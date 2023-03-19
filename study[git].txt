@@ -1,0 +1,95 @@
+study[git].txt
+[20230316]
+지역저장소 <-->  깃허브(원격 저장소)
+git init - 해당프로젝트를 깃 지역 저장소로 저장
+git add - 수정한 파일을 스테이징 영역으로 옮긴다
+git commit - 지역저장소에 저장한다
+git push -  원격저장소에 반영한다
+git status - 
+
+
+git clone - 지역저장소에 내려받는다
+git pull - 일부변경사항만 내려받는다
+
+git add 반영목록\ 20230316.txt     //반영목록을 추가한다 
+git commit -m "test commit"        //커밋이름같다
+git branch -M distribution         //브랜취 이름 정해줬다
+git push origin distribution              //깃허브에 올렸다.
+
+<?? 1> branch 해줄때도 이름이 필요한가... 현재 터미널로 하면 잘되는데 UI로 하면 잘 안된다... 
+하나씩이야 하겠는데 파일이 많으면 어쩔려구.
+<?? 2> 파일을 이름을 바꿨다...
+
+[20230317]
+-- ls -a   //하면 지역저장소의 폴더 내부를 볼수 있다.
+
+-- 깃 시작하면
+   - 사용자등록 
+     : git config user.name "사용자 이름"
+     : git config user.email "이메일 주소"
+     : 저장소폴더에서 
+       git config user.name "사용자 이름"
+       git config user.email "사용자 이름"
+
+-- 깃 설정 파일 확인
+    - cat .git/config
+
+    ex)
+[core]
+        repositoryformatversion = 0
+        filemode = false
+        bare = false
+        logallrefupdates = true
+        symlinks = false
+        ignorecase = true
+[user]
+        name = kim779
+[remote "origin"]
+        url = https://github.com/kim779/study.git
+        fetch = +refs/heads/*:refs/remotes/origin/*
+[branch "branch1"]
+        remote = origin
+        merge = refs/heads/distribution
+
+-- 깃 원격 저장소 설정
+    홈페이지 가서 레파지토리 하나 생성한뒤 거기서 알려주는 URL를 복사해온다.
+    터미널에서 
+    git remote add origin 복사해온URL
+    ex) git remote add origin "https://github.com/kim779/study.git"
+
+    위처럼 등록 해주면 
+    cat .git/config 해서 보면 아래처럼 추가되있는것을 확인해볼수 있다
+
+    [remote "origin"]
+        url = https://github.com/kim779/study.git
+        fetch = +refs/heads/*:refs/remotes/origin/*
+
+
+   .gitignore 파일 설정
+    ex)
+    #log     //여기서 #은 주석이다
+    logs 
+    *.log 
+
+    #dependency directoies
+    node_modykes/
+
+
+-- 깃작업트리
+-작업디렉터리 : 실제 작업중인 파일들이 존재하는 영역. 소스 수정하고 그런영역이다
+
+-스테이징디렉터리 : 작업 디렉터리에서 작업중인 파일중 깃이 추적하는 파일들을 식별하는 영역
+실제로는 .git의 숨김폴더 내부의 index 파일에서 추적하는 파일들을 식별하고 있습니다.
+-지역저장소: 스테이징 영역에서 추적되는 파일이 커밋으로 등록되는 영역. 즉 스테이징 영역의
+파일 혹은 파일들이 하나의 변경 단위인 커밋으로 등록되는 과정이다
+
+
+[20230319]
+1- 깃허브에 가서 branch를 설정가능하다(디폴트를 설정하거나, 다른 브랜치를 지우거나)    
+2- 커밋한 내용을 수정하고 싶을때
+   커밋이 되있는상태에서 파일을 수정한뒤 
+   git commit --amend --no-edit
+   스테이징 된상태에서 하는거 아닌가
+   
+     
+
