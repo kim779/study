@@ -44,6 +44,29 @@ git push "원격저장소식별자" "브랜치"
 
 git clone
 
+git clone으로 원격저장소의 특정폴더만 내려받기
+1) 본인 피씨에 폴더 만든다
+2) vcs 에서 cd 만든폴더 가서
+git init testclone
+위처럼 치면 내부에 testclone이라는 폴더 생기고 그안에 .git 이 생긴다
+
+git config core.sparseCheckout true
+
+git remote add -f origin https://github.com/kim779/IBK-git.git
+위처럼 치면 
+
+Updating origin
+remote: Enumerating objects: 20358, done.
+remote: Total 20358 (delta 0), reused 0 (delta 0), pack-reused 20358
+Receiving objects: 100% (20358/20358), 891.74 MiB | 10.75 MiB/s, done.
+Resolving deltas: 100% (10917/10917), done.
+From https://github.com/kim779/IBK-git
+ * [new branch]        b_ibk      -> origin/b_ibk
+
+ 위처럼 알아서 한다
+
+ git pull origin 브랜치명
+
 
 git branch -a
 	브랜치 정보 보기
@@ -65,3 +88,6 @@ git branch -d mergeTestBarnch
 
 git push origin :mergeTestBranch
     원격저장소의 브랜치(mergeTestBranch)를 를 삭제한다 
+
+rm -r testclone   
+    폴더를 삭제한다 (testclone)
