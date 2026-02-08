@@ -1,0 +1,411 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB190930)
+MAPSIZE(198, 604)
+VERSION(001)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("시간대별 시세")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(FMS|FLASH)
+TITLE("[190930] 시간대별 시세")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pooppoop")
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL(0, 0, 604, 49)        COLOR(66, 130)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+GROUP  GP1(650, 99, 672, 119)  'Group'        COLOR(-1, 0)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  HCOD(650, 8, 720, 32)  AL_LEFT  CUR(0)      COLOR(194, 0)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  TRIGGER_HOST(650, 128, 696, 145)  AL_LEFT  CUR(0)      COLOR(230, 0)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  2021(650, 41, 709, 64)  LEN(12)  IO_ALPHA|AL_CENTER||FA_FLASH    COLOR(203, 1)  CUR(0)            TABORDER(0)  IOORDER(1)  &
+  HINTTYPE(IH_NONE)
+OUT  2023(44, 26, 106, 46)  LEN(8)  IO_NUM|AL_RIGHT||FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSUP    COLOR(68, 69)  CUR(0)  LINECOLOR(75)          IFRGB(94, 95)  TABORDER(0)  IOORDER(10)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  2030(231, 26, 293, 46)  LEN(8)  IO_NUM|AL_RIGHT||FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSUP    COLOR(68, 69)  CUR(0)  LINECOLOR(75)          IFRGB(94, 95)  TABORDER(0)  IOORDER(12)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  2031(324, 26, 386, 46)  LEN(8)  IO_NUM|AL_RIGHT||FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSUP    COLOR(68, 69)  CUR(0)  LINECOLOR(75)          IFRGB(94, 95)  TABORDER(0)  IOORDER(13)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  11306(650, 214, 709, 233)  LEN(2)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("00")          TABORDER(11)  IOORDER(4)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  BUTTON0(68, 3, 87, 23)  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(15, 130)  CUR(0)    "검색.bmp"    TABORDER(2)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+CONTROL  17413(88, 3, 239, 23)    "CX_Symbol"  "/a89/b91/c92/d69"  LEN(0)  EDIT_OUTPUT    COLOR(90, 130)  TABORDER(0)  IOORDER(9)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON1(452, 3, 500, 23)  '차트'  TP_PUSH|IMAGETEXT|AL_STRETCH        FOCUS  COLOR(64, 186)  CUR(0)    "3BTN.BMP"    TABORDER(7)  ENABLE  &
+  IMAGETEXT  HINTTYPE(IH_NONE)
+OBJECT  OBJ(0, 49, 604, 198)    "IB19093A"  TABORDER(12)  IOORDER(14)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  2029(137, 26, 199, 46)  LEN(8)  IO_NUM|AL_RIGHT||FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSUP    COLOR(68, 69)  CUR(0)  LINECOLOR(75)          IFRGB(94, 95)  TABORDER(0)  IOORDER(11)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON3(623, 212, 642, 232)  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(208, 186)  CUR(0)    "관심.BMP"    TABORDER(3)  ENABLE  &
+  IMAGETEXT  HINTTYPE(IH_NONE)
+PANEL  PANEL1(3, 26, 45, 46)  '현재가'  LINECOLOR(75)      COLOR(96, 97)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL02(104, 26, 138, 46)  '시가'  LINECOLOR(75)      COLOR(96, 97)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL2(198, 26, 232, 46)  '고가'  LINECOLOR(75)      COLOR(96, 97)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL3(292, 26, 326, 46)  '저가'  LINECOLOR(75)      COLOR(96, 97)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  is_real(394, 7, 444, 19)  '실시간'  TP_CHECK|EDIT_NOP        FONT("굴림체", 9, NORMAL)  COLOR(69, 130)  CUR(0)      TABORDER(6)  ENABLE  &
+  VISIBLE  CHECKED  TRANSPARENT  HINTTYPE(IH_STRING)  HELPTEXT("실시간 체결데이터 수신")HELPTEXT("실시간 체결데이터 수신")
+EDIT  11309(242, 3, 330, 23)  LEN(8)  IO_NUM|EDIT_INPUT|FA_SKIP|FA_DATE    COLOR(99, 130)  CUR(0)  TP_SUNKEN  INIT("00000000")          EDITFORMAT("9999/99/99")  TABORDER(4)  IOORDER(5)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+COMBO  cb_Freq(332, 3, 386, 22)  TP_SUNKEN  LEN(2)  COUNT(4)  VCOUNT(4)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_NUM|EDIT_INPUT|FA_SKIP    COLOR(68, 130)  CUR(0)  DISPLAY("틱", "1분", "5분", "10분")  DATA("00", "01", "05", "10")    TABORDER(5)  IOORDER(6)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+CONTROL  jcod(3, 3, 68, 23)  |FA_PROTECT|FA_SKIP  "CX_CODECTRL"  "/u0/k검색.BMP/lAXCOMBO.BMP/p/s0/o"  LEN(6)  EDIT_INPUT    COLOR(192, 130)  TABORDER(1)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  etime(504, 26, 544, 46)  LEN(4)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_SUNKEN          EDITFORMAT("99:99")  TABORDER(10)  IOORDER(8)  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  stime(452, 26, 492, 46)  LEN(4)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_SUNKEN          EDITFORMAT("99:99")  TABORDER(9)  IOORDER(7)  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL0(492, 26, 502, 46)  '~'  AL_CENTER  CUR(0)      COLOR(168, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  range(394, 26, 444, 46)  '시간대'  TP_CHECK|EDIT_NOP          COLOR(208, 232)  CUR(0)      TABORDER(8)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  1301(630, 168, 695, 188)  LEN(6)  IO_MIXED|EDIT_INOUT|CODE      COLOR(192, 130)  CUR(0)  TP_SUNKEN  CURSOR        TABORDER(13)  IOORDER(2)  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Dim real_f, count
+real_f = True
+'-----------------------------------------------------------------------
+Sub send_f()
+	range.Checked = False
+	stime.Enable = False
+
+	etime.Enable = False
+
+	is_real.Checked = True
+	stime.Data = "0730"
+
+	jcod.Data = SCREEN.object("main.1301").Data
+	S1301.Data = jcod.Data
+	If Trim(jcod.Data) = "000000" Or Trim(jcod.Data) = "" Then
+		SCREEN.OnSend False
+		Exit Sub
+	End If
+	SCREEN.Send 0
+End Sub
+'-----------------------------------------------------------------------
+Sub SetDate(StrDate)
+	S11309.Data = StrDate
+	'SYSTEM.Trace StrDate & "|"
+End Sub
+'-----------------------------------------------------------------------
+Function GetToday()
+	YY = Year(Date)
+	MM = Month(Date)
+	If Len(MM) = 1 Then
+		MM = "0" & MM
+	End If
+	DD = Day(Date)
+	If Len(DD) = 1 Then
+		DD = "0" & DD
+	End If
+	GetToday = YY & MM & DD
+End Function
+'-----------------------------------------------------------------------
+Sub Onalert()
+	If is_real.Checked = False Then
+		Exit Sub
+	End If
+End Sub
+'-----------------------------------------------------------------------
+Sub IsReal_check()
+	If is_real.Checked = False Then
+		SCREEN.Object("OBJ.1301").Clear
+		SCREEN.Object("OBJ.1021").Clear
+	Else
+		SCREEN.Object("OBJ.1301").Data = S1301.Data
+		SCREEN.Object("OBJ.1021").Data = "A" + S1301.Data
+
+		'ELW인지 주식종목인지 구별
+		If Trim(S1301.Data) <> "" Then
+
+			If IsNumeric(Left(Trim(S1301.Data), 1)) = False Then
+				Exit Sub
+			End If
+
+			If Trim(SCREEN.GetCodeType(S1301.Data)) = "27" Then	'ETN은 'Q'로 시작함
+				SCREEN.Object("OBJ.1021").Data = "Q" & S1301.Data
+			Else
+				If Left(Trim(S1301.Data), 1) < 5 Or Left(Trim(S1301.Data), 1) > 8 Then
+					SCREEN.Object("OBJ.1021").Data = "A" + S1301.Data
+				Else
+					SCREEN.Object("OBJ.1021").Data = "J" + S1301.Data
+				End If
+			End If
+		End If
+
+
+	End If
+End Sub
+
+_AW_ONINDECLARE_AW_
+#load IB888888
+
+_AW_ONENDSUB_AW_
+_AW_ONSTART_AW_
+stime.Data = "0730"
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+If range.Checked = True Then
+	stime.Enable = True
+	etime.Enable = True
+Else
+	stime.Enable = False
+	etime.Enable = False
+End If
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+'If S11309.Data = GetToday Then
+'	is_real.Checked = True
+'	is_real.Enable = True
+'	Call IsReal_check()
+'Else
+'	is_real.Checked = False
+'	is_real.Enable = False
+'	Call IsReal_check()
+'End If
+
+'Call IsReal_check()
+OBJ.Send
+
+_AW_ONENDSUB_AW_
+_AW_ONKEY_AW_
+If SCREEN.Key = 13 Then
+	SCREEN.OnSend False
+End If
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(2023)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(2030)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(2031)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON0)
+_AW_ONCLICK_AW_
+Dim retn
+retn = SCREEN.GetCode(100, "jcod", "hnam", 0 )
+If retn <> True Then
+       Exit Sub
+End If
+
+range.Checked = False
+stime.Enable = False
+etime.Enable = False
+stime.Data = "0730"
+is_real.Checked = True
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON1)
+_AW_ONCLICK_AW_
+S11306.data = cb_Freq.Data
+If Trim(S11306.Data) = "00" Then
+	If Trim(BUTTON1.Text) = "차트" Then
+		OBJ.SetObject "IB200720"
+		BUTTON1.Text = "데이터"
+	Else
+		OBJ.SetObject "IB200710"
+		BUTTON1.Text = "차트"
+	End If
+Else
+	If Trim(BUTTON1.Text) = "차트" Then
+		OBJ.SetObject "IB200723"
+		BUTTON1.Text = "데이터"
+	Else
+		OBJ.SetObject "IB200711"
+		BUTTON1.Text = "차트"
+	End If
+End If
+
+OBJ.Send
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(2029)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON3)
+_AW_ONCLICK_AW_
+'Dim mapname, data
+'
+'mapname = "IB202200" & "/d"
+'data = "appendCODE" & vbTab & S1301.Data & vbLf
+'
+'SCREEN.CreateWindow 1, mapname, data
+
+SCREEN.CreateWindow 1, "IB202201 /t/s/p5/d", "appendCODE" & _
+			vbTab & S1301.Data & vbLf
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(is_real)
+_AW_ONCLICK_AW_
+Call IsReal_check()
+stime.Data = "0730"
+range.Checked = False
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(11309)
+_AW_ONCHANGE_AW_
+If S11309.Data = GetToday Then
+	If range.Checked = False Then
+		is_real.Checked = True
+		is_real.Enable = True
+		Call IsReal_check()
+	End If
+Else
+	is_real.Checked = False
+	is_real.Enable = False
+	Call IsReal_check()
+End If
+
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(cb_Freq)
+_AW_ONCHANGE_AW_
+real_f = True
+S11306.data = cb_Freq.Data
+If Trim(S11306.Data) = "00" Then
+	If Trim(BUTTON1.Text) = "차트" Then
+		OBJ.SetObject "IB19093A"
+	Else
+
+		OBJ.SetObject "IB200720"
+	End If
+Else
+	If Trim(BUTTON1.Text) = "차트" Then
+		OBJ.SetObject "IB19093B"
+	Else
+
+		OBJ.SetObject "IB200723"
+	End If
+End If
+
+OBJ.Send
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(jcod)
+_AW_ONCHANGE_AW_
+Dim codx
+codx = Trim(jcod.Data)
+If codx = "000000" Or codx = "" Or Len(codx) <> 6 Then
+	SCREEN.ClearAll 0, 2
+	OBJ.ClearAll 2
+	Exit Sub
+End If
+S1301.Data = jcod.Data
+SCREEN.Object("main.1301").Data = jcod.Data
+SCREEN.Proc "main.code_change", "main"
+jcod.SetFocus
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(etime)
+_AW_ONCHANGE_AW_
+If Len(Trim(etime.data)) <> 4 Then
+	MsgBox "조회시간을 확인하여 주십시오", 0, "IBK 투자증권"
+	etime.Setfocus
+	Exit Sub
+Else
+	OBJ.Send
+End If
+_AW_ONENDSUB_AW_
+_AW_ONKEYCHANGE_AW_
+If SCREEN.Key = 13 Then
+	obj0.Send
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(stime)
+_AW_ONCHANGE_AW_
+If Len(Trim(stime.data)) <> 4 Then
+	MsgBox "조회시간을 확인하여 주십시오", 0, "IBK 투자증권"
+	stime.Setfocus
+End If
+
+If Trim(etime.data) <> "" Then
+	If CLng(stime.data) > CLng(etime.data) Then
+		MsgBox "조회시작 시간이 끝시간보다 더 늦은 시간 입니다.", 0, "IBK 투자증권"
+		Exit Sub
+	End If
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(range)
+_AW_ONCLICK_AW_
+If range.Checked = True Then
+	stime.Enable = True
+	etime.Enable = True
+	is_real.Checked = False
+	S2021.Clear
+Else
+	stime.Enable = False
+	etime.Enable = False
+	If S11309.Data = GetToday Then
+		is_real.Checked = True
+		is_real.Enable = True
+	End If
+	stime.Data = "0730"
+	SCREEN.Send 0
+End If
+stime.SetFocus
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

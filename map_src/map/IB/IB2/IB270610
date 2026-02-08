@@ -1,0 +1,158 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB270610)
+MAPSIZE(625, 889)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Æ÷Å» Á¾¸ñ°Ô½ÃÆÇ")
+MAPPUBLIC(";")
+FONT("±¼¸²", 9, NORMAL)
+OPTIONS(FMS)
+TITLE("Æ÷Å» Á¾¸ñ°Ô½ÃÆÇ")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pooppoop")
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL0(0, 0, 1003, 26)  LINECOLOR(67)      COLOR(66, 67)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  1301(2, 3, 67, 23)  LEN(6)  IO_MIXED|EDIT_INOUT|FA_WRAP|FA_HAN|CODE    FONT("±¼¸²Ã¼", 9, NORMAL)    COLOR(99, 130)  CUR(0)  TP_SUNKEN          TABORDER(1)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON0(67, 3, 86, 23)  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(15, 63)  CUR(0)    "°Ë»ö.BMP"    TABORDER(2)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+CONTROL  17413(88, 3, 221, 23)    "CX_Symbol"  "/a89/b91/c92/d69"  LEN(0)  EDIT_OUTPUT  FONT("±¼¸²Ã¼", 9, NORMAL)    COLOR(90, 130)  TABORDER(0)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BROWSER  BROWSER0(1, 28, 889, 623)  EDIT_NOP    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+GROUP  gp1(605, 145, 725, 195)  'Group'        COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  RADIO0(255, 3, 319, 24)  'ÆÅ½º³Ý'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(gp1)      COLOR(67, 232)  CUR(0)      TABORDER(3)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  RADIO1(319, 3, 383, 24)  '³×ÀÌ¹ö'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(gp1)      COLOR(67, 232)  CUR(0)      TABORDER(4)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  RADIO2(382, 3, 446, 24)  '¿¢½º¿ø'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(gp1)      COLOR(67, 232)  CUR(0)      TABORDER(5)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON1(791, 2, 836, 24)  '<-'  TP_PUSH|IMAGETEXT|AL_STRETCH        FOCUS  COLOR(208, 232)  CUR(0)    "2BTN.BMP"    TABORDER(6)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Const myFILE = "userconf.ini"
+
+Sub LoadConfig()
+	If SCREEN.CreateObject("INFO") Then
+		RADIO0.Checked = CBool(Trim(INFO.PopData(LOGIN.Name, myFILE, SCREEN.GetMapName(0), "RADIO0"))="True")
+		RADIO1.Checked = CBool(Trim(INFO.PopData(LOGIN.Name, myFILE, SCREEN.GetMapName(0), "RADIO1"))="True")
+		RADIO2.Checked = CBool(Trim(INFO.PopData(LOGIN.Name, myFILE, SCREEN.GetMapName(0), "RADIO2"))="True")
+		If Not RADIO0.Checked And Not RADIO1.Checked And Not RADIO2.Checked Then
+			RADIO0.Checked = True
+		End If
+	End If
+End Sub
+
+Sub SaveConfig()
+	If SCREEN.CreateObject("INFO") Then
+		INFO.PushData LOGIN.Name, myFILE, SCREEN.GetMapName(0), "RADIO0", ""&RADIO0.Checked
+		INFO.PushData LOGIN.Name, myFILE, SCREEN.GetMapName(0), "RADIO1", ""&RADIO1.Checked
+		INFO.PushData LOGIN.Name, myFILE, SCREEN.GetMapName(0), "RADIO2", ""&RADIO2.Checked
+	End If
+End Sub
+
+Sub Navigate()
+	If Trim(S1301.Data) <> "" Then
+		If RADIO0.Checked Then
+			BROWSER0.Navigate("http://board4.moneta.co.kr/cgi-bin/paxBulletin/bulList.cgi?code=" + Trim(S1301.Data) + "&boardid="  + Trim(S1301.Data) + "&frame=analysis")
+		ElseIf RADIO1.Checked Then
+			BROWSER0.Navigate("http://stock.naver.com/item/board.nhn?code=" + Trim(S1301.Data))
+		ElseIf RADIO2.Checked Then
+			BROWSER0.Navigate("http://dis4.x1.co.kr/bbs/real_stockMainList.do?boardId=" + Trim(S1301.Data))
+		End If
+	End If
+End Sub
+
+_AW_ONSTART_AW_
+Call LoadConfig()
+Call Navigate()
+
+_AW_ONENDSUB_AW_
+_AW_ONTIMER_AW_
+BROWSER0.Navigate("javascript:history.back();")
+
+_AW_ONENDSUB_AW_
+_AW_ONCLOSE_AW_
+Call SaveConfig()
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(1301)
+_AW_ONCHANGE_AW_
+If Trim(S1301.Data) = "000000" Or Trim(S1301.Data) = "" Then
+	Exit Sub
+End If
+S1301.Trigger "",True
+SCREEN.Send 0
+Call Navigate()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON0)
+_AW_ONCLICK_AW_
+Dim retn
+retn = SCREEN.GetCode(100, "1301", "hnam", 0 )
+If retn <> True Then
+       Exit Sub
+End If
+
+SCREEN.Send 2
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(RADIO0)
+_AW_ONCLICK_AW_
+Call Navigate()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(RADIO1)
+_AW_ONCLICK_AW_
+Call Navigate()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(RADIO2)
+_AW_ONCLICK_AW_
+Call Navigate()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON1)
+_AW_ONCLICK_AW_
+BROWSER0.Navigate("javascript:history.back();")
+SCREEN.SetTimer 0, True
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

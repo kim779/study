@@ -1,0 +1,686 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB201500)
+MAPSIZE(536, 1192)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("굴림", 9, NORMAL)
+TITLE("[2015] 업종 전광판")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL5(1186, 56, 1190, 529)        COLOR(68, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL4(0, 525, 1192, 535)        COLOR(68, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL14(0, 51, 1192, 63)        COLOR(68, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL12(0, 56, 6, 529)        COLOR(68, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL99(0, 0, 1200, 50)        COLOR(66, 69)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL2(125, 5, 149, 25)  '업종'  AL_CENTER  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(194, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  20301(150, 5, 196, 25)  LEN(3)  IO_NUM|EDIT_INPUT|FA_WRAP|CODE    FONT("굴림체", 9, NORMAL)    COLOR(68, 130)  CUR(0)  TP_SUNKEN  INIT("001")          TABORDER(1)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  UBUT(196, 5, 215, 25)  TP_PUSH|IMAGE|AL_STRETCH      COLOR(68, 130)  CUR(0)    "검색.BMP"    TABORDER(2)  ENABLE  &
+  VISIBLE  IMAGE  HOVER  HINTTYPE(IH_NONE)
+COMBO  cb_Sort(214, 5, 299, 25)  TP_SUNKEN  LEN(1)  COUNT(5)  VCOUNT(5)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_NUM|EDIT_INPUT    COLOR(68, 69)  CUR(0)  DISPLAY("종목코드순", "종목명순", "상승률순", "거래량순", "시가총액순")  DATA("0", "1", "2", "3", "4")    TABORDER(3)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  ck_DataTp(385, 7, 452, 26)  '예상체결'  TP_CHECK|EDIT_NOP          COLOR(66, 130)  CUR(0)      TABORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  bt_Next(1101, 27, 1190, 47)  '다음(PageDown)'  TP_USER|IMAGETEXT|AL_STRETCH    KEYMAP(PAGEDN)    FONT("굴림체", 9, NORMAL)  FOCUS  COLOR(208, 186)  CUR(0)    "6BTN.BMP"    TABORDER(5)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+BUTTON  bt_Prev(1016, 27, 1100, 47)  '이전(PageUp)'  TP_USER|IMAGETEXT|AL_STRETCH    KEYMAP(PAGEUP)    FONT("굴림체", 9, NORMAL)  FOCUS  COLOR(208, 186)  CUR(0)    "6BTN.BMP"    TABORDER(6)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+BUTTON  bt_Column(330, 5, 376, 25)  '거래량'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, NORMAL)  FOCUS  COLOR(208, 186)  CUR(0)    "2BTN.BMP"    TABORDER(7)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+PANEL  PANEL2(0, 0, 1, 50)        COLOR(64, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  SUBMAP(6, 59, 1188, 528)    "IB201510"  TABORDER(8)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL0(1191, 0, 1194, 50)        COLOR(64, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  UPJM(6, 29, 446, 48)    "IB201501"  TABORDER(9)  IOORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  JMOBJ(530, 29, 820, 48)    "IB201502"  TABORDER(10)  IOORDER(5)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  r_kospi(9, 6, 64, 25)  '코스피'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(GP1)    FONT("굴림체", 9, NORMAL)  COLOR(68, 130)  CUR(0)      TABORDER(11)  ENABLE  &
+  VISIBLE  CHECKED  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  r_kosdaq(64, 6, 119, 25)  '코스닥'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(GP1)    FONT("굴림체", 9, NORMAL)  COLOR(68, 130)  CUR(0)      TABORDER(12)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+PANEL  PANEL6(4, 5, 124, 25)  LINECOLOR(165)      COLOR(66, 130)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+GROUP  GP1(70, 551, 120, 572)  'Group'        COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  TOTPAGE(998, 29, 1018, 48)  'B'  AL_LEFT  CUR(0)      COLOR(66, 232)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  CURPAGE(976, 29, 996, 48)  'A'  AL_LEFT  CUR(0)      COLOR(66, 232)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL0(1009, 29, 1019, 48)  ')'  AL_LEFT  CUR(0)      COLOR(66, 232)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL1(934, 29, 978, 48)  '(Page:'  AL_LEFT  CUR(0)      COLOR(66, 232)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL3(988, 28, 998, 47)  '/'  AL_LEFT  CUR(0)      COLOR(66, 232)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  1301(130, 555, 195, 575)  LEN(6)  IO_MIXED|EDIT_INOUT|FA_HAN|CODE      COLOR(192, 130)  CUR(0)  TP_SUNKEN  CURSOR        TABORDER(13)  IOORDER(6)  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL4(470, 7, 1130, 26)  '구분   :   ! 권리락   / 액면분할(병합)   $ 투자유의   % 감리(이상급등)   & 관리   ＠ 불성실공시   × 거래정지'  AL_LEFT  CUR(0)      COLOR(66, 232)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL5(470, 29, 530, 48)  '등락   :   '  AL_LEFT  CUR(0)      COLOR(66, 232)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  autopage(833, 30, 933, 49)  '자동페이지전환'  TP_CHECK|EDIT_NOP          COLOR(66, 130)  CUR(0)      TABORDER(14)  ENABLE  &
+  VISIBLE  CHECKED  HINTTYPE(IH_NONE)
+PANEL  PANEL1(-2, 52, 1194, 537)  LIMAGE(0)  LINEW(4)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+PANEL  PANEL3(0, 50, 1192, 52)        COLOR(64, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  CHECK0(40, 645, 102, 664)  '!권리락'  TP_CHECK|EDIT_NOP          COLOR(66, 130)  CUR(0)      TABORDER(15)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  CHECK1(100, 645, 207, 664)  '/액면분할(병합)'  TP_CHECK|EDIT_NOP          COLOR(66, 130)  CUR(0)      TABORDER(16)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  CHECK2(206, 645, 281, 664)  '$투자유의'  TP_CHECK|EDIT_NOP          COLOR(66, 130)  CUR(0)      TABORDER(17)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  CHECK3(281, 645, 392, 664)  '%감리(이상급등)'  TP_CHECK|EDIT_NOP          COLOR(66, 130)  CUR(0)      TABORDER(18)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  CHECK4(393, 645, 444, 664)  '&관리'  TP_CHECK|EDIT_NOP          COLOR(66, 130)  CUR(0)      TABORDER(19)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  CHECK5(446, 645, 536, 664)  '＠불성실공시'  TP_CHECK|EDIT_NOP          COLOR(66, 130)  CUR(0)      TABORDER(20)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  CHECK6(535, 645, 612, 664)  '×거래정지'  TP_CHECK|EDIT_NOP          COLOR(66, 130)  CUR(0)      TABORDER(21)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  CHECK7(613, 645, 658, 664)  '일반'  TP_CHECK|EDIT_NOP          COLOR(66, 130)  CUR(0)      TABORDER(22)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON0(1154, 5, 1190, 25)  '설정'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, NORMAL)  FOCUS  COLOR(208, 186)  CUR(0)    "2BTN.BMP"    TABORDER(23)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+BUTTON  infobt(1063, 5, 1153, 25)  '관심종목등록'  TP_USER|IMAGETEXT|AL_STRETCH    KEYMAP(PAGEUP)    FONT("굴림체", 9, NORMAL)  FOCUS  COLOR(208, 186)  CUR(0)    "6BTN.BMP"    TABORDER(24)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+COMBO  infocb(1066, 25, 1152, 65)  TP_SUNKEN  LEN(2)  COUNT(0)  VCOUNT(0)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_MIXED|EDIT_INPUT|FA_SKIP    COLOR(68, 69)  CUR(0)    TABORDER(25)  IOORDER(7)  ENABLE  &
+  HINTTYPE(IH_NONE)
+CONTROL  cxMarket(300, 5, 320, 25)  |FA_SKIP  "CX_MarketPicker"  "/k2/tIB201500/u1/d1"  LEN(12)  EDIT_NOP    COLOR(192, 232)  TABORDER(0)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  edMarketTrigger(1305, 16, 1337, 36)  LEN(6)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(26)  IOORDER(8)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL6(1240, 16, 1300, 36)  '거래소'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Dim IsFirst
+Dim strx, str
+
+IsFirst = "1"
+'-----------------------------------------------------------------------
+Sub SetIsFirst(Value)
+	IsFirst = Value
+End Sub
+'-----------------------------------------------------------------------
+Function GetIniData(Section, Default)
+	Data = ""
+	If SCREEN.CreateObject("Info") Then
+		Data = Trim(INFO.PopData(LOGIN.Name, "userconf.ini", "IB201500", Section))
+		If Len(Data) = 0 Then
+			INFO.PushData LOGIN.Name, "userconf.ini", "IB201500", Section, Default
+			Data = Default
+		End If
+	End If
+	GetIniData = Data
+End Function
+'-----------------------------------------------------------------------
+Sub SetIniData(Section, Data)
+	If SCREEN.CreateObject("Info") Then
+		INFO.PushData LOGIN.Name, "userconf.ini", "IB201500", Section, Data
+	End If
+End Sub
+'-----------------------------------------------------------------------
+Sub ChangeGrid()
+	SCREEN.Proc "SUBMAP.ch_grid", ""
+End Sub
+
+
+Sub Onstart()
+	SCREEN.OnSend = False
+	SCREEN.IgnoreChange True
+
+	'종목코드
+	UpCd = GetIniData("UPCD", "001")
+	S20301.Data = UpCd
+
+
+	SCREEN.Object("UPJM.20301").DATA = S20301.Data
+	UPJM.Send
+
+	SCREEN.Object("JMOBJ.20301").data = S20301.Data
+	JMOBJ.Send
+
+	If r_kospi.Checked = True Then
+		SCREEN.Object("JMOBJ.20301").data = "001"
+	Else
+		SCREEN.Object("JMOBJ.20301").data = "201"
+	End If
+
+	'자동페이지전환
+	Index = GetIniData("AOTOCHECK", "1")
+	If Index = "0" Then
+		autopage.Checked = False
+	End If
+
+	'코스피여부
+	Index = GetIniData("ISKOSPI", "1")
+	If Index = "1" Then
+		r_kospi.Checked = True
+		r_kosdaq.Checked = False
+	Else
+		r_kospi.Checked = False
+		r_kosdaq.Checked = True
+	End If
+
+	'정렬
+	Index = GetIniData("SORT", "0")
+	cb_Sort.Index = Index
+
+	'거래량여부
+	Data = GetIniData("ISVOL", "거래량")
+	bt_Column.Text = Data
+	ChangeGrid
+
+	'예상체결
+	Data = GetIniData("ISYE", "0")
+	If Data = "1" Then
+		ck_DataTp.Checked = True
+		SUBMAP.SetObject("IB201520")
+		SCREEN.Object("SUBMAP.ed_DataTp").Data = "1"
+	Else
+		ck_DataTp.Checked = False
+		SUBMAP.SetObject("IB201510")
+		SCREEN.Object("SUBMAP.ed_DataTp").Data = "0"
+	End If
+
+
+
+	JMOBJ.Send
+	SUBMAP.Send
+
+	'If SCREEN.CreateObject("Info") Then
+
+	'	IsKospi = Trim(INFO.PopData(LOGIN.Name, "userconf.ini", "IB201500", "ISKOSPI"))
+	'	If Len(IsKospi) = 0 Then
+	'		INFO.PushData LOGIN.Name, "userconf.ini", "IB201500", "ISKOSPI", "1"
+	'		IsKospi = "1"
+	'	Else
+	'		If IsKospi = "1" Then
+	'			r_kospi.Checked = True
+	'			r_kosdaq.Checked = False
+	'		Else
+	'			r_kospi.Checked = False
+	'			r_kosdaq.Checked = True
+	'		End If
+	'	End If
+	'End If
+
+	IsFirst = "0"
+	SCREEN.IgnoreChange False
+End Sub
+
+Sub CloseIB202201()
+	For i=0 To 3
+		For ii=1 To SCREEN.Object("SUBMAP.GRID"&i).Rows
+			SCREEN.Object("SUBMAP.GRID"&i).setgridcell ii, 3, 0
+		Next
+	Next
+End Sub
+
+Sub Change_MKGubn_Main(sMKGubn)
+	cxMarket.sMarket = sMKGubn
+	SUBMAP.Send
+End Sub
+
+_AW_ONINDECLARE_AW_
+#load IB888888
+
+_AW_ONENDSUB_AW_
+_AW_ONSTART_AW_
+' 현재 화면의 시장식별자(cxMarket)에 고유 화면번호 부여
+cxMarket.MNum = SCREEN.GetMapName(1)
+cxMarket.Major = SCREEN.Major
+
+Call Onstart()
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+SCREEN.OnSend = False
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(20301)
+_AW_ONCHANGE_AW_
+If IsFirst = "1" Then
+	Exit Sub
+End If
+
+Dim	cod
+Dim r_upgb
+If (Len(Trim(S20301.Data)) <> 3) Then
+	S20301.SetFocus
+	Exit Sub
+Else
+	r_upgb = P_GetBigCd(S20301.Data)
+'	SYSTEM.Trace r_upgb
+	Select Case r_upgb
+		Case "101"
+		Case "401"
+		Case "001"		'KOSPI
+			r_kospi.Checked = True
+			r_kosdaq.Checked = False
+			SetIniData "ISKOSPI", "1"
+		Case "301"
+		Case "201"		'KOSDAQ
+			r_kospi.Checked = False
+			r_kosdaq.Checked = True
+			SetIniData "ISKOSPI", "0"
+		Case Else
+		   S20301.Data = "001"
+		   r_kospi.Checked = True
+		   r_kosdaq.Checked = False
+		   SetIniData "ISKOSPI", "1"
+	End Select
+
+	SCREEN.Object("SUBMAP.ed_TrTp").Data = "0"
+	SUBMAP.Send
+	SCREEN.Object("UPJM.20301").DATA = S20301.Data
+	UPJM.Send
+	SCREEN.Object("JMOBJ.20301").data = S20301.Data
+	JMOBJ.Send
+	SetIniData "UPCD", S20301.Data
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(UBUT)
+_AW_ONCLICK_AW_
+Dim retn, upcd
+
+If r_kospi.Checked Then
+	upcd = "001"
+Else
+	upcd = "201"
+End If
+
+SCREEN.IgnoreChange True
+Select Case upcd
+	Case "001", "101", "401"		'KOSPI, KOSPI200, KOSPI100
+		retn = SCREEN.GetCode(104, "20301", "20022", 0)
+	Case "201", "301"							'KOSDAQ
+		retn = SCREEN.GetCode(104, "20301", "20022", 9)
+End Select
+SCREEN.IgnoreChange False
+
+S20301.SetFocus
+SCREEN.Object("SUBMAP.ed_TrTp").Data = "0"
+SUBMAP.Send
+SCREEN.Object("UPJM.20301").DATA = S20301.Data
+UPJM.Send
+SCREEN.Object("JMOBJ.20301").data = S20301.Data
+JMOBJ.Send
+SetIniData "UPCD", S20301.Data
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(cb_Sort)
+_AW_ONCHANGE_AW_
+SCREEN.Object("SUBMAP.ed_TrTp").Data = "0"
+SUBMAP.Send
+SetIniData"SORT", cb_Sort.Data
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(ck_DataTp)
+_AW_ONCLICK_AW_
+If ck_DataTp.Checked Then
+	SUBMAP.SetObject("IB201520")
+	SCREEN.Object("SUBMAP.ed_DataTp").Data = "1"
+	SUBMAP.Send
+	SetIniData "ISYE", "1"
+Else
+	SUBMAP.SetObject("IB201510")
+	SCREEN.Object("SUBMAP.ed_DataTp").Data = "0"
+	SUBMAP.Send
+	SetIniData "ISYE", "0"
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(bt_Next)
+_AW_ONCLICK_AW_
+SCREEN.Object("SUBMAP.ed_TrTp").Data = "2"
+
+'Call CloseIB202201()
+
+If CURPAGE.Data = TOTPAGE.Data Then
+	SCREEN.Object("SUBMAP.ed_NextCk").Data = "00000"
+Else
+	SCREEN.Object("SUBMAP.ed_NextCk").Data = SCREEN.Object("SUBMAP.ot_NextCk").Data
+End If
+
+SUBMAP.Send
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(bt_Prev)
+_AW_ONCLICK_AW_
+SCREEN.Object("SUBMAP.ed_TrTp").Data = "1"
+
+'Call CloseIB202201()
+
+If Int(CURPAGE.Data) = 1 Then
+	SCREEN.Object("SUBMAP.ed_PrevCk").Data = (Int(TOTPAGE.Data) - 1) * 100
+Else
+	SCREEN.Object("SUBMAP.ed_PrevCk").Data = SCREEN.Object("SUBMAP.ot_PrevCk").Data
+End If
+
+SUBMAP.Send
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(bt_Column)
+_AW_ONCLICK_AW_
+If bt_Column.Text = "거래량" Then
+	bt_Column.Text = "등락률"
+Else
+	bt_Column.Text = "거래량"
+End If
+SetIniData "ISVOL", bt_Column.Text
+ChangeGrid
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(r_kospi)
+_AW_ONCLICK_AW_
+SCREEN.IgnoreChange True
+S20301.Data = "001"
+SCREEN.IgnoreChange False
+SCREEN.Object("SUBMAP.ed_TrTp").Data = "0"
+SUBMAP.Send
+SCREEN.Object("JMOBJ.20301").data = S20301.Data
+JMOBJ.Send
+SCREEN.Object("UPJM.20301").DATA = S20301.Data
+UPJM.Send
+
+SetIniData "ISKOSPI", "1"
+SetIniData "UPCD", S20301.Data
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(r_kosdaq)
+_AW_ONCLICK_AW_
+SCREEN.IgnoreChange True
+S20301.Data = "201"
+SCREEN.IgnoreChange False
+SCREEN.Object("SUBMAP.ed_TrTp").Data = "0"
+SUBMAP.Send
+SCREEN.Object("JMOBJ.20301").data = S20301.Data
+JMOBJ.Send
+SCREEN.Object("UPJM.20301").DATA = S20301.Data
+UPJM.Send
+
+SetIniData "ISKOSPI", "0"
+SetIniData "UPCD", S20301.Data
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(1301)
+_AW_ONCHANGE_AW_
+If S1301.Data = "000000" Or Trim(S1301.Data) = "" Then
+	S1301.Clear
+	S1301.SetFocus
+	Exit Sub
+End If
+
+S1301.Trigger "", True
+S1301.SetFocus
+_AW_ONENDSUB_AW_
+_AW_ONKEYCHANGE_AW_
+If S1301.Data = "000000" Or Trim(S1301.Data) = "" Then
+	S1301.Clear
+	S1301.SetFocus
+	Exit Sub
+End If
+
+S1301.Trigger "", True
+S1301.SetFocus
+'SYSTEM.Trace "1301 onkey event"
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(autopage)
+_AW_ONCLICK_AW_
+If autopage.Checked Then
+	SetIniData "AOTOCHECK", "1"
+	'INFO.PushData LOGIN.Name, "userconf.ini", "IB201500", "AOTOCHECK", "1"
+Else
+	SetIniData "AOTOCHECK", "0"
+	'INFO.PushData LOGIN.Name, "userconf.ini", "IB201500", "AOTOCHECK", "0"
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(CHECK0)
+_AW_ONCLICK_AW_
+If CHECK0.Checked Then
+	SUBMAP.Send
+	SetIniData "GB1", "1"
+Else
+	SUBMAP.Send
+	SetIniData "GB1", "0"
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(CHECK1)
+_AW_ONCLICK_AW_
+If CHECK1.Checked Then
+	SUBMAP.Send
+	SetIniData "GB2", "1"
+Else
+	SUBMAP.Send
+	SetIniData "GB2", "0"
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(CHECK2)
+_AW_ONCLICK_AW_
+If CHECK2.Checked Then
+	SUBMAP.Send
+	SetIniData "GB3", "1"
+Else
+	SUBMAP.Send
+	SetIniData "GB3", "0"
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(CHECK3)
+_AW_ONCLICK_AW_
+If CHECK3.Checked Then
+	SUBMAP.Send
+	SetIniData "GB4", "1"
+Else
+	SUBMAP.Send
+	SetIniData "GB4", "0"
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(CHECK4)
+_AW_ONCLICK_AW_
+If CHECK4.Checked Then
+	SUBMAP.Send
+	SetIniData "GB5", "1"
+Else
+	SUBMAP.Send
+	SetIniData "GB5", "0"
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(CHECK5)
+_AW_ONCLICK_AW_
+If CHECK5.Checked Then
+	SUBMAP.Send
+	SetIniData "GB6", "1"
+Else
+	SUBMAP.Send
+	SetIniData "GB6", "0"
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(CHECK6)
+_AW_ONCLICK_AW_
+If CHECK6.Checked Then
+	SUBMAP.Send
+	SetIniData "GB7", "1"
+Else
+	SUBMAP.Send
+	SetIniData "GB7", "0"
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(CHECK7)
+_AW_ONCLICK_AW_
+If CHECK7.Checked Then
+	SUBMAP.Send
+	SetIniData "GB8", "1"
+Else
+	SUBMAP.Send
+	SetIniData "GB8", "0"
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON0)
+_AW_ONCLICK_AW_
+
+SCREEN.CreateWindow 2, "IB201503 /p5 " , ""
+'
+'If SYSTEM.Pop("mapcs") = "OK" Then
+	SUBMAP.Send
+'End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(infobt)
+_AW_ONCLICK_AW_
+Dim i,ii
+
+autopage.Checked False
+SetIniData "AOTOCHECK", "0"
+
+For i=0 To 3
+	For ii=1 To SCREEN.Object("SUBMAP.GRID"&i).Rows
+		If Trim(SCREEN.Object("SUBMAP.GRID"&i).GetGridCell(ii,3)) = 1 Then
+			str = Trim(SCREEN.Object("SUBMAP.GRID"&i).GetGridCell(ii,2)) & vbTab
+			strx = strx & str
+		End If
+	Next
+Next
+
+
+If str <> "" Then
+	If SCREEN.CreateObject("INFO") Then
+		For i = 1 To 99
+			If i < 10 Then
+				ii = "0"&i
+			Else
+				ii = i
+			End If
+			item = Trim(INFO.PopData(LOGIN.Name, "portfolio.ini", "GROUPNAME" , ii))
+			If item <> "" Then
+				item = ii&item
+				items = items + item&vbTab
+			Else
+				Exit For
+			End If
+		Next
+	End If
+
+	items = "02" & vbTab & items
+
+	infocb.SetItems(items)
+	infocb.ShowDropDown  True
+Else
+	MsgBox "원하는 종목을 체크한뒤 관심종목등록 버튼을 다시 클릭해 주십시오.자동페이지전환 체크가 해제 됩니다.",0,"IBK투자증권"
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(infocb)
+_AW_ONCHANGE_AW_
+SCREEN.CreateWindow 1, "IB202201 /t/s/d", "appendITEMS" & _
+		vbTab & infocb.Data & vbTab & strx
+strx = ""
+str =""
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(cxMarket)
+_AW_ONCLICK_AW_
+JMOBJ.Send
+SUBMAP.Send
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(edMarketTrigger)
+_AW_ONCHANGE_AW_
+Change_MKGubn_Main(Trim(edMarketTrigger.Data))
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

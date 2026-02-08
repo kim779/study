@@ -1,0 +1,122 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB999982)
+MAPSIZE(78, 183)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("주식종목명 Control")
+MAPPUBLIC(";")
+FONT("굴림체", 9, BOLD)
+OPTIONS(FLASH)
+TITLE("주식종목명")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pibojggb")
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+LABEL  LABEL19(0, 0, 885, 520)  'Label'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  ingubn(5, 35, 55, 55)  LEN(1)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("N")          TABORDER(1)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  intype(5, 110, 55, 130)  LEN(2)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(2)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL0(90, 55, 540, 75)  '        O:휴장일 및 업무가능시간체크, A:365일업무 업무가능시간체크'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL1(5, 5, 35, 25)  'in'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL2(90, 35, 540, 55)  ' //구분 K:현물, S:주식선물, C:상품선물, F:지수선물옵션'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL3(90, 110, 540, 130)  ' //1:펀드, 2:채권, 3:RP, 4:비대면, 5:간편소액담보, 6:맞춤서비스, '  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL4(90, 130, 695, 150)  '7:온라인계좌실명확인, 8:주문대리인연장해지, 9:예약주문, 10:연금개시신청, 11.NXT종가매매'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL5(145, 215, 1030, 235)  ' ex)비대면은 365일이기때문에 gubn구분값 A 나머지는 휴장일 체크를 위해 gubn값 O으로 입력  및 type에 맞는 업무 입력'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL6(145, 235, 1030, 255)  '추후 업무가능시간 추가시 cfg에서 순차적으로 추가만하게 끔 수정'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  outgubn(0, 270, 55, 290)  LEN(1)  IO_MIXED|AL_CENTER|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(3)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL7(0, 245, 30, 265)  'out'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL8(80, 270, 530, 290)  '//0:휴장일, 1:장전, 2:장전시간외 3:장전동시호가, 4:정규장장중'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL9(80, 290, 670, 310)  '//5:장후동시호가, 6:장후시간외, 7:시간외단일가, 8:장마감, 9:에러(공통) , 10:장준비'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL10(80, 335, 470, 355)  '/*          0. 휴장일                       */'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL11(80, 355, 470, 375)  '/*          1. 장전              ~08:00        */'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL12(80, 375, 470, 395)  '/*          2. 프리마켓     08:00~08:50     */'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL13(80, 395, 470, 415)  '/*          3. 오전휴장     08:50~09:00     */'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL14(80, 415, 470, 435)  '/*          4. 메인마켓     09:00~15:20     */'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL15(80, 435, 470, 455)  '/*          5. 오후휴장     15:20~15:30     */'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL16(80, 455, 470, 475)  '/*          6. 단일가매매   15:30~15:40     */'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL17(80, 475, 470, 495)  '/*          7. 에프터마켓   15:40~20:00     */'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL18(80, 495, 470, 515)  '/*          8. 장마감       20:00~             */'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  BUTTON0(40, 0, 90, 30)  'send'  TP_PUSH      AL_CENTER    FOCUS  COLOR(208, 232)  CUR(0)      TABORDER(3)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONRECEIVE_AW_
+If outgubn.Data = "0" Then      '/*          0. 휴장일                       */
+	'SCREEN.Object("main.pnTMarket").Text = "NXT6장마감.BMP"
+
+ElseIf outgubn.Data = "1" Then  '/*          1. 장전              ~08:00        */
+	'SCREEN.Object("main.pnTMarket").Text = "NXT5장전.BMP"
+
+ElseIf outgubn.Data = "2" Then   '/*          2. 프리마켓     08:00~08:50     */
+	'SCREEN.Object("main.pnTMarket").Text = "NXT4프리마켓.bmp"
+
+ElseIf outgubn.Data = "3" Then   '/*          3. 오전휴장     08:50~09:00     */
+	'SCREEN.Object("main.pnTMarket").Text = "NXT5장전.BMP"
+
+ElseIf outgubn.Data = "4" Then   '/*          4. 메인마켓     09:00~15:20     */
+'	SCREEN.Object("main.pnTMarket").Text = "NXT4메인마켓.bmp"
+
+ElseIf outgubn.Data = "5" Then    '/*          5. 오후휴장     15:20~15:30     */
+	'SCREEN.Object("main.pnTMarket").Text = "NXT5장전.BMP"
+
+ElseIf outgubn.Data = "6" Then    '/*          6. 단일가매매   15:30~15:40     */
+	'SCREEN.Object("main.pnTMarket").Text = "NXT5애프터마켓.bmp"
+
+ElseIf outgubn.Data = "7" Then    '/*          7. 에프터마켓   15:40~20:00     */
+	'SCREEN.Object("main.pnTMarket").Text = "NXT5애프터마켓.bmp"
+
+ElseIf outgubn.Data = "8" Then    '/*          8. 장마감       20:00~             */
+	'SCREEN.Object("main.pnTMarket").Text = "NXT6장마감.BMP"
+End If
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(BUTTON0)
+_AW_ONCLICK_AW_
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

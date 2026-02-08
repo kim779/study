@@ -1,0 +1,729 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB960030)
+MAPSIZE(500, 730)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("MS Sans Serif", 9, NORMAL)
+TITLE("[9603]MTS 팝업 설정")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+LABEL  LABEL0(9, 10, 120, 30)  '[배너 내용 입력]'  AL_LEFT  FONT("MS Sans Serif", 9, BOLD)  CUR(0)      COLOR(0, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+CONTROL  cx_upload(850, 330, 985, 390)  |FA_PROTECT  "CX_UPLOAD"  ""  LEN(0)  EDIT_NOP    COLOR(192, 130)  TABORDER(0)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON6(640, 475, 715, 495)  '배포'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("MS Sans Serif", 9, BOLD)  COLOR(7, 186)  CUR(0)    "2BTN.BMP"    TABORDER(2)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+LABEL  LABEL10(939, 543, 1114, 558)  'CI 이미지 DB+리소스 사용안함'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  update(10, 475, 147, 495)  '최종 업데이트 일자 : '  AL_LEFT  FONT("MS Sans Serif", 9, BOLD)  CUR(0)      COLOR(0, 130)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_NONE)
+OUT  updatedate(135, 475, 290, 495)  LEN(30)  IO_MIXED|AL_LEFT||FA_RIGHT|FA_SKIP    COLOR(181, 232)  CUR(0)            TABORDER(0)  IOORDER(8)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL13(355, 475, 621, 495)  '※ 그리드저장 -> 설정저장 -> 배포 순으로 진행'  AL_LEFT  CUR(0)      COLOR(0, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+GRID  GRID0(5, 30, 725, 205)  VISIBLEROW(10)  CELLH(20)  MATRIX(500, 12)  FIX(0)  MAINCOLOR(208, 232)  LINECOLOR(0)  FOCUSCOLOR(78)  FOCUSKIND(4)    FONT("MS Sans Serif", 9, NORMAL)  ROWC(68, 77)  |FLEXIBLE|VSCROLL|HSCROLL|NO3D|RROW|XHLINE|PAGE|HEADER|GRFTEXT    &
+	COLINFO("gubn")  LEN(4)  WIDTH(54)  HEAD("구분")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 192)  IO_MIXED|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Nonum")  LEN(2)  WIDTH(54)  HEAD("순서")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 192)  IO_NUM|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("startDate")  LEN(12)  WIDTH(100)  HEAD("시작 시각")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 192)  IO_NUM|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  EDITFORMAT("9999/99/99 99:99")    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("endDate")  LEN(12)  WIDTH(100)  HEAD("종료 시각")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 192)  IO_NUM|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  EDITFORMAT("9999/99/99 99:99")    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("eventTitle")  LEN(30)  WIDTH(170)  HEAD("이벤트 타이틀")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 192)  IO_MIXED|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("eventSubTitle")  LEN(40)  WIDTH(190)  HEAD("이벤트 서브 타이틀")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 192)  IO_MIXED|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("imgFileName")  LEN(15)  WIDTH(100)  HEAD("이미지 파일명")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 192)  IO_MIXED|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("viewUrl")  LEN(30)  WIDTH(193)  HEAD("화면명/URL")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 192)  IO_MIXED|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("isPopup")  LEN(5)  WIDTH(50)  HEAD("링크방법")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 192)  IO_MIXED|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("sortIdx")  LEN(0)  WIDTH(80)  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 192)  IO_MIXED|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col0")  LEN(0)  WIDTH(40)  HEAD("UP")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_NOP      COLOR(200, 232)  COLCUR(0, 0)    IBUTTON  BUTTONSTR("▲")    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col1")  LEN(0)  WIDTH(40)  HEAD("DOWN")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_NOP      COLOR(200, 232)  COLCUR(0, 0)    IBUTTON  BUTTONSTR("▼")    HNORMAL  SORTSTARTPOS(0)    TABORDER(3)  IOORDER(7)  ENABLE  &
+  VISIBLE
+
+PANEL  PANEL2(5, 205, 725, 470)    |IMAGE|AL_STRETCH    COLOR(192, 232)  CUR(0)    "매도_BG.BMP"  ENABLE  &
+  VISIBLE  IMAGE  HINTTYPE(IH_NONE)
+LABEL  LABEL1(16, 310, 71, 330)  '시간'  AL_LEFT  CUR(0)      COLOR(194, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  ed_startdate(180, 310, 275, 329)  LEN(12)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 130)  CUR(0)  TP_SUNKEN          TABORDER(4)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL2(325, 310, 380, 330)  '종료시각'  AL_LEFT  CUR(0)      COLOR(194, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  ed_enddate(375, 310, 470, 329)  LEN(12)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 130)  CUR(0)  TP_SUNKEN          TABORDER(5)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL3(16, 334, 96, 354)  '이벤트 타이틀'  AL_LEFT  CUR(0)      COLOR(194, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  ed_eventtitle(128, 334, 468, 353)  LEN(30)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 130)  CUR(0)  TP_SUNKEN          TABORDER(6)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL4(16, 359, 121, 379)  '이벤트 서브 타이틀'  AL_LEFT  CUR(0)      COLOR(194, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL5(16, 385, 96, 405)  '이미지 파일명'  AL_LEFT  CUR(0)      COLOR(194, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL6(16, 409, 96, 429)  '화면명 or URL'  AL_LEFT  CUR(0)      COLOR(194, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  ed_ispopup(565, 385, 630, 404)  LEN(5)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 130)  CUR(0)  TP_SUNKEN          TABORDER(7)  IOORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL7(509, 385, 559, 405)  '링크방법'  AL_LEFT  CUR(0)      COLOR(194, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  BUTTON1(420, 440, 580, 460)  '그리드 저장(화면에저장)'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, BOLD)  FOCUS  COLOR(208, 186)  CUR(0)    "6BTN_EN.BMP"    TABORDER(8)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+LABEL  LABEL8(8, 566, 38, 586)  '구분'  AL_LEFT  CUR(0)      COLOR(194, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  ed_seq(38, 566, 133, 585)  LEN(8)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_XFLOAT    COLOR(192, 130)  CUR(0)  TP_NONE          TABORDER(9)  IOORDER(5)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  ed_sortidx(110, 595, 130, 614)  LEN(1)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_XFLOAT    COLOR(192, 130)  CUR(0)  TP_NONE  INIT(" ")          TABORDER(10)  IOORDER(6)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL14(16, 230, 721, 250)  '2. 시작, 종료시각 : 12자리 YYYYMMDDhhmm (ex) 202301010700)'  AL_LEFT  CUR(0)      COLOR(0, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL9(16, 246, 721, 266)  '3. 링크방법 : C(화면이동) / P(팝업) / U(URL이동)'  AL_LEFT  CUR(0)      COLOR(0, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  itmp(120, 665, 475, 684)  LEN(30)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_XFLOAT    COLOR(192, 130)  CUR(0)  TP_NONE  INIT(" ")          TABORDER(11)  IOORDER(9)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  SBTN(585, 440, 715, 460)  '설정저장(서버저장)'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, BOLD)  FOCUS  COLOR(0, 186)  CUR(0)    "조회BTN.BMP"    TABORDER(1)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+OUT  OUTPUT1(832, 156, 917, 181)  LEN(40)  IO_MIXED|AL_CENTER|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(10)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  OUTPUT2(832, 181, 917, 206)  LEN(40)  IO_MIXED|AL_CENTER|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(11)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  OUTPUT3(832, 206, 917, 231)  LEN(40)  IO_MIXED|AL_CENTER|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(12)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  OUTPUT4(832, 231, 917, 256)  LEN(40)  IO_MIXED|AL_CENTER|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(13)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  OUTPUT5(917, 156, 1002, 181)  LEN(40)  IO_MIXED|AL_CENTER|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(14)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  OUTPUT6(917, 181, 1002, 206)  LEN(40)  IO_MIXED|AL_CENTER|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(15)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  OUTPUT7(917, 206, 1002, 231)  LEN(40)  IO_MIXED|AL_CENTER|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(16)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  OUTPUT8(917, 231, 1002, 256)  LEN(40)  IO_MIXED|AL_CENTER|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(17)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON0(335, 440, 415, 460)  '초기화'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, BOLD)  FOCUS  COLOR(208, 186)  CUR(0)    "4BTN.BMP"    TABORDER(12)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+GRID  GRID1(5, 30, 725, 205)  VISIBLEROW(10)  CELLH(20)  MATRIX(500, 12)  FIX(0)  MAINCOLOR(208, 232)  LINECOLOR(0)  FOCUSCOLOR(78)  FOCUSKIND(4)    FONT("MS Sans Serif", 9, NORMAL)  ROWC(68, 77)  |FLEXIBLE|VSCROLL|HSCROLL|NO3D|RROW|XHLINE|PAGE|HEADER|GRFTEXT    &
+	COLINFO("gubn")  LEN(4)  WIDTH(54)  HEAD("구분")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 192)  IO_MIXED|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Nonum")  LEN(2)  WIDTH(54)  HEAD("순서")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 192)  IO_NUM|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("startDate")  LEN(12)  WIDTH(100)  HEAD("시작 시각")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 192)  IO_NUM|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  EDITFORMAT("9999/99/99 99:99")    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("endDate")  LEN(12)  WIDTH(100)  HEAD("종료 시각")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 192)  IO_NUM|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  EDITFORMAT("9999/99/99 99:99")    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("eventTitle")  LEN(30)  WIDTH(170)  HEAD("이벤트 타이틀")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 192)  IO_MIXED|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("eventSubTitle")  LEN(40)  WIDTH(190)  HEAD("이벤트 서브 타이틀")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 192)  IO_MIXED|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("imgFileName")  LEN(15)  WIDTH(100)  HEAD("이미지 파일명")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 192)  IO_MIXED|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("viewUrl")  LEN(30)  WIDTH(193)  HEAD("화면명/URL")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 192)  IO_MIXED|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("isPopup")  LEN(5)  WIDTH(50)  HEAD("링크방법")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 192)  IO_MIXED|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("sortIdx")  LEN(0)  WIDTH(80)  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 192)  IO_MIXED|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col0")  LEN(0)  WIDTH(40)  HEAD("UP")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_NOP      COLOR(200, 232)  COLCUR(0, 0)    IBUTTON  BUTTONSTR("▲")    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col1")  LEN(0)  WIDTH(40)  HEAD("DOWN")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_NOP      COLOR(200, 232)  COLCUR(0, 0)    IBUTTON  BUTTONSTR("▼")    HNORMAL  SORTSTARTPOS(0)    TABORDER(13)  IOORDER(18)  ENABLE
+LABEL  LABEL12(16, 215, 721, 235)  '1. 구분 (A : 첫번째 탭, B: 두번째 탭 P:팝업용)'  AL_LEFT  CUR(0)      COLOR(0, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL15(128, 310, 183, 330)  '시작시각'  AL_LEFT  CUR(0)      COLOR(194, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  RTYPE1(128, 265, 178, 285)  'A'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(GP1)      COLOR(0, 232)  CUR(0)      TABORDER(14)  ENABLE  &
+  VISIBLE  CHECKED  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  RTYPE2(193, 265, 243, 285)  'B'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(GP1)      COLOR(0, 232)  CUR(0)      TABORDER(15)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+GROUP  GP1(1114, 97, 1234, 147)  'Group'        COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL16(16, 265, 71, 285)  '구분'  AL_LEFT  CUR(0)      COLOR(194, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  RTYPE3(255, 265, 305, 285)  'P'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(GP1)      COLOR(0, 232)  CUR(0)      TABORDER(16)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+GRID  GRID2(5, 30, 725, 205)  VISIBLEROW(10)  CELLH(20)  MATRIX(500, 12)  FIX(0)  MAINCOLOR(208, 232)  LINECOLOR(0)  FOCUSCOLOR(78)  FOCUSKIND(4)    FONT("MS Sans Serif", 9, NORMAL)  ROWC(68, 77)  |FLEXIBLE|VSCROLL|HSCROLL|NO3D|RROW|XHLINE|PAGE|HEADER|GRFTEXT    &
+	COLINFO("gubn")  LEN(4)  WIDTH(54)  HEAD("구분")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 192)  IO_MIXED|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Nonum")  LEN(2)  WIDTH(54)  HEAD("순서")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 192)  IO_NUM|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("startDate")  LEN(12)  WIDTH(100)  HEAD("시작 시각")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 192)  IO_NUM|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  EDITFORMAT("9999/99/99 99:99")    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("endDate")  LEN(12)  WIDTH(100)  HEAD("종료 시각")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 192)  IO_NUM|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  EDITFORMAT("9999/99/99 99:99")    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("eventTitle")  LEN(30)  WIDTH(170)  HEAD("이벤트 타이틀")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 192)  IO_MIXED|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("eventSubTitle")  LEN(40)  WIDTH(190)  HEAD("이벤트 서브 타이틀")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 192)  IO_MIXED|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("imgFileName")  LEN(15)  WIDTH(100)  HEAD("이미지 파일명")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 192)  IO_MIXED|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("viewUrl")  LEN(30)  WIDTH(193)  HEAD("화면명/URL")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 192)  IO_MIXED|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("isPopup")  LEN(5)  WIDTH(50)  HEAD("링크방법")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 192)  IO_MIXED|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("sortIdx")  LEN(0)  WIDTH(80)  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 192)  IO_MIXED|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col0")  LEN(0)  WIDTH(40)  HEAD("UP")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_NOP      COLOR(200, 232)  COLCUR(0, 0)    IBUTTON  BUTTONSTR("▲")    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col1")  LEN(0)  WIDTH(40)  HEAD("DOWN")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_NOP      COLOR(200, 232)  COLCUR(0, 0)    IBUTTON  BUTTONSTR("▼")    HNORMAL  SORTSTARTPOS(0)    TABORDER(17)  IOORDER(19)  ENABLE
+OUT  ed_view(128, 410, 628, 430)  LEN(100)  IO_NUM|AL_LEFT|    COLOR(192, 232)  CUR(0)  LINECOLOR(21)          TABORDER(0)  IOORDER(20)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  ed_eventsubtitle(128, 360, 628, 380)  LEN(100)  IO_NUM|AL_LEFT|    COLOR(192, 232)  CUR(0)  LINECOLOR(21)          TABORDER(0)  IOORDER(21)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  ed_imgfilename(128, 385, 334, 405)  LEN(64)  IO_MIXED|EDIT_INOUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_SUNKEN          TABORDER(18)  IOORDER(22)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON4(333, 385, 371, 405)  '찾기'  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(7, 186)  CUR(0)    "2BTN.BMP"    TABORDER(19)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+BUTTON  BUTTON5(374, 385, 494, 405)  '이미지 개발기 등록'  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(7, 186)  CUR(0)    "6BTN.BMP"    TABORDER(20)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+LABEL  LABEL11(16, 287, 71, 307)  '순서'  AL_LEFT  CUR(0)      COLOR(194, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  Nonum(128, 287, 223, 306)  LEN(2)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 130)  CUR(0)  TP_SUNKEN          TABORDER(21)  IOORDER(23)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL17(495, 10, 720, 30)  '※개발기에서만 사용 가능합니다.'  AL_RIGHT  FONT("MS Sans Serif", 9, BOLD)  CUR(0)      COLOR(0, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Dim g_flag
+Dim g_ArrCtrl
+Dim dic, myFSO, WriteStuff, ReadStuff, line, lines
+
+
+'dic = SYSTEM.Home & "/dev/" & "cfgtmp2.ini"
+dic = SYSTEM.Home & "/tab/" & "MTSPBI.INI"
+itmp.Data = dic
+
+g_ArrCtrl = Array(ed_seq, Nonum, ed_startdate, ed_enddate, ed_eventtitle, ed_eventsubtitle, _
+	ed_imgfilename, ed_view, ed_ispopup, ed_sortidx)
+'-----------------------------------------------------------------------
+Sub InitCtrl() 'Edit Box 초기화
+	For i = LBound(g_ArrCtrl) To UBound(g_ArrCtrl)
+		If i <> 0 Then
+			g_ArrCtrl(i).Data = ""
+		End If
+	Next
+End Sub
+'-----------------------------------------------------------------------
+Sub Grid2Edit(Row) '그리드 Row 클릭시, 하단 EditBox에 Road
+	If RTYPE1.Checked Then
+		Data = Trim(GRID0.GetGridCell(Row, 1))
+	ElseIf RTYPE2.Checked Then
+		Data = Trim(GRID1.GetGridCell(Row, 1))
+	Else
+		Data = Trim(GRID2.GetGridCell(Row, 1))
+	End If
+	If Len(Data) = 0 Then
+		Exit Sub
+	End If
+	For i = LBound(g_ArrCtrl) To UBound(g_ArrCtrl)
+		If RTYPE1.Checked Then
+			g_ArrCtrl(i).Data = GRID0.GetGridCell(Row, i + 1)
+		ElseIf RTYPE2.Checked Then
+			g_ArrCtrl(i).Data = GRID1.GetGridCell(Row, i + 1)
+		Else
+			g_ArrCtrl(i).Data = GRID2.GetGridCell(Row, i + 1)
+		End If
+	Next
+End Sub
+'-----------------------------------------------------------------------
+Sub Edit2Grid(Row) '그리드 저장 버튼 클릭시, 해당 row 그리드에 Save
+	Dim tmp
+	For i = LBound(g_ArrCtrl) To UBound(g_ArrCtrl)
+		If i <> 0 Then
+			If RTYPE1.Checked Then
+				If i = 1 Then
+					tmp = l_format(Trim(g_ArrCtrl(i).text), "0", 2)
+					GRID0.SetGridCell Row, i + 1, tmp
+				Else
+					GRID0.SetGridCell Row, i + 1, g_ArrCtrl(i).Data
+				End If
+			ElseIf RTYPE2.Checked Then
+				If i = 1 Then
+					tmp = l_format(Trim(g_ArrCtrl(i).text), "0", 2)
+					GRID1.SetGridCell Row, i + 1, tmp
+				Else
+					GRID1.SetGridCell Row, i + 1, g_ArrCtrl(i).Data
+				End If
+			Else
+				If i = 1 Then
+					tmp = l_format(Trim(g_ArrCtrl(i).text), "0", 2)
+					GRID2.SetGridCell Row, i + 1, tmp
+				Else
+					GRID2.SetGridCell Row, i + 1, g_ArrCtrl(i).Data
+				End If
+			End If
+		End If
+	Next
+End Sub
+'-----------------------------------------------------------------------
+Sub FileWrite(str) 'INI FILE WRITE
+	Set myFSO = CreateObject("Scripting.FileSystemObject")
+	Set WriteStuff = myFSO.CreateTextFile(dic, True)
+
+	WriteStuff.WriteLine(str)
+	WriteStuff.Close
+
+	Set myFSO = Nothing
+	Set WriteStuff = Nothing
+End Sub
+'-----------------------------------------------------------------------
+Sub Fileread()	'INI FILE ROAD
+	Dim kk, tm
+	lines = ""
+	lines = ""
+	Set myFSO = CreateObject("Scripting.FileSystemObject")
+	If myFSO.FileExists(dic) = False Then
+		MsgBox "설정파일이 없습니다. " & dic
+		Exit Sub
+	End If
+	Set f = myFSO.GetFile(dic)
+	Set readStuff = myFSO.OpenTextFile(dic, 1, True)
+
+	kk = 0
+	Do Until readStuff.AtEndOfStream
+		line = readStuff.ReadLine
+		If Len(Trim(line)) > 0 Then
+			lines = lines & line & vbCrLf
+			kk = kk + 1
+		End If
+	Loop
+
+	data = Split(lines, vbCrLf, -1, 1)
+
+	If Trim(lines) <> "" Then
+		For ii = 0 To kk-1
+			myline = Split(data(ii), "|", -1, 1)
+
+			For jj = 0 To 8
+				If Left(myline(0),1) = "A" Then
+					GRID0.SetGridCell ii+1, jj+1, Trim(myline(jj))
+				ElseIf Left(myline(0),1) = "B" Then
+					GRID1.SetGridCell ii-19, jj+1, Trim(myline(jj))
+				Else
+					GRID2.SetGridCell ii-39, jj+1, Trim(myline(jj))
+				End If
+			Next
+			If Left(myline(0),1) = "A" Then
+				GRID0.InsertRow(ii+1)
+			ElseIf Left(myline(0),1) = "B" Then
+				GRID1.InsertRow(ii-19)
+			Else
+				GRID2.InsertRow(ii-39)
+			End If
+		Next
+	End If
+
+	readStuff.Close
+
+	updatedate.Data = f.DateLastModified
+
+	Set myFSO = Nothing
+	Set readStuff = Nothing
+End Sub
+'-----------------------------------------------------------------------
+Sub Upper_Row(row) '그리드 ROW UP 버튼
+	For ii = 1 To 9
+		Dim tmp
+
+		If RTYPE1.Checked Then
+			tmp = GRID0.GetGridCell(row, ii)
+			GRID0.SetGridCell row, ii, GRID0.GetGridCell(row-1, ii)
+			GRID0.SetGridCell row-1, ii, tmp
+		ElseIf RTYPE2.Checked Then
+			tmp = GRID1.GetGridCell(row, ii)
+			GRID1.SetGridCell row, ii, GRID1.GetGridCell(row-1, ii)
+			GRID1.SetGridCell row-1, ii, tmp
+		Else
+			tmp = GRID2.GetGridCell(row, ii)
+			GRID2.SetGridCell row, ii, GRID2.GetGridCell(row-1, ii)
+			GRID2.SetGridCell row-1, ii, tmp
+		End If
+	Next
+	Grid2Edit(row)
+End Sub
+'-----------------------------------------------------------------------
+Sub Lower_Row(row) '그리드 ROW DOWN 버튼
+	For ii = 1 To 9
+		Dim tmp
+
+		If RTYPE1.Checked Then
+			tmp = GRID0.GetGridCell(row, ii)
+			GRID0.SetGridCell row, ii, GRID0.GetGridCell(row+1, ii)
+			GRID0.SetGridCell row+1, ii, tmp
+		ElseIf RTYPE2.Checked Then
+			tmp = GRID1.GetGridCell(row, ii)
+			GRID1.SetGridCell row, ii, GRID1.GetGridCell(row+1, ii)
+			GRID1.SetGridCell row+1, ii, tmp
+		Else
+			tmp = GRID2.GetGridCell(row, ii)
+			GRID2.SetGridCell row, ii, GRID2.GetGridCell(row+1, ii)
+			GRID2.SetGridCell row+1, ii, tmp
+		End If
+	Next
+	Grid2Edit(row)
+End Sub
+'----------------------------------------------------------------------
+Function checkNoNum(tmpNonum)
+checkNoNum = True
+
+	If RTYPE1.Checked Then
+		Set tmpgrid = SCREEN.Object("GRID0")
+
+	ElseIf RTYPE2.Checked Then
+		Set tmpgrid = SCREEN.Object("GRID1")
+	Else
+		Set tmpgrid = SCREEN.Object("GRID2")
+	End If
+
+	For ii = 1 To 20
+
+		If tmpgrid.Row <> ii Then '클릭한 자신은 제외
+			If Len(Trim(tmpgrid.GetGridCell (ii, 2))) > 0 Then
+				If CInt(Trim(tmpNonum)) = CInt(Trim(tmpgrid.GetGridCell (ii, 2))) Then
+					checkNoNum = False
+				End If
+			End If
+		End If
+	Next
+
+
+End Function
+
+_AW_ONINDECLARE_AW_
+#load IB888888
+
+_AW_ONENDSUB_AW_
+_AW_ONSTART_AW_
+Fileread()
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+Initctrl()
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(cx_upload)
+_AW_ONCHANGE_AW_
+'EMSG.Data = "파일전송 완료"
+MsgBox "파일 업로드 완료" & vbCrLf & "등록 및 수정 필요합니다."
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON6)
+_AW_ONCLICK_AW_
+SCREEN.CreateWindow 1, "IB960013 /p5", ""
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(GRID0)
+_AW_ONCLICK_AW_
+If GRID0.HitPos = "3" Then
+	Grid2Edit(GRID0.Row)
+	row = GRID0.Row
+	col = GRID0.Column
+
+	If col = 10 And Not row = 1 Then
+		Upper_Row row
+	ElseIf col = 11 And Not row = 20 Then
+		Lower_Row row
+	ElseIf (col = 10 And row = 1) Or (col = 11 And row = 20) Then
+		MsgBox "Row를 움직일 수 없습니다."
+	End If
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON1)
+_AW_ONCLICK_AW_
+If Len(Trim(ed_startdate.Data)) <> 12 Or Len(Trim(ed_enddate.Data)) <> 12 Then
+	MsgBox "날짜를 확인해 주세요."
+	If Len(Trim(ed_startdate.Data)) <> 12 Then
+		ed_startdate.SetFocus
+		Exit Sub
+	End If
+	If Len(Trim(ed_enddate.Data)) <> 12 Then
+		ed_enddate.SetFocus
+		Exit Sub
+	End If
+ElseIf checkNoNum(Nonum.Data) = False Then
+	MsgBox "순서가 중복됩니다. 순서를 확인해 주세요."
+	Nonum.SetFocus
+	Exit Sub
+ElseIf CDbl(ed_startdate.Data) > CDbl(ed_enddate.Data) Then
+	MsgBox "시작일이 종료일보다 큽니다. 날짜를 확인해 주세요."
+	Exit Sub
+
+ElseIf Trim(ed_eventtitle.Data) = ""  Then
+	MsgBox "이벤트 타이틀이 없습니다."
+	ed_eventtitle.SetFocus
+	Exit Sub
+
+ElseIf Trim(ed_imgfilename.Data) = ""  Then
+	MsgBox "이미지가 없습니다."
+	Exit Sub
+
+ElseIf Trim(ed_ispopup.Data) <> "C" And Trim(ed_ispopup.Data) <> "P"  And Trim(ed_ispopup.Data) <> "U" Then
+	MsgBox "링크방법을 확인해 주세요."
+	Exit Sub
+
+ElseIf Trim(ed_view.Data) = ""  Then
+	MsgBox "링크내용이 없습니다."
+	Exit Sub
+
+End If
+
+If RTYPE1.Checked Then
+	Call Edit2Grid(GRID0.Row)
+ElseIf RTYPE2.Checked Then
+	Call Edit2Grid(GRID1.Row)
+Else
+	Call Edit2Grid(GRID2.Row)
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(SBTN)
+_AW_ONCLICK_AW_
+Dim ct
+
+'A타입 셋팅
+For ii = 1 To 20
+	If ii <> 1 Then
+		text = text & vbCrLf
+	End If
+
+	ct = l_format(ii, "0", 2)
+
+	text = text & "A" & ct & "|"
+
+	For jj = 2 To 9
+		If jj = 2 Then
+			text = text & RTrim(GRID0.GetGridCell (ii, jj))
+		Else
+			text = text & "|"& RTrim(GRID0.GetGridCell (ii, jj))
+		End If
+	Next
+Next
+text = text & vbCrLf
+'B타입 셋팅
+For ii = 1 To 20
+	If ii <> 1 Then
+		text = text & vbCrLf
+	End If
+
+	ct = l_format(ii, "0", 2)
+
+	text = text & "B" & ct & "|"
+
+	For jj = 2 To 9
+		If jj = 2 Then
+			text = text & RTrim(GRID1.GetGridCell (ii, jj))
+		Else
+			text = text & "|"& RTrim(GRID1.GetGridCell (ii, jj))
+		End If
+	Next
+Next
+
+text = text & vbCrLf
+'P타입 셋팅
+For ii = 1 To 20
+	If ii <> 1 Then
+		text = text & vbCrLf
+	End If
+
+	ct = l_format(ii, "0", 2)
+
+	text = text & "P" & ct & "|"
+
+	For jj = 2 To 9
+		If jj = 2 Then
+			text = text & RTrim(GRID2.GetGridCell (ii, jj))
+		Else
+			text = text & "|"& RTrim(GRID2.GetGridCell (ii, jj))
+		End If
+	Next
+Next
+
+FileWrite(text)
+GRID0.Clear
+GRID1.Clear
+GRID2.Clear
+Fileread()
+cx_upload.UploadDefaultPath()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON0)
+_AW_ONCLICK_AW_
+Dim rowname
+If RTYPE1.Checked Then
+	rowname = Trim(GRID0.GetGridCell(GRID0.Row, 1))
+ElseIf RTYPE2.Checked Then
+	rowname = Trim(GRID1.GetGridCell(GRID1.Row, 1))
+Else
+	rowname = Trim(GRID2.GetGridCell(GRID2.Row, 1))
+End If
+
+If MsgBox(rowname & "열을 초기화 하시겠습니까? 초기화 이후 설정저장 클릭시 완전히 저장됩니다.", vbExclamation + vbYesNo, "MTS 반영") = 7 Then
+	Exit Sub
+End If
+
+InitCtrl()
+
+If RTYPE1.Checked Then
+	Call Edit2Grid(GRID0.Row)
+ElseIf RTYPE2.Checked Then
+	Call Edit2Grid(GRID1.Row)
+Else
+	Call Edit2Grid(GRID2.Row)
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(GRID1)
+_AW_ONCLICK_AW_
+If GRID1.HitPos = "3" Then
+	Grid2Edit(GRID1.Row)
+	row = GRID1.Row
+	col = GRID1.Column
+
+	If col = 10 And Not row = 1 Then
+		Upper_Row row
+	ElseIf col = 11 And Not row = 20 Then
+		Lower_Row row
+	ElseIf (col = 10 And row = 1) Or (col = 11 And row = 20) Then
+		MsgBox "Row를 움직일 수 없습니다."
+	End If
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(RTYPE1)
+_AW_ONCLICK_AW_
+GRID0.Visible = True
+GRID1.Visible = False
+GRID2.Visible = False
+GRID0.Clear
+GRID1.Clear
+GRID2.Clear
+Fileread()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(RTYPE2)
+_AW_ONCLICK_AW_
+GRID0.Visible = False
+GRID1.Visible = True
+GRID2.Visible = False
+GRID0.Clear
+GRID1.Clear
+GRID2.Clear
+Fileread()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(RTYPE3)
+_AW_ONCLICK_AW_
+GRID0.Visible = False
+GRID1.Visible = False
+GRID2.Visible = True
+GRID0.Clear
+GRID1.Clear
+GRID2.Clear
+Fileread()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(GRID2)
+_AW_ONCLICK_AW_
+If GRID2.HitPos = "3" Then
+	Grid2Edit(GRID2.Row)
+	row = GRID2.Row
+	col = GRID2.Column
+
+	If col = 10 And Not row = 1 Then
+		Upper_Row row
+	ElseIf col = 11 And Not row = 20 Then
+		Lower_Row row
+	ElseIf (col = 10 And row = 1) Or (col = 11 And row = 20) Then
+		MsgBox "Row를 움직일 수 없습니다."
+	End If
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(ed_view)
+_AW_ONCLICK_AW_
+Dim text
+SCREEN.CreateWindow 2, "IB960001 /p5", ""
+
+text = SYSTEM.pop ("IB960001_TEXT")
+If Len(Trim(text)) > 0 Then
+		ed_view.data = text
+		SYSTEM.Push "IB960001_TEXT", ""
+	Exit Sub
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(ed_eventsubtitle)
+_AW_ONCLICK_AW_
+Dim text
+SCREEN.CreateWindow 2, "IB960001 /p5", ""
+
+text = SYSTEM.pop ("IB960001_TEXT")
+If Len(Trim(text)) > 0 Then
+		ed_eventsubtitle.data = text
+		SYSTEM.Push "IB960001_TEXT", ""
+	Exit Sub
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(ed_imgfilename)
+_AW_ONKEYCHANGE_AW_
+'If SCREEN.Key = "13" Then  '-- Enter 키 입력
+'	BUTTON0.SetFocus
+'End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON4)
+_AW_ONCLICK_AW_
+Dim imgname
+If RTYPE1.Checked Then
+	imgname = Trim(GRID0.GetGridCell(GRID0.Row, 1)) & ".png"
+ElseIf RTYPE2.Checked Then
+	imgname = Trim(GRID1.GetGridCell(GRID1.Row, 1)) & ".png"
+Else
+	imgname = Trim(GRID2.GetGridCell(GRID2.Row, 1)) & ".png"
+End If
+
+If MsgBox(imgname & "을 찾아 저장해주세요.", vbExclamation + vbYesNo, "MTS 반영") = 7 Then
+	Exit Sub
+End If
+
+
+ed_imgfilename.Data = cx_upload.GetFilePath()
+
+If Trim(ed_imgfilename.text) <> Trim(imgname) Then
+	ed_imgfilename.Data = ""
+	MsgBox "이미지를 잘못 선택하셨습니다."
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON5)
+_AW_ONCLICK_AW_
+cx_upload.upload3(ed_imgfilename.Data)
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

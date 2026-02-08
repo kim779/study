@@ -1,0 +1,866 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB190200)
+MAPSIZE(534, 1339)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("[1902] 편입비중 실�")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(ENCODE|CR2TAB)
+TITLE("[1902] 편입비중 실시간 계산")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("piboPBxQ")
+MAPTYPE(FIXED)
+HEADER(LEDGER)
+TRXH("11CSONAQ088")
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL17(899, 553, 1729, 577)  LIMAGE(0)  LINEW(3)  LINETYPE(4)  LINECOLOR(64)      COLOR(34, 232)  CUR(0)    AL_LEFT    ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  GUIDE(918, 557, 1700, 573)        COLOR(34, 69)  CUR(0)    AL_LEFT    ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL0(0, 0, 1152, 40)        COLOR(66, 130)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  In(510, 700, 666, 720)  LEN(5)  IO_MIXED|EDIT_INOUT|FA_WRAP    COLOR(192, 69)  CUR(0)  TP_SUNKEN  INIT("00001")          TABORDER(1)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL7(552, 700, 624, 720)  '레코드갯수'  AL_LEFT  CUR(0)      COLOR(141, 192)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  Gubn(510, 719, 666, 739)  LEN(1)  IO_MIXED|EDIT_INOUT|FA_WRAP    COLOR(192, 69)  CUR(0)  TP_SUNKEN  INIT("2")          TABORDER(2)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL0(552, 719, 624, 739)  '조회구분'  AL_LEFT  CUR(0)      COLOR(141, 192)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  zGrpNo(510, 738, 666, 758)  LEN(20)  IO_MIXED|EDIT_INOUT|FA_WRAP    COLOR(192, 69)  CUR(0)  TP_SUNKEN          TABORDER(3)  IOORDER(3)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL1(552, 738, 624, 758)  '그룹번호'  AL_LEFT  CUR(0)      COLOR(141, 192)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL18(426, 855, 440, 869)    |IMAGE|AL_STRETCH    COLOR(34, 232)  CUR(0)    "알림_ic.bmp"  ENABLE  &
+  IMAGE  HINTTYPE(IH_NONE)
+BUTTON  b_send(1105, 10, 1141, 30)  '조회'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, BOLD)  COLOR(208, 186)  CUR(0)    "조회BTN.BMP"    TABORDER(5)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+GROUP  GROUP0(124, 643, 194, 663)  'Group'        COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  RADIO0(8, 565, 46, 585)  '전체'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(GROUP0)      COLOR(66, 232)  CUR(0)      TABORDER(6)  ENABLE  &
+  CHECKED  HINTTYPE(IH_NONE)
+BUTTON  RADIO1(51, 565, 114, 585)  '그룹번호'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(GROUP0)      COLOR(66, 232)  CUR(0)      TABORDER(7)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  next_btn(119, 623, 151, 643)  '다음'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, NORMAL)  COLOR(208, 69)  CUR(0)    "2btn.bmp"    TABORDER(8)  &
+  IMAGETEXT  HINTTYPE(IH_NONE)
+COMBO  COMBO0(117, 565, 251, 585)  TP_SUNKEN  LEN(20)  COUNT(0)  VCOUNT(0)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_NUM|EDIT_INPUT|FA_SKIP    COLOR(68, 130)  CUR(0)    TABORDER(9)  IOORDER(6)  &
+  HINTTYPE(IH_NONE)
+OUT  out1(555, 760, 660, 780)  LEN(1)  IO_NUM|AL_CENTER|    COLOR(192, 69)  CUR(0)            TABORDER(0)  IOORDER(4)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  BUTTON5(255, 565, 320, 584)  '그룹갱신'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, NORMAL)  COLOR(208, 130)  CUR(0)    "4btn.bmp"    TABORDER(10)  ENABLE  &
+  IMAGETEXT  HINTTYPE(IH_NONE)
+OBJECT  OBJ_GRP(710, 585, 1010, 850)    "IB190191"  TABORDER(11)  IOORDER(7)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL3(235, 600, 620, 620)  '항목을 더블클릭시 계좌별 상세내역을 확인하실수 있습니다.'  AL_LEFT  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(66, 91)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL3(-2, 0, 1, 60)        COLOR(64, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  OBJ_BOTTOM(0, 483, 1153, 533)  |FA_ENUM  "IB190201"  TABORDER(12)  IOORDER(8)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON2(1083, 10, 1103, 30)  TP_PUSH|IMAGE|AL_STRETCH      COLOR(208, 232)  CUR(0)    "엑셀.bmp"    TABORDER(13)  ENABLE  &
+  VISIBLE  IMAGE  HOVER  HINTTYPE(IH_NONE)
+BUTTON  CHK_GROUPING(325, 565, 436, 585)  '비그룹계좌 제외'  TP_CHECK|EDIT_NOP          COLOR(66, 130)  CUR(0)      TABORDER(14)  ENABLE  &
+  CHECKED  HINTTYPE(IH_STRING)  HELPTEXT("그룹에 편입된 계좌만 조회")HELPTEXT("그룹에 편입된 계좌만 조회")
+LABEL  LABEL2(558, 11, 1066, 31)  '* 유가증권총평가 = 주식 + RP / 주식편입비율은 RP분제외하여 산출 / RP평가금액 세후기준'  AL_LEFT  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(66, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL4(1151, 0, 1340, 40)        COLOR(66, 130)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL2(1148, 0, 1154, 60)        COLOR(64, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL6(1337, 0, 1343, 60)        COLOR(64, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON0(10, 10, 75, 30)  '그룹보기'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, NORMAL)  COLOR(208, 130)  CUR(0)    "4btn.bmp"    TABORDER(16)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+LABEL  LABEL4(1187, 11, 1304, 31)  '그룹목록'  AL_CENTER  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(66, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON1(1310, 10, 1330, 30)  TP_PUSH|IMAGE|AL_STRETCH      COLOR(208, 232)  CUR(0)    "TURN.bmp"    TABORDER(17)  ENABLE  &
+  VISIBLE  IMAGE  HOVER  HINTTYPE(IH_NONE)
+PANEL  PANEL95(-2, 40, 1151, 505)  LIMAGE(0)  LINEW(4)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    RESIZABLE  AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+GRID  GRID1(7, 45, 1139, 483)  VISIBLEROW(0)  CELLH(18)  MATRIX(500, 15)  FIX(0)  MAINCOLOR(208, 232)  LINECOLOR(75)  FOCUSCOLOR(78)  FOCUSKIND(4)  ROWC(68, 77)  |FLEXIBLE|VSCROLL|INS_TOP|GRFIX|NO3D|RROW|PAGE|GRFTEXT    &
+	COLINFO("col1")  LEN(20)  WIDTH(86)  HEAD("계좌번호")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_ZEROSUP|SA_SPACE    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  COLUMN_SORT  INORMAL  EDITFORMAT("999-99-999999")    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col0")  LEN(40)  WIDTH(70)  HEAD("계좌명")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  COLUMN_SORT  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col14")  LEN(40)  WIDTH(130)  HEAD("그룹명")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT  |FA_SKIP    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col2")  LEN(16)  WIDTH(100)  HEAD("예수금")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_CORGB|SA_COSIGN    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  COLUMN_SORT  INORMAL  IFRGB(69, 69)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col3")  LEN(16)  WIDTH(100)  HEAD("D1예수금")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_CORGB|SA_COSIGN    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  COLUMN_SORT  INORMAL  IFRGB(69, 69)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col4")  LEN(16)  WIDTH(100)  HEAD("D2예수금")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_CORGB|SA_COSIGN    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  COLUMN_SORT  INORMAL  IFRGB(69, 69)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col5")  LEN(16)  WIDTH(100)  HEAD("주식평가금액")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_CORGB|SA_COSIGN    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  COLUMN_SORT  INORMAL  IFRGB(69, 69)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col13")  LEN(16)  WIDTH(100)  HEAD("RP평가금액")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_SKIP|FA_CORGB|SA_COSIGN    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col8")  LEN(16)  WIDTH(100)  HEAD("유가증권총평가")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_SKIP    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col9")  LEN(24)  WIDTH(100)  HEAD("총평가금액")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_SKIP    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  COLUMN_SORT  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col6")  LEN(16)  WIDTH(100)  HEAD("총평가금액")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_CORGB|SA_COSIGN    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_SORT  INORMAL  IFRGB(94, 95)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col10")  LEN(16)  WIDTH(75)  HEAD("주식편입비율")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_SKIP    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  COLUMN_SORT  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col11")  LEN(16)  WIDTH(55)  HEAD("현금비율")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_SKIP    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  COLUMN_SORT  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col12")  LEN(1)  WIDTH(20)  HEAD("당일이체이력여부")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col7")  LEN(16)  WIDTH(100)  HEAD("RP평가금액")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_CORGB|SA_COSIGN    COLOR(68, 69)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    TABORDER(4)  IOORDER(5)  ENABLE  &
+  VISIBLE
+
+PANEL  PANEL5(1151, 40, 1340, 535)  LIMAGE(0)  LINEW(4)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    RESIZABLE  AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+GRID  GRID0(1163, 51, 1329, 526)  VISIBLEROW(0)  CELLH(18)  MATRIX(50, 3)  FIX(0)  MAINCOLOR(208, 232)  LINECOLOR(75)  FOCUSCOLOR(78)  FOCUSKIND(4)  ROWC(68, 77)  |FLEXIBLE|VSCROLL|INS_TOP|GRFIX|NO3D|RROW|GRFTEXT    &
+	COLINFO("Col0")  LEN(1)  WIDTH(20)  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_INPUT  |FA_SKIP    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  ICHECK    HCHECK  COLCUR(0, 0)  &
+	COLINFO("Col2")  LEN(40)  WIDTH(130)  HEAD("그룹명")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT  |FA_SKIP    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col1")  LEN(20)  WIDTH(80)  HEAD("그룹번호")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT  |FA_SKIP    COLOR(68, 69)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    TABORDER(15)  IOORDER(9)  ENABLE  &
+  VISIBLE
+
+BUTTON  BUTTON3(79, 10, 115, 30)  '조회'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, BOLD)  COLOR(208, 186)  CUR(0)    "조회BTN.BMP"    TABORDER(18)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Dim g_groupRow, g_gridRow
+g_groupRow = 1
+g_gridRow = 1
+
+Sub RemoveNonGroupingRows()
+	OBJ_GRP.Proc "RemoveNonGroupingRows", "parent.GRID1,1"
+End Sub
+
+Sub EndQueryGroup(Mode)
+	If Mode = 1 Then
+		SCREEN.Proc "OBJ_GRP.StrQueryGroupList", "COMBO0"
+		SCREEN.Proc "OBJ_GRP.QueryGroupListToGrid", "parent.GRID0"
+		SetAllCheck("1")
+		Call GRID0.SetHeadCell(1, "1")
+
+		'SYSTEM.Trace "GRID0[" & GRID0.Rows & "]"
+		'SCREEN.Proc "OBJ_GRP.StrQueryAcntList", COMBO0.Data&",2,acgrid,cmb_acnt"
+		Call Send_f("0")
+	End If
+End Sub
+
+'0: 전체조회, 1:그룹조회 처음, 2:그룹조회 다음
+Sub Send_f(val)
+	LEDGER.Rcnt = "0050"'CalcRow()'"0008"
+	LEDGER.Fkey = "C"
+
+	If val = "0" Then
+		GRID1.Clear
+		OBJ_BOTTOM.ClearAll 2
+		Call GRID1.SetDataPosition(0)
+		zGrpNo.Data = GRID0.GetGridCell(1, 3)
+		g_groupRow = 1
+		g_gridRow = 1
+	ElseIf val = "1" Then
+		GRID1.Clear
+		Call GRID1.SetDataPosition(0)
+		zGrpNo.Data = ""
+		g_groupRow = 1
+		g_gridRow = 1
+		Call SetCheckGroup()
+	ElseIf val = "2" Then
+		Call GRID1.SetDataPosition(2)
+	End If
+
+	SCREEN.Send 0
+End Sub
+
+Sub Send_c()
+	'LEDGER.Rcnt = "0008"
+	LEDGER.Fkey = "7"
+	Call GRID1.SetDataPosition(2)
+
+	SCREEN.Send 0
+
+End Sub
+
+Sub CheckInput()
+	Dim ii, dd
+	'MsgBox "CheckInput"
+	dd = "" '임의의 값
+	For ii=1 To GRID1.Rows
+		dd = Trim(GRID1.GetGridCell(ii, 1))
+		If dd <> "" Then
+			Exit For
+		End If
+	Next
+	'MsgBox "["&dd&"]"
+	If dd = "" Then
+		SCREEN.Object("Object0.zFnoOrdPtnCode").Data = "SS"
+		SCREEN.Object("Object0.lFundOrdNo").data = "+000000000"
+	Else
+		SCREEN.Object("Object0.zFnoOrdPtnCode").Data = "00"
+	End If
+End Sub
+
+Sub AddJumun(str)
+
+	'MsgBox "["&str&"]"
+	Dim no, msg
+	no = Mid(str,1,10)
+	msg = Mid(str,11,Len(str)-11)
+	GRID1.InsertRow GRID1.Rows
+	GRID1.SetGridCell GRID1.Rows, 1, no
+	GRID1.SetGridCell GRID1.Rows, 2, msg
+	SCREEN.Send 0
+End Sub
+
+Sub EndJumun()
+	Dim ii, val, chk, Total, ival
+	If GRID1.Rows > 0 Then
+		Total = SCREEN.Object("main.OBJ_ODR.OBJ_FUNDACC.Grid0").rows
+
+		ival = 1
+		If Total > 0 Then
+			For ii=1 To Total
+				chk = SCREEN.Object("main.OBJ_ODR.OBJ_FUNDACC.Grid0").GetGridCell(ii, 23)
+				If chk = 1 Then
+					Call SCREEN.Object("main.OBJ_ODR.OBJ_FUNDACC.Grid0").SetGridCell(ii, 27, GRID1.GetGridCell(ival, 1))
+					Call SCREEN.Object("main.OBJ_ODR.OBJ_FUNDACC.Grid0").SetGridCell(ii, 24, GRID1.GetGridCell(ival, 2))
+					ival = ival + 1
+				End If
+			Next
+		End If
+
+		SCREEN.Object("main.OBJ_ODR.o_jmno").data = SCREEN.Object("Object0.OFundOrdNo").data
+		SCREEN.Proc "main.OBJ_ODR.AfterOrder", ""
+	End If
+End Sub
+
+Function GetState(val)
+	Dim ss, ret
+	ss = CStr(CLng(val))
+	Select Case ss
+		Case "0"
+			ret = "정상"
+		Case "6"
+			ret = "정정확인"
+		Case "8"
+			ret = "취소확인"
+		Case "7"
+			ret = "정정중"
+		Case "9"
+			ret = "취소중"
+		Case Else
+			ret = "그외..거부"
+	End Select
+	GetState = ret
+End Function
+
+Sub SetOrderGb(val)
+	Dim ii, chk
+	For ii=1 To GRID1.Rows
+		'chk = GRID1.GetGridCell(ii, 33)
+		'If chk = "1" Then
+			Call GRID1.SetGridCell(ii, 29, val) '주문구분
+		'End If
+	Next
+
+	Select Case val
+		Case "00" '지정가
+
+		Case "03" '시장가
+			SetAllDanga("0")
+		Case "05" '조건부지정가
+
+		Case "06" '최유리지정가
+			SetAllDanga("0")
+		Case "07" '최우선지정가
+			SetAllDanga("0")
+		Case "81" '시간외종가
+			SetAllDanga("0")
+	End Select
+End Sub
+
+Sub SetOrderConf(val)
+	Dim ii, chk
+	For ii=1 To GRID1.Rows
+		'chk = GRID1.GetGridCell(ii, 33)
+		'If chk = "1" Then
+			Call GRID1.SetGridCell(ii, 30, val) '주문조건
+		'End If
+
+	Next
+End Sub
+
+Sub SetAllDanga(val)
+	Dim ii, chk
+	For ii=1 To GRID1.Rows
+		'chk = GRID1.GetGridCell(ii, 33)
+		'If chk = "1" Then
+			Call GRID1.SetGridCell(ii, 32, val) '주문단가
+		'End If
+
+	Next
+End Sub
+
+Sub SetAllCheck(val)
+	Dim ii, chk, val2
+	For ii=1 To GRID1.Rows
+		'chk = GRID1.GetGridCell(ii, 33)
+		'If chk = "1" Then
+		'	Call GRID1.SetGridCell(ii, 33, val) '선택필드
+		'End If
+		val2 = CLng(GRID1.GetGridCell(ii, 15)) '가능수량
+		'SYSTEM.Trace val2
+		If val2 > 0 Then
+			Call GRID1.SetGridCell(ii, 34, val) '선택필드
+			'MsgBox "가능수량이 0보다 큰 항목만 선택가능합니다.",vbOKOnly, "IBK투자증권"
+		End If
+
+	Next
+End Sub
+
+Function GetPwd(val)
+
+	'GetPwd = "0423"
+	For ii=1 To acgrid.Rows
+		acnt = acgrid.GetGridCell(ii,1)
+		If acnt = val Then
+			GetPwd = acgrid.GetGridCell(ii,3)
+			Exit Function
+		End If
+	Next
+	GetPwd = ""
+End Function
+
+Sub SetDanga(val)
+	Dim ii, val2, idata
+	If Trim(val) = "" Then
+		Exit Sub
+	End If
+	For ii=1 To GRID1.Rows
+		idata = GRID1.GetGridCell(ii, 29) '호가유형
+		If idata = "03" Or idata = "06" Or idata = "07" Or idata = "81" Then
+		Else
+			Call GRID1.SetGridCell(ii, 32, val) '체크박스선택
+		End If
+	Next
+End Sub
+
+Sub ChangeMMColor()
+	Dim ii
+	For ii=1 To GRID1.Rows
+		idata = GRID1.GetGridCell(ii, 8) '매매구분
+		If idata = "1" Then
+			GRID1.SetTRgb ii, 8, 95
+		Else
+			GRID1.SetTRgb ii, 8, 94
+		End If
+	Next
+End Sub
+
+Function CalcRow()
+	Dim cnt, scnt
+	cnt = Int((8000-(32+GRID0.Rows*28*2+5)-400)/278) '400은 PB헤더값(340)+60은 여분
+	'MsgBox C(cnt,5)
+	scnt = CStr(cnt)
+
+	For ii = 1 To 5-Len(scnt)-1
+		scnt="0"&scnt
+	Next
+
+	CalcRow = scnt
+End Function
+
+Sub ClearOutput()
+	SCREEN.Object("OBJ_BOTTOM.SUM1").Clear
+	SCREEN.Object("OBJ_BOTTOM.SUM2").Clear
+	SCREEN.Object("OBJ_BOTTOM.SUM3").Clear
+	SCREEN.Object("OBJ_BOTTOM.SUM4").Clear
+	SCREEN.Object("OBJ_BOTTOM.SUM5").Clear
+	SCREEN.Object("OBJ_BOTTOM.SUM6").Clear
+	SCREEN.Object("OBJ_BOTTOM.SUM7").Clear
+	SCREEN.Object("OBJ_BOTTOM.SUM8").Clear
+End Sub
+
+Sub ShowGroup(bool)
+	If bool Then	'그룹 보이기
+		SCREEN.SetSize 1338, 534
+		PANEL3.SetRect -2, 0, 1, 60
+		PANEL0.SetRect 189, 0, 1341, 40
+		LABEL2.SetRect 746, 11, 1254, 31
+		BUTTON2.SetRect 1271, 10, 1291, 30
+		b_send.SetRect 1293, 10, 1329, 30
+		PANEL95.SetRect 185, 40, 1338, 505
+		GRID1.SetRect 194, 45, 1326, 483
+		OBJ_BOTTOM.SetRect 188, 483, 1340, 533
+
+		BUTTON0.SetRect 198, 10, 263, 30
+		BUTTON3.SetRect 265, 10, 301, 30
+		LABEL4.SetRect 36, 11, 153, 31
+		BUTTON1.SetRect 159, 10, 179, 30
+		PANEL4.SetRect 0, 0, 189, 40
+		PANEL5.SetRect -2, 40, 187, 535
+		GRID0.SetRect 10, 51, 176, 526
+		PANEL6.SetRect 1337, 0, 1343, 60
+		PANEL2.SetRect 184, 0, 188, 60
+	Else			'그룹 숨기기
+		SCREEN.SetSize 1150, 534
+		PANEL3.SetRect -2, 0, 1, 60
+		PANEL0.SetRect 0, 0, 1152, 40
+		LABEL2.SetRect 558, 11, 1066, 31
+		BUTTON2.SetRect 1083, 10, 1103, 30
+		b_send.SetRect 1105, 10, 1141, 30
+		PANEL95.SetRect -2, 40, 1151, 505
+		GRID1.SetRect 7, 45, 1139, 483
+		OBJ_BOTTOM.SetRect 0, 483, 1153, 533
+
+		BUTTON0.SetRect 10, 10, 75, 30
+		BUTTON3.SetRect 265, 10, 301, 30
+		LABEL4.SetRect 36, 11, 153, 31
+		BUTTON1.SetRect 159, 10, 179, 30
+		PANEL4.SetRect 0, 0, 189, 40
+		PANEL5.SetRect -2, 40, 187, 535
+		GRID0.SetRect 10, 51, 176, 526
+		PANEL6.SetRect 1337, 0, 1343, 60
+		PANEL2.SetRect 184, 0, 188, 60
+	End If
+
+	BUTTON3.Visible = bool
+	LABEL4.Visible = bool
+	BUTTON1.Visible = bool
+	PANEL4.Visible = bool
+	PANEL5.Visible = bool
+	GRID0.Visible = bool
+	PANEL6.Visible = bool
+	PANEL2.Visible = bool
+End Sub
+
+Sub SetAllCheck(val)
+	Dim ii
+	For ii=1 To GRID0.Rows
+		If Trim(GRID0.GetGridCell(ii, 2)) <> "" Then
+			Call GRID0.SetGridCell(ii, 1, val) '선택필드
+		End If
+	Next
+End Sub
+
+Sub SetCheckGroup()
+	For ii = g_groupRow To GRID0.Rows
+		If GRID0.GetGridCell(ii, 1) = "1" And Trim(GRID0.GetGridCell(ii, 3)) <> "" Then
+			zGrpNo.Data = GRID0.GetGridCell(ii, 3)
+			Exit For
+		End If
+	Next
+	g_groupRow = ii
+	'SYSTEM.Trace "g_groupRow[" & g_groupRow & "]"
+
+End Sub
+
+_AW_ONSTART_AW_
+'Call Send_f()
+Call ShowGroup(False)
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+SCREEN.OnSend = False
+Gubn.Data = "2"
+SCREEN.OnSend = True
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+SCREEN.Object("OBJ_BOTTOM.GUIDE").text = GUIDE.text
+
+If CHK_GROUPING.Checked Then
+		Call RemoveNonGroupingRows()
+End If
+
+Dim ii, sname, TotalSum1, TotalSum2, TotalSum3, TotalSum4, TotalSum5, TotalSum6, TotalSum7, TotalSum8, TotalSum9,diff, nAdd
+If LEDGER.Next = "Y" Then
+	next_btn.Enable = True
+	Call Send_c()
+Else
+
+	nAdd = (GRID1.Rows - g_gridRow) + 1
+
+'	SYSTEM.Trace "g_gridRow[" & g_gridRow & "] GRID1.Rows[" & GRID1.Rows & "] nAdd[" & nAdd & "] g_groupRow[" & g_groupRow & "] GRID0.Rows[" & GRID0.Rows & "]"
+
+	For ii = g_gridRow To GRID1.Rows
+		If Trim(GRID0.GetGridCell(g_groupRow, 2)) <> "" Then
+			Call GRID1.SetGridCell(ii, 3, GRID0.GetGridCell(g_groupRow, 2))
+		End If
+
+		'SYSTEM.Trace "group[" & GRID0.GetGridCell(g_groupRow, 2) & "]"
+	Next
+
+	g_gridRow = g_gridRow + nAdd
+
+	For ii= g_groupRow+1 To GRID0.Rows
+		If Trim(GRID0.GetGridCell(ii, 2)) <> "" And GRID0.GetGridCell(ii, 1) = "1" Then
+			zGrpNo.Data = GRID0.GetGridCell(ii, 3)
+			g_groupRow = ii
+		'	SYSTEM.Trace "g_groupRow[" & g_groupRow & "]"
+
+			send_f("2")
+			Exit For
+		End If
+	Next
+
+	next_btn.Enable = False
+	TotalSum1 = 0
+	TotalSum2 = 0
+	TotalSum3 = 0
+	TotalSum4 = 0
+	TotalSum5 = 0
+	TotalSum6 = 0
+	TotalSum7 = 0
+	TotalSum8 = 0
+	TotalSum9 = 0
+
+	If GRID1.Rows < 1 Then
+		ClearOutput()
+		Exit Sub
+	End If
+
+	For ii=1 To GRID1.Rows
+		If GRID1.GetGridCell(ii, 14)="1" Then
+			GRID1.SetTRgb ii, 1, 94
+		Else
+			GRID1.SetTRgb ii, 1, 69
+		End If
+
+		GRID1.SetGridCell ii, 8, FormatNumber(CDbl(GRID1.GetGridCell(ii, 15)),0)
+		GRID1.SetGridCell ii, 9, FormatNumber(CDbl(GRID1.GetGridCell(ii, 7))+CDbl(GRID1.GetGridCell(ii, 8)),0)
+		GRID1.SetGridCell ii, 10, FormatNumber(CDbl(GRID1.GetGridCell(ii, 6))+CDbl(GRID1.GetGridCell(ii, 7)),0)
+
+		If Len(Trim(GRID1.GetGridCell(ii, 7))) > 0 Then
+			EvalAmt = CDbl(Trim(GRID1.GetGridCell(ii, 7)))
+			TotalAmt = CDbl(Trim(GRID1.GetGridCell(ii, 10)))
+
+			If TotalAmt = 0 Then
+				GRID1.SetGridCell ii, 12, "0.00"
+				GRID1.SetGridCell ii, 13, "0.00"
+			Else
+				diff = (CDbl(Evalamt) /CDbl(TotalAmt)) * 100
+				diff = FormatNumber(diff, 2)
+				GRID1.SetGridCell ii, 12, diff
+				GRID1.SetGridCell ii, 13, FormatNumber(100 - diff, 2)
+			End If
+		ElseIf Len(Trim(GRID1.GetGridCell(ii, 10))) > 0 Then
+			TotalAmt = CDbl(Trim(GRID1.GetGridCell(ii, 10)))
+			If TotalAmt = 0 Then
+				GRID1.SetGridCell ii, 13, "0.00"
+			Else
+				GRID1.SetGridCell ii, 13, "100.00"
+			End If
+			GRID1.SetGridCell ii, 12, "0.00"
+		Else
+			GRID1.SetGridCell ii, 12, "0.00"
+			GRID1.SetGridCell ii, 13, "0.00"
+		End If
+
+'		If GRID1.GetGridCell(ii, 8) <> 0 Then
+'			Dim EvalAmt, TotalAmt
+'			EvalAmt = Trim(GRID1.GetGridCell(ii, 6))
+'			TotalAmt = Trim(GRID1.GetGridCell(ii, 7))
+'
+'			If EvalAmt = "" Or TotalAMt = "" Then
+'				GRID1.SetGridCell ii,9, "0"
+'				GRID1.SetGridCell ii,10, "100.00"
+'			Else
+'				If IsNumeric(EvalAmt) = False Or IsNumeric(TotalAmt) = False Then
+'					GRID1.SetGridCell ii,9, "0"
+'					GRID1.SetGridCell ii,10, "100.00"
+'				Else
+'					diff = CDbl(EvalAmt) / CDbl(TotalAmt) * 100
+'					diff = FormatNumber(diff, 2)
+'
+'					GRID1.SetGridCell ii,9, diff
+'					GRID1.SetGridCell ii,10, FormatNumber(100 - diff, 2)
+'				End If
+'			End If
+'		Else
+'			GRID1.SetGridCell ii,9, "0"
+'			GRID1.SetGridCell ii,10, "100.00"
+'		End If
+
+		TotalSum1 = TotalSum1 + GRID1.GetGridCell(ii, 4)
+		TotalSum2 = TotalSum2 + GRID1.GetGridCell(ii, 5)
+		TotalSum3 = TotalSum3 + GRID1.GetGridCell(ii, 6)
+		TotalSum4 = TotalSum4 + GRID1.GetGridCell(ii, 7)
+		TotalSum5 = TotalSum5 + GRID1.GetGridCell(ii, 8)
+		TotalSum6 = TotalSum6 + GRID1.GetGridCell(ii, 9)
+
+		Dim tmp7Val
+		tmp7Val = Trim(GRID1.GetGridCell(ii, 10))
+
+		If tmp7Val = "" Then
+			TotalSum7 = TotalSum7
+		Else
+			If IsNumeric(tmp7Val) = True Then
+				TotalSum7 = TotalSum7 + CDbl(tmp7Val)
+			Else
+				TotalSum7 = TotalSum7
+			End If
+		End If
+
+		If Trim(TotalSum4) <> "" Or Trim(TotalSum7) <> "" Then
+			If IsNumeric(TotalSum4) = True And IsNumeric(TotalSum7) = True Then
+				If CDbl(TotalSum7) = 0 Then
+					TotalSum8 = 0
+					TotalSum9 = 100
+				Else
+					TotalSum8 = (CDbl(TotalSum4) / CDbl(TotalSum7)) * 100
+					TotalSum9 = 100 - TotalSum8
+				End If
+			Else
+				TotalSum8 = 0
+				TotalSum9 = 100
+			End If
+		Else
+			TotalSum8 = 0
+			TotalSum9 = 100
+		End If
+	Next
+
+	SCREEN.Object("OBJ_BOTTOM.SUM2").Data = TotalSum1
+	SCREEN.Object("OBJ_BOTTOM.SUM3").Data = TotalSum2
+	SCREEN.Object("OBJ_BOTTOM.SUM4").Data = TotalSum3
+	SCREEN.Object("OBJ_BOTTOM.SUM5").Data = TotalSum4
+	SCREEN.Object("OBJ_BOTTOM.SUM6").Data = TotalSum5
+	SCREEN.Object("OBJ_BOTTOM.SUM7").Data = TotalSum6
+	SCREEN.Object("OBJ_BOTTOM.SUM8").Data = TotalSum7
+	SCREEN.Object("OBJ_BOTTOM.SUM9").Data = FormatNumber(TotalSum8,2)
+	SCREEN.Object("OBJ_BOTTOM.SUM10").Data = FormatNumber(TotalSum9,2)
+
+	SCREEN.SetTimer 3, False
+	'GRID1.Sort 2, True, False
+
+
+'	OUTPUT0.Data = TotalSum3
+'	SUM4.Data = TotalSum3
+'	OUTPUT3.Data = TotalSum3 + OUTPUT15.Data
+'	SUM2.Data = TotalSum1
+'	For ii=1 To GRID1.Rows
+'		data = FormatNumber(GRID1.GetGridCell(ii, 11)/OUTPUT3.Data*100,2)
+'		Call GRID1.SetGridCell(ii,21, data)
+'	Next
+'	SUM5.Data = FormatNumber(SUM4.Data/OUTPUT3.Data*100,2)
+'	SUM6.Data = FormatNumber(100-SUM5.Data,2)
+End If
+
+'For ii=1 To GRID1.Rows
+'	sname = Mid(GRID1.GetGridCell(ii,5),2,6)
+'	sname = Trim(SCREEN.GetName(100, sname, 99))
+'	Call GRID1.SetGridCell(ii, 28, GRID1.GetGridCell(ii,9))  '호가유형
+'	Call GRID1.SetGridCell(ii, 29, GRID1.GetGridCell(ii,22)) '주문구분
+'	Call GRID1.SetGridCell(ii, 30, CStr(CLng(GRID1.GetGridCell(ii,14)))) '주문수량
+'	Call GRID1.SetGridCell(ii, 31, CStr(CLng(GRID1.GetGridCell(ii,11)))) '주문단가
+'	Call GRID1.SetGridCell(ii, 32, sname) '종목명
+'	Call GRID1.SetGridCell(ii, 34, GetState(GRID1.GetGridCell(ii,18))) '주문처리유형명
+'	idata = GRID1.GetGridCell(ii, 14) '가능수량
+'	If idata > 0 Then
+'		Call GRID1.SetGridCell(ii, 33, "1") '체크박스선택
+'	End If
+'Next
+'Call ChangeMMColor()
+
+_AW_ONENDSUB_AW_
+_AW_ONTIMER_AW_
+GRID1.Sort 2, True, True
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(b_send)
+_AW_ONCLICK_AW_
+'GRID0.SetRows 2
+'in2.Data = "00002"
+'Call GRID0.SetGridCell(1, 1, "00110000026")
+'Call GRID0.SetGridCell(1, 2, "0423")
+'Call GRID0.SetGridCell(2, 1, "00110000035")
+'Call GRID0.SetGridCell(2, 2, "0423")
+
+
+
+Call Send_f("1")
+'SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(RADIO0)
+_AW_ONCLICK_AW_
+COMBO0.Enable = Not RADIO0.Checked
+'Call Send_f(True)
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(RADIO1)
+_AW_ONCLICK_AW_
+COMBO0.Enable = RADIO1.Checked
+'Call Send_f(True)
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(next_btn)
+_AW_ONCLICK_AW_
+Call Send_c()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(COMBO0)
+_AW_ONCHANGE_AW_
+'Call Send_f(True)
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON5)
+_AW_ONCLICK_AW_
+  OBJ_GRP.Proc "Refresh", ""
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON2)
+_AW_ONCLICK_AW_
+GRID1.Excel True,True,""
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(CHK_GROUPING)
+_AW_ONCLICK_AW_
+
+Call Send_f()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON0)
+_AW_ONCLICK_AW_
+If BUTTON0.Text = "그룹보기" Then
+	BUTTON0.Text = "그룹닫기"
+	Call ShowGroup(True)
+ElseIf BUTTON0.Text = "그룹닫기" Then
+	BUTTON0.Text = "그룹보기"
+	Call ShowGroup(False)
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON1)
+_AW_ONCLICK_AW_
+OBJ_GRP.Proc "Refresh", ""
+SCREEN.Proc "OBJ_GRP.QueryGroupListToGrid", "parent.GRID0"
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(GRID1)
+_AW_ONDBLCLK_AW_
+Dim Col, Row, val, val2
+Col = GRID1.Column
+Row = GRID1.Row
+If Row <> -1 And Len(Replace(Trim(GRID1.GetGridCell(GRID1.row, 1)), "-", ""))=11 Then
+	'SYSTEM.Trace "LEN = " & Len(Replace(Trim(GRID1.GetGridCell(GRID1.row, 1)), "-", ""))
+	If Col=2 Then
+		SCREEN.CreateWindow 1, "IB140200 /p5/t/s /d", _
+		"AN1A" & vbTab & Replace(Trim(GRID1.GetGridCell(GRID1.row, 1)), "-", "") & vbLf & _
+		'"zOrdStrDt" & vbTab & zQryStrDt.Data & vbLf & _
+		'"zOrdEndDt" & vbTab & zQryEndDt.Data & vbLf & _
+		"BeforeInit" & vbTab & "1" & vbLf & _
+		"Beforejmchk" & vbTab & "0" & vbLf
+		'"Beforejmcd" & vbTab & Trim(GRID0.GetGridCell(GRID0.row, 6))
+	ElseIf Col=1 Then
+		val = Replace(Trim(GRID1.GetGridCell(GRID1.row, 1)), "-", "") '계좌번호
+		SCREEN.CreateWindow 1, "IB120200 /t/S/p5/d", "AN1A" & vbTab & val
+	Else
+		val = GRID1.GetGridCell(Row, 1) '계좌번호
+		val2 = GRID1.GetGridCell(Row, 2) '계좌명
+		SCREEN.CreateWindow 1, "IB190220 /t/S/p5/d", "EDIT0"&vbTab&val&vbLf&"EDIT1"&vbTab&val2
+	End If
+End If
+_AW_ONENDSUB_AW_
+_AW_ONCHANGE_AW_
+Dim Col, Row, val, val2
+Col = GRID1.Column
+Row = GRID1.Row
+
+Select Case Col
+	Case 32  '주문가격
+		val = GRID1.GetGridCell(Row, 29)
+		If val = "03" Or val = "06" Or val = "07" Or val = "81" Then
+			Call GRID1.SetGridCell(Row, Col, "0")
+			MsgBox "단가 입력이 불가한 주문구분입니다.",vbOKOnly, "IBK투자증권"
+		End If
+	Case 31  '주문수량
+		val = CLng(GRID1.GetGridCell(Row, 16)) '가능수량
+		val2 = CLng(GRID1.GetGridCell(Row, Col)) '주문수량
+		If val<val2 Then
+			Call GRID1.SetGridCell(Row, Col, val)
+			MsgBox "주문수량이 가능수량을 초과하였습니다..",vbOKOnly, "IBK투자증권"
+		End If
+	Case 29 '주문구분
+		val = GRID1.GetGridCell(Row, Col)
+		If val = "03" Or val = "06" Or val = "07" Or val = "81" Then
+			Call GRID1.SetGridCell(Row, 32, "0")
+			'MsgBox "단가 입력이 불가한 주문구분입니다.",vbOKOnly, "IBK투자증권"
+		End If
+
+End Select
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(GRID0)
+_AW_ONCLICK_AW_
+If GRID0.HitPos = 4 And GRID0.Column = 1 Then
+	If GRID0.GetHeadCell(1) = "1" Then
+		Call SetAllCheck("1")
+	Else
+		Call SetAllCheck("0")
+	End If
+ElseIf GRID0.HitPos = 3 And GRID0.Column = 1 Then
+	Call GRID0.SetHeadCell(1,"0")
+End If
+_AW_ONENDSUB_AW_
+_AW_ONDBLCLK_AW_
+Dim bCheck
+If GRID0.HitPos = 3 And GRID0.Column = 2 Then
+	Call GRID0.SetHeadCell(1,"0")
+
+	If GRID0.GetGridCell(GRID0.Row, 1) = "1" Then
+		bCheck = "0"
+	Else
+		bCheck = "1"
+	End If
+
+	Call GRID0.SetGridCell(GRID0.Row, 1, bCheck)
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON3)
+_AW_ONCLICK_AW_
+'GRID0.SetRows 2
+'in2.Data = "00002"
+'Call GRID0.SetGridCell(1, 1, "00110000026")
+'Call GRID0.SetGridCell(1, 2, "0423")
+'Call GRID0.SetGridCell(2, 1, "00110000035")
+'Call GRID0.SetGridCell(2, 2, "0423")
+
+
+
+Call Send_f("1")
+'SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

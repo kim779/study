@@ -1,0 +1,155 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB840350)
+MAPSIZE(195, 341)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("청약 투자설명서")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+TITLE("청약 투자설명서")
+TOPATH(AXIS)
+METHOD(MENU)
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+BUTTON  tjsmDn(44, 97, 166, 117)  '투자설명서 다운로드'  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(208, 231)  CUR(10)    "10btn.bmp"    TABORDER(1)  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+BUTTON  acrDn(167, 97, 301, 117)  '아크로벳리더 다운로드'  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(208, 186)  CUR(10)    "10btn.bmp"    TABORDER(2)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+PANEL  PANEL2(9, 3, 142, 23)  '투자설명서 다운로드'  TP_NONE      COLOR(68, 130)  CUR(0)    AL_LEFT  FONT("굴림체", 9, BOLD)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+PANEL  PANEL5(1, 6, 12, 20)    |IMAGE|AL_CENTER    COLOR(0, 232)  CUR(0)    "텍스트화살표_하단.BMP"  ENABLE  &
+  VISIBLE  TRANSPARENT  IMAGE  HINTTYPE(IH_NONE)
+LABEL  LABEL0(5, 25, 335, 45)  '- 청약신청 전에 투자설명서 내용을 확인하시기 바랍니다.'  AL_LEFT  CUR(0)      COLOR(0, 91)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL1(5, 47, 335, 67)  '- 사전에 투자설명서를 교부받거나 거부확인서를 제출하신'  AL_LEFT  CUR(0)      COLOR(0, 91)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL2(17, 70, 266, 90)  '고객께서는 다운로드 없이 청약 가능합니다.'  AL_LEFT  CUR(0)      COLOR(0, 91)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL3(10, 125, 344, 145)  '투자설명서를 읽기 위해서는 Acrobat Reader가 필요합니다.'  AL_LEFT  CUR(0)      COLOR(0, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  tjsmChk(10, 150, 339, 170)  '해당종목의 투자설명서를 교부받았음을 확인합니다.'  TP_CHECK|EDIT_NOP        FONT("굴림체", 9, BOLD)  COLOR(0, 231)  CUR(0)      TABORDER(3)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  s_btn(132, 174, 168, 194)  '확인'  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(208, 69)  CUR(10)    "3btn.bmp"    TABORDER(4)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+BUTTON  c_btn(169, 174, 205, 194)  '취소'  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(208, 69)  CUR(10)    "3btn.bmp"    TABORDER(5)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+OBJECT  obj_serverCheck(50, 310, 340, 410)    "IB840352"  TABORDER(6)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONINDECLARE_AW_
+#LOAD IB888833
+
+_AW_ONENDSUB_AW_
+_AW_ONSTART_AW_
+tjsmChk.Enable = False
+s_btn.Enable = False
+c_btn.Enable = False
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(tjsmDn)
+_AW_ONCLICK_AW_
+Dim url, jmcd, gjdt, param
+
+SYSTEM.Push "Dn_Success", ""
+
+If Len(Trim(SCREEN.Object("parent.zIsuNo").Data)) = 6 Then
+	jmcd = "A" & Trim(SCREEN.Object("parent.zIsuNo").Data)
+Else
+	jmcd = Trim(SCREEN.Object("parent.zIsuNo").Data)
+End If
+
+'SYSTEM.Trace "jmcd = " & jmcd
+
+param = "zAcntNo" & vbTab & SCREEN.Object("parent.AN1A").Data & vbLf &_
+		"zAppyIsuNo" & vbTab & jmcd & vbLf &_
+		"zAppySrtDt" & vbTab & SCREEN.Object("parent.zAppySrtDt").Data & vbLf &_
+		"regYn" & vbTab & SCREEN.Object("parent.regYn").Data
+
+SCREEN.CreateWindow 2, "IB840267 /p5 /d", param
+
+If SYSTEM.Pop("Dn_Success") <> "OK" Then
+	Exit Sub
+End If
+
+tjsmChk.Enable = True
+s_btn.Enable = True
+c_btn.Enable = True
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(acrDn)
+_AW_ONCLICK_AW_
+SYSTEM.Navigate "http://www.adobe.com/kr/products/acrobat/readstep2.html"
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(tjsmChk)
+_AW_ONCLICK_AW_
+'con_chk()
+
+'If tjsmChk.Checked = True Then
+'	s_btn.Enable = True
+'	c_btn.enable = True
+'Else
+'	s_btn.Enable = False
+'End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(s_btn)
+_AW_ONCLICK_AW_
+	'SCREEN.Object("parent.obj0.tjsmDn").Enable = True
+	'SCREEN.Object("parent.obj0.acrDn").Enable = True
+
+	SCREEN.Object("parent.zIsuNo").Enable = True
+	SCREEN.Object("parent.SYMBOL7").Enable = True
+	SCREEN.Object("parent.zBaseDt").Enable = True
+	SCREEN.Object("parent.lAppyQty").Enable = True
+	SCREEN.Object("parent.OverAppyQty").Enable = True
+	SCREEN.Object("parent.BUTTON0").Enable = True
+
+	'SCREEN.Object("parent.obj0.tjsmChk").Enable = False
+	's_btn.Enable = False
+	'c_btn.Enable = False
+
+	SCREEN.Object("parent.lAppyQty").SetFocus
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(c_btn)
+_AW_ONCLICK_AW_
+'SCREEN.CloseWindow()
+If tjsmChk.Enable = False Then
+	Exit Sub
+End If
+
+tjsmChk.Checked = False
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

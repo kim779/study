@@ -1,0 +1,171 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB303090)
+MAPSIZE(217, 287)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("대용주문 obj")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(CR2TAB|SAVE)
+TITLE("[303090] 대용주문")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(NORM)
+HEADER(LEDGER)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL0(0, 0, 287, 26)        COLOR(66, 67)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+CONTROL  AN1A(3, 3, 143, 23)    "CX_Account"  "/w0/t투자성향정보팝업"  LEN(11)  EDIT_INPUT    COLOR(68, 130)  TABORDER(1)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  ACNM(146, 3, 210, 23)  LEN(20)  IO_MIXED|AL_LEFT||FA_SKIP    COLOR(49, 130)  CUR(0)  LINECOLOR(48)          TABORDER(0)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  ed_pswd(213, 3, 269, 23)  LEN(8)  IO_MIXED|EDIT_INPUT|FA_PASSWD|FA_WRAP    COLOR(192, 130)  CUR(0)  TP_SUNKEN          TABORDER(2)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  OBJ_odr(0, 55, 287, 218)    "IB303050"  TABORDER(3)  IOORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  clearpush_buy(371, 48, 403, 75)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("1")          TABORDER(4)  IOORDER(5)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  clearpush_sell(371, 76, 403, 103)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("1")          TABORDER(5)  IOORDER(6)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  clearpush_jj(371, 104, 403, 131)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("1")          TABORDER(6)  IOORDER(7)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  clearpush_cancel(371, 132, 403, 159)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("1")          TABORDER(7)  IOORDER(8)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  OBJ_snd(345, 189, 545, 289)    "IB999911"  TABORDER(8)  IOORDER(9)  ENABLE  &
+  HINTTYPE(IH_NONE)
+GROUP  GROUP0(336, 165, 552, 294)  '주문전송 obj'        COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+USRTAB  tab_order(0, 26, 287, 55)  FOCUS  INDEX(0)  COUNT(2)  AL_TOP  TAB_IMAGE  |FA_SKIP|FA_UPPER    FONT("굴림체", 9, NORMAL)    COLOR(3, 70)  CUR(0)  TABIMAGE("OTAB.bmp")  FCOLOR(3, 71)  CAPTION("선물대용매도", "정정/취소")  TABINFO("1:1", "1:3")  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  chk_OrderConfirm(250, 320, 319, 340)  '주문확인'  TP_CHECK|EDIT_NOP          COLOR(208, 232)  CUR(0)      TABORDER(9)  ENABLE  &
+  CHECKED  TRANSPARENT  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Dim xxxx_flag
+xxxx_flag = 1
+Sub order_tab_change()
+	Select Case tab_order.ID
+	Case "1" : OBJ_odr.SetObject("IB303050")	'대용매도
+	Case "3" : OBJ_odr.SetObject("IB303070")	'정정
+	Case "4" : OBJ_odr.SetObject("IB100180")	'취소
+	Case "7" :
+		OBJ_odr.SetObject("IB303040")	'대용지정/해지
+		Exit Sub
+	End Select
+	OBJ_odr.Proc "sygb_proc", ""
+End Sub
+
+'***************************************************************************
+' DESC: 계좌명/비밀번호 Setting
+'***************************************************************************
+Sub Set_account()
+	ACNM.Data = AN1A.name
+	ed_pswd.Data = AN1A.Password
+
+	If xxxx_flag = 1 And SCREEN.GetMapName(1) = "IB100200" Then
+		SCREEN.Proc "main.chk_xxxx", ""		'비밀번호 체크
+		xxxx_flag = 0
+	End If
+
+	SCREEN.Proc "main.Set_account", "jumn"
+	SCREEN.Object("main.guide").Text = ""
+'	Call obj_svol.ClearAll(2)
+	If tab_order.ID <> 7 Then
+		SCREEN.Object("obj_odr.o_jmno").Clear
+	End If
+	If Trim(ed_pswd.Data) = "" Then
+		ed_pswd.SetFocus : Exit Sub
+	End If
+End Sub
+
+'=== 가격자동 체크박스 체크값 기억/설정 ===
+Sub Set_Auto(mmgb)
+	Dim flag
+	If (mmgb < "1") Or (mmgb > "3") Then Exit Sub
+	flag = SYSTEM.Pop("auto_flag_s")		'-매도,매수,정정
+	If Len(Trim(flag)) <> 3 Then flag = "000"	'-default:자동아님
+	SCREEN.Object("obj_odr.chk_auto").Checked = (Mid(flag,mmgb,1) = "1")
+	SCREEN.Object("obj_odr.cboPrice").Enable = (Mid(flag,mmgb,1) = "1")
+End Sub
+Sub Get_Auto(mmgb, c_auto)
+	Dim flag, val
+	If c_auto = "True" Then
+		val = "1"
+	Else
+		val = "0"
+	End If
+
+	flag = SYSTEM.Pop("auto_flag_s")		'-매도,매수,정정
+	Select Case mmgb
+	Case "1" : flag = val & Mid(flag,2)
+	Case "2" : flag = Left(flag,1) & val & Mid(flag,3)
+	Case "3" : flag = Left(flag,2) & val
+	Case Else : Exit Sub
+	End Select
+	If Len(Trim(flag)) <> 3 Then flag = "000"	'-default:자동아님
+	SYSTEM.Push "auto_flag_s", flag
+End Sub
+
+_AW_ONSTART_AW_
+If Left(SCREEN.GetMapName(1),6) = "IB1002" Then
+	tab_order.SetTabVisible 7, False
+	If tab_order.IsTabVisible(tab_order.ID) = False Then
+		tab_order.ID = 1
+	End If
+Else
+	tab_order.SetTabVisible 7, True
+End If
+Call order_tab_change()
+
+'783-8047
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(AN1A)
+_AW_ONCHANGE_AW_
+Call Set_account()
+
+SCREEN.Object("main.obj_account").Send
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(ed_pswd)
+_AW_ONCHANGE_AW_
+If Trim(ed_pswd.Data) = "" Then
+	Exit Sub
+End If
+'SCREEN.Proc "main.all_account", ""
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(tab_order)
+_AW_ONCLICK_AW_
+Call order_tab_change()
+
+'Case "1" : OBJ_odr.SetObject("IB303050")	'대용매도
+'Case "3" : OBJ_odr.SetObject("IB303070")	'정정
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

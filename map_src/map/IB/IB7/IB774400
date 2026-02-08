@@ -1,0 +1,101 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB774400)
+MAPSIZE(746, 1046)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("한경컨센서스(W)")
+MAPPUBLIC(";")
+FONT("굴림", 9, NORMAL)
+TITLE("한경컨센서스(W)")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+BROWSER  BROWSER1(1190, 0, 2240, 750)  EDIT_NOP    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  OBJ_STAFF(161, 764, 377, 827)    "IB0000AW"  TABORDER(1)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+CONTROL  BROWSER0(0, 0, 1045, 745)  |FA_PROTECT  "CX_WEBEDGE"  "/k1"  LEN(0)  EDIT_NOP    COLOR(192, 232)  TABORDER(0)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Sub Navigate()
+	SCREEN.SetTimer 3, False
+End Sub
+
+'날짜 8자리, 구분자
+Function SetDateString(as_val, Div_string)
+	SetDateString = ""
+
+	If Len(as_val) = 0 Then
+		Exit Function
+	End If
+
+	SetDateString = Mid(as_val, 1, 4) & Div_string & Mid(as_val, 5, 2) & Div_string & Mid(as_val, 7, 2)
+End Function
+
+_AW_ONINDECLARE_AW_
+#Load IB888833
+#Load IB888888
+
+_AW_ONENDSUB_AW_
+_AW_ONSTART_AW_
+SCREEN.Proc "OBJ_STAFF.Send_F", ""
+
+_AW_ONENDSUB_AW_
+_AW_ONTIMER_AW_
+Dim shost, id, StartDay, EndDay, Dateurl1, Dateurl2
+shost = SYSTEM.Host
+
+
+StartDay = SetDateString(change_date("m", -1), "-")
+EndDay =  SetDateString(getCurrDay(), "-")
+Dateurl1 = "sdate%3D" + StartDay + "%26edate%3D" + EndDay
+Dateurl2 = "sdate="   + StartDay + "&edate="     + EndDay
+
+If Mid(shost,1,6) = "172.17" Then	' 내부망
+	If SYSTEM.ConnectBy = 1 Then	' 직원
+		id = Trim(LOGIN.User)		' 직원사번
+	Else
+		id = Trim(SCREEN.Object("OBJ_STAFF.emno").Data) ' 직원사번
+	End If
+	If Len(id) > 0 Then	' 직원사번 존재시 CDN으로 망연계 인터넷 단말에서 조회
+		url = "https://www.ibks.com/redirectCDN.jsp?url=http%3A//consensus.hankyung.com/analysis/list%3F" + Dateurl1 + "&id="&id
+		SYSTEM.Navigate url
+	Else				' 직원 사번 미존재시 일반 고객으로 간주
+		BROWSER0.Navigate("https://consensus.hankyung.com/analysis/list?" + Dateurl2)
+	End If
+Else	' 외부망 :: bypass
+	BROWSER0.Navigate("https://consensus.hankyung.com/analysis/list?" + Dateurl2)
+End If
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(BROWSER0)
+_AW_ONCLICK_AW_
+SYSTEM.Push "DOYOUAGREE", "YES"
+SCREEN.CloseWindow()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

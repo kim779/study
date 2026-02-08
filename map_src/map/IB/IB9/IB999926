@@ -1,0 +1,211 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB999926)
+MAPSIZE(521, 837)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("상품선물STOP주문 전")
+MAPPUBLIC(";")
+FONT("굴림", 9, NORMAL)
+TITLE("상품선물STOP주문 전송")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pibfrsfd")
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+LABEL  LABEL3(18, 192, 91, 211)  '주문조건'  AL_CENTER  CUR(0)      COLOR(195, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL4(18, 167, 91, 186)  '호가유형'  AL_CENTER  CUR(0)      COLOR(195, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL5(18, 267, 91, 286)  '주문조건1'  AL_CENTER  CUR(0)      COLOR(195, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL6(18, 242, 91, 261)  '주문수량'  AL_CENTER  CUR(0)      COLOR(195, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL7(18, 117, 91, 136)  '종목코드'  AL_CENTER  CUR(0)      COLOR(195, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL8(18, 92, 91, 111)  '원예약번호'  AL_CENTER  CUR(0)      COLOR(195, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL9(18, 67, 91, 86)  '비밀번호'  AL_CENTER  CUR(0)      COLOR(195, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL10(18, 42, 91, 61)  '계좌번호'  AL_CENTER  CUR(0)      COLOR(195, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL11(18, 217, 91, 236)  '매매구분'  AL_CENTER  CUR(0)      COLOR(195, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL17(18, 142, 91, 161)  '주문구분'  AL_CENTER  CUR(0)      COLOR(195, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  ed_accn(103, 42, 210, 61)  LEN(11)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(4)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  ed_pswd(103, 67, 210, 86)  LEN(8)  IO_ALPHA|EDIT_INPUT|FA_PASSWD|FA_WRAP|FA_ENUM    COLOR(192, 232)  CUR(0)  TP_NONE    ENCRYPT("en_accn")        TABORDER(5)  IOORDER(3)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  ed_ojno(103, 92, 210, 111)  LEN(6)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(6)  IOORDER(4)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  ed_cod2(103, 117, 210, 136)  LEN(12)  IO_ALPHA|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(7)  IOORDER(5)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  ed_jqty(103, 242, 210, 261)  LEN(8)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(8)  IOORDER(10)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  ed_cpr1(103, 267, 210, 286)  LEN(10)  IO_NUM|EDIT_INPUT|FA_COMMA|FA_RIGHT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(9)  IOORDER(11)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  ed_fdtp(103, 142, 132, 161)  LEN(2)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(2)  IOORDER(6)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  ed_mmgb(103, 217, 132, 236)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(3)  IOORDER(9)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  ed_hogb(103, 167, 132, 186)  LEN(2)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(10)  IOORDER(7)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  ed_cdgb(103, 192, 132, 211)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(11)  IOORDER(8)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL13(321, 61, 394, 80)  '예약번호'  AL_CENTER  CUR(0)      COLOR(195, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  o_jmno(400, 61, 460, 76)  LEN(6)  IO_NUM|AL_CENTER|    COLOR(192, 209)  CUR(0)            TABORDER(0)  IOORDER(15)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  o_ocnt(400, 36, 460, 56)  LEN(4)  IO_NUM|AL_CENTER||FA_SKIP    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(18)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  o_emsg(400, 140, 663, 160)  LEN(80)  IO_MIXED|AL_LEFT|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(17)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL22(321, 140, 394, 159)  '결과MSG'  AL_CENTER  CUR(0)      COLOR(195, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL15(321, 86, 394, 105)  '원예약번호'  AL_CENTER  CUR(0)      COLOR(195, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  o_ojno(400, 86, 460, 101)  LEN(6)  IO_NUM|AL_CENTER|    COLOR(192, 0)  CUR(0)            TABORDER(0)  IOORDER(16)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL16(322, 36, 395, 55)  'O CNT'  AL_CENTER  CUR(0)      COLOR(195, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL21(18, 17, 91, 36)  'I CNT'  AL_CENTER  CUR(0)      COLOR(195, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  ed_icnt(103, 17, 144, 36)  LEN(4)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("0001")          TABORDER(1)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL14(400, 165, 811, 184)  '[주문유형,시장구분,매매구분] (INDEX) [서비스명] [오류코드 오류메세지]'  AL_LEFT  CUR(0)      COLOR(195, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL18(327, 233, 488, 278)  '* 세부값 주문공통전문 참조 *'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+GROUP  GROUP0(8, 1, 253, 460)  'Input'        COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+GROUP  GROUP1(312, 8, 824, 190)  'Output'        COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  en_accn(97, 472, 204, 491)  LEN(8)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(12)  IOORDER(19)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL20(18, 471, 91, 490)  '계좌_암호'  AL_CENTER  CUR(0)      COLOR(195, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL0(18, 292, 91, 311)  '주문가격1'  AL_CENTER  CUR(0)      COLOR(195, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  ed_prc1(103, 292, 210, 311)  LEN(10)  IO_NUM|EDIT_INPUT|FA_COMMA|FA_RIGHT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(13)  IOORDER(12)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL12(18, 317, 91, 336)  '주문조건2'  AL_CENTER  CUR(0)      COLOR(195, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  ed_cpr2(103, 317, 210, 336)  LEN(10)  IO_NUM|EDIT_INPUT|FA_COMMA|FA_RIGHT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(14)  IOORDER(13)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL19(18, 342, 91, 361)  '주문가격2'  AL_CENTER  CUR(0)      COLOR(195, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  ed_prc2(103, 342, 210, 361)  LEN(10)  IO_NUM|EDIT_INPUT|FA_COMMA|FA_RIGHT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(15)  IOORDER(14)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Dim objnm
+objnm = "parent.obj_odr"
+
+_AW_ONSEND_AW_
+Dim code, sygb, sydt, tabtext, pre_id
+
+If Trim(SCREEN.Object(objnm & ".jmbtclick").data) = 0 Then
+	SCREEN.OnSend = False
+	Exit Sub
+End If
+
+If SYSTEM.ConnectBy = 1 Then
+	If LOGIN.Cani = 0 Then
+		MsgBox "본사직원은 주문이 불가합니다.",,"IBK투자증권"
+		SCREEN.OnSend = False
+		Exit Sub
+	End If
+End If
+
+
+SYSTEM.push "FO_ogno", ""
+SYSTEM.push "FO_jprc", ""
+
+ed_accn.Data = SCREEN.Object(objnm & ".ed_acno").data		'계좌번호
+ed_pswd.Data = SCREEN.Object(objnm & ".ed_pswd").data		'비밀번호
+ed_ojno.Data = SCREEN.Object(objnm & ".ed_ogno").data		'원예약번호
+ed_cod2.Data = SCREEN.Object(objnm & ".ed_cfocod").data		'종목코드
+ed_fdtp.Data = SCREEN.Object(objnm & ".ed_odgb").data		'주문구분    00:서버STOP, 01:서버STOP, LIMIT 02:서버OCO
+ed_hogb.Data = SCREEN.Object(objnm & ".ed_hogb").data		'호가유형
+ed_cdgb.Data = SCREEN.Object(objnm & ".ed_jmgb").data		'주문조건
+ed_mmgb.Data = SCREEN.Object(objnm & ".ed_mmgb").data		'매매구분
+
+en_accn.Data = Mid(ed_accn.Data, 1, 8) 	'계좌번호암호화
+
+ed_jqty.Data = SCREEN.Object(objnm & ".ed_jqty").data		'주문수량
+
+Dim fgubn
+fgubn = Left(Trim(ed_cod2.Data), 3)
+
+If ed_fdtp.Data = "00" Then
+	If fgubn = "185" Or fgubn = "186" Or fgubn = "187" Or _
+	   fgubn = "A85" Or fgubn = "A86" Or fgubn = "A87" Then
+		ed_cpr1.Data = SCREEN.Object(objnm & ".ed_jprc").data & "00"		'주문조건1
+	Else
+		ed_cpr1.Data = SCREEN.Object(objnm & ".ed_jprc").data				'주문조건1
+	End If
+ElseIf ed_fdtp.Data = "01" Then
+	If fgubn = "185" Or fgubn = "186" Or fgubn = "187" Or _
+	   fgubn = "A85" Or fgubn = "A86" Or fgubn = "A87" Then
+		ed_cpr1.Data = SCREEN.Object(objnm & ".ed_jprc_con").data & "00"	'주문조건1
+		ed_prc1.Data = SCREEN.Object(objnm & ".ed_jprc").data & "00"		'주문가격1
+	Else
+		ed_cpr1.Data = SCREEN.Object(objnm & ".ed_jprc_con").data			'주문조건1
+		ed_prc1.Data = SCREEN.Object(objnm & ".ed_jprc").data				'주문가격1
+	End If
+ElseIf ed_fdtp.Data = "02" Then
+	If fgubn = "185" Or fgubn = "186" Or fgubn = "187" Or _
+	   fgubn = "A85" Or fgubn = "A86" Or fgubn = "A87" Then
+		ed_cpr1.Data = SCREEN.Object(objnm & ".ed_jprc_con").data & "00"	'주문조건1
+		ed_prc1.Data = SCREEN.Object(objnm & ".ed_jprc").data & "00"		'주문가격1
+		ed_cpr2.Data = SCREEN.Object(objnm & ".ed_jprc_lowCon").data & "00"	'주문조건2
+		ed_prc2.Data = SCREEN.Object(objnm & ".ed_jprc_low").data & "00"	'주문가격2
+	Else
+		ed_cpr1.Data = SCREEN.Object(objnm & ".ed_jprc_con").data			'주문조건1
+		ed_prc1.Data = SCREEN.Object(objnm & ".ed_jprc").data				'주문가격1
+		ed_cpr2.Data = SCREEN.Object(objnm & ".ed_jprc_lowCon").data		'주문조건2
+		ed_prc2.Data = SCREEN.Object(objnm & ".ed_jprc_low").data			'주문가격2
+	End If
+End If
+
+If Trim(SCREEN.Object(objnm & ".jmbtclick").data) = 1 Then
+	SCREEN.Object(objnm & ".jmbtclick").data = 0
+End If
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+Dim ecod
+
+If Left(Trim(o_emsg.Data), 1) = "0" Then
+	If SCREEN.Object("main.tab_account").ID = "1" Then
+		'SCREEN.Object("main.OBJ_account").Send
+		SCREEN.Proc "main.OBJ_account.init", ""
+	End If
+Else
+	MsgBox Trim(o_emsg.Data), , "IBK투자증권"
+End If
+
+SCREEN.Object("main.guide").text = o_emsg.Data			'메시지
+
+_AW_ONENDSUB_AW_
+}
+
+
+

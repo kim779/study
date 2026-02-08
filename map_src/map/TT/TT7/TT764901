@@ -1,0 +1,87 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(TT764901)
+MAPSIZE(95, 185)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("MS Sans Serif", 9, NORMAL)
+OPTIONS(FMS|FLASH)
+TITLE("Untitled")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pooppoop")
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL0(0, 0, 185, 95)  TP_RAISED      COLOR(208, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  20301(25, 180, 145, 199)  LEN(3)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("101")          TABORDER(1)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  20023(0, 0, 75, 15)  LEN(9)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT    COLOR(192, 69)  CUR(0)  TP_NONE          IFRGB(94, 95)  TABORDER(0)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON0(155, 185, 235, 225)  'Àü¼Û'  TP_PUSH      AL_CENTER    FOCUS  COLOR(208, 232)  CUR(0)      TABORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  20021(40, 220, 112, 244)  LEN(5)  IO_MIXED|AL_LEFT||FA_FLASH|FA_XDELETE    COLOR(203, 1)  CUR(0)            TABORDER(0)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Dim g_IsStart
+
+g_IsStart = False
+'--------------------------------------------------------
+Sub SendData(ClassCd)
+	S20301.Data = ClassCd
+	g_IsStart = True
+	SCREEN.Send 0
+End Sub
+'--------------------------------------------------------
+Sub SetData()
+	SCREEN.Proc "Main.SetData", S20023.Data
+End Sub
+'--------------------------------------------------------
+Sub OnAlert()
+	SetData
+End Sub
+
+_AW_ONSEND_AW_
+If Not g_IsStart Then
+	SCREEN.OnSend = False
+End If
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+SetData
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(20023)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON0)
+_AW_ONCLICK_AW_
+SendData "101"
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

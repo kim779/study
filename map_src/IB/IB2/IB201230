@@ -1,0 +1,112 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB201230)
+MAPSIZE(800, 1024)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("한경 컨센서스")
+MAPPUBLIC(";")
+FONT("굴림", 9, NORMAL)
+OPTIONS(FMS)
+TITLE("한경 컨센서스")
+TOPATH(AXIS)
+METHOD(MENU)
+TRXCODE("pooppoop")
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL0(0, 0, 1032, 26)  LINECOLOR(67)      COLOR(66, 67)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  1301(2, 3, 67, 23)  LEN(6)  IO_MIXED|EDIT_INOUT|FA_WRAP|FA_HAN|CODE    FONT("굴림체", 9, NORMAL)    COLOR(99, 130)  CUR(0)  TP_SUNKEN          TABORDER(1)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON0(67, 3, 86, 23)  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(15, 63)  CUR(0)    "검색.BMP"    TABORDER(2)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+CONTROL  17413(88, 3, 221, 23)    "CX_Symbol"  "/a89/b91/c92/d69"  LEN(0)  EDIT_OUTPUT  FONT("굴림체", 9, NORMAL)    COLOR(90, 130)  TABORDER(0)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  OBJ_STAFF(1044, 33, 1260, 96)    "IB0000AW"  TABORDER(3)  IOORDER(3)  ENABLE  &
+  HINTTYPE(IH_NONE)
+CONTROL  BROWSER0(0, 27, 1024, 801)  |FA_PROTECT  "CX_WEBEDGE"  "/k1"  LEN(0)  EDIT_NOP    COLOR(192, 232)  TABORDER(0)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Sub Navigate()
+	SCREEN.SetTimer 3, False
+End Sub
+
+_AW_ONRECEIVE_AW_
+SCREEN.Proc "OBJ_STAFF.Send_F", ""
+
+_AW_ONENDSUB_AW_
+_AW_ONTIMER_AW_
+Dim shost, id
+If Trim(S1301.Data) <> "" Then
+	shost = SYSTEM.Host
+	If Mid(shost,1,6) = "172.17" Then	' 내부망
+		If SYSTEM.ConnectBy = 1 Then	' 직원
+			id = Trim(LOGIN.User)		' 직원사번
+		Else
+			id = Trim(SCREEN.Object("OBJ_STAFF.emno").Data) ' 직원사번
+		End If
+		If Len(id) > 0 Then	' 직원사번 존재시 CDN으로 망연계 인터넷 단말에서 조회
+			url = "https://www.ibks.com/redirectCDN.jsp?url=http%3A//consensus.hankyung.com/analysis/list%3Freport_type%3DCO%26search_value%3DREPORT_TITLE%26search_text%3D"&Trim(S1301.Data)&"&id="&id
+			SYSTEM.Navigate url
+		Else				' 직원 사번 미존재시 일반 고객으로 간주
+			BROWSER0.Navigate("https://consensus.hankyung.com/analysis/list?report_type=CO&search_value=REPORT_TITLE&search_text=" + Trim(S1301.Data))
+		End If
+	Else	' 외부망 :: bypass
+		BROWSER0.Navigate("https://consensus.hankyung.com/analysis/list?report_type=CO&search_value=REPORT_TITLE&search_text=" + Trim(S1301.Data))
+	End If
+End If
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(1301)
+_AW_ONCHANGE_AW_
+If Trim(S1301.Data) = "000000" Or Trim(S1301.Data) = "" Then
+	Exit Sub
+End If
+S1301.Trigger "",True
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON0)
+_AW_ONCLICK_AW_
+Dim retn
+retn = SCREEN.GetCode(100, "1301", "hnam", 0 )
+If retn <> True Then
+       Exit Sub
+End If
+
+SCREEN.Send 2
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BROWSER0)
+_AW_ONCLICK_AW_
+SYSTEM.Push "DOYOUAGREE", "YES"
+SCREEN.CloseWindow()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

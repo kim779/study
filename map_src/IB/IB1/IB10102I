@@ -1,0 +1,63 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB10102I)
+MAPSIZE(192, 642)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("일자별시세 차트")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(FLASH)
+TITLE("[10102I] 주식일별차트")
+TOPATH(AXIS)
+METHOD(SEND)
+TRXCODE("bg201121")
+MAPTYPE(FIXEDEX)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+EDIT  1301(149, 269, 211, 287)  LEN(12)  IO_MIXED|EDIT_INPUT    COLOR(10, 63)  CUR(0)  TP_NONE          TABORDER(1)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+CONTROL  18412(0, 0, 642, 192)  |FA_PROTECT|FA_FLASH  "C_Total"  "/nIB20011799/r200/d100/i1/u1/t2/j1/m15/m220/m30/m40/g15/g220/g30/g40"  LEN(0)  EDIT_INOUT  FONT("굴림체", 9, NORMAL)    COLOR(192, 232)  TABORDER(2)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  1021(147, 305, 253, 325)  LEN(12)  IO_ALPHA|AL_LEFT||FA_FLASH    COLOR(211, 232)  CUR(0)            TABORDER(0)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONSEND_AW_
+Dim str, str2
+'S1301.Data = SCREEN.Object("parent.1301").Data
+SCREEN.OnSend = False
+str = "1" & vbTab & SCREEN.Object("parent.1301").Data & vbTab
+S18412.RequestTR str
+
+'str2 = "1" & vbTab & SCREEN.Object("parent.1301").Data & vbTab & "1" & vbTab
+'
+'If SCREEN.Object("main.RADIO0").Checked = True Then
+'	str2 = "1" & vbTab & SCREEN.Object("parent.1301").Data & vbTab & "1" & vbTab
+'ElseIf SCREEN.Object("main.RADIO1").Checked = True Then
+'	str2 = "1" & vbTab & SCREEN.Object("parent.1301").Data & vbTab & "2" & vbTab
+'ElseIf SCREEN.Object("main.RADIO2").Checked = True Then
+'	str2 = "1" & vbTab & SCREEN.Object("parent.1301").Data & vbTab & "3" & vbTab
+'End If
+'
+'S18412.RequestTR2 str2
+
+_AW_ONENDSUB_AW_
+}
+
+
+

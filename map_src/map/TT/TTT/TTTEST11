@@ -1,0 +1,92 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(TTTEST11)
+MAPSIZE(450, 700)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("굴림", 9, NORMAL)
+TITLE("사용안함")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+
+Sub save_excel()
+
+
+	' 1. Create obj
+	On Error Resume Next
+	Dim obj1
+	Set obj1 = CreateObject("Excel.Application")
+
+	obj1.visible = True
+	On Error Resume Next
+
+
+	' 2. Add Workbook
+	Dim obj2
+	'Set obj2 = obj1.WorkBooks.Open("\\172.16.213.33\정보전략팀\Public\37_IT개발팀\98. 프로젝트\2023_KRX_차세대\Documents\HTS_MAP_TR_LIST.xlsx")
+	Set obj2 = obj1.WorkBooks.Open("\\172.16.213.33\정보전략팀\Public\37_IT개발팀\98. 프로젝트\2023_KRX_차세대\Documents\HTS_MAP_TR_LIST_test.xlsx")
+
+
+	' 3. Select Sheet
+	Dim obj3
+	Set obj3 = obj2.WorkSheets(1) '첫번째 시트 인덱스
+	MsgBox "[" & obj3.Cells(2,3)& "]"
+
+	jj = 0
+	For ii = 1 To GRID0.Rows '0이 아닌 1부터 시작함
+
+		'그리드 1열(TR명)에 값이 없으면 exit
+		If Trim(GRID0.GetGridCell(ii,1)) = "" Then
+			Exit For
+		End If
+
+		If Trim(GRID0.GetGridCell(ii,5)) = "수정" Then
+			fnam = Trim(GRID0.GetGridCell(ii,1))
+			mdat = Trim(GRID0.GetGridCell(ii,4))
+
+			For jj = 3 To GRID0.Rows
+				'2열에 값이 없으면 exit
+				If Trim(obj3.Cells(jj,2)) = "" Then
+					Exit For
+				End If
+
+				If Trim(obj3.Cells(jj,2)) = fnam Then
+					obj3.Cells(jj,9) = mdat
+					MsgBox "수정된게 있다"
+				End If
+			Next
+		End If
+
+	Next
+
+	obj3.SaveAs("\\172.16.213.33\정보전략팀\Public\37_IT개발팀\98. 프로젝트\2023_KRX_차세대\Documents\HTS_MAP_TR_LIST_test.xlsx")
+	obj1.Quit
+	MsgBox "엑셀등록 완료"
+End Sub
+
+}
+
+
+

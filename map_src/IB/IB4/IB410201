@@ -1,0 +1,215 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB410201)
+MAPSIZE(217, 115)
+VERSION(001)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("[410201] ALL 콜옵션")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(CR2TAB)
+TITLE("[410201] ALL 옵션시세")
+TOPATH(AXIS)
+METHOD(SEND)
+TRXCODE("bo410201")
+MAPTYPE(NORM)
+HEADER(NOP)
+HELPFILE("세")
+}
+
+
+
+FORM DIVISION
+{
+
+LABEL  LABEL0(0, 0, 106, 18)  '내재변동성(IV)'  AL_CENTER  FONT("굴림체", 9, BOLD)  CUR(0)      COLOR(74, 76)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+GRID  HANG(0, 35, 106, 217)  VISIBLEROW(11)  CELLH(14)  MATRIX(100, 5)  FIX(0)  MAINCOLOR(7, 0)  LINECOLOR(75)  FOCUSCOLOR(153)  FOCUSKIND(0)    FONT("굴림", 9, BOLD)  VARIANT("$?")  |VSCROLL|NO3D|GLINE    &
+	COLINFO("c_cod")  LEN(8)  WIDTH(80)  HEAD("CALL")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("c_chk")  LEN(1)  WIDTH(19)  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_ALPHA|EDIT_INPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  ICHECK    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("1")  LEN(7)  WIDTH(52)  HEAD("행사가")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT  |FA_CORGB|SA_CORAW    COLOR(74, 76)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(6, 7)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("p_chk")  LEN(1)  WIDTH(19)  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_ALPHA|EDIT_INPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  ICHECK    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("p_cod")  LEN(8)  WIDTH(80)  HEAD("PUT")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    TABORDER(1)  IOORDER(3)  ENABLE  &
+  VISIBLE
+
+EDIT  func(293, 184, 317, 203)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("F")          TABORDER(2)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+COMBO  MMYY(0, 17, 106, 35)  TP_NONE  LEN(6)  COUNT(0)  VCOUNT(0)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_NUM|EDIT_INPUT  FONT("굴림체", 9, NORMAL)    COLOR(68, 69)  CUR(0)    EDITFORMAT("")  TABORDER(3)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Dim num
+num = 0
+Function code_cnt()
+	Dim kk, ii
+	kk = 0
+	For ii = 1  To HANG.Rows
+	     If HANG.GetGridCell(ii, 2) = "1" Then
+				kk = kk+1
+		  End If
+	     If HANG.GetGridCell(ii, 4) = "1" Then
+				kk = kk+1
+		  End If
+	Next
+	code_cnt = kk
+End Function
+
+Function Search_code(sCode)
+	Dim ii
+'SYSTEM.Trace "SRART"
+	For ii = 0 To 3
+		If StrComp(SCREEN.Object("main.code"&ii).data, sCode, 1) = 0 Then
+			SCREEN.Object("main.code"&ii).data = ""
+			Search_code = ii
+		End If
+	Next
+'SYSTEM.Trace "SEARCH_CODE"&ii
+End Function
+
+Function Search_pos()
+	Dim ii
+	For ii = 0 To 3
+		If Trim(SCREEN.Object("main.code"&ii).data) = "" Then
+			Search_pos = ii
+			Exit Function
+		End If
+	Next
+End Function
+
+Public Sub f_CheckGrid( sCode )
+	Dim i
+	For i = 1 To SCREEN.Object("MAIN.OBJ02.HANG").Rows
+		If Trim(SCREEN.Object("MAIN.OBJ02.HANG").GetGridCell(i, 1)) = Trim(sCode) Then
+			SCREEN.Object("MAIN.OBJ02.HANG").SetGridCell i, 2, "1"
+		ElseIf Trim(SCREEN.Object("MAIN.OBJ02.HANG").GetGridCell(i, 5)) = Trim(sCode) Then
+			SCREEN.Object("MAIN.OBJ02.HANG").SetGridCell i, 4, "1"
+		ElseIf Trim(Trim(SCREEN.Object("MAIN.OBJ02.HANG").GetGridCell(i, 1))) = "" Then
+			Exit Sub
+		End If
+	Next
+End Sub
+
+Public Function f_NumChecked()
+	Dim i
+
+	f_NumChecked = 0
+	For i = 1 To SCREEN.Object("MAIN.OBJ02.HANG").Rows
+		If HANG.GetGridCell(i, 2) = "1" Or HANG.GetGridCell(i, 2) = "-1" Then
+			f_NumChecked = f_NumChecked + 1
+		End If
+		If HANG.GetGridCell(i, 4) = "1" Or HANG.GetGridCell(i, 4) = "-1" Then
+			f_NumChecked = f_NumChecked + 1
+		End If
+		If Trim(HANG.GetGridCell(i, 1)) = "" Then Exit For
+	Next
+End Function
+
+Public Function f_ClickGrid( lRowIdx, lColIdx )
+	Dim ls_chk
+	f_ClickGrid = 0
+	ls_chk = Trim(HANG.GetGridCell(lRowIdx, lColIdx))
+	If ls_chk = 1 Then
+		If lColIdx = 2 Then
+			ls_codx = Trim(HANG.GetGridCell(lRowIdx, lColIdx - 1 ))
+		ElseIf lColIdx = 4 Then
+			ls_codx = Trim(HANG.GetGridCell(lRowIdx, lColIdx + 1 ))
+		End If
+
+		If Trim(ls_codx) = "" Then
+			HANG.SetGridCell lRowIdx, lColIdx , "0"
+			f_ClickGrid = 1
+		End If
+
+		ls_cnt = f_NumChecked
+		If ls_cnt > 4 Then
+			MsgBox("최대 선택가능한 종목갯수는 4개 입니다.")
+			HANG.SetGridCell lRowIdx, lColIdx , "0"
+			f_ClickGrid = 1
+		End If
+	End If
+End Function
+
+_AW_ONSTART_AW_
+'SCREEN.Send 0
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+'Dim kk
+'
+'For kk = 0 To 3
+'	SCREEN.Object("main.code"&kk).data = ""
+'	SCREEN.Object("main.CTL0").clearAllData()
+'	SCREEN.Object("main.CTL0").update()
+'	SCREEN.Object("main.CTL0").ShowGraph 0, kk, 0
+'Next
+'HANG.Clear
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+func.Data = ""
+SCREEN.Proc "Main.sendTr", "1"
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(HANG)
+_AW_ONCLICK_AW_
+Dim chk, kk, code
+If HANG.HitPos =  3  Then 'item 클릭시
+	If HANG.Column = 2 Or HANG.Column = 4 Then
+		lFlag = f_ClickGrid(HANG.row, HANG.Column)
+		If lFlag = 1 Then
+			Exit Sub
+		End If
+		kk = Search_pos()
+'SYSTEM.Trace "--"&kk
+		If IsNumeric(kk) = False Then
+			Exit Sub
+		End If
+'SYSTEM.Trace "****"
+		If HANG.Column = 2 Then
+			chk = HANG.GetGridCell (HANG.row, 2)
+'SYSTEM.Trace "&&&&"&chk
+			code = HANG.GetGridCell (HANG.row, 1)
+			If chk = 1 Then
+				SCREEN.Object("main.code"&kk).data = code
+			Else
+				kk = Search_code(code)
+			End If
+'SYSTEM.Trace "------------------------"
+		Else
+			chk = HANG.GetGridCell (HANG.row, 4)
+			code = HANG.GetGridCell (HANG.row, 5)
+			If chk = 1 Then
+				SCREEN.Object("main.code" & kk).data = code
+			Else
+				kk = Search_code(code)
+			End If
+		End If
+		SCREEN.Proc "MAIN.set_cfg", kk & "," &chk
+	End If
+
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(MMYY)
+_AW_ONCHANGE_AW_
+HANG.Clear
+SCREEN.send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

@@ -1,0 +1,348 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB170800)
+MAPSIZE(433, 912)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("[주식]종합잔고")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(ENCODE|CR2TAB)
+TITLE("종합잔고정보-종합잔고")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("piboPBxQ")
+MAPTYPE(NORM)
+HEADER(LEDGER)
+TRXH("11CSDPAQ911")
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL0(-2, 32, 914, 414)  LIMAGE(0)  LINEW(4)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL(-2, 0, 914, 33)  LIMAGE(0)  LINEW(3)  LINETYPE(4)  LINECOLOR(64)      COLOR(66, 67)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL0(6, 7, 74, 27)  '종합계좌번호'  AL_CENTER  CUR(0)      COLOR(66, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+CONTROL  AN99(78, 7, 218, 27)    "CX_Account"  "/w0"  LEN(11)  EDIT_INPUT    COLOR(68, 130)  TABORDER(1)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  ANCM(219, 7, 345, 27)  LEN(40)  IO_MIXED|AL_LEFT||FA_SKIP    COLOR(160, 130)  CUR(0)  LINECOLOR(89)          TABORDER(0)  IOORDER(10)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL1(350, 7, 407, 27)  '비밀번호'  AL_LEFT  CUR(0)      COLOR(66, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  zPwd(403, 7, 459, 27)  LEN(8)  IO_MIXED|EDIT_INPUT|FA_PASSWD|FA_WRAP    COLOR(192, 130)  CUR(0)  TP_SUNKEN          TABORDER(2)  IOORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  h_acnm(30, 561, 150, 580)  LEN(40)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_SKIP|FA_PASS    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(9)  IOORDER(11)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  send_btn(869, 7, 906, 27)  '조회'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, BOLD)  FOCUS  COLOR(208, 186)  CUR(0)    "조회BTN.BMP"    TABORDER(7)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+GROUP  GROUP0(18, 601, 227, 652)  'In'        COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  In(31, 621, 72, 640)  LEN(5)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_PASS    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("00001")          TABORDER(10)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  in_out(18, 668, 297, 693)  LEN(34)  IO_MIXED|AL_CENTER|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(6)  ENABLE  &
+  HINTTYPE(IH_NONE)
+GROUP  GROUP1(332, 589, 702, 773)  'Out'        COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  Out(350, 612, 399, 627)  LEN(5)  IO_MIXED|AL_CENTER|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(7)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  Out2(629, 612, 678, 627)  LEN(1)  IO_MIXED|AL_CENTER|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(9)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  BUTTON1(847, 7, 868, 27)  TP_PUSH|IMAGE|AL_STRETCH      FOCUS  COLOR(208, 69)  CUR(0)    "엑셀.BMP"    TABORDER(6)  &
+  VISIBLE  IMAGE  HINTTYPE(IH_NONE)
+LABEL  LABEL4(468, 7, 525, 27)  '조회기준'  AL_LEFT  CUR(0)      COLOR(66, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+COMBO  gubn(521, 7, 760, 27)  TP_SUNKEN  LEN(1)  COUNT(2)  VCOUNT(2)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_MIXED|EDIT_INPUT    COLOR(192, 130)  CUR(0)  DISPLAY("대용가", "주식(현재가), 채권(시가 또는 장부가)")  DATA("0", "1")    TABORDER(3)  IOORDER(5)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  ret_trade(764, 7, 808, 27)  '도움말'  TP_PUSH|IMAGETEXT|AL_STRETCH        FOCUS  COLOR(208, 186)  CUR(0)    "3BTN.BMP"    TABORDER(4)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+BUTTON  BUTTON0(809, 7, 841, 27)  '인쇄'  TP_PUSH|IMAGETEXT|AL_STRETCH        FOCUS  COLOR(208, 186)  CUR(0)    "2BTN.BMP"    TABORDER(5)  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+TABLE  TABLE0(353, 640, 594, 757)  MATRIX(5, 1)  LINECOLOR(232)  CELLH(20)  AUTOSIZE  |MULTI  EDIT_OUTPUT    &
+	COLINFO("Row0")  LEN(40)  WIDTH(80)  HEAD("지점명")  COLALIGN(AL_CENTER, AL_RIGHT)  HEADCOLOR(208, 232)  IO_MIXED    COLOR(192, 232)  COLCUR(0, 0)  COLHINTTYPE(IH_NONE)    COLUMN_VISIBLE  &
+	COLINFO("Row1")  LEN(40)  WIDTH(80)  HEAD("계좌명")  COLALIGN(AL_CENTER, AL_RIGHT)  HEADCOLOR(208, 232)  IO_MIXED    COLOR(192, 232)  COLCUR(0, 0)  COLHINTTYPE(IH_NONE)    COLUMN_VISIBLE  &
+	COLINFO("Row2")  LEN(20)  WIDTH(80)  HEAD("계좌번호")  COLALIGN(AL_CENTER, AL_RIGHT)  HEADCOLOR(208, 232)  IO_MIXED    COLOR(192, 232)  COLCUR(0, 0)  COLHINTTYPE(IH_NONE)    COLUMN_VISIBLE  &
+	COLINFO("Row3")  LEN(18)  WIDTH(80)  HEAD("연속키횟수")  COLALIGN(AL_CENTER, AL_RIGHT)  HEADCOLOR(208, 232)  IO_MIXED    COLOR(192, 232)  COLCUR(0, 0)  COLHINTTYPE(IH_NONE)    COLUMN_VISIBLE  &
+	COLINFO("Row4")  LEN(16)  WIDTH(80)  HEAD("평가금액")  COLALIGN(AL_CENTER, AL_RIGHT)  HEADCOLOR(208, 232)  IO_NUM|FA_COMMA|FA_RIGHT    COLOR(192, 232)  COLCUR(0, 0)  COLHINTTYPE(IH_NONE)    COLUMN_VISIBLE  IOORDER(8)  ENABLE
+GRID  GRID0(6, 40, 906, 365)  VISIBLEROW(0)  CELLH(18)  MATRIX(2000, 1)  FIX(0)  MAINCOLOR(181, 232)  LINECOLOR(75)  FOCUSCOLOR(78)  FOCUSKIND(4)  |FLEXIBLE|VSCROLL|HSCROLL|NOHEAD|XVLINE|XHLINE|GRFTEXT|GRXSIZE    &
+	COLINFO("Col0")  LEN(200)  WIDTH(900)  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_MIXED|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    TABORDER(8)  IOORDER(12)  ENABLE  &
+  VISIBLE
+
+EDIT  zAcntNo_dummy(94, 621, 214, 640)  LEN(9)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_PASS    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(11)  IOORDER(3)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  GUIDE1(-2, 413, 914, 437)  LIMAGE(0)  LINEW(3)  LINETYPE(4)  LINECOLOR(64)      COLOR(34, 69)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL7(5, 418, 19, 432)    |IMAGE|AL_STRETCH    COLOR(208, 232)  CUR(0)    "알림_ic.bmp"  ENABLE  &
+  VISIBLE  TRANSPARENT  IMAGE  HINTTYPE(IH_NONE)
+PANEL  GUIDE(18, 416, 878, 434)        COLOR(34, 69)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL10(7, 367, 66, 388)  LINECOLOR(96)  |IMAGE|AL_CENTER    COLOR(208, 232)  CUR(0)    "참고사항.BMP"  ENABLE  &
+  VISIBLE  TRANSPARENT  IMAGE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON2(14, 394, 21, 401)  TP_PUSH|IMAGETEXT|AL_STRETCH        FOCUS  COLOR(208, 232)  CUR(0)    "텍스트화살표_하단.bmp"    TABORDER(12)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+LABEL  LABEL23(25, 390, 332, 410)  '본 화면은 KRX시세 기준으로 평가됩니다.'  AL_LEFT  CUR(0)      COLOR(96, 91)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Dim sect, cnt
+sect = 0
+cnt = 0
+
+'== 계좌명, 비밀번호 설정
+Sub Set_account()
+	SCREEN.ClearAll 0, 2
+	ANCM.Data = AN99.Name
+	h_acnm.Data = AN99.Name
+	zPwd.Data = AN99.Password
+
+	If Len(Trim(AN99.Data)) <> 11 Then
+		AN99.SetFocus
+		Exit Sub
+	End If
+
+	If SYSTEM.ConnectBy = 1 Then
+		If Len(Trim(zPwd.Data)) < 4 Then
+			zPwd.SetFocus
+			Exit Sub
+		End If
+	End If
+
+	Call send_f()
+End Sub
+
+'== 첫 조회
+Sub send_f()
+	SCREEN.ClearAll 0, 2
+	ANCM.Data = AN99.Name
+	LEDGER.Fkey = "C"
+	SCREEN.Send 0
+End Sub
+
+'== 연속 조회
+Sub send_c()
+	LEDGER.Fkey = "7"
+	GRID0.SetDataPosition(2)
+	SCREEN.Send 0
+End Sub
+
+_AW_ONINDECLARE_AW_
+#load IB888833
+
+_AW_ONENDSUB_AW_
+_AW_ONSTART_AW_
+Call Check_LoginType(zPwd)
+
+LEDGER.Rcnt = "0010"
+'help.Data = "False"
+
+If SCREEN.CreateObject("Info") Then
+	Dim g_combo
+	g_combo = Trim(INFO.popData (LOGIN.Name, "userconf.ini", SCREEN.GetMapName(1), "G_COMBO"))
+	gubn.Data = g_combo
+End If
+
+gubn.Data = 1
+
+If SYSTEM.ConnectBy = "1" Then
+	BUTTON0.Enable = False
+	BUTTON0.Visible = False
+End If
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+SCREEN.OnSend = False
+GUIDE.Text = ""
+
+If Len(Trim(AN99.Data)) <> 11 Then
+	MsgBox "종합계좌번호를 확인하여 주십시오.", , "IBK투자증권"
+	AN99.SetFocus
+	Exit Sub
+End If
+
+If Mid(Trim(AN99.Data), 4, 2) <> "00" Then
+	MsgBox "종합계좌번호(ex.001-00-123456)를 확인하여 주십시오.", , "IBK투자증권"
+	AN99.SetFocus
+	Exit Sub
+End If
+
+If SYSTEM.ConnectBy = 0 And Trim(zPwd.Data) = "" Then
+    zPwd.Data = "9999"
+Else
+    If Len(Trim(zPwd.Data)) < 4 Then
+        MsgBox "비밀번호를 확인하여 주십시오.", , "IBK투자증권"
+        zPwd.SetFocus
+        Exit Sub
+    End If
+End If
+
+SCREEN.OnSend = True
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+If LEDGER.Ecod = "3669" Then
+	SCREEN.ClearAll 2, 2
+	ANCM.Data = h_acnm.Data
+End If
+
+If LEDGER.Next = "Y" Then
+	Call send_c()
+	cnt = cnt + 1
+Else
+	send_btn.SetFocus
+End If
+
+If sect = 0 And LEDGER.Next <> "Y" Then
+	zPwd.SetFocus
+End If
+
+BUTTON0.Enable = True
+BUTTON1.Enable = True
+
+_AW_ONENDSUB_AW_
+_AW_ONKEY_AW_
+If SCREEN.Key = 13 Then
+End If
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(AN99)
+_AW_ONCHANGE_AW_
+Call Set_account()	'-- 계좌명, 비밀번호 설정
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(zPwd)
+_AW_ONKEYCHANGE_AW_
+'== 비밀번호 변경시 조회 버튼 기능 수행.
+If SCREEN.Key = "13" Then  '-- Enter 키 입력
+	If Len(Trim(zPwd.Data)) >= 4 Then
+		sect = 0
+		Call send_f()
+	End If
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(send_btn)
+_AW_ONCLICK_AW_
+sect = 1
+cnt = 0
+Call send_f()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON1)
+_AW_ONCLICK_AW_
+GRID0.Excel True, True, "IB120370"
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(gubn)
+_AW_ONCHANGE_AW_
+SCREEN.CreateObject("Info")
+INFO.pushData LOGIN.Name, "userconf.ini", SCREEN.GetMapName(1), "G_COMBO", gubn.data
+
+If Len(Trim(AN99.Data)) <> 11 Then
+	AN99.SetFocus
+	Exit Sub
+End If
+
+If SYSTEM.ConnectBy = 1 Then
+	If Len(Trim(zPwd.Data)) < 4 Then
+		zPwd.SetFocus
+		Exit Sub
+	End If
+End If
+
+Call send_f()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(ret_trade)
+_AW_ONCLICK_AW_
+'MsgBox "준비중", , SCREEN.GetCaption()
+
+'If Trim(help.data) = "False" Then
+'	img.Visible = True
+'	board.Visible = True
+'	title.Visible = True
+'	l1.Visible = True
+'	l2.Visible = True
+'	l3.Visible = True
+'	l4.Visible = True
+'	l5.Visible = True
+'	l6.Visible = True
+'	p1.Visible = True
+'	p2.Visible = True
+'	p3.Visible = True
+'	p4.Visible = True
+'	p5.Visible = True
+'	p6.Visible = True
+'	help.data = "True"
+'Else
+'	img.Visible = False
+'	board.Visible = False
+'	title.Visible = False
+'	l1.Visible = False
+'	l2.Visible = False
+'	l3.Visible = False
+'	l4.Visible = False
+'	l5.Visible = False
+'	l6.Visible = False
+'	p1.Visible = False
+'	p2.Visible = False
+'	p3.Visible = False
+'	p4.Visible = False
+'	p5.Visible = False
+'	p6.Visible = False
+'	help.data = "False"
+'End If
+
+ret_trade.SetFocus
+SCREEN.CreateWindow 1, "IB170810 /t /p5 /s", ""
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON0)
+_AW_ONCLICK_AW_
+BUTTON0.SetFocus
+
+Dim data
+data = "a" & vbTab & Trim(AN99.Data) & vbTab  & _
+	   "b" & vbTab & Trim(zPwd.Data) & vbTab & _
+	   "c" & vbTab & Trim(gubn.Data) & vbTab & _
+	   "d" & vbTab & Trim(ANCM.Data) & vbTab & _
+	   "e" & vbTab & cnt & vbTab
+
+SCREEN.CreateWindow 3, "IB0000A3 /t/d/p5/S", _
+		"WxReport01" & vbTab & data
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(GRID0)
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

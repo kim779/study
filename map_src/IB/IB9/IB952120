@@ -1,0 +1,177 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB952120)
+MAPSIZE(52, 848)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+TITLE("Untitled")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pmho1003")
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+EDIT  cust_id(54, 6, 134, 26)  LEN(8)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_SKIP  FONT("굴림체", 9, NORMAL)    COLOR(192, 130)  CUR(0)  TP_SUNKEN          TABORDER(1)  IOORDER(5)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL23(0, 6, 54, 26)  '고객 ID : '  AL_LEFT  CUR(0)      COLOR(146, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  reg(142, 6, 218, 26)  '등록'  TP_PUSH|IMAGETEXT|AL_STRETCH        FOCUS  COLOR(208, 186)  CUR(0)    "4BTN.BMP"    TABORDER(2)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+BUTTON  edit(219, 6, 254, 26)  '수정'  TP_PUSH|IMAGETEXT|AL_STRETCH        FOCUS  COLOR(208, 186)  CUR(0)    "2BTN.BMP"    TABORDER(3)  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+BUTTON  delete(255, 6, 290, 26)  '삭제'  TP_PUSH|IMAGETEXT|AL_STRETCH        FOCUS  COLOR(208, 186)  CUR(0)    "2BTN.BMP"    TABORDER(4)  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+BUTTON  eraser(291, 6, 326, 26)  '지움'  TP_PUSH|IMAGETEXT|AL_STRETCH        FOCUS  COLOR(208, 186)  CUR(0)    "2BTN.BMP"    TABORDER(5)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+BUTTON  cancle(327, 6, 362, 26)  '취소'  TP_PUSH|IMAGETEXT|AL_STRETCH        FOCUS  COLOR(208, 186)  CUR(0)    "2BTN.BMP"    TABORDER(6)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+OUT  login_id(765, 6, 845, 26)  LEN(8)  IO_MIXED|AL_LEFT||FA_WRAP|FA_SKIP  FONT("굴림체", 9, NORMAL)    COLOR(192, 130)  CUR(0)  LINECOLOR(75)          TABORDER(0)  IOORDER(6)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL0(704, 6, 759, 26)  '처리자 ID : '  AL_LEFT  CUR(0)      COLOR(146, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  ckey(72, 90, 192, 110)  LEN(30)  IO_ALPHA|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(7)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  gubn(216, 88, 239, 107)  LEN(1)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(8)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  EDIT0(354, 197, 681, 226)  LEN(100)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(9)  IOORDER(3)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  OUTPUT0(17, 34, 809, 52)  LEN(80)  IO_MIXED|AL_LEFT|  FONT("굴림체", 9, NORMAL)    COLOR(34, 130)  CUR(0)            TABORDER(0)  IOORDER(7)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  g_ckey(606, 409, 906, 427)  LEN(30)  IO_MIXED|AL_CENTER|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(9)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  g_gubn(613, 388, 649, 402)  LEN(1)  IO_MIXED|AL_CENTER|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(8)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  memo0(411, 286, 745, 362)  LEN(5000)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(10)  IOORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL1(373, 9, 680, 25)  '내용 복사/붙이기 : Ctrl + Insert / Shift + Insert'  AL_LEFT  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(208, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONSTART_AW_
+login_id.Data = LOGIN.User
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+EDIT0.Data = SCREEN.Object("main.title").Text
+memo0.data = SCREEN.Object("main.object0.memo").text
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+SCREEN.Proc "main.send_f", ""
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(reg)
+_AW_ONCLICK_AW_
+Dim rgdt, usid, rgid, msg, ret
+
+msg = ""
+msg = msg + "고객ID : " & cust_id.Data & vbLf
+msg = msg + "제목   : " & SCREEN.Object("main.title").Text & vbLf & vbLf
+msg = msg + "다음과 같은 내용으로 등록하시겠습니까?"
+ret = MsgBox (msg, vbYesNo+vbExclamation+vbDefaultButton2, "이상매매통보자 신규등록")
+If (ret=vbNo) Then Exit Sub End If
+
+rgdt = "              "
+usid = cust_id.Data
+rgid = login_id.Data
+gubn.Data = "C"
+ckey.data = (rgdt & usid & rgid)
+SCREEN.send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(edit)
+_AW_ONCLICK_AW_
+Dim msg, ret, rgdt, usid, rgid, mm, dd, h, m, s
+
+msg = ""
+msg = msg + "고객ID : " & cust_id.Data & vbLf
+msg = msg + "제목   : " & SCREEN.Object("main.title").Text & vbLf & vbLf
+msg = msg + "다음과 같은 내용으로 수정하시겠습니까?"
+ret = MsgBox(msg, vbYesNo+vbExclamation+vbDefaultButton2, "이상매매통보자 내용수정")
+If (ret=vbNo) Then Exit Sub End If
+
+gubn.Data = "U"
+'rgdt = Mid(ckey.data, 1, 14)
+'usid = cust_id.Data
+'rgid = login_id.Data
+'
+'ckey.data = (rgdt & usid & rgid)
+
+SCREEN.send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(delete)
+_AW_ONCLICK_AW_
+Dim msg, ret
+
+msg = ""
+msg = msg + "고객ID : " & cust_id.Data & vbLf
+msg = msg + "제목   : " & SCREEN.Object("main.title").Text & vbLf & vbLf
+msg = msg + "다음 내용을 삭제하시겠습니까?"
+ret = MsgBox(msg, vbYesNo+vbExclamation+vbDefaultButton2, "이상매매통보자 삭제")
+If (ret=vbNo) Then Exit Sub End If
+
+gubn.Data = "D"
+SCREEN.send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(eraser)
+_AW_ONCLICK_AW_
+Dim msg, ret
+
+msg = ""
+msg = msg + "작업 내용이 지워집니다. 계속하시겠습니까?"
+ret = MsgBox(msg, vbYesNo+vbExclamation+vbDefaultButton2, "이상매매통보자 지움")
+If (ret=vbNo) Then Exit Sub End If
+
+cust_id.Clear
+cust_id.Enable = True
+SCREEN.Object("main.object0.memo").clear
+SCREEN.Object("main.object0.memo").enable = True
+SCREEN.Object("main.title").clear
+SCREEN.Object("main.title").enable = True
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(cancle)
+_AW_ONCLICK_AW_
+Dim msg, ret
+
+msg = ""
+msg = msg + "작업 내용이 취소됩니다. 계속하시겠습니까?"
+ret = MsgBox(msg, vbYesNo+vbExclamation+vbDefaultButton2, "이상매매통보자 취소")
+If (ret=vbNo) Then Exit Sub End If
+
+SCREEN.Proc "main.send_f", ""
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

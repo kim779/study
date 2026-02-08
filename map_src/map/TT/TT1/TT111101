@@ -1,0 +1,292 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(TT111101)
+MAPSIZE(122, 186)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+TITLE("종목")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL20(0, 0, 186, 122)  LIMAGE(2)  LINEW(4)  STRESS(44)  STRESSW(3)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON1(97, 29, 116, 49)  '현'  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(15, 94)  CUR(0)    "1BTN.bmp"    TABORDER(1)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_STRING)  HELPTEXT("현물종목")HELPTEXT("현물종목")
+GROUP  grp(6, 7, 182, 119)  '종목'    FONT("굴림체", 9, BOLD)      COLOR(-1, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON0(148, 203, 182, 223)  '지움'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, BOLD)  COLOR(208, 186)  CUR(0)    "조회BTN.BMP"    TABORDER(2)  ENABLE  &
+  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+OUT  name(12, 62, 176, 82)  LEN(30)  IO_MIXED|AL_LEFT|  FONT("굴림체", 9, BOLD)    COLOR(160, 130)  CUR(0)  LINECOLOR(89)          TABORDER(0)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON2(119, 29, 138, 49)  '업'  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(15, 130)  CUR(0)    "1BTN.bmp"    TABORDER(3)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_REF)  HELPTEXT("업종지수")HELPTEXT("업종지수")
+BUTTON  BUTTON3(141, 29, 160, 49)  '파'  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(15, 130)  CUR(0)    "1BTN.bmp"    TABORDER(4)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_STRING)  HELPTEXT("파생(선물/옵션)")HELPTEXT("파생(선물/옵션)")
+EDIT  fcod(12, 29, 92, 49)  LEN(8)  IO_ALPHA|EDIT_INPUT|FA_UPPER|CODE    FONT("굴림체", 9, NORMAL)    COLOR(192, 130)  CUR(0)  TP_SUNKEN          TABORDER(5)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  scod(12, 29, 92, 49)  LEN(6)  IO_MIXED|EDIT_INOUT|FA_UPPER|CODE    FONT("굴림체", 9, NORMAL)    COLOR(192, 130)  CUR(0)  TP_SUNKEN          TABORDER(6)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  ucod(12, 29, 92, 49)  LEN(3)  IO_MIXED|EDIT_INOUT|FA_UPPER|CODE    FONT("굴림체", 9, NORMAL)    COLOR(192, 130)  CUR(0)  TP_SUNKEN          TABORDER(7)  IOORDER(4)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  gubn(228, 172, 268, 197)  LEN(1)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("s")          TABORDER(8)  IOORDER(5)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  BUTTON4(126, 89, 174, 109)  '지움'  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(15, 130)  CUR(0)    "2BTN.bmp"    TABORDER(9)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_STRING)  HELPTEXT("파생(선물/옵션)")HELPTEXT("파생(선물/옵션)")
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Sub clear()
+	scod.Data = ""
+	ucod.Data = ""
+	fcod.Data = ""
+	scod.Visible = True
+	ucod.Visible = False
+	fcod.Visible = False
+	BUTTON1.TRgb = 94
+	BUTTON2.TRgb = 130
+	BUTTON3.TRgb = 130
+	gubn.Data = "s"
+	name.Clear
+End Sub
+
+Sub Setting(cod)
+	Select Case SCREEN.GetCodeType(cod)
+		Case 11, 12
+			scod.Visible = False
+			ucod.Visible = False
+
+			fcod.Visible = True
+
+			fcod.Data = cod
+			Select Case Mid(fcod.Data, 1, 1)
+				Case "1", "4" :											' 선물
+					name.Data = SCREEN.GetName(101, fcod.Data, 0)
+					gubn.Data = "f"
+				Case "2", "3" :											' 콜, 풋
+					name.Data = SCREEN.GetName(102, fcod.Data, 0)
+					gubn.Data = "o"
+			End Select
+
+			BUTTON1.TRgb = 130
+			BUTTON2.TRgb = 130
+			BUTTON3.TRgb = 94
+		Case 1, 2, 3, 9, 6
+			scod.Visible = True
+			ucod.Visible = False
+			fcod.Visible = False
+
+			scod.Data = cod
+			name.Data = SCREEN.GetName(100, scod.Data, 0)
+			BUTTON1.TRgb = 94
+			BUTTON2.TRgb = 130
+			BUTTON3.TRgb = 130
+			gubn.Data = "s"
+		Case Else
+			scod.Visible = False
+			ucod.Visible = True
+			fcod.Visible = False
+
+			ucod.Data = cod
+			name.Data = SCREEN.GetName(104, ucod.Data, 99)
+			BUTTON1.TRgb = 130
+			BUTTON2.TRgb = 94
+			BUTTON3.TRgb = 130
+			gubn.Data = "u"
+	End Select
+End Sub
+
+_AW_ONSTART_AW_
+Call clear()
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+SCREEN.OnSend False
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(BUTTON1)
+_AW_ONCLICK_AW_
+Dim retn
+retn = SCREEN.GetCode(100, "scod", "name", 0 )
+If retn <> True Then
+       Exit Sub
+End If
+scod.visible True
+fcod.visible False
+ucod.visible False
+
+BUTTON1.TRgb = 94
+BUTTON2.TRgb = 130
+BUTTON3.TRgb = 130
+
+gubn.Data = "s"
+
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON0)
+_AW_ONCLICK_AW_
+S1301.clear
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON2)
+_AW_ONCLICK_AW_
+Dim retn
+retn = SCREEN.GetCode(104, "ucod", "name", 99 )
+If retn <> True Then
+       Exit Sub
+End If
+
+scod.visible False
+fcod.visible False
+ucod.visible True
+
+BUTTON1.TRgb = 130
+BUTTON2.TRgb = 94
+BUTTON3.TRgb = 130
+
+gubn.Data = "u"
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON3)
+_AW_ONCLICK_AW_
+Dim retn
+retn = SCREEN.GetCode(103, "fcod", "name", 2 )
+If retn <> True Then
+       Exit Sub
+End If
+
+scod.visible False
+fcod.visible True
+ucod.visible False
+
+BUTTON1.TRgb = 130
+BUTTON2.TRgb = 130
+BUTTON3.TRgb = 94
+
+If Left(fcod.data, 1) = "1" Or Left(fcod.data, 1) = "4" Then
+	gubn.Data = "f"
+Else
+	gubn.Data = "o"
+End If
+
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(fcod)
+_AW_ONCHANGE_AW_
+Select Case Mid(fcod.Data, 1, 1)
+	Case "1", "4"											' 선물
+		name.Data = SCREEN.GetName(101, fcod.Data, 0)
+		gubn.Data = "f"
+	Case "2", "3"											' 콜, 풋
+		name.data = SCREEN.GetName(102, fcod.Data, 0)
+		gubn.Data = "o"
+	Case Else
+		name.Data = ""
+End Select
+
+SYSTEM.SetHistory "fcod", fcod.Data
+
+If Trim(fcod.data) <> "" Then
+SYSTEM.Trace "fcod :" & fcod.data
+	SCREEN.Object("main.obj_chart").send
+End If
+_AW_ONENDSUB_AW_
+_AW_ONKEYCHANGE_AW_
+If SCREEN.Key = 13 Then
+	Select Case Mid(fcod.Data, 1, 1)
+	Case "1", "4" :											' 선물
+		name.Data = SCREEN.GetName(101, fcod.Data, 0)
+	Case "2", "3" :											' 콜, 풋
+		name.data = SCREEN.GetName(102, fcod.Data, 0)
+	Case Else
+		name.Data = ""
+	End Select
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(scod)
+_AW_ONCHANGE_AW_
+
+If gubn.Data = "s" Then
+	name.Data = SCREEN.GetName(100, scod.Data, 0)
+End If
+SYSTEM.SetHistory "scod", scod.Data
+
+If Trim(scod.data) <> "" Then
+SYSTEM.Trace "scod : " & scod.data
+	SCREEN.Object("main.obj_chart").send
+End If
+_AW_ONENDSUB_AW_
+_AW_ONKEYCHANGE_AW_
+If SCREEN.Key = 13 Then
+	name.Data = SCREEN.GetName(100, scod.Data, 0)
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(ucod)
+_AW_ONCHANGE_AW_
+
+If gubn.Data = "u" Then
+	name.Data = SCREEN.GetName(104, ucod.Data, 99)
+End If
+
+SYSTEM.SetHistory "ucod", ucod.Data
+
+If Trim(ucod.data) <> "" Then
+	SCREEN.Object("main.obj_chart").send
+End If
+_AW_ONENDSUB_AW_
+_AW_ONKEYCHANGE_AW_
+If SCREEN.Key = 13 Then
+	name.Data = SCREEN.GetName(104, ucod.Data, 99)
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON4)
+_AW_ONCLICK_AW_
+Call clear()
+SCREEN.Object("main.obj_chart").send
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

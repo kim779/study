@@ -1,0 +1,223 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB430520)
+MAPSIZE(19, 566)
+VERSION(001)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("[4305]종목비교-선물")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(FLASH)
+TITLE("[4305] 투자주체별 종목비교-선물")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("bo430520")
+MAPTYPE(NORM)
+HEADER(NOP)
+BGROUND(BRUSH, 14)
+}
+
+
+
+FORM DIVISION
+{
+
+GROUP  GROUP0(953, 10, 1011, 40)        COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+COMBO  stype(164, 114, 274, 132)  TP_NONE  LEN(1)  COUNT(2)  VCOUNT(2)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_NUM|EDIT_INPUT    COLOR(68, 69)  CUR(0)  DISPLAY("보유계약", "보유금액")  DATA("1", "2")    TABORDER(1)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  gubn(144, 114, 160, 132)  LEN(1)  IO_ALPHA|EDIT_INPUT|FA_WRAP    COLOR(192, 0)  CUR(0)  TP_NONE  INIT("1")          TABORDER(2)  IOORDER(1)  &
+  HINTTYPE(IH_NONE)
+TABLE  TABLE0(133, 0, 233, 19)  MATRIX(1, 1)  LINECOLOR(75)  CELLH(20)  AUTOSIZE  |MULTI  EDIT_OUTPUT    &
+	COLINFO("Row0")  LEN(12)  WIDTH(35)  HEAD("개인")  COLALIGN(AL_CENTER, AL_RIGHT)  HEADCOLOR(96, 130)  IO_NUM|FA_COMMA|FA_RIGHT|FA_CORGB|SA_COSIGN    COLOR(68, 69)  COLCUR(0, 0)  COLHINTTYPE(IH_NONE)    COLUMN_VISIBLE  IFRGB(94, 95)  IOORDER(6)  ENABLE  &
+  VISIBLE
+
+TABLE  TABLE1(84, 0, 134, 19)  MATRIX(1, 1)  LINECOLOR(75)  CELLH(20)  AUTOSIZE  |NOHEAD  EDIT_OUTPUT    &
+	COLINFO("023")  LEN(8)  WIDTH(52)  HEAD("현재가")  COLALIGN(AL_CENTER, AL_RIGHT)  HEADCOLOR(74, 76)  IO_NUM|FA_CORGB|SA_COSUP    COLOR(68, 69)  COLCUR(0, 0)  COLHINTTYPE(IH_NONE)    COLUMN_VISIBLE  IFRGB(94, 95)  IOORDER(5)  ENABLE  &
+  VISIBLE
+
+TABLE  TABLE2(230, 0, 330, 19)  MATRIX(1, 1)  LINECOLOR(75)  CELLH(20)  AUTOSIZE  |MULTI  EDIT_OUTPUT    &
+	COLINFO("Row0")  LEN(12)  WIDTH(35)  HEAD("외인")  COLALIGN(AL_CENTER, AL_RIGHT)  HEADCOLOR(96, 130)  IO_NUM|FA_COMMA|FA_RIGHT|FA_CORGB|SA_COSIGN    COLOR(68, 69)  COLCUR(0, 0)  COLHINTTYPE(IH_NONE)    COLUMN_VISIBLE  IFRGB(94, 95)  IOORDER(7)  ENABLE  &
+  VISIBLE
+
+TABLE  TABLE3(328, 0, 468, 19)  MATRIX(1, 1)  LINECOLOR(75)  CELLH(20)  AUTOSIZE  |MULTI  EDIT_OUTPUT    &
+	COLINFO("Row0")  LEN(12)  WIDTH(60)  HEAD("금융투자")  COLALIGN(AL_CENTER, AL_RIGHT)  HEADCOLOR(96, 130)  IO_NUM|FA_COMMA|FA_RIGHT|FA_CORGB|SA_COSIGN    COLOR(68, 69)  COLCUR(0, 0)  COLHINTTYPE(IH_NONE)    COLUMN_VISIBLE  IFRGB(94, 95)  IOORDER(8)  ENABLE  &
+  VISIBLE
+
+TABLE  TABLE4(466, 0, 566, 19)  MATRIX(1, 1)  LINECOLOR(75)  CELLH(20)  AUTOSIZE  |MULTI  EDIT_OUTPUT    &
+	COLINFO("Row0")  LEN(12)  WIDTH(35)  HEAD("투신")  COLALIGN(AL_CENTER, AL_RIGHT)  HEADCOLOR(96, 130)  IO_NUM|FA_COMMA|FA_RIGHT|FA_CORGB|SA_COSIGN    COLOR(68, 69)  COLCUR(0, 0)  COLHINTTYPE(IH_NONE)    COLUMN_VISIBLE  IFRGB(94, 95)  IOORDER(9)  ENABLE  &
+  VISIBLE
+
+TABLE  TABLE5(0, 0, 86, 19)  MATRIX(1, 1)  LINECOLOR(75)  CELLH(20)  AUTOSIZE  |NOHEAD  EDIT_OUTPUT    &
+	COLINFO("22")  LEN(30)  WIDTH(52)  HEAD("현재가")  COLALIGN(AL_CENTER, AL_LEFT)  HEADCOLOR(96, 130)  IO_MIXED    COLOR(96, 130)  COLCUR(0, 0)  COLHINTTYPE(IH_NONE)    COLUMN_VISIBLE  IOORDER(3)  ENABLE  &
+  VISIBLE
+
+OUT  021(30, 55, 148, 75)  LEN(8)  IO_NUM|AL_CENTER||FA_FLASH    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(4)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Private Sub loadUserConfig()
+	If SCREEN.CreateObject("Info") Then
+		str1  = Trim(INFO.popData(LOGIN.Name, "userconf.ini", "DH322500", "GUBN"))
+		If str1 = "" Then
+		    	saveUserConfig()
+		Else
+			gubn.Data = str1
+			Select Case gubn.Data
+			Case "1"
+				RADIO1.Checked = True
+			Case "2"
+				RADIO0.Checked = True
+			Case Else
+			End Select
+
+			stype.data = Trim(INFO.popData(LOGIN.Name, "userconf.ini", "DH322500", "STYPE"))
+			If stype.Data = "1" Then
+				danw.Text = "계약"
+			Else
+				danw.Text = "십만원"
+			End If
+		End If
+	End If
+End Sub
+
+Private Sub saveUserConfig()
+	If SCREEN.CreateObject("Info") Then
+		INFO.pushData LOGIN.Name, "userconf.ini", "DH322500", "GUBN",  gubn.Data
+		INFO.pushData LOGIN.Name, "userconf.ini", "DH322500", "STYPE",  stype.Data
+	End If
+End Sub
+
+Private Sub Obj_Send()
+    saveUserConfig()
+    SCREEN.Send 0
+End Sub
+
+
+'***************************************************************
+'* Name   : checkFOOrder
+'* DESC   : 선물/옵션 주문 설정 값 세팅
+'* WRITOR : 이성훈 Data/Time : 2004-04-29
+'***************************************************************
+Dim ss_jmhi										 '주문확인창
+Dim ss_onec                            '원클릭 팝업주문
+Dim ss_ppos                            '팝업주문위치
+
+Private Sub checkFOOrder()
+   If SCREEN.CreateObject("foorder") = False Then
+      Exit Sub
+   End If
+
+   FOORDER.User = LOGIN.Name
+	ss_jmhi = FOORDER.jmhi
+	ss_onec = FOORDER.Onec
+	ss_ppos = FOORDER.ppos
+
+End Sub
+
+'*****************************************************************
+'NAME : P_CALL_TRIGGER_JM_WINDOW
+'DESC : 주문 필드 trigger 처리
+'*****************************************************************
+Private Sub P_CALL_TRIGGER_JM_WINDOW()
+	Dim Is_temp
+
+	JMDG.Data = S016301.GetGridCell(S016301.Row, 17)
+
+	ls_temp = S016301.GetGridCell(S016301.Row , 1)
+	If Trim(CODX.Data) <> Trim(ls_temp) Then
+'		JMDG.Trigger "JMDG", True
+		CODX.Data = Trim(ls_temp)
+		CODX.Trigger "CODX", True
+		CODX.Push("CODX")
+	End If
+End Sub
+
+'*****************************************************************
+'NAME : P_CALL_RESET_JM_WINDOW
+'DESC : 주문 window 처리
+'*****************************************************************
+Private Sub P_CALL_RESET_JM_WINDOW()
+
+	Dim ls_pop
+
+	CODX.Data = S016301.GetGridCell(S016301.Row , 1)
+	JMDG.Data = S016301.GetGridCell(S016301.Row , 17)
+	hnam.Data = S016301.GetGridCell(S016301.Row , 19)
+	ACCN2.Pop("ACCN2")
+	ACNM.Pop("ACNM")
+	PSWD.Pop("PSWD")
+	JMCN.Pop("JMCN")
+	MMGB.Pop("MMGB")
+
+	SCREEN.CreateWindow 3, "DH111100 /d/p" & ss_ppos & "/S", _
+			"MMGB"&vbTab&MMGB.Data&vbLf& _
+			"JMGB"&vbTab&JMGB.Data&vbLf& _
+			"JMCN"&vbTab&JMCN.Data&vbLf& _
+			"JMDG"&vbTab&JMDG.Data&vbLf& _
+			"HNAM"&vbTab&hnam.Data&vbLf& _
+			"CODX"&vbTab&CODX.Data&vbLf
+End Sub
+
+'*****************************************************************
+'NAME : P_PUT_TRIGGER_JM_WINDOW
+'DESC : 주문 필드 trigger 처리
+'*****************************************************************
+Private Sub P_PUT_TRIGGER_JM_WINDOW()
+	Dim Is_temp
+
+	JMDG.Data = S016302.GetGridCell(S016302.Row, 3)
+
+	ls_temp = S016302.GetGridCell(S016302.Row , 1)
+	If Trim(CODX.Data) <> Trim(ls_temp) Then
+'		JMDG.Trigger "JMDG", True
+		CODX.Data = Trim(ls_temp)
+		CODX.Trigger "CODX", True
+		CODX.Push("CODX")
+	End If
+
+End Sub
+
+'*****************************************************************
+'NAME : P_PUT_RESET_JM_WINDOW
+'DESC : 주문 window 처리
+'*****************************************************************
+Private Sub P_PUT_RESET_JM_WINDOW()
+	Dim ls_pop
+
+	CODX.Data = S016302.GetGridCell(S016302.Row , 1)
+	JMDG.Data = S016302.GetGridCell(S016302.Row , 3)
+	hnam.Data = S016302.GetGridCell(S016302.Row , 19)
+	ACCN2.Pop("ACCN2")
+	ACNM.Pop("ACNM")
+	PSWD.Pop("PSWD")
+	JMCN.Pop("JMCN")
+	MMGB.Pop("MMGB")
+
+	SCREEN.CreateWindow 3, "DH111100 /d/p" & ss_ppos & "/S", _
+			"MMGB"&vbTab&MMGB.Data&vbLf& _
+			"JMGB"&vbTab&JMGB.Data&vbLf& _
+			"JMCN"&vbTab&JMCN.Data&vbLf& _
+			"JMDG"&vbTab&JMDG.Data&vbLf& _
+			"HNAM"&vbTab&hnam.Data&vbLf& _
+			"CODX"&vbTab&CODX.Data&vbLf
+End Sub
+
+_AW_ONSEND_AW_
+gubn.Data = SCREEN.Object("MAIN.gubn").Data
+stype.Data = SCREEN.Object("MAIN.stype").Data
+
+_AW_ONENDSUB_AW_
+}
+
+
+

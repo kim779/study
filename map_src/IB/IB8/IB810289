@@ -1,0 +1,49 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB810289)
+MAPSIZE(440, 360)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("NICE통신사약관")
+MAPPUBLIC(";")
+FONT("굴림", 9, NORMAL)
+TITLE("이용약관 통합")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+CONTROL  WebLink(0, 0, 360, 440)  |FA_PROTECT  "CX_Thtmlex"  "/w"  LEN(0)  EDIT_NOP    COLOR(192, 130)  TABORDER(0)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONSTART_AW_
+'BROWSER0.Navigate("https://cert.vno.co.kr/app/agree/agree_main.jsp")
+WebLink.Seturl2("https://cert.vno.co.kr/app/agree/agree_main.jsp")
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(WebLink)
+_AW_ONDBLCLK_AW_
+edlog.Data = WebLink.strLog
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

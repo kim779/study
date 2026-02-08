@@ -1,0 +1,308 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB951900)
+MAPSIZE(426, 394)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+TITLE("[9519] 사용자단말정보 조회")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pmho9519")
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL1(-2, 0, 395, 55)  LIMAGE(0)  LINEW(3)  LINETYPE(4)  LINECOLOR(64)      COLOR(66, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL10(0, 55, 395, 448)  LIMAGE(0)  LINEW(3)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+GRID  GRID0(5, 80, 390, 423)  VISIBLEROW(19)  CELLH(18)  MATRIX(300, 2)  FIX(0)  MAINCOLOR(7, 0)  LINECOLOR(65)  FOCUSCOLOR(78)  FOCUSKIND(4)    FONT("굴림체", 9, NORMAL)  ROWC(68, 77)  |FLEXIBLE|VSCROLL|NO3D|RROW|PAGE|KEYFOCUS|GRFTEXT    &
+	COLINFO("in_date")  LEN(40)  WIDTH(295)  HEAD("OS명")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT  |FA_ZEROSUP|SA_SPACE    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  COLUMN_SORT  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("time")  LEN(6)  WIDTH(74)  HEAD("사용자수")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_ZEROSUP|SA_SPACE    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  COLUMN_SORT  INORMAL    HNORMAL  SORTSTARTPOS(0)    TABORDER(1)  IOORDER(8)  ENABLE  &
+  VISIBLE
+
+BUTTON  send_btn(350, 5, 386, 25)  '조회'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, BOLD)  FOCUS  COLOR(208, 186)  CUR(0)    "조회btn.bmp"    TABORDER(2)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+EDIT  func(520, 315, 590, 335)  LEN(1)  IO_ALPHA|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_SUNKEN  INIT("H")          TABORDER(3)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  day1(88, 30, 174, 50)  LEN(8)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_DATE  FONT("굴림체", 9, NORMAL)    COLOR(68, 130)  CUR(0)  TP_SUNKEN          EDITFORMAT("9999/99/99")  TABORDER(4)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  day2(185, 30, 271, 50)  LEN(8)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_DATE  FONT("굴림체", 9, NORMAL)    COLOR(68, 130)  CUR(0)  TP_SUNKEN          EDITFORMAT("9999/99/99")  TABORDER(5)  IOORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL4(176, 30, 185, 50)  '~'  AL_LEFT  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(208, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL0(5, 30, 55, 50)  '조회일자'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+GROUP  GP0(810, 410, 880, 460)  'Group'        COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+COMBO  COMBO0(88, 5, 163, 25)  TP_SUNKEN  LEN(1)  COUNT(2)  VCOUNT(2)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_MIXED|EDIT_INPUT|FA_SKIP    COLOR(68, 69)  CUR(0)  DISPLAY("HTS", "MTS")  DATA("H", "M")    TABORDER(6)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  RADIO0(172, 5, 212, 25)  'OS'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(GP0)      COLOR(208, 232)  CUR(0)      TABORDER(7)  ENABLE  &
+  VISIBLE  CHECKED  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  RADIO1(213, 5, 253, 25)  '모델'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(GP0)      COLOR(208, 232)  CUR(0)      TABORDER(8)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  RADIO2(263, 5, 333, 25)  'App 버전'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(GP0)      COLOR(208, 232)  CUR(0)      TABORDER(9)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+OUT  OUTPUT0(75, 58, 149, 78)  LEN(7)  IO_MIXED|AL_CENTER|    COLOR(181, 232)  CUR(0)  LINECOLOR(0)          TABORDER(0)  IOORDER(7)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL1(10, 59, 73, 79)  '총사용자수'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+OUT  OUTPUT1(210, 58, 284, 78)  LEN(7)  IO_MIXED|AL_CENTER|    COLOR(181, 232)  CUR(0)  LINECOLOR(0)          TABORDER(0)  IOORDER(5)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL2(160, 58, 205, 78)  'Android'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+OUT  OUTPUT2(315, 58, 389, 78)  LEN(7)  IO_MIXED|AL_CENTER|    COLOR(181, 232)  CUR(0)  LINECOLOR(0)          TABORDER(0)  IOORDER(6)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL3(290, 58, 310, 78)  'IOS'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL5(5, 5, 55, 25)  '단말구분'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Sub SetFirstData()
+	Dim Nextmon, Nextday
+
+
+	'
+	'ed_sdat.Data = syear & smon & sday
+
+	Nextday = change_indate("d", -1, Date)
+	Nextmon = change_indate("d", -1, Date)
+
+	day1.Data = Nextday
+	day2.Data = Nextmon
+
+End Sub
+
+_AW_ONINDECLARE_AW_
+#load IB888888
+
+_AW_ONENDSUB_AW_
+_AW_ONSTART_AW_
+If COMBO0.Data = "M" Then
+	RADIO0.Visible = True
+	RADIO1.Visible = True
+	RADIO2.Visible = True
+	LABEL2.Visible = True
+	LABEL3.Visible = True
+	OUTPUT1.Visible = True
+	OUTPUT2.Visible = True
+
+	OUTPUT1.Skip = False
+	OUTPUT2.Skip = False
+
+	If RADIO0.Checked = True Then
+		func.Data = "O"		'MTS OS 정보
+	ElseIf RADIO1.Checked = True Then
+		func.Data = "M"		'MTS 모델 정보
+	ElseIf RADIO2.Checked = True Then
+		func.Data = "A"		'MTS App 버전 정보
+	End If
+ElseIf COMBO0.Data = "H" Then
+	RADIO0.Visible = False
+	RADIO1.Visible = False
+	RADIO2.Visible = False
+	LABEL2.Visible = False
+	LABEL3.Visible = False
+	OUTPUT1.Visible = False
+	OUTPUT2.Visible = False
+
+	func.Data = "H"
+	OUTPUT1.Skip = True
+	OUTPUT2.Skip = True
+End If
+
+Call SetFirstData()
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+SCREEN.ClearAll 0, 2
+
+If COMBO0.Data = "M" Then
+	RADIO0.Visible = True
+	RADIO1.Visible = True
+	RADIO2.Visible = True
+	LABEL2.Visible = True
+	LABEL3.Visible = True
+	OUTPUT1.Visible = True
+	OUTPUT2.Visible = True
+
+	OUTPUT1.Skip = False
+	OUTPUT2.Skip = False
+
+	If RADIO0.Checked = True Then
+		func.Data = "O"		'MTS OS 정보
+	ElseIf RADIO1.Checked = True Then
+		func.Data = "M"		'MTS 모델 정보
+	ElseIf RADIO2.Checked = True Then
+		func.Data = "A"		'MTS App 버전 정보
+	End If
+ElseIf COMBO0.Data = "H" Then
+	RADIO0.Visible = False
+	RADIO1.Visible = False
+	RADIO2.Visible = False
+	LABEL2.Visible = False
+	LABEL3.Visible = False
+	OUTPUT1.Visible = False
+	OUTPUT2.Visible = False
+
+	func.Data = "H"
+	OUTPUT1.Skip = True
+	OUTPUT2.Skip = True
+End If
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+If func.Data = "M" Then
+	GRID0.SetHead 1, "모델명"
+ElseIf func.Data = "O" Then
+	GRID0.SetHead 1, "OS명"
+ElseIf func.Data = "H" Then
+	GRID0.SetHead 1, "OS명"
+ElseIf func.Data = "A" Then
+	GRID0.SetHead 1, "App 버전"
+End If
+
+GRID0.Sort 1, True, True
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(GRID0)
+_AW_ONCLICK_AW_
+If GRID0.HitPos = 3 Then
+	If GRID0.Column = 5 Then
+		MsgBox GRID0.data,,GRID0.Head
+	End If
+'	S1301.DATA = GRID0.GetGridCell(GRID0.INDEX + 1, 2)
+'	If Trim(S1301.DATA) = "" Then
+'	    Exit Sub
+'	End If
+'
+'	S1301.Trigger "", False
+'	S1301.Trigger "", True
+'	SYSTEM.SetHistory "1301", S1301.Data
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(send_btn)
+_AW_ONCLICK_AW_
+If COMBO0.Data = "M" Then
+	RADIO0.Visible = True
+	RADIO1.Visible = True
+	RADIO2.Visible = True
+
+	If RADIO0.Checked = True Then
+		func.Data = "O"		'MTS OS 정보
+	ElseIf RADIO1.Checked = True Then
+		func.Data = "M"		'MTS 모델 정보
+	ElseIf RADIO2.Checked = True Then
+		func.Data = "A"		'MTS App 버전 정보
+	End If
+ElseIf COMBO0.Data = "H" Then
+	RADIO0.Visible = False
+	RADIO1.Visible = False
+	RADIO2.Visible = False
+	func.Data = "H"
+End If
+
+
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(day1)
+_AW_ONCHANGE_AW_
+SCREEN.IgnoreChange True
+
+SCREEN.Send 0
+SCREEN.IgnoreChange False
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(day2)
+_AW_ONCHANGE_AW_
+SCREEN.IgnoreChange True
+
+
+SCREEN.Send 0
+SCREEN.IgnoreChange False
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(COMBO0)
+_AW_ONCHANGE_AW_
+If COMBO0.Data = "M" Then
+	RADIO0.Visible = True
+	RADIO1.Visible = True
+	RADIO2.Visible = True
+
+	OUTPUT1.Skip = False
+	OUTPUT2.Skip = False
+
+	If RADIO0.Checked = True Then
+		func.Data = "O"		'MTS OS 정보
+	ElseIf RADIO1.Checked = True Then
+		func.Data = "M"		'MTS 모델 정보
+	ElseIf RADIO2.Checked = True Then
+		func.Data = "A"		'MTS App 버전 정보
+	End If
+ElseIf COMBO0.Data = "H" Then
+	RADIO0.Visible = False
+	RADIO1.Visible = False
+	RADIO2.Visible = False
+	func.Data = "H"
+	OUTPUT1.Skip = True
+	OUTPUT2.Skip = True
+End If
+
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(RADIO0)
+_AW_ONCLICK_AW_
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(RADIO1)
+_AW_ONCLICK_AW_
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(RADIO2)
+_AW_ONCLICK_AW_
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

@@ -1,0 +1,333 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB102012)
+MAPSIZE(300, 650)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("매수조건내역")
+MAPPUBLIC(";")
+FONT("굴림", 9, NORMAL)
+TITLE("매수조건내역")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("piat1004")
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+EDIT  e_acnt_no(765, 30, 885, 49)  LEN(11)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(1)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+GROUP  GROUP0(755, 10, 890, 115)  'IN'        COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  e_count(765, 75, 885, 94)  LEN(5)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("100")          TABORDER(2)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+GRID  GRID0(0, 0, 650, 300)  VISIBLEROW(0)  CELLH(19)  MATRIX(1000, 25)  FIX(6)  MAINCOLOR(7, 232)  LINECOLOR(75)  FOCUSCOLOR(78)  FOCUSKIND(4)    FONT("굴림체", 9, NORMAL)  ROWC(68, 77)  |FLEXIBLE|VSCROLL|HSCROLL|INS_TOP|NO3D|RROW|XHLINE|PAGE|HEADER|GRVALID|GRFTEXT    &
+	COLINFO("Col9")  LEN(0)  WIDTH(30)  HEAD("실행")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_NOP      COLOR(192, 232)  COLCUR(0, 0)    COLUMN_IMAGE  COLUMN_VISIBLE  IBUTTON  BUTTONIMG("ico_watch_buy.bmp")    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col13")  LEN(0)  WIDTH(30)  HEAD("삭제")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_NOP      COLOR(192, 232)  COLCUR(0, 0)    COLUMN_IMAGE  COLUMN_VISIBLE  IBUTTON  BUTTONIMG("ico_delete.bmp")    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col12")  LEN(0)  WIDTH(30)  HEAD("상세")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_NOP      COLOR(192, 232)  COLCUR(0, 0)    COLUMN_IMAGE  COLUMN_VISIBLE  IBUTTON  BUTTONIMG("ico_list.bmp")    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col1")  LEN(18)  WIDTH(75)  HEAD("등록번호")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col2")  LEN(20)  WIDTH(59)  HEAD("처리상태")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col3")  LEN(9)  WIDTH(66)  HEAD("종목코드")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col4")  LEN(40)  WIDTH(90)  HEAD("종목명")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col23")  LEN(0)  WIDTH(30)  HEAD("이하")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_NOP      COLOR(192, 232)  COLCUR(0, 0)    COLUMN_IMAGE  COLUMN_VISIBLE  IBUTTON  BUTTONIMG("BUY_CHECK_ON.BMP")    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col22")  LEN(0)  WIDTH(30)  HEAD("이상")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_NOP      COLOR(192, 232)  COLCUR(0, 0)    COLUMN_IMAGE  COLUMN_VISIBLE  IBUTTON  BUTTONIMG("BUY_CHECK_ON.BMP")    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col21")  LEN(0)  WIDTH(30)  HEAD("대비")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_NOP      COLOR(192, 232)  COLCUR(0, 0)    COLUMN_IMAGE  COLUMN_VISIBLE  IBUTTON  BUTTONIMG("BUY_CHECK_ON.BMP")    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col20")  LEN(0)  WIDTH(30)  HEAD("TS")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_NOP      COLOR(192, 232)  COLCUR(0, 0)    COLUMN_IMAGE  COLUMN_VISIBLE  IBUTTON  BUTTONIMG("BUY_CHECK_ON.BMP")    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col7")  LEN(20)  WIDTH(87)  HEAD("주문구분")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT  |FA_ZEROSUP|SA_SPACE    COLOR(192, 54)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col6")  LEN(20)  WIDTH(70)  HEAD("주문유형")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col5")  LEN(40)  WIDTH(100)  HEAD("주문수량")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col8")  LEN(20)  WIDTH(70)  HEAD("가격")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT  |FA_ZEROSUP|SA_SPACE    COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col11")  LEN(8)  WIDTH(80)  HEAD("유효기간")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_DATE    COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  EDITFORMAT("9999/99/99")    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col10")  LEN(8)  WIDTH(80)  HEAD("설정일자")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_DATE    COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  EDITFORMAT("9999/99/99")    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col15")  LEN(11)  WIDTH(30)  HEAD("계좌")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_NUM|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col16")  LEN(1)  WIDTH(30)  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_NUM|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col19")  LEN(1)  WIDTH(30)  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_NUM|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col18")  LEN(1)  WIDTH(30)  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_NUM|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col17")  LEN(1)  WIDTH(30)  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_NUM|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col0")  LEN(32)  WIDTH(100)  HEAD("TTTEST")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col14")  LEN(1)  WIDTH(30)  HEAD("처리상태")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col24")  LEN(200)  WIDTH(30)  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_NUM|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    TABORDER(3)  IOORDER(7)  ENABLE  &
+  VISIBLE
+
+OUT  OUTPUT0(20, 365, 420, 395)  LEN(64)  IO_NUM|AL_LEFT|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(5)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  obj_delete_SVR(980, 440, 1085, 545)    "IB102030"  TABORDER(4)  IOORDER(8)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  obj_exec_SVR(755, 295, 860, 400)    "IB102031"  TABORDER(5)  IOORDER(9)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  obj_stop_SVR(1015, 325, 1105, 410)    "IB102032"  TABORDER(6)  IOORDER(10)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  OUTPUT1(30, 340, 85, 360)  LEN(5)  IO_NUM|AL_CENTER|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(3)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  OUTPUT2(105, 345, 160, 365)  LEN(5)  IO_NUM|AL_CENTER|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(4)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  OUTPUT3(195, 470, 231, 484)  LEN(1)  IO_NUM|AL_CENTER|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(6)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Sub refreshList()
+	GRID0.Clear
+	SCREEN.Send 0
+End Sub
+
+_AW_ONSTART_AW_
+
+GRID0.LoadButtonImage "Col20", "", "BUY_CHECK_ON.BMP", "BUY_CHECK_OFF.BMP"
+GRID0.LoadButtonImage "Col21", "", "BUY_CHECK_ON.BMP", "BUY_CHECK_OFF.BMP"
+GRID0.LoadButtonImage "Col22", "", "BUY_CHECK_ON.BMP", "BUY_CHECK_OFF.BMP"
+GRID0.LoadButtonImage "Col23", "", "BUY_CHECK_ON.BMP", "BUY_CHECK_OFF.BMP"
+
+
+'GRID0.LoadButtonImage "Col9", "", "CS_ROLLSEARCHPLAY.BMP", "CS_ROLLSEARCHSTOP.BMP"
+GRID0.LoadButtonImage "Col9", "", "ico_watch_stop.BMP", "ico_watch_buy.BMP"
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+OUTPUT1.Data = ""
+OUTPUT2.Data = ""
+
+SCREEN.Proc "Parent.DisplayCondCnt", ""
+'GRID0.Clear
+e_acnt_no.Data = Trim(SCREEN.Object("main.AN5A").Data)
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+
+Dim nCheck
+For i = 0 To GRID0.Rows
+	'data trim
+	For j = 1 To GRID0.Columns
+		GRID0.SetGridCell i, j, Trim(GRID0.GetGridCell(i,j))
+	Next
+	
+	nCheck = Trim(GRID0.GetGridCell(i,24))
+	If nCheck = "1" Then
+		GRID0.DispButtonImage i, 1, 3
+	Else
+		GRID0.DispButtonImage i, 1, 2
+	End If
+
+	nCheck = Trim(GRID0.GetGridCell(i,19))
+	If nCheck = "1" Then
+		GRID0.DispButtonImage i, 8, 2
+	Else
+		GRID0.DispButtonImage i, 8, 3
+	End If
+	nCheck = Trim(GRID0.GetGridCell(i,20))
+	If nCheck = "1" Then
+		GRID0.DispButtonImage i, 9, 2
+	Else
+		GRID0.DispButtonImage i, 9, 3
+	End If
+	nCheck = Trim(GRID0.GetGridCell(i,21))
+	If nCheck = "1" Then
+		GRID0.DispButtonImage i, 10, 2
+	Else
+		GRID0.DispButtonImage i, 10, 3
+	End If
+	nCheck = Trim(GRID0.GetGridCell(i,22))
+	If nCheck = "1" Then
+		GRID0.DispButtonImage i, 11, 2
+	Else
+		GRID0.DispButtonImage i, 11, 3
+	End If
+
+Next
+
+'Call GRID0.SetRows(GRID0.Rows)
+
+If GRID0.Rows > 0 Then
+
+	'SCREEN.Object("main.guide").text = "   조회가 완료되었습니다."
+
+	SCREEN.Proc "Parent.DisplayCondCnt", ""
+End If
+
+SCREEN.Object("main.guide").text = Trim(OUTPUT0.Data)
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(GRID0)
+_AW_ONCLICK_AW_
+If GRID0.HitPos <> "3" Then
+	Exit Sub
+End If
+
+Dim szSq
+Dim szok
+Dim szAcc
+'조건 실행 / 중지 처리
+If GRID0.Column = 1 Then
+	'실행 중지 조건상태값 확인 필요
+
+	'일련번호
+	szSq = Trim(GRID0.GetGridCell(GRID0.Row, 4))
+	If szSq = "" Then
+		MsgBox "실행 할 조건을 확인하십시오.",, "IBK투자증권"
+		Exit Sub
+	End If
+	nCheck = Trim(GRID0.GetGridCell(GRID0.Row,24))
+	If nCheck = "1" Then
+		'==========================================================================================
+		'조건 중지
+		'==========================================================================================
+		SCREEN.Object("obj_stop_SVR.e_sq").Data = szSq
+
+		szok = MsgBox("선택한 주문조건을 감시 중지하시겠어요?" ,1, "IBK투자증권")
+
+		If szok <> "1" Then
+			Exit Sub
+		End If
+
+		'계좌번호
+		SCREEN.Object("obj_stop_SVR.e_acnt_no").Data = Trim(SCREEN.Object("main.AN5A").Data)
+		obj_stop_SVR.Send
+		'==========================================================================================
+	Else
+		'==========================================================================================
+		'조건 실행
+		'==========================================================================================
+		SCREEN.Object("obj_exec_SVR.e_sq").Data = szSq
+		szok = MsgBox("선택한 주문조건을 감시 실행하시겠어요?" ,1, "IBK투자증권")
+		If szok <> "1" Then
+			Exit Sub
+		End If
+		'계좌번호
+		SCREEN.Object("obj_exec_SVR.e_acnt_no").Data = Trim(SCREEN.Object("main.AN5A").Data)
+		obj_exec_SVR.Send
+		'==========================================================================================
+	End If
+End If
+'조건 삭제 처리
+If GRID0.Column = 2 Then
+
+	'일련번호
+	szSq = Trim(GRID0.GetGridCell(GRID0.Row, 4))
+
+	If szSq = "" Then
+		MsgBox "삭제 할 조건을 확인하십시오.",, "IBK투자증권"
+		Exit Sub
+	End If
+
+
+	'실행중인 조건은 삭제 못함
+	nCheck = Trim(GRID0.GetGridCell(GRID0.Row,24))
+	If nCheck = "1" Then
+		MsgBox "감시 중인 주문 입니다."& vbCrLf &"감시 중지 후 삭제해 주세요.",, "IBK투자증권"
+		Exit Sub
+	End If
+
+	szok = MsgBox("선택한 감시내역을"& vbCrLf &"정말 삭제하시겠습니까?" ,1, "IBK투자증권")
+
+	If szok <> "1" Then
+		Exit Sub
+	End If
+
+	SCREEN.Object("obj_delete_SVR.e_sq").Data = szSq
+
+	'계좌번호
+	SCREEN.Object("obj_delete_SVR.e_acnt_no").Data = Trim(SCREEN.Object("main.AN5A").Data)
+
+	'01:잔고청산 02:조건감시 05:종목별신규편입
+	SCREEN.Object("obj_delete_SVR.e_est_typ_cd").Data = "02"
+
+	obj_delete_SVR.Send
+End If
+
+
+If GRID0.Column = 3 Then
+
+	Dim dmsg
+
+
+	'일련번호
+	szSq = Trim(GRID0.GetGridCell(GRID0.Row, 4))
+	If szSq = "" Then
+		MsgBox "조건등록번호를 확인 하세요.",, "IBK투자증권"
+		Exit Sub
+	End If
+	'계좌번호
+	szAcc = Trim(SCREEN.Object("main.AN5A").Data)
+	'계좌명
+	szAccnm = Trim(SCREEN.Object("main.AN5A").name)
+
+
+	dmsg  = "e_acnt_no"  & vbTab & Trim(szAcc)& vbLf & "e_sq"  & vbTab & Trim(szSq) & vbLf & "e_accnm"  & vbTab & Trim(szAccnm)& vbLf
+	SCREEN.CreateWindow 2, "IB102040 /p5 /d", dmsg
+
+End If
+_AW_ONENDSUB_AW_
+_AW_ONDBLCLK_AW_
+If GRID0.HitPos <> "3" Then
+	Exit Sub
+End If
+
+
+codx = Trim(GRID0.GetGridCell(GRID0.Row, 6))
+codnm = Trim(GRID0.GetGridCell(GRID0.Row, 7))
+'일련번호
+szSq = Trim(GRID0.GetGridCell(GRID0.Row, 4))
+
+
+If szSq = "" Then
+	MsgBox "조건등록번호를 확인 하세요.",, "IBK투자증권"
+	Exit Sub
+End If
+
+nCheck = Trim(GRID0.GetGridCell(GRID0.Row,24))
+If szSq = "" Then
+	Exit Sub
+End If
+If nCheck = "1" Then
+	'==========================================================================================
+	'조건 중지
+	'==========================================================================================
+	SCREEN.Object("obj_stop_SVR.e_sq").Data = szSq
+
+	szok = MsgBox("감시 중인 주문은 조건을 변경할 수 없어요."& vbCrLf &"감시를 중단할까요?" ,1, "IBK투자증권")
+	If szok <> "1" Then
+		Exit Sub
+	End If
+	'계좌번호
+	SCREEN.Object("obj_stop_SVR.e_acnt_no").Data = Trim(SCREEN.Object("main.AN5A").Data)
+	obj_stop_SVR.Send
+End If
+
+
+
+SCREEN.Object("main.1301").Data = codx
+
+
+SCREEN.Object("main.e_jcode").Data = codx
+SCREEN.Object("main.e_jname").Data = codnm
+'일단은 현금으로 각각 단건조회 해외서 신용구분 처리하자
+SCREEN.Object("main.e_crdt").Data = "00"
+SCREEN.Object("main.e_ldate").Data = ""
+SCREEN.Object("main.e_avprc").Data = ""
+
+SCREEN.Object("main.e_sq").Data = szSq
+
+
+SCREEN.Proc "main.send_sise_all", "SVR_CONDLIST"
+SCREEN.Proc "main.send_ItemInfo", "SVR_CONDLIST_B"
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

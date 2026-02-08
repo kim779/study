@@ -1,0 +1,266 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB250100)
+MAPSIZE(409, 708)
+VERSION(001)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("신용거래현황")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+TITLE("[2501] 종목별 신용거래현황")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL10(-4, 26, 713, 411)  LIMAGE(0)  LINEW(6)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  SYMBOL9(0, 0, 710, 26)        COLOR(66, 69)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  SYMBOL7(343, 3, 386, 23)  '기준일'  AL_CENTER  CUR(0)      COLOR(68, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  SYMBOL11(70, 3, 89, 23)  TP_PUSH|IMAGE|AL_STRETCH      COLOR(68, 1)  CUR(0)    "검색.BMP"    TABORDER(2)  ENABLE  &
+  VISIBLE  IMAGE  HOVER  HINTTYPE(IH_NONE)
+LABEL  SYMBOL21(587, 3, 652, 23)  '(단위:백만)'  AL_CENTER  CUR(0)      COLOR(68, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  12901(383, 3, 467, 23)  LEN(8)  IO_NUM|EDIT_INPUT|FA_SKIP|FA_DATE    COLOR(68, 130)  CUR(0)  TP_SUNKEN          EDITFORMAT("9999/99/99")  TABORDER(5)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  C_ER(542, 3, 581, 23)  '대주'  TP_CHECK|EDIT_NOP          COLOR(12, 130)  CUR(0)      TABORDER(6)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+PANEL  PANEL2(0, 0, 1, 26)        COLOR(64, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL3(708, 0, 710, 26)        COLOR(64, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+CONTROL  1301(5, 3, 70, 23)    "CX_CODECTRL"  "/u0/k검색.BMP/lAXCOMBO.BMP/p/s0/o"  LEN(6)  EDIT_INOUT    COLOR(192, 130)  TABORDER(1)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  obj(7, 36, 705, 401)    "IB250110"  TABORDER(7)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON1(127, 3, 146, 23)  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, NORMAL)  COLOR(208, 232)  CUR(0)    "관심.BMP"    TABORDER(3)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+CONTROL  ctl_Category(89, 3, 127, 23)    "CX_Category"  "/k0/i돌려보기.BMP/t/r1301"  LEN(0)  EDIT_NOP  FONT("굴림체", 9, NORMAL)    COLOR(68, 232)  TABORDER(0)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  obj_hnam(178, 3, 338, 23)    "IB250101"  TABORDER(4)  IOORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON0(655, 3, 703, 23)  '차트'  TP_PUSH|IMAGETEXT|AL_STRETCH        FOCUS  COLOR(208, 186)  CUR(0)    "3btn.bmp"    TABORDER(8)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Option Explicit
+
+Sub Send_Main()
+	obj_hnam.Send
+	SCREEN.Proc "obj.send_f", ""
+End Sub
+
+_AW_ONINDECLARE_AW_
+#load IB888888
+
+_AW_ONENDSUB_AW_
+_AW_ONSTART_AW_
+Dim dat
+Dim dat2
+
+dat = change_date ("d" , -1 )
+dat2 = week_check( dat)
+S12901.Data = dat2
+
+Send_Main()
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+SCREEN.OnSend = False
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(SYMBOL11)
+_AW_ONCLICK_AW_
+Dim retn
+retn = SCREEN.GetCode(100, "1301", "hnam", 0 )
+
+If retn <> True Then
+       Exit Sub
+End If
+
+Send_Main()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(12901)
+_AW_ONCHANGE_AW_
+Send_Main()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(C_ER)
+_AW_ONCLICK_AW_
+Dim grid
+Set grid = SCREEN.Object("obj.12510")
+
+If C_ER.Checked = True Then
+	grid.SetColumnVisible 3, False	'신규
+	grid.SetColumnVisible 4, False	'상환
+	grid.SetColumnVisible 5, False	'잔고
+	grid.SetColumnVisible 6, False	'잔고대비
+	grid.SetColumnVisible 7, False	'금액
+	grid.SetColumnVisible 15, False	'공여율
+	grid.SetColumnVisible 16, False	'잔고율
+
+	grid.SetColumnVisible 8, True	'신규
+	grid.SetColumnVisible 9, True	'상환
+	grid.SetColumnVisible 10, True	'잔고
+	grid.SetColumnVisible 11, True  '잔고대비
+	grid.SetColumnVisible 12, True	'금액
+	grid.SetColumnVisible 13, True	'공여율
+	grid.SetColumnVisible 14, True	'잔고율
+Else
+	grid.SetColumnVisible 3, True	'신규
+	grid.SetColumnVisible 4, True	'상환
+	grid.SetColumnVisible 5, True	'잔고
+	grid.SetColumnVisible 6, True	'잔고대비
+	grid.SetColumnVisible 7, True	'금액
+	grid.SetColumnVisible 15, True	'공여율
+	grid.SetColumnVisible 16, True	'잔고율
+
+	grid.SetColumnVisible 8, False	'신규
+	grid.SetColumnVisible 9, False	'상환
+	grid.SetColumnVisible 10, False	'잔고
+	grid.SetColumnVisible 11, False '잔고대비
+	grid.SetColumnVisible 12, False	'금액
+	grid.SetColumnVisible 13, False	'공여율
+	grid.SetColumnVisible 14, False	'잔고율
+End If
+
+' 차트화면일 경우에 차트 서비스 호출.
+'If BUTTON0.text = "데이터" Then
+'	SCREEN.Object("obj.OBJECT0").Send
+'End If
+Send_Main()
+_AW_ONENDSUB_AW_
+_AW_ONDBLCLK_AW_
+Dim grid
+Set grid = SCREEN.Object("obj.12510")
+
+If C_ER.Checked = True Then
+	grid.SetColumnVisible 3, False
+	grid.SetColumnVisible 4, False
+	grid.SetColumnVisible 5, False
+	grid.SetColumnVisible 6, False
+	grid.SetColumnVisible 13, False
+	grid.SetColumnVisible 14, False
+
+	grid.SetColumnVisible 7, True
+	grid.SetColumnVisible 8, True
+	grid.SetColumnVisible 9, True
+	grid.SetColumnVisible 10, True
+	grid.SetColumnVisible 11, True
+	grid.SetColumnVisible 12, True
+Else
+	grid.SetColumnVisible 3, True
+	grid.SetColumnVisible 4, True
+	grid.SetColumnVisible 5, True
+	grid.SetColumnVisible 6, True
+	grid.SetColumnVisible 13, True
+	grid.SetColumnVisible 14, True
+
+	grid.SetColumnVisible 7, False
+	grid.SetColumnVisible 8, False
+	grid.SetColumnVisible 9, False
+	grid.SetColumnVisible 10, False
+	grid.SetColumnVisible 11, False
+	grid.SetColumnVisible 12, False
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(1301)
+_AW_ONCHANGE_AW_
+S1301.Trigger "", True
+Send_Main()
+
+S1301.SetFocus
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON1)
+_AW_ONCLICK_AW_
+SCREEN.CreateWindow 1, "IB202201 /t/s/p5/d", "appendCODE" & _
+			vbTab & S1301.Data & vbLf
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(ctl_Category)
+_AW_ONCLICK_AW_
+Dim codx
+codx = ctl_Category.GetPreCode(S1301.Data)
+
+If Trim(codx) = "" Then
+	Exit Sub
+End If
+
+S1301.Data = codx
+obj_hnam.Send
+S1301.Trigger "", True
+SCREEN.Proc "obj.send_f", ""
+S1301.SetFocus
+_AW_ONENDSUB_AW_
+_AW_ONDBLCLK_AW_
+Dim codx
+codx = ctl_Category.GetNextCode(S1301.Data)
+
+If Trim(codx) = "" Then
+	Exit Sub
+End If
+
+S1301.Data = codx
+obj_hnam.Send
+S1301.Trigger "", True
+SCREEN.Proc "obj.send_f", ""
+S1301.SetFocus
+_AW_ONENDSUB_AW_
+_AW_ONCHANGE_AW_
+S1301.Data = ctl_Category.GetCurCode
+obj_hnam.Send
+S1301.Trigger "", True
+SCREEN.Proc "obj.send_f", ""
+S1301.SetFocus
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON0)
+_AW_ONCLICK_AW_
+If BUTTON0.text = "데이터" Then
+	obj.SetObject ("IB250110")
+	BUTTON0.text = "차트"
+Else
+	obj.SetObject ("IB250120")
+	BUTTON0.text = "데이터"
+End If
+Send_Main()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

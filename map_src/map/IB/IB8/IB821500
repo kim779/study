@@ -1,0 +1,298 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB821500)
+MAPSIZE(443, 709)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("계좌현황정보")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(ENCODE)
+TITLE("[8215]MY계좌정보")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL13(-2, 28, 711, 421)  LIMAGE(0)  LINEW(4)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL11(0, 0, 709, 28)        COLOR(64, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL6(0, 1, 709, 27)  LIMAGE(0)  LINEW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(66, 69)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL0(7, 4, 79, 24)  '종합계좌번호'  AL_LEFT  CUR(0)      COLOR(66, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+CONTROL  AN99(81, 4, 221, 24)    "CX_Account"  "/w0"  LEN(11)  EDIT_INPUT    COLOR(192, 232)  TABORDER(1)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL6(295, 4, 345, 24)  '비밀번호'  AL_LEFT  CUR(0)      COLOR(66, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  zPwd(344, 4, 400, 24)  LEN(8)  IO_MIXED|EDIT_INPUT|FA_PASSWD|FA_WRAP    COLOR(192, 130)  CUR(0)  TP_SUNKEN          TABORDER(2)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  send_btn(666, 4, 702, 24)  '조회'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, BOLD)  FOCUS  COLOR(208, 186)  CUR(0)    "조회btn.bmp"    TABORDER(3)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+OUT  ACNM(222, 4, 286, 24)  LEN(30)  IO_MIXED|AL_LEFT||FA_SKIP    COLOR(160, 130)  CUR(0)  LINECOLOR(89)          TABORDER(0)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  sect(757, 32, 776, 57)  LEN(1)  IO_NUM|EDIT_INPUT|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("1")          TABORDER(4)  IOORDER(4)  ENABLE  &
+  HINTTYPE(IH_NONE)
+CONTROL  AN98(56, 4, 196, 24)    "CX_Account"  "/w0"  LEN(11)  EDIT_INPUT    COLOR(192, 232)  TABORDER(5)  IOORDER(5)  ENABLE  &
+  HINTTYPE(IH_NONE)
+USRTAB  mainTab(6, 35, 206, 61)  FOCUS  INDEX(0)  COUNT(2)  AL_TOP  TAB_IMAGE      FONT("굴림체", 9, NORMAL)    COLOR(3, 70)  CUR(0)  TABIMAGE("TAB.bmp")  FCOLOR(3, 71)  CAPTION("종합계좌현황", "개별계좌현황")  TABINFO("1:1", "1:2")  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BOX  BOX0(6, 60, 703, 415)    COLOR(165, 165)  LINEW(1)  BX_LINE    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  GUIDE_around(-2, 420, 711, 444)  LIMAGE(0)  LINEW(3)  LINETYPE(4)  LINECOLOR(64)      COLOR(34, 69)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  GUIDE(29, 423, 699, 441)  LINECOLOR(34)      COLOR(34, 130)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+PANEL  PANEL109(15, 425, 29, 439)    |IMAGE|AL_STRETCH    COLOR(181, 232)  CUR(0)    "알림_ic.bmp"  ENABLE  &
+  VISIBLE  IMAGE  HINTTYPE(IH_NONE)
+USRTAB  subTab(10, 63, 700, 89)  FOCUS  INDEX(0)  COUNT(4)  AL_TOP  TAB_IMAGE      FONT("굴림체", 9, NORMAL)    COLOR(3, 70)  CUR(0)  TABIMAGE("TAB.bmp")  FCOLOR(3, 71)  CAPTION("기본정보", "약정현황", "주소현황", "자동이체내역")  TABINFO("1:1", "1:2", "1:4", "1:3")  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  obj(10, 90, 699, 415)    ""  TABORDER(6)  IOORDER(6)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  chk_passwd(159, 774, 279, 794)    "IB810191"  TABORDER(7)  IOORDER(7)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL36(34, 772, 154, 792)  'chk_pass'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Option Explicit
+
+Dim startFlag
+startFlag = 1
+
+'== 계좌명, 비밀번호 설정
+Sub Set_account(acntCtrl)
+	If acntCtrl.Visible = True Then
+		SCREEN.ClearAll 0, 2
+		obj.ClearAll 2
+		GUIDE.Text = ""
+		zPwd.Clear
+
+		If Len(Trim(acntCtrl.Data)) = 11 Then
+			ACNM.Data = acntCtrl.Name
+			zPwd.Data = acntCtrl.Password
+
+'			If Len(Trim(ACNM.Password)) = 44 Then
+'				If zPwd.Data <> "HEAD" Then
+'					LEDGER.Hsiz = 44
+'					LEDGER.Epwd = Trim(ACNM.Password)
+'					zPwd.Data = "HEAD"
+'				End If
+'			End If
+
+			'If SYSTEM.ConnectBy = 0 Then
+			'	If Trim(zPwd.Data) = "" Then
+			'		zPwd.Data = "9999"
+			'	End If
+			'End If
+
+			Call selSubTab()
+		Else
+			acntCtrl.SetFocus
+			Exit Sub
+		End If
+	End If
+End Sub
+
+Sub selMainTab()
+	GUIDE.Text = ""
+	If mainTab.ID = 1 Then
+		LABEL0.Text = "종합계좌번호"
+		AN98.VIsible False
+		AN99.Visible True
+		ACNM.SetRect 222, 4, 286, 24
+		subTab.SetTabVisible 3, True
+		subTab.SetTabVisible 4, True
+	Else
+
+		LABEL0.Text = "계좌번호"
+		AN98.VIsible True
+		AN99.Visible False
+		ACNM.SetRect 198, 4, 262, 24
+		subTab.SetTabVisible 3, False
+		subTab.SetTabVisible 4, False
+
+		If subTab.ID >= 3 Then
+			subTab.ID = 1
+		End If
+	End If
+
+	Call selSubTab()
+End Sub
+
+Sub selSubTab()
+	If mainTab.ID = 1 Then
+		Select Case subTab.ID
+			Case 1 : obj.SetObject "IB821511"
+			Case 2 :
+				SCREEN.Proc "obj.IBK_Input_Visible", ""
+				obj.SetObject "IB821512"
+			Case 3 : obj.SetObject "IB821513"
+			Case 4 : obj.SetObject "IB821514"
+		End Select
+	Else
+		If subTab.ID = 1 Then
+			Dim acntTp
+
+			If Trim(AN98.Data) = "" Then
+				Call alert_msg("계좌번호를 확인하여 주십시오.")
+				AN98.SetFocus
+				Exit Sub
+			End If
+
+			acntTp = Mid(Trim(AN98.Data), 4, 2)
+
+			Select Case acntTp
+				Case "10", "11", "12", "51", "52"		: obj.SetObject "IB82152A"	'------ 위탁
+				Case "20", "21"           		  		: obj.SetObject "IB82152B"	'------ 선물
+				Case "30", "31", "37"	    	 		: obj.SetObject "IB82152C"	'------ 저축
+				Case "53", "55", "57"         	  		: obj.SetObject "IB82152D"	'------ 수익증권
+				Case Else
+					obj.SetObject "IB82152A"
+					Exit Sub
+			End Select
+		Else
+			obj.SetObject "IB821522"
+		End If
+	End If
+	If startFlag = 2 Then
+		Call send_f()
+	End If
+End Sub
+
+Sub send_f()
+	If Len(Trim(zPwd.Data)) < 4 Then
+		MsgBox "비밀번호를 확인하여 주십시오.", , "IBK투자증권"
+		zPwd.SetFocus
+	Else
+		If mainTab.ID = 1 Then
+			If subTab.ID = 1 Then
+				SCREEN.Proc "obj.obj.send_f", ""
+			Else
+				SCREEN.Proc "obj.send_f", ""
+			End If
+		Else
+			SCREEN.Proc "obj.send_f", ""
+			SCREEN.Proc "obj.object0.send_f", ""
+		End If
+	End If
+End Sub
+
+
+Sub passPW()
+	startFlag = 2
+	Call send_f()
+End Sub
+
+_AW_ONINDECLARE_AW_
+#Load IB888833
+
+_AW_ONENDSUB_AW_
+_AW_ONSTART_AW_
+'직원/고객에 따른 비밀번호 컨트롤 설정
+'Call Check_LoginType(zPwd)
+
+AN98.Visible = False
+AN99.visible = True
+
+Call selMainTab()
+
+Dim ipop
+ipop = SYSTEM.Pop("IB821500")
+SYSTEM.Push "IB821500", "0"
+If ipop = "1" Then
+	subTab.ID = 2
+End If
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+SCREEN.OnSend = False
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(AN99)
+_AW_ONCHANGE_AW_
+Call Set_account(AN99)
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(zPwd)
+_AW_ONKEYCHANGE_AW_
+'== 비밀번호 변경시 조회 버튼 기능 수행.
+If SCREEN.Key = "13" Then  '-- Enter 키 입력
+	If Len(Trim(zPwd.Data)) < 4 Then
+		MsgBox "비밀번호를 확인하여 주십시오.", , "IBK투자증권"
+		zPwd.SetFocus
+	Else
+		If AN98.Visible = False Then
+			SCREEN.Object("chk_passwd.IntaccNo").data = AN99.data
+		Else
+			SCREEN.Object("chk_passwd.IntaccNo").data = AN98.data
+		End If
+		SCREEN.Object("chk_passwd.Pwd").data = zPwd.Data
+		chk_passwd.Send
+	End If
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(send_btn)
+_AW_ONCLICK_AW_
+If Len(Trim(zPwd.Data)) < 4 Then
+	MsgBox "비밀번호를 확인하여 주십시오.", , "IBK투자증권"
+	zPwd.SetFocus
+Else
+	If AN98.Visible = False Then
+		SCREEN.Object("chk_passwd.IntaccNo").data = AN99.data
+	Else
+		SCREEN.Object("chk_passwd.IntaccNo").data = AN98.data
+	End If
+	SCREEN.Object("chk_passwd.Pwd").data = zPwd.Data
+	chk_passwd.Send
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(AN98)
+_AW_ONCHANGE_AW_
+Call Set_account(AN98)
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(mainTab)
+_AW_ONCLICK_AW_
+Call selMainTab()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(subTab)
+_AW_ONCLICK_AW_
+Call selSubTab()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

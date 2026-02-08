@@ -1,0 +1,346 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB190010)
+MAPSIZE(343, 894)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("굴림", 9, NORMAL)
+OPTIONS(FMS)
+TITLE("펀드그룹 매매제한종목 편집")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL0(-5, 0, 1010, 560)  TP_RAISED      COLOR(208, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL2(525, 0, 895, 345)  LIMAGE(0)  LINEW(3)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL63(0, -5, 255, 345)  LIMAGE(0)  LINEW(3)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  obj0(50, 410, 610, 715)    "IB190002"  TABORDER(1)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+GRID  GRID0(5, 60, 245, 335)  VISIBLEROW(0)  CELLH(18)  MATRIX(500, 3)  FIX(0)  MAINCOLOR(208, 232)  LINECOLOR(75)  FOCUSCOLOR(78)  FOCUSKIND(4)  ROWC(68, 77)  |SELALWAYS|FLEXIBLE|VSCROLL|NO3D|RROW|XHLINE|PAGE|GRFTEXT    &
+	COLINFO("번호")  LEN(20)  WIDTH(49)  HEAD("번호")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HBUTTON  HBUTTONIMG("")    &
+	COLINFO("그룹명")  LEN(40)  WIDTH(175)  HEAD("그룹명")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("그룹번호")  LEN(20)  WIDTH(100)  HEAD("그룹번호")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    TABORDER(2)  IOORDER(2)  ENABLE  &
+  VISIBLE
+
+PANEL  PANEL_bg(0, 0, 255, 30)  '그룹목록'  LIMAGE(1)  LINEW(3)  LINETYPE(4)  LINECOLOR(64)      COLOR(66, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL1(525, 0, 895, 30)  '매매제한종목'  LIMAGE(1)  LINEW(3)  LINETYPE(4)  LINECOLOR(64)      COLOR(66, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL5(520, 0, 525, 345)  LINECOLOR(64)      COLOR(64, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL1(530, 35, 585, 55)  '그룹명'  AL_LEFT  CUR(0)      COLOR(181, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  ed_gp_name(590, 35, 690, 55)  LEN(20)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_SUNKEN          TABORDER(3)  IOORDER(3)  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON1(830, 60, 885, 80)  '종목추가'  TP_PUSH|IMAGETEXT|AL_STRETCH        FOCUS  COLOR(208, 186)  CUR(0)    "4BTN.BMP"    TABORDER(4)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+BUTTON  BUTTON0(670, 60, 689, 80)  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(15, 63)  CUR(0)    "검색.BMP"    TABORDER(5)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+GRID  GRID2(530, 85, 885, 335)  VISIBLEROW(0)  CELLH(18)  MATRIX(500, 2)  FIX(0)  MAINCOLOR(208, 232)  LINECOLOR(75)  FOCUSCOLOR(78)  FOCUSKIND(4)  ROWC(68, 77)  |SELALWAYS|FLEXIBLE|VSCROLL|NO3D|RROW|XHLINE|PAGE|GRFTEXT    &
+	COLINFO("종목코드")  LEN(80)  WIDTH(169)  HEAD("종목코드")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HBUTTON  HBUTTONIMG("")    &
+	COLINFO("종목명")  LEN(81)  WIDTH(169)  HEAD("종목명")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    TABORDER(6)  IOORDER(4)  ENABLE  &
+  VISIBLE
+
+EDIT  ed_gp_num(625, 380, 719, 399)  LEN(20)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(7)  IOORDER(5)  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  obj1(620, 415, 840, 715)    "IB190011"  TABORDER(8)  IOORDER(6)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON2(190, 35, 246, 55)  '조회'  TP_PUSH|IMAGETEXT|AL_STRETCH        FOCUS  COLOR(208, 186)  CUR(0)    "4BTN.BMP"    TABORDER(9)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+LABEL  LABEL0(530, 60, 585, 80)  '종목추가'  AL_LEFT  CUR(0)      COLOR(181, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  obj_symbol(693, 60, 826, 80)    "IB999910"  TABORDER(10)  IOORDER(7)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL3(255, 0, 260, 345)  LINECOLOR(64)      COLOR(64, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL4(260, -5, 520, 345)  LIMAGE(0)  LINEW(3)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL7(260, 0, 520, 30)  '계좌목록'  LIMAGE(1)  LINEW(3)  LINETYPE(4)  LINECOLOR(64)      COLOR(66, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  HINTTYPE(IH_NONE)
+GRID  GRID1(265, 60, 511, 335)  VISIBLEROW(0)  CELLH(18)  MATRIX(500, 2)  FIX(0)  MAINCOLOR(208, 232)  LINECOLOR(75)  FOCUSCOLOR(78)  FOCUSKIND(4)  ROWC(68, 77)  |SELALWAYS|FLEXIBLE|VSCROLL|NO3D|RROW|XHLINE|PAGE|GRFTEXT    &
+	COLINFO("accn")  LEN(20)  WIDTH(100)  HEAD("계좌번호")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HBUTTON  HBUTTONIMG("")    &
+	COLINFO("acnm")  LEN(40)  WIDTH(130)  HEAD("계좌명")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    TABORDER(11)  IOORDER(8)  ENABLE
+BUTTON  BUTTON3(170, 5, 246, 25)  '계좌별 등록'  TP_PUSH|IMAGETEXT|AL_STRETCH        FOCUS  COLOR(208, 186)  CUR(0)    "4BTN.BMP"    TABORDER(12)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+EDIT  1301(590, 60, 670, 80)  LEN(6)  IO_NUM|EDIT_INPUT|FA_WRAP|CODE      COLOR(192, 232)  CUR(0)  TP_SUNKEN          TABORDER(13)  IOORDER(9)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  OBJ_Accn(845, 415, 990, 715)    "IB190191"  TABORDER(14)  IOORDER(10)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Dim bShow	'계좌목록 보여줄지 여부
+bShow = False
+
+Sub gp_list_done()
+	Dim name, num, idx
+
+	GRID0.Clear
+	idx = 1
+
+	For i = 1 To SCREEN.Object("obj0.GRID0").Rows
+		num = Trim(SCREEN.Object("obj0.GRID0").GetGridCell( i, 1 )) '그룹번호
+		name = Trim(SCREEN.Object("obj0.GRID0").GetGridCell( i, 2 )) '그룹명
+		If Len(num) = 0 Then
+			Exit For
+		End If
+
+		GRID0.InsertRow(-1)
+		GRID0.SetGridCell idx, 1, Right(num,3)
+		GRID0.SetGridCell idx, 2, name
+		GRID0.SetGridCell idx, 3, num
+
+		idx = idx + 1
+	Next
+
+	ed_gp_num.Data = GRID0.GetGridCell(1,3)
+	ed_gp_name.Data = GRID0.GetGridCell(1,2)
+
+	SCREEN.Proc "obj1.query", ed_gp_num.Data
+End Sub
+
+Sub modify()
+	Dim num
+	num = GRID0.GetGridCell( GRID0.Row, 3 )
+	
+	If bShow Then
+		Call GRID1_Click()
+	Else
+		Call GRID0_Click()
+	End If
+
+'	SCREEN.Proc "obj1.query", num
+End Sub
+
+Sub code_list_done()
+
+	GRID2.Clear
+
+	Dim code, name, idx
+
+	idx = 1
+	For i = 1 To SCREEN.Object("obj1.GRID0").Rows
+		code = Trim(SCREEN.Object("obj1.GRID0").GetGridCell( i, 1 ))
+		name = Trim(SCREEN.Object("obj1.GRID0").GetGridCell( i, 2 ))
+
+		If Len(code) = 0 Then
+			Exit For
+		End If
+
+		GRID2.InsertRow(-1)
+		GRID2.SetGridCell idx, 1, code
+		GRID2.SetGridCell idx, 2, name
+
+		idx = idx + 1
+	Next
+End Sub
+
+Sub AccnShow()
+	If bShow Then	'계좌목록도 등록
+		BUTTON3.Text = "그룹별 등록"
+		SCREEN.SetSize 893, 343
+		'계좌목록
+		PANEL7.Visible = True
+		PANEL4.Visible = True
+		GRID1.Visible = True
+		PANEL5.Visible = True
+
+		'매매제한종목
+		PANEL1.SetRect 525, 0, 895, 30
+		PANEL2.SetRect 525, 0, 895, 345
+		LABEL1.SetRect 530, 35, 585, 55
+		LABEL1.Text = "계좌번호"
+		ed_gp_name.SetRect 590, 35, 690, 55
+		LABEL0.SetRect 530, 60, 585, 80
+		S1301.SetRect 590, 60, 670, 80
+		BUTTON0.SetRect 670, 60, 689, 80
+		obj_symbol.SetRect 693, 60, 826, 80
+		BUTTON1.SetRect 830, 60, 885, 80
+		GRID2.SetRect 530, 85, 885, 335
+
+		'그룹을 선택하지 않았을때 해당그룹의 계좌목록을 보여주게 하기 위해서.
+		SCREEN.Proc "OBJ_Accn.QueryAccountListNoSet", Trim( GRID0.GetGridCell( GRID0.Row, 3 ) ) & "," & "parent.GRID1"
+		Call GRID1_Click()
+
+	Else			'그룹별로 등록
+		BUTTON3.Text = "계좌별 등록"
+		SCREEN.SetSize 628, 343
+		'계좌목록
+		PANEL7.Visible = False
+		PANEL4.Visible = False
+		GRID1.Visible = False
+		PANEL5.Visible = False
+
+		'매매제한종목
+		PANEL1.SetRect 260, 0, 630, 30
+		PANEL2.SetRect 260, 0, 630, 345
+		LABEL1.SetRect 265, 35, 320, 55
+		LABEL1.Text = "그룹명"
+		ed_gp_name.SetRect 325, 35, 425, 55
+		LABEL0.SetRect 265, 60, 320, 80
+		S1301.SetRect 325, 60, 405, 80
+		BUTTON0.SetRect 405, 60, 424, 80
+		obj_symbol.SetRect 428, 60, 561, 80
+		BUTTON1.SetRect 565, 60, 620, 80
+		GRID2.SetRect 265, 85, 620, 335
+
+		Call GRID0_Click()
+	End If
+End Sub
+
+
+Sub GRID0_Click()
+	Dim name,num
+
+	num = Trim( GRID0.GetGridCell( GRID0.Row, 3 ) )
+	name = Trim( GRID0.GetGridCell( GRID0.Row, 2 ) )
+
+	If Not bShow Then
+		ed_gp_name.Data = name
+		ed_gp_num.Data = num
+
+		GRID2.Clear
+
+		If Len( num ) = 0 Then
+			Exit Sub
+		End If
+
+		SCREEN.Proc "obj1.query", num
+	End If
+
+	SCREEN.Proc "OBJ_Accn.QueryAccountListNoSet", num & "," & "parent.GRID1"
+End Sub
+
+Sub GRID1_Click()
+	Dim name,num
+	num = Trim( GRID1.GetGridCell( GRID1.Row, 1 ) )
+	name = Trim( GRID1.GetGridCell( GRID1.Row, 2 ) )
+
+	ed_gp_name.Data = num
+	ed_gp_num.Data = "ACNT"& num
+
+	GRID2.Clear
+
+	If Len( num ) = 0 Then
+		Exit Sub
+	End If
+
+	SCREEN.Proc "obj1.query", "ACNT"& num
+End Sub
+
+_AW_ONSTART_AW_
+obj0.Send
+
+bShow = False
+AccnShow()
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+SCREEN.OnSend = False
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(GRID0)
+_AW_ONCLICK_AW_
+Call GRID0_Click()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON1)
+_AW_ONCLICK_AW_
+	SCREEN.Proc "obj1.add", S1301.Data & "," & ed_gp_num.Data
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON0)
+_AW_ONCLICK_AW_
+Dim retn
+retn = SCREEN.GetCode(100, "1301", "hnam", 0 )
+If retn <> True Then
+      Exit Sub
+End If
+SCREEN.Send 0
+'SCREEN.Proc "parent.send_sise", "sise" & "," & S1301.Data
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(GRID2)
+_AW_ONDBLCLK_AW_
+Dim code
+
+code = Trim(GRID2.GetGridCell( GRID2.Row, 1 ))
+
+If Len(code) = 0 Then
+	Exit Sub
+End If
+
+SCREEN.Proc "obj1.delete", code & "," & ed_gp_num.Data
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON2)
+_AW_ONCLICK_AW_
+If bShow Then
+	Call GRID1_Click()
+Else
+	Call GRID0_Click()
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(GRID1)
+_AW_ONCLICK_AW_
+Call GRID1_Click()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON3)
+_AW_ONCLICK_AW_
+
+If BUTTON3.Text = "계좌별 등록" Then
+	bShow = True
+Else
+	bShow = False
+End If
+
+AccnShow()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(1301)
+_AW_ONCHANGE_AW_
+obj_symbol.Send
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

@@ -1,0 +1,204 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB200111)
+MAPSIZE(218, 304)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("현재가_체결")
+MAPPUBLIC(";")
+FONT("굴림", 9, NORMAL)
+OPTIONS(FMS|FLASH)
+TITLE("[200111]체결")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pooppoop")
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+EDIT  1301(563, 81, 625, 99)  LEN(12)  IO_MIXED|EDIT_INPUT    COLOR(35, 63)  CUR(0)  TP_NONE          TABORDER(2)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  1021(623, 81, 729, 101)  LEN(12)  IO_ALPHA|AL_LEFT||FA_FLASH    COLOR(211, 232)  CUR(0)            TABORDER(0)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL0(0, 0, 304, 25)        COLOR(66, 1)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+TABLE  TABLE1(-1, 0, 127, 20)  MATRIX(1, 1)  LINECOLOR(75)  CELLH(19)    FONT("굴림체", 9, NORMAL)|MULTI|XVLINE|XHLINE  EDIT_OUTPUT    &
+	COLINFO("2118")  LEN(9)  WIDTH(55)  HEAD("총매도")  COLALIGN(AL_CENTER, AL_RIGHT)  HEADCOLOR(96, 95)  IO_NUM|FA_COMMA|FA_RIGHT|FA_CORGB|SA_CORAW    COLOR(68, 69)  COLCUR(0, 0)  COLHINTTYPE(IH_NONE)    COLUMN_VISIBLE  IFRGB(209, 214)  IOORDER(4)  ENABLE  &
+  VISIBLE
+
+TABLE  TABLE0(124, 0, 252, 20)  MATRIX(1, 1)  LINECOLOR(75)  CELLH(19)    FONT("굴림체", 9, NORMAL)|MULTI|XVLINE|XHLINE  EDIT_OUTPUT    &
+	COLINFO("2119")  LEN(9)  WIDTH(56)  HEAD("총매수")  COLALIGN(AL_CENTER, AL_RIGHT)  HEADCOLOR(96, 94)  IO_NUM|FA_COMMA|FA_RIGHT|FA_CORGB|SA_CORAW    COLOR(68, 69)  COLCUR(0, 0)  COLHINTTYPE(IH_NONE)    COLUMN_VISIBLE  IFRGB(209, 214)  IOORDER(5)  ENABLE  &
+  VISIBLE
+
+GRID  11310(0, 19, 304, 218)  VISIBLEROW(10)  CELLH(18)  MATRIX(200, 6)  FIX(0)  MAINCOLOR(7, 0)  LINECOLOR(75)  FOCUSCOLOR(78)  FOCUSKIND(3)    FONT("굴림체", 9, NORMAL)  VARIANT("$?")  ROWC(68, 77)  |FLEXIBLE|VSCROLL|INS_TOP|NO3D|RROW|XHLINE|PAGE|HEADER|GRFTEXT    &
+	COLINFO("11034")  LEN(6)  WIDTH(55)  HEAD("시간")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_CORGB|SA_CORAW    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  EDITFORMAT("99:99:99")    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("2023")  LEN(7)  WIDTH(61)  HEAD("체결가")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSUP    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(94, 95)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("11024")  LEN(7)  WIDTH(61)  HEAD("전일비")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|FA_CONTRAST|SA_SPACE|SA_CORAW|SA_PAINT    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(94, 95)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("11032")  LEN(8)  WIDTH(49)  HEAD("체결량")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSUP    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(94, 95)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("2027")  LEN(12)  WIDTH(62)  HEAD("거래량")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_CORGB|SA_COSUP    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(94, 95)    HCOMBO  HCOMBOCOUNT(2)  HCOMBODISPLAY("거래량", "체결강도")  HCOMBODATA("00", "01")    &
+	COLINFO("2036")  LEN(12)  WIDTH(62)  HEAD("체결강도")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSUP    COLOR(68, 69)  COLCUR(0, 0)    INORMAL  IFRGB(94, 95)    HCOMBO  HCOMBOCOUNT(2)  HCOMBODISPLAY("거래량", "체결강도")  HCOMBODATA("00", "01")    TABORDER(1)  IOORDER(3)  ENABLE  &
+  VISIBLE
+
+EDIT  save_code(498, 81, 563, 101)  LEN(6)  IO_MIXED|EDIT_INOUT|FA_WRAP|FA_HAN|FA_SKIP|CODE    FONT("굴림체", 9, NORMAL)    COLOR(99, 69)  CUR(0)  TP_SUNKEN          TABORDER(3)  IOORDER(6)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  is_real(252, 4, 302, 16)  '실시간'  TP_CHECK|EDIT_NOP        FONT("굴림체", 9, NORMAL)  COLOR(69, 69)  CUR(0)      TABORDER(4)  ENABLE  &
+  VISIBLE  CHECKED  TRANSPARENT  HINTTYPE(IH_STRING)  HELPTEXT("실시간 체결데이터 수신")HELPTEXT("실시간 체결데이터 수신")
+BUTTON  real_push(380, 0, 424, 20)  '실시간'  TP_RADIO|RD_PUSH|EDIT_NOP      GROUP(GROUP0)"3BTN.BMP"        COLOR(208, 232)  CUR(10)      TABORDER(5)  ENABLE  &
+  VISIBLE  CHECKED  HINTTYPE(IH_STRING)  HELPTEXT("실시간 체결데이터 수신")HELPTEXT("실시간 체결데이터 수신")
+BUTTON  real_pop(380, 0, 424, 20)  '실시간'  TP_RADIO|RD_PUSH|EDIT_NOP      GROUP(GROUP0)"3BTN.BMP"        COLOR(208, 232)  CUR(10)      TABORDER(6)  ENABLE  &
+  HINTTYPE(IH_STRING)  HELPTEXT("실시간 체결데이터 수신")HELPTEXT("실시간 체결데이터 수신")
+GROUP  GROUP0(505, 45, 570, 70)  '실시간'        COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  1777(668, 115, 688, 135)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("2")          TABORDER(7)  IOORDER(7)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL2(499, 115, 669, 135)  '시장구분 1:KRX 2:NXT 3:통합'  LINECOLOR(238)      COLOR(200, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Dim count
+
+'-----------------------------------------------------------------------
+Sub p_write_ini(state)
+	If SCREEN.CreateObject("INFO") = True Then
+		INFO.PushData LOGIN.Name, "userconf.ini", "IB200111", "c_INDX", Trim(state)
+		INFO.PushData LOGIN.Name, "userconf.ini", "IB200111", "c_CHK", is_real.Checked
+	End If
+End Sub
+'-----------------------------------------------------------------------
+Sub p_read_ini()
+	If SCREEN.CreateObject("INFO") = True Then
+		Dim state, chk
+		chk = Trim(INFO.PopData(LOGIN.Name, "userconf.ini", "IB200111", "c_CHK"))
+		If Trim(chk) <> "" Then
+			is_real.Checked = chk
+		End If
+
+		state = Trim(INFO.PopData(LOGIN.Name, "userconf.ini", "IB200111", "c_INDX"))
+		If Trim(state) <> "" Then
+			S11310.SetHeadCell 5, state
+			S11310.SetHeadCell 6, state
+			change_state(state)
+		End If
+	End If
+End Sub
+'-----------------------------------------------------------------------
+Sub change_state(state)
+	Select Case state
+	Case "00"	' 거래량
+		S11310.SetColumnVisible 5, True
+		S11310.SetColumnVisible 6, False
+	Case "01"	' 체결강도
+		S11310.SetColumnVisible 5, False
+		S11310.SetColumnVisible 6, True
+	End Select
+	Call p_write_ini(state)
+	SCREEN.SetTimer 1, False
+End Sub
+
+_AW_ONINDECLARE_AW_
+#load IB999901
+
+_AW_ONENDSUB_AW_
+_AW_ONSTART_AW_
+S11310.SetHeadCell 5, "00"
+S11310.SetHeadCell 6, "00"
+Call p_read_ini()
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+S1301.Data = SCREEN.object("main.1301").Data
+If Len(Trim(S1301.Data)) <> 6 Then
+	SCREEN.OnSend False
+	Exit Sub
+End If
+
+SetMKGubn777()
+SYSTEM.Trace "[MKGubn][IB200111][onSend][poop]1301 = " & S1301.Data & " 1777 = " & S1777.Data
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+If is_real.Checked = False Then
+	S1021.Clear
+End If
+
+_AW_ONENDSUB_AW_
+_AW_ONTIMER_AW_
+SCREEN.Send 0
+
+_AW_ONENDSUB_AW_
+_AW_ONCLOSE_AW_
+Call p_write_ini(Trim(S11310.GetHeadCell( 5 )))
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(11310)
+_AW_ONCLICK_AW_
+If S11310.HitPos = 4 Then
+	Select Case S11310.Column
+	Case 5, 6	' Change Column Visible
+		Dim state
+		state = Trim(S11310.GetHeadCell( S11310.Column ))
+		S11310.SetHeadCell 5, state
+		S11310.SetHeadCell 6, state
+		Call change_state(state)
+	End Select
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(is_real)
+_AW_ONCLICK_AW_
+Dim state
+state = Trim(S11310.GetHeadCell( 5 ))
+Call p_write_ini(state)
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ONDBLCLK_AW_
+Dim state
+state = Trim(S11310.GetHeadCell( 5 ))
+Call p_write_ini(state)
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(real_push)
+_AW_ONCLICK_AW_
+real_push.Visible False
+real_pop.Visible True
+real_pop.Checked False
+
+Call IsReal_check()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(real_pop)
+_AW_ONCLICK_AW_
+real_push.Visible True
+real_pop.Visible False
+real_push.Checked True
+
+Call IsReal_check()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

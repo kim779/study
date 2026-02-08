@@ -1,0 +1,96 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(TT040000)
+MAPSIZE(320, 558)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("¼±¹°/¿É¼Ç Á¾¸ñÄÁÆ®·")
+MAPPUBLIC(";")
+FONT("±¼¸²", 9, NORMAL)
+TITLE("¼±¹°/¿É¼Ç Á¾¸ñÄÁÆ®·Ñ")
+TOPATH(AXIS)
+METHOD(MENU)
+TRXCODE("pooppoop")
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+BUTTON  Fxx(102, 6, 121, 26)  'F'  TP_PUSH      AL_CENTER  FONT("±¼¸²", 9, NORMAL)  FOCUS  COLOR(208, 232)  CUR(0)      TABORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  Cxx(121, 6, 140, 26)  'C'  TP_PUSH      AL_CENTER  FONT("±¼¸²", 9, NORMAL)  FOCUS  COLOR(208, 232)  CUR(0)      TABORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  Pxx(140, 6, 159, 26)  'P'  TP_PUSH      AL_CENTER  FONT("±¼¸²", 9, NORMAL)  FOCUS  COLOR(208, 232)  CUR(0)      TABORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  ed_focod(8, 7, 103, 26)  LEN(8)  IO_ALPHA|EDIT_INPUT|FA_WRAP|CODE      COLOR(192, 232)  CUR(0)  TP_SUNKEN          TABORDER(4)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  30301(9, 48, 104, 67)  LEN(8)  IO_ALPHA|EDIT_INPUT|FA_WRAP|CODE      COLOR(192, 232)  CUR(0)  TP_SUNKEN          TABORDER(5)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  40301(120, 48, 215, 67)  LEN(8)  IO_ALPHA|EDIT_INPUT|FA_WRAP|CODE      COLOR(192, 232)  CUR(0)  TP_SUNKEN          TABORDER(6)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_SCRIPT_AW_(Fxx)
+_AW_ONCLICK_AW_
+Dim sdata
+Dim rcv_data
+
+If Trim(S30301.Data) = "" Then
+	sdata = "30301" & Chr(127) & " " & vbTab & "30301" & vbTab
+	rcv_data = SCREEN.ServiceEx("pooppoop", sdata, Len(sdata), &H02, 5000000)
+	S30301.Data = rcv_data
+End If
+
+ed_focod.Data = S30301.Data
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(Cxx)
+_AW_ONCLICK_AW_
+Dim sdata
+Dim rcv_data
+
+If Trim(S40301.Data) = "" Then
+	sdata = "40301" & Chr(127) & "2" & vbTab & "40301" & vbTab
+	rcv_data = SCREEN.ServiceEx("pooppoop", sdata, Len(sdata), &H02, 5000000)
+	S40301.Data = rcv_data
+End If
+
+ed_focod.Data = "2" & Mid(S40301.Data, 2)
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(Pxx)
+_AW_ONCLICK_AW_
+Dim sdata
+Dim rcv_data
+
+If Trim(S40301.Data) = "" Then
+	sdata = "40301" & Chr(127) & "3" & vbTab & "40301" & vbTab
+	rcv_data = SCREEN.ServiceEx("pooppoop", sdata, Len(sdata), &H02, 5000000)
+	S40301.Data = rcv_data
+End If
+
+ed_focod.Data = "3" & Mid(S40301.Data, 2)
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

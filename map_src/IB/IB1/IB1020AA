@@ -1,0 +1,554 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB1020AA)
+MAPSIZE(638, 495)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("자동주문서비스신청")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+TITLE("[1020]주식자동주문 서비스 신청")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("piboPBxQ")
+MAPTYPE(FIXED)
+HEADER(LEDGER)
+TRXH("11CSACAT510")
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL19(0, 40, 495, 615)  LIMAGE(0)  LINEW(4)  LINETYPE(4)  LINECOLOR(64)      COLOR(192, 69)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL28(5, 80, 490, 120)  LINECOLOR(232)      COLOR(192, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL27(0, 0, 495, 40)  LIMAGE(0)  LINEW(4)  LINETYPE(4)  LINECOLOR(64)      COLOR(192, 69)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  zPwd(380, 10, 440, 30)  LEN(8)  IO_MIXED|EDIT_INPUT|FA_PASSWD|FA_WRAP|FA_SKIP|FA_ENUM  FONT("굴림체", 10, NORMAL)    COLOR(192, 130)  CUR(0)  TP_SUNKEN    ENCRYPT("en_accn")        TABORDER(1)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL3(325, 10, 375, 30)  '비밀번호'  AL_CENTER  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(192, 232)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+CONTROL  AN5A(580, 555, 720, 575)  |FA_SKIP  "CX_Account"  "/w3"  LEN(11)  EDIT_INPUT  FONT("굴림체", 10, NORMAL)    COLOR(68, 130)  TABORDER(2)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  ACNM(171, 10, 271, 30)  LEN(20)  IO_MIXED|AL_LEFT||FA_SKIP  FONT("굴림체", 10, NORMAL)    COLOR(49, 69)  CUR(0)  LINECOLOR(48)          TABORDER(0)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL2(10, 10, 60, 30)  '계좌번호'  AL_CENTER  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(192, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  b_send(445, 10, 481, 30)  '조회'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, BOLD)  COLOR(208, 186)  CUR(0)    "조회BTN.BMP"    TABORDER(3)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+BUTTON  chk0(20, 90, 455, 110)  '[필수] 주식자동주문 이용 동의문'  TP_CHECK|EDIT_NOP          COLOR(192, 69)  CUR(0)      TABORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL0(550, 60, 670, 80)  '처리구분'        COLOR(208, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL2(550, 81, 670, 101)  '서비스유형코드'        COLOR(208, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL3(550, 102, 670, 122)  '계좌번호'        COLOR(208, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL4(550, 123, 670, 143)  '비밀번호'        COLOR(208, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL5(550, 144, 670, 164)  '등록일'        COLOR(208, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL6(550, 165, 670, 185)  '해지일'        COLOR(208, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL7(550, 186, 670, 206)  '발송일'        COLOR(208, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL8(550, 207, 670, 227)  '회수일'        COLOR(208, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL9(550, 228, 670, 248)  '승인요청일'        COLOR(208, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL10(550, 249, 670, 269)  '승인자추가메세지'        COLOR(208, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL11(550, 270, 670, 290)  '승인사용자명'        COLOR(208, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL12(550, 290, 670, 310)  '승인처리ID'        COLOR(208, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL13(550, 312, 670, 332)  '최종승인자ID'        COLOR(208, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  EDIT0(671, 60, 791, 80)  LEN(1)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_SUNKEN          TABORDER(5)  IOORDER(5)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  EDIT1(671, 81, 791, 101)  LEN(2)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_SUNKEN          TABORDER(6)  IOORDER(6)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  EDIT2(671, 102, 791, 122)  LEN(20)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_SUNKEN          TABORDER(7)  IOORDER(7)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  EDIT3(671, 123, 791, 143)  LEN(8)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_SUNKEN          TABORDER(8)  IOORDER(8)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  EDIT4(671, 144, 791, 164)  LEN(8)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_SUNKEN          TABORDER(9)  IOORDER(10)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  EDIT5(671, 165, 791, 185)  LEN(8)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_SUNKEN          TABORDER(10)  IOORDER(9)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  EDIT6(671, 186, 791, 206)  LEN(8)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_SUNKEN          TABORDER(11)  IOORDER(11)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  EDIT7(671, 207, 791, 227)  LEN(8)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_SUNKEN          TABORDER(12)  IOORDER(12)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  EDIT8(671, 228, 791, 248)  LEN(8)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_SUNKEN          TABORDER(13)  IOORDER(13)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  EDIT9(671, 249, 791, 269)  LEN(100)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_SUNKEN          TABORDER(14)  IOORDER(14)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  EDIT10(671, 270, 791, 290)  LEN(40)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_SUNKEN          TABORDER(15)  IOORDER(15)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  EDIT11(671, 291, 791, 311)  LEN(8)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_SUNKEN          TABORDER(16)  IOORDER(16)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  EDIT12(671, 312, 791, 332)  LEN(16)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_SUNKEN          TABORDER(17)  IOORDER(17)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL14(550, 15, 790, 35)  '입력'        COLOR(208, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL15(550, 345, 790, 365)  '출력'        COLOR(208, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL16(550, 367, 670, 387)  '입력값'        COLOR(208, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL17(550, 39, 670, 59)  'In'        COLOR(208, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  zin(671, 39, 791, 59)  LEN(5)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_SUNKEN          TABORDER(18)  IOORDER(4)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  OUTPUT0(671, 367, 790, 387)  LEN(235)  IO_MIXED|AL_CENTER|    COLOR(192, 69)  CUR(0)            TABORDER(0)  IOORDER(18)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL18(550, 388, 670, 408)  '출력값'        COLOR(208, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  OUTPUT1(671, 388, 790, 408)  LEN(5)  IO_MIXED|AL_CENTER|    COLOR(192, 69)  CUR(0)            TABORDER(0)  IOORDER(19)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL20(550, 409, 670, 429)  '계좌명'        COLOR(208, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  OUTPUT2(671, 409, 790, 429)  LEN(40)  IO_MIXED|AL_CENTER|    COLOR(192, 69)  CUR(0)            TABORDER(0)  IOORDER(20)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL21(550, 430, 670, 450)  '실명확인번호'        COLOR(208, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  OUTPUT3(671, 430, 790, 450)  LEN(24)  IO_MIXED|AL_CENTER|    COLOR(192, 69)  CUR(0)            TABORDER(0)  IOORDER(21)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL22(550, 451, 670, 471)  '출금은행코드'        COLOR(208, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  OUTPUT4(671, 451, 790, 471)  LEN(2)  IO_MIXED|AL_CENTER|    COLOR(192, 69)  CUR(0)            TABORDER(0)  IOORDER(22)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL23(550, 472, 670, 492)  '출금계좌번호'        COLOR(208, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  OUTPUT5(671, 472, 790, 492)  LEN(20)  IO_MIXED|AL_CENTER|    COLOR(192, 69)  CUR(0)            TABORDER(0)  IOORDER(23)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL24(550, 493, 670, 513)  '처리상태명'        COLOR(208, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  OUTPUT6(671, 493, 790, 513)  LEN(20)  IO_MIXED|AL_CENTER|    COLOR(192, 69)  CUR(0)            TABORDER(0)  IOORDER(24)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL25(550, 514, 670, 534)  '승인방식코드'        COLOR(208, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  OUTPUT7(671, 514, 790, 534)  LEN(2)  IO_MIXED|AL_CENTER|    COLOR(192, 69)  CUR(0)            TABORDER(0)  IOORDER(25)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  GUIDE1(0, 615, 495, 639)  LIMAGE(1)  LINEW(3)  STRESS(0)  STRESSW(0)  LINETYPE(4)  LINECOLOR(64)      COLOR(34, 69)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL26(11, 620, 25, 634)    |IMAGE|AL_STRETCH    COLOR(208, 232)  CUR(0)    "알림_ic.bmp"  ENABLE  &
+  VISIBLE  TRANSPARENT  IMAGE  HINTTYPE(IH_NONE)
+PANEL  GUIDE(27, 615, 495, 639)        COLOR(228, 130)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+OBJECT  OBJECT3(1060, 5, 1320, 110)    "IB822010"  TABORDER(19)  IOORDER(26)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  ACNT(66, 10, 161, 30)  LEN(11)  IO_NUM|AL_CENTER||FA_SKIP    COLOR(192, 69)  CUR(0)  LINECOLOR(232)          EDITFORMAT("999-99-999999")  TABORDER(0)  IOORDER(27)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON0(95, 55, 111, 71)  TP_PUSH|IMAGE|AL_CENTER      FOCUS  COLOR(208, 232)  CUR(0)    "ICO_LOGIN_B_INFO_16.BMP"    TABORDER(20)  ENABLE  &
+  VISIBLE  IMAGE  HINTTYPE(IH_NONE)
+LABEL  LABEL0(115, 52, 390, 77)  '주식자동주문을 이용하고 있지 않아요.'  AL_LEFT  CUR(0)      COLOR(192, 232)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON1(25, 132, 40, 147)  TP_PUSH|IMAGE|AL_CENTER      FOCUS  COLOR(208, 232)  CUR(0)    "BUY_NO01.BMP"    TABORDER(21)  ENABLE  &
+  VISIBLE  IMAGE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON2(25, 210, 40, 225)  TP_PUSH|IMAGE|AL_CENTER      FOCUS  COLOR(208, 232)  CUR(0)    "BUY_NO02.BMP"    TABORDER(22)  ENABLE  &
+  VISIBLE  IMAGE  HINTTYPE(IH_NONE)
+LABEL  LABEL1(45, 130, 300, 150)  '주식자동주문조건만족 시 알림 수신방법'  AL_LEFT  FONT("굴림체", 9, BOLD)  CUR(0)      COLOR(192, 232)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL4(45, 209, 360, 229)  'SMS 알림 수신에 대한 개인정보 수집, 이용 동의'  AL_LEFT  FONT("굴림체", 9, BOLD)  CUR(0)      COLOR(192, 232)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL29(5, 150, 490, 190)        COLOR(242, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  CHECK0(90, 160, 160, 180)  'SMS(필수)'  TP_CHECK|EDIT_NOP          COLOR(242, 232)  CUR(0)      TABORDER(23)  ENABLE  &
+  VISIBLE  CHECKED  HINTTYPE(IH_NONE)
+BUTTON  CHECK1(185, 160, 285, 180)  'HTS 팝업(선택)'  TP_CHECK|EDIT_NOP          COLOR(242, 232)  CUR(0)      TABORDER(24)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  CHECK2(305, 160, 405, 180)  'MTS 알림(선택)'  TP_CHECK|EDIT_NOP          COLOR(242, 232)  CUR(0)      TABORDER(25)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL30(5, 235, 490, 415)        COLOR(242, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  CHECK3(10, 420, 290, 440)  '개인정보 수집, 이용에 동의합니다.'  TP_CHECK|EDIT_NOP          COLOR(192, 232)  CUR(0)      TABORDER(26)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON3(5, 445, 490, 485)  '서비스 신청'  TP_PUSH      AL_CENTER  FONT("굴림", 10, BOLD)  FOCUS  COLOR(32, 192)  CUR(0)      TABORDER(27)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL5(10, 240, 485, 260)  '※ 주식자동주문 조건 만족 시 계좌에 등록된 휴대폰번호로 SMS가 발송됩니다.'  AL_LEFT  CUR(0)      COLOR(242, 232)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL6(10, 265, 485, 285)  '※ 당사는 주식자동주문 조건 만족 시 SMS발송을 위하여, 고객님의 개인정보'  AL_LEFT  CUR(0)      COLOR(242, 232)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL7(10, 285, 485, 305)  '   (휴대폰번호)를 수집, 이용하고 있으며, 이를 위하여 당사는 개인정보보호법'  AL_LEFT  CUR(0)      COLOR(242, 232)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL8(10, 305, 485, 325)  '   제15조, 제22조에 따라 고객님의 동의를 얻어야 합니다.'  AL_LEFT  CUR(0)      COLOR(242, 232)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL9(10, 330, 485, 350)  '※ 아래의 내용을 참고하여 개인정보 수집, 이용 동의를 해주세요'  AL_LEFT  CUR(0)      COLOR(242, 232)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL10(10, 350, 485, 370)  '  - 개인정보 수집 및 이용목적:주식자동주문 조건 만족 사실 안내를 위한 SMS 발송'  AL_LEFT  CUR(0)      COLOR(242, 232)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL11(10, 370, 485, 390)  '  - 개인정보 수집 및 활용 항목:휴대폰번호'  AL_LEFT  CUR(0)      COLOR(242, 232)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL12(10, 390, 485, 410)  '  - 개인정보의 보유 및 이용기간:주식자동주문 서비스신청일 ~ 서비스해지일'  AL_LEFT  CUR(0)      COLOR(242, 232)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON4(5, 490, 110, 510)  '꼭 확인해주세요!'  TP_PUSH|IMAGETEXT|AL_STRETCH        FOCUS  COLOR(208, 192)  CUR(0)    "BOX_RISKCLASS_2.BMP"    TABORDER(28)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+LABEL  LABEL13(5, 515, 475, 535)  '※ 주식자동주문 조건만족 시 알림수신 방법을 MTS알림으로 선택한 고객님은'  AL_LEFT  CUR(0)      COLOR(192, 232)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL14(5, 535, 490, 555)  '   당사 MTS를 설치 후 로그인하시고, 알림을 설정하셔야 MTS로 받아보실 수 있습니다.'  AL_LEFT  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(192, 232)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  e_YG(519, 604, 639, 623)  LEN(20)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(29)  IOORDER(28)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  BUTTON5(5, 445, 240, 485)  '서비스 변경'  TP_PUSH      AL_CENTER  FONT("굴림", 10, BOLD)  FOCUS  COLOR(32, 192)  CUR(0)      TABORDER(30)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  BUTTON6(255, 445, 490, 485)  '서비스 해지'  TP_PUSH      AL_CENTER  FONT("굴림", 10, BOLD)  FOCUS  COLOR(224, 192)  CUR(0)      TABORDER(31)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  e_SAVE(519, 624, 639, 643)  LEN(20)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(32)  IOORDER(29)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  obj_yg(860, 40, 965, 145)    "IB1020BB"  TABORDER(33)  IOORDER(30)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  obj_getHP(825, 165, 1030, 275)    "IB1020DD"  TABORDER(34)  IOORDER(31)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  obj_SVR_YG(825, 300, 1400, 600)    "IB1020CC"  TABORDER(35)  IOORDER(32)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  e_tot_clsf(525, 655, 645, 674)  LEN(1)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(36)  IOORDER(33)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  obj_timeCheck(965, 680, 1070, 785)    "IB1020EE"  TABORDER(37)  IOORDER(34)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  E_CHCHECK(395, 50, 440, 69)  LEN(3)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(38)  IOORDER(35)  ENABLE  &
+  HINTTYPE(IH_NONE)
+CONTROL  ctrl_webpop(1140, 95, 1240, 140)  |FA_PROTECT  "CX_Thtmlex"  "/w"  LEN(0)  EDIT_NOP    COLOR(192, 232)  TABORDER(0)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Dim status
+status = False
+
+'약정등록 가능시간이 아닐때 컨트롤들 비활성화
+Sub DisableCtrl()
+	zPwd.Enable = False
+	b_send.Enable = False
+	BUTTON3.Enable = False
+	BUTTON5.Enable = False
+	BUTTON6.Enable = False
+End Sub
+
+Sub Set_account()
+'	SCREEN.ClearAll 0, 2
+	AN5A.data = ACNT.Data
+	ACNM.Data = AN5A.Name
+	zPwd.Data = AN5A.Password
+
+	If Len(Trim(AN5A.Data)) <> 11 Then
+		AN5A.SetFocus
+		Exit Sub
+	End If
+
+
+	If Len(Trim(zPwd.Data)) < 4 Then
+		zPwd.SetFocus
+		Exit Sub
+	End If
+
+	e_SAVE.Data = "N"
+Call send_f()
+
+End Sub
+
+Sub send_f()
+	If Len(Trim(zPwd.Data)) < 4 Then
+		GUIDE.Text = "비밀번호를 확인하여 주십시오."
+		MsgBox "비밀번호를 확인하십시오", , "IBK투자증권"
+		zPwd.SetFocus
+		Exit Sub
+	End If
+
+	LEDGER.Fkey = "5"
+	SCREEN.Object("OBJECT3.IntaccNo").Data = Trim(AN5A.Data)
+	SCREEN.Object("OBJECT3.Pwd").Data = Trim(zPwd.Data)
+	OBJECT3.Send
+End Sub
+
+'OBJECT3 비밀번호 체크 성공후 호출 됨
+Sub OkSend()
+	If Trim(e_SAVE.Data) = "N" Or Trim(e_SAVE.Data) = "" Then
+		' N 일때는 비밀번호 체크후자동주문 서비스약정 조회
+		SCREEN.Object("obj_yg.zAcntNo").Data = Trim(AN5A.Data)
+		SCREEN.Object("obj_yg.zPwd").Data = Trim(zPwd.Data)
+		obj_yg.Send
+
+		obj_getHP.Send
+	ElseIf Trim(e_SAVE.Data) = "C" Then
+		'C는 서비스 변경
+		'0:조회 1:등록 2:변경 3:해지
+		status = check_combox()
+		If status = False Then
+			Exit Sub
+		End If
+		szok = MsgBox( "주식자동주문 서비스를" & vbCrLf & "변경하시겠습니까?" ,1, "IBK투자증권")
+		If szok <> "1" Then
+			Exit Sub
+		End If
+		SCREEN.Object("obj_SVR_YG.e_use_yn").Data = "2"
+		obj_SVR_YG.Send
+	ElseIf Trim(e_SAVE.Data) = "Y" Then
+		'Y일때는 약정서비스신청/해지
+		If Trim(e_YG.Data) = "N" Then
+			status = check_combox()
+			If status = False Then
+				Exit Sub
+			End If
+
+			szok = MsgBox( "주식자동주문 서비스를" & vbCrLf & "신청하시겠습니까?" ,1, "IBK투자증권")
+			If szok <> "1" Then
+				Exit Sub
+			End If
+		Else
+			'0:조건없음 1:저장된 조건있음 2:감시중인 조건 있음
+			If e_tot_clsf.Data = "0" Then
+				szok = MsgBox( "주식자동주문 서비스를" & vbCrLf & "해지하시겠습니까?" ,1, "IBK투자증권")
+				If szok <> "1" Then
+					Exit Sub
+				End If
+			ElseIf e_tot_clsf.Data = "1" Then
+				szok = MsgBox( "자동주문 등록된 내역이 있어요." & vbCrLf & "서비스 해지 시 자동주문 등록내역은"& vbCrLf & "일괄 삭제되요, 정말 해지하시겠습니까?" ,1, "IBK투자증권")
+				If szok <> "1" Then
+					Exit Sub
+				End If
+
+			ElseIf e_tot_clsf.Data = "2" Then
+				MsgBox "감시 중인 주문이 있어요, 감시조건 중지"& vbCrLf & "또는 삭제 후 해지하실 수 있어요.", , "IBK투자증권"
+				Exit Sub
+			End If
+
+
+		End If
+		SCREEN.Send 0
+	End If
+End Sub
+
+Function check_combox()
+	If CHECK0.Checked = False Then
+		MsgBox "SMS는 필수 입니다.", , "IBK투자증권"
+		check_combox = False
+		Exit Function
+	End If
+
+	If chk0.Checked = False Then
+		MsgBox "주식자동주문 이용 동의문을" & vbCrLf & "확인해 주세요.", , "IBK투자증권"
+		check_combox = False
+		Exit Function
+	End If
+
+	If CHECK3.Checked = False Then
+		MsgBox "개인정보 수집,이용에 동의해 주세요.", , "IBK투자증권"
+		check_combox = False
+		Exit Function
+	End If
+
+	check_combox = True
+End Function
+
+
+Sub SVR_YG(szVal)
+	If szVal = "YES" Then
+		e_YG.Data = "Y"
+		BUTTON3.Visible = False
+		BUTTON5.Visible = True
+		BUTTON6.Visible = True
+		LABEL0.Data = "주식자동주문을 이용하고 있어요."
+	Else
+		e_YG.Data = "N"
+		BUTTON3.Visible = True
+		BUTTON5.Visible = False
+		BUTTON6.Visible = False
+		LABEL0.Data = "주식자동주문을 이용하고 있지 않아요."
+	End If
+End Sub
+
+Sub ShowMsg(szVal)
+	If szVal = "MODY" Then
+		MsgBox "주식자동주문 서비스 변경이" & vbCrLf & "완료되었어요.", , "IBK투자증권"
+		SCREEN.CloseWindow
+	End If
+End Sub
+
+_AW_ONSTART_AW_
+AN5A.data = ACNT.Data
+
+If Trim(e_YG.Data) = "Y" Then
+	BUTTON3.Visible = False
+	BUTTON5.Visible = True
+	BUTTON6.Visible = True
+	chk0.Checked = True
+	CHECK3.Checked = True
+	CHECK3.Visible = False
+	LABEL0.Data = "주식자동주문을 이용하고 있어요."
+Else
+	BUTTON3.Visible = True
+	BUTTON5.Visible = False
+	BUTTON6.Visible = False
+	CHECK3.Visible = True
+	LABEL0.Data = "주식자동주문을 이용하고 있지 않아요."
+End If
+
+'0:조회 1:등록 2:변경 3:해지
+SCREEN.Object("obj_SVR_YG.e_use_yn").Data = "0"
+obj_SVR_YG.Send
+
+
+obj_timeCheck.Send
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+SCREEN.OnSend = False
+
+
+zin.Data = "00001"
+If Trim(e_YG.Data) = "Y" Then
+	EDIT0.Data = "2"		'처리구분 1: 등록 2: 해제
+Else
+	EDIT0.Data = "1"		'처리구분 1: 등록 2: 해제
+End If
+
+EDIT1.Data = "3M"		'서비스유형 3M: 주식서버자동주문
+EDIT2.Data = ACNT.data
+EDIT3.Data = zPwd.Data
+
+SCREEN.OnSend = True
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+If Left(Trim(LEDGER.Ecod), 1) = "0" Then
+
+	If Trim(e_YG.Data) = "N" Then
+		'0:조회 1:등록 2:변경 3:해지
+		SCREEN.Object("obj_SVR_YG.e_use_yn").Data = "1"
+		obj_SVR_YG.Send
+		MsgBox "주식자동주문 서비스 신청이" & vbCrLf & "완료되었어요.", , "IBK투자증권"
+		SCREEN.CloseWindow
+	Else
+		'0:조회 1:등록 2:변경 3:해지
+		'SCREEN.Object("obj_SVR_YG.e_use_yn").Data = "3"
+		'obj_SVR_YG.Send
+		MsgBox "주식자동주문 서비스 해지가" & vbCrLf & "완료되었어요.", , "IBK투자증권"
+		SCREEN.CloseWindow
+	End If
+End If
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(zPwd)
+_AW_ONKEYCHANGE_AW_
+If SCREEN.Key = "13" Then  '-- Enter 키 입력
+	e_SAVE.Data = "N"
+	Call send_f()
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(AN5A)
+_AW_ONCHANGE_AW_
+Call Set_account()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(b_send)
+_AW_ONCLICK_AW_
+e_SAVE.Data = "N"
+Call send_f()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(chk0)
+_AW_ONCLICK_AW_
+Dim OK
+If chk0.Checked = True Then
+	'SYSTEM.Navigate "http://download.ibks.com/customer/IBK_INVMAGREE.pdf"
+	'ctrl_webpop.Seturl3("https://download.ibks.com/customer/IBK_INVMAGREE.pdf")
+	'ctrl_webpop.PopUpUrl("https://download.ibks.com/customer/IBK_INVMAGREE.pdf")
+	ctrl_webpop.PopUpUrl("https://download.ibks.com/customer/ibks_st_stoploss.pdf")
+	
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(ACNT)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON3)
+_AW_ONCLICK_AW_
+e_SAVE.Data = "Y"
+Call send_f()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON5)
+_AW_ONCLICK_AW_
+
+'변경한 내역 체크
+'내용을 변경하지 않고 서비스변경 버튼 클릭 시 주식자동주문 서비스를 변경하시겠습니까? 컨펌팝업이 나옴.
+'해당 케이스에서는 변경내용이 없습니다. ALERT을 제공해 주세요.
+'윤영선 차장님 요청
+If Len(Trim(zPwd.Data)) < 4 Then
+	GUIDE.Text = "비밀번호를 확인하여 주십시오."
+	MsgBox "비밀번호를 확인하십시오", , "IBK투자증권"
+	zPwd.SetFocus
+	Exit Sub
+End If
+
+
+Dim szCheck
+If CHECK0.Checked = True Then
+	szCheck = "1"
+Else
+	szCheck = "0"
+End If
+
+If CHECK1.Checked = True Then
+	szCheck = szCheck &"1"
+Else
+	szCheck = szCheck &"0"
+End If
+
+If CHECK2.Checked = True Then
+	szCheck = szCheck &"1"
+Else
+	szCheck = szCheck &"0"
+End If
+
+If szCheck = E_CHCHECK.Data Then
+	MsgBox "변경내역이 없습니다.", , "IBK투자증권"
+	Exit Sub
+End If
+
+
+e_SAVE.Data = "C"
+
+Call send_f()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON6)
+_AW_ONCLICK_AW_
+
+
+e_SAVE.Data = "Y"
+Call send_f()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

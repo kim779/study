@@ -1,0 +1,297 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB000155)
+MAPSIZE(238, 618)
+VERSION(002)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("거래원 종목별거래순")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(FMS|FLASH)
+TITLE("[2305] 거래원 종목별거래순위")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  SYMBOL8(0, 0, 618, 28)        COLOR(66, 69)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  SYMBOL2(89, 480, 108, 500)  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(68, 69)  CUR(0)    "검색.BMP"    TABORDER(2)  ENABLE  &
+  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+LABEL  SYMBOL6(350, 4, 370, 24)  '∼'  AL_CENTER  CUR(0)      COLOR(68, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+OUT  HNAM(23, 507, 148, 525)  LEN(20)  IO_MIXED|AL_LEFT|    COLOR(131, 1)  CUR(0)  TP_SUNKEN          TABORDER(0)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  DATE1(262, 4, 350, 24)  LEN(8)  IO_NUM|EDIT_INOUT|FA_WRAP|FA_DATE    COLOR(99, 130)  CUR(0)  TP_SUNKEN          EDITFORMAT("9999/99/99")  TABORDER(6)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  DATE2(370, 4, 458, 24)  LEN(8)  IO_NUM|EDIT_INOUT|FA_WRAP|FA_DATE    COLOR(99, 130)  CUR(0)  TP_SUNKEN          EDITFORMAT("9999/99/99")  TABORDER(7)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  OBJ01(129, 480, 289, 500)    "IB240101"  TABORDER(4)  IOORDER(4)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  OBJ02(0, 28, 309, 238)    RESIZABLE  "IB00015C"  TABORDER(8)  IOORDER(5)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  OBJ03(309, 28, 618, 238)    RESIZABLE  "IB00015D"  TABORDER(9)  IOORDER(6)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+COMBO  BEFORE(63, 336, 143, 356)  TP_SUNKEN  LEN(1)  COUNT(5)  VCOUNT(5)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_NUM|EDIT_INPUT    COLOR(99, 130)  CUR(0)  DISPLAY("전일", "5일", "15일", "20일", "직접지정")  DATA("3", "4", "5", "6", "1")    TABORDER(5)  IOORDER(7)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  BUTTON1(108, 480, 127, 500)  TP_PUSH|IMAGE|AL_STRETCH      COLOR(208, 232)  CUR(0)    "관심.BMP"    TABORDER(3)  ENABLE  &
+  IMAGE  HINTTYPE(IH_NONE)
+CONTROL  1301(24, 480, 89, 500)  |FA_PROTECT  "CX_CODECTRL"  "/u0/k검색.BMP/lAXCOMBO.BMP/p/s0/o"  LEN(6)  EDIT_INPUT    COLOR(192, 130)  TABORDER(1)  IOORDER(8)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  r1(26, 5, 63, 23)  '전일'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(GP1)    FONT("굴림체", 9, NORMAL)  COLOR(68, 130)  CUR(0)      TABORDER(10)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+PANEL  PANEL0(24, 4, 259, 24)  LINECOLOR(165)      COLOR(66, 130)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  r2(68, 5, 105, 23)  '5일'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(GP1)    FONT("굴림체", 9, NORMAL)  COLOR(68, 130)  CUR(0)      TABORDER(11)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  r3(107, 5, 144, 23)  '15일'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(GP1)    FONT("굴림체", 9, NORMAL)  COLOR(68, 130)  CUR(0)      TABORDER(12)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  r4(152, 5, 189, 23)  '25일'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(GP1)    FONT("굴림체", 9, NORMAL)  COLOR(68, 130)  CUR(0)      TABORDER(13)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  r5(194, 5, 256, 23)  '직접지정'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(GP1)    FONT("굴림체", 9, NORMAL)  COLOR(68, 130)  CUR(0)      TABORDER(14)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+GROUP  GP1(252, 451, 336, 494)  'Group'        COLOR(-1, 232)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+CONTROL  cxMarket(2, 4, 22, 24)  |FA_SKIP  "CX_MarketPicker"  "/k2/t/u1/d1"  LEN(12)  EDIT_NOP    COLOR(192, 232)  TABORDER(0)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Dim xstr, xvalue, xistrue
+Dim myFILE, myMAP
+myFILE = "userconf.ini"
+myMAP = SCREEN.GetMapName(0)
+
+Dim g_dayx
+g_dayx = Trim(SYSTEM.pop("val_2312"))
+If g_dayx <> "" Then
+	BEFORE.Data = g_dayx
+End If
+
+SYSTEM.Push "val_2312", ""
+
+Sub send_f()
+	S1301.Data = SCREEN.Object("main.1301").Data
+	SCREEN.Object("OBJ02.CODE_1").data = S1301.Data
+	SCREEN.Object("OBJ03.CODE_2").data = S1301.Data
+	OBJ02.Send
+	OBJ03.Send
+End Sub
+
+Sub radio_click()
+	If SCREEN.CreateObject("Info") Then
+		INFO.pushData LOGIN.Name, myFILE, myMAP, "RD_CHK", BEFORE.Data
+	End If
+
+	If BEFORE.Data = "1" Then
+		DATE1.Enable = True
+		DATE2.Enable = True
+	Else
+		DATE1.Enable = False
+		DATE2.Enable = False
+	End If
+
+	SCREEN.Object("OBJ02.BEFORE").data = BEFORE.Data
+	SCREEN.Object("OBJ03.BEFORE").data = BEFORE.Data
+	send_f()
+End Sub
+
+Sub p_read_ini()
+	Dim rd_val
+	If SCREEN.CreateObject("Info") Then
+		rd_val = Trim(INFO.popData (LOGIN.Name, myFILE, myMAP, "RD_CHK"))
+		If rd_val = "" Then
+			rd_val = "1"
+		End If
+		BEFORE.Data = rd_val
+	End If
+	Select Case BEFORE.Data
+	Case "3"
+		r1.Checked = True
+	Case "4"
+		r2.Checked = True
+	Case "5"
+		r3.Checked = True
+	Case "6"
+		r4.Checked = True
+	Case "1"
+		r5.Checked = True
+	End Select
+End Sub
+
+
+Sub Change_MKGubn_OBJ(sMKGubn)
+	cxMarket.sMarket = sMKGubn
+	send_f()
+End Sub
+
+_AW_ONSTART_AW_
+If UCase(TypeName( SCREEN.Object("Main.cxMarket") )) <> "NOTHING" Then
+	cxMarket.sMarket = SCREEN.Object("Main.cxMarket").sMarket
+End If
+
+p_read_ini()
+
+If BEFORE.Data = "1" Then
+	DATE1.Enable = True
+	DATE2.Enable = True
+Else
+	DATE1.Enable = False
+	DATE2.Enable = False
+End If
+SCREEN.Send 0
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+SCREEN.Object("OBJ02.DATE1").data = DATE1.Data
+SCREEN.Object("OBJ03.DATE1").data = DATE1.Data
+SCREEN.Object("OBJ02.DATE2").data = DATE2.Data
+SCREEN.Object("OBJ03.DATE2").data = DATE2.Data
+
+SCREEN.Object("OBJ02.BEFORE").data = BEFORE.Data
+SCREEN.Object("OBJ03.BEFORE").data = BEFORE.Data
+
+send_f()
+SCREEN.OnSend False
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(SYMBOL2)
+_AW_ONCLICK_AW_
+
+Dim retn
+retn = SCREEN.GetCode(100, "1301", "hnam", 0 )
+If retn <> True Then
+       Exit Sub
+End If
+
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(DATE1)
+_AW_ONCHANGE_AW_
+
+SCREEN.Object("OBJ02.DATE1").data = DATE1.Data
+SCREEN.Object("OBJ03.DATE1").data = DATE1.Data
+send_f()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(DATE2)
+_AW_ONCHANGE_AW_
+
+SCREEN.Object("OBJ02.DATE2").data = DATE2.Data
+SCREEN.Object("OBJ03.DATE2").data = DATE2.Data
+send_f()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BEFORE)
+_AW_ONCHANGE_AW_
+If BEFORE.Data = "1" Then
+	DATE1.Enable = True
+	DATE2.Enable = True
+Else
+	DATE1.Enable = False
+	DATE2.Enable = False
+End If
+
+
+SCREEN.Object("OBJ02.BEFORE").data = BEFORE.Data
+SCREEN.Object("OBJ03.BEFORE").data = BEFORE.Data
+send_f()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON1)
+_AW_ONCLICK_AW_
+
+'Dim mapname, data
+'
+'mapname = "IB202200" & "/d"
+'data = "appendCODE" & vbTab & S1301.Data & vbLf
+'
+'SCREEN.CreateWindow 1, mapname, data
+
+SCREEN.CreateWindow 1, "IB202201 /t/s/p5/d", "appendCODE" & _
+			vbTab & S1301.Data & vbLf & "map" & vbTab & "1" & vbLf
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(r1)
+_AW_ONCLICK_AW_
+
+BEFORE.Data = "3"
+radio_click()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(r2)
+_AW_ONCLICK_AW_
+
+BEFORE.Data = "4"
+radio_click()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(r3)
+_AW_ONCLICK_AW_
+
+BEFORE.Data = "5"
+radio_click()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(r4)
+_AW_ONCLICK_AW_
+
+BEFORE.Data = "6"
+radio_click()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(r5)
+_AW_ONCLICK_AW_
+
+BEFORE.Data = "1"
+radio_click()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(cxMarket)
+_AW_ONCLICK_AW_
+SCREEN.Proc "main.Change_MKGubn_Main", cxMarket.sMarket
+
+send_f()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

@@ -1,0 +1,114 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB650199)
+MAPSIZE(121, 217)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+TITLE("주문설정")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL0(-55, -5, 245, 190)  TP_RAISED      COLOR(200, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  chk1(30, 25, 100, 45)  '단가저장'  TP_CHECK|EDIT_NOP          COLOR(200, 232)  CUR(0)      TABORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  chk2(125, 25, 195, 45)  '수량저장'  TP_CHECK|EDIT_NOP          COLOR(200, 232)  CUR(0)      TABORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+GROUP  GROUP0(10, 10, 210, 50)  '주문전송 후 단가/수량 처리'        COLOR(-1, 232)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+GROUP  GROUP1(10, 55, 210, 95)  '주문단위'        COLOR(-1, 232)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  ro1(30, 70, 90, 90)  '원단위'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(GROUP1)      COLOR(200, 232)  CUR(0)      TABORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  ro2(125, 70, 185, 90)  '천단위'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(GROUP1)      COLOR(200, 232)  CUR(0)      TABORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  send_btn(125, 98, 165, 118)  '확인'  TP_PUSH|IMAGETEXT|AL_STRETCH        FOCUS  COLOR(208, 186)  CUR(0)    "2btn.bmp"    TABORDER(5)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+BUTTON  BUTTON0(170, 98, 210, 118)  '취소'  TP_PUSH|IMAGETEXT|AL_STRETCH        FOCUS  COLOR(208, 186)  CUR(0)    "2btn.bmp"    TABORDER(6)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONSTART_AW_
+Dim p1,p2,p3,p4
+
+If SCREEN.CreateObject("Info") Then
+  	p1 = INFO.PopData("", "bondoption.ini", "jqty", "chk1")
+  	If p1 <> "0" Then
+  		chk1.Checked = True
+  	Else
+  		chk1.Checked = False
+  	End If
+
+  	p2 = INFO.PopData("", "bondoption.ini", "jqty", "chk2")
+  	If p2 <> "0" Then
+  		chk2.Checked = True
+  	Else
+  		chk2.Checked = False
+  	End If
+
+  	p3 = INFO.PopData("", "bondoption.ini", "jprc", "ro1")
+  	If p3 <> "0" Then
+  		ro1.Checked = True
+  	Else
+  		ro1.Checked = False
+  	End If
+
+  	p4 = INFO.PopData("", "bondoption.ini", "jprc", "ro2")
+  	If p4 <> "0" Then
+  		ro2.Checked = True
+  	Else
+  		ro2.Checked = False
+  	End If
+End If
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(send_btn)
+_AW_ONCLICK_AW_
+If SCREEN.CreateObject("Info") Then
+ 	INFO.PushData "", "bondoption.ini", "jqty", "chk1", chk1.Checked
+ 	INFO.PushData "", "bondoption.ini", "jqty", "chk2", chk2.Checked
+ 	INFO.PushData "", "bondoption.ini", "jprc", "ro1", ro1.Checked
+ 	INFO.PushData "", "bondoption.ini", "jprc", "ro2", ro2.Checked
+End If
+
+If ro1.Checked = False Then
+	SYSTEM.Push "jqty_option","OK"
+Else
+	SYSTEM.Push "jqty_option","NO"
+End If
+
+SCREEN.CloseWindow
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON0)
+_AW_ONCLICK_AW_
+SCREEN.CloseWindow
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

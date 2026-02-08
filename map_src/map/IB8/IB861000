@@ -1,0 +1,442 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB861000)
+MAPSIZE(508, 725)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(ENCODE|CR2TAB)
+TITLE("IBK주식거래캐시백통장 지원금액 현황")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pibopbxq")
+MAPTYPE(NORM)
+HEADER(LEDGER)
+TRXH("11CSONCQ376")
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL5(0, 0, 726, 49)  LIMAGE(0)  LINEW(5)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL(0, 0, 726, 49)  LINETYPE(3)  LINECOLOR(64)      COLOR(66, 67)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL1(-2, 49, 727, 486)  LIMAGE(0)  LINEW(5)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL0(9, 3, 57, 23)  '계좌번호'  AL_CENTER  CUR(0)      COLOR(66, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+OUT  ACNM(180, 3, 282, 23)  LEN(40)  IO_MIXED|AL_LEFT||FA_SKIP    COLOR(49, 130)  CUR(0)  LINECOLOR(48)          TABORDER(0)  IOORDER(15)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL1(293, 3, 342, 23)  '비밀번호'  AL_LEFT  CUR(0)      COLOR(66, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  zPwd(345, 3, 401, 23)  LEN(8)  IO_MIXED|EDIT_INPUT|FA_PASSWD|FA_WRAP    COLOR(192, 130)  CUR(0)  TP_SUNKEN          TABORDER(1)  IOORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  send_btn(684, 26, 720, 46)  '조회'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, BOLD)  FOCUS  COLOR(208, 186)  CUR(0)    "조회BTN.BMP"    TABORDER(4)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+PANEL  PANEL38(0, 484, 726, 508)  LIMAGE(0)  LINEW(3)  LINETYPE(4)  LINECOLOR(64)      COLOR(34, 232)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL39(8, 489, 22, 503)    |IMAGE|AL_STRETCH    COLOR(34, 232)  CUR(0)    "알림_ic.bmp"  ENABLE  &
+  VISIBLE  IMAGE  HINTTYPE(IH_NONE)
+PANEL  GUIDE(24, 488, 642, 504)        COLOR(34, 69)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  zSrtDt(60, 26, 110, 45)  LEN(8)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP|FA_DATE    COLOR(192, 232)  CUR(0)  TP_SUNKEN          EDITFORMAT("9999/99/99")  TABORDER(2)  IOORDER(5)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL4(9, 26, 58, 45)  '기준분기'  AL_LEFT  CUR(0)      COLOR(66, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  zEndDt(190, 26, 240, 46)  LEN(8)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP|FA_DATE    COLOR(192, 130)  CUR(0)  TP_SUNKEN          EDITFORMAT("9999/99/99")  TABORDER(3)  IOORDER(6)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL3(177, 26, 183, 46)  '~'  AL_LEFT  CUR(0)      COLOR(208, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL22(18, 325, 465, 345)  'IBK투자증권 지점 관리자 지정시 캐시백 제외'  AL_LEFT  CUR(0)      COLOR(208, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+PANEL  PANEL98(7, 302, 67, 324)    |IMAGE|AL_CENTER    COLOR(208, 232)  CUR(0)    "참고사항.BMP"  ENABLE  &
+  VISIBLE  TRANSPARENT  IMAGE  HINTTYPE(IH_NONE)
+PANEL  PANEL99(7, 330, 16, 339)    |IMAGE|AL_CENTER    COLOR(208, 232)  CUR(0)    "텍스트화살표_하단.BMP"  ENABLE  &
+  VISIBLE  TRANSPARENT  IMAGE  HINTTYPE(IH_NONE)
+LABEL  LABEL5(18, 343, 470, 363)  '계좌번호 557시작하는 계좌의 거래세지원금조회가 가능합니다.'  AL_LEFT  CUR(0)      COLOR(208, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+PANEL  PANEL0(7, 348, 16, 357)    |IMAGE|AL_CENTER    COLOR(208, 232)  CUR(0)    "텍스트화살표_하단.BMP"  ENABLE  &
+  VISIBLE  TRANSPARENT  IMAGE  HINTTYPE(IH_NONE)
+LABEL  LABEL6(18, 362, 498, 382)  '지원금은 매분기 첫 1개월내 고객님의 계좌로 입금됩니다.'  AL_LEFT  CUR(0)      COLOR(208, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+PANEL  PANEL2(7, 367, 16, 376)    |IMAGE|AL_CENTER    COLOR(208, 232)  CUR(0)    "텍스트화살표_하단.BMP"  ENABLE  &
+  VISIBLE  TRANSPARENT  IMAGE  HINTTYPE(IH_NONE)
+LABEL  LABEL7(18, 382, 498, 402)  '지원금은 분기 총 발생 거래세의 10%이며, 분기당 최대 75만원까지만 지급됩니다.'  AL_LEFT  CUR(0)      COLOR(208, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+PANEL  PANEL4(7, 387, 16, 396)    |IMAGE|AL_CENTER    COLOR(208, 232)  CUR(0)    "텍스트화살표_하단.BMP"  ENABLE  &
+  VISIBLE  TRANSPARENT  IMAGE  HINTTYPE(IH_NONE)
+COMBO  CMB_ACCT(60, 3, 162, 23)  TP_SUNKEN  LEN(11)  COUNT(0)  VCOUNT(0)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_MIXED|EDIT_INPUT  FONT("굴림체", 9, NORMAL)    COLOR(192, 130)  CUR(0)    TABORDER(5)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL9(25, 645, 126, 663)  'obj_getAcnt'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  obj_getAcnt(130, 645, 250, 665)    "IB861430"  TABORDER(6)  IOORDER(14)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL8(330, 26, 405, 46)  '(결제일기준)'  AL_LEFT  CUR(0)      COLOR(208, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+GRID  GRID0(4, 55, 720, 297)  VISIBLEROW(0)  CELLH(20)  MATRIX(1000, 9)  FIX(0)  MAINCOLOR(208, 232)  LINECOLOR(75)  FOCUSCOLOR(78)  FOCUSKIND(4)  ROWC(68, 77)  |FLEXIBLE|VSCROLL|NO3D|RROW|XHLINE|GRFTEXT    &
+	COLINFO("QtrTpNm")  LEN(10)  WIDTH(70)  HEAD("분기")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("SellAmt")  LEN(16)  WIDTH(100)  HEAD("총주식매도금액")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSIGN    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(69, 69)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Trtax")  LEN(16)  WIDTH(100)  HEAD("징수거래세")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSIGN    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(69, 69)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("zBscAmt")  LEN(16)  WIDTH(100)  HEAD("지원금액(10%)")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSIGN    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(69, 69)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("zCmsnAmtRat")  LEN(11)  WIDTH(110)  HEAD("거래세 추가지원율")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  FLOAT(2)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|FA_FLOAT|SA_SPACE|SA_COSIGN    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(69, 69)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("AddAmt")  LEN(16)  WIDTH(120)  HEAD("거래세 추가지원금액")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSIGN    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(69, 69)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("TotAmt")  LEN(16)  WIDTH(100)  HEAD("총 지원금액")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSIGN    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(69, 69)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Amt")  LEN(16)  WIDTH(70)  HEAD("당사부담제세금")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT      COLOR(192, 69)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Amt1")  LEN(16)  WIDTH(70)  HEAD("세금포함지원금액")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT      COLOR(192, 69)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    TABORDER(7)  IOORDER(13)  ENABLE  &
+  VISIBLE
+
+LABEL  LABEL10(18, 400, 670, 420)  '해당 조건 충족 시 거래세 추가지원 금액이 발생되며, 고객님의 기본 지원금과함께 계좌로 입금됩니다.'  AL_LEFT  CUR(0)      COLOR(208, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+PANEL  PANEL6(7, 405, 16, 414)    |IMAGE|AL_CENTER    COLOR(208, 232)  CUR(0)    "텍스트화살표_하단.BMP"  ENABLE  &
+  VISIBLE  TRANSPARENT  IMAGE  HINTTYPE(IH_NONE)
+COMBO  COMBO0(113, 26, 173, 45)  TP_SUNKEN  LEN(1)  COUNT(4)  VCOUNT(4)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_NUM|EDIT_INPUT  FONT("굴림체", 9, NORMAL)    COLOR(192, 232)  CUR(0)  DISPLAY("1분기", "2분기", "3분기", "4분기")  DATA("1", "2", "3", "4")    TABORDER(8)  IOORDER(8)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+COMBO  COMBO1(243, 26, 303, 45)  TP_SUNKEN  LEN(1)  COUNT(4)  VCOUNT(4)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_NUM|EDIT_INPUT  FONT("굴림체", 9, NORMAL)    COLOR(192, 232)  CUR(0)  DISPLAY("1분기", "2분기", "3분기", "4분기")  DATA("1", "2", "3", "4")    TABORDER(9)  IOORDER(10)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  CMB_ACCT1(25, 670, 81, 690)  LEN(9)  IO_MIXED|EDIT_INPUT|FA_PASSWD|FA_WRAP    COLOR(192, 130)  CUR(0)  TP_SUNKEN          TABORDER(10)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  zIn(150, 696, 270, 716)  LEN(5)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_NOR|FA_PASS    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("00001")          TABORDER(11)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  zInptVal(410, 696, 530, 716)  LEN(43)  IO_MIXED|AL_CENTER||FA_PASSWD    COLOR(192, 69)  CUR(0)            TABORDER(0)  IOORDER(11)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  OUT(410, 716, 530, 736)  LEN(1)  IO_NUM|AL_CENTER|    COLOR(192, 69)  CUR(0)            TABORDER(0)  IOORDER(12)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL11(25, 696, 145, 716)  '입력레코드갯수'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL15(290, 696, 410, 716)  '입력내용'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL16(290, 716, 410, 736)  '출력레코드갯수'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  zSrtDt1(150, 723, 270, 743)  LEN(4)  IO_NUM|EDIT_INPUT|FA_PASS    COLOR(192, 232)  CUR(0)  TP_SUNKEN          TABORDER(12)  IOORDER(7)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL13(25, 749, 145, 769)  '입력날짜2'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL12(25, 725, 145, 745)  '입력날짜1'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  zEndDt1(150, 750, 270, 770)  LEN(4)  IO_NUM|EDIT_INPUT|FA_PASS    COLOR(192, 232)  CUR(0)  TP_SUNKEN          TABORDER(13)  IOORDER(9)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL14(18, 418, 675, 438)  '지원금 지급 시 1만원 미만 금액은 절사되어 1만원 단위로 지급됩니다.'  AL_LEFT  CUR(0)      COLOR(208, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+PANEL  PANEL7(7, 423, 16, 432)    |IMAGE|AL_CENTER    COLOR(208, 232)  CUR(0)    "텍스트화살표_하단.BMP"  ENABLE  &
+  VISIBLE  TRANSPARENT  IMAGE  HINTTYPE(IH_NONE)
+LABEL  LABEL18(18, 457, 675, 477)  '해당 제도에 대해 변경 사항이 발생 시 고객 공지 되오니 반드시 확인바랍니다.'  AL_LEFT  CUR(0)      COLOR(208, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+PANEL  PANEL8(7, 462, 16, 471)    |IMAGE|AL_CENTER    COLOR(208, 232)  CUR(0)    "텍스트화살표_하단.BMP"  ENABLE  &
+  VISIBLE  TRANSPARENT  IMAGE  HINTTYPE(IH_NONE)
+LABEL  LABEL17(18, 438, 675, 458)  '지원금액 5만원 초과 부과되는 제세공과금(22%)은 당사가 부담합니다.'  AL_LEFT  CUR(0)      COLOR(208, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+PANEL  PANEL10(7, 443, 16, 452)    |IMAGE|AL_CENTER    COLOR(208, 232)  CUR(0)    "텍스트화살표_하단.BMP"  ENABLE  &
+  VISIBLE  TRANSPARENT  IMAGE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Option Explicit
+
+Dim bInit
+bInit = 1
+
+'--계좌번호, 계좌명 세팅
+Sub acct_set()
+	If Len(CMB_ACCT.Data) = 11 Then
+		Dim tmpAcnm
+		tmpAcnm = Split(Trim(CMB_ACCT.Text), " ")
+
+		ACNM.Data = tmpAcnm(2)
+		If SYSTEM.ConnectBy = "0" Then
+			zPwd.Data = "9999"
+		End If
+
+		Call send_f()
+	Else
+		CMB_ACCT.SetFocus
+	End If
+End Sub
+
+
+'== 첫 조회
+Sub send_f()
+	'SCREEN.ClearAll 0, 2
+	LEDGER.Fkey = "C"
+	SCREEN.Send 0
+End Sub
+
+'== 연속 조회
+Sub send_c()
+	LEDGER.Fkey = "7"
+	GRID0.SetDataPosition(2)
+	SCREEN.Send 0
+End Sub
+
+
+Sub chkdate()
+	Dim dyear
+
+	dyear = Year(Date)
+
+	If dyear < CDbl(zSrtDt1.Data) Or CDbl(zEndDt1.Data) < CDbl(zSrtDt1.Data) Then
+		MsgBox "시작분기의 미래값입력 오류 입니다.",0,"IBK투자증권"
+	End If
+
+	If CDbl(zEndDt1.Data) = CDbl(zSrtDt1.Data) And CDbl(COMBO1.Data) < CDbl(COMBO0.Data) Then
+		MsgBox "시작분기의 미래값입력 오류 입니다.",0,"IBK투자증권"
+	End If
+End Sub
+
+Sub SetDate()
+	Dim sYear, sQuarter, sMonth
+
+	sYear = Year(DateAdd("m", -3, Date))
+	sMonth = Month(DateAdd("m", -3, Date))
+
+	Select Case sMonth
+		Case 1,2,3
+			sQuarter = 1
+		Case 4,5,6
+			sQuarter = 2
+		Case 7,8,9
+			sQuarter = 3
+		Case 10,11,12
+			sQuarter = 4
+	End Select
+
+	zEndDt.Data = sYear & "0101"
+	zEndDt1.Data = Left(zEndDt.Data,4)
+	COMBO1.Data = sQuarter
+
+	zSrtDt.Data = sYear & "0101"
+	zSrtDt1.Data = Left(zSrtDt.Data,4)
+	COMBO0.Data = sQuarter
+End Sub
+
+Sub ChkRange()
+	Dim dYear, sQuarter, dMonth, curtmp, custmpSrt,custmpEnd
+
+	dyear = Year(Date)
+	dMonth = Month(Date)
+
+	Select Case dMonth
+		Case 1,2,3
+			sQuarter = 1
+		Case 4,5,6
+			sQuarter = 2
+		Case 7,8,9
+			sQuarter = 3
+		Case 10,11,12
+			sQuarter = 4
+	End Select
+
+	curtmp = dyear *10 + sQuarter
+	custmpSrt = CDbl(zSrtDt1.Data)*10 + CDbl(COMBO0.Data)
+	custmpEnd = CDbl(zEndDt1.Data)*10  + CDbl(COMBO1.Data)
+
+'	MsgBox "curtmp : " & curtmp & " custmpSrt : "&custmpSrt & " custmpEnd : "&custmpEnd,0,"IBK투자증권"
+
+	If curtmp < custmpSrt Or curtmp < custmpEnd Then
+	  MsgBox "기준분기의 미래값 입력 오류입니다.",0,"IBK투자증권"
+	  Call SetDate()
+	End If
+
+End Sub
+
+_AW_ONINDECLARE_AW_
+#load IB888833
+#Load IB888888
+
+_AW_ONENDSUB_AW_
+_AW_ONSTART_AW_
+bInit = 1
+Call SetDate()
+
+'직원/고객에 따른 비밀번호 컨트롤 설정
+Call Check_LoginType(zPwd)
+SCREEN.Proc "obj_getAcnt.send_f", ""	'계좌번호 가져오기(CX_DATATRANS)
+
+bInit = 0
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+LEDGER.Rcnt = "0020"
+
+SCREEN.OnSend = False
+zIn.Data = "00001"
+
+
+If Len(Trim(CMB_ACCT.Data)) <> 11 Then
+	Call alert_msg("계좌번호를 확인하여 주십시오.")
+	SCREEN.Object("parent.CMB_ACCT").SetFocus
+	Exit Sub
+End If
+
+zPwd.Data = Trim(SCREEN.Object("parent.zPwd").Data)
+
+If Len(Trim(zPwd.Data)) < 4 Then
+	Call alert_msg("계좌비밀번호를 확인하여 주십시오.")
+	SCREEN.Object("parent.zPwd").SetFocus
+	Exit Sub
+End If
+
+zEndDt1.Data = Left(zEndDt.Data,4)
+zSrtDt1.Data = Left(zSrtDt.Data,4)
+
+Call chkdate()
+
+SCREEN.OnSend = True
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+Dim ecod
+ecod = Trim(LEDGER.Ecod)
+
+If chkNumericData(ecod) = False Then
+	Exit Sub
+End If
+
+If ecod= "3669" Then
+	SCREEN.ClearAll 0, 2
+	zPwd.SetFocus
+	Exit Sub
+End If
+
+If LEDGER.Next = "Y" And ecod <> "0136" Then
+	Call send_c()
+Else
+	Dim i
+	For i = 0 To GRID0.Rows
+		GRID0.SetGridCell i,9, GRID0.GetGridCell(i,7)
+	Next
+End If
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(zPwd)
+_AW_ONKEYCHANGE_AW_
+'== 비밀번호 변경시 조회 버튼 기능 수행.
+If SCREEN.Key = "13" Then  '-- Enter 키 입력
+	Call send_f()
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(send_btn)
+_AW_ONCLICK_AW_
+Call send_f()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(zSrtDt)
+_AW_ONCHANGE_AW_
+If bInit = 1 Then
+	Exit Sub
+End If
+
+Dim sYear, sMonth, sQuarter
+
+sYear = Mid(zSrtDt.Data, 1, 4)
+sMonth = Mid(zSrtDt.Data, 5, 2)
+
+Select Case sMonth
+	Case 1,2,3
+		sQuarter = 1
+	Case 4,5,6
+		sQuarter = 2
+	Case 7,8,9
+		sQuarter = 3
+	Case 10,11,12
+		sQuarter = 4
+End Select
+
+zSrtDt1.Data = Left(zSrtDt.Data,4)
+COMBO0.Data = sQuarter
+
+Call ChkRange()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(zEndDt)
+_AW_ONCHANGE_AW_
+If bInit = 1 Then
+	Exit Sub
+End If
+
+Dim sYear, sMonth, sQuarter
+
+sYear = Mid(zEndDt.Data, 1, 4)
+sMonth = Mid(zEndDt.Data, 5, 2)
+
+Select Case sMonth
+	Case 1,2,3
+		sQuarter = 1
+	Case 4,5,6
+		sQuarter = 2
+	Case 7,8,9
+		sQuarter = 3
+	Case 10,11,12
+		sQuarter = 4
+End Select
+
+zEndDt1.Data = Left(zEndDt.Data,4)
+COMBO1.Data = sQuarter
+
+Call ChkRange()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(CMB_ACCT)
+_AW_ONCHANGE_AW_
+zPwd.Clear
+
+Call acct_set()
+
+zPwd.Setfocus
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(GRID0)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(COMBO0)
+_AW_ONCHANGE_AW_
+Call ChkRange()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(COMBO1)
+_AW_ONCHANGE_AW_
+Call ChkRange()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(CMB_ACCT1)
+_AW_ONKEYCHANGE_AW_
+'== 비밀번호 변경시 조회 버튼 기능 수행.
+If SCREEN.Key = "13" Then  '-- Enter 키 입력
+	Call send_f()
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

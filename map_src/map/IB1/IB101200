@@ -1,0 +1,216 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB101200)
+MAPSIZE(275, 299)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("매수-미니주문")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(CR2TAB)
+TITLE("[1012] 매수-미니주문")
+TOPATH(AXIS)
+METHOD(MENU)
+MAPTYPE(NORM)
+HEADER(LEDGER)
+BGROUND(BRUSH, 64)
+}
+
+
+
+FORM DIVISION
+{
+
+OBJECT  OBJ_order(0, 0, 299, 257)    "IB100190"  TABORDER(2)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BTN_expand(327, 9, 347, 29)  TP_PUSH|IMAGE|AL_CENTER      FOCUS  COLOR(208, 232)  CUR(0)    "창조절좌우.BMP"    TABORDER(1)  ENABLE  &
+  VISIBLE  IMAGE  HINTTYPE(IH_NONE)
+PANEL  GUIDE(0, 257, 299, 275)        COLOR(66, 69)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  OBJ_sise(83, 300, 412, 557)    "IB100110"  TABORDER(3)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  1301(12, 300, 77, 320)  LEN(6)  IO_MIXED|EDIT_INOUT|FA_WRAP|FA_HAN|CODE    FONT("굴림체", 9, NORMAL)    COLOR(28, 232)  CUR(0)  TP_NONE          TABORDER(4)  IOORDER(3)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  domino_data(69, 280, 345, 298)  LEN(40)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(5)  IOORDER(4)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL0(12, 280, 69, 298)  '도미노'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  ed_jprc(360, 175, 444, 195)  LEN(10)  IO_NUM|EDIT_INPUT|FA_COMMA|FA_RIGHT|FA_WRAP|FA_SKIP|FA_XFLOAT  SPIN(1)    FONT("굴림체", 9, BOLD)    COLOR(104, 103)  CUR(0)  TP_SUNKEN  INIT("0")          TABORDER(6)  IOORDER(5)  ENABLE  &
+  HOVER  HINTTYPE(IH_NONE)
+OBJECT  obj_obj_sise(145, 400, 500, 455)    "IB10011Z"  TABORDER(7)  IOORDER(6)  ENABLE  &
+  HINTTYPE(IH_NONE)
+CONTROL  cxMarket(110, 5, 130, 25)  |FA_SKIP  "CX_MarketPicker"  "/k2/tIB101300/u1/d1"  LEN(12)  EDIT_NOP    COLOR(209, 232)  TABORDER(0)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Sub send_sise_all(xval)
+SCREEN.IgnoreChange True
+	If xval <> "jumun" And xval <> "account" Then
+  		S1301.Trigger "", False
+ 	End If
+	S1301.Trigger "", True
+	If xval <> "jumun" Then
+		Call Ord_ChangeCode(S1301.Data)
+	End If
+	OBJ_sise.Send
+	If SCREEN.Object("OBJ_order.obj_odr.1301").Iskonex = True Then
+		SCREEN.Object("OBJ_order.obj_odr.c_jqty").type = Asc("N")
+	Else
+		SCREEN.Object("OBJ_order.obj_odr.c_jqty").type = Asc("1")
+	End If
+
+SCREEN.IgnoreChange False
+End Sub
+
+'========================================
+' 하위 OBJ에 시장구분자 세팅 후 조회 발생
+'========================================
+Sub Change_MKGubn_Main(sMKGubn)
+
+	If SCREEN.CreateObject("Info") Then
+		INFO.pushData LOGIN.Name, myFILE, myMAP, "MKgubn", sMKGubn
+	End If
+
+	'=====================
+	' 직전 시장구분자 저장
+	'=====================
+	Dim tMKGubn
+	tMKGubn = cxMarket.sMarket
+
+	'================================================================
+	' 소속 OBJ 내의 cxMarket 시장 구분을 Main 시장구분으로 세팅
+	'================================================================
+	' 여기서 시장구분자 보정 후 Change_MKGubn_Main_Limited 함수 호출되어서
+	' 하위 오브젝트에 시장 자동으로 전파한다.
+	'================================================================
+	Call Spread_mkgb(S1301.Data, sMKGubn)
+
+
+	'================================================================
+	' 시장 변동이 없을 경우 조회 Send 발생 SKIP 처리
+	'================================================================
+	' Spread_mkgb() 함수 이후의 시장구분자는 보정되고 난 다음의 시장구분자이다.
+	'================================================================
+	If tMKGubn = cxMarket.sMarket Then
+		Exit Sub
+	End If
+
+
+	'====================
+	' 하단 원장 OBJ 조회
+	'====================
+	Call Change_MKGubn_Main_Send()
+End Sub
+
+
+
+'=========================================
+' 하위 OBJ에 시장구분자 세팅 (조회 미발생)
+'=========================================
+Sub Change_MKGubn_Main_Limited(sMKGubn)
+
+	' 직전 시장구분자 저장
+	Dim tMKGubn
+	tMKGubn = cxMarket.sMarket
+
+	SCREEN.IgnoreChange True
+	cxMarket.sCode = S1301.Data
+	cxMarket.sMarket = sMKGubn
+
+	SCREEN.Proc "Main.OBJ_order.OBJ_odr.Change_MKGubn_OBJ"    , sMKGubn
+	SCREEN.Proc "Main.OBJ_order.OBJ_account.Change_MKGubn_OBJ", sMKGubn
+	SCREEN.IgnoreChange False
+
+	' 시장 변동 발생 시 조회 발생
+	If tMKGubn <> cxMarket.sMarket Then
+		Change_MKGubn_Main_Send()
+		Exit Sub
+	End If
+
+End Sub
+
+
+
+
+'=====================================
+' 하위 OBJ 시장 변동에 따른 Send 발생
+'=====================================
+Sub Change_MKGubn_Main_Send()
+	OBJ_sise.Send
+
+	obj_obj_sise.Send
+End Sub
+
+_AW_ONINDECLARE_AW_
+'== 주문obj를포함한 main의 공통함수
+#LOAD IB999913
+
+_AW_ONENDSUB_AW_
+_AW_ONSTART_AW_
+' 현재 화면의 시장식별자(cxMarket)에 고유 화면번호 부여
+cxMarket.MNum = SCREEN.GetMapName(1)
+cxMarket.Major = SCREEN.Major
+
+Call Set_mini_order(2)
+
+'-- 주문단가 트리거 처리
+SCREEN.SetTimer 4, False
+
+_AW_ONENDSUB_AW_
+_AW_ONTIMER_AW_
+If Trim(ed_jprc.Data) <> "" Then
+	SCREEN.Object("OBJ_order.OBJ_odr.ed_jprc").Data = ed_jprc.Data
+End If
+
+Call Set_mini_domino(2)
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(1301)
+_AW_ONCHANGE_AW_
+Dim Myvar, name
+
+name = SCREEN.GetName(100, S1301.data, 0)
+If (name <> "") Then
+	Call send_sise_all("main")
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(ed_jprc)
+_AW_ONCHANGE_AW_
+SCREEN.SetTimer 2, False
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(cxMarket)
+_AW_ONCLICK_AW_
+SCREEN.Proc "main.Change_MKGubn_Main", cxMarket.sMarket
+
+If UCase(TypeName( SCREEN.Object("cbSOrder") )) <> "NOTHING" Then
+	If cxMarket.sMarket = "통합" Then
+		cbSOrder.Data = "S"
+	ElseIf cxMarket.sMarket = "KRX" Then
+		cbSOrder.Data = "1"
+	ElseIf cxMarket.sMarket = "NXT" Then
+		cbSOrder.Data = "N"
+	End If
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

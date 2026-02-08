@@ -1,0 +1,317 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB250320)
+MAPSIZE(245, 628)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("MS Sans Serif", 9, NORMAL)
+TITLE("[2503] 업종별 신용거래 현황 차트")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pibg2503")
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL0(0, 0, 628, 244)  LINECOLOR(0)      COLOR(241, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+CONTROL  drChart(0, 30, 627, 243)  |FA_FLASH  "CX_DRCHART"  "/iMC250300"  LEN(0)  EDIT_INOUT    COLOR(192, 232)  TABORDER(1)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  RADIO0(60, 7, 110, 27)  '신규'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(GROUP0)      COLOR(241, 130)  CUR(0)      TABORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL0(10, 7, 50, 27)  '종가'  AL_CENTER  CUR(0)      COLOR(241, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  RADIO1(115, 7, 167, 27)  '상환'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(GROUP0)      COLOR(241, 130)  CUR(0)      TABORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  RADIO2(173, 7, 238, 27)  '잔고수량'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(GROUP0)      COLOR(241, 130)  CUR(0)      TABORDER(4)  ENABLE  &
+  VISIBLE  CHECKED  HINTTYPE(IH_NONE)
+BUTTON  RADIO3(251, 7, 321, 27)  '잔고금액'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(GROUP0)      COLOR(241, 130)  CUR(0)      TABORDER(5)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+GROUP  GROUP0(40, 350, 150, 470)  'Group'        COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL1(305, 490, 485, 545)  'Label'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Dim OnStart
+OnStart = 0
+
+Sub change_chart(key)
+	Dim 	inputData
+	Dim     nkey		'[23];      Next Key
+	Dim	    sdate		'[8];		일자
+	Dim		upcd		'[3];		업종코드
+	Dim     temp
+	CStr    str
+'	Select Case key
+'			Case 1 gubn = "0"
+'			Case 2 gubn = "2"
+'			End Select
+'	g_gubn = key
+
+	sDate = "        "
+	temp = 120
+	nrec=Trim(temp)
+
+	If(Len(nrec)=3) Then
+	    str = " "
+		nrec = str & nrec
+	End If
+	If(Len(nrec)=2) Then
+	    str = "  "
+		nrec = str & nrec
+	End If
+	If(Len(nrec)=1) Then
+	    str = "   "
+		nrec = str & nrec
+	End If
+
+	If(Len(nrec)=0) Then
+		nrec = " 120"
+		request_count.Data = 120
+	End If
+
+	upcd = SCREEN.Object("main.20301").data
+	sdate = SCREEN.Object("main.26901").data
+
+	SYSTEM.Trace "OnStart ; " & OnStart
+
+	If OnStart = 0 Then
+		Exit Sub
+	End If
+
+	nkey = "                       "
+	cttp = check_combo()
+
+'	SYSTEM.Trace "change_chart upcd : " & upcd & " date : " & ed_date & " cttp : " & cttp
+	inputData = nkey & sdate & upcd & cttp
+
+	Dim szTR
+	szTR = "pibg2503"
+	drChart.SendTr szTR, upcd, inputData,1
+
+End Sub
+
+Function 	check_combo()
+	If RADIO0.Checked = True Then
+		check_combo = 1
+	ElseIf RADIO1.Checked = True Then
+		check_combo = 2
+	ElseIf RADIO2.Checked = True Then
+		check_combo = 3
+	ElseIf RADIO3.Checked = True Then
+		check_combo = 4
+	End If
+End Function
+
+
+
+Sub Set_combo(combo_no)
+	If combo_no = "1" Then
+		drChart.GetChartProperty("SetGraphHide (0, 0, 신규, false )")
+		drChart.GetChartProperty("SetGraphHide (0, 0, 상환, true )")
+		drChart.GetChartProperty("SetGraphHide (0, 0, 잔고수량, True )")
+		drChart.GetChartProperty("SetGraphHide (0, 0, 잔고금액, true )")
+
+		RADIO0.Checked = True
+		RADIO1.Checked = False
+		RADIO2.Checked = False
+		RADIO3.Checked = False
+	ElseIf combo_no = "2" Then
+		drChart.GetChartProperty("SetGraphHide (0, 0, 신규, true )")
+		drChart.GetChartProperty("SetGraphHide (0, 0, 상환, false )")
+		drChart.GetChartProperty("SetGraphHide (0, 0, 잔고수량, true )")
+		drChart.GetChartProperty("SetGraphHide (0, 0, 잔고금액, true )")
+
+		RADIO0.Checked = False
+		RADIO1.Checked = True
+		RADIO2.Checked = False
+		RADIO3.Checked = False
+	ElseIf combo_no = "3" Then
+		drChart.GetChartProperty("SetGraphHide (0, 0, 신규, true )")
+		drChart.GetChartProperty("SetGraphHide (0, 0, 상환, true )")
+		drChart.GetChartProperty("SetGraphHide (0, 0, 잔고수량, false )")
+		drChart.GetChartProperty("SetGraphHide (0, 0, 잔고금액, true )")
+
+		RADIO0.Checked = False
+		RADIO1.Checked = False
+		RADIO2.Checked = True
+		RADIO3.Checked = False
+	ElseIf combo_no = "4" Then
+		drChart.GetChartProperty("SetGraphHide (0, 0, 신규, true )")
+		drChart.GetChartProperty("SetGraphHide (0, 0, 상환, true )")
+		drChart.GetChartProperty("SetGraphHide (0, 0, 잔고수량, true )")
+		drChart.GetChartProperty("SetGraphHide (0, 0, 잔고금액, false )")
+
+		RADIO0.Checked = False
+		RADIO1.Checked = False
+		RADIO2.Checked = False
+		RADIO3.Checked = True
+	End If
+	p_write_ini()
+End Sub
+
+
+Sub p_write_ini()
+	Dim combo_no
+	If RADIO0.Checked = True Then
+		combo_no = 1
+	ElseIf RADIO1.Checked = True Then
+		combo_no = 2
+	ElseIf RADIO2.Checked = True Then
+		combo_no = 3
+	ElseIf RADIO3.Checked = True Then
+		combo_no = 4
+	End If
+
+	If SCREEN.CreateObject("INFO") Then
+		INFO.pushData LOGIN.Name, "userconf.ini", SCREEN.GetMapName(0), "combo", combo_no
+	End If
+End Sub
+
+Sub p_read_ini()
+	If SCREEN.CreateObject("INFO") Then
+		Dim combo_no
+		combo_no = Trim(INFO.PopData(LOGIN.Name, "userconf.ini", SCREEN.GetMapName(0), "combo"))
+	End If
+
+	If combo_no = "1" Then
+		Set_combo(1)
+		RADIO0.Checked = True
+		LABEL1.Text = "신규"
+	ElseIf combo_no = "2" Then
+		Set_combo(2)
+		RADIO1.Checked = True
+		LABEL1.Text = "상환"
+	ElseIf combo_no = "3" Then
+		Set_combo(3)
+		RADIO2.Checked = True
+		LABEL1.Text = "잔고수량"
+	ElseIf combo_no = "4" Then
+		Set_combo(4)
+		RADIO3.Checked = True
+		LABEL1.Text = "잔고금액"
+	Else
+		Set_combo(3)
+		RADIO2.Checked = True
+		LABEL1.Text = "잔고수량"
+	End If
+
+End Sub
+
+_AW_ONSTART_AW_
+Dim szPropName
+OnStart = 1
+szPropName = "bShowPriceMinMaxText(0)"
+drChart.GetChartProperty( szPropName )
+
+p_read_ini()
+change_chart(3)
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(drChart)
+_AW_ONCHANGE_AW_
+'drChart.GetChartState() 리턴값
+'STATE_NONE					0
+'STATE_STARTRECEIVE			1 	TR받은 직후
+'STATE_ENDRECEIVE			2 	조회결과를 차트컨트롤에 그린 후
+'STATE_CHANGEONPAGECNT		3	데이터 조회 스크롤 시
+'STATE_SENDTR				4	TR 전송시
+'STATE_DESTROYCHART			5	차트화면 내려갈때
+
+Dim TotCnt
+Dim DataCnt
+Dim ret
+ret = drChart.GetChartState()
+TotCnt = drChart.GetChartProperty("GetDataCount")
+DataCnt = drChart.GetChartProperty( "GetOnePageDataCount" )
+
+SYSTEM.Trace "ret[" & ret & "] TotCnt[" & TotCnt & "] DataCnt[" & DataCnt & "]"
+
+If ret = 2 Then
+	SCREEN.IgnoreChange False
+	'request_count.Data = TotCnt
+	SCREEN.IgnoreChange True
+End If
+
+If ret =  3 Then
+	SCREEN.IgnoreChange False
+	'data_count.Data = DataCnt
+	SCREEN.IgnoreChange True
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(RADIO0)
+_AW_ONCLICK_AW_
+drChart.ChangeGraphTitle LABEL1.Text, "신규"
+LABEL1.Text = "신규"
+Set_combo(1)
+change_chart(1)
+_AW_ONENDSUB_AW_
+_AW_ONDBLCLK_AW_
+Set_combo(1)
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(RADIO1)
+_AW_ONCLICK_AW_
+drChart.ChangeGraphTitle LABEL1.Text, "상환"
+LABEL1.Text = "상환"
+Set_combo(2)
+change_chart(1)
+_AW_ONENDSUB_AW_
+_AW_ONDBLCLK_AW_
+Set_combo(2)
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(RADIO2)
+_AW_ONCLICK_AW_
+drChart.ChangeGraphTitle LABEL1.Text, "잔고수량"
+LABEL1.Text = "잔고수량"
+Set_combo(3)
+change_chart(1)
+_AW_ONENDSUB_AW_
+_AW_ONDBLCLK_AW_
+Set_combo(3)
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(RADIO3)
+_AW_ONCLICK_AW_
+drChart.ChangeGraphTitle LABEL1.Text, "잔고금액"
+LABEL1.Text = "잔고금액"
+Set_combo(4)
+change_chart(1)
+_AW_ONENDSUB_AW_
+_AW_ONDBLCLK_AW_
+Set_combo(5)
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

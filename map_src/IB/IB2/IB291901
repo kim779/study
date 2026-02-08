@@ -1,0 +1,508 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB291901)
+MAPSIZE(265, 554)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("투자자별 시간대별 �")
+MAPPUBLIC(";")
+FONT("굴림", 9, NORMAL)
+TITLE("[2919] 투자자별 시간대별 매매현황(상세)")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pibo2919")
+MAPTYPE(NORM)
+HEADER(NOP)
+REPEATTIME(30000)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL11(-2, 261, 557, 267)        COLOR(64, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL63(-1, 32, 556, 264)  LIMAGE(0)  LINEW(3)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL_bg(-2, 0, 556, 32)  LIMAGE(1)  LINEW(3)  LINETYPE(4)  LINECOLOR(64)      COLOR(66, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON3(508, 6, 545, 26)  '조회'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, BOLD)  COLOR(14, 186)  CUR(0)    "조회BTN.BMP"    TABORDER(1)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+PANEL  PANEL2(6, 6, 36, 26)  '창수'        COLOR(68, 130)  CUR(0)    AL_CENTER  FONT("굴림체", 9, NORMAL)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+COMBO  COMBO1(35, 6, 73, 26)  TP_SUNKEN  LEN(1)  COUNT(3)  VCOUNT(3)  INDEX(1)  MATCHKEY(NOTMAPPING)  IO_NUM|EDIT_INOUT|FA_SKIP  FONT("굴림체", 9, NORMAL)    COLOR(192, 130)  CUR(0)  DISPLAY("1", "2", "3")  DATA("0", "1", "2")    TABORDER(2)  IOORDER(17)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+GRID  26500(6, 77, 550, 258)  VISIBLEROW(11)  CELLH(18)  MATRIX(1000, 10)  FIX(0)  MAINCOLOR(7, 0)  LINECOLOR(75)  FOCUSCOLOR(78)  FOCUSKIND(3)    FONT("굴림체", 9, NORMAL)  ROWC(68, 77)  |FLEXIBLE|VSCROLL|INS_TOP|NOHEAD|NO3D|RROW|XHLINE|PAGE|HEADER|GRFTEXT    &
+	COLINFO("26302")  LEN(6)  WIDTH(55)  HEAD("시간")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT      COLOR(32, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  EDITFORMAT("99:99:99")    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("26306")  LEN(9)  WIDTH(84)  HEAD("매수")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSUP    COLOR(32, 94)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(94, 94)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col0")  LEN(9)  WIDTH(75)  HEAD("매도")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSUP    COLOR(32, 95)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(94, 95)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col1")  LEN(9)  WIDTH(80)  HEAD("순매수")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSIGN    COLOR(32, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(94, 95)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col2")  LEN(9)  WIDTH(83)  HEAD("매수")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSUP    COLOR(32, 94)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col3")  LEN(9)  WIDTH(75)  HEAD("매도")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSUP    COLOR(32, 95)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col4")  LEN(9)  WIDTH(76)  HEAD("순매수")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSIGN    COLOR(32, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(94, 95)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col5")  LEN(9)  WIDTH(75)  HEAD("매수")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT    COLOR(32, 94)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col6")  LEN(9)  WIDTH(75)  HEAD("매도")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT    COLOR(32, 95)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col7")  LEN(9)  WIDTH(77)  HEAD("순매수")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_CORGB|SA_COSIGN    COLOR(32, 69)  COLCUR(0, 0)    INORMAL  IFRGB(94, 95)    HNORMAL  SORTSTARTPOS(0)    TABORDER(3)  IOORDER(16)  ENABLE  &
+  VISIBLE
+
+PANEL  PANEL0(6, 39, 61, 78)  '시    간'  LINECOLOR(75)      COLOR(74, 76)  CUR(0)    AL_CENTER  FONT("굴림체", 9, NORMAL)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL3(60, 58, 145, 78)  '매    수'  LINECOLOR(75)      COLOR(74, 76)  CUR(0)    AL_CENTER  FONT("굴림체", 9, NORMAL)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL4(144, 58, 220, 78)  '매    도'  LINECOLOR(75)      COLOR(74, 76)  CUR(0)    AL_CENTER  FONT("굴림체", 9, NORMAL)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL5(219, 58, 300, 78)  '순  매  수'  LINECOLOR(75)      COLOR(74, 76)  CUR(0)    AL_CENTER  FONT("굴림체", 9, NORMAL)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+COMBO  COM2(143, 39, 219, 59)  TP_SUNKEN  LEN(2)  COUNT(10)  VCOUNT(11)  INDEX(7)  MATCHKEY(NOTMAPPING)  IO_NUM|EDIT_INOUT|FA_SKIP  FONT("굴림체", 9, NORMAL)    COLOR(192, 130)  CUR(0)  DISPLAY("증권", "보험", "투신", "은행", "종금/신금", "기금/연금", "사모펀드", "기타", "개인", "외국인")  DATA("1", "2", "3", "4", "5", "6", "12", "7", "8", "9")    TABORDER(4)  IOORDER(18)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  B_01(218, 39, 298, 59)  '증   감'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, NORMAL)  COLOR(68, 186)  CUR(0)    "6BTN.BMP"    TABORDER(5)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+COMBO  COM1(60, 39, 145, 59)  TP_SUNKEN  LEN(1)  COUNT(10)  VCOUNT(10)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_NUM|EDIT_INOUT|FA_SKIP  FONT("굴림체", 9, NORMAL)    COLOR(192, 130)  CUR(0)  DISPLAY("거래소수량", "거래소금액", "코스닥수량", "코스닥금액", "선물수량", "선물금액", "콜옵션수량", "콜옵션금액", "풋옵션수량", "풋옵션금액")  DATA("8", "0", "9", "1", "2", "3", "4", "5", "6", "7")    TABORDER(6)  IOORDER(19)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL6(299, 58, 384, 78)  '매    수'  LINECOLOR(75)      COLOR(74, 76)  CUR(0)    AL_CENTER  FONT("굴림체", 9, NORMAL)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL7(382, 58, 458, 78)  '매    도'  LINECOLOR(75)      COLOR(74, 76)  CUR(0)    AL_CENTER  FONT("굴림체", 9, NORMAL)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL8(457, 58, 550, 78)  '순  매  수'  LINECOLOR(75)      COLOR(74, 76)  CUR(0)    AL_CENTER  FONT("굴림체", 9, NORMAL)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+COMBO  COM4(381, 39, 457, 59)  TP_SUNKEN  LEN(2)  COUNT(10)  VCOUNT(11)  INDEX(7)  MATCHKEY(NOTMAPPING)  IO_NUM|EDIT_INOUT|FA_SKIP  FONT("굴림체", 9, NORMAL)    COLOR(192, 130)  CUR(0)  DISPLAY("증권", "보험", "투신", "은행", "종금/신금", "기금/연금", "사모펀드", "기타", "개인", "외국인")  DATA("1", "2", "3", "4", "5", "6", "12", "7", "8", "9")    TABORDER(7)  IOORDER(20)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  B_02(457, 39, 549, 59)  '증   감'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, NORMAL)  COLOR(68, 186)  CUR(0)    "7BTN.BMP"    TABORDER(8)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+COMBO  COM3(298, 39, 383, 59)  TP_SUNKEN  LEN(1)  COUNT(10)  VCOUNT(10)  INDEX(1)  MATCHKEY(NOTMAPPING)  IO_NUM|EDIT_INOUT|FA_SKIP  FONT("굴림체", 9, NORMAL)    COLOR(192, 130)  CUR(0)  DISPLAY("거래소수량", "거래소금액", "코스닥수량", "코스닥금액", "선물수량", "선물금액", "콜옵션수량", "콜옵션금액", "풋옵션수량", "풋옵션금액")  DATA("8", "0", "9", "1", "2", "3", "4", "5", "6", "7")    TABORDER(9)  IOORDER(21)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  upgb1(815, 32, 844, 51)  LEN(2)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("1")          TABORDER(10)  IOORDER(1)  &
+  HINTTYPE(IH_NONE)
+EDIT  upgb2(815, 52, 844, 71)  LEN(2)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("2")          TABORDER(11)  IOORDER(2)  &
+  HINTTYPE(IH_NONE)
+EDIT  upgb3(815, 72, 844, 91)  LEN(2)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("3")          TABORDER(12)  IOORDER(3)  &
+  HINTTYPE(IH_NONE)
+EDIT  upcd1(815, 103, 844, 122)  LEN(3)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("1")          TABORDER(13)  IOORDER(4)  &
+  HINTTYPE(IH_NONE)
+EDIT  upcd2(815, 124, 844, 143)  LEN(3)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("1")          TABORDER(14)  IOORDER(5)  &
+  HINTTYPE(IH_NONE)
+EDIT  upcd3(815, 143, 844, 162)  LEN(3)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("1")          TABORDER(15)  IOORDER(6)  &
+  HINTTYPE(IH_NONE)
+EDIT  tjcd1(815, 178, 844, 197)  LEN(2)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("8")          TABORDER(16)  IOORDER(7)  &
+  HINTTYPE(IH_NONE)
+EDIT  tjcd2(815, 199, 844, 218)  LEN(2)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("8")          TABORDER(17)  IOORDER(8)  &
+  HINTTYPE(IH_NONE)
+EDIT  tjcd3(815, 218, 844, 237)  LEN(2)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("8")          TABORDER(18)  IOORDER(9)  &
+  HINTTYPE(IH_NONE)
+EDIT  gubn1(815, 258, 844, 277)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("1")          TABORDER(19)  IOORDER(10)  &
+  HINTTYPE(IH_NONE)
+EDIT  gubn2(815, 279, 844, 298)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("0")          TABORDER(20)  IOORDER(11)  &
+  HINTTYPE(IH_NONE)
+EDIT  gubn3(815, 298, 844, 317)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("1")          TABORDER(21)  IOORDER(12)  &
+  HINTTYPE(IH_NONE)
+EDIT  sgub1(815, 335, 844, 354)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("1")          TABORDER(22)  IOORDER(13)  &
+  HINTTYPE(IH_NONE)
+EDIT  sgub2(815, 356, 844, 375)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("1")          TABORDER(23)  IOORDER(14)  &
+  HINTTYPE(IH_NONE)
+EDIT  sgub3(815, 375, 844, 394)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("1")          TABORDER(24)  IOORDER(15)  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL1(244, 6, 508, 26)  '(순매수 단위:천주 주식,옵션:억원 선물:계약)'  AL_LEFT  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(68, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  COM(78, 6, 116, 24)  AL_LEFT  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Const myFILE = "userconf.ini"
+Const myMAP = "IB291900"
+
+Sub p_read_com()
+If SCREEN.CreateObject("Info") Then
+ 	COM.text = Trim(INFO.PopData(LOGIN.Name, myFILE, myMAP, "COMBO1"))
+End If
+End Sub
+
+Sub p_write_com()
+If SCREEN.CreateObject("Info") Then
+	COM.Text = COMBO1.Data
+  INFO.PushData LOGIN.Name, myFILE, myMAP, "COMBO1", COM.Text
+End If
+End Sub
+
+Sub SetComboItem(nData, hCombo)
+	Dim sItem
+	If nData = "8" Or nData = "0" Or nData = "9" Or nData = "1" Then
+		sItem = hCombo.Data & vbTab & "01금융투자" & vbTab & "02보험" & vbTab & "03투신" & vbTab & "12사모" & vbTab & "04은행" & vbTab & "05기타금융" & vbTab & "06연기금" & vbTab &  "13국가" & vbTab & "07기타법인" & vbTab & "08개인" & vbTab & "09외국인"
+	Else
+		sItem = hCombo.Data & vbTab & "01금융투자" & vbTab & "02보험" & vbTab & "03투신" & vbTab & "04은행" & vbTab & "05기타금융" & vbTab & "06연기금" & vbTab & "07기타법인" & vbTab & "08개인" & vbTab & "09외국인"
+	End If
+
+	hCombo.SetItems(sItem)
+
+End Sub
+
+_AW_ONSTART_AW_
+p_read_com()
+
+If COM.text <> "1" Then
+	SCREEN.SetTimer 1, False
+End If
+
+
+gubn = Trim(INFO.PopData(LOGIN.Name, myFILE, myMAP, "GU_BN"))
+
+If gubn <> "" Then
+	COM1.Index = Trim(INFO.PopData(LOGIN.Name, myFILE, myMAP, "COM1"))
+	COM2.Index = Trim(INFO.PopData(LOGIN.Name, myFILE, myMAP, "COM2"))
+	sgub1.Data = Trim(INFO.PopData(LOGIN.Name, myFILE, myMAP, "BUT1"))
+
+	Call SetComboItem(COM1.Data, COM2)
+
+	If sgub1.Data = "1" Then
+		B_01.Text = "증  감"
+	Else
+		B_01.Text = "누  적"
+	End If
+
+	combb = Trim(INFO.PopData(LOGIN.Name, myFILE, myMAP, "COM3"))
+	If combb <> "" Then
+		COM3.Index = Trim(INFO.PopData(LOGIN.Name, myFILE, myMAP, "COM3"))
+		COM4.Index = Trim(INFO.PopData(LOGIN.Name, myFILE, myMAP, "COM4"))
+		sgub2.Data = Trim(INFO.PopData(LOGIN.Name, myFILE, myMAP, "BUT2"))
+
+		Call SetComboItem(COM3.Data, COM4)
+
+		If sgub2.Data = "1" Then
+			B_02.Text = "증  감"
+		Else
+			B_02.Text = "누  적"
+		End If
+	End If
+End If
+
+'MsgBox(gubn)
+'Select Case gubn
+'	Case "0"
+'		COM1.Index = Trim(INFO.PopData(LOGIN.Name, myFILE, myMAP, "COM1"))
+'		COM2.Index = Trim(INFO.PopData(LOGIN.Name, myFILE, myMAP, "COM2"))
+'		sgub1.Data = Trim(INFO.PopData(LOGIN.Name, myFILE, myMAP, "BUT1"))
+'		If sgub1.Data = "1" Then
+'			B_01.Text = "증  감"
+'		Else
+'			B_01.Text = "누  적"
+'		End If
+'
+'	Case "1"
+'	If gubn <> "" Then
+'		COM1.Index = Trim(INFO.PopData(LOGIN.Name, myFILE, myMAP, "COM1"))
+'		COM2.Index = Trim(INFO.PopData(LOGIN.Name, myFILE, myMAP, "COM2"))
+'		sgub1.Data = Trim(INFO.PopData(LOGIN.Name, myFILE, myMAP, "BUT1"))
+'		If sgub1.Data = "1" Then
+'			B_01.Text = "증  감"
+'		Else
+'			B_01.Text = "누  적"
+'		End If
+'
+'		combb = Trim(INFO.PopData(LOGIN.Name, myFILE, myMAP, "COM3"))
+'		If combb <> "" Then
+'			COM3.Index = Trim(INFO.PopData(LOGIN.Name, myFILE, myMAP, "COM3"))
+'			COM4.Index = Trim(INFO.PopData(LOGIN.Name, myFILE, myMAP, "COM4"))
+'			sgub2.Data = Trim(INFO.PopData(LOGIN.Name, myFILE, myMAP, "BUT2"))
+'
+'			If sgub2.Data = "1" Then
+'				B_02.Text = "증  감"
+'			Else
+'				B_02.Text = "누  적"
+'			End If
+'		End If
+'	End If
+'End Select
+
+SCREEN.Send 0
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+Select Case COM1.Data
+	Case "0"
+		upgb1.Data = "1"
+		gubn1.Data = "0"
+	Case "1"
+		upgb1.Data = "2"
+		gubn1.Data = "0"
+	Case "2"
+		upgb1.Data = "3"
+		gubn1.Data = "1"
+	Case "3"
+		upgb1.Data = "3"
+		gubn1.Data = "0"
+	Case "4"
+		upgb1.Data = "4"
+		gubn1.Data = "1"
+	Case "5"
+		upgb1.Data = "4"
+		gubn1.Data = "0"
+	Case "6"
+		upgb1.Data = "5"
+		gubn1.Data = "1"
+	Case "7"
+		upgb1.Data = "5"
+		gubn1.Data = "1"
+	Case "8"
+		upgb1.Data = "1"
+		gubn1.Data = "1"
+	Case "9"
+		upgb1.Data = "2"
+		gubn1.Data = "1"
+End Select
+tjcd1.data = COM2.Data
+
+Select Case COM3.Data
+	Case "0"
+		upgb2.Data = "1"
+		gubn2.Data = "0"
+	Case "1"
+		upgb2.Data = "2"
+		gubn2.Data = "0"
+	Case "2"
+		upgb2.Data = "3"
+		gubn2.Data = "1"
+	Case "3"
+		upgb2.Data = "3"
+		gubn2.Data = "0"
+	Case "4"
+		upgb2.Data = "4"
+		gubn2.Data = "1"
+	Case "5"
+		upgb2.Data = "4"
+		gubn2.Data = "0"
+	Case "6"
+		upgb2.Data = "5"
+		gubn2.Data = "1"
+	Case "7"
+		upgb2.Data = "5"
+		gubn2.Data = "1"
+	Case "8"
+		upgb2.Data = "1"
+		gubn2.Data = "1"
+	Case "9"
+		upgb2.Data = "2"
+		gubn2.Data = "1"
+End Select
+tjcd2.data = COM4.Data
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+'SYSTEM.Push "GUBN", "2"
+'SYSTEM.Push "COM1", COM1.Index
+'SYSTEM.Push "COM2", COM2.Index
+'SYSTEM.Push "BUT1", sgub1.Data
+'
+'SYSTEM.Push "COM3", COM3.Index
+'SYSTEM.Push "COM4", COM4.Index
+'SYSTEM.Push "BUT2", sgub2.Data
+
+If SCREEN.CreateObject("Info") Then
+	INFO.PushData LOGIN.Name, myFILE, myMAP, "GU_BN", "1"
+
+	INFO.PushData LOGIN.Name, myFILE, myMAP, "COM1", COM1.Index
+	INFO.PushData LOGIN.Name, myFILE, myMAP, "COM2", COM2.Index
+	INFO.PushData LOGIN.Name, myFILE, myMAP, "BUT1", sgub1.Data
+
+	INFO.PushData LOGIN.Name, myFILE, myMAP, "COM3", COM3.Index
+	INFO.PushData LOGIN.Name, myFILE, myMAP, "COM4", COM4.Index
+	INFO.PushData LOGIN.Name, myFILE, myMAP, "BUT2", sgub2.Data
+End If
+
+_AW_ONENDSUB_AW_
+_AW_ONTIMER_AW_
+Select Case COM.text
+	Case "0"
+		SCREEN.changemap "IB291900"
+	Case "1"
+		SCREEN.changemap "IB291901"
+	Case "2"
+		SCREEN.changemap "IB291902"
+End Select
+
+_AW_ONENDSUB_AW_
+_AW_ONCLOSE_AW_
+If SCREEN.CreateObject("Info") Then
+	INFO.PushData LOGIN.Name, myFILE, myMAP, "GU_BN", "1"
+
+	INFO.PushData LOGIN.Name, myFILE, myMAP, "COM1", COM1.Index
+	INFO.PushData LOGIN.Name, myFILE, myMAP, "COM2", COM2.Index
+	INFO.PushData LOGIN.Name, myFILE, myMAP, "BUT1", sgub1.Data
+
+	INFO.PushData LOGIN.Name, myFILE, myMAP, "COM3", COM3.Index
+	INFO.PushData LOGIN.Name, myFILE, myMAP, "COM4", COM4.Index
+	INFO.PushData LOGIN.Name, myFILE, myMAP, "BUT2", sgub2.Data
+End If
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(BUTTON3)
+_AW_ONCLICK_AW_
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(COMBO1)
+_AW_ONCHANGE_AW_
+Select Case COMBO1.data
+	Case "0"
+		SYSTEM.push "GUBN", "1"
+		SYSTEM.Push "COM1", COM1.index
+		SYSTEM.Push "COM2", COM2.Index
+		SYSTEM.Push "BUT1", sgub1.data
+		p_write_com()
+		SCREEN.changemap "IB291900"
+	Case "1"
+	Case "2"
+		SYSTEM.push "GUBN", "1"
+		SYSTEM.Push "COM1", COM1.index
+		SYSTEM.Push "COM2", COM2.Index
+		SYSTEM.Push "BUT1", sgub1.data
+		SYSTEM.Push "COM3", COM3.index
+		SYSTEM.Push "COM4", COM4.Index
+		SYSTEM.Push "BUT2", sgub2.data
+		p_write_com()
+		SCREEN.changemap "IB291902"
+End Select
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(26500)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(COM2)
+_AW_ONCHANGE_AW_
+'tjcd1.data = COM2.Data
+
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(B_01)
+_AW_ONCLICK_AW_
+Select Case sgub1.Data
+	Case "1"
+		sgub1.Data = "0"
+		B_01.Text = "누  적"
+	Case "0"
+		sgub1.Data = "1"
+		B_01.Text = "증  감"
+End Select
+
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(COM1)
+_AW_ONCHANGE_AW_
+'Select Case COM1.Data
+'	Case "0"
+'		upgb1.Data = "1"
+'		gubn1.Data = "0"
+'	Case "1"
+'		upgb1.Data = "2"
+'		gubn1.Data = "0"
+'	Case "2"
+'		upgb1.Data = "3"
+'		gubn1.Data = "1"
+'	Case "3"
+'		upgb1.Data = "3"
+'		gubn1.Data = "0"
+'	Case "4"
+'		upgb1.Data = "4"
+'		gubn1.Data = "1"
+'	Case "5"
+'		upgb1.Data = "4"
+'		gubn1.Data = "0"
+'	Case "6"
+'		upgb1.Data = "5"
+'		gubn1.Data = "1"
+'	Case "7"
+'		upgb1.Data = "5"
+'		gubn1.Data = "1"
+'End Select
+
+Call SetComboItem(COM1.Data, COM2)
+
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(COM4)
+_AW_ONCHANGE_AW_
+'tjcd2.data = COM4.Data
+
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(B_02)
+_AW_ONCLICK_AW_
+Select Case sgub2.Data
+	Case "1"
+		sgub2.Data = "0"
+		B_02.Text = "누  적"
+	Case "0"
+		sgub2.Data = "1"
+		B_02.Text = "증  감"
+End Select
+
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(COM3)
+_AW_ONCHANGE_AW_
+'Select Case COM3.Data
+'	Case "0"
+'		upgb2.Data = "1"
+'		gubn2.Data = "0"
+'	Case "1"
+'		upgb2.Data = "2"
+'		gubn2.Data = "0"
+'	Case "2"
+'		upgb2.Data = "3"
+'		gubn2.Data = "1"
+'	Case "3"
+'		upgb2.Data = "3"
+'		gubn2.Data = "0"
+'	Case "4"
+'		upgb2.Data = "4"
+'		gubn2.Data = "1"
+'	Case "5"
+'		upgb2.Data = "4"
+'		gubn2.Data = "0"
+'	Case "6"
+'		upgb2.Data = "5"
+'		gubn2.Data = "1"
+'	Case "7"
+'		upgb2.Data = "5"
+'		gubn2.Data = "1"
+'End Select
+
+Call SetComboItem(COM3.Data, COM4)
+
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

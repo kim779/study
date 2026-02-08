@@ -1,0 +1,186 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB453620)
+MAPSIZE(256, 161)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("굴림", 9, NORMAL)
+OPTIONS(FMS|FLASH)
+TITLE("스프레드종목분석")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pooppoop")
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL67(80, 0, 160, 20)  '이론가SP'  LINECOLOR(0)      COLOR(74, 192)  CUR(0)    AL_CENTER  FONT("굴림체", 9, NORMAL)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL4(0, 0, 80, 20)  '현재가SP'  LINECOLOR(0)      COLOR(74, 192)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  out4(0, 20, 80, 40)  LEN(8)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_SKIP|FA_CORGB|FA_FLOAT|SA_ZERO|SA_COSIGN    COLOR(76, 69)  CUR(0)  LINECOLOR(0)        FLOAT(2)    IFRGB(94, 95)  TABORDER(0)  IOORDER(10)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  out1(80, 20, 160, 40)  LEN(8)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_SKIP|FA_CORGB|FA_FLOAT|SA_ZERO|SA_COSIGN    COLOR(76, 69)  CUR(0)  LINECOLOR(0)        FLOAT(2)    IFRGB(94, 95)  TABORDER(0)  IOORDER(7)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  100021(175, 115, 310, 135)  LEN(16)  IO_MIXED|AL_CENTER|  FONT("굴림체", 9, NORMAL)    COLOR(192, 69)  CUR(0)  LINECOLOR(75)          TABORDER(0)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  100301(185, 155, 305, 174)  LEN(8)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(1)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  obj_1(0, 80, 160, 165)    "IB453640"  TABORDER(2)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  obj_2(0, 165, 160, 255)    "IB453640"  TABORDER(3)  IOORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  code1(500, 40, 559, 59)  LEN(8)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(4)  IOORDER(5)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  code2(500, 200, 560, 219)  LEN(8)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(5)  IOORDER(6)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL0(0, 40, 80, 60)  '매수SP'  LINECOLOR(0)      COLOR(74, 192)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL1(80, 40, 160, 60)  '매도SP'  LINECOLOR(0)      COLOR(74, 192)  CUR(0)    AL_CENTER  FONT("굴림체", 9, NORMAL)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  out2(0, 60, 80, 80)  LEN(8)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_SKIP|FA_CORGB|FA_FLOAT|SA_ZERO|SA_COSIGN    COLOR(76, 69)  CUR(0)  LINECOLOR(0)        FLOAT(2)    IFRGB(94, 95)  TABORDER(0)  IOORDER(8)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  out3(80, 60, 160, 80)  LEN(8)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_SKIP|FA_CORGB|FA_FLOAT|SA_ZERO|SA_COSIGN    COLOR(76, 69)  CUR(0)  LINECOLOR(0)        FLOAT(2)    IFRGB(94, 95)  TABORDER(0)  IOORDER(9)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Sub Set_code()
+	Dim code
+	code = S100301.Data
+
+	code1.Data = "1" & Mid(code,2,2) & Mid(code,4,2) & "000"
+	code2.Data = "1" & Mid(code,2,2) & Mid(code,6,2) & "000"
+
+	SCREEN.Object("obj_1.100301").Data = code1.Data
+	SCREEN.Object("obj_1.tPANEL").Text = code1.Data
+	obj_1.Send
+
+	SCREEN.Object("obj_2.100301").Data = code2.Data
+	SCREEN.Object("obj_2.tPANEL").Text = code2.Data
+	obj_2.Send
+End Sub
+
+Function make_cal( a )
+	If CDbl(a) > 0 Then
+		make_cal = "+" & a
+	Else
+		make_cal = a
+	End If
+End Function
+
+Sub cal()
+	Dim a, b
+
+	' 이론가 SP
+	a = Trim(SCREEN.Object("obj_1.101202").Data)
+	b = Trim(SCREEN.Object("obj_2.101202").Data)
+
+	If Len(Trim(a)) < 1 Then
+		a = 0
+	End If
+
+	If Len(Trim(b)) = 0 Then
+		SYSTEM.Trace("Exit Sub")
+	 	Exit Sub
+	End If
+
+	out1.Data = make_cal( CStr( Round(CDbl(a)-CDbl(b),2) ) )
+
+	' 현재가 SP
+	a = Trim(SCREEN.Object("obj_1.101023").Data)
+	b = Trim(SCREEN.Object("obj_2.101023").Data)
+
+	If Len(Trim(a)) < 1 Then
+		a = 0
+	End If
+
+	out4.Data = make_cal( CStr( Round(CDbl(a)-CDbl(b),2) ) )
+
+	' 매수 SP
+	a = Trim(SCREEN.Object("obj_1.102071").Data)
+	b = Trim(SCREEN.Object("obj_2.102071").Data)
+
+	If Len(Trim(a)) < 1 Then
+		a = 0
+	End If
+
+	If Len(Trim(b)) = 0 Then
+		b = 0
+	End If
+
+	out2.Data = make_cal( CStr( Round(CDbl(a)-CDbl(b),2) ) )
+
+	' 매도 SP
+	a = Trim(SCREEN.Object("obj_1.102051").Data)
+	b = Trim(SCREEN.Object("obj_2.102051").Data)
+
+	If Len(Trim(a)) < 1 Then
+		a = 0
+	End If
+
+	If Len(Trim(b)) = 0 Then
+		b = 0
+	End If
+
+	a = Replace(a, "0+", "+")
+	b = Replace(b, "0+", "+")
+
+	a = Replace(a, "0-", "-")
+	b = Replace(b, "0-", "-")
+	
+	out3.Data = make_cal( CStr( Round(CDbl(a)-CDbl(b),2) ) )
+End Sub
+
+_AW_ONSTART_AW_
+'S100301.Data = SCREEN.Object("main.ed_csp").Data
+'SCREEN.Send 0
+'
+'Set_code()
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+S100301.Data = SCREEN.Object("main.ed_csp").Data
+
+'Set_code()
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+Call Set_code()
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(out4)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(out1)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(out2)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(out3)
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

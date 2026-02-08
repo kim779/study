@@ -1,0 +1,547 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB951100)
+MAPSIZE(726, 836)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("HTS 활용도 측정")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+TITLE("[9511] 동시접속자 통계")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pmhotrst")
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL63(-1, 76, 840, 706)  LIMAGE(0)  LINEW(3)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL_bg(0, 0, 840, 76)  LIMAGE(1)  LINEW(3)  LINETYPE(4)  LINECOLOR(64)      COLOR(66, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL2(6, 29, 54, 49)  '기간검색'  AL_LEFT  CUR(0)      COLOR(208, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL3(1080, 125, 1086, 145)  '~'  AL_LEFT  CUR(0)      COLOR(208, 130)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL4(6, 6, 54, 26)  '기간별'  AL_LEFT  CUR(0)      COLOR(208, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  RADIO1(60, 6, 110, 26)  '시간별'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(grp1)      COLOR(208, 130)  CUR(0)      TABORDER(2)  ENABLE  &
+  VISIBLE  CHECKED  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  RADIO0(116, 6, 167, 26)  '일자별'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(grp1)      COLOR(208, 130)  CUR(0)      TABORDER(3)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  RADIO2(173, 6, 211, 26)  '월별'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(grp1)      COLOR(208, 130)  CUR(0)      TABORDER(4)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+GRID  GRID0(6, 83, 832, 698)  VISIBLEROW(0)  CELLH(18)  MATRIX(1000, 14)  FIX(0)  MAINCOLOR(7, 0)  LINECOLOR(75)  FOCUSCOLOR(78)  FOCUSKIND(3)  ROWC(68, 77)  |MERGE|FLEXIBLE|VSCROLL|INS_TOP|NO3D|RROW|XHLINE|HEADER|KEYFOCUS|GRFTEXT|GRXSIZE|GLINE    &
+	COLINFO("date")  LEN(14)  WIDTH(79)  HEAD("기간")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT  |FA_CORGB|SA_CORAW    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(232, 232)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col1")  LEN(5)  WIDTH(79)  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_NUM|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col0")  LEN(40)  WIDTH(79)  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_NUM|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("ecnt")  LEN(10)  WIDTH(79)  HEAD("직원")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_CORAW    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  COLUMN_SORT  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("ccnt")  LEN(10)  WIDTH(79)  HEAD("고객(정회원)")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|SA_SPACE    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  COLUMN_SORT  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("jcnt")  LEN(10)  WIDTH(79)  HEAD("고객(준회원)")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|SA_SPACE    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  COLUMN_SORT  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col2")  LEN(10)  WIDTH(119)  HEAD("HTS 합계")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_SKIP|SA_SPACE    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("wcnt")  LEN(10)  WIDTH(119)  HEAD("WTS")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|SA_SPACE    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col3")  LEN(10)  WIDTH(119)  HEAD("MTS")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|SA_SPACE    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col5")  LEN(10)  WIDTH(79)  HEAD("신MTS")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|SA_SPACE    COLOR(68, 69)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col6")  LEN(10)  WIDTH(79)  HEAD("카카오증권")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|SA_SPACE    COLOR(68, 69)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col4")  LEN(10)  WIDTH(79)  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_NUM|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("mwcnt")  LEN(10)  WIDTH(79)  HEAD("iONE")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|SA_SPACE    COLOR(68, 69)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("tcnt")  LEN(10)  WIDTH(136)  HEAD("매체 합계")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_SKIP|SA_SPACE    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  COLUMN_SORT  INORMAL    HNORMAL  SORTSTARTPOS(0)    TABORDER(5)  IOORDER(6)  ENABLE  &
+  VISIBLE
+
+BUTTON  send_btn(793, 4, 830, 24)  '조회'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, BOLD)  FOCUS  COLOR(208, 186)  CUR(0)    "조회btn.bmp"    TABORDER(1)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+GROUP  grp1(1045, 331, 1165, 381)  'Group'        COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  TDM(1045, 261, 1061, 280)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("1")          TABORDER(6)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  BUTTON3(772, 4, 792, 24)  TP_PUSH|IMAGE|AL_STRETCH      COLOR(208, 232)  CUR(0)    "엑셀.bmp"    TABORDER(7)  ENABLE  &
+  VISIBLE  IMAGE  HOVER  HINTTYPE(IH_NONE)
+OUT  GUIDE(1052, 474, 1462, 492)  LEN(80)  IO_MIXED|AL_LEFT|    COLOR(66, 69)  CUR(0)            TABORDER(0)  IOORDER(5)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  sdat(59, 29, 146, 49)  LEN(8)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP|FA_DATE    COLOR(192, 130)  CUR(0)  TP_SUNKEN          EDITFORMAT("9999/99/99")  TABORDER(10)  IOORDER(9)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  edat(1095, 125, 1182, 145)  LEN(8)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP|FA_DATE    COLOR(192, 130)  CUR(0)  TP_SUNKEN          EDITFORMAT("9999/99/99")  TABORDER(11)  IOORDER(10)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  zStrDt(1064, 261, 1124, 280)  LEN(8)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("1")          TABORDER(12)  IOORDER(3)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  zEndDt(1127, 261, 1189, 280)  LEN(8)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("1")          TABORDER(13)  IOORDER(4)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  yesYear(1039, 395, 1118, 414)  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  yesMonth(1125, 395, 1199, 414)  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  yesDay(1209, 396, 1283, 415)  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+COMBO  month(166, 29, 253, 49)  TP_SUNKEN  LEN(2)  COUNT(12)  VCOUNT(12)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_NUM|EDIT_INPUT|FA_SKIP    COLOR(192, 130)  CUR(0)  DISPLAY("1월", "2월", "3월", "4월", "5월", "6월", "7월", "8월", "9월", "10월", "11월", "12월")  DATA("01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12")    TABORDER(9)  IOORDER(8)  ENABLE  &
+  HINTTYPE(IH_NONE)
+COMBO  year(59, 29, 146, 49)  TP_SUNKEN  LEN(4)  COUNT(19)  VCOUNT(19)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_NUM|EDIT_INPUT|FA_SKIP    COLOR(192, 130)  CUR(0)  DISPLAY("2010년", "2011년", "2012년", "2013년", "2014년", "2015년", "2016년", "2017년", "2018년", "2019년", "2020년", "2021년", "2022년", "2023년", "2024년", "2025년", "2026년", "2027년", "2028년")  DATA("2010", "2011", "2012", "2013", "2014", "2015", "2016", "2017", "2018", "2019", "2020", "2021", "2022", "2023", "2024", "2025", "2026", "2027", "2028")    TABORDER(8)  IOORDER(7)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  dflag(1185, 344, 1212, 363)  '0'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  mflag(1217, 344, 1244, 363)  '0'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL5(13, 52, 287, 72)  '이 화면은 전일 데이터까지 조회할 수 있습니다.'  AL_LEFT  CUR(0)      COLOR(208, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+PANEL  PANEL2(3, 56, 13, 66)    |IMAGETEXT|AL_CENTER    COLOR(208, 232)  CUR(0)    "텍스트화살표_상단.bmp"  ENABLE  &
+  VISIBLE  TRANSPARENT  IMAGETEXT  HINTTYPE(IH_NONE)
+BUTTON  RADIO3(217, 6, 285, 26)  '순방문자'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(grp1)      COLOR(208, 130)  CUR(0)      TABORDER(14)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  btn(739, 27, 831, 47)  '당일내역 확인'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, NORMAL)  FOCUS  COLOR(208, 186)  CUR(0)    "7BTN.BMP"    TABORDER(15)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+PANEL  PANEL11(-2, 727, 839, 730)        COLOR(64, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  GUIDE1(-2, 704, 840, 728)  LIMAGE(1)  LINEW(3)  STRESS(0)  STRESSW(0)  LINETYPE(4)  LINECOLOR(64)      COLOR(34, 69)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL0(7, 709, 21, 723)    |IMAGE|AL_STRETCH    COLOR(208, 232)  CUR(0)    "알림_ic.bmp"  ENABLE  &
+  VISIBLE  TRANSPARENT  IMAGE  HINTTYPE(IH_NONE)
+OBJECT  obj_gmsg(21, 707, 646, 725)  |FA_ENUM  "IB951101"  TABORDER(16)  IOORDER(11)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  CHECK0(314, 6, 397, 26)  '휴장일 제외'  TP_CHECK|EDIT_NOP          COLOR(66, 130)  CUR(0)      TABORDER(17)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  hjgu(1193, 259, 1209, 278)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("0")          TABORDER(18)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONSTART_AW_
+yesYear.Text = Left(DateAdd("d", -1, Date), 4)
+yesMonth.Text = Mid(DateAdd("d", -1, Date), 6, 2)
+yesDay.Text = Right(DateAdd("d", -1, Date), 2)
+
+
+sdat.Data = yesYear.Text & yesMonth.Text & yesDay.Text
+edat.Data = yesYear.Text & yesMonth.Text & yesDay.Text
+
+zStrDt.Data = sdat.Data
+zEndDt.Data = edat.Data
+
+GRID0.SetColumnVisible 6, False
+GRID0.SetColumnVisible 10, False
+GRID0.SetColumnVisible 11, False
+GRID0.SetColumnVisible 13, False
+
+GRID0.SetColumnWidth 4, 118
+GRID0.SetColumnWidth 5, 119
+
+GRID0.SetHead 5, "고객"
+
+SCREEN.SEND 0
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+Dim i, emp, acust, bcust, htot, Total, huser, wuser, muser, juser, kuser, dayd, mwuser
+SCREEN.Object("obj_gmsg.gmsg").data = Trim(GUIDE.Data)
+
+If RADIO3.Checked = True Then
+	For i = 1 To GRID0.Rows
+	If Trim(GRID0.GetGridCell (i, 4)) = "" Then
+		emp =0
+	Else
+		emp = CLng(Trim(GRID0.GetGridCell (i, 4)))
+	End If
+
+	If Trim(GRID0.GetGridCell (i, 5)) = "" Then
+		acust = 0
+	Else
+		acust = CLng(Trim(GRID0.GetGridCell (i, 5)))
+	End If
+
+	If Trim(GRID0.GetGridCell (i, 6)) = "" Then
+		bcust = 0
+	Else
+		bcust = CLng(Trim(GRID0.GetGridCell (i, 6)))
+	End If
+
+	If Trim(GRID0.GetGridCell (i, 8)) = "" Then
+		wuser = 0
+	Else
+		wuser = CLng(Trim(GRID0.GetGridCell (i, 8)))
+	End If
+
+	If Trim(GRID0.GetGridCell (i, 9)) = "" Then
+		muser = 0
+	Else
+		muser = CLng(Trim(GRID0.GetGridCell (i, 9)))
+	End If
+
+	If Trim(GRID0.GetGridCell (i, 10)) = "" Then
+		juser = 0
+	Else
+		juser = CLng(Trim(GRID0.GetGridCell (i, 10)))
+	End If
+
+	If Trim(GRID0.GetGridCell (i, 11)) = "" Then
+		kuser = 0
+	Else
+		kuser = CLng(Trim(GRID0.GetGridCell (i, 11)))
+	End If
+
+	If Trim(GRID0.GetGridCell (i, 13)) = "" Then
+		mwuser = 0
+	Else
+		mwuser = CLng(Trim(GRID0.GetGridCell (i, 13)))
+	End If
+
+	dayd = Mid(Trim(GRID0.GetGridCell (i, 1)), 1, 2)
+	dayd = FormatNumber(dayd, 0)
+
+	If (year.Data = 2020 And month.Data = 12 And dayd >= 4) Or (year.Data > 2020) Then
+		htot = CLng(Trim(GRID0.GetGridCell (i, 12)))
+		Total = htot + wuser + muser + juser + kuser + mwuser
+	Else
+		htot = emp + acust + bcust
+		Total = htot + wuser + muser + juser + kuser + mwuser
+	End If
+
+	GRID0.SetGridCell i, 5, htot - emp
+	GRID0.SetGridCell i, 7, htot
+	GRID0.SetGridCell i, 14, Total
+	Next
+
+Else
+	For i = 1 To GRID0.Rows
+	If Trim(GRID0.GetGridCell (i, 4)) = "" Then
+		emp =0
+	Else
+		emp = CLng(Trim(GRID0.GetGridCell (i, 4)))
+	End If
+
+	If Trim(GRID0.GetGridCell (i, 5)) = "" Then
+		acust = 0
+	Else
+		acust = CLng(Trim(GRID0.GetGridCell (i, 5)))
+	End If
+
+	If Trim(GRID0.GetGridCell (i, 6)) = "" Then
+		bcust = 0
+	Else
+		bcust = CLng(Trim(GRID0.GetGridCell (i, 6)))
+	End If
+
+		If Trim(GRID0.GetGridCell (i, 8)) = "" Then
+		wuser = 0
+	Else
+		wuser = CLng(Trim(GRID0.GetGridCell (i, 8)))
+	End If
+
+	If Trim(GRID0.GetGridCell (i, 9)) = "" Then
+		muser = 0
+	Else
+		muser = CLng(Trim(GRID0.GetGridCell (i, 9)))
+	End If
+
+
+	htot = emp + acust + bcust
+	Total = htot + wuser + muser
+
+	GRID0.SetGridCell i, 5, acust + bcust
+	GRID0.SetGridCell i, 7, htot
+	GRID0.SetGridCell i, 14, Total
+	Next
+
+End If
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(RADIO1)
+_AW_ONCLICK_AW_
+sdat.Visible = True
+'edat.Visible = True
+year.Visible = False
+month.Visible = False
+'LABEL3.Visible = True
+CHECK0.Visible = False
+
+zStrDt.Data = sdat.Data
+zEndDt.Data = edat.Data
+btn.Visible = True
+TDM.Data = "1"
+
+GRID0.SetColumnVisible 6, False
+GRID0.SetColumnVisible 10, False
+GRID0.SetColumnVisible 11, False
+GRID0.SetColumnVisible 13, False
+
+GRID0.SetColumnWidth 4, 118
+GRID0.SetColumnWidth 5, 119
+GRID0.SetColumnWidth 7, 119
+GRID0.SetColumnWidth 8, 119
+GRID0.SetColumnWidth 9, 119
+GRID0.SetColumnWidth 14, 137
+
+GRID0.SetHead 5, "고객"
+
+SCREEN.ClearAll 2, 2
+SCREEN.SEND 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(RADIO0)
+_AW_ONCLICK_AW_
+sdat.Visible = False
+'edat.Visible = False
+year.Visible = True
+month.Visible = True
+'LABEL3.Visible = False
+CHECK0.Visible = True
+
+If dflag.Text = "0" Then
+	year.data = yesYear.text
+	month.data = yesMonth.Text
+End If
+
+zStrDt.Data = year.data & month.data & "01"
+zEndDt.Data = year.data & month.data & "31"
+btn.Visible = False
+TDM.Data = "2"
+
+GRID0.SetColumnVisible 6, False
+GRID0.SetColumnVisible 10, False
+GRID0.SetColumnVisible 11, False
+GRID0.SetColumnVisible 13, False
+
+GRID0.SetColumnWidth 4, 118
+GRID0.SetColumnWidth 5, 119
+GRID0.SetColumnWidth 7, 119
+GRID0.SetColumnWidth 8, 119
+GRID0.SetColumnWidth 9, 119
+GRID0.SetColumnWidth 14, 137
+
+GRID0.SetHead 5, "고객"
+
+SCREEN.ClearAll 2, 2
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(RADIO2)
+_AW_ONCLICK_AW_
+sdat.Visible = False
+'edat.Visible = False
+year.Visible = True
+month.Visible = False
+'LABEL3.Visible = False
+CHECK0.Visible = False
+
+TDM.Data = "3"
+
+If mflag.Text = "0" Then
+	year.data = yesYear.text
+End If
+btn.Visible = False
+zStrDt.Data = year.data & "0101"
+zEndDt.Data = year.data & "1231"
+
+GRID0.SetColumnVisible 6, False
+GRID0.SetColumnVisible 10, False
+GRID0.SetColumnVisible 11, False
+GRID0.SetColumnVisible 13, False
+
+GRID0.SetColumnWidth 4, 118
+GRID0.SetColumnWidth 5, 119
+GRID0.SetColumnWidth 7, 119
+GRID0.SetColumnWidth 8, 119
+GRID0.SetColumnWidth 9, 119
+GRID0.SetColumnWidth 14, 137
+
+GRID0.SetHead 5, "고객"
+
+SCREEN.ClearAll 2, 2
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(GRID0)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(send_btn)
+_AW_ONCLICK_AW_
+SCREEN.ClearAll 2, 2
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON3)
+_AW_ONCLICK_AW_
+GRID0.Excel True,True,""
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(sdat)
+_AW_ONCHANGE_AW_
+zStrDt.Data = sdat.Data
+
+SCREEN.ClearAll 2, 2
+SCREEN.SEND 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(edat)
+_AW_ONCHANGE_AW_
+zEndDt.Data = edat.Data
+
+SCREEN.ClearAll 2, 2
+SCREEN.SEND 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(zStrDt)
+_AW_ONCHANGE_AW_
+SCREEN.SEND 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(zEndDt)
+_AW_ONCHANGE_AW_
+SCREEN.SEND 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(month)
+_AW_ONCHANGE_AW_
+zStrDt.Data = year.Data & month.Data & "01"
+zEndDt.Data = year.Data & month.Data & "31"
+
+dflag.Text = "1"
+
+SCREEN.ClearAll 2, 2
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(year)
+_AW_ONCHANGE_AW_
+If RADIO0.Checked = True Or RADIO3.Checked = True Then
+	zStrDt.Data = year.Data & month.Data & "01"
+	zEndDt.Data = year.Data & month.Data & "31"
+ElseIf	RADIO2.Checked = True Then
+	zStrDt.Data = year.Data & "0101"
+	zEndDt.Data = year.Data & "1231"
+Else
+	zStrDt.Data = sdat.Data
+	zEndDt.Data = edat.Data
+End If
+
+If RADIO0.Checked = True Then
+	dflag.Text = "1"
+ElseIf RADIO2.Checked = True Then
+	mflag.Text = "1"
+End If
+
+SCREEN.ClearAll 2, 2
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(RADIO3)
+_AW_ONCLICK_AW_
+sdat.Visible = False
+'edat.Visible = False
+year.Visible = True
+month.Visible = True
+'LABEL3.Visible = False
+CHECK0.Visible = True
+
+If dflag.Text = "0" Then
+	year.data = yesYear.text
+	month.data = yesMonth.Text
+End If
+btn.Visible = False
+zStrDt.Data = year.data & month.data & "01"
+zEndDt.Data = year.data & month.data & "31"
+
+TDM.Data = "8"
+
+GRID0.SetColumnVisible 6, False
+GRID0.SetColumnVisible 10, True
+GRID0.SetColumnVisible 11, True
+GRID0.SetColumnVisible 13, True
+
+GRID0.SetColumnWidth 4, 80
+GRID0.SetColumnWidth 5, 80
+GRID0.SetColumnWidth 7, 80
+GRID0.SetColumnWidth 8, 80
+GRID0.SetColumnWidth 9, 80
+GRID0.SetColumnWidth 13, 85
+GRID0.SetColumnWidth 14, 89
+
+GRID0.SetHead 5, "고객"
+
+SCREEN.ClearAll 2, 2
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(btn)
+_AW_ONCLICK_AW_
+Dim y, m, d
+y = Left(Date, 4)
+m = Mid(Date, 6, 2)
+d = Right(Date, 2)
+
+sdat.Data = y&m&d
+edat.Data = y&m&d
+
+zStrDt.Data = sdat.Data
+zEndDt.Data = edat.Data
+
+TDM.Data = "1"
+
+SCREEN.ClearAll 2, 2
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(CHECK0)
+_AW_ONCLICK_AW_
+If CHECK0.Checked = True Then
+	hjgu.Data = "1"
+Else
+	hjgu.Data = "0"
+End If
+
+SCREEN.ClearAll 2, 2
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ONDBLCLK_AW_
+If CHECK0.Checked = True Then
+	hjgu.Data = "1"
+Else
+	hjgu.Data = "0"
+End If
+
+SCREEN.ClearAll 2, 2
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

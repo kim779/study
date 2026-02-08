@@ -1,0 +1,118 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB291620)
+MAPSIZE(319, 727)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("[144620]")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+TITLE("[291620]")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("ping2916")
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+EDIT  gubn(477, 589, 497, 609)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(1)  IOORDER(5)  &
+  HINTTYPE(IH_NONE)
+EDIT  fday(476, 522, 539, 540)  LEN(8)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(2)  IOORDER(3)  &
+  HINTTYPE(IH_NONE)
+EDIT  tday(476, 544, 539, 562)  LEN(8)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(3)  IOORDER(4)  &
+  HINTTYPE(IH_NONE)
+EDIT  mscd(476, 473, 499, 492)  LEN(2)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(4)  IOORDER(2)  &
+  HINTTYPE(IH_NONE)
+CONTROL  CONTROL0(0, 0, 727, 318)  |FA_PROTECT  "C_UserGrp"  "/i10000001100011010100000000000000000030000000000711003355468710000000"  LEN(0)  EDIT_INOUT    COLOR(192, 232)  TABORDER(5)  IOORDER(6)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  mkcd(869, 164, 909, 184)  LEN(1)  IO_ALPHA|EDIT_INPUT  FONT("굴림체", 9, NORMAL)    COLOR(192, 130)  CUR(0)  TP_NONE          TABORDER(6)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONSEND_AW_
+Dim varSjup
+varSjup = SCREEN.Object("main.lblRBtnNo").text
+'시장코드&업종코드 세팅
+Select Case varSjup
+	Case 1
+		mscd.Data = 0
+		If SCREEN.Object("main.stock").data = 1 Then
+			gubn.Data = 0		' 금액
+		Else
+			gubn.Data = 1		' 수량
+		End If
+	Case 2
+		mscd.Data = 1 '27
+		If SCREEN.Object("main.stock").data = 1 Then
+			gubn.Data = 0		' 금액
+		Else
+			gubn.Data = 1		' 수량
+		End If
+	Case 3
+		mscd.Data = 2 '50
+		If SCREEN.Object("main.stock").data = 1 Then
+			gubn.Data = 0		' 금액
+		Else
+			gubn.Data = 1		' 수량
+		End If
+	Case 4
+		mscd.Data = 3 '40
+		If SCREEN.Object("main.future").data = 1 Then
+			gubn.Data = 0		' 금액
+		Else
+			gubn.Data = 1		' 수량
+		End If
+	Case 5
+		mscd.Data = 4 '42
+		If SCREEN.Object("main.coption").data = 1 Then
+			gubn.Data = 0		' 금액
+		Else
+			gubn.Data = 1		' 수량
+		End If
+	Case 6
+		mscd.Data = 5 '43
+		If SCREEN.Object("main.coption").data = 1 Then
+			gubn.Data = 0		' 금액
+		Else
+			gubn.Data = 1		' 수량
+		End If
+	Case Else
+		mscd.Data = 0
+		If SCREEN.Object("main.stock").data = 1 Then
+			gubn.Data = 0		' 금액
+		Else
+			gubn.Data = 1		' 수량
+		End If
+End Select
+fday.Data = SCREEN.Object("main.fday").Data
+tday.Data = SCREEN.Object("main.tday").Data
+
+
+If UCase(TypeName( SCREEN.Object("main.cxMarket"))) <> "NOTHING" Then
+	If SCREEN.Object("main.cxMarket").sMarket = "KRX" Then
+		mkcd.Data = "1"
+	ElseIf SCREEN.Object("main.cxMarket").sMarket = "NXT" Then
+		mkcd.Data = "2"
+	ElseIf SCREEN.Object("main.cxMarket").sMarket = "통합" Then
+		mkcd.Data = "3"
+	End If
+End If
+
+_AW_ONENDSUB_AW_
+}
+
+
+

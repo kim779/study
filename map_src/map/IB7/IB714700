@@ -1,0 +1,59 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB714700)
+MAPSIZE(626, 790)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("≈ı¿⁄±≥¿∞ºæ≈Õ")
+MAPPUBLIC(";")
+FONT("±º∏≤√º", 9, NORMAL)
+OPTIONS(FMS)
+TITLE("[7147]±≥¿∞Ω≈√ª/√Îº“")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL0(0, 0, 1, 58)        COLOR(64, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL63(0, 0, 835, 650)  LIMAGE(0)  LINEW(4)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  tabchange(5, 750, 20, 770)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("0")          TABORDER(1)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+CONTROL  CONTROL0(0, 0, 790, 625)  |FA_PROTECT  "CX_WebLink"  ""  LEN(0)  EDIT_NOP    COLOR(192, 232)  TABORDER(0)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONSTART_AW_
+If SCREEN.CreateObject("Info") Then
+	Dim gubn
+	gubn = Trim(INFO.PopData("", "notice7700.ini", "pop", "data"))
+
+	If gubn = 1 Then
+		CONTROL0.Navigate2 "/customer/edu/appr_list.do%3Fseq=6",True
+	Else
+		CONTROL0.Navigate2 "/customer/edu/appr_list.do",True
+	End If
+
+	INFO.PushData "", "notice7700.ini", "pop", "data", 0
+End If
+
+_AW_ONENDSUB_AW_
+}
+
+
+

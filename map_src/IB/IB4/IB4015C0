@@ -1,0 +1,378 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB4015C0)
+MAPSIZE(485, 440)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("민감도설정")
+MAPPUBLIC(";")
+FONT("굴림", 9, NORMAL)
+OPTIONS(CR2TAB)
+TITLE("민감도설정")
+TOPATH(AXIS)
+METHOD(MENU)
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL0(0, 0, 442, 485)  LIMAGE(0)  LINEW(3)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 69)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+GROUP  G0(560, 418, 994, 525)  ' 기초자산 가격 적용 '        COLOR(-1, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+GROUP  G1(557, 329, 991, 439)  ' 변동성 (Volatility) : 이론가 계산에 적용 '        COLOR(-1, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  R1_0(19, 153, 138, 170)  '사용자 정의 콜옵션'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(G1)      COLOR(0, 130)  CUR(0)      TABORDER(6)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  R1_1(19, 180, 350, 200)  'KOSPI200지수의 N일 역사적 변동성(Historical Volatility)'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(G1)      COLOR(0, 130)  CUR(0)      TABORDER(7)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL0(203, 153, 258, 170)  '%, 풋옵션'  AL_LEFT  CUR(0)      COLOR(0, 69)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL1(322, 153, 352, 168)  '%'  AL_LEFT  CUR(0)      COLOR(0, 69)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  edUserCall(140, 151, 198, 171)  LEN(6)  IO_NUM|EDIT_INPUT|FA_RIGHT|FA_WRAP    COLOR(68, 69)  CUR(0)  TP_SUNKEN          TABORDER(8)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  edUserPut(261, 151, 319, 171)  LEN(6)  IO_NUM|EDIT_INPUT|FA_RIGHT|FA_WRAP    COLOR(68, 69)  CUR(0)  TP_SUNKEN          TABORDER(9)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  edHV(355, 180, 409, 200)  LEN(6)  IO_NUM|EDIT_INPUT|FA_RIGHT|FA_WRAP    COLOR(68, 69)  CUR(0)  TP_SUNKEN          TABORDER(10)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL2(412, 181, 425, 200)  '%'  AL_LEFT  CUR(0)      COLOR(0, 69)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+GROUP  G2(482, 476, 916, 628)  ' 잔존일수 '        COLOR(-1, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  R2_0(22, 262, 162, 278)  '거래일수 기준 (권장)'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(G2)      COLOR(0, 130)  CUR(0)      TABORDER(11)  ENABLE  &
+  VISIBLE  CHECKED  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  R2_1(238, 261, 338, 278)  '달력일수 기준'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(G2)      COLOR(0, 130)  CUR(0)      TABORDER(12)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  chkTimeValue(22, 289, 405, 306)  '장중 시간가치 감소를 반영'  TP_CHECK|EDIT_NOP          COLOR(0, 130)  CUR(0)      TABORDER(13)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL3(38, 313, 162, 330)  '시간가치 감소시간대 :'  AL_LEFT  CUR(0)      COLOR(0, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  edTimeStart(166, 311, 206, 331)  LEN(4)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(68, 130)  CUR(0)  TP_SUNKEN          TABORDER(14)  IOORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  edTimeEnd(293, 311, 334, 331)  LEN(4)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(68, 130)  CUR(0)  TP_SUNKEN          TABORDER(15)  IOORDER(5)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL4(208, 313, 287, 330)  '부터 매매시간'  AL_LEFT  CUR(0)      COLOR(0, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL5(339, 313, 371, 330)  '동안'  AL_LEFT  CUR(0)      COLOR(0, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL6(38, 338, 225, 355)  '( 시간표시는 HHMM, 예 : 0800 )'  AL_LEFT  CUR(0)      COLOR(0, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL7(23, 366, 429, 383)  '주) 종목별 이론가 및 IV, 델타 등 Greeks값 계산시 잔존일수로 반영됩니다.'  AL_LEFT  CUR(0)      COLOR(0, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  R0_0(20, 34, 189, 52)  'KOSPI200 지수 - 배당지수'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(G0)      COLOR(0, 130)  CUR(0)      TABORDER(1)  ENABLE  &
+  VISIBLE  CHECKED  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  R0_1(20, 62, 113, 79)  '선물최근월물'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(G0)      COLOR(0, 130)  CUR(0)      TABORDER(2)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  R0_2(20, 89, 156, 109)  '가중 :  KOSPI200 지수'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(G0)      COLOR(0, 130)  CUR(0)      TABORDER(3)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  edK200Rate(161, 88, 219, 108)  LEN(5)  IO_NUM|EDIT_INPUT|FA_RIGHT|FA_WRAP    COLOR(68, 69)  CUR(0)  TP_SUNKEN  INIT("100")          TABORDER(4)  IOORDER(6)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL8(221, 91, 276, 108)  '%  +  선물'  AL_LEFT  CUR(0)      COLOR(0, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL9(342, 92, 372, 107)  '%'  AL_LEFT  CUR(0)      COLOR(0, 69)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  edFutureRate(281, 88, 339, 108)  LEN(5)  IO_NUM|EDIT_INPUT|FA_RIGHT|FA_WRAP    COLOR(68, 69)  CUR(0)  TP_SUNKEN  INIT("0")          TABORDER(5)  IOORDER(7)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  btnConfirm(360, 459, 396, 479)  '적용'  TP_PUSH|IMAGETEXT|AL_CENTER        FOCUS  COLOR(208, 232)  CUR(0)    "2BTN.BMP"    TABORDER(16)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+BUTTON  btnCancel(398, 459, 434, 479)  '취소'  TP_PUSH|IMAGETEXT|AL_CENTER        FOCUS  COLOR(208, 232)  CUR(0)    "2BTN.BMP"    TABORDER(17)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+BUTTON  btnInit(7, 459, 91, 479)  '초기값 적용'  TP_PUSH|IMAGETEXT|AL_CENTER        COLOR(208, 232)  CUR(0)    "6BTN.BMP"    TABORDER(18)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+CONTROL  Cfg(501, 22, 577, 74)    "CX_Cfg"  "/mMINGAM/c/d"  LEN(0)  EDIT_NOP    COLOR(192, 232)  TABORDER(0)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  R3_0(44, 205, 91, 217)  '90일'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(G1_1)      COLOR(0, 130)  CUR(0)      TABORDER(19)  ENABLE  &
+  VISIBLE  CHECKED  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  R3_1(107, 206, 154, 218)  '60일'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(G1_1)      COLOR(0, 130)  CUR(0)      TABORDER(20)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  R3_2(171, 205, 218, 217)  '30일'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(G1_1)      COLOR(0, 130)  CUR(0)      TABORDER(21)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  R3_3(233, 205, 280, 217)  '21일'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(G1_1)      COLOR(0, 130)  CUR(0)      TABORDER(22)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+GROUP  G1_1(658, 510, 805, 537)  'Group'        COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  R0_3(192, 61, 285, 78)  '자동계산'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(G0)      COLOR(0, 130)  CUR(0)      TABORDER(23)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BOX  BOX0(7, 19, 434, 118)    COLOR(43, 43)  LINEW(1)  BX_LINE    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BOX  BOX1(7, 135, 434, 242)    COLOR(43, 43)  LINEW(1)  BX_LINE    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BOX  BOX2(7, 255, 434, 389)    COLOR(43, 43)  LINEW(1)  BX_LINE    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL10(11, 14, 96, 26)  ' 기초자산 가격 적용 '  AL_LEFT  CUR(0)      COLOR(181, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL11(11, 129, 230, 141)  ' 변동성 (Volatility) : 이론가 계산에 적용 '  AL_LEFT  CUR(0)      COLOR(181, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL12(11, 249, 64, 262)  '잔존일수'  AL_LEFT  CUR(0)      COLOR(181, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BOX  BOX3(7, 395, 434, 455)    COLOR(209, 232)  LINEW(1)  BX_LINE    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL13(25, 405, 431, 422)  '> KRX민감도는 09:00 ~ 16:00분까지 10초단위 갱신되며 거래소의 자체산출'  AL_LEFT  CUR(0)      COLOR(0, 209)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL14(25, 425, 431, 442)  '기준으로 제공되는 데이터로 별도 설정은 불가합니다.'  AL_LEFT  CUR(0)      COLOR(0, 209)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Sub InitConfig()
+	Dim sVal
+
+	Cfg.LoadDefaultCfg()
+	SetCfg()
+End Sub
+
+Sub SetCfg()
+	sVal = Cfg.ReadCfg("BPType")
+	Select Case sVal
+	Case "1"
+		R0_1.Checked = True
+	Case "2"
+		R0_2.Checked = True
+	Case "3"
+		R0_3.Checked = True
+	'Case "0"
+	Case Else
+		R0_0.Checked = True
+	End Select
+	ChangeBPType()
+
+	sVal = Cfg.ReadCfg("K200Rate")
+	If CLng(sVal) > 100 Then
+		sVal = "100"
+	ElseIf CLng(sVal) < 0 Then
+		sVal = "0"
+	End If
+	edK200Rate.Data = sVal
+	SetFutureRate()
+'변동성설정(0:종목별내재변동성, 1:콜풋ATM내재변동성, 3:사용자정의, 4: 역사적변동성 HVDay적용)
+
+	sVal = Cfg.ReadCfg("VolType")
+	Select Case sVal
+	Case "2"
+		R1_0.Checked = True
+	'Case "3" '역사적 내재변동성
+	Case Else
+		R1_1.Checked = True
+	End Select
+	ChangeVolType()
+
+	edUserCall.Data = Cfg.ReadCfg("UserCallIV")
+	edUserPut.Data = Cfg.ReadCfg("UserPutIV")
+	sVal = Cfg.ReadCfg("HVDay")
+	Select Case CLng(sVal)
+	Case 60
+		R3_1.Checked = True
+	Case 30
+		R3_2.Checked = True
+	Case 21
+		R3_3.Checked = True
+	Case Else '90일
+		R3_0.Checked = True
+	End Select
+
+	sVal = Cfg.ReadCfg("RDType")
+	Select Case sVal
+	Case "0"
+		R2_0.Checked = True
+	Case "1"
+		R2_1.Checked = True
+	End Select
+
+	sVal = Cfg.ReadCfg("TimeValue")
+	If sval = "1" Then
+		chkTimeValue.Checked = True
+	End If
+	CheckTimeValue()
+	edTimeStart.Data = Cfg.ReadCfg("TimeStart")
+	edTimeEnd.Data = Cfg.ReadCfg("TimeEnd")
+End Sub
+
+Sub ChangeBPType()
+	edK200Rate.Enable = R0_2.Checked
+End Sub
+
+Sub ChangeVolType()
+	edUserCall.Enable = R1_0.Checked
+	edUserPut.Enable = R1_0.Checked
+	R3_0.Enable = R1_1.Checked
+	R3_1.Enable = R1_1.Checked
+	R3_2.Enable = R1_1.Checked
+	R3_3.Enable = R1_1.Checked
+End Sub
+
+Sub CheckTimeValue()
+	edTimeStart.Enable = chkTimeValue.Checked
+	edTimeEnd.Enable = chkTimeValue.Checked
+End Sub
+
+Sub SaveCfg()
+	Dim sVal
+
+	If R0_1.Checked Then
+		sVal = "1"
+	ElseIf R0_2.Checked Then
+		sVal = "2"
+	ElseIf R0_3.Checked Then
+		sVal = "3"
+	Else
+		sVal = "0"
+	End If
+	Cfg.WriteCfg "BPType", sVal
+	Cfg.WriteCfg "K200Rate", Trim(edK200Rate.Data)
+
+	If R1_0.Checked Then
+		sVal = "2"
+	Else
+		sVal = "3"
+	End If
+	Cfg.WriteCfg "VolType", sVal
+	Cfg.WriteCfg "UserCallIV", edUserCall.Data
+	Cfg.WriteCfg "UserPutIV", edUserPut.Data
+
+	If R3_1.Checked Then
+		sVal = "60"
+	ElseIf R3_2.Checked Then
+		sVal = "30"
+	ElseIf R3_3.Checked Then
+		sVal = "21"
+	Else
+		sVal = "90"
+	End If
+	Cfg.WriteCfg "HVDay", sVal
+
+	If R2_1.Checked Then
+		sVal = "1"
+	Else
+		sVal = "0"
+	End If
+	Cfg.WriteCfg "RDType", sVal
+
+	If chkTimeValue.Checked Then
+		sVal = "1"
+	Else
+		sVal = "0"
+	End If
+	Cfg.WriteCfg "TimeValue", sVal
+
+	Cfg.WriteCfg "TimeStart", edTimeStart.Data
+	Cfg.WriteCfg "TimeEnd", edTimeEnd.Data
+
+	Cfg.SaveCfg()
+End Sub
+
+Sub SetFutureRate()
+	Dim sVal
+	sVal = edK200Rate.Data
+
+	If CLng(sVal) > 100 Then
+		sVal = "100"
+		edK200Rate.Data = sVal
+	ElseIf CLng(sVal) < 0 Then
+		sVal = "0"
+		edK200Rate.Data = sVal
+	End If
+
+	edFutureRate.Data = CStr(100 - CLng(sVal))
+End Sub
+
+_AW_ONSTART_AW_
+SetCfg()
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(R1_0)
+_AW_ONCLICK_AW_
+ChangeVolType()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(R1_1)
+_AW_ONCLICK_AW_
+ChangeVolType()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(chkTimeValue)
+_AW_ONCLICK_AW_
+CheckTimeValue()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(R0_0)
+_AW_ONCLICK_AW_
+ChangeBPType()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(R0_1)
+_AW_ONCLICK_AW_
+ChangeBPType()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(R0_2)
+_AW_ONCLICK_AW_
+ChangeBPType()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(edK200Rate)
+_AW_ONCHANGE_AW_
+SetFutureRate()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(btnConfirm)
+_AW_ONCLICK_AW_
+SaveCfg()
+SYSTEM.Push "ModalResult", "OK"
+SCREEN.CloseWindow
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(btnCancel)
+_AW_ONCLICK_AW_
+SYSTEM.Push "ModalResult", "CANCEL"
+SCREEN.CloseWindow
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(btnInit)
+_AW_ONCLICK_AW_
+InitConfig()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(R0_3)
+_AW_ONCLICK_AW_
+ChangeBPType()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

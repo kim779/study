@@ -1,0 +1,222 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(TT112100)
+MAPSIZE(245, 287)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("[1121] 선물/옵션 미")
+MAPPUBLIC(";")
+FONT("굴림", 9, NORMAL)
+OPTIONS(CR2TAB)
+TITLE("[1121] 선물/옵션 매도미니주문")
+TOPATH(AXIS)
+METHOD(MENU)
+MAPTYPE(NORM)
+HEADER(NOP)
+BGROUND(BRUSH, 64)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL0(0, 0, 330, 29)        COLOR(76, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HOVER  GRADIENT(66, 67)  HINTTYPE(IH_NONE)
+OUT  HNAM(111, 5, 254, 23)  LEN(18)  IO_MIXED|AL_LEFT||SUM    FONT("굴림체", 9, BOLD)    COLOR(90, 69)  CUR(0)  LINECOLOR(65)          TABORDER(0)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  SYMBOL7(90, 5, 108, 23)  TP_PUSH|IMAGE|AL_STRETCH      COLOR(24, 0)  CUR(0)    "검색.BMP"    TABORDER(1)  ENABLE  &
+  VISIBLE  IMAGE  HOVER  HINTTYPE(IH_NONE)
+EDIT  ed_focod(3, 5, 88, 23)  LEN(8)  IO_ALPHA|EDIT_INPUT|FA_WRAP|CODE      COLOR(192, 26)  CUR(0)  TP_NONE          TABORDER(2)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+USRTAB  TAB1(3, 28, 266, 56)  FOCUS  INDEX(0)  COUNT(3)  AL_TOP  TAB_IMAGE        COLOR(22, 68)  CUR(0)  TABIMAGE("TAB.BMP")  FCOLOR(14, 93)  CAPTION("매도", "매수", "정정/취소")  TABINFO("1:1", "1:2", "1:3")  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  obj01(1, 55, 286, 222)    "TT112121"  TABORDER(3)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON0(191, 32, 259, 50)  '호가펼치기'  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(208, 232)  CUR(0)    "4BTN.BMP"    TABORDER(4)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+PANEL  guide(2, 223, 286, 243)  LINECOLOR(65)      COLOR(78, 69)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  clearpush_buy(389, 64, 421, 91)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("1")          TABORDER(5)  IOORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  clearpush_sell(389, 92, 421, 119)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("1")          TABORDER(6)  IOORDER(5)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  clearpush_jj(389, 120, 421, 147)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("1")          TABORDER(7)  IOORDER(6)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  clearpush_cancel(389, 148, 421, 175)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("1")          TABORDER(8)  IOORDER(7)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Dim enter
+enter = False
+
+'***************************************************************************
+' DESC: 사용자 입력키 Action
+'***************************************************************************
+Sub OnAxUserKey(key)
+	If SCREEN.Object("OBJ01.CONFIG").EnterOrder = True Then
+		If key = 13 Then
+			SYSTEM.UserKey	= True
+			If SCREEN.Object("OBJ01.CONFIG").OrderGB = "3" Then '취소시 전부취소
+				SCREEN.Object("OBJ01.ed_mdgb").Index = 1
+			End If
+			enter = True
+			SCREEN.SetTimer 0, True
+		End If
+	End If
+End Sub
+
+'***************************************************************************
+' DESC: 탭 제어
+'***************************************************************************
+Sub Set_TabPage(idx)
+	Select Case TAB1.Index
+		Case "1"
+			obj01.SetObject "TT112121"
+			SCREEN.SetCaption "TT112100"&vbTab&"[1121] 선물/옵션 매도미니주문"
+		Case "2"
+			obj01.SetObject "TT112122"
+			SCREEN.SetCaption "TT112200"&vbTab&"[1122] 선물/옵션 매수미니주문"
+		Case "3"
+			obj01.SetObject "TT112123"
+			SCREEN.SetCaption "TT112300"&vbTab&"[1123] 선물/옵션 정정취소미니주문"
+	End Select
+	SCREEN_focus()
+	guide.Text = ""
+End Sub
+
+
+'***************************************************************
+' 전체적인 포커스 관리
+'***************************************************************
+Sub SCREEN_focus()
+
+	If Trim(SCREEN.Object("OBJ01.AN20").data) = "" Then
+		SCREEN.Object("OBJ01.AN20").Setfocus
+	Else
+		If TAB1.Index <= 2 Then
+			SCREEN.Object("OBJ01.ed_pswd").Setfocus
+		Else
+			If Trim(SCREEN.Object("OBJ01.ed_pswd").data) = "" Then
+				SCREEN.Object("OBJ01.ed_pswd").Setfocus
+			Else
+				obj01.Send
+			End If
+		End If
+	End If
+
+End Sub
+
+_AW_ONSTART_AW_
+SCREEN_focus()
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+Dim code
+
+code = Left(ed_focod.Data, 1)
+
+If code = "1" Or code = "4" Then
+	HNAM.Data = SCREEN.GetName (101, ed_focod.Data, 0)
+	If Trim(HNAM.Data) =  "" Then
+		ed_focod.Data = ""
+	Else
+		ed_focod.Trigger "ed_focod", True
+
+		ed_focod.Trigger "30301", True
+		SYSTEM.SetHistory "30301", ed_focod.Data
+		SYSTEM.SetHistory "ed_focod", ed_focod.Data
+	End If
+	ed_focod.Trigger "ed_focod", False
+Else
+	HNAM.Data = SCREEN.GetName (102, ed_focod.Data, 0)
+	If Trim(HNAM.Data) =  "" Then
+		ed_focod.Data = ""
+	Else
+		ed_focod.Trigger "ed_focod", True
+
+		ed_focod.Trigger "40301", True
+		SYSTEM.SetHistory "40301", ed_focod.Data
+		SYSTEM.SetHistory "ed_focod", ed_focod.Data
+	End If
+	ed_focod.Trigger "ed_focod", False
+End If
+
+obj01.Send
+SCREEN.OnSend = False
+
+_AW_ONENDSUB_AW_
+_AW_ONSELECT_AW_
+Select Case data
+	Case "1121"	'매도주문
+		TAB1.ID = 1
+	Case "1122"	'매수주문
+		TAB1.ID = 2
+	Case "1123"	'정정주문
+		TAB1.ID = 3
+	Case "1124"	'취소주문
+		TAB1.ID = 4
+End Select
+
+Set_TabPage(TAB1.ID)
+
+_AW_ONENDSUB_AW_
+_AW_ONTIMER_AW_
+If enter = True Then
+	obj01.Proc "Jumun_click", ""
+	enter = False
+	Exit Sub
+End If
+
+'주문성공후 커서 위치
+obj01.Proc "Set_cursor", "1,main,ed_focod"
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(SYMBOL7)
+_AW_ONCLICK_AW_
+Dim code
+
+code = SCREEN.GetCode (103, "ed_focod", "HNAM", 2)
+If code <>  True Then
+	Exit Sub
+End If
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(ed_focod)
+_AW_ONCHANGE_AW_
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(TAB1)
+_AW_ONCLICK_AW_
+Set_TabPage(TAB1.ID)
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON0)
+_AW_ONCLICK_AW_
+SCREEN.ChangeMap ("DH112140")
+'SCREEN.CreateWindow 1, "DH301100 /t/s/p0", ""
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

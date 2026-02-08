@@ -1,0 +1,202 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB1021T0)
+MAPSIZE(196, 334)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("[1002] 담보대출주문")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(FMS|FLASH)
+TITLE("[1021] 담보대출 신용매도주문")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pooppoop")
+MAPTYPE(NORM)
+HEADER(NOP)
+BGROUND(BRUSH, 181)
+}
+
+
+
+FORM DIVISION
+{
+
+OBJECT  OBJ_order(0, 0, 334, 180)    "IB1021T1"  TABORDER(1)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  1301(359, 48, 424, 68)  LEN(6)  IO_MIXED|EDIT_INOUT|FA_WRAP|FA_HAN|CODE    FONT("굴림체", 9, NORMAL)    COLOR(28, 232)  CUR(0)  TP_NONE          TABORDER(2)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  1021(352, 16, 452, 36)  LEN(16)  IO_ALPHA|AL_LEFT||FA_FLASH    COLOR(31, 2)  CUR(0)            TABORDER(0)  IOORDER(2)  &
+  HINTTYPE(IH_NONE)
+OBJECT  obj_sise(355, 76, 460, 181)    "IB1021T5"  TABORDER(3)  IOORDER(4)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  GUIDE1(0, 179, 336, 197)        COLOR(34, 69)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL0(1, 182, 15, 196)    |IMAGE|AL_STRETCH    COLOR(208, 232)  CUR(0)    "알림_ic.bmp"  ENABLE  &
+  VISIBLE  TRANSPARENT  IMAGE  HINTTYPE(IH_NONE)
+PANEL  GUIDE(15, 181, 332, 199)        COLOR(228, 69)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+OBJECT  obj_Buf(552, 51, 682, 156)    "IB1000T0"  TABORDER(4)  IOORDER(5)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  domino(14, 256, 225, 275)  LEN(400)  IO_MIXED|EDIT_INPUT|FA_ZEROSUP|FA_WRAP|FA_SKIP|SA_SPACE    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(5)  IOORDER(6)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  goInterest(15, 179, 38, 198)  LEN(1)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("N")          TABORDER(6)  IOORDER(7)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  obj_obj_sise(65, 345, 420, 400)    "IB10011Z"  TABORDER(7)  IOORDER(8)  ENABLE  &
+  HINTTYPE(IH_NONE)
+CONTROL  cxMarket(630, 195, 649, 213)  |FA_SKIP  "CX_MarketPicker"  "/k2/t/u1/d2/y1/fIB1011T2좌하"  LEN(12)  EDIT_NOP    COLOR(192, 232)  TABORDER(0)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Sub all_account()
+
+End Sub
+
+Sub send_sise_all(xval)
+SCREEN.IgnoreChange True
+	S1301.Trigger "", True
+	If xval <> "jumun" Then
+		Call Ord_ChangeCode(S1301.Data)
+	End If
+	obj_obj_sise.Send
+	SCREEN.Send 0
+SCREEN.IgnoreChange False
+
+	Dim param
+	param = Trim(SYSTEM.Pop("jngo_1000"))
+
+	If param = "" Then
+
+	Else
+		domino.Data = param
+		SYSTEM.Push "jngo_1000", ""
+		Call setData()
+	End If
+End Sub
+
+
+Sub SetInitCustomer()
+'	If sPass <> "" Then
+'		SCREEN.Object("OBJ_order.ed_pswd").Data = sPass
+'	End If
+End Sub
+
+
+Sub SetPassword(sData)
+	Dim Ifind, sAcc, sPass
+	ifind = InStr(sData, "-")
+	sAcc = Trim( Left(sData, Ifind-1) )
+	sPass = Trim( Mid(sData, Ifind+1, Len(sData)- Ifind) )
+
+	If Trim(SCREEN.Object("OBJ_order.AN1A").data) = sAcc Then
+		If sPass <> "" Then
+			SCREEN.Object("OBJ_order.ed_pswd").data = sPass
+		End If
+	End If
+
+End Sub
+
+Sub SetData()
+	Dim arr
+	arr = Split(Trim(domino.Data), "|")
+
+	'arr(0) - 화면구분, arr(1) - 계좌, arr(2) - 계좌명, arr(3) - 신용구분, arr(4) - 신용코드, arr(5) - 잔고, arr(6) - 신용일자
+	If Trim(SCREEN.Object("OBJ_order.AN1A").Data) <> Trim(arr(1)) Then
+		SCREEN.Object("OBJ_order.AN1A").Data = Trim(arr(1))
+		SCREEN.Proc "OBJ_order.Set_account", ""
+		SCREEN.Object("OBJ_order.ACNM").Data = Trim(arr(2))
+	End If
+
+	If Trim(arr(0)) = "실시간" Then
+		If Trim(arr(3)) = "01" And Trim(arr(4)) = "80" Then
+			SCREEN.SetTimer 3, False
+		Else
+			GUIDE.Text = "주식주문탭을 선택하여 주십시오."
+			Exit Sub
+		End If
+	Else
+		GUIDE.Text = "주식주문탭을 선택하여 주십시오."
+		Exit Sub
+	End If
+End Sub
+
+Sub ChangeCode(codx)
+	SCREEN.Object("OBJ_order.OBJ_odr.1301").Data = codx
+	SCREEN.Proc "OBJ_order.OBJ_odr.ChangeCode", ""
+End Sub
+
+Sub Set_prc(data)
+	If Trim(data) = "" Then
+		Exit Sub
+	End If
+
+	If SCREEN.Object("OBJ_order.tab_order").id <> 3 Then
+		If SCREEN.Object("OBJ_order.obj_odr.CHK_auto").checked = False Then
+			SCREEN.Object("OBJ_order.obj_odr.ed_jprc").data = data
+		End If
+	End If
+End Sub
+
+
+Sub MKTriggerFromMain(sdata)
+	cxMarket.sMarket = sdata
+	SCREEN.Object("OBJ_order.obj_odr.cxMarket").sMarket = sdata
+	SCREEN.Proc "OBJ_order.obj_odr.Set_1000_OrderMap",""
+End Sub
+
+_AW_ONINDECLARE_AW_
+'== 주문obj를포함한 main의 공통함수
+#LOAD IB999913
+#load IB1000BB
+
+_AW_ONENDSUB_AW_
+_AW_ONSTART_AW_
+obj_sise.Send
+
+_AW_ONENDSUB_AW_
+_AW_ONSELECT_AW_
+OBJ_order.Proc "order_tab_change", ""
+
+_AW_ONENDSUB_AW_
+_AW_ONTIMER_AW_
+If Trim(SCREEN.Object("OBJ_order.tab_order").ID) <> "1" Then
+	SCREEN.Object("OBJ_order.tab_order").ID = 1
+	SCREEN.Proc "OBJ_order.order_tab_change", ""
+End If
+
+Dim arr
+arr = Split(Trim(domino.Data), "|")
+
+If Trim(arr(5)) = "" Then
+	SCREEN.Object("OBJ_order.OBJ_odr.ed_jqty").Data = 0
+Else
+	SCREEN.Object("OBJ_order.OBJ_odr.ed_jqty").Data = Trim(arr(5))
+End If
+
+SCREEN.Object("OBJ_order.OBJ_odr.ed_date").Data = Trim(arr(6))
+
+domino.Clear
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(1301)
+_AW_ONCHANGE_AW_
+Call send_sise_all("main")
+obj_sise.Send
+SYSTEM.Trace "IB1021T0 1301 OnChange"
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

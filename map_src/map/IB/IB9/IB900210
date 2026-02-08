@@ -1,0 +1,170 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB900210)
+MAPSIZE(28, 348)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+TITLE("관리계좌 그룹 조회")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+BUTTON  new_grp(6, 5, 78, 25)  '새 그 룹'  TP_PUSH|IMAGETEXT|AL_CENTER        FOCUS  COLOR(208, 130)  CUR(0)    "5BTN.bmp"    TABORDER(1)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+BUTTON  edit_grp(83, 5, 155, 25)  '그룹편집'  TP_PUSH|IMAGETEXT|AL_CENTER        FOCUS  COLOR(208, 130)  CUR(0)    "5BTN.bmp"    TABORDER(2)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+LABEL  LABEL0(165, 5, 225, 25)  '그룹 선택'  AL_CENTER  CUR(0)      COLOR(228, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+COMBO  grp_combo(227, 5, 343, 24)  TP_SUNKEN  LEN(4)  COUNT(0)  VCOUNT(0)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_MIXED|EDIT_INOUT|FA_SKIP    COLOR(68, 69)  CUR(0)    TABORDER(3)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+GRID  grp_list(11, 57, 336, 225)  VISIBLEROW(0)  CELLH(20)  MATRIX(10000, 2)  FIX(0)  MAINCOLOR(208, 232)  LINECOLOR(0)  FOCUSCOLOR(0)  FOCUSKIND(0)  |FLEXIBLE|VSCROLL|HEADER    &
+	COLINFO("ID")  LEN(4)  WIDTH(49)  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_MIXED|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("nm")  LEN(40)  WIDTH(256)  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_MIXED|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    TABORDER(4)  IOORDER(1)  ENABLE
+CONTROL  CONTROL0(649, 480, 764, 510)  |FA_PROTECT  "CX_DATATRANS"  ""  LEN(0)  EDIT_NOP    COLOR(192, 232)  TABORDER(0)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  BUTTON0(157, 3, 179, 23)  TP_PUSH      AL_CENTER    FOCUS  COLOR(208, 232)  CUR(0)      TABORDER(5)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Dim cnt, str
+cnt = 0
+
+Sub Setting()
+	Dim ii, items, items2, id, name, str
+
+	grp_combo.Clear
+
+	items = "01"
+
+	For ii = 1 To grp_list.Rows
+
+		id = Trim(grp_list.GetGridCell (ii, 1))
+		name = Trim(grp_list.GetGridCell (ii, 2))
+
+		items = items & vbTab & id & name
+		cnt = cnt + 1
+	Next
+
+	grp_combo.SetItems(items )
+End Sub
+
+Sub query_gp()
+
+	Dim data
+
+	data = CONTROL0.Get813Group("")
+	grp_list.Clear
+	grp_list.InsertRows 0, data, True
+
+	Call Setting()
+
+	SCREEN.proc "main.obj1.query", ""
+End Sub
+
+_AW_ONINDECLARE_AW_
+#load IB888888
+
+_AW_ONENDSUB_AW_
+_AW_ONSTART_AW_
+Call query_gp
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+
+SCREEN.OnSend = False
+'Call query_gp()
+
+_AW_ONENDSUB_AW_
+_AW_ONTIMER_AW_
+'Call CONTROL0.Refresh813(0)
+Call query_gp()
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(new_grp)
+_AW_ONCLICK_AW_
+SCREEN.CreateWindow 2, "IB90021A /p5", ""
+Call CONTROL0.Refresh813(0)
+SCREEN.SetTimer 10, False
+'
+'If Trim(SYSTEM.Pop("new_accn")) <> "no" Then
+'	grp_list.InsertRow(grp_list.rows)
+'	'-- 새로운 그룹생성되면 ID 는 "0000" 으로 세팅
+'	grp_list.SetGridCell grp_list.rows, 1, "0000"
+'	grp_list.SetGridCell grp_list.rows, 2, Trim(SYSTEM.Pop("new_accn"))
+'End If
+'
+'Call Setting()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(edit_grp)
+_AW_ONCLICK_AW_
+'SYSTEM.Push "grp_edit", l_format(grp_combo.data)
+SCREEN.CreateWindow 2, "IB90021B /p5", ""
+Call CONTROL0.Refresh813(0)
+SCREEN.SetTimer 10, False
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(grp_combo)
+_AW_ONCHANGE_AW_
+SCREEN.proc "main.obj1.query", ""
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(CONTROL0)
+_AW_ONDBLCLK_AW_
+'MsgBox "Control: "+CONTROL0.data
+Dim DataList, spos, dpos, symb, data, cnt
+cnt = 1
+DataList = CONTROL0.data
+'MsgBox "DataList: "+ DataList
+dpos = 0
+spos = InStr(DataList, "|")
+While spos <> 0
+	symb = Mid(DataList,dpos+1,spos-dpos-1)
+	'MsgBox "symb: "+ symb
+	dpos = InStr(spos+1,DataList, "|")
+	data = Mid(DataList, spos+1, dPos-spos-1)
+	spos = InStr(dpos+1,DataList, "|")
+	SCREEN.Object(symb).data = data
+
+Wend
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON0)
+_AW_ONCLICK_AW_
+Call CONTROL0.Refresh813(0)
+Call query_gp
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

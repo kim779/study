@@ -1,0 +1,245 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB951600)
+MAPSIZE(426, 1200)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+TITLE("[9516] 사용자정보 조회")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pmho9516")
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL1(-2, 0, 1200, 32)  LIMAGE(0)  LINEW(3)  LINETYPE(4)  LINECOLOR(64)      COLOR(66, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL10(-1, 32, 1201, 426)  LIMAGE(0)  LINEW(3)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  user_id(5, 6, 75, 26)  LEN(8)  IO_ALPHA|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_SUNKEN          TABORDER(1)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+COMBO  INI_NM(85, 6, 305, 26)  TP_SUNKEN  LEN(100)  COUNT(0)  VCOUNT(0)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_MIXED|EDIT_INPUT    COLOR(68, 130)  CUR(0)    TABORDER(2)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+GRID  GRID0(5, 40, 1195, 420)  VISIBLEROW(19)  CELLH(18)  MATRIX(300, 7)  FIX(0)  MAINCOLOR(7, 0)  LINECOLOR(65)  FOCUSCOLOR(78)  FOCUSKIND(4)    FONT("굴림체", 9, NORMAL)  ROWC(68, 77)  |FLEXIBLE|VSCROLL|NO3D|RROW|PAGE|KEYFOCUS|GRFTEXT    &
+	COLINFO("user_id")  LEN(8)  WIDTH(60)  HEAD("USER_ID")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_ALPHA|EDIT_OUTPUT  |FA_ZEROSUP|SA_SPACE    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("ini_nm")  LEN(100)  WIDTH(80)  HEAD("INI_NM")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_ALPHA|EDIT_OUTPUT  |FA_ZEROSUP|SA_SPACE    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  COLUMN_SORT  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("sect_nm")  LEN(100)  WIDTH(80)  HEAD("SECT_NM")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT  |FA_ZEROSUP|FA_REF|FA_DRAG|SA_SPACE    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  COLUMN_SORT  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("sect_key")  LEN(100)  WIDTH(80)  HEAD("SECT_KEY")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_ZEROSUP|SA_SPACE    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  COLUMN_SORT  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("value")  LEN(500)  WIDTH(764)  HEAD("VALUE")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_ZEROSUP|SA_SPACE    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  COLUMN_SORT  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("in_date")  LEN(8)  WIDTH(60)  HEAD("IN_DATE")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_ZEROSUP|SA_SPACE    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  COLUMN_SORT  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("time")  LEN(6)  WIDTH(50)  HEAD("TIME")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_ZEROSUP|SA_SPACE    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  COLUMN_SORT  INORMAL    HNORMAL  SORTSTARTPOS(0)    TABORDER(5)  IOORDER(5)  ENABLE  &
+  VISIBLE
+
+COMBO  SECT_NM(320, 6, 540, 26)  TP_SUNKEN  LEN(100)  COUNT(0)  VCOUNT(0)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_MIXED|EDIT_INPUT    COLOR(68, 130)  CUR(0)    TABORDER(3)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+COMBO  SECT_KEY(555, 6, 775, 26)  TP_SUNKEN  LEN(100)  COUNT(0)  VCOUNT(0)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_MIXED|EDIT_INPUT    COLOR(68, 130)  CUR(0)    TABORDER(4)  IOORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  send_btn(1155, 6, 1191, 26)  '조회'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, BOLD)  FOCUS  COLOR(208, 186)  CUR(0)    "조회btn.bmp"    TABORDER(6)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Dim c_item, c_list
+Dim ii
+Dim idx_ini_nm, idx_sect_nm, idx_sect_key
+
+Function fill_space(item)
+	Dim pos, char, rlen
+
+	rlen = 0
+	For pos = 1 To Len(item)
+		char = Mid(item, pos, 1)
+		If Asc(char) < 0 Then
+			rlen = rlen + 2
+		Else
+			rlen = rlen + 1
+		End If
+	Next
+
+	For ii = rlen+1 To 100 Step 1
+		item = item & " "
+	Next
+
+	fill_space = item
+End Function
+
+c_item = "-- 선택 --"
+c_item = fill_space(c_item)
+c_list = c_item & vbTab & c_item & c_item
+
+Sub combo_start()
+	INI_NM.SetItems(c_list)
+	SECT_NM.SetItems(c_list)
+	SECT_KEY.SetItems(c_list)
+End Sub
+
+Sub combo_set(col_n)
+	Dim row_n, data, list, index, ii, jj, item
+	list = ""
+	list = c_list
+	GRID0.Column = col_n
+
+	For row_n = 1 To GRID0.Rows
+		GRID0.Row = row_n
+		item = Trim(GRID0.text)
+		ii = 0
+		If row_n > 1 Then
+			For ii = row_n-1 To 1 Step -1
+				GRID0.Row = ii
+				If item = Trim(GRID0.Data) Then
+					Exit For
+				End If
+			Next
+		End If
+		If ii = 0 Then
+			item = fill_space(item)
+			list = list & vbTab & item & item
+		End If
+	Next
+	If col_n = "2" Then
+		INI_NM.Setitems list
+	ElseIf col_n = "3" Then
+		SECT_NM.Setitems list
+	ElseIf col_n = "4" Then
+		SECT_KEY.Setitems list
+	End If
+End Sub
+
+Sub re_combo_set(col_n)
+	Dim list, item
+	list = ""
+	list = c_list
+	GRID0.Column = col_n
+
+	If col_n = "2" Then
+		item = INI_NM.Text
+		list = list & vbTab & item & item
+		INI_NM.Setitems list
+		INI_NM.Index = 1
+	ElseIf col_n = "3" Then
+		item = SECT_NM.Text
+		list = list & vbTab & item & item
+		SECT_NM.Setitems list
+		SECT_NM.Index = 1
+	ElseIf col_n = "4" Then
+		item = SECT_KEY.Text
+		list = list & vbTab & item & item
+		SECT_KEY.Setitems list
+		SECT_KEY.Index = 1
+	End If
+End Sub
+
+_AW_ONSTART_AW_
+combo_start()
+user_id.SetFocus()
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+If idx_ini_nm = 0 Then
+	combo_set("2")
+Else
+	re_combo_set("2")
+End If
+
+If idx_sect_nm = 0 Then
+	combo_set("3")
+Else
+	re_combo_set("3")
+End If
+
+If idx_sect_key = 0 Then
+	combo_set("4")
+Else
+	re_combo_set("4")
+End If
+
+idx_ini_nm=INI_NM.Index
+idx_sect_nm = SECT_NM.Index
+idx_sect_key = SECT_KEY.index
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(user_id)
+_AW_ONCHANGE_AW_
+combo_start()
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(INI_NM)
+_AW_ONCHANGE_AW_
+If idx_ini_nm <> INI_NM.Index Then
+	idx_ini_nm = INI_NM.index
+	SCREEN.Send 0
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(GRID0)
+_AW_ONCLICK_AW_
+If GRID0.HitPos = 3 Then
+	If GRID0.Column = 5 Then
+		MsgBox GRID0.data,,GRID0.Head
+	End If
+'	S1301.DATA = GRID0.GetGridCell(GRID0.INDEX + 1, 2)
+'	If Trim(S1301.DATA) = "" Then
+'	    Exit Sub
+'	End If
+'
+'	S1301.Trigger "", False
+'	S1301.Trigger "", True
+'	SYSTEM.SetHistory "1301", S1301.Data
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(SECT_NM)
+_AW_ONCHANGE_AW_
+If idx_sect_nm <> SECT_NM.Index Then
+	idx_sect_nm = SECT_NM.index
+	SCREEN.Send 0
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(SECT_KEY)
+_AW_ONCHANGE_AW_
+If idx_sect_key <> SECT_KEY.Index Then
+	idx_sect_key = SECT_KEY.index
+	SCREEN.Send 0
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(send_btn)
+_AW_ONCLICK_AW_
+combo_start()
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

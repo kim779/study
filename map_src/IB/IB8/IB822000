@@ -1,0 +1,381 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB822000)
+MAPSIZE(507, 758)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("매체별 약정내역")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(ENCODE|CR2TAB)
+TITLE("[8220]매체별 약정내역")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL10(-3, 53, 762, 486)  LIMAGE(0)  LINEW(5)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL(0, 0, 759, 53)  LINETYPE(3)  LINECOLOR(64)      COLOR(66, 67)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL0(7, 4, 55, 24)  '계좌번호'  AL_CENTER  CUR(0)      COLOR(66, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+CONTROL  AN1A(57, 4, 197, 24)    "CX_Account"  "/w0"  LEN(11)  EDIT_INPUT    COLOR(68, 130)  TABORDER(1)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  ANCM(200, 4, 264, 24)  LEN(20)  IO_MIXED|AL_LEFT||FA_SKIP    COLOR(49, 130)  CUR(0)  LINECOLOR(48)          TABORDER(0)  IOORDER(6)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL1(272, 4, 322, 24)  '비밀번호'  AL_LEFT  CUR(0)      COLOR(66, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  zPwd(322, 4, 378, 24)  LEN(8)  IO_MIXED|EDIT_INPUT|FA_PASSWD|FA_WRAP|FA_SKIP    COLOR(192, 130)  CUR(0)  TP_SUNKEN          TABORDER(2)  IOORDER(5)  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  send_btn(681, 4, 718, 24)  '조회'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, BOLD)  FOCUS  COLOR(208, 186)  CUR(0)    "조회BTN.BMP"    TABORDER(4)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+BUTTON  next_btn(719, 4, 755, 24)  '다음'  TP_PUSH|IMAGETEXT|AL_STRETCH        FOCUS  COLOR(208, 186)  CUR(0)    "2BTN.BMP"    TABORDER(5)  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+PANEL  PANEL8(-2, 484, 761, 508)  LIMAGE(0)  LINEW(3)  LINETYPE(4)  LINECOLOR(64)      COLOR(34, 232)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL7(4, 489, 18, 503)    |IMAGE|AL_STRETCH    COLOR(34, 232)  CUR(0)    "알림_ic.bmp"  ENABLE  &
+  VISIBLE  IMAGE  HINTTYPE(IH_NONE)
+PANEL  GUIDE(21, 488, 745, 504)        COLOR(34, 130)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL2(390, 4, 440, 24)  '매체구분'  AL_LEFT  CUR(0)      COLOR(66, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL3(7, 29, 55, 49)  '거래기간'  AL_CENTER  CUR(0)      COLOR(66, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  RADIO0(303, 28, 337, 48)  '5일'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(group0)      COLOR(66, 130)  CUR(0)      TABORDER(9)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  RADIO1(351, 28, 392, 48)  '10일'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(group0)      COLOR(66, 130)  CUR(0)      TABORDER(10)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  zOrdStrDt(57, 28, 144, 48)  LEN(8)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_DATE    COLOR(192, 130)  CUR(0)  TP_SUNKEN          EDITFORMAT("9999/99/99")  TABORDER(6)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  zOrdEndDt(159, 28, 246, 48)  LEN(8)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_DATE    COLOR(192, 130)  CUR(0)  TP_SUNKEN          EDITFORMAT("9999/99/99")  TABORDER(7)  IOORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL6(148, 28, 154, 48)  '~'  AL_LEFT  CUR(0)      COLOR(208, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  RADIO3(255, 28, 294, 48)  '당일'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(group0)      COLOR(66, 130)  CUR(0)      TABORDER(8)  ENABLE  &
+  VISIBLE  CHECKED  HINTTYPE(IH_NONE)
+BOX  BOX0(248, 28, 457, 48)    COLOR(165, 69)  LINEW(1)  BX_LINE    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  RADIO2(402, 29, 446, 47)  '1개월'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(group0)      COLOR(66, 130)  CUR(0)      TABORDER(11)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  OBJECT0(26, 516, 286, 621)    "IB822010"  TABORDER(12)  IOORDER(7)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  BUTTON3(660, 4, 680, 24)  TP_PUSH|IMAGE|AL_STRETCH      COLOR(208, 186)  CUR(0)    "엑셀.bmp"    TABORDER(3)  ENABLE  &
+  IMAGE  HOVER  HINTTYPE(IH_NONE)
+LABEL  LABEL22(472, 28, 1072, 48)  '최대 1개월까지 조회가능합니다.'  AL_LEFT  CUR(0)      COLOR(208, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+PANEL  PANEL99(461, 33, 470, 42)    |IMAGE|AL_CENTER    COLOR(208, 232)  CUR(0)    "텍스트화살표_하단.BMP"  ENABLE  &
+  VISIBLE  TRANSPARENT  IMAGE  HINTTYPE(IH_NONE)
+LABEL  isGiganChk(33, 725, 153, 745)  'N'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  obj(6, 62, 756, 426)    "IB822020"  TABORDER(13)  IOORDER(8)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  sect(160, 724, 190, 736)  '1'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+GROUP  GROUP0(122, 631, 242, 681)  'Group'        COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+COMBO  cbGubn(440, 4, 605, 24)  TP_SUNKEN  LEN(2)  COUNT(18)  VCOUNT(18)  INDEX(1)  MATCHKEY(NOTMAPPING)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(68, 69)  CUR(0)  DISPLAY("영업점", "HTS", "WTS", "콜센터", "ARS", "MTS(iphone)", "MTS(안드로이드)", "HK솔리드(HTS/WTS)", "HK솔리드(MTS)", "HK솔리드(영업점)", "참좋은스탁론A형(HTS/WTS)", "참좋은스탁론A형(지점)", "참좋은스탁론B형(HTS/WTS)", "참좋은스탁론B형(지점)", "참좋은스탁론A형(MTS)", "참좋은스탁론B형(MTS)", "증권통(MTS)", "증권플러스(MTS)")  DATA("00", "01", "02", "06", "07", "81", "82", "31", "89", "33", "34", "36", "37", "39", "8A", "8B", "8C", "8F")    TABORDER(14)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  img(5, 433, 64, 453)    |IMAGE|AL_STRETCH    COLOR(208, 232)  CUR(0)    "참고사항.BMP"  ENABLE  &
+  VISIBLE  TRANSPARENT  IMAGE  HINTTYPE(IH_NONE)
+LABEL  LABEL5(20, 457, 370, 477)  '전체 주식거래내역은[1402]화면을 이용하여 주시기 바랍니다.'  AL_LEFT  CUR(0)      COLOR(64, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+PANEL  PANEL0(6, 461, 15, 470)  LINECOLOR(96)  |IMAGE|AL_CENTER    COLOR(208, 232)  CUR(0)    "텍스트화살표_하단.BMP"  ENABLE  &
+  VISIBLE  TRANSPARENT  IMAGE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON0(365, 457, 420, 477)  '바로가기'  TP_PUSH|IMAGETEXT|AL_STRETCH        FOCUS  COLOR(77, 69)  CUR(0)    "4BTN.bmp"    TABORDER(15)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Option Explicit
+
+Public Today
+Today = getCurrDay()
+
+'== 계좌명, 비밀번호 설정
+Sub Set_account()
+	SCREEN.ClearAll 0, 2
+	GUIDE.Text = ""
+
+	ANCM.Data = AN1A.Name
+	zPwd.Data = AN1A.Password
+	If Trim(AN1A.Data) = "" Then
+		AN1A.SetFocus
+		Exit Sub
+	End If
+
+	If SYSTEM.ConnectBy = 1 Then
+		If Trim(zPwd.Data) = "" Then
+			zPwd.SetFocus
+			Exit Sub
+		End If
+	Else
+		zPwd.Data = "9999"
+	End If
+
+	Call send_f()
+End Sub
+
+'== 첫 조회
+Sub send_f()
+	SCREEN.ClearAll 0, 2
+	ANCM.Data = Trim(AN1A.Name)
+	next_btn.Enable = False
+
+	If SYSTEM.ConnectBy = 1 Then
+		SCREEN.Object("OBJECT0.IntaccNo").Data = Trim(AN1A.Data)
+		SCREEN.Object("OBJECT0.Pwd").Data = Trim(zPwd.Data)
+		OBJECT0.Send
+	Else
+		SCREEN.Proc "obj.send_f", ""
+	End If
+
+End Sub
+
+
+'== 연속 조회
+Sub send_c()
+	SCREEN.Proc "obj.send_c", ""
+End Sub
+
+
+Sub OkSend()
+	SCREEN.Proc "obj.send_f", ""
+End Sub
+
+Sub beforeDateChg()
+	Dim comDate, srtDt
+	srtDt = Trim(zOrdStrDt.Data)
+
+	isGiganChk.Text = "N"
+
+	srtDt = Left(srtDt, 4) & "-" & Mid(srtDt, 5, 2) & "-" & Right(srtDt, 2)
+	comDate = change_indate("m", 1, srtDt)
+
+	If CLng(comDate) < CLng(zOrdEndDt.Data) Then
+		zOrdEndDt.Data = comDate
+		RADIO2.Checked = True
+
+		isGiganChk.Text = "Y"
+	End If
+
+	If CLng(zOrdStrDt.Data) > CLng(zOrdEndDt.Data) Then
+		zOrdEndDt.Data = comDate
+		RADIO2.Checked = True
+
+		isGiganChk.Text = "Y"
+	End If
+
+	sect.Text = 4
+	'Call send_f()
+End Sub
+
+Sub afterDateChg()
+	Dim comDate, endDt
+	endDt = Trim(zOrdEndDt.Data)
+
+	isGiganChk.Text = "N"
+
+	endDt = Left(endDt, 4) & "-" & Mid(endDt, 5, 2) & "-" & Right(endDt, 2)
+	comDate = change_indate("m", -1, endDt)
+
+	If CLng(comDate) > CLng(zOrdStrDt.Data) Then
+		zOrdStrDt.Data = comDate
+		RADIO2.Checked = True
+
+		isGiganChk.Text = "Y"
+	End If
+
+	If CLng(zOrdStrDt.Data) > CLng(zOrdEndDt.Data) Then
+		zOrdStrDt.Data = comDate
+		RADIO2.Checked = True
+
+		isGiganChk.Text = "Y"
+	End If
+
+	sect.Text = 5
+	'Call send_f()
+End Sub
+
+_AW_ONINDECLARE_AW_
+#Load IB888833
+#Load IB888888
+
+_AW_ONENDSUB_AW_
+_AW_ONSTART_AW_
+Call Check_LoginType(zPwd)
+
+If SCREEN.CreateObject("Info") Then
+	Dim g_combo
+	g_combo = Trim(INFO.popData (LOGIN.Name, "userconf.ini", SCREEN.GetMapName(1), "G_COMBO"))
+	cbGubn.Data = g_combo
+End If
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+SCREEN.OnSend = False
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(AN1A)
+_AW_ONCHANGE_AW_
+Call Set_account()	'-- 계좌명, 비밀번호 설정
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(zPwd)
+_AW_ONKEYCHANGE_AW_
+'== 비밀번호 변경시 조회 버튼 기능 수행.
+If SCREEN.Key = "13" Then  '-- Enter 키 입력
+	If CheckInput(AN1A, zPwd) = True Then
+		Call send_f()
+	End If
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(send_btn)
+_AW_ONCLICK_AW_
+Call send_f()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(next_btn)
+_AW_ONCLICK_AW_
+Call send_c()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(RADIO0)
+_AW_ONCLICK_AW_
+'sect.Text = 7
+isGiganChk.Text = "N"
+
+Dim Day1, Day2, mm, dd, mYear, mMonth, mDay
+Day2 = getDateSerial(zOrdEndDt.Data)
+Day1 = change_indate("d", -5, Day2)
+
+'SCREEN.IgnoreChange True
+zOrdStrDt.data = Day1
+'SCREEN.IgnoreChange False
+
+Call send_f()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(RADIO1)
+_AW_ONCLICK_AW_
+'sect.Text = 8
+isGiganChk.Text = "N"
+
+Dim Day1, Day2, mm, dd
+Day2 = getDateSerial(zOrdEndDt.Data)
+Day1 = change_indate("d", -10, Day2)
+
+'SCREEN.IgnoreChange True
+zOrdStrDt.data = Day1
+'SCREEN.IgnoreChange False
+
+Call send_f()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(zOrdStrDt)
+_AW_ONCHANGE_AW_
+sect.Text = "4"
+next_btn.Enable = False
+'Call beforeDateChg()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(zOrdEndDt)
+_AW_ONCHANGE_AW_
+sect.Text = "5"
+next_btn.Enable = False
+'Call afterDateChg()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(RADIO3)
+_AW_ONCLICK_AW_
+'sect.Text = 6
+isGiganChk.Text = "N"
+
+Dim Today
+today = getCurrDay()
+
+'SCREEN.IgnoreChange True
+zOrdStrDt.Data = Today
+zOrdEndDt.Data = Today
+'SCREEN.IgnoreChange False
+
+
+Call send_f()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(RADIO2)
+_AW_ONCLICK_AW_
+'sect.Text = 9
+isGiganChk.Text = "N"
+
+Dim Day1, Day2, mm, dd
+Day2 = getDateSerial(zOrdEndDt.Data)
+Day1 = change_indate("m", -1, Day2)
+
+'SCREEN.IgnoreChange True
+zOrdStrDt.data = Day1
+'SCREEN.IgnoreChange False
+
+Call send_f()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON3)
+_AW_ONCLICK_AW_
+GRID0.Excel True,True,""
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(cbGubn)
+_AW_ONCHANGE_AW_
+Call send_f()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON0)
+_AW_ONCLICK_AW_
+SCREEN.CreateWindow 1, "IB140200 /t/p5/s", ""
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

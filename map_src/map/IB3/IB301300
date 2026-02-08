@@ -1,0 +1,138 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB301300)
+MAPSIZE(246, 276)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("선옵주문 -미니정정")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(CR2TAB|SAVE)
+TITLE("[3013] 선물옵션주문-정정")
+TOPATH(AXIS)
+METHOD(MENU)
+MAPTYPE(FIXED)
+HEADER(LEDGER)
+BGROUND(BRUSH, 64)
+}
+
+
+
+FORM DIVISION
+{
+
+OBJECT  OBJ_order(0, 0, 276, 228)    "IB300190"  TABORDER(1)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  OBJ_sise(42, 270, 347, 496)    "IB300110"  TABORDER(2)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  HNAM(180, 525, 314, 545)  LEN(18)  IO_MIXED|AL_LEFT||SUM    FONT("굴림체", 9, BOLD)    COLOR(90, 69)  CUR(0)  LINECOLOR(65)          TABORDER(0)  IOORDER(4)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  domino_data(156, 486, 432, 504)  LEN(40)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(4)  IOORDER(5)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL0(99, 486, 156, 504)  '도미노'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  dbx(48, 234, 473, 252)  LINECOLOR(65)      COLOR(78, 69)  CUR(0)    AL_LEFT    ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  ed_focod(210, 229, 290, 249)  LEN(8)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_UPPER|CODE      COLOR(192, 69)  CUR(0)  TP_NONE          TABORDER(3)  IOORDER(3)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  ed_jprc(328, 189, 412, 209)  LEN(10)  IO_NUM|EDIT_INPUT|FA_COMMA|FA_RIGHT|FA_WRAP|FA_SKIP|FA_FLOAT  SPIN(1)  SPINTYPE(110)    FONT("굴림체", 9, BOLD)    COLOR(104, 103)  CUR(0)  TP_SUNKEN  INIT("0")        FLOAT(2)    TABORDER(5)  IOORDER(6)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  GUIDE(0, 228, 276, 246)        COLOR(66, 69)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Sub send_sise_all(gubn)
+	Dim code, fogb, rsymb
+dbx.Text = dbx.Text & ed_focod.data&"ALL"
+	code = Left(ed_focod.Data, 1)
+	If code = "1" Or code = "4" Or code = "A" Or code = "D" Then
+		fogb = 101
+		rsymb = "30301"
+		OBJ_sise.SetObject("IB300110")
+	Else
+		fogb = 102
+		rsymb = "40301"
+		OBJ_sise.SetObject("IB300115")
+	End If
+	HNAM.Data = SCREEN.GetName (fogb, ed_focod.Data, 0)
+	SCREEN.Object("OBJ_order.OBJ_odr.hnam").data = HNAM.data
+
+	If gubn = "main" Then
+		SCREEN.IgnoreChange True
+		SCREEN.Object("OBJ_order.OBJ_odr.ed_focod").data = ed_focod.data
+		SCREEN.IgnoreChange False
+	End If
+
+	If Trim(HNAM.Data) =  "" Then
+		SCREEN.ClearAll 2, 2
+		Exit Sub
+	Else
+		ed_focod.Trigger "ed_focod", True
+		ed_focod.Trigger rsymb, True
+		ed_focod.Trigger rsymb, False
+		SYSTEM.SetHistory rsymb, ed_focod.Data
+		SYSTEM.SetHistory "ed_focod", ed_focod.Data
+	End If
+
+	OBJ_sise.Send
+
+End Sub
+
+_AW_ONINDECLARE_AW_
+'== 선물옵션주문obj를포함한 main의 공통함수
+#LOAD IB999923
+
+_AW_ONENDSUB_AW_
+_AW_ONSTART_AW_
+Call Set_mini_order(3)
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+SCREEN.OnSend = False
+
+_AW_ONENDSUB_AW_
+_AW_ONTIMER_AW_
+If Trim(ed_jprc.Data) <> "" Then
+	SCREEN.Object("OBJ_order.OBJ_odr.ed_jprc").Data = ed_jprc.Data
+	ed_jprc.Data = ""
+Else
+	'주문성공후 커서 위치
+	SCREEN.Proc "OBJ_order.OBJ_odr.Set_cursor", ""
+End If
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(dbx)
+_AW_ONCLICK_AW_
+dbx.Text = ed_focod.Data
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(ed_focod)
+_AW_ONCHANGE_AW_
+dbx.Text = "CHANG"
+Call send_sise_all("main")
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(ed_jprc)
+_AW_ONCHANGE_AW_
+SCREEN.SetTimer 2, False
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

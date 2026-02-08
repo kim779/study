@@ -1,0 +1,271 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB204200)
+MAPSIZE(409, 594)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("거래정지종목")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+TITLE("[2042] 거래정지종목")
+TOPATH(AXIS)
+METHOD(SEND)
+TRXCODE("pibo2042")
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL11(0, 408, 599, 412)        COLOR(64, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL2(0, 0, 596, 29)        COLOR(64, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL63(-2, 28, 596, 409)  LIMAGE(0)  LINEW(4)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL_bg(1, 0, 593, 26)        COLOR(66, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+GRID  GRID(6, 36, 588, 401)  VISIBLEROW(0)  CELLH(18)  MATRIX(1000, 8)  FIX(0)  MAINCOLOR(7, 0)  LINECOLOR(75)  FOCUSCOLOR(78)  FOCUSKIND(4)    FONT("굴림체", 9, NORMAL)  ROWC(68, 77)  |FLEXIBLE|VSCROLL|NO3D|RROW|XHLINE|HEADER|GRFTEXT    &
+	COLINFO("1")  LEN(4)  WIDTH(44)  HEAD("순번")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("2")  LEN(20)  WIDTH(112)  HEAD("종목명")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_REF)  COLHELPTEXT("1301")  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT  |FA_REF|FA_DRAG    COLOR(68, 69)  COLCUR(0, 0)  REFERENCE(1301)    COLUMN_VISIBLE  COLUMN_SORT  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col0")  LEN(1)  WIDTH(44)  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_NUM|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("1301")  LEN(6)  WIDTH(66)  HEAD("종목코드")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_ALPHA|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  COLUMN_SORT  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col1")  LEN(8)  WIDTH(70)  HEAD("거래정지일")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  COLUMN_SORT  INORMAL  EDITFORMAT("9999/99/99")    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("5")  LEN(2)  WIDTH(44)  HEAD("사유코드")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("4")  LEN(60)  WIDTH(274)  HEAD("정지사유")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT  |FA_SKIP|FA_CORGB|SA_COSUP    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(209, 214)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col2")  LEN(1)  WIDTH(44)  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_NUM|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    TABORDER(1)  IOORDER(2)  ENABLE  &
+  VISIBLE
+
+EDIT  sjgb(99, 436, 144, 461)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("4")          TABORDER(2)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  R1(112, 4, 165, 24)  '코스피'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(G0)    FONT("굴림체", 9, NORMAL)  COLOR(208, 130)  CUR(0)      TABORDER(3)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  R2(175, 4, 229, 24)  '코스닥'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(G0)    FONT("굴림체", 9, NORMAL)  COLOR(208, 130)  CUR(0)      TABORDER(4)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+GROUP  G0(280, 436, 340, 463)  'Group'        COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  1301(181, 442, 255, 461)  LEN(6)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(5)  IOORDER(3)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  R0(360, 450, 400, 470)  '전체'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(G0)    FONT("굴림체", 9, NORMAL)  COLOR(208, 69)  CUR(0)      TABORDER(6)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  RADIO0(10, 4, 105, 24)  '전체(ELW제외)'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(G0)    FONT("굴림체", 9, NORMAL)  COLOR(208, 130)  CUR(0)      TABORDER(7)  ENABLE  &
+  VISIBLE  CHECKED  TRANSPARENT  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Dim ii, jj, kk, stop_reason(80)
+
+Sub Set_reason()
+'	For ii = 0 To UBound(stop_reason)
+		stop_reason(ii) = ""
+'	Next
+
+'	For kk = 1 To GRID.Rows
+
+	Select Case GRID.GetGridCell(jj, 8)
+	Case "P"
+		stop_reason(11) = "풍문등관련주가및거래량급변"
+		stop_reason(12) = "매매거래폭주"
+		stop_reason(13) = "시장관리상"
+		stop_reason(20) = "불성실공시법인지정"
+		stop_reason(21) = "조회공시불이행 불성실지정예고"
+		stop_reason(22) = "공시번복 불성실지정예고"
+		stop_reason(23) = "중요내용공시변경 불성실지정예고"
+		stop_reason(24) = "부도발생"
+		stop_reason(25) = "영업활동정지"
+		stop_reason(26) = "법정관리(화의)신청,종결,폐지"
+		stop_reason(27) = "합병,분할,영업의양수도"
+		stop_reason(28) = "파산등해산사유발생"
+		stop_reason(29) = "은행거래정지(관리)"
+		stop_reason(30) = "무상증자(10%이상)"
+		stop_reason(31) = "주식배당(10%이상)"
+		stop_reason(32) = "자본감소10%이상,주식소각"
+		stop_reason(33) = "영업활동정지"
+		stop_reason(34) = "반기검토의견 부적정"
+		stop_reason(35) = "반기검토의견 의견거절"
+		stop_reason(36) = "자본잠식(50%이상)"
+		stop_reason(37) = "거래량요건미달"
+		stop_reason(38) = "감사의견한정"
+		stop_reason(39) = "주식양도제한"
+		stop_reason(40) = "사외이사수미달"
+		stop_reason(41) = "사업,반기,분기보고서 미제출"
+		stop_reason(42) = "감사의견부적정3년계속"
+		stop_reason(43) = "감사의견거절3년계속"
+		stop_reason(44) = "자본전액잠식3년계속"
+		stop_reason(45) = "주식분포상황요건미비"
+		stop_reason(46) = "공시의무위반"
+		stop_reason(47) = "기타공익과투자자보호및시장관리상"
+		stop_reason(48) = "위조,변조유가증권발생"
+		stop_reason(49) = "주식병합,분할등주권제출요구"
+		stop_reason(50) = "상장폐지유예종료"
+		stop_reason(51) = "기타공익과투자자보호"
+		stop_reason(52) = "보통주 제외한보호예수"
+		stop_reason(53) = "매출액 미달"
+		stop_reason(54) = "주가수준 미달"
+		stop_reason(55) = "시가총액 미달"
+		stop_reason(56) = "기타시장관리"
+		stop_reason(57) = "지주회사의 완전자회사로의편입"
+		stop_reason(58) = "영업용순자본비율등재무요건미달(ELW)"
+		stop_reason(60) = "신주인수권증권행사기간만료"
+		stop_reason(70) = "업무의 정지(ETF)"
+		stop_reason(71) = "규모,유동성,자산구성미달(ETF)"
+		stop_reason(72) = "자산구성요건 미달(리츠)"
+		stop_reason(73) = "배당(수입분배)요건미달(선박투자회사 및 리츠)"
+		stop_reason(74) = "권리행사완료(ELW)"
+		stop_reason(75) = "권리행사기가간만료(ELW)"
+		stop_reason(76) = "발행회사의주식워런트증권전부보유(ELW)"
+		stop_reason(77) = "유동성공급자의 주식워런트증권분부보유(ELW)"
+		stop_reason(78) = "유동성공급계약미체결(ELW)"
+	Case "Q"
+		stop_reason(1) = "시세 및 거래량의 급변이 예상되는 경우"
+		stop_reason(2) = "거래할 내용이 현저히 공정성을 결여할 우려가 있는 경우"
+		stop_reason(6) = "피흡수합병 등"
+		stop_reason(9) = "호가폭주"
+		stop_reason(10) = "불성실공시법인 지정"
+		stop_reason(11) = "구주권 제출"
+		stop_reason(12) = "최대주주 등 불공정거래행위관련 증선위 조치"
+		stop_reason(13) = "관리종목지정사유발생"
+		stop_reason(14) = "상장폐지 사유 발생"
+		stop_reason(15) = "정기보고서 미제출"
+		stop_reason(16) = "기타 투자자보호"
+		stop_reason(17) = "조회공시요구 기한내 불응"
+		stop_reason(18) = "LP교체 미이행, LP수 미달"
+		stop_reason(19) = "괴리율 초과(ETF)"
+		stop_reason(20) = "운용사 업무정지(ETF)"
+		stop_reason(21) = "규모요건,유동성요건,자산구성요건 등 미달(ETF)"
+		stop_reason(22) = "우회상장여부 및 요건충족확인"
+		stop_reason(23) = "조회공시 신고시한 위반"
+		stop_reason(51) = "은행관리등"
+		stop_reason(52) = "합병"
+		stop_reason(53) = "분할"
+		stop_reason(54) = "영업양수도"
+		stop_reason(55) = "무상증자"
+		stop_reason(56) = "자본감소"
+		stop_reason(57) = "주식소각(발행주식총수의 20%이상)"
+		stop_reason(58) = "주식배당"
+		stop_reason(59) = "주식교환, 이전"
+		stop_reason(60) = "기타"
+		stop_reason(61) = "최대주주 변경"
+		stop_reason(62) = "자본잠식률 50%이상"
+		stop_reason(63) = "지주회사의 자회사 편입"
+		stop_reason(64) = "지주회사의 자회사 탈퇴"
+		stop_reason(65) = "불성실공시법인 지정 예고"
+		stop_reason(66) = "증권관련 집단소송"
+		stop_reason(67) = "매출액 30억원 미만"
+		stop_reason(68) = "경상손실 및 시가총액 미만으로 관리 종목지정법인이 경상손실 확인시"
+		stop_reason(69) = "반기자본 전액잠식"
+		stop_reason(70) = "업무의 정지(ETF)"
+		stop_reason(71) = "규모,유동성,자산구성미달(ETF)"
+		stop_reason(72) = "회계처리기준위반"
+	End Select
+'	Next
+End Sub
+
+Sub stop_jong()
+
+	Set_reason()
+'
+	For jj = 1 To GRID.Rows
+		ii = Trim(GRID.GetGridCell(jj, 6))		'거래정지사유 코드
+
+		If ii = "" Then
+			ii = 0
+		ElseIf IsNumeric(ii) = False Then
+		    ii = 0
+		ElseIf  ii > 80 Then
+			ii = 0
+		Else
+
+		End If
+		Set_reason()
+		reason = stop_reason(ii)
+		GRID.SetGridCell jj, 7, reason
+	Next
+
+End Sub
+
+_AW_ONINDECLARE_AW_
+#load IB888888
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+stop_jong()
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(GRID)
+_AW_ONCLICK_AW_
+Dim code
+
+If GRID.HitPos = 3 Then
+	code = GRID.GetGridCell(GRID.row, 4)
+	If Trim(code) <> "" Then
+		S1301.Data = code
+		S1301.Trigger "", True
+	End If
+End If
+_AW_ONENDSUB_AW_
+_AW_ONDBLCLK_AW_
+'Dim code
+'
+'If GRID.HitPos = 3 Then
+'	code = GRID.GetGridCell(GRID.row, 4)
+'	If Trim(code) <> "" Then
+'		S1301.Data = code
+'		S1301.Trigger "", True
+'	End If
+'End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(R1)
+_AW_ONCLICK_AW_
+sjgb.Data = "1"
+GRID.Clear
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(R2)
+_AW_ONCLICK_AW_
+sjgb.Data = "2"
+GRID.Clear
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(R0)
+_AW_ONCLICK_AW_
+sjgb.Data = "0"
+GRID.Clear
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(RADIO0)
+_AW_ONCLICK_AW_
+sjgb.Data = "4"
+GRID.Clear
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

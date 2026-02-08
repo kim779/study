@@ -1,0 +1,372 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB190191)
+MAPSIZE(318, 789)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("관리 그룹/계좌 조회")
+MAPPUBLIC(";")
+FONT("굴림", 9, NORMAL)
+OPTIONS(ENCODE)
+TITLE("SDLDQ003 관리/그룹 계좌조회")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("piboPBxQ")
+MAPTYPE(FIXED)
+HEADER(LEDGER)
+TRXH("11CSDLDQ003")
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL0(-15, -5, 805, 335)  TP_RAISED      COLOR(208, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL0(5, 6, 90, 25)  '레코드 갯수'  AL_CENTER  CUR(0)      COLOR(168, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  In(90, 6, 210, 26)  LEN(5)  IO_MIXED|EDIT_INOUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_SUNKEN  INIT("00001")          TABORDER(1)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL1(5, 26, 90, 45)  '조회구분'  AL_CENTER  CUR(0)      COLOR(168, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  qtyp(90, 26, 210, 46)  LEN(1)  IO_MIXED|EDIT_INOUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_SUNKEN  INIT("1")          TABORDER(2)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL2(5, 46, 90, 65)  '그룹유형코드'  AL_CENTER  CUR(0)      COLOR(168, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  gtyp(90, 46, 210, 66)  LEN(2)  IO_MIXED|EDIT_INOUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_SUNKEN  INIT("10")          TABORDER(3)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL3(5, 66, 90, 85)  '그룹번호'  AL_CENTER  CUR(0)      COLOR(168, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  gpno(90, 66, 210, 86)  LEN(20)  IO_MIXED|EDIT_INOUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_SUNKEN          TABORDER(4)  IOORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL4(5, 86, 90, 105)  '그룹명'  AL_CENTER  CUR(0)      COLOR(168, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  gpnm(90, 86, 210, 106)  LEN(40)  IO_MIXED|EDIT_INOUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_SUNKEN          TABORDER(5)  IOORDER(5)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL5(215, 6, 300, 25)  '레코드 갯수'  AL_CENTER  CUR(0)      COLOR(168, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  OUTPUT0(300, 6, 362, 25)  LEN(1)  IO_NUM|AL_LEFT|    COLOR(192, 69)  CUR(0)            TABORDER(0)  IOORDER(6)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+GRID  GRID0(214, 28, 755, 285)  VISIBLEROW(0)  CELLH(20)  MATRIX(999, 8)  FIX(0)  MAINCOLOR(208, 232)  LINECOLOR(0)  FOCUSCOLOR(0)  FOCUSKIND(0)  |FLEXIBLE|VSCROLL|HSCROLL    &
+	COLINFO("gpno")  LEN(20)  WIDTH(63)  HEAD("그룹번호")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_MIXED|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("gpnm")  LEN(40)  WIDTH(64)  HEAD("그룹명")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_MIXED|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("acno")  LEN(20)  WIDTH(80)  HEAD("그룹계좌번호")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_MIXED|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("acnm")  LEN(40)  WIDTH(67)  HEAD("계좌명")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_MIXED|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("pswd")  LEN(44)  WIDTH(68)  HEAD("비밀번호")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_MIXED|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("mult")  LEN(17)  WIDTH(58)  HEAD("배수")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_MIXED|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("rate")  LEN(17)  WIDTH(53)  HEAD("비율")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_MIXED|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("gnm2")  LEN(40)  WIDTH(80)  HEAD("그룹계좌부기명")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_MIXED|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    TABORDER(6)  IOORDER(7)  ENABLE  &
+  VISIBLE
+
+BUTTON  btn_send(5, 110, 85, 150)  '전송'  TP_PUSH      AL_CENTER    FOCUS  COLOR(208, 232)  CUR(0)      TABORDER(7)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON0(0, 265, 80, 285)  '콤보테스트'  TP_PUSH      AL_CENTER    FOCUS  COLOR(208, 232)  CUR(0)      TABORDER(8)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+COMBO  COMBO0(90, 265, 210, 285)  TP_NONE  LEN(20)  COUNT(0)  VCOUNT(0)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_NUM|EDIT_INOUT|FA_SKIP    COLOR(68, 69)  CUR(0)    TABORDER(9)  IOORDER(8)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  GUIDE(5, 290, 755, 310)  LEN(999)  IO_MIXED|AL_LEFT||FA_SKIP    COLOR(192, 69)  CUR(0)            TABORDER(0)  IOORDER(9)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+GRID  GRID1(225, 340, 766, 597)  VISIBLEROW(0)  CELLH(20)  MATRIX(999, 8)  FIX(0)  MAINCOLOR(208, 232)  LINECOLOR(0)  FOCUSCOLOR(0)  FOCUSKIND(0)  |FLEXIBLE|VSCROLL|HSCROLL    &
+	COLINFO("gpno")  LEN(20)  WIDTH(63)  HEAD("그룹번호")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_MIXED|EDIT_OUTPUT  |FA_SKIP    COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("gpnm")  LEN(40)  WIDTH(64)  HEAD("그룹명")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_MIXED|EDIT_OUTPUT  |FA_SKIP    COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("acno")  LEN(20)  WIDTH(80)  HEAD("그룹계좌번호")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_MIXED|EDIT_OUTPUT  |FA_SKIP    COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("acnm")  LEN(40)  WIDTH(67)  HEAD("계좌명")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_MIXED|EDIT_OUTPUT  |FA_SKIP    COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("pswd")  LEN(44)  WIDTH(68)  HEAD("비밀번호")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_MIXED|EDIT_OUTPUT  |FA_SKIP    COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("mult")  LEN(17)  WIDTH(58)  HEAD("배수")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_MIXED|EDIT_OUTPUT  |FA_SKIP    COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("rate")  LEN(17)  WIDTH(53)  HEAD("비율")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_MIXED|EDIT_OUTPUT  |FA_SKIP    COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("gnm2")  LEN(40)  WIDTH(80)  HEAD("그룹계좌부기명")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_MIXED|EDIT_OUTPUT  |FA_SKIP    COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    TABORDER(10)  IOORDER(10)  ENABLE  &
+  VISIBLE
+
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+' 1:그룹조회 , 2:그룹계좌조회
+Dim qryMode, groupList, groupAcnt, groupingAcnt, qryIndx, bFirst
+Set groupAcnt = CreateObject("Scripting.Dictionary")
+Set groupingAcnt = CreateObject("Scripting.Dictionary")
+
+Sub Refresh()
+	GRID0.Clear
+	GRID1.Clear
+	groupAcnt.RemoveAll()
+	groupingAcnt.RemoveAll()
+	qryMode = 1
+	SCREEN.Send 0
+End Sub
+
+Sub QueryGroupList(cb_group)
+	Dim cbtxt
+	cbtxt = ""
+
+'	' 그룹이 존재하지 않을경우
+'	If UBound(groupList)=-1 Then
+'		SCREEN.Object(cb_group).SetItems cbtxt
+'		Exit Sub
+'	End If
+
+	For i=0 To UBound(groupList)
+		cbtxt = cbtxt  & groupList(i)(0) & groupList(i)(1) & vbTab
+	Next
+
+	If UBound(groupList)<>-1 Then
+		cbtxt = groupList(0)(0) & vbTab & cbtxt
+		SCREEN.Object(cb_group).SetItems cbtxt
+	Else
+		COMBO0.Clear
+	End If
+End Sub
+
+'1902에서 사용함.
+Sub QueryGroupListToGrid(grid)
+	Dim grno, grnm, nIndex
+
+	SCREEN.Object(grid).clear
+	For i=0 To UBound(groupList)
+		grno = Trim(groupList(i)(0))
+		grnm = groupList(i)(1)
+		SCREEN.Object(grid).InsertRow -1
+		SCREEN.Object(grid).SetGridCell i+1, 3, grno
+		nIndex = InStr(grnm, " ")
+		SCREEN.Object(grid).SetGridCell i+1, 2, Mid(grnm, nIndex+1)
+	Next
+End Sub
+
+Sub RemoveNonGroupingRows(gd_acnt, acno_idx)
+	Dim acnts, gpid, grid
+	Set grid = SCREEN.Object(gd_acnt)
+	For ii=grid.Rows To 1 Step -1
+		'MsgBox ii & " : " & Trim(grid.GetGridCell(ii, acno_idx)) & ", " & groupingAcnt.Exists( Trim(grid.GetGridCell(ii, acno_idx)) )
+		If Not groupingAcnt.Exists( Trim(grid.GetGridCell(ii, acno_idx)) ) Then
+			grid.RemoveRow(ii-1)
+		End If
+	Next
+End Sub
+
+Sub QueryAccountList(gp_no, gd_acnt)
+	Dim acnts, grid
+	acnts = groupAcnt.Item( gp_no & Space(20-Len(gp_no)) )
+	Set grid = SCREEN.Object(gd_acnt)
+	grid.Clear
+	grid.SetRows UBound(acnts)+1
+	For i=0 To UBound(acnts)
+		Call grid.SetGridCell(i+1, 1, acnts(i)(0))
+		Call grid.SetGridCell(i+1, 2, acnts(i)(1))
+		Call grid.SetGridCell(i+1, 3, acnts(i)(2))
+		Call grid.SetGridCell(i+1, 4, acnts(i)(3))
+		Call grid.SetGridCell(i+1, 5, acnts(i)(4))
+		Call grid.SetGridCell(i+1, 6, acnts(i)(2))
+	Next
+End Sub
+
+Sub StrQueryGroupList(strbox)
+	QueryGroupList "parent." & strbox
+End Sub
+
+Function FormatAcnt(str)
+	If Len(Trim(str))<>11 Then
+		FormatAcnt = str
+	End If
+	FormatAcnt = Mid(str,1,3)&"-"&Mid(str,4,2)&"-"&Mid(str,6,6)
+End Function
+
+Sub StrQueryAcntList(gp_no, tp, grid, combo)
+	Dim ary2, cbtxt
+	'그룹ID 길이 맞추기 위해서 공백처리
+	'SYSTEM.Trace "StrQueryAcntList"& grid
+
+	For i=0 To 20-Len(gp_no)-1
+		gp_no = gp_no+" "
+	Next
+	ary2 = groupAcnt.Item(gp_no)
+
+	If IsEmpty(ary2) Then
+		Exit Sub
+	End If
+
+	cbtxt = ""
+	SCREEN.Object("main."&grid).SetRows UBound(ary2,1)+1
+	For i=0 To UBound(ary2)
+		Call SCREEN.Object("main."&grid).SetGridCell((i+1), 1, ary2(i)(0))
+		Call SCREEN.Object("main."&grid).SetGridCell((i+1), 2, ary2(i)(1))
+		Call SCREEN.Object("main."&grid).SetGridCell((i+1), 3, ary2(i)(2))
+		Call SCREEN.Object("main."&grid).SetGridCell((i+1), 4, ary2(i)(3))
+		Call SCREEN.Object("main."&grid).SetGridCell((i+1), 5, ary2(i)(4))
+		If tp = 2 Then
+			acnt = ary2(i)(0)
+			acnm = Trim(ary2(i)(1))
+			cbtxt = cbtxt  & acnt&FormatAcnt(acnt)&"    "&acnm&""& vbTab
+		End If
+		'cbtxt = cbtxt  & ary2(i)(0) & ary2(i)(1) & vbTab
+	Next
+	If tp = 2 Then
+		cbtxt = ary2(0)(0)& vbTab & cbtxt
+		SCREEN.Object("main."&combo).SetItems cbtxt
+	End If
+	SCREEN.Proc "main.OBJ_ACCN.EndQueryGroup", "2"
+
+End Sub
+
+Sub QueryAllAccountList(gd_acnt)
+	Dim grid, Orggrid
+	Set grid = SCREEN.Object(gd_acnt)
+	Set Orggrid = SCREEN.Object("OBJ_UTP.GRID0")
+	grid.Clear
+	grid.SetRows GRID1.Rows
+	For i=1 To GRID1.Rows
+		Call grid.SetGridCell(i, 1, Trim(GRID1.GetGridCell(i, 3)))
+		Call grid.SetGridCell(i, 2, Trim(GRID1.GetGridCell(i, 4)))
+		Call grid.SetGridCell(i, 3, Trim(GRID1.GetGridCell(i, 5)))
+		Call grid.SetGridCell(i, 4, Trim(GRID1.GetGridCell(i, 6)))
+		Call grid.SetGridCell(i, 5, Trim(GRID1.GetGridCell(i, 7)))
+
+		'SYSTEM.Trace "grid[" & GRID1.Rows & "] accn[" & Trim(GRID1.GetGridCell(i, 3)) & "] pwd[" & Trim(GRID1.GetGridCell(i, 5)) & "]"
+	Next
+End Sub
+
+Sub QueryAccountListNoSet(gp_no, gd_acnt)
+	Dim acnts, grid
+	acnts = groupAcnt.Item( gp_no & Space(20-Len(gp_no)) )
+	Set grid = SCREEN.Object(gd_acnt)
+	grid.Clear
+	'grid.SetRows UBound(acnts)+1
+	For i=0 To UBound(acnts)
+		grid.InsertRow(-1)
+		Call grid.SetGridCell(i+1, 1, acnts(i)(0))
+		Call grid.SetGridCell(i+1, 2, acnts(i)(1))
+		Call grid.SetGridCell(i+1, 3, acnts(i)(2))
+		Call grid.SetGridCell(i+1, 4, acnts(i)(3))
+		Call grid.SetGridCell(i+1, 5, acnts(i)(4))
+		Call grid.SetGridCell(i+1, 6, acnts(i)(2))
+	Next
+End Sub
+
+_AW_ONSTART_AW_
+'디폴트 그룹리스트조회
+Call Refresh()
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+LEDGER.Rcnt = "0040"
+GRID0.SetDataPosition 2
+If qryMode=1 Then
+	qtyp.Data = "1"
+Else
+	qtyp.Data = "2"
+	If UBound(groupList)=-1 Then
+		SCREEN.OnSend = False
+		Exit Sub
+	End If
+	gpno.Data = groupList(qryIndx)(0)
+
+End If
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+
+If qryMode=1 Then
+	If LEDGER.Next = "Y" Then
+		LEDGER.Fkey = "7"
+		SCREEN.Send 0
+		Exit Sub
+	Else
+		' 초기 그룹 조회
+		Dim data, text, tdat, idx
+		ReDim groupList( GRID0.Rows-1 )
+
+		For i=1 To GRID0.Rows
+			data = GRID0.GetGridCell(i, 1)
+			tdat = Trim(data)
+			'SYSTEM.Trace " tdat[" & tdat & "] text[" & Mid(tdat, Len(tdat)-2) & "]"
+			text = Mid(tdat, Len(tdat)-2) & " " & Trim(GRID0.GetGridCell(i, 2))
+			groupList(i-1) = Array(data, text)
+		Next
+
+		qryMode = 2
+		qryIndx = 0
+		GRID0.Clear
+		SCREEN.Send 0
+		Exit Sub
+	End If
+End If
+
+If qryMode=2 Then
+	If LEDGER.Next="Y" Then
+		LEDGER.Fkey = "7"
+		SCREEN.Send 0
+		Exit Sub
+	Else
+		Dim arr, acno, acnm, pswd, mult, rate, grno, grnm
+		ReDim arr(GRID0.Rows-1)
+
+		For i=1 To GRID0.Rows
+			grno = Trim(GRID0.GetGridCell(i, 1))
+			grnm = Trim(GRID0.GetGridCell(i, 2))
+			acno = Trim(GRID0.GetGridCell(i, 3))
+			acnm = Trim(GRID0.GetGridCell(i, 4))
+			pswd = Trim(GRID0.GetGridCell(i, 5))
+			mult = Trim(GRID0.GetGridCell(i, 6))
+			rate = Trim(GRID0.GetGridCell(i, 7))
+
+			GRID1.SetRows GRID1.Rows + 1
+			GRID1.InsertRow(-1)
+			GRID1.SetGridCell GRID1.Rows, 1, grno
+			GRID1.SetGridCell GRID1.Rows, 2, grnm
+			GRID1.SetGridCell GRID1.Rows, 3, acno
+			GRID1.SetGridCell GRID1.Rows, 4, acnm
+			GRID1.SetGridCell GRID1.Rows, 5, pswd
+			GRID1.SetGridCell GRID1.Rows, 6, mult
+			GRID1.SetGridCell GRID1.Rows, 7, rate
+
+			arr(i-1) = Array(acno, acnm, pswd, mult, rate)
+			groupingAcnt.Item(acno) = True
+
+		Next
+
+		'SYSTEM.Trace "mode2 "
+		'SCREEN.Proc "OBJ_UTP.SetData", ""
+
+		groupAcnt.Add gpno.Data, arr
+
+		qryIndx = qryIndx + 1
+		If qryIndx<=UBound(groupList) Then
+			GRID0.Clear
+			SCREEN.Send 0
+		Else
+			SCREEN.Proc "parent.EndQueryGroup", "1"
+			'OBJ_UTP.Send
+
+		End If
+
+	End If
+End If
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(btn_send)
+_AW_ONCLICK_AW_
+SCREEN.Send 0
+'Call Refresh()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON0)
+_AW_ONCLICK_AW_
+
+QueryGroupList COMBO0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

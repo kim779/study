@@ -1,0 +1,428 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB4302T0)
+MAPSIZE(367, 600)
+VERSION(001)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("투자주체별 순매수추")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(FMS|FLASH)
+TITLE("[4302] 투자주체별 순매수추이")
+TOPATH(AXIS)
+METHOD(MENU)
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  SYMBOL62(0, 0, 600, 51)        COLOR(66, 130)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  R1(3, 3, 53, 23)  '거래소'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(gp1)      COLOR(14, 69)  CUR(0)      TABORDER(1)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  R2(108, 3, 159, 23)  '코스닥'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(gp1)      COLOR(14, 69)  CUR(0)      TABORDER(2)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  R3(163, 3, 217, 23)  'KP선물'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(gp1)      COLOR(14, 69)  CUR(0)      TABORDER(3)  ENABLE  &
+  VISIBLE  CHECKED  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  R4(219, 3, 261, 23)  'KP콜'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(gp1)      COLOR(14, 69)  CUR(0)      TABORDER(4)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  R5(265, 3, 309, 23)  'KP풋'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(gp1)      COLOR(14, 69)  CUR(0)      TABORDER(5)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  UPNM(689, 144, 770, 162)  AL_LEFT  FONT("굴림", 9, BOLD)  CUR(0)      COLOR(194, 0)  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+GROUP  GP1(997, 128, 1019, 157)  'Group'        COLOR(-1, 0)  ENABLE  &
+  HINTTYPE(IH_NONE)
+GROUP  GP2(1013, 153, 1035, 182)  'Group'        COLOR(-1, 0)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  F2(528, 3, 590, 23)  '금액(억)'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(gp3)      COLOR(14, 69)  CUR(0)      TABORDER(6)  ENABLE  &
+  VISIBLE  CHECKED  TRANSPARENT  HINTTYPE(IH_NONE)
+GROUP  GP3(1007, 143, 1029, 172)  'Group'        COLOR(-1, 0)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  R8(57, 3, 107, 23)  'KP200'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(gp1)      COLOR(14, 69)  CUR(0)      TABORDER(7)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  62302(731, 163, 756, 181)  LEN(2)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(203, 232)  CUR(0)  TP_NONE          TABORDER(8)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  62304(732, 212, 757, 229)  LEN(2)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(203, 232)  CUR(0)  TP_NONE          TABORDER(9)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  F1(447, 3, 521, 23)  '수량(계약)'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(gp3)      COLOR(14, 69)  CUR(0)      TABORDER(10)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL0(646, 163, 716, 183)  '시장구분'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL1(647, 212, 717, 232)  '투자자코드'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL2(646, 187, 716, 207)  '업종구분'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  62303(731, 187, 765, 204)  LEN(4)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(203, 232)  CUR(0)  TP_NONE          TABORDER(11)  IOORDER(3)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  Lobj(0, 51, 247, 367)    "IB4302T1"  TABORDER(12)  IOORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  Robj(248, 53, 598, 367)    RESIZABLE  "IB4302T3"  TABORDER(13)  IOORDER(5)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BOX  BOX0(246, 51, 600, 368)    COLOR(75, 75)  LINEW(1)  BX_LINE    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  E1(45, 29, 85, 49)  '개인'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(gp2)      COLOR(14, 69)  CUR(0)      TABORDER(14)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  E2(3, 29, 43, 49)  '외인'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(gp2)      COLOR(14, 69)  CUR(0)      TABORDER(15)  ENABLE  &
+  VISIBLE  CHECKED  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  E3(327, 29, 367, 49)  '은행'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(gp2)      COLOR(14, 69)  CUR(0)      TABORDER(16)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  E4(371, 29, 434, 49)  '기타금융'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(gp2)      COLOR(14, 69)  CUR(0)      TABORDER(17)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  E5(132, 29, 196, 49)  '금융투자'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(gp2)      COLOR(14, 69)  CUR(0)      TABORDER(18)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  E6(200, 29, 240, 49)  '보험'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(gp2)      COLOR(14, 69)  CUR(0)      TABORDER(19)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  E7(438, 29, 488, 49)  '연기금'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(gp2)      COLOR(14, 69)  CUR(0)      TABORDER(20)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  E8(243, 29, 283, 49)  '투신'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(gp2)      COLOR(14, 69)  CUR(0)      TABORDER(21)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  E0(88, 29, 128, 49)  '기관'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(gp2)      COLOR(14, 69)  CUR(0)      TABORDER(22)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  e9(285, 29, 325, 49)  '사모'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(gp2)      COLOR(14, 69)  CUR(0)      TABORDER(23)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  e10(492, 29, 532, 49)  '국가'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(gp2)      COLOR(14, 69)  CUR(0)      TABORDER(24)  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  e11(534, 29, 595, 49)  '기타법인'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(gp2)      COLOR(14, 69)  CUR(0)      TABORDER(25)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+
+Sub P_OBJSEND()
+	saveUserConfig()
+	Lobj.Send
+	Robj.send
+End Sub
+
+Function loadUserConfig()
+	loadUserConfig = False
+'	If SCREEN.CreateObject("Info") Then
+
+'		str1  = Trim(INFO.popData(LOGIN.Name, "userconf.ini", "DH322200", "62302"))
+		If str1 = "" Then
+		    saveUserConfig()
+		Else
+			S62302.Data = str1
+			S62303.data = Trim(INFO.popData(LOGIN.Name, "userconf.ini", "IB430200", "62303"))
+			Select Case Trim(S62302.Data)
+			Case "0"
+				If S62303.Data = "0001" Then
+					R1.Checked = True
+				Else
+					R8.Checked = True
+				End If
+			Case "1"
+				R2.Checked = True
+			Case "2"
+				R3.Checked = True
+			Case "5"
+				R4.Checked = True
+			Case "6"
+				R5.Checked = True
+			Case Else
+			End Select
+
+'			S62304.data = Trim(INFO.popData(LOGIN.Name, "userconf.ini", "IB430200", "62304"))
+			Select Case Trim(S62304.Data)
+			Case "9"
+				E2.Checked = True
+			Case "8"
+				E1.Checked = True
+			Case "0"
+				E0.Checked = True
+			Case"3"
+				E8.Checked = True
+			Case "1"
+				E5.checked = True
+			Case "2"
+				E6.Checked = True
+			Case "4"
+				E3.Checked = True
+			Case "5"
+				E4.Checked = True
+			Case "6"
+				E7.Checked = True
+			Case "7"
+				E9.Checked = True
+			Case "13"
+				e10.Checked = True
+			Case "12"
+				e11.Checked = True
+			Case Else
+			End Select
+'			str1 = Trim(INFO.popData(LOGIN.Name, "userconf.ini", "IB430200", "GUBN"))
+			If str1 = "1" Then
+				F1.checked = True
+				Lobj.SetObject("IB4302T1")
+			Else
+				F2.checked = True
+				Lobj.SetObject("IB4302T2")
+			End If
+
+			loadUserConfig = True
+'		End If
+
+	End If
+End Function
+
+Sub saveUserConfig()
+	Dim gubn
+'	If SCREEN.CreateObject("Info") Then
+'		INFO.pushData LOGIN.Name, "userconf.ini", "IB430200", "62302", S62302.Data
+'		INFO.pushData LOGIN.Name, "userconf.ini", "IB430200", "62303", S62303.Data
+'		INFO.pushData LOGIN.Name, "userconf.ini", "IB430200", "62304", S62304.Data
+		If F1.Checked = True Then
+			gubn = "1"
+		Else
+			gubn = "2"
+		End If
+'		INFO.pushData LOGIN.Name, "userconf.ini", "DH322200", "GUBN", gubn
+
+'	End If
+End Sub
+
+Sub SetCombo(bEnable)
+	e10.Enable = bEnable
+	E9.Enable = bEnable
+
+	If bEnable = False Then
+		If E9.Checked  Or e10.Checked Then
+			E2.Checked = True
+			S62304.Data = "9"
+			P_objsend()
+		End If
+	End If
+
+End Sub
+
+_AW_ONSTART_AW_
+If loadUserConfig() = False Then
+	S62302.Data = "2"
+	S62303.Data = "0"
+	S62304.Data = "9"
+End If
+
+SetCombo(False)
+
+P_objsend()
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+'If F1.Checked = True Then
+'	SCREEN.Object("Robj.F1").data = "1"
+'	SCREEN.Object("Robj.F2").data = "0"
+'End If
+'
+'If F2.Checked = True Then
+'	SCREEN.Object("Robj.F1").data = "0"
+'	SCREEN.Object("Robj.F2").data = "1"
+'End If
+Robj.Send
+
+SCREEN.OnSend = False
+
+_AW_ONENDSUB_AW_
+_AW_ONCLOSE_AW_
+saveUserConfig()
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(R1)
+_AW_ONCLICK_AW_
+S62302.Data = "0"
+S62303.Data = "0001"
+
+SetCombo(True)
+
+P_objsend()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(R2)
+_AW_ONCLICK_AW_
+S62302.Data = "1"
+S62303.Data = "1"
+
+SetCombo(True)
+
+P_objsend()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(R3)
+_AW_ONCLICK_AW_
+S62302.Data = "2"
+S62303.Data = "0"
+
+SetCombo(False)
+
+P_objsend()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(R4)
+_AW_ONCLICK_AW_
+S62302.Data = "5"
+S62303.Data = "0"
+
+SetCombo(False)
+
+P_objsend()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(R5)
+_AW_ONCLICK_AW_
+S62302.Data = "6"
+S62303.Data = "0"
+
+SetCombo(False)
+
+P_objsend()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(F2)
+_AW_ONCLICK_AW_
+Lobj.SetObject("IB4302T1")
+P_objsend()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(R8)
+_AW_ONCLICK_AW_
+S62302.Data = "0"
+S62303.Data = "1001"
+
+SetCombo(True)
+
+P_objsend()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(F1)
+_AW_ONCLICK_AW_
+Lobj.SetObject("IB4302T2")
+P_objsend()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(E1)
+_AW_ONCLICK_AW_
+S62304.Data = "8"
+P_objsend()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(E2)
+_AW_ONCLICK_AW_
+S62304.Data = "9"
+P_objsend()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(E3)
+_AW_ONCLICK_AW_
+S62304.Data = "4"
+P_objsend()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(E4)
+_AW_ONCLICK_AW_
+S62304.Data = "5"
+P_objsend()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(E5)
+_AW_ONCLICK_AW_
+S62304.Data = "1"
+P_objsend()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(E6)
+_AW_ONCLICK_AW_
+S62304.Data = "2"
+P_objsend()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(E7)
+_AW_ONCLICK_AW_
+S62304.Data = "6"
+P_objsend()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(E8)
+_AW_ONCLICK_AW_
+S62304.Data = "3"
+P_objsend()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(E0)
+_AW_ONCLICK_AW_
+S62304.Data = "0"
+P_objsend()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(e9)
+_AW_ONCLICK_AW_
+S62304.Data = "12"
+P_objsend()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(e10)
+_AW_ONCLICK_AW_
+	S62304.Data = "13"
+	P_objsend()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(e11)
+_AW_ONCLICK_AW_
+S62304.Data = "7"
+P_objsend()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

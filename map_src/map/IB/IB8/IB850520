@@ -1,0 +1,197 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB850520)
+MAPSIZE(490, 800)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("현금상환")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+TITLE("현금상환")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL63(-3, 50, 803, 490)  LIMAGE(0)  LINEW(5)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL0(0, 0, 800, 50)  LINETYPE(3)  LINECOLOR(64)      COLOR(66, 232)  CUR(0)    AL_CENTER  FONT("굴림체", 10, NORMAL)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+CONTROL  AN50(74, 3, 214, 23)    "CX_Account"  "/w0"  LEN(11)  EDIT_INPUT    COLOR(192, 130)  TABORDER(1)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL0(6, 3, 56, 23)  '계좌번호'  AL_LEFT  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(66, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL2(6, 26, 68, 46)  '상환금'  AL_LEFT  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(66, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL4(309, 26, 391, 46)  '총 상환할금액'  AL_LEFT  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(66, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL1(338, 3, 388, 23)  '비밀번호'  AL_LEFT  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(66, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  zPwd(388, 3, 448, 23)  LEN(8)  IO_MIXED|EDIT_INPUT|FA_PASSWD|FA_WRAP    COLOR(192, 130)  CUR(0)  TP_SUNKEN          TABORDER(2)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  order_btn(679, 26, 794, 46)  '현금상환신청'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, BOLD)  FOCUS  COLOR(208, 68)  CUR(0)    "담보교체신청.bmp"    TABORDER(5)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+OUT  lTotRfundRqrdAmt(388, 26, 528, 46)  LEN(16)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSUP    COLOR(192, 130)  CUR(0)  LINECOLOR(65)          IFRGB(69, 69)  TABORDER(0)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  ACNM(217, 3, 281, 23)  LEN(20)  IO_MIXED|AL_LEFT||FA_SKIP  FONT("굴림체", 9, NORMAL)    COLOR(49, 130)  CUR(0)  LINECOLOR(48)          TABORDER(0)  IOORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  aa(74, 26, 214, 46)  LEN(15)  IO_NUM|EDIT_INPUT|FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_WRAP|FA_SKIP|SA_SPACE    COLOR(192, 130)  CUR(0)  TP_SUNKEN          TABORDER(3)  IOORDER(5)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+USRTAB  UTAB0(6, 171, 794, 197)  FOCUS  INDEX(0)  COUNT(1)  AL_TOP  TAB_IMAGE        COLOR(3, 70)  CUR(0)  TABIMAGE("tab.bmp")  FCOLOR(3, 71)  CAPTION("현금상환 및 현금상환취소 내역")  TABINFO("1:1")  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  obj_list(6, 197, 794, 471)    "IB850522"  TABORDER(6)  IOORDER(6)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  send_btn(640, 26, 677, 46)  '조회'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, BOLD)  FOCUS  COLOR(208, 186)  CUR(0)    "조회btn.bmp"    TABORDER(4)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+OBJECT  obj(6, 59, 794, 161)    "IB850521"  TABORDER(7)  IOORDER(7)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Option Explicit
+
+Sub Set_account()
+	SCREEN.ClearAll 0, 2
+	aa.Clear
+	obj.ClearAll 2
+	obj_list.ClearAll 2
+
+	If Len(Trim(AN50.Data)) = 11 Then
+		ACNM.Data = Trim(AN50.Name)
+		zPwd.Data = Trim(AN50.Password)
+
+		If Trim(SCREEN.Object("main.zAcntNo").Data) <> Trim(AN50.Data) Then
+			SCREEN.Object("main.zAcntNo").Data = Trim(AN50.Data)
+			SCREEN.Object("main.zPwd").Data = ""
+		Else
+			If Trim(zPwd.Data) = "" And Len(Trim(SCREEN.Object("main.zPwd").Data)) >= 4 Then
+				zPwd.Data = Trim(SCREEN.Object("main.zPwd").Data)
+			End If
+		End If
+
+		If SYSTEM.ConnectBy = 1 Then
+			If Len(Trim(zPwd.Data)) < 4 Then
+				zPwd.SetFocus
+				Exit Sub
+			End If
+		End If
+
+		SCREEN.Proc "obj_list.send_f", ""
+	Else
+		SCREEN.Object("main.zAcntNo").Data = ""
+		SCREEN.Object("main.zPwd").Data = ""
+
+		AN50.SetFocus
+		Exit Sub
+	End If
+End Sub
+
+Sub chgScreen()
+	If SCREEN.Object("parent.UTAB0").ID = "2" Then
+		LABEL2.Text = "상환금"
+		LABEL4.Visible = True
+		lTotRfundRqrdAmt.Visible = True
+		order_btn.Text = "현금상환신청"
+		obj.SetObject "IB850521"
+	Else
+		LABEL2.Text = "원처리번호"
+		LABEL4.Visible = False
+		lTotRfundRqrdAmt.Visible = False
+		order_btn.Text = "현금상환취소신청"
+		obj.SetObject "IB850530"
+	End If
+End Sub
+
+_AW_ONINDECLARE_AW_
+#Load IB888833
+#Load IB888888
+
+_AW_ONENDSUB_AW_
+_AW_ONSTART_AW_
+Call chgScreen()
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+SCREEN.OnSend = False
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(AN50)
+_AW_ONCHANGE_AW_
+Call Set_account()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(zPwd)
+_AW_ONKEYCHANGE_AW_
+'== 비밀번호 변경시 조회 버튼 기능 수행.
+If SCREEN.Key = "13" Then  '-- Enter 키 입력
+	If CheckInput(AN50, zPwd) = False Then
+		Exit Sub
+	End If
+
+	SCREEN.Object("main.zAcntNo").Data = Trim(AN50.Data)
+	SCREEN.Object("main.zPwd").Data = Trim(zPwd.Data)
+
+	If Is_numeric(aa.Data) = True Then
+		Call send_f()
+	Else
+		aa.SetFocus
+	End If
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(order_btn)
+_AW_ONCLICK_AW_
+SCREEN.Proc "obj.confirmOrder", ""
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(lTotRfundRqrdAmt)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(aa)
+_AW_ONCHARCHANGE_AW_
+If Left(Trim(aa.Data), 1) = "-" Or Left(Trim(aa.Data), 1) = "+" Then
+	aa.Data = Mid(Trim(aa.Data), 2)
+End If
+_AW_ONENDSUB_AW_
+_AW_ONKEYCHANGE_AW_
+If SCREEN.Key = "13" Then  '-- Enter 키 입력
+	If CheckInput(AN50, zPwd) = True Then
+		SCREEN.Proc "obj.send_f", ""
+	End If
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(send_btn)
+_AW_ONCLICK_AW_
+SCREEN.Proc "obj.send_f", ""
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

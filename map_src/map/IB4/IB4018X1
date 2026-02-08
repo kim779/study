@@ -1,0 +1,100 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB4018X1)
+MAPSIZE(38, 234)
+VERSION(001)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("[300110]선물호가")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(FMS|FLASH)
+TITLE("[4018X1] 호가정보-선물")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pooppoop")
+MAPTYPE(FIXED)
+HEADER(NOP)
+HELPFILE("?")
+}
+
+
+
+FORM DIVISION
+{
+
+OUT  31204(179, 18, 224, 37)  LEN(6)  IO_MIXED|AL_RIGHT||FA_CORGB|SA_COSUP    COLOR(192, 69)  CUR(0)            IFRGB(94, 95)  TABORDER(0)  IOORDER(6)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_STRING)  HELPTEXT("베이시스")HELPTEXT("베이시스")
+EDIT  30301(190, 292, 265, 312)  LEN(8)  IO_ALPHA|EDIT_INOUT|FA_WRAP|FA_NOR  FONT("굴림체", 9, NORMAL)    COLOR(203, 0)  CUR(0)  TP_NONE          TABORDER(1)  IOORDER(1)  &
+  HINTTYPE(IH_NONE)
+OUT  30021(189, 321, 267, 341)  LEN(8)  IO_ALPHA|AL_LEFT||FA_FLASH    COLOR(41, 42)  CUR(0)            TABORDER(0)  IOORDER(2)  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL4(106, 321, 186, 341)  'RTS KEY'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  OBJ0(1, 0, 235, 38)    "IB4018X3"  TABORDER(2)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  31025(348, 37, 431, 54)  LEN(9)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT|FA_CORGB|SA_COSUP  FONT("굴림", 9, BOLD)    COLOR(68, 69)  CUR(0)            IFRGB(94, 95)  TABORDER(0)  IOORDER(4)  ENABLE  &
+  HINTTYPE(IH_STRING)  HELPTEXT("현재가")HELPTEXT("현재가")
+OUT  31026(349, 61, 432, 78)  LEN(9)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT|FA_CORGB|SA_COSUP  FONT("굴림", 9, BOLD)    COLOR(68, 69)  CUR(0)            IFRGB(94, 95)  TABORDER(0)  IOORDER(5)  ENABLE  &
+  HINTTYPE(IH_STRING)  HELPTEXT("현재가")HELPTEXT("현재가")
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+'Sub OnAlert()
+'	If ( SCREEN.Object("parent.OBJ_order.tab_order").ID = "1" Or SCREEN.Object("parent.OBJ_order.tab_order").ID = "2") Then
+'		If SCREEN.Object("parent.OBJ_order.OBJ_odr.CHK_auto").Checked = True And SCREEN.Object("parent.OBJ_order.OBJ_odr.r_hogb0").Checked Then
+'			If SCREEN.Object("parent.OBJ_order.OBJ_odr.flash_fg").Data = 0 Then
+'				Select Case SCREEN.Object("parent.OBJ_order.OBJ_odr.cboPrice").Data
+'					Case "025" : SCREEN.Object("parent.OBJ_order.OBJ_odr.ed_jprc").Data = S31025.Data
+'					Case "023" : SCREEN.Object("parent.OBJ_order.OBJ_odr.ed_jprc").Data = S31023.Data
+'					Case "026" : SCREEN.Object("parent.OBJ_order.OBJ_odr.ed_jprc").Data = S31026.Data
+'				End Select
+'			End If
+'		End If
+'	End If
+'End Sub
+
+_AW_ONSEND_AW_
+If Trim(SCREEN.Object("parent.ed_focod").data) = "" Then
+	S30301.Data = "00000000"
+Else
+	S30301.Data = Trim(SCREEN.Object("parent.ed_focod").data)
+End If
+
+SCREEN.Object("OBJ0.30301").Data = S30301.Data
+OBJ0.Send
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+'SCREEN.Proc "parent.obj_order.obj_odr.QueryHoga", ""
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(31204)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(31025)
+_AW_ONCLICK_AW_
+SCREEN.Object("main.obj_order.obj_odr.ed_jprc").data = S31023.Data
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(31026)
+_AW_ONCLICK_AW_
+SCREEN.Object("main.obj_order.obj_odr.ed_jprc").data = S31023.Data
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

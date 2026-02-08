@@ -1,0 +1,136 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB230025)
+MAPSIZE(192, 343)
+VERSION(001)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("선물_체결1")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(FMS|FLASH)
+TITLE("선물_체결2")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pooppoop")
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+GRID  104310(0, 0, 343, 194)  VISIBLEROW(0)  CELLH(18)  MATRIX(200, 6)  FIX(6)  MAINCOLOR(7, 0)  LINECOLOR(75)  FOCUSCOLOR(78)  FOCUSKIND(4)    FONT("굴림체", 9, NORMAL)  VARIANT("$?")  ROWC(68, 77)  |FLEXIBLE|VSCROLL|HSCROLL|INS_TOP|NO3D|RROW|XHLINE|PAGE|HEADER|GRFTEXT    &
+	COLINFO("104034")  LEN(8)  WIDTH(55)  HEAD("시간")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_ZEROSUP|SA_SPACE    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  EDITFORMAT("99:99:99")    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("104023")  LEN(12)  WIDTH(70)  HEAD("체결가")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSUP    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(94, 95)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("104032")  LEN(12)  WIDTH(68)  HEAD("체결량")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSUP    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(94, 95)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("104002")  LEN(12)  WIDTH(72)  HEAD("기초자산")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSUP    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(69, 69)    HCOMBO  HCOMBOCOUNT(2)  HCOMBODISPLAY("기초자산", "대비")  HCOMBODATA("00", "01")    &
+	COLINFO("104024")  LEN(8)  WIDTH(72)  HEAD("대비")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|FA_CONTRAST|SA_SPACE|SA_CORAW|SA_TEXT    COLOR(68, 69)  COLCUR(0, 0)    INORMAL  IFRGB(94, 95)    HCOMBO  HCOMBOCOUNT(2)  HCOMBODISPLAY("기초자산", "대비")  HCOMBODATA("00", "01")    &
+	COLINFO("104204")  LEN(12)  WIDTH(67)  HEAD("BASIS")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSIGN    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(94, 95)    HNORMAL  SORTSTARTPOS(0)    TABORDER(1)  IOORDER(4)  ENABLE  &
+  VISIBLE
+
+LABEL  LABEL0(446, 15, 546, 33)  '종목코드(단축)'  AL_CENTER  CUR(0)      COLOR(3, 63)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  100301(453, 38, 553, 56)  LEN(8)  IO_ALPHA|EDIT_INPUT    COLOR(0, 63)  CUR(0)  TP_NONE          TABORDER(2)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  100021(458, 132, 566, 147)  LEN(8)  IO_MIXED|AL_CENTER||FA_FLASH    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  col_num(45, 265, 65, 284)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 130)  CUR(0)  TP_NONE          TABORDER(3)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Option Explicit
+Dim g_ArrData
+
+g_ArrData = Array(Array("기초자산", "00"), Array("대비", "01"))
+
+'--------------------------------------------------------------------------------------
+Sub p_write_ini()
+	If SCREEN.CreateObject("INFO") = True Then
+		INFO.PushData LOGIN.Name, "userconf.ini", "IB230025", "col_num", col_num.Data
+	End If
+End Sub
+'--------------------------------------------------------------------------------------
+Sub p_read_ini()
+	Dim ArrCols, i, HeadData
+	If SCREEN.CreateObject("INFO") = True Then
+
+		Dim tmp
+		tmp = Trim(INFO.PopData(LOGIN.Name, "userconf.ini", "IB230025", "col_num"))
+
+		If tmp = "" Then
+			S104310.SetColumnVisible 4, True
+			S104310.SetColumnVisible 5, False
+			col_num.Data = 4
+		ElseIf tmp = "4" Then
+			S104310.SetColumnVisible 4, True
+			S104310.SetColumnVisible 5, False
+			col_num.Data = 4
+		Else
+			S104310.SetColumnVisible 4, False
+			S104310.SetColumnVisible 5, True
+			col_num.Data = 5
+		End If
+	End If
+End Sub
+'--------------------------------------------------------------------------------------
+
+_AW_ONSTART_AW_
+S100301.Data = Trim(SCREEN.Object("parent.ed_fcod").data)
+'SCREEN.Send 0
+p_read_ini()
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+S100301.Data = Trim(SCREEN.Object("parent.ed_fcod").data)
+
+_AW_ONENDSUB_AW_
+_AW_ONCLOSE_AW_
+p_write_ini
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(104310)
+_AW_ONCLICK_AW_
+If S104310.HitPos = 4 Then
+	Dim i
+	For i = LBound(g_ArrData) To UBound(g_ArrData)
+		If Trim(S104310.GetHeadCell( S104310.Column )) = g_ArrData(i)(1) Then
+
+			S104310.SetHead S104310.Column, g_ArrData(i)(0)
+
+			If Trim(S104310.GetHead(col_num.Data)) = "기초자산" And S104310.Column = 5  Then
+				S104310.SetColumnVisible 4, True
+				S104310.SetColumnVisible 5, False
+				S104310.SetHead S104310.Column, g_ArrData(i+1)(0)							' 변경된 column head 원복
+				col_num.Data = 4															' 보여지는 column 저장
+			ElseIf Trim(S104310.GetHead(col_num.Data)) = "대비" And S104310.Column = 4 Then
+			 	S104310.SetColumnVisible 4, False
+				S104310.SetColumnVisible 5, True
+				S104310.SetHead S104310.Column, g_ArrData(i-1)(0)
+				col_num.Data = 5
+			End If
+
+			Exit For
+		End If
+	Next
+    p_write_ini
+	SCREEN.Send 0
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

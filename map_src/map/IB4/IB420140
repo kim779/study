@@ -1,0 +1,170 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB420140)
+MAPSIZE(291, 533)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("KOSPI200 2초지수")
+MAPPUBLIC(";")
+FONT("굴림", 9, NORMAL)
+OPTIONS(FLASH)
+TITLE("[420140]KOSPI200 데이터")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("bo420140")
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+GRID  GRID(0, 0, 533, 291)  VISIBLEROW(15)  CELLH(18)  MATRIX(500, 7)  FIX(0)  MAINCOLOR(7, 0)  LINECOLOR(75)  FOCUSCOLOR(78)  FOCUSKIND(3)  AUTOSIZE    FONT("굴림체", 9, NORMAL)  VARIANT("$?")  ROWC(68, 77)  |FLEXIBLE|VSCROLL|INS_TOP|NO3D|RROW|XHLINE|PAGE|HEADER|GRFTEXT    &
+	COLINFO("Col1")  LEN(6)  WIDTH(80)  HEAD("시 간")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  EDITFORMAT("99:99:99")    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("MILS")  LEN(2)  WIDTH(106)  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_CORGB|SA_CORAW    COLOR(192, 232)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col2")  LEN(9)  WIDTH(80)  HEAD("실시간K200")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_CORGB|SA_COSUP    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(94, 95)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col3")  LEN(8)  WIDTH(80)  HEAD("K200")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_CORGB|SA_COSUP    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(94, 95)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col4")  LEN(8)  WIDTH(82)  HEAD("실시간 대비")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_CORGB|FA_CONTRAST|SA_COSIGN|SA_TEXT    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(94, 95)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col5")  LEN(6)  WIDTH(90)  HEAD("실시간 등락률")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSIGN    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(94, 95)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col6")  LEN(9)  WIDTH(106)  HEAD("GAP")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSIGN    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(94, 95)    HNORMAL  SORTSTARTPOS(0)    TABORDER(1)  IOORDER(4)  ENABLE  &
+  VISIBLE
+
+OUT  20021(259, 383, 304, 402)  LEN(5)  IO_ALPHA|AL_CENTER||FA_FLASH    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(3)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  20301(258, 327, 285, 346)  LEN(3)  IO_NUM|EDIT_INPUT|FA_SEND|FA_WRAP|FA_NOR|SA_ALL    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("101")          TABORDER(2)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  21309(259, 355, 280, 373)  LEN(2)  IO_NUM|EDIT_INPUT|FA_SEND|FA_WRAP|FA_NOR|SA_ALL    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("00")          TABORDER(3)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  OBJECT0(475, 410, 800, 435)    "IB420141"  TABORDER(4)  IOORDER(5)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  OBJECT1(425, 535, 750, 560)    "IB420142"  TABORDER(5)  IOORDER(6)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Dim g_ArrData
+
+g_ArrData = Array(0, 0, 0, 0)	'REAL 시간, REAL JISU, 거래소 지수, 거래소대비
+'----------------------------------------------------------------
+Sub SetData()
+	For i = LBound(g_ArrData) To UBound(g_ArrData)
+		If g_ArrData(0) = 0 Or g_ArrData(2) = 0 Then
+			Exit Sub
+		End If
+	Next
+	BefJisu = g_ArrData(2) - g_ArrData(3)
+
+
+	'LABEL0.Data = g_ArrData(1) & "|" & g_ArrData(2)
+	Diff = g_ArrData(1) - BefJisu
+	If BefJisu = 0 Then
+		Exit Sub
+	End If
+	DiffRate = Diff * 100 / BefJisu
+	Gap = g_ArrData(2) - g_ArrData(1)
+
+
+	If g_ArrData(1) > BefJisu Then
+		RealJisu = "+" & FormatNumber(g_ArrData(1), 2, -2, -2, 0)
+		Diff = "2 " & FormatNumber(Diff, 2, -2, -2, 0)
+		DiffRate = "+" & FormatNumber(DiffRate, 2, -2, -2, 0)
+	ElseIf g_ArrData(1) < BefJisu Then
+		RealJisu = FormatNumber(g_ArrData(1), 2, -2, -2, 0)
+
+		Diff = "5 " & FormatNumber(Abs(Diff), 2, -2, -2, 0)
+		DiffRate = "-" & FormatNumber(DiffRate, 2, -2, -2, 0)
+	Else
+		RealJisu = FormatNumber(g_ArrData(1), 2, -2, -2, 0)
+		Diff = "3 " & FormatNumber(Diff, 2, -2, -2, 0)
+		DiffRate = FormatNumber(DiffRate, 2, -2, -2, 0)
+	End If
+
+	If g_ArrData(2) > BefJisu Then
+		K200Jisu = "+" & FormatNumber(g_ArrData(2), 2, -2, -2, 0)
+	ElseIf g_ArrData(2) < BefJisu Then
+		K200Jisu = FormatNumber(g_ArrData(2), 2, -2, -2, 0)
+	Else
+		K200Jisu = FormatNumber(g_ArrData(2), 2, -2, -2, 0)
+	End If
+
+	If Gap > 0 Then
+		Gap = "+" & FormatNumber(Gap, 2, -2, -2, 0)
+	ElseIf Gap < 0 Then
+		Gap = "-" & FormatNumber(Gap, 2, -2, -2, 0)
+	Else
+		Gap = FormatNumber(Gap, 2, -2, -2, 0)
+	End If
+
+	GRID.InsertRow 0
+	GRID.SetGridCell 1, 1, g_ArrData(0)
+	GRID.SetGridCell 1, 3, RealJisu
+	GRID.SetGridCell 1, 4, K200Jisu
+	GRID.SetGridCell 1, 5, Diff
+	GRID.SetGridCell 1, 6, DiffRate
+	GRID.SetGridCell 1, 7, Gap
+
+
+End Sub
+'----------------------------------------------------------------
+Sub SetTime(Data)
+	'LABEL0.Data = Data
+End Sub
+'----------------------------------------------------------------
+Sub SetKRXData(Data)
+	ArrData = Split(Data, "|")
+	If UBound(ArrData) < 1 Then
+		Exit Sub
+	End If
+
+	g_ArrData(2) = CDbl(ArrData(0))
+	g_ArrData(3) = CDbl(ArrData(1))
+	SetData
+End Sub
+'----------------------------------------------------------------
+Sub SetRealData(Data)
+	ArrData = Split(Data, "|")
+	If UBound(ArrData) < 1 Then
+		Exit Sub
+	End If
+
+	g_ArrData(0) = Trim(ArrData(0))
+	g_ArrData(1) = CDbl(ArrData(1))
+	SetData
+End Sub
+
+_AW_ONSTART_AW_
+S21309.Data = "00"
+SCREEN.Send 0
+OBJECT0.Proc "SendData", ""
+OBJECT1.Proc "SendData", ""
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+S20301.Data = "101"
+S21309.Data = "00"	'-- 2초지수
+If S20301.Data = "   " Then
+	SCREEN.OnSend = False
+End If
+If S21309.Data = "  " Then
+	SCREEN.OnSend = False
+End If
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(GRID)
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

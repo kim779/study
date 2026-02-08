@@ -1,0 +1,174 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB400290)
+MAPSIZE(241, 243)
+VERSION(001)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("[400290] 월물별")
+MAPPUBLIC(";")
+FONT("굴림", 9, NORMAL)
+OPTIONS(FLASH|XFONT)
+TITLE("[400290] 월물별")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("bo400290")
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+GRID  grd(1, 25, 241, 241)  VISIBLEROW(0)  CELLH(18)  MATRIX(500, 5)  FIX(0)  MAINCOLOR(7, 0)  LINECOLOR(75)  FOCUSCOLOR(78)  FOCUSKIND(4)    FONT("굴림체", 9, NORMAL)  ROWC(68, 77)  |FLEXIBLE|VSCROLL|INS_TOP|NO3D|RROW|XHLINE|PAGE|GRFTEXT    &
+	COLINFO("41021")  LEN(8)  WIDTH(80)  HEAD("rts")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_ALPHA|EDIT_OUTPUT  |FA_FLASH    COLOR(68, 69)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("40310")  LEN(8)  WIDTH(49)  HEAD("행사가")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_CORGB|SA_COSUP    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("41023")  LEN(8)  WIDTH(42)  HEAD("현재가")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_CORGB|SA_COSUP    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(94, 95)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("41024")  LEN(8)  WIDTH(69)  HEAD("대비")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_CORGB|FA_CONTRAST|SA_CORAW|SA_TEXT    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(94, 95)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("41027")  LEN(9)  WIDTH(64)  HEAD("거래량")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    TABORDER(1)  IOORDER(2)  ENABLE  &
+  VISIBLE
+
+EDIT  cod2(246, 10, 324, 28)  LEN(8)  IO_ALPHA|EDIT_INOUT|FA_WRAP    COLOR(10, 63)  CUR(0)  TP_NONE          TABORDER(2)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  titl(3, 3, 240, 23)  AL_LEFT  CUR(0)      COLOR(66, 69)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  codx(250, 40, 328, 58)  LEN(8)  IO_ALPHA|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(10, 63)  CUR(0)  TP_NONE          TABORDER(3)  IOORDER(3)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  HSGA_INDX(252, 71, 279, 91)  AL_LEFT  CUR(0)      COLOR(62, 63)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  FIRST(251, 99, 278, 119)  '0'  AL_LEFT  CUR(0)      COLOR(62, 63)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  CHK1(153, 3, 235, 21)  TP_CHECK|EDIT_NOP          COLOR(208, 232)  CUR(0)      TABORDER(4)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LB_chk(171, 3, 233, 21)  AL_LEFT  CUR(0)      COLOR(66, 69)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Dim row
+row = 1
+
+_AW_ONSTART_AW_
+SCREEN.Send 0
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+Dim str, indx, title
+Dim ii, hsga
+
+'같은화면에서 send는 skip
+If (FIRST.Text = "1") Then
+	FIRST.Text = "0"
+	SCREEN.OnSend = False
+	Exit Sub
+End If
+
+cod2.Data = SCREEN.Object("main.40301").data
+If Left(cod2.Data, 1) = "2" Or Left(cod2.Data, 1) = "B" Then
+	LB_chk.Data = "PUT 종목"
+Else
+	LB_chk.Data = "CALL 종목"
+End If
+\
+
+'체크박스 선택되면 콜/풋 반대로 보여주기
+If CHK1.Checked = True Then
+	If Left(cod2.Data, 1) = "2"  Then
+		cod2.Data = "3" & Mid(cod2.Data, 2)
+    End If
+	If Left(cod2.Data, 1) = "3"  Then
+		cod2.Data = "2" & Mid(cod2.Data, 2)
+	End If
+End If
+
+'체크박스 선택되면 콜/풋 반대로 보여주기
+If CHK1.Checked = True Then
+	If Left(cod2.Data, 1) = "B"  Then
+		cod2.Data = "C" & Mid(cod2.Data, 2)
+    End If
+	If Left(cod2.Data, 1) = "C"  Then
+		cod2.Data = "B" & Mid(cod2.Data, 2)
+	End If
+End If
+
+
+If (Left(cod2.Data, 1) = "2" Or Left(cod2.Data, 1) = "B") Then		'Call
+	title = " CALL 옵션 월물별"
+End If
+
+If (Left(cod2.Data, 1) = "3" Or Left(cod2.Data, 1) = "C") Then		'Call
+	title = " PUT 옵션 월물별"
+End If
+
+
+titl.Text = title
+hsga = Trim(HSGA_INDX.Text)
+If (hsga <> "") Then
+	grd.SetPRgb hsga, 2, 62
+End If
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+Dim ii, hsga
+For ii = 1 To grd.Rows
+	hsga = Left(Trim(grd.GetGridCell(ii,2)),1)
+	If (hsga = "+") Then
+		HSGA_INDX.Text = ii
+		hsga = Mid(Trim(grd.GetGridCell(ii,2)), 2, 8)
+		grd.SetGridCell ii, 2, hsga
+		grd.SetPRgb ii, 2, 211
+		Exit Sub
+	Else
+		grd.SetPRgb ii, 2, 68
+	End If
+Next
+
+For ii = 1 To grd.Rows
+	hsga = grd.GetPRgb(ii, 2)
+
+	If hsga <> 68 Then
+		If hsga <> 211 Then
+			grd.SetPRgb ii, 2, 68
+		End If
+	End If
+Next
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(grd)
+_AW_ONDBLCLK_AW_
+Dim ocod
+If (grd.HitPos <> 3) Then
+	Exit Sub
+End If
+ocod = grd.GetGridCell(grd.Row, 1)
+ocod = Trim(ocod)
+If (ocod = "") Then
+	Exit Sub
+End If
+FIRST.Text = "1"
+codx.Data = ocod
+codx.Trigger "40301", False
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(CHK1)
+_AW_ONCLICK_AW_
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

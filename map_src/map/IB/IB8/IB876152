@@ -1,0 +1,174 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB876152)
+MAPSIZE(40, 403)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("±º∏≤√º", 9, NORMAL)
+OPTIONS(FMS|FLASH)
+TITLE("[876150]∞¸Ω…¡æ∏Ò")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pooppoop")
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+EDIT  1301(210, 495, 330, 514)  LEN(6)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(1)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  1021(193, 660, 341, 695)  LEN(10)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSUP    COLOR(192, 69)  CUR(0)            IFRGB(94, 95)  TABORDER(0)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  2023(126, 303, 274, 338)  LEN(10)  IO_NUM|AL_CENTER|    COLOR(192, 69)  CUR(0)            IFRGB(94, 95)  TABORDER(0)  IOORDER(3)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  2024(275, 303, 452, 338)  LEN(10)  IO_NUM|AL_CENTER|    COLOR(192, 69)  CUR(0)            IFRGB(94, 95)  TABORDER(0)  IOORDER(4)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  1022(6, 303, 126, 338)  LEN(30)  IO_MIXED|AL_LEFT||FA_ZEROSUP|SA_SPACE    COLOR(74, 76)  CUR(0)            TABORDER(0)  IOORDER(5)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  SYMBOL97(0, 0, 128, 40)        COLOR(232, 192)  CUR(0)    AL_LEFT  FONT("»ﬁ∏’µ’±Ÿ«ÏµÂ∂Û¿Œ", 18, NORMAL)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL2(268, 0, 403, 40)        COLOR(232, 38422271)  CUR(0)    AL_LEFT  FONT("»ﬁ∏’µ’±Ÿ«ÏµÂ∂Û¿Œ", 18, NORMAL)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL1(268, 0, 403, 40)        COLOR(232, 50218557)  CUR(0)    AL_LEFT  FONT("»ﬁ∏’µ’±Ÿ«ÏµÂ∂Û¿Œ", 18, NORMAL)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL3(128, 0, 268, 40)        COLOR(232, 50218557)  CUR(0)    AL_RIGHT  FONT("»ﬁ∏’µ’±Ÿ«ÏµÂ∂Û¿Œ", 18, NORMAL)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL4(128, 0, 268, 40)        COLOR(232, 38422271)  CUR(0)    AL_RIGHT  FONT("»ﬁ∏’µ’±Ÿ«ÏµÂ∂Û¿Œ", 18, NORMAL)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL5(128, 0, 268, 40)        COLOR(232, 192)  CUR(0)    AL_RIGHT  FONT("»ﬁ∏’µ’±Ÿ«ÏµÂ∂Û¿Œ", 18, NORMAL)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Sub Clear()
+	SCREEN.ClearAll 0, 2
+End Sub
+
+Sub OnAlert()
+		PANEL1.Text = ""
+		PANEL2.Text = ""
+		PANEL3.Text = ""
+		PANEL5.Text = ""
+		PANEL5.Text = ""
+	SYMBOL97.Text = Trim(Mid(S1022.Data, 2, 30))
+	If Left(S2024.Data, 1) = "5" Then
+		PANEL2.Visible = False
+		PANEL1.Visible = True
+		PANEL4.Visible = False
+		PANEL3.Visible = True
+		PANEL5.Visible = False
+		S2024.Data = Mid(S2024.Data, 2, 10)
+		diff = FormatCurrency (S2024.Data)
+		diff_data = Trim(Mid(diff, 2, 10))
+		PANEL1.text = " °Â" & diff_data
+		PANEL3.Text = Trim(Mid(S2023.Data, 2, 9))
+		curr = FormatCurrency (PANEL3.Text)
+		PANEL3.Text = Trim(Mid(curr, 2, 20))
+	ElseIf Left(S2024.Data, 1) = "4" Then
+		PANEL2.Visible = False
+		PANEL1.Visible = True
+		PANEL4.Visible = False
+		PANEL3.Visible = True
+		PANEL5.Visible = False
+		S2024.Data = Mid(S2024.Data, 2, 10)
+		diff = FormatCurrency (S2024.Data)
+		diff_data = Trim(Mid(diff, 2, 10))
+		PANEL1.text = " °È" & diff_data
+		PANEL3.Text = Trim(Mid(S2023.Data, 2, 9))
+		curr = FormatCurrency (PANEL3.Text)
+		PANEL3.Text = Trim(Mid(curr, 2, 20))
+	ElseIf Left(S2024.Data, 1) = "2" Then
+		PANEL1.Visible = False
+		PANEL2.Visible = True
+		PANEL3.Visible = False
+		PANEL4.Visible = True
+		PANEL5.Visible = False
+		S2024.Data = Mid(S2024.Data, 2, 10)
+		diff = FormatCurrency (S2024.Data)
+		diff_data = Trim(Mid(diff, 2, 10))
+		PANEL2.text = " °„" & diff_data
+		PANEL4.Text = Trim(Mid(S2023.Data, 2, 9))
+		curr = FormatCurrency (PANEL4.Text)
+		PANEL4.Text = Trim(Mid(curr, 2, 20))
+	ElseIf Left(S2024.Data, 1) = "1" Then
+		PANEL1.Visible = False
+		PANEL2.Visible = True
+		PANEL3.Visible = False
+		PANEL4.Visible = True
+		PANEL5.Visible = False
+		S2024.Data = Mid(S2024.Data, 2, 10)
+		diff = FormatCurrency (S2024.Data)
+		diff_data = Trim(Mid(diff, 2, 10))
+		PANEL2.text = " °Ë" & diff_data
+		PANEL4.Text = Trim(Mid(S2023.Data, 2, 9))
+		curr = FormatCurrency (PANEL4.Text)
+		PANEL4.Text = Trim(Mid(curr, 2, 20))
+	ElseIf Left(S2024.Data, 1) = "3" Then
+		PANEL1.Visible = True
+		PANEL2.Visible = False
+		PANEL3.Visible = False
+		PANEL4.Visible = False
+		PANEL5.Visible = True
+		S2024.Data = Mid(S2024.Data, 2, 10)
+		diff = FormatCurrency (S2024.Data)
+		diff_data = Trim(Mid(diff, 2, 10))
+		PANEL1.Text = diff_data
+		PANEL5.Text = Trim(S2023.Data)
+		curr = FormatCurrency (PANEL5.Text)
+		PANEL5.Text = Trim(Mid(curr, 2, 20))
+	Else
+		PANEL1.Visible = True
+		PANEL2.Visible = False
+		PANEL3.Visible = False
+		PANEL4.Visible = False
+		PANEL5.Visible = True
+
+		PANEL1.Text = Trim(S2024.Data)
+		PANEL5.Text = Trim(S2023.Data)
+		SYSTEM.Trace "panel5.text : " & PANEL5.Text
+		If(PANEL5.Text = "") Then
+			Exit Sub
+		End If
+		curr = FormatCurrency (PANEL5.Text)
+		PANEL5.Text = Trim(Mid(curr, 2, 20))
+
+
+
+	End If
+
+End Sub
+
+_AW_ONRECEIVE_AW_
+OnAlert()
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(1021)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(2023)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(2024)
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

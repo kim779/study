@@ -1,0 +1,73 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB171010)
+MAPSIZE(269, 690)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+TITLE("종합계좌현황")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+USRTAB  tab(0, 0, 690, 26)  FOCUS  INDEX(0)  COUNT(4)  AL_TOP  TAB_IMAGE      FONT("굴림체", 9, NORMAL)    COLOR(3, 70)  CUR(0)  TABIMAGE("TAB.bmp")  FCOLOR(3, 71)  CAPTION("기본정보", "약정현황", "자동이체내역", "주소현황")  TABINFO("1:1", "1:2", "1:3", "1:4")  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  sobj(0, 25, 690, 269)    "IB171011"  TABORDER(1)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONSEND_AW_
+SCREEN.OnSend = False
+If tab.ID = "1" Then
+	SCREEN.Object("sobj.obj").Send
+Else
+	sobj.Send
+End If
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(tab)
+_AW_ONCLICK_AW_
+'AN99 : 종합계좌
+'AN98 : 개별계좌
+
+Select Case tab.ID
+Case 1
+		 sobj.SetObject "IB171011"
+		 SCREEN.Object("sobj.obj").Send
+Case 2
+		 sobj.SetObject "IB171012"
+		 sobj.Send
+Case 3
+		 sobj.SetObject "IB171013"
+		 sobj.Send
+Case 4
+		 sobj.SetObject "IB171014"
+		 sobj.Send
+Case Else
+         Exit Sub
+End Select
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

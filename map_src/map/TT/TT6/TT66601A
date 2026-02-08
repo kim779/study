@@ -1,0 +1,238 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(TT66601A)
+MAPSIZE(74, 238)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+TITLE("새그룹")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pidoaged")
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL63(0, 0, 239, 75)  LIMAGE(0)  LINEW(4)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  grp_nm(78, 11, 220, 31)  LEN(40)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_SUNKEN          TABORDER(1)  IOORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL0(12, 12, 72, 32)  '그 룹 명'  AL_CENTER  CUR(0)      COLOR(228, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BOX  BOX0(6, 6, 231, 37)    COLOR(75, 75)  LINEW(1)  BX_LINE    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  ok(36, 45, 108, 65)  '확   인'  TP_PUSH|IMAGETEXT|AL_CENTER        FOCUS  COLOR(208, 130)  CUR(0)    "5BTN.bmp"    TABORDER(2)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+BUTTON  cancle(131, 44, 203, 64)  '취  소'  TP_PUSH|IMAGETEXT|AL_CENTER        FOCUS  COLOR(208, 130)  CUR(0)    "5BTN.bmp"    TABORDER(3)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+EDIT  usid(45, 278, 187, 298)  LEN(12)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_SUNKEN          TABORDER(4)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  act(52, 315, 194, 335)  LEN(1)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_SUNKEN          TABORDER(5)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  gpid(54, 354, 196, 374)  LEN(4)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_SUNKEN          TABORDER(6)  IOORDER(3)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  nrec(60, 399, 202, 419)  LEN(4)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_SUNKEN          TABORDER(7)  IOORDER(5)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  acno(61, 430, 203, 450)  LEN(11)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_SUNKEN          TABORDER(8)  IOORDER(6)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  zpwd(53, 466, 195, 486)  LEN(8)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_SUNKEN          TABORDER(9)  IOORDER(7)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  OUTPUT0(347, 500, 436, 527)  LEN(4)  IO_MIXED|AL_CENTER|    COLOR(192, 69)  CUR(0)            TABORDER(0)  IOORDER(8)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  OUTPUT1(354, 532, 729, 559)  LEN(80)  IO_MIXED|AL_CENTER|    COLOR(192, 69)  CUR(0)            TABORDER(0)  IOORDER(9)  ENABLE  &
+  HINTTYPE(IH_NONE)
+CONTROL  CONTROL0(540, 191, 655, 221)  |FA_PROTECT  "CX_DATATRANS"  ""  LEN(0)  EDIT_NOP    COLOR(192, 232)  TABORDER(0)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Sub ok_click()
+	SYSTEM.Push "new_accn", Trim(grp_nm.Data)
+	SCREEN.CloseWindow
+End Sub
+
+Sub cancle_click()
+	SYSTEM.Push "new_accn", "no"
+	SCREEN.CloseWindow
+End Sub
+
+_AW_ONSEND_AW_
+usid.Data = "981300"
+
+act.Data = "I"
+
+gpid.Data = "0000"
+
+nrec.Data = "0000"
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+
+SCREEN.SetTimer 4, False
+
+_AW_ONENDSUB_AW_
+_AW_ONTIMER_AW_
+
+SCREEN.CloseWindow
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(grp_nm)
+_AW_ONKEYCHANGE_AW_
+If SCREEN.Key = 13 Then
+	If Trim(grp_nm.data) = "" Then
+		MsgBox "그룹명을 확인하여 주십시오.", 0, "IBK 투자증권"
+		Exit Sub
+	Else
+		SCREEN.Send 0
+	End If
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(ok)
+_AW_ONCLICK_AW_
+If Trim(grp_nm.data) = "" Then
+	MsgBox "그룹명을 확인하여 주십시오.", 0, "IBK 투자증권"
+	Exit Sub
+Else
+	SCREEN.Send 0
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(cancle)
+_AW_ONCLICK_AW_
+SYSTEM.Push "new_accn", "no"
+
+SCREEN.CloseWindow
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(usid)
+_AW_ONKEYCHANGE_AW_
+If SCREEN.Key = 13 Then
+	If Trim(grp_nm.data) = "" Then
+		MsgBox "그룹명을 확인하여 주십시오.", 0, "IBK 투자증권"
+		Exit Sub
+	Else
+		Call ok_click()
+	End If
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(act)
+_AW_ONKEYCHANGE_AW_
+If SCREEN.Key = 13 Then
+	If Trim(grp_nm.data) = "" Then
+		MsgBox "그룹명을 확인하여 주십시오.", 0, "IBK 투자증권"
+		Exit Sub
+	Else
+		Call ok_click()
+	End If
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(gpid)
+_AW_ONKEYCHANGE_AW_
+If SCREEN.Key = 13 Then
+	If Trim(grp_nm.data) = "" Then
+		MsgBox "그룹명을 확인하여 주십시오.", 0, "IBK 투자증권"
+		Exit Sub
+	Else
+		Call ok_click()
+	End If
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(nrec)
+_AW_ONKEYCHANGE_AW_
+If SCREEN.Key = 13 Then
+	If Trim(grp_nm.data) = "" Then
+		MsgBox "그룹명을 확인하여 주십시오.", 0, "IBK 투자증권"
+		Exit Sub
+	Else
+		Call ok_click()
+	End If
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(acno)
+_AW_ONKEYCHANGE_AW_
+If SCREEN.Key = 13 Then
+	If Trim(grp_nm.data) = "" Then
+		MsgBox "그룹명을 확인하여 주십시오.", 0, "IBK 투자증권"
+		Exit Sub
+	Else
+		Call ok_click()
+	End If
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(zpwd)
+_AW_ONKEYCHANGE_AW_
+If SCREEN.Key = 13 Then
+	If Trim(grp_nm.data) = "" Then
+		MsgBox "그룹명을 확인하여 주십시오.", 0, "IBK 투자증권"
+		Exit Sub
+	Else
+		Call ok_click()
+	End If
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(CONTROL0)
+_AW_ONDBLCLK_AW_
+'MsgBox "Control: "+CONTROL0.data
+Dim DataList, spos, dpos, symb, data, cnt
+cnt = 1
+DataList = CONTROL0.data
+'MsgBox "DataList: "+ DataList
+dpos = 0
+spos = InStr(DataList, "|")
+While spos <> 0
+	symb = Mid(DataList,dpos+1,spos-dpos-1)
+	'MsgBox "symb: "+ symb
+	dpos = InStr(spos+1,DataList, "|")
+	data = Mid(DataList, spos+1, dPos-spos-1)
+	spos = InStr(dpos+1,DataList, "|")
+	SCREEN.Object(symb).data = data
+
+Wend
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

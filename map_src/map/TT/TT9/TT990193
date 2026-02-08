@@ -1,0 +1,381 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(TT990193)
+MAPSIZE(37, 136)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("선물옵션주문 obj")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(CR2TAB)
+TITLE("[990193] 동시주문")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(NORM)
+HEADER(LEDGER)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL2(0, 0, 136, 37)        COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  JUMUN_B(5, 5, 131, 34)  '동시주문'  TP_USER|IMAGETEXT|AL_STRETCH    KEYMAP(F2)    FONT("새굴림", 11, BOLD)  FOCUS  COLOR(193, 240)  CUR(0)    "정정.BMP"    TABORDER(1)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Dim ed_jqty, ed_jprc, ed_focod, c_hogb, OrdCfg, ed_ogno, chk_auto
+
+Sub DoOrder()
+	SCREEN.Proc "main.OBJ_order1.OBJ_odr.init_data", ""
+	SCREEN.Proc "main.OBJ_order2.OBJ_odr.init_data", ""
+	
+	If Both_Error_check("1") = False Then 
+		Exit Sub
+	End If
+	
+	If Both_Error_check("2") = False Then 
+		Exit Sub
+	End If
+	
+	SCREEN.Object("main.OBJ_order1.obj_snd").send
+	SCREEN.Object("main.OBJ_order2.obj_snd").send
+	Call QueryOption2("1","after")
+	Call QueryOption2("2","after")
+End Sub
+
+'***************************************************************************
+' DESC: 주문전 Error Check
+'***************************************************************************
+Function Both_Error_check(target)
+	Dim mstr, mmgb		
+	Both_Error_check = False
+	
+	If Trim(SCREEN.Object("main.AN20").Data) = "" Then
+		SCREEN.Object("main.AN20").SetFocus
+		MsgBox "계좌번호를 확인하십시오.", , "IBK투자증권"
+		Exit Function
+	End If
+	If Len(Trim(SCREEN.Object("main.ed_pswd").Data)) < 4 Then
+		SCREEN.Object("main.ed_pswd").SetFocus
+		MsgBox "비밀번호를 확인하십시오.", , "IBK투자증권"
+		Exit Function
+	End If
+	
+	mmgb = CLng(Mid(SCREEN.Object("main.OBJ_order"& target &".OBJ_odr").GetObject, 7, 1)) - 4
+	
+	Select Case mmgb
+		Case "1" : mstr = "매도"
+		Case "2" : mstr = "매수"		
+	End Select
+	
+	Set ed_jqty = SCREEN.Object("main.OBJ_order" & target & ".OBJ_odr.ed_jqty")
+	Set ed_jprc = SCREEN.Object("main.OBJ_order" & target & ".OBJ_odr.ed_jprc" & target)
+	Set ed_focod = SCREEN.Object("main.OBJ_order" & target & ".OBJ_odr.ed_focod" & target)
+	
+	'주문수량 check
+	If ed_jqty.Enable = True And Is_numeric(ed_jqty.Data) = False Then
+		MsgBox mstr & "수량을 입력하십시오.", , "IBK투자증권"
+		ed_jqty.SetFocus
+		Exit Function
+	End If
+
+	'주문단가 check
+	If mstr <> "취소" Then
+		If ed_jprc.Enable = True Then
+			If Left(ed_focod.Data,3)<>"401" Then
+				If Is_numeric(ed_jprc.Data) = False Then
+					MsgBox mstr & "가격을 입력하십시오.", , "IBK투자증권"
+					ed_jprc.SetFocus
+					Exit Function
+				End If
+			Else
+				' Spread종목의 경우 -가 올 수 있으므로 Is_numeric을 쓰지 않는다. lkm 09.06.04
+				If IsNumeric(ed_jprc.Data) = False Then
+					MsgBox mstr & "가격을 입력하십시오.", , "IBK투자증권"
+					ed_jprc.SetFocus
+					Exit Function
+				End If
+			End If
+		End If
+	End If
+
+	'주문착오방지를 위한 모범규준 check
+	If chk_both_mistake_order(target, ed_focod.Data, ed_jprc) = False Then
+		Exit Function
+	End If
+
+	Both_Error_check = True
+End Function
+
+'***************************************************************
+'NAME: chk_mistake_order
+'DESC: 주문착오방지를 위한 모범규준
+'      주식] 경고 - (금액:20억 초과 50억 이하), (수량:상장주식수 1%초과 3%이하)
+'            보류 - (금액:50억 초과), (수량:상장주식수 3%초과)
+'      선물] 경고 - (수량:300계약 초과 500계약 이하)
+'            보류 - (수량:500계약 초과)
+'      옵션] 경고 - (금액:20억 초과 50억 이하)
+'            보류 - (금액:50억 초과)
+'      ELW ] 경고 - (금액:20억 초과 50억 이하)
+'            보류 - (금액:50억 초과)
+'***************************************************************
+Function chk_both_mistake_order(target, code, ed_jprc)
+	Dim prc, qty, amount, listed_qty, dmsg, msgOpt, hogb,dmsg2
+	Dim dlg_check
+	Dim bElw
+	Dim mmgb
+	
+	bElw = False
+	chk_both_mistake_order = False
+	qty = Trim(ed_jqty.Data)
+	prc = Trim(ed_jprc.Data)
+	dmsg = ""
+	dmsg2 = ""
+	msgOpt = vbYesNo + vbInformation + vbDefaultButton2
+	
+	mmgb = CLng(Mid(SCREEN.Object("main.OBJ_order"& target &".OBJ_odr").GetObject, 7, 1)) - 4
+	
+	If mmgb > 2 Then		'정정/취소 제외
+		chk_both_mistake_order = True
+		Exit Function
+	End If
+	
+	Set ed_jqty = SCREEN.Object("main.OBJ_order" & target & ".OBJ_odr.ed_jqty")
+	Set ed_jprc = SCREEN.Object("main.OBJ_order" & target & ".OBJ_odr.ed_jprc" & target)
+	Set ed_focod = SCREEN.Object("main.OBJ_order" & target & ".OBJ_odr.ed_focod" & target)
+	Set c_hogb = SCREEN.Object("main.OBJ_order" & target & ".OBJ_odr.c_hogb")
+
+	Select Case Len(Trim(code))
+	Case 8		'== 선물, 옵션
+		Select Case Left(code,1)
+		Case "1", "4"
+			If qty > 300 And qty <= 500 Then
+				dmsg = "주문수량이 300계약을 초과한 이상주문입니다." '& vbLf & vbLf &_
+						'"주문처리하시겠습니까?"
+			ElseIf qty > 500 Then
+				dmsg = "주문수량이 500계약을 초과한 이상주문입니다." '& vbLf & vbLf &_
+						'"책임자의 확인 및 승인을 거친 후 처리하시기 바랍니다."
+				msgOpt = vbOKOnly + vbInformation
+			End If
+		Case "2", "3"
+			hogb = Right(c_hogb.Data, 1)
+			If hogb = "3" Or hogb = "6" Then			'-- 시장가/최유리
+				prc = Trim(SCREEN.Object("main.OBJ_sise"& target & ".40354").Data)	'-- 상한가로 적용
+			End If
+			If prc = "" Then prc = "0"
+			amount = qty * prc * 1000 	'옵션 1틱 = 100,000원 (소숫점 2자리 감안하여 1000만 곱함)
+			If amount > 2000000000 And amount <= 5000000000 Then
+				dmsg2 = "주문금액이 20억을 초과한 이상주문입니다." '& vbLf & vbLf &_
+						'"주문처리하시겠습니까?"
+			ElseIf amount > 5000000000 Then
+				dmsg2 = "주문금액이 50억을 초과한 이상주문입니다." '& vbLf & vbLf &_
+						'"'책임자의 확인 및 승인을 거친 후 처리하시기 바랍니다."
+				msgOpt = vbOKOnly + vbInformation
+			End If
+		End Select
+	Case Else
+		Exit Function
+	End Select
+
+	'주문착오방지 확인
+	If Trim(dmsg) = "" And Trim(dmsg2) = "" Then
+		chk_both_mistake_order = True
+	Else
+
+		SCREEN.CreateWindow 2, "IB999951 /p5 /d", "EDIT0" & vbTab & dmsg & vbLf & "EDIT1" & vbTab & dmsg2 & vbLf
+		dlg_check = SYSTEM.Pop("protectjumun")
+		SYSTEM.Push "protectjumun",""
+		If dlg_check = "OK" Then
+			chk_opt_mistake_order = True
+			Exit Function
+		End If
+
+'		If MsgBox(dmsg, msgOpt,"주문확인") = vbYes Then
+'			chk_opt_mistake_order = True
+'			Exit Function
+'		End If
+	End If
+End Function
+
+
+'****************************************************************************
+' DESC: 주문옵션적용 when: common(주문전), after(주문후)
+'****************************************************************************
+Sub QueryOption2(refsrc, when)
+	
+	Set ed_jqty = SCREEN.Object("main.OBJ_order" & refsrc & ".OBJ_odr.ed_jqty")
+	Set ed_jprc = SCREEN.Object("main.OBJ_order" & refsrc & ".OBJ_odr.ed_jprc" & refsrc)
+	Set ed_focod = SCREEN.Object("main.OBJ_order" & refsrc & ".OBJ_odr.ed_focod" & refsrc)
+	Set c_hogb = SCREEN.Object("main.OBJ_order" & refsrc & ".OBJ_odr.c_hogb")
+	Set OrdCfg = SCREEN.Object("main.OBJ_order" & refsrc & ".OBJ_odr.OrdCfg")
+	Set ed_ogno = SCREEN.Object("main.OBJ_order" & refsrc & ".OBJ_odr.ed_ogno")
+	
+	mmgb = CLng(Mid(SCREEN.Object("main.OBJ_order"& refsrc &".OBJ_odr").GetObject, 7, 1)) - 4
+	
+	Dim qtyOpt, cfgGB, prc, ret
+
+	ret = SYSTEM.Pop ("F_ogno")
+	If ret <> "" Then
+		Exit Sub
+	End If
+
+	If when = "after" Then
+		If OrdCfg.KeepQty = False Then		'-- 수량유지안함
+			ed_jqty.Data = "0"
+		End If
+		' 금감원 원칙으로 주문후 원주문번호 clear
+		Select Case mmgb
+		Case "3", "4"
+			ed_ogno.Data = ""
+		End Select
+
+		If mmgb <> "4" And OrdCfg.KeepPrc = False Then		'-- 단가유지안함
+			ed_jprc.Data = "0"
+		End If
+		Exit Sub
+	End If
+
+'	If when = "after" Then
+'		Select Case mmgb
+'		Case "3", "4"
+'			ed_jqty.Data = "0"
+'			ed_ogno.data = ""
+'			If mmgb = "3" Then		ed_jprc.Data = "0"
+'			Exit Sub
+'		End Select
+'	End If
+
+	Select Case mmgb
+		Case "1" : cfgGB = "SellQtyGB"
+		Case "2" : cfgGB = "BuyQtyGB"
+		Case "3"
+			qtyOpt = OrdCfg.ReadCfg("JJPrcGB")
+			Select Case qtyOpt
+				Case "0"
+					ed_jprc.Data = "0"
+				Case "1" ': OrdCfg.QueryHoga				'기본단가설정 사용
+					Call QueryHoga()	'OrdCfg.QueryHoga		'기본단가설정 사용
+				Case "2"
+					prc = SYSTEM.Pop("FO_jprc")
+					If Trim(prc) = "" Then prc = "0"
+					ed_jprc.data = prc
+			End Select
+
+			Exit Sub
+		Case "4" : Exit Sub
+	End Select
+
+	'단가설정
+	Select Case Right(c_hogb.Data,1)
+	Case "0", "5"			'지정(00,10,20), 조건부지정
+		If when = "common" Or OrdCfg.KeepPrc = False Then	'주문전 or 주문수량유지안함
+			Call QueryHoga()	'OrdCfg.QueryHoga			'기본단가설정 사용
+		End If
+	Case Else
+		ed_jprc.Data = "0"
+	End Select
+
+	'수량설정
+	ret = SYSTEM.Pop ("F_jqty")
+	If ret <> "" Then
+		ed_jqty.data = ret
+		SYSTEM.Push "F_jqty", ""
+		Exit Sub
+	End If
+
+	If when = "common" Or OrdCfg.KeepQty = False Then		'주문전 or 주문단가유지안함
+		qtyOpt = OrdCfg.ReadCfg(cfgGB)							'수량설정 index
+		Select Case qtyOpt
+			Case "0", "2"				'수량, 금액매수 Set
+				OrdCfg.QueryQty
+			Case "1"						'매도가능수량 Set				'
+				SCREEN.SetTimer 3, False
+			Case Else
+		End Select
+	End If
+
+	SCREEN.Object("main.guide").Text = " "					'메세지
+End Sub
+
+Sub QueryHoga2(refsrc)
+	Set ed_jqty = SCREEN.Object("main.OBJ_order" & refsrc & ".OBJ_odr.ed_jqty")
+	Set ed_jprc = SCREEN.Object("main.OBJ_order" & refsrc & ".OBJ_odr.ed_jprc" & refsrc)
+	Set ed_focod = SCREEN.Object("main.OBJ_order" & refsrc & ".OBJ_odr.ed_focod" & refsrc)
+	Set c_hogb = SCREEN.Object("main.OBJ_order" & refsrc & ".OBJ_odr.c_hogb")
+	Set OrdCfg = SCREEN.Object("main.OBJ_order" & refsrc & ".OBJ_odr.OrdCfg")
+	Set ed_ogno = SCREEN.Object("main.OBJ_order" & refsrc & ".OBJ_odr.ed_ogno")
+	Set chk_auto = SCREEN.Object("main.OBJ_order" & refsrc & ".OBJ_odr.chk_auto")
+
+	Dim siseObj, prcOpt, cfgGB
+
+	siseObj = "main.OBJ_sise" & refsrc & "."
+	Select Case mmgb
+		Case "1" : cfgGB = "SellPrcGB"
+		Case "2" : cfgGB = "BuyPrcGB"
+		Case "3"
+'			OrdCfg.QueryHoga
+			If OrdCfg.ReadCfg("JJPrcGb") <> "1" Then Exit Sub
+
+			prcOpt = "023"
+'			Exit Sub
+		Case Else : Exit Sub
+	End Select
+
+	If Right(c_hogb.Data,1) = "3" Or Right(c_hogb.Data,1) = "6" Then
+		ed_jprc.Data = "0"
+		Exit Sub
+	End If
+
+	If mmgb < "3" Then	prcOpt = OrdCfg.ReadCfg(cfgGB)
+	If Trim(prcOpt) = "" Then prcOpt = "023"
+	Select Case Left(ed_focod.Data,1)
+	Case "1", "4" :
+					prcOpt = "31" & prcOpt
+	Case "2", "3" :
+					prcOpt = "41" & prcOpt
+	Case Else : Exit Sub
+	End Select
+	If Len(Trim(prcOpt)) < 5 Then Exit Sub
+
+	prcOpt = siseObj & prcOpt
+	ed_jprc.Data = SCREEN.Object(prcOpt).Data
+
+	OrdCfg.Price = CStr(ed_jprc.Data / 100)
+	OrdCfg.Push
+	If mmgb = "3" Then Exit Sub
+
+	If chk_auto.Checked = False Then
+		ed_jprc.Data = "0"
+		Exit Sub
+	End If
+
+End Sub
+
+_AW_ONINDECLARE_AW_
+#load TT888888
+#load TT999927
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(JUMUN_B)
+_AW_ONCLICK_AW_
+Call DoOrder()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

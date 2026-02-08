@@ -1,0 +1,182 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB810127)
+MAPSIZE(88, 240)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+TITLE("[810127]")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(FIXED)
+HEADER(NOP)
+BGROUND(BRUSH, 171)
+}
+
+
+
+FORM DIVISION
+{
+
+EDIT  zPwd(82, 0, 192, 20)  LEN(8)  IO_ALPHA|EDIT_INPUT|FA_PASSWD|FA_WRAP|FA_ENUM    COLOR(192, 69)  CUR(0)  TP_SUNKEN    ENCRYPT("ACCN")        TABORDER(1)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  lMnyoutDpsBfbalAmt(88, 267, 197, 287)  LEN(16)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSUP    COLOR(192, 69)  CUR(0)  LINECOLOR(75)          IFRGB(232, 232)  TABORDER(0)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  lMnyoutDpsCrbalAmt(88, 289, 197, 309)  LEN(16)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSUP    COLOR(192, 69)  CUR(0)  LINECOLOR(75)          IFRGB(232, 232)  TABORDER(0)  IOORDER(3)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  lMnyrclOdpntRepayAmt(82, 66, 192, 86)  LEN(16)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT|FA_SKIP|FA_CORGB|SA_COSUP    COLOR(192, 69)  CUR(0)  LINECOLOR(75)          IFRGB(69, 69)  TABORDER(0)  IOORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  send_btn(195, 66, 227, 86)  '조회'  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(208, 69)  CUR(0)    "2btn.bmp"    TABORDER(5)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+LABEL  PAN_pwd(0, 0, 75, 20)  '계좌비밀번호'  AL_LEFT  CUR(0)      COLOR(171, 69)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  PAN_type(17, 245, 63, 265)  '출금유형'  AL_LEFT  CUR(0)      COLOR(171, 69)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  PAN_price(0, 66, 75, 86)  '출금가능금액'  AL_LEFT  CUR(0)      COLOR(171, 69)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  PAN_before(17, 267, 68, 287)  '전 예수금'  AL_LEFT  CUR(0)      COLOR(171, 69)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  PAN_after(17, 289, 68, 309)  '후 예수금'  AL_LEFT  CUR(0)      COLOR(171, 69)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  zMnyoutPtnTp(87, 245, 196, 265)  '예수금출금'  LINECOLOR(75)      COLOR(68, 69)  CUR(0)    AL_LEFT    ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  sPwd(82, 22, 192, 42)  LEN(8)  IO_ALPHA|EDIT_INPUT|FA_PASSWD|FA_WRAP|FA_ENUM    COLOR(192, 69)  CUR(0)  TP_SUNKEN    ENCRYPT("ACCN")        TABORDER(2)  IOORDER(5)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL0(0, 20, 75, 40)  '보안비밀번호'  AL_LEFT  CUR(0)      COLOR(171, 69)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  AMT(82, 89, 192, 109)  LEN(15)  IO_NUM|EDIT_INPUT|FA_COMMA|FA_RIGHT|FA_WRAP|FA_SKIP  FONT("굴림체", 9, BOLD)    COLOR(195, 69)  CUR(0)  TP_SUNKEN  INIT("0")          TABORDER(3)  IOORDER(6)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL6(0, 89, 74, 109)  '이체금액'  AL_LEFT  CUR(0)      COLOR(64, 69)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL1(0, 110, 74, 130)  '송금자명변경'  AL_LEFT  CUR(0)      COLOR(64, 69)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  send_name(82, 111, 192, 131)  LEN(40)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 69)  CUR(0)  TP_SUNKEN          TABORDER(4)  IOORDER(7)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  CHECK0(196, 89, 236, 109)  '전액'  TP_CHECK|EDIT_NOP          COLOR(208, 69)  CUR(0)      TABORDER(6)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONINDECLARE_AW_
+#LOAD IB888833
+
+_AW_ONENDSUB_AW_
+_AW_ONSTART_AW_
+SCREEN.SetTimer 5, False
+
+_AW_ONENDSUB_AW_
+_AW_ONTIMER_AW_
+If Len(SCREEN.Object("parent.CMB_ACCT").Data) = 11 Then
+	If Mid(SCREEN.Object("parent.CMB_ACCT").Data,1,1) = "5" Then
+		LABEL0.Visible = True
+		sPwd.Visible = True
+	Else
+		LABEL0.Visible = False
+		sPwd.Visible = False
+	End If
+End If
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(zPwd)
+_AW_ONKEYCHANGE_AW_
+'== 비밀번호 변경시 조회 버튼 기능 수행.
+If SCREEN.Key = "13" Then  '-- Enter 키 입력--
+	If CheckInput(SCREEN.Object("parent.zAcntNo"), zPwd) = True Then
+		SCREEN.Proc "parent.AMT_send", ""
+		If SCREEN.Object("parent.F1").Checked = True Then
+			SCREEN.Proc "parent.F1_chk", ""
+		End If
+	End If
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(lMnyoutDpsBfbalAmt)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(lMnyoutDpsCrbalAmt)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(lMnyrclOdpntRepayAmt)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(send_btn)
+_AW_ONCLICK_AW_
+If CheckInput(SCREEN.Object("parent.zAcntNo"), zPwd) = True Then
+	SCREEN.Proc "parent.AMT_send", ""
+	If SCREEN.Object("parent.F1").Checked = True Then
+		SCREEN.Proc "parent.F1_chk", ""
+	Else
+		SCREEN.Proc "parent.F2_chk", ""
+	End If
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(sPwd)
+_AW_ONKEYCHANGE_AW_
+'== 비밀번호 변경시 조회 버튼 기능 수행.
+If SCREEN.Key = "13" Then  '-- Enter 키 입력--
+	If CheckInput(SCREEN.Object("parent.zAcntNo"), zPwd) = True Then
+		SCREEN.Proc "parent.AMT_send", ""
+		If SCREEN.Object("parent.F1").Checked = True Then
+			SCREEN.Proc "parent.F1_chk", ""
+		End If
+	End If
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(AMT)
+_AW_ONCHANGE_AW_
+If Len(Trim(AMT.Data)) = 15 Then
+'	alert_msg("출금한도금액이 초과되었습니다")
+End If
+AMT.SetFocus
+_AW_ONENDSUB_AW_
+_AW_ONKEYCHANGE_AW_
+'== 비밀번호 변경시 조회 버튼 기능 수행.
+If SCREEN.Key = "13" Then  '-- Enter 키 입력
+	chk.Text = "1"
+	EDIT_AMT.Clear
+
+	Call DoOrderR()
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(CHECK0)
+_AW_ONCLICK_AW_
+If CheckInput(SCREEN.Object("parent.zAcntNo"), zPwd) = True Then
+	If CHECK0.Checked = True Then
+		AMT.Data = lMnyrclOdpntRepayAmt.Data
+	Else
+		AMT.Data = 0
+	End If
+Else
+	CHECK0.Checked = False
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

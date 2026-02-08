@@ -1,0 +1,179 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB230800)
+MAPSIZE(401, 544)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("굴림", 9, NORMAL)
+TITLE("거래원별 전체 순매수/매도 상위")
+TOPATH(AXIS)
+METHOD(MENU)
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL10(-4, 26, 548, 403)  LIMAGE(0)  LINEW(6)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  OBJECT0(6, 36, 538, 393)    "IB231010"  TABORDER(1)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  SYMBOL25(0, 0, 544, 26)        COLOR(66, 69)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  RD1(8, 3, 46, 23)  '전일'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(gp1)      COLOR(68, 130)  CUR(0)      TABORDER(2)  ENABLE  &
+  VISIBLE  CHECKED  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  RD2(54, 3, 92, 23)  '주간'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(gp1)      COLOR(68, 130)  CUR(0)      TABORDER(3)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  RD3(101, 3, 146, 23)  '2주간'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(gp1)      COLOR(68, 130)  CUR(0)      TABORDER(4)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  RD4(155, 3, 193, 23)  '월간'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(gp1)      COLOR(68, 130)  CUR(0)      TABORDER(5)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  BUTTON0(501, 3, 537, 23)  '조회'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, BOLD)  COLOR(64, 186)  CUR(0)    "조회btn.bmp"    TABORDER(6)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+GROUP  gp1(575, 10, 605, 95)  'Group'        COLOR(-1, 232)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+GROUP  gp2(620, 10, 650, 95)  'Group'        COLOR(-1, 232)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  RADIO1(231, 2, 276, 22)  '수량'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(gp2)      COLOR(68, 130)  CUR(0)      TABORDER(7)  ENABLE  &
+  VISIBLE  CHECKED  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  RADIO2(279, 2, 344, 22)  '금액(원)'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(gp2)      COLOR(68, 130)  CUR(0)      TABORDER(8)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+PANEL  PANEL3(0, 0, 1, 26)        COLOR(64, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL0(543, 0, 545, 26)        COLOR(64, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Const myFILE = "userconf.ini"
+
+Sub LoadConfig()
+	If SCREEN.CreateObject("INFO") Then
+		RD1.Checked = CBool(Trim(INFO.PopData(LOGIN.Name, myFILE, SCREEN.GetMapName(0), "RD1"))="True")
+		RD2.Checked = CBool(Trim(INFO.PopData(LOGIN.Name, myFILE, SCREEN.GetMapName(0), "RD2"))="True")
+		RD3.Checked = CBool(Trim(INFO.PopData(LOGIN.Name, myFILE, SCREEN.GetMapName(0), "RD3"))="True")
+		RD4.Checked = CBool(Trim(INFO.PopData(LOGIN.Name, myFILE, SCREEN.GetMapName(0), "RD4"))="True")
+		If Not RD1.Checked And Not RD2.Checked And Not RD3.Checked And Not RD4.Checked Then
+			RD1.Checked = True
+		End If
+
+		RADIO1.Checked = CBool(Trim(INFO.PopData(LOGIN.Name, myFILE, SCREEN.GetMapName(0), "RADIO1"))="True")
+		RADIO2.Checked = CBool(Trim(INFO.PopData(LOGIN.Name, myFILE, SCREEN.GetMapName(0), "RADIO2"))="True")
+		If Not RADIO1.Checked And Not RADIO2.Checked Then
+			RADIO1.Checked = True
+		End If
+	End If
+End Sub
+
+Sub SaveConfig()
+	If SCREEN.CreateObject("INFO") Then
+		INFO.PushData LOGIN.Name, myFILE, SCREEN.GetMapName(0), "RD1", ""&RD1.Checked
+		INFO.PushData LOGIN.Name, myFILE, SCREEN.GetMapName(0), "RD2", ""&RD2.Checked
+		INFO.PushData LOGIN.Name, myFILE, SCREEN.GetMapName(0), "RD3", ""&RD3.Checked
+		INFO.PushData LOGIN.Name, myFILE, SCREEN.GetMapName(0), "RD4", ""&RD4.Checked
+		INFO.PushData LOGIN.Name, myFILE, SCREEN.GetMapName(0), "RADIO1", ""&RADIO1.Checked
+		INFO.PushData LOGIN.Name, myFILE, SCREEN.GetMapName(0), "RADIO2", ""&RADIO2.Checked
+	End If
+End Sub
+
+Sub SendRequest()
+	If RADIO1.Checked Then
+		OBJECT0.SetObject "IB230810"
+	Else
+		OBJECT0.SetObject "IB230820"
+	End If
+
+	If RD2.Checked Then
+		SCREEN.Object("OBJECT0.flag").Data = "0100"
+	ElseIf RD3.Checked Then
+		SCREEN.Object("OBJECT0.flag").Data = "0010"
+	ElseIf RD4.Checked Then
+		SCREEN.Object("OBJECT0.flag").Data = "0001"
+	Else
+		SCREEN.Object("OBJECT0.flag").Data = "1000"
+	End If
+
+	'MsgBox SCREEN.Object("OBJECT0.flag").Data
+
+	OBJECT0.Send
+End Sub
+
+_AW_ONSTART_AW_
+Call LoadConfig()
+Call SendRequest()
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+SCREEN.OnSend = False
+
+_AW_ONENDSUB_AW_
+_AW_ONCLOSE_AW_
+Call SaveConfig()
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(RD1)
+_AW_ONCLICK_AW_
+Call SendRequest()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(RD2)
+_AW_ONCLICK_AW_
+Call SendRequest()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(RD3)
+_AW_ONCLICK_AW_
+Call SendRequest()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(RD4)
+_AW_ONCLICK_AW_
+Call SendRequest()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON0)
+_AW_ONCLICK_AW_
+OBJECT0.Send
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(RADIO1)
+_AW_ONCLICK_AW_
+Call SendRequest()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(RADIO2)
+_AW_ONCLICK_AW_
+Call SendRequest()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

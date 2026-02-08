@@ -1,0 +1,135 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(TT555555)
+MAPSIZE(419, 540)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("굴림", 9, NORMAL)
+OPTIONS(FLASH)
+TITLE("excel")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pidoksnd")
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL63(-50, -60, 850, 655)  LIMAGE(0)  LINEW(3)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON1(485, 15, 522, 35)  '조회'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, BOLD)  FOCUS  COLOR(208, 186)  CUR(0)    "조회btn.bmp"    TABORDER(1)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+EDIT  EDIT0(55, 35, 160, 55)  LEN(1)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(2)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  EDIT1(55, 60, 160, 80)  LEN(64)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(3)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  EDIT2(55, 90, 160, 110)  LEN(4)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(4)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  EDIT3(55, 120, 160, 140)  LEN(12)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(5)  IOORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  OUTPUT0(55, 175, 175, 200)  LEN(1)  IO_NUM|AL_CENTER|    COLOR(192, 130)  CUR(0)  TP_NONE          TABORDER(0)  IOORDER(5)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  OUTPUT1(55, 205, 175, 230)  LEN(64)  IO_MIXED|AL_CENTER|    COLOR(192, 130)  CUR(0)  TP_NONE          TABORDER(0)  IOORDER(6)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Dim CellValue1(5000)
+Dim CellValue2(5000)
+Dim cnt
+
+Sub CellArray()
+
+Dim objXL
+Dim objWB
+Dim objWS
+Dim ii
+
+Set objXL = CreateObject("Excel.Application")
+Set objWB = objXL.WorkBooks.Open("C:\Users\IBKS\Desktop\(HTS,MTS 파트)테이블_컬럼_분석_ALTIBASE_V1.0.xlsx")
+Set objWS = objXL.ActiveWorkBook.WorkSheets("HTS(MP11)")
+
+ii = 5
+
+Do Until objXL.Cells(ii, 2).Value = ""
+
+	CellValue1(ii-5) = objXL.Cells(ii, 2).Value
+	CellValue2(ii-5) = objXL.Cells(ii, 3).Value
+
+	GRID0.SetGridCell ii-4, 1, CellValue1(ii-5)
+	GRID0.SetGridCell ii-4, 2, CellValue2(ii-5)
+
+	cnt = cnt + 1
+	ii = ii + 1
+
+Loop
+
+objWB.Close
+objXL.Quit
+
+End Sub
+
+
+Sub file()
+
+Dim objFSO
+Dim objFile
+Dim arr(1000)
+Dim file, stk, str
+Dim ii, jj
+
+jj = 0
+'For ii = 0 To 1
+
+'	file = "C:\Users\IBKS\Desktop\" & CellValue1(ii) & ".sql"
+	file  = "C:\Users\IBKS\Desktop\TKCHMSR.sql"
+
+	Set objFSO = CreateObject("Scripting.FileSystemObject")
+	Set objFile = objFSO.OpenTextFile(file, 1)
+
+	jj = 1
+
+	Do Until ObjFile.AtEndOfStream
+		str = objFile.ReadLine
+
+		If Len(str) > 0 Then
+		'	MsgBox str
+		'	MsgBox Len(str)
+			stk = Split(str, " ")
+			GRID0.SetGridCell jj, 3, stk(1)
+			jj = jj + 1
+		End If
+	Loop
+
+	objFile.Close
+
+'Next
+
+End Sub
+
+_AW_SCRIPT_AW_(BUTTON1)
+_AW_ONCLICK_AW_
+'CellArray()
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

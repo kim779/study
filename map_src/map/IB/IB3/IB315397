@@ -1,0 +1,198 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB315397)
+MAPSIZE(227, 363)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(6)
+MAPDESC("펀드취소확인창")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(ENCODE|CR2TAB|CERTIFY)
+TITLE("[3153]펀드취소확인창")
+TOPATH(AXIS)
+METHOD(MENU)
+MAPTYPE(FIXED)
+HEADER(NOP)
+BGROUND(BRUSH, 181)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL3(0, 0, 365, 229)  LIMAGE(0)  LINEW(4)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  L_CNT(26, 178, 41, 200)  '0'  AL_LEFT  CUR(0)      COLOR(181, 94)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  s_data(530, 172, 680, 192)  LEN(20000)  IO_MIXED|EDIT_INPUT|FA_SKIP    COLOR(192, 69)  CUR(0)  TP_SUNKEN          TABORDER(1)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  NREC(530, 150, 680, 170)  LEN(4)  IO_NUM|EDIT_INOUT|FA_PROTECT    COLOR(192, 69)  CUR(0)  TP_SUNKEN  INIT(" ")          TABORDER(2)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  B_SEARCH(195, 200, 279, 220)  '펀드취소 확인'  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(208, 186)  CUR(0)    "6BTN.BMP"    TABORDER(3)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+BUTTON  BUTTON0(280, 200, 360, 220)  '아니오/닫기'  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(208, 186)  CUR(0)    "6BTN.BMP"    TABORDER(4)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+LABEL  LABEL2(44, 178, 248, 200)  '건 주문을 모두취소 하시겠습니까 ?'  AL_LEFT  CUR(0)      COLOR(181, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+GRID  GRID(7, 34, 358, 180)  VISIBLEROW(0)  CELLH(18)  MATRIX(300, 7)  FIX(0)  MAINCOLOR(7, 0)  LINECOLOR(75)  FOCUSCOLOR(78)  FOCUSKIND(4)  ROWC(68, 77)  |VSCROLL|INS_TOP|NO3D|RROW|XHLINE|PAGE|TABLE|CUD|GRFTEXT    &
+	COLINFO("accn")  LEN(11)  WIDTH(87)  HEAD("계좌번호")  COLALIGN(AL_LEFT, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_INPUT  |FA_PROTECT    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  EDITFORMAT("999-99-999999")    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col0")  LEN(10)  WIDTH(80)  HEAD("원주문번호")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("mmgb")  LEN(20)  WIDTH(58)  HEAD("매매구분")  COLALIGN(AL_LEFT, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_ALPHA|EDIT_INPUT  |FA_PROTECT    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("hogb")  LEN(20)  WIDTH(60)  HEAD("호가구분")  COLALIGN(AL_LEFT, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_INPUT  |FA_PROTECT    COLOR(68, 69)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("code")  LEN(12)  WIDTH(59)  HEAD("종목코드")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_ALPHA|EDIT_INPUT  |FA_PROTECT    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("jqty")  LEN(9)  WIDTH(51)  HEAD("주문수량")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_INPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_PROTECT|SA_SPACE    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("jprc")  LEN(10)  WIDTH(80)  HEAD("주문단가")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  FLOAT(2)  IO_NUM|EDIT_INPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_PROTECT|FA_CORGB|FA_FLOAT|SA_SPACE|SA_CORAW    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_SHOWFORM  INORMAL  IFRGB(69, 69)    HNORMAL  SORTSTARTPOS(0)    TABORDER(5)  IOORDER(3)  ENABLE  &
+  VISIBLE
+
+PANEL  GUIDE(0, 260, 888, 280)  LINECOLOR(77)      COLOR(78, 69)  CUR(0)    AL_LEFT  FONT("굴림체", 9, NORMAL)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  gubn(889, 199, 989, 219)  '1'  AL_LEFT  CUR(0)      COLOR(141, 192)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL1(428, 150, 528, 170)  'NREC'  AL_LEFT  CUR(0)      COLOR(141, 192)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL3(428, 172, 528, 192)  's_data'  AL_LEFT  CUR(0)      COLOR(141, 192)  ENABLE  &
+  HINTTYPE(IH_NONE)
+GROUP  GROUP0(480, 200, 537, 213)  'Group'        COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL1(7, 7, 358, 34)        COLOR(66, 130)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL0(8, 10, 135, 32)  '※ 펀드취소확인창'  AL_LEFT  FONT("굴림체", 9, BOLD)  CUR(0)      COLOR(181, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Dim Mydata
+
+Function data_split()
+	Mydata = Split(s_data.data, "#", -1, 1) 								' 레코드 단위로 자르고 있는중..
+
+	For ii = 0 To NREC.data-1
+		Mydata(ii) = Split(Mydata(ii), "|", -1, 1)							' 한 레코드를 개체별로 자르는중..
+		GRID.SetGridCell NREC.Data - ii, 1,Trim(Mydata(ii)(0))				' CUD
+		GRID.SetGridCell NREC.Data - ii, 2,Trim(Mydata(ii)(1))				' 주문유형
+		GRID.SetGridCell NREC.Data - ii, 3,Trim(Mydata(ii)(2))				' 시장구분
+		GRID.SetGridCell NREC.Data - ii, 4,Trim(Mydata(ii)(3))				' 매매구분
+		GRID.SetGridCell NREC.Data - ii, 5,Trim(Mydata(ii)(4))				' 계좌번호
+		GRID.SetGridCell NREC.Data - ii, 6,Trim(Mydata(ii)(5))				' 비밀번호
+		GRID.SetGridCell NREC.Data - ii, 7,Trim(Mydata(ii)(6))
+	Next
+End Function
+
+Sub cell_enable(flag)
+	Dim ii
+
+	For ii = 1 To GRID.Rows
+		If Trim(GRID.getGridCell(ii, 1)) <> "1" Then		Exit For
+		GRID.SetCellEnable ii, 11, flag
+	Next
+
+End Sub
+
+Sub AllModify()
+	Dim ii, tprc
+
+	For ii = 1 To GRID.Rows
+		If Trim(GRID.getGridCell(ii, 1)) <> "1" Then		Exit For
+
+		If r1.Checked = True Then	'지정가
+			tprc = Trim(GRID.GetGridCell(ii,11))
+			If tprc = "" Then tprc = "0"
+
+			If Mid(Trim(GRID.getGridCell(ii, 8)),2,1) = "0" Then
+				GRID.SetGridCell ii, 12,tprc*100 		' 주문가격
+			Else
+				GRID.SetGridCell ii, 12,tprc			' 주문가격
+			End If
+			GRID.SetGridCell ii, 13, "00"		' 호가구분
+		Else
+			GRID.SetGridCell ii, 12,"0"			' 주문가격
+			GRID.SetGridCell ii, 13, "03"		' 호가구분
+		End If
+
+		GRID.SetGridCell ii,6, pswd.Data  '2009.07
+
+	Next
+	SCREEN.Send 0
+End Sub
+
+_AW_ONSTART_AW_
+NREC.Pop("num")
+L_CNT.Text = NREC.Data
+
+data_split()
+cell_enable(0)
+'Call GRID.SetCellFocus(1, 11)
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+SCREEN.OnSend = False
+If SYSTEM.ConnectBy = 1 Then
+	If LOGIN.Cani = 0 Then
+		MsgBox "본사직원은 주문이 불가합니다.",,"IBK투자증권"
+		SCREEN.OnSend = False
+		Exit Sub
+	End If
+End If
+SCREEN.OnSend = True
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+MsgBox GUIDE.Text, ,"주문확인"
+SCREEN.CloseWindow()
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(B_SEARCH)
+_AW_ONCLICK_AW_
+SYSTEM.Push "C3153", "OK"
+SCREEN.CloseWindow
+'Dim ii, tprc
+'
+'For ii = 1 To GRID.Rows
+'	If Trim(GRID.getGridCell(ii, 1)) <> "1" Then		Exit For
+'
+'	If r1.Checked = True Then	'지정가
+'		tprc = Trim(GRID.GetGridCell(ii,11))
+'		If tprc = "" Then tprc = "0"
+'
+'		If Mid(Trim(GRID.getGridCell(ii, 8)),2,1) = "0" Then
+'			GRID.SetGridCell ii, 12,tprc*100 		' 주문가격
+'		Else
+'			GRID.SetGridCell ii, 12,tprc			' 주문가격
+'		End If
+'		GRID.SetGridCell ii, 13, "00"		' 호가구분
+'	Else
+'		GRID.SetGridCell ii, 12,"0"			' 주문가격
+'		GRID.SetGridCell ii, 13, "03"		' 호가구분
+'	End If
+'
+'Next
+'SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON0)
+_AW_ONCLICK_AW_
+SYSTEM.Push "C3153", "NO"
+SCREEN.CloseWindow
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(GRID)
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

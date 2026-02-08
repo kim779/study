@@ -1,0 +1,218 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB610128)
+MAPSIZE(186, 266)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("주식 시간대별시세")
+MAPPUBLIC(";")
+FONT("굴림", 9, NORMAL)
+OPTIONS(FMS|FLASH)
+TITLE("[obj 610128] 체결")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pooppoop")
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+GRID  11310(0, 0, 265, 158)  VISIBLEROW(10)  CELLH(18)  MATRIX(9999, 4)  FIX(4)  MAINCOLOR(7, 0)  LINECOLOR(75)  FOCUSCOLOR(78)  FOCUSKIND(4)    FONT("굴림체", 9, NORMAL)  VARIANT("$?")  ROWC(68, 77)  |FLEXIBLE|VSCROLL|INS_TOP|NO3D|RROW|XHLINE|PAGE|HEADER|GRFTEXT    &
+	COLINFO("11034")  LEN(6)  WIDTH(57)  HEAD("시간")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  EDITFORMAT("99:99:99")    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("2023")  LEN(8)  WIDTH(61)  HEAD("현재가")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_CORGB|SA_CORAW    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(94, 95)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("2033")  LEN(8)  WIDTH(54)  HEAD("등락률")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_CORAW    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(94, 95)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("2027")  LEN(12)  WIDTH(75)  HEAD("거래량")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    TABORDER(1)  IOORDER(5)  ENABLE
+EDIT  1301(3, 163, 116, 183)  LEN(9)  IO_ALPHA|EDIT_INPUT|FA_WRAP|FA_HAN    COLOR(28, 232)  CUR(0)  TP_NONE          TABORDER(2)  IOORDER(1)  &
+  HINTTYPE(IH_NONE)
+OUT  1021(126, 166, 257, 184)  LEN(9)  IO_ALPHA|AL_CENTER||FA_FLASH    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(4)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  11309(507, 198, 616, 218)  LEN(8)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(3)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  1777(280, 5, 381, 25)  LEN(1)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_HAN|FA_NOR    COLOR(99, 69)  CUR(0)  TP_NONE          TABORDER(4)  IOORDER(3)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+
+Dim g_IsFirst
+Dim g_StdCode
+Dim g_BefAccVol
+Dim g_Today
+Dim g_Flag
+
+g_IsFirst = True
+g_StdCode = ""
+g_BefAccVol = 0
+g_Today = GetToday()
+g_Flag = 1
+'-----------------------------------------------------------------------
+Sub SetFlag(Flag)
+	g_Flag = Flag
+End Sub
+'-----------------------------------------------------------------------
+Function Str2Int(Data)
+	Str2Int = 0
+	AData = Trim(Data)
+	If Len(AData) = 0 Then
+		Exit Function
+	End If
+	Str2Int = CLng(AData)
+End Function
+'-----------------------------------------------------------------------
+Function SetSign(Data)
+	SetSign = Data
+	If Data > 0 Then
+		SetSign = "+" & Data
+	End If
+End Function
+'-----------------------------------------------------------------------
+Function GetToday()
+	AYear = Year(Date)
+	AMonth = Month(Date)
+	If Len(AMonth) = 1 Then
+		AMonth = "0" & AMonth
+	End If
+	ADay = Day(Date)
+	If Len(ADay) = 1 Then
+		ADay = "0" & ADay
+	End If
+	GetToday = AYear & AMonth & ADay
+End Function
+'-----------------------------------------------------------------------
+'Sub S100301Change()
+'	S100301.Trigger "", True
+'	S100301.Trigger "ed_fcod", True
+'	SYSTEM.SetHistory "ed_fcod", S100301.Data
+'	SCREEN.Send 0
+'End Sub
+'-----------------------------------------------------------------------
+'Sub ProcSendData(Name1)
+'	If Len(S1301.Data) = 0 Then
+'		Exit Sub
+'	End If
+'
+'	SCREEN.Proc "parent.ProcSendData", S100021.Data & ", " & COMBO0.Data & ", " & ed_Date.Data
+'End Sub
+'-----------------------------------------------------------------------
+Sub SetAccVol(Data)
+	If Len(Trim(Data)) = 0 Then
+		Data = 0
+	End If
+
+	g_BefAccVol = CLng(Data)
+End Sub
+'-----------------------------------------------------------------------
+Sub OnAlert()
+	Dim ArrData
+	If g_Flag <> 1 Then
+		Exit Sub
+	End If
+	If CLng(g_Today) <> CLng(S11309.Data) Then
+		Exit Sub
+	End If
+
+	AccVol = Trim(S11310.GetGridCell (1, 4))
+	If AccVol = "" Then
+		Exit Sub
+	Else
+		If AccVol = 0 Then
+			Exit Sub
+		End If
+	End If
+
+
+	Flag = 0
+	For i = 1 To S11310.Rows
+		AccVol = Trim(S11310.GetGridCell(i, 4))
+		If Len(Trim(AccVol)) = 0 Then
+			Exit For
+		ElseIf CLng(AccVol) = g_BefAccVol Then
+			Flag = 1
+			Exit For
+		End If
+	Next
+
+	If Flag = 1 And i - 1 >= 1 Then
+		j = i - 1
+		Do While(1)
+			If j <= 0 Then
+				Exit Do
+			End If
+			ArrData = Array("", "", "", "")
+			'0:시간, 1:현재가, 2:등락률, 4:거래량
+
+
+			ArrData(0) = (S11310.GetGridCell(j,1))
+			ArrData(1) = (S11310.GetGridCell(j,2))
+			ArrData(2) = (S11310.GetGridCell(j,3))
+			If ArrData(2) < 0 Then
+				ArrData(2) = "-" & ArrData(2)
+			Else
+			End If
+			ArrData(3) = (S11310.GetGridCell(j,4))
+
+			Data = Join(ArrData, "|")
+			SCREEN.Proc "parent.ProcSetData", Data
+			j = j - 1
+		Loop
+	End If
+
+	g_BefAccVol = CLng(S11310.GetGridCell(1,4))
+
+End Sub
+
+_AW_ONSTART_AW_
+AYear = Year(Date)
+AMon = Month(Date)
+If Len(AMon) = 1 Then
+	AMon = "0" & AMon
+End If
+ADay = Day(Date)
+If Len(ADay) = 1 Then
+	ADay = "0" & ADay
+End If
+S11309.data = AYear & AMon & ADay
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+S1301.Data = SCREEN.Object("main.1301").data
+
+If Trim(S1301.Data) = "" Then
+	SCREEN.OnSend = False
+	Exit Sub
+End If
+
+If UCase(TypeName( SCREEN.Object("main.cxMarket"))) <> "NOTHING" Then
+	If SCREEN.Object("main.cxMarket").sMarket = "KRX" Then
+		S1777.Data = "1"
+	ElseIf SCREEN.Object("main.cxMarket").sMarket = "NXT" Then
+		S1777.Data = "2"
+	ElseIf SCREEN.Object("main.cxMarket").sMarket = "통합" Then
+		S1777.Data = "3"
+	End If
+	SYSTEM.Trace "IB610128  yes cxMarket"
+Else
+	SYSTEM.Trace "IB610128  no cxMarket"
+End If
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(11310)
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

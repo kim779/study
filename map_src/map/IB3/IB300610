@@ -1,0 +1,69 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB300610)
+MAPSIZE(330, 320)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+TITLE("선물옵션호가")
+TOPATH(AXIS)
+METHOD(MENU)
+MAPTYPE(FIXED)
+HEADER(NOP)
+BGROUND(BRUSH, 66)
+}
+
+
+
+FORM DIVISION
+{
+
+EDIT  ed_focod(463, 286, 543, 306)  LEN(8)  IO_ALPHA|EDIT_INOUT|FA_UPPER|CODE    FONT("굴림체", 9, NORMAL)    COLOR(192, 63)  CUR(0)  TP_SUNKEN          TABORDER(1)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  OBJ(0, 0, 320, 330)    "IB300611"  TABORDER(2)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Dim code
+
+Sub change_code(codx)
+	If Len(Trim(codx)) <> 8 Then
+		Exit Sub
+	End If
+
+	ed_focod.Data = codx
+	code = Left(codx, 1)
+	If code = "1" Or code = "4" Then
+		OBJ.SetObject("IB300611")
+	Else
+		OBJ.SetObject("IB300612")
+	End If
+	OBJ.Send
+End Sub
+
+_AW_ONSEND_AW_
+SCREEN.OnSend = False
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(ed_focod)
+_AW_ONCHANGE_AW_
+change_code(ed_focod.Data)
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

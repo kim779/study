@@ -1,0 +1,281 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB4009T0)
+MAPSIZE(367, 502)
+VERSION(001)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("[4009] 시간대별 체�")
+MAPPUBLIC(";")
+FONT("굴림", 9, NORMAL)
+OPTIONS(FLASH|CR2TAB)
+TITLE("[4009] 시간대별 체결")
+TOPATH(AXIS)
+METHOD(MENU)
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+BUTTON  but(244, 109, 300, 129)  '작게보기'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, NORMAL)  COLOR(208, 232)  CUR(0)    "4btn.BMP"    TABORDER(1)  ENABLE  &
+  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+PANEL  PANEL(0, 0, 600, 25)        COLOR(66, 1)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  OBJ(0, 26, 502, 366)    RESIZABLE  "IB4009T1"  TABORDER(2)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  HNAM(96, 3, 230, 23)  LEN(18)  IO_MIXED|AL_LEFT||SUM    FONT("굴림체", 9, BOLD)    COLOR(160, 69)  CUR(0)  LINECOLOR(89)          TABORDER(0)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  SYMBOL7(75, 3, 94, 23)  TP_PUSH|IMAGE|AL_STRETCH      COLOR(24, 0)  CUR(0)    "검색.BMP"    TABORDER(3)  ENABLE  &
+  VISIBLE  IMAGE  HOVER  HINTTYPE(IH_NONE)
+EDIT  ed_focod(3, 3, 75, 23)  LEN(8)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_UPPER|CODE    FONT("굴림체", 9, NORMAL)    COLOR(192, 26)  CUR(0)  TP_SUNKEN          TABORDER(4)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  SYMBOL14(658, 447, 677, 467)  TP_PUSH|IMAGE|AL_STRETCH      COLOR(23, 232)  CUR(0)    "창조절좌우.bmp"    TABORDER(5)  ENABLE  &
+  VISIBLE  IMAGE  HOVER  HINTTYPE(IH_NONE)  HELPTEXT("늘이기")HELPTEXT("늘이기")
+BUTTON  SYMBOL15(680, 449, 699, 469)  TP_PUSH|IMAGE|AL_STRETCH      COLOR(23, 0)  CUR(0)    "창조절좌우.bmp"    TABORDER(6)  ENABLE  &
+  VISIBLE  IMAGE  HOVER  HINTTYPE(IH_NONE)  HELPTEXT("좁히기")HELPTEXT("좁히기")
+BUTTON  CHECK0(236, 7, 300, 20)  '체결강조'  TP_CHECK|EDIT_NOP          COLOR(66, 69)  CUR(0)      TABORDER(7)  ENABLE  &
+  VISIBLE  CHECKED  HINTTYPE(IH_STRING)  HELPTEXT(" < 현재가가 매수호가/매도호가와 같아지는 처음 순간을 강조합니다. >\n - 현재가 = 매수호가 (빨강색)\n - 현재가 = 매도호가 (파란색)")HELPTEXT(" < 현재가가 매수호가/매도호가와 같아지는 처음 순간을 강조합니다. >\n - 현재가 = 매수호가 (빨강색)\n - 현재가 = 매도호가 (파란색)")
+EDIT  40301(632, 488, 761, 511)  LEN(12)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(8)  IOORDER(4)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  30301(634, 518, 763, 541)  LEN(12)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(9)  IOORDER(5)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Dim but_flag, window, fstart, ostart
+fstart = 1
+ostart = 1
+but_flag = 0
+window = 0
+
+_AW_ONSTART_AW_
+SYMBOL14.Visible = False
+window=0
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+Dim code
+
+code = Left(ed_focod.Data, 1)
+SCREEN.OnSend = False
+If code = "1" Or code = "4" Or code = "A" Or code = "D" Then
+	HNAM.Data = SCREEN.GetName (101, ed_focod.Data, 0)
+	If but.Text = "크게보기" Then
+	'	SCREEN.SetSize 348, 319
+		OBJ.SetObject ("IB4009T3")
+		SYMBOL14.Visible = True
+		SYMBOL15.Visible = False
+	Else
+	'	SCREEN.SetSize 502, 340
+		OBJ.SetObject ("IB4009T1")
+		SYMBOL15.visible=True
+		SYMBOL14.Visible = False
+	End If
+	SCREEN.Object("obj.30301").data = ed_focod.Data
+	If Trim(HNAM.Data) =  "" Then
+		SCREEN.ClearAll 2, 0
+		Exit Sub
+	Else
+		ed_focod.Trigger "ed_focod", True
+		ed_focod.Trigger "30301", True
+		SYSTEM.SetHistory "30301", ed_focod.Data
+ 		SYSTEM.SetHistory "ed_focod", ed_focod.Data
+	End If
+Else
+	HNAM.Data = SCREEN.GetName (102, ed_focod.Data, 0)
+	If but.Text = "크게보기" Then
+	'	SCREEN.SetSize 348, 319
+		OBJ.SetObject ("IB4009T4")
+		SYMBOL14.Visible = True
+		SYMBOL15.Visible = False
+
+	Else
+	'	SCREEN.SetSize 502, 340
+		OBJ.SetObject ("IB4009T2")
+		SYMBOL15.visible=True
+		SYMBOL14.Visible = False
+
+	End If
+	SCREEN.Object("obj.40301").data = ed_focod.Data
+	If Trim(HNAM.Data) =  "" Then
+		SCREEN.ClearAll 2, 0
+		Exit Sub
+	Else
+		ed_focod.Trigger "ed_focod", True
+		ed_focod.Trigger "40301", True
+		SYSTEM.SetHistory "40301", ed_focod.Data
+		SYSTEM.SetHistory "ed_focod", ed_focod.Data
+	End If
+End If
+
+OBJ.Send
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(but)
+_AW_ONCLICK_AW_
+If but.Text = "크게보기" Then
+	but.Text = "작게보기"
+Else
+	but.Text = "크게보기"
+End If
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(SYMBOL7)
+_AW_ONCLICK_AW_
+Dim ed_focod
+
+ed_focod = SCREEN.GetCode (103, "ed_focod", "HNAM", 2)
+If ed_focod <>  True Then
+	Exit Sub
+End If
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(ed_focod)
+_AW_ONCHANGE_AW_
+CHECK0.Checked = True
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(SYMBOL14)
+_AW_ONCLICK_AW_
+but.Text = "작게보기"
+window = 0
+but_flag = 0
+CHECK0.Checked = True
+
+'If but.Text = "크게보기" Then
+'	but.Text = "작게보기"
+'Else
+'	but.Text = "크게보기"
+'End If
+SCREEN.Send 0
+
+'SCREEN.CHANGEMAP "IB401010"
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(SYMBOL15)
+_AW_ONCLICK_AW_
+but.Text = "크게보기"
+window = 1
+but_flag = 0
+CHECK0.Checked = True
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(CHECK0)
+_AW_ONCLICK_AW_
+Dim code
+
+code = Left(ed_focod.Data, 1)
+
+If window = 0 Then
+	If but_flag = 0 Then
+		but.TRgb = 69
+		If code = "1" Or code = "4" Or code = "A" Or code = "D" Then
+			SCREEN.Object("OBJ.34310").SetColumnVisible 6, True
+			SCREEN.Object("OBJ.34310").SetColumnVisible 7, False
+		Else
+			SCREEN.Object("OBJ.44310").SetColumnVisible 6, True
+			SCREEN.Object("OBJ.44310").SetColumnVisible 7, False
+		End If
+
+		but_flag = 1
+
+	Else
+		but.TRgb = 68
+		If code = "1" Or code = "4" Or code = "A" Or code = "D" Then
+			SCREEN.Object("OBJ.34310").SetColumnVisible 6, False
+			SCREEN.Object("OBJ.34310").SetColumnVisible 7, True
+		Else
+			SCREEN.Object("OBJ.44310").SetColumnVisible 6, False
+			SCREEN.Object("OBJ.44310").SetColumnVisible 7, True
+		End If
+
+		but_flag = 0
+	End If
+Else
+	If but_flag = 0 Then
+		but.TRgb = 69
+		If code = "1" Or code = "4" Or code = "A" Or code = "D" Then
+			SCREEN.Object("OBJ.34310").SetColumnVisible 3, True
+			SCREEN.Object("OBJ.34310").SetColumnVisible 4, False
+		Else
+			SCREEN.Object("OBJ.44310").SetColumnVisible 3, True
+			SCREEN.Object("OBJ.44310").SetColumnVisible 4, False
+		End If
+
+		but_flag = 1
+	Else
+
+		but.TRgb = 68
+
+		If code = "1" Or code = "4" Or code = "A" Or code = "D" Then
+			SCREEN.Object("OBJ.34310").SetColumnVisible 3, False
+			SCREEN.Object("OBJ.34310").SetColumnVisible 4, True
+		Else
+			SCREEN.Object("OBJ.44310").SetColumnVisible 3, False
+			SCREEN.Object("OBJ.44310").SetColumnVisible 4, True
+		End If
+
+		but_flag = 0
+	End If
+End If
+
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(40301)
+_AW_ONCHANGE_AW_
+If ostart = 1 Then
+	ostart = 0
+	Exit Sub
+End If
+
+ed_focod.Data = S40301.Data
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(30301)
+_AW_ONCHANGE_AW_
+If fstart = 1 Then
+	fstart = 0
+	Exit Sub
+End If
+
+ed_focod.Data = S30301.Data
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

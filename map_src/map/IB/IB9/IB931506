@@ -1,0 +1,87 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB931506)
+MAPSIZE(45, 251)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("굴림", 9, NORMAL)
+TITLE("그룹이름 입력")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+EDIT  ed_name(70, 10, 175, 29)  LEN(20)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_SUNKEN          TABORDER(1)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON1(185, 10, 241, 30)  '확인'  TP_PUSH|IMAGETEXT|AL_STRETCH        FOCUS  COLOR(208, 186)  CUR(0)    "4BTN.BMP"    TABORDER(2)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+LABEL  LABEL0(5, 10, 65, 29)  '그룹이름'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Dim closeBtn ' Close 버튼을 눌렀는지 
+
+Sub closeEdit()
+	closeBtn = True
+	SCREEN.CloseWindow
+End Sub
+
+_AW_ONSTART_AW_
+Dim name
+name = SYSTEM.Pop("IB931506")
+
+closeBtn = False
+
+ed_name.Data = name
+ed_name.SetFocus
+
+_AW_ONENDSUB_AW_
+_AW_ONCLOSE_AW_
+
+If closeBtn = True Then
+	SYSTEM.Push  "IB931506", ed_name.Data
+Else
+	SYSTEM.Push  "IB931506", "취소됨"
+End If
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(ed_name)
+_AW_ONKEYCHANGE_AW_
+If SCREEN.Key = 13 Then
+	SCREEN.Proc "main.closeEdit",""	
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON1)
+_AW_ONCLICK_AW_
+
+closeBtn = True
+
+SCREEN.CloseWindow
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

@@ -1,0 +1,96 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB420142)
+MAPSIZE(98, 408)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("2초지수")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(FMS|FLASH)
+TITLE("[420142]2초지수, 10초지수")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pooppoop")
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+EDIT  20301(11, 14, 131, 33)  LEN(3)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("998")          TABORDER(1)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  20021(131, 14, 203, 38)  LEN(5)  IO_MIXED|AL_LEFT||FA_FLASH|FA_XDELETE    COLOR(203, 1)  CUR(0)            TABORDER(0)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  20023(215, 20, 300, 40)  LEN(8)  IO_NUM|AL_CENTER|    COLOR(192, 69)  CUR(0)            TABORDER(0)  IOORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  20034(316, 19, 401, 39)  LEN(8)  IO_NUM|AL_CENTER|    COLOR(192, 69)  CUR(0)            TABORDER(0)  IOORDER(5)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON0(140, 45, 220, 85)  TP_PUSH      AL_CENTER    FOCUS  COLOR(208, 232)  CUR(0)      TABORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  1777(10, 50, 130, 69)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("1")          TABORDER(3)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Dim g_Code
+Dim g_Flag
+Dim g_BefTime
+
+g_Code = "998"
+g_Flag = False
+g_BefTime = ""
+'----------------------------------------------------------------------
+Sub SendData()
+	g_Flag = True
+	S20301.Data = g_Code
+	SCREEN.Send 0
+End Sub
+'----------------------------------------------------------------------
+Sub OnAlert()
+	Data = S20034.Data & "|" & S20023.Data
+
+	SCREEN.Proc "Parent.SetRealData", Data
+End Sub
+
+_AW_ONSEND_AW_
+If Not g_Flag Then
+	SCREEN.OnSend = False
+	Exit Sub
+End If
+
+If UCase(TypeName( SCREEN.Object("main.cxMarket"))) <> "NOTHING" Then
+	If SCREEN.Object("main.cxMarket").sMarket = "KRX" Then
+		S1777.Data = "1"
+	ElseIf SCREEN.Object("main.cxMarket").sMarket = "NXT" Then
+		S1777.Data = "2"
+	ElseIf SCREEN.Object("main.cxMarket").sMarket = "통합" Then
+		S1777.Data = "3"
+	End If
+Else
+	MsgBox "no cxmarket"
+End If
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(BUTTON0)
+_AW_ONCLICK_AW_
+SendData
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

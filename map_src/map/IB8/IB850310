@@ -1,0 +1,906 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB850310)
+MAPSIZE(306, 754)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("대출신청")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(ENCODE)
+TITLE("[850310]대출신청")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("piboPBxQ")
+MAPTYPE(FIXED)
+HEADER(LEDGER)
+TRXH("11CSLNAT008")
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL8(145, 46, 290, 75)        COLOR(68, 97)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL10(0, 180, 754, 310)        COLOR(68, 97)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL7(0, 20, 755, 170)        COLOR(68, 97)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL1(0, 80, 125, 100)  '대출한도'        COLOR(96, 97)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL0(0, 0, 754, 25)        COLOR(66, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL0(3, 3, 51, 23)  '계좌번호'  AL_LEFT  CUR(0)      COLOR(208, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL1(271, 3, 319, 23)  '비밀번호'  AL_LEFT  CUR(0)      COLOR(208, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  zPwd(324, 3, 384, 23)  LEN(8)  IO_MIXED|EDIT_INPUT|FA_PASSWD|FA_WRAP    COLOR(192, 130)  CUR(0)  TP_SUNKEN          TABORDER(2)  IOORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  send_btn(680, 3, 717, 23)  '조회'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, BOLD)  FOCUS  COLOR(208, 186)  CUR(0)    "조회BTN.BMP"    TABORDER(3)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+BUTTON  next_btn(720, 3, 752, 23)  '다음'  TP_PUSH|IMAGETEXT|AL_STRETCH        FOCUS  COLOR(208, 186)  CUR(0)    "2btn.bmp"    TABORDER(4)  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+CONTROL  AN19(56, 3, 196, 23)    "CX_Account"  "/w0"  LEN(11)  EDIT_INPUT    COLOR(192, 130)  TABORDER(1)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL22(20, 230, 473, 253)  '대출실행금액란에 1만원 단위로 대출희망 금액을 입력하여 주시기 바랍니다. '  AL_LEFT  CUR(0)      COLOR(208, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+PANEL  PANEL25(5, 234, 15, 247)    |IMAGETEXT|AL_CENTER    COLOR(208, 232)  CUR(0)    "텍스트화살표_하단.bmp"  ENABLE  &
+  VISIBLE  TRANSPARENT  IMAGETEXT  HINTTYPE(IH_NONE)
+LABEL  LABEL23(20, 250, 523, 270)  '대출실행금액에 따라 담보수량이 자동으로 계산되어 설정되며, 1주 단위로 설정됩니다.'  AL_LEFT  CUR(0)      COLOR(208, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+PANEL  PANEL26(5, 255, 15, 265)    |IMAGETEXT|AL_CENTER    COLOR(208, 232)  CUR(0)    "텍스트화살표_하단.bmp"  ENABLE  &
+  VISIBLE  TRANSPARENT  IMAGETEXT  HINTTYPE(IH_NONE)
+PANEL  PANEL29(5, 208, 65, 233)    |IMAGETEXT|AL_CENTER    COLOR(208, 232)  CUR(0)    "참고사항.bmp"  ENABLE  &
+  VISIBLE  TRANSPARENT  IMAGETEXT  HINTTYPE(IH_NONE)
+BUTTON  loan_btn(655, 210, 746, 240)  '대출실행'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, BOLD)  FOCUS  COLOR(209, 76)  CUR(0)    "담보교체신청.bmp"    TABORDER(6)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+OUT  ACNM(197, 3, 261, 23)  LEN(11)  IO_MIXED|AL_LEFT||FA_SKIP    COLOR(49, 130)  CUR(0)  LINECOLOR(48)          TABORDER(0)  IOORDER(27)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  zTotLnlmtAmt(124, 80, 250, 100)  LEN(16)  IO_NUM|AL_RIGHT||FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSUP    COLOR(192, 69)  CUR(0)            IFRGB(69, 69)  TABORDER(0)  IOORDER(15)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL2(249, 80, 374, 100)  '대출잔고'        COLOR(96, 97)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  zLoanBalAmt(373, 80, 500, 100)  LEN(16)  IO_NUM|AL_RIGHT||FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSUP    COLOR(192, 69)  CUR(0)            IFRGB(69, 69)  TABORDER(0)  IOORDER(16)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL5(499, 80, 624, 100)  '대출가능금액합계'        COLOR(96, 97)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  zLrgMnyoutSumAmt(623, 80, 751, 100)  LEN(16)  IO_NUM|AL_RIGHT||FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSUP    COLOR(192, 69)  CUR(0)            IFRGB(69, 69)  TABORDER(0)  IOORDER(19)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+GRID  GRID0(2, 100, 753, 208)  VISIBLEROW(0)  CELLH(18)  MATRIX(2000, 20)  FIX(0)  MAINCOLOR(7, 0)  LINECOLOR(75)  FOCUSCOLOR(78)  FOCUSKIND(3)  ROWC(68, 77)  |SELALWAYS|FLEXIBLE|VSCROLL|NO3D|RROW|XHLINE|KEYFOCUS|GRFTEXT|GRXSIZE    &
+	COLINFO("zIsuNo_ori")  LEN(12)  WIDTH(80)  HEAD("종목번호원본")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_NUM|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("zIsuNo")  LEN(12)  WIDTH(90)  HEAD("종목번호")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT  |FA_SKIP|FA_CORGB|SA_CORAW    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(69, 69)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("zIsuNm")  LEN(40)  WIDTH(108)  HEAD("종목명")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT  |FA_CORGB|FA_REF|FA_DRAG|SA_CORAW    COLOR(68, 69)  COLCUR(0, 0)  REFERENCE(1301)    COLUMN_VISIBLE  INORMAL  IFRGB(69, 69)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("zBuyDt")  LEN(8)  WIDTH(90)  HEAD("매수일")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    INORMAL  EDITFORMAT("9999/99/99")    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("zTaxChrTp")  LEN(1)  WIDTH(90)  HEAD("과세구분")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT  |FA_CORGB|SA_CORAW    COLOR(68, 69)  COLCUR(0, 0)    INORMAL  IFRGB(69, 69)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("zTaxchrTpNm")  LEN(40)  WIDTH(90)  HEAD("과세구분명")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT  |FA_CORGB|SA_CORAW    COLOR(68, 69)  COLCUR(0, 0)    INORMAL  IFRGB(69, 69)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("zHldQty")  LEN(16)  WIDTH(120)  HEAD("보유수량")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSUP    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(69, 69)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("zPldgSetupQty")  LEN(16)  WIDTH(97)  HEAD("기담보설정수량")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSUP    COLOR(68, 69)  COLCUR(0, 0)    INORMAL  IFRGB(69, 69)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("zLoanAbleQty")  LEN(16)  WIDTH(120)  HEAD("대출가능수량")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSUP    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(69, 69)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("zLoanAbleAmt")  LEN(16)  WIDTH(130)  HEAD("대출가능금액")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSUP    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(69, 69)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("zLoanRat")  LEN(7)  WIDTH(70)  HEAD("대출률")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_SKIP|FA_CORGB|SA_SPACE|SA_COSUP    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(69, 69)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("zLoanRat_ori")  LEN(7)  WIDTH(80)  HEAD("대출률원본")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_NUM|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("zEvalBasePrc")  LEN(10)  WIDTH(90)  HEAD("평가기준가")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSUP    COLOR(68, 69)  COLCUR(0, 0)    INORMAL  IFRGB(69, 69)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("zLoanPrslAmt")  LEN(16)  WIDTH(97)  HEAD("대출신청금액")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("amt")  LEN(15)  WIDTH(97)  HEAD("대출실행금액")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(209, 76)  IO_NUM|EDIT_INPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_SKIP|SA_SPACE    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("lLoanPrslQty")  LEN(16)  WIDTH(90)  HEAD("대출신청수량")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSUP    COLOR(68, 69)  COLCUR(0, 0)    INORMAL  IFRGB(69, 69)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("zLoanGrdCode")  LEN(2)  WIDTH(90)  HEAD("대출등급코드")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT  |FA_CORGB|SA_CORAW    COLOR(68, 69)  COLCUR(0, 0)    INORMAL  IFRGB(69, 69)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("zDueDt")  LEN(8)  WIDTH(90)  HEAD("만기일")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    INORMAL  EDITFORMAT("9999/99/99")    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Intrat")  LEN(7)  WIDTH(80)  HEAD("이자율")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col0")  LEN(2)  WIDTH(80)  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_NUM|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    TABORDER(5)  IOORDER(26)  ENABLE  &
+  VISIBLE
+
+CONTROL  CONTROL1(0, 100, 751, 101)  |FA_PROTECT  "CX_LINE"  "/ctype0/dtype1/lcolor75/w1"  LEN(0)  EDIT_NOP    COLOR(192, 232)  TABORDER(0)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BOX  BOX0(123, 80, 373, 101)    COLOR(75, 232)  LINEW(1)  BX_LINE    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BOX  BOX1(372, 80, 755, 101)    COLOR(75, 232)  LINEW(1)  BX_LINE    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BOX  BOX2(640, 100, 737, 208)    COLOR(209, 232)  LINEW(1)  BX_LINE    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL3(30, 520, 150, 540)  '입력레코드갯수'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  zIn(153, 520, 273, 540)  LEN(5)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_PASS    COLOR(192, 232)  CUR(0)  TP_SUNKEN  INIT("00001")          TABORDER(7)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL4(30, 541, 150, 561)  '계좌번호 나머지'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  zAcntNo_dummy(153, 541, 273, 561)  LEN(9)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_PASS    COLOR(192, 232)  CUR(0)  TP_SUNKEN          TABORDER(8)  IOORDER(3)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL5(30, 562, 150, 582)  '대출미수구분'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  zLoanRcvblTp(153, 562, 273, 582)  LEN(1)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_PASS    COLOR(192, 232)  CUR(0)  TP_SUNKEN          TABORDER(9)  IOORDER(5)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL6(30, 583, 150, 603)  '대출신청그리드갯수'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  zLoanPrsl(151, 579, 271, 599)  LEN(5)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_PASS    COLOR(192, 232)  CUR(0)  TP_SUNKEN  INIT("00000")          TABORDER(10)  IOORDER(9)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL7(445, 520, 565, 540)  '입력값'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  inptVal(567, 520, 905, 540)  LEN(52)  IO_MIXED|AL_LEFT||FA_ZEROSUP|SA_ZERO    COLOR(192, 69)  CUR(0)            TABORDER(0)  IOORDER(11)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL8(445, 541, 565, 561)  '입력대출신청그리드갯수'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  inptLoanPrsl(567, 541, 687, 561)  LEN(1)  IO_MIXED|AL_CENTER|    COLOR(192, 69)  CUR(0)            TABORDER(0)  IOORDER(12)  ENABLE  &
+  HINTTYPE(IH_NONE)
+GRID  GRID2(445, 563, 801, 693)  VISIBLEROW(0)  CELLH(20)  MATRIX(8, 7)  FIX(0)  MAINCOLOR(208, 232)  LINECOLOR(0)  FOCUSCOLOR(0)  FOCUSKIND(0)  |FLEXIBLE|VSCROLL|HSCROLL    &
+	COLINFO("zPldgIsuNo")  LEN(12)  WIDTH(80)  HEAD("담보종목번호")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_MIXED|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("zBndBuyDt")  LEN(8)  WIDTH(80)  HEAD("채권매수일")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_MIXED|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("zBndTaxTp")  LEN(1)  WIDTH(80)  HEAD("채권과세구분")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_MIXED|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("zNewLoanAmt")  LEN(16)  WIDTH(80)  HEAD("신규대출금액")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_NUM|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("zNewLoanQty")  LEN(16)  WIDTH(80)  HEAD("신규대출수량")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_NUM|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("zLoanIntrstGrdCode")  LEN(2)  WIDTH(80)  HEAD("대출이자등급코드")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_MIXED|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("zLoanDueDt")  LEN(8)  WIDTH(80)  HEAD("대출만기일")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_MIXED|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    TABORDER(12)  IOORDER(13)  ENABLE
+LABEL  LABEL9(447, 697, 567, 717)  '출력레코드갯수'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  zOut(569, 697, 689, 717)  LEN(5)  IO_MIXED|AL_CENTER|    COLOR(192, 69)  CUR(0)            TABORDER(0)  IOORDER(14)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL10(447, 718, 567, 738)  '대용금전잔금액'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  zSubstAmtBfbalAmt(569, 718, 689, 738)  LEN(16)  IO_NUM|AL_CENTER|    COLOR(192, 69)  CUR(0)            TABORDER(0)  IOORDER(17)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL11(447, 739, 567, 759)  '대용금금잔금액'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  zSubstAmtCrbalAmt(569, 739, 689, 759)  LEN(16)  IO_NUM|AL_CENTER|    COLOR(192, 69)  CUR(0)            TABORDER(0)  IOORDER(18)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL12(447, 760, 567, 780)  '총담보평가금액'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  zTotPldgEvalAmt(569, 760, 689, 780)  LEN(16)  IO_NUM|AL_CENTER|    COLOR(192, 69)  CUR(0)            TABORDER(0)  IOORDER(20)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL13(447, 781, 567, 801)  '대출담보율'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  zLoanPldgRat(569, 781, 689, 801)  LEN(9)  IO_NUM|AL_CENTER|    COLOR(192, 69)  CUR(0)            TABORDER(0)  IOORDER(21)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL14(447, 802, 567, 822)  '대출신청최저금액'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  zLoanPrslLwstAmt(569, 802, 689, 822)  LEN(16)  IO_NUM|AL_CENTER|    COLOR(192, 69)  CUR(0)            TABORDER(0)  IOORDER(22)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL15(447, 823, 567, 843)  '그리드레코드갯수'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  OUTPUT0(569, 823, 689, 843)  LEN(1)  IO_NUM|AL_CENTER|    COLOR(192, 69)  CUR(0)            TABORDER(0)  IOORDER(25)  ENABLE  &
+  HINTTYPE(IH_NONE)
+GRID  GRID1(29, 607, 377, 737)  VISIBLEROW(0)  CELLH(20)  MATRIX(8, 11)  FIX(0)  MAINCOLOR(208, 232)  LINECOLOR(0)  FOCUSCOLOR(0)  FOCUSKIND(0)  |VSCROLL|HSCROLL    &
+	COLINFO("zPldgIsuNo")  LEN(12)  WIDTH(80)  HEAD("담보종목번호")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_MIXED|EDIT_INPUT      COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("zBndBuyDt")  LEN(8)  WIDTH(80)  HEAD("채권매수일")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_MIXED|EDIT_INPUT      COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("zBndTaxTp")  LEN(1)  WIDTH(80)  HEAD("채권과세구분")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_MIXED|EDIT_INPUT      COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("zNewLoanAmt_giho")  LEN(1)  WIDTH(116)  HEAD("신규대출금액기호")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_NUM|EDIT_INPUT      COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("zNewLoanAmt")  LEN(15)  WIDTH(104)  HEAD("신규대출금액")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_NUM|EDIT_INPUT      COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("zNewLoanQty")  LEN(16)  WIDTH(109)  HEAD("신규대출수량")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_NUM|EDIT_INPUT      COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("zLoanIntrstGrdCode")  LEN(2)  WIDTH(120)  HEAD("대출이자등급코드")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_MIXED|EDIT_INPUT      COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("zLoanDueDt")  LEN(8)  WIDTH(119)  HEAD("대출만기일")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_MIXED|EDIT_INPUT      COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("zIsuNm")  LEN(40)  WIDTH(80)  HEAD("종목명")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_NUM|EDIT_OUTPUT  |FA_SKIP    COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("zLoanAbleAmt")  LEN(16)  WIDTH(80)  HEAD("대출가능수량")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_NUM|EDIT_OUTPUT  |FA_SKIP    COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col0")  LEN(2)  WIDTH(80)  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_NUM|EDIT_INPUT      COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    TABORDER(11)  IOORDER(10)  ENABLE
+OBJECT  obj_getMoney(163, 761, 263, 781)    "IB9999C0"  TABORDER(13)  IOORDER(28)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL20(34, 756, 154, 776)  'obj_getMoney'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  obj_cancelMoney(163, 784, 263, 804)    "IB850155"  TABORDER(14)  IOORDER(29)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL21(34, 779, 154, 799)  'obj_cancelMoney'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL16(33, 804, 153, 824)  '종목트리커'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  1301(156, 804, 276, 824)  LEN(6)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_SKIP|FA_NOR|FA_PASS    COLOR(192, 232)  CUR(0)  TP_SUNKEN          TABORDER(15)  IOORDER(30)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL17(20, 267, 338, 287)  '대출가능시간은 영업일 08:00-16:00입니다.'  AL_LEFT  CUR(0)      COLOR(208, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+PANEL  PANEL3(5, 272, 15, 282)    |IMAGETEXT|AL_CENTER    COLOR(208, 232)  CUR(0)    "텍스트화살표_하단.bmp"  ENABLE  &
+  VISIBLE  TRANSPARENT  IMAGETEXT  HINTTYPE(IH_NONE)
+LABEL  LABEL18(20, 284, 498, 304)  '상담/문의 : IBK투자증권 관리영업점 또는 고객센터 (1588-0030, 1544-0050)'  AL_LEFT  CUR(0)      COLOR(208, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+PANEL  PANEL4(5, 289, 15, 299)    |IMAGETEXT|AL_CENTER    COLOR(208, 232)  CUR(0)    "텍스트화살표_하단.bmp"  ENABLE  &
+  VISIBLE  TRANSPARENT  IMAGETEXT  HINTTYPE(IH_NONE)
+LABEL  LABEL19(444, 499, 564, 519)  '대출금액합계'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  LoanAmtSum(567, 499, 697, 519)  LEN(16)  IO_NUM|AL_CENTER|    COLOR(192, 69)  CUR(0)            TABORDER(0)  IOORDER(23)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL24(445, 230, 668, 250)  '(개인한도:주민번호 기준 최대 20억)'  AL_LEFT  CUR(0)      COLOR(208, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  AgrmReqstDt(351, 465, 422, 484)  LEN(8)  IO_MIXED|EDIT_INPUT    COLOR(192, 69)  CUR(0)  TP_SUNKEN          TABORDER(16)  IOORDER(6)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL25(276, 465, 341, 485)  '130809추가'  AL_LEFT  CUR(0)      COLOR(66, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  AgrmTrxId(351, 484, 422, 503)  LEN(8)  IO_MIXED|EDIT_INPUT    COLOR(192, 69)  CUR(0)  TP_SUNKEN          TABORDER(17)  IOORDER(7)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  AgrmTrxStep(351, 505, 422, 524)  LEN(2)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 69)  CUR(0)  TP_SUNKEN  INIT("+0")          TABORDER(18)  IOORDER(8)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  AgrmMthdCode(351, 525, 423, 543)  LEN(2)  IO_MIXED|AL_CENTER||FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSUP    COLOR(192, 232)  CUR(0)  LINECOLOR(75)          IFRGB(69, 69)  TABORDER(0)  IOORDER(24)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  obj_cusstatus(161, 849, 282, 869)    "IB49892U"  TABORDER(19)  IOORDER(31)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL26(36, 848, 156, 868)  'obj_cusstatus'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  BUTTON1(1269, 53, 1534, 73)  '투자자정보확인서 화면 바로가기'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, BOLD)  COLOR(208, 186)  CUR(0)    "9BTN.BMP"    TABORDER(20)  ENABLE  &
+  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+PANEL  PANEL6(959, 43, 1104, 83)        COLOR(96, 97)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL17(0, 45, 150, 80)        COLOR(96, 97)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BOX  BOX3(1264, 43, 1265, 123)    COLOR(75, 232)  LINEW(1)  BX_LINE    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL28(15, 56, 135, 71)  '대출 상품위험등급'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BOX  BOX4(1104, 43, 1105, 123)    COLOR(75, 232)  LINEW(1)  BX_LINE    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BOX  BOX5(959, 43, 1539, 44)    COLOR(50, 232)  LINEW(1)  BX_LINE    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BOX  BOX6(959, 123, 1539, 124)    COLOR(50, 232)  LINEW(1)  BX_LINE    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BOX  BOX7(959, 83, 1539, 84)    COLOR(50, 232)  LINEW(1)  BX_LINE    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BOX  BOX10(300, 45, 301, 80)    COLOR(232, 232)  LINEW(1)  BX_LINE    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  acntno(984, 277, 1284, 297)  LEN(30)  IO_MIXED|AL_LEFT|    COLOR(68, 69)  CUR(0)            TABORDER(0)  IOORDER(33)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL27(170, 51, 270, 76)  '매우높은위험'  AL_LEFT  CUR(0)      COLOR(208, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+OUT  sentence1(20, 28, 685, 46)  LEN(100)  IO_MIXED|AL_LEFT|    COLOR(68, 232)  CUR(0)            TABORDER(0)  IOORDER(32)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  grdimg1(343, 68, 358, 81)  '▲'  AL_CENTER  CUR(0)      COLOR(192, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL9(313, 48, 743, 70)    |IMAGE|AL_CENTER    COLOR(181, 232)  CUR(0)    "BAR_RISKCLASS_2_NEW.bmp"  ENABLE  &
+  VISIBLE  IMAGE  HINTTYPE(IH_NONE)
+PANEL  PANEL11(3, 26, 23, 46)    |IMAGE|AL_CENTER    COLOR(192, 192)  CUR(0)    "ICO_LOGIN_B_INFO_16.bmp"  ENABLE  &
+  VISIBLE  IMAGE  HINTTYPE(IH_NONE)
+BOX  BOX9(0, 80, 754, 81)    COLOR(50, 232)  LINEW(1)  BX_LINE    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BOX  BOX8(0, 45, 754, 46)    COLOR(50, 232)  LINEW(1)  BX_LINE    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+GROUP  GROUP1(1064, 534, 1399, 749)  'obj_ansim 안심차단대상여부조회'        COLOR(-1, 232)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  obj_ansim(1110, 600, 1340, 731)    "IB9999AS"  TABORDER(21)  IOORDER(34)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  zAcnt1(1092, 413, 1219, 433)  LEN(20)  IO_MIXED|EDIT_INOUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(22)  IOORDER(35)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  zPwd1(1092, 438, 1152, 458)  LEN(8)  IO_MIXED|EDIT_INPUT|FA_PASSWD|FA_WRAP|FA_SKIP    COLOR(192, 130)  CUR(0)  TP_SUNKEN          TABORDER(23)  IOORDER(36)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+GROUP  GROUP0(1066, 390, 1291, 510)  '안심차단추가해야하는부분'        COLOR(-1, 232)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  zObjYn(1092, 470, 1217, 490)  LEN(1)  IO_MIXED|AL_CENTER||FA_SKIP|FA_CORGB|SA_COSUP    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(37)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  chkrun1(1110, 565, 1185, 585)  LEN(1)  IO_MIXED|EDIT_INOUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("N")          TABORDER(24)  IOORDER(38)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+CONTROL  CX_DTS(1410, 255, 1585, 495)  |FA_PROTECT  "CX_DATATRANS"  ""  LEN(0)  EDIT_NOP    COLOR(192, 232)  TABORDER(0)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Option Explicit
+Dim gubn, gridPos
+Dim corpyn
+
+Sub Set_account()
+	SCREEN.ClearAll 0, 2
+	GRID0.Clear
+
+	If SCREEN.Object("main.UTAB1").ID <> 7 Then
+		SCREEN.Object("main.obj1").ClearAll 2
+	End If
+
+	If Len(Trim(AN19.Data)) = 11 Then
+		ACNM.Data = Trim(AN19.Name)
+		zPwd.Data = Trim(AN19.Password)
+	Else
+		AN19.SetFocus
+		Exit Sub
+	End If
+
+	If Len(Trim(zPwd.Data)) < 4 Then
+		zPwd.SetFocus
+		Exit Sub
+	End If
+
+	Call send_f()
+End Sub
+
+Sub send_f()
+	SCREEN.ClearAll 0, 2
+	GRID0.Clear
+	ACNM.Data = Trim(AN19.Name)
+
+	gubn = "inquiry"
+	gridPos = 1
+	zLoanPrsl.Data = "00000"
+	GRID1.SetRows 0
+
+	LEDGER.Fkey = "C"
+	SCREEN.Send 0
+End Sub
+
+Sub send_c()
+	GRID0.SetDataPosition 2
+	gubn = "inquiry"
+	zLoanPrsl.Data = "00000"
+	GRID1.SetRows 0
+
+	LEDGER.Fkey = "7"
+	SCREEN.Send 0
+End Sub
+
+Sub send_o()
+	gubn = "order"
+	LEDGER.Fkey = "5"
+	SCREEN.Send 0
+End Sub
+
+Sub applLoan()
+    '여신거래 안심차단 로직추가
+    SYSTEM.Trace "applLoan_zObjYn:"&zObjYn.Data
+    If zObjYn.Data = "Y" Then
+       Call popup()
+       Exit Sub
+    End If
+
+    SYSTEM.Trace "appLoanconfirm start"
+
+	SYSTEM.Push "applyLoanConfirm8503", ""
+
+    acntno.Data = Trim(AN19.Data) + "  " + Trim(ACNM.Data)
+
+	If chkLoanCnt < 1 Then
+		Call alert_msg("대출실행금액을 확인하여 주십시오.")
+		loan_btn.SetFocus
+		Exit Sub
+	End If
+
+	If chkLoanCnt > 8 Then
+		Call alert_msg("한 번에 8개의 종목만 대출 실행 가능합니다.")
+		loan_btn.SetFocus
+		Exit Sub
+	End If
+
+	zLoanPrsl.Data = chkLoanCnt
+	GRID1.SetRows zLoanPrsl.Data
+
+	If chkLoanAmt = "OK" Then
+		Dim dmsg, ii, jmNm, loanAbleAmt, loanAmt, record, matrix
+		dmsg = ""
+		record = ""
+		matrix = ""
+
+		For ii = 1 To GRID1.Rows
+			jmNm = Trim(GRID1.GetGridCell(ii, 9))
+			loanAbleAmt = Trim(GRID1.GetGridCell(ii, 10))
+			loanAmt = Trim(GRID1.GetGridCell(ii, 5))
+
+			record = jmNm & "|" & loanAbleAmt & "|" & loanAmt
+			matrix = matrix & "#" & record
+		Next
+
+		dmsg = "s_data" & vbTab & matrix & vbLf
+
+        'PUSH
+        SYSTEM.Trace "acntno.Data:"&acntno.Data
+        SYSTEM.Push "applyLoanConfirm8503_acntno", Mid(Trim(AN19.Data),1,3) & "-"& Mid(Trim(AN19.Data),4,2) & "-" & Mid(Trim(AN19.Data),6,6) & "  " & Trim(ACNM.Data)
+		SCREEN.CreateWindow 2, "IB85031A /t /p5 /d", dmsg
+
+		If Trim(SYSTEM.Pop("applyLoanConfirm8503")) = "OK" Then
+			Call send_o()
+		End If
+
+		SYSTEM.Push "applyLoanConfirm8503", ""
+	ElseIf chkLoanAmt = "NotNumeric" Then
+		Call alert_msg("대출실행금액은 정수만 입력하여 주십시오.")
+		loan_btn.SetFocus
+		Exit Sub
+	ElseIf chkLoanAmt = "OverAmt" Then
+		Call alert_msg("대출실행금액이 대출가능금액을 초과합니다.")
+		loan_btn.SetFocus
+		Exit Sub
+	ElseIf chkLoanAmt = "NotZero" Then
+		Call alert_msg("대출실행금액은 1만원 단위로 입력하여 주십시오.")
+		loan_btn.SetFocus
+		Exit Sub
+	End If
+End Sub
+
+Function chkLoanCnt()
+	Dim loanAmt, ii, cnt
+	chkLoanCnt = 0
+
+	For ii = 1 To GRID0.Rows
+		loanAmt = Trim(GRID0.GetGridCell(ii, 15))
+
+		If loanAmt <> "" Then
+			If Is_numeric(loanAmt) = True Then
+				cnt = cnt + 1
+			End If
+		End If
+	Next
+
+	chkLoanCnt = cnt
+End Function
+
+Function chkLoanAmt()
+	chkLoanAmt = ""
+	GRID1.Clear
+
+	Dim ii, grd1Pos, loanAmt, firstChar, jmcd, jmNm, bondBuyDt, bondTaxGubn, newLoanAmt, loanGrade, loanDueDt, loanAbleAmt, FcurrMktCode
+
+	grd1Pos = 1
+
+	For ii = 1 To GRID0.Rows
+		loanAmt = Trim(GRID0.GetGridCell(ii, 15))
+
+		If loanAmt <> "" Then
+			If is_numeric(loanAmt) = True Then
+				firstChar = Left(loanAmt, 1)
+
+				If AscW(firstChar) < 48 Or AscW(firstChar) > 57 Then
+					chkLoanAmt = "NotNumeric"
+					Exit Function
+				End If
+
+				loanAbleAmt = Trim(GRID0.GetGridCell(ii, 10))
+
+				If Trim(loanAbleAmt) = "" Then
+					loanAbleAmt = 0
+				End If
+
+'				MsgBox "loanAbleAmt & loanAmt = " & loanAbleAmt & "   ^^^   " & loanAmt
+				If CDbl(loanAbleAmt) < CDbl(loanAmt) Then
+					chkLoanAmt = "OverAmt"
+					Exit Function
+				End If
+
+				If (loanAmt Mod 10000) <> 0 Then
+					chkLoanAmt = "NotZero"
+					Exit Function
+				End If
+
+				newLoanAmt = String(15 - Len(Trim(loanAmt)), "0") & loanAmt
+
+				jmcd = Trim(GRID0.GetGridCell(ii, 1))
+				jmNm = Trim(GRID0.GetGridCell(ii, 3))
+				bondBuyDt = Trim(GRID0.GetGridCell(ii, 4))
+				bondTaxGubn = Trim(GRID0.GetGridCell(ii, 5))
+				loanGrade = Trim(GRID0.GetGridCell(ii, 17))
+				loanDueDt = Trim(GRID0.GetGridCell(ii, 18))
+				FcurrMktCode = Trim(GRID0.GetGridCell(ii,20))
+
+				GRID1.SetGridCell grd1Pos, 1, jmcd
+				GRID1.SetGridCell grd1Pos, 2, bondBuyDt
+				GRID1.SetGridCell grd1Pos, 3, bondTaxGubn
+				GRID1.SetGridCell grd1Pos, 4, "+"
+				GRID1.SetGridCell grd1Pos, 5, newLoanAmt
+				GRID1.SetGridCell grd1Pos, 6, "+0000000000000000"
+				GRID1.SetGridCell grd1Pos, 7, loanGrade
+				GRID1.SetGridCell grd1Pos, 8, loanDueDt
+				GRID1.SetGridCell grd1Pos, 9, jmNm
+				GRID1.SetGridCell grd1Pos, 10, loanAbleAmt
+				GRID1.SetGridCell grd1Pos, 11, FcurrMktCode
+
+				grd1Pos = grd1Pos + 1
+			End If
+		End If
+	Next
+
+	chkLoanAmt = "OK"
+End Function
+'12.06 전문 수정하였음.
+
+Sub complete_cusstatus()
+
+    SYSTEM.Trace "complete_cusstatus start"
+
+
+	Dim char,check_char,tmptujaYN,tmpinfoYN,tmptujaNM,tmptujaGD,tempYN
+
+	tmptujaYN = Trim(SCREEN.Object("obj_cusstatus.OUTPUT7").Data)
+	tmpinfoYN = Trim(SCREEN.Object("obj_cusstatus.OUTPUT8").Data)
+	tmptujaNM = Trim(SCREEN.Object("obj_cusstatus.zGrdNm").Data)
+
+
+	If Trim(tmptujaYN) = "0" Then
+		tmptujaYN = "미희망"
+	Else
+		tmptujaYN = "희망"
+	End If
+
+	If tmptujaNM = "안정형" Then
+		check_char = 1
+	ElseIf tmptujaNM = "안정추구형" Then
+		check_char = 2
+	ElseIf tmptujaNM = "위험중립형" Then
+		check_char = 3
+	ElseIf tmptujaNM = "적극투자형" Then
+		check_char = 4
+	ElseIf tmptujaNM = "공격투자형" Then
+		check_char = 6
+	End If
+
+    SYSTEM.Trace "11tmpinfoYN:"&tmpinfoYN
+	If Trim(tmpinfoYN) = "0" Then
+		tmptujaNM = ""
+		tmpinfoYN = "미제공"
+		'check_char = 7
+	Else
+		tmpinfoYN = "제공"
+	End If
+
+    SYSTEM.Trace "22tmpinfoYN:"&tmpinfoYN
+	Select Case check_char
+		Case 1 :
+			tmptujaGD = "매우낮은위험이하"
+		Case 2 :
+			tmptujaGD = "낮은위험이하"
+		Case 3 :
+			tmptujaGD = "보통위험이하"
+		Case 4 :
+			tmptujaGD = "다소높은위험이하"
+		Case 6 :
+			tmptujaGD = "매우높은위험이하"
+		Case 7 :
+			tmptujaGD = ""
+	End Select
+
+	If Trim(SCREEN.Object("obj_cusstatus.LEDGER").Ecod) = "3956" Then '"미등록"
+			tmptujaNM   = "없음(미등록)"
+			tmptujaGD   = "-"
+			'Exit Sub
+	ElseIf CDbl(SCREEN.Object("obj_cusstatus.zToday").Data) > CDbl(SCREEN.Object("obj_cusstatus.zDueDate").Data) Then '만료일
+		tmptujaNM   = "없음(만료)"
+		tmptujaGD   = "-"
+		'Exit Sub
+
+	ElseIf Trim(SCREEN.Object("obj_cusstatus.OUTPUT6").Data) = "0" Then ' 전문금융소비자 일경우 스킵
+		tmptujaNM   = "전문금융소비자"
+		SYSTEM.Trace "profess111"
+
+'	ElseIf tmpinfoYN = "미제공" Or tmptujaYN = "미희망" Then '미희망은 요건 없어짐
+'		If tmpinfoYN = "미제공" Then
+'			tmptujaNM   = "없음(정보미제공)"
+'			tmptujaGD   = "-"
+'		End If
+	Else '일반금융소비자
+
+    End If
+
+    SYSTEM.Trace "11tmptujaNM:"&tmptujaNM
+    SYSTEM.Trace "11tmptujaGD:"&tmptujaGD
+
+
+	If tmptujaNM = "안정형" Then
+		sentence1.Data = "고객님의 투자성향은 안정형으로 매우낮은위험 이하 등급의 상품이 적합합니다."
+	ElseIf tmptujaNM = "안정추구형" Then
+		sentence1.Data = "고객님의 투자성향은 안정추구형으로 보통위험 이하 등급의 상품이 적합합니다."
+	ElseIf tmptujaNM = "위험중립형" Then
+		sentence1.Data = "고객님의 투자성향은 위험중립형으로 다소높은위험 이하 등급의 상품이 적합합니다."
+	ElseIf tmptujaNM = "적극투자형" Then
+		sentence1.Data = "고객님의 투자성향은 적극투자형으로 높은위험 이하 등급의 상품이 적합합니다."
+	ElseIf tmptujaNM = "공격투자형" Then
+		sentence1.Data = "고객님의 투자성향은 공격투자형으로 매우높은위험 이하 등급의 상품이 적합합니다."
+	End If
+
+
+
+    If tmptujaNM = "전문금융소비자" Then
+        sentence1.Data = "고객님은 전문금융소비자로, 매우높은 위험 이하 등급의 상품이 적합합니다."
+        SYSTEM.Trace "profess222"
+    End If
+
+    If tmpinfoYN = "미제공" Then
+        SYSTEM.Trace "333:"&tmpinfoYN
+		sentence1.Data = "고객님은 당사에 투자자정보 제공을 원하지 않으세요. "
+    End If
+
+    SYSTEM.Trace "profess333"
+    If tmptujaGD = "-" Then
+        SYSTEM.Trace "tmptujaGD(-)"
+		sentence1.Data = "투자자정보확인서가 작성되지 않았거나, 유효기간이 만료되었습니다."
+    End If
+
+End Sub
+
+Sub anshim()
+'여신거래 안심차단 프로세스 추가
+zAcnt1.Data = AN19.data
+zPwd1.Data  = zPwd.Data
+
+SYSTEM.Trace "zAcnt1.Data:"&zAcnt1.Data
+SYSTEM.Trace "zPwd1.Data:"&zPwd1.Data
+
+If corpyn = "Y" Then
+   SYSTEM.Trace "corp skip"
+Else
+   SYSTEM.Trace "person anshim"
+   SCREEN.Object("obj_ansim").Send
+End If
+
+'여신거래 안심차단 프로세스 끝
+End Sub
+
+
+Sub popup()
+    MsgBox "여신거래 안심차단 신청상태이므로 대출 불가능합니다."
+End Sub
+
+Sub LoadAccounts()
+
+	Dim accList, ii, acc, acno, ACNM, acid, actp, idx, myAcntFlag, value
+	accList = Split(CX_DTS.GetTypeData ("4","1" ), vbLf, -1, vbTextCompare)  'accoutcc 로 전계좌 불러오기 0->1
+
+    zAcnt1.Data = AN19.data
+
+	idx = 1
+
+	SYSTEM.Trace "LoadAccounts zAcnt1.Data:"&zAcnt1.Data
+
+	For ii=0 To UBound(accList)
+		acc = Trim(accList(ii))
+
+		If Len(acc)>11 Then
+			acc = Split(acc, "|", -1, vbTextCompare)
+			acno = Trim(Mid(acc(0), 1, 11))
+			ACNM = Mid(acc(0), 12)
+			ACNM = Replace(ACNM, vbTab, "")
+			ACNM = Trim(ACNM)
+			acid = Trim(acc(1))
+			actp = Mid(acno, 4, 2)
+			myAcntFlag = acc(2)
+			SYSTEM.Trace "start logic acno:"&acno
+            SYSTEM.Trace "myAcntFlag:"&myAcntFlag
+			'계좌플래그 2 또는 3 이면 랩계좌, 법인계좌 타입 = 4
+			If chkNumericData(myAcntFlag) = True Then
+				value = myAcntFlag And 4    '법인계좌 4 와 And 연산
+			    If value = 0 Then
+                   SYSTEM.Trace "person"
+                   corpyn = "N"
+                Else
+                   If Trim(zAcnt1.Data) = Trim(acno) Then
+                   	  SYSTEM.Trace "corp"
+                   	  corpyn = "Y"
+                   	  SYSTEM.Trace "end logic corpyn:"&corpyn
+                   	  Exit Sub
+                   End If
+				End If
+			End If
+		End If
+	Next
+
+End Sub
+
+_AW_ONINDECLARE_AW_
+#load IB888833
+#load IB888888
+
+_AW_ONENDSUB_AW_
+_AW_ONSTART_AW_
+LEDGER.Rcnt = "0010"
+'obj_cusstatus.Proc "send_f", ""
+SYSTEM.TRACE "onstart"
+
+
+'Call LoadAccounts()
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+SCREEN.OnSend = False
+Call guide_msg("")
+
+zIn.Data = "00001"
+
+If Len(Trim(AN19.Data)) <> 11 Then
+	Call guide_msg("계좌번호를 확인하여 주십시오.")
+	AN19.SetFocus
+	Exit Sub
+End If
+
+zAcntNo_dummy.Data = ""
+
+If Len(Trim(zPwd.Data)) < 4 Then
+	Call guide_msg("비밀번호를 확인하여 주십시오.")
+	zPwd.SetFocus
+	Exit Sub
+End If
+
+zLoanRcvblTp.Data = "0"
+grdimg1.Visible = True
+SCREEN.OnSend = True
+
+obj_cusstatus.Proc "send_f", ""
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+Dim ecod
+ecod = Trim(LEDGER.Ecod)
+
+Call LoadAccounts()
+
+If Left(ecod, 1) = "0" Then
+	If gubn = "order" Then
+		SCREEN.ClearAll 0, 2
+		ACNM.Data = Trim(AN19.Name)
+		Call alert_msg(Trim(LEDGER.Emsg))
+
+		If IsBnkAccnType(AN19) = True Then
+			SCREEN.Proc "obj_cancelMoney.send_f", ""
+		End If
+
+		Call send_f()
+		Exit Sub
+	End If
+
+	If LEDGER.Next = "Y" Then
+		next_btn.Enable = True
+	Else
+		next_btn.Enable = False
+	End If
+
+	If GRID0.Rows > 0 Then
+		loan_btn.Enable = True
+
+		Dim ii, jmcd, loanRate, loanAmt
+
+		For ii = gridPos To GRID0.Rows
+			jmcd = Trim(GRID0.GetGridCell(ii, 1))
+			loanRate = Trim(GRID0.GetGridCell(ii, 12))
+			loanRate = FormatNumber(loanRate * 100, 2)
+			loanAmt = Trim(GRID0.GetGridCell(ii, 14))
+
+			If Len(jmcd) = 7 Then
+				jmcd = Mid(jmcd, 2)
+			End If
+
+			GRID0.SetGridCell ii, 2, jmcd
+			GRID0.SetGridCell ii, 11, loanRate & "%"
+
+			If Is_numeric(loanAmt) = True Then
+				GRID0.SetGridCell ii, 15, loanAmt
+			Else
+				GRID0.SetGridCell ii, 15, ""
+			End If
+		Next
+
+		gridPos = ii
+	End If
+
+	'여신거래 안심차단 프로세스 추가
+     Call anshim()
+
+
+Else
+	MsgBox Trim(LEDGER.Emsg), ,"IBK투자증권"
+	next_btn.Enable = False
+End If
+
+Call guide_msg(Trim(LEDGER.Emsg))
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(zPwd)
+_AW_ONKEYCHANGE_AW_
+'== 비밀번호 변경시 조회 버튼 기능 수행.
+If SCREEN.Key = "13" Then  '-- Enter 키 입력
+	Call send_f()
+	obj_cusstatus.Proc "send_f", ""
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(send_btn)
+_AW_ONCLICK_AW_
+Call send_f()
+
+Call anshim()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(next_btn)
+_AW_ONCLICK_AW_
+Call send_c()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(AN19)
+_AW_ONCHANGE_AW_
+Call Set_account()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(loan_btn)
+_AW_ONCLICK_AW_
+Call applLoan()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(zTotLnlmtAmt)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(zLoanBalAmt)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(zLrgMnyoutSumAmt)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(GRID0)
+_AW_ONCLICK_AW_
+If GRID0.HitPos <> 3 Then
+	Exit Sub
+End If
+
+If GRID0.Column <> 15 Then
+	Exit Sub
+End If
+_AW_ONENDSUB_AW_
+_AW_ONDBLCLK_AW_
+If GRID0.HitPos <> 3 Then
+	Exit Sub
+End If
+
+If GRID0.Column < 15 Then
+	Dim jmcd
+	jmcd = Trim(GRID0.GetGridCell(GRID0.Row, 2))
+
+	If Len(jmcd) = "6" Then
+		S1301.Data = jmcd
+		S1301.Trigger "", True
+	End If
+End If
+_AW_ONENDSUB_AW_
+_AW_ONKEYCHANGE_AW_
+If SCREEN.Key = "13" Then
+	If Len(Trim(AN19.Data)) <> 11 Then
+		Exit Sub
+	End If
+
+	If Len(Trim(zPwd.Data)) < 4 Then
+		Exit Sub
+	End If
+
+	Call applLoan()
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(AgrmMthdCode)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON1)
+_AW_ONCLICK_AW_
+'SCREEN.CreateWindow 1, "IB821200 /t/p5", ""
+If checktest("10") Then
+	MsgBox "true"
+Else
+	MsgBox "False"
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(zAcnt1)
+_AW_ONCHANGE_AW_
+'Call Set_account()	'-- 계좌명, 비밀번호 설정
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(chkrun1)
+_AW_ONCHANGE_AW_
+'Call Set_account()	'-- 계좌명, 비밀번호 설정
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

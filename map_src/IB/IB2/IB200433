@@ -1,0 +1,230 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB200433)
+MAPSIZE(181, 296)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("뉴스")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+TITLE("뉴스")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pibo7710")
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL1(0, 0, 296, 25)        COLOR(66, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  RADIO0(74, 2, 137, 18)  '종목뉴스'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(GROUP0)      COLOR(208, 130)  CUR(0)      TABORDER(1)  ENABLE  &
+  VISIBLE  CHECKED  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  RADIO1(5, 2, 70, 18)  '전체뉴스'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(GROUP0)      COLOR(208, 130)  CUR(0)      TABORDER(2)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+OBJECT  obj0(0, 21, 294, 181)    "IB200439"  TABORDER(3)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+GROUP  GROUP0(14, 261, 88, 297)  'Group'        COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL2(153, 1, 286, 20)  LINECOLOR(165)      COLOR(66, 130)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  r2_3(242, 1, 282, 21)  '시황'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(GROUP1)      COLOR(208, 130)  CUR(0)      TABORDER(4)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  r2_2(200, 1, 240, 21)  '공시'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(GROUP1)      COLOR(208, 130)  CUR(0)      TABORDER(5)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  r2_1(157, 1, 197, 21)  '전체'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(GROUP1)      COLOR(208, 130)  CUR(0)      TABORDER(6)  ENABLE  &
+  VISIBLE  CHECKED  TRANSPARENT  HINTTYPE(IH_NONE)
+GROUP  GROUP1(82, 536, 202, 586)  'Group'        COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Sub rd_click()
+	Dim ii
+
+	If r2_1.Checked Then
+		For ii=1 To 20
+			If ii = 7 Then
+				SCREEN.Object("obj0.GUBN"&ii).Checked = False
+			Else
+				SCREEN.Object("obj0.GUBN"&ii).Checked = True
+			End If
+		Next
+	ElseIf r2_2.Checked Then
+		For ii=1 To 20
+			If ii = 2 Then
+				SCREEN.Object("obj0.GUBN"&ii).Checked = True
+			Else
+				SCREEN.Object("obj0.GUBN"&ii).Checked = False
+			End If
+		Next
+	ElseIf r2_3.Checked Then
+		For ii=1 To 20
+			If ii = 2 Or ii = 7 Then
+				SCREEN.Object("obj0.GUBN"&ii).Checked = False
+			Else
+				SCREEN.Object("obj0.GUBN"&ii).Checked = True
+			End If
+		Next
+	Else
+
+	End If
+End Sub
+
+_AW_ONSTART_AW_
+SCREEN.SetTimer 2, False
+
+If SCREEN.CreateObject("Info") Then
+	Dim rd_val
+	Dim chkval
+	rd_val = Trim(INFO.popData (LOGIN.Name, "userconf.ini", "IB200400", "RD_CHK"))
+
+	If rd_val = "" Then
+		rd_val = "1"
+	End If
+	Select Case rd_val
+	Case 1
+		r2_1.Checked = True
+		r2_2.Checked = False
+		r2_3.Checked = False
+	Case 2
+		r2_1.Checked = False
+		r2_2.Checked = True
+		r2_3.Checked = False
+	Case 3
+		r2_1.Checked = False
+		r2_2.Checked = False
+		r2_3.Checked = True
+	End Select
+
+	newsdata = Trim(INFO.PopData(LOGIN.Name, "userconf.ini", "IB200400", "news"))
+
+	If newsdata = "1" Then
+		RADIO0.Checked = True
+		obj0.SetObject "IB200439"
+		obj0.Send
+		'obj0.SetRect 280, 26, 560, 188
+	ElseIf newsdata = "2" Then
+		RADIO1.Checked = True
+		obj0.SetObject "IB200438"
+		obj0.Send
+		'obj0.SetRect 0, 26, 280, 188
+
+		r2_1.Enable = False
+		r2_2.Enable = False
+		r2_3.Enable = False
+	End If
+Else
+	r2_1.Checked = True
+	r2_2.Checked = False
+	r2_3.Checked = False
+End If
+
+rd_click()
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+SCREEN.OnSend False
+obj0.Send
+
+_AW_ONENDSUB_AW_
+_AW_ONTIMER_AW_
+If SCREEN.CreateObject("Info") Then
+	newsdata = Trim(INFO.PopData(LOGIN.Name, "userconf.ini", "IB200400", "news"))
+End If
+
+If newsdata = "1" Then
+	RADIO0.Checked = True
+	obj0.SetObject "IB200439"
+	obj0.Send
+ElseIf newsdata = "2" Then
+	RADIO1.Checked = True
+	obj0.SetObject "IB200438"
+	obj0.Send
+End If
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(RADIO0)
+_AW_ONCLICK_AW_
+obj0.SetObject "IB200439"
+obj0.Send
+
+r2_1.Enable = True
+r2_2.Enable = True
+r2_3.Enable = True
+
+If SCREEN.CreateObject("Info") Then
+	INFO.PushData LOGIN.Name, "userconf.ini", "IB200400", "news", "1"
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(RADIO1)
+_AW_ONCLICK_AW_
+obj0.SetObject "IB200438"
+obj0.Send
+
+r2_1.Enable = False
+r2_2.Enable = False
+r2_3.Enable = False
+
+If SCREEN.CreateObject("Info") Then
+	INFO.PushData LOGIN.Name, "userconf.ini", "IB200400", "news", "2"
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(r2_3)
+_AW_ONCLICK_AW_
+Dim ii
+If SCREEN.CreateObject("Info") Then
+	INFO.pushData LOGIN.Name, "userconf.ini", "IB200400", "RD_CHK", "3"
+End If
+rd_click()
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(r2_2)
+_AW_ONCLICK_AW_
+Dim ii
+If SCREEN.CreateObject("Info") Then
+	INFO.pushData LOGIN.Name, "userconf.ini", "IB200400", "RD_CHK", "2"
+End If
+rd_click()
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(r2_1)
+_AW_ONCLICK_AW_
+Dim ii
+If SCREEN.CreateObject("Info") Then
+	INFO.pushData LOGIN.Name, "userconf.ini", "IB200400", "RD_CHK", "1"
+End If
+rd_click()
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

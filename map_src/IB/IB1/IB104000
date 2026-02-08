@@ -1,0 +1,323 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB104000)
+MAPSIZE(667, 815)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("[1040] 주식예약주문")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(CR2TAB)
+TITLE("[1040] 주식예약주문")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL4(492, 222, 795, 268)        COLOR(64, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL5(2, 664, 902, 668)        COLOR(64, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL3(-2, 263, 817, 644)  LIMAGE(0)  LINEW(4)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL2(494, 0, 817, 264)  LIMAGE(0)  LINEW(4)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL10(0, 1, 495, 263)  LIMAGE(0)  LINEW(4)  STRESS(44)  STRESSW(3)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  OBJ_sise(8, 10, 337, 256)    "IB104010"  TABORDER(1)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+USRTAB  TAB_account(6, 271, 805, 297)  FOCUS  INDEX(0)  COUNT(6)  AL_TOP  TAB_IMAGE        COLOR(3, 130)  CUR(0)  TABIMAGE("tab.bmp")  FCOLOR(3, 130)  CAPTION(" 예약주문시 유의사항 ", " 예약주문내역 ", "기간 예약주문내역 ", " 예약주문 처리결과 ", "기간 예약주문 처리결과", "실시간 잔고")  TABINFO("1:1", "1:2", "0:5", "1:3", "0:6", "1:4")  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  OBJ_account(6, 297, 809, 636)    "IB104021"  TABORDER(2)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  OBJ_order(524, 7, 809, 257)    "IB104090"  TABORDER(3)  IOORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  1301(846, 70, 946, 90)  LEN(6)  IO_MIXED|EDIT_INOUT|FA_WRAP|FA_HAN|CODE    FONT("굴림체", 9, NORMAL)    COLOR(28, 232)  CUR(0)  TP_NONE          TABORDER(4)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  OBJ_info(339, 10, 487, 255)    "IB104030"  TABORDER(5)  IOORDER(5)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL8(0, 642, 819, 667)  LIMAGE(0)  LINEW(3)  LINETYPE(4)  LINECOLOR(64)      COLOR(34, 232)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL7(9, 647, 23, 662)    |IMAGE|AL_STRETCH    COLOR(34, 232)  CUR(0)    "알림_ic.bmp"  ENABLE  &
+  VISIBLE  IMAGE  HINTTYPE(IH_NONE)
+PANEL  GUIDE(28, 646, 784, 663)        COLOR(34, 130)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL0(-2, -1, 494, 1)        COLOR(64, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+USRTAB  tab_ordtyp(502, 7, 524, 257)  FOCUS  INDEX(0)  COUNT(5)  AL_LEFT  TAB_3D      FONT("굴림체", 9, NORMAL)    COLOR(3, 70)  CUR(0)  FCOLOR(3, 71)  CAPTION("현금", "신용", "대출", "취소", "취소")  TABINFO("1:0", "1:1", "1:2", "1:3", "0:4")  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  xxxx(1185, 455, 1265, 475)  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  obj(6, 297, 809, 632)    ""  TABORDER(6)  IOORDER(6)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Sub all_account()
+	OBJ_account.Send
+End Sub
+
+Sub send_sise_all(xval)
+SCREEN.IgnoreChange True
+	S1301.Trigger "", True
+
+	If xval <> "jumun" Then
+		Call Ord_ChangeCode(S1301.Data)
+	End If
+	OBJ_sise.Send
+	OBJ_info.Send
+SCREEN.IgnoreChange False
+End Sub
+
+Sub tab_ordtyp_change()
+	Select Case tab_ordtyp.ID
+	Case 0
+		OBJ_order.SetObject("IB104090")
+		Call Set_init()
+	Case 1
+		OBJ_order.SetObject("IB104091")
+		Call Set_init()
+	Case 2
+		OBJ_order.SetObject("IB104092")
+		Call Set_init()
+	Case 3
+		tab_ordtyp.SetTabVisible 3, True
+		tab_ordtyp.SetTabVisible 4, False
+		OBJ_order.SetObject("IB104093")
+
+	Case 4
+		tab_ordtyp.SetTabVisible 3, False
+		tab_ordtyp.SetTabVisible 4, True
+		OBJ_order.SetObject("IB104094")
+	End Select
+End Sub
+
+Sub Set_init()
+	If SCREEN.Object("OBJ_order.OBJ_odr.ed_occd").data = "00" Then
+		SCREEN.Object("OBJ_order.OBJ_odr.ed_sdat").enable = False
+		SCREEN.Object("OBJ_order.OBJ_odr.ed_edat").enable = False
+	End If
+End Sub
+
+Sub Set_type(val)
+	Dim value
+	value = val
+	SYSTEM.Trace "ste_type start : " & val & value
+
+	If val = "0" Then						'예약주문내역
+		TAB_account.Index = 2
+		TAB_account.SetTabVisible 2, True
+		TAB_account.SetTabVisible 3, True
+		TAB_account.SetTabVisible 5, False
+		TAB_account.SetTabVisible 6, False
+		obj.Visible = False
+		OBJ_account.Visible = True
+		SCREEN.Object("obj.OBJ_hnam.17413").Visible = False
+		OBJ_account.SetObject ("IB104022")
+	ElseIf val = "1" Then					'기간예약주문내역
+		TAB_account.Index = 5
+		TAB_account.SetTabVisible 5, True
+		TAB_account.SetTabVisible 2, False
+		TAB_account.SetTabVisible 6, True
+		TAB_account.SetTabVisible 3, False
+		obj.SetObject("IB104032")
+		SCREEN.Proc "obj.send_f", ""
+		obj.Visible = True
+		OBJ_account.Visible = False
+		SCREEN.Object("obj.OBJ_hnam.17413").Visible = True
+	ElseIf val = "2" Then					'예약주문 처리결과
+		TAB_account.Index = 3
+		TAB_account.SetTabVisible 2, True
+		TAB_account.SetTabVisible 3, True
+		TAB_account.SetTabVisible 5, False
+		TAB_account.SetTabVisible 6, False
+		obj.Visible = False
+		OBJ_account.Visible = True
+		OBJ_account.SetObject ("IB104023")
+		OBJ_account.Proc "send_f", ""
+		
+	ElseIf val = "3" Then					'기간예약주문 처리결과
+		TAB_account.Index = 6
+		TAB_account.SetTabVisible 5, True
+		TAB_account.SetTabVisible 2, False
+		TAB_account.SetTabVisible 6, True
+		TAB_account.SetTabVisible 3, False
+		obj.SetObject("IB104033")
+		obj.Visible = True
+		OBJ_account.Visible = False
+	End If
+	'Call clck_account()
+End Sub
+
+Sub clck_account()
+
+'	Dim chk
+'
+'	If obj.GetObject <> "" Then
+'		chk = 1
+'	End If
+
+'	If chk = 1 Then
+'		obj.Visible = False
+'		SCREEN.Object("obj.OBJ_hnam.17413").Visible = False
+'		OBJ_account.Visible = True
+'	End If
+
+
+	Select Case TAB_account.ID
+	Case 1
+		OBJ_account.SetObject ("IB104021")
+		obj.Visible = False
+		OBJ_account.Visible = True
+		If obj.GetObject = "IB104032" Then
+			SCREEN.Object("obj.OBJ_hnam.17413").Visible = False
+		End If
+	Case 2
+		OBJ_account.SetObject ("IB104022")
+		obj.Visible = False
+		OBJ_account.Visible = True
+		If obj.GetObject = "IB104032" Then
+			SCREEN.Object("obj.OBJ_hnam.17413").Visible = False
+		End If
+	Case 3
+		OBJ_account.SetObject ("IB104023")
+		obj.Visible = False
+		OBJ_account.Visible = True
+		If obj.GetObject = "IB104032" Then
+			SCREEN.Object("obj.OBJ_hnam.17413").Visible = False
+		End If
+	Case 4
+		OBJ_account.SetObject ("IB104024")
+		obj.Visible = False
+		OBJ_account.Visible = True
+		If obj.GetObject = "IB104032" Then
+			SCREEN.Object("obj.OBJ_hnam.17413").Visible = False
+		End If
+
+		SCREEN.Object("OBJ_account.objX").Visible = True
+	Case 5
+		obj.SetObject("IB104032")
+		obj.Visible = True
+		OBJ_account.Visible = False
+		If OBJ_account.GetObject = "IB104024" Then
+			SCREEN.Object("OBJ_account.objX").Visible = False
+		End If
+
+
+	Case 6
+		obj.Visible = True
+		OBJ_account.Visible = False
+		obj.SetObject("IB104033")
+		If OBJ_account.GetObject = "IB104024" Then
+			SCREEN.Object("OBJ_account.objX").Visible = False
+		End If
+	Case Else
+		Exit Sub
+	End Select
+End Sub
+
+_AW_ONINDECLARE_AW_
+'== 주문obj를포함한 main의 공통함수
+#LOAD IB999913
+
+_AW_ONENDSUB_AW_
+_AW_ONSTART_AW_
+
+
+Call send_sise_all("main")
+Call Set_init()
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+SCREEN.OnSend = False
+
+_AW_ONENDSUB_AW_
+_AW_ONTIMER_AW_
+Dim ecod
+ecod  = Trim(SCREEN.Object("OBJ_order.OBJ_snd.LEDGER").ecod)
+
+If Left(ecod, 1) <> "0" Then
+	Exit Sub
+End If
+
+
+
+
+If SCREEN.Object("OBJ_order.OBJ_odr.ed_occd").data = "00" Then
+	SYSTEM.Trace "일반예약"
+	TAB_account.SetTabVisible 2, True
+	TAB_account.SetTabVisible 3, True
+	TAB_account.SetTabVisible 5, False
+	TAB_account.SetTabVisible 6, False
+	obj.Visible = False
+
+	If OBJ_account.GetObject <> "IB104022" Then
+		TAB_account.ID = "2"
+
+
+		OBJ_account.SetObject "IB104022"
+	End If
+	SCREEN.Proc "OBJ_account.send_f", ""
+Else
+	Set_type("1")
+	obj.Send
+
+End If
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(TAB_account)
+_AW_ONCLICK_AW_
+Call clck_account()
+
+'Sub clck_account()
+'	Select Case TAB_account.ID
+'	Case 1
+'		OBJ_account.SetObject ("IB104021")
+'	Case 2
+'		OBJ_account.SetObject ("IB104022")
+'	Case 3
+'		OBJ_account.SetObject ("IB104023")
+'	Case 4
+'		OBJ_account.SetObject ("IB104024")
+'	Case 5
+'		OBJ_account.SetObject ("IB104032")
+'	Case Else
+'		Exit Sub
+'	End Select
+'End Sub
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(1301)
+_AW_ONCHANGE_AW_
+Call send_sise_all("main")
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(tab_ordtyp)
+_AW_ONCLICK_AW_
+Call tab_ordtyp_change()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

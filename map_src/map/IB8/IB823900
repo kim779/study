@@ -1,0 +1,91 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB823900)
+MAPSIZE(44, 327)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("MS Sans Serif", 9, NORMAL)
+TITLE("GTS 설치검사")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(FIXED)
+HEADER(NOP)
+BGROUND(BRUSH, 240)
+}
+
+
+
+FORM DIVISION
+{
+
+GROUP  GROUP0(5, 0, 325, 40)        COLOR(-1, 232)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL0(10, 10, 320, 35)  'GTS 설치를 검사합니다.........'  AL_LEFT  CUR(0)      COLOR(168, 229)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Function readFromRegistry (strRegistryKey, strDefault )
+
+Dim WSHShell, value
+
+On Error Resume Next
+
+Set WSHShell = CreateObject("WScript.Shell")
+
+value = WSHShell.RegRead( strRegistryKey )
+
+
+If Err.number <> 0 Then
+
+readFromRegistry= strDefault
+
+Else
+
+readFromRegistry=value
+
+End If
+
+
+Set WSHShell = Nothing
+End Function
+
+_AW_ONSTART_AW_
+Dim a
+a = readFromRegistry("HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{AD9D2732-5729-4B30-9251-2502E3E25EBA}\InstallLocation","NO")  '끝에 화일명이 아닌 프로그램 이름 넣기!
+                           
+SCREEN.SetSize 327,44
+
+If a <> "NO" Then
+	Dim oShell
+
+	Set oShell = CreateObject ("WScript.shell")
+	 oShell.Run("""" & a & "\Bin\StartMain.exe""")
+	Set oShell = Nothing
+Else
+	Dim msgAns
+	
+	msgAns = MsgBox ("설치된 GTS 프로그램이 없습니다.설치하시겠습니까?",1,"GTS 확인창")
+	
+	If msgAns = 1 Then
+		SYSTEM.Navigate "http://www.ibks.com/customer/dealing/download.jsp"
+	End If
+End If
+
+SCREEN.CloseWindow
+
+_AW_ONENDSUB_AW_
+}
+
+
+

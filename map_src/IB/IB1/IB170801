@@ -1,0 +1,166 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB170801)
+MAPSIZE(499, 667)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("[1708]전제")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(SAVE)
+TITLE("[170801]종합잔고 전체")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL1(-2, 26, 670, 478)  LIMAGE(0)  LINEW(3)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+USRTAB  tab_subHangmok(6, 34, 662, 60)  FOCUS  INDEX(0)  COUNT(2)  AL_TOP  TAB_IMAGE      FONT("굴림체", 9, NORMAL)    COLOR(3, 70)  CUR(0)  TABIMAGE("tab.bmp")  FCOLOR(3, 71)  CAPTION("잔고현황요약", "유가증권상세")  TABINFO("1:0", "1:1")  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL0(2, 0, 669, 26)  LINECOLOR(66)      COLOR(66, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL0(6, 3, 56, 23)  '계좌번호'  AL_LEFT  CUR(0)      COLOR(66, 69)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+CONTROL  AN99(56, 3, 196, 23)    "CX_Account"  "/w0"  LEN(11)  EDIT_INPUT    COLOR(192, 69)  TABORDER(2)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL1(326, 3, 376, 23)  '비밀번호'  AL_LEFT  CUR(0)      COLOR(66, 69)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  zPwd(376, 3, 432, 23)  LEN(8)  IO_MIXED|EDIT_INPUT|FA_PASSWD|FA_WRAP    COLOR(192, 69)  CUR(0)  TP_SUNKEN          TABORDER(3)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  send_btn(597, 3, 629, 23)  '조회'  TP_PUSH|IMAGETEXT|AL_STRETCH        FOCUS  COLOR(208, 69)  CUR(0)    "2btn.bmp"    TABORDER(4)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+BUTTON  next_btn(630, 3, 662, 23)  '다음'  TP_PUSH|IMAGETEXT|AL_STRETCH        FOCUS  COLOR(208, 69)  CUR(0)    "2btn.bmp"    TABORDER(5)  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+OUT  ACNM(199, 3, 319, 23)  LEN(30)  IO_MIXED|AL_LEFT||FA_SKIP    COLOR(160, 69)  CUR(0)  LINECOLOR(89)          TABORDER(0)  IOORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  GUIDE_around(-2, 475, 670, 499)  LIMAGE(0)  LINEW(3)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 69)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  GUIDE(22, 478, 622, 496)  LINECOLOR(181)      COLOR(34, 69)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+PANEL  PANEL109(8, 480, 22, 494)    |IMAGE|AL_STRETCH    COLOR(181, 232)  CUR(0)    "알림_ic.bmp"  ENABLE  &
+  VISIBLE  IMAGE  HINTTYPE(IH_NONE)
+OBJECT  obj0(6, 60, 662, 422)    "IB170810"  TABORDER(1)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  OBJECT0(6, 431, 606, 471)  |FA_ENUM  "IB170803"  TABORDER(6)  IOORDER(5)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Sub tabSelect()
+	Select Case tab_subHangmok.ID
+		Case 0
+			obj0.SetObject ""
+			obj0.SetObject "IB170810"
+			SCREEN.Object("obj0.SecDtlGrid").Visible = False
+			SCREEN.Object("obj0.BalStGrid").Visible = True
+			SCREEN.SetTimer 3, False
+		Case 1
+			obj0.SetObject ""
+			obj0.SetObject "IB170802"
+			obj0.Send
+	End Select
+End Sub
+
+_AW_ONSTART_AW_
+Call tabSelect()
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+SCREEN.OnSend = False
+
+_AW_ONENDSUB_AW_
+_AW_ONTIMER_AW_
+If Trim(AN99.Data) = "" Or Len(Trim(AN99.Data)) < 11 Or Trim(zPwd.Data) = "" Or Len(Trim(zPwd.Data)) < 4 Then
+	Exit Sub
+End If
+
+If SCREEN.Object("main.tab_hangmok").ID = "0" Then
+	SCREEN.Object("obj0.zRmnCnfTp").Data = "1"
+ElseIf SCREEN.Object("main.tab_hangmok").ID = "1" Then
+	SCREEN.Object("obj0.zRmnCnfTp").Data = "0"
+End If
+
+SCREEN.Object("obj0.zOtptTp").Data = "1"
+SCREEN.Object("obj0.zBalTrxTp").Data = "0"
+
+SCREEN.Proc "obj0.send_f", ""
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(tab_subHangmok)
+_AW_ONCLICK_AW_
+GUIDE.Text = ""
+
+Call tabSelect()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(AN99)
+_AW_ONCHANGE_AW_
+SCREEN.ClearAll 2, 2
+zPwd.Clear
+
+If Len(Trim(AN99.Data)) > 10 Then
+	ACNM.Data = Trim(AN99.Name)
+	zPwd.Data = Trim(AN99.Password)
+
+	If Len(Trim(zPwd.Data)) < 4 Then
+		zPwd.SetFocus
+	End If
+Else
+	AN99.SetFocus
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(zPwd)
+_AW_ONKEYCHANGE_AW_
+If SCREEN.Key = "13" Then
+	Call tabSelect()
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(send_btn)
+_AW_ONCLICK_AW_
+If tab_subHangmok.ID = 0 Then
+	SCREEN.Proc "obj0.send_f", ""
+ElseIf tab_subHangmok.ID = 1 Then
+	SCREEN.Proc "obj0.obj0.send_f", ""
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(next_btn)
+_AW_ONCLICK_AW_
+If tab_subHangmok.ID = 0 Then
+	SCREEN.Proc "obj0.send_c", ""
+ElseIf tab_subHangmok.ID = 1 Then
+	SCREEN.Proc "obj0.obj0.send_c", ""
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

@@ -1,0 +1,514 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB950102)
+MAPSIZE(392, 481)
+VERSION(001)
+MAPKIND(NORMAL)
+MAPGROUP(4)
+MAPDESC("사용자현황")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(XFONT)
+TITLE("매체별 사용자현황")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pmho9099")
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL63(0, 0, 483, 394)  LIMAGE(0)  LINEW(3)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+GROUP  GRP(556, 169, 701, 293)  'User Selection'        COLOR(-1, 33554432)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  SYMBOL14(605, 261, 637, 281)  '전송'  TP_PUSH|IMAGETEXT|AL_CENTER        COLOR(7, 209)  CUR(0)    "2BTN.BMP"    TABORDER(6)  ENABLE  &
+  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+EDIT  SVIP(593, 5, 714, 25)  LEN(15)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_NOR    COLOR(204, 232)  CUR(0)  TP_NONE          TABORDER(7)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  FUNC(649, 93, 669, 113)  LEN(1)  IO_MIXED|EDIT_INOUT|FA_SEND|FA_WRAP|FA_NOR|SA_ALL    COLOR(204, 232)  CUR(0)  TP_NONE          TABORDER(8)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  R_ALL(559, 189, 685, 209)  '전체 사용자'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(GRP)      COLOR(7, 63)  CUR(0)      TABORDER(1)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  R_USR(559, 233, 634, 253)  '선택사용자'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(GRP)      COLOR(7, 63)  CUR(0)      TABORDER(3)  ENABLE  &
+  CHECKED  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  USID(639, 232, 696, 252)  LEN(8)  IO_ALPHA|EDIT_INPUT|FA_WRAP    COLOR(50331647, 33554432)  CUR(0)  TP_NONE          TABORDER(4)  IOORDER(4)  ENABLE  &
+  HINTTYPE(IH_NONE)
+GRID  GRID01(7, 25, 477, 389)  VISIBLEROW(30)  CELLH(18)  MATRIX(4196, 11)  FIX(0)  MAINCOLOR(7, 0)  LINECOLOR(75)  FOCUSCOLOR(78)  FOCUSKIND(3)  ROWC(68, 77)  |FLEXIBLE|VSCROLL|INS_TOP|NO3D|RROW|XHLINE|PAGE|HEADER|GRFTEXT    &
+	COLINFO("HOST")  LEN(12)  WIDTH(70)  HEAD("HOST")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("SEQN")  LEN(4)  WIDTH(44)  HEAD("단말")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_SORT  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("DANMAL")  LEN(10)  WIDTH(70)  HEAD("단말")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_REF)  COLHELPTEXT("Col1")  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT  |FA_SKIP    COLOR(68, 69)  COLCUR(0, 0)  REFERENCE(Col1)    COLUMN_VISIBLE  COLUMN_SORT  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("USID")  LEN(8)  WIDTH(69)  HEAD("접속ID")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_ALPHA|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  COLUMN_SORT  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("USRN")  LEN(16)  WIDTH(80)  HEAD("이름")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  COLUMN_SORT  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("PCNT")  LEN(4)  WIDTH(61)  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_SORT  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col0")  LEN(6)  WIDTH(62)  HEAD("접속시간")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  EDITFORMAT("99:99:99")    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("QCNT")  LEN(15)  WIDTH(103)  HEAD("IP 주소")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_REF)  COLHELPTEXT("NAME")  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  COLUMN_SORT  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("NAME")  LEN(8)  WIDTH(58)  HEAD("TERM명")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_SORT  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("API/TS")  LEN(1)  WIDTH(35)  HEAD("API/TS")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col1")  LEN(50)  WIDTH(44)  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_NUM|EDIT_OUTPUT  |FA_SKIP    COLOR(192, 232)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    TABORDER(9)  IOORDER(5)  ENABLE  &
+  VISIBLE
+
+OUT  SVRM(570, 336, 684, 356)  LEN(20)  IO_MIXED|AL_LEFT||FA_SKIP    COLOR(64, 209)  CUR(0)  TP_ETCHED          TABORDER(0)  IOORDER(11)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  R_SVR(559, 210, 702, 230)  '선택서버의 사용자'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(GRP)      COLOR(7, 63)  CUR(0)      TABORDER(2)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  BUTTON0(571, 261, 603, 281)  '찾기'  TP_PUSH|IMAGETEXT|AL_CENTER        COLOR(7, 63)  CUR(0)    "2BTN.BMP"    TABORDER(5)  ENABLE  &
+  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+BUTTON  BUTTON1(639, 261, 671, 281)  '지움'  TP_PUSH|IMAGETEXT|AL_CENTER        COLOR(7, 63)  CUR(0)    "2BTN.BMP"    TABORDER(10)  ENABLE  &
+  IMAGETEXT  HOVER  HINTTYPE(IH_STRING)  HELPTEXT("공지 내용을 지우고 새로 작성합니다..")HELPTEXT("공지 내용을 지우고 새로 작성합니다..")
+LABEL  LABEL0(11, 3, 45, 23)  'HOST'  AL_LEFT  FONT("굴림체", 9, BOLD)  CUR(0)      COLOR(208, 232)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LBL_CNT(445, 465, 505, 480)  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL1(170, 3, 225, 23)  '매체구분'  AL_LEFT  FONT("굴림체", 9, BOLD)  CUR(0)      COLOR(208, 232)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+OUT  OUTPUT1(599, 413, 690, 436)  LEN(4)  IO_MIXED|AL_CENTER|    COLOR(192, 69)  CUR(0)            TABORDER(0)  IOORDER(6)  ENABLE  &
+  HINTTYPE(IH_NONE)
+COMBO  cbHost(44, 3, 164, 22)  TP_SUNKEN  LEN(3)  COUNT(15)  VCOUNT(15)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_MIXED|EDIT_INPUT|FA_SKIP    COLOR(192, 232)  CUR(0)  DISPLAY("전체", "BP11", "BP12", "BP13", "BP14", "BP15", "BP16", "BP21", "BP22", "BP23", "BP24", "BP25", "BP26", "KHT", "BPT")  DATA("TOT", "B11", "B12", "B13", "B14", "B15", "B16", "B21", "B22", "B23", "B24", "B25", "B26", "KHT", "BPT")    TABORDER(11)  IOORDER(7)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+COMBO  cbGubn(223, 1, 336, 23)  TP_SUNKEN  LEN(3)  COUNT(10)  VCOUNT(10)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_MIXED|EDIT_INPUT|FA_SKIP    COLOR(192, 232)  CUR(0)  DISPLAY("전체", "HTS", "WTS", "MTS", "아이폰", "안드로이드폰", "API", "증권통", "증권플러스", "모바일WTS")  DATA("TOT", "HTS", "WTS", "MTS", "SSS", "UUU", "API", "MST", "MSP", "mmm")    TABORDER(12)  IOORDER(8)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL2(340, 3, 425, 23)  '합계 : '  AL_LEFT  FONT("굴림체", 9, BOLD)  CUR(0)      COLOR(208, 232)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  BUTTON2(1254, 16, 1291, 36)  '조회'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, BOLD)  COLOR(7, 186)  CUR(0)    "조회BTN.BMP"    TABORDER(13)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+BUTTON  BUTTON3(440, 3, 477, 23)  '조회'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, BOLD)  COLOR(7, 186)  CUR(0)    "조회BTN.BMP"    TABORDER(14)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+EDIT  CHCK(650, 115, 705, 135)  LEN(3)  IO_MIXED|EDIT_INPUT|FA_SEND|FA_WRAP|FA_NOR|SA_ALL    COLOR(204, 232)  CUR(0)  TP_NONE          TABORDER(15)  IOORDER(3)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  Gubn(255, 429, 312, 449)  LEN(3)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(50331647, 33554432)  CUR(0)  TP_SUNKEN  INIT("TOT")          TABORDER(16)  IOORDER(9)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  Host(255, 454, 312, 474)  LEN(3)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(50331647, 33554432)  CUR(0)  TP_SUNKEN  INIT("TOT")          TABORDER(17)  IOORDER(10)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL3(215, 429, 249, 449)  'HOST'  AL_LEFT  FONT("굴림체", 9, BOLD)  CUR(0)      COLOR(208, 232)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL4(194, 454, 249, 474)  '매체구분'  AL_LEFT  FONT("굴림체", 9, BOLD)  CUR(0)      COLOR(208, 232)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  COUNTER(396, 528, 639, 544)  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_REF)  HELPTEXT("COUNTER")HELPTEXT("COUNTER")
+LABEL  COUNTER2(396, 547, 639, 563)  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  COUNTER3(396, 565, 639, 581)  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  HTSCNT(222, 500, 307, 520)  LEN(7)  IO_NUM|AL_CENTER||FA_SKIP    COLOR(192, 69)  CUR(0)  LINECOLOR(17)          TABORDER(0)  IOORDER(12)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  IPHONECNT(222, 519, 307, 539)  LEN(7)  IO_NUM|AL_CENTER||FA_SKIP    COLOR(192, 69)  CUR(0)  LINECOLOR(17)          TABORDER(0)  IOORDER(13)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  ANDROIDCNT(222, 538, 307, 558)  LEN(7)  IO_NUM|AL_CENTER||FA_SKIP    COLOR(192, 69)  CUR(0)  LINECOLOR(17)          TABORDER(0)  IOORDER(14)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  WTSCNT(222, 576, 307, 596)  LEN(7)  IO_NUM|AL_CENTER||FA_SKIP    COLOR(192, 69)  CUR(0)  LINECOLOR(17)          TABORDER(0)  IOORDER(15)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  APICNT(222, 557, 307, 577)  LEN(7)  IO_NUM|AL_CENTER||FA_SKIP    COLOR(192, 69)  CUR(0)  LINECOLOR(17)          TABORDER(0)  IOORDER(16)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  mstcnt(222, 614, 307, 634)  LEN(7)  IO_NUM|AL_CENTER||FA_SKIP    COLOR(192, 69)  CUR(0)  LINECOLOR(17)          TABORDER(0)  IOORDER(17)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  mspcnt(222, 633, 307, 653)  LEN(7)  IO_NUM|AL_CENTER||FA_SKIP    COLOR(192, 69)  CUR(0)  LINECOLOR(17)          TABORDER(0)  IOORDER(18)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  IONECNT(222, 595, 307, 615)  LEN(7)  IO_NUM|AL_CENTER||FA_SKIP    COLOR(192, 69)  CUR(0)  LINECOLOR(17)          TABORDER(0)  IOORDER(19)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL0(44, 500, 223, 520)  'HTS'  LINECOLOR(17)      COLOR(208, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL1(44, 519, 223, 539)  'MTS - 아이폰'  LINECOLOR(17)      COLOR(208, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL2(44, 538, 223, 558)  'MTS - 안드로이드'  LINECOLOR(17)      COLOR(208, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL3(44, 557, 223, 577)  'API'  LINECOLOR(17)      COLOR(208, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL4(44, 576, 223, 596)  'WTS - 홈페이지'  LINECOLOR(17)      COLOR(208, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL5(44, 595, 223, 615)  'WTS - 모바일'  LINECOLOR(17)      COLOR(208, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL7(44, 614, 223, 634)  '증권통'  LINECOLOR(17)      COLOR(208, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL8(44, 633, 223, 653)  '증권플러스'  LINECOLOR(17)      COLOR(208, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  unknowncnt(222, 652, 307, 672)  LEN(7)  IO_NUM|AL_CENTER||FA_SKIP    COLOR(192, 69)  CUR(0)  LINECOLOR(17)          TABORDER(0)  IOORDER(20)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL9(44, 652, 223, 672)  '미상'  LINECOLOR(17)      COLOR(208, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Sub send_f()
+	GRID01.Clear
+	FUNC.Data = "Y"
+	SVIP.Data = GetSVIP("Host")
+	CHCK.Data = GetCHCK("Gubn")
+	SCREEN.Send 0
+End Sub
+
+Function GetSVIP(ObjName)
+	GetSVIP = "999.999.999.999"
+
+	Select Case Trim(SCREEN.Object(ObjName).Data)
+	Case "B11"			GetSVIP = "211.255.204.71"
+	Case "B12"			GetSVIP = "211.255.204.72"
+	Case "B13"			GetSVIP = "211.255.204.73"
+	Case "B14"			GetSVIP = "211.255.204.74"
+	Case "B15"			GetSVIP = "211.255.204.75"
+	Case "B16"			GetSVIP = "211.255.204.76"
+
+	Case "B21"			GetSVIP = "172.16.222.34"
+	Case "B22"			GetSVIP = "172.16.222.35"
+	Case "B23"			GetSVIP = "172.16.222.36"
+	Case "B24"			GetSVIP = "172.16.222.37"
+	Case "B25"			GetSVIP = "172.16.222.38"
+	Case "B26"			GetSVIP = "172.16.222.39"
+
+	Case "KHT"			GetSVIP = "172.16.202.106"
+	Case "BPT"			GetSVIP = "172.16.202.150"
+	End Select
+
+End Function
+
+
+Function GetCHCK(ObjName)
+	GetCHCK = "TOT"
+
+	If Trim(SCREEN.Object(ObjName).Data) <> "" Then
+		GetCHCK = SCREEN.Object(ObjName).Data
+	End If
+End Function
+
+
+Sub CountUser()
+	Dim term, id		' 터미널명, 사용자 ID
+	Dim ctime, ApiTs 	' 접속시간, API여부
+	Dim customer, employee, unknown	' HTS - 고객, 직원, 미상
+	Dim wts, mwts		' WTS, Mobile WTS
+	Dim eApi, cApi		' API
+	Dim mst				' 증권통
+	Dim msp				' 증권플러스
+	Dim	staff			' 직원
+
+	' 출력 메시지
+	Dim msg, msg2, msg3, Total, Total2, Total3
+
+	' 합계
+	Total = 0
+	Total2 = 0
+	Total3 = 0
+
+	' HTS
+	customer = 0
+	employee = 0
+	unknown = 0
+
+	' WTS
+	wts = 0
+	mwts = 0
+
+	' API
+	eApi = 0
+	cApi = 0
+
+	' 제휴매체 (증권통/증권플러스)
+	msp = 0
+	mst = 0
+
+	' MTS
+	iphone = 0
+	android = 0
+
+	For i = 1 To GRID01.Rows
+		term = Trim(GRID01.GetGridText(i, 9))	' 터미널 명
+		id   = Trim(GRID01.GetGridText(i, 4))	' 접속자 ID
+
+		If Len(term)=0 Then
+			Exit For
+		End If
+
+		term  = Left(term, 1)					' 접속 터미널 구분 : C(고객) T(직원) S(아이폰) U(안드로이드) m(Mobile-WTS)
+
+		ApiTs = Trim(GRID01.GetGridText(i, 10))	' API 여부 구분자
+		staff = IsNumeric(id)					' 숫자형 ID는 직원으로 간주
+
+		If id = "##ibk9" Then					' ##ibk9 (WTS) ID도 직원으로 간주
+			staff = True
+		End If
+
+		Select Case Trim(term)
+		Case "T":	' 직원
+			If ApiTs="Y" Then	'API 사용자
+				eApi = eApi + 1
+				SetRowColor i, 95
+				GRID01.SetGridCell i, 11, "직원용 API"
+				GRID01.SetGridCell i, 3, "직(A)"
+			Else
+				employee = employee + 1
+				If Trim(id) = "##ibk9" Then	'##ibk9이면 (WTS)
+					GRID01.SetGridCell i, 11, "직원용 HTS - 조회용"
+					GRID01.SetGridCell i, 3, "직(H)"
+				Else
+					GRID01.SetGridCell i, 11, "직원용 HTS"
+					GRID01.SetGridCell i, 3, "직(H)"
+				End If
+			End If
+
+		Case "C":	' 고객
+			If ApiTs="Y" Then	'API 사용자
+				cApi = cApi + 1
+				SetRowColor i, 95
+				'GRID01.SetTRgb i, 2, 95
+				GRID01.SetGridCell i, 11, "고객용 API"
+				GRID01.SetGridCell i, 3, "고(A)"
+			Else
+				If Trim(id) = "##ibk9" Then	'##ibk9이면 (WTS)
+					wts = wts + 1
+					GRID01.SetGridCell i, 11, "고객용 WTS"
+					GRID01.SetGridCell i, 3, "고(W)"
+				Else
+					customer = customer + 1
+					GRID01.SetGridCell i, 11, "고객용 HTS"
+					GRID01.SetGridCell i, 3, "고(H)"
+				End If
+			End If
+
+		Case "O":	' 증권통
+			mst = mst + 1
+			GRID01.SetGridCell i, 3, "증(T)"
+			GRID01.SetGridCell i, 11, "증권통"
+
+		Case "Q":	' 증권플러스
+			msp = msp + 1
+			GRID01.SetGridCell i, 3, "증(P)"
+			GRID01.SetGridCell i, 11, "증권플러스(카카오스톡)"
+
+		Case "S":	' 신 아이폰
+			If staff = True Then
+				If ApiTs="Y" Then	'API 사용자
+					eApi = eApi + 1
+					SetRowColor i, 95
+					GRID01.SetGridCell i, 11, "직원용 API"
+					GRID01.SetGridCell i, 3, "직(A)"
+				Else
+					employee = employee + 1
+					GRID01.SetGridCell i, 11, "직원용 HTS"
+					GRID01.SetGridCell i, 3, "직(H)"
+				End If
+			Else
+				iphone = iphone + 1
+				GRID01.SetGridCell i, 3, "아(M)"
+				GRID01.SetGridCell i, 11, "아이폰"
+			End If
+
+		Case "U":	' 신 안드로이드
+			android = android + 1
+			GRID01.SetGridCell i, 3, "안(M)"
+			GRID01.SetGridCell i, 11, "안드로이드폰"
+
+		Case "W":	' WTS
+			wts = wts + 1
+			If Trim(id) = "##ibk9" Then	'##ibk9이면 서(W)
+				GRID01.SetGridCell i, 3, "서(W)"
+				GRID01.SetGridCell i, 11, "서버용 WTS"
+			Else
+				GRID01.SetGridCell i, 3, "WTS"
+				GRID01.SetGridCell i, 11, "웹 WTS"
+			End If
+
+		Case "m":	' 모바일 WTS
+			mwts = mwts + 1
+			If Trim(id) = "##ibk9" Then	'##ibk9이면 서(W)
+				GRID01.SetGridCell i, 3, "서(m)"
+				GRID01.SetGridCell i, 11, "서버용 Mobile WTS"
+			Else
+				GRID01.SetGridCell i, 3, "고(m)"
+				GRID01.SetGridCell i, 11, "Mobile  WTS"
+			End If
+
+		Case Else	' 미정의
+			unknown = unknown + 1
+			GRID01.SetGridCell i, 3, "???"
+			GRID01.SetGridCell i, 11, "미정의[" & term & "]"
+
+		End Select
+
+	Next
+
+	Total  = customer + employee + cApi + eApi + unknown
+	Total2 = iphone + android + mst + msp
+	Total3 = wts + mwts
+	msg  = "고(" & customer & ") 직(" & employee & ") API(" & cApi + eApi & ") ETC(" & unknown & ")"
+	msg2 = "아(" & iphone   & ") 안(" & android  & ") 통("  & mst         & ") 플("  & msp     & ")"
+	msg3 = "WTS("& wts & ") IONE(" & mwts & ")"
+	COUNTER.Data  = "HTS(" & Total  & ")=" & msg
+	COUNTER2.Data = "MTS(" & Total2 & ")=" & msg2
+	COUNTER3.Data = "WTS(" & Total3 & ")=" & msg3
+
+	HTSCNT.Data      = customer + employee	' HTS     : 고객 + 직원
+	IPHONECNT.Data   = iphone			    ' iPhone  : iPhone
+	ANDROIDCNT.Data  = Android			    ' Android : And
+	APICNT.Data      = cApi + eApi		    ' API
+	WTSCNT.Data      = wts				    ' WTS
+	IONECNT.Data     = mwts				    ' Mobile WTS (ionebank)
+	mstcnt.Data      = mst				    ' 증권통
+	mspcnt.Data      = msp				    ' 증권플러스
+	unknowncnt.data  = unknown
+	LABEL2.Data = "합계 : " & GRID01.Rows
+End Sub
+
+Sub SetRowColor(row, color)
+	Dim ii
+	For ii = 1 To GRID01.Columns
+		GRID01.SetTRgb row, ii, color
+	Next
+End Sub
+
+Sub SelectComboBoxItem(hCombo, strItem)
+	Dim i, value , temp, bSame
+	i = 0
+	temp =""
+	SCREEN.Object(hCombo).Index = i
+
+	bSame = False
+
+	value = Trim(SCREEN.Object(hCombo).Data)
+
+'	SYSTEM.Trace "hCombo.Data===>" & Trim(SCREEN.Object(hCombo).Data)
+'	SYSTEM.Trace "strItem===>" & strItem
+
+	Do While Trim(value) <> ""
+		SCREEN.Object(hCombo).Index = i
+		value = SCREEN.Object(hCombo).Data
+
+		If Trim(strItem) = Trim(value) Or Trim(value) = Trim(temp) Then
+			bSame = True
+			Exit Do
+		End If
+
+		temp = value
+'		SYSTEM.Trace "hCombo.Index===>" & i
+'		SYSTEM.Trace "hCombo.Data===>" & value
+
+		i = i+1
+	Loop
+
+	If bSame = False Then
+		SCREEN.Object(hCombo).Index = 0
+	End If
+End Sub
+
+_AW_ONSTART_AW_
+
+Call SelectComboBoxItem("cbHost", Host.Data)
+Call SelectComboBoxItem("cbGubn", Gubn.Data)
+
+Call send_f()
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+
+CountUser()
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(SYMBOL14)
+_AW_ONCLICK_AW_
+Dim dmsg
+
+If Trim(MEMO.Text) = "" Then
+	MsgBox "전문내용을 입력하세요"
+	MEMO.SetFocus
+	Exit Sub
+End If
+
+FUNC.Data = "S"
+
+If R_ALL.Checked = True Then
+	dmsg = "전체서버 사용자에게 전문전달 합니다."
+ElseIf R_SVR.Checked = True Then
+	dmsg = "선택서버의 전체사용자에게 전문전달 합니다."
+ElseIf R_USR.Checked = True Then
+	If Trim(USID.Data) = "" Then
+		MsgBox "사용자 ID를 입력하세요", ,"긴급전문전달"
+		USID.SetFocus
+		Exit Sub
+	End If
+	dmsg = "선택사용자 [" & Trim(USID.Data) & "] 에게 전문전달 합니다."
+Else
+	Exit Sub
+End If
+dmsg = dmsg & vbLf & vbLf & "전송하시겠습니까?"
+
+If MsgBox(dmsg, vbExclamation + vbYesNo, "긴급전문전달") = 7 Then
+	Exit Sub
+End If
+
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(R_ALL)
+_AW_ONCLICK_AW_
+USID.Clear
+USID.Enable = False
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(R_USR)
+_AW_ONCLICK_AW_
+USID.Enable = True
+USID.SetFocus
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(GRID01)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(R_SVR)
+_AW_ONCLICK_AW_
+USID.Clear
+USID.Enable = False
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(cbHost)
+_AW_ONCHANGE_AW_
+Host.Data = cbHost.Data
+Call send_f
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(cbGubn)
+_AW_ONCHANGE_AW_
+Gubn.Data = cbGubn.Data
+Call send_f
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON2)
+_AW_ONCLICK_AW_
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON3)
+_AW_ONCLICK_AW_
+Call send_f
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

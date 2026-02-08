@@ -1,0 +1,380 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(TT810121)
+MAPSIZE(155, 629)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("투자자별 시간대별")
+MAPPUBLIC(";")
+FONT("굴림", 9, NORMAL)
+OPTIONS(FMS|FLASH)
+TITLE("투자주체별 시간대별 매매동향")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pooppoop")
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+LABEL  SYMBOL10(48, 283, 118, 303)  '업종코드'  AL_RIGHT  CUR(0)      COLOR(131, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  62301(128, 333, 148, 351)  LEN(1)  IO_NUM|EDIT_INPUT    COLOR(131, 1)  CUR(0)  TP_NONE  INIT("0")          TABORDER(1)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  62303(128, 283, 174, 303)  LEN(3)  IO_NUM|EDIT_INPUT|FA_SEND|SA_ALL    COLOR(68, 130)  CUR(0)  TP_SUNKEN  INIT("001")          TABORDER(2)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  62310(128, 358, 170, 378)  LEN(2)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("1")          TABORDER(3)  IOORDER(6)  &
+  HINTTYPE(IH_NONE)
+GRID  62311(0, 0, 629, 155)  VISIBLEROW(16)  CELLH(19)  MATRIX(2000, 16)  FIX(16)  MAINCOLOR(7, 0)  LINECOLOR(75)  FOCUSCOLOR(78)  FOCUSKIND(4)  ROWC(68, 77)  |SELALWAYS|FLEXIBLE|VSCROLL|INS_TOP|NO3D|RROW|XHLINE|PAGE|HEADER|GRFTEXT    &
+	COLINFO("62034")  LEN(8)  WIDTH(70)  HEAD("시간")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_ZEROSUP|SA_SPACE    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  EDITFORMAT("99999999")    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("62701")  LEN(8)  WIDTH(61)  HEAD("지수")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  FLOAT(2)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_CORGB|FA_FLOAT|SA_COSUP    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(94, 95)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("62702")  LEN(8)  WIDTH(66)  HEAD("대비")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  FLOAT(2)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_CORGB|FA_FLOAT|FA_CONTRAST|SA_CORAW|SA_TEXT    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(94, 95)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("62703")  LEN(8)  WIDTH(50)  HEAD("등락률")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_CORGB|SA_COSIGN    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(94, 95)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("62308")  LEN(12)  WIDTH(61)  HEAD("외국인")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSIGN    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(94, 95)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("62310")  LEN(12)  WIDTH(61)  HEAD("개인")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSIGN    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(94, 95)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("62312")  LEN(12)  WIDTH(61)  HEAD("기관계")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSIGN    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(94, 95)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("62315")  LEN(12)  WIDTH(61)  HEAD("투신")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSIGN    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(94, 95)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("62313")  LEN(12)  WIDTH(61)  HEAD("증권")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSIGN    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(94, 95)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("62314")  LEN(12)  WIDTH(61)  HEAD("보험")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSIGN    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(94, 95)    HCOMBO  HCOMBOCOUNT(7)  HCOMBODISPLAY("보험", "은행", "종금/신금", "기금/연금", "사모펀드", "국가", "기타")  HCOMBODATA("10", "11", "12", "13", "14", "15", "16")    &
+	COLINFO("62316")  LEN(12)  WIDTH(61)  HEAD("은행")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSIGN    COLOR(68, 69)  COLCUR(0, 0)    INORMAL  IFRGB(94, 95)    HCOMBO  HCOMBOCOUNT(7)  HCOMBODISPLAY("보험", "은행", "종금/신금", "기금/연금", "사모펀드", "국가", "기타")  HCOMBODATA("10", "11", "12", "13", "14", "15", "16")    &
+	COLINFO("62317")  LEN(12)  WIDTH(61)  HEAD("종금/신금")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSIGN    COLOR(68, 69)  COLCUR(0, 0)    INORMAL  IFRGB(94, 95)    HCOMBO  HCOMBOCOUNT(7)  HCOMBODISPLAY("보험", "은행", "종금/신금", "기금/연금", "사모펀드", "국가", "기타")  HCOMBODATA("10", "11", "12", "13", "14", "15", "16")    &
+	COLINFO("62318")  LEN(12)  WIDTH(61)  HEAD("기금/연금")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSIGN    COLOR(68, 69)  COLCUR(0, 0)    INORMAL  IFRGB(94, 95)    HCOMBO  HCOMBOCOUNT(7)  HCOMBODISPLAY("보험", "은행", "종금/신금", "기금/연금", "사모펀드", "국가", "기타")  HCOMBODATA("10", "11", "12", "13", "14", "15", "16")    &
+	COLINFO("62520")  LEN(12)  WIDTH(61)  HEAD("사모펀드")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSIGN    COLOR(68, 69)  COLCUR(0, 0)    INORMAL  IFRGB(94, 95)    HCOMBO  HCOMBOCOUNT(7)  HCOMBODISPLAY("보험", "은행", "종금/신금", "기금/연금", "사모펀드", "국가", "기타")  HCOMBODATA("10", "11", "12", "13", "14", "15", "16")    &
+	COLINFO("62521")  LEN(12)  WIDTH(61)  HEAD("국가")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSIGN    COLOR(68, 69)  COLCUR(0, 0)    INORMAL  IFRGB(94, 95)    HCOMBO  HCOMBOCOUNT(7)  HCOMBODISPLAY("보험", "은행", "종금/신금", "기금/연금", "사모펀드", "국가", "기타")  HCOMBODATA("10", "11", "12", "13", "14", "15", "16")    &
+	COLINFO("62319")  LEN(12)  WIDTH(61)  HEAD("기타")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSIGN    COLOR(68, 69)  COLCUR(0, 0)    INORMAL  IFRGB(94, 95)    HCOMBO  HCOMBOCOUNT(7)  HCOMBODISPLAY("보험", "은행", "종금/신금", "기금/연금", "사모펀드", "국가", "기타")  HCOMBODATA("10", "11", "12", "13", "14", "15", "16")    TABORDER(4)  IOORDER(7)  ENABLE  &
+  VISIBLE
+
+LABEL  LABEL0(48, 308, 118, 328)  '시장구분'  AL_RIGHT  CUR(0)      COLOR(131, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+OBJECT  OBJ1(113, 439, 203, 483)    "TT810199"  TABORDER(5)  IOORDER(8)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  OBJ2(213, 439, 303, 483)    "TT810199"  TABORDER(6)  IOORDER(9)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  OBJ3(313, 439, 403, 483)    "TT810199"  TABORDER(7)  IOORDER(10)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  OBJ4(411, 439, 501, 483)    "TT810199"  TABORDER(8)  IOORDER(11)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  OBJ5(510, 439, 600, 483)    "TT810199"  TABORDER(9)  IOORDER(12)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  OBJ6(14, 496, 104, 540)    "TT810199"  TABORDER(10)  IOORDER(13)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  OBJ7(112, 496, 202, 540)    "TT810199"  TABORDER(11)  IOORDER(14)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  OBJ8(212, 496, 302, 540)    "TT810199"  TABORDER(12)  IOORDER(15)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  OBJ9(312, 496, 402, 540)    "TT810199"  TABORDER(13)  IOORDER(16)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  OBJ10(410, 496, 500, 540)    "TT810199"  TABORDER(14)  IOORDER(17)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  OBJ11(509, 496, 599, 540)    "TT810199"  TABORDER(15)  IOORDER(18)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  OBJ0(14, 439, 104, 483)    "TT810199"  TABORDER(16)  IOORDER(19)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL3(31, 333, 125, 353)  '누적/증감 구분'  AL_RIGHT  CUR(0)      COLOR(131, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL1(31, 358, 125, 378)  '금액단위'  AL_RIGHT  CUR(0)      COLOR(131, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  62302(128, 307, 170, 327)  LEN(2)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("1")          TABORDER(17)  IOORDER(2)  &
+  HINTTYPE(IH_NONE)
+EDIT  62307(128, 258, 174, 278)  LEN(2)  IO_NUM|EDIT_INPUT|FA_SEND|SA_ALL    COLOR(68, 130)  CUR(0)  TP_SUNKEN  INIT("001")          TABORDER(18)  IOORDER(5)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL2(48, 258, 118, 278)  '조회구분'  AL_RIGHT  CUR(0)      COLOR(131, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  62305(128, 233, 174, 253)  LEN(2)  IO_NUM|EDIT_INPUT|FA_SEND|SA_ALL    COLOR(68, 130)  CUR(0)  TP_SUNKEN  INIT("001")          TABORDER(19)  IOORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL4(48, 232, 118, 252)  '시간간격'  AL_RIGHT  CUR(0)      COLOR(131, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+'Option Explicit
+Dim g_ArrItems
+Dim g_ArrData
+Dim g_ArrInput, Giho, min, cvol, mgvl, msvl
+
+Set re = New RegExp
+re.Global = True
+re.IgnoreCase = True
+re.MultiLine = True
+re.Pattern = "[^0-9.\-\+]"
+
+'투자코드,투자자명,ColNumber
+g_ArrData = Array(Array("외국인", "9", "5"), Array("개인", "8", "6"),_
+	Array("기관계", "0", "7"), Array("투신", "3", "8"),_
+	Array("증권", "1", "9"), Array("보험", "2", "10"),_
+	Array("은행", "4", "11"), Array("종금/신금", "5", "12"),_
+	Array("기금/연금", "6", "13"), Array("사모펀드", "12", "14"),_
+	Array("국가", "13", "15"), Array("기타", "7", "16"))
+
+Sub send_f()
+	S62311.Clear
+	S62303.Data = SCREEN.Object("main.ed_upcd").Data
+	SCREEN.Send 0
+End Sub
+
+Sub send_eachtuja()
+	Dim ii
+	For ii = LBound(g_ArrData) To UBound(g_ArrData)
+		SCREEN.Object("OBJ" & ii & ".62302").Data = SCREEN.Object("main.upgb").Data
+		SCREEN.Object("OBJ" & ii & ".62303").Data = SCREEN.Object("main.ed_upcd").Data
+		SCREEN.Object("OBJ" & ii & ".62304").Data = g_ArrData(ii)(1)
+		SCREEN.Object("OBJ" & ii).Send
+	Next
+End Sub
+
+
+'시간 혹은 일자
+g_ArrInput = Array("", "")
+'-----------------------------------------------------------------------
+Function Null_check(Data)
+	If Trim(data) = "" Then
+		Null_check = 0
+		Exit Function
+	End If
+	Null_check  = CLng(Data)
+End Function
+'-----------------------------------------------------------------------
+Function SetSign(Data)
+	SetSign = Data
+	Data = re.Replace(Data,"")
+	If Len(Data) > 0 Then
+		If r1_3.Checked And Int(Data) > 0 Then
+			SetSign = "+" & Data
+		Else
+			SetSign = Data
+		End If
+	End If
+End Function
+'-----------------------------------------------------------------------
+Function ForceSign(Data, Rate)
+	ForceSign = Data
+	Data = re.Replace(Data,"")
+	Rate = re.Replace(Rate,"")
+	If Len(Rate) > 0 Then
+		If CDbl(Rate) > 0 Then
+			ForceSign = "+" & Data
+		ElseIf CDbl(Rate) < 0 Then
+			ForceSign = "-" & Data
+		End If
+	End If
+End Function
+'-----------------------------------------------------------------------
+Function SetTimeElement(hh, mm, ss)
+	If Len(hh) = 1 Then
+		hh = "0" & hh
+	End If
+	If Len(mm) = 1 Then
+		mm = "0" & mm
+	End If
+	If Len(ss) = 1 Then
+		ss = "0" & ss
+	End If
+	SetTimeElement = hh & ":" & mm & ":" & ss
+End Function
+'-----------------------------------------------------------------------
+Function GetTime(SrcTime, Interval)
+	If Len(SrcTime) = 5 Then
+		SrcTime = "0" & SrcTime
+	End If
+
+	AHour = CLng(Mid(SrcTime, 1, 2))
+	AMin = CLng(Mid(SrcTime, 3, 2))
+	ASec = CLng(Mid(SrcTime, 5, 2))
+	If Interval = 0 Then '30초간격
+		ASec = Fix(CLng(Mid(SrcTime, 5, 2)) / 30) * 30
+	Else
+		ASec = 0
+		AMin = (Fix(CLng(Mid(SrcTime, 3, 2)) / Interval) * Interval) + Interval
+	End If
+
+	ADate = TimeSerial(AHour, AMin, ASec)
+
+	GetTime = SetTimeElement(Hour(ADate), Minute(ADate), Second(ADate))
+End Function
+'-----------------------------------------------------------------------
+Function GetTimeJisu(SrcTime, Interval)
+	Dim remain
+	If Len(SrcTime) = 5 Then
+		SrcTime = "0" & SrcTime
+	End If
+
+	AHour = CLng(Mid(SrcTime, 1, 2))
+	AMin = CLng(Mid(SrcTime, 3, 2))
+	ASec = CLng(Mid(SrcTime, 5, 2))
+
+	If Interval = 0 Then '30초간격
+		If ASec > 0 Then
+			If ASec < 40 Then
+				ASec = 30
+			Else
+				ASec = 0
+				AMin = AMin + 1
+			End If
+		End If
+	Else
+		If (AMin Mod Interval) > 0 Then
+			ASec = 0
+			AMin = (AMin / Interval) + Interval
+		End If
+
+		If ASec > 0 Then
+			ASec = 0
+			AMin = AMin + Interval
+		End If
+	End If
+
+	ADate = TimeSerial(AHour, AMin, ASec)
+
+	GetTimeJisu = SetTimeElement(Hour(ADate), Minute(ADate), Second(ADate))
+End Function
+'-----------------------------------------------------------------------
+Sub ProcSetData(Data)
+
+	ArrData = Split(Data, "|")
+
+	ADateTime = GetTime(ArrData(1), min)
+	CurTime = S62311.GetGridCell(1, 1)
+	'SYSTEM.Trace "ADateTime=["&ADateTime&"], CurTime=["&CurTime&"]"
+	ctime = CLng(re.Replace(CurTime,""))
+	ntime = CLng(re.Replace(ADateTime,""))
+
+	If ctime < ntime Then
+		S62311.InsertRow 0
+		S62311.SetGridCell 1, 1, ADateTime
+		rate = SCREEN.Object("main.OBJ0.20033").Data
+		S62311.SetGridCell 1, 2, ForceSign(SCREEN.Object("main.OBJ0.20023").Data, rate)
+		S62311.SetGridCell 1, 3, ForceSign(SCREEN.Object("main.OBJ0.20024").Data, rate)
+		S62311.SetGridCell 1, 4, ForceSign(SCREEN.Object("main.OBJ0.20033").Data, rate)
+	End If
+
+	For i = LBound(g_ArrData) To UBound(g_ArrData)
+		If g_ArrData(i)(1) = Trim(ArrData(0)) Then
+			Select Case S62307.Data
+			Case "01"	'매수거래량
+				S62311.SetGridCell 1, g_ArrData(i)(2), SetSign(ArrData(2))
+			Case "03"	'매도거래량
+				S62311.SetGridCell 1, g_ArrData(i)(2), SetSign(ArrData(3))
+			Case "05"	'순매수량
+				S62311.SetGridCell 1, g_ArrData(i)(2), SetSign(ArrData(4))
+			Case "02"	'매수거래대금
+				S62311.SetGridCell 1, g_ArrData(i)(2), SetSign(ArrData(5))
+			Case "04"	'매도거래대금
+				S62311.SetGridCell 1, g_ArrData(i)(2), SetSign(ArrData(6))
+			Case "06"	'순매수거래대금
+				S62311.SetGridCell 1, g_ArrData(i)(2), SetSign(ArrData(7))
+			End Select
+		ElseIf ADateTime <> CurTime Then
+			S62311.SetGridCell 1, g_ArrData(i)(2), SetSign(S62311.GetGridCell(2, g_ArrData(i)(2)))
+		End If
+	Next
+End Sub
+'-----------------------------------------------------------------------
+
+Sub updatejisu(param)
+	ArrData = Split(param, "|")
+	ADateTime = GetTimeJisu(ArrData(0), min)
+	CurTime = S62311.GetGridCell(1, 1)
+	ctime = CLng(re.Replace(CurTime,""))
+	ntime = CLng(re.Replace(ADateTime,""))
+	If ctime = ntime Then
+		S62311.SetGridCell 1, 2, ForceSign(ArrData(1), ArrData(3))
+		S62311.SetGridCell 1, 3, ForceSign(ArrData(2), ArrData(3))
+		S62311.SetGridCell 1, 4, ForceSign(ArrData(3), ArrData(3))
+	ElseIf ctime < ntime Then
+		S62311.InsertRow 0
+		S62311.SetGridCell 1, 1, ADateTime
+		S62311.SetGridCell 1, 2, ForceSign(ArrData(1), ArrData(3))
+		S62311.SetGridCell 1, 3, ForceSign(ArrData(2), ArrData(3))
+		S62311.SetGridCell 1, 4, ForceSign(ArrData(3), ArrData(3))
+		For i = LBound(g_ArrData) To UBound(g_ArrData)
+			S62311.SetGridCell 1, g_ArrData(i)(2), SetSign(S62311.GetGridCell(2, g_ArrData(i)(2)))
+		Next
+	End If
+End Sub
+
+_AW_ONINDECLARE_AW_
+#load IB888888
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+Dim r_upgb, gubn
+
+S62305.Data = SCREEN.Object("parent.time").Data
+S62310.Data = "1"
+
+r_upgb = P_GetBigCd(S62303.Data)
+Select Case r_upgb
+	Case "001"		'KOSPI
+		S62302.DATA = "00"
+	Case "101"		'KOSPI200
+		S62302.DATA = "10"
+	Case "201"		'KOSDAQ
+		S62302.DATA = "90"
+	Case Else		
+		S62302.DATA = "0"
+		S62303.Data = "0"
+End Select
+
+If SCREEN.Object("parent.r1_1").Checked Then
+	gubn = 1
+ElseIf SCREEN.Object("parent.r1_2").Checked Then
+	gubn = 3
+Else
+	gubn = 5
+End If
+
+If Not SCREEN.Object("parent.r2_1").Checked Then
+	gubn = gubn + 1
+End If
+
+If SCREEN.Object("parent.r3_1").Checked Then
+	S62301.Data = "1"
+Else
+	S62301.Data = "2"
+End If
+
+If Len(gubn) < 2 Then
+	S62307.Data = "0"&gubn
+End If
+
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(62311)
+_AW_ONCLICK_AW_
+Dim target, i
+
+If S62311.HitPos = 4 Then
+	target = S62311.GetHeadCell(S62311.Column)
+
+	If S62311.Column < 10 Or Len(target) <= 0 Then
+		Exit Sub
+	End If
+
+	For i = LBound(g_ArrData) To UBound(g_ArrData)
+		If Trim(target) = g_ArrData(i)(2) Then
+			S62311.SetColumnVisible target, True
+		ElseIf g_ArrData(i)(2) >= 10 Then
+			S62311.SetColumnVisible g_ArrData(i)(2), False
+		End If
+	Next
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

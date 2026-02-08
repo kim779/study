@@ -1,0 +1,196 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB540000)
+MAPSIZE(408, 798)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("투자자별시간대별매�")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(FMS|FLASH)
+TITLE("[5400] 투자자 당일 동향")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(NORM)
+HEADER(NOP)
+REPEATTIME(20000)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL11(-2, 405, 800, 413)        COLOR(64, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL63(-1, 32, 799, 407)  LIMAGE(0)  LINEW(3)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL_bg(-2, 0, 800, 32)  LIMAGE(1)  LINEW(3)  LINETYPE(4)  LINECOLOR(64)      COLOR(66, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  HNAM(195, 6, 285, 26)  AL_LEFT  CUR(0)      COLOR(68, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  CHGB(640, 8, 670, 26)  AL_LEFT  CUR(0)      COLOR(131, 130)  &
+  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  SYMBOL10(6, 6, 29, 26)  '업종'  AL_LEFT  CUR(0)      COLOR(131, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  SYMBOL11(593, 6, 695, 26)  '단위 : 천주, 억원'  AL_LEFT  CUR(0)      COLOR(76, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  BUTTON0(758, 6, 795, 26)  '조회'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, BOLD)  FOCUS  COLOR(208, 186)  CUR(0)    "조회btn.bmp"    TABORDER(4)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+EDIT  62303(33, 6, 79, 26)  LEN(3)  IO_NUM|EDIT_INPUT|FA_SEND|FA_SKIP|SA_ALL|CODE      COLOR(68, 130)  CUR(0)  TP_SUNKEN  INIT("001")          TABORDER(1)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  SYMBOL2(79, 6, 98, 26)  TP_PUSH|IMAGE|AL_STRETCH      COLOR(131, 1)  CUR(0)    "검색.BMP"    TABORDER(2)  ENABLE  &
+  VISIBLE  IMAGE  HOVER  HINTTYPE(IH_NONE)
+COMBO  62302(101, 6, 191, 26)  TP_SUNKEN  LEN(2)  COUNT(6)  VCOUNT(6)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_NUM|EDIT_INPUT|FA_SEND|FA_SKIP|SA_ALL    COLOR(68, 130)  CUR(0)  DISPLAY("KOSPI", "KOSDAQ", "선물", "콜옵션", "풋옵션", "KOSPI200")  DATA("00", "90", "02", "05", "06", "10")    TABORDER(3)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  obj1(6, 39, 792, 110)    "IB540010"  TABORDER(5)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  obj2(6, 111, 792, 400)    "IB540020"  TABORDER(6)  IOORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Dim xstr, xvalue, xistrue
+
+_AW_ONINDECLARE_AW_
+#load IB888888
+
+_AW_ONENDSUB_AW_
+_AW_ONSTART_AW_
+
+'SCREEN.Object("OBJ01.62302").Data = S62302.data
+'obj01.Send
+SCREEN.Send 0
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+Dim Is_upcd
+
+ls_upcd = S62303.DATA
+HNAM.text = SCREEN.GetName(104, ls_upcd, 0)
+S62303.SetFocus
+
+'obj1.Send
+obj2.Send
+
+SCREEN.OnSend = False
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(BUTTON0)
+_AW_ONCLICK_AW_
+'If BUTTON0.text = "조회" Then
+'	BUTTON0.text = "연속"
+'Else
+'	BUTTON0.text = "조회"
+'End If
+
+'obj01.Send
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(62303)
+_AW_ONCHANGE_AW_
+Dim   r_upgb
+
+SCREEN.IgnoreChange True
+	r_upgb = P_GetBigCd(S62303.Data)
+	Select Case Left(r_upgb,1)
+		Case "0"		'KOSPI
+			S62302.DATA = "00"
+			SYMBOL2.Enable = True
+		Case "1"		'KOSPI200
+			S62302.DATA = "10"
+			SYMBOL2.Enable = False
+		Case "2"		'KOSDAQ
+			S62302.DATA = "90"
+			SYMBOL2.Enable = True
+		Case Else
+			S62303.Data = "001"
+			S62302.DATA = "00"
+			SYMBOL2.Enable = True
+	End Select
+SCREEN.IgnoreChange False
+
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(SYMBOL2)
+_AW_ONCLICK_AW_
+Dim retn, ln_idx
+
+Select Case S62302.DATA
+    Case "00"
+        ln_idx = "0"
+    Case "90"
+        ln_idx = "9"
+    Case "10"
+        ln_idx = "1"
+End Select
+
+Select Case ln_idx
+Case "0", "9" : retn = SCREEN.GetCode(104, "62303", "HNAM", ln_idx)
+Case "1" : retn = SCREEN.GetCode(107, "62303", "HNAM", 0)
+End Select
+
+'If retn <> True Then
+'       Exit Sub
+'End If
+
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(62302)
+_AW_ONCHANGE_AW_
+SCREEN.IgnoreChange True
+Select Case S62302.DATA
+    Case "00"
+        S62303.data="001"
+		SYMBOL2.Enable = True
+
+    Case "90"
+        S62303.data="201"
+		SYMBOL2.Enable = True
+
+    Case "02"
+        S62303.data="001"
+		SYMBOL2.Enable = False
+
+	Case "06"
+        S62303.data="001"
+		SYMBOL2.Enable = False
+
+    Case "05"
+        S62303.data="001"
+		SYMBOL2.Enable = False
+
+    Case "10"
+        S62303.data="101"
+		SYMBOL2.Enable = False
+
+End Select
+SCREEN.IgnoreChange False
+
+'obj01.Send
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

@@ -1,0 +1,292 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB200421)
+MAPSIZE(44, 311)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(FMS|FLASH)
+TITLE("[200421]종목정보")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pooppoop")
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+EDIT  1301(345, 30, 410, 50)  LEN(6)  IO_MIXED|EDIT_INOUT|FA_WRAP|FA_HAN|CODE    FONT("굴림체", 9, NORMAL)    COLOR(99, 69)  CUR(0)  TP_SUNKEN          TABORDER(1)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  1021(462, 25, 536, 45)  LEN(12)  IO_ALPHA|AL_LEFT||FA_FLASH  FONT("굴림체", 9, NORMAL)    COLOR(211, 232)  CUR(0)            TABORDER(0)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  2023(377, 140, 488, 171)  LEN(12)  IO_NUM|AL_RIGHT||FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSUP  FONT("Tahoma", 16, BOLD)    COLOR(68, 69)  CUR(0)            IFRGB(94, 95)  TABORDER(0)  IOORDER(3)  ENABLE  &
+  HINTTYPE(IH_STRING)  HELPTEXT("현재가")HELPTEXT("현재가")
+OUT  2024(488, 140, 566, 171)  LEN(8)  IO_NUM|AL_RIGHT||FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|FA_CONTRAST|SA_SPACE|SA_COSIGN|SA_TEXT  FONT("Tahoma", 11, BOLD)    COLOR(68, 69)  CUR(0)            IFRGB(94, 95)  TABORDER(0)  IOORDER(4)  ENABLE  &
+  HINTTYPE(IH_STRING)  HELPTEXT("전일대비")HELPTEXT("전일대비")
+OUT  2033(564, 140, 613, 171)  LEN(8)  IO_NUM|AL_RIGHT||FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSIGN  FONT("Tahoma", 11, BOLD)    COLOR(68, 69)  CUR(0)            IFRGB(94, 95)  TABORDER(0)  IOORDER(5)  ENABLE  &
+  HINTTYPE(IH_STRING)  HELPTEXT("등락률")HELPTEXT("등락률")
+OUT  2027(613, 140, 704, 171)  LEN(12)  IO_NUM|AL_RIGHT||FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSUP  FONT("Tahoma", 11, BOLD)    COLOR(68, 69)  CUR(0)            IFRGB(94, 95)  TABORDER(0)  IOORDER(6)  ENABLE  &
+  HINTTYPE(IH_STRING)  HELPTEXT("거래량")HELPTEXT("거래량")
+TABLE  tDiff(375, 180, 493, 231)  MATRIX(6, 1)  LINECOLOR(232)  CELLH(20)  AUTOSIZE  |NOHEAD  EDIT_OUTPUT    &
+	COLINFO("2024")  LEN(9)  WIDTH(80)  COLALIGN(AL_CENTER, AL_RIGHT)  HEADCOLOR(208, 232)  IO_NUM    COLOR(192, 232)  COLCUR(0, 0)  COLHINTTYPE(IH_NONE)    COLUMN_VISIBLE  &
+	COLINFO("2023")  LEN(9)  WIDTH(80)  COLALIGN(AL_CENTER, AL_RIGHT)  HEADCOLOR(208, 232)  IO_NUM    COLOR(192, 232)  COLCUR(0, 0)  COLHINTTYPE(IH_NONE)    COLUMN_VISIBLE  &
+	COLINFO("2033")  LEN(9)  WIDTH(80)  COLALIGN(AL_CENTER, AL_RIGHT)  HEADCOLOR(208, 232)  IO_NUM    COLOR(192, 232)  COLCUR(0, 0)  COLHINTTYPE(IH_NONE)    COLUMN_VISIBLE  &
+	COLINFO("2027")  LEN(9)  WIDTH(80)  COLALIGN(AL_CENTER, AL_RIGHT)  HEADCOLOR(208, 232)  IO_NUM    COLOR(192, 232)  COLCUR(0, 0)  COLHINTTYPE(IH_NONE)    COLUMN_VISIBLE  &
+	COLINFO("2028")  LEN(9)  WIDTH(80)  COLALIGN(AL_CENTER, AL_RIGHT)  HEADCOLOR(208, 232)  IO_NUM    COLOR(192, 232)  COLCUR(0, 0)  COLHINTTYPE(IH_NONE)    COLUMN_VISIBLE  &
+	COLINFO("2403")  LEN(9)  WIDTH(80)  COLALIGN(AL_CENTER, AL_RIGHT)  HEADCOLOR(208, 232)  IO_NUM    COLOR(192, 232)  COLCUR(0, 0)  COLHINTTYPE(IH_NONE)    COLUMN_VISIBLE  IOORDER(7)  ENABLE
+LABEL  LABEL14(0, 0, 311, 25)  AL_CENTER  FONT("맑은 고딕", 14, BOLD)  CUR(0)      COLOR(68, 216)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  curr(0, 0, 106, 25)  LEN(9)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT|FA_SKIP|FA_CORGB|SA_COSUP  FONT("Tahoma", 14, BOLD)    COLOR(68, 69)  CUR(0)            IFRGB(94, 95)  TABORDER(0)  IOORDER(8)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_STRING)  HELPTEXT("현재가")HELPTEXT("현재가")
+OUT  diff(123, 0, 153, 25)  LEN(9)  IO_NUM|AL_RIGHT||FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_SKIP|FA_CORGB|FA_CONTRAST|SA_SPACE|SA_COSUP|SA_TEXT  FONT("Tahoma", 9, BOLD)    COLOR(68, 69)  CUR(0)            IFRGB(94, 95)  TABORDER(0)  IOORDER(9)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_STRING)  HELPTEXT("전일대비")HELPTEXT("전일대비")
+OUT  gvol(215, 0, 311, 25)  LEN(9)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT|FA_SKIP  FONT("Tahoma", 9, BOLD)    COLOR(68, 232)  CUR(0)            IFRGB(94, 95)  TABORDER(0)  IOORDER(11)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_STRING)  HELPTEXT("거래량")HELPTEXT("거래량")
+OUT  rate(175, 0, 226, 25)  LEN(9)  IO_MIXED|AL_RIGHT||FA_SKIP|FA_CORGB|SA_COSIGN  FONT("Tahoma", 9, BOLD)    COLOR(68, 69)  CUR(0)            IFRGB(94, 95)  TABORDER(0)  IOORDER(10)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_STRING)  HELPTEXT("등락률")HELPTEXT("등락률")
+OUT  2403_(245, 175, 337, 197)  LEN(9)  IO_NUM|AL_RIGHT|  FONT("굴림체", 9, NORMAL)    COLOR(68, 186)  CUR(0)            IFRGB(94, 95)  TABORDER(0)  IOORDER(12)  ENABLE  &
+  HINTTYPE(IH_STRING)
+PANEL  PANEL10(176, 173, 246, 195)  '전일대비'        COLOR(77, 130)  CUR(0)    AL_CENTER    ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  2028_(80, 173, 176, 195)  LEN(9)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT|FA_ZEROSUP|SA_SPACE  FONT("굴림체", 9, NORMAL)    COLOR(68, 186)  CUR(0)            EDITFORMAT("999,999,999(백만)")  TABORDER(0)  IOORDER(13)  ENABLE  &
+  HINTTYPE(IH_STRING)
+PANEL  PANEL9(11, 173, 81, 195)  '거 래 대 금'        COLOR(77, 130)  CUR(0)    AL_CENTER    ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  sign(108, 0, 125, 25)  LEN(4)  IO_NUM|AL_RIGHT||FA_ZEROSUP|FA_SKIP|FA_CORGB|FA_CONTRAST|SA_SPACE|SA_CORAW|SA_TEXT  FONT("굴림", 9, BOLD)    COLOR(68, 69)  CUR(0)            IFRGB(94, 95)  TABORDER(0)  IOORDER(14)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_STRING)  HELPTEXT("전일대비")HELPTEXT("전일대비")
+BOX  BOX1(0, 24, 155, 44)    COLOR(75, 75)  LINEW(1)  BX_LINE    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+TABLE  TABLE0(0, 24, 155, 44)  MATRIX(1, 1)  LINECOLOR(75)  CELLH(20)  AUTOSIZE  |MULTI  EDIT_OUTPUT    &
+	COLINFO("2028")  LEN(9)  WIDTH(70)  HEAD("거래대금")  COLALIGN(AL_CENTER, AL_RIGHT)  HEADCOLOR(77, 232)  IO_NUM|FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_SKIP|SA_SPACE    COLOR(192, 232)  COLCUR(0, 0)  COLHINTTYPE(IH_NONE)    COLUMN_VISIBLE  EDITFORMAT("999,999,999(백만)")  IOORDER(15)  ENABLE  &
+  VISIBLE
+
+TABLE  TABLE1(154, 24, 311, 44)  MATRIX(1, 1)  LINECOLOR(75)  CELLH(20)  AUTOSIZE  |MULTI  EDIT_OUTPUT    &
+	COLINFO("2403")  LEN(8)  WIDTH(89)  HEAD("거래량전일대비")  COLALIGN(AL_CENTER, AL_RIGHT)  HEADCOLOR(77, 232)  FLOAT(2)  IO_NUM|FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_SKIP|FA_CORGB|FA_FLOAT|SA_SPACE|SA_CORAW    COLOR(192, 232)  COLCUR(0, 0)  COLHINTTYPE(IH_NONE)    COLUMN_VISIBLE  EDITFORMAT("99999.99%")  IOORDER(16)  ENABLE  &
+  VISIBLE
+
+BOX  BOX2(154, 24, 311, 44)    COLOR(75, 75)  LINEW(1)  BX_LINE    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BOX  BOX0(0, 0, 311, 25)    COLOR(75, 75)  LINEW(1)  BX_LINE    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  2321(245, 215, 313, 235)  LEN(9)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT  FONT("굴림체", 9, NORMAL)    COLOR(68, 69)  CUR(0)            IFRGB(94, 95)  TABORDER(0)  IOORDER(17)  ENABLE  &
+  HINTTYPE(IH_STRING)  HELPTEXT("거래량")HELPTEXT("거래량")
+EDIT  1777(115, 55, 135, 75)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("1")          TABORDER(2)  IOORDER(18)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Set re1 = New RegExp
+re1.Global = True
+re1.IgnoreCase = True
+re1.MultiLine = True
+re1.Pattern = "[^0-9]"
+
+Set re2 = New RegExp
+re2.Global = True
+re2.IgnoreCase = True
+re2.MultiLine = True
+re2.Pattern = "[^0-9\-]"
+
+Dim g_Arrdata, xval, yval, zval, gA
+Dim adist, bdist, spos, signwidth, nBottom, nIndex
+adist = 0
+bdist = 5
+signwidth = 17
+nBottom = 35
+gA = Array(32, 40, 58, 67, 79, 93)
+
+g_Arrdata = Array(_
+Array(2,  gA(0), gA(0)+adist, gA(0)+adist+signwidth, gA(0)+adist+signwidth-3, gA(0)+adist+signwidth-3+bdist),_
+Array(3,  gA(1), gA(1)+adist, gA(1)+adist+signwidth, gA(1)+adist+signwidth-3, gA(1)+adist+signwidth-3+bdist),_
+Array(4,  gA(2), gA(2)+adist, gA(2)+adist+signwidth, gA(2)+adist+signwidth-3, gA(2)+adist+signwidth-3+bdist),_
+Array(5,  gA(3), gA(3)+adist, gA(3)+adist+signwidth, gA(3)+adist+signwidth-3, gA(3)+adist+signwidth-3+bdist),_
+Array(6,  gA(4), gA(4)+adist, gA(4)+adist+signwidth, gA(4)+adist+signwidth-3, gA(4)+adist+signwidth-3+bdist),_
+Array(7,  gA(5), gA(5)+adist, gA(5)+adist+signwidth, gA(5)+adist+signwidth-3, gA(5)+adist+signwidth-3+bdist))
+
+Sub Onalert()
+	Dim drate
+	sign.Data = Left(Trim(tDiff.GetTableCell(1)), 1)
+	diff.Data = Trim(tDiff.GetTableCell(1))
+	curr.Data = Trim(tDiff.GetTableCell(2))
+	If Len(Trim(tDiff.GetTableCell(3))) > 0 Then
+		drate = CDbl(Trim(tDiff.GetTableCell(3)))
+	Else
+		drate = 0.0
+	End If
+
+	TABLE0.SetTableCell 1,  tDiff.GetTableCell(5)
+
+	If Trim(S2027.Data) <> "" And Trim(S2027.Data) <> "0" And Trim(S2321.Data) <> "" And Trim(S2321.Data) <> "0" Then
+		var = S2027.Data / S2321.Data * 100
+		TABLE1.SetTableCell 1, FormatNumber(var, 2)
+	Else
+		TABLE1.SetTableCell 1, 0
+	End If
+	'TABLE1.SetTableCell 1,  tDiff.GetTableCell(6)
+
+	If drate = 0.0 Then
+		rate.Data = ""
+	Else
+		rate.Data = Trim(tDiff.GetTableCell(3))&"%"
+	End If
+
+	gvol.Data = Trim(tDiff.GetTableCell(4))
+
+	If Left(Trim(tDiff.GetTableCell(1)), 1) = "2" Or Left(Trim(tDiff.GetTableCell(1)), 1) = "5" Then
+		spos = 2
+	Else
+		spos = 0
+	End If
+	xval = re1.Replace(tDiff.GetTableCell(2), "")
+	yval = difflen(Len(re1.Replace(diff.Data, "")))
+	zval = ratelen(Len(re2.Replace(rate.Data, "")))
+	'curr.SetRect
+	If  Len(xval) <= 2 Then
+		nIndex = 0
+		curr.SetRect 0,					   0, 		g_Arrdata(0)(1), 		   nBottom
+		sign.SetRect g_Arrdata(0)(2),      0, g_Arrdata(0)(3),          nBottom
+		diff.SetRect g_Arrdata(0)(4),      0,      g_Arrdata(0)(4)+yval-1,      nBottom
+		rate.SetRect g_Arrdata(0)(5)+yval, 0,      g_Arrdata(0)(5)+yval+zval, nBottom
+	ElseIf Len(xval) = 3 Then
+		nIndex = 1
+	ElseIf Len(xval) = 4 Then
+		nIndex = 2
+	ElseIf Len(xval) = 5 Then
+		nIndex = 3
+	ElseIf Len(xval) = 6 Then
+		nIndex = 4
+	ElseIf Len(xval) > 6 Then
+		nIndex = 5
+	End If
+
+	curr.SetRect 0,                    		0,  	g_Arrdata(nIndex)(1),         nBottom-10
+	sign.SetRect g_Arrdata(nIndex)(2),      0, 		g_Arrdata(nIndex)(3),           nBottom-10
+	diff.SetRect g_Arrdata(nIndex)(4),      0,      g_Arrdata(nIndex)(4)+yval-1,      nBottom-10
+	rate.SetRect g_Arrdata(nIndex)(5)+yval, 0,      g_Arrdata(nIndex)(5)+yval+zval, nBottom-10
+
+
+End Sub
+
+Function ratelen(parm)
+	If parm <= 3 Then
+		ratelen = 54
+	ElseIf parm = 4 Then
+		ratelen = 63
+	ElseIf parm = 5 Then
+		ratelen = 72
+	ElseIf parm = 6 Then
+		ratelen = 81		'6초과 추후 보정
+	ElseIf parm > 6 Then
+		ratelen = 63
+	End If
+End Function
+
+Function difflen(parm)
+	If parm =1 Then
+		difflen = 15
+	ElseIf parm = 2 Then
+		difflen = 24
+	ElseIf parm = 3 Then
+		difflen = 33
+	ElseIf parm = 4 Then
+		difflen = 46
+	ElseIf parm = 5 Then
+		difflen = 54
+	ElseIf parm = 6 Then	'6, 6 > 추후 보정
+		difflen = 63
+	ElseIf parm > 6 Then
+		difflen = 63
+	End If
+End Function
+
+_AW_ONSEND_AW_
+S1301.Data = SCREEN.object("main.1301").Data
+If Len(Trim(S1301.Data)) <> 6 Then
+	Exit Sub
+End If
+
+If UCase(TypeName( SCREEN.Object("main.cxMarket"))) <> "NOTHING" Then
+	If SCREEN.Object("main.cxMarket").sMarket = "KRX" Then
+		S1777.Data = "1"
+	ElseIf SCREEN.Object("main.cxMarket").sMarket = "NXT" Then
+		S1777.Data =  "2"
+	ElseIf SCREEN.Object("main.cxMarket").sMarket = "통합" Then
+		S1777.Data =  "3"
+	End If
+	SYSTEM.Trace "yes cxMarket 1777 = " & S1777.Data
+End If
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+Call Onalert()
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(2023)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(2024)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(2033)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(2027)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(curr)
+_AW_ONCLICK_AW_
+'SCREEN.Object("main.obj_order.obj_odr.ed_jprc").data = S2023.Data
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(diff)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(gvol)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(rate)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(2403_)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(2028_)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(sign)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(2321)
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

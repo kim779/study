@@ -1,0 +1,87 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB400520)
+MAPSIZE(231, 323)
+VERSION(001)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("[4005]Á¾¸ñº°È£°¡ -¿")
+MAPPUBLIC(";")
+FONT("±¼¸²Ã¼", 9, NORMAL)
+OPTIONS(FMS|FLASH)
+TITLE("[4005]Á¾¸ñº°È£°¡ -¿É¼Ç")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pooppoop")
+MAPTYPE(FIXED)
+HEADER(NOP)
+HELPFILE("É¼?")
+BGROUND(BRUSH, 68)
+}
+
+
+
+FORM DIVISION
+{
+
+CONTROL  47401(0, 0, 323, 231)    "CX_FODepth"  "/u4/d5/p4/b/s1/l/c/h1/o/g/a1/w/fIB400520/r"  LEN(0)  EDIT_OUTPUT    COLOR(193, 232)  TABORDER(0)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  40301(484, 81, 559, 101)  LEN(8)  IO_ALPHA|EDIT_INOUT|FA_WRAP  FONT("±¼¸²Ã¼", 9, NORMAL)    COLOR(141, 0)  CUR(0)  TP_NONE          TABORDER(1)  IOORDER(1)  &
+  HINTTYPE(IH_NONE)
+OUT  40021(474, 51, 552, 71)  LEN(8)  IO_ALPHA|AL_LEFT||FA_FLASH    COLOR(141, 42)  CUR(0)            TABORDER(0)  IOORDER(2)  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+'Option Explicit
+'Dim runMingam
+'
+'If SCREEN.CreateObject("DX_OPSENSCAL") = False Then
+'	runMingam = False
+'Else
+'	runMingam = True
+'	DX_OPSENSCAL.UserName 	= LOGIN.Name 								'ReadCfgÀÛ¾÷À» À§ÇØ UserName ÇÊ¿ä
+'	DX_OPSENSCAL.ReadCfg
+'End If
+'
+'Sub OnAlert()
+'	If runMingam = False Or Trim(S40301.Data) = "" Then
+'		Exit Sub
+'	End If
+'
+'	' IV, Delta, Gamma, Theta, Vegga, Rho °è»ê
+'	' ÀÔ·ÂÀÎÀÚ : ÇöÀç°¡, K200, ¼±¹°ÃÖ±Ù¿ù¹°, Àå½Ã°£
+'	DX_OPSENSCAL.CalcEx Abs(TABLE3.GetTableText(3)), S20023.Data, S31023.Data, S20034.Data
+'
+'		iv.Data = DX_OPSENSCAL.iv
+'	delta.Data = DX_OPSENSCAL.delta
+'	gamma.Data = DX_OPSENSCAL.gamma
+'	theta.Data = DX_OPSENSCAL.theta
+'	vega.Data = DX_OPSENSCAL.Vegga
+'	rho.Data = DX_OPSENSCAL.rho
+'End Sub
+
+_AW_ONRECEIVE_AW_
+'If SCREEN.CreateObject("DX_OPSENSCAL") Then
+'	DX_OPSENSCAL.JCode      = S40301.Text								'Á¾¸ñÄÚµå
+'	DX_OPSENSCAL.Strike     = Abs(TABLE3.GetTableCell(4))		'Çà»ç°¡
+'	DX_OPSENSCAL.CD         = TABLE3.GetTableCell(1)				'CD ±Ý¸®
+'	DX_OPSENSCAL.BedangJisu = TABLE3.GetTableCell(2) / 1000000	'¹è´çÁö¼ö
+'	DX_OPSENSCAL.BzRemainDays = TABLE3.GetTableCell(6)			'¿µ¾÷ÀÏ
+'	DX_OPSENSCAL.CalRemainDays = TABLE3.GetTableCell(5)			'´Þ·ÂÀÏ
+'	DX_OPSENSCAL.SetHv TABLE3.GetTableCell(7), TABLE3.GetTableCell(8), TABLE3.GetTableCell(9), TABLE3.GetTableCell(10) '¿ª»çÀûº¯µ¿¼º
+'End If
+'OnAlert()
+
+_AW_ONENDSUB_AW_
+}
+
+
+

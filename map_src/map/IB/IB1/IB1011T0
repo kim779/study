@@ -1,0 +1,415 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB1011T0)
+MAPSIZE(198, 334)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("매도-미니주문")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(CR2TAB)
+TITLE("[1011] 매도-미니주문")
+TOPATH(AXIS)
+METHOD(MENU)
+MAPTYPE(NORM)
+HEADER(LEDGER)
+BGROUND(BRUSH, 181)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL0(0, 182, 335, 200)        COLOR(34, 69)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  OBJ_order(0, 0, 334, 181)    "IB1011T1"  TABORDER(1)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  OBJ_sise(83, 300, 412, 557)    "IB10011G"  TABORDER(2)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  1301(12, 300, 77, 320)  LEN(6)  IO_MIXED|EDIT_INOUT|FA_WRAP|FA_HAN|CODE    FONT("굴림체", 9, NORMAL)    COLOR(28, 232)  CUR(0)  TP_NONE          TABORDER(3)  IOORDER(3)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL0(12, 280, 69, 298)  '도미노'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL1(5, 184, 19, 198)    |IMAGE|AL_STRETCH    COLOR(34, 69)  CUR(0)    "알림_ic.bmp"  ENABLE  &
+  VISIBLE  TRANSPARENT  IMAGE  HINTTYPE(IH_NONE)
+PANEL  GUIDE(23, 182, 334, 200)        COLOR(34, 69)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  domino_1000(19, 246, 230, 265)  LEN(400)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(7)  IOORDER(7)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  obj_Buf(365, 95, 495, 200)    "IB1000T0"  TABORDER(6)  IOORDER(6)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  domino_data(70, 180, 346, 198)  LEN(40)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(4)  IOORDER(4)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  ed_jprc(25, 180, 109, 200)  LEN(10)  IO_NUM|EDIT_INPUT|FA_COMMA|FA_RIGHT|FA_WRAP|FA_SKIP|FA_XFLOAT  SPIN(1)    FONT("굴림체", 9, BOLD)    COLOR(104, 103)  CUR(0)  TP_SUNKEN  INIT("0")          TABORDER(5)  IOORDER(5)  ENABLE  &
+  HOVER  HINTTYPE(IH_NONE)
+EDIT  OnTrigger(90, 210, 110, 229)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("0")          TABORDER(8)  IOORDER(8)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  goInterest(5, 180, 28, 199)  LEN(1)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("N")          TABORDER(9)  IOORDER(9)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  obj_obj_sise(75, 475, 430, 530)    "IB10011Z"  TABORDER(10)  IOORDER(10)  ENABLE  &
+  HINTTYPE(IH_NONE)
+CONTROL  cxMarket(305, 5, 324, 23)  |FA_SKIP  "CX_MarketPicker"  "/k2/t/u1/d1"  LEN(12)  EDIT_NOP    COLOR(192, 232)  TABORDER(0)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  edMarketTrigger(400, 220, 445, 238)  LEN(6)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(206, 197)  CUR(0)  TP_NONE          TABORDER(11)  IOORDER(11)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Dim IsDomino, gubn, ogno, jmgb, stotgubn
+gubn = ""
+ogno = ""
+jmgb = ""
+stotgubn = ""
+Sub send_sise_all(xval)
+SCREEN.IgnoreChange True
+	S1301.Trigger "", True
+	If xval <> "jumun" Then
+		Call Ord_ChangeCode(S1301.Data)
+	End If
+	OBJ_sise.Send
+	obj_obj_sise.Send
+
+	If SCREEN.Object("OBJ_order.obj_odr.1301").Iskonex = True Then
+		SCREEN.Object("OBJ_order.obj_odr.c_jqty").type = Asc("N")
+	Else
+		SCREEN.Object("OBJ_order.obj_odr.c_jqty").type = Asc("1")
+	End If
+
+SCREEN.IgnoreChange False
+
+	Dim param
+	param = Trim(SYSTEM.Pop("jngo_1000"))
+
+	If param = "" Then
+
+	Else
+		domino_1000.Data = param
+		SYSTEM.Push "jngo_1000", ""
+		Call setData()
+	End If
+
+End Sub
+
+Sub sendTrigger(data)
+	OnTrigger.Data = 1
+	S1301.Data = data
+	SCREEN.SetTimer 2, False
+End Sub
+
+Sub SetInitCustomer()
+'	If sPass <> "" Then
+'		SCREEN.Object("OBJ_order.ed_pswd").Data = sPass
+'	End If
+End Sub
+
+
+Sub SetPassword(sData)
+	Dim Ifind, sAcc, sPass
+	ifind = InStr(sData, "-")
+	sAcc = Trim( Left(sData, Ifind-1) )
+	sPass = Trim( Mid(sData, Ifind+1, Len(sData)- Ifind) )
+
+
+	If Trim(SCREEN.Object("OBJ_order.AN1A").data) = sAcc Then
+		If sPass <> "" Then
+			SCREEN.Object("OBJ_order.ed_pswd").data = sPass
+		End If
+	End If
+End Sub
+
+Sub SetJprc(sData)
+'	SYSTEM.Trace "sData : " & sData
+	SCREEN.Object("OBJ_order.OBJ_odr.ed_jprc").data = sData
+End Sub
+
+Sub SetData()
+
+	SYSTEM.Trace "SetData : " & sData
+
+	Dim arr
+	arr = Split(Trim(domino_1000.Data), "|")
+
+	'arr(0) - 화면구분, arr(1) - 계좌, arr(2) - 계좌명, arr(3) - 신용구분, arr(4) - 신용코드, arr(5) - 잔고, arr(6) - 신용일자
+
+	If Trim(arr(0)) = "실시간" Then
+		If Trim(arr(3)) = "01" And Trim(arr(4)) = "80" Then
+			GUIDE.Text = "대출상환탭을 선택하여 주십시오."
+			'MsgBox "대출상환탭을 선택하여 주십시오.", , "IBK투자증권"
+			Exit Sub
+		End If
+	ElseIf (arr(0)) = "체결" Or (arr(0)) = "미체결" Then
+
+	End If
+
+	If Trim(SCREEN.Object("OBJ_order.AN1A").Data) <> Trim(arr(1)) Then
+		SCREEN.Object("OBJ_order.AN1A").Data = Trim(arr(1))
+		SCREEN.Proc "OBJ_order.Set_account", ""
+		SCREEN.Object("OBJ_order.ACNM").Data = Trim(arr(2))
+	End If
+
+
+	SCREEN.SetTimer 3, False
+End Sub
+
+Sub ChangeCode(codx)
+	SCREEN.Object("OBJ_order.OBJ_odr.1301").Data = codx
+	SCREEN.Proc "OBJ_order.OBJ_odr.ChangeCode", ""
+End Sub
+
+Sub Set_prc(data)
+	If Trim(data) = "" Then
+		Exit Sub
+	End If
+
+	If SCREEN.Object("OBJ_order.tab_order").id <> 3 Then
+		If SCREEN.Object("OBJ_order.obj_odr.CHK_auto").checked = False Then
+			SCREEN.Object("OBJ_order.obj_odr.ed_jprc").data = data
+		End If
+	End If
+End Sub
+
+
+'Sub MKTriggerFromMain(sdata)
+'	SCREEN.Object("OBJ_order.obj_odr.cxMarket").sMarket = sdata
+'	SCREEN.Proc "OBJ_order.obj_odr.Set_1000_OrderMap",""
+'End Sub
+
+
+
+
+
+
+
+
+
+'========================================
+' 하위 OBJ에 시장구분자 세팅 후 조회 발생
+'========================================
+'Sub Change_MKGubn_Main(sMKGubn)
+Sub MKTriggerFromMain(sMKGubn)
+
+	If SCREEN.CreateObject("Info") Then
+		INFO.pushData LOGIN.Name, myFILE, myMAP, "MKgubn", sMKGubn
+	End If
+
+	'=====================
+	' 직전 시장구분자 저장
+	'=====================
+	Dim tMKGubn
+	tMKGubn = cxMarket.sMarket
+
+SYSTEM.Trace "[IB100100][Change_MKGubn_Main] sMKGubn = " & sMKGubn
+
+
+	'================================================================
+	' 소속 OBJ 내의 cxMarket 시장 구분을 Main 시장구분으로 세팅
+	'================================================================
+	' 여기서 시장구분자 보정 후 Change_MKGubn_Main_Limited 함수 호출되어서
+	' 하위 오브젝트에 시장 자동으로 전파한다.
+	'================================================================
+	Call Spread_mkgb(S1301.Data, sMKGubn)
+
+
+	'================================================================
+	' 시장 변동이 없을 경우 조회 Send 발생 SKIP 처리
+	'================================================================
+	' Spread_mkgb() 함수 이후의 시장구분자는 보정되고 난 다음의 시장구분자이다.
+	'================================================================
+	If tMKGubn = cxMarket.sMarket Then
+		Exit Sub
+	End If
+
+
+	'====================
+	' 하단 원장 OBJ 조회
+	'====================
+	Call Change_MKGubn_Main_Send()
+End Sub
+
+
+
+
+'==========================================
+' 하위 OBJ에 시장구분자 세팅 (조회 미발생)
+'==========================================
+Sub Change_MKGubn_Main_Limited(sMKGubn)
+
+	' 직전 시장구분자 저장
+	Dim tMKGubn
+	tMKGubn = cxMarket.sMarket
+
+	SCREEN.IgnoreChange True
+	cxMarket.sCode = S1301.Data
+	cxMarket.sMarket = sMKGubn
+
+	SCREEN.Proc "Main.OBJ_sise.Change_MKGubn_OBJ"             , sMKGubn
+	SCREEN.Proc "Main.OBJ_order.OBJ_odr.Change_MKGubn_OBJ"    , sMKGubn
+'	SYSTEM.Trigger "edMarketTrigger_1000", sMKGubn, ""	' DLL로 TRIGGER 발생
+	SCREEN.IgnoreChange False
+
+
+	' 시장 변동 발생 시 조회 발생
+	If tMKGubn <> cxMarket.sMarket Then
+		Change_MKGubn_Main_Send()
+		Exit Sub
+	End If
+
+End Sub
+
+
+
+'=====================================
+' 하위 OBJ 시장 변동에 따른 Send 발생
+'=====================================
+Sub Change_MKGubn_Main_Send()
+		'================================================================
+		' 하단 원장 OBJ 조회 :: 잔고구분자에 시장 변경 버튼이 존재
+		'================================================================
+		SCREEN.Object("obj_obj_sise").Send	' 주문 단가 세팅용 시세 OBJ 조회
+		SCREEN.Object("OBJ_sise").Send		' 좌측 상단 시세 OBJ 조회
+End Sub
+
+_AW_ONINDECLARE_AW_
+'== 주문obj를포함한 main의 공통함수
+#LOAD IB999913
+#load IB1000BB
+
+_AW_ONENDSUB_AW_
+_AW_ONSTART_AW_
+'Call Set_mini_order(1)
+
+'-- 주문단가 트리거 처리
+'SCREEN.SetTimer 4, False
+
+cxMarket.sMarket = LoadMKGubn
+cxMarket.sCode = S1301.Data
+
+_AW_ONENDSUB_AW_
+_AW_ONSELECT_AW_
+'Select Case data
+'	Case "1011T0"	'매도
+'		SCREEN.Object("OBJ_order.tab_order").ID = 1
+'		SCREEN.SetCaption "IB1011T1" & "[1011] 매도"
+'	Case "1012T0"	'매수
+'		SCREEN.Object("OBJ_order.tab_order").ID = 2
+'		SCREEN.SetCaption "IB1011T1" & "[1012] 매수"
+'	Case "1013T0"	'정정
+'		SCREEN.Object("OBJ_order.tab_order").ID = 3
+'		SCREEN.SetCaption "IB1011T1" & "[1013] 정정"
+'	Case "1014T0"	'취소
+'		SCREEN.Object("OBJ_order.tab_order").ID = 4
+'		SCREEN.SetCaption "IB1011T1" & "[1014] 취소"
+'	Case Else
+'		Exit Sub
+'End Select
+'
+'OBJ_order.Proc "order_tab_change", ""
+'
+'IsDomino = "D" & Right(data,1)
+'SCREEN.SetTimer 2, False
+'Call Set_mini_domino(Right(data,1))
+
+_AW_ONENDSUB_AW_
+_AW_ONTIMER_AW_
+If OnTrigger.Data = 1 Then
+	OnTrigger.Data = 0
+	S1301.Trigger "",True
+	S1301.Trigger "",False
+Else
+	If gubn = "set" Then
+		SCREEN.Object("OBJ_order.OBJ_odr.ed_ogno").Data = ogno
+		SCREEN.Object("OBJ_order.OBJ_odr.shogb").Data = jmgb
+
+		If jmgb = "01" Then
+			SCREEN.Object("OBJ_order.OBJ_odr.edStopPrc").Visible = True
+			SCREEN.Object("OBJ_order.OBJ_odr.labelStop").Visible = True
+			Select Case Trim(stotgubn)
+			Case "효력즉시발생":
+				SCREEN.Object("OBJ_order.OBJ_odr.edStopPrc").Enable = False
+			Case "효력발생":
+				SCREEN.Object("OBJ_order.OBJ_odr.edStopPrc").Enable = False
+			Case "효력미발생", "접수완료":
+				SCREEN.Object("OBJ_order.OBJ_odr.edStopPrc").Enable = True
+			Case Else :
+				SCREEN.Object("OBJ_order.OBJ_odr.edStopPrc").Enable = False
+			End Select
+		End If
+
+		gubn = ""
+		Exit Sub
+	End If
+
+	Dim arr
+	arr = Split(Trim(domino_1000.Data), "|")
+
+
+	If Trim(arr(0)) = "실시간" Then
+		If Trim(SCREEN.Object("OBJ_order.tab_order").ID) <> "1" Then
+			SCREEN.Object("OBJ_order.tab_order").ID = 1
+			SCREEN.Proc "OBJ_order.order_tab_change", ""
+		End If
+
+		If Trim(arr(3)) = "00" Then '현금
+			SCREEN.Proc "OBJ_order.OBJ_odr.Set_CashCredit", "0"
+		ElseIf Trim(arr(3)) = "01" Then	'신용
+			SCREEN.Proc "OBJ_order.OBJ_odr.Set_CashCredit", "1"
+		End If
+
+		SCREEN.Object("OBJ_order.OBJ_odr.ed_jqty").Data = Trim(arr(5))
+		If Trim(arr(3)) = "01" Then
+			SCREEN.Object("OBJ_order.OBJ_odr.ed_date").Data = Trim(arr(6))
+			SCREEN.Object("OBJ_order.OBJ_odr.c_sygb").Data = "1"&Trim(arr(4))
+		End If
+	ElseIf Trim(arr(0)) = "체결" Or Trim(arr(0)) = "미체결" Then
+		If Trim(SCREEN.Object("OBJ_order.tab_order").ID) <> "3" Then
+			SCREEN.Object("OBJ_order.tab_order").ID = 3
+			SCREEN.Proc "OBJ_order.order_tab_change", ""
+		End If
+
+		gubn = "set"
+		ogno = Trim(arr(3))
+		jmgb = Trim(arr(4))
+		stotgubn = Trim(arr(5))
+		SCREEN.SetTimer 3, False
+	End If
+
+	domino_1000.Clear
+End If
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(1301)
+_AW_ONCHANGE_AW_
+S1301.Trigger "",True
+S1301.Trigger "",False
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(ed_jprc)
+_AW_ONCHANGE_AW_
+'SCREEN.SetTimer 2, False
+Call SetJprc(ed_jprc.Data)
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(edMarketTrigger)
+_AW_ONCHANGE_AW_
+cxMarket.sMarket = edMarketTrigger.Data
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

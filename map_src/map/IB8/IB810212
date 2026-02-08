@@ -1,0 +1,151 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB810212)
+MAPSIZE(149, 508)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("계좌명조회")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(ENCODE|CR2TAB)
+TITLE("계좌명조회")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("piboPBxQ")
+MAPTYPE(FIXED)
+HEADER(LEDGER)
+TRXH("31CSACMQ229")
+}
+
+
+
+FORM DIVISION
+{
+
+GROUP  grp1(19, 20, 213, 132)  'INPUT'        COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  zIn(108, 42, 193, 58)  LEN(5)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("00001")          TABORDER(1)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL9(27, 42, 105, 58)  '레코드갯수'        COLOR(66, 76)  CUR(0)    AL_LEFT    ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  zAcntNo(108, 59, 193, 75)  LEN(20)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(2)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL0(27, 59, 105, 75)  '계좌번호'        COLOR(66, 76)  CUR(0)    AL_LEFT    ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  OUTPUT(250, 41, 485, 57)  LEN(25)  IO_MIXED|AL_LEFT|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(3)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  Out(340, 58, 430, 76)  LEN(5)  IO_NUM|AL_CENTER|    COLOR(192, 232)  CUR(0)  LINECOLOR(75)          TABORDER(0)  IOORDER(4)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  O_zAcntNo(340, 77, 430, 95)  LEN(20)  IO_NUM|AL_CENTER||FA_SKIP    COLOR(192, 232)  CUR(0)  LINECOLOR(75)          IFRGB(232, 232)  TABORDER(0)  IOORDER(5)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  zAcntNm(340, 95, 430, 113)  LEN(40)  IO_MIXED|AL_CENTER||FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSUP    COLOR(192, 232)  CUR(0)  LINECOLOR(75)          IFRGB(232, 232)  TABORDER(0)  IOORDER(6)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL10(249, 59, 339, 77)  '레코드갯수'  LINECOLOR(0)      COLOR(74, 76)  CUR(0)    AL_LEFT    ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL11(249, 76, 339, 94)  '계좌번호'  LINECOLOR(0)      COLOR(74, 76)  CUR(0)    AL_LEFT    ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL13(249, 93, 339, 111)  '계좌명'  LINECOLOR(0)      COLOR(74, 76)  CUR(0)    AL_LEFT    ENABLE  &
+  HINTTYPE(IH_NONE)
+GROUP  GROUP02(232, 20, 492, 147)  'INPUT'        COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  Rmnno(341, 114, 441, 129)  LEN(24)  IO_MIXED|AL_CENTER|    COLOR(192, 69)  CUR(0)            TABORDER(0)  IOORDER(7)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL2(249, 110, 339, 128)  '실명확인번호'  LINECOLOR(0)      COLOR(74, 76)  CUR(0)    AL_LEFT    ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL3(249, 127, 339, 145)  '고객번호'  LINECOLOR(0)      COLOR(74, 76)  CUR(0)    AL_LEFT    ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  ClntNo(341, 130, 441, 145)  LEN(20)  IO_MIXED|AL_CENTER|    COLOR(192, 69)  CUR(0)            TABORDER(0)  IOORDER(8)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Option Explicit
+
+Sub send_f()
+	SCREEN.ClearAll 0, 0
+	LEDGER.Fkey = "C"
+	SCREEN.Send 0
+End Sub
+
+_AW_ONINDECLARE_AW_
+#LOAD IB888833
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+SCREEN.OnSend = False
+
+Dim tmpAccn1, tmpAccn2, tmpAccn3
+tmpAccn1 = Trim(SCREEN.Object("parent.zBkeepAcntNo1").Data)
+tmpAccn2 = Trim(SCREEN.Object("parent.zBkeepAcntNo2").Data)
+tmpAccn3 = Trim(SCREEN.Object("parent.zBkeepAcntNo3").Data)
+
+zIn.Data = "00001"
+zAcntNo.Data = tmpAccn1 & tmpAccn2 & tmpAccn3
+
+SCREEN.OnSend = True
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+If Left(Trim(LEDGER.Ecod), 1) = "0" Then
+	SCREEN.Object("parent.ACNM2").Text = Trim(zAcntNm.Data)
+	SCREEN.Object("parent.sendBtn").SetFocus
+
+ 	'출고 계좌의 계좌주와 입고계좌의 계좌주 실명확인번호 다르면 양도구분 활성화
+ 	SCREEN.Object("parent.r_miyangdo").Checked = True
+
+ 'MsgBox "["& zIn.data &"]["& Trim(zAcntNo.Data) &"]["& LOGIN.Juno &"]["& Trim(Rmnno.Data) &"]"
+ 	Dim blVal
+    blVal = SCREEN.Object("parent.r_miyack").Checked And Trim(LOGIN.Juno) <> Trim(Rmnno.Data)
+    SCREEN.Object("parent.r_miyangdo").Enable = blVal
+    SCREEN.Object("parent.r_yangdo").Enable = blVal
+    SCREEN.Object("parent.c_rcod").Enable = blVal
+
+' 	If SCREEN.Object("parent.r_miyack").Checked = True And _
+'  		Trim(LOGIN.Juno) <> Trim(Rmnno.Data) Then
+'  		SCREEN.Object("parent.r_miyangdo").Enable = True
+'  		SCREEN.Object("parent.r_yangdo").Enable = True
+'  		SCREEN.Object("parent.c_rcod").Enable = True '대체사유 : 미양도일 때 활성화
+' 	Else
+'  		SCREEN.Object("parent.r_miyangdo").Enable = False
+'  		SCREEN.Object("parent.r_yangdo").Enable = False
+' 	End If
+
+Else
+	Dim msg
+
+	If Trim(LEDGER.Ecod) = "1143" Then
+		msg = LEDGER.Ecod & " [" & Time & "] " & "입고계좌번호를 잘못 입력하셨습니다."
+
+		SCREEN.Object("parent.ACNM2").Text = ""
+
+	Else
+		msg = Trim(LEDGER.Emsg)
+	End If
+
+	Call alert_msg(msg)
+	Call guide_msg(msg)
+
+	SCREEN.Object("parent.zBkeepAcntNo1").SetFocus
+End If
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(O_zAcntNo)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(zAcntNm)
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

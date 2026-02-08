@@ -1,0 +1,115 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB9002AA)
+MAPSIZE(399, 471)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("굴림", 9, NORMAL)
+TITLE("그룹삭제")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pidoaged")
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+EDIT  usid(35, 65, 114, 89)  LEN(12)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(1)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  act(41, 96, 120, 120)  LEN(1)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(2)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  gpid(39, 135, 118, 159)  LEN(4)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(3)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  gpnm(42, 171, 233, 195)  LEN(40)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(4)  IOORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  nrec(45, 203, 124, 227)  LEN(4)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(5)  IOORDER(5)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  accn(44, 234, 123, 258)  LEN(11)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(6)  IOORDER(6)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  zpwd(45, 282, 124, 306)  LEN(8)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(7)  IOORDER(7)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  OUTPUT0(60, 373, 151, 394)  LEN(4)  IO_MIXED|AL_CENTER|    COLOR(192, 69)  CUR(0)            TABORDER(0)  IOORDER(8)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  OUTPUT1(60, 417, 609, 438)  LEN(80)  IO_MIXED|AL_LEFT|    COLOR(192, 69)  CUR(0)            TABORDER(0)  IOORDER(9)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+CONTROL  CONTROL0(462, 305, 577, 335)  |FA_PROTECT  "CX_DATATRANS"  ""  LEN(0)  EDIT_NOP    COLOR(192, 232)  TABORDER(0)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONINDECLARE_AW_
+#load IB888888
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+Dim dept, common_nm
+If SCREEN.CreateObject("Info") Then
+	dept = Trim(INFO.PopData("", "ACCNTDEPT.INI", "ACCNTDEPT", "DEPT"))
+	common_nm = Trim(INFO.PopData("", "ACCNTDEPT.INI", "ACCNTDEPT", "COMMONNM"))
+End If
+
+usid.Data = "9" & dept & common_nm
+
+act.Data = "D"
+
+gpid.Data = Trim(SCREEN.Object("parent.idx").data)
+
+gpid.Data = l_format(gpid.data, "0", 4)
+
+gpnm.Data = Trim(SCREEN.Object("parent.str").data)
+
+nrec.Data = "0000"
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+'SCREEN.Proc "parent.parent_send", ""
+'Call CONTROL0.Refresh813(0)
+SCREEN.SetTimer 4, False
+
+_AW_ONENDSUB_AW_
+_AW_ONTIMER_AW_
+'Call CONTROL0.Refresh813(0)
+'SCREEN.proc "parent.query", ""
+
+'SCREEN.Object("parent.button0").enable = True
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(CONTROL0)
+_AW_ONDBLCLK_AW_
+'MsgBox "Control: "+CONTROL0.data
+Dim DataList, spos, dpos, symb, data, cnt
+cnt = 1
+DataList = CONTROL0.data
+'MsgBox "DataList: "+ DataList
+dpos = 0
+spos = InStr(DataList, "|")
+While spos <> 0
+	symb = Mid(DataList,dpos+1,spos-dpos-1)
+	'MsgBox "symb: "+ symb
+	dpos = InStr(spos+1,DataList, "|")
+	data = Mid(DataList, spos+1, dPos-spos-1)
+	spos = InStr(dpos+1,DataList, "|")
+	SCREEN.Object(symb).data = data
+
+Wend
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

@@ -1,0 +1,116 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB000135)
+MAPSIZE(477, 618)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("지수종합")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(FLASH|CR2TAB)
+TITLE("리서치")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+CONTROL  ctl_Thtmlex(0, 28, 618, 477)  |FA_PROTECT  RESIZABLE  "CX_Thtmlex"  "/wwww.ibks.com*slinvestment*slresearch*slrespect_list.do?gubun=DAIL&popup=Y/s1"  LEN(0)  EDIT_NOP    COLOR(192, 232)  TABORDER(0)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL1(0, 0, 618, 28)        COLOR(66, 69)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  r2(83, 4, 152, 24)  '경제/채권'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(GP1)    FONT("굴림체", 9, NORMAL)  COLOR(68, 130)  CUR(0)      TABORDER(1)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  r1(8, 4, 79, 24)  '전략/시황'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(GP1)    FONT("굴림체", 9, NORMAL)  COLOR(68, 130)  CUR(0)      TABORDER(2)  ENABLE  &
+  VISIBLE  CHECKED  TRANSPARENT  HINTTYPE(IH_NONE)
+PANEL  PANEL6(4, 4, 365, 24)  LINECOLOR(165)      COLOR(66, 130)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  r3(158, 4, 223, 24)  '산업분석'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(GP1)    FONT("굴림체", 9, NORMAL)  COLOR(68, 130)  CUR(0)      TABORDER(3)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  r4(227, 4, 292, 24)  '기업분석'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(GP1)    FONT("굴림체", 9, NORMAL)  COLOR(68, 130)  CUR(0)      TABORDER(4)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  r5(295, 4, 360, 24)  '고지사항'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(GP1)    FONT("굴림체", 9, NORMAL)  COLOR(68, 130)  CUR(0)      TABORDER(5)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+GROUP  GP1(4, 547, 79, 600)  'Group'        COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Dim g_ArrData
+g_ArrData = Array(_
+"www.ibks.com/investment/research/respect_list.do?gubun=DAIL&popup=Y",_
+"www.ibks.com/investment/research/strategy_list.do?popup=Y",_
+"www.ibks.com/investment/research/morning_list.do?popup=Y",_
+"www.ibks.com/investment/research/enterpriseAnalysis_list.do?popup=Y",_
+"www.ibks.com/investment/research/businessAnalysis_list.do?popup=Y",_
+"www.ibks.com/investment/research/bulletinboard_list.do?popup=Y")
+
+Sub send_f()
+	Dim ii
+	For ii=1 To 5
+		If SCREEN.Object("r"&ii).Checked = True Then
+			ctl_Thtmlex.viewUrl(g_ArrData(ii))
+		End If
+	Next
+End Sub
+
+_AW_ONSTART_AW_
+send_f()
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+SCREEN.OnSend False
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(r2)
+_AW_ONCLICK_AW_
+send_f()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(r1)
+_AW_ONCLICK_AW_
+send_f()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(r3)
+_AW_ONCLICK_AW_
+send_f()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(r4)
+_AW_ONCLICK_AW_
+send_f()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(r5)
+_AW_ONCLICK_AW_
+send_f()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

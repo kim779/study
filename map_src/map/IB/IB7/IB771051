@@ -1,0 +1,182 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB771051)
+MAPSIZE(258, 690)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("기업분석")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(FMS)
+TITLE("[7710] 기업분석")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pooppoop")
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL63(0, 31, 690, 258)  LIMAGE(0)  LINEW(4)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL_bg(0, 0, 690, 32)        COLOR(66, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BROWSER  BROWSER0(6, 39, 684, 252)  EDIT_NOP    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BTN_MD(727, 6, 764, 26)  '조회'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, BOLD)  COLOR(132, 186)  CUR(0)    "조회BTN.BMP"    TABORDER(1)  ENABLE  &
+  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+EDIT  1301(7, 6, 72, 26)  LEN(6)  IO_MIXED|EDIT_INOUT|FA_WRAP|FA_HAN|CODE    FONT("굴림체", 9, NORMAL)    COLOR(99, 130)  CUR(0)  TP_SUNKEN          TABORDER(2)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON0(72, 6, 91, 26)  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(15, 63)  CUR(0)    "검색.BMP"    TABORDER(3)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+CONTROL  17413(94, 6, 227, 26)    "CX_Symbol"  "/a105/b91/c90/d130"  LEN(0)  EDIT_OUTPUT  FONT("굴림체", 9, NORMAL)    COLOR(90, 130)  TABORDER(0)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+GROUP  gp(50, 650, 132, 745)        COLOR(-1, 232)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  r0(249, 7, 313, 25)  'Snapshot'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(gp)      COLOR(208, 130)  CUR(0)      TABORDER(4)  ENABLE  &
+  VISIBLE  CHECKED  TRANSPARENT  HINTTYPE(IH_NONE)
+BOX  BOX0(239, 6, 676, 26)    COLOR(165, 66)  LINEW(1)  BX_LINE    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  r1(318, 7, 384, 25)  '기업개요'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(gp)      COLOR(208, 130)  CUR(0)      TABORDER(5)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  r2(386, 7, 451, 25)  '재무제표'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(gp)      COLOR(208, 130)  CUR(0)      TABORDER(6)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  r3(455, 7, 520, 25)  '재무비율'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(gp)      COLOR(208, 130)  CUR(0)      TABORDER(7)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  r4(525, 7, 588, 25)  '투자지표'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(gp)      COLOR(208, 130)  CUR(0)      TABORDER(8)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  r5(594, 7, 671, 25)  'Disclosure'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(gp)      COLOR(208, 130)  CUR(0)      TABORDER(9)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  menu(236, 660, 372, 682)  LEN(2)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("11")          TABORDER(10)  IOORDER(3)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONSTART_AW_
+menu.Data = "11"
+r0.Checked = True
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(BTN_MD)
+_AW_ONCLICK_AW_
+If Trim(S1301.Data) <> "" Then
+	BROWSER0.Navigate("http://comp.fnguide.com/SVO/fncompany.asp?menuid="+Trim(menu.data)+"&gicode=A"+ Trim(S1301.Data) +"&cID=63")
+Else
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(1301)
+_AW_ONCHANGE_AW_
+If Trim(S1301.Data) = "000000" Or Trim(S1301.Data) = "" Then
+	Exit Sub
+End If
+S1301.Trigger "",True
+
+If Trim(S1301.Data) <> "" Then
+	BROWSER0.Navigate("http://comp.fnguide.com/SVO/fncompany.asp?menuid="+Trim(menu.data)+"&gicode=A"+ Trim(S1301.Data) +"&cID=63")
+Else
+End If
+
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON0)
+_AW_ONCLICK_AW_
+Dim retn
+retn = SCREEN.GetCode(100, "1301", "hnam", 0 )
+If retn <> True Then
+       Exit Sub
+End If
+
+SCREEN.Send 2
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(r0)
+_AW_ONCLICK_AW_
+menu.Data = "11"
+
+If Trim(S1301.Data) <> "" Then
+	BROWSER0.Navigate("http://comp.fnguide.com/SVO/fncompany.asp?menuid="+Trim(menu.data)+"&gicode=A"+ Trim(S1301.Data) +"&cID=63")
+Else
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(r1)
+_AW_ONCLICK_AW_
+menu.Data = "12"
+
+If Trim(S1301.Data) <> "" Then
+	BROWSER0.Navigate("http://comp.fnguide.com/SVO/fncompany.asp?menuid="+Trim(menu.data)+"&gicode=A"+ Trim(S1301.Data) +"&cID=63")
+Else
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(r2)
+_AW_ONCLICK_AW_
+menu.Data = "13"
+If Trim(S1301.Data) <> "" Then
+	BROWSER0.Navigate("http://comp.fnguide.com/SVO/fncompany.asp?menuid="+Trim(menu.data)+"&gicode=A"+ Trim(S1301.Data) +"&cID=63")
+Else
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(r3)
+_AW_ONCLICK_AW_
+menu.Data = "14"
+If Trim(S1301.Data) <> "" Then
+	BROWSER0.Navigate("http://comp.fnguide.com/SVO/fncompany.asp?menuid="+Trim(menu.data)+"&gicode=A"+ Trim(S1301.Data) +"&cID=63")
+Else
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(r4)
+_AW_ONCLICK_AW_
+menu.Data = "15"
+If Trim(S1301.Data) <> "" Then
+	BROWSER0.Navigate("http://comp.fnguide.com/SVO/fncompany.asp?menuid="+Trim(menu.data)+"&gicode=A"+ Trim(S1301.Data) +"&cID=63")
+Else
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(r5)
+_AW_ONCLICK_AW_
+menu.Data = "16"
+If Trim(S1301.Data) <> "" Then
+	BROWSER0.Navigate("http://comp.fnguide.com/SVO/fncompany.asp?menuid="+Trim(menu.data)+"&gicode=A"+ Trim(S1301.Data) +"&cID=63")
+Else
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

@@ -1,0 +1,106 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB59401A)
+MAPSIZE(165, 367)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("보이스피싱")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+TITLE("보이스피싱 피해예방 안내")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(FIXED)
+HEADER(NOP)
+BGROUND(BRUSH, 66)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL4(0, 0, 377, 175)  LIMAGE(0)  LINEW(3)  STRESS(0)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(66, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  s_btn(86, 136, 175, 156)  '예'  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(208, 186)  CUR(10)    "4BTN.BMP"    TABORDER(1)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+BUTTON  c_btn(175, 136, 305, 156)  '아니오(거래 계속)'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, BOLD)  COLOR(208, 186)  CUR(10)    "4BTN.BMP"    TABORDER(2)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+EDIT  EDIT0(210, 725, 266, 744)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("0")          TABORDER(3)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  obj0(755, 225, 910, 290)    "IB810227"  TABORDER(4)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL6(0, 10, 370, 30)  '※ 매일 수백명, 금융사기(보이스피싱) 피해자 발생!'  AL_CENTER  FONT("굴림체", 9, BOLD)  CUR(0)      COLOR(208, 94)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL0(0, 50, 370, 70)  ' 금융사기, 보이스피싱이 의심되는 이체요청을 받으셨나요?'  AL_LEFT  FONT("굴림체", 9, BOLD)  CUR(0)      COLOR(208, 97)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  accn(80, 725, 190, 745)  LEN(20)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(5)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  gubn(80, 750, 190, 770)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(6)  IOORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL1(0, 72, 370, 92)  '  ● 저금리 대환, 신용등급 상향 목적의 이체 요구'  AL_LEFT  CUR(0)      COLOR(208, 97)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL2(0, 88, 370, 108)  '  ● 검찰, 경찰, 금융감독원 직원의 이체 요구'  AL_LEFT  CUR(0)      COLOR(208, 97)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL3(0, 104, 370, 124)  '  ● 문자, 메신저 등을 통한 가족이나 지인의 부탁'  AL_LEFT  CUR(0)      COLOR(208, 97)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_SCRIPT_AW_(s_btn)
+_AW_ONCLICK_AW_
+'SCREEN.Object("obj0.zTrxTp").data = "1"	'처리구분 (1: 등록, 2: 조회)
+'SCREEN.Object("obj0.zAcntNo").data = accn.Data
+'
+'If gubn.Data = "1" Then
+'	SCREEN.Object("obj0.zTrdPtnCode").data = "01"
+'Else
+'	SCREEN.Object("obj0.zTrdPtnCode").data = "02"
+'End If
+'
+'SCREEN.Object("obj0.zQuest1").data = "1"
+'SCREEN.Object("obj0.zQuest2").data = "1"
+'
+'obj0.Send
+'
+'SYSTEM.Push "order", "VOICE"
+
+SCREEN.CreateWindow 1, "IB59401B /p5 /d", "gubn" & vbTab & "1" & vbLf & "accn" & vbTab & accn.Data
+SCREEN.CloseWindow
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(c_btn)
+_AW_ONCLICK_AW_
+SCREEN.Object("obj0.zTrxTp").data = "1"	'처리구분 (1: 등록, 2: 조회)
+SCREEN.Object("obj0.zAcntNo").data = accn.Data
+
+If gubn.Data = "1" Then
+	SCREEN.Object("obj0.zTrdPtnCode").data = "01"
+Else
+	SCREEN.Object("obj0.zTrdPtnCode").data = "02"
+End If
+
+SCREEN.Object("obj0.zQuest1").data = "0"
+SCREEN.Object("obj0.zQuest2").data = "0"
+
+obj0.Send
+
+SYSTEM.Push "order", "OK"
+SCREEN.CloseWindow
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

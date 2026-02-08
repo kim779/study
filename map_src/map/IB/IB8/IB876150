@@ -1,0 +1,255 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB876150)
+MAPSIZE(81, 403)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("±¼¸²Ã¼", 9, NORMAL)
+OPTIONS(FMS|FLASH)
+TITLE("[876150] °ü½ÉÁ¾¸ñ")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pooppoop")
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL0(-6, -8, 479, 435)  TP_RAISED      COLOR(192, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  OBJECT0(83, 120, 446, 405)    "IB876151"  TABORDER(1)  IOORDER(6)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  2023(395, 575, 543, 610)  LEN(10)  IO_NUM|AL_CENTER|    COLOR(192, 69)  CUR(0)            IFRGB(94, 95)  TABORDER(0)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  2024(542, 577, 719, 612)  LEN(10)  IO_NUM|AL_CENTER|    COLOR(192, 69)  CUR(0)            IFRGB(94, 95)  TABORDER(0)  IOORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  1022(419, 473, 539, 508)  LEN(30)  IO_MIXED|AL_LEFT||FA_ZEROSUP|SA_SPACE    COLOR(74, 76)  CUR(0)            TABORDER(0)  IOORDER(5)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  1301(200, 485, 320, 504)  LEN(6)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(2)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  1021(183, 650, 331, 685)  LEN(10)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSUP    COLOR(192, 69)  CUR(0)            IFRGB(94, 95)  TABORDER(0)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  OBJECT1(0, 41, 403, 81)    "IB876152"  TABORDER(3)  IOORDER(7)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  SYMBOL97(0, 0, 128, 40)        COLOR(232, 192)  CUR(0)    AL_LEFT  FONT("ÈÞ¸ÕµÕ±ÙÇìµå¶óÀÎ", 18, NORMAL)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL2(268, 0, 403, 40)        COLOR(232, 38422271)  CUR(0)    AL_LEFT  FONT("ÈÞ¸ÕµÕ±ÙÇìµå¶óÀÎ", 18, NORMAL)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL1(268, 0, 403, 40)        COLOR(232, 50218557)  CUR(0)    AL_LEFT  FONT("ÈÞ¸ÕµÕ±ÙÇìµå¶óÀÎ", 18, NORMAL)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL3(128, 0, 268, 40)        COLOR(232, 50218557)  CUR(0)    AL_RIGHT  FONT("ÈÞ¸ÕµÕ±ÙÇìµå¶óÀÎ", 18, NORMAL)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL4(128, 0, 268, 40)        COLOR(232, 38422271)  CUR(0)    AL_RIGHT  FONT("ÈÞ¸ÕµÕ±ÙÇìµå¶óÀÎ", 18, NORMAL)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL5(128, 0, 268, 40)        COLOR(232, 192)  CUR(0)    AL_RIGHT  FONT("ÈÞ¸ÕµÕ±ÙÇìµå¶óÀÎ", 18, NORMAL)  ENABLE  &
+  HINTTYPE(IH_NONE)
+COMBO  COMBO0(391, 658, 511, 677)  TP_NONE  LEN(2)  COUNT(0)  VCOUNT(0)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_NUM|EDIT_INPUT    COLOR(68, 69)  CUR(0)    TABORDER(4)  IOORDER(8)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Dim ii
+ii = 0
+Sub SetRealData
+	SYSTEM.Trace "setrealdata START!!!"
+	SCREEN.SetTimer 1, False
+End Sub
+
+Sub SetCombo(Data)
+	SYSTEM.Trace "data : " & Data
+	COMBO0.SetItems(vbTab & Data)
+
+End Sub
+
+Sub Setdata(data)
+	'test32.Data = data
+	SCREEN.proc"OBJECT0.Combo_change", data
+End Sub
+
+Sub OnAlert()
+		PANEL1.Text = ""
+		PANEL2.Text = ""
+		PANEL3.Text = ""
+		PANEL5.Text = ""
+		PANEL5.Text = ""
+	SYMBOL97.Text = Trim(Mid(S1022.Data, 2, 30))
+	If Left(S2024.Data, 1) = "5" Then
+		PANEL2.Visible = False
+		PANEL1.Visible = True
+		PANEL4.Visible = False
+		PANEL3.Visible = True
+		PANEL5.Visible = False
+		S2024.Data = Mid(S2024.Data, 2, 10)
+		diff = FormatCurrency (S2024.Data)
+		diff_data = Trim(Mid(diff, 2, 10))
+		PANEL1.text = " ¡å" & diff_data
+		PANEL3.Text = Trim(Mid(S2023.Data, 2, 9))
+		curr = FormatCurrency (PANEL3.Text)
+		PANEL3.Text = Trim(Mid(curr, 2, 20))
+	ElseIf Left(S2024.Data, 1) = "4" Then
+		PANEL2.Visible = False
+		PANEL1.Visible = True
+		PANEL4.Visible = False
+		PANEL3.Visible = True
+		PANEL5.Visible = False
+		S2024.Data = Mid(S2024.Data, 2, 10)
+		diff = FormatCurrency (S2024.Data)
+		diff_data = Trim(Mid(diff, 2, 10))
+		PANEL1.text = " ¡é" & diff_data
+		PANEL3.Text = Trim(Mid(S2023.Data, 2, 9))
+		curr = FormatCurrency (PANEL3.Text)
+		PANEL3.Text = Trim(Mid(curr, 2, 20))
+	ElseIf Left(S2024.Data, 1) = "2" Then
+		PANEL1.Visible = False
+		PANEL2.Visible = True
+		PANEL3.Visible = False
+		PANEL4.Visible = True
+		PANEL5.Visible = False
+		S2024.Data = Mid(S2024.Data, 2, 10)
+		diff = FormatCurrency (S2024.Data)
+		diff_data = Trim(Mid(diff, 2, 10))
+		PANEL2.text = " ¡ã" & diff_data
+		PANEL4.Text = Trim(Mid(S2023.Data, 2, 9))
+		curr = FormatCurrency (PANEL4.Text)
+		PANEL4.Text = Trim(Mid(curr, 2, 20))
+	ElseIf Left(S2024.Data, 1) = "1" Then
+		PANEL1.Visible = False
+		PANEL2.Visible = True
+		PANEL3.Visible = False
+		PANEL4.Visible = True
+		PANEL5.Visible = False
+		S2024.Data = Mid(S2024.Data, 2, 10)
+		diff = FormatCurrency (S2024.Data)
+		diff_data = Trim(Mid(diff, 2, 10))
+		PANEL2.text = " ¡è" & diff_data
+		PANEL4.Text = Trim(Mid(S2023.Data, 2, 9))
+		curr = FormatCurrency (PANEL4.Text)
+		PANEL4.Text = Trim(Mid(curr, 2, 20))
+	ElseIf Left(S2024.Data, 1) = "3" Then
+		PANEL1.Visible = True
+		PANEL2.Visible = False
+		PANEL3.Visible = False
+		PANEL4.Visible = False
+		PANEL5.Visible = True
+		S2024.Data = Mid(S2024.Data, 2, 10)
+		diff = FormatCurrency (S2024.Data)
+		diff_data = Trim(Mid(diff, 2, 10))
+		PANEL1.Text = diff_data
+		PANEL5.Text = Trim(S2023.Data)
+		curr = FormatCurrency (PANEL5.Text)
+		PANEL5.Text = Trim(Mid(curr, 2, 20))
+	Else
+		PANEL1.Visible = True
+		PANEL2.Visible = False
+		PANEL3.Visible = False
+		PANEL4.Visible = False
+		PANEL5.Visible = True
+
+		PANEL1.Text = Trim(S2024.Data)
+		PANEL5.Text = Trim(S2023.Data)
+		SYSTEM.Trace "panel5.text : " & PANEL5.Text
+		If(PANEL5.Text = "") Then
+			Exit Sub
+		End If
+		curr = FormatCurrency (PANEL5.Text)
+		PANEL5.Text = Trim(Mid(curr, 2, 20))
+
+
+
+	End If
+
+End Sub
+
+_AW_ONSTART_AW_
+
+OBJECT0.Send
+
+'OBJECT0.Send
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+OnAlert()
+
+_AW_ONENDSUB_AW_
+_AW_ONTIMER_AW_
+Dim rows, temprow
+Dim Interval
+Interval = 100
+SYSTEM.Trace "rows : " & SCREEN.Object("OBJECT0.GRID0").rows
+SYSTEM.Trace "temprows : " & CLng(SCREEN.Object("OBJECT0.temprow").Data)
+
+If SCREEN.Object("OBJECT0.GRID0").rows = 0 Then
+	SCREEN.ClearAll 0 ,2
+	SCREEN.Proc "object1.Clear", ""
+	Exit Sub
+End If
+
+
+If CLng(SCREEN.Object("OBJECT0.GRID0").Rows) > CLng(SCREEN.Object("OBJECT0.temprow").Data) Then
+
+	For ii = SCREEN.Object("OBJECT0.temprow").Data To SCREEN.Object("OBJECT0.temprow").Data+2
+		item =  SCREEN.Object("OBJECT0.GRID0").GetGridCell(ii, 2)
+		item2 =  SCREEN.Object("OBJECT0.GRID0").GetGridCell(ii+1, 2)
+		SCREEN.Object("OBJECT0.temprow").Data = SCREEN.Object("OBJECT0.temprow").Data + 2
+		ii = SCREEN.Object("OBJECT0.temprow").Data
+
+		S1301.Data = item
+		SCREEN.Object("OBJECT1.1301").Data = item2
+
+		SCREEN.Send 0
+		OBJECT1.Send
+
+	Next
+	SCREEN.SetTimer Interval, False
+	SYSTEM.Trace "> "
+ElseIf CLng(SCREEN.Object("OBJECT0.GRID0").Rows) = CLng(SCREEN.Object("OBJECT0.temprow").Data) Then
+	item =  SCREEN.Object("OBJECT0.GRID0").GetGridCell(1, 2)
+	S1301.Data = item
+	SCREEN.Send 0
+Else
+	SYSTEM.Trace "< "
+	SCREEN.Object("OBJECT0.temprow").Data = 1
+	SCREEN.SetTimer Interval, False
+End If
+
+
+'SYSTEM.Trace "1301 data : " & S1301.Data
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(2023)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(2024)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(1021)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(COMBO0)
+_AW_ONCHANGE_AW_
+SCREEN.proc"OBJECT0.Combo_change", COMBO0.Data
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

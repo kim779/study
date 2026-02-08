@@ -1,0 +1,403 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB498706)
+MAPSIZE(720, 640)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("투자자확인서 정정")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(ENCODE|CR2TAB)
+TITLE("투자성향에 적합하지 않은 거래 확인")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("piboPBxQ")
+MAPTYPE(NORM)
+HEADER(LEDGER)
+TRXH("31CSACMT111")
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL_bg(998, 99, 1548, 769)  LIMAGE(1)  LINEW(3)  LINETYPE(4)  LINECOLOR(64)  |IMAGE|AL_CENTER    COLOR(66, 232)  CUR(0)    "POPUP_12_상품거래의사확인_251110.BMP"  ENABLE  &
+  VISIBLE  IMAGE  HINTTYPE(IH_NONE)
+PANEL  PANEL23(788, 235, 1453, 885)  LIMAGE(0)  LINEW(4)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(240, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL0(805, 273, 888, 291)  '상품유형   : '  AL_LEFT  FONT("굴림체", 9, BOLD)  CUR(0)      COLOR(208, 69)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL1(805, 291, 888, 309)  '상품위험도 : '  AL_LEFT  FONT("굴림체", 9, BOLD)  CUR(0)      COLOR(208, 69)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_NONE)
+OUT  fund_type(889, 272, 1179, 290)  LEN(40)  IO_MIXED|AL_LEFT||FA_SKIP  FONT("굴림체", 9, BOLD)    COLOR(240, 232)  CUR(0)            TABORDER(0)  IOORDER(10)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  fund_status(889, 290, 1179, 308)  LEN(40)  IO_MIXED|AL_LEFT||FA_SKIP  FONT("굴림체", 9, BOLD)    COLOR(240, 232)  CUR(0)            TABORDER(0)  IOORDER(11)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  domino(1228, 133, 1348, 151)  LEN(40)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(1)  IOORDER(12)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL31(1139, 31, 1224, 49)  '넘어온데이터'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  f_name(1228, 30, 1348, 49)  LEN(40)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(2)  IOORDER(13)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  f_tran(1228, 50, 1348, 69)  LEN(40)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(3)  IOORDER(14)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  f_num(1228, 70, 1348, 89)  LEN(12)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(4)  IOORDER(15)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  fund_Dtl(1228, 91, 1348, 110)  LEN(40)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(5)  IOORDER(16)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  fund_DtlCode(1228, 112, 1348, 131)  LEN(2)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(6)  IOORDER(17)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  confirm(805, 777, 1405, 795)  '본인의 투자성향에 적합하지 않은 거래임을 확인하였고, '  TP_CHECK|EDIT_NOP        FONT("굴림체", 10, BOLD)  COLOR(208, 36054731)  CUR(0)      TABORDER(7)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  BUTTON0(1065, 835, 1109, 855)  '확 인'  TP_PUSH|IMAGETEXT|AL_STRETCH        FOCUS  COLOR(208, 232)  CUR(0)    "3BTN.BMP"    TABORDER(8)  ENABLE  &
+  IMAGETEXT  HINTTYPE(IH_NONE)
+BUTTON  BUTTON1(1116, 837, 1160, 857)  '취 소'  TP_PUSH|IMAGETEXT|AL_STRETCH        FOCUS  COLOR(208, 232)  CUR(0)    "3BTN.BMP"    TABORDER(9)  ENABLE  &
+  IMAGETEXT  HINTTYPE(IH_NONE)
+EDIT  in(887, 31, 981, 49)  LEN(5)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("00001")          TABORDER(10)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL9(798, 31, 883, 49)  '입력'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  EDIT0(887, 51, 981, 69)  LEN(1)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("1")          TABORDER(11)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL10(798, 51, 883, 69)  '처리구분'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  EDIT1(887, 71, 981, 89)  LEN(1)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(12)  IOORDER(3)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  EDIT2(887, 91, 981, 109)  LEN(24)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(13)  IOORDER(4)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  EDIT3(887, 111, 981, 129)  LEN(20)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(14)  IOORDER(5)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  EDIT4(887, 131, 981, 149)  LEN(8)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(15)  IOORDER(6)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  EDIT5(887, 151, 981, 169)  LEN(12)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(16)  IOORDER(7)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL11(798, 71, 883, 89)  '확인구분'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL12(798, 91, 883, 109)  '실명확인번호'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL13(798, 111, 883, 129)  '계좌번호'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL14(798, 131, 883, 149)  '비밀번호'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL15(798, 151, 883, 169)  '종목번호'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  OUTPUT2(991, 31, 1126, 49)  LEN(5)  IO_MIXED|AL_LEFT|    COLOR(192, 232)  CUR(0)  LINECOLOR(75)          TABORDER(0)  IOORDER(18)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  OUTPUT3(991, 51, 1126, 69)  LEN(1)  IO_MIXED|AL_LEFT|    COLOR(192, 232)  CUR(0)  LINECOLOR(75)          TABORDER(0)  IOORDER(19)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  OUTPUT4(991, 71, 1126, 89)  LEN(1)  IO_MIXED|AL_LEFT|    COLOR(192, 232)  CUR(0)  LINECOLOR(75)          TABORDER(0)  IOORDER(20)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  OUTPUT5(991, 91, 1126, 109)  LEN(24)  IO_MIXED|AL_LEFT|    COLOR(192, 232)  CUR(0)  LINECOLOR(75)          TABORDER(0)  IOORDER(21)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  OUTPUT6(991, 111, 1126, 129)  LEN(20)  IO_MIXED|AL_LEFT|    COLOR(192, 232)  CUR(0)  LINECOLOR(75)          TABORDER(0)  IOORDER(22)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  OUTPUT7(991, 131, 1126, 149)  LEN(8)  IO_MIXED|AL_LEFT|    COLOR(192, 232)  CUR(0)  LINECOLOR(75)          TABORDER(0)  IOORDER(23)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  OUTPUT8(991, 151, 1126, 169)  LEN(12)  IO_MIXED|AL_LEFT|    COLOR(192, 232)  CUR(0)  LINECOLOR(75)          TABORDER(0)  IOORDER(24)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  GUIDE(768, 8, 1507, 26)        COLOR(66, 69)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL4(797, 172, 882, 190)  '처리일'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL5(797, 192, 882, 210)  '처리일련번호'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  TrxDt(886, 172, 980, 190)  LEN(8)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(17)  IOORDER(8)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  TrxSeqno(886, 193, 980, 211)  LEN(10)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("+000000000")          TABORDER(18)  IOORDER(9)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  ClntNm(990, 172, 1125, 190)  LEN(40)  IO_MIXED|AL_LEFT|    COLOR(192, 232)  CUR(0)  LINECOLOR(75)          TABORDER(0)  IOORDER(25)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  IsuNm(990, 192, 1125, 210)  LEN(40)  IO_MIXED|AL_LEFT|    COLOR(192, 232)  CUR(0)  LINECOLOR(75)          TABORDER(0)  IOORDER(26)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  OUTPUT9(990, 212, 1125, 230)  LEN(10)  IO_NUM|AL_LEFT|    COLOR(192, 232)  CUR(0)  LINECOLOR(75)          TABORDER(0)  IOORDER(27)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  mainMap(1228, 153, 1348, 171)  LEN(8)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(19)  IOORDER(28)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  acnt(1228, 178, 1283, 198)  LEN(11)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(20)  IOORDER(29)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  f_gubn(1228, 203, 1283, 223)  LEN(2)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(21)  IOORDER(30)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  flag(1289, 178, 1344, 198)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("0")          TABORDER(22)  IOORDER(31)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL7(788, 235, 1453, 265)  '투자성향에 적합하지 않은 거래 확인'  LINECOLOR(0)      COLOR(74, 76)  CUR(0)    AL_CENTER  FONT("굴림", 10, BOLD)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  psnYn(1289, 203, 1344, 223)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("1")          TABORDER(23)  IOORDER(32)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL2(805, 309, 888, 327)  '가입상품   : '  AL_LEFT  FONT("굴림체", 9, BOLD)  CUR(0)      COLOR(208, 69)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_NONE)
+OUT  fund_name(1050, 235, 1550, 270)  LEN(40)  IO_MIXED|AL_CENTER||FA_SKIP  FONT("굴림체", 12, BOLD)    COLOR(240, 232)  CUR(0)            TABORDER(0)  IOORDER(33)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL0(816, 796, 1416, 813)  'IBK투자증권으로부터 투자권유를 받지 않았으며, 본인의 판단으로 가입합니다.'        COLOR(208, 36054731)  CUR(0)    AL_LEFT  FONT("굴림체", 10, BOLD)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_NONE)
+OUT  zGrdNm(1378, 45, 1457, 63)  LEN(40)  IO_MIXED|AL_LEFT|  FONT("굴림체", 9, BOLD)    COLOR(66, 69)  CUR(0)            TABORDER(0)  IOORDER(34)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL1(805, 348, 1434, 758)  LINECOLOR(216)      COLOR(240, 69)  CUR(0)    AL_CENTER    ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL3(823, 593, 1373, 610)  '1. 투자자성향 대비 위험도가 높은 투자성 상품 가입 시 금융회사는 투자권유를 할 수'        COLOR(240, 130)  CUR(0)    AL_LEFT  FONT("굴림", 10, BOLD)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL8(836, 610, 936, 627)  ' 없으므로'        COLOR(240, 130)  CUR(0)    AL_LEFT  FONT("굴림", 10, BOLD)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL11(823, 634, 1373, 651)  '2. 귀하께서 투자권유를 희망하지 않는 경우 금융회사는 적합성 원칙 준수 의무를'        COLOR(240, 130)  CUR(0)    AL_LEFT  FONT("굴림", 10, BOLD)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL15(823, 676, 1293, 693)  '3. '        COLOR(240, 130)  CUR(0)    AL_LEFT  FONT("굴림", 10, BOLD)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL4(836, 652, 1036, 669)  ' 부담하지 않습니다.'        COLOR(240, 130)  CUR(0)    AL_LEFT  FONT("굴림", 10, BOLD)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL12(841, 676, 1371, 693)  '투자 시 원금손실이 발생할 수 있으며, 투자손익에 대한 책임은 모두 고객에게 귀속'        COLOR(240, 42350335)  CUR(0)    AL_LEFT  FONT("굴림", 10, BOLD)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL13(1364, 676, 1419, 693)  '됩니다.'        COLOR(240, 130)  CUR(0)    AL_LEFT  FONT("굴림", 10, BOLD)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL14(823, 704, 1373, 721)  '4. 투자자성향 대비 고위험 상품에 투자하는 경우에는                              '        COLOR(240, 130)  CUR(0)    AL_LEFT  FONT("굴림", 10, BOLD)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL16(836, 722, 1036, 739)  ' 있습니다.'        COLOR(240, 130)  CUR(0)    AL_LEFT  FONT("굴림", 10, BOLD)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL19(1372, 704, 1417, 721)  '할 수'        COLOR(240, 130)  CUR(0)    AL_LEFT  FONT("굴림", 10, BOLD)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL17(1165, 704, 1376, 721)  '예상보다 더 큰 폭의 손실이 발생'        COLOR(240, 42350335)  CUR(0)    AL_LEFT  FONT("굴림", 10, BOLD)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL9(901, 610, 1111, 627)  '본인 판단 하에 투자여부를 결정'        COLOR(240, 42350335)  CUR(0)    AL_LEFT  FONT("굴림", 10, BOLD)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL10(1104, 610, 1219, 627)  '하셔야 합니다.'        COLOR(240, 130)  CUR(0)    AL_LEFT  FONT("굴림", 10, BOLD)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL2(823, 411, 1343, 428)  ' 아래 내용을 반드시 읽고 확인절차를 거쳐 주시기 바랍니다.'        COLOR(240, 130)  CUR(0)    AL_LEFT  FONT("굴림", 9, NORMAL)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL18(823, 431, 1423, 448)  ' 본 확인서는 향후 분쟁또는 소송이 발생하는 경우 귀하의 권리 구제에 불리하게 사용될 수 있습니다. '        COLOR(240, 130)  CUR(0)    AL_LEFT  FONT("굴림", 9, NORMAL)  ENABLE  &
+  HINTTYPE(IH_NONE)
+TABLE  TABLE4(1007, 459, 1177, 529)  MATRIX(2, 1)  LINECOLOR(96)  CELLH(35)  AUTOSIZE    FONT("굴림체", 11, NORMAL)|XHLINE  EDIT_NOP    &
+	COLINFO("Row11")  LEN(0)  WIDTH(80)  HEAD("투자자성향")  COLALIGN(AL_CENTER, AL_CENTER)  HEADCOLOR(96, 97)  IO_NUM    COLOR(68, 69)  COLCUR(0, 0)  COLHINTTYPE(IH_NONE)    COLUMN_VISIBLE  &
+	COLINFO("Row10")  LEN(0)  WIDTH(80)  HEAD("상품위험등급")  COLALIGN(AL_CENTER, AL_CENTER)  HEADCOLOR(96, 97)  IO_NUM    COLOR(68, 69)  COLCUR(0, 0)  COLHINTTYPE(IH_NONE)    COLUMN_VISIBLE  IOORDER(0)  ENABLE
+OUT  tujaNM(1028, 351, 1258, 386)  LEN(40)  IO_MIXED|AL_CENTER||FA_ZEROSUP|FA_SKIP|SA_SPACE  FONT("굴림체", 12, BOLD)    COLOR(192, 69)  CUR(0)            TABORDER(0)  IOORDER(35)  &
+  HINTTYPE(IH_NONE)
+OUT  tujasang(1288, 351, 1518, 386)  LEN(40)  IO_MIXED|AL_CENTER||FA_ZEROSUP|FA_SKIP|SA_SPACE  FONT("굴림체", 12, BOLD)    COLOR(192, 69)  CUR(0)            TABORDER(0)  IOORDER(36)  &
+  HINTTYPE(IH_NONE)
+BOX  BOX1(1007, 494, 1411, 495)    COLOR(75, 75)  LINEW(1)  BX_LINE    ENABLE  &
+  HINTTYPE(IH_NONE)
+TABLE  TABLE0(826, 459, 1006, 529)  MATRIX(1, 1)  LINECOLOR(96)  CELLH(35)  AUTOSIZE    FONT("굴림체", 11, NORMAL)|XHLINE  EDIT_NOP    &
+	COLINFO("Row11")  LEN(0)  WIDTH(80)  HEAD("적합성 진단결과")  COLALIGN(AL_CENTER, AL_CENTER)  HEADCOLOR(96, 97)  IO_NUM    COLOR(68, 69)  COLCUR(0, 0)  COLHINTTYPE(IH_NONE)    COLUMN_VISIBLE  IOORDER(0)  ENABLE
+BOX  BOX0(826, 459, 1411, 460)    COLOR(75, 75)  LINEW(1)  BX_LINE    ENABLE  &
+  HINTTYPE(IH_NONE)
+BOX  BOX2(826, 528, 1411, 529)    COLOR(75, 75)  LINEW(1)  BX_LINE    ENABLE  &
+  HINTTYPE(IH_NONE)
+BOX  BOX3(826, 459, 827, 529)    COLOR(75, 75)  LINEW(1)  BX_LINE    ENABLE  &
+  HINTTYPE(IH_NONE)
+BOX  BOX4(1006, 459, 1007, 529)    COLOR(75, 75)  LINEW(1)  BX_LINE    ENABLE  &
+  HINTTYPE(IH_NONE)
+BOX  BOX5(1177, 459, 1178, 529)    COLOR(75, 75)  LINEW(1)  BX_LINE    ENABLE  &
+  HINTTYPE(IH_NONE)
+BOX  BOX6(1411, 459, 1412, 529)    COLOR(75, 75)  LINEW(1)  BX_LINE    ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL5(823, 363, 1373, 380)  '본 확인서는 투자자가 본인의 투자성향에 적합(적정)하지 않은 투자성 상품에 대한'        COLOR(240, 130)  CUR(0)    AL_LEFT  FONT("굴림", 10, BOLD)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL6(823, 382, 1373, 399)  '거래 의사를 확인하기 위해 마련되었습니다.'        COLOR(240, 130)  CUR(0)    AL_LEFT  FONT("굴림", 10, BOLD)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL20(826, 558, 896, 583)  '유의사항'    |IMAGETEXT|AL_STRETCH    COLOR(240, 76)  CUR(0)    "매수.BMP"FONT("굴림", 9, NORMAL)  ENABLE  &
+  IMAGETEXT  HINTTYPE(IH_NONE)
+PANEL  PANEL21(615, 830, 735, 860)  LINECOLOR(11)      COLOR(208, 232)  CUR(10)    AL_CENTER    ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+PANEL  PANEL22(760, 830, 880, 859)  TP_RAISED      COLOR(208, 232)  CUR(10)    AL_LEFT    ENABLE  &
+  VISIBLE  VERTICAL  TRANSPARENT  HOVER  GRADIENT(0, 0)  HINTTYPE(IH_NONE)
+OBJECT  OBJECT1(0, 0, 640, 720)    "IB498708"  TABORDER(25)  IOORDER(38)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  OBJECT0(0, 0, 640, 720)    "IB498707"  TABORDER(24)  IOORDER(37)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  mapN(640, 200, 730, 225)  LEN(8)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(26)  IOORDER(39)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Sub SetObject(gubn)
+	If gubn = "0"Then
+		OBJECT0.Visible = True
+		OBJECT1.Visible = False
+	Else
+		OBJECT0.Visible = False
+		OBJECT1.Visible = True
+	End If
+End Sub
+
+
+Sub SendData()
+	AddAuth()
+End Sub
+
+Sub SetAuth()
+	'SYSTEM.Push "rp_masu_confirm", "YES"
+	SYSTEM.Push "FD_IB498706", ""
+	SYSTEM.Push "bNoSuitable", ""
+	SYSTEM.Trigger "SetAuth", "", mapN.Data
+	SYSTEM.Push "FD_IB498706_Y","Y"
+	SCREEN.CloseWindow
+End Sub
+
+Sub AddAuth()
+	Dim dmsg
+	dmsg = "Rmnno"    & vbTab & Trim(LOGIN.Juno)	& vbLf &_
+		   "o_amt"    & vbTab & Trim("000000000000000")	& vbLf
+	SYSTEM.Push "FD_IB498706", "OK"
+	SYSTEM.Push "bNoSuitable", "ok"
+	'	dmsg =  '"o_name"   & vbTab & Mid(Trim(CMB_MY.Text), 5) & vbLf &_
+			'"gubn"     & vbTab & Trim(gubn.Data)           & vbLf &_
+			'"o_man"    & vbTab & Trim(OUT_ACNM.Data)       & vbLf &_
+			'"o_amt"    & vbTab & Trim(AMT.Data)	           & vbLf &_
+			'"Rmnno"    & vbTab & Trim(LOGIN.Juno)	& vbLf
+	SCREEN.CreateWindow 3, "IB810195 /t/d/p5/s/d", dmsg
+
+End Sub
+
+_AW_ONINDECLARE_AW_
+#Load IB888833
+
+_AW_ONENDSUB_AW_
+_AW_ONSTART_AW_
+fund_type.Data = f_tran.Data
+fund_status.data = domino.Data
+fund_name.Data = f_name.Data
+
+EDIT1.Data = "5" ' 확인구분 : 집합투자증권(수익증권) => 5
+'EDIT2.Data = LOGIN.Juno
+EDIT3.Data = Trim(acnt.Data)
+EDIT5.Data = f_num.Data
+'상품위험등급
+
+tujasang.Data = Trim(domino.Data)
+
+
+SYSTEM.Push "FD_IB498706_Y","N"
+
+'투자자성향
+tujaNM.Data = Trim(zGrdNm.Data)
+
+
+
+
+	Select Case Trim(tujasang.Data)
+		Case "매우낮은위험" :
+			tujasang.TRgb = "39853824"
+		Case "낮은위험" :
+			tujasang.TRgb = "46100224"
+		Case "보통위험" :
+			tujasang.TRgb = "38842368"
+		Case "다소높은위험" :
+			tujasang.TRgb = "33603839"
+		Case "높은위험" :
+			tujasang.TRgb = "33580799"
+		Case "매우높은위험" :
+			tujasang.TRgb = "33554687"
+	End Select
+
+	Select Case Trim(tujaNM.Data)
+		Case "안정형" :
+			tujaNM.TRgb = "39853824"
+		Case "안정추구형" :
+			tujaNM.TRgb = "38842368"
+		Case "위험중립형" :
+			tujaNM.TRgb = "33603839"
+		Case "적극투자형" :
+			tujaNM.TRgb = "33580799"
+		Case "공격투자형" :
+			tujaNM.TRgb = "33554687"
+	End Select
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+EDIT3.Data = Trim(acnt.Data)
+EDIT5.Data = f_num.Data
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+If Left(Trim(LEDGER.Ecod), 1) = "0" Then
+'	flag.Data = "1"
+'	dmsg = "f_name" 	  & vbTab & Trim(f_name.Data) 		& vbLf &_
+'		   "f_num" 	   	  & vbTab & Trim(f_num.Data) 		& vbLf &_
+'		   "f_tran" 	  & vbTab & Trim(f_tran.Data) 		& vbLf &_
+'		   "fund_Dtl"     & vbTab & Trim(fund_Dtl.Data) 	& vbLf &_
+'		   "fund_DtlCode" & vbTab & Trim(fund_DtlCode.Data) & vbLf &_
+'		   "domino" 	  & vbTab & Trim(domino.Data) 	    & vbLf &_
+'		   "mainMap"	  & vbTab & Trim(mainMap.Data)		& vbLf &_
+'		   "acnt"		  & vbTab & Trim(acnt.Data)			& vbLf &_
+'		   "psnYn"	      & vbTab & Trim(psnYn.Data)		& vbLf &_
+'		   "zGrdNm"	   	  & vbTab & Trim(zGrdNm.Data)	 	& vbLf &_
+'		   "flag"		  & vbTab & Trim(flag.Data)			& vbLf
+
+'	If fund_DtlCode.Data = "84" Then
+'		SCREEN.CreateWindow 1, "IB498796 /p1 /d", dmsg
+'	ElseIf fund_DtlCode.Data = "6D" Then
+'		SCREEN.CreateWindow 1, "IB498797 /p1 /d", dmsg
+'	Else
+'		SCREEN.CreateWindow 1, "IB498725 /p1 /d", dmsg
+'	End If
+
+'	SCREEN.CloseWindow
+	SCREEN.Proc "parent.inform_popup1",""
+Else
+	alert_msg(Trim(LEDGER.Emsg))
+End If
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(BUTTON0)
+_AW_ONCLICK_AW_
+If confirm.Checked = True Then
+	SCREEN.Send 0
+Else
+	MsgBox "고객 확인사항을 읽고 체크박스를 선택 후 등록하여 주십시오.", ,"IBK투자증권"
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON1)
+_AW_ONCLICK_AW_
+SCREEN.CloseWindow
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(PANEL21)
+_AW_ONCLICK_AW_
+
+SCREEN.CloseWindow
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(PANEL22)
+_AW_ONCLICK_AW_
+	flag.Data = "1"
+	dmsg = "f_name" 	  & vbTab & Trim(f_name.Data) 		& vbLf &_
+		   "f_num" 	   	  & vbTab & Trim(f_num.Data) 		& vbLf &_
+		   "f_tran" 	  & vbTab & Trim(f_tran.Data) 		& vbLf &_
+		   "fund_Dtl"     & vbTab & Trim(fund_Dtl.Data) 	& vbLf &_
+		   "fund_DtlCode" & vbTab & Trim(fund_DtlCode.Data) & vbLf &_
+		   "domino" 	  & vbTab & Trim(domino.Data) 	    & vbLf &_
+		   "mainMap"	  & vbTab & Trim(mainMap.Data)		& vbLf &_
+		   "acnt"		  & vbTab & Trim(acnt.Data)			& vbLf &_
+		   "psnYn"	      & vbTab & Trim(psnYn.Data)		& vbLf &_
+		   "zGrdNm"	   	  & vbTab & Trim(zGrdNm.Data)	 	& vbLf &_
+		   "flag"		  & vbTab & Trim(flag.Data)			& vbLf
+
+	If fund_DtlCode.Data = "84" Then
+		SCREEN.CreateWindow 1, "IB498796 /p1 /d", dmsg
+	ElseIf fund_DtlCode.Data = "6D" Then
+		SCREEN.CreateWindow 1, "IB498797 /p1 /d", dmsg
+	Else
+		SCREEN.CreateWindow 1, "IB498725 /p1 /d", dmsg
+	End If
+
+	SCREEN.CloseWindow
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

@@ -1,0 +1,79 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB6666XX)
+MAPSIZE(69, 453)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("비밀번호검증")
+MAPPUBLIC(";")
+FONT("MS Sans Serif", 9, NORMAL)
+OPTIONS(ENCODE)
+TITLE("비밀번호검증")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pibo6316")
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+BUTTON  BUTTON0(365, 25, 445, 65)  TP_PUSH      AL_CENTER    FOCUS  COLOR(208, 232)  CUR(0)      TABORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL105(6, 5, 116, 25)  '입력'  LINECOLOR(75)      COLOR(74, 76)  CUR(0)    AL_CENTER    ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  cod2(115, 5, 225, 25)  LEN(12)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(2)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL6(225, 5, 335, 25)  '유효여부'  LINECOLOR(75)      COLOR(74, 76)  CUR(0)    AL_CENTER    ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  gubn(335, 5, 445, 25)  LEN(1)  IO_MIXED|AL_CENTER|    COLOR(192, 69)  CUR(0)  LINECOLOR(0)          TABORDER(0)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONSEND_AW_
+Select Case SCREEN.GetMapName(1)
+	Case "IB630100" cod2.Data = SCREEN.Object("main.obj_jumn.sycd").data
+	Case "IB650100"	cod2.Data = SCREEN.Object("main.obj_jumn.cgcd").data
+	Case "IB670100"	cod2.Data = SCREEN.Object("main.obj_jumn.jscd").data
+	Case "IB650000"	cod2.Data = SCREEN.Object("main.obj_Odr.sycd").data
+End Select
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+If SCREEN.GetMapName(1) <> "IB650000" Then
+	Select Case gubn.Data
+		Case "0"	SCREEN.Object("main.obj_jumn.ed_jprc").SetType(350)
+		Case "1"	SCREEN.Object("main.obj_jumn.ed_jprc").SetType(351)
+		Case "2"	SCREEN.Object("main.obj_jumn.ed_jprc").SetType(352)
+	End Select
+Else
+	Select Case gubn.Data
+		Case "0"	SCREEN.Object("main.obj_Odr.ed_jprc").SetType(350)
+		Case "1"	SCREEN.Object("main.obj_Odr.ed_jprc").SetType(351)
+		Case "2"	SCREEN.Object("main.obj_Odr.ed_jprc").SetType(352)
+	End Select
+End If
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(BUTTON0)
+_AW_ONCLICK_AW_
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

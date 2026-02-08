@@ -1,0 +1,112 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(TTT98765)
+MAPSIZE(211, 518)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(FMS|FLASH|CR2TAB)
+TITLE("[6954]분류명검색")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL8(0, 0, 185, 212)        COLOR(66, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL3(22, 10, 85, 30)  '세세분류명'  AL_LEFT  CUR(0)      COLOR(66, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  CodeVal(20, 35, 175, 55)  LEN(100)  IO_MIXED|EDIT_INPUT|FA_XFLOAT    COLOR(192, 232)  CUR(0)  TP_SUNKEN          TABORDER(1)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  send_btn(135, 70, 172, 90)  '조회'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, BOLD)  FOCUS  COLOR(208, 186)  CUR(0)    "조회BTN.bmp"    TABORDER(2)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+PANEL  PANEL4(185, -1, 518, 211)  LIMAGE(0)  LINEW(3)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    RESIZABLE  AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL40(0, 211, 185, 213)        COLOR(64, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+GRID  GRID0(195, 4, 509, 207)  VISIBLEROW(10)  CELLH(18)  MATRIX(2000, 2)  FIX(0)  MAINCOLOR(7, 0)  LINECOLOR(75)  FOCUSCOLOR(78)  FOCUSKIND(3)    FONT("굴림체", 9, NORMAL)  VARIANT("$?")  ROWC(68, 77)  |FLEXIBLE|VSCROLL|INS_TOP|NO3D|RROW|XHLINE|GRFTEXT    &
+	COLINFO("CmnCsldtCode")  LEN(10)  WIDTH(76)  HEAD("세세분류코드")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("CodeVal")  LEN(100)  WIDTH(220)  HEAD("세세분류명")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT  |FA_CORGB|SA_CORAW    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(94, 95)    HNORMAL  SORTSTARTPOS(0)    TABORDER(3)  IOORDER(2)  ENABLE  &
+  VISIBLE
+
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Dim ReadData(2000)
+'==파일 읽기
+Sub Read_f()
+	Dim FSO, F, i
+	Set FSO = CreateObject("Scripting.FileSystemObject")
+	Set F = FSO.OpenTextFile(SYSTEM.Home & "\tab\KRSTCODE.dat", 1)
+	i = 0
+	Do While F.AtEndOfLine <> True
+		ReadData(i) = F.ReadLine
+		i = i + 1
+	Loop
+End Sub
+		
+
+'== 조회
+'Sub send_f()
+'	GRID0.Clear
+	'Dim FSO, F, ReadData 
+'	Dim Code, Value, Arry, tmp
+'	grows = 0
+	'Set FSO = CreateObject("Scripting.FileSystemObject")
+	'Set F = FSO.OpenTextFile(SYSTEM.Home & "\tab\KRSTCODE.dat", 1)
+	'Do While F.AtEndOfLine <> True
+'		ReadData = F.ReadLine
+'		Arry = Split(ReadData, vbTab, -1 ,1)
+'		Code = Arry(0)
+'		Value = Arry(1)
+'		If Len(Trim(Code)) = 5 Then
+'			If InStr(1, Value, Trim(CodeVal.Data), 1)  > 0 Then
+				grows = grows + 1
+'				GRID0.InsertRow(-1)
+'				GRID0.SetGridCell grows, 1, Code
+'				GRID0.SetGridCell grows, 2, Value
+'			End If
+'		End If
+'	Loop
+'End Sub
+
+_AW_ONINDECLARE_AW_
+#load IB888888
+
+_AW_ONENDSUB_AW_
+_AW_ONSTART_AW_
+CodeVal.SetFocus
+Call Read_f()
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(send_btn)
+_AW_ONCLICK_AW_
+'Call send_f()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(GRID0)
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

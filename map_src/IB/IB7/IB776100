@@ -1,0 +1,75 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB776100)
+MAPSIZE(557, 684)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("기업분석")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(FMS)
+TITLE("[7761]동영상투자정보")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL0(0, 0, 1, 58)        COLOR(64, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+USRTAB  tab(0, 0, 690, 26)  FOCUS  INDEX(0)  COUNT(6)  AL_TOP  TAB_IMAGE      FONT("굴림체", 9, NORMAL)    COLOR(3, 70)  CUR(0)  TABIMAGE("tab.bmp")  FCOLOR(3, 71)  CAPTION("동영상 투자전략 홈", "유망주 투자전략", "고충주 대응전략", "주간 투자전략", "온라인 강의실", "애널리스트 특집")  TABINFO("1:0", "1:1", "1:2", "1:3", "0:4", "1:5")  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL63(-2, 26, 687, 733)  LIMAGE(0)  LINEW(4)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BROWSER  BROWSER0(8, 35, 679, 555)  EDIT_OUTPUT    IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  tabchange(5, 750, 20, 770)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("0")          TABORDER(1)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONSTART_AW_
+tab.ID = tabchange.Data
+If tab.ID = 1 Then
+BROWSER0.Navigate("http://web3.fnup.com/service/IBK/Live/ifm_vodList.asp?vodType=0&cf=HTS")
+Else
+BROWSER0.Navigate("http://web3.fnup.com/service/IBK/Live/ifm_main.asp?cf=HTS")
+End If
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(tab)
+_AW_ONCLICK_AW_
+Select Case tab.ID
+	Case 0
+		BROWSER0.Navigate("http://web3.fnup.com/service/IBK/Live/ifm_main.asp?cf=HTS")
+	Case 1
+		BROWSER0.Navigate("http://web3.fnup.com/service/IBK/Live/ifm_vodList.asp?vodType=0&cf=HTS")
+	Case 2
+		BROWSER0.Navigate("http://web3.fnup.com/service/IBK/Live/ifm_vodListC.asp?cf=HTS")
+	Case 3
+		BROWSER0.Navigate("http://web3.fnup.com/service/IBK/Live/ifm_vodList.asp?vodType=2&cf=HTS")
+	Case 4
+		BROWSER0.Navigate("http://web3.fnup.com/service/IBK/Live/ifm_vodList.asp?vodType=3&cf=HTS")
+	Case 5
+		BROWSER0.Navigate("http://web3.fnup.com/service/IBK/Live/ifm_vodList.asp?vodType=4&cf=HTS")
+End Select
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

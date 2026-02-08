@@ -1,0 +1,260 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(TT282001)
+MAPSIZE(160, 311)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("조기종료 현황")
+MAPPUBLIC(";")
+FONT("굴림", 9, NORMAL)
+OPTIONS(FLASH)
+TITLE("[2820] 조기종료 현황")
+TOPATH(AXIS)
+METHOD(MENU)
+TRXCODE("tt282000")
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL63(0, 0, 311, 160)        COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON0(225, 17, 262, 37)  '조회'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, BOLD)  FOCUS  COLOR(208, 186)  CUR(0)    "조회BTN.BMP"    TABORDER(1)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+GRID  GRID(0, 0, 206, 161)  VISIBLEROW(0)  CELLH(18)  MATRIX(2000, 6)  FIX(0)  MAINCOLOR(7, 0)  LINECOLOR(75)  FOCUSCOLOR(78)  FOCUSKIND(3)    FONT("굴림체", 9, NORMAL)  ROWC(68, 77)  |MERGE|SELALWAYS|FLEXIBLE|VSCROLL|NO3D|RROW|XHLINE|PAGE|KEYFOCUS|GRFTEXT    &
+	COLINFO("Col10")  LEN(4)  WIDTH(30)  HEAD("번호")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("021")  LEN(12)  WIDTH(60)  HEAD("RTS코드")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT  |FA_CORGB|FA_FLASH|SA_CORAW    COLOR(68, 69)  COLCUR(10, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("023")  LEN(12)  WIDTH(58)  HEAD("현재가")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT  |FA_ZEROSUP|FA_CORGB|SA_ZERO|SA_COSUP    COLOR(68, 69)  COLCUR(10, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(94, 95)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col0")  LEN(12)  WIDTH(30)  HEAD("직전값")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_MIXED|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("034")  LEN(8)  WIDTH(50)  HEAD("시간")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col1")  LEN(1)  WIDTH(22)  HEAD("갱신플래그")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_NUM|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    TABORDER(2)  IOORDER(3)  ENABLE  &
+  VISIBLE
+
+EDIT  page(265, 103, 300, 123)  LEN(4)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_SUNKEN  INIT("1")          TABORDER(3)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL1(225, 104, 264, 122)  'PAGE'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  gubn(265, 77, 300, 97)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_SUNKEN  INIT("2")          TABORDER(4)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL0(225, 78, 264, 96)  '구분'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON1(225, 42, 262, 62)  '조회'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, BOLD)  FOCUS  COLOR(208, 186)  CUR(0)    "조회BTN.BMP"    TABORDER(5)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+LABEL  LABEL2(210, 0, 305, 20)  'Label'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Dim pgrid
+Dim today
+'-----------------------------------------------------------------------
+Function TimeDiff(ATime, BTime)
+	AHour = ATime \ 10000
+	AMin = (ATime Mod 10000) \ 100
+	ASec = ATime Mod 100
+	ASecTime = AHour*3600 + AMin*60 + ASec
+	
+	BHour = BTime \ 10000
+	BMin = (BTime Mod 10000) \ 100
+	BSec = BTime Mod 100
+	BSecTime = BHour*3600 + BMin*60 + BSec
+	
+	RSecTime = BSecTime - ASecTime
+	If (RSecTime < 0) Then
+		TimeDiff = 0
+	Else
+		TimeDiff = (RSecTime\3600)*10000 + ((RSecTime Mod 3600)\60)*100 + RSecTime Mod 60
+	End If
+	
+End Function
+'-----------------------------------------------------------------------
+Sub send_f(spage)
+	page.Data = spage
+	SCREEN.Send 0
+End Sub
+'-----------------------------------------------------------------------
+Set re = New RegExp
+re.Global = True
+re.IgnoreCase = True
+re.MultiLine = True
+re.Pattern = "[^0-9.\-\+]"
+Sub Onalert()
+	Dim prow, ret
+	Dim lval, rval, tval
+	For ii=1 To GRID.Rows
+
+		xval = Trim(GRID.GetGridCell(ii, 3))
+		rtim = re.Replace(GRID.GetGridCell(ii, 5), "")
+		ret = 0
+		For jj=1 To pgrid.Rows
+			lval = 0
+			rval = 0
+			tval = 0
+			grtp = Trim(pgrid.GetGridCell(jj, 5))	'권리유형
+			pgval = xval '예상평가가격
+			pamax = Trim(pgrid.GetGridCell(jj, 10)) '평가전체 최고가
+			pamin = Trim(pgrid.GetGridCell(jj, 11)) '평가전체 최저가
+			p1max = Trim(pgrid.GetGridCell(jj, 12)) '평가1구간 최고가
+			p1min = Trim(pgrid.GetGridCell(jj, 13)) '평가1구간 최저가
+			p2max = Trim(pgrid.GetGridCell(jj, 14)) '평가2구간 최고가
+			p2min = Trim(pgrid.GetGridCell(jj, 15)) '평가2구간 최저가
+
+			gjga = re.Replace(pgrid.GetGridCell(jj, 17), "") '발생기준가격
+			hsga = re.Replace(pgrid.GetGridCell(jj, 21), "")	'행사가격
+			bsre = re.Replace(pgrid.GetGridCell(jj, 19), "")	'지급비율
+			jhre = re.Replace(pgrid.GetGridCell(jj, 22), "")	'전환비율
+			jday = re.Replace(pgrid.GetGridCell(jj, 7), "")	'조기종료일
+			jtim = CDbl(re.Replace(pgrid.GetGridCell(jj, 8), ""))	'조기종료시간
+			actm = CLng(pgrid.GetGridCell(jj, 23))	'누적평가시간
+			esti = CLng(pgrid.GetGridCell(jj, 24))	'평가시작시간
+			
+			If jj = 1 Then
+				SYSTEM.Trace esti
+			End If
+
+			If CDbl(p1max) = 0 Then
+				pgrid.SetGridCell jj, 10, xval
+				pgrid.SetGridCell jj, 11, xval
+				pgrid.SetGridCell jj, 12, xval
+				pgrid.SetGridCell jj, 13, xval
+				pgrid.SetGridCell jj, 14, xval
+				pgrid.SetGridCell jj, 15, xval
+
+				pamax = xval
+				pamin = xval
+				p1max = xval
+				p1min = xval
+				p2max = xval
+				p2min = xval
+			ElseIf CDbl(p2max) = 0 Then
+				pgrid.SetGridCell jj, 14, xval
+				pgrid.SetGridCell jj, 15, xval
+				p2max = xval
+				p2min = xval
+			End If
+
+			If jday = Today Then
+				ret = chk_val(pamax, pamin, xval)	'1이면 최고값 경신, 2이면 최저값 경신
+
+				If ret > 0 Then
+					pgrid.SetGridCell jj, 9+ret, xval
+					SYSTEM.Trace "jj=["&jj&"] time=["&CDbl(rtim)&"]"
+					If CDbl(rtim) < 140000 Then	   '당일 오전 Knock OUT
+						pgrid.SetGridCell jj, 11+ret, xval
+					Else					'당일 오후 Knock OUT
+						pgrid.SetGridCell jj, 13+ret, xval
+					End If
+				End If
+			Else
+				ret = chk_val(pamax, pamin, xval)
+				If ret > 0 Then
+					If CLng(rtim) < 140000 Then
+						pgrid.SetGridCell jj, 9+ret, xval
+						pgrid.SetGridCell jj, 13+ret, xval
+					Else
+						TimeGap = TimeDiff(esti, rtim)
+						If (TimeGap + actm) < 30000 Then
+							pgrid.SetGridCell jj, 9+ret, xval
+							pgrid.SetGridCell jj, 13+ret, xval
+						Else
+							Exit Sub
+						End If
+					End If
+				End If
+			End If
+			igjga = CDbl(gjga)
+			ihsga = CDbl(hsga) / 100.0
+			ibsre = CDbl(bsre) / 100.0
+			ijhre = CDbl(jhre) / 1000000.0
+			ipval = CDbl(xval)
+			If grtp = "콜" And ret = 2 Then
+				pgrid.SetGridCell jj, 16+ret, xval
+				lval = (igjga-ihsga) * ibsre
+				rval = ipval-ihsga
+				If lval > rval Then
+					tval = lval*ijhre
+				Else
+					tval = rval*ijhre
+				End If
+'				SYSTEM.Trace "jj="&jj&" gjga="&igjga&" hsga="&ihsga&" xval="&ipval&" jhre="&ijhre&"]"
+'				SYSTEM.Trace "jj="&jj&" lval="&lval&" rval="&rval&" tval="&tval
+			ElseIf grtp = "풋" And ret = 1 Then
+				pgrid.SetGridCell jj, 17+ret, xval
+				lval = (ihsga-igjga) * ibsre
+				rval = ihsga-ipval
+				If lval > rval Then
+					tval = lval*ijhre
+				Else
+					tval = rval*ijhre
+				End If
+			End If
+			If ret <> 0 Then
+				pgrid.SetGridCell jj, 20, tval
+			End If
+'			If ret <> 0 Then
+'				SYSTEM.Trace "ret="&ret&" gjga="&igjga&" hsga="&ihsga&" bsre="&ibsre&" jhre="&ijhre
+'			End If
+
+			'pgrid.SetGridCell jj, 10, xval
+		Next
+'		xval = Trim(GRID.GetGridCell(ii, 3))
+'		yval = Trim(GRID.GetGridCell(ii, 4))
+'		SYSTEM.Trace "xval=["&xval&"] yval=["&yval&"]"
+'		If xval = yval Then
+'			GRID.SetGridCell ii, 5, "0"
+'		Else
+'			GRID.SetGridCell ii, 4, xval
+'			GRID.SetGridCell ii, 5, "1"
+'		End If
+	Next
+End Sub
+
+Function chk_val(max, min, curr)
+	If CDbl(max) < CDbl(curr) Then
+		chk_val = 1
+	ElseIf CDbl(min) > CDbl(curr) Then
+		chk_val = 2
+	Else
+		chk_val = 0
+	End If
+End Function
+
+_AW_ONSTART_AW_
+Set pgrid = SCREEN.Object("parent.GRID1")
+today = Replace(Date, "-", "")
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(BUTTON0)
+_AW_ONCLICK_AW_
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(GRID)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON1)
+_AW_ONCLICK_AW_
+Call Onalert()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

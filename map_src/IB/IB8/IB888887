@@ -1,0 +1,500 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB888887)
+MAPSIZE(681, 905)
+VERSION(000)
+MAPKIND(PROCEDURES)
+MAPGROUP(0)
+MAPDESC("선물_체결실시간")
+MAPPUBLIC(";")
+FONT("굴림", 9, NORMAL)
+TITLE("[8887] 선물_체결실시간")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+'****************************************************************************************************************************
+' 주문번호 : c_jmno, 원주문번호 : c_ojno,  종목코드 : c_code, 종목명   : c_hnam, 주문구분 : c_jmgb,  호가구분  : c_hogb,
+' 주문가격 : c_jprc, 주문수량 : c_jqty,    체결시간 : c_time, 체결수량 : c_dqty, 체결가격 : c_dprc, 미체결수량 : c_wqty, 주문상태 : c_stat
+' 정정취소수량합: c_hqty
+'****************************************************************************************************************************
+' DESC :  선물  실시간 주문 체결
+'****************************************************************************************************************************
+
+Sub sCont_Notice(RTSGRID, VIEWGRID)
+Dim r_stat, r_jmno, r_ojno, row_F, row_O
+	r_stat = Trim(RTSGRID.GetGridCell(1, 11))					' 접수구분
+	r_jmno = Trim(RTSGRID.GetGridCell(1, 2))						' 주문번호
+	r_ojno = Trim(RTSGRID.GetGridCell(1, 3))						' 원주문번호
+
+	If InStr(r_stat,"접수") > 0 Then									' 기본셋팅
+		Call RTSGRID.SetGridCell (1,13, "0")
+		Call RTSGRID.SetGridCell (1,14, "0")
+	ElseIf r_stat = "거부" Or r_stat = "접수오류" Then
+		Call RTSGRID.SetGridCell (1, 13, "0")
+		Call RTSGRID.SetGridCell (1, 14, "0")
+	End If
+
+' *********     VIEWGRID가 empty일 경우     *********
+	If VIEWGRID.Rows = 0 Then
+		VIEWGRID.InsertRow 0
+		Update_Row(1)
+		RTSGRID.RemoveRow 0
+		Exit Sub
+	End If
+
+	row_F = Find_Row(r_jmno)
+	Update_Row_1(row_F)
+' ********* 동일한 주문번호가 존재하는 경우 *********
+	If row_F > 0 Then
+		If r_stat = "체결" Then
+			Call Modify_dqty(RTSGRID.GetGridCell(1, 13), row_F)
+
+			RTSGRID.RemoveRow 0
+			Exit Sub
+		ElseIf r_stat = "정정확인" Or r_stat = "취소확인" Then
+			row_O = Find_Row(r_ojno)
+'			If row_O > 0 And r_stat = "정정확인"	Then
+			If row_O > 0 Then
+					Modify_wqty(row_O)		' 원주문의 미체결 계산
+					Modify_hqty(row_O)		' 원주문의 정취량
+			End If
+
+'			VIEWGRID.SetGridCell row_F, c_hqty, Trim(RTSGRID.GetGridCell(1, 13))					'정정/취소수량
+			VIEWGRID.SetGridCell row_F, c_wqty, Trim(RTSGRID.GetGridCell(1, 8))						' 미체결수량
+			VIEWGRID.SetGridCell row_F, c_stat, Trim(RTSGRID.GetGridCell(1,11))						' 접수구분
+			RTSGRID.RemoveRow 0
+			Exit Sub
+		ElseIf r_stat = "거부" Or r_stat = "접수오류" Then
+
+		ElseIf InStr(r_stat,"접수") > 0 Then
+
+		Else
+			RTSGRID.RemoveRow 0
+			Exit Sub
+		End If
+' ********* 일치하는 주문번호가 없는경우 *********
+	Else
+		If r_stat = "정정확인" Or r_stat = "취소확인" Then
+			row_O = Find_Row(r_ojno)
+'			If row_O > 0 And r_stat = "정정확인"	Then
+			If row_O > 0 Then
+					Modify_wqty(row_O)		' 원주문의 미체결 계산
+					Modify_hqty(row_O)		' 원주문의 정취량
+			End If
+
+			Call RTSGRID.SetGridCell (1, 13, "0")
+			Call RTSGRID.SetGridCell (1, 14, "0")
+		End If
+		VIEWGRID.InsertRow 0
+		row_F = 1
+	End If
+
+	Update_Row(row_F)
+	RTSGRID.RemoveRow 0
+End Sub
+
+'****************************************************************************************************************************
+' DESC :  선물  실시간 주문  미체결
+'****************************************************************************************************************************
+Sub sNCont_Notice(RTSGRID, VIEWGRID)
+Dim r_stat, r_jmno, r_ojno, row_F, row_O, wqty, r_time
+	r_stat = Trim(RTSGRID.GetGridCell(1, 11))					' 접수구분
+	r_jmno = Trim(RTSGRID.GetGridCell(1, 2))						' 주문번호
+	r_ojno = Trim(RTSGRID.GetGridCell(1, 3))						' 원주문번호
+	r_wqty = Trim(RTSGRID.GetGridCell(1, 8))						' 미체결수량
+	If r_wqty = "" Then r_wqty = "0"
+	r_time = Trim(RTSGRID.GetGridCell(1, 15))						' 체결시간
+
+	SYSTEM.Trace "sNCont_Notice[" & r_time & "]"
+
+	If InStr(r_stat,"접수") > 0 Then									' 기본셋팅
+		Call RTSGRID.SetGridCell (1,13, "0")
+		Call RTSGRID.SetGridCell (1,14, "0")
+	ElseIf r_stat = "거부" Or r_stat = "접수오류" Then
+		Call RTSGRID.SetGridCell (1, 13, "0")
+		Call RTSGRID.SetGridCell (1, 14, "0")
+	End If
+
+' *********     VIEWGRID가 empty일 경우     *********
+	If VIEWGRID.Rows = 0 Then
+		If CDbl(r_wqty) > 0 Then
+			VIEWGRID.InsertRow 0
+			Update_Row(1)
+		End If
+		RTSGRID.RemoveRow 0
+		Exit Sub
+	End If
+
+	row_F = Find_Row(r_jmno)
+	Update_Row_1(row_F)
+' ********* 동일한 주문번호가 존재하는 경우 *********
+
+	If row_F > 0 Then
+		If r_stat = "체결" Then
+			Call Modify_dqty(RTSGRID.GetGridCell(1, 13), row_F)
+
+			If CDbl(r_wqty) < 1 Then
+				VIEWGRID.RemoveRow row_F-1
+			End If
+			RTSGRID.RemoveRow 0
+			Exit Sub
+		ElseIf r_stat = "정정확인" Or r_stat = "취소확인" Then
+			row_O = Find_Row(r_ojno)
+'			If row_O > 0 And r_stat = "정정확인"	Then
+			If row_O > 0 Then
+					Modify_wqty(row_O)
+					wqty = Trim(VIEWGRID.GetGridCell (row_O, c_wqty))
+					If wqty = "" Then wqty = "0"
+
+					If CDbl(wqty) < 1 Then
+							VIEWGRID.RemoveRow row_O-1
+					End If
+			End If
+
+			VIEWGRID.SetGridCell row_F, c_wqty, r_wqty												' 미체결수량
+			VIEWGRID.SetGridCell row_F, c_stat, Trim(RTSGRID.GetGridCell(1,11))						' 접수구분
+			RTSGRID.RemoveRow 0
+
+			If CDbl(r_wqty) < 1 Then
+				VIEWGRID.RemoveRow row_F-1
+			End If
+			Exit Sub
+		ElseIf r_stat = "거부" Or r_stat = "접수오류" Then
+		ElseIf InStr(r_stat,"접수") > 0 Then
+		Else
+			RTSGRID.RemoveRow 0
+			Exit Sub
+		End If
+' ********* 일치하는 주문번호가 없는경우 *********
+	Else
+
+		If r_stat = "정정확인" Or r_stat = "취소확인" Then
+			row_O = Find_Row(r_ojno)
+'			If row_O > 0 And r_stat = "정정확인"	Then
+			If row_O > 0 Then
+					Modify_wqty(row_O)
+					wqty = Trim(VIEWGRID.GetGridCell (row_O, c_wqty))
+					If wqty = "" Then wqty = "0"
+
+					If CDbl(wqty) < 1 Then
+							VIEWGRID.RemoveRow row_O-1
+					End If
+			End If
+
+			Call RTSGRID.SetGridCell (1, 13, "0")
+			Call RTSGRID.SetGridCell (1, 14, "0")
+		End If
+		VIEWGRID.InsertRow 0
+		row_F = 1
+	End If
+
+	If CDbl(r_wqty) < 1 Then
+		VIEWGRID.RemoveRow row_F-1
+		RTSGRID.RemoveRow 0
+		Exit Sub
+	End If
+	Update_Row(row_F)
+	RTSGRID.RemoveRow 0
+End Sub
+
+'****************************************************************************************************************************
+' DESC :  Help Funtion
+'****************************************************************************************************************************
+Sub Modify_dqty(amt, row_F)
+	Dim amt_T, amount, t_dprc, mkty, ccnt
+	amount = Trim(VIEWGRID.GetGridCell (row_F, c_dqty))													' 체결수량
+
+	' 분할체결 처리.
+	amount = Replace(amount, "※ ", "")
+	ccnt = Trim(RTSGRID.GetGridCell(1, 16))
+
+	If amount = "" Then	amount = "0"
+
+	amount = CDbl(amount) + CDbl(amt)
+'	amount = CDbl(amt)
+	Call VIEWGRID.SetGridCell (row_F, c_dqty, amount)
+	Call VIEWGRID.SetGridCell (row_F, c_stat, Trim(RTSGRID.GetGridCell(1,11)))					' 처리구분
+	Call VIEWGRID.SetGridCell (row_F, c_wqty, Trim(RTSGRID.GetGridCell(1,8)))						' 미체결수량
+
+	' 분할체결 처리.
+	Call VIEWGRID.SetGridCell (row_F, 24, ccnt)
+	Call SetChegCountDisplay(VIEWGRID, 15, 24, row_F)
+
+	If Trim(RTSGRID.GetGridCell(1, 14)) <> "" Then
+'		If Mid(Trim(RTSGRID.GetGridCell(1, 4)),2,1) = "0" Then
+		mkty = Mid(Trim(RTSGRID.GetGridCell(1, 4)),2,2)
+		If ("10" <= mkty And mkty <= "59") Or ("B0" <= mkty And mkty <= "ZZ") _ 
+					Or ("0A"  <= mkty And mkty <= "0Z") Or ("1A"  <= mkty And mkty <= "1Z") _
+					Or ("2A"  <= mkty And mkty <= "2Z") Or ("3A"  <= mkty And mkty <= "3Z") _
+					Or ("4A"  <= mkty And mkty <= "4Z") Or ("5A"  <= mkty And mkty <= "5Z") _
+					Or ("6A"  <= mkty And mkty <= "6Z") Or ("7A"  <= mkty And mkty <= "7Z") _
+					Or ("8A"  <= mkty And mkty <= "8Z") Or ("9A"  <= mkty And mkty <= "9Z") Then
+			t_dprc = Trim(CDbl(RTSGRID.GetGridCell(1, 14))/100)
+		Else
+			t_dprc = Trim(CDbl(RTSGRID.GetGridCell(1, 14))/100)
+			If mkty >= "85" And mkty <= "87" Then
+				t_dprc = FormatNumber(t_dprc, 0)
+			Else
+				t_dprc = FormatNumber(t_dprc, 2)
+			End If
+		End If
+		Call VIEWGRID.SetGridCell (row_F, c_dprc, t_dprc)	' 체결가격
+	End If
+End Sub
+
+Sub Modify_wqty(row)
+	Dim h_qty, w_qty
+	h_qty = RTSGRID.GetGridCell (1, 13)										' 정정/취소 확인수량
+	w_qty = Trim(VIEWGRID.GetGridCell (row, c_wqty))
+
+	If w_qty = "" Then w_qty = "0"
+	If w_qty <> "0" Then
+		h_qty = CDbl(w_qty) - h_qty
+	Else
+		h_qty = "0"
+	End If
+
+	Call VIEWGRID.SetGridCell (row, c_wqty, h_qty)
+
+End Sub
+
+Sub Modify_hqty(row)
+	Dim tmp, hqty, hqty_T
+
+	hqty = RTSGRID.GetGridCell (1, 13)										' 정정/취소 확인수량
+	tmp = Trim(VIEWGRID.GetGridCell (row, c_hqty))
+
+	If tmp = "" Then tmp = "0"
+	hqty_T = CDbl(hqty) + CDbl(tmp)
+
+	Call VIEWGRID.SetGridCell (row, c_hqty, hqty_T)
+
+End Sub
+
+Function Find_Row(jm_num)														' 주문번호/원주문번호가 일치하는 Row Return
+	Dim row
+	For row = 1 To VIEWGRID.Rows
+		If Trim(jm_num) = Trim(VIEWGRID.GetGridCell(row, c_jmno)) Then
+			Find_Row = row
+			Exit Function
+		End If
+	Next
+	Find_Row = 0
+End Function
+
+Sub Update_Row(row)															' 해당 Row에 Update Row
+	Dim t_dprc, mkty
+
+		VIEWGRID.SetGridCell row, c_jmno, Trim(RTSGRID.GetGridCell(1, 2))			' 주문번호
+		VIEWGRID.SetGridCell row, c_ojno, Trim(RTSGRID.GetGridCell(1, 3))			' 원주문번호
+		VIEWGRID.SetGridCell row, c_code, Trim(RTSGRID.GetGridCell(1, 4))			' 종목코드
+		VIEWGRID.SetGridCell row, c_hnam, Trim(RTSGRID.GetGridCell(1, 5))			' 종목명
+		VIEWGRID.SetGridCell row, c_wqty, Trim(RTSGRID.GetGridCell(1, 8))			' 미체결수량
+		VIEWGRID.SetGridCell row, c_dqty, Trim(RTSGRID.GetGridCell(1, 13))			' 체결수량
+		VIEWGRID.SetGridCell row, c_hqty, "0"										' 정/취수량
+'		SYSTEM.Trace "Update_Row(row) : " & Trim(RTSGRID.GetGridCell(1, 4))
+'		If Mid(Trim(RTSGRID.GetGridCell(1, 4)),2,1) = "0" Then
+		mkty = Mid(Trim(RTSGRID.GetGridCell(1, 4)),2,2)
+
+		If ("10" <= mkty And mkty <= "59") Or ("B0" <= mkty And mkty <= "ZZ") _ 
+				Or ("0A" <= mkty And mkty <= "0Z")  Or ("1A" <= mkty And mkty <= "1Z")  _
+				Or ("2A" <= mkty And mkty <= "2Z")  Or ("3A" <= mkty And mkty <= "3Z")  _
+				Or ("4A" <= mkty And mkty <= "4Z")  Or ("5A" <= mkty And mkty <= "5Z")  _
+				Or ("6A" <= mkty And mkty <= "6Z")  Or ("7A" <= mkty And mkty <= "7Z")  _
+				Or ("8A" <= mkty And mkty <= "8Z")  Or ("9A" <= mkty And mkty <= "9Z") 	Then
+			t_dprc = Trim(CDbl(RTSGRID.GetGridCell(1, 14))/100)
+		Else
+			t_dprc = Trim(CDbl(RTSGRID.GetGridCell(1, 14))/100)
+			If mkty >= "85" And mkty <= "87" Then
+				t_dprc = FormatNumber(t_dprc, 0)
+			Else
+				t_dprc = FormatNumber(t_dprc, 2)
+			End If
+		End If
+
+
+		VIEWGRID.SetGridCell row, c_dprc, t_dprc									' 체결가격
+		VIEWGRID.SetGridCell row, c_jqty, Trim(RTSGRID.GetGridCell(1, 9))			' 주문수량
+
+'		SYSTEM.Trace "Update_Row(row)2 mkty : " & mkty
+'		If Mid(Trim(RTSGRID.GetGridCell(1, 4)),2,1) = "0" Then
+
+		If ("10" <= mkty And mkty <= "59") Or ("B0" <= mkty And mkty <= "ZZ") _
+					 Or  ("0A" <= mkty And mkty <= "0Z")   Or  ("1A" <= mkty And mkty <= "1Z")  _
+					 Or  ("2A" <= mkty And mkty <= "2Z")   Or  ("3A" <= mkty And mkty <= "3Z")  _
+					 Or  ("4A" <= mkty And mkty <= "4Z")   Or  ("5A" <= mkty And mkty <= "5Z")  _
+					 Or  ("6A" <= mkty And mkty <= "6Z")   Or  ("7A" <= mkty And mkty <= "7Z")  _
+					 Or  ("8A" <= mkty And mkty <= "8Z")   Or  ("9A" <= mkty And mkty <= "9Z")  Then
+			t_dprc = Trim(CDbl(RTSGRID.GetGridCell(1, 10))/100)
+		Else
+			t_dprc = Trim(CDbl(RTSGRID.GetGridCell(1, 10))/100)
+			If mkty >= "85" And mkty <= "87" Then
+				t_dprc = FormatNumber(t_dprc, 0)
+			Else
+				t_dprc = FormatNumber(t_dprc, 2)
+			End If
+		End If
+
+		VIEWGRID.SetGridCell row, c_jprc, t_dprc									' 주문단가
+		VIEWGRID.SetGridCell row, c_stat, Trim(RTSGRID.GetGridCell(1,11))			' 접수구분
+		VIEWGRID.SetGridCell row, c_time, Trim(RTSGRID.GetGridCell(1,15))			' 처리시간
+
+		If Trim(RTSGRID.GetGridCell(1, 7)) <> "" Then										' 호가구분
+			VIEWGRID.SetGridCell row, c_hogb, Trim(RTSGRID.GetGridCell(1, 7))
+			'VIEWGRID.SetGridCell row, c_htmp, Get_hogb(Trim(RTSGRID.GetGridCell(1, 7)))
+			VIEWGRID.SetGridCell row, c_htmp, Trim(RTSGRID.GetGridCell(1, 7))
+		End If
+
+		Dim ho, color, ogin
+		If Trim(RTSGRID.GetGridCell(1, 6)) <> "" Then				' 주문구분
+			ogin = Trim(RTSGRID.GetGridCell(1, 6))
+			ho = Left(ogin,2)
+			Select Case ho
+				Case "매수" : ogin= "+" & ogin: color = 94
+				Case "매도" : ogin= "-" & ogin: color = 95
+				Case Else   : Exit Sub
+			End Select
+			VIEWGRID.SetGridCell row, c_jmgb, ogin
+'			VIEWGRID.SetTRgb row, c_dqty, color							' 체결가격/체결수량 색상반영
+'			VIEWGRID.SetTRgb row, c_dprc, color
+		End If
+
+End Sub
+
+'***************************************************************
+'NEXT 조회 후 FIRST 클릭시 처음 조회 강제 Setting
+'***************************************************************
+Sub Clear_Cont()
+	If SYSTEM.SystemID = "H" Then				'하나증권
+		LEDGER.contf = "0"
+	Else												'대투증권
+		LEDGER.TrContYn = "0"
+	End If
+End Sub
+
+'****************************************************************************************************************************
+' DESC :  분할체결된 정보가 존재할 경우 체결량에 "※" 표시를 해준다.
+'      :  row 가 -1일 경우 모든 row에 대해 적용한다.
+'****************************************************************************************************************************
+Sub SetChegCountDisplay(grid, dqty_idx, dseq_idx, row)
+	Dim dqty, st, ed
+
+	If row < 1 Then
+		st = 1
+		ed = grid.Rows
+	Else
+		st = row
+		ed = row
+	End If
+
+	For ii=st To ed
+'		SYSTEM.Trace "DQTY : " & Trim(grid.GetGridCell(ii, dqty_idx)) & ", DSEQ : " & Trim(grid.GetGridCell(ii, dseq_idx))
+		If grid.GetGridCell(ii, dseq_idx)>1 Then
+			dqty = Trim(grid.GetGridCell(ii, dqty_idx))
+			If Left(dqty, 2)<>"※ " Then
+				grid.SetGridCell ii, dqty_idx, "※ " & dqty
+			End If
+		End If
+	Next
+End Sub
+
+'****************************************************************************************************************************
+' DESC :  분할체결된 내역을 더블클릭할 경우 아래 함수를 호출하여 상세체결내역을 조회한다.
+'****************************************************************************************************************************
+Sub ShowDetailChegPopup()
+	Dim jprc, ccnt, row, col, hogb, juno, accno, accnm, mapn
+
+	row = VIEWGRID.Row
+	col = VIEWGRID.Column
+
+	If VIEWGRID.HitPos = 3 Then
+		ccnt = Trim(VIEWGRID.GetGridCell(row, 24))
+		If Len(ccnt)=0 Then
+			Exit Sub
+		End If
+		If ccnt > 1 Then
+			juno = Trim(VIEWGRID.GetGridCell(row, c_jmno))
+			hogb = Trim(VIEWGRID.GetGridCell(row, c_hogb))
+			If hogb="시장가" Then
+				jprc = hogb
+			Else
+				jprc = Trim(VIEWGRID.GetGridCell(row, c_jprc))
+			End If
+
+			mapn = SCREEN.GetMapName(0)
+			If Left(mapn, 6)="IB3106" Then
+				accno = ACCN.Data
+				accnm = ACNM.Data
+			ElseIf Right(mapn, 2)="00" Then
+				accno = AN20.Data
+				accnm = ACNM.Data
+			Else
+				accno = ed_accn.Data
+				accnm = ACNM.Data
+			End If
+
+
+			SCREEN.CreateWindow 2, _
+				"IB9999B0 /p5 /d", _
+				"juno" & vbTab & juno & vbLf & _
+				"acno" & vbTab & accno & vbLf & _
+				"acnm" & vbTab & accnm & vbLf & _
+				"jprc" & vbTab & jprc
+		End If
+	End If
+End Sub
+
+
+Sub Update_Row_1(row)															' 주문단가, 호가구분
+	Dim t_dprc, mkty
+
+		mkty = Mid(Trim(RTSGRID.GetGridCell(1, 4)),2,2)
+
+		If ("10" <= mkty And mkty <= "59") Or ("B0" <= mkty And mkty <= "ZZ")  _
+			Or  ("0A" <= mkty And mkty <= "0Z") Or  ("1A" <= mkty And mkty <= "1Z") _
+			Or  ("2A" <= mkty And mkty <= "2Z") Or  ("3A" <= mkty And mkty <= "3Z") _
+			Or  ("4A" <= mkty And mkty <= "4Z") Or  ("5A" <= mkty And mkty <= "5Z") _
+			Or  ("6A" <= mkty And mkty <= "6Z") Or  ("7A" <= mkty And mkty <= "7Z") _
+			Or  ("8A" <= mkty And mkty <= "8Z") Or  ("9A" <= mkty And mkty <= "9Z") Then
+			t_dprc = Trim(CDbl(RTSGRID.GetGridCell(1, 10))/100)
+		Else
+			t_dprc = Trim(CDbl(RTSGRID.GetGridCell(1, 10))/100)
+			If mkty >= "85" And mkty <= "87" Then
+				t_dprc = FormatNumber(t_dprc, 0)
+			Else
+				t_dprc = FormatNumber(t_dprc, 2)
+			End If
+		End If
+
+		VIEWGRID.SetGridCell row, c_jprc, t_dprc									' 주문단가
+		VIEWGRID.SetGridCell row, c_stat, Trim(RTSGRID.GetGridCell(1,11))			' 접수구분
+		VIEWGRID.SetGridCell row, c_time, Trim(RTSGRID.GetGridCell(1,15))			' 체결시간
+
+		If Trim(RTSGRID.GetGridCell(1, 7)) <> "" Then										' 호가구분
+			VIEWGRID.SetGridCell row, c_hogb, Trim(RTSGRID.GetGridCell(1, 7))
+			VIEWGRID.SetGridCell row, c_htmp, Trim(RTSGRID.GetGridCell(1, 7))
+		End If
+End Sub
+
+}
+
+
+

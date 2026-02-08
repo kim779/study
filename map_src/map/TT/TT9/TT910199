@@ -1,0 +1,184 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(TT910199)
+MAPSIZE(203, 555)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("투자주체별순매수추�")
+MAPPUBLIC(";")
+FONT("굴림", 9, NORMAL)
+OPTIONS(FMS|FLASH)
+TITLE("[430201]투자주체별순매수추이(수량)")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pooppoop")
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL63(0, 0, 555, 203)        COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+GRID  62310(0, 0, 432, 202)  VISIBLEROW(10)  CELLH(18)  MATRIX(1000, 7)  FIX(7)  MAINCOLOR(7, 0)  LINECOLOR(75)  FOCUSCOLOR(78)  FOCUSKIND(4)    FONT("굴림체", 9, NORMAL)  VARIANT("$?")  ROWC(68, 77)  |FLEXIBLE|VSCROLL|INS_TOP|NO3D|RROW|XHLINE|PAGE|HEADER|GRFTEXT    &
+	COLINFO("62034")  LEN(6)  WIDTH(56)  HEAD("시간")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_ALPHA|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  EDITFORMAT("99:99:99")    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("62334")  LEN(7)  WIDTH(60)  HEAD("매수량")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|SA_ZERO    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("62333")  LEN(7)  WIDTH(60)  HEAD("매도량")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|SA_ZERO    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("62343")  LEN(7)  WIDTH(60)  HEAD("순매수량")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_ZERO|SA_COSIGN    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(94, 95)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("62340")  LEN(7)  WIDTH(60)  HEAD("매수대금")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|SA_ZERO    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("62339")  LEN(7)  WIDTH(60)  HEAD("매도대금")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|SA_ZERO    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("62344")  LEN(7)  WIDTH(60)  HEAD("순매수대금")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_ZERO|SA_COSIGN    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(94, 95)    HNORMAL  SORTSTARTPOS(0)    TABORDER(4)  IOORDER(5)  ENABLE  &
+  VISIBLE
+
+EDIT  62302(506, 11, 545, 29)  LEN(2)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(203, 0)  CUR(0)  TP_SUNKEN          TABORDER(1)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  62303(506, 30, 545, 49)  LEN(4)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(203, 0)  CUR(0)  TP_SUNKEN          TABORDER(2)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  시장구분(440, 11, 505, 31)  '시장구분'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL0(440, 30, 505, 50)  '업종코드'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  62304(506, 50, 545, 69)  LEN(2)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(203, 0)  CUR(0)  TP_SUNKEN          TABORDER(3)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL1(440, 50, 505, 70)  '투자자코드'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL2(440, 71, 505, 91)  'RTS코드'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+OUT  62021(440, 91, 546, 111)  LEN(10)  IO_MIXED|AL_LEFT||FA_FLASH    COLOR(192, 232)  CUR(0)  LINECOLOR(232)          TABORDER(0)  IOORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+
+Dim g_IsFirst
+Dim g_StdCode
+Dim g_BefVol
+Dim g_BefAmt
+Dim g_Today
+
+g_IsFirst = True
+g_StdCode = ""
+g_BefVol = 0
+g_BefAmt = 0
+g_Today = GetToday()
+
+Function GetToday()
+	AYear = Year(Date)
+	AMonth = Month(Date)
+	If Len(AMonth) = 1 Then
+		AMonth = "0" & AMonth
+	End If
+	ADay = Day(Date)
+	If Len(ADay) = 1 Then
+		ADay = "0" & ADay
+	End If
+	GetToday = AYear & AMonth & ADay
+End Function
+
+Sub OnAlert()
+	Flag = 0
+	If S62310.Rows > 1 Then
+		'tempvol = 0
+		'tempamt = 0
+'		msvl = Trim(S62310.GetGridCell(1, 2))
+'		mdvl = Trim(S62310.GetGridCell(1, 3))
+'		smvl = Trim(S62310.GetGridCell(1, 4))
+'		msmt = Trim(S62310.GetGridCell(1, 5))
+'		mdmt = Trim(S62310.GetGridCell(1, 6))
+'		smmt = Trim(S62310.GetGridCell(1, 7))
+
+'		If Len(msvl) = 0 And Len(mdvl) = 0  Then
+'			tempvol = 0
+'		ElseIf Len(msvl) <> 0 And Len(mdvl)  = 0  Then
+'			tempvol = CLng(msvl)
+'		ElseIf Len(msvl)  = 0 And Len(mdvl) <> 0  Then
+'			tempvol = CLng(mdvl)
+'		Else
+'			tempvol = CLng(msvl) + CLng(mdvl)
+'		End If
+'
+'		If Len(msmt) = 0 And Len(mdmt) = 0  Then
+'			tempamt = 0
+'		ElseIf Len(msmt) <> 0 And Len(mdmt)  = 0  Then
+'			tempamt = CLng(msmt)
+'		ElseIf Len(msvl)  = 0 And Len(mdmt) <> 0  Then
+'			tempamt = CLng(mdmt)
+'		Else
+'			tempamt = CLng(msmt) + CLng(mdmt)
+'		End If
+		
+
+		'If tempvol <> g_BefVol Or tempamt <> g_BefAmt Then
+			Flag = 1
+		'	g_BefVol = tempvol
+		'	g_BefAmt = tempamt
+		'End If
+	End If
+	'SYSTEM.Trace "TT910199 @ OnAlert TJCD=["&Trim(S62304.Data)&"] MASU["&Trim(S62310.GetGridCell(1,2))&"] MADO["&Trim(S62310.GetGridCell(1,3))&"]"
+	If Flag = 1 Then
+		ArrData = Array("", "", "", "", "", "", "", "")
+		ArrData(0) = Trim(S62304.Data)							'0:투자자코드
+		ArrData(1) = Getval(Trim(S62310.GetGridCell(1,1)))		'1:시간 혹은 일자
+		ArrData(2) = Getval(Trim(S62310.GetGridCell(1,2)))		'2:매수량
+		ArrData(3) = Getval(Trim(S62310.GetGridCell(1,3)))		'3:매도량
+		ArrData(4) = Getval(Trim(S62310.GetGridCell(1,4)))		'4:순매수량
+		ArrData(5) = Getval(Trim(S62310.GetGridCell(1,5)))		'5:매수대금
+		ArrData(6) = Getval(Trim(S62310.GetGridCell(1,6)))		'6:매도대금
+		ArrData(7) = Getval(Trim(S62310.GetGridCell(1,7)))		'7:순매수대금
+
+		ArrData2 = Array("", "", "", "", "", "", "", "")
+		ArrData2(0) = Trim(S62304.Data)							'0:투자자코드
+		If S62310.Rows > 1 Then
+			ArrData2(1) = Getval(Trim(S62310.GetGridCell(2,1)))		'1:시간 혹은 일자
+			ArrData2(2) = Getval(Trim(S62310.GetGridCell(2,2)))		'2:매수량
+			ArrData2(3) = Getval(Trim(S62310.GetGridCell(2,3)))		'3:매도량
+			ArrData2(4) = Getval(Trim(S62310.GetGridCell(2,4)))		'4:순매수량
+			ArrData2(5) = Getval(Trim(S62310.GetGridCell(2,5)))		'5:매수대금
+			ArrData2(6) = Getval(Trim(S62310.GetGridCell(2,6)))		'6:매도대금
+			ArrData2(7) = Getval(Trim(S62310.GetGridCell(2,7)))		'7:순매수대금
+		Else
+			ArrData2(1) = "0"
+			ArrData2(2) = "0"
+			ArrData2(3) = "0"
+			ArrData2(4) = "0"
+			ArrData2(5) = "0"
+			ArrData2(6) = "0"
+			ArrData2(7) = "0"
+		End If
+		
+		Data = Join(ArrData, "|")
+		Data2 = Join(ArrData2, "|")
+		SCREEN.Proc "parent.ProcSetData", Data & "," & Data2
+	End If
+End Sub
+
+Function Getval(Data)
+	Getval = Data
+	If Len(Data) = 0 Then
+		Getval = "0"
+	End If
+End Function
+
+Sub send_f()
+	SCREEN.Send 0
+End Sub
+
+_AW_SCRIPT_AW_(62310)
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

@@ -1,0 +1,288 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB611240)
+MAPSIZE(401, 520)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("펀드상세정보")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(ENCODE)
+TITLE("펀드상세정보")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(FIXEDEX)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  topPanel(0, 0, 520, 27)  LINETYPE(3)  LINECOLOR(64)      COLOR(66, 181)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  bgPanel(-3, 27, 523, 373)  LIMAGE(0)  LINEW(5)  STRESS(0)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+USRTAB  tab_hangmok(6, 36, 514, 62)  FOCUS  INDEX(0)  COUNT(4)  AL_TOP  TAB_IMAGE      FONT("굴림체", 9, NORMAL)    COLOR(3, 70)  CUR(0)  TABIMAGE("tab.bmp")  FCOLOR(3, 71)  CAPTION("펀드개요", "계좌상세", "일별기준가", "기간수익률")  TABINFO("1:0", "1:1", "1:2", "1:3")  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  obj0(6, 62, 514, 364)    ""  TABORDER(1)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL0(6, 3, 56, 23)  '계좌번호'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  zAcntNo(60, 3, 170, 23)  LEN(14)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_NOR    COLOR(192, 232)  CUR(0)  TP_SUNKEN          EDITFORMAT("999-99-999999-999")  TABORDER(2)  IOORDER(2)  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  ACNM(172, 3, 236, 23)  LEN(20)  IO_MIXED|AL_LEFT||FA_SKIP    COLOR(49, 130)  CUR(0)  LINECOLOR(48)          TABORDER(0)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL2(243, 3, 293, 23)  '비밀번호'  AL_LEFT  CUR(0)      COLOR(66, 130)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  zPwd(295, 3, 351, 23)  LEN(8)  IO_MIXED|EDIT_INPUT|FA_PASSWD|FA_WRAP|FA_NOR    COLOR(192, 130)  CUR(0)  TP_SUNKEN          TABORDER(3)  IOORDER(4)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL1(28, 524, 78, 544)  '펀드번호'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  fundCode(83, 524, 203, 543)  LEN(12)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_NOR    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(4)  IOORDER(5)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL3(223, 524, 273, 544)  '펀드이름'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  fundName(273, 524, 488, 544)  LEN(40)  IO_MIXED|AL_LEFT||FA_WRAP|FA_NOR    COLOR(49, 130)  CUR(0)  LINECOLOR(48)          TABORDER(0)  IOORDER(6)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL4(25, 550, 105, 570)  '도미노데이타'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  Domino_6112(105, 550, 485, 570)  LEN(500)  IO_MIXED|EDIT_INPUT|FA_ZEROSUP|FA_WRAP|FA_NOR|SA_SPACE    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(5)  IOORDER(7)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  GUIDE_around(-2, 371, 522, 395)  LIMAGE(0)  LINEW(3)  LINETYPE(4)  LINECOLOR(64)      COLOR(34, 232)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  GUIDE_image(4, 376, 18, 390)    |IMAGE|AL_STRETCH    COLOR(34, 232)  CUR(0)    "알림_ic.bmp"  ENABLE  &
+  VISIBLE  IMAGE  HINTTYPE(IH_NONE)
+PANEL  GUIDE(24, 375, 504, 391)        COLOR(34, 130)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  send_btn(477, 3, 513, 23)  '조회'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, BOLD)  FOCUS  COLOR(208, 69)  CUR(0)    "조회BTN.BMP"    TABORDER(6)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Option Explicit
+
+Const topPanelLT = 0
+Const topPanelRBY = 27
+Const bgPanelLTX = -3
+Const bgPanelLTY = 27
+Const tabLTX = 6
+Const tabLTY = 36
+Const tabRBY = 62
+Const objLTX = 6
+Const objLTY = 62
+Const GUIDELTX = 24
+Const GUIDEImageLTX = 4
+Const GUIDEImage = 14
+Const GUIDEArounLTX = -2
+
+Sub SetSystemPushData()
+	Dim param
+	param = Trim(SYSTEM.Pop("Domino_6112"))
+
+
+	If Trim(param) <> "" Then
+		Domino_6112.Data = param
+		Call SetDominoData()
+	Else
+		Domino_6112.Data = ""
+	End If
+
+	Call SetScreen()
+End Sub
+
+Sub SetDominoData()
+	Dim dataArr
+	dataArr = Split(Trim(Domino_6112.Data), "|")
+
+	zAcntNo.Data  = dataArr(0)
+	ACNM.Data     = dataArr(1)
+	fundCode.Data = dataArr(2)
+	fundName.Data = dataArr(3)
+
+	'Domino_6112.Data = ""
+End Sub
+
+
+Sub SetScreen()
+	Dim objWidth, objHeight, objRBX, objRBY
+
+	GUIDE.Text = ""
+	LABEL2.Visible = False
+	zPwd.Visible = False
+	send_btn.Visible = True
+
+	Select Case tab_hangmok.ID
+		Case 0 : objWidth = 508 : objHeight = 302
+		Case 1 : objWidth = 554 : objHeight = 155
+		Case 2 : objWidth = 360 : objHeight = 508
+		Case 3 : objWidth = 390 : objHeight = 305
+	End Select
+
+	objRBX = objWidth + OBJLTX
+	objRBY = objHeight + OBJLTY
+
+	SCREEN.SetSize objRBX + 6, objRBY + 7 + 24
+	topPanel.SetRect topPanelLT, topPanelLT, objRBX + 6, topPanelRBY
+	send_btn.SetRect objRBX - 37, 3, objRBX - 1, 23
+	bgPanel.SetRect bgPanelLTX, bgPanelLTY, objRBX + 9, objRBY + 8
+	tab_hangmok.SetRect tabLTX, tabLTY, objRBX, tabRBY
+	obj0.SetRect objLTX, objLTY, objRBX, objRBY
+	GUIDE_around.SetRect GUIDEArounLTX, objRBY + 6, objRBX + 10 - 2, objRBY + 7 + 24
+	GUIDE_image.SetRect GUIDEImageLTX, objRBY + 7 + 6 - 2, GUIDEImage + GUIDEImageLTX, objRBY + 7 + 6 + GUIDEImage - 2
+	GUIDE.SetRect GUIDELTX, objRBY + 7 + 4, objRBX + 6 - 40, objRBY + 7 + 4 + 16
+
+	Select Case tab_hangmok.ID
+		Case 0
+				obj0.SetObject "IB498977"
+				SCREEN.Object("obj0.fundcode").Data = fundCode.Data
+				If Trim(fundCode.Data) <> "" Then
+					SCREEN.Proc "obj0.send_f", ""
+				End If
+		Case 1
+				obj0.SetObject "IB611210" '펀드상세
+				LABEL2.Visible = True
+				zPwd.Visible = True
+
+				If SYSTEM.ConnectBy = 0 Then
+					SCREEN.Proc "obj0.send_f", ""
+				Else
+					zPwd.Clear
+					zPwd.SetFocus
+				End If
+		Case 2
+				send_btn.Visible = False
+				obj0.SetObject "IB611220" '일별기준
+				SCREEN.Proc "obj0.send_f",""
+		Case 3
+				obj0.SetObject "IB611230" '기간수익
+				SCREEN.Object("obj0.fundcode").Data = Trim(fundCode.Data)
+				SCREEN.Proc "obj0.send_f",""
+				SCREEN.Object("obj0.ed_name").Data = Trim(fundName.Data)
+				SCREEN.Object("obj0.TABLE0").Data = Trim(fundName.Data)
+	End Select
+End Sub
+
+Sub tab_change()
+	Select Case tab_hangmok.ID
+		Case 0
+			SCREEN.SetSize 520, 373
+			topPanel.SetRect 0, 0, 520, 27
+
+			PANEL1.Visible = True
+			PANEL1.SetRect 0,0, 520,334
+			tab_hangmok.SetRect 5,4,518,28
+
+			obj0.SetRect 5, 28, 516, 330
+			obj0.SetObject ""
+			obj0.SetObject "IB498977" '펀드개요
+
+			SCREEN.Object("obj0.fundcode").Data = fundCode.Data
+			SCREEN.Proc "obj0.send_f",""
+		Case 1
+			SCREEN.SetSize 561, 203
+
+			PANEL1.SetRect 0,0, 561,35
+			tab_hangmok.SetRect 3,4,557,28
+
+			obj0.SetRect 0, 28, 561, 202
+			obj0.SetObject ""
+			obj0.SetObject "IB611210" '펀드상세
+
+
+			SCREEN.Object("obj0.EDIT0").data = EDIT0.Data
+			SCREEN.Object("obj0.zPwd").data = zPwd.Data
+			obj0.send
+		Case 2
+			SCREEN.SetSize 347, 558
+
+			PANEL1.SetRect 0,0, 347,40
+			tab_hangmok.SetRect 3,4,344,28
+
+			obj0.SetRect 0, 28, 348, 559
+			obj0.SetObject ""
+			obj0.SetObject "IB611220" '일별기준
+
+			SCREEN.Object("obj0.fundcode").data = fundCode.DATA
+			SCREEN.Object("obj0.ed_name").data = ed_name.Data
+			SCREEN.Proc "obj0.send_f",""
+		Case 3
+			SCREEN.SetSize 399, 345
+
+			PANEL1.SetRect 0,0, 399,40
+			tab_hangmok.SetRect 3,4,397,28
+
+			obj0.SetRect 0, 28, 400, 346
+			obj0.SetObject ""
+			obj0.SetObject "IB611230" '기간수익
+
+			SCREEN.Object("obj0.fundcode").data = fundCode.DATA
+			SCREEN.Object("obj0.ed_name").data = ed_name.Data
+			SCREEN.Object("obj0.TABLE0").data = ed_name.Data
+			SCREEN.Proc "obj0.send_f",""
+	End Select
+End Sub
+
+_AW_ONINDECLARE_AW_
+#Load IB888833
+
+_AW_ONENDSUB_AW_
+_AW_ONSTART_AW_
+Call Check_LoginType(zPwd)
+
+'If Trim(Domino_6112.Text) = "" Then
+'	Call SetSystemPushData()
+'End If
+'
+'
+'Call SetScreen()
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(tab_hangmok)
+_AW_ONCLICK_AW_
+Call SetScreen()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(zAcntNo)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(zPwd)
+_AW_ONKEYCHANGE_AW_
+'== 비밀번호 변경시 조회 버튼 기능 수행.
+If SCREEN.Key = "13" Then  '-- Enter 키 입력
+	SCREEN.Proc "obj0.send_f", ""
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(Domino_6112)
+_AW_ONCHANGE_AW_
+Call SetDominoData()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(send_btn)
+_AW_ONCLICK_AW_
+SCREEN.Proc "obj0.send_f", ""
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

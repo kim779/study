@@ -1,0 +1,798 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB190130)
+MAPSIZE(456, 1010)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("펀드주문그리드")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+TITLE("1901 펀드주문그리드")
+TOPATH(AXIS)
+METHOD(MENU)
+MAPTYPE(FIXED)
+HEADER(NOP)
+BGROUND(BRUSH, 200)
+}
+
+
+
+FORM DIVISION
+{
+
+GRID  GD_ORDER(0, 25, 1010, 455)  VISIBLEROW(1000)  CELLH(18)  MATRIX(100, 19)  FIX(0)  MAINCOLOR(0, 0)  LINECOLOR(75)  FOCUSCOLOR(78)  FOCUSKIND(4)    FONT("굴림체", 9, NORMAL)  ROWC(68, 77)  |VSCROLL|HSCROLL|INS_TOP|NO3D|RROW|XHLINE|GRFTEXT|GBOTTOM    &
+	COLINFO("oflg")  LEN(1)  WIDTH(36)  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_INOUT  |FA_SKIP    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  ICHECK    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("acno")  LEN(11)  WIDTH(88)  HEAD("계좌번호")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_ALPHA|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  COLUMN_SHOWFORM  COLUMN_SORT  INORMAL  EDITFORMAT("999-99-999999")    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("acnm")  LEN(40)  WIDTH(120)  HEAD("계좌명")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  COLUMN_SORT  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("pswd")  LEN(8)  WIDTH(36)  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("mult")  LEN(16)  WIDTH(36)  HEAD("배수")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_SORT  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("rate")  LEN(16)  WIDTH(46)  HEAD("비율(%)")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_RIGHT    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_SORT  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("aamt")  LEN(16)  WIDTH(80)  HEAD("총평가금액")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  COLUMN_SORT  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("tamt")  LEN(16)  WIDTH(80)  HEAD("평가금액")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  COLUMN_SORT  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("crat")  LEN(7)  WIDTH(60)  HEAD("비중")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  COLUMN_SORT  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("tqty")  LEN(16)  WIDTH(55)  HEAD("잔고수량")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  COLUMN_SORT  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("cqty")  LEN(16)  WIDTH(55)  HEAD("산정수량")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  COLUMN_SORT  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("mmgb")  LEN(8)  WIDTH(40)  HEAD("매매")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT  |FA_CORGB|SA_COSUP    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  COLUMN_SORT  INORMAL  IFRGB(94, 95)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("hogb")  LEN(2)  WIDTH(96)  MATCHKEY(NOTMAPPING)  HEAD("주문구분")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_ALPHA|EDIT_INPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  COLUMN_SORT  ICOMBO  COUNT(3)  DISPLAY("지정가", "시장가", "시간외단일가")  DATA("00", "03", "82")    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("jqty")  LEN(16)  WIDTH(60)  HEAD("주문수량")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_INPUT  |FA_COMMA|FA_RIGHT    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  COLUMN_SORT  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("jprc")  LEN(16)  WIDTH(70)  HEAD("주문단가")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_INPUT  |FA_COMMA|FA_RIGHT    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  COLUMN_SORT  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("jmno")  LEN(6)  WIDTH(54)  HEAD("주문번호")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("jmsg")  LEN(80)  WIDTH(400)  HEAD("주문결과")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("epswd")  LEN(44)  WIDTH(33)  HEAD("암호화비번")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_NUM|EDIT_OUTPUT  |FA_SKIP    COLOR(192, 232)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("YN")  LEN(1)  WIDTH(36)  HEAD("매매제한")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_MIXED|EDIT_OUTPUT  |FA_SKIP    COLOR(192, 232)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    TABORDER(2)  IOORDER(3)  ENABLE  &
+  VISIBLE
+
+EDIT  1301(15, 590, 135, 609)  LEN(0)  IO_ALPHA|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(1)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  OBJ_jango(10, 465, 125, 580)    "IB190141"  TABORDER(3)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  CHK_ALL(11, 29, 21, 39)  TP_CHECK|EDIT_NOP          COLOR(208, 232)  CUR(0)      TABORDER(4)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BOX  BOX0(0, 0, 1010, 25)    COLOR(75, 75)  LINEW(1)  BX_LINE    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LBL_INFO(7, 6, 807, 21)  AL_LEFT  CUR(0)      COLOR(200, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BTN_MASU(942, 1, 1005, 25)  '매수(F2)'  TP_USER|IMAGETEXT|AL_STRETCH    KEYMAP(F2)    FONT("굴림체", 9, BOLD)  FOCUS  COLOR(208, 240)  CUR(0)    "매수.BMP"    TABORDER(6)  ENABLE  &
+  IMAGETEXT  HINTTYPE(IH_NONE)
+BUTTON  BTN_MADO(942, 1, 1005, 25)  '매도(F3)'  TP_USER|IMAGETEXT|AL_STRETCH    KEYMAP(F3)    FONT("굴림체", 9, BOLD)  FOCUS  COLOR(208, 240)  CUR(0)    "매도.BMP"    TABORDER(7)  ENABLE  &
+  IMAGETEXT  HINTTYPE(IH_NONE)
+BUTTON  BTN_RECALC(790, 3, 840, 23)  '재계산'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, BOLD)  COLOR(208, 186)  CUR(0)    "조회BTN.BMP"    TABORDER(8)  ENABLE  &
+  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+OBJECT  OBJ_odr(55, 100, 910, 400)    "IB190160"  TABORDER(5)  IOORDER(4)  ENABLE  &
+  HINTTYPE(IH_NONE)  HELPTEXT("일반주문")HELPTEXT("일반주문")
+EDIT  jmbtclick(135, 619, 185, 639)  LEN(1)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("0")          TABORDER(9)  IOORDER(5)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL26(14, 619, 129, 638)  '주문버튼클릭구분값'  AL_CENTER  CUR(0)      COLOR(195, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Dim bOrdering
+bOrdering = False
+
+Sub SetPrice(prc)
+	If bOrdering Then
+		'MsgBox "주문중 주문가격을 변경할 수 없습니다.", vbOKOnly, "IBK투자증권"
+		Exit Sub
+	End If
+	For ii=1 To GD_ORDER.Rows
+		'SYSTEM.Trace "|" & Trim(GD_ORDER.GetGridCell(ii, 2)) & "|" & GD_ORDER.GetGridCell(ii, 13) & "|"
+		If Trim(GD_ORDER.GetGridCell(ii, 2))<>"" And GD_ORDER.GetGridCell(ii, 13)<>"03" Then
+			GD_ORDER.SetGridCell ii, 15, CLng(prc)
+		End If
+	Next
+	Call CalcJqty()
+End Sub
+
+Function GetInfoMsg()
+	Dim lmsg
+
+	mmgb = SCREEN.Object("main.mmgb").Data
+	Select Case mmgb
+		Case "1"	lmsg = "매매구분[매도],  "
+		Case "2"	lmsg = "매매구분[매수],  "
+		Case "3"	lmsg = "매매구분[정정],  "
+		Case "4"	lmsg = "매매구분[취소],  "
+	End Select
+
+	hogb = SCREEN.Object("main.hogb").Data
+	Select Case hogb
+		Case "00"	lmsg = lmsg & "주문구분[지정가],  "
+		Case "03"	lmsg = lmsg & "주문구분[시장가],  "
+		Case "82"	lmsg = lmsg & "주문구분[시간외],  "
+	End Select
+
+	code = SCREEN.Object("main.1301").Data
+	hnam = SCREEN.GetName(100, code, 99)
+	lmsg = lmsg & "종목[" & Trim(hnam) & "(" & Trim(code) & ")],  "
+
+	mmgj = SCREEN.Object("main.mmgj").Data
+	mmrt = CCur(SCREEN.Object("main.mmrt").Data)/10.0
+	If mmgb="1" Then
+		Select Case mmgj
+			Case "1"	lmsg = lmsg & "기준[비율]"
+			Case "2"	lmsg = lmsg & "기준[배수]"
+			Case "3"	lmsg = lmsg & "기준[잔고],  비율[" & FormatNumber(mmrt, 1, TristateTrue) & "]"
+			Case "4"	lmsg = lmsg & "기준[총평가금액],  비율[" & FormatNumber(mmrt, 1, TristateTrue) & "]"
+			Case "5"	lmsg = lmsg & "기준[목표비중],  비율[" & FormatNumber(mmrt, 1, TristateTrue) & "]"
+			Case "9"	lmsg = lmsg & "기준[직접입력]"
+		End Select
+	ElseIf mmgb="2" Then
+		Select Case mmgj
+			Case "1"	lmsg = lmsg & "기준[비율]"
+			Case "2"	lmsg = lmsg & "기준[배수]"
+			Case "3"	lmsg = lmsg & "기준[목표비중],  비율[" & FormatNumber(mmrt, 1, TristateTrue) & "]"
+			Case "4"	lmsg = lmsg & "기준[총평가금액],  비율[" & FormatNumber(mmrt, 1, TristateTrue) & "]"
+			Case "9"	lmsg = lmsg & "기준[직접입력]"
+		End Select
+	End If
+	GetInfoMsg = lmsg
+End Function
+
+Function SetAccount()
+	Dim grid
+	Call GD_ORDER.Clear()
+	Set grid = SCREEN.Object("main.GD_ACCNTS")
+
+	If grid.Rows=0 Then
+		MsgBox "그룹 혹은 계좌번호를 확인하십시오.", vbOKOnly, "IBK투자증권"
+		SetAccount = False
+		Exit Function
+	End If
+
+	GD_ORDER.SetRows(grid.Rows)
+	For i=1 To grid.Rows
+		Call GD_ORDER.SetGridCell(i, 1, "0")								' 주문여부
+		Call GD_ORDER.SetGridCell(i, 2, Trim(grid.GetGridCell(i,1)))		' 계좌번호
+		Call GD_ORDER.SetGridCell(i, 3, Trim(grid.GetGridCell(i,2)))		' 계좌명
+		Call GD_ORDER.SetGridCell(i, 4, Trim(grid.GetGridCell(i,3)))		' 비밀번호
+		Call GD_ORDER.SetGridCell(i, 5, CLng(Trim(grid.GetGridCell(i,5))))	' 배수
+		Call GD_ORDER.SetGridCell(i, 6, CDbl(Trim(grid.GetGridCell(i,4))))	' 비율
+		Call GD_ORDER.SetGridCell(i, 7, 0)									' 총평가금액
+		Call GD_ORDER.SetGridCell(i, 8, 0)									' 평가금액
+		Call GD_ORDER.SetGridCell(i, 9, 0)									' 비중
+		Call GD_ORDER.SetGridCell(i, 10, 0)									' 잔고수량
+		Call GD_ORDER.SetGridCell(i, 11, "")								' 산정수량
+		Call GD_ORDER.SetGridCell(i, 12, "")								' 매매구분명
+		Call GD_ORDER.SetGridCell(i, 13, "")								' 호가구분
+		Call GD_ORDER.SetGridCell(i, 14, "")								' 주문수량
+		Call GD_ORDER.SetGridCell(i, 15, "")								' 주문단가
+		Call GD_ORDER.SetGridCell(i, 16, "")								' 주문번호
+		Call GD_ORDER.SetGridCell(i, 17, "")								' 주문결과
+		Call GD_ORDER.SetGridCell(i, 18, Trim(grid.GetGridCell(i,6)))		' 암호화비번
+	Next
+	SetAccount = True
+End Function
+
+Sub SetOrderGrid()
+	bOrdering = False
+
+	Dim mmgb, hogb, mmgb_nm, grid, jprc
+
+	mmgb = SCREEN.Object("main.mmgb").Data
+	hogb = SCREEN.Object("main.hogb").Data
+	jprc = SCREEN.Object("main.jprc").Data
+
+	If mmgb="1" Then
+		mmgb_nm = "-매도"
+		BTN_MADO.Visible = True
+		BTN_MASU.Visible = False
+	ElseIf mmgb="2" Then
+		mmgb_nm = "+매수"
+		BTN_MADO.Visible = False
+		BTN_MASU.Visible = True
+	Else
+		BTN_MADO.Visible = False
+		BTN_MASU.Visible = False
+		Exit Sub
+	End If
+
+	If hogb="03" Then
+		jprc = "0"
+	End If
+
+	If Not SetAccount() Then
+		Exit Sub
+	End If
+
+	For i=1 To GD_ORDER.Rows
+		Call GD_ORDER.SetGridCell(i, 12, mmgb_nm)							' 매매구분명
+		Call GD_ORDER.SetGridCell(i, 13, hogb)								' 호가구분
+		Call GD_ORDER.SetGridCell(i, 15, CLng(jprc))				 		' 주문단가
+	Next
+
+	GD_ORDER.SetColumnVisible 5, False
+	GD_ORDER.SetColumnVisible 6, False
+	GD_ORDER.SetColumnVisible 7, False
+	GD_ORDER.SetColumnVisible 8, False
+	mmgj = SCREEN.Object("parent.mmgj").Data
+	If mmgj="1" Then
+		GD_ORDER.SetColumnVisible 6, True
+	ElseIf mmgj="2" Then
+		GD_ORDER.SetColumnVisible 5, True
+	Else
+		GD_ORDER.SetColumnVisible 7, True
+		GD_ORDER.SetColumnVisible 8, True
+	End If
+
+	' 매매기준이 직접입력인 경우 산정수량을 보여주지 않는다.
+	If mmgj="9" Then
+		GD_ORDER.SetColumnVisible 11, False
+	Else
+		GD_ORDER.SetColumnVisible 11, True
+	End If
+
+	LBL_INFO.Text = GetInfoMsg()
+
+	SCREEN.Proc "OBJ_jango.QueryJango", "parent"
+End Sub
+
+Sub EndQueryJango(name)
+	bOrdering = False
+
+	Dim grid
+	Set grid = SCREEN.Object( "OBJ_jango." & name )
+	For ii=1 To grid.Rows
+		For jj=1 To GD_ORDER.Rows
+			If Len(Trim(GD_ORDER.GetGridCell(jj, 2)))=0 Then
+				Exit For
+			End If
+			If Trim(grid.GetGridCell(ii,1)) = Trim(GD_ORDER.GetGridCell(jj, 2)) Then
+				v1 = grid.GetGridCell(ii, 7)	' 평가금액
+				v2 = grid.GetGridCell(ii, 8)	' 주식평가금액
+				v3 = grid.GetGridCell(ii, 9)	' D+2예수금
+				v4 = CCur(v2) + CCur(v3)
+				'MsgBox v2 & "," & v3 & "," & v4
+				GD_ORDER.SetGridCell jj, 7, v4					' 주식평가금액 + D2예수금 = 총평가금액
+				GD_ORDER.SetGridCell jj, 8, CCur(v1)			' 평가금액
+				If IsNumeric(v1) = True And CCur(v1)<>0.0 And CCur(v4)<>0.0 Then
+					tmp = FormatNumber(CCur(v1)/CCur(v4)*100.0, 4, TristateTrue)
+					If Mid(tmp, 1,1)="." Then
+						GD_ORDER.SetGridCell jj, 9, "0" & tmp
+					Else
+						GD_ORDER.SetGridCell jj, 9, tmp
+					End If
+				Else
+					GD_ORDER.SetGridCell jj, 9, "0.0000"
+				End If
+				GD_ORDER.SetGridCell jj, 10, CCur( grid.GetGridCell(ii, 5) )  ' 잔고수량(체결기준)
+				'MsgBox Trim(grid.GetGridCell(ii,1)) & ", " & Trim(GD_ORDER.GetGridCell(jj, 2))
+				Exit For
+			End If
+		Next
+	Next
+	Call CalcJqty()
+End Sub
+
+Sub CalcJqty()
+	bOrdering = False
+
+	mmgb = SCREEN.Object("parent.mmgb").Data
+	If mmgb="1" Then
+		Call CalcMadoJqty()
+	ElseIf mmgb="2" Then
+		Call CalcMasuJqty()
+	End If
+End Sub
+
+Sub CalcMadoJqty()
+	bOrdering = False
+
+	Dim val
+	mmgj = SCREEN.Object("parent.mmgj").Data					' 매매기준
+	mmrt = CCur(SCREEN.Object("parent.mmrt").Data)/10.0			' 매매비율 (*10 해서 온다)
+	jqty = CLng(SCREEN.Object("parent.jqty").Data)				' 주문수량
+	unit = CLng(SCREEN.Object("parent.unit").Data)				' 종목매매단위
+	curr = CLng(SCREEN.Object("parent.curr").Data)				' 수량반영시 현재가!
+
+	For ii=1 To GD_ORDER.Rows
+		If Len(Trim(GD_ORDER.GetGridCell(ii, 2)))=0 Then
+			Exit For
+		End If
+
+		rate = CCur(GD_ORDER.GetGridCell( ii, 6))		' 주문 비율
+		jngo = CCur(GD_ORDER.GetGridCell( ii, 10))		' 잔고 수량
+		mult = CCur(GD_ORDER.GetGridCell( ii, 5))		' 주문 승수
+		aamt = CCur(GD_ORDER.GetGridCell( ii, 7))		' 총평가금액
+		pamt = CCur(GD_ORDER.GetGridCell( ii, 8))		' 평가금액
+		hogb = GD_ORDER.GetGridCell(ii, 13)				' 주문(호가)구분
+		jprc = GD_ORDER.GetGridCell(ii, 15)				' 주문가격
+
+		If mmgj="1" Then
+			' 계좌비율 * 주문수량
+			val = CLng(rate * jqty / 100.0)
+		ElseIf mmgj="2" Then
+			' 계좌승수 * 주문수량
+			val = CLng(mult * jqty)
+		ElseIf mmgj="3" Then
+			' 매매비율 * 잔고
+			val = CLng( (mmrt/100.0) * jngo )
+		ElseIf mmgj="4" Then
+			' 시장가인 경우 현재가를 기준으로 매매수량 산정한다. (수량반영시점의 현재가임)
+			If hogb="03" Then ' 시장가
+				jprc = curr
+			End If
+
+			' (총평가금액*비율) / (주문가 or 현재가)
+			val = CLng( CLng((mmrt/100.0) * aamt) / jprc )
+		ElseIf mmgj="5" Then
+			' 목표비중
+			v2 = aamt * (mmrt/100.0)
+			v1 = pamt
+
+			' 시장가인 경우 현재가를 기준으로 매매수량 산정한다. (수량반영시점의 현재가임)
+			If hogb="03" Then ' 시장가
+				jprc = curr
+			End If
+
+			If mmrt=0 Then
+				val = jngo
+			ElseIf v2<v1 Then
+				val = CLng((v1-v2)/jprc)
+			Else
+				val = 0
+			End If
+		Else
+			val = 0
+		End If
+		GD_ORDER.SetGridCell ii, 11, val
+
+		' 단주주문 -> 매매단위처리 X, 일반주문 -> 매매단위처리 O
+		' 잔고<산정수량 -> 산정수량을 잔고로 생각하고 처리함.
+		If jngo < val Then
+			GD_ORDER.SetGridCell ii, 14, (jngo-(jngo Mod unit))
+		Else
+			GD_ORDER.SetGridCell ii, 14, (val-(val Mod unit))
+		End If
+
+		' 직접입력의 경우 산정수량제한에 걸릴 수 있으므로 이곳에서 MAX잡아준다.
+		If mmgj="9" Then
+			GD_ORDER.SetGridCell ii, 11, 999999999
+		End If
+	Next
+
+	' 주문수량이 0인것은 체크 해제한다.
+	Call ClearCheck()
+	Call AllCheck()
+	Call CheckCheck()
+End Sub
+
+Sub CalcMasuJqty()
+	bOrdering = False
+
+	Dim val
+	mmgj = SCREEN.Object("parent.mmgj").Data					' 매매기준
+	mmrt = CCur(SCREEN.Object("parent.mmrt").Data)/10.0			' 매매비율 (*10 해서 온다)
+	jqty = CLng(SCREEN.Object("parent.jqty").Data)				' 주문수량
+	unit = CLng(SCREEN.Object("parent.unit").Data)				' 종목매매단위
+
+	' 호가 선택으로 주문단가 변경시, 시장가 선택 항목의 경우, 최신의 현재가를 반영할 수 있도록 수정.
+	'curr = CLng(SCREEN.Object("parent.curr").Data)				' 수량반영시 현재가!
+	curr = CLng(SCREEN.Object("main.OBJ_sise.2023").Data)
+
+	For ii=1 To GD_ORDER.Rows
+		If Len(Trim(GD_ORDER.GetGridCell(ii, 2)))=0 Then
+			Exit For
+		End If
+
+		rate = CCur(GD_ORDER.GetGridCell(ii, 6 ))		' 주문 비율
+		jngo = CCur(GD_ORDER.GetGridCell(ii, 10))		' 잔고 수량
+		mult = CCur(GD_ORDER.GetGridCell(ii, 5 ))		' 주문 승수
+		aamt = CCur(GD_ORDER.GetGridCell(ii, 7))		' 총평가금액
+		camt = CCur(GD_ORDER.GetGridCell(ii, 8))		' 평가금액
+		crat = CCur(GD_ORDER.GetGridCell(ii, 9))/100.0	' 비중
+
+		hogb = GD_ORDER.GetGridCell(ii, 13)				' 주문(호가)구분
+		jprc = GD_ORDER.GetGridCell(ii, 15)				' 주문가격
+
+		If mmgj="1" Then
+			' 계좌비율 * 주문수량
+			val = CLng(rate * jqty / 100.0)
+		ElseIf mmgj="2" Then
+			' 계좌승수 * 주문수량
+			val = CLng(mult * jqty)
+		ElseIf mmgj="3" Then
+			' 목표비중
+			v2 = aamt * (mmrt/100.0)
+			v1 = pamt
+
+			' 시장가인 경우 현재가를 기준으로 매매수량 산정한다. (수량반영시점의 현재가임)
+			If hogb="03" Then ' 시장가
+				jprc = curr
+			End If
+
+			If v1<v2 Then
+				val = CLng((v2-v1)/jprc)
+				If val>jngo Then
+					val = val - jngo
+				Else
+					val = 0
+				End If
+			Else
+				val = 0
+			End If
+		ElseIf mmgj="4" Then
+			' 종목평가금액 대신 총평가금액을 표시한다.
+			GD_ORDER.SetColumnVisible 7, True
+			GD_ORDER.SetColumnVisible 8, False
+
+			' 시장가인 경우 현재가를 기준으로 매매수량 산정한다. (수량반영시점의 현재가임)
+			If hogb="03" Then ' 시장가
+				jprc = curr
+			End If
+
+			' (총평가금액*비율) / (주문가 or 현재가)
+			val = CLng( CLng((mmrt/100.0) * aamt) / jprc )
+
+		Else
+			val = 0
+		End If
+		GD_ORDER.SetGridCell ii, 11, val
+		GD_ORDER.SetGridCell ii, 14, (val-(val Mod unit))
+
+		' 직접입력의 경우 산정수량제한에 걸릴 수 있으므로 이곳에서 MAX잡아준다.
+		If mmgj="9" Then
+			GD_ORDER.SetGridCell ii, 11, 999999999
+		End If
+	Next
+
+	' 주문수량이 0인것은 체크 해제한다.
+	Call ClearCheck()
+	Call AllCheck()
+	Call CheckCheck()
+End Sub
+
+Sub ClearCheck()
+	For ii=1 To GD_ORDER.Rows
+		If Len(Trim(GD_ORDER.GetGridCell(ii, 2)))=0 Then
+			Exit For
+		End If
+		Call GD_ORDER.SetGridCell(ii, 1, "0")
+	Next
+End Sub
+
+Sub AllCheck()
+	Dim mmgb
+	mmgb = SCREEN.Object("main.mmgb").Data
+
+	If mmgb ="1" Then
+		For ii=1 To GD_ORDER.Rows
+			If Len(Trim(GD_ORDER.GetGridCell(ii, 2)))=0 Then
+				Exit For
+			End If
+			If CLng(GD_ORDER.GetGridCell(ii, 14))<>0 Then
+				Call GD_ORDER.SetGridCell(ii, 1, "1")
+			End If
+		Next
+	Else
+		For ii=1 To GD_ORDER.Rows
+			If Len(Trim(GD_ORDER.GetGridCell(ii, 2)))=0 Then
+				Exit For
+			End If
+			If CLng(GD_ORDER.GetGridCell(ii, 14))<>0 Then'And SCREEN.Object("main.OBJ_limit2.OGRID").GetGridCell(ii, 2) = "N" Then
+				If SCREEN.Object("main.OBJ_limit2.OGRID").GetGridCell(ii, 2) = "Y" Then
+					Call GD_ORDER.SetGridCell(ii, 17, "해당계좌에 매수금지종목으로 등록되어 있습니다.")
+					Call GD_ORDER.SetTRgb(ii, 17, 94)
+				Else
+					Call GD_ORDER.SetGridCell(ii, 1, "1")
+					Call GD_ORDER.SetTRgb(ii, 17, 69)
+				End If
+			End If
+
+			'그리드에 Y N 저장
+			Call GD_ORDER.SetGridCell(ii, 19, SCREEN.Object("main.OBJ_limit2.OGRID").GetGridCell(ii, 2))
+		Next
+
+	End If
+End Sub
+
+Sub CheckCheck()
+	For ii=1 To GD_ORDER.Rows
+		If Len(Trim(GD_ORDER.GetGridCell(ii, 2)))=0 Then
+			Exit Sub
+		End If
+
+		If GD_ORDER.GetGridCell(ii, 1)="1" Then
+			CHK_ALL.Checked = True
+			Exit Sub
+		End If
+	Next
+	Call GD_ORDER.SetGridCell(0, 1, "0")
+End Sub
+
+Sub SendOrder(gubn)
+	bOrdering = True
+
+	Dim grid, obj, dmsg, gjnm, jidx, jcnt, jqty, jamt, jprc, code, mkgb, objnm
+
+	If gubn = 1 Then ' 매도
+		Select Case SCREEN.Object("main.mmgj").Data
+			Case "1"	gjnm = "비율기준(매도)"
+			Case "2"	gjnm = "배수기준(매도)"
+			Case "3"	gjnm = "잔고기준(매도)"
+			Case "4"	gjnm = "총평가금액기준(매도)"
+			Case "5"	gjnm = "목표비중(매도)"
+			Case "9"	gjnm = "직접입력(매도)"
+		End Select
+	ElseIf gubn = 2 Then ' 매수
+		Select Case SCREEN.Object("main.mmgj").Data
+			Case "1"	gjnm = "비율기준(매수)"
+			Case "2"	gjnm = "배수기준(매수)"
+			Case "3"	gjnm = "목표비중(매수)"
+			Case "4"	gjnm = "총평가금액기준(매수)"
+			Case "9"	gjnm = "직접입력(매수)"
+		End Select
+	Else
+		Exit Sub
+	End If
+
+	obj = "OBJ_odr"
+	
+	' KRX/NXT/SOR 시장구분자 추가 (Set to odgb)
+	objnm = "Main.OBJ_odr"
+	If SCREEN.Object(objnm & ".cxMarket").sMarket = "KRX" Then
+		mkgb = "1"
+	ElseIf SCREEN.Object(objnm & ".cxMarket").sMarket = "NXT" Then
+		mkgb = "N"
+	ElseIf SCREEN.Object(objnm & ".cxMarket").sMarket = "통합" Then
+		mkgb = "S"
+	Else
+		mkgb = "1"	
+	End If
+
+
+	Set grid = SCREEN.Object(obj & ".OGRID")
+
+	jidx = 1
+	jcnt = 0
+	jqty = 0
+	jamt = 0
+	jprc = SCREEN.Object("main.OBJ_sise.2023").Data
+	Call grid.Clear()
+	For ii=1 To GD_ORDER.Rows
+		'SYSTEM.Trace "gubn[" & gubn & "] YN[" & GD_ORDER.GetGridCell(ii, 19) & "]"
+		If gubn = 2 And GD_ORDER.GetGridCell(ii, 19) = "Y"  Then	'매수이면서 매매제한이 되어 있으면 넘어간다.
+			Call GD_ORDER.SetGridCell(ii, 1, "0")
+		End If
+
+		If GD_ORDER.GetGridCell(ii, 1)="1" And CLng(GD_ORDER.GetGridCell(ii, 14))>0 Then
+			grid.SetGridCell jidx, 1, mkgb
+			grid.SetGridCell jidx, 2, " "
+			grid.SetGridCell jidx, 3, gubn
+			grid.SetGridCell jidx, 4, GD_ORDER.GetGridCell(ii, 2)
+			grid.SetGridCell jidx, 5, "HEAD"
+			code = Trim(SCREEN.Object("parent.1301").Data)
+			If Trim(SCREEN.GetCodeType(code)) = "27" Then	'ETN은 'Q'로 시작함
+				code = "Q" & code
+			Else
+				Select Case Mid(code, 1, 1)
+					Case "5", "6", "7", "8"
+						code = "J" & code
+					Case Else
+						code = "A" & code
+				End Select
+			End If
+			grid.SetGridCell jidx, 7, code
+			grid.SetGridCell jidx, 9, CLng(GD_ORDER.GetGridCell(ii, 14))
+			grid.SetGridCell jidx, 10, CLng(GD_ORDER.GetGridCell(ii, 15))
+			grid.SetGridCell jidx, 11, GD_ORDER.GetGridCell(ii, 13)
+			grid.SetGridCell jidx, 12, "0"
+			grid.SetGridCell jidx, 14, "X"
+			grid.SetGridCell jidx, 15, GD_ORDER.GetGridCell(ii, 18)	'암호화된비번
+			jidx = jidx + 1
+			jcnt = jcnt + 1
+			jqty = jqty + CLng(GD_ORDER.GetGridCell(ii, 14))
+
+			If GD_ORDER.GetGridCell(ii, 13)="03" Then
+				' 시장가일 경우 현재가 기준으로 계산
+				jamt = jamt + ( CLng(GD_ORDER.GetGridCell(ii, 14)) * jprc )
+			Else
+				jamt = jamt + ( CLng(GD_ORDER.GetGridCell(ii, 14)) * CLng(GD_ORDER.GetGridCell(ii, 15)) )
+			End If
+
+			'SYSTEM.Trace jidx & ", " & jcnt & ", " & jqty & ", " & jamt & ", " & gjnm
+		End If
+	Next
+
+	If jidx=1 Then
+		MsgBox "한계좌 이상을 선택하셔야 합니다.", vbOKOnly, "IBK투자증권"
+		Exit Sub
+	End If
+
+	dmsg =	"o_gpno" & vbTab & SCREEN.Object("main.CB_GROUP").Text & vbLf & _
+		"o_hnam" & vbTab & Trim(SCREEN.Object("main.hnam").Data) & vbLf & _
+		"o_mmgj" & vbTab & gjnm & vbLf & _
+		"o_jcnt" & vbTab & jcnt & vbLf & _
+		"o_jqty" & vbTab & jqty & vbLf & _
+		"o_jamt" & vbTab & jamt & vbLf & _
+		"o_pric" & vbTab & CLng(jamt/jqty)
+
+	'SYSTEM.Trace dmsg
+
+	If gubn="1" Then
+		SCREEN.CreateWindow 2, "IB190113 /S /p99 /d", dmsg
+	ElseIf gubn="2" Then
+		SCREEN.CreateWindow 2, "IB190114 /S /p99 /d", dmsg
+	Else
+		Exit Sub
+	End If
+
+	If SYSTEM.Pop("stock_fund_order") <> "OK" Then
+		Exit Sub
+	End If
+
+	jmbtclick.Data = 1
+
+	SCREEN.Object(obj & ".NREC").Data = jcnt
+
+	SCREEN.Proc obj & ".SendOrder", ""
+End Sub
+
+Sub RecvOrder()
+	Dim obj
+
+	obj = "OBJ_odr"
+
+	BTN_MASU.Visible = False
+	BTN_MADO.Visible = False
+
+	Dim grid, jmno
+	Set grid = SCREEN.Object( obj & ".OGRID")
+
+	For ii=1 To grid.Rows
+		For jj=1 To GD_ORDER.Rows
+			If	Trim(grid.GetGridCell(ii,4))=Trim(GD_ORDER.GetGridCell(jj,2)) Then 'And Trim(grid.GetGridCell(ii,5))= "UTP1" Then
+
+				jmno = Trim(grid.GetGridCell(ii, 16))
+				emsg = Trim(grid.GetGridCell(ii, 18))
+
+'				SYSTEM.Trace "jmno[" & jmno & "] emsg[" & emsg & "]"
+
+				If jmno<>"" Then
+					jmno = CLng(jmno)
+					If jmno<>0 Then
+						GD_ORDER.SetGridCell jj, 16, jmno
+					End If
+				End If
+				If Len(Trim(emsg)) > 4 Then
+					If CLng(Mid(emsg,1,4))>=1000 Then
+						GD_ORDER.SetTRgb jj, 17, 94
+					Else
+						GD_ORDER.SetTRgb jj, 17, 69
+					End If
+				End If
+				GD_ORDER.SetGridCell jj, 17, emsg
+				Exit For
+			End If
+		Next
+	Next
+
+	SCREEN.Proc "main.OBJ_odr.AfterOrder", ""
+End Sub
+
+_AW_ONSTART_AW_
+jmbtclick.Data = 0
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+OnSend = False
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(GD_ORDER)
+_AW_ONCLICK_AW_
+
+col = GD_ORDER.Column
+row = GD_ORDER.Row
+
+If GD_ORDER.HitPos=4 Then
+End If
+
+If GD_ORDER.HitPos=3 And col=1 Then
+	acno = GD_ORDER.GetGridCell(row, 2)
+	jqty = GD_ORDER.GetGridCell(row, 14)
+
+	If Len(Trim(acno))=0 Then
+		' 빈Row의 경우 체크되지 않도록 한다.
+		Call GD_ORDER.SetGridCell(row, 1, 0)
+	ElseIf Len(Trim(jqty))=0 Or CLng(jqty)=0 Then
+		' 주문수량이 0이면 체크되지 않도록 한다.
+		Call GD_ORDER.SetGridCell(row, 1, 0)
+	End If
+	Call CheckCheck()
+End If
+_AW_ONENDSUB_AW_
+_AW_ONCHANGE_AW_
+Dim row, col, val, prc, obj
+
+row = GD_ORDER.Row
+col = GD_ORDER.Column
+
+'SYSTEM.Trace "GRID Change : Row[" & row & "], Col[" & col & "]"
+
+' 주문구분(호가), 주문가 변경시 처리 로
+If col=13 Or col=15 Then
+	val = GD_ORDER.GetGridCell(row, 13)
+	prc = CLng(GD_ORDER.GetGridCell(row, 15))
+
+	If val="03" Then				' 단가가 변경되거나, 주문구분이 변경되면 주문구분을 확인한다.
+		Call GD_ORDER.SetGridCell(row, 15, "0")
+	ElseIf val="00" And prc<5 Then	' 지정가로 변경되고, 단가가 0이면 현재가를 디폴트 세팅.
+		Set obj = SCREEN.Object("main.OBJ_sise." & "2023")
+		If IsNull(obj) Then
+			Set obj = SCREEN.Object("main.OBJ_sise." & "14723")
+		End If
+		Call GD_ORDER.SetGridCell(row, 15, obj.Data)
+	End If
+	Call CalcJqty()
+End If
+
+' 주문수량 변경시
+If col=14 Then
+	val = GD_ORDER.GetGridCell(row, 14)
+	qty = GD_ORDER.GetGridCell(row, 11)
+	'SYSTEM.Trace "qty => " & val & ", " & qty
+	If Not IsNumeric(val) Or Not IsNumeric(qty) Then
+		Exit Sub
+	End If
+
+'	If CLng(val)>CLng(qty) Then
+'		MsgBox "산정수량보다 큰 주문수량을 입력하실 수 없습니다.", vbOKOnly, "IBK투자증권"
+'		If qty=0 Then
+'			GD_ORDER.SetGridCell row, 14, "0"
+'		Else
+'			GD_ORDER.SetGridCell row, 14, qty
+'		End If
+'	End If
+
+	Call ClearCheck()
+	Call AllCheck()
+	Call CheckCheck()
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(CHK_ALL)
+_AW_ONCLICK_AW_
+
+If CHK_ALL.Checked Then
+	Call AllCheck()
+Else
+	Call ClearCheck()
+End If
+
+Call CheckCheck()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BTN_MASU)
+_AW_ONCLICK_AW_
+If BTN_MASU.Visible Then
+	SendOrder "2"
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BTN_MADO)
+_AW_ONCLICK_AW_
+If BTN_MADO.Visible Then
+	SendOrder "1"
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

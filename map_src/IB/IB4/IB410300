@@ -1,0 +1,390 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB410300)
+MAPSIZE(281, 609)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("풋/콜 레이쇼 분석")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(FMS|FLASH|CR2TAB)
+TITLE("[4103] 풋/콜 레이쇼 분석")
+TOPATH(AXIS)
+METHOD(MENU)
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL10(-2, 31, 611, 281)  LIMAGE(0)  LINEW(4)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  SYMBOL1(-2, 0, 611, 32)  LIMAGE(0)  LINEW(3)  LINETYPE(4)  LINECOLOR(64)      COLOR(66, 130)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BT1_UP(21, 344, 41, 364)  '일'  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(208, 232)  CUR(0)    "1BTN.BMP"    TABORDER(2)  ENABLE  &
+  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+COMBO  INTV(669, 117, 724, 137)  TP_NONE  LEN(3)  COUNT(5)  VCOUNT(5)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_MIXED|EDIT_INPUT    COLOR(68, 69)  CUR(0)  DISPLAY("10분", "15분", "20분", "30분", "60분")  DATA("010", "015", "020", "030", "060")    TABORDER(3)  IOORDER(3)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  DREC(99, 6, 142, 26)  LEN(3)  IO_NUM|EDIT_INPUT|FA_RIGHT|FA_PASS  FONT("굴림체", 9, NORMAL)    COLOR(68, 130)  CUR(0)  TP_SUNKEN  INIT("300")          TABORDER(1)  IOORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  tt1(58, 6, 94, 26)  '기간'  AL_RIGHT  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(141, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  tt2(142, 6, 154, 26)  '일'  AL_CENTER  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(141, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL1(262, 6, 286, 26)  '기준'  AL_CENTER  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(141, 130)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_NONE)
+COMBO  GUBN(291, 6, 371, 26)  TP_SUNKEN  LEN(1)  COUNT(2)  VCOUNT(2)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_NUM|EDIT_INPUT  FONT("굴림체", 9, NORMAL)    COLOR(68, 130)  CUR(0)  DISPLAY("거래대금", "거래량")  DATA("2", "1")    TABORDER(4)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  BUTTON1(518, 6, 566, 26)  '차트'  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(208, 186)  CUR(0)    "3BTN.BMP"    TABORDER(5)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+BUTTON  BUTTON3(567, 6, 603, 26)  '조회'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, BOLD)  COLOR(208, 186)  CUR(0)    "조회BTN.BMP"    TABORDER(6)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+EDIT  TICK(273, 424, 308, 446)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("2")          TABORDER(7)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  GJIL(164, 6, 249, 26)  LEN(8)  IO_NUM|EDIT_INPUT|FA_RIGHT|FA_DATE  FONT("굴림체", 9, NORMAL)    COLOR(68, 130)  CUR(0)  TP_SUNKEN  INIT("99999999")          EDITFORMAT("9999/99/99")  TABORDER(8)  IOORDER(5)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL0(328, 424, 443, 449)  '처리단위 1:분 2:일별'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  BT2_UP(53, 333, 73, 353)  '분'  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(208, 232)  CUR(0)    "1BTN.BMP"    TABORDER(10)  ENABLE  &
+  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+BUTTON  BT1_DN(7, 6, 27, 26)  '일'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, NORMAL)  COLOR(208, 186)  CUR(0)    "1BTN.BMP"    TABORDER(11)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+BUTTON  BT2_DN(28, 6, 48, 26)  '분'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, NORMAL)  COLOR(208, 186)  CUR(0)    "1BTN.BMP"    TABORDER(12)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+LABEL  LABEL2(484, 424, 534, 444)  '분갯수'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL3(484, 449, 534, 469)  '일갯수'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  bun_cnt(534, 424, 614, 446)  LEN(3)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("300")          TABORDER(13)  IOORDER(7)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  day_cnt(534, 449, 614, 471)  LEN(3)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("300")          TABORDER(14)  IOORDER(8)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL4(369, 474, 524, 494)  '차트수치구분 1:차트,2:수치'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  CTGB(534, 474, 599, 496)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("1")          TABORDER(15)  IOORDER(9)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  BUTTON0(59, 459, 149, 489)  'save'  TP_PUSH      AL_CENTER    COLOR(208, 232)  CUR(0)      TABORDER(16)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  BUTTON4(149, 459, 239, 489)  'load'  TP_PUSH      AL_CENTER    COLOR(208, 232)  CUR(0)      TABORDER(17)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  OBJ0(6, 39, 603, 273)    "IB410320"  TABORDER(9)  IOORDER(6)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  RADIO0(376, 7, 426, 25)  '최근월'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(grp0)      COLOR(141, 130)  CUR(0)      TABORDER(18)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  RADIO1(436, 7, 474, 25)  '전체'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(grp0)      COLOR(141, 130)  CUR(0)      TABORDER(19)  ENABLE  &
+  VISIBLE  CHECKED  TRANSPARENT  HINTTYPE(IH_NONE)
+GROUP  grp0(365, 330, 509, 363)        COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  TRGB(275, 385, 310, 407)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("1")          TABORDER(20)  IOORDER(10)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL5(328, 382, 705, 407)  '1:전체, 2:최근월   현재 skip 상태임.. 차트에서만 사용'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Private Sub loadUserConfig()
+'	If SCREEN.CreateObject("Info") Then
+'
+'	    If str1 = "" Then
+'		    saveUserConfig()
+'	    Else
+'		    TICK.Data = str1
+'		    day_cnt.data = Trim(INFO.popData(LOGIN.Name, "userconf.ini", "IB410300", "day_cnt"))
+'		    bun_cnt.data = Trim(INFO.popData(LOGIN.Name, "userconf.ini", "IB410300", "bun_cnt"))
+'		    GUBN.data    = Trim(INFO.popData(LOGIN.Name, "userconf.ini", "IB410300", "GUBN"))
+'  		    INTV.Data    = Trim(INFO.popData(LOGIN.Name, "userconf.ini", "IB410300", "INTV"))
+'		    CTGB.data    = Trim(INFO.popData(LOGIN.Name, "userconf.ini", "IB410300", "CTGB"))
+'		    If TICK.Data = "1" Then
+'			     bun_select()
+'          Else
+'              Day_select()
+'          End If
+'          If CTGB.data = "2" Then
+'				   BUTTON1.Text = "차트"
+'				   OBJ0.SETOBJECT("IB410320")
+'				   CTGB.Data = "2"
+'			 Else
+'				   BUTTON1.Text = "수치"
+'				   OBJ0.SETOBJECT("IB410310")
+'				   CTGB.Data = "1"
+'			 End If
+'
+'	    End If
+'	End If
+	DREC.Data = "300"
+End Sub
+
+Private Sub saveUserConfig()
+'	If SCREEN.CreateObject("Info") Then
+'		INFO.pushData LOGIN.Name, "userconf.ini", "IB410300", "TICK", TICK.Data
+'		INFO.pushData LOGIN.Name, "userconf.ini", "IB410300", "day_cnt", day_cnt.Data
+'		INFO.pushData LOGIN.Name, "userconf.ini", "IB410300", "bun_cnt", bun_cnt.Data
+'		INFO.pushData LOGIN.Name, "userconf.ini", "IB410300", "GUBN", GUBN.Data
+'   	INFO.pushData LOGIN.Name, "userconf.ini", "IB410300", "INTV", INTV.Data
+'		INFO.pushData LOGIN.Name, "userconf.ini", "IB410300", "CTGB", CTGB.Data
+'	End If
+End Sub
+
+Private Sub Obj_Send()
+	saveUserConfig()
+	OBJ0.Send
+End Sub
+
+Private Sub day_select()
+	tt1.Text = "기간"
+	tt2.Text = "일"
+	TICK.Data = "2"
+	DREC.Data = day_cnt.Data
+	GJIL.Visible = True
+	INTV.Visible = False
+'	DREC.Data = "300"
+'   BT1_UP.Visible = False
+'   BT1_DN.Visible = True
+'   BT2_UP.Visible = True
+'   BT2_DN.Visible = False
+End Sub
+
+
+
+Private Sub bun_select()
+	tt1.Text = "데이터"
+	tt2.Text = "개"
+	TICK.Data = "1"
+	INTV.Visible = True
+	DREC.Data = bun_cnt.Data
+	GJIL.Visible = False
+'	DREC.Data = "300"
+'   BT1_UP.Visible = True
+'   BT1_DN.Visible = False
+'   BT2_UP.Visible = False
+'   BT2_DN.Visible = True
+End Sub
+
+_AW_ONSTART_AW_
+loadUserConfig()
+Obj_Send()
+BUTTON1.SetFocus
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+'saveUserConfig()
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(BT1_UP)
+_AW_ONCLICK_AW_
+day_select()
+Obj_Send()
+
+
+'If(BUTTON0.Text = "일") Then
+'   BUTTON0.Text = "분"
+'   tt1.Text = "기간"
+'   tt2.Text = "일"
+'   TICK.Data = "2"
+'   GJIL.Visible = True
+'   INTV.Visible = False
+'Else
+'   BUTTON0.Text = "일"
+'   tt1.Text = "데이터"
+'   tt2.Text = "개"
+'   TICK.Data = "1"
+'   INTV.Visible = True
+'   GJIL.Visible = False
+'End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(INTV)
+_AW_ONCHANGE_AW_
+Obj_Send()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(DREC)
+_AW_ONCHANGE_AW_
+If TICK.Data = "1" Then
+    bun_cnt.Data = DREC.Data
+Else
+    day_cnt.Data = DREC.Data
+End If
+
+Obj_Send()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(GUBN)
+_AW_ONCHANGE_AW_
+Obj_Send()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON1)
+_AW_ONCLICK_AW_
+If(BUTTON1.Text = "데이터") Then
+   BUTTON1.Text = "차트"
+   OBJ0.SETOBJECT("IB410320")
+   BT2_DN.Enable = True
+'	GUBN.Visible = False
+'	LABEL1.Visible = False
+   CTGB.Data = "2"
+ 	BT2_DN.Visible = True
+Else
+   BUTTON1.Text = "데이터"
+   OBJ0.SETOBJECT("IB410310")
+   CTGB.Data = "1"
+   Call day_select()
+   BT2_DN.Enable = False
+'	LABEL1.Visible = True
+'	GUBN.Visible = True
+	BT2_DN.Visible = False
+End If
+Obj_Send()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON3)
+_AW_ONCLICK_AW_
+Obj_Send()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(GJIL)
+_AW_ONCHANGE_AW_
+Obj_Send()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BT2_UP)
+_AW_ONCLICK_AW_
+bun_select()
+Obj_Send()
+
+
+
+'If(BUTTON0.Text = "일") Then
+'   BUTTON0.Text = "분"
+'   tt1.Text = "기간"
+'   tt2.Text = "일"
+'   TICK.Data = "2"
+'   GJIL.Visible = True
+'   INTV.Visible = False
+'Else
+'   BUTTON0.Text = "일"
+'   tt1.Text = "데이터"
+'   tt2.Text = "개"
+'   TICK.Data = "1"
+'   INTV.Visible = True
+'   GJIL.Visible = False
+'End If
+'Obj_Send()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BT1_DN)
+_AW_ONCLICK_AW_
+day_select()
+Obj_Send()
+
+BUTTON1.Visible = True
+
+'If(BUTTON0.Text = "일") Then
+'   BUTTON0.Text = "분"
+'   tt1.Text = "기간"
+'   tt2.Text = "일"
+'   TICK.Data = "2"
+'   GJIL.Visible = True
+'   INTV.Visible = False
+'Else
+'   BUTTON0.Text = "일"
+'   tt1.Text = "데이터"
+'   tt2.Text = "개"
+'   TICK.Data = "1"
+'   INTV.Visible = True
+'   GJIL.Visible = False
+'End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BT2_DN)
+_AW_ONCLICK_AW_
+bun_select()
+Obj_Send()
+BUTTON1.Visible = False
+
+
+'If(BUTTON0.Text = "일") Then
+'   BUTTON0.Text = "분"
+'   tt1.Text = "기간"
+'   tt2.Text = "일"
+'   TICK.Data = "2"
+'   GJIL.Visible = True
+'   INTV.Visible = False
+'Else
+'   BUTTON0.Text = "일"
+'   tt1.Text = "데이터"
+'   tt2.Text = "개"
+'   TICK.Data = "1"
+'   INTV.Visible = True
+'   GJIL.Visible = False
+'End If
+'Obj_Send()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON0)
+_AW_ONCLICK_AW_
+saveUserConfig()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON4)
+_AW_ONCLICK_AW_
+loadUserConfig()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(RADIO0)
+_AW_ONCLICK_AW_
+TRGB.Data = "2"
+'Obj_Send()
+OBJ0.Send
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(RADIO1)
+_AW_ONCLICK_AW_
+TRGB.Data = "1"
+'Obj_Send()
+OBJ0.Send
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

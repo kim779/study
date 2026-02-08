@@ -1,0 +1,312 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB201503)
+MAPSIZE(332, 182)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+TITLE("조회종목제외")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL0(0, 0, 194, 334)  LIMAGE(0)  LINEW(3)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 130)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  btn_confirm(58, 307, 126, 327)  '확인'  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(208, 232)  CUR(0)    "4BTN.BMP"    TABORDER(9)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+BUTTON  CHECK0(27, 9, 165, 28)  '불성실공시종목 제외'  TP_CHECK|EDIT_NOP          COLOR(181, 130)  CUR(0)      TABORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  CHECK1(27, 34, 153, 53)  '신규상장종목 제외'  TP_CHECK|EDIT_NOP          COLOR(181, 130)  CUR(0)      TABORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  CHECK3(27, 84, 139, 103)  '우선주종목 제외'  TP_CHECK|EDIT_NOP          COLOR(181, 130)  CUR(0)      TABORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  CHECK5(27, 134, 127, 153)  '감리종목 제외'  TP_CHECK|EDIT_NOP          COLOR(181, 130)  CUR(0)      TABORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  CHECK2(27, 59, 139, 78)  '권리락종목 제외'  TP_CHECK|EDIT_NOP          COLOR(181, 130)  CUR(0)      TABORDER(5)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  CHECK4(27, 109, 128, 128)  '관리종목 제외'  TP_CHECK|EDIT_NOP          COLOR(181, 130)  CUR(0)      TABORDER(6)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  CHECK6(27, 159, 150, 178)  '거래정지종목 제외'  TP_CHECK|EDIT_NOP          COLOR(181, 130)  CUR(0)      TABORDER(7)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  CHECK7(27, 184, 151, 203)  '투자유의종목 제외'  TP_CHECK|EDIT_NOP          COLOR(181, 130)  CUR(0)      TABORDER(8)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  CHECK8(27, 209, 151, 228)  '투자경고종목 제외'  TP_CHECK|EDIT_NOP          COLOR(181, 130)  CUR(0)      TABORDER(10)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  CHECK9(27, 234, 151, 253)  '투자위험종목 제외'  TP_CHECK|EDIT_NOP          COLOR(181, 130)  CUR(0)      TABORDER(11)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  CHECK10(27, 259, 171, 278)  '투자주의환기종목 제외'  TP_CHECK|EDIT_NOP          COLOR(181, 130)  CUR(0)      TABORDER(12)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  CHECK11(27, 284, 171, 303)  '투자주의종목 제외'  TP_CHECK|EDIT_NOP          COLOR(181, 130)  CUR(0)      TABORDER(13)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Function GetIniData(Section, Default)
+	Data = ""
+	If SCREEN.CreateObject("Info") Then
+		Data = Trim(INFO.PopData(LOGIN.Name, "userconf.ini", "IB201500", Section))
+		If Len(Data) = 0 Then
+			INFO.PushData LOGIN.Name, "userconf.ini", "IB201500", Section, Default
+			Data = Default
+		End If
+	End If
+	GetIniData = Data
+End Function
+'-----------------------------------------------------------------------
+Sub SetIniData(Section, Data)
+	If SCREEN.CreateObject("Info") Then
+		INFO.PushData LOGIN.Name, "userconf.ini", "IB201500", Section, Data
+	End If
+End Sub
+
+_AW_ONINDECLARE_AW_
+#load IB888888
+
+_AW_ONENDSUB_AW_
+_AW_ONSTART_AW_
+chk0 = GetIniData("GB0", "1")
+If 	chk0 = "1" Then
+	CHECK0.Checked = True
+Else
+	CHECK0.Checked = False
+End If
+
+chk1 = GetIniData("GB1", "1")
+If 	chk1 = "1" Then
+	CHECK1.Checked = True
+Else
+	CHECK1.Checked = False
+End If
+
+chk2 = GetIniData("GB2", "1")
+If 	chk2 = "1" Then
+	CHECK2.Checked = True
+Else
+	CHECK2.Checked = False
+End If
+
+chk3 = GetIniData("GB3", "1")
+If 	chk3 = "1" Then
+	CHECK3.Checked = True
+Else
+	CHECK3.Checked = False
+End If
+
+chk4 = GetIniData("GB4", "1")
+If 	chk4 = "1" Then
+	CHECK4.Checked = True
+Else
+	CHECK4.Checked = False
+End If
+
+chk5 = GetIniData("GB5", "1")
+If 	chk5 = "1" Then
+	CHECK5.Checked = True
+Else
+	CHECK5.Checked = False
+End If
+
+chk6 = GetIniData("GB6", "1")
+If 	chk6 = "1" Then
+	CHECK6.Checked = True
+Else
+	CHECK6.Checked = False
+End If
+
+chk7 = GetIniData("GB7", "1")
+If 	chk7 = "1" Then
+	CHECK7.Checked = True
+Else
+	CHECK7.Checked = False
+End If
+
+chk8 = GetIniData("GB8", "1")
+If 	chk8 = "1" Then
+	CHECK8.Checked = True
+Else
+	CHECK8.Checked = False
+End If
+
+chk9 = GetIniData("GB9", "1")
+If 	chk9 = "1" Then
+	CHECK9.Checked = True
+Else
+	CHECK9.Checked = False
+End If
+
+chk10 = GetIniData("GB10", "1")
+If 	chk10 = "1" Then
+	CHECK10.Checked = True
+Else
+	CHECK10.Checked = False
+End If
+
+chk11 = GetIniData("GB11", "1")
+If 	chk11 = "1" Then
+	CHECK11.Checked = True
+Else
+	CHECK11.Checked = False
+End If
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(btn_confirm)
+_AW_ONCLICK_AW_
+'SYSTEM.Push "mapcs", "OK"
+SCREEN.CloseWindow
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(CHECK0)
+_AW_ONCLICK_AW_
+If CHECK0.Checked Then
+	SetIniData "GB0", "1"
+Else
+	SetIniData "GB0", "0"
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(CHECK1)
+_AW_ONCLICK_AW_
+If CHECK1.Checked Then
+	SetIniData "GB1", "1"
+Else
+	SetIniData "GB1", "0"
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(CHECK3)
+_AW_ONCLICK_AW_
+If CHECK3.Checked Then
+	SetIniData "GB3", "1"
+Else
+	SetIniData "GB3", "0"
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(CHECK5)
+_AW_ONCLICK_AW_
+If CHECK5.Checked Then
+	SetIniData "GB5", "1"
+Else
+	SetIniData "GB5", "0"
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(CHECK2)
+_AW_ONCLICK_AW_
+If CHECK2.Checked Then
+	SetIniData "GB2", "1"
+Else
+	SetIniData "GB2", "0"
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(CHECK4)
+_AW_ONCLICK_AW_
+If CHECK4.Checked Then
+	SetIniData "GB4", "1"
+Else
+	SetIniData "GB4", "0"
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(CHECK6)
+_AW_ONCLICK_AW_
+If CHECK6.Checked Then
+	SetIniData "GB6", "1"
+Else
+	SetIniData "GB6", "0"
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(CHECK7)
+_AW_ONCLICK_AW_
+If CHECK7.Checked Then
+	SetIniData "GB7", "1"
+Else
+	SetIniData "GB7", "0"
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(CHECK8)
+_AW_ONCLICK_AW_
+If CHECK8.Checked Then
+	SetIniData "GB8", "1"
+Else
+	SetIniData "GB8", "0"
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(CHECK9)
+_AW_ONCLICK_AW_
+If CHECK9.Checked Then
+	SetIniData "GB9", "1"
+Else
+	SetIniData "GB9", "0"
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(CHECK10)
+_AW_ONCLICK_AW_
+If CHECK10.Checked Then
+	SetIniData "GB10", "1"
+Else
+	SetIniData "GB10", "0"
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(CHECK11)
+_AW_ONCLICK_AW_
+If CHECK11.Checked Then
+	SetIniData "GB11", "1"
+Else
+	SetIniData "GB11", "0"
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

@@ -1,0 +1,117 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(TT900063)
+MAPSIZE(469, 490)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("MS Sans Serif", 9, NORMAL)
+OPTIONS(CR2TAB)
+TITLE("OBJECT용 계좌 결제예정내역")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("piboPBxQ")
+MAPTYPE(FIXED)
+HEADER(LEDGER)
+TRXH("11CSONCQ350")
+}
+
+
+
+FORM DIVISION
+{
+
+EDIT  in(138, 7, 188, 26)  LEN(5)  IO_DIGIT|EDIT_INOUT|FA_WRAP|FA_XFLOAT    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("00001")          TABORDER(1)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  OUTPUT0(5, 224, 60, 239)  LEN(1)  IO_NUM|AL_CENTER|    COLOR(192, 69)  CUR(0)            TABORDER(0)  IOORDER(3)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  GUIDE(-2, 182, 488, 200)  LINECOLOR(75)      COLOR(66, 69)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON0(335, 85, 415, 125)  TP_PUSH      AL_CENTER    FOCUS  COLOR(208, 232)  CUR(0)      TABORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL4(13, 7, 88, 27)  '레코드갯수'  AL_CENTER  CUR(0)      COLOR(66, 69)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_NONE)
+GRID  GRID0(8, 32, 163, 162)  VISIBLEROW(0)  CELLH(20)  MATRIX(2, 1)  FIX(0)  MAINCOLOR(208, 232)  LINECOLOR(0)  FOCUSCOLOR(0)  FOCUSKIND(0)      &
+	COLINFO("acc")  LEN(20)  WIDTH(134)  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_NUM|EDIT_INOUT      COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    TABORDER(3)  IOORDER(2)  ENABLE  &
+  VISIBLE
+
+GRID  GRID1(8, 252, 333, 462)  VISIBLEROW(0)  CELLH(20)  MATRIX(0, 2)  FIX(0)  MAINCOLOR(208, 232)  LINECOLOR(0)  FOCUSCOLOR(0)  FOCUSKIND(0)  |FLEXIBLE    &
+	COLINFO("buy")  LEN(17)  WIDTH(134)  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_NUM|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("sell")  LEN(17)  WIDTH(134)  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_NUM|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    TABORDER(4)  IOORDER(4)  ENABLE  &
+  VISIBLE
+
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Sub send_f()
+	SCREEN.ClearAll 0, 2
+	LEDGER.Fkey = "C"
+	SCREEN.Send 0
+End Sub
+
+'== 연속 조회
+Sub send_c()
+	LEDGER.Fkey = "7"
+	GRID0.SetDataPosition(2)
+	SCREEN.Send 0
+End Sub
+
+Function Find_Row(acc_no, mtp,code)
+
+
+	For row = 1 To GRID0.Rows
+		If Trim(acc_no) = Trim(GRID0.GetGridCell (row, 2)) _
+				And Trim(mtp) = Trim(GRID0.GetGridCell (row, 4)) _
+				And Trim(code) = Trim(GRID0.GetGridCell (row, 6)) Then
+			Find_Row = row
+			Exit Function
+		End If
+	Next
+	Find_Row = 0
+End Function
+
+_AW_ONRECEIVE_AW_
+Dim ii, jj, Total_Buy, Total_Sell
+
+If LEDGER.Next = "Y" Then
+	Send_c()
+
+Else
+	Total_Buy  = 0
+	Total_Sell = 0
+	If GRID1.Rows = 0 Then Exit Sub
+	For ii= 1 To GRID1.Rows
+		Total_Buy = Total_Buy + CLng(GRID1.GetGridCell(ii,1))
+		ToTal_Sell = Total_Sell + CLng(GRID1.GetGridCell(ii,2))
+	Next
+	MsgBox CStr(Total_Buy) & " <===> " & CStr(Total_Sell)
+	
+'	'MsgBox sAccList
+'	Call SCREEN.Object("main.control0").SetFilterAcc(sAccList)
+'	SCREEN.Object("main.send_btn").Enable = True
+'	SCREEN.Proc "main.send_f", ""
+End If
+
+'SCREEN.Object("main.Guide").Text = GUIDE.Text
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(BUTTON0)
+_AW_ONCLICK_AW_
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

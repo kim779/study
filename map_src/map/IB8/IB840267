@@ -1,0 +1,285 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB840267)
+MAPSIZE(211, 635)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("투자설명서 다운로드")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(ENCODE|CR2TAB)
+TITLE("투자설명서 다운로드창")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("piboPBxQ")
+MAPTYPE(FIXED)
+HEADER(LEDGER)
+TRXH("11CSPBST024")
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL105(0, 0, 637, 213)  LIMAGE(0)  LINEW(3)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  GUIDE(8, 182, 628, 205)  |FA_ENUM  "IB100199"  TABORDER(11)  IOORDER(19)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+CONTROL  c_down(846, 145, 1466, 318)  |FA_PROTECT  "CX_Download"  ""  LEN(0)  EDIT_NOP  FONT("굴림체", 9, NORMAL)    COLOR(192, 232)  TABORDER(0)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL0(438, 367, 518, 390)  '레코드 갯수'  AL_LEFT  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(208, 69)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL1(438, 395, 518, 418)  '처리구분'  AL_LEFT  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(208, 69)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL2(438, 449, 518, 472)  '실명확인번호'  AL_LEFT  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(208, 69)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL3(438, 477, 518, 500)  '계좌번호'  AL_LEFT  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(208, 69)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL4(438, 505, 518, 528)  '청약종목번호'  AL_LEFT  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(208, 69)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  zIn(522, 367, 631, 391)  LEN(5)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 69)  CUR(0)  TP_NONE  INIT("00001")          TABORDER(1)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  zTrxTp(522, 396, 631, 420)  LEN(1)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 69)  CUR(0)  TP_NONE  INIT("1")          TABORDER(2)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  zRmnno(522, 449, 631, 473)  LEN(24)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 69)  CUR(0)  TP_NONE          TABORDER(3)  IOORDER(4)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  zAcntNo(522, 477, 631, 501)  LEN(20)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 69)  CUR(0)  TP_NONE          TABORDER(4)  IOORDER(5)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  zAppyIsuNo(522, 504, 631, 528)  LEN(12)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 69)  CUR(0)  TP_NONE          TABORDER(5)  IOORDER(6)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL5(671, 395, 751, 415)  '레코드 갯수'  AL_LEFT  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(208, 69)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL10(671, 367, 751, 387)  'input 갯수'  AL_LEFT  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(208, 69)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL14(670, 421, 750, 441)  '고객명'  AL_LEFT  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(208, 69)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL15(670, 449, 750, 469)  '종목명'  AL_LEFT  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(208, 69)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL16(670, 477, 750, 497)  '발송방법명'  AL_LEFT  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(208, 69)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  inputCount(759, 368, 879, 388)  LEN(290)  IO_MIXED|AL_CENTER|    COLOR(192, 69)  CUR(0)            TABORDER(0)  IOORDER(11)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  Out(759, 396, 879, 416)  LEN(5)  IO_NUM|AL_CENTER|    COLOR(192, 69)  CUR(0)            TABORDER(0)  IOORDER(12)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  zCintNm(758, 422, 878, 442)  LEN(40)  IO_MIXED|AL_CENTER|    COLOR(192, 69)  CUR(0)            TABORDER(0)  IOORDER(13)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  zIsuNm(758, 450, 878, 470)  LEN(40)  IO_MIXED|AL_CENTER|    COLOR(192, 69)  CUR(0)            TABORDER(0)  IOORDER(14)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  zTrxIp(758, 478, 878, 498)  LEN(40)  IO_MIXED|AL_CENTER|    COLOR(192, 69)  CUR(0)            TABORDER(0)  IOORDER(15)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL17(438, 533, 518, 556)  '교부일'  AL_LEFT  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(208, 69)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL18(438, 561, 518, 584)  '발송방법코드'  AL_LEFT  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(208, 69)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL19(438, 589, 518, 612)  'DOWN 시각'  AL_LEFT  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(208, 69)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  zDlvrDt(522, 532, 631, 556)  LEN(8)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 69)  CUR(0)  TP_NONE          TABORDER(6)  IOORDER(7)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  zSndMthdCode(523, 562, 632, 586)  LEN(2)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 69)  CUR(0)  TP_NONE  INIT("03")          TABORDER(7)  IOORDER(8)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  zDownTime(522, 589, 695, 613)  LEN(17)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 69)  CUR(0)  TP_NONE          TABORDER(8)  IOORDER(9)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL6(8, 284, 133, 307)  '기준일자(청약개시일)'  AL_LEFT  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(208, 69)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  zAppySrtDt(137, 284, 246, 308)  LEN(8)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 69)  CUR(0)  TP_NONE          TABORDER(9)  IOORDER(17)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL(8, 312, 133, 337)  '등록여부'  AL_LEFT  CUR(0)      COLOR(208, 69)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  regYn(138, 312, 243, 337)  LEN(1)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 69)  CUR(0)  TP_NONE          TABORDER(10)  IOORDER(18)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  obj_serverCheck(21, 588, 311, 688)    "IB840352"  TABORDER(12)  IOORDER(20)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL7(435, 617, 515, 640)  'URL'  AL_LEFT  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(208, 69)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  zAppyDlvrUrl(519, 617, 692, 641)  LEN(200)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 69)  CUR(0)  TP_NONE          TABORDER(13)  IOORDER(10)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL8(670, 507, 750, 527)  '청약시작일'  AL_LEFT  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(208, 69)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  zAppySrtDt_(758, 508, 878, 528)  LEN(8)  IO_MIXED|AL_CENTER|    COLOR(192, 69)  CUR(0)            TABORDER(0)  IOORDER(16)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  btnClose(593, 183, 625, 203)  '닫기'  TP_PUSH|IMAGETEXT|AL_STRETCH        FOCUS  COLOR(208, 69)  CUR(0)    "2BTN.BMP"    TABORDER(14)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+LABEL  LABEL9(438, 422, 518, 445)  '교부구분'  AL_LEFT  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(208, 69)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  zDlvrTp(522, 423, 631, 447)  LEN(1)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 69)  CUR(0)  TP_NONE  INIT("1")          TABORDER(15)  IOORDER(3)  ENABLE  &
+  HINTTYPE(IH_NONE)
+CONTROL  CONTROL0(252, 709, 387, 804)  |FA_PROTECT  "CX_log"  ""  LEN(0)  EDIT_NOP    COLOR(192, 232)  TABORDER(0)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Option Explicit
+
+Function getCurrTime()
+	Dim currHour, currMin, currSec
+	currHour = Hour(Now)
+	currMin = Minute(Now)
+	currSec = Second(Now)
+
+	If Len(currHour) = 1 Then
+		currHour = "0" & currHour
+	End If
+
+	If Len(currMin) = 1 Then
+		currMin = "0" & currMin
+	End If
+
+	If Len(currSec) = 1 Then
+		currSec = "0" & currSec
+	End If
+
+	getCurrTime = currHour & currMin & currSec
+End Function
+
+_AW_ONINDECLARE_AW_
+#LOAD IB888833
+#Load IB888888
+
+_AW_ONENDSUB_AW_
+_AW_ONSTART_AW_
+GUIDE.Text = "투자설명서 교부중..."
+obj_serverCheck.Send
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+SCREEN.OnSend = False
+
+zIn.Data = "00001"
+zTrxTp.Data = "1"
+zDlvrTp.Data = "1"
+zRmnno.Data = LOGIN.Juno
+
+If Len(Trim(zAcntNo.Data)) <> 11 Then
+	Call alert_msg("계좌번호를 확인하여 주십시오.")
+	Exit Sub
+End If
+
+If Trim(zAppyIsuNo.Data) = "" Then
+	Call alert_msg("청약종목을 확인하여 주십시오.")
+	Exit Sub
+End If
+
+zDlvrDt.Data = getCurrDay()
+zSndMthdCode.Data = "03"
+zDownTime.Data = getCurrTime()
+zAppyDlvrUrl.Data = ""
+
+SCREEN.OnSend = True
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+'If Left(LEDGER.Ecod,1) <> "0" Then
+'	MsgBox Trim(LEDGER.Emsg),,"IBK투자증권"
+'Else
+'	SCREEN.CloseWindow()
+'End If
+
+SCREEN.CloseWindow()
+
+_AW_ONENDSUB_AW_
+_AW_ONTIMER_AW_
+Dim code, staff
+code = Trim(zAppyIsuNo.Data)
+
+If Len(code) < 3 Then
+	MsgBox "종목코드를 확인하시기 바랍니다.",,"IBK투자증권"
+	Exit Sub
+End If
+'
+If SCREEN.CreateObject("Info") Then
+		staff = Trim(INFO.PopData(LOGIN.Name, "userconf.ini", "IB0000AX", "staff"))
+End If
+
+
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+' AS-IS : code = Mid(code,2,Len(code)-1)
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+' TO-BE : 무조건 앞에 1 Byte를 떼면 7 Byte 말고 다른 종목 체계에서 오류 나서 아래와 같이 수정함
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+' 2025.05.21 by LIM
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Select Case Len(code)
+Case 7	' 일반코드   :: A000660 -> 앞에 접두 1Byte 떼야 함
+	code = Mid(code,2,Len(code)-1)
+Case Else  ' 신주인수권등의 9 Byte 종목 :: J0110801F -> 그대로 사용
+	code = Trim(code)
+End Select
+
+
+Dim sFName
+sFName = ""
+If staff = "X" Then
+	sFName = "https:\\download.ibks.com\subscribe\"
+Else
+	sFName = "https:\\www.ibks.com\files\subscribe\"
+End If
+sFName = sFName & Trim(zAppySrtDt.Data)&"_"& Trim(code) & ".pdf"
+GUIDE.Text = Trim(sFName)
+'MsgBox(sFName)
+
+
+'Dim oShell
+'Set oShell = CreateObject ("WScript.shell")
+'oShell.Run sFName
+'oShell = Null
+
+Dim dmsg, title
+title = "투자설명서"
+dmsg  = "ed_url"   & vbTab & Trim(sFName) & vbLf &_
+        "ed_title" & vbTab & Trim(title)  & vbLf
+SYSTEM.Push "DOYOUAGREE", "NO"
+
+
+SCREEN.CreateWindow 2, "IB999991 /p5 /d", dmsg
+
+If SYSTEM.Pop("DOYOUAGREE") <> "YES" Then
+	MsgBox Trim(title)& "에 동의를 하신 후 진행이 가능합니다.", , "IBK투자증권"
+	SCREEN.CloseWindow()
+End If
+
+'
+Dim succ
+succ = "OK"
+SCREEN.Send 0
+SYSTEM.Push "Dn_Success", succ
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(c_down)
+_AW_ONDBLCLK_AW_
+If Trim(regYn.Data) = "N" Then
+
+	Dim succ
+
+	If c_down.IsDownload() = "1" Then '다운로드 성공시
+		succ = "OK"
+		SCREEN.Send 0
+	End If
+
+	SYSTEM.Push "Dn_Success", succ
+Else
+	SYSTEM.Push "Dn_Success", "OK"
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(btnClose)
+_AW_ONCLICK_AW_
+SCREEN.CloseWindow
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

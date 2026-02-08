@@ -1,0 +1,310 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB1301T0)
+MAPSIZE(203, 688)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("일별손익")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(ENCODE)
+TITLE("[1301]일별손익")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(NORM)
+HEADER(LEDGER)
+BGROUND(BRUSH, 181)
+}
+
+
+
+FORM DIVISION
+{
+
+LABEL  LABEL3(0, 40, 705, 69)  AL_LEFT  CUR(0)      COLOR(181, 232)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL0(0, 0, 700, 52)        COLOR(66, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL0(6, 4, 56, 24)  '계좌번호'  AL_LEFT  CUR(0)      COLOR(66, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+CONTROL  AN1A(57, 4, 197, 24)    "CX_Account"  "/w0"  LEN(11)  EDIT_INPUT    COLOR(192, 130)  TABORDER(1)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  ACNM(201, 4, 265, 24)  LEN(30)  IO_MIXED|AL_LEFT||FA_SKIP    COLOR(160, 130)  CUR(0)  LINECOLOR(89)          TABORDER(0)  IOORDER(5)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL1(6, 28, 56, 48)  '조회구분'  AL_LEFT  CUR(0)      COLOR(66, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL6(307, 4, 357, 24)  '비밀번호'  AL_LEFT  CUR(0)      COLOR(66, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  zPwd(359, 4, 415, 24)  LEN(8)  IO_MIXED|EDIT_INPUT|FA_PASSWD|FA_WRAP    COLOR(192, 130)  CUR(0)  TP_SUNKEN          TABORDER(2)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+COMBO  zQryTp(57, 28, 200, 48)  TP_SUNKEN  LEN(1)  COUNT(2)  VCOUNT(2)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_MIXED|EDIT_INPUT    COLOR(68, 130)  CUR(0)  DISPLAY("당일매도기준", "당일매수분 매도기준")  DATA("1", "2")    TABORDER(3)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  CHECK0(205, 28, 301, 48)  '매매비용 포함'  TP_CHECK|EDIT_NOP          COLOR(66, 130)  CUR(0)      TABORDER(4)  ENABLE  &
+  VISIBLE  CHECKED  HINTTYPE(IH_NONE)
+LABEL  LABEL2(307, 28, 357, 48)  '조회일자'  AL_LEFT  CUR(0)      COLOR(66, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+COMBO  COMBO0(620, 25, 679, 45)  TP_SUNKEN  LEN(1)  COUNT(2)  VCOUNT(2)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_NUM|EDIT_INPUT|FA_SKIP    COLOR(68, 130)  CUR(0)  DISPLAY("당일", "일자별")  DATA("0", "1")    TABORDER(5)  IOORDER(6)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  send_btn(610, 4, 646, 24)  '조회'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, BOLD)  FOCUS  COLOR(208, 186)  CUR(0)    "조회BTN.BMP"    TABORDER(6)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+BUTTON  next_btn(647, 4, 683, 24)  '다음'  TP_PUSH|IMAGETEXT|AL_STRETCH        FOCUS  COLOR(208, 186)  CUR(0)    "2btn.bmp"    TABORDER(7)  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+OBJECT  obj(0, 55, 688, 186)    "IB1301T1"  TABORDER(8)  IOORDER(8)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  zCmsnAmtAppTp(12, 362, 32, 388)  LEN(1)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("1")          TABORDER(9)  IOORDER(4)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  b_chk(734, 5, 758, 24)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(10)  IOORDER(9)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  temp_ACNM(12, 392, 132, 411)  LEN(30)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(11)  IOORDER(10)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  zOrdDt(359, 28, 446, 48)  LEN(8)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_DATE    COLOR(68, 130)  CUR(0)  TP_SUNKEN          EDITFORMAT("9999/99/99")  TABORDER(12)  IOORDER(7)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  sec(12, 416, 34, 434)  LEN(1)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("1")          TABORDER(13)  IOORDER(11)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  BUTTON0(561, 4, 609, 24)  '도움말'  TP_PUSH|IMAGETEXT|AL_STRETCH        FOCUS  COLOR(208, 186)  CUR(0)    "3BTN.BMP"    TABORDER(14)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+OBJECT  GUIDE(0, 187, 701, 205)  |FA_ENUM  "IB1000G0"  TABORDER(15)  IOORDER(12)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  obj_Buf(189, 320, 324, 452)    "IB1000T0"  TABORDER(16)  IOORDER(13)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  tday(525, 25, 612, 45)  LEN(8)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_DATE    COLOR(68, 130)  CUR(0)  TP_SUNKEN          EDITFORMAT("9999/99/99")  TABORDER(17)  IOORDER(14)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Const myFILE = "userconf.ini"
+Const myMAP = "WithFee"
+
+'== 계좌명, 비밀번호 설정
+Sub Set_account()
+	SCREEN.ClearAll 2, 2
+	SCREEN.Object("GUIDE.GUIDE").Text = ""
+
+	ACNM.Data = AN1A.Name
+	zPwd.Data = AN1A.Password
+
+	If Len(Trim(AN1A.Data)) < 11 Then
+		AN1A.SetFocus
+		Exit Sub
+	End If
+
+	If SYSTEM.ConnectBy = "1" Then
+		If Len(Trim(zPwd.Data)) < 4 Then
+			zPwd.SetFocus
+			Exit Sub
+		End If
+	End If
+
+	If Trim( SCREEN.Object("obj_Buf.edt_MapNo").Data) = "" Then
+		Exit Sub
+	End If
+
+	SCREEN.Proc "obj.send_f", ""
+End Sub
+
+Sub send_f()
+	If SYSTEM.ConnectBy = "1" Then
+		If Len(Trim(zPwd.Data)) < 4 Then
+			obj.ClearAll 2
+			next_btn.Enable = False
+			SCREEN.Object("main.GUIDE.GUIDE").Text = "비밀번호를 입력하세요."
+			Exit Sub
+		End If
+	End If
+
+	If Trim(zOrdDt.Data) = Trim(tday.Data) Then
+		obj.SetObject("IB1301T1")
+	Else
+		obj.SetObject("IB1301T2")
+	End If
+	
+	SCREEN.Proc "obj.send_f", ""
+End Sub
+
+'''///////
+Sub SetInitCustomer()
+	Dim iCustomerType
+	iCustomerType = SYSTEM.ConnectBy
+	SCREEN.Object("obj_Buf.edt_Customer").Data = iCustomerType
+	If iCustomerType <> "1" Then '고객
+		zPwd.Enable = False
+		If Trim(zPwd.Data) = "" Then
+			zPwd.Data = "9999"
+		End If
+	End If
+
+	SetInitVal()
+End Sub
+
+
+Sub SetInitVal()
+'매매비용 포함여부
+	Dim stock_fee
+	If SCREEN.CreateObject("Info") Then
+		stock_fee = INFO.PopData(LOGIN.Name, myFILE, myMAP, "Stock")
+		If Trim(stock_fee) = "" Then
+			stock_fee = False
+		End If
+		CHECK0.Checked = stock_fee
+		If CHECK0.Checked = False Then
+			zCmsnAmtAppTp.Data = 0
+		Else
+	  	  zCmsnAmtAppTp.Data = 1
+		End If
+	End If
+
+	If SCREEN.Object("obj_Buf.edt_sndCnt").Data = 0 Then
+		'Call send_f()
+	End If
+
+End Sub
+
+
+Sub SetPassword(sData)
+	Dim Ifind, sAcc, sPass
+	ifind = InStr(sData, "-")
+	sAcc = Trim( Left(sData, Ifind-1) )
+	sPass = Trim( Mid(sData, Ifind+1, Len(sData)- Ifind) )
+	If Trim(AN1A.Data) = sAcc Then
+		zPwd.data = sPass
+		If Trim( SCREEN.Object("obj_Buf.edt_sndCnt").Data) = "0" Then
+			Call send_f()
+		End If
+	End If
+End Sub
+
+_AW_ONINDECLARE_AW_
+#Load IB888833
+#load IB1000BB
+
+_AW_ONENDSUB_AW_
+_AW_ONSTART_AW_
+If Trim(zPwd.Data) = "" And SYSTEM.ConnectBy <> "1" Then '고객
+	zPwd.Enable = False
+End If
+
+'매매비용 포함여부
+Dim stock_fee
+If SCREEN.CreateObject("Info") Then
+	stock_fee = INFO.PopData(LOGIN.Name, myFILE, myMAP, "Stock")
+	If Trim(stock_fee) = "" Then
+		stock_fee = False
+	End If
+	CHECK0.Checked = stock_fee
+End If
+
+'If SCREEN.CreateObject("Info") Then
+'	combo = Trim(INFO.popData (LOGIN.Name, "userconf.ini", SCREEN.GetMapName(1), "100136_COM1"))
+'	zQryTp.Data = combo
+'End If
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+SCREEN.OnSend = False
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(AN1A)
+_AW_ONCHANGE_AW_
+Set_account()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(zPwd)
+_AW_ONKEYCHANGE_AW_
+
+If SCREEN.Key = 13 And Trim(zPwd.Data) <> "" Then
+	Call send_f()
+	SCREEN.Proc "OnSave_ToDLL", "False, PSWD, " & Trim(AN1A.Data) & "-" & Trim(zPwd.Data)
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(zQryTp)
+_AW_ONCHANGE_AW_
+Call send_f()
+sec.Data = "4"
+SCREEN.CreateObject("Info")
+INFO.pushData LOGIN.Name, "userconf.ini", SCREEN.GetMapName(1), "100136_COM1", zQryTp.data
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(CHECK0)
+_AW_ONCLICK_AW_
+If CHECK0.Checked = False Then
+	zCmsnAmtAppTp.Data = 0
+Else
+    zCmsnAmtAppTp.Data = 1
+End If
+
+If SCREEN.CreateObject("Info") Then
+  INFO.PushData LOGIN.Name, myFILE, myMAP, "Stock", CHECK0.Checked
+End If
+
+Call send_f()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(COMBO0)
+_AW_ONCHANGE_AW_
+If COMBO0.Data = 0 Then
+	zOrdDt.Visible = False
+	obj.SetObject("IB1301T1")
+ElseIf COMBO0.Data = 1 Then
+	zOrdDt.Visible = True
+	obj.SetObject("IB1301T2")
+End If
+
+Call send_f()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(send_btn)
+_AW_ONCLICK_AW_
+SCREEN.Proc "obj.send_f", ""
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(next_btn)
+_AW_ONCLICK_AW_
+SCREEN.Proc "obj.send_c", ""
+sec.Data = "3"
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(zOrdDt)
+_AW_ONCHANGE_AW_
+Call send_f()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON0)
+_AW_ONCLICK_AW_
+SCREEN.CreateWindow 1, "IB130130 /t/s/p5/", ""
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(tday)
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

@@ -1,0 +1,106 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB821521)
+MAPSIZE(244, 690)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(ENCODE)
+TITLE("개별-기본")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(NORM)
+HEADER(LEDGER)
+}
+
+
+
+FORM DIVISION
+{
+
+EDIT  an(14, 323, 134, 342)  LEN(20)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(1)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  pwd(16, 348, 136, 367)  LEN(8)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(2)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  obj(0, 0, 690, 244)    "IB82152A"  TABORDER(3)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Sub SetIndividualAccn()
+'	SYSTEM.Trace "aaaaaaaaaa"
+	Dim tmpMidAccn
+	tmpMidAccn = Mid(Trim(SCREEN.Object("main.AN98").Data), 4, 2)
+
+	Select Case tmpMidAccn
+		Case "10", "11", "51", "52"
+			obj.SetObject "IB82152A"	'------ 위탁
+		Case "20", "21"
+			obj.SetObject "IB82152B"	'------ 선물
+		Case "30"
+			obj.SetObject "IB82152C"	'------ 저축
+		Case Else
+			obj.SetObject "IB82152D"	'------ 수익증권
+	End Select
+End Sub
+
+_AW_ONINDECLARE_AW_
+#load IB888833
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+SCREEN.OnSend False
+
+Dim bit
+
+an.Data = SCREEN.Object("main.AN98").data
+pwd.Data = SCREEN.Object("main.zpwd").data
+
+Call SetIndividualAccn()
+
+'bit = Mid(an.data, 4, 2)
+'
+'Select Case bit
+'	Case "10", "51", "52"
+'		obj.SetObject "IB82152A"	'------ 위탁
+'	Case "20"
+'		obj.SetObject "IB82152B"	'------ 선물
+'	Case "30"
+'		obj.SetObject "IB82152C"	'------ 저축
+'	Case Else
+'		obj.SetObject "IB82152D"	'------ 수익증권
+'End Select
+
+If CheckInput(an, pwd) = True Then
+	obj.Send
+	Exit Sub
+End If
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+If LEDGER.Ecod = "3669" Or LEDGER.Ecod = "1001"Then
+	SCREEN.ClearAll 1,2
+	If SCREEN.Object("main.sect").Data = "1" Then
+		SCREEN.Object("main.ACNM").Data = SCREEN.Object("main.AN99").name
+	Else
+		SCREEN.Object("main.ACNM").Data = SCREEN.Object("main.AN98").name
+	End If
+	SCREEN.Object("main.zPwd").Clear
+	SCREEN.Object("main.zPwd").SetFocus
+End If
+
+_AW_ONENDSUB_AW_
+}
+
+
+

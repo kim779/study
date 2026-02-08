@@ -1,0 +1,153 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB510000)
+MAPSIZE(478, 746)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("선물옵션예약주문")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(CR2TAB|SAVE)
+TITLE("[5100] 선물옵션예약주문")
+TOPATH(AXIS)
+METHOD(MENU)
+TRXCODE("pooppoop")
+MAPTYPE(NORM)
+HEADER(LEDGER)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL1(0, 477, 751, 481)        COLOR(64, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL2(-2, 242, 748, 457)  LIMAGE(0)  LINEW(4)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL63(456, 0, 748, 244)  LIMAGE(0)  LINEW(4)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL3(0, 0, 460, 2)        COLOR(64, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL0(0, 2, 457, 242)  LIMAGE(2)  LINEW(4)  STRESS(44)  STRESSW(3)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  OBJ_order(464, 8, 740, 236)    "IB510090"  TABORDER(1)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  OBJ_sise(8, 10, 450, 234)    "IB510010"  TABORDER(2)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  OBJ_account(6, 276, 741, 449)    "IB510021"  TABORDER(3)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  dbx(181, 550, 855, 568)  LINECOLOR(65)      COLOR(78, 69)  CUR(0)    AL_LEFT    ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  HNAM(180, 525, 314, 545)  LEN(18)  IO_MIXED|AL_LEFT||SUM    FONT("굴림체", 9, BOLD)    COLOR(90, 69)  CUR(0)  LINECOLOR(65)          TABORDER(0)  IOORDER(4)  ENABLE  &
+  HINTTYPE(IH_NONE)
+USRTAB  tab_account(6, 250, 741, 276)  FOCUS  INDEX(0)  COUNT(4)  AL_TOP  TAB_IMAGE        COLOR(3, 70)  CUR(0)  TABIMAGE("tab.bmp")  FCOLOR(3, 71)  CAPTION("미결제약정", "예약주문내역 ", " 예약주문 처리결과 ", " 실시간잔고   ")  TABINFO("1:1", "1:2", "0:3", "0:4")  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  ed_focod(320, 525, 400, 545)  LEN(8)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_UPPER|CODE      COLOR(192, 69)  CUR(0)  TP_NONE          TABORDER(4)  IOORDER(5)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  GUIDE1(-2, 454, 748, 478)  LIMAGE(1)  LINEW(3)  STRESS(0)  STRESSW(0)  LINETYPE(4)  LINECOLOR(64)      COLOR(34, 69)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL5(7, 459, 21, 473)    |IMAGE|AL_STRETCH    COLOR(208, 232)  CUR(0)    "알림_ic.bmp"  ENABLE  &
+  VISIBLE  TRANSPARENT  IMAGE  HINTTYPE(IH_NONE)
+PANEL  GUIDE(20, 454, 648, 478)        COLOR(228, 130)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Sub send_sise_all(gubn)
+	Dim code, fogb, rsymb
+dbx.Text = dbx.Text & ed_focod.data&"ALL:"&gubn
+	code = Left(ed_focod.Data, 1)
+	If code = "1" Or code = "4" Or code = "A" Or code = "D" Then
+		fogb = 101
+		rsymb = "30301"
+		OBJ_sise.SetObject("IB510010")
+	Else
+		fogb = 102
+		rsymb = "40301"
+		OBJ_sise.SetObject("IB510011")
+	End If
+
+	HNAM.Data = SCREEN.GetName (fogb, ed_focod.Data, 0)
+	SCREEN.Object("OBJ_order.OBJ_odr.hnam").data = HNAM.data
+
+	If gubn = "main" Then
+		SCREEN.IgnoreChange True
+		SCREEN.Object("OBJ_order.OBJ_odr.ed_focod").data = ed_focod.data
+		SCREEN.IgnoreChange False
+	End If
+
+	If Trim(HNAM.Data) =  "" Then
+		SCREEN.ClearAll 2, 2
+		Exit Sub
+	Else
+		ed_focod.Trigger "ed_focod", True
+		ed_focod.Trigger rsymb, True
+		ed_focod.Trigger rsymb, False
+		SYSTEM.SetHistory rsymb, ed_focod.Data
+		SYSTEM.SetHistory "ed_focod", ed_focod.Data
+	End If
+
+	OBJ_sise.Send
+
+End Sub
+
+_AW_ONINDECLARE_AW_
+'== 선물옵션주문obj를포함한 main의 공통함수
+#LOAD IB999923
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+SCREEN.OnSend = False
+
+_AW_ONENDSUB_AW_
+_AW_ONTIMER_AW_
+'주문성공후 커서 위치
+SCREEN.Proc "OBJ_order.OBJ_odr.Set_cursor", ""
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(dbx)
+_AW_ONCLICK_AW_
+dbx.Text = ed_focod.Data
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(tab_account)
+_AW_ONCLICK_AW_
+Select Case tab_account.ID
+Case 1
+	OBJ_account.SetObject ("IB510021")
+Case 2
+	OBJ_account.SetObject ("IB510022")
+Case 3
+	OBJ_account.SetObject ("IB510023")
+Case 4
+	OBJ_account.SetObject ("IB510024")
+Case Else
+	Exit Sub
+End Select
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(ed_focod)
+_AW_ONCHANGE_AW_
+dbx.Text = "CHANG"
+Call send_sise_all("main")
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

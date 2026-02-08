@@ -1,0 +1,72 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB0000AA)
+MAPSIZE(24, 166)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("LOGIN_PUSH")
+MAPPUBLIC(";")
+FONT("±¼¸²Ã¼", 9, NORMAL)
+TITLE("LOGIN -> Push")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONSTART_AW_
+SYSTEM.Push "LOGIN.Brno" , LOGIN.Brno
+SYSTEM.Push "LOGIN.Cani" , LOGIN.Cani
+SYSTEM.Push "LOGIN.Cogb" , LOGIN.Cogb
+SYSTEM.Push "LOGIN.Ctyp" , LOGIN.Ctyp
+SYSTEM.Push "LOGIN.Day0" , LOGIN.Day0
+SYSTEM.Push "LOGIN.Day1" , LOGIN.Day1
+SYSTEM.Push "LOGIN.Day2" , LOGIN.Day2
+SYSTEM.Push "LOGIN.Juno" , LOGIN.Juno
+SYSTEM.Push "LOGIN.Lcog" , LOGIN.Lcog
+SYSTEM.Push "LOGIN.Litm" , LOGIN.Litm
+SYSTEM.Push "LOGIN.Lotm" , LOGIN.Lotm
+SYSTEM.Push "LOGIN.Lpci" , LOGIN.Lpci
+SYSTEM.Push "LOGIN.Lpui" , LOGIN.Lpui
+SYSTEM.Push "LOGIN.Misf" , LOGIN.Misf
+SYSTEM.Push "LOGIN.Name" , LOGIN.Name
+SYSTEM.Push "LOGIN.Nick" , LOGIN.Nick
+SYSTEM.Push "LOGIN.Order", LOGIN.Order
+SYSTEM.Push "LOGIN.Otpf" , LOGIN.Otpf
+SYSTEM.Push "LOGIN.User" , LOGIN.User
+SYSTEM.Push "LOGIN.Utyp" , LOGIN.Utyp
+
+If SCREEN.CreateObject("INFO") Then
+	INFO.PushData LOGIN.Name, LOGIN.Name & ".ini", "LOGIN", "LITM" , LOGIN.Litm
+	INFO.PushData LOGIN.Name, LOGIN.Name & ".ini", "LOGIN", "LOTM" , LOGIN.Lotm
+	INFO.PushData LOGIN.Name, LOGIN.Name & ".ini", "LOGIN", "LPCI" , LOGIN.Lpci
+	INFO.PushData LOGIN.Name, LOGIN.Name & ".ini", "LOGIN", "LPUI" , LOGIN.Lpui
+	INFO.PushData LOGIN.Name, LOGIN.Name & ".ini", "LOGIN", "MISF" , LOGIN.Misf
+	INFO.PushData LOGIN.Name, LOGIN.Name & ".ini", "LOGIN", "NAME" , LOGIN.Name
+	INFO.PushData LOGIN.Name, LOGIN.Name & ".ini", "LOGIN", "NICK" , LOGIN.Nick
+	INFO.PushData LOGIN.Name, LOGIN.Name & ".ini", "LOGIN", "OTPF" , LOGIN.Otpf
+	INFO.PushData LOGIN.Name, LOGIN.Name & ".ini", "LOGIN", "UTYP" , SYSTEM.ConnectBy
+End If
+
+SCREEN.CloseWindow
+
+_AW_ONENDSUB_AW_
+}
+
+
+

@@ -1,0 +1,289 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB240300)
+MAPSIZE(534, 753)
+VERSION(004)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("종목별외국인")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(FMS|FLASH)
+TITLE("[2403] 종목별 외국인 거래동향")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pooppoop")
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL10(-4, 26, 757, 411)  LIMAGE(0)  LINEW(6)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL1(0, 0, 753, 26)        COLOR(66, 63)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  SYMBOL7(342, 3, 366, 23)  '일자'  AL_CENTER  CUR(0)      COLOR(45, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  GRAPH(699, 3, 747, 23)  '차 트'  TP_PUSH|IMAGETEXT|AL_STRETCH        FOCUS  COLOR(1, 186)  CUR(0)    "3BTN.BMP"    TABORDER(5)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+EDIT  c_date(367, 3, 465, 23)  LEN(8)  IO_NUM|EDIT_INPUT|FA_SEND|FA_SKIP|FA_DATE|SA_ALL    COLOR(192, 130)  CUR(0)  TP_SUNKEN          EDITFORMAT("9999/99/99")  TABORDER(4)  IOORDER(6)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON0(90, 3, 109, 23)  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(15, 63)  CUR(0)    "검색.bmp"    TABORDER(2)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+CONTROL  17413(169, 3, 339, 23)    "CX_Symbol"  "/a89/b91/c92/d69"  LEN(0)  EDIT_OUTPUT    COLOR(90, 130)  TABORDER(0)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  CHK(813, 14, 848, 27)  'Label'  AL_LEFT  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(4, 0)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  OBJECT0(6, 36, 747, 401)    "IB240310"  TABORDER(6)  IOORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+CONTROL  ctl_Category(109, 3, 147, 23)    "CX_Category"  "/k0/i돌려보기.BMP/t/r1301"  LEN(0)  EDIT_NOP  FONT("굴림", 9, NORMAL)    COLOR(68, 130)  TABORDER(0)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON1(147, 3, 166, 23)  TP_PUSH|IMAGE|AL_STRETCH      COLOR(208, 232)  CUR(0)    "관심.BMP"    TABORDER(3)  ENABLE  &
+  VISIBLE  IMAGE  HINTTYPE(IH_NONE)
+PANEL  PANEL3(0, 0, 1, 26)        COLOR(64, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL0(-3, 407, 756, 535)  LIMAGE(0)  LINEW(5)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  OBJECT1(6, 416, 747, 526)  |FA_ENUM  "IB240301"  TABORDER(7)  IOORDER(5)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL2(752, 0, 754, 26)        COLOR(64, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+CONTROL  1301(25, 3, 90, 23)  |FA_PROTECT  "CX_CODECTRL"  "/u0/k검색.BMP/lAXCOMBO.BMP/p/s0/o"  LEN(6)  EDIT_INPUT    COLOR(192, 130)  TABORDER(1)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  1021(810, 40, 888, 58)  LEN(16)  IO_NUM|AL_CENTER||FA_FLASH    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+CONTROL  cxMarket(4, 3, 24, 23)  |FA_SKIP  "CX_MarketPicker"  "/k2/tIB240300/u1/d1"  LEN(12)  EDIT_NOP    COLOR(192, 232)  TABORDER(0)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  edMarketTrigger(915, 160, 945, 180)  LEN(6)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(8)  IOORDER(7)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  1777(530, 5, 550, 25)  LEN(1)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(9)  IOORDER(8)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Const myFILE = "userconf.ini"
+Const myMAP = "IB240300"
+Dim IsStart
+Sub p_read_ini()
+If SCREEN.CreateObject("Info") Then
+ 	CHK.text = Trim(INFO.PopData(LOGIN.Name, myFILE, myMAP, "G_CHCK"))
+End If
+End Sub
+
+
+Sub p_write_ini()
+If SCREEN.CreateObject("Info") Then
+  INFO.PushData LOGIN.Name, myFILE, myMAP, "G_CHCK", CHK.text
+End If
+End Sub
+
+
+Sub Change_MKGubn_Main(sMKGubn)
+	cxMarket.sMarket = sMKGubn
+	Send_Screen()
+
+End Sub
+
+Sub Send_Screen()
+	cxMarket.sCode = Trim(S1301.Data)
+	SCREEN.Send 0
+End Sub
+
+_AW_ONSTART_AW_
+' 현재 화면의 시장식별자(cxMarket)에 고유 화면번호 부여
+cxMarket.Major = SCREEN.Major
+
+p_read_ini()
+IsStart = 0
+'If CHK.text = "1" Then
+'	CHK.text = "1"
+'	OBJECT0.SetObject "IB240310"
+'	GRAPH.Text = "그래프"
+'Else
+'	CHK.text = "2"
+'	OBJECT0.SetObject "IB240320"
+'	GRAPH.Text = "텍스트"
+'End If
+
+
+Send_Screen()
+S1301.SetFocus
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+If S1301.Data = "000000" Or Trim(S1301.Data) = "" Or S1301.Data = "      " Then
+	SCREEN.OnSend False
+Else
+	'서비스 명 변경 및 거래소 구분코드 MKCD 추가.
+	If UCase(TypeName( SCREEN.Object("main.cxMarket"))) <> "NOTHING" Then
+		If SCREEN.Object("main.cxMarket").sMarket = "KRX" Then
+			S1777.Data = "1"
+		ElseIf SCREEN.Object("main.cxMarket").sMarket = "NXT" Then
+			S1777.Data = "2"
+		ElseIf SCREEN.Object("main.cxMarket").sMarket = "통합" Then
+			S1777.Data = "3"
+		End If
+	End If
+	cxMarket.sCode = Trim(S1301.Data)
+	OBJECT0.Send
+End If
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+If IsStart = 0 Then
+	S1301.SetFocus
+	IsStart = 1
+End If
+
+_AW_ONENDSUB_AW_
+_AW_ONCLOSE_AW_
+p_write_ini()
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(GRAPH)
+_AW_ONCLICK_AW_
+If CHK.text = "1" Then
+	CHK.text = "2"
+	OBJECT0.SetObject "IB240310"
+	GRAPH.Text = "차 트"
+Else
+	CHK.text = "1"
+	OBJECT0.SetObject "IB240320"
+	GRAPH.Text = "데이터"
+End If
+cxMarket.sCode = Trim(S1301.Data)
+OBJECT0.Send
+
+GRAPH.SetFocus
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(c_date)
+_AW_ONCHANGE_AW_
+Send_Screen()
+_AW_ONENDSUB_AW_
+_AW_ONKEYCHANGE_AW_
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON0)
+_AW_ONCLICK_AW_
+Dim retn
+retn = SCREEN.GetCode(100, "1301", "hnam", 0 )
+If retn <> True Then
+       Exit Sub
+End If
+
+Send_Screen()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(ctl_Category)
+_AW_ONCLICK_AW_
+Dim codx
+codx = ctl_Category.GetPreCode(S1301.Data)
+If Trim(codx) = "" Then
+	Exit Sub
+End If
+S1301.Data = codx
+S1301.Trigger "",True
+
+Send_Screen()
+
+GRAPH.SetFocus
+S1301.SetFocus
+_AW_ONENDSUB_AW_
+_AW_ONDBLCLK_AW_
+Dim codx
+codx = ctl_Category.GetNextCode(S1301.Data)
+If Trim(codx) = "" Then
+	Exit Sub
+End If
+S1301.Data = codx
+S1301.Trigger "",True
+
+SCREEN.Send 0
+
+GRAPH.SetFocus
+S1301.SetFocus
+_AW_ONENDSUB_AW_
+_AW_ONCHANGE_AW_
+S1301.Data = ctl_Category.GetCurCode
+S1301.Trigger "",True
+
+SCREEN.Send 0
+
+GRAPH.SetFocus
+S1301.SetFocus
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON1)
+_AW_ONCLICK_AW_
+SCREEN.CreateWindow 1, "IB202201 /t/s/p5/d", "appendCODE" & _
+			vbTab & S1301.Data & vbLf & "map" & vbTab & "1" & vbLf
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(1301)
+_AW_ONCHANGE_AW_
+If S1301.Data = "000000" Or Trim(S1301.Data) = "" Then
+	S1301.Clear
+	S1301.SetFocus
+	Exit Sub
+End If
+
+S1301.Trigger "", True
+OBJECT0.ClearAll 2
+Send_Screen()
+
+S1301.SetFocus
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(cxMarket)
+_AW_ONCLICK_AW_
+SCREEN.Proc "main.Change_MKGubn_Main", cxMarket.sMarket
+
+If UCase(TypeName( SCREEN.Object("cbSOrder") )) <> "NOTHING" Then
+	If cxMarket.sMarket = "통합" Then
+		cbSOrder.Data = "S"
+	ElseIf cxMarket.sMarket = "KRX" Then
+		cbSOrder.Data = "1"
+	ElseIf cxMarket.sMarket = "NXT" Then
+		cbSOrder.Data = "N"
+	End If
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(edMarketTrigger)
+_AW_ONCHANGE_AW_
+Change_MKGubn_Main(Trim(edMarketTrigger.Data))
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

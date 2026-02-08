@@ -1,0 +1,68 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB867002)
+MAPSIZE(264, 144)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("삭제해주세요")
+MAPPUBLIC(";")
+FONT("굴림", 9, NORMAL)
+TITLE("삭제해주세요")
+TOPATH(AXIS)
+METHOD(SEND)
+TRXCODE("piboro08")
+MAPTYPE(RESIZE)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+EDIT  gubn(10, 225, 75, 250)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT(" ")          TABORDER(1)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+GRID  grid1(0, 0, 100, 216)  VISIBLEROW(0)  CELLH(18)  MATRIX(11, 1)  FIX(1)  MAINCOLOR(7, 232)  LINECOLOR(75)  FOCUSCOLOR(78)  FOCUSKIND(3)    FONT("굴림체", 9, NORMAL)  ROWC(68, 77)  |FLEXIBLE|NO3D|RROW|XHLINE|HEADER|GRFTEXT    &
+	COLINFO("qdate")  LEN(6)  WIDTH(100)  HEAD("분기날짜")  COLALIGN(AL_LEFT, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_FLASH    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    TABORDER(2)  IOORDER(2)  ENABLE  &
+  VISIBLE
+
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONSEND_AW_
+grid1.Clear
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+Dim items
+items = "00"
+For ii = 1 To grid1.Rows
+	data = grid1.GetGridCell (ii, 1)
+	grid1.SetGridCell ii, jj, Trim(data)
+	items = items & vbTab &data
+Next
+
+SCREEN.Object("main.cb_Qurt").SetItems(items)
+
+SCREEN.Object("main.obj0.ed_qdate").Data = SCREEN.Object("main.cb_Qurt").Text
+SCREEN.Object("main.obj1.ed_qdate").Data = SCREEN.Object("main.cb_Qurt").Text
+SCREEN.Object("main.obj2.ed_qdate").Data = SCREEN.Object("main.cb_Qurt").Text
+
+SCREEN.Proc "main.obj0_send", ""
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(grid1)
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

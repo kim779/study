@@ -1,0 +1,394 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB110700)
+MAPSIZE(618, 700)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("[1107]form")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+TITLE("[1107]기간별체결")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(RESIZEX)
+HEADER(LEDGER)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL1(0, 96, 700, 598)  LIMAGE(0)  LINEW(5)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    RESIZABLE  AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL0(0, 0, 700, 96)  LINETYPE(3)  LINECOLOR(64)      COLOR(66, 130)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+CONTROL  AN1A(58, 3, 198, 23)    "CX_Account"  "/w0"  LEN(11)  EDIT_INPUT    COLOR(192, 130)  TABORDER(1)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL0(6, 3, 55, 23)  '계좌번호'  AL_LEFT  CUR(0)      COLOR(66, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+OUT  ACNM(199, 3, 327, 23)  LEN(20)  IO_MIXED|AL_LEFT||FA_SKIP    COLOR(49, 130)  CUR(0)  LINECOLOR(48)          TABORDER(0)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL1(358, 3, 407, 23)  '비밀번호'  AL_LEFT  CUR(0)      COLOR(66, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  zPwd(408, 3, 472, 23)  LEN(8)  IO_MIXED|EDIT_INPUT|FA_PASSWD|FA_WRAP    COLOR(192, 130)  CUR(0)  TP_SUNKEN          TABORDER(2)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL2(6, 26, 29, 46)  '구분'  AL_LEFT  CUR(0)      COLOR(66, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+COMBO  zBnsTp(34, 26, 94, 46)  TP_SUNKEN  LEN(1)  COUNT(3)  VCOUNT(3)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_NUM|EDIT_INPUT    COLOR(68, 130)  CUR(0)  DISPLAY("전체", "매도", "매수")  DATA("0", "1", "2")    TABORDER(3)  IOORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  jmEnableChk(129, 26, 192, 46)  '종목번호'  TP_CHECK|EDIT_NOP          COLOR(66, 130)  CUR(0)      TABORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  jmFindBtn(260, 26, 279, 46)  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(15, 63)  CUR(0)    "검색.BMP"    TABORDER(5)  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+OBJECT  obj_hnam(281, 26, 437, 46)    "IB110410"  TABORDER(6)  IOORDER(5)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+CONTROL  jmcd1104(195, 26, 260, 46)  |FA_PROTECT|FA_SKIP  "CX_CODECTRL"  "/u0/k검색.BMP/lAXCOMBO.BMP/p/s0"  LEN(6)  EDIT_NOP    COLOR(192, 130)  TABORDER(0)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL3(5, 49, 55, 70)  '거래기간'  AL_LEFT  CUR(0)      COLOR(66, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL4(142, 49, 150, 69)  '~'  AL_LEFT  CUR(0)      COLOR(66, 69)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  zQrySrtDt(55, 49, 141, 69)  LEN(8)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_DATE    COLOR(192, 130)  CUR(0)  TP_SUNKEN          EDITFORMAT("9999/99/99")  TABORDER(7)  IOORDER(6)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  zQryEndDt(150, 49, 236, 69)  LEN(8)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_DATE    COLOR(192, 130)  CUR(0)  TP_SUNKEN          EDITFORMAT("9999/99/99")  TABORDER(8)  IOORDER(7)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  RADIO0(243, 49, 283, 69)  '전일'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(GROUP0)      COLOR(208, 130)  CUR(0)      TABORDER(9)  ENABLE  &
+  VISIBLE  CHECKED  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  RADIO1(288, 49, 323, 69)  '5일'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(GROUP0)      COLOR(208, 130)  CUR(0)      TABORDER(10)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  RADIO2(329, 49, 369, 69)  '10일'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(GROUP0)      COLOR(208, 130)  CUR(0)      TABORDER(11)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  RADIO3(376, 49, 421, 69)  '1개월'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(GROUP0)      COLOR(208, 130)  CUR(0)      TABORDER(12)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BOX  BOX0(238, 49, 428, 69)    COLOR(165, 66)  LINEW(1)  BX_LINE    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  send_btn(534, 49, 566, 69)  '조회'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, BOLD)  FOCUS  COLOR(208, 186)  CUR(0)    "조회BTN.BMP"    TABORDER(13)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+BUTTON  next_btn(567, 49, 603, 69)  '다음'  TP_PUSH|IMAGETEXT|AL_STRETCH        FOCUS  COLOR(208, 186)  CUR(0)    "2btn.bmp"    TABORDER(14)  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+OBJECT  obj_list(6, 105, 691, 588)    RESIZABLE  "IB110710"  TABORDER(15)  IOORDER(8)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  obj_chkPwd(808, 241, 928, 261)    "IB110720"  TABORDER(16)  IOORDER(9)  ENABLE  &
+  HINTTYPE(IH_NONE)
+GROUP  GROUP0(738, 345, 858, 395)  'Group'        COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  isPwdChkYn(864, 267, 908, 290)  'N'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL5(737, 243, 857, 263)  'obj_chkPwd'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL6(738, 267, 858, 287)  'isPwdChkYn'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  sel(863, 289, 907, 312)  '1'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL8(737, 289, 857, 309)  'sel'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL22(16, 72, 214, 92)  '당일 내역은 조회가 불가능합니다.'  AL_LEFT  CUR(0)      COLOR(66, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+PANEL  PANEL99(5, 77, 14, 86)    |IMAGE|AL_CENTER    COLOR(208, 232)  CUR(0)    "텍스트화살표_하단.BMP"  ENABLE  &
+  VISIBLE  TRANSPARENT  IMAGE  HINTTYPE(IH_NONE)
+LABEL  LABEL7(232, 72, 430, 92)  '최대 1개월까지 조회가 가능합니다.'  AL_LEFT  CUR(0)      COLOR(66, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+PANEL  PANEL2(221, 77, 230, 86)    |IMAGE|AL_CENTER    COLOR(208, 232)  CUR(0)    "텍스트화살표_하단.BMP"  ENABLE  &
+  VISIBLE  TRANSPARENT  IMAGE  HINTTYPE(IH_NONE)
+LABEL  dateSel(862, 312, 906, 335)  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL10(736, 312, 856, 332)  'dateSel'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  GUIDE(0, 594, 700, 618)  |FA_ENUM  "IB110730"  TABORDER(17)  IOORDER(10)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Option Explicit
+
+Dim Today
+Today = getDateSerial(Date)
+
+
+Sub Set_account()
+	SCREEN.ClearAll 0, 2
+	obj_chkPwd.ClearAll 2
+	obj_list.ClearAll 2
+
+	If Len(Trim(AN1A.Data)) = 11 Then
+		ACNM.Data = Trim(AN1A.Name)
+		SYSTEM.Trace Trim(AN1A.Password)
+		If Len(Trim(AN1A.Password)) <> 44 Then
+			zPwd.Data = Trim(AN1A.Password)
+		Else
+			LEDGER.Hsiz = 44
+			LEDGER.Epwd = Trim(AN1A.Password)
+	 		zPwd.Data = "HEAD"
+		End If
+
+		If SYSTEM.ConnectBy = 1 Then
+			If Len(Trim(zPwd.Data)) < 4 Then
+				zPwd.SetFocus
+				Exit Sub
+			Else
+				SCREEN.Proc "obj_chkPwd.send_f", ""
+			End If
+		Else
+			Call OkSend()
+		End If
+	Else
+		AN1A.SetFocus
+		Exit Sub
+	End If
+
+	If SYSTEM.ConnectBy = "0" And Trim(zPwd.Data) = "" Then
+   		zPwd.Data = "9999"
+	End If
+End Sub
+
+Sub OkSend()
+	SCREEN.Proc "obj_list.send_f", ""
+End Sub
+
+Sub send_f()
+	If SYSTEM.ConnectBy = "0" Then
+		Call OkSend()
+	Else
+		Dim acnt
+		acnt = Trim(SCREEN.Object("obj_chkPwd.IntaccNo").Data)
+
+		If Trim(acnt) = Trim(AN1A.Data) Then
+			If Trim(isPwdChkYn.Text) = "Y" Then
+				Call OkSend()
+			Else
+				SCREEN.Proc "obj_chkPwd.send_f", ""
+			End If
+		Else
+			SCREEN.Proc "obj_chkPwd.send_f", ""
+		End If
+	End If
+End Sub
+
+
+Sub chgDate(param)
+	Dim tmpDt
+	tmpDt = 0
+
+	Select Case Trim(param)
+		Case "1"
+					tmpDt = change_indate("d", -1, Date)
+					tmpDt = week_check(tmpDt)
+
+					zQrySrtDt.Data = tmpDt
+					zQryEndDt.Data = tmpDt
+		Case "2"
+					tmpDt = change_indate("d", -5, zQryEndDt.Text)
+					tmpDt = week_check(tmpDt)
+
+					zQrySrtDt.Data = tmpDt
+		Case "3"
+					tmpDt = change_indate("d", -10, zQryEndDt.Text)
+					tmpDt = week_check(tmpDt)
+
+					zQrySrtDt.Data = tmpDt
+		Case "4"
+					tmpDt = change_indate("m", -1, zQryEndDt.Text)
+					'tmpDt = week_check(tmpDt)
+
+					zQrySrtDt.Data = tmpDt
+	End Select
+End Sub
+
+_AW_ONINDECLARE_AW_
+#Load IB888833
+#Load IB888888
+
+_AW_ONENDSUB_AW_
+_AW_ONSTART_AW_
+' 현재 화면의 시장식별자(cxMarket)에 고유 화면번호 부여
+'cxMarket.Major = SCREEN.Major
+
+Call Check_LoginType(zPwd)
+
+jmEnableChk.Checked = False
+jmcd1104.Clear
+jmcd1104.Enable False
+
+Call chgDate("1")
+
+'obj_list.SetRect 6, 105, 597, 483
+'SCREEN.SetSize 609, 617
+'SCREEN.SetSize 644, 263
+SCREEN.SetTimer 0.1, False
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+SCREEN.OnSend = False
+
+_AW_ONENDSUB_AW_
+_AW_ONTIMER_AW_
+'SCREEN.SetSize 609, 617
+jmcd1104.Clear
+obj_hnam.Send
+'SCREEN.SetSize 609, 618
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(AN1A)
+_AW_ONCHANGE_AW_
+sel.Text = "1"
+Call Set_account()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(zPwd)
+_AW_ONCHARCHANGE_AW_
+isPwdChkYn.Text = "N"
+_AW_ONENDSUB_AW_
+_AW_ONKEYCHANGE_AW_
+If SCREEN.Key = "13" Then
+	If CheckInput(AN1A, zPwd) = True Then
+		sel.Text = "2"
+		Call send_f()
+	End If
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(zBnsTp)
+_AW_ONCHANGE_AW_
+sel.Text = "3"
+
+Call send_f()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(jmEnableChk)
+_AW_ONCLICK_AW_
+If jmEnableChk.Checked = True Then
+	sel.Text = "4"
+	jmcd1104.Enable True
+	jmFindBtn.Enable True
+	obj_hnam.Enable True
+	jmcd1104.SetFocus
+
+	If Len(Trim(jmcd1104.Data)) = 6 Then
+		Call send_f()
+	End If
+Else
+	jmcd1104.Clear
+	obj_hnam.Send
+	jmcd1104.Enable False
+	jmFindBtn.Enable False
+	obj_hnam.Enable False
+
+
+	Call send_f()
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(jmFindBtn)
+_AW_ONCLICK_AW_
+sel.Text = "4"
+Dim retn
+retn = SCREEN.GetCode(100, "jmcd1104", "hnam", 0 )
+
+If retn <> True Then
+      Exit Sub
+End If
+
+obj_hnam.Send
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(jmcd1104)
+_AW_ONCHANGE_AW_
+sel.Text = "4"
+obj_hnam.Send
+Call send_f()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(zQrySrtDt)
+_AW_ONCHANGE_AW_
+sel.Text = "5"
+dateSel.Text = "1"
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(zQryEndDt)
+_AW_ONCHANGE_AW_
+sel.Text = "6"
+dateSel.Text = "2"
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(RADIO0)
+_AW_ONCLICK_AW_
+sel.Text = "7"
+Call chgDate("1")
+Call send_f()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(RADIO1)
+_AW_ONCLICK_AW_
+sel.Text = "8"
+Call chgDate("2")
+Call send_f()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(RADIO2)
+_AW_ONCLICK_AW_
+sel.Text = "9"
+Call chgDate("3")
+Call send_f()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(RADIO3)
+_AW_ONCLICK_AW_
+sel.Text = "10"
+Call chgDate("4")
+Call send_f()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(send_btn)
+_AW_ONCLICK_AW_
+sel.Text = "11"
+Call send_f()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(next_btn)
+_AW_ONCLICK_AW_
+sel.Text = "12"
+
+SCREEN.Proc "obj_list.send_c", ""
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

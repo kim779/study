@@ -1,0 +1,241 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB8101AE)
+MAPSIZE(195, 190)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("MOTP")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(ENCODE|CR2TAB)
+TITLE("[8101] MOTP")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("piboPBxQ")
+MAPTYPE(NORM)
+HEADER(LEDGER)
+BGROUND(BRUSH, 181)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL2(0, 168, 190, 195)  LINECOLOR(75)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL3(0, 19, 190, 170)  LINECOLOR(75)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL5(0, 0, 190, 20)  '모바일 OTP인증번호 입력'  LINECOLOR(75)      COLOR(75, 232)  CUR(0)    AL_LEFT  FONT("굴림체", 9, BOLD)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  zOtpVrfVal(85, 105, 170, 125)  LEN(6)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 130)  CUR(0)  TP_SUNKEN          TABORDER(3)  IOORDER(1)  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL0(10, 105, 84, 125)  '인증번호'  AL_LEFT  CUR(0)      COLOR(64, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  BUTTON2(380, 63, 412, 83)  '닫기'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, NORMAL)  COLOR(208, 186)  CUR(0)    "2btn.bmp"    TABORDER(2)  ENABLE  &
+  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+BUTTON  BUTTON3(319, 63, 379, 83)  '유의사항'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, NORMAL)  COLOR(208, 186)  CUR(0)    "4btn.bmp"    TABORDER(1)  ENABLE  &
+  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+LABEL  LABEL2(5, 30, 185, 50)  '모바일OTP 인증번호 숫자6자리를'  AL_LEFT  CUR(0)      COLOR(64, 81)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  BUTTON1(1, 172, 189, 192)  '전      송'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, BOLD)  FOCUS  COLOR(208, 186)  CUR(0)    "16BTN.BMP"    TABORDER(5)  ENABLE  &
+  IMAGETEXT  HINTTYPE(IH_NONE)
+BUTTON  BUTTON0(0, 170, 188, 190)  '확      인'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, BOLD)  FOCUS  COLOR(208, 186)  CUR(0)    "16BTN.BMP"    TABORDER(4)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+LABEL  LABEL3(5, 52, 185, 72)  '입력해주세요.'  AL_LEFT  CUR(0)      COLOR(64, 81)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+CONTROL  ctrl_motp(15, 230, 110, 290)  |FA_PROTECT  "CX_SimpleAuth"  "/k2"  LEN(0)  EDIT_NOP    COLOR(192, 130)  TABORDER(0)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  obj_clientNum(90, 305, 210, 360)    "IB8101AF"  TABORDER(6)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL1(5, 305, 79, 325)  '고객번호조회'  AL_LEFT  CUR(0)      COLOR(64, 130)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  ClientNum(265, 320, 350, 340)  LEN(20)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 130)  CUR(0)  TP_SUNKEN          TABORDER(7)  IOORDER(3)  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL4(265, 300, 315, 320)  '고객번호'  AL_LEFT  CUR(0)      COLOR(64, 130)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  BUTTON4(160, 0, 190, 20)  '닫기'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, NORMAL)  COLOR(208, 186)  CUR(0)    "2btn.bmp"    TABORDER(8)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Dim sendCnt
+sendCnt = 0
+
+Sub init()
+SYSTEM.Trace "IB8101AF init"
+	obj_clientNum.Send
+	zOtpVrfVal.Data = ""
+	zOtpVrfVal.SetFocus
+	SCREEN.SetTimer 10, False
+End Sub
+
+_AW_ONINDECLARE_AW_
+#Load IB888833
+
+_AW_ONENDSUB_AW_
+_AW_ONTIMER_AW_
+zOtpVrfVal.SetFocus
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(PANEL5)
+_AW_ONCLICK_AW_
+'ctrl_motp.CertOTPMP ClientNum.Data, zOtpVrfVal.Data
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(zOtpVrfVal)
+_AW_ONKEYCHANGE_AW_
+'== 보안카드번호 입력 버튼 기능 수행.
+If SCREEN.Key = "13" Then  '-- Enter 키 입력
+	SCREEN.Proc "parent.Confirm_Send", ""
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON2)
+_AW_ONCLICK_AW_
+SCREEN.Object("parent.OBJ_otp2").Visible = False
+SCREEN.Object("parent.BTN_BANK").SetFocus
+
+zOtpVrfVal.Clear
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON3)
+_AW_ONCLICK_AW_
+SCREEN.CreateWindow 2, "IB810190 /t /s /p5 /d", ""
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON1)
+_AW_ONCLICK_AW_
+If Trim(zMdaSeqno.data) = "" Then
+	MsgBox "매체일련번호를 입력하세요",0,"IBK투자증권"
+Else
+	If SCREEN.Object("parent.obj_otp1.zOnesfCnfPtnTp").data = "S" Then
+		If CHECK0.Checked = True Then
+			SCREEN.Object("parent.obj_otp1.obj_op").send
+		Else
+			SCREEN.Object("parent.obj_otp1.obj_ox").send
+		End If
+	Else
+		SCREEN.Proc "parent.Confirm_Send", ""
+	End If
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON0)
+_AW_ONCLICK_AW_
+'ctrl_motp.CertOTP ClientNum.Data, zOtpVrfVal.Data
+ctrl_motp.CertOTP ClientNum.Data, zOtpVrfVal.Data
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(ctrl_motp)
+_AW_ONCLICK_AW_
+'MOTP 인증성공시
+SYSTEM.Trace "onclick"
+If ctrl_motp.OTPState = 1 Then                     'MTOP 일련번호 조회 -> 조회성공후 자동검증
+	SYSTEM.Trace " MTOP search ecode = " &  ctrl_motp.ERRcode & "  OTP seqnum = "  & ctrl_motp.OTPSeqNo
+Else
+	If SCREEN.GetMapName(1) = "IB810100" Then
+		SCREEN.Proc "parent.send", ""
+		SCREEN.Proc "parent.OTP_hide", ""
+	Else
+		SCREEN.Proc "parent.obj_snd.send_o", ""
+		SCREEN.Object("parent.obj_showCerti").Visible = False
+	End If
+End If
+_AW_ONENDSUB_AW_
+_AW_ONCHANGE_AW_
+'MOTP 인증실패시
+
+If ctrl_motp.OTPState = 1 Then                     'MTOP 일련번호 조회 -> 조회성공후 자동검증
+	SYSTEM.Trace " MTOP search ecode = " &  ctrl_motp.ERRcode
+
+	alert_msg(Trim(ctrl_motp.ERRMsg))
+Else
+	Dim msg
+	msg = "MOTP Cert return Ecode = " & ctrl_motp.ERRcode
+	SYSTEM.Trace msg
+	msg = "MOTP cert Result = " & ctrl_motp.OTPsuccYN
+	SYSTEM.Trace msg
+	msg = "MOTP max error cnt = " & ctrl_motp.OTPMaxErrCnt
+	SYSTEM.Trace msg
+	msg = "MOTP err cnt = " & ctrl_motp.OTPErrCnt
+	SYSTEM.Trace msg
+
+'000000	OTP검증성공
+'000101	필수항목누락
+'000102	필수항목길이오류
+'010101	mSB버전정보불일치
+'100101	Connection 실패
+'100102	SQL 수행 오류
+'040101	등록되지 않은 OTP일련번호
+'040103	OTP일련번호와 고객번호 불일치
+'040104	OTP 잠김 상태
+'040105	OTP 폐기 상태
+'040201	유효하지않은 거래번호
+'040202	OTP값 암복호화 오류
+'040203	OTP값 불일치
+'040204	OTP값 중복검증 요청
+'900404	OTP검증실패
+
+	msg = Trim(ctrl_motp.ERRMsg)
+
+	If ctrl_motp.ERRcode = "040203" Then
+		msg = msg & vbLf & vbLf & "재시도 가능횟수는 "& CInt(ctrl_motp.OTPMaxErrCnt) - CInt(ctrl_motp.OTPErrCnt) & "회 남았습니다."
+	End If
+
+	alert_msg(msg)
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(ClientNum)
+_AW_ONKEYCHANGE_AW_
+'== 보안카드번호 입력 버튼 기능 수행.
+If SCREEN.Key = "13" Then  '-- Enter 키 입력
+	SCREEN.Proc "parent.Confirm_Send", ""
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON4)
+_AW_ONCLICK_AW_
+
+If SCREEN.GetMapName(1) = "IB810100" Then
+	SCREEN.Object("parent.OBJ_MOTP").Visible = False
+	SCREEN.Object("parent.BTN_BANK").SetFocus
+Else
+	SCREEN.Object("parent.obj_showCerti").Visible = False
+	SCREEN.Object("parent.sendBtn").SetFocus
+End If
+
+zOtpVrfVal.Clear
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

@@ -1,0 +1,103 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB410410)
+MAPSIZE(238, 857)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("베이시스비교차트")
+MAPPUBLIC(";")
+FONT("굴림", 9, NORMAL)
+OPTIONS(FLASH|XFONT)
+TITLE("[4104] 베이시스")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("bg410410")
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+CONTROL  basis(0, 2, 857, 240)  |FA_FLASH  "C_UserGrp"  "/i7100003750037503010000000000000000002000000000011100335546871020000001110050266112102000000112000000000010000000"  LEN(0)  EDIT_INOUT    COLOR(28, 63)  TABORDER(1)  IOORDER(7)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  rtyp(262, 322, 298, 338)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("0")          TABORDER(2)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  btyp(260, 300, 296, 316)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("0")          TABORDER(3)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  1021(137, 292, 222, 316)  LEN(8)  IO_MIXED|AL_LEFT||FA_FLASH|FA_XDELETE    COLOR(203, 1)  CUR(0)            TABORDER(0)  IOORDER(6)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  chk1(265, 345, 301, 361)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("0")          TABORDER(4)  IOORDER(3)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  chk2(265, 365, 301, 381)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("0")          TABORDER(5)  IOORDER(4)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  chk3(265, 390, 301, 406)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("0")          TABORDER(6)  IOORDER(5)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Sub check_basis()
+	If SCREEN.Object("parent.check0").checked = False Then
+		basis.SetShowLine 0, False
+	ElseIf SCREEN.Object("parent.check0").checked = True Then
+		basis.SetShowLine 0, True
+	End If
+
+	If SCREEN.Object("parent.check1").checked = False Then
+		basis.SetShowLine 1, False
+	ElseIf SCREEN.Object("parent.check1").checked = True Then
+		basis.SetShowLine 1, True
+	End If
+
+	If SCREEN.Object("parent.check2").checked = False Then
+		basis.SetShowLine 2, False
+	ElseIf SCREEN.Object("parent.check2").checked = True Then
+		basis.SetShowLine 2, True
+	End If
+End Sub
+
+
+Sub check_future()
+	If SCREEN.Object("parent.check3").checked = False Then
+		basis.SetShowLine 0, False
+	ElseIf SCREEN.Object("parent.check3").checked = True Then
+		basis.SetShowLine 0, True
+	End If
+
+	If SCREEN.Object("parent.check4").checked = False Then
+		basis.SetShowLine 1, False
+	ElseIf SCREEN.Object("parent.check4").checked = True Then
+		basis.SetShowLine 1, True
+	End If
+
+	If SCREEN.Object("parent.check5").checked = False Then
+		basis.SetShowLine 2, False
+	ElseIf SCREEN.Object("parent.check5").checked = True Then
+		basis.SetShowLine 2, True
+	End If
+End Sub
+
+_AW_ONRECEIVE_AW_
+If  SCREEN.Object("parent.radio0").checked = True Then
+	Call check_basis()
+End If
+
+If SCREEN.Object("parent.radio1").checked = True Then
+	Call check_future()
+End If
+
+_AW_ONENDSUB_AW_
+}
+
+
+

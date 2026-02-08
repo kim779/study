@@ -1,0 +1,405 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB611510)
+MAPSIZE(232, 610)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("[6115]펀드백신해지")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+TITLE("[6115] 펀드백신해지")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL3(-2, 100, 612, 209)  LIMAGE(0)  LINEW(4)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 130)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL0(1, 26, 609, 98)        COLOR(66, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL0(6, 29, 56, 49)  '계좌번호'  AL_LEFT  CUR(0)      COLOR(66, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+CONTROL  AN50(82, 29, 222, 49)    "CX_Account"  "/w0"  LEN(11)  EDIT_NOP    COLOR(192, 232)  TABORDER(0)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL1(425, 29, 475, 49)  '비밀번호'  AL_LEFT  CUR(0)      COLOR(66, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  zPwd(476, 29, 536, 49)  LEN(8)  IO_MIXED|EDIT_INPUT|FA_PASSWD|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_SUNKEN          TABORDER(1)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL2(5, 75, 79, 95)  '위탁계좌번호'  AL_LEFT  CUR(0)      COLOR(66, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL3(5, 52, 55, 72)  '펀드번호'  AL_LEFT  CUR(0)      COLOR(66, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  zIvstfndCode(121, 52, 180, 72)  LEN(8)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_SUNKEN          TABORDER(3)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  getHoldFundBtn(180, 52, 199, 72)  TP_PUSH|IMAGETEXT|AL_STRETCH        FOCUS  COLOR(208, 232)  CUR(0)    "검색.BMP"    TABORDER(4)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+PANEL  FundName(200, 52, 431, 72)  LINECOLOR(89)      COLOR(90, 69)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  ACNM(224, 29, 324, 49)  LINECOLOR(89)      COLOR(90, 69)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  zIndivisualAcnm(224, 75, 324, 95)  LINECOLOR(89)      COLOR(90, 69)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL4(425, 75, 475, 95)  '비밀번호'  AL_LEFT  CUR(0)      COLOR(66, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  zIndivisualPwd(476, 75, 536, 95)  LEN(8)  IO_MIXED|EDIT_INPUT|FA_PASSWD|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_SUNKEN          TABORDER(6)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  send_btn(567, 75, 603, 95)  '조회'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, BOLD)  FOCUS  COLOR(208, 186)  CUR(0)    "조회btn.bmp"    TABORDER(7)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+EDIT  subAN50(82, 52, 119, 72)  LEN(3)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_SUNKEN          TABORDER(2)  IOORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  obj_yjStatus(6, 109, 604, 167)    "IB611520"  TABORDER(8)  IOORDER(5)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  obj_snd(114, 757, 187, 777)    "IB611501"  TABORDER(9)  IOORDER(6)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL6(39, 758, 113, 778)  'obj_snd'  AL_LEFT  CUR(0)      COLOR(66, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  obj_totalAcnt(119, 778, 192, 798)    "IB611502"  TABORDER(10)  IOORDER(7)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL7(39, 778, 113, 798)  'obj_totalAcnt'  AL_LEFT  CUR(0)      COLOR(66, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+COMBO  zIndivisualAcnt(82, 75, 222, 95)  TP_SUNKEN  LEN(11)  COUNT(0)  VCOUNT(0)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(68, 130)  CUR(0)    TABORDER(5)  IOORDER(8)  &
+  VISIBLE  HINTTYPE(IH_NONE)
+USRTAB  UTAB0(0, 0, 610, 26)  FOCUS  INDEX(1)  COUNT(2)  AL_TOP  TAB_IMAGE        COLOR(208, 232)  CUR(0)  TABIMAGE("TAB.BMP")  FCOLOR(208, 232)  CAPTION("펀드백신신청", "펀드백신해지")  TABINFO("1:0", "1:1")  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  panel_left(0, 26, 1, 98)        COLOR(64, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  panel_bottom(0, 98, 610, 100)        COLOR(64, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL2(609, 26, 611, 98)        COLOR(64, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL8(0, 208, 614, 232)  LIMAGE(0)  LINEW(3)  LINETYPE(4)  LINECOLOR(64)      COLOR(34, 232)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL7(6, 213, 20, 227)    |IMAGE|AL_STRETCH    COLOR(34, 232)  CUR(0)    "알림_ic.bmp"  ENABLE  &
+  VISIBLE  IMAGE  HINTTYPE(IH_NONE)
+PANEL  GUIDE(22, 212, 602, 228)        COLOR(34, 130)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  sndBtn(201, 171, 396, 201)  '펀드백신 해지'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, BOLD)  FOCUS  COLOR(181, 76)  CUR(0)    "담보교체신청.bmp"    TABORDER(11)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+CONTROL  CX_DTS(43, 704, 193, 744)  |FA_PROTECT  "CX_DATATRANS"  ""  LEN(0)  EDIT_NOP    COLOR(192, 232)  TABORDER(0)  ENABLE  &
+  HINTTYPE(IH_NONE)
+GRID  VGRID(16, 553, 497, 692)  VISIBLEROW(0)  CELLH(20)  MATRIX(500, 4)  FIX(0)  MAINCOLOR(7, 0)  LINECOLOR(65)  FOCUSCOLOR(78)  FOCUSKIND(4)  ROWC(68, 77)  |SELALWAYS|VSCROLL|NO3D|RROW|XHLINE|GRFTEXT    &
+	COLINFO("acno")  LEN(11)  WIDTH(101)  HEAD("계좌번호")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_ALPHA|EDIT_NOP  |FA_SKIP    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  COLUMN_SORT  INORMAL  EDITFORMAT("999-99-999999")    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("acnm")  LEN(20)  WIDTH(168)  HEAD("계좌명")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_NOP  |FA_SKIP    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  COLUMN_SORT  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("acid")  LEN(20)  WIDTH(94)  HEAD("계좌코드")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_INPUT  |FA_SKIP    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  COLUMN_SORT  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("org_acid")  LEN(11)  WIDTH(101)  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_NOP  |FA_SKIP    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  EDITFORMAT("999-99-999999")    HNORMAL  SORTSTARTPOS(0)    TABORDER(12)  IOORDER(9)  ENABLE
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Option Explicit
+
+Sub Set_account()
+	zPwd.Clear
+	subAN50.Clear
+	zIvstfndCode.Clear
+	FundName.Text = ""
+	zIndivisualAcnm.Text = ""
+	zIndivisualPwd.Clear
+
+	obj_yjStatus.ClearAll 0
+
+
+	If Len(Trim(AN50.Data)) = 11 Then
+		ACNM.Text = Trim(AN50.Name)
+		zPwd.Data = Trim(AN50.Password)
+
+		Call LoadAccounts()
+
+		If Len(Trim(zPwd.Data)) < 4 Then
+			zPwd.SetFocus
+			Exit Sub
+		End If
+
+	Else
+		AN50.SetFocus
+		Exit Sub
+	End If
+
+	getHoldFundBtn.SetFocus
+End Sub
+
+
+Function Error_Check(param)
+	Error_Check = False
+
+	If Len(Trim(AN50.Data)) <> 11 Then
+		GUIDE.Text = "계좌번호를 확인하여 주십시오."
+		AN50.SetFocus
+		Exit Function
+	End If
+
+	If Len(Trim(zPwd.Data)) < 4 Then
+		GUIDE.Text = "비밀번호를 확인하여 주십시오."
+		zPwd.SetFocus
+		Exit Function
+	End If
+
+	If Len(Trim(zPwd.Data)) < 4 Then
+		GUIDE.Text = "비밀번호를 확인하여 주십시오."
+		zPwd.SetFocus
+		Exit Function
+	End If
+
+	If Len(Trim(subAN50.Data)) < 3 Or Len(Trim(zIvstfndCode.Data)) < 8 Or Trim(FundName.Text) = "" Then
+		GUIDE.Text = "펀드번호를 확인하여 주십시오."
+		getHoldFundBtn.SetFocus
+		Exit Function
+	End If
+
+	If Trim(param) = "inquery" Then
+		Error_check = True
+		Exit Function
+	End If
+
+	If Len(Trim(zIndivisualAcnt.Data)) < 11 Then
+		GUIDE.Text = "위탁계좌번호를 확인하여 주십시오."
+		zIndivisualAcnt.SetFocus
+		Exit Function
+	End If
+
+	If Len(Trim(zIndivisualAcnt.Data)) < 11 Then
+		GUIDE.Text = "위탁계좌번호를 확인하여 주십시오."
+		zIndivisualAcnt.SetFocus
+		Exit Function
+	End If
+
+	If Len(Trim(zIndivisualPwd.Data)) < 4 Then
+		GUIDE.Text = "위탁계좌비밀번호를 확인하여 주십시오."
+		zIndivisualPwd.SetFocus
+		Exit Function
+	End If
+
+	Error_Check = True
+End Function
+
+Sub checkYJStatus()
+	If Error_Check("inquery") = False Then
+		Exit Sub
+	Else
+		SCREEN.Proc "obj_yjStatus.send_f", ""
+	End If
+End Sub
+
+Sub LoadAccounts()
+	VGRID.Clear
+
+	Dim accList, ii, indiAcct, acct, acno, acName, acid, actp, idx
+	accList = Split(CX_DTS.GetTypeData ("4","" ), vbLf, -1, vbTextCompare)
+	idx = 1
+
+	For ii = 0 To UBound(accList)
+		indiAcct = Trim(accList(ii))
+
+		If Len(Trim(indiAcct)) > 11 Then
+			acct = Split(indiAcct, "|", -1, vbTextCompare)
+
+			acno = Trim(Mid(acct(0), 1, 11))
+			acName = Mid(acct(0), 12)
+			acName = Trim(Replace(acName, vbTab, ""))
+			acid = Trim(acct(1))
+			actp = Mid(acno, 4, 2)
+
+			If actp="10" Then
+				VGRID.SetGridCell idx, 1, acno
+				VGRID.SetGridCell idx, 2, acName
+				VGRID.SetGridCell idx, 3, acid
+				VGRID.SetGridCell idx, 4, acno
+				idx = idx + 1
+			End If
+		End If
+	Next
+
+	Dim acnt1, acnt3, grAcnt, grAcnt1, grAcnt3, items, grAcnm
+	acnt1 = Left(Trim(AN50.Data), 3)
+	acnt3 = Right(Trim(AN50.Data), 6)
+	items = ""
+
+	For ii = 1 To VGRID.Rows
+		grAcnt = Trim(VGRID.GetGridCell(ii, 1))
+
+		If Trim(grAcnt) = "" Then
+			Exit For
+		End If
+
+		grAcnt1 = Left(Trim(grAcnt), 3)
+		grAcnt3 = Right(Trim(grAcnt), 6)
+
+		If Trim(acnt1) = Trim(grAcnt1) And Trim(acnt3) = Trim(grAcnt3) Then
+			If items = "" Then
+				items = grAcnt
+			End If
+
+			items = items & vbTab & grAcnt & Trim(VGRID.GetGridText(ii, 4))
+			grAcnm = Trim(VGRID.GetGridCell(ii, 2))
+		End If
+	Next
+
+	zIndivisualAcnt.SetItems items
+	zIndivisualAcnm.Text = grAcnm
+End Sub
+
+Sub send()
+	SYSTEM.Push "fundVaccineCancel", ""
+
+	If Error_Check("order") = False Then
+		Exit Sub
+	End If
+
+	Dim dmsg
+	dmsg = "acno" & vbTab & Trim(AN50.Data) & vbLf &_
+	       "acnm" & vbTab & Trim(ACNM.Text) & vbLf &_
+	       "fundName" & vbTab & Trim(FundName.Text) & vbLf &_
+	       "oppAcno" & vbTab & Trim(zIndivisualAcnt.Data) & vbLf &_
+	       "oppAcnm" & vbTab & Trim(zIndivisualAcnm.Text) & vbLf
+
+	SYSTEM.Push "fundVaccineCancel", "Yes"
+
+	SCREEN.CreateWindow 2, "IB611511 /t /s /p5 /d", dmsg
+
+	If Trim(SYSTEM.Pop("fundVaccineCancel")) = "No" Then
+		Exit Sub
+	End If
+
+	SCREEN.Proc "obj_snd.send_o", "cancel"
+End Sub
+
+_AW_ONINDECLARE_AW_
+#Load IB888833
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+SCREEN.OnSend = False
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(AN50)
+_AW_ONCHANGE_AW_
+Call Set_account()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(zPwd)
+_AW_ONKEYCHANGE_AW_
+If SCREEN.Key = "13" Then
+	If Len(Trim(zPwd.Data)) > 3 Then
+		getHoldFundBtn.SetFocus
+	End If
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(getHoldFundBtn)
+_AW_ONCLICK_AW_
+If Len(Trim(AN50.Data)) <> 11 Then
+	Call alert_msg("펀드계좌번호(ex.001-53-123456)를 확인하여 주십시오.")
+	AN50.SetFocus
+	Exit Sub
+End If
+
+If SYSTEM.ConnectBy = 1 Then
+	If Len(Trim(zPwd.Data)) < 4 Then
+		Call alert_msg("비밀번호를 확인하여 주십시오..")
+		zPwd.SetFocus
+		Exit Sub
+	End If
+End If
+
+Dim msg, getDataArr
+
+SYSTEM.Push "fundo", ""
+SCREEN.CreateWindow 2, "IB610610  /t /s /p?/d" , "EDIT0" & vbTab & Trim(AN50.Data)
+
+msg = Trim(SYSTEM.Pop("fundo"))
+If msg = "NO" Then
+	SYSTEM.Push "fundo", ""
+	Exit Sub
+End If
+
+SYSTEM.Push "fundo", ""
+
+getDataArr = Split(msg, "|")
+If UBound(getDataArr) < 2 Then Exit Sub
+
+subAN50.Data = Trim(getDataArr(0))
+zIvstfndCode.Data = Trim(getDataArr(1))
+FundName.Text = Trim(getDataArr(2))
+
+obj_yjStatus.ClearAll 0
+
+If Len(Trim(zIndivisualPwd.Data)) < 4 Then
+	zIndivisualPwd.SetFocus
+Else
+	send_btn.SetFocus
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(send_btn)
+_AW_ONCLICK_AW_
+If Error_Check("inquery") = False Then
+	Exit Sub
+End If
+
+SCREEN.Proc "obj_yjStatus.send_f", ""
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(zIndivisualAcnt)
+_AW_ONCHANGE_AW_
+zIndivisualPwd.Clear
+
+If Len(Trim(zIndivisualAcnt.Data)) <> "" Then
+	zIndivisualAcnm.Text = Trim(ACNM.Text)
+End If
+
+zIndivisualPwd.SetFocus
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(UTAB0)
+_AW_ONCLICK_AW_
+If UTAB0.ID = "0" Then
+	SCREEN.ChangeMap "IB611500"
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(sndBtn)
+_AW_ONCLICK_AW_
+Call send()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(VGRID)
+_AW_ONCHANGE_AW_
+Call GridCheck()
+_AW_ONENDSUB_AW_
+_AW_ONKEYCHANGE_AW_
+'
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

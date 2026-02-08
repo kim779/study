@@ -1,0 +1,180 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB875498)
+MAPSIZE(552, 184)
+VERSION(003)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("일자별 시세")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(FMS|FLASH)
+TITLE("[875498]")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pooppoop")
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL63(0, 0, 897, 465)  LIMAGE(0)  LINEW(4)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+GRID  12500(0, 5, 170, 457)  VISIBLEROW(3000)  CELLH(18)  MATRIX(10, 3)  FIX(10)  MAINCOLOR(7, 0)  LINECOLOR(75)  FOCUSCOLOR(78)  FOCUSKIND(3)    FONT("굴림체", 9, NORMAL)  ROWC(68, 77)  |FLEXIBLE|INS_TOP|NO3D|RROW|XHLINE|PAGE|HEADER|GRFTEXT    &
+	COLINFO("12021")  LEN(16)  WIDTH(100)  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_ALPHA|EDIT_OUTPUT  |FA_CORGB|FA_FLASH|SA_CORAW    COLOR(68, 69)  COLCUR(0, 0)    INORMAL  IFRGB(94, 95)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("12302")  LEN(8)  WIDTH(66)  HEAD("일자")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  EDITFORMAT("9999/99/99")    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("12023")  LEN(8)  WIDTH(62)  HEAD("종가")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSUP    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(94, 95)    HNORMAL  SORTSTARTPOS(0)    TABORDER(3)  IOORDER(3)  ENABLE  &
+  VISIBLE
+
+EDIT  12901(0, 495, 88, 513)  LEN(8)  IO_NUM|EDIT_INPUT|FA_DATE    COLOR(68, 69)  CUR(0)  TP_NONE  INIT("00000000")          EDITFORMAT("9999/99/99")  TABORDER(2)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  1301(0, 520, 89, 538)  LEN(6)  IO_MIXED|EDIT_INPUT|FA_SEND|FA_WRAP|SA_ALL    COLOR(68, 69)  CUR(0)  TP_NONE          TABORDER(1)  IOORDER(1)  &
+  HINTTYPE(IH_NONE)
+OUT  1022(0, 470, 130, 490)  LEN(20)  IO_MIXED|AL_LEFT|    COLOR(131, 1)  CUR(0)  TP_SUNKEN          TABORDER(0)  IOORDER(4)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  AKey(90, 500, 150, 520)  LEN(1)  IO_MIXED|EDIT_INOUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_SUNKEN  INIT("0")          TABORDER(4)  IOORDER(5)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  1777(100, 520, 120, 540)  LEN(1)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(5)  IOORDER(6)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Sub senddata
+S12901.Data = Trim(SCREEN.Object("parent.ZQryDt").Data)
+
+Select Case Trim(SCREEN.Object("parent.keys").data)
+	Case 1
+		S1301.Data = SCREEN.Object("parent.cod1").data
+		AKey.Data = 1
+	Case 2
+		S1301.Data = SCREEN.Object("parent.cod2").data
+		AKey.Data = 2
+	Case 3
+		S1301.Data = SCREEN.Object("parent.cod3").data
+		AKey.Data = 3
+	Case 4
+		S1301.Data = SCREEN.Object("parent.cod4").data
+		AKey.Data = 4
+End Select
+End Sub
+
+_AW_ONSEND_AW_
+Call senddata
+
+If UCase(TypeName( SCREEN.Object("main.cxMarket"))) <> "NOTHING" Then
+	If SCREEN.Object("main.cxMarket").sMarket = "KRX" Then
+		S1777.Data = "1"
+	ElseIf SCREEN.Object("main.cxMarket").sMarket = "NXT" Then
+		S1777.Data =  "2"
+	ElseIf SCREEN.Object("main.cxMarket").sMarket = "통합" Then
+		S1777.Data =  "3"
+	End If
+	SYSTEM.Trace "yes cxMarket 1777 = " & S1777.Data
+Else
+	SYSTEM.Trace "no cxMarket map = " & SCREEN.GetMapName(0)
+End I
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+Dim i, ii,AA,BB,CC
+Select Case Trim(AKey.Data)
+Case 1
+	ii = SCREEN.object("parent.il_1").data
+	If Trim(SCREEN.Object("parent.ZQryDt").Data) = Trim(S12500.GetGridCell(1, 2)) Then
+		If Trim(SCREEN.Object("parent.grid0").getgridcell(ii,23)) <> "" Then
+			SCREEN.Object("parent.grid0").Setgridcell ii, 27,  Trim(S12500.GetGridCell(1, 3))
+			AA = CDbl(S12500.GetGridCell(1, 3))
+			BB = CDbl(SCREEN.Object("parent.grid0").getgridcell(ii,23))
+			SCREEN.Object("parent.grid0").Setgridcell ii, 31 ,Fix(AA/BB*100)
+			If Trim(SCREEN.Object("parent.grid0").getgridcell(ii,13)) <> "" Then
+				CC = CDbl(Trim(SCREEN.Object("parent.grid0").getgridcell(ii,13)))
+				If Fix(AA/BB*100) < CC Then
+					SCREEN.Object("parent.grid0").SetTRgb ii,31,94
+				End If
+			End If
+		End If
+	End If
+		SCREEN.object("parent.il_1").data = ii+1
+		SCREEN.Proc "parent.jonggaset_1",""
+Case 2
+	ii = SCREEN.object("parent.il_2").data
+	If Trim(SCREEN.Object("parent.ZQryDt").Data) = Trim(S12500.GetGridCell(1, 2)) Then
+		If Trim(SCREEN.Object("parent.grid0").getgridcell(ii,24)) <> "" Then
+			SCREEN.Object("parent.grid0").Setgridcell ii, 28 , Trim(S12500.GetGridCell(1, 3))
+			AA = CDbl(S12500.GetGridCell(1, 3))
+			BB = CDbl(SCREEN.Object("parent.grid0").getgridcell(ii,24))
+			SCREEN.Object("parent.grid0").Setgridcell ii, 32 , Fix(AA/BB*100)
+			If Trim(SCREEN.Object("parent.grid0").getgridcell(ii,13)) <> "" Then
+				CC = CDbl(Trim(SCREEN.Object("parent.grid0").getgridcell(ii,13)))
+				If Fix(AA/BB*100) < CC Then
+					SCREEN.Object("parent.grid0").SetTRgb ii,32,94
+				End If
+			End If
+		End If
+	End If
+		SCREEN.object("parent.il_2").data = ii + 1
+		SCREEN.Proc "parent.jonggaset_2",""
+Case 3
+	ii = SCREEN.object("parent.il_3").data
+	If Trim(SCREEN.Object("parent.ZQryDt").Data) = Trim(S12500.GetGridCell(1, 2)) Then
+		If Trim(SCREEN.Object("parent.grid0").getgridcell(ii,25)) <> "" Then
+			SCREEN.Object("parent.grid0").Setgridcell ii, 29 , Trim(S12500.GetGridCell(1, 3))
+			AA = CDbl(S12500.GetGridCell(1, 3))
+			BB = CDbl(SCREEN.Object("parent.grid0").getgridcell(ii,25))
+			SCREEN.Object("parent.grid0").Setgridcell ii, 33 , Fix(AA/BB*100)
+			If Trim(SCREEN.Object("parent.grid0").getgridcell(ii,13)) <> "" Then
+				CC = CDbl(Trim(SCREEN.Object("parent.grid0").getgridcell(ii,13)))
+				If Fix(AA/BB*100) < CC Then
+					SCREEN.Object("parent.grid0").SetTRgb ii,33,94
+				End If
+			End If
+		End If
+	End If
+		SCREEN.object("parent.il_3").data = ii + 1
+		SCREEN.Proc "parent.jonggaset_3",""
+Case 4
+	ii = SCREEN.object("parent.il_4").data
+	If Trim(SCREEN.Object("parent.ZQryDt").Data) = Trim(S12500.GetGridCell(1, 2)) Then
+		If Trim(SCREEN.Object("parent.grid0").getgridcell(ii,26)) <> "" Then
+			SCREEN.Object("parent.grid0").Setgridcell ii, 30 , Trim(S12500.GetGridCell(1, 3))
+			AA = CDbl(S12500.GetGridCell(1, 3))
+			BB = CDbl(SCREEN.Object("parent.grid0").getgridcell(ii,26))
+			SCREEN.Object("parent.grid0").Setgridcell ii, 34 , Fix(AA/BB*100)
+			If Trim(SCREEN.Object("parent.grid0").getgridcell(ii,13)) <> "" Then
+				CC = CDbl(Trim(SCREEN.Object("parent.grid0").getgridcell(ii,13)))
+				If Fix(AA/BB*100) < CC Then
+					SCREEN.Object("parent.grid0").SetTRgb ii,34,94
+				End If
+			End If
+		End If
+	End If
+		SCREEN.object("parent.il_4").data = ii + 1
+		SCREEN.Proc "parent.jonggaset_4",""
+End Select
+
+'S12500.row
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(12500)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(12901)
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

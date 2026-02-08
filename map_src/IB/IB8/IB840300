@@ -1,0 +1,221 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB840300)
+MAPSIZE(688, 724)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("[온라인]유상청약")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(ENCODE)
+TITLE("유상청약")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL1(-2, 411, 726, 665)  LIMAGE(0)  LINEW(4)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL0(357, 0, 726, 412)  LIMAGE(0)  LINEW(4)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL63(-2, 0, 358, 412)  LIMAGE(0)  LINEW(4)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+USRTAB  UTAB0(6, 8, 350, 34)  FOCUS  INDEX(0)  COUNT(2)  AL_TOP  TAB_IMAGE        COLOR(208, 70)  CUR(0)  TABIMAGE("TAB.BMP")  FCOLOR(208, 71)  CAPTION("유상청약", "취 소")  TABINFO("1:0", "1:1")  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  obj1(6, 34, 350, 404)    "IB840310"  TABORDER(1)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  obj2(6, 419, 718, 660)    "IB840330"  TABORDER(2)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  obj3(365, 8, 718, 400)    "IB840340"  TABORDER(3)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL11(0, 688, 855, 691)        COLOR(64, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  GUIDE1(-2, 664, 726, 688)  LIMAGE(1)  LINEW(3)  STRESS(0)  STRESSW(0)  LINETYPE(4)  LINECOLOR(64)      COLOR(34, 69)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL2(4, 669, 18, 683)    |IMAGE|AL_STRETCH    COLOR(208, 232)  CUR(0)    "알림_ic.bmp"  ENABLE  &
+  VISIBLE  TRANSPARENT  IMAGE  HINTTYPE(IH_NONE)
+PANEL  GUIDE(20, 664, 693, 688)        COLOR(228, 130)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+OBJECT  obj4(860, 320, 1050, 390)    "IB840301"  TABORDER(4)  IOORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  MktTpNm(975, 285, 1085, 305)  LEN(20)  IO_MIXED|AL_CENTER|    COLOR(192, 69)  CUR(0)  LINECOLOR(0)          TABORDER(0)  IOORDER(5)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL6(860, 285, 970, 305)  '종목구분'  LINECOLOR(75)      COLOR(74, 76)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+
+'-- obj1의 정보를 obj2에게 넘겨주는 프로시져
+
+Sub obj1_to_obj2()
+	SCREEN.Object("obj2.zAcntNo").data = SCREEN.Object("obj1.AN1A").data & "         "
+	SCREEN.Object("obj2.zPwd").data = SCREEN.Object("obj1.zpwd").data
+	'SCREEN.Object("obj2.zAppyDt").data = SCREEN.Object("obj1.zBaseDt").data
+End Sub
+
+'-- obj3의 그리드 더블클릭시 obj1에게 데이터를 넘겨주는 프로시져
+
+Sub obj3_to_obj1()
+	Dim acnt, acnt_t
+	acnt = Trim(SCREEN.Object("obj2.zAcntNo").data)
+	acnt_t = Left(acnt, 3)
+
+	SCREEN.Object("obj1.lAppyQty").data = 0
+
+	If Trim(SCREEN.Object("obj2.beajung").data) <> "" Then
+		If UTAB0.ID = 0 Then
+			SCREEN.Object("obj1.lAppyQty").data = Trim(SCREEN.Object("obj2.beajung").data)
+		End If
+	End If
+	SCREEN.Object("obj1.OverAppyQty").data = 0
+	SCREEN.Object("obj1.lAppyQty1").clear
+	SCREEN.Object("obj1.lMktcplAppyQty1").clear
+
+	SCREEN.Object("obj1.zIsuNo").data = Mid(SCREEN.Object("obj3.edit0").data, 1, Len(SCREEN.Object("obj3.edit0").data))
+
+	SCREEN.Object("obj4.IsuNo").data = Trim(SCREEN.Object("obj1.zIsuNo").data)
+	obj4.Send
+
+	SCREEN.Object("obj1.HNAM").data = SCREEN.Object("obj3.edit1").data
+	SCREEN.Object("obj1.jmNm").Data = SCREEN.Object("obj3.Edit1").Data
+	SCREEN.Object("obj1.amt").data = SCREEN.Object("obj3.edit2").data
+	SCREEN.Object("obj1.amt1").data = SCREEN.Object("obj3.edit2").data
+	SCREEN.Object("obj1.zBaseDt").Data = SCREEN.Object("obj3.EDIT3").Data
+
+	If (acnt_t >= "551" And acnt_t <= "561") Then '190103 561 계좌 추가
+		SCREEN.Object("obj1.gubn").data = "1"
+	Else
+		SCREEN.Object("obj1.gubn").data = "0"
+	End If
+	find_lAsgnQty()
+	cal_lAppyQty()
+	'SCREEN.Object("obj1.obj").send
+
+	'청약신청탭일 경우에만, 투자설명서 배부여부를 확인
+	If UTAB0.ID = 0 Then
+		SCREEN.Object("obj1.obj10").Send
+	End If
+End Sub
+
+'-- obj2의 그리드 더블클릭시 obj1에게 데이터를 넘겨주는 프로시져
+
+Sub obj2_to_obj1()
+	SCREEN.Object("obj1.lAppyQty").data = 0
+
+	If Trim(SCREEN.Object("obj2.beajung").data) <> "" Then
+		If UTAB0.ID = 0 Then
+			SCREEN.Object("obj1.lAppyQty").data = Trim(SCREEN.Object("obj2.beajung").data)
+		End If
+	End If
+
+	If Trim(SCREEN.Object("obj2.chogwa").data) <> "" Then
+		If UTAB0.ID = 0 Then
+			SCREEN.Object("obj1.OverAppyQty").data = Trim(SCREEN.Object("obj2.chogwa").data)
+		End If
+	Else
+		SCREEN.Object("obj1.OverAppyQty").data = 0
+	End If
+
+	SCREEN.Object("obj1.lAppyQty1").clear
+	SCREEN.Object("obj1.lMktcplAppyQty1").clear
+	SCREEN.Object("obj1.zIsuNo").data = Mid(SCREEN.Object("obj2.edit0").data, 1, Len(SCREEN.Object("obj3.edit0").data))
+	SCREEN.Object("obj1.HNAM").data = SCREEN.Object("obj2.edit1").data
+	SCREEN.Object("obj1.jmNm").data = SCREEN.Object("obj2.edit1").data
+	find_dFltnPrc()
+	cal_lAppyQty()
+
+	If UTAB0.ID = 0 Then
+		SCREEN.Object("obj1.obj10").Send
+	End If
+End Sub
+
+Sub find_dFltnPrc() 'obj2(아래 그리드)클릭 시 우측 상단(obj3) 발행가 가져오기
+	Dim ii, dFltnPrc
+	dFltnPrc = 0
+	For ii=1 To SCREEN.Object("obj3.GRID0").Rows
+		If Trim(SCREEN.Object("obj1.zIsuNo").data) = Trim(SCREEN.Object("obj3.GRID0").GetGridCell(ii, 2))Then '종목코드
+			dFltnPrc = Trim(SCREEN.Object("obj3.GRID0").GetGridCell(ii, 6))	'발행가
+			Exit For
+		End If
+	Next
+
+	SCREEN.Object("obj1.amt").data = dFltnPrc
+	SCREEN.Object("obj1.amt1").data = dFltnPrc
+
+End Sub
+
+Sub find_lAsgnQty() '우측 상단(obj3) 클릭 시 obj2(아래 그리드) 보통배정수량 가져오기
+	Dim ii, lAgnQty1, lAgnQty2
+	lAgnQty1 = 0
+	lAgnQty2 = 0
+	For ii=1 To SCREEN.Object("obj2.GRID0").Rows
+		If Trim(SCREEN.Object("obj1.zIsuNo").data) = Trim(SCREEN.Object("obj2.GRID0").GetGridCell(ii, 2))Then '종목코드
+			lAgnQty1 = Trim(SCREEN.Object("obj2.GRID0").GetGridCell(ii, 12))	'보통배정수량
+			lAgnQty2 = Trim(SCREEN.Object("obj2.GRID0").GetGridCell(ii, 29))	'초과배정수량
+			Exit For
+		End If
+	Next
+
+	SCREEN.Object("obj1.lAppyQty").data = lAgnQty1
+	SCREEN.Object("obj1.OverAppyQty").data = lAgnQty2
+
+End Sub
+
+
+Sub cal_lAppyQty() '청약수량 * 발행가
+
+	If Trim(SCREEN.Object("obj1.amt").data) = "" Then
+		SCREEN.Object("obj1.lAppyQty1").data = 0 '보통배정수량 금액
+		SCREEN.Object("obj1.lMktcplAppyQty1").data = 0 '초과배정수량 금액
+	Else
+		If SCREEN.Object("obj1.gubn").data = "1" Then
+			If Trim(SCREEN.Object("main.MktTpNm").Data) = "채 권" Then
+				SCREEN.Object("obj1.lAppyQty1").data = SCREEN.Object("obj1.lAppyQty").data
+				SCREEN.Object("obj1.lMktcplAppyQty1").data = SCREEN.Object("obj1.OverAppyQty").data
+			Else
+				SCREEN.Object("obj1.lAppyQty1").data = SCREEN.Object("obj1.lAppyQty").data * SCREEN.Object("obj1.amt").data
+				SCREEN.Object("obj1.lMktcplAppyQty1").data = SCREEN.Object("obj1.OverAppyQty").data * SCREEN.Object("obj1.amt1").data
+			End If
+		Else
+			SCREEN.Object("obj1.lAppyQty1").data = SCREEN.Object("obj1.lAppyQty").data * SCREEN.Object("obj1.amt").data
+			SCREEN.Object("obj1.lMktcplAppyQty1").data = SCREEN.Object("obj1.OverAppyQty").data * SCREEN.Object("obj1.amt1").data
+		End If
+	End If
+
+End Sub
+
+_AW_ONSTART_AW_
+obj3.Send
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(UTAB0)
+_AW_ONCLICK_AW_
+
+Select  Case (UTAB0.Index)
+	Case "0" : obj1.SetObject "IB840310"	 '-- 청약신청
+	Case "1" : obj1.SetObject "IB840320"	 '-- 청약취소
+
+End Select
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

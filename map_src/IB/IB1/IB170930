@@ -1,0 +1,124 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB170930)
+MAPSIZE(485, 1059)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("ÆÝµåÀÜ°í")
+MAPPUBLIC(";")
+FONT("±¼¸²Ã¼", 9, NORMAL)
+OPTIONS(ENCODE)
+TITLE("[1709]ÆÝµåÀÜ°í")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL3(1054, 0, 1059, 56)        COLOR(64, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL2(0, 0, 5, 56)        COLOR(64, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+USRTAB  tab_mainHangmok(1, 0, 1058, 26)  FOCUS  INDEX(4)  COUNT(11)  AL_TOP  TAB_IMAGE      FONT("±¼¸²Ã¼", 9, NORMAL)    COLOR(3, 70)  CUR(0)  TABIMAGE("tab.bmp")  FCOLOR(3, 71)  CAPTION(" ÀüÃ¼ ", "Á¾ÇÕ°èÁÂº°", "À§Å¹/ÀúÃà", " ¼±¹° ", " ÆÝµå ", " CMA ", "  RP  ", " Ã¤±Ç ", "  CD  ", "  CP  ", "½ÅÅ¹/±âÅ¸")  TABINFO("1:0", "0:1", "1:2", "1:3", "1:4", "1:5", "1:6", "1:7", "1:8", "1:9", "1:10")  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  obj_6112(0, 26, 1059, 485)    "IB611200"  TABORDER(1)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  accn(50, 551, 173, 575)  LEN(11)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(2)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  acnm(178, 552, 306, 572)  LEN(40)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(3)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  Label0(23, 583, 388, 619)  'ÀüÃ¼ÅÇ¿¡¼­ ±×¸®µå Å¬¸¯Çß´ÂÁö ±×³É ÆÝµåÅÇÀ» Å¬¸¯Çß´ÂÁö ±¸ºÐ'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  gubn(390, 587, 433, 610)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(4)  IOORDER(4)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Option Explicit
+
+Sub tab_mainChange()
+	Select Case tab_mainHangmok.ID
+		Case 0 :
+				SCREEN.ChangeMap "IB170900"
+		Case 2 :
+				SCREEN.ChangeMap "IB170910"
+		Case 3 :
+				SCREEN.ChangeMap "IB170920"
+		Case 4 :
+				SCREEN.ChangeMap "IB170930"
+		Case 5 :
+				SCREEN.ChangeMap "IB170940"
+		Case 6 :
+				SCREEN.ChangeMap "IB170950"
+		Case 7 :
+				SCREEN.ChangeMap "IB170960"
+		Case 8 :
+				SCREEN.ChangeMap "IB170970"
+		Case 9 :
+				SCREEN.ChangeMap "IB170980"
+		Case 10 :
+				SCREEN.ChangeMap "IB170990"
+	End Select
+End Sub
+
+_AW_ONINDECLARE_AW_
+#Load IB888833
+
+_AW_ONENDSUB_AW_
+_AW_ONSTART_AW_
+gubn.Data = "1"
+
+If Trim(SYSTEM.Pop("1709_accn")) <> "" Then
+	Dim tmpAccn
+
+	tmpAccn = Trim(SYSTEM.Pop("1709_accn"))
+
+	If Len(Trim(tmpAccn)) > 11 Then
+		tmpAccn = Left(Trim(tmpAccn), 11)
+	End If
+
+	accn.Data = tmpAccn
+	acnm.Data = Trim(SYSTEM.Pop("1709_name"))
+
+	gubn.Data = "1"
+	SCREEN.SetTimer 4, False
+Else
+	gubn.Data = "2"
+	SCREEN.Proc "obj_6112.Set_account", ""
+End If
+
+_AW_ONENDSUB_AW_
+_AW_ONTIMER_AW_
+SCREEN.Object("obj_6112.AN55").Data = accn.Data
+SCREEN.Object("obj_6112.ACNM").Data = acnm.Data
+
+SYSTEM.Push "1709_accn", ""
+SYSTEM.Push "1709_name", ""
+
+SCREEN.Proc "obj_6112.send_f", ""
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(tab_mainHangmok)
+_AW_ONCLICK_AW_
+Call tab_mainChange()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

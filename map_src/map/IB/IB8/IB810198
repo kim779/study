@@ -1,0 +1,92 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB810198)
+MAPSIZE(114, 205)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+TITLE("추가인증 예외대상CHK")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pihofrpf")
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL0(-185, -60, 210, 140)  TP_RAISED      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  type(105, 5, 205, 25)  LEN(1)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_SUNKEN  INIT("U")          TABORDER(1)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  type1(0, 5, 100, 25)  'type'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  data(105, 30, 205, 50)  LEN(15)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_SUNKEN          TABORDER(2)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL0(0, 30, 100, 50)  'data'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON0(0, 80, 205, 115)  TP_PUSH      AL_CENTER    FOCUS  COLOR(208, 232)  CUR(0)      TABORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL5(0, 55, 100, 75)  'isyn'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  isyn(105, 55, 205, 75)  LEN(1)  IO_MIXED|AL_CENTER|    COLOR(192, 69)  CUR(0)  LINECOLOR(0)          TABORDER(0)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  OBJECT0(230, 60, 325, 140)    "IB810290"  TABORDER(4)  IOORDER(4)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Sub Send_F()
+	data.data = Trim(SYSTEM.UserID)
+	'SCREEN.Send 0
+End Sub
+
+Sub Noauth()
+	MsgBox "현재 해외출국 예외신청이 되어있고, 해외IP,출국정보가 조회되었습니다. PC지정/추가인증 서비스가 적용되지 않습니다.",0,"IBK투자증권"
+	SCREEN.Proc "parent.parent.parent.BNK_SEND2", "02"
+End Sub
+
+_AW_ONSEND_AW_
+Call Send_F()
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+If Trim(isyn.data) <> "" Then
+	If Trim(isyn.data) = "Y" Then
+		MsgBox "현재 해외출국 예외신청이 되어있지만 해외에서 접속하지 않았으므로,PC지정/추가인증 서비스가 적용됩니다.",0,"IBK투자증권"
+		SCREEN.Proc "parent.PCLogic",""
+	Else
+		SCREEN.CreateWindow 2, "IB890510 /t /s /p5", ""
+		If SYSTEM.Pop("agree") = "OK" Then
+			OBJECT0.Send
+		Else
+			SCREEN.Proc "parent.PCLogic",""
+		End If
+	End If
+End If
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(BUTTON0)
+_AW_ONCLICK_AW_
+Call Send_F()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

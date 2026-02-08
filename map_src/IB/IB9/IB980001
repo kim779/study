@@ -1,0 +1,114 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB980001)
+MAPSIZE(99, 162)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("웹링크용 대표화면")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+OUT  1021(134, 165, 234, 185)  LEN(16)  IO_ALPHA|AL_LEFT||FA_FLASH    COLOR(31, 2)  CUR(0)            TABORDER(0)  IOORDER(1)  &
+  HINTTYPE(IH_NONE)
+EDIT  1301(64, 165, 129, 185)  LEN(6)  IO_MIXED|EDIT_INOUT|FA_ZEROSUP|FA_WRAP|FA_HAN|FA_SKIP|FA_NOR|SA_SPACE|CODE      COLOR(68, 69)  CUR(0)  TP_SUNKEN          TABORDER(1)  IOORDER(2)  &
+  HINTTYPE(IH_NONE)
+CONTROL  WebCtrl(0, 0, 405, 190)  |FA_PROTECT  "CX_NoticeWeb"  ""  LEN(0)  EDIT_NOP    COLOR(192, 232)  TABORDER(0)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  url(0, 190, 405, 210)  LEN(64)  IO_MIXED|EDIT_INOUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_SUNKEN  INIT("http://www.ibks.com/wts/OS/IOS00012_00.jsp")          TABORDER(2)  IOORDER(3)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  edUrlTrigger(495, 205, 630, 225)  LEN(100)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(3)  IOORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Sub starturl()
+
+	Dim map, title
+	WebCtrl.Home = SYSTEM.Home
+	WebCtrl.UserID = LOGIN.User
+
+	WebCtrl.SetWidth 810
+	WebCtrl.SetHeight 652
+	url.Data = SYSTEM.Pop("IB980001_URL")
+	WebCtrl.NavigateFRmap url.Data, False
+
+End Sub
+
+_AW_ONSTART_AW_
+Dim map, title
+WebCtrl.Home = SYSTEM.Home
+WebCtrl.UserID = LOGIN.User
+
+WebCtrl.SetWidth 900
+WebCtrl.SetHeight 652
+url.Data = SYSTEM.Pop("IB980001_URL")
+If Len(Trim(url.Data)) > 0 Then
+	WebCtrl.NavigateFRmap url.Data, False
+End If
+SYSTEM.Push "IB980001_URL", ""
+
+'SCREEN.SetSize WebCtrl.Width-4, WebCtrl.Height-4
+'SCREEN.SetTimerX 5,5, False
+'SCREEN.SetCaption WebCtrl.GetCaption
+
+_AW_ONENDSUB_AW_
+_AW_ONTIMERX_AW_
+If id = 5 Then
+	SCREEN.SetSize WebCtrl.Width-3, WebCtrl.Height-3
+End If
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(1301)
+_AW_ONCHANGE_AW_
+WebCtrl.ItemCode = S1301.Data
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(url)
+_AW_ONKEYCHANGE_AW_
+'If SCREEN.Key = "13" Then  '-- Enter 키 입력
+'	BUTTON0.SetFocus
+'End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(edUrlTrigger)
+_AW_ONCHANGE_AW_
+Dim map, title
+WebCtrl.Home = SYSTEM.Home
+WebCtrl.UserID = LOGIN.User
+
+WebCtrl.SetWidth 900
+WebCtrl.SetHeight 652
+url.Data = edUrlTrigger.Data
+If Len(Trim(url.Data)) > 0 Then
+	WebCtrl.NavigateFRmap url.Data, False
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

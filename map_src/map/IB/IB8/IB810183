@@ -1,0 +1,135 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB810183)
+MAPSIZE(192, 282)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(ENCODE|CR2TAB)
+TITLE("Untitled")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("piboPBxQ")
+MAPTYPE(FIXED)
+HEADER(LEDGER)
+TRXH("31CSACAT500")
+}
+
+
+
+FORM DIVISION
+{
+
+LABEL  LABEL0(20, 20, 140, 40)  '입력레코드갯수'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  zIn(145, 20, 265, 40)  LEN(5)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_NOR    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("00001")          TABORDER(1)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL1(20, 41, 140, 61)  '구분'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  zTP(145, 41, 265, 61)  LEN(1)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_NOR    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("1")          TABORDER(2)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL2(20, 62, 140, 82)  '처리구분'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  zTrxTp(145, 62, 265, 82)  LEN(1)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_NOR    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(3)  IOORDER(3)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL3(20, 83, 140, 103)  '사용자ID'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  zUserId(145, 83, 265, 103)  LEN(16)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_NOR    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(4)  IOORDER(4)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL4(20, 104, 140, 124)  '은행코드'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  zBnkCode(145, 104, 265, 124)  LEN(3)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_NOR    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(5)  IOORDER(5)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL5(20, 125, 140, 145)  '은행계좌번호'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  zBnkAcntNo(145, 125, 265, 145)  LEN(20)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_NOR    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(6)  IOORDER(6)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL6(20, 145, 140, 165)  '은행제휴카드번호(계좌명)'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  zBnkAcntNm(145, 145, 265, 165)  LEN(20)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_NOR    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(7)  IOORDER(7)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL7(20, 165, 140, 185)  '은행계좌명(계좌닉네임)'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  zBnkAcntNick(145, 165, 265, 185)  LEN(40)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_NOR    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(8)  IOORDER(8)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL8(20, 245, 140, 265)  '은행명'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  zBnkName(145, 245, 265, 265)  LEN(40)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_SKIP|FA_NOR    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(9)  IOORDER(9)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Option Explicit
+
+Sub send_o()
+	SCREEN.ClearAll 0, 2
+	LEDGER.Fkey = "5"
+	SCREEN.Send 0
+End Sub
+
+Sub confirm()
+	SYSTEM.Push "favorate_register", ""
+	SYSTEM.Push "favorate_nick", ""
+
+	Dim Domino
+	Domino = "bank" & vbTab & Trim(zBnkName.Data)     & vbLf &_
+	         "acct" & vbTab & Trim(zBnkAcntNo.Data)   & vbLf &_
+	         "nick" & vbTab & Trim(zBnkAcntNm.Data)   & vbLf &_
+	         "name" & vbTab & Trim(zBnkAcntNick.Data) & vbLf
+	'닉네임에 계좌명을 넣고 있어서 바꿈
+
+	SCREEN.CreateWindow 2, "IB81018D /p5 /d", Domino
+
+	If Trim(SYSTEM.Pop("favorate_register")) <> "OK" Then
+		Exit Sub
+	Else
+		Dim regNick
+		regNick = Trim(SYSTEM.Pop("favorate_nick"))
+
+		If regNick <> "" Then
+			zBnkAcntNick.Data = regNick
+		End If
+
+		Call send_o()
+	End If
+End Sub
+
+_AW_ONINDECLARE_AW_
+#Load IB888833
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+SCREEN.OnSend = False
+
+zIn.Data = "00001"
+zTrxTp.Data = "1"
+zUserId.Data = Trim(LOGIN.User)
+
+SCREEN.OnSend = True
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+Dim ecod
+ecod = Trim(LEDGER.Ecod)
+
+If chkNumericData(ecod) = False Then
+	Exit Sub
+End If
+
+Call alert_msg(Trim(LEDGER.Emsg))
+
+_AW_ONENDSUB_AW_
+}
+
+
+

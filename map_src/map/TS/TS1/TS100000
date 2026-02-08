@@ -1,0 +1,80 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(TS100000)
+MAPSIZE(17, 180)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("MS Sans Serif", 9, NORMAL)
+TITLE("TS100000")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Function readFromRegistry (strRegistryKey, strDefault )
+
+Dim WSHShell, value
+
+On Error Resume Next
+
+Set WSHShell = CreateObject("WScript.Shell")
+
+value = WSHShell.RegRead( strRegistryKey )
+
+
+If Err.number <> 0 Then
+
+readFromRegistry= strDefault
+
+Else
+
+readFromRegistry=value
+
+End If
+
+
+Set WSHShell = Nothing
+End Function
+
+_AW_ONSTART_AW_
+Dim a
+a = readFromRegistry("HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{AD9D2732-5729-4B30-9251-2502E3E25EBA}\InstallLocation","-1")  '끝에 화일명이 아닌 프로그램 이름 넣기!
+'If a <> "" Then
+'    Check2.Value = 1
+'Else
+'    Check2.Value = 0
+'End If                                  '시작 레지스트에 등록되어 있는지 읽어와서 체크하기
+If a <> -1 Then
+	Dim oShell
+	
+	Set oShell = CreateObject ("WScript.shell")
+	 oShell.Run("""" & a & "\Bin\StartMain.exe""")
+	Set oShell = Nothing
+Else
+	MsgBox "GTS가 설치되어 있지 않읍니다.",1,"GTS 확인창"
+End If
+
+_AW_ONENDSUB_AW_
+}
+
+
+

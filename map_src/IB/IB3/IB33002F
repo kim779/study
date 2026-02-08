@@ -1,0 +1,95 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB33002F)
+MAPSIZE(239, 89)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("선옵종합2-복수종목1")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+TITLE("[33002F] 선물옵션종합화면2-복수종목1")
+TOPATH(AXIS)
+METHOD(MENU)
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+OBJECT  obj(0, 17, 89, 239)    "IB33002G"  TABORDER(1)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  SYMBOL7(72, 0, 89, 18)  TP_PUSH|IMAGE|AL_STRETCH      COLOR(24, 0)  CUR(10)    "검색.BMP"    TABORDER(2)  ENABLE  &
+  VISIBLE  IMAGE  HOVER  HINTTYPE(IH_NONE)
+EDIT  ed_focod(0, 0, 72, 18)  LEN(8)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_UPPER|FA_NOR|CODE    FONT("굴림체", 9, NORMAL)    COLOR(192, 69)  CUR(0)  TP_SUNKEN          TABORDER(3)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Sub ChangeCode()
+	Dim code, fogb, rsymb
+
+	code = Left(ed_focod.Data, 1)
+	If code = "1" Or code = "4" Or code = "A" Or code = "D" Then
+		fogb = 101
+		rsymb = "30301"
+		obj.SetObject("IB33002G")
+	Else
+		fogb = 102
+		rsymb = "40301"
+		obj.SetObject("IB33002H")
+	End If
+
+	SCREEN.Object("obj."&rsymb).data = ed_focod.data
+	'HNAM.Data = SCREEN.GetName (fogb, ed_focod.Data, 0)
+	'If Trim(HNAM.Data) =  "" Then
+	'	SCREEN.ClearAll 2, 0
+	'	Exit Sub
+	'End If
+	'
+	'ed_focod.Trigger "ed_focod", True
+	'ed_focod.Trigger rsymb, True
+	'SYSTEM.SetHistory rsymb, ed_focod.Data
+	'SYSTEM.SetHistory "ed_focod", ed_focod.Data
+
+	obj.Send
+End Sub
+
+_AW_ONSEND_AW_
+SCREEN.OnSend = False
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(SYMBOL7)
+_AW_ONCLICK_AW_
+Dim name
+
+name = SCREEN.GetCode (103, "ed_focod", "", 2)
+If name <>  True Then
+	Exit Sub
+End If
+Call ChangeCode()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(ed_focod)
+_AW_ONCHANGE_AW_
+Call ChangeCode()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

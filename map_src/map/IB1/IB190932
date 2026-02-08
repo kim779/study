@@ -1,0 +1,92 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB190932)
+MAPSIZE(198, 604)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("종합_차트")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(FMS|FLASH)
+TITLE("[190932] 종합_차트")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pooppoop")
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL0(11, 252, 615, 278)        COLOR(66, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  BUTTON2(79, 255, 98, 275)  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(15, 63)  CUR(0)    "검색.BMP"    TABORDER(1)  ENABLE  &
+  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+CONTROL  17413(99, 255, 250, 275)    "CX_Symbol"  "/a89/b91/c92/d69"  LEN(0)  EDIT_OUTPUT  FONT("굴림체", 9, NORMAL)    COLOR(90, 130)  TABORDER(0)  IOORDER(3)  ENABLE  &
+  HINTTYPE(IH_NONE)
+CONTROL  jcod(14, 255, 79, 275)  |FA_PROTECT|FA_SKIP  "CX_CODECTRL"  "/u0/k검색.BMP/lAXCOMBO.BMP/p/s0/o"  LEN(6)  EDIT_INPUT    COLOR(192, 130)  TABORDER(2)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+CONTROL  18412(0, 0, 604, 198)  |FA_PROTECT|FA_SKIP|FA_FLASH  "C_Total"  "/nIB19093299/r200/d100/i1/u1/t2/j1/m15/m220/m30/m40/g15/g220/g30/g40"  LEN(0)  EDIT_INOUT  FONT("굴림체", 9, NORMAL)    COLOR(192, 232)  TABORDER(3)  IOORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  1301(641, 178, 706, 198)  LEN(6)  IO_MIXED|EDIT_INPUT    COLOR(192, 130)  CUR(0)  TP_SUNKEN  CURSOR        TABORDER(4)  IOORDER(1)  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONSEND_AW_
+Dim str, str2
+
+jcod.Data = SCREEN.object("main.1301").Data
+S1301.Data = jcod.Data
+
+Dim codx
+codx = Trim(jcod.Data)
+If codx = "000000" Or codx = "" Or Len(codx) <> 6 Then
+	SCREEN.OnSend False
+	Exit Sub
+End If
+str = "1" & vbTab & S1301.Data & vbTab
+S18412.RequestTR str
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(BUTTON2)
+_AW_ONCLICK_AW_
+Dim retn
+retn = SCREEN.GetCode(100, "jcod", "hnam", 0 )
+If retn <> True Then
+      Exit Sub
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(jcod)
+_AW_ONCHANGE_AW_
+Dim codx
+codx = Trim(jcod.Data)
+If codx = "000000" Or codx = "" Or Len(codx) <> 6 Then
+	SCREEN.ClearAll 0, 2
+	Exit Sub
+End If
+S1301.Data = jcod.Data
+SCREEN.Object("main.1301").Data = jcod.Data
+SCREEN.Proc "main.code_change", "main"
+jcod.SetFocus
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

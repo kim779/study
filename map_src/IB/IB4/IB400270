@@ -1,0 +1,47 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB400270)
+MAPSIZE(180, 661)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("현재가_차트")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(FMS|FLASH)
+TITLE("[400270]옵션_차트")
+TOPATH(AXIS)
+METHOD(MENU)
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+CONTROL  48411(0, 0, 661, 180)  |FA_PROTECT|FA_FLASH  "C_Total"  "/nTT100100/r200/d100/i1/u3/t2/j1/m15/m220/m30/m40/g15/g220/g30/g40"  LEN(0)  EDIT_INOUT  FONT("굴림체", 9, NORMAL)    COLOR(192, 232)  TABORDER(1)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONSEND_AW_
+Dim str
+SCREEN.OnSend = False
+
+str = "4" & vbTab & SCREEN.Object("main.40301").Data & vbTab & "4" & vbTab & "30"
+'str = "3" & vbTab & SCREEN.Object("main.40301").Data & vbTab & "4" vbTab & "00" & vbTab
+S48411.RequestTR str
+
+_AW_ONENDSUB_AW_
+}
+
+
+

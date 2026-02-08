@@ -1,0 +1,87 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB170990)
+MAPSIZE(548, 729)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("[1709]전제")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+TITLE("[1709]종합잔고 전체")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+USRTAB  tab_mainHangmok(1, 3, 729, 29)  FOCUS  INDEX(10)  COUNT(11)  AL_TOP  TAB_IMAGE      FONT("굴림체", 9, NORMAL)    COLOR(3, 70)  CUR(0)  TABIMAGE("tab.bmp")  FCOLOR(3, 71)  CAPTION(" 전체 ", "종합계좌별", "위탁/저축", " 선물 ", " 펀드 ", " CMA ", "  RP  ", " 채권 ", "  CD  ", "  CP  ", "신탁/기타")  TABINFO("1:0", "0:1", "1:2", "1:3", "1:4", "1:5", "1:6", "1:7", "1:8", "1:9", "1:10")  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  panel_up(0, 0, 900, 3)        COLOR(64, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  panel_left(0, 0, 1, 58)        COLOR(64, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  OBJECT0(0, 29, 729, 548)    "IB622200"  TABORDER(1)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Option Explicit
+
+
+Sub tab_mainChange()
+	Select Case tab_mainHangmok.ID
+		Case 0 :
+				SCREEN.ChangeMap "IB170900"
+		Case 2 :
+				SCREEN.ChangeMap "IB170910"
+		Case 3 :
+				SCREEN.ChangeMap "IB170920"
+		Case 4 :
+				SCREEN.ChangeMap "IB170930"
+		Case 5 :
+				SCREEN.ChangeMap "IB170940"
+		Case 6 :
+				SCREEN.ChangeMap "IB170950"
+		Case 7 :
+				SCREEN.ChangeMap "IB170960"
+		Case 8 :
+				SCREEN.ChangeMap "IB170970"
+		Case 9 :
+				SCREEN.ChangeMap "IB170980"
+		Case 10 :
+				SCREEN.ChangeMap "IB170990"
+	End Select
+End Sub
+
+_AW_ONINDECLARE_AW_
+#load IB888833
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+SCREEN.OnSend False
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(tab_mainHangmok)
+_AW_ONCLICK_AW_
+Call tab_mainChange()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

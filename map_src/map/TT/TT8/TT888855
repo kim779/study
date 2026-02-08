@@ -1,0 +1,101 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(TT888855)
+MAPSIZE(247, 422)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("굴림", 9, NORMAL)
+TITLE("용어사전테스트")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL0(5, 10, 420, 245)  TP_RAISED      COLOR(208, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  lb_Data(20, 20, 205, 80)  '테스트2'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_REF)  HELPTEXT("lb_Ref")HELPTEXT("lb_Ref")
+LABEL  lb_Ref(75, 375, 640, 410)  'Label'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON1(30, 170, 110, 210)  '테스트1'  TP_PUSH      AL_CENTER    FOCUS  COLOR(208, 232)  CUR(0)      TABORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON0(115, 170, 195, 210)  '테스트2'  TP_PUSH      AL_CENTER    FOCUS  COLOR(208, 232)  CUR(0)      TABORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON2(200, 170, 280, 210)  '테스트5'  TP_PUSH      AL_CENTER    FOCUS  COLOR(208, 232)  CUR(0)      TABORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+'-----------------------------------------------------------------------
+Sub SetDictHintLabel(RefLabel, DataLabel)
+	RefLabel.Text = ""
+	Dim FSO, F
+	Set FSO = CreateObject("Scripting.FileSystemObject")
+	If Not FSO.FileExists(SYSTEM.Home & "\tab\dict.txt") Then
+		Exit Sub
+	End If
+	Set F = FSO.OpenTextFile(SYSTEM.Home & "\tab\dict.txt", 1)
+	ReadLine = ""
+	Do While Not F.AtEndOfLine
+		ReadLine = F.ReadLine
+		If Len(ReadLine) = 0 Then
+			Exit Do
+		End If
+		DL = Split(ReadLine, "|")
+		If UBound(DL) >= 1 Then
+			If DL(0) = DataLabel.Text Then
+				RefLabel.Text = DL(1)
+			End If
+		End If
+	Loop
+	F.Close
+End Sub
+
+_AW_ONSTART_AW_
+SetDictHintLabel lb_Ref, lb_Data
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(BUTTON1)
+_AW_ONCLICK_AW_
+lb_Data.Text = "테스트1"
+SetDictHintLabel lb_Ref, lb_Data
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON0)
+_AW_ONCLICK_AW_
+lb_Data.Text = "테스트2"
+SetDictHintLabel lb_Ref, lb_Data
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON2)
+_AW_ONCLICK_AW_
+lb_Data.Text = "테스트5"
+SetDictHintLabel lb_Ref, lb_Data
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

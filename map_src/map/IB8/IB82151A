@@ -1,0 +1,130 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB82151A)
+MAPSIZE(450, 700)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(ENCODE)
+TITLE("Untitled")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("piboPBxQ")
+MAPTYPE(FIXED)
+HEADER(LEDGER)
+TRXH("11CSACMQ201")
+}
+
+
+
+FORM DIVISION
+{
+
+EDIT  EDIT0(10, 365, 130, 385)  LEN(5)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("00001")          TABORDER(1)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  an(10, 392, 180, 412)  LEN(20)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(2)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  pwd(10, 419, 74, 439)  LEN(8)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(3)  IOORDER(3)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  inout(172, 351, 462, 371)  LEN(33)  IO_NUM|AL_CENTER|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(4)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  OUTPUT0(7, 29, 677, 49)  LEN(123)  IO_MIXED|AL_LEFT|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(7)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  AcntStatNm(8, 52, 294, 72)  LEN(40)  IO_MIXED|AL_LEFT|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(8)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  OUTPUT1(9, 75, 658, 95)  LEN(109)  IO_MIXED|AL_LEFT|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(9)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  RmnTpNm(12, 106, 184, 126)  LEN(20)  IO_MIXED|AL_LEFT|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(10)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  OUTPUT2(15, 138, 656, 158)  LEN(54)  IO_MIXED|AL_LEFT|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(11)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  LedgSdinfAddrPtnNm(16, 173, 481, 193)  LEN(40)  IO_MIXED|AL_LEFT|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(12)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  PwdContErrCnt(52, 264, 231, 284)  LEN(9)  IO_NUM|AL_LEFT|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(16)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  OUTPUT4(15, 302, 656, 322)  LEN(182)  IO_MIXED|AL_LEFT|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(17)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  OUTPUT5(18, 267, 44, 280)  LEN(1)  IO_MIXED|AL_CENTER|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(15)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  OUTPUT3(17, 208, 482, 228)  LEN(40)  IO_MIXED|AL_LEFT|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(13)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  OUTPUT6(18, 233, 483, 253)  LEN(40)  IO_MIXED|AL_LEFT|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(14)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  OUTPUT7(304, 394, 340, 408)  LEN(5)  IO_NUM|AL_CENTER|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(5)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  ClntNo(10, 6, 231, 27)  LEN(20)  IO_MIXED|AL_CENTER|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(6)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Option Explicit
+
+Sub send_f()
+	SCREEN.ClearAll 0, 2
+	LEDGER.Fkey = "C"
+	SCREEN.Send 0
+End Sub
+
+_AW_ONINDECLARE_AW_
+#Load IB888833
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+SCREEN.Onsend False
+
+an.Data = Trim(SCREEN.Object("parent.parent.AN99").Data)
+pwd.Data = Trim(SCREEN.Object("parent.parent.zpwd").Data)
+
+' 기본값[9999] - 09/07/15
+If SYSTEM.ConnectBy = "0" And Trim(pwd.Data) = "" Then
+   pwd.Data = "9999"
+End If
+
+If CheckInput(an, pwd) = True Then
+	SCREEN.OnSend True
+End If
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+If LEDGER.Ecod = "3669" Or LEDGER.Ecod = "1001"Then
+	SCREEN.ClearAll 1,2
+	If SCREEN.Object("main.sect").Data = "1" Then
+		SCREEN.Object("main.ACNM").Data = SCREEN.Object("main.AN99").name
+	Else
+		SCREEN.Object("main.ACNM").Data = SCREEN.Object("main.AN98").name
+	End If
+	SCREEN.Object("main.zPwd").Clear
+	SCREEN.Object("main.zPwd").SetFocus
+Else
+	SCREEN.Object("parent.AcntStatNm").data = Trim(AcntStatNm.Data)
+	SCREEN.Object("parent.RmnTpNm").data = Trim(RmnTpNm.Data)
+	SCREEN.Object("parent.LedgSdinfAddrPtnNm").data = Trim(LedgSdinfAddrPtnNm.Data)
+
+	If Trim(PwdContErrCnt.Data) = "" Then
+		PwdContErrCnt.Data = "0"
+	End If
+
+	Select Case CLng(Trim(PwdContErrCnt.Data))
+	Case 0
+		SCREEN.Object("parent.PwdContErrCnt").data = "없음 (0회)"
+	Case Else
+        SCREEN.Object("parent.PwdContErrCnt").data = CLng(Trim(PwdContErrCnt.Data)) & " 회"
+	End Select
+	SCREEN.Proc "parent.send_f", ""
+End If
+
+_AW_ONENDSUB_AW_
+}
+
+
+

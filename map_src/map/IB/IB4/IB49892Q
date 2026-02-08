@@ -1,0 +1,84 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB49892Q)
+MAPSIZE(101, 279)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("펀드상품체크�")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(ENCODE)
+TITLE("펀드상품체크")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(FIXED)
+HEADER(LEDGER)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL23(-1, 0, 487, 129)  LIMAGE(0)  LINEW(4)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL85(20, 15, 302, 30)  '선택하신 펀드는 보수가 더 저렴한 온라인'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  BUTTON0(55, 70, 131, 90)  '다른클래스'  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(208, 186)  CUR(0)    "4btn.bmp"    TABORDER(1)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+LABEL  LABEL0(20, 35, 302, 50)  '전용클래스(e)가 있습니다'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  BUTTON1(155, 70, 231, 90)  '닫기'  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(208, 186)  CUR(0)    "4btn.bmp"    TABORDER(2)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_SCRIPT_AW_(BUTTON0)
+_AW_ONCLICK_AW_
+Dim dmsg
+Dim sCode
+Dim tempYN,tempYN2
+
+sCode = SYSTEM.Pop("4989_FUNDCODE")
+SYSTEM.Push "4989_FUNDCODE", ""
+
+If(Len(sCode) > 0) Then
+	dmsg = "fundcd" & vbTab & sCode  & vbLf
+	'SCREEN.CreateWindow 3, "IB49892N /s//t/d/p5", dmsg
+	'SCREEN.CloseWindow
+	SYSTEM.Push "IB49892N_JOIN", "" '가입버튼을 눌렀다면 ChangeCode에서 SOFFQ111에 정보를 받아
+								'IB498970에서 get3month 응답을 받고
+								'OBJ2에서 joinFund를 호출해 가입을 시작한다.
+	SYSTEM.Push "IB49892N_OK" , "" '종목 더블클릭
+	SCREEN.CreateWindow 2, "IB49892N /p5 /d", dmsg
+	tempYN = SYSTEM.pop ("IB49892N_OK")
+	tempYN2 = SYSTEM.pop ("IB49892N_JOIN")
+	If Len(Trim(tempYN)) > 0 Or Len(Trim(tempYN2)) > 0 Then
+			SCREEN.CreateWindow 1, "IB498700 /t/s/p5/", ""
+			SCREEN.CloseWindow
+		Exit Sub
+	End If
+
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON1)
+_AW_ONCLICK_AW_
+SCREEN.CloseWindow
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

@@ -1,0 +1,166 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB1020CC)
+MAPSIZE(398, 746)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("약정 정보저장")
+MAPPUBLIC(";")
+FONT("굴림", 9, NORMAL)
+TITLE("서버자동주문 약정 정보저장")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("piat3007")
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+EDIT  e_acnt_no(20, 10, 140, 29)  LEN(11)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(1)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  o_acnt_no(425, 20, 510, 40)  LEN(11)  IO_MIXED|AL_LEFT|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(10)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  o_rslt_clsf(531, 130, 616, 150)  LEN(4)  IO_MIXED|AL_LEFT|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(14)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  o_errmsg(535, 150, 620, 170)  LEN(64)  IO_MIXED|AL_LEFT|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(15)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  e_sms_rqst_cncl_f(20, 35, 140, 54)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(2)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  e_push_rqst_cncl_f(20, 60, 140, 79)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(3)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  e_mts_push_rqst_cncl_f(20, 85, 140, 104)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(4)  IOORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  e_hp_no1(20, 110, 140, 129)  LEN(4)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(5)  IOORDER(5)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  e_hp_no2(20, 135, 140, 154)  LEN(4)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(6)  IOORDER(6)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  e_hp_no3(20, 160, 140, 179)  LEN(4)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(7)  IOORDER(7)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  e_use_yn(20, 185, 140, 204)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(8)  IOORDER(8)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  o_sms_rqst_cncl_f(425, 50, 510, 70)  LEN(1)  IO_MIXED|AL_LEFT|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(11)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  o_push_rqst_cncl_f(425, 75, 510, 95)  LEN(1)  IO_MIXED|AL_LEFT|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(12)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  o_mts_push_rqst_cncl_f(430, 100, 515, 120)  LEN(1)  IO_MIXED|AL_LEFT|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(13)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  o_tot_clsf(530, 195, 615, 215)  LEN(1)  IO_MIXED|AL_LEFT|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(16)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  e_usernm(30, 225, 150, 244)  LEN(32)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(9)  IOORDER(9)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONSEND_AW_
+SCREEN.OnSend = False
+
+Dim act
+Dim fir, sec, third
+e_acnt_no.Data = SCREEN.Object("parent.AN5A").data
+e_usernm.Data = Trim(LOGIN.Name)
+
+If Len(Trim(e_acnt_no.Data)) <> 11 Then
+'	Call alert_msg("계좌번호를 확인하여 주십시오.")
+	SCREEN.Object("parent.AN5A").SetFocus
+	Exit Sub
+End If
+
+'0:조회 1:등록 2:변경 3:해지
+If e_use_yn.Data = "1" Or e_use_yn.Data = "2" Then
+	If SCREEN.Object("parent.CHECK0").Checked = True Then
+		e_sms_rqst_cncl_f.Data = "1"
+	Else
+		e_sms_rqst_cncl_f.Data = "2"
+	End If
+
+	If SCREEN.Object("parent.CHECK1").Checked = True Then
+		e_push_rqst_cncl_f.Data = "1"
+	Else
+		e_push_rqst_cncl_f.Data = "2"
+	End If
+
+	If SCREEN.Object("parent.CHECK2").Checked = True Then
+		e_mts_push_rqst_cncl_f.Data = "1"
+	Else
+		e_mts_push_rqst_cncl_f.Data = "2"
+	End If
+Else
+	e_sms_rqst_cncl_f.Data = ""
+	e_push_rqst_cncl_f.Data = ""
+	e_mts_push_rqst_cncl_f.Data = ""
+End If
+
+
+
+
+
+
+SCREEN.OnSend = True
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+
+
+e_acnt_no.Data = ""
+
+If Trim(o_rslt_clsf.Data) = "0000" Then
+	'조회면 셋팅
+	If e_use_yn.Data = "0" Then
+		Dim szCheck
+		If o_sms_rqst_cncl_f.Data = "1" Then
+			SCREEN.Object("parent.CHECK0").Checked = True
+			szCheck = "1"
+		Else
+			SCREEN.Object("parent.CHECK0").Checked = False
+			szCheck = "0"
+		End If
+
+		If o_push_rqst_cncl_f.Data = "1" Then
+			SCREEN.Object("parent.CHECK1").Checked = True
+			szCheck = szCheck & "1"
+		Else
+			SCREEN.Object("parent.CHECK1").Checked = False
+			szCheck = szCheck & "0"
+		End If
+
+		If o_mts_push_rqst_cncl_f.Data = "1" Then
+			SCREEN.Object("parent.CHECK2").Checked = True
+			szCheck = szCheck & "1"
+		Else
+			SCREEN.Object("parent.CHECK2").Checked = False
+			szCheck = szCheck & "0"
+		End If
+
+		'수정체크용 데이터
+		SCREEN.Object("parent.E_CHCHECK").Data = szCheck
+
+
+		'0:조건없음 1:저장된 조건있음 2:감시중인 조건 있음
+		SCREEN.Object("parent.e_tot_clsf").data = o_tot_clsf.Data
+	ElseIf e_use_yn.Data = "2" Then
+		'변경완료 메세지
+		SCREEN.Proc "main.ShowMsg", "MODY"
+	End If
+ElseIf Trim(o_rslt_clsf.Data) = "0001" Then
+	SCREEN.Object("main.guide").text = "[서버자동주문] " & Trim(o_errmsg.Data)
+Else
+	SCREEN.Object("main.guide").text = "[서버자동주문] " & Trim(o_errmsg.Data)
+	MsgBox Trim(o_errmsg.Data)
+End If
+
+_AW_ONENDSUB_AW_
+}
+
+
+

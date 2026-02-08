@@ -1,0 +1,62 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB201112)
+MAPSIZE(204, 893)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("일자별시세 차트")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(FLASH)
+TITLE("[201112] 주식일별차트")
+TOPATH(AXIS)
+METHOD(SEND)
+TRXCODE("ng201121")
+MAPTYPE(FIXEDEX)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+EDIT  1301(335, 289, 397, 307)  LEN(12)  IO_MIXED|EDIT_INPUT    COLOR(10, 63)  CUR(0)  TP_NONE          TABORDER(1)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+CONTROL  18412(0, 0, 893, 200)  |FA_PROTECT|FA_FLASH  "C_Total"  "/nIB20011799/r200/d100/i1/u1/t2/j1/m15/m220/m30/m40/g15/g220/g30/g40"  LEN(0)  EDIT_INOUT  FONT("굴림체", 9, NORMAL)    COLOR(192, 232)  TABORDER(2)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  1021(230, 289, 336, 309)  LEN(12)  IO_MIXED|AL_LEFT||FA_FLASH    COLOR(211, 232)  CUR(0)            TABORDER(0)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONSEND_AW_
+Dim str, str2
+'S1301.Data = SCREEN.Object("parent.1301").Data
+SCREEN.OnSend = False
+str = "1" & vbTab & SCREEN.Object("parent.1301").Data & vbTab
+
+If UCase(TypeName( SCREEN.Object("main.cxMarket"))) <> "NOTHING" Then
+	If SCREEN.Object("main.cxMarket").sMarket = "KRX" Then
+		S18412.sMarket = "KRX"
+	ElseIf SCREEN.Object("main.cxMarket").sMarket = "NXT" Then
+		S18412.sMarket = "NXT"
+	ElseIf SCREEN.Object("main.cxMarket").sMarket = "통합" Then
+		S18412.sMarket = "통합"
+	End If
+End If
+
+S18412.RequestTR str
+
+_AW_ONENDSUB_AW_
+}
+
+
+

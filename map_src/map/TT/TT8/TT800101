@@ -1,0 +1,86 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(TT800101)
+MAPSIZE(178, 303)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("굴림", 9, NORMAL)
+TITLE("ELS확률_종목코드리스트")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pihorels")
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+EDIT  ed_DispId(13, 30, 133, 49)  LEN(6)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 130)  CUR(0)  TP_NONE  INIT("872000")          TABORDER(1)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+GRID  GRID0(13, 51, 277, 162)  VISIBLEROW(0)  CELLH(20)  MATRIX(500, 3)  FIX(0)  MAINCOLOR(208, 232)  LINECOLOR(0)  FOCUSCOLOR(0)  FOCUSKIND(0)  |VSCROLL|NOHEAD    &
+	COLINFO("Col0")  LEN(12)  WIDTH(80)  HEAD("종목코드")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_MIXED|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col1")  LEN(20)  WIDTH(80)  HEAD("종목명")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_MIXED|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col2")  LEN(1)  WIDTH(80)  HEAD("종목타입")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_MIXED|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    TABORDER(2)  IOORDER(3)  ENABLE  &
+  VISIBLE
+
+EDIT  ed_DIdx(13, 10, 133, 29)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 130)  CUR(0)  TP_NONE  INIT("0")          TABORDER(3)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Dim ArrData
+
+ArrData = Array()
+ReDim ArrData( GRID0.Rows - 1)
+'----------------------------------------------------------------------
+Sub GetHNamList()
+	ArrItem = Array("", "")
+
+	For i = 1 To GRID0.Rows
+		HNam = Trim(GRID0.GetGridCell( i, 2 ))
+		If Len(HNam) = 0 Then
+			Exit For
+		End If
+		Code = GRID0.GetGridCell( i, 1 )
+		CdTp = Trim(GRID0.GetGridCell( i, 3 ))
+
+		Data  = Code & CdTp
+		ArrItem(0) = Data
+		ArrItem(1) = HNam
+
+
+		Item = Join(ArrItem, "~")
+		SYSTEM.Trace Item
+		ArrData(i - 1) = Item
+	Next
+	Data = Join(ArrData, "|")
+	Cnt = i
+
+	SCREEN.Proc "main.SetCodeList", Data & ", " & Cnt
+End Sub
+
+_AW_ONSTART_AW_
+SCREEN.Send 0
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+SCREEN.Proc "main.comb_list_done", ""
+
+_AW_ONENDSUB_AW_
+}
+
+
+

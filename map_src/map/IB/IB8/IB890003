@@ -1,0 +1,166 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB890003)
+MAPSIZE(79, 474)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("투자성향 체크")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(ENCODE)
+TITLE("투자성향 체크")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(FIXED)
+HEADER(LEDGER)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL0(0, 0, 476, 81)  LIMAGE(0)  LINEW(4)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 130)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON0(199, 53, 245, 73)  '변 경'  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(208, 232)  CUR(0)    "3BTN.BMP"    TABORDER(3)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+BUTTON  BUTTON1(247, 53, 293, 73)  '취 소'  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(208, 232)  CUR(0)    "3BTN.BMP"    TABORDER(4)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+LABEL  LABEL40(8, 8, 468, 28)  AL_CENTER  CUR(0)      COLOR(181, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL41(8, 28, 468, 48)  AL_CENTER  CUR(0)      COLOR(181, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  gubn(86, 133, 206, 152)  LEN(20)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_PASS    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(5)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  BUTTON2(160, 53, 456, 73)  '부적합 금융투자상품(파생상품등) 거래확인서 등록'  TP_PUSH|IMAGETEXT|AL_STRETCH        FOCUS  COLOR(208, 186)  CUR(0)    "20BTN.BMP"    TABORDER(2)  ENABLE  &
+  IMAGETEXT  HINTTYPE(IH_NONE)
+BUTTON  BUTTON3(22, 53, 158, 73)  '투자자정보확인서 변경'  TP_PUSH|IMAGETEXT|AL_STRETCH        FOCUS  COLOR(208, 186)  CUR(0)    "11BTN.BMP"    TABORDER(1)  ENABLE  &
+  IMAGETEXT  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Option Explicit
+
+Sub SetAlert()
+	Dim IsBool
+
+	If Trim(gubn.Data) = "lessRisk" Then
+		LABEL40.Text = "공격투자형 이상이어야 파생상품 거래가 가능합니다."
+		LABEL41.Text = "투자자정보 확인서를 변경하시겠습니까?"
+
+		IsBool = True
+	Else
+		LABEL40.Text = "거래경험 조건 미충족시 거래경험을 변경하시거나"
+		LABEL41.Text = "부적합 금융투자상품(파생상품등) 거래확인서를 " & "제출하셔야 거래가 가능합니다."
+
+		IsBool = False
+	End If
+
+	BUTTON0.Visible = IsBool
+	BUTTON1.Visible = IsBool
+	BUTTON2.Visible = Not IsBool
+	BUTTON3.Visible = Not IsBool
+End Sub
+
+_AW_ONINDECLARE_AW_
+#Load IB888833
+
+_AW_ONENDSUB_AW_
+_AW_ONSTART_AW_
+Call SetAlert()
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+SCREEN.OnSend = False
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+If Left(Trim(LEDGER.Ecod), 1) = "0" Then
+	If Trim(OUTPUT20.Data) <> "" Then
+		'최종고객성향
+		If Trim(OUTPUT20.Data) <> "공격투자형" Then
+			Call SetAlert("lessRisk")
+			Exit Sub
+		End If
+	Else
+		'정보제공구분
+		If Trim(OUTPUT8.Data) = "0" Then
+			Call SetAlert("lessRisk") '미제공
+		Else
+			Call SetAlert("lessRisk") '미등록
+		End If
+
+		Exit Sub
+	End If
+
+	Dim age
+	age = CLng(Year(Now)) - CLng(Left(OUTPUT0.Data, 4)) + 1
+
+	If age < 65 Then
+		If CLng(OUTPUT24.Data) < 12 Then
+			Call SetAlert("lessExpi")
+			Exit Sub
+		End If
+	Else
+		If CLng(OUTPUT24.Data) < 36 Then
+			Call SetAlert("lessExpi")
+			Exit Sub
+		End If
+	End If
+ElseIf Trim(LEDGER.Ecod) = "3167" Then
+	Call SetAlert("lessRisk") '미제공
+ElseIf Trim(LEDGER.Ecod) = "3956" Then
+	Call SetAlert("lessRisk") '미등록"
+End If
+
+_AW_ONENDSUB_AW_
+_AW_ONTIMER_AW_
+'SCREEN.CloseWindow
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(BUTTON0)
+_AW_ONCLICK_AW_
+SCREEN.CreateWindow 1, "IB821200 /t/s/p5", ""
+
+SCREEN.CloseWindow
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON1)
+_AW_ONCLICK_AW_
+SCREEN.CloseWindow
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON2)
+_AW_ONCLICK_AW_
+SCREEN.CreateWindow 1, "IB821400 /t/s/p5", ""
+
+SCREEN.CloseWindow
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON3)
+_AW_ONCLICK_AW_
+SCREEN.CreateWindow 1, "IB821200 /t/s/p5", ""
+
+SCREEN.CloseWindow
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

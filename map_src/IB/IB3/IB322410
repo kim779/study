@@ -1,0 +1,136 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB322410)
+MAPSIZE(84, 287)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("¿É¼ÇÇöÀç°¡_¼±¹°Áö¼ö")
+MAPPUBLIC(";")
+FONT("±¼¸²Ã¼", 9, NORMAL)
+OPTIONS(FMS|FLASH)
+TITLE("Untitled")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pooppoop")
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+OUT  200231(35, 10, 107, 29)  LEN(10)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT|FA_SKIP|FA_CORGB|SA_COSUP  FONT("±¼¸²", 9, BOLD)    COLOR(68, 69)  CUR(0)            IFRGB(94, 95)  TABORDER(0)  IOORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  20021(648, 13, 720, 37)  LEN(5)  IO_MIXED|AL_LEFT||FA_FLASH|FA_XDELETE    COLOR(203, 1)  CUR(0)            TABORDER(0)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  20024(149, 46, 210, 65)  LEN(7)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT|FA_CORGB|FA_CONTRAST|SA_CORAW|SA_TEXT  FONT("±¼¸²", 9, BOLD)    COLOR(68, 69)  CUR(0)            IFRGB(94, 95)  TABORDER(0)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  20033(210, 46, 281, 65)  LEN(7)  IO_NUM|AL_RIGHT||FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSIGN  FONT("±¼¸²", 9, BOLD)    COLOR(68, 69)  CUR(0)            IFRGB(94, 95)  TABORDER(0)  IOORDER(6)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  20301(140, 13, 184, 33)  LEN(3)  IO_NUM|EDIT_INPUT|FA_WRAP|CODE      COLOR(28, 130)  CUR(0)  TP_SUNKEN  INIT("001")          TABORDER(1)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  SYMBOL97(16, 46, 77, 65)  'ÇöÀçÁö¼ö'        COLOR(96, 130)  CUR(0)    AL_CENTER  FONT("±¼¸²", 9, BOLD)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  20023(80, 45, 135, 64)  LEN(10)  IO_NUM|EDIT_INOUT|FA_COMMA|FA_RIGHT|FA_WRAP|FA_CORGB|SA_COSUP    COLOR(192, 130)  CUR(0)  TP_NONE          IFRGB(94, 95)  TABORDER(2)  IOORDER(5)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONINDECLARE_AW_
+#load IB888888
+
+_AW_ONENDSUB_AW_
+_AW_ONSTART_AW_
+S20301.Data = "101"
+SCREEN.SetTimer 2, False
+
+_AW_ONENDSUB_AW_
+_AW_ONTIMER_AW_
+SCREEN.Send 0
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(200231)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(20024)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(20033)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(20301)
+_AW_ONCHANGE_AW_
+Dim	cod
+Dim r_upgb
+If (Len(Trim(S20301.Data)) <> 3) Then
+	S20301.SetFocus
+	Exit Sub
+Else
+	SCREEN.IgnoreChange True
+'	r_upgb = P_GetBigCd(S20301.Data)
+'	Select Case r_upgb
+'		Case "001"		'KOSPI
+'			upgb.Data = r_upgb
+'		Case "101"		'KOSPI200
+'			upgb.Data = r_upgb
+'		Case "201"		'KOSDAQ
+'			upgb.Data = r_upgb
+'		Case "301"		'KOSDAQ50
+'			If S20301.Data = "303" Then
+'				upgb.Data = S20301.Data
+'			Else
+'				upgb.Data = r_upgb
+'			End If
+'		Case "401"		'KOSPI100
+'			upgb.Data = r_upgb
+'		Case "303"		'KOSTA
+'			upgb.Data = r_upgb
+'		Case "999"		'KRX100
+'			upgb.Data = r_upgb
+'		Case "601"		'SECTOR
+'			upgb.Data = r_upgb
+'		Case "701"		'SECTOR
+'			upgb.Data = r_upgb
+'		Case "801"		'±âÅ¸
+'			upgb.Data = r_upgb
+'		Case Else
+'		   S20301.Data = "001"
+'		   upgb.Data = "001"
+'	End Select
+	S20301.Data = "101"
+	SCREEN.SetTimer 2, False
+	SCREEN.IgnoreChange False
+End If
+_AW_ONENDSUB_AW_
+_AW_ONKEYCHANGE_AW_
+If SCREEN.Key = 13 Then
+	If(Len(Trim(S20301.Data)) <> 3) Then
+'			S20301.Clear
+			S20301.SetFocus
+			Exit Sub
+	End If
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(20023)
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

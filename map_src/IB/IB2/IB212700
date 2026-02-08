@@ -1,0 +1,409 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB212700)
+MAPSIZE(512, 878)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("성과분석")
+MAPPUBLIC(";")
+FONT("굴림", 9, NORMAL)
+OPTIONS(FMS)
+TITLE("[2127] 성과분석")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pooppoop")
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL2(0, 458, 880, 515)  LIMAGE(0)  LINEW(4)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL0(0, 0, 880, 26)        COLOR(66, 69)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+COMBO  COMBO0(25, 3, 95, 23)  TP_SUNKEN  LEN(3)  COUNT(2)  VCOUNT(2)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_NUM|EDIT_INPUT  FONT("굴림체", 9, NORMAL)    COLOR(68, 130)  CUR(0)  DISPLAY("KOSPI", "KOSDAQ")  DATA("001", "201")    TABORDER(1)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  UBUT(170, 3, 189, 23)  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(3, 0)  CUR(0)    "검색.BMP"    TABORDER(2)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+LABEL  LABEL0(100, 3, 125, 23)  '업종'  AL_LEFT  CUR(0)      COLOR(192, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+OUT  20022(192, 3, 300, 23)  LEN(20)  IO_MIXED|AL_LEFT|    COLOR(90, 130)  CUR(0)  LINECOLOR(89)          TABORDER(0)  IOORDER(5)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  20301(126, 3, 170, 23)  LEN(3)  IO_NUM|EDIT_INPUT|FA_WRAP|CODE      COLOR(28, 130)  CUR(0)  TP_SUNKEN  INIT("001")          TABORDER(3)  IOORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL10(0, 25, 880, 460)  LIMAGE(0)  LINEW(4)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON0(835, 3, 871, 23)  '조회'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, BOLD)  COLOR(208, 186)  CUR(0)    "조회BTN.BMP"    TABORDER(4)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+OBJECT  OBJECT0(7, 32, 871, 447)    "IB212701"  TABORDER(5)  IOORDER(6)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL1(302, 3, 352, 23)  '정렬방법'  AL_LEFT  CUR(0)      COLOR(192, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+COMBO  COMBO1(355, 3, 457, 23)  TP_SUNKEN  LEN(1)  COUNT(8)  VCOUNT(8)  INDEX(2)  MATCHKEY(NOTMAPPING)  IO_NUM|EDIT_INPUT|FA_SKIP  FONT("굴림체", 9, NORMAL)    COLOR(68, 130)  CUR(0)  DISPLAY("종목코드", "종목명", "시가총액", "종목성과1주", "종목성과1개월", "종목성과3개월", "종목성과6개월", "종목성과1년")  DATA("1", "2", "3", "4", "5", "6", "7", "8")    TABORDER(6)  IOORDER(7)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  CPAGE(792, 5, 803, 24)  'A'  AL_LEFT  CUR(0)      COLOR(66, 232)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL2(807, 5, 818, 24)  '/'  AL_LEFT  CUR(0)      COLOR(66, 232)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  TPAGE(820, 5, 831, 24)  'A'  AL_LEFT  CUR(0)      COLOR(66, 232)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  CHECK0(463, 3, 503, 23)  '종목'  TP_CHECK|EDIT_NOP          COLOR(208, 232)  CUR(0)      TABORDER(7)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  BUTTON1(571, 3, 590, 23)  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(15, 63)  CUR(0)    "검색.BMP"    TABORDER(8)  ENABLE  &
+  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+CONTROL  17413(590, 3, 725, 23)    "CX_Symbol"  "/a89/b91/c92/d69"  LEN(0)  EDIT_OUTPUT  FONT("굴림체", 9, NORMAL)    COLOR(90, 130)  TABORDER(0)  IOORDER(8)  ENABLE  &
+  HINTTYPE(IH_NONE)
+CONTROL  1301(506, 3, 571, 23)  |FA_PROTECT  "CX_CODECTRL"  "/u0/k검색.BMP/lAXCOMBO.BMP/p/s0/o"  LEN(6)  EDIT_INPUT    COLOR(192, 130)  TABORDER(9)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  company(728, 3, 788, 23)  '돌려보기'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, NORMAL)  COLOR(208, 186)  CUR(0)    "4BTN.BMP"    TABORDER(10)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+PANEL  PANEL1(8, 465, 65, 484)    |IMAGETEXT|AL_STRETCH    COLOR(208, 232)  CUR(0)    "참고사항.bmp"  ENABLE  &
+  VISIBLE  TRANSPARENT  IMAGETEXT  HINTTYPE(IH_NONE)
+LABEL  LABEL9(27, 490, 335, 510)  '조회버튼을 클릭한 시점 기점으로 데이터가 조회됩니다.'  AL_LEFT  CUR(0)      COLOR(64, 91)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+PANEL  PANEL3(15, 494, 24, 503)  LINECOLOR(96)  |IMAGE|AL_CENTER    COLOR(208, 232)  CUR(0)    "텍스트화살표_하단.BMP"  ENABLE  &
+  VISIBLE  TRANSPARENT  IMAGE  HINTTYPE(IH_NONE)
+EDIT  1777(905, 15, 925, 35)  LEN(0)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(11)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+CONTROL  cxMarket(4, 3, 24, 23)  |FA_SKIP  "CX_MarketPicker"  "/k2/tIB212700/u1/d1"  LEN(12)  EDIT_NOP    COLOR(192, 232)  TABORDER(0)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  edMarketTrigger(965, 5, 997, 25)  LEN(6)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(12)  IOORDER(9)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Sub	code_trigger(code)
+	SYSTEM.Trace "code_trigger: " & code
+	S1301.DATA = code
+	If Trim(S1301.DATA) = "" Then
+	    Exit Sub
+	End If
+
+	S1301.Trigger "", False
+	S1301.Trigger "", True
+    SYSTEM.SetHistory "1301", S1301.DATA
+End Sub
+
+
+Sub Send_Main()
+	' 현재 코드를 시장식별자에 대입하여 NXT 지원 가능 여부 판단
+	If CHECK0.Checked = True Then
+		cxMarket.sCode = S1301.Data
+	Else
+		cxMarket.sCode = "005930"
+	End If
+
+	Dim code
+	code = SCREEN.GetCodeType(S1301.Data)
+
+	If CHECK0.Checked = True Then
+		If code = 1 Or code = 6 Then
+			COMBO0.Index = 0
+			S20301.Data = 1
+		Else
+			COMBO0.Index = 1
+			S20301.Data = 201
+		End If
+	End If
+
+
+	SYSTEM.Trace "code type : " & code
+
+	SCREEN.Send 0
+	OBJECT0.Send
+End Sub
+
+Sub Change_MKGubn_Main(sMKGubn)
+	cxMarket.sMarket = sMKGubn
+
+	Send_Main()
+End Sub
+
+_AW_ONINDECLARE_AW_
+#load IB888888
+
+_AW_ONENDSUB_AW_
+_AW_ONSTART_AW_
+cxMarket.MNum = SCREEN.GetMapName(1)
+cxMarket.Major = SCREEN.Major
+Send_Main()
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+If cxMarket.sMarket = "KRX" Then
+	S1777.Data = "1"
+ElseIf cxMarket.sMarket = "NXT" Then
+	S1777.Data = "2"
+ElseIf cxMarket.sMarket = "통합" Then
+	S1777.Data = "3"
+End If
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(COMBO0)
+_AW_ONCHANGE_AW_
+S20301.Data = COMBO0.Data
+Send_Main()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(UBUT)
+_AW_ONCLICK_AW_
+Dim sUpjongCode, bTF
+
+Select Case COMBO0.Index
+	Case 0
+		bTF = SCREEN.GetCode(104, "20301", "20022", 0)
+	Case 1					'KOSDAQ
+		bTF = SCREEN.GetCode(104, "20301", "20022", 9)
+End Select
+
+If (bTF <> True) Then
+	S20301.SetFocus
+	Exit Sub
+Else
+	S20301.SetFocus
+	CHECK0.Checked = False
+	S1301.Visible = False
+	BUTTON1.Visible = False
+	S17413.visible = False
+
+	Send_Main()
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(20301)
+_AW_ONCHANGE_AW_
+Dim	cod
+Dim r_upgb
+
+
+
+If (Len(Trim(S20301.Data)) <> 3) Then
+	S20301.SetFocus
+	Exit Sub
+Else
+	SCREEN.IgnoreChange True
+	r_upgb = P_GetBigCd(S20301.Data)
+	SYSTEM.Trace "r_upgb : " & r_upgb
+	Select Case r_upgb
+		Case "001"		'KOSPI
+			SYSTEM.Trace "001"
+			COMBO0.Data = r_upgb
+'		Case "101"		'KOSPI200
+'			upgb.Data = r_upgb
+		Case "201"		'KOSDAQ
+			COMBO0.Data = r_upgb
+'		Case "301"		'KOSDAQ50
+'			If S20301.Data = "303" Then
+'				upgb.Data = S20301.Data
+'			ElseIf S20301.Data = "305" Or S20301.Data = "306" Or S20301.Data = "307" Or (S20301.Data >= 309 And S20301.Data <= 317) Then
+'				upgb.Data = "201"
+'			Else
+'				upgb.Data = r_upgb
+'			End If
+'		Case "401"		'KOSPI100
+'			upgb.Data = r_upgb
+'		Case "303"		'KOSTA
+'			upgb.Data = r_upgb
+'		Case "999"		'KRX100
+'			SYSTEM.Trace "upgb data00 : " & r_upgb
+'			upgb.Data = 601
+'			SYSTEM.Trace "upgb data0 : " & upgb.Data
+'		Case "998"		'KRX300
+'			SYSTEM.Trace "r_upgb1 : " & r_upgb
+'			upgb.Data = 601
+'			SYSTEM.Trace "r_upgb2 : " & upgb.Data & r_upgb
+'		Case "997"		'KRX Mid 200
+'			SYSTEM.Trace "r_upgb1 : " & r_upgb
+'			upgb.Data = 601
+'			SYSTEM.Trace "r_upgb3 : " & upgb.Data & r_upgb
+'		Case "601"		'SECTOR
+'			upgb.Data = r_upgb
+'		Case "701"		'SECTOR
+'			upgb.Data = r_upgb
+'		Case "801"		'기타
+'			upgb.Data = r_upgb
+'		Case Else
+'		   SYSTEM.Trace "else case"
+'		   S20301.Data = "001"
+'		   upgb.Data = "001"
+	End Select
+'
+	CHECK0.Checked = False
+	S1301.Visible = False
+	BUTTON1.Visible = False
+	S17413.visible = False
+
+'	SYSTEM.Trace "r_upgb : " & upgb.Data
+'	If upcd_flg = 1 Then
+'		upcd_flg = 2
+'	Else
+'		Call p_write_com()
+'	End If
+'
+'	SCREEN.SetTimer 2, False
+'	SCREEN.IgnoreChange False
+
+	Send_Main()
+End If
+_AW_ONENDSUB_AW_
+_AW_ONKEYCHANGE_AW_
+If SCREEN.Key = 13 Then
+	If(Len(Trim(S20301.Data)) <> 3) Then
+'			S20301.Clear
+			S20301.SetFocus
+			Exit Sub
+	End If
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON0)
+_AW_ONCLICK_AW_
+Send_Main()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(COMBO1)
+_AW_ONCHANGE_AW_
+SYSTEM.Trace "COMBO1 OnChange"
+SCREEN.Object("OBJECT0.EDIT4").data = "F"
+SCREEN.Object("OBJECT0.EDIT5").data = "-1"
+
+If COMBO1.Data = 1 Or COMBO1.Data = 2 Then
+	SCREEN.Object("OBJECT0.EDIT3").data = "0"
+Else
+	SCREEN.Object("OBJECT0.EDIT3").data = "1"
+End If
+
+
+
+Send_Main()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(CHECK0)
+_AW_ONCLICK_AW_
+If CHECK0.Checked = True Then
+	Dim code
+
+	company.Enable = False
+
+
+	SCREEN.Object("OBJECT0.EDIT4").data = "F"
+	SCREEN.Object("OBJECT0.EDIT5").data = "-1"
+
+	If COMBO1.Data = 1 Or COMBO1.Data = 2 Then
+		SCREEN.Object("OBJECT0.EDIT3").data = "0"
+	Else
+		SCREEN.Object("OBJECT0.EDIT3").data = "1"
+	End If
+
+	S1301.Visible = True
+	BUTTON1.Visible = True
+	S17413.visible = True
+
+	code = SCREEN.GetCodeType(S1301.Data)
+
+	If code = 1 Or code = 6Then
+		COMBO0.Index = 0
+		S20301.Data = 1
+	Else
+		COMBO0.Index = 1
+		S20301.Data = 201
+	End If
+
+	Send_Main()
+
+Else
+	company.Enable = True
+	S1301.Visible = False
+	BUTTON1.Visible = False
+	S17413.visible = False
+	Send_Main()
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON1)
+_AW_ONCLICK_AW_
+Dim retn
+retn = SCREEN.GetCode(100, "1301", "hnam", 0 )
+If retn <> True Then
+       Exit Sub
+End If
+
+Send_Main()
+
+S1301.SetFocus
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(1301)
+_AW_ONCHANGE_AW_
+Send_Main()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(company)
+_AW_ONCLICK_AW_
+Dim i, str, ncnt
+str = ""
+ncnt = SCREEN.Object("OBJECT0.GRID1").Rows
+
+If CHECK0.Checked = False Then
+
+	For i = 1 To ncnt
+		str = str & Trim(SCREEN.Object("OBJECT0.GRID1").GetGridCell(i, 1))
+		str = str & vbTab
+		str = str & Trim(SCREEN.Object("OBJECT0.GRID1").GetGridCell(i, 2))
+		str = str & vbLf
+
+	Next
+	If Len(Trim(str)) > 0 Then
+		SYSTEM.SetAutoCode str, ncnt
+	End If
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(cxMarket)
+_AW_ONCLICK_AW_
+Change_MKGubn_Main(cxMarket.sMarket)
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(edMarketTrigger)
+_AW_ONCHANGE_AW_
+Change_MKGubn_Main(Trim(edMarketTrigger.Data))
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

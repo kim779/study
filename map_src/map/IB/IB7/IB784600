@@ -1,0 +1,75 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB784600)
+MAPSIZE(463, 649)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("종목별/일별국내금리")
+MAPPUBLIC(";")
+FONT("굴림", 9, NORMAL)
+TITLE("[7846] 종목별/일별국내금리")
+TOPATH(AXIS)
+METHOD(SEND)
+TRXCODE("pooppoop")
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL6(0, 0, 747, 6)        COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL0(648, 0, 650, 76)        COLOR(64, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL1(0, 0, 1, 51)        COLOR(64, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+USRTAB  UTAB(0, 530, 647, 556)  FOCUS  INDEX(5)  COUNT(7)  AL_TOP  TAB_IMAGE      FONT("굴림체", 9, NORMAL)    COLOR(3, 70)  CUR(0)  TABIMAGE("TAB.BMP")  FCOLOR(3, 71)  CAPTION("금리종합", "LIBOR금리", "국채수익율", "금리와국내주가", "한미금리비교", "종목/일별금리", "국내외금리")  TABINFO("1:1", "1:2", "1:3", "1:4", "1:5", "1:6", "1:7")  ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  OBJECT0(0, 0, 649, 466)    "IB784610"  TABORDER(1)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Sub ChangeMap()
+	Select Case UTAB.Index
+		Case "1"		'금리종합
+			SCREEN.ChangeMap "IB784100"
+		Case "2"		'LIBOR금리
+			SCREEN.ChangeMap "IB784200"
+		Case "3"		'국채수익률
+			SCREEN.ChangeMap "IB784300"
+		Case "4"		'금리와국내주가
+			SCREEN.ChangeMap "IB784400"
+		Case "5"		'한미금리비교
+			SCREEN.ChangeMap "IB784500"
+		Case "6"		'종목별/일별국내금리
+			SCREEN.ChangeMap "IB784600"
+		Case "7"		'국내외금리현황
+			SCREEN.ChangeMap "IB784700"
+		Case Else
+			Exit Sub
+	End Select
+End Sub
+
+_AW_SCRIPT_AW_(UTAB)
+_AW_ONCLICK_AW_
+ChangeMap()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

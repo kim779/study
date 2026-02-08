@@ -1,0 +1,190 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB314920)
+MAPSIZE(375, 334)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("굴림", 9, NORMAL)
+TITLE("314920")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pibo3149")
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+GRID  GRID0(0, 0, 334, 375)  VISIBLEROW(4)  CELLH(18)  MATRIX(300, 4)  FIX(0)  MAINCOLOR(7, 0)  LINECOLOR(75)  FOCUSCOLOR(78)  FOCUSKIND(4)    FONT("굴림체", 9, NORMAL)  ROWC(68, 77)  |FLEXIBLE|VSCROLL|INS_TOP|NO3D|RROW|XHLINE|PAGE|HEADER|GRFTEXT    &
+	COLINFO("Col0")  LEN(12)  WIDTH(80)  HEAD("체결가")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_CORGB|SA_COSUP    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(94, 95)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col1")  LEN(8)  WIDTH(80)  HEAD("대비")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|FA_CONTRAST|SA_SPACE|SA_CORAW|SA_TEXT    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(94, 95)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col2")  LEN(12)  WIDTH(79)  HEAD("체결량")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSUP    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(94, 95)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col3")  LEN(12)  WIDTH(79)  HEAD("비중")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSUP    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    TABORDER(1)  IOORDER(4)  ENABLE  &
+  VISIBLE
+
+EDIT  100301(204, 633, 275, 653)  LEN(8)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_HAN    COLOR(28, 232)  CUR(0)  TP_NONE  INIT("161DC000")          TABORDER(2)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  rownum(141, 468, 226, 483)  LEN(3)  IO_NUM|AL_CENTER|    COLOR(192, 69)  CUR(0)            TABORDER(0)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  gvol(231, 468, 316, 483)  LEN(12)  IO_NUM|AL_CENTER|    COLOR(192, 69)  CUR(0)            TABORDER(0)  IOORDER(3)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Dim g_ArrColorData
+
+g_ArrColorData = Array(-1, -1)
+
+Sub SetGridLineColor(Row, StarCol, EndCol, RGBValue)
+	For i = StartCol To EndCol
+		GRID0.SetPRgb Row, i, RGBValue
+	Next
+End Sub
+
+Sub SetGridColor()
+	If g_ArrColorData(0) <> -1 Then
+		SetGridLineColor g_ArrColorData(0), 1, 4, g_ArrColorData(1)
+	End If
+
+	If Len(Trim(rownum.Data)) = 0 Then
+		rownum.Data = "-1"
+	End If
+
+	Row = CLng(rownum.Data) + 1
+	g_ArrColorData(0) = Row
+	g_ArrColorData(1) = GRID0.GetPRgb(Row, 1)
+	SetGridLineColor Row, 1, 4, 204
+
+	If Row > 10 Then
+		If Row + 10 > GRID0.Rows Then
+			GRID0.Index GRID0.Rows - 1
+		Else
+			GRID0.Index Row + 9
+		End If
+	End If
+End Sub
+
+Sub ProcReal(Name1)
+	Prc = SCREEN.Object("main.101023").data
+	Diff = SCREEN.Object("main.101024").data
+	TrdVol = SCREEN.Object("main.101032").data
+	AccVol = Trim(SCREEN.Object("main.101027").data)
+
+	If Len(Trim(gvol.Data)) = 0 Then
+		gvol.Data = 0
+	End If
+	If Len(AccVol) = 0 Then
+		AccVol = 0
+	End If
+	If CLng(AccVol) = CLng(gvol.Data) Then
+		Exit Sub
+	End If
+	gvol.Data = AccVol
+
+	If Len(AccVol) = 0 Or Accvol = 0 Then
+		Exit Sub
+	End If
+
+	FindFlag = False
+	MaxVol = 0
+	MaxIndex = -1
+	If GRID0.Rows = 0 Then
+		GRID0.InsertRow 0
+		GRID0.SetGridCell 1, 1, Prc
+		GRID0.SetGridCell 1, 2, Diff
+		GRID0.SetGridCell 1, 3, TrdVol
+		GRID0.SetGridCell 1, 4, FormatNumber(TrdVol*100/AccVol, 2, -2, -2, 0) & " %"
+		rownum.Data = 0
+		SetGridColor
+	Else
+		For i = 1 To GRID0.Rows
+			GridPrc = GRID0.GetGridCell(i, 1)
+			GridDiff = GRID0.GetGridCell(i, 2)
+			GridVol = GRID0.GetGridCell(i, 3)
+
+			Giho = Mid(LTrim(GridDiff), 1, 1)
+			If Giho = "1" Or Giho = "2" Then
+				GridPrc = "+" & FormatNumber(GridPrc, 2, -2, -2, 0)
+			ElseIf Giho = "4" Or Giho = "5" Then
+				GridPrc = "-" & FormatNumber(GridPrc, 2, -2, -2, 0)
+			End If
+
+			Row = i
+			If CDbl(GridPrc) = CDbl(Prc) Then
+				GridVol = CLng(TrdVol) + CLng(GridVol)
+				FindFlag = True
+			End If
+			VolRate = FormatNumber(GridVol*100/AccVol, 2, -2, -2, 0)
+
+			If CLng(GridVol) > MaxVol Then
+				MaxIndex = i
+				MaxVol = CLng(GridVol)
+			End If
+
+			GRID0.SetGridCell Row, 1, GridPrc
+			GRID0.SetGridCell Row, 2, GridDiff
+			GRID0.SetGridCell Row, 3, GridVol
+			GRID0.SetGridCell Row, 4, VolRate & " %"
+		Next
+		If Not FindFlag Then
+			GRID0.InsertRow 0
+			GRID0.SetGridCell 1, 1, Prc
+			GRID0.SetGridCell 1, 2, Diff
+			GRID0.SetGridCell 1, 3, TrdVol
+			GRID0.SetGridCell 1, 4, FormatNumber(TrdVol*100/AccVol, 2, -2, -2, 0) & " %"
+			GRID0.Sort 1, 0, False
+			If CLng(GridVol) > MaxVol Then
+				MaxIndex = -1
+			End If
+		End If
+
+		If MaxIndex <> -1 Then
+			rownum.Data = CStr(MaxIndex) - 1
+			SetGridColor
+		Else
+			MaxVol = 0
+			For i = 1 To GRID0.Rows
+				GridVol = GRID0.GetGridCell(i, 3)
+				If CLng(GridVol) > MaxVol Then
+					MaxIndex = i
+					MaxVol = CLng(GridVol)
+				End If
+			Next
+			rownum.Data = CStr(MaxIndex) - 1
+			SetGridColor
+		End If
+	End If
+End Sub
+
+_AW_ONSEND_AW_
+GRID0.Clear
+S100301.Data = SCREEN.Object("main.100301").data
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+If GRID0.Rows <> 0 Then
+	SetGridColor
+End If
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(GRID0)
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

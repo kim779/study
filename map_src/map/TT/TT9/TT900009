@@ -1,0 +1,66 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(TT900009)
+MAPSIZE(663, 899)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("MS Sans Serif", 9, NORMAL)
+TITLE("투자설명서 다운로드")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(FIXED)
+HEADER(NOP)
+BGROUND(BRUSH, 64)
+}
+
+
+
+FORM DIVISION
+{
+
+CONTROL  19283(0, 0, 470, 275)  |FA_PROTECT  "CX_Download"  ""  LEN(0)  EDIT_NOP    COLOR(64, 232)  TABORDER(0)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONSTART_AW_
+'S19283.address = "http://dscall.daishin.co.kr/images/faq/"
+'S19283.protocol = "HTTP"
+'S19283.filename = "dkdlsjf.pdf"
+
+'S19283.DoDownload
+
+S19283.protocol = "FTP"
+S19283.address = "172.17.1.64"
+S19283.username = "123456"
+S19283.pw = "1111"
+S19283.filename = "20090225_093380.pdf"
+S19283.directory = "abc/iop/"
+
+S19283.DoDownload
+
+_AW_ONENDSUB_AW_
+_AW_ONCLOSE_AW_
+MsgBox "dddddd"
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(19283)
+_AW_ONCLICK_AW_
+MsgBox "0"
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

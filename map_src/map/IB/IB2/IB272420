@@ -1,0 +1,505 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB272420)
+MAPSIZE(226, 770)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+TITLE("종목별 일별 대차 차트")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pibg2724")
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+EDIT  ed_dttp(625, 411, 660, 430)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("1")          TABORDER(1)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  ed_cttp(665, 411, 700, 430)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("0")          TABORDER(2)  IOORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  b_send(720, 411, 757, 431)  '조회'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, BOLD)  FOCUS  COLOR(208, 186)  CUR(0)    "조회BTN.BMP"    TABORDER(3)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+EDIT  ed_ckdt(440, 420, 560, 439)  LEN(8)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("99999999")          TABORDER(4)  IOORDER(5)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  ed_date(295, 420, 415, 439)  LEN(8)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("99999999")          TABORDER(5)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL63(0, 0, 770, 220)        COLOR(241, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+CONTROL  drChart(0, 30, 765, 220)  |FA_FLASH  "CX_DRCHART"  "/iMC272420"  LEN(0)  EDIT_INOUT    COLOR(192, 232)  TABORDER(6)  IOORDER(6)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  RADIO0(40, 0, 105, 28)  '당일체결'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(GROUP0)      COLOR(241, 130)  CUR(0)      TABORDER(7)  ENABLE  &
+  VISIBLE  CHECKED  HINTTYPE(IH_NONE)
+LABEL  LABEL0(0, 0, 40, 30)  '현재가'  AL_CENTER  CUR(0)      COLOR(241, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  RADIO1(105, 0, 170, 28)  '당일상환'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(GROUP0)      COLOR(241, 130)  CUR(0)      TABORDER(8)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  RADIO2(175, 0, 240, 28)  '당일잔고'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(GROUP0)      COLOR(241, 130)  CUR(0)      TABORDER(9)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  RADIO3(244, 0, 309, 28)  '증감'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(GROUP0)      COLOR(241, 130)  CUR(0)      TABORDER(10)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  RADIO4(290, 0, 378, 28)  '당일잔고금액'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(GROUP0)      COLOR(241, 130)  CUR(0)      TABORDER(11)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  RADIO5(382, 0, 427, 28)  '비중'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(GROUP0)      COLOR(241, 130)  CUR(0)      TABORDER(12)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+GROUP  GROUP0(35, -10, 430, 30)  'Group'        COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  ed_code(155, 425, 275, 444)  LEN(6)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(13)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  cb_gb(155, 470, 210, 490)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 130)  CUR(0)  TP_NONE  INIT("0")          TABORDER(14)  IOORDER(7)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  EDIT0(50, 325, 110, 345)  LEN(20)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 130)  CUR(0)  TP_NONE          TABORDER(15)  IOORDER(8)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL1(55, 385, 115, 400)  '당일체결'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL2(55, 415, 115, 430)  '당일상환'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Sub change_chart(key, nxt)
+	'	drChart.DelAllBozoMsg()'
+	'	drChart.AddBozoMsg 1, "UD", key
+
+
+	Dim inputData
+	Dim tnkey
+
+	Dim    cod2 	'[15];            종목코드
+	Dim    sDate 	'[8];             검색시작일
+	Dim    nrec		'[4];             조회건수
+	Dim    unit		'[3];             조회단위 1분봉, 3분봉
+	Dim    gubn		'[1];             조회구분
+					'				  0 : 틱, 1 : 분, 2 : 일
+					'				  3 : 주, 4 : 월
+	Dim    egbn		'[1];             수정주가 구분
+	Dim    smod		'[1];             조회모드
+	Dim    nkey		'[23];      Next Key
+	Dim    bgbn		'[1];             허봉, 실봉구분
+					'				  0: 허봉 1: 실봉
+	Dim    dgbn		'[1];             당일 구분
+	Dim    temp
+	CStr   str
+	Select Case key
+			Case 0 gubn = "0"
+			Case 1 gubn = "1"
+			Case 2 gubn = "2"
+			Case 3 gubn = "3"
+			Case 4 gubn = "4"
+			Case 5 gubn = "5"
+			Case 6 gubn = "6"
+	End Select
+
+	ed_ckdt.Data = SCREEN.Object("main.ed_date").Data
+	ed_code.Data = SCREEN.Object("main.1301").Data
+
+	cod2 = ed_code.Data
+	sDate = ed_ckdt.Data
+
+	temp = 120
+	nrec=Trim(temp)
+
+	If(Len(nrec)=3) Then
+	    str = " "
+		nrec = str & nrec
+	End If
+	If(Len(nrec)=2) Then
+	    str = "  "
+		nrec = str & nrec
+	End If
+	If(Len(nrec)=1) Then
+	    str = "   "
+		nrec = str & nrec
+	End If
+
+	If(Len(nrec)=0) Then
+		nrec = " 120"
+		request_count.Data = 120
+	End If
+
+	If cb_gb.Data = 0 Then
+		p_read_ini()
+	End If
+
+	If gubn = "0" Then
+		If cb_gb.Data = 1 Then
+			gubn = "1"
+		ElseIf cb_gb.Data = 2 Then
+			gubn = "2"
+		ElseIf cb_gb.Data = 3 Then
+			gubn = "3"
+		ElseIf cb_gb.Data = 4 Then
+			gubn = "4"
+		ElseIf cb_gb.Data = 5 Then
+			gubn = "5"
+		ElseIf cb_gb.Data = 6 Then
+			gubn = "6"
+		End If
+	End If
+
+	tnkey = LTrim(drChart.GetNextKey())
+
+	If tnkey = "" Then
+		nkey = "                       "
+	Else
+		If nxt = "1" Then
+		nkey = tnkey & "                 "
+		Else
+			nkey = "                       "
+		End If
+	End If
+
+	unit = g_gunit
+	egbn = "1"
+	smod = "1"
+	'nkey = "                       "
+	bgbn = "1"
+	dgbn = "0"
+
+	If gubn = "6" Then
+		drChart.DelAllPacketRQ
+		drChart.AddPacketRQ "0;보조일자;;;YYYYMMDD;무;"
+		drChart.AddPacketRQ "1;자료일자;date;8;YYYYMMDD;무;"
+		drChart.AddPacketRQ "1;현재가;curr;9;× 1;무;"
+		drChart.AddPacketRQ "1;당일체결;data;12;× 0.01;무;"
+	Else
+		drChart.DelAllPacketRQ
+		drChart.AddPacketRQ "0;보조일자;;;YYYYMMDD;무;"
+		drChart.AddPacketRQ "1;자료일자;date;8;YYYYMMDD;무;"
+		drChart.AddPacketRQ "1;현재가;curr;9;× 1;무;"
+		drChart.AddPacketRQ "1;당일체결;data;12;× 1;무;"
+	End If
+
+
+	SYSTEM.Trace "change_chart unit : " & unit & " g_unit : " & g_gunit
+	'drChart.SetSubMsg "UM", "E"
+	inputData = cod2 & sDate & nrec & gubn & nkey & smod & bgbn
+
+	szTR = "pibg2724"
+
+	drChart.SendTr szTR, cod2, inputData,1
+
+End Sub
+
+
+'----------------------------------------------------------
+Sub SendData(Data)
+	ArrData = Split(Data, "|")
+	If UBound(ArrData) < 1 Then
+		Exit Sub
+	End If
+	If ArrData(0) = "1" Then
+		ed_cttp.Data = ArrData(1)
+	Else
+		'ArrData - 0:Type, 1:종목코드, 2:차트타입, 3:연속일자
+		ed_code.Data = ArrData(1)
+		ed_cttp.Data = ArrData(2)
+		ed_ckdt.Data = ArrData(3)
+		If Len(Trim(ed_ckdt.Data)) = 0 Then
+			Exit Sub
+		End If
+	End If
+	SCREEN.Send 0
+End Sub
+'----------------------------------------------------------
+Sub SetInit()
+	AYear = Year(Date)
+	AMon = Month(Date)
+	If Len(AMon) = 1 Then
+		AMon = "0" & AMon
+	End If
+	ADay = Day(Date)
+	If Len(ADay) = 1 Then
+		ADay = "0" & ADay
+	End If
+
+	ed_date.Data = AYear & AMon & ADay
+End Sub
+
+Sub p_write_ini()
+	Dim combo_no
+	If RADIO0.Checked = True Then
+		combo_no = 1
+	ElseIf RADIO1.Checked = True Then
+		combo_no = 2
+	ElseIf RADIO2.Checked = True Then
+		combo_no = 3
+	ElseIf RADIO3.Checked = True Then
+		combo_no = 4
+	ElseIf RADIO4.Checked = True Then
+		combo_no = 5
+	ElseIf RADIO5.Checked = True Then
+		combo_no = 6
+	End If
+
+	If SCREEN.CreateObject("INFO") Then
+		INFO.pushData LOGIN.Name, "userconf.ini", SCREEN.GetMapName(0), "combo", combo_no
+	End If
+End Sub
+
+Sub p_read_ini()
+	If SCREEN.CreateObject("INFO") Then
+		Dim combo_no
+		combo_no = Trim(INFO.PopData(LOGIN.Name, "userconf.ini", SCREEN.GetMapName(0), "combo"))
+	End If
+
+	If combo_no = "1" Then
+		Set_combo(1)
+	ElseIf combo_no = "2" Then
+		Set_combo(2)
+	ElseIf combo_no = "3" Then
+		Set_combo(3)
+	ElseIf combo_no = "4" Then
+		Set_combo(4)
+	ElseIf combo_no = "5" Then
+		Set_combo(5)
+	ElseIf combo_no = "6" Then
+		Set_combo(6)
+	Else
+		Set_combo(1)
+	End If
+
+End Sub
+
+Sub Set_combo(combo_no)
+	Dim size
+	Dim type1
+
+	If combo_no = "1" Then
+		RADIO0.Checked = True
+		RADIO1.Checked = False
+		RADIO2.Checked = False
+		RADIO3.Checked = False
+		RADIO4.Checked = False
+		RADIO5.Checked = False
+		cb_gb.Data = 1
+		chartnm_change(1)
+	ElseIf combo_no = "2" Then
+		RADIO0.Checked = False
+		RADIO1.Checked = True
+		RADIO2.Checked = False
+		RADIO3.Checked = False
+		RADIO4.Checked = False
+		RADIO5.Checked = False
+		cb_gb.Data = 2
+		chartnm_change(2)
+	ElseIf combo_no = "3" Then
+		RADIO0.Checked = False
+		RADIO1.Checked = False
+		RADIO2.Checked = True
+		RADIO3.Checked = False
+		RADIO4.Checked = False
+		RADIO5.Checked = False
+		cb_gb.Data = 3
+		chartnm_change(3)
+	ElseIf combo_no = "4" Then
+		RADIO0.Checked = False
+		RADIO1.Checked = False
+		RADIO2.Checked = False
+		RADIO3.Checked = True
+		RADIO4.Checked = False
+		RADIO5.Checked = False
+		cb_gb.Data = 4
+		chartnm_change(4)
+	ElseIf combo_no = "5" Then
+		RADIO0.Checked = False
+		RADIO1.Checked = False
+		RADIO2.Checked = False
+		RADIO3.Checked = False
+		RADIO4.Checked = True
+		RADIO5.Checked = False
+		cb_gb.Data = 5
+		chartnm_change(5)
+	ElseIf combo_no = "6" Then
+		RADIO0.Checked = False
+		RADIO1.Checked = False
+		RADIO2.Checked = False
+		RADIO3.Checked = False
+		RADIO4.Checked = False
+		RADIO5.Checked = True
+		cb_gb.Data = 6
+		chartnm_change(6)
+	End If
+	p_write_ini
+End Sub
+
+Sub chartnm_change(key)
+
+	SYSTEM.Trace " key[" & key & "]"
+
+	If key = 1 Then
+		drChart.ChangeGraphTitle "당일상환", "당일체결"
+		drChart.ChangeGraphTitle "당일잔고", "당일체결"
+		drChart.ChangeGraphTitle "증감", "당일체결"
+		drChart.ChangeGraphTitle "당일잔고금액", "당일체결"
+		drChart.ChangeGraphTitle "비중", "당일체결"
+	ElseIf key = 2 Then
+		drChart.ChangeGraphTitle "당일체결", "당일상환"
+		drChart.ChangeGraphTitle "당일잔고", "당일상환"
+		drChart.ChangeGraphTitle "증감", "당일상환"
+		drChart.ChangeGraphTitle "당일잔고금액", "당일상환"
+		drChart.ChangeGraphTitle "비중", "당일상환"
+	ElseIf key = 3 Then
+		drChart.ChangeGraphTitle "당일상환", "당일잔고"
+		drChart.ChangeGraphTitle "당일체결", "당일잔고"
+		drChart.ChangeGraphTitle "증감", "당일잔고"
+		drChart.ChangeGraphTitle "당일잔고금액", "당일잔고"
+		drChart.ChangeGraphTitle "비중", "당일잔고"
+	ElseIf key = 4 Then
+		drChart.ChangeGraphTitle "당일상환", "증감"
+		drChart.ChangeGraphTitle "당일잔고", "증감"
+		drChart.ChangeGraphTitle "당일체결", "증감"
+		drChart.ChangeGraphTitle "당일잔고금액", "증감"
+		drChart.ChangeGraphTitle "비중", "증감"
+	ElseIf key = 5 Then
+		drChart.ChangeGraphTitle "당일상환", "당일잔고금액"
+		drChart.ChangeGraphTitle "당일잔고", "당일잔고금액"
+		drChart.ChangeGraphTitle "증감", "당일잔고금액"
+		drChart.ChangeGraphTitle "당일체결", "당일잔고금액"
+		drChart.ChangeGraphTitle "비중", "당일잔고금액"
+	ElseIf key  = 6 Then
+		drChart.ChangeGraphTitle "당일상환", "비중"
+		drChart.ChangeGraphTitle "당일잔고", "비중"
+		drChart.ChangeGraphTitle "증감", "비중"
+		drChart.ChangeGraphTitle "당일잔고금액", "비중"
+		drChart.ChangeGraphTitle "당일체결", "비중"
+	End If
+
+End Sub
+
+_AW_ONSTART_AW_
+ed_ckdt.Data = SCREEN.Object("main.ed_date").Data
+ed_code.Data = SCREEN.Object("main.1301").Data
+
+p_read_ini
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(b_send)
+_AW_ONCLICK_AW_
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(drChart)
+_AW_ONCHANGE_AW_
+'drChart.GetChartState() 리턴값
+'STATE_NONE					0
+'STATE_STARTRECEIVE			1 	TR받은 직후
+'STATE_ENDRECEIVE			2 	조회결과를 차트컨트롤에 그린 후
+'STATE_CHANGEONPAGECNT		3	데이터 조회 스크롤 시
+'STATE_SENDTR				4	TR 전송시
+'STATE_DESTROYCHART			5	차트화면 내려갈때
+
+Dim TotCnt
+Dim DataCnt
+Dim ret
+Dim end_key
+ret = drChart.GetChartState()
+TotCnt = drChart.GetChartProperty("GetDataCount")
+DataCnt = drChart.GetChartProperty( "GetOnePageDataCount" )
+
+'If ret = 2 Then
+'	SCREEN.IgnoreChange False
+	'request_count.Data = TotCnt
+'	SCREEN.IgnoreChange True
+'End If
+
+'If ret =  3 Then
+'	SCREEN.IgnoreChange False
+'	data_count.Data = DataCnt
+'	SCREEN.IgnoreChange True
+'End If
+
+end_key = LTrim(drChart.GetNextKey())
+If end_key = "99999999" Then
+	SYSTEM.Trace "end_key"
+	SCREEN.Object("main.BUTTON4").Enable = False
+Else
+	SCREEN.Object("main.BUTTON4").Enable = True
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(RADIO0)
+_AW_ONCLICK_AW_
+Set_combo(1)
+'chartnm_change(1)
+change_chart 1, 0
+_AW_ONENDSUB_AW_
+_AW_ONDBLCLK_AW_
+Set_combo(1)
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(RADIO1)
+_AW_ONCLICK_AW_
+Set_combo(2)
+'chartnm_change(2)
+change_chart 2, 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(RADIO2)
+_AW_ONCLICK_AW_
+Set_combo(3)
+'chartnm_change(3)
+change_chart 3, 0
+_AW_ONENDSUB_AW_
+_AW_ONDBLCLK_AW_
+Set_combo(3)
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(RADIO3)
+_AW_ONCLICK_AW_
+Set_combo(4)
+'chartnm_change(4)
+change_chart 4, 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(RADIO4)
+_AW_ONCLICK_AW_
+Set_combo(5)
+'chartnm_change(5)
+change_chart 5, 0
+_AW_ONENDSUB_AW_
+_AW_ONDBLCLK_AW_
+Set_combo(5)
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(RADIO5)
+_AW_ONCLICK_AW_
+Set_combo(6)
+'chartnm_change(6)
+change_chart 6, 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

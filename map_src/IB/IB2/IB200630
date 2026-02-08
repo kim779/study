@@ -1,0 +1,256 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB200630)
+MAPSIZE(367, 300)
+VERSION(001)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("현재가2")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(FMS|FLASH)
+TITLE("[200630]주식-시세정보-복수종목현재가")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pooppoop")
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+CONTROL  1301(21, 3, 86, 23)  |FA_PROTECT  "CX_CODECTRL"  "/u0/k검색.BMP/lAXCOMBO.BMP/p/s0/o"  LEN(6)  EDIT_INOUT    COLOR(192, 232)  TABORDER(3)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+USRTAB  UT1(0, 231, 300, 257)  FOCUS  INDEX(0)  COUNT(6)  AL_TOP  TAB_IMAGE  |FA_NOR      COLOR(3, 70)  CUR(0)  TABIMAGE("TAB.BMP")  FCOLOR(3, 71)  CAPTION("상세", "체결", "일별", "틱", "분", "일")  TABINFO("1:1", "1:2", "1:3", "1:4", "1:5", "1:6")  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL0(0, 0, 300, 25)        COLOR(66, 69)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  BUTTON0(86, 3, 105, 23)  TP_PUSH|IMAGE|AL_STRETCH      COLOR(15, 130)  CUR(0)    "검색.BMP"    TABORDER(1)  ENABLE  &
+  VISIBLE  IMAGE  HOVER  HINTTYPE(IH_NONE)
+OBJECT  OBJ01(0, 257, 300, 366)    "IB200611"  TABORDER(2)  IOORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  CDCHG(380, 135, 423, 152)  AL_LEFT  FONT("굴림체", 10, NORMAL)  CUR(0)      COLOR(165, 0)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  1021(247, 3, 347, 23)  LEN(16)  IO_ALPHA|AL_LEFT||FA_FLASH    COLOR(130, 131)  CUR(0)            TABORDER(0)  IOORDER(3)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  FST(309, 230, 331, 249)  'F'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+CONTROL  17413(108, 3, 248, 23)    "CX_Symbol"  "/a89/b91/c92/d69"  LEN(0)  EDIT_OUTPUT  FONT("굴림체", 9, NORMAL)    COLOR(90, 130)  TABORDER(0)  IOORDER(5)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+CONTROL  17412(0, 26, 300, 228)    "CX_Depth"  "/u1/d5/p0/b/s1/l/c/h1/o/g/x/a1/w/fIB200630/r"  LEN(0)  EDIT_OUTPUT    COLOR(192, 232)  TABORDER(0)  IOORDER(6)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  1777(550, 113, 570, 133)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("2")          TABORDER(4)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL2(381, 113, 551, 133)  '시장구분 1:KRX 2:NXT 3:통합'  LINECOLOR(238)      COLOR(200, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  HINTTYPE(IH_NONE)
+CONTROL  cxMarket(2, 3, 20, 23)  |FA_SKIP  "CX_MarketPicker"  "/k2/t/u1/d2"  LEN(12)  EDIT_NOP    COLOR(192, 232)  TABORDER(0)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Private Sub SAVE_GROUP()
+   SCREEN.CreateObject("Info")
+
+	If SCREEN.Object("MAIN.R1").checked = True Then
+		SCREEN.Object("MAIN.13").data = S1301.Data
+		INFO.PushData LOGIN.Name, "userconf.ini", "IB200600", "MULT13", S1301.Data
+		'S1301.Push("MULT13")
+		CDCHG.Text = "13"
+		CDCHG.Push("CDCHG")
+	End If
+
+	If SCREEN.Object("MAIN.R2").checked = True Then
+		SCREEN.Object("MAIN.23").data = S1301.Data
+		INFO.PushData LOGIN.Name, "userconf.ini", "IB200600", "MULT23", S1301.Data
+		'S1301.Push("MULT23")
+		CDCHG.Text = "23"
+		CDCHG.Push("CDCHG")
+	End If
+
+	If SCREEN.Object("MAIN.R3").checked = True Then
+		SCREEN.Object("MAIN.33").data = S1301.Data
+		INFO.PushData LOGIN.Name, "userconf.ini", "IB200600", "MULT33", S1301.Data
+		'S1301.Push("MULT33")
+		CDCHG.Text = "33"
+		CDCHG.Push("CDCHG")
+	End If
+
+	If SCREEN.Object("MAIN.R4").checked = True Then
+		SCREEN.Object("MAIN.43").data = S1301.Data
+		INFO.PushData LOGIN.Name, "userconf.ini", "IB200600", "MULT43", S1301.Data
+		'S1301.Push("MULT43")
+		CDCHG.Text = "43"
+		CDCHG.Push("CDCHG")
+	End If
+
+	If SCREEN.Object("MAIN.R5").checked = True Then
+		SCREEN.Object("MAIN.53").data = S1301.Data
+		INFO.PushData LOGIN.Name, "userconf.ini", "IB200600", "MULT53", S1301.Data
+		'S1301.Push("MULT53")
+		CDCHG.Text = "53"
+		CDCHG.Push("CDCHG")
+	End If
+End Sub
+
+Sub saveDepthInfo()
+	If SCREEN.CreateObject("Info") Then
+		INFO.pushData LOGIN.Name, "userconf.ini", SCREEN.GetMapName(1), "SepType", S17412.sDepthInfo
+	End If
+SYSTEM.Trace "saveDepthInfo SepType = " & S17412.sDepthInfo
+End Sub
+
+Sub LoadDepthInfo()
+SYSTEM.Trace "LoadDepthInfo myMAP(parent) = " & SCREEN.GetMapName(1)  & " self = " & SCREEN.GetMapName(0)
+	If SCREEN.CreateObject("Info") Then
+		S17412.sDepthInfo =	Trim(INFO.popData (LOGIN.Name, "userconf.ini", SCREEN.GetMapName(1), "SepType"))
+	End If
+End Sub
+
+_AW_ONINDECLARE_AW_
+#load IB888888
+#load IB999901
+
+_AW_ONENDSUB_AW_
+_AW_ONSTART_AW_
+cxMarket.MNum = SCREEN.GetMapName(1)
+LoadDepthInfo()
+Dim v_code
+FST.Text = "S"
+
+v_code = Trim(SCREEN.Object("main.13").data)
+If v_code = "" Then
+	SCREEN.OnSend = False
+	Exit Sub
+End If
+
+
+S1301.Data = v_code
+Select_Send("SCREEN.Send 0")
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+If cxMarket.sMarket = "KRX" Then
+	S1777.Data = "1"
+	S17412.SetMKtype(1)
+ElseIf cxMarket.sMarket = "NXT" Then
+	S1777.Data = "2"
+	S17412.SetMKtype(2)
+ElseIf cxMarket.sMarket = "통합" Then
+	S1777.Data = "3"
+	S17412.SetMKtype(3)
+End If
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+Select Case SCREEN.Object("main.cursor").text
+Case "1"
+	SCREEN.Object("main.obj01.1301").Setfocus
+Case "2"
+	SCREEN.Object("main.obj02.1301").Setfocus
+Case "3"
+	SCREEN.Object("main.obj03.1301").Setfocus
+Case Else
+	SCREEN.Object("main.obj01.1301").Setfocus
+End Select
+
+If Trim(SCREEN.Object("main.obj01.1301").data) = "" Then
+	SCREEN.Object("main.obj01.1301").Setfocus
+	Exit Sub
+End If
+
+If Trim(SCREEN.Object("main.obj02.1301").data) = "" Then
+	SCREEN.Object("main.obj02.1301").Setfocus
+	Exit Sub
+End If
+
+If Trim(S1301.Data) = "" Then
+	SCREEN.Object("main.cursor").text = "3"
+	S1301.SetFocus
+	Exit Sub
+End If
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(1301)
+_AW_ONCHANGE_AW_
+Dim Myvar, name
+
+'최초 START시 1301 send no ...
+If Trim(FST.Text) = "F" Then
+	Exit Sub
+End If
+
+name = SCREEN.GetName(100, S1301.data, 0)
+If (name <> "") Then
+	If SCREEN.Object("main.flag").text = "1" Then
+		S1301.Trigger "", True
+	End If
+End If
+
+SAVE_GROUP()
+SCREEN.Object("main.cursor").text = "1"
+Select_Send("SCREEN.Send 0")
+Select_Send("OBJ01.Send")
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(UT1)
+_AW_ONCLICK_AW_
+Select Case UT1.index
+	Case 1
+		OBJ01.SetObject "IB200611"
+	Case 2
+		OBJ01.SetObject "IB200612"
+	Case 3
+		OBJ01.SetObject "IB200613"
+	Case 4
+		OBJ01.SetObject "IB200614"
+	Case 5
+		OBJ01.SetObject "IB200617"
+	Case 6
+		OBJ01.SetObject "IB200618"
+End Select
+
+OBJ01.send
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON0)
+_AW_ONCLICK_AW_
+Dim retn
+retn = SCREEN.GetCode(100, "1301", "hnam", 0 )
+If retn <> True Then
+	SCREEN.OnSend = False
+	Exit Sub
+End If
+
+SAVE_GROUP()
+SCREEN.Object("main.cursor").text = "1"
+Select_Send("SCREEN.Send 0")
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(cxMarket)
+_AW_ONCLICK_AW_
+Select_Send("SCREEN.Send 0")
+Select_Send("OBJ01.Send")
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

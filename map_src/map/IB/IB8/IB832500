@@ -1,0 +1,389 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB832500)
+MAPSIZE(394, 700)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("단축메뉴")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+TITLE("[8325] 단축메뉴 서비스 등록/해지")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pibashor")
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL4(-2, 76, 702, 373)  LIMAGE(0)  LINEW(4)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL63(-2, 0, 702, 78)  LIMAGE(0)  LINEW(4)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+USRTAB  tab(6, 8, 694, 34)  FOCUS  INDEX(0)  COUNT(2)  AL_TOP  TAB_IMAGE      FONT("굴림체", 9, NORMAL)    COLOR(3, 70)  CUR(0)  TABIMAGE("TAB.BMP")  FCOLOR(3, 71)  CAPTION("등록/변경", "해지")  TABINFO("1:1", "1:2")  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL11(0, 394, 704, 397)        COLOR(64, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL(-2, 371, 702, 395)  LIMAGE(1)  LINEW(3)  STRESS(0)  STRESSW(0)  LINETYPE(4)  LINECOLOR(64)      COLOR(34, 69)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL3(7, 376, 21, 390)    |IMAGE|AL_STRETCH    COLOR(208, 232)  CUR(0)    "알림_ic.bmp"  ENABLE  &
+  VISIBLE  TRANSPARENT  IMAGE  HINTTYPE(IH_NONE)
+PANEL  GUIDE(20, 371, 625, 395)        COLOR(228, 130)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+PANEL  PANEL0(6, 34, 694, 70)        COLOR(66, 67)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL5(12, 43, 108, 63)  '계좌번호'  AL_LEFT  CUR(0)      COLOR(66, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+OUT  ACNM(213, 43, 355, 63)  LEN(20)  IO_MIXED|AL_LEFT||FA_SKIP    COLOR(49, 130)  CUR(0)  LINECOLOR(48)          TABORDER(0)  IOORDER(6)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL6(360, 43, 414, 63)  '비밀번호'  AL_CENTER  CUR(0)      COLOR(66, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  ed_pswd(418, 43, 474, 63)  LEN(8)  IO_MIXED|EDIT_INPUT|FA_PASSWD|FA_WRAP|FA_SKIP    COLOR(192, 130)  CUR(0)  TP_SUNKEN          TABORDER(1)  IOORDER(7)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+GROUP  GP0(41, 479, 88, 500)  'Group'        COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  send_btn(620, 43, 684, 63)  '등록/변경'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, BOLD)  FOCUS  COLOR(208, 68)  CUR(0)    "전송.bmp"    TABORDER(2)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+OBJECT  obj_chkPW(126, 478, 296, 578)    "IB999960"  TABORDER(3)  IOORDER(8)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  BUTTON0(574, 43, 613, 63)  '조회'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, BOLD)  FOCUS  COLOR(208, 186)  CUR(0)    "조회BTN.BMP"    TABORDER(4)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+EDIT  gubn(477, 494, 519, 514)  LEN(1)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(5)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  acno(477, 521, 651, 541)  LEN(20)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(6)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL0(398, 494, 471, 514)  '구분'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL1(398, 521, 470, 541)  '계좌번호'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL4(398, 546, 470, 566)  '레코드개수'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  o_msg(477, 568, 589, 588)  LEN(40)  IO_MIXED|AL_CENTER|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(4)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL12(398, 568, 470, 588)  'OMSG'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  obauth(28, 624, 301, 752)    "IB832501"  TABORDER(7)  IOORDER(9)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  o_reccnt(477, 546, 581, 566)  LEN(2)  IO_MIXED|AL_LEFT|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(3)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  chkpwdyn(259, 768, 301, 788)  LEN(1)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("N")          TABORDER(8)  IOORDER(10)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL13(180, 768, 253, 788)  '비번체크구분'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+COMBO  cmb_acnt(67, 43, 207, 63)  TP_SUNKEN  LEN(13)  COUNT(0)  VCOUNT(0)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_NUM|EDIT_INPUT|FA_SKIP    COLOR(68, 69)  CUR(0)    TABORDER(9)  IOORDER(11)  &
+  VISIBLE  HINTTYPE(IH_NONE)
+GRID  LGRID(6, 84, 281, 365)  VISIBLEROW(10)  CELLH(20)  MATRIX(100, 3)  FIX(0)  MAINCOLOR(7, 0)  LINECOLOR(75)  FOCUSCOLOR(78)  FOCUSKIND(4)    FONT("굴림체", 9, NORMAL)  ROWC(68, 77)  |MERGE|SELALWAYS|FLEXIBLE|VSCROLL|NO3D|RROW|XHLINE|GRFTEXT    &
+	COLINFO("Col0")  LEN(40)  WIDTH(110)  HEAD("ARS 전체메뉴")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT  |FA_SKIP    COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col1")  LEN(40)  WIDTH(149)  HEAD("ARS 전체메뉴")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT  |FA_SKIP    COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col2")  LEN(2)  WIDTH(51)  HEAD("코드값")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_SKIP    COLOR(192, 232)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    TABORDER(10)  IOORDER(12)  ENABLE  &
+  VISIBLE
+
+BUTTON  accn_dell(298, 188, 334, 208)  '▶'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("MS Sans Serif", 9, BOLD)  FOCUS  COLOR(208, 186)  CUR(10)    "2BTN.BMP"    TABORDER(11)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_STRING)  HELPTEXT("메뉴추가")HELPTEXT("메뉴추가")
+BUTTON  accn_add(298, 222, 334, 242)  '◀'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("MS Sans Serif", 9, BOLD)  FOCUS  COLOR(208, 186)  CUR(10)    "2BTN.BMP"    TABORDER(12)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_STRING)  HELPTEXT("메뉴삭제")HELPTEXT("메뉴삭제")
+GRID  RGRID(350, 84, 694, 205)  VISIBLEROW(10)  CELLH(20)  MATRIX(5, 5)  FIX(0)  MAINCOLOR(7, 0)  LINECOLOR(75)  FOCUSCOLOR(78)  FOCUSKIND(4)    FONT("굴림체", 9, NORMAL)  ROWC(68, 77)  |MERGE|SELALWAYS|NO3D|RROW|XHLINE|GRFTEXT    &
+	COLINFO("Col0")  LEN(40)  WIDTH(31)  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_INOUT  |FA_SKIP    COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  ICHECK    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col1")  LEN(1)  WIDTH(38)  HEAD("순번")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT  |FA_SKIP    COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col3")  LEN(2)  WIDTH(31)  HEAD("메뉴코드")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_NUM|EDIT_OUTPUT  |FA_SKIP    COLOR(192, 232)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col4")  LEN(2)  WIDTH(31)  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_NUM|EDIT_OUTPUT  |FA_SKIP    COLOR(192, 232)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col2")  LEN(50)  WIDTH(275)  HEAD("등록 할 단축메뉴")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT  |FA_SKIP    COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    TABORDER(13)  IOORDER(13)  ENABLE  &
+  VISIBLE
+
+GRID  GRIDIO(398, 616, 727, 736)  VISIBLEROW(10)  CELLH(20)  MATRIX(5, 4)  FIX(0)  MAINCOLOR(7, 0)  LINECOLOR(75)  FOCUSCOLOR(78)  FOCUSKIND(4)    FONT("굴림체", 9, NORMAL)  ROWC(68, 77)  |MERGE|NO3D|RROW|XHLINE|GRFTEXT    &
+	COLINFO("Col1")  LEN(1)  WIDTH(38)  HEAD("순번")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_INOUT      COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col3")  LEN(2)  WIDTH(31)  HEAD("메뉴코드")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_NUM|EDIT_INOUT      COLOR(192, 232)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col0")  LEN(2)  WIDTH(38)  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_NUM|EDIT_INOUT      COLOR(192, 232)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col2")  LEN(50)  WIDTH(260)  HEAD("등록 할 단축메뉴")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_INOUT      COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    TABORDER(14)  IOORDER(5)  ENABLE
+PANEL  PANEL1(350, 266, 694, 365)  LINECOLOR(75)      COLOR(96, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  SYMBOL25(367, 273, 695, 293)  'ARS 초기메뉴에 대한 전체안내를 생략하고 미리 지정한'  AL_LEFT  CUR(0)      COLOR(14, 91)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+PANEL  PANEL2(354, 278, 364, 288)    |IMAGETEXT|AL_CENTER    COLOR(208, 232)  CUR(0)    "텍스트화살표_하단.bmp"  ENABLE  &
+  VISIBLE  TRANSPARENT  IMAGETEXT  HINTTYPE(IH_NONE)
+LABEL  LABEL2(367, 290, 695, 310)  '메뉴만 사용 가능하도록 등록하여 이용하는 서비스입니다.'  AL_LEFT  CUR(0)      COLOR(14, 91)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL3(367, 307, 695, 327)  '개인고객(법인제외)기준 발신번호인증 서비스 등록 고객에'  AL_LEFT  CUR(0)      COLOR(14, 91)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+PANEL  PANEL5(354, 312, 364, 322)    |IMAGETEXT|AL_CENTER    COLOR(208, 232)  CUR(0)    "텍스트화살표_하단.bmp"  ENABLE  &
+  VISIBLE  TRANSPARENT  IMAGETEXT  HINTTYPE(IH_NONE)
+LABEL  LABEL7(367, 324, 695, 344)  '한하여 주민등록번호기준 최대 5개의 단축메뉴가 등록이'  AL_LEFT  CUR(0)      COLOR(14, 91)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL8(367, 341, 695, 361)  '가능합니다.'  AL_LEFT  CUR(0)      COLOR(14, 91)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Dim grid, menu
+
+Sub chkpwd()
+	If Len(Trim(ed_pswd.Data)) < 4 Then
+		GUIDE.Text = "비밀번호를 입력하시기 바랍니다."
+		Exit Sub
+	End If
+	If chkpwdyn.Data = "N" Then
+		SCREEN.Object("obj_chkPW.IntaccNo").data = Trim(cmb_acnt.Data)
+		SCREEN.Object("obj_chkPW.Pwd").data = Trim(ed_pswd.Data)
+		SCREEN.Object("obj_chkPW.chk").data = "1"
+		obj_chkPW.Send
+	Else
+		Call send_f()
+	End If
+End Sub
+
+Sub AllSell()
+	chkpwdyn.Data = "Y"
+	Call send_f()
+End Sub
+
+Sub Set_account()
+	chkpwdyn.Data = "N"
+	Set grid = SCREEN.Object("obauth.grid0")
+	acno.Data = Split(cmb_acnt.Data, "|")(0)
+	ACNM.Data = grid.getgridcell(CLng(Split(cmb_acnt.Data, "|")(1)), 2)
+	ed_pswd.Data = ""
+	GUIDE.Text = ""
+End Sub
+
+Sub send_f()
+	gubn.Data = "Q"
+	Call gridcls()
+	SCREEN.Send 0
+End Sub
+
+Sub save_f()
+	Dim ii, cansaveyn
+	cansaveyn = "N"
+'	SYSTEM.Trace chkpwdyn.Data
+	gubn.Data = "I"
+	If chkpwdyn.Data = "N" Then
+		GUIDE.Text = "조회후 등록/변경 하세요"
+		Exit Sub
+	End If
+	For ii = 1 To 5
+		If Len(RGRID.GetGridCell(ii, 3)) > 0 Then
+			cansaveyn = "Y"
+		End If
+	Next
+	If cansaveyn <> "Y" Then
+		GUIDE.Text = "선택한 메뉴가 없습니다."
+		Exit Sub
+	End If
+	SCREEN.Send 0
+End Sub
+
+Sub del_f()
+	gubn.Data = "D"
+	If chkpwdyn.Data = "N" Then
+		GUIDE.Text = "조회후 해지 하세요"
+		Exit Sub
+	End If
+	If r1.Enable = False And r2.Enable = False Then
+		GUIDE.Text = "해지가능한 전화번호가 없습니다."
+		Exit Sub
+	End If
+	If r1.Checked = False And r2.Checked = False Then
+		GUIDE.Text = "해지할 전화번호를 선택하세요."
+		Exit Sub
+	End If
+	SCREEN.Send 0
+End Sub
+
+Sub move_right()
+	Dim srow, mcod1, mcod2, ii, menuname
+	srow = LGRID.Row
+	For ii = 1 To RGRID.Rows
+		If RGRID.GetGridCell(ii, 3) = LGRID.GetGridCell(srow, 3) Then
+			GUIDE.Text = "이미 추가되어있습니다."
+			Exit Sub
+		End If
+	Next
+	mcod1 = CLng(Left(LGRID.GetGridCell(srow, 3), 1))
+	mcod2 = CLng(Right(LGRID.GetGridCell(srow, 3), 1))
+
+	menuname = Split(menu(mcod1-1)(0), "|")(1) & " > " & Split(menu(mcod1-1)(mcod2), "|")(1)
+	RGRID.SetGridCell RGRID.Row, 3, mcod1&mcod2
+	RGRID.SetGridCell RGRID.Row, 5, menuname
+
+End Sub
+
+Sub move_left()
+	Dim ii
+	For ii = 1 To 5
+		If RGRID.GetGridCell(ii, 1) = 1 Then
+			RGRID.SetGridCell ii, 1, 0
+			RGRID.SetGridCell ii, 3, ""
+			RGRID.SetGridCell ii, 5, ""
+		End If
+	Next
+End Sub
+
+Sub gridcls()
+	Dim ii
+	For ii = 1 To 5
+		RGRID.SetGridCell ii, 3, ""
+		RGRID.SetGridCell ii, 5, ""
+	Next
+End Sub
+
+_AW_ONINDECLARE_AW_
+#Load IB888833
+
+_AW_ONENDSUB_AW_
+_AW_ONSTART_AW_
+obauth.Send
+Dim ii, jj, kk
+
+menu = Array(Array("1|시세 및 시황", "1|현재가", "2|주가지수", "3|선물옵션현재가"), _
+Array("2|빠른현금매도", "1|현금매도", "2|현금매수", "3|주문정정", "4|주문취소", "5|신용매도", "6|신용매수"), _
+Array("3|일반주문", "1|현금주문", "2|신용  담보대출주문", "3|단주주문", "4|시간외단일가주문", "5|예약주문"), _
+Array("4|잔고 및 체결", "1|계좌조회", "2|체결내역"), _
+Array("5|이체서비스", "1|은행으로 출금", "2|계좌간 자금대체", "3|이체내역", "4|직원 연결"), _
+Array("6|CMA 및 금융상품", "1|CMA 및 금융상품 잔고", "2|CMA 입출금내역", "3|펀드별 기준가조회", "4|직원 연결"), _
+Array("7|각종청약업무", "1|공모실권주청약", "2|유상청약"), _
+Array("8|사고등록 및 HOT Line 서비스신청", "1|사고등록신청", "2|ARS주문비밀번호", "3|HOT Line 서비스 등록 및 변경", "4|주소 및 정보변경"))
+
+kk = 1
+LGRID.InsertRow -1
+For ii = LBound(menu) To UBound(menu)
+	For jj = LBound(menu(ii)) To UBound(menu(ii))
+		If jj = 0 Then
+			LGRID.SetGridCell kk, 1, Split(menu(ii)(jj), "|")(0) & " " & Split(menu(ii)(jj), "|")(1)
+		Else
+			LGRID.SetGridCell kk, 2, Split(menu(ii)(jj), "|")(0) & " " & Split(menu(ii)(jj), "|")(1)
+			LGRID.SetGridCell kk, 3, Split(menu(ii)(0), "|")(0) & Split(menu(ii)(jj), "|")(0)
+		End If
+
+		If(jj <> 0) Then
+			LGRID.InsertRow -1
+			kk = kk + 1
+		End If
+	Next
+Next
+LGRID.RemoveRow -1
+
+For ii = 1 To 5
+	RGRID.SetGridCell ii,2,ii
+Next
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+Dim ii
+GRIDIO.Clear
+If gubn.Data = "I" Then
+	For ii = 1 To 5
+		If Trim(RGRID.GetGridCell(ii, 3)) <> "" Then
+			GRIDIO.SetGridCell ii, 1, ii
+			GRIDIO.SetGridCell ii, 2, RGRID.GetGridCell(ii, 3)
+			GRIDIO.SetGridCell ii, 4, RGRID.GetGridCell(ii, 5)
+		End If
+	Next
+End If
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+Dim rcnt, ii, temp, row, code
+GUIDE.Text = o_msg.Data
+rcnt = CLng(o_reccnt.Data)
+If rcnt > 0 Then
+	For ii = 1 To 5
+		temp = Trim(GRIDIO.GetGridCell(ii, 4))
+		If Len(temp) > 0 Then
+			row = CLng(GRIDIO.GetGridCell(ii, 1))
+			code = GRIDIO.GetGridCell(ii, 2)
+			RGRID.SetGridCell row, 3, code
+			RGRID.SetGridCell row, 5, temp
+		End If
+	Next
+End If
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(tab)
+_AW_ONCLICK_AW_
+Select Case tab.ID
+Case 1
+	send_btn.Text = "등록/변경"
+Case 2
+	send_btn.Text = "해지"
+End Select
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(ed_pswd)
+_AW_ONKEYCHANGE_AW_
+'== 비밀번호 변경시 조회 버튼 기능 수행.
+If SCREEN.Key = "13" Then  '-- Enter 키 입력
+
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(send_btn)
+_AW_ONCLICK_AW_
+If tab.ID = 1 Then
+	Call save_f()
+Else
+	Call del_f()
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON0)
+_AW_ONCLICK_AW_
+Call chkpwd()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(cmb_acnt)
+_AW_ONCHANGE_AW_
+Call set_account()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(LGRID)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(accn_dell)
+_AW_ONCLICK_AW_
+Call move_right()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(accn_add)
+_AW_ONCLICK_AW_
+Call move_left()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(RGRID)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(GRIDIO)
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

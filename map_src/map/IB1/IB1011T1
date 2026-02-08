@@ -1,0 +1,274 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB1011T1)
+MAPSIZE(180, 334)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("주식주문 obj")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(CR2TAB)
+TITLE("[1001] 주식주문")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(FIXED)
+HEADER(LEDGER)
+BGROUND(BRUSH, 181)
+}
+
+
+
+FORM DIVISION
+{
+
+USRTAB  tab_order(1, 24, 332, 48)  FOCUS  INDEX(0)  COUNT(4)  AL_TOP  TAB_IMAGE  |FA_SKIP|FA_UPPER    FONT("굴림체", 9, NORMAL)    COLOR(3, 70)  CUR(0)  TABIMAGE("OTAB.BMP")  FCOLOR(3, 71)  CAPTION("매도", "매수", "정정/취소", "취소")  TABINFO("1:1", "1:2", "1:3", "0:4")  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL0(0, 0, 334, 25)  LINECOLOR(67)      COLOR(66, 67)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BTN_expand(98, 257, 118, 277)  TP_PUSH|IMAGE|AL_STRETCH      FOCUS  COLOR(208, 232)  CUR(0)    "창조절좌우.BMP"    TABORDER(13)  ENABLE  &
+  IMAGE  HOVER  HINTTYPE(IH_REF)  HELPTEXT("lb_expand")HELPTEXT("lb_expand")
+OUT  ACNM(148, 2, 212, 22)  LEN(20)  IO_MIXED|AL_LEFT||FA_SKIP    COLOR(160, 130)  CUR(0)  LINECOLOR(89)          TABORDER(0)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  ed_pswd(219, 2, 275, 22)  LEN(8)  IO_MIXED|EDIT_INPUT|FA_PASSWD|FA_WRAP    COLOR(192, 130)  CUR(0)  TP_SUNKEN          TABORDER(2)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  OBJ_odr(0, 48, 334, 183)    "IB1011T2"  TABORDER(3)  IOORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  clearpush_buy(83, 290, 115, 317)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("1")          TABORDER(4)  IOORDER(5)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  clearpush_sell(83, 318, 115, 345)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("1")          TABORDER(5)  IOORDER(6)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  clearpush_jj(83, 346, 115, 373)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("1")          TABORDER(6)  IOORDER(7)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  clearpush_cancel(83, 374, 115, 401)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("1")          TABORDER(7)  IOORDER(8)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  OBJ_snd(57, 431, 257, 531)    "IB999911"  TABORDER(8)  IOORDER(9)  ENABLE  &
+  HINTTYPE(IH_NONE)
+GROUP  GROUP0(48, 407, 264, 536)  '주문전송 obj'        COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  lb_expand(137, 552, 232, 572)  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL0(47, 552, 127, 572)  '확장버튼 캡션'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+CONTROL  AN1A(5, 2, 145, 22)    "CX_Account"  "/w0"  LEN(11)  EDIT_INPUT    COLOR(68, 130)  TABORDER(1)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BTN01(208, 26, 232, 46)  '현'  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(132, 232)  CUR(0)    "1BTN.BMP"    TABORDER(9)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_STRING)  HELPTEXT("현재가")HELPTEXT("현재가")
+BUTTON  BTN02(233, 26, 257, 46)  '체'  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(132, 232)  CUR(0)    "1BTN.BMP"    TABORDER(10)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_STRING)  HELPTEXT("체결내역")HELPTEXT("체결내역")
+BUTTON  BTN03(258, 26, 282, 46)  '잔'  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(132, 232)  CUR(0)    "1BTN.BMP"    TABORDER(11)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_STRING)  HELPTEXT("잔고")HELPTEXT("잔고")
+BUTTON  BTN04(283, 26, 307, 46)  '예'  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(132, 232)  CUR(0)    "1BTN.BMP"    TABORDER(12)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_STRING)  HELPTEXT("예수금")HELPTEXT("예수금")
+BUTTON  chk_OrderConfirm(168, 660, 237, 680)  '주문확인'  TP_CHECK|EDIT_NOP          COLOR(208, 232)  CUR(0)      TABORDER(14)  &
+  CHECKED  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  BUTTON0(308, 26, 332, 46)  '단'  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(132, 186)  CUR(0)    "1BTN.BMP"    TABORDER(15)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_STRING)  HELPTEXT("시간외단일가")HELPTEXT("시간외단일가")
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Dim xxxx_flag
+xxxx_flag = 1	'-비밀번호체크
+
+Sub order_tab_change()
+	If Left(SCREEN.GetMapName(1),5) = "IB101" Then	'== 미니주문
+		SCREEN.Proc "main.Order_mini_change", ""
+	End If
+		Select Case tab_order.ID
+		Case "1" : OBJ_odr.SetObject("IB1011T2")
+		Case "2" : OBJ_odr.SetObject("IB1011T3")
+		Case "3" : OBJ_odr.SetObject("IB1011T4")
+		Case "4" : OBJ_odr.SetObject("IB1011T5")
+		End Select
+End Sub
+
+'***************************************************************************
+' DESC: 계좌명/비밀번호 Setting
+'***************************************************************************
+Sub Set_account()
+	ACNM.Data = AN1A.name
+	ed_pswd.Data = AN1A.Password
+
+	If Trim(SYSTEM.Pop("1000trPSWD")) <> "" And Trim(AN1A.Data) = Trim(SYSTEM.Pop("1000trACC")) Then
+		ed_pswd.Data = Trim(SYSTEM.Pop("1000trPSWD"))
+		SYSTEM.Push "1000trPSWD", ""
+		SYSTEM.Push "1000trACC", ""
+	End If
+
+	SCREEN.Proc "obj_odr.OBJ_JUNGSAN.CalcJungsan", ""
+
+	SCREEN.Proc "main.Set_account", "jumn"
+	SCREEN.Object("obj_odr.o_jmno").Clear
+	SCREEN.Object("main.guide").Text = " "
+
+	If xxxx_flag = 1 Then
+		SCREEN.Proc "main.chk_xxxx", ""		'비밀번호 체크
+		xxxx_flag = 0
+	End If
+	If Trim(ed_pswd.Data) = "" Then
+		ed_pswd.SetFocus : Exit Sub
+	End If
+	ed_pswd.SetFocus
+End Sub
+
+'=== 가격자동 체크박스 체크값 기억/설정 ===
+Sub Set_Auto(mmgb)
+	Dim flag
+	If (mmgb < "1") Or (mmgb > "3") Then Exit Sub
+	flag = SYSTEM.Pop("auto_flag_s")		'-매도,매수,정정
+	If Len(Trim(flag)) <> 3 Then flag = "000"	'-default:자동아님
+	SCREEN.Object("obj_odr.chk_auto").Checked = (Mid(flag,mmgb,1) = "1")
+	SCREEN.Object("obj_odr.cboPrice").Enable = (Mid(flag,mmgb,1) = "1")
+End Sub
+Sub Get_Auto(mmgb, c_auto)
+	Dim flag, val
+	If c_auto = "True" Then
+		val = "1"
+	Else
+		val = "0"
+	End If
+
+	flag = SYSTEM.Pop("auto_flag_s")		'-매도,매수,정정
+	If Len(Trim(flag)) <> 3 Then flag = "000"	'-default:자동아님
+	Select Case mmgb
+	Case "1" : flag = val & Mid(flag,2)
+	Case "2" : flag = Left(flag,1) & val & Mid(flag,3)
+	Case "3" : flag = Left(flag,2) & val
+	Case Else : Exit Sub
+	End Select
+	SYSTEM.Push "auto_flag_s", flag
+End Sub
+
+
+Sub SetTab(index)
+	Select Case index
+		Case "1"  OBJ_odr.SetObject("IB100150")
+		Case "2"  OBJ_odr.SetObject("IB100160")
+	End Select
+End Sub
+
+Sub SetPrc(prc)
+	SCREEN.Object("OBJ_odr.ed_jprc").Data = prc
+End Sub
+
+_AW_ONSTART_AW_
+'== 주식주문(1001) 화면에서만 확장버튼 보임
+'CONTROL0.visible2 False
+Select Case Left(SCREEN.GetMapName(1),6)
+Case "IB1001"
+	BTN_expand.Visible = True
+	Select Case Right(SCREEN.GetMapName(1),2)
+	Case "00" : lb_expand.Text = "축소 (1차)" : BTN_expand.Text = "창조절좌우축소.BMP"
+	Case "01" : lb_expand.Text = "확대 (2차)"
+	Case "02" : lb_expand.Text = "확대 (3차)"
+	Case Else : lb_expand.Text = " "
+	End Select
+End Select
+'SCREEN.SetTimer 2, False
+
+_AW_ONENDSUB_AW_
+_AW_ONTIMER_AW_
+'CONTROL0.data = "QUEST_DATA"
+
+_AW_ONENDSUB_AW_
+_AW_ONCLOSE_AW_
+'주식주문2(IB100200)에서 주문타입변경시 계좌비밀번호 유지
+If SCREEN.GetMapName(1) = "IB100200" Then
+	SCREEN.Object("main.xxxx").Text = ed_pswd.Data
+End If
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(tab_order)
+_AW_ONCLICK_AW_
+SCREEN.object("main.guide").Text = ""
+SCREEN.object("main.panel0").Text = ""
+
+Call order_tab_change()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BTN_expand)
+_AW_ONCLICK_AW_
+'-- 1차, 2차, 3차 확장(IB100101, IB100102, IB100100)
+Select Case SCREEN.GetMapName(1)
+Case "IB100100" : SCREEN.ChangeMap("IB100101")
+Case "IB100101" : SCREEN.ChangeMap("IB100102")
+Case "IB100102" : SCREEN.ChangeMap("IB100100")
+End Select
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(ed_pswd)
+_AW_ONKEYCHANGE_AW_
+If Trim(ed_pswd.Data) = "" Then
+	Exit Sub
+End If
+
+If SCREEN.Key = 13 And Trim(ed_pswd.Data) <> "" Then
+	SCREEN.Proc "main.OnSave_ToDLL", "False, PSWD, " & Trim(AN1A.Data) & "-" & Trim(ed_pswd.Data)
+	SCREEN.Proc "main.OnStartInterest", "Y"
+	OBJ_odr.Proc "MoveTabFocus", 1
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(AN1A)
+_AW_ONCHANGE_AW_
+
+SCREEN.Proc "main.OnSave_ToDLL", "False, PSWD, " & Trim(AN1A.Data) & "-" & Trim(AN1A.Password)
+Call Set_account()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BTN01)
+_AW_ONCLICK_AW_
+Dim dmsg
+dmsg = "1301" & vbTab & SCREEN.Object("obj_odr.1301").data & vbLf
+SCREEN.CreateWindow 1, "IB200100 /s/t/d", dmsg
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BTN02)
+_AW_ONCLICK_AW_
+SCREEN.CreateWindow 1, "IB110200 /s/t", ""
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BTN03)
+_AW_ONCLICK_AW_
+SCREEN.CreateWindow 1, "IB120100 /s/t", ""
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BTN04)
+_AW_ONCLICK_AW_
+SCREEN.CreateWindow 1, "IB120600 /s/t", ""
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON0)
+_AW_ONCLICK_AW_
+SCREEN.CreateWindow 1, "IB500000 /s/t", ""
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

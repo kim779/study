@@ -1,0 +1,154 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB400700)
+MAPSIZE(280, 270)
+VERSION(001)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("[4007] 체결호가")
+MAPPUBLIC(";")
+FONT("굴림", 9, NORMAL)
+OPTIONS(FMS|FLASH|CR2TAB|INTER|DOMINO)
+TITLE("[4007] 체결호가")
+TOPATH(AXIS)
+METHOD(MENU)
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL10(-2, 31, 272, 280)  LIMAGE(2)  LINEW(6)  STRESS(44)  STRESSW(3)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  SYMBOL11(-2, 0, 272, 32)  LIMAGE(0)  LINEW(3)  LINETYPE(4)  LINECOLOR(64)      COLOR(66, 74)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  OBJ(8, 41, 262, 270)    "IB400710"  TABORDER(1)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  SYMBOL13(243, 6, 263, 26)  TP_PUSH|IMAGE|AL_STRETCH      COLOR(23, 232)  CUR(0)    "다음.BMP"    TABORDER(2)  ENABLE  &
+  VISIBLE  IMAGE  HOVER  HINTTYPE(IH_NONE)  HELPTEXT("체결호가 II 가기")HELPTEXT("체결호가 II 가기")
+OUT  HNAM(104, 6, 238, 26)  LEN(18)  IO_MIXED|AL_LEFT||SUM    FONT("굴림체", 9, BOLD)    COLOR(90, 130)  CUR(0)  LINECOLOR(89)          TABORDER(0)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  SYMBOL7(82, 6, 101, 26)  TP_PUSH|IMAGE|AL_STRETCH      COLOR(24, 0)  CUR(0)    "검색.BMP"    TABORDER(3)  ENABLE  &
+  VISIBLE  IMAGE  HOVER  HINTTYPE(IH_NONE)
+EDIT  40301(446, 101, 575, 124)  LEN(12)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(4)  IOORDER(4)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  30301(448, 131, 577, 154)  LEN(12)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(5)  IOORDER(5)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  ed_focod(7, 6, 82, 26)  LEN(8)  IO_MIXED|EDIT_INPUT|FA_SEND|FA_WRAP|FA_UPPER|SA_ALL|CODE    FONT("굴림체", 9, NORMAL)    COLOR(68, 130)  CUR(0)  TP_SUNKEN          TABORDER(6)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Dim fstart, ostart
+fstart = 1
+ostart = 1
+
+_AW_ONSTART_AW_
+SCREEN.Send 0
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+Dim code
+
+SCREEN.OnSend = False
+
+code = Left(ed_focod.Data, 1)
+
+If code = "1" Or code = "4" Or code = "A" Or code = "D"  Then
+	HNAM.Data = SCREEN.GetName (101, ed_focod.Data, 0)
+	If Trim(HNAM.Data) =  "" Then
+		SCREEN.ClearAll 2, 0
+		Exit Sub
+	Else
+		OBJ.SetObject "IB400710"
+		SCREEN.Object("obj.30301").data = ed_focod.Data
+		ed_focod.Trigger "ed_focod", True
+		ed_focod.Trigger "30301", True
+		SYSTEM.SetHistory "30301", ed_focod.Data
+		SYSTEM.SetHistory "ed_focod", ed_focod.Data
+	End If
+Else
+	HNAM.Data = SCREEN.GetName (102, ed_focod.Data, 0)
+	If Trim(HNAM.Data) =  "" Then
+		SCREEN.ClearAll 2, 0
+		Exit Sub
+	Else
+		OBJ.SetObject "IB400720"
+		SCREEN.Object("obj.40301").data = ed_focod.Data
+		ed_focod.Trigger "ed_focod", True
+		ed_focod.Trigger "40301", True
+		SYSTEM.SetHistory "40301", ed_focod.Data
+		SYSTEM.SetHistory "ed_focod", ed_focod.Data
+	End If
+End If
+
+OBJ.Send
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(SYMBOL13)
+_AW_ONCLICK_AW_
+SCREEN.ChangeMap "IB400800"
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(SYMBOL7)
+_AW_ONCLICK_AW_
+Dim ed_focod
+
+ed_focod = SCREEN.GetCode (103, "ed_focod", "HNAM", 2)
+If ed_focod <>  True Then
+	Exit Sub
+End If
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(40301)
+_AW_ONCHANGE_AW_
+If ostart = 1 Then
+	ostart = 0
+	Exit Sub
+End If
+
+ed_focod.Data = S40301.Data
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(30301)
+_AW_ONCHANGE_AW_
+If fstart = 1 Then
+	fstart = 0
+	Exit Sub
+End If
+
+ed_focod.Data = S30301.Data
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(ed_focod)
+_AW_ONCHANGE_AW_
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

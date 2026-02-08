@@ -1,0 +1,137 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB900221)
+MAPSIZE(232, 420)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("±¼¸²Ã¼", 9, NORMAL)
+TITLE("IB900221")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pidoaged")
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+CONTROL  CONTROL0(612, 71, 727, 101)  |FA_PROTECT  "CX_DATATRANS"  ""  LEN(0)  EDIT_NOP    COLOR(192, 232)  TABORDER(0)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  usid(18, 125, 115, 145)  LEN(12)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(1)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  act(19, 154, 116, 174)  LEN(1)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(2)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  gid(17, 181, 114, 201)  LEN(4)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(3)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  gnm(18, 207, 298, 227)  LEN(40)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(4)  IOORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  nrec(269, 10, 345, 49)  LEN(4)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(5)  IOORDER(5)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  ecod(479, 213, 595, 243)  LEN(4)  IO_MIXED|AL_CENTER|    COLOR(192, 69)  CUR(0)            TABORDER(0)  IOORDER(7)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  emsg(473, 257, 856, 287)  LEN(80)  IO_MIXED|AL_LEFT|    COLOR(192, 69)  CUR(0)            TABORDER(0)  IOORDER(8)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+GRID  GRID1(0, 0, 255, 116)  VISIBLEROW(0)  CELLH(18)  MATRIX(1000, 2)  FIX(0)  MAINCOLOR(208, 232)  LINECOLOR(0)  FOCUSCOLOR(0)  FOCUSKIND(0)  |VSCROLL|NO3D    &
+	COLINFO("Col0")  LEN(11)  WIDTH(80)  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_MIXED|EDIT_INPUT      COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col1")  LEN(8)  WIDTH(159)  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_MIXED|EDIT_INPUT      COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    TABORDER(6)  IOORDER(6)  ENABLE  &
+  VISIBLE
+
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONINDECLARE_AW_
+#load IB888888
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+Dim rec, ii, dept, common_nm
+SCREEN.OnSend = False
+If SCREEN.CreateObject("Info") Then
+	dept = Trim(INFO.PopData("", "ACCNTDEPT.INI", "ACCNTDEPT", "DEPT"))
+	common_nm = Trim(INFO.PopData("", "ACCNTDEPT.INI", "ACCNTDEPT", "COMMONNM"))
+End If
+
+usid.Data = "9" & dept & common_nm
+
+gid.Data = l_format(Trim(SCREEN.Object("main.obj0.grp_combo").data), "0", 4)
+
+If Trim(gid.data) = "" Then
+	SCREEN.Object("parent.GRID0").Clear
+	Exit Sub
+End If
+
+gnm.Data = Trim(SCREEN.Object("main.obj0.grp_combo").text)
+act.Data = "U"
+
+rec = 0
+GRID1.Clear
+GRID1.SetRows 1000
+
+For ii =1 To SCREEN.Object("parent.GRID0").Rows
+	If Trim(SCREEN.Object("parent.GRID0").GetGridCell(ii, 2)) = "" Then
+		Exit For
+	End If
+		GRID1.InsertRow(ii)
+		GRID1.SetGridCell ii, 1, Trim(SCREEN.Object("parent.GRID0").GetGridCell(ii, 2))
+		GRID1.SetGridCell ii, 2, Trim(SCREEN.Object("parent.GRID0").GetGridCell(ii, 4))
+		rec = rec + 1
+Next
+
+nrec.Data = l_format(rec, "0", 4)
+
+If rec > 0 Then
+	GRID1.SetRows rec
+Else
+	GRID1.SetRows 0
+End If
+
+SCREEN.OnSend = True
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+Call CONTROL0.Refresh813(0)
+SCREEN.SetTimer 10, False
+
+_AW_ONENDSUB_AW_
+_AW_ONTIMER_AW_
+SCREEN.Proc "parent.query", ""
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(CONTROL0)
+_AW_ONDBLCLK_AW_
+'MsgBox "Control: "+CONTROL0.data
+Dim DataList, spos, dpos, symb, data, cnt
+cnt = 1
+DataList = CONTROL0.data
+'MsgBox "DataList: "+ DataList
+dpos = 0
+spos = InStr(DataList, "|")
+While spos <> 0
+	symb = Mid(DataList,dpos+1,spos-dpos-1)
+	'MsgBox "symb: "+ symb
+	dpos = InStr(spos+1,DataList, "|")
+	data = Mid(DataList, spos+1, dPos-spos-1)
+	spos = InStr(dpos+1,DataList, "|")
+	SCREEN.Object(symb).data = data
+
+Wend
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

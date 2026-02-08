@@ -1,0 +1,79 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB20005E)
+MAPSIZE(215, 415)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("°¡°ÝÈå¸§ Â÷Æ®")
+MAPPUBLIC(";")
+FONT("±¼¸²Ã¼", 9, NORMAL)
+OPTIONS(FLASH|CR2TAB)
+TITLE("°¡°ÝÈå¸§")
+TOPATH(AXIS)
+METHOD(SEND)
+TRXCODE("bg20005e")
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+CONTROL  ctl(0, 0, 415, 215)  |FA_PROTECT  "C_UserGrp"  "/i713200376001200201000000000000000000200000000001110033554687100000000112005026611210000000"  LEN(0)  EDIT_INOUT    COLOR(192, 232)  TABORDER(1)  IOORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  1021(261, 398, 367, 418)  LEN(12)  IO_ALPHA|AL_LEFT||FA_FLASH    COLOR(211, 232)  CUR(0)            TABORDER(0)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  chart_gb(260, 370, 294, 393)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(2)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  check(262, 423, 298, 437)  LEN(1)  IO_MIXED|AL_CENTER|    COLOR(192, 69)  CUR(0)            TABORDER(0)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Sub send()
+	SCREEN.Send 0
+End Sub
+
+_AW_ONSEND_AW_
+If SCREEN.Object("parent.CK_KO").Checked = True And _
+	SCREEN.Object("parent.CK_KQ").Checked = True Then
+	chart_gb.Data = "1"
+End If
+
+If SCREEN.Object("parent.CK_KO").Checked = True And _
+	SCREEN.Object("parent.CK_KQ").Checked = False Then
+	chart_gb.Data = "2"
+End If
+
+If SCREEN.Object("parent.CK_KO").Checked = False And _
+	SCREEN.Object("parent.CK_KQ").Checked = True Then
+	chart_gb.Data = "3"
+End If
+
+If SCREEN.Object("parent.CK_KO").Checked = False And _
+	SCREEN.Object("parent.CK_KQ").Checked = False And _
+	SCREEN.Object("parent.CK_F").Checked = True Then
+	chart_gb.Data = "4"
+End If
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+If check.Data = "F" Then
+	ctl.Clear
+End If
+
+_AW_ONENDSUB_AW_
+}
+
+
+

@@ -1,0 +1,115 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB1000BB)
+MAPSIZE(580, 867)
+VERSION(000)
+MAPKIND(PROCEDURES)
+MAPGROUP(1)
+MAPDESC("Procedures")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+TITLE("IB1000BB")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+'1000번 버퍼용
+Function OnFromDLLMarket(sKey, sVal)
+SYSTEM.Trace "[MKGUBN][OnFromDLLMarket] map = " & SCREEN.GetMapName(0)
+SYSTEM.Trace "[MKGUBN][OnFromDLLMarket] sKey = " & sKey & "  sVal = " & sVal
+End Function
+
+Function OnFromDLLValue(sKey, sVal)
+SYSTEM.Trace "[MKGUBN][IB1000BB] sKey = " & sKey & "  sVal = " & sVal
+	Dim sRecvList, sPass, iarLen
+'	sRecvList = Split(sVal, vbTab, -1, 1)
+'	sPass = ""
+'	iarLen = UBound(sRecvLis
+
+	If UCase(TypeName( SCREEN.Object("obj_Buf.edt_pass") )) = "NOTHING" Then
+		Exit Function
+	End If
+
+	SCREEN.Object("obj_Buf.edt_pass").Data = sVal
+'0-mapno
+	Select Case sKey
+		Case "LoadMapKey"
+
+			SCREEN.Object("obj_Buf.edt_MapNo").Data = sVal'sRecvList(0)
+			SetInitCustomer()
+
+		Case "PSWD"
+			SetPassword(sVal)
+			SCREEN.Object("obj_Buf.edt_pass").Data = sVal
+
+			If Trim(SCREEN.GetMapName(1)) = "IB2022T0" Then
+		    	 If IsSame(sVal) = False Then
+					SCREEN.Proc "OBJ1.OnGroup", intercombo.Data
+				End If
+			End If
+
+		Case "edtBuf"
+
+		Case "ed_jprc"
+			SetJprc(sVal)
+
+
+	End Select
+End Function
+
+Function OnSave_ToDLL(brecv, sKey, sVal)
+
+	Dim sData, sTmp
+	sTmp = SCREEN.Object("obj_Buf.edt_MapNo").Data & vbTab '& vbTab & sKey & vbTab & sVal & vbTab
+
+	If brecv Then
+		sTmp = sTmp & "SEND" & vbTab
+	End If
+
+	sTmp = sTmp & sKey & vbTab & sVal & vbTab
+
+	sData = "BUF_1000" & vbTab & sTmp
+
+SYSTEM.Trace "[IB100000] OnSave_ToDLL brecv = " & brecv
+SYSTEM.Trace "[IB100000] OnSave_ToDLL sKey = " & sKey
+SYSTEM.Trace "[IB100000] OnSave_ToDLL sVal = " & sVal
+SYSTEM.Trace "[IB100000] OnSave_ToDLL BUF_1000 = " & sData
+
+	SCREEN.Object("obj_Buf.edtBuf").Trigger sData, True
+End Function
+
+Sub OnStartInterest(data)
+	goInterest.Data = data
+	goInterest.Trigger "goInterest", True
+End Sub
+
+
+
+Function Tabchange1000()
+	If SCREEN.GetMapName(0) = "IB1021T0" Or SCREEN.GetMapName(0) = "IB1011T0" Then
+		SYSTEM.Push "1000trPSWD" , SCREEN.Object("OBJ_order.ed_pswd").data
+		SYSTEM.Push "1000trACC" , SCREEN.Object("OBJ_order.AN1A").data
+	End If
+End Function
+
+}
+
+
+

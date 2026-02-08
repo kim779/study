@@ -1,0 +1,150 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB212800)
+MAPSIZE(608, 1200)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("종목토론")
+MAPPUBLIC(";")
+FONT("MS Sans Serif", 9, NORMAL)
+OPTIONS(FMS)
+TITLE("[2128] 종목토론")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pooppoop")
+MAPTYPE(NORM)
+HEADER(NOP)
+BGROUND(BRUSH, 3)
+}
+
+
+
+FORM DIVISION
+{
+
+USRTAB  tab_new(0, 0, 1200, 26)  FOCUS  INDEX(0)  COUNT(2)  AL_TOP  TAB_IMAGE      FONT("굴림체", 9, NORMAL)    COLOR(3, 70)  CUR(0)  TABIMAGE("tab.bmp")  FCOLOR(3, 71)  CAPTION("네이버 토론", "다음 토론")  TABINFO("1:0", "0:1")  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL_bg(1, 25, 10006, 57)        COLOR(66, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  1301(5, 31, 70, 51)  LEN(6)  IO_MIXED|EDIT_INOUT|FA_WRAP|FA_HAN|CODE    FONT("굴림체", 9, NORMAL)    COLOR(99, 130)  CUR(0)  TP_SUNKEN          TABORDER(1)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BTN_JM(70, 31, 89, 51)  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(15, 63)  CUR(0)    "검색.BMP"    TABORDER(2)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+CONTROL  17413(92, 31, 225, 51)    "CX_Symbol"  "/a105/b91/c90/d130"  LEN(0)  EDIT_OUTPUT  FONT("굴림체", 9, NORMAL)    COLOR(90, 130)  TABORDER(0)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  1021(395, 675, 473, 693)  LEN(16)  IO_NUM|AL_CENTER||FA_FLASH    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BROWSER  BROWSER0(0, 1000, 1000, 1551)  EDIT_NOP    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+CONTROL  WebLink1(1300, 55, 2500, 606)  |FA_PROTECT  "CX_Thtmlex"  "/w"  LEN(0)  EDIT_NOP    COLOR(192, 130)  TABORDER(0)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  edlog(525, 785, 1255, 805)  LEN(100)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(3)  IOORDER(4)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  BTN_NEXT(266, 30, 302, 52)  '다음'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, NORMAL)  FOCUS  COLOR(188, 186)  CUR(0)    "2BTN.BMP"    TABORDER(4)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+BUTTON  BTN_PREV(228, 30, 264, 52)  '이전'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, NORMAL)  FOCUS  COLOR(188, 186)  CUR(0)    "2BTN.BMP"    TABORDER(5)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+CONTROL  WebLink(0, 55, 1200, 606)  |FA_PROTECT  "CX_WEBEDGE"  "/k1"  LEN(0)  EDIT_NOP    COLOR(192, 232)  TABORDER(0)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Sub web_navigate()
+	Dim sLinkAddr
+
+	If Trim(S1301.Data) <> "" Then
+		If tab_new.ID = 1 Then
+			sLinkAddr = "https://finance.daum.net/quotes/"+"A"+Trim(S1301.Data)+"#talks"
+		Else
+			sLinkAddr = "https://m.stock.naver.com/discussion/domestic/"& Trim(S1301.Data) &"/posts?orgCode=C1AABU0000"
+		End If
+	End If
+
+	WebLink.Navigate(sLinkAddr)
+End Sub
+
+_AW_SCRIPT_AW_(tab_new)
+_AW_ONCLICK_AW_
+Dim sLinkAddr
+
+Select Case tab_new.ID
+	Case 0
+		sLinkAddr = "https://finance.naver.com/item/board.nhn?code="+Trim(S1301.Data)
+	Case 1
+		sLinkAddr = "https://finance.daum.net/quotes/"+"A"+Trim(S1301.Data)+"#talks"
+End Select
+
+WebLink.Seturl2(sLinkAddr)
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(1301)
+_AW_ONCHANGE_AW_
+If Trim(S1301.Data) = "000000" Or Trim(S1301.Data) = "" Then
+	Exit Sub
+End If
+S1301.Trigger "",True
+
+web_navigate()
+
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BTN_JM)
+_AW_ONCLICK_AW_
+Dim retn
+retn = SCREEN.GetCode(100, "1301", "hnam", 0 )
+If retn <> True Then
+       Exit Sub
+End If
+
+web_navigate()
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(WebLink1)
+_AW_ONDBLCLK_AW_
+edlog.Data = WebLink.strLog
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BTN_NEXT)
+_AW_ONCLICK_AW_
+WebLink.GoForward()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BTN_PREV)
+_AW_ONCLICK_AW_
+WebLink.GoBack()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(WebLink)
+_AW_ONCLICK_AW_
+SYSTEM.Push "DOYOUAGREE", "YES"
+SCREEN.CloseWindow()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

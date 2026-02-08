@@ -1,0 +1,320 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB850530)
+MAPSIZE(102, 788)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("현금상환")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(ENCODE|CR2TAB)
+TITLE("현금상환")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("piboPBxQ")
+MAPTYPE(FIXED)
+HEADER(LEDGER)
+TRXH("11CSLNAT105")
+}
+
+
+
+FORM DIVISION
+{
+
+EDIT  lOrgTrxNo(149, 521, 269, 541)  LEN(16)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_PASS    COLOR(192, 232)  CUR(0)  TP_SUNKEN          TABORDER(2)  IOORDER(4)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  zPwd(149, 500, 269, 520)  LEN(8)  IO_MIXED|EDIT_INPUT|FA_PASSWD|FA_WRAP    COLOR(192, 130)  CUR(0)  TP_SUNKEN          TABORDER(1)  IOORDER(3)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL3(27, 458, 147, 478)  '레코드갯수'  AL_LEFT  CUR(0)      COLOR(96, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  zIn(149, 458, 269, 478)  LEN(5)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_PASS    COLOR(192, 232)  CUR(0)  TP_SUNKEN  INIT("00001")          TABORDER(3)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  Out(427, 480, 547, 500)  LEN(5)  IO_NUM|AL_CENTER|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(6)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  zInptVal(427, 459, 547, 479)  LEN(49)  IO_NUM|AL_CENTER||FA_PASSWD    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(5)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  zAcntNo(149, 479, 269, 499)  LEN(20)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_PASS    COLOR(192, 130)  CUR(0)  TP_SUNKEN          TABORDER(4)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL0(27, 479, 147, 499)  '계좌번호'  AL_LEFT  CUR(0)      COLOR(96, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL1(27, 500, 147, 520)  '비밀번호'  AL_LEFT  CUR(0)      COLOR(96, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL2(27, 521, 147, 541)  '원처리번호'  AL_LEFT  CUR(0)      COLOR(96, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL4(304, 459, 424, 479)  '입력값'  AL_LEFT  CUR(0)      COLOR(96, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL5(304, 480, 424, 500)  '레코드갯수'  AL_LEFT  CUR(0)      COLOR(96, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL7(0, 1, 165, 21)  '처리번호'  AL_CENTER  CUR(0)      COLOR(96, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  lTrxNo(166, 1, 394, 21)  LEN(10)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSUP    COLOR(68, 69)  CUR(0)            IFRGB(69, 69)  TABORDER(0)  IOORDER(8)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL8(394, 1, 559, 21)  '취소된 상환금'  AL_CENTER  CUR(0)      COLOR(96, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  zLoanRfundAmt(560, 1, 788, 21)  LEN(16)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSUP    COLOR(68, 69)  CUR(0)            IFRGB(69, 69)  TABORDER(0)  IOORDER(9)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL9(0, 21, 165, 41)  '대출전잔'  AL_CENTER  CUR(0)      COLOR(96, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  zLoanBfbalAmt(166, 21, 394, 41)  LEN(16)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSUP    COLOR(77, 69)  CUR(0)            IFRGB(69, 69)  TABORDER(0)  IOORDER(13)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL10(394, 21, 559, 41)  '대출약정한도'  AL_CENTER  CUR(0)      COLOR(96, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  lLoanCtrctLmtAmt(560, 21, 788, 41)  LEN(16)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSUP    COLOR(77, 69)  CUR(0)            IFRGB(69, 69)  TABORDER(0)  IOORDER(11)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL11(0, 41, 165, 61)  '대출금잔'  AL_CENTER  CUR(0)      COLOR(96, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  zLoanCrbalAmt(166, 41, 394, 61)  LEN(16)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSUP    COLOR(68, 69)  CUR(0)            IFRGB(69, 69)  TABORDER(0)  IOORDER(14)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL12(394, 41, 559, 61)  '대출만기일'  AL_CENTER  CUR(0)      COLOR(96, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  zDueDt(560, 41, 788, 61)  LEN(8)  IO_NUM|AL_RIGHT|    COLOR(68, 69)  CUR(0)            EDITFORMAT("9999/99/99")  TABORDER(0)  IOORDER(10)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL13(0, 61, 165, 81)  '예수금전잔'  AL_CENTER  CUR(0)      COLOR(96, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  zDpsBfbalAmt(166, 61, 394, 81)  LEN(16)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSUP    COLOR(77, 69)  CUR(0)            IFRGB(69, 69)  TABORDER(0)  IOORDER(15)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL14(394, 61, 559, 81)  '대출이자등급'  AL_CENTER  CUR(0)      COLOR(96, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  zCrdtGrd(560, 61, 788, 81)  LEN(2)  IO_MIXED|AL_RIGHT|    COLOR(77, 69)  CUR(0)            IFRGB(69, 69)  TABORDER(0)  IOORDER(12)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL15(0, 81, 165, 101)  '예수금금잔'  AL_CENTER  CUR(0)      COLOR(96, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  zDpsCrbalAmt(166, 81, 394, 101)  LEN(16)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSUP    COLOR(68, 69)  CUR(0)            IFRGB(69, 69)  TABORDER(0)  IOORDER(16)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL16(394, 81, 559, 101)  AL_CENTER  CUR(0)      COLOR(96, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  OUTPUT8(560, 81, 788, 101)  LEN(0)  IO_NUM|AL_CENTER||FA_SKIP    COLOR(68, 69)  CUR(0)            IFRGB(69, 69)  TABORDER(0)  IOORDER(17)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BOX  BOX0(165, 1, 166, 101)    COLOR(75, 75)  LINEW(1)  BX_LINE    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BOX  BOX1(559, 1, 560, 101)    COLOR(75, 75)  LINEW(1)  BX_LINE    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BOX  BOX2(0, 0, 788, 1)    COLOR(75, 75)  LINEW(1)  BX_LINE    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BOX  BOX3(0, 101, 788, 102)    COLOR(75, 75)  LINEW(1)  BX_LINE    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  OUTPUT0(495, 625, 655, 645)  LEN(16)  IO_NUM|AL_CENTER|    COLOR(192, 69)  CUR(0)            TABORDER(0)  IOORDER(7)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Option Explicit
+
+Dim sendType
+
+'== 첫 조회
+Sub send_f()
+	SCREEN.ClearAll 0, 2
+	sendType = "Q"
+
+	LEDGER.Fkey = "C"
+	SCREEN.Send 0
+End Sub
+
+Sub send_o()
+	sendType = "O"
+	LEDGER.Fkey = "5"
+	SCREEN.Send 0
+End Sub
+
+Sub confirmOrder()
+	SYSTEM.Push "fundLoan_8505", ""
+
+	If chkInpt() = False Then
+		Exit Sub
+	End If
+
+	Dim dmsg, odrGubn, odrName
+	odrGubn = "현금상환"
+	odrName = "현금상환금"
+
+	dmsg = "odrGubn" & vbTab & odrGubn         & vbLf &_
+		   "odrName" & vbTab & odrName         & vbLf &_
+		   "o_acno"  & vbTab & Trim(SCREEN.Object("parent.AN50").Data) & vbLf &_
+		   "o_acnm"  & vbTab & Trim(SCREEN.Object("parent.ACNM").Data) & vbLf &_
+		   "o_aa"    & vbTab & Trim(SCREEN.Object("parent.aa").Data)   & vbLf
+
+	SCREEN.CreateWindow 2, "IB85051A /t /s /p5 /d", dmsg
+
+	If Trim(SYSTEM.Pop("fundLoan_8505")) <> "OK" Then
+		Exit Sub
+	End If
+
+	Call send_o()
+End Sub
+
+
+Function chkInpt()
+	Dim msg
+
+	chkInpt = False
+
+	If Len(Trim(SCREEN.Object("parent.AN50").Data)) <> 11 Then
+		msg = "계좌번호(ex.xxx-53-xxxxxx)를 확인하여 주십시오."
+		Call alert_msg(msg)
+		Call guide_msg(msg)
+		SCREEN.Object("parent.AN50").SetFocus
+		Exit Function
+	End If
+
+	If Len(Trim(SCREEN.Object("parent.zPwd").Data)) < 4 Then
+		msg = "비밀번호를 확인하여 주십시오."
+		Call alert_msg(msg)
+		Call guide_msg(msg)
+		SCREEN.Object("parent.zPwd").SetFocus
+		Exit Function
+	End If
+
+	If Is_numeric(SCREEN.Object("parent.aa").Data) = False Then
+		msg = "상환금을 확인하여 주십시오."
+		Call alert_msg(msg)
+		Call guide_msg(msg)
+		SCREEN.Object("parent.aa").SetFocus
+		Exit Function
+	End If
+
+	chkInpt = True
+End Function
+
+_AW_ONINDECLARE_AW_
+#Load IB888833
+#Load IB888888
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+' -- TR 보내기전 입력 필드 확인
+SCREEN.OnSend = False
+Call guide_msg("")
+
+zIn.Data = "00001"
+
+zAcntNo.Data = SCREEN.Object("parent.AN50").data
+zPwd.Data = SCREEN.Object("parent.zPwd").data
+
+If CheckInput(zAcntNo, zPwd) = True Then
+	Dim amt
+	amt = Trim(SCREEN.Object("parent.aa").Data)
+
+	If IsNumeric(amt) = False Then
+		Call alert_msg("상환금을 확인하여 주십시오.")
+		SCREEN.Object("parent.aa").SetFocus
+		Exit Sub
+	End If
+
+	If sendType = "O" And amt <= 0 Then
+		Call alert_msg("상환금을 확인하여 주십시오.")
+		SCREEN.Object("parent.aa").SetFocus
+		Exit Sub
+	End If
+
+	lOrgTrxNo.Data = "+" & l_zeropad(SCREEN.Object("parent.aa"))
+	SCREEN.OnSend = True
+End If
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+Dim ecod
+ecod = Trim(LEDGER.Ecod)
+
+If chkNumericData(ecod) = False Then
+	Exit Sub
+End If
+
+If sendType = "O" Then
+	Call alert_msg(Trim(LEDGER.Emsg))
+
+	SCREEN.Object("parent.aa").Clear
+
+	If Left(ecod, 1) = 0 Then
+		SCREEN.Proc "parent.obj_list.send_f", ""
+	End If
+
+	SCREEN.Object("parent.aa").SetFocus
+Else
+	SCREEN.Object("parent.send_btn").SetFocus
+End If
+
+Call guide_msg(Trim(LEDGER.Emsg))
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(zPwd)
+_AW_ONKEYCHANGE_AW_
+'== 비밀번호 변경시 조회 버튼 기능 수행.
+If SCREEN.Key = "13" Then  '-- Enter 키 입력
+	If Len(Trim(zPwd.Data)) < 4 Then
+		zPwd.SetFocus
+		Exit Sub
+	Else
+		Dim acnt
+		acnt = Trim(SCREEN.Object("main.zAcntNo").Data)
+
+		If acnt <> Trim(AN50.Data) Then
+			SCREEN.Object("main.zAcntNo").Data = Trim(AN50.Data)
+		End If
+
+		SCREEN.Object("main.zPwd").Data = Trim(zPwd.Data)
+	End If
+
+	If Is_numeric(aa.Data) = True Then
+		Call send_f()
+	Else
+		aa.SetFocus
+	End If
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(lTrxNo)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(zLoanRfundAmt)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(zLoanBfbalAmt)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(lLoanCtrctLmtAmt)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(zLoanCrbalAmt)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(zDueDt)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(zDpsBfbalAmt)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(zCrdtGrd)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(zDpsCrbalAmt)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(OUTPUT8)
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

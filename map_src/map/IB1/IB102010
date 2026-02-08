@@ -1,0 +1,349 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB102010)
+MAPSIZE(335, 660)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("감시내역")
+MAPPUBLIC(";")
+FONT("굴림", 9, NORMAL)
+TITLE("매도감시내역")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL1(0, 0, 660, 335)  LIMAGE(0)  LINEW(4)  STRESS(0)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(192, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+USRTAB  tab_Type(5, 5, 655, 31)  FOCUS  INDEX(0)  COUNT(2)  AL_TOP  TAB_IMAGE      FONT("굴림체", 9, NORMAL)    COLOR(3, 70)  CUR(0)  TABIMAGE("tab.bmp")  FCOLOR(3, 71)  CAPTION("감시내역", "실시간잔고")  TABINFO("1:0", "1:1")  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  obj_svrcondlist(5, 30, 655, 330)    "IB102011"  TABORDER(1)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  L_CNT(187, 7, 422, 27)  AL_LEFT  FONT("굴림", 9, BOLD)  CUR(0)      COLOR(22, 54)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  btn_exe(431, 7, 503, 27)  '일괄실행'  TP_PUSH|IMAGETEXT|AL_CENTER        FOCUS  COLOR(208, 232)  CUR(0)    "5BTN.BMP"    TABORDER(2)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+BUTTON  btn_stop(507, 7, 579, 27)  '일괄중지'  TP_PUSH|IMAGETEXT|AL_CENTER        FOCUS  COLOR(208, 232)  CUR(0)    "5BTN.BMP"    TABORDER(3)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+BUTTON  btn_del(583, 7, 655, 27)  '일괄삭제'  TP_PUSH|IMAGETEXT|AL_CENTER        FOCUS  COLOR(208, 232)  CUR(0)    "5BTN.BMP"    TABORDER(4)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+BUTTON  send_btn(618, 7, 655, 27)  '조회'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, BOLD)  FOCUS  COLOR(208, 186)  CUR(0)    "조회BTN.BMP"    TABORDER(5)  ENABLE  &
+  IMAGETEXT  HINTTYPE(IH_NONE)
+BUTTON  cautionBtn(596, 7, 616, 27)  TP_PUSH|IMAGETEXT|AL_STRETCH        FOCUS  COLOR(208, 186)  CUR(0)    "참고_01.bmp"    TABORDER(6)  ENABLE  &
+  IMAGETEXT  HINTTYPE(IH_STRING)  HELPTEXT("참고사항")HELPTEXT("참고사항")
+BUTTON  BUTTON1(538, 7, 594, 27)  '잔고설정'  TP_PUSH|IMAGETEXT|AL_STRETCH        FOCUS  COLOR(208, 186)  CUR(0)    "4btn.bmp"    TABORDER(7)  ENABLE  &
+  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+OBJECT  obj_AllDel(745, 25, 850, 130)    "IB102035"  TABORDER(8)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  obj_AllStop(945, 75, 1050, 180)    "IB102036"  TABORDER(9)  IOORDER(3)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  obj_AllExe(1175, 175, 1280, 280)    ""  TABORDER(10)  IOORDER(4)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+
+Sub sendData(szVal)
+	If szVal = "QRY" Then
+		'/* 계좌번호 */
+		accn = Trim(SCREEN.Object("main.AN5A").Data)
+		If Len(accn) <> 11 Then
+			'SCREEN.Object("main.guide").text = "계좌번호를 확인해 주십시오."
+			Exit Sub
+		End If
+		'비밀번호 체크만...
+		If SYSTEM.ConnectBy = "0" Then
+			pass = "9999"
+		Else
+			pass = Trim(SCREEN.Object("main.pswd2").Data)
+		End If
+		If Len(pass) < 4 Then
+			'SCREEN.Object("main.guide").text = "비밀번호를 확인해 주십시오."
+			Exit Sub
+		End If
+
+		SCREEN.Proc "obj_svrcondlist.refreshList", ""
+		'obj_svrcondlist.Send
+	End If
+End Sub
+
+Sub DisplayCondList()
+	tab_Type.ID = 0
+	SetObj()
+End Sub
+
+Sub SetObj()
+
+	Dim nID
+	nID = SCREEN.Object("main.tab_condType").ID
+
+	L_CNT.Data = ""
+	If tab_Type.ID = 0 Then
+		'감시내역
+		If nID = 7 Then		'청산
+			obj_svrcondlist.SetObject "IB102011"
+		ElseIf nID = 2 Then	'신규 매수
+			obj_svrcondlist.SetObject "IB102012"
+		ElseIf nID = 5 Then	'잔고편입
+			obj_svrcondlist.SetObject "IB102013"
+		Else
+		End If
+		L_CNT.Visible = True
+		btn_exe.Visible = True
+		btn_stop.Visible = True
+		btn_del.Visible = True
+
+		BUTTON1.Visible = False
+		cautionBtn.Visible = False
+		send_btn.Visible = False
+		sendData "QRY"
+	Else
+		'실시간잔고
+		obj_svrcondlist.SetObject "IB102015"
+		L_CNT.Visible = False
+		btn_exe.Visible = False
+		btn_stop.Visible = False
+		btn_del.Visible = False
+
+		BUTTON1.Visible = True
+		cautionBtn.Visible = True
+		send_btn.Visible = True
+	End If
+
+End Sub
+
+
+Sub DisplayCondCnt()
+	Dim nCondCnt
+	nCondCnt = Trim(SCREEN.Object("obj_svrcondlist.OUTPUT1").data)
+	If nCondCnt = "" Then
+		nCondCnt = "0"
+	End If
+	Dim nExeCnt
+	nExeCnt = Trim(SCREEN.Object("obj_svrcondlist.OUTPUT2").data)
+	If nExeCnt = "" Then
+		nExeCnt = "0"
+	End If
+
+	Dim szText
+	szText = "총 "&CInt(nCondCnt)&"건 중 "&CInt(nExeCnt)&"건 감시 중"
+
+	L_CNT.Data = szText
+	If tab_Type.ID = 0 Then
+		If nID = 7 Then		'청산
+			L_CNT.TRgb = 32
+		ElseIf nID = 2 Then	'신규 매수
+			L_CNT.TRgb = 54
+		ElseIf nID = 2 Then	'잔고편입
+			L_CNT.TRgb = 32
+		Else
+
+		End If
+	End If
+End Sub
+
+_AW_SCRIPT_AW_(tab_Type)
+_AW_ONCLICK_AW_
+
+Call SetObj()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(btn_exe)
+_AW_ONCLICK_AW_
+	'/* 계좌번호 */
+accn = Trim(SCREEN.Object("main.AN5A").Data)
+If Len(accn) <> 11 Then
+	SCREEN.Object("main.guide").text = "계좌번호를 확인해 주십시오."
+	Exit Sub
+End If
+'비밀번호 체크만...
+If SYSTEM.ConnectBy = "0" Then
+	pass = "9999"
+Else
+	pass = Trim(SCREEN.Object("main.pswd2").Data)
+End If
+If Len(pass) < 4 Then
+	SCREEN.Object("main.guide").text = "비밀번호를 확인해 주십시오."
+	Exit Sub
+End If
+
+
+
+
+Dim nID
+nID = SCREEN.Object("main.tab_condType").ID
+
+Dim szText
+
+
+'01:잔고청산 02:조건감시 05:종목별신규편입
+'감시내역
+If nID = 7 Then		'청산
+	szText = "매도 조건 전체를"
+	obj_AllExe.SetObject "IB102037"
+ElseIf nID = 2 Then	'신규 매수
+	szText = "매수 조건 전체를"
+	obj_AllExe.SetObject "IB102038"
+ElseIf nID = 5 Then	'잔고편입
+	szText = "신규잔고편입 조건 전체를"
+	obj_AllExe.SetObject "IB102039"
+End If
+
+
+SCREEN.Object("obj_AllExe.e_acnt_no").Data = Trim(SCREEN.Object("main.AN5A").Data)
+
+szok = MsgBox( szText & vbCrLf & "일괄실행 하시겠습니까?" ,1, "IBK투자증권")
+If szok <> "1" Then
+	Exit Sub
+End If
+
+obj_AllExe.Send
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(btn_stop)
+_AW_ONCLICK_AW_
+	'/* 계좌번호 */
+accn = Trim(SCREEN.Object("main.AN5A").Data)
+If Len(accn) <> 11 Then
+	SCREEN.Object("main.guide").text = "계좌번호를 확인해 주십시오."
+	Exit Sub
+End If
+'비밀번호 체크만...
+If SYSTEM.ConnectBy = "0" Then
+	pass = "9999"
+Else
+	pass = Trim(SCREEN.Object("main.pswd2").Data)
+End If
+If Len(pass) < 4 Then
+	SCREEN.Object("main.guide").text = "비밀번호를 확인해 주십시오."
+	Exit Sub
+End If
+
+SCREEN.Object("obj_AllStop.e_acnt_no").Data = Trim(SCREEN.Object("main.AN5A").Data)
+
+
+Dim nID
+nID = SCREEN.Object("main.tab_condType").ID
+
+Dim szText
+
+
+'01:잔고청산 02:조건감시 05:종목별신규편입
+'감시내역
+If nID = 7 Then		'청산
+	SCREEN.Object("obj_AllStop.e_est_typ_cd").Data = "01"
+	szText = "매도 조건 전체를"
+ElseIf nID = 2 Then	'신규 매수
+	SCREEN.Object("obj_AllStop.e_est_typ_cd").Data = "02"
+	szText = "매수 조건 전체를"
+ElseIf nID = 5 Then	'잔고편입
+	SCREEN.Object("obj_AllStop.e_est_typ_cd").Data = "05"
+	szText = "신규잔고편입 조건 전체를"
+End If
+
+szok = MsgBox( szText & vbCrLf & "일괄중지 하시겠습니까?" ,1, "IBK투자증권")
+If szok <> "1" Then
+	Exit Sub
+End If
+
+obj_AllStop.Send
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(btn_del)
+_AW_ONCLICK_AW_
+	'/* 계좌번호 */
+accn = Trim(SCREEN.Object("main.AN5A").Data)
+If Len(accn) <> 11 Then
+	SCREEN.Object("main.guide").text = "계좌번호를 확인해 주십시오."
+	Exit Sub
+End If
+'비밀번호 체크만...
+If SYSTEM.ConnectBy = "0" Then
+	pass = "9999"
+Else
+	pass = Trim(SCREEN.Object("main.pswd2").Data)
+End If
+
+If Len(pass) < 4 Then
+	SCREEN.Object("main.guide").text = "비밀번호를 확인해 주십시오."
+	Exit Sub
+End If
+
+SCREEN.Object("obj_AllDel.e_acnt_no").Data = Trim(SCREEN.Object("main.AN5A").Data)
+
+
+Dim nID
+nID = SCREEN.Object("main.tab_condType").ID
+
+Dim szText
+
+
+'01:잔고청산 02:조건감시 05:종목별신규편입
+'감시내역
+If nID = 7 Then		'청산
+	SCREEN.Object("obj_AllDel.e_est_typ_cd").Data = "01"
+	szText = "매도 조건 전체를"
+ElseIf nID = 2 Then	'신규 매수
+	SCREEN.Object("obj_AllDel.e_est_typ_cd").Data = "02"
+	szText = "매수 조건 전체를"
+ElseIf nID = 5 Then	'잔고편입
+	SCREEN.Object("obj_AllDel.e_est_typ_cd").Data = "05"
+	szText = "신규잔고편입 조건 전체를"
+End If
+
+szok = MsgBox( szText & vbCrLf & "일괄삭제 하시겠습니까?" ,1, "IBK투자증권")
+If szok <> "1" Then
+	Exit Sub
+End If
+
+obj_AllDel.Send
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(send_btn)
+_AW_ONCLICK_AW_
+
+obj_svrcondlist.Send
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(cautionBtn)
+_AW_ONCLICK_AW_
+SCREEN.Proc "obj_svrcondlist.Click_cautionBtn", ""
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON1)
+_AW_ONCLICK_AW_
+SCREEN.Proc "obj_svrcondlist.Click_BUTTON1", ""
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

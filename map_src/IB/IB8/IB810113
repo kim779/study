@@ -1,0 +1,132 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB810113)
+MAPSIZE(130, 224)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("굴림", 9, NORMAL)
+TITLE("[810113]")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(FIXED)
+HEADER(NOP)
+BGROUND(BRUSH, 171)
+}
+
+
+
+FORM DIVISION
+{
+
+EDIT  zPwd(82, 0, 191, 20)  LEN(8)  IO_ALPHA|EDIT_INPUT|FA_PASSWD|FA_WRAP|FA_MAND|FA_ENUM    COLOR(192, 69)  CUR(0)  TP_SUNKEN    ENCRYPT("ACCN")        TABORDER(4)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  lMnyoutDpsBfbalAmt(82, 88, 191, 108)  LEN(16)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSUP    COLOR(192, 69)  CUR(0)  LINECOLOR(75)          IFRGB(232, 232)  TABORDER(0)  IOORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  lMnyoutDpsCrbalAmt(82, 110, 191, 130)  LEN(16)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSUP    COLOR(192, 69)  CUR(0)  LINECOLOR(75)          IFRGB(232, 232)  TABORDER(0)  IOORDER(5)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  lMnyrclOdpntRepayAmt(82, 44, 191, 64)  LEN(16)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT|FA_SKIP|FA_CORGB|SA_COSUP    COLOR(192, 69)  CUR(0)  LINECOLOR(75)          IFRGB(69, 69)  TABORDER(0)  IOORDER(6)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  send_btn(192, 44, 224, 64)  '조회'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, NORMAL)  COLOR(208, 69)  CUR(0)    "2btn.bmp"    TABORDER(5)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+EDIT  zBncertSellIsuNo(82, 22, 152, 42)  LEN(6)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 69)  CUR(0)  TP_SUNKEN          TABORDER(1)  IOORDER(2)  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  zBncertSellIsuSeqno(154, 22, 191, 42)  LEN(6)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 69)  CUR(0)  TP_SUNKEN          TABORDER(2)  IOORDER(3)  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  fundbtn(192, 22, 224, 42)  '조회'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, NORMAL)  COLOR(208, 69)  CUR(0)    "2btn.bmp"    TABORDER(3)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+LABEL  PAN_fund(0, 22, 75, 42)  '출금펀드번호'  AL_LEFT  CUR(0)      COLOR(171, 69)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  PAN_pwd(0, 0, 75, 20)  '계좌비밀번호'  AL_LEFT  CUR(0)      COLOR(171, 69)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  PAN_type(12, 66, 58, 86)  '출금유형'  AL_LEFT  CUR(0)      COLOR(171, 69)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  PAN_price(0, 44, 75, 64)  '출금가능금액'  AL_LEFT  CUR(0)      COLOR(171, 69)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  PAN_before(11, 88, 62, 108)  '전 예수금'  AL_LEFT  CUR(0)      COLOR(171, 69)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  PAN_after(11, 110, 62, 130)  '후 예수금'  AL_LEFT  CUR(0)      COLOR(171, 69)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  zMnyoutPtnTp(82, 66, 191, 86)  '예수금출금'  LINECOLOR(75)      COLOR(68, 69)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONINDECLARE_AW_
+#LOAD IB888833
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(zPwd)
+_AW_ONKEYCHANGE_AW_
+'== 비밀번호 변경시 조회 버튼 기능 수행.
+If SCREEN.Key = "13" Then  '-- Enter 키 입력
+	If CheckInput(SCREEN.Object("parent.zAcntNo"), zPwd) = True Then
+		SCREEN.Proc "parent.AMT_send", ""
+		If SCREEN.Object("parent.f1").Checked = True Then 
+			SCREEN.Proc "parent.F1_chk", ""
+		Else 
+			SCREEN.Proc "parent.F2_chk", ""
+		End If 
+	End If
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(lMnyoutDpsBfbalAmt)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(lMnyoutDpsCrbalAmt)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(lMnyrclOdpntRepayAmt)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(send_btn)
+_AW_ONCLICK_AW_
+SCREEN.Proc "parent.AMT_send", ""
+If SCREEN.Object("parent.F1").Checked = True Then
+	SCREEN.Proc "parent.F1_chk", ""
+Else
+	SCREEN.Proc "parent.F2_chk", ""
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(fundbtn)
+_AW_ONCLICK_AW_
+Dim acct, msg, fundname
+acct = Replace(SCREEN.Object("parent.CMB_ACCT").text, "-", "")
+
+SYSTEM.Push "fundno", ""
+SCREEN.CreateWindow 2, "IB810108 /t/d/p5/S", _
+		"zAcntNo" & vbTab & acct
+
+msg = SYSTEM.Pop("fundno")
+If msg = "NO" Then
+	Exit Sub
+End If
+
+fundname = Split(msg, "|")
+zBncertSellIsuNo.Data = fundname(0)
+zBncertSellIsuSeqno.Data = fundname(1)
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

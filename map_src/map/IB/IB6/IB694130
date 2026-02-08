@@ -1,0 +1,394 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB694130)
+MAPSIZE(425, 879)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(ENCODE|CR2TAB)
+TITLE("[694130]수익률추이")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("piboPBxQ")
+MAPTYPE(FIXED)
+HEADER(LEDGER)
+TRXH("11CSWMWQ202")
+}
+
+
+
+FORM DIVISION
+{
+
+OUT  zStkEvalAmt(337, 1, 457, 21)  LEN(8)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSIGN    COLOR(68, 130)  CUR(0)            IFRGB(130, 130)  TABORDER(0)  IOORDER(15)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  zBasePrc(568, 1, 877, 21)  LEN(60)  IO_MIXED|AL_CENTER||FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSIGN    COLOR(68, 130)  CUR(0)            IFRGB(130, 130)  TABORDER(0)  IOORDER(11)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  zTotDpsastEvalAmt(96, 1, 216, 21)  LEN(8)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT|FA_ZEROSUP|SA_SPACE    COLOR(68, 130)  CUR(0)            EDITFORMAT("9999/99/99")  TABORDER(0)  IOORDER(9)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL116(0, 1, 95, 21)  '계좌설정일'        COLOR(96, 130)  CUR(0)    AL_CENTER  FONT("굴림체", 9, NORMAL)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL5(216, 1, 336, 21)  '목표수익률'        COLOR(96, 130)  CUR(0)    AL_CENTER  FONT("굴림체", 9, NORMAL)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL10(457, 1, 567, 21)  '벤치마크'        COLOR(96, 130)  CUR(0)    AL_CENTER  FONT("굴림체", 9, NORMAL)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  OUTPUT0(568, 21, 877, 41)  LEN(20)  IO_NUM|AL_CENTER|    COLOR(77, 130)  CUR(0)            TABORDER(0)  IOORDER(14)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  OUTPUT1(337, 21, 457, 41)  LEN(9)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSIGN    COLOR(77, 130)  CUR(0)            IFRGB(130, 130)  TABORDER(0)  IOORDER(16)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  OUTPUT2(96, 21, 216, 41)  LEN(8)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT|FA_ZEROSUP|SA_SPACE    COLOR(77, 130)  CUR(0)            EDITFORMAT("9999/99/99")  TABORDER(0)  IOORDER(10)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL2(216, 21, 336, 41)  '로스컷수익률'        COLOR(96, 130)  CUR(0)    AL_CENTER  FONT("굴림체", 9, NORMAL)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL3(0, 21, 95, 41)  '상품전환일'        COLOR(96, 130)  CUR(0)    AL_CENTER  FONT("굴림체", 9, NORMAL)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL4(457, 21, 567, 41)  '전계좌번호'        COLOR(96, 130)  CUR(0)    AL_CENTER  FONT("굴림체", 9, NORMAL)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  OUTPUT4(337, 41, 877, 61)  LEN(100)  IO_MIXED|AL_LEFT||FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSIGN    COLOR(68, 130)  CUR(0)            IFRGB(130, 130)  TABORDER(0)  IOORDER(13)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  OUTPUT6(96, 41, 216, 61)  LEN(8)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT|FA_ZEROSUP|SA_SPACE    COLOR(68, 130)  CUR(0)            EDITFORMAT("9999/99/99")  TABORDER(0)  IOORDER(12)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL6(0, 41, 95, 61)  '해지일자'        COLOR(96, 130)  CUR(0)    AL_CENTER  FONT("굴림체", 9, NORMAL)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL7(216, 41, 336, 61)  '해지사유'        COLOR(96, 130)  CUR(0)    AL_CENTER  FONT("굴림체", 9, NORMAL)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL0(10, 610, 130, 630)  '입력레코드갯수'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  zIn(130, 610, 250, 630)  LEN(5)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_NOR|FA_PASS    COLOR(192, 232)  CUR(0)  TP_SUNKEN  INIT("00001")          TABORDER(1)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL1(10, 630, 130, 650)  '계좌번호'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  zAcntNo(130, 630, 250, 650)  LEN(20)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_NOR|FA_PASS    COLOR(192, 232)  CUR(0)  TP_SUNKEN          TABORDER(2)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL2(10, 650, 130, 670)  '비밀번호'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  zPwd(130, 650, 250, 670)  LEN(8)  IO_MIXED|EDIT_INPUT|FA_PASSWD|FA_WRAP|FA_NOR|FA_PASS    COLOR(192, 232)  CUR(0)  TP_SUNKEN          TABORDER(3)  IOORDER(3)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL3(10, 670, 130, 690)  '조회시작'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  zQryDt(130, 670, 250, 690)  LEN(8)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_NOR|FA_PASS    COLOR(192, 232)  CUR(0)  TP_SUNKEN          TABORDER(4)  IOORDER(4)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL4(252, 609, 372, 629)  '입력값'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  zInptVal(372, 609, 492, 629)  LEN(49)  IO_MIXED|AL_CENTER||FA_PASSWD    COLOR(192, 69)  CUR(0)            TABORDER(0)  IOORDER(6)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL5(252, 629, 372, 649)  '출력레코드갯수'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  zOut(372, 629, 492, 649)  LEN(5)  IO_NUM|AL_CENTER|    COLOR(192, 69)  CUR(0)            TABORDER(0)  IOORDER(7)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL6(251, 649, 371, 669)  '상품명'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  OUTPUT5(371, 649, 491, 669)  LEN(40)  IO_MIXED|AL_CENTER|    COLOR(192, 69)  CUR(0)            TABORDER(0)  IOORDER(8)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL7(250, 666, 370, 686)  '출력'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  OUTPUT7(370, 666, 490, 686)  LEN(1)  IO_MIXED|AL_CENTER|    COLOR(192, 69)  CUR(0)            TABORDER(0)  IOORDER(17)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL8(9, 689, 129, 709)  '조회종료'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  zQryEndDt(129, 689, 249, 709)  LEN(8)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_NOR|FA_PASS    COLOR(192, 232)  CUR(0)  TP_SUNKEN          TABORDER(5)  IOORDER(5)  ENABLE  &
+  HINTTYPE(IH_NONE)
+GRID  GRID0(0, 64, 878, 425)  VISIBLEROW(0)  CELLH(20)  MATRIX(1000, 9)  FIX(0)  MAINCOLOR(181, 232)  LINECOLOR(75)  FOCUSCOLOR(78)  FOCUSKIND(4)  ROWC(68, 77)  |FLEXIBLE|VSCROLL|NO3D|RROW|XHLINE|GRFTEXT    &
+	COLINFO("Col0")  LEN(8)  WIDTH(75)  HEAD("일자")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  EDITFORMAT("9999/99/99")    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col1")  LEN(13)  WIDTH(78)  HEAD("기준가")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSIGN    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(69, 69)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col2")  LEN(11)  WIDTH(106)  HEAD("계좌운영 수익률")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSIGN    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(69, 69)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col3")  LEN(9)  WIDTH(104)  HEAD("고객투자 수익률")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSIGN    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(69, 69)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col4")  LEN(9)  WIDTH(98)  HEAD("벤치마크 수익률")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSIGN    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(69, 69)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col5")  LEN(9)  WIDTH(144)  HEAD("계좌 - 벤치마크 수익률")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSIGN    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(69, 69)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col6")  LEN(16)  WIDTH(80)  HEAD("좌수")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSIGN    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(69, 69)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col7")  LEN(16)  WIDTH(97)  HEAD("평가금액")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSIGN    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(69, 69)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col8")  LEN(9)  WIDTH(80)  HEAD("주식비중")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSIGN    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(69, 69)    HNORMAL  SORTSTARTPOS(0)    TABORDER(6)  IOORDER(18)  ENABLE  &
+  VISIBLE
+
+LABEL  LABEL9(250, 690, 370, 710)  '연속'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  continue(370, 690, 490, 709)  LEN(1)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("N")          TABORDER(7)  IOORDER(19)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BOX  BOX4(0, 61, 878, 62)    COLOR(75, 75)  LINEW(1)  BX_LINE    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BOX  BOX0(0, 1, 878, 2)    COLOR(75, 75)  LINEW(2)  BX_LINE    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BOX  BOX1(95, 1, 96, 61)    COLOR(75, 75)  LINEW(1)  BX_LINE    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BOX  BOX2(336, 1, 337, 61)    COLOR(75, 75)  LINEW(1)  BX_LINE    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BOX  BOX3(567, 1, 568, 41)    COLOR(75, 75)  LINEW(1)  BX_LINE    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Option Explicit
+
+Sub send_f()
+	SCREEN.ClearAll 0, 2
+	If continue.Data = "N"	Then
+		LEDGER.Fkey = "C"
+	Else
+		LEDGER.Fkey = "7"
+	End If
+
+	SCREEN.Send 0
+
+End Sub
+
+Sub Set_obj()
+	obj.SetObject "IB694121"
+End Sub
+
+_AW_ONINDECLARE_AW_
+#Load IB888833
+#Load IB888888
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+SCREEN.OnSend = False
+'LEDGER.Rcnt = "0010"
+Call guide_msg("")
+
+zIn.Data = "00001"
+zAcntNo.Data = Trim(SCREEN.Object("parent.AM99").Data)
+
+If SYSTEM.ConnectBy = 1 Then
+	If Len(Trim(zAcntNo.Data)) <> 11 Then
+	'	Call alert_msg("계좌번호를 확인하여 주십시오.")
+		SCREEN.Object("parent.AM99").SetFocus
+		Exit Sub
+	Else
+		If Mid(Trim(zAcntNo.Data), 4, 2) <> "00" Then
+	'		Call alert_msg("종합계좌번호를 입력하여 주십시오.")
+			SCREEN.Object("parent.AM99").SetFocus
+			Exit Sub
+		End If
+	End If
+End If
+
+If SYSTEM.ConnectBy = 0 And Trim(SCREEN.Object("parent.zPwd").Data) = "" Then
+	zPwd.Data = "9999"
+Else
+	zPwd.Data = Trim(SCREEN.Object("parent.zPwd").Data)
+End If
+
+If Len(Trim(zPwd.Data)) < 4 Then
+	'Call alert_msg("비밀번호를 확인하여 주십시오.")
+	SCREEN.Object("parent.zPwd").SetFocus
+	Exit Sub
+End If
+
+zQryDt.Data = Trim(SCREEN.Object("parent.zQryDt").Data)
+zQryEndDt.Data = Trim(SCREEN.Object("parent.zQryEndDt").Data)
+SCREEN.OnSend = True
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+If LEDGER.Next = "Y" Then
+	continue.Data = "Y"
+	GRID0.SetDataPosition 2
+	send_f()
+Else
+	continue.Data = "N"
+End If
+
+Dim ii
+ii = 0
+Dim bench, ac_bench
+
+
+For ii = 1 To GRID0.Rows
+	bench = GRID0.GetGridCell(ii, 5)
+
+	If bench > 0 Then
+		GRID0.SetTRgb ii, 5, 94
+	ElseIf bench < 0 Then
+		GRID0.SetTRgb ii, 5, 95
+	End If
+
+	ac_bench = GRID0.GetGridCell(ii, 6)
+
+	If ac_bench > 0 Then
+		GRID0.SetTRgb ii, 6, 94
+	ElseIf ac_bench < 0 Then
+		GRID0.SetTRgb ii, 6, 95
+	End If
+
+Next
+
+_AW_ONENDSUB_AW_
+_AW_ONTIMER_AW_
+If (exgb="0") Then
+	Call show_ExpandObj()
+	Call hide_ReduceObj()
+
+	OBJ_tuja.SetRect 7,37,662,284
+	obj_reduce1.SetRect 2007,37,2325,284
+	obj_reduce2.SetRect 2342,37,2662,284
+
+
+
+
+Else
+	'화면 내의 obj 설정
+	Call hide_ExpandObj()
+	Call show_ReduceObj()
+
+	obj_reduce1.SetRect 7,37,325,284
+	obj_reduce2.SetRect 342,37,662,284
+	OBJ_tuja.SetRect 2007,37,2662,284
+
+
+
+
+End If
+
+Dim rd_val
+
+'뉴스화면에 대한 설정
+If tab_tuja.Visible = True Then
+	If tab_tuja.ID = 4 Then
+		If SCREEN.CreateObject("Info") Then
+			newsdata = Trim(INFO.PopData(LOGIN.Name, "userconf.ini", "IB200000", "news"))
+		End If
+'		SYSTEM.Trace "TUJAEX"
+		rd_val = Trim(INFO.popData (LOGIN.Name, "userconf.ini", "IB200000", "RD_CHK"))
+
+		If rd_val = "" Then
+			rd_val = "1"
+		End If
+		Select Case rd_val
+		Case 1
+			SCREEN.Object("OBJ_tuja.r2_1").Checked = True
+			SCREEN.Object("OBJ_tuja.r2_2").Checked = False
+			SCREEN.Object("OBJ_tuja.r2_3").Checked = False
+		Case 2
+			SCREEN.Object("OBJ_tuja.r2_1").Checked = False
+			SCREEN.Object("OBJ_tuja.r2_2").Checked = True
+			SCREEN.Object("OBJ_tuja.r2_3").Checked = False
+		Case 3
+			SCREEN.Object("OBJ_tuja.r2_1").Checked = False
+			SCREEN.Object("OBJ_tuja.r2_2").Checked = False
+			SCREEN.Object("OBJ_tuja.r2_3").Checked = True
+		End Select
+
+		If newsdata = "2" Then
+			SCREEN.Object("OBJ_tuja.RADIO3").checked = True
+			SCREEN.Object("OBJ_tuja.obj0").Visible = True
+			SCREEN.Object("OBJ_tuja.obj0").SetRect 0, 27, 655, 248
+			SCREEN.Object("OBJ_tuja.GRID0").Visible = False
+			SCREEN.Object("OBJ_tuja.1301").Enable False
+
+			SCREEN.Object("OBJ_tuja.r2_1").Enable = False
+			SCREEN.Object("OBJ_tuja.r2_2").Enable = False
+			SCREEN.Object("OBJ_tuja.r2_3").Enable = False
+		Else
+			SCREEN.Object("OBJ_tuja.RADIO2").checked = True
+			SCREEN.Object("OBJ_tuja.obj0").Visible = False
+			SCREEN.Object("OBJ_tuja.obj0").SetRect 655, 27, 1310, 248
+			SCREEN.Object("OBJ_tuja.GRID0").Visible = True
+			SCREEN.Object("OBJ_tuja.1301").Enable True
+
+			SCREEN.Object("OBJ_tuja.r2_1").Enable = True
+			SCREEN.Object("OBJ_tuja.r2_2").Enable = True
+			SCREEN.Object("OBJ_tuja.r2_3").Enable = True
+		End If
+
+		OBJ_tuja.Proc "rd_click",""
+	End If
+Else
+	If tab_tujaEx1.ID = 4 Then
+		If SCREEN.CreateObject("Info") Then
+			newsdata = Trim(INFO.PopData(LOGIN.Name, "userconf.ini", "IB200000", "news"))
+		End If
+
+		rd_val = Trim(INFO.popData (LOGIN.Name, "userconf.ini", "IB200000", "RD_CHK"))
+
+		If rd_val = "" Then
+			rd_val = "1"
+		End If
+		Select Case rd_val
+		Case 1
+			SCREEN.Object("obj_reduce1.r2_1").Checked = True
+			SCREEN.Object("obj_reduce1.r2_2").Checked = False
+			SCREEN.Object("obj_reduce1.r2_3").Checked = False
+		Case 2
+			SCREEN.Object("obj_reduce1.r2_1").Checked = False
+			SCREEN.Object("obj_reduce1.r2_2").Checked = True
+			SCREEN.Object("obj_reduce1.r2_3").Checked = False
+		Case 3
+			SCREEN.Object("obj_reduce1.r2_1").Checked = False
+			SCREEN.Object("obj_reduce1.r2_2").Checked = False
+			SCREEN.Object("obj_reduce1.r2_3").Checked = True
+		End Select
+
+		If newsdata = "2" Then
+'			SYSTEM.Trace "2"
+			SCREEN.Object("obj_reduce1.RADIO3").checked = True
+			SCREEN.Object("obj_reduce1.obj0").Visible = True
+			SCREEN.Object("obj_reduce1.obj0").SetRect 0, 29, 318, 247
+
+			SCREEN.Object("obj_reduce1.r2_1").Enable = False
+			SCREEN.Object("obj_reduce1.r2_2").Enable = False
+			SCREEN.Object("obj_reduce1.r2_3").Enable = False
+		Else
+'			SYSTEM.Trace "1"
+			SCREEN.Object("obj_reduce1.RADIO2").checked = True
+			SCREEN.Object("obj_reduce1.obj0").Visible = False
+			SCREEN.Object("obj_reduce1.obj0").SetRect 318, 29, 636, 247
+
+			SCREEN.Object("obj_reduce1.r2_1").Enable = True
+			SCREEN.Object("obj_reduce1.r2_2").Enable = True
+			SCREEN.Object("obj_reduce1.r2_3").Enable = True
+		End If
+
+		obj_reduce1.Proc "rd_click",""
+		obj_reduce1.Send
+	End If
+End If
+
+Call send_sise_all("main")
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(zStkEvalAmt)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(zBasePrc)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(zTotDpsastEvalAmt)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(OUTPUT1)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(OUTPUT2)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(OUTPUT4)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(OUTPUT6)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(GRID0)
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

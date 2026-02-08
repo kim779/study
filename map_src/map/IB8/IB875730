@@ -1,0 +1,207 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB875730)
+MAPSIZE(532, 184)
+VERSION(003)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("일자별 시세")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(FMS|FLASH)
+TITLE("[875730]")
+TOPATH(AXIS)
+METHOD(SEND)
+TRXCODE("pooppoop")
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL63(-2, 0, 895, 465)  LIMAGE(0)  LINEW(4)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+GRID  12500(0, 5, 170, 457)  VISIBLEROW(3000)  CELLH(18)  MATRIX(100, 3)  FIX(10)  MAINCOLOR(7, 0)  LINECOLOR(75)  FOCUSCOLOR(78)  FOCUSKIND(3)    FONT("굴림체", 9, NORMAL)  ROWC(68, 77)  |FLEXIBLE|VSCROLL|INS_TOP|NO3D|RROW|XHLINE|PAGE|HEADER|GRFTEXT    &
+	COLINFO("12021")  LEN(16)  WIDTH(100)  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_ALPHA|EDIT_OUTPUT  |FA_CORGB|FA_FLASH|SA_CORAW    COLOR(68, 69)  COLCUR(0, 0)    INORMAL  IFRGB(94, 95)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("12302")  LEN(8)  WIDTH(66)  HEAD("일자")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  EDITFORMAT("9999/99/99")    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("12023")  LEN(8)  WIDTH(62)  HEAD("종가")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSUP    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(94, 95)    HNORMAL  SORTSTARTPOS(0)    TABORDER(3)  IOORDER(4)  ENABLE  &
+  VISIBLE
+
+EDIT  12901(0, 495, 88, 513)  LEN(8)  IO_NUM|EDIT_INPUT|FA_DATE    COLOR(68, 69)  CUR(0)  TP_NONE  INIT("00000000")          EDITFORMAT("9999/99/99")  TABORDER(2)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  1301(0, 520, 89, 538)  LEN(6)  IO_MIXED|EDIT_INPUT|FA_SEND|FA_WRAP|FA_HAN|SA_ALL|CODE      COLOR(68, 69)  CUR(0)  TP_NONE          TABORDER(1)  IOORDER(1)  &
+  HINTTYPE(IH_NONE)
+OUT  1022(0, 470, 130, 490)  LEN(20)  IO_MIXED|AL_LEFT|    COLOR(131, 1)  CUR(0)  TP_SUNKEN          TABORDER(0)  IOORDER(5)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  1777(90, 495, 110, 515)  LEN(1)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(4)  IOORDER(3)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Sub senddata
+S12901.Data = SCREEN.Object("parent.zFstDeterDt").Data
+Select Case SCREEN.Object("parent.key").data
+	Case 1
+		S1301.Data = SCREEN.Object("parent.zFdastIsuNo11").data
+	Case 2
+		S1301.Data = SCREEN.Object("parent.zFdastIsuNo12").data
+	Case 3
+		S1301.Data = SCREEN.Object("parent.zFdastIsuNo13").data
+	Case 4
+		S1301.Data = SCREEN.Object("parent.zFdastIsuNo14").data
+End Select
+End Sub
+
+_AW_ONSEND_AW_
+Call senddata
+
+If UCase(TypeName( SCREEN.Object("main.cxMarket"))) <> "NOTHING" Then
+	If SCREEN.Object("main.cxMarket").sMarket = "KRX" Then
+		S1777.Data = "1"
+	ElseIf SCREEN.Object("main.cxMarket").sMarket = "NXT" Then
+		S1777.Data =  "2"
+	ElseIf SCREEN.Object("main.cxMarket").sMarket = "통합" Then
+		S1777.Data =  "3"
+	End If
+	SYSTEM.Trace "yes cxMarket 1777 = " & S1777.Data
+Else
+	SYSTEM.Trace "no cxMarket map = " & SCREEN.GetMapName(0)
+End If
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+Dim i, ii,AA,DD,E1
+For ii=1 To  S12500.Row
+	If SCREEN.Object("parent.zFstDeterDt").Data = Trim(S12500.GetGridCell(ii, 2)) Then
+
+	Select Case SCREEN.Object("parent.key").data
+		Case 1
+				DD = FormatNumber(Trim(S12500.GetGridCell(ii, 3)))
+				DD = Split(DD,".",-1,1)
+				SCREEN.Object("parent.lFdast1FstPrc").Data = DD(0)
+				For i = 1 To 12
+					If Trim(SCREEN.Object("parent.dLvlRat"&i).Data) <>"" Then
+						E1= Trim(SCREEN.Object("parent.dLvlRat"&i).Data)
+						AA = FormatNumber(SCREEN.Object("parent.lFdast1FstPrc").Data * E1 / 100)
+						AA = Split(AA,".",-1,1)
+						SCREEN.Object("parent.lFdast1Prc"&i).Data = AA(0)
+					End If
+				Next
+					If Trim(SCREEN.Object("parent.dKiLvlRat").Data) <>"" Then
+						E1= Trim(SCREEN.Object("parent.dKiLvlRat").Data)
+						AA = FormatNumber(SCREEN.Object("parent.lFdast1FstPrc").Data * E1 / 100)
+						AA = Split(AA,".",-1,1)
+						SCREEN.Object("parent.lFdast1KiPrc").Data = AA(0)
+					End If
+					If Trim(SCREEN.Object("parent.dKoLvlRat").Data) <>"" Then
+						E1= Trim(SCREEN.Object("parent.dKoLvlRat").Data)
+						AA = FormatNumber(SCREEN.Object("parent.lFdast1FstPrc").Data * E1 / 100)
+						AA = Split(AA,".",-1,1)
+						SCREEN.Object("parent.lFdast1KoPrc").Data = AA(0)
+					End If
+				SCREEN.Object("parent.CONTROL1").Data = S1022.Data
+
+		Case 2
+				DD = FormatNumber(Trim(S12500.GetGridCell(ii, 3)))
+				DD = Split(DD,".",-1,1)
+				SCREEN.Object("parent.lFdast2FstPrc").Data = DD(0)
+				For i = 1 To 12
+					If Trim(SCREEN.Object("parent.dLvlRat"&i).Data) <>"" Then
+						E1= Trim(SCREEN.Object("parent.dLvlRat"&i).Data)
+						AA = FormatNumber(SCREEN.Object("parent.lFdast2FstPrc").Data * E1 / 100)
+						AA = Split(AA,".",-1,1)
+						SCREEN.Object("parent.lFdast2Prc"&i).Data = AA(0)
+					End If
+				Next
+					If Trim(SCREEN.Object("parent.dKiLvlRat").Data) <>"" Then
+						E1= Trim(SCREEN.Object("parent.dKiLvlRat").Data)
+						AA = FormatNumber(SCREEN.Object("parent.lFdast2FstPrc").Data * E1 / 100)
+						AA = Split(AA,".",-1,1)
+						SCREEN.Object("parent.lFdast2KiPrc").Data = AA(0)
+					End If
+					If Trim(SCREEN.Object("parent.dKoLvlRat").Data) <>"" Then
+						E1= Trim(SCREEN.Object("parent.dKoLvlRat").Data)
+						AA = FormatNumber(SCREEN.Object("parent.lFdast2FstPrc").Data * E1 / 100)
+						AA = Split(AA,".",-1,1)
+						SCREEN.Object("parent.lFdast2KoPrc").Data = AA(0)
+					End If
+				SCREEN.Object("parent.CONTROL2").Data = S1022.Data
+
+		Case 3
+			DD = FormatNumber(Trim(S12500.GetGridCell(ii, 3)))
+				DD = Split(DD,".",-1,1)
+				SCREEN.Object("parent.lFdast3FstPrc").Data = DD(0)
+				For i = 1 To 12
+					If Trim(SCREEN.Object("parent.dLvlRat"&i).Data) <>"" Then
+						E1= Trim(SCREEN.Object("parent.dLvlRat"&i).Data)
+						AA = FormatNumber(SCREEN.Object("parent.lFdast3FstPrc").Data * E1 / 100)
+						AA = Split(AA,".",-1,1)
+						SCREEN.Object("parent.lFdast3Prc"&i).Data = AA(0)
+					End If
+				Next
+					If Trim(SCREEN.Object("parent.dKiLvlRat").Data) <>"" Then
+						E1= Trim(SCREEN.Object("parent.dKiLvlRat").Data)
+						AA = FormatNumber(SCREEN.Object("parent.lFdast3FstPrc").Data * E1 / 100)
+						AA = Split(AA,".",-1,1)
+						SCREEN.Object("parent.lFdast3KiPrc").Data = AA(0)
+					End If
+					If Trim(SCREEN.Object("parent.dKoLvlRat").Data) <>"" Then
+						E1= Trim(SCREEN.Object("parent.dKoLvlRat").Data)
+						AA = FormatNumber(SCREEN.Object("parent.lFdast3FstPrc").Data * E1 / 100)
+						AA = Split(AA,".",-1,1)
+						SCREEN.Object("parent.lFdast3KoPrc").Data = AA(0)
+					End If
+				SCREEN.Object("parent.CONTROL3").Data = S1022.Data
+		Case 4
+			DD = FormatNumber(Trim(S12500.GetGridCell(ii, 3)))
+				DD = Split(DD,".",-1,1)
+				SCREEN.Object("parent.lFdast4FstPrc").Data = DD(0)
+				For i = 1 To 12
+					If Trim(SCREEN.Object("parent.dLvlRat"&i).Data) <>"" Then
+						E1= Trim(SCREEN.Object("parent.dLvlRat"&i).Data)
+						AA = FormatNumber(SCREEN.Object("parent.lFdast4FstPrc").Data * E1 / 100)
+						AA = Split(AA,".",-1,1)
+						SCREEN.Object("parent.lFdast4Prc"&i).Data = AA(0)
+					End If
+				Next
+					If Trim(SCREEN.Object("parent.dKiLvlRat").Data) <>"" Then
+						E1= Trim(SCREEN.Object("parent.dKiLvlRat").Data)
+						AA = FormatNumber(SCREEN.Object("parent.lFdast4FstPrc").Data * E1 / 100)
+						AA = Split(AA,".",-1,1)
+						SCREEN.Object("parent.lFdast4KiPrc").Data = AA(0)
+					End If
+					If Trim(SCREEN.Object("parent.dKoLvlRat").Data) <>"" Then
+						E1= Trim(SCREEN.Object("parent.dKoLvlRat").Data)
+						AA = FormatNumber(SCREEN.Object("parent.lFdast4FstPrc").Data * E1 / 100)
+						AA = Split(AA,".",-1,1)
+						SCREEN.Object("parent.lFdast4KoPrc").Data = AA(0)
+					End If
+				SCREEN.Object("parent.CONTROL4").Data = S1022.Data
+	End Select
+	Exit For
+	End If
+Next
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(12500)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(12901)
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

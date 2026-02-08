@@ -1,0 +1,129 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB960000)
+MAPSIZE(540, 748)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("공지팝업 관리자")
+MAPPUBLIC(";")
+FONT("굴림", 9, NORMAL)
+OPTIONS(FLASH)
+TITLE("공지팝업 관리자")
+TOPATH(AXIS)
+METHOD(MENU)
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL0(0, 0, 750, 540)  LIMAGE(0)  LINEW(4)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 69)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  OBJ1(11, 33, 741, 533)    "IB960010"  TABORDER(1)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+USRTAB  UTAB0(11, 8, 731, 34)  FOCUS  INDEX(0)  COUNT(5)  AL_TOP  TAB_IMAGE        COLOR(3, 70)  CUR(0)  TABIMAGE("tab.bmp")  FCOLOR(68, 71)  CAPTION("7700 초기공지", "HTS 팝업공지", "MTS 배너 및 팝업공지", "신MTS 배너 및 팝업공지", "신MTS 공모주공지")  TABINFO("1:1", "1:2", "1:3", "1:5", "1:4")  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Dim flag
+flag = False
+
+'FIRST가 1이면 체크안된거고, 0이면 체크된거임.
+'TODAY가 없으면 FIRST를 1로 세팅한다.
+Sub Set_Ini()
+	Dim Today, Check
+
+'	If SCREEN.CreateObject("Info") Then
+
+'	 	Today = INFO.PopData("", "NOTICECOOKIE.ini", "7700", "TODAY")
+
+'	 	If Today = "0" Then
+'	 		INFO.PushData "", "NOTICECOOKIE.INI", "7700", "TODAY", CDAT.Data
+'			INFO.PushData "", "NOTICECOOKIE.ini", "7700", "FIRST", "1"
+'	 	Else
+'	 		INFO.PushData "", "NOTICECOOKIE.INI", "7700", "TODAY", CDAT.Data
+'	 	End If
+
+'	 	Check = INFO.PopData("", "NOTICECOOKIE.ini", "7700", "FIRST")
+
+'	 	If Check = "0" Then
+'	 		CHECK0.Checked = True
+'			INFO.PushData "", "NOTICECOOKIE.ini", "7700", "FIRST", "0"
+'	 	Else
+'	 		CHECK0.Checked = False
+'			INFO.PushData "", "NOTICECOOKIE.ini", "7700", "FIRST", "1"
+'	 	End If
+'	End If
+
+End Sub
+
+
+Sub	Set_tab(data)
+	Dim array
+'	array = Split(data, ";")
+'	SCREEN.Object("obj_gongzi.UTAB1").index = array(0)
+'	SCREEN.Object("obj_gongzi.UTAB3").index = array(1)
+
+'	SCREEN.Proc "obj_gongzi.InitPosition", data
+'	SCREEN.proc "obj_gongzi.Set_EventTab", array(2)
+
+End Sub
+
+Sub order_tab_change()
+'	If Left(SCREEN.GetMapName(1),5) = "IB101" Then	'== 미니주문
+'		SCREEN.Proc "main.Order_mini_change", ""
+'	End If
+'		Select Case tab_order.ID
+'		Case "1" : OBJ_odr.SetObject("IB100150")
+'		Case "2" : OBJ_odr.SetObject("IB100160")
+'		Case "3" : OBJ_odr.SetObject("IB100170")
+'		Case "4" : OBJ_odr.SetObject("IB100180")
+'		End Select
+End Sub
+
+_AW_ONSEND_AW_
+SCREEN.OnSend False
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(UTAB0)
+_AW_ONCLICK_AW_
+Select Case UTAB0.ID
+Case 1	'7700
+
+	OBJ1.SetObject ("IB960010")
+
+Case 2	'HTS팝업
+	OBJ1.SetObject ("IB960020")
+
+Case 3	' MTS배너
+	OBJ1.SetObject ("IB960030")
+
+Case 4	' 신MTS공모주
+	OBJ1.SetObject ("IB960040")
+
+Case 5	' 신MTS배너
+	OBJ1.SetObject ("IB960050")
+
+Case Else
+	Exit Sub
+End Select
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

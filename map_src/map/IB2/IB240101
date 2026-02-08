@@ -1,0 +1,63 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB240101)
+MAPSIZE(20, 160)
+VERSION(001)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("종목명")
+MAPPUBLIC(";")
+FONT("굴림", 9, NORMAL)
+OPTIONS(FMS|FLASH)
+TITLE("[240101]종목명")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pooppoop")
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+EDIT  1301(4, 24, 67, 42)  LEN(6)  IO_MIXED|EDIT_INOUT|FA_WRAP|FA_HAN  FONT("굴림체", 9, NORMAL)    COLOR(68, 69)  CUR(0)  TP_NONE          TABORDER(1)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+CONTROL  17413(0, 0, 160, 20)    "CX_Symbol"  "/a89/b91/c92/d69"  LEN(0)  EDIT_OUTPUT  FONT("굴림체", 9, NORMAL)    COLOR(90, 130)  TABORDER(0)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  1021(0, 45, 78, 63)  LEN(16)  IO_NUM|AL_CENTER||FA_FLASH    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  1777(174, 68, 194, 88)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("2")          TABORDER(2)  IOORDER(4)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL4(5, 68, 175, 88)  '시장구분 1:KRX 2:NXT 3:통합'  LINECOLOR(238)      COLOR(200, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONSEND_AW_
+S1301.Data = SCREEN.Object("parent.1301").data
+If UCase(TypeName( SCREEN.Object("main.cxMarket"))) <> "NOTHING" Then
+	If SCREEN.Object("main.cxMarket").sMarket = "KRX" Then
+		S1777.Data = "1"
+	ElseIf SCREEN.Object("main.cxMarket").sMarket = "NXT" Then
+		S1777.Data =  "2"
+	ElseIf SCREEN.Object("main.cxMarket").sMarket = "통합" Then
+		S1777.Data =  "3"
+	End If
+	SYSTEM.Trace "yes cxMarket 1777 = " & S1777.Data
+Else
+	SYSTEM.Trace "no cxMarket map = " & SCREEN.GetMapName(0)
+End If
+
+_AW_ONENDSUB_AW_
+}
+
+
+

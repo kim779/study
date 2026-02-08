@@ -1,0 +1,66 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB871300)
+MAPSIZE(1, 1)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("±¼¸²", 9, NORMAL)
+TITLE("IBKS HUB")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+BUTTON  BUTTON1(0, 75, 90, 110)  TP_PUSH      AL_CENTER    FOCUS  COLOR(208, 232)  CUR(0)      TABORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+CONTROL  CONTROL0(5, 115, 105, 215)  |FA_PROTECT  "CX_log"  ""  LEN(0)  EDIT_NOP    COLOR(192, 232)  TABORDER(0)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONSTART_AW_
+
+
+Dim path
+path = SYSTEM.Home & "\exe\HUB.exe"
+CONTROL0.ExcuteFile(path)
+'SCREEN.SetTimer 10, False
+SCREEN.CloseWindow
+
+_AW_ONENDSUB_AW_
+_AW_ONTIMER_AW_
+SCREEN.CloseWindow
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(BUTTON1)
+_AW_ONCLICK_AW_
+Dim path
+Dim oShell
+'path = SYSTEM.Home & "\exe\CUSTOMERCALC.EXE"   'CUSTOMERCALC.EXE   HOB.exe
+path = SYSTEM.Home & "\exe\HOB.exe"
+Set oShell = CreateObject("WScript.shell")
+oShell.Run(path)
+oShell = Null
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

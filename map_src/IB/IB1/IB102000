@@ -1,0 +1,712 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB102000)
+MAPSIZE(720, 1000)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("주식서버자동주문")
+MAPPUBLIC(";")
+FONT("굴림", 9, NORMAL)
+TITLE("주식자동주문")
+TOPATH(AXIS)
+METHOD(MENU)
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL0(0, 0, 1000, 80)        COLOR(66, 130)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL3(0, 20, 1000, 50)  LIMAGE(0)  LINEW(4)  STRESS(0)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(192, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+USRTAB  tab_condType(5, 52, 995, 78)  FOCUS  INDEX(0)  COUNT(4)  AL_TOP  TAB_IMAGE  |FA_UPPER    FONT("굴림체", 9, NORMAL)    COLOR(3, 70)  CUR(0)  TABIMAGE("tab.bmp")  FCOLOR(3, 71)  CAPTION("자동주문등록(매도)", "자동주문등록(매수)", "신규잔고편입매도", "내역조회")  TABINFO("1:7", "1:2", "1:5", "1:6")  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL2(0, 415, 1000, 695)  LIMAGE(0)  LINEW(4)  STRESS(0)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(192, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  obj_condlist(0, 80, 660, 415)    "IB102022"  TABORDER(5)  IOORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL_hoga(660, 145, 1000, 415)  LIMAGE(0)  LINEW(4)  STRESS(0)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(192, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL3(274, 25, 322, 45)  '비밀번호'  AL_LEFT  CUR(0)      COLOR(208, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+CONTROL  AN5A(55, 26, 195, 46)  |FA_SKIP  "CX_Account"  "/w3"  LEN(11)  EDIT_INPUT    COLOR(68, 130)  TABORDER(1)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  ACNM(199, 25, 263, 45)  LEN(20)  IO_MIXED|AL_LEFT||FA_SKIP    COLOR(49, 130)  CUR(0)  LINECOLOR(48)          TABORDER(0)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL6(4, 25, 52, 45)  '계좌번호'  AL_LEFT  CUR(0)      COLOR(208, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  pswd2(325, 25, 385, 45)  LEN(8)  IO_MIXED|EDIT_INPUT|FA_PASSWD|FA_WRAP|FA_SKIP|FA_ENUM    COLOR(192, 130)  CUR(0)  TP_SUNKEN    ENCRYPT("en_accn")        TABORDER(2)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  b_Acc(389, 25, 445, 45)  '조회'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림", 10, BOLD)  FOCUS  COLOR(208, 69)  CUR(0)    "6BTN_조회.BMP"    TABORDER(3)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+BUTTON  b_Yak(750, 25, 930, 45)  '자동주문 서비스 신청'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림", 10, BOLD)  FOCUS  COLOR(208, 69)  CUR(0)    "6BTN_조회.BMP"    TABORDER(4)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+PANEL  PANEL1(660, 80, 1000, 146)  LIMAGE(0)  LINEW(4)  STRESS(0)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(192, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+CONTROL  1301(668, 88, 737, 108)  |FA_PROTECT  "CX_CODECTRL"  "/u0/k검색.BMP/lAXCOMBO.BMP/p/s0/o"  LEN(6)  EDIT_INOUT    COLOR(192, 130)  TABORDER(6)  IOORDER(5)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON2(735, 88, 756, 108)  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(15, 63)  CUR(0)    "검색.BMP"    TABORDER(7)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+CONTROL  ctl_Category(1160, 68, 1200, 88)    "CX_Category"  "/k0/i돌려보기.BMP/t/r1301"  LEN(0)  EDIT_NOP  FONT("굴림체", 9, NORMAL)    COLOR(68, 232)  TABORDER(0)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON1(756, 88, 777, 108)  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, NORMAL)  COLOR(208, 232)  CUR(0)    "관심.BMP"    TABORDER(8)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+OBJECT  OBJ_hnam(776, 88, 992, 108)    "IB2000YJ"  TABORDER(9)  IOORDER(6)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  obj_currSise(666, 109, 992, 140)    "IB102021"  TABORDER(10)  IOORDER(7)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  OBJ_sise(665, 175, 992, 409)    "IB102020"  TABORDER(11)  IOORDER(8)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+USRTAB  tab_hoga(665, 150, 992, 176)  FOCUS  INDEX(0)  COUNT(2)  AL_TOP  TAB_IMAGE      FONT("굴림체", 9, NORMAL)    COLOR(3, 70)  CUR(0)  TABIMAGE("tab.bmp")  FCOLOR(3, 71)  CAPTION("호가", "차트")  TABINFO("1:0", "1:1")  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  bt_Hoga2(1746, 222, 1766, 242)  '10'  TP_PUSH|IMAGETEXT|AL_STRETCH        FOCUS  COLOR(208, 186)  CUR(0)    "1BTN.BMP"    TABORDER(12)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+OBJECT  obj_svrCond(5, 420, 995, 690)    "IB102023"  TABORDER(13)  IOORDER(9)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL4(0, 695, 1000, 720)  LIMAGE(1)  LINEW(1)  STRESS(1)  STRESSW(0)  LINETYPE(4)  LINECOLOR(64)      COLOR(34, 69)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL5(5, 700, 19, 714)    |IMAGE|AL_STRETCH    COLOR(208, 232)  CUR(0)    "알림_ic.bmp"  ENABLE  &
+  VISIBLE  TRANSPARENT  IMAGE  HINTTYPE(IH_NONE)
+PANEL  GUIDE(25, 698, 930, 718)        COLOR(203, 69)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  e_jcode(1346, 110, 1466, 129)  LEN(20)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(14)  IOORDER(10)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  e_jname(1346, 130, 1466, 149)  LEN(20)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(15)  IOORDER(11)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  e_crdt(1346, 150, 1466, 169)  LEN(20)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(16)  IOORDER(12)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  e_ldate(1346, 170, 1466, 189)  LEN(20)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(17)  IOORDER(13)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  e_avprc(1346, 190, 1466, 209)  LEN(20)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(18)  IOORDER(14)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  obj_chkPW(1125, 245, 1295, 345)    "IB102098"  TABORDER(19)  IOORDER(15)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  BUTTON0(1356, 235, 1436, 275)  TP_PUSH      AL_CENTER    FOCUS  COLOR(208, 232)  CUR(0)      TABORDER(20)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  e_prcset(620, 25, 745, 44)  LEN(20)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(21)  IOORDER(16)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  obj_yg(1210, 480, 1315, 585)    "IB1020BB"  TABORDER(22)  IOORDER(17)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  e_YG(470, 25, 525, 45)  LEN(20)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(23)  IOORDER(18)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  e_sq(1345, 210, 1465, 229)  LEN(20)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(24)  IOORDER(19)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  edServerMsg(885, 50, 985, 75)  LEN(10)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(25)  IOORDER(20)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL0(5, 1, 500, 21)  'ⓘ 주식자동주문은 KRX 한국거래소시장의 정규장(영업일 09:00 ~ 15:20)만 이용 가능합니다'  AL_LEFT  CUR(0)      COLOR(208, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  BUTTON3(935, 25, 991, 45)  '도움말'  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(208, 186)  CUR(0)    "4btn.bmp"    TABORDER(26)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+CONTROL  CONTROL0(1270, 415, 1375, 435)  |FA_PROTECT  "CX_DOWNLOAD"  "/tDONOTNEEDUI"  LEN(0)  EDIT_NOP    COLOR(192, 232)  TABORDER(0)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+
+Dim ginitFinish
+ginitFinish = False
+
+'***************************************************************************
+' 주식자동주문 알림 내역 클릭시 내역조회 보여주기용 함수
+'***************************************************************************
+Sub SetHisListTab()
+	tab_condType.ID = 6
+
+	'obj_condlist.SetRect 0,60,1000,675
+	obj_condlist.SetRect 0,80,1000,695
+	obj_condlist.SetObject "IB102014"
+
+	OBJ_sise.SetObject "IB102022"
+
+	obj_currSise.SetObject "IB102022"
+	obj_currSise.Visible = False
+	OBJ_sise.Visible = False
+	PANEL_hoga.Visible = False
+	PANEL1.Visible = False
+	tab_hoga.Visible = False
+
+	S1301.Visible = False
+	OBJ_hnam.SetObject "IB102022"
+	OBJ_hnam.Visible = False
+	BUTTON1.Visible = False
+	BUTTON2.Visible = False
+
+	obj_svrCond.Visible = False
+
+	If Trim(edServerMsg.Data) = "3" Then  '//(매도) 감시조건을 충족  /주문내역보기
+		SCREEN.Object("obj_condlist.tab_Type").ID = 0
+	ElseIf Trim(edServerMsg.Data) = "4" Then   '//(매수) 감시조건을 충족  /주문내역보기
+		SCREEN.Object("obj_condlist.tab_Type").ID = 0
+	ElseIf Trim(edServerMsg.Data) = "5" Then   '//(신규편입매도) 감시조건을 충족  /주문내역보기
+		SCREEN.Object("obj_condlist.tab_Type").ID = 0
+	ElseIf Trim(edServerMsg.Data) = "6" Then   ' //조건만료  /감시내역보기
+		SCREEN.Object("obj_condlist.tab_Type").ID = 1
+	ElseIf Trim(edServerMsg.Data) = "8" Then		'//착오방지
+		SCREEN.Object("obj_condlist.tab_Type").ID = 1
+	End If
+
+	SCREEN.Proc "obj_condlist.SetObj", ""
+End Sub
+
+
+'***************************************************************************
+' DESC : 계좌 setting
+'***************************************************************************
+Sub Set_account()
+	SCREEN.ClearAll 0, 2
+	e_YG.Data = ""
+	'b_send.Enable = True
+	ACNM.Data = AN5A.name
+	'비밀번호 자동입력 사용 안함 ...일단..
+	pswd2.Data = ""'AN5A.Password
+	If Trim(AN5A.Data) = "" Then
+		AN5A.SetFocus
+		Exit Sub
+	End If
+	If Trim(pswd2.Data) = "" Then
+		pswd2.SetFocus
+		Exit Sub
+	End If
+End Sub
+
+
+'====================================
+'조건저장 성공후 리스트 재조회 하기 위해서
+'====================================
+Sub refreshList()
+
+	If Trim(pswd2.Data) = "" Then
+		pswd2.SetFocus
+		Exit Sub
+	End If
+
+
+	SCREEN.Proc "obj_condlist.DisplayCondList", ""
+	SCREEN.Proc "obj_condlist.obj_svrcondlist.refreshList", ""
+
+End Sub
+
+
+Sub clickcondTypeTab()
+	obj_currSise.Visible = True
+	OBJ_sise.Visible = True
+	PANEL_hoga.Visible = True
+	PANEL1.Visible = True
+	tab_hoga.Visible = True
+
+	S1301.Enable  True
+	BUTTON1.Enable True
+	BUTTON2.Enable True
+	S1301.Visible = True
+	OBJ_hnam.Visible = True
+	BUTTON1.Visible = True
+	BUTTON2.Visible = True
+
+	obj_svrCond.Visible = True
+
+	Select Case tab_condType.ID
+	Case 7 :
+		'obj_condlist.SetRect 0,60,660,395
+		obj_condlist.SetRect 0,80,660,415
+		obj_condlist.SetObject "IB102010"
+		obj_svrCond.SetObject "IB102002"
+		S1301.Enable  False
+		BUTTON1.Enable False
+		BUTTON2.Enable False
+	Case 2 :
+		'obj_condlist.SetRect 0,60,660,395
+		obj_condlist.SetRect 0,80,660,415
+		obj_condlist.SetObject "IB102010"
+		obj_svrCond.SetObject "IB102003"
+
+	Case 5 :
+		'obj_condlist.SetRect 0,60,660,395
+		obj_condlist.SetRect 0,80,660,415
+		obj_condlist.SetObject "IB102010"
+		obj_svrCond.SetObject "IB102004"
+	Case 6 :
+		'obj_condlist.SetRect 0,60,1000,675
+		obj_condlist.SetRect 0,80,1000,695
+		obj_condlist.SetObject "IB102014"
+
+		OBJ_sise.SetObject "IB102022"
+
+		obj_currSise.SetObject "IB102022"
+		obj_currSise.Visible = False
+		OBJ_sise.Visible = False
+		PANEL_hoga.Visible = False
+		PANEL1.Visible = False
+		tab_hoga.Visible = False
+
+		S1301.Visible = False
+		OBJ_hnam.SetObject "IB102022"
+		OBJ_hnam.Visible = False
+		BUTTON1.Visible = False
+		BUTTON2.Visible = False
+
+		obj_svrCond.Visible = False
+
+
+	End Select
+
+
+	If Trim(pswd2.Data) = "" Or Trim(e_YG.Data) = "" Then
+		obj_condlist.SetObject "IB102022"
+		obj_svrCond.SetObject "IB102023"
+
+		'내역 조회 보다 계좌 바뀌는 경우임 호가 obj 화면들 원복 시키려고
+		If tab_condType.ID <> 6 And OBJ_sise.GetObject = "IB102022" Then
+			OBJ_hnam.SetObject "IB2000YJ"
+			OBJ_hnam.Visible = True
+			OBJ_hnam.Send
+
+			obj_currSise.SetObject "IB102021"
+			obj_currSise.Visible = True
+			obj_currSise.Send
+			Call click_hogaTab()
+		End If
+
+		pswd2.SetFocus
+		Exit Sub
+	End If
+
+
+	If tab_condType.ID <> 6 And OBJ_sise.GetObject = "IB102022" Then
+		OBJ_hnam.SetObject "IB2000YJ"
+		obj_currSise.SetObject "IB102021"
+		OBJ_hnam.Visible = True
+		OBJ_hnam.Send
+
+		obj_currSise.SetObject "IB102021"
+		obj_currSise.Visible = True
+		obj_currSise.Send
+
+		Call click_hogaTab()
+	End If
+
+	SCREEN.Proc "obj_condlist.SetObj", ""
+
+
+	Call InitItemCode()
+
+End Sub
+
+
+Sub click_hogaTab()
+
+	Select Case tab_hoga.ID
+	Case 0 : OBJ_sise.SetObject "IB102020"
+
+			Call SetHogaVisible()
+	Case 1 : OBJ_sise.SetObject "IB102044"
+
+	End Select
+
+	OBJ_sise.Send
+End Sub
+
+
+Sub send_sise_all(xval)
+SCREEN.IgnoreChange True
+If xval <> "jumun" And xval <> "account" Then
+	S1301.Trigger "", False
+End If
+S1301.Trigger "1301", True
+
+OBJ_hnam.Send
+OBJ_sise.Send
+obj_currSise.Send
+
+If tab_condType.ID = 7 Or tab_condType.ID = 5 Or tab_condType.ID = 2 Then
+	If obj_svrCond.GetObject <> "IB102023" Then
+		SCREEN.Object("obj_svrCond.e_jcode").data = S1301.Data
+		SCREEN.Object("obj_svrCond.e_jname").data = SCREEN.GetName(100, S1301.Data, 0)
+		SCREEN.Object("obj_svrCond.e_crdt").data = "00"
+		SCREEN.Object("obj_svrCond.e_ldate").data = ""
+	'	SCREEN.Object("obj_svrCond.e_avprc").data = e_avprc.Data
+
+		SCREEN.Proc "obj_svrCond.SetJanInfo", "ITEMCHANGE"
+	End If
+End If
+
+SCREEN.IgnoreChange False
+
+End Sub
+
+
+Sub send_ItemInfo(xval)
+	If xval = "JANGOINFO" Then
+		'잔고 더블클릭으로 들어온 정보 처리
+		If tab_condType.ID = 7 Or tab_condType.ID = 5 Or tab_condType.ID = 2 Then
+			'잔고청산
+			SCREEN.Object("obj_svrCond.e_jcode").data = e_jcode.Data
+			SCREEN.Object("obj_svrCond.e_jname").data = e_jname.Data
+			SCREEN.Object("obj_svrCond.e_crdt").data = e_crdt.Data
+			SCREEN.Object("obj_svrCond.e_ldate").data = e_ldate.Data
+			SCREEN.Object("obj_svrCond.e_avprc").data = e_avprc.Data
+
+			SCREEN.Proc "obj_svrCond.SetJanInfo", "JANGOINFO"
+
+		End If
+	ElseIf xval = "SVR_CONDLIST_B" Then
+		'매수조건리스트에서 더블클릭
+		SCREEN.Object("obj_svrCond.e_sq").data = e_sq.Data
+		SCREEN.Object("obj_svrCond.e_avprc").data = e_avprc.Data
+		SCREEN.Proc "obj_svrCond.LoadCond", ""
+	End If
+
+End Sub
+
+Sub SetHogaVisible()
+	If  OBJ_sise.GetObject = "IB102020" Then
+		Sindex = "0"
+		If SCREEN.CreateObject("Info") Then
+			Sindex = Trim(INFO.PopData(LOGIN.Name, "userconf.ini", "IB102020", "HOGA_INDEX"))
+			If Len(Sindex) = 0 Then
+				INFO.PushData LOGIN.Name, "userconf.ini", "IB1001E0", "HOGA_INDEX", "0"
+				Sindex = "0"
+			End If
+		End If
+
+		OBJ_sise.Proc "ProcSetVisible", Sindex
+	End If
+End Sub
+
+'현재가 셋팅
+Sub Set_prc(data)
+	If Trim(data) = "" Then
+		Exit Sub
+	End If
+	MsgBox data
+
+End Sub
+
+Sub CheckPwFinish()
+	'서버자동주문 약정동의 체크
+	SCREEN.Object("obj_yg.zAcntNo").Data = Trim(AN5A.Data)
+	SCREEN.Object("obj_yg.zPwd").Data = Trim(pswd2.Data)
+	obj_yg.Send
+End Sub
+
+Sub SVR_YG(szVal)
+	If szVal = "YES" Then
+		b_Yak.Text = "자동주문 서비스 변경/해지"
+		e_YG.Data = "Y"
+		Call clickcondTypeTab()
+		Call SVR_SendStart()
+	Else
+		b_Yak.Text = "자동주문 서비스 신청"
+		e_YG.Data = "N"
+		szok = MsgBox("주식자동주문 서비스를 신청하셔야"& vbCrLf &"이용하실 수 있어요."& vbCrLf &"서비스신청을 하시겠어요?" ,1, "IBK투자증권")
+
+		If szok <> "1" Then
+			SCREEN.CloseWindow
+		Else
+			SCREEN.SetTimer 5, True
+		End If
+
+	End If
+End Sub
+
+Sub SVR_SendStart()
+	SCREEN.Proc "obj_condlist.sendData", "QRY"
+End Sub
+
+Sub InitItemCode()
+If tab_condType.ID = 7 Or tab_condType.ID = 5 Or tab_condType.ID = 2 Then
+
+	SCREEN.Object("obj_svrCond.e_jcode").data = S1301.Data
+	SCREEN.Object("obj_svrCond.e_jname").data = SCREEN.GetName(100, S1301.Data, 0)
+	SCREEN.Object("obj_svrCond.e_crdt").data = "00"
+	SCREEN.Object("obj_svrCond.e_ldate").data = ""
+'	SCREEN.Object("obj_svrCond.e_avprc").data = e_avprc.Data
+
+	SCREEN.Proc "obj_svrCond.SetJanInfo", "ITEMCHANGE"
+End If
+
+End Sub
+
+Sub ShowYG_POPUP()
+	Dim title, dmsg
+	dmsg  = "ACNT"  & vbTab & Trim(AN5A.Data)& vbLf & "e_YG"  & vbTab & Trim(e_YG.Data) & vbLf
+	SCREEN.CreateWindow 2, "IB1020AA /p5 /d", dmsg
+
+	Call CheckPwFinish()
+End Sub
+
+_AW_ONSTART_AW_
+
+'==============================================
+'실시간 호가 관련 화면 한번 아래 소스 로 바꿧다 다시 로드 되면
+'화면 깜박임이 사라짐;;;
+OBJ_sise.SetObject "IB102022"
+obj_currSise.SetObject "IB102022"
+obj_currSise.Visible = False
+OBJ_sise.Visible = False
+'==============================================
+
+
+SCREEN.Proc "obj_condlist.SetObj", ""
+
+ginitFinish = True
+
+_AW_ONENDSUB_AW_
+_AW_ONTIMER_AW_
+Call ShowYG_POPUP()
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(tab_condType)
+_AW_ONCLICK_AW_
+If Trim(pswd2.Data) = "" Or Trim(e_YG.Data) = "" Then
+	tab_condType.ID = 7
+	Exit Sub
+End If
+
+Call clickcondTypeTab()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(AN5A)
+_AW_ONCHANGE_AW_
+Dim logdata
+Call Set_account()	'-- 계좌명, 비밀번호 설정
+
+e_YG.Data = ""
+tab_condType.ID = 7
+Call clickcondTypeTab()
+
+pswd2.SetFocus
+
+'SCREEN.Proc  "objX.OnClear", ""
+'SCREEN.Proc "OBJ02.ClearGrid" , ""
+
+'initialize()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(pswd2)
+_AW_ONKEYCHANGE_AW_
+	If Len(Trim(pswd2.Data)) < 4 Then
+		GUIDE.Text = "비밀번호를 확인하여 주십시오."
+		MsgBox "비밀번호를 확인하십시오", , "IBK투자증권"
+		pswd2.SetFocus
+		Exit Sub
+	End If
+
+	SCREEN.Object("obj_chkPW.IntaccNo").data = Trim(AN5A.Data)
+	SCREEN.Object("obj_chkPW.Pwd").data = Trim(pswd2.Data)
+	SCREEN.Object("obj_chkPW.chk").data = "1"
+	obj_chkPW.Send
+
+'	Call TaxRateSend()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(b_Acc)
+_AW_ONCLICK_AW_
+	If Len(Trim(pswd2.Data)) < 4 Then
+		GUIDE.Text = "비밀번호를 확인하여 주십시오."
+		MsgBox "비밀번호를 확인하십시오", , "IBK투자증권"
+		pswd2.SetFocus
+		Exit Sub
+	End If
+
+	SCREEN.Object("obj_chkPW.IntaccNo").data = Trim(AN5A.Data)
+	SCREEN.Object("obj_chkPW.Pwd").data = Trim(pswd2.Data)
+	SCREEN.Object("obj_chkPW.chk").data = "1"
+	obj_chkPW.Send
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(b_Yak)
+_AW_ONCLICK_AW_
+
+Call ShowYG_POPUP()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(1301)
+_AW_ONCHANGE_AW_
+If Trim(S1301.Data) = "000000" Or Trim(S1301.Data) = "" Then
+	Exit Sub
+End If
+
+'내역조회 보는중에 종목조회 안함
+If tab_condType.ID = 6 Then
+	Exit Sub
+End If
+
+'그외 서버자동주문 가능 종목 체크
+'코스피: 1 코스닥 :2 ETF:6 ETN : 27 만 가능
+Dim szCheckType
+szCheckType = SCREEN.GetName(199,Trim(S1301.Data),0)
+'szCheckType = SCREEN.GetCodeType(Trim(S1301.Data))
+If  szCheckType = "1" Or szCheckType = "2" Or szCheckType = "6" Or szCheckType = "27" Then
+Else
+	If ginitFinish = True Then
+		MsgBox "코스피, 코스닥, ETF, ETN 종목만" & vbCrLf &"주식자동주문 설정이 가능합니다.", , "IBK투자증권"
+	Else
+		GUIDE.Text = "코스피, 코스닥, ETF, ETN 종목만 주식자동주문 설정이 가능합니다."
+	End If
+End If
+
+Call send_sise_all("main")
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON2)
+_AW_ONCLICK_AW_
+Dim retn
+retn = SCREEN.GetCode(100, "1301", "hnam", 0 )
+If retn <> True Then
+      Exit Sub
+End If
+
+'Call send_sise_all("main")
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(ctl_Category)
+_AW_ONCLICK_AW_
+Dim codx
+codx = ctl_Category.GetPreCode(S1301.Data)
+If Trim(codx) = "" Then
+	Exit Sub
+End If
+S1301.Data = codx
+S1301.Trigger "",True
+
+Call send_sise_all("main")
+_AW_ONENDSUB_AW_
+_AW_ONDBLCLK_AW_
+Dim codx
+codx = ctl_Category.GetNextCode(S1301.Data)
+If Trim(codx) = "" Then
+	Exit Sub
+End If
+S1301.Data = codx
+S1301.Trigger "",True
+
+Call send_sise_all("main")
+_AW_ONENDSUB_AW_
+_AW_ONCHANGE_AW_
+S1301.Data = ctl_Category.GetCurCode
+S1301.Trigger "",True
+
+Call send_sise_all("main")
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON1)
+_AW_ONCLICK_AW_
+SCREEN.CreateWindow 1, "IB202201 /t/s/p5/d", "appendCODE" & _
+			vbTab & S1301.Data & vbLf
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(tab_hoga)
+_AW_ONCLICK_AW_
+Call click_hogaTab()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(bt_Hoga2)
+_AW_ONCLICK_AW_
+SIndex = 0
+
+OBJ_sise.Proc "ChangeHoga", ""
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON0)
+_AW_ONCLICK_AW_
+
+Dim codx
+codx = S1301.Data
+MsgBox codx
+MsgBox SCREEN.GetCodeType(codx)
+
+e_jcode.Data = codx
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(edServerMsg)
+_AW_ONCHANGE_AW_
+
+If Trim(AN5A.Data) = "" Then
+	Exit Sub
+End If
+If Trim(pswd2.Data) = "" Then
+	Exit Sub
+End If
+
+If Trim(e_YG.Data) <> "Y" Then
+	Exit Sub
+End If
+
+If Trim(edServerMsg.Data) = "0" Then   '재조회
+	If tab_condType.ID = 7 Or tab_condType.ID = 2 Or tab_condType.ID = 5 Then
+		SCREEN.Proc "obj_condlist.obj_svrcondlist.refreshList", ""
+	End If
+ElseIf Trim(edServerMsg.Data) = "1" Then '서비스 신청되었음
+
+ElseIf Trim(edServerMsg.Data) = "2" Then '서비스 해지
+
+ElseIf Trim(edServerMsg.Data) = "3" Then  '//(매도) 감시조건을 충족  /주문내역보기
+	Call SetHisListTab ()
+ElseIf Trim(edServerMsg.Data) = "4" Then   '//(매수) 감시조건을 충족  /주문내역보기
+	Call SetHisListTab ()
+ElseIf Trim(edServerMsg.Data) = "5" Then   '//(신규편입매도) 감시조건을 충족  /주문내역보기
+	Call SetHisListTab ()
+ElseIf Trim(edServerMsg.Data) = "6" Then   ' //조건만료  /감시내역보기
+	Call SetHisListTab ()
+ElseIf Trim(edServerMsg.Data) = "8" Then   ' //착오방지  /감시내역보기
+	Call SetHisListTab ()
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON3)
+_AW_ONCLICK_AW_
+Dim url, urlchk
+url = "https://www.ibks.com/hts/hts_noticeview.do?seq=5712"
+urlchk = CONTROL0.CheckURLEnable(url)
+
+If urlchk = -1 Or urlchk = 404 Then
+	SCREEN.CreateWindow 1, "IB910000 /t/s/p5", ""
+Else
+	SYSTEM.Navigate url
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

@@ -1,0 +1,159 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB594014)
+MAPSIZE(142, 584)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("5940 출금가능금액")
+MAPPUBLIC(";")
+FONT("굴림", 9, NORMAL)
+OPTIONS(ENCODE)
+TITLE("5940 외화출금가능금액")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("piboPBxQ")
+MAPTYPE(FIXED)
+HEADER(LEDGER)
+TRXH("14CSDPNQ181")
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL21(5, -5, 495, 139)  LIMAGE(0)  LINEW(4)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    RESIZABLE  AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL10(20, 45, 68, 65)  '계좌번호'  AL_CENTER  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(66, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL19(20, 66, 70, 86)  '통화코드'  AL_LEFT  CUR(0)      COLOR(208, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  ed_acno(80, 45, 207, 65)  LEN(20)  IO_MIXED|EDIT_INOUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(1)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  zIn(80, 26, 155, 46)  LEN(5)  IO_MIXED|EDIT_INOUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("00001")          TABORDER(2)  IOORDER(1)  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  lb_in(20, 26, 68, 46)  'in'  AL_LEFT  CUR(0)      COLOR(208, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  ed_crycode(80, 66, 155, 86)  LEN(3)  IO_MIXED|EDIT_INOUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(3)  IOORDER(3)  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  o_ocnt(315, 18, 465, 38)  LEN(5)  IO_NUM|AL_CENTER|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL16(215, 18, 288, 38)  'O CNT'  AL_CENTER  CUR(0)      COLOR(195, 232)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  o_crycode(315, 39, 465, 59)  LEN(3)  IO_MIXED|AL_CENTER||FA_CORGB|SA_COSUP    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(5)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  o_fcurrdps(315, 60, 465, 80)  LEN(17)  IO_NUM|AL_CENTER|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(6)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL4(215, 40, 288, 60)  '통화코드'  AL_CENTER  CUR(0)      COLOR(195, 232)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL5(215, 60, 315, 80)  '외화출금가능금액'  AL_CENTER  CUR(0)      COLOR(195, 232)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON0(480, 20, 545, 65)  TP_PUSH      AL_CENTER    FOCUS  COLOR(208, 232)  CUR(0)      TABORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  OUTPUT0(5, 100, 860, 120)  LEN(100)  IO_MIXED|AL_LEFT||FA_SKIP    COLOR(192, 69)  CUR(0)            TABORDER(0)  IOORDER(7)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Dim Istep, strtmp
+
+Sub send_f()
+	Istep = 0
+	SCREEN.Send 0
+End Sub
+
+_AW_ONINDECLARE_AW_
+#load IB888833
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+LEDGER.Rcnt = "0008"
+
+If Istep = 0 Then
+	ed_crycode.Data = "USD"
+ElseIf Istep = 1 Then
+	ed_crycode.Data = "CNY"
+ElseIf Istep = 2 Then
+	ed_crycode.Data = "HKD"
+ElseIf Istep = 3 Then
+	ed_crycode.Data = "EUR" 
+ElseIf Istep = 4 Then
+	ed_crycode.Data = "JPY"  
+End If
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+Dim ecod
+Dim i, j
+
+ecod = Left(Trim(LEDGER.Emsg), 4)
+
+'SYSTEM.Trace "IB594014 " &Istep & "  "  & o_crycode.Data & "   " &  o_fcurrdps.Data
+strtmp = strtmp & "   " & o_fcurrdps.Data
+OUTPUT0.Data = strtmp
+
+If Istep = 0 Then
+	SCREEN.proc "parent.setgrid","USD, " &  o_fcurrdps.Data
+	ed_crycode.Data = "CNY"
+ElseIf Istep = 1 Then
+	SCREEN.proc "parent.setgrid","CNY, " &  o_fcurrdps.Data
+	ed_crycode.Data = "HKD"
+ElseIf Istep = 2 Then
+	SCREEN.proc "parent.setgrid","HKD, " &  o_fcurrdps.Data
+	ed_crycode.Data = "EUR"
+ElseIf Istep = 3 Then
+	SCREEN.proc "parent.setgrid","EUR, " &  o_fcurrdps.Data
+	ed_crycode.Data = "JPY"
+ElseIf Istep = 4 Then
+	SCREEN.proc "parent.setgrid","JPY, " &  o_fcurrdps.Data
+	Exit Sub
+End If
+
+Istep = Istep + 1
+
+SCREEN.Send 0
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(ed_acno)
+_AW_ONCHANGE_AW_
+'Call Set_account()	'-- 계좌명, 비밀번호 설정
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(zIn)
+_AW_ONCHANGE_AW_
+'ctrl_code.SetIMAXGroup IMAXGROUP.Data
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(ed_crycode)
+_AW_ONCHANGE_AW_
+'ctrl_code.SetIMAXGroup IMAXGROUP.Data
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON0)
+_AW_ONCLICK_AW_
+ed_acno.Data = "00110011689"
+send_f()
+
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

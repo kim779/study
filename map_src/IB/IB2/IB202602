@@ -1,0 +1,508 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB202602)
+MAPSIZE(499, 692)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(FLASH)
+TITLE("IBKS추천종목")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pihorsdt")
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+EDIT  gubun(895, 87, 970, 112)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("1")          TABORDER(2)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON1(652, 3, 688, 23)  '조회'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, BOLD)  FOCUS  COLOR(208, 186)  CUR(0)    "조회btn.bmp"    TABORDER(1)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+GRID  301300(3, 26, 688, 261)  VISIBLEROW(15)  CELLH(18)  MATRIX(2000, 14)  FIX(10)  MAINCOLOR(7, 0)  LINECOLOR(75)  FOCUSCOLOR(78)  FOCUSKIND(4)    FONT("굴림체", 9, NORMAL)  ROWC(68, 77)  |FLEXIBLE|VSCROLL|NO3D|RROW|XHLINE|PAGE|HEADER|KEYFOCUS|GRFTEXT    &
+	COLINFO("1021")  LEN(12)  WIDTH(80)  HEAD("종목코드")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_ALPHA|EDIT_OUTPUT  |FA_FLASH    COLOR(192, 232)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col3")  LEN(8)  WIDTH(70)  HEAD("추천일")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  COLUMN_SORT  INORMAL  EDITFORMAT("9999/99/99")    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("001")  LEN(40)  WIDTH(100)  HEAD("종목명")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  COLHELPTEXT("1301")  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT  |FA_ZEROSUP|FA_REF|FA_DRAG|SA_SPACE    COLOR(68, 69)  COLCUR(0, 0)  REFERENCE(1301)    COLUMN_VISIBLE  COLUMN_SORT  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("2023")  LEN(9)  WIDTH(61)  HEAD("현재가")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_REF)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSUP    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  COLUMN_SORT  INORMAL  IFRGB(94, 95)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("2024")  LEN(8)  WIDTH(69)  HEAD("대비")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|FA_CONTRAST|SA_SPACE|SA_CORAW|SA_TEXT    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  COLUMN_SORT  INORMAL  IFRGB(94, 95)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("2033")  LEN(7)  WIDTH(49)  HEAD("등락률")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSIGN    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  COLUMN_SORT  INORMAL  IFRGB(94, 95)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("2027")  LEN(10)  WIDTH(76)  HEAD("거래량")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|SA_SPACE    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  COLUMN_SORT  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("002")  LEN(9)  WIDTH(78)  HEAD("추천전일종가")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_FLASH|SA_SPACE    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  COLUMN_SORT  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("727")  LEN(9)  WIDTH(67)  HEAD("목표주가")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|SA_SPACE    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  COLUMN_SORT  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("741")  LEN(10)  WIDTH(48)  HEAD("수익률")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSIGN    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  COLUMN_SORT  INORMAL  IFRGB(94, 95)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("725")  LEN(10)  WIDTH(51)  HEAD("벤치마크")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSIGN    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  COLUMN_SORT  INORMAL  IFRGB(94, 95)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col0")  LEN(8)  WIDTH(80)  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_NUM|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col1")  LEN(1)  WIDTH(80)  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_NUM|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("1301")  LEN(6)  WIDTH(80)  HEAD("종목코드")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_NUM|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    TABORDER(4)  IOORDER(3)  ENABLE  &
+  VISIBLE
+
+BUTTON  RADIO2(56, 4, 103, 21)  '종목'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(GROUP0)      COLOR(208, 130)  CUR(0)      TABORDER(5)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  RADIO3(8, 5, 48, 22)  '전체'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(GROUP0)      COLOR(208, 130)  CUR(0)      TABORDER(6)  ENABLE  &
+  VISIBLE  CHECKED  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  BUTTON2(167, 2, 186, 22)  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(15, 63)  CUR(0)    "검색.BMP"    TABORDER(7)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+CONTROL  1301(102, 2, 167, 22)  |FA_PROTECT|FA_FLASH  "CX_CODECTRL"  "/u0/k검색.BMP/lAXCOMBO.BMP/s0/o"  LEN(6)  EDIT_INPUT    COLOR(192, 130)  TABORDER(12)  IOORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+GROUP  GROUP0(815, 215, 935, 265)  'Group'        COLOR(-1, 232)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  OBJECT0(3, 295, 688, 491)    "IB202603"  TABORDER(8)  IOORDER(5)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  IsuNo(743, 110, 813, 135)  LEN(7)  IO_NUM|AL_CENTER|    COLOR(68, 69)  CUR(0)            TABORDER(0)  IOORDER(6)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  jusik_nm2(720, 661, 865, 681)  LEN(40)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_SKIP  FONT("굴림체", 9, BOLD)    COLOR(90, 98)  CUR(0)  TP_SUNKEN          TABORDER(9)  IOORDER(7)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  OBJECT1(780, 427, 845, 472)    "IB202604"  TABORDER(10)  IOORDER(8)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  OBJECT2(855, 432, 920, 477)    "IB202605"  TABORDER(11)  IOORDER(9)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  pa1(752, 327, 822, 352)  LEN(10)  IO_NUM|AL_CENTER|    COLOR(68, 69)  CUR(0)            TABORDER(0)  IOORDER(10)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  pa2(827, 327, 897, 352)  LEN(10)  IO_NUM|AL_CENTER|    COLOR(68, 69)  CUR(0)            TABORDER(0)  IOORDER(11)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  EDIT0(746, 70, 821, 95)  LEN(6)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(3)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+USRTAB  UTAB1(3, 267, 688, 293)  FOCUS  INDEX(0)  COUNT(2)  AL_TOP  TAB_IMAGE        COLOR(3, 70)  CUR(0)  TABIMAGE("tab.bmp")  FCOLOR(3, 71)  CAPTION("추천사유", "참고사항")  TABINFO("1:1", "1:2")  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  OBJECT3(3, 295, 688, 491)    "IB202606"  TABORDER(13)  IOORDER(12)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  jusik_nm(189, 3, 331, 21)  'Label'  AL_LEFT  FONT("굴림체", 9, BOLD)  CUR(0)      COLOR(90, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BOX  BOX6(187, 2, 332, 22)    COLOR(98, 98)  LINEW(1)  BX_2CLR    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  EDIT1(743, 153, 846, 178)  LEN(6)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(14)  IOORDER(13)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Dim fg, fg2
+fg2 = 0
+Sub Set1301(Data)
+
+	SCREEN.IgnoreChange True
+	S1301.Data = Data
+
+
+	If Len(Trim(Data)) = 6 Then
+		S1301.Data = Trim(Data)
+	End If
+
+	If Trim(S1301.Data) = "000000" Or Trim(S1301.Data) = "" Then
+		Exit Sub
+	End If
+	EDIT0.data = S1301.data
+'
+	jusik_nm.Data = SCREEN.GetName(100, S1301.Data, 0)
+
+	If SCREEN.CreateObject("INFO") = True Then
+		INFO.PushData LOGIN.Name, "userconf.ini", "IB202600", "POPUP_FLAG", 1
+	End If
+
+	SCREEN.Send 0
+	SCREEN.IgnoreChange False
+End Sub
+
+Sub grid_Click()
+	Dim data
+
+	data = Mid( Trim(S301300.GetGridCell(S301300.row, 1)) , 2, 6)
+
+
+	If Trim(IsuNo.Data) <> data Then
+		IsuNo.Data = data
+		If Len(IsuNo.Data) < 6 Then
+			Exit Sub
+		Else
+			SCREEN.Proc "OBJECT0.send_f", ""
+			If RADIO2.Checked = True Then
+				S1301.Data = IsuNo.Data
+				jusik_nm.Data = SCREEN.GetName(100, S1301.Data, 0)
+			End If
+		End If
+
+	End If
+
+	If RADIO3.Checked = True Then
+		S301300.SetFocus()
+		If fg2 <> 0 Then
+			S1301.Data = IsuNo.Data
+		Else
+			fg2 = 1
+		End If
+	End If
+
+	UTAB1.ID = 1
+	OBJECT0.Visible = True
+	OBJECT3.Visible = False
+
+	'S1301.Data = IsuNo.Data
+
+End Sub
+
+
+Sub send_f()
+	Dim flag
+
+	If SCREEN.CreateObject("INFO") = True Then
+			flag =  Trim(INFO.PopData(LOGIN.Name, "userconf.ini", "IB202600", "POPUP_FLAG"))
+			If Len(Trim(flag)) = 0 Then
+				flag = 0
+			End If
+	End If
+
+	If flag <> 1  And RADIO3.Checked = True Then
+		EDIT0.Data = ""
+	End If
+
+	SCREEN.Send 0
+'S301300.SetFocus()
+End Sub
+
+
+Sub  Onalert()
+Dim i, data, data2, bmsp, data3
+	For i = 1 To S301300.Rows
+		'data = FormatNumber(Trim(GRID0.GetGridCell (i, 4))*100, 2, 0, 0, 0)
+		If Trim(S301300.GetGridCell (i, 8)) <> "" Then
+			If Int(Trim(S301300.GetGridCell (i, 8))) <> 0  Then
+				data = Round((Abs(S301300.GetGridCell (i, 4)) - Trim(S301300.GetGridCell (i, 8))) / Trim(S301300.GetGridCell (i, 8)) * 100 ,2)
+
+				If data > 0 Then
+				'data = "+"& data
+					S301300.SetGridCell i, 10, "+" & FormatNumber(data, 2, 0, 0, 0) & "%"
+				Else
+					S301300.SetGridCell i, 10, FormatNumber(data, 2, 0, 0, 0) & "%"
+				End If
+			End If
+		End If
+	Next
+End Sub
+
+
+Sub p_write_ini()
+	If SCREEN.CreateObject("INFO") = True Then
+			INFO.PushData LOGIN.Name, "userconf.ini", "IB202600", "POPUP_FLAG", 0
+	End If
+End Sub
+
+Sub p_write_ini2()
+	If SCREEN.CreateObject("INFO") = True Then
+			INFO.PushData LOGIN.Name, "userconf.ini", "IB202600", "POPUP_FLAG", 1
+	End If
+End Sub
+
+Sub p_read_ini()
+	If SCREEN.CreateObject("INFO") = True Then
+		fg =  Trim(INFO.PopData(LOGIN.Name, "userconf.ini", "IB202600", "POPUP_FLAG"))
+ 	End If
+End Sub
+
+
+
+Sub  Onalert2()
+Dim i, data, data2, bmsp, data3
+	For i = 1 To S301300.Rows
+		If Trim(pa1.Data) = "" Or Trim(pa2.Data) = "" Then
+			Exit Sub
+		End If
+
+		If S301300.GetGridCell (i, 13) = "1" Then ' 지수값
+			data2 = Abs(Trim(pa1.Data))
+		ElseIf S301300.GetGridCell (i, 13) = "2" Then
+			data2 = Abs(Trim(pa2.Data))
+		Else
+			Exit Sub
+		End If
+
+			If Trim(S301300.GetGridCell (i, 12)) <> "" Then
+				If Int(Trim(S301300.GetGridCell (i, 12))) <> 0 Then
+					bmsp = Trim(S301300.GetGridCell (i, 12))/100
+
+					data3 = bmsp - data2
+					data2 = Round((Abs( data2 - bmsp) / bmsp) *100  ,2)
+
+
+					If data3 < 0 Then
+						S301300.SetGridCell i, 11, "+" & FormatNumber(data2, 2, 0, 0, 0) & "%"
+					ElseIf data3 = 0 Then
+						S301300.SetGridCell i, 11, FormatNumber(data2, 2, 0, 0, 0) & "%"
+					Else
+						S301300.SetGridCell i, 11, "-" & FormatNumber(data2, 2, 0, 0, 0) & "%"
+					End If
+				End If
+			End If
+	Next
+End Sub
+
+_AW_ONSEND_AW_
+
+
+Dim flag, f2
+If SCREEN.CreateObject("INFO") = True Then
+		flag =  Trim(INFO.PopData(LOGIN.Name, "userconf.ini", "IB202600", "POPUP_FLAG"))
+		f2 =  Trim(INFO.PopData(LOGIN.Name, "userconf.ini", "IB202600", "POPUP_CODE"))
+
+		If Len(Trim(flag)) = 0 Then
+				flag = 0
+		End If
+End If
+
+If flag = 1 Then
+	If Len(Trim(EDIT0.data)) = 0  Then
+		RADIO3.Checked = True
+		RADIO2.Checked = False
+		S1301.Clear
+		jusik_nm.Clear
+	Else
+		RADIO2.Checked = True
+		RADIO3.Checked = False
+
+		S1301.Visible = True
+		jusik_nm.Visible = True
+		BUTTON2.Visible = True
+		BOX6.Visible = True
+
+	End If
+
+Else
+	Dim fg2
+	If SCREEN.CreateObject("INFO") = True Then
+		fg2 =  Trim(INFO.PopData(LOGIN.Name, "userconf.ini", "IB202600", "POPUP_CODE"))
+ 	End If
+
+	'If Len(Trim(S1301.data)) = 6 Then
+	If Len(Trim(fg2)) = 6 Then
+		RADIO2.Checked = True
+		RADIO3.Checked = False
+
+		S1301.Visible = True
+		jusik_nm.Visible = True
+		BUTTON2.Visible = True
+
+		EDIT0.Data = S1301.data
+
+	Else
+
+		RADIO3.Checked = True
+		RADIO2.Checked = False
+
+		IsuNo.data = "000000"
+		S1301.data = "000000"
+		jusik_nm.Clear
+		EDIT0.data = "000000"
+		S1301.Visible = False
+		jusik_nm.Visible = False
+		BUTTON2.Visible = False
+		BOX6.Visible = False
+	End If
+
+End If
+
+S301300.SetFocus()
+
+If SCREEN.CreateObject("INFO") = True Then
+		INFO.PushData LOGIN.Name, "userconf.ini", "IB202600", "POPUP_CODE", ""
+End If
+
+'SCREEN.Send 0
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+'If RADIO3.Checked = True Then
+	S301300.Index 0
+	S301300.Row = 1
+	S301300.SetFocus()
+'End If
+
+'For i = 1 To S301300.Rows
+'	S301300.SetGridCell i, 14, Mid( Trim(S301300.GetGridCell(i, 2)) , 2, 6)
+'Next
+
+
+Call grid_Click()
+
+_AW_ONENDSUB_AW_
+_AW_ONTIMER_AW_
+'
+
+_AW_ONENDSUB_AW_
+_AW_ONCLOSE_AW_
+Call p_write_ini()
+
+If SCREEN.CreateObject("INFO") = True Then
+		INFO.PushData LOGIN.Name, "userconf.ini", "IB202600", "POPUP_CODE", ""
+End If
+
+_AW_ONENDSUB_AW_
+_AW_ONKEY_AW_
+If SCREEN.key = 13  Then
+	SCREEN.Onsend = False
+End If
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(BUTTON1)
+_AW_ONCLICK_AW_
+If Len(Trim(S1301.data)) = 6 Then
+	If RADIO2.checked = True Then
+		EDIT0.Data = S1301.data
+		BOX6.Visible = True
+	Else
+		S1301.Data = ""
+		BOX6.Visible = False
+	End If
+
+	Call send_f()
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(301300)
+_AW_ONCLICK_AW_
+
+If S301300.HitPos = 3 Then
+	Call grid_Click()
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(RADIO2)
+_AW_ONCLICK_AW_
+Call p_write_ini2()
+
+If SCREEN.CreateObject("INFO") = True Then
+		INFO.PushData LOGIN.Name, "userconf.ini", "IB202600", "POPUP_CODE", ""
+End If
+
+
+S1301.Clear
+jusik_nm.Clear
+EDIT0.Clear
+
+S1301.Visible = True
+jusik_nm.Visible = True
+BUTTON2.Visible = True
+BOX6.Visible = True
+S301300.SetFocus()
+S1301.SetFocus()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(RADIO3)
+_AW_ONCLICK_AW_
+S1301.Clear
+jusik_nm.Clear
+EDIT0.Clear
+S1301.Visible = False
+jusik_nm.Visible = False
+BUTTON2.Visible = False
+IsuNo.Clear
+BOX6.Visible = False
+
+If SCREEN.CreateObject("INFO") = True Then
+		INFO.PushData LOGIN.Name, "userconf.ini", "IB202600", "POPUP_CODE", ""
+End If
+
+Call p_write_ini()
+Call send_f()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON2)
+_AW_ONCLICK_AW_
+Dim retn
+retn = SCREEN.GetCode(100, "EDIT1", "jusik_nm", 0 )
+If retn <> True Then
+      Exit Sub
+End If
+S1301.Data = EDIT1.Data
+EDIT0.Data = EDIT1.Data
+SCREEN.Send 0
+'SCREEN.Proc "parent.send_sise", "sise" & "," & S1301.Data
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(1301)
+_AW_ONCHANGE_AW_
+'SCREEN.IgnoreChange  True
+'SCREEN.SetTimer 3 , False
+'
+'S301300.SetFocus()
+'SCREEN.IgnoreChange False
+
+'SCREEN.SetTimer 3 , False
+
+'SCREEN.IgnoreChange  True
+
+'SCREEN.IgnoreChange False
+
+
+Dim tmp
+If SCREEN.CreateObject("INFO") = True Then
+	tmp =  Trim(INFO.PopData(LOGIN.Name, "userconf.ini", "IB202600", "POPUP_CODE"))
+End If
+
+If Len(Trim(tmp)) = 6 Then
+	S1301.Data = Trim(tmp)
+End If
+
+If Trim(S1301.Data) = "000000" Or Trim(S1301.Data) = "" Then
+	Exit Sub
+End If
+EDIT0.data = S1301.data
+'
+jusik_nm.Data = SCREEN.GetName(100, S1301.Data, 0)
+
+Call send_f()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(UTAB1)
+_AW_ONCLICK_AW_
+Select Case UTAB1.ID
+Case 1
+	'OBJECT0.SetObject ("IB202603")
+	OBJECT0.Visible = True
+	OBJECT3.Visible = False
+Case 2
+	'OBJECT0.SetObject ("IB202606")
+	OBJECT0.Visible = False
+	OBJECT3.Visible = True
+Case Else
+	Exit Sub
+End Select
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(EDIT1)
+_AW_ONCHANGE_AW_
+
+S1301.Data = EDIT1.Data
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

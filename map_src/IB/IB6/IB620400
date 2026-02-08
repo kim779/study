@@ -1,0 +1,227 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB620400)
+MAPSIZE(448, 690)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("RP 매도")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(CR2TAB)
+TITLE("[6204]RP매매취소")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL1(-3, 27, 693, 427)  LIMAGE(0)  LINEW(5)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL18(0, 0, 690, 27)  LINETYPE(3)  LINECOLOR(64)      COLOR(66, 0)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  zPwd(326, 3, 386, 23)  LEN(8)  IO_MIXED|EDIT_INPUT|FA_PASSWD|FA_WRAP|FA_ENUM  FONT("굴림체", 9, NORMAL)    COLOR(192, 130)  CUR(0)  TP_SUNKEN    ENCRYPT("ACCN")        TABORDER(2)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+CONTROL  AN51(57, 3, 197, 23)    "CX_Account"  "/w0"  LEN(11)  EDIT_INPUT  FONT("굴림체", 9, NORMAL)    COLOR(68, 130)  TABORDER(1)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  ACNM(198, 3, 262, 23)  LEN(20)  IO_MIXED|AL_LEFT||FA_SKIP  FONT("굴림체", 9, NORMAL)    COLOR(160, 130)  CUR(0)  LINECOLOR(89)          TABORDER(0)  IOORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL1(6, 3, 54, 23)  '계좌번호'  AL_LEFT  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(208, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL3(274, 3, 322, 23)  '비밀번호'  AL_LEFT  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(208, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+COMBO  zRpBnsTp(532, 3, 607, 23)  TP_SUNKEN  LEN(1)  COUNT(3)  VCOUNT(3)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_NUM|EDIT_INPUT    COLOR(192, 130)  CUR(0)  DISPLAY("수시", "일반", "수익자유")  DATA("2", "1", "7")    TABORDER(5)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL4(493, 3, 530, 23)  'RP구분'  AL_LEFT  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(208, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+OBJECT  OBJ(6, 36, 684, 418)    "IB620420"  TABORDER(8)  IOORDER(5)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  lRpDays(84, 498, 201, 519)  LEN(6)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("+00000")          TABORDER(9)  IOORDER(6)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL20(-2, 425, 692, 449)  LIMAGE(0)  LINEW(3)  LINETYPE(4)  LINECOLOR(64)      COLOR(34, 97)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL21(4, 430, 18, 444)    |IMAGE|AL_STRETCH    COLOR(34, 232)  CUR(0)    "알림_ic.bmp"  ENABLE  &
+  VISIBLE  TRANSPARENT  IMAGE  HINTTYPE(IH_NONE)
+PANEL  GUIDE(20, 428, 680, 446)        COLOR(34, 97)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  send_btn(610, 3, 647, 23)  '조회'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, BOLD)  FOCUS  COLOR(208, 186)  CUR(0)    "조회btn.bmp"    TABORDER(6)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+BUTTON  next_btn(648, 3, 684, 23)  '다음'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, NORMAL)  COLOR(208, 186)  CUR(0)    "2btn.bmp"    TABORDER(7)  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+BUTTON  masuRadio(396, 3, 437, 23)  '매수'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(mmgbGR)      COLOR(66, 130)  CUR(0)      TABORDER(3)  ENABLE  &
+  VISIBLE  CHECKED  HINTTYPE(IH_NONE)
+BUTTON  madoRadio(441, 3, 482, 23)  '매도'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(mmgbGR)      COLOR(66, 130)  CUR(0)      TABORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BOX  BOX2(391, 3, 488, 23)    COLOR(165, 232)  LINEW(1)  BX_LINE    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+GROUP  mmgbGr(116, 568, 236, 618)  'Group'        COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Option Explicit
+
+Sub Set_account()
+	SCREEN.ClearAll 2, 2
+	GUIDE.Text = ""
+
+	If Len(Trim(AN51.Data)) = 11 Then
+		ACNM.Data = Trim(AN51.Name)
+		zPwd.Data = Trim(AN51.Password)
+
+		If Len(Trim(zPwd.Data)) < 4 Then
+			zPwd.SetFocus
+		End If
+	Else
+		AN51.SetFocus
+	End If
+End Sub
+
+
+Sub SetMmgbScr()
+	next_btn.Enable = False
+	GUIDE.Text = ""
+
+	If masuRadio.Checked = True Then
+		OBJ.SetObject "IB620420"
+	Else
+		OBJ.SetObject "IB620410"
+	End If
+End Sub
+
+
+Function inpot(data, plen)
+	Dim tlen, fdat, bdat
+
+	tlen = Len(data)
+
+	fdat = Left(data, tlen - plen)
+	bdat = Right(data, plen)
+
+	inpot = fdat & "." & bdat
+End Function
+
+Sub DoOrder()
+	Dim dmsg
+	If Error_check() = False Then			'주문전 Error Check
+		Exit Sub
+	End If
+
+	dmsg = "o_acno" & vbTab & AN51.Data & vbLf &_
+			"o_acnm" & vbTab & ACNM.Data & vbLf &_
+			"o_juno" & vbTab & CDbl(lSettNo.Data) & vbLf &_
+			"o_gubn" & vbTab & COMBO.Text & vbLf &_
+			"o_rpgb" & vbTab & zRpBnsTp.text & vbLf
+
+	SCREEN.CreateWindow 2, "IB620405 /p5 /d", dmsg
+
+	If SYSTEM.Pop("rp_cancel_order") <> "OK" Then
+		Exit Sub
+	End If
+
+	OBJ.Send		'주문전송
+End Sub
+
+Function Error_check()
+	Error_check = False
+	If Trim(AN51.Data) = "" Then
+		MsgBox "계좌번호를 확인하십시오.", , "IBK투자증권"
+		AN51.SetFocus
+		Exit Function
+	End If
+	If Len(Trim(zPwd.Data)) < 4 Then
+		MsgBox "비밀번호를 확인하십시오.", , "IBK투자증권"
+		zPwd.SetFocus
+		Exit Function
+	End If
+
+	If CDbl(lSettNo.Data) = 0 Then
+		MsgBox "매매번호를 확인하십시오.", , "IBK투자증권"
+		lSettNo.SetFocus
+		Exit Function
+	End If
+
+	Error_check = True
+End Function
+
+_AW_ONINDECLARE_AW_
+#LOAD IB888833
+
+_AW_ONENDSUB_AW_
+_AW_ONSTART_AW_
+'If SCREEN.GetMapName(1) = "IB620400" Then
+	AN51.AgentType = 5	'금융상품매매대리인(5), 자금대체 대리인(6) 세팅
+'End If
+
+Call SetMmgbScr()
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(zPwd)
+_AW_ONKEYCHANGE_AW_
+If SCREEN.Key = 13 Then
+	If CheckInput(AN51, zPwd) = True Then
+		send_btn.SetFocus
+	End If
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(AN51)
+_AW_ONCHANGE_AW_
+Call Set_account()	'-- 계좌명, 비밀번호 설정
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(zRpBnsTp)
+_AW_ONCHANGE_AW_
+SCREEN.Proc "OBJ.OBJ.send_f", ""
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(send_btn)
+_AW_ONCLICK_AW_
+SCREEN.Proc "OBJ.OBJ.send_f", ""
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(next_btn)
+_AW_ONCLICK_AW_
+SCREEN.Proc "OBJ.OBJ.send_c", ""
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(masuRadio)
+_AW_ONCLICK_AW_
+Call SetMmgbScr()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(madoRadio)
+_AW_ONCLICK_AW_
+Call SetMmgbScr()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

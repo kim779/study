@@ -1,0 +1,252 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB810217)
+MAPSIZE(189, 796)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("약정계좌조회")
+MAPPUBLIC(";")
+FONT("굴림", 9, NORMAL)
+OPTIONS(ENCODE|CR2TAB)
+TITLE("약정계좌번호조회")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("piboPBxQ")
+MAPTYPE(FIXED)
+HEADER(LEDGER)
+TRXH("33CSACMQ913")
+}
+
+
+
+FORM DIVISION
+{
+
+GROUP  grp1(5, 79, 199, 155)  'INPUT'        COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+GROUP  GROUP0(224, 80, 487, 154)  'OUTPUT'        COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  In(94, 101, 179, 117)  LEN(5)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("00001")          TABORDER(1)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL9(13, 101, 91, 117)  '레코드갯수'        COLOR(66, 76)  CUR(0)    AL_LEFT    ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  zElecfnUserId(94, 118, 179, 134)  LEN(16)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(2)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL0(13, 118, 91, 134)  '전자금융사용자ID'        COLOR(66, 76)  CUR(0)    AL_LEFT    ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  OUTPUT(241, 101, 476, 117)  LEN(21)  IO_MIXED|AL_LEFT|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(3)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  Out(332, 118, 422, 136)  LEN(1)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSUP    COLOR(192, 232)  CUR(0)  LINECOLOR(75)          IFRGB(232, 232)  TABORDER(0)  IOORDER(4)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL13(241, 118, 331, 136)  '레코드'  LINECOLOR(0)      COLOR(74, 76)  CUR(0)    AL_LEFT    ENABLE  &
+  HINTTYPE(IH_NONE)
+GRID  GRID0(0, 0, 795, 85)  VISIBLEROW(0)  CELLH(18)  MATRIX(200, 18)  FIX(0)  MAINCOLOR(7, 232)  LINECOLOR(75)  FOCUSCOLOR(78)  FOCUSKIND(4)    FONT("굴림체", 9, NORMAL)  ROWC(68, 77)  |FLEXIBLE|VSCROLL|HSCROLL|NO3D|RROW|GRFTEXT    &
+	COLINFO("Col0")  LEN(2)  WIDTH(38)  HEAD("상품유형코드")  COLALIGN(AL_LEFT, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col1")  LEN(40)  WIDTH(80)  HEAD("상품유형명")  COLALIGN(AL_LEFT, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col2")  LEN(1)  WIDTH(20)  HEAD("계좌계층구분")  COLALIGN(AL_LEFT, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col3")  LEN(20)  WIDTH(80)  HEAD("계좌구분")  COLALIGN(AL_LEFT, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col4")  LEN(2)  WIDTH(25)  HEAD("계좌상태코드")  COLALIGN(AL_LEFT, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col5")  LEN(40)  WIDTH(80)  HEAD("계좌상태명")  COLALIGN(AL_LEFT, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col6")  LEN(3)  WIDTH(36)  HEAD("지점번호")  COLALIGN(AL_LEFT, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col7")  LEN(40)  WIDTH(80)  HEAD("지점명")  COLALIGN(AL_LEFT, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col8")  LEN(20)  WIDTH(110)  HEAD("계좌번호")  COLALIGN(AL_LEFT, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  EDITFORMAT("999-99-999999999999999")    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col9")  LEN(40)  WIDTH(80)  HEAD("계좌명")  COLALIGN(AL_LEFT, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col10")  LEN(1)  WIDTH(18)  HEAD("동일인여부")  COLALIGN(AL_LEFT, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col11")  LEN(40)  WIDTH(80)  HEAD("동일인여부")  COLALIGN(AL_LEFT, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col12")  LEN(8)  WIDTH(80)  HEAD("만기일")  COLALIGN(AL_LEFT, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col13")  LEN(1)  WIDTH(38)  HEAD("랩상품구분")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("HtsRegYn")  LEN(1)  WIDTH(38)  HEAD("HTS약정여부")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("MtsCtrctYn")  LEN(1)  WIDTH(38)  HEAD("MTS약정여부")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("PsTp")  LEN(1)  WIDTH(38)  HEAD("개인법인구분")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("PsTpNm")  LEN(40)  WIDTH(38)  HEAD("개인법인구분명")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    TABORDER(3)  IOORDER(5)  ENABLE
+BUTTON  send_btn(610, 85, 642, 105)  '조회'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, NORMAL)  COLOR(208, 232)  CUR(0)    "2btn.bmp"    TABORDER(4)  ENABLE  &
+  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+EDIT  YChk(755, 149, 775, 168)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("0")          TABORDER(5)  IOORDER(6)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL0(490, 149, 755, 169)  'SACAQ519서비스에서약정된계좌가나왔는지체크'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+'== 첫 조회
+Sub send_f()
+	LEDGER.Fkey = "C"
+	SCREEN.Send 0
+End Sub
+
+'== 연속 조회
+Sub send_c()
+	LEDGER.Fkey = "7"
+	GRID0.SetDataPosition(2)
+	SCREEN.Send 0
+End Sub
+
+Dim user_acc, item, items, account519, add_item
+Dim account(100), count913, ii, jj, a, b, bIn, final_acct(100), fCount
+
+Sub AcctSetting()
+	user_acc = Trim(SCREEN.Object("parent.CMB_ACCT").Text)
+
+	item = ""
+	items = ""
+	count913 = 0
+'	SYSTEM.Trace "selectAcct : " & user_acc
+'	SYSTEM.Trace "FindYackAcct in 519 Service : " & YChk.Data
+	For ii=1 To GRID0.Rows
+		If Trim(GRID0.getgridcell(ii, 9)) <> "" Then
+
+			item = Trim(GRID0.GetGridtext(ii,9))
+
+			If Mid(item,5,2) <> "00" And Len(Trim(GRID0.GetGridCell(ii,9))) = 11 Then
+
+				'앞 3자리 뒤에 6자리가 같은 계좌는 추가, 가운데까지 같은 계좌는 제외
+				If Mid(user_acc,1,3) = Mid(item, 1,3) Then
+					If Mid(user_acc,8,6) = Mid(item, 8,6) Then
+						If Mid(user_acc,5,2) <> Mid(item, 5,2) And Mid(item, 5,2) <> "00" Then
+							If Mid(item, 5,2) = "10" Or Mid(item, 5,2) = "11" Or Mid(item, 5,2) = "30" Then
+								items = items & vbTab & item
+								account(count913) = Trim(Replace(item, "-", ""))
+								count913 = count913 + 1
+'								SYSTEM.Trace "account_913 Service : " & item
+							End If
+						End If
+					End If
+				End If
+			End If
+		End If
+	Next
+
+'	SYSTEM.Trace "count of 913 : " & count913
+
+	'1일경우 519서비스에서 약정된 계좌가 안나왔음으로 선택한 계좌의 상품구분만 틀린 계좌만 보여준다
+	If Trim(YChk.Data) = "1" Then
+		SCREEN.Object("parent.CMB_ACCT2").SetItems("")
+		SCREEN.Object("parent.CMB_ACCT2").SetItems(items)
+		Exit Sub
+	End If
+
+	'다른 계좌중에 약정된 계좌는 보여준다
+	'SACAQ519에서 현재 등록된 계좌외에에 모든 약정계좌를 뿌려준다
+	For ii=1 To SCREEN.Object("parent.obj_yackAccnStatus.GRID0").Rows
+
+		If Trim(SCREEN.Object("parent.obj_yackAccnStatus.GRID0").getgridcell(ii, 5)) <> "" Then
+
+			account519 = Trim(SCREEN.Object("parent.obj_yackAccnStatus.GRID0").GetGridtext(ii,5))
+
+			a = -1
+
+			For jj=1 To count913
+				If account519 = account(jj) Then
+					a = 0
+				End If
+			Next
+
+
+
+			If a = -1 Then
+				add_item = Mid(account519,1,3) & "-" & Mid(account519,4,2) & "-" & Mid(account519,6,6)
+'				SYSTEM.Trace "account_519 Service : " & add_item
+				items = items & vbTab & add_item
+			End If
+		End If
+
+	Next
+
+	SCREEN.Object("parent.CMB_ACCT2").SetItems(items)
+End Sub
+
+_AW_ONSEND_AW_
+SCREEN.ClearAll 0,2
+LEDGER.Rcnt = "0025"
+zElecfnUserId.Data = LEDGER.Usid
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+GRID0.Sort 9, True, True
+
+Dim ii, jj, items, item, account, account519
+If Trim(LEDGER.Next) = "Y" Then
+	send_c()
+Else
+	Call AcctSetting()
+
+'	For ii=1 To GRID0.Rows
+'		If Trim(GRID0.getgridcell(ii, 9)) <> "" Then
+'			item = Trim(GRID0.GetGridtext(ii,9))
+'			If Mid(item,5,2) <> "00" And Len(Trim(GRID0.GetGridCell(ii,9))) = 11 Then
+'
+'				user_acc = Trim(SCREEN.Object("parent.CMB_ACCT").Text)
+
+				'같은 계좌만 보이도록 조회
+'				If Mid(user_acc,1,3) = Mid(item, 1,3) Then
+'					If Mid(user_acc,8,6) = Mid(item, 8,6) Then
+'						items = items & vbTab & item
+'					End If
+				'다른 계좌중에 약정된 계좌는 보여준다
+				'SACAQ519와 비교하여 zOppIttAcntNo가 같을 경우엔 913의 계좌를 Append 한다
+'				Else
+'					account = Replace(item, "-", "")
+'
+'					For jj=1 To SCREEN.Object("parent.CHECK_RELAACCT.GRID0").Rows
+'
+'						If Trim(SCREEN.Object("parent.CHECK_RELAACCT.GRID0").getgridcell(jj, 5)) <> "" Then
+'							account519 = Trim(SCREEN.Object("parent.CHECK_RELAACCT.GRID0").GetGridtext(jj,5))
+'
+'							If account = account519 Then
+'								account = Mid(account519,1,3) & "-" & Mid(account519,4,2) & "-" & Mid(account519,6,6)
+'								items = items & vbTab & account
+'							End If
+'
+'						End If
+'					Next
+'				End If
+'
+'
+'			End If
+'		End If
+'	Next
+
+
+	'For jj=1 To SCREEN.Object("parent.CHECK_RELAACCT.GRID0").Rows
+	'
+	'	If Trim(SCREEN.Object("parent.CHECK_RELAACCT.GRID0").getgridcell(jj, 5)) <> "" Then
+	'		item = Trim(SCREEN.Object("parent.CHECK_RELAACCT.GRID0").GetGridtext(jj,5))
+	'
+	'		If Mid(item,5,2) <> "00" And Len(Trim(SCREEN.Object("parent.CHECK_RELAACCT.GRID0").GetGridCell(jj,5))) = 11 Then
+	'			items = items & vbTab & item
+	'		End If
+	'	End If
+	'Next
+
+'	SCREEN.Object("parent.CMB_ACCT2").SetItems(items)
+'	SCREEN.Object("parent.AMT").SetFocus
+End If
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(Out)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(GRID0)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(send_btn)
+_AW_ONCLICK_AW_
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

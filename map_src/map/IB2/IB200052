@@ -1,0 +1,142 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB200052)
+MAPSIZE(247, 655)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("종합_투자")
+MAPPUBLIC(";")
+FONT("굴림", 9, NORMAL)
+OPTIONS(FMS|FLASH|CR2TAB)
+TITLE("종합_투자")
+TOPATH(AXIS)
+METHOD(MENU)
+MAPTYPE(NORM)
+HEADER(NOP)
+BGROUND(BRUSH, 181)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL3(0, 136, 655, 247)        COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL0(0, 0, 655, 27)        COLOR(66, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  rVol(6, 4, 44, 24)  '수량'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(grp1)      COLOR(16, 130)  CUR(0)      TABORDER(1)  ENABLE  &
+  VISIBLE  CHECKED  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  rAmt(54, 4, 92, 24)  '금액'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(grp1)      COLOR(16, 130)  CUR(0)      TABORDER(2)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+GROUP  grp1(996, 66, 1036, 91)  'grp1'        COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  OBJ(0, 27, 655, 136)    "IB20005A"  TABORDER(3)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON0(588, 3, 648, 24)  '상세보기'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, NORMAL)  FOCUS  COLOR(208, 69)  CUR(0)    "4BTN.BMP"    TABORDER(4)  ENABLE  &
+  IMAGETEXT  HINTTYPE(IH_NONE)
+LABEL  SYMBOL11(526, 4, 654, 24)  '(단위 천주, 계약, 억원)'  AL_LEFT  CUR(0)      COLOR(68, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+OBJECT  OBJ0(1, 140, 321, 246)    "IB200058"  TABORDER(5)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  OBJ1(326, 140, 646, 246)    "IB200059"  TABORDER(6)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Sub OBJ_setting()
+	SCREEN.SetTimer 4, False
+End Sub
+
+_AW_ONSTART_AW_
+Call OBJ_setting()
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+OBJ.Send
+SCREEN.OnSend False
+
+_AW_ONENDSUB_AW_
+_AW_ONTIMER_AW_
+Dim flag
+
+If SCREEN.CreateObject("Info") Then
+	flag = Trim(INFO.popData (LOGIN.Name, "userconf.ini", SCREEN.GetMapName(1), "200052_RDO1"))
+End If
+
+OBJ0.SetObject "IB200058"
+OBJ1.SetObject "IB200059"
+
+Select Case flag
+	Case "1"
+		OBJ.SetObject "IB20005A"
+		rVol.Checked True
+		rAmt.Checked False
+		SCREEN.Object("OBJ0.gubn").Data = 1
+		SCREEN.Object("OBJ1.gubn").Data = 1
+	Case "0"
+		OBJ.SetObject "IB20005B"
+		rVol.Checked False
+		rAmt.Checked True
+		SCREEN.Object("OBJ0.gubn").Data = 0
+		SCREEN.Object("OBJ1.gubn").Data = 0
+End Select
+
+OBJ.Send
+OBJ0.Send
+OBJ1.Send
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(rVol)
+_AW_ONCLICK_AW_
+OBJ.SetObject "IB20005A"
+
+SCREEN.CreateObject("Info")
+INFO.pushData LOGIN.Name, "userconf.ini", SCREEN.GetMapName(1), "200052_RDO1", "1"
+
+Call OBJ_setting()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(rAmt)
+_AW_ONCLICK_AW_
+OBJ.SetObject "IB20005B"
+
+SCREEN.CreateObject("Info")
+INFO.pushData LOGIN.Name, "userconf.ini", SCREEN.GetMapName(1), "200052_RDO1", "0"
+
+Call OBJ_setting()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON0)
+_AW_ONCLICK_AW_
+'Dim gubn, msg
+'
+'If rVol.Checked = True Then
+'	gubn = 1
+'Else
+'	gubn = 2
+'End If
+'
+'msg = "sect" & vbTab & gubn & vbLf
+
+SCREEN.CreateWindow 1, "IB290800 /p5 /d", ""
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

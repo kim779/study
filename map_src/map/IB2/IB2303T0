@@ -1,0 +1,832 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB2303T0)
+MAPSIZE(367, 502)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("회원매매입체분석")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(FMS|FLASH|DROP)
+TITLE("[IB2303T0] 거래원별 입체분석")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pooppoop")
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL19(0, 0, 820, 29)        COLOR(64, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL1(-2, 29, 667, 406)  LIMAGE(0)  LINEW(4)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL0(1, 0, 503, 27)        COLOR(66, 63)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  17021(74, 554, 150, 572)  LEN(8)  IO_ALPHA|AL_CENTER||FA_FLASH    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  OBJ(2, 30, 501, 366)    "IB2303T1"  TABORDER(3)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  dayb2(680, 5, 722, 25)  '일자별'  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(15, 69)  CUR(10)    "3btn.bmp"    TABORDER(2)  ENABLE  &
+  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+BUTTON  dayb1(419, 4, 461, 24)  '차트'  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(15, 69)  CUR(10)    "3btn.bmp"    TABORDER(1)  ENABLE  &
+  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+EDIT  mode(32, 555, 66, 576)  LEN(1)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("T")          TABORDER(4)  IOORDER(3)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  dayb3(553, 582, 595, 602)  '일자별'  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(15, 69)  CUR(10)    "3btn.bmp"    TABORDER(5)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+BUTTON  BUTTON0(88, 3, 107, 23)  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(15, 63)  CUR(10)    "검색.bmp"    TABORDER(6)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+CONTROL  17413(108, 3, 228, 23)    "CX_Symbol"  "/a89/b91/c92/d69"  LEN(0)  EDIT_OUTPUT  FONT("굴림체", 9, NORMAL)    COLOR(90, 130)  TABORDER(0)  IOORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  gubn(31, 580, 65, 601)  LEN(1)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("T")          TABORDER(7)  IOORDER(5)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  dayb4(510, 582, 552, 602)  '차트'  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(15, 69)  CUR(10)    "3btn.bmp"    TABORDER(8)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+COMBO  COMBO0(225, 575, 295, 595)  TP_NONE  LEN(1)  COUNT(3)  VCOUNT(3)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_NUM|EDIT_INPUT    COLOR(192, 232)  CUR(0)  DISPLAY("매수/매도", "순매수", "순매도")  DATA("1", "2", "3")    TABORDER(9)  IOORDER(6)  ENABLE  &
+  HINTTYPE(IH_NONE)
+COMBO  COMBO1(297, 575, 347, 595)  TP_NONE  LEN(1)  COUNT(2)  VCOUNT(2)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_NUM|EDIT_INPUT    COLOR(192, 232)  CUR(0)  DISPLAY("일자", "시간")  DATA("1", "2")    TABORDER(10)  IOORDER(7)  ENABLE  &
+  HINTTYPE(IH_NONE)
+COMBO  acumdd(73, 430, 150, 449)  TP_NONE  LEN(3)  COUNT(9)  VCOUNT(9)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_NUM|EDIT_INPUT    COLOR(192, 232)  CUR(0)  DISPLAY("당일", "2일누적", "3일누적", "4일누적", "5일누적", "10일누적", "20일누적", "60일누적", "120일누적")  DATA("001", "002", "003", "004", "005", "010", "020", "060", "120")    TABORDER(11)  IOORDER(8)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL2(44, 432, 74, 449)  '기준'        COLOR(68, 69)  CUR(0)    AL_CENTER  FONT("굴림체", 9, NORMAL)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_NONE)
+GROUP  grp1(374, 559, 424, 609)  'grp1'        COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+GROUP  grp2(434, 559, 484, 609)  'grp2'        COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  dt_time(105, 588, 145, 607)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(18)  IOORDER(10)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  msd(105, 568, 145, 587)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(17)  IOORDER(9)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  OUTPUT0(64, 539, 139, 552)  LEN(9)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_SKIP|SA_SPACE    COLOR(74, 94)  CUR(0)            TABORDER(0)  IOORDER(11)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL3(229, 3, 416, 23)  TP_RAISED      COLOR(180, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BOX  BOX2(229, 3, 416, 23)    COLOR(165, 89)  LINEW(1)  BX_LINE    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  Radio(234, 3, 302, 23)  '매수/매도'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(grp1)      COLOR(66, 69)  CUR(0)      TABORDER(12)  ENABLE  &
+  VISIBLE  CHECKED  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  RADIO0(307, 3, 357, 23)  '순매수'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(grp1)      COLOR(66, 69)  CUR(0)      TABORDER(13)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  RADIO1(361, 3, 411, 23)  '순매도'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(grp1)      COLOR(66, 69)  CUR(0)      TABORDER(14)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  RADIO2(58, 455, 99, 475)  '일자'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(grp2)      COLOR(66, 69)  CUR(0)      TABORDER(15)  ENABLE  &
+  CHECKED  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  RADIO3(101, 455, 143, 475)  '시간'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(grp2)      COLOR(66, 69)  CUR(0)      TABORDER(16)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_NONE)
+CONTROL  cxMarket(3, 3, 23, 23)  |FA_SKIP  "CX_MarketPicker"  "/k2/t/u1/d1"  LEN(12)  EDIT_NOP    COLOR(192, 232)  TABORDER(0)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  1777(859, 316, 879, 336)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("2")          TABORDER(19)  IOORDER(12)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL4(690, 316, 860, 336)  '시장구분 1:KRX 2:NXT 3:통합'  LINECOLOR(238)      COLOR(200, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  edMarketTrigger(690, 340, 780, 360)  LEN(6)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(20)  IOORDER(13)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+CONTROL  1301(24, 3, 89, 23)  |FA_PROTECT  "CX_CODECTRL"  "/u0/k검색.BMP/lAXCOMBO.BMP/p/s0/o"  LEN(6)  EDIT_INPUT    COLOR(192, 130)  TABORDER(21)  IOORDER(14)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Option Explicit
+cxMarket.sMarket = LoadMKGubn
+Const myFILE = "userconf.ini"
+
+Dim trcd(8)	'회원사코드
+Dim vol(8)  '순매수/순매도/매수/매도 수량
+Dim nrec	'유효회원사 수
+
+Function get_trcd(data)
+
+	Dim ii, pos, volpos		'data안의 위치를 나타냄.
+
+	get_trcd = False
+
+	SCREEN.ClearAll 2, 2
+
+	For ii = 0 To 7
+		trcd(ii) = 0
+	Next
+
+	nrec = 0
+	nrec = Trim(Mid(data, 1, 4))
+
+'	SYSTEM.Trace "REC COUNT : " & nrec
+
+	If nrec = "0" Or nrec = "" Then
+
+		SCREEN.Object("obj.obj1.box0").PRgb = 0
+		SCREEN.Object("obj.obj2.box0").PRgb = 0
+		SCREEN.Object("obj.obj3.box0").PRgb = 0
+		SCREEN.Object("obj.obj4.box0").PRgb = 0
+		SCREEN.Object("obj.obj5.box0").PRgb = 0
+		SCREEN.Object("obj.obj6.box0").PRgb = 0
+		SCREEN.Object("obj.obj7.box0").PRgb = 0
+		SCREEN.Object("obj.obj8.box0").PRgb = 0
+		dayb1.Visible = True
+		dayb2.Visible = True
+
+		If gubn.data="D" Then '차트인 경우 컨트롤 초기화 별도처리
+			SCREEN.Object("OBJ.OBJ1.obj.CONTROL0").Clear
+			SCREEN.Object("OBJ.OBJ2.obj.CONTROL0").Clear
+			SCREEN.Object("OBJ.OBJ3.obj.CONTROL0").Clear
+			SCREEN.Object("OBJ.OBJ4.obj.CONTROL0").Clear
+			SCREEN.Object("OBJ.OBJ5.obj.CONTROL0").Clear
+			SCREEN.Object("OBJ.OBJ6.obj.CONTROL0").Clear
+			SCREEN.Object("OBJ.OBJ7.obj.CONTROL0").Clear
+			SCREEN.Object("OBJ.OBJ8.obj.CONTROL0").Clear
+		End If
+
+		Exit Function
+
+	End If
+
+	pos = 5
+	volpos = 8
+
+	For ii = 0 To nrec-1
+		trcd(ii) = Trim(Mid(data, pos + 13*ii, 3))
+		vol(ii) = Trim(Mid(data, volpos + 13*ii, 10))
+	Next
+'	For ii = 0 To nrec-1
+'		SYSTEM.Trace "** data(" & ii & ") :: " & trcd(ii) & "|" & vol(ii)
+'	Next
+
+	get_trcd = True
+
+End Function
+
+Function send_obj()
+
+	SCREEN.Object("obj.obj1.box0").PRgb = 0
+	SCREEN.Object("obj.obj2.box0").PRgb = 0
+	SCREEN.Object("obj.obj3.box0").PRgb = 0
+	SCREEN.Object("obj.obj4.box0").PRgb = 0
+	SCREEN.Object("obj.obj5.box0").PRgb = 0
+	SCREEN.Object("obj.obj6.box0").PRgb = 0
+	SCREEN.Object("obj.obj7.box0").PRgb = 0
+	SCREEN.Object("obj.obj8.box0").PRgb = 0
+
+	If msd.Data = "1" Then
+		SCREEN.Object("obj.obj1.obj.knd").data = "1" '매수
+		SCREEN.Object("obj.obj2.obj.knd").data = "1"
+		SCREEN.Object("obj.obj3.obj.knd").data = "1"
+		SCREEN.Object("obj.obj4.obj.knd").data = "1"
+		SCREEN.Object("obj.obj5.obj.knd").data = "2" '매도
+		SCREEN.Object("obj.obj6.obj.knd").data = "2"
+		SCREEN.Object("obj.obj7.obj.knd").data = "2"
+		SCREEN.Object("obj.obj8.obj.knd").data = "2"
+	ElseIf msd.Data = "2" Then
+		SCREEN.Object("obj.obj1.obj.knd").data = "3" '순매수
+		SCREEN.Object("obj.obj2.obj.knd").data = "3"
+		SCREEN.Object("obj.obj3.obj.knd").data = "3"
+		SCREEN.Object("obj.obj4.obj.knd").data = "3"
+		SCREEN.Object("obj.obj5.obj.knd").data = "3"
+		SCREEN.Object("obj.obj6.obj.knd").data = "3"
+		SCREEN.Object("obj.obj7.obj.knd").data = "3"
+		SCREEN.Object("obj.obj8.obj.knd").data = "3"
+	ElseIf msd.Data = "3" Then
+		SCREEN.Object("obj.obj1.obj.knd").data = "4" '순매도
+		SCREEN.Object("obj.obj2.obj.knd").data = "4"
+		SCREEN.Object("obj.obj3.obj.knd").data = "4"
+		SCREEN.Object("obj.obj4.obj.knd").data = "4"
+		SCREEN.Object("obj.obj5.obj.knd").data = "4"
+		SCREEN.Object("obj.obj6.obj.knd").data = "4"
+		SCREEN.Object("obj.obj7.obj.knd").data = "4"
+		SCREEN.Object("obj.obj8.obj.knd").data = "4"
+	End If
+
+	SCREEN.Object("obj.obj1.trcd").data = trcd(0)
+	SCREEN.Object("obj.obj2.trcd").data = trcd(1)
+	SCREEN.Object("obj.obj3.trcd").data = "0"
+	SCREEN.Object("obj.obj4.trcd").data = "0"
+	SCREEN.Object("obj.obj5.trcd").data = "0"
+	SCREEN.Object("obj.obj6.trcd").data = "0"
+	SCREEN.Object("obj.obj7.trcd").data = "0"
+	SCREEN.Object("obj.obj8.trcd").data = "0"
+	SCREEN.Object("obj.obj1.obj.OUTPUT0").data = vol(0)
+	SCREEN.Object("obj.obj2.obj.OUTPUT0").data = vol(1)
+	SCREEN.Object("obj.obj3.obj.OUTPUT0").data = ""
+	SCREEN.Object("obj.obj4.obj.OUTPUT0").data = ""
+	SCREEN.Object("obj.obj5.obj.OUTPUT0").data = ""
+	SCREEN.Object("obj.obj6.obj.OUTPUT0").data = ""
+	SCREEN.Object("obj.obj7.obj.OUTPUT0").data = ""
+	SCREEN.Object("obj.obj8.obj.OUTPUT0").data = ""
+
+	Select Case nrec
+	    Case 1
+	    	SCREEN.Object("obj.obj2.box0").PRgb = 0
+			SCREEN.Object("obj.obj3.box0").PRgb = 0
+			SCREEN.Object("obj.obj4.box0").PRgb = 0
+			SCREEN.Object("obj.obj5.box0").PRgb = 0
+			SCREEN.Object("obj.obj6.box0").PRgb = 0
+			SCREEN.Object("obj.obj7.box0").PRgb = 0
+			SCREEN.Object("obj.obj8.box0").PRgb = 0
+	    Case 2
+			SCREEN.Object("obj.obj3.box0").PRgb = 0
+			SCREEN.Object("obj.obj4.box0").PRgb = 0
+			SCREEN.Object("obj.obj5.box0").PRgb = 0
+			SCREEN.Object("obj.obj6.box0").PRgb = 0
+			SCREEN.Object("obj.obj7.box0").PRgb = 0
+			SCREEN.Object("obj.obj8.box0").PRgb = 0
+		Case 3
+			SCREEN.Object("obj.obj1.trcd").data = trcd(0)
+			SCREEN.Object("obj.obj2.trcd").data = trcd(1)
+			SCREEN.Object("obj.obj5.trcd").data = trcd(2)
+			SCREEN.Object("obj.obj1.obj.OUTPUT0").data = vol(0)
+			SCREEN.Object("obj.obj2.obj.OUTPUT0").data = vol(1)
+			SCREEN.Object("obj.obj5.obj.OUTPUT0").data = vol(2)
+			SCREEN.Object("obj.obj3.box0").PRgb = 0
+			SCREEN.Object("obj.obj4.box0").PRgb = 0
+			SCREEN.Object("obj.obj6.box0").PRgb = 0
+			SCREEN.Object("obj.obj7.box0").PRgb = 0
+			SCREEN.Object("obj.obj8.box0").PRgb = 0
+		Case 4
+			SCREEN.Object("obj.obj1.trcd").data = trcd(0)
+			SCREEN.Object("obj.obj2.trcd").data = trcd(1)
+			SCREEN.Object("obj.obj5.trcd").data = trcd(2)
+			SCREEN.Object("obj.obj6.trcd").data = trcd(3)
+			SCREEN.Object("obj.obj1.obj.OUTPUT0").data = vol(0)
+			SCREEN.Object("obj.obj2.obj.OUTPUT0").data = vol(1)
+			SCREEN.Object("obj.obj5.obj.OUTPUT0").data = vol(2)
+			SCREEN.Object("obj.obj6.obj.OUTPUT0").data = vol(3)
+			SCREEN.Object("obj.obj3.box0").PRgb = 0
+			SCREEN.Object("obj.obj4.box0").PRgb = 0
+			SCREEN.Object("obj.obj7.box0").PRgb = 0
+			SCREEN.Object("obj.obj8.box0").PRgb = 0
+		Case 5
+			SCREEN.Object("obj.obj1.trcd").data = trcd(0)
+			SCREEN.Object("obj.obj2.trcd").data = trcd(1)
+			SCREEN.Object("obj.obj3.trcd").data = trcd(2)
+			SCREEN.Object("obj.obj5.trcd").data = trcd(3)
+			SCREEN.Object("obj.obj6.trcd").data = trcd(4)
+			SCREEN.Object("obj.obj1.obj.OUTPUT0").data = vol(0)
+			SCREEN.Object("obj.obj2.obj.OUTPUT0").data = vol(1)
+			SCREEN.Object("obj.obj3.obj.OUTPUT0").data = vol(2)
+			SCREEN.Object("obj.obj5.obj.OUTPUT0").data = vol(3)
+			SCREEN.Object("obj.obj6.obj.OUTPUT0").data = vol(4)
+			SCREEN.Object("obj.obj4.box0").PRgb = 0
+			SCREEN.Object("obj.obj7.box0").PRgb = 0
+			SCREEN.Object("obj.obj8.box0").PRgb = 0
+		Case 6
+			SCREEN.Object("obj.obj1.trcd").data = trcd(0)
+			SCREEN.Object("obj.obj2.trcd").data = trcd(1)
+			SCREEN.Object("obj.obj3.trcd").data = trcd(2)
+			SCREEN.Object("obj.obj5.trcd").data = trcd(3)
+			SCREEN.Object("obj.obj6.trcd").data = trcd(4)
+			SCREEN.Object("obj.obj7.trcd").data = trcd(5)
+			SCREEN.Object("obj.obj1.obj.OUTPUT0").data = vol(0)
+			SCREEN.Object("obj.obj2.obj.OUTPUT0").data = vol(1)
+			SCREEN.Object("obj.obj3.obj.OUTPUT0").data = vol(2)
+			SCREEN.Object("obj.obj5.obj.OUTPUT0").data = vol(3)
+			SCREEN.Object("obj.obj6.obj.OUTPUT0").data = vol(4)
+			SCREEN.Object("obj.obj7.obj.OUTPUT0").data = vol(5)
+			SCREEN.Object("obj.obj4.box0").PRgb = 0
+			SCREEN.Object("obj.obj8.box0").PRgb = 0
+		Case 7
+			SCREEN.Object("obj.obj1.trcd").data = trcd(0)
+			SCREEN.Object("obj.obj2.trcd").data = trcd(1)
+			SCREEN.Object("obj.obj3.trcd").data = trcd(2)
+			SCREEN.Object("obj.obj4.trcd").data = trcd(3)
+			SCREEN.Object("obj.obj5.trcd").data = trcd(4)
+			SCREEN.Object("obj.obj6.trcd").data = trcd(5)
+			SCREEN.Object("obj.obj7.trcd").data = trcd(6)
+			SCREEN.Object("obj.obj1.obj.OUTPUT0").data = vol(0)
+			SCREEN.Object("obj.obj2.obj.OUTPUT0").data = vol(1)
+			SCREEN.Object("obj.obj3.obj.OUTPUT0").data = vol(2)
+			SCREEN.Object("obj.obj4.obj.OUTPUT0").data = vol(3)
+			SCREEN.Object("obj.obj5.obj.OUTPUT0").data = vol(4)
+			SCREEN.Object("obj.obj6.obj.OUTPUT0").data = vol(5)
+			SCREEN.Object("obj.obj7.obj.OUTPUT0").data = vol(6)
+			SCREEN.Object("obj.obj8.box0").PRgb = 0
+		Case 8
+			SCREEN.Object("obj.obj1.trcd").data = trcd(0)
+			SCREEN.Object("obj.obj2.trcd").data = trcd(1)
+			SCREEN.Object("obj.obj3.trcd").data = trcd(2)
+			SCREEN.Object("obj.obj4.trcd").data = trcd(3)
+			SCREEN.Object("obj.obj5.trcd").data = trcd(4)
+			SCREEN.Object("obj.obj6.trcd").data = trcd(5)
+			SCREEN.Object("obj.obj7.trcd").data = trcd(6)
+			SCREEN.Object("obj.obj8.trcd").data = trcd(7)
+			SCREEN.Object("obj.obj1.obj.OUTPUT0").data = vol(0)
+			SCREEN.Object("obj.obj2.obj.OUTPUT0").data = vol(1)
+			SCREEN.Object("obj.obj3.obj.OUTPUT0").data = vol(2)
+			SCREEN.Object("obj.obj4.obj.OUTPUT0").data = vol(3)
+			SCREEN.Object("obj.obj5.obj.OUTPUT0").data = vol(4)
+			SCREEN.Object("obj.obj6.obj.OUTPUT0").data = vol(5)
+			SCREEN.Object("obj.obj7.obj.OUTPUT0").data = vol(6)
+			SCREEN.Object("obj.obj8.obj.OUTPUT0").data = vol(7)
+	End Select
+
+	OBJ.RSend
+
+End Function
+
+Sub LoadConfig()
+	If SCREEN.CreateObject("INFO") Then
+		mode.Data = Trim(INFO.PopData(LOGIN.Name, myFILE, SCREEN.GetMapName(0), "mode"))
+		gubn.Data = Trim(INFO.PopData(LOGIN.Name, myFILE, SCREEN.GetMapName(0), "gubn"))
+		If Trim(mode.Data) = "" Then
+			mode.Data = "T"
+		End If
+
+		If Trim(gubn.Data) = "" Then
+			gubn.Data = "T"
+		End If
+
+		If mode.Data = "T" Then
+        	acumdd.Data = "001"
+			acumdd.Enable = False
+		End If
+	End If
+End Sub
+
+Sub SaveConfig()
+	If SCREEN.CreateObject("INFO") Then
+		INFO.PushData LOGIN.Name, myFILE, SCREEN.GetMapName(0), "mode", mode.Data
+		INFO.PushData LOGIN.Name, myFILE, SCREEN.GetMapName(0), "gubn", gubn.Data
+	End If
+End Sub
+
+Sub SendReqeust(name)
+
+	' 버튼클릭에 의한 호출일 경우 조회구분값을 토글시킨다.
+	If name="dayb1" Or name="dayb4" Then
+		If gubn.Data = "T" Then
+			gubn.Data = "D"
+		Else
+			gubn.Data = "T"
+		End If
+	ElseIf name="dayb2" Or name="dayb3" Then
+        If RADIO2.Checked = True Then
+        	mode.Data = "D"
+        	acumdd.Data = "001"
+			acumdd.Enable = True
+        ElseIf RADIO3.Checked = True Then
+        	mode.Data = "T"
+        	acumdd.Data = "001"
+			acumdd.Enable = False
+        End If
+'		If mode.Data = "T" Then
+'			mode.Data = "D"
+'		Else
+'			mode.Data = "T"
+'		End If
+	End If
+
+	' 버튼 캡션 설정
+	If mode.Data = "T" Then  '시간
+		dayb2.Text = "일자별"
+		dayb3.Text = "일자별"
+		RADIO3.Checked = True
+	Else                     '일자
+		dayb2.Text = "시간별"
+		dayb3.Text = "시간별"
+		RADIO2.Checked = True
+	End If
+
+	If gubn.data = "T" Then
+		dayb1.Text = "차트"
+		dayb4.Text = "차트"
+	Else
+		dayb1.Text = "데이터"
+		dayb4.Text = "데이터"
+	End If
+
+	' 현재모드에 맞는 Sub맵을 호출한다.
+	If mode.Data="T" And gubn.data="T" Then
+		OBJ.SetObject("IB2303T1")  '시간별데이타
+	ElseIf mode.Data="T" And gubn.data="D" Then
+		OBJ.SetObject("IB2303T3")  '시간별차트
+	ElseIf mode.Data="D" And gubn.data="T" Then
+		OBJ.SetObject("IB2303T2")  '일자별데이타
+	ElseIf mode.Data="D" And gubn.data="D" Then
+		OBJ.SetObject("IB2303T3")  '일자별차트
+	End If
+
+	SCREEN.Service "pibo2303", S1301.Data & msd.Data & "08" & dt_time.Data & acumdd.Data, 13, 0
+
+End Sub
+
+
+Sub send_1obj()
+
+	If msd.Data = "1" Then
+		SCREEN.Object("obj.obj1.obj.knd").data = "1" '매수
+		SCREEN.Object("obj.obj2.obj.knd").data = "1"
+		SCREEN.Object("obj.obj3.obj.knd").data = "1"
+		SCREEN.Object("obj.obj4.obj.knd").data = "1"
+		SCREEN.Object("obj.obj5.obj.knd").data = "2" '매도
+		SCREEN.Object("obj.obj6.obj.knd").data = "2"
+		SCREEN.Object("obj.obj7.obj.knd").data = "2"
+		SCREEN.Object("obj.obj8.obj.knd").data = "2"
+	ElseIf msd.Data = "2" Then
+		SCREEN.Object("obj.obj1.obj.knd").data = "3" '순매수
+		SCREEN.Object("obj.obj2.obj.knd").data = "3"
+		SCREEN.Object("obj.obj3.obj.knd").data = "3"
+		SCREEN.Object("obj.obj4.obj.knd").data = "3"
+		SCREEN.Object("obj.obj5.obj.knd").data = "3"
+		SCREEN.Object("obj.obj6.obj.knd").data = "3"
+		SCREEN.Object("obj.obj7.obj.knd").data = "3"
+		SCREEN.Object("obj.obj8.obj.knd").data = "3"
+	ElseIf msd.Data = "3" Then
+		SCREEN.Object("obj.obj1.obj.knd").data = "4" '순매도
+		SCREEN.Object("obj.obj2.obj.knd").data = "4"
+		SCREEN.Object("obj.obj3.obj.knd").data = "4"
+		SCREEN.Object("obj.obj4.obj.knd").data = "4"
+		SCREEN.Object("obj.obj5.obj.knd").data = "4"
+		SCREEN.Object("obj.obj6.obj.knd").data = "4"
+		SCREEN.Object("obj.obj7.obj.knd").data = "4"
+		SCREEN.Object("obj.obj8.obj.knd").data = "4"
+	End If
+
+	OBJ.RSend
+
+End Sub
+
+
+Sub Set_color
+
+	If CDbl(fn_nvl(SCREEN.Object("obj.obj1.obj.OUTPUT0").data)) >= 0 Then
+		SCREEN.Object("obj.obj1.BOX0").PRgb = 94
+		SCREEN.Object("obj.obj1.obj.OUTPUT0").TRgb = 94
+	ElseIf CDbl(fn_nvl(SCREEN.Object("obj.obj1.obj.OUTPUT0").data)) < 0 Then
+		SCREEN.Object("obj.obj1.BOX0").PRgb = 95
+		SCREEN.Object("obj.obj1.obj.OUTPUT0").TRgb = 95
+	End If
+	If CDbl(fn_nvl(SCREEN.Object("obj.obj2.obj.OUTPUT0").data)) >= 0 Then
+		SCREEN.Object("obj.obj2.BOX0").PRgb = 94
+		SCREEN.Object("obj.obj2.obj.OUTPUT0").TRgb = 94
+	ElseIf CDbl(fn_nvl(SCREEN.Object("obj.obj2.obj.OUTPUT0").data)) < 0 Then
+		SCREEN.Object("obj.obj2.BOX0").PRgb = 95
+		SCREEN.Object("obj.obj2.obj.OUTPUT0").TRgb = 95
+	End If
+	If CDbl(fn_nvl(SCREEN.Object("obj.obj3.obj.OUTPUT0").data)) >= 0 Then
+		SCREEN.Object("obj.obj3.BOX0").PRgb = 94
+		SCREEN.Object("obj.obj3.obj.OUTPUT0").TRgb = 94
+	ElseIf CDbl(fn_nvl(SCREEN.Object("obj.obj3.obj.OUTPUT0").data)) < 0 Then
+		SCREEN.Object("obj.obj3.BOX0").PRgb = 95
+		SCREEN.Object("obj.obj3.obj.OUTPUT0").TRgb = 95
+	End If
+	If CDbl(fn_nvl(SCREEN.Object("obj.obj4.obj.OUTPUT0").data)) >= 0 Then
+		SCREEN.Object("obj.obj4.BOX0").PRgb = 94
+		SCREEN.Object("obj.obj4.obj.OUTPUT0").TRgb = 94
+	ElseIf CDbl(fn_nvl(SCREEN.Object("obj.obj4.obj.OUTPUT0").data)) < 0 Then
+		SCREEN.Object("obj.obj4.BOX0").PRgb = 95
+		SCREEN.Object("obj.obj4.obj.OUTPUT0").TRgb = 95
+	End If
+	If CDbl(fn_nvl(SCREEN.Object("obj.obj5.obj.OUTPUT0").data)) >= 0 Then
+		SCREEN.Object("obj.obj5.BOX0").PRgb = 94
+		SCREEN.Object("obj.obj5.obj.OUTPUT0").TRgb = 94
+	ElseIf CDbl(fn_nvl(SCREEN.Object("obj.obj5.obj.OUTPUT0").data)) < 0 Then
+		SCREEN.Object("obj.obj5.BOX0").PRgb = 95
+		SCREEN.Object("obj.obj5.obj.OUTPUT0").TRgb = 95
+	End If
+	If CDbl(fn_nvl(SCREEN.Object("obj.obj6.obj.OUTPUT0").data)) >= 0 Then
+		SCREEN.Object("obj.obj6.BOX0").PRgb = 94
+		SCREEN.Object("obj.obj6.obj.OUTPUT0").TRgb = 94
+	ElseIf CDbl(fn_nvl(SCREEN.Object("obj.obj6.obj.OUTPUT0").data)) < 0 Then
+		SCREEN.Object("obj.obj6.BOX0").PRgb = 95
+		SCREEN.Object("obj.obj6.obj.OUTPUT0").TRgb = 95
+	End If
+	If CDbl(fn_nvl(SCREEN.Object("obj.obj7.obj.OUTPUT0").data)) >= 0 Then
+		SCREEN.Object("obj.obj7.BOX0").PRgb = 94
+		SCREEN.Object("obj.obj7.obj.OUTPUT0").TRgb = 94
+	ElseIf CDbl(fn_nvl(SCREEN.Object("obj.obj7.obj.OUTPUT0").data)) < 0 Then
+		SCREEN.Object("obj.obj7.BOX0").PRgb = 95
+		SCREEN.Object("obj.obj7.obj.OUTPUT0").TRgb = 95
+	End If
+
+	If CDbl(fn_nvl(SCREEN.Object("obj.obj8.obj.OUTPUT0").data)) >= 0 Then
+		SCREEN.Object("obj.obj8.BOX0").PRgb = 94
+		SCREEN.Object("obj.obj8.obj.OUTPUT0").TRgb = 94
+	ElseIf CDbl(fn_nvl(SCREEN.Object("obj.obj8.obj.OUTPUT0").data)) < 0 Then
+		SCREEN.Object("obj.obj8.BOX0").PRgb = 95
+		SCREEN.Object("obj.obj8.obj.OUTPUT0").TRgb = 95
+	End If
+
+	Dim fogb(8)
+
+	If gubn.Data = "D" And mode.Data = "D" Then '일별차트
+		fogb(1) = Mid(SCREEN.Object("obj.obj1.obj.tnam").Data, 2, 1)
+		fogb(2) = Mid(SCREEN.Object("obj.obj2.obj.tnam").Data, 2, 1)
+		fogb(3) = Mid(SCREEN.Object("obj.obj3.obj.tnam").Data, 2, 1)
+		fogb(4) = Mid(SCREEN.Object("obj.obj4.obj.tnam").Data, 2, 1)
+		fogb(5) = Mid(SCREEN.Object("obj.obj5.obj.tnam").Data, 2, 1)
+		fogb(6) = Mid(SCREEN.Object("obj.obj6.obj.tnam").Data, 2, 1)
+		fogb(7) = Mid(SCREEN.Object("obj.obj7.obj.tnam").Data, 2, 1)
+		fogb(8) = Mid(SCREEN.Object("obj.obj8.obj.tnam").Data, 2, 1)
+	Else
+		fogb(1) = Mid(SCREEN.Object("obj.obj1.obj.tnam").Data, 1, 1)
+		fogb(2) = Mid(SCREEN.Object("obj.obj2.obj.tnam").Data, 1, 1)
+		fogb(3) = Mid(SCREEN.Object("obj.obj3.obj.tnam").Data, 1, 1)
+		fogb(4) = Mid(SCREEN.Object("obj.obj4.obj.tnam").Data, 1, 1)
+		fogb(5) = Mid(SCREEN.Object("obj.obj5.obj.tnam").Data, 1, 1)
+		fogb(6) = Mid(SCREEN.Object("obj.obj6.obj.tnam").Data, 1, 1)
+		fogb(7) = Mid(SCREEN.Object("obj.obj7.obj.tnam").Data, 1, 1)
+		fogb(8) = Mid(SCREEN.Object("obj.obj8.obj.tnam").Data, 1, 1)
+	End If
+
+	If fogb(1) = "+" Then
+		If CDbl(fn_nvl(SCREEN.Object("obj.obj1.obj.OUTPUT0").data)) >= 0 Then
+			SCREEN.Object("obj.obj1.tnam").TRgb = 94
+		Else
+			SCREEN.Object("obj.obj1.tnam").TRgb = 95
+		End If
+	End If
+	If fogb(2) = "+" Then
+		If CDbl(fn_nvl(SCREEN.Object("obj.obj2.obj.OUTPUT0").data)) >= 0 Then
+			SCREEN.Object("obj.obj2.tnam").TRgb = 94
+		Else
+			SCREEN.Object("obj.obj2.tnam").TRgb = 95
+		End If
+	End If
+	If fogb(3) = "+" Then
+		If CDbl(fn_nvl(SCREEN.Object("obj.obj3.obj.OUTPUT0").data)) >= 0 Then
+			SCREEN.Object("obj.obj3.tnam").TRgb = 94
+		Else
+			SCREEN.Object("obj.obj3.tnam").TRgb = 95
+		End If
+	End If
+	If fogb(4) = "+" Then
+		If CDbl(fn_nvl(SCREEN.Object("obj.obj4.obj.OUTPUT0").data)) >= 0 Then
+			SCREEN.Object("obj.obj4.tnam").TRgb = 94
+		Else
+			SCREEN.Object("obj.obj4.tnam").TRgb = 95
+		End If
+	End If
+	If fogb(5) = "+" Then
+		If CDbl(fn_nvl(SCREEN.Object("obj.obj5.obj.OUTPUT0").data)) >= 0 Then
+			SCREEN.Object("obj.obj5.tnam").TRgb = 94
+		Else
+			SCREEN.Object("obj.obj5.tnam").TRgb = 95
+		End If
+	End If
+	If fogb(6) = "+" Then
+		If CDbl(fn_nvl(SCREEN.Object("obj.obj6.obj.OUTPUT0").data)) >= 0 Then
+			SCREEN.Object("obj.obj6.tnam").TRgb = 94
+		Else
+			SCREEN.Object("obj.obj6.tnam").TRgb = 95
+		End If
+	End If
+	If fogb(7) = "+" Then
+		If CDbl(fn_nvl(SCREEN.Object("obj.obj7.obj.OUTPUT0").data)) >= 0 Then
+			SCREEN.Object("obj.obj7.tnam").TRgb = 94
+		Else
+			SCREEN.Object("obj.obj7.tnam").TRgb = 95
+		End If
+	End If
+	If fogb(8) = "+" Then
+		If CDbl(fn_nvl(SCREEN.Object("obj.obj8.obj.OUTPUT0").data)) >= 0 Then
+			SCREEN.Object("obj.obj8.tnam").TRgb = 94
+		Else
+			SCREEN.Object("obj.obj8.tnam").TRgb = 95
+		End If
+	End If
+
+	If Trim(SCREEN.Object("obj.obj1.obj.tnam").Data) = "" Or Trim(SCREEN.Object("obj.obj1.obj.tnam").Data) = "T" Then SCREEN.Object("OBJ.obj1.BOX0").PRgb = 0 End If
+	If Trim(SCREEN.Object("obj.obj2.obj.tnam").Data) = "" Or Trim(SCREEN.Object("obj.obj2.obj.tnam").Data) = "T" Then SCREEN.Object("OBJ.obj2.BOX0").PRgb = 0 End If
+	If Trim(SCREEN.Object("obj.obj3.obj.tnam").Data) = "" Or Trim(SCREEN.Object("obj.obj3.obj.tnam").Data) = "T" Then SCREEN.Object("OBJ.obj3.BOX0").PRgb = 0 End If
+	If Trim(SCREEN.Object("obj.obj4.obj.tnam").Data) = "" Or Trim(SCREEN.Object("obj.obj4.obj.tnam").Data) = "T" Then SCREEN.Object("OBJ.obj4.BOX0").PRgb = 0 End If
+	If Trim(SCREEN.Object("obj.obj5.obj.tnam").Data) = "" Or Trim(SCREEN.Object("obj.obj5.obj.tnam").Data) = "T" Then SCREEN.Object("OBJ.obj5.BOX0").PRgb = 0 End If
+	If Trim(SCREEN.Object("obj.obj6.obj.tnam").Data) = "" Or Trim(SCREEN.Object("obj.obj6.obj.tnam").Data) = "T" Then SCREEN.Object("OBJ.obj6.BOX0").PRgb = 0 End If
+	If Trim(SCREEN.Object("obj.obj7.obj.tnam").Data) = "" Or Trim(SCREEN.Object("obj.obj7.obj.tnam").Data) = "T" Then SCREEN.Object("OBJ.obj7.BOX0").PRgb = 0 End If
+	If Trim(SCREEN.Object("obj.obj8.obj.tnam").Data) = "" Or Trim(SCREEN.Object("obj.obj8.obj.tnam").Data) = "T" Then SCREEN.Object("OBJ.obj8.BOX0").PRgb = 0 End If
+
+	If Trim(SCREEN.Object("obj.obj1.obj.tnam").Data) <> "" And Trim(SCREEN.Object("obj.obj1.obj.tnam").Data) <> "T" And fn_nvl(SCREEN.Object("obj.obj1.obj.output0").data) = 0 Then
+		If SCREEN.Object("obj.obj1.obj.knd").data = "1" Then SCREEN.Object("OBJ.obj1.BOX0").PRgb = 94 End If
+		If SCREEN.Object("obj.obj1.obj.knd").data = "4" Then SCREEN.Object("OBJ.obj1.BOX0").PRgb = 95 End If
+	End If
+	If Trim(SCREEN.Object("obj.obj2.obj.tnam").Data) <> "" And Trim(SCREEN.Object("obj.obj2.obj.tnam").Data) <> "T" And fn_nvl(SCREEN.Object("obj.obj2.obj.output0").data) = 0 Then
+		If SCREEN.Object("obj.obj2.obj.knd").data = "1" Then SCREEN.Object("OBJ.obj2.BOX0").PRgb = 94 End If
+		If SCREEN.Object("obj.obj2.obj.knd").data = "4" Then SCREEN.Object("OBJ.obj2.BOX0").PRgb = 95 End If
+	End If
+	If Trim(SCREEN.Object("obj.obj3.obj.tnam").Data) <> "" And Trim(SCREEN.Object("obj.obj3.obj.tnam").Data) <> "T" And fn_nvl(SCREEN.Object("obj.obj3.obj.output0").data) = 0 Then
+		If SCREEN.Object("obj.obj3.obj.knd").data = "1" Then SCREEN.Object("OBJ.obj3.BOX0").PRgb = 94 End If
+		If SCREEN.Object("obj.obj3.obj.knd").data = "4" Then SCREEN.Object("OBJ.obj3.BOX0").PRgb = 95 End If
+	End If
+	If Trim(SCREEN.Object("obj.obj4.obj.tnam").Data) <> "" And Trim(SCREEN.Object("obj.obj4.obj.tnam").Data) <> "T" And fn_nvl(SCREEN.Object("obj.obj4.obj.output0").data) = 0 Then
+		If SCREEN.Object("obj.obj4.obj.knd").data = "1" Then SCREEN.Object("OBJ.obj4.BOX0").PRgb = 94 End If
+		If SCREEN.Object("obj.obj4.obj.knd").data = "4" Then SCREEN.Object("OBJ.obj4.BOX0").PRgb = 95 End If
+	End If
+	If Trim(SCREEN.Object("obj.obj5.obj.tnam").Data) <> "" And Trim(SCREEN.Object("obj.obj5.obj.tnam").Data) <> "T" And fn_nvl(SCREEN.Object("obj.obj5.obj.output0").data) = 0 Then
+		If SCREEN.Object("obj.obj5.obj.knd").data = "2" Then SCREEN.Object("OBJ.obj5.BOX0").PRgb = 95 End If
+		If SCREEN.Object("obj.obj5.obj.knd").data = "4" Then SCREEN.Object("OBJ.obj5.BOX0").PRgb = 95 End If
+	End If
+	If Trim(SCREEN.Object("obj.obj6.obj.tnam").Data) <> "" And Trim(SCREEN.Object("obj.obj6.obj.tnam").Data) <> "T" And Trim(SCREEN.Object("obj.obj1.obj.tnam").Data) <> "T" And fn_nvl(SCREEN.Object("obj.obj6.obj.output0").data) = 0 Then
+		If SCREEN.Object("obj.obj6.obj.knd").data = "2" Then SCREEN.Object("OBJ.obj6.BOX0").PRgb = 95 End If
+		If SCREEN.Object("obj.obj6.obj.knd").data = "4" Then SCREEN.Object("OBJ.obj6.BOX0").PRgb = 95 End If
+	End If
+	If Trim(SCREEN.Object("obj.obj7.obj.tnam").Data) <> "" And Trim(SCREEN.Object("obj.obj7.obj.tnam").Data) <> "T" And fn_nvl(SCREEN.Object("obj.obj7.obj.output0").data) = 0 Then
+		If SCREEN.Object("obj.obj7.obj.knd").data = "2" Then SCREEN.Object("OBJ.obj7.BOX0").PRgb = 95 End If
+		If SCREEN.Object("obj.obj7.obj.knd").data = "4" Then SCREEN.Object("OBJ.obj7.BOX0").PRgb = 95 End If
+	End If
+	If Trim(SCREEN.Object("obj.obj8.obj.tnam").Data) <> "" And Trim(SCREEN.Object("obj.obj8.obj.tnam").Data) <> "T" And fn_nvl(SCREEN.Object("obj.obj8.obj.output0").data) = 0 Then
+		If SCREEN.Object("obj.obj8.obj.knd").data = "2" Then SCREEN.Object("OBJ.obj8.BOX0").PRgb = 95 End If
+		If SCREEN.Object("obj.obj8.obj.knd").data = "4" Then SCREEN.Object("OBJ.obj8.BOX0").PRgb = 95 End If
+	End If
+
+End Sub
+
+Sub MKTriggerFromMain(sdata)
+	cxMarket.sMarket = sdata
+	SCREEN.Send 0
+	SetMKGubn777()
+	OBJ.RSend
+End Sub
+
+_AW_ONINDECLARE_AW_
+#Load IB888888
+#load IB999901
+
+_AW_ONENDSUB_AW_
+_AW_ONSTART_AW_
+cxMarket.sMarket = LoadMKGubn
+cxMarket.MNum = "IB100000"
+SetMKGubn777()
+If Radio.Checked = True Then
+   msd.Data = "1"
+ElseIf RADIO0.Checked = True Then
+   msd.Data = "2"
+ElseIf RADIO1.Checked = True Then
+   msd.Data = "3"
+End If
+
+If RADIO2.Checked = True Then
+   dt_time.Data = "1"
+ElseIf RADIO3.Checked = True Then
+   dt_time.Data = "2"
+   acumdd.Data = "001"
+   acumdd.Enable = False
+End If
+
+Call LoadConfig()
+Call SendReqeust("")
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+SetMKGubn777()
+SYSTEM.Trace "[MKGUBN][IB2303T0][OnSend][poop] 1777 = " & S1777.Data
+
+_AW_ONENDSUB_AW_
+_AW_ONSERVICE_AW_
+'SYSTEM.Trace data
+If get_trcd(data) = False Then
+	Exit Sub
+End If
+
+send_obj()
+
+_AW_ONENDSUB_AW_
+_AW_ONTIMER_AW_
+OBJ.RSend
+
+_AW_ONENDSUB_AW_
+_AW_ONCLOSE_AW_
+Call SaveConfig()
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(dayb2)
+_AW_ONCLICK_AW_
+Call SendReqeust("dayb2")
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(dayb1)
+_AW_ONCLICK_AW_
+Call SendReqeust("dayb1")
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(dayb3)
+_AW_ONCLICK_AW_
+Call SendReqeust("dayb3")
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON0)
+_AW_ONCLICK_AW_
+Dim retn
+retn = SCREEN.GetCode(100, "1301", "hnam", 0 )
+If retn <> True Then
+       Exit Sub
+End If
+
+SCREEN.Send 0
+SCREEN.Service "pibo2303", S1301.Data, 6, 0
+S1301.Trigger "", True
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(dayb4)
+_AW_ONCLICK_AW_
+Call SendReqeust("dayb4")
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(acumdd)
+_AW_ONCHANGE_AW_
+Call SendReqeust("")
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(Radio)
+_AW_ONCLICK_AW_
+msd.Data = "1"
+Call SendReqeust("")
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(RADIO0)
+_AW_ONCLICK_AW_
+msd.Data = "2"
+Call SendReqeust("")
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(RADIO1)
+_AW_ONCLICK_AW_
+msd.Data = "3"
+Call SendReqeust("")
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(RADIO2)
+_AW_ONCLICK_AW_
+dt_time.Data = "1"
+Call SendReqeust("dayb2")
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(RADIO3)
+_AW_ONCLICK_AW_
+dt_time.Data = "2"
+Call SendReqeust("dayb2")
+
+acumdd.Data = "001"
+acumdd.Enable = False
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(cxMarket)
+_AW_ONCLICK_AW_
+SaveMKGubn(cxMarket.sMarket)
+SYSTEM.Trigger "edMarketTrigger_1000", cxMarket.sMarket, ""
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(edMarketTrigger)
+_AW_ONCHANGE_AW_
+cxMarket.sMarket = edMarketTrigger.Data
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(1301)
+_AW_ONCHANGE_AW_
+Dim name
+
+name = SCREEN.GetName(100, S1301.data, 0)
+If (name <> "") Then
+	SCREEN.Send 0
+	cxMarket.sCode = S1301.Data
+	'SCREEN.Service "pibo2303", S1301.Data, 6, 0
+	SCREEN.Service "pibo2303", S1301.Data & msd.Data & "08" & dt_time.Data & acumdd.Data, 13, 0
+	cxMarket.sCode = S1301.Data
+	S1301.Trigger "", True
+Else
+	SCREEN.ClearAll 2, 2
+	SCREEN.Send 0
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

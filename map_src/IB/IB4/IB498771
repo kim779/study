@@ -1,0 +1,133 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB498771)
+MAPSIZE(237, 479)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("굴림", 9, NORMAL)
+OPTIONS(ENCODE)
+TITLE("Untitled")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("piboPBxQ")
+MAPTYPE(FIXED)
+HEADER(LEDGER)
+TRXH("31CSOFFQ354")
+}
+
+
+
+FORM DIVISION
+{
+
+EDIT  REC(78, 20, 178, 40)  LEN(5)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_SUNKEN  INIT("00001")          TABORDER(1)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+GROUP  GROUP0(4, 3, 208, 75)  'IN'        COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+GROUP  GROUP1(210, 9, 443, 182)  'OUT'        COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL0(16, 20, 76, 40)  '레코드'  AL_LEFT  CUR(0)      COLOR(141, 240)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  fundcode(78, 42, 179, 62)  LEN(12)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 69)  CUR(0)  TP_SUNKEN          TABORDER(2)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL1(16, 43, 76, 63)  '코드'  AL_LEFT  CUR(0)      COLOR(141, 240)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  OUTPUT0(216, 26, 435, 46)  LEN(62)  IO_NUM|AL_CENTER|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL2(215, 48, 275, 68)  '운용사명'  AL_LEFT  CUR(0)      COLOR(141, 240)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL3(215, 70, 275, 90)  '수탁회사명'  AL_LEFT  CUR(0)      COLOR(141, 240)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL4(215, 92, 275, 112)  '관리사원명'  AL_LEFT  CUR(0)      COLOR(141, 240)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL5(213, 114, 277, 134)  '펀드유형명'  AL_LEFT  CUR(0)      COLOR(141, 240)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  zOpfirmNm(277, 47, 402, 67)  LEN(50)  IO_MIXED|AL_CENTER|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  zTrstcoNm(276, 69, 401, 89)  LEN(50)  IO_MIXED|AL_CENTER|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(5)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  OUTPUT3(277, 91, 402, 111)  LEN(40)  IO_MIXED|AL_CENTER|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(6)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  zFundPtnNm(278, 113, 403, 133)  LEN(40)  IO_MIXED|AL_CENTER|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(7)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  OUTPUT5(214, 136, 433, 156)  LEN(568)  IO_NUM|AL_CENTER|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(8)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  GUIDE(0, 215, 552, 233)  LINECOLOR(75)      COLOR(66, 69)  CUR(0)    AL_LEFT    ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONSEND_AW_
+fundcode.Data = SCREEN.Object("parent.fundcode").Data
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+Dim OpfirmNm,tmp,tmp2
+OpfirmNm = Trim(zOpfirmNm.data)
+For i  = 1 To Len(OpfirmNm)
+	If i Mod 4 > 0 Then
+		If Len(OpfirmNm) < 5 And i = Len(OpfirmNm) Then ' 가운데정렬을 맞춰주기위해
+			tmp = tmp & Mid(OpfirmNm,i,1) & "\n"
+		Else
+			tmp = tmp & Mid(OpfirmNm,i,1)
+		End If
+	Else
+		If i <> Len(OpfirmNm) Then
+			tmp = tmp & Mid(OpfirmNm,i,1) & "\n"
+		Else
+			If i = 4 Then ' 가운데정렬을 맞춰주기위해
+				tmp = tmp & Mid(OpfirmNm,i,1) & "\n"
+			Else
+				tmp = tmp & Mid(OpfirmNm,i,1)
+			End If
+		End If
+	End If
+Next
+
+Dim FundPtnNm
+FundPtnNm = Trim(zFundPtnNm.data)
+For i  = 1 To Len(FundPtnNm)
+	If i Mod 4 > 0 Then
+		If Len(FundPtnNm) < 5 And i = Len(FundPtnNm) Then ' 가운데정렬을 맞춰주기위해
+			tmp2 = tmp2 & Mid(FundPtnNm,i,1) & "\n"
+		Else
+			tmp2 = tmp2 & Mid(FundPtnNm,i,1)
+		End If
+	Else
+		If i <> Len(FundPtnNm) Then
+			tmp2 = tmp2 & Mid(FundPtnNm,i,1) & "\n"
+		Else
+			If i = 4 Then ' 가운데정렬을 맞춰주기위해
+				tmp2 = tmp2 & Mid(FundPtnNm,i,1) & "\n"
+			Else
+				tmp2 = tmp2 & Mid(FundPtnNm,i,1)
+			End If
+		End If
+	End If
+Next
+
+SCREEN.Object("parent.zOpfirmNm").data = tmp
+SCREEN.Object("parent.zTrstcoNm").data = Trim(zTrstcoNm.data)
+SCREEN.Object("parent.zFundPtnNm").data = tmp2
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(fundcode)
+_AW_ONCHANGE_AW_
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

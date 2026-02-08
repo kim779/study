@@ -1,0 +1,91 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB783121)
+MAPSIZE(216, 342)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("비교지수차트")
+MAPPUBLIC(";")
+FONT("굴림", 9, NORMAL)
+TITLE("비교지수차트")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("bf783120")
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL0(0, 0, 342, 26)        COLOR(66, 63)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL1(3, 4, 55, 22)  '비교지수'  AL_CENTER  CUR(0)      COLOR(66, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+COMBO  COMBO1(56, 3, 144, 23)  TP_SUNKEN  LEN(16)  COUNT(4)  VCOUNT(4)  INDEX(2)  MATCHKEY(NOTMAPPING)  IO_ALPHA|EDIT_INPUT    COLOR(19, 130)  CUR(0)  DISPLAY("KOSPI", "KOSDAQ", "다우 산업", "나스닥 종합")  DATA("001         ", "201         ", "DJI@DJI         ", "NAS@IXIC        ")    TABORDER(1)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+CONTROL  CONTROL0(0, 29, 342, 216)    "C_VolLine1"  "/w/d300/r300/u2/t2/n0"  LEN(0)  EDIT_OUTPUT    COLOR(192, 232)  TABORDER(0)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Const myFILE = "userconf.ini"
+Const myMAP = "IB783121"
+
+
+
+Sub write_set( a )
+
+If SCREEN.CreateObject("INFO") Then
+	INFO.PushData LOGIN.Name, myFILE, myMAP, "SAVE", a
+
+End If
+
+End Sub
+
+Sub read_set()
+
+	SCREEN.CreateObject("INFO")
+
+	Dim a
+	a = INFO.PopData( LOGIN.Name, myFILE, myMAP, "SAVE" )
+
+	If IsNumeric(a) Then
+		COMBO1.Index = a
+	Else
+		COMBO1.Index = 0
+	End If
+
+	SCREEN.Send 0
+
+End Sub
+
+_AW_ONSTART_AW_
+read_set()
+
+'SCREEN.Send 0
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(COMBO1)
+_AW_ONCHANGE_AW_
+write_set(COMBO1.Index)
+
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

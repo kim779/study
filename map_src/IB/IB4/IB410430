@@ -1,0 +1,59 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB410430)
+MAPSIZE(272, 864)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("베이시스괴리율차트")
+MAPPUBLIC(";")
+FONT("굴림", 9, NORMAL)
+OPTIONS(FLASH)
+TITLE("[410430]베이시스괴리율차트")
+TOPATH(AXIS)
+METHOD(MENU)
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+EDIT  32301(884, 4, 948, 23)  LEN(8)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  ST_CLASSIC          TABORDER(1)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL0(4, 4, 864, 269)  '베이시스괴리율차트'  TP_RAISED      COLOR(208, 232)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+'Sub Quary_chart()
+'	ctl0.ClearAllData()
+'
+'	ctl0.Setticksize 0, 0.05
+'	ctl0.SetChartPeriod 0, 1
+'	ctl0.SetChartCycle 0, 1
+'	ctl0.Setuserindexperiod 0, 1
+'	ctl0.SetInputValue 0,0, "CODE", S32301.Data
+'
+'	'데이타 요청
+'	ctl0.RequestData 0,0
+'End Sub
+
+_AW_ONSEND_AW_
+'Quary_chart()
+'SCREEN.OnSend = False
+
+_AW_ONENDSUB_AW_
+}
+
+
+

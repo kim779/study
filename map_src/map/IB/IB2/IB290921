@@ -1,0 +1,111 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB290921)
+MAPSIZE(158, 904)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+TITLE("[IB290221]종목별 투자자별 매매현황 chart")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("ng202421")
+MAPTYPE(NORM)
+HEADER(NOP)
+BGROUND(BRUSH, 192)
+}
+
+
+
+FORM DIVISION
+{
+
+EDIT  cod2(57, 675, 104, 698)  LEN(12)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_PASS    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(1)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  srtDt(57, 699, 119, 722)  LEN(8)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_PASS    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("20000103")          TABORDER(2)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  gubn(56, 724, 118, 747)  LEN(1)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_PASS    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(3)  IOORDER(3)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  kfgb(55, 748, 117, 771)  LEN(1)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_PASS    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("1")          TABORDER(4)  IOORDER(4)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  dagb(55, 772, 117, 795)  LEN(1)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_PASS    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("1")          TABORDER(5)  IOORDER(5)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  endDt(54, 796, 116, 819)  LEN(8)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_PASS    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(6)  IOORDER(6)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  check(281, 680, 345, 707)  LEN(1)  IO_NUM|AL_CENTER|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(7)  ENABLE  &
+  HINTTYPE(IH_NONE)
+CONTROL  chart(0, 0, 850, 158)  |FA_PROTECT  "C_UserGrp"  "/i700200300003000201000000000000000000300000000001110000032768100000000712003355468710000000"  LEN(0)  EDIT_INOUT    COLOR(192, 232)  TABORDER(7)  IOORDER(8)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  gi(856, 4, 901, 24)  '기관'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(kfgbGr)      COLOR(192, 130)  CUR(0)      TABORDER(8)  ENABLE  &
+  VISIBLE  CHECKED  HINTTYPE(IH_NONE)
+BUTTON  fo(856, 27, 901, 47)  '외인'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(kfgbGr)      COLOR(192, 130)  CUR(0)      TABORDER(9)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+GROUP  kfgbGr(374, 774, 494, 824)  'Group'        COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+'조회
+Sub send_f()
+	'거래소 구분값 추가로 인한 코드 변경 before -> cod2.Data = Trim(SCREEN.Object("parent.cod2").Data)
+	If UCase(TypeName( SCREEN.Object("main.cxMarket"))) <> "NOTHING" Then
+		If SCREEN.Object("main.cxMarket").sMarket = "KRX" Then
+			cod2.Data = SCREEN.Object("main.1301").Data
+		ElseIf SCREEN.Object("main.cxMarket").sMarket = "NXT" Then
+			cod2.Data = "N." & SCREEN.Object("main.1301").Data
+		ElseIf SCREEN.Object("main.cxMarket").sMarket = "통합" Then
+			cod2.Data = "M." & SCREEN.Object("main.1301").Data
+		End If
+	End If
+
+	gubn.Data = Trim(SCREEN.Object("parent.gubn").Data)
+	endDt.Data = Trim(SCREEN.Object("parent.endDt").Data)
+
+	SCREEN.Send 0
+End Sub
+
+'기관, 외인 차트 선택
+Sub kgSel()
+	If gi.Checked = True Then
+		kfgb.Data = "1"
+	Else
+		kfgb.Data = "2"
+	End If
+
+	SCREEN.Send 0
+End Sub
+
+_AW_ONRECEIVE_AW_
+If Trim(check.Data) = "F" Then
+	chart.Clear
+	Exit Sub
+End If
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(gi)
+_AW_ONCLICK_AW_
+Call kgSel()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(fo)
+_AW_ONCLICK_AW_
+Call kgSel()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

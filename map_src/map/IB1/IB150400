@@ -1,0 +1,110 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB150400)
+MAPSIZE(670, 743)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+TITLE("Untitled")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+USRTAB  tab_mainHangmok(0, 3, 743, 29)  FOCUS  INDEX(0)  COUNT(2)  AL_TOP  TAB_IMAGE      FONT("굴림체", 9, NORMAL)    COLOR(3, 70)  CUR(0)  TABIMAGE("tab.bmp")  FCOLOR(3, 71)  CAPTION("기징수 이자내역", "종목별 이자내역")  TABINFO("1:0", "1:1")  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  obj(0, 30, 743, 648)    ""  TABORDER(1)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL8(-2, 646, 745, 670)  LIMAGE(0)  LINEW(3)  LINETYPE(4)  LINECOLOR(64)      COLOR(34, 232)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL7(6, 652, 20, 666)    |IMAGE|AL_STRETCH    COLOR(34, 232)  CUR(0)    "알림_ic.bmp"  ENABLE  &
+  VISIBLE  IMAGE  HINTTYPE(IH_NONE)
+PANEL  GUIDE(22, 651, 702, 667)        COLOR(34, 130)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL0(0, 0, 743, 3)        COLOR(49673717, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  edMarketTrigger(845, 35, 877, 55)  LEN(6)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(2)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL6(784, 35, 844, 55)  '거래소'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+CONTROL  cxMarket(754, 35, 772, 55)  |FA_SKIP  "CX_MarketPicker"  "/k2/tIB150400/u1/d1"  LEN(12)  EDIT_NOP    COLOR(192, 232)  TABORDER(0)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Option Explicit
+
+Sub tab_mainChange()
+	If tab_mainHangmok.ID = 0 Then
+		obj.SetObject "IB150420"
+	Else
+		obj.SetObject "IB150410"
+	End If
+End Sub
+
+Sub Change_MKGubn_Main(sMKGubn)
+	cxMarket.sMarket = sMKGubn
+	If tab_mainHangmok.ID = 0 Then
+		SCREEN.Proc "main.obk.send_f", ""
+	End If
+	'SCREEN.Object("obj").Send
+End Sub
+
+_AW_ONSTART_AW_
+cxMarket.MNum = SCREEN.GetMapName(1)
+cxMarket.Major = SCREEN.Major
+
+Call tab_mainChange()
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(tab_mainHangmok)
+_AW_ONCLICK_AW_
+Call tab_mainChange()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(edMarketTrigger)
+_AW_ONCHANGE_AW_
+Change_MKGubn_Main(Trim(edMarketTrigger.Data))
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(cxMarket)
+_AW_ONCLICK_AW_
+SCREEN.Proc "main.Change_MKGubn_Main", cxMarket.sMarket
+
+If UCase(TypeName( SCREEN.Object("cbSOrder") )) <> "NOTHING" Then
+	If cxMarket.sMarket = "통합" Then
+		cbSOrder.Data = "S"
+	ElseIf cxMarket.sMarket = "KRX" Then
+		cbSOrder.Data = "1"
+	ElseIf cxMarket.sMarket = "NXT" Then
+		cbSOrder.Data = "N"
+	End If
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

@@ -1,0 +1,65 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB821520)
+MAPSIZE(269, 690)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+TITLE("개별계좌현황")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+USRTAB  tab(0, 0, 690, 26)  FOCUS  INDEX(0)  COUNT(2)  AL_TOP  TAB_IMAGE      FONT("굴림체", 9, NORMAL)    COLOR(3, 70)  CUR(0)  TABIMAGE("TAB.bmp")  FCOLOR(3, 71)  CAPTION("기본정보", "약정현황")  TABINFO("1:1", "1:2")  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  sobj(0, 25, 690, 269)    "IB821521"  TABORDER(1)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONSEND_AW_
+SCREEN.OnSend = False
+
+	sobj.Send
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(tab)
+_AW_ONCLICK_AW_
+'AN99 : 종합계좌
+'AN98 : 개별계좌
+
+Select Case tab.ID
+Case 1
+		 sobj.SetObject "IB821521"
+Case 2
+		 sobj.SetObject "IB821522"
+
+Case Else
+         Exit Sub
+End Select
+
+sobj.Send
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

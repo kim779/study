@@ -1,0 +1,273 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB840420)
+MAPSIZE(345, 455)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("청약예약취소등록")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(ENCODE)
+TITLE("[840420]")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("piboPBxQ")
+MAPTYPE(FIXED)
+HEADER(LEDGER)
+TRXH("31CSRGST104")
+BGROUND(BRUSH, 64)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL0(0, 0, 455, 345)        COLOR(66, 67)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  zpwd(359, 3, 415, 23)  LEN(8)  IO_MIXED|EDIT_INPUT|FA_PASSWD|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_SUNKEN          TABORDER(1)  IOORDER(4)  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL0(10, 30, 58, 50)  '종목번호'  AL_CENTER  CUR(0)      COLOR(66, 69)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  BUTTON3(160, 29, 179, 49)  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(15, 63)  CUR(0)    "검색.BMP"    TABORDER(2)  ENABLE  &
+  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+EDIT  1301(95, 30, 182, 50)  LEN(9)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_HAN|FA_NOR    COLOR(99, 69)  CUR(0)  TP_SUNKEN          TABORDER(3)  IOORDER(6)  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL3(8, 52, 60, 72)  '기 준 일'  AL_CENTER  CUR(0)      COLOR(66, 69)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  zBaseDt(95, 55, 182, 75)  LEN(8)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_DATE    COLOR(192, 69)  CUR(0)  TP_SUNKEN          EDITFORMAT("9999/99/99")  TABORDER(4)  IOORDER(8)  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  In(3, 374, 74, 393)  LEN(5)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 69)  CUR(0)  TP_SUNKEN  INIT("00001")          TABORDER(5)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  zIsuNo_A(3, 416, 21, 436)  LEN(1)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("A")          TABORDER(6)  IOORDER(5)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  zIsuNo_space(23, 416, 68, 436)  LEN(3)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 69)  CUR(0)  TP_SUNKEN          TABORDER(7)  IOORDER(7)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  inOutput(82, 374, 378, 392)  LEN(45)  IO_MIXED|AL_CENTER|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(9)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  outSum(82, 394, 126, 412)  LEN(5)  IO_MIXED|AL_CENTER|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(10)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  zAcntNm(81, 422, 321, 440)  LEN(40)  IO_MIXED|AL_CENTER|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(11)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  zIsuNm(81, 444, 321, 462)  LEN(40)  IO_MIXED|AL_CENTER|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(12)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  sec(16, 357, 34, 377)  LEN(1)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(8)  IOORDER(13)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  AN1A_space(97, 324, 168, 343)  LEN(9)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 69)  CUR(0)  TP_SUNKEN          TABORDER(9)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  account(13, 324, 94, 343)  LEN(11)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 69)  CUR(0)  TP_SUNKEN          TABORDER(10)  IOORDER(3)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  BUTTON0(325, 90, 445, 145)  '예약유상취소'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 11, NORMAL)  FOCUS  COLOR(208, 192)  CUR(0)    "전송.bmp"    TABORDER(11)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+LABEL  LABEL2(10, 7, 465, 28)  '▶ 예약유상청약취소 정보 입력'  AL_LEFT  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(65, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  jmNm(184, 30, 445, 50)  LEN(40)  IO_MIXED|EDIT_INPUT|FA_SKIP|FA_NOR  FONT("굴림체", 9, NORMAL)    COLOR(192, 69)  CUR(0)  TP_SUNKEN          TABORDER(12)  IOORDER(14)  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+'== 계좌명, 비밀번호 설정
+Sub Set_start()
+	SCREEN.ClearAll 0, 2
+    S1301.Clear
+    'SCREEN.Object("OBJECT0.1301").Clear
+    'OBJECT0.Send
+	zBaseDt.Clear
+	jmNm.Clear
+End Sub
+
+'== 첫 조회
+Sub send_f()
+	SCREEN.proc "Main.setAccnt", SCREEN.Object("Main.AN6A").Data &","& SCREEN.Object("Main.zpwd").data
+	SCREEN.Send 0
+End Sub
+Sub codechange()
+	If Trim(S1301.Data) = "000000" Then
+			Exit Sub
+		End If
+	S1301.Trigger "",True
+	'S1301.Trigger "", False
+
+	'SCREEN.Object("OBJECT0.1301").data = S1301.Data
+
+	'OBJECT0.Send
+
+End Sub
+'Sub viewName()
+'	SCREEN.Object("OBJECT0.1301").data = S1301.Data
+'	OBJECT0.Send
+'End Sub
+
+'--유상청약예약
+Sub cancel()
+	If CheckInput(SCREEN.Object("Main.AN6A"), SCREEN.Object("Main.zpwd")) = False Then
+		Exit Sub
+	End If
+
+	If Trim(S1301.Data) = "" Then
+		alert_msg("청약종목이 입력되지 않았습니다.")
+		S1301.SetFocus
+		Exit Sub
+	End If
+
+	If Trim(zBaseDt.Data) = "" Then
+		alert_msg("기준일자가 입력되지 않았습니다.")
+		zBaseDt.SetFocus
+		Exit Sub
+	End If
+
+	dmsg = "acno" & vbTab & SCREEN.Object("Main.AN6A").Data & vbLf &_
+		   "acnm" & vbTab & SCREEN.Object("Main.AN6A").Name & vbLf &_
+'		   "hnam" & vbTab & Mid(SCREEN.Object("OBJECT0.1022").Data, 2) & vbLf
+		   "hnam" & vbTab & jmNm.Data & vbLf
+
+
+			SCREEN.CreateWindow 2, "IB84042A /p5 /d", dmsg
+
+			If SYSTEM.Pop("reser_cancel") <> "OK" Then
+				Exit Sub
+			Else
+				LEDGER.Fkey = "5"
+				SCREEN.Send 0
+			End If
+End Sub
+
+_AW_ONINDECLARE_AW_
+#Load IB888833
+
+_AW_ONENDSUB_AW_
+_AW_ONSTART_AW_
+Set_start()
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+' -- TR 보내기전 입력 필드 확인
+
+SCREEN.OnSend = False
+
+If Len(Trim(SCREEN.Object("Main.AN6A").data )) > 0 Then
+	account.data = SCREEN.Object("Main.AN6A").data '계좌번호
+Else
+	Exit Sub
+End If
+
+If Len(Trim(SCREEN.Object("Main.zpwd").data)) >= 4 Then
+	LEDGER.Hsiz = 44
+	LEDGER.EPwd = SYSTEM.EncryptSHA(Trim(SCREEN.Object("Main.zpwd").data))
+	zpwd.Data = "HEAD"
+Else
+	Exit Sub
+End If
+
+If CheckInput(SCREEN.Object("Main.AN6A"), SCREEN.Object("Main.zpwd")) = True Then
+'	If Trim(S1301.Data) = "" Then
+'		zIsuNo_A.Data = ""
+'	Else
+'		If Trim(SCREEN.GetCodeType(S1301.Data)) = "27" Then	'ETN은 'Q'로 시작함
+'			zIsuNo_A.Data = "Q"
+'		Else
+'			zIsuNo_A.Data = "A"
+'		End If
+'	End If
+
+	SCREEN.onsend = True
+ 	Exit Sub
+End If
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+'If LEDGER.Ecod = "3669" Then
+'	SCREEN.ClearAll 1,2
+'	ACNM.Data = SCREEN.Object("Main.AN1A").Name
+'	zpwd.Clear
+'	zpwd.SetFocus
+'ElseIf Left(Trim(LEDGER.ECod), 1) = "0" Then
+'	SCREEN.proc "Main.setAccnt", AN1A.Data &","& zpwd.Data
+
+'	If(SCREEN.Object("main.sec").Data) = "2" Then
+'		confirm.Visible = True
+'	ElseIf (SCREEN.Object("main.sec").Data) = "3" Then
+'		confirm.Visible = False
+'	End If
+'End If
+
+'SCREEN.proc "Main.Search",""
+'SCREEN.proc "Main.setAccnt", AN1A.Data &","& zpwd.Data
+'Select Case SCREEN.Object("main.sec").Data
+'	Case "1" zpwd.SetFocus
+'	Case "2" send_btn.SetFocus
+'	Case "3" confirm.SetFocus
+'End Select
+
+'If Left(Trim(LEDGER.ECod), 1) = "0" Then
+'	LEDGER.Fkey = "5"
+
+'End If
+SCREEN.proc "Main.refresh",""
+MsgBox Trim(LEDGER.Emsg), , "IBK투자증권"
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(zpwd)
+_AW_ONKEYCHANGE_AW_
+'== 비밀번호 변경시 조회 버튼 기능 수행.
+If SCREEN.Key = "13" Then  '-- Enter 키 입력
+	SCREEN.Object("main.sec").data  = "1"
+	Call send_f()
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON3)
+_AW_ONCLICK_AW_
+Dim retn
+retn = SCREEN.GetCode(100, "1301", "hnam", 0 )
+If retn <> True Then
+      Exit Sub
+End If
+
+SCREEN.Object("OBJECT0.1301").data = S1301.Data
+OBJECT0.Send
+'SCREEN.Proc "parent.send_sise", "sise" & "," & S1301.Data
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(1301)
+_AW_ONKEYCHANGE_AW_
+If SCREEN.Key = "13" Then  '-- Enter 키 입력
+	zBaseDt.SetFocus
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(zBaseDt)
+_AW_ONKEYCHANGE_AW_
+If SCREEN.Key = "13" Then  '-- Enter 키 입력
+	send_btn.SetFocus
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON0)
+_AW_ONCLICK_AW_
+SCREEN.Object("main.sec").Data = "2"
+Call cancel()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

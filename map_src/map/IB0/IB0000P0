@@ -1,0 +1,357 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB0000P0)
+MAPSIZE(115, 395)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("이벤트팝업여부")
+MAPPUBLIC(";")
+FONT("MS Sans Serif", 9, NORMAL)
+TITLE("이벤트팝업여부")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pibopopu")
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+OUT  o_popu(164, 47, 394, 67)  LEN(1)  IO_MIXED|AL_LEFT|    COLOR(192, 69)  CUR(0)  LINECOLOR(255)          TABORDER(0)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  i_gubn(164, 0, 394, 20)  LEN(4)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("0009")          TABORDER(1)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL0(0, 0, 164, 20)  '조회구분'  LINECOLOR(255)      COLOR(238, 192)  CUR(0)    AL_CENTER  FONT("MS Sans Serif", 9, BOLD)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  i_usid(164, 19, 394, 39)  LEN(16)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(2)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL1(0, 19, 164, 39)  '사용자ID'  LINECOLOR(255)      COLOR(238, 192)  CUR(0)    AL_CENTER  FONT("MS Sans Serif", 9, BOLD)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL2(0, 47, 164, 67)  '팝업여부'  LINECOLOR(255)      COLOR(238, 192)  CUR(0)    AL_CENTER  FONT("MS Sans Serif", 9, BOLD)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL3(0, 66, 164, 86)  '상태메시지'  LINECOLOR(255)      COLOR(238, 192)  CUR(0)    AL_CENTER  FONT("MS Sans Serif", 9, BOLD)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  o_emsg(164, 66, 394, 86)  LEN(99)  IO_MIXED|AL_LEFT|    COLOR(192, 69)  CUR(0)  LINECOLOR(255)          TABORDER(0)  IOORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  CDAT(271, 90, 391, 109)  LEN(8)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP|FA_DATE    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(3)  IOORDER(5)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON0(2, 91, 24, 110)  TP_PUSH      AL_CENTER    FOCUS  COLOR(208, 232)  CUR(0)      TABORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON1(26, 91, 48, 110)  TP_PUSH      AL_CENTER    FOCUS  COLOR(208, 232)  CUR(0)      TABORDER(5)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON2(69, 91, 91, 110)  TP_PUSH      AL_CENTER    FOCUS  COLOR(208, 232)  CUR(0)      TABORDER(6)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON3(95, 90, 117, 109)  TP_PUSH      AL_CENTER    FOCUS  COLOR(208, 232)  CUR(0)      TABORDER(7)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON4(120, 90, 142, 109)  TP_PUSH      AL_CENTER    FOCUS  COLOR(208, 232)  CUR(0)      TABORDER(8)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON5(150, 91, 172, 110)  TP_PUSH      AL_CENTER    FOCUS  COLOR(208, 232)  CUR(0)      TABORDER(9)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON6(176, 91, 198, 110)  TP_PUSH      AL_CENTER    FOCUS  COLOR(208, 232)  CUR(0)      TABORDER(10)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+'Dim list
+'Set list = CreateObject("Scripting.Dictionary")
+Sub Set_Ini()
+	Dim tp, Check, Today
+    Dim f2, f4
+    Dim nowtime, hhmm, shhmm
+
+    If(Len(Hour(Now)) = 1) Then
+       hhmm = Hour(Now)*100 + Minute(Now)
+       shhmm = "0" + CStr(hhmm)
+    Else
+       hhmm = Hour(Now)*100 + Minute(Now)
+       shhmm = CStr(hhmm)
+    End If
+
+    Dim yy, mm, dd, cday, MyWeek
+	cday = DateAdd("d", 0, Date) '오늘날짜
+	yy = Year(cday)
+	mm = Month(cday)
+	dd = Day(cday)
+
+	If Len(mm) = 1 Then mm = "0"&mm
+	If Len(dd) = 1 Then dd = "0"&dd
+
+	cday = yy&mm&dd
+	nowtime = cday + shhmm
+
+
+    SYSTEM.Trace "shhmm:"&shhmm
+
+	If SCREEN.CreateObject("Info") Then
+		Today = INFO.PopData("", "NOTICECOOKIE.INI", "EVENT_POPUP", "TODAY")
+	 	tp = INFO.PopData("", "NOTICEPOPUP.INI", "TYPE", "TP")
+		f2 = INFO.PopData("", "NOTICEPOPUP.INI", tp&"TYPE", "F2")
+		f4 = INFO.PopData("", "NOTICEPOPUP.INI", tp&"TYPE", "F4")
+
+		'nowtime = Today + shhmm
+		SYSTEM.Trace "nowtime:"&nowtime
+		SYSTEM.Trace "f2:"&f2
+		SYSTEM.Trace "f4:"&f4
+
+	 	If Today = "0" Or (Today <> CDAT.Data) Then
+			INFO.PushData "", "NOTICECOOKIE.INI", "EVENT_POPUP", "TODAY", CDAT.Data
+			INFO.PushData "", "NOTICECOOKIE.INI", "EVENT_POPUP", "FIRST", "1"
+		Else
+		 	INFO.PushData "", "NOTICECOOKIE.INI", "EVENT_POPUP", "TODAY", CDAT.Data
+		End If
+
+	 	Check = INFO.PopData("", "NOTICECOOKIE.INI", "EVENT_POPUP", "FIRST")
+
+		If tp <> "D" And Check = "1" Then
+			If CDbl(f2) < CDbl(nowtime) And CDbl(nowtime) < CDbl(f4) Then
+				SYSTEM.Trace "popup"
+				SCREEN.CreateWindow 1, "IB0000P4 /p1", ""
+			End If
+		End If
+
+	End If
+End Sub
+
+
+
+'***************************************************************************
+'	Func : SetDic
+'	Desc : Set Dictionary
+'***************************************************************************
+'Sub SetDic()
+'	Dim gubn, key, tmpb
+
+'	' Clear Dic
+'	list.RemoveAll
+
+'	' Set Dic
+'	For ii = 1 To 3
+'		key = "KEY"&Trim(ii)
+
+'		If list.Exists(key) Then	' Dup Dic
+'			SYSTEM.Trace "SetDIC list key exist"
+'		Else
+'			tmpb = "STR " & Trim(ii) & " TEST"
+'			list.Item(key) = tmpb
+'		End If
+'	Next
+'End Sub
+
+'***************************************************************************
+'	Func : ReadDic
+'	Desc : Read Dictionary
+'***************************************************************************
+'Sub ReadDic(ii)
+'	Dim key, tmpb
+'	key = "KEY"&Trim(ii)
+'	If list.Exists(key) Then
+'		tmpb = list.Item(key)
+'		SYSTEM.Trace "KEY     FOUND : " & tmpb
+'	Else
+'		SYSTEM.Trace "KEY NOT FOUND : " & ii
+'	End If
+'End Sub
+
+
+
+
+' 원장 스위칭 시각 로그인 시 팝업창으로 스위칭 알림 문구 제공
+' kind : "국내", "해외"
+'Sub check_switching(kind)
+'	Dim ding, stim, etim, curr
+
+'	' 현재 시각 : 시(HH) + 분(MM)
+'	curr = Hour(Now)*100 + Minute(Now)
+'	If SCREEN.CreateObject("Info") Then
+'		' 메시지 출력 여부
+'	 	ding = INFO.PopData("", "SWITCHING.INI", "SWITCHING", "DING")
+'	 	If ding <> "Y" Then
+'	 		Exit Sub
+'	 	End If
+
+'	 	' 스위칭 시작 시각
+'	 	stim = INFO.PopData("", "SWITCHING.INI", kind, "STIM")
+'	 	' 데이터 미존재 시, Default 값 세팅
+'	 	If Trim(stim) = "" Then
+'	 		Select Case Trim(kind)
+'	 		Case "국내"		' 국내 원장 재기동 시작 시각
+'	 			stim = 2340
+'	 		Case "해외"		' 해외 원장 재기동 시작 시각
+'	 			stim = 0620
+'	 		End Select
+'	 	End If
+
+'	 	' 스위칭 종료 시각
+'	 	etim = INFO.PopData("", "SWITCHING.INI", kind, "ETIM")
+'	 	' 데이터 미존재 시, Default 값 세팅
+'	 	If Trim(etim) = "" Then
+'	 		Select Case Trim(kind)
+'	 		Case "국내"		' 국내 원장 재기동 시작 시각
+'	 			etim = 0050
+'	 		Case "해외"		' 해외 원장 재기동 시작 시각
+'	 			etim = 0640
+'	 		End Select
+'	 	End If
+
+'	 	' Data 보정 :
+'	 	If Trim(curr) <> "" Then
+'	 		curr = CDbl(curr)
+'	 	End If
+
+'	 	If Trim(stim) <> "" Then
+'	 		stim = CDbl(stim)
+'	 	End If
+
+'	 	If Trim(etim) <> "" Then
+'	 		etim = CDbl(etim)
+'	 	End If
+
+'		' 원장 재기동 시각에 안내문구 표시
+'		Select Case Trim(kind)
+'		Case "국내" ' 23:40 ~ 익일 00:50 사이에 국내원장 재기동 안내문구 팝업
+'			If stim =< curr Or curr =< etim Then
+'				SCREEN.CreateWindow 3, "IB0000P9 /t/S/p5/d", "KIND"&vbTab&Trim(kind)&vbLf
+'			End If
+'		Case "해외" ' 06:20 ~      06:40 사이에 해외원장 재기동 안내문구 팝업
+'			Dim tmpkind
+'			If stim = 720 Then
+'				tmpkind = "해외서머해제"
+'			Else
+'				tmpkind = "해외서머"
+'			End If
+
+'			If stim =< curr And curr =< etim Then
+'				SCREEN.CreateWindow 3, "IB0000P9 /t/S/p5/d", "KIND"&vbTab&Trim(tmpkind)&vbLf
+'			End If
+'		End Select
+
+'	End If
+'End Sub
+
+_AW_ONSTART_AW_
+'MsgBox "TEST"
+' 원장 재기동 시간 검사
+SCREEN.SetTimer 5, False
+
+ '지정일에만 이벤트 팝업 여부 조회 - 시간체크 시 사용
+ '시스템부하 경감 위해 08:50 ~ 09:30 팝업 X
+'Dim hhmm, Check
+'hhmm = Hour(Now)*100 + Minute(Now)
+
+'If 850 <= hhmm And hhmm <= 930 Then
+'	Exit Sub
+'End If
+
+
+'SYSTEM.Trace CDAT.Data
+'SYSTEM.Trace "TEST"
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+SCREEN.OnSend = False
+
+i_usid.Data = LOGIN.User
+If Trim(i_usid.Data) = "" Then
+	Exit Sub
+End If
+
+SCREEN.OnSend = True
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+Dim res, Today, Check
+
+'Dim hhmm
+'hhmm = Hour(Now)*100 + Minute(Now)
+
+res = o_popu.Data
+If i_gubn.Data = "0010" Then
+	If SCREEN.CreateObject("Info") Then
+
+		Today = INFO.PopData("", "NOTICECOOKIE.INI", "EVENT_POPUP2", "TODAY")
+
+		' INIT INI FILE
+		If Today = "0" Or (Today <> CDAT.Data) Then
+			INFO.PushData "", "NOTICECOOKIE.INI", "EVENT_POPUP2", "TODAY", CDAT.Data
+			INFO.PushData "", "NOTICECOOKIE.INI", "EVENT_POPUP2", "FIRST", "1"
+		Else
+		 	INFO.PushData "", "NOTICECOOKIE.INI", "EVENT_POPUP2", "TODAY", CDAT.Data
+		End If
+
+		Check = INFO.PopData("", "NOTICECOOKIE.INI", "EVENT_POPUP2", "FIRST")
+
+		If InStr(res, "1") > 0 And Check = "1" Then ' FIRST 가 1일때 보여줌
+			SCREEN.CreateWindow 1, "IB0000P2 /p2", "" ' 우측상단
+		End If
+
+	End If
+End If
+
+_AW_ONENDSUB_AW_
+_AW_ONTIMER_AW_
+'Call check_switching("국내")
+'Call check_switching("해외")
+
+Call Set_Ini()
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(BUTTON1)
+_AW_ONCLICK_AW_
+'Dim ii
+'For ii = 1 To 4
+'	Call ReadDic(ii)
+'Next
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON2)
+_AW_ONCLICK_AW_
+'
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON3)
+_AW_ONCLICK_AW_
+'
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON4)
+_AW_ONCLICK_AW_
+'
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON5)
+_AW_ONCLICK_AW_
+'
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON6)
+_AW_ONCLICK_AW_
+'
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

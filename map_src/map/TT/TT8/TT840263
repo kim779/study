@@ -1,0 +1,182 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(TT840263)
+MAPSIZE(309, 328)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("계좌현황")
+MAPPUBLIC(";")
+FONT("굴림", 9, NORMAL)
+OPTIONS(ENCODE)
+TITLE("계좌현황")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("piboPBxO")
+MAPTYPE(FIXED)
+HEADER(LEDGER)
+TRXH("31CSDPNQ031")
+BGROUND(BRUSH, 64)
+}
+
+
+
+FORM DIVISION
+{
+
+GROUP  grp1(10, 123, 204, 252)  'INPUT'        COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+GROUP  GROUP0(229, 124, 286, 207)  'OUTPUT'        COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  In(99, 145, 184, 161)  LEN(5)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("00001")          TABORDER(1)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL9(18, 145, 96, 161)  '레코드갯수'        COLOR(66, 76)  CUR(0)    AL_LEFT    ENABLE  &
+  HINTTYPE(IH_NONE)
+GRID  GRID0(0, 0, 256, 92)  VISIBLEROW(0)  CELLH(18)  MATRIX(200, 3)  FIX(0)  MAINCOLOR(7, 232)  LINECOLOR(75)  FOCUSCOLOR(78)  FOCUSKIND(4)    FONT("굴림체", 9, NORMAL)  ROWC(68, 77)  |FLEXIBLE|VSCROLL|NO3D|RROW|GRFTEXT    &
+	COLINFO("zBnkCode")  LEN(3)  WIDTH(80)  HEAD("은행코드")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_MIXED|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("zBnkNm")  LEN(40)  WIDTH(80)  HEAD("은행명")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_MIXED|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("zBnkAcntNo")  LEN(20)  WIDTH(80)  HEAD("은행계좌번호")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_MIXED|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    TABORDER(2)  IOORDER(7)  ENABLE  &
+  VISIBLE
+
+PANEL  GUIDE(19, 357, 620, 373)        COLOR(66, 232)  CUR(0)    AL_LEFT    ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  in_out(12, 258, 302, 281)  LEN(36)  IO_MIXED|AL_CENTER|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(5)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  zBankCode(22, 164, 65, 185)  LEN(3)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(3)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  zAcntNo(80, 166, 189, 182)  LEN(20)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(4)  IOORDER(3)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  zPwd(22, 192, 142, 211)  LEN(8)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(5)  IOORDER(4)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  Out(242, 142, 263, 156)  LEN(1)  IO_NUM|AL_CENTER|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(6)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+'== 첫 조회
+Sub send_f()
+	LEDGER.Fkey = "C"
+	SCREEN.Send 0
+End Sub
+
+'== 연속 조회
+Sub send_c()
+	LEDGER.Fkey = "7"
+	GRID0.SetDataPosition 2
+	SCREEN.Send 0
+End Sub
+
+Sub Setting()
+	Dim ii, citem, items, items2, str, name, code
+'	items = "" & vbTab & "" & "" & vbTab
+	items = ""
+'	items2 = "" & vbTab & ""
+	items2 = ""
+	citem = "" & vbTab & "" & ""
+
+	For ii=1 To GRID0.Rows
+
+'		str = Trim(GRID0.GetGridtext(ii, 3))
+		str = GRID0.GetGridtext(ii, 3)
+		name = Trim(GRID0.GetGridtext(ii,2))
+		code = Trim(GRID0.GetGridtext(ii,1))
+
+		If str <> "" And name <> "" And code <> "" Then
+		   items = items & str & str & vbTab
+		   items2 = items2 & name & vbTab
+		   citem = citem & vbTab & code
+		End If
+	Next
+
+	'환불입고계좌 데이터가 있는 체크
+	If SCREEN.Object("main.OBJ1.chk_ipgo").Text = "1" Then
+		'환불입고계좌가 있을경우 앞에 붙이기
+		'ipgo_data = SCREEN.Object("main.OBJ1.zRebatAcntNo").data & "         "
+		'ipgo_name = SCREEN.Object("main.OBJ1.ANCM1").data
+
+		ipgo_data = ""
+		ipgo_name = ""
+
+		items = ipgo_data & ipgo_data & vbTab & items
+		items2 = vbTab & ipgo_name & vbTab & items2
+
+		'콤보박스 디폴트 선택 데이터
+		items = ipgo_data & vbTab & items
+	Else
+		'콤보박스 디폴트 선택 데이터(공백)
+		items = vbTab & vbTab & items
+		items2 =  vbTab & vbTab & items2
+	End If
+
+	SCREEN.Object("main.OBJ1.code").SetItems(citem)
+	SCREEN.Object("main.OBJ1.zRebatAmtMtrsfBnkAcntNo").SetItems(items)'
+	SCREEN.Object("main.OBJ1.zRebatAmtMtrsfBnkAcntNo_nm").SetItems(items2)
+	SCREEN.Proc "main.OBJ1.transacct_set", ""  '--계좌번호, 계좌명 세팅
+End Sub
+
+_AW_ONINDECLARE_AW_
+#Load IB888833
+
+_AW_ONENDSUB_AW_
+_AW_ONSTART_AW_
+Call Check_LoginType(zPwd)
+
+LEDGER.Rcnt = "0010"
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+'zAcntNo.Data = SCREEN.Object("main.obj1.AN1A").data
+
+'환불입고계좌에 대한 환불이체계좌 조회
+SCREEN.OnSend = False
+
+zAcntNo.Data = SCREEN.Object("main.obj1.zRebatAcntNo").Data
+zPwd.Data = SCREEN.Object("main.obj1.zpwd").data
+
+If SYSTEM.ConnectBy = 0 Then
+	zPwd.Data = "9999"
+End If
+
+SCREEN.OnSend = True
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+If LEDGER.Next = "Y" Then
+	Call send_c()
+Else
+	Call Setting()
+
+	If SCREEN.Object("parent.IsClickButton").Text = 0 Then
+		Call alert_msg("환불이체계좌를 확인하시기 바랍니다. 청약 신청을 원하시면 전송버튼을 클릭해 주세요")
+		SCREEN.Object("parent.IsClickButton").Text  = 1
+		SCREEN.Object("parent.BUTTON1").SetFocus
+		Exit Sub
+	End If
+'	SCREEN.Proc "main.OBJ1.send_f", ""	'--자동 전송
+
+	If SCREEN.Object("parent.jusik").Checked = True Then
+		SCREEN.Object("parent.zIsuNo").SetFocus
+	Else
+		SCREEN.Object("parent.zIsuNo_chae").SetFocus
+	End If
+End If
+
+'SCREEN.Proc "main.OBJ1.bank_chk", ""  '--은행개설계좌 여부 체크
+'SCREEN.Proc "main.OBJ1.fund_chk", ""  '--펀드계좌 여부 체크
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(GRID0)
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

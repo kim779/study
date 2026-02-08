@@ -1,0 +1,127 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB0000C3)
+MAPSIZE(201, 414)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("굴림", 9, NORMAL)
+TITLE("보안프로그램 실행 안내")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL15(-1, 30, 414, 200)  LIMAGE(0)  LINEW(4)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL2(10, 40, 405, 95)        COLOR(96, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL10(20, 50, 34, 64)    |IMAGE|AL_STRETCH    COLOR(208, 232)  CUR(0)    "알림_ic.bmp"  ENABLE  &
+  VISIBLE  TRANSPARENT  IMAGE  HINTTYPE(IH_NONE)
+PANEL  GUIDE2(35, 45, 395, 69)  '현재 보안프로그램중 일부가 실행되고 있지 않습니다.'        COLOR(228, 209)  CUR(0)    AL_LEFT  FONT("굴림", 9, BOLD)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+PANEL  PANEL25(15, 110, 25, 120)    |IMAGETEXT|AL_CENTER    COLOR(208, 232)  CUR(0)    "텍스트화살표_하단.bmp"  ENABLE  &
+  VISIBLE  TRANSPARENT  IMAGETEXT  HINTTYPE(IH_NONE)
+LABEL  LABEL22(30, 105, 405, 125)  '보안 프로그램이 실행되지 않을경우 해킹에 노출될 수 있습니다.'  AL_LEFT  CUR(0)      COLOR(208, 69)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+PANEL  PANEL5(15, 145, 25, 155)    |IMAGETEXT|AL_CENTER    COLOR(208, 232)  CUR(0)    "텍스트화살표_하단.bmp"  ENABLE  &
+  VISIBLE  TRANSPARENT  IMAGETEXT  HINTTYPE(IH_NONE)
+LABEL  LABEL11(30, 140, 255, 160)  '보안프로그램을 실행하시겠습니까?'  AL_LEFT  CUR(0)      COLOR(208, 69)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BOX  BOX0(10, 130, 405, 132)    COLOR(201, 201)  LINEW(1)  BX_LINE    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  btn_yes(45, 165, 120, 185)  '예'  TP_USER|IMAGETEXT|AL_STRETCH        FONT("굴림체", 9, BOLD)  FOCUS  COLOR(208, 186)  CUR(0)    "6BTN_조회.BMP"    TABORDER(1)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+BUTTON  btn_no(130, 165, 200, 185)  '아니오'  TP_PUSH|IMAGETEXT|AL_STRETCH        FOCUS  COLOR(208, 186)  CUR(0)    "6BTN.BMP"    TABORDER(2)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+PANEL  PANEL6(-1, 0, 414, 35)  LIMAGE(0)  LINEW(4)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL12(125, 9, 305, 29)  '[ 보안프로그램 실행 안내 ]'  AL_LEFT  FONT("MS Sans Serif", 9, BOLD)  CUR(0)      COLOR(181, 232)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL0(45, 70, 102, 88)  '방화벽 :'        COLOR(228, 232)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+PANEL  PANEL3(170, 70, 250, 88)  '키보드보안 :'        COLOR(228, 232)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+PANEL  pn_nprotect(96, 70, 153, 88)  '실행중'        COLOR(228, 222)  CUR(0)    AL_LEFT  FONT("굴림", 9, BOLD)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+PANEL  pn_kdefense(245, 70, 302, 88)  '실행중'        COLOR(228, 222)  CUR(0)    AL_LEFT  FONT("굴림", 9, BOLD)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  btn_nochk(220, 166, 350, 186)  '다시 묻지 않습니다.'  TP_CHECK|EDIT_NOP          COLOR(208, 232)  CUR(0)      TABORDER(3)  ENABLE  &
+  VISIBLE  CHECKED  TRANSPARENT  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Dim r_rgb, b_rgb, val, myFILE
+
+myFILE = "userconf.ini"
+r_rgb = 209
+b_rgb = 222
+
+Sub Load()
+	If SCREEN.CreateObject("INFO") Then
+		val = Trim(INFO.PopData(LOGIN.Name, myFILE, SCREEN.GetMapName(0), "FIREWALL"))
+		If val="ON" Then
+			pn_nprotect.Text = "실행중"
+			pn_nprotect.TRgb = b_rgb
+		Else
+			pn_nprotect.Text = "미실행"
+			pn_nprotect.TRgb = r_rgb
+		End If
+		
+		val = Trim(INFO.PopData(LOGIN.Name, myFILE, SCREEN.GetMapName(0), "KEYSECURE"))
+		If val="ON" Then
+			pn_kdefense.Text = "실행중"
+			pn_kdefense.TRgb = b_rgb
+		Else
+			pn_kdefense.Text = "미실행"
+			pn_kdefense.TRgb = r_rgb
+		End If
+	End If
+End Sub
+
+Sub Save(yesno)
+	If SCREEN.CreateObject("INFO") Then
+		INFO.PushData LOGIN.Name, myFILE, SCREEN.GetMapName(0), "YESNO", yesno
+		INFO.PushData LOGIN.Name, myFILE, SCREEN.GetMapName(0), "NOPOPUP", btn_nochk.Checked
+	End If
+End Sub
+
+_AW_ONSTART_AW_
+Call Load()
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(btn_yes)
+_AW_ONCLICK_AW_
+Call Save("YES")
+SCREEN.CloseWindow
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(btn_no)
+_AW_ONCLICK_AW_
+Call Save("NO")
+SCREEN.CloseWindow
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

@@ -1,0 +1,118 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB49892M)
+MAPSIZE(241, 197)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("투자성향 체크")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(ENCODE)
+TITLE("투자성향 체크")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("piboPBxQ")
+MAPTYPE(FIXED)
+HEADER(LEDGER)
+TRXH("31CSACMQ193")
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  GUIDE(1, 696, 740, 714)        COLOR(66, 69)  CUR(0)    AL_LEFT    ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL23(0, 0, 200, 240)  LIMAGE(0)  LINEW(4)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  in(103, 13, 197, 31)  LEN(5)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_PASS    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("00001")          TABORDER(1)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL6(14, 13, 99, 31)  '입력'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  Rmnno(100, 30, 194, 48)  LEN(24)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_PASS    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(2)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL7(14, 33, 99, 51)  '실명확인번호'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL8(14, 75, 99, 93)  '조회종료일'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL9(14, 125, 99, 143)  'data1'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL10(14, 145, 99, 163)  '고객성향'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL11(14, 165, 99, 183)  'data2'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL32(14, 53, 99, 71)  '조회시작일'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  OrySrtDt(105, 52, 191, 72)  LEN(8)  IO_NUM|EDIT_INPUT|FA_DATE    COLOR(68, 130)  CUR(0)  TP_SUNKEN          EDITFORMAT("9999/99/99")  TABORDER(3)  IOORDER(3)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  OryEndDt(106, 73, 192, 93)  LEN(8)  IO_NUM|EDIT_INPUT|FA_DATE    COLOR(68, 130)  CUR(0)  TP_SUNKEN          EDITFORMAT("9999/99/99")  TABORDER(4)  IOORDER(4)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  BUTTON0(102, 194, 187, 219)  TP_PUSH      AL_CENTER    FOCUS  COLOR(208, 232)  CUR(0)      TABORDER(5)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  data1(104, 124, 189, 144)  LEN(250)  IO_MIXED|AL_CENTER|    COLOR(192, 130)  CUR(0)            TABORDER(0)  IOORDER(6)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  GrdNm(103, 147, 190, 167)  LEN(1)  IO_MIXED|AL_LEFT|    COLOR(192, 130)  CUR(0)            TABORDER(0)  IOORDER(7)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  data2(106, 169, 191, 189)  LEN(469)  IO_MIXED|AL_LEFT|    COLOR(192, 130)  CUR(0)            TABORDER(0)  IOORDER(8)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  OUTPUT3(106, 97, 191, 117)  LEN(45)  IO_MIXED|AL_CENTER|    COLOR(192, 130)  CUR(0)            TABORDER(0)  IOORDER(5)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONRECEIVE_AW_
+If Trim(GrdNm.Data) = "" Then
+	'MsgBox "투자성향이 등록되어 있지 않습니다.", , "IBK투자증권"
+'	SCREEN.Object("parent.riskcombo").Data = "06"
+'	SCREEN.Object("parent.zFundRiskCode").Data = "06"
+	Exit Sub
+ElseIf Trim(GrdNm.Data) = "5" Then
+	SCREEN.Object("parent.riskcombo").Data = "06"
+	SCREEN.Object("parent.zFundRiskCode").Data = "06"
+ElseIf Trim(GrdNm.Data) = "4" Then
+	SCREEN.Object("parent.riskcombo").Data = "04"
+	SCREEN.Object("parent.zFundRiskCode").Data = "04"
+ElseIf Trim(GrdNm.Data) = "3" Then
+	SCREEN.Object("parent.riskcombo").Data = "03"
+	SCREEN.Object("parent.zFundRiskCode").Data = "03"
+ElseIf Trim(GrdNm.Data) = "2" Then
+	SCREEN.Object("parent.riskcombo").Data = "02"
+	SCREEN.Object("parent.zFundRiskCode").Data = "02"
+ElseIf Trim(GrdNm.Data) = "1" Then
+	SCREEN.Object("parent.riskcombo").Data = "01"
+	SCREEN.Object("parent.zFundRiskCode").Data = "01"
+ElseIf Trim(GrdNm.Data) = "0" Then '금융소비자
+	SCREEN.Object("parent.riskcombo").Data = "06"
+	SCREEN.Object("parent.zFundRiskCode").Data = "06"
+End If
+
+SCREEN.Proc "parent.send_f", ""
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(OrySrtDt)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(OryEndDt)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON0)
+_AW_ONCLICK_AW_
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

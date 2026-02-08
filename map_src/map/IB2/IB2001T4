@@ -1,0 +1,195 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB2001T4)
+MAPSIZE(321, 190)
+VERSION(003)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("현재가_섹터")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+TITLE("현재가_섹터")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pino2702")
+MAPTYPE(RESIZE)
+HEADER(NOP)
+BGROUND(BRUSH, 181)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL0(0, 0, 304, 25)        COLOR(66, 1)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  hnam(746, 75, 826, 103)  LEN(12)  IO_MIXED|AL_LEFT|  FONT("굴림체", 9, BOLD)    COLOR(68, 69)  CUR(0)            TABORDER(0)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  BUTTON0(461, 3, 517, 23)  '돌려보기'  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(208, 232)  CUR(0)    "4BTN.BMP"    TABORDER(4)  ENABLE  &
+  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+BUTTON  BUTTON2(518, 3, 550, 23)  '조회'  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(208, 232)  CUR(0)    "2BTN.BMP"    TABORDER(2)  ENABLE  &
+  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+GRID  GRID1(321, 104, 508, 196)  VISIBLEROW(10)  CELLH(18)  MATRIX(100, 2)  FIX(1)  MAINCOLOR(7, 0)  LINECOLOR(75)  FOCUSCOLOR(78)  FOCUSKIND(3)    FONT("굴림체", 9, NORMAL)  ROWC(68, 77)  |SELALWAYS|FLEXIBLE|VSCROLL|GRFIX|NO3D|RROW|XHLINE|PAGE|GRFTEXT    &
+	COLINFO("Col0")  LEN(4)  WIDTH(80)  HEAD("테마코드")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col1")  LEN(30)  WIDTH(171)  HEAD("테마명")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    TABORDER(3)  IOORDER(2)  ENABLE
+BUTTON  BUTTON1(556, 69, 575, 89)  TP_PUSH|IMAGE|AL_STRETCH      COLOR(208, 232)  CUR(0)    "검색.BMP"    TABORDER(1)  ENABLE  &
+  IMAGE  HOVER  HINTTYPE(IH_NONE)
+OBJECT  OBJ1(0, 27, 190, 321)    "IB2001T5"  TABORDER(5)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  ssjm(403, 3, 523, 23)  LEN(7)  IO_NUM|AL_CENTER||FA_SKIP    COLOR(66, 69)  CUR(0)            TABORDER(0)  IOORDER(4)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL0(3, 3, 30, 23)  '섹터'  AL_CENTER  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(66, 69)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+OBJECT  OBJECT0(178, 414, 314, 434)    "IB270202"  TABORDER(6)  IOORDER(5)  ENABLE  &
+  HINTTYPE(IH_NONE)
+COMBO  TMCB(35, 3, 186, 23)  TP_SUNKEN  LEN(0)  COUNT(0)  VCOUNT(0)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_NUM|EDIT_INPUT|FA_SKIP  FONT("굴림체", 9, NORMAL)    COLOR(68, 69)  CUR(0)    TABORDER(7)  IOORDER(6)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  trg_ac(205, 5, 230, 24)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("0")          TABORDER(8)  IOORDER(7)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  1301(350, 210, 440, 230)  LEN(12)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(9)  IOORDER(8)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONINDECLARE_AW_
+#load IB888888
+#load IB999901
+
+_AW_ONENDSUB_AW_
+_AW_ONSTART_AW_
+S1301.Data = SYSTEM.GetHistory(False, 1301)
+'SCREEN.Send 0
+SCREEN.SetTimer 5, False
+'------
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+S1301.Data = SCREEN.object("main.1301").Data
+'If Len(Trim(S1301.Data)) <> 6 Then
+'	SCREEN.OnSend False
+'End If
+
+If UCase(TypeName( SCREEN.Object("main.cxMarket"))) <> "NOTHING" Then
+	If SCREEN.Object("main.cxMarket").sMarket = "KRX" Then
+		S1301.Data = SCREEN.Object("main.1301").Data
+	ElseIf SCREEN.Object("main.cxMarket").sMarket = "NXT" Then
+		S1301.Data = "N." & SCREEN.Object("main.1301").Data
+	ElseIf SCREEN.Object("main.cxMarket").sMarket = "통합" Then
+		S1301.Data = "M." & SCREEN.Object("main.1301").Data
+	End If
+End If
+
+If trg_ac.Data = "1" Then
+	SCREEN.SetTimer 10, False
+	SCREEN.OnSend = False
+Else
+'	SYSTEM.Trace "SCREEN.OnSend = True"
+	SCREEN.OnSend = True
+End If
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+GRID1.Row = 1
+If GRID1.GetGridCell(1, 1) <> "  " Then
+	SCREEN.Object("OBJ1.tmcd").data = GRID1.GetGridCell(1, 1)
+	OBJ1.send
+Else
+	ssjm.Clear
+	SCREEN.Object("OBJ1.grid2").clear
+End If
+
+
+Dim ii, str, items
+For ii = 1 To GRID1.Rows
+	str = Trim(GRID1.GetGridCell(ii, 2))
+
+	items = items & vbTab & str
+Next
+
+TMCB.SetItems(items)
+
+OBJECT0.send
+
+_AW_ONENDSUB_AW_
+_AW_ONTIMER_AW_
+If trg_ac.Data = "0" Then
+	SCREEN.Send 0
+Else
+	trg_ac.Data = "0"
+End If
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(BUTTON0)
+_AW_ONCLICK_AW_
+Dim i, str
+str = ""
+For i = 1 To SCREEN.Object("OBJ1.GRID2").Rows
+	str = str & Trim(SCREEN.Object("OBJ1.GRID2").GetGridCell(i, 2))
+	str = str & vbTab
+	str = str & Trim(SCREEN.Object("OBJ1.GRID2").GetGridCell(i, 3))
+	str = str & vbLf
+Next
+If Len(Trim(str)) > 0 Then
+	SYSTEM.SetAutoCode str, SCREEN.Object("OBJ1.GRID2").Rows
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(GRID1)
+_AW_ONCLICK_AW_
+If GRID1.HitPos = 3 Then
+	SCREEN.Object("OBJ1.tmcd").data = GRID1.GetGridCell(GRID1.Row, 1)
+	OBJ1.send
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON1)
+_AW_ONCLICK_AW_
+Dim retn
+retn = SCREEN.GetCode(100, "1301", "hnam", 0 )
+If retn <> True Then
+       Exit Sub
+End If
+
+If SCREEN.GetCodeType(S1301.data) = 2 Then
+	hnam.TRgb = 7
+ElseIf SCREEN.GetCodeType(S1301.data) = 1 Then
+	hnam.TRgb = 6
+Else
+	hnam.TRgb = 0
+End If
+
+SCREEN.Send 2
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(TMCB)
+_AW_ONCHANGE_AW_
+SCREEN.Object("OBJ1.tmcd").data = GRID1.GetGridCell(TMCB.Index +1 , 1)
+OBJ1.send
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(trg_ac)
+_AW_ONCHANGE_AW_
+'SYSTEM.Trace "trg_ac: " & trg_ac.Data
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

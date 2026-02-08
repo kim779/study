@@ -1,0 +1,97 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB200132)
+MAPSIZE(372, 322)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(FMS|FLASH)
+TITLE("[200132]호가컨트롤")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pooppoop")
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+CONTROL  17412(0, 0, 322, 372)    "CX_Depth"  "/u1/d10/p0/b/s0/l/c/h3/o/g/a1/fIB200100/red_jprc/t"  LEN(0)  EDIT_OUTPUT  FONT("굴림체", 9, NORMAL)    COLOR(193, 232)  TABORDER(0)  IOORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  1021(430, 70, 504, 90)  LEN(12)  IO_ALPHA|AL_LEFT||FA_FLASH  FONT("굴림체", 9, NORMAL)    COLOR(211, 232)  CUR(0)            TABORDER(0)  IOORDER(3)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  1777(430, 120, 450, 140)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("2")          TABORDER(1)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  1301(430, 90, 510, 110)  LEN(12)  IO_MIXED|EDIT_INOUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(2)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Sub SendTR(data)
+	SCREEN.Object("main.1301").data = data
+	SCREEN.Send 2
+End Sub
+
+Sub saveDepthInfo()
+	If SCREEN.CreateObject("Info") Then
+		INFO.pushData LOGIN.Name, "userconf.ini", SCREEN.GetMapName(1), "SepType", S17412.sDepthInfo
+	End If
+SYSTEM.Trace "saveDepthInfo SepType = " & S17412.sDepthInfo
+End Sub
+
+Sub LoadDepthInfo()
+SYSTEM.Trace "LoadDepthInfo myMAP(parent) = " & SCREEN.GetMapName(1)  & " self = " & SCREEN.GetMapName(0)
+	If SCREEN.CreateObject("Info") Then
+		S17412.sDepthInfo =	Trim(INFO.popData (LOGIN.Name, "userconf.ini", SCREEN.GetMapName(1), "SepType"))
+	End If
+End Sub
+
+_AW_ONSTART_AW_
+LoadDepthInfo()
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+S1301.Data = SCREEN.object("main.1301").Data
+If Len(Trim(S1301.Data)) <> 6 Then
+	SCREEN.OnSend False
+End If
+
+If UCase(TypeName( SCREEN.Object("main.cxMarket") )) <> "NOTHING" Then
+SYSTEM.Trace "[IB1001E0][onSend] Change_MKGubn = " & SCREEN.Object("main.cxMarket").sMarket
+	If Trim(SCREEN.Object("main.cxMarket").sMarket) = "통합" Then
+		S1777.Data = "3"
+		S17412.SetMKtype(3)
+	ElseIf Trim(SCREEN.Object("main.cxMarket").sMarket) = "KRX" Then
+		S1777.Data = "1"
+		S17412.SetMKtype(1)
+	ElseIf Trim(SCREEN.Object("main.cxMarket").sMarket) = "NXT" Then
+		S1777.Data = "2"
+		S17412.SetMKtype(2)
+	End If
+End If
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(17412)
+_AW_ONCHANGE_AW_
+saveDepthInfo
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

@@ -1,0 +1,639 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB650100)
+MAPSIZE(646, 657)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("장내채권주문")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(FLASH|CR2TAB)
+TITLE("[6501] 장내채권 주문")
+TOPATH(AXIS)
+METHOD(MENU)
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL53(0, 0, 665, 100)        COLOR(68, 97)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL3(0, 395, 661, 624)  LIMAGE(0)  LINEW(3)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL6(7, 428, 650, 453)        COLOR(66, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL2(347, 97, 661, 395)  LIMAGE(0)  LINEW(3)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL0(0, 97, 349, 395)  LIMAGE(0)  LINEW(3)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  obj_hoga(6, 130, 341, 387)    "IB650171"  TABORDER(3)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL1(353, 104, 653, 129)        COLOR(66, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  ACNM(500, 106, 564, 126)  LEN(20)  IO_MIXED|AL_LEFT||FA_SKIP    COLOR(160, 130)  CUR(0)  LINECOLOR(89)          TABORDER(0)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  ed_pswd(594, 106, 650, 126)  LEN(8)  IO_MIXED|EDIT_INPUT|FA_PASSWD|FA_WRAP    COLOR(192, 130)  CUR(0)  TP_SUNKEN          TABORDER(2)  IOORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+CONTROL  AN1A(357, 106, 497, 126)    "CX_Account"  "/w0"  LEN(11)  EDIT_INPUT    COLOR(68, 130)  TABORDER(1)  IOORDER(5)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  cgcd(715, 491, 803, 511)  LEN(12)  IO_ALPHA|EDIT_INPUT|FA_SEND|FA_WRAP|FA_UPPER|FA_PASS|SA_ALL    COLOR(68, 69)  CUR(0)  TP_NONE          TABORDER(4)  IOORDER(6)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  OBJ_snd(721, 535, 922, 636)    "IB999941"  TABORDER(6)  IOORDER(7)  ENABLE  &
+  HINTTYPE(IH_NONE)
+GROUP  GROUP0(714, 515, 930, 644)  '주문전송 obj'        COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+USRTAB  tab_sise(6, 104, 341, 130)  FOCUS  INDEX(0)  COUNT(4)  AL_TOP  TAB_IMAGE      FONT("굴림체", 9, NORMAL)    COLOR(3, 70)  CUR(0)  TABIMAGE("TAB.BMP")  FCOLOR(3, 71)  CAPTION("호가", "시간별", "일자별", "상세")  TABINFO("1:1", "1:3", "1:4", "1:2")  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  jm_gubn(805, 491, 824, 510)  LEN(1)  IO_NUM|EDIT_INOUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(7)  IOORDER(8)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  obj_account(7, 453, 649, 614)    "IB650181"  TABORDER(8)  IOORDER(9)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+USRTAB  tab_account(7, 402, 649, 428)  FOCUS  INDEX(0)  COUNT(4)  AL_TOP  TAB_IMAGE      FONT("굴림체", 9, NORMAL)    COLOR(3, 70)  CUR(0)  TABIMAGE("TAB.bmp")  FCOLOR(3, 71)  CAPTION("잔고", "체결", "예수금", "주문가능")  TABINFO("1:1", "1:2", "1:3", "1:4")  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  b_excl(551, 430, 571, 450)  TP_PUSH|IMAGE|AL_STRETCH      COLOR(208, 232)  CUR(0)    "엑셀.bmp"    TABORDER(11)  ENABLE  &
+  VISIBLE  IMAGE  HOVER  HINTTYPE(IH_NONE)
+LABEL  LABEL(252, 431, 277, 451)  '체결'  AL_LEFT  CUR(0)      COLOR(209, 130)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_NONE)
+COMBO  cggb(280, 430, 354, 450)  TP_SUNKEN  LEN(1)  COUNT(3)  VCOUNT(3)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_NUM|EDIT_INPUT|FA_PASS    COLOR(192, 130)  CUR(0)  DISPLAY("전체", "체결", "미체결")  DATA("0", "1", "2")    TABORDER(12)  IOORDER(10)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  tabs(822, 680, 902, 699)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(13)  IOORDER(11)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  dyLabel(144, 430, 169, 450)  '대용구분'  AL_LEFT  CUR(0)      COLOR(209, 130)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  b_quri(572, 430, 609, 450)  '조회'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, BOLD)  COLOR(208, 186)  CUR(0)    "조회btn.bmp"    TABORDER(9)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+EDIT  dyEdit(818, 753, 921, 783)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(68, 69)  CUR(0)  TP_NONE  INIT("0")          TABORDER(15)  IOORDER(13)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  cggbEdit(817, 787, 918, 812)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(68, 69)  CUR(0)  TP_NONE  INIT("0")          TABORDER(16)  IOORDER(14)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  GUIDE1(0, 623, 661, 647)  LIMAGE(1)  LINEW(3)  STRESS(0)  STRESSW(0)  LINETYPE(4)  LINECOLOR(64)      COLOR(34, 69)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL5(9, 628, 23, 642)    |IMAGE|AL_STRETCH    COLOR(208, 232)  CUR(0)    "알림_ic.bmp"  ENABLE  &
+  VISIBLE  TRANSPARENT  IMAGE  HINTTYPE(IH_NONE)
+PANEL  GUIDE(24, 624, 652, 648)        COLOR(228, 69)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  b_quri2(611, 430, 648, 450)  '조회'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, BOLD)  COLOR(208, 186)  CUR(0)    "조회btn.bmp"    TABORDER(17)  ENABLE  &
+  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+COMBO  dyCombo(172, 430, 232, 450)  TP_SUNKEN  LEN(1)  COUNT(2)  VCOUNT(2)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_NUM|EDIT_INPUT|FA_PASS    COLOR(192, 130)  CUR(0)  DISPLAY("일반", "대용")  DATA("0", "1")    TABORDER(14)  IOORDER(12)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  dtxt(487, 432, 552, 450)  '(수량: 천)'  AL_LEFT  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(66, 130)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  b_next(611, 430, 647, 450)  '다음'  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(208, 186)  CUR(0)    "2btn.bmp"    TABORDER(10)  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+OBJECT  obj_jumn(354, 158, 654, 388)    "IB650110"  TABORDER(5)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+USRTAB  tab_order(352, 127, 652, 156)  FOCUS  INDEX(0)  COUNT(5)  AL_TOP  TAB_IMAGE  |FA_SKIP|FA_UPPER    FONT("굴림체", 9, NORMAL)    COLOR(3, 70)  CUR(0)  TABIMAGE("OTAB.BMP")  FCOLOR(3, 71)  CAPTION("매도", "매수", "정정", "취소", "대용")  TABINFO("1:1", "1:2", "1:3", "1:4", "1:5")  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  ed_gubn(715, 470, 800, 490)  LEN(1)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_SUNKEN  INIT("0")          TABORDER(18)  IOORDER(15)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  dtext(487, 432, 552, 450)  '(수량: 원)'  AL_LEFT  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(66, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  BUTTON1(9, 430, 69, 450)  '일괄정정'  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(208, 186)  CUR(0)    "4btn.bmp"    TABORDER(19)  &
+  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+BUTTON  BUTTON2(70, 430, 130, 450)  '일괄취소'  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(208, 209)  CUR(0)    "4btn.bmp"    TABORDER(20)  &
+  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+OBJECT  chk_pass(819, 657, 939, 677)    "IB810191"  TABORDER(21)  IOORDER(16)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL36(694, 655, 814, 675)  'chk_pass'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  dsgb1(369, 430, 394, 450)  '구분'  AL_LEFT  CUR(0)      COLOR(209, 130)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_NONE)
+COMBO  dsgb(397, 430, 471, 450)  TP_SUNKEN  LEN(1)  COUNT(3)  VCOUNT(3)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_NUM|EDIT_INPUT|FA_PASS    COLOR(192, 130)  CUR(0)  DISPLAY("전체", "매도", "매수")  DATA("0", "1", "2")    TABORDER(22)  IOORDER(17)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  obj_spin(705, 750, 775, 775)    "IB6666XX"  TABORDER(23)  IOORDER(18)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  btn_list(303, 105, 340, 125)  '조회'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, BOLD)  COLOR(208, 186)  CUR(0)    "조회btn.bmp"    TABORDER(24)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+LABEL  LABEL23(75, 25, 615, 45)  '채권 주문 시 충분한 이해없이 확인했다고 답변할 경우 향후 분쟁 또는 소송이 발생하는 경우 '  AL_LEFT  CUR(0)      COLOR(208, 214)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL17(75, 42, 550, 62)  '고객의 권리구제에 불리하게 작용될 수 있으므로 신중을 기하여 주시기 바랍니다.'  AL_LEFT  CUR(0)      COLOR(208, 214)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL18(75, 66, 575, 86)  '☎ 상담/문의 : IBK투자증권 관리영업점 또는 고객센터 (1588-0030, 1544-0050)'  AL_LEFT  CUR(0)      COLOR(208, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL24(75, 9, 645, 29)  '최종 매수 전 상품 내용을 충분히 숙지하시고, 고객투자성향 등을 감안하여 투자를 결정해 주세요.'  AL_LEFT  CUR(0)      COLOR(208, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  BUTTON10(6, 20, 65, 74)  TP_PUSH|IMAGE|AL_STRETCH      COLOR(15, 63)  CUR(0)    "WARNING_128.bmp"    TABORDER(25)  &
+  VISIBLE  IMAGE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Dim Odrgubn
+
+'***************************************************************************
+' DESC: 계좌설
+'***************************************************************************
+Sub Set_account()
+	SCREEN.Object("obj_jumn.ed_accn").Data = AN1A.data
+	ACNM.Data = AN1A.name
+	ed_pswd.Data = AN1A.Password
+
+	Dim data
+
+	If Trim(AN1A.Data) = "" Then
+		AN1A.SetFocus
+	ElseIf Trim(ed_pswd.Data) = "" Then
+		ed_pswd.SetFocus
+	Else
+		SCREEN.Object("obj_jumn.cgcd").SetFocus
+	End If
+	GUIDE.text = ""
+
+	data = Trim(AN1A.password)
+'	SYSTEM.Trace "6501 account : " & AN1A.name & data
+	If data <> "" Then
+'		SYSTEM.Trace "6501 not Null : " & data
+		SCREEN.Proc "obj_account.send_f", ""
+	Else
+'		SYSTEM.Trace "6501 Null : " & data
+		'obj_account.Send
+	End If
+End Sub
+
+
+
+Sub order_tab_change()
+	Select Case tab_order.ID
+		Case "1" : obj_jumn.SetObject("IB650110")
+'			If tab_account.ID = 4 Then
+'
+'				SCREEN.proc "obj_account.clear", ""
+'			End If
+		'	SCREEN.object("obj_account.panel38").visible = False
+		Case "2" : obj_jumn.SetObject("IB650120")
+			If tab_account.ID = 4 Then
+			'	SCREEN.proc "obj_account.clear", ""
+				If SCREEN.Object("obj_account.radio0").checked = True Then
+					SCREEN.Object("obj_account.panel38").visible = True
+				End If
+			End If
+		Case "3" : obj_jumn.SetObject("IB650130")
+		Case "4" : obj_jumn.SetObject("IB650140")
+		Case "5" : obj_jumn.SetObject("IB650150")
+	End Select
+
+	If tab_order.ID = "3" Or tab_order.ID = "4" Then
+		SCREEN.Object("obj_jumn.ed_ogno").SetFocus
+	Else
+		SCREEN.Object("obj_jumn.cgcd").SetFocus
+	End If
+End Sub
+
+Sub sise_tab_change()
+	Select Case tab_sise.ID
+		Case "1" : obj_hoga.SetObject("IB650171")
+		Case "2" : obj_hoga.SetObject("IB650172")
+		Case "3" : obj_hoga.SetObject("IB650173")
+		Case "4" : obj_hoga.SetObject("IB650174")
+	End Select
+	obj_hoga.Send
+End Sub
+
+Sub send_sise()
+	ed_gubn.Data = SCREEN.Object("obj_jumn.ed_sysj").Data
+	obj_hoga.ClearAll 0
+	obj_hoga.Send
+End Sub
+
+'***************************************************************************
+' DESC: 호가가격 Setting
+'***************************************************************************
+Sub Set_Odrjprc(jprc)
+	If  tab_order.ID <> 4 And SCREEN.Object("obj_jumn.ed_jprc").Enable = True Then
+		SCREEN.Object("obj_jumn.ed_jprc").Data = jprc
+		If tab_account.ID = 4 Then
+			SCREEN.Object("obj_account.ordprc").data = jprc
+		End If
+	End If
+End Sub
+
+Sub resend()
+	If tab_account.ID = 1 Or tab_account.ID = 2 Then
+		obj_account.Proc "send_f", ""
+	End If
+End Sub
+
+Sub passPW()
+	Dim cnt,accn2,pswd1,accn,mkgb2,ii,code,jprc,jmsu,jmna,mcsu,jmgb,dyac
+	Dim vonm,etc1,txgb,feee,sycg,sysj,dhbd,unit,addr,cdat,etc2,s_data
+	SYSTEM.push "bondpush", SCREEN.GetMapName(1)
+	cnt = 0
+	accn2 = Mid(AN1A.data, 1, 8)
+	pswd1 = ed_pswd.Data
+	accn = AN1A.data										'계좌번호
+	mkgb2 = ""
+	If Odrgubn = 1 Then
+		For ii = 1 To SCREEN.Object("obj_account.grid").rows
+			If SCREEN.Object("obj_account.grid").GetGridCell(ii ,1) = 1 Then
+				cnt = cnt + 1
+			    code = SCREEN.Object("obj_account.grid").GetGridCell(ii, 8)   		'종목코드
+				jprc = SCREEN.Object("obj_account.grid").GetGridCell(ii, 25)			'주문가격(or 정정가격)
+				jmsu = SCREEN.Object("obj_account.grid").GetGridCell(ii, 23)			'주문수량
+				jmnu = SCREEN.Object("obj_account.grid").GetGridCell(ii, 6)			'주문번호
+				jmna = SCREEN.Object("obj_account.grid").GetGridCell(ii, 9)			'종목명
+				mcsu = SCREEN.Object("obj_account.grid").GetGridCell(ii, 21)			'미체결량
+				jmgb = SCREEN.Object("parent.obj_jumn.ed_jmgb").data
+				dyac = SCREEN.Object("parent.obj_jumn.ed_dyac").data
+				vonm = SCREEN.Object("parent.obj_jumn.ed_vonm").data
+				etc1 = jmgb & dyac & vonm		'기타입력1
+
+				txgb = SCREEN.Object("parent.obj_jumn.ed_txgb").data
+				'feee = SCREEN.Object("parent.obj_jumn.ed_feee").data
+				feee = "1" '수수료를 적용하도록 기본 세팅함.
+				sycg = SCREEN.Object("parent.obj_jumn.ed_sycg").data
+				sysj = SCREEN.Object("parent.obj_jumn.ed_sysj").data
+				dhbd = SCREEN.Object("parent.obj_jumn.ed_dhbd").data
+				unit = SCREEN.Object("parent.obj_jumn.ed_unit").data
+				addr = SCREEN.Object("parent.obj_jumn.addr").data
+				cdat = SCREEN.Object("parent.obj_jumn.ed_date").data
+				etc2 = txgb & feee & sycg & sysj & dhbd & unit & addr & cdat		'기타입력2
+
+				s_data = "#" & s_data
+				s_data = etc2 & "|" & s_data					'처리구분	16
+				s_data = etc1 & "|" & s_data					'처리구분	15
+				s_data = "C" & "|" & s_data					'처리구분	14
+				s_data = "2" & "|" & s_data					'모두구분	13
+				s_data = "0" & "|" & s_data					'주문조건	12
+				s_data = "00" & "|" & s_data				'호가구분	11
+				s_data = jprc & "|" & s_data				'주문가격	10
+				s_data = mcsu & "|" & s_data				'주문수량(정정, 취소수량)	9
+				s_data = jmna & "|" & s_data				'종목명		8
+				s_data = code & "|" & s_data				'종목코드	7
+				s_data = jmnu & "|" & s_data				'주문번호	6
+				s_data = pswd1 & "|" & s_data				'비밀번호	5
+				s_data = accn & "|" & s_data				'계좌번호	4
+				s_data = "3" & "|" & s_data					'매매구분	3
+				s_data = mkgb2 & "|" & s_data				'시장구분	2
+				s_data = "1" & "|" & s_data					'주문유형	1
+				s_data = "1" & "|" & s_data					'CUD
+			End If
+		Next
+		If cnt > 0 Then
+			SCREEN.CreateWindow 3, "IB630199 /p5 /d", "s_data" & vbTab & s_data & vbLf & "acct" & vbTab & AN1A.Data & vbLf & "pswd" & vbTab & pswd1 & vbLf _
+																 & "NREC" & vbTab & cnt & vbLf & "ACNM" & vbTab & ACNM.Data
+			clear_check()
+		End If
+	ElseIf Odrgubn = 2 Then
+		For ii = 1 To SCREEN.Object("obj_account.grid").rows
+			If SCREEN.Object("obj_account.grid").GetGridCell(ii ,1) = 1 Then
+				cnt = cnt + 1
+			    code = SCREEN.Object("obj_account.grid").GetGridCell(ii, 8)   		'종목코드
+				jprc = SCREEN.Object("obj_account.grid").GetGridCell(ii, 25)			'주문가격(or 정정가격)
+				jmsu = SCREEN.Object("obj_account.grid").GetGridCell(ii, 23)			'주문수량
+				jmnu = SCREEN.Object("obj_account.grid").GetGridCell(ii, 6)			'주문번호
+				jmna = SCREEN.Object("obj_account.grid").GetGridCell(ii, 9)			'종목명
+				mcsu = SCREEN.Object("obj_account.grid").GetGridCell(ii, 21)			'미체결량
+				jmgb = SCREEN.Object("parent.obj_jumn.ed_jmgb").data
+				dyac = SCREEN.Object("parent.obj_jumn.ed_dyac").data
+				vonm = SCREEN.Object("parent.obj_jumn.ed_vonm").data
+				etc1 = jmgb & dyac & vonm		'기타입력1
+
+				txgb = SCREEN.Object("parent.obj_jumn.ed_txgb").data
+				'feee = SCREEN.Object("parent.obj_jumn.ed_feee").data
+				feee = "1" '수수료를 적용하도록 기본 세팅함.
+				sycg = SCREEN.Object("parent.obj_jumn.ed_sycg").data
+				sysj = SCREEN.Object("parent.obj_jumn.ed_sysj").data
+				dhbd = SCREEN.Object("parent.obj_jumn.ed_dhbd").data
+				unit = SCREEN.Object("parent.obj_jumn.ed_unit").data
+				addr = SCREEN.Object("parent.obj_jumn.addr").data
+				cdat = SCREEN.Object("parent.obj_jumn.ed_date").data
+				etc2 = txgb & feee & sycg & sysj & dhbd & unit & addr & cdat		'기타입력2
+
+				s_data = "#" & s_data
+				s_data = etc2 & "|" & s_data					'처리구분	16
+				s_data = etc1 & "|" & s_data					'처리구분	15
+				s_data = "C" & "|" & s_data					'처리구분	14
+				s_data = "2" & "|" & s_data					'모두구분	13
+				s_data = "0" & "|" & s_data					'주문조건	12
+				s_data = "99" & "|" & s_data				'호가구분	11
+				s_data = jprc & "|" & s_data				'주문가격	10
+				s_data = mcsu & "|" & s_data				'주문수량(정정, 취소수량)	9
+				s_data = jmna & "|" & s_data				'종목명		8
+				s_data = code & "|" & s_data				'종목코드	7
+				s_data = jmnu & "|" & s_data				'주문번호	6
+				s_data = pswd1 & "|" & s_data				'비밀번호	5
+				s_data = accn & "|" & s_data				'계좌번호	4
+				s_data = "4" & "|" & s_data					'매매구분	3
+				s_data = mkgb2 & "|" & s_data				'시장구분	2
+				s_data = "1" & "|" & s_data					'주문유형	1
+				s_data = "1" & "|" & s_data					'CUD
+			End If
+		Next
+		If cnt > 0 Then
+			SCREEN.CreateWindow 3, "IB630198 /p5 /d", "s_data" & vbTab & s_data & vbLf & "acct" & vbTab & AN1A.Data & vbLf & "pswd" & vbTab & pswd1 & vbLf _
+																 & "NREC" & vbTab & cnt & vbLf & "ACNM" & vbTab & ACNM.Data
+			clear_check()
+		End If
+	Else
+		Exit Sub
+	End If
+End Sub
+
+Sub clear_check()
+	SCREEN.Object("obj_account.allCheck").Checked = False
+	For ii = 1 To SCREEN.Object("obj_account.GRID").Rows
+		If Trim(SCREEN.Object("obj_account.GRID").GetGridCell (ii, 8)) = "" Then
+			Exit Sub
+		End If
+		If SCREEN.Object("obj_account.GRID").GetGridCell(ii, 1) = "1" Then
+			SCREEN.Object("obj_account.GRID").SetGridCell ii, 1,"0"
+		End If
+	Next
+	BUTTON1.Enable = False
+	BUTTON2.Enable = False
+End Sub
+
+
+Sub sendA()
+	SCREEN.Proc "obj_account.send_f", ""
+End Sub
+
+_AW_ONSTART_AW_
+send_sise()
+Set_account()
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+SCREEN.OnSend = False
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(ed_pswd)
+_AW_ONKEYCHANGE_AW_
+If SCREEN.Key = 13 Then
+	If Len(Trim(AN1A.Data)) < 11 Then
+		AN1A.SetFocus
+		Exit Sub
+	End If
+
+	If Len(Trim(ed_pswd.Data)) < 4 Then
+		ed_pswd.SetFocus
+		Exit Sub
+	End If
+
+	obj_account.Send
+
+	If tab_order.ID = "3" Or tab_order.ID = "4" Then
+		SCREEN.Object("obj_jumn.ed_ogno").SetFocus
+	Else
+		SCREEN.Object("obj_jumn.cgcd").SetFocus
+	End If
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(AN1A)
+_AW_ONCHANGE_AW_
+obj_account.ClearAll 2
+Call Set_account()
+
+SCREEN.Object("obj_account").Send
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(cgcd)
+_AW_ONCHANGE_AW_
+cgcd.Trigger "cgcd", False
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(tab_sise)
+_AW_ONCLICK_AW_
+Call sise_tab_change()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(jm_gubn)
+_AW_ONCHANGE_AW_
+tab_order.ID = jm_gubn.Data
+order_tab_change()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(tab_account)
+_AW_ONCLICK_AW_
+Select Case tab_account.ID
+Case 1 :
+	obj_account.SetObject("IB650181")
+	b_quri.Visible = True
+	b_quri2.Visible = False
+	b_excl.Visible = True
+	b_next.Visible = True
+	cggb.Visible = False
+	LABEL.Visible = False
+	dyLabel.Visible = False
+	dyCombo.Visible = False
+'	b_quri.SetRect 571, 281, 603, 301
+	BUTTON1.Visible = False
+	BUTTON2.Visible = False
+	dsgb1.Visible = False
+	dsgb.Visible = False
+Case 2 :
+	obj_account.SetObject("IB650182")
+	b_quri.Visible = True
+	b_quri2.Visible = False
+	b_excl.Visible = True
+	b_next.Visible = True
+	cggb.Visible = True
+	LABEL.Visible = True
+	dyLabel.Visible = True
+	dyCombo.Visible = True
+'	b_quri.SetRect 571, 281, 603, 301
+	dyCombo.Index = dyEdit.Data
+	cggb.Index = cggbEdit.Data
+	SCREEN.Object("obj_account.cggb").data = cggb.Data
+	SCREEN.Object("obj_account.EDIT8").data = dsgb.Data
+	BUTTON1.Visible = True
+	BUTTON2.Visible = True
+	dsgb1.Visible = True
+	dsgb.Visible = True
+Case 3 :
+	obj_account.SetObject("IB650183")
+	b_quri.Visible = False
+	b_quri2.Visible = True
+'	b_quri.SetRect 604, 232, 636, 252
+	b_excl.Visible = False
+	b_next.Visible = False
+	cggb.Visible = False
+	LABEL.Visible = False
+	dyLabel.Visible = False
+	dyCombo.Visible = False
+'	b_quri.SetRect 604, 281, 636, 301
+	BUTTON1.Visible = False
+	BUTTON2.Visible = False
+	dsgb1.Visible = False
+	dsgb.Visible = False
+Case 4 :
+	obj_account.SetObject("IB650184")
+	b_quri.Visible = False
+	b_quri2.Visible = True
+'	b_quri.SetRect 604, 232, 636, 252
+	b_excl.Visible = False
+	b_next.Visible = False
+	cggb.Visible = False
+	LABEL.Visible = False
+	dyLabel.Visible = False
+	dyCombo.Visible = False
+	BUTTON1.Visible = False
+	BUTTON2.Visible = False
+	dsgb1.Visible = False
+	dsgb.Visible = False
+End Select
+
+'If Trim(ed_pswd.Data) <> "" Then
+	'obj_account.Send
+'End If
+
+SCREEN.Proc "obj_account.send_f", ""
+
+If tab_account.ID = 2 Then
+	dtxt.Visible = True
+Else
+	dtxt.Visible = False
+End If
+
+If tab_account.ID = 1 Then
+	dtext.Visible = True
+Else
+	dtext.Visible = False
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(b_excl)
+_AW_ONCLICK_AW_
+SCREEN.Object("obj_account.GRID").Excel True,True,""
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(cggb)
+_AW_ONCHANGE_AW_
+If tab_account.ID = 2 Then
+	GUIDE.Text = ""
+	cggbEdit.Data = cggb.data
+	SCREEN.Object("obj_account.cggb").data = cggb.Data
+	'obj_account.Send
+	SCREEN.Proc "obj_account.send_f", ""
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(tabs)
+_AW_ONCHANGE_AW_
+tab_order.ID = tabs.data
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(b_quri)
+_AW_ONCLICK_AW_
+SCREEN.Proc "obj_account.send_f", ""
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(b_quri2)
+_AW_ONCLICK_AW_
+SCREEN.Proc "obj_account.send_f", ""
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(dyCombo)
+_AW_ONCHANGE_AW_
+If tab_account.ID = 2 Then
+	'GUIDE.Text = ""
+	dyEdit.Data = dyCombo.Index
+	SCREEN.Object("obj_account.dyGubn").Data = Trim(dyCombo.Data)
+	'obj_account.Send
+	SCREEN.Proc "obj_account.send_f", ""
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(b_next)
+_AW_ONCLICK_AW_
+SCREEN.Proc "obj_account.send_c", ""
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(tab_order)
+_AW_ONCLICK_AW_
+Call order_tab_change()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON1)
+_AW_ONCLICK_AW_
+If Len(Trim(AN1A.data)) < 4 Then
+	MsgBox "비밀번호를 확인하여 주십시오.", , "IBK투자증권"
+	ed_pswd.SetFocus
+Else
+	SCREEN.Object("chk_pass.IntaccNo").data = AN1A.data
+	SCREEN.Object("chk_pass.Pwd").data = ed_pswd.data
+	chk_pass.Send
+	Odrgubn = 1
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON2)
+_AW_ONCLICK_AW_
+If Len(Trim(AN1A.data)) < 4 Then
+	MsgBox "비밀번호를 확인하여 주십시오.", , "IBK투자증권"
+	ed_pswd.SetFocus
+Else
+	SCREEN.Object("chk_pass.IntaccNo").data = AN1A.data
+	SCREEN.Object("chk_pass.Pwd").data = ed_pswd.data
+	chk_pass.Send
+	Odrgubn = 2
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(dsgb)
+_AW_ONCHANGE_AW_
+If tab_account.ID = 2 Then
+	GUIDE.Text = ""
+	SCREEN.Object("obj_account.EDIT8").data = dsgb.Data
+	'obj_account.Send
+	SCREEN.Proc "obj_account.send_f", ""
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(btn_list)
+_AW_ONCLICK_AW_
+SCREEN.Proc "main.send_sise", ""
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

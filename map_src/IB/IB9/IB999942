@@ -1,0 +1,84 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB999942)
+MAPSIZE(618, 788)
+VERSION(000)
+MAPKIND(PROCEDURES)
+MAPGROUP(1)
+MAPDESC("Procedures")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+TITLE("Procedures")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Option Explicit
+'채권주문 공통 library
+'*******************************************
+'채권 매수시
+'*******************************************
+Sub buyChaeProc()
+	Dim prc, qty, fee, tax, tax2, amt
+	prc = CCur(ed_jprc.Data)
+	qty = CCur(ed_jqty.Data)
+
+	fee = 0.006			'0.6%로 고정
+
+	amt = Round(prc * qty / 10000)
+	tax = Round(amt * fee)
+
+	SCREEN.Proc "main.obj_getMoney.contributionBnk", amt + tax
+End Sub
+
+Sub send_o()
+	SCREEN.Object("parent.obj_snd").send		'주문전송
+	Call QueryOption("after")
+
+	Dim mapNm
+	mapNm = Left(Trim(SCREEN.GetMapName(1)), 6)
+
+	If mapNm = "IB6801" Then
+		Call SetCursor()
+	End If
+End Sub
+
+Sub modifyChaeProc(availQty)
+	Dim prc, qty, fee, tax, tax2, amt
+	prc = CCur(ed_jprc.Data)
+
+	If r_mdgb0.Checked = True Then
+		qty = CCur(availQty)
+	Else
+		qty = CCur(ed_jqty.Data)
+	End If
+
+	fee = 0.006			'0.6%로 고정
+
+	amt = Round(prc * qty / 10000)
+	tax = Round(amt * fee)
+
+	SCREEN.Proc "main.obj_getMoney.contributionBnk", amt + tax
+End Sub
+
+}
+
+
+

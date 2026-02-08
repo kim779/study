@@ -1,0 +1,238 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB295800)
+MAPSIZE(384, 603)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("프로그램매매시간대�")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(FLASH)
+TITLE("[2958]주식종목별 프로그램 매매 현황")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pino2958")
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL10(0, -1, 784, 32)        COLOR(64, 130)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL63(-1, 29, 605, 386)  LIMAGE(0)  LINEW(3)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL_bg(1, 0, 603, 26)        COLOR(66, 130)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON0(91, 3, 110, 23)  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(15, 63)  CUR(0)    "검색.bmp"    TABORDER(1)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+OBJECT  OBJECT0(111, 3, 244, 23)    "IB999910"FIXEDSIZE  TABORDER(2)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL0(350, 3, 416, 23)  '(단위 : 주)'  AL_LEFT  CUR(0)      COLOR(208, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+OBJECT  OBJECT1(6, 36, 598, 380)    "IB295810"  TABORDER(3)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON1(554, 3, 598, 23)  '일자별'  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(68, 186)  CUR(0)    "3BTN.BMP"    TABORDER(4)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+BUTTON  BUTTON2(340, 485, 420, 525)  TP_PUSH      AL_CENTER    FOCUS  COLOR(208, 232)  CUR(0)      TABORDER(5)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL9(-2, 384, 606, 392)        COLOR(64, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON3(507, 3, 551, 23)  '차트'  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(68, 186)  CUR(0)    "3BTN.BMP"    TABORDER(6)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+BUTTON  BUTTON4(420, 3, 503, 23)  '차트연속조회'  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(68, 186)  CUR(0)    "3BTN.BMP"    TABORDER(7)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+EDIT  edMarketTrigger(915, 40, 947, 60)  LEN(6)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(8)  IOORDER(4)  ENABLE  &
+  HINTTYPE(IH_NONE)
+CONTROL  cxMarket(4, 3, 24, 23)  |FA_SKIP  "CX_MarketPicker"  "/k2/tIB295800/u1/d1"  LEN(12)  EDIT_NOP    COLOR(192, 232)  TABORDER(0)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+CONTROL  1301(25, 3, 90, 23)  |FA_PROTECT  "CX_CODECTRL"  "/u0/k검색.BMP/lAXCOMBO.BMP/p/s0/o"  LEN(6)  EDIT_INPUT    COLOR(192, 130)  TABORDER(9)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Sub IsReal_check()
+	If is_real.Checked = False Then
+		'SCREEN.Object("OBJECT1.1301").Clear
+		SCREEN.Object("OBJECT1.1021").Clear
+	Else
+		SCREEN.Object("OBJECT1.1301").Data = S1301.Data
+		SCREEN.Object("OBJECT1.1021").Data = "A" & S1301.Data
+		Send_OBJ1()
+	End If
+End Sub
+
+Sub Change_MKGubn_Main(sMKGubn)
+	cxMarket.sMarket = sMKGubn
+	SCREEN.Object("object1.11310").Clear
+	Send_OBJ()
+	OBJECT1.Proc "change_code", ""
+
+End Sub
+
+Sub Send_Screen()
+	cxMarket.sCode = Trim(S1301.Data)
+	SCREEN.Send 0
+End Sub
+
+Sub Send_OBJ()
+	cxMarket.sCode = Trim(S1301.Data)
+	OBJECT1.Send
+	OBJECT0.send
+End Sub
+
+Sub Send_OBJ1()
+	cxMarket.sCode = Trim(S1301.Data)
+	OBJECT1.Send
+End Sub
+
+_AW_ONSTART_AW_
+' 현재 화면의 시장식별자(cxMarket)에 고유 화면번호 부여
+cxMarket.Major = SCREEN.Major
+
+S1301.Data = SYSTEM.GetHistory(False, 1301)
+SCREEN.Object("object1.1301").Data = S1301.Data
+SCREEN.Object("object1.11310").Clear
+
+Send_OBJ()
+
+If BUTTON1.Text = "일자별" And BUTTON3.Text = "데이터" Then
+	BUTTON4.Enable = True
+Else
+	BUTTON4.Enable = False
+End If
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+'CHECK0.Checked = SCREEN.Object("main.is_real").Checked
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(BUTTON0)
+_AW_ONCLICK_AW_
+Dim retn
+retn = SCREEN.GetCode(100, "1301", "hnam", 0 )
+If retn <> True Then
+       Exit Sub
+End If
+
+Send_Screen()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON1)
+_AW_ONCLICK_AW_
+If BUTTON1.Text = "일자별" Then
+	If BUTTON3.Text = "차트" Then
+		OBJECT1.SetObject "IB295820"
+		BUTTON4.Enable = False
+	Else
+		OBJECT1.SetObject "IB295840"
+		BUTTON4.Enable = False
+	End If
+
+	BUTTON1.Text = "시간별"
+ElseIf BUTTON1.Text = "시간별" Then
+	If BUTTON3.Text = "차트" Then
+		OBJECT1.SetObject "IB295810"
+		BUTTON4.Enable = False
+	Else
+		OBJECT1.SetObject "IB295830"
+		BUTTON4.Enable = True
+	End If
+
+	BUTTON1.Text = "일자별"
+End If
+SCREEN.Object("object1.11310").Clear
+Send_OBJ1()
+OBJECT1.Proc "change_code", ""
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON3)
+_AW_ONCLICK_AW_
+If BUTTON3.Text = "차트" Then
+	If BUTTON1.Text = "일자별" Then
+		OBJECT1.SetObject "IB295830"
+		BUTTON4.Enable = True
+	Else
+		OBJECT1.SetObject "IB295840"
+		BUTTON4.Enable = False
+	End If
+
+	BUTTON3.Text = "데이터"
+
+ElseIf BUTTON3.Text = "데이터" Then
+	If BUTTON1.Text = "일자별" Then
+		OBJECT1.SetObject "IB295810"
+		BUTTON4.Enable = False
+	Else
+		OBJECT1.SetObject "IB295820"
+		BUTTON4.Enable = False
+	End If
+
+	BUTTON3.Text = "차트"
+End If
+SCREEN.Object("object1.11310").Clear
+Send_OBJ1()
+OBJECT1.Proc "change_code", ""
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON4)
+_AW_ONCLICK_AW_
+OBJECT1.Proc "next_chart", ""
+'OBJECT1.Send
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(edMarketTrigger)
+_AW_ONCHANGE_AW_
+Change_MKGubn_Main(Trim(edMarketTrigger.Data))
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(cxMarket)
+_AW_ONCLICK_AW_
+'Change_MKGubn_Main(Trim(edMarketTrigger.Data))
+
+SCREEN.Object("object1.11310").Clear
+Send_OBJ()
+OBJECT1.Proc "change_code", ""
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(1301)
+_AW_ONCHANGE_AW_
+SCREEN.Object("object1.1301").Data = S1301.Data
+SCREEN.Object("object1.11310").Clear
+
+S1301.Trigger "",True
+S1301.Trigger "",False
+
+Send_OBJ()
+OBJECT1.Proc "change_code", ""
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

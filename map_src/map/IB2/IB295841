@@ -1,0 +1,225 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB295841)
+MAPSIZE(166, 602)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("MS Sans Serif", 9, NORMAL)
+OPTIONS(FMS|FLASH)
+TITLE("[295841]프로그램 매매현황 차트")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("ng295801")
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+CONTROL  drChart(0, 0, 600, 165)  |FA_FLASH  "CX_DRCHART"  "/iMC295841"  LEN(0)  EDIT_INOUT    COLOR(192, 232)  TABORDER(1)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  1301(665, 75, 745, 93)  LEN(6)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_HAN|CODE      COLOR(68, 69)  CUR(0)  TP_NONE          TABORDER(2)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Sub change_chart(key)
+	'	drChart.DelAllBozoMsg()'
+	'	drChart.AddBozoMsg 1, "UD", key
+
+
+	Dim inputData
+	Dim code_type
+	Dim codx
+
+	Dim    cod2 	'[12];            종목코드
+	Dim    sDate 	'[8];             검색시작일
+	Dim    nrec		'[4];             조회건수
+	Dim    unit		'[3];             조회단위 1분봉, 3분봉
+	Dim    gubn		'[1];             조회구분
+					'				  0 : 틱, 1 : 분, 2 : 일
+					'				  3 : 주, 4 : 월
+	Dim    egbn		'[1];             수정주가 구분
+	Dim    smod		'[1];             조회모드
+	Dim    nkey		'[23];      Next Key
+	Dim    bgbn		'[1];             허봉, 실봉구분
+					'				  0: 허봉 1: 실봉
+	Dim    dgbn		'[1];             당일 구분
+	Dim    temp
+	CStr   str
+
+	Select Case key
+			Case 1 gubn = "0"
+			Case 2 gubn = "2"
+	End Select
+
+	codx = S1301.Data
+
+	' 코드 연동용 시장 접두 제거
+	codx = Replace(codx, "M.", "")
+	codx = Replace(codx, "N.", "")
+
+	code_type = SCREEN.GetCodeType( Trim(codx) )
+	If code_type = 0 Then
+		code_type = SCREEN.GetName( 199, Trim(codx), 0)
+	End If
+
+	prefix = ""
+	suffix = "      "
+
+	If code_type = "" Then
+		Exit Sub
+	End If
+
+	Select Case code_type
+	Case 27	' ETN - ETN종목은 접두가 Q로 시작
+
+		' 시장선택 구분자가 존재하면 시장에 따라 prefix 선택
+		If UCase(TypeName( SCREEN.Object("main.cxMarket") )) <> "NOTHING" Then
+
+SYSTEM.Trace "ETN sMarket : " & SCREEN.Object("main.cxMarket").sMarket
+
+			Select Case Trim(SCREEN.Object("main.cxMarket").sMarket)
+			Case "KRX"
+				prefix = "Q"
+				suffix = "     "
+
+			Case "NXT"
+				prefix = "N.Q"
+				suffix = "   "
+
+			Case "통합"
+				prefix = "M.Q"
+				suffix = "   "
+			End Select
+		End If
+
+	Case 9	' ELW - ELW 종목은 접두가 J로 시작
+		prefix = "J"	' ELW는 대체 거래소 없음
+
+	Case Else	' 다른 일반종목은 접두가 A로 시작
+SYSTEM.Trace "NORMAL sMarket : " & SCREEN.Object("main.cxMarket").sMarket & "\\" & code_type
+
+		If UCase(TypeName( SCREEN.Object("main.cxMarket") )) <> "NOTHING" Then
+			Select Case Trim(SCREEN.Object("main.cxMarket").sMarket)
+			Case "KRX"
+				prefix = "A"
+				suffix = "     "
+
+			Case "NXT"
+				prefix = "N.A"
+				suffix = "   "
+
+			Case "통합"
+				prefix = "M.A"
+				suffix = "   "
+
+			End Select
+		End If
+
+	End Select
+
+	g_gubn = key
+	cod2 = prefix + codx + suffix
+	sDate = "        "
+	temp = 120
+	nrec=Trim(temp)
+
+	SYSTEM.Trace "nrec[" & nrec & "]"
+
+	If(Len(nrec)=3) Then
+	    str = " "
+		nrec = str & nrec
+	End If
+	If(Len(nrec)=2) Then
+	    str = "  "
+		nrec = str & nrec
+	End If
+	If(Len(nrec)=1) Then
+	    str = "   "
+		nrec = str & nrec
+	End If
+
+	If(Len(nrec)=0) Then
+		nrec = " 120"
+		request_count.Data = 120
+	End If
+
+	unit = g_gunit
+	'gubn = "2"
+	egbn = "1"
+	smod = "1"
+	nkey = "                       "
+	bgbn = "1"
+	dgbn = "0"
+
+	SYSTEM.Trace "change_chart unit : " & unit & " g_unit : " & g_gunit
+	'drChart.SetSubMsg "UM", "E"
+	inputData = cod2 & sDate & nrec & gubn & nkey & smod & bgbn
+
+	Dim szTR
+	szTR = "ng295801"
+	drChart.SendTr szTR, cod2, inputData, 1
+End Sub
+
+_AW_ONSTART_AW_
+Dim szPropName
+
+szPropName = "bShowPriceMinMaxText(0)"
+drChart.GetChartProperty( szPropName )
+
+S1301.Data = SCREEN.Object("main.1301").Data
+change_chart(2)
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(drChart)
+_AW_ONCHANGE_AW_
+'drChart.GetChartState() 리턴값
+'STATE_NONE					0
+'STATE_STARTRECEIVE			1 	TR받은 직후
+'STATE_ENDRECEIVE			2 	조회결과를 차트컨트롤에 그린 후
+'STATE_CHANGEONPAGECNT		3	데이터 조회 스크롤 시
+'STATE_SENDTR				4	TR 전송시
+'STATE_DESTROYCHART			5	차트화면 내려갈때
+
+Dim TotCnt
+Dim DataCnt
+Dim ret
+ret = drChart.GetChartState()
+TotCnt = drChart.GetChartProperty("GetDataCount")
+DataCnt = drChart.GetChartProperty( "GetOnePageDataCount" )
+
+SYSTEM.Trace "ret[" & ret & "] TotCnt[" & TotCnt & "] DataCnt[" & DataCnt & "]"
+
+'If ret = 2 Then
+'	SCREEN.IgnoreChange False
+	'request_count.Data = TotCnt
+'	SCREEN.IgnoreChange True
+'End If
+
+'If ret =  3 Then
+'	SCREEN.IgnoreChange False
+	'data_count.Data = DataCnt
+'	SCREEN.IgnoreChange True
+'End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

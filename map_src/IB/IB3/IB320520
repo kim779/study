@@ -1,0 +1,60 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB320520)
+MAPSIZE(72, 151)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(FMS)
+TITLE("옵션현재가")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pooppoop")
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+EDIT  41301(12, 12, 75, 32)  LEN(8)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(1)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  41023(12, 41, 118, 64)  LEN(12)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|FA_CONTRAST|SA_ZERO|SA_COSUP|SA_PAINT    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  val(122, 11, 144, 30)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("1")          TABORDER(2)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONSTART_AW_
+val.Data = 1
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+Dim data
+data = Trim(val.data)
+
+Select Case data
+Case 1: SCREEN.Object("parent.ordamt1").data = S41023.text
+Case 2: SCREEN.Object("parent.ordamt2").data = S41023.text
+Case 3: SCREEN.Object("parent.ordamt3").data = S41023.text
+Case 4: SCREEN.Object("parent.ordamt4").data = S41023.text
+Case 5: SCREEN.Object("parent.ordamt5").data = S41023.text
+End Select
+
+_AW_ONENDSUB_AW_
+}
+
+
+

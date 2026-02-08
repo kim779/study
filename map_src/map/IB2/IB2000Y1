@@ -1,0 +1,126 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB2000Y1)
+MAPSIZE(300, 655)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("검색")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(FMS|FLASH|CR2TAB)
+TITLE("검색")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+OBJECT  OBJ(76, 0, 655, 300)    "IB2000ZA"  TABORDER(2)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+GRID  GRID0(0, 28, 76, 300)  VISIBLEROW(11)  CELLH(18)  MATRIX(101, 1)  FIX(12)  MAINCOLOR(181, 0)  LINECOLOR(75)  FOCUSCOLOR(78)  FOCUSKIND(4)    FONT("굴림체", 9, NORMAL)  ROWC(76, 77)  |SELALWAYS|FLEXIBLE|VSCROLL|NO3D|RROW|XHLINE|PAGE|HEADER|GRFTEXT    &
+	COLINFO("Col0")  LEN(20)  WIDTH(60)  HEAD("검색조건")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT  |FA_FLASH    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    TABORDER(1)  IOORDER(1)  ENABLE  &
+  VISIBLE
+
+PANEL  PANEL1(0, 0, 76, 28)        COLOR(66, 69)  CUR(0)    AL_CENTER  FONT("굴림체", 9, NORMAL)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  SNAME(6, 6, 63, 24)  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Dim myFILE, myMAP
+myFILE = "userconf.ini"
+myMAP = SCREEN.GetMapName(0)
+Dim g_array
+g_ArrData=Array(Array("종목등락", "IB2000ZA", ""), _
+                Array("상하직전", "IB2000ZB", ""), _
+                Array("상하이탈", "IB2000ZC", ""), _
+                Array("고저근접", "IB2000ZD", ""), _
+                Array("신고신저", "IB2000ZE", ""), _
+                Array("등락순위", "IB2000ZF", ""), _
+                Array("상승률순", "IB2000ZG", ""), _
+                Array("하락률순", "IB2000ZH", ""), _
+                Array("최저상승", "IB2000ZI", ""), _
+                Array("최고하락", "IB2000ZJ", ""), _
+                Array("거래증순", "IB2000ZK", ""), _
+                Array("거래회순", "IB2000ZL", ""), _
+                Array("거래량순", "IB2000ZM", ""), _
+                Array("거래액순", "IB2000ZN", ""), _
+                Array("거급(준)", "IB2000ZO", ""), _
+                Array("거래급등", "IB2000ZP", ""))
+
+Sub makecond()
+	Dim ii
+	SYSTEM.Trace "UBound(g_ArrData) : " & UBound(g_ArrData)
+	SYSTEM.Trace "grid0.Rows : " & GRID0.Rows
+
+	If GRID0.Rows = UBound(g_ArrData) + 1 Then
+		Exit Sub
+	End If
+
+	For ii=LBound(g_ArrData) To UBound(g_ArrData)
+		GRID0.InsertRow -1
+		GRID0.SetGridCell ii+1, 1, g_ArrData(ii)(0)
+		SYSTEM.Trace "grid count : " & ii
+	Next
+
+End Sub
+
+_AW_ONSTART_AW_
+makecond()
+SNAME.Text = Trim(GRID0.GetGridCell(GRID0.Row,1))
+
+If SCREEN.CreateObject("Info") Then
+	Dim scond,namobj
+	scond = Trim(INFO.popData (LOGIN.Name, myFILE, myMAP, "scond"))
+	If scond <> "" Then
+		namobj = g_ArrData(scond-1)(1)
+		OBJ.SetObject(namobj)
+		'OBJ.Send
+		SNAME.Text = Trim(GRID0.GetGridCell(scond,1))
+		GRID0.Index = (scond-1)
+	End If
+End If
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+OBJ.Send
+SCREEN.OnSend False
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(GRID0)
+_AW_ONCLICK_AW_
+If GRID0.HitPos = 3 Then
+	Dim namobj
+	namobj = g_ArrData(GRID0.row-1)(1)
+
+SYSTEM.Trace "[MKGUBN][IB2000Y1 namobj = " & namobj
+
+	OBJ.SetObject(namobj)
+	'OBJ.Send
+	SNAME.Text = Trim(GRID0.GetGridCell(GRID0.Row,1))
+	If SCREEN.CreateObject("Info") Then
+		INFO.pushData LOGIN.Name, myFILE, myMAP, "scond", GRID0.Row
+	End If
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

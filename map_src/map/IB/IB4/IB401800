@@ -1,0 +1,349 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB401800)
+MAPSIZE(365, 668)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("일별가격흐름")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(FMS|FLASH)
+TITLE("[4018]선물옵션 미결제약정 차트")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pooppoop")
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL63(0, 30, 675, 366)  LIMAGE(0)  LINEW(4)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL_bg(0, 0, 670, 32)  LIMAGE(1)  LINEW(3)  LINETYPE(4)  LINECOLOR(64)      COLOR(66, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL5(321, 6, 379, 26)  '조회일자'        COLOR(74, 130)  CUR(0)    AL_CENTER  FONT("굴림체", 9, NORMAL)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  GUBN(711, 96, 736, 115)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("1")          TABORDER(1)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  2304(776, 193, 865, 217)  LEN(8)  IO_MIXED|AL_CENTER|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  OBJ_chart(6, 80, 661, 358)    "IB401801"  TABORDER(2)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+GROUP  gp1(741, 36, 861, 86)  'gp1'        COLOR(-1, 232)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  is_real(735, 410, 787, 422)  '실시간'  TP_CHECK|EDIT_NOP        FONT("굴림체", 9, NORMAL)  COLOR(69, 130)  CUR(0)      TABORDER(3)  ENABLE  &
+  CHECKED  TRANSPARENT  HINTTYPE(IH_STRING)  HELPTEXT("실시간 체결데이터 수신")HELPTEXT("실시간 체결데이터 수신")
+EDIT  o_date(379, 6, 466, 26)  LEN(8)  IO_NUM|EDIT_INOUT|FA_SKIP|FA_DATE    COLOR(192, 232)  CUR(0)  TP_SUNKEN          EDITFORMAT("9999/99/99")  TABORDER(4)  IOORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON8(468, 6, 488, 26)  TP_PUSH|IMAGE|AL_CENTER      FOCUS  COLOR(208, 232)  CUR(0)    "CODEPREV.BMP"    TABORDER(5)  ENABLE  &
+  VISIBLE  IMAGE  HINTTYPE(IH_STRING)  HELPTEXT("이전일로 이동")HELPTEXT("이전일로 이동")
+BUTTON  BUTTON9(489, 6, 509, 26)  TP_PUSH|IMAGE|AL_CENTER      FOCUS  COLOR(208, 232)  CUR(0)    "CODENEXT.BMP"    TABORDER(6)  ENABLE  &
+  VISIBLE  IMAGE  HINTTYPE(IH_STRING)  HELPTEXT("다음일로 이동")HELPTEXT("다음일로 이동")
+EDIT  ed_focod(11, 6, 91, 26)  LEN(8)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_UPPER|CODE      COLOR(192, 130)  CUR(0)  TP_SUNKEN          TABORDER(7)  IOORDER(5)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  HNAM(110, 6, 316, 26)  LEN(18)  IO_MIXED|AL_LEFT||SUM    FONT("굴림체", 9, BOLD)    COLOR(90, 69)  CUR(0)  LINECOLOR(65)          TABORDER(0)  IOORDER(6)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  SYMBOL7(91, 6, 109, 26)  TP_PUSH|IMAGE|AL_STRETCH      COLOR(24, 0)  CUR(10)    "검색.BMP"    TABORDER(8)  ENABLE  &
+  VISIBLE  IMAGE  HOVER  HINTTYPE(IH_NONE)
+OBJECT  OBJ_info(10, 36, 428, 74)    "IB4018X5"  TABORDER(9)  IOORDER(7)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  dbx(225, 445, 650, 463)  LINECOLOR(65)      COLOR(78, 69)  CUR(0)    AL_LEFT    ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  OBJ_sise(427, 36, 661, 74)    "IB4018X1"  TABORDER(10)  IOORDER(8)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL0(525, 6, 560, 26)  '구분'        COLOR(74, 130)  CUR(0)    AL_CENTER  FONT("굴림체", 9, NORMAL)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  rd_type1(565, 10, 605, 22)  '기본'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(gp1)      COLOR(208, 232)  CUR(0)      TABORDER(11)  ENABLE  &
+  VISIBLE  CHECKED  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  rd_type2(610, 10, 650, 22)  '합성'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(gp1)      COLOR(208, 232)  CUR(0)      TABORDER(12)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Const myFILE = "userconf.ini"
+Const myMAP = "IB401800"
+
+Function GetToday()
+	YY = Year(Date)
+	MM = Month(Date)
+	If Len(MM) = 1 Then
+		MM = "0" & MM
+	End If
+	DD = Day(Date)
+	If Len(DD) = 1 Then
+		DD = "0" & DD
+	End If
+	GetToday = YY & MM & DD
+End Function
+
+Sub send_sise_all(GUBN)
+	Dim code, fogb, rsymb, acnm
+	dbx.Text = dbx.Text & ed_focod.data&"ALL:"&GUBN
+	code = Left(ed_focod.Data, 1)
+	If code = "1" Or code = "4" Or code = "A" Or code = "D" Then
+		fogb = 101
+		rsymb = "30301"
+		OBJ_sise.SetObject("IB4018X1")
+		OBJ_info.SetObject("IB4018X5")
+
+	ElseIf code = "2" Or code = "3" Or code = "B" Or code = "C" Then
+		fogb = 102
+		rsymb = "40301"
+		OBJ_sise.SetObject("IB4018X2")
+		OBJ_info.SetObject("IB4018X6")
+	End If
+
+
+	HNAM.Data = SCREEN.GetName (fogb, ed_focod.Data, 0)
+	ed_focod.Trigger "ed_focod", True
+	ed_focod.Trigger rsymb, True
+	ed_focod.Trigger rsymb, False
+	SYSTEM.SetHistory rsymb, ed_focod.Data
+	SYSTEM.SetHistory "ed_focod", ed_focod.Data
+
+	OBJ_sise.Send
+	OBJ_info.Send
+	OBJ_chart.Send
+End Sub
+
+Function BoolToStr(bVal)
+	BoolToStr = "0"
+	If bVal=True Then
+		BoolToStr = "1"
+	End If
+End Function
+
+Function StrToBool(sVal)
+	StrToBool = True
+	If sVal="0" Then
+		StrToBool = False
+	End If
+End Function
+
+
+Sub p_write_ini()
+	If SCREEN.CreateObject("info") Then
+		INFO.PushData LOGIN.Name, myFILE, myMAP, "rd_type1", BoolToStr(rd_type1.Checked)
+		INFO.PushData LOGIN.Name, myFILE, myMAP, "rd_type2", BoolToStr(rd_type2.Checked)
+	End If
+End Sub
+
+Sub p_read_ini()
+	If SCREEN.CreateObject("Info") Then
+		rd_type2.Checked = StrToBool(INFO.PopData(LOGIN.Name, myFILE, myMAP, "rd_type2"))
+		rd_type1.Checked = StrToBool(INFO.PopData(LOGIN.Name, myFILE, myMAP, "rd_type1"))
+
+		If rd_type1.Checked=False And rd_type2.Checked=False Then
+			rd_type1.Checked = True
+		End If
+
+		If rd_type1.Checked Then
+		OBJ_chart.SetObject "IB401801"
+		ElseIf rd_type2.Checked Then
+			OBJ_chart.SetObject "IB401802"
+		End If
+	End If
+End Sub
+
+_AW_ONINDECLARE_AW_
+#LOAD IB999923
+#load IB888888
+
+_AW_ONENDSUB_AW_
+_AW_ONSTART_AW_
+Call p_read_ini()
+OBJ_chart.Send
+
+_AW_ONENDSUB_AW_
+_AW_ONCLOSE_AW_
+Call p_write_ini()
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(PANEL5)
+_AW_ONCLICK_AW_
+OBJ_chart.Send
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(is_real)
+_AW_ONCLICK_AW_
+If is_real.Checked = True Then
+	OBJ01.Send
+
+	If Trim(S2304.data) = "장중" Then
+		SCREEN.SetTimer 300, False
+	End If
+End If
+
+OBJ_chart.Send
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(o_date)
+_AW_ONCHANGE_AW_
+OBJ_chart.Send
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON8)
+_AW_ONCLICK_AW_
+Dim c_dt, dt, ii, tmpDt
+
+tmpDt = getDateSerial(o_date.Data)
+c_dt = change_indate("d", -1, tmpDt)
+c_dt = week_check(c_dt)
+o_date.Data = c_dt
+
+dt = gettoday()
+
+OBJ_chart.Send
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON9)
+_AW_ONCLICK_AW_
+Dim c_dt, dt, t_dt, cYear, cMonth, cDay, tmp_dt, tmpDt2
+dt = gettoday()
+tmpDt2 = getDateSerial(o_date.Data)
+c_dt = DateAdd("d", 1, tmpDt2)
+
+cYear = Year(c_dt)
+cMonth = Month(c_dt)
+
+If Len(Trim(cMonth)) = 1 Then
+	cMonth = "0" & cMonth
+End If
+
+cDay = Day(c_dt)
+
+If Len(Trim(cDay)) = 1 Then
+	cDay = "0" & cDay
+End If
+
+tmp_dt = cYear & cMonth & cDay
+
+If CLng(tmp_dt) > CLng(dt) Then
+	Exit Sub
+End If
+
+For ii = 1 To 6
+	If Weekday(c_dt) = "1" Or Weekday(c_dt) = "7" Then
+		c_dt = DateAdd("d", 1, CDate(c_dt))
+	Else
+		Exit For
+	End If
+Next
+
+cYear = Year(c_dt)
+cMonth = Month(c_dt)
+
+If Len(Trim(cMonth)) = 1 Then
+	cMonth = "0" & cMonth
+End If
+
+cDay = Day(c_dt)
+
+If Len(Trim(cDay)) = 1 Then
+	cDay = "0" & cDay
+End If
+
+o_date.Data = cYear & cMonth & cDay
+
+OBJ_chart.Send
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(ed_focod)
+_AW_ONCHANGE_AW_
+Dim code
+
+code = ed_focod.Data
+If Len(code)=8 Then
+	If Left(code, 1)="1" Or Left(code, 1)="4" Or _
+	   Left(code, 1)="A" Or Left(code, 1)="D" Then
+		HNAM.Data = SCREEN.GetName (101, ed_focod.Data, 0)
+	Else
+		HNAM.Data = SCREEN.GetName (102, ed_focod.Data, 0)
+	End If
+	SCREEN.Proc "main.send_sise_all", "main"
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(SYMBOL7)
+_AW_ONCLICK_AW_
+Dim ed_focod
+
+ed_focod = SCREEN.GetCode (103, "ed_focod", "HNAM", 2)
+If ed_focod <>  True Then
+	Exit Sub
+End If
+
+SCREEN.Proc "main.send_sise_all", "main"
+
+'Call ChangeCode()  'cyh
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(dbx)
+_AW_ONCLICK_AW_
+dbx.Text = ed_focod.Data
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(PANEL0)
+_AW_ONCLICK_AW_
+OBJ_chart.Send
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(rd_type1)
+_AW_ONCLICK_AW_
+
+If rd_type1.Checked Then
+	OBJ_chart.SetObject "IB401801"
+ElseIf rd_type2.Checked Then
+	OBJ_chart.SetObject "IB401802"
+End If
+OBJ_chart.Send
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(rd_type2)
+_AW_ONCLICK_AW_
+If rd_type1.Checked Then
+	OBJ_chart.SetObject "IB401801"
+ElseIf rd_type2.Checked Then
+	OBJ_chart.SetObject "IB401802"
+End If
+OBJ_chart.Send
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

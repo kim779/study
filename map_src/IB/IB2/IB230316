@@ -1,0 +1,171 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB230316)
+MAPSIZE(148, 150)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("회원매매입체분석")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(FLASH|XFONT)
+TITLE("[230316] 일별")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("no230316")
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL0(0, 0, 150, 18)  LINECOLOR(75)      COLOR(90, 2)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL1(160, 86, 277, 104)  LINECOLOR(0)      COLOR(2, 2)  CUR(0)    AL_CENTER    ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  tnam(160, 60, 255, 77)  LEN(16)  IO_MIXED|AL_CENTER|    COLOR(3, 63)  CUR(0)            TABORDER(0)  IOORDER(4)  ENABLE  &
+  HINTTYPE(IH_NONE)
+GRID  GRD(0, 17, 150, 148)  VISIBLEROW(7)  CELLH(18)  MATRIX(2000, 4)  FIX(0)  MAINCOLOR(7, 0)  LINECOLOR(75)  FOCUSCOLOR(78)  FOCUSKIND(0)  AUTOSIZE  ROWC(68, 77)  |FLEXIBLE|VSCROLL|INS_TOP|NOHEAD|NO3D|RROW|XHLINE|PAGE    &
+	COLINFO("11034")  LEN(4)  WIDTH(52)  HEAD("일자")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  EDITFORMAT("99/99")    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("11023")  LEN(8)  WIDTH(82)  HEAD("매수량")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_CORGB|SA_CORAW    COLOR(68, 94)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(94, 95)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col0")  LEN(9)  WIDTH(37)  HEAD("체결가")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT    COLOR(68, 69)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col1")  LEN(8)  WIDTH(37)  HEAD("대비")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_CONTRAST|SA_TEXT    COLOR(68, 69)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    TABORDER(1)  IOORDER(6)  ENABLE  &
+  VISIBLE
+
+EDIT  1301(155, 0, 241, 24)  LEN(12)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(2)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  trcd(161, 32, 243, 55)  LEN(3)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("0")          TABORDER(3)  IOORDER(3)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  tvol(160, 120, 235, 133)  LEN(9)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_CORAW    COLOR(74, 94)  CUR(0)            TABORDER(0)  IOORDER(5)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  knd(265, 40, 295, 63)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("0")          TABORDER(4)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  OUTPUT0(35, 3, 110, 16)  LEN(15)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_SKIP|SA_SPACE    COLOR(90, 94)  CUR(0)            TABORDER(0)  IOORDER(7)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONINDECLARE_AW_
+#Load IB888888
+
+_AW_ONENDSUB_AW_
+_AW_ONSTART_AW_
+'SYSTEM.Trace "Set Object ~~~!!!!!!!!!!@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
+
+'	If msd.Data = "1" Then
+'		SCREEN.Object("obj.obj1.obj.knd").data = "1" '매수
+'		SCREEN.Object("obj.obj2.obj.knd").data = "1"
+'		SCREEN.Object("obj.obj3.obj.knd").data = "1"
+'		SCREEN.Object("obj.obj4.obj.knd").data = "1"
+'		SCREEN.Object("obj.obj5.obj.knd").data = "2" '매도
+'		SCREEN.Object("obj.obj6.obj.knd").data = "2"
+'		SCREEN.Object("obj.obj7.obj.knd").data = "2"
+'		SCREEN.Object("obj.obj8.obj.knd").data = "2"
+'	ElseIf msd.Data = "2" Then
+'		SCREEN.Object("obj.obj1.obj.knd").data = "3" '순매수
+'		SCREEN.Object("obj.obj2.obj.knd").data = "3"
+'		SCREEN.Object("obj.obj3.obj.knd").data = "3"
+'		SCREEN.Object("obj.obj4.obj.knd").data = "3"
+'		SCREEN.Object("obj.obj5.obj.knd").data = "3"
+'		SCREEN.Object("obj.obj6.obj.knd").data = "3"
+'		SCREEN.Object("obj.obj7.obj.knd").data = "3"
+'		SCREEN.Object("obj.obj8.obj.knd").data = "3"
+'	ElseIf msd.Data = "3" Then
+'		SCREEN.Object("obj.obj1.obj.knd").data = "4" '순매도
+'		SCREEN.Object("obj.obj2.obj.knd").data = "4"
+'		SCREEN.Object("obj.obj3.obj.knd").data = "4"
+'		SCREEN.Object("obj.obj4.obj.knd").data = "4"
+'		SCREEN.Object("obj.obj5.obj.knd").data = "4"
+'		SCREEN.Object("obj.obj6.obj.knd").data = "4"
+'		SCREEN.Object("obj.obj7.obj.knd").data = "4"
+'		SCREEN.Object("obj.obj8.obj.knd").data = "4"
+'	End If
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+Dim tcd
+
+S1301.Data = SCREEN.Object("main.1301").data
+If UCase(TypeName( SCREEN.Object("main.cxMarket"))) <> "NOTHING" Then
+	If SCREEN.Object("main.cxMarket").sMarket = "KRX" Then
+		S1301.Data = SCREEN.Object("main.1301").Data
+	ElseIf SCREEN.Object("main.cxMarket").sMarket = "NXT" Then
+		S1301.Data = "N." & SCREEN.Object("main.1301").Data
+	ElseIf SCREEN.Object("main.cxMarket").sMarket = "통합" Then
+		S1301.Data = "M." & SCREEN.Object("main.1301").Data
+	End If
+End If
+
+
+If Trim(S1301.Data) = "" Then
+	SCREEN.OnSend = False
+End If
+
+trcd.Data = SCREEN.Object("parent.trcd").data
+
+tcd = Trim(trcd.Data)
+If tcd = "0" Or tcd = "" Then
+	SCREEN.OnSend = False
+End If
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+
+'SYSTEM.Trace "(knd) : " & knd.Data & " (Receive) trcd : " & trcd.Data & "  , tvol : " & tvol.Data
+
+'Dim i
+'For i = 0 To GRD.Rows
+'	SYSTEM.Trace "obj grid receive data : " & GRD.GetGridCell(i,2)
+'Next
+
+Dim fogb
+If Trim(tnam.Data) = "" Then
+	Exit Sub
+End If
+
+'fogb = Mid(tnam.Data, 1, 1)
+'If fogb = "+" Then			'외국계 회원사
+'	If tvol.Data < 0 Then
+'		tnam.Data = Replace(tnam.Data, "+", "-")
+'	End If
+'End If
+
+'SYSTEM.Trace tnam.Data & "|" & tvol.Data
+
+SCREEN.Object("parent.tnam").data = Trim(tnam.Data)
+
+SCREEN.Proc "main.set_color", ""
+
+
+'테두리 및 외국계증권사명 색지정
+'If Trim(tvol.Data) = "" Then
+'	SCREEN.Object("parent.BOX0").PRgb = 64
+'ElseIf fn_nvl(tvol.Data) < 0 Then
+'	SCREEN.Object("parent.BOX0").PRgb = 95
+'	If fogb = "+" Then
+'		SCREEN.Object("parent.tnam").Trgb = 95
+'	End If
+'ElseIf fn_nvl(tvol.Data) > 0 Then
+'	SCREEN.Object("parent.BOX0").PRgb = 94
+'	If fogb = "+" Then
+'		SCREEN.Object("parent.tnam").Trgb = 94
+'	End If
+'End If
+
+
+SCREEN.Proc "main.OBJ.eachsend1","1"
+
+_AW_ONENDSUB_AW_
+}
+
+
+

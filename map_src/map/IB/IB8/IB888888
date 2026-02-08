@@ -1,0 +1,1261 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB888888)
+MAPSIZE(791, 1069)
+VERSION(000)
+MAPKIND(PROCEDURES)
+MAPGROUP(0)
+MAPDESC("공통LIBRAY")
+MAPPUBLIC(";")
+FONT("굴림", 9, NORMAL)
+TITLE("[8888] 공통LIBRAY")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Dim g_s88Accn
+Dim g_s88Pswd
+
+'== 영업일 표시 실명제
+'   : D+1 일, D+2일  => D+1(5/18), D+2(5/19)
+Sub P_GetDDay(day1, day2)
+	If Trim(LOGIN.Day1) <> "" Then
+		Day1 = Trim(LOGIN.Day1)
+		Day2 = Trim(LOGIN.Day2)
+	End If
+End Sub
+
+g_s88Accn = ""
+g_s88Pswd = ""
+
+'***************************************************************
+'잔고클릭시, 매도주문창 연동기능
+'***************************************************************
+Sub HowMaedoJumun()
+	If chk_jango.Checked = True Then
+		SCREEN.Proc "main.change_tab_order", 1  ' 잔고 클릭시 매도로...
+	Else
+		' DO NOTHING
+	End If
+End Sub
+
+'***************************************************************
+'관심종목 그리드 클릭시 뉴스알람 처리 관련 이벤트
+'***************************************************************
+Sub newsClick()
+	Dim key_text, key_value, sig
+
+    key_text = Trim(S90303.GetGridCell(S90303.Row, 4))
+    key_value = Trim(S90303.GetGridCell(S90303.Row, 3))
+
+	If (S90303.Row Mod 2) = 0 Then
+		S90303.SetPRgb S90303.Row, 5, 77
+	Else
+		S90303.SetPRgb S90303.Row, 5, 76
+	End If
+
+	sig = Trim(S90303.GetGridCell(S90303.Row, 5))
+
+	If sig = "추" Then
+			If SCREEN.CreateObject("INFO") = True Then
+				INFO.PushData LOGIN.Name, "userconf.ini", "IB202600", "POPUP_CODE", Trim(S90303.GetGridCell(S90303.Row, 2))
+			End If
+			If SCREEN.CreateObject("INFO") = True Then
+				INFO.PushData LOGIN.Name, "userconf.ini", "IB202600", "POPUP_FLAG", 1
+			End If
+			SCREEN.CreateWindow 1, "IB202600 /t/s/p5/d", "CODE" & vbTab & Trim(S90303.GetGridCell(S90303.Row, 2))
+	Else
+	    If key_value <> "" And key_text <> "" Then
+			SCREEN.CreateWindow 4, "IBNEWSXX /S/d/p1", "015"& vbTab & key_text & vbLf & _
+			"016" & vbTab & key_value & vbLf & "1301" & vbTab & S90303.GetGridCell(S90303.Row, 2)
+		End If
+	End If
+
+	S90303.SetGridCell S90303.Row, 5, ""
+	S90303.SetGridCell S90303.Row, 4, ""
+	S90303.SetGridCell S90303.Row, 3, ""
+End Sub
+
+'***************************************************************
+'업종 대분류 RETURN
+'***************************************************************
+Function P_GetBigCd(fu_upgb)
+	Select Case Left(fu_upgb,1)
+		Case "0" : P_GetBigCd = "001"		'KOSPI
+		Case "1" : P_GetBigCd = "101"		'KOSPI200
+		Case "2" : P_GetBigCd = "201"		'KOSDAQ
+		Case "3" : P_GetBigCd = "301"		'KOSDAQ50
+		Case "4" : P_GetBigCd = "401"		'KOSPI100
+		Case "5" : P_GetBigCd = "501"		'KONEX
+		Case "6" : P_GetBigCd = "601"		'SECTOR
+		Case "7" : P_GetBigCd = "701"		'프리보드
+		Case Else
+			If fu_upgb = "999" Or fu_upgb = "998" Or fu_upgb = "997" Then
+				P_GetBigCd = fu_upgb
+			ElseIf Left(fu_upgb,1) = "8" Then
+				P_GetBigCd = "801"			'기타지수
+			Else
+				P_GetBigCd = ""
+			End If
+	End Select
+End Function
+
+
+'*************************************************************************
+' change_date : 시스템 일자에서 원하는만큼 일자를 옮김
+' 호출형식 예) change_date("m",-3) -> 시스템일자에서 3달전 일자를 Return
+' m : month , d : day , y : year
+'*************************************************************************
+Public Function change_date(dat,diff)
+	Dim cday, yy, mm, dd
+	cday = DateAdd(dat, diff, Date)
+
+	yy = Year(cday)
+	mm = Month(cday)
+	If Len(mm) = 1 Then mm = "0"&mm
+	dd = Day(cday)
+	If Len(dd) = 1 Then dd = "0"&dd
+
+	cday = yy&mm&dd
+	change_date = CDbl(cday)
+End Function
+
+
+'*************************************************************************
+' week_check : 받아온 일자가 토,일요일일경우 금요일일자로 Return
+' Return 형식 : 예) 20040603 의  상수
+'*************************************************************************
+Public Function week_check(eday)
+	Dim MyDate, MyWeek, yy, mm, dd
+
+	If Trim(eday) = "" Then
+		Exit Function
+	End If
+
+	If IsDate(eday) = False Then
+		eday = DateSerial(Mid(eday,1,4),Mid(eday,5,2),Mid(eday,7,2))
+	End If
+	If IsDate(eday) = False Then Exit Function
+
+
+	MyWeek = Weekday(eday)
+	If MyWeek = 1 Then
+		eday= DateAdd("d", -2 , eday)
+	ElseIf MyWeek = 7 Then
+		eday= DateAdd("d", -1 , eday)
+	End If
+
+	yy = Year(eday)
+	mm = Month(eday)
+	If Len(mm) = 1 Then mm = "0"&mm
+	dd = Day(eday)
+	If Len(dd) = 1 Then dd = "0"&dd
+
+	eday = yy&mm&dd
+	week_check = eday
+End Function
+
+
+'*************************************************************************
+' change_indate : 입력일자에서 원하는만큼 일자를 옮김
+' 호출형식 예) change_indate("m",-3) -> 입력일자에서 3달전 일자를 Return
+' m : month , d : day , y : year
+'*************************************************************************
+Public Function change_indate(dat,diff, indate)
+	Dim cday, yy, mm, dd
+
+	cday = DateAdd(dat, diff, CDate(indate))
+
+	yy = Year(cday)
+	mm = Month(cday)
+	If Len(mm) = 1 Then mm = "0"&mm
+	dd = Day(cday)
+	If Len(dd) = 1 Then dd = "0"&dd
+
+	cday = yy&mm&dd
+	change_indate = CDbl(cday)
+End Function
+
+
+'*************************************************************************
+' getCurrDay : 오늘날짜를 가져옴
+'*************************************************************************
+Public Function getCurrDay()
+	Dim cday, yy, mm, dd
+	cday = LOGIN.Day0
+
+	If Trim(cday) = "" Then
+		yy = Year(Date)
+		mm = Month(Date)
+
+		If Len(mm) = 1 Then
+			mm = "0"& mm
+		End If
+
+		dd = Day(Date)
+
+		If Len(dd) = 1 Then
+			dd = "0"& dd
+		End If
+
+		cday = yy&mm&dd
+	End If
+
+	getCurrDay = CDbl(cday)
+End Function
+
+
+
+'*************************************************************************
+' getCurrDay : 오늘날짜를 가져옴
+'*************************************************************************
+Public Function getDateSerial(inptDate)
+	Dim cday, yy, mm, dd
+	cday = Trim(inptDate)
+
+	yy = Left(cday, 4)
+	mm = Mid(cday, 5, 2)
+	dd = Right(cday, 2)
+
+	cday = DateSerial(yy, mm, dd)
+
+
+	getDateSerial = CDbl(cday)
+End Function
+
+
+'***************************************************************************
+' DESC: 0보다큰 숫자형식인지 검사. 유효숫자( > 0):true else false
+'***************************************************************************
+Function Is_numeric(data)
+	Dim num
+	num = Trim(data)
+
+	If num = "" Then
+		num = 0
+	End If
+
+	Is_numeric = False
+	If IsNumeric(num) = False Then
+		Exit Function
+	End If
+	If CDbl(num) <= 0 Then
+		Exit Function
+	End If
+
+	Is_numeric = True
+End Function
+
+
+'***************************************************************
+'NAME: l_format
+'DESC: 특정문자로 자리수 맞추어 표시
+'EX)   l_format("99", "0", 5)   			return	"00099"
+'		 l_format("11111", "#", 10)		return	"#####11111"
+'***************************************************************
+Function l_format(str, char, sln)
+	If Trim(str) = "" Then
+		l_format = ""
+		Exit Function
+	End If
+	l_format = String(sln - Len(str), char) & str
+End Function
+
+
+'***************************************************************
+'NAME: chk_mistake_order
+'DESC: 주문착오방지를 위한 모범규준(14.04월 기준)
+'	   선물옵션 거래승수변경(17.03.27)
+'      주식] 경고 - (금액:15억 초과 60억 이하), (수량: 적용대상 제외) (18.11.08 변경)
+'            보류 - (금액:60억 초과), (수량: 적용대상 제외) (18.11.08 변경)
+'	   ELW ] 경고 - (금액:20억 초과 50억 이하)
+'            보류 - (금액:50억 초과)
+'-------------------------------------------------------------
+'      선물] 경고 - (수량:600계약 초과 1000계약 이하)	(17.03.27 변경)
+'            보류 - (수량:1000계약 초과)
+'-------------------------------------------------------------
+'      2010.10.01 주문착오방지 모범규준 강화버전
+'      지수선물] 수량기준 - 경고(300<val<=500), 보류(val>500)
+'                가격기준 - 경고( 50<val<=100), 보류(val>100)
+'      금리선물] 가격기준 - 경고( 50<val<=100), 보류(val>100)
+'      통화선물] 가격기준 - 경고(100<val<=200), 보류(val>200)
+'      금  선물] 가격기준 - 경고( 50<val<=100), 보류(val>100)
+'      돈육선물] 가격기준 - 경고(100<val<=200), 보류(val>200)
+'      스프레드] 가격기준 - 경고( 50<val<=100), 보류(val>100)
+'-------------------------------------------------------------
+'      옵션] 경고 - (금액:20억 초과 50억 이하)
+'            보류 - (금액:50억 초과)
+'
+'***************************************************************
+Function chk_mistake_order(code)
+	Dim prc, qty, amount, listed_qty, dmsg, msgOpt, hogb,dmsg2, mkty, curr, tick_warn, tick_limit, tick_1, tick_2, bSpread
+	Dim dlg_check, mapn, sdata, rcv_prc, hogaPrc, qtyx, rcv_qty, diff_code1, diff_code2, rcv_diff1, rcv_diff2, rcv_curr
+	Dim bElw
+	Dim	rane, val1, val2
+
+	mapn = SCREEN.GetMapName(0)
+	bElw = False
+	chk_mistake_order = False
+	qty = Trim(ed_jqty.Data)
+	prc = Trim(ed_jprc.Data)
+	If prc <> "" Then
+		prc = CDbl(prc)
+	End If
+	dmsg = ""
+	dmsg2 = ""
+	msgOpt = vbYesNo + vbInformation + vbDefaultButton2
+
+	If mmgb > 2 Then
+		If ed_jqty.visible = False  Or ed_mmgb.data = 4 Then '전부정정 / 취소 제외
+			chk_mistake_order = True
+			Exit Function
+		End If
+	End If
+
+
+	Select Case Len(Trim(code))
+	Case 6	'================================== 주식, ELW=========================================================
+		'-----------------------------------------금액기준 체크---------------------------------------------------
+		
+		' ELW 종목 여부 확인
+		If SCREEN.GetCodeType(code) = "9" Then
+			bElw = True
+		End If
+
+		sdata = ""
+		If Not bElw Then	' ELW외 나머지 종목
+
+			hogb = Right(shogb.Data,1)
+			Select Case Trim(hogb)
+			Case "2", "3", "5", "6", "7" '-- 중간가/시장가/최유리/조건부지정가/최우선
+				If SCREEN.GetMapName(1) = "IB104000" Then   '-- 예약주문은 현재가 변경 적용
+					sdata = "1301" & Chr(127) & code & vbTab & "2023" & vbTab
+				Else  '-- 기준가로 변경 적용
+					sdata = "1301" & Chr(127) & code & vbTab & "1336" & vbTab
+				End If
+
+			Case "1"	'-- 시간외종가
+				If shogb.Data = "81" Then	'-- 시간외종가
+					sdata = "1301" & Chr(127) & code & vbTab & "2023" & vbTab
+				ElseIf shogb.Data = "61" Then	'--장개시전 시간외종가
+					sdata = "1301" & Chr(127) & code & vbTab & "1336" & vbTab
+				End If
+
+			Case Else	'-- Default
+				' Do Nothing
+
+			End Select
+
+			' 특정 주문 호가 유형 조건 해당시, 조회 후 기준 가격 재할당
+			If Len(Trim(sdata)) > 0 Then
+				' NXT 여부 CHK
+				If UCase(TypeName( SCREEN.Object("main.cxMarket"))) <> "NOTHING" Then
+					If SCREEN.Object("main.cxMarket").IsNXTAble(S1301.Data) = 1 Then
+						sdata = sdata & "1777" & Chr(127) & "2" & vbTab
+					End If
+				End If
+
+				rcv_prc = SCREEN.ServiceEx("pooppoop", sdata, Len(sdata), &H02, 5000000)
+				prc  = rcv_prc
+				If prc = 0 Then
+					sdata = "1301" & Chr(127) & code & vbTab & "1336" & vbTab
+					If SCREEN.Object("main.cxMarket").IsNXTAble(S1301.Data) = 1 Then
+						sdata = sdata & "1777" & Chr(127) & "2" & vbTab
+					End If
+					rcv_prc = SCREEN.ServiceEx("pooppoop", sdata, Len(sdata), &H02, 5000000)
+					prc  = rcv_prc
+				End If
+			End If
+
+			' 투자위험고지 팝업 여부 CHECK
+			If mmgb = 2 Then	' 매수
+				rane = 0
+				val1 = ""
+				val2 = ""
+				Select Case SCREEN.GetCodeType(code)
+				Case 6, 27	' ETF/ETN
+					' 투자유의 여부 조회
+					val1 = Trim(SCREEN.Object("OBJ_hnam.17413").Sinfo)
+					Select Case Trim(val1)
+					Case "단기", "경고", "위험", "정리", "유의"	' 투자유의는 ETF/ETN 종목만
+						rane = 1
+					End Select
+				End Select
+
+				' 단기과열, 투자경고, 투자위험, 정리매매 여부 조회
+				val2 = Trim(SCREEN.Object("OBJ_hnam.17413").sMkMsg)
+				If val2 = "1" Then
+					rane = 1
+				End If
+
+				If rane = 1 Then
+					SCREEN.CreateWindow 2, "IB999954 /p5 /d", "EDIT0" & vbTab & rane & vbLf
+					dlg_check = SYSTEM.Pop("protectjumun")
+					SYSTEM.Push "protectjumun",""
+					If dlg_check <> "OK" Then
+						chk_mistake_order = False
+						Exit Function
+					End If
+				End If
+			End If
+
+			rane = ""
+			dmsg = ""
+			dmsg2 = ""
+
+			' 주문금액 CHECK
+			If Trim(prc) <> "" Then
+				prc = CDbl(prc)
+				prc = Abs(prc)
+			End If
+
+			amount = qty * prc
+
+			If amount > 1500000000 And amount <= 6000000000 Then
+				dmsg = "주문금액이 15억을 초과하는 이상주문입니다."
+'			ElseIf amount > 6000000000 Then
+
+				'''''''''''''''''''''''''''''''''''''''''''''''
+				' 이 주석이 막혀 있는 이유는,
+				' 15억 이상 초과하는 주문은 원장단에서
+				' 주문 막는것으로 착오주문 방지
+				' (확인일자 : 2025.02.28 by 윤영선 차장님)
+				'''''''''''''''''''''''''''''''''''''''''''''''
+
+'				dmsg = "주문금액이 60억을 초과하는 이상주문입니다."
+'				msgOpt = vbOKOnly + vbInformation
+			End If
+		Else	' ELW 종목
+			amount = qty * prc
+			If amount > 2000000000 And amount <= 5000000000 Then
+				dmsg = "주문금액이 20억을 초과하는 이상주문입니다."
+			ElseIf amount > 5000000000 Then
+				dmsg = "주문금액이 50억을 초과하는 이상주문입니다."
+				msgOpt = vbOKOnly + vbInformation
+			End If
+		End If
+
+		'---------------------------------------------------------------------------------------------------------
+		'-------------------------------------------수량기준 체크(18.11.08 삭제)-------------------------------------------------
+
+'		If Not bElw Then
+'			If Trim(SCREEN.Object("main.OBJ_sise.12374").Data) <> "" Then
+'				listed_qty = CDbl(Trim(SCREEN.Object("main.OBJ_sise.12374").Data)) 	'-- 상장주식수
+'			End If
+'			If Trim(qty) <> "" Then
+'				qty = CDbl(qty)
+'			End If
+'
+'			If qty > (listed_qty*0.01) And qty  <= (listed_qty* 0.03) Then
+'				dmsg2 = "주문수량이 상장주식수 대비 1%를 초과하는 이상주문입니다."
+'			ElseIf qty > (listed_qty * 0.03) Then
+'				dmsg2 = "주문수량이 상장주식수 대비 3%를 초과하는 이상주문입니다."
+'				msgOpt = vbOKOnly + vbInformation
+'			End If
+'		End If
+		'==========================================================================================================
+
+	Case 8	'=================================선물, 옵션===========================================================
+		mkty = Mid(code, 2, 2)
+		hogb = Right(c_hogb.Data, 1)
+		If Trim(prc) <> "" Then
+			prc = CDbl(prc)
+		End If
+
+		Select Case Left(code,1)
+		Case "1", "4", "A", "D"	'-------------------------------------선물/스프레드--------------------------------------------
+			If Left(code,1)="4" Or Left(code,1)="D" Then
+				bSpread = True
+			Else
+				bSpread = False
+			End If
+
+			tick_warn = 0
+			tick_limit = 0
+
+			Select Case mkty
+			Case "01"
+				If Not bSpread Then		' -----------------------------------KOSPI200선물---------------------------------------			If mkty = "01" And Left(code,1)= "1" Then
+					If qty > 600 And qty <= 1000 Then
+						dmsg = "주문수량이 600계약을 초과한 이상주문입니다."
+					ElseIf qty > 1000 Then
+						dmsg = "주문수량이 1000계약을 초과한 이상주문입니다."
+						msgOpt = vbOKOnly + vbInformation
+					End If
+				Else				' -----------------------------------KOSPI200선물 스프레드-----------------------------------
+					tick_1 = 50
+					tick_2 = 100
+					tick_warn = (0.05 * tick_1) * 100
+					tick_limit = (0.05 * tick_2) * 100
+
+					sdata = "30301" & Chr(127) & code & vbTab & "31023" & vbTab
+					rcv_curr = SCREEN.ServiceEx("pooppoop", sdata, Len(sdata), &H02, 5000000)
+					curr = Mid(rcv_curr, 2, Len(rcv_curr)-1) * 100
+
+					If Trim(curr) <> "" Then
+						curr = CDbl(curr)
+					End If
+
+				End If
+			Case "05"
+				If Not bSpread Then		' -----------------------------------MINI KOSPI200선물---------------------------------------			If mkty = "01" And Left(code,1)= "1" Then
+					If qty > 3000 And qty <= 5000 Then
+						dmsg = "주문수량이 3000계약을 초과한 이상주문입니다."
+					ElseIf qty > 5000 Then
+						dmsg = "주문수량이 5000계약을 초과한 이상주문입니다."
+						msgOpt = vbOKOnly + vbInformation
+					End If
+				Else				' -----------------------------------MINI KOSPI200선물 스프레드-----------------------------------
+					tick_1 = 125
+					tick_2 = 250
+					tick_warn = (0.02 * tick_1) * 100
+					tick_limit = (0.02 * tick_2) * 100
+
+					sdata = "30301" & Chr(127) & code & vbTab & "31023" & vbTab
+					rcv_curr = SCREEN.ServiceEx("pooppoop", sdata, Len(sdata), &H02, 5000000)
+					curr = Mid(rcv_curr, 2, Len(rcv_curr)-1) * 100
+
+					If Trim(curr) <> "" Then
+						curr = CDbl(curr)
+					End If
+
+				End If
+			Case "65", "66", "67"	' ---------------------------------금리선물/금리선물 스프레드-----------------
+				tick_1 = 50
+				tick_2 = 100
+				tick_warn = (0.01 * tick_1) * 100
+				tick_limit = (0.01 * tick_2) * 100
+
+				If bSpread = True Then
+					sdata = "100301" & Chr(127) & code & vbTab & "101023" & vbTab
+					rcv_curr = SCREEN.ServiceEx("pooppoop", sdata, Len(sdata), &H02, 5000000)
+					curr = Mid(rcv_curr, 2, Len(rcv_curr)-1) * 100
+
+					If Trim(curr) <> "" Then
+						curr = CDbl(curr)
+					End If
+				Else
+					If Trim(SCREEN.Object("main.OBJ_sise.101023").Data) <> "" Then
+						curr = CDbl(Trim(SCREEN.Object("main.OBJ_sise.101023").Data)) * 100.0
+					End If
+					If hogb = "3" Or hogb = "6" Then
+						sdata = "100301" & Chr(127) & code & vbTab & "100319" & vbTab
+						rcv_prc = SCREEN.ServiceEx("pooppoop", sdata, Len(sdata), &H02, 5000000)
+						prc = rcv_prc * 100 '기준가로 적용
+					End If
+				End If
+
+			Case "70"	' ---------------------------------30년 국채 금리선물/금리선물 스프레드-----------------
+				tick_1 = 50
+				tick_2 = 100
+				tick_warn = (0.02 * tick_1) * 100
+				tick_limit = (0.02 * tick_2) * 100
+
+				If bSpread = True Then
+					sdata = "100301" & Chr(127) & code & vbTab & "101023" & vbTab
+					rcv_curr = SCREEN.ServiceEx("pooppoop", sdata, Len(sdata), &H02, 5000000)
+					curr = Mid(rcv_curr, 2, Len(rcv_curr)-1) * 100
+
+					If Trim(curr) <> "" Then
+						curr = CDbl(curr)
+					End If
+				Else
+					If Trim(SCREEN.Object("main.OBJ_sise.101023").Data) <> "" Then
+						curr = CDbl(Trim(SCREEN.Object("main.OBJ_sise.101023").Data)) * 100.0
+					End If
+					If hogb = "3" Or hogb = "6" Then
+						sdata = "100301" & Chr(127) & code & vbTab & "100319" & vbTab
+						rcv_prc = SCREEN.ServiceEx("pooppoop", sdata, Len(sdata), &H02, 5000000)
+						prc = rcv_prc * 100 '기준가로 적용
+					End If
+				End If
+
+			Case "75", "76", "77", "78"	'---------------------------------------------------통화선물/통화선물 스프레드----------------
+				tick_1 = 50
+				tick_2 = 100
+				If mkty <> "78" Then
+					tick_warn = (0.10 * tick_1) * 100
+					tick_limit = (0.10 * tick_2) * 100
+				Else
+					tick_warn = (0.01 * tick_1) * 100
+					tick_limit = (0.01 * tick_2) * 100
+				End If
+
+				If bSpread = True Then
+					sdata = "100301" & Chr(127) & code & vbTab & "101023" & vbTab
+					rcv_curr = SCREEN.ServiceEx("pooppoop", sdata, Len(sdata), &H02, 5000000)
+					curr = Mid(rcv_curr, 2, Len(rcv_curr)-1) * 100
+
+					If Trim(curr) <> "" Then
+						curr = CDbl(curr)
+					End If
+				Else
+					If Trim(SCREEN.Object("main.OBJ_sise.101023").Data) <> "" Then
+						curr = CDbl(Trim(SCREEN.Object("main.OBJ_sise.101023").Data)) * 100.0
+					End If
+
+					If hogb = "3" Or hogb = "6" Then
+						sdata = "100301" & Chr(127) & code & vbTab & "100319" & vbTab
+						rcv_prc = SCREEN.ServiceEx("pooppoop", sdata, Len(sdata), &H02, 5000000)
+						prc = rcv_prc * 100 '기준가로 적용
+					End If
+				End If
+
+			Case Else
+				If ("10" <= mkty And mkty <= "59") Or ("B0" <= mkty And mkty <= "ZZ")  _
+							Or ("0A" <= mkty And mkty <= "0Z") Or ("1A" <= mkty And mkty <= "1Z") _
+							Or ("2A" <= mkty And mkty <= "2Z") Or ("3A" <= mkty And mkty <= "3Z") _
+							Or ("4A" <= mkty And mkty <= "4Z") Or ("5A" <= mkty And mkty <= "5Z") _
+							Or ("6A" <= mkty And mkty <= "6Z") Or ("7A" <= mkty And mkty <= "7Z") _
+							Or ("8A" <= mkty And mkty <= "8Z") Or ("9A" <= mkty And mkty <= "9Z") Then	'----------------------------------주식선물/주식선물 스프레드---------------------
+					If bSpread = False Then
+						If hogb = "3" Or hogb = "5" Or hogb = "6" Then
+							sdata = "100301" & Chr(127) & code & vbTab & "100319" & vbTab
+							rcv_prc = SCREEN.ServiceEx("pooppoop", sdata, Len(sdata), &H02, 5000000)
+							prc = rcv_prc
+						End If
+
+						sdata = "100301" & Chr(127) & code & vbTab & "100802" & vbTab    '거래 승수
+						rcv_qty = SCREEN.ServiceEx("pooppoop", sdata, Len(sdata), &H02, 5000000)
+						qtyx = rcv_qty
+
+						amount = prc*qty*qtyx
+						If amount > 1000000000 Then
+							dmsg = "주문금액이 10억원을 벗어난 이상주문입니다."
+							msgOpt = vbOKOnly + vbInformation
+						ElseIf amount > 500000000 Then
+							dmsg = "주문금액이 5억원을 벗어난 이상주문입니다."
+						End If
+					Else
+						diff_code1 = "1"& Mid(code, 2,4) & "000"
+						sdata = "100301" & Chr(127) & diff_code1 & vbTab & "100319" & vbTab
+						rcv_diff1 = SCREEN.ServiceEx("pooppoop", sdata, Len(sdata), &H02, 5000000)
+						diff_code2 = "1"& Mid(code, 2,2) & Mid(code, 6,2) & "000"
+						sdata = "100301" & Chr(127) & diff_code2 & vbTab & "100319" & vbTab
+						rcv_diff2 = SCREEN.ServiceEx("pooppoop", sdata, Len(sdata), &H02, 5000000)
+
+						If rcv_diff1 < rcv_diff2 Then
+							hogaPrc = rcv_diff1
+						Else
+							hogaPrc = rcv_diff2
+						End If
+
+						If Trim(hogaPrc) <> "" Then
+							hogaPrc = CDbl(hogaPrc)
+						End If
+
+						tick_1 = 50
+						tick_2 = 100
+						If hogaPrc < 10000 Then
+							hogaPrc = 5
+						ElseIf hogaPrc < 50000 Then
+							hogaPrc = 25
+						ElseIf hogaPrc < 100000 Then
+							hogaPrc = 50
+						ElseIf hogaPrc < 500000 Then
+							hogaPrc = 250
+						Else
+							hogaPrc = 500
+						End If
+
+						tick_warn = 50 * hogaPrc
+						tick_limit = 100 * hogaPrc
+						sdata = "100301" & Chr(127) & code & vbTab & "101023" & vbTab
+						rcv_curr = SCREEN.ServiceEx("pooppoop", sdata, Len(sdata), &H02, 5000000)
+						curr = Mid(rcv_curr, 2, Len(rcv_curr)-1)
+
+						If Trim(curr) <> "" Then
+							curr = CDbl(curr)
+						End If
+
+					End If
+				End If
+			End Select
+
+			If  tick_warn>0 And tick_limit>0 Then
+'				SYSTEM.Trace "Price(" & prc & "), Curr(" & curr & "), tick_warn(" & tick_warn & "), tick_limit(" & tick_limit & ")"
+				' 부동소숫점 연산시 오류 발생하여 보정값 처리함
+				If (prc < (curr-tick_limit-0.00001)) Or (prc > (curr+tick_limit+0.00001)) Then
+					dmsg = "주문가격이 " & tick_2 & "틱을 벗어난 이상주문입니다."
+					msgOpt = vbOKOnly + vbInformation
+				ElseIf (prc < (curr-tick_warn-0.00001)) Or (prc > (curr+tick_warn+0.00001)) Then
+					dmsg = "주문가격이 " & tick_1 & "틱을 벗어난 이상주문입니다."
+				End If
+			End If
+
+
+
+		'-----------------------------------------------------------------------------------------------------------------
+		Case "2", "3" 	'-------------------------------------KOSPI200 콜/풋 옵션-----------------------------------------
+			hogb = Right(c_hogb.Data, 1)
+			If hogb = "3" Or hogb = "5" Or hogb = "6" Then			'-- 시장가/최유리/조건부
+				sdata = "40301" & Chr(127) & code & vbTab & "40348" & vbTab
+				rcv_prc = SCREEN.ServiceEx("pooppoop", sdata, Len(sdata), &H02, 5000000)
+				prc = rcv_prc * 100	'-- 기준가로 적용
+			End If
+
+			If Trim(prc) <> "" Then
+				prc = CDbl(prc)
+			End If
+
+			If mkty = "05" Then
+				amount = qty * prc * 500 	'mini옵션 0.01 = 50,000원
+			Else
+				amount = qty * prc * 2500 	'옵션 0.01 = 250,000원
+			End If
+			If amount > 2000000000 And amount <= 5000000000 Then
+				dmsg2 = "주문금액이 20억을 초과한 이상주문입니다."
+			ElseIf amount > 5000000000 Then
+				dmsg2 = "주문금액이 50억을 초과한 이상주문입니다."
+				msgOpt = vbOKOnly + vbInformation
+			End If
+		End Select
+		'=========================================================================================================================
+	Case Else
+		Exit Function
+	End Select
+
+	'++++++++++++++++++++++++++++++++++++++++++++++주문착오방지 확인 팝업 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+	If Trim(dmsg) = "" And Trim(dmsg2) = "" Then
+		chk_mistake_order = True
+	Else
+		SCREEN.CreateWindow 2, "IB999951 /p5 /d", "EDIT0" & vbTab & dmsg & vbLf & "EDIT1" & vbTab & dmsg2 & vbLf
+		dlg_check = SYSTEM.Pop("protectjumun")
+		SYSTEM.Push "protectjumun",""
+		If dlg_check = "OK" Then
+			chk_mistake_order = True
+			Exit Function
+		End If
+	End If
+	'++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+End Function
+
+
+Function chk_mistake_order_sp(code, jprc)
+	ed_jprc.Data = jprc
+	If chk_mistake_order(code) = True Then
+		chk_mistake_order_sp = True
+	End If
+End Function
+
+
+
+'***************************************************************
+'NAME: chk_elw_price
+'DESC: ELW종목 주문착오방지.
+'      현재가격대비 -50% ~ 100% 를 벗어나는 주문에 대해 확인창 띄움
+'***************************************************************
+Function chk_elw_price(code)
+	Dim	jprice, cprice, prc_a, prc_b
+	Dim	rcv_curr, sdata, dmsg
+	chk_elw_price = True
+	If ed_mkgb.Data <> "1" Then Exit Function
+	If Trim(ed_mmgb.Data) = "4" Then Exit Function					'-- 취소주문시 확인안함
+
+	Select Case Left(code, 1)
+	Case "5", "6", "7", "8"			'ELW종목
+		jprice = Int(ed_jprc.data)
+		sdata = "1301" & Chr(127) & code & vbTab & "2023" & vbTab
+		rcv_curr = SCREEN.ServiceEx("pooppoop", sdata, Len(sdata), &H02, 5000000)
+		cprice = Abs(Int(rcv_curr))
+		'호가한도가격설정기준(현재가) 500원 미만일 경우
+		'상한은 MAX(상한값, 500원), 하한은 적용 배제
+		prc_a = (Int(cprice) *0.5)
+		prc_b = (Int(cprice) * 2)
+		If cprice < 500 Then
+			prc_a = 0
+			If prc_b < 500 Then prc_b = 500
+		End If
+
+		If jprice < prc_a Or jprice > prc_b Then
+			If jprice > prc_b Then
+				dmsg = vbLf & "고객님의 주문가격은 현재가격과 비교하여 현저히 높습니다.   "
+			ElseIf jprice < prc_a Then
+				dmsg = vbLf & "고객님의 주문가격은 현재가격과 비교하여 현저히 낮습니다.   "
+			End If
+			dmsg = dmsg & vbLf & Space(58) & "~~~~~~~~~~" & _
+					vbLf & "착오주문여부를 한 번 더 확인하시기 바랍니다." & _
+					vbLf & vbLf & vbLf & "주문을 전송하시겠습니까?"
+			If MsgBox(dmsg, vbYesNo + vbInformation, "ELW종목 주문착오방지") = vbNo Then
+				chk_elw_price = False
+			End If
+		End If
+	End Select
+End Function
+
+'***************************************************************
+'NAME: hoga_unit
+' 기능      : 주식 호가단위 계산
+' 호가세분화로 인한 수정 2010.07.15
+'**********************************************************************
+Function hoga_unit(byval inval, code)
+	If (inval < 1000) Then
+		hoga_unit = 1
+	ElseIf (inval < 5000) Then
+		hoga_unit = 5
+	ElseIf (inval < 10000) Then
+		hoga_unit = 10
+	ElseIf (inval < 50000) Then
+		hoga_unit = 50
+	ElseIf (inval < 100000) Then
+		hoga_unit = 100
+	ElseIf (inval < 500000) Then
+		If SCREEN.GetCodeType(code) = 2 Then
+			hoga_unit = 100
+		Else
+			hoga_unit = 500
+		End If
+	Else
+		If SCREEN.GetCodeType(code) = 2 Then
+			hoga_unit = 100
+		Else
+			hoga_unit = 1000
+		End If
+	End If
+End Function
+
+'***************************************************************
+'NAME: P_pswdConfirm()
+' 기능      : 패스워드 체크
+'**********************************************************************
+Function P_pswdConfirm(accn, pswd, msg)
+	Dim ret, sdata
+
+	If accn = g_s88Accn And Len(Trim(pswd)) <> 0 Then
+		'NextKey = Trim(LEDGER.Next)
+'		SYSTEM.Trace "1 P_pswdConfirm is Next" & "|" & pswd & "|" & accn
+		If g_s88Pswd = pswd Then
+'			SYSTEM.Trace "P_pswdConfirm is Next" & "|" & pswd & "|" & accn
+			P_pswdConfirm = True
+			Exit Function
+		End If
+	End If
+	g_s88Pswd = pswd
+	g_s88Accn = accn
+
+	P_pswdConfirm = False
+
+'	SYSTEM.Trace "P_pswdConfirm = False"
+
+	If SYSTEM.ConnectBy = "1" Then
+		If Len(Trim(accn)) <> 11 Then Exit Function
+		If Len(Trim(pswd)) > 8 Then Exit Function
+'		SYSTEM.Trace "P_pswdConfirm = 1 "
+		msg = ""
+		sdata = accn&pswd
+		ret = SCREEN.ServiceEx("pibopswd", accn&pswd, Len(sdata), 0, 600000)
+'		SYSTEM.Trace "ret : "& ret
+		If Left(ret,1) <> "1" Then
+			msg = Mid(ret,2,99)
+			If Trim(msg) = "" Then
+				msg = "대기 시간 초과입니다. 결과를 꼭 확인 바랍니다."
+			End If
+			If InStr(msg, "3669") > 0 Then
+				MsgBox msg, , "IBK투자증권"
+			End If
+			Exit Function
+		End If
+	End If
+'	SYSTEM.Trace "P_pswdConfirm = True "
+	P_pswdConfirm = True
+End Function
+
+'***************************************************************
+'NAME: fn_nvl()
+' 기능      : null data handling
+'**********************************************************************
+Public Function fn_nvl(data)
+	Dim r_data
+	If Trim(data) = "" Then
+		r_data = 0
+	Else
+		If IsNull(data) = True Or IsEmpty(data) = True Then
+			r_data = 0
+		Else
+			r_data = data
+		End If
+	End If
+	fn_nvl = r_data
+End Function
+
+'***************************************************************
+'NAME: SetCreditGubn()
+' 기능      : 실시간 잔고 화면 신용구분 세팅
+'**********************************************************************
+
+Sub SetCreditGubn()
+	Dim ccode, cdata
+
+	For ii=1 To VIEWGRID.Rows
+		ccode = Trim(VIEWGRID.GetGridCell(ii, 17))
+
+		Select Case ccode
+		Case "00"
+			cdata = ""
+		Case "01"
+			cdata = "유통융자"
+		Case "03"
+			cdata = "자기융자"
+		Case "05"
+			cdata = "유통대주"
+		Case "07"
+			cdata = "자기대주"
+		Case "40"
+			cdata = "예탁담보자동대출"
+		Case "51"
+			cdata = "증권금융예탁담보신용대출"
+		Case "52"
+			cdata = "증권금융예탁담보자동대출"
+		Case "55"
+			cdata = "증권금융미수담보대출"
+		Case "60"
+			cdata = "수익증권담보대출"
+		Case "70"
+			cdata = "매도대금담보대출"
+		Case "80"
+			cdata = "예탁주식담보신용대출"
+		Case "82"
+			cdata = "예탁채권담보신용대출"
+		Case "90"
+			cdata = "매입자금담보대출"
+		Case "95"
+			cdata = "자기공모주청약대출"
+		Case "97"
+			cdata = "유통공모주청약대출"
+		Case "91"
+			cdata = "자기유상청약대출"
+		End Select
+
+		VIEWGRID.SetGridCell ii, 19, cdata
+	Next
+End Sub
+
+''''''''''''''''''' 종합화면 관심종목 탭관련 함수
+
+'계좌의 보유종목 불러오기
+Sub SettingRemain(row)
+
+	If SYSTEM.ConnectBy = "1" Then	'직원
+		If SCREEN.GetMapName(1) = "IB2022T0" Then
+			SCREEN.Object("obj_Remain.AN1A").data = SCREEN.Object("parent.AN98").data
+			SCREEN.Object("obj_Remain.pswd").data = SCREEN.Object("parent.zPwd").data
+		ElseIf SCREEN.GetMapName(1) = "IB101700" Then
+			SCREEN.Object("obj_Remain.AN1A").data = SCREEN.Object("parent.AN1A").data
+			SCREEN.Object("obj_Remain.pswd").data = SCREEN.Object("parent.zPwd").data
+		Else
+			SCREEN.Object("obj_Remain.AN1A").data = SCREEN.Object("main.OBJ_order.AN1A").data
+			SCREEN.Object("obj_Remain.pswd").data = SCREEN.Object("main.OBJ_order.ed_pswd").data
+		End If
+	Else
+
+		If SCREEN.GetMapName(1) = "IB2022T0" Then
+			SCREEN.Object("obj_Remain.AN1A").data = SCREEN.Object("parent.AN98").data
+		ElseIf SCREEN.GetMapName(1) = "IB101700" Then
+			SCREEN.Object("obj_Remain.AN1A").data = SCREEN.Object("parent.AN1A").data
+		Else
+			SCREEN.Object("obj_Remain.AN1A").data = SCREEN.Object("main.OBJ_order.AN1A").data
+		End If
+		SCREEN.Object("obj_Remain.pswd").data = "9999"
+	End If
+
+	Call RemainSend(row)
+
+End Sub
+
+'계좌 보유종목 가져오기
+Sub RemainSend(row)
+	SCREEN.Object("obj_Remain.grid_row").data = 0
+	SCREEN.Object("obj_Remain.rcount").data = row
+	obj_Remain.Send
+End Sub
+
+
+Sub startSend(viewtype)
+	If viewtype = 0 Then
+		SCREEN.Send 0
+	Else
+		SCREEN.Send 0
+		OBJ1.Send
+	End If
+
+End Sub
+
+Sub deleteRow()
+	Dim group
+
+	If Trim(SCREEN.GetMapName(1)) <> "IB200000" And Left(Trim(SCREEN.GetMapName(1)), 7) <> "IB2022T" And Trim(SCREEN.GetMapName(1)) <> "IB2000XX" And Trim(SCREEN.GetMapName(1)) <> "IB2000YY" Then
+		If Trim(SCREEN.GetMapName(1)) = "IB101700" Then
+			If Trim(SCREEN.GetMapName(0)) = "IB101713" Then
+				group = Trim(SCREEN.Object("parent.parent.intercombo").data)
+			Else
+				group = Trim(SCREEN.Object("parent.intercombo").data)
+			End If
+		ElseIf Left(Trim(SCREEN.GetMapName(0)), 7) = "IB00015" Then
+			group = Trim(SCREEN.Object("main.obj_info2.intercombo").data)
+		Else
+			group = Trim(SCREEN.Object("main.obj_tuja.intercombo").data)
+		End If
+	End If
+
+	If InStr(group, "00") = 0 Then
+		Exit Sub
+	End If
+
+	Dim ii, name
+
+	For ii = S90303.Rows To 1 Step -1
+		name = Trim(S90303.GetGridCell(ii, 6))
+
+		If name = "" Then
+			S90303.RemoveRow(ii-1)
+		End If
+	Next
+End Sub
+
+Sub GetMyMapName()
+	Dim result
+	result = Trim(SCREEN.GetMapName(0))
+
+	SCREEN.Object("obj_Remain.mapName").data = result
+End Sub
+
+
+Sub SetStaticData()
+	arrangeOK.Data = 0
+End Sub
+
+'분할화면 관심 정렬용
+Sub setArrange(data)
+
+	Dim temp(100,2), save(100,2), field, count, ii, jj, strTemp, firstword
+
+	arrangeOK.Data = 1
+
+	For ii=0 To 100
+		For jj=0 To 2
+			temp(ii,jj) = ""
+			save(ii,jj) = ""
+		Next
+	Next
+
+
+
+	If data = "01" Then
+		field = 16				'업종코드
+	ElseIf data = "02" Then
+		field = 6				'종목명
+	ElseIf data = "03" Then
+		field = 2				'종목코드
+	Else
+		Exit Sub
+	End If
+
+	count = 0
+
+	'데이터 수신
+	For ii=1 To S90303.Rows
+		If Trim(S90303.GetGridCell(ii,2)) <> "" Then
+
+			temp(count,0) = Trim(S90303.GetGridCell(ii,2))
+
+			If field = 6 Then
+				firstword = Trim(Left(S90303.GetGridCell(ii,field),1))
+				If firstword = "!" Or firstword = "/" Or firstword = "$" Or firstword = "%" Or firstword = "&" Or firstword = "@" Or firstword = "X" Then
+					temp(count,1) = Mid(Trim(S90303.GetGridCell(ii,field)),2)
+				Else
+					temp(count,1) = Trim(S90303.GetGridCell(ii,field))
+				End If
+			Else
+				temp(count,1) = Trim(S90303.GetGridCell(ii,field))
+			End If
+
+			count = count + 1
+
+		End If
+	Next
+
+	For ii=1 To SCREEN.Object("OBJ1.90303").Rows
+		If Trim(SCREEN.Object("OBJ1.90303").GetGridCell(ii,2)) <> "" Then
+			temp(count,0) = Trim(SCREEN.Object("OBJ1.90303").GetGridCell(ii,2))
+			If field = 6 Then
+				firstword = Trim(Left(SCREEN.Object("OBJ1.90303").GetGridCell(ii,field),1))
+				If firstword = "!" Or firstword = "/" Or firstword = "$" Or firstword = "%" Or firstword = "&" Or firstword = "@" Or firstword = "X" Then
+					temp(count,1) = Trim(Mid(SCREEN.Object("OBJ1.90303").GetGridCell(ii,field), 2))
+				Else
+					temp(count,1) = Trim(SCREEN.Object("OBJ1.90303").GetGridCell(ii,field))
+				End If
+			Else
+				temp(count,1) = Trim(SCREEN.Object("OBJ1.90303").GetGridCell(ii,field))
+			End If
+			count = count + 1
+
+		End If
+	Next
+
+	count = count - 1
+
+
+'	S90303.Clear
+'	SCREEN.Object("OBJ1.90303").Clear
+
+	'정렬
+	For ii=0 To count-1
+		For jj=ii+1 To count
+			If temp(ii,1) > temp(jj,1) Then
+				strTemp = temp(ii,0)
+				temp(ii,0) = temp(jj,0)
+				temp(jj,0) = strTemp
+
+				strTemp = temp(ii,1)
+				temp(ii,1) = temp(jj,1)
+				temp(jj,1) = strTemp
+			End If
+		Next
+	Next
+
+'	For ii=0 To count
+'		SYSTEM.Trace "temp(" & ii & ")(0) : " & temp(ii,0) & " (1) : " &  temp(ii,1)
+'	Next
+
+	count = 0
+
+	'재배치
+	For ii=1 To S90303.Rows
+		S90303.SetGridCell ii,2, temp(count,0)
+		count = count + 1
+	Next
+
+	For ii=1 To SCREEN.Object("OBJ1.90303").Rows
+		SCREEN.Object("OBJ1.90303").SetGridCell ii,2, temp(count,0)
+		count = count + 1
+	Next
+
+	SCREEN.Send 0
+	OBJ1.Send
+End Sub
+
+'풀화면 관심 정렬용
+Sub setArrange2(data)
+
+	Dim temp(100,2), field, count, ii, jj, strTemp, firstword
+'	SYSTEM.Trace "arrangeOK.Data : " & arrangeOK.Data
+	arrangeOK.Data = 1
+
+	For ii=0 To 100
+		For jj=0 To 2
+			temp(ii,jj) = ""
+		Next
+	Next
+
+
+
+	If data = "01" Then
+		If SCREEN.GetMapName(1) = "IB200000" Then
+			field = 22				'업종코드
+		ElseIf SCREEN.GetMapName(1) = "IB2000XX" Then
+			field = 22				'업종코드
+		ElseIf SCREEN.GetMapName(1) = "IB2000YY" Then
+			field = 22				'업종코드
+		ElseIf SCREEN.GetMapName(1) = "IB300000" Then
+			field = 19				'업종코드
+
+		ElseIf SCREEN.GetMapName(1) = "IB500000" Then
+			field = 19				'업종코드
+		ElseIf SCREEN.GetMapName(1) = "IB2022T0" Then
+			field = 19				'업종코드
+		End If
+
+	ElseIf data = "02" Then
+		field = 6				'종목명
+	ElseIf data = "03" Then
+		field = 2				'종목코드
+	Else
+		Exit Sub
+	End If
+
+	count = 0
+
+	'데이터 수신
+	For ii=1 To S90303.Rows
+		If Trim(S90303.GetGridCell(ii,2)) <> "" Then
+
+			temp(count,0) = Trim(S90303.GetGridCell(ii,2))
+
+			If field = 6 Then
+				firstword = Trim(Left(S90303.GetGridCell(ii,field),1))
+				If firstword = "!" Or firstword = "/" Or firstword = "$" Or firstword = "%" Or firstword = "&" Or firstword = "@" Or firstword = "X" Then
+					temp(count,1) = Mid(Trim(S90303.GetGridCell(ii,field)),2)
+				Else
+					temp(count,1) = Trim(S90303.GetGridCell(ii,field))
+				End If
+			Else
+				temp(count,1) = Trim(S90303.GetGridCell(ii,field))
+			End If
+
+			count = count + 1
+
+		End If
+	Next
+
+	count = count - 1
+'	For ii=0 To count
+'		SYSTEM.Trace "temp(" & ii & ")(0) : " & temp(ii,0) & " (1) : " &  temp(ii,1)
+'	Next
+
+'	S90303.Clear
+'	SCREEN.Object("OBJ1.90303").Clear
+
+	'정렬
+	For ii=0 To count-1
+		For jj=ii+1 To count
+			If temp(ii,1) > temp(jj,1) Then
+				strTemp = temp(ii,0)
+				temp(ii,0) = temp(jj,0)
+				temp(jj,0) = strTemp
+
+				strTemp = temp(ii,1)
+				temp(ii,1) = temp(jj,1)
+				temp(jj,1) = strTemp
+			End If
+		Next
+	Next
+
+
+
+
+
+
+
+
+	count = 0
+
+	'재배치
+	For ii=1 To S90303.Rows
+		S90303.SetGridCell ii,2, temp(count,0)
+		count = count + 1
+	Next
+
+	SCREEN.Send 0
+End Sub
+
+}
+
+
+

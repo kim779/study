@@ -1,0 +1,146 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB454121)
+MAPSIZE(252, 454)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("상품 시간대별시세")
+MAPPUBLIC(";")
+FONT("굴림", 9, NORMAL)
+OPTIONS(FMS|FLASH)
+TITLE("[454121] 시간대별 시세(틱)")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pooppoop")
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+GRID  104310(0, 0, 455, 251)  VISIBLEROW(0)  CELLH(18)  MATRIX(200, 5)  FIX(0)  MAINCOLOR(7, 0)  LINECOLOR(75)  FOCUSCOLOR(78)  FOCUSKIND(4)    FONT("굴림체", 9, NORMAL)  VARIANT("$?")  ROWC(68, 77)  |FLEXIBLE|VSCROLL|INS_TOP|NO3D|RROW|XHLINE|PAGE|HEADER|GRFTEXT    &
+	COLINFO("104034")  LEN(6)  WIDTH(71)  HEAD("시간")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  EDITFORMAT("99:99:99")    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("104023")  LEN(8)  WIDTH(87)  HEAD("종가")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSIGN    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(94, 95)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("104024")  LEN(8)  WIDTH(87)  HEAD("전일대비")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|FA_CONTRAST|SA_SPACE|SA_CORAW|SA_TEXT    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(94, 95)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("104032")  LEN(10)  WIDTH(97)  HEAD("체결량")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSUP    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(69, 69)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("104027")  LEN(10)  WIDTH(97)  HEAD("거래량")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|SA_SPACE    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    TABORDER(1)  IOORDER(3)  ENABLE  &
+  VISIBLE
+
+EDIT  100301(165, 465, 236, 485)  LEN(8)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_HAN    COLOR(28, 232)  CUR(0)  TP_NONE  INIT("161DC000")          TABORDER(2)  IOORDER(1)  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  100021(174, 545, 311, 583)  LEN(12)  IO_NUM|AL_CENTER||FA_FLASH    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Dim g_AccVol
+
+g_AccVol = 0
+'-----------------------------------------------------------------------
+Function Str2Int(Data)
+	Str2Int = 0
+	AData = Trim(Data)
+
+	If Len(AData) = 0 Then
+		Exit Function
+	End If
+	Str2Int = CLng(AData)
+End Function
+'-----------------------------------------------------------------------
+Function Str2Dbl(Data)
+	Str2Dbl = 0
+	AData = Trim(Data)
+	If Len(AData) = 0 Then
+		Exit Function
+	End If
+	Str2Dbl = CDbl(AData)
+End Function
+'-----------------------------------------------------------------------
+Sub OnAlert()
+	SetProcReal
+End Sub
+'-----------------------------------------------------------------------
+Sub SetProcReal()
+	AllFlag = False
+	If g_AccVol = 0 Then
+		AllFlag = True
+	End If
+
+	ArrData = Array(0, 0, 0, 0)
+	For i = 1 To S104310.Rows
+		ArrData(3) = Str2Dbl( S104310.GetGridCell(i, 5) )
+		If ArrData(3) = 0 Then
+			Exit For
+		End If
+
+		If AllFlag Then
+			ArrData(0) = Str2Dbl( S104310.GetGridCell(i, 2) )
+			ArrData(1) = S104310.GetGridCell(i, 3)
+			ArrData(2) = Str2Int( S104310.GetGridCell(i, 4) )
+
+			Data = Join(ArrData, "|")
+			SCREEN.Proc "parent.OnRealData", Data
+		ElseIf ArrData(3) <= g_AccVol Then
+			Exit For
+		Else
+			ArrData(0) = Str2Dbl( S104310.GetGridCell(i, 2) )
+			ArrData(1) = S104310.GetGridCell(i, 3)
+			ArrData(2) = Str2Int( S104310.GetGridCell(i, 4) )
+
+			Data = Join(ArrData, "|")
+			SCREEN.Proc "parent.OnRealData", Data
+		End If
+	Next
+
+	g_AccVol = Str2Int( S104310.GetGridCell(1, 5) )
+End Sub
+
+_AW_ONSTART_AW_
+'S100301.Data = SCREEN.Object("main.100301").data
+'SCREEN.Send 0
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+'S104310.Clear
+
+Dim cod
+S100301.Data = SCREEN.Object("main.100301").data
+If Trim(S100301.Data) = "" Then
+	SCREEN.OnSend = False
+	Exit Sub
+End If
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+g_AccVol = Trim(S104310.GetGridCell(1, 5))
+If Len(g_AccVol) = 0 Then
+	g_AccVol = 0
+Else
+	g_AccVol = CLng(g_AccVol)
+End If
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(104310)
+_AW_ONCHANGE_AW_
+LABEL0.Data = g_Cnt
+
+g_Cnt = g_Cnt + 1
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

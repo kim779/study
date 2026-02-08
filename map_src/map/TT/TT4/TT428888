@@ -1,0 +1,93 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(TT428888)
+MAPSIZE(184, 238)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("MS Sans Serif", 9, NORMAL)
+TITLE("Untitled")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL0(0, -5, 240, 185)  TP_RAISED      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON1(75, 55, 155, 95)  '파일'  TP_PUSH      AL_CENTER    FOCUS  COLOR(208, 232)  CUR(0)      TABORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_SCRIPT_AW_(BUTTON1)
+_AW_ONCLICK_AW_
+	Dim fso, ts, data, parseData, userID, index, directory
+	Const ForReading = 1
+
+	userID = Trim(SYSTEM.UserID)
+	
+	Set fso = CreateObject("Scripting.FileSystemObject")
+	directory = SYSTEM.Home & "\tab\otpuser.txt"
+
+	'tp.Data = 0
+
+	If fso.FileExists(directory) = False Then
+	MsgBox "없다"
+		Exit Sub
+	End If
+
+'tp.Data = 1
+
+	Set ts = fso.OpenTextFile(directory, ForReading)
+	data = ts.ReadLine
+	ts.Close
+
+
+   SYSTEM.Trace "data : " & data & "dicrectory : " & directory
+	If Trim(data) = "" Then
+		Exit Sub
+	End If
+
+
+'
+'	Do While Len(data) > 0
+'		index = InStr(data, ";")
+		SYSTEM.Trace "data : " & data & " index : " & index
+'
+'		If index > 0 Then
+'			parseData = Mid(data, 1, index-1)
+'			data = Mid(data, index+1)
+'		Else
+'			Exit Sub
+'		End If
+'
+'		If userID = Trim(parseData) Then
+'			GRID0.SetColumnVisible 10, True
+'			GRID0.SetColumnWidth 11, 113
+'			Exit Sub
+'		End If
+'	Loop
+
+
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

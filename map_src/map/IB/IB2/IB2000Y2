@@ -1,0 +1,221 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB2000Y2)
+MAPSIZE(300, 655)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("지수종합")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(FLASH|CR2TAB)
+TITLE("지수종합")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("bo200051")
+MAPTYPE(NORM)
+HEADER(NOP)
+BGROUND(BRUSH, 181)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL2(0, 241, 655, 250)        COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL1(212, 0, 655, 247)        COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL3(0, 240, 211, 246)        COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL0(244, 431, 684, 458)        COLOR(66, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  gubn(138, 324, 244, 341)  LEN(11)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(28, 232)  CUR(0)  TP_NONE  INIT("11111111111")          TABORDER(1)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+GRID  GRID0(0, 0, 213, 300)  VISIBLEROW(11)  CELLH(20)  MATRIX(11, 6)  FIX(0)  MAINCOLOR(181, 0)  LINECOLOR(65)  FOCUSCOLOR(78)  FOCUSKIND(0)  AUTOSIZE    FONT("굴림체", 9, NORMAL)  ROWC(68, 77)  |NO3D|RROW|XHLINE|GRXSIZE    &
+	COLINFO("021")  LEN(12)  WIDTH(91)  HEAD("RTS CODE")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(7, 76)  IO_MIXED|EDIT_OUTPUT  |FA_FLASH    COLOR(68, 232)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("022")  LEN(16)  WIDTH(73)  HEAD("업종명")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT      COLOR(68, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("023")  LEN(9)  WIDTH(68)  HEAD("지수")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|FA_DOMINO|SA_SPACE|SA_COSUP    COLOR(68, 232)  COLCUR(0, 0)  DOM(024)    COLUMN_VISIBLE  INORMAL  IFRGB(94, 95)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("024")  LEN(9)  WIDTH(70)  HEAD("대   비")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_RIGHT|FA_ZEROSUP|FA_CORGB|FA_CONTRAST|SA_SPACE|SA_CORAW|SA_TEXT    COLOR(68, 232)  COLCUR(0, 0)    INORMAL  IFRGB(94, 95)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("033")  LEN(9)  WIDTH(71)  HEAD("등락률")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSIGN    COLOR(68, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(94, 95)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col0")  LEN(12)  WIDTH(71)  HEAD("거래량(천)")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    TABORDER(2)  IOORDER(3)  ENABLE  &
+  VISIBLE
+
+BUTTON  CK_KO(251, 436, 307, 453)  '코스피'  TP_CHECK|EDIT_NOP          COLOR(66, 130)  CUR(0)      TABORDER(3)  ENABLE  &
+  CHECKED  HINTTYPE(IH_NONE)
+BUTTON  CK_KQ(309, 436, 365, 453)  '코스닥'  TP_CHECK|EDIT_NOP          COLOR(66, 130)  CUR(0)      TABORDER(4)  ENABLE  &
+  CHECKED  HINTTYPE(IH_NONE)
+BUTTON  CK_F(369, 436, 425, 453)  '선물'  TP_CHECK|EDIT_NOP          COLOR(66, 130)  CUR(0)      TABORDER(5)  ENABLE  &
+  CHECKED  HINTTYPE(IH_NONE)
+OBJECT  OBJ_chart(211, 0, 650, 300)    "IB2000YC"  TABORDER(6)  IOORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  OUTPUT0(147, 355, 218, 372)  LEN(4)  IO_NUM|AL_CENTER|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  1777(256, 380, 276, 400)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("2")          TABORDER(7)  IOORDER(5)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL4(87, 380, 257, 400)  '시장구분 1:KRX 2:NXT 3:통합'  LINECOLOR(238)      COLOR(200, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Sub send_TR()
+	Dim cnt, who
+	cnt = 0
+	If CK_KO.Checked = True Then
+		who = 0
+		cnt = cnt + 1
+	End If
+	If CK_KQ.Checked = True Then
+		who = 1
+		cnt = cnt + 1
+	End If
+	If CK_F.Checked = True Then
+		who = 2
+		cnt = cnt + 1
+	End If
+	If cnt = 0 Or cnt = 1 Then
+		Select Case who
+		Case 0 :
+			CK_KO.Checked = True
+			CK_KO.Enable = False
+		Case 1 :
+			CK_KQ.Checked = True
+			CK_KQ.Enable = False
+		Case 2 :
+			CK_F.Checked = True
+			CK_F.Enable = False
+		End Select
+	Else
+		CK_KO.Enable = True
+		CK_KQ.Enable = True
+		CK_F.Enable = True
+	End If
+End Sub
+
+Sub func_CHK()
+	If CK_KO.Checked = False And CK_KQ.Checked = False And CK_F.Checked = True Then
+		OBJ_chart.SetObject "IB20005G"
+		OBJ_chart.Send
+		Exit Sub
+	End If
+
+	If CK_F.Checked = True Then
+		OBJ_chart.SetObject "IB20005G"
+	Else
+		OBJ_chart.SetObject "IB20005G"
+	End If
+End Sub
+
+_AW_ONINDECLARE_AW_
+#load IB999901
+
+_AW_ONENDSUB_AW_
+_AW_ONSTART_AW_
+Dim kospi, kosdaq, future
+
+If SCREEN.CreateObject("Info") Then
+	kospi = Trim(INFO.popData (LOGIN.Name, "userconf.ini", SCREEN.GetMapName(1), "200051_CHK1"))
+	kosdaq = Trim(INFO.popData (LOGIN.Name, "userconf.ini", SCREEN.GetMapName(1), "200051_CHK2"))
+	future = Trim(INFO.popData (LOGIN.Name, "userconf.ini", SCREEN.GetMapName(1), "200051_CHK3"))
+End If
+
+Select Case kospi
+	Case "1" CK_KO.Checked = True
+	Case "0" CK_KO.Checked = False
+End Select
+
+Select Case kosdaq
+	Case "1" CK_KQ.Checked = True
+	Case "0" CK_KQ.Checked = False
+End Select
+
+Select Case future
+	Case "1" CK_F.Checked = True
+	Case "0" CK_F.Checked = False
+End Select
+
+send_TR()
+func_CHK()
+
+SCREEN.SetTimer 5, False
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+
+SetMKGubn777()
+SYSTEM.Trace "[MKGUBN][IB2000Y2][OnSend][bo200051] 1777 = " & S1777.Data
+
+OBJ_chart.Send
+
+_AW_ONENDSUB_AW_
+_AW_ONTIMER_AW_
+OBJ_chart.Send
+'SYSTEM.Trace "object send"
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(CK_KO)
+_AW_ONCLICK_AW_
+Call send_TR()
+
+Call func_CHK()
+
+SCREEN.CreateObject("Info")
+If CK_KO.Checked = True Then
+	INFO.pushData LOGIN.Name, "userconf.ini", SCREEN.GetMapName(1), "200051_CHK1", "1"
+Else
+	INFO.pushData LOGIN.Name, "userconf.ini", SCREEN.GetMapName(1), "200051_CHK1", "0"
+End If
+
+OBJ_chart.Send
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(CK_KQ)
+_AW_ONCLICK_AW_
+Call send_TR()
+
+Call func_CHK()
+
+SCREEN.CreateObject("Info")
+If CK_KQ.Checked = True Then
+	INFO.pushData LOGIN.Name, "userconf.ini", SCREEN.GetMapName(1), "200051_CHK2", "1"
+Else
+	INFO.pushData LOGIN.Name, "userconf.ini", SCREEN.GetMapName(1), "200051_CHK2", "0"
+End If
+
+OBJ_chart.Send
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(CK_F)
+_AW_ONCLICK_AW_
+Call send_TR()
+
+Call func_CHK()
+
+SCREEN.CreateObject("Info")
+If CK_F.Checked = True Then
+	INFO.pushData LOGIN.Name, "userconf.ini", SCREEN.GetMapName(1), "200051_CHK3", "1"
+Else
+	INFO.pushData LOGIN.Name, "userconf.ini", SCREEN.GetMapName(1), "200051_CHK3", "0"
+End If
+
+OBJ_chart.Send
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

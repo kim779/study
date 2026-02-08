@@ -1,0 +1,94 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB100211)
+MAPSIZE(350, 303)
+VERSION(001)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("10호가")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(FMS|FLASH|CR2TAB)
+TITLE("10호가")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("*")
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+CONTROL  17412(0, 0, 303, 350)    "CX_Depth"  "/u1/d10/p0/b/s1/l/c/h3/g/a2/fIB100211/red_jprc"  LEN(0)  EDIT_OUTPUT    COLOR(192, 232)  TABORDER(0)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  1777(554, 16, 574, 36)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("2")          TABORDER(1)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL3(385, 16, 555, 36)  '시장구분 1:KRX 2:NXT 3:통합'  LINECOLOR(238)      COLOR(200, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  1021(355, 80, 455, 100)  LEN(16)  IO_ALPHA|AL_LEFT||FA_FLASH    COLOR(31, 232)  CUR(0)            TABORDER(0)  IOORDER(2)  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Sub saveDepthInfo()
+	If SCREEN.CreateObject("Info") Then
+		INFO.pushData LOGIN.Name, "userconf.ini", SCREEN.GetMapName(1), "SepType", S17412.sDepthInfo
+	End If
+SYSTEM.Trace "saveDepthInfo SepType = " & S17412.sDepthInfo
+End Sub
+
+Sub LoadDepthInfo()
+SYSTEM.Trace "LoadDepthInfo myMAP(parent) = " & SCREEN.GetMapName(1)  & " self = " & SCREEN.GetMapName(0)
+	If SCREEN.CreateObject("Info") Then
+		S17412.sDepthInfo =	Trim(INFO.popData (LOGIN.Name, "userconf.ini", SCREEN.GetMapName(1), "SepType"))
+	End If
+End Sub
+
+_AW_ONINDECLARE_AW_
+#load IB999901
+
+_AW_ONENDSUB_AW_
+_AW_ONSTART_AW_
+LoadDepthInfo()
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+If UCase(TypeName( SCREEN.Object("main.cxMarket") )) <> "NOTHING" Then
+SYSTEM.Trace "[IB100211][onSend] Change_MKGubn = " & SCREEN.Object("main.cxMarket").sMarket
+	If Trim(SCREEN.Object("main.cxMarket").sMarket) = "통합" Then
+		S1777.Data = "3"
+		S17412.SetMKtype(3)
+		SYSTEM.Trace "[IB100211][onSend] 3333"
+	ElseIf Trim(SCREEN.Object("main.cxMarket").sMarket) = "KRX" Then
+		S1777.Data = "1"
+		S17412.SetMKtype(1)
+		SYSTEM.Trace "[IB100211][onSend] 1111"
+	ElseIf Trim(SCREEN.Object("main.cxMarket").sMarket) = "NXT" Then
+		S1777.Data = "2"
+		S17412.SetMKtype(2)
+		SYSTEM.Trace "[IB100211][onSend] 2222"
+	End If
+End If
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(17412)
+_AW_ONCHANGE_AW_
+saveDepthInfo
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

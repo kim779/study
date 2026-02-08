@@ -1,0 +1,485 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB999911)
+MAPSIZE(385, 788)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("주식주문 전송")
+MAPPUBLIC(";")
+FONT("굴림", 9, NORMAL)
+OPTIONS(ENCODE|CERTIFY)
+TITLE("주식주문 전송")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pibosodr")
+MAPTYPE(NORM)
+HEADER(LEDGER)
+TRXH("piboSorder")
+}
+
+
+
+FORM DIVISION
+{
+
+LABEL  LABEL0(18, 282, 91, 301)  '정정취소'  AL_CENTER  CUR(0)      COLOR(195, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL2(18, 61, 91, 80)  '시장구분'  AL_CENTER  CUR(0)      COLOR(195, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL3(18, 260, 91, 279)  '주문조건'  AL_CENTER  CUR(0)      COLOR(195, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL4(18, 237, 91, 256)  '호가구분'  AL_CENTER  CUR(0)      COLOR(195, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL5(18, 215, 91, 234)  '주문단가'  AL_CENTER  CUR(0)      COLOR(195, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL6(18, 193, 91, 212)  '주문수량'  AL_CENTER  CUR(0)      COLOR(195, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL7(18, 171, 91, 190)  '종목코드'  AL_CENTER  CUR(0)      COLOR(195, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL8(18, 149, 91, 168)  '원주문번호'  AL_CENTER  CUR(0)      COLOR(195, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL9(18, 127, 91, 146)  '비밀번호'  AL_CENTER  CUR(0)      COLOR(195, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL10(18, 105, 91, 124)  '계좌번호'  AL_CENTER  CUR(0)      COLOR(195, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL11(18, 83, 91, 102)  '매매구분'  AL_CENTER  CUR(0)      COLOR(195, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL19(18, 304, 91, 323)  '처리구분'  AL_CENTER  CUR(0)      COLOR(195, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL17(18, 39, 91, 58)  '주문유형'  AL_CENTER  CUR(0)      COLOR(195, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  ed_acno(97, 105, 204, 124)  LEN(11)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(5)  IOORDER(5)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  ed_pswd(97, 127, 204, 146)  LEN(8)  IO_ALPHA|EDIT_INPUT|FA_PASSWD|FA_WRAP|FA_ENUM    COLOR(192, 232)  CUR(0)  TP_NONE    ENCRYPT("en_accn")        TABORDER(6)  IOORDER(6)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  ed_ogno(97, 149, 204, 168)  LEN(12)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(7)  IOORDER(7)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  ed_code(97, 171, 204, 190)  LEN(12)  IO_ALPHA|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(8)  IOORDER(8)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  ed_jqty(97, 193, 204, 212)  LEN(8)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(9)  IOORDER(9)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  ed_jprc(97, 215, 204, 234)  LEN(10)  IO_NUM|EDIT_INPUT|FA_COMMA|FA_RIGHT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(10)  IOORDER(10)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  ed_prgb(97, 304, 126, 323)  LEN(1)  IO_ALPHA|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("X")          TABORDER(14)  IOORDER(14)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  ed_odgb(97, 39, 126, 58)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(2)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  ed_mkgb(97, 61, 126, 80)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(3)  IOORDER(3)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  ed_mmgb(97, 83, 126, 102)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(4)  IOORDER(4)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  ed_hogb(97, 237, 126, 256)  LEN(2)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(11)  IOORDER(11)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  ed_jmgb(97, 260, 126, 279)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(12)  IOORDER(12)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  ed_mdgb(97, 282, 126, 301)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(13)  IOORDER(13)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL12(18, 326, 91, 345)  '기타1 (20)'  AL_CENTER  CUR(0)      COLOR(195, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  ed_gmo(97, 326, 209, 345)  LEN(20)  IO_ALPHA|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(15)  IOORDER(15)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL13(273, 61, 346, 80)  '주문번호'  AL_CENTER  CUR(0)      COLOR(195, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  o_jmno(352, 61, 412, 76)  LEN(6)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSIGN    COLOR(192, 209)  CUR(0)            IFRGB(69, 69)  TABORDER(0)  IOORDER(18)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  o_ocnt(352, 36, 412, 56)  LEN(4)  IO_NUM|AL_CENTER|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(17)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  o_ldat(352, 111, 615, 131)  LEN(80)  IO_ALPHA|AL_LEFT|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(20)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL22(273, 111, 346, 130)  '주문번호'  AL_CENTER  CUR(0)      COLOR(195, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL15(273, 86, 346, 105)  '원주문번호'  AL_CENTER  CUR(0)      COLOR(195, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  o_mono(352, 86, 412, 101)  LEN(6)  IO_NUM|AL_CENTER|    COLOR(192, 0)  CUR(0)            TABORDER(0)  IOORDER(19)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL16(274, 36, 347, 55)  'O CNT'  AL_CENTER  CUR(0)      COLOR(195, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL21(18, 17, 91, 36)  'I CNT'  AL_CENTER  CUR(0)      COLOR(195, 232)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  ed_icnt(97, 17, 138, 36)  LEN(4)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("0001")          TABORDER(1)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL14(354, 131, 765, 150)  '[주문유형,시장구분,매매구분] (INDEX) [서비스명] [오류코드 오류메세지]'  AL_LEFT  CUR(0)      COLOR(195, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL18(279, 233, 440, 278)  '* 세부값 주문공통전문 참조 *'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+GROUP  GROUP0(8, 1, 253, 381)  'Input'        COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+GROUP  GROUP1(264, 8, 776, 190)  'Output'        COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  l_jmno(282, 207, 338, 225)  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  guide2(262, 282, 434, 300)  LINECOLOR(65)      COLOR(68, 69)  CUR(0)    AL_LEFT    ENABLE  &
+  HINTTYPE(IH_NONE)
+CONTROL  OrdCfg(267, 311, 340, 358)  |FA_PROTECT  "CX_OrderCfg"  "/k1/xPOOPPOOP/m/p/q/sIB1001C0/rIB100100"  LEN(0)  EDIT_NOP    COLOR(192, 232)  TABORDER(0)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  en_accn(97, 387, 204, 406)  LEN(8)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(17)  IOORDER(21)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL20(18, 386, 91, 405)  '계좌_암호'  AL_CENTER  CUR(0)      COLOR(195, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL23(19, 348, 92, 367)  '기타2 (20)'  AL_CENTER  CUR(0)      COLOR(195, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  ed_gmm(95, 355, 207, 374)  LEN(20)  IO_ALPHA|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(16)  IOORDER(16)  ENABLE  &
+  HINTTYPE(IH_NONE)
+CONTROL  cxdatatran(505, 270, 655, 340)  |FA_PROTECT  "CX_DATATRANS"  ""  LEN(0)  EDIT_NOP    COLOR(192, 232)  TABORDER(0)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Dim objnm
+Dim sOwnerAcc
+objnm = "parent.obj_odr"
+'*********************************************************************************
+'* 주문후 환결설정
+'*********************************************************************************
+Sub Set_option
+	Dim jprc, jqty
+	'**********************************************************************
+	' Main 주문설정 적용
+	'**********************************************************************
+	If OrdCfg.KeepPrc = True	Then		'주문후 단가저장
+		jprc = Trim(ed_jprc.Data)
+		If is_numeric(jprc) = True Then
+			OrdCfg.Price = CDbl(ed_jprc.Data)
+			SCREEN.Object(objnm & ".ed_jprc").data = OrdCfg.Price
+		End If
+	Else
+		SCREEN.Object(objnm & ".ed_jprc").data = ""
+	End If
+
+	If OrdCfg.KeepQty = True	Then		'주문후 수량저장
+		jqty = Trim(ed_jqty.Data)
+		If is_numeric(jqty) = True Then
+			OrdCfg.Qty = CDbl(ed_jqty.Data)
+			SCREEN.Object(objnm & ".ed_jqty").data = OrdCfg.Qty
+		End If
+	Else
+		SCREEN.Object(objnm & ".ed_jqty").data = ""
+	End If
+	'**********************************************************************
+	'0101화면의 주문설정
+	'**********************************************************************
+	'주문후 focus 위치
+	Select Case SCREEN.Object(objnm & ".OrdCfg").ReadCfg("CursorPos")
+		Case 0			'계좌번호
+			If Trim(SCREEN.Object("parent.tab_order").text) = "신용매도" Then
+				SCREEN.Object("parent.AN11").Setfocus
+			Else
+				SCREEN.Object("parent.AN1A").Setfocus
+			End If
+		Case 1			'비밀번호
+			SCREEN.Object("parent.ed_pswd").Setfocus
+		Case 2			'종목코드
+			SCREEN.Object(objnm & ".1301").Setfocus
+		Case 3			'수량
+			SCREEN.Object(objnm & ".ed_jqty").Setfocus
+		Case 3			'단가
+			SCREEN.Object(objnm & ".ed_jprc").Setfocus
+		Case Else
+			If Trim(SCREEN.Object("parent.tab_order").text) = "신용매도" Then
+				SCREEN.Object("parent.AN11").Setfocus
+			Else
+				SCREEN.Object("parent.AN1A").Setfocus
+			End If
+	End Select
+	'**********************************************************************
+End Sub
+
+Sub SetownerAcc()
+	SYSTEM.Trace "!!!!!!!!!!!!!!!!!!!!! start SetownerAcc"
+	Dim ii, tmpAcnt, acnt, acnm, nick, myFlag
+	accnGrp = cxdatatran.GetTypeData("4", "1")
+
+	If Trim(accnGrp) = "" Then
+		Exit Sub
+	End If
+
+	accnList = Split(accnGrp, vbLf)
+
+	For ii = LBound(accnList) To UBound(accnList) - 1
+		accnInfo = Split(accnList(ii), "|")
+
+
+		tmpAcnt = Trim(accnInfo(0))
+
+		If tmpAcnt <> "" Then
+			acntacnm = Split(tmpAcnt,vbTab)
+			acnt = Trim(acntacnm(0))
+			acnm = Trim(acntacnm(2))
+			nick = Trim(accnInfo(1))
+			myFlag = Trim(accnInfo(2))
+
+			value = myFlag And 1
+
+			If value = 1 Then
+				sOwnerAcc = sOwnerAcc & acnt & "|"
+			End If
+
+		End If
+
+	Next
+
+	SYSTEM.Trace "!!!!!!!!!!!!!!!!!!!!!get owneracc = " & sOwnerAcc
+End Sub
+
+_AW_ONINDECLARE_AW_
+#load DH888888
+
+_AW_ONENDSUB_AW_
+_AW_ONSTART_AW_
+SetownerAcc()
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+Dim code, sygb, sydt, tabtext
+Dim pre_id
+
+If Trim(SCREEN.Object(objnm & ".jmbtclick").data) = 0 Then
+	SCREEN.OnSend = False
+	Exit Sub
+End If
+
+If SYSTEM.ConnectBy = 1 Then
+	If LOGIN.Cani = 0 Then
+		MsgBox "본사직원은 주문이 불가합니다.",,"IBK투자증권"
+		SCREEN.OnSend = False
+		Exit Sub
+	End If
+End If
+
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+' 주문유형
+' 1:일반
+' 2:선옵
+' 3:예약
+' 4:CM
+' 5:단주
+' 7:기간예약
+' N:NXT일반
+' S:SOR일반
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Select Case SCREEN.GetMapName(1)
+Case "IB885100"	' CM 단주
+	ed_odgb.Data = "4"'SCREEN.Object(objnm & ".ed_odgb").data		'주문유형
+
+Case "IB360000"	' NXT
+	ed_odgb.Data = "N"
+
+Case Else	' 일반
+	ed_odgb.Data = SCREEN.Object(objnm & ".ed_odgb").data		'주문유형
+
+	If UCase(TypeName( SCREEN.Object(objnm & ".cxMarket"))) <> "NOTHING" Then
+		If SCREEN.Object(objnm & ".cxMarket").sMarket = "KRX" Then
+			ed_odgb.Data = "1"
+		ElseIf SCREEN.Object(objnm & ".cxMarket").sMarket = "NXT" Then
+			ed_odgb.Data = "N"
+		ElseIf SCREEN.Object(objnm & ".cxMarket").sMarket = "통합" Then
+			ed_odgb.Data = "S"
+		End If
+
+SYSTEM.Trace "[IB999911] cxMarket 존재 ed_odgb = " & ed_odgb.Data
+	Else
+SYSTEM.Trace "[IB999911] !!!!! cxMarket 존재 NO  ed_odgb = " & ed_odgb.Data
+	End If
+
+End Select
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+
+ed_mkgb.Data = SCREEN.Object(objnm & ".ed_mkgb").data		'시장구분
+ed_mmgb.Data = SCREEN.Object(objnm & ".ed_mmgb").data		'매매구분
+ed_acno.Data = SCREEN.Object(objnm & ".ed_acno").data		'계좌번호
+'------------------------------------------------------------------------ 일방향 암호화
+LEDGER.Hsiz = 44
+LEDGER.EPwd = SYSTEM.EncryptSHA(Trim(SCREEN.Object(objnm & ".ed_pswd").data))
+ed_pswd.Data = "HEAD"
+'------------------------------------------------------------------------
+'ed_pswd.Data = SCREEN.Object(objnm & ".ed_pswd").data		'비밀번호
+ed_ogno.Data = SCREEN.Object(objnm & ".ed_ogno").data		'원주문번호
+en_accn.Data = Mid(ed_acno.Data, 1, 8) 	'계좌번호암호화
+'종목코드
+code = Trim(SCREEN.Object(objnm & ".1301").data)
+
+If Trim(SCREEN.GetCodeType(code)) = "27" Then	'ETN은 'Q'로 시작함
+	ed_code.Data = "Q" & code
+Else
+	Select Case Mid(code, 1, 1)
+		Case "5", "6", "7", "8"
+			ed_code.Data = "J" & code
+		Case Else
+			ed_code.Data = "A" & code
+	End Select
+End If
+
+
+If SCREEN.GetMapName(1) = "IB882000" Then
+	If SCREEN.Object(objnm & ".c_gubn").checked = True Then			'차익거래
+		ed_prgb.Data = "Y"
+	Else
+		ed_prgb.Data = SCREEN.Object(objnm & ".ed_prgb").data		'처리구분
+	End If
+Else
+	ed_prgb.Data = SCREEN.Object(objnm & ".ed_prgb").data		'처리구분
+End If
+
+ed_jqty.Data = SCREEN.Object(objnm & ".ed_jqty").data		'주문수량
+ed_jprc.Data = SCREEN.Object(objnm & ".ed_jprc").data		'주문단가
+ed_hogb.Data = SCREEN.Object(objnm & ".ed_hogb").data		'호가구분
+ed_jmgb.Data = SCREEN.Object(objnm & ".ed_jmgb").data		'주문조건
+ed_mdgb.Data = SCREEN.Object(objnm & ".ed_mdgb").data		'정정취소
+'ed_prgb.Data = SCREEN.Object(objnm & ".ed_prgb").data		'처리구분
+
+ed_gmo.Data = SCREEN.Object(objnm & ".ed_gmo").data		'기타입력1
+ed_gmm.Data = SCREEN.Object(objnm & ".ed_gmm").data		'기타입력2
+
+' 스톱지정가 입력 CHK
+If UCase(TypeName( SCREEN.Object(objnm & ".edStopPrc"))) <> "NOTHING" Then
+	If SCREEN.Object(objnm & ".shogb").data = 1 Then	' 주문유형이 스톱지정가일때
+
+		' mmgb 매매구분 	1:매도 2:매수 3:정정 4:취소
+		Select Case ed_mmgb.Data
+		Case 1	' 매도
+		Case 2	' 매수
+			If Len(Trim(SCREEN.Object(objnm & ".edStopPrc").data)) = 0  Or SCREEN.Object(objnm & ".edStopPrc").data = 0 Then
+				MsgBox "스톱지정가 가격을 설정하세요",,"IBK투자증권"
+				SCREEN.OnSend = False
+				Exit Sub
+			End If
+		End Select
+	End If
+	ed_gmm.Data = SCREEN.Object(objnm & ".edStopPrc").data		'기타입력2
+End If
+
+If Trim(SCREEN.Object(objnm & ".jmbtclick").data) = 1 Then
+	SCREEN.Object(objnm & ".jmbtclick").data = 0
+End If
+
+
+SYSTEM.Trace "[IB999911] MAP = " & SCREEN.GetMapName(1)
+SYSTEM.Trace "[IB999911] objnm = " & objnm
+SYSTEM.Trace "[IB999911] ed_odgb = " & ed_odgb.Data
+SYSTEM.Trace "[IB999911] ed_jqty = " & ed_jqty.Data
+SYSTEM.Trace "[IB999911] ed_jprc = " & ed_jprc.Data
+SYSTEM.Trace "[IB999911] ed_hogb = " & ed_hogb.Data
+SYSTEM.Trace "[IB999911] ed_jmgb = " & ed_jmgb.Data
+SYSTEM.Trace "[IB999911] ed_mdgb = " & ed_mdgb.Data
+SYSTEM.Trace "[IB999911] ed_gmo = " & ed_jmgb.Data
+SYSTEM.Trace "[IB999911] ed_gmm = " & ed_mdgb.Data
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+Dim ecod, MyVar
+
+OrdCfg.LoadInfo
+If OrdCfg.ReadCfg("ShowMsg2") = 1 Then
+	MsgBox Trim(LEDGER.Emsg), , "주문확인창"
+End If
+
+If OrdCfg.ReadCfg("MSGPOPUP") = "0" Then
+	If Left(LEDGER.Ecod, 1) <> "0" Then
+		MsgBox Trim(LEDGER.Emsg), , "IBK투자증권"
+	End If
+End If
+
+SCREEN.Object("main.guide").text = LEDGER.Emsg							   '메시지
+
+
+If SCREEN.GetMapName(1) = "IB2000XX" Or SCREEN.GetMapName(1) = "IB2000YY" Or SCREEN.GetMapName(1) = "IB360000" Then
+	SCREEN.Object(objnm & ".o_jmno").data = "주문번호 : " & Trim(o_jmno.Data)  '주문번호
+Else
+	SCREEN.Object(objnm & ".o_jmno").data = Trim(o_jmno.Data)  '주문번호
+End If
+
+'정상적으로 주문이 되었을때 메세지가 뜨도록 설정
+If SCREEN.GetMapName(1) = "IB104000" Then
+	If Left(LEDGER.Ecod, 1) = "0" Then
+		MsgBox Trim(LEDGER.Emsg), , "IBK투자증권"
+	End If
+End If
+
+If Trim(o_jmno.Data) <> "" Then
+	l_jmno.Text = Trim(o_jmno.Data)
+End If
+
+
+'정상적인 주문일경우, 주문전송후 주문번호 깜빡임
+ecod = LEDGER.Ecod
+If Trim(ecod) <> "" Then
+	If IsNumeric(ecod) = True	Then
+		If CDbl(ecod) = 0 Then
+			Select Case SCREEN.Object("parent.TAB_ORDER").ID
+				Case 1			'매수
+					SCREEN.Object(objnm & ".o_jmno").blink True, 161
+				Case 2, 5		'매도
+					SCREEN.Object(objnm & ".o_jmno").blink True, 162
+				Case 3			'정정
+					SCREEN.Object(objnm & ".o_jmno").blink True, 163
+				Case 4			'취소
+					SCREEN.Object(objnm & ".o_jmno").blink True, 164
+				Case 6			'유형정정
+					SCREEN.Object(objnm & ".o_jmno").blink True, 163
+			End Select
+'			SCREEN.Object("parent.obj_jumn.o_jmno").blink True, 64
+
+			SCREEN.SetTimer 20, False
+		'ETF 약관동의시에만 주문 가능
+		ElseIf CDbl(ecod) = 4386 Then
+			If SYSTEM.ConnectBy = 0 Then
+				MyVar = MsgBox (Trim(LEDGER.Emsg), 1, "IBK투자증권")
+
+				If MyVar = 1 Then
+'					SCREEN.CreateWindow 1, "IB890100 /t/s/p5", ""
+					SCREEN.SetTimerx 100, 5, False
+				End If
+			End If
+		ElseIf CDbl(ecod) = 4131 Then
+			SCREEN.CreateWindow 2, "IB999952 /t/s/p5", ""
+		End If
+	End If
+End If
+
+If ecod = "4710" And  SCREEN.GetMapName(1) = "IB360000" Then
+	SCREEN.Object("main.GUIDE").Text = "넥스트레이드 메인마켓 주문 준비중입니다."
+	MsgBox "넥스트레이드 메인마켓 주문 준비중입니다.",0, "IBK 투자증권"
+End If
+
+If ecod = "4727" Or ecod = "3735" Then
+	SYSTEM.Trace "-- onreceive sOwnerAcc len= "  & Len(sOwnerAcc)
+	SYSTEM.Trace "-- onreceive ed_acno = [" & ed_acno.Data & "]"
+	If InStr(sOwnerAcc, ed_acno.Data) > 0 Then
+		SCREEN.CreateWindow 1, "IB999963 /t /S /p5",""
+	Else
+		MsgBox "2025년 10월 27일부터 주식거래, 청약을 하기 위해서는" & vbLf & "계좌 소유주 본인이 최선집행기준 설명서를 확인해야해요."_
+ & vbLf & "(문의 : 고객센터 1544-0050, 1588-0030)",0,"최선집행의무 등록 안내"
+	End If
+End If
+
+'Call Set_option()
+
+_AW_ONENDSUB_AW_
+_AW_ONTIMER_AW_
+'주문번호 깜빡임정지
+SCREEN.Object(objnm & ".o_jmno").blink False, -1
+
+_AW_ONENDSUB_AW_
+_AW_ONTIMERX_AW_
+If id = 100 Then
+	SCREEN.CreateWindow 1, "IB890100 /t/s/p5", ""
+End If
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(o_jmno)
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

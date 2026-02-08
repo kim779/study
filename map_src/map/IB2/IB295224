@@ -1,0 +1,66 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB295224)
+MAPSIZE(87, 725)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("±º∏≤√º", 9, NORMAL)
+OPTIONS(FLASH)
+TITLE("Untitled")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("ng295201")
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+CONTROL  chart1(0, 0, 725, 87)  |FA_PROTECT|FA_FLASH  "C_UserGrp"  "/i41320233000000010100000000000000000010000000000211000842144020000000"  LEN(0)  EDIT_INOUT    COLOR(192, 232)  TABORDER(1)  IOORDER(6)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  upcd(655, 441, 713, 463)  LEN(1)  IO_NUM|EDIT_INPUT|FA_SEND|FA_WRAP|SA_ALL    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(2)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  dfgb(495, 345, 555, 364)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(3)  IOORDER(3)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  jgga(422, 470, 458, 489)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(4)  IOORDER(5)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  vggb(433, 426, 469, 445)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(5)  IOORDER(4)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  mkcd(0, 0, 20, 20)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("2")          TABORDER(6)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONSEND_AW_
+upcd.Data = SCREEN.Object("parent.upcd").data
+vggb.Data = SCREEN.Object("parent.vggb").data
+dfgb.Data = SCREEN.Object("parent.dfgb").data
+jgga.Data = SCREEN.Object("parent.jgga").data
+
+If UCase(TypeName( SCREEN.Object("main.cxMarket"))) <> "NOTHING" Then
+	If SCREEN.Object("main.cxMarket").sMarket = "KRX" Then
+		mkcd.Data = "1"
+	ElseIf SCREEN.Object("main.cxMarket").sMarket = "NXT" Then
+		mkcd.Data = "2"
+	ElseIf SCREEN.Object("main.cxMarket").sMarket = "≈Î«’" Then
+		mkcd.Data = "3"
+	End If
+End If
+
+_AW_ONENDSUB_AW_
+}
+
+
+

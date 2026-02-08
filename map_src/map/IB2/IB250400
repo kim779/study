@@ -1,0 +1,538 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB250400)
+MAPSIZE(413, 732)
+VERSION(001)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("주가상승률순위")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(FLASH)
+TITLE("[2504] 기간등락률순위")
+TOPATH(AXIS)
+METHOD(MENU)
+TRXCODE("pino2504")
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL10(-4, 49, 740, 419)  LIMAGE(0)  LINEW(6)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+GRID  207300(6, 59, 730, 409)  VISIBLEROW(18)  CELLH(18)  MATRIX(60, 14)  FIX(4)  MAINCOLOR(7, 0)  LINECOLOR(75)  FOCUSCOLOR(78)  FOCUSKIND(3)    FONT("굴림체", 9, NORMAL)  ROWC(68, 77)  |SELALWAYS|FLEXIBLE|VSCROLL|NO3D|RROW|XHLINE|PAGE|HEADER|KEYFOCUS|GRFTEXT    &
+	COLINFO("1021")  LEN(12)  WIDTH(80)  HEAD("종목코드")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_ALPHA|EDIT_OUTPUT  |FA_FLASH    COLOR(68, 69)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("1301")  LEN(12)  WIDTH(70)  HEAD("코드")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_ALPHA|EDIT_OUTPUT  |FA_ZEROSUP|SA_SPACE    COLOR(68, 69)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("1304")  LEN(20)  WIDTH(80)  HEAD("종목명")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_REF)  COLHELPTEXT("1301")  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT  |FA_REF|FA_DRAG    COLOR(68, 69)  COLCUR(0, 0)  REFERENCE(1301)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col0")  LEN(8)  WIDTH(66)  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_CORGB|SA_COSUP    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(94, 95)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col1")  LEN(8)  WIDTH(65)  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_CORGB|SA_COSUP    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col4")  LEN(7)  WIDTH(60)  HEAD("기간대비")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_CORGB|FA_CONTRAST|SA_CORAW|SA_TEXT    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(94, 95)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col5")  LEN(8)  WIDTH(63)  HEAD("기간등락률")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSIGN    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(94, 95)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col3")  LEN(7)  WIDTH(64)  HEAD("기간고가비")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_CORGB|FA_CONTRAST|SA_CORAW|SA_TEXT    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(94, 95)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col2")  LEN(8)  WIDTH(53)  HEAD("(하락률)")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSIGN    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(94, 95)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("2023")  LEN(8)  WIDTH(55)  HEAD("현재가")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_CORGB|SA_COSUP    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(94, 95)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("2024")  LEN(7)  WIDTH(60)  HEAD("전일대비")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_CORGB|FA_CONTRAST|SA_CORAW|SA_TEXT    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(94, 95)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("2033")  LEN(8)  WIDTH(48)  HEAD("등락률")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSIGN    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(94, 95)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("2027")  LEN(12)  WIDTH(67)  HEAD("거래량")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|SA_SPACE    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col6")  LEN(1)  WIDTH(27)  HEAD("등급")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    TABORDER(1)  IOORDER(12)  ENABLE  &
+  VISIBLE
+
+PANEL  SYMBOL38(0, 0, 736, 49)        COLOR(66, 69)  CUR(0)    AL_CENTER  FONT("굴림체", 9, NORMAL)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL3(413, 3, 450, 23)  '거래량'  AL_LEFT  CUR(0)      COLOR(208, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  1301(901, 157, 972, 177)  LEN(6)  IO_MIXED|EDIT_INOUT|FA_WRAP|FA_HAN|FA_SKIP  FONT("굴림체", 9, NORMAL)    COLOR(28, 232)  CUR(0)  TP_NONE          TABORDER(2)  IOORDER(14)  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL0(7, 26, 39, 46)  '기간'  AL_LEFT  CUR(0)      COLOR(208, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  UBUT(181, 3, 200, 23)  TP_PUSH|IMAGE|AL_STRETCH      COLOR(68, 69)  CUR(0)    "검색.BMP"    TABORDER(3)  ENABLE  &
+  VISIBLE  IMAGE  HOVER  HINTTYPE(IH_NONE)
+EDIT  ucod(908, 306, 938, 326)  LEN(3)  IO_NUM|EDIT_INPUT    COLOR(68, 69)  CUR(0)  TP_SUNKEN  INIT("001")          TABORDER(4)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL2(108, 3, 136, 23)  '업종'        COLOR(68, 130)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+COMBO  upgb(31, 3, 103, 23)  TP_SUNKEN  LEN(3)  COUNT(7)  VCOUNT(7)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_NUM|EDIT_INOUT|FA_SKIP    COLOR(68, 130)  CUR(0)  DISPLAY("KOSPI", "KOSDAQ", "KONEX", "KOSPI200", "KOSPI100", "ELW", "전체(ELW제외)")  DATA("001", "201", "501", "101", "401", "888", "889")    TABORDER(5)  IOORDER(15)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  200022(202, 3, 302, 23)  LEN(20)  IO_MIXED|AL_LEFT||FA_SKIP  FONT("굴림체", 9, NORMAL)    COLOR(90, 130)  CUR(0)  LINECOLOR(89)          TABORDER(0)  IOORDER(13)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+COMBO  gchk(306, 3, 405, 23)  TP_SUNKEN  LEN(1)  COUNT(8)  VCOUNT(8)  INDEX(1)  MATCHKEY(NOTMAPPING)  IO_NUM|EDIT_INPUT    COLOR(192, 130)  CUR(0)  DISPLAY("전체", "보통주", "우선주", "액면분할", "관리종목", "이상급등종목", "관리종목제외", "관리종목/우선주제외")  DATA("0", "1", "2", "3", "4", "5", "6", "7")    TABORDER(6)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+COMBO  gvol(452, 2, 551, 22)  TP_SUNKEN  LEN(4)  COUNT(7)  VCOUNT(7)  INDEX(1)  MATCHKEY(NOTMAPPING)  IO_NUM|EDIT_INPUT    COLOR(192, 130)  CUR(0)  DISPLAY("전체", "1천주이상", "5천주이상", "1만주이상", "5만주이상", "10만주이상", "50만주이상")  DATA("0000", "0001", "0005", "0010", "0050", "0100", "0500")    TABORDER(7)  IOORDER(6)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+COMBO  val1(432, 26, 531, 46)  TP_SUNKEN  LEN(8)  COUNT(8)  VCOUNT(8)  INDEX(1)  MATCHKEY(NOTMAPPING)  IO_NUM|EDIT_INPUT    COLOR(192, 130)  CUR(0)  DISPLAY("0원이상", "1000원이상", "2500원이상", "5000원이상", "1만원이상", "25000원이상", "5만원이상", "10만원이상")  DATA("00000000", "00001000", "00002500", "00005000", "00010000", "00025000", "00050000", "00100000")    TABORDER(8)  IOORDER(7)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL1(404, 26, 430, 46)  '가격'  AL_LEFT  CUR(0)      COLOR(208, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+COMBO  val2(548, 26, 647, 46)  TP_SUNKEN  LEN(8)  COUNT(8)  VCOUNT(8)  INDEX(6)  MATCHKEY(NOTMAPPING)  IO_NUM|EDIT_INPUT    COLOR(192, 130)  CUR(0)  DISPLAY("1000원미만", "2500원미만", "5000원미만", "1만원미만", "25000원미만", "5만원미만", "10만원미만", "1000만원미만")  DATA("00001000", "00002500", "00005000", "00010000", "00025000", "00050000", "00100000", "10000000")    TABORDER(9)  IOORDER(8)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+COMBO  sort(282, 26, 381, 46)  TP_SUNKEN  LEN(1)  COUNT(2)  VCOUNT(2)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_NUM|EDIT_INPUT    COLOR(192, 130)  CUR(0)  DISPLAY("상승률상위", "하락률상위")  DATA("0", "1")    TABORDER(10)  IOORDER(9)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  sday(34, 26, 124, 46)  LEN(8)  IO_NUM|EDIT_INPUT|FA_DATE    COLOR(68, 130)  CUR(0)  TP_SUNKEN          EDITFORMAT("9999/99/99")  TABORDER(11)  IOORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  eday(142, 26, 232, 46)  LEN(8)  IO_NUM|EDIT_INPUT|FA_DATE    COLOR(68, 130)  CUR(0)  TP_SUNKEN          EDITFORMAT("9999/99/99")  TABORDER(12)  IOORDER(5)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  v_sday(905, 211, 996, 231)  LEN(10)  IO_NUM|AL_CENTER|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(10)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  v_eday(906, 235, 997, 255)  LEN(10)  IO_NUM|AL_CENTER|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(11)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL2(129, 26, 142, 46)  '~'  AL_LEFT  FONT("굴림체", 14, NORMAL)  CUR(0)      COLOR(208, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL4(255, 26, 281, 46)  '정렬'  AL_LEFT  CUR(0)      COLOR(208, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL5(534, 26, 547, 46)  '~'  AL_LEFT  FONT("굴림체", 14, NORMAL)  CUR(0)      COLOR(208, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  b_send(693, 26, 729, 46)  '조회'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, BOLD)  COLOR(208, 186)  CUR(0)    "조회BTN.BMP"    TABORDER(13)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+LABEL  chk(910, 268, 976, 294)  '0'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  20301(136, 3, 181, 23)  LEN(3)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP|CODE      COLOR(28, 130)  CUR(0)  TP_SUNKEN  INIT("001")          TABORDER(14)  IOORDER(16)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL3(735, 0, 737, 49)        COLOR(64, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL1(0, 0, 1, 49)        COLOR(64, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  lbSortup(405, 60, 456, 77)  AL_LEFT  CUR(0)      COLOR(192, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_STRING)  HELPTEXT("기간 고가 대비 현재가 등락률")HELPTEXT("기간 고가 대비 현재가 등락률")
+LABEL  lbSortdown(405, 60, 456, 77)  AL_LEFT  CUR(0)      COLOR(192, 130)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_STRING)  HELPTEXT("기간 저가 대비 현재가 등락률")HELPTEXT("기간 저가 대비 현재가 등락률")
+CONTROL  cxMarket(7, 3, 27, 23)  |FA_SKIP  "CX_MarketPicker"  "/k2/tIB250400/u1/d1"  LEN(12)  EDIT_NOP    COLOR(192, 232)  TABORDER(0)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  mkcd(75, 580, 115, 600)  LEN(1)  IO_ALPHA|EDIT_INPUT  FONT("굴림체", 9, NORMAL)    COLOR(192, 130)  CUR(0)  TP_NONE          TABORDER(15)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  edMarketTrigger(570, 70, 602, 90)  LEN(6)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(16)  IOORDER(17)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Public Today
+Today = getCurrDay()
+
+Dim c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13
+Dim IsStart
+IsStart = 1
+
+'Dim xstr, xvalue, xistrue
+'Const myFILE = "userconf.ini"
+'Const myMAP = "DH212000"
+'
+'Sub p_write_ini()
+'If SCREEN.CreateObject("info") Then
+'  INFO.PushData LOGIN.Name, myFILE, myMAP, "c_jgub", jgub.data
+'  INFO.PushData LOGIN.Name, myFILE, myMAP, "c_uchk", uchk.data
+'  INFO.PushData LOGIN.Name, myFILE, myMAP, "c_gchk", gchk.data
+'  INFO.PushData LOGIN.Name, myFILE, myMAP, "c_rate", c_rate.data
+'  INFO.PushData LOGIN.Name, myFILE, myMAP, "c_gvol", gvol.data
+'  INFO.PushData LOGIN.Name, myFILE, myMAP, "c_com1", com1.data
+'End If
+'End Sub
+'
+'Sub p_read_ini()
+'If SCREEN.CreateObject("Info") Then
+'	jgub.data = Trim(INFO.PopData(LOGIN.Name, myFILE, myMAP, "c_jgub"))
+'	uchk.data = Trim(INFO.PopData(LOGIN.Name, myFILE, myMAP, "c_uchk"))
+'	If uchk.Data = "1" Then
+'		u_chk.Checked = True
+'	Else
+'		u_chk.Checked = False
+'	End If
+'	gchk.data = Trim(INFO.PopData(LOGIN.Name, myFILE, myMAP, "c_gchk"))
+'	If gchk.Data = "1" Then
+'		g_chk.Checked = True
+'	Else
+'		g_chk.Checked = False
+'	End If
+'	c_rate.data = Trim(INFO.PopData(LOGIN.Name, myFILE, myMAP, "c_rate"))
+'	gvol.data = Trim(INFO.PopData(LOGIN.Name, myFILE, myMAP, "c_gvol"))
+' 	com1.data = Trim(INFO.PopData(LOGIN.Name, myFILE, myMAP, "c_com1"))
+'End If
+'End Sub
+
+
+Dim upcd_flg
+upcd_flg = 1
+
+Const myFILE = "userconf.ini"
+Const myMAP = "IB250400"
+
+Sub p_write_com()
+If SCREEN.CreateObject("Info") Then
+  INFO.PushData LOGIN.Name, myFILE, myMAP, "COMBO1", S20301.Data
+
+End If
+End Sub
+
+Sub p_read_com()
+If SCREEN.CreateObject("Info") Then
+ 	S20301.Data = Trim(INFO.PopData(LOGIN.Name, myFILE, myMAP, "COMBO1"))
+End If
+
+If Len(Trim(S20301.data)) = 0 Then
+	S20301.data = "001"
+	upgb.DATA = "001"
+End If
+End Sub
+
+Sub OnGridClickedXX(strdata)
+
+	Dim arr
+	arr = Split(strdata, vbTab, -1, 0)
+
+	S1301.DATA = S207300.GetGridCell(CInt(arr(2)) + 1, 2)
+	If Trim(S1301.DATA) = "" Then
+	    Exit Sub
+	End If
+
+	S1301.Trigger "", False
+	S1301.Trigger "", True
+	SYSTEM.SetHistory "1301", S1301.DATA
+End Sub
+
+Sub OnGridDragClickedXX(strdata)
+
+	Dim scode
+	scode = Split(strdata, vbTab, -1, 0)
+
+	S1301.DATA = scode(1)
+	If Trim(S1301.DATA) = "" Then
+	    Exit Sub
+	End If
+
+	S1301.Trigger "", False
+	S1301.Trigger "", True
+	SYSTEM.SetHistory "1301", S1301.DATA
+
+End Sub
+
+Sub Change_MKGubn_Main(sMKGubn)
+
+SYSTEM.Trace "[IB250400]Change_MKGubn_Main sMKGubn = " & sMKGubn
+	cxMarket.sMarket = sMKGubn
+	SCREEN.Send 0
+
+End Sub
+
+_AW_ONINDECLARE_AW_
+#load IB888888
+
+_AW_ONENDSUB_AW_
+_AW_ONSTART_AW_
+' 현재 화면의 시장식별자(cxMarket)에 고유 화면번호 부여
+cxMarket.Major = SCREEN.Major
+
+'p_read_ini()
+'upgb.Data = "001"
+SCREEN.IgnoreChange True
+sday.data = change_date("d",-7)
+eday.Data = Today
+SCREEN.IgnoreChange False
+Call p_read_com()
+SCREEN.Send 0
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+Dim Is_upcd
+
+ucod.Data = S20301.Data
+
+ls_upcd = Trim(ucod.Data)
+S200022.data = SCREEN.GetName(104, ls_upcd, 0)
+
+ucod.SetFocus
+
+If sday.Data > eday.Data Then
+	sday.Data = eday.Data
+End If
+
+If UCase(TypeName( SCREEN.Object("main.cxMarket"))) <> "NOTHING" Then
+	If SCREEN.Object("main.cxMarket").sMarket = "KRX" Then
+		mkcd.Data = "1"
+	ElseIf SCREEN.Object("main.cxMarket").sMarket = "NXT" Then
+		mkcd.Data = "2"
+	ElseIf SCREEN.Object("main.cxMarket").sMarket = "통합" Then
+		mkcd.Data = "3"
+	End If
+End If
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+S207300.SetHead 4, v_sday.Data
+S207300.SetHead 5, v_eday.Data
+
+If sort.Data = 0 Then
+	S207300.SetHead 8, "기간고가비"
+	S207300.SetHead 9, "(하락률)"
+Else
+	S207300.SetHead 8, "기간저가비"
+	S207300.SetHead 9, "(상승률)"
+End If
+If IsStart = 1 Then
+	SCREEN.Send 0
+	IsStart = 0
+End If
+
+_AW_ONENDSUB_AW_
+_AW_ONTIMER_AW_
+	S1301.Trigger "", False
+	S1301.Trigger "", True
+	SYSTEM.SetHistory "1301", S1301.DATA
+
+_AW_ONENDSUB_AW_
+_AW_ONCLOSE_AW_
+'p_write_ini()
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(207300)
+_AW_ONDBLCLK_AW_
+'If S207300.HitPos = 3 Then
+'	S1301.DATA = S207300.GetGridCell(S207300.Row, 2)
+'	If Trim(S1301.DATA) = "" Then
+'	    Exit Sub
+'	End If
+'
+'	S1301.Trigger "", False
+'	S1301.Trigger "", True
+'	SYSTEM.SetHistory "1301", S1301.DATA
+'End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(UBUT)
+_AW_ONCLICK_AW_
+Dim retn
+
+Select Case upgb.DATA
+	Case "001", "101", "401"		'KOSPI, KOSPI200, KOSPI100
+		retn = SCREEN.GetCode(104, "20301", "200022", 0)
+	Case "201"							'KOSDAQ
+		retn = SCREEN.GetCode(104, "20301", "200022", 9)
+	Case "501"							'KONEX
+		retn = SCREEN.GetCode(104, "20301", "200022", 501)
+End Select
+
+
+If (retn <> True) Then
+	S20301.SetFocus
+	Exit Sub
+Else
+	S20301.SetFocus
+	SCREEN.Send 0
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(ucod)
+_AW_ONCHANGE_AW_
+'Dim	cod
+'If (Len(Trim(ucod.Data)) <> 3) Then
+'	ucod.SetFocus
+'	Exit Sub
+'Else
+'	SCREEN.IgnoreChange True
+'	r_upgb = P_GetBigCd(ucod.DATA)
+'	Select Case r_upgb
+'		Case "001"		'KOSPI
+'			c_upgb.DATA = r_upgb
+'		Case "101"		'KOSPI200
+'			c_upgb.DATA = r_upgb
+'		Case "201"		'KOSDAQ
+'			c_upgb.DATA = r_upgb
+'		Case "301"		'KOSDAQ50
+'			c_upgb.DATA = r_upgb
+'		Case "303"		'KOSTAR
+'			c_upgb.DATA = r_upgb
+'		Case "401"		'KOSPI100
+'			c_upgb.DATA = r_upgb
+'		Case "888"		'ELW
+'			c_upgb.DATA = r_upgb
+'		Case Else
+'		   ucod.DATA = "001"
+'		   c_upgb.DATA = "001"
+'	End Select
+'	SCREEN.Send 0
+'	SCREEN.IgnoreChange False
+'End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(upgb)
+_AW_ONCHANGE_AW_
+SCREEN.IgnoreChange True
+S20301.Data = upgb.Data
+SCREEN.IgnoreChange False
+If S20301.Data = 889 Then
+	S20301.Enable = False
+	UBUT.Enable = False
+Else
+	S20301.Enable = True
+	UBUT.Enable = True
+End If
+
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(gchk)
+_AW_ONCHANGE_AW_
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(gvol)
+_AW_ONCHANGE_AW_
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(val1)
+_AW_ONCHANGE_AW_
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(val2)
+_AW_ONCHANGE_AW_
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(sort)
+_AW_ONCHANGE_AW_
+
+If sort.Data = "0" Then      '상승률
+	lbSortup.Visible = True
+	lbSortdown.Visible = False
+Else
+	lbSortup.Visible = False
+	lbSortdown.Visible = True
+End If
+
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(sday)
+_AW_ONCHANGE_AW_
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(eday)
+_AW_ONCHANGE_AW_
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(b_send)
+_AW_ONCLICK_AW_
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(20301)
+_AW_ONCHANGE_AW_
+Dim	cod
+If (Len(Trim(S20301.Data)) <> 3) Or IsNumeric(S20301.Data) = False Then
+	S20301.Clear
+	S20301.SetFocus
+	Exit Sub
+Else
+	SCREEN.IgnoreChange True
+	r_upgb = P_GetBigCd(S20301.DATA)
+	If S20301.Data = 889 Then
+		r_upgb = 889
+	End If
+	Select Case r_upgb
+		Case "001"		'KOSPI
+			upgb.DATA = r_upgb
+		Case "101"		'KOSPI200
+			upgb.DATA = r_upgb
+		Case "201"		'KOSDAQ
+			upgb.DATA = r_upgb
+		Case "301"		'KOSDAQ50
+			upgb.DATA = r_upgb
+		Case "303"		'KOSTAR
+			upgb.DATA = r_upgb
+		Case "401"		'KOSPI100
+			upgb.DATA = r_upgb
+		Case "501"		'KONEX
+			upgb.DATA = r_upgb
+		Case "888"		'ELW
+			upgb.DATA = r_upgb
+		Case "889"
+			upgb.Data = r_upgb
+		Case Else
+		   S20301.DATA = "001"
+		   upgb.DATA = "001"
+	End Select
+If upcd_flg = 1 Then
+	upcd_flg = 2
+Else
+	Call p_write_com()
+	SCREEN.Send 0
+End If
+	SCREEN.IgnoreChange False
+End If
+_AW_ONENDSUB_AW_
+_AW_ONKEYCHANGE_AW_
+If SCREEN.Key = 13 Then
+	If(Len(Trim(S20301.Data)) <> 3) Or IsNumeric(S20301.Data) = False Then
+			S20301.Clear
+			S20301.SetFocus
+			Exit Sub
+	End If
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(cxMarket)
+_AW_ONCLICK_AW_
+SCREEN.Proc "main.Change_MKGubn_Main", cxMarket.sMarket
+
+If UCase(TypeName( SCREEN.Object("cbSOrder") )) <> "NOTHING" Then
+	If cxMarket.sMarket = "통합" Then
+		cbSOrder.Data = "S"
+	ElseIf cxMarket.sMarket = "KRX" Then
+		cbSOrder.Data = "1"
+	ElseIf cxMarket.sMarket = "NXT" Then
+		cbSOrder.Data = "N"
+	End If
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(edMarketTrigger)
+_AW_ONCHANGE_AW_
+Change_MKGubn_Main(Trim(edMarketTrigger.Data))
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

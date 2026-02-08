@@ -1,0 +1,128 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB000131)
+MAPSIZE(477, 618)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("관심")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(FMS|FLASH|CR2TAB)
+TITLE("[000131]등락")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+GRID  GRID0(0, 28, 76, 477)  VISIBLEROW(11)  CELLH(18)  MATRIX(101, 1)  FIX(12)  MAINCOLOR(181, 0)  LINECOLOR(75)  FOCUSCOLOR(78)  FOCUSKIND(4)    FONT("굴림체", 9, NORMAL)  ROWC(76, 77)  |SELALWAYS|FLEXIBLE|VSCROLL|NO3D|RROW|XHLINE|PAGE|HEADER|GRFTEXT    &
+	COLINFO("Col0")  LEN(20)  WIDTH(60)  HEAD("검색조건")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT  |FA_FLASH    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    TABORDER(1)  IOORDER(1)  ENABLE  &
+  VISIBLE
+
+OBJECT  OBJ(76, 0, 618, 477)    "IB00013D"  TABORDER(2)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL1(0, 0, 76, 28)        COLOR(66, 69)  CUR(0)    AL_CENTER  FONT("굴림체", 9, NORMAL)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  SNAME(6, 6, 55, 24)  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+CONTROL  cxMarket(55, 5, 75, 25)  |FA_SKIP  "CX_MarketPicker"  "/k2/t/u1/d1"  LEN(12)  EDIT_NOP    COLOR(192, 232)  TABORDER(0)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Dim g_array
+g_ArrData=Array(Array("종목등락", "IB00013D", ""), _
+                Array("상하직전", "IB00013E", ""), _
+                Array("상하이탈", "IB00013F", ""), _
+                Array("고저근접", "IB00013G", ""), _
+                Array("신고신저", "IB00013H", ""), _
+                Array("등락순위", "IB00013I", ""), _
+                Array("상승률순", "IB00013J", ""), _
+                Array("하락률순", "IB00013K", ""), _
+                Array("최저상승", "IB00013L", ""), _
+                Array("최고하락", "IB00013M", ""), _
+                Array("거래증순", "IB00013N", ""), _
+                Array("거래회순", "IB00013O", ""), _
+                Array("거래량순", "IB00013P", ""), _
+                Array("거래액순", "IB00013Q", ""), _
+                Array("거급(준)", "IB00013R", ""), _
+                Array("거래급등", "IB00013S", ""))
+Sub makecond()
+	Dim ii
+	For ii=LBound(g_ArrData) To UBound(g_ArrData)
+		GRID0.InsertRow -1
+		GRID0.SetGridCell ii+1, 1, g_ArrData(ii)(0)
+	Next
+End Sub
+
+Sub OBJSend()
+	OBJ.Send
+End Sub
+
+Sub Change_MKGubn_OBJ(sMKGubn)
+	cxMarket.sMarket = sMKGubn
+	OBJSend()
+End Sub
+
+_AW_ONSTART_AW_
+SCREEN.SetTimer 1,False
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+OBJ.Send
+SCREEN.OnSend False
+
+_AW_ONENDSUB_AW_
+_AW_ONTIMER_AW_
+
+If UCase(TypeName( SCREEN.Object("Main.cxMarket") )) <> "NOTHING" Then
+	cxMarket.sMarket = SCREEN.Object("Main.cxMarket").sMarket
+End If
+
+makecond()
+
+SNAME.Text = Trim(GRID0.GetGridCell(GRID0.Row,1))
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(GRID0)
+_AW_ONCLICK_AW_
+If GRID0.HitPos = 3 Then
+	If Trim(GRID0.GetGridCell(GRID0.row,1)) <> "" Then
+		Dim namobj
+		namobj = g_ArrData(GRID0.row-1)(1)
+		OBJ.SetObject(namobj)
+	'	OBJ.Send
+		SNAME.Text = Trim(GRID0.GetGridCell(GRID0.Row,1))
+	End If
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(cxMarket)
+_AW_ONCLICK_AW_
+SCREEN.Proc "main.Change_MKGubn_Main", cxMarket.sMarket
+
+
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

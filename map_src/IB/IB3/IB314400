@@ -1,0 +1,216 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB314400)
+MAPSIZE(517, 680)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("상품선물주문")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(CR2TAB|SAVE)
+TITLE("[3144] Stop Limit 주문")
+TOPATH(AXIS)
+METHOD(MENU)
+MAPTYPE(NORM)
+HEADER(LEDGER)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL7(680, 2, 682, 280)        COLOR(64, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL2(-2, 281, 682, 494)  LIMAGE(0)  LINEW(4)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL63(-2, 0, 361, 282)  LIMAGE(0)  LINEW(4)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL3(361, 0, 684, 2)        COLOR(64, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL0(361, 2, 680, 280)  LIMAGE(2)  LINEW(4)  STRESS(44)  STRESSW(3)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  OBJ_order(7, 8, 354, 274)    "IB314490"  TABORDER(1)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  OBJ_sise(368, 8, 673, 274)    "IB314410"  TABORDER(2)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  OBJ_account(6, 314, 674, 485)    "IB314430"  TABORDER(3)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  HNAM(176, 585, 310, 605)  LEN(40)  IO_MIXED|AL_LEFT||SUM    FONT("굴림체", 9, BOLD)    COLOR(90, 69)  CUR(0)  LINECOLOR(65)          TABORDER(0)  IOORDER(5)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  GUIDE1(-2, 493, 682, 517)  LIMAGE(1)  LINEW(3)  STRESS(0)  STRESSW(0)  LINETYPE(4)  LINECOLOR(64)      COLOR(34, 69)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL5(5, 498, 19, 512)    |IMAGE|AL_STRETCH    COLOR(208, 232)  CUR(0)    "알림_ic.bmp"  ENABLE  &
+  VISIBLE  TRANSPARENT  IMAGE  HINTTYPE(IH_NONE)
+PANEL  GUIDE(21, 493, 649, 517)        COLOR(228, 69)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+USRTAB  tab_account(6, 288, 673, 314)  FOCUS  INDEX(0)  COUNT(2)  AL_TOP  TAB_IMAGE      FONT("굴림체", 9, NORMAL)    COLOR(3, 70)  CUR(0)  TABIMAGE("TAB.bmp")  FCOLOR(3, 71)  CAPTION(" 미실행조건주문 ", " 미결제약정 ")  TABINFO("1:1", "1:2")  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  ed_cfocod(183, 555, 263, 575)  LEN(8)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_UPPER|CODE      COLOR(192, 69)  CUR(0)  TP_NONE          TABORDER(4)  IOORDER(4)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL1(361, 280, 684, 282)        COLOR(64, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  ed_focod(267, 554, 325, 577)  LEN(8)  IO_ALPHA|EDIT_INPUT|FA_WRAP    COLOR(192, 130)  CUR(0)  TP_NONE          TABORDER(5)  IOORDER(6)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  ed_fcod(332, 554, 390, 577)  LEN(8)  IO_ALPHA|EDIT_INPUT|FA_WRAP    COLOR(192, 130)  CUR(0)  TP_NONE          TABORDER(6)  IOORDER(7)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  flag(186, 609, 255, 633)  LEN(6)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("000000")          TABORDER(7)  IOORDER(8)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL4(10, 5, 670, 510)  '미사용'  TP_RAISED      COLOR(208, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Sub send_sise_all(gubn)
+'	SYSTEM.Trace "aaa"
+	Dim code, fogb, rsymb, acnm, jmNm
+	code = Left(ed_cfocod.Data, 1)
+	jmNm = SCREEN.GetName(127, Trim(ed_cfocod.Data), 0)
+
+	If jmNm <> "" Then							'국내선물
+		ed_cfocod.Trigger "ed_fcod", True
+		If code = "1" Or code = "4" Or code = "A" Or code = "D" Then
+			fogb = 127
+			rsymb = "100301"
+			OBJ_sise.SetObject("IB314410")
+		ElseIf code = "2" Or code = "3" Or code = "B" Or code = "C" Then
+			fogb = 102
+			rsymb = "40301"
+			OBJ_sise.SetObject("IB314414")
+		End If
+	Else										'지수선물
+		ed_cfocod.Trigger "ed_focod", True
+		If code = "1" Or code = "4" Or code = "A" Or code = "D" Then
+			fogb = 101
+			rsymb = "30301"
+			OBJ_sise.SetObject("IB314412")
+		ElseIf code = "2" Or code = "3" Or code = "B" Or code = "C" Then
+			fogb = 102
+			rsymb = "40301"
+			OBJ_sise.SetObject("IB314414")
+		End If
+	End If
+
+	HNAM.Data = SCREEN.GetName (fogb, ed_cfocod.Data, 0)
+
+	SCREEN.Object("OBJ_order.OBJ_odr.hnam").data = HNAM.data
+
+	If gubn = "main" Then
+		SCREEN.IgnoreChange True
+		SCREEN.Object("OBJ_order.OBJ_odr.ed_cfocod").data = ed_cfocod.data
+		SCREEN.IgnoreChange False
+	End If
+
+	acnm = Trim(SCREEN.Object("OBJ_order.acnm").data)
+	If Trim(HNAM.Data) =  "" Then
+		SCREEN.ClearAll 0, 2
+		OBJ_order.ClearAll 2
+		SCREEN.Object("obj_order.obj_odr").ClearAll 2
+		OBJ_sise.ClearAll 2
+		SCREEN.Object("obj_sise.obj0").ClearAll 2
+		SCREEN.Object("OBJ_order.acnm").data = acnm
+		OBJ_sise.Send
+		Exit Sub
+	Else
+		ed_cfocod.Trigger "ed_cfocod", True
+		ed_cfocod.Trigger rsymb, True
+		ed_cfocod.Trigger rsymb, False
+		SYSTEM.SetHistory rsymb, ed_cfocod.Data
+		SYSTEM.SetHistory "ed_cfocod", ed_cfocod.Data
+	End If
+
+	OBJ_sise.Send
+	SCREEN.Proc "OBJ_order.OBJ_odr.afterSendSiseJumn", ""
+End Sub
+
+_AW_ONSEND_AW_
+SCREEN.OnSend = False
+
+_AW_ONENDSUB_AW_
+_AW_ONTIMER_AW_
+'주문성공후 커서 위치
+SCREEN.Proc "OBJ_order.OBJ_odr.Set_cursor", ""
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(tab_account)
+_AW_ONCLICK_AW_
+Select Case tab_account.ID
+Case 1
+	OBJ_account.SetObject("IB314430")
+	SCREEN.Proc "OBJ_account.init", ""
+Case 2 : OBJ_account.SetObject("IB314431")
+End Select
+
+GUIDE.Text = ""
+'OBJ_account.Send
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(ed_cfocod)
+_AW_ONCHANGE_AW_
+Call send_sise_all("main")
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(ed_focod)
+_AW_ONCHANGE_AW_
+'If Left(Trim(ed_focod.Data), 1) = "4" Then
+'	Exit Sub
+'End If
+
+'flag.Data = flag.Data + 1
+'
+'If flag.Data < 3 Then
+'	If Trim(ed_cfocod.Data) = "" Then
+'		ed_cfocod.Data = ed_focod.Data
+'		Call send_sise_all("main")
+'		Exit Sub
+'	End If
+'End If
+'
+'If flag.Data > 2 Then
+'	ed_cfocod.Data = ed_focod.Data
+'	Call send_sise_all("main")
+'End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(ed_fcod)
+_AW_ONCHANGE_AW_
+'If Left(Trim(ed_focod.Data), 1) = "4" Then
+'	Exit Sub
+'End If
+
+'flag.Data = flag.Data + 1
+'
+'If flag.Data < 3 Then
+'	If Trim(ed_cfocod.Data) = "" Then
+'		ed_cfocod.Data = ed_fcod.Data
+'		Call send_sise_all("main")
+'		Exit Sub
+'	End If
+'End If
+'
+'If flag.Data > 2 Then
+'	ed_cfocod.Data = ed_fcod.Data
+'	Call send_sise_all("main")
+'End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

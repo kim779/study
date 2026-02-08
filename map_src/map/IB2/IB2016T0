@@ -1,0 +1,97 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB2016T0)
+MAPSIZE(365, 318)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("복수현재가")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(FMS|FLASH|SAVE)
+TITLE("[2016]복수현재가")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pooppoop")
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL20(0, 0, 330, 400)  LIMAGE(2)  LINEW(4)  STRESS(44)  STRESSW(3)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+CONTROL  17412(0, 0, 318, 366)    "CX_Depth"  "/u1/d10/p0/b/s0/l/c/h3/o/g/a1/fIB201600/red_jprc"  LEN(0)  EDIT_OUTPUT  FONT("굴림체", 9, NORMAL)    COLOR(193, 232)  TABORDER(0)  IOORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  1301(0, 0, 66, 20)  LEN(6)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_NOR    COLOR(192, 232)  CUR(0)  TP_SUNKEN          TABORDER(1)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  1021(67, 0, 141, 20)  LEN(12)  IO_ALPHA|AL_LEFT||FA_FLASH  FONT("굴림체", 9, NORMAL)    COLOR(211, 232)  CUR(0)            TABORDER(0)  IOORDER(3)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  1777(395, 115, 415, 135)  LEN(1)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(2)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Sub change_code(codx)
+	If Len(Trim(codx)) <> 6 Then
+		Exit Sub
+	End If
+		SYSTEM.Trace "[IB201600]change_code  codx = " & codx
+	
+	S1301.Data = codx
+	SCREEN.Send 0
+End Sub
+
+Sub changerange(rg1,rg2)
+	'Dim arr,rg1,rg2
+
+	If rg1 > rg2 Then
+		S17412.SetPriceRange rg1,rg2
+	Else
+		S17412.SetPriceRange rg2,rg1
+	End If
+End Sub
+
+Sub changepercent(rg1,rg2)
+	S17412.SetPercent rg1,rg2
+End Sub
+
+Sub change_Market(sVal)
+
+	SYSTEM.Trace "[IB201600]change_Market  sVal = " & sVal
+
+	If sVal = "KRX" Then
+		S1777.Data = "1"
+		S17412.SetMKtype(1)
+	ElseIf sVal = "NXT" Then
+		S1777.Data =  "2"
+		S17412.SetMKtype(2)
+	ElseIf sVal = "통합" Then
+		S1777.Data =  "3"
+		S17412.SetMKtype(3)
+	End If
+
+	SCREEN.Send 0
+
+End Sub
+
+_AW_ONFOCUS_AW_
+If S1301.Data <> "" Then
+	SYSTEM.SetHistory "1301",S1301.Data
+End If
+
+_AW_ONENDSUB_AW_
+}
+
+
+

@@ -1,0 +1,70 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB49897C)
+MAPSIZE(520, 752)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("ÆÝµå»ó¼¼")
+MAPPUBLIC(";")
+FONT("±¼¸²Ã¼", 9, NORMAL)
+TITLE("[4989] ÆÝµå»ó¼¼")
+TOPATH(AXIS)
+METHOD(MENU)
+MAPTYPE(RESIZE)
+HEADER(NOP)
+BGROUND(BRUSH, 64)
+}
+
+
+
+FORM DIVISION
+{
+
+BROWSER  BROWSER0(0, 0, 752, 520)  EDIT_NOP    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL0(0, 584, 765, 609)  LINECOLOR(67)      COLOR(66, 67)  CUR(0)    AL_CENTER    ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  BTN_MD(718, 586, 750, 606)  'Á¶È¸'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("±¼¸²Ã¼", 9, NORMAL)  COLOR(132, 69)  CUR(0)    "2BTN.BMP"    TABORDER(1)  ENABLE  &
+  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+LABEL  LABEL1(2, 586, 50, 606)  'Á¾¸ñ¹øÈ£'  AL_LEFT  CUR(0)      COLOR(141, 69)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_STRING)
+EDIT  FDCD(52, 586, 137, 606)  LEN(12)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 69)  CUR(0)  TP_SUNKEN          TABORDER(2)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  search_btn(139, 586, 171, 606)  '°Ë»ö'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("±¼¸²Ã¼", 9, NORMAL)  FOCUS  COLOR(208, 69)  CUR(0)    "2btn.bmp"    TABORDER(3)  ENABLE  &
+  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_SCRIPT_AW_(BTN_MD)
+_AW_ONCLICK_AW_
+If Trim(FDCD.Data) <> "" Then
+	BROWSER0.Navigate("http://wlink.fundzone.co.kr/ibk/ibk_fund_detail_view_" + Trim(FDCD.Data) + "_13075140.html")
+Else
+	BROWSER0.Navigate("http://wlink.fundzone.co.kr/ibk/ibk_fund_detail_view_KR5307688790_13075140.html")
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(FDCD)
+_AW_ONCHANGE_AW_
+If Trim(FDCD.Data) <> "" Then
+	BROWSER0.Navigate("http://wlink.fundzone.co.kr/ibk/ibk_fund_detail_view_" + Trim(FDCD.Data) + "_13075140.html")
+Else
+	BROWSER0.Navigate("http://wlink.fundzone.co.kr/ibk/ibk_fund_detail_view_KR5307688790_13075140.html")
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

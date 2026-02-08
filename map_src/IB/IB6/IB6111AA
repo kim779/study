@@ -1,0 +1,218 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB6111AA)
+MAPSIZE(304, 380)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("판매사 조회")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+TITLE("판매사 조회")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL105(0, 51, 380, 304)  LIMAGE(0)  LINEW(4)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL1(0, 0, 380, 52)  LIMAGE(0)  LINEW(3)  LINETYPE(4)  LINECOLOR(64)      COLOR(66, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+GRID  GRID1(8, 59, 374, 297)  VISIBLEROW(0)  CELLH(20)  MATRIX(1000, 2)  FIX(0)  MAINCOLOR(64, 232)  LINECOLOR(75)  FOCUSCOLOR(78)  FOCUSKIND(4)    FONT("굴림체", 9, NORMAL)  ROWC(68, 77)  |MERGE|FLEXIBLE|VSCROLL|NO3D|RROW|XHLINE|PAGE|HEADER|GRFTEXT    &
+	COLINFO("Col0")  LEN(10)  WIDTH(99)  HEAD("기관코드")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col1")  LEN(40)  WIDTH(251)  HEAD("기관명")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    TABORDER(1)  IOORDER(1)  ENABLE  &
+  VISIBLE
+
+BUTTON  BUTTON0(301, 19, 337, 39)  '선택'  TP_PUSH|IMAGETEXT|AL_CENTER        FOCUS  COLOR(208, 186)  CUR(0)    "2BTN.BMP"    TABORDER(2)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+BUTTON  BUTTON1(338, 19, 374, 39)  '닫기'  TP_PUSH|IMAGETEXT|AL_CENTER        FOCUS  COLOR(208, 186)  CUR(0)    "2BTN.BMP"    TABORDER(3)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+EDIT  search_fund(74, 20, 258, 40)  LEN(40)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_HAN|FA_SKIP  FONT("굴림체", 9, NORMAL)    COLOR(68, 69)  CUR(0)  TP_SUNKEN          TABORDER(4)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+GROUP  GROUP2(7, 5, 298, 45)  '기관명으로 검색'    FONT("굴림체", 9, NORMAL)      COLOR(-1, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON3(261, 19, 293, 39)  '검색'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, NORMAL)  COLOR(208, 186)  CUR(0)    "2btn.bmp"    TABORDER(5)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+PANEL  PANEL4(0, 329, 382, 331)        COLOR(64, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL0(18, 20, 69, 40)  '기 관 명'  AL_LEFT  CUR(0)      COLOR(208, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Sub Find_fund()
+	Dim ii, pos
+	pos = 0
+
+	For ii = GRID1.rows To 1 Step -1
+		pos = InStr(Trim(GRID1.GetGridCell(ii, 2)), Trim(search_fund.data))
+
+		If pos = 0 Then
+			GRID1.RemoveRow ii-1
+		End If
+	Next
+End Sub
+
+Dim objdic
+
+Sub Set_compcode()
+
+	Set objdic = createobject("scripting.dictionary")
+	objdic.RemoveAll()
+
+	objdic.add "0000100", "교보증권"
+	objdic.add "0000200", "신한금융투자"
+	objdic.add "0000300", "한국투자증권"
+	objdic.add "0000400", "대신증권"
+	objdic.add "0000500", "대우증권"
+	objdic.add "0000600", "신영증권"
+	objdic.add "0000800", "유진투자증권"
+	objdic.add "0000900", "한양증권"
+	objdic.add "0001000", "메리츠증권"
+	objdic.add "0001200", "우리투자증권"
+	objdic.add "0001700", "현대증권"
+	objdic.add "0002100", "한화증권"
+	objdic.add "0002200", "에이치엠씨투자증권"
+	objdic.add "0002400", "동양종합금융증권"
+	objdic.add "0002500", "SK증권"
+	objdic.add "0002700", "솔로몬투자증권"
+	objdic.add "0002800", "엔에이치투자증권"
+	objdic.add "0002900", "골든브릿지투자증권"
+	objdic.add "0003000", "삼성증권"
+	objdic.add "0003100", "동부증권"
+	objdic.add "0003400", "케이비투자증권"
+	objdic.add "0004400", "메릴린치증권서울지점1"
+	objdic.add "0004410", "메릴린치증권서울지점2"
+	objdic.add "0004600", "하이투자증권"
+	objdic.add "0004900", "미래에셋증권"
+	objdic.add "0005200", "리딩투자증권"
+	objdic.add "0005500", "푸르덴셜투자증권"
+	objdic.add "0005600", "하나대투증권"
+	objdic.add "0006800", "아이비케이투자증권"
+	objdic.add "0006900", "바로투자증권"
+	objdic.add "0007000", "토러스투자증권"
+	objdic.add "0007200", "엘아이지투자증권"
+	objdic.add "0007300", "애플투자증권"
+	objdic.add "0007500", "아이엔지증권"
+	objdic.add "0008300", "한맥투자증권"
+	objdic.add "0008600", "BS투자증권"
+	objdic.add "0075200", "이트레이드증권"
+	objdic.add "0075300", "코리아RB중개증권"
+	objdic.add "0075600", "비엔지증권"
+	objdic.add "0075800", "흥국투자증권"
+	objdic.add "0095092", "우리은행(판매)"
+	objdic.add "0100092", "하나은행(판매)"
+	objdic.add "0105092", "제일은행(판매)"
+	objdic.add "0112092", "국민은행(판매)"
+	objdic.add "0116092", "아이엔지생명(판매)"
+	objdic.add "0118092", "외환은행(판매)"
+	objdic.add "0123092", "기업은행(판매)"
+	objdic.add "0126092", "삼성화재해상보험(판매)"
+	objdic.add "0164092", "신한은행(판매)"
+	objdic.add "0205092", "현대해상화재보험(판매)"
+	objdic.add "0212092", "대한생명보험(위탁판매)"
+	objdic.add "0228092", "금호생명보험(판매)"
+	objdic.add "0293092", "미래에셋생명보험(판매)"
+
+	GRID1.Clear
+	For Each aa In objdic.keys
+		GRID1.InsertRow -1
+		GRID1.Setgridcell GRID1.Rows, 1, Trim(aa)
+		GRID1.Setgridcell GRID1.Rows, 2, Trim(objdic.item(aa))
+	Next
+End Sub
+
+_AW_ONSTART_AW_
+SYSTEM.Push "fundcompmsg", "NO"
+Call Set_compcode()
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(GRID1)
+_AW_ONDBLCLK_AW_
+
+Dim msg
+
+msg = Trim(GRID1.GetGridCell(GRID1.row, 1)) & "|" & _
+	Trim(GRID1.GetGridCell(GRID1.Row, 2))
+
+If Trim(GRID1.GetGridCell(GRID1.row, 1)) <> "" Then
+	SYSTEM.Push "fundcompmsg", msg
+End If
+
+SCREEN.CloseWindow
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON0)
+_AW_ONCLICK_AW_
+
+Dim msg
+
+msg = Trim(GRID1.GetGridCell(GRID1.row, 1)) & "|" & _
+	Trim(GRID1.GetGridCell(GRID1.Row, 2))
+
+If Trim(GRID1.GetGridCell(GRID1.row, 1)) <> "" Then
+	SYSTEM.Push "fundcompmsg", msg
+End If
+
+SCREEN.CloseWindow
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON1)
+_AW_ONCLICK_AW_
+SCREEN.CloseWindow
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(search_fund)
+_AW_ONKEYCHANGE_AW_
+If SCREEN.Key = "13" Then  '-- Enter 키 입력
+	If Trim(search_fund.data) = "" Then
+		Call Set_compcode()
+	Else
+		Call Find_fund()
+		GRID1.SetFocus
+		GRID1.Index = 1
+		GRID1.Index = 0
+	End If
+
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON3)
+_AW_ONCLICK_AW_
+If Trim(search_fund.data) = "" Then
+	Call Set_compcode()
+Else
+	Call Find_fund()
+	GRID1.SetFocus
+	GRID1.Index = 1
+	GRID1.Index = 0
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

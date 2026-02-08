@@ -1,0 +1,535 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB693110)
+MAPSIZE(172, 394)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("[온라인]청약종목")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(ENCODE|CR2TAB)
+TITLE("청약종목")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("piboPBxQ")
+MAPTYPE(FIXED)
+HEADER(LEDGER)
+TRXH("31CSPBSQ003")
+BGROUND(BRUSH, 181)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL(0, 0, 394, 25)        COLOR(66, 67)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL0(3, 3, 64, 23)  '청약개시일'  AL_CENTER  CUR(0)      COLOR(66, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  zQrySrtDt(70, 3, 156, 23)  LEN(8)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_DATE    COLOR(192, 130)  CUR(0)  TP_SUNKEN          EDITFORMAT("9999/99/99")  TABORDER(1)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  send_btn(355, 3, 392, 23)  '조회'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, BOLD)  FOCUS  COLOR(208, 186)  CUR(0)    "조회BTN.BMP"    TABORDER(2)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+GRID  GRID0(0, 26, 394, 172)  VISIBLEROW(4)  CELLH(18)  MATRIX(2000, 13)  FIX(0)  MAINCOLOR(68, 232)  LINECOLOR(75)  FOCUSCOLOR(78)  FOCUSKIND(4)  ROWC(68, 77)  |MULTI|FLEXIBLE|VSCROLL|HSCROLL|NO3D|RROW|XHLINE|GRFTEXT    &
+	COLINFO("type")  LEN(20)  WIDTH(74)  HEAD("구분")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT  |FA_SKIP    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("zAppySrtDt")  LEN(8)  WIDTH(73)  HEAD("청약개시일")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  EDITFORMAT("9999/99/99")    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("zAppyIsuNo")  LEN(12)  WIDTH(80)  HEAD("종목번호")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT  |FA_ZEROSUP|SA_SPACE    COLOR(68, 69)  COLCUR(10, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("zIsuNm")  LEN(40)  WIDTH(80)  HEAD("종목명")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_REF)  COLHELPTEXT("l3GrpAppyLmtQty")  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("dFltnPrc")  LEN(13)  WIDTH(76)  HEAD("발행가")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSIGN    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(69, 69)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("l3GrpAppyLmtQty")  LEN(16)  WIDTH(77)  HEAD("3그룹청약한도수량")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSIGN    COLOR(68, 69)  COLCUR(0, 0)    INORMAL  IFRGB(69, 69)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("zRebatDt")  LEN(8)  WIDTH(75)  HEAD("환불일")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_WRAP    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  EDITFORMAT("9999/99/99")    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("zLstdDt")  LEN(8)  WIDTH(75)  HEAD("입고예정일")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  EDITFORMAT("9999/99/99")    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("zAppyEndDt")  LEN(8)  WIDTH(73)  HEAD("청약종료일")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  EDITFORMAT("9999/99/99")    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("zOfrPtnCode")  LEN(2)  WIDTH(77)  HEAD("모집유형코드")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("zTpNm1")  LEN(40)  WIDTH(76)  HEAD("공모구분")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col1")  LEN(40)  WIDTH(74)  HEAD("투자위험구분명")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_NUM|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("int_no")  LEN(40)  WIDTH(74)  HEAD("종목소개")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_NOP  |FA_SKIP    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_IMAGE  COLUMN_VISIBLE  IBUTTON  BUTTONIMG("종목소개.BMP")    HNORMAL  SORTSTARTPOS(0)    TABORDER(4)  IOORDER(6)  ENABLE  &
+  VISIBLE
+
+GROUP  GROUP0(12, 357, 119, 419)  'In'        COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  In(21, 376, 66, 395)  LEN(5)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("00001")          TABORDER(5)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  in_out(13, 423, 125, 450)  LEN(13)  IO_MIXED|AL_CENTER|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(3)  ENABLE  &
+  HINTTYPE(IH_NONE)
+GROUP  GROUP1(15, 463, 116, 528)  'Out'        COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  OUTPUT0(25, 479, 47, 494)  LEN(1)  IO_NUM|AL_CENTER|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(4)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  obj(380, 330, 813, 527)    "IB69311A"  TABORDER(6)  IOORDER(5)  ENABLE  &
+  HINTTYPE(IH_NONE)
+CONTROL  CONTROL0(164, 499, 269, 519)  |FA_PROTECT  "CX_DOWNLOAD"  "/tDONOTNEEDUI"  LEN(0)  EDIT_NOP    COLOR(192, 232)  TABORDER(0)  ENABLE  &
+  HINTTYPE(IH_NONE)
+GRID  GRID1(320, 625, 714, 771)  VISIBLEROW(4)  CELLH(18)  MATRIX(2000, 13)  FIX(0)  MAINCOLOR(68, 232)  LINECOLOR(75)  FOCUSCOLOR(78)  FOCUSKIND(4)  ROWC(68, 77)  |MULTI|FLEXIBLE|VSCROLL|HSCROLL|NO3D|RROW|XHLINE|GRFTEXT    &
+	COLINFO("type")  LEN(20)  WIDTH(74)  HEAD("구분")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT  |FA_SKIP    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("zAppySrtDt")  LEN(8)  WIDTH(73)  HEAD("청약개시일")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  EDITFORMAT("9999/99/99")    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("zAppyIsuNo")  LEN(12)  WIDTH(80)  HEAD("종목번호")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT  |FA_ZEROSUP|SA_SPACE    COLOR(68, 69)  COLCUR(10, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("zIsuNm")  LEN(40)  WIDTH(80)  HEAD("종목명")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_REF)  COLHELPTEXT("l3GrpAppyLmtQty")  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("dFltnPrc")  LEN(13)  WIDTH(76)  HEAD("발행가")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSIGN    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(69, 69)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("l3GrpAppyLmtQty")  LEN(16)  WIDTH(77)  HEAD("3그룹청약한도수량")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSIGN    COLOR(68, 69)  COLCUR(0, 0)    INORMAL  IFRGB(69, 69)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("zRebatDt")  LEN(8)  WIDTH(75)  HEAD("환불일")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_WRAP    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  EDITFORMAT("9999/99/99")    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("zLstdDt")  LEN(8)  WIDTH(75)  HEAD("입고예정일")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  EDITFORMAT("9999/99/99")    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("zAppyEndDt")  LEN(8)  WIDTH(73)  HEAD("청약종료일")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  EDITFORMAT("9999/99/99")    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("zOfrPtnCode")  LEN(2)  WIDTH(77)  HEAD("모집유형코드")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("zTpNm1")  LEN(40)  WIDTH(76)  HEAD("공모구분")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col1")  LEN(40)  WIDTH(74)  HEAD("투자위험구분명")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_NUM|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("int_no")  LEN(40)  WIDTH(74)  HEAD("종목소개")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_NOP  |FA_SKIP    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_IMAGE  COLUMN_VISIBLE  IBUTTON  BUTTONIMG("종목소개.BMP")    HNORMAL  SORTSTARTPOS(0)    TABORDER(3)  IOORDER(7)  ENABLE
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+'== 첫 조회
+Sub send_f()
+	GRID0.Clear
+	GRID1.Clear
+	LEDGER.Fkey = "C"
+	SCREEN.Send 0
+End Sub
+
+'== 연속 조회
+Sub send_c()
+	LEDGER.Fkey = "7"
+	GRID0.SetDataPosition(2)
+	SCREEN.Send 0
+End Sub
+
+'== D-2 날짜 구하기
+Sub getD_2()
+	Dim yy, mm, dd, cday, MyWeek
+
+	cday = DateAdd("d", -2, Date)
+	MyWeek = Weekday(cday)
+
+	If MyWeek = 1 Then
+		cday= DateAdd("d", -2 , cday)
+	ElseIf MyWeek = 7 Then
+		cday= DateAdd("d", -1 , cday)
+	End If
+
+	yy = Year(cday)
+	mm = Month(cday)
+	dd = Day(cday)
+
+	If Len(mm) = 1 Then mm = "0"&mm
+	If Len(dd) = 1 Then dd = "0"&dd
+
+	cday = yy&mm&dd
+	zQrySrtDt.Data = CDbl(cday)
+End Sub
+
+Sub code_info(code)
+	SCREEN.SetTimer 1, False
+'	Dim url, urlchk
+'	url = "http://www.ibks.com/fundproduct/els/detail/" & code & ".jsp?popup=Y"
+'	urlchk = CONTROL0.CheckURLEnable(url)
+'	If Trim(code) <> "" Then
+'		If urlchk = -1 Or urlchk = 404 Then
+'			SCREEN.CreateWindow 1, "IB910000 /t/s/p5", ""
+'	    Else
+'			SYSTEM.Navigate url
+'			SYSTEM.Trace url
+'		End If
+'	End If
+End Sub
+
+_AW_ONINDECLARE_AW_
+#load IB888833
+
+_AW_ONENDSUB_AW_
+_AW_ONSTART_AW_
+LEDGER.Rcnt = "0030"
+
+Call getD_2()
+Call send_f()
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+SCREEN.Object("main.GUIDE").Text = ""
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+If LEDGER.Next = "Y" Then
+	Call send_c()
+Else
+	Dim Today, i, j, str
+	Today = Year(Now) & Right("0" & Month(Now), 2) & Right("0" & Day(Now), 2)
+
+
+	For i = GRID0.Rows To 1 Step -1
+		If Trim(GRID0.GetGridCell(i, 10)) <> "06" And Trim(GRID0.GetGridCell(i, 10)) <> "12" And Trim(GRID0.GetGridCell(i, 10)) <> "13" And Trim(GRID0.GetGridCell(i, 10)) <> "14" And Trim(GRID0.GetGridCell(i, 10)) <> "15" And Trim(GRID0.GetGridCell(i, 10)) <> "10" Then
+			GRID0.RemoveRow (i - 1)
+		Else
+			str = Trim(GRID0.GetGridCell (i, 3))
+
+			If Left(str, 1) = "A" Then
+				GRID0.SetGridCell i, 3, Mid(str, 2, Len(str))
+			End If
+
+			If Trim(GRID0.GetGridCell(i, 9)) <> "" Then
+				If CDbl(Today) > CDbl(GRID0.GetGridCell(i, 9)) Then
+					GRID0.SetGridCell i, 1, "마감"
+				Else
+					GRID0.SetGridCell i, 1, "진행중"
+				End If
+			End If
+		End If
+	Next
+
+' 	Grid1에서 다 작업하고 난후 Grid0으로 옮길려고 했지만 "마감", "진행중"이 나오지 않고.
+'	2번째 3번째 라인을 더블클릭하여도 무조건 첫번째만 나와서 포기함..
+'
+'	GRID0.Clear
+'
+'	For i = 1 To GRID1.Rows
+'		For j = 1 To GRID1.Columns
+'			GRID0.SetGridCell i, j, GRID1.GetGridCell(i, j)
+'		Next
+'	Next
+End If
+
+'SCREEN.Proc "main.obj1.Set_focus", ""
+
+_AW_ONENDSUB_AW_
+_AW_ONTIMER_AW_
+	Dim url, urlchk
+	url = "http://www.ibks.com/fundproduct/els/detail/" & Trim(SCREEN.Object("obj.output1").data) & ".jsp?popup=Y"
+	urlchk = CONTROL0.CheckURLEnable(url)
+	If Trim(SCREEN.Object("obj.output1").data) <> "" Then
+		If urlchk = -1 Or urlchk = 404 Then
+			SCREEN.CreateWindow 1, "IB910000 /t/s/p5", ""
+	    Else
+	    	SCREEN.Object("main.curr_code").Data = Trim(SCREEN.Object("obj.output1").data)
+			SYSTEM.Navigate url
+		End If
+	End If
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(zQrySrtDt)
+_AW_ONCHANGE_AW_
+Call send_f()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(send_btn)
+_AW_ONCLICK_AW_
+Call send_f()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(GRID0)
+_AW_ONCLICK_AW_
+If GRID0.HitPos <> 3 Then
+	Exit Sub
+End If
+
+If GRID0.Rows < 1 Or Trim(GRID0.GetGridCell(GRID0.Row, 2)) = "" Then
+	Exit Sub
+End If
+
+'If GRID0.Column = 13 Then
+'	Dim jmCode, url, urlchk
+'	jmCode = Trim(GRID0.GetGridCell(GRID0.row, 3))		'종목코드
+'
+'	If jmcode = "" Then
+'		Exit Sub
+'	End If
+'
+'	url = "http://www.ibks.com/fundproduct/els/detail/" & jmcode & ".jsp?popup=Y"
+'    urlchk = CONTROL0.CheckURLEnable(url)
+'	If urlchk = -1 Or urlchk = 404 Then
+'		SCREEN.CreateWindow 1, "IB910000 /t/s/p5", ""
+'    Else
+'		SYSTEM.Navigate url
+'	End If
+'
+'End If
+
+If GRID0.Column = 13 Then
+	Dim jmCode, startDt, EndDt, Domino
+	jmCode = Trim(GRID0.GetGridCell(GRID0.row, 3))		'종목코드
+	startDt = Trim(GRID0.GetGridCell(GRID0.row, 2))		'청약개시일
+	EndDt = Trim(GRID0.GetGridCell(GRID0.row, 9))		'청약종료일
+
+	Domino = jmcode & "," & startdt
+	obj.proc "get_data", Domino
+
+End If
+_AW_ONENDSUB_AW_
+_AW_ONDBLCLK_AW_
+If Trim(GRID0.GetGridCell(GRID0.Row, 2)) = "" Then
+	Exit Sub
+End If
+
+If SCREEN.Object("main.UTAB1").ID <> 0 Then
+	Exit Sub
+End If
+
+Dim jmcd, jmnm, cystdt
+jmcd = Trim(GRID0.GetGridcell(GRID0.Row, 3))		'종목코드
+jmnm = Trim(GRID0.GetGridCell(GRID0.Row, 4))		'종목명
+cystdt = Trim(GRID0.GetGridCell(GRID0.Row, 2))		'청약개시일
+
+SCREEN.Object("main.obj0.lAppyQty").Clear
+
+	SCREEN.Object("main.obj0.zAppyIsuNo").Data = jmcd
+	SCREEN.Object ("main.obj0.zAppySrtDt").Data = cystdt
+
+	SCREEN.Proc "main.obj0.set_chae", ""
+
+
+If SCREEN.Object("main.UTAB1").ID = 0 Then
+	SCREEN.Proc "main.obj1.obj1.check_clear", ""
+	SCREEN.Object("main.obj1.lAppyQty").Clear
+
+		SCREEN.Object("main.OBJ1.chae").Checked = True
+		SCREEN.Object("main.obj1.zIsuNo_chae").Data = jmcd
+		SCREEN.Object("main.obj1.chae_nm").Data = jmnm
+		SCREEN.Object("main.obj1.zAppySrtDt").Data = cystdt
+		SCREEN.Object("main.obj1.Scrkey").Data = "Y"
+		SCREEN.Proc "main.OBJ1.set_chae", ""
+
+
+	SCREEN.Object("main.obj1.obj1").Send		'투자설명서 교부 여부확인
+End If
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+'		'투자자성향서 체크여부
+'		'If LOGIN.Ctyp = "0" Then
+'		'	MsgBox "투자자 정보 확인서 등록을 하셔야합니다.",,"IBK투자증권"
+'		'	SCREEN.CreateWindow 2, "IB820882 /t/s/p5", ""
+'		'	SCREEN.CreateWindow 1, "IB821200 /t/s/p5", ""
+'		'	Exit Sub
+'		'End If
+'
+'		'SCREEN.Object("main.obj3.next_btn").enable = False
+'
+'		Dim str, dt, amt
+'		str = Trim(GRID0.GetGridcell(GRID0.row, 3))
+'
+'		'amt = Trim(GRID0.GetGridCell(GRID0.row, 5))
+'		'SCREEN.Object("main.obj1.amt").data = amt
+'
+'		dt = Trim(GRID0.GetGridCell(GRID0.row, 2))
+'		'SCREEN.Object("main.UTAB0").Index = 0
+'		'SCREEN.Object("main.obj3").SetObject "IB693120"
+'
+'		If Len(str) <> 6 Then
+'			SCREEN.Object("main.OBJ0.chae").checked = True
+'			SCREEN.Object("main.obj0.zIsuNo_chae").data = str
+'			SCREEN.Object("main.obj0.chae_nm").data = Trim(GRID0.GetGridcell(GRID0.row, 4))
+'			SCREEN.Object ("main.obj0.zAppySrtDt").data = dt
+'
+'			SCREEN.Proc "main.obj0.set_chae", ""
+'		Else
+'
+'			SCREEN.Object("main.OBJ0.jusik").checked = True
+'			SCREEN.Object("main.obj0.no").data = str
+'
+'			SCREEN.Object ("main.obj0.zAppySrtDt").data = dt
+'			SCREEN.Proc "main.obj0.set_jusik", ""
+'			SCREEN.Object("main.obj0.jusik_nm").data = Trim(GRID0.GetGridcell(GRID0.row, 4))
+'		End If
+'
+'		SCREEN.Object("main.zAppySrtDt").data = dt
+'
+'		If Len(str) <> 6  Then
+'			SCREEN.Object("main.OBJ1.chae").checked = True
+'			SCREEN.Object("main.obj1.zIsuNo_chae").data = Trim(GRID0.GetGridcell(GRID0.row, 3))
+'			SCREEN.Object("main.obj1.chae_nm").data = Trim(GRID0.GetGridcell(GRID0.row, 4))
+'
+'			SCREEN.Proc "main.OBJ1.set_chae", ""
+'
+'		Else
+'			SCREEN.Object("main.OBJ1.jusik").checked = True
+'			SCREEN.Object("main.obj1.zIsuNo").data = Trim(GRID0.GetGridcell(GRID0.row, 3))
+'			SCREEN.Object("main.obj1.jusik_nm").data = Trim(GRID0.GetGridcell(GRID0.row, 4))
+'
+'			SCREEN.Proc "main.OBJ1.set_jusik", ""
+'		End If
+'
+'		If SCREEN.Object("main.UTAB1").ID = 0 Then
+'			SCREEN.Object("main.obj1.zAppySrtDt").Data = Trim(GRID0.GetGridCell(GRID0.row, 2))
+'			SCREEN.Object("main.obj1.obj1").Send
+'		End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(GRID1)
+_AW_ONCLICK_AW_
+If GRID1.HitPos <> 3 Then
+	Exit Sub
+End If
+
+If GRID1.Rows < 1 Or Trim(GRID1.GetGridCell(GRID1.Row, 2)) = "" Then
+	Exit Sub
+End If
+
+'If GRID1.Column = 13 Then
+'	Dim jmCode, url, urlchk
+'	jmCode = Trim(GRID1.GetGridCell(GRID1.row, 3))		'종목코드
+'
+'	If jmcode = "" Then
+'		Exit Sub
+'	End If
+'
+'	url = "http://www.ibks.com/fundproduct/els/detail/" & jmcode & ".jsp?popup=Y"
+'    urlchk = CONTROL0.CheckURLEnable(url)
+'	If urlchk = -1 Or urlchk = 404 Then
+'		SCREEN.CreateWindow 1, "IB910000 /t/s/p5", ""
+'    Else
+'		SYSTEM.Navigate url
+'	End If
+'
+'End If
+
+If GRID1.Column = 13 Then
+	Dim jmCode, startDt, EndDt, Domino
+	jmCode = Trim(GRID1.GetGridCell(GRID1.row, 3))		'종목코드
+	startDt = Trim(GRID1.GetGridCell(GRID1.row, 2))		'청약개시일
+	EndDt = Trim(GRID1.GetGridCell(GRID1.row, 9))		'청약종료일
+
+	Domino = jmcode & "," & startdt
+	obj.proc "get_data", Domino
+
+End If
+_AW_ONENDSUB_AW_
+_AW_ONDBLCLK_AW_
+If Trim(GRID1.GetGridCell(GRID1.Row, 2)) = "" Then
+	Exit Sub
+End If
+
+If SCREEN.Object("main.UTAB1").ID <> 0 Then
+	Exit Sub
+End If
+
+Dim jmcd, jmnm, cystdt
+jmcd = Trim(GRID1.GetGridcell(GRID1.Row, 3))		'종목코드
+jmnm = Trim(GRID1.GetGridCell(GRID1.Row, 4))		'종목명
+cystdt = Trim(GRID1.GetGridCell(GRID1.Row, 2))		'청약개시일
+
+SCREEN.Object("main.obj0.lAppyQty").Clear
+
+
+	SCREEN.Object("main.obj0.zAppyIsuNo").Data = jmcd
+	SCREEN.Object ("main.obj0.zAppySrtDt").Data = cystdt
+
+	SCREEN.Proc "main.obj0.set_chae", ""
+
+
+If SCREEN.Object("main.UTAB1").ID = 0 Then
+	SCREEN.Proc "main.obj1.obj1.check_clear", ""
+	SCREEN.Object("main.obj1.lAppyQty").Clear
+
+		SCREEN.Object("main.OBJ1.chae").Checked = True
+		SCREEN.Object("main.obj1.zIsuNo_chae").Data = jmcd
+		SCREEN.Object("main.obj1.chae_nm").Data = jmnm
+		SCREEN.Object("main.obj1.zAppySrtDt").Data = cystdt
+
+		SCREEN.Proc "main.OBJ1.set_chae", ""
+
+
+	SCREEN.Object("main.obj1.obj1").Send		'투자설명서 교부 여부확인
+End If
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+'		'투자자성향서 체크여부
+'		'If LOGIN.Ctyp = "0" Then
+'		'	MsgBox "투자자 정보 확인서 등록을 하셔야합니다.",,"IBK투자증권"
+'		'	SCREEN.CreateWindow 2, "IB820882 /t/s/p5", ""
+'		'	SCREEN.CreateWindow 1, "IB821200 /t/s/p5", ""
+'		'	Exit Sub
+'		'End If
+'
+'		'SCREEN.Object("main.obj3.next_btn").enable = False
+'
+'		Dim str, dt, amt
+'		str = Trim(GRID1.GetGridcell(GRID1.row, 3))
+'
+'		'amt = Trim(GRID1.GetGridCell(GRID1.row, 5))
+'		'SCREEN.Object("main.obj1.amt").data = amt
+'
+'		dt = Trim(GRID1.GetGridCell(GRID1.row, 2))
+'		'SCREEN.Object("main.UTAB0").Index = 0
+'		'SCREEN.Object("main.obj3").SetObject "IB693120"
+'
+'		If Len(str) <> 6 Then
+'			SCREEN.Object("main.OBJ0.chae").checked = True
+'			SCREEN.Object("main.obj0.zIsuNo_chae").data = str
+'			SCREEN.Object("main.obj0.chae_nm").data = Trim(GRID1.GetGridcell(GRID1.row, 4))
+'			SCREEN.Object ("main.obj0.zAppySrtDt").data = dt
+'
+'			SCREEN.Proc "main.obj0.set_chae", ""
+'		Else
+'
+'			SCREEN.Object("main.OBJ0.jusik").checked = True
+'			SCREEN.Object("main.obj0.no").data = str
+'
+'			SCREEN.Object ("main.obj0.zAppySrtDt").data = dt
+'			SCREEN.Proc "main.obj0.set_jusik", ""
+'			SCREEN.Object("main.obj0.jusik_nm").data = Trim(GRID1.GetGridcell(GRID1.row, 4))
+'		End If
+'
+'		SCREEN.Object("main.zAppySrtDt").data = dt
+'
+'		If Len(str) <> 6  Then
+'			SCREEN.Object("main.OBJ1.chae").checked = True
+'			SCREEN.Object("main.obj1.zIsuNo_chae").data = Trim(GRID1.GetGridcell(GRID1.row, 3))
+'			SCREEN.Object("main.obj1.chae_nm").data = Trim(GRID1.GetGridcell(GRID1.row, 4))
+'
+'			SCREEN.Proc "main.OBJ1.set_chae", ""
+'
+'		Else
+'			SCREEN.Object("main.OBJ1.jusik").checked = True
+'			SCREEN.Object("main.obj1.zIsuNo").data = Trim(GRID1.GetGridcell(GRID1.row, 3))
+'			SCREEN.Object("main.obj1.jusik_nm").data = Trim(GRID1.GetGridcell(GRID1.row, 4))
+'
+'			SCREEN.Proc "main.OBJ1.set_jusik", ""
+'		End If
+'
+'		If SCREEN.Object("main.UTAB1").ID = 0 Then
+'			SCREEN.Object("main.obj1.zAppySrtDt").Data = Trim(GRID1.GetGridCell(GRID1.row, 2))
+'			SCREEN.Object("main.obj1.obj1").Send
+'		End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

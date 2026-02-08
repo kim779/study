@@ -1,0 +1,290 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB270200)
+MAPSIZE(395, 565)
+VERSION(003)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("종목별 섹터조회")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+TITLE("[2702] 종목별 섹터조회")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pino2702")
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL1(0, 0, 565, 31)        COLOR(64, 69)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL0(2, 0, 563, 27)        COLOR(66, 69)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL1(26, 3, 78, 23)  '종목코드'  AL_LEFT  CUR(0)      COLOR(208, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+OUT  hnam(573, 544, 653, 572)  LEN(12)  IO_MIXED|AL_LEFT|  FONT("굴림체", 9, BOLD)    COLOR(68, 69)  CUR(0)            TABORDER(0)  IOORDER(3)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  BUTTON0(470, 3, 526, 23)  '돌려보기'  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(208, 186)  CUR(0)    "4BTN.BMP"    TABORDER(5)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+BUTTON  BUTTON2(528, 3, 560, 23)  '조회'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, BOLD)  COLOR(208, 186)  CUR(0)    "조회BTN.BMP"    TABORDER(8)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+BUTTON  BUTTON1(141, 3, 160, 23)  TP_PUSH|IMAGE|AL_STRETCH      COLOR(208, 232)  CUR(0)    "검색.BMP"    TABORDER(2)  ENABLE  &
+  VISIBLE  IMAGE  HOVER  HINTTYPE(IH_NONE)
+OUT  ssjm(358, 3, 416, 23)  LEN(7)  IO_NUM|AL_CENTER||FA_SKIP    COLOR(66, 130)  CUR(0)            TABORDER(0)  IOORDER(6)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL0(327, 3, 351, 23)  '상승'  AL_CENTER  CUR(0)      COLOR(208, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+OBJECT  OBJECT0(161, 3, 301, 23)    "IB270202"  TABORDER(3)  IOORDER(7)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL38(-2, 29, 565, 395)  LIMAGE(0)  LINEW(4)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+GRID  GRID1(7, 38, 194, 328)  VISIBLEROW(10)  CELLH(18)  MATRIX(100, 2)  FIX(1)  MAINCOLOR(7, 0)  LINECOLOR(75)  FOCUSCOLOR(78)  FOCUSKIND(3)    FONT("굴림체", 9, NORMAL)  ROWC(68, 77)  |SELALWAYS|FLEXIBLE|VSCROLL|NO3D|RROW|XHLINE|PAGE|GRFTEXT    &
+	COLINFO("Col0")  LEN(4)  WIDTH(80)  HEAD("테마코드")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col1")  LEN(30)  WIDTH(171)  HEAD("섹터명")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    TABORDER(6)  IOORDER(4)  ENABLE  &
+  VISIBLE
+
+OBJECT  OBJ1(194, 38, 557, 328)    "IB270201"  TABORDER(7)  IOORDER(5)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+CONTROL  1301(76, 3, 141, 23)  |FA_PROTECT|FA_SKIP  "CX_CODECTRL"  "/u0/k검색.BMP/lAXCOMBO.BMP/p/s0/o"  LEN(12)  EDIT_INPUT    COLOR(192, 130)  TABORDER(1)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON3(413, 3, 469, 23)  '섹터종합'  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(208, 186)  CUR(0)    "4BTN.BMP"    TABORDER(4)  &
+  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+PANEL  PANEL2(9, 332, 68, 353)  LINECOLOR(96)  |IMAGE|AL_CENTER    COLOR(208, 232)  CUR(0)    "참고사항.BMP"  ENABLE  &
+  VISIBLE  TRANSPARENT  IMAGE  HINTTYPE(IH_NONE)
+LABEL  LABEL4(27, 352, 562, 372)  '본 화면은 인포스탁에서 제공하는 섹터분류에 따른 정보 화면입니다.'  AL_LEFT  CUR(0)      COLOR(96, 91)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  BUTTON4(15, 358, 22, 365)  TP_PUSH|IMAGETEXT|AL_STRETCH        FOCUS  COLOR(208, 232)  CUR(0)    "텍스트화살표_하단.bmp"    TABORDER(9)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+LABEL  LABEL2(27, 369, 562, 389)  '이 정보는 투자참고형 자료이며, 해당 정보에 대해 당사는 어떠한 책임도 없음을 알려드립니다.'  AL_LEFT  CUR(0)      COLOR(96, 91)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  BUTTON5(15, 375, 22, 382)  TP_PUSH|IMAGETEXT|AL_STRETCH        FOCUS  COLOR(208, 232)  CUR(0)    "텍스트화살표_하단.bmp"    TABORDER(10)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+EDIT  trg_ac(65, 425, 90, 444)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("0")          TABORDER(11)  IOORDER(8)  ENABLE  &
+  HINTTYPE(IH_NONE)
+CONTROL  cxMarket(5, 3, 23, 23)  |FA_SKIP  "CX_MarketPicker"  "/k2/tIB270200/u1/d1"  LEN(12)  EDIT_NOP    COLOR(192, 232)  TABORDER(0)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  code(660, 190, 765, 210)  LEN(12)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(12)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  edMarketTrigger(668, 30, 700, 50)  LEN(6)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(13)  IOORDER(9)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL6(603, 30, 663, 50)  '거래소'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Sub Change_MKGubn_Main(sMKGubn)
+	cxMarket.sMarket = sMKGubn
+	Select_Send("SCREEN.Send 0")
+End Sub
+
+_AW_ONINDECLARE_AW_
+#load IB888888
+#load IB999901
+
+_AW_ONENDSUB_AW_
+_AW_ONSTART_AW_
+' 현재 화면의 시장식별자(cxMarket)에 고유 화면번호 부여
+cxMarket.Major = SCREEN.Major
+
+
+S1301.Data = SYSTEM.GetHistory(False, 1301)
+
+SCREEN.SetTimer 5, False
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+'S1301.Data = SCREEN.object("main.1301").Data
+'If Len(Trim(S1301.Data)) <> 6 Then
+'	SCREEN.OnSend False
+'End If
+
+S1301.Data = SCREEN.object("main.1301").Data
+If cxMarket.sMarket = "KRX" Then
+ 	code.Data = S1301.Data
+ElseIf cxMarket.sMarket = "NXT" Then
+	code.Data = "N." & S1301.Data
+ElseIf cxMarket.sMarket = "통합" Then
+	code.Data = "M." & S1301.Data
+End If
+
+'테마 눌러도 테마주 안변하게 수정
+If trg_ac.Data = "1" Then
+	SCREEN.SetTimer 10, False
+	SCREEN.OnSend = False
+Else
+'	SYSTEM.Trace "SCREEN.OnSend = True"
+	SCREEN.OnSend = True
+End If
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+GRID1.Row = 1
+If GRID1.GetGridCell(1, 1) <> "  " Then
+	SCREEN.Object("OBJ1.tmcd").data = GRID1.GetGridCell(1, 1)
+	SCREEN.Object("OBJ1.grid2").clear
+	OBJ1.send
+Else
+	ssjm.Clear
+	SCREEN.Object("OBJ1.grid2").clear
+End If
+
+Dim ii, str, items
+For ii = 1 To GRID1.Rows
+	str = Trim(GRID1.GetGridCell(ii, 2))
+Next
+
+OBJECT0.send
+
+_AW_ONENDSUB_AW_
+_AW_ONTIMER_AW_
+If trg_ac.Data = "0" Then
+	Select_Send("SCREEN.Send 0")
+Else
+	trg_ac.Data = "0"
+End If
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(BUTTON0)
+_AW_ONCLICK_AW_
+Dim i, str
+str = ""
+For i = 1 To SCREEN.Object("OBJ1.GRID2").Rows
+	str = str & Trim(SCREEN.Object("OBJ1.GRID2").GetGridCell(i, 2))
+	str = str & vbTab
+	str = str & Trim(SCREEN.Object("OBJ1.GRID2").GetGridCell(i, 3))
+	str = str & vbLf
+Next
+If Len(Trim(str)) > 0 Then
+	SYSTEM.SetAutoCode str, SCREEN.Object("OBJ1.GRID2").Rows
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON2)
+_AW_ONCLICK_AW_
+trg_ac.Data = "0"
+
+SCREEN.SetTimer 5, False
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON1)
+_AW_ONCLICK_AW_
+Dim retn
+retn = SCREEN.GetCode(100, "1301", "hnam", 0 )
+If retn <> True Then
+       Exit Sub
+End If
+
+If SCREEN.GetCodeType(S1301.data) = 2 Then
+	hnam.TRgb = 7
+ElseIf SCREEN.GetCodeType(S1301.data) = 1 Then
+	hnam.TRgb = 6
+Else
+	hnam.TRgb = 0
+End If
+
+Select_Send("SCREEN.Send 2")
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(ssjm)
+_AW_ONCLICK_AW_
+S1301.Data = SCREEN.object("main.1301").Data
+
+If cxMarket.sMarket = "KRX" Then
+ 	S1301.Data = S1301.Data
+ElseIf cxMarket.sMarket = "NXT" Then
+	S1301.Data = "N." & S1301.Data
+ElseIf cxMarket.sMarket = "통합" Then
+	S1301.Data = "M." & S1301.Data
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(GRID1)
+_AW_ONCLICK_AW_
+If GRID1.HitPos = 3 Then
+	SCREEN.Object("OBJ1.tmcd").data = GRID1.GetGridCell(GRID1.Row, 1)
+	OBJ1.send
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(1301)
+_AW_ONCHANGE_AW_
+SCREEN.Object("OBJ1.tmcd").data = " "
+
+SCREEN.IgnoreChange True
+'S1301.Data = l_format(S1301.Data, "0", 6)
+SCREEN.IgnoreChange False
+If Trim(S1301.Data) = "000000" Then
+	Exit Sub
+End If
+S1301.Trigger "",True
+S1301.Trigger "",False
+
+If SCREEN.GetCodeType(S1301.data) = 2 Then
+	hnam.TRgb = 7
+ElseIf SCREEN.GetCodeType(S1301.data) = 1 Then
+	hnam.TRgb = 6
+Else
+	hnam.TRgb = 0
+End If
+
+trg_ac.Data = "0"
+
+SCREEN.SetTimer 5, False
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON3)
+_AW_ONCLICK_AW_
+SCREEN.CreateWindow 1, "IB800000 /p1/t/s", ""
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(trg_ac)
+_AW_ONCHANGE_AW_
+'SYSTEM.Trace "trg_ac: " & trg_ac.Data
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(cxMarket)
+_AW_ONCLICK_AW_
+Select_Send("SCREEN.Send 0")
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(edMarketTrigger)
+_AW_ONCHANGE_AW_
+Change_MKGubn_Main(Trim(edMarketTrigger.Data))
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

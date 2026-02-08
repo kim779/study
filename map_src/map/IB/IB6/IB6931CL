@@ -1,0 +1,88 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB6931CL)
+MAPSIZE(176, 244)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("80세이상 파생상품 �")
+MAPPUBLIC(";")
+FONT("굴림", 9, NORMAL)
+OPTIONS(ENCODE|CR2TAB)
+TITLE("80이상 파생상품 무경험")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pibopbxq")
+MAPTYPE(FIXED)
+HEADER(LEDGER)
+TRXH("31CSACMQ331")
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL0(0, 0, 244, 176)  TP_RAISED      COLOR(208, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  InA(0, 0, 90, 19)  LEN(5)  IO_MIXED|EDIT_INPUT|FA_WRAP  FONT("굴림체", 10, NORMAL)    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("00001")          TABORDER(1)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  out(0, 100, 90, 120)  LEN(5)  IO_MIXED|AL_CENTER|  FONT("굴림체", 10, NORMAL)    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(5)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  inout(0, 75, 90, 95)  LEN(25)  IO_MIXED|AL_CENTER|  FONT("굴림체", 10, NORMAL)    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  zaccountno(0, 25, 90, 44)  LEN(11)  IO_MIXED|EDIT_INPUT|FA_WRAP  FONT("굴림체", 10, NORMAL)    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(2)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  ztptext(0, 125, 90, 145)  LEN(1)  IO_MIXED|AL_CENTER|  FONT("굴림체", 10, NORMAL)    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(6)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  ztptext1(0, 150, 90, 170)  LEN(1)  IO_MIXED|AL_CENTER|  FONT("굴림체", 10, NORMAL)    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(7)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON0(100, 0, 235, 170)  TP_PUSH      AL_CENTER    FOCUS  COLOR(208, 232)  CUR(0)      TABORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  zaccountno_1(0, 50, 90, 69)  LEN(9)  IO_MIXED|EDIT_INPUT|FA_WRAP  FONT("굴림체", 10, NORMAL)    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(3)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONSEND_AW_
+zaccountno.Data = Trim(SCREEN.Object("parent.AN1A").data)
+InA.Data = "00001"
+LEDGER.Fkey = "C"
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+If Left(LEDGER.ecod, 1) = "0" Then
+	If ztptext.Data = "1" And  ztptext1.Data = "0" Then
+		MSG = MsgBox ("고객님은 80세 이상의 파생상품 무경험자입니다." & vbCrLf & "가입하시려는 상품의 투자설명서를 확인하시고 투자위험에 대해 인지하셨습니까?",4,"IBK투자증권")
+		If MSG = 6 Then
+			SCREEN.Object("parent.obj_subsc.Item6Yn").data = "1"
+		Else
+			Exit Sub
+		End If
+	Else
+		SCREEN.Object("parent.obj_subsc.Item6Yn").data = "0"
+	End If
+	SCREEN.Object("parent.obj_subsc").send
+Else
+	MsgBox LEDGER.Emsg,1,"IBK투자증권"
+	Exit Sub
+End If
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(BUTTON0)
+_AW_ONCLICK_AW_
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

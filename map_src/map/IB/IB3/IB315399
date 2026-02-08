@@ -1,0 +1,114 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB315399)
+MAPSIZE(139, 407)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(6)
+MAPDESC("펀드주문_사용자설정")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(ENCODE|CR2TAB|CERTIFY)
+TITLE("[3153]펀드주문_사용자설정")
+TOPATH(AXIS)
+METHOD(MENU)
+MAPTYPE(FIXED)
+HEADER(NOP)
+BGROUND(BRUSH, 181)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL3(0, 0, 409, 142)  LIMAGE(0)  LINEW(4)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  B_SEARCH(275, 115, 335, 135)  '확인'  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(208, 186)  CUR(10)    "4BTN.BMP"    TABORDER(1)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+BUTTON  BUTTON0(340, 115, 400, 135)  '취소'  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(208, 186)  CUR(10)    "4BTN.BMP"    TABORDER(2)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+LABEL  LABEL0(10, 100, 330, 115)  '※ 위 사항은 신규로 표시되는 펀드주문화면에만 적용됨.'  AL_LEFT  CUR(0)      COLOR(181, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+GROUP  GROUP0(10, 9, 200, 95)  '주문입력확인창'        COLOR(-1, 232)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+GROUP  GROUP1(205, 9, 400, 95)  '주문전송 후 입력창상태 설정'        COLOR(-1, 232)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  CHECK0(15, 33, 195, 45)  '신규주문확인창 없음'  TP_CHECK|EDIT_NOP          COLOR(181, 232)  CUR(0)      TABORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  CHECK1(15, 55, 195, 67)  '그룹별 정정주문확인창 없음'  TP_CHECK|EDIT_NOP          COLOR(181, 232)  CUR(0)      TABORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  CHECK2(15, 75, 195, 87)  '그룹별 취소주문확인창 없음'  TP_CHECK|EDIT_NOP          COLOR(181, 232)  CUR(0)      TABORDER(5)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  CHECK3(210, 33, 390, 45)  '주문전송 후 수량지움'  TP_CHECK|EDIT_NOP          COLOR(181, 232)  CUR(0)      TABORDER(6)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  CHECK4(210, 55, 390, 67)  '주문전송 후 가격지움'  TP_CHECK|EDIT_NOP          COLOR(181, 232)  CUR(0)      TABORDER(7)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  CHECK5(210, 75, 390, 87)  '주문전송 후 체크표시 유지'  TP_CHECK|EDIT_NOP          COLOR(181, 232)  CUR(0)      TABORDER(8)  ENABLE  &
+  VISIBLE  CHECKED  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Sub SaveCfg
+	Dim ii, str
+	If SCREEN.CreateObject("Info") Then
+		str = ""
+		For ii=0 To 5
+			If SCREEN.Object("CHECK"&CStr(ii)).Checked Then
+				str = str&"1"
+			Else
+				str = str&"0"
+			End If
+		Next
+		INFO.PushData LOGIN.Name, "userconf.ini", "IB315300", "config", str
+	End If
+End Sub
+
+Sub LoadCfg
+	Dim ii, str
+	If SCREEN.CreateObject("Info") Then
+		str = Trim(INFO.PopData(LOGIN.Name, "userconf.ini", "IB315300", "config"))
+		For ii=0 To 5
+			'MsgBox CStr(ii)&": "&Mid(Str,ii+1,1)
+			If Mid(str, ii+1, 1) = "1" Then
+				SCREEN.Object("CHECK"&CStr(ii)).Checked = True
+			Else
+				SCREEN.Object("CHECK"&CStr(ii)).Checked = False
+			End If
+		Next
+		'INFO.PushData LOGIN.Name, "userconf.ini", "IB315300", "config", str
+	End If
+End Sub
+
+_AW_ONSTART_AW_
+Call LoadCfg()
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(B_SEARCH)
+_AW_ONCLICK_AW_
+Call SaveCfg()
+SYSTEM.Push "C3153_CONFIG", "OK"
+SCREEN.CloseWindow
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON0)
+_AW_ONCLICK_AW_
+SYSTEM.Push "C3153_CONFIG", "NO"
+SCREEN.CloseWindow
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

@@ -1,0 +1,302 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB0000P2)
+MAPSIZE(520, 398)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("증권거래세 팝업")
+MAPPUBLIC(";")
+FONT("MS Sans Serif", 9, NORMAL)
+TITLE("알려드립니다")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL0(0, 0, 400, 525)        COLOR(64, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  CDAT(666, 70, 786, 89)  LEN(8)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP|FA_DATE    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(1)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL_bg(0, 0, 400, 480)  LIMAGE(1)  LINEW(3)  LINETYPE(4)  LINECOLOR(64)  |IMAGE|AL_CENTER    COLOR(66, 232)  CUR(0)    "EVENT02.bmp"  ENABLE  &
+  VISIBLE  IMAGE  HINTTYPE(IH_NONE)
+PANEL  PANEL1(40, 380, 360, 445)  TP_NONE      COLOR(181, 232)  CUR(10)    AL_CENTER    ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  BUTTON0(0, 480, 199, 520)  '닫기'  TP_PUSH      AL_CENTER  FONT("돋움", 12, BOLD)  FOCUS  COLOR(238, 240)  CUR(10)      TABORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON1(200, 480, 399, 520)  '오늘 하루 보지 않기'  TP_PUSH      AL_CENTER  FONT("돋움", 12, BOLD)  FOCUS  COLOR(247, 240)  CUR(10)      TABORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  CHECK0(520, 660, 675, 677)  '오늘은 이창을 열지 않음'  TP_CHECK|EDIT_NOP          COLOR(208, 192)  CUR(10)      TABORDER(4)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+PANEL  PANEL2(600, 430, 835, 465)  TP_NONE      COLOR(181, 232)  CUR(10)    AL_CENTER    ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL0(480, 205, 510, 217)  'Label'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL1(480, 235, 510, 247)  'Label'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL3(420, 260, 815, 495)  TP_NONE      COLOR(181, 232)  CUR(10)    AL_CENTER    ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+'FIRST가 1이면 체크안된거고, 0이면 체크된거임.
+'TODAY가 없으면 FIRST를 1로 세팅한다.
+Sub Set_Ini()
+	Dim Today, Check
+
+	If SCREEN.CreateObject("Info") Then
+
+	 	Today = INFO.PopData("", "NOTICECOOKIE.ini", "EVENT_POPUP2", "TODAY")
+
+	 	If Today = "0" Then
+	 		INFO.PushData "", "NOTICECOOKIE.INI", "EVENT_POPUP2", "TODAY", CDAT.Data
+			INFO.PushData "", "NOTICECOOKIE.ini", "EVENT_POPUP2", "FIRST", "1"
+	 	Else
+	 		INFO.PushData "", "NOTICECOOKIE.INI", "EVENT_POPUP2", "TODAY", CDAT.Data
+	 	End If
+
+	 	Check = INFO.PopData("", "NOTICECOOKIE.ini", "EVENT_POPUP2", "FIRST")
+
+	 	If Check = "0" Then
+	 		CHECK0.Checked = True
+			INFO.PushData "", "NOTICECOOKIE.ini", "EVENT_POPUP2", "FIRST", "0"
+	 	Else
+	 		CHECK0.Checked = False
+			INFO.PushData "", "NOTICECOOKIE.ini", "EVENT_POPUP2", "FIRST", "1"
+	 	End If
+	End If
+
+End Sub
+
+_AW_ONSTART_AW_
+Call Set_Ini()
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+'Dim text
+'Dim jqty, rtcn, shcn
+
+'For i = 1 To GRID_RES.Columns
+'	text = GRID_RES.GetGridText(1, i)
+'	If text= "O" Then
+'		GRID_RES.SetTRgb 1, i, 94
+'	End If
+'Next
+
+'If OUTPUT1.Data = "O" Then
+'	OUTPUT1.TRgb = 94
+'End If
+
+'If OUTPUT2.Data = "O" Then
+'	OUTPUT2.TRgb = 94
+'End If
+
+'If OUTPUT3.Data = "O" Then
+'	OUTPUT3.TRgb = 94
+'End If
+
+'If OUTPUT4.Data = "O" Then
+'	OUTPUT4.TRgb = 94
+'End If
+
+'If OUTPUT5.Data = "O" Then
+'	OUTPUT5.TRgb = 94
+'End If
+
+'For i = 1 To GRID_RGT.Rows
+'	GRID_RGT.SetGridCell i, 2, Trim(GRID_RGT.GetGridCell(i, 2))
+'	GRID_RGT.SetGridCell i, 3, Trim(GRID_RGT.GetGridCell(i, 3))
+'	GRID_RGT.SetGridCell i, 4, Trim(GRID_RGT.GetGridCell(i, 4))
+'Next
+
+'For i = 1 To GRID_DUE.Rows
+'	GRID_DUE.SetGridCell i, 2, Trim(GRID_DUE.GetGridCell(i, 2))
+'	jqty = Trim(GRID_DUE.GetGridCell(i, 3))
+'	GRID_DUE.SetGridCell i, 3, FormatNumber(jqty, 0) + " 주"
+'Next
+'For i = 1 To GRID_FRZ.Rows
+'	GRID_FRZ.SetGridCell i, 1, Trim(GRID_FRZ.GetGridCell(i, 1))
+'Next
+'For i = 1 To GRID_RET.Rows
+'	If GRID_RET.GetGridCell(i, 3) = "Y" Then
+'		GRID_RET.SetGridCell i, 3, "O"
+'	Else
+'		GRID_RET.SetGridCell i, 3, "X"
+'	End If
+'
+'	GRID_RET.SetGridCell i, 4, Trim(GRID_RET.GetGridCell(i, 5)) + " 회"
+'Next
+'For i = 1 To GRID_SRT.Rows
+'	GRID_SRT.SetGridCell i, 3, CStr(Trim(GRID_SRT.GetGridCell(i, 3)) * 100) + " %"
+'	GRID_SRT.SetGridCell i, 4, CStr(Trim(GRID_SRT.GetGridCell(i, 4)) * 100) + " %"
+'	GRID_SRT.SetGridCell i, 5, Trim(GRID_SRT.GetGridCell(i, 6)) + " 회"
+'Next
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(PANEL1)
+_AW_ONCLICK_AW_
+'Dim WS
+'Set WS = CreateObject("WScript.Shell")
+
+'LABEL0.Data = "False"
+'On Error Resume Next
+'LABEL0.Data = WS.RegRead("HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Edge\IEToEdge\SiteListUrlBucket")
+
+'If LABEL0.Data = "False" Then
+'	Dim link
+'	link = "https://youtu.be/q7yVjzTT2kI"
+'	SYSTEM.Navigate link & vbTab & "780" & vbTab & "750"
+'Else
+'	Dim EDGE
+'	Set EDGE = CreateObject("WScript.Shell")
+'	On Error Resume Next
+'	EDGE.Run "msedge https://youtu.be/q7yVjzTT2kI"
+'End If
+
+'WS = Nothing
+'EDGE = Nothing
+
+'기존 리서치 전망 팝업
+'Dim link
+'link = "https://youtu.be/hMqfQYJTp5g"
+
+'SYSTEM.Navigate link & vbTab & "780" & vbTab & "750"
+
+
+'기존 거래세 팝업
+'SCREEN.CreateWindow 1, "IB861400 /t/d", ""
+
+'SCREEN.CreateWindow 1, "IB718000 /t/d", ""
+
+SYSTEM.Push "IB980001_URL", "https://www.ibks.com/event/event_newSemester.jsp"
+SCREEN.CreateWindow 1, "IB980001 /p?", ""
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON0)
+_AW_ONCLICK_AW_
+SCREEN.CloseWindow()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON1)
+_AW_ONCLICK_AW_
+Dim Today
+
+'FIRST가 1이면 체크안된거고, 0이면 체크된거임.
+'TODAY가 없으면 FIRST를 1로 세팅한다.
+
+If SCREEN.CreateObject("Info") Then
+
+ 	Today = INFO.PopData("", "NOTICECOOKIE.ini", "EVENT_POPUP2", "TODAY")
+
+ 	If Today = "0" Then
+ 		INFO.PushData "", "NOTICECOOKIE.INI", "EVENT_POPUP2", "TODAY", CDAT.Data
+		INFO.PushData "", "NOTICECOOKIE.ini", "EVENT_POPUP2", "FIRST", "1"
+ 	Else
+ 		INFO.PushData "", "NOTICECOOKIE.INI", "EVENT_POPUP2", "TODAY", CDAT.Data
+		INFO.PushData "", "NOTICECOOKIE.ini", "EVENT_POPUP2", "FIRST", "0"
+ 	End If
+
+End If
+
+SCREEN.CloseWindow()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(CHECK0)
+_AW_ONCLICK_AW_
+Dim Today
+
+'FIRST가 1이면 체크안된거고, 0이면 체크된거임.
+'TODAY가 없으면 FIRST를 1로 세팅한다.
+
+If SCREEN.CreateObject("Info") Then
+
+ 	Today = INFO.PopData("", "NOTICECOOKIE.ini", "EVENT_POPUP", "TODAY")
+
+ 	If Today = "0" Then
+ 		INFO.PushData "", "NOTICECOOKIE.INI", "EVENT_POPUP", "TODAY", CDAT.Data
+		INFO.PushData "", "NOTICECOOKIE.ini", "EVENT_POPUP", "FIRST", "1"
+ 	Else
+ 		INFO.PushData "", "NOTICECOOKIE.INI", "EVENT_POPUP", "TODAY", CDAT.Data
+		INFO.PushData "", "NOTICECOOKIE.ini", "EVENT_POPUP", "FIRST", "0"
+ 	End If
+
+End If
+
+SCREEN.CloseWindow()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(PANEL2)
+_AW_ONCLICK_AW_
+'Dim link
+'link = "https://www.ibks.com/event/event_isaAccount.jsp"
+
+' 	link = "http://www.ibks.com/notice/event_list.do?progress_yn=Y&popup=Y"
+
+'SYSTEM.Navigate link & vbTab & "780" & vbTab & "750"
+
+SCREEN.CreateWindow 1, "IB861400 /t/d", ""
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(PANEL3)
+_AW_ONCLICK_AW_
+'Dim WS
+'Set WS = CreateObject("WScript.Shell")
+'
+'LABEL1.Data = "False"
+'On Error Resume Next
+'LABEL1.Data = WS.RegRead("HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Edge\IEToEdge\SiteListUrlBucket")
+'
+'If LABEL1.Data = "False" Then
+'	Dim link
+'	link = "https://www.ibks.com/notice/notice_view.do?seq=4542&popup=Y"
+'	SYSTEM.Navigate link & vbTab & "800" & vbTab & "750"
+'Else
+'	Dim EDGE
+'	Set EDGE = CreateObject("WScript.Shell")
+'	On Error Resume Next
+'	EDGE.Run "msedge https://www.ibks.com/notice/notice_view.do?seq=4542&popup=Y"
+'End If
+'
+'WS = Nothing
+'EDGE = Nothing
+
+'기존 리서치 전망 팝업
+'Dim link
+'link = "https://youtu.be/hMqfQYJTp5g"
+
+'SYSTEM.Navigate link & vbTab & "780" & vbTab & "750"
+
+
+'기존 거래세 팝업
+'SCREEN.CreateWindow 1, "IB861400 /t/d", ""
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

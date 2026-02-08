@@ -1,0 +1,209 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB0000P3)
+MAPSIZE(520, 398)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("MS Sans Serif", 9, NORMAL)
+TITLE("알려드립니다")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL0(0, 0, 405, 525)        COLOR(64, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  CDAT(666, 70, 786, 89)  LEN(8)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP|FA_DATE    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(1)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL_bg(0, 0, 400, 480)  LIMAGE(1)  LINEW(3)  LINETYPE(4)  LINECOLOR(64)  |IMAGE|AL_CENTER    COLOR(66, 232)  CUR(0)    "EVENT03.bmp"  ENABLE  &
+  VISIBLE  IMAGE  HINTTYPE(IH_NONE)
+PANEL  PANEL3(535, 305, 665, 435)  TP_NONE      COLOR(181, 232)  CUR(10)    AL_CENTER    ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  CHECK0(415, 485, 575, 502)  '오늘은 이 창을 열지 않음'  TP_CHECK|EDIT_NOP          COLOR(208, 192)  CUR(10)      TABORDER(2)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+PANEL  PANEL1(115, 405, 295, 459)  TP_NONE      COLOR(181, 232)  CUR(10)    AL_CENTER    ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  BUTTON0(0, 480, 199, 520)  '닫기'  TP_PUSH      AL_CENTER  FONT("돋움", 12, BOLD)  FOCUS  COLOR(238, 240)  CUR(10)      TABORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON1(200, 480, 399, 520)  '오늘 하루 보지 않기'  TP_PUSH      AL_CENTER  FONT("돋움", 12, BOLD)  FOCUS  COLOR(247, 240)  CUR(10)      TABORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL0(490, 215, 520, 227)  'Label'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+'FIRST가 1이면 체크안된거고, 0이면 체크된거임.
+'TODAY가 없으면 FIRST를 1로 세팅한다.
+Sub Set_Ini()
+	Dim Today, Check
+
+	If SCREEN.CreateObject("Info") Then
+
+	 	Today = INFO.PopData("", "NOTICECOOKIE.ini", "EVENT_POPUP3", "TODAY")
+
+	 	If Today = "0" Then
+	 		INFO.PushData "", "NOTICECOOKIE.INI", "EVENT_POPUP3", "TODAY", CDAT.Data
+			INFO.PushData "", "NOTICECOOKIE.ini", "EVENT_POPUP3", "FIRST", "1"
+	 	Else
+	 		INFO.PushData "", "NOTICECOOKIE.INI", "EVENT_POPUP3", "TODAY", CDAT.Data
+	 	End If
+
+	 	Check = INFO.PopData("", "NOTICECOOKIE.ini", "EVENT_POPUP3", "FIRST")
+
+	 	If Check = "0" Then
+	 		CHECK0.Checked = True
+			INFO.PushData "", "NOTICECOOKIE.ini", "EVENT_POPUP3", "FIRST", "0"
+	 	Else
+	 		CHECK0.Checked = False
+			INFO.PushData "", "NOTICECOOKIE.ini", "EVENT_POPUP3", "FIRST", "1"
+	 	End If
+	End If
+
+End Sub
+
+_AW_ONSTART_AW_
+Call Set_Ini()
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(PANEL3)
+_AW_ONCLICK_AW_
+'Dim link
+'link = "https://www.ibks.com/event/event_creditLoan.jsp"
+'
+'SYSTEM.Navigate link & vbTab & "690" & vbTab & "800"
+'
+'SCREEN.CreateWindow 1, "IB623500 /t/d", ""
+'
+'Dim WS
+'Set WS = CreateObject("WScript.Shell")
+'
+'LABEL0.Data = "False"
+'On Error Resume Next
+'LABEL0.Data = WS.RegRead("HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Edge\IEToEdge\SiteListUrlBucket")
+'
+'If LABEL0.Data = "False" Then
+'	Dim link
+'	link = "https://youtu.be/yxEVQLtQx_c"
+'	SYSTEM.Navigate link & vbTab & "800" & vbTab & "750"
+'Else
+'	Dim EDGE
+'	Set EDGE = CreateObject("WScript.Shell")
+'	On Error Resume Next
+'	EDGE.Run "msedge https://youtu.be/yxEVQLtQx_c"
+'End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(CHECK0)
+_AW_ONCLICK_AW_
+Dim Today
+
+'FIRST가 1이면 체크안된거고, 0이면 체크된거임.
+'TODAY가 없으면 FIRST를 1로 세팅한다.
+
+If SCREEN.CreateObject("Info") Then
+
+ 	Today = INFO.PopData("", "NOTICECOOKIE.ini", "GLOBAL_POPUP", "TODAY")
+
+ 	If Today = "0" Then
+ 		INFO.PushData "", "NOTICECOOKIE.INI", "GLOBAL_POPUP", "TODAY", CDAT.Data
+		INFO.PushData "", "NOTICECOOKIE.ini", "GLOBAL_POPUP", "FIRST", "1"
+ 	Else
+ 		INFO.PushData "", "NOTICECOOKIE.INI", "GLOBAL_POPUP", "TODAY", CDAT.Data
+		INFO.PushData "", "NOTICECOOKIE.ini", "GLOBAL_POPUP", "FIRST", "0"
+ 	End If
+
+End If
+
+SCREEN.CloseWindow()
+
+
+'Dim nomore
+'NOMORE = 1 다시 보지 않기
+'If SCREEN.CreateObject("Info") Then
+' 	nomore = INFO.PopData("", "NOTICECOOKIE.ini", "GLOBAL_POPUP", "nomore")
+'	INFO.PushData "", "NOTICECOOKIE.ini", "GLOBAL_POPUP", "nomore", "1"
+'End If
+
+'SCREEN.CloseWindow()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(PANEL1)
+_AW_ONCLICK_AW_
+Dim WS
+Set WS = CreateObject("WScript.Shell")
+
+LABEL0.Data = "False"
+On Error Resume Next
+LABEL0.Data = WS.RegRead("HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Edge\IEToEdge\SiteListUrlBucket")
+
+If LABEL0.Data = "False" Then
+	Dim link
+	link = "https://www.ibks.com/notice/notice_view.do?seq=4670&popup=Y"
+	SYSTEM.Navigate link & vbTab & "580" & vbTab & "750"
+Else
+	Dim EDGE
+	Set EDGE = CreateObject("WScript.Shell")
+	On Error Resume Next
+	EDGE.Run "msedge https://www.ibks.com/notice/notice_view.do?seq=4670&popup=Y"
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON0)
+_AW_ONCLICK_AW_
+SCREEN.CloseWindow()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON1)
+_AW_ONCLICK_AW_
+Dim Today
+
+'FIRST가 1이면 체크안된거고, 0이면 체크된거임.
+'TODAY가 없으면 FIRST를 1로 세팅한다.
+
+If SCREEN.CreateObject("Info") Then
+
+ 	Today = INFO.PopData("", "NOTICECOOKIE.ini", "EVENT_POPUP3", "TODAY")
+
+ 	If Today = "0" Then
+ 		INFO.PushData "", "NOTICECOOKIE.INI", "EVENT_POPUP3", "TODAY", CDAT.Data
+		INFO.PushData "", "NOTICECOOKIE.ini", "EVENT_POPUP3", "FIRST", "1"
+ 	Else
+ 		INFO.PushData "", "NOTICECOOKIE.INI", "EVENT_POPUP3", "TODAY", CDAT.Data
+		INFO.PushData "", "NOTICECOOKIE.ini", "EVENT_POPUP3", "FIRST", "0"
+ 	End If
+
+End If
+
+SCREEN.CloseWindow()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

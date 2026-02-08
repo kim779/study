@@ -1,0 +1,202 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB90021B)
+MAPSIZE(265, 250)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+TITLE("그룹편집")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL63(0, -2, 250, 265)  LIMAGE(0)  LINEW(4)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+GRID  GRID0(15, 34, 238, 197)  VISIBLEROW(0)  CELLH(18)  MATRIX(1000, 3)  FIX(0)  MAINCOLOR(208, 232)  LINECOLOR(75)  FOCUSCOLOR(78)  FOCUSKIND(4)  ROWC(68, 77)  |FLEXIBLE|VSCROLL|NO3D|RROW|XHLINE|HEADER|GRFTEXT    &
+	COLINFO("Col0")  LEN(1)  WIDTH(19)  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_INPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  ICHECK    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col2")  LEN(4)  WIDTH(19)  HEAD("id")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_MIXED|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col1")  LEN(40)  WIDTH(188)  HEAD("그  룹  명")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    TABORDER(1)  IOORDER(1)  ENABLE  &
+  VISIBLE
+
+LABEL  LABEL0(17, 14, 104, 31)  '현재 계좌 그룹'  AL_CENTER  CUR(0)      COLOR(228, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  del(49, 205, 121, 225)  '삭  제'  TP_PUSH|IMAGETEXT|AL_CENTER        FOCUS  COLOR(208, 130)  CUR(0)    "5BTN.bmp"    TABORDER(2)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+BUTTON  chg_nm(129, 205, 201, 225)  '이름변경'  TP_PUSH|IMAGETEXT|AL_CENTER        FOCUS  COLOR(208, 130)  CUR(0)    "5BTN.bmp"    TABORDER(3)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+BOX  BOX0(10, 8, 243, 234)    COLOR(232, 232)  LINEW(1)  BX_LINE    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON0(169, 238, 241, 258)  '확  인'  TP_PUSH|IMAGETEXT|AL_CENTER        FOCUS  COLOR(208, 130)  CUR(0)    "5BTN.bmp"    TABORDER(4)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+OBJECT  son_obj1(604, 382, 709, 487)    "IB9002AB"  TABORDER(5)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  son_obj0(373, 400, 478, 505)    "IB9002AA"  TABORDER(6)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+CONTROL  CONTROL0(452, 295, 567, 325)  |FA_PROTECT  "CX_DATATRANS"  ""  LEN(0)  EDIT_NOP    COLOR(192, 232)  TABORDER(0)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  idx(544, 167, 585, 186)  LEN(4)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(7)  IOORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  str(544, 192, 744, 211)  LEN(40)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(8)  IOORDER(5)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+GROUP  GROUP0(353, 374, 503, 535)  'Group'        COLOR(-1, 232)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+GROUP  GROUP1(584, 354, 734, 515)  'Group'        COLOR(-1, 232)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Sub parent_send()
+	SCREEN.Send 0
+End Sub
+
+Sub query()
+	'Call CONTROL0.Refresh813(0)
+
+	Dim data
+	data = CONTROL0.Get813Group("")
+	GRID0.Clear
+	GRID0.InsertRows 0, data, True
+End Sub
+
+_AW_ONSTART_AW_
+'SCREEN.Send 0
+'
+Call query()
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+
+'SCREEN.SetTimer 2, False
+'Call query()
+
+_AW_ONENDSUB_AW_
+_AW_ONTIMER_AW_
+SCREEN.CloseWindow
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(GRID0)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(del)
+_AW_ONCLICK_AW_
+Dim ii, cnt, id, param, row
+cnt = 0
+For ii =1 To GRID0.Rows
+	If Trim(GRID0.GetGridCell(ii, 1)) = 1 Then
+		cnt = cnt + 1
+		idx.data = Trim(GRID0.GetGridCell(ii, 2))
+		str.Data = Trim(GRID0.GetGridCell(ii, 3))
+		row = ii
+	End If
+Next
+
+If cnt = 0 Then
+	MsgBox "삭제할 그룹을 선택하여 주십시오", 0, "IBK 투자증권"
+	Exit Sub
+ElseIf cnt > 1 Then
+	MsgBox "한 그룹만 선택하여 주십시오", 0, "IBK 투자증권"
+	Exit Sub
+End If
+
+GRID0.RemoveRow(row-1)
+'GRID0.SetGridCell idx.Data, 3, ""
+
+son_obj0.Send
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(chg_nm)
+_AW_ONCLICK_AW_
+Dim ii, cnt, param, row
+cnt = 0
+For ii =1 To GRID0.Rows
+	If Trim(GRID0.GetGridCell(ii, 1)) = 1 Then
+		cnt = cnt + 1
+		idx.Data = Trim(GRID0.GetGridCell(ii, 2))
+		str.Data = Trim(GRID0.GetGridCell(ii, 3))
+		row = ii
+	End If
+Next
+
+If cnt = 0 Then
+	MsgBox "이름을 변경할 그룹을 선택하여 주십시오", 0, "IBK 투자증권"
+	Exit Sub
+ElseIf cnt > 1 Then
+	MsgBox "한 그룹만 선택하여 주십시오", 0, "IBK 투자증권"
+	Exit Sub
+End If
+
+param = "grp_nm" & vbTab & Trim(str.data) & vbLf
+
+SCREEN.CreateWindow 2, "IB90021C /p5 /d", param
+
+str.data = Trim(SYSTEM.Pop("chg_nm"))
+
+'If Trim(str.data) <> "no" Then
+'	For ii = 1 To GRID0.Rows
+'		If Trim(GRID0.GetGridCell(ii, 2)) = Trim(idx.data) Then
+'			GRID0.SetGridCell ii, 3, Trim(str.data)
+'		End If
+'	Next
+'
+'	son_obj1.Send
+'End If
+GRID0.SetGridCell row, 3, str.Data
+
+son_obj1.Send
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON0)
+_AW_ONCLICK_AW_
+SCREEN.SetTimer 3, False
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(CONTROL0)
+_AW_ONDBLCLK_AW_
+'MsgBox "Control: "+CONTROL0.data
+Dim DataList, spos, dpos, symb, data, cnt
+cnt = 1
+DataList = CONTROL0.data
+'MsgBox "DataList: "+ DataList
+dpos = 0
+spos = InStr(DataList, "|")
+While spos <> 0
+	symb = Mid(DataList,dpos+1,spos-dpos-1)
+	'MsgBox "symb: "+ symb
+	dpos = InStr(spos+1,DataList, "|")
+	data = Mid(DataList, spos+1, dPos-spos-1)
+	spos = InStr(dpos+1,DataList, "|")
+	SCREEN.Object(symb).data = data
+
+Wend
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

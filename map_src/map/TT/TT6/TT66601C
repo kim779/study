@@ -1,0 +1,102 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(TT66601C)
+MAPSIZE(74, 238)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+TITLE("그룹이름변경")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL63(0, 0, 239, 75)  LIMAGE(0)  LINEW(4)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  grp_nm(78, 11, 220, 31)  LEN(40)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_SUNKEN          TABORDER(1)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL0(12, 12, 72, 32)  '그 룹 명'  AL_CENTER  CUR(0)      COLOR(228, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BOX  BOX0(6, 6, 231, 37)    COLOR(75, 75)  LINEW(1)  BX_LINE    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  ok(36, 45, 108, 65)  '확   인'  TP_PUSH|IMAGETEXT|AL_CENTER        FOCUS  COLOR(208, 130)  CUR(0)    "5BTN.bmp"    TABORDER(2)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+BUTTON  cancle(131, 44, 203, 64)  '취  소'  TP_PUSH|IMAGETEXT|AL_CENTER        FOCUS  COLOR(208, 130)  CUR(0)    "5BTN.bmp"    TABORDER(3)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Sub ok_click()
+	SYSTEM.Push "chg_nm", Trim(grp_nm.Data)
+	SCREEN.CloseWindow
+End Sub
+
+Sub cancle_click()
+	SYSTEM.Push "chg_nm", "no"
+	SCREEN.CloseWindow
+End Sub
+
+_AW_ONSTART_AW_
+'grp_nm.Data = SYSTEM.Pop("chg_nm")
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+SCREEN.OnSend = False
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(grp_nm)
+_AW_ONKEYCHANGE_AW_
+If SCREEN.Key = 13 Then
+	If Trim(grp_nm.data) = "" Then
+		MsgBox "그룹명을 확인하여 주십시오.", 0, "IBK 투자증권"
+		Exit Sub
+	Else
+		Call ok_click()
+	End If
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(ok)
+_AW_ONCLICK_AW_
+If Trim(grp_nm.data) = "" Then
+	MsgBox "그룹명을 확인하여 주십시오.", 0, "IBK 투자증권"
+	Exit Sub
+End If
+
+SYSTEM.Push "chg_nm", Trim(grp_nm.Data)
+SCREEN.CloseWindow
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(cancle)
+_AW_ONCLICK_AW_
+'SYSTEM.Push "chg_nm", "no"
+
+SCREEN.CloseWindow
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

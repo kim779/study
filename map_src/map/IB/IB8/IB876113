@@ -1,0 +1,86 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB876113)
+MAPSIZE(63, 554)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("[8761] 전광판-무장�")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(FMS|FLASH)
+TITLE("무장애_백업")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  SYMBOL97(70, 10, 245, 50)  '시스템 無장애'        COLOR(232, 192)  CUR(0)    AL_CENTER  FONT("HY견고딕", 25, BOLD)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  data2(375, 15, 595, 55)  '(YYYY/MM/DD~)'        COLOR(232, 192)  CUR(0)    AL_LEFT  FONT("HY견고딕", 18, NORMAL)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL1(330, 15, 370, 55)  '일'        COLOR(232, 192)  CUR(0)    AL_RIGHT  FONT("HY견고딕", 18, NORMAL)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  data1(280, 0, 345, 55)  '000'        COLOR(232, 94)  CUR(0)    AL_RIGHT  FONT("맑은 고딕", 40, BOLD)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL0(-10, -2, 560, 316)  TP_RAISED      COLOR(232, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL2(115, 10, 465, 50)  'IB876112 장애 발생해서 현재미사용'  TP_RAISED      COLOR(208, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONSTART_AW_
+    Dim diff
+    Dim yy, mm, dd, cday, MyWeek
+
+    Dim sagonal
+
+    ''''''''''''''''''''''
+    '이후 장애 발생시 아래 변수 sagonal 만 수정해주면 됨
+    '수정시에는 반드시 YYYY-MM-DD 양식으로 변경해줘야함!
+    '2021-11-03 피코그램 상장 장애발생
+    '2024-06-24 한중엔시에스 상장 장애발생
+    sagonal = "2024-06-24"
+    ''''''''''''''''''''''''
+    ''''절대장애발생금지''''
+    ''''''''''''''''''''''''
+    ''''''''''''''''''''''''
+
+	cday = DateAdd("d", 0, Date) '오늘날짜
+	yy = Year(cday)
+	mm = Month(cday)
+	dd = Day(cday)
+
+	If Len(mm) = 1 Then mm = "0"&mm
+	If Len(dd) = 1 Then dd = "0"&dd
+
+	cday = yy&"-"&mm&"-"&dd
+    SYSTEM.Trace "cday:"&CStr(cday)
+
+    '사고날부터 일자 계산
+    diff = DateDiff("d", CStr(sagonal), CStr(cday))
+
+    SYSTEM.Trace "diff:"&diff
+
+
+    data1.Text = CStr(diff)
+    data2.Text = "("&Mid(sagonal,1, 4)&"/"&Mid(sagonal,6, 2)&"/"&Mid(sagonal,9, 2)&"~)"
+
+_AW_ONENDSUB_AW_
+}
+
+
+

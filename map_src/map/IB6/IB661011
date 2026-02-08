@@ -1,0 +1,207 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB661011)
+MAPSIZE(230, 700)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("장외채권 판매중지")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(ENCODE|CR2TAB)
+TITLE("[6610] 장외채권 판매중지종목")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("piboPBxQ")
+MAPTYPE(FIXED)
+HEADER(LEDGER)
+TRXH("31CSOFBQ685")
+}
+
+
+
+FORM DIVISION
+{
+
+GRID  GRID(0, 0, 700, 225)  VISIBLEROW(0)  CELLH(19)  MATRIX(2000, 10)  FIX(0)  MAINCOLOR(64, 232)  LINECOLOR(75)  FOCUSCOLOR(78)  FOCUSKIND(4)  ROWC(68, 77)  |MERGE|SELALWAYS|FLEXIBLE|VSCROLL|HSCROLL|NO3D|RROW|XHLINE|GRFTEXT    &
+	COLINFO("Col1")  LEN(12)  WIDTH(85)  HEAD("종목코드")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col0")  LEN(40)  WIDTH(204)  HEAD("종목명")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("17")  LEN(8)  WIDTH(75)  HEAD("발행일")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  EDITFORMAT("9999/99/99")    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("37")  LEN(8)  WIDTH(75)  HEAD("만기일")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  EDITFORMAT("9999/99/99")    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col2")  LEN(8)  WIDTH(80)  HEAD("변경일")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col3")  LEN(4)  WIDTH(80)  HEAD("채권신용평가등급")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col4")  LEN(40)  WIDTH(160)  HEAD("신용등급")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col5")  LEN(1)  WIDTH(90)  HEAD("사유구분")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col6")  LEN(40)  WIDTH(90)  HEAD("구분명1")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col7")  LEN(100)  WIDTH(700)  HEAD("판매중지 사유")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    TABORDER(1)  IOORDER(7)  ENABLE  &
+  VISIBLE
+
+EDIT  REC(792, 22, 892, 42)  LEN(5)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_SUNKEN  INIT("00001")          TABORDER(2)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+GROUP  GROUP0(717, 0, 921, 214)  'IN'        COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+GROUP  GROUP1(716, 343, 920, 490)  'OUT'        COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  OUTDUMP(793, 363, 893, 383)  LEN(19)  IO_MIXED|AL_CENTER|    COLOR(192, 232)  CUR(0)  LINECOLOR(0)          TABORDER(0)  IOORDER(5)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL0(730, 22, 790, 42)  '레코드'  AL_LEFT  CUR(0)      COLOR(141, 240)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL3(730, 62, 790, 82)  '종목번호'  AL_LEFT  CUR(0)      COLOR(141, 240)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  EDIT0(792, 62, 892, 82)  LEN(12)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_SUNKEN          TABORDER(3)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  OUTPUT(731, 362, 791, 382)  'OUTPUT'  AL_LEFT  CUR(0)      COLOR(141, 240)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  OUTPUT2(793, 447, 893, 467)  LEN(1)  IO_MIXED|AL_CENTER|    COLOR(192, 232)  CUR(0)  LINECOLOR(0)          TABORDER(0)  IOORDER(6)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL7(731, 447, 791, 467)  '레코드'  AL_LEFT  CUR(0)      COLOR(141, 240)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL1(730, 84, 790, 104)  '조회구분'  AL_LEFT  CUR(0)      COLOR(141, 240)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  EDIT1(792, 84, 892, 104)  LEN(1)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_SUNKEN  INIT("1")          TABORDER(4)  IOORDER(3)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL2(730, 106, 790, 126)  '삭제구분'  AL_LEFT  CUR(0)      COLOR(141, 240)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  EDIT2(792, 106, 892, 126)  LEN(1)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_SUNKEN  INIT("1")          TABORDER(5)  IOORDER(4)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  EDIT4(225, 365, 300, 385)  LEN(10)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_SUNKEN  INIT("1")          TABORDER(6)  IOORDER(8)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+'== 첫 조회
+Sub send_f()
+	GRID.Clear
+	LEDGER.Fkey = "C"
+	SCREEN.Send 0
+	SCREEN.Object("main.GUIDE").text = "조회내역이 없습니다."
+
+End Sub
+
+'== 연속 조회
+Sub send_c()
+	LEDGER.Fkey = "7"
+	GRID.SetDataPosition(2)
+	SCREEN.Send 0
+End Sub
+
+Sub FMNum(row,col,pindex)
+	If GRID.GetGridCell(row,col) <> "" Then
+		GRID.SetGridCell row,col,FormatNumber(Int(GRID.GetGridCell(row,col)*10^pindex)/10^pindex,pindex)
+	End If
+End Sub
+
+Sub Setcelldata(row, data1, data2, data3, data4, data5, data6)
+	'MsgBox row &":"& data1&":"& data2&":"& data3&":"& data4&":"& data5&":"& data6
+	GRID.SetGridCell row,1,data1
+	GRID.SetGridCell row,2,data2
+	GRID.SetGridCell row,3,data3
+	GRID.SetGridCell row,4,data4
+	GRID.SetGridCell row,5,data5
+	GRID.SetGridCell row,6,data6
+	GRID.InsertRow row
+End Sub
+
+_AW_ONINDECLARE_AW_
+#Load IB888833
+
+_AW_ONENDSUB_AW_
+_AW_ONSTART_AW_
+
+
+LEDGER.Rcnt = "0010"
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+If LEDGER.Next = "Y" Then
+	send_c()
+Else
+	If GRID.Rows > 0 Then
+		For i = 1 To GRID.Rows
+		 If GRID.GetGridCell(i,39) <> "" Then '상품위험등급
+		 	GRID.SetCell i,12,Trim(GRID.GetGridCell(i,39))
+		 End If
+
+		 Call FMNum(i,13,3) '매수수익률
+		 Call FMNum(i,18,3) '세후수익률
+		 Call FMNum(i,14,3) '연환산세전수익률
+		 Call FMNum(i,34,3) '연평균세전수익률
+		 Call FMNum(i,15,2)  '매수단가
+
+
+'		 If GRID.GetGridCell(i,20) <> "" Then '주문가능수량
+'		 	GRID.SetCell i,20,Trim(GRID.GetGridCell(i,20))
+'		 End If
+
+		 If GRID.GetGridCell(i,22) <> "" Then '잔존기간
+		 	GRID.SetCell i,22,Trim(GRID.GetGridCell(i,22)) & "일"
+		 End If
+
+		Next
+	End If
+End If
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(GRID)
+_AW_ONDBLCLK_AW_
+'Dim p4
+Exit Sub
+If GRID.HitPos <> 3 Then
+	Exit Sub
+End If
+'
+If Trim(GRID.GetGridCell(GRID.Row,1)) = "" Then
+	Exit Sub
+End If
+
+If Trim(GRID.GetGridCell(GRID.Row,6)) <> "" Then 	'종목코드
+	'종목상세 셋팅
+	SCREEN.Object("main.obj_detail.EDIT0").data = Trim(GRID.GetGridCell(GRID.Row,6))
+	If Trim(GRID.GetGridCell(GRID.Row,11)) <> "" Then '신용등급
+		SCREEN.Object("main.obj_detail.sin").data = Trim(GRID.GetGridCell(GRID.Row,11))
+	End If
+	If Trim(GRID.GetGridCell(GRID.Row,39)) <> "" Then '위험등급
+		SCREEN.Object("main.obj_detail.wee").data = Trim(GRID.GetGridCell(GRID.Row,39))
+	End If
+	SCREEN.Proc "main.obj_detail.send_f", ""
+
+	'주문셋팅
+	SCREEN.Object("main.obj_jumn.ed_lsuNo").data = Trim(GRID.GetGridCell(GRID.Row,6)) '종목번호
+	SCREEN.Object("main.obj_jumn.cgname").data = Trim(GRID.GetGridCell(GRID.Row,10)) '종목명
+	SCREEN.Object("main.obj_jumn.ed_BnsBndUprc").data = Trim(GRID.GetGridCell(GRID.Row,15)) '매수단가
+	SCREEN.Object("main.obj_jumn.ed_BnsBndErnrat").data = Trim(GRID.GetGridCell(GRID.Row,13)) '매수채권수익률
+	SCREEN.Object("main.obj_jumn.ed_FundOpAcntNo").data = Trim(GRID.GetGridCell(GRID.Row,2)) '펀드운용계좌번호
+	SCREEN.Object("main.obj_jumn.ed_BuyDt").data = Trim(GRID.GetGridCell(GRID.Row,17)) '매수일
+	SCREEN.Object("main.obj_jumn.ed_DclsSeqno").data = Trim(GRID.GetGridCell(GRID.Row,5)) '공시일련번호
+	SCREEN.Object("main.obj_jumn.ed_BuyBndUprc").data = Trim(GRID.GetGridCell(GRID.Row,16)) '매수채권단가
+
+	'장외채권 표준투자권유준칙 개정 2024 10/22반영
+	SCREEN.Object("main.obj_jumn.BndBaseErnrat").data = Trim(GRID.GetGridCell(GRID.Row,43)) '민평금리 (평균)
+	SCREEN.Object("main.obj_jumn.DclsrUprc").data = Trim(GRID.GetGridCell(GRID.Row,44)) '민평단가 (평균)
+	SCREEN.Object("main.obj_jumn.Uprc").data = Trim(GRID.GetGridCell(GRID.Row,45)) '단가차이 (평균단가-판매단가)
+	SCREEN.Object("main.obj_jumn.ErnRat").data = Trim(GRID.GetGridCell(GRID.Row,46)) '비율 (단가차이/매수단가)
+
+	SCREEN.Proc "main.obj_jumn.changecode", ""
+
+
+
+
+
+
+
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

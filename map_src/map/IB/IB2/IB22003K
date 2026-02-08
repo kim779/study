@@ -1,0 +1,89 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB22003K)
+MAPSIZE(96, 509)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("±¼¸²Ã¼", 9, NORMAL)
+OPTIONS(FMS|FLASH)
+TITLE("Untitled")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pooppoop")
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+BUTTON  BUTTON0(130, 5, 165, 45)  TP_PUSH      AL_CENTER    FOCUS  COLOR(208, 232)  CUR(0)      TABORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  30303(5, 5, 125, 24)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("1")          TABORDER(2)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  30021(5, 25, 125, 45)  LEN(40)  IO_MIXED|AL_LEFT|    COLOR(192, 69)  CUR(0)            TABORDER(0)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  futureList(0, 55, 480, 75)  LEN(80)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(3)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Dim codes
+codes = Array(4)
+
+Sub mysend(idx)
+	data = "30303" & Chr(127) & idx  & Chr(9) & "30021" & Chr(9) & "30303" & Chr(9)
+	Call SCREEN.Service("pooppoop", data, Len(data), &H02)
+End Sub
+
+Sub send_f()
+	futureList.Clear
+	If SCREEN.Object("parent.parent.gubn").data = "1" Then
+		Call mysend(14)
+	Else
+		Call mysend(1)
+	End If
+End Sub
+
+_AW_ONSERVICE_AW_
+datas = Split(data, Chr(9))
+If datas(1) <> "" Then
+	If Left(Trim(datas(0)),1) <> "4" Then
+		idx = CLng(datas(1))
+		If SCREEN.Object("parent.parent.gubn").data = "1" Then
+			futureList.Data = Trim(futureList.Data) & "|" & idx & Trim(datas(0))
+			mysend(idx+1)
+		Else
+			idx = idx
+			futureList.Data = Trim(futureList.Data) & "|" & "0"&idx & Trim(datas(0))
+			mysend(idx+1)
+		End If
+	End If
+End If
+
+SCREEN.Proc "parent.setFutureCode", ""
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(BUTTON0)
+_AW_ONCLICK_AW_
+Call mysend(1)
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

@@ -1,0 +1,102 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB10102A)
+MAPSIZE(179, 643)
+VERSION(001)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("Æ½Â÷Æ®")
+MAPPUBLIC(";")
+FONT("±¼¸²Ã¼", 9, NORMAL)
+OPTIONS(FLASH)
+TITLE("[10102A]Æ½Â÷Æ®")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("ng200721")
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+EDIT  1301(74, 222, 158, 242)  LEN(12)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(1)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  check(115, 260, 145, 281)  LEN(1)  IO_MIXED|AL_CENTER|    COLOR(192, 23)  CUR(0)            TABORDER(0)  IOORDER(5)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  18305(25, 220, 113, 240)  LEN(8)  IO_NUM|EDIT_INPUT    COLOR(99, 130)  CUR(0)  TP_SUNKEN  INIT("00000000")          EDITFORMAT("9999/99/99")  TABORDER(2)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  1021(164, 222, 249, 239)  LEN(12)  IO_MIXED|AL_LEFT||FA_WRAP    COLOR(203, 1)  CUR(0)            TABORDER(0)  IOORDER(4)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  real(487, 201, 512, 224)  LEN(1)  IO_NUM|EDIT_INPUT    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(3)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+CONTROL  CONTROL0(0, 0, 643, 179)  |FA_PROTECT|FA_FLASH  "C_UserGrp"  "/i61300120000120010100000000000000000010000000000912003355468720000000"  LEN(0)  EDIT_INOUT    COLOR(192, 232)  TABORDER(4)  IOORDER(6)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Function GetToday()
+	YY = Year(Date)
+	MM = Month(Date)
+	If Len(MM) = 1 Then
+		MM = "0" & MM
+	End If
+	DD = Day(Date)
+	If Len(DD) = 1 Then
+		DD = "0" & DD
+	End If
+	GetToday = YY & MM & DD
+End Function
+
+_AW_ONSEND_AW_
+S1301.Data = SCREEN.Object("parent.parent.1301").Data
+S18305.Data = SCREEN.Object("parent.parent.11309").Data
+
+
+real.Data = "1"
+
+'If Len(Trim(S1301.Data)) <> 6 Then
+'	SCREEN.OnSend False
+'End If
+
+If UCase(TypeName( SCREEN.Object("parent.1777") )) <> "NOTHING" Then
+	If SCREEN.Object("parent.1777").Data = "1" Then
+
+	ElseIf SCREEN.Object("parent.1777").Data = "2" Then
+		S1301.Data = "N." & S1301.Data
+	ElseIf SCREEN.Object("parent.1777").Data = "3" Then
+		S1301.Data = "M." & S1301.Data
+	End If
+End If
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+'If SCREEN.Object("main.is_real").checked=False Then
+'	S1021.clear
+'End If
+
+'If check.Data = "F" Then
+'	CONTROL0.clear
+'End If
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(18305)
+_AW_ONCHANGE_AW_
+SCREEN.Send ALL
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

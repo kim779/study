@@ -1,0 +1,70 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB2006T6)
+MAPSIZE(120, 256)
+VERSION(001)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("Æ½Â÷Æ®")
+MAPPUBLIC(";")
+FONT("±¼¸²Ã¼", 9, NORMAL)
+OPTIONS(FLASH)
+TITLE("[2006T6]Æ½Â÷Æ®")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("ng200614")
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+CONTROL  CONTROL0(0, 0, 256, 120)  |FA_PROTECT|FA_FLASH  "C_UserGrp"  "/i61300020000050010100000000000000000010000000000912003355468710000000"  LEN(0)  EDIT_INOUT    COLOR(192, 232)  TABORDER(1)  IOORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  upcd(235, 160, 319, 180)  LEN(12)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(2)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  1021(380, 180, 465, 200)  LEN(12)  IO_MIXED|AL_LEFT||FA_FLASH|FA_XDELETE    COLOR(203, 1)  CUR(0)            TABORDER(0)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  check(169, 230, 199, 251)  LEN(1)  IO_MIXED|AL_CENTER|    COLOR(192, 23)  CUR(0)            TABORDER(0)  IOORDER(3)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONSEND_AW_
+CONTROL0.Clear
+upcd.Data = SCREEN.Object("parent.1301").Data
+
+If UCase(TypeName( SCREEN.Object("parent.cxMarket") )) <> "NOTHING" Then
+	If SCREEN.Object("parent.cxMarket").sMarket = "KRX" Then
+		upcd.Data = SCREEN.Object("parent.1301").Data
+	ElseIf SCREEN.Object("parent.cxMarket").sMarket = "NXT" Then
+		upcd.Data = "N." & SCREEN.Object("parent.1301").Data
+	ElseIf SCREEN.Object("parent.cxMarket").sMarket = "ÅëÇÕ" Then
+		upcd.Data = "M." & SCREEN.Object("parent.1301").Data
+	End If
+End If
+
+'If Len(Trim(upcd.Data)) <> 6 Then
+'	SCREEN.OnSend False
+'End If
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+If check.Data = "F" Then
+	CONTROL0.Clear
+End If
+
+_AW_ONENDSUB_AW_
+}
+
+
+

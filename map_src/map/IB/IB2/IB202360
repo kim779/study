@@ -1,0 +1,142 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB202360)
+MAPSIZE(550, 1000)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("ETF정보")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(FMS|FLASH)
+TITLE("[2023] ETF정보")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pooppoop")
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL63(-2, 31, 1003, 550)  LIMAGE(0)  LINEW(4)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL_bg(0, 0, 1005, 32)        COLOR(66, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BROWSER  BROWSER0(6, 39, 995, 543)  EDIT_NOP    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BTN_MD(961, 6, 996, 26)  '조회'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, BOLD)  COLOR(132, 186)  CUR(0)    "조회BTN.BMP"    TABORDER(1)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+EDIT  1301(7, 6, 72, 26)  LEN(6)  IO_MIXED|EDIT_INOUT|FA_WRAP|FA_HAN|CODE    FONT("굴림체", 9, NORMAL)    COLOR(99, 130)  CUR(0)  TP_SUNKEN          TABORDER(2)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON0(72, 6, 91, 26)  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(15, 63)  CUR(0)    "검색.BMP"    TABORDER(3)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+CONTROL  17413(94, 6, 227, 26)    "CX_Symbol"  "/a105/b91/c90/d130"  LEN(0)  EDIT_OUTPUT  FONT("굴림체", 9, NORMAL)    COLOR(90, 130)  TABORDER(0)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+GROUP  gp(50, 650, 132, 745)        COLOR(-1, 232)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  r0(245, 7, 319, 25)  'Snapshot'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(gp)      COLOR(208, 130)  CUR(0)      TABORDER(4)  ENABLE  &
+  VISIBLE  CHECKED  TRANSPARENT  HINTTYPE(IH_NONE)
+BOX  BOX0(235, 6, 440, 26)    COLOR(165, 66)  LINEW(1)  BX_LINE    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  r1(320, 7, 430, 25)  '성과 및 위험분석'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(gp)      COLOR(208, 130)  CUR(0)      TABORDER(5)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  menu(236, 660, 372, 682)  LEN(3)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("401")          TABORDER(6)  IOORDER(4)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  1021(375, 660, 453, 678)  LEN(16)  IO_NUM|AL_CENTER||FA_FLASH    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONSTART_AW_
+menu.Data = "401"
+r0.Checked = True
+
+If Trim(S1301.Data) <> "" Then
+	BROWSER0.Navigate("http://comp.fnguide.com/svo/handbook_New/xml/etf_snapshot.asp?pGB=1&gicode=A"+Trim(S1301.Data)+"&cID=32&MenuYn=N&ReportGB=&NewMenuID="+Trim(menu.data)+"&stkGb=770")
+Else
+End If
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(BTN_MD)
+_AW_ONCLICK_AW_
+menu.Data = "401"
+r0.Checked = True
+
+If Trim(S1301.Data) <> "" Then
+	BROWSER0.Navigate("http://comp.fnguide.com/svo/handbook_New/xml/etf_snapshot.asp?pGB=1&gicode=A"+Trim(S1301.Data)+"&cID=32&MenuYn=N&ReportGB=&NewMenuID="+Trim(menu.data)+"&stkGb=770")
+Else
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(1301)
+_AW_ONCHANGE_AW_
+If Trim(S1301.Data) = "000000" Or Trim(S1301.Data) = "" Then
+	Exit Sub
+End If
+S1301.Trigger "",True
+
+menu.Data = "401"
+r0.Checked = True
+
+If Trim(S1301.Data) <> "" Then
+	BROWSER0.Navigate("http://comp.fnguide.com/svo/handbook_New/xml/etf_snapshot.asp?pGB=1&gicode=A"+Trim(S1301.Data)+"&cID=32&MenuYn=N&ReportGB=&NewMenuID="+Trim(menu.data)+"&stkGb=770")
+Else
+End If
+
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON0)
+_AW_ONCLICK_AW_
+Dim retn
+retn = SCREEN.GetCode(211, "1301", "hnam", 111 )
+If retn <> True Then
+       Exit Sub
+End If
+
+SCREEN.Send 2
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(r0)
+_AW_ONCLICK_AW_
+menu.Data = "401"
+
+If Trim(S1301.Data) <> "" Then
+	BROWSER0.Navigate("http://comp.fnguide.com/svo/handbook_New/xml/etf_snapshot.asp?pGB=1&gicode=A"+Trim(S1301.Data)+"&cID=32&MenuYn=N&ReportGB=&NewMenuID="+Trim(menu.data)+"&stkGb=770")
+Else
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(r1)
+_AW_ONCLICK_AW_
+menu.Data = "402"
+If Trim(S1301.Data) <> "" Then
+	BROWSER0.Navigate("http://comp.fnguide.com/svo/handbook_New/xml/etf_analysis.asp?pGB=1&gicode=A"+Trim(S1301.Data)+"&cID=32&MenuYn=N&ReportGB=&NewMenuID="+Trim(menu.data)+"&stkGb=770")
+Else
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

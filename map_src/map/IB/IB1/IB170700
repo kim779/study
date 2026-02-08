@@ -1,0 +1,223 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB170700)
+MAPSIZE(569, 850)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+TITLE("Untitled")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL1(-2, 28, 852, 546)  LIMAGE(0)  LINEW(4)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 130)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL0(0, 0, 850, 27)  LINETYPE(3)  LINECOLOR(64)      COLOR(66, 130)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL0(8, 3, 58, 23)  '계좌번호'  AL_LEFT  CUR(0)      COLOR(66, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+CONTROL  AN1A(62, 3, 202, 23)  |FA_SKIP  "CX_Account"  "/w0"  LEN(11)  EDIT_INPUT    COLOR(68, 130)  TABORDER(1)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  zPwd(337, 3, 397, 23)  LEN(8)  IO_MIXED|EDIT_INPUT|FA_PASSWD|FA_WRAP|FA_SKIP|FA_ENUM    COLOR(192, 130)  CUR(0)  TP_SUNKEN    ENCRYPT("en_accn")        TABORDER(2)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL3(287, 3, 335, 23)  '비밀번호'  AL_LEFT  CUR(0)      COLOR(208, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+OUT  ACNM(204, 3, 268, 23)  LEN(20)  IO_MIXED|AL_LEFT||FA_SKIP    COLOR(49, 130)  CUR(0)  LINECOLOR(48)          TABORDER(0)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL1(425, 3, 461, 24)  '결제일'  AL_LEFT  CUR(0)      COLOR(66, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  zBaseDt(462, 3, 548, 23)  LEN(8)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_DATE    COLOR(192, 130)  CUR(0)  TP_SUNKEN          EDITFORMAT("9999/99/99")  TABORDER(3)  IOORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  send_btn(775, 3, 807, 23)  '조회'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, BOLD)  FOCUS  COLOR(208, 186)  CUR(0)    "조회BTN.BMP"    TABORDER(4)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+BUTTON  next_btn(808, 3, 844, 23)  '다음'  TP_PUSH|IMAGETEXT|AL_STRETCH        FOCUS  COLOR(208, 186)  CUR(0)    "2btn.bmp"    TABORDER(5)  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+USRTAB  mainTab(6, 36, 683, 62)  FOCUS  INDEX(0)  COUNT(4)  AL_TOP  TAB_IMAGE      FONT("굴림체", 9, NORMAL)    COLOR(3, 70)  CUR(0)  TABIMAGE("tab.BMP")  FCOLOR(3, 71)  CAPTION(" 유가증권 ", " 투자신탁 ", " 선물옵션 ", " CD/CP/RP ")  TABINFO("1:0", "1:1", "1:2", "1:3")  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  obj(6, 61, 844, 538)    "IB170710"  TABORDER(6)  IOORDER(5)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+CONTROL  AN2A(62, 3, 202, 23)  |FA_SKIP  "CX_Account"  "/w0"  LEN(11)  EDIT_INPUT    COLOR(68, 130)  TABORDER(7)  IOORDER(6)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+CONTROL  AN50(62, 3, 202, 23)  |FA_SKIP  "CX_Account"  "/w0"  LEN(11)  EDIT_INPUT    COLOR(68, 130)  TABORDER(8)  IOORDER(7)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+CONTROL  AN20(62, 3, 202, 23)  |FA_SKIP  "CX_Account"  "/w0"  LEN(11)  EDIT_INPUT    COLOR(68, 130)  TABORDER(9)  IOORDER(8)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL8(-2, 545, 852, 569)  LIMAGE(0)  LINEW(3)  LINETYPE(4)  LINECOLOR(64)      COLOR(34, 232)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL7(4, 550, 18, 564)    |IMAGE|AL_STRETCH    COLOR(34, 232)  CUR(0)    "알림_ic.bmp"  ENABLE  &
+  VISIBLE  IMAGE  HINTTYPE(IH_NONE)
+PANEL  GUIDE(20, 550, 820, 566)        COLOR(34, 130)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  panel_bottom(0, 27, 1000, 28)        COLOR(64, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Option Explicit
+
+Dim acntArr, startFlag
+acntArr = Array("AN1A", "AN50", "AN20", "AN2A")		'유가증권, 투자신탁, 선물옵션, CD/CD/RP
+startFlag = 0
+
+Sub SetAcntCtrl()
+	'SYSTEM.Trace "SetAcntCtrl start"
+	ACNM.Clear
+	zPwd.Clear
+	next_btn.Enable = False
+	'obj.ClearAll 2
+
+	Dim ii, arrAcnt, viewAcnt, bVis
+	viewAcnt = Trim(acntArr(mainTab.ID))
+
+	For ii = LBound(acntArr) To UBound(acntArr)
+		arrAcnt = Trim(acntArr(ii))
+
+		If arrAcnt = viewAcnt Then
+			bVis = True
+		Else
+			bVis = False
+		End If
+
+		SCREEN.Object(arrAcnt).Visible bVis
+	Next
+
+	SCREEN.Proc "obj.setScreen", ""
+
+	If startFlag = 1 Then
+		Call Set_account(acntArr(mainTab.ID))
+	End If
+End Sub
+
+Sub Set_account(acntCtrl)
+	'SCREEN.ClearAll 0, 2
+
+	Dim acnt
+	Set acnt = SCREEN.Object(acntCtrl)
+
+	If acnt.Visible = False Then
+		Exit Sub
+	End If
+
+	startFlag = 1
+
+	If Len(Trim(acnt.Data)) = 11 Then
+		ACNM.Data = Trim(acnt.Name)
+		zPwd.Data = Trim(acnt.Password)
+
+		If SYSTEM.ConnectBy = 1 Then
+			If Len(Trim(zPwd.Data)) < 4 Then
+				zPwd.SetFocus
+				Exit Sub
+			End If
+		End If
+
+		SCREEN.Proc "obj.send_f", ""
+	Else
+		acnt.SetFocus
+	End If
+End Sub
+
+_AW_ONINDECLARE_AW_
+#Load IB888833
+
+_AW_ONENDSUB_AW_
+_AW_ONSTART_AW_
+Call Check_LoginType(zPwd)
+Call SetAcntCtrl()
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+SCREEN.OnSend = False
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(AN1A)
+_AW_ONCHANGE_AW_
+Call Set_account("AN1A")	'-- 계좌명, 비밀번호 설정
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(zPwd)
+_AW_ONKEYCHANGE_AW_
+If SCREEN.Key = "13" Then
+	If Len(Trim(zPwd.Data)) < 4 Then
+		Exit Sub
+	End If
+
+	SCREEN.Proc "obj.send_f", ""
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(zBaseDt)
+_AW_ONCHANGE_AW_
+SCREEN.Proc "obj.send_f", ""
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(send_btn)
+_AW_ONCLICK_AW_
+SCREEN.Proc "obj.send_f", ""
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(next_btn)
+_AW_ONCLICK_AW_
+SCREEN.Proc "obj.send_c", ""
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(mainTab)
+_AW_ONCLICK_AW_
+GUIDE.Text = ""
+Call SetAcntCtrl()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(AN2A)
+_AW_ONCHANGE_AW_
+Call Set_account("AN2A")
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(AN50)
+_AW_ONCHANGE_AW_
+Call Set_account("AN50")	'-- 계좌명, 비밀번호 설정
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(AN20)
+_AW_ONCHANGE_AW_
+Call Set_account("AN20")	'-- 계좌명, 비밀번호 설정
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

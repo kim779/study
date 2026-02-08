@@ -1,0 +1,765 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB950100)
+MAPSIZE(795, 1791)
+VERSION(001)
+MAPKIND(NORMAL)
+MAPGROUP(4)
+MAPDESC("사용자현황")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(XFONT)
+TITLE("[9501] 사용자현황")
+TOPATH(AXIS)
+METHOD(SEND)
+TRXCODE("pmho9099")
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL11(0, 792, 2000, 802)        COLOR(64, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL_bg(0, 0, 1883, 32)  LIMAGE(1)  LINEW(3)  LINETYPE(4)  LINECOLOR(64)      COLOR(66, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON1(1750, 6, 1787, 26)  '조회'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, BOLD)  COLOR(7, 186)  CUR(0)    "조회BTN.BMP"    TABORDER(3)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+EDIT  FUNC(575, 859, 621, 879)  LEN(1)  IO_ALPHA|EDIT_INOUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("X")          TABORDER(1)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  SVNO(623, 853, 681, 876)  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+COMBO  SVER(190, 857, 401, 877)  TP_NONE  LEN(15)  COUNT(0)  VCOUNT(10)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_NUM|EDIT_INPUT    COLOR(192, 130)  CUR(0)    TABORDER(2)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  L_SIZE(694, 863, 724, 875)  '0'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  BUTTON0(9, 6, 45, 26)  '축소'  TP_PUSH|IMAGETEXT|AL_CENTER        FOCUS  COLOR(208, 232)  CUR(0)    "2BTN.bmp"    TABORDER(4)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_STRING)  HELPTEXT("개별 장비 보기")HELPTEXT("개별 장비 보기")
+OUT  total(49, 6, 147, 26)  LEN(20)  IO_NUM|AL_CENTER|  FONT("굴림체", 9, BOLD)    COLOR(74, 192)  CUR(10)  LINECOLOR(230)          TABORDER(0)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  63C(1567, 6, 1657, 26)  LEN(20)  IO_NUM|AL_CENTER|  FONT("굴림체", 9, BOLD)    COLOR(74, 192)  CUR(0)  LINECOLOR(230)          TABORDER(0)  IOORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  IDC(1656, 6, 1746, 26)  LEN(20)  IO_NUM|AL_CENTER|  FONT("굴림체", 9, BOLD)    COLOR(74, 192)  CUR(0)  LINECOLOR(230)          TABORDER(0)  IOORDER(5)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+GRID  APIGRID(15, 880, 366, 1242)  VISIBLEROW(30)  CELLH(18)  MATRIX(2048, 10)  FIX(0)  MAINCOLOR(7, 0)  LINECOLOR(75)  FOCUSCOLOR(78)  FOCUSKIND(3)  ROWC(68, 77)  |FLEXIBLE|VSCROLL|INS_TOP|NO3D|RROW|XHLINE|PAGE|HEADER|GRFTEXT    &
+	COLINFO("Col3")  LEN(4)  WIDTH(40)  HEAD("서버")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("SEQN")  LEN(4)  WIDTH(44)  HEAD("단말")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_SORT  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("DANMAL")  LEN(10)  WIDTH(44)  HEAD("단말")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_REF)  COLHELPTEXT("Col1")  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT  |FA_SKIP    COLOR(68, 69)  COLCUR(0, 0)  REFERENCE(Col1)    COLUMN_VISIBLE  COLUMN_SORT  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("USID")  LEN(8)  WIDTH(50)  HEAD("접속ID")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_ALPHA|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  COLUMN_SORT  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("USRN")  LEN(16)  WIDTH(46)  HEAD("이름")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  COLUMN_SORT  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col0")  LEN(6)  WIDTH(56)  HEAD("접속시간")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_SKIP    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  EDITFORMAT("99:99:99")    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("PCNT")  LEN(10)  WIDTH(61)  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_SORT  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("QCNT")  LEN(15)  WIDTH(99)  HEAD("IP 주소")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_REF)  COLHELPTEXT("NAME")  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  COLUMN_SORT  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("NAME")  LEN(8)  WIDTH(58)  HEAD("TERM명")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_SORT  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("API/TS")  LEN(1)  WIDTH(35)  HEAD("API/TS")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    TABORDER(5)  IOORDER(9)  ENABLE
+GRID  TSGRID(375, 880, 726, 1242)  VISIBLEROW(30)  CELLH(18)  MATRIX(2048, 10)  FIX(0)  MAINCOLOR(7, 0)  LINECOLOR(75)  FOCUSCOLOR(78)  FOCUSKIND(3)  ROWC(68, 77)  |FLEXIBLE|VSCROLL|INS_TOP|NO3D|RROW|XHLINE|PAGE|HEADER|GRFTEXT    &
+	COLINFO("Col3")  LEN(4)  WIDTH(40)  HEAD("서버")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("SEQN")  LEN(4)  WIDTH(44)  HEAD("단말")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_SORT  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("DANMAL")  LEN(10)  WIDTH(44)  HEAD("단말")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_REF)  COLHELPTEXT("Col1")  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT  |FA_SKIP    COLOR(68, 69)  COLCUR(0, 0)  REFERENCE(Col1)    COLUMN_VISIBLE  COLUMN_SORT  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("USID")  LEN(8)  WIDTH(50)  HEAD("접속ID")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_ALPHA|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  COLUMN_SORT  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("USRN")  LEN(16)  WIDTH(46)  HEAD("이름")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  COLUMN_SORT  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col0")  LEN(6)  WIDTH(56)  HEAD("접속시간")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_SKIP    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  EDITFORMAT("99:99:99")    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("PCNT")  LEN(10)  WIDTH(61)  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_SORT  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("QCNT")  LEN(15)  WIDTH(99)  HEAD("IP 주소")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_REF)  COLHELPTEXT("NAME")  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  COLUMN_SORT  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("NAME")  LEN(8)  WIDTH(58)  HEAD("TERM명")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_SORT  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("API/TS")  LEN(1)  WIDTH(35)  HEAD("API/TS")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    TABORDER(6)  IOORDER(10)  ENABLE
+GRID  PTSGRID(735, 880, 1086, 1242)  VISIBLEROW(30)  CELLH(18)  MATRIX(2048, 10)  FIX(0)  MAINCOLOR(7, 0)  LINECOLOR(75)  FOCUSCOLOR(78)  FOCUSKIND(3)  ROWC(68, 77)  |FLEXIBLE|VSCROLL|INS_TOP|NO3D|RROW|XHLINE|PAGE|HEADER|GRFTEXT    &
+	COLINFO("Col3")  LEN(4)  WIDTH(40)  HEAD("서버")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("SEQN")  LEN(4)  WIDTH(44)  HEAD("단말")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_SORT  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("DANMAL")  LEN(10)  WIDTH(44)  HEAD("단말")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_REF)  COLHELPTEXT("Col1")  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT  |FA_SKIP    COLOR(68, 69)  COLCUR(0, 0)  REFERENCE(Col1)    COLUMN_VISIBLE  COLUMN_SORT  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("USID")  LEN(8)  WIDTH(50)  HEAD("접속ID")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_ALPHA|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  COLUMN_SORT  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("USRN")  LEN(16)  WIDTH(46)  HEAD("이름")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  COLUMN_SORT  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col0")  LEN(6)  WIDTH(56)  HEAD("접속시간")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_SKIP    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  EDITFORMAT("99:99:99")    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("PCNT")  LEN(10)  WIDTH(61)  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_SORT  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("QCNT")  LEN(15)  WIDTH(99)  HEAD("IP 주소")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_REF)  COLHELPTEXT("NAME")  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  COLUMN_SORT  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("NAME")  LEN(8)  WIDTH(58)  HEAD("TERM명")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_SORT  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("API/TS")  LEN(1)  WIDTH(35)  HEAD("API/TS")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    TABORDER(7)  IOORDER(11)  ENABLE
+LABEL  LABEL0(55, 860, 185, 875)  'API'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL1(435, 860, 565, 875)  'TS'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL2(795, 860, 925, 875)  'PTS'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  IDATA(719, 6, 814, 26)  LEN(20)  IO_NUM|AL_CENTER|  FONT("굴림체", 9, NORMAL)    COLOR(66, 130)  CUR(0)            TABORDER(0)  IOORDER(12)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  ADATA(819, 6, 914, 26)  LEN(20)  IO_NUM|AL_CENTER|  FONT("굴림체", 9, NORMAL)    COLOR(66, 130)  CUR(0)            TABORDER(0)  IOORDER(13)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  MSPDATA(919, 6, 1014, 26)  LEN(20)  IO_NUM|AL_CENTER|  FONT("굴림체", 9, NORMAL)    COLOR(66, 130)  CUR(0)            TABORDER(0)  IOORDER(14)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  MSTDATA(1240, 10, 1313, 30)  LEN(20)  IO_NUM|AL_CENTER|  FONT("굴림체", 9, NORMAL)    COLOR(66, 130)  CUR(0)            TABORDER(0)  IOORDER(15)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  APIDATA(315, 6, 388, 26)  LEN(20)  IO_NUM|AL_CENTER|  FONT("굴림체", 9, NORMAL)    COLOR(66, 130)  CUR(0)            TABORDER(0)  IOORDER(16)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  WTSDATA(481, 6, 554, 26)  LEN(20)  IO_NUM|AL_CENTER|  FONT("굴림체", 9, NORMAL)    COLOR(66, 130)  CUR(0)            TABORDER(0)  IOORDER(17)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  IONEDATA(554, 6, 627, 26)  LEN(20)  IO_NUM|AL_CENTER|  FONT("굴림체", 9, NORMAL)    COLOR(66, 130)  CUR(0)            TABORDER(0)  IOORDER(18)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL6(481, 6, 628, 26)  LINECOLOR(230)      COLOR(208, 69)  CUR(0)    AL_CENTER  FONT("굴림체", 9, BOLD)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+OUT  HTSDATA(242, 6, 315, 26)  LEN(20)  IO_NUM|AL_CENTER|  FONT("굴림체", 9, NORMAL)    COLOR(66, 130)  CUR(0)            TABORDER(0)  IOORDER(19)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL7(242, 6, 389, 26)  LINECOLOR(230)      COLOR(208, 69)  CUR(0)    AL_CENTER  FONT("굴림체", 9, BOLD)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+OBJECT  OBJ10(0, 32, 180, 412)    "IB950121"  TABORDER(8)  IOORDER(20)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  OBJ11(180, 32, 360, 412)    "IB950121"  TABORDER(9)  IOORDER(21)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  OBJ13(538, 32, 718, 412)    "IB950121"  TABORDER(10)  IOORDER(22)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  OBJ20(0, 412, 180, 792)    "IB950121"  TABORDER(11)  IOORDER(23)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  OBJ21(180, 412, 360, 792)    "IB950121"  TABORDER(12)  IOORDER(24)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  OBJ23(538, 412, 718, 792)    "IB950121"  TABORDER(13)  IOORDER(25)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  OBJ12(359, 32, 539, 412)    "IB950121"  TABORDER(14)  IOORDER(26)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  OBJ22(359, 412, 539, 792)    "IB950121"  TABORDER(15)  IOORDER(27)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  OBJ14(717, 32, 897, 412)    "IB950121"  TABORDER(16)  IOORDER(28)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  OBJ24(717, 412, 897, 792)    "IB950121"  TABORDER(17)  IOORDER(29)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  OBJ15(896, 32, 1076, 412)    "IB950121"  TABORDER(18)  IOORDER(30)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  OBJ25(896, 412, 1076, 792)    "IB950121"  TABORDER(19)  IOORDER(31)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  HTSCNT(152, 6, 243, 26)  LEN(20)  IO_NUM|AL_CENTER|  FONT("굴림체", 9, BOLD)    COLOR(74, 192)  CUR(10)  LINECOLOR(230)          TABORDER(0)  IOORDER(6)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  WTSCNT(393, 6, 482, 26)  LEN(20)  IO_NUM|AL_CENTER|  FONT("굴림체", 9, BOLD)    COLOR(74, 192)  CUR(10)  LINECOLOR(230)          TABORDER(0)  IOORDER(8)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  MTSCNT(632, 6, 721, 26)  LEN(20)  IO_NUM|AL_CENTER|  FONT("굴림체", 9, BOLD)    COLOR(74, 192)  CUR(0)  LINECOLOR(230)          TABORDER(0)  IOORDER(7)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  OBJ16(1075, 32, 1255, 412)    "IB950121"  TABORDER(20)  IOORDER(32)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  OBJ26(1075, 412, 1255, 792)    "IB950121"  TABORDER(21)  IOORDER(33)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  OBJ17(1254, 32, 1434, 412)    "IB950121"  TABORDER(22)  IOORDER(34)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  OBJ27(1254, 412, 1434, 792)    "IB950121"  TABORDER(23)  IOORDER(35)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  OBJ18(1433, 32, 1613, 412)    "IB950121"  TABORDER(24)  IOORDER(36)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  OBJ28(1433, 412, 1613, 792)    "IB950121"  TABORDER(25)  IOORDER(37)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  OBJ19(1612, 32, 1792, 412)    "IB950121"  TABORDER(26)  IOORDER(38)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  OBJ29(1612, 412, 1792, 792)    "IB950121"  TABORDER(27)  IOORDER(39)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  ISTKDATA(1019, 6, 1114, 26)  LEN(20)  IO_NUM|AL_CENTER|  FONT("굴림체", 9, NORMAL)    COLOR(66, 130)  CUR(0)            TABORDER(0)  IOORDER(40)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  ASTKDATA(1119, 6, 1214, 26)  LEN(20)  IO_NUM|AL_CENTER|  FONT("굴림체", 9, NORMAL)    COLOR(66, 130)  CUR(0)            TABORDER(0)  IOORDER(41)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL0(720, 6, 1225, 26)  LINECOLOR(230)      COLOR(208, 130)  CUR(0)    AL_CENTER  FONT("굴림체", 9, NORMAL)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+' OBJ별 서버 기입
+Sub InitOBJ()
+'	' FOR DEV
+'	SCREEN.Object("obj10.label0").Data = "BPDEV [172.16.202.106]"
+'	SCREEN.Object("obj11.label0").Data = "BPUAT [211.255.204.104]"
+'	' FOR DEV
+'	SCREEN.Object("obj10.SVIP").Data = "172.16.202.106"
+'	SCREEN.Object("obj11.SVIP").Data = "211.255.204.104"
+
+	' FOR REAL
+	SCREEN.Object("obj10.label0").Data = "BP10 [211.255.204.70]"
+	SCREEN.Object("obj11.label0").Data = "BP11 [211.255.204.71]"
+	SCREEN.Object("obj12.label0").Data = "BP12 [211.255.204.72]"
+	SCREEN.Object("obj13.label0").Data = "BP13 [211.255.204.73]"
+	SCREEN.Object("obj14.label0").Data = "BP14 [211.255.204.74]"
+	SCREEN.Object("obj15.label0").Data = "BP15 [211.255.204.75]"
+	SCREEN.Object("obj16.label0").Data = "BP16 [211.255.204.76]"
+	SCREEN.Object("obj17.label0").Data = "BP17 [211.255.204.77]"
+	SCREEN.Object("obj18.label0").Data = "BP18 [211.255.204.78]"
+	SCREEN.Object("obj19.label0").Data = "BP19 [211.255.204.79]"
+	' FOR REAL
+	SCREEN.Object("obj20.label0").Data = "BP20 [172.16.222.33]"
+	SCREEN.Object("obj21.label0").Data = "BP21 [172.16.222.34]"
+	SCREEN.Object("obj22.label0").Data = "BP22 [172.16.222.35]"
+	SCREEN.Object("obj23.label0").Data = "BP23 [172.16.222.36]"
+	SCREEN.Object("obj24.label0").Data = "BP24 [172.16.222.37]"
+	SCREEN.Object("obj25.label0").Data = "BP25 [172.16.222.38]"
+	SCREEN.Object("obj26.label0").Data = "BP26 [172.16.222.39]"
+	SCREEN.Object("obj27.label0").Data = "BP27 [172.16.222.57]"
+	SCREEN.Object("obj28.label0").Data = "BP28 [172.16.222.58]"
+	SCREEN.Object("obj29.label0").Data = "BP29 [172.16.222.59]"
+	' FOR REAL
+	SCREEN.Object("obj10.SVIP").Data = "211.255.204.70"
+	SCREEN.Object("obj11.SVIP").Data = "211.255.204.71"
+	SCREEN.Object("obj12.SVIP").Data = "211.255.204.72"
+	SCREEN.Object("obj13.SVIP").Data = "211.255.204.73"
+	SCREEN.Object("obj14.SVIP").Data = "211.255.204.74"
+	SCREEN.Object("obj15.SVIP").Data = "211.255.204.75"
+	SCREEN.Object("obj16.SVIP").Data = "211.255.204.76"
+	SCREEN.Object("obj17.SVIP").Data = "211.255.204.77"
+	SCREEN.Object("obj18.SVIP").Data = "211.255.204.78"
+	SCREEN.Object("obj19.SVIP").Data = "211.255.204.79"
+	' FOR REAL
+	SCREEN.Object("obj20.SVIP").Data = "172.16.222.33"
+	SCREEN.Object("obj21.SVIP").Data = "172.16.222.34"
+	SCREEN.Object("obj22.SVIP").Data = "172.16.222.35"
+	SCREEN.Object("obj23.SVIP").Data = "172.16.222.36"
+	SCREEN.Object("obj24.SVIP").Data = "172.16.222.37"
+	SCREEN.Object("obj25.SVIP").Data = "172.16.222.38"
+	SCREEN.Object("obj26.SVIP").Data = "172.16.222.39"
+	SCREEN.Object("obj27.SVIP").Data = "172.16.222.57"
+	SCREEN.Object("obj28.SVIP").Data = "172.16.222.58"
+	SCREEN.Object("obj29.SVIP").Data = "172.16.222.59"
+
+
+
+End Sub
+
+
+Function GetCount(data)
+	Dim tmp
+	GetCount = 0
+
+	data =  Trim(data)
+
+	If IsNull(data) Or Len(data)=0 Then
+		Exit Function
+	Else
+		GetCount = CLng(data)
+	End If
+
+End Function
+
+Sub CalcTotal()
+	'   본사                                                                             	   IDC
+	Dim c10,c11, c12, c13, c14, c15, c16, c17, c18, c19,                                 	   c20,c21, c22, c23, c24, c25, c26, c27, c28, c29
+	Dim	hts, hts10,hts11, hts12, hts13, hts14, hts15, hts16, hts17, hts18, hts19,              hts20,hts21, hts22, hts23, hts24, hts25, hts26, hts27, hts28, hts29
+	Dim	wts, wts10,wts11, wts12, wts13, wts14, wts15, wts16, wts17, wts18, wts19,              wts20,wts21, wts22, wts23, wts24, wts25, wts26, wts27, wts28, wts29
+	Dim	ione, ione10,ione11, ione12, ione13, ione14, ione15, ione16, ione17, ione18, ione19,   ione20,ione21, ione22, ione23, ione24, ione25, ione26, ione27, ione28, ione29
+	Dim	api, api10,api11, api12, api13, api14, api15, api16, api17, api18, api19,              api20,api21, api22, api23, api24, api25, api26, api27, api28, api29
+	Dim	msp, msp10,msp11, msp12, msp13, msp14, msp15, msp16, msp17, msp18, msp19,              msp20,msp21, msp22, msp23, msp24, msp25, msp26, msp27, msp28, msp29
+	Dim	mst, mst10,mst11, mst12, mst13, mst14, mst15, mst16, mst17, mst18, mst19,              mst20,mst21, mst22, mst23, mst24, mst25, mst26, mst27, mst28, mst29
+	Dim Iphone,   Iphone10,  Iphone11,  Iphone12,  Iphone13,  Iphone14,  Iphone15,  Iphone16,  Iphone17,  Iphone18,  Iphone19
+	Dim           Iphone20,  Iphone21,  Iphone22,  Iphone23,  Iphone24,  Iphone25,  Iphone26,  Iphone27,  Iphone28,  Iphone29
+	Dim Android,  Android10, Android11, Android12, Android13, Android14, Android15, Android16, Android17, Android18, Android19
+	Dim           Android20, Android21, Android22, Android23, Android24, Android25, Android26, Android27, Android28, Android29
+	Dim unknown,  unknown10, unknown11, unknown12, unknown13, unknown14, unknown15, unknown16, unknown17, unknown18, unknown19
+	Dim           unknown20, unknown21, unknown22, unknown23, unknown24, unknown25, unknown26, unknown27, unknown28, unknown29
+
+	' I-One Stock 신 MTS 매체 추가
+	Dim istk,   istk10, istk11, istk12, istk13, istk14, istk15, istk16, istk17, istk18, istk19
+	Dim         istk20, istk21, istk22, istk23, istk24, istk25, istk26, istk27, istk28, istk29
+	Dim astk,   astk10, astk11, astk12, astk13, astk14, astk15, astk16, astk17, astk18, astk19
+	Dim         astk20, astk21, astk22, astk23, astk24, astk25, astk26, astk27, astk28, astk29
+
+	' 전체 사용자 수
+	c10 = GetCount(SCREEN.Object("obj10.output0").Data)
+	c11 = GetCount(SCREEN.Object("obj11.output0").Data)
+	c12 = GetCount(SCREEN.Object("obj12.output0").Data)
+	c13 = GetCount(SCREEN.Object("obj13.output0").Data)
+	c14 = GetCount(SCREEN.Object("obj14.output0").Data)
+	c15 = GetCount(SCREEN.Object("obj15.output0").Data)
+	c16 = GetCount(SCREEN.Object("obj16.output0").Data)
+	c17 = GetCount(SCREEN.Object("obj17.output0").Data)
+	c18 = GetCount(SCREEN.Object("obj18.output0").Data)
+	c19 = GetCount(SCREEN.Object("obj19.output0").Data)
+
+	c20 = GetCount(SCREEN.Object("obj20.output0").Data)
+	c21 = GetCount(SCREEN.Object("obj21.output0").Data)
+	c22 = GetCount(SCREEN.Object("obj22.output0").Data)
+	c23 = GetCount(SCREEN.Object("obj23.output0").Data)
+	c24 = GetCount(SCREEN.Object("obj24.output0").Data)
+	c25 = GetCount(SCREEN.Object("obj25.output0").Data)
+	c26 = GetCount(SCREEN.Object("obj26.output0").Data)
+	c27 = GetCount(SCREEN.Object("obj27.output0").Data)
+	c28 = GetCount(SCREEN.Object("obj28.output0").Data)
+	c29 = GetCount(SCREEN.Object("obj29.output0").Data)
+
+	' HTS 사용자 수
+	hts10 = GetCount(SCREEN.Object("obj10.htscnt").Data)
+	hts11 = GetCount(SCREEN.Object("obj11.htscnt").Data)
+	hts12 = GetCount(SCREEN.Object("obj12.htscnt").Data)
+	hts13 = GetCount(SCREEN.Object("obj13.htscnt").Data)
+	hts14 = GetCount(SCREEN.Object("obj14.htscnt").Data)
+	hts15 = GetCount(SCREEN.Object("obj15.htscnt").Data)
+	hts16 = GetCount(SCREEN.Object("obj16.htscnt").Data)
+	hts17 = GetCount(SCREEN.Object("obj17.htscnt").Data)
+	hts18 = GetCount(SCREEN.Object("obj18.htscnt").Data)
+	hts19 = GetCount(SCREEN.Object("obj19.htscnt").Data)
+
+	hts20 = GetCount(SCREEN.Object("obj20.htscnt").Data)
+	hts21 = GetCount(SCREEN.Object("obj21.htscnt").Data)
+	hts22 = GetCount(SCREEN.Object("obj22.htscnt").Data)
+	hts23 = GetCount(SCREEN.Object("obj23.htscnt").Data)
+	hts24 = GetCount(SCREEN.Object("obj24.htscnt").Data)
+	hts25 = GetCount(SCREEN.Object("obj25.htscnt").Data)
+	hts26 = GetCount(SCREEN.Object("obj26.htscnt").Data)
+	hts27 = GetCount(SCREEN.Object("obj27.htscnt").Data)
+	hts28 = GetCount(SCREEN.Object("obj28.htscnt").Data)
+	hts29 = GetCount(SCREEN.Object("obj29.htscnt").Data)
+
+	' 아이폰 사용자 수
+	Iphone10 = GetCount(SCREEN.Object("obj10.iphonecnt").Data)
+	Iphone11 = GetCount(SCREEN.Object("obj11.iphonecnt").Data)
+	Iphone12 = GetCount(SCREEN.Object("obj12.iphonecnt").Data)
+	Iphone13 = GetCount(SCREEN.Object("obj13.iphonecnt").Data)
+	Iphone14 = GetCount(SCREEN.Object("obj14.iphonecnt").Data)
+	Iphone15 = GetCount(SCREEN.Object("obj15.iphonecnt").Data)
+	Iphone16 = GetCount(SCREEN.Object("obj16.iphonecnt").Data)
+	Iphone17 = GetCount(SCREEN.Object("obj17.iphonecnt").Data)
+	Iphone18 = GetCount(SCREEN.Object("obj18.iphonecnt").Data)
+	Iphone19 = GetCount(SCREEN.Object("obj19.iphonecnt").Data)
+
+	Iphone20 = GetCount(SCREEN.Object("obj20.iphonecnt").Data)
+	Iphone21 = GetCount(SCREEN.Object("obj21.iphonecnt").Data)
+	Iphone22 = GetCount(SCREEN.Object("obj22.iphonecnt").Data)
+	Iphone23 = GetCount(SCREEN.Object("obj23.iphonecnt").Data)
+	Iphone24 = GetCount(SCREEN.Object("obj24.iphonecnt").Data)
+	Iphone25 = GetCount(SCREEN.Object("obj25.iphonecnt").Data)
+	Iphone26 = GetCount(SCREEN.Object("obj26.iphonecnt").Data)
+	Iphone27 = GetCount(SCREEN.Object("obj27.iphonecnt").Data)
+	Iphone28 = GetCount(SCREEN.Object("obj28.iphonecnt").Data)
+	Iphone29 = GetCount(SCREEN.Object("obj29.iphonecnt").Data)
+
+	' 안드로이드 사용자 수
+	Android10 = GetCount(SCREEN.Object("obj10.androidcnt").Data)
+	Android11 = GetCount(SCREEN.Object("obj11.androidcnt").Data)
+	Android12 = GetCount(SCREEN.Object("obj12.androidcnt").Data)
+	Android13 = GetCount(SCREEN.Object("obj13.androidcnt").Data)
+	Android14 = GetCount(SCREEN.Object("obj14.androidcnt").Data)
+	Android15 = GetCount(SCREEN.Object("obj15.androidcnt").Data)
+	Android16 = GetCount(SCREEN.Object("obj16.androidcnt").Data)
+	Android17 = GetCount(SCREEN.Object("obj17.androidcnt").Data)
+	Android18 = GetCount(SCREEN.Object("obj18.androidcnt").Data)
+	Android19 = GetCount(SCREEN.Object("obj19.androidcnt").Data)
+
+	Android20 = GetCount(SCREEN.Object("obj20.androidcnt").Data)
+	Android21 = GetCount(SCREEN.Object("obj21.androidcnt").Data)
+	Android22 = GetCount(SCREEN.Object("obj22.androidcnt").Data)
+	Android23 = GetCount(SCREEN.Object("obj23.androidcnt").Data)
+	Android24 = GetCount(SCREEN.Object("obj24.androidcnt").Data)
+	Android25 = GetCount(SCREEN.Object("obj25.androidcnt").Data)
+	Android26 = GetCount(SCREEN.Object("obj26.androidcnt").Data)
+	Android27 = GetCount(SCREEN.Object("obj27.androidcnt").Data)
+	Android28 = GetCount(SCREEN.Object("obj28.androidcnt").Data)
+	Android29 = GetCount(SCREEN.Object("obj29.androidcnt").Data)
+
+	' I-One Stock 아이폰 사용자 수
+	istk10 = GetCount(SCREEN.Object("obj10.istkcnt").Data)
+	istk11 = GetCount(SCREEN.Object("obj11.istkcnt").Data)
+	istk12 = GetCount(SCREEN.Object("obj12.istkcnt").Data)
+	istk13 = GetCount(SCREEN.Object("obj13.istkcnt").Data)
+	istk14 = GetCount(SCREEN.Object("obj14.istkcnt").Data)
+	istk15 = GetCount(SCREEN.Object("obj15.istkcnt").Data)
+	istk16 = GetCount(SCREEN.Object("obj16.istkcnt").Data)
+	istk17 = GetCount(SCREEN.Object("obj17.istkcnt").Data)
+	istk18 = GetCount(SCREEN.Object("obj18.istkcnt").Data)
+	istk19 = GetCount(SCREEN.Object("obj19.istkcnt").Data)
+
+	istk20 = GetCount(SCREEN.Object("obj20.istkcnt").Data)
+	istk21 = GetCount(SCREEN.Object("obj21.istkcnt").Data)
+	istk22 = GetCount(SCREEN.Object("obj22.istkcnt").Data)
+	istk23 = GetCount(SCREEN.Object("obj23.istkcnt").Data)
+	istk24 = GetCount(SCREEN.Object("obj24.istkcnt").Data)
+	istk25 = GetCount(SCREEN.Object("obj25.istkcnt").Data)
+	istk26 = GetCount(SCREEN.Object("obj26.istkcnt").Data)
+	istk27 = GetCount(SCREEN.Object("obj27.istkcnt").Data)
+	istk28 = GetCount(SCREEN.Object("obj28.istkcnt").Data)
+	istk29 = GetCount(SCREEN.Object("obj29.istkcnt").Data)
+
+	' I-One Stock 안드로이드 사용자 수
+	astk10 = GetCount(SCREEN.Object("obj10.astkcnt").Data)
+	astk11 = GetCount(SCREEN.Object("obj11.astkcnt").Data)
+	astk12 = GetCount(SCREEN.Object("obj12.astkcnt").Data)
+	astk13 = GetCount(SCREEN.Object("obj13.astkcnt").Data)
+	astk14 = GetCount(SCREEN.Object("obj14.astkcnt").Data)
+	astk15 = GetCount(SCREEN.Object("obj15.astkcnt").Data)
+	astk16 = GetCount(SCREEN.Object("obj16.astkcnt").Data)
+	astk17 = GetCount(SCREEN.Object("obj17.astkcnt").Data)
+	astk18 = GetCount(SCREEN.Object("obj18.astkcnt").Data)
+	astk19 = GetCount(SCREEN.Object("obj19.astkcnt").Data)
+
+	astk20 = GetCount(SCREEN.Object("obj20.astkcnt").Data)
+	astk21 = GetCount(SCREEN.Object("obj21.astkcnt").Data)
+	astk22 = GetCount(SCREEN.Object("obj22.astkcnt").Data)
+	astk23 = GetCount(SCREEN.Object("obj23.astkcnt").Data)
+	astk24 = GetCount(SCREEN.Object("obj24.astkcnt").Data)
+	astk25 = GetCount(SCREEN.Object("obj25.astkcnt").Data)
+	astk26 = GetCount(SCREEN.Object("obj26.astkcnt").Data)
+	astk27 = GetCount(SCREEN.Object("obj27.astkcnt").Data)
+	astk28 = GetCount(SCREEN.Object("obj28.astkcnt").Data)
+	astk29 = GetCount(SCREEN.Object("obj29.astkcnt").Data)
+
+
+	' WTS 홈페이지 사용자 수
+	wts10 = GetCount(SCREEN.Object("obj10.wtscnt").Data)
+	wts11 = GetCount(SCREEN.Object("obj11.wtscnt").Data)
+	wts12 = GetCount(SCREEN.Object("obj12.wtscnt").Data)
+	wts13 = GetCount(SCREEN.Object("obj13.wtscnt").Data)
+	wts14 = GetCount(SCREEN.Object("obj14.wtscnt").Data)
+	wts15 = GetCount(SCREEN.Object("obj15.wtscnt").Data)
+	wts16 = GetCount(SCREEN.Object("obj16.wtscnt").Data)
+	wts17 = GetCount(SCREEN.Object("obj17.wtscnt").Data)
+	wts18 = GetCount(SCREEN.Object("obj18.wtscnt").Data)
+	wts19 = GetCount(SCREEN.Object("obj19.wtscnt").Data)
+
+	wts20 = GetCount(SCREEN.Object("obj20.wtscnt").Data)
+	wts21 = GetCount(SCREEN.Object("obj21.wtscnt").Data)
+	wts22 = GetCount(SCREEN.Object("obj22.wtscnt").Data)
+	wts23 = GetCount(SCREEN.Object("obj23.wtscnt").Data)
+	wts24 = GetCount(SCREEN.Object("obj24.wtscnt").Data)
+	wts25 = GetCount(SCREEN.Object("obj25.wtscnt").Data)
+	wts26 = GetCount(SCREEN.Object("obj26.wtscnt").Data)
+	wts27 = GetCount(SCREEN.Object("obj27.wtscnt").Data)
+	wts28 = GetCount(SCREEN.Object("obj28.wtscnt").Data)
+	wts29 = GetCount(SCREEN.Object("obj29.wtscnt").Data)
+
+	' WTS 모바일WTS(IONEBANK) 사용자 수
+	ione10 = GetCount(SCREEN.Object("obj10.ionecnt").Data)
+	ione11 = GetCount(SCREEN.Object("obj11.ionecnt").Data)
+	ione12 = GetCount(SCREEN.Object("obj12.ionecnt").Data)
+	ione13 = GetCount(SCREEN.Object("obj13.ionecnt").Data)
+	ione14 = GetCount(SCREEN.Object("obj14.ionecnt").Data)
+	ione15 = GetCount(SCREEN.Object("obj15.ionecnt").Data)
+	ione16 = GetCount(SCREEN.Object("obj16.ionecnt").Data)
+	ione17 = GetCount(SCREEN.Object("obj17.ionecnt").Data)
+	ione18 = GetCount(SCREEN.Object("obj18.ionecnt").Data)
+	ione19 = GetCount(SCREEN.Object("obj19.ionecnt").Data)
+
+	ione20 = GetCount(SCREEN.Object("obj20.ionecnt").Data)
+	ione21 = GetCount(SCREEN.Object("obj21.ionecnt").Data)
+	ione22 = GetCount(SCREEN.Object("obj22.ionecnt").Data)
+	ione23 = GetCount(SCREEN.Object("obj23.ionecnt").Data)
+	ione24 = GetCount(SCREEN.Object("obj24.ionecnt").Data)
+	ione25 = GetCount(SCREEN.Object("obj25.ionecnt").Data)
+	ione26 = GetCount(SCREEN.Object("obj26.ionecnt").Data)
+	ione27 = GetCount(SCREEN.Object("obj27.ionecnt").Data)
+	ione28 = GetCount(SCREEN.Object("obj28.ionecnt").Data)
+	ione29 = GetCount(SCREEN.Object("obj29.ionecnt").Data)
+
+	' API 사용자 수
+	api10 = GetCount(SCREEN.Object("obj10.apicnt").Data)
+	api11 = GetCount(SCREEN.Object("obj11.apicnt").Data)
+	api12 = GetCount(SCREEN.Object("obj12.apicnt").Data)
+	api13 = GetCount(SCREEN.Object("obj13.apicnt").Data)
+	api14 = GetCount(SCREEN.Object("obj14.apicnt").Data)
+	api15 = GetCount(SCREEN.Object("obj15.apicnt").Data)
+	api16 = GetCount(SCREEN.Object("obj16.apicnt").Data)
+	api17 = GetCount(SCREEN.Object("obj17.apicnt").Data)
+	api18 = GetCount(SCREEN.Object("obj18.apicnt").Data)
+	api19 = GetCount(SCREEN.Object("obj19.apicnt").Data)
+
+	api20 = GetCount(SCREEN.Object("obj20.apicnt").Data)
+	api21 = GetCount(SCREEN.Object("obj21.apicnt").Data)
+	api22 = GetCount(SCREEN.Object("obj22.apicnt").Data)
+	api23 = GetCount(SCREEN.Object("obj23.apicnt").Data)
+	api24 = GetCount(SCREEN.Object("obj24.apicnt").Data)
+	api25 = GetCount(SCREEN.Object("obj25.apicnt").Data)
+	api26 = GetCount(SCREEN.Object("obj26.apicnt").Data)
+	api27 = GetCount(SCREEN.Object("obj27.apicnt").Data)
+	api28 = GetCount(SCREEN.Object("obj28.apicnt").Data)
+	api29 = GetCount(SCREEN.Object("obj29.apicnt").Data)
+
+	' 증권통 사용자 수
+	mst10 = GetCount(SCREEN.Object("obj10.mstcnt").Data)
+	mst11 = GetCount(SCREEN.Object("obj11.mstcnt").Data)
+	mst12 = GetCount(SCREEN.Object("obj12.mstcnt").Data)
+	mst13 = GetCount(SCREEN.Object("obj13.mstcnt").Data)
+	mst14 = GetCount(SCREEN.Object("obj14.mstcnt").Data)
+	mst15 = GetCount(SCREEN.Object("obj15.mstcnt").Data)
+	mst16 = GetCount(SCREEN.Object("obj16.mstcnt").Data)
+	mst17 = GetCount(SCREEN.Object("obj17.mstcnt").Data)
+	mst18 = GetCount(SCREEN.Object("obj18.mstcnt").Data)
+	mst19 = GetCount(SCREEN.Object("obj19.mstcnt").Data)
+
+	mst20 = GetCount(SCREEN.Object("obj20.mstcnt").Data)
+	mst21 = GetCount(SCREEN.Object("obj21.mstcnt").Data)
+	mst22 = GetCount(SCREEN.Object("obj22.mstcnt").Data)
+	mst23 = GetCount(SCREEN.Object("obj23.mstcnt").Data)
+	mst24 = GetCount(SCREEN.Object("obj24.mstcnt").Data)
+	mst25 = GetCount(SCREEN.Object("obj25.mstcnt").Data)
+	mst26 = GetCount(SCREEN.Object("obj26.mstcnt").Data)
+	mst27 = GetCount(SCREEN.Object("obj27.mstcnt").Data)
+	mst28 = GetCount(SCREEN.Object("obj28.mstcnt").Data)
+	mst29 = GetCount(SCREEN.Object("obj29.mstcnt").Data)
+
+	' 증권플러스 (구카카오스톡) 사용자 수
+	msp10 = GetCount(SCREEN.Object("obj10.mspcnt").Data)
+	msp11 = GetCount(SCREEN.Object("obj11.mspcnt").Data)
+	msp12 = GetCount(SCREEN.Object("obj12.mspcnt").Data)
+	msp13 = GetCount(SCREEN.Object("obj13.mspcnt").Data)
+	msp14 = GetCount(SCREEN.Object("obj14.mspcnt").Data)
+	msp15 = GetCount(SCREEN.Object("obj15.mspcnt").Data)
+	msp16 = GetCount(SCREEN.Object("obj16.mspcnt").Data)
+	msp17 = GetCount(SCREEN.Object("obj17.mspcnt").Data)
+	msp18 = GetCount(SCREEN.Object("obj18.mspcnt").Data)
+	msp19 = GetCount(SCREEN.Object("obj19.mspcnt").Data)
+
+	msp20 = GetCount(SCREEN.Object("obj20.mspcnt").Data)
+	msp21 = GetCount(SCREEN.Object("obj21.mspcnt").Data)
+	msp22 = GetCount(SCREEN.Object("obj22.mspcnt").Data)
+	msp23 = GetCount(SCREEN.Object("obj23.mspcnt").Data)
+	msp24 = GetCount(SCREEN.Object("obj24.mspcnt").Data)
+	msp25 = GetCount(SCREEN.Object("obj25.mspcnt").Data)
+	msp26 = GetCount(SCREEN.Object("obj26.mspcnt").Data)
+	msp27 = GetCount(SCREEN.Object("obj27.mspcnt").Data)
+	msp28 = GetCount(SCREEN.Object("obj28.mspcnt").Data)
+	msp29 = GetCount(SCREEN.Object("obj29.mspcnt").Data)
+
+	' 미상
+	unknown10 = GetCount(SCREEN.Object("obj10.unknowncnt").Data)
+	unknown11 = GetCount(SCREEN.Object("obj11.unknowncnt").Data)
+	unknown12 = GetCount(SCREEN.Object("obj12.unknowncnt").Data)
+	unknown13 = GetCount(SCREEN.Object("obj13.unknowncnt").Data)
+	unknown14 = GetCount(SCREEN.Object("obj14.unknowncnt").Data)
+	unknown15 = GetCount(SCREEN.Object("obj15.unknowncnt").Data)
+	unknown16 = GetCount(SCREEN.Object("obj16.unknowncnt").Data)
+	unknown17 = GetCount(SCREEN.Object("obj17.unknowncnt").Data)
+	unknown18 = GetCount(SCREEN.Object("obj18.unknowncnt").Data)
+	unknown19 = GetCount(SCREEN.Object("obj19.unknowncnt").Data)
+
+	unknown20 = GetCount(SCREEN.Object("obj20.unknowncnt").Data)
+	unknown21 = GetCount(SCREEN.Object("obj21.unknowncnt").Data)
+	unknown22 = GetCount(SCREEN.Object("obj22.unknowncnt").Data)
+	unknown23 = GetCount(SCREEN.Object("obj23.unknowncnt").Data)
+	unknown24 = GetCount(SCREEN.Object("obj24.unknowncnt").Data)
+	unknown25 = GetCount(SCREEN.Object("obj25.unknowncnt").Data)
+	unknown26 = GetCount(SCREEN.Object("obj26.unknowncnt").Data)
+	unknown27 = GetCount(SCREEN.Object("obj27.unknowncnt").Data)
+	unknown28 = GetCount(SCREEN.Object("obj28.unknowncnt").Data)
+	unknown29 = GetCount(SCREEN.Object("obj29.unknowncnt").Data)
+
+	' 증권플러스 전체/본사/IDC
+	MSP     = msp10 + msp11 + msp12 + msp13 + msp14 + msp15 + msp16 + msp17 + msp18 + msp19 + msp20 + msp21 + msp22 + msp23 + msp24 + msp25 + msp26 + msp27 + msp28 + msp29
+
+	' 증권플러스 MSP 제외 :: 중복 계산되는중
+	total.Data = "전체:"&FormatNumber(c10 + c11 + c12 + c13 + c14 + c15 + c16 + c17 + c18 + c19 + c20 + c21 + c22 + c23 + c24 + c25 + c26 + c27 + c28 + c29, 0)
+	S63C.Data  = "본사:"&FormatNumber(c10 + c11 + c12 + c13 + c14 + c15 + c16 + c17 + c18 + c19, 0)
+	IDC.Data   = "IDC:" &FormatNumber(c20 + c21 + c22 + c23 + c24 + c25 + c26 + c27 + c28 + c29, 0)
+
+	hts     = hts10 + hts11 + hts12 + hts13 + hts14 + hts15 + hts16 + hts17 + hts18 + hts19 + hts20 + hts21 + hts22 + hts23 + hts24 + hts25 + hts26 + hts27 + hts28 + hts29
+	wts     = wts10 + wts11 + wts12 + wts13 + wts14 + wts15 + wts16 + wts17 + wts18 + wts19 + wts20 + wts21 + wts22 + wts23 + wts24 + wts25 + wts26 + wts27 + wts28 + wts29
+	API     = api10 + api11 + api12 + api13 + api14 + api15 + api16 + api17 + api18 + api19 + api20 + api21 + api22 + api23 + api24 + api25 + api26 + api27 + api28 + api29
+	MST     = mst10 + mst11 + mst12 + mst13 + mst14 + mst15 + mst16 + mst17 + mst18 + mst19 + mst20 + mst21 + mst22 + mst23 + mst24 + mst25 + mst26 + mst27 + mst28 + mst29
+	MSP     = msp10 + msp11 + msp12 + msp13 + msp14 + msp15 + msp16 + msp17 + msp18 + msp19 + msp20 + msp21 + msp22 + msp23 + msp24 + msp25 + msp26 + msp27 + msp28 + msp29
+	ione    = ione10 + ione11 + ione12 + ione13 + ione14 + ione15 + ione16 + ione17 + ione18 + ione19 + ione20 + ione21 + ione22 + ione23 + ione24 + ione25 + ione26 + ione27 + ione28 + ione29
+	Iphone  = Iphone10 + Iphone11 + Iphone12 + Iphone13 + Iphone14 + Iphone15 + Iphone16 + Iphone17 + Iphone18 + Iphone19 + Iphone20 + Iphone21 + Iphone22 + Iphone23 + Iphone24 + Iphone25 + Iphone26 + Iphone27 + Iphone28 + Iphone29
+	Android = Android10 + Android11 + Android12 + Android13 + Android14 + Android15 + Android16 + Android17 + Android18 + Android19 + Android20 + Android21 + Android22 + Android23 + Android24 + Android25 + Android26 + Android27 + Android28 + Android29
+	unknown = unknown10 + unknown11 + unknown12 + unknown13 + unknown14 + unknown15 + unknown16 + unknown17 + unknown18 + unknown19 + unknown20 + unknown21 + unknown22 + unknown23 + unknown24 + unknown25 + unknown26 + unknown27 + unknown28 + unknown29
+
+	' I-One Stock 신 MTS 매체 합산
+	istk  = istk10 + istk11 + istk12 + istk13 + istk14 + istk15 + istk16 + istk17 + istk18 + istk19 + istk20 + istk21 + istk22 + istk23 + istk24 + istk25 + istk26 + istk27 + istk28 + istk29
+	astk = astk10 + astk11 + astk12 + astk13 + astk14 + astk15 + astk16 + astk17 + astk18 + astk19 + astk20 + astk21 + astk22 + astk23 + astk24 + astk25 + astk26 + astk27 + astk28 + astk29
+
+	HTSCNT.Data = "HTS:"&FormatNumber(hts + API , 0)
+	WTSCNT.Data = "WTS:"&FormatNumber(wts + ione, 0)
+	MTSCNT.Data = "MTS:"&FormatNumber(Iphone + Android + MST + MSP + istk + astk, 0)
+	Iphone      = FormatNumber(Iphone, 0)
+	Android	    = FormatNumber(Android, 0)
+	MST         = FormatNumber(MST, 0)
+	MSP         = FormatNumber(MSP, 0)
+	API         = FormatNumber(API, 0)
+	istk        = FormatNumber(istk, 0)
+	astk	    = FormatNumber(astk, 0)
+
+	HTSDATA.Data = "PC:"&FormatNumber(hts , 0)
+	APIDATA.Data = "API:"&FormatNumber(API , 0)
+
+	WTSDATA.Data = "HOME:"&FormatNumber(wts , 0)
+	IONEDATA.Data = "IONE:"&FormatNumber(ione , 0)
+
+	IDATA.Data   = "(구)아:" & Trim(Iphone)
+	ADATA.Data   = "(구)안:" & Trim(Android)
+	MSPDATA.Data = "플:" & Trim(MSP)
+	MSTDATA.Data = "통:" & Trim(MST)
+	ISTKDATA.Data = "(신)아:" & Trim(istk)
+	ASTKDATA.Data = "(신)안:" & Trim(astk)
+
+End Sub
+
+Sub DetailView(gubn)
+	SCREEN.CreateWindow 2, "IB950122 /t /s /p99 /d", "Gubn" & vbTab & gubn & vbLf
+End Sub
+
+_AW_ONSTART_AW_
+Call InitOBJ()
+
+SCREEN.SetTimer 1, True
+SCREEN.Send 0
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+SCREEN.Onsend = False
+total.Clear
+
+OBJ10.proc "send_f", ""
+OBJ11.proc "send_f", ""
+OBJ12.proc "send_f", ""
+OBJ13.proc "send_f", ""
+OBJ14.proc "send_f", ""
+OBJ15.proc "send_f", ""
+OBJ16.proc "send_f", ""
+OBJ17.proc "send_f", ""
+OBJ18.proc "send_f", ""
+OBJ19.proc "send_f", ""
+
+OBJ20.proc "send_f", ""
+OBJ21.proc "send_f", ""
+OBJ22.proc "send_f", ""
+OBJ23.proc "send_f", ""
+OBJ24.proc "send_f", ""
+OBJ25.proc "send_f", ""
+OBJ26.proc "send_f", ""
+OBJ27.proc "send_f", ""
+OBJ28.proc "send_f", ""
+OBJ29.proc "send_f", ""
+
+_AW_ONENDSUB_AW_
+_AW_ONTIMER_AW_
+'SCREEN.SetTimer 1, True
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(BUTTON1)
+_AW_ONCLICK_AW_
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(SVER)
+_AW_ONCHANGE_AW_
+SCREEN.object("obj11.FUNC").Data = "V"
+OBJ11.Send
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON0)
+_AW_ONCLICK_AW_
+SCREEN.ChangeMap "IB950110"
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(total)
+_AW_ONCLICK_AW_
+DetailView "TOT"
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(APIGRID)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(TSGRID)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(PTSGRID)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(IDATA)
+_AW_ONCLICK_AW_
+DetailView "SSS"
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(ADATA)
+_AW_ONCLICK_AW_
+DetailView "UUU"
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(MSPDATA)
+_AW_ONCLICK_AW_
+DetailView "MSP"
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(MSTDATA)
+_AW_ONCLICK_AW_
+DetailView "MST"
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(APIDATA)
+_AW_ONCLICK_AW_
+DetailView "API"
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(WTSDATA)
+_AW_ONCLICK_AW_
+DetailView "WTS"
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(IONEDATA)
+_AW_ONCLICK_AW_
+DetailView "mmm"
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(HTSDATA)
+_AW_ONCLICK_AW_
+DetailView "HTS"
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(HTSCNT)
+_AW_ONCLICK_AW_
+DetailView "HTS"
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(WTSCNT)
+_AW_ONCLICK_AW_
+DetailView "WTS"
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(MTSCNT)
+_AW_ONCLICK_AW_
+DetailView "MTS"
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(ISTKDATA)
+_AW_ONCLICK_AW_
+DetailView "iii"
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(ASTKDATA)
+_AW_ONCLICK_AW_
+DetailView "aaa"
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

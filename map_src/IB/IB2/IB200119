@@ -1,0 +1,85 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB200119)
+MAPSIZE(211, 248)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("±º∏≤√º", 9, NORMAL)
+OPTIONS(FMS|FLASH)
+TITLE("Untitled")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pooppoop")
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+EDIT  1301(0, 0, 44, 22)  LEN(12)  IO_ALPHA|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(1)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  1021(0, 33, 103, 51)  LEN(12)  IO_ALPHA|AL_CENTER||FA_FLASH    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  2635(0, 53, 103, 71)  LEN(9)  IO_NUM|AL_CENTER||FA_CORGB|SA_CORAW    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(3)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  2638(0, 73, 103, 91)  LEN(9)  IO_NUM|AL_CENTER||FA_CORGB|SA_CORAW    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(4)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  1777(75, 5, 95, 25)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("3")          TABORDER(2)  IOORDER(5)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Dim g_Flag
+
+g_Flag = 1
+'-----------------------------------------------------------------------
+Sub SetFlag(Flag)
+	g_Flag = Flag
+End Sub
+'-----------------------------------------------------------------------
+Sub OnAlert()
+	If g_Flag <> 1 Then
+		Exit Sub
+	End If
+	Dim cvol
+	cvol = -(S2635.Data) + S2638.Data
+
+	If cvol <> 0 Then
+		SCREEN.Proc "parent.progMm", cvol
+	End If
+End Sub
+
+_AW_ONSEND_AW_
+S1301.Data = SCREEN.Object("Main.1301").Data
+
+If UCase(TypeName( SCREEN.Object("main.cxMarket"))) <> "NOTHING" Then
+	If SCREEN.Object("main.cxMarket").sMarket = "KRX" Then
+		S1777.Data = "1"
+	ElseIf SCREEN.Object("main.cxMarket").sMarket = "NXT" Then
+		S1777.Data =  "2"
+	ElseIf SCREEN.Object("main.cxMarket").sMarket = "≈Î«’" Then
+		S1777.Data =  "3"
+	End If
+	SYSTEM.Trace "yes cxMarket 1777 = " & S1777.Data
+Else
+	SYSTEM.Trace "no cxMarket map = " & SCREEN.GetMapName(0)
+End If
+
+_AW_ONENDSUB_AW_
+}
+
+
+

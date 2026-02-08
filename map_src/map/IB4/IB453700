@@ -1,0 +1,170 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB453700)
+MAPSIZE(401, 744)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("국내선물 스프레드 �")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+TITLE("[4537] 국내선물 스프레드 일별시세")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL4(0, 0, 744, 29)        COLOR(64, 130)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL63(0, 26, 744, 401)  LIMAGE(0)  LINEW(4)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL(1, 0, 743, 27)        COLOR(66, 130)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON1(688, 3, 736, 23)  '차트'  TP_PUSH|IMAGETEXT|AL_STRETCH        FOCUS  COLOR(64, 186)  CUR(0)    "3BTN.BMP"    TABORDER(1)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+EDIT  ed_fcod(317, 4, 392, 24)  LEN(8)  IO_ALPHA|EDIT_INOUT|FA_UPPER|CODE    FONT("굴림체", 9, NORMAL)    COLOR(192, 130)  CUR(0)  TP_SUNKEN          TABORDER(2)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  SYMBOL7(392, 4, 411, 24)  TP_PUSH|IMAGE|AL_STRETCH      COLOR(24, 0)  CUR(0)    "검색.BMP"    TABORDER(3)  ENABLE  &
+  VISIBLE  IMAGE  HOVER  HINTTYPE(IH_NONE)
+OUT  100022(413, 4, 597, 24)  LEN(30)  IO_MIXED|AL_LEFT|  FONT("굴림체", 9, BOLD)    COLOR(160, 130)  CUR(0)  LINECOLOR(89)          TABORDER(0)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  65311(35, 4, 126, 24)  LEN(8)  IO_NUM|EDIT_INPUT|FA_DATE    COLOR(192, 130)  CUR(0)  TP_SUNKEN          EDITFORMAT("9999/99/99")  TABORDER(4)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL1(6, 4, 33, 24)  '일자'  AL_LEFT  CUR(0)      COLOR(131, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  BUTTON0(131, 4, 265, 24)  '종목코드 리스트 갱신'  TP_PUSH|IMAGETEXT|AL_STRETCH        FOCUS  COLOR(64, 186)  CUR(0)    "7BTN.bmp"    TABORDER(5)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+LABEL  LABEL0(287, 4, 314, 24)  '종목'  AL_LEFT  CUR(0)      COLOR(131, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+OBJECT  obj0(6, 33, 121, 395)    "IB453710"  TABORDER(6)  IOORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  obj1(125, 33, 737, 395)    "IB453720"  TABORDER(7)  IOORDER(5)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Sub ed_fcod_change()
+	Dim name
+	ed_fcod.Trigger "", True
+	ed_fcod.Trigger "ed_fcod", True
+	SYSTEM.SetHistory "ed_fcod", ed_fcod.Data
+	name = SCREEN.GetName(127, ed_fcod.Data, 0)
+	S100022.Data = name
+	If BUTTON1.Text = "차트" Then
+		SCREEN.Object("obj1.viewgrid").clear
+	End If
+	obj1.Send
+End Sub
+
+_AW_ONSTART_AW_
+obj0.Send
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+SCREEN.OnSend = False
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(BUTTON1)
+_AW_ONCLICK_AW_
+If BUTTON1.Text = "차트" Then
+	obj1.SetObject("IB453730")
+	BUTTON1.Text = "데이터"
+Else
+	obj1.SetObject("IB453720")
+	BUTTON1.Text = "차트"
+End If
+
+obj1.Send
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(ed_fcod)
+_AW_ONCHANGE_AW_
+Dim name
+If Left(ed_fcod.Data, 1) <> "4" And Left(ed_fcod.Data, 1) <> "D" Then
+	ed_fcod.Clear
+	S100022.Clear
+	If BUTTON1.Text = "차트" Then
+		SCREEN.Object("obj1.viewgrid").clear
+	End If
+	Exit Sub
+End If
+
+'ed_fcod.Trigger "", True
+'ed_fcod.Trigger "ed_fcod", True
+SYSTEM.SetHistory "ed_fcod", ed_fcod.Data
+name = SCREEN.GetName(127, ed_fcod.Data, 0)
+S100022.Data = name
+
+If BUTTON1.Text = "차트" Then
+	SCREEN.Object("obj1.viewgrid").clear
+End If
+
+obj1.Send
+'SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(SYMBOL7)
+_AW_ONCLICK_AW_
+Dim CODX
+
+CODX = SCREEN.GetCode (127, "ed_fcod" , "100022", 1)
+If CODX <>  True Then
+	Exit Sub
+End If
+If Left(ed_fcod.Data, 1) <> "4" And Left(ed_fcod.Data, 1) <> "D" Then
+	ed_fcod.Clear
+	S100022.Clear
+	If BUTTON1.Text = "차트" Then
+		SCREEN.Object("obj1.viewgrid").clear
+	End If
+	Exit Sub
+End If
+'SCREEN.Send 0
+If BUTTON1.Text = "차트" Then
+	SCREEN.Object("obj1.viewgrid").clear
+End If
+
+obj1.Send
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(65311)
+_AW_ONCHANGE_AW_
+If BUTTON1.Text = "차트" Then
+	SCREEN.Object("obj1.viewgrid").clear
+End If
+
+obj0.Send
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON0)
+_AW_ONCLICK_AW_
+obj0.Send
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

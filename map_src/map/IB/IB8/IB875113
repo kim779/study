@@ -1,0 +1,440 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB875113)
+MAPSIZE(398, 190)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("MS Sans Serif", 9, NORMAL)
+TITLE("IB875113")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pihsrels")
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL32(0, 0, 99, 20)  '최초(가격)결정일'  TP_NONE      COLOR(74, 76)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL0(0, 21, 99, 41)  '결정일 가격1'  TP_NONE      COLOR(74, 76)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL1(0, 42, 99, 62)  '결정일 가격2'  TP_NONE      COLOR(74, 76)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL2(0, 63, 99, 83)  '평가(조회)일'  TP_NONE      COLOR(74, 76)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL4(0, 84, 99, 104)  '현재가1'  TP_NONE      COLOR(74, 76)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL5(0, 105, 99, 125)  '현재가2'  TP_NONE      COLOR(74, 76)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  ot_DecPrc1(100, 21, 190, 41)  LEN(9)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT  FONT("굴림", 9, BOLD)    COLOR(96, 186)  CUR(0)  LINECOLOR(247)          TABORDER(0)  IOORDER(10)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  ot_DecPrc2(100, 42, 190, 62)  LEN(9)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT  FONT("굴림", 9, BOLD)    COLOR(96, 186)  CUR(0)  LINECOLOR(247)          TABORDER(0)  IOORDER(11)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  ot_SercPrc1(100, 84, 190, 104)  LEN(9)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT  FONT("굴림", 9, BOLD)    COLOR(96, 186)  CUR(0)  LINECOLOR(247)          TABORDER(0)  IOORDER(13)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  ot_SercPrc2(100, 105, 190, 125)  LEN(9)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT  FONT("굴림", 9, BOLD)    COLOR(96, 186)  CUR(0)  LINECOLOR(247)          TABORDER(0)  IOORDER(14)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL27(378, 202, 511, 221)  '구분'  TP_NONE      COLOR(74, 76)  CUR(0)    AL_LEFT  FONT("굴림체", 9, NORMAL)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  ed_DIdx(513, 202, 573, 222)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("7")          TABORDER(1)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL28(378, 222, 511, 241)  '화면번호'  TP_NONE      COLOR(74, 76)  CUR(0)    AL_LEFT  FONT("굴림체", 9, NORMAL)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  ed_DiId(513, 222, 573, 242)  LEN(6)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("875100")          TABORDER(2)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL6(378, 242, 511, 261)  '종목코드1'  TP_NONE      COLOR(74, 76)  CUR(0)    AL_LEFT  FONT("굴림체", 9, NORMAL)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  ed_ItemCd1(513, 242, 573, 262)  LEN(12)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("005930")          TABORDER(3)  IOORDER(3)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL7(378, 262, 511, 281)  '종목코드2'  TP_NONE      COLOR(74, 76)  CUR(0)    AL_LEFT  FONT("굴림체", 9, NORMAL)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  ed_ItemCd2(513, 262, 573, 282)  LEN(12)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("005490")          TABORDER(4)  IOORDER(4)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  dt_Date(100, 0, 190, 20)  LEN(8)  IO_NUM|EDIT_INOUT|FA_WRAP|FA_SKIP|FA_DATE    COLOR(192, 232)  CUR(0)  TP_SUNKEN          EDITFORMAT("9999/99/99")  TABORDER(5)  IOORDER(5)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  dt_SrchDate(100, 63, 190, 83)  LEN(8)  IO_NUM|EDIT_INOUT|FA_WRAP|FA_SKIP|FA_DATE    COLOR(192, 232)  CUR(0)  TP_SUNKEN          EDITFORMAT("9999/99/99")  TABORDER(6)  IOORDER(6)  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL8(378, 282, 511, 301)  '최초(가격)결정일'  TP_NONE      COLOR(74, 76)  CUR(0)    AL_LEFT    ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL9(378, 302, 511, 321)  '조회일자'  TP_NONE      COLOR(74, 76)  CUR(0)    AL_LEFT    ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  ed_DecDate(513, 282, 573, 302)  LEN(8)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(7)  IOORDER(7)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  ed_SrchDate(513, 302, 573, 322)  LEN(8)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(8)  IOORDER(8)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  BUTTON0(513, 327, 573, 347)  '전송'  TP_PUSH      AL_CENTER    FOCUS  COLOR(208, 232)  CUR(0)      TABORDER(9)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  ot_DecDate(215, 0, 325, 19)  LEN(8)  IO_MIXED|AL_CENTER||FA_RIGHT  FONT("굴림", 9, BOLD)    COLOR(96, 186)  CUR(0)  LINECOLOR(247)          TABORDER(0)  IOORDER(9)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  ot_SrchDate(215, 60, 325, 79)  LEN(8)  IO_MIXED|AL_CENTER||FA_RIGHT  FONT("굴림", 9, BOLD)    COLOR(96, 186)  CUR(0)  LINECOLOR(247)          TABORDER(0)  IOORDER(12)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  ot_LevDate1(0, 189, 70, 209)  LEN(10)  IO_MIXED|AL_CENTER||FA_SKIP    COLOR(96, 186)  CUR(0)  LINECOLOR(247)          TABORDER(0)  IOORDER(15)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  ot_LevDate2(0, 210, 70, 230)  LEN(10)  IO_MIXED|AL_CENTER||FA_SKIP    COLOR(96, 186)  CUR(0)  LINECOLOR(247)          TABORDER(0)  IOORDER(16)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  ot_LevDate3(0, 231, 70, 251)  LEN(10)  IO_MIXED|AL_CENTER||FA_SKIP    COLOR(96, 186)  CUR(0)  LINECOLOR(247)          TABORDER(0)  IOORDER(17)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  ot_LevDate4(0, 252, 70, 272)  LEN(10)  IO_MIXED|AL_CENTER||FA_SKIP    COLOR(96, 186)  CUR(0)  LINECOLOR(247)          TABORDER(0)  IOORDER(18)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  ot_LevDate5(0, 273, 70, 293)  LEN(10)  IO_MIXED|AL_CENTER||FA_SKIP    COLOR(96, 186)  CUR(0)  LINECOLOR(247)          TABORDER(0)  IOORDER(19)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  ot_LevDate6(0, 294, 70, 314)  LEN(10)  IO_MIXED|AL_CENTER||FA_SKIP    COLOR(96, 186)  CUR(0)  LINECOLOR(247)          TABORDER(0)  IOORDER(20)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  ot_LevDate7(0, 315, 70, 335)  LEN(10)  IO_MIXED|AL_CENTER||FA_SKIP    COLOR(96, 186)  CUR(0)  LINECOLOR(247)          TABORDER(0)  IOORDER(21)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  ot_LevDate8(0, 336, 70, 356)  LEN(10)  IO_MIXED|AL_CENTER||FA_SKIP    COLOR(96, 186)  CUR(0)  LINECOLOR(247)          TABORDER(0)  IOORDER(22)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  ot_LevDate9(0, 357, 70, 377)  LEN(10)  IO_MIXED|AL_CENTER||FA_SKIP    COLOR(96, 186)  CUR(0)  LINECOLOR(247)          TABORDER(0)  IOORDER(23)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  ot_LevPrc1(70, 189, 130, 209)  LEN(10)  IO_NUM|AL_RIGHT||FA_COMMA|FA_RIGHT|FA_SKIP    COLOR(96, 186)  CUR(0)  LINECOLOR(247)          TABORDER(0)  IOORDER(24)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  ot_LevPrc2(70, 210, 130, 230)  LEN(10)  IO_NUM|AL_RIGHT||FA_COMMA|FA_RIGHT|FA_SKIP    COLOR(96, 186)  CUR(0)  LINECOLOR(247)          TABORDER(0)  IOORDER(25)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  ot_LevPrc3(70, 231, 130, 251)  LEN(10)  IO_NUM|AL_RIGHT||FA_COMMA|FA_RIGHT|FA_SKIP    COLOR(96, 186)  CUR(0)  LINECOLOR(247)          TABORDER(0)  IOORDER(26)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  ot_LevPrc4(70, 252, 130, 272)  LEN(10)  IO_NUM|AL_RIGHT||FA_COMMA|FA_RIGHT|FA_SKIP    COLOR(96, 186)  CUR(0)  LINECOLOR(247)          TABORDER(0)  IOORDER(27)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  ot_LevPrc5(70, 273, 130, 293)  LEN(10)  IO_NUM|AL_RIGHT||FA_COMMA|FA_RIGHT|FA_SKIP    COLOR(96, 186)  CUR(0)  LINECOLOR(247)          TABORDER(0)  IOORDER(28)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  ot_LevPrc6(70, 294, 130, 314)  LEN(10)  IO_NUM|AL_RIGHT||FA_COMMA|FA_RIGHT|FA_SKIP    COLOR(96, 186)  CUR(0)  LINECOLOR(247)          TABORDER(0)  IOORDER(29)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  ot_LevPrc7(70, 315, 130, 335)  LEN(10)  IO_NUM|AL_RIGHT||FA_COMMA|FA_RIGHT|FA_SKIP    COLOR(96, 186)  CUR(0)  LINECOLOR(247)          TABORDER(0)  IOORDER(30)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  ot_LevPrc8(70, 336, 130, 356)  LEN(10)  IO_NUM|AL_RIGHT||FA_COMMA|FA_RIGHT|FA_SKIP    COLOR(96, 186)  CUR(0)  LINECOLOR(247)          TABORDER(0)  IOORDER(31)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  ot_LevPrc9(70, 357, 130, 377)  LEN(10)  IO_NUM|AL_RIGHT||FA_COMMA|FA_RIGHT|FA_SKIP    COLOR(96, 186)  CUR(0)  LINECOLOR(247)          TABORDER(0)  IOORDER(32)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  ot_KI(0, 378, 70, 398)  LEN(10)  IO_MIXED|AL_CENTER||FA_SKIP    COLOR(96, 186)  CUR(0)  LINECOLOR(247)          TABORDER(0)  IOORDER(33)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  ot_LevPrc10(70, 378, 130, 398)  LEN(10)  IO_NUM|AL_RIGHT||FA_COMMA|FA_RIGHT|FA_SKIP    COLOR(96, 186)  CUR(0)  LINECOLOR(247)          TABORDER(0)  IOORDER(34)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  ot_Lev2Prc1(130, 189, 190, 209)  LEN(10)  IO_NUM|AL_RIGHT||FA_COMMA|FA_RIGHT|FA_SKIP    COLOR(96, 186)  CUR(0)  LINECOLOR(247)          TABORDER(0)  IOORDER(35)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  ot_Lev2Prc2(130, 210, 190, 230)  LEN(10)  IO_NUM|AL_RIGHT||FA_COMMA|FA_RIGHT|FA_SKIP    COLOR(96, 186)  CUR(0)  LINECOLOR(247)          TABORDER(0)  IOORDER(36)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  ot_Lev2Prc3(130, 231, 190, 251)  LEN(10)  IO_NUM|AL_RIGHT||FA_COMMA|FA_RIGHT|FA_SKIP    COLOR(96, 186)  CUR(0)  LINECOLOR(247)          TABORDER(0)  IOORDER(37)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  ot_Lev2Prc4(130, 252, 190, 272)  LEN(10)  IO_NUM|AL_RIGHT||FA_COMMA|FA_RIGHT|FA_SKIP    COLOR(96, 186)  CUR(0)  LINECOLOR(247)          TABORDER(0)  IOORDER(38)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  ot_Lev2Prc5(130, 273, 190, 293)  LEN(10)  IO_NUM|AL_RIGHT||FA_COMMA|FA_RIGHT|FA_SKIP    COLOR(96, 186)  CUR(0)  LINECOLOR(247)          TABORDER(0)  IOORDER(39)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  ot_Lev2Prc6(130, 294, 190, 314)  LEN(10)  IO_NUM|AL_RIGHT||FA_COMMA|FA_RIGHT|FA_SKIP    COLOR(96, 186)  CUR(0)  LINECOLOR(247)          TABORDER(0)  IOORDER(40)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  ot_Lev2Prc7(130, 315, 190, 335)  LEN(10)  IO_NUM|AL_RIGHT||FA_COMMA|FA_RIGHT|FA_SKIP    COLOR(96, 186)  CUR(0)  LINECOLOR(247)          TABORDER(0)  IOORDER(41)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  ot_Lev2Prc8(130, 336, 190, 356)  LEN(10)  IO_NUM|AL_RIGHT||FA_COMMA|FA_RIGHT|FA_SKIP    COLOR(96, 186)  CUR(0)  LINECOLOR(247)          TABORDER(0)  IOORDER(42)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  ot_Lev2Prc9(130, 357, 190, 377)  LEN(10)  IO_NUM|AL_RIGHT||FA_COMMA|FA_RIGHT|FA_SKIP    COLOR(96, 186)  CUR(0)  LINECOLOR(247)          TABORDER(0)  IOORDER(43)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  ot_Lev2Prc10(130, 378, 190, 398)  LEN(10)  IO_NUM|AL_RIGHT||FA_COMMA|FA_RIGHT|FA_SKIP    COLOR(96, 186)  CUR(0)  LINECOLOR(247)          TABORDER(0)  IOORDER(44)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL10(0, 168, 69, 188)  '조기상환일'  TP_NONE      COLOR(74, 76)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL11(70, 168, 129, 188)  '결정가1'  TP_NONE      COLOR(74, 76)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL12(130, 168, 189, 188)  '결정가2'  TP_NONE      COLOR(74, 76)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Dim g_ArrCd
+Dim g_Index
+
+'Index 0:상환횟수, 1:cycle
+g_ArrCd = Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+g_ArrCtrls = Array(Array(0, ot_LevDate1, ot_LevPrc1, ot_Lev2Prc1),_
+	Array(0, ot_LevDate2, ot_LevPrc2, ot_Lev2Prc2),_
+	Array(0, ot_LevDate3, ot_LevPrc3, ot_Lev2Prc3),_
+	Array(0, ot_LevDate4, ot_LevPrc4, ot_Lev2Prc4),_
+	Array(0, ot_LevDate5, ot_LevPrc5, ot_Lev2Prc5),_
+	Array(0, ot_LevDate6, ot_LevPrc6, ot_Lev2Prc6),_
+	Array(0, ot_LevDate7, ot_LevPrc7, ot_Lev2Prc7),_
+	Array(0, ot_LevDate8, ot_LevPrc8, ot_Lev2Prc8),_
+	Array(0, ot_LevDate9, ot_LevPrc9, ot_Lev2Prc9),_
+	Array(0, ot_KI, ot_LevPrc10, ot_Lev2Prc10))
+
+g_Index = -1
+'-------------------------------------------------------
+Sub SetItemCd(Data)
+	ArrData = Split(Data, "|")
+	If UBound(ArrData) < 1 Then
+		Exit Sub
+	End If
+	ed_ItemCd1.Data = ArrData(0)
+	ed_ItemCd2.Data = ArrData(1)
+End Sub
+'-------------------------------------------------------
+Sub SetIndex(Data)
+	g_Index = Data
+End Sub
+'-------------------------------------------------------
+Function GetItemValue(ItemCd, Value)
+	Ret = 0
+	If Len(Trim(ItemCd)) = 6 Then
+		If Value Mod 100 = 0 Then
+			Ret = Value \ 100
+		Else
+			Ret = Value \ 100 + 1
+		End If
+	Else
+		If (Value*100) Mod 100 = 0 Then
+			Ret = Value/100
+		Else
+			Ret = Value/100 + 0.005
+		End If
+		Ret = FormatNumber(Ret, 2, -2, -2, 0)
+	End If
+	GetItemValue = Ret
+End Function
+'-------------------------------------------------------
+Sub CalcCdData()
+	InitCtrls
+	'SYSTEM.Trace "CalcCdData"
+'	Prc1 = Trim(ot_DecPrc1.Data)
+'	Prc2 = Trim(ot_DecPrc2.Data)
+'	Prc3 = Trim(ot_SercPrc1.Data)
+'	Prc4 = Trim(ot_SercPrc2.Data)
+'
+'	If Len(Prc1) = 0 Or Len(Prc2) = 0 Then
+'		Exit Sub
+'	End If
+'
+'	If Len(Prc3) = 0 Or Len(Prc4) = 0 Then
+'		Exit Sub
+'	End If
+'
+'	InitCtrls
+'	Prc = 0
+'	Prc1 = CDbl(Prc1)
+'	Prc2 = CDbl(Prc2)
+'	Prc3 = CDbl(Prc3)
+'	Prc4 = CDbl(Prc4)
+'	Prc5 = Prc3/Prc1
+'	Prc6 = Prc4/Prc2
+'	ItemCd = ""
+'	If Prc5 > Prc6 Then
+'		Prc = Prc2
+'		ItemCd = Trim(ed_ItemCd2.Data)
+'	Else
+'		Prc = Prc1
+'		ItemCd = Trim(ed_ItemCd1.Data)
+'	End If
+
+	Prc1 = Trim(ot_DecPrc1.Data)
+	Prc2 = Trim(ot_DecPrc2.Data)
+
+	If Len(Prc1) = 0 Or Len(Prc2) = 0 Then
+		Exit Sub
+	End If
+
+	Prc1 = CDbl(Prc1)
+	Prc2 = CDbl(Prc2)
+
+	FirstDate = dt_Date.Data
+	FirstYear = Mid(FirstDate, 1, 4)
+	FirstMon = Mid(FirstDate, 5, 2)
+	FirstDay = Mid(FirstDate, 7, 2)
+	FirstDate = DateSerial(FirstYear, FirstMon, FirstDay)
+	For i = 2 To UBound(g_ArrCd)
+		Cd = Trim(g_ArrCd(i))
+		If Len(Cd) <> 0 Then
+			Value1 = Prc1 * Cd
+			Value2 = Prc2 * Cd
+			Value1 = GetItemValue(ed_ItemCd1.Data, Value1)
+			Value2 = GetItemValue(ed_ItemCd2.Data, Value2)
+			'SYSTEM.Trace Value
+'			If Len(Trim(ItemCd)) = 6 Then
+'				If Value1 Mod 100 = 0 Then
+'					Value1 = Value1 \ 100
+'				Else
+'					Value1 = Value \ 100 + 1
+'				End If
+'			Else
+'				If (Value*100) Mod 100 = 0 Then
+'					Value = Value/100
+'				Else
+'					Value = Value/100 + 0.005
+'				End If
+'				Value = FormatNumber(Value, 2, -2, -2, 0)
+'			End If
+			'SYSTEM.Trace i & "|" & Cd & "|" & Value
+			If i <= g_ArrCd(0) + 1 Or i = UBound(g_ArrCd) Then
+				AYear = Year(DateAdd("m", g_ArrCd(1) * (i - 1), FirstDate))
+				AMon = Month(DateAdd("m", g_ArrCd(1) * (i - 1), FirstDate))
+				If Len(AMon) = 1 Then
+					AMon = "0" & AMon
+				End If
+				ADay = Day(DateAdd("m", g_ArrCd(1) * (i - 1), FirstDate))
+				If Len(ADay) = 1 Then
+					ADay = "0" & ADay
+				End If
+
+				If i <> UBound(g_ArrCd) Then
+					g_ArrCtrls(i - 2)(1).Data = AYear & "/" & AMon & "/" & ADay
+				End If
+				g_ArrCtrls(i - 2)(2).Data = Value1
+				g_ArrCtrls(i - 2)(3).Data = Value2
+				'SYSTEM.Trace i & "|" & Value & "|" & Cd
+			End If
+		End If
+	Next
+	SetDecAndSrchData
+End Sub
+'-------------------------------------------------------
+Sub SetCdData(Data)
+	ArrData = Split(Data, "|")
+	For i = LBound(ArrData)To UBound(ArrData)
+		If i > UBound(g_ArrCd) Then
+			Exit For
+		End If
+
+		g_ArrCd(i) = CLng(ArrData(i))
+	Next
+	CalcCdData
+End Sub
+'-------------------------------------------------------
+Sub SetDecDate(Data)
+	dt_Date.Data = Data
+End Sub
+'-------------------------------------------------------
+Sub SetSrchDate(Data)
+	dt_SrchDate.Data = Data
+End Sub
+'-------------------------------------------------------
+Sub SendData()
+	SCREEN.Send 0
+End Sub
+'-------------------------------------------------------
+Sub InitCtrls()
+	For i = LBound(g_ArrCtrls) To UBound(g_ArrCtrls)
+		g_ArrCtrls(i)(0) = 0
+		g_ArrCtrls(i)(1).Data = ""
+		g_ArrCtrls(i)(2).Data = ""
+		g_ArrCtrls(i)(3).Data = ""
+	Next
+	ot_KI.Data = "KI가격"
+End Sub
+'-------------------------------------------------------
+Function GetMin(Data1, Data2)
+	If Len(Trim(Data1)) = 0 Or Len(Trim(Data2)) Then
+		GetMin = -1
+	End If
+	If Data1 > Data2 Then
+		GetMin = CLng(Len(Trim(Data2)))
+	Else
+		GetMin = CLng(Len(Trim(Data1)))
+	End If
+End Function
+'-------------------------------------------------------
+Function GetDate(StrDate)
+	AYear = Mid(StrDate, 1, 4)
+	AMon = Mid(StrDate, 5, 2)
+	ADay = Mid(StrDate, 7, 2)
+	GetDate = DateSerial(AYear, AMon, ADay)
+End Function
+'-------------------------------------------------------
+Sub SetDecAndSrchData()
+	ArrData = Array(0, 0, 0, 0, 0, 0)
+	ArrData(0) = Trim(dt_Date.Data)
+	ArrData(1) = Trim(ot_DecPrc1.Data)
+	ArrData(2) = Trim(ot_DecPrc2.Data)
+
+	ArrData(3) = dt_SrchDate.Data
+	ArrData(4) = Trim(ot_SercPrc1.Data)
+	ArrData(5) = Trim(ot_SercPrc2.Data)
+
+	Data1 = Join(ArrData, "|")
+
+	ArrData1 = Array(0, 0, 0, 0, 0, 0, 0, 0, 0)
+	If Trim(Len(dt_Date.Data)) <> 8 Then
+		Exit Sub
+	End If
+
+	BDate = ""
+	StdDate = GetDate(dt_Date.Data)
+	For i = LBound(g_ArrCtrls) To UBound(g_ArrCtrls) - 1
+		ADate = Mid(g_ArrCtrls(i)(1).Data, 1, 4) &_
+			Mid(g_ArrCtrls(i)(1).Data, 6, 2) &_
+			Mid(g_ArrCtrls(i)(1).Data, 9, 2)
+		ADate = Trim(ADate)
+		If Len(ADate) = 0 Then
+			Exit For
+		End If
+		BDate = GetDate(ADate)
+		ADiff = DateDiff("d", StdDate, BDate)
+		ArrData1(i) = ADiff
+	Next
+	Data2 = Join(ArrData1, "|")
+
+	If Len(BDate) = 0 Then
+		Exit Sub
+	End If
+
+	SrchDate = GetDate(dt_SrchDate.Data)
+	BDiff = DateDiff("d", SrchDate, BDate)
+
+	CDiff = DateDiff("d", StdDate, SrchDate)
+	Data3 = ADiff & "|" & BDiff & "|" & CDiff
+	'SYSTEM.Trace Data3
+	Data = Data1 & "@" & Data2 & "@" & Data3
+	SCREEN.Proc "Parent.SetDecAndSrchData", g_Index & "," & Data
+End Sub
+'-------------------------------------------------------
+Sub SetItemCd(Data)
+	ArrData = Split(Data, "|")
+	ed_ItemCd1.Data = ArrData(0)
+	ed_ItemCd2.Data = ArrData(1)
+End Sub
+
+_AW_ONSEND_AW_
+ot_KI.Data = "KI가격"
+ed_DecDate.Data = dt_Date.Data
+ed_SrchDate.Data = dt_SrchDate.Data
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+CalcCdData
+SetDecAndSrchData
+'dt_Date.Data = ot_DecDate.Data
+
+'dt_SrchDate.Data = ot_SrchDate.Data
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(dt_Date)
+_AW_ONCHANGE_AW_
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(dt_SrchDate)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON0)
+_AW_ONCLICK_AW_
+ed_DecDate.Data = dt_Date.Data
+ed_SrchDate.Data = dt_SrchDate.Data
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

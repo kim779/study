@@ -1,0 +1,82 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB200108)
+MAPSIZE(162, 304)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("현재가_추이")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(FLASH)
+TITLE("현재가_추이")
+TOPATH(AXIS)
+METHOD(SEND)
+TRXCODE("ng200920")
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+CONTROL  ctl(0, 0, 304, 162)  |FA_PROTECT|FA_FLASH  "C_UserGrp"  "/i4132003600000003020000000000000000002000000000091000000000001000000009200033554687100000000220001263225610000000"  LEN(0)  EDIT_INOUT    COLOR(192, 232)  TABORDER(1)  IOORDER(6)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  bday(78, 440, 157, 463)  LEN(8)  IO_NUM|EDIT_INPUT    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(2)  IOORDER(3)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  check(162, 442, 192, 463)  LEN(1)  IO_MIXED|AL_CENTER|    COLOR(192, 23)  CUR(0)            TABORDER(0)  IOORDER(5)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  GUBN(236, 447, 261, 466)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(3)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  isreal(280, 451, 305, 470)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(4)  IOORDER(4)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  cod2(560, 260, 660, 280)  LEN(12)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(5)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONSEND_AW_
+cod2.Data = SCREEN.Object("main.1301").Data
+
+If UCase(TypeName( SCREEN.Object("main.cxMarket"))) <> "NOTHING" Then
+	If SCREEN.Object("main.cxMarket").sMarket = "KRX" Then
+		cod2.Data = SCREEN.Object("main.1301").Data
+	ElseIf SCREEN.Object("main.cxMarket").sMarket = "NXT" Then
+		cod2.Data = "N." & SCREEN.Object("main.1301").Data
+	ElseIf SCREEN.Object("main.cxMarket").sMarket = "통합" Then
+		cod2.Data = "M." & SCREEN.Object("main.1301").Data
+	End If
+End If
+
+Dim sData
+
+sData = Date
+
+SYSTEM.Trace sData
+
+bday.Data = Replace(sData, "-", "")
+
+SYSTEM.Trace bday.Data
+GUBN.Data = "1"
+
+isreal.Data = "1"
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+If check.Data = "F" Then
+	ctl.Clear
+End If
+
+_AW_ONENDSUB_AW_
+}
+
+
+

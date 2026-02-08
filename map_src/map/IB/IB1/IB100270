@@ -1,0 +1,311 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB100270)
+MAPSIZE(179, 602)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("주식 잔고내역")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(FLASH)
+TITLE("[IB100270] 주식 잔고 내역")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("PIBOSJGO")
+MAPTYPE(FIXED)
+HEADER(LEDGER)
+BGROUND(BRUSH, 64)
+}
+
+
+
+FORM DIVISION
+{
+
+GRID  VIEWGRID(-2, 0, 600, 179)  VISIBLEROW(13)  CELLH(19)  MATRIX(1000, 15)  FIX(0)  MAINCOLOR(7, 0)  LINECOLOR(65)  FOCUSCOLOR(78)  FOCUSKIND(2)  ROWC(68, 77)  |MERGE|FLEXIBLE|VSCROLL|HSCROLL|GRFIX|NO3D|RROW|XHLINE|PAGE|KEYFOCUS    &
+	COLINFO("isOK")  LEN(1)  WIDTH(20)  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_INPUT  |FA_SKIP    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  ICHECK    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("c_code")  LEN(12)  WIDTH(66)  HEAD("종목코드")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_ALPHA|EDIT_OUTPUT  |FA_FLASH    COLOR(68, 69)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("c_hnam")  LEN(40)  WIDTH(86)  HEAD("종목명")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_REF)  COLHELPTEXT("c_code")  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT  |FA_REF    COLOR(68, 69)  COLCUR(0, 0)  REFERENCE(c_code)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col0")  LEN(3)  WIDTH(20)  HEAD("신용구분")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("c_xqty")  LEN(15)  WIDTH(54)  HEAD("체결잔고")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("c_bqty")  LEN(15)  WIDTH(54)  HEAD("주문잔량")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("c_cqty")  LEN(15)  WIDTH(54)  HEAD("매입평균가")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("c_curr")  LEN(15)  WIDTH(60)  HEAD("매도가능잔고")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_CORGB|SA_COSUP    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(209, 214)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("c_pprc")  LEN(15)  WIDTH(60)  HEAD("현재가")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("c_pamt")  LEN(15)  WIDTH(74)  HEAD("평가금액")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("c_psam")  LEN(15)  WIDTH(73)  HEAD("평가손익")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_CORGB|SA_CORAW    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(94, 95)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("c_srat")  LEN(15)  WIDTH(60)  HEAD("평가수익율")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_CORGB|SA_CORAW    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(94, 95)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col1")  LEN(15)  WIDTH(20)  HEAD("매입금액")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col2")  LEN(15)  WIDTH(20)  HEAD("신용금액")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col3")  LEN(8)  WIDTH(20)  HEAD("대출일")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    TABORDER(1)  IOORDER(1)  ENABLE  &
+  VISIBLE
+
+BUTTON  C_all(3, 1, 15, 18)  TP_CHECK|EDIT_NOP          COLOR(208, 232)  CUR(0)      TABORDER(2)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  num(95, 300, 137, 319)  LEN(3)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(3)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL7(16, 300, 91, 319)  '일괄취소갯수'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BOX  BOX0(8, 293, 146, 332)    COLOR(65, 65)  LINEW(1)  BX_LINE    ENABLE  &
+  HINTTYPE(IH_NONE)
+CONTROL  CONTROL0(170, 302, 315, 424)  |FA_PROTECT  "CX_Notify"  "/edit0|00|01|14|12|02|03|05|06|04|10|07|08|09|11|"  LEN(0)  EDIT_NOP    COLOR(192, 232)  TABORDER(0)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BOX  BOX1(162, 292, 325, 435)    COLOR(65, 65)  LINEW(1)  BX_LINE    ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  GUIDE(3, 261, 705, 279)        COLOR(66, 69)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  ed_pswd(635, 50, 695, 70)  LEN(8)  IO_ALPHA|EDIT_INPUT|FA_PASSWD|FA_WRAP|FA_SKIP|FA_ENUM|FA_PASS    COLOR(192, 232)  CUR(0)  TP_SUNKEN    ENCRYPT("en_accn")        TABORDER(4)  IOORDER(3)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Const MAX_ROWS = 50
+Const HP_ITEM  = 3
+'미니
+'Const MD_MAP	= "DH012200/t/S/p5/d"
+'Const MS_MAP	= "DH012100/t/S/p5/d"
+'통합
+'Const MD_MAP	= "DH010100/t/S/p5/d"
+'Const MS_MAP	= "DH010100/t/S/p5/d"
+
+'***************************************************************************
+'	Func : run_xorder
+'***************************************************************************
+Sub run_xorder
+
+Dim s_data, accn, pswd
+num.Data = 0
+
+accn = SCREEN.Object("main.OBJ_order.AN16").data
+pswd = Trim(SCREEN.Object("main.OBJ_order.pswd").data)
+For ii = 1 To VIEWGRID.Rows
+	If VIEWGRID.GetGridCell(ii ,1) = 1 Then
+		If CDbl(num.Data) = MAX_ROWS Then Exit For
+		If Trim(pswd) = "" Then Exit For
+
+		s_data = "#" &s_data
+		s_data = VIEWGRID.GetCell(ii , "c_msgb") & "|" & s_data		' 7 주문구분
+		s_data = VIEWGRID.GetCell(ii , "c_curr") & "|" & s_data		' 6 주문가
+		s_data = VIEWGRID.GetCell(ii , "c_xqty") & "|" & s_data		' 5 주문가능수량
+		s_data = VIEWGRID.GetCell(ii , "c_hnam") & "|" & s_data		' 4 종목명
+		s_data = VIEWGRID.GetCell(ii , "c_code") & "|" & s_data		' 3 종목코드
+		s_data = pswd & "|" & s_data									' 2 비밀번호
+		s_data = accn & "|" & s_data									' 1 계좌번호
+
+		num.Data = num.Data + 1
+	End If
+Next
+
+If num.Data > 0 Then
+	num.Push ""
+	SCREEN.CreateWindow 2, "DH700302 /t/s/p?/d", "s_data" & vbTab & s_data
+	cls_check
+End If
+
+End Sub
+
+'***************************************************************************
+'	Func : All check
+'***************************************************************************
+Sub all_check()
+	Dim cnt
+	cnt = 0
+	If Trim(VIEWGRID.GetGridCell(1,1)) <> "" Then
+		If C_all.Checked = True Then
+			For i = 1 To VIEWGRID.Rows
+				If Trim(VIEWGRID.GetGridCell(i, 2)) <> "" Then
+					VIEWGRID.SetGridCell i , 1, 1
+					cnt = cnt + 1
+				End If
+			Next
+			If cnt > 0 Then
+				SCREEN.Object("parent.B_xodr").Enable = True
+			End If
+		ElseIf C_all.Checked = False Then
+			For i = 1 To VIEWGRID.Rows
+				VIEWGRID.SetGridCell i ,1, 0
+			Next
+			SCREEN.object("parent.B_xodr").Enable = False
+		End If
+	End If
+End Sub
+
+'***************************************************************************
+'	Func : btn check
+'***************************************************************************
+Sub btn_check()
+	Dim cnt
+	cnt = 0
+	For i = 1 To VIEWGRID.Rows
+			If Trim(VIEWGRID.GetGridCell(i, 2)) <> "" Then
+				If Trim(VIEWGRID.GetGridCell(i, 1)) = 1 Then
+					cnt = cnt + 1
+				End If
+			End If
+	Next
+	If cnt > 0 Then
+		SCREEN.object("parent.B_xodr").Enable = True
+	Else
+		SCREEN.object("parent.B_xodr").Enable = False
+	End If
+End Sub
+
+'***************************************************************************
+'	Func : cls_check
+'***************************************************************************
+Sub cls_check()
+	For i = 1 To VIEWGRID.Rows
+		VIEWGRID.SetGridCell i ,1, 0
+	Next
+	SCREEN.Object("parent.B_XODR").Enable = False
+	C_all.Checked = False
+End Sub
+
+'***************************************************************************
+'	Func : Find_Row
+'***************************************************************************
+Function Find_Row(sKey)
+	Dim sCode, sGubn, sDate
+
+	sCode = Mid(sKey, 1, 7)
+	sDate = Mid(sKey, 13, 8)
+	sGubn = Mid(sKey, 21, 2)
+	For row = 1 To VIEWGRID.Rows
+		If Trim(sCode) = Trim(VIEWGRID.GetGridCell (row, 1)) _
+				And Trim(sGubn) = Trim(VIEWGRID.GetGridCell (row, 5)) _
+				And Trim(sDate) = Trim(VIEWGRID.GetGridCell (row, 15)) _
+				And Trim(jGubn) = Trim(VIEWGRID.GetGridCell (row, 4)) Then
+			Find_Row = row
+			Exit Function
+		End If
+	Next
+	Find_Row = 0
+End Function
+
+_AW_ONSEND_AW_
+SCREEN.OnSend False
+VIEWGRID.Clear
+
+Dim accn, pswd
+accn = SCREEN.Object("main.OBJ_order.AN1A").data
+
+If SYSTEM.ConnectBy = "0" Then
+	ed_pswd.Data = "9999"
+Else
+	ed_pswd.Data = Trim(SCREEN.Object("main.OBJ_order.ed_pswd").Data)
+End If
+
+pswd = ed_pswd.Data
+
+If accn <> "" And pswd <> "" Then
+
+	Call Password_initSettingSHA(ed_pswd)
+
+	If Trim(ed_pswd.Data) = "HEAD" Then
+		If Len(Trim(LEDGER.EPwd)) <> 44 Then
+			SCREEN.Object("main.GUIDE").Text = "일방향암호화에 실패하였습니다. 비밀번호를 다시 입력해 주세요."
+			SCREEN.Object("main.OBJ_order.ed_pswd").Data = ""
+			SCREEN.Object("main.OBJ_order.ed_pswd").SetFocus
+			SCREEN.OnSend = False
+			Exit Sub
+		Else
+			pswd = LEDGER.EPwd
+		End If
+	End If
+
+	Call CONTROL0.Send(accn , pswd)
+Else
+	If Trim(pswd) = "" Then
+		SCREEN.Object("main.OBJ_order.ed_pswd").Setfocus
+	End If
+End If
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+'SCREEN.Object("parent.B_N2").Enable = False
+
+_AW_ONENDSUB_AW_
+_AW_ONCLOSE_AW_
+'CONTROL0.Clear
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(VIEWGRID)
+_AW_ONCLICK_AW_
+If VIEWGRID.HitPos = HP_ITEM Then
+	If Mid(Trim(VIEWGRID.GetGridCell(VIEWGRID.row, 2)), 2, 6) <> "" And _
+								Trim(VIEWGRID.GetGridCell(VIEWGRID.row, 8)) <> "" Then
+		If VIEWGRID.Column = 1 Then
+				btn_check
+		End If
+	End If
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(C_all)
+_AW_ONCLICK_AW_
+all_check()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(CONTROL0)
+_AW_ONDBLCLK_AW_
+Dim row, sList
+If  CONTROL0.Flag = "A" Then
+	VIEWGRID.Clear
+	VIEWGRID.InsertRows 0, CONTROL0.DataList, True
+'	Call VIEWGRID.Sort (2, True, True)
+Else
+	row = Find_Row(Left(CONTROL0.DataList, 22))
+	sList = Mid(CONTROL0.DataList, 23, Len(CONTROL0.DataList)-22)
+
+	Select Case CONTROL0.Flag
+		Case "I"						'insert
+				VIEWGRID.InsertRow row
+				VIEWGRID.Update row, sList
+		Case "D"						'delete
+				VIEWGRID.RemoveRow row-1
+		Case "U"						'update
+				VIEWGRID.Update row-1, sList
+		Case Else
+
+				tmp = GUIDE.Text
+				If (Mid(tmp,1,4) = "3669") Then
+				  MsgBox(Trim(GUIDE.Text))
+				End If
+				Exit Sub
+	End Select
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(ed_pswd)
+_AW_ONKEYCHANGE_AW_
+'If SCREEN.Key = 13 And Trim(pswd.Data) <> "" Then
+'	SCREEN.Object("obj.account").data = AN1A.Data
+'	SCREEN.Object("obj.pswd").data = pswd.data
+'	obj.Send
+'
+'	If Trim(out_hts.data) = "" Then
+'		first_send()
+'	End If
+'End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

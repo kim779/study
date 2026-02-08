@@ -1,0 +1,773 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB291600)
+MAPSIZE(404, 804)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("투자자별 기간별매매")
+MAPPUBLIC(";")
+FONT("굴림", 9, NORMAL)
+OPTIONS(CR2TAB)
+TITLE("[2916] 투자자별 기간별매매현황")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL63(0, 32, 805, 400)  LIMAGE(0)  LINEW(3)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON61(5, 340, 69, 392)  TP_PUSH|IMAGE|AL_STRETCH      COLOR(15, 63)  CUR(0)    "풋옵션_차트.bmp"    TABORDER(32)  ENABLE  &
+  VISIBLE  IMAGE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON51(5, 287, 69, 339)  TP_PUSH|IMAGE|AL_STRETCH      COLOR(15, 63)  CUR(0)    "콜옵션_차트.bmp"    TABORDER(31)  ENABLE  &
+  VISIBLE  IMAGE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON41(5, 234, 69, 286)  TP_PUSH|IMAGE|AL_STRETCH      COLOR(15, 63)  CUR(0)    "선물_차트.bmp"    TABORDER(30)  ENABLE  &
+  VISIBLE  IMAGE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON31(5, 181, 69, 233)  TP_PUSH|IMAGE|AL_STRETCH      COLOR(15, 63)  CUR(0)    "코스닥_차트.bmp"    TABORDER(29)  ENABLE  &
+  VISIBLE  IMAGE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON21(5, 128, 69, 180)  TP_PUSH|IMAGE|AL_STRETCH      COLOR(15, 63)  CUR(0)    "코스피200_차트.bmp"    TABORDER(28)  ENABLE  &
+  VISIBLE  IMAGE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON11(5, 75, 70, 127)  TP_PUSH|IMAGE|AL_STRETCH      COLOR(15, 63)  CUR(0)    "거래소_차트.bmp"    TABORDER(27)  ENABLE  &
+  VISIBLE  IMAGE  HINTTYPE(IH_NONE)
+CONTROL  CONTROL10(730, 57, 731, 391)  |FA_PROTECT  "CX_LINE"  "/ctype0/dtype0/lcolor75/w1"  LEN(0)  EDIT_NOP    COLOR(192, 232)  TABORDER(0)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  OBJ1(70, 73, 796, 234)    "IB29162A"  TABORDER(12)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL11(0, 398, 805, 412)        COLOR(64, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL_bg(-2, 0, 805, 32)  LIMAGE(1)  LINEW(3)  LINETYPE(4)  LINECOLOR(64)      COLOR(66, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  radAmt(101, 507, 141, 527)  '금액'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(grp1)    FONT("굴림체", 9, NORMAL)  COLOR(76, 130)  CUR(0)      TABORDER(4)  ENABLE  &
+  VISIBLE  CHECKED  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  radVol(56, 507, 96, 527)  '수량'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(grp1)    FONT("굴림체", 9, NORMAL)  COLOR(76, 130)  CUR(0)      TABORDER(3)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL0(30, 6, 57, 26)  '기간'  AL_LEFT  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(76, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL1(570, 450, 725, 470)  '(단위 : 천주, 계약, 억원)'  AL_LEFT  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(76, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+TABLE  TABLE1(182, 38, 251, 74)  MATRIX(1, 1)  LINECOLOR(75)  CELLH(20)  AUTOSIZE    FONT("굴림체", 9, BOLD)  EDIT_NOP    &
+	COLINFO("Row0")  LEN(0)  WIDTH(80)  HEAD("개인")  COLALIGN(AL_CENTER, AL_RIGHT)  HEADCOLOR(74, 76)  IO_NUM    COLOR(68, 63)  COLCUR(0, 0)  COLHINTTYPE(IH_NONE)    COLUMN_VISIBLE  IOORDER(0)  ENABLE  &
+  VISIBLE
+
+TABLE  TABLE2(114, 38, 183, 74)  MATRIX(1, 1)  LINECOLOR(75)  CELLH(20)  AUTOSIZE    FONT("굴림체", 9, BOLD)  EDIT_NOP    &
+	COLINFO("Row0")  LEN(0)  WIDTH(80)  HEAD("외국인")  COLALIGN(AL_CENTER, AL_RIGHT)  HEADCOLOR(74, 76)  IO_NUM    COLOR(68, 69)  COLCUR(0, 0)  COLHINTTYPE(IH_NONE)    COLUMN_VISIBLE  IOORDER(0)  ENABLE  &
+  VISIBLE
+
+TABLE  TABLE3(250, 38, 319, 74)  MATRIX(1, 1)  LINECOLOR(75)  CELLH(20)  AUTOSIZE    FONT("굴림체", 9, BOLD)  EDIT_NOP    &
+	COLINFO("Row0")  LEN(0)  WIDTH(80)  HEAD("기관계")  COLALIGN(AL_CENTER, AL_RIGHT)  HEADCOLOR(74, 76)  IO_NUM    COLOR(35, 63)  COLCUR(0, 0)  COLHINTTYPE(IH_NONE)    COLUMN_VISIBLE  IOORDER(0)  ENABLE  &
+  VISIBLE
+
+TABLE  TABLE10(940, 56, 1000, 74)  MATRIX(1, 1)  LINECOLOR(75)  CELLH(20)  AUTOSIZE    FONT("굴림체", 9, NORMAL)  EDIT_NOP    &
+	COLINFO("Row0")  LEN(0)  WIDTH(80)  HEAD("국가")  COLALIGN(AL_CENTER, AL_RIGHT)  HEADCOLOR(74, 76)  IO_NUM    COLOR(35, 63)  COLCUR(0, 0)  COLHINTTYPE(IH_NONE)    COLUMN_VISIBLE  IOORDER(0)  ENABLE  &
+  VISIBLE
+
+BUTTON  BUTTON20(5, 128, 69, 180)  TP_PUSH|IMAGE|AL_STRETCH      COLOR(15, 63)  CUR(0)    "코스피200_데이터.bmp"    TABORDER(7)  ENABLE  &
+  VISIBLE  IMAGE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON30(5, 181, 69, 233)  TP_PUSH|IMAGE|AL_STRETCH      COLOR(15, 63)  CUR(0)    "코스닥_데이터.bmp"    TABORDER(8)  ENABLE  &
+  VISIBLE  IMAGE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON40(5, 234, 69, 286)  TP_PUSH|IMAGE|AL_STRETCH      COLOR(15, 63)  CUR(0)    "선물_데이터.bmp"    TABORDER(9)  ENABLE  &
+  VISIBLE  IMAGE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON50(5, 287, 69, 339)  TP_PUSH|IMAGE|AL_STRETCH      COLOR(15, 63)  CUR(0)    "콜옵션_데이터.bmp"    TABORDER(10)  ENABLE  &
+  VISIBLE  IMAGE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON60(5, 340, 69, 392)  TP_PUSH|IMAGE|AL_STRETCH      COLOR(15, 63)  CUR(0)    "풋옵션_데이터.bmp"    TABORDER(11)  ENABLE  &
+  VISIBLE  IMAGE  HINTTYPE(IH_NONE)
+GROUP  grp1(923, 368, 1001, 692)  'grp1'        COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  lblRBtnNo(909, 127, 965, 150)  'lblRBtnNo'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  fday(60, 6, 154, 26)  LEN(8)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_DATE  FONT("굴림체", 9, NORMAL)    COLOR(68, 130)  CUR(0)  TP_SUNKEN          EDITFORMAT("9999/99/99")  TABORDER(1)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  tday(172, 6, 266, 26)  LEN(8)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_DATE  FONT("굴림체", 9, NORMAL)    COLOR(68, 130)  CUR(0)  TP_SUNKEN          EDITFORMAT("9999/99/99")  TABORDER(2)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL2(159, 6, 167, 26)  '~'  AL_LEFT  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(76, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  unit(341, 635, 361, 655)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(13)  IOORDER(4)  GROUPN(29)  &
+  HINTTYPE(IH_NONE)
+EDIT  vagb(341, 612, 361, 632)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(14)  IOORDER(5)  GROUPN(29)  &
+  HINTTYPE(IH_NONE)
+EDIT  EDIT0(339, 568, 402, 586)  LEN(8)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(15)  IOORDER(6)  GROUPN(29)  &
+  HINTTYPE(IH_NONE)
+EDIT  EDIT1(339, 590, 402, 608)  LEN(8)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(16)  IOORDER(7)  GROUPN(29)  &
+  HINTTYPE(IH_NONE)
+LABEL  ISGRAPH(921, 150, 977, 172)  'T'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  BUTTON0(760, 6, 797, 26)  '조회'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, BOLD)  FOCUS  COLOR(208, 186)  CUR(0)    "조회BTN.BMP"    TABORDER(17)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+EDIT  g_chck(438, 522, 474, 541)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("0")          TABORDER(18)  IOORDER(8)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  RADIO0(145, 506, 243, 526)  '금액+계약수'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(grp1)    FONT("굴림체", 9, NORMAL)  COLOR(76, 130)  CUR(0)      TABORDER(5)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+TABLE  TABLE0(318, 38, 731, 57)  MATRIX(1, 1)  LINECOLOR(75)  CELLH(20)  AUTOSIZE    FONT("굴림체", 9, NORMAL)  EDIT_NOP    &
+	COLINFO("Row0")  LEN(0)  WIDTH(80)  HEAD("기관")  COLALIGN(AL_CENTER, AL_RIGHT)  HEADCOLOR(74, 76)  IO_NUM    COLOR(35, 63)  COLCUR(0, 0)  COLHINTTYPE(IH_NONE)    COLUMN_VISIBLE  IOORDER(0)  ENABLE  &
+  VISIBLE
+
+EDIT  focus(466, 460, 500, 478)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(19)  IOORDER(9)  ENABLE  &
+  HINTTYPE(IH_NONE)
+CONTROL  CONTROL0(182, 41, 183, 390)  |FA_PROTECT  "CX_LINE"  "/ctype0/dtype0/lcolor75/w1"  LEN(0)  EDIT_NOP    COLOR(192, 232)  TABORDER(0)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+CONTROL  CONTROL1(250, 42, 251, 391)  |FA_PROTECT  "CX_LINE"  "/ctype0/dtype0/lcolor75/w1"  LEN(0)  EDIT_NOP    COLOR(192, 232)  TABORDER(0)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+CONTROL  CONTROL2(318, 57, 319, 391)  |FA_PROTECT  "CX_LINE"  "/ctype0/dtype0/lcolor75/w1"  LEN(0)  EDIT_NOP    COLOR(192, 232)  TABORDER(0)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+CONTROL  CONTROL3(377, 57, 378, 391)  |FA_PROTECT  "CX_LINE"  "/ctype0/dtype0/lcolor75/w1"  LEN(0)  EDIT_NOP    COLOR(192, 232)  TABORDER(0)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+CONTROL  CONTROL4(436, 57, 437, 391)  |FA_PROTECT  "CX_LINE"  "/ctype0/dtype0/lcolor75/w1"  LEN(0)  EDIT_NOP    COLOR(192, 232)  TABORDER(0)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+CONTROL  CONTROL6(495, 57, 496, 391)  |FA_PROTECT  "CX_LINE"  "/ctype0/dtype0/lcolor75/w1"  LEN(0)  EDIT_NOP    COLOR(192, 232)  TABORDER(0)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+CONTROL  CONTROL7(554, 57, 555, 391)  |FA_PROTECT  "CX_LINE"  "/ctype0/dtype0/lcolor75/w1"  LEN(0)  EDIT_NOP    COLOR(192, 232)  TABORDER(0)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+CONTROL  CONTROL8(612, 57, 613, 391)  |FA_PROTECT  "CX_LINE"  "/ctype0/dtype0/lcolor75/w1"  LEN(0)  EDIT_NOP    COLOR(192, 232)  TABORDER(0)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+CONTROL  CONTROL9(671, 57, 672, 391)  |FA_PROTECT  "CX_LINE"  "/ctype0/dtype0/lcolor75/w1"  LEN(0)  EDIT_NOP    COLOR(192, 232)  TABORDER(0)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+TABLE  TABLE15(554, 56, 614, 74)  MATRIX(1, 1)  LINECOLOR(75)  CELLH(20)  AUTOSIZE    FONT("굴림체", 9, NORMAL)  EDIT_NOP    &
+	COLINFO("Row0")  LEN(0)  WIDTH(80)  HEAD("은행")  COLALIGN(AL_CENTER, AL_RIGHT)  HEADCOLOR(74, 76)  IO_NUM    COLOR(35, 63)  COLCUR(0, 0)  COLHINTTYPE(IH_NONE)    COLUMN_VISIBLE  IOORDER(0)  ENABLE  &
+  VISIBLE
+
+TABLE  TABLE16(612, 56, 672, 74)  MATRIX(1, 1)  LINECOLOR(75)  CELLH(20)  AUTOSIZE    FONT("굴림체", 9, NORMAL)  EDIT_NOP    &
+	COLINFO("Row0")  LEN(0)  WIDTH(80)  HEAD("기타금융")  COLALIGN(AL_CENTER, AL_RIGHT)  HEADCOLOR(74, 76)  IO_NUM    COLOR(35, 63)  COLCUR(0, 0)  COLHINTTYPE(IH_NONE)    COLUMN_VISIBLE  IOORDER(0)  ENABLE  &
+  VISIBLE
+
+TABLE  TABLE17(318, 56, 378, 74)  MATRIX(1, 1)  LINECOLOR(75)  CELLH(20)  AUTOSIZE    FONT("굴림체", 9, NORMAL)  EDIT_NOP    &
+	COLINFO("Row0")  LEN(0)  WIDTH(80)  HEAD("금융투자")  COLALIGN(AL_CENTER, AL_RIGHT)  HEADCOLOR(74, 76)  IO_NUM    COLOR(35, 63)  COLCUR(0, 0)  COLHINTTYPE(IH_NONE)    COLUMN_VISIBLE  IOORDER(0)  ENABLE  &
+  VISIBLE
+
+TABLE  TABLE18(377, 56, 437, 74)  MATRIX(1, 1)  LINECOLOR(75)  CELLH(20)  AUTOSIZE    FONT("굴림체", 9, NORMAL)  EDIT_NOP    &
+	COLINFO("Row0")  LEN(0)  WIDTH(80)  HEAD("보험")  COLALIGN(AL_CENTER, AL_RIGHT)  HEADCOLOR(74, 76)  IO_NUM    COLOR(35, 63)  COLCUR(0, 0)  COLHINTTYPE(IH_NONE)    COLUMN_VISIBLE  IOORDER(0)  ENABLE  &
+  VISIBLE
+
+TABLE  TABLE19(671, 56, 731, 74)  MATRIX(1, 1)  LINECOLOR(75)  CELLH(20)  AUTOSIZE    FONT("굴림체", 9, NORMAL)  EDIT_NOP    &
+	COLINFO("Row0")  LEN(0)  WIDTH(80)  HEAD("연기금 등")  COLALIGN(AL_CENTER, AL_RIGHT)  HEADCOLOR(74, 76)  IO_NUM    COLOR(35, 63)  COLCUR(0, 0)  COLHINTTYPE(IH_NONE)    COLUMN_VISIBLE  IOORDER(0)  ENABLE  &
+  VISIBLE
+
+TABLE  TABLE20(436, 56, 496, 74)  MATRIX(1, 1)  LINECOLOR(75)  CELLH(20)  AUTOSIZE    FONT("굴림체", 9, NORMAL)  EDIT_NOP    &
+	COLINFO("Row0")  LEN(0)  WIDTH(80)  HEAD("투신")  COLALIGN(AL_CENTER, AL_RIGHT)  HEADCOLOR(74, 76)  IO_NUM    COLOR(35, 63)  COLCUR(0, 0)  COLHINTTYPE(IH_NONE)    COLUMN_VISIBLE  IOORDER(0)  ENABLE  &
+  VISIBLE
+
+TABLE  TABLE22(495, 56, 555, 74)  MATRIX(1, 1)  LINECOLOR(75)  CELLH(20)  AUTOSIZE    FONT("굴림체", 9, NORMAL)  EDIT_NOP    &
+	COLINFO("Row0")  LEN(0)  WIDTH(80)  HEAD("사모")  COLALIGN(AL_CENTER, AL_RIGHT)  HEADCOLOR(74, 76)  IO_NUM    COLOR(35, 63)  COLCUR(0, 0)  COLHINTTYPE(IH_NONE)    COLUMN_VISIBLE  IOORDER(0)  ENABLE  &
+  VISIBLE
+
+TABLE  TABLE11(730, 38, 799, 74)  MATRIX(1, 1)  LINECOLOR(75)  CELLH(20)  AUTOSIZE    FONT("굴림체", 9, NORMAL)  EDIT_NOP    &
+	COLINFO("Row0")  LEN(0)  WIDTH(80)  HEAD("기타법인")  COLALIGN(AL_CENTER, AL_RIGHT)  HEADCOLOR(74, 76)  IO_NUM    COLOR(35, 63)  COLCUR(0, 0)  COLHINTTYPE(IH_NONE)    COLUMN_VISIBLE  IOORDER(0)  ENABLE  &
+  VISIBLE
+
+CONTROL  CONTROL5(1040, 42, 1041, 391)  |FA_PROTECT  "CX_LINE"  "/ctype0/dtype0/lcolor75/w1"  LEN(0)  EDIT_NOP    COLOR(192, 232)  TABORDER(0)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+CONTROL  CONTROL11(857, 42, 858, 391)  |FA_PROTECT  "CX_LINE"  "/ctype0/dtype0/lcolor75/w1"  LEN(0)  EDIT_NOP    COLOR(192, 232)  TABORDER(0)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON7(701, 6, 757, 26)  '참고사항'  TP_PUSH|IMAGETEXT|AL_STRETCH        FOCUS  COLOR(208, 69)  CUR(0)    "4btn.bmp"    TABORDER(20)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+COMBO  stock(300, 6, 384, 25)  TP_SUNKEN  LEN(1)  COUNT(2)  VCOUNT(2)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_NUM|EDIT_INPUT    COLOR(68, 69)  CUR(0)  DISPLAY("금액(억원)", "수량(천주)")  DATA("1", "2")    TABORDER(21)  IOORDER(10)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL3(274, 6, 299, 26)  '주식'  AL_LEFT  CUR(0)      COLOR(66, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+COMBO  future(419, 6, 503, 25)  TP_SUNKEN  LEN(1)  COUNT(2)  VCOUNT(2)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_NUM|EDIT_INPUT    COLOR(68, 69)  CUR(0)  DISPLAY("금액(억원)", "수량(계약)")  DATA("1", "2")    TABORDER(22)  IOORDER(11)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL23(394, 6, 419, 26)  '선물'  AL_LEFT  CUR(0)      COLOR(66, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+COMBO  coption(539, 6, 623, 25)  TP_SUNKEN  LEN(1)  COUNT(2)  VCOUNT(2)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_NUM|EDIT_INPUT    COLOR(68, 69)  CUR(0)  DISPLAY("금액(억원)", "수량(계약)")  DATA("1", "2")    TABORDER(23)  IOORDER(12)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL4(514, 6, 539, 26)  '옵션'  AL_LEFT  CUR(0)      COLOR(66, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+OBJECT  OBJ2(70, 232, 796, 286)    "IB29162B"  TABORDER(24)  IOORDER(13)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  OBJ3(70, 285, 796, 392)    "IB29162C"  TABORDER(25)  IOORDER(14)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  OBJ5(70, 75, 802, 394)    "IB291620"  TABORDER(26)  IOORDER(15)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+TABLE  TABLE4(5, 38, 115, 74)  MATRIX(1, 1)  LINECOLOR(75)  CELLH(20)  AUTOSIZE    FONT("굴림체", 9, BOLD)  EDIT_NOP    &
+	COLINFO("Row0")  LEN(0)  WIDTH(80)  COLALIGN(AL_CENTER, AL_RIGHT)  HEADCOLOR(74, 76)  IO_NUM    COLOR(68, 69)  COLCUR(0, 0)  COLHINTTYPE(IH_NONE)    COLUMN_VISIBLE  IOORDER(0)  ENABLE  &
+  VISIBLE
+
+BUTTON  BUTTON10(5, 75, 69, 127)  TP_PUSH|IMAGE|AL_STRETCH      COLOR(15, 63)  CUR(0)    "거래소_데이터.bmp"    TABORDER(6)  ENABLE  &
+  VISIBLE  IMAGE  HINTTYPE(IH_NONE)
+CONTROL  cxMarket(6, 6, 26, 26)  |FA_SKIP  "CX_MarketPicker"  "/k2/tIB291600/u1/d1"  LEN(12)  EDIT_NOP    COLOR(192, 232)  TABORDER(0)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  edMarketTrigger(864, 179, 894, 199)  LEN(6)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(33)  IOORDER(16)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Option Explicit
+Const R_TCNT = 6
+Const R_UNIT = 10
+Const DNIMG = "_DN.bmp"
+Const HVIMG = "_EN.bmp"
+Const UPIMG = ".bmp"
+Dim strExpr
+Dim ii
+Dim button, graphchk
+
+Sub ButtonRecov(button, graphchk)
+    SYSTEM.Trace "ButtonRecov"
+
+    '그래프 모드가 아니면
+    If graphchk = 0 Then
+    SYSTEM.Trace "graphchk:0 button:"&button
+    	If button = 1 Then
+			BUTTON11.Visible = False
+			BUTTON11.Enable  = False
+			BUTTON10.Visible = True
+			BUTTON10.Enable  = True
+    	ElseIf button = 2 Then
+			BUTTON21.Visible = False
+			BUTTON21.Enable  = False
+			BUTTON20.Visible = True
+			BUTTON20.Enable  = True
+    	ElseIf button = 3 Then
+ 			BUTTON31.Visible = False
+			BUTTON31.Enable  = False
+			BUTTON30.Visible = True
+			BUTTON30.Enable  = True
+    	ElseIf button = 4 Then
+			BUTTON41.Visible = False
+			BUTTON41.Enable  = False
+			BUTTON40.Visible = True
+			BUTTON40.Enable  = True
+    	ElseIf button = 5 Then
+ 			BUTTON51.Visible = False
+			BUTTON51.Enable  = False
+			BUTTON50.Visible = True
+			BUTTON50.Enable  = True
+    	ElseIf button = 6 Then
+ 			BUTTON61.Visible = False
+			BUTTON61.Enable  = False
+			BUTTON60.Visible = True
+			BUTTON60.Enable  = True
+        End If
+    Else
+        SYSTEM.Trace "graphchk:1 button:"&button
+        If button = 1 Then
+			BUTTON10.Visible = False
+			BUTTON10.Enable  = False
+			BUTTON11.Visible = True
+			BUTTON11.Enable  = True
+    	ElseIf button = 2 Then
+			BUTTON20.Visible = False
+			BUTTON20.Enable  = False
+			BUTTON21.Visible = True
+			BUTTON21.Enable  = True
+    	ElseIf button = 3 Then
+			BUTTON30.Visible = False
+			BUTTON30.Enable  = False
+			BUTTON31.Visible = True
+			BUTTON31.Enable  = True
+    	ElseIf button = 4 Then
+			BUTTON40.Visible = False
+			BUTTON40.Enable  = False
+			BUTTON41.Visible = True
+			BUTTON41.Enable  = True
+    	ElseIf button = 5 Then
+			BUTTON50.Visible = False
+			BUTTON50.Enable  = False
+			BUTTON51.Visible = True
+			BUTTON51.Enable  = True
+    	ElseIf button = 6 Then
+			BUTTON60.Visible = False
+			BUTTON60.Enable  = False
+			BUTTON61.Visible = True
+			BUTTON61.Enable  = True
+        End If
+    End If
+
+
+
+End Sub
+
+Sub ShowLine(bShow)
+ CONTROL0.ShowLine(bShow)
+ CONTROL1.ShowLine(bShow)
+ CONTROL2.ShowLine(bShow)
+ CONTROL3.ShowLine(bShow)
+ CONTROL4.ShowLine(bShow)
+ CONTROL5.ShowLine(bShow)
+ CONTROL6.ShowLine(bShow)
+ CONTROL7.ShowLine(bShow)
+ CONTROL8.ShowLine(bShow)
+ CONTROL9.ShowLine(bShow)
+ CONTROL10.ShowLine(bShow)
+
+End Sub
+
+'Radio Button 처리
+Sub ControlRBtn(iNum, radFlag)
+	Dim WHIMG
+
+
+
+	For ii=0 To R_TCNT - 1
+		strExpr = "BUTTON" & R_UNIT*(ii+1) & ".text=" & Chr(34) & "투자자별" & "0" & (ii+2)
+		If ii = CLng(iNum-1) Then
+			SYSTEM.Trace "graph txt : " & ISGRAPH.Text & " RbnNo : " & lblRBtnNo.Text
+			SYSTEM.Trace "iNum : " & iNum
+
+			If (ISGRAPH.Text = "G") And (CLng(lblRBtnNo.Text) = CLng(iNum)) Then
+			    SYSTEM.Trace "pyo mode"
+				OBJ5.Visible = False
+				SYSTEM.Trace "showline = " & "false"
+				ShowLine(1)
+				ISGRAPH.Text = "T"
+				OBJ1.Send
+				OBJ2.Send
+				OBJ3.Send
+				'	strExpr = strExpr & UPIMG
+				Call ButtonRecov(iNum, 0)
+		   Else
+				SYSTEM.Trace "graph mode"
+
+				OBJ5.Visible = True
+				SYSTEM.Trace "showline = " & "true"
+				ShowLine(0)
+		        ISGRAPH.Text = "G"
+				'	strExpr = strExpr & DNIMG
+		     	Call ButtonRecov(iNum, 1)
+			End If
+		Else
+				'strExpr = strExpr & UPIMG
+		End If
+		'strExpr = strExpr & Chr(34)
+
+		'execute strExpr
+	Next
+
+	lblRBtnNo.Text = iNum
+
+	If ISGRAPH.Text = "T" Then
+		OBJ1.Send
+		OBJ2.Send
+		OBJ3.Send
+	Else
+		OBJ5.Send
+	End If
+End Sub
+
+Const myFILE = "userconf.ini"
+Const myMAP = "IB291600"
+Dim jj
+
+Sub p_read_ini()
+If SCREEN.CreateObject("Info") Then
+ 	jj = Trim(INFO.PopData(LOGIN.Name, myFILE, myMAP, "G_CHCK"))
+	Select Case jj
+		Case "1"
+			Call ControlRBtn(1, False)
+		Case "2"
+			Call ControlRBtn(2, False)
+		Case "3"
+			Call ControlRBtn(3, False)
+		Case "4"
+			Call ControlRBtn(4, False)
+		Case "5"
+			Call ControlRBtn(3, False)
+		Case "6"
+			Call ControlRBtn(4, False)
+		Case Else
+
+		End Select
+	g_chck.Data = jj
+End If
+End Sub
+
+
+Sub p_write_ini()
+	If SCREEN.CreateObject("Info") Then
+	  INFO.PushData LOGIN.Name, myFILE, myMAP, "G_CHCK", g_chck.data
+	End If
+End Sub
+
+Sub p_write_ini2()
+	If SCREEN.CreateObject("INFO") Then
+		INFO.PushData LOGIN.Name, "userconf.ini", "IB291600", "stock", stock.data
+		INFO.PushData LOGIN.Name, "userconf.ini", "IB291600", "future", future.data
+		INFO.PushData LOGIN.Name, "userconf.ini", "IB291600", "option", coption.data
+	End If
+End Sub
+
+Sub p_read_ini2()
+	If SCREEN.CreateObject("INFO") Then
+		Dim vol, amt, acc
+		vol = Trim(INFO.PopData(LOGIN.Name, "userconf.ini", "IB291600", "stock"))
+		amt = Trim(INFO.PopData(LOGIN.Name, "userconf.ini", "IB291600", "future"))
+		acc = Trim(INFO.PopData(LOGIN.Name, "userconf.ini", "IB291600", "option"))
+
+		stock.data = vol
+		future.Data = amt
+		coption.data = acc
+
+		OBJ1.Send
+		OBJ2.Send
+		OBJ3.send
+
+	End If
+End Sub
+
+Sub Change_MKGubn_Main(sMKGubn)
+
+SYSTEM.Trace "[IB291600]Change_MKGubn_Main sMKGubn = " & sMKGubn
+	cxMarket.sMarket = sMKGubn
+	OBJ1.Send
+
+	If OBJ5.Visible =  True Then
+		OBJ5.Send
+	End If
+
+End Sub
+
+_AW_ONSTART_AW_
+' 현재 화면의 시장식별자(cxMarket)에 고유 화면번호 부여
+cxMarket.Major = SCREEN.Major
+
+
+OBJ5.Visible = False
+ShowLine(1)
+Call p_read_ini2()
+lblRBtnNo.Text = 0
+OBJ1.Send
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+SCREEN.OnSend False
+
+_AW_ONENDSUB_AW_
+_AW_ONCLOSE_AW_
+'p_write_ini()
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(BUTTON61)
+_AW_ONCLICK_AW_
+g_chck.Data = "6"
+Call ControlRBtn(6, False)
+
+button = 6
+'BUTTON61.Visible = False
+'BUTTON61.Enable  = False
+'BUTTON60.Visible = True
+'BUTTON60.Enable  = True
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON51)
+_AW_ONCLICK_AW_
+g_chck.Data = "5"
+Call ControlRBtn(5, False)
+
+button = 5
+'BUTTON51.Visible = False
+'BUTTON51.Enable  = False
+'BUTTON50.Visible = True
+'BUTTON50.Enable  = True
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON41)
+_AW_ONCLICK_AW_
+g_chck.Data = "4"
+Call ControlRBtn(4, False)
+
+button = 4
+'BUTTON41.Visible = False
+'BUTTON41.Enable  = False
+'BUTTON40.Visible = True
+'BUTTON40.Enable  = True
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON31)
+_AW_ONCLICK_AW_
+g_chck.Data = "3"
+Call ControlRBtn(3, False)
+
+button = 3
+'BUTTON31.Visible = False
+'BUTTON31.Enable  = False
+'BUTTON30.Visible = True
+'BUTTON30.Enable  = True
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON21)
+_AW_ONCLICK_AW_
+g_chck.Data = "2"
+Call ControlRBtn(2, False)
+
+button = 2
+'BUTTON21.Visible = False
+'BUTTON21.Enable  = False
+'BUTTON20.Visible = True
+'BUTTON20.Enable  = True
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON11)
+_AW_ONCLICK_AW_
+g_chck.Data = "1"
+Call ControlRBtn(1, False)
+
+button = 1
+'BUTTON11.Visible = False
+'BUTTON11.Enable  = False
+'BUTTON10.Visible = True
+'BUTTON10.Enable  = True
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(radAmt)
+_AW_ONCLICK_AW_
+'OBJ1.SetObject "MG720510"
+'
+'If CLng(lblRBtnNo.Text) = 0 Then
+'	lblRBtnNo.Text = 1
+'End If
+'Call ControlRBtn(CLng(lblRBtnNo.Text), True)
+BUTTON10.Enable = True
+BUTTON20.Enable = True
+BUTTON30.Enable = True
+BUTTON40.Enable = True
+BUTTON50.Enable = True
+BUTTON60.Enable = True
+OBJ1.Send
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(radVol)
+_AW_ONCLICK_AW_
+'OBJ1.SetObject "MG720510"
+'
+'If CLng(lblRBtnNo.Text) = 0 Then
+'	lblRBtnNo.Text = 1
+'End If
+'Call ControlRBtn(CLng(lblRBtnNo.Text), True)
+BUTTON10.Enable = True
+BUTTON20.Enable = True
+BUTTON30.Enable = True
+BUTTON40.Enable = True
+BUTTON50.Enable = True
+BUTTON60.Enable = True
+OBJ1.Send
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON20)
+_AW_ONCLICK_AW_
+g_chck.Data = "2"
+Call ControlRBtn(2, False)
+
+button = 2
+'BUTTON20.Visible = False
+'BUTTON20.Enable  = False
+'BUTTON21.Visible = True
+'BUTTON21.Enable  = True
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON30)
+_AW_ONCLICK_AW_
+g_chck.Data = "3"
+Call ControlRBtn(3, False)
+
+button = 3
+'BUTTON30.Visible = False
+'BUTTON30.Enable  = False
+'BUTTON31.Visible = True
+'BUTTON31.Enable  = True
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON40)
+_AW_ONCLICK_AW_
+g_chck.Data = "4"
+Call ControlRBtn(4, False)
+
+button = 4
+'BUTTON40.Visible = False
+'BUTTON40.Enable  = False
+'BUTTON41.Visible = True
+'BUTTON41.Enable  = True
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON50)
+_AW_ONCLICK_AW_
+g_chck.Data = "5"
+Call ControlRBtn(5, False)
+
+button = 5
+'BUTTON50.Visible = False
+'BUTTON50.Enable  = False
+'BUTTON51.Visible = True
+'BUTTON51.Enable  = True
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON60)
+_AW_ONCLICK_AW_
+g_chck.Data = "6"
+Call ControlRBtn(6, False)
+
+button = 6
+'BUTTON60.Visible = False
+'BUTTON60.Enable  = False
+'BUTTON61.Visible = True
+'BUTTON61.Enable  = True
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(fday)
+_AW_ONCHANGE_AW_
+focus.Data = "f"
+If ISGRAPH.Text = "T" Then
+	OBJ1.Send
+	OBJ2.Send
+	OBJ3.Send
+Else
+	OBJ5.Send
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(tday)
+_AW_ONCHANGE_AW_
+focus.Data = "b"
+If ISGRAPH.Text = "T" Then
+	OBJ1.Send
+	OBJ2.Send
+	OBJ3.Send
+Else
+	OBJ5.Send
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON0)
+_AW_ONCLICK_AW_
+OBJ1.Send
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(RADIO0)
+_AW_ONCLICK_AW_
+'OBJ1.SetObject "MG720510"
+'
+'If CLng(lblRBtnNo.Text) = 0 Then
+'	lblRBtnNo.Text = 1
+'End If
+'Call ControlRBtn(CLng(lblRBtnNo.Text), True)
+BUTTON10.Enable = False
+BUTTON20.Enable = False
+BUTTON30.Enable = False
+BUTTON40.Enable = False
+BUTTON50.Enable = False
+BUTTON60.Enable = False
+OBJ1.SetObject "IB291610"
+OBJ1.Send
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON7)
+_AW_ONCLICK_AW_
+SCREEN.CreateWindow 1, "IB291603 /s /p5", ""
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(stock)
+_AW_ONCHANGE_AW_
+Call p_write_ini2()
+
+If ISGRAPH.Text = "T" Then
+	OBJ1.Send
+Else
+	OBJ5.Send
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(future)
+_AW_ONCHANGE_AW_
+Call p_write_ini2()
+If ISGRAPH.Text = "T" Then
+	OBJ2.Send
+Else
+	OBJ5.Send
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(coption)
+_AW_ONCHANGE_AW_
+Call p_write_ini2()
+If ISGRAPH.Text = "T" Then
+	OBJ3.Send
+Else
+	OBJ5.Send
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON10)
+_AW_ONCLICK_AW_
+g_chck.Data = "1"
+Call ControlRBtn(1, False)
+
+button = 1
+'BUTTON10.Visible = False
+'BUTTON10.Enable  = False
+'BUTTON11.Visible = True
+'BUTTON11.Enable  = True
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(cxMarket)
+_AW_ONCLICK_AW_
+SCREEN.Proc "main.Change_MKGubn_Main", cxMarket.sMarket
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(edMarketTrigger)
+_AW_ONCHANGE_AW_
+Change_MKGubn_Main(Trim(edMarketTrigger.Data))
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

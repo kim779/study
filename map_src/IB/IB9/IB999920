@@ -1,0 +1,160 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB999920)
+MAPSIZE(250, 320)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("주문확인 경고창")
+MAPPUBLIC(";")
+FONT("굴림", 9, NORMAL)
+TITLE("주문확인 보기설정")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL1(0, 0, 320, 251)  LINECOLOR(67)      COLOR(68, 67)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL0(8, 140, 313, 158)  '※주문확인창 보지않기 선택 시 이후 전송되는 주문은'  AL_LEFT  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(208, 69)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL1(8, 160, 313, 178)  '확인창 없이 원클릭으로 주문 전송됩니다.'  AL_LEFT  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(208, 69)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL2(8, 180, 313, 198)  '주문의 신속성을 부여할 수 있으나 HTS 이용시 주의가'  AL_LEFT  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(208, 69)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL3(375, 91, 619, 109)  '사용자의 조작주의가 필요합니다.'  AL_LEFT  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(208, 69)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL4(375, 110, 619, 128)  '주문확인창 없이 주문처리 하시겠습니까?'  AL_LEFT  FONT("굴림", 9, NORMAL)  CUR(0)      COLOR(208, 214)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  BTN_Y(102, 225, 158, 245)  '확인'  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(132, 232)  CUR(0)    "4BTN.BMP"    TABORDER(1)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+BUTTON  BTN_N(162, 225, 218, 245)  '취소'  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(132, 232)  CUR(0)    "4BTN.BMP"    TABORDER(2)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+LABEL  LABEL5(375, 75, 619, 93)  '클릭 한 번으로 주문이 들어가므로'  AL_LEFT  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(208, 69)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  CHECK0(390, 160, 584, 177)  '주문 확인창 설정 계속 유지'  TP_CHECK|EDIT_NOP        FONT("굴림체", 9, BOLD)  COLOR(197, 94)  CUR(0)      TABORDER(3)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL6(6, 10, 295, 27)  '설정 시 모든 주문화면에 동일하게 적용됩니다.'  AL_LEFT  FONT("굴림체", 9, BOLD)  CUR(0)      COLOR(208, 94)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+CONTROL  cx_log(350, 200, 460, 255)  |FA_PROTECT  "CX_log"  ""  LEN(0)  EDIT_NOP    COLOR(192, 232)  TABORDER(0)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL7(5, 30, 294, 47)  '(주식, 선물옵션 주문화면전체)'  AL_LEFT  FONT("굴림체", 9, BOLD)  CUR(0)      COLOR(208, 94)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+PANEL  PANEL0(40, 55, 280, 90)  LINECOLOR(75)      COLOR(68, 130)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  r_ConF(73, 62, 248, 82)  '주문 확인창 보기(권장)'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(GP1)    FONT("굴림", 9, BOLD)  COLOR(146, 130)  CUR(0)      TABORDER(4)  ENABLE  &
+  VISIBLE  CHECKED  TRANSPARENT  HINTTYPE(IH_NONE)
+PANEL  PANEL2(40, 95, 280, 130)  LINECOLOR(75)      COLOR(68, 130)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  r_noConF(73, 102, 248, 122)  '주문확인창 보지않기'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(GP1)    FONT("굴림", 9, BOLD)  COLOR(146, 130)  CUR(0)      TABORDER(5)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL8(8, 200, 313, 218)  '필요합니다'  AL_LEFT  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(208, 69)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+GROUP  GP1(350, 270, 406, 290)  'GP1'        COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  btn_dec(470, 200, 555, 240)  '복호화Hlog.ini '  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(132, 232)  CUR(0)    "4BTN.BMP"    TABORDER(6)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Function Null_check(Data)
+    Null_check = Data
+    If Trim(data) = "" Then
+        Null_check = "NO"
+        Exit Function
+    End If
+End Function
+
+_AW_ONSTART_AW_
+SYSTEM.Push "rtn_OrderConfirm", "NO"
+
+If SCREEN.CreateObject("info") Then
+	 If INFO.PopData("", "AXIS.INI", "MODE", "DEV") = "1" Then
+	 	btn_dec.Visible = True
+	 Else
+	 	btn_dec.Visible = False
+	 End If
+End If
+
+Dim yn
+If SCREEN.CreateObject("info") Then
+	yn = Null_check(Trim(INFO.popdata(LOGIN.name, "userconf.ini", "S-ORD", "ORD_CONF")))
+	cx_log.WriteHlog "Hlog.ini", "IB999920", "[onstart]ORD_CONF", yn
+End If
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+SCREEN.OnSend = False
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(BTN_Y)
+_AW_ONCLICK_AW_
+Dim yn
+
+If r_ConF.Checked = True Then
+	yn = "NO"   '주문확인창 보기
+Else
+	yn = "OK"   '주문확인창 안보기
+End If
+
+SYSTEM.Push "rtn_OrderConfirm", yn
+
+If SCREEN.CreateObject("info") Then
+   	INFO.pushdata LOGIN.name, "userconf.ini", "S-ORD", "ORD_CONF", yn
+End If
+
+cx_log.WriteHlog "Hlog.ini", "IB999920", "ORD_CONF", yn
+
+SCREEN.CloseWindow
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BTN_N)
+_AW_ONCLICK_AW_
+SYSTEM.Push "rtn_OrderConfirm", "NO"
+SCREEN.CloseWindow
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(LABEL6)
+_AW_ONCLICK_AW_
+cx_log.DecHFile "Hlog.ini", "Crashlog"
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(LABEL7)
+_AW_ONCLICK_AW_
+cx_log.DecHFile "Hlog.ini", "Crashlog"
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(btn_dec)
+_AW_ONCLICK_AW_
+
+
+cx_log.DecFileFromDlg()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

@@ -1,0 +1,181 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB810256)
+MAPSIZE(203, 508)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("OTP요청")
+MAPPUBLIC(";")
+FONT("굴림", 9, NORMAL)
+OPTIONS(ENCODE|CR2TAB)
+TITLE("[8102]OTP요청")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("piboPBxQ")
+MAPTYPE(FIXED)
+HEADER(LEDGER)
+TRXH("31CSBPGT314")
+}
+
+
+
+FORM DIVISION
+{
+
+GROUP  grp1(19, 20, 213, 132)  'INPUT'        COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  zIn(108, 42, 193, 58)  LEN(5)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("00001")          TABORDER(1)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL9(27, 42, 105, 58)  '레코드갯수'        COLOR(66, 76)  CUR(0)    AL_LEFT    ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  zUserId(108, 59, 193, 75)  LEN(16)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(2)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL0(27, 59, 105, 75)  '사용자ID'        COLOR(66, 76)  CUR(0)    AL_LEFT    ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  zReqstSvcId(108, 76, 193, 92)  LEN(8)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(3)  IOORDER(3)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL2(27, 76, 105, 92)  '요청서비스ID'        COLOR(66, 76)  CUR(0)    AL_LEFT    ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  OUTPUT(250, 41, 485, 57)  LEN(29)  IO_MIXED|AL_LEFT|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(4)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  Out(340, 59, 430, 77)  LEN(5)  IO_NUM|AL_LEFT|    COLOR(192, 232)  CUR(0)  LINECOLOR(75)          TABORDER(0)  IOORDER(5)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  lOnesfCnfTrxSeqno(340, 77, 430, 95)  LEN(5)  IO_NUM|AL_LEFT|    COLOR(192, 232)  CUR(0)  LINECOLOR(75)          IFRGB(232, 232)  TABORDER(0)  IOORDER(6)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  zOnesfCnfPtnTp(340, 95, 430, 113)  LEN(1)  IO_MIXED|AL_LEFT|    COLOR(192, 232)  CUR(0)  LINECOLOR(75)          IFRGB(232, 232)  TABORDER(0)  IOORDER(7)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL10(249, 59, 339, 77)  '레코드갯수'  LINECOLOR(0)      COLOR(74, 76)  CUR(0)    AL_LEFT    ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL11(249, 77, 339, 95)  '본인확인처리일련번호'  LINECOLOR(0)      COLOR(74, 76)  CUR(0)    AL_LEFT    ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL13(249, 95, 339, 113)  '본인확인유형구분'  LINECOLOR(0)      COLOR(74, 76)  CUR(0)    AL_LEFT    ENABLE  &
+  HINTTYPE(IH_NONE)
+GROUP  GROUP0(232, 20, 502, 169)  'INPUT'        COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  lRetryAbleCnt(340, 113, 430, 131)  LEN(2)  IO_NUM|AL_LEFT|    COLOR(192, 232)  CUR(0)  LINECOLOR(75)          IFRGB(232, 232)  TABORDER(0)  IOORDER(8)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL4(249, 113, 339, 131)  '재시도가능횟수'  LINECOLOR(0)      COLOR(74, 76)  CUR(0)    AL_LEFT    ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  zMdaSeqnoReqstYn(340, 132, 430, 150)  LEN(1)  IO_NUM|AL_LEFT|    COLOR(192, 232)  CUR(0)  LINECOLOR(75)          IFRGB(232, 232)  TABORDER(0)  IOORDER(9)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL5(249, 132, 339, 150)  '매체일련번호요청여부'  LINECOLOR(0)      COLOR(74, 76)  CUR(0)    AL_LEFT    ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  send_btn(468, 3, 500, 23)  '조회'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, NORMAL)  COLOR(208, 232)  CUR(0)    "2btn.bmp"    TABORDER(4)  ENABLE  &
+  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+OBJECT  obj_op(40, 230, 195, 305)    "IB8101OP"  TABORDER(5)  IOORDER(10)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  opgubn(27, 105, 82, 121)  LEN(4)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("8102")          TABORDER(6)  IOORDER(11)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  obj_ox(265, 220, 420, 295)    "IB8101OX"  TABORDER(7)  IOORDER(12)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Option Explicit
+
+Sub send_f()
+	SCREEN.ClearAll 0, 0
+	SCREEN.Object("parent.responseMsg").Text = ""
+	LEDGER.Fkey = "C"
+	SCREEN.Send 0
+End Sub
+
+_AW_ONINDECLARE_AW_
+#Load IB888833
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+SCREEN.OnSend = False
+
+zIn.Data = "00001"
+zUserId.Data = Trim(SYSTEM.UserID)
+zReqstSvcId.Data = ""
+opgubn.Data = "8102"
+
+SCREEN.OnSend = True
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+SCREEN.Object("parent.responseMsg").Text = ""
+SCREEN.Object("parent.opindata").data = ""
+SCREEN.Object("parent.zMdaSeqno").data = ""
+
+If Trim(zOnesfCnfPtnTp.data) = "S" Then
+	SCREEN.Object("parent.LABEL3").text = "공동앱에 스마트OTP카드를"
+	SCREEN.Object("parent.LABEL4").text = "태그하여 생성되는 OTP생성번호"
+	SCREEN.Object("parent.LABEL5").text = "를 입력하여 주십시오"
+	SCREEN.Object("parent.CHECK0").visible = True
+Else
+	SCREEN.Object("parent.LABEL3").text = "OTP생성기에 표시되는"
+	SCREEN.Object("parent.LABEL4").text = "OTP생성번호를 입력하여"
+	SCREEN.Object("parent.LABEL5").text = "주십시오"
+	SCREEN.Object("parent.CHECK0").visible = False
+End If
+
+If Left(Trim(LEDGER.Ecod), 1) = "0" Then
+	SCREEN.Object("parent.lOnesfCnfTrxSeqno").Data = Trim(lOnesfCnfTrxSeqno.Data)
+	SCREEN.Object("parent.zOtpVrfVal").SetFocus
+
+	If zMdaSeqnoReqstYn.data = "Y" Then
+		SCREEN.Object("parent.zMdaSeqno").Enable = True
+		SCREEN.Object("parent.zMdaSeqno").SetFocus
+		If Trim(zOnesfCnfPtnTp.data) = "S" Then
+			MsgBox "매체일련번호 입력 후 전송 버튼을 클릭하세요",0,"IBK투자증권"
+			SCREEN.Object("parent.BUTTON0").Visible = False
+			SCREEN.Object("parent.BUTTON1").Visible = True
+		End If
+	Else
+		SCREEN.Object("parent.zMdaSeqno").Enable = False
+		If Trim(zOnesfCnfPtnTp.data) = "S" Then
+			If SCREEN.Object("parent.CHECK0").Checked = True Then
+				obj_op.Send
+			Else
+				obj_ox.Send
+			End If
+		End If
+	End If
+Else
+	SCREEN.Object("parent.responseMsg").Text = Trim(LEDGER.Emsg)
+	Call alert_msg(Trim(LEDGER.Emsg))
+End If
+
+_AW_ONENDSUB_AW_
+_AW_ONTIMER_AW_
+'SCREEN.Object("parent.OBJ_otp2").send
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(lOnesfCnfTrxSeqno)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(zOnesfCnfPtnTp)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(lRetryAbleCnt)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(zMdaSeqnoReqstYn)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(send_btn)
+_AW_ONCLICK_AW_
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

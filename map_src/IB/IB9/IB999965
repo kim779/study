@@ -1,0 +1,102 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB999965)
+MAPSIZE(147, 350)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("종목등락률")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(FLASH)
+TITLE("최선집행의무 등록 안내")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL1(0, 0, 350, 150)  LIMAGE(0)  LINEW(4)  STRESS(0)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(96, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL0(15, 20, 345, 50)  '중요 약관/설명서 미확인 시 '  AL_LEFT  FONT("굴림", 11, BOLD)  CUR(0)      COLOR(96, 224)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL1(15, 60, 345, 90)  '약관/설명서를 확인하시겠어요?'  AL_LEFT  FONT("굴림", 11, BOLD)  CUR(0)      COLOR(96, 224)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON0(90, 110, 146, 130)  '확인'  TP_PUSH|IMAGETEXT|AL_STRETCH        FOCUS  COLOR(208, 186)  CUR(0)    "4btn.bmp"    TABORDER(1)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+BUTTON  BUTTON1(205, 110, 261, 130)  '취소'  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(208, 186)  CUR(0)    "4btn.bmp"    TABORDER(2)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+EDIT  code(120, 180, 285, 190)  LEN(12)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(3)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL2(15, 45, 345, 65)  '3월 4일부터 국내주식 거래,청약이 불가해요.'  AL_LEFT  FONT("굴림", 11, BOLD)  CUR(0)      COLOR(96, 94)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Function Check_PDF_Confirm()
+	Check_PDF_Confirm = False
+	sRet = SYSTEM.Pop("PDF_CONFIRM")
+	If sRet = 1 Then
+		Check_PDF_Confirm = True
+	End If
+End Function
+
+_AW_ONTIMERX_AW_
+Dim ret
+Dim pdfret
+If id = 1 Then
+	ret = SYSTEM.Pop("999963closed")
+	SYSTEM.Trace "------------ontimer ret = " & ret
+	If ret = "1" Then
+		pdfret = SYSTEM.Pop("PDF_CONFIRM_ALL")
+		If pdfret = 1 Then
+			SCREEN.CloseWindow
+		Else
+		SYSTEM.Trace "999963 closed but no confirm"
+			'SCREEN.SetTimerX 1,1000, False
+			'SCREEN.CreateWindow 2, "IB999962 /t /S /p5",""
+			MsgBox "중요 약관/설명서 미확인 시 주문이 불가능합니다.", 0, "IBK투자증권"
+			SCREEN.CloseWindow
+		End If
+	Else
+		SYSTEM.Trace "999963 still open"
+		SCREEN.SetTimerX 1,1000, False
+	End If
+End If
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(BUTTON0)
+_AW_ONCLICK_AW_
+Dim sRet
+SYSTEM.Push "PDF_CONFIRM_ALL", "0"
+
+SCREEN.SetTimerX 1,1000, False
+
+SCREEN.CreateWindow 2, "IB999962 /t /S /p5",""
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON1)
+_AW_ONCLICK_AW_
+SCREEN.CloseWindow()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

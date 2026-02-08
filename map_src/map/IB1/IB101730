@@ -1,0 +1,94 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB101730)
+MAPSIZE(285, 656)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("관심")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(FMS|FLASH|CR2TAB)
+TITLE("[101730]검색")
+TOPATH(AXIS)
+METHOD(MENU)
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+GRID  GRID0(0, 28, 114, 285)  VISIBLEROW(11)  CELLH(18)  MATRIX(101, 1)  FIX(12)  MAINCOLOR(181, 0)  LINECOLOR(75)  FOCUSCOLOR(78)  FOCUSKIND(4)    FONT("굴림체", 9, NORMAL)  ROWC(76, 77)  |SELALWAYS|FLEXIBLE|VSCROLL|NO3D|RROW|XHLINE|PAGE|HEADER|GRFTEXT    &
+	COLINFO("Col0")  LEN(20)  WIDTH(98)  HEAD("검색조건")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT  |FA_FLASH    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    TABORDER(1)  IOORDER(1)  ENABLE  &
+  VISIBLE
+
+OBJECT  OBJ(114, 0, 656, 285)    "IB10173D"  TABORDER(2)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL1(0, 0, 114, 28)        COLOR(66, 69)  CUR(0)    AL_CENTER  FONT("굴림체", 9, NORMAL)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  SNAME(6, 6, 109, 24)  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Dim g_array
+g_ArrData=Array(Array("종목등락", "IB10173D", ""), _
+                Array("상하직전", "IB10173E", ""), _
+                Array("상하이탈", "IB10173F", ""), _
+                Array("고저근접", "IB10173G", ""), _
+                Array("신고신저", "IB10173H", ""), _
+                Array("등락순위", "IB10173I", ""), _
+                Array("상승률순", "IB10173J", ""), _
+                Array("하락률순", "IB10173K", ""), _
+                Array("최저상승", "IB10173L", ""), _
+                Array("최고하락", "IB10173M", ""), _
+                Array("거래증순", "IB10173N", ""), _
+                Array("거래회순", "IB10173O", ""), _
+                Array("거래량순", "IB10173P", ""), _
+                Array("거래액순", "IB10173Q", ""), _
+                Array("거급(준)", "IB10173R", ""), _
+                Array("거래급등", "IB10173S", ""))
+Sub makecond()
+	Dim ii
+	For ii=LBound(g_ArrData) To UBound(g_ArrData)
+		GRID0.InsertRow -1
+		GRID0.SetGridCell ii+1, 1, g_ArrData(ii)(0)
+	Next
+End Sub
+
+_AW_ONSTART_AW_
+makecond()
+SNAME.Text = Trim(GRID0.GetGridCell(GRID0.Row,1))
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+SCREEN.OnSend False
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(GRID0)
+_AW_ONCLICK_AW_
+If GRID0.HitPos = 3 Then
+	Dim namobj
+	namobj = g_ArrData(GRID0.row-1)(1)
+	OBJ.SetObject(namobj)
+	OBJ.Send
+	SNAME.Text = Trim(GRID0.GetGridCell(GRID0.Row,1))
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

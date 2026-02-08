@@ -1,0 +1,410 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB999970)
+MAPSIZE(20, 194)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("주문화면 정산금액")
+MAPPUBLIC(";")
+FONT("MS Sans Serif", 9, NORMAL)
+TITLE("주문화면 정산금액")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL0(0, 0, 155, 20)        COLOR(182, 130)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL0(3, 3, 52, 18)  '정산금액'  AL_LEFT  CUR(0)      COLOR(182, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  out_total(53, 1, 155, 19)  LEN(30)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  OBJ_FEE(7, 70, 217, 197)    "IB999971"  TABORDER(1)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  out_hts(275, 60, 375, 80)  LEN(11)  IO_NUM|AL_CENTER|    COLOR(192, 232)  CUR(0)  LINECOLOR(0)          TABORDER(0)  IOORDER(3)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  save_hts(275, 85, 385, 105)  LEN(16)  IO_NUM|AL_CENTER|    COLOR(192, 232)  CUR(0)  LINECOLOR(0)          TABORDER(0)  IOORDER(4)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BOX  BOX0(0, 0, 156, 20)    COLOR(130, 130)  LINEW(1)  BX_LINE    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  account(280, 108, 406, 132)  LEN(11)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(2)  IOORDER(5)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  dtlBtn(158, 0, 194, 20)  '상세'  TP_PUSH|IMAGETEXT|AL_CENTER        COLOR(132, 186)  CUR(0)    "2btn.BMP"    TABORDER(3)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+EDIT  orderAmt(279, 130, 389, 150)  LEN(30)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(4)  IOORDER(6)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  feeAmt(391, 130, 501, 150)  LEN(30)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(5)  IOORDER(7)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  taxAmt(278, 150, 388, 170)  LEN(30)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(6)  IOORDER(8)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  jmcd(280, 171, 329, 196)  LEN(6)  IO_MIXED|EDIT_INPUT|FA_WRAP  FONT("굴림체", 9, NORMAL)    COLOR(192, 232)  CUR(0)  TP_SUNKEN          TABORDER(7)  IOORDER(9)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  isDanju(281, 202, 367, 223)  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL6(129, 64, 249, 84)  '시작일자'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  date1(378, 68, 498, 88)  LEN(20)  IO_MIXED|AL_CENTER|    COLOR(192, 69)  CUR(0)            TABORDER(0)  IOORDER(10)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Option Explicit
+
+Dim mmgb, mapNm, acnt
+mmgb = ""
+mapNm = ""
+acnt = ""
+
+Function CheckHoga(para)
+	Dim pre_para
+  	pre_para = Mid(para, 2,1)
+
+	If (pre_para = "3") Or (pre_para = "6") Or (pre_para = "7") Or (pre_para = "1") Then
+		CheckHoga = True
+	Else
+	    CheckHoga = False
+	End If
+
+	If para = "01" Then   '스톱지정가인 경우
+		CheckHoga = False
+	End If
+
+End Function
+
+Sub CalcJungsan()
+	mapNm = Trim(SCREEN.GetMapName(1))
+	If mapNm = "IB105000" Then
+		Exit Sub
+	End If
+
+	acnt = Trim(SCREEN.Object("parent.parent.AN1A").Data)
+
+	If acnt = "" Then
+		Call dataClear()
+		Exit Sub
+	End If
+
+	jmcd.Data = Trim(SCREEN.Object("main.1301").Data)
+
+	If Len(Trim(jmcd.Data)) <> 6 Then
+		Call dataClear()
+		Exit Sub
+	End If
+
+	If SYSTEM.ConnectBy = "0" Then
+		If Trim(account.Data) = acnt Then
+			Call calc()
+		Else
+			account.Data = acnt
+			OBJ_FEE.Send
+		End If
+	Else								'직원용일경우 수수료를 가져올 필요없이 영업점 수수료 계산
+		Call calc()
+	End If
+End Sub
+
+Sub calc()
+
+'	SYSTEM.Trace "calc step1"
+	If SYSTEM.ConnectBy = "0" Then
+		If Trim(out_hts.Data) = "" Then
+			Call dataClear()
+			Exit Sub
+		End If
+	End If
+
+'	SYSTEM.Trace "calc step2"
+
+	Dim tamt, jqty, jprc, tprc, shogb
+	jqty = Trim(SCREEN.Object("parent.ed_jqty").Data)
+
+	If Is_numeric(jqty) = False Then
+		Call dataClear()
+		Exit Sub
+	End If
+
+	If mapNm = "IB103000" Then												'단주주문
+		isDanju.Text = "단주"
+		jprc = Trim(SCREEN.Object("main.OBJ_sise.2023").Data)
+		shogb = "00"
+	ElseIf mapNm = "IB100100" Or mapNm = "IB100200" Or mapNm = "IB800000" Or mapNm = "IB000100" Then
+		If SCREEN.Object("main.tab_ordtyp").ID = "2" Then									'단주주문
+			isDanju.Text = "단주"
+			jprc = Trim(SCREEN.Object("main.OBJ_sise.2023").Data)
+			shogb = "00"
+		ElseIf SCREEN.Object("main.tab_ordtyp").ID = "0" Then								'현금/신용
+			isDanju.Text = ""
+			jprc = Trim(SCREEN.Object("parent.ed_jprc").Data)
+			shogb = Trim(SCREEN.Object("parent.shogb").Data)
+		End If
+	Else
+		isDanju.Text = ""
+		jprc = Trim(SCREEN.Object("parent.ed_jprc").Data)
+		shogb = Trim(SCREEN.Object("parent.shogb").Data)
+	End If
+
+	If Is_numeric(jprc) = False Then
+		Call dataClear()
+		Exit Sub
+	End If
+
+	If CheckHoga(shogb) = True Then
+		tprc = Trim(SCREEN.Object("main.OBJ_SISE.2023").Data)
+
+	    If is_numeric(tprc) = True Then
+	  		jprc = tprc
+	  	Else
+	  		Call dataClear()
+	  		Exit Sub
+	    End If
+	End If
+
+	tamt = jqty * jprc
+	If Is_numeric(tamt) = False Then
+		Call dataClear()
+		Exit Sub
+	End If
+
+	orderAmt.Data = tamt													'주문금액
+
+	'**************************************************************************************
+	' 수수료 계산
+	' 수수료는 원단위이하 절삭
+	'**************************************************************************************
+	Dim jmcdtp, tmpFee
+	'jmcdtp = SCREEN.GetCodeType(Trim(jmcd.Data))		'SCREEN.GetCodeType : 1 거래소, 2 코스닥, 3 프리보드, 6 ETF, 9 ELW
+	jmcdtp = SCREEN.GetName(199, Trim(jmcd.Data), 0)
+	If Trim(jmcdtp) = "" Then
+		Exit Sub
+	End If
+	'SYSTEM.Trace "jmcdtp : " & jmcdtp
+	If Trim(isDanju.Text) <> "단주" Then
+		If SYSTEM.ConnectBy = "0" Then
+			If Is_numeric(save_hts.Data) = False Then
+				save_hts.Data = "0"
+			End If
+
+			If Trim(out_hts.Data) = "+0.00012500" And Trim(save_hts.Data) = "+000000000000500" Then		'save 수수료
+				If tamt >= 1000 Then
+					tmpFee = Fix(CDbl(tamt) * CDbl(out_hts.Data))					'소수점이하 버림.
+					tmpFee = CDbl(Left(Trim(tmpFee), Len(tmpFee) - 1) & "0") 		'수수료는 원단위 이하 절삭
+					feeAmt.Data = tmpFee + CDbl(save_hts.Data)
+				Else																'save수수료이면서 주문금액이 1000원이하이면 수수료는 0.1%에 +500원 제외
+					tmpFee = Fix(CDbl(tamt) * 0.001)								'수수료 0.1%, 소수점이하 버림.
+					tmpFee = CDbl(Left(Trim(tmpFee), Len(tmpFee) - 1) & "0")
+					feeAmt.Data = tmpFee 											'+500원 제외
+				End If
+			Else
+				tmpFee = Fix(CDbl(tamt) * CDbl(out_hts.Data))						'소수점이하 버림.
+				tmpFee = CDbl(Left(Trim(tmpFee), Len(tmpFee) - 1) & "0") 			'수수료는 원단위 이하 절삭
+				feeAmt.Data = tmpFee + CDbl(save_hts.Data)
+			End If
+		Else																		'직원용
+			If jmcdtp = 3 Then														'프리보드는 수수료 0.4%
+				tmpFee = Fix(CDbl(tamt) * 0.004)
+			Else
+				tmpFee = Fix(CDbl(tamt) * 0.005)
+			End If
+
+			tmpFee = CDbl(Left(Trim(tmpFee), Len(tmpFee) - 1) & "0")
+
+			feeAmt.Data = tmpFee
+		End If
+	Else
+		tmpFee = Fix(CDbl(tamt) * 0.005)								'단주주문시 수수료는 0.5%, 소수점이하 버림.
+		tmpFee = CDbl(Left(Trim(tmpFee), Len(tmpFee) - 1) & "0") 		'수수료는 원단위 이하 절삭
+
+		feeAmt.Data = tmpFee
+	End If
+
+	If Is_numeric(feeAmt.Data) = False Then
+		feeAmt.Data = 0
+	End If
+
+
+	'**************************************************************************************
+	' 거래세 계산
+	' 거래세는 사사오입
+	'**************************************************************************************
+	Dim tmpTax
+
+
+
+	If mmgb = "1" Then												'매도
+		If isDanju.Text <> "단주" Then
+			If Trim(jmcdtp) = "" Then
+				Exit Sub
+			End If
+			Select Case jmcdtp
+				Case 1, 2, 3 : tmpTax = Round((CDbl(tamt) * 0.0015), 0)		'코스피, 코스닥, K-OTC: 거래세 0.15%, 거래세는 사사오입
+																 			'단 코스피는 증권거래세 0.00% + 농특세 0.15% 총 0.15%
+				Case 28 : tmpTax = Round((CDbl(tamt) * 0.001), 0)			'코넥스 : 거래세 0.1%, 거래세는 사사오입
+				Case 6, 9 :	tmpTax = 0										'ETF, ELW는 거래세 없음.
+			End Select
+		Else
+			tmpTax = Round((CDbl(tamt) * 0.005), 0)							'단주주문일경우 세금은 0.5%
+		End If
+	Else
+		tmpTax = 0
+	End If
+
+	taxAmt.Data = tmpTax
+
+	If Is_numeric(taxAmt.Data) = False Then
+		taxAmt.Data = 0
+	End If
+
+'	SYSTEM.Trace "Caljungsan:: mmgb : " & mmgb & "  tamt : " &  tamt
+'	SYSTEM.Trace "Caljungsan:: jmcdtp : " & jmcdtp & "  tmpTax : " &  tmpTax
+	'**************************************************************************************
+	' 정산금액
+	'**************************************************************************************
+	Dim tmpJungsanAmt
+
+	If mmgb = "1" Then
+		tmpJungsanAmt = CDbl(orderAmt.Data) - CDbl(feeAmt.Data) - CDbl(taxAmt.Data)
+	Else
+		tmpJungsanAmt = CDbl(orderAmt.Data) + CDbl(feeAmt.Data)
+	End If
+
+'	SYSTEM.Trace "Caljungsan:: tmpJungsanAmt : " &  tmpJungsanAmt
+
+	out_total.Data = Trim(FormatNumber(tmpJungsanAmt,0)) & " 원"
+End Sub
+
+
+Sub dataClear()
+	orderAmt.Data = 0
+	feeAmt.Data = 0
+	taxAmt.Data = 0
+	out_total.Data = ""
+End Sub
+
+_AW_ONINDECLARE_AW_
+#Load IB888888
+
+_AW_ONENDSUB_AW_
+_AW_ONSTART_AW_
+mapNm = Trim(SCREEN.GetMapName(1))
+
+If mapNm = "IB105000" Then
+	SCREEN.Object("parent.OBJ_JUNGSAN").Visible = False
+	Exit Sub
+
+ElseIf mapNm = "IB103000" Then				'단주주문
+	isDanju.Text = "단주"
+	mmgb = Trim(SCREEN.Object("parent.ed_mmgb").Data)
+
+ElseIf mapNm = "IB100100" Or mapNm = "IB100200" Or mapNm = "IB800000" Or mapNm = "IB000100" Then
+	Dim tabGb
+	tabGb = Trim(SCREEN.Object("main.tab_ordtyp").ID)
+	SYSTEM.Trace "tabGb : " & tabGb
+	If tabGb = "2" Then											'단주
+		isDanju.Text = "단주"
+		mmgb = Trim(SCREEN.Object("parent.ed_mmgb").Data)
+	ElseIf SCREEN.Object("main.tab_ordtyp").ID = "0" Then		'현금/신용
+		isDanju.Text = ""
+		mmgb = Trim(SCREEN.Object("parent.ed_mmgb").Data)
+	Else														'대출
+		SCREEN.Object("parent.OBJ_JUNGSAN").Visible = False
+	End If
+
+Else	'1011, 1012, 2000, 3000, 5000
+	isDanju.Text = ""
+	mmgb = Trim(SCREEN.Object("parent.ed_mmgb").Data)
+End If
+
+If mmgb = "" Then
+	mmgb = "1"
+End If
+
+If mmgb = "1" Then
+	PANEL0.PRgb = 182
+	LABEL0.PRgb = 182
+	BOX0.PRgb   = 61
+	dtlBtn.Text = "매도_2BTN.BMP"
+ElseIf mmgb = "2" Then
+	PANEL0.PRgb = 183
+	LABEL0.PRgb = 183
+	BOX0.PRgb   = 163
+	dtlBtn.Text = "매수_2BTN.BMP"
+Else
+	PANEL0.PRgb = 184
+	LABEL0.PRgb = 184
+	BOX0.PRgb   = 185
+	dtlBtn.Text = "2btn.BMP"
+End If
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+SCREEN.OnSend = False
+
+_AW_ONENDSUB_AW_
+_AW_ONTIMER_AW_
+If SCREEN.Object("main.tab_ordtyp").ID = "2" Then
+	isDanju.Text = "단주"
+	mmgb = SCREEN.Object("parent.zBnsTp").Data
+ElseIf SCREEN.Object("main.tab_ordtyp").ID = "0" Then
+	isDanju.Text = ""
+	mmgb = SCREEN.Object("parent.ed_mmgb").data
+End If
+
+
+
+If mmgb = "1" Then
+	PANEL0.PRgb = 182
+	LABEL0.PRgb = 182
+	BOX0.PRgb   = 61
+	dtlBtn.Text = "매도_2BTN.BMP"
+ElseIf mmgb = "2" Then
+	PANEL0.PRgb = 183
+	LABEL0.PRgb = 183
+	BOX0.PRgb   = 163
+	dtlBtn.Text = "매수_2BTN.BMP"
+Else
+	PANEL0.PRgb = 184
+	LABEL0.PRgb = 184
+	BOX0.PRgb   = 185
+	dtlBtn.Text = "2btn.BMP"
+End If
+
+If SCREEN.Object("parent.JUMUN_B").Text = "매수(F2)" Or SCREEN.Object("parent.JUMUN_B").Text = "매도(F3)" Or _
+		SCREEN.Object("parent.JUMUN_B").Text = "단주매도(F3)" Then
+	SCREEN.Object("parent.OBJ_JUNGSAN").Visible = True
+End If
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(dtlBtn)
+_AW_ONCLICK_AW_
+Dim param
+param = "orderAmt"   & vbTab & Trim(FormatNumber(orderAmt.Data,0))  &" 원" & vbLf & _
+		"feeAmt"     & vbTab & Trim(feeAmt.Data)    &" 원" & vbLf & _
+		"taxAmt"     & vbTab & Trim(taxAmt.Data)    &" 원" & vbLf
+
+If mmgb = "1" Then
+	SCREEN.CreateWindow 5, "IB999972 /t /S /p? /d", param
+Else
+	SCREEN.CreateWindow 5, "IB999973 /t /S /p? /d", param
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

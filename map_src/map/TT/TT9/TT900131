@@ -1,0 +1,52 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(TT900131)
+MAPSIZE(105, 706)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("±¼¸²", 9, NORMAL)
+TITLE("Untitled")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pmho1002")
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+EDIT  ckey(8, 10, 128, 29)  LEN(30)  IO_MIXED|EDIT_INPUT    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(1)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  cont(7, 40, 697, 103)  LEN(5000)  IO_MIXED|AL_LEFT|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONSEND_AW_
+ckey.Data = SCREEN.object("parent.ckey").data
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+SCREEN.Object("parent.g_memo").data = cont.Data
+
+SCREEN.Proc "parent.send_pop", ""
+
+SCREEN.Proc "parent.send_obj2", ""
+
+_AW_ONENDSUB_AW_
+}
+
+
+

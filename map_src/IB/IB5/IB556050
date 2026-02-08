@@ -1,0 +1,362 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB556050)
+MAPSIZE(300, 305)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("5560우측하단주문")
+MAPPUBLIC(";")
+FONT("굴림", 9, NORMAL)
+TITLE("미국주식예약주문")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(FIXED)
+HEADER(NOP)
+BGROUND(BRUSH, 171)
+}
+
+
+
+FORM DIVISION
+{
+
+USRTAB  tab_order(1, 30, 275, 59)  FOCUS  INDEX(0)  COUNT(4)  AL_TOP  TAB_IMAGE  |FA_SKIP|FA_UPPER    FONT("굴림체", 9, NORMAL)    COLOR(3, 70)  CUR(0)  TABIMAGE("OTAB.BMP")  FCOLOR(3, 71)  CAPTION("예약매도", "예약매수", "예약취소", "예약매도상환")  TABINFO("1:1", "1:2", "1:3", "1:4")  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  ACNM(142, 5, 245, 25)  LEN(20)  IO_MIXED|AL_LEFT||FA_SKIP    COLOR(49, 130)  CUR(0)  LINECOLOR(48)          TABORDER(0)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  ed_pswd(245, 5, 301, 25)  LEN(8)  IO_MIXED|EDIT_INPUT|FA_PASSWD|FA_WRAP    COLOR(192, 130)  CUR(0)  TP_SUNKEN          TABORDER(2)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+CONTROL  AN3A(3, 5, 143, 25)    "CX_Account"  "/w0/t투자성향정보팝업"  LEN(11)  EDIT_INPUT    COLOR(68, 130)  TABORDER(1)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  OBJ_odr(0, 55, 305, 300)    "IB556060"  TABORDER(3)  IOORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  IMAXGROUP(90, 365, 115, 385)  LEN(2)  IO_MIXED|EDIT_INOUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(5)  IOORDER(5)  &
+  HINTTYPE(IH_NONE)
+EDIT  IMAXSKIN(117, 365, 142, 385)  LEN(1)  IO_MIXED|EDIT_INOUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(6)  IOORDER(6)  &
+  HINTTYPE(IH_NONE)
+GROUP  GROUP1(462, 367, 678, 496)  '주문전송 미국 obj'        COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  OBJ_snd(467, 387, 667, 487)    "IB99993B"  TABORDER(4)  IOORDER(7)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  IMAXGRIDCULVAL(90, 70, 555, 89)  LEN(200)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(7)  IOORDER(8)  &
+  HINTTYPE(IH_NONE)
+OBJECT  obj_exrate(217, 376, 357, 441)    "IB55000E"  TABORDER(8)  IOORDER(9)  ENABLE  &
+  HINTTYPE(IH_NONE)
+GROUP  GROUP2(202, 351, 377, 461)  'obj_exrate'        COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+CONTROL  cx_log(525, 170, 540, 190)  |FA_PROTECT  "CX_log"  ""  LEN(0)  EDIT_NOP    COLOR(192, 232)  TABORDER(0)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  edLoadDay(276, 33, 351, 48)  LEN(8)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(9)  IOORDER(10)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  edPassCnt(276, 49, 351, 64)  LEN(8)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(10)  IOORDER(11)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Dim g_flag
+g_flag = 0
+Dim g_int
+Dim g_jqty
+
+Sub InitIMAX
+	SCREEN.Proc "OBJ_odr.InitIMAX", ""
+End Sub
+
+
+Sub refresh_jango()
+	Select Case SCREEN.Object("Main.tab_jango").ID
+		Case 1 : SCREEN.Proc "Main.OBJ_jango.send_r", "" ' 예약주문내역
+	Case Else
+		' Do Nothing
+	End Select
+End Sub
+
+
+Sub Order_tab_change()
+	Select Case tab_order.ID
+		Case "1": OBJ_odr.SetObject("IB556060")
+		Case "2": OBJ_odr.SetObject("IB556070")
+		Case "3": OBJ_odr.SetObject("IB556080")
+		Case "4": OBJ_odr.SetObject("IB556061")
+	End Select
+
+End Sub
+
+Sub Parent_tab_change(tabID)
+	g_jqty = edPassCnt.Data
+	g_int = edLoadDay.Data
+	edPassCnt.Data= ""
+	edLoadDay.Data = ""
+	jango_tab_change(tabID)
+End Sub
+
+Sub jango_tab_change(index)
+	SCREEN.SetTimerX index, 5, False
+End Sub
+
+Sub SetOrdCancel()
+SYSTEM.Trace "IB556050 SetOrdCancel"
+	If tab_order.ID = 3 Then
+		OBJ_odr.Proc "Set_Orsjmno", ""
+	End If
+End Sub
+
+Sub Set_account()
+	ACNM.Data = AN3A.name
+	ed_pswd.Data = AN3A.Password
+
+	SCREEN.Proc "main.Set_account", "jumn"
+	SCREEN.Object("main.guide").Text = " "
+
+'	If xxxx_flag = 1 Then
+'		SCREEN.Proc "main.chk_xxxx", ""		'비밀번호 체크
+'		xxxx_flag = 0
+'	End If
+
+	If Trim(ed_pswd.Data) = "" Then
+		ed_pswd.SetFocus : Exit Sub
+	End If
+
+	SCREEN.SetTimer 3, False
+End Sub
+
+Sub SetGroup(groupID)
+	SCREEN.Proc "OBJ_odr.SetGroup", groupID
+End Sub
+
+'계좌 컨트롤 계좌리스트 조회끝난뒤 호출
+Sub Acc_SearchComplete()
+	SCREEN.Proc "main.Acc_SearchComplete", "1"
+End Sub
+
+Sub ChangeIMaxCode(smkgubn , scode)
+	OBJ_odr.Proc "ChangeIMaxCode", smkgubn & "," & scode
+End Sub
+
+
+Sub ExRateSearch2(edacno, lbcur)
+
+SYSTEM.Trace "------------------------------- edacno = " & edacno
+SYSTEM.Trace "------------------------------- lbcur = " & lbcur
+	SCREEN.Object("obj_exrate.ed_acno").Data =edacno
+	SCREEN.Object("obj_exrate.ed_mkcode").Data =lbcur
+	SCREEN.Object("obj_exrate").Send
+
+End Sub
+
+_AW_ONSEND_AW_
+SCREEN.OnSend = False
+
+_AW_ONENDSUB_AW_
+_AW_ONTIMER_AW_
+SCREEN.Proc "Main.OBJ_jango.send_f", "" '체결 미체결 예수금 차트 글로벌 뉴스 조회
+
+_AW_ONENDSUB_AW_
+_AW_ONTIMERX_AW_
+	If id = 4  Then
+'		tab_order.ID = 4
+'		OBJ_odr.SetObject("IB556061")
+'		SCREEN.Proc "OBJ_odr.InitIMAX",""
+'		SCREEN.SetTimerX 5, 500, False
+
+		If tab_order.ID <> id Then
+
+slog =  "changeTo 1  id = " & id & "  tab_order ID = " & tab_order.ID
+cx_log.axlog "[IMAXBAL]", slog
+
+			tab_order.ID = 4
+			OBJ_odr.SetObject("IB556061")
+			SCREEN.Proc "OBJ_odr.InitIMAX",""
+			SCREEN.SetTimerX 5, 500, False
+		Else
+			If Len(g_int) > 0 Then
+				SCREEN.Object("OBJ_odr.zlndt").data = g_int
+			End If
+			If Len(g_jqty) > 0 Then
+				SCREEN.Object("OBJ_odr.ed_jqty").data = g_jqty
+			End If
+			SCREEN.Proc "OBJ_odr.CalWon",""
+
+slog = "nochange  g_jqty = " & SCREEN.Object("OBJ_odr.ed_jqty").data
+cx_log.axlog "[IMAXBAL]", slog
+
+			SCREEN.SetTimerX 5, 100, False
+		End If
+
+
+	ElseIf  id = 5 Then
+		If Len(g_int) > 0 Then
+			SCREEN.Object("OBJ_odr.zlndt").data = g_int
+		End If
+		If Len(g_jqty) > 0 Then
+			SCREEN.Object("OBJ_odr.ed_jqty").data = g_jqty
+		End If
+		SCREEN.Proc "OBJ_odr.CalWon",""
+		g_jqty = ""
+		g_int = ""
+
+	ElseIf  id = 1 Then
+'		tab_order.ID = 1
+'		OBJ_odr.SetObject("IB556060")
+'		SCREEN.Proc "OBJ_odr.InitIMAX",""
+'		SCREEN.SetTimerX 6, 500, False
+
+		If tab_order.ID <> id Then
+
+slog =  "changeTo 1  id = " & id & "  tab_order ID = " & tab_order.ID
+cx_log.axlog "[IMAXBAL]", slog
+
+			tab_order.ID = 1
+			OBJ_odr.SetObject("IB556060")
+			SCREEN.Proc "OBJ_odr.InitIMAX",""
+			SCREEN.SetTimerX 6, 500, False
+		Else
+
+slog = "nochange  g_jqty = " & SCREEN.Object("OBJ_odr.ed_jqty").data
+cx_log.axlog "[IMAXBAL]", slog
+
+			SCREEN.Proc "OBJ_odr.CalWon",""
+			SCREEN.SetTimerX 6, 100, False
+
+		End If
+
+	ElseIf  id = 6 Then
+		SCREEN.Object("OBJ_odr.ed_jqty").data = g_jqty
+		SCREEN.Proc "OBJ_odr.CalWon",""
+		g_jqty = ""
+		g_int = ""
+	End If
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(tab_order)
+_AW_ONCLICK_AW_
+Call Order_tab_change()
+SCREEN.Proc "OBJ_odr.InitIMAX",""
+
+'Case "1": OBJ_odr.SetObject("IB556060")
+'Case "2": OBJ_odr.SetObject("IB556070")
+'Case "3": OBJ_odr.SetObject("IB556080")
+'Case "4": OBJ_odr.SetObject("IB556061")
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(ed_pswd)
+_AW_ONCHARCHANGE_AW_
+If SCREEN.Key = 13 And Len(Trim(ed_pswd.Data)) > 0  Then
+	SCREEN.Proc "main.all_account", ""
+End If
+_AW_ONENDSUB_AW_
+_AW_ONKEYCHANGE_AW_
+If SCREEN.Key = 13 And Len(Trim(ed_pswd.Data)) > 0  Then
+	SCREEN.Proc "main.all_account", ""
+'	SCREEN.Object("OBJ_odr.1301").SetFocus
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(AN3A)
+_AW_ONCHANGE_AW_
+Call Set_account()
+Acc_SearchComplete()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(IMAXGROUP)
+_AW_ONCHANGE_AW_
+IMAXGROUP.Trigger "", False
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(IMAXSKIN)
+_AW_ONCHANGE_AW_
+IMAXSKIN.Trigger "", False
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(IMAXGRIDCULVAL)
+_AW_ONCHANGE_AW_
+
+
+Dim arr, gubn, jqty, indt
+gubn = ""
+jqty = ""
+indt = ""
+
+arr = Split(IMAXGRIDCULVAL.Data, "|", -1, 1)
+For ii = LBound(arr) To UBound(arr)
+	SYSTEM.Trace arr(ii)
+
+	If ii = 8 Then
+		If Trim(arr(ii)) = "대출" Then
+			gubn ="대출"
+		ElseIf Trim(arr(ii)) = "현금" Then
+			gubn ="현금"
+		End If
+	End If
+
+'6매도가능
+'8잔고구분
+'9잔고수량
+'18대출일
+
+	If ii = 6 Then
+		jqty = arr(ii)
+	End If
+
+	If ii = 18 Then
+		indt = arr(ii)
+	End If
+
+
+
+Next
+
+'If Trim(gubn) = "대출" Then
+'	tab_order.ID = 4
+'	Call Order_tab_change()
+'	SCREEN.Proc "OBJ_odr.InitIMAX",""
+
+'	SCREEN.Object("OBJ_odr.ed_jqty").data = jqty
+'	indt = Replace(indt,"/","")
+'	'MsgBox indt
+'	SCREEN.Object("OBJ_odr.zlndt").data = indt
+'ElseIf Trim(gubn) = "현금" Then
+'	tab_order.ID = 1
+'	Call Order_tab_change()
+'	SCREEN.Proc "OBJ_odr.InitIMAX",""
+
+'	SCREEN.Object("OBJ_odr.ed_jqty").data = jqty
+'End If
+
+If Trim(gubn) = "대출" Then
+	indt = Replace(indt,"/","")
+	g_jqty = jqty
+	g_int = indt
+	Call jango_tab_change(4)
+
+ElseIf Trim(gubn) = "현금" Then
+	g_jqty = jqty
+	g_int = indt
+	Call jango_tab_change(1)
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

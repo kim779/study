@@ -1,0 +1,101 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB875250)
+MAPSIZE(450, 700)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("MS Sans Serif", 9, NORMAL)
+TITLE("[IB875250]")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pidoeldt")
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL31(0, 0, 700, 380)        COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  ed_gubn(10, 10, 130, 29)  LEN(1)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("q")          TABORDER(1)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  ot_smsg(10, 40, 305, 65)  LEN(64)  IO_MIXED|AL_LEFT|    COLOR(192, 69)  CUR(0)            TABORDER(0)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  ot_nrec(10, 70, 125, 85)  LEN(4)  IO_NUM|AL_RIGHT|    COLOR(192, 69)  CUR(0)            TABORDER(0)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON0(480, 55, 560, 95)  TP_PUSH      AL_CENTER    FOCUS  COLOR(208, 232)  CUR(0)      TABORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+GRID  GRID0(25, 140, 615, 345)  VISIBLEROW(0)  CELLH(20)  MATRIX(2000, 2)  FIX(0)  MAINCOLOR(208, 232)  LINECOLOR(0)  FOCUSCOLOR(0)  FOCUSKIND(0)  |VSCROLL|TABLE    &
+	COLINFO("Col0")  LEN(6)  WIDTH(80)  HEAD("주차")  COLALIGN(AL_LEFT, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_MIXED|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col1")  LEN(16)  WIDTH(262)  HEAD("주차명")  COLALIGN(AL_LEFT, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_MIXED|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    TABORDER(3)  IOORDER(4)  ENABLE  &
+  VISIBLE
+
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Dim g_ComboIndex
+g_ComboIndex = "0"
+'-------------------------------------------------------------
+Sub SetComboIndex(Data)
+	g_ComboIndex = Data
+End Sub
+'-------------------------------------------------------------
+Sub SetComboData()
+	Data = Trim(ot_nrec.Data)
+	If Len(Data) = 0 Then
+		Exit Sub
+	End If
+	Data = ""
+	For i = 1 To ot_nrec.Data
+		Week = Trim(GRID0.GetGridCell(i, 1))
+		Disp = Trim(GRID0.GetGridCell(i, 2))
+
+		If Len(Week) = 0 Then
+			Exit For
+		ElseIf Len(Week) = 5 Then
+			Week = " " & Week
+		End If
+
+		If i = 1 Then
+			Data = Week
+		End If
+
+		Data = Data & vbTab & Week & Disp
+	Next
+
+	SCREEN.Proc "Main.SetComboData", Data & "," & g_ComboIndex & "," & ot_nrec.Data
+End Sub
+'-------------------------------------------------------------
+Sub SendData()
+	SCREEN.Send 0
+End Sub
+
+_AW_ONRECEIVE_AW_
+SetComboData
+'SCREEN.Proc "Main.SendData" ,"0"
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(BUTTON0)
+_AW_ONCLICK_AW_
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

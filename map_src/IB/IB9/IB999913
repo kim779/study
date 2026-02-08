@@ -1,0 +1,452 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB999913)
+MAPSIZE(641, 925)
+VERSION(000)
+MAPKIND(PROCEDURES)
+MAPGROUP(1)
+MAPDESC("주문obj main공통함�")
+MAPPUBLIC(";")
+FONT("굴림", 9, NORMAL)
+TITLE("주문obj포함 main공통함수")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+'== 주문obj를포함한 main의 공통함수
+Sub SetPrice(code, Price)
+	If code <> "" Then
+		If Len(code) = 7 Then
+			code = Mid(code, 2)
+		End If
+'		SYSTEM.Trace "mapName : " & SCREEN.GetMapName(1) & "code : " & code & " objCode : " & S1301.data
+
+		If code = S1301.data Then
+			If SCREEN.GetMapName(1) <> "IB303100" Then
+				If SCREEN.GetMapName(1) = "IB103200" Or SCREEN.GetMapName(1) = "IB103300" Then
+					If tab_ordtyp.ID = 0 Then
+						If	SCREEN.Object("OBJ_order.obj_odr.ed_jprc").Enable = True Then
+							SCREEN.Object("OBJ_order.obj_odr.ed_jprc").data = Price
+						End If
+					End If
+				Else
+					If	SCREEN.Object("OBJ_order.obj_odr.ed_jprc").Enable = True Then
+						SCREEN.Object("OBJ_order.obj_odr.ed_jprc").data = Price
+						SCREEN.Object("OBJ_order.obj_odr.ed_jprc").SetFocus
+					End If
+				End If
+			End If
+		End If
+	End If
+End Sub
+
+Sub SetStopPrice(code, Price)
+	If code <> "" Then
+		If Len(code) = 7 Then
+			code = Mid(code, 2)
+		End If
+
+		If code = S1301.data Then
+			If SCREEN.GetMapName(1) = "IB103200" Or SCREEN.GetMapName(1) = "IB103300" Then
+				If tab_ordtyp.ID = 0 Then
+					If UCase(TypeName( SCREEN.Object("OBJ_order.obj_odr.edStopPrc"))) <> "NOTHING" Then
+						If	SCREEN.Object("OBJ_order.obj_odr.edStopPrc").Enable = True Then
+							SCREEN.Object("OBJ_order.obj_odr.edStopPrc").data = Price
+						End If
+					End If
+				End If
+			Else
+				If UCase(TypeName( SCREEN.Object("OBJ_order.obj_odr.edStopPrc"))) <> "NOTHING" Then
+					If	SCREEN.Object("OBJ_order.obj_odr.edStopPrc").Enable = True Then
+						SCREEN.Object("OBJ_order.obj_odr.edStopPrc").data = Price
+						SCREEN.Object("OBJ_order.obj_odr.edStopPrc").SetFocus
+					End If
+				Else
+					SYSTEM.Trace "!!!!!!!!!!!!!999913  edStopPrc no exist"
+				End If
+			End If
+		End If
+	End If
+End Sub
+
+'********************************************************************
+Sub Order_mini_change()
+	Select Case SCREEN.Object("OBJ_order.tab_order").ID
+	Case "1" : SCREEN.SetCaption "IB101100" &vbTab& "[1011] 매도"
+	Case "2" : SCREEN.SetCaption "IB101200" &vbTab& "[1012] 매수"
+	Case "3" : SCREEN.SetCaption "IB101300" &vbTab& "[1013] 정정"
+	Case "4" : SCREEN.SetCaption "IB101400" &vbTab& "[1014] 취소"
+	End Select
+End Sub
+
+'********************************************************************
+' desc : 미니주문 오픈시 해당 주문obj로 설정
+'        1:매도, 2:매수, 3:정정, 4:취소
+Sub Set_mini_order(xval)
+	Dim	sdata
+	If xval < 1 Or xval > 4 Then Exit Sub
+
+	SCREEN.Object("OBJ_order.tab_order").id = xval
+	Select Case xval
+	Case 1 : SCREEN.Object("OBJ_order.obj_odr").SetObject "IB100150"
+	Case 2 : SCREEN.Object("OBJ_order.obj_odr").SetObject "IB100160"
+	Case 3 : SCREEN.Object("OBJ_order.obj_odr").SetObject "IB100170"
+	Case 4 : SCREEN.Object("OBJ_order.obj_odr").SetObject "IB100180"
+	End Select
+	'-- CreatWindow로 미니주문 open시 domino데이타 처리
+	SCREEN.SetTimer 2, True
+End Sub
+
+Sub Set_mini_domino(xval)
+	Dim sdata, mkgb, codx
+	'-- CreatWindow로 미니주문 open시
+	'   domino_data = "종목코드 | 주문번호 | 주문가격 | 주문수량 | "
+
+	' 도미노 파싱
+	domino_data.data = SYSTEM.Pop("domino_data")
+	If Trim(domino_data.Data) = "" Then
+		Exit Sub
+	End If
+	SCREEN.Object("OBJ_order.obj_odr.isQueryHoga").Data = "1"
+	sdata = Split(domino_data.Data,"|")
+SCREEN.IgnoreChange True
+
+	SYSTEM.Push "S_code", sdata(0)	' 종목코드
+	SYSTEM.Push "S_ogno", sdata(1)	' 원주문번호
+	SYSTEM.Push "S_jprc", sdata(2)	' 주문가격
+	SYSTEM.Push "S_jqty", sdata(3)	' 주문수량
+	mkgb = sdata(4)					' 시장구분 1:KRX 2:NXT S:SOR
+	codx = SYSTEM.Pop("S_code")
+
+	' 시장구분자 변경
+	Call Spread_mkgb(codx, mkgb)
+
+SYSTEM.Trace "IB999913 upbound = " & UBound(sdata)
+
+	SCREEN.Object("OBJ_order.obj_odr.OBJ_hnam.1301").Data = SYSTEM.Pop("S_code")
+	SCREEN.Object("OBJ_order.obj_odr.1301").Data = SYSTEM.Pop("S_code")
+	SCREEN.Object("OBJ_order.obj_odr.OBJ_hnam").Send
+	S1301.Data = sdata(0)
+	SCREEN.Object("OBJ_order.obj_odr.ed_ogno").Data = SYSTEM.Pop("S_ogno")
+
+	If SCREEN.Object("OBJ_order.obj_odr.ed_jqty").Enable Then
+'		SYSTEM.Trace "1001 domino qty :::: " & sdata(3)
+		SCREEN.Object("OBJ_order.obj_odr.ed_jqty").Data = SYSTEM.Pop("S_jqty")
+	End If
+
+	If xval = "3" Then	'-- 정정인 경우
+		SCREEN.Object("OBJ_order.obj_odr.ed_jprc").Data = SYSTEM.Pop("S_jprc")
+		If UBound(sdata) > 4 Then
+			If InStr(sdata(4), "스톱") > 0 Then
+				SCREEN.Object("OBJ_order.obj_odr.shogb").Data = "01"
+			ElseIf InStr(sdata(4), "중간") > 0 Then
+				SCREEN.Object("OBJ_order.obj_odr.shogb").Data = "02"
+			End If
+		End If
+	End If
+
+	SYSTEM.Push "S_ogno", ""
+	SYSTEM.Push "S_jprc", ""
+	SYSTEM.Push "S_jqty", ""
+	SYSTEM.Push "S_code", ""
+
+	obj_sise.Send
+
+SCREEN.IgnoreChange False
+	domino_data.Clear
+	SYSTEM.Push "domino_data", ""
+
+	SCREEN.Object("OBJ_order.obj_odr.ed_jqty").SetFocus
+End Sub
+
+'********************************************************************
+' desc : 메시지를 가이드로 출력
+Sub	Set_guide(msgx)
+	If Trim(msgx) = "" Then msgx = Space(80)
+	guide.Text = msgx
+End Sub
+
+'********************************************************************
+' desc : 시세OBJ의 종목코드 변경시 주문OBJ코드 변경
+Sub Ord_ChangeCode(code)
+SYSTEM.Trace "      [999913]Ord_ChangeCode -> ChangeCode"
+
+SCREEN.IgnoreChange True
+	SCREEN.Object("OBJ_order.obj_odr.1301").Data = code
+SCREEN.IgnoreChange False
+	SCREEN.Proc "OBJ_order.obj_odr.ChangeCode", ""
+
+End Sub
+
+'********************************************************************
+' desc : 미체결, 체결, 잔고 내역 클릭시 주문화면 변경
+'        1:매도, 2:매수, 3:정정, 4:취소
+Sub change_tab_order(valx)
+	If SCREEN.GetMapName(1) = "IB100200" Or SCREEN.GetMapName(1) = "IB100100" Then
+		tab_ordtyp.id = valx / 10
+		Call tab_ordtyp_change()
+	End If
+	valx = valx Mod 10
+
+	' 현재 주문 탭과 같은 탭인 경우 SetObject SKIP 처리
+	' 2025.09.19 by LIM
+	If UCase(TypeName( SCREEN.Object("Main.OBJ_order.tab_order") )) <> "NOTHING" Then
+		If SCREEN.Object("Main.OBJ_order.tab_order").ID = valx Then
+			Exit Sub
+		End If
+	End If
+
+	SCREEN.Object("OBJ_order.tab_order").id = valx
+	Select Case valx
+	Case 1				'-- 매도
+		Select Case SCREEN.GetMapName(1)
+		Case "IB200000" : SCREEN.Object("OBJ_order.OBJ_odr").SetObject "IB200095"
+		Case "IB2000XX" : SCREEN.Object("OBJ_order.OBJ_odr").SetObject "IB200095"
+		Case "IB2000YY" : SCREEN.Object("OBJ_order.OBJ_odr").SetObject "IB200095"
+		Case "IB300000" : SCREEN.Object("OBJ_order.OBJ_odr").SetObject "IB300095"
+		Case "IB680100" : SCREEN.Object("OBJ_order.OBJ_odr").SetObject "IB680150"
+		Case "IB690100" : SCREEN.Object("OBJ_order.OBJ_odr").SetObject "IB690150"
+		Case "IB610100" : SCREEN.Object("OBJ_order.OBJ_odr").SetObject "IB610150"
+		Case "IB104000" : SCREEN.Object("OBJ_order.OBJ_odr").SetObject "IB104050"
+		Case "IB180100" : SCREEN.Object("OBJ_order.OBJ_odr").SetObject "IB180150"
+		Case "IB101900" : SCREEN.Object("OBJ_order.OBJ_odr").SetObject "IB101950"
+		Case "IB360000" : SCREEN.Object("OBJ_order.OBJ_odr").SetObject "IB360410"
+		Case Else		: SCREEN.Object("OBJ_order.obj_odr").SetObject "IB100150"
+		End Select
+	Case 2				'-- 매수
+		Select Case SCREEN.GetMapName(1)
+		Case "IB200000" : SCREEN.Object("OBJ_order.OBJ_odr").SetObject "IB200096"
+		Case "IB2000XX" : SCREEN.Object("OBJ_order.OBJ_odr").SetObject "IB200096"
+		Case "IB2000YY" : SCREEN.Object("OBJ_order.OBJ_odr").SetObject "IB200096"
+		Case "IB300000" : SCREEN.Object("OBJ_order.OBJ_odr").SetObject "IB300096"
+		Case "IB680100" : SCREEN.Object("OBJ_order.OBJ_odr").SetObject "IB680160"
+		Case "IB690100" : SCREEN.Object("OBJ_order.OBJ_odr").SetObject "IB690160"
+		Case "IB610100" : SCREEN.Object("OBJ_order.OBJ_odr").SetObject "IB610160"
+		Case "IB104000" : SCREEN.Object("OBJ_order.OBJ_odr").SetObject "IB104060"
+		Case "IB180100" : SCREEN.Object("OBJ_order.OBJ_odr").SetObject "IB180160"
+		Case "IB101900" : SCREEN.Object("OBJ_order.OBJ_odr").SetObject "IB101960"
+		Case "IB360000" : SCREEN.Object("OBJ_order.OBJ_odr").SetObject "IB360420"
+		Case Else 		: SCREEN.Object("OBJ_order.obj_odr").SetObject "IB100160"
+		End Select
+	Case 3				'-- 정정
+		Select Case SCREEN.GetMapName(1)
+		Case "IB200000" : SCREEN.Object("OBJ_order.OBJ_odr").SetObject "IB200097"
+		Case "IB2000XX" : SCREEN.Object("OBJ_order.OBJ_odr").SetObject "IB200097"
+		Case "IB2000YY" : SCREEN.Object("OBJ_order.OBJ_odr").SetObject "IB200097"
+		Case "IB300000" : SCREEN.Object("OBJ_order.OBJ_odr").SetObject "IB300097"
+		Case "IB680100" : SCREEN.Object("OBJ_order.OBJ_odr").SetObject "IB680170"
+		Case "IB690100" : SCREEN.Object("OBJ_order.OBJ_odr").SetObject "IB690170"
+		Case "IB610100" : SCREEN.Object("OBJ_order.OBJ_odr").SetObject "IB610170"
+		Case "IB180100" : SCREEN.Object("OBJ_order.OBJ_odr").SetObject "IB180170"
+		Case "IB101900" : SCREEN.Object("OBJ_order.OBJ_odr").SetObject "IB101970"
+		Case "IB360000" : SCREEN.Object("OBJ_order.OBJ_odr").SetObject "IB360430"
+		Case Else		: SCREEN.Object("OBJ_order.obj_odr").SetObject "IB100170"
+		End Select
+	Case 4				'-- 취소
+		Select Case SCREEN.GetMapName(1)
+		Case "IB200000" : SCREEN.Object("OBJ_order.OBJ_odr").SetObject "IB200098"
+		Case "IB300000" : SCREEN.Object("OBJ_order.OBJ_odr").SetObject "IB300098"
+		Case "IB680100" : SCREEN.Object("OBJ_order.OBJ_odr").SetObject "IB680180"
+		Case "IB690100" : SCREEN.Object("OBJ_order.OBJ_odr").SetObject "IB690180"
+		Case "IB610100" : SCREEN.Object("OBJ_order.OBJ_odr").SetObject "IB610180"
+		Case "IB104000" : SCREEN.Object("OBJ_order.OBJ_odr").SetObject "IB104080"
+		Case "IB101900" : SCREEN.Object("OBJ_order.OBJ_odr").SetObject "IB101980"
+		Case Else		: SCREEN.Object("OBJ_order.obj_odr").SetObject "IB100180"
+		End Select
+	Case Else : Exit Sub
+	End Select
+End Sub
+
+'********************************************************************
+' desc : 주식주문2(IB100200)에서 주문타입변경시 계좌비밀번호 유지
+Sub chk_xxxx()
+	Dim xxxx_acc, xxxx_pswd, xxxxdata
+	If SCREEN.GetMapName(1) = "IB100200" Or SCREEN.GetMapName(1) = "IB104000" Or SCREEN.GetMapName(1) = "IB000100" Or SCREEN.GetMapName(1) = "IB100100" Then
+
+		If Trim(SCREEN.Object("OBJ_order.ed_pswd").Data) <> "" Then
+			Exit Sub
+		End If
+
+		If Trim(xxxx.Text) = "" Then
+			Exit Sub
+		Else
+		SYSTEM.Trace Trim(xxxx.Text)
+			xxxxdata = Split(Trim(xxxx.Text),"|",-1,1)
+			xxxx_acc = Trim(xxxxdata(0))
+			xxxx_pswd = Trim(xxxxdata(1))
+		End If
+
+		If xxxx_pswd = "" Then
+			Exit Sub
+		ElseIf xxxx_acc <> Trim(SCREEN.Object("OBJ_order.AN1A").Data) Then
+			Exit Sub
+		End If
+
+
+		SCREEN.IgnoreChange True
+			SCREEN.Object("OBJ_order.ed_pswd").Data = Trim(xxxx_pswd)
+		SCREEN.IgnoreChange False
+	End If
+End Sub
+
+
+'=============================================================================
+' 미체결내역 클릭 시, 종목에 따른 NXT 지원 여부에 따라 Main 시장을 변경하거나
+' 현재 선택한 시장과 Main의 시장이 다른경우 선택한 시장을 전파
+' ------------------------------ 주의 ----------------------------
+' 현재 함수 수정 시, IB999901과 IB999913 공통 동시에 수정이 필요함
+' ----------------------------------------------------------------
+'=============================================================================
+Sub Spread_mkgb(codx, mkgb)
+	Dim sMKGubn, tMKGubn, t_mkgb, iret
+
+	'==============================================
+	' 현재 입력받은 시장구분자
+	'==============================================
+	' 미체결에서 호출 시 : 1   2   S
+	' 일반화면   호출 시 : KRX NXT 통합 (cxMarket)
+	'==============================================
+	Select Case mkgb
+	Case "KRX"
+		t_mkgb = "1"
+	Case "NXT"
+		t_mkgb = "2"
+	Case "통합"
+		t_mkgb = "S"
+	Case "SOR"
+		t_mkgb = "S"
+	Case Else
+		t_mkgb = mkgb
+	End Select
+
+
+
+	If UCase(TypeName( SCREEN.Object("Main.cxMarket") ) ) <> "NOTHING" Then
+
+		SCREEN.IgnoreChange True
+
+		'===============================
+		' Main의 직전 시장정보 임시 저장
+		'===============================
+		tMKGubn = SCREEN.Object("Main.cxMarket").sMarket
+
+		'=========================
+		' 현재 입력받은 시장구분자
+		'=========================
+		Select Case Trim(t_mkgb)
+		Case "1"	' KRX
+			sMKGubn = "KRX"
+
+		Case "2"	' NXT
+			sMKGubn = "NXT"
+
+		Case "S"	' SOR
+			sMKGubn = "통합"
+
+		Case Else
+			sMKGubn = "KRX"
+		End Select
+SYSTEM.Trace "      [999901]Spread_mkgb() B4 : " & SCREEN.Object("Main.cxMarket").sMarket
+		'============================================
+		' 현재 종목에 맞는 Main 시장 변경 (차후 원복)
+		'============================================
+		SCREEN.Object("Main.cxMarket").sCode = codx
+
+
+
+		'==================================
+		' 화면 권한에 따른 "통합" 처리 분기
+		'==================================
+		iret = SCREEN.Object("Main.cxMarket").GetMapPermission(SCREEN.GetMapName(1))	' 대표화면번호로 화면 권한 획득
+SYSTEM.Trace "      [999901]Spread_mkgb() AF : " & SCREEN.Object("Main.cxMarket").sMarket & vbTab & iret
+
+		Select Case iret
+		Case 1	' KRX
+			sMKGubn = "KRX"	' KRX 강제 변환
+			tMKGubn = "KRX"
+
+		Case 2	' NXT
+			sMKGubn = "NXT"	' NXT 강제 변환
+			tMKGubn = "NXT"
+
+		Case 3	' KRX|NXT (SOR 미지원)
+			'=================================================
+			' NXT 불가종목인데 시장선택이 NXT로 되어 있을 경우
+			' 시장구분을 통합으로 변경
+			'=================================================
+			If SCREEN.Object("Main.cxMarket").IsNXTAble(S1301.Data) <> 1 Then	' NXT 불가종목
+				If sMKGubn = "NXT" Then
+					sMKGubn = "KRX"
+					tMKGubn = "KRX"
+				End If
+			End If
+
+			' KRX|NXT 화면에서는 통합이 노출되면 안된다
+			' 화면 권한이 SOR 미지원 화면인경우, SOR인 경우에 직전 시장구분자 유지
+			If sMKGubn = "통합" Then
+				sMKGubn = tMKGubn	' 직전 시장을 유지
+			End If
+
+			' 그래도 통합이 남아 있으면 강제로 KRX로 변경
+			If sMKGubn = "통합" Then
+				sMKGubn = "KRX"
+				tMKGubn = "KRX"
+			End If
+
+
+		Case 7	' KRX|NXT|SOR
+			'=================================================
+			' NXT 불가종목인데 시장선택이 NXT로 되어 있을 경우
+			' 시장구분을 통합으로 변경
+			'=================================================
+			If SCREEN.Object("Main.cxMarket").IsNXTAble(S1301.Data) <> 1 Then	' NXT 불가종목
+				If sMKGubn = "NXT" Then
+					sMKGubn = "통합"
+					tMKGubn = "KRX"
+				End If
+			End If
+		End Select
+
+
+
+		'====================================
+		' 현재 클릭한 화면에 변경 시장 선적용
+		'====================================
+		If UCase(TypeName( SCREEN.Object("cxMarket") ) ) <> "NOTHING" Then
+			cxMarket.MNum = SCREEN.GetMapName(1)
+			cxMarket.sCode = SCREEN.Object("Main.cxMarket").sCode
+			'cxMarket.sMarket = sMKGubn
+		End If
+
+		'================================
+		' 현재 선택된(보정된) 시장 전파
+		'================================
+		SCREEN.Object("Main.cxMarket").sMarket = tMKGubn	' Main 화면 시장 원복
+SYSTEM.Trace "      [999901]Spread_mkgb() FINAL : " & SCREEN.Object("Main.cxMarket").sMarket & vbTab & sMKGubn
+		SCREEN.Proc "Main.Change_MKGubn_Main_Limited", sMKGubn
+
+		SCREEN.IgnoreChange False
+	End If
+End Sub
+
+}
+
+
+

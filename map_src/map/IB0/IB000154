@@ -1,0 +1,224 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB000154)
+MAPSIZE(238, 618)
+VERSION(002)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("투자자종목별평균가")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(FMS|FLASH)
+TITLE("[IB000154] 투자자 종목별 평균가")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pooppoop")
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  SYMBOL5(0, 0, 618, 28)        COLOR(66, 1)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  obj(0, 28, 618, 238)    "IB00015G"  TABORDER(1)  IOORDER(8)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON1(83, 388, 102, 408)  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, NORMAL)  COLOR(15, 63)  CUR(0)    "검색.BMP"    TABORDER(2)  ENABLE  &
+  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+EDIT  day1(104, 4, 188, 24)  LEN(8)  IO_NUM|EDIT_INPUT|FA_SKIP|FA_DATE  FONT("굴림체", 9, NORMAL)    COLOR(192, 130)  CUR(0)  TP_SUNKEN          EDITFORMAT("9999/99/99")  TABORDER(3)  IOORDER(10)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LB_DATE(3, 6, 27, 24)  '기간'  AL_LEFT  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(208, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  day2(197, 4, 281, 24)  LEN(8)  IO_NUM|EDIT_INPUT|FA_SKIP|FA_DATE  FONT("굴림체", 9, NORMAL)    COLOR(192, 130)  CUR(0)  TP_SUNKEN          EDITFORMAT("9999/99/99")  TABORDER(4)  IOORDER(11)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL0(190, 4, 195, 24)  '~'  AL_CENTER  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(208, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  send_btn(625, 91, 661, 111)  '조회'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, BOLD)  FOCUS  COLOR(208, 186)  CUR(0)    "조회btn.bmp"    TABORDER(5)  ENABLE  &
+  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+OUT  2023(283, 4, 352, 24)  LEN(9)  IO_NUM|AL_RIGHT||FA_COMMA|FA_RIGHT|FA_CORGB|SA_COSUP  FONT("굴림체", 9, BOLD)    COLOR(68, 186)  CUR(0)  LINECOLOR(75)          IFRGB(94, 95)  TABORDER(0)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_STRING)
+OUT  2024(351, 4, 407, 24)  LEN(6)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT|FA_CORGB|FA_CONTRAST|SA_CORAW|SA_TEXT  FONT("굴림체", 9, BOLD)    COLOR(68, 69)  CUR(0)  LINECOLOR(75)          IFRGB(94, 95)  TABORDER(0)  IOORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_STRING)
+OUT  2033(405, 4, 450, 24)  LEN(9)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSIGN  FONT("굴림체", 9, NORMAL)    COLOR(68, 69)  CUR(0)  LINECOLOR(75)          IFRGB(94, 95)  TABORDER(0)  IOORDER(5)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_STRING)
+OUT  2027(449, 4, 521, 24)  LEN(9)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT|FA_ZEROSUP|SA_SPACE  FONT("굴림체", 9, NORMAL)    COLOR(68, 186)  CUR(0)  LINECOLOR(75)          IFRGB(94, 95)  TABORDER(0)  IOORDER(6)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_STRING)
+OUT  14333(572, 4, 615, 24)  LEN(9)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT|FA_ZEROSUP|SA_SPACE  FONT("굴림체", 9, NORMAL)    COLOR(68, 186)  CUR(0)  LINECOLOR(75)          IFRGB(94, 95)  TABORDER(0)  IOORDER(7)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_STRING)
+PANEL  PANEL6(520, 4, 573, 24)  '외인비중'  LINECOLOR(75)      COLOR(77, 130)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+CONTROL  1301(18, 388, 83, 408)  |FA_PROTECT  "CX_CODECTRL"  "/u0/k검색.BMP/lAXCOMBO.BMP/p/s0/o"  LEN(6)  EDIT_INPUT    COLOR(192, 130)  TABORDER(6)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  1021(165, 448, 243, 471)  LEN(7)  IO_ALPHA|AL_CENTER||FA_FLASH    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+COMBO  BEFORE(29, 4, 101, 24)  TP_SUNKEN  LEN(1)  COUNT(6)  VCOUNT(6)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_NUM|EDIT_INPUT|FA_SKIP    COLOR(99, 130)  CUR(0)  DISPLAY("직접지정", "당일", "전일", "5일", "15일", "20일")  DATA("1", "7", "3", "4", "5", "6")    TABORDER(7)  IOORDER(9)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Option Explicit
+Dim Isstart
+Dim myFILE, myMAP
+
+Isstart = False
+myFILE = "userconf.ini"
+myMAP = SCREEN.GetMapName(0)
+
+Sub send_f()
+	If Isstart = False Then
+		Exit Sub
+	End If
+	SCREEN.ClearAll 0, 2
+	SCREEN.Send 0
+	SCREEN.Proc "obj.send_f", ""
+End Sub
+
+Sub OnAlert()
+	obj.Proc "diffupdate", S2023.Data
+End Sub
+
+Sub SetDate()
+	Dim strtDt, EndDt
+	If BEFORE.Data = "1" Then
+		day1.Enable = True
+		day2.Enable = True
+	Else
+		day1.Enable = False
+		day2.Enable = False
+	End If
+
+	Select Case Trim(BEFORE.Data)
+		Case "1" : strtDt = change_date("d", -15)
+		Case "3" : strtDt = change_date("d", -1)
+		Case "4" : strtDt = change_date("d", -5)
+		Case "5" : strtDt = change_date("d", -15)
+		Case "6" : strtDt = change_date("d", -20)
+		Case "7" : strtDt = getCurrDay()
+	End Select
+
+	strtDt = week_check(strtDt)
+
+	If Trim(BEFORE.Data) = "3" Then
+		EndDt = strtDt
+	Else
+		EndDt  = getCurrDay()
+	End If
+
+	day1.Data = strtDt
+	day2.Data = EndDt
+End Sub
+
+_AW_ONINDECLARE_AW_
+#Load IB888888
+#Load IB888833
+
+_AW_ONENDSUB_AW_
+_AW_ONSTART_AW_
+Dim gign
+Isstart = True
+If SCREEN.CreateObject("Info")  Then
+	gign = Trim(INFO.popData (LOGIN.Name, myFILE, myMAP, "gign"))
+	If gign = "" Then
+		gign = "1"
+	End If
+	BEFORE.Data = gign
+	Call SetDate()
+	SCREEN.Object("obj.day1").Data = day1.Data
+	SCREEN.Object("obj.day2").Data = day2.Data
+End If
+SCREEN.Send 0
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+S1301.Data = SCREEN.Object("main.1301").Data
+SCREEN.Proc "obj.send_f", ""
+
+_AW_ONENDSUB_AW_
+_AW_ONKEY_AW_
+If Key = 13 Then
+	SCREEN.OnSend = False
+End If
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(BUTTON1)
+_AW_ONCLICK_AW_
+Dim retn
+retn = SCREEN.GetCode(100, "1301", "hnam", 0 )
+If retn <> True Then
+       Exit Sub
+End If
+
+send_all()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(day1)
+_AW_ONCHANGE_AW_
+send_f()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(day2)
+_AW_ONCHANGE_AW_
+send_f()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(send_btn)
+_AW_ONCLICK_AW_
+send_f()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(2023)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(2024)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(2033)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(2027)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(14333)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BEFORE)
+_AW_ONCHANGE_AW_
+
+If SCREEN.CreateObject("Info") Then
+	INFO.pushData LOGIN.Name, myFILE, myMAP, "gign", BEFORE.Data
+End If
+
+Call SetDate()
+
+Call send_f()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

@@ -1,0 +1,84 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB101500)
+MAPSIZE(485, 656)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("주식현재가")
+MAPPUBLIC(";")
+FONT("굴림", 9, NORMAL)
+TITLE("[1015]주식현재가")
+TOPATH(AXIS)
+METHOD(MENU)
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+OBJECT  obj(0, 26, 656, 486)    "IB101010"  TABORDER(1)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+USRTAB  selectMap(0, 0, 656, 26)  FOCUS  INDEX(0)  COUNT(12)  AL_TOP  TAB_IMAGE      FONT("굴림체", 9, NORMAL)    COLOR(181, 70)  CUR(0)  TABIMAGE("tab.bmp")  FCOLOR(3, 71)  CAPTION("주식현재가", "시간별", "일자별", "가격흐름", "거래원", "가격대별", "매매동향", "외국인", "투자의견", "신용", "뉴스", "편람")  TABINFO("1:1", "1:2", "1:3", "1:4", "1:5", "1:6", "1:7", "1:8", "1:9", "1:10", "0:11", "1:12")  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONINDECLARE_AW_
+#load SE799999
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(selectMap)
+_AW_ONCLICK_AW_
+Select Case selectMap.ID
+	Case 1 :
+			obj.SetObject "IB101010"
+			SCREEN.SetCaption "주식현재가"
+	Case 2 :
+			obj.SetObject "IB101020"
+			SCREEN.SetCaption "시간별"
+	Case 3 :
+			obj.SetObject "IB101025"
+			SCREEN.SetCaption "일자별"
+	Case 4 :
+			obj.SetObject "IB101026"
+			SCREEN.SetCaption "가격흐름"
+	Case 5 :
+			obj.SetObject "IB101029"
+			SCREEN.SetCaption "거래원"
+	Case 6 :
+			obj.SetObject "IB101030"
+			SCREEN.SetCaption "가격대별"
+	Case 7 :
+			obj.SetObject "IB101031"
+			SCREEN.SetCaption "매매동향"
+	Case 8 :
+			obj.SetObject "IB101032"
+			SCREEN.SetCaption "외국인"
+	Case 9 :
+			obj.SetObject "IB101033"
+			SCREEN.SetCaption "투자의견"
+	Case 10 :
+			obj.SetObject "IB101034"
+			SCREEN.SetCaption "신용"
+	Case 12 :
+			obj.SetObject "IB101036"
+			SCREEN.SetCaption "편람"
+End Select
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

@@ -1,0 +1,720 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB850510)
+MAPSIZE(580, 800)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("대출신청 및 해지")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(ENCODE|CR2TAB)
+TITLE("대출신청 및 해지")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("piboPBxQ")
+MAPTYPE(NORM)
+HEADER(LEDGER)
+TRXH("11CSLNAT010")
+}
+
+
+
+FORM DIVISION
+{
+
+LABEL  LABEL8(2, 140, 802, 142)  AL_LEFT  CUR(0)      COLOR(64, 232)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL1(0, 142, 804, 580)  LIMAGE(0)  LINEW(4)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL0(0, 0, 800, 50)  LINETYPE(3)  LINECOLOR(64)      COLOR(66, 232)  CUR(0)    AL_CENTER  FONT("굴림체", 10, NORMAL)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL0(442, 26, 492, 46)  '구분'  AL_LEFT  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(66, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL1(5, 3, 55, 23)  '계좌번호'  AL_LEFT  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(66, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL2(5, 26, 85, 46)  '대출실행금액'  AL_LEFT  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(66, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+COMBO  zTrxTp(474, 26, 614, 46)  TP_SUNKEN  LEN(1)  COUNT(2)  VCOUNT(2)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_NUM|EDIT_INPUT    COLOR(192, 130)  CUR(0)  DISPLAY("대출실행", "대출실행취소")  DATA("0", "1")    TABORDER(4)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  aa(89, 26, 229, 46)  LEN(15)  IO_NUM|EDIT_INPUT|FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_WRAP|FA_SKIP|SA_SPACE    COLOR(192, 130)  CUR(0)  TP_SUNKEN          TABORDER(3)  IOORDER(14)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL4(330, 3, 380, 23)  '비밀번호'  AL_LEFT  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(66, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  zPwd(385, 3, 445, 23)  LEN(8)  IO_MIXED|EDIT_INPUT|FA_PASSWD|FA_WRAP    COLOR(192, 130)  CUR(0)  TP_SUNKEN          TABORDER(2)  IOORDER(5)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON0(660, 26, 795, 46)  '대출실행'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, BOLD)  FOCUS  COLOR(208, 68)  CUR(0)    "담보교체신청.bmp"    TABORDER(6)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+EDIT  zIn(362, 688, 463, 713)  LEN(5)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_PASS    COLOR(192, 232)  CUR(0)  TP_SUNKEN  INIT("00001")          TABORDER(9)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL5(305, 688, 355, 708)  'Input'  AL_LEFT  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(66, 69)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL3(240, 26, 428, 46)  '(담보설정/해지단위 : 100,000원)'  AL_LEFT  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(66, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+CONTROL  AN50(89, 3, 229, 23)    "CX_Account"  "/w0"  LEN(11)  EDIT_INPUT    COLOR(192, 130)  TABORDER(1)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+TABLE  TABLE0(7, 150, 407, 210)  MATRIX(4, 1)  LINECOLOR(75)  CELLH(20)  AUTOSIZE  |MULTI|XHLINE  EDIT_OUTPUT    &
+	COLINFO("Row3")  LEN(1)  WIDTH(80)  COLALIGN(AL_CENTER, AL_RIGHT)  HEADCOLOR(96, 130)  IO_NUM    COLOR(77, 232)  COLCUR(0, 0)  COLHINTTYPE(IH_NONE)    &
+	COLINFO("Row0")  LEN(9)  WIDTH(157)  HEAD("설정번호")  COLALIGN(AL_CENTER, AL_RIGHT)  HEADCOLOR(96, 130)  IO_NUM|FA_COMMA|FA_RIGHT|FA_ZEROSUP|SA_SPACE    COLOR(68, 69)  COLCUR(0, 0)  COLHINTTYPE(IH_NONE)    COLUMN_VISIBLE  &
+	COLINFO("Row1")  LEN(9)  WIDTH(157)  HEAD("예탁담보비율(%)")  COLALIGN(AL_CENTER, AL_RIGHT)  HEADCOLOR(96, 130)  IO_NUM|FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSUP    COLOR(77, 69)  COLCUR(0, 0)  COLHINTTYPE(IH_NONE)    COLUMN_VISIBLE  IFRGB(69, 69)  &
+	COLINFO("Row2")  LEN(9)  WIDTH(157)  HEAD("총 담보비율(%)")  COLALIGN(AL_CENTER, AL_RIGHT)  HEADCOLOR(96, 130)  IO_NUM|FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSUP    COLOR(68, 69)  COLCUR(0, 0)  COLHINTTYPE(IH_NONE)    COLUMN_VISIBLE  IFRGB(69, 69)  IOORDER(9)  ENABLE  &
+  VISIBLE
+
+TABLE  TABLE1(406, 150, 796, 210)  MATRIX(3, 1)  LINECOLOR(75)  CELLH(20)  AUTOSIZE  |MULTI|XHLINE  EDIT_OUTPUT    &
+	COLINFO("Row0")  LEN(8)  WIDTH(157)  HEAD("대출만기일")  COLALIGN(AL_CENTER, AL_RIGHT)  HEADCOLOR(96, 130)  IO_NUM|FA_RIGHT    COLOR(68, 69)  COLCUR(0, 0)  COLHINTTYPE(IH_NONE)    COLUMN_VISIBLE  EDITFORMAT("9999/99/99")  &
+	COLINFO("Row1")  LEN(16)  WIDTH(157)  HEAD("대출약정한도")  COLALIGN(AL_CENTER, AL_RIGHT)  HEADCOLOR(96, 130)  IO_NUM|FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSUP    COLOR(77, 69)  COLCUR(0, 0)  COLHINTTYPE(IH_NONE)    COLUMN_VISIBLE  IFRGB(69, 69)  &
+	COLINFO("Row2")  LEN(16)  WIDTH(157)  HEAD("대출가능금액")  COLALIGN(AL_CENTER, AL_RIGHT)  HEADCOLOR(96, 130)  IO_NUM|FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSUP    COLOR(68, 69)  COLCUR(0, 0)  COLHINTTYPE(IH_NONE)    COLUMN_VISIBLE  IFRGB(69, 69)  IOORDER(10)  ENABLE  &
+  VISIBLE
+
+TABLE  TABLE2(7, 211, 407, 271)  MATRIX(3, 1)  LINECOLOR(75)  CELLH(20)  AUTOSIZE  |MULTI|XHLINE  EDIT_OUTPUT    &
+	COLINFO("Row0")  LEN(16)  WIDTH(157)  HEAD("지정(해지)금액")  COLALIGN(AL_CENTER, AL_RIGHT)  HEADCOLOR(96, 130)  IO_NUM|FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSUP    COLOR(77, 69)  COLCUR(0, 0)  COLHINTTYPE(IH_NONE)    COLUMN_VISIBLE  IFRGB(69, 69)  &
+	COLINFO("Row1")  LEN(16)  WIDTH(157)  HEAD("대출전잔")  COLALIGN(AL_CENTER, AL_RIGHT)  HEADCOLOR(96, 130)  IO_NUM|FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSUP    COLOR(68, 69)  COLCUR(0, 0)  COLHINTTYPE(IH_NONE)    COLUMN_VISIBLE  IFRGB(69, 69)  &
+	COLINFO("Row2")  LEN(16)  WIDTH(157)  HEAD("대출금잔")  COLALIGN(AL_CENTER, AL_RIGHT)  HEADCOLOR(96, 130)  IO_NUM|FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSUP    COLOR(77, 69)  COLCUR(0, 0)  COLHINTTYPE(IH_NONE)    COLUMN_VISIBLE  IFRGB(69, 69)  IOORDER(11)  ENABLE  &
+  VISIBLE
+
+TABLE  TABLE3(406, 211, 796, 271)  MATRIX(3, 1)  LINECOLOR(75)  CELLH(20)  AUTOSIZE  |MULTI|XHLINE  EDIT_OUTPUT    &
+	COLINFO("Row1")  LEN(16)  WIDTH(157)  HEAD("예수금전잔")  COLALIGN(AL_CENTER, AL_RIGHT)  HEADCOLOR(96, 130)  IO_NUM|FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSUP    COLOR(77, 69)  COLCUR(0, 0)  COLHINTTYPE(IH_NONE)    COLUMN_VISIBLE  IFRGB(69, 69)  &
+	COLINFO("Row2")  LEN(16)  WIDTH(157)  HEAD("예수금금잔")  COLALIGN(AL_CENTER, AL_RIGHT)  HEADCOLOR(96, 130)  IO_NUM|FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSUP    COLOR(68, 69)  COLCUR(0, 0)  COLHINTTYPE(IH_NONE)    COLUMN_VISIBLE  IFRGB(69, 69)  &
+	COLINFO("Row0")  LEN(0)  WIDTH(157)  COLALIGN(AL_CENTER, AL_RIGHT)  HEADCOLOR(96, 130)  IO_NUM|FA_SKIP    COLOR(77, 76)  COLCUR(0, 0)  COLHINTTYPE(IH_NONE)    COLUMN_VISIBLE  IOORDER(12)  ENABLE  &
+  VISIBLE
+
+OUT  OUTPUT0(362, 744, 467, 769)  LEN(50)  IO_NUM|AL_CENTER|    COLOR(192, 232)  CUR(0)  LINECOLOR(0)          TABORDER(0)  IOORDER(7)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL6(278, 749, 356, 769)  'Gridoutput'  AL_LEFT  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(66, 69)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  OUTPUT1(689, 701, 794, 726)  LEN(5)  IO_NUM|AL_CENTER|    COLOR(192, 232)  CUR(0)  LINECOLOR(0)          TABORDER(0)  IOORDER(8)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL7(627, 704, 677, 724)  'Output'  AL_LEFT  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(66, 69)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  AN1A_space(365, 716, 436, 735)  LEN(9)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_PASS    COLOR(192, 69)  CUR(0)  TP_SUNKEN          TABORDER(10)  IOORDER(4)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  INewLoadAmt(354, 655, 494, 675)  LEN(16)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_PASS    COLOR(192, 232)  CUR(0)  TP_SUNKEN          TABORDER(11)  IOORDER(6)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  ACNM(232, 3, 312, 23)  LEN(20)  IO_MIXED|AL_LEFT||FA_SKIP  FONT("굴림체", 9, NORMAL)    COLOR(49, 130)  CUR(0)  LINECOLOR(48)          TABORDER(0)  IOORDER(15)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  obj_list(7, 300, 797, 574)    "IB850511"  TABORDER(7)  IOORDER(13)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON1(620, 26, 657, 46)  '조회'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, BOLD)  FOCUS  COLOR(208, 186)  CUR(0)    "조회btn.bmp"    TABORDER(5)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+USRTAB  UTAB0(7, 274, 797, 300)  FOCUS  INDEX(0)  COUNT(2)  AL_TOP  TAB_IMAGE        COLOR(3, 70)  CUR(0)  TABIMAGE("tab.bmp")  FCOLOR(3, 71)  CAPTION("담보설정가능내역", "대출실행/취소내역")  TABINFO("1:1", "1:2")  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON3(758, 276, 795, 296)  '조회'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, BOLD)  FOCUS  COLOR(208, 186)  CUR(0)    "조회btn.bmp"    TABORDER(8)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+EDIT  sendType(831, 262, 855, 297)  LEN(1)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_SKIP|FA_PASS    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(12)  IOORDER(16)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL53(0, 50, 800, 140)        COLOR(68, 97)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL46(0, 90, 145, 130)        COLOR(96, 97)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL50(20, 105, 120, 120)  '대출 상품위험등급'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+PANEL  PANEL47(145, 91, 250, 131)        COLOR(68, 97)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL48(323, 100, 753, 122)    |IMAGE|AL_CENTER    COLOR(181, 232)  CUR(0)    "BAR_RISKCLASS_2_NEW.bmp"  ENABLE  &
+  VISIBLE  IMAGE  HINTTYPE(IH_NONE)
+OUT  tujaGD(30, 690, 180, 730)  LEN(40)  IO_MIXED|AL_LEFT|    COLOR(68, 69)  CUR(0)            TABORDER(0)  IOORDER(17)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  sentence1(25, 61, 690, 81)  LEN(100)  IO_MIXED|AL_LEFT|    COLOR(68, 232)  CUR(0)            TABORDER(0)  IOORDER(18)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BOX  BOX20(0, 90, 800, 91)    COLOR(50, 232)  LINEW(1)  BX_LINE    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BOX  BOX21(0, 130, 800, 131)    COLOR(50, 232)  LINEW(1)  BX_LINE    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BOX  BOX22(275, 90, 276, 130)    COLOR(75, 232)  LINEW(1)  BX_LINE    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  obj_cusstatus(153, 808, 274, 828)    "IB49892U"  TABORDER(13)  IOORDER(19)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL51(28, 807, 148, 827)  'obj_cusstatus'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  tujaNM(330, 884, 480, 904)  LEN(40)  IO_MIXED|AL_LEFT|    COLOR(68, 69)  CUR(0)            TABORDER(0)  IOORDER(20)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  tujaGD_1(490, 879, 640, 899)  LEN(40)  IO_MIXED|AL_LEFT|    COLOR(68, 69)  CUR(0)            TABORDER(0)  IOORDER(21)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  grdimg1(355, 117, 370, 132)  '▲'  AL_CENTER  CUR(0)      COLOR(168, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL27(175, 105, 260, 120)  '매우높은위험'  AL_LEFT  CUR(0)      COLOR(208, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+PANEL  PANEL2(5, 60, 25, 80)    |IMAGE|AL_CENTER    COLOR(192, 192)  CUR(0)    "ICO_LOGIN_B_INFO_16.bmp"  ENABLE  &
+  VISIBLE  IMAGE  HINTTYPE(IH_NONE)
+GROUP  GROUP1(1074, 544, 1409, 759)  'obj_ansim 안심차단대상여부조회'        COLOR(-1, 232)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  obj_ansim(1115, 605, 1345, 736)    "IB9999AS"  TABORDER(14)  IOORDER(22)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  zAcnt1(1102, 423, 1229, 443)  LEN(20)  IO_MIXED|EDIT_INOUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(15)  IOORDER(23)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  zPwd1(1102, 448, 1162, 468)  LEN(8)  IO_MIXED|EDIT_INPUT|FA_PASSWD|FA_WRAP|FA_SKIP    COLOR(192, 130)  CUR(0)  TP_SUNKEN          TABORDER(16)  IOORDER(24)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+GROUP  GROUP0(1076, 400, 1301, 520)  '안심차단추가해야하는부분'        COLOR(-1, 232)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  zObjYn(1102, 480, 1227, 500)  LEN(1)  IO_MIXED|AL_CENTER||FA_SKIP|FA_CORGB|SA_COSUP    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(25)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  chkrun1(1115, 575, 1190, 595)  LEN(1)  IO_MIXED|EDIT_INOUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("N")          TABORDER(17)  IOORDER(26)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+CONTROL  CX_DTS(1430, 275, 1605, 515)  |FA_PROTECT  "CX_DATATRANS"  ""  LEN(0)  EDIT_NOP    COLOR(192, 232)  TABORDER(0)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Option Explicit
+Dim corpyn
+Dim dmsg
+
+Sub Set_account()
+	SCREEN.ClearAll 0, 2
+	obj_list.ClearAll 2
+	aa.Clear
+	zPwd.Clear
+
+	If Trim(SCREEN.Object("main.zAcntNo").Data) <> Trim(AN50.Data) Then
+		SCREEN.Object("main.zAcntNo").Data = Trim(AN50.Data)
+		SCREEN.Object("main.zPwd").Data = ""
+	End If
+
+	If Len(Trim(AN50.Data)) = 11 Then
+		ACNM.Data = Trim(AN50.Name)
+		zPwd.Data = Trim(AN50.Password)
+
+		If Trim(zPwd.Data) = "" Then
+			If Trim(SCREEN.Object("main.zAcntNo").Data) = Trim(AN50.Data) Then
+				If Len(Trim(SCREEN.Object("main.zPwd").Data)) >= 4 Then
+					zPwd.Data = Trim(SCREEN.Object("main.zPwd").Data)
+				End If
+			End If
+		End If
+
+		If SYSTEM.ConnectBy = 1 Then
+			If Len(Trim(zPwd.Data)) < 4 Then
+				zPwd.SetFocus
+				Exit Sub
+			End If
+		End If
+
+		SCREEN.Proc "obj_list.send_f", ""
+	Else
+		AN50.SetFocus
+		Exit Sub
+	End If
+End Sub
+
+'== 첫 조회
+Sub send_f()
+	sendType.Data = "Q"
+	SCREEN.ClearAll 0, 2
+	ACNM.Data = Trim(AN50.Name)
+
+	LEDGER.Fkey = "C"
+	SCREEN.Send 0
+End Sub
+
+'== 전송
+Sub send_o()
+	LEDGER.Fkey = "5"
+	sendType.Data = "O"
+	SCREEN.Send 0
+End Sub
+
+Sub confirmOrder()
+	SYSTEM.Push "fundLoan_8505", ""
+
+    '여신거래 안심차단 로직추가
+    SYSTEM.Trace "applLoan_zObjYn:"&zObjYn.Data
+    If zObjYn.Data = "Y" Then
+       Call popup()
+       Exit Sub
+    End If
+
+	If chkInpt() = False Then
+		Exit Sub
+	End If
+
+	Dim odrGubn, odrName
+
+	If zTrxTp.Data = "0" Then
+		odrGubn = "신청"
+		odrName = "신청금액"
+	Else
+		odrGubn = "해지"
+		odrName = "해지금액"
+	End If
+
+	dmsg = "odrGubn" & vbTab & odrGubn         & vbLf &_
+		   "odrName" & vbTab & odrName         & vbLf &_
+		   "o_acno"  & vbTab & Trim(AN50.Data) & vbLf &_
+		   "o_acnm"  & vbTab & Trim(ACNM.Data) & vbLf &_
+		   "o_aa"    & vbTab & Trim(aa.Data)   & vbLf
+
+	SCREEN.SetTimer 10, False
+
+End Sub
+
+
+Function chkInpt()
+	Dim msg
+
+	chkInpt = False
+
+	If Len(Trim(AN50.Data)) <> 11 Then
+		msg = "계좌번호(ex.xxx-53-xxxxxx)를 확인하여 주십시오."
+		Call alert_msg(msg)
+		Call guide_msg(msg)
+		AN50.SetFocus
+		Exit Function
+	End If
+
+	If Len(Trim(zPwd.Data)) < 4 Then
+		msg = "비밀번호를 확인하여 주십시오."
+		Call alert_msg(msg)
+		Call guide_msg(msg)
+		zPwd.SetFocus
+		Exit Function
+	End If
+
+	If Is_numeric(aa.Data) = False Then
+		msg = "금액을 확인하여 주십시오."
+		Call alert_msg(msg)
+		Call guide_msg(msg)
+		aa.SetFocus
+		Exit Function
+	End If
+
+	chkInpt = True
+End Function
+
+
+'Function comChkData(data)
+'	Dim num = Trim(data)
+'
+'	comChkData = False
+'
+'	If num = "" Then
+'		Exit Function
+'	End If
+'
+'	comChkData = True
+'End Function
+
+Function comChkData(data)
+	Dim num
+	num = Trim(data)
+
+	If num = "" Then
+		comChkData = False
+		Exit Function
+	Else
+		comChkData = True
+		Exit Function
+	End If
+End Function
+
+
+
+Sub complete_cusstatus()
+
+	Dim char,check_char,tmptujaYN,tmpinfoYN,tmptujaNM,tmptujaGD,tempYN
+
+	tmptujaYN = Trim(SCREEN.Object("obj_cusstatus.OUTPUT7").Data)
+	tmpinfoYN = Trim(SCREEN.Object("obj_cusstatus.OUTPUT8").Data)
+	tmptujaNM = Trim(SCREEN.Object("obj_cusstatus.zGrdNm").Data)
+
+	If Trim(tmptujaYN) = "0" Then
+		tmptujaYN = "미희망"
+	Else
+		tmptujaYN = "희망"
+	End If
+
+	If tmptujaNM = "안정형" Then
+		check_char = 1
+	ElseIf tmptujaNM = "안정추구형" Then
+		check_char = 2
+	ElseIf tmptujaNM = "위험중립형" Then
+		check_char = 3
+	ElseIf tmptujaNM = "적극투자형" Then
+		check_char = 4
+	ElseIf tmptujaNM = "공격투자형" Then
+		check_char = 6
+	End If
+
+	If Trim(tmpinfoYN) = "0" Then
+		tmptujaNM = ""
+		tmpinfoYN = "미제공"
+		'check_char = 7
+	Else
+		tmpinfoYN = "제공"
+	End If
+
+	Select Case check_char
+		Case 1 :
+			tmptujaGD = "매우낮은위험이하"
+		Case 2 :
+			tmptujaGD = "낮은위험이하"
+		Case 3 :
+			tmptujaGD = "보통위험이하"
+		Case 4 :
+			tmptujaGD = "다소높은위험이하"
+		Case 6 :
+			tmptujaGD = "매우높은위험이하"
+		Case 7 :
+			tmptujaGD = ""
+	End Select
+
+	If Trim(SCREEN.Object("obj_cusstatus.LEDGER").Ecod) = "3956" Then '"미등록"
+			tmptujaNM   = "없음(미등록)"
+			tmptujaGD   = "-"
+			'Exit Sub
+	ElseIf CDbl(SCREEN.Object("obj_cusstatus.zToday").Data) > CDbl(SCREEN.Object("obj_cusstatus.zDueDate").Data) Then '만료일
+		tmptujaNM   = "없음(만료)"
+		tmptujaGD   = "-"
+		'Exit Sub
+
+	ElseIf Trim(SCREEN.Object("obj_cusstatus.OUTPUT6").Data) = "0" Then ' 전문금융소비자 일경우 스킵
+		tmptujaNM   = "전문금융소비자"
+		SYSTEM.Trace "profess111"
+'	ElseIf tmpinfoYN = "미제공" Or tmptujaYN = "미희망" Then '미희망은 요건 없어짐
+'		If tmpinfoYN = "미제공" Then
+'			tmptujaNM   = "없음(정보미제공)"
+'			tmptujaGD   = "-"
+'		End If
+	Else '일반금융소비자
+
+    End If
+
+	If tmptujaNM = "안정형" Then
+		sentence1.Data = "고객님의 투자성향은 안정형으로 매우낮은위험 이하 등급의 상품이 적합합니다."
+	ElseIf tmptujaNM = "안정추구형" Then
+		sentence1.Data = "고객님의 투자성향은 안정추구형으로 보통위험 이하 등급의 상품이 적합합니다."
+	ElseIf tmptujaNM = "위험중립형" Then
+		sentence1.Data = "고객님의 투자성향은 위험중립형으로 다소높은위험 이하 등급의 상품이 적합합니다."
+	ElseIf tmptujaNM = "적극투자형" Then
+		sentence1.Data = "고객님의 투자성향은 적극투자형으로 높은위험 이하 등급의 상품이 적합합니다."
+	ElseIf tmptujaNM = "공격투자형" Then
+		sentence1.Data = "고객님의 투자성향은 공격투자형으로 매우높은위험 이하 등급의 상품이 적합합니다."
+	End If
+	    'tmptujaGD = "매우높은위험"
+
+
+    If tmptujaNM = "전문금융소비자" Then
+        sentence1.Data = "고객님은 전문금융소비자로, 매우높은 위험 이하 등급의 상품이 적합합니다."
+        SYSTEM.Trace "profess222"
+    End If
+
+    If tmpinfoYN = "미제공" Then
+		sentence1.Data = "고객님은 당사에 투자자정보 제공을 원하지 않으세요. "
+    End If
+
+    If tmptujaGD = "-" Then
+		sentence1.Data = "투자자정보확인서가 작성되지 않았거나, 유효기간이 만료되었습니다."
+    End If
+
+    SYSTEM.trace "compl"
+End Sub
+
+
+Sub anshim()
+'여신거래 안심차단 프로세스 추가
+zAcnt1.Data = AN50.data
+zPwd1.Data  = zPwd.Data
+
+SYSTEM.Trace "zAcnt1.Data:"&zAcnt1.Data
+SYSTEM.Trace "zPwd1.Data:"&zPwd1.Data
+
+If corpyn = "Y" Then
+   SYSTEM.Trace "corp skip"
+Else
+   SYSTEM.Trace "person anshim"
+   SCREEN.Object("obj_ansim").Send
+End If
+
+'여신거래 안심차단 프로세스 끝
+End Sub
+
+
+Sub popup()
+    MsgBox "여신거래 안심차단 신청상태이므로 대출 불가능합니다."
+End Sub
+
+Sub LoadAccounts()
+
+
+
+	Dim accList, ii, acc, acno, ACNM, acid, actp, idx, myAcntFlag, value
+	accList = Split(CX_DTS.GetTypeData ("4","1" ), vbLf, -1, vbTextCompare)  'accoutcc 로 전계좌 불러오기 0->1
+
+	zAcnt1.Data = AN50.data
+
+	idx = 1
+
+	SYSTEM.Trace "LoadAccounts zAcnt1.Data:"&zAcnt1.Data
+
+	For ii=0 To UBound(accList)
+		acc = Trim(accList(ii))
+
+		If Len(acc)>11 Then
+			acc = Split(acc, "|", -1, vbTextCompare)
+			acno = Trim(Mid(acc(0), 1, 11))
+			ACNM = Mid(acc(0), 12)
+			ACNM = Replace(ACNM, vbTab, "")
+			ACNM = Trim(ACNM)
+			acid = Trim(acc(1))
+			actp = Mid(acno, 4, 2)
+			myAcntFlag = acc(2)
+			SYSTEM.Trace "start logic acno:"&acno
+            SYSTEM.Trace "myAcntFlag:"&myAcntFlag
+			'계좌플래그 2 또는 3 이면 랩계좌, 법인계좌 타입 = 4
+			If chkNumericData(myAcntFlag) = True Then
+				value = myAcntFlag And 4    '법인계좌 4 와 And 연산
+			    If value = 0 Then
+                   SYSTEM.Trace "person"
+                   corpyn = "N"
+                Else
+                   If Trim(zAcnt1.Data) = Trim(acno) Then
+                   	  SYSTEM.Trace "corp"
+                   	  corpyn = "Y"
+                   	  SYSTEM.Trace "end logic corpyn:"&corpyn
+                   	  Exit Sub
+                   End If
+				End If
+			End If
+		End If
+	Next
+
+End Sub
+
+_AW_ONINDECLARE_AW_
+#Load IB888833
+#Load IB888888
+
+_AW_ONENDSUB_AW_
+_AW_ONSTART_AW_
+Call LoadAccounts()
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+' -- TR 보내기전 입력 필드 확인
+
+SCREEN.OnSend = False
+Call guide_msg("")
+
+
+
+If CheckInput(AN50, zPwd) = True Then
+	If Is_numeric(aa.Data) = False Then
+		If Trim(sendType.Data) = "O" Then
+			Dim msg
+			msg = "신청하실 담보금액을 확인하여 주십시오."
+
+			Call alert_msg(msg)
+			Call guide_msg(msg)
+
+			aa.SetFocus
+			Exit Sub
+		Else
+			aa.Data = 0
+		End If
+	End If
+
+	INewLoadAmt.Data = "+" & l_zeropad(aa)
+	SCREEN.OnSend = True
+End If
+obj_cusstatus.Proc "send_f", ""
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+Dim ecod
+ecod = Trim(LEDGER.Ecod)
+
+Call LoadAccounts()
+
+If comChkData(ecod) = False Then
+	Exit Sub
+End If
+
+If Left(ecod, 1) = 0 Then
+	Dim damb, dambTotal
+	damb = Trim(TABLE0.GetTableCell(3))
+	dambTotal = Trim(TABLE0.GetTableCell(4))
+
+	If comChkData(damb) = True Then
+		If damb = "0.0000" Then
+			damb = ""
+		Else
+			damb = damb * 100
+		End If
+	Else
+		damb = ""
+	End If
+
+	TABLE0.SetTableCell 3, damb
+
+	If comChkData(dambTotal) = True Then
+		If dambTotal = "0.0000" Then
+			dambTotal = ""
+		Else
+			dambTotal = dambTotal * 100
+		End If
+	Else
+		dambTotal = ""
+	End If
+
+	'여신거래 안심차단 프로세스 추가
+     Call anshim()
+
+	TABLE0.SetTableCell 4, dambTotal
+Else
+	If ecod = "3669" Then
+		zPwd.SetFocus
+	End If
+End If
+
+If Trim(sendType.Data) = "O" Then
+	If ecod <> "3669" Then
+		Call alert_msg(Trim(LEDGER.Emsg))
+	End If
+
+	aa.Clear
+
+	If Left(ecod, 1) = 0 Then
+		SCREEN.Proc "obj_list.send_f", ""
+	End If
+End If
+
+Call guide_msg(Trim(LEDGER.Emsg))
+
+_AW_ONENDSUB_AW_
+_AW_ONTIMER_AW_
+	SCREEN.CreateWindow 2, "IB85051A /t /s /p5 /d", dmsg
+
+	If Trim(SYSTEM.Pop("fundLoan_8505")) <> "OK" Then
+		Exit Sub
+	End If
+
+	Call send_o()
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(zTrxTp)
+_AW_ONCHANGE_AW_
+	If zTrxTp.Data = "0" Then
+		BUTTON0.Text= "대출실행"
+	Else
+		BUTTON0.Text= "대출실행취소"
+	End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(aa)
+_AW_ONKEYCHANGE_AW_
+If SCREEN.Key = "13" Then  '-- Enter 키 입력
+	Call send_f()
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(zPwd)
+_AW_ONKEYCHANGE_AW_
+'== 비밀번호 변경시 조회 버튼 기능 수행.
+If SCREEN.Key = "13" Then  '-- Enter 키 입력
+	If Len(Trim(zPwd.Data)) < 4 Then
+		zPwd.SetFocus
+	Else
+		Dim acnt
+		acnt = Trim(SCREEN.Object("main.zAcntNo").Data)
+
+		If acnt <> Trim(AN50.Data) Then
+			SCREEN.Object("main.zAcntNo").Data = Trim(AN50.Data)
+		End If
+
+		SCREEN.Object("main.zPwd").Data = Trim(zPwd.Data)
+
+		If Is_numeric(aa.Data) = False Then
+			aa.SetFocus
+		Else
+			Call send_f()
+		End If
+	End If
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON0)
+_AW_ONCLICK_AW_
+chkrun1.Data = "Y"
+Call anshim()
+
+If corpyn = "Y" Then
+  Call confirmOrder()
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(AN50)
+_AW_ONCHANGE_AW_
+Call Set_account()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON1)
+_AW_ONCLICK_AW_
+Call send_f()
+'obj_cusstatus.Proc "send_f", ""
+
+	'여신거래 안심차단 프로세스 추가
+     Call anshim()
+SCREEN.Proc "obj_list.send_f", ""
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(UTAB0)
+_AW_ONCLICK_AW_
+Call guide_msg("")
+
+Select Case UTAB0.ID
+	Case 1
+		obj_list.SetObject("IB850511")
+		BUTTON3.Visible = True
+	Case 2
+		obj_list.SetObject("IB850512")
+		BUTTON3.Visible = False
+End Select
+
+SCREEN.Proc "obj_list.send_f", ""
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON3)
+_AW_ONCLICK_AW_
+SCREEN.Proc "obj_list.send_f", ""
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(zAcnt1)
+_AW_ONCHANGE_AW_
+'Call Set_account()	'-- 계좌명, 비밀번호 설정
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(chkrun1)
+_AW_ONCHANGE_AW_
+'Call Set_account()	'-- 계좌명, 비밀번호 설정
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

@@ -1,0 +1,279 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB453500)
+MAPSIZE(404, 692)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("선물종목간스프레드")
+MAPPUBLIC(";")
+FONT("굴림", 9, NORMAL)
+OPTIONS(FMS|FLASH)
+TITLE("선물종목간스프레드")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pooppoop")
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+OUT  100021(89, 590, 224, 610)  LEN(30)  IO_MIXED|AL_LEFT||FA_FLASH  FONT("굴림체", 9, BOLD)    COLOR(90, 69)  CUR(0)  LINECOLOR(89)          TABORDER(0)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL13(63, 471, 136, 488)  '현재가'        COLOR(96, 130)  CUR(0)    AL_CENTER  FONT("굴림체", 9, NORMAL)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  101023(137, 471, 224, 490)  LEN(8)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSUP  FONT("굴림체", 9, BOLD)    COLOR(76, 69)  CUR(0)            IFRGB(94, 95)  TABORDER(0)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL67(63, 488, 136, 506)  '전일대비'        COLOR(96, 130)  CUR(0)    AL_CENTER  FONT("굴림체", 9, NORMAL)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  101024(137, 489, 224, 508)  LEN(8)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT|FA_ZEROSUP|SA_SPACE  FONT("굴림체", 9, BOLD)    COLOR(188, 69)  CUR(0)            IFRGB(94, 95)  TABORDER(0)  IOORDER(3)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  SYMBOL26(64, 505, 139, 526)  '이 론 가'  AL_CENTER  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(77, 97)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  101202(139, 510, 229, 531)  LEN(8)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSIGN  FONT("굴림체", 9, NORMAL)    COLOR(76, 69)  CUR(0)            IFRGB(94, 95)  TABORDER(0)  IOORDER(4)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL0(61, 446, 116, 471)  '기준종목'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL1(237, 438, 292, 463)  '비교종목'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL0(236, 470, 309, 487)  '현재가'        COLOR(96, 130)  CUR(0)    AL_CENTER  FONT("굴림체", 9, NORMAL)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL2(236, 487, 309, 505)  '전일대비'        COLOR(96, 130)  CUR(0)    AL_CENTER  FONT("굴림체", 9, NORMAL)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL2(237, 504, 312, 525)  '이 론 가'  AL_CENTER  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(77, 97)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  lb_ComCurr(307, 471, 382, 491)  'Label'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  lb_ComDiff(307, 486, 382, 506)  'Label'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  lb_ComTheoPrc(307, 506, 382, 526)  'Label'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  lb_ComCode(315, 435, 370, 455)  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL63(0, 27, 692, 405)  LIMAGE(0)  LINEW(4)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  101027(143, 529, 223, 550)  LEN(12)  IO_NUM|AL_RIGHT||FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSUP    COLOR(68, 69)  CUR(0)  LINECOLOR(75)          IFRGB(94, 95)  TABORDER(0)  IOORDER(5)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL3(68, 529, 143, 550)  '누적거래량'  AL_CENTER  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(77, 97)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL4(68, 549, 143, 570)  '시간'  AL_CENTER  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(77, 97)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  101034(143, 549, 223, 570)  LEN(12)  IO_NUM|AL_RIGHT||FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSUP    COLOR(68, 69)  CUR(0)  LINECOLOR(75)          IFRGB(94, 95)  TABORDER(0)  IOORDER(6)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  obj1(5, 32, 686, 397)    "IB453520"  TABORDER(1)  IOORDER(7)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL19(0, 0, 692, 27)        COLOR(64, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL4(2, 0, 690, 27)        COLOR(66, 29)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  100301(4, 3, 84, 23)  LEN(8)  IO_ALPHA|EDIT_INOUT|FA_UPPER|CODE    FONT("굴림체", 9, NORMAL)    COLOR(192, 130)  CUR(0)  TP_SUNKEN          TABORDER(2)  IOORDER(8)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  SYMBOL7(84, 3, 103, 23)  TP_PUSH|IMAGE|AL_STRETCH      COLOR(24, 0)  CUR(0)    "검색.BMP"    TABORDER(3)  ENABLE  &
+  VISIBLE  IMAGE  HOVER  HINTTYPE(IH_NONE)
+OUT  100022(104, 3, 254, 23)  LEN(30)  IO_MIXED|AL_LEFT|  FONT("굴림체", 9, BOLD)    COLOR(160, 130)  CUR(0)  LINECOLOR(89)          TABORDER(0)  IOORDER(9)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  obj0(254, 3, 504, 23)    "IB453510"  TABORDER(4)  IOORDER(10)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+COMBO  COMBO0(504, 3, 554, 22)  TP_NONE  LEN(4)  COUNT(5)  VCOUNT(5)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_NUM|EDIT_INPUT|FA_SKIP    COLOR(68, 69)  CUR(0)  DISPLAY("1분", "5분", "10분", "60분", "일별")  DATA("0060", "0300", "0600", "3600", "0000")    TABORDER(5)  IOORDER(11)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Dim g_IsFirst
+Dim g_StdCode
+Dim g_BefAccVol
+Dim g_Today
+
+g_IsFirst = True
+g_StdCode = ""
+g_BefAccVol = 0
+g_Today = GetToday()
+'-----------------------------------------------------------------------
+Function Str2Dbl(Data)
+	Str2Dbl = 0
+	AData = Trim(Data)
+	If Len(AData) = 0 Then
+		Exit Function
+	End If
+	Str2Dbl = CDbl(AData)
+End Function
+'-----------------------------------------------------------------------
+Function GetToday()
+	AYear = Year(Date)
+	AMonth = Month(Date)
+	If Len(AMonth) = 1 Then
+		AMonth = "0" & AMonth
+	End If
+	ADay = Day(Date)
+	If Len(ADay) = 1 Then
+		ADay = "0" & ADay
+	End If
+	GetToday = AYear & AMonth & ADay
+End Function
+'-----------------------------------------------------------------------
+Sub OnAlert()
+	If Len(Trim(S100021.Data)) = 0 Or Len(Trim(lb_ComCode.Data)) = 0 Then
+		Exit Sub
+	End If
+
+	If Len(Trim(S101027.Data)) = 0 Then
+		AccVol = 0
+	Else
+		AccVol = CLng(S101027.Data)
+	End If
+
+	If g_BefAccVol = AccVol Then
+		Exit Sub
+	End If
+	ArrData = Array("", "", "", "", "", "", "")
+	If COMBO0.Data = "0000" Then
+		ArrData(0) = g_Today
+	Else
+		ArrData(0) = S101034.Data
+	End If
+
+	ArrData(1) = FormatNumber(Str2Dbl(S101023.Data), 2, -2, -2, 0)
+	ArrData(2) = FormatNumber(Str2Dbl(S101024.Data), 2, -2, -2, 0)
+	ArrData(3) = FormatNumber(Str2Dbl(S101202.Data), 2, -2, -2, 0)
+
+	ArrData(4) = FormatNumber(Str2Dbl(lb_ComCurr.Data), 2, -2, -2, 0)
+	ArrData(5) = FormatNumber(Str2Dbl(lb_ComDiff.Data), 2, -2, -2, 0)
+	ArrData(6) = FormatNumber(Str2Dbl(lb_ComTheoPrc.Data), 2, -2, -2, 0)
+
+	Data = Join(ArrData, "|")
+	obj1.Proc "ProcSetData", Data
+	g_BefAccVol = AccVol
+End Sub
+'-----------------------------------------------------------------------
+Sub S100301Change()
+	S100301.Trigger "", True
+	S100301.Trigger "ed_fcod", True
+	SYSTEM.SetHistory "ed_fcod", S100301.Data
+	SCREEN.Send 0
+End Sub
+'-----------------------------------------------------------------------
+Sub ProcCompData(Curr, Diff, TheoPrc)
+	lb_ComCurr.Data = Curr
+	lb_ComDiff.Data = Diff
+	lb_ComTheoPrc.Data = TheoPrc
+End Sub
+'-----------------------------------------------------------------------
+Sub ProcSetComCode(ComCode)
+	lb_ComCode.Data = ComCode
+	ProcSendData("")
+End Sub
+'-----------------------------------------------------------------------
+Sub ProcSendData(Name1)
+	If Len(S100301.Data) = 0 Then
+		Exit Sub
+	End If
+	If Len(lb_ComCode.Data) = 0 Then
+		Exit Sub
+	End If
+	
+	Select Case Trim(Left(S100301.Data, 1))
+	Case "1", "A"
+		' Process
+	Case Else
+		Exit Sub
+	End Select 
+	
+	
+	Select Case Trim(Left(lb_ComCode.Data, 1))
+	Case "1", "A"
+		' Process
+	Case Else
+		Exit Sub
+	End Select 
+
+	obj1.Proc "ProcSendData", S100021.Data & ", " & lb_ComCode.Data & ", " & COMBO0.Data
+End Sub
+
+_AW_ONSTART_AW_
+SCREEN.Trigger = False
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+If Len(Trim(S101027.Data)) = 0 Then
+	g_BefAccVol = 0
+Else
+	g_BefAccVol = CLng(S101027.Data)
+End If
+
+ProcSendData("")
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(101023)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(101024)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(101202)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(101027)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(101034)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(100301)
+_AW_ONCHANGE_AW_
+If g_IsFirst Then
+	S100301.Data = ""
+	g_IsFirst = False
+End If
+If S100301.Data <> "" Then
+	If Mid(S100301.Data, 1, 1) = "4" Or Mid(S100301.Data, 1, 1) = "D" Then
+		S100301.Data = g_StdCode
+		Exit Sub
+	Else
+		g_StdCode = S100301.Data
+	End If
+	S100301Change
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(SYMBOL7)
+_AW_ONCLICK_AW_
+Dim CODX
+
+CODX = SCREEN.GetCode (127, "100301" , "100022", 1)
+If CODX <>  True Then
+	Exit Sub
+End If
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(COMBO0)
+_AW_ONCHANGE_AW_
+ProcSendData("")
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

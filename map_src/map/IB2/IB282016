@@ -1,0 +1,152 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB282016)
+MAPSIZE(452, 333)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("ELW 기초 현재가(10)")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(FMS|FLASH)
+TITLE("[2801] ELW 기초 현재가(10)")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pooppoop")
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+TABLE  TABLE10(167, 396, 331, 450)  MATRIX(3, 1)  LINECOLOR(192)  CELLH(18)  AUTOSIZE    FONT("굴림체", 9, NORMAL)|MULTI|XHLINE  EDIT_OUTPUT    &
+	COLINFO("3112")  LEN(9)  WIDTH(73)  HEAD("예상체결량")  COLALIGN(AL_CENTER, AL_RIGHT)  HEADCOLOR(44932500, 68)  IO_NUM|FA_COMMA    COLOR(68, 69)  COLCUR(0, 0)  COLHINTTYPE(IH_NONE)    COLUMN_VISIBLE  &
+	COLINFO("5355")  LEN(12)  WIDTH(73)  HEAD("PER")  COLALIGN(AL_CENTER, AL_RIGHT)  HEADCOLOR(96, 97)  IO_NUM|FA_RIGHT    COLOR(68, 69)  COLCUR(0, 0)  COLHINTTYPE(IH_NONE)    COLUMN_VISIBLE  &
+	COLINFO("5353")  LEN(8)  WIDTH(73)  HEAD("EPS")  COLALIGN(AL_CENTER, AL_RIGHT)  HEADCOLOR(96, 97)  IO_NUM|FA_COMMA|FA_RIGHT    COLOR(68, 69)  COLCUR(0, 0)  COLHINTTYPE(IH_NONE)    COLUMN_VISIBLE  IOORDER(5)  ENABLE  &
+  VISIBLE
+
+PANEL  PANEL1(0, 0, 335, 25)        COLOR(66, 69)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HOVER  GRADIENT(0, 0)  HINTTYPE(IH_NONE)
+TABLE  TABLE6(2, 396, 167, 450)  MATRIX(3, 1)  LINECOLOR(192)  CELLH(18)  AUTOSIZE    FONT("굴림체", 9, NORMAL)|MULTI|XHLINE  EDIT_OUTPUT    &
+	COLINFO("3111")  LEN(9)  WIDTH(73)  HEAD("예상체결가")  COLALIGN(AL_CENTER, AL_RIGHT)  HEADCOLOR(44932500, 68)  IO_NUM|FA_COMMA|FA_RIGHT|FA_CORGB|SA_COSUP    COLOR(68, 69)  COLCUR(0, 0)  COLHINTTYPE(IH_NONE)    COLUMN_VISIBLE  IFRGB(94, 95)  &
+	COLINFO("2305")  LEN(9)  WIDTH(73)  HEAD("시가총액")  COLALIGN(AL_CENTER, AL_RIGHT)  HEADCOLOR(96, 97)  IO_NUM|FA_COMMA|FA_RIGHT    COLOR(68, 69)  COLCUR(0, 0)  COLHINTTYPE(IH_NONE)    COLUMN_VISIBLE  &
+	COLINFO("2334")  LEN(9)  WIDTH(73)  HEAD("외인취득")  COLALIGN(AL_CENTER, AL_RIGHT)  HEADCOLOR(96, 97)  IO_NUM|FA_COMMA|FA_RIGHT    COLOR(68, 69)  COLCUR(0, 0)  COLHINTTYPE(IH_NONE)    COLUMN_VISIBLE  IOORDER(4)  ENABLE  &
+  VISIBLE
+
+OUT  1021(347, 50, 425, 73)  LEN(7)  IO_ALPHA|AL_CENTER||FA_FLASH    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+CONTROL  17413(72, 3, 242, 23)    "CX_Symbol"  "/a89/b91/c92/d69"  LEN(0)  EDIT_OUTPUT  FONT("굴림체", 9, NORMAL)    COLOR(90, 130)  TABORDER(0)  IOORDER(6)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BOX  BOX2(2, 396, 331, 451)    COLOR(65, 65)  LINEW(1)  BX_LINE    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+CONTROL  17412(2, 27, 331, 394)    "CX_Depth"  "/u1/d10/p0/b/s1/l/c/h3/o/g/a1/f/r"  LEN(0)  EDIT_OUTPUT    COLOR(193, 232)  TABORDER(0)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  1301(346, 27, 393, 45)  LEN(6)  IO_ALPHA|EDIT_INPUT|FA_XFLOAT  FONT("굴림체", 9, NORMAL)    COLOR(68, 69)  CUR(0)  TP_NONE          TABORDER(1)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  company(298, 3, 330, 23)  '호가'  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(208, 69)  CUR(0)    "2BTN.BMP"    TABORDER(2)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+PANEL  PANEL0(10, 5, 67, 23)  '기초자산'        COLOR(68, 69)  CUR(0)    AL_CENTER  FONT("굴림체", 9, BOLD)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+COMBO  COMBO0(3, 3, 67, 23)  TP_NONE  LEN(6)  COUNT(0)  VCOUNT(5)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_NUM|EDIT_INOUT    COLOR(192, 69)  CUR(0)    TABORDER(3)  IOORDER(7)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+'Dim map_size
+'map_size = False
+
+Sub Query_Chart()
+'	Dim gubn
+'	ctl0.ClearAllData
+'	If Len(Trim(S1301.Data)) <> 6 Or S1301.Data = "000000" Then
+'		Exit Sub
+'	End If
+'
+'	ctl0.Setticksize 0, 0.05
+'	ctl0.SetChartPeriod 0, 2
+'	ctl0.SetInputValue 0,0, "1301", S1301.Data
+'	ctl0.RequestData 0,0
+End Sub
+
+Sub Set_combo()
+
+Dim items, item1, item2, item3, item4, item5
+
+S1301.Data = SCREEN.object("parent.elw_gcjs").data
+If Trim(S1301.Data) = "ASKET" Then
+
+	item1 = Trim(Mid(SCREEN.Object("parent.1881").Data, 2, 6))&Trim(SCREEN.Object("parent.1861").Data)
+	item2 = Trim(Mid(SCREEN.Object("parent.1882").Data, 2, 6))&Trim(SCREEN.Object("parent.1862").Data)
+	item3 = Trim(Mid(SCREEN.Object("parent.1883").Data, 2, 6))&Trim(SCREEN.Object("parent.1863").Data)
+	item4 = Trim(Mid(SCREEN.Object("parent.1884").Data, 2, 6))&Trim(SCREEN.Object("parent.1864").Data)
+	item5 = Trim(Mid(SCREEN.Object("parent.1885").Data, 2, 6))&Trim(SCREEN.Object("parent.1865").Data)
+
+	If item3 = "" Then
+		items = vbTab & item1 & vbTab & item2
+	Else
+		items = vbTab & item1 & vbTab & item2 & vbTab & item3
+	End If
+	If item4 <> "" Then
+		items = items & vbTab & item4
+	End If
+	If item5 <> "" Then
+		items = items & vbTab & item5
+	End If
+
+	COMBO0.SetItems(items)
+	COMBO0.Index = SCREEN.Object("parent.obj1.combo0").index
+	COMBO0.Refresh
+	S1301.Data = COMBO0.data
+	PANEL1.Visible = False
+	COMBO0.Visible = True
+Else
+	S1301.Data = Mid(SCREEN.Object("parent.1881").Data, 2, 6)
+	PANEL1.Visible = True
+	COMBO0.Visible = False
+End If
+
+SCREEN.Send 0
+End Sub
+
+_AW_ONSEND_AW_
+If Len(Trim(S1301.Data)) <> 6 Then
+	SCREEN.OnSend False
+	Exit Sub
+End If
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+Query_Chart()
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(company)
+_AW_ONCLICK_AW_
+SCREEN.Object("parent.C_MAP").DATA = "0"
+ SCREEN.SetTimer 1, True
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(COMBO0)
+_AW_ONCHANGE_AW_
+S1301.Data = COMBO0.Data
+SCREEN.Proc "main.change_index", COMBO0.Index
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

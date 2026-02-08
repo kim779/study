@@ -1,0 +1,294 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB770040)
+MAPSIZE(384, 287)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("MS Sans Serif", 9, NORMAL)
+TITLE("공지사항")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(FIXED)
+HEADER(NOP)
+BGROUND(BRUSH, 240)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL1(0, 350, 287, 385)        COLOR(240, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  btnLink(3, 356, 66, 376)  '바로가기'  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(208, 186)  CUR(10)    "6BTN.BMP"    TABORDER(1)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+BUTTON  BUTTON0(220, 358, 238, 376)  '1'  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(208, 186)  CUR(10)    "1BTN.BMP"    TABORDER(2)  ENABLE  &
+  IMAGETEXT  HINTTYPE(IH_NONE)
+BUTTON  BUTTON1(242, 358, 260, 376)  '2'  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(208, 186)  CUR(10)    "1BTN.BMP"    TABORDER(3)  ENABLE  &
+  IMAGETEXT  HINTTYPE(IH_NONE)
+BUTTON  BUTTON2(265, 358, 283, 376)  '3'  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(208, 186)  CUR(10)    "1BTN.BMP"    TABORDER(4)  ENABLE  &
+  IMAGETEXT  HINTTYPE(IH_NONE)
+BUTTON  BUTTON3(276, 852, 294, 870)  '4'  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(208, 186)  CUR(10)    "1BTN.BMP"    TABORDER(5)  ENABLE  &
+  IMAGETEXT  HINTTYPE(IH_NONE)
+BUTTON  BUTTON4(300, 851, 318, 869)  '5'  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(208, 186)  CUR(10)    "1BTN.BMP"    TABORDER(6)  ENABLE  &
+  IMAGETEXT  HINTTYPE(IH_NONE)
+OBJECT  obj(0, 0, 287, 348)    "IB77004A"  TABORDER(7)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  rbtn1(217, 357, 238, 378)  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(208, 186)  CUR(10)    "button_1.BMP"    TABORDER(8)  ENABLE  &
+  IMAGETEXT  HINTTYPE(IH_NONE)
+BUTTON  rbtn2(240, 358, 261, 378)  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(208, 186)  CUR(10)    "button_2.BMP"    TABORDER(9)  ENABLE  &
+  IMAGETEXT  HINTTYPE(IH_NONE)
+BUTTON  rbtn3(263, 357, 284, 378)  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(208, 186)  CUR(10)    "button_3.BMP"    TABORDER(10)  ENABLE  &
+  IMAGETEXT  HINTTYPE(IH_NONE)
+BUTTON  rbtn4(274, 851, 295, 872)  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(208, 186)  CUR(10)    "button_4.BMP"    TABORDER(11)  ENABLE  &
+  IMAGETEXT  HINTTYPE(IH_NONE)
+BUTTON  rbtn5(298, 850, 319, 871)  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(208, 186)  CUR(10)    "button_5.BMP"    TABORDER(12)  ENABLE  &
+  IMAGETEXT  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Dim staticTime, SelectObj, maxNumber
+
+Sub StopAction()
+	staticTime = -1
+End Sub
+
+Sub clickButton(position)
+	Dim ii
+	For ii=1 To maxNumber
+		SCREEN.Object("BUTTON" & (ii-1)).Visible True
+		SCREEN.Object("rbtn" & ii).Visible False
+	Next
+
+
+	Select Case position
+		Case 0 :
+			BUTTON0.Visible False
+			rbtn1.Visible True
+		Case 1 :
+			BUTTON1.Visible False
+			rbtn2.Visible True
+		Case 2 :
+			BUTTON2.Visible False
+			rbtn3.Visible True
+		Case 3 :
+			BUTTON3.Visible False
+			rbtn4.Visible True
+		Case 4 :
+			BUTTON4.Visible False
+			rbtn5.Visible True
+	End Select
+End Sub
+
+Sub buttonVisible(vis)
+		Dim ii, row
+		BUTTON0.Visible False
+		rbtn1.Visible False
+		BUTTON1.Visible False
+		rbtn2.Visible False
+		BUTTON2.Visible False
+		rbtn3.Visible False
+		BUTTON3.Visible False
+		rbtn4.Visible False
+		BUTTON4.Visible False
+		rbtn5.Visible False
+
+		row = CInt(vis)
+
+		For ii = 1 To row
+			If ii=1 Then
+				SCREEN.Object("rbtn" & ii).Visible True
+			Else
+				SCREEN.Object("BUTTON" & (ii-1)).Visible True
+			End If
+		Next
+
+End Sub
+
+_AW_ONSTART_AW_
+staticTime = 0
+SelectObj = 0
+maxNumber = 0
+
+Call buttonVisible(0)
+
+If SCREEN.CreateObject("Info") Then
+ 	maxNumber = Trim(INFO.PopData("", "notice7700.ini", "ADNumber", "num"))
+
+ 	If Trim(maxNumber) <> "" Then
+ 		Call buttonVisible(maxNumber)
+ 	Else
+ 		maxNumber = 3
+ 		Call buttonVisible(maxNumber)
+ 	End If
+End If
+
+SCREEN.SetTimer 20, False
+
+_AW_ONENDSUB_AW_
+_AW_ONTIMER_AW_
+If staticTime >= 0 And CInt(staticTime) < CInt(maxNumber) Then
+
+	Select Case staticTime
+		Case 0 : obj.SetObject("IB77004A")
+				Call clickButton(0)
+		Case 1 : obj.SetObject("IB77004B")
+				Call clickButton(1)
+		Case 2 : obj.SetObject("IB77004C")
+				Call clickButton(2)
+		Case 3 : obj.SetObject("IB77004D")
+				Call clickButton(3)
+		Case 4 : obj.SetObject("IB77004E")
+				Call clickButton(4)
+	End Select
+
+	SelectObj = staticTime
+	staticTime = staticTime + 1
+
+	If Trim(staticTime) <> "" And Trim(maxNumber) <> "" Then
+		If 	CInt(staticTime) >= CInt(maxNumber) Then
+			staticTime = 0
+		End If
+	Else
+		staticTime = -1
+	End If
+
+	SCREEN.SetTimer 30, False
+End If
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(btnLink)
+_AW_ONCLICK_AW_
+If SCREEN.CreateObject("Info") Then
+ 	Dim link
+ 	link = Trim(INFO.PopData("", "notice7700.ini", SelectObj, "url"))
+ 	SYSTEM.Navigate link & vbTab & "1000" & vbTab & "800"
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON0)
+_AW_ONCLICK_AW_
+staticTime = -1
+SelectObj = 0
+obj.SetObject "IB77004A"
+
+Call clickButton(0)
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON1)
+_AW_ONCLICK_AW_
+staticTime = -1
+SelectObj = 1
+obj.SetObject "IB77004B"
+
+Call clickButton(1)
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON2)
+_AW_ONCLICK_AW_
+staticTime = -1
+SelectObj = 2
+obj.SetObject "IB77004C"
+
+Call clickButton(2)
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON3)
+_AW_ONCLICK_AW_
+staticTime = -1
+SelectObj = 3
+obj.SetObject "IB77004D"
+
+Call clickButton(3)
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON4)
+_AW_ONCLICK_AW_
+staticTime = -1
+SelectObj = 4
+obj.SetObject "IB77004E"
+
+Call clickButton(4)
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(rbtn1)
+_AW_ONCLICK_AW_
+staticTime = -1
+SelectObj = 0
+obj.SetObject "IB77004A"
+
+Call clickButton(0)
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(rbtn2)
+_AW_ONCLICK_AW_
+staticTime = -1
+SelectObj = 1
+obj.SetObject "IB77004B"
+
+Call clickButton(1)
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(rbtn3)
+_AW_ONCLICK_AW_
+staticTime = -1
+SelectObj = 2
+obj.SetObject "IB77004C"
+
+Call clickButton(2)
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(rbtn4)
+_AW_ONCLICK_AW_
+staticTime = -1
+SelectObj = 3
+obj.SetObject "IB77004D"
+
+Call clickButton(3)
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(rbtn5)
+_AW_ONCLICK_AW_
+staticTime = -1
+SelectObj = 4
+obj.SetObject "IB77004E"
+
+Call clickButton(4)
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

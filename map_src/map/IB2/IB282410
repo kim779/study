@@ -1,0 +1,71 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB282410)
+MAPSIZE(195, 323)
+VERSION(001)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("Ã¼°á")
+MAPPUBLIC(";")
+FONT("±¼¸²Ã¼", 9, NORMAL)
+OPTIONS(FMS|FLASH)
+TITLE("TICK-2504")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pooppoop")
+MAPTYPE(FIXED)
+HEADER(NOP)
+BGROUND(BRUSH, 200)
+}
+
+
+
+FORM DIVISION
+{
+
+EDIT  1301(68, 415, 128, 435)  LEN(6)  IO_MIXED|EDIT_INOUT    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(1)  IOORDER(1)  &
+  HINTTYPE(IH_NONE)
+BOX  BOX0(0, 0, 325, 195)    COLOR(21, 22)  LINEW(1)  BX_2CLR    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  1021(133, 417, 196, 431)  LEN(7)  IO_ALPHA|AL_CENTER||FA_FLASH  FONT("±¼¸²Ã¼", 9, NORMAL)    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+CONTROL  ctrl(0, 0, 322, 193)  |FA_FLASH  "C_Total"  "/nMG02080101/r150/d100/i1/u1/t512/j1/m15/m220/m30/m40/v/g15/g220/g30/g40"  LEN(0)  EDIT_NOP    COLOR(192, 232)  TABORDER(0)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Dim ss_div, ss_codx
+
+ss_div = "0001"                             'ÁÖ½ÄÃ­Æ® : 0001, ¾÷Á¾Ã­Æ® : 0002, ¼±¹°Ã­Æ® : 0003, ¿É¼ÇÃ­Æ® 0004
+
+Public Sub requestTr()
+   Dim str
+
+	ss_codx = SCREEN.Object("main.1301").data
+	str = ss_div & vbTab & ss_codx & vbTab
+
+	ctrl.RequestTR(str)
+End Sub
+
+_AW_ONSTART_AW_
+requestTr()
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+requestTr()
+
+SCREEN.OnSend = False
+Exit Sub
+
+_AW_ONENDSUB_AW_
+}
+
+
+

@@ -1,0 +1,452 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB241221)
+MAPSIZE(208, 871)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("MS Sans Serif", 9, NORMAL)
+OPTIONS(FMS|FLASH)
+TITLE("[2412]외국인 매매동향 차트")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("ping2412")
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+EDIT  next_time(896, 319, 991, 339)  LEN(6)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 130)  CUR(0)  TP_NONE          TABORDER(1)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL63(0, 0, 876, 165)        COLOR(241, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+CONTROL  drChart(0, 25, 870, 210)  |FA_FLASH  "CX_DRCHART"  "/iMC241221"  LEN(0)  EDIT_INOUT    COLOR(192, 232)  TABORDER(2)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  CHECK0(6, 2, 110, 22)  '거래소 순매수'  TP_CHECK|EDIT_NOP          COLOR(241, 232)  CUR(0)      TABORDER(3)  ENABLE  &
+  VISIBLE  CHECKED  HINTTYPE(IH_NONE)
+BUTTON  CHECK1(110, 2, 205, 22)  '금감원 순매수'  TP_CHECK|EDIT_NOP          COLOR(241, 232)  CUR(0)      TABORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  CHECK2(220, 2, 305, 22)  '보유주식수'  TP_CHECK|EDIT_NOP          COLOR(241, 232)  CUR(0)      TABORDER(5)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  CHECK3(310, 2, 378, 22)  '외인비중'  TP_CHECK|EDIT_NOP          COLOR(241, 232)  CUR(0)      TABORDER(6)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  1301(900, 275, 1029, 295)  LEN(12)  IO_MIXED|EDIT_INPUT|FA_ZEROSUP|FA_WRAP|FA_HAN|SA_SPACE    COLOR(99, 69)  CUR(0)  TP_NONE          TABORDER(7)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Sub change_chart(key)
+	'	drChart.DelAllBozoMsg()'
+	'	drChart.AddBozoMsg 1, "UD", key
+
+
+	Dim inputData
+	Dim tnkey
+
+	Dim    cod2 	'[15];            종목코드
+	Dim    sDate 	'[8];             검색시작일
+	Dim    nrec		'[4];             조회건수
+	Dim    unit		'[3];             조회단위 1분봉, 3분봉
+	Dim    gubn		'[1];             조회구분
+					'				  0 : 틱, 1 : 분, 2 : 일
+					'				  3 : 주, 4 : 월
+	Dim    egbn		'[1];             수정주가 구분
+	Dim    smod		'[1];             조회모드
+	Dim    nkey		'[23];      	Next Key
+	Dim    bgbn		'[1];             허봉, 실봉구분
+					'				  0: 허봉 1: 실봉
+	Dim    dgbn		'[1];             당일 구분
+	Dim    temp
+	Dim    code_type ' 코드 타입 (입력 코드 보정용)
+	Dim    prefix	 ' 코드 접두 : A, N.A, M.A, Q, N.Q, M.Q, ...
+	Dim    suffix    ' 코드 접미 : Space
+	CStr   str
+
+	code_type = Trim(SCREEN.Object("main.1301").Data)
+
+	' 코드 연동용 시장 접두 제거
+	code_type = Replace(code_type, "M.", "")
+	code_type = Replace(code_type, "N.", "")
+
+	prefix = ""
+	suffix = "   "
+
+	Select Case code_type
+	Case "27"	' ETN - ETN종목은 접두가 Q로 시작
+
+		' 시장선택 구분자가 존재하면 시장에 따라 prefix 선택
+		If UCase(TypeName( SCREEN.Object("main.cxMarket") )) <> "NOTHING" Then
+
+SYSTEM.Trace "ETN sMarket : " & SCREEN.Object("main.cxMarket").sMarket
+
+			Select Case Trim(SCREEN.Object("main.cxMarket").sMarket)
+			Case "KRX"
+				prefix = ""
+				suffix = "     "
+
+			Case "NXT"
+				prefix = "N."
+				suffix = "   "
+
+			Case "통합"
+				prefix = "M."
+				suffix = "   "
+			End Select
+		End If
+
+	Case "9"	' ELW - ELW 종목은 접두가 J로 시작
+		prefix = "  "	' ELW는 대체 거래소 없음
+
+	Case Else	' 다른 일반종목은 접두가 A로 시작
+SYSTEM.Trace "NORMAL sMarket : " & SCREEN.Object("main.cxMarket").sMarket
+
+		If UCase(TypeName( SCREEN.Object("main.cxMarket") )) <> "NOTHING" Then
+			Select Case Trim(SCREEN.Object("main.cxMarket").sMarket)
+			Case "KRX"
+				prefix = ""
+				suffix = "     "
+
+			Case "NXT"
+				prefix = "N."
+				suffix = "    "
+
+			Case "통합"
+				prefix = "M."
+				suffix = "    "
+
+			End Select
+		End If
+
+	End Select
+
+
+
+
+
+	gubn = 1
+	cod2 = S1301.Data
+	sDate = "        "
+	temp = 120
+	nrec=Trim(temp)
+
+	If(Len(nrec)=3) Then
+	    str = " "
+		nrec = str & nrec
+	End If
+	If(Len(nrec)=2) Then
+	    str = "  "
+		nrec = str & nrec
+	End If
+	If(Len(nrec)=1) Then
+	    str = "   "
+		nrec = str & nrec
+	End If
+
+	If(Len(nrec)=0) Then
+		nrec = " 120"
+		request_count.Data = 120
+	End If
+
+	unit = g_gunit
+	egbn = "1"
+	smod = "1"
+	tnkey = LTrim(drChart.GetNextKey())
+
+	If tnkey = "" Then
+		nkey = "                       "
+	Else
+		If key = "3" Then
+			nkey = tnkey & "                 "
+		Else
+			nkey = "                       "
+		End If
+	End If
+
+	bgbn = "1"
+	dgbn = "0"
+
+	cod2 = prefix + code_type + suffix
+
+	SYSTEM.Trace "change_chart unit : " & unit & " g_unit : " & g_gunit
+	'drChart.SetSubMsg "UM", "E"
+	inputData = cod2 & sDate & nrec & gubn & nkey & smod & bgbn
+
+SYSTEM.Trace "DR_chart map=" &SCREEN.GetMapName(0) & "  inputData = " & inputData
+
+	Dim szTR
+	szTR = "ping2412"
+	drChart.SendTr szTR, S1301.Data, inputData,1
+
+	next_time.Data = ""
+
+End Sub
+
+Sub Set_stime()
+	Dim stime, t_string, tstring
+	stime= drChart.GetChartProperty("GetData(자료일자, 0)")
+
+	t_string = Split(stime, "/", -1, 1)
+	tstring = Split(t_string(1), ":", -1, 1)
+
+	next_time.Data = tstring(0) & tstring(1) & tstring(2) & "  "
+
+	change_chart(1)
+
+End Sub
+
+
+Sub Set_check(check_no)
+	If check_no = "1" Then
+		If CHECK0.Checked = False Then
+			drChart.GetChartProperty("SetGraphHide (0, 0, 거래소순매수, true )")
+			CHECK0.Checked = False
+		Else
+			drChart.GetChartProperty("SetGraphHide (0, 0, 거래소순매수, false )")
+			CHECK0.Checked = True
+		End If
+
+	ElseIf check_no = "2" Then
+		If CHECK1.Checked = False Then
+			drChart.GetChartProperty("SetGraphHide (0, 0, 금감원순매수, true )")
+			CHECK1.Checked = False
+		Else
+			drChart.GetChartProperty("SetGraphHide (0, 0, 금감원순매수, false )")
+			CHECK1.Checked = True
+		End If
+
+	ElseIf check_no = "3" Then
+		If CHECK2.Checked = False Then
+			drChart.GetChartProperty("SetGraphHide (0, 0, 보유주식수, true )")
+			CHECK2.Checked = False
+		Else
+			drChart.GetChartProperty("SetGraphHide (0, 0, 보유주식수, false )")
+			CHECK2.Checked = True
+		End If
+
+	ElseIf check_no = "4" Then
+		If CHECK3.Checked = False Then
+			drChart.GetChartProperty("SetGraphHide (0, 0, 외인비중, true )")
+			CHECK3.Checked = False
+		Else
+			drChart.GetChartProperty("SetGraphHide (0, 0, 외인비중, false )")
+			CHECK3.Checked = True
+		End If
+	End If
+	
+	p_write_ini()
+
+End Sub
+
+Sub Set_checkinit()
+	Set_check(1)
+	Set_check(2)
+	Set_check(3)
+	Set_check(4)
+End Sub
+
+
+Sub p_write_ini()
+	Dim check_no1, check_no2, check_no3, check_no4
+
+	If CHECK0.Checked = True Then
+		check_no1 = 1
+	ElseIf CHECK0.Checked = False Then
+		check_no1 = 0
+	End If
+
+
+	If CHECK1.Checked = True Then
+		check_no2 = 1
+	ElseIf CHECK2.Checked = False Then
+		check_no2 = 0
+	End If
+
+	If CHECK2.Checked = True Then
+		check_no3 = 1
+	ElseIf CHECK0.Checked = False Then
+		check_no3 = 0
+	End If
+
+	If CHECK3.Checked = True Then
+		check_no4 = 1
+	ElseIf CHECK0.Checked = False Then
+		check_no4 = 0
+	End If
+
+	If SCREEN.CreateObject("INFO") Then
+		INFO.pushData LOGIN.Name, "userconf.ini", SCREEN.GetMapName(0), "check1", check_no1
+		INFO.pushData LOGIN.Name, "userconf.ini", SCREEN.GetMapName(0), "check2", check_no2
+		INFO.pushData LOGIN.Name, "userconf.ini", SCREEN.GetMapName(0), "check3", check_no3
+		INFO.pushData LOGIN.Name, "userconf.ini", SCREEN.GetMapName(0), "check4", check_no4
+	End If
+
+End Sub
+
+Sub p_read_ini()
+	If SCREEN.CreateObject("INFO") Then
+		Dim check_no1, check_no2, check_no3, check_no4
+		check_no1 = Trim(INFO.PopData(LOGIN.Name, "userconf.ini", SCREEN.GetMapName(0), "check1"))
+		check_no2 = Trim(INFO.PopData(LOGIN.Name, "userconf.ini", SCREEN.GetMapName(0), "check2"))
+		check_no3 = Trim(INFO.PopData(LOGIN.Name, "userconf.ini", SCREEN.GetMapName(0), "check3"))
+		check_no4 = Trim(INFO.PopData(LOGIN.Name, "userconf.ini", SCREEN.GetMapName(0), "check4"))
+	End If
+
+	If check_no1 = "1" Then
+		CHECK0.Checked = True
+	ElseIf check_no1 = "0" Then
+		CHECK0.Checked = False
+	Else
+		CHECK0.Checked = True
+	End If
+
+	If check_no2 = "1" Then
+		CHECK1.Checked = True
+	ElseIf check_no2 = "0" Then
+		CHECK1.Checked = False
+	Else
+		CHECK1.Checked = False
+	End If
+
+	If check_no3 = "1" Then
+		CHECK2.Checked = True
+	ElseIf check_no3 = "0" Then
+		CHECK2.Checked = False
+	Else
+		CHECK2.Checked = False
+	End If
+
+	If check_no4 = "1" Then
+		CHECK3.Checked = True
+	ElseIf check_no4 = "0" Then
+		CHECK3.Checked = False
+	Else
+		CHECK3.Checked = False
+	End If
+
+	Set_checkinit
+
+End Sub
+
+_AW_ONSTART_AW_
+Dim szPropName
+
+szPropName = "bShowPriceMinMaxText(0)"
+drChart.GetChartProperty( szPropName )
+
+S1301.Data = SCREEN.Object("main.1301").Data
+
+'change_chart(1)
+p_read_ini
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+'change_chart(1)
+'If UCase(TypeName( SCREEN.Object("main.cxMarket"))) <> "NOTHING" Then
+'	If SCREEN.Object("main.cxMarket").sMarket = "KRX" Then
+'		S1301.Data = SCREEN.Object("main.1301").Data
+'	ElseIf SCREEN.Object("main.cxMarket").sMarket = "NXT" Then
+'		S1301.Data = "N." & SCREEN.Object("main.1301").Data
+'	ElseIf SCREEN.Object("main.cxMarket").sMarket = "통합" Then
+'		S1301.Data = "M." & SCREEN.Object("main.1301").Data
+'	End If
+'End If
+
+_AW_ONENDSUB_AW_
+_AW_ONCLOSE_AW_
+p_write_ini
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(drChart)
+_AW_ONCHANGE_AW_
+'drChart.GetChartState() 리턴값
+'STATE_NONE					0
+'STATE_STARTRECEIVE			1 	TR받은 직후
+'STATE_ENDRECEIVE			2 	조회결과를 차트컨트롤에 그린 후
+'STATE_CHANGEONPAGECNT		3	데이터 조회 스크롤 시
+'STATE_SENDTR				4	TR 전송시
+'STATE_DESTROYCHART			5	차트화면 내려갈때
+
+Dim TotCnt
+Dim DataCnt
+Dim ret
+Dim end_key
+ret = drChart.GetChartState()
+TotCnt = drChart.GetChartProperty("GetDataCount")
+DataCnt = drChart.GetChartProperty( "GetOnePageDataCount" )
+
+SYSTEM.Trace "ret[" & ret & "] TotCnt[" & TotCnt & "] DataCnt[" & DataCnt & "]"
+
+'If ret = 2 Then
+'	SCREEN.IgnoreChange False
+	'request_count.Data = TotCnt
+'	SCREEN.IgnoreChange True
+'End If
+
+'If ret =  3 Then
+'	SCREEN.IgnoreChange False
+	'data_count.Data = DataCnt
+'	SCREEN.IgnoreChange True
+'End If
+
+'end_key = LTrim(drChart.GetNextKey())
+'If end_key = "999999" Then
+'	SYSTEM.Trace "end_key"
+'	SCREEN.Object("main.BUTTON4").Enable = False
+'Else
+'	SCREEN.Object("main.BUTTON4").Enable = True
+'End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(CHECK0)
+_AW_ONCLICK_AW_
+Set_check(1)
+_AW_ONENDSUB_AW_
+_AW_ONDBLCLK_AW_
+Set_check(1)
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(CHECK1)
+_AW_ONCLICK_AW_
+Set_check(2)
+_AW_ONENDSUB_AW_
+_AW_ONDBLCLK_AW_
+Set_check(2)
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(CHECK2)
+_AW_ONCLICK_AW_
+Set_check(3)
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(CHECK3)
+_AW_ONCLICK_AW_
+Set_check(4)
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

@@ -1,0 +1,225 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB861220)
+MAPSIZE(362, 565)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(ENCODE)
+TITLE("IBK 투자통장 마일리지 현황")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pibopbxq")
+MAPTYPE(NORM)
+HEADER(LEDGER)
+TRXH("11CSONCQ360")
+}
+
+
+
+FORM DIVISION
+{
+
+EDIT  zPwd(155, 660, 275, 680)  LEN(8)  IO_MIXED|EDIT_INPUT|FA_PASSWD|FA_WRAP|FA_NOR|FA_PASS    COLOR(192, 130)  CUR(0)  TP_SUNKEN          TABORDER(1)  IOORDER(3)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  zIn(155, 620, 275, 640)  LEN(5)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_NOR|FA_PASS    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("00001")          TABORDER(5)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  zAcntNo(155, 640, 275, 660)  LEN(20)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_NOR|FA_PASS    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(6)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  zInptVal(415, 620, 535, 640)  LEN(50)  IO_MIXED|AL_CENTER||FA_PASSWD    COLOR(192, 69)  CUR(0)            TABORDER(0)  IOORDER(7)  ENABLE  &
+  HINTTYPE(IH_NONE)
+GRID  GRID0(0, 0, 565, 361)  VISIBLEROW(0)  CELLH(18)  MATRIX(2000, 4)  FIX(0)  MAINCOLOR(208, 232)  LINECOLOR(75)  FOCUSCOLOR(78)  FOCUSKIND(4)  ROWC(68, 77)  |MULTI|FLEXIBLE|VSCROLL|NO3D|RROW|XHLINE|GRFTEXT    &
+	COLINFO("dt1")  LEN(8)  WIDTH(69)  HEAD("일자")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  EDITFORMAT("9999/99/99")    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("CtrctAmt")  LEN(16)  WIDTH(160)  HEAD("약정금액")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSUP    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(69, 69)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("CmsnAmt")  LEN(16)  WIDTH(160)  HEAD("순수탁 수수료")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSUP    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(69, 69)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Amt")  LEN(16)  WIDTH(160)  HEAD("마일리지 합계금액")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSUP    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(69, 69)    HNORMAL  SORTSTARTPOS(0)    TABORDER(4)  IOORDER(9)  ENABLE  &
+  VISIBLE
+
+EDIT  zSrtDt(155, 680, 275, 700)  LEN(8)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_DATE|FA_NOR|FA_PASS    COLOR(192, 232)  CUR(0)  TP_SUNKEN          EDITFORMAT("9999/99/99")  TABORDER(2)  IOORDER(4)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  zEndDt(155, 700, 275, 720)  LEN(8)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_DATE|FA_NOR|FA_PASS    COLOR(192, 130)  CUR(0)  TP_SUNKEN          EDITFORMAT("9999/99/99")  TABORDER(3)  IOORDER(5)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  OUTPUT0(415, 640, 535, 660)  LEN(1)  IO_NUM|AL_CENTER|    COLOR(192, 69)  CUR(0)            TABORDER(0)  IOORDER(8)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL9(30, 620, 150, 640)  '입력레코드갯수'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL10(30, 640, 150, 660)  '계좌번호'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL11(30, 660, 150, 680)  '비밀번호'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL12(30, 680, 150, 700)  '시작일'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL13(30, 700, 150, 720)  '종료일'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL14(30, 720, 150, 740)  '조회구분'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  zQryTp(155, 720, 275, 740)  LEN(1)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_NOR|FA_PASS    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(7)  IOORDER(6)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL15(295, 620, 415, 640)  '입력내용'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL16(295, 640, 415, 660)  '출력레코드갯수'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Option Explicit
+
+Dim flag_date
+flag_date = "N"
+
+'== 첫 조회
+Sub send_f()
+	SCREEN.ClearAll 0, 2
+	LEDGER.Fkey = "C"
+	SCREEN.Send 0
+End Sub
+
+'== 연속 조회
+Sub send_c()
+	LEDGER.Fkey = "7"
+	GRID0.SetDataPosition(2)
+	SCREEN.Send 0
+End Sub
+
+Sub chkDate()
+	Dim srtDt, EndDt, betDate, DateSel, Today
+	srtDt = Trim(SCREEN.Object("parent.zSrtDt").Data)
+	EndDt = Trim(SCREEN.Object("parent.zEndDt").Data)
+	DateSel = Trim(SCREEN.Object("parent.dateSel").Text)
+	Today = getCurrDay()
+
+	If CLng(srtDt) > CLng(Today) Or CLng(EndDt) > CLng(Today) Then
+		flag_date = "over"
+		srtDt = change_indate("d", -14, getDateSerial(Today))
+		EndDt = Today
+
+		SCREEN.Object("parent.zSrtDt").Data = srtDt
+		SCREEN.Object("parent.zEndDt").Data = EndDt
+	Else
+		If CLng(srtDt) > CLng(EndDt) Then
+			flag_date = "srtOver"
+			srtDt = change_indate("d", -14, getDateSerial(EndDt))
+			SCREEN.Object("parent.zSrtDt").Data = srtDt
+		End If
+		
+		If DateSel = "1" Then
+			betDate = change_indate("m", 3, Trim(SCREEN.Object("parent.zSrtDt").Text))
+
+			If CLng(EndDt) > CLng(betDate) Then
+				flag_date = "3months"
+				EndDt = betDate
+				SCREEN.Object("parent.zEndDt").Data = EndDt
+			End If
+		Else
+			betDate = change_indate("m", -3, Trim(SCREEN.Object("parent.zEndDt").Text))
+
+			If CLng(srtDt) < CLng(betDate) Then
+				flag_date = "Y"
+				srtDt = betDate
+				SCREEN.Object("parent.zSrtDt").Data = srtDt
+			End If
+		End If
+	End If
+
+	zSrtDt.Data = srtDt
+	zEndDt.Data = EndDt
+End Sub
+
+_AW_ONINDECLARE_AW_
+#load IB888833
+#Load IB888888
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+LEDGER.Rcnt = "0020"
+
+SCREEN.OnSend = False
+
+zIn.Data = "00001"
+zAcntNo.Data = Trim(SCREEN.Object("parent.CMB_ACCT").Data)
+
+If Len(Trim(zAcntNo.Data)) <> 11 Then
+	Call alert_msg("계좌번호를 확인하여 주십시오.")
+	SCREEN.Object("parent.CMB_ACCT").SetFocus
+	Exit Sub
+End If
+
+zPwd.Data = Trim(SCREEN.Object("parent.zPwd").Data)
+
+If Len(Trim(zPwd.Data)) < 4 Then
+	Call alert_msg("계좌비밀번호를 확인하여 주십시오.")
+	SCREEN.Object("parent.zPwd").SetFocus
+	Exit Sub
+End If
+
+Call chkDate()
+
+zQryTp.Data = Trim(SCREEN.Object("parent.zQryTp").Data)
+SCREEN.OnSend = True
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+Dim ecod
+ecod = Trim(LEDGER.Ecod)
+
+If chkNumericData(ecod) = False Then
+	Exit Sub
+End If
+
+If ecod= "3669" Then
+	SCREEN.ClearAll 0, 2
+	zPwd.SetFocus
+	Exit Sub
+End If
+
+If LEDGER.Next = "Y" And ecod <> "0136" Then
+	Call send_c()
+Else
+	If flag_date = "3months" Then
+		Call alert_msg("결제일의 조회기간은 최대 3개월까지 조회 가능합니다.")
+	ElseIf flag_date = "srtOver" Then
+		Call alert_msg("결제일의 시작일이 종료일보다 이후입니다.")
+	ElseIf flag_date = "over" Then
+		Call alert_msg("조회일이 오늘보다 이후입니다.")
+	End If
+	
+	flag_date = "N"
+End If
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(zPwd)
+_AW_ONKEYCHANGE_AW_
+'== 비밀번호 변경시 조회 버튼 기능 수행.
+If SCREEN.Key = "13" Then  '-- Enter 키 입력
+	Call send_f()
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(GRID0)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(zSrtDt)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(zEndDt)
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

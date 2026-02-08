@@ -1,0 +1,994 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB2000XX)
+MAPSIZE(617, 1006)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("주식종합화면")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(CR2TAB|SAVE)
+TITLE("[2000] 주식종합화면")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL8(1003, 0, 1012, 620)        COLOR(64, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  OBJ_Interest(8, 29, 326, 329)    "IB2000W0"  TABORDER(16)  IOORDER(12)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL0(670, 66, 1008, 335)  LIMAGE(0)  LINEW(4)  STRESS(0)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(192, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL_hoga(670, 67, 1006, 335)  LIMAGE(0)  LINEW(4)  STRESS(44)  STRESSW(3)  LINETYPE(4)  LINECOLOR(64)      COLOR(192, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  panel_hoga2(334, 67, 670, 334)  LIMAGE(0)  LINEW(2)  STRESS(44)  STRESSW(3)  LINETYPE(4)  LINECOLOR(64)      COLOR(192, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL7(0, 0, 334, 335)  LIMAGE(0)  LINEW(4)  STRESS(0)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(192, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL6(333, 66, 671, 335)  LIMAGE(0)  LINEW(4)  STRESS(0)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(192, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL3(670, 334, 1008, 597)  LIMAGE(0)  LINEW(4)  STRESS(0)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(192, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL2(0, 334, 671, 597)  LIMAGE(0)  LINEW(4)  STRESS(0)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(192, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+USRTAB  tab_account(5, 340, 660, 360)  FOCUS  INDEX(0)  COUNT(9)  AL_TOP  TAB_3D      FONT("굴림체", 9, NORMAL)    COLOR(49805560, 70)  CUR(0)  FCOLOR(47041997, 71)  CAPTION("미체결/잔고", "미체결", "실시간잔고", "예수금", "매매일지", "일별손익", "주문가능", "체결", "원장잔고")  TABINFO("1:0", "1:1", "1:2", "1:4", "1:5", "1:6", "1:7", "1:8", "0:9")  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  OBJ_order(679, 343, 999, 588)    "IB2000Z1"  TABORDER(2)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  OBJ_account(9, 363, 664, 588)    "IB200081"  TABORDER(3)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL0(1036, 129, 1161, 149)  '테마관련체크'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  theme_check(1166, 129, 1186, 149)  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  theme_1301(1320, 129, 1385, 149)  LEN(6)  IO_MIXED|EDIT_INOUT|FA_WRAP|FA_HAN|CODE    FONT("굴림체", 9, NORMAL)    COLOR(28, 232)  CUR(0)  TP_NONE          TABORDER(8)  IOORDER(4)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL1(1190, 129, 1315, 149)  '테마클릭한종목'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  btn_send(611, 341, 643, 361)  '조회'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, BOLD)  COLOR(132, 69)  CUR(0)    "조회btn.BMP"    TABORDER(7)  ENABLE  &
+  IMAGETEXT  HOVER  HINTTYPE(IH_STRING)
+OBJECT  obj_reduce2(342, 93, 662, 327)    "IB2000X0"  TABORDER(11)  IOORDER(7)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  OPEN_BTN3(644, 341, 664, 361)  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(132, 232)  CUR(0)    "LINK.BMP"    TABORDER(6)  ENABLE  &
+  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+PANEL  PANEL4(0, 597, 1006, 618)  LIMAGE(1)  LINEW(1)  STRESS(1)  STRESSW(0)  LINETYPE(4)  LINECOLOR(64)      COLOR(34, 69)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL5(8, 601, 22, 615)    |IMAGE|AL_STRETCH    COLOR(208, 232)  CUR(0)    "알림_ic.bmp"  ENABLE  &
+  VISIBLE  TRANSPARENT  IMAGE  HINTTYPE(IH_NONE)
+PANEL  GUIDE(28, 600, 928, 616)        COLOR(203, 69)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+USRTAB  tab_sise(675, 73, 995, 93)  FOCUS  INDEX(0)  COUNT(8)  AL_TOP  TAB_3D        COLOR(49805560, 70)  CUR(0)  FCOLOR(47041997, 71)  CAPTION("호가", "체결", "일별", "회원", "상세", "차트", "체강", "투자")  TABINFO("1:0", "1:1", "1:2", "1:3", "1:4", "1:5", "1:6", "1:7")  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  OBJ_sise(680, 90, 1000, 324)    "IB2000XD"  TABORDER(1)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  obj_reduce1(8, 29, 326, 329)    ""  TABORDER(12)  IOORDER(8)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+USRTAB  tab_tujaEx2(339, 73, 662, 93)  FOCUS  INDEX(0)  COUNT(8)  AL_TOP  TAB_3D        COLOR(49805560, 70)  CUR(0)  FCOLOR(47041997, 71)  CAPTION("호가", "체결", "일별", "회원", "상세", "차트", "섹터", "투자")  TABINFO("1:0", "1:1", "1:2", "1:3", "1:4", "1:5", "1:6", "1:7")  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  OPEN_BTN0(1387, 127, 1407, 147)  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(132, 232)  CUR(0)    "LINK.BMP"    TABORDER(5)  ENABLE  &
+  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+BUTTON  OPEN_BTN1(983, 73, 1001, 91)  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(132, 232)  CUR(0)    "LINK.BMP"    TABORDER(4)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+PANEL  PANEL9(978, 36, 999, 37)  LINETYPE(3)  LINECOLOR(165)      COLOR(208, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  theme_code(1242, 169, 1275, 188)  LEN(4)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_SKIP  FONT("굴림체", 9, NORMAL)    COLOR(192, 232)  CUR(0)  TP_SUNKEN          TABORDER(9)  IOORDER(5)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  theme_index(1219, 169, 1239, 188)  LEN(2)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP  FONT("굴림체", 9, NORMAL)    COLOR(192, 232)  CUR(0)  TP_SUNKEN          TABORDER(10)  IOORDER(6)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  TMNAM(1088, 168, 1213, 188)  LEN(50)  IO_MIXED|EDIT_INPUT|FA_PROTECT|FA_WRAP|FA_SKIP|FA_NOR  FONT("굴림체", 9, NORMAL)    COLOR(192, 232)  CUR(0)  TP_SUNKEN          TABORDER(13)  IOORDER(9)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  Click_favo(1043, 168, 1058, 187)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_SUNKEN          TABORDER(14)  IOORDER(10)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  OBJECT0(1040, 95, 1120, 115)    "IB2000ZQ"  TABORDER(15)  IOORDER(11)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  bt_reduce(646, 73, 665, 91)  '10'  TP_PUSH|IMAGETEXT|AL_STRETCH        FOCUS  COLOR(208, 186)  CUR(0)    "1BTN.BMP"    TABORDER(19)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+PANEL  PANEL1(333, 0, 1008, 68)  LIMAGE(0)  LINEW(4)  STRESS(0)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(192, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+CONTROL  1301(361, 7, 428, 27)  |FA_PROTECT  "CX_CODECTRL"  "/u0/k검색.BMP/lAXCOMBO.BMP/p/s0/o"  LEN(6)  EDIT_INOUT    COLOR(192, 130)  TABORDER(17)  IOORDER(13)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON2(428, 7, 447, 27)  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(15, 63)  CUR(0)    "검색.BMP"    TABORDER(18)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+CONTROL  ctl_Category(447, 7, 485, 27)    "CX_Category"  "/k0/i돌려보기.BMP/t/r1301"  LEN(0)  EDIT_NOP  FONT("굴림체", 9, NORMAL)    COLOR(68, 232)  TABORDER(0)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON1(485, 7, 504, 27)  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, NORMAL)  COLOR(208, 232)  CUR(0)    "관심.BMP"    TABORDER(21)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+OBJECT  OBJ_hnam(505, 7, 638, 27)    "IB2000XE"  TABORDER(20)  IOORDER(14)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  bt_Hoga2(983, 73, 1001, 91)  '10'  TP_PUSH|IMAGETEXT|AL_STRETCH        FOCUS  COLOR(208, 186)  CUR(0)    "1BTN.BMP"    TABORDER(22)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+BUTTON  reduce(980, 7, 1000, 27)  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(132, 232)  CUR(0)    "MINUSBTN.BMP"    TABORDER(23)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+OBJECT  obj_codeInfo(671, 7, 975, 27)    "IB2000XF"  TABORDER(24)  IOORDER(15)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  obj_currSise(341, 30, 1001, 61)    "IB2000XG"  TABORDER(25)  IOORDER(16)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  obj_obj_sise(1040, 60, 1160, 85)    "IB10011Z"  TABORDER(26)  IOORDER(17)  ENABLE  &
+  HINTTYPE(IH_NONE)
+CONTROL  cxMarket(340, 7, 360, 27)  |FA_SKIP  "CX_MarketPicker"  "/k2/tIB2000XX/u1"  LEN(12)  EDIT_NOP    COLOR(192, 232)  TABORDER(0)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+USRTAB  tab_tujaEx1(7, 9, 335, 29)  FOCUS  INDEX(7)  COUNT(9)  AL_TOP  TAB_3D      FONT("굴림체", 9, NORMAL)    COLOR(49805560, 70)  CUR(0)  FCOLOR(47041997, 71)  CAPTION("관심", "검색", "지수", "외/기", "뉴스", "투자", "테마", "차트", "성과")  TABINFO("1:0", "1:1", "1:2", "1:3", "1:4", "1:5", "0:6", "1:7", "1:8")  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  edMarketTrigger(1105, 20, 1137, 40)  LEN(6)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(27)  IOORDER(18)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL2(1035, 20, 1095, 40)  '거래소'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  BUTTON0(625, 10, 645, 25)  TP_PUSH      AL_CENTER    FOCUS  COLOR(208, 232)  CUR(0)      TABORDER(28)  &
+  HINTTYPE(IH_NONE)
+BUTTON  BUTTON3(650, 10, 670, 25)  TP_PUSH      AL_CENTER    FOCUS  COLOR(208, 232)  CUR(0)      TABORDER(29)  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Dim exgb
+Dim mapName
+Dim scrHandle
+Dim bCallClick
+Dim bCanClose
+Dim bTryCnt
+myFILE = "userconf.ini"
+myMAP = SCREEN.GetMapName(0)
+
+Sub OnPortfolio(msg)
+	SCREEN.Proc "main.OBJ_Interest.OnPortfolio", "ok"
+End Sub
+
+'CX_INTEREST.DLL 사용시 필요 함수
+Sub SetTrData(map,handle,file,bookmark,data,dataLen)
+	Dim hKey
+	If map <> "2000" Then
+		Exit Sub
+	End If
+
+	If tab_tujaEx1.ID = 0 Then
+		hKey = SCREEN.Object("OBJ_Interest.CONTROL1").GetMapHandle()
+
+		If Trim(handle) <> Trim(hKey) Then
+			Exit Sub
+		End If
+
+		SCREEN.Object("OBJ_Interest.CfgFile").Data = file
+		SCREEN.Object("OBJ_Interest.BookFile").Data = bookmark
+		SCREEN.Object("OBJ_Interest.trData").Data = data
+		SCREEN.Object("OBJ_Interest.DataLen").Data = dataLen
+	End If
+
+End Sub
+
+
+'투자탭 분할1
+Sub click_tujaEx1()
+	Dim msgAns
+
+	mapName = OBJ_Interest.GetObject
+
+	If InStr(mapName,"IB2000W0") > 0 And tab_tujaEx1.ID <> 0 Then
+		If SCREEN.Object("OBJ_Interest.CONTROL1").CheckSaveStatus = True Then
+			msgAns = MsgBox ("[관심종목]변경 사항을 저장하시겠습니까?",1,"관심종목 저장 확인창")
+
+			If msgAns = 1 Then
+				SCREEN.Object("OBJ_Interest.CONTROL1").ClosingSave tab_tujaEx1.ID
+				SCREEN.Object("OBJ_Interest.CfgFile").Data = ""
+				SCREEN.Object("OBJ_Interest.BookFile").Data = ""
+				SCREEN.Object("OBJ_Interest.trData").Data = ""
+				SCREEN.Object("OBJ_Interest.DataLen").Data = ""
+				SCREEN.SetTimer 1, False
+				bCallClick = True
+				Exit Sub
+			Else
+				SCREEN.Object("OBJ_Interest.CONTROL1").Recover
+			End If
+
+			SCREEN.Object("OBJ_Interest.CfgFile").Data = ""
+			SCREEN.Object("OBJ_Interest.BookFile").Data = ""
+			SCREEN.Object("OBJ_Interest.trData").Data = ""
+			SCREEN.Object("OBJ_Interest.DataLen").Data = ""
+		End If
+	End If
+
+	Select Case tab_tujaEx1.ID
+		Case 0 :
+			OBJ_Interest.Visible True
+			obj_reduce1.Visible False
+			If Trim(SCREEN.Object("OBJ_Interest.intercombo").Data) <> "" Then
+				SCREEN.Object("OBJ_Interest.CONTROL1").ChangeGroup SCREEN.Object("OBJ_Interest.intercombo").Data
+			End If
+
+			OBJ_Interest.SetRect 8,29,326,329
+			obj_reduce1.SetRect 8,1029,326,1329
+		Case 1 :
+			OBJ_Interest.Visible False
+			obj_reduce1.Visible True
+			obj_reduce1.SetObject "IB2000W1"
+			obj_reduce1.SetRect 8,29,326,329
+			OBJ_Interest.SetRect 8,1029,326,1329
+		Case 2 :
+			OBJ_Interest.Visible False
+			obj_reduce1.Visible True
+			obj_reduce1.SetObject "IB2000W2" ': OPEN_BTN0.Visible False
+			obj_reduce1.SetRect 8,29,326,329
+			OBJ_Interest.SetRect 8,1029,326,1329
+		Case 3 :
+			OBJ_Interest.Visible False
+			obj_reduce1.Visible True
+			obj_reduce1.SetObject "IB2000W3" ': OPEN_BTN0.Visible False
+			obj_reduce1.SetRect 8,29,326,329
+			OBJ_Interest.SetRect 8,1029,326,1329
+		Case 4 :
+			OBJ_Interest.Visible False
+			obj_reduce1.Visible True
+			obj_reduce1.SetObject "IB2000W4"
+			obj_reduce1.SetRect 8,29,326,329
+			OBJ_Interest.SetRect 8,1029,326,1329
+		Case 5 :
+			OBJ_Interest.Visible False
+			obj_reduce1.Visible True
+			obj_reduce1.SetObject "IB2000W6"
+			obj_reduce1.SetRect 8,29,326,329
+			OBJ_Interest.SetRect 8,1029,326,1329
+		Case 6 :
+			OBJ_Interest.Visible False
+			obj_reduce1.Visible True
+			obj_reduce1.SetObject "IB2000W7"
+			obj_reduce1.SetRect 8,29,326,329
+			OBJ_Interest.SetRect 8,1029,326,1329
+		Case 7 :
+			OBJ_Interest.Visible False
+			obj_reduce1.Visible True
+			obj_reduce1.SetObject "IB2000W8"
+			obj_reduce1.SetRect 8,29,326,329
+			OBJ_Interest.SetRect 8,1029,326,1329
+		Case 8 :
+			OBJ_Interest.Visible False
+			obj_reduce1.Visible True
+			obj_reduce1.SetObject "IB2000W9"
+			obj_reduce1.SetRect 8,29,326,329
+			OBJ_Interest.SetRect 8,1029,326,1329
+
+	End Select
+
+	If tab_tujaEx1.ID <> 0 Then
+		obj_reduce1.Send
+	End If
+End Sub
+
+Sub click_tujaEx2()
+	Select Case tab_tujaEx2.ID
+		Case 0 : obj_reduce2.SetObject "IB2000X0" : obj_reduce2.Proc "SetIniName", "1"
+		Case 1 : obj_reduce2.SetObject "IB2000X4"
+		Case 2 : obj_reduce2.SetObject "IB2000X5"
+		Case 3 : obj_reduce2.SetObject "IB2000X6"
+		Case 4 : obj_reduce2.SetObject "IB2000X8"
+		Case 5 : obj_reduce2.SetObject "IB2000X9"
+		Case 6 : obj_reduce2.SetObject "IB2000XB"
+		Case 7 : obj_reduce2.SetObject "IB2000XJ"
+	End Select
+
+	obj_reduce2.Send
+
+	'호가탭일 경우 테두리있는 패널 사용
+	If tab_tujaEx2.ID  = 0 Then
+		panel_hoga2.Visible True
+		PANEL6.Visible False
+'		obj_reduce2.Proc "SetIniName", "0"
+		bt_reduce.Visible True
+	Else
+		panel_hoga2.Visible False
+		PANEL6.Visible True
+		bt_reduce.Visible False
+	End If
+End Sub
+
+Sub Click_sise()
+	Select Case tab_sise.ID
+	Case 0 : OBJ_sise.SetObject "IB2000XD"
+			OPEN_BTN1.Visible = False
+			OBJ_sise.Proc "SetIniName", "1"
+			bt_Hoga2.Visible True
+	Case 1 : OBJ_sise.SetObject "IB2000X4"
+			OPEN_BTN1.Visible = True
+			bt_Hoga2.Visible False
+	Case 2 : OBJ_sise.SetObject "IB2000X5"
+			OPEN_BTN1.Visible = True
+			bt_Hoga2.Visible False
+	Case 3 : OBJ_sise.SetObject "IB2000X6"
+			OPEN_BTN1.Visible = True
+			bt_Hoga2.Visible False
+	Case 4 : OBJ_sise.SetObject "IB2000X8"
+			OPEN_BTN1.Visible = False
+			bt_Hoga2.Visible False
+	Case 5 : OBJ_sise.SetObject "IB2000CT"
+			OPEN_BTN1.Visible = True
+			bt_Hoga2.Visible False
+	Case 6 : OBJ_sise.SetObject "IB2000XA"
+			OPEN_BTN1.Visible = True
+			bt_Hoga2.Visible False
+	Case 7 : OBJ_sise.SetObject "IB2000XJ"
+			OPEN_BTN1.Visible = True
+			bt_Hoga2.Visible False
+	End Select
+
+	If tab_sise.ID  = 0 Then
+		PANEL_hoga.Visible True
+		PANEL0.Visible False
+	Else
+		PANEL_hoga.Visible False
+		PANEL0.Visible True
+	End If
+
+	OBJ_sise.Send
+End Sub
+
+Sub Click_Account()
+	Select Case tab_account.ID
+	Case 0 : OBJ_account.SetObject "IB200081"	' 미체결/잔고 0
+			 OPEN_BTN3.Visible = False
+			 btn_send.Visible = False
+	Case 1 : OBJ_account.SetObject "IB200082"	' 미체결 1
+			 OPEN_BTN3.Visible = True
+			 btn_send.Visible = False
+	Case 2 : OBJ_account.SetObject "IB200083"	' 실시간잔고 2
+			 OPEN_BTN3.Visible = True
+			 btn_send.Visible = False
+	'Case 3 : OBJ_account.SetObject ""
+	Case 4 : OBJ_account.SetObject "IB200084"	' 예수금 4
+			 OPEN_BTN3.Visible = True
+			 btn_send.Visible = True
+	Case 5 : OBJ_account.SetObject "IB200085"	' 매매일지 5
+			 OPEN_BTN3.Visible = True
+			 btn_send.Visible = False
+	Case 6 : OBJ_account.SetObject "IB200086"	' 당일손익 6
+			 OPEN_BTN3.Visible = True
+			 btn_send.Visible = False
+	Case 7 : OBJ_account.SetObject "IB200087"	' 주문가능 7
+			 OPEN_BTN3.Visible = True
+			 btn_send.Visible = False
+	Case 8 : OBJ_account.SetObject "IB200088"	' 체결 8
+			 OPEN_BTN3.Visible = True
+			 btn_send.Visible = False
+	'Case 9 : OBJ_account.SetObject "IB1202D2"	' 원장잔고 9
+	'		 OPEN_BTN3.Visible = True
+	End Select
+
+	GUIDE.Text = ""
+
+	If Trim(SCREEN.Object("OBJ_order.ed_pswd").data) <> "" Then
+		OBJ_account.Send
+	End If
+
+	If tab_account.ID = 2 Then
+		OBJ_account.Proc "main_sended", ""
+	ElseIf tab_account.ID = 8 Then
+		OBJ_account.Proc "first_send", ""
+	Else
+		OBJ_account.Send
+	End If
+End Sub
+
+Sub all_account()
+	If tab_account.ID = 2 Then
+		OBJ_account.Proc "main_sended", ""
+	Else
+		OBJ_account.Send
+	End If
+End Sub
+
+'모든 obj 1301에 종목정보 전송
+Sub send_sise_all(xval)
+	SCREEN.IgnoreChange True
+	If xval <> "jumun" And xval <> "account" Then
+  		S1301.Trigger "", False
+ 	End If
+	S1301.Trigger "1301", True
+
+	OBJ_hnam.Send
+	OBJECT0.Send
+	obj_codeInfo.Send
+	obj_currSise.Send
+
+	SCREEN.Object("obj_currSise.newsViewBtn").Visible = False
+	SCREEN.Object("obj_currSise.news_output").Visible = False
+
+	If Trim(SCREEN.Object("OBJ_sise").GetObject) <> "" Then
+		OBJ_sise.Send
+	End If
+
+	If Trim(SCREEN.Object("obj_reduce2").GetObject) <> "" Then
+		obj_reduce2.Send
+	End If
+
+	If tab_tujaEx1.ID = 4 Then	'뉴스
+		obj_reduce1.Send
+	End If
+
+	If tab_tujaEx2.ID = 6 Then	'테마
+			obj_reduce2.Send
+	End If
+
+	If tab_account.ID = "7" Then
+		SCREEN.Proc "obj_account.send_main", ""
+	End If
+
+	If xval <> "jumun" Then
+		'If Trim(S1301.Data) <> Trim(SCREEN.Object("obj_order.obj_odr.1301").Data) Then
+			SCREEN.IgnoreChange True
+			SCREEN.Object("OBJ_order.obj_odr.1301").Data = S1301.Data
+			SCREEN.Proc "OBJ_order.obj_odr.ChangeCode", ""
+			SCREEN.IgnoreChange False
+		'End If
+	End If
+
+	obj_obj_sise.Send
+
+	If SCREEN.Object("OBJ_order.obj_odr.1301").Iskonex = True Then
+		SCREEN.Object("OBJ_order.obj_odr.c_jqty").type = Asc("N")
+	Else
+		SCREEN.Object("OBJ_order.obj_odr.c_jqty").type = Asc("1")
+	End If
+
+	SCREEN.IgnoreChange False
+End Sub
+
+' 관심종목 창을 닫을때 프로시져 호출
+Sub CloseIB202201()
+	SCREEN.Proc "main.OBJ_Interest.OnPortfolio", "ok"
+End Sub
+
+Sub Settrigger(data, handle)
+	Dim codx, hKey
+
+	hKey = SCREEN.Object("OBJ_Interest.CONTROL1").GetMapHandle()
+
+	If Trim(handle) <> Trim(hKey) Then
+		Exit Sub
+	End If
+
+	If tab_tujaEx1.ID <> 0 Then
+		Exit Sub
+	End If
+
+	codx = Trim(data)
+	If Left(codx, 1) = "m" Then
+		Exit Sub
+	End If
+
+	If Len(codx) = 3 Then
+		Exit Sub
+
+	ElseIf Len(codx) = 6 Then
+		S1301.Data = codx
+		SCREEN.Proc "Send_sise_all", codx
+	Else
+		Exit Sub
+	End If
+End Sub
+
+Sub RefreshInterest(key)
+	If tab_tujaEx1.ID = 0 Then
+		OBJ_Interest.Proc "RefreshCX",key
+	End If
+End Sub
+
+Sub SaveConfig()
+	If SCREEN.CreateObject("Info") Then
+		INFO.PushData LOGIN.Name, "userconf.ini", "IB200000", "tujatab_status", "1"
+		INFO.PushData LOGIN.Name, "userconf.ini", "IB2000XX", "tab_tujaEx1", tab_tujaEx1.ID
+		INFO.PushData LOGIN.Name, "userconf.ini", "IB2000XX", "tab_tujaEx2", tab_tujaEx2.ID
+		INFO.PushData LOGIN.Name, "userconf.ini", "IB2000XX", "tab_sise", tab_sise.ID
+		INFO.PushData LOGIN.Name, "userconf.ini", "IB2000XX", "tab_account", tab_account.ID
+	End If
+End Sub
+
+Sub Set_prc(data)
+	If Trim(data) = "" Then
+		Exit Sub
+	End If
+
+	If SCREEN.Object("OBJ_order.tab_order").id <> 3 Then
+		If SCREEN.Object("OBJ_order.obj_odr.CHK_auto").checked = False Then
+			SCREEN.Object("OBJ_order.obj_odr.ed_jprc").data = data
+		End If
+	End If
+End Sub
+
+
+
+
+
+
+
+'========================================
+' 하위 OBJ에 시장구분자 세팅 후 조회 발생
+'========================================
+Sub Change_MKGubn_Main(sMKGubn)
+
+	If SCREEN.CreateObject("Info") Then
+		INFO.pushData LOGIN.Name, myFILE, myMAP, "MKgubn", sMKGubn
+	End If
+
+	'=====================
+	' 직전 시장구분자 저장
+	'=====================
+	Dim tMKGubn
+	tMKGubn = cxMarket.sMarket
+
+	'================================================================
+	' 소속 OBJ 내의 cxMarket 시장 구분을 Main 시장구분으로 세팅
+	'================================================================
+	' 여기서 시장구분자 보정 후 Change_MKGubn_Main_Limited 함수 호출되어서
+	' 하위 오브젝트에 시장 자동으로 전파한다.
+	'================================================================
+	Call Spread_mkgb(S1301.Data, sMKGubn)
+
+
+	'================================================================
+	' 시장 변동이 없을 경우 조회 Send 발생 SKIP 처리
+	'================================================================
+	' Spread_mkgb() 함수 이후의 시장구분자는 보정되고 난 다음의 시장구분자이다.
+	'================================================================
+	If tMKGubn = cxMarket.sMarket Then
+		Exit Sub
+	End If
+
+
+	'====================
+	' 하단 원장 OBJ 조회
+	'====================
+	Call Change_MKGubn_Main_Send()
+End Sub
+
+
+'=========================================
+' 하위 OBJ에 시장구분자 세팅 (조회 미발생)
+'=========================================
+Sub Change_MKGubn_Main_Limited(sMKGubn)
+
+	' 직전 시장구분자 저장
+	Dim tMKGubn
+	tMKGubn = cxMarket.sMarket
+
+	SCREEN.IgnoreChange True
+	cxMarket.sCode = S1301.Data
+	cxMarket.sMarket = sMKGubn		' Main Market 변경
+
+	'거래소 구분값추가로 인한 연동 함수
+	SCREEN.Proc "main.OBJ_account.Change_MKGubn_OBJ"          , sMKGubn
+	SCREEN.Proc "main.OBJ_order.OBJ_odr.Change_MKGubn_OBJ"    , sMKGubn
+	SCREEN.Proc "main.obj_reduce1.Change_MKGubn_OBJ"          , sMKGubn
+	SCREEN.Proc "main.obj_reduce1.Change_MKGubn_OBJ_Reduce1"  , sMKGubn
+	SCREEN.Proc "main.obj_reduce2.Change_MKGubn_OBJ"          , sMKGubn
+	SCREEN.Proc "main.OBJ_sise.Change_MKGubn_OBJ"             , sMKGubn
+	SCREEN.Proc "Main.OBJ_account.OBJ1.Change_MKGubn_OBJ"     , sMKGubn
+	SCREEN.Proc "main.OBJ_Interest.Change_MKGubn_OBJ"         , sMKGubn
+
+	SCREEN.IgnoreChange False
+
+	' 시장 변동 발생 시 조회 발생
+	If tMKGubn <> cxMarket.sMarket Then
+		Change_MKGubn_Main_Send()
+		SCREEN.Proc "main.OBJ_Interest.ChangeMarket"              , sMKGubn
+	End If
+
+End Sub
+
+
+
+'=====================================
+' 하위 OBJ 시장 변동에 따른 Send 발생
+'=====================================
+Sub Change_MKGubn_Main_Send()
+	' 하단 원장 OBJ 조회 :: 잔고구분자에 시장 변경 버튼이 존재
+	Select Case tab_account.ID
+	Case 0 : ' 미체결|잔고
+		' 미체결 내역은 변경하지 않도록 위해 다음 구문을 사용
+		' => 서브 미체결|잔고 화면의 OnSend() 에서 DONOTSEND 일때는
+		'    미체결 조회 하지 않도록 스크립트 미체결내역의 OnSend 스크립트 추가
+		SCREEN.Object("OBJ_account.OBJ0.GOSTOP").Text = "DONOTSEND"
+		SCREEN.Object("OBJ_account.OBJ1").Send
+
+	Case 2 :  ' 실시간잔고
+		SCREEN.Object("OBJ_account").Send
+
+	End Select
+
+	SCREEN.Object("main.obj_codeInfo").Send	' 전송 시점에 시장선택
+	SCREEN.Object("main.obj_currSise").Send ' 전송 시점에 시장선택
+	SCREEN.Object("main.OBJ_hnam").Send	' 전송 시점에 시장선택
+	SCREEN.Object("obj_obj_sise").Send	' 주문 단가 세팅용 시세 OBJ 전송 시점에 시장선택
+
+	SCREEN.Object("main.obj_reduce1").Send
+	SCREEN.Object("main.obj_reduce2").Send
+	SCREEN.Object("main.OBJ_sise").Send
+	SCREEN.Object("main.OBJECT0").Send
+
+	OBJ_hnam.Send
+	If UCase(TypeName( SCREEN.Object("OBJ_order.obj_odr.OBJ_hnam"))) <> "NOTHING" Then
+		 SCREEN.Object("OBJ_order.obj_odr.OBJ_hnam").Send
+	End If
+End Sub
+
+_AW_ONINDECLARE_AW_
+'== 주문obj를포함한 main의 공통함수
+#LOAD IB999913
+
+#load IB888888
+
+'주식주문 공통
+#load IB999912
+
+'버튼클릭자료수집
+#Load IB888833
+
+#LOAD IB999901	' KRX|NXT|SOR 시장 연동 설정
+
+_AW_ONENDSUB_AW_
+_AW_ONSTART_AW_
+cxMarket.MNum = SCREEN.GetMapName(1)
+
+' 현재 화면의 시장식별자(cxMarket)에 고유 화면번호 부여
+cxMarket.Major = SCREEN.Major
+cxMarket.sCode = S1301.Data
+SYSTEM.Push "J_qty", ""
+SYSTEM.Push "J_jprc", ""
+SYSTEM.Push "S_date", ""
+SYSTEM.Push "J_click", ""
+
+Call click_tujaEx1()
+Call click_tujaEx2()
+Call click_sise()
+
+Select Case tab_account.ID
+Case 0 :
+	btn_send.Visible False
+	OPEN_BTN3.Visible False
+Case 4 :
+	btn_send.Visible True
+	OPEN_BTN3.Visible True
+Case Else :
+	btn_send.Visible False
+	OPEN_BTN3.Visible True
+End Select
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+SCREEN.OnSend = False
+
+_AW_ONENDSUB_AW_
+_AW_ONTIMER_AW_
+Call click_tujaEx1()
+
+_AW_ONENDSUB_AW_
+_AW_ONCLOSE_AW_
+Call SaveConfig()
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(tab_account)
+_AW_ONCLICK_AW_
+Call Click_Account()
+
+
+
+'	Case 0 : OBJ_account.SetObject "IB200081"	' 미체결/잔고 0
+'	Case 1 : OBJ_account.SetObject "IB200082"	' 미체결 1
+'	Case 2 : OBJ_account.SetObject "IB200083"	' 실시간잔고 2
+'	'Case 3 : OBJ_account.SetObject ""
+'	Case 4 : OBJ_account.SetObject "IB200084"	' 예수금 4
+'	Case 5 : OBJ_account.SetObject "IB200085"	' 매매일지 5
+'	Case 6 : OBJ_account.SetObject "IB200086"	' 당일손익 6
+'	Case 7 : OBJ_account.SetObject "IB200087"	' 주문가능 7
+'	Case 8 : OBJ_account.SetObject "IB200088"	' 체결 8
+'	'Case 9 : OBJ_account.SetObject "IB1202D2"	' 원장잔고 9
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(btn_send)
+_AW_ONCLICK_AW_
+'버튼클릭자료수집
+'Call btnClickCnt(btn_send)  // Time Count Founction
+
+OBJ_account.Send
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(OPEN_BTN3)
+_AW_ONCLICK_AW_
+Select Case tab_account.ID
+Case 1
+        SCREEN.CreateWindow 1, "IB110100 /t/d/p5/S", _
+        "TDATA" & vbTab & SCREEN.Object("OBJ_order.AN1A").data & "|" & S1301.Data
+Case 2
+        SCREEN.CreateWindow 1, "IB120100 /t/d/s/p5", _
+        "ACCN" & vbTab & SCREEN.Object("OBJ_order.AN1A").data & vbLf
+Case 4
+         SCREEN.CreateWindow 1, "IB120600 /t/d/p5/S", _
+        "ACCN" & vbTab & SCREEN.Object("OBJ_order.AN1A").data & vbLf
+Case 5
+         SCREEN.CreateWindow 1, "IB140200 /t/d/p5/S", _
+		"TDATA" & vbTab & SCREEN.Object("OBJ_order.AN1A").data & "|" & S1301.Data
+Case 6
+         SCREEN.CreateWindow 1, "IB130100 /t/d/p5/S", _
+        "ACCN" & vbTab & SCREEN.Object("OBJ_order.AN1A").data & vbLf
+Case 7
+         SCREEN.CreateWindow 1, "IB120800 /t/d/p5/S", _
+        "ACCN" & vbTab & SCREEN.Object("OBJ_order.AN1A").data & vbLf &_
+		"1301" & vbTab & S1301.Data
+Case 8
+         SCREEN.CreateWindow 1, "IB110200 /t/d/p5/S", _
+        "TDATA" & vbTab & SCREEN.Object("OBJ_order.AN1A").data & "|" & S1301.Data
+Case Else
+         Exit Sub
+End Select
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(tab_sise)
+_AW_ONCLICK_AW_
+Call Click_sise()
+
+
+'호가 IB2000XD
+'체결 IB2000X4
+'일별 IB2000X5
+'회원 IB2000X6
+'상세 IB2000X8
+'차트 IB2000CT
+'체강 IB2000XA
+'투자 IB2000XJ
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(tab_tujaEx2)
+_AW_ONCLICK_AW_
+Call click_tujaEx2()
+
+'호가 IB2000X0
+'체결 IB2000X4
+'일별 IB2000X5
+'회원 IB2000X6
+'상세 IB2000X8
+'차트 IB2000X9
+'섹터 IB2000XB
+'투자 IB2000XJ  bo200437
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(OPEN_BTN0)
+_AW_ONCLICK_AW_
+Dim Intercombo
+Select Case tab_tuja.ID
+Case 0
+	Intercombo = Trim(SCREEN.Object("OBJ_Interest.intercombo").Data)
+	If Intercombo = "" Then
+		idx = 0
+	Else
+		If Intercombo -1 < 0 Then
+			idx = 0
+		Else
+			idx = Intercombo - 1
+		End If
+	End If
+
+	SCREEN.CreateWindow 1, "IB202200 /t/d/p5/S", "selectGroup" & vbTab & Intercombo & vbLf
+Case 1
+	SCREEN.CreateWindow 1, "IB210300 /t/d/p5/S", "200901" & vbTab & SCREEN.Object("main.OBJ_tuja.OBJ.200901").Data
+Case 2
+	SCREEN.CreateWindow 1, "IB240900 /t/d/p5/S", ""
+Case 3
+	SCREEN.CreateWindow 1, "IB270200 /t/d/p5/S", _
+		"1301" & vbTab & S1301.data
+Case 4
+	SCREEN.CreateWindow 1, "IB771000 /t/d/p5/S", _
+		"1301" & vbTab & S1301.data
+Case 5
+	SCREEN.CreateWindow 1, "IB290800 /t/d/p5/S", ""
+Case 6
+	SCREEN.CreateWindow 1, "IB270100 /t/d/p5/S", ""
+'	SCREEN.CreateWindow 1, "IB292300 /t/d/p5/S", _
+'		"1301" & vbTab & S1301.data
+Case 7
+'	SCREEN.CreateWindow 1, "IB230400 /t/d/p5/S", _
+'		"1301" & vbTab & S1301.data & vbLf & "TRAD" & vbTab & _
+'		SCREEN.Object("main.OBJ_tuja.TRAD").Data
+Case Else
+         Exit Sub
+End Select
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(OPEN_BTN1)
+_AW_ONCLICK_AW_
+Select Case tab_sise.ID
+Case 0
+        SCREEN.CreateWindow 1, "IB201400 /t/d/p5/S", _
+		"1301" & vbTab & S1301.data
+Case 1
+        SCREEN.CreateWindow 1, "IB200700 /t/d/p5/S", _
+		"1301" & vbTab & S1301.data
+Case 2
+        SCREEN.CreateWindow 1, "IB201100 /t/d/p5/S", _
+        "1301" & vbTab & S1301.Data & vbLf
+Case 3
+        SCREEN.CreateWindow 1, "IB230100 /t/d/s/p5", _
+        "1301" & vbTab & S1301.Data
+Case 5
+         SCREEN.CreateWindow 1, "IB711200 /t/d/p5/S", _
+        "1301" & vbTab & S1301.Data
+Case 6
+         SCREEN.CreateWindow 1, "IB212000 /t/d/p5/S", _
+        "1301" & vbTab & S1301.Data
+Case 7
+         SCREEN.CreateWindow 1, "IB202500 /t/d/p5/S", _
+        "1301" & vbTab & S1301.Data
+
+Case Else
+         Exit Sub
+End Select
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(bt_reduce)
+_AW_ONCLICK_AW_
+SIndex = 0
+
+obj_reduce2.Proc "ChangeHoga", ""
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(1301)
+_AW_ONCHANGE_AW_
+If Trim(S1301.Data) = "000000" Or Trim(S1301.Data) = "" Then
+	Exit Sub
+End If
+
+Call send_sise_all("main")
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON2)
+_AW_ONCLICK_AW_
+Dim retn
+retn = SCREEN.GetCode(100, "1301", "hnam", 0 )
+If retn <> True Then
+      Exit Sub
+End If
+
+Call send_sise_all("main")
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(ctl_Category)
+_AW_ONCLICK_AW_
+Dim codx
+codx = ctl_Category.GetPreCode(S1301.Data)
+If Trim(codx) = "" Then
+	Exit Sub
+End If
+S1301.Data = codx
+S1301.Trigger "",True
+
+Call send_sise_all("main")
+_AW_ONENDSUB_AW_
+_AW_ONDBLCLK_AW_
+Dim codx
+codx = ctl_Category.GetNextCode(S1301.Data)
+If Trim(codx) = "" Then
+	Exit Sub
+End If
+S1301.Data = codx
+S1301.Trigger "",True
+
+Call send_sise_all("main")
+_AW_ONENDSUB_AW_
+_AW_ONCHANGE_AW_
+S1301.Data = ctl_Category.GetCurCode
+S1301.Trigger "",True
+
+Call send_sise_all("main")
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON1)
+_AW_ONCLICK_AW_
+SCREEN.CreateWindow 1, "IB202201 /t/s/p5/d", "appendCODE" & _
+			vbTab & S1301.Data & vbLf
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(bt_Hoga2)
+_AW_ONCLICK_AW_
+SIndex = 0
+
+OBJ_sise.Proc "ChangeHoga", ""
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(reduce)
+_AW_ONCLICK_AW_
+Call SaveConfig()
+SCREEN.CreateWindow 1, "IB2000YY /t/d/c/S", "1301" & vbTab & S1301.data
+'SCREEN.CloseWindow
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(cxMarket)
+_AW_ONCLICK_AW_
+SCREEN.Proc "main.Change_MKGubn_Main", cxMarket.sMarket
+Call send_sise_all("main")	' 최상위맵의 시장 변경은 수동으로 Send 를 발생시켜야 한다
+SCREEN.Proc "main.OBJ_Interest.ChangeMarket", cxMarket.sMarket	' 관심종목
+If tab_account.ID = "2" Then
+	OBJ_account.Send()
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(tab_tujaEx1)
+_AW_ONCLICK_AW_
+Call click_tujaEx1()
+
+'관심 IB2000W0
+'검색 IB2000W1    IB2000W1
+'지수 IB2000W2    bo200051
+'외/기 IB2000W3   bo200014
+'뉴스 IB2000W4    bo20010a
+'투자 IB2000W6
+'차트 IB2000W8    gooppoop
+'성과분석 IB2000W9    pibo2127
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(edMarketTrigger)
+_AW_ONCHANGE_AW_
+Change_MKGubn_Main(Trim(edMarketTrigger.Data))
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON0)
+_AW_ONCLICK_AW_
+OBJ_hnam.Send
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON3)
+_AW_ONCLICK_AW_
+SCREEN.Object("OBJ_order.obj_odr.OBJ_hnam").Send
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

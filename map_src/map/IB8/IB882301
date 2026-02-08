@@ -1,0 +1,526 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB882301)
+MAPSIZE(176, 307)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("MS Sans Serif", 9, NORMAL)
+TITLE("[IB882301] 합성주문1")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL10(212, 103, 307, 143)  '설정가격'        COLOR(96, 130)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL9(212, 72, 307, 102)        COLOR(96, 130)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL7(152, 0, 307, 30)        COLOR(96, 130)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL13(0, 0, 75, 30)  '합성매도'        COLOR(96, 130)  CUR(0)    AL_CENTER  FONT("굴림체", 9, NORMAL)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL0(76, 0, 151, 30)  '최대수량'        COLOR(96, 130)  CUR(0)    AL_CENTER  FONT("굴림체", 9, NORMAL)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  ot_Con(0, 31, 75, 71)  LEN(8)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_SKIP|FA_CORGB|SA_SPACE|SA_COSIGN  FONT("굴림체", 14, BOLD)    COLOR(76, 69)  CUR(0)            IFRGB(94, 95)  TABORDER(0)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  ot_ConVol(76, 31, 151, 71)  LEN(8)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_SKIP|FA_CORGB|SA_SPACE|SA_COSUP  FONT("굴림체", 14, BOLD)    COLOR(76, 69)  CUR(0)            IFRGB(94, 95)  TABORDER(0)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL2(0, 72, 75, 102)  '합성매수'        COLOR(96, 130)  CUR(0)    AL_CENTER  FONT("굴림체", 9, NORMAL)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL3(76, 72, 151, 102)  '최대수량'        COLOR(96, 130)  CUR(0)    AL_CENTER  FONT("굴림체", 9, NORMAL)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  ot_Rev(0, 103, 75, 143)  LEN(8)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_SKIP|FA_CORGB|SA_SPACE|SA_COSIGN  FONT("굴림체", 14, BOLD)    COLOR(76, 69)  CUR(0)            IFRGB(94, 95)  TABORDER(0)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  ot_RevVol(76, 103, 151, 143)  LEN(8)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_SKIP|FA_CORGB|SA_SPACE|SA_COSUP  FONT("굴림체", 14, BOLD)    COLOR(76, 69)  CUR(0)            IFRGB(94, 95)  TABORDER(0)  IOORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  COPT_OBJ(364, 198, 654, 333)    "IB88210B"  TABORDER(1)  IOORDER(5)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  POPT_OBJ(364, 338, 654, 473)    "IB88210B"  TABORDER(2)  IOORDER(6)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL4(212, 31, 307, 71)        COLOR(96, 130)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL5(152, 72, 211, 102)  '자동주문'        COLOR(96, 130)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL6(152, 103, 211, 143)  '설정가격'        COLOR(96, 130)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+GROUP  GP0(659, 393, 779, 443)  'Group'        COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  rb_Con(161, 5, 224, 25)  '합성매도'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(GP0)      COLOR(96, 232)  CUR(0)      TABORDER(3)  ENABLE  &
+  VISIBLE  CHECKED  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  rb_Rev(234, 5, 297, 25)  '합성매수'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(GP0)      COLOR(96, 232)  CUR(0)      TABORDER(4)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  BUTTON0(33, 323, 198, 403)  '테스트 전송'  TP_PUSH      AL_CENTER    FOCUS  COLOR(208, 232)  CUR(0)      TABORDER(5)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  ed_Prc(226, 113, 296, 133)  LEN(10)  IO_NUM|EDIT_INPUT|FA_COMMA|FA_RIGHT|FA_WRAP|FA_SKIP|FA_FLOAT  SPIN(0)  SPINTYPE(120)    FONT("굴림체", 9, BOLD)    COLOR(78, 130)  CUR(0)  TP_SUNKEN  INIT("0")        FLOAT(2)    TABORDER(6)  IOORDER(7)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  ck_Order(241, 199, 282, 219)  '설정'  TP_CHECK|EDIT_NOP          COLOR(76, 232)  CUR(0)      TABORDER(7)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  ed_Vol(226, 41, 296, 61)  LEN(10)  IO_NUM|EDIT_INPUT|FA_COMMA|FA_RIGHT|FA_WRAP|FA_SKIP|FA_XFLOAT  SPIN(1)    FONT("굴림체", 9, BOLD)    COLOR(76, 130)  CUR(0)  TP_SUNKEN  INIT("0")          TABORDER(8)  IOORDER(8)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL0(0, 255, 301, 280)  'Label'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL8(152, 31, 211, 71)  '수량'        COLOR(96, 130)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  chk_auto(240, 78, 281, 98)  '설정'  TP_CHECK|EDIT_NOP          COLOR(76, 232)  CUR(0)      TABORDER(9)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+OBJECT  obj_chkPW(0, 424, 170, 524)    "IB999960"  TABORDER(10)  IOORDER(9)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL10(30, 275, 130, 295)  'Label'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Dim g_ArrItem
+Dim g_ArrData
+Dim g_ArrCtrls
+
+'Index :
+'	0 - 종목코드
+'	1 - 매도호가
+'	2 - 매도수량
+'	3 - 매수호가
+'	4 - 매수수량
+'	5 - 행사가격
+'	6 - 거래단위 : 거래승수가 10만원이면 5이고, 50만원이면 1이다.
+g_ArrItem = Array("", 0, 0, 0, 0, 0, 0)
+
+'Index :
+'	0 - 콜옵션
+'	1 - 풋옵션
+g_ArrData = Array(g_ArrItem, g_ArrItem)
+
+g_ArrCtrls = Array(Array(ot_Con, ot_ConVol, ot_Rev, ot_RevVol),_
+	Array(rb_Con, rb_Rev))
+'------------------------------------------------------
+Sub InitData()
+	chk_auto.Checked = False
+	ck_Order.Checked = False
+	ed_Prc.Data = "0"
+	ed_Vol.Data = "0"
+End Sub
+'------------------------------------------------------
+Sub SendData(OptItemCd)
+	Call InitData()
+	COPT_OBJ.Proc "SendOptData", "2" & Mid(OptItemCd, 2, 7)
+	POPT_OBJ.Proc "SendOptData", "3" & Mid(OptItemCd, 2, 7)
+End Sub
+'------------------------------------------------------
+Sub SetData(Data)
+	ArrData = Split(Data, "|")
+'MsgBox "SetData = " & Data
+	Index = -1
+
+	If Mid(ArrData(0), 1, 1) = "2" Or Mid(ArrData(0), 1, 1) = "B" Then		'콜옵션
+		Index = 0
+	ElseIf Mid(ArrData(0), 1, 1) = "3" Or Mid(ArrData(0), 1, 1) = "C" Then		'풋옵션
+		Index = 1
+	Else
+		Exit Sub
+	End If
+
+	For i = LBound(g_ArrData(Index)) To UBound(g_ArrData(Index))
+		'MsgBox i & "|" & ArrData(i)
+		If i > 0 Then
+			g_ArrData(Index)(i) = Abs(CDbl(ArrData(i)))
+		Else
+			g_ArrData(Index)(i) = ArrData(i)
+		End If
+	Next
+	CalcData
+End Sub
+'------------------------------------------------------
+Function GetMinVol(ArrVolData)
+	GetMinVol = ArrVolData(0)
+
+	For i = 1 To UBound(ArrVolData)
+		If GetMinVol > ArrVolData(i) Then
+			GetMinVol = ArrVolData(i)
+		End If
+	Next
+End Function
+
+'------------------------------------------------------
+Sub CalcData()
+	If Len(g_ArrData(0)(0)) = 0 Or Len(g_ArrData(1)(0)) = 0 Then
+		Exit Sub
+	End If
+'MsgBox "CalcData = " & g_ArrData(0)(1)
+	ExerPrc = g_ArrData(0)(5) '콜옵션 행사가격
+'MsgBox "콜옵션 행사가격 = " & ExerPrc
+	ArrVolData = Array(0, 0)
+	'합성매도 계산
+	CBidPrc = g_ArrData(0)(3)	'콜옵션 매수호가
+	PAskPrc = g_ArrData(1)(1)	'풋옵션 매도호가
+
+	If CBidPrc = 0 Or PAskPrc = 0 Then
+		Exit Sub
+	End If
+
+	Con = (ExerPrc + CBidPrc) - PAskPrc
+	ArrVolData(0) = g_ArrData(0)(4)	'콜옵션 매수수량
+	ArrVolData(1) = g_ArrData(1)(2)	'풋옵션 매도수량
+
+	Vol = GetMinVol(ArrVolData)
+	If Con > 0 Then
+		g_ArrCtrls(0)(0).Data = "+" & FormatNumber(Con, 2, -2, -2, 0)
+	Else
+		g_ArrCtrls(0)(0).Data = FormatNumber(Con, 2, -2, -2, 0)
+	End If
+	g_ArrCtrls(0)(1).Data = Vol
+
+	'합성매수 계산
+	CAskPrc = g_ArrData(0)(1)
+	PBidPrc = g_ArrData(1)(3)
+
+	If  CAskPrc = 0 Or PBidPrc = 0 Then
+		Exit Sub
+	End If
+
+	Rev = (ExerPrc + CAskPrc) - PBidPrc
+	ArrVolData(0) = CLng(g_ArrData(0)(2))
+	ArrVolData(1) = CLng(g_ArrData(1)(4))
+	Vol = GetMinVol(ArrVolData)
+
+	If Rev > 0 Then
+		g_ArrCtrls(0)(2).Data = "+" & FormatNumber(Rev, 2, -2, -2, 0)
+	Else
+		g_ArrCtrls(0)(2).Data = FormatNumber(Rev, 2, -2, -2, 0)
+	End If
+	g_ArrCtrls(0)(3).Data = Vol
+
+	ExecOrder
+
+End Sub
+'-------------------------------------------------------------------------------------
+Function GetData(StrData, DataType)
+	GetData = 0
+
+	Data = Trim(StrData)
+	If Len(Data) = 0 Then
+		Exit Function
+	Else
+		If DataType = 1 Then			'CDBL
+			GetData = CDbl(Data)
+		Else							'CLNG
+			GetData = CLng(Data)
+		End If
+	End If
+End Function
+'------------------------------------------------------
+Sub ExecOrder()
+'MsgBox "ExecOrder"
+	If Not ck_Order.Checked Then
+		Exit Sub
+	End If
+
+	SetValue = GetData(ed_Prc.Data, 2)/100		'설정가격
+	SetVol = GetData(ed_Vol.Data, 1)			'설정수량
+
+	If SetVol = 0 Then
+		Exit Sub
+	End If
+
+	OrdValue = 0
+	OrdVol = 0
+
+	OptDrn = g_ArrData(1)(6)	'거래단위 : 거래승수가 10만원이면 5이고, 50만원이면 1이다.
+
+	'0:종목코드, 1:매도(1), 매수(3), 2:가격, 3:수량
+	'FutArrItem = Array("", 0, 0, 0)
+	COptArrItem = Array("", 0, 0, 0)
+	POptArrItem = Array("", 0, 0, 0)
+	If rb_Con.Checked Then				'합성매도
+		OrdValue = GetData(ot_Con.Data, 1)
+		OrdVol = GetData(ot_ConVol.Data, 2)
+
+		If OrdVol = 0 Then
+			Exit Sub
+		End If
+
+		If SetVol > OrdVol Then
+			Exit Sub
+		End If
+
+		If SetValue > OrdValue Then
+			Exit Sub
+		End If
+
+		If OrdVol > SetVol Then
+			OrdVol = SetVol
+		End If
+
+		SetItem 0, 1, OrdVol*OptDrn, COptArrItem
+		SetItem 1, 3, OrdVol*OptDrn, POptArrItem
+
+	Else								'합성매수
+		OrdValue = GetData(ot_Rev.Data, 1)
+		OrdVol = GetData(ot_RevVol.Data, 2)
+
+		If OrdVol = 0 Then
+			Exit Sub
+		End If
+
+		'조건1 OrdVol >= SetVol
+		If SetVol > OrdVol Then
+			Exit Sub
+		End If
+
+		'조건2 OrdValue <= SetValue
+		If OrdValue > SetValue   Then
+			Exit Sub
+		End If
+
+		If OrdVol > SetVol Then
+			OrdVol = SetVol
+		End If
+
+		SetItem 0, 3, OrdVol*OptDrn, COptArrItem
+		SetItem 1, 1, OrdVol*OptDrn, POptArrItem
+	End If
+
+	CData = Join(COptArrItem, "~")
+	PData = Join(POptArrItem, "~")
+
+	Data = CData & "|" & PData
+
+	'데이타를 넘겨주는곳
+	LABEL0.Data = Data
+	ck_Order.Checked = False
+	chk_auto.Checked = False
+	SCREEN.Proc "main.call_jumun", Data
+End Sub
+'------------------------------------------------------
+Sub SetItem(ItemIdx, AskBidType, Vol, ArrData)
+	ArrData(0) = g_ArrData(ItemIdx)(0)
+	ArrData(1) = AskBidType
+	If ASkBidType = 1 Then
+		ArrData(2) = g_ArrData(ItemIdx)(3)
+	ElseIf ASkBidType = 3 Then
+		ArrData(2) = g_ArrData(ItemIdx)(1)
+	End If
+	ArrData(3) = Vol
+End Sub
+'------------------------------------------------------
+Sub AllSell()
+	ck_Order.Checked = True
+	chk_auto.Checked = True
+End Sub
+
+_AW_ONINDECLARE_AW_
+#LOAD IB888833
+#LOAD IB888887
+#load IB888888
+
+_AW_ONENDSUB_AW_
+_AW_ONSTART_AW_
+ed_Prc.SetRange -99999999, 99999999
+
+_AW_ONENDSUB_AW_
+_AW_ONKEY_AW_
+If SCREEN.Key = 13 Then
+	SCREEN.OnSend = False
+End If
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(ot_Con)
+_AW_ONCLICK_AW_
+If ck_Order.Checked = False Then
+	ed_Prc.Data = ot_Con.Data
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(ot_ConVol)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(ot_Rev)
+_AW_ONCLICK_AW_
+If ck_Order.Checked = False Then
+	ed_Prc.Data = ot_Rev.Data
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(ot_RevVol)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(rb_Con)
+_AW_ONCLICK_AW_
+Call InitData()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(rb_Rev)
+_AW_ONCLICK_AW_
+Call InitData()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON0)
+_AW_ONCLICK_AW_
+FutItemCd = "101F6000"
+OptItemCd = "201F4257"
+
+SendData FutItemCd, OptItemCd
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(ck_Order)
+_AW_ONCLICK_AW_
+LABEL0.Data = ""
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(LABEL0)
+_AW_ONCLICK_AW_
+'Dim Data
+'Data = "101F6000~3~275.75~1|201F4272~1~4.7~5|301F4272~3~2.38~5"
+'SCREEN.Proc "main.call_jumun", Data
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(chk_auto)
+_AW_ONCLICK_AW_
+'***************************************************************************
+' DESC: 주문설정전 Error Check
+'***************************************************************************
+Dim msg, acno, pswd
+
+If chk_auto.Checked = True Then
+	chk_auto.Checked = True
+	If Trim(ed_Vol.Data) = "" Then
+		chk_auto.Checked = False
+		SCREEN.Object("main.GUIDE").Text = "주문수량을 확인하세요"
+		ed_Vol.SetFocus
+		Exit Sub
+	Else
+		If IsNumeric(ed_Vol.Data) = True Then
+			If CLng(ed_Vol.Data) <= 0 Then
+				chk_auto.Checked = False
+				SCREEN.Object("main.GUIDE").Text = "주문수량을 확인하세요"
+				ed_Vol.SetFocus
+				Exit Sub
+			End If
+		Else
+			chk_auto.Checked = False
+			SCREEN.Object("main.GUIDE").Text = "주문수량을 확인하세요"
+			ed_Vol.SetFocus
+			Exit Sub
+		End If
+	End If
+	SCREEN.Object("main.GUIDE").Text = ""
+	acno = Trim(SCREEN.Object("main.AN20").Data)
+	pswd = Trim(SCREEN.Object("main.ed_pswd").Data)
+
+	If Trim(acno) = "" Or Len(acno) < 11 Then
+		chk_auto.Checked = False
+		SCREEN.Object("main.GUIDE").Text = "계좌번호를 확인하세요"
+		Exit Sub
+	End If
+
+	If Trim(pswd) = "" Or Len(pswd) < 4 Then
+		chk_auto.Checked = False
+		SCREEN.Object("main.GUIDE").Text = "비밀번호를 확인하세요"
+		SCREEN.Object("main.ed_pswd").SetFocus
+		Exit Sub
+	End If
+
+	SCREEN.Object("obj_chkPW.IntaccNo").data = acno
+	SCREEN.Object("obj_chkPW.Pwd").data = pswd
+	SCREEN.Object("obj_chkPW.chk").data = "1"	'일괄청산
+	obj_chkPW.Send
+	'ck_Order.Checked = True
+	chk_auto.Checked = False
+Else
+	chk_auto.Checked = False
+	ck_Order.Checked = False
+End If
+_AW_ONENDSUB_AW_
+_AW_ONDBLCLK_AW_
+'***************************************************************************
+' DESC: 주문설정전 Error Check
+'***************************************************************************
+Dim msg, acno, pswd
+
+If chk_auto.Checked = True Then
+	chk_auto.Checked = True
+	If Trim(ed_Vol.Data) = "" Then
+		chk_auto.Checked = False
+		SCREEN.Object("main.GUIDE").Text = "주문수량을 확인하세요"
+		ed_Vol.SetFocus
+		Exit Sub
+	Else
+		If IsNumeric(ed_Vol.Data) = True Then
+			If CLng(ed_Vol.Data) <= 0 Then
+				chk_auto.Checked = False
+				SCREEN.Object("main.GUIDE").Text = "주문수량을 확인하세요"
+				ed_Vol.SetFocus
+				Exit Sub
+			End If
+		Else
+			chk_auto.Checked = False
+			SCREEN.Object("main.GUIDE").Text = "주문수량을 확인하세요"
+			ed_Vol.SetFocus
+			Exit Sub
+		End If
+	End If
+	SCREEN.Object("main.GUIDE").Text = ""
+	acno = Trim(SCREEN.Object("main.AN20").Data)
+	pswd = Trim(SCREEN.Object("main.ed_pswd").Data)
+
+	If Trim(acno) = "" Or Len(acno) < 11 Then
+		chk_auto.Checked = False
+		SCREEN.Object("main.GUIDE").Text = "계좌번호를 확인하세요"
+		Exit Sub
+	End If
+
+	If Trim(pswd) = "" Or Len(pswd) < 4 Then
+		chk_auto.Checked = False
+		SCREEN.Object("main.GUIDE").Text = "비밀번호를 확인하세요"
+		SCREEN.Object("main.ed_pswd").SetFocus
+		Exit Sub
+	End If
+
+	SCREEN.Object("obj_chkPW.IntaccNo").data = acno
+	SCREEN.Object("obj_chkPW.Pwd").data = pswd
+	SCREEN.Object("obj_chkPW.chk").data = "1"	'일괄청산
+	obj_chkPW.Send
+	'ck_Order.Checked = True
+	chk_auto.Checked = False
+Else
+	chk_auto.Checked = False
+	ck_Order.Checked = False
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

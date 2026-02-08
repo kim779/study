@@ -1,0 +1,263 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB450204)
+MAPSIZE(56, 268)
+VERSION(001)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("투자자거래소")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(FMS|FLASH)
+TITLE("[450204]투자자 그래프")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pooppoop")
+MAPTYPE(FIXED)
+HEADER(NOP)
+REPEATTIME(30000)
+BGROUND(BRUSH, 121)
+}
+
+
+
+FORM DIVISION
+{
+
+EDIT  UPGB(538, 9, 566, 29)  LEN(2)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(203, 0)  CUR(0)  TP_NONE          TABORDER(1)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  UPCD(535, 30, 580, 50)  LEN(4)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(203, 0)  CUR(0)  TP_NONE          TABORDER(2)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  VAGB(539, 49, 567, 69)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(203, 0)  CUR(0)  TP_NONE          TABORDER(3)  IOORDER(3)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  CHK1(152, 225, 180, 245)  LEN(1)  IO_NUM|EDIT_INOUT|FA_WRAP|FA_SKIP    COLOR(203, 0)  CUR(0)  TP_NONE          TABORDER(4)  IOORDER(4)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  CHK2(173, 225, 201, 245)  LEN(1)  IO_NUM|EDIT_INOUT|FA_WRAP|FA_SKIP    COLOR(203, 0)  CUR(0)  TP_NONE          TABORDER(5)  IOORDER(5)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  CHK3(194, 225, 222, 245)  LEN(1)  IO_NUM|EDIT_INOUT|FA_WRAP|FA_SKIP    COLOR(203, 0)  CUR(0)  TP_NONE          TABORDER(6)  IOORDER(6)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  CHK4(215, 225, 243, 245)  LEN(1)  IO_NUM|EDIT_INOUT|FA_WRAP|FA_SKIP    COLOR(203, 0)  CUR(0)  TP_NONE          TABORDER(7)  IOORDER(7)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  CHK5(236, 225, 264, 245)  LEN(1)  IO_NUM|EDIT_INOUT|FA_WRAP|FA_SKIP    COLOR(203, 0)  CUR(0)  TP_NONE          TABORDER(8)  IOORDER(8)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  CHK6(257, 225, 285, 245)  LEN(1)  IO_NUM|EDIT_INOUT|FA_WRAP|FA_SKIP    COLOR(203, 0)  CUR(0)  TP_NONE          TABORDER(9)  IOORDER(9)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  CHK7(287, 225, 315, 245)  LEN(1)  IO_NUM|EDIT_INOUT|FA_WRAP|FA_SKIP    COLOR(203, 0)  CUR(0)  TP_NONE          TABORDER(10)  IOORDER(10)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  CHK8(308, 225, 336, 245)  LEN(1)  IO_NUM|EDIT_INOUT|FA_WRAP|FA_SKIP    COLOR(203, 0)  CUR(0)  TP_NONE          TABORDER(11)  IOORDER(11)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  CHK9(323, 225, 351, 245)  LEN(1)  IO_NUM|EDIT_INOUT|FA_WRAP|FA_SKIP    COLOR(203, 0)  CUR(0)  TP_NONE          TABORDER(12)  IOORDER(12)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  fday(542, 137, 617, 157)  LEN(8)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(203, 0)  CUR(0)  TP_NONE          TABORDER(13)  IOORDER(14)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  TDAY(542, 157, 617, 177)  LEN(8)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(203, 0)  CUR(0)  TP_NONE          TABORDER(14)  IOORDER(15)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  DTYP(540, 115, 568, 135)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(203, 0)  CUR(0)  TP_NONE          TABORDER(15)  IOORDER(13)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  CHK0(128, 224, 156, 244)  LEN(1)  IO_NUM|EDIT_INOUT|FA_WRAP|FA_SKIP    COLOR(203, 0)  CUR(0)  TP_NONE          TABORDER(16)  IOORDER(16)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL0(17, 6, 137, 49)  '차트'  TP_RAISED      COLOR(208, 232)  CUR(0)    AL_CENTER  FONT("굴림체", 12, NORMAL)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Dim xstr, xvalue, xistrue, cnt
+
+Sub Cnt_chck()
+cnt = 0
+			If CHK0.data = "1" Then
+ 					cnt = cnt + 1
+          End If
+          If CHK1.data = "1" Then
+ 					cnt = cnt + 1
+          End If
+          If CHK2.data = "1" Then
+ 					cnt = cnt + 1
+          End If
+          If CHK3.data = "1" Then
+ 					cnt = cnt + 1
+          End If
+          If CHK4.data = "1" Then
+ 					cnt = cnt + 1
+          End If
+          If CHK5.data = "1" Then
+ 					cnt = cnt + 1
+          End If
+          If CHK6.data = "1" Then
+ 					cnt = cnt + 1
+          End If
+          If CHK7.data = "1" Then
+ 					cnt = cnt + 1
+          End If
+          If CHK8.data = "1" Then
+ 					cnt = cnt + 1
+          End If
+          If CHK9.data = "1" Then
+ 					cnt = cnt + 1
+          End If
+
+'If cnt >= 4 Then
+'	If CHK0.Data = "0" Then
+'	    SCREEN.Object("PARENT.E0").Enable = False
+'	Else
+'	    SCREEN.Object("PARENT.E0").Enable = True
+'	End If
+'	If CHK1.Data = "0" Then
+'	    SCREEN.Object("PARENT.E1").Enable = False
+'	Else
+'	    SCREEN.Object("PARENT.E1").Enable = True
+'	End If
+'	If CHK2.Data = "0" Then
+'	    SCREEN.Object("PARENT.E2").Enable = False
+'	Else
+'	    SCREEN.Object("PARENT.E2").Enable = True
+'	End If
+'	If CHK3.Data = "0" Then
+'	    SCREEN.Object("PARENT.E3").Enable = False
+'	Else
+'	    SCREEN.Object("PARENT.E3").Enable = True
+'	End If
+'	If CHK4.Data = "0" Then
+'	    SCREEN.Object("PARENT.E4").Enable = False
+'	Else
+'	    SCREEN.Object("PARENT.E4").Enable = True
+'	End If
+'	If CHK5.Data = "0" Then
+'	    SCREEN.Object("PARENT.E5").Enable = False
+'	Else
+'	    SCREEN.Object("PARENT.E5").Enable = True
+'	End If
+'	If CHK6.Data = "0" Then
+'	    SCREEN.Object("PARENT.E6").Enable = False
+'	Else
+'	    SCREEN.Object("PARENT.E6").Enable = True
+'	End If
+'	If CHK7.Data = "0" Then
+'	    SCREEN.Object("PARENT.E7").Enable = False
+'	Else
+'	    SCREEN.Object("PARENT.E7").Enable = True
+'	End If
+'	If CHK8.Data = "0" Then
+'	    SCREEN.Object("PARENT.E8").Enable = False
+'	Else
+'	    SCREEN.Object("PARENT.E8").Enable = True
+'	End If
+'	If CHK9.Data = "0" Then
+'	    SCREEN.Object("PARENT.E9").Enable = False
+'	Else
+'	    SCREEN.Object("PARENT.E9").Enable = True
+'	End If
+'Else
+'	SCREEN.Object("PARENT.E0").Enable = True
+'	SCREEN.Object("PARENT.E1").Enable = True
+'	SCREEN.Object("PARENT.E2").Enable = True
+'	SCREEN.Object("PARENT.E3").Enable = True
+'	SCREEN.Object("PARENT.E4").Enable = True
+'	SCREEN.Object("PARENT.E5").Enable = True
+'	SCREEN.Object("PARENT.E6").Enable = True
+'	SCREEN.Object("PARENT.E7").Enable = True
+'	SCREEN.Object("PARENT.E8").Enable = True
+'	SCREEN.Object("PARENT.E9").Enable = True
+'End If
+End Sub
+
+_AW_ONSTART_AW_
+'SCREEN.Send 0
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+'UPGB.Data = SCREEN.Object("PARENT.UPGB").Data
+'UPCD.Data = SCREEN.Object("PARENT.UPCD").Data
+'VAGB.Data = SCREEN.Object("PARENT.F1").Text
+'CHK0.Data = SCREEN.Object("PARENT.E0").Text
+'CHK1.Data = SCREEN.Object("PARENT.E1").Text
+'CHK2.Data = SCREEN.Object("PARENT.E2").Text
+'CHK3.Data = SCREEN.Object("PARENT.E3").Text
+'CHK4.Data = SCREEN.Object("PARENT.E4").Text
+'CHK5.Data = SCREEN.Object("PARENT.E5").Text
+'CHK6.Data = SCREEN.Object("PARENT.E6").Text
+'CHK7.Data = SCREEN.Object("PARENT.E7").Text
+'CHK8.Data = SCREEN.Object("PARENT.E8").Text
+'CHK9.Data = SCREEN.Object("PARENT.E9").Text
+'fday.Data = SCREEN.Object("PARENT.FDAY").Data
+'TDAY.Data = SCREEN.Object("PARENT.TDAY").Data
+'DTYP.Data = SCREEN.Object("PARENT.DTYP").Data
+
+'UPGB.Data = 01
+'UPCD.Data = 01
+'VAGB.Data = 0
+'CHK0.Data = SCREEN.Object("PARENT.E0").Data
+'CHK1.Data = SCREEN.Object("PARENT.E1").Data
+'CHK2.Data = SCREEN.Object("PARENT.E2").Data
+'CHK3.Data = SCREEN.Object("PARENT.E3").Data
+'CHK4.Data = SCREEN.Object("PARENT.E4").Data
+'CHK5.Data = SCREEN.Object("PARENT.E5").Data
+'CHK6.Data = SCREEN.Object("PARENT.E6").Data
+'CHK7.Data = SCREEN.Object("PARENT.E7").Data
+'CHK8.Data = SCREEN.Object("PARENT.E8").Data
+'CHK9.Data = SCREEN.Object("PARENT.E9").Data
+'fday.Data = "20080101"
+'TDAY.Data = "20080103"
+'DTYP.Data = 3
+
+'If (DTYP.Data = " 4") Then
+'	If( TDAY.Data = fday.Data) Then
+'	   MsgBox "시작일자와 종료일자가 동일합니다."
+'		SCREEN.onSend = False
+'	End If
+
+
+'	If( TDAY.Data < fday.Data) Then
+'	   MsgBox "시작일자가 종료일자보다 미래입니다."
+'		SCREEN.onSend = False
+'	End If
+'End If
+
+'차트 설정---------------------------------------------
+
+'Call CTL0.ClearAllData()
+
+
+'Call CTL0.SetInputValue (0,0, "UPGB", UPGB.Data)
+'Call CTL0.SetInputValue (0,0, "UPCD", UPCD.Data)
+'Call CTL0.SetInputValue (0,0, "GUBN", VAGB.Data)
+'Call CTL0.SetInputValue (0,0, "CHK0", CHK0.Data)
+'Call CTL0.SetInputValue (0,0, "CHK1", CHK1.Data)
+'Call CTL0.SetInputValue (0,0, "CHK2", CHK2.Data)
+'Call CTL0.SetInputValue (0,0, "CHK3", CHK3.Data)
+'Call CTL0.SetInputValue (0,0, "CHK4", CHK4.Data)
+'Call CTL0.SetInputValue (0,0, "CHK5", CHK5.Data)
+'Call CTL0.SetInputValue (0,0, "CHK6", CHK6.Data)
+'Call CTL0.SetInputValue (0,0, "CHK7", CHK7.Data)
+'Call CTL0.SetInputValue (0,0, "CHK8", CHK8.Data)
+'Call CTL0.SetInputValue (0,0, "CHK9", CHK9.Data)
+'Call CTL0.SetInputValue (0,0, "FDAY", fday.Data)
+'Call CTL0.SetInputValue (0,0, "TDAY", TDAY.Data)
+'Call CTL0.SetInputValue (0,0, "DTYP", DTYP.Data)
+
+'If DTYP.Data = "4" Then
+	'Call CTL0.Setchartperiod (0,2)
+'Else
+'	Call CTL0.Setchartperiod (0,1)
+'End If
+
+
+'데이타 요청
+'Call CTL0.RequestData(0,0)
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+'Cnt_chck()
+
+_AW_ONENDSUB_AW_
+}
+
+
+

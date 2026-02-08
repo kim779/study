@@ -1,0 +1,59 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB876002)
+MAPSIZE(59, 272)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("굴림", 9, NORMAL)
+TITLE("Untitled")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("piborels")
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+EDIT  didx(3, 4, 71, 24)  LEN(1)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_SUNKEN  INIT("0")          TABORDER(1)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  code(75, 4, 266, 24)  LEN(12)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_SUNKEN          TABORDER(2)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  OUTPUT0(3, 28, 264, 54)  LEN(20)  IO_MIXED|AL_LEFT|    COLOR(192, 232)  CUR(0)  LINECOLOR(0)          TABORDER(0)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Sub search()
+	Dim grid, ii, cods, ctype, jname
+	Set grid = SCREEN.Object("parent.GRID0")
+	For ii = 1 To grid.Rows
+		ctype = Trim(grid.GetGridCell(ii, 2))
+		cods = Trim(grid.GetGridCell(ii, 3))
+		jname = Trim(grid.GetGridCell(ii, 4))
+		If ctype = "해외지수" And jname = "" Then
+			didx.Data = "0"
+			cods.Data = cods
+			SCREEN.Send 0
+			Exit For
+		End If
+	Next
+End Sub
+
+}
+
+
+

@@ -1,0 +1,275 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB883190)
+MAPSIZE(263, 278)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("선물옵션주문 obj")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(CR2TAB|SAVE)
+TITLE("[8831] CM선물옵션주문")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(NORM)
+HEADER(LEDGER)
+}
+
+
+
+FORM DIVISION
+{
+
+USRTAB  tab_order(2, 33, 278, 62)  FOCUS  INDEX(0)  COUNT(4)  AL_TOP  TAB_IMAGE  |FA_SKIP|FA_UPPER    FONT("굴림체", 9, NORMAL)    COLOR(3, 70)  CUR(0)  TABIMAGE("OTAB.bmp")  FCOLOR(3, 71)  CAPTION("매도", "매수", "정정/취소", "취소")  TABINFO("1:1", "1:2", "1:3", "0:4")  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+CONTROL  AN20(3, 3, 143, 23)    "CX_Account"  "/w0"  LEN(11)  EDIT_INPUT    COLOR(68, 69)  TABORDER(1)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  ACNM(213, 3, 583, 23)  LEN(60)  IO_MIXED|AL_LEFT||FA_SKIP    COLOR(160, 69)  CUR(0)  LINECOLOR(89)          TABORDER(0)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  ed_pswd(148, 3, 209, 23)  LEN(8)  IO_MIXED|EDIT_INPUT|FA_PASSWD|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_SUNKEN          TABORDER(2)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  OBJ_odr(2, 62, 278, 241)    "IB883150"  TABORDER(3)  IOORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  clearpush_buy(371, 48, 403, 75)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("1")          TABORDER(4)  IOORDER(5)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  clearpush_sell(371, 76, 403, 103)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("1")          TABORDER(5)  IOORDER(6)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  clearpush_jj(371, 104, 403, 131)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("1")          TABORDER(6)  IOORDER(7)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  clearpush_cancel(371, 132, 403, 159)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("1")          TABORDER(7)  IOORDER(8)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  OBJ_snd(345, 189, 545, 289)    "IB999921"  TABORDER(8)  IOORDER(9)  ENABLE  &
+  HINTTYPE(IH_NONE)
+GROUP  GROUP0(336, 165, 552, 294)  '주문전송 obj'        COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  BTN01(193, 35, 213, 55)  '현'  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(132, 232)  CUR(0)    "1BTN.BMP"    TABORDER(9)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+BUTTON  BTN02(214, 35, 234, 55)  '체'  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(132, 232)  CUR(0)    "1BTN.BMP"    TABORDER(10)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+BUTTON  BTN03(235, 35, 255, 55)  '잔'  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(132, 232)  CUR(0)    "1BTN.BMP"    TABORDER(11)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+BUTTON  BTN04(256, 35, 276, 55)  '예'  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(132, 232)  CUR(0)    "1BTN.BMP"    TABORDER(12)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+LABEL  lb_expand(345, 320, 440, 340)  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  chk_OrderConfirm(250, 320, 319, 340)  '주문확인'  TP_CHECK|EDIT_NOP          COLOR(208, 232)  CUR(0)      TABORDER(13)  ENABLE  &
+  CHECKED  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  BUTTON0(2, 242, 68, 263)  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(132, 232)  CUR(0)    "4BTN.BMP"    TABORDER(14)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+BUTTON  BUTTON1(72, 242, 138, 263)  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(132, 232)  CUR(0)    "4BTN.BMP"    TABORDER(15)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+BUTTON  BUTTON2(142, 242, 208, 263)  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(132, 232)  CUR(0)    "4BTN.BMP"    TABORDER(16)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+BUTTON  BUTTON3(212, 242, 278, 263)  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(132, 232)  CUR(0)    "4BTN.BMP"    TABORDER(17)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Sub order_tab_change()
+	Select Case tab_order.ID
+	Case "1" : OBJ_odr.SetObject("IB883150")
+	Case "2" : OBJ_odr.SetObject("IB883160")
+	Case "3" : OBJ_odr.SetObject("IB883170")
+	Case "4" : OBJ_odr.SetObject("IB883180")
+	End Select
+End Sub
+
+'***************************************************************************
+' DESC: 계좌명/비밀번호 Setting
+'***************************************************************************
+Sub Set_account()
+	ACNM.Data = AN20.name
+	ed_pswd.Data = AN20.Password
+	SCREEN.Proc "main.Set_account", "jumn"
+	SCREEN.Object("obj_odr.o_jmno").Clear
+	SCREEN.Object("main.guide").Text = ""
+'	Call obj_svol.ClearAll(2)
+
+	If Trim(ed_pswd.Data) = "" Then
+		ed_pswd.SetFocus : Exit Sub
+	Else
+		SCREEN.Proc "main.OBJ_account_send", ""
+	End If
+
+End Sub
+
+'=== 가격자동 체크박스 체크값 기억/설정 ===
+Sub Set_Auto(mmgb)
+	Dim flag
+	If (mmgb < "1") Or (mmgb > "3") Then Exit Sub
+	flag = SYSTEM.Pop("auto_flag_f")		'-매도,매수,정정
+	If Len(Trim(flag)) <> 3 Then flag = "000"	'-default:자동아님
+	SCREEN.Object("obj_odr.chk_auto").Checked = (Mid(flag,mmgb,1) = "1")
+	SCREEN.Object("obj_odr.cboPrice").Enable = (Mid(flag,mmgb,1) = "1")
+End Sub
+Sub Get_Auto(mmgb, c_auto)
+	Dim flag, val
+	If c_auto = "True" Then
+		val = "1"
+	Else
+		val = "0"
+	End If
+
+	flag = SYSTEM.Pop("auto_flag_f")		'-매도,매수,정정
+	Select Case mmgb
+	Case "1" : flag = val & Mid(flag,2)
+	Case "2" : flag = Left(flag,1) & val & Mid(flag,3)
+	Case "3" : flag = Left(flag,2) & val
+	Case Else : Exit Sub
+	End Select
+	If Len(Trim(flag)) <> 3 Then flag = "000"	'-default:자동아님
+	SYSTEM.Push "auto_flag_f", flag
+End Sub
+
+Sub AddHistory(code)
+	If BUTTON0.Text<>code And BUTTON1.Text<>code And BUTTON2.Text<>code And BUTTON3.Text<>code Then
+		BUTTON3.Text = BUTTON2.Text
+		BUTTON2.Text = BUTTON1.Text
+		BUTTON1.Text = BUTTON0.Text
+		BUTTON0.Text = code
+	End If
+End Sub
+
+Sub BtnCodeChange(focod)
+	If Trim(focod)<>"" Then
+		SCREEN.Object("obj_odr.ed_cfocod").Data = focod
+		SCREEN.Proc "obj_odr.ChangeCode", ""
+	End If
+End Sub
+
+Sub ClearLastStat()
+'	If LOGIN.Brno="903" Or LOGIN.Brno="813" Then
+		SYSTEM.Push "IB8831_JPRC", ""
+		SYSTEM.Push "IB8831_JQTY", ""
+'	End If
+End Sub
+
+_AW_ONSTART_AW_
+Call ClearLastStat()
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(tab_order)
+_AW_ONCLICK_AW_
+Call order_tab_change()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(AN20)
+_AW_ONCHANGE_AW_
+Call Set_account()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(ed_pswd)
+_AW_ONCHANGE_AW_
+If Len(Trim(ed_pswd.Data)) = "" Then
+	Exit Sub
+End If
+
+'SCREEN.Proc "main.OBJ_account_send", ""
+SCREEN.Object("main.OBJ_account").Send
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BTN01)
+_AW_ONCLICK_AW_
+Dim dmsg, major, symb, objn
+
+major = Left(SCREEN.Object("obj_odr.ed_cfocod").data, 1)
+
+If major = "1" Or major = "4" Or major = "A" Or major = "D" Then
+	If Mid(SCREEN.Object("obj_odr.ed_cfocod").data, 2, 1) = "0" Then
+		symb = "30301"
+		objn = "IB400100"
+	Else
+		symb = "100301"
+		objn = "IB453000"
+	End If
+ElseIf major = "2" Or major = "3" Or major = "B" Or major = "C" Then
+	If Mid(SCREEN.Object("obj_odr.ed_cfocod").data, 2, 1) = "0" Then
+		symb = "40301"
+		objn = "IB400200"
+	Else
+		Exit Sub
+	End If
+Else
+	symb = ""
+End If
+
+If symb = "" Then Exit Sub
+
+dmsg = symb & vbTab & SCREEN.Object("obj_odr.ed_cfocod").data & vbLf
+SCREEN.CreateWindow 1, objn&" /s/t/d", dmsg
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BTN02)
+_AW_ONCLICK_AW_
+Dim dmsg
+dmsg = "mkgb"&vbTab&"X"&vbLf&_
+	"focod" & vbTab & SCREEN.Object("obj_odr.ed_cfocod").data & vbLf
+
+SCREEN.CreateWindow 1, "IB310200 /s/t/d", dmsg
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BTN03)
+_AW_ONCLICK_AW_
+
+SCREEN.CreateWindow 1, "IB320100 /s/t", ""
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BTN04)
+_AW_ONCLICK_AW_
+SCREEN.CreateWindow 1, "IB320200 /s/t", ""
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON0)
+_AW_ONCLICK_AW_
+BtnCodeChange BUTTON0.Text
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON1)
+_AW_ONCLICK_AW_
+BtnCodeChange BUTTON1.Text
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON2)
+_AW_ONCLICK_AW_
+BtnCodeChange BUTTON2.Text
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON3)
+_AW_ONCLICK_AW_
+BtnCodeChange BUTTON3.Text
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

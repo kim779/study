@@ -1,0 +1,182 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB101700)
+MAPSIZE(310, 656)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("관심")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(FMS|FLASH|CR2TAB)
+TITLE("[1017]관심종목")
+TOPATH(AXIS)
+METHOD(MENU)
+MAPTYPE(NORM)
+HEADER(NOP)
+BGROUND(BRUSH, 181)
+}
+
+
+
+FORM DIVISION
+{
+
+USRTAB  selectMap(0, 0, 657, 26)  FOCUS  INDEX(0)  COUNT(2)  AL_TOP  TAB_IMAGE      FONT("굴림체", 9, NORMAL)    COLOR(181, 70)  CUR(0)  TABIMAGE("tab.bmp")  FCOLOR(3, 71)  CAPTION("관심", "검색")  TABINFO("1:1", "1:2")  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  obj(0, 26, 656, 311)    "IB101710"  TABORDER(1)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Dim bNowPrice
+Sub OnPortfolio(confirm)
+	Dim groupNames, parseData, Items, codelist, row, countGroup
+
+	If SCREEN.CreateObject("DX_INTEREST") = False Then
+		Exit Sub
+	End If
+
+	If UCase(confirm) <> "OK" And UCase(confirm) <> "START" Then
+		Exit Sub
+	End If
+
+	Items = ""
+	DX_INTEREST.SetUserName(LOGIN.Name)
+	groupNames = DX_INTEREST.LoadGroupNames()
+
+	countGroup = 0
+	Do While Len(groupNames) > 0
+
+		parseData = Mid(groupNames, 1, InStr(groupNames, vbTab) -1)
+		groupNames = Mid(groupNames, InStr(groupNames, vbTab) + 1)
+		Items = parseData & vbTab & Items
+		countGroup = countGroup + 1
+	Loop
+
+	'계좌 보유종목 조회
+	If countGroup < 100 Then
+		Items = "00 보유종목" & vbTab & Items
+	End If
+
+	If Items = "" Then
+		intercombo.SetItems("")
+	Else
+		intercombo.SetItems(vbTab & Items)
+	End If
+
+	Call p_read_com()
+'	intercombo.Data = SYSTEM.Pop("cxPortfolioItem")
+	SCREEN.Proc "OBJ1.OnGroup", intercombo.Data
+
+
+    Call p_write_com()
+	'축소화면도 같이 업데이트
+
+End Sub
+
+
+Sub p_read_com()
+	If SCREEN.CreateObject("Info") Then
+		SYSTEM.Trace "!!!!!!!reduce::read file : " & Trim(INFO.PopData(LOGIN.Name, "intercfg.ini", "MAIN", "SELECTGROUP_MAP"))
+	 	Dim data
+	 	data = Trim(INFO.PopData(LOGIN.Name, "intercfg.ini", "MAIN", "SELECTGROUP_MAP"))
+		If data = "" Then
+			intercombo.Data = "01"
+		Else
+			intercombo.Data = data
+		End If
+		SYSTEM.Trace "!!!!!!!reduce::read combo: " & intercombo.Data
+	End If
+End Sub
+
+Sub p_write_com()
+	If SCREEN.CreateObject("Info") Then
+		SYSTEM.Trace "Extend::write : " & intercombo.Data
+	  INFO.PushData LOGIN.Name, "intercfg.ini", "MAIN", "SELECTGROUP_MAP", intercombo.Data
+	End If
+End Sub
+
+Sub SetPswd(data)
+	obj.Proc "SetPswd", data
+End Sub
+
+Sub SetAcnt(data)
+	obj.Proc "SetAcnt", data
+End Sub
+
+_AW_ONSTART_AW_
+SYSTEM.Trigger "getUserInfo", "", ""
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+SCREEN.OnSend False
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(selectMap)
+_AW_ONCLICK_AW_
+Select Case selectMap.ID
+	Case 1 :
+			obj.SetObject "IB101710"
+			SCREEN.SetCaption "관심종목"
+	Case 2 :
+			obj.SetObject "IB101730"
+			SCREEN.SetCaption "검색"
+	Case 3 :
+			obj.SetObject ""
+			SCREEN.SetCaption ""
+	Case 4 :
+			obj.SetObject ""
+			SCREEN.SetCaption ""
+	Case 5 :
+			obj.SetObject ""
+			SCREEN.SetCaption ""
+	Case 6 :
+			obj.SetObject ""
+			SCREEN.SetCaption ""
+	Case 7 :
+			obj.SetObject ""
+			SCREEN.SetCaption ""
+	Case 8 :
+			obj.SetObject ""
+			SCREEN.SetCaption ""
+	Case 9 :
+			obj.SetObject ""
+			SCREEN.SetCaption ""
+	Case 10 :
+			obj.SetObject ""
+			SCREEN.SetCaption ""
+	Case 11 :
+			obj.SetObject ""
+			SCREEN.SetCaption ""
+	Case 12 :
+			obj.SetObject ""
+			SCREEN.SetCaption ""
+	Case 13 :
+			obj.SetObject ""
+			SCREEN.SetCaption ""
+	Case 14 :
+			obj.SetObject ""
+			SCREEN.SetCaption ""
+	Case 15 :
+			obj.SetObject ""
+			SCREEN.SetCaption ""
+	Case 16 :
+			obj.SetObject ""
+			SCREEN.SetCaption ""
+End Select
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

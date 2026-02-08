@@ -1,0 +1,355 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(TE300010)
+MAPSIZE(560, 870)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("서비스ID IO 조회")
+MAPPUBLIC(";")
+FONT("굴림", 9, NORMAL)
+OPTIONS(ENCODE|CR2TAB)
+TITLE("서비스ID IO 조회")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("piboPBxQ")
+MAPTYPE(FIXED)
+HEADER(LEDGER)
+TRXH("31CSBPGQ776")
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL0(-10, -10, 890, 570)  TP_RAISED      COLOR(108, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  etSvcId(80, 20, 180, 40)  LEN(8)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("SBPGQ776")          TABORDER(1)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  lbSvcId(10, 20, 80, 40)  '서비스'  AL_LEFT  CUR(0)      COLOR(209, 232)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  lbSvcHanglNm(10, 75, 80, 95)  '서비스ID명'  AL_LEFT  CUR(0)      COLOR(209, 232)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+OUT  opSvcHanglNm(80, 75, 430, 95)  LEN(70)  IO_MIXED|AL_LEFT|    COLOR(194, 232)  CUR(0)  LINECOLOR(216)          TABORDER(0)  IOORDER(6)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  etIn(931, 20, 981, 40)  LEN(5)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("00001")          TABORDER(2)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  opIn(931, 52, 981, 72)  LEN(5)  IO_NUM|AL_CENTER|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(3)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  lbChgDttm(630, 75, 730, 95)  '최종변경일시'  AL_RIGHT  CUR(0)      COLOR(209, 232)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+OUT  opChgDttm(735, 75, 845, 95)  LEN(17)  IO_NUM|AL_LEFT|    COLOR(194, 232)  CUR(0)  LINECOLOR(216)          EDITFORMAT("9999/99/99 99:99")  TABORDER(0)  IOORDER(7)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  opOut1(935, 116, 985, 136)  LEN(5)  IO_MIXED|AL_CENTER|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(5)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  opSvcId(932, 85, 982, 105)  LEN(8)  IO_MIXED|AL_CENTER|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(4)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  opOut2(935, 144, 985, 164)  LEN(1)  IO_MIXED|AL_CENTER|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(8)  ENABLE  &
+  HINTTYPE(IH_NONE)
+GRID  GRID0(5, 115, 865, 515)  VISIBLEROW(0)  CELLH(20)  MATRIX(500, 17)  FIX(0)  MAINCOLOR(208, 232)  LINECOLOR(0)  FOCUSCOLOR(0)  FOCUSKIND(4)  |FLEXIBLE|VSCROLL|XHLINE    &
+	COLINFO("objTp")  LEN(1)  WIDTH(1)  HEAD("대상구분")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_MIXED|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("objDtlSeq")  LEN(6)  WIDTH(1)  HEAD("오브젝트상세일련번호")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_NUM|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("itemSeqno")  LEN(4)  WIDTH(70)  HEAD("일련번호")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(200, 232)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_CORGB|SA_COSIGN    COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(97, 97)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("itemClssCode")  LEN(2)  WIDTH(1)  HEAD("아이템분류코드")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_MIXED|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("showInptOtptTp")  LEN(10)  WIDTH(60)  HEAD("구분")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(200, 232)  IO_MIXED|EDIT_OUTPUT  |FA_SKIP    COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("inptOtptTp")  LEN(1)  WIDTH(1)  HEAD("구분")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_MIXED|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("itemId")  LEN(30)  WIDTH(200)  HEAD("아이템ID")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(200, 232)  IO_MIXED|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("showItemHanglNm")  LEN(80)  WIDTH(300)  HEAD("아이템명")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(200, 232)  IO_MIXED|EDIT_OUTPUT  |FA_SKIP    COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("showItemFmtn")  LEN(30)  WIDTH(60)  HEAD("형식")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(200, 232)  IO_NUM|EDIT_OUTPUT  |FA_SKIP    COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("showItemDtype")  LEN(10)  WIDTH(60)  HEAD("데이터형")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(200, 232)  IO_MIXED|EDIT_OUTPUT  |FA_SKIP    COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("itemDtype")  LEN(2)  WIDTH(1)  HEAD("데이터형")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_MIXED|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("itemLen")  LEN(6)  WIDTH(90)  HEAD("크기(반복수)")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(200, 232)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_CORGB|SA_COSIGN    COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(97, 97)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("itemFmtn")  LEN(100)  WIDTH(1)  HEAD("형식")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_MIXED|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("itemHanglNm")  LEN(40)  WIDTH(1)  HEAD("아이템명")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_MIXED|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("itemHanglShtnNm")  LEN(40)  WIDTH(1)  HEAD("아이템한글단축명")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_MIXED|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("itemEngNm")  LEN(40)  WIDTH(1)  HEAD("아이템영문명")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_MIXED|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("itemEngShtnNm")  LEN(40)  WIDTH(1)  HEAD("아이템영문단축명")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_MIXED|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    TABORDER(3)  IOORDER(9)  ENABLE  &
+  VISIBLE
+
+BUTTON  btnTransfer(705, 15, 775, 45)  '조회'  TP_PUSH      AL_CENTER    FOCUS  COLOR(247, 192)  CUR(0)      TABORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL0(5, 5, 865, 7)  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL1(5, 55, 865, 57)  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL2(5, 61, 865, 63)  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL3(5, 107, 865, 109)  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL1(5, 532, 19, 546)    |IMAGE|AL_STRETCH    COLOR(208, 232)  CUR(0)    "알림_ic.bmp"  ENABLE  &
+  VISIBLE  TRANSPARENT  IMAGE  HINTTYPE(IH_NONE)
+OUT  GUIDE(22, 530, 871, 548)  LEN(80)  IO_MIXED|AL_LEFT|    COLOR(108, 130)  CUR(0)            TABORDER(0)  IOORDER(10)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  btnCreate(775, 15, 845, 45)  '생성'  TP_PUSH      AL_CENTER    FOCUS  COLOR(218, 192)  CUR(0)      TABORDER(5)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Dim cnt					'입출력 갯수
+
+Sub transfer()
+	cnt = 0		'초기화
+	LEDGER.RCnt = "0010"  ' 조회요청개수 (OUT GRID COUNT)
+	LEDGER.Fkey = "C"     ' 조회 (첫 조회)
+	SCREEN.Send 0
+End Sub
+
+Sub chkReceive()
+	Dim inptOtptTp		'구분
+	Dim strInptOtptTp	'구분 String 값
+	Dim itemNm			'아이템명
+	Dim itemFmtn		'형식
+	Dim itemDtype		'데이터형
+	Dim i
+
+	For i = 1 To GRID0.Rows
+		inptOtptTp = GRID0.GetGridCell(i, 6)
+		itemNm = GRID0.GetGridCell(i, 14)
+		itemFmtn = RTrim(GRID0.GetGridCell(i, 13))
+		itemDtype = RTrim(GRID0.GetGridCell(i, 11))
+
+		'구분
+		If inptOtptTp = "1" Then
+			GRID0.SetGridCell i, 5, "입출력"
+			strInptOtptTp = "입출력"
+			cnt = cnt + 1
+		ElseIf inptOtptTp = "2" Then
+			GRID0.SetGridCell i, 5, "출력"
+			strInptOtptTp = "출력"
+		Else
+			GRID0.SetGridCell i, 5, strInptOtptTp
+			If strInptOtptTp = "입출력" Then
+				cnt = cnt + 1
+			End If
+		End If
+
+		'아이템명
+		GRID0.SetGridCell i, 8, itemNm
+
+		'형식
+		GRID0.Setgridcell i, 9, itemFmtn
+
+		'데이터형
+		If itemDtype = "S" Then
+			GRID0.SetGridCell i, 10, "String"
+		ElseIf itemDtype = "L" Then
+			GRID0.SetGridCell i, 10, "Long"
+		ElseIf itemDtype = "D" Then
+			GRID0.SetGridCell i, 10, "Duble"
+		End If
+	Next
+End Sub
+
+Sub createFile()
+	Dim path
+	Dim fileName
+
+	If Trim(opSvcId.Data) = "" Then
+		MsgBox "먼저 서비스ID 조회를 해주세요."
+	Else
+		'바탕화면 경로
+		path = CreateObject("WScript.Shell").SpecialFolders("Desktop")
+		fileName = path & "\" & opSvcId.Data
+
+		'파일쓰기
+    	Call TextStrimWrite(fileName)
+	End If
+End Sub
+
+'파일쓰기
+Sub TextStrimWrite(strPathName)
+	Dim myArr()					'배열
+	Dim tempStr
+	Dim itemDtype				'데이터형
+	Dim itemLen					'크기(반복수)
+	Dim gridFlag				'그리드 체크 플래그
+	ReDim myArr(cnt)			'배열 크기 재지정
+
+    Set objStream = CreateObject("ADODB.Stream")
+    objStream.Charset = "UTF-8"
+    objStream.Open
+
+    objStream.WriteText "TR=PIBOPBXQ" & vbCrLf
+    objStream.WriteText "DESCRIPTION=" & opSvcHanglNm.Data & vbCrLf & vbCrLf
+	objStream.WriteText "FORMAT=STRUCTURE" & vbCrLf
+	objStream.WriteText "OPTION=ENC,LEDGER" & vbCrLf & vbCrLf
+
+	'입출력 중 입력
+	For i = 1 To cnt
+		If RTrim(GRID0.GetGridCell(i, 8)) = "" Then		'아이템명이 빈 값이면
+			objStream.WriteText "IN=In:CHAR:5:갯수" & vbCrLf
+			myArr(i-1) = "OUT=In:CHAR:5:갯수"
+		Else
+			tempStr = OutputStr(i)
+			objStream.WriteText "IN=" & tempStr & vbCrLf
+			myArr(i-1) = "OUT=" & tempStr
+		End If
+	Next
+
+	objStream.WriteText vbCrLf
+
+	'입출력 중 출력
+	For i = 1 To cnt
+		objStream.WriteText myArr(i-1) & vbCrLf
+	Next
+
+	gridFlag = False		'초기화
+
+	'출력
+	For i = cnt + 1 To GRID0.Rows
+		itemDtype = RTrim(GRID0.GetGridCell(i, 11))		'데이터형
+		itemLen = RTrim(GRID0.GetGridCell(i, 12))		'크기(반복수)
+
+		If gridFlag = True Then		'그리드 체크 될 시(이후부터는 기존 그리드 혹은 새로운 그리드)
+			If itemDtype = "" Then	'새로운 그리드일 시 띄어쓰기
+				objStream.WriteText vbCrLf
+				'objStream.WriteText "OUT=@Grid:5:레코드갯수"
+				objStream.WriteText "OUT=@" & RTrim(GRID0.GetGridCell(i, 7)) & ":5:레코드갯수"
+			Else					'그리드
+				objStream.WriteText ":" & OutputStr(i)
+			End If
+		Else
+			If itemDtype = "" Then			'데이터형이 빈 값이면 -> 출력의 시작 부분
+				If itemLen <> 1 Then		'그리드 시작 부분
+					gridFlag = True
+					'objStream.WriteText "OUT=@Grid:5:레코드갯수"
+					objStream.WriteText "OUT=@" & RTrim(GRID0.GetGridCell(i, 7)) & ":5:레코드갯수"
+				Else					'일반 출력 시작 부분
+					objStream.WriteText "OUT=" & OutputStr(i) & vbCrLf
+				End If
+			Else						'일반 출력
+				objStream.WriteText "OUT=" & OutputStr(i) & vbCrLf
+			End If
+		End If
+	Next
+
+    '설정 부분
+    Set BinaryStream = CreateObject("adodb.stream")
+    BinaryStream.Type = 1
+    BinaryStream.Mode = 3
+    BinaryStream.Open
+    objStream.Position = 3
+    objStream.CopyTo BinaryStream
+    objStream.Flush
+    objStream.Close
+    BinaryStream.SaveToFile strPathName, 2
+    BinaryStream.Close
+    Set objStream = Nothing
+    Set BinaryStream = Nothing
+End Sub
+
+'출력 문장 만드는 함수
+Function OutputStr(i)
+	Dim str
+	Dim itemFmtn				'형식
+	Dim itemNm					'아이템명
+
+	'아이템ID
+	str = str & RTrim(GRID0.GetGridCell(i, 7))
+
+	'데이터형
+	str = str & ":CHAR"
+
+	'형식
+	itemFmtn = RTrim(GRID0.GetGridCell(i, 9))
+
+	'Data Length
+	If itemFmtn = "" Then	'형식이 없으면
+		str = str & ":5"
+	Else
+		str = str & ":" & CalcLength(itemFmtn)
+	End If
+
+	'아이템명
+	itemNm = RTrim(GRID0.GetGridCell(i, 8))
+	If itemNm = "" Then
+		str = str & ":레코드갯수"
+	Else
+		str = str & ":" & itemNm
+	End If
+
+	OutputStr = str
+End Function
+
+'형식 넘기면 크기를 반환하는 함수
+Function CalcLength(itemFmtn)
+	Dim count
+	Dim str
+	Dim bracketFlag			'괄호 체크 플래그
+	Dim numStr				'문자형 숫자를 저장할 변수
+	Dim size
+	Dim i
+
+	bracketFlag = False		'초기화
+	numStr = ""				'초기화
+
+	size = Len(itemFmtn)
+	For i = 1 To size
+		str = Mid(itemFmtn, i, 1)		'한 문자 추출
+		If str = "S" Then				'S 나오면 +1
+			count = count + 1
+		ElseIf str = "." Then			'.(소수점) 나오면 +1
+			count = count + 1
+		Else
+			If bracketFlag = True Then	'괄호 시작 후
+				If IsNumeric(str) = True Then		'숫자이면 저장
+					numStr = numStr & str
+				Else					'숫자가 아니면 닫는 괄호 -> )
+					bracketFlag = False				'플래그 초기화
+					count = count + CInt(numStr)	'숫자 변환 후 카운트 증가
+					numStr = ""						'초기화
+				End If
+			Else
+				If str = "(" Then	'괄호 시작 -> (
+					bracketFlag = True
+				ElseIf IsNumeric(str) = True Then	'숫자 이고
+					If Mid(itemFmtn, i+1, 1) <> "(" Then	'오른쪽에 여는 괄호가 없을 시, 즉 -> ex. 9(5)가 아닐경우
+						count = count + 1
+					End If
+				End If
+			End If
+		End If
+	Next
+
+	CalcLength = count
+End Function
+
+_AW_ONRECEIVE_AW_
+chkReceive()
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(opChgDttm)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(GRID0)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(btnTransfer)
+_AW_ONCLICK_AW_
+transfer()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(btnCreate)
+_AW_ONCLICK_AW_
+'파일 생성
+createFile()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

@@ -1,0 +1,50 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB282630)
+MAPSIZE(46, 135)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("MS Sans Serif", 9, NORMAL)
+TITLE("[IB282630] 배당정보 전 영업일구하기")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pibo2826")
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+EDIT  ed_qrgb(0, 0, 120, 19)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("3")          TABORDER(1)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  ot_sdat(0, 20, 100, 40)  LEN(8)  IO_NUM|AL_CENTER|    COLOR(192, 69)  CUR(0)            TABORDER(0)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+'----------------------------------------------------------------
+Sub SendDate()
+	SCREEN.Proc "Main.SetDate", ot_sdat.Data
+End Sub
+
+_AW_ONRECEIVE_AW_
+SendDate
+
+_AW_ONENDSUB_AW_
+}
+
+
+

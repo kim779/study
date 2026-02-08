@@ -1,0 +1,223 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB61163A)
+MAPSIZE(304, 327)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("운용사 조회")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+TITLE("운용사 조회")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL105(0, 51, 327, 304)  LIMAGE(0)  LINEW(4)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL1(0, 0, 327, 52)  LIMAGE(0)  LINEW(3)  LINETYPE(4)  LINECOLOR(64)      COLOR(66, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+GRID  GRID1(8, 59, 320, 297)  VISIBLEROW(0)  CELLH(20)  MATRIX(1000, 2)  FIX(0)  MAINCOLOR(64, 232)  LINECOLOR(75)  FOCUSCOLOR(78)  FOCUSKIND(4)    FONT("굴림체", 9, NORMAL)  ROWC(68, 77)  |MERGE|FLEXIBLE|VSCROLL|HSCROLL|NO3D|RROW|XHLINE|PAGE|HEADER|GRFTEXT    &
+	COLINFO("Col0")  LEN(10)  WIDTH(99)  HEAD("기관코드")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col1")  LEN(100)  WIDTH(351)  HEAD("운용사명")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    TABORDER(1)  IOORDER(1)  ENABLE  &
+  VISIBLE
+
+BUTTON  BUTTON0(247, 20, 283, 40)  '선택'  TP_PUSH|IMAGETEXT|AL_CENTER        FOCUS  COLOR(208, 186)  CUR(0)    "2BTN.BMP"    TABORDER(2)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+BUTTON  BUTTON1(284, 20, 320, 40)  '닫기'  TP_PUSH|IMAGETEXT|AL_CENTER        FOCUS  COLOR(208, 186)  CUR(0)    "2BTN.BMP"    TABORDER(3)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+EDIT  search_fund(65, 20, 207, 40)  LEN(100)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_HAN|FA_SKIP  FONT("굴림체", 9, NORMAL)    COLOR(68, 69)  CUR(0)  TP_SUNKEN          TABORDER(4)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_REF)  HELPTEXT("search_fund")HELPTEXT("search_fund")
+GROUP  GROUP2(7, 5, 245, 45)  '운용사명으로 검색'    FONT("굴림체", 9, NORMAL)      COLOR(-1, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON3(209, 20, 241, 40)  '검색'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, NORMAL)  COLOR(208, 186)  CUR(0)    "2btn.bmp"    TABORDER(5)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+PANEL  PANEL4(0, 329, 382, 331)        COLOR(64, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL0(14, 20, 65, 40)  '운용사명'  AL_LEFT  CUR(0)      COLOR(208, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Sub Find_fund()
+	Dim ii, pos
+	pos = 0
+
+	For ii = GRID1.rows To 1 Step -1
+		pos = InStr(Trim(GRID1.GetGridCell(ii, 2)), Trim(search_fund.data))
+
+		If pos = 0 Then
+			GRID1.RemoveRow ii-1
+		End If
+	Next
+End Sub
+
+Dim objdic
+
+Sub Set_compcode()
+
+	Set objdic = createobject("scripting.dictionary")
+	objdic.RemoveAll()
+
+	objdic.add "000",	"전체(운용사 전체)"
+	objdic.add "101",	"한국투신운용"
+	objdic.add "102",	"하나UBS자산운용"
+	objdic.add "103",	"푸르덴셜자산운용"
+	objdic.add "104",	"하이자산운용"
+	objdic.add "105",	"삼성자산운용"
+	objdic.add "107",	"동양자산운용"
+	objdic.add "203",	"대신투신운용"
+	objdic.add "205",	"산은자산운용"
+	objdic.add "206",	"우리자산운용"
+	objdic.add "207",	"교보악사자산운용"
+	objdic.add "209",	"신영투신운용"
+	objdic.add "210",	"신한BNP파리바자산운용"
+	objdic.add "212",	"ING자산운용"
+	objdic.add "213",	"한화투신운용"
+	objdic.add "214",	"유진자산운용"
+	objdic.add "216",	"동부자산운용"
+	objdic.add "217",	"프랭클린템플턴투신"
+	objdic.add "223",	"KB자산운용"
+	objdic.add "224",	"흥국투신운용"
+	objdic.add "225",	"미래에셋맵스자산운용"
+	objdic.add "226",	"아이투신""운용"
+	objdic.add "228",	"알리안츠글로벌인베스터스자산운용"
+	objdic.add "229",	"PCA투신운용"
+	objdic.add "230",	"슈로더투신운용"
+	objdic.add "231",	"도이치자산운용"
+	objdic.add "232",	"NH-CA자산운용"
+	objdic.add "233",	"칸서스자산운용"
+	objdic.add "234",	"IBK자산운용"
+	objdic.add "235",	"피델리티자산운용"
+	objdic.add "236",	"한국밸류자산운용"
+	objdic.add "237",	"제이피모간자산운용"
+	objdic.add "238",	"마이어자산운용"
+	objdic.add "240",	"GS자산운용"
+	objdic.add "301",	"미래에셋자산운용"
+	objdic.add "302",	"SEI에셋코리아자산"
+	objdic.add "303",	"마이다스에셋자산운용"
+	objdic.add "305",	"드림자산운용"
+	objdic.add "306",	"KTB자산운용"
+	objdic.add "307",	"유리자산운용"
+	objdic.add "308",	"피닉스자산운용"
+	objdic.add "309",	"골든브릿지자산운용"
+	objdic.add "310",	"마이애셋자산운용"
+	objdic.add "311",	"플러스자산운용"
+	objdic.add "312",	"골드만자산운용"
+	objdic.add "313",	"와이즈에셋자산운용"
+	objdic.add "321",	"알파에셋자산운용"
+	objdic.add "345",	"다올부동산자산운용"
+	objdic.add "350",	"현대인베스트먼트자산운용"
+	objdic.add "363",	"트러스톤자산운용"
+	objdic.add "364",	"에셋플러스자산운용"
+	objdic.add "366",	"블랙록자산운용"
+	objdic.add "368",	"LS자산운용"
+	objdic.add "370",	"얼라이언스번스틴자산운용(주)"
+	objdic.add "373",	"현대자산운용"
+	objdic.add "501",	"메리츠자산운용"
+
+End Sub
+
+Sub arrange()
+	GRID1.Clear
+	For Each aa In objdic.keys
+		GRID1.InsertRow -1
+		GRID1.Setgridcell GRID1.Rows, 1, Trim(aa)
+		GRID1.Setgridcell GRID1.Rows, 2, Trim(objdic.item(aa))
+	Next
+End Sub
+
+_AW_ONSTART_AW_
+SYSTEM.Push "fundcompmsg", "NO"
+Call Set_compcode()
+Call arrange()
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+SCREEN.OnSend False
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(GRID1)
+_AW_ONDBLCLK_AW_
+
+Dim msg
+
+msg = Trim(GRID1.GetGridCell(GRID1.row, 1)) & "|" & _
+	Trim(GRID1.GetGridCell(GRID1.Row, 2))
+
+If Trim(GRID1.GetGridCell(GRID1.row, 1)) <> "" Then
+	SYSTEM.Push "fundcompmsg", msg
+End If
+
+SCREEN.CloseWindow
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON0)
+_AW_ONCLICK_AW_
+
+Dim msg
+
+msg = Trim(GRID1.GetGridCell(GRID1.row, 1)) & "|" & _
+	Trim(GRID1.GetGridCell(GRID1.Row, 2))
+
+If Trim(GRID1.GetGridCell(GRID1.row, 1)) <> "" Then
+	SYSTEM.Push "fundcompmsg", msg
+End If
+
+SCREEN.CloseWindow
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON1)
+_AW_ONCLICK_AW_
+SCREEN.CloseWindow
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(search_fund)
+_AW_ONKEYCHANGE_AW_
+If SCREEN.Key = "13" Then  '-- Enter 키 입력
+	Call arrange()
+		Call Find_fund()
+		GRID1.SetFocus
+		GRID1.Index = 1
+		GRID1.Index = 0
+
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON3)
+_AW_ONCLICK_AW_
+	Call arrange()
+	Call Find_fund()
+	GRID1.SetFocus
+	GRID1.Index = 1
+	GRID1.Index = 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

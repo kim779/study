@@ -1,0 +1,80 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB270202)
+MAPSIZE(20, 125)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("테마조회 종목명")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(FMS|FLASH)
+TITLE("[2192] 종목별 테마조회")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pooppoop")
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+EDIT  13011(235, 15, 298, 33)  LEN(12)  IO_MIXED|EDIT_INOUT|FA_SEND|FA_WRAP|FA_HAN|FA_SKIP|SA_ALL|CODE    FONT("굴림체", 9, NORMAL)    COLOR(28, 232)  CUR(0)  TP_NONE          TABORDER(1)  IOORDER(5)  ENABLE  &
+  HINTTYPE(IH_NONE)
+CONTROL  17413(-1, 0, 125, 20)    "CX_Symbol"  "/a89/b91/c92/d69"  LEN(0)  EDIT_OUTPUT    COLOR(90, 130)  TABORDER(0)  IOORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  1021(130, 30, 208, 48)  LEN(16)  IO_NUM|AL_CENTER||FA_FLASH    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  1777(125, 55, 205, 75)  LEN(1)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(2)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  1301(310, 75, 380, 95)  LEN(6)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(3)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONSEND_AW_
+	S1301.Data = SCREEN.Object("main.1301").data
+
+If UCase(TypeName( SCREEN.Object("main.cxMarket"))) <> "NOTHING" Then
+	If SCREEN.Object("main.cxMarket").sMarket = "KRX" Then
+		S1777.Data = "1"
+	ElseIf SCREEN.Object("main.cxMarket").sMarket = "NXT" Then
+		S1777.Data = "2"
+	ElseIf SCREEN.Object("main.cxMarket").sMarket = "통합" Then
+		S1777.Data = "3"
+	End If
+End If
+
+SYSTEM.Trace "[OnSend] S1301 = " & S1301.Data & "  " & S1777.Data
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(13011)
+_AW_ONCHANGE_AW_
+Dim name
+name = SCREEN.GetName(100, S1301.data, 0)
+If (name <> "") Then
+
+'   interest_idx.Pop("INTER")
+'   inter.index = CLng(Trim(interest_idx.text))
+'   inter.code = S1301.Data
+
+	S1301.Trigger "", False
+	S1301.Trigger "", True
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

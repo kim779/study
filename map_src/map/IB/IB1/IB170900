@@ -1,0 +1,483 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB170900)
+MAPSIZE(644, 670)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("[1709]전제")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+TITLE("[1709]종합잔고 전체")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  panel_bottom(0, 50, 900, 82)        COLOR(64, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL1(-2, 82, 672, 620)  LIMAGE(0)  LINEW(4)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL0(1, 29, 670, 80)  LINECOLOR(66)      COLOR(66, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL0(7, 32, 81, 52)  '계좌번호'  AL_LEFT  CUR(0)      COLOR(66, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+CONTROL  AN00(58, 32, 198, 52)  |FA_SKIP  "CX_Account"  "/w0"  LEN(11)  EDIT_INPUT    COLOR(192, 69)  TABORDER(2)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL1(326, 32, 376, 52)  '비밀번호'  AL_LEFT  CUR(0)      COLOR(66, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  zPwd(377, 32, 433, 52)  LEN(8)  IO_MIXED|EDIT_INPUT|FA_PASSWD|FA_WRAP    COLOR(192, 69)  CUR(0)  TP_SUNKEN          TABORDER(3)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  send_btn(628, 32, 664, 52)  '조회'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, BOLD)  FOCUS  COLOR(208, 69)  CUR(0)    "조회BTN.BMP"    TABORDER(4)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+BUTTON  next_btn(24, 685, 60, 705)  '다음'  TP_PUSH|IMAGETEXT|AL_STRETCH        FOCUS  COLOR(208, 69)  CUR(0)    "2btn.bmp"    TABORDER(5)  &
+  IMAGETEXT  HINTTYPE(IH_NONE)
+OUT  ACNM(200, 32, 320, 52)  LEN(30)  IO_MIXED|AL_LEFT||FA_SKIP    COLOR(160, 69)  CUR(0)  LINECOLOR(89)          TABORDER(0)  IOORDER(5)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  OBJECT0(10, 447, 610, 619)  |FA_ENUM  "IB170903"  TABORDER(6)  IOORDER(6)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+USRTAB  tab_mainHangmok(1, 3, 669, 29)  FOCUS  INDEX(0)  COUNT(11)  AL_TOP  TAB_IMAGE      FONT("굴림체", 9, NORMAL)    COLOR(3, 70)  CUR(0)  TABIMAGE("tab.bmp")  FCOLOR(3, 71)  CAPTION(" 전체 ", "종합계좌별", "위탁/저축", " 선물 ", " 펀드 ", " CMA ", "  RP  ", " 채권 ", "  CD  ", "  CP  ", "신탁/기타")  TABINFO("1:0", "0:1", "1:2", "1:3", "1:4", "1:5", "1:6", "1:7", "1:8", "1:9", "1:10")  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL8(-2, 620, 672, 644)  LIMAGE(0)  LINEW(3)  LINETYPE(4)  LINECOLOR(64)      COLOR(34, 232)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL7(7, 625, 21, 639)    |IMAGE|AL_STRETCH    COLOR(34, 232)  CUR(0)    "알림_ic.bmp"  ENABLE  &
+  VISIBLE  IMAGE  HINTTYPE(IH_NONE)
+PANEL  GUIDE(22, 624, 662, 640)        COLOR(34, 130)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  panel_up(0, 0, 900, 3)        COLOR(64, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  panel_left(0, 0, 1, 80)        COLOR(64, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  panel_rigth(669, 0, 672, 80)        COLOR(64, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON1(605, 32, 626, 52)  TP_PUSH|IMAGE|AL_STRETCH      FOCUS  COLOR(208, 69)  CUR(0)    "엑셀.BMP"    TABORDER(7)  ENABLE  &
+  VISIBLE  IMAGE  HINTTYPE(IH_NONE)
+CONTROL  AN99(58, 32, 198, 52)  |FA_SKIP  "CX_Account"  "/w0"  LEN(11)  EDIT_INPUT    COLOR(192, 69)  TABORDER(8)  IOORDER(7)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  totalAccn(95, 56, 174, 76)  '종합계좌별'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(viewGR)      COLOR(66, 130)  CUR(0)      TABORDER(9)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  allAccn(14, 56, 92, 76)  '보유전계좌'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(viewGR)      COLOR(66, 130)  CUR(0)      TABORDER(10)  ENABLE  &
+  VISIBLE  CHECKED  HINTTYPE(IH_NONE)
+BOX  optionBox(10, 56, 173, 76)    COLOR(165, 232)  LINEW(1)  BX_LINE    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+GROUP  viewGR(153, 721, 275, 784)  'Group'        COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+USRTAB  tab_subHangmok(6, 90, 664, 116)  FOCUS  INDEX(0)  COUNT(2)  AL_TOP  TAB_IMAGE      FONT("굴림체", 9, NORMAL)    COLOR(3, 70)  CUR(0)  TABIMAGE("tab.bmp")  FCOLOR(3, 71)  CAPTION("잔고현황요약", "유가증권상세")  TABINFO("1:0", "1:1")  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  obj0(6, 115, 664, 449)  |FA_ENUM  "IB170902"  TABORDER(1)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+USRTAB  tab_subSubHangmok(5, 117, 663, 143)  FOCUS  INDEX(0)  COUNT(8)  AL_TOP  TAB_IMAGE      FONT("굴림체", 9, NORMAL)    COLOR(3, 70)  CUR(0)  TABIMAGE("tab.bmp")  FCOLOR(3, 71)  CAPTION("주식", "국내채권/ELS/ELB", "펀드", "선물", "옵션", "해외주식/채권", "외화잔고", "신탁/기타")  TABINFO("1:0", "1:1", "1:2", "1:3", "1:4", "1:7", "1:8", "1:5")  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  BTN_MD(587, 119, 625, 139)  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, NORMAL)  FOCUS  COLOR(132, 186)  CUR(0)    "이미지_매도.BMP"    TABORDER(11)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+BUTTON  BTN_MS(625, 119, 663, 139)  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, NORMAL)  FOCUS  COLOR(132, 186)  CUR(0)    "이미지_매수.BMP"    TABORDER(12)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+EDIT  1301(355, 690, 465, 710)  LEN(6)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_SKIP|FA_NOR    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(13)  IOORDER(8)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  ed_jqty(355, 652, 465, 672)  LEN(10)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(14)  IOORDER(9)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BTN_FO_MD(787, 100, 825, 120)  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, NORMAL)  FOCUS  COLOR(132, 186)  CUR(0)    "이미지_매도.BMP"    TABORDER(15)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+BUTTON  BTN_FO_MS(826, 100, 864, 120)  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, NORMAL)  FOCUS  COLOR(132, 186)  CUR(0)    "이미지_매수.BMP"    TABORDER(16)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+EDIT  ed_focod(355, 700, 465, 720)  LEN(15)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_SKIP|FA_NOR    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(17)  IOORDER(10)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL3(192, 57, 242, 77)  '조회일자'  AL_LEFT  CUR(0)      COLOR(66, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  trdDt(243, 57, 333, 77)  LEN(8)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_DATE    COLOR(192, 232)  CUR(0)  TP_SUNKEN          EDITFORMAT("9999/99/99")  TABORDER(18)  IOORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+CONTROL  AM99(690, 135, 830, 155)  |FA_SKIP  "CX_Account"  "/w0"  LEN(11)  EDIT_INPUT    COLOR(192, 69)  TABORDER(19)  IOORDER(11)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Option Explicit
+
+Sub Set_account()
+	SCREEN.ClearAll 0, 2
+	zPwd.Clear
+
+	obj0.ClearAll 2
+
+	If SYSTEM.ConnectBy = "0" Then
+		If Len(Trim(AN99.Data)) <> 11 Then
+			Exit Sub
+		End If
+	Else
+		If Len(Trim(AN00.Data)) = 11 Then
+			ACNM.Data = Trim(AN00.Name)
+			zPwd.Data = Trim(AN00.Password)
+
+			If Len(Trim(zPwd.Data)) < 4 Then
+				zPwd.SetFocus
+				Exit Sub
+			End If
+		Else
+			AN00.SetFocus
+			Exit Sub
+		End If
+	End If
+
+	SCREEN.Proc "obj0.send_f", ""
+End Sub
+
+
+Sub tabSelect()
+	Select Case tab_subHangmok.ID
+		Case 0
+			tab_subSubHangmok.Visible = False
+
+			If SYSTEM.ConnectBy = 1 Or Trim(LOGIN.User) = "asset1" Then		'직원용 or 에셋플러스자문사
+				obj0.SetRect 6, 115, 664, 449
+			Else
+				obj0.SetRect 6, 95, 664, 450			' 그리드오브젝트
+			End If
+
+			SCREEN.Object("obj0.SecDtlGrid").Visible = False
+			SCREEN.Object("obj0.PANEL1").Visible = True
+			SCREEN.Object("obj0.PANEL2").Visible = True
+			SCREEN.Object("obj0.PANEL3").Visible = True
+			SCREEN.Object("obj0.PANEL4").Visible = True
+			SCREEN.Object("obj0.PANEL5").Visible = True
+			SCREEN.Object("obj0.OUTPUT1").Visible = True
+			SCREEN.Object("obj0.OUTPUT2").Visible = True
+			SCREEN.Object("obj0.OUTPUT3").Visible = True
+			SCREEN.Object("obj0.OUTPUT4").Visible = True
+
+			SCREEN.Object("obj0.BalStGrid").Visible = True
+			BTN_MD.Visible = False
+			BTN_MS.Visible = False
+		Case 1
+			tab_subSubHangmok.Visible = True
+			tab_subSubHangmok.ID = 0
+
+			If SYSTEM.ConnectBy = 1  Or Trim(LOGIN.User) = "asset1" Then		'직원용 or 에셋플러스 자문사
+				obj0.SetRect 6, 141, 664, 475
+			Else
+				obj0.SetRect 6, 122, 664, 477			' 그리드오브젝트
+			End If
+
+			SCREEN.Object("obj0.SecDtlGrid").Visible = True
+			SCREEN.Object("obj0.BalStGrid").Visible = False
+
+			SCREEN.Object("obj0.PANEL1").Visible = False
+			SCREEN.Object("obj0.PANEL2").Visible = False
+			SCREEN.Object("obj0.PANEL3").Visible = False
+			SCREEN.Object("obj0.PANEL4").Visible = False
+			SCREEN.Object("obj0.PANEL5").Visible = False
+			SCREEN.Object("obj0.OUTPUT1").Visible = False
+			SCREEN.Object("obj0.OUTPUT2").Visible = False
+			SCREEN.Object("obj0.OUTPUT3").Visible = False
+			SCREEN.Object("obj0.OUTPUT4").Visible = False
+
+			BTN_MD.Visible = True
+			BTN_MS.Visible = True
+
+	End Select
+
+	Call send_f()
+End Sub
+
+
+Sub tab_mainChange()
+	Select Case tab_mainHangmok.ID
+		Case 0 :
+				SCREEN.ChangeMap "IB170900"
+		Case 2 :
+				SCREEN.ChangeMap "IB170910"
+		Case 3 :
+				SCREEN.ChangeMap "IB170920"
+		Case 4 :
+				SCREEN.ChangeMap "IB170930"
+		Case 5 :
+				SCREEN.ChangeMap "IB170940"
+		Case 6 :
+				SCREEN.ChangeMap "IB170950"
+		Case 7 :
+				SCREEN.ChangeMap "IB170960"
+		Case 8 :
+				SCREEN.ChangeMap "IB170970"
+		Case 9 :
+				SCREEN.ChangeMap "IB170980"
+		Case 10 :
+				SCREEN.ChangeMap "IB170990"
+	End Select
+End Sub
+
+
+Sub send_f()
+	If SYSTEM.ConnectBy = "1" Then
+		If Len(Trim(zPwd.Data)) < 4 Then
+			Exit Sub
+		End If
+	End If
+
+	SCREEN.Proc "obj0.send_f", ""
+End Sub
+
+_AW_ONINDECLARE_AW_
+#load IB888833
+
+_AW_ONENDSUB_AW_
+_AW_ONSTART_AW_
+'2009/12/18
+'직원용일 경우 AN00을 추가하여 관리계좌조회시 입력가능하도록 수정
+'PB TR3050은 종합계좌(00)를 입력하지않고 위탁계좌나 선물계좌를 입력해도 조회가능하므로 추가 작업 없음.
+
+'2010/01/29
+'고객용일경우 종합계좌별은 계좌를 선택할 수 없는데다 하나의 종합계좌만 보여줘
+'보유전계좌, 종합계좌별 옵션을 보이지 않게 하고 보유전계좌로 고정해서 send
+
+Call Check_LoginType(zPwd)
+
+tab_mainHangmok.ID = 0
+
+
+If SYSTEM.ConnectBy = 1 Or Trim(LOGIN.User) = "asset1" Then '직원용, 에셋플러스자산운용사
+	AN99.Visible False
+	AN00.VIsible True
+
+	LABEL0.Visible = True
+	ACNM.Visible = True
+	LABEL1.Visible = True
+	zPwd.Visible = True
+
+	optionBox.Visible = True
+
+	If Trim(LOGIN.User) = "asset1" Then '에셋플러스자산운용사
+		allAccn.Checked =False
+		allAccn.Enable = False
+		totalAccn.Checked = True
+	End If
+
+
+	allAccn.Visible = True
+	totalAccn.Visible = True
+
+	LABEL3.SetRect 192, 57, 242, 77			'조회일자 라벨
+	trdDt.SetRect 243, 57, 333, 77			'조회일자
+	PANEL0.SetRect 1, 29, 670, 80			'조회부분 판넬
+	PANEL1.SetRect -2, 82, 672, 622			'그리드부분 판넬
+	tab_subHangmok.SetRect 6, 90, 664, 116	'잔고요약현황 부분 탭
+	tab_subSubHangmok.SetRect 5, 117, 663, 143	'주식 부분 탭
+	obj0.SetRect 6, 115, 664, 449			' 그리드오브젝트
+	BTN_MD.SetRect 586, 119, 624, 139		'매도버튼
+	BTN_MS.SetRect 625, 119, 663, 139		'매수버튼
+
+Else 		'고객용
+	AN99.Visible False				'고객용 종합계좌
+	AN00.VIsible False				'직원용 전체계좌
+
+	LABEL0.Visible = False			'계좌번호 라벨
+	ACNM.Visible = False			'계좌명
+	LABEL1.Visible = False			'비밀번호 라벨
+	zPwd.Visible = False			'비밀번호
+
+	optionBox.Visible = False		'옵션을 둘러싸고 있는 박스
+	allAccn.Visible = False			'보유전계좌 라디오버튼
+	totalAccn.Visible = False		'종합계좌별 라디오버튼
+
+	LABEL3.SetRect 7, 35, 57, 55			'조회일자 라벨
+	trdDt.SetRect 58, 35, 148, 55			'조회일자
+	PANEL0.SetRect 1, 29, 670, 60			'조회부분 판넬
+	PANEL1.SetRect -2, 62, 672, 622			'그리드부분 판넬
+	tab_subHangmok.SetRect 6, 70, 664, 96	'잔고요약현황 부분 탭
+	tab_subSubHangmok.SetRect 5, 97, 663, 123	'주식 부분 탭
+	obj0.SetRect 6, 95, 664, 450			' 그리드오브젝트
+	BTN_MD.SetRect 586, 100, 624, 120		'매도버튼
+	BTN_MS.SetRect 625, 100, 663, 120		'매수버튼
+End If
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+SCREEN.OnSend False
+
+_AW_ONENDSUB_AW_
+_AW_ONTIMER_AW_
+If SYSTEM.ConnectBy = 0 Then
+	If Len(Trim(AN99.Data)) < 11 Then
+		AN00.SetFocus
+		Exit Sub
+	End If
+ElseIf SYSTEM.ConnectBy = 1 Then
+	If Len(Trim(AN00.Data)) < 11 Then
+		AN00.SetFocus
+		Exit Sub
+	End If
+
+	If Len(Trim(zPwd.Data)) < 4 Then
+		zPwd.SetFocus
+		Exit Sub
+	End If
+End If
+
+If tab_subHangmok.ID = 0 Then
+	SCREEN.Proc "obj0.send_f", ""
+Else
+	SCREEN.Proc "obj0.obj0.send_f", ""
+End If
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(AN00)
+_AW_ONCHANGE_AW_
+Call Set_account()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(zPwd)
+_AW_ONKEYCHANGE_AW_
+If SCREEN.Key = "13" Then
+	SCREEN.Proc "obj0.send_f", ""
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(send_btn)
+_AW_ONCLICK_AW_
+SCREEN.Proc "obj0.send_f", ""
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(next_btn)
+_AW_ONCLICK_AW_
+If tab_subHangmok.ID = 0 Then
+	SCREEN.Proc "obj0.send_c", ""
+ElseIf tab_subHangmok.ID = 1 Then
+	SCREEN.Proc "obj0.obj0.send_c", ""
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(tab_mainHangmok)
+_AW_ONCLICK_AW_
+Call tab_mainChange()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON1)
+_AW_ONCLICK_AW_
+Dim gridNm
+
+If tab_subHangmok.ID = 0 Then
+	gridNm = "obj0.BalstGrid"
+Else
+	gridNm = "obj0.SecDtlGrid"
+End If
+
+'If SCREEN.Object(gridNm).Rows < 1 Then
+'	MsgBox "조회 후 사용하십시오.", , "IBK투자증권"
+'	Exit Sub
+'End If
+
+SCREEN.Object(gridNm).Excel True, True, "IB170900"
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(AN99)
+_AW_ONCHANGE_AW_
+Call Set_account()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(totalAccn)
+_AW_ONCLICK_AW_
+Call send_f()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(allAccn)
+_AW_ONCLICK_AW_
+Call send_f()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(tab_subHangmok)
+_AW_ONCLICK_AW_
+GUIDE.Text = ""
+
+Call tabSelect()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(tab_subSubHangmok)
+_AW_ONCLICK_AW_
+Call send_f()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BTN_MD)
+_AW_ONCLICK_AW_
+'SCREEN.CreateWindow 1, "IB101100 /t/s/p5", "1301" & vbTab & _
+'	S1301.Data & vbLf
+
+SCREEN.CreateWindow 1, "IB101100 /t/S/p5/d", "1301" & vbTab & _
+	S1301.Data & vbLf & "ed_jqty" & vbTab & ed_jqty.Data & vbLf
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BTN_MS)
+_AW_ONCLICK_AW_
+'SCREEN.CreateWindow 1, "IB101200 /t/s/p5", "1301" & vbTab & _
+'	S1301.Data & vbLf
+
+SCREEN.CreateWindow 1, "IB101200 /t/S/p5/d", "1301" & vbTab & _
+	S1301.Data & vbLf & "ed_jqty" & vbTab & ed_jqty.Data & vbLf
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BTN_FO_MD)
+_AW_ONCLICK_AW_
+'SCREEN.CreateWindow 1, "IB101100 /t/s/p5", "1301" & vbTab & _
+'	S1301.Data & vbLf
+
+SCREEN.CreateWindow 1, "IB301100 /t/S/p5/d", "ed_focod" & vbTab & _
+	ed_focod.Data & vbLf & "ed_jqty" & vbTab & ed_jqty.Data & vbLf
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BTN_FO_MS)
+_AW_ONCLICK_AW_
+'SCREEN.CreateWindow 1, "IB101200 /t/s/p5", "1301" & vbTab & _
+'	S1301.Data & vbLf
+
+SCREEN.CreateWindow 1, "IB301200 /t/S/p5/d", "ed_focod" & vbTab & _
+	ed_focod.Data & vbLf & "ed_jqty" & vbTab & ed_jqty.Data & vbLf
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(trdDt)
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

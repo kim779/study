@@ -1,0 +1,289 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB22002R)
+MAPSIZE(170, 555)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("일중추이차트")
+MAPPUBLIC(";")
+FONT("굴림", 9, NORMAL)
+OPTIONS(FLASH)
+TITLE("[22002R]일중추이차트")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pibg2952")
+MAPTYPE(NORM)
+HEADER(NOP)
+HELPFILE("IB295225")
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL0(490, 0, 563, 170)        COLOR(192, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  upcd(535, 431, 593, 453)  LEN(1)  IO_NUM|EDIT_INPUT|FA_SEND|FA_WRAP|SA_ALL    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(1)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+CONTROL  chart1(0, 0, 490, 170)  |FA_PROTECT  "C_UserGrp"  "/i5130023300000003010000000000000000002000000000011100335546872020000001110050266112202000000113000000000020200000"  LEN(0)  EDIT_INOUT    COLOR(192, 232)  TABORDER(2)  IOORDER(11)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  dfgb(533, 462, 593, 481)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(3)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  CHECK0(504, 14, 546, 26)  '차익'  TP_CHECK|EDIT_NOP        FONT("굴림체", 9, NORMAL)  COLOR(208, 69)  CUR(0)      TABORDER(4)  ENABLE  &
+  VISIBLE  CHECKED  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  CHECK1(504, 33, 555, 45)  '비차익'  TP_CHECK|EDIT_NOP        FONT("굴림체", 9, NORMAL)  COLOR(208, 69)  CUR(0)      TABORDER(5)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  CHECK2(504, 52, 546, 64)  '전체'  TP_CHECK|EDIT_NOP        FONT("굴림체", 9, NORMAL)  COLOR(208, 69)  CUR(0)      TABORDER(6)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  CHECK3(504, 98, 551, 110)  'KP200'  TP_CHECK|EDIT_NOP        FONT("굴림체", 9, NORMAL)  COLOR(208, 69)  CUR(0)      TABORDER(7)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  CHECK4(504, 117, 557, 129)  '거래량'  TP_CHECK|EDIT_NOP        FONT("굴림체", 9, NORMAL)  COLOR(208, 69)  CUR(0)      TABORDER(8)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  CHECK5(504, 135, 552, 147)  'BASIS'  TP_CHECK|EDIT_NOP        FONT("굴림체", 9, NORMAL)  COLOR(208, 69)  CUR(0)      TABORDER(9)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  chaik(245, 346, 268, 365)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("1")          TABORDER(10)  IOORDER(5)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  bichaik(246, 373, 269, 392)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("0")          TABORDER(11)  IOORDER(6)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  total(246, 401, 269, 420)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("0")          TABORDER(12)  IOORDER(7)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  KP(249, 422, 272, 441)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("0")          TABORDER(13)  IOORDER(8)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  vol(253, 452, 276, 471)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("0")          TABORDER(14)  IOORDER(9)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  basis(264, 480, 287, 499)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("0")          TABORDER(15)  IOORDER(10)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  jgga(534, 546, 570, 565)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(16)  IOORDER(4)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  vggb(545, 502, 581, 521)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(17)  IOORDER(3)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONINDECLARE_AW_
+#load "IB888888"
+
+_AW_ONENDSUB_AW_
+_AW_ONSTART_AW_
+Dim cha, bicha, Tot, KP200, vo, bs
+
+If SCREEN.CreateObject("info") Then
+	cha = Trim(INFO.popdata(LOGIN.name, "userconf.ini", "IB22002R", "IB22002R_chaik"))
+	bicha = Trim(INFO.popdata(LOGIN.name, "userconf.ini", "IB22002R", "IB22002R_bichaik"))
+	tot = Trim(INFO.popdata(LOGIN.name, "userconf.ini", "IB22002R", "IB22002R_total"))
+	KP200 = Trim(INFO.popdata(LOGIN.name, "userconf.ini", "IB22002R", "IB22002R_kp"))
+	vo = Trim(INFO.popdata(LOGIN.name, "userconf.ini", "IB22002R", "IB22002R_vol"))
+	bs = Trim(INFO.popdata(LOGIN.name, "userconf.ini", "IB22002R", "IB22002R_basis"))
+
+	chaik.Data = cha
+	bichaik.Data = bicha
+	total.Data = Tot
+	KP.Data = KP200
+	vol.Data = vo
+	basis.Data = bs
+End If
+
+If chaik.Data = "1" Then
+	CHECK0.checked = True
+Else
+	CHECK0.checked = False
+End If
+
+If bichaik.Data = "1" Then
+	CHECK1.checked = True
+Else
+	CHECK1.checked = False
+End If
+
+If total.Data = "1" Then
+	CHECK2.checked = True
+Else
+	CHECK2.checked = False
+End If
+
+If KP.Data = "1" Then
+	CHECK3.checked = True
+Else
+	CHECK3.checked = False
+End If
+
+If vol.Data = "1" Then
+	CHECK4.checked = True
+Else
+	CHECK4.checked = False
+End If
+
+If basis.Data = "1" Then
+	CHECK5.checked = True
+Else
+	CHECK5.checked = False
+End If
+
+'2009.07.13 아무것도 선택하지 않았을 경우 전체차트 보여줌.
+If chaik.Data = "0" And bichaik.Data = "0" And total.Data = "0" And KP.Data = "0" And vol.Data = "0" And basis.Data = "0" Then
+   CHECK0.Checked = True
+   CHECK1.Checked = True
+   CHECK2.Checked = True
+   CHECK3.Checked = True
+   CHECK4.Checked = True
+   CHECK5.Checked = True
+End If
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+SCREEN.OnSend = False
+Dim ii
+ii = 0
+
+If CHECK0.Checked = True Then
+	ii = ii +1
+	chaik.Data = "1"
+Else
+	chaik.Data = "0"
+End If
+
+If CHECK1.Checked = True Then
+	ii = ii +1
+	bichaik.Data = "1"
+Else
+	bichaik.Data = "0"
+End If
+
+If CHECK2.Checked = True Then
+	ii = ii +1
+	total.Data = "1"
+Else
+	total.Data = "0"
+End If
+
+
+If ii < 1 Then
+	SCREEN.OnSend = False
+	chart1.Clear
+Else
+	SCREEN.OnSend = True
+End If
+
+upcd.Data = SCREEN.Object("parent.upgb").data
+vggb.Data = SCREEN.Object("parent.vggb").data
+dfgb.Data = SCREEN.Object("parent.dfgb").data
+jgga.Data = SCREEN.Object("parent.jgga").data
+
+_AW_ONENDSUB_AW_
+_AW_ONCLOSE_AW_
+Dim cha, bicha, Tot, KP200, vo, bs
+
+If CHECK0.Checked = True Then
+	cha = "1"
+Else
+	cha = "0"
+End If
+
+If CHECK1.Checked = True Then
+	bicha = "1"
+Else
+	bicha = "0"
+End If
+
+If CHECK2.Checked = True Then
+	Tot = "1"
+Else
+	Tot = "0"
+End If
+
+If CHECK3.Checked = True Then
+	KP200 = "1"
+Else
+	KP200 = "0"
+End If
+
+If CHECK4.Checked = True Then
+	vo = "1"
+Else
+	vo = "0"
+End If
+
+If CHECK5.Checked = True Then
+	bs = "1"
+Else
+	bs = "0"
+End If
+
+If SCREEN.CreateObject("info") Then
+	INFO.pushdata LOGIN.Name, "userconf.ini", "IB22002R", "IB22002R_chaik", cha
+	INFO.pushdata LOGIN.Name, "userconf.ini", "IB22002R", "IB22002R_bichaik", bicha
+	INFO.pushdata LOGIN.Name, "userconf.ini", "IB22002R", "IB22002R_total", Tot
+	INFO.pushdata LOGIN.Name, "userconf.ini", "IB22002R", "IB22002R_kp", KP200
+	INFO.pushdata LOGIN.Name, "userconf.ini", "IB22002R", "IB22002R_vol", vo
+	INFO.pushdata LOGIN.Name, "userconf.ini", "IB22002R", "IB22002R_basis", bs
+End If
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(CHECK0)
+_AW_ONCLICK_AW_
+'If CHECK0.Checked = True Then
+'	CHECK1.checked = False
+'	CHECK2.checked = False
+'End If
+
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(CHECK1)
+_AW_ONCLICK_AW_
+'If CHECK1.Checked = True Then
+'	CHECK0.checked = False
+'	CHECK2.checked = False
+'End If
+
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(CHECK2)
+_AW_ONCLICK_AW_
+'If CHECK2.Checked = True Then
+'	CHECK0.checked = False
+'	CHECK1.checked = False
+'End If
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(CHECK3)
+_AW_ONCLICK_AW_
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(CHECK4)
+_AW_ONCLICK_AW_
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(CHECK5)
+_AW_ONCLICK_AW_
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

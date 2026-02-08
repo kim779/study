@@ -1,0 +1,220 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB999923)
+MAPSIZE(860, 994)
+VERSION(000)
+MAPKIND(PROCEDURES)
+MAPGROUP(0)
+MAPDESC("선옵obj main공통함�")
+MAPPUBLIC(";")
+FONT("굴림", 9, NORMAL)
+TITLE("선옵주문obj포함 main공통함수")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+'== 선물옵션주문obj를포함한 main의 공통함수
+
+'********************************************************************
+Sub Order_mini_change()
+	Dim xval
+
+	xval = SCREEN.Object("OBJ_order.tab_order").ID
+	Select Case xval
+	Case "1" : SCREEN.SetCaption "IB301100" &vbTab& "[3011] 매도"
+	Case "2" : SCREEN.SetCaption "IB301200" &vbTab& "[3012] 매수"
+	Case "3" : SCREEN.SetCaption "IB301300" &vbTab& "[3013] 정정"
+	Case "4" : SCREEN.SetCaption "IB301400" &vbTab& "[3014] 취소"
+	End Select
+
+	'-- CreatWindow로 미니주문 open시
+	'   domino_data = "종목코드 | 주문번호 | 주문가격 | 주문수량 |"
+	domino_data.data = SYSTEM.Pop("domino_data")
+	If Trim(domino_data.Data) = "" Then
+		Exit Sub
+	End If
+
+	SCREEN.SetTimer 2, True
+
+End Sub
+
+Sub Set_mini_domino(xval)
+	Dim sdata
+	domino_data.data = SYSTEM.Pop("domino_data")
+	If Trim(domino_data.Data) = "" Then
+		Exit Sub
+	End If
+	sdata = Split(domino_data.Data,"|")
+SCREEN.IgnoreChange True
+
+	SYSTEM.Push "F_ogno", sdata(1)
+	SYSTEM.Push "F_jprc", sdata(2)
+	SYSTEM.Push "F_jqty", sdata(3)
+	SYSTEM.Push "F_code", sdata(0)
+
+	SCREEN.Object("OBJ_order.obj_odr.ed_focod").Data = SYSTEM.Pop("F_code")
+	SCREEN.Proc "OBJ_order.obj_odr.ChangeCode", ""
+	SCREEN.Object("OBJ_order.obj_odr.ed_ogno").Data = SYSTEM.Pop("F_ogno")
+	If xval = 3 Then	'-- 정정인 경우
+		SCREEN.Object("OBJ_order.obj_odr.ed_jprc").Data = SYSTEM.Pop("F_jprc")
+	End If
+
+	If SCREEN.Object("OBJ_order.obj_odr.ed_jqty").Enable Then
+		SCREEN.Object("OBJ_order.obj_odr.ed_jqty").Data = SYSTEM.Pop("F_jqty")
+	End If
+
+	SYSTEM.Push "F_ogno", ""
+	SYSTEM.Push "F_jprc", ""
+	SYSTEM.Push "F_jqty", ""
+	SYSTEM.Push "F_code", ""
+
+SCREEN.IgnoreChange False
+	domino_data.Clear
+	SYSTEM.Push "domino_data", ""
+
+	SCREEN.Object("OBJ_order.obj_odr.ed_jqty").SetFocus
+End Sub
+
+
+'********************************************************************
+' desc : 미니주문 오픈시 해당 주문obj로 설정
+'        1:매도, 2:매수, 3:정정, 4:취소
+Sub Set_mini_order(xval)
+	Dim	sdata
+	If xval < 1 Or xval > 4 Then Exit Sub
+
+'	SCREEN.Object("OBJ_order.tab_order").id = xval
+'	Select Case xval
+'	Case 1 : SCREEN.Object("OBJ_order.obj_odr").SetObject "IB300150"
+'	Case 2 : SCREEN.Object("OBJ_order.obj_odr").SetObject "IB300160"
+'	Case 3 : SCREEN.Object("OBJ_order.obj_odr").SetObject "IB300170"
+'	Case 4 : SCREEN.Object("OBJ_order.obj_odr").SetObject "IB300180"
+'	End Select
+
+	'-- CreatWindow로 미니주문 open시
+	'   domino_data = "종목코드 | 주문번호 | 주문가격 | 주문수량 |"
+	If Trim(domino_data.Data) = "" Then
+		Exit Sub
+	End If
+
+	sdata = Split(domino_data.Data,"|")
+SCREEN.IgnoreChange True
+	SCREEN.Object("OBJ_order.obj_odr.ed_focod").Data = sdata(0)
+	SCREEN.Proc "OBJ_order.obj_odr.ChangeCode", ""
+	SCREEN.Object("OBJ_order.obj_odr.ed_ogno").Data = sdata(1)
+	If xval = 3 Then	'-- 정정인 경우
+		SCREEN.Object("OBJ_order.obj_odr.ed_jprc").Data = sdata(2)
+	End If
+	SCREEN.Object("OBJ_order.obj_odr.ed_jqty").Data = sdata(3)
+	SYSTEM.Push "F_ogno", sdata(1)
+'	SYSTEM.Push "F_jprc", sdata(2)
+
+SCREEN.IgnoreChange False
+End Sub
+
+
+'********************************************************************
+' desc : 메시지를 가이드로 출력
+Sub	Set_guide(msgx)
+	guide.Text = msgx
+End Sub
+
+'********************************************************************
+' desc : 시세OBJ의 종목코드 변경시 주문OBJ코드 변경
+Sub Ord_ChangeCode(code)
+	SCREEN.Object("OBJ_order.obj_odr.ed_focod").Data = code
+	SCREEN.Proc "OBJ_order.obj_odr.ChangeCode", ""
+End Sub
+
+Sub tab_info_change()
+	Dim obj_name, fogb, mapid
+
+	Select Case Left(SCREEN.Object("main.ed_focod").Data, 1)
+	Case "1", "4", "A", "D" : fogb = 0	'-- 선물
+	Case "2", "3", "B", "C" : fogb = 1	'-- 옵션
+	Case Else : fogb = 0
+	End Select
+
+	mapid = Left(SCREEN.GetMapName(1), 6)
+	Select Case mapid
+	Case "IB2200"
+		Select Case SCREEN.Object("main.tab_info").ID
+		Case 1 : obj_name = "21"
+		Case 2 : obj_name = 22 + fogb
+		Case 3 : obj_name = 24 + fogb
+		Case 4 : obj_name = "26"
+		Case 5 : obj_name = "27"
+		Case 6 : obj_name = "28"
+		Case 7 : obj_name = 29 + fogb
+		Case 8 : obj_name = "2H"  'CYH추가
+		Case Else : Exit Sub
+		End Select
+	Case "IB3001"
+		Select Case SCREEN.Object("main.tab_info").ID
+		Case 1 : obj_name = 21 + fogb
+		Case 2 : obj_name = "23"
+		Case 3 : obj_name = 25 + fogb
+		Case Else : Exit Sub
+		End Select
+	Case "IB3300"
+		Select Case SCREEN.Object("main.tab_info").ID
+		Case 1 : obj_name = 41 + fogb
+		Case 2 : obj_name = 43 + fogb
+		Case 3 : obj_name = "45"
+		Case 4 : obj_name = "46"
+		Case Else : Exit Sub
+		End Select
+	Case Else
+		Exit Sub
+	End Select
+
+	obj_name = mapid & obj_name
+	OBJ_info.SetObject(obj_name)
+	If mapid = "IB2200" Then
+		Select Case tab_info.id
+		Case 2,3,7,8   'CYH추가 (CASE 8)
+			OBJ_info.Send
+		Case Else
+		End Select
+	Else
+		OBJ_info.Send
+	End If
+
+	SCREEN.Proc "OBJ_order.OBJ_odr.hoga_unit", Trim(SCREEN.Object("main.ed_focod").Data)
+
+End Sub
+
+'********************************************************************
+' desc : 아래하단 계좌 탭 send 여부
+Sub OBJ_account_send()
+	Dim accn, pswd, objn
+
+	Select Case SCREEN.GetMapName(1)
+	Case "IB300100", "IB302000", "IB220000", "IB330000", "IB304100", "IB304200"
+		OBJ_account.send
+	Case Else
+	End Select
+
+End Sub
+
+}
+
+
+

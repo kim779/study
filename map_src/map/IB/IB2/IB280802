@@ -1,0 +1,62 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB280802)
+MAPSIZE(72, 125)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("현재자산가치계산")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+TITLE("[2808]현재자산가치")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("bo280802")
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+EDIT  cod2(9, 6, 102, 25)  LEN(6)  IO_NUM|EDIT_INPUT    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(1)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  curr(10, 30, 88, 49)  LEN(9)  IO_NUM|AL_RIGHT||FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_CORAW  FONT("굴림", 9, NORMAL)    COLOR(68, 69)  CUR(0)            TABORDER(0)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONSEND_AW_
+cod2.Data = SCREEN.Object("main.1301").data
+
+SCREEN.OnSend = False
+If Trim(cod2.data) = "" Then
+	cod2.Clear
+	SCREEN.ClearAll 0, 0
+	Exit Sub
+End If
+'If cod2.Data < 500000 Then
+If SCREEN.GetCodeType(cod2.Data) <> 9 Then
+	cod2.Clear
+	Exit Sub
+End If
+
+SCREEN.OnSend = True
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+SCREEN.Object("parent.Ijisu").data = curr.Data
+
+_AW_ONENDSUB_AW_
+}
+
+
+

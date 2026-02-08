@@ -1,0 +1,96 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB100138)
+MAPSIZE(20, 420)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(FMS)
+TITLE("[100138]")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pooppoop")
+MAPTYPE(NORM)
+HEADER(NOP)
+BGROUND(BRUSH, 66)
+}
+
+
+
+FORM DIVISION
+{
+
+BUTTON  BUTTON0(117, 0, 136, 20)  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(15, 63)  CUR(0)    "검색.BMP"    TABORDER(1)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+EDIT  1301(51, 0, 116, 20)  LEN(6)  IO_MIXED|EDIT_INOUT|FA_WRAP|FA_HAN|CODE      COLOR(99, 130)  CUR(0)  TP_SUNKEN          TABORDER(2)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+CONTROL  17413(135, 0, 268, 20)    "CX_Symbol"  "/a89/b91/c92/d69"  LEN(0)  EDIT_OUTPUT  FONT("굴림체", 9, NORMAL)    COLOR(90, 130)  TABORDER(0)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL0(0, 0, 50, 20)  '종목코드'  AL_LEFT  CUR(0)      COLOR(66, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  2023(342, 0, 406, 20)  LEN(10)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_ZERO|SA_COSUP    COLOR(192, 69)  CUR(0)  LINECOLOR(75)          IFRGB(94, 95)  TABORDER(0)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL6(290, 0, 340, 20)  '매수가격'  AL_LEFT  CUR(0)      COLOR(66, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_SCRIPT_AW_(BUTTON0)
+_AW_ONCLICK_AW_
+Dim retn
+retn = SCREEN.GetCode(100, "1301", "hnam", 0 )
+If retn <> True Then
+      Exit Sub
+End If
+
+SCREEN.Send 0
+'SCREEN.Proc "parent.send_sise", "sise" & "," & S1301.Data
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(1301)
+_AW_ONCHANGE_AW_
+If Trim(S1301.Data) = "000000" Then
+		Exit Sub
+	End If
+S1301.Trigger "",True
+'S1301.Trigger "", False
+
+SCREEN.object("parent.dAcntMgnRat").Clear
+SCREEN.object("parent.dIsuMgnRat").Clear
+SCREEN.object("parent.dTrdMgnrt").Clear
+SCREEN.object("parent.IDps").Clear
+SCREEN.object("parent.IMnyMgn").Clear
+SCREEN.object("parent.IMnyOrdAbleAmt").Clear
+SCREEN.object("parent.ISubstAmt").Clear
+SCREEN.object("parent.ISubstMgn").Clear
+SCREEN.object("parent.ISubstOrdAbleAmt").Clear
+SCREEN.object("parent.IMgnRat30pctOrdAbleAmt").Clear
+SCREEN.object("parent.IMgnRat50pctOrdAbleAmt").Clear
+SCREEN.object("parent.IMgnRat100pctOrdAbleAmt").Clear
+SCREEN.object("parent.IMgnRat30OrdAbleQty").Clear
+SCREEN.object("parent.IMgnRat50OrdAbleQty").Clear
+SCREEN.object("parent.IMgnRat100OrdAbleQty").Clear
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(2023)
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

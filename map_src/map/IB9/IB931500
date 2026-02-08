@@ -1,0 +1,586 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB931500)
+MAPSIZE(394, 975)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("굴림", 9, NORMAL)
+TITLE("펀드그룹계좌편집")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL63(0, 0, 320, 395)  LIMAGE(0)  LINEW(3)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL0(325, 0, 710, 395)  LIMAGE(0)  LINEW(3)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL1(750, 0, 975, 395)  LIMAGE(0)  LINEW(3)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL_bg(0, 0, 320, 30)  '그룹목록'  LIMAGE(1)  LINEW(3)  LINETYPE(4)  LINECOLOR(64)      COLOR(66, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL2(325, 0, 710, 30)  '그룹계좌'  LIMAGE(1)  LINEW(3)  LINETYPE(4)  LINECOLOR(64)      COLOR(66, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL3(749, 0, 974, 30)  '미등록계좌'  LIMAGE(1)  LINEW(3)  LINETYPE(4)  LINECOLOR(64)      COLOR(66, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL5(708, 0, 750, 395)  LINECOLOR(64)      COLOR(64, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  accn_dell(712, 180, 747, 200)  '▶'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("MS Sans Serif", 9, BOLD)  FOCUS  COLOR(208, 186)  CUR(10)    "2BTN.BMP"    TABORDER(1)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_STRING)  HELPTEXT("계좌제거")HELPTEXT("계좌제거")
+BUTTON  accn_add(712, 210, 747, 230)  '◀'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("MS Sans Serif", 9, BOLD)  FOCUS  COLOR(208, 186)  CUR(10)    "2BTN.BMP"    TABORDER(2)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_STRING)  HELPTEXT("계좌추가")HELPTEXT("계좌추가")
+GRID  gr_gp_list(5, 60, 315, 385)  VISIBLEROW(0)  CELLH(18)  MATRIX(500, 3)  FIX(0)  MAINCOLOR(208, 232)  LINECOLOR(75)  FOCUSCOLOR(78)  FOCUSKIND(4)  ROWC(68, 77)  |SELALWAYS|VSCROLL|NO3D|RROW|XHLINE|PAGE|GRFTEXT    &
+	COLINFO("번호")  LEN(20)  WIDTH(76)  HEAD("번호")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HBUTTON  HBUTTONIMG("")    &
+	COLINFO("그룹명")  LEN(40)  WIDTH(217)  HEAD("그룹명")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("그룹번호")  LEN(20)  WIDTH(100)  HEAD("그룹번호")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    TABORDER(3)  IOORDER(1)  ENABLE  &
+  VISIBLE
+
+GRID  gr_gp_accn(335, 60, 705, 385)  VISIBLEROW(0)  CELLH(18)  MATRIX(500, 7)  FIX(0)  MAINCOLOR(208, 232)  LINECOLOR(75)  FOCUSCOLOR(78)  FOCUSKIND(4)  ROWC(68, 77)  |SELALWAYS|VSCROLL|INS_TOP|NO3D|RROW|XHLINE|PAGE|GRFTEXT    &
+	COLINFO("col2")  LEN(20)  WIDTH(124)  HEAD("그룹번호")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("col3")  LEN(40)  WIDTH(92)  HEAD("그룹명")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("col4")  LEN(20)  WIDTH(88)  HEAD("계좌번호")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_CORGB|SA_CORAW    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  EDITFORMAT("999-99-999999")    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("col5")  LEN(40)  WIDTH(89)  HEAD("계좌명")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT  |FA_CORGB|SA_CORAW    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(69, 69)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("col6")  LEN(8)  WIDTH(56)  HEAD("비밀번호")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_INPUT  |FA_PASSWD|FA_CORGB|SA_CORAW    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_HIMGTEXT  COLUMN_VISIBLE  INORMAL  IFRGB(69, 69)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("col7")  LEN(17)  WIDTH(60)  HEAD("비율")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_INPUT  |FA_ZEROSUP|FA_ENUM|SA_SPACE    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_HIMGTEXT  COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("col8")  LEN(17)  WIDTH(60)  HEAD("배수")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_INPUT  |FA_ZEROSUP|FA_ENUM|SA_SPACE    COLOR(192, 69)  COLCUR(0, 0)    COLUMN_HIMGTEXT  COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    TABORDER(4)  IOORDER(2)  ENABLE  &
+  VISIBLE
+
+GRID  gr_accn_list(755, 60, 965, 385)  VISIBLEROW(0)  CELLH(18)  MATRIX(500, 2)  FIX(0)  MAINCOLOR(208, 232)  LINECOLOR(75)  FOCUSCOLOR(78)  FOCUSKIND(4)  ROWC(68, 77)  |SELALWAYS|VSCROLL|NO3D|RROW|XHLINE|PAGE|GRFTEXT    &
+	COLINFO("col2")  LEN(20)  WIDTH(100)  HEAD("계좌번호")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  EDITFORMAT("999-99-999999")    HBUTTON  HBUTTONIMG("")    &
+	COLINFO("col3")  LEN(40)  WIDTH(94)  HEAD("계좌명")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    TABORDER(5)  IOORDER(3)  ENABLE  &
+  VISIBLE
+
+LABEL  LABEL1(335, 35, 380, 55)  '그룹명'  AL_LEFT  CUR(0)      COLOR(181, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  ed_gp_name(375, 35, 480, 55)  LEN(20)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_SUNKEN          TABORDER(6)  IOORDER(4)  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  group_dell(67, 35, 123, 55)  '그룹삭제'  TP_PUSH|IMAGETEXT|AL_STRETCH        FOCUS  COLOR(208, 186)  CUR(0)    "4BTN.BMP"    TABORDER(7)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+OBJECT  obj1(0, 530, 515, 780)    "IB931502"  TABORDER(8)  IOORDER(5)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  obj4(965, 410, 1195, 580)    "IB931508"  TABORDER(9)  IOORDER(6)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  obj3(975, 0, 1355, 350)    "IB931501"  TABORDER(10)  IOORDER(7)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  obj5(5, 420, 110, 525)    "IB931505"  TABORDER(11)  IOORDER(8)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  obj2(525, 450, 955, 780)    "IB931503"  TABORDER(12)  IOORDER(9)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON0(5, 35, 61, 55)  '새 그룹'  TP_PUSH|IMAGETEXT|AL_STRETCH        FOCUS  COLOR(208, 186)  CUR(0)    "4BTN.BMP"    TABORDER(13)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+BUTTON  BUTTON1(495, 35, 551, 55)  '그룹저장'  TP_PUSH|IMAGETEXT|AL_STRETCH        FOCUS  COLOR(208, 186)  CUR(0)    "4BTN.BMP"    TABORDER(14)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+BUTTON  BUTTON2(755, 35, 855, 55)  '보유계좌조회'  TP_PUSH|IMAGETEXT|AL_STRETCH        FOCUS  COLOR(208, 186)  CUR(0)    "6BTN.BMP"    TABORDER(15)  ENABLE  &
+  IMAGETEXT  HINTTYPE(IH_NONE)
+BUTTON  BUTTON3(190, 35, 246, 55)  '조회'  TP_PUSH|IMAGETEXT|AL_STRETCH        FOCUS  COLOR(208, 186)  CUR(0)    "4BTN.BMP"    TABORDER(16)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+BUTTON  BUTTON4(128, 35, 184, 55)  '이름변경'  TP_PUSH|IMAGETEXT|AL_STRETCH        FOCUS  COLOR(208, 186)  CUR(0)    "4BTN.BMP"    TABORDER(17)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+BUTTON  BUTTON5(250, 35, 315, 55)  '제한종목'  TP_PUSH|IMAGETEXT|AL_STRETCH        FOCUS  COLOR(208, 186)  CUR(0)    "4BTN.BMP"    TABORDER(18)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+PANEL  PANEL4(320, 0, 325, 395)  LINECOLOR(64)      COLOR(64, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  ed_gp_num(265, 425, 385, 444)  LEN(40)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(19)  IOORDER(10)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Function ggd( obj, row, col )
+	ggd = Trim(SCREEN.Object(obj).GetGridCell(row,col))
+End Function
+
+Sub get_gp_list()
+'	SYSTEM.Trace("get_gp_list")
+
+	gr_gp_list.Clear
+	gr_gp_accn.Clear
+	gr_accn_list.Clear
+
+	SCREEN.Object("obj2.GRID0").Clear ' 그룹 계좌리스트 초기화
+
+	obj1.Send
+End Sub
+
+Sub gp_select( row ) ' 그룹이 선택 되었을 때
+
+Dim gp_num, num, idx, temp
+
+'gr_gp_accn.Clear
+
+gp_num = Trim(gr_gp_list.GetGridCell( row, 3 )) ' 그룹번호
+If Len(gp_num) = 0 Then ' 그룹번호가 없으면 새그룹 일 경우
+	Exit Sub
+End If
+
+gr_gp_accn.Clear
+
+ed_gp_num.Data = gp_num
+ed_gp_name.Data = gr_gp_list.GetGridCell( row, 2 ) '
+idx = 1
+
+For i = 1 To SCREEN.Object("obj2.GRID0").Rows
+	num = ggd("obj2.GRID0",i,1)
+	If Len(num) = 0 Then
+		Exit For
+	End If
+
+	If num = gp_num Then
+		gr_gp_accn.SetGridCell idx, 1, ggd("obj2.GRID0",i,1) '그룹번호
+		gr_gp_accn.SetGridCell idx, 2, ggd("obj2.GRID0",i,2) '그룹명
+		gr_gp_accn.SetGridCell idx, 3, ggd("obj2.GRID0",i,3) '계좌번호
+		gr_gp_accn.SetGridCell idx, 4, ggd("obj2.GRID0",i,4) '계좌명
+		gr_gp_accn.SetGridCell idx, 5, ggd("obj2.GRID0",i,5) '비밀번호
+
+		temp = ggd("obj2.GRID0",i,6)
+		gr_gp_accn.SetGridCell idx, 6, FormatNumber(temp,2) '배율
+
+		temp = ggd("obj2.GRID0",i,7)
+		gr_gp_accn.SetGridCell idx, 7, FormatNumber(temp,0) '승수
+
+		idx = idx + 1
+	End If
+Next
+
+End Sub
+
+Sub gp_accn_done()
+	gp_select(1)
+
+	obj4.Send ' 보유계좌 조회
+End Sub
+
+Sub gp_list_done()
+
+Dim num, name
+
+For i = 1 To SCREEN.Object("obj1.GRID0").Rows
+
+	num = ggd("obj1.GRID0", i, 1 )
+	name = ggd("obj1.GRID0", i, 2 )
+	If Len(num) = 0 Then
+		Exit For
+	End If
+
+	gr_gp_list.SetGridCell i, 1, Right( num, 3 )
+	gr_gp_list.SetGridCell i, 2, name
+	gr_gp_list.SetGridCell i, 3, num
+Next
+
+SCREEN.Proc "obj2.query_accn", "1"
+
+End Sub
+
+Sub accn_list_done()
+
+Dim accn, name, ty, gp_accn, find, idx
+
+'SYSTEM.Trace("accn_list_done " & SCREEN.Object("obj4.GRID0").Rows)
+
+idx = 1
+For i = 1 To SCREEN.Object("obj4.GRID0").Rows
+
+	accn = ggd("obj4.GRID0", i, 1 )
+
+	If Len(accn) = 0 Then
+		Exit For
+	End If
+
+	name = ggd("obj4.GRID0", i, 2 )
+	name = Left( name, InStr(name,"|")-1 )
+
+	find = False
+
+'	SYSTEM.Trace( accn & " " & name )
+
+	For j = 1 To SCREEN.Object("obj2.GRID0").Rows ' 그룹에 들어간 계좌 제외
+		gp_accn = ggd("obj2.GRID0", j, 3 )
+		If  gp_accn = accn Then
+
+'			SYSTEM.Trace( "그룹에 들어간 계좌 " & gp_accn & " " & accn )
+
+			find = True
+		End If
+	Next
+
+	ty = Mid( accn ,4, 2 )
+	If ty <> "10" And ty <> "53" Then ' 주식이 아닌 계좌 제
+		find = True
+	End If
+
+	If find = False Then ' 전체 보유 계좌에 추가
+'		SYSTEM.Trace( "계좌 추가 " & accn  )
+		gr_accn_list.SetGridCell idx, 1, accn
+		gr_accn_list.SetGridCell idx, 2, name
+		idx = idx + 1
+	End If
+
+Next
+
+End Sub
+
+Function total_d()
+	Dim total
+
+	total = CDbl(0)
+	For i = 1 To gr_gp_accn.Rows
+		If Len( Trim( gr_gp_accn.GetGridCell(i,3) ) ) <> 0 And Len( Trim(gr_gp_accn.GetGridCell(i,6)) )<> 0 Then
+			total = CDbl(total) + CDbl(Trim(gr_gp_accn.GetGridCell(i,6)))
+		End If
+	Next
+
+	total_d = Round(total,2)
+
+End Function
+
+Sub check_pwd( accn, ret ) ' 비밀번호 검사 결과
+
+For i = 1 To gr_gp_accn.Rows
+
+	If Trim(gr_gp_accn.GetGridCell( i, 3)) = accn Then
+		If ret = "N" Then
+			MsgBox accn & " " & "비밀번호 검증 실패"
+		Else
+			MsgBox accn & " " & "비밀번호 검증 성공 "
+		End If
+
+		Exit For
+	End If
+
+Next
+
+End Sub
+
+Sub add_accn()
+
+Dim accn, name, add
+
+accn = Trim(gr_accn_list.GetGridCell( gr_accn_list.Row, 1 ))
+name = Trim(gr_accn_list.GetGridCell( gr_accn_list.Row, 2 ))
+
+If Len(accn) = 0 Then
+	Exit Sub
+End If
+
+add = True
+
+For i = 1 To gr_gp_accn.Rows
+	If Len(Trim(gr_gp_accn.GetGridCell( i, 3 ))) = 0 Then
+		Exit For
+	End If
+
+	If Trim(gr_gp_accn.GetGridCell(i,3)) = accn Then
+		add = False
+		Exit For
+	End If
+Next
+
+If add = True Then
+	gr_gp_accn.SetGridCell i, 3, accn
+	gr_gp_accn.SetGridCell i, 4, name
+	gr_gp_accn.SetGridCell i, 5, ""
+	gr_gp_accn.SetGridCell i, 6, "1.00"
+	gr_gp_accn.SetGridCell i, 7, "1"
+End If
+
+End Sub
+
+_AW_ONINDECLARE_AW_
+#LOAD IB888833
+
+_AW_ONENDSUB_AW_
+_AW_ONSTART_AW_
+IsNewGroup = False
+
+get_gp_list()
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(accn_dell)
+_AW_ONCLICK_AW_
+If Len(Trim(ed_gp_name.Data)) = 0 Then
+	Exit Sub
+End If
+
+gr_gp_accn.RemoveRow( gr_gp_accn.Row-1 )
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(accn_add)
+_AW_ONCLICK_AW_
+If Len(Trim(ed_gp_name.Data)) = 0 Then
+	Exit Sub
+End If
+
+add_accn()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(gr_gp_list)
+_AW_ONCLICK_AW_
+gp_select( gr_gp_list.Row )
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(gr_gp_accn)
+_AW_ONCLICK_AW_
+'If gr_gp_accn.Column = 6 And Len(Trim(gr_gp_accn.GetGridCell(gr_gp_accn.Row,3))) <> 0 Then
+'
+'	Dim a
+'	a = CDbl(100) - total_d
+'	a = FormatNumber(a,2)
+'
+'	gr_gp_accn.SetGridCell gr_gp_accn.Row, gr_gp_accn.Column, a
+'
+'End If
+_AW_ONENDSUB_AW_
+_AW_ONDBLCLK_AW_
+gr_gp_accn.RemoveRow( gr_gp_accn.Row-1 )
+_AW_ONENDSUB_AW_
+_AW_ONKEYCHANGE_AW_
+'SYSTEM.Trace( "OnKey " & SCREEN.Key )
+'
+'If SCREEN.Key = 13 Then
+'
+'	If gr_gp_accn.Column = 5 Then ' 비밀번호 입력시
+'		Dim accn, pwd
+'
+'		accn = Trim(gr_gp_accn.GetGridCell( gr_gp_accn.Row, 3 ))
+'		pwd = Trim(gr_gp_accn.GetGridCell( gr_gp_accn.Row, 5 ))
+'
+'		If Len( pwd ) <> 4 Then
+'			MsgBox "비밀번호가 정확하지 않습니다."
+'			Exit Sub
+'		End If
+'
+'		SCREEN.Object("obj5.accn").Data = accn
+'		SCREEN.Object("obj5.pwd").Data = pwd
+'
+'		obj5.Send
+'	ElseIf gr_gp_accn.Column = 6 Then ' 빈도 입력시
+'		If total_d > 100 Then
+'			MsgBox "전체 합이 100 이 넘었습니다"
+'			Exit Sub
+'		End If
+'
+'	End If
+'
+'End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(gr_accn_list)
+_AW_ONDBLCLK_AW_
+If Len(Trim(ed_gp_name.Data)) = 0 Then
+	Exit Sub
+End If
+
+add_accn()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(group_dell)
+_AW_ONCLICK_AW_
+Dim name, num
+
+name = Trim(ed_gp_name.Data)
+num = Trim(ed_gp_num.Data)
+
+If Len(num) = 0 Then
+	Exit Sub
+End If
+
+Dim ret
+ret = MsgBox("'" & name & "' 그룹을 삭제 하시겠습니까?", 4, "그룹삭제")
+If ret = vbYes Then
+	SCREEN.Proc "obj3.do_delete", num & "," & name
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON0)
+_AW_ONCLICK_AW_
+SYSTEM.Push "IB931506",""
+
+SCREEN.CreateWindow 2, "IB931506 /p?", ""
+
+IsNewGroup = True
+
+Dim name, num
+name = Trim(SYSTEM.Pop("IB931506"))
+
+If name = "취소됨" Then
+	Exit Sub
+End If
+
+If Len(Trim(name)) = 0 Then
+	MsgBox "그룹이름을 입력해 주십시요."
+	Exit Sub
+End If
+
+For i = 1 To gr_gp_list.Rows
+	num = Trim(gr_gp_list.GetGridCell( i, 3 ))
+	If Len(num) = 0 Then
+		gr_gp_list.SetGridCell i, 1, "새그룹"
+		gr_gp_list.SetGridCell i, 2, name
+		gr_gp_list.Index i-1
+		gr_gp_list.Row i
+		gr_gp_list.Refresh
+		Exit For
+	End If
+Next
+
+ed_gp_name.Data = name
+gr_gp_accn.Clear
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON1)
+_AW_ONCLICK_AW_
+Dim name, num
+name = Trim(ed_gp_name.Data)
+num = Trim(ed_gp_num.Data )
+
+If Len(name) = 0 Then
+	MsgBox "그룹이름을 입력해 주십시요"
+	Exit Sub
+End If
+
+'새 그룹인지 아닌지 확인
+Dim bFindGroup, gp_num, no, gp_name
+bFindGroup = True
+For i = 1 To gr_gp_list.Rows
+	gp_num = Trim(gr_gp_list.GetGridCell( i, 3 ))
+	gp_name = Trim(gr_gp_list.GetGridCell( i,2 ))
+	no = Trim(gr_gp_list.GetGridCell(i,1))
+	If Len(gp_num) = 0 And no = "새그룹" And gp_name = name Then ' 그룹번호가 없고, 번호에 '새그룹'이 들어가 있으면
+		bFindGroup = False
+		Exit For
+	End If
+Next
+
+If bFindGroup = False Then ' 그룹 추가시 현재 그룹에 있는 항목이 있는지 조사
+Dim accn, accn1
+For i = 1 To gr_gp_accn.Rows
+	accn = Trim(gr_gp_accn.GetGridCell( i, 3 ))
+	If Len(accn) = 0 Then
+	 Exit For
+	End If
+
+	For j = 1 To SCREEN.Object("obj2.GRID0").Rows
+		accn1 = ggd("obj2.GRID0",j,3)
+		If accn = accn1 Then
+			MsgBox "[" & accn & "] 계좌는 다른 그룹에 추가 되어 있습니다."
+			Exit Sub
+		End If
+	Next
+Next
+
+End If
+
+Dim ret,msg
+If bFindGroup = False Then
+	ret = MsgBox("'" & name & "' 그룹을 추가 하시겠습니까?", 4, "그룹추가")
+	If ret = vbYes Then
+'		SYSTEM.Trace(name & " " & num )
+		SCREEN.Proc "obj3.do_insert", "I, " & name & ", " & num
+	End If
+Else
+	ret = MsgBox("'" & name & "' 그룹을 수정 하시겠습니까?", 4, "그룹수정")
+	If ret = vbYes Then
+		SCREEN.Proc "obj3.do_insert", "U," & name & "," & num
+	End If
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON2)
+_AW_ONCLICK_AW_
+obj4.Send
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON3)
+_AW_ONCLICK_AW_
+get_gp_list()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON4)
+_AW_ONCLICK_AW_
+Dim num, name, ret
+
+name = Trim(ed_gp_name.Data)
+num = Trim(ed_gp_num.Data)
+
+If Len(num) = 0 Then
+	MsgBox "그룹을 선택해 주십시요"
+	Exit Sub
+End If
+
+SYSTEM.Push "IB931506",name
+
+SCREEN.CreateWindow 2, "IB931506 /p?", ""
+
+Dim newName
+newName = Trim(SYSTEM.Pop("IB931506"))
+
+If newName = "취소됨" Then
+	Exit Sub
+End If
+
+If Len(newName) = 0 Then
+	MsgBox "그룹이름을 입력해 주십시요."
+	Exit Sub
+End If
+
+If name = newName Then
+	MsgBox "그룹이름이 같습니다."
+	Exit Sub
+End If
+
+ret = MsgBox("'" & newName & "' 그룹이름을 변경 하시겠습니까?", 4, "그룹이름변경")
+If ret = vbYes Then
+	SCREEN.Proc "obj3.do_insert", "U," & newName & "," & num
+End If
+
+ed_gp_name.Data = newName
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON5)
+_AW_ONCLICK_AW_
+SCREEN.CreateWindow 2, "IB931600 /p?", ""
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

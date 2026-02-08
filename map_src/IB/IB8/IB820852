@@ -1,0 +1,71 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB820852)
+MAPSIZE(122, 234)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("±¼¸²Ã¼", 9, NORMAL)
+TITLE("[820852]StartMap")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL0(0, 0, 701, 456)  TP_RAISED      COLOR(208, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONSEND_AW_
+SCREEN.OnSend = False
+
+Dim READTYPE, link, limit
+
+If SYSTEM.ConnectBy = 0 Then
+
+	If SCREEN.CreateObject("Info") Then
+	
+	  	READTYPE = INFO.PopData("", "NOTICEMAP.ini", "MO", "READTYPE")
+	  	If READTYPE <> "0" Then
+	  		Exit Sub
+	  	End If
+	
+	  	limit = INFO.PopData("", "NOTICEMAP.ini", "MO", "TO")
+	  	If limit < Replace(Date,"-","") Then
+	  		Exit Sub
+	  	End If
+	
+	  	link = Trim(INFO.PopData("", "NOTICEMAP.ini", "MO", "url"))
+	 	If Trim(link) <> "" Then
+			If InStr(link,"HTS:") > 0 Then
+				link = Mid(link,5,8)
+				SCREEN.CreateWindow 1, link & " /t/d/p5/S", ""
+			Else
+		 		SYSTEM.Navigate link & vbTab & "1000" & vbTab & "800"
+		 	End If
+	 	End If
+	End If
+Else
+	Exit Sub
+End If
+
+_AW_ONENDSUB_AW_
+}
+
+
+

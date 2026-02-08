@@ -1,0 +1,99 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB2009T2)
+MAPSIZE(245, 502)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("일별가격흐름 차트")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(FLASH)
+TITLE("[2009T2] 일별가격흐름")
+TOPATH(AXIS)
+METHOD(SEND)
+TRXCODE("ng200920")
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+CONTROL  ctl(0, 0, 502, 243)  |FA_PROTECT  "C_UserGrp"  "/i6132003600000003020000000000000000001000000000091200000000001000000009220033554687100000000220001263225610000000"  LEN(0)  EDIT_INOUT    COLOR(192, 232)  TABORDER(1)  IOORDER(6)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  1301(40, 260, 178, 280)  LEN(12)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_HAN    COLOR(99, 69)  CUR(0)  TP_NONE          TABORDER(2)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  bday(19, 362, 98, 385)  LEN(8)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(3)  IOORDER(3)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  check(103, 364, 133, 385)  LEN(1)  IO_MIXED|AL_CENTER|    COLOR(192, 23)  CUR(0)            TABORDER(0)  IOORDER(5)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  GUBN(240, 290, 360, 309)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 130)  CUR(0)  TP_NONE          TABORDER(4)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  isreal(270, 441, 295, 460)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(5)  IOORDER(4)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Sub send()
+	SCREEN.Send 0
+End Sub
+
+Function GetToday()
+	YY = Year(Date)
+	MM = Month(Date)
+	If Len(MM) = 1 Then
+		MM = "0" & MM
+	End If
+	DD = Day(Date)
+	If Len(DD) = 1 Then
+		DD = "0" & DD
+	End If
+	GetToday = YY & MM & DD
+End Function
+
+_AW_ONSEND_AW_
+Dim dt
+
+S1301.Data = SCREEN.Object("main.1301").Data
+
+If UCase(TypeName( SCREEN.Object("main.cxMarket"))) <> "NOTHING" Then
+	If SCREEN.Object("main.cxMarket").sMarket = "KRX" Then
+		S1301.Data = SCREEN.Object("main.1301").Data
+	ElseIf SCREEN.Object("main.cxMarket").sMarket = "NXT" Then
+		S1301.Data = "N." & SCREEN.Object("main.1301").Data
+	ElseIf SCREEN.Object("main.cxMarket").sMarket = "통합" Then
+		S1301.Data = "M." & SCREEN.Object("main.1301").Data
+	End If
+End If
+
+GUBN.Data = "1"
+bday.Data = SCREEN.Object("parent.o_date").Data
+dt = gettoday()
+
+If CLng(dt) = CLng(bday.data) Then
+	isreal.Data = "1"
+Else
+	isreal.Data = "0"
+End If
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+If check.Data = "F" Then
+	ctl.Clear
+End If
+
+_AW_ONENDSUB_AW_
+}
+
+
+

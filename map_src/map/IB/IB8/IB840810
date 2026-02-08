@@ -1,0 +1,230 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB840810)
+MAPSIZE(325, 387)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("[온라인]청약종목")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(ENCODE)
+TITLE("청약종목")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("piboPBxQ")
+MAPTYPE(FIXED)
+HEADER(LEDGER)
+TRXH("31CSPBSQ003")
+BGROUND(BRUSH, 64)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL(0, 0, 392, 25)        COLOR(66, 67)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL0(3, 3, 64, 23)  '조회시작일'  AL_CENTER  CUR(0)      COLOR(66, 69)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  zQrySrtDt(70, 3, 158, 23)  LEN(8)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_DATE    COLOR(192, 232)  CUR(0)  TP_SUNKEN          EDITFORMAT("9999/99/99")  TABORDER(1)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  send_btn(353, 3, 385, 23)  '조회'  TP_PUSH|IMAGETEXT|AL_CENTER        FOCUS  COLOR(208, 69)  CUR(0)    "2BTN.BMP"    TABORDER(2)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+GRID  GRID0(0, 27, 387, 325)  VISIBLEROW(0)  CELLH(18)  MATRIX(2000, 13)  FIX(0)  MAINCOLOR(68, 232)  LINECOLOR(75)  FOCUSCOLOR(78)  FOCUSKIND(4)  ROWC(68, 77)  |MULTI|FLEXIBLE|VSCROLL|HSCROLL|GRFIX|NO3D|RROW|GRVALID|GRFTEXT    &
+	COLINFO("type")  LEN(20)  WIDTH(72)  HEAD("구분")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT  |FA_SKIP    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("zAppySrtDt")  LEN(8)  WIDTH(73)  HEAD("청약개시일")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  EDITFORMAT("9999/99/99")    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("zAppyIsuNo")  LEN(12)  WIDTH(80)  HEAD("종목번호")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(10, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("zIsuNm")  LEN(40)  WIDTH(80)  HEAD("종목명")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("dFltnPrc")  LEN(10)  WIDTH(75)  HEAD("발행가")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSIGN    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(69, 69)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col0")  LEN(3)  WIDTH(77)  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("l3GrpAppyLmtQty")  LEN(16)  WIDTH(77)  HEAD("3그룹청약한도수량")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSIGN    COLOR(68, 69)  COLCUR(0, 0)    INORMAL  IFRGB(69, 69)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("zRebatDt")  LEN(8)  WIDTH(75)  HEAD("환불일")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_WRAP    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  EDITFORMAT("9999/99/99")    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("zLstdDt")  LEN(8)  WIDTH(75)  HEAD("상장예정일")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  EDITFORMAT("9999/99/99")    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("zAppyEndDt")  LEN(8)  WIDTH(73)  HEAD("청약종료일")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  EDITFORMAT("9999/99/99")    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("zOfrPtnCode")  LEN(2)  WIDTH(77)  HEAD("모집유형코드")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("zTpNm1")  LEN(40)  WIDTH(75)  HEAD("공모구분")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("int_no")  LEN(40)  WIDTH(72)  HEAD("종목소개")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_NOP  |FA_SKIP    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_IMGTEXT  COLUMN_VISIBLE  IBUTTON  BUTTONSTR("종목소개")  BUTTONIMG("5BTN.BMP")    HNORMAL  SORTSTARTPOS(0)    TABORDER(3)  IOORDER(5)  ENABLE  &
+  VISIBLE
+
+GROUP  GROUP0(11, 412, 118, 474)  'In'        COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  In(20, 431, 65, 450)  LEN(5)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("00001")          TABORDER(4)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  in_out(12, 478, 124, 505)  LEN(13)  IO_MIXED|AL_CENTER|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(3)  ENABLE  &
+  HINTTYPE(IH_NONE)
+GROUP  GROUP1(14, 518, 115, 583)  'Out'        COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  OUTPUT0(24, 534, 46, 549)  LEN(1)  IO_NUM|AL_CENTER|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(4)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+'== 첫 조회
+Sub send_f()
+	LEDGER.Fkey = "C"
+	SCREEN.Send 0
+End Sub
+
+'== 연속 조회
+Sub send_c()
+	LEDGER.Fkey = "7"
+	GRID0.SetDataPosition(2)
+	SCREEN.Send 0
+End Sub
+
+_AW_ONINDECLARE_AW_
+#load IB888833
+
+_AW_ONENDSUB_AW_
+_AW_ONSTART_AW_
+LEDGER.Rcnt = "0008"
+
+'== 일주일 전날짜 구하기
+
+Dim yy, mm, dd, cday, MyWeek
+
+cday = DateAdd("d", -15, Date)
+MyWeek = Weekday(cday)
+If MyWeek = 1 Then
+	cday= DateAdd("d", -2 , cday)
+ElseIf MyWeek = 7 Then
+	cday= DateAdd("d", -1 , cday)
+End If
+
+yy = Year(cday)
+mm = Month(cday)
+If Len(mm) = 1 Then mm = "0"&mm
+
+dd = Day(cday)
+If Len(dd) = 1 Then dd = "0"&dd
+
+cday = yy&mm&dd
+zQrySrtDt.Data = CDbl(cday)
+
+SCREEN.Send 0
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+GRID0.Clear
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+Dim Today, i, str
+
+Today = Year(Now) & Right("0" & Month(Now), 2) & Right("0" & Day(Now), 2)
+
+For i=1 To GRID0.Rows
+
+	str = Trim(GRID0.GetGridCell (i, 3))
+	If Left(str, 1) = "A" Then
+		GRID0.SetGridCell i, 3, Mid(str, 2, Len(str))
+	End If
+
+	If Trim(GRID0.GetGridCell(i, 10)) <> "" Then
+		If CDbl(Today) > CDbl(GRID0.GetGridCell(i, 10)) Then
+			GRID0.SetGridCell i, 1, "마감"
+		Else
+			GRID0.SetGridCell i, 1, "진행중"
+		End If
+	End If
+Next
+
+
+If LEDGER.Next = "Y" Then
+	Call send_c()
+End If
+
+send_btn.SetFocus
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(zQrySrtDt)
+_AW_ONCHANGE_AW_
+If SCREEN.Key = 13 Then
+	Call send_f()
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(send_btn)
+_AW_ONCLICK_AW_
+Call send_f()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(GRID0)
+_AW_ONCLICK_AW_
+If GRID0.HitPos <> 3 Then
+	Exit Sub
+End If
+
+If GRID0.Column = 13 Then
+	SCREEN.CreateWindow 1, "IB840211 /t/s/p5/d", "zAppyIsuNo" & vbTab & GRID0.GetGridCell(GRID0.row, 3) & vbLf & "zAppySrtDt_in" & vbTab & GRID0.GetGridCell(GRID0.row, 2) & vbLf & "zLstdDt_in" & vbTab & GRID0.GetGridCell(GRID0.row, 9)
+End If
+_AW_ONENDSUB_AW_
+_AW_ONDBLCLK_AW_
+SCREEN.Object("main.obj3.next_btn").enable = False
+
+Dim str, dt, amt
+str = Trim(GRID0.GetGridcell(GRID0.row, 3))
+
+amt = Trim(GRID0.GetGridCell(GRID0.row, 5))
+SCREEN.Object("main.obj1.amt").data = amt
+
+dt = Trim(GRID0.GetGridCell(GRID0.row, 2))
+
+If Len(str) <> 6  Then
+	SCREEN.Object("main.OBJ1.chae").checked = True
+	SCREEN.Object("main.obj1.zIsuNo_chae").data = str
+	SCREEN.Object("main.obj1.chae_nm").data = Trim(GRID0.GetGridcell(GRID0.row, 4))
+	SCREEN.Proc "main.OBJ1.set_chae", ""
+	SCREEN.Object("main.obj1.objrecv").send
+	SCREEN.Object ("main.obj1.zAppySrtDt").data = dt
+Else
+	SCREEN.Object("main.OBJ1.jusik").checked = True
+	SCREEN.Object("main.obj1.zIsuNo").data = str
+	SCREEN.Proc "main.OBJ1.set_jusik", ""
+	SCREEN.Object("main.obj1.objrecv").send
+	SCREEN.Object ("main.obj1.zAppySrtDt").data = dt
+End If
+
+If Len(str) <> 6 Then
+	SCREEN.Object("main.OBJ3.chae").checked = True
+	SCREEN.Object("main.obj3.zIsuNo_chae").data = str
+	SCREEN.Object("main.obj3.chae_nm").data = Trim(GRID0.GetGridcell(GRID0.row, 4))
+	SCREEN.Object ("main.obj3.zAppySrtDt").data = dt
+	SCREEN.Proc "main.obj3.set_chae", ""
+	SCREEN.proc "main.obj3.send_f", ""
+Else
+	SCREEN.Object("main.OBJ3.jusik").checked = True
+	SCREEN.Object("main.obj3.no").data = str
+	SCREEN.Object("main.obj3.obj").send
+	SCREEN.Object ("main.obj3.zAppySrtDt").data = dt
+	SCREEN.Proc "main.obj3.set_jusik", ""
+	SCREEN.proc "main.obj3.send_f", ""
+End If
+
+SCREEN.Object("main.obj1.tjsmDn").enable = True
+_AW_ONENDSUB_AW_
+_AW_ONKEYCHANGE_AW_
+If SCREEN.Key = 13 Then
+	SCREEN.Send 0
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

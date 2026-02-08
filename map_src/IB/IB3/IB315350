@@ -1,0 +1,589 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB315350)
+MAPSIZE(234, 1033)
+VERSION(003)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("[obj] 매도주문-선옵")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(CR2TAB|INTER)
+TITLE("[315350] 매도주문 - 선물옵션")
+TOPATH(AXIS)
+METHOD(MENU)
+MAPTYPE(NORM)
+HEADER(NOP)
+BGROUND(BRUSH, 171)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL2(0, 0, 295, 234)        COLOR(171, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+GROUP  GP1(385, 368, 441, 388)  'GP1'        COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  ed_jprc(38, 50, 148, 70)  LEN(10)  IO_NUM|EDIT_INPUT|FA_COMMA|FA_RIGHT|FA_WRAP|FA_SKIP|FA_FLOAT  SPIN(1)    FONT("굴림체", 9, BOLD)    COLOR(78, 130)  CUR(0)  TP_SUNKEN  INIT("0")        FLOAT(2)    TABORDER(2)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL23(8, 28, 38, 48)  '유형'  AL_LEFT  CUR(0)      COLOR(228, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+COMBO  c_hogbs(38, 27, 148, 47)  TP_SUNKEN  LEN(2)  COUNT(4)  VCOUNT(4)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_NUM|EDIT_INPUT|FA_SKIP    COLOR(192, 130)  CUR(0)  DISPLAY("지정가", "시장가", "조건부지정가", "최유리지정가")  DATA("00", "03", "05", "06")    TABORDER(1)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL24(8, 50, 32, 70)  '가격'  AL_LEFT  CUR(0)      COLOR(228, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+PANEL  PANEL0(50, 390, 247, 411)  LINECOLOR(61)      COLOR(182, 130)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  r_p1(7, 76, 61, 96)  '단위수'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(GP1)      COLOR(146, 130)  CUR(0)      TABORDER(3)  ENABLE  &
+  VISIBLE  CHECKED  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  r_p2(64, 76, 118, 96)  '전체수'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(GP1)      COLOR(146, 130)  CUR(0)      TABORDER(4)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+GROUP  GP2(384, 387, 440, 407)  'GP2'        COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  Qty1(189, 98, 218, 116)  '1'  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(132, 232)  CUR(10)    "2BTN.BMP"    TABORDER(5)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+BUTTON  Qty2(220, 98, 249, 116)  '2'  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(132, 232)  CUR(10)    "2BTN.BMP"    TABORDER(6)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+BUTTON  Qty3(251, 98, 280, 116)  '3'  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(132, 232)  CUR(10)    "2BTN.BMP"    TABORDER(7)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+BUTTON  BUTTON12(158, 98, 187, 116)  'C'  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(132, 232)  CUR(10)    "2BTN.BMP"    TABORDER(8)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+LABEL  LABEL0(8, 5, 32, 25)  '펀드'  AL_LEFT  CUR(0)      COLOR(228, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+COMBO  cmb_fund(38, 5, 148, 24)  TP_SUNKEN  LEN(4)  COUNT(0)  VCOUNT(0)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_NUM|EDIT_INPUT    COLOR(68, 69)  CUR(0)    TABORDER(9)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  r_p3(121, 76, 181, 96)  '비율(%)'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(GP1)      COLOR(146, 130)  CUR(0)      TABORDER(10)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  SYMBOL83(8, 97, 32, 117)  '수량'  AL_LEFT  CUR(0)      COLOR(228, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  ed_jqty(38, 97, 148, 117)  LEN(15)  IO_NUM|EDIT_INPUT|FA_COMMA|FA_RIGHT|FA_WRAP|FA_SKIP|FA_XFLOAT  SPIN(1)      COLOR(68, 130)  CUR(0)  TP_SUNKEN  INIT("0")          TABORDER(11)  IOORDER(4)  ENABLE  &
+  VISIBLE  HOVER  HINTTYPE(IH_NONE)
+BUTTON  BUTTON2(7, 98, 36, 116)  '수량'  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(132, 232)  CUR(0)    "2BTN.BMP"    TABORDER(12)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+BUTTON  BUTTON3(5, 168, 90, 186)  '일괄가능수량'  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(132, 232)  CUR(10)    "6BTN.BMP"    TABORDER(13)  ENABLE  &
+  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+OUT  OUTPUT0(96, 169, 290, 185)  LEN(16)  IO_NUM|AL_CENTER|    COLOR(192, 69)  CUR(0)            TABORDER(0)  IOORDER(5)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  btn_jumun(5, 190, 290, 228)  '매도'  TP_USER|IMAGETEXT|AL_STRETCH        FONT("새굴림", 11, BOLD)  FOCUS  COLOR(193, 240)  CUR(10)    "매도.BMP"    TABORDER(14)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+LABEL  LABEL1(8, 135, 32, 155)  '구분'  AL_LEFT  CUR(0)      COLOR(228, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  edit_mgb(40, 135, 55, 155)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_SUNKEN  INIT("1")          TABORDER(15)  IOORDER(6)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  R_sell(95, 125, 175, 165)  '1. 매도'  TP_RADIO|RD_PUSH|EDIT_NOP      GROUP(GP2)"매도.BMP"      FONT("굴림체", 11, BOLD)  COLOR(208, 240)  CUR(10)      TABORDER(16)  ENABLE  &
+  VISIBLE  CHECKED  HINTTYPE(IH_NONE)
+BUTTON  R_buy(180, 125, 260, 165)  '2. 매수'  TP_RADIO|RD_PUSH|EDIT_NOP      GROUP(GP2)"매수.BMP"      FONT("굴림체", 11, BOLD)  COLOR(208, 240)  CUR(10)      TABORDER(17)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL3(184, 77, 233, 97)  '일괄번호'  AL_LEFT  CUR(0)      COLOR(228, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+OUT  o_jmno(233, 78, 288, 95)  LEN(6)  IO_NUM|AL_CENTER||FA_RIGHT|FA_ZEROSUP|FA_SKIP|SA_SPACE  FONT("굴림체", 10, BOLD)    COLOR(175, 130)  CUR(0)            TABORDER(0)  IOORDER(7)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  OBJ_FUNDACC(295, 0, 1034, 234)    "IB315330"  TABORDER(18)  IOORDER(8)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BOX  PANEL1(2, 73, 292, 122)    COLOR(61, 232)  LINEW(1)  BX_LINE    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BOX  PANEL3(233, 78, 288, 95)    COLOR(61, 232)  LINEW(1)  BX_LINE    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  btn_jumun2(5, 190, 290, 228)  '매도'  TP_USER|IMAGETEXT|AL_STRETCH        FONT("새굴림", 11, BOLD)  FOCUS  COLOR(193, 240)  CUR(10)    "매수.BMP"    TABORDER(19)  ENABLE  &
+  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+BUTTON  BUTTON0(235, 5, 290, 25)  '펀드설정'  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(132, 232)  CUR(10)    "4BTN.BMP"    TABORDER(20)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+BUTTON  CHECK0(122, 272, 302, 284)  '신규주문확인창 없음'  TP_CHECK|EDIT_NOP          COLOR(181, 232)  CUR(0)      TABORDER(21)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  CHECK1(122, 293, 302, 305)  '그룹별 정정주문확인창 없음'  TP_CHECK|EDIT_NOP          COLOR(181, 232)  CUR(0)      TABORDER(22)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  CHECK2(122, 313, 302, 325)  '그룹별 취소주문확인창 없음'  TP_CHECK|EDIT_NOP          COLOR(181, 232)  CUR(0)      TABORDER(23)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  CHECK3(317, 271, 497, 283)  '주문전송 후 수량지움'  TP_CHECK|EDIT_NOP          COLOR(181, 232)  CUR(0)      TABORDER(24)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  CHECK4(317, 293, 497, 305)  '주문전송 후 가격지움'  TP_CHECK|EDIT_NOP          COLOR(181, 232)  CUR(0)      TABORDER(25)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  CHECK5(317, 313, 497, 325)  '주문전송 후 체크표시 유지'  TP_CHECK|EDIT_NOP          COLOR(181, 232)  CUR(0)      TABORDER(26)  ENABLE  &
+  CHECKED  HINTTYPE(IH_NONE)
+BUTTON  BUTTON4(150, 5, 205, 25)  '펀드갱신'  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(132, 232)  CUR(10)    "4BTN.BMP"    TABORDER(27)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+CONTROL  c_pric(150, 50, 170, 70)    "CX_Price"  "/k2/i1BTN.BMP/t원/red_jprc/xpibohoga"  LEN(0)  EDIT_NOP    COLOR(132, 186)  TABORDER(0)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  100301(35, 280, 115, 300)  LEN(8)  IO_MIXED|EDIT_INOUT|FA_WRAP|FA_UPPER|CODE      COLOR(192, 130)  CUR(0)  TP_SUNKEN          TABORDER(28)  IOORDER(9)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Option Explicit
+
+
+Dim start_f
+start_f = 1
+
+'***************************************************************************
+' DESC: 주문전송
+'***************************************************************************
+Sub DoOrder()
+	Dim trow, irow, ii, val, chk, val_cnt
+	o_jmno.Data = "0"
+	SCREEN.Object("main.OBJ_ORDSEND.zFundId").data = Mid(cmb_fund.Data,2)
+	trow = SCREEN.Object("main.OBJ_odr.OBJ_FUNDACC.Grid0").rows
+	SCREEN.Object("main.OBJ_ORDSEND.in2").data = CStr(trow)
+
+	If trow > 0 Then
+		val_cnt = 1
+		Call SCREEN.Object("main.OBJ_ORDSEND.Grid0").Clear
+		SCREEN.Object("main.OBJ_ORDSEND.Grid0").SetRows trow
+		For ii = 1 To trow
+			chk = SCREEN.Object("main.OBJ_odr.OBJ_FUNDACC.Grid0").GetGridCell(ii, 22)
+			If chk = 1 Then
+				Call SCREEN.Object("main.OBJ_ORDSEND.Grid0").SetGridCell(val_cnt, 1,  SCREEN.Object("main.OBJ_odr.OBJ_FUNDACC.Grid0").GetGridCell(ii, 1))
+				Call SCREEN.Object("main.OBJ_ORDSEND.Grid0").SetGridCell(val_cnt, 2,  "")
+				Call SCREEN.Object("main.OBJ_ORDSEND.Grid0").SetGridCell(val_cnt, 3,  SCREEN.Object("main.OBJ_Sise.100301").Data)
+				Call SCREEN.Object("main.OBJ_ORDSEND.Grid0").SetGridCell(val_cnt, 4,  edit_mgb.Data)
+				Call SCREEN.Object("main.OBJ_ORDSEND.Grid0").SetGridCell(val_cnt, 5,  c_hogbs.Data)
+				Call SCREEN.Object("main.OBJ_ORDSEND.Grid0").SetGridCell(val_cnt, 6,  "03")
+				val = SCREEN.Object("main.OBJ_odr.OBJ_FUNDACC.Grid0").GetGridCell(val_cnt, 24)
+				val = makeqty(val)
+				Call SCREEN.Object("main.OBJ_ORDSEND.Grid0").SetGridCell(val_cnt, 7,  val)'"+000000000000002")
+				val = SCREEN.Object("main.OBJ_odr.OBJ_FUNDACC.Grid0").GetGridCell(val_cnt, 25)
+				val = makeprice(val)
+				Call SCREEN.Object("main.OBJ_ORDSEND.Grid0").SetGridCell(val_cnt, 8,  val)'"+000000203.05")'
+				val_cnt = val_cnt+1
+				Call SCREEN.Object("main.OBJ_odr.OBJ_FUNDACC.Grid0").SetGridCell(ii, 23, "")
+				Call SCREEN.Object("main.OBJ_odr.OBJ_FUNDACC.Grid0").SetGridCell(ii, 26, "")
+			End If
+		Next
+		SCREEN.Object("main.OBJ_ORDSEND.Grid0").SetRows val_cnt-1
+		SCREEN.Object("main.OBJ_ORDSEND.in2").data = CStr(val_cnt-1)
+	End If
+	'Exit Sub
+	If OrderConform() Then
+		Call SCREEN.Object("main.OBJ_ORDSEND").Send
+	End If
+End Sub
+
+Function OrderConform()
+	If CHECK0.Checked Then
+		OrderConform = True
+		Exit Function
+	End If
+	Dim acnt, cnt, code, jprc, s_data, mmgb, hogb, ret, jqty, ii, cf
+
+	For ii = 1 To SCREEN.Object("main.OBJ_odr.OBJ_FUNDACC.Grid0").Rows
+		If SCREEN.Object("main.OBJ_odr.OBJ_FUNDACC.Grid0").GetGridCell(ii ,22) = 1 Then
+			cnt = cnt + 1
+			acnt = SCREEN.Object("main.OBJ_odr.OBJ_FUNDACC.Grid0").GetGridCell(ii, 1)			'계좌번호
+			If edit_mgb.Data="1" Then
+				mmgb = "매도"
+			Else
+				mmgb = "매수"
+			End If
+			'mmgb = SCREEN.Object("main.OBJ_odr.OBJ_FUNDACC.Grid0").GetGridCell(ii, 19)			'매매구분
+			hogb = c_hogbs.Text																	'호가구분
+			code = SCREEN.Object("main.OBJ_SISE.100301").data									'종목코드
+			jqty = SCREEN.Object("main.OBJ_odr.OBJ_FUNDACC.Grid0").GetGridCell(ii, 24)			'주문수량
+			jprc = SCREEN.Object("main.OBJ_odr.OBJ_FUNDACC.Grid0").GetGridCell(ii, 25)			'주문단가
+
+			s_data = "#" & s_data
+			s_data = jprc & "|" & s_data				'주문단가
+			s_data = jqty & "|" & s_data				'주문수량
+			s_data = code & "|" & s_data				'종목코드
+			s_data = hogb & "|" & s_data				'호가구분
+			s_data = mmgb & "|" & s_data				'매매구분
+			s_data = acnt & "|" & s_data				'계좌번호
+		End If
+	Next
+
+	If cnt > 0 Then
+		SYSTEM.Push "num", cnt
+		'SCREEN.CreateWindow 2, "IB310103 /p5 /d", "s_data" & vbTab & s_data
+		SCREEN.CreateWindow 2, "IB315395 /p5 /d", "s_data" & vbTab & s_data & vbLf
+	End If
+	cf = SYSTEM.Pop("C3153")
+	If cnt = 0 Then
+		MsgBox "주문 낼 항목을 선택하십시오.",,"IBK투자증권"
+		cf = "NO"
+	End If
+	If cf = "OK" Then
+		OrderConform = True
+	Else
+		OrderConform = False
+	End If
+End Function
+
+Sub ReadQtyConfig
+	Dim data, array, j, i
+	If SCREEN.CreateObject("Info") Then
+		data = Trim(INFO.PopData(LOGIN.Name, "ordcfg.ini", "IB315300", "812_QtyConfig"))
+	End If
+	If Trim(data) = "" Then
+		data = "1|2|3"
+	End If
+	array = Split(data, "|", -1, 1)
+
+	j=0
+	For Each i in array
+	 j = j+1
+
+	 If Trim(array(j-1)) <> "" Then
+	 	SCREEN.Object("Qty"&CStr(j)).Text = CStr(CLng(array(j-1)))
+	 End If
+	Next
+End Sub
+
+Sub SetPrice(val)
+	Dim trows, ii, chk
+	trows = SCREEN.Object("main.OBJ_odr.OBJ_FUNDACC.Grid0").Rows
+	For ii = 1 To trows
+		chk = SCREEN.Object("main.OBJ_odr.OBJ_FUNDACC.Grid0").GetGridCell(ii, 22)
+		If chk = 1 Then
+			Call SCREEN.Object("main.OBJ_odr.OBJ_FUNDACC.Grid0").SetGridCell(ii, 25,  val)
+		End If
+	Next
+	Call SetBtnTitle()
+End Sub
+
+Sub SetQty(val)
+	Dim trows, ii, chk, multi,iqty, biyu
+	trows = SCREEN.Object("main.OBJ_odr.OBJ_FUNDACC.Grid0").Rows
+	For ii = 1 To trows
+		chk = SCREEN.Object("main.OBJ_odr.OBJ_FUNDACC.Grid0").GetGridCell(ii, 22)
+		multi = SCREEN.Object("main.OBJ_odr.OBJ_FUNDACC.Grid0").GetGridCell(ii, 27)
+		biyu  = SCREEN.Object("main.OBJ_odr.OBJ_FUNDACC.Grid0").GetGridCell(ii, 28)
+		If chk = 1 Then
+			If r_p1.Checked Then
+				iqty = val*multi/100
+				Call SCREEN.Object("main.OBJ_odr.OBJ_FUNDACC.Grid0").SetGridCell(ii, 24,  iqty)
+			ElseIf r_p2.Checked Then
+				Call SCREEN.Object("main.OBJ_odr.OBJ_FUNDACC.Grid0").SetGridCell(ii, 24,  val)
+			Else
+				iqty = val*biyu/10000
+				Call SCREEN.Object("main.OBJ_odr.OBJ_FUNDACC.Grid0").SetGridCell(ii, 24,  iqty)
+			End If
+		End If
+	Next
+	Call SetBtnTitle()
+End Sub
+
+Function MakeQty(str)
+	If Trim(str) = "" Then
+		MakeQty = "+000000000000000"
+		Exit Function
+	End If
+	str = "+"&Mid(str,2)
+
+	MakeQty = str
+End Function
+
+Function MakePrice(str)
+
+	str = "+"&Mid(str, 3,Len(str)-4)&"."&Mid(str, Len(str)-1,2)
+
+	MakePrice = str
+End Function
+
+Sub ChangeHogaType()
+	If c_hogbs.Data = "00" Then
+		ed_jprc.Enable = True
+		ed_jprc.SetFocus
+	ElseIf c_hogbs.Data = "03" Then
+		ed_jprc.Enable = False
+		ed_jprc.data = 0
+	ElseIf c_hogbs.Data = "05" Then
+		ed_jprc.Enable = True
+		ed_jprc.SetFocus
+	ElseIf c_hogbs.Data = "06" Then
+		ed_jprc.Enable = False
+		ed_jprc.data = 0
+	End If
+	Call SetPrice(ed_jprc.Data)
+End Sub
+
+Sub SetBtnTitle()
+	Dim prc,qty,mgb
+	If edit_mgb.Data = "1" Then
+		mgb = "매도"
+	ElseIf edit_mgb.Data = "2" Then
+		mgb = "매수"
+	End If
+	prc = CStr(ed_jprc.Data/100)
+	qty = GetTotalQty()
+	btn_jumun.Text = mgb & " " & prc & " X " & CStr(qty)
+	btn_jumun2.Text = mgb & " " & prc & " X " & CStr(qty)
+
+End Sub
+
+
+Function GetTotalQty()
+	Dim trows, ii, chk, multi,iqty,tqty
+	trows = SCREEN.Object("main.OBJ_odr.OBJ_FUNDACC.Grid0").Rows
+	tqty = 0
+	For ii = 1 To trows
+		chk = SCREEN.Object("main.OBJ_odr.OBJ_FUNDACC.Grid0").GetGridCell(ii, 22)
+
+		If chk = 1 Then
+			tqty = tqty + SCREEN.Object("main.OBJ_odr.OBJ_FUNDACC.Grid0").GetGridCell(ii, 24)
+
+		End If
+	Next
+	GetTotalQty = tqty
+End Function
+
+
+Sub LoadCfg()
+	Dim ii, str
+	If SCREEN.CreateObject("Info") Then
+		str = Trim(INFO.PopData(LOGIN.Name, "userconf.ini", "IB315300", "config"))
+		If Len(str) < 6 Then
+			str = "000001"
+		End If
+		For ii=0 To 5
+
+			If Mid(str, ii+1, 1) = "1" Then
+				SCREEN.Object("CHECK"&CStr(ii)).Checked = True
+			Else
+				SCREEN.Object("CHECK"&CStr(ii)).Checked = False
+			End If
+		Next
+		'INFO.PushData LOGIN.Name, "userconf.ini", "IB315300", "config", str
+	End If
+End Sub
+
+Sub AfterOrder()
+	If CHECK3.Checked Then
+		ed_jqty.Data = 0
+		Call SetQty(ed_jqty.Data)
+	End If
+	If CHECK4.Checked Then
+		ed_jprc.Data = 0
+		Call SetPrice(ed_jprc.Data)
+	End If
+	If Not CHECK5.Checked Then
+		SCREEN.Proc "OBJ_FUNDACC.SetAllCheck", "0"
+	End If
+	SCREEN.Proc "main.OBJ_FUNDACC.send_f", ""
+End Sub
+
+_AW_ONINDECLARE_AW_
+#load IB888888
+#load IB999930
+
+_AW_ONENDSUB_AW_
+_AW_ONSTART_AW_
+Call ReadQtyConfig()
+Call LoadCfg()
+SCREEN.SetTimer 10, False
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+SCREEN.OnSend = False
+
+_AW_ONENDSUB_AW_
+_AW_ONTIMER_AW_
+If Trim(S100301.Data) <> "" Then
+'	SYSTEM.Trace "OnTimer: "& S100301.Data
+	Call hoga_unit(S100301.Data)
+End If
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(ed_jprc)
+_AW_ONCHANGE_AW_
+If (c_hogbs.Data = "03") Or (c_hogbs.Data = "06") Then
+	ed_jprc.data = "0"
+End If
+Call SetPrice(ed_jprc.Data)
+_AW_ONENDSUB_AW_
+_AW_ONCHARCHANGE_AW_
+Call SetPrice(ed_jprc.Data)
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(c_hogbs)
+_AW_ONCHANGE_AW_
+Call ChangeHogaType()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(r_p1)
+_AW_ONCLICK_AW_
+Call SetQty(ed_jqty.data)
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(r_p2)
+_AW_ONCLICK_AW_
+Call SetQty(ed_jqty.data)
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(Qty1)
+_AW_ONCLICK_AW_
+ed_jqty.data = Qty1.Text
+Call SetQty(ed_jqty.data)
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(Qty2)
+_AW_ONCLICK_AW_
+ed_jqty.data = Qty2.Text
+Call SetQty(ed_jqty.data)
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(Qty3)
+_AW_ONCLICK_AW_
+ed_jqty.data = Qty3.Text
+Call SetQty(ed_jqty.data)
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON12)
+_AW_ONCLICK_AW_
+ed_jqty.Data = "0"
+Call SetQty(ed_jqty.data)
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(cmb_fund)
+_AW_ONCHANGE_AW_
+If cmb_fund.Data <> "" Then
+	'SCREEN.Object("main.OBJ_FUNDACC").Send
+	SCREEN.Proc "main.OBJ_odr.OBJ_FUNDACC.send_f", ""
+End If
+'SCREEN.Object("main.FUNDID").data = cmb_fund.Data
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(r_p3)
+_AW_ONCLICK_AW_
+Call SetQty(ed_jqty.data)
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(ed_jqty)
+_AW_ONCHANGE_AW_
+Call SetQty(ed_jqty.data)
+_AW_ONENDSUB_AW_
+_AW_ONCHARCHANGE_AW_
+Call SetQty(ed_jqty.data)
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON2)
+_AW_ONCLICK_AW_
+SCREEN.CreateWindow 2, "IB315380 /s/p5/d ", ""
+
+If SYSTEM.Pop("812_QtyConfig") = "OK" Then
+	Call ReadQtyConfig()
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(btn_jumun)
+_AW_ONCLICK_AW_
+Call DoOrder()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(edit_mgb)
+_AW_ONCHANGE_AW_
+If edit_mgb.Data = "1" Then
+  R_sell.Checked = True
+Else
+  R_buy.Checked = True
+End If
+Call SetBtnTitle()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(R_sell)
+_AW_ONCLICK_AW_
+edit_mgb.Data = "1"
+Call SetBtnTitle()
+PANEL1.PRgb = 61
+PANEL2.PRgb = 171
+o_jmno.PRgb = 175
+PANEL3.PRgb = 61
+btn_jumun.Visible = True
+btn_jumun2.Visible = False
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(R_buy)
+_AW_ONCLICK_AW_
+edit_mgb.Data = "2"
+Call SetBtnTitle()
+PANEL1.PRgb = 163
+PANEL2.PRgb = 170
+o_jmno.PRgb = 162
+PANEL3.PRgb = 163
+btn_jumun2.Visible = True
+btn_jumun.Visible = False
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(btn_jumun2)
+_AW_ONCLICK_AW_
+Call DoOrder()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON0)
+_AW_ONCLICK_AW_
+SCREEN.CreateWindow 2, "IB315399", ""
+If SYSTEM.Pop("C3153_CONFIG")="OK" Then
+	Call LoadCfg()
+	SCREEN.Proc "main.OBJ_ODR2.LoadCfg", ""
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON4)
+_AW_ONCLICK_AW_
+SCREEN.Object("main.OBJ_FUND").Send
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(c_pric)
+_AW_ONCLICK_AW_
+c_pric.JCode = SCREEN.Object("main.OBJ_SISE.100301").data
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(100301)
+_AW_ONCHANGE_AW_
+	Call Hoga_unit(S100301.Data)
+	ed_jprc.Data = "0"
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

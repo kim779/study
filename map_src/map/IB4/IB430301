@@ -1,0 +1,285 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB430301)
+MAPSIZE(205, 694)
+VERSION(001)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("[430301]투자자별 종")
+MAPPUBLIC(";")
+FONT("굴림", 9, NORMAL)
+OPTIONS(FLASH)
+TITLE("[430301]투자자별 종합 시간대별 매매추이 그래프")
+TOPATH(AXIS)
+METHOD(MENU)
+TRXCODE("ng430301")
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+CONTROL  CONTROL0(0, 0, 694, 205)  |FA_PROTECT  "C_UserGrp"  "/i70300400004000040100000000000000000020000000000113003355468710200000011300000327681020000001130050266112102000000113000842150410200000"  LEN(0)  EDIT_INOUT    COLOR(192, 232)  TABORDER(1)  IOORDER(12)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  sjcd(699, 150, 764, 169)  LEN(2)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(2)  IOORDER(4)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  sugm(699, 190, 764, 209)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(3)  IOORDER(6)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  tjcd1(699, 213, 764, 232)  LEN(2)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(4)  IOORDER(7)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  tjcd2(699, 233, 764, 252)  LEN(2)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(5)  IOORDER(8)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  tjcd3(699, 253, 764, 272)  LEN(2)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(6)  IOORDER(9)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  tjcd4(699, 273, 764, 292)  LEN(2)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(7)  IOORDER(10)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  inp1(699, 90, 764, 109)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(8)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  upcd(699, 170, 764, 189)  LEN(4)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(9)  IOORDER(5)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  inp2(699, 110, 764, 129)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(10)  IOORDER(3)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  check(700, 296, 727, 318)  LEN(1)  IO_MIXED|AL_CENTER|    COLOR(192, 69)  CUR(0)            TABORDER(0)  IOORDER(11)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  mkcd(640, 40, 660, 60)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("1")          TABORDER(11)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Dim xstr, xvalue, xistrue, cnt
+
+Sub Cnt_chck()
+cnt = 0
+			If CHK0.data = "1" Then
+ 					cnt = cnt + 1
+          End If
+          If CHK1.data = "1" Then
+ 					cnt = cnt + 1
+          End If
+          If CHK2.data = "1" Then
+ 					cnt = cnt + 1
+          End If
+          If CHK3.data = "1" Then
+ 					cnt = cnt + 1
+          End If
+          If CHK4.data = "1" Then
+ 					cnt = cnt + 1
+          End If
+          If CHK5.data = "1" Then
+ 					cnt = cnt + 1
+          End If
+          If CHK6.data = "1" Then
+ 					cnt = cnt + 1
+          End If
+          If CHK7.data = "1" Then
+ 					cnt = cnt + 1
+          End If
+          If CHK8.data = "1" Then
+ 					cnt = cnt + 1
+          End If
+          If CHK9.data = "1" Then
+ 					cnt = cnt + 1
+          End If
+
+If cnt >= 4 Then
+	If CHK0.Data = "0" Then
+	    SCREEN.Object("PARENT.E0").Enable = False
+	Else
+	    SCREEN.Object("PARENT.E0").Enable = True
+	End If
+	If CHK1.Data = "0" Then
+	    SCREEN.Object("PARENT.E1").Enable = False
+	Else
+	    SCREEN.Object("PARENT.E1").Enable = True
+	End If
+	If CHK2.Data = "0" Then
+	    SCREEN.Object("PARENT.E2").Enable = False
+	Else
+	    SCREEN.Object("PARENT.E2").Enable = True
+	End If
+	If CHK3.Data = "0" Then
+	    SCREEN.Object("PARENT.E3").Enable = False
+	Else
+	    SCREEN.Object("PARENT.E3").Enable = True
+	End If
+	If CHK4.Data = "0" Then
+	    SCREEN.Object("PARENT.E4").Enable = False
+	Else
+	    SCREEN.Object("PARENT.E4").Enable = True
+	End If
+	If CHK5.Data = "0" Then
+	    SCREEN.Object("PARENT.E5").Enable = False
+	Else
+	    SCREEN.Object("PARENT.E5").Enable = True
+	End If
+	If CHK6.Data = "0" Then
+	    SCREEN.Object("PARENT.E6").Enable = False
+	Else
+	    SCREEN.Object("PARENT.E6").Enable = True
+	End If
+	If CHK7.Data = "0" Then
+	    SCREEN.Object("PARENT.E7").Enable = False
+	Else
+	    SCREEN.Object("PARENT.E7").Enable = True
+	End If
+	If CHK8.Data = "0" Then
+	    SCREEN.Object("PARENT.E8").Enable = False
+	Else
+	    SCREEN.Object("PARENT.E8").Enable = True
+	End If
+	If CHK9.Data = "0" Then
+	    SCREEN.Object("PARENT.E9").Enable = False
+	Else
+	    SCREEN.Object("PARENT.E9").Enable = True
+	End If
+Else
+	SCREEN.Object("PARENT.E0").Enable = True
+	SCREEN.Object("PARENT.E1").Enable = True
+	SCREEN.Object("PARENT.E2").Enable = True
+	SCREEN.Object("PARENT.E3").Enable = True
+	SCREEN.Object("PARENT.E4").Enable = True
+	SCREEN.Object("PARENT.E5").Enable = True
+	SCREEN.Object("PARENT.E6").Enable = True
+	SCREEN.Object("PARENT.E7").Enable = True
+	SCREEN.Object("PARENT.E8").Enable = True
+	SCREEN.Object("PARENT.E9").Enable = True
+End If
+End Sub
+
+_AW_ONSEND_AW_
+SCREEN.OnSend = False
+
+If UCase(TypeName( SCREEN.Object("main.cxMarket"))) <> "NOTHING" Then
+	If SCREEN.Object("main.cxMarket").sMarket = "KRX" Then
+		mkcd.Data = "1"
+	ElseIf SCREEN.Object("main.cxMarket").sMarket = "NXT" Then
+		mkcd.Data = "2"
+	ElseIf SCREEN.Object("main.cxMarket").sMarket = "통합" Then
+		mkcd.Data = "3"
+	End If
+End If
+
+inp1.Data = SCREEN.Object("Main.inp1").Data
+inp2.Data = SCREEN.Object("Main.inp2").Data
+Select Case SCREEN.Object("Main.sjcd").Data
+Case "00"			' kospi
+	sjcd.Data = "1"
+	upcd.Data = "1"
+Case "10"			' kospi200
+	sjcd.Data = "1"
+	upcd.Data = "1001"
+Case "90"			' kosdaq
+	sjcd.Data = "1"
+	upcd.Data = "9001"
+Case "22"			' 선물
+	sjcd.Data = "2"
+	upcd.Data = "0"
+Case "55"			' 콜옵션
+	sjcd.Data = "5"
+	upcd.Data = "0"
+Case "66"			' 풋옵션
+	sjcd.Data = "6"
+	upcd.Data = "0"
+Case "11"			' M선물
+	sjcd.Data = "10"
+	upcd.Data = "0"
+Case "88"			' 미니콜옵션
+	sjcd.Data = "8"
+	upcd.Data = "0"
+Case "99"			' 미니풋옵션
+	sjcd.Data = "9"
+	upcd.Data = "0"
+Case "97"			' 목 위클리 콜옵션
+	sjcd.Data = "12"
+	upcd.Data = "0"
+Case "98"			' 목 위클리 풋옵션
+	sjcd.Data = "13"
+	upcd.Data = "0"
+Case "77"			' 월 위클리 콜옵션
+	sjcd.Data = "15"
+	upcd.Data = "0"
+Case "78"			' 월 위클리 풋옵션
+	sjcd.Data = "16"
+	upcd.Data = "0"
+End Select
+SYSTEM.Trace("IB430301 send sjcd = " &  sjcd.Data & "  upcd=" & upcd.Data )
+sugm.Data = SCREEN.Object("Main.sugm").Data
+tjcd1.Data = SCREEN.Object("Main.tjcd1").Data
+tjcd2.Data = SCREEN.Object("Main.tjcd2").Data
+tjcd3.Data = SCREEN.Object("Main.tjcd3").Data
+tjcd4.Data = SCREEN.Object("Main.tjcd4").Data
+
+
+Dim s_cnt
+s_cnt = 0
+If SCREEN.Object("parent.CH2").Checked = True Then
+	s_cnt = s_cnt + 1
+End If
+If SCREEN.Object("parent.CH1").Checked = True Then
+	s_cnt = s_cnt + 1
+End If
+If SCREEN.Object("parent.CH3").Checked = True Then
+	s_cnt = s_cnt + 1
+End If
+If SCREEN.Object("parent.CH6").Checked = True Then
+	s_cnt = s_cnt + 1
+End If
+If SCREEN.Object("parent.CH4").Checked = True Then
+	s_cnt = s_cnt + 1
+End If
+If SCREEN.Object("parent.CH5").Checked = True Then
+	s_cnt = s_cnt + 1
+End If
+If SCREEN.Object("parent.CH7").Checked = True Then
+	s_cnt = s_cnt + 1
+End If
+If SCREEN.Object("parent.CH8").Checked = True Then
+	s_cnt = s_cnt + 1
+End If
+If SCREEN.Object("parent.CH9").Checked = True Then
+	s_cnt = s_cnt + 1
+End If
+If SCREEN.Object("parent.CH10").Checked = True Then
+	s_cnt = s_cnt + 1
+End If
+If SCREEN.Object("parent.CH11").Checked = True Then
+	s_cnt = s_cnt + 1
+End If
+If SCREEN.Object("parent.CH12").Checked = True Then
+	s_cnt = s_cnt + 1
+End If
+
+If s_cnt < 1 Then
+	CONTROL0.Clear
+	Exit Sub
+Else
+	SCREEN.OnSend = True
+End If
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+If check.Data = "F" Then
+	CONTROL0.Clear
+End If
+
+SCREEN.SetTimer 300, False
+
+_AW_ONENDSUB_AW_
+_AW_ONTIMER_AW_
+SCREEN.Send 0
+
+_AW_ONENDSUB_AW_
+}
+
+
+

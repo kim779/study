@@ -1,0 +1,570 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB454000)
+MAPSIZE(254, 613)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("굴림", 9, NORMAL)
+OPTIONS(FMS|FLASH)
+TITLE("국채선물 이론가 계산기")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pooppoop")
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL5(-2, 0, 615, 255)  LIMAGE(0)  LINEW(6)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  ed_Call(390, 45, 455, 65)  LEN(8)  IO_NUM|EDIT_INPUT|FA_COMMA|FA_RIGHT|FA_WRAP|FA_SKIP|FA_FLOAT  SPIN(0)  SPINTYPE(120)      COLOR(195, 130)  CUR(0)  TP_SUNKEN  INIT("2")        FLOAT(2)    TABORDER(1)  IOORDER(3)  ENABLE  &
+  VISIBLE  HOVER  HINTTYPE(IH_NONE)
+TABLE  TABLE0(5, 45, 155, 105)  MATRIX(3, 1)  LINECOLOR(243)  CELLH(18)  AUTOSIZE  |MULTI  EDIT_OUTPUT    &
+	COLINFO("101023")  LEN(8)  WIDTH(80)  HEAD("현재가")  COLALIGN(AL_CENTER, AL_RIGHT)  HEADCOLOR(74, 68)  IO_NUM|FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSUP    COLOR(192, 232)  COLCUR(0, 0)  COLHINTTYPE(IH_NONE)    COLUMN_VISIBLE  IFRGB(94, 95)  &
+	COLINFO("101002")  LEN(8)  WIDTH(80)  HEAD("현물가")  COLALIGN(AL_CENTER, AL_RIGHT)  HEADCOLOR(74, 68)  IO_NUM    COLOR(192, 232)  COLCUR(0, 0)  COLHINTTYPE(IH_NONE)    COLUMN_VISIBLE  &
+	COLINFO("101202")  LEN(8)  WIDTH(80)  HEAD("이론가")  COLALIGN(AL_CENTER, AL_RIGHT)  HEADCOLOR(74, 68)  IO_NUM    COLOR(192, 232)  COLCUR(0, 0)  COLHINTTYPE(IH_NONE)    COLUMN_VISIBLE  IOORDER(4)  ENABLE  &
+  VISIBLE
+
+TABLE  TABLE1(155, 45, 325, 105)  MATRIX(3, 1)  LINECOLOR(243)  CELLH(18)  AUTOSIZE  |MULTI  EDIT_OUTPUT    &
+	COLINFO("101024")  LEN(8)  WIDTH(90)  HEAD("전일비")  COLALIGN(AL_CENTER, AL_RIGHT)  HEADCOLOR(74, 68)  IO_NUM|FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|FA_CONTRAST|SA_SPACE|SA_CORAW|SA_TEXT    COLOR(192, 232)  COLCUR(0, 0)  COLHINTTYPE(IH_NONE)    COLUMN_VISIBLE  IFRGB(94, 95)  &
+	COLINFO("Row1")  LEN(8)  WIDTH(90)  HEAD("수익률(%)")  COLALIGN(AL_CENTER, AL_RIGHT)  HEADCOLOR(74, 68)  IO_MIXED    COLOR(192, 232)  COLCUR(0, 0)  COLHINTTYPE(IH_NONE)    COLUMN_VISIBLE  &
+	COLINFO("Row2")  LEN(8)  WIDTH(90)  HEAD("선도수익률(%)")  COLALIGN(AL_CENTER, AL_RIGHT)  HEADCOLOR(74, 68)  IO_MIXED    COLOR(192, 232)  COLCUR(0, 0)  COLHINTTYPE(IH_NONE)    COLUMN_VISIBLE  IOORDER(5)  ENABLE  &
+  VISIBLE
+
+OUT  ot_CallNm(325, 45, 390, 65)  LEN(20)  IO_MIXED|AL_CENTER||FA_SKIP    COLOR(74, 68)  CUR(0)  LINECOLOR(0)          TABORDER(0)  IOORDER(6)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  ot_CDNm(325, 65, 390, 85)  LEN(20)  IO_MIXED|AL_CENTER||FA_SKIP    COLOR(74, 68)  CUR(0)  LINECOLOR(0)          TABORDER(0)  IOORDER(7)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  ot_MSB1Nm(325, 85, 390, 105)  LEN(20)  IO_MIXED|AL_CENTER||FA_SKIP    COLOR(74, 68)  CUR(0)  LINECOLOR(0)          TABORDER(0)  IOORDER(8)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  ed_CD(390, 65, 455, 85)  LEN(8)  IO_NUM|EDIT_INPUT|FA_COMMA|FA_RIGHT|FA_WRAP|FA_SKIP|FA_FLOAT  SPIN(0)  SPINTYPE(120)      COLOR(195, 130)  CUR(0)  TP_SUNKEN  INIT("2")        FLOAT(2)    TABORDER(2)  IOORDER(9)  ENABLE  &
+  VISIBLE  HOVER  HINTTYPE(IH_NONE)
+EDIT  ed_MSB(390, 85, 455, 105)  LEN(8)  IO_NUM|EDIT_INPUT|FA_COMMA|FA_RIGHT|FA_WRAP|FA_SKIP|FA_FLOAT  SPIN(0)  SPINTYPE(120)      COLOR(195, 130)  CUR(0)  TP_SUNKEN  INIT("2")        FLOAT(2)    TABORDER(3)  IOORDER(10)  ENABLE  &
+  VISIBLE  HOVER  HINTTYPE(IH_NONE)
+OUT  ot_TrdDate(455, 45, 520, 65)  LEN(20)  IO_MIXED|AL_CENTER||FA_SKIP    COLOR(74, 68)  CUR(0)  LINECOLOR(0)          TABORDER(0)  IOORDER(11)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  ot_FutExpiDate(455, 65, 520, 85)  LEN(20)  IO_MIXED|AL_CENTER||FA_SKIP    COLOR(74, 68)  CUR(0)  LINECOLOR(0)          TABORDER(0)  IOORDER(12)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  ot_FutTime(455, 85, 520, 105)  LEN(20)  IO_MIXED|AL_CENTER||FA_SKIP    COLOR(74, 68)  CUR(0)  LINECOLOR(0)          TABORDER(0)  IOORDER(13)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  12901_D(520, 45, 608, 65)  LEN(8)  IO_NUM|EDIT_INPUT|FA_SKIP|FA_DATE    COLOR(195, 130)  CUR(0)  TP_SUNKEN  INIT("00000000")          EDITFORMAT("9999/99/99")  TABORDER(4)  IOORDER(14)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  ed_FutExpiDate(520, 65, 608, 85)  LEN(8)  IO_NUM|EDIT_INPUT|FA_SKIP|FA_DATE    COLOR(195, 130)  CUR(0)  TP_SUNKEN  INIT("00000000")          EDITFORMAT("9999/99/99")  TABORDER(5)  IOORDER(15)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  OBJECT0(0, 0, 457, 40)    "IB454010"  TABORDER(6)  IOORDER(16)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  100301(25, 365, 215, 395)  LEN(8)  IO_ALPHA|EDIT_INPUT|FA_WRAP    COLOR(192, 130)  CUR(0)  TP_NONE  INIT("161DC000")          TABORDER(7)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  ed_Time(520, 85, 608, 105)  LEN(8)  IO_MIXED|AL_RIGHT||FA_SKIP    COLOR(68, 130)  CUR(0)  LINECOLOR(130)          TABORDER(0)  IOORDER(17)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  OBJECT1(5, 110, 608, 250)    "IB454020"  TABORDER(8)  IOORDER(18)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL19(455, 0, 615, 40)        COLOR(64, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL0(455, 5, 610, 35)        COLOR(66, 29)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  bt_Calc(567, 10, 607, 30)  '계산'  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(68, 186)  CUR(0)    "4BTN.BMP"    TABORDER(9)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+OUT  100021(225, 355, 400, 405)  LEN(8)  IO_MIXED|AL_CENTER|    COLOR(192, 69)  CUR(0)            TABORDER(0)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  BUTTON0(525, 10, 565, 30)  '조회'  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(68, 186)  CUR(0)    "4BTN.BMP"    TABORDER(10)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Dim g_ArrDataItem
+Dim g_ArrData
+Dim g_ArrRate
+Dim g_SendFlag
+
+'0:채권코드, 1:채권명, 2:유통수익률,
+'3:발행일, 4:만기일, 5:표면이율
+g_ArrDataItem = Array("", "", 0, "", "", 0)
+g_ArrData = Array(g_ArrDataItem, g_ArrDataItem, g_ArrDataItem, g_ArrDataItem, g_ArrDataItem)
+'0:총이자지급방법, 년간이자지급횟수
+g_ArrRate = Array(6, 2)
+g_SendFlag = False
+'-----------------------------------------------------------------------
+Sub SendData()
+	g_SendFlag = True
+	SCREEN.Send 0
+End Sub
+'-----------------------------------------------------------------------
+Function Str2Dbl(Data)
+	Str2Dbl = 0
+	AData = Trim(Data)
+	If Len(AData) = 0 Then
+		Exit Function
+	End If
+	Str2Dbl = CDbl(AData)
+End Function
+'-----------------------------------------------------------------------
+Function Str2Int(Data)
+	Str2Int = 0
+	AData = Trim(Data)
+	If Len(AData) = 0 Then
+		Exit Function
+	End If
+	Str2Int = CLng(AData)
+End Function
+'-----------------------------------------------------------------------
+Sub SetData(Data)
+	ArrData = Split(Data, "|")
+	ed_Call.Data = (ArrData(0))
+	ed_CD.Data = (ArrData(1))
+	ed_MSB.Data = (ArrData(2))
+	ed_Time.Data = ArrData(3)
+
+	Calc
+End Sub
+'-----------------------------------------------------------------------
+Sub SetFutData(Data)
+	ArrData = Split(Data, "|")
+	S100301.Data = ArrData(0)
+	ed_FutExpiDate.Data = ArrData(1)
+	SendData
+End Sub
+'-----------------------------------------------------------------------
+Sub InitArrData(StartIndex)
+	For i = StartIndex To UBound(g_ArrData)
+		For j = LBound(g_ArrData) To UBound(g_ArrData)
+			g_ArrData(i)(j) = g_ArrDataItem(j)
+		Next
+	Next
+End Sub
+'-----------------------------------------------------------------------
+Sub SetArrData(Data)
+	ArrData1 = Split(Data, "|")
+	For i = LBound(ArrData1) To UBound(ArrData1)
+		ArrData2 = Split(ArrData1(i), "^")
+		For j = LBound(ArrData2) To UBound(ArrData2)
+			g_ArrData(i)(j) = ArrData2(j)
+		Next
+	Next
+	InitArrData(UBound(ArrData1))
+
+End Sub
+'-----------------------------------------------------------------------
+Sub Calc()
+	MeanYield = 0
+	PreYield = 0
+	OBJECT1.Proc "GridClear", ""
+	OBJECT1.Proc "PushGridData", ""
+
+	CallRate = Str2Dbl(ed_Call.Data)
+	BondCd1 = Trim(g_ArrData(0)(0))
+	If CallRate = 0 Or Len(BondCd1) = 0 Then
+		Exit Sub
+	End If
+	'0:인덱스, 1:국채단가, 2:선도가격, 3:선도금리
+	ArrData2 = Array (-1, "", "", "")
+	For i = LBound(g_ArrData) To UBound(g_ArrData)
+		If Len(g_ArrData(i)(0)) = 0 Then
+			Exit For
+		End If
+
+		'0:전이자락일, 1:차기이자락일, 2:표면이율,
+		'3:이표금액, 4:상환금액
+		ArrConItem = Array("", "", 0, 0, 0)
+
+		ArrContents = Array( _
+			ArrConItem, ArrConItem, ArrConItem, ArrConItem,_
+			ArrConItem, ArrConItem, ArrConItem, ArrConItem,_
+			ArrConItem, ArrConItem, ArrConItem, ArrConItem,_
+			ArrConItem, ArrConItem, ArrConItem, ArrConItem,_
+			ArrConItem, ArrConItem, ArrConItem, ArrConItem,_
+			ArrConItem, ArrConItem, ArrConItem, ArrConItem,_
+			ArrConItem, ArrConItem, ArrConItem, ArrConItem _
+
+		)
+
+		'0:매매일자, 1:선물코드, 2:채권코드,
+		'3:유통수익률, 4:콜금리, 5:CD금리
+		'6:통안채1년, 7:선물만기일, 8:채권발행일,
+		'9:채권만기일, 10:표면이율, 11:이자지급방법
+		'12:InterpollRate, 13:기준일수, 14:잔존일수
+		'15:년간이자지급횟수, 16:총이자지급횟수, 17:채권가격용
+		'18:채권가격, 19:선도가격, 20:선도금리
+
+		InInfor = Array(S12901_D.Data, S100301.Data, g_ArrData(i)(0), _
+			g_ArrData(i)(2), Str2Dbl(ed_Call.Data)/10000, Str2Dbl(ed_CD.Data)/10000, _
+			Str2Dbl(ed_MSB.Data)/10000, ed_FutExpiDate.Data, g_ArrData(i)(3), _
+			g_ArrData(i)(4), g_ArrData(i)(5), g_ArrRate(0), _
+			0, 0, 0, _
+			g_ArrRate(1), 0, ArrContents, _
+			0, 0, 0)
+
+		'0:현물금리, 1:선도금리
+		TheoElem = Array(0, 0)
+		ArrTheoPrc = Array(TheoElem, TheoElem, TheoElem, TheoElem, TheoElem)
+
+		'0:채권종목코드, 1:채권명, 2:채권가격,
+		'3:선도가격, 4:선도금리
+		BondElem = Array("", "", 0, 0, 0, 0)
+		ArrBond = Array(BondElem, BondElem, BondElem, BondElem, BondElem)
+		ArrBond(i)(0) = g_ArrData(i)(0)
+		ArrBond(i)(1) = g_ArrData(i)(1)
+
+		GetTheoPrice InInfor, ArrTheoPrc(i), ArrBond, i, 24
+		MeanYield = MeanYield + ArrTheoPrc(i)(0)
+		PreYield = PreYield + ArrTheoPrc(i)(1)
+
+		ArrData2(0) = i
+		ArrData2(1) = FormatNumber(ArrBond(i)(2), 2, -2, -2, 0)
+		ArrData2(2) = FormatNumber(ArrBond(i)(3), 2, -2, -2, 0)
+		ArrData2(3) = FormatNumber(Arrbond(i)(4), 2, -2, -2, 0)
+
+		Data = Join(ArrData2, "|")
+
+
+		OBJECT1.Proc "SetGridData", Data
+		ArrData2(0) = -1
+	Next
+
+	If i = 0 Then
+		i = 1
+	End If
+
+	MeanYield = MeanYield / CDbl(i)
+	PreYield = PreYield / CDbl(i)
+
+	If Mid(S100301.Data, 1, 3) = "165" Then	' 3년국채
+		Seq = 6
+	ElseIf Mid(S100301.Data, 1, 3) = "166" Then	' 5년국채
+		Seq = 10
+	ElseIf Mid(S100301.Data, 1, 3) = "167" Then	' 10년국채
+		Seq = 20
+	ElseIf Mid(S100301.Data, 1, 3) = "170" Then	' 30년국채
+		Seq = 60
+	Else
+		Seq = 6
+	End If
+
+	BondPrc = GetLog(MeanYield, Seq)
+	LogPrc = GetLog(PreYield, Seq)
+
+	SYSTEM.Trace g_ArrData(i)(0) & "||" & PreYield & "||" & Seq
+
+	TABLE0.SetTableCell 2, FormatNumber(BondPrc, 2, -2, -2, 0)
+	TABLE0.SetTableCell 3, FormatNumber(LogPrc, 2, -2, -2, 0)
+	TABLE1.SetTableCell 2, FormatNumber(MeanYield, 2, -2, -2, 0)
+	TABLE1.SetTableCell 3, FormatNumber(PreYield, 2, -2, -2, 0)
+End Sub
+'-----------------------------------------------------------------------
+Sub GetTheoPrice(InInfor, TheoElem, ArrBond, BondIndex, NumArray)
+	PrevDate = InInfor(8)
+	i = 0
+	SYSTEM.Trace "CLng(PrevDate) : "&CLng(PrevDate)
+	SYSTEM.Trace "CLng(InInfor(9)):"&CLng(InInfor(9))
+	Do While (i < NumArray And CLng(PrevDate) < CLng(InInfor(9)))
+		InInfor(17)(i)(0) = PrevDate
+		InInfor(17)(i)(1) = AfterCouponDay(InInfor(11), InInfor(8), i + 1, InInfor(9))
+		InInfor(17)(i)(2) = InInfor(10)
+		InInfor(17)(i)(3) = 10000 * InInfor(10) / CDbl(InInfor(15))
+
+		PrevDate = InInfor(17)(i)(1)
+		i = i + 1
+	Loop
+	InInfor(16) = i
+	SYSTEM.Trace "i:"&i
+	InInfor(17)(i - 1)(4) = 10000
+
+	InInfor(18) = GetBondPrice(InInfor)
+
+	TrdDays = GetDays(InInfor(0), InInfor(7))
+	Inter = 0
+	For i = 0 To InInfor(16)
+		Temp = InInfor(17)(i)(1)
+		If Len(Temp) = 0 Then
+			Temp = 0
+		Else
+			Temp = CLng(Temp)
+		End If
+
+		If Temp <= CLng(InInfor(7)) And Temp > CLng(InInfor(0)) Then
+			t = GetDays(InInfor(0), InInfor(17)(i)(1))
+			If t <= 91 Then
+				InInfor(12) = InInfor(4) + (InInfor(5) - InInfor(4)) / (91 - 1) * (t - 1)
+			Else
+				InInfor(12) = InInfor(5) + (InInfor(6) - InInfor(5)) / (365 - 91) * (t - 91)
+			End If
+			Inter = Inter + InInfor(17)(i)(3)/(1 + InInfor(12) * t / 365)
+		End If
+	Next
+
+	If TrdDays <= 91 Then
+		InInfor(12) = InInfor(4) + (InInfor(5) - InInfor(4)) / (91 - 1) * (TrdDays - 1)
+	Else
+		InInfor(12) = InInfor(5) + (InInfor(6) - InInfor(5)) / (365 - 91) * (TrdDays - 91)
+	End If
+	InInfor(19) = (InInfor(18) - Inter) * (1 + InInfor(12) * TrdDays / 365)
+	TempInInfor = InInfor
+
+	InInfor(20) = ForwdYield(TempInInfor, InInfor(19))
+	InInfor(20) = InInfor(20) * 100
+	InInfor(19) = InInfor(19) / 100
+	InInfor(18) = InInfor(18) / 100
+
+	TheoElem(0) = InInfor(3) * 100
+	TheoElem(1) = InInfor(20)
+
+	ArrBond(BondIndex)(2) = InInfor(18)
+	ArrBond(BondIndex)(3) = InInfor(19)
+	ArrBond(BondIndex)(4) = InInfor(20)
+
+End Sub
+'-----------------------------------------------------------------------
+Function AfterCouponDay(IntMethod, IssueDate, Num, FutExpiDate)
+    IssueDate_ = TranDate(IssueDate)
+    LastDay = TranDate(FutExpiDate)
+    NextDate = DateAdd("m", CLng(IntMethod) * Num, IssueDate_)
+
+    If NextDate > LastDay Then
+        AfterCouponDay = GetDateToStr(LastDay)
+    Else
+        AfterCouponDay = GetDateToStr(NextDate)
+    End If
+End Function
+'-----------------------------------------------------------------------
+Function GetBondPrice(InInfor)
+    StandardDate = InInfor(0)
+    I = 0
+    Do While (I < InInfor(16) And CLng(InInfor(17)(I)(1)) <= CLng(StandardDate))
+        I = I + 1
+    Loop
+    If Len(InInfor(17)(I)(1)) = 0 Then
+        I = I - 1
+    End If
+
+
+    InInfor(13) = GetDays(InInfor(17)(I)(0), InInfor(17)(I)(1))
+
+    If CLng(StandardDate) < CLng(InInfor(8)) Then
+
+        InInfor(14) = GetDays(InInfor(8), InInfor(17)(I)(1))
+
+    Else
+
+        InInfor(14) = GetDays(StandardDate, InInfor(17)(I)(1))
+
+    End If
+
+    DiscountFactor = 1 + (InInfor(3) / CDbl(InInfor(15)) _
+        * (CDbl(InInfor(14)) / CDbl(InInfor(13))))
+    temp1 = 1 + InInfor(3) / CDbl(InInfor(15))
+    temp2 = CDbl(InInfor(14)) / CDbl(InInfor(13))
+    j = 0
+    temp5 = 0
+    Do While (j <= InInfor(16) - I)
+        k = I + j
+        temp2 = j
+        temp3 = temp1 ^ temp2
+        SYSTEM.Trace "temp3:"&temp3
+        SYSTEM.Trace "k:"&k
+        SYSTEM.Trace "j:"&j
+        SYSTEM.Trace "InInfor(16):"&InInfor(16)
+        SYSTEM.Trace "InInfor(17)(k)(3):"&InInfor(17)(k)(3)
+        temp5 = (InInfor(17)(k)(3) + InInfor(17)(k)(4)) / temp3
+        InInfor(18) = InInfor(18) + temp5
+        j = j + 1
+    Loop
+    InInfor(18) = InInfor(18) / DiscountFactor
+    GetBondPrice = InInfor(18)
+
+End Function
+'-----------------------------------------------------------------------
+Function GetDays(StrDate1, StrDate2)
+    GetDays = DateDiff("d", TranDate(StrDate1), TranDate(StrDate2))
+End Function
+'-----------------------------------------------------------------------
+Function TranDate(SrcDate)
+    TranDate = ""
+    If Len(SrcDate) <> 8 Then
+        Exit Function
+    End If
+    StrDate = Mid(SrcDate, 1, 4) & "-" & Mid(SrcDate, 5, 2) & "-" & Mid(SrcDate, 7, 2)
+    MyDate = CDate(StrDate)
+    MyDate = DateAdd("m", 1, MyDate)
+    TranDate = StrDate
+End Function
+'-----------------------------------------------------------------------
+Function GetDateToStr(SrcDate)
+    GetDateToStr = Mid(SrcDate, 1, 4) & Mid(SrcDate, 6, 2) & Mid(SrcDate, 9, 2)
+End Function
+'-----------------------------------------------------------------------
+Function GetLog(dX, iY)
+	' 이론가 계산
+
+    Yield = dX * 0.01
+    Sequence = iY
+
+    rate0 = 1 / (1 + (Yield / 2))
+    rate1 = 1
+    rate2 = 1
+
+    For I = 1 To Sequence
+        rate1 = rate1 * rate0
+        ' 3년국채, 5년국채, 10년국채, 30년국채 :: 5/2
+        If Mid(S100301.Data, 2, 2) = "65" Or Mid(S100301.Data, 2, 2) = "66" Or Mid(S100301.Data, 2, 2) = "67" Or Mid(S100301.Data, 2, 2) = "70" Then
+        	a = (5 / 2) * rate1
+        Else
+        	a = (8 / 2) * rate1
+        End If
+        b = b + a
+    Next
+
+    For I = 1 To Sequence
+        rate2 = rate2 * rate0
+    Next
+
+    c = rate2 * 100
+
+    FuturePrice = b + c
+
+    GetLog = FuturePrice
+End Function
+'-----------------------------------------------------------------------
+Function ForwdYield(InterInfor, iTempPrice)
+    InitY = 16
+    PreY = -99
+    HighY = 256
+    LowY = 0
+    Do While (1)
+        StandardDate = InterInfor(7)
+        InterInfor(3) = InitY
+        TempPrice = 0
+        I = 0
+        Do While (I < InterInfor(16) And CLng(InterInfor(17)(I)(1)) <= CLng(StandardDate))
+            I = I + 1
+        Loop
+        If Len(InterInfor(17)(I)(1)) = 0 Then
+            I = I - 1
+        End If
+
+        InterInfor(13) = GetDays(InterInfor(17)(I)(0), InterInfor(17)(I)(1))
+        InterInfor(14) = GetDays(StandardDate, InterInfor(17)(I)(1))
+        DiscountFactor = 1 + (InterInfor(3) / CDbl(InterInfor(15))) _
+            * (CDbl(InterInfor(14)) / CDbl(InterInfor(13)))
+        temp1 = 1 + InterInfor(3) / CDbl(InterInfor(15))
+        j = 0
+        Do While (j <= InterInfor(16) - I)
+            k = I + j
+            temp2 = j
+            temp3 = temp1 ^ temp2
+            TempPrice = TempPrice + (InterInfor(17)(k)(3) + InterInfor(17)(k)(4)) / temp3
+            j = j + 1
+        Loop
+
+         TempPrice = TempPrice / DiscountFactor
+        ForwdTempPrice = TempPrice
+
+        If (InitY < 0.00000001) Then
+            ForwdYield = InitY
+
+            Exit Function
+        End If
+
+        If (InitY > 255.99999999) Then
+            ForwdYield = InitY
+
+            Exit Function
+        End If
+
+        TOL = InitY - PreY
+        If TOL < 0 Then
+            If -TOL < 0.00000001 Then
+                ForwdYield = InitY
+
+                Exit Function
+            End If
+        Else
+            If TOL < 0.00000001 Then
+                ForwdYield = InitY
+
+                Exit Function
+            End If
+        End If
+        PreY = InitY
+
+        If iTempPrice > ForwdTempPrice Then
+            HighY = InitY
+            InitY = (InitY + LowY) / 2
+
+        ElseIf iTempPrice < ForwdTempPrice Then
+            LowY = InitY
+            InitY = (InitY + HighY) / 2
+
+        Else
+            ForwdYield = InitY
+
+            Exit Function
+        End If
+
+    Loop
+    ForwdYield = 0
+
+End Function
+
+_AW_ONSTART_AW_
+ot_CallNm.Data = "콜금리"
+ot_CDNm.Data = "CD금리"
+ot_MSB1Nm.Data = "산금1년"
+ot_TrdDate.Data = "거래일"
+ot_FutExpiDate.Data = "만기일"
+ot_FutTime.Data = "수신시간"
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+If g_SendFlag Then
+	g_SendFlag = False
+	OBJECT1.Proc "SendData" , ""
+Else
+	SCREEN.OnSend = False
+End If
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+Calc
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(12901_D)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(ed_FutExpiDate)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(bt_Calc)
+_AW_ONCLICK_AW_
+Calc
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON0)
+_AW_ONCLICK_AW_
+OBJECT0.Proc "SetFutData", ""
+SendData
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

@@ -1,0 +1,203 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB2016T1)
+MAPSIZE(367, 318)
+VERSION(001)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("현재가1")
+MAPPUBLIC(";")
+FONT("굴림", 9, NORMAL)
+OPTIONS(FMS|FLASH)
+TITLE("주식-시세정보-복수종목현재가")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pooppoop")
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+USRTAB  UT1(0, 195, 318, 221)  FOCUS  INDEX(0)  COUNT(7)  AL_TOP  TAB_IMAGE  |FA_NOR      COLOR(3, 70)  CUR(0)  TABIMAGE("TAB.BMP")  FCOLOR(3, 71)  CAPTION("상세", "체결", "일별", "차트", "회원", "투자", "뉴스")  TABINFO("1:1", "1:2", "1:3", "1:4", "1:5", "1:6", "1:7")  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL0(0, 0, 300, 25)        COLOR(66, 69)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+OBJECT  OBJ01(0, 220, 318, 366)    "IB2016T2"  TABORDER(1)  IOORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  CDCHG(380, 135, 423, 152)  AL_LEFT  FONT("굴림체", 10, NORMAL)  CUR(0)      COLOR(165, 0)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  1021(380, 80, 480, 100)  LEN(16)  IO_MIXED|AL_LEFT||FA_FLASH    COLOR(130, 131)  CUR(0)            TABORDER(0)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  FST(220, 370, 242, 389)  'F'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+CONTROL  17412(0, 0, 318, 192)    "CX_Depth"  "/u1/d5/p0/b/s1/l/c/h1/o/g/x/a1/w/fIB201600/r"  LEN(0)  EDIT_OUTPUT    COLOR(193, 232)  TABORDER(0)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  1301(250, 370, 316, 390)  LEN(6)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_NOR    COLOR(192, 232)  CUR(0)  TP_SUNKEN          TABORDER(2)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  OPEN_BTN2(298, 198, 318, 218)  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(132, 232)  CUR(0)    "LINK.BMP"    TABORDER(3)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+EDIT  1777(385, 105, 405, 125)  LEN(1)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(4)  IOORDER(5)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Sub change_code(codx)
+	If Len(Trim(codx)) <> 6 Then
+		Exit Sub
+	End If
+SYSTEM.Trace "[IB201600] change_code codx = " & codx
+	S1301.Data = codx
+	SCREEN.Send 0
+	OBJ01.Send
+End Sub
+
+Sub change_tab(index)
+	UT1.Index = index
+
+	Select Case UT1.index
+		Case 1
+			OBJ01.SetObject "IB2016T2"
+		Case 2
+			OBJ01.SetObject "IB2016T3"
+		Case 3
+			OBJ01.SetObject "IB2016T4"
+		Case 4
+			OBJ01.SetObject "IB2016T5"
+		Case 5
+			OBJ01.SetObject "IB2016T6"
+		Case 6
+			OBJ01.SetObject "IB2016T7"
+		Case 7
+			OBJ01.SetObject "IB2016T8"
+	End Select
+
+	SCREEN.Object("OBJ01.1777").Data = S1777.Data
+	OBJ01.send
+End Sub
+
+Sub changerange(rg1,rg2)
+	'Dim arr,rg1,rg2
+
+	If rg1 > rg2 Then
+		S17412.SetPriceRange rg1,rg2
+	Else
+		S17412.SetPriceRange rg2,rg1
+	End If
+End Sub
+
+Sub changepercent(rg1,rg2)
+	S17412.SetPercent rg1,rg2
+End Sub
+
+Sub change_Market(sVal)
+SYSTEM.Trace "[IB201600] change_Market sVal = " & sVal
+	If sVal = "KRX" Then
+		S1777.Data = "1"
+		S17412.SetMKtype(1)
+	ElseIf sVal = "NXT" Then
+		S1777.Data =  "2"
+		S17412.SetMKtype(2)
+	ElseIf sVal = "통합" Then
+		S1777.Data =  "3"
+		S17412.SetMKtype(3)
+	End If
+
+	SCREEN.Send 0
+
+
+	SYSTEM.Trace "[IB2016]change_Market  sVal = " & sVal
+
+
+	SCREEN.Object("OBJ01.1777").Data = S1777.Data
+
+	OBJ01.Send
+End Sub
+
+_AW_ONINDECLARE_AW_
+#load IB888888
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+If Len(Trim(S1301.Data)) = 0 Then
+	SCREEN.OnSend = False
+	Exit Sub
+End If
+
+SCREEN.OnSend = True
+
+_AW_ONENDSUB_AW_
+_AW_ONFOCUS_AW_
+If S1301.Data <> "" Then
+	SYSTEM.SetHistory "1301",S1301.Data
+End If
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(UT1)
+_AW_ONCLICK_AW_
+Select Case UT1.index
+	Case 1
+		OBJ01.SetObject "IB2016T2"
+	Case 2
+		OBJ01.SetObject "IB2016T3"
+	Case 3
+		OBJ01.SetObject "IB2016T4"
+	Case 4
+		OBJ01.SetObject "IB2016T5"
+	Case 5
+		OBJ01.SetObject "IB2016T6"
+	Case 6
+		OBJ01.SetObject "IB2016T7"
+	Case 7
+		OBJ01.SetObject "IB2016T8"
+End Select
+
+OBJ01.send
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(OPEN_BTN2)
+_AW_ONCLICK_AW_
+Select Case UT1.ID
+Case 1	'상세
+		SCREEN.CreateWindow 1, "IB202300 /t//p5/S/d", _
+		"1301" & vbTab & S1301.data
+Case 2	'체결
+		SCREEN.CreateWindow 1, "IB2007XX /t/d/p5/S", _
+		"1301" & vbTab & S1301.data
+'		SCREEN.ChangeMap "IB200700"
+Case 3	'일별
+        SCREEN.CreateWindow 1, "IB2011T0 /t/d/p5/S", _
+        "1301" & vbTab & S1301.Data
+Case 4	'차트
+         SCREEN.CreateWindow 1, "IB711200 /t/S/p5/d", "1301" & vbTab & S1301.Data
+Case 5	'회원
+        SCREEN.CreateWindow 1, "IB230100 /t/s/p5/d", _
+        "1301" & vbTab & S1301.Data
+Case 6	'투자
+         SCREEN.CreateWindow 1, "IB202500 /t/s/p5/d", _
+        "1301" & vbTab & S1301.Data
+Case 7	'뉴스
+		SCREEN.CreateWindow 1, "IB771000 /t/S /d", "1301" & vbTab & S1301.Data
+Case Else
+         Exit Sub
+End Select
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

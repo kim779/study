@@ -1,0 +1,592 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB1304T0)
+MAPSIZE(203, 688)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("투자수익률(상세)")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(ENCODE)
+TITLE("[1304]투자수익률(상세)")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("piboPBxQ")
+MAPTYPE(NORM)
+HEADER(LEDGER)
+TRXH("11CSSLBQ056")
+BGROUND(BRUSH, 181)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL0(0, 0, 700, 51)        COLOR(66, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL0(11, 4, 61, 24)  '계좌번호'  AL_LEFT  CUR(0)      COLOR(66, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+CONTROL  AN1A(61, 4, 201, 24)    "CX_Account"  "/w0"  LEN(11)  EDIT_INPUT    COLOR(192, 232)  TABORDER(1)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL1(276, 4, 326, 24)  '비밀번호'  AL_LEFT  CUR(0)      COLOR(66, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  zPwd(329, 4, 385, 24)  LEN(8)  IO_MIXED|EDIT_INPUT|FA_PASSWD|FA_WRAP    COLOR(192, 130)  CUR(0)  TP_SUNKEN          TABORDER(2)  IOORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  send_btn(613, 4, 649, 24)  '조회'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, BOLD)  FOCUS  COLOR(208, 186)  CUR(0)    "조회BTN.BMP"    TABORDER(3)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+BUTTON  next_btn(650, 4, 686, 24)  '다음'  TP_PUSH|IMAGETEXT|AL_STRETCH        FOCUS  COLOR(208, 186)  CUR(0)    "2btn.bmp"    TABORDER(4)  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+LABEL  LABEL3(11, 28, 61, 49)  '결 제 월'  AL_LEFT  CUR(0)      COLOR(66, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL2(263, 28, 313, 48)  '기간구분'  AL_LEFT  CUR(0)      COLOR(66, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  RADIO0(315, 28, 359, 48)  '일별'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(group0)      COLOR(66, 130)  CUR(0)      TABORDER(5)  ENABLE  &
+  VISIBLE  CHECKED  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  RADIO1(360, 28, 404, 48)  '주별'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(group0)      COLOR(66, 130)  CUR(0)      TABORDER(6)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  zStrDt(61, 28, 148, 48)  LEN(8)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_DATE    COLOR(192, 130)  CUR(0)  TP_SUNKEN          EDITFORMAT("9999/99/99")  TABORDER(7)  IOORDER(5)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  zEndDt(167, 28, 254, 48)  LEN(8)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_DATE    COLOR(192, 130)  CUR(0)  TP_SUNKEN          EDITFORMAT("9999/99/99")  TABORDER(8)  IOORDER(6)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL4(154, 28, 160, 48)  '~'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+OUT  ACNM(205, 4, 269, 24)  LEN(30)  IO_MIXED|AL_LEFT||FA_SKIP    COLOR(160, 130)  CUR(0)  LINECOLOR(89)          TABORDER(0)  IOORDER(23)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  RADIO2(406, 28, 450, 48)  '월별'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(group0)      COLOR(66, 130)  CUR(0)      TABORDER(9)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  zIn(163, 310, 283, 330)  LEN(5)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("00001")          TABORDER(10)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  account_space(164, 352, 284, 372)  LEN(9)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("         ")          TABORDER(11)  IOORDER(3)  ENABLE  &
+  HINTTYPE(IH_NONE)
+GROUP  GROUP0(30, 648, 256, 760)  'input'        COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  zQryTermTp(163, 441, 283, 461)  LEN(1)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("1")          TABORDER(12)  IOORDER(7)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  OUTPUT0(267, 652, 529, 668)  LEN(51)  IO_MIXED|AL_CENTER|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(9)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  OUTPUT1(267, 671, 325, 689)  LEN(5)  IO_NUM|AL_CENTER|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(10)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL8(269, 690, 319, 710)  '계좌명'  AL_LEFT  CUR(0)      COLOR(64, 69)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  zAcntNm(319, 690, 500, 710)  LEN(40)  IO_MIXED|AL_CENTER|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(11)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL6(268, 712, 348, 732)  '매매약정금액'  AL_LEFT  CUR(0)      COLOR(64, 69)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  IBnsctrAmt(348, 712, 500, 732)  LEN(16)  IO_NUM|AL_CENTER|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(12)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL5(629, 28, 682, 48)  '(단위:원)'  AL_LEFT  CUR(0)      COLOR(66, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+PANEL  PANEL1(0, 54, 119, 72)  '투자원금평잔'        COLOR(96, 130)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  IInvstAvrbalPramt(120, 54, 229, 72)  LEN(16)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSIGN    COLOR(192, 130)  CUR(0)            IFRGB(69, 69)  TABORDER(0)  IOORDER(15)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL2(229, 54, 345, 72)  '입금고액'        COLOR(96, 130)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  IMnyinAmt(346, 54, 455, 72)  LEN(16)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSIGN    COLOR(192, 130)  CUR(0)            IFRGB(69, 69)  TABORDER(0)  IOORDER(13)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL3(456, 54, 576, 72)  '출금고액'        COLOR(96, 130)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  IMnyoutAmt(576, 54, 686, 72)  LEN(16)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSIGN    COLOR(192, 130)  CUR(0)            IFRGB(69, 69)  TABORDER(0)  IOORDER(14)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL4(0, 71, 119, 89)  '투자수익'        COLOR(96, 130)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  IInvstPlAmt(119, 71, 229, 89)  LEN(16)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSIGN    COLOR(77, 130)  CUR(0)            IFRGB(94, 95)  TABORDER(0)  IOORDER(16)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  dInvstErnrat(346, 71, 455, 89)  LEN(9)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSIGN    COLOR(77, 130)  CUR(0)            IFRGB(94, 95)  TABORDER(0)  IOORDER(17)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  OUTPUT2(268, 734, 326, 752)  LEN(1)  IO_NUM|AL_CENTER|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(18)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  sec(54, 765, 76, 783)  LEN(1)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("1")          TABORDER(13)  IOORDER(24)  ENABLE  &
+  HINTTYPE(IH_NONE)
+GRID  GRID0(0, 93, 688, 185)  VISIBLEROW(0)  CELLH(18)  MATRIX(2000, 11)  FIX(0)  MAINCOLOR(181, 232)  LINECOLOR(75)  FOCUSCOLOR(78)  FOCUSKIND(3)  ROWC(68, 77)  |FLEXIBLE|VSCROLL|NO3D|RROW|XHLINE|GRFTEXT    &
+	COLINFO("Col1")  LEN(8)  WIDTH(55)  HEAD("기간말일")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  EDITFORMAT("9999/99/99")    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col2")  LEN(19)  WIDTH(73)  HEAD("기초순자산")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSIGN    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(69, 69)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col3")  LEN(19)  WIDTH(73)  HEAD("기말순자산")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSIGN    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(69, 69)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col4")  LEN(16)  WIDTH(76)  HEAD("투자원금평잔")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSIGN    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(69, 69)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col5")  LEN(16)  WIDTH(73)  HEAD("약정금액")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSIGN    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(69, 69)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col6")  LEN(16)  WIDTH(75)  HEAD("입금고액")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSIGN    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(69, 69)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col7")  LEN(16)  WIDTH(73)  HEAD("출금고액")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSIGN    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(69, 69)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col8")  LEN(16)  WIDTH(68)  HEAD("평가손익")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSIGN    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(94, 95)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col0")  LEN(10)  WIDTH(49)  HEAD("수익률")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSIGN    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(94, 95)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col10")  LEN(1)  WIDTH(55)  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_NUM|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col9")  LEN(13)  WIDTH(57)  HEAD("KOSPI등락")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSIGN    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(94, 95)    HNORMAL  SORTSTARTPOS(0)    TABORDER(14)  IOORDER(19)  ENABLE  &
+  VISIBLE
+
+BUTTON  BUTTON0(504, 4, 612, 24)  '수익률 산식보기'  TP_PUSH|IMAGETEXT|AL_STRETCH        FOCUS  COLOR(208, 186)  CUR(0)    "8btn.bmp"    TABORDER(15)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+OBJECT  GUIDE(0, 187, 703, 205)  |FA_ENUM  "IB1000G0"  TABORDER(16)  IOORDER(20)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  obj_Buf(348, 242, 483, 374)    "IB1000T0"  TABORDER(17)  IOORDER(21)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL5(229, 72, 345, 90)  '투자수익률'        COLOR(96, 130)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL6(456, 72, 576, 90)  '기간지수등락률'        COLOR(96, 130)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  kospisum(576, 72, 686, 90)  LEN(16)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSIGN    COLOR(77, 130)  CUR(0)            IFRGB(69, 69)  TABORDER(0)  IOORDER(22)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BOX  BOX0(0, 54, 689, 55)    COLOR(75, 75)  LINEW(1)  BX_LINE    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BOX  BOX1(0, 89, 689, 90)    COLOR(75, 75)  LINEW(1)  BX_LINE    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BOX  BOX6(118, 54, 119, 90)    COLOR(75, 75)  LINEW(1)  BX_LINE    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BOX  BOX2(345, 54, 346, 90)    COLOR(75, 75)  LINEW(1)  BX_LINE    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BOX  BOX3(576, 54, 577, 90)    COLOR(75, 75)  LINEW(1)  BX_LINE    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL10(41, 309, 161, 329)  '레코드갯수'  AL_LEFT  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL11(41, 330, 161, 350)  '계좌번호'  AL_LEFT  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL12(41, 351, 161, 371)  '계좌번호_나머지'  AL_LEFT  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL13(41, 372, 161, 392)  '비밀번호'  AL_LEFT  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL14(41, 394, 161, 414)  '조회시작일'  AL_LEFT  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL15(41, 417, 161, 437)  '조회종료일'  AL_LEFT  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL16(41, 440, 161, 460)  '기간구분'  AL_LEFT  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL17(41, 462, 161, 482)  '구분'  AL_LEFT  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL7(456, 28, 506, 48)  '조회구분'  AL_LEFT  CUR(0)      COLOR(66, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  sortR_asc(513, 28, 557, 48)  '정순'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(sortTpGr)      COLOR(66, 130)  CUR(0)      TABORDER(18)  ENABLE  &
+  VISIBLE  CHECKED  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  sortR_dsc(563, 28, 607, 48)  '역순'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(sortTpGr)      COLOR(66, 130)  CUR(0)      TABORDER(19)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BOX  BOX4(508, 28, 608, 48)    COLOR(165, 232)  LINEW(1)  BX_LINE    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BOX  BOX5(312, 28, 448, 48)    COLOR(165, 232)  LINEW(1)  BX_LINE    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+GROUP  sortTpGr(88, 767, 208, 817)  'Group'        COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+COMBO  com_gubn(430, 5, 494, 23)  TP_NONE  LEN(1)  COUNT(5)  VCOUNT(5)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_NUM|EDIT_INPUT    COLOR(68, 69)  CUR(0)  DISPLAY("예탁자산평잔(기초평잔+입출금평잔)", "투입자산기준(기초자산+입금고-출금고)", "투입자산기준(기초자산+입금고)", "투입자산기준(기초자산+입출금고평잔)", "투입자산기준(기초자산+입금고평잔)")  DATA("1", "2", "3", "4", "5")    TABORDER(20)  IOORDER(8)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL9(400, 5, 435, 25)  '구분'  AL_LEFT  CUR(0)      COLOR(66, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Sub SetInitCustomer()
+	Dim iCustomerType
+	iCustomerType = SYSTEM.ConnectBy
+	SCREEN.Object("obj_Buf.edt_Customer").Data = iCustomerType
+	If iCustomerType <> "1" Then '고객
+		zPwd.Enable = False
+		If Trim(zPwd.Data) = "" Then
+			zPwd.Data = "9999"
+		End If
+	End If
+
+	If SCREEN.Object("obj_Buf.edt_sndCnt").Data = 0 Then
+		Call send_f()
+	End If
+
+End Sub
+
+Sub SetPassword(sData)
+	Dim Ifind, sAcc, sPass
+	ifind = InStr(sData, "-")
+	sAcc = Trim( Left(sData, Ifind-1) )
+	sPass = Trim( Mid(sData, Ifind+1, Len(sData)- Ifind) )
+	If Trim(AN1A.Data) = sAcc Then
+		zPwd.data = sPass
+		If Trim( SCREEN.Object("obj_Buf.edt_sndCnt").Data) = "0" Then
+			Call send_f()
+		End If
+	End If
+End Sub
+
+
+
+
+'== 계좌명, 비밀번호 설정
+Sub Set_account()
+
+	SCREEN.Object("GUIDE.GUIDE").Text = ""
+
+	SCREEN.ClearAll 2, 2
+	ACNM.Data = AN1A.Name
+	zPwd.Data = Trim(AN1A.Password)
+	If Trim(zPwd.Data) = "" And SYSTEM.ConnectBy <> "1" Then '고객
+		zPwd.Data = "9999"
+	End If
+
+	If Trim(AN1A.Data) = "" Then
+		AN1A.SetFocus
+		Exit Sub
+	End If
+
+	If Trim(zPwd.Data) = "" Then
+		zPwd.SetFocus
+		Exit Sub
+	End If
+
+	If Trim( SCREEN.Object("obj_Buf.edt_MapNo").Data) = "" Then
+		Exit Sub
+	End If
+
+	Call send_f()
+End Sub
+
+'== 첫 조회
+Sub send_f()
+	If  Trim(AN1A.Data) = "" Then
+		AN1A.SetFocus
+		Exit Sub
+	End If
+
+	If  Trim(zPwd.Data) = "" Then
+		zPwd.SetFocus
+		Exit Sub
+	End If
+
+	'SCREEN.Object ("GUIDE.GUIDE").Data = ""
+	SCREEN.Object("obj_Buf.edt_sndCnt").Data = SCREEN.Object("obj_Buf.edt_sndCnt").Data + 1
+	LEDGER.Fkey = "C"
+	SCREEN.Send 0
+End Sub
+
+'== 연속조회
+Sub send_c()
+	LEDGER.Fkey = "7"
+	GRID0.SetDataPosition(2)
+	SCREEN.Send 0
+End Sub
+
+Sub CalKospi()
+	Dim ii, sum
+
+	sum = 0
+	For ii=1 To GRID0.Rows
+		kp = Trim(GRID0.GetGridCell(ii, 11))
+		sum = sum + kp
+	Next
+
+	kospisum.Data = FormatNumber(sum, 2, -1, 0, 0)
+
+	If kospisum.Data > 0 Then
+		kospisum.TRgb = 94
+	ElseIf kospisum.Data < 0 Then
+		kospisum.TRgb = 95
+	ElseIf kospisum.Data = 0 Then
+		kospisum.TRgb = 130
+	End If
+End Sub
+
+Sub p_write_ini()
+	If SCREEN.CreateObject("INFO") = True Then
+		Dim sort
+		sort = ""
+
+		If sortR_asc.Checked = True Then
+			sort = "asc"
+		Else
+			sort = "dsc"
+		End If
+
+		INFO.PushData LOGIN.Name, "userconf.ini", SCREEN.GetMapName(1), "sort", sort
+	End If
+End Sub
+
+Sub p_read_ini()
+	If SCREEN.CreateObject("INFO") = True Then
+		Dim sort
+		sort = Trim(INFO.PopData(LOGIN.Name, "userconf.ini", SCREEN.GetMapName(1), "sort"))
+
+		If sort = "" Then
+			sort = "asc"
+		End If
+
+		If sort = "asc" Then
+			sortR_asc.Checked = True
+		Else
+			sortR_dsc.Checked = True
+		End If
+	End If
+End Sub
+
+
+Sub SetTermTp()
+	Dim val
+
+	If sortR_asc.Checked = True Then
+		val = 0
+	Else
+		val = 3
+	End If
+
+	If RADIO0.Checked = True Then
+		zStrDt.SetFormat "9999/99/99"
+		zEndDt.SetFormat "9999/99/99"
+
+		val = val + 1
+	ElseIf RADIO1.Checked = True Then
+		zStrDt.SetFormat "9999/99/99"
+		zEndDt.SetFormat "9999/99/99"
+
+		val = val + 2
+	Else
+		zStrDt.SetFormat "9999/99"
+		zEndDt.SetFormat "9999/99"
+
+	 	val = val + 3
+	End If
+
+	zQryTermTp.Data = val
+
+	Call send_f()
+End Sub
+
+_AW_ONINDECLARE_AW_
+#Load IB888833
+#load IB1000BB
+
+_AW_ONENDSUB_AW_
+_AW_ONSTART_AW_
+LEDGER.Rcnt = "0020"
+Call Check_LoginType(zPwd)
+Call p_read_ini()
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+' -- TR 보내기전 입력 필드 확인
+
+SCREEN.OnSend = False
+
+zIn.Data = "00001"
+
+' 기본값[9999] - 09/07/15
+If SYSTEM.ConnectBy = "0" And Trim(zPwd.Data) = "" Then
+   zPwd.Data = "9999"
+Else
+	If SYSTEM.UserPass <> Trim(zPwd.Data) Then
+		If Trim(zPwd.Data) <> "HEAD" And Len(Trim(zPwd.Data)) >= 4 Then
+			LEDGER.Hsiz = 44
+			LEDGER.EPwd = SYSTEM.EncryptSHA(Trim(zPwd.Data))
+			zPwd.Data = "HEAD"
+		End If
+
+		If Trim(zPwd.Data) = "HEAD" Then
+			If Len(Trim(LEDGER.EPwd)) <> 44 Then
+				GUIDE.Text = "일방향암호화에 실패하였습니다. 비밀번호를 다시 입력해 주세요."
+				zPwd.Data = ""
+				zPwd.SetFocus
+				SCREEN.OnSend = False
+				Exit Sub
+			End If
+		End If
+	End If
+End If
+
+If CheckInput(AN1A, zPwd) = True Then
+	SCREEN.OnSend = True
+End If
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+If LEDGER.Ecod = "3669" Then
+	SCREEN.ClearAll 1,2
+	ACNM.Data = AN1A.Name
+	zPwd.Clear
+	zPwd.SetFocus
+End If
+
+Select Case sec.data
+	Case "1"	zPwd.SetFocus
+	Case "2"	send_btn.SetFocus
+	Case "3"	next_btn.SetFocus
+	Case "4"	chart.SetFocus
+End Select
+
+If LEDGER.Next = "Y" Then
+	next_btn.Enable = True
+Else
+	next_btn.Enable = False
+End If
+
+If IsNumeric(dInvstErnrat.Data) = True Then
+	If Trim(dInvstErnrat.Data) > 0 Then
+		dInvstErnrat.TRgb = 94
+	ElseIf Trim(dInvstErnrat.Data) < 0 Then
+		dInvstErnrat.TRgb = 95
+	Else
+		dInvstErnrat.TRgb = 69
+	End If
+End If
+
+For ii = 1 To GRID0.Rows
+	If IsNumeric(GRID0.GetGridCell(ii, 9)) = True Then
+		If Trim(GRID0.GetGridCell(ii, 9)) > 0 Then
+			GRID0.SetTRgb ii, 9, 94
+		ElseIf Trim(GRID0.GetGridCell(ii, 9)) < 0 Then
+			GRID0.SetTRgb ii, 9, 95
+		Else
+			GRID0.SetTRgb ii, 9, 69
+		End If
+	End If
+Next
+
+Call CalKospi()
+
+send_btn.Enable = True
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(AN1A)
+_AW_ONCHANGE_AW_
+SCREEN.Object("GUIDE.GUIDE").Text = ""
+Set_account()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(zPwd)
+_AW_ONKEYCHANGE_AW_
+'== 비밀번호 변경시 조회 버튼 기능 수행.
+'If SCREEN.Key = "13" Then  '-- Enter 키 입력
+'	'Call send_f()
+'	CONTROL0.data = "AN98|"+AN98.Data+"|pswd|"+zPwd.Data+"|"
+'End If
+
+If SCREEN.Key = 13 And Trim(zPwd.Data) <> "" Then
+
+
+	SCREEN.Proc "OnSave_ToDLL", "False, PSWD, " & Trim(AN1A.Data) & "-" & Trim(zPwd.Data)
+
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(send_btn)
+_AW_ONCLICK_AW_
+send_btn.Enable = False
+send_f()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(next_btn)
+_AW_ONCLICK_AW_
+next_btn.Enable = False
+send_c()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(RADIO0)
+_AW_ONCLICK_AW_
+Call SetTermTp()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(RADIO1)
+_AW_ONCLICK_AW_
+Call SetTermTp()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(zStrDt)
+_AW_ONCHANGE_AW_
+If zQryTermTp.Data = "3" Then
+	zStrDt.SetFormat "9999/99"
+End If
+
+Call send_f()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(zEndDt)
+_AW_ONCHANGE_AW_
+If zQryTermTp.Data = "3" Then
+	zEndDt.SetFormat "9999/99"
+End If
+
+Call send_f()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(RADIO2)
+_AW_ONCLICK_AW_
+Call SetTermTp()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(IInvstAvrbalPramt)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(IMnyinAmt)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(IMnyoutAmt)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(IInvstPlAmt)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(dInvstErnrat)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(GRID0)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON0)
+_AW_ONCLICK_AW_
+SCREEN.CreateWindow 4, "IB130530 /s/p5 /t", ""
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(kospisum)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(sortR_asc)
+_AW_ONCLICK_AW_
+Call p_write_ini()
+Call SetTermTp()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(sortR_dsc)
+_AW_ONCLICK_AW_
+Call p_write_ini()
+Call SetTermTp()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(com_gubn)
+_AW_ONCHANGE_AW_
+Call send_f()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

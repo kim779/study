@@ -1,0 +1,254 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB693100)
+MAPSIZE(692, 766)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("[온라인]ELS청약")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(ENCODE|CR2TAB)
+TITLE("ELS 쳥약")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL3(-2, 453, 768, 670)  LIMAGE(0)  LINEW(4)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL2(-2, 187, 768, 454)  LIMAGE(0)  LINEW(4)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL105(-2, 0, 408, 188)  LIMAGE(0)  LINEW(4)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+USRTAB  UTAB1(6, 195, 759, 221)  FOCUS  INDEX(0)  COUNT(4)  AL_TOP  TAB_IMAGE        COLOR(208, 70)  CUR(0)  TABIMAGE("TAB.BMP")  FCOLOR(208, 71)  CAPTION("청약신청", "청약취소", "추납신청", "추납취소")  TABINFO("1:0", "1:1", "0:2", "0:3")  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  obj2(6, 8, 400, 180)    "IB693110"  TABORDER(2)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  test(6, 785, 135, 803)  'Label'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  zAppySrtDt(210, 783, 268, 805)  LEN(8)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(4)  IOORDER(4)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL6(139, 784, 208, 804)  '청약개시일'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  obj1(6, 221, 760, 446)    "IB693160"  TABORDER(5)  IOORDER(5)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  obj3(6, 487, 758, 661)    "IB693140"  TABORDER(1)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL0(407, 0, 768, 188)  LIMAGE(0)  LINEW(4)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  obj0(415, 8, 760, 177)    "IB693120"  TABORDER(3)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+USRTAB  UTAB0(7, 461, 526, 487)  FOCUS  INDEX(0)  COUNT(2)  AL_TOP  TAB_IMAGE        COLOR(208, 70)  CUR(0)  TABIMAGE("TAB.BMP")  FCOLOR(208, 71)  CAPTION("청약내역조회", "청약경쟁률")  TABINFO("1:1", "1:2")  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  GUIDE1(-2, 669, 768, 693)  LIMAGE(1)  LINEW(3)  STRESS(0)  STRESSW(0)  LINETYPE(4)  LINECOLOR(64)      COLOR(34, 69)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL7(8, 674, 22, 688)    |IMAGE|AL_STRETCH    COLOR(208, 232)  CUR(0)    "알림_ic.bmp"  ENABLE  &
+  VISIBLE  TRANSPARENT  IMAGE  HINTTYPE(IH_NONE)
+PANEL  GUIDE(23, 672, 651, 690)        COLOR(34, 69)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BOX  BOX0(512, 486, 758, 487)    COLOR(44, 232)  LINEW(1)  BX_LINE    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  curr_code(438, 783, 594, 809)  LEN(12)  IO_MIXED|AL_LEFT||FA_SKIP    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(6)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL4(40, 55, 705, 630)  '미사용'  TP_RAISED      COLOR(208, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Sub okClick()
+	If SCREEN.Object("obj1.Scrkey").data = "Y" Then
+		obj1.Proc "okClick", ""
+	End If
+End Sub
+
+Dim array
+Sub SendMsg(msg)
+	If SCREEN.Object("obj1.Scrkey").data = "Y" Then
+		array = Split(msg, " ")
+		If array(0) = "3206" Then
+			msg = "0198 " & array(1) & " 등록이 완료되었습니다."
+		End If
+		GUIDE.Text = msg
+	End If
+End Sub
+
+
+'Option Explicit
+
+Dim startFlag
+
+
+
+'		Dim flag
+'
+'		'obj1의 종목번호를 obj3 종목번호에 넘기기
+'		Sub obj1_to_obj3()
+'
+'			If UTAB0.Index <> 0 Then
+'				Exit Sub
+'			End If
+'		'	test.Text = SCREEN.Object("obj3.obj.1301").data
+'			If SCREEN.Object("obj1.jusik").checked = True Then
+'
+'				SCREEN.Object("obj3.jusik").checked = True
+'
+'				'obj1의 주식종목에 데이터가 있을 경우
+'				If Trim(SCREEN.Object("obj1.zIsuNo").data) <> "" Then
+'					SCREEN.Object("obj3.no").data = SCREEN.Object("obj1.zIsuNo").data
+'					SCREEN.Object("obj3.jusik_nm").data = SCREEN.Object("obj1.jusik_nm").data
+'		'			SCREEN.Object("obj3.obj").send
+'
+'					SCREEN.Proc "obj3.set_jusik", ""
+'				Else
+'					'obj1의 주식종목에 데이터가 없을 경우
+'					SCREEN.Object("obj3.no").data = ""
+'					SCREEN.Object("obj3.jusik_nm").data = ""
+'		'			SCREEN.Object("obj3.obj").send
+'
+'					SCREEN.Proc "obj3.set_jusik_first", ""
+'				End If
+'
+'			ElseIf SCREEN.Object("obj1.chae").checked = True Then
+'
+'				SCREEN.Object("obj3.chae").checked = True
+'				If Trim(SCREEN.Object("obj1.zIsuNo_chae").data) <> "" Then
+'					SCREEN.Object("obj3.zIsuNo_chae").data = SCREEN.Object("obj1.zIsuNo_chae").data
+'					SCREEN.Object("obj3.chae_nm").data = SCREEN.Object("obj1.chae_nm").data
+'
+'					SCREEN.Proc "obj3.set_chae", ""
+'				Else
+'					SCREEN.Object("obj3.zIsuNo_chae").data = ""
+'					SCREEN.Object("obj3.chae_nm").data = ""
+'
+'					SCREEN.Proc "obj3.set_chae_first", ""
+'				End If
+'			End If
+'
+'			SCREEN.Object("main.obj1.zpwd").SetFocus
+'		End Sub
+'
+'		Sub Setting_bottomTab()
+'			If Trim(zAppySrtDt.Data) <> "" Then
+'				SCREEN.Object("obj3.zAppySrtDt").data = zAppySrtDt.Data
+'			End If
+'
+'			If UTAB0.Index = 0 Then
+'				If SCREEN.Object("obj1.chae").checked = True Then
+'					SCREEN.Object("obj3.chae_nm").data = SCREEN.Object("obj1.chae_nm").data
+'				Else
+'					SCREEN.Object("obj3.jusik_nm").data = SCREEN.Object("obj1.jusik_nm").data
+'				End If
+'			ElseIf UTAB0.Index = 2 Then
+'				obj3.Send
+'			End If
+'		End Sub
+
+_AW_ONSTART_AW_
+SCREEN.SetTimer 10, False
+
+UTAB1.Index = 0
+obj1.SetObject "IB693160" 	'청약신청
+UTAB0.Index = 1
+obj3.SetObject "IB693140" 	'청약경쟁률
+
+
+
+'		flag = 0
+'
+'		UTAB1.Index = 0
+'		obj1.SetObject "IB693160" 	'청약신청
+'		UTAB0.Index = 1
+'		obj3.SetObject "IB693140" 	'청약경쟁률
+'
+'		SCREEN.SetTimer 10, True
+
+_AW_ONENDSUB_AW_
+_AW_ONTIMER_AW_
+If startFlag = 0 Then
+	SCREEN.CreateWindow 4, "IB693112 /t/s/p5/", ""
+	startFlag = 1
+End If
+
+
+
+
+
+
+
+
+'		If flag = 0 Then
+'			SCREEN.CreateWindow 4, "IB693112 /t/s/p5/", ""
+'			flag = 1
+'		End If
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(UTAB1)
+_AW_ONCLICK_AW_
+GUIDE.Text = ""
+
+Select Case UTAB1.Index
+	Case 0
+			obj1.SetObject "IB693160" 	'청약신청
+	Case 1
+			obj1.SetObject "IB693170"	'청약취소
+			UTAB0.Index = 1
+			obj3.SetObject "IB693140"
+
+	Case Else
+			obj1.SetObject "IB693160" 	'청약신청
+End Select
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(UTAB0)
+_AW_ONCLICK_AW_
+GUIDE.Text = ""
+
+Select Case UTAB0.Index
+	Case 1
+			obj3.SetObject "IB693140"
+	Case 2
+			obj3.SetObject "IB693130"
+	Case Else
+			obj3.SetObject "IB693140"
+End Select
+
+
+
+
+
+
+
+'SCREEN.Object("GUIDE.guide").text = ""
+'
+'Select  Case (UTAB0.Index)
+'	Case "0" : obj3.SetObject "IB693120"	 '-- 청약증거금
+'			   Call obj1_to_obj3()
+'	Case "1" : obj3.SetObject "IB693130"	 '-- 청약경쟁률
+'	Case "2" : obj3.SetObject "IB693140"	 '-- 청약내역조회
+'End Select
+'
+'Call Setting_bottomTab()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

@@ -1,0 +1,82 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB820862)
+MAPSIZE(148, 401)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("은행신규고객혜택")
+MAPPUBLIC(";")
+FONT("굴림", 9, NORMAL)
+TITLE("은행신규고객혜택")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL15(-3, -6, 405, 164)  LIMAGE(0)  LINEW(4)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL2(7, 14, 390, 109)        COLOR(96, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL10(15, 24, 29, 38)    |IMAGE|AL_STRETCH    COLOR(208, 232)  CUR(0)    "알림_ic.bmp"  ENABLE  &
+  VISIBLE  TRANSPARENT  IMAGE  HINTTYPE(IH_NONE)
+PANEL  GUIDE2(30, 19, 375, 43)  '고객님의 첫방문을 환영합니다.'        COLOR(228, 130)  CUR(0)    AL_LEFT  FONT("굴림체", 9, NORMAL)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+PANEL  PANEL3(30, 39, 495, 63)  '은행개설 신규고객님께는 온라인수수료 무료부터'        COLOR(228, 130)  CUR(0)    AL_LEFT  FONT("굴림체", 9, NORMAL)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  send_btn(71, 120, 171, 140)  '예'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, BOLD)  FOCUS  COLOR(208, 186)  CUR(0)    "6BTN_조회.BMP"    TABORDER(1)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+BUTTON  program(196, 120, 296, 140)  '아니요'  TP_PUSH|IMAGETEXT|AL_STRETCH        FOCUS  COLOR(208, 186)  CUR(0)    "6BTN.BMP"    TABORDER(2)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+PANEL  PANEL0(30, 59, 495, 83)  '생활에 필요한 레인보우 경품까지 다양한 혜택이 제공됩니다.'        COLOR(228, 130)  CUR(0)    AL_LEFT  FONT("굴림체", 9, NORMAL)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+PANEL  PANEL4(30, 79, 495, 103)  '지금 안내페이지로 이동하시겠습니까?'        COLOR(228, 130)  CUR(0)    AL_LEFT  FONT("굴림체", 9, NORMAL)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+CONTROL  AN99(10, 240, 129, 260)  |FA_PROTECT  "CX_Account"  "/w0"  LEN(11)  EDIT_NOP    COLOR(192, 232)  TABORDER(0)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+'--------------------------------------------------------------------------
+
+_AW_SCRIPT_AW_(send_btn)
+_AW_ONCLICK_AW_
+
+If AN99.OnlySIse = "1" Then '시세전용으로 로그인한경우.
+	MsgBox "상품신청을 위해서는 공인인증 로그인이 필요합니다. 공인인증 로그인 후 온라인지점 > 계좌개설 안내 > 은행제휴 신규계좌혜택 페이지에서 신청 바랍니다. " , , "IBK투자증권"
+Else
+	SCREEN.CreateWindow 1, "IB866200 /s/t/d/p1", "" '홈페이지화면링크걸기
+End If
+
+SCREEN.CloseWindow
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(program)
+_AW_ONCLICK_AW_
+
+MsgBox "상품을 선택하지 않으시면 CJ외식상품권(2만원권)이 자동 신청됩니다. " , , "IBK투자증권"
+
+SCREEN.CloseWindow
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

@@ -1,0 +1,146 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB959620)
+MAPSIZE(363, 800)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("[9596] MTS 로그 관�")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(FLASH|INTER)
+TITLE("[9596] MTS 로그 관리")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pmhoulog")
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+MEMO  MEMO0(0, 23, 800, 363)  TP_RAISED  IO_MIXED  EDIT_OUTPUT  FONT("굴림체", 10, NORMAL)    COLOR(181, 232)  |FA_HAN  CHARS(0)  FA_HAN  TABORDER(1)  IOORDER(7)  &
+  VISIBLE
+
+EDIT  i_type(58, 472, 78, 492)  LEN(1)  IO_ALPHA|EDIT_INPUT    COLOR(192, 232)  CUR(0)  TP_SUNKEN  INIT("L")          TABORDER(2)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL_bg(51, 392, 876, 422)  LIMAGE(1)  LINEW(3)  LINETYPE(4)  LINECOLOR(64)      COLOR(66, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL1(66, 397, 116, 417)  '사용자ID'  AL_LEFT  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(208, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  i_hnam(229, 397, 302, 417)  LEN(16)  IO_ALPHA|EDIT_INPUT|FA_WRAP  FONT("굴림체", 10, NORMAL)    COLOR(192, 232)  CUR(0)  TP_SUNKEN          TABORDER(3)  IOORDER(3)  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  i_bpip(301, 397, 430, 417)  LEN(16)  IO_ALPHA|EDIT_INPUT|FA_WRAP  FONT("굴림체", 10, NORMAL)    COLOR(192, 232)  CUR(0)  TP_SUNKEN          TABORDER(4)  IOORDER(4)  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  i_term(429, 397, 502, 417)  LEN(16)  IO_ALPHA|EDIT_INPUT|FA_WRAP  FONT("굴림체", 10, NORMAL)    COLOR(192, 232)  CUR(0)  TP_SUNKEN          TABORDER(5)  IOORDER(5)  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  i_fnam(0, 0, 740, 20)  LEN(128)  IO_ALPHA|EDIT_INPUT|FA_WRAP  FONT("굴림체", 10, NORMAL)    COLOR(192, 232)  CUR(0)  TP_SUNKEN          TABORDER(6)  IOORDER(6)  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON0(742, 397, 862, 417)  '사용자 로그수집'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, BOLD)  COLOR(7, 186)  CUR(0)    "9BTN.BMP"    TABORDER(7)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+EDIT  i_usid(120, 397, 185, 417)  LEN(16)  IO_ALPHA|EDIT_INPUT|FA_WRAP  FONT("굴림체", 10, NORMAL)    COLOR(192, 232)  CUR(0)  TP_SUNKEN  INIT("mrotp2")          TABORDER(8)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON1(184, 397, 221, 417)  '검색'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, BOLD)  COLOR(7, 186)  CUR(0)    "조회BTN.BMP"    TABORDER(9)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+BUTTON  BUTTON2(740, 0, 800, 20)  '파일삭제'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, BOLD)  COLOR(7, 186)  CUR(0)    "6BTN_조회.BMP"    TABORDER(10)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Sub sep_memo()
+	Dim str, ii, jj, slen, cnt, comp, piece
+	str = Trim(MEMO0.Text)
+	slen = Len(str)
+	If slen <= 0 Then
+		Exit Sub
+	End If
+
+	cnt = Int(slen / 50)
+
+	jj = 1
+	For ii = 0 To cnt
+		piece = Trim(Mid(str, jj, 50))
+		jj = jj + 50
+		comp = "PANEL"&ii
+		SCREEN.Object(comp).Text = piece
+		SCREEN.Object(comp).Visible = True
+	Next
+
+	SCREEN.SetSize 540-1, ((cnt+2) * 20) + 40
+	PANEL.SetRect 0, 0, 540, ((cnt+2) * 20) + 40
+End Sub
+
+_AW_ONSTART_AW_
+If Trim(i_fnam.Data) <> "" Then
+	i_type.Data = "V"
+	SCREEN.Send 0
+End If
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+Dim data
+
+data = Trim(MEMO0.Text)
+
+MEMO0.Text = Replace(data, vbLf, vbCrLf)
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(BUTTON0)
+_AW_ONCLICK_AW_
+If Trim(i_usid.Data) = "" Or Trim(i_hnam.Data) = "" Or Trim(i_bpip.Data) = "" Or Trim(i_term.Data) = "" Then
+	MsgBox "로그를 수집하고자 하는 사용자 정보를 그리드에서 선택해주십시오."
+	GMSG.Data = "로그를 수집하고자 하는 사용자 정보를 그리드에서 선택해주십시오."
+	Exit Sub
+End If
+
+If Trim(i_fnam.Data) = "" Then
+	MsgBox "수집할 파일명을 기입해주세요."
+	GMSG.Data = "수집할 파일명을 기입해주세요."
+	i_fnam.SetFocus()
+	Exit Sub
+End If
+
+i_type.Data = "G"
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON1)
+_AW_ONCLICK_AW_
+GRID0.Clear()
+If Trim(i_usid.Data) = "" Then
+	MsgBox "검색할 사용자 ID를 입력해 주십시오."
+	GMSG.Data = "검색할 사용자 ID를 입력해 주십시오."
+	i_usid.SetFocus()
+	Exit Sub
+End If
+
+i_type.Data = "F"
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON2)
+_AW_ONCLICK_AW_
+i_type.Data = "R"
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

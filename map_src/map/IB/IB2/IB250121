@@ -1,0 +1,77 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB250121)
+MAPSIZE(180, 698)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("일봉차트")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+TITLE("[250121] 투자주체별 당일 매매동향 그래프")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("ng250121")
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+CONTROL  CONTROL0(0, 0, 698, 181)  |FA_PROTECT|FA_FLASH  "C_UserGrp"  "/i71020018000000040200000000000000000030000000000111003355468720000000031200126322561000000001210016711680100000000122000842163110000000"  LEN(0)  EDIT_INOUT    COLOR(192, 232)  TABORDER(1)  IOORDER(5)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  cod2(848, 65, 922, 90)  LEN(12)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(2)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  date(846, 96, 920, 121)  LEN(8)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(3)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  check(848, 127, 878, 148)  LEN(1)  IO_MIXED|AL_CENTER|    COLOR(192, 23)  CUR(0)            TABORDER(0)  IOORDER(4)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  djchk(1010, 95, 1084, 120)  LEN(1)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("0")          TABORDER(4)  IOORDER(3)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL0(955, 95, 1010, 115)  '대주체크'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONSEND_AW_
+cod2.Data = SCREEN.Object("main.1301").Data
+
+If UCase(TypeName( SCREEN.Object("main.cxMarket"))) <> "NOTHING" Then
+	If SCREEN.Object("main.cxMarket").sMarket = "KRX" Then
+		cod2.Data = SCREEN.Object("main.1301").Data
+	ElseIf SCREEN.Object("main.cxMarket").sMarket = "NXT" Then
+		cod2.Data = "N." & SCREEN.Object("main.1301").Data
+	ElseIf SCREEN.Object("main.cxMarket").sMarket = "통합" Then
+		cod2.Data = "M." & SCREEN.Object("main.1301").Data
+	End If
+End If
+
+Set grid = SCREEN.Object("parent.12510")
+date.Data = Trim(grid.GetGridCell(1, 1))
+
+If SCREEN.Object("parent.parent.C_ER").Checked = True Then
+	djchk.Data = 1
+Else
+	djchk.Data = 0
+End If
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+If check.Data = "F" Then
+	CONTROL0.Clear
+End If
+
+_AW_ONENDSUB_AW_
+}
+
+
+

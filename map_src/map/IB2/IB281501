@@ -1,0 +1,349 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB281501)
+MAPSIZE(160, 311)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("¡∂±‚¡æ∑· «ˆ»≤")
+MAPPUBLIC(";")
+FONT("±º∏≤", 9, NORMAL)
+OPTIONS(FLASH)
+TITLE("[2815] ¡∂±‚¡æ∑· «ˆ»≤")
+TOPATH(AXIS)
+METHOD(MENU)
+TRXCODE("pibo2815")
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL63(0, 0, 311, 160)        COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON0(225, 17, 262, 37)  '¡∂»∏'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("±º∏≤√º", 9, BOLD)  FOCUS  COLOR(208, 186)  CUR(0)    "¡∂»∏BTN.BMP"    TABORDER(1)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+GRID  GRID(0, 0, 206, 161)  VISIBLEROW(0)  CELLH(18)  MATRIX(2000, 4)  FIX(0)  MAINCOLOR(7, 0)  LINECOLOR(75)  FOCUSCOLOR(78)  FOCUSKIND(3)    FONT("±º∏≤√º", 9, NORMAL)  ROWC(68, 77)  |MERGE|SELALWAYS|FLEXIBLE|VSCROLL|NO3D|RROW|XHLINE|PAGE|KEYFOCUS|GRFTEXT    &
+	COLINFO("Col10")  LEN(4)  WIDTH(30)  HEAD("π¯»£")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("021")  LEN(12)  WIDTH(69)  HEAD("RTSƒ⁄µÂ")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT  |FA_CORGB|FA_FLASH|SA_CORAW    COLOR(68, 69)  COLCUR(10, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("023")  LEN(12)  WIDTH(64)  HEAD("«ˆ¿Á∞°")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT  |FA_ZEROSUP|FA_CORGB|SA_ZERO|SA_COSUP    COLOR(68, 69)  COLCUR(10, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(94, 95)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("034")  LEN(8)  WIDTH(57)  HEAD("Ω√∞£")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    TABORDER(2)  IOORDER(4)  ENABLE  &
+  VISIBLE
+
+EDIT  page(255, 94, 290, 114)  LEN(4)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_SUNKEN  INIT("1")          TABORDER(3)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL1(215, 95, 254, 113)  'PAGE'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  gubn(255, 68, 290, 88)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_SUNKEN          TABORDER(4)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL0(215, 69, 254, 87)  '±∏∫–'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL2(210, 0, 305, 20)  'Label'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  code(255, 119, 290, 139)  LEN(6)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_SUNKEN  INIT("1")          TABORDER(5)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL3(215, 120, 254, 138)  'CODE'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Dim pgrid
+Dim today
+'-----------------------------------------------------------------------
+Function TimeDiff(ATime, BTime)
+	AHour = ATime \ 10000
+	AMin = (ATime Mod 10000) \ 100
+	ASec = ATime Mod 100
+	ASecTime = AHour*3600 + AMin*60 + ASec
+
+	BHour = BTime \ 10000
+	BMin = (BTime Mod 10000) \ 100
+	BSec = BTime Mod 100
+	BSecTime = BHour*3600 + BMin*60 + BSec
+
+	RSecTime = BSecTime - ASecTime
+	If (RSecTime < 0) Then
+		TimeDiff = 0
+	Else
+		TimeDiff = (RSecTime\3600)*10000 + ((RSecTime Mod 3600)\60)*100 + RSecTime Mod 60
+	End If
+
+End Function
+'-----------------------------------------------------------------------
+Sub send_f(spage)
+	page.Data = spage
+	SCREEN.Send 0
+End Sub
+'-----------------------------------------------------------------------
+Sub send_c(scode)
+	code.Data = scode
+	SCREEN.Send 0
+End Sub
+'-----------------------------------------------------------------------
+Set re = New RegExp
+Set hre = New RegExp
+re.Global = True
+re.IgnoreCase = True
+re.MultiLine = True
+re.Pattern = "[^0-9.\-\+]"
+hre.Global = True
+hre.IgnoreCase = True
+hre.MultiLine = True
+hre.Pattern = "[^§°-§æ|§ø-§”|∞°-∆R]"
+Sub Onalert()
+	Dim gjtime 'ø¿¿¸/ø¿»ƒ ¿Â ±∏∫–Ω√∞£
+	Dim prow, ret, evyn
+	Dim lval, rval, tval, grtp, pgval, pamax, pamin
+	Dim p1max, p1min, p2max, p2min, gjga, hsga, bsre
+	Dim jhre, jday, jtim, actm, esti, sjtim
+	Dim rtimeokyn, sgjtime, recokyn
+	Dim	jendyn
+	For ii=1 To GRID.Rows
+		jendyn = 0
+		If Len(re.Replace(GRID.GetGridCell(ii, 4), "")) > 0 Then
+			rtimeokyn = 1
+		Else
+			strrtime = hre.Replace(GRID.GetGridCell(ii, 4), "")
+			LABEL2.Data = strrtime
+			If strrtime = "¿Â∏∂∞®" Then
+				jendyn = 1
+				rtimeokyn = 1
+			ElseIf strrtime = "¿Â¡æ∑·" Then
+				LABEL2.Data = "¿Â¡æ∑·"
+				Exit Sub
+			Else
+				rtimeokyn = 0
+			End If
+		End If
+
+		rtim = re.Replace(GRID.GetGridCell(ii, 4), "")
+		sgjtime = re.Replace(SCREEN.Object("parent.jtgb").Data, "")
+		If Len(sgjtime) > 0 Then
+			gjtime = CLng(sgjtime)
+		Else
+			SCREEN.Send 0
+			Exit Sub
+		End If
+
+		If jendyn = 1 Then
+			rtim = "183000"
+		End If
+
+		If SCREEN.GetMapName(1) = "IB281500" And rtimeokyn = 1 Then
+			For jj=1 To pgrid.Rows
+				xval = Trim(GRID.GetGridCell(ii, 3))
+				evyn = Replace(pgrid.GetGridCell(jj, 16), " ", "")
+				recno = re.Replace(pgrid.GetGridCell(jj, 1), "")					'RECNO
+				If Trim(evyn) <> "øœ∑·" And Len(recno) > 0 Then
+					ret = 0
+					lval = 0
+					rval = 0
+					tval = 0
+					grtp = Trim(pgrid.GetGridCell(jj, 5))			 		'±«∏Æ¿Ø«¸
+					pgval = xval 									 		'øπªÛ∆Ú∞°∞°∞›
+					gjga = re.Replace(pgrid.GetGridCell(jj, 17), "") 		'πﬂª˝±‚¡ÿ∞°∞›
+					hsga = re.Replace(pgrid.GetGridCell(jj, 21), "")		'«‡ªÁ∞°∞›
+					bsre = re.Replace(pgrid.GetGridCell(jj, 19), "")		'¡ˆ±ﬁ∫Ò¿≤
+					jhre = re.Replace(pgrid.GetGridCell(jj, 22), "")		'¿¸»Ø∫Ò¿≤
+					jday = re.Replace(pgrid.GetGridCell(jj, 7), "")			'¡∂±‚¡æ∑·¿œ
+					jtim = CLng(re.Replace(pgrid.GetGridCell(jj, 8), ""))	'¡∂±‚¡æ∑·Ω√∞£
+					actm = CLng(pgrid.GetGridCell(jj, 23))					'¥©¿˚∆Ú∞°Ω√∞£
+					esti = CLng(pgrid.GetGridCell(jj, 24))					'∆Ú∞°Ω√¿€Ω√∞£
+
+
+					If jday = Today Then
+						If CLng(jtim) < CLng(gjtime) Then		'¥Á¿œ ø¿¿¸ KNOCK OUT
+							If CLng(rtim) < CLng(gjtime) Then
+
+								'1±∏∞£ √÷∞Ì/√÷¿˙ ∞ªΩ≈ »Æ¿Œ
+								ret = chk_section(jj, 12, 13, xval)	'chk_section(grid.rownum, maxcolnum, mincolnum, diffval)
+							Else
+								'2±∏∞£ √÷∞Ì/√÷¿˙ ∞ªΩ≈ »Æ¿Œ
+								ret = chk_section(jj, 14, 15, xval)
+							End If
+						Else									'¥Á¿œ ø¿»ƒ KNOCK OUT
+							ret = chk_section(jj, 12, 13, xval)
+
+						End If
+					Else
+						'2±∏∞£ √÷∞Ì/√÷¿˙ ∞ªΩ≈ »Æ¿Œ
+
+						If CLng(rtim) < CLng(gjtime) Then
+							ret = chk_section(jj, 14, 15, xval)
+						Else
+							TimeGap = TimeDiff(esti, rtim)
+							If (TimeGap + actm) < 30000 Then
+								ret = chk_section(jj, 14, 15, xval)
+							End If
+						End If
+					End If
+					If ret > 0 Then
+						ret = chk_section(jj, 10, 11, xval)
+					End If
+
+					If ret > 0 Then
+						igjga = CDbl(gjga)
+						ihsga = CDbl(hsga) / 100.0
+						ibsre = CDbl(bsre) / 100.0
+						ijhre = CDbl(jhre) / 1000000.0
+						ipval = CDbl(xval)
+						If grtp = "ƒ›" And ret = 2 Then
+							pgrid.SetGridCell jj, 18, xval			'øπªÛ∆Ú∞°∞°∞›
+							lval = (igjga-ihsga) * ibsre
+							rval = ipval-ihsga
+							If lval > rval Then
+								tval = lval*ijhre
+							Else
+								tval = rval*ijhre
+							End If
+							pgrid.SetGridCell jj, 20, Fix(CDbl(tval)*100)			'¡ı±«¥ÁøπªÛ¡ˆ±ﬁæ◊
+						ElseIf grtp = "«≤" And ret = 1 Then
+							pgrid.SetGridCell jj, 18, xval
+							lval = (ihsga-igjga) * ibsre
+							rval = ihsga-ipval
+							If lval > rval Then
+								tval = lval*ijhre
+							Else
+								tval = rval*ijhre
+							End If
+							pgrid.SetGridCell jj, 20, Fix(CDbl(tval)*100)
+						End If
+					End If
+				End If
+			Next
+		ElseIf rtimeokyn = 1 Then
+			xval = Trim(GRID.GetGridCell(ii, 3))
+			evyn = Replace(SCREEN.Object("parent.evyn").Data, " ", "")
+			If Trim(evyn) <> "øœ∑·" Then
+				ret = 0
+				lval = 0
+				rval = 0
+				tval = 0
+				grtp = Trim(SCREEN.Object("parent.krye").Data)	 		'±«∏Æ¿Ø«¸
+				pgval = xval 									 		'øπªÛ∆Ú∞°∞°∞›
+				jday = re.Replace(SCREEN.Object("parent.eeod").Data, "")			'¡∂±‚¡æ∑·¿œ
+				jtim = CLng(re.Replace(SCREEN.Object("parent.kotm").Data, ""))	'¡∂±‚¡æ∑·Ω√∞£
+				actm = CLng(SCREEN.Object("parent.atim").Data)					'¥©¿˚∆Ú∞°Ω√∞£
+				esti = CLng(SCREEN.Object("parent.esti").Data)					'∆Ú∞°Ω√¿€Ω√∞£
+
+				If jday = Today Then
+					If CLng(jtim) < CLng(gjtime) Then		'¥Á¿œ ø¿¿¸ KNOCK OUT
+
+						If CLng(rtim) < CLng(gjtime) Then
+							'1±∏∞£ √÷∞Ì/√÷¿˙ ∞ªΩ≈ »Æ¿Œ
+							ret = chk_onesect(SCREEN.Object("parent.g1mx"), SCREEN.Object("parent.g1mn"), xval)	'chk_section(maxobj, minobj, diffval)
+						Else
+							'SYSTEM.Trace "jj="&jj&" max="&SCREEN.Object("parent.g2mx").data&" min="&SCREEN.Object("parent.g2mn").Data&" xval="&xval
+							'2±∏∞£ √÷∞Ì/√÷¿˙ ∞ªΩ≈ »Æ¿Œ
+							ret = chk_onesect(SCREEN.Object("parent.g2mx"), SCREEN.Object("parent.g2mn"), xval)
+						End If
+					Else									'¥Á¿œ ø¿»ƒ KNOCK OUT
+						ret = chk_onesect(SCREEN.Object("parent.g1mx"), SCREEN.Object("parent.g1mn"), xval)
+					End If
+				Else
+					'2±∏∞£ √÷∞Ì/√÷¿˙ ∞ªΩ≈ »Æ¿Œ
+					If CLng(rtim) < CLng(gjtime) Then
+						ret = chk_onesect(SCREEN.Object("parent.g2mx"), SCREEN.Object("parent.g2mn"), xval)
+					Else
+						TimeGap = TimeDiff(esti, rtim)
+						If (TimeGap + actm) < 30000 Then
+							ret = chk_onesect(SCREEN.Object("parent.g2mx"), SCREEN.Object("parent.g2mn"), xval)
+						End If
+					End If
+				End If
+				If ret > 0 Then
+					ret = chk_onesect(SCREEN.Object("parent.pamx"), SCREEN.Object("parent.pamn"), xval)
+				End If
+
+				If ret > 0 Then
+					If grtp = "ƒ›" And ret = 2 Then
+						SCREEN.Object("parent.ysev").Data = xval	'øπªÛ∆Ú∞°∞°∞›
+					ElseIf grtp = "«≤" And ret = 1 Then
+						SCREEN.Object("parent.ysev").Data = xval
+					End If
+				End If
+			End If
+		End If
+	Next
+End Sub
+
+Function chk_onesect(maxobj, minobj, val)
+	chk_onesect = 0
+	max = Trim(maxobj.Data)
+	min = Trim(minobj.Data)
+	If CDbl(max) = 0 Then
+		max = val
+		maxobj.Data = val
+	End If
+	If CDbl(min) = 0 Then
+		min = val
+		minobj.Data = val
+	End If
+
+	If CDbl(max) < CDbl(val) Then
+		chk_onesect = 1
+		maxobj.Data = val
+	ElseIf CDbl(min) > CDbl(val) Then
+		chk_onesect = 2
+		minobj.Data = val
+	End If
+End Function
+
+Function chk_section(nrow, maxcnum, mincnum, val)
+	chk_section = 0
+	max = Trim(pgrid.GetGridCell(nrow, maxcnum))
+	min = Trim(pgrid.GetGridCell(nrow, mincnum))
+	If CDbl(max) = 0 Then
+		max = val
+		pgrid.SetGridCell nrow, maxcnum, val
+	End If
+	If CDbl(min) = 0 Then
+		min = val
+		pgrid.SetGridCell nrow, mincnum, val
+	End If
+
+	If CDbl(max) < CDbl(val) Then
+		chk_section = 1
+		pgrid.SetGridCell nrow, maxcnum, val
+	ElseIf CDbl(min) > CDbl(val) Then
+		chk_section = 2
+		pgrid.SetGridCell nrow, mincnum, val
+	End If
+End Function
+
+_AW_ONSTART_AW_
+
+today = Replace(Date, "-", "")
+If SCREEN.GetMapName(1) = "IB281500" Then
+	gubn.Data = "2"
+	Set pgrid = SCREEN.Object("parent.GRID1")
+Else
+	gubn.Data = "3"
+End If
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(BUTTON0)
+_AW_ONCLICK_AW_
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(GRID)
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

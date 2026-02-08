@@ -1,0 +1,109 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB120810)
+MAPSIZE(20, 257)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(FMS|FLASH)
+TITLE("[120810]")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pooppoop")
+MAPTYPE(FIXED)
+HEADER(NOP)
+BGROUND(BRUSH, 66)
+}
+
+
+
+FORM DIVISION
+{
+
+CONTROL  1301(50, 0, 115, 20)  |FA_PROTECT  "CX_CODECTRL"  "/u0/k검색.BMP/lAXCOMBO.BMP/p/s0/o"  LEN(6)  EDIT_INOUT    COLOR(192, 130)  TABORDER(2)  IOORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON0(115, 0, 134, 20)  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(15, 63)  CUR(0)    "검색.BMP"    TABORDER(1)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+CONTROL  17413(137, 0, 257, 20)    "CX_Symbol"  "/a89/b91/c92/d69"  LEN(0)  EDIT_OUTPUT  FONT("굴림체", 9, NORMAL)    COLOR(90, 130)  TABORDER(0)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL0(0, 0, 50, 20)  '종목코드'  AL_LEFT  CUR(0)      COLOR(66, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  2023(342, 0, 406, 20)  LEN(10)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_ZERO|SA_COSUP    COLOR(192, 69)  CUR(0)  LINECOLOR(75)          IFRGB(94, 95)  TABORDER(0)  IOORDER(3)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL6(290, 0, 340, 20)  '매수가격'  AL_LEFT  CUR(0)      COLOR(66, 69)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  1021(0, 155, 78, 173)  LEN(16)  IO_NUM|AL_CENTER||FA_FLASH    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONRECEIVE_AW_
+If Trim(S2023.Data) <> "" Then
+	SCREEN.Object("main.dOrdPrc").data = S2023.Data
+
+	If SCREEN.Object("parent.startFlag").Text = "1" Then
+		SCREEN.Proc "parent.send_f", ""
+	End If
+End If
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(1301)
+_AW_ONCHANGE_AW_
+If Trim(S1301.Data) = "000000" Then
+		Exit Sub
+	End If
+S1301.Trigger "",True
+'S1301.Trigger "", False
+SCREEN.object("main.IMgnRat20pctOrdAbleAmt").Clear
+SCREEN.object("main.IMgnRat20OrdAbleQty").Clear
+SCREEN.object("main.dAcntMgnRat").Clear
+SCREEN.object("main.dIsuMgnRat").Clear
+SCREEN.object("main.dTrdMgnrt").Clear
+SCREEN.object("main.IDps").Clear
+SCREEN.object("main.IMnyMgn").Clear
+SCREEN.object("main.IMnyOrdAbleAmt").Clear
+SCREEN.object("main.ISubstAmt").Clear
+SCREEN.object("main.ISubstMgn").Clear
+SCREEN.object("main.ISubstOrdAbleAmt").Clear
+SCREEN.object("main.IMgnRat30pctOrdAbleAmt").Clear
+SCREEN.object("main.IMgnRat50pctOrdAbleAmt").Clear
+SCREEN.object("main.IMgnRat100pctOrdAbleAmt").Clear
+SCREEN.object("main.IMgnRat30OrdAbleQty").Clear
+SCREEN.object("main.IMgnRat50OrdAbleQty").Clear
+SCREEN.object("main.IMgnRat100OrdAbleQty").Clear
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON0)
+_AW_ONCLICK_AW_
+Dim retn
+retn = SCREEN.GetCode(100, "1301", "hnam", 0 )
+If retn <> True Then
+      Exit Sub
+End If
+
+SCREEN.Send 0
+'SCREEN.Proc "parent.send_sise", "sise" & "," & S1301.Data
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(2023)
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

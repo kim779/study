@@ -1,0 +1,140 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB101600)
+MAPSIZE(485, 610)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("투자자시장종합")
+MAPPUBLIC(";")
+FONT("굴림", 9, NORMAL)
+TITLE("[1016]당일동향")
+TOPATH(AXIS)
+METHOD(MENU)
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+GROUP  grp1(729, 548, 757, 572)  'grp1'        COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  btn1(239, 532, 258, 552)  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(208, 69)  CUR(0)    "창조절좌우.bmp"    TABORDER(1)  ENABLE  &
+  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)  HELPTEXT("좌우확대")HELPTEXT("좌우확대")
+BUTTON  btn2(259, 532, 278, 552)  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(208, 69)  CUR(0)    "창조절상하.bmp"    TABORDER(2)  ENABLE  &
+  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)  HELPTEXT("상하확대")HELPTEXT("상하확대")
+LABEL  LABEL0(329, 551, 356, 569)  '기간'  AL_LEFT  CUR(0)      COLOR(76, 69)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  fday(359, 551, 453, 569)  LEN(8)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_DATE    COLOR(68, 69)  CUR(0)  TP_NONE          EDITFORMAT("9999/99/99")  TABORDER(3)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  tday(471, 551, 565, 569)  LEN(8)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_DATE    COLOR(68, 69)  CUR(0)  TP_NONE          EDITFORMAT("9999/99/99")  TABORDER(4)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL2(458, 551, 466, 569)  '-'  AL_LEFT  CUR(0)      COLOR(76, 69)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  BUTTON0(639, 551, 683, 569)  '조회'  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(208, 232)  CUR(0)    "2BTN.BMP"    TABORDER(5)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+GROUP  grp2(710, 590, 738, 614)  'grp2'        COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+USRTAB  selectMap(0, 0, 610, 26)  FOCUS  INDEX(0)  COUNT(12)  AL_TOP  TAB_IMAGE      FONT("굴림체", 9, NORMAL)    COLOR(181, 70)  CUR(0)  TABIMAGE("tab.bmp")  FCOLOR(3, 71)  CAPTION("당일동향", "차트", "시간대", "일자별", "순매수추이", "업종별현황", "매매흐름", "업종지수", "전체업종", "업종일별", "시간대등락", "업종거래비중")  TABINFO("1:1", "0:2", "1:3", "1:4", "1:5", "1:6", "1:7", "1:8", "1:9", "1:10", "1:11", "1:12")  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  obj(0, 26, 610, 486)    "IB101040"  TABORDER(6)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONINDECLARE_AW_
+#load SE799999
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(btn1)
+_AW_ONCLICK_AW_
+SCREEN.ChangeMap "IB290830"
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(btn2)
+_AW_ONCLICK_AW_
+SCREEN.ChangeMap "IB290840"
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(fday)
+_AW_ONCHANGE_AW_
+'SCREEN.Object("obj1.fday").Data = fday.Data
+
+obj1.Send
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(tday)
+_AW_ONCHANGE_AW_
+obj1.Send
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON0)
+_AW_ONCLICK_AW_
+obj1.Send
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(selectMap)
+_AW_ONCLICK_AW_
+Select Case selectMap.ID
+	Case 1 :
+			obj.SetObject "IB101040"		'당일동향
+			SCREEN.SetCaption "당일동향"
+	Case 2 :
+	Case 3 :
+			obj.SetObject "IB101620"		'시간대별
+			SCREEN.SetCaption "시간대별"
+	Case 4 :
+			obj.SetObject "IB101625"		'일자별
+			SCREEN.SetCaption "일자별"
+	Case 5 :
+			obj.SetObject "IB101630"		'순매수추이
+			SCREEN.SetCaption "순매수추이"
+	Case 6 :
+			obj.SetObject "IB101632"		'업종별
+			SCREEN.SetCaption "업종별현황"
+	Case 7 :
+			obj.SetObject "IB101635"		'전체 업종별
+			SCREEN.SetCaption "매매흐름"
+	Case 8 :
+			obj.SetObject "IB101640"		'업종별 주가지수
+			SCREEN.SetCaption "업종지수"
+	Case 9 :
+			obj.SetObject "IB101645"		'투자자 시장종합
+			SCREEN.SetCaption "전체업종"
+	Case 10 :
+			obj.SetObject "IB101650"		'투자자 시장종합
+			SCREEN.SetCaption "업종일별"
+	Case 11 :
+	        obj.SetObject "IB101655"		'투자자 시장종합
+	        SCREEN.SetCaption "시간대등락"
+	Case 12 :
+			obj.SetObject "IB101660"		'투자자 시장종합
+			SCREEN.SetCaption "업종거래비중"
+End Select
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

@@ -1,0 +1,868 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB590010)
+MAPSIZE(370, 454)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("5901 환전")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(ENCODE|CR2TAB)
+TITLE("5901 환전")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("piboPBxQ")
+MAPTYPE(NORM)
+HEADER(LEDGER)
+TRXH("13CSDPDT080")
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL7(0, 0, 2, 30)        COLOR(64, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL0(0, 0, 455, 30)        COLOR(66, 130)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+USRTAB  tab_ex(0, 5, 455, 31)  FOCUS  INDEX(0)  COUNT(2)  AL_TOP  TAB_IMAGE  |FA_SKIP|FA_UPPER    FONT("굴림체", 9, NORMAL)    COLOR(3, 70)  CUR(0)  TABIMAGE("OTAB.bmp")  FCOLOR(3, 71)  CAPTION("외화매수", "외화매도")  TABINFO("1:2", "1:1")  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL1(0, 30, 454, 370)  LIMAGE(0)  LINEW(4)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    RESIZABLE  AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+TABLE  TABLE1(341, 170, 451, 190)  MATRIX(1, 1)  LINECOLOR(75)  CELLH(19)  AUTOSIZE  |NOHEAD  EDIT_OUTPUT    &
+	COLINFO("TBL01")  LEN(16)  WIDTH(115)  HEAD("원화금잔")  COLALIGN(AL_CENTER, AL_RIGHT)  HEADCOLOR(74, 192)  IO_NUM|FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSUP    COLOR(192, 69)  COLCUR(0, 0)  COLHINTTYPE(IH_NONE)    COLUMN_VISIBLE  IFRGB(69, 69)  IOORDER(41)  ENABLE  &
+  VISIBLE
+
+LABEL  LABEL4(15, 57, 90, 77)  '적용환율'  AL_LEFT  CUR(0)      COLOR(208, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL0(15, 80, 90, 100)  '신청외화'  AL_LEFT  CUR(0)      COLOR(208, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL2(15, 104, 90, 124)  '예상원화'  AL_LEFT  CUR(0)      COLOR(208, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  dtlBtn(225, 80, 321, 100)  '환전예상액계산'  TP_PUSH|IMAGETEXT|AL_STRETCH        FOCUS  COLOR(132, 186)  CUR(0)    "7btn.BMP"    TABORDER(1)  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+COMBO  cbo_type_mesu(235, 35, 320, 55)  TP_SUNKEN  LEN(1)  COUNT(3)  VCOUNT(3)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_NUM|EDIT_INPUT|FA_SKIP    COLOR(192, 130)  CUR(0)  DISPLAY("USD", "HKD", "CNY")  DATA("0", "1", "2")    TABORDER(2)  IOORDER(48)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL3(200, 35, 220, 55)  '->'  AL_LEFT  CUR(0)      COLOR(208, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+GROUP  gp(485, 23, 976, 682)  'Group'        COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  ed_exprc(100, 104, 205, 124)  LEN(15)  IO_NUM|EDIT_INPUT|FA_COMMA|FA_RIGHT|FA_WRAP|FA_SKIP|SHOWFORM      COLOR(192, 232)  CUR(0)  TP_SUNKEN  INIT("0.00")          TABORDER(3)  IOORDER(49)  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL22(12, 212, 452, 232)  ' 환전가능 시간 : 09:00 ~ 23:00(국내영업일)'  AL_LEFT  CUR(0)      COLOR(208, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+PANEL  PANEL99(4, 218, 13, 227)    |IMAGE|AL_CENTER    COLOR(208, 232)  CUR(0)    "텍스트화살표_하단.BMP"  ENABLE  &
+  VISIBLE  TRANSPARENT  IMAGE  HINTTYPE(IH_NONE)
+LABEL  LABEL5(12, 250, 452, 270)  ' 조회시점과 환전시점에 환율변동 가능하니 결과를 확인하여 주시기 바랍니다.'  AL_LEFT  CUR(0)      COLOR(208, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+PANEL  PANEL2(4, 256, 13, 265)    |IMAGE|AL_CENTER    COLOR(208, 232)  CUR(0)    "텍스트화살표_하단.BMP"  ENABLE  &
+  VISIBLE  TRANSPARENT  IMAGE  HINTTYPE(IH_NONE)
+LABEL  LABEL6(12, 269, 452, 289)  ' 이종통화간 환전은 원화로 환전 후 대상통화로 추가 환전하여 주십시오'  AL_LEFT  CUR(0)      COLOR(208, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL7(12, 231, 452, 251)  ' 환전 후 취소 불가합니다.'  AL_LEFT  CUR(0)      COLOR(208, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+PANEL  PANEL3(4, 237, 13, 246)    |IMAGE|AL_CENTER    COLOR(208, 232)  CUR(0)    "텍스트화살표_하단.BMP"  ENABLE  &
+  VISIBLE  TRANSPARENT  IMAGE  HINTTYPE(IH_NONE)
+LABEL  LABEL8(12, 288, 452, 308)  ' 은행예수금방식 계좌는 환전필요금액을 은행계좌에서 인출됩니다.'  AL_LEFT  CUR(0)      COLOR(208, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+PANEL  PANEL5(4, 294, 13, 303)    |IMAGE|AL_CENTER    COLOR(208, 232)  CUR(0)    "텍스트화살표_하단.BMP"  ENABLE  &
+  VISIBLE  TRANSPARENT  IMAGE  HINTTYPE(IH_NONE)
+LABEL  LABEL9(10, 128, 65, 148)  '처리결과'  AL_LEFT  FONT("굴림체", 9, BOLD)  CUR(0)      COLOR(208, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL11(299, 128, 354, 148)  '거래번호'  AL_LEFT  FONT("굴림체", 9, BOLD)  CUR(0)      COLOR(208, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+PANEL  won1(100, 35, 175, 55)  'KRW'  LINECOLOR(0)      COLOR(192, 232)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  won2(235, 35, 310, 55)  'KRW'  LINECOLOR(0)      COLOR(192, 232)  CUR(0)    AL_LEFT    ENABLE  &
+  HINTTYPE(IH_NONE)
+COMBO  cbo_type_medo(100, 35, 185, 55)  TP_SUNKEN  LEN(1)  COUNT(3)  VCOUNT(3)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_NUM|EDIT_INPUT|FA_SKIP    COLOR(192, 130)  CUR(0)  DISPLAY("USD", "HKD", "CNY")  DATA("0", "1", "2")    TABORDER(4)  IOORDER(50)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL12(496, 121, 544, 141)  '계좌번호'  AL_CENTER  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(66, 130)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL13(496, 144, 544, 164)  '비밀번호'  AL_LEFT  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(66, 130)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL19(496, 75, 544, 95)  '환전구분'  AL_LEFT  CUR(0)      COLOR(208, 130)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  ed_acno(596, 121, 723, 141)  LEN(20)  IO_MIXED|EDIT_INOUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(5)  IOORDER(4)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  ed_pswd(596, 144, 652, 164)  LEN(8)  IO_MIXED|EDIT_INOUT|FA_PASSWD|FA_WRAP  FONT("굴림체", 9, NORMAL)    COLOR(192, 130)  CUR(0)  TP_SUNKEN          TABORDER(6)  IOORDER(5)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  zIn(596, 52, 671, 72)  LEN(5)  IO_MIXED|EDIT_INOUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("00001")          TABORDER(7)  IOORDER(1)  &
+  HINTTYPE(IH_NONE)
+LABEL  lb_in(496, 52, 544, 72)  'in'  AL_LEFT  CUR(0)      COLOR(208, 130)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  ed_chgtpcode(596, 75, 616, 95)  LEN(1)  IO_MIXED|EDIT_INOUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("1")          TABORDER(8)  IOORDER(2)  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL14(496, 98, 544, 118)  '처리구분'  AL_CENTER  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(66, 130)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  ed_trxtp(596, 98, 723, 118)  LEN(1)  IO_MIXED|EDIT_INOUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(9)  IOORDER(3)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL15(496, 167, 581, 187)  '등록구분코드'  AL_LEFT  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(66, 130)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  ed_regtpcode(596, 167, 652, 187)  LEN(2)  IO_MIXED|EDIT_INOUT|FA_WRAP  FONT("굴림체", 9, NORMAL)    COLOR(192, 130)  CUR(0)  TP_SUNKEN          TABORDER(10)  IOORDER(6)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL16(496, 190, 571, 210)  '환율구분코드'  AL_LEFT  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(66, 130)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  ed_chgrtpcode(596, 190, 652, 210)  LEN(2)  IO_MIXED|EDIT_INOUT|FA_WRAP  FONT("굴림체", 9, NORMAL)    COLOR(192, 130)  CUR(0)  TP_SUNKEN          TABORDER(11)  IOORDER(7)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL10(496, 213, 571, 233)  '환전유형코드'  AL_LEFT  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(66, 130)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL17(496, 236, 571, 256)  '대상출금금액'  AL_LEFT  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(66, 130)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL18(496, 259, 571, 279)  '환전입금금액'  AL_LEFT  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(66, 130)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL20(496, 282, 571, 302)  '대상통화코드'  AL_LEFT  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(66, 130)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL21(496, 305, 571, 325)  '환전통화코드'  AL_LEFT  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(66, 130)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL23(496, 328, 571, 348)  '적용환율'  AL_LEFT  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(66, 130)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL24(496, 351, 571, 371)  '우대율'  AL_LEFT  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(66, 130)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL25(496, 374, 571, 394)  '구분2'  AL_LEFT  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(66, 130)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL26(496, 397, 596, 417)  '예약환전일련번호'  AL_LEFT  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(66, 130)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL27(496, 420, 596, 440)  '기준환율'  AL_LEFT  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(66, 130)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL28(496, 443, 596, 463)  '우대율적용구분'  AL_LEFT  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(66, 130)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL29(496, 466, 596, 486)  '환전금액'  AL_LEFT  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(66, 130)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL30(496, 489, 596, 509)  '원화금액'  AL_LEFT  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(66, 130)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL31(496, 512, 596, 532)  '외화금액'  AL_LEFT  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(66, 130)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL32(496, 535, 596, 555)  '응답코드'  AL_LEFT  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(66, 130)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL33(496, 558, 596, 578)  '대고객환율'  AL_LEFT  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(66, 130)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL34(496, 581, 596, 601)  '전문일련번호'  AL_LEFT  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(66, 130)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL35(496, 604, 596, 624)  '처리일자번호'  AL_LEFT  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(66, 130)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL36(496, 627, 596, 647)  '처리지점번호'  AL_LEFT  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(66, 130)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL37(496, 650, 596, 670)  '거래일'  AL_LEFT  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(66, 130)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  ed_chgptncode(596, 213, 652, 233)  LEN(2)  IO_MIXED|EDIT_INOUT|FA_WRAP  FONT("굴림체", 9, NORMAL)    COLOR(192, 130)  CUR(0)  TP_SUNKEN          TABORDER(12)  IOORDER(8)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  ed_tgtoutamt(616, 236, 779, 256)  LEN(25)  IO_NUM|EDIT_INOUT|FA_RIGHT  FONT("굴림체", 9, NORMAL)    COLOR(192, 130)  CUR(0)  TP_SUNKEN          TABORDER(13)  IOORDER(10)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  ed_chginamt(616, 259, 779, 279)  LEN(25)  IO_NUM|EDIT_INOUT|FA_RIGHT  FONT("굴림체", 9, NORMAL)    COLOR(192, 130)  CUR(0)  TP_SUNKEN          TABORDER(14)  IOORDER(12)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  ed_tgtcrcycode(596, 282, 652, 302)  LEN(3)  IO_MIXED|EDIT_INOUT|FA_WRAP  FONT("굴림체", 9, NORMAL)    COLOR(192, 130)  CUR(0)  TP_SUNKEN          TABORDER(15)  IOORDER(13)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  ed_chgcrcycode(596, 305, 652, 325)  LEN(3)  IO_MIXED|EDIT_INOUT|FA_WRAP  FONT("굴림체", 9, NORMAL)    COLOR(192, 130)  CUR(0)  TP_SUNKEN          TABORDER(16)  IOORDER(14)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  ed_appexrate(616, 328, 713, 348)  LEN(14)  IO_NUM|EDIT_INOUT|FA_RIGHT  FONT("굴림체", 9, NORMAL)    COLOR(192, 130)  CUR(0)  TP_SUNKEN          TABORDER(17)  IOORDER(16)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  ed_prvrate(616, 351, 713, 371)  LEN(14)  IO_NUM|EDIT_INOUT|FA_RIGHT  FONT("굴림체", 9, NORMAL)    COLOR(192, 130)  CUR(0)  TP_SUNKEN          TABORDER(18)  IOORDER(18)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  ed_tp2(596, 374, 716, 394)  LEN(2)  IO_MIXED|EDIT_INOUT|FA_WRAP  FONT("굴림체", 9, NORMAL)    COLOR(192, 130)  CUR(0)  TP_SUNKEN          TABORDER(19)  IOORDER(19)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  ed_rsvchgnum(596, 396, 716, 416)  LEN(10)  IO_MIXED|EDIT_INOUT|FA_WRAP  FONT("굴림체", 9, NORMAL)    COLOR(192, 130)  CUR(0)  TP_SUNKEN          TABORDER(20)  IOORDER(20)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  ed_baseexrate(616, 420, 719, 440)  LEN(10)  IO_NUM|EDIT_INOUT|FA_RIGHT  FONT("굴림체", 9, NORMAL)    COLOR(192, 130)  CUR(0)  TP_SUNKEN          TABORDER(21)  IOORDER(22)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  ed_prvapptp(596, 443, 716, 463)  LEN(1)  IO_MIXED|EDIT_INOUT|FA_WRAP  FONT("굴림체", 9, NORMAL)    COLOR(192, 130)  CUR(0)  TP_SUNKEN          TABORDER(22)  IOORDER(23)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  ed_examt(616, 466, 730, 486)  LEN(17)  IO_NUM|EDIT_INOUT|FA_RIGHT  FONT("굴림체", 9, NORMAL)    COLOR(192, 130)  CUR(0)  TP_SUNKEN          TABORDER(23)  IOORDER(25)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  ed_won(616, 489, 730, 509)  LEN(15)  IO_NUM|EDIT_INOUT  FONT("굴림체", 9, NORMAL)    COLOR(192, 130)  CUR(0)  TP_SUNKEN          TABORDER(24)  IOORDER(27)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  ed_fcuramt(616, 512, 730, 532)  LEN(16)  IO_NUM|EDIT_INOUT|FA_RIGHT  FONT("굴림체", 9, NORMAL)    COLOR(192, 130)  CUR(0)  TP_SUNKEN          TABORDER(25)  IOORDER(29)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  ed_rescode(596, 535, 716, 555)  LEN(3)  IO_MIXED|EDIT_INOUT|FA_WRAP  FONT("굴림체", 9, NORMAL)    COLOR(192, 130)  CUR(0)  TP_SUNKEN          TABORDER(26)  IOORDER(30)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  ed_custrate(616, 558, 709, 578)  LEN(14)  IO_NUM|EDIT_INOUT|FA_RIGHT  FONT("굴림체", 9, NORMAL)    COLOR(192, 130)  CUR(0)  TP_SUNKEN          TABORDER(27)  IOORDER(32)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  ed_tgseqno(616, 581, 683, 601)  LEN(9)  IO_NUM|EDIT_INOUT  FONT("굴림체", 9, NORMAL)    COLOR(192, 130)  CUR(0)  TP_SUNKEN          TABORDER(28)  IOORDER(34)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  ed_txseqno(616, 604, 683, 624)  LEN(9)  IO_NUM|EDIT_INOUT  FONT("굴림체", 9, NORMAL)    COLOR(192, 130)  CUR(0)  TP_SUNKEN          TABORDER(29)  IOORDER(36)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  ed_trxbrnno(596, 627, 716, 647)  LEN(3)  IO_MIXED|EDIT_INOUT|FA_WRAP  FONT("굴림체", 9, NORMAL)    COLOR(192, 130)  CUR(0)  TP_SUNKEN          TABORDER(30)  IOORDER(37)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  ed_trddt(596, 650, 716, 670)  LEN(8)  IO_MIXED|EDIT_INOUT|FA_WRAP  FONT("굴림체", 9, NORMAL)    COLOR(192, 130)  CUR(0)  TP_SUNKEN          TABORDER(31)  IOORDER(38)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  o_ocnt(531, 774, 591, 794)  LEN(5)  IO_NUM|AL_CENTER|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(39)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL38(454, 774, 527, 793)  'O CNT'  AL_CENTER  CUR(0)      COLOR(195, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  o_trdno(355, 128, 445, 148)  LEN(10)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSUP    COLOR(192, 232)  CUR(0)  LINECOLOR(0)          TABORDER(0)  IOORDER(40)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+GROUP  GROUP0(57, 626, 392, 822)  'obj_apprate 적용환율조회 (코스콤)'        COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+GROUP  GROUP1(62, 380, 397, 595)  'obj_srhreate_k835 거래환율조회(은행)'        COLOR(-1, 232)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL39(726, 328, 951, 348)  '<-- obj_apprate조회후 적용환율 가져옴'  AL_LEFT  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(66, 130)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL40(726, 351, 951, 371)  '<-- obj_apprate조회후 우대율 가져옴'  AL_LEFT  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(66, 130)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL41(15, 35, 90, 55)  '통화코드'  AL_LEFT  CUR(0)      COLOR(208, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  BUTTON0(330, 35, 410, 55)  '적용환율조회'  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(132, 186)  CUR(0)    "6btn.BMP"    TABORDER(34)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+EDIT  ed_appexrate_skip(100, 57, 205, 77)  LEN(12)  IO_NUM|EDIT_INPUT|FA_COMMA|FA_RIGHT|FA_WRAP|FA_SKIP|FA_FLOAT|SHOWFORM      COLOR(192, 232)  CUR(0)  TP_SUNKEN  INIT("0.00")        FLOAT(2)    TABORDER(35)  IOORDER(53)  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  URATE(225, 57, 299, 77)  AL_LEFT  CUR(0)      COLOR(208, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  ed_appPrc_skip(100, 80, 205, 100)  LEN(12)  IO_NUM|EDIT_INPUT|FA_COMMA|FA_RIGHT|FA_WRAP|FA_SKIP|FA_FLOAT|SHOWFORM      COLOR(192, 232)  CUR(0)  TP_SUNKEN  INIT("0.00")        FLOAT(2)    TABORDER(36)  IOORDER(54)  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL43(733, 468, 833, 488)  '환전신청금액'  AL_LEFT  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(66, 130)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LTIM(299, 57, 450, 77)  '(최종조회시간 : 00:00:00)'  AL_LEFT  CUR(0)      COLOR(208, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  ed_prvrate_skip(140, 5, 238, 25)  LEN(14)  IO_NUM|EDIT_INPUT|FA_RIGHT|FA_WRAP|FA_SKIP|FA_FLOAT  FONT("굴림체", 9, NORMAL)    COLOR(192, 130)  CUR(0)  TP_SUNKEN        FLOAT(4)    TABORDER(37)  IOORDER(55)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  obj_srhreate(105, 416, 335, 547)    "IB590050"  TABORDER(33)  IOORDER(52)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  obj_apprate(88, 654, 286, 802)    "IB590040"  TABORDER(32)  IOORDER(51)  ENABLE  &
+  HINTTYPE(IH_NONE)
+TABLE  TABLE8(232, 170, 342, 190)  MATRIX(1, 1)  LINECOLOR(75)  CELLH(19)  AUTOSIZE  |NOHEAD  EDIT_OUTPUT    &
+	COLINFO("TBL01")  LEN(16)  WIDTH(115)  HEAD("원화전잔")  COLALIGN(AL_CENTER, AL_RIGHT)  HEADCOLOR(74, 192)  IO_NUM|FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSUP    COLOR(192, 69)  COLCUR(0, 0)  COLHINTTYPE(IH_NONE)    COLUMN_VISIBLE  IFRGB(69, 69)  IOORDER(42)  ENABLE  &
+  VISIBLE
+
+TABLE  TABLE9(232, 189, 342, 209)  MATRIX(1, 1)  LINECOLOR(75)  CELLH(19)  AUTOSIZE  |NOHEAD  EDIT_OUTPUT    &
+	COLINFO("TBL01")  LEN(17)  WIDTH(115)  HEAD("외화전잔")  COLALIGN(AL_CENTER, AL_RIGHT)  HEADCOLOR(74, 192)  FLOAT(2)  IO_NUM|FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|FA_FLOAT|SA_SPACE|SA_COSUP    COLOR(192, 69)  COLCUR(0, 0)  COLHINTTYPE(IH_NONE)    COLUMN_VISIBLE  IFRGB(69, 69)  IOORDER(43)  ENABLE  &
+  VISIBLE
+
+TABLE  TABLE10(341, 189, 451, 209)  MATRIX(1, 1)  LINECOLOR(75)  CELLH(19)  AUTOSIZE  |NOHEAD  EDIT_OUTPUT    &
+	COLINFO("TBL01")  LEN(17)  WIDTH(115)  HEAD("외화금잔")  COLALIGN(AL_CENTER, AL_RIGHT)  HEADCOLOR(74, 192)  FLOAT(2)  IO_NUM|FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|FA_FLOAT|SA_SPACE|SA_COSUP    COLOR(192, 69)  COLCUR(0, 0)  COLHINTTYPE(IH_NONE)    COLUMN_VISIBLE  IFRGB(69, 69)  IOORDER(44)  ENABLE  &
+  VISIBLE
+
+TABLE  T_WON(54, 170, 154, 190)  MATRIX(1, 1)  LINECOLOR(75)  CELLH(19)  AUTOSIZE  |NOHEAD  EDIT_OUTPUT    &
+	COLINFO("TBL01")  LEN(16)  WIDTH(115)  HEAD("원화금액")  COLALIGN(AL_CENTER, AL_RIGHT)  HEADCOLOR(74, 192)  IO_NUM|FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSUP    COLOR(192, 69)  COLCUR(0, 0)  COLHINTTYPE(IH_NONE)    COLUMN_VISIBLE  IFRGB(69, 69)  IOORDER(45)  ENABLE  &
+  VISIBLE
+
+TABLE  T_FOR(54, 189, 154, 209)  MATRIX(1, 1)  LINECOLOR(75)  CELLH(19)  AUTOSIZE  |NOHEAD  EDIT_OUTPUT    &
+	COLINFO("TBL01")  LEN(17)  WIDTH(115)  HEAD("외화금액")  COLALIGN(AL_CENTER, AL_RIGHT)  HEADCOLOR(74, 192)  FLOAT(2)  IO_NUM|FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|FA_FLOAT|SA_SPACE|SA_COSUP    COLOR(192, 69)  COLCUR(0, 0)  COLHINTTYPE(IH_NONE)    COLUMN_VISIBLE  IFRGB(69, 69)  IOORDER(46)  ENABLE  &
+  VISIBLE
+
+TABLE  TABLE13(153, 168, 233, 209)  MATRIX(1, 1)  LINECOLOR(75)  CELLH(19)  AUTOSIZE  |NOHEAD  EDIT_OUTPUT    &
+	COLINFO("TBL01")  LEN(15)  WIDTH(115)  HEAD("적용환율")  COLALIGN(AL_CENTER, AL_RIGHT)  HEADCOLOR(74, 192)  FLOAT(2)  IO_NUM|FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|FA_FLOAT|SA_SPACE|SA_COSUP    COLOR(192, 69)  COLCUR(0, 0)  COLHINTTYPE(IH_NONE)    COLUMN_VISIBLE  IFRGB(69, 69)  IOORDER(47)  ENABLE  &
+  VISIBLE
+
+PANEL  PANEL4(5, 151, 55, 171)  '구분'  LINECOLOR(75)      COLOR(74, 192)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL6(54, 151, 154, 171)  '최종환전금액'  LINECOLOR(75)      COLOR(74, 192)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL8(153, 151, 233, 171)  '최종적용환율'  LINECOLOR(75)      COLOR(74, 192)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL10(232, 151, 342, 171)  '예수금전잔'  LINECOLOR(75)      COLOR(74, 192)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL11(341, 151, 451, 171)  '예수금금잔'  LINECOLOR(75)      COLOR(74, 192)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL12(5, 170, 55, 190)  '원화'  LINECOLOR(75)      COLOR(74, 192)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL13(5, 189, 55, 209)  '외화'  LINECOLOR(75)      COLOR(74, 192)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  S1(597, 236, 617, 256)  LEN(1)  IO_NUM|EDIT_INOUT|FA_WRAP  FONT("굴림체", 9, NORMAL)    COLOR(192, 130)  CUR(0)  TP_SUNKEN  INIT("+")          TABORDER(38)  IOORDER(9)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  S2(597, 259, 617, 279)  LEN(1)  IO_NUM|EDIT_INOUT|FA_WRAP  FONT("굴림체", 9, NORMAL)    COLOR(192, 130)  CUR(0)  TP_SUNKEN  INIT("+")          TABORDER(39)  IOORDER(11)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  S3(597, 328, 617, 348)  LEN(1)  IO_NUM|EDIT_INOUT|FA_WRAP  FONT("굴림체", 9, NORMAL)    COLOR(192, 130)  CUR(0)  TP_SUNKEN  INIT("+")          TABORDER(40)  IOORDER(15)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  S4(597, 351, 617, 371)  LEN(1)  IO_NUM|EDIT_INOUT|FA_WRAP  FONT("굴림체", 9, NORMAL)    COLOR(192, 130)  CUR(0)  TP_SUNKEN  INIT("+")          TABORDER(41)  IOORDER(17)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  S6(597, 466, 617, 486)  LEN(1)  IO_NUM|EDIT_INOUT|FA_WRAP  FONT("굴림체", 9, NORMAL)    COLOR(192, 130)  CUR(0)  TP_SUNKEN  INIT("+")          TABORDER(42)  IOORDER(24)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  S7(597, 489, 617, 509)  LEN(1)  IO_NUM|EDIT_INOUT|FA_WRAP  FONT("굴림체", 9, NORMAL)    COLOR(192, 130)  CUR(0)  TP_SUNKEN  INIT("+")          TABORDER(43)  IOORDER(26)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  S8(597, 512, 617, 532)  LEN(1)  IO_NUM|EDIT_INOUT|FA_WRAP  FONT("굴림체", 9, NORMAL)    COLOR(192, 130)  CUR(0)  TP_SUNKEN  INIT("+")          TABORDER(44)  IOORDER(28)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  S5(597, 420, 617, 440)  LEN(1)  IO_NUM|EDIT_INOUT|FA_WRAP  FONT("굴림체", 9, NORMAL)    COLOR(192, 130)  CUR(0)  TP_SUNKEN  INIT("+")          TABORDER(45)  IOORDER(21)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  S9(597, 558, 617, 578)  LEN(1)  IO_NUM|EDIT_INOUT|FA_WRAP  FONT("굴림체", 9, NORMAL)    COLOR(192, 130)  CUR(0)  TP_SUNKEN  INIT("+")          TABORDER(46)  IOORDER(31)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  S10(597, 581, 617, 601)  LEN(1)  IO_NUM|EDIT_INOUT|FA_WRAP  FONT("굴림체", 9, NORMAL)    COLOR(192, 130)  CUR(0)  TP_SUNKEN  INIT("+")          TABORDER(47)  IOORDER(33)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  S11(597, 604, 617, 624)  LEN(1)  IO_NUM|EDIT_INOUT|FA_WRAP  FONT("굴림체", 9, NORMAL)    COLOR(192, 130)  CUR(0)  TP_SUNKEN  INIT("+")          TABORDER(48)  IOORDER(35)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL44(782, 235, 917, 255)  '<-- 미사용 :: 0 세팅'  AL_LEFT  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(66, 130)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL45(782, 259, 917, 279)  '<-- 미사용 :: 0 세팅'  AL_LEFT  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(66, 130)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL46(12, 307, 452, 327)  ' 은행예수금방식 계좌가 외화매도시 환전된 원화는 은행계좌로 송금됩니다.'  AL_LEFT  CUR(0)      COLOR(208, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+PANEL  PANEL14(4, 313, 13, 322)    |IMAGE|AL_CENTER    COLOR(208, 232)  CUR(0)    "텍스트화살표_하단.BMP"  ENABLE  &
+  VISIBLE  TRANSPARENT  IMAGE  HINTTYPE(IH_NONE)
+BUTTON  SND(225, 104, 321, 124)  '외화 환전'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, BOLD)  FOCUS  COLOR(208, 186)  CUR(0)    "6BTN_조회.BMP"    TABORDER(49)  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+EDIT  chk(379, 6, 450, 26)  LEN(10)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP|SHOWFORM      COLOR(192, 232)  CUR(0)  TP_SUNKEN          TABORDER(50)  IOORDER(56)  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL47(325, 6, 374, 26)  '은행환율'  AL_LEFT  CUR(0)      COLOR(208, 130)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_NONE)
+BOX  BOX0(99, 78, 207, 102)    COLOR(94, 94)  LINEW(4)  BX_LINE    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  obj_getMoney(829, 737, 929, 757)    "IB9999C2"  TABORDER(51)  IOORDER(57)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL48(700, 732, 820, 752)  'obj_getMoney'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  obj_cancelMoney(829, 760, 929, 780)    "IB850155"  TABORDER(52)  IOORDER(58)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL49(700, 755, 820, 775)  'obj_cancelMoney'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL50(550, 20, 670, 40)  'SDPDT080_환전'  AL_CENTER  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL51(695, 800, 815, 820)  'obj_SDPAQ066'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  obj_SDPAQ066(830, 795, 930, 820)    "IB9999C3"  TABORDER(53)  IOORDER(59)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL15(4, 275, 13, 284)    |IMAGE|AL_CENTER    COLOR(208, 232)  CUR(0)    "텍스트화살표_하단.BMP"  ENABLE  &
+  VISIBLE  TRANSPARENT  IMAGE  HINTTYPE(IH_NONE)
+LABEL  LABEL42(12, 326, 452, 346)  ' 당사 모계좌 잔액 부족시 환전이 불가할 수 있습니다.'  AL_LEFT  CUR(0)      COLOR(208, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+PANEL  PANEL16(4, 332, 13, 341)    |IMAGE|AL_CENTER    COLOR(208, 232)  CUR(0)    "텍스트화살표_하단.BMP"  ENABLE  &
+  VISIBLE  TRANSPARENT  IMAGE  HINTTYPE(IH_NONE)
+LABEL  LABEL52(12, 345, 452, 365)  ' (17시 이후 환전시 유의)'  AL_LEFT  CUR(0)      COLOR(208, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Dim flag
+
+Sub send_f(sdata)
+	Select Case Trim(sdata)
+	Case "0":	' 환전예상금액
+		' 처리구분
+		ed_trxtp.Data = "0"   '0:환전예상금액 1:전문송신 2:은행응답불능 3:은행응답정상
+		LEDGER.Fkey = "C"
+	Case "1":	' 외화환전 전문송신
+		' 처리구분
+		ed_trxtp.Data = "1"   '0:환전예상금액 1:전문송신 2:은행응답불능 3:은행응답정상
+		LEDGER.Fkey = "5"
+
+		' 외화 환전 시 전문 체크
+
+	End Select
+
+	' 우대환율 존재시, 우대환율 입력
+	' 입력가이드 상으로는 01로 입력하라고 되어 있음
+	ed_chgrtpcode.Data = "01"        '01고시환율
+	If Trim(ed_prvrate_skip.Data) <> "" Then
+		If CDbl(ed_prvrate_skip.Data) > 0 Then
+			ed_chgrtpcode.Data = "02"	' 02우대환율
+		End If
+	End If
+
+	' 환전 유형코드
+	If tab_ex.ID = 2 Then		' 외화매수
+		ed_chgptncode.Data = "01"    '환전유형코드 01외화매수 02외화매도
+	Else
+		ed_chgptncode.Data = "02"
+	End If
+
+	' 대상통화코드 & 환전통화코드
+	Select Case tab_ex.ID
+	Case 2:		' 외화매수
+		Select Case cbo_type_mesu.Index
+		Case 0:	' USD
+			ed_chgcrcycode.Data = "USD"
+		Case 1:	' HKD
+			ed_chgcrcycode.Data = "HKD"
+		Case 2:	' CNY
+			ed_chgcrcycode.Data = "CNY"
+		End Select
+		ed_tgtcrcycode.Data = "KRW"     '대상통화코드
+
+	Case 1:		' 외화매도
+		Select Case cbo_type_medo.Index
+		Case 0:	' USD
+			ed_tgtcrcycode.Data = "USD"
+		Case 1:	' HKD
+			ed_tgtcrcycode.Data = "HKD"
+		Case 2:	' CNY
+			ed_tgtcrcycode.Data = "CNY"
+		End Select
+		ed_chgcrcycode.Data = "KRW"     '환전통화코드
+
+	End Select
+
+
+	'적용환율 'obj_appreate 에서 조회해온값을 사용해야 한다.
+	If Trim(ed_appexrate_skip.Text) = "" Then
+		ed_appexrate_skip.Data = "0.0"
+	End If
+	ed_appexrate.Data = t_format(Trim(Replace(ed_appexrate_skip.Text, ",", "")), 9, 4)
+
+	'우대율 'obj_appreate 에서 조회해온값을 사용해야 한다.
+	If Trim(ed_prvrate_skip.Text) = "" Then
+		ed_prvrate_skip.Data = "0.0"
+	End If
+	ed_prvrate.Data = t_format(Trim(Replace(ed_prvrate_skip.Text, ",", "")), 9, 4)
+
+ 	' 입력가이드 상으로는 02로 입력하라고 되어 있음
+'	If tab_ex.ID = 2 Then     '외화매수
+'		ed_tp2.Data = "01"
+'	Else
+'		ed_tp2.Data = "02"    '외화매도
+'	End If
+	ed_tp2.Data = "02"    '외화매도
+
+	'환전신청금액
+	If Trim(ed_appPrc_skip.Text) = "" Then
+		ed_appPrc_skip.Data = "0.0"
+	End If
+	ed_examt.Data = t_format(Trim(Replace(ed_appPrc_skip.Text, ",", "")), 14, 2)
+
+
+
+	Select Case Trim(sdata)
+	Case "0":	' 환전예상금액
+		ed_won.Data     = t_format("0.0", 15, 0)
+		ed_fcuramt.Data = t_format("0.0", 11, 4)
+	Case "1":	' 전문송신
+		' 환전 전문 송신 시, 환전예상금액으로 받아온
+		' 원화&외화 데이터를 그대로 입력한다.
+		' 데이터 없을 시, 주문절차 중단 고려 필요
+		'ed_won.Data
+		'ed_fcuramt.Data
+
+	End Select
+
+	SCREEN.Send 0
+End Sub
+
+Sub obj_srhrate_Send()
+	obj_srhreate.Send 0
+End Sub
+
+Sub obj_apprate_Send() 'SDPDQ099
+	obj_apprate.Send 0
+End Sub
+
+Sub Clear_Input()
+	SCREEN.ClearAll 0, 2
+	chk.Clear()
+
+	ed_appexrate_skip.Data = ""      '적용환율
+	ed_appPrc_skip.Data = ""         '신청외화
+	ed_prvrate.Data = ""             '우대율
+	ed_exprc.Data = "" 				 '예상원화
+	ed_appPrc_skip.Enable = False
+	dtlBtn.Enable = False
+	SND.Enable = False
+End Sub
+
+
+' 숫자를 포멧팅에 맞게 변환
+Function t_format(istr, inum, fnum)
+	Dim ipos, stmp, tmps, dpos
+
+	tmps = ""
+	stmp = ""
+
+	' Dot Position (From Left)
+	dpos = InStr(1, istr, ".", 1)
+
+	' 정수 추출
+	If dpos = 0 Then	' Dot 미존재
+		tmps = String(inum - Len(istr), "0") & Trim(istr)	' 추출한 정수값에 0을 붙여서 inum만큼 채움
+	Else				' Dot 존재
+		tmps = Left(istr, InStr(1, istr, ".", 1) - 1)		' 입력받은 숫자에서 정수값 추출
+		tmps = String(inum - Len(tmps), "0") & Trim(tmps)	' 추출한 정수값에 0을 붙여서 inum만큼 채움
+	End If
+
+	' 소숫점 자리 이하 추출
+	If (fnum > 0) Then
+
+		' Dot Position (From Right)
+		ipos = Len(istr) - InStr(1, istr, ".", 1) + 1
+
+		If dpos = 0 Then										' 소수점 미입력시
+			stmp = String(fnum, "0")							' 추출한 소수점 자리값에 0을 붙여서 fnum 만큼 채움
+		Else
+			stmp = Mid(istr, InStr(1, istr, ".", 1) + 1, ipos)	' 입력받은 숫자에서 소수점 이하값만 추출
+			stmp = stmp & String(fnum - Len(stmp), "0")			' 추출한 소수점 자리값에 0을 붙여서 fnum 만큼 채움
+		End If
+
+		t_format = Trim(tmps) & "." & Trim(stmp)
+	Else
+		t_format = Trim(tmps)
+	End If
+
+
+End Function
+
+_AW_ONINDECLARE_AW_
+#load IB888888
+#load IB888833
+
+_AW_ONENDSUB_AW_
+_AW_ONSTART_AW_
+'SCREEN.SetTimer 1, Flase
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+SCREEN.OnSend = False
+
+Dim ii, comp
+
+' Sign
+For ii = 1 To 11
+	SCREEN.Object("S"&ii).Data = "+"
+Next
+
+' Default Setting
+' 입력개수
+zIn.Data = "00001"
+
+' 환전구분코드 :: 1:단건환전 2:일괄환전
+ed_chgtpcode.Data = "1"
+
+' 계좌번호
+ed_acno.Data = SCREEN.Object("parent.AN3A").data	'계좌번호
+If Len(Trim(ed_acno.Data)) <> 11 Then
+	Call alert_msg("계좌번호를 확인하여 주십시오.")
+	SCREEN.Object("Main.AN3A").SetFocus
+	Exit Sub
+End If
+
+
+' 비밀번호
+If SYSTEM.ConnectBy = "1" Then	' 직원용
+	ed_pswd.Data = SCREEN.Object("parent.ed_pswd").Data
+
+	If  Len(Trim(ed_pswd.Data)) >= 4 Then
+		LEDGER.Hsiz = 44
+		LEDGER.EPwd = SYSTEM.EncryptSHA(Trim(ed_pswd.Data))
+		ed_pswd.Data = "HEAD"
+	End If
+
+	If Trim(ed_pswd.Data) = "HEAD" Then
+		If Len(Trim(LEDGER.EPwd)) <> 44 Then
+			'GUIDE.Text = "일방향암호화에 실패하였습니다. 비밀번호를 다시 입력해 주세요.."
+			ed_pswd.Data = ""
+			SCREEN.Object("parent.ed_pswd").Data = ""
+			ed_pswd.SetFocus
+			Exit Sub
+		End If
+	End If
+Else
+	ed_pswd.Data = Trim(SCREEN.Object("Main.pswd").Data)
+End If
+If Len(Trim(ed_pswd.Data)) < 4 Then
+	Call alert_msg("비밀번호를 확인하여 주십시오.")
+	SCREEN.Object("Main.pswd").SetFocus
+	Exit Sub
+End If
+
+' 등록구분코드
+ed_regtpcode.Data = "01"
+
+' 대상출금금액
+ed_tgtoutamt.Data = t_format("0.0", 18, 6)
+
+' 환전입금금액
+ed_chginamt.Data  = t_format("0.0", 18, 6)
+
+' 구분2
+'ed_tp2.Data = "02"
+
+' 예약환전일련번호
+ed_rsvchgnum.Data = "          "
+
+' 기준환율
+ed_baseexrate.Data = t_format("0.0", 5, 4)
+
+' 우대율적용구분
+ed_prvapptp.Data = " "
+
+' 응답코드
+ed_rescode.Data = "   "
+
+' 대고객환율
+ed_custrate.Data = t_format("0.0", 9, 4)
+
+' 전문일련번호
+ed_tgseqno.Data = t_format("0.0", 9, 0)
+
+' 처리일련번호
+ed_txseqno.Data = t_format("0.0", 9, 0)
+
+' 처리지점번호
+ed_trxbrnno.Data = "   "
+
+' 거래일
+ed_trddt.Data = "        "
+
+'20230830 550 이상인 경우 로직 추가 시작
+'SYSTEM.Trace "550 이상 logic start : Left(ed_acno.Data, 3):" & Left(ed_acno.Data, 3)
+
+'550 이상 계좌와 외화 환전 버튼 클릭시만 실행
+'결국 ed_won.Data 만 계산하는 로직임
+'If Left(ed_acno.Data, 3) >= 550 And flag = 2 Then
+
+'    Dim zDpsBalAmt               '예수금잔고금액
+'    Dim zPsnOutAbleAmt           '인출가능금액
+'    Dim zMnyrclAmt               '현금미수금액
+'    Dim zIntrstDlinqAmt         '이자미납금액
+'    Dim zEtclnd                  '기타대여금
+'    Dim zOldUnRfundAmt           '(구) 미상환금액
+'    Dim zPrsmptMnyoutAbleAmtD2   '추정인출가능금 D+2
+'    Dim zBnkDps                  '은행예수금
+
+'    zDpsBalAmt                = SCREEN.Object("main.obj_exchange.obj_SDPAQ066.DpsBalAmt").Data
+'    zPsnOutAbleAmt            = SCREEN.Object("main.obj_exchange.obj_SDPAQ066.PsnOutAbleAmt").Data
+'    zMnyrclAmt                = SCREEN.Object("main.obj_exchange.obj_SDPAQ066.MnyrclAmt").Data
+'    zIntrstDlinqAmt           = SCREEN.Object("main.obj_exchange.obj_SDPAQ066.IntrstDlinqAmt").Data
+'    zEtclnd                   = SCREEN.Object("main.obj_exchange.obj_SDPAQ066.Etclnd").Data
+'    zOldUnRfundAmt            = SCREEN.Object("main.obj_exchange.obj_SDPAQ066.OldUnRfundAmt").Data
+'    zPrsmptMnyoutAbleAmtD2    = SCREEN.Object("main.obj_exchange.obj_SDPAQ066.PrsmptMnyoutAbleAmtD2").Data
+'    zBnkDps                   = SCREEN.Object("main.obj_exchange.obj_SDPAQ066.BnkDps").Data
+
+'    SYSTEM.Trace "zDpsBalAmt:"&zDpsBalAmt
+'    SYSTEM.Trace "zPsnOutAbleAmt:"&zPsnOutAbleAmt
+'    SYSTEM.Trace "zMnyrclAmt:"&zMnyrclAmt
+'    SYSTEM.Trace "zIntrstDlinqAmt:"&zIntrstDlinqAmt
+'    SYSTEM.Trace "zEtclnd:"&zEtclnd
+'    SYSTEM.Trace "zOldUnRfundAmt:"&zOldUnRfundAmt
+'    SYSTEM.Trace "zPrsmptMnyoutAbleAmtD2:"&zPrsmptMnyoutAbleAmtD2
+'    SYSTEM.Trace "zBnkDps:"&zBnkDps
+
+
+'  If tab_ex.ID = 2 Then '매수
+'    SYSTEM.Trace "maesu_logic start "
+'    SYSTEM.Trace "ed_won.Data:"&ed_won.Data
+
+'    Dim zmisu
+'    zmisu = 0
+'    If Trim(zMnyrclAmt) = "" Then
+'       zMnyrclAmt = 0
+'    End If
+'    If Trim(zIntrstDlinqAmt) = "" Then
+'       zIntrstDlinqAmt = 0
+'    End If
+'    If Trim(zEtclnd) = "" Then
+'       zEtclnd = 0
+'    End If
+'    If Trim(zOldUnRfundAmt) = "" Then
+'       zOldUnRfundAmt = 0
+'    End If
+
+'    zmisu = zMnyrclAmt + zIntrstDlinqAmt + zEtclnd + zOldUnRfundAmt
+'    SYSTEM.Trace "step1_zmisu:"& zmisu
+'    If CLng(zmisu) > 0 Then
+'       MsgBox "미수발생 계좌는 외화 매수가 불가합니다."
+'       SYSTEM.Trace "zmisu:"& CLng(zmisu)
+'       Exit Sub
+'    End If
+
+'    Dim minable
+'    minable = 0
+'    If CLng(zPsnOutAbleAmt) > CLng(zPrsmptMnyoutAbleAmtD2) Then
+'       minable = CLng(zPrsmptMnyoutAbleAmtD2)
+'    Else
+'       minable = CLng(zPsnOutAbleAmt)
+'    End If
+'    SYSTEM.Trace "minable:"& CLng(minable)
+
+'    If CLng(minable) * 0.97 < CLng(ed_won.Data) Then
+'       MsgBox "환전에 필요한 원화가 부족합니다."
+'       Exit Sub
+'    End If
+
+'    'If CLng(zDpsBalAmt) - CLng(zBnkDps) < CLng(ed_won.Data) Then
+'         SYSTEM.Trace "obj_getMoney.contributionBnk logic start:"&ed_won.Data
+'        '은행에서 증권으로 돈 입금
+'         SCREEN.Proc "obj_getMoney.contributionBnk", ed_won.Data
+'    'End If
+'  End If
+
+' 'flag 초기화
+' flag = 0
+
+'End If
+ SYSTEM.Trace "getmoney logic end"
+ '20230830 550 이상인 경우 로직 추가 끝
+
+'SDPDT080 환전시작
+SCREEN.OnSend = True
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+Select Case LEDGER.Ecod
+	Case "3139"	' 환전신청금액을 입력하십시오
+		ed_appPrc_skip.SetFocus()
+		MsgBox SCREEN.Object("Main.GUIDE").Text
+
+	Case "0001"	' 환전예상액 계산이 완료되었습니다.
+		TABLE13.Clear()
+		TABLE9.Clear()
+		TABLE10.Clear()
+		T_FOR.Clear()
+
+		dtlBtn.Enable = False
+		ed_appPrc_skip.Enable = False
+		SCREEN.Object("Main.SND").Enable = True
+		SND.Enable = True
+		ed_exprc.Data = ed_won.Data
+
+	Case "0175"	' 환전 처리가 완료되었습니다.
+		SCREEN.Object("Main.SND").Enable = False
+		SND.Enable = False
+		dtlBtn.Enable = False
+		o_trdno.Data = Replace(o_trdno.Data, "+", "")	' 기호 이상하게 줘서 이렇게 처리
+		MsgBox SCREEN.Object("Main.GUIDE").Text
+		SCREEN.Proc "Main.obj_acccur.send_f", ""
+		SCREEN.Proc "Main.obj_list.send_f", ""
+
+        'If tab_ex.ID = 1 And Left(ed_acno.Data, 3) >= 550 Then '매도한 환전액 은행을 송금
+        If tab_ex.ID = 1 And IsBnkAccnType(SCREEN.Object("ed_acno")) = True Then
+             SYSTEM.Trace "maedo_logic start "
+             SYSTEM.Trace "T_WON.Data:"&T_WON.GetTableCell(1)
+
+
+
+			    Dim zDpsBalAmt               '예수금잔고금액
+			    Dim zPsnOutAbleAmt           '인출가능금액
+			    Dim zMnyrclAmt               '현금미수금액
+			    Dim zIntrstDlinqAmt         '이자미납금액
+			    Dim zEtclnd                  '기타대여금
+			    Dim zOldUnRfundAmt           '(구) 미상환금액
+			    Dim zPrsmptMnyoutAbleAmtD2   '추정인출가능금 D+2
+			    Dim zBnkDps                  '은행예수금
+
+			    zDpsBalAmt                = SCREEN.Object("main.obj_exchange.obj_SDPAQ066.DpsBalAmt").Data
+			    zPsnOutAbleAmt            = SCREEN.Object("main.obj_exchange.obj_SDPAQ066.PsnOutAbleAmt").Data
+			    zMnyrclAmt                = SCREEN.Object("main.obj_exchange.obj_SDPAQ066.MnyrclAmt").Data
+			    zIntrstDlinqAmt           = SCREEN.Object("main.obj_exchange.obj_SDPAQ066.IntrstDlinqAmt").Data
+			    zEtclnd                   = SCREEN.Object("main.obj_exchange.obj_SDPAQ066.Etclnd").Data
+			    zOldUnRfundAmt            = SCREEN.Object("main.obj_exchange.obj_SDPAQ066.OldUnRfundAmt").Data
+			    zPrsmptMnyoutAbleAmtD2    = SCREEN.Object("main.obj_exchange.obj_SDPAQ066.PrsmptMnyoutAbleAmtD2").Data
+			    zBnkDps                   = SCREEN.Object("main.obj_exchange.obj_SDPAQ066.BnkDps").Data
+
+
+			    Dim zmisu
+			    zmisu = 0
+			    If Trim(zMnyrclAmt) = "" Then
+			       zMnyrclAmt = 0
+			    End If
+			    If Trim(zIntrstDlinqAmt) = "" Then
+			       zIntrstDlinqAmt = 0
+			    End If
+			    If Trim(zEtclnd) = "" Then
+			       zEtclnd = 0
+			    End If
+			    If Trim(zOldUnRfundAmt) = "" Then
+			       zOldUnRfundAmt = 0
+			    End If
+
+			    zmisu = CCur(zMnyrclAmt) + CCur(zIntrstDlinqAmt) + CCur(zEtclnd) + CCur(zOldUnRfundAmt)
+			    'zmisu = CCur(zMnyrclAmt) + CCur(zIntrstDlinqAmt)
+			    SYSTEM.Trace "step1_zmisu:"& zmisu
+			    '미수 있으면 은행으로 돈 안보냄 - 김민재 요청
+			    If CLng(zmisu) > 0 Then
+			       SYSTEM.Trace "recv_zmisu:"& CCur(zmisu)
+			    Else
+	              '증권에서 은행으로 돈 출금
+	              SYSTEM.Trace "obj_getMoney.paymentBnk"
+	              SCREEN.Proc "obj_getMoney.paymentBnk", Fix(T_WON.GetTableCell(1))
+			    End If
+
+
+         End If
+
+	Case Else
+		SND.Enable = False
+		'MsgBox SCREEN.Object("Main.GUIDE").Text
+End Select
+
+_AW_ONENDSUB_AW_
+_AW_ONTIMER_AW_
+Clear_Input()
+' 은행으로부터 해당 화폐의 매도/매수에 대한 고시 환율을 조회(SDPKT169)한 다음
+' 해당 고시환율에 대한 적용환율을 코스콤으로부터 조회(SDPDQ099)
+SCREEN.Object("obj_srhreate").Send
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(tab_ex)
+_AW_ONCLICK_AW_
+If tab_ex.ID = 2 Then				' 외화매수
+	won1.Visible = True
+	cbo_type_mesu.Visible = True
+	won2.Visible = False
+	cbo_type_medo.Visible = False
+Else								' 외화매도
+	won1.Visible = False
+	cbo_type_mesu.Visible = False
+	won2.Visible = True
+	cbo_type_medo.Visible = True
+End If
+
+Clear_Input()
+SCREEN.SetTimer 1, Flase
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(dtlBtn)
+_AW_ONCLICK_AW_
+'Clear_Input()	' 조회해온 적용환율을 사용하기에, Clear하지 않음
+Call send_f("0")
+
+ If Left(ed_acno.Data, 3) >= 550 Then
+    SYSTEM.Trace "obj_SDPAQ066.send_f"
+    SCREEN.Proc "obj_SDPAQ066.send_f",""
+ End If
+flag = 1
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(cbo_type_mesu)
+_AW_ONCHANGE_AW_
+Clear_Input()
+' 은행으로부터 해당 화폐의 매도/매수에 대한 고시 환율을 조회(SDPKT169)한 다음
+' 해당 고시환율에 대한 적용환율을 코스콤으로부터 조회(SDPDQ099)
+SCREEN.Object("obj_srhreate").Send
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(cbo_type_medo)
+_AW_ONCHANGE_AW_
+Clear_Input()
+' 은행으로부터 해당 화폐의 매도/매수에 대한 고시 환율을 조회(SDPKT169)한 다음
+' 해당 고시환율에 대한 적용환율을 코스콤으로부터 조회(SDPDQ099)
+SCREEN.Object("obj_srhreate").Send
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON0)
+_AW_ONCLICK_AW_
+Clear_Input()
+' 은행으로부터 해당 화폐의 매도/매수에 대한 고시 환율을 조회(SDPKT169)한 다음
+' 해당 고시환율에 대한 적용환율을 코스콤으로부터 조회(SDPDQ099)
+SCREEN.Object("obj_srhreate").Send
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(SND)
+_AW_ONCLICK_AW_
+' 외화환전 전 조회환율과 현재 은행 환율을 비교하여
+' 다른 경우 환전 불가 처리
+obj_srhreate.Proc "send_chk", ""
+flag = 2
+' 외화환전
+'SCREEN.Proc "send_f", "1"
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

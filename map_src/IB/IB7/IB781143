@@ -1,0 +1,88 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB781143)
+MAPSIZE(170, 294)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("¿ùºÀ")
+MAPPUBLIC(";")
+FONT("±¼¸²", 9, NORMAL)
+OPTIONS(FMS|FLASH)
+TITLE("[781143]¿ùºÀ")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pooppoop")
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+EDIT  SYMB(306, 13, 418, 33)  LEN(12)  IO_ALPHA|EDIT_INPUT|FA_WRAP|FA_UPPER    COLOR(192, 232)  ST_CLASSIC          TABORDER(1)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  hnam(306, 36, 468, 55)  LEN(30)  IO_MIXED|AL_LEFT|    COLOR(192, 232)  TP_ETCHED          TABORDER(0)  IOORDER(4)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  021(308, 60, 460, 77)  LEN(16)  IO_ALPHA|AL_CENTER|    COLOR(192, 232)            TABORDER(0)  IOORDER(3)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  SND_FLAG(308, 83, 342, 98)  'N'  AL_LEFT      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  dgub(312, 126, 364, 151)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  ST_CLASSIC          TABORDER(2)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL0(2, 2, 292, 169)  '¿ùºÀÂ÷Æ®'  TP_RAISED      COLOR(208, 232)    AL_CENTER  FONT("±¼¸²", 24, NORMAL)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONSEND_AW_
+Dim codx
+Dim t_indx
+
+'SCREEN.IgnoreChange True 'Onchange event False·Î ÀüÈ¯
+'If SND_FLAG.text = "N" Then
+'	SYMB.Data = SCREEN.Object("main.symb").text
+'End If
+'SND_FLAG.Text = "N"
+'SCREEN.IgnoreChange False 'Onchange event True·Î ÀüÈ¯
+
+'SYMB.Data = SCREEN.Object ("main.symb").text
+'codx = SYMB.Data
+'codx = Trim(codx)
+'If Len(codx) <= 0 Then
+'	SCREEN.OnSend = False
+'End If
+'
+'t_indx = SCREEN.Object ("main.chart_tab").index
+'Select Case t_indx
+'	Case 1
+'		dgub.Data = t_indx
+'	Case 2
+'		dgub.Data = t_indx
+'	Case 3
+'		dgub.Data = t_indx
+'	Case Else
+'		SCREEN.OnSend = False
+'End Select
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(SYMB)
+_AW_ONCHANGE_AW_
+'SND_FLAG.Text = "Y"
+'SCREEN.send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

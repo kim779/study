@@ -1,0 +1,90 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(TT875990)
+MAPSIZE(393, 530)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("굴림", 9, NORMAL)
+TITLE("ELS확률_종목코드리스트")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pidoiels")
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+EDIT  rest(13, 27, 133, 46)  LEN(27)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 130)  CUR(0)  TP_SUNKEN  INIT("875100")          TABORDER(1)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+GRID  GRID0(14, 88, 508, 284)  VISIBLEROW(0)  CELLH(20)  MATRIX(9999, 2)  FIX(0)  MAINCOLOR(208, 232)  LINECOLOR(0)  FOCUSCOLOR(0)  FOCUSKIND(0)  |FLEXIBLE|VSCROLL    &
+	COLINFO("Col0")  LEN(16)  WIDTH(80)  HEAD("종목코드")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_MIXED|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col1")  LEN(20)  WIDTH(206)  HEAD("종목명")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_MIXED|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    TABORDER(2)  IOORDER(3)  ENABLE  &
+  VISIBLE
+
+EDIT  gubn(13, 6, 133, 25)  LEN(1)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 130)  CUR(0)  TP_SUNKEN  INIT("F")          TABORDER(3)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON0(379, 33, 463, 73)  TP_PUSH      AL_CENTER    FOCUS  COLOR(208, 232)  CUR(0)      TABORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Dim ArrData
+
+ArrData = Array()
+ReDim ArrData( GRID0.Rows - 1)
+'----------------------------------------------------------------------
+Sub GetHNamList()
+	ArrItem = Array("", "")
+
+	For i = 1 To GRID0.Rows
+		HNam = Trim(GRID0.GetGridCell( i, 2 ))
+		If Len(HNam) = 0 Then
+			Exit For
+		End If
+		Code = GRID0.GetGridCell( i, 1 )
+		CdTp = Trim(GRID0.GetGridCell( i, 3 ))
+
+		Data  = Code & CdTp
+		ArrItem(0) = Data
+		ArrItem(1) = HNam
+
+
+		Item = Join(ArrItem, "~")
+		SYSTEM.Trace Item
+		ArrData(i - 1) = Item
+	Next
+	Data = Join(ArrData, "|")
+	Cnt = i
+
+	SCREEN.Proc "main.SetCodeList", Data & ", " & Cnt
+End Sub
+
+_AW_ONSTART_AW_
+'SCREEN.Send 0
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(BUTTON0)
+_AW_ONCLICK_AW_
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

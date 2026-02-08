@@ -1,0 +1,146 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB49874B)
+MAPSIZE(150, 690)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("굴림", 9, NORMAL)
+TITLE("STEP2-B")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(FIXED)
+HEADER(NOP)
+BGROUND(BRUSH, 68)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL1(5, 0, 685, 150)  LINECOLOR(0)      COLOR(68, 68)  CUR(0)    AL_CENTER  FONT("굴림체", 9, BOLD)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL3(20, 12, 120, 27)  '▶ 상품상세'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL4(20, 48, 120, 63)  '▶ 납입방법'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL1(20, 86, 120, 101)  '▶ 저축기간'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL6(20, 124, 120, 139)  '▶ 가입금액'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  radio1(115, 9, 235, 29)  '벤처투자신탁'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(R1)      COLOR(146, 130)  CUR(0)      TABORDER(1)  ENABLE  &
+  VISIBLE  CHECKED  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  radio21(115, 45, 195, 65)  '임의식'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(R2)      COLOR(146, 130)  CUR(0)      TABORDER(2)  ENABLE  &
+  VISIBLE  CHECKED  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  radio22(200, 45, 280, 65)  '자유적립식'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(R2)      COLOR(146, 130)  CUR(0)      TABORDER(3)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+GROUP  R1(73, 333, 129, 353)  'R1'        COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+GROUP  R2(73, 352, 129, 372)  'R2'        COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL4(20, 35, 670, 36)  LINECOLOR(93)      COLOR(182, 130)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+PANEL  PANEL0(20, 72, 670, 73)  LINECOLOR(93)      COLOR(182, 130)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+PANEL  PANEL3(20, 112, 670, 113)  LINECOLOR(93)      COLOR(182, 130)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  joinAmt(115, 120, 300, 145)  LEN(15)  IO_NUM|EDIT_INPUT|FA_COMMA|FA_RIGHT|FA_WRAP|FA_XFLOAT    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(4)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL7(115, 120, 300, 145)  LINECOLOR(68)      COLOR(182, 130)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  month(115, 80, 318, 105)  '개월이상'  AL_RIGHT  CUR(0)      COLOR(243, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL7(300, 120, 318, 145)  '원'  AL_LEFT  CUR(0)      COLOR(68, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL2(115, 80, 318, 105)  LINECOLOR(93)      COLOR(182, 130)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+PANEL  PANEL5(115, 120, 318, 145)  LINECOLOR(93)      COLOR(182, 130)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Sub radio_switch()
+	If SCREEN.Object("main.OBJECT1.RISKYN").Data = "Y" Then '숙려대상자 일경우
+		joinAmt.Visible = True
+		LABEL6.Visible = True
+		LABEL7.Visible = True
+		PANEL3.Visible = True
+		PANEL7.Visible = True
+		PANEL5.Visible = True
+	Else
+		joinAmt.Visible = False
+		LABEL6.Visible = False
+		LABEL7.Visible = False
+		PANEL3.Visible = False
+		PANEL7.Visible = False
+		PANEL5.Visible = False
+	End If
+
+	If radio21.Checked Then
+		'저축기간 셋팅
+		month.text = ""
+	Else
+		'저축기간 셋팅
+		month.text = "36개월이상"
+	End If
+End Sub
+
+
+Sub CheckNext()
+	If Int(joinAmt.Data) < 1000 And joinAmt.Visible = True Then
+		MsgBox "가입금액을 1,000원 이상으로 입력해 주세요 (기준가에 따라 매수금액이 상이할 수 있음)"
+	Else
+		'주문데이터 셋팅
+		SCREEN.Object("main.OBJECT1.R2").Checked = True '벤처투자
+
+		If radio21.Checked Then
+			SCREEN.Object("main.OBJECT1.JY1").Checked = True'임의식
+			SCREEN.Object("main.OBJECT1.nyear").Data = "" '저축기간
+
+		Else
+			SCREEN.Object("main.OBJECT1.JB2").Checked = True'자유적립식
+			SCREEN.Object("main.OBJECT1.nyear").Data = "36" '저축기간
+		End If
+
+		If joinAmt.Visible = True Then
+			SCREEN.Object("main.OBJECT1.Fund_Reserve_prc").Data	= joinAmt.Data '숙려대상자는 펀드매수예약을 바로 진행한다.
+			SCREEN.Object("main.OBJECT1.Fund_Reserve_prc").Visible = True
+		End If
+		'화면변경
+		SCREEN.Proc "main.changeStep", "3"
+	End If
+
+End Sub
+
+_AW_ONSTART_AW_
+radio_switch()
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(radio21)
+_AW_ONCLICK_AW_
+radio_switch()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(radio22)
+_AW_ONCLICK_AW_
+radio_switch()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

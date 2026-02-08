@@ -1,0 +1,236 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB590040)
+MAPSIZE(170, 450)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("5904 은행환율조회")
+MAPPUBLIC(";")
+FONT("굴림", 9, NORMAL)
+OPTIONS(ENCODE)
+TITLE("5904 적용환율")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("piboPBxQ")
+MAPTYPE(FIXED)
+HEADER(LEDGER)
+TRXH("14CSDPDQ099")
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL21(0, 0, 410, 170)  LIMAGE(0)  LINEW(4)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    RESIZABLE  AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL10(31, 52, 79, 72)  '계좌번호'  AL_CENTER  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(66, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL11(31, 72, 79, 92)  '비밀번호'  AL_LEFT  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(66, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL19(6, 112, 81, 132)  '환전유형코드'  AL_LEFT  CUR(0)      COLOR(208, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  ed_acno(91, 52, 218, 72)  LEN(20)  IO_MIXED|EDIT_INOUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(1)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  ed_pswd(91, 72, 147, 92)  LEN(8)  IO_MIXED|EDIT_INOUT|FA_PASSWD|FA_WRAP  FONT("굴림체", 9, NORMAL)    COLOR(192, 130)  CUR(0)  TP_SUNKEN          TABORDER(2)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  zIn(91, 32, 166, 52)  LEN(5)  IO_MIXED|EDIT_INOUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("00001")          TABORDER(3)  IOORDER(1)  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  lb_in(31, 32, 79, 52)  'in'  AL_LEFT  CUR(0)      COLOR(208, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  ed_Sgubn(91, 112, 124, 132)  LEN(2)  IO_MIXED|EDIT_INOUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(4)  IOORDER(6)  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL2(31, 92, 79, 112)  '환율'  AL_LEFT  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(66, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  sign(91, 92, 107, 112)  LEN(1)  IO_MIXED|EDIT_INOUT|FA_WRAP  FONT("굴림체", 9, NORMAL)    COLOR(192, 130)  CUR(0)  TP_SUNKEN  INIT("+")          TABORDER(5)  IOORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  o_ocnt(320, 42, 380, 62)  LEN(5)  IO_NUM|AL_CENTER|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(7)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL16(243, 42, 316, 61)  'O CNT'  AL_CENTER  CUR(0)      COLOR(195, 232)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  ApplXchrat(349, 72, 466, 92)  LEN(14)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT|FA_CORGB|SA_COSUP    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(9)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL0(246, 72, 319, 91)  '적용환율'  AL_CENTER  CUR(0)      COLOR(195, 232)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  PrvlgRat(350, 93, 467, 113)  LEN(14)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT|FA_CORGB|SA_COSUP    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(11)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL3(247, 93, 320, 112)  '우대율'  AL_CENTER  CUR(0)      COLOR(195, 232)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  ed_gdxchrat(111, 91, 237, 111)  LEN(16)  IO_NUM|EDIT_INOUT  FONT("굴림체", 9, NORMAL)    COLOR(192, 130)  CUR(0)  TP_SUNKEN          TABORDER(6)  IOORDER(5)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL4(124, 113, 220, 132)  '01:매수/02:매도'  AL_CENTER  CUR(0)      COLOR(195, 232)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  OUTPUT0(317, 73, 347, 93)  LEN(1)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT|FA_CORGB|SA_COSUP    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(8)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  OUTPUT1(318, 94, 348, 114)  LEN(1)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT|FA_CORGB|SA_COSUP    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(10)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Sub send_f()
+	SCREEN.Send 0
+End Sub
+
+_AW_ONINDECLARE_AW_
+#load IB888833
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+Dim tmpb
+LEDGER.Rcnt = "0008"
+
+SCREEN.OnSend = False
+zIn.Data = "00001"
+ed_acno.Data = Trim(SCREEN.Object("Main.AN3A").Data)
+
+If Len(Trim(ed_acno.Data)) <> 11 Then
+	Call alert_msg("계좌번호를 확인하여 주십시오.")
+	SCREEN.Object("Main.AN3A").SetFocus
+	Exit Sub
+End If
+
+If SYSTEM.ConnectBy = 0 And Trim(SCREEN.Object("Main.pswd").Data) = "" Then
+	ed_pswd.Data = "9999"
+Else
+	ed_pswd.Data = Trim(SCREEN.Object("Main.pswd").Data)
+End If
+
+If Len(Trim(ed_pswd.Data)) < 4 Then
+	Call alert_msg("비밀번호를 확인하여 주십시오.")
+	SCREEN.Object("Main.pswd").SetFocus
+	Exit Sub
+End If
+
+'------------------------------------------------------------------------ 일방향 암호화
+LEDGER.Hsiz = 44
+LEDGER.EPwd = SYSTEM.EncryptSHA(Trim(ed_pswd.Data))
+'------------------------------------------------------------------------
+
+'k835 에서 서비스를 조회해서 환율조회해야 한다.
+'외화매수인 경우 외화예금입금환율
+'외화매도인 경우 외화예금출금환율
+' 매도/매수 구분에 따라 매도환율/매수환율 구분하여 적용환율 조회
+' * 적용환율 입력 환율에 기입
+Select Case SCREEN.Object("parent.tab_ex").ID
+Case 2:		' 외화매수
+	tmpb = Trim(SCREEN.Object("Main.obj_exchange.obj_srhreate.o_bfxchrat").Data) & "0"
+Case 1:		' 외화매도
+	tmpb = Trim(SCREEN.Object("Main.obj_exchange.obj_srhreate.o_xchrat").Data) & "0"
+End Select
+
+' Zero Padding
+tmpb = "0000000000000000" & Trim(tmpb)
+ed_gdxchrat.Data = Right(Trim(tmpb), 16)
+sign.Data = "+"
+
+If SCREEN.Object("parent.tab_ex").ID = 2 Then
+	ed_Sgubn.Data = "01"     '외화매수
+Else
+	ed_Sgubn.Data = "02"      '외화매도
+End If
+
+SCREEN.OnSend = True
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+Dim desc, ltim
+
+Select Case LEDGER.Ecod
+	Case "0136"	' 조회가 완료되었습니다.
+		' Proceed
+
+	Case Else
+		Exit Sub
+End Select
+
+
+
+' Description
+SCREEN.Object("Parent.URATE").Clear()
+If Trim(PrvlgRat.Data) <> "" And Trim(PrvlgRat.Data) <> "0" Then
+	If CDbl(PrvlgRat.Data) > 0 Then
+		desc = "우대율:" & CDbl(Trim(PrvlgRat.Data)) & "%"
+	End If
+
+	SCREEN.Object("Parent.URATE").Text = Trim(desc)
+End If
+
+' Description
+'ltim = "(최종조회시간 : " & Hour(Now()) & ":" & Minute(Now()) & ":" & Second(Now()) & ")"
+'SCREEN.Object("Parent.LTIM").Text = Trim(ltim)
+
+
+' 적용환율
+SCREEN.Object("Parent.ed_appexrate_skip").Data = ApplXchrat.Data
+
+' 우대환율
+SCREEN.Object("Parent.ed_prvrate_skip").Data = PrvlgRat.Data
+
+SCREEN.Object("Main.obj_exchange.dtlBtn").Enable = True
+SCREEN.Object("Main.obj_exchange.ed_appPrc_skip").Enable = True
+SCREEN.Object("Main.obj_exchange.ed_appPrc_skip").SetFocus()
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(ed_acno)
+_AW_ONCHANGE_AW_
+'Call Set_account()	'-- 계좌명, 비밀번호 설정
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(ed_pswd)
+_AW_ONKEYCHANGE_AW_
+'== 비밀번호 변경시 조회 버튼 기능 수행.
+If SCREEN.Key = "13" Then  '-- Enter 키 입력
+	Call send_f()
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(zIn)
+_AW_ONCHANGE_AW_
+'ctrl_code.SetIMAXGroup IMAXGROUP.Data
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(ed_Sgubn)
+_AW_ONCHANGE_AW_
+'ctrl_code.SetIMAXGroup IMAXGROUP.Data
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(sign)
+_AW_ONKEYCHANGE_AW_
+'== 비밀번호 변경시 조회 버튼 기능 수행.
+If SCREEN.Key = "13" Then  '-- Enter 키 입력
+	Call send_f()
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(ed_gdxchrat)
+_AW_ONKEYCHANGE_AW_
+'== 비밀번호 변경시 조회 버튼 기능 수행.
+If SCREEN.Key = "13" Then  '-- Enter 키 입력
+	Call send_f()
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

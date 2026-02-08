@@ -1,0 +1,123 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB202300)
+MAPSIZE(575, 1000)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("기업분석")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(FMS)
+TITLE("[2023] 기업분석")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pooppoop")
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+LABEL  LABEL0(1090, 75, 1291, 117)  '종목랭킹 트리거용'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  OBJECT0(1, 26, 1001, 576)    ""  TABORDER(1)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL0(0, 0, 1, 78)        COLOR(64, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+USRTAB  tab(0, 0, 1000, 26)  FOCUS  INDEX(0)  COUNT(10)  AL_TOP  TAB_IMAGE      FONT("굴림체", 9, NORMAL)    COLOR(3, 70)  CUR(0)  TABIMAGE("tab.bmp")  FCOLOR(3, 71)  CAPTION("기업분석", "리서치동향", "컨센서스", "랭킹분석", "부가정보", "ETF정보", "기업캘린더", "리포트동향", "요약리포트", "이용안내")  TABINFO("1:0", "0:1", "1:2", "1:3", "1:4", "1:5", "1:6", "1:7", "1:8", "1:9")  ENABLE  &
+  HINTTYPE(IH_NONE)
+USRTAB  tab_new(0, 0, 1000, 26)  FOCUS  INDEX(0)  COUNT(8)  AL_TOP  TAB_IMAGE      FONT("굴림체", 9, NORMAL)    COLOR(3, 70)  CUR(0)  TABIMAGE("tab.bmp")  FCOLOR(3, 71)  CAPTION("기업분석", "ETN/ETF정보", "어닝스모니터", "랭킹정보", "부가정보", "리포트서머리", "한경컨센서스", "어닝스캘린더")  TABINFO("1:0", "0:1", "1:2", "1:3", "1:4", "1:5", "1:8", "1:6")  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  1301(1205, 84, 1270, 104)  LEN(6)  IO_MIXED|EDIT_INOUT|FA_WRAP|FA_HAN|CODE    FONT("굴림체", 9, NORMAL)    COLOR(99, 130)  CUR(0)  TP_SUNKEN          TABORDER(2)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONSTART_AW_
+'If SYSTEM.ConnectBy = 0 Then
+'	tab.Visible = True
+'	tab_new.Visible = False
+'	OBJECT0.SetObject("IB202310")
+'Else
+'	tab.Visible = False
+	tab_new.Visible = True
+	OBJECT0.SetObject("IB2023Y0")
+'End If
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(tab)
+_AW_ONCLICK_AW_
+Select Case tab.ID
+	Case 0
+		OBJECT0.SetObject("IB202310")
+'	Case 1
+'		OBJECT0.SetObject("IB202320")
+	Case 2
+		OBJECT0.SetObject("IB202330")
+	Case 3
+		OBJECT0.SetObject("IB202340")
+	Case 4
+		OBJECT0.SetObject("IB202350")
+	Case 5
+		OBJECT0.SetObject("IB202360")
+	Case 6
+		OBJECT0.SetObject("IB202370")
+	Case 7
+		OBJECT0.SetObject("IB202380")
+	Case 8
+		OBJECT0.SetObject("IB202390")
+	Case 9
+		OBJECT0.SetObject("IB202391")
+End Select
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(tab_new)
+_AW_ONCLICK_AW_
+Select Case tab_new.ID
+	Case 0
+		OBJECT0.SetObject("IB2023Y0")
+	Case 1
+		OBJECT0.SetObject("IB2023Y1")
+	Case 2
+		OBJECT0.SetObject("IB2023Y2")
+	Case 3
+		OBJECT0.SetObject("IB2023Y3")
+	Case 4
+		OBJECT0.SetObject("IB2023Y4")
+	Case 5
+		OBJECT0.SetObject("IB2023Y5")
+	Case 6
+		OBJECT0.SetObject("IB2023Y6")
+	Case 7
+		OBJECT0.SetObject("IB2023Y7")
+	Case 8	' 한경컨센서스
+		OBJECT0.SetObject("IB2023Y8")
+End Select
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(1301)
+_AW_ONCHANGE_AW_
+
+S1301.Trigger "", False
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

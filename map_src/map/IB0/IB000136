@@ -1,0 +1,213 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB000136)
+MAPSIZE(477, 618)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("지수종합")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(FLASH|CR2TAB)
+TITLE("4분할")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL9(0, 470, 618, 477)        COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL8(0, 234, 618, 269)        COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL6(0, 0, 618, 30)        COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL5(614, 0, 618, 477)        COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL4(304, 0, 313, 477)        COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL7(0, 0, 4, 477)        COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL1(308, 238, 618, 477)  LINETYPE(3)  LINECOLOR(66)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+PANEL  PANEL2(0, 238, 309, 477)  LINETYPE(3)  LINECOLOR(66)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+PANEL  PANEL0(308, 0, 618, 239)  LINETYPE(3)  LINECOLOR(66)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+PANEL  PANEL3(0, 0, 309, 239)  LINETYPE(3)  LINECOLOR(66)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+OBJECT  OBJ1(3, 29, 305, 235)    "IB000140"  TABORDER(1)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  OBJ2(312, 29, 614, 235)    "IB000141"  TABORDER(2)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  OBJ3(3, 268, 305, 474)    "IB000142"  TABORDER(3)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  OBJ4(312, 268, 614, 474)    "IB000143"  TABORDER(4)  IOORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+USRTAB  tab_info1(3, 3, 305, 29)  FOCUS  INDEX(0)  COUNT(7)  AL_TOP  TAB_IMAGE      FONT("굴림체", 9, NORMAL)    COLOR(3, 70)  CUR(0)  TABIMAGE("tab.bmp")  FCOLOR(3, 71)  CAPTION("회원", "체결", "투자", "일별", "상세", "차트", "매물")  TABINFO("1:1", "1:2", "1:3", "1:4", "1:5", "1:7", "1:6")  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+USRTAB  tab_info2(312, 3, 614, 29)  FOCUS  INDEX(1)  COUNT(7)  AL_TOP  TAB_IMAGE      FONT("굴림체", 9, NORMAL)    COLOR(3, 70)  CUR(0)  TABIMAGE("tab.bmp")  FCOLOR(3, 71)  CAPTION("회원", "체결", "투자", "일별", "상세", "차트", "매물")  TABINFO("1:1", "1:2", "1:3", "1:4", "1:5", "1:7", "1:6")  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+USRTAB  tab_info3(3, 242, 305, 268)  FOCUS  INDEX(2)  COUNT(7)  AL_TOP  TAB_IMAGE      FONT("굴림체", 9, NORMAL)    COLOR(3, 70)  CUR(0)  TABIMAGE("tab.bmp")  FCOLOR(3, 71)  CAPTION("회원", "체결", "투자", "일별", "상세", "차트", "매물")  TABINFO("1:1", "1:2", "1:3", "1:4", "1:5", "1:7", "1:6")  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+USRTAB  tab_info4(312, 242, 614, 268)  FOCUS  INDEX(3)  COUNT(7)  AL_TOP  TAB_IMAGE      FONT("굴림체", 9, NORMAL)    COLOR(3, 70)  CUR(0)  TABIMAGE("tab.bmp")  FCOLOR(3, 71)  CAPTION("회원", "체결", "투자", "일별", "상세", "차트", "매물")  TABINFO("1:1", "1:2", "1:3", "1:4", "1:5", "1:7", "1:6")  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Dim myFILE, myMAP
+myFILE = "userconf.ini"
+myMAP = SCREEN.GetMapName(0)
+
+Sub click_tab(param)
+	Dim objseq
+	tabid = SCREEN.Object("tab_info"&param).ID
+	Select Case tabid
+	Case 1
+		SCREEN.Object("OBJ"&param).SetObject("IB000140")
+	Case 2
+		SCREEN.Object("OBJ"&param).SetObject("IB000141")
+	Case 3
+		SCREEN.Object("OBJ"&param).SetObject("IB000142")
+	Case 4
+		SCREEN.Object("OBJ"&param).SetObject("IB000143")
+	Case 5
+		SCREEN.Object("OBJ"&param).SetObject("IB000144")
+	Case 6
+		SCREEN.Object("OBJ"&param).SetObject("IB000145")
+	Case 7
+		If param = 1 Then
+			SCREEN.Object("OBJ"&param).SetObject("IB000146")
+		ElseIf param = 2 Then
+			SCREEN.Object("OBJ"&param).SetObject("IB000147")
+		ElseIf param = 3 Then
+			SCREEN.Object("OBJ"&param).SetObject("IB000148")
+		ElseIf param = 4 Then
+			SCREEN.Object("OBJ"&param).SetObject("IB000149")
+		End If
+	End Select
+	SCREEN.Object("OBJ"&param).Proc "settype", param
+	SCREEN.Object("OBJ"&param).Send
+End Sub
+
+
+Sub click_tab2(param)
+	Dim objseq
+	tabid = SCREEN.Object("tab_info"&param).ID
+	Select Case tabid
+	Case 1
+		SCREEN.Object("OBJ"&param).SetObject("IB000140")
+	Case 2
+		SCREEN.Object("OBJ"&param).SetObject("IB000141")
+	Case 3
+		SCREEN.Object("OBJ"&param).SetObject("IB000142")
+	Case 4
+		SCREEN.Object("OBJ"&param).SetObject("IB000143")
+	Case 5
+		SCREEN.Object("OBJ"&param).SetObject("IB000144")
+	Case 6
+		SCREEN.Object("OBJ"&param).SetObject("IB000145")
+	Case 7
+		If param = 1 Then
+			SCREEN.Object("OBJ"&param).SetObject("IB000146")
+		ElseIf param = 2 Then
+			SCREEN.Object("OBJ"&param).SetObject("IB000147")
+		ElseIf param = 3 Then
+			SCREEN.Object("OBJ"&param).SetObject("IB000148")
+		ElseIf param = 4 Then
+			SCREEN.Object("OBJ"&param).SetObject("IB000149")
+		End If
+	End Select
+	SCREEN.Object("OBJ"&param).Proc "settype", param
+	'SCREEN.Object("OBJ"&param).Send
+End Sub
+
+Sub p_write_ini()
+	Dim ii
+	If SCREEN.CreateObject("Info") Then
+		For ii=1 To 4
+			INFO.pushData LOGIN.Name, myFILE, myMAP, "tab"&ii, SCREEN.Object("tab_info"&ii).ID
+		Next
+	End If
+End Sub
+
+Sub p_read_ini()
+	If SCREEN.CreateObject("INFO") Then
+		Dim tabid, ii
+		For ii=1 To 4
+			tabid = Trim(INFO.PopData(LOGIN.Name, myFILE, myMAP, "tab"&ii))
+			If tabid = "" Then
+				tabid = ii
+			End If
+			SCREEN.Object("tab_info"&ii).ID = tabid
+			click_tab2(ii)
+		Next
+	End If
+
+	SCREEN.SetTimer 2,False
+End Sub
+
+_AW_ONSTART_AW_
+p_read_ini()
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+OBJ1.Send
+OBJ2.Send
+OBJ3.Send
+OBJ4.Send
+SCREEN.OnSend False
+
+_AW_ONENDSUB_AW_
+_AW_ONTIMER_AW_
+	SCREEN.Send 0
+
+_AW_ONENDSUB_AW_
+_AW_ONCLOSE_AW_
+p_write_ini()
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(tab_info1)
+_AW_ONCLICK_AW_
+click_tab("1")
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(tab_info2)
+_AW_ONCLICK_AW_
+click_tab("2")
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(tab_info3)
+_AW_ONCLICK_AW_
+click_tab("3")
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(tab_info4)
+_AW_ONCLICK_AW_
+click_tab("4")
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

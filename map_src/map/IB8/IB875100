@@ -1,0 +1,143 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB875100)
+MAPSIZE(588, 1060)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("[8751]ELS 진단 서비")
+MAPPUBLIC(";")
+FONT("굴림", 9, NORMAL)
+TITLE("[8751]ELS 진단 서비스")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL31(0, 0, 1060, 29)        COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+USRTAB  UTAB0(1, 3, 1055, 29)  FOCUS  INDEX(0)  COUNT(4)  AL_TOP  TAB_IMAGE        COLOR(208, 70)  CUR(0)  TABIMAGE("tab.bmp")  FCOLOR(208, 71)  CAPTION("TwoStocks", "OneStock", "기타상품", "개별종목확률")  TABINFO("1:1", "1:2", "1:4", "0:3")  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL8(-2, 564, 1060, 588)  LIMAGE(1)  LINEW(3)  STRESS(0)  STRESSW(0)  LINETYPE(4)  LINECOLOR(64)      COLOR(34, 69)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL5(2, 569, 16, 583)    |IMAGE|AL_STRETCH    COLOR(208, 232)  CUR(0)    "알림_ic.bmp"  ENABLE  &
+  VISIBLE  TRANSPARENT  IMAGE  HINTTYPE(IH_NONE)
+PANEL  GUIDE1(20, 564, 1055, 588)        COLOR(228, 69)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+PANEL  PANEL0(-1, 0, 1, 65)        COLOR(64, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL1(0, 29, 933, 418)        COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  OBJ4(0, 29, 1060, 565)    "IB875140"  TABORDER(4)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  OBJ3(0, 29, 933, 565)    "IB875130"  TABORDER(3)  IOORDER(3)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  OBJ2(0, 29, 1060, 565)    "IB875120"  TABORDER(2)  IOORDER(4)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  OBJ1(0, 29, 1060, 565)    "IB875110"  TABORDER(1)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL6(1059, 0, 1061, 65)        COLOR(64, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON0(970, 5, 1053, 25)  '개별종목확률'  TP_PUSH|IMAGETEXT|AL_STRETCH        FOCUS  COLOR(68, 186)  CUR(0)    "7BTN.BMP"    TABORDER(5)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Option Explicit
+'--------------------------------------------------------------------
+Sub startSend()
+	If UTAB1.ID = 7 Then
+		Exit Sub
+	End If
+
+	If Len(Trim(SCREEN.Object("obj0.AN19").Data)) < 11 Then
+		SCREEN.Object("obj0.AN19").SetFocus
+		Exit Sub
+	End If
+
+	If SYSTEM.ConnectBy = 1 Then
+		If Len(Trim(SCREEN.Object("obj0.zPwd").Data)) < 4 Then
+			SCREEN.Object("obj0.zPwd").SetFocus
+			Exit Sub
+		End If
+	End If
+
+	SCREEN.SetTimer 3, False
+End Sub
+'--------------------------------------------------------------------
+Sub SetGuide(Data)
+	If Data = "1" Then
+		GUIDE1.Text = "확률 계산중입니다. 잠시만 기다려주십시요."
+	ElseIf Data = "2" Then
+		GUIDE1.Text = ""
+	Else
+		GUIDE1.Text = Data
+	End If
+End Sub
+
+_AW_ONINDECLARE_AW_
+#load IB888833
+
+_AW_ONENDSUB_AW_
+_AW_ONSTART_AW_
+SCREEN.SetTimer 10, False
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+SCREEN.OnSend = False
+
+_AW_ONENDSUB_AW_
+_AW_ONTIMER_AW_
+SCREEN.CreateWindow 2, "IB875191 /p?", ""
+
+_AW_ONENDSUB_AW_
+_AW_ONKEY_AW_
+If SCREEN.Key = 13 Then
+	SCREEN.OnSend = False
+End If
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(UTAB0)
+_AW_ONCLICK_AW_
+Dim ii, jj
+ii = UTAB0.Index
+If SCREEN.Object("OBJ"&ii).Visible = True Then
+	Exit Sub
+End If
+For jj=1 To 4
+	If ii = jj Then
+		SCREEN.Object("OBJ"&jj).Visible = True
+		SCREEN.Object("OBJ"&jj).SetRect 0, 29,1060, 565
+	Else
+		SCREEN.Object("OBJ"&jj).Visible = False
+		SCREEN.Object("OBJ"&jj).SetRect 1500, 29,1951, 565
+	End If
+Next
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON0)
+_AW_ONCLICK_AW_
+SCREEN.CreateWindow 1, "IB875150 /p5/s", ""
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

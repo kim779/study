@@ -1,0 +1,156 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB874310)
+MAPSIZE(335, 725)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("MS Sans Serif", 9, NORMAL)
+TITLE("[8743]펀드노트:운용전략")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pidofund")
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL1(0, 0, 725, 336)  LIMAGE(0)  LINEW(4)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(200, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL_bg(0, 0, 725, 38)  LIMAGE(1)  LINEW(3)  LINETYPE(4)  LINECOLOR(64)      COLOR(66, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+MEMO  MEMO0(4, 38, 720, 333)  TP_NONE  IO_MIXED  EDIT_OUTPUT  FONT("맑은 고딕", 9, NORMAL)    COLOR(192, 232)  |FA_HAN  CHARS(0)  FA_HAN  TABORDER(1)  IOORDER(5)  ENABLE  &
+  VISIBLE
+
+EDIT  fundnm(30, 350, 744, 376)  LEN(256)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_HAN    COLOR(192, 232)  CUR(0)  TP_SUNKEN          TABORDER(4)  IOORDER(3)  ENABLE  &
+  HINTTYPE(IH_STRING)  HELPTEXT("펀드명 키워드 검색")HELPTEXT("펀드명 키워드 검색")
+EDIT  func(193, 398, 228, 433)  LEN(1)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("0")          TABORDER(2)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  temp(238, 398, 273, 433)  LEN(1)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(3)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  output(283, 408, 363, 428)  LEN(16000)  IO_MIXED|AL_LEFT|    COLOR(192, 232)  CUR(0)  LINECOLOR(21)          TABORDER(0)  IOORDER(4)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL0(10, 9, 720, 29)  AL_LEFT  FONT("굴림", 12, BOLD)  CUR(0)      COLOR(168, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Sub createFile()
+	Dim path
+	Dim fileName
+
+	If Trim(trname.data) = "" Then
+		MsgBox "먼저 서비스ID 조회를 해주세요."
+	Else
+		'바탕화면 경로
+		path = CreateObject("WScript.Shell").SpecialFolders("Desktop")
+		fileName = path & "\" & Trim(usid.data) & "_" & Trim(trname.data) & ".txt"
+
+		'파일쓰기
+    	Call TextStrimWrite(fileName)
+	End If
+End Sub
+
+'파일쓰기
+Sub TextStrimWrite(strPathName)
+	Dim myArr()					'배열
+	Dim tempStr
+	Dim itemDtype				'데이터형
+	Dim itemLen					'크기(반복수)
+	Dim gridFlag				'그리드 체크 플래그
+	ReDim myArr(cnt)			'배열 크기 재지정
+
+    Set objStream = CreateObject("ADODB.Stream")
+    objStream.Charset = "UTF-8"
+    objStream.Open
+
+	objStream.WriteText data.data
+
+    '설정 부분
+    Set BinaryStream = CreateObject("adodb.stream")
+    BinaryStream.Type = 1
+    BinaryStream.Mode = 3
+    BinaryStream.Open
+    objStream.Position = 3
+    objStream.CopyTo BinaryStream
+    objStream.Flush
+    objStream.Close
+    BinaryStream.SaveToFile strPathName, 2
+    BinaryStream.Close
+    Set objStream = Nothing
+    Set BinaryStream = Nothing
+End Sub
+
+_AW_ONINDECLARE_AW_
+#load IB888888
+
+_AW_ONENDSUB_AW_
+_AW_ONSTART_AW_
+fundnm.Data = Replace(Trim(fundnm.Data), "|||||", "/")
+LABEL0.Text = Trim(fundnm.text)
+SCREEN.Send 0
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+func.Data = "S"
+fundnm.Data = Replace(Trim(fundnm.Data), "|||||", "/")
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+Dim text,dmsg
+If Len(Trim(output.data)) >  0 Then
+	output.data = Replace(output.data,"|", vbCrLf)
+	output.data = Replace(output.data,"<BR>", vbCrLf)
+	output.data = Replace(output.data,"$$", "/")
+	MEMO0.Text = output.data
+End If
+
+_AW_ONENDSUB_AW_
+_AW_ONTIMER_AW_
+SCREEN.Send 0
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(fundnm)
+_AW_ONCHANGE_AW_
+LABEL0.Text = Trim(fundnm.text)
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(output)
+_AW_ONCLICK_AW_
+Dim text,dmsg
+data.data = Replace(data.data,"/","$$")
+data.data = Replace(data.data,vbLf,"||")
+dmsg = "memo" & vbTab & data.data & vbLf
+SCREEN.CreateWindow 2, "IB960001 /p5 /d", dmsg
+
+
+text = SYSTEM.pop ("IB960001_TEXT")
+If Len(Trim(text)) > 0 Then
+		data.data = text
+		SYSTEM.Push "IB960001_TEXT", ""
+	Exit Sub
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

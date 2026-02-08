@@ -1,0 +1,140 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB400300)
+MAPSIZE(268, 259)
+VERSION(001)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("미니현재가")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(FMS|FLASH|CR2TAB|INTER|DOMINO)
+TITLE("[4003] 미니 현재가")
+TOPATH(AXIS)
+METHOD(MENU)
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL10(-2, 31, 261, 268)  LIMAGE(0)  LINEW(4)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL0(-2, 0, 261, 32)  LIMAGE(0)  LINEW(3)  LINETYPE(4)  LINECOLOR(64)      COLOR(66, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  HNAM(108, 6, 242, 26)  LEN(18)  IO_MIXED|AL_LEFT||SUM    FONT("굴림체", 9, BOLD)    COLOR(90, 130)  CUR(0)  LINECOLOR(89)          TABORDER(0)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  OBJ(6, 39, 253, 260)    "IB400310"  TABORDER(3)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  SYMBOL7(87, 6, 106, 26)  TP_PUSH|IMAGE|AL_STRETCH      COLOR(24, 0)  CUR(0)    "검색.BMP"    TABORDER(2)  ENABLE  &
+  VISIBLE  IMAGE  HOVER  HINTTYPE(IH_NONE)
+EDIT  40301(416, 71, 545, 94)  LEN(12)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP|FA_PASS    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(4)  IOORDER(3)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  30301(418, 101, 547, 124)  LEN(12)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP|FA_PASS    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(5)  IOORDER(4)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  ed_focod(7, 6, 87, 26)  LEN(8)  IO_MIXED|EDIT_INPUT|FA_SEND|FA_WRAP|FA_UPPER|SA_ALL|CODE      COLOR(68, 130)  CUR(0)  TP_SUNKEN          TABORDER(1)  IOORDER(5)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Dim fstart, ostart
+fstart = 1
+ostart = 1
+
+_AW_ONSEND_AW_
+Dim code
+
+code = Left(ed_focod.Data, 1)
+SCREEN.OnSend = False
+If code = "1" Or code = "4" Or code = "A" Or code = "D"  Then
+	HNAM.Data = SCREEN.GetName (101, ed_focod.Data, 0)
+	OBJ.SetObject "IB400310"
+	SCREEN.Object("obj.30301").data = ed_focod.Data
+	If Trim(HNAM.Data) =  "" Then
+		SCREEN.ClearAll 2, 0
+		Exit Sub
+	Else
+		ed_focod.Trigger "ed_focod", True
+		ed_focod.Trigger "30301", True
+		SYSTEM.SetHistory "30301", ed_focod.Data
+		SYSTEM.SetHistory "ed_focod", ed_focod.Data
+	End If
+Else
+	HNAM.Data = SCREEN.GetName (102, ed_focod.Data, 0)
+	OBJ.SetObject "IB400320"
+	SCREEN.Object("obj.40301").data = ed_focod.Data
+	If Trim(HNAM.Data) =  "" Then
+		SCREEN.ClearAll 2, 0
+		Exit Sub
+	Else
+		ed_focod.Trigger "ed_focod", True
+		ed_focod.Trigger "40301", True
+		SYSTEM.SetHistory "40301", ed_focod.Data
+		SYSTEM.SetHistory "ed_focod", ed_focod.Data
+	End If
+End If
+
+OBJ.Send
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(SYMBOL7)
+_AW_ONCLICK_AW_
+Dim code
+
+code = SCREEN.GetCode (103, "ed_focod", "HNAM", 2)
+If code <>  True Then
+	Exit Sub
+End If
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(40301)
+_AW_ONCHANGE_AW_
+If ostart = 1 Then
+	ostart = 0
+	Exit Sub
+End If
+
+ed_focod.Data = S40301.Data
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(30301)
+_AW_ONCHANGE_AW_
+If fstart = 1 Then
+	fstart = 0
+	Exit Sub
+End If
+
+ed_focod.Data = S30301.Data
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(ed_focod)
+_AW_ONCHANGE_AW_
+ed_focod.Trigger "", True
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

@@ -1,0 +1,57 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB1002B0)
+MAPSIZE(20, 20)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(CR2TAB)
+TITLE("Untitled")
+TOPATH(AXIS)
+METHOD(MENU)
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+BUTTON  srcChgBtn(0, 0, 20, 20)  TP_PUSH|IMAGE|AL_STRETCH      COLOR(132, 232)  CUR(10)    "TURN.BMP"    TABORDER(1)  ENABLE  &
+  VISIBLE  IMAGE  HOVER  HINTTYPE(IH_STRING)  HELPTEXT("주문창 위치이동")HELPTEXT("주문창 위치이동")
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONSEND_AW_
+SCREEN.OnSend = False
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(srcChgBtn)
+_AW_ONCLICK_AW_
+If Trim(SCREEN.Object("parent.changeSrcType").Text) = "type2" Then
+'	srcChgBtn.Text = "이전.BMP"
+	SCREEN.Object("parent.changeSrcType").Text = "type1"
+Else
+'	srcChgBtn.Text = "다음.BMP"
+	SCREEN.Object("parent.changeSrcType").Text = "type2"
+End If
+
+SCREEN.Proc "parent.changeSrc", ""
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

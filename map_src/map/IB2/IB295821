@@ -1,0 +1,71 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB295821)
+MAPSIZE(162, 592)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("MS Sans Serif", 9, NORMAL)
+TITLE("[295821]프로그램 매매현황 차트")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+CONTROL  drChart(0, 0, 592, 162)  |FA_FLASH  "CX_DRCHART"  "/iTT000003"  LEN(0)  EDIT_INOUT    COLOR(192, 232)  TABORDER(1)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_SCRIPT_AW_(drChart)
+_AW_ONCHANGE_AW_
+'drChart.GetChartState() 리턴값
+'STATE_NONE					0
+'STATE_STARTRECEIVE			1 	TR받은 직후
+'STATE_ENDRECEIVE			2 	조회결과를 차트컨트롤에 그린 후
+'STATE_CHANGEONPAGECNT		3	데이터 조회 스크롤 시
+'STATE_SENDTR				4	TR 전송시
+'STATE_DESTROYCHART			5	차트화면 내려갈때
+
+Dim TotCnt
+Dim DataCnt
+Dim ret
+ret = drChart.GetChartState()
+TotCnt = drChart.GetChartProperty("GetDataCount")
+DataCnt = drChart.GetChartProperty( "GetOnePageDataCount" )
+
+SYSTEM.Trace "ret[" & ret & "] TotCnt[" & TotCnt & "] DataCnt[" & DataCnt & "]"
+
+If ret = 2 Then
+	SCREEN.IgnoreChange False
+	'request_count.Data = TotCnt
+	SCREEN.IgnoreChange True
+End If
+
+If ret =  3 Then
+	SCREEN.IgnoreChange False
+	data_count.Data = DataCnt
+	SCREEN.IgnoreChange True
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

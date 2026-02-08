@@ -1,0 +1,550 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB292121)
+MAPSIZE(289, 840)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("투자자별 시간대별")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(FMS|FLASH)
+TITLE("2921 투자주체별 시간대별 매매동향")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pooppoop")
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+LABEL  SYMBOL10(31, 358, 101, 378)  '업종코드'  AL_RIGHT  CUR(0)      COLOR(131, 130)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  62301(111, 408, 131, 426)  LEN(1)  IO_NUM|EDIT_INPUT    COLOR(131, 1)  CUR(0)  TP_NONE  INIT("0")          TABORDER(1)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  62303(111, 358, 157, 378)  LEN(3)  IO_NUM|EDIT_INPUT|FA_SEND|SA_ALL    COLOR(68, 130)  CUR(0)  TP_SUNKEN  INIT("001")          TABORDER(2)  IOORDER(3)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  62310(111, 433, 153, 453)  LEN(2)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("1")          TABORDER(3)  IOORDER(6)  &
+  HINTTYPE(IH_NONE)
+GRID  62311(0, 0, 840, 289)  VISIBLEROW(16)  CELLH(19)  MATRIX(2000, 16)  FIX(16)  MAINCOLOR(7, 0)  LINECOLOR(75)  FOCUSCOLOR(78)  FOCUSKIND(4)  ROWC(68, 77)  |SELALWAYS|FLEXIBLE|VSCROLL|INS_TOP|NOHEAD|NO3D|RROW|XHLINE|PAGE|HEADER|GRFTEXT    &
+	COLINFO("62034")  LEN(8)  WIDTH(70)  HEAD("시간")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_ZEROSUP|SA_SPACE    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  EDITFORMAT("99999999")    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("62701")  LEN(8)  WIDTH(61)  HEAD("지수")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  FLOAT(2)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_CORGB|FA_FLOAT|SA_COSUP    COLOR(68, 69)  COLCUR(0, 0)    INORMAL  IFRGB(94, 95)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("62702")  LEN(8)  WIDTH(66)  HEAD("대비")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  FLOAT(2)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|FA_FLOAT|FA_CONTRAST|SA_SPACE|SA_CORAW|SA_TEXT    COLOR(68, 69)  COLCUR(0, 0)    INORMAL  IFRGB(94, 95)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("62703")  LEN(8)  WIDTH(50)  HEAD("등락률")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_CORGB|SA_COSIGN    COLOR(68, 69)  COLCUR(0, 0)    INORMAL  IFRGB(94, 95)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("62308")  LEN(12)  WIDTH(78)  HEAD("외국인")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSIGN    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(94, 95)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("62310")  LEN(12)  WIDTH(78)  HEAD("개인")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSIGN    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(94, 95)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("62312")  LEN(12)  WIDTH(78)  HEAD("기관계")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSIGN    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(94, 95)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("62313")  LEN(12)  WIDTH(76)  HEAD("금융투자")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSIGN    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(94, 95)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("62314")  LEN(12)  WIDTH(76)  HEAD("보험")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSIGN    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(94, 95)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("62315")  LEN(12)  WIDTH(76)  HEAD("투신")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSIGN    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(94, 95)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("62520")  LEN(12)  WIDTH(76)  HEAD("사모")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSIGN    COLOR(68, 69)  COLCUR(0, 0)    INORMAL  IFRGB(94, 95)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("62316")  LEN(12)  WIDTH(76)  HEAD("은행")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSIGN    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(94, 95)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("62317")  LEN(12)  WIDTH(76)  HEAD("기타금융")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSIGN    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(94, 95)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("62318")  LEN(12)  WIDTH(76)  HEAD("연기금")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSIGN    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(94, 95)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("62521")  LEN(12)  WIDTH(76)  HEAD("국가")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSIGN    COLOR(68, 69)  COLCUR(0, 0)    INORMAL  IFRGB(94, 95)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("62319")  LEN(12)  WIDTH(64)  HEAD("기타법인")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSIGN    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(94, 95)    HNORMAL  SORTSTARTPOS(0)    TABORDER(4)  IOORDER(8)  ENABLE  &
+  VISIBLE
+
+LABEL  LABEL0(31, 383, 101, 403)  '시장구분'  AL_RIGHT  CUR(0)      COLOR(131, 130)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_NONE)
+OBJECT  OBJ1(111, 490, 211, 550)    "IB290099"  TABORDER(5)  IOORDER(9)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  OBJ2(213, 490, 313, 550)    "IB290099"  TABORDER(6)  IOORDER(10)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  OBJ3(315, 490, 415, 550)    "IB290099"  TABORDER(7)  IOORDER(11)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  OBJ4(417, 490, 517, 550)    "IB290099"  TABORDER(8)  IOORDER(12)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  OBJ5(9, 558, 109, 618)    "IB290099"  TABORDER(9)  IOORDER(13)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  OBJ6(111, 558, 211, 618)    "IB290099"  TABORDER(10)  IOORDER(14)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  OBJ7(213, 558, 313, 618)    "IB290099"  TABORDER(11)  IOORDER(15)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  OBJ8(315, 558, 415, 618)    "IB290099"  TABORDER(12)  IOORDER(16)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  OBJ9(417, 558, 517, 618)    "IB290099"  TABORDER(13)  IOORDER(17)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  OBJ10(9, 623, 109, 683)    "IB290099"  TABORDER(14)  IOORDER(18)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  OBJ11(113, 623, 213, 683)    "IB290099"  TABORDER(15)  IOORDER(19)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  OBJ0(13, 482, 97, 561)    "IB290099"  TABORDER(16)  IOORDER(20)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL3(14, 408, 108, 428)  '누적/증감 구분'  AL_RIGHT  CUR(0)      COLOR(131, 130)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL1(14, 433, 108, 453)  '금액단위'  AL_RIGHT  CUR(0)      COLOR(131, 130)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  62302(111, 382, 153, 402)  LEN(2)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("1")          TABORDER(17)  IOORDER(2)  &
+  HINTTYPE(IH_NONE)
+EDIT  62307(111, 333, 157, 353)  LEN(2)  IO_NUM|EDIT_INPUT|FA_SEND|SA_ALL    COLOR(68, 130)  CUR(0)  TP_SUNKEN  INIT("001")          TABORDER(18)  IOORDER(5)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL2(31, 333, 101, 353)  '조회구분'  AL_RIGHT  CUR(0)      COLOR(131, 130)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL4(31, 307, 101, 327)  '시간간격'  AL_RIGHT  CUR(0)      COLOR(131, 130)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_NONE)
+OBJECT  OBJ12(217, 623, 317, 683)    "IB290099"  TABORDER(20)  IOORDER(21)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  OBJ13(321, 623, 421, 683)    "IB290099"  TABORDER(21)  IOORDER(22)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL5(14, 459, 108, 479)  '리핏여부'  AL_RIGHT  CUR(0)      COLOR(131, 130)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  62522(111, 459, 153, 479)  LEN(2)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("0")          TABORDER(22)  IOORDER(7)  &
+  HINTTYPE(IH_NONE)
+EDIT  62305(110, 306, 156, 326)  LEN(2)  IO_NUM|EDIT_INPUT|FA_SEND|SA_ALL    COLOR(68, 130)  CUR(0)  TP_SUNKEN  INIT("001")          TABORDER(19)  IOORDER(4)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+'Option Explicit
+Dim g_ArrData
+Set re = New RegExp
+re.Global = True
+re.IgnoreCase = True
+re.MultiLine = True
+re.Pattern = "[^0-9.\-\+]"
+
+'투자코드,투자자명,ColNumber
+g_ArrData = Array(Array("기관계", "0", "7", True),_
+	Array("금융투자", "1", "8", True),_
+	Array("보험", "2", "9", True),_
+	Array("투신", "3", "10", True),_
+	Array("은행", "4", "12", True),_
+	Array("기타금융", "5", "13", True),_
+    Array("연기금", "6", "14", True),_
+    Array("기타법인", "7", "16", True),_
+    Array("개인", "8", "6", True),_
+    Array("외국인", "9", "5", True),_
+    Array("미등록외국인", "10", "16", False),_
+    Array("선물업자", "11", "16", False),_
+	 Array("사모", "12", "11", True),_
+	Array("국가", "13", "15", True))
+
+Sub send_f()
+	S62311.Clear
+	S62303.Data = SCREEN.Object("parent.62303").Data
+
+	SCREEN.Send 0
+End Sub
+
+Sub send_eachtuja()
+	Dim ii, upgb, upcd, sjcd
+
+	upcd = SCREEN.Object("parent.62303").Data
+	upgb = Trim(SCREEN.Object("parent.62302").Data)
+
+	If upgb = "90" Then
+		sjcd = "1"
+		upcd = CLng(upcd) - 200
+	ElseIf  upgb = "02" Then
+		sjcd = "2"
+		upcd = "0"
+	ElseIf  upgb = "05" Then
+		sjcd = "5"
+		upcd = "0"
+	ElseIf  upgb = "06" Then
+		sjcd = "6"
+		upcd = "0"
+	ElseIf  upgb = "10" Then
+		sjcd = "0"
+		upcd = "1001"
+	Else
+		sjcd = "0"
+	End If
+
+
+'	If upgb = "0" Or upgb = "1" Then
+'		sjcd = "0"
+'		If upcd = 101 Then
+'			upcd = 1001
+'		End If
+'	Else
+'		sjcd = "1"
+'		upcd = CLng(upcd) - 200
+'	End If
+
+	For ii = LBound(g_ArrData) To UBound(g_ArrData)
+		SCREEN.Object("OBJ" & ii & ".62302").Data = sjcd
+		SCREEN.Object("OBJ" & ii & ".62303").Data = upcd
+		SCREEN.Object("OBJ" & ii & ".62304").Data = g_ArrData(ii)(1)
+		If g_ArrData(ii)(3) = True Then
+			If CLng(upgb) = 3 Then
+				SCREEN.Object("OBJ" & ii).ClearAll 0
+			Else
+				SCREEN.Object("OBJ" & ii).Proc "send_f", ""
+			End If
+		End If
+	Next
+
+	If upcd = "1001" Then
+		upcd = "101"
+	End If
+
+	If upgb = "90" Then
+		sjcd = "0"
+		upcd = CLng(upcd) + 200
+	End If
+	S62303.Data = upcd
+	S62302.Data = sjcd
+
+End Sub
+
+
+'-----------------------------------------------------------------------
+Function SetSign(Data)
+	SetSign = Data
+	Data = re.Replace(Data,"")
+	If Len(Data) > 0 Then
+		If SCREEN.Object("parent.r1_3").Checked And CLng(Data) > 0 Then
+			SetSign = "+" & Data
+		Else
+			SetSign = Data
+		End If
+	End If
+End Function
+'-----------------------------------------------------------------------
+Function ForceSign(Data, Rate)
+	ForceSign = Data
+	Data = re.Replace(Data,"")
+	Rate = re.Replace(Rate,"")
+	If Len(Rate) > 0 Then
+		If CDbl(Rate) > 0 Then
+			ForceSign = "+" & Data
+		ElseIf CDbl(Rate) < 0 Then
+			ForceSign = "-" & Data
+		End If
+	End If
+End Function
+'-----------------------------------------------------------------------
+Function SetTimeElement(hh, mm, ss)
+	If Len(hh) = 1 Then
+		hh = "0" & hh
+	End If
+	If Len(mm) = 1 Then
+		mm = "0" & mm
+	End If
+	If Len(ss) = 1 Then
+		ss = "0" & ss
+	End If
+	SetTimeElement = hh & ":" & mm & ":" & ss
+End Function
+'-----------------------------------------------------------------------
+Function GetTime(SrcTime, Interval)
+	If Len(SrcTime) = 5 Then
+		SrcTime = "0" & SrcTime
+	End If
+
+	AHour = CLng(Mid(SrcTime, 1, 2))
+	AMin = CLng(Mid(SrcTime, 3, 2))
+	ASec = CLng(Mid(SrcTime, 5, 2))
+	If Interval = 0 Then '30초간격
+		If ASec >= 30 Then
+			ASec = 0
+			AMin = AMin + 1
+		Else
+			ASec = 30
+		End If
+	ElseIf Interval = 60 Then
+		AHour = AHour + 1
+		AMin = 0
+		ASec = 0
+	Else
+		ASec = 0
+		AMin = (Fix(AMin / Interval) + 1) * Interval
+	End If
+	ADate = TimeSerial(AHour, AMin, ASec)
+
+	GetTime = SetTimeElement(Hour(ADate), Minute(ADate), Second(ADate))
+End Function
+'-----------------------------------------------------------------------
+Function GetTimeJisu(SrcTime, Interval)
+	Dim remain
+	If Len(SrcTime) = 5 Then
+		SrcTime = "0" & SrcTime
+	End If
+
+	AHour = CLng(Mid(SrcTime, 1, 2))
+	AMin = CLng(Mid(SrcTime, 3, 2))
+	ASec = CLng(Mid(SrcTime, 5, 2))
+
+	If Interval = 0 Then '30초간격
+		If ASec > 0 Then
+			If ASec < 40 Then
+				ASec = 30
+			Else
+				ASec = 0
+				AMin = AMin + 1
+			End If
+		End If
+	ElseIf Interval = 60 Then
+		AHour = AHour + 1
+		AMin = 0
+		ASec = 0
+	Else
+		ASec = 0
+		AMin = (Fix(AMin / Interval) + 1) * Interval
+	End If
+
+	ADate = TimeSerial(AHour, AMin, ASec)
+
+	GetTimeJisu = SetTimeElement(Hour(ADate), Minute(ADate), Second(ADate))
+End Function
+'-----------------------------------------------------------------------
+Sub ProcSetData(Data, Data2)
+	Dim ii, jj, temp, tmpstr
+	Dim ArrData, ArrData2
+	Dim ADateTime, CurTime
+	Dim ctime, ntime
+	Dim rate
+
+	ArrData = Split(Data, "|")
+	ArrData2 = Split(Data2, "|")
+
+
+
+'	If g_ArrData(ArrData(0))(0) <> "기관계" Then
+'		Exit Sub
+'	End If
+'	SYSTEM.Trace "1 tjcd["&ArrData(0)&"] tjnm["& g_ArrData(ArrData(0))(0) &"] Time["&ArrData(1)&"]"
+'	SYSTEM.Trace "2 ["& g_ArrData(ArrData(0))(0) &"] val["&ArrData(4)&"] val["&ArrData(7)&"]"
+	ADateTime = GetTime(ArrData(1), SCREEN.Object("parent.time").Data)
+	CurTime = S62311.GetGridCell(1, 1)
+	temp = re.Replace(CurTime,"")
+
+	If Len(temp) = 0 Then
+		'Call send_f()
+		'Exit Sub
+		CurTime = "0"
+	End If
+
+	ctime = CLng(re.Replace(CurTime,""))
+	ntime = CLng(re.Replace(ADateTime,""))
+
+	Select Case S62307.Data
+		Case "01"		'매수거래량
+			jj = 2
+		Case "03"		'매도거래량
+			jj = 3
+		Case "05"		'순매수량
+			jj = 4
+		Case "02"		'매수거래대금
+			jj = 5
+		Case "04"		'매도거래대금
+			jj = 6
+		Case "06"		'순매수거래대금
+			jj = 7
+	End Select
+
+'	SYSTEM.Trace "2 ProcSetData rtime=["&ArrData(1)&"] ctime=["&ctime&"] ntime=["&ntime&"]"
+
+'	SYSTEM.Trace "arrdata=["&CLng(ArrData(jj))&"]"
+
+	If ctime < ntime Then
+		If S62311.Rows < 1 And CLng(ArrData(jj)) = 0 Then
+			Exit Sub
+		End If
+'		SYSTEM.Trace "inserted row"
+		S62311.InsertRow 0
+		S62311.SetGridCell 1, 1, ADateTime
+'		rate = SCREEN.Object("main.OBJ0.20033").Data
+'		S62311.SetGridCell 1, 2, ForceSign(SCREEN.Object("main.OBJ0.20023").Data, rate)
+'		S62311.SetGridCell 1, 3, ForceSign(SCREEN.Object("main.OBJ0.20024").Data, rate)
+'		S62311.SetGridCell 1, 4, ForceSign(SCREEN.Object("main.OBJ0.20033").Data, rate)
+	End If
+
+
+	'SYSTEM.Trace "g_ArrData(ii)(1)=["&g_ArrData(ii)(1)&"] arrdata(0)=["&ArrData(0)&"]"
+	For ii = LBound(g_ArrData) To UBound(g_ArrData)
+
+		If g_ArrData(ii)(1) = Trim(ArrData(0)) Then
+			'SYSTEM.Trace "3 g_ArrData(ii)(1)=["&g_ArrData(ii)(1)&"] arrdata(0)=["&ArrData(0)&"]"
+			tmpstr = "0"
+
+			If SCREEN.Object("parent.r3_2").Checked Then
+'				SYSTEM.Trace "S62311.Rows=["&S62311.Rows&"]"
+				If S62311.Rows > 1 Then
+					If ctime < ntime Then
+						tmpstr = Trim( S62311.GetGridCell(2, g_ArrData(ii)(2)) )
+					Else
+						tmpstr = Trim( S62311.GetGridCell(1, g_ArrData(ii)(2)) )
+					End If
+					If Len(tmpstr) = 0 Then
+						tmpstr = "0"
+					End If
+				Else
+					tmpstr = ArrData2(jj)
+				End If
+'				SYSTEM.Trace "0 tmpstr=["&tmpstr&"]"
+				If Len(ArrData(jj)) = 0 Then
+					ArrData(jj) = 0
+				End If
+
+				If Len(ArrData2(jj)) = 0 Then
+					ArrData2(jj) = 0
+				End If
+
+				If ctime < ntime Then
+					ArrData(jj) = ArrData(jj) - ArrData2(jj)
+				Else
+'					SYSTEM.Trace "1 tmpstr=["&tmpstr&"]"
+'					SYSTEM.Trace "2 tmpstr=["&ArrData(jj)&"]"
+'					SYSTEM.Trace "3 tmpstr=["&ArrData2(jj)&"]"
+					ArrData(jj) = ArrData(jj) - ArrData2(jj) + tmpstr
+				End If
+
+			End If
+
+			If ArrData(jj) = 0 Then
+				ArrData(jj) = ""
+			End If
+
+			'SYSTEM.Trace "1 ["&g_ArrData(ii)(0)&"] result=["&ArrData(jj)&"]"
+			S62311.SetGridCell 1, g_ArrData(ii)(2), SetSign(ArrData(jj))
+		Else
+			If ctime < ntime Then
+				If SCREEN.Object("parent.r3_2").Checked Then
+					S62311.SetGridCell 1, g_ArrData(ii)(2), ""
+				Else
+					S62311.SetGridCell 1, g_ArrData(ii)(2), SetSign(S62311.GetGridCell(2, g_ArrData(ii)(2)))
+				End If
+			End If
+		End If
+	Next
+End Sub
+'-----------------------------------------------------------------------
+
+Sub updatejisu(param)
+	ArrData = Split(param, "|")
+	'ADateTime = GetTimeJisu(ArrData(0), SCREEN.Object("parent.time").Data)
+	ADateTime = ArrData(0)
+	CurTime = S62311.GetGridCell(1, 1)
+
+	temp = re.Replace(CurTime,"")
+	If Len(temp) = 0 Then
+		'Call send_f()
+		Exit Sub
+	End If
+
+	ctime = (re.Replace(CurTime,""))
+	ntime = (re.Replace(ADateTime,""))
+	If Len(ntime) = 0 Then
+		'SYSTEM.Trace "time=["&ADateTime&"]"
+		S62311.SetGridCell 1, 2, ForceSign(ArrData(1), ArrData(3))
+		S62311.SetGridCell 1, 3, ForceSign(ArrData(2), ArrData(3))
+		S62311.SetGridCell 1, 4, ForceSign(ArrData(3), ArrData(3))
+		Exit Sub
+	End If
+	'SYSTEM.Trace "updatejisu ctime=["&ctime&"] ntime=["&ntime&"]"
+	If ctime >= ntime Then
+		S62311.SetGridCell 1, 2, ForceSign(ArrData(1), ArrData(3))
+		S62311.SetGridCell 1, 3, ForceSign(ArrData(2), ArrData(3))
+		S62311.SetGridCell 1, 4, ForceSign(ArrData(3), ArrData(3))
+'	ElseIf ctime < ntime Then
+'		S62311.InsertRow 0
+'		S62311.SetGridCell 1, 1, ADateTime
+'		S62311.SetGridCell 1, 2, ForceSign(ArrData(1), ArrData(3))
+'		S62311.SetGridCell 1, 3, ForceSign(ArrData(2), ArrData(3))
+'		S62311.SetGridCell 1, 4, ForceSign(ArrData(3), ArrData(3))
+'		For i = LBound(g_ArrData) To UBound(g_ArrData)
+'			If SCREEN.Object("parent.r3_2").Checked Then
+'				S62311.SetGridCell 1, g_ArrData(ii)(2), ""
+'			Else
+'				S62311.SetGridCell 1, g_ArrData(i)(2), SetSign(S62311.GetGridCell(2, g_ArrData(i)(2)))
+'			End If
+'		Next
+	End If
+End Sub
+
+_AW_ONINDECLARE_AW_
+#load IB888888
+
+_AW_ONENDSUB_AW_
+_AW_ONSTART_AW_
+'SCREEN.Object("parent.parent.OPEN_BTN").Visible = True
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+Dim r_upgb, gubn, upgb
+
+S62305.Data = SCREEN.Object("parent.time").Data
+S62310.Data = "1"
+
+r_upgb = P_GetBigCd(S62303.Data)
+
+Select Case r_upgb
+	Case "001"		'KOSPI
+		S62302.DATA = "00"
+	Case "101"		'KOSPI200
+		S62302.DATA = "10"
+	Case "201"		'KOSDAQ
+		S62302.DATA = "90"
+	Case Else
+		S62302.DATA = "0"
+		S62303.Data = "0"
+End Select
+
+
+If SCREEN.Object("parent.r1_1").Checked Then
+	gubn = 1
+ElseIf SCREEN.Object("parent.r1_2").Checked Then
+	gubn = 3
+Else
+	gubn = 5
+End If
+
+If Not SCREEN.Object("parent.r2_1").Checked Then
+	gubn = gubn + 1
+End If
+
+If SCREEN.Object("parent.r3_1").Checked Then
+	S62301.Data = "1"
+Else
+	S62301.Data = "2"
+End If
+
+If Len(gubn) < 2 Then
+	S62307.Data = "0"&gubn
+End If
+If Trim(S62522.Data) <> "1" Then
+	Call send_eachtuja()
+End If
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(62311)
+_AW_ONCLICK_AW_
+Dim target, i
+
+If S62311.HitPos = 4 Then
+	target = S62311.GetHeadCell(S62311.Column)
+
+	If S62311.Column < 10 Or Len(target) <= 0 Then
+		Exit Sub
+	End If
+
+	For i = LBound(g_ArrData) To UBound(g_ArrData)
+		If Trim(target) = g_ArrData(i)(2) Then
+			S62311.SetColumnVisible target, True
+		ElseIf g_ArrData(i)(2) >= 10 Then
+			S62311.SetColumnVisible g_ArrData(i)(2), False
+		End If
+	Next
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

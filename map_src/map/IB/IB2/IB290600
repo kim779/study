@@ -1,0 +1,445 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB290600)
+MAPSIZE(406, 580)
+VERSION(001)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("[2906]시간대별등락�")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(FMS|ENCODE)
+TITLE("[2906] 시간대별 등락종목수")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pooppoop")
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL1(-4, 26, 584, 408)  LIMAGE(0)  LINEW(6)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL0(0, 0, 580, 26)        COLOR(66, 130)  CUR(0)    AL_CENTER  FONT("굴림체", 10, NORMAL)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL0(97, 3, 121, 23)  '업종'  AL_LEFT  CUR(0)      COLOR(68, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  r_10sec(350, 3, 389, 23)  '10초'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(GROUP1)      COLOR(16, 130)  CUR(0)      TABORDER(5)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  r_10min(436, 3, 474, 23)  '10분'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(GROUP1)      COLOR(16, 130)  CUR(0)      TABORDER(7)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+GROUP  GROUP0(33, 454, 79, 479)  'Group'        COLOR(-1, 13)  ENABLE  &
+  HINTTYPE(IH_NONE)
+GROUP  GROUP1(115, 457, 161, 482)  'Group'        COLOR(-1, 13)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  r_day(482, 3, 521, 23)  '일간'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(GROUP1)      COLOR(16, 130)  CUR(0)      TABORDER(8)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+OBJECT  OBJECT0(6, 37, 574, 397)    "IB290610"FIXEDSIZE  TABORDER(10)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+COMBO  upgb(7, 3, 92, 23)  TP_SUNKEN  LEN(3)  COUNT(5)  VCOUNT(5)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_NUM|EDIT_INOUT    COLOR(68, 130)  CUR(0)  DISPLAY("KOSPI", "KOSDAQ", "KOSPI200", "KOSPI100", "섹터지수")  DATA("001", "201", "101", "401", "601")    TABORDER(1)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON0(537, 3, 573, 23)  '조회'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, BOLD)  COLOR(208, 186)  CUR(0)    "조회BTN.BMP"    TABORDER(9)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+LABEL  LABEL1(956, 6, 1033, 26)  '(실시간안됨)'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  SYMBOL14(167, 3, 186, 23)  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(131, 1)  CUR(0)    "검색.BMP"    TABORDER(3)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+EDIT  20301(122, 3, 167, 23)  LEN(3)  IO_NUM|EDIT_INPUT|FA_WRAP|CODE    FONT("굴림체", 9, NORMAL)    COLOR(68, 130)  CUR(0)  TP_SUNKEN  INIT("001")          TABORDER(2)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  20022(188, 3, 307, 23)  LEN(20)  IO_MIXED|AL_LEFT|  FONT("굴림체", 9, NORMAL)    COLOR(90, 130)  CUR(0)  LINECOLOR(89)          TABORDER(0)  IOORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL3(579, 0, 581, 26)        COLOR(64, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL2(0, 0, 1, 26)        COLOR(64, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  r_2sec(309, 3, 348, 23)  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(GROUP1)      COLOR(16, 130)  CUR(0)      TABORDER(4)  ENABLE  &
+  VISIBLE  CHECKED  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  r_1min(395, 3, 434, 23)  '1분'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(GROUP1)      COLOR(16, 130)  CUR(0)      TABORDER(6)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  SEC(324, 3, 343, 23)  '2초'  AL_LEFT  CUR(0)      COLOR(68, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Const MYFILE = "userconf.ini"
+Const MYMAP = "IB290600"
+
+
+'upgb 801
+'KTOP 30(812) 2초
+
+'upgb 201
+'KOSDAQ150(305) 2초
+
+'upgb 101
+'KOSPI200(116) 경기방어 2초
+'KOSPI200(117) 중소형주지수 10초
+'KOSPI200(118) 산업재 2초
+'KOSPI200(119) 건강관리 2초
+
+Sub check_UpJong()
+	Select Case Trim(S20301.Data)
+	' 1초 주기 지수
+	Case 	101, 107, 108, 109, 110,       _
+			111, 112, 113, 114, 116,       _
+			117, 130, 305, 310, 311,       _
+			312, 313, 314, 315, 316,       _
+			317, 620, 621, 622, 628,       _
+			629, 630, 631, 632, 633,       _
+			997, 998, 999, 650
+			SEC.Text = "1초"
+			SEC.Visible = True
+			r_2sec.Visible  = True
+			r_10sec.Visible = True
+
+	' 2초 주기 지수
+	Case	118, 120, 121, 122, 123,       _
+			127, 128, 129, 307, 308,       _
+			601, 602, 603, 604, 606,       _
+			607, 609, 610, 612, 613,       _
+			615, 616, 623, 624, 625,       _
+			626, 627, 801, 802, 803,       _
+			804, 805, 812, 813, 814
+			SEC.Text = "2초"
+			SEC.Visible = True
+			r_2sec.Visible  = True
+			r_10sec.Visible = True
+
+	' 10초 주기 지수
+	Case Else
+			SEC.Visible = False
+			SEC.Clear()
+			r_2sec.Visible  = False
+			r_10sec.Visible = True
+
+			If r_2sec.Checked = True Then
+				r_10sec.Checked = True
+			End If
+	End Select
+End Sub
+
+Sub	Set_object()
+	If r_2sec.Checked = True Then
+		OBJECT0.SetObject "IB290610"
+	ElseIf r_10sec.Checked = True Then
+		If upgb.Data = "101" Or upgb.Data = "303" Or upgb.Data = "999" Or (upgb.Data >= 601 And upgb.Data <= 699) Then
+			OBJECT0.SetObject "IB290630"
+		Else
+			OBJECT0.SetObject "IB290610"
+		End If
+	ElseIf r_1min.Checked = True Then
+		If upgb.Data = "707" Then
+			OBJECT0.SetObject "IB290610"
+		Else
+			OBJECT0.SetObject "IB290630"
+		End If
+	ElseIf r_10min.Checked = True Then
+		OBJECT0.SetObject "IB290630"
+	ElseIf r_day.Checked = True Then
+		OBJECT0.SetObject "IB290620"
+	End If
+
+	OBJECT0.Send
+End Sub
+
+Sub Up_name()
+	Dim name
+	name = SCREEN.GetName(104, S20301.Data, 99)
+
+	If name <> "" Then
+		S20022.Data = name
+	End If
+End Sub
+
+Sub p_write_ini()
+	If SCREEN.CreateObject("INFO") Then
+		Dim selRadio
+		If r_2sec.Checked = True Then
+			selRadio = 1
+		ElseIf r_10sec.Checked = True Then
+			selRadio = 2
+		ElseIf r_1min.Checked = True Then
+			selRadio = 3
+		ElseIf r_10min.Checked = True Then
+			selRadio = 4
+		ElseIf r_day.Checked = True Then
+			selRadio = 5
+		End If
+
+		INFO.PushData LOGIN.Name, MYFILE, MYMAP, "upGubn", upgb.Data
+		INFO.PushData LOGIN.Name, MYFILE, MYMAP, "upjong", S20301.Data
+		INFO.PushData LOGIN.Name, MYFILE, MYMAP, "radio",  selRadio
+	End If
+End Sub
+
+Sub p_read_ini()
+	If SCREEN.CreateObject("INFO") Then
+		Dim upGubn, upjong
+		upGubn   = Trim(INFO.PopData(LOGIN.Name, MYFILE, MYMAP, "upGubn"))
+		upjong   = Trim(INFO.PopData(LOGIN.Name, MYFILE, MYMAP, "upjong"))
+		selRadio = Trim(INFO.PopData(LOGIN.Name, MYFILE, MYMAP, "radio"))
+
+		SCREEN.IgnoreChange True
+		If upGubn = "" Then
+			upgb.Data = "001"
+		Else
+			upgb.Data = upGubn
+		End If
+
+		If upjong = "" Then
+			S20301.Data = "001"
+		Else
+			S20301.Data = upjong
+		End If
+
+		If selRadio = "" Then
+			If upgb.Data = "101" Then
+				r_2sec.Checked = True
+'			ElseIf upgb.Data = "701" Then  프리보드 지수 삭제
+'				r_1min.Checked = True
+			Else
+				r_10sec.Checked = True
+			End If
+		Else
+			Select Case SelRadio
+				Case 1 : r_2sec.Checked = True
+				Case 2 : r_10sec.Checked = True
+				Case 3 : r_1min.Checked = True
+				Case 4 : r_10min.Checked = True
+				Case 5 : r_day.Checked = True
+			End Select
+		End If
+
+		SCREEN.IgnoreChange False
+	End If
+End Sub
+
+
+Dim upcd_flg
+upcd_flg = 1
+
+
+Sub p_write_com()
+	If SCREEN.CreateObject("Info") Then
+	  	INFO.PushData LOGIN.Name, myFILE, myMAP, "COMBO1", S20301.Data
+		INFO.PushData LOGIN.Name, MYFILE, MYMAP, "upGubn", upgb.Data
+	End If
+End Sub
+
+Sub p_read_com()
+	If SCREEN.CreateObject("Info") Then
+	 	S20301.Data = Trim(INFO.PopData(LOGIN.Name, myFILE, myMAP, "COMBO1"))
+	 	upgb.Data = Trim(INFO.PopData(LOGIN.Name, myFILE, myMAP, "upGubn"))
+	End If
+
+	If Len(Trim(S20301.data)) = 0 Then
+		S20301.data = "001"
+		upgb.DATA = "001"
+	End If
+
+End Sub
+
+_AW_ONINDECLARE_AW_
+#load IB888888
+
+_AW_ONENDSUB_AW_
+_AW_ONSTART_AW_
+'Call p_read_ini()
+Call p_read_com()
+Call check_UpJong()
+SCREEN.SetTimer 2, False
+
+_AW_ONENDSUB_AW_
+_AW_ONTIMER_AW_
+SCREEN.Send 0
+Call Set_object()
+
+_AW_ONENDSUB_AW_
+_AW_ONCLOSE_AW_
+Call p_write_ini()
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(r_10sec)
+_AW_ONCLICK_AW_
+Call Set_object()
+'LABEL1.Visible = False
+'
+'SCREEN.Send 0
+'SCREEN.SetTimer 1, False
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(r_10min)
+_AW_ONCLICK_AW_
+Call Set_object()
+'LABEL1.Visible = True
+'
+'SCREEN.Send 0
+'SCREEN.SetTimer 1, False
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(r_day)
+_AW_ONCLICK_AW_
+Call Set_object()
+'LABEL1.Visible = False
+'
+'SCREEN.Send 0
+'SCREEN.SetTimer 1, False
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(upgb)
+_AW_ONCHANGE_AW_
+SCREEN.IgnoreChange True
+S20301.Data = upgb.Data
+SCREEN.IgnoreChange False
+
+Call check_UpJong()
+'Call Set_Object()
+
+SCREEN.Send 0
+SCREEN.SetTimer 1, False
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON0)
+_AW_ONCLICK_AW_
+SCREEN.Send 2
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(SYMBOL14)
+_AW_ONCLICK_AW_
+Dim retn
+
+Select Case upgb.Index
+	Case 0, 2, 3   			'KOSPI
+		retn = SCREEN.GetCode(104, "20301", "20022", 0)
+	Case 1					'KOSDAQ
+		retn = SCREEN.GetCode(104, "20301", "20022", 9)
+	Case 4						'SECTOR
+		retn = SCREEN.GetCode(104, "20301", "20022", 200)
+End Select
+
+S20301.SetFocus
+
+If (retn = True) Then
+	SCREEN.Send 0
+	SCREEN.SetTimer 2, False
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(20301)
+_AW_ONCHANGE_AW_
+Dim  r_upgb
+SCREEN.IgnoreChange True
+	r_upgb = P_GetBigCd(S20301.Data)
+	Select Case r_upgb
+		Case "001"		'KOSPI
+			upgb.Data = r_upgb
+		Case "101"		'KOSPI200
+			upgb.Data = r_upgb
+		Case "201"		'KOSDAQ
+			upgb.Data = r_upgb
+		Case "301"		'KOSDAQ50
+			If S20301.Data = "303" Then
+				upgb.Data = S20301.Data
+			ElseIf S20301.Data = "305" Or (S20301.Data >= 309 And S20301.Data <= 317) Then
+				upgb.Data = "201"
+			Else
+				upgb.Data = r_upgb
+			End If
+		Case "401"		'KOSPI100
+			upgb.Data = r_upgb
+		Case "303"		'KOSTA
+			upgb.Data = r_upgb
+		Case "999"		'KRX100
+			upgb.Data = r_upgb
+		Case "998"		'KRX300
+			upgb.Data = r_upgb
+		Case "997"		'KRX200
+			upgb.Data = r_upgb
+		Case "601"		'SECTOR
+			upgb.Data = r_upgb
+		Case "701"		'SECTOR
+			upgb.Data = r_upgb
+		Case "801"		'기타
+			upgb.Data = r_upgb
+		Case Else
+		   S20301.Data = "001"
+		   upgb.Data = "001"
+	End Select
+
+Call check_UpJong()
+'Call Set_Object()
+
+If upcd_flg = 1 Then
+	upcd_flg = 2
+Else
+	Call p_write_com()
+
+End If
+
+SCREEN.Send 0
+SCREEN.SetTimer 1, False
+SCREEN.IgnoreChange False
+
+S20301.SetFocus
+Up_name()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(r_2sec)
+_AW_ONCLICK_AW_
+Call Set_object()
+'LABEL1.Visible = False
+
+'SCREEN.Send 0
+'SCREEN.SetTimer 1, False
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(r_1min)
+_AW_ONCLICK_AW_
+Call Set_object()
+'LABEL1.Visible = False
+'
+'SCREEN.Send 0
+'SCREEN.SetTimer 1, False
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(SEC)
+_AW_ONCLICK_AW_
+r_2sec.Checked = True
+Call Set_object()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

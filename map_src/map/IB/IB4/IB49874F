@@ -1,0 +1,80 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB49874F)
+MAPSIZE(230, 690)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("굴림", 9, NORMAL)
+TITLE("Untitled")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(FIXED)
+HEADER(NOP)
+BGROUND(BRUSH, 68)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL1(0, 180, 690, 230)        COLOR(68, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL28(117, 160, 567, 175)  'IBK투자증권 관리영업점 또는 고객센터 (1588-0030,1544-0050)'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  BUTTON3(5, 156, 105, 176)  '상담/문의'  TP_PUSH|IMAGETEXT|AL_STRETCH        FOCUS  COLOR(208, 186)  CUR(0)    "8BTN.BMP"    TABORDER(1)  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+LABEL  LABEL3(48, 95, 648, 110)  '펀드매수 신청이 완료되었습니다.'  AL_CENTER  FONT("굴림", 12, BOLD)  CUR(0)      COLOR(168, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  accinfo(48, 115, 648, 130)  AL_CENTER  FONT("굴림", 11, NORMAL)  CUR(0)      COLOR(168, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  NEXT(575, 185, 682, 226)  '닫기'  TP_PUSH|IMAGETEXT|AL_STRETCH        FOCUS  COLOR(208, 186)  CUR(10)    "btn_close.bmp"    TABORDER(2)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+BUTTON  B_AUTO(15, 185, 122, 226)  '자동이체신청'  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(208, 186)  CUR(10)    "btn_application_2.bmp"    TABORDER(3)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+PANEL  PANEL6(313, 10, 377, 74)    |IMAGE|AL_STRETCH    COLOR(181, 232)  CUR(0)    "ico_final.bmp"  ENABLE  &
+  VISIBLE  IMAGE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONSTART_AW_
+
+Dim seq,zSettDt,tmp
+seq = SCREEN.Object("main.OBJECT5.jumn_obj.lOrdNo").Data
+zSettDt = Trim(SCREEN.Object("main.OBJECT5.jumn_obj.zSettDt").Data)
+'zSettDt = Trim(SCREEN.Object("main.OBJECT5.jumn_obj.zBuyPtnNm").Data)
+If Len(zSettDt) = 8 And IsNumeric(zSettDt) = True Then
+	tmp = Mid(zSettDt,1,4) & "/" & Mid(zSettDt,5,2)  & "/" & Mid(zSettDt,7,2)
+Else
+	tmp = zSettDt
+End If
+accinfo.Data = "(처리번호 "& seq & ", 매수결제일 " & tmp & ")"
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(NEXT)
+_AW_ONCLICK_AW_
+SCREEN.Proc "parent.CloseWindow", ""
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(B_AUTO)
+_AW_ONCLICK_AW_
+SCREEN.Proc "main.changeStep", "6"
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

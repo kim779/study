@@ -1,0 +1,564 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB190111)
+MAPSIZE(197, 318)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("펀드매도주문")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(CR2TAB|INTER)
+TITLE("1901 복수계좌 매도주문")
+TOPATH(AXIS)
+METHOD(MENU)
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL3(0, 0, 319, 197)    |IMAGE|AL_STRETCH    COLOR(171, 232)  CUR(0)    "매도_BG.BMP"  ENABLE  &
+  VISIBLE  IMAGE  HINTTYPE(IH_NONE)
+LABEL  SYMBOL28(4, 5, 28, 25)  '종목'  AL_LEFT  CUR(0)      COLOR(228, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  SYMBOL83(4, 51, 28, 71)  '수량'  AL_LEFT  CUR(0)      COLOR(228, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  ed_jprc(30, 74, 114, 94)  LEN(10)  IO_NUM|EDIT_INPUT|FA_COMMA|FA_RIGHT|FA_WRAP|FA_SKIP|FA_XFLOAT  SPIN(1)    FONT("굴림체", 9, NORMAL)    COLOR(78, 130)  CUR(0)  TP_SUNKEN  INIT("0")          TABORDER(6)  IOORDER(2)  ENABLE  &
+  VISIBLE  HOVER  HINTTYPE(IH_NONE)
+EDIT  ed_jqty(30, 51, 114, 71)  LEN(8)  IO_NUM|EDIT_INPUT|FA_COMMA|FA_RIGHT|FA_WRAP|FA_SKIP|FA_XFLOAT  SPIN(1)      COLOR(68, 130)  CUR(0)  TP_SUNKEN  INIT("0")          TABORDER(5)  IOORDER(3)  ENABLE  &
+  VISIBLE  HOVER  HINTTYPE(IH_NONE)
+BUTTON  BUTTON2(95, 5, 114, 25)  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(15, 63)  CUR(0)    "검색.bmp"    TABORDER(15)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+LABEL  LABEL23(4, 28, 28, 48)  '구분'  AL_LEFT  CUR(0)      COLOR(228, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL24(4, 74, 28, 94)  '단가'  AL_LEFT  CUR(0)      COLOR(228, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+PANEL  PANEL0(30, 28, 260, 48)  LINECOLOR(61)      COLOR(182, 130)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  r_hogb0(34, 28, 88, 48)  '지정가'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(GP1)      COLOR(146, 130)  CUR(0)      TABORDER(2)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  r_hogb1(98, 28, 152, 48)  '시장가'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(GP1)      COLOR(146, 130)  CUR(0)      TABORDER(3)  ENABLE  &
+  VISIBLE  CHECKED  TRANSPARENT  HINTTYPE(IH_NONE)
+CONTROL  1301(30, 5, 95, 25)  |FA_PROTECT|FA_SKIP  "CX_CODECTRL"  "/u0/k검색.BMP/lAXCOMBO.BMP/p/s0/o"  LEN(6)  EDIT_INOUT    COLOR(192, 130)  TABORDER(1)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+CONTROL  c_pric(117, 74, 137, 94)    "CX_Price"  "/k1/i매도_1BTN_BG.BMP/t원/red_jprc/xpibohoga"  LEN(0)  EDIT_NOP    COLOR(132, 186)  TABORDER(0)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+CONTROL  c_jqty(117, 51, 137, 71)    "CX_Amount"  "/k1/i매도_1BTN_BG.BMP/t주/red_jqty"  LEN(0)  EDIT_NOP    COLOR(132, 186)  TABORDER(0)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  OBJ_hnam(115, 5, 231, 25)    "IB999919"FIXEDSIZE  TABORDER(16)  IOORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+GROUP  GP1(14, 216, 70, 236)  'GP1'        COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+CONTROL  OrdCfg(86, 211, 159, 258)  |FA_PROTECT  "CX_OrderCfg"  "/k1/xPOOPPOOP/m/ped_jprc/qed_jqty/sIB1001C0/rIB100100"  LEN(0)  EDIT_NOP    COLOR(192, 232)  TABORDER(0)  ENABLE  &
+  HINTTYPE(IH_NONE)
+GROUP  GP2(13, 235, 69, 255)  'GP2'        COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL0(12, 266, 85, 285)  '호가구분'  AL_CENTER  CUR(0)      COLOR(195, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  ed_hogb(85, 266, 114, 286)  LEN(2)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP|FA_PASS    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("00")          TABORDER(17)  IOORDER(5)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL5(114, 266, 319, 287)  '00: 지정가 03: 시장가 05: 조건부지정가 06: 최유리지정가 07: 최우선지정가'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL6(12, 285, 85, 304)  '주문조건'  AL_CENTER  CUR(0)      COLOR(195, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  ed_jmgb(85, 286, 114, 305)  LEN(2)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP|FA_PASS    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("00")          TABORDER(18)  IOORDER(6)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL7(114, 287, 319, 305)  '01: IOC 02: FOK'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  r_hogb2(162, 28, 252, 48)  '시간외단일가'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(GP1)      COLOR(146, 130)  CUR(0)      TABORDER(4)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+PANEL  PANEL1(30, 100, 205, 191)  LINECOLOR(61)      COLOR(182, 130)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL1(8, 108, 24, 186)  '기 준'  AL_CENTER  CUR(0)      COLOR(228, 130)  ENABLE  &
+  VISIBLE  VERTICAL  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  r_mmgj0(40, 105, 105, 125)  '비율기준'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(GP2)      COLOR(146, 130)  CUR(0)      TABORDER(7)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  r_mmgj1(40, 125, 105, 145)  '배수기준'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(GP2)      COLOR(146, 130)  CUR(0)      TABORDER(9)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  r_mmgj2(125, 105, 190, 125)  '잔고기준'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(GP2)      COLOR(146, 130)  CUR(0)      TABORDER(8)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  r_mmgj3(40, 165, 200, 185)  '총평가금액 기준'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(GP2)      COLOR(146, 130)  CUR(0)      TABORDER(11)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  ed_mmrt1(240, 120, 296, 139)  LEN(3)  IO_NUM|EDIT_INPUT|FA_RIGHT|FA_WRAP|FA_FLOAT    COLOR(192, 232)  CUR(0)  TP_SUNKEN        FLOAT(1)    TABORDER(13)  IOORDER(7)  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL3(300, 120, 315, 140)  '%'  AL_LEFT  CUR(0)      COLOR(228, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  BTN_APPLY(211, 145, 313, 190)  '수량 반영'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림", 9, BOLD)  FOCUS  COLOR(208, 240)  CUR(0)    "매도.BMP"    TABORDER(14)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+LABEL  LABEL4(209, 120, 235, 140)  '비율'  AL_LEFT  CUR(0)      COLOR(228, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  ed_mkgb(85, 306, 114, 324)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP|FA_PASS    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("1")          TABORDER(19)  IOORDER(8)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL8(12, 304, 85, 323)  '시장구분'  AL_CENTER  CUR(0)      COLOR(195, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  r_mmgj4(40, 145, 200, 165)  '총평가금액 대비 목표비중'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(GP2)      COLOR(146, 130)  CUR(0)      TABORDER(10)  ENABLE  &
+  VISIBLE  CHECKED  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  ed_mmrt(240, 120, 296, 139)  LEN(2)  IO_NUM|EDIT_INPUT|FA_RIGHT|FA_WRAP|FA_FLOAT    COLOR(192, 232)  CUR(0)  TP_SUNKEN        FLOAT(1)    TABORDER(12)  IOORDER(9)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  CHK_LIMIT(250, 5, 315, 25)  '비율제한'  TP_CHECK|EDIT_NOP          COLOR(208, 232)  CUR(0)      TABORDER(20)  ENABLE  &
+  VISIBLE  CHECKED  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  r_mmgj9(125, 125, 190, 145)  '직접입력'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(GP2)      COLOR(146, 130)  CUR(0)      TABORDER(21)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+CONTROL  cxMarket(125, 305, 143, 325)  |FA_SKIP  "CX_MarketPicker"  "/k2/t/u1/d1"  LEN(12)  EDIT_NOP    COLOR(192, 232)  TABORDER(0)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Const myFILE = "userconf.ini"
+
+Sub MyChangeCode()
+	ed_jprc.Data = "0"
+
+	ed_jqty.Data = "0"
+	ed_mmrt.Data = "0.0"
+	ed_mmrt.Enable = True
+	ed_mmrt1.Data = "0.0"
+	ed_mmrt1.Enable = False
+
+
+	'=====================
+	' Main단 종목코드 변경
+	'=====================
+	SCREEN.Object("main.1301").Data = S1301.Data
+	SCREEN.Object("OBJ_hnam.1301").Data = S1301.Data
+	SCREEN.Object("OBJ_hnam").Send
+
+
+	'====================================
+	' 종목에 따른 시장 구분자 보정
+	'====================================
+	If UCase(TypeName( SCREEN.Object("Main.cxMarket"))) <> "NOTHING" Then
+		Dim tmp_mkgb
+		tmp_mkgb = SCREEN.Object("Main.cxMarket").sMarket
+		Call Spread_mkgb(S1301.Data,tmp_mkgb)
+	End If
+
+
+
+	SCREEN.Proc "main.send_sise_all", "jumun"
+End Sub
+
+Sub AfterOrder()
+	ed_jprc.Data = "0"
+	ed_jqty.Data = "0"
+	ed_mmrt.Data = "0.0"
+	ed_mmrt1.Data = "0.0"
+End Sub
+
+Sub CheckHogb()
+	If r_hogb1.Checked Then
+		ed_jprc.Data = "0"
+		ed_jprc.Enable = False
+	Else
+		ed_jprc.Enable = True
+	End If
+End Sub
+
+Sub MyQueryHoga()
+	Dim siseObj, prcOpt, cfgGB, mapid, mainmap
+	siseObj = "parent.OBJ_sise."
+	prcOpt = siseObj & "1377"
+	If Is_numeric(SCREEN.Object(prcOpt).Data) Then
+		ed_jqty.SetDelta SCREEN.Object(prcOpt).Data
+	End If
+	Set_mkgb(Trim(S1301.Data))
+End Sub
+
+Sub SetRateType(bVal)
+	If bVal=False Then
+		ed_mmrt.Data = "0.0"
+		ed_mmrt1.Data = "0.0"
+		ed_jqty.Enable = True
+		ed_mmrt.Enable = False
+		ed_mmrt1.Enable = False
+	Else
+		ed_jqty.Data = 0
+		ed_jqty.Enable = False
+		ed_mmrt.Enable = True
+		ed_mmrt1.Enable = True
+	End If
+End Sub
+
+Sub ApplyToOrderGrid()
+	Dim val1, val2, val3
+	If Len(S1301.Data)<>6 Then
+		MsgBox "종목코드를 입력하십시오.", vbOKOnly, "IBK투자증권"
+		S1301.SetFocus
+		Exit Sub
+	End If
+
+	val1 = Trim(S1301.Data)
+	val2 = Trim(SCREEN.Object("main.OBJ_sise.1301").Data)
+	val3 = Trim(SCREEN.Object("main.OBJ_sise2.1301").Data)
+	If val1<>val2 Or val1<>val3 Then
+		MsgBox "종목시세가 정상적으로 조회되지 않았습니다." & vbCrLf & "종목코드를 다시 선택하시기 바랍니다..", vbOKOnly, "IBK투자증권"
+		S1301.SetFocus
+		Exit Sub
+	End If
+
+	' 매매기준이 직접입력일 경우 수량은 체크하지 않는다.
+	If ed_jqty.Enable And (Not IsNumeric(ed_jqty.Data) Or CLng(ed_jqty.Data)<=0) And Not r_mmgj9.Checked Then
+		MsgBox "수량을 입력하십시오.", vbOKOnly, "IBK투자증권"
+		ed_jqty.SetFocus
+		Exit Sub
+	End If
+
+	If Not IsNumeric(ed_jprc.Data) Or (CLng(ed_jprc.Data)<5 And ed_jprc.Enable=True And Not r_mmgj9.Checked) Then
+		MsgBox "단가를 입력하십시오.", vbOKOnly, "IBK투자증권"
+		ed_jprc.SetFocus
+		Exit Sub
+	End If
+
+'	If (r_mmgj2.Checked Or r_mmgj3.Checked) Then
+		Dim mmrt
+
+		If ed_mmrt1.Visible Then
+			mmrt = Trim(ed_mmrt1.Data)
+		Else
+			mmrt = Trim(ed_mmrt.Data)
+		End If
+
+		If mmrt="" Then
+			MsgBox "비율을 입력하십시오.", vbOKOnly, "IBK투자증권"
+			If ed_mmrt1.Visible Then
+				ed_mmrt1.SetFocus
+			Else
+				ed_mmrt.SetFocus
+			End If
+			Exit Sub
+		End If
+'	End If
+
+	If Not r_mmgj9.Checked Then
+		Dim tab_accn, bRet
+		bRet = MsgBox("수량반영시 기존 주문설정내역이 사라집니다." & vbCrLf & "계속하시겠습니까?", vbYesNo, "IBK투자증권")
+		If bRet<>vbYes Then
+			S1301.SetFocus
+			Exit Sub
+		End If
+	End If
+
+	SCREEN.Object("main.1301").Data = Trim(S1301.Data)
+	SCREEN.Object("main.hnam").Data = Trim(SCREEN.GetName(100, Trim(S1301.Data), 99))
+	SCREEN.Object("main.mmgb").Data = "1"
+	SCREEN.Object("main.jqty").Data = ed_jqty.Data
+	SCREEN.Object("main.jprc").Data = ed_jprc.Data
+	SCREEN.Object("main.unit").Data = SCREEN.Object("main.OBJ_sise.1377").Data
+	SCREEN.Object("main.curr").Data = SCREEN.Object("main.OBJ_sise.2023").Data
+
+	' 현재가 조회 체크
+'	If Not r_mmgj9.Checked Then
+'		If CLng(SCREEN.Object("main.curr").Data)=0 Then
+'			MsgBox _
+'				SCREEN.Object("main.hnam").Data & _
+'				"[" & Trim(S1301.Data) & "]의 현재가가 조회되지 않았습니다." & vbCrLf & _
+'				"지정가 주문을 이용하시거나, 잠시 후, 이용해 주시기 바랍니다." & vbCrLf & _
+'				"이용에 불편을 드려 죄송합니다.", vbOKOnly + vbInformation , _
+'				"IBK투자증권"
+'			Exit Sub
+'		End If
+'	End If
+
+	' 호가구분 세팅
+	If r_hogb1.Checked Then
+		SCREEN.Object("main.hogb").Data = "03"
+	ElseIf r_hogb2.Checked Then
+		SCREEN.Object("main.hogb").Data = "82"
+	Else
+		SCREEN.Object("main.hogb").Data = "00"
+	End If
+
+	' 매매기준 세팅
+	If r_mmgj0.Checked Then
+		SCREEN.Object("main.mmgj").Data = "1"
+	ElseIf r_mmgj1.Checked Then
+		SCREEN.Object("main.mmgj").Data = "2"
+	ElseIf r_mmgj2.Checked Then
+		SCREEN.Object("main.mmgj").Data = "3"
+	ElseIf r_mmgj3.Checked Then
+		SCREEN.Object("main.mmgj").Data = "4"
+	ElseIf r_mmgj4.Checked Then
+		SCREEN.Object("main.mmgj").Data = "5"
+	ElseIf r_mmgj9.Checked Then
+		SCREEN.Object("main.mmgj").Data = "9"
+	Else
+		SCREEN.Object("main.mmgj").Data = "1"
+		r_mmgj0.Checked = True
+	End If
+
+	If ed_mmrt1.Visible Then
+		SCREEN.Object("main.mmrt").Data = Replace(ed_mmrt1.Data, " ", "0")
+	Else
+		SCREEN.Object("main.mmrt").Data = Replace(ed_mmrt.Data, " ", "0")
+	End If
+
+	SCREEN.Proc "main.tab_accn_change", "1"
+	SCREEN.Proc "main.SetOrderGrid", ""
+End Sub
+
+Function GetBool(str)
+	If Len(str)=0 Or str="0" Then
+		GetBool = False
+	Else
+		GetBool = True
+	End If
+End Function
+
+Sub LoadConfig()
+	r_mmgj4.Checked = True	'기본값
+
+	If SCREEN.CreateObject("INFO") Then
+		r_hogb0.Checked = GetBool(Trim(INFO.PopData(LOGIN.Name, myFILE, "IB190111", "r_hogb0")))
+		r_hogb1.Checked = GetBool(Trim(INFO.PopData(LOGIN.Name, myFILE, "IB190111", "r_hogb1")))
+		r_hogb2.Checked = GetBool(Trim(INFO.PopData(LOGIN.Name, myFILE, "IB190111", "r_hogb2")))
+		r_mmgj0.Checked = GetBool(Trim(INFO.PopData(LOGIN.Name, myFILE, "IB190111", "r_mmgj0")))
+		r_mmgj1.Checked = GetBool(Trim(INFO.PopData(LOGIN.Name, myFILE, "IB190111", "r_mmgj1")))
+		r_mmgj2.Checked = GetBool(Trim(INFO.PopData(LOGIN.Name, myFILE, "IB190111", "r_mmgj2")))
+		r_mmgj3.Checked = GetBool(Trim(INFO.PopData(LOGIN.Name, myFILE, "IB190111", "r_mmgj3")))
+		r_mmgj4.Checked = GetBool(Trim(INFO.PopData(LOGIN.Name, myFILE, "IB190111", "r_mmgj4")))
+		r_mmgj9.Checked = GetBool(Trim(INFO.PopData(LOGIN.Name, myFILE, "IB190111", "r_mmgj9")))
+
+		If r_mmgj0.Checked Or r_mmgj1.Checked Or r_mmgj9.Checked Then
+			Call SetRateType(False)
+		Else
+			Call SetRateType(True)
+		End If
+
+		Call CheckHogb()
+	End If
+End Sub
+
+Sub SaveConfig()
+	If SCREEN.CreateObject("INFO") Then
+		INFO.PushData LOGIN.Name, myFILE, "IB190111", "r_hogb0", r_hogb0.Checked
+		INFO.PushData LOGIN.Name, myFILE, "IB190111", "r_hogb1", r_hogb1.Checked
+		INFO.PushData LOGIN.Name, myFILE, "IB190111", "r_hogb2", r_hogb2.Checked
+		INFO.PushData LOGIN.Name, myFILE, "IB190111", "r_mmgj0", r_mmgj0.Checked
+		INFO.PushData LOGIN.Name, myFILE, "IB190111", "r_mmgj1", r_mmgj1.Checked
+		INFO.PushData LOGIN.Name, myFILE, "IB190111", "r_mmgj2", r_mmgj2.Checked
+		INFO.PushData LOGIN.Name, myFILE, "IB190111", "r_mmgj3", r_mmgj3.Checked
+		INFO.PushData LOGIN.Name, myFILE, "IB190111", "r_mmgj4", r_mmgj4.Checked
+		INFO.PushData LOGIN.Name, myFILE, "IB190111", "r_mmgj9", r_mmgj9.Checked
+	End If
+End Sub
+
+Sub SetHogaObj()
+	If r_hogb2.Checked Then
+		SCREEN.Object("main.OBJ_sise").SetObject "IB190180"
+	Else
+		SCREEN.Object("main.OBJ_sise").SetObject "IB190120"
+	End If
+
+	SCREEN.Object("main.OBJ_sise").send
+End Sub
+
+_AW_ONINDECLARE_AW_
+#load IB888888
+
+'주식주문 공통
+#load IB999912
+
+#load IB999901
+
+_AW_ONENDSUB_AW_
+_AW_ONSTART_AW_
+cxMarket.MNum = SCREEN.GetMapName(1)
+cxMarket.sMarket = "KRX"
+
+ed_mmrt.Data = "0.0"
+ed_mmrt1.Data = "0.0"
+Call CheckHogb()
+Call LoadConfig()
+Call SetHogaObj()
+
+_AW_ONENDSUB_AW_
+_AW_ONCLOSE_AW_
+Call SaveConfig()
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(ed_jprc)
+_AW_ONCHANGE_AW_
+
+SCREEN.Proc "main.SetPrice", "," & ed_jprc.Data
+
+SYSTEM.Trace "MAP[" & SCREEN.GetMapName(1) & "]"
+SYSTEM.Trace "DE ed_jprc[" & ed_jprc.Data & "]"
+
+If ed_jprc.Enable = False Then
+ ed_jprc.Data = "0"
+End If
+_AW_ONENDSUB_AW_
+_AW_ONSETFOCUS_AW_
+Dim mapid, symb
+mapid = SCREEN.Object("main.OBJ_sise").getobject()
+
+Select Case Left(SCREEN.GetMapName(1),6)
+Case "IB5000"
+	symb = "14723"
+Case Else
+	symb = "2023"
+End Select
+
+If CDbl(ed_jprc.Data) < 5 Then
+	ed_jprc.Data = SCREEN.Object("main.OBJ_sise."&symb).Data
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON2)
+_AW_ONCLICK_AW_
+Dim retn
+If SCREEN.GetMapName(1)="IB105000" Then
+	retn = SCREEN.GetCode (120, "1301", "1022", 0)
+Else
+	retn = SCREEN.GetCode(100, "1301", "1022", 0 )
+End If
+If retn <> True Then
+       Exit Sub
+End If
+Call MyChangeCode()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(r_hogb0)
+_AW_ONCLICK_AW_
+Call CheckHogb()
+Call SetHogaObj()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(r_hogb1)
+_AW_ONCLICK_AW_
+Call CheckHogb()
+Call SetHogaObj()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(1301)
+_AW_ONCHANGE_AW_
+Call MyChangeCode()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(c_pric)
+_AW_ONCLICK_AW_
+c_pric.JCode = S1301.Data
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(c_jqty)
+_AW_ONCHANGE_AW_
+ed_jqty.SetFocus
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(r_hogb2)
+_AW_ONCLICK_AW_
+Call CheckHogb()
+Call SetHogaObj()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(r_mmgj0)
+_AW_ONCLICK_AW_
+Call SetRateType(False)
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(r_mmgj1)
+_AW_ONCLICK_AW_
+Call SetRateType(False)
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(r_mmgj2)
+_AW_ONCLICK_AW_
+Call SetRateType(True)
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(r_mmgj3)
+_AW_ONCLICK_AW_
+Call SetRateType(True)
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BTN_APPLY)
+_AW_ONCLICK_AW_
+Call ApplyToOrderGrid()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(r_mmgj4)
+_AW_ONCLICK_AW_
+Call SetRateType(True)
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(CHK_LIMIT)
+_AW_ONCLICK_AW_
+If CHK_LIMIT.Checked Then
+	ed_mmrt.Visible = True
+	ed_mmrt1.Visible = False
+Else
+	ret = MsgBox("비율제한을 해제하면 9.9% 이상의 비율입력이 가능하여 주의가 요구됩니다." & vbCrLf & _
+				 "비율제한을 해제하시겠습니까?", vbOKCancel+vbExclamation, "IBK투자증권")
+	If ret<>vbOK Then
+		CHK_LIMIT.Checked = True
+		Exit Sub
+	End If
+
+	ed_mmrt.Visible = False
+	ed_mmrt1.Visible = True
+End If
+
+ed_mmrt.Data = "0.0"
+ed_mmrt1.Data = "0.0"
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(r_mmgj9)
+_AW_ONCLICK_AW_
+Call SetRateType(False)
+Call ApplyToOrderGrid()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(cxMarket)
+_AW_ONCLICK_AW_
+SCREEN.Proc "main.Change_MKGubn_Main", cxMarket.sMarket
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

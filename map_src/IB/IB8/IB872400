@@ -1,0 +1,154 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB872400)
+MAPSIZE(560, 730)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("관리자별 협의수수료")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(ENCODE|XPRINT)
+TITLE("[8724]협의수수료")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL41(0, 0, 730, 560)  LIMAGE(0)  LINEW(4)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 69)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL35(0, 534, 730, 560)  LIMAGE(1)  LINEW(3)  STRESS(0)  STRESSW(0)  LINETYPE(4)  LINECOLOR(64)      COLOR(34, 69)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  GUIDE(22, 537, 692, 557)        COLOR(203, 69)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+PANEL  PANEL39(7, 540, 21, 554)    |IMAGE|AL_STRETCH    COLOR(208, 232)  CUR(0)    "알림_ic.bmp"  ENABLE  &
+  VISIBLE  TRANSPARENT  IMAGE  HINTTYPE(IH_NONE)
+USRTAB  UTAB0(3, 3, 733, 29)  FOCUS  INDEX(0)  COUNT(2)  AL_TOP  TAB_IMAGE        COLOR(3, 70)  CUR(0)  TABIMAGE("tab.bmp")  FCOLOR(68, 71)  CAPTION("현물", "선물옵션")  TABINFO("1:1", "1:2")  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  OBJECT0(0, 29, 730, 530)    "IB872410"  TABORDER(1)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  panel_up(35, 611, 935, 614)        COLOR(64, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  panel_bottom(40, 630, 940, 632)        COLOR(64, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  panel_left(0, 0, 1, 560)        COLOR(64, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  panel_rigth(0, 0, 3, 50)        COLOR(64, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL0(730, 0, 733, 560)        COLOR(64, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+CONTROL  CX_DTS(325, 690, 365, 720)  |FA_PROTECT  "CX_DATATRANS"  ""  LEN(0)  EDIT_NOP    COLOR(192, 232)  TABORDER(0)  ENABLE  &
+  HINTTYPE(IH_NONE)
+COMBO  COMBO0(745, 300, 840, 320)  TP_NONE  LEN(11)  COUNT(0)  VCOUNT(0)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_NUM|EDIT_INPUT    COLOR(192, 232)  CUR(0)    TABORDER(2)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Sub LoadAccounts()
+
+	Dim accList, ii, acc, acno, acnm, acid, actp, items, myAcntFlag
+
+	accList = Split(CX_DTS.GetTypeData ("4","" ), vbLf, -1, vbTextCompare)
+
+	items = vbTab
+	For ii=0 To UBound(accList)
+		acc = Trim(accList(ii))
+		If Len(acc)>11 Then
+			acc = Split(acc, "|", -1, vbTextCompare)
+			acno = Trim(Mid(acc(0), 1, 11))
+			acnm = Mid(acc(0), 12)
+			acnm = Replace(acnm, vbTab, "")
+			acnm = Trim(acnm)
+			acid = Trim(acc(1))
+			actp = Mid(acno, 4, 2)
+			myAcntFlag = acc(2)
+
+			If chkNumericData(myAcntFlag) = True Then
+				If CLng(myAcntFlag) < 2 Then
+					If actp="10" Or actp="51" Or actp="11" Or actp="30" Or actp="50" Or actp="53" Then
+						items = items & acno&Left(acno,3)&"-"& Mid(acno,4,2)&"-"&Right(acno,6)&" "&acnm & vbTab
+					End If
+				'items += acno & vbTab   				'SYSTEM.Trace ("계좌" &  acno & acc & acnm)
+				End If
+			End If
+
+		End If
+	Next
+
+	'COMBO0.SetItems(items)
+	SCREEN.Object("main.OBJECT0.COMBACC").SetItems(items)
+End Sub
+
+Sub LoadAccounts2()
+
+	Dim accList, ii, acc, acno, acnm, acid, actp, items
+
+	accList = Split(CX_DTS.GetTypeData ("4","" ), vbLf, -1, vbTextCompare)
+
+	items = vbTab
+
+	For ii=0 To UBound(accList)
+		acc = Trim(accList(ii))
+		If Len(acc)>11 Then
+			acc = Split(acc, "|", -1, vbTextCompare)
+			acno = Trim(Mid(acc(0), 1, 11))
+			acnm = Mid(acc(0), 12)
+			acnm = Replace(acnm, vbTab, "")
+			acnm = Trim(acnm)
+			acid = Trim(acc(1))
+			actp = Mid(acno, 4, 2)
+
+			If actp="20" Or actp="21" Then
+				items = items & acno & Left(acno,3) &"-"& Mid(acno,4,2) &"-"& Right(acno,6) & " " & acnm & vbTab
+			End If
+			'items += acno & vbTab   				'SYSTEM.Trace ("계좌" &  acno & acc & acnm)
+		End If
+
+	Next
+
+	'COMBO0.SetItems(items)
+	SCREEN.Object("main.OBJECT0.COMBACC").SetItems(items)
+End Sub
+
+
+'Dim items
+'items = "00" & vbTab & "01유통융자" & vbTab & "03자기융자" & vbTab & "05유통대주" & vbTab & "07자기대주"  & vbTab & "80예탁주식담보융자"  & vbTab & "82예탁채권담보융자"& vbTab & "00"
+'COMBO0.SetItems(items)
+
+_AW_ONINDECLARE_AW_
+#load IB888833
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(UTAB0)
+_AW_ONCLICK_AW_
+Select Case UTAB0.ID
+Case 1
+	OBJECT0.SetObject ("IB872410")
+
+Case 2
+	OBJECT0.SetObject ("IB872420")
+
+Case Else
+	Exit Sub
+End Select
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

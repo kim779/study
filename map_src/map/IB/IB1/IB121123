@@ -1,0 +1,394 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB121123)
+MAPSIZE(140, 214)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(ENCODE)
+TITLE("[121123]")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("piboPBxO")
+MAPTYPE(FIXED)
+HEADER(LEDGER)
+TRXH("115SONAT090")
+BGROUND(BRUSH, 171)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL2(0, 0, 214, 89)    |IMAGE|AL_STRETCH    COLOR(171, 232)  CUR(0)    "매도_BG.BMP"  ENABLE  &
+  VISIBLE  IMAGE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON1(158, 50, 210, 92)  TP_PUSH|IMAGE|AL_STRETCH      FOCUS  COLOR(186, 94)  CUR(0)    "가상매도.bmp"    TABORDER(38)  ENABLE  &
+  VISIBLE  IMAGE  HINTTYPE(IH_NONE)
+LABEL  LABEL6(2, 50, 52, 70)  '주문수량'  AL_LEFT  CUR(0)      COLOR(181, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  IOrdQty(53, 50, 133, 70)  LEN(15)  IO_NUM|EDIT_INPUT|FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_WRAP|SA_ZERO    COLOR(192, 232)  CUR(0)  TP_SUNKEN  INIT("0")          TABORDER(2)  IOORDER(11)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL7(2, 73, 52, 93)  '주문가격'  AL_LEFT  CUR(0)      COLOR(181, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  dOrdPrc(53, 73, 133, 93)  LEN(9)  IO_NUM|EDIT_INPUT|FA_COMMA|FA_RIGHT|FA_ZEROSUP|SA_ZERO    COLOR(192, 232)  CUR(0)  TP_SUNKEN  INIT("0")          TABORDER(3)  IOORDER(13)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  In(0, 148, 71, 167)  LEN(5)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("00001")          TABORDER(4)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  account_space(154, 148, 217, 167)  LEN(9)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("         ")          TABORDER(5)  IOORDER(3)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  zAcntNo(70, 148, 156, 167)  LEN(11)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(6)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  zPwd(0, 168, 57, 188)  LEN(8)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(7)  IOORDER(4)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL2(3, 188, 53, 208)  '키워드'  AL_LEFT  CUR(0)      COLOR(66, 69)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  zKeywd(55, 190, 215, 209)  LEN(40)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(8)  IOORDER(5)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL3(2, 210, 52, 230)  '처리구분'  AL_LEFT  CUR(0)      COLOR(66, 69)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL8(6, 630, 56, 650)  '계좌명'  AL_LEFT  CUR(0)      COLOR(64, 69)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  zAcntNm(56, 629, 133, 649)  LEN(40)  IO_MIXED|AL_CENTER|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(39)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL9(2, 230, 52, 250)  '매매구분'  AL_LEFT  CUR(0)      COLOR(66, 69)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  zBnsTp(54, 230, 76, 250)  LEN(1)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(9)  IOORDER(15)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL10(2, 250, 78, 270)  '호가유형코드'  AL_LEFT  CUR(0)      COLOR(66, 69)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL11(2, 268, 116, 288)  'Program호가유형코드'  AL_LEFT  CUR(0)      COLOR(66, 69)  ENABLE  &
+  HINTTYPE(IH_NONE)
+COMBO  zOrdprcPtnCode(74, 252, 208, 271)  TP_NONE  LEN(2)  COUNT(21)  VCOUNT(21)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_MIXED|EDIT_INPUT    COLOR(192, 232)  CUR(0)  DISPLAY("지정가", "시장가", "조건부지정가", "최유리지정가", "최우선지정가", "자사주", "부분충족(프리보드)", "전량충족(프리보드)", "장개시전시간외", "장개시전시간외대량", "장개시전시간외바스켓", "신고대량전장시가", "신고대량종가", "장중대량", "장중바스켓", "시간외종가", "시간외단일가", "시간외대량", "바스켓주문", "시간외자사주", "자사주스톡옵션")  DATA("00", "03", "05", "06", "07", "09", "41", "42", "61", "67", "68", "71", "73", "77", "78", "81", "82", "87", "88", "89", "91")    TABORDER(10)  IOORDER(16)  ENABLE  &
+  HINTTYPE(IH_NONE)
+COMBO  zTrxTp(52, 210, 136, 229)  TP_NONE  LEN(1)  COUNT(4)  VCOUNT(4)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_MIXED|EDIT_INPUT    COLOR(192, 232)  CUR(0)  DISPLAY("매도", "매수", "입금", "출금")  DATA("1", "2", "3", "4")    TABORDER(11)  IOORDER(6)  ENABLE  &
+  HINTTYPE(IH_NONE)
+COMBO  zPrgmOrdprcPtnCode(116, 268, 208, 287)  TP_NONE  LEN(2)  COUNT(5)  VCOUNT(5)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_MIXED|EDIT_INPUT    COLOR(192, 232)  CUR(0)  DISPLAY("일반", "차익거래", "비차익거래", "주식차익", "ETF차익")  DATA("00", "01", "02", "03", "04")    TABORDER(12)  IOORDER(17)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL12(2, 286, 88, 306)  '공매도가능여부'  AL_LEFT  CUR(0)      COLOR(66, 69)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  zStslAbleYn(88, 286, 110, 306)  LEN(1)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("0")          TABORDER(13)  IOORDER(18)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL13(2, 304, 88, 324)  '공매도호가구분'  AL_LEFT  CUR(0)      COLOR(66, 69)  ENABLE  &
+  HINTTYPE(IH_NONE)
+COMBO  zStslOrdprcTp(90, 306, 162, 325)  TP_NONE  LEN(1)  COUNT(3)  VCOUNT(3)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_MIXED|EDIT_INPUT    COLOR(192, 232)  CUR(0)  DISPLAY("일반", "차입주식매도", "기타공매도")  DATA("0", "1", "2")    TABORDER(14)  IOORDER(19)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL14(2, 324, 88, 344)  '통신매체코드'  AL_LEFT  CUR(0)      COLOR(66, 69)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  zCommdaCode(92, 324, 114, 344)  LEN(2)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("01")          TABORDER(15)  IOORDER(20)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL15(3, 339, 55, 359)  '신용구분'  AL_LEFT  CUR(0)      COLOR(64, 69)  ENABLE  &
+  HINTTYPE(IH_NONE)
+COMBO  zMgntrnCode(54, 340, 156, 359)  TP_NONE  LEN(3)  COUNT(8)  VCOUNT(8)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_MIXED|EDIT_INPUT    COLOR(192, 232)  CUR(0)  DISPLAY("보통", "유통융자신규", "자기융자신규", "자기대주신규", "유통융자상환", "자기융자상환", "자기대주상환", "예탁담보대출상환(신용)")  DATA("000", "001", "003", "007", "101", "103", "107", "180")    TABORDER(16)  IOORDER(21)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL16(3, 362, 54, 382)  '대출일자'  AL_LEFT  CUR(0)      COLOR(64, 69)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL17(2, 378, 88, 398)  '회원번호'  AL_LEFT  CUR(0)      COLOR(66, 69)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  zMbrNo(90, 380, 147, 400)  LEN(3)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(17)  IOORDER(23)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL18(2, 398, 88, 418)  '주문조건구분'  AL_LEFT  CUR(0)      COLOR(66, 69)  ENABLE  &
+  HINTTYPE(IH_NONE)
+COMBO  zOrdCndiTp(92, 400, 184, 419)  TP_NONE  LEN(1)  COUNT(3)  VCOUNT(3)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_MIXED|EDIT_INPUT    COLOR(192, 232)  CUR(0)  DISPLAY("없음", "IOC", "FOK")  DATA("0", "1", "2")    TABORDER(18)  IOORDER(24)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL19(2, 418, 88, 438)  '전략코드'  AL_LEFT  CUR(0)      COLOR(66, 69)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  zStrtgCode(90, 418, 147, 438)  LEN(6)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(19)  IOORDER(25)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL20(2, 434, 88, 454)  '그룹ID'  AL_LEFT  CUR(0)      COLOR(66, 69)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  zGrpId(90, 436, 208, 456)  LEN(20)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(20)  IOORDER(26)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL21(2, 452, 88, 472)  '주문회차'  AL_LEFT  CUR(0)      COLOR(66, 69)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  IOrdSeqNo(90, 454, 208, 474)  LEN(10)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("+000000000")          TABORDER(21)  IOORDER(27)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL22(2, 472, 88, 492)  '포트폴리오번호'  AL_LEFT  CUR(0)      COLOR(66, 69)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  IPtflNo(90, 474, 208, 494)  LEN(10)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("+000000000")          TABORDER(22)  IOORDER(28)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL23(2, 490, 88, 510)  '바스켓번호'  AL_LEFT  CUR(0)      COLOR(66, 69)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  IBskNo(90, 492, 208, 512)  LEN(10)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("+000000000")          TABORDER(23)  IOORDER(29)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL24(2, 508, 88, 528)  '트렌치번호'  AL_LEFT  CUR(0)      COLOR(66, 69)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  ITrchNo(90, 510, 208, 530)  LEN(10)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("+000000000")          TABORDER(24)  IOORDER(30)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL25(2, 528, 88, 548)  '아이템번호'  AL_LEFT  CUR(0)      COLOR(66, 69)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  IItemNo(90, 528, 208, 548)  LEN(10)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("+000000000")          TABORDER(25)  IOORDER(31)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL26(0, 546, 86, 566)  '운용지시번호'  AL_LEFT  CUR(0)      COLOR(66, 69)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  zOpDrtnNo(90, 548, 208, 568)  LEN(12)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(26)  IOORDER(32)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL27(0, 566, 102, 586)  '유동성공급자여부'  AL_LEFT  CUR(0)      COLOR(66, 69)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  zLpYn(104, 566, 126, 586)  LEN(1)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("0")          TABORDER(27)  IOORDER(33)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL28(0, 586, 102, 606)  '반대매매구분'  AL_LEFT  CUR(0)      COLOR(66, 69)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  zCvrgTp(104, 586, 126, 606)  LEN(1)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("0")          TABORDER(28)  IOORDER(34)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL29(2, 606, 82, 626)  '입출금증감액'  AL_LEFT  CUR(0)      COLOR(66, 69)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  IMnyiolncdecAmt(100, 606, 200, 626)  LEN(15)  IO_NUM|EDIT_INPUT|FA_ZEROSUP|FA_WRAP|SA_ZERO    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("000000000000000")          TABORDER(29)  IOORDER(36)  ENABLE  &
+  HINTTYPE(IH_NONE)
+GROUP  Group(170, 168, 202, 188)  'Group'        COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  zIsuNm(55, 650, 132, 670)  LEN(40)  IO_MIXED|AL_CENTER|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(40)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  OUTPUT0(6, 686, 50, 702)  LEN(5)  IO_NUM|AL_CENTER|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(38)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  OBJECT0(2, 4, 214, 50)    "IB121122"  TABORDER(1)  IOORDER(41)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  zIsuNo_space(160, 22, 214, 41)  LEN(5)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(30)  IOORDER(9)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  zIsuNo_A(140, 2, 158, 21)  LEN(1)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("A")          TABORDER(31)  IOORDER(7)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  zIsuNo(156, 2, 214, 21)  LEN(6)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_NOR    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(32)  IOORDER(8)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  OUTPUT1(2, 668, 212, 688)  LEN(245)  IO_MIXED|AL_CENTER|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(37)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL0(5, 650, 55, 670)  '종목명'  AL_LEFT  CUR(0)      COLOR(64, 69)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  e_sign(38, 75, 50, 93)  LEN(1)  IO_NUM|EDIT_INPUT|FA_RIGHT|FA_ZEROSUP|SA_ZERO    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("+")          TABORDER(33)  IOORDER(12)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  EDIT0(38, 50, 50, 68)  LEN(1)  IO_NUM|EDIT_INPUT|FA_RIGHT|FA_ZEROSUP|SA_ZERO    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("+")          TABORDER(34)  IOORDER(10)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  IMnyiolncdecAmt_sign(86, 606, 98, 624)  LEN(1)  IO_NUM|EDIT_INPUT|FA_RIGHT|FA_ZEROSUP|SA_ZERO    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("+")          TABORDER(35)  IOORDER(35)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  e_point(160, 77, 180, 95)  LEN(3)  IO_NUM|EDIT_INPUT|FA_RIGHT|FA_ZEROSUP|SA_ZERO    COLOR(192, 232)  CUR(0)  TP_NONE  INIT(".00")          TABORDER(36)  IOORDER(14)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  zLoanDt(54, 362, 156, 382)  LEN(8)  IO_MIXED|EDIT_INPUT|FA_DATE    COLOR(99, 69)  CUR(0)  TP_NONE  INIT("00000000")          TABORDER(37)  IOORDER(22)  ENABLE  &
+  HINTTYPE(IH_NONE)
+CONTROL  c_jqty(135, 50, 155, 70)    "CX_Amount"  "/k1/i매도_1BTN_BG.BMP/t주/rIOrdQty"  LEN(0)  EDIT_NOP    COLOR(132, 186)  TABORDER(0)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+CONTROL  c_pric(135, 73, 155, 93)    "CX_Price"  "/k1/i매도_1BTN_BG.BMP/t원/rdOrdPrc/xpibohoga"  LEN(0)  EDIT_NOP    COLOR(132, 186)  TABORDER(0)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Sub ctl_Object(data)
+	If data = "1" Then
+		OBJECT0.Send
+	End If
+End Sub
+
+'가상매매시작버튼을 클릭하지 않고 주문을 할 경우 '1162 계좌정보가 등록되지 않았습니다.' 메세지 출력되어
+'조회를 먼저 하도록 수정
+Function beforeOrderCheck()
+	beforeOrderCheck = False
+
+	Dim ii, tmpAccn, tmpCnt, flag
+	flag = "N"
+
+	For ii = 0 To 4
+		tmpCnt = "accn1211_" & ii
+		tmpAccn = SCREEN.Object("main.preAccn_" & ii).Text
+
+		If Trim(SCREEN.Object("main.AN10").Data) = Trim(tmpAccn) Then
+			flag = "Y"
+			Exit For
+		End If
+	Next
+
+	If flag = "N" Then
+		MsgBox "가상매매시작버튼을 클릭하여 주십시오.", , "IBK투자증권"
+		SCREEN.Object("main.BUTTON0").SetFocus
+		Exit Function
+	End If
+
+	beforeOrderCheck = True
+End Function
+
+_AW_ONINDECLARE_AW_
+#Load IB888833
+
+_AW_ONENDSUB_AW_
+_AW_ONSTART_AW_
+'If Trim(SCREEN.Object("main.T1301").data) <> "" Then
+'	SCREEN.Object("OBJECT0.1301").data = Trim(SCREEN.Object("main.T1301").data)
+'	OBJECT0.Send
+'End If
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+If SYSTEM.UserPass <> Trim(zPwd.Data) Then
+	If Trim(zPwd.Data) <> "HEAD" And Len(Trim(zPwd.Data)) >= 4 Then
+		LEDGER.Hsiz = 44
+		LEDGER.EPwd = SYSTEM.EncryptSHA(Trim(zPwd.Data))
+		zPwd.Data = "HEAD"
+	End If
+	
+	If Trim(zPwd.Data) = "HEAD" Then
+		If Len(Trim(LEDGER.EPwd)) <> 44 Then
+			SCREEN.Object("main.GUIDE").Text = "일방향암호화에 실패하였습니다. 비밀번호를 다시 입력해 주세요."
+			SCREEN.OnSend = False
+			Exit Sub
+		End If
+	End If
+End If
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+If Left(Trim(LEDGER.Ecod), 1) = "0" Then
+	SCREEN.proc "Main.viewNowStatus", "1"
+	IOrdQty.Data = 0
+	dOrdPrc.Data = 0
+Else
+	SCREEN.Object("main.next_btn").Enable = False
+End If
+
+'포커싱
+'If BUTTON0.Enable = True Then
+'	BUTTON0.SetFocus
+'ElseIf BUTTON1.Enable = True Then
+'	BUTTON1.SetFocus
+'ElseIf BUTTON2.Enable = True Then
+'	BUTTON2.SetFocus
+'End If
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(BUTTON1)
+_AW_ONCLICK_AW_
+If beforeOrderCheck = False Then
+	Exit Sub
+End If
+
+'입력 필드 공백시
+If Len(Trim(SCREEN.Object("main.AN10").Data)) <> 11 Then
+	alert_msg("계좌번호를 확인하여 주십시오.")
+	SCREEN.Object("main.AN10").SetFocus
+	Exit Sub
+End If
+
+If Len(Trim(SCREEN.Object("main.zPwd").Data)) < 4 Then
+	alert_msg("비밀번호를 확인하여 주십시오.")
+	SCREEN.Object("main.zPwd").SetFocus
+	Exit Sub
+End If
+
+If Trim(SCREEN.Object("OBJECT0.1301").Data) = "" Then
+	alert_msg("종목번호를 확인하여 주십시오.")
+	SCREEN.Object("OBJECT0.1301").SetFocus
+	Exit Sub
+End If
+
+If Trim(IOrdQty.Data) <= 0 Then
+	alert_msg("주문수량을 확인하여 주십시오.")
+	IOrdQty.SetFocus
+	Exit Sub
+End If
+
+If Trim(dOrdPrc.Data) <= 0 Then
+		alert_msg("주문가격을 확인하여 주십시오.")
+		dOrdPrc.SetFocus
+		Exit Sub
+End If
+
+
+'상위 맵에서 데이터 가져오기
+Dim val
+zIsuNo.Data = SCREEN.Object("OBJECT0.1301").data
+
+If SCREEN.GetCodeType(zIsuNo.Data) = 9 Then
+	zIsuNo_A.Data = "J"
+ElseIf SCREEN.GetCodeType(zIsuNo.Data) = 27 Then
+	zIsuNo_A.Data = "Q"
+Else
+	zIsuNo_A.Data = "A"
+End If
+
+val = SCREEN.object("main.UTAB1").Index
+zAcntNo.Data = SCREEN.object("main.AN10").data
+zPwd.Data = SCREEN.object("main.zPwd").data
+
+'탭 선택
+Select Case val
+	Case 2
+		zMgntrnCode.Data = "000"
+		zTrxTp.Data = "2"
+	Case 1
+		zMgntrnCode.Data = "000"
+		zTrxTp.Data = "1"
+	Case 6
+		zMgntrnCode.Data = "003"
+		zTrxTp.Data = "2"
+	Case 5
+		zMgntrnCode.Data = "103"
+		zTrxTp.Data = "1"
+	Case Else
+		Exit Sub
+End Select
+
+SCREEN.Object("main.sec").data = "3"
+
+'확인창 띄우기
+dmsg = "acno" & vbTab & SCREEN.Object("main.AN10").Data & vbLf &_
+	   "acnm" & vbTab & SCREEN.Object("main.AN10").Name & vbLf &_
+	   "hnam" & vbTab & Mid(SCREEN.Object("OBJECT0.1022").Data, 2) & vbLf &_
+	   "capa" & vbTab & IOrdQty.Data & vbLf &_
+	   "cost" & vbTab & dOrdPrc.Data & vbLf &_
+	   "tab" & vbTab & val & vbLf
+
+		SCREEN.CreateWindow 2, "IB12112A /p5 /d", dmsg
+
+		If SYSTEM.Pop("confirm") <> "OK" Then
+			Exit Sub
+		Else
+			SCREEN.Send 0
+		End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(IOrdQty)
+_AW_ONKEYCHANGE_AW_
+dOrdPrc.SetFocus
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(dOrdPrc)
+_AW_ONKEYCHANGE_AW_
+If SCREEN.Object("BUTTON0").Enable = True Then
+	SCREEN.Object("BUTTON0").SetFocus
+ElseIf SCREEN.Object("BUTTON1").Enable = True Then
+	SCREEN.Object("BUTTON1").SetFocus
+ElseIf SCREEN.Object("BUTTON2").Enable = True Then
+	SCREEN.Object("BUTTON2").SetFocus
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(zLoanDt)
+_AW_ONCHANGE_AW_
+'SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(c_pric)
+_AW_ONCLICK_AW_
+c_pric.JCode = zIsuNo.Data
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

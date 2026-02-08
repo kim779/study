@@ -1,0 +1,312 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB241200)
+MAPSIZE(528, 868)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("MS Sans Serif", 9, NORMAL)
+OPTIONS(FMS|FLASH)
+TITLE("[2412] 종목별 외국인 동향")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pooppoop")
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL_bg(0, 0, 871, 32)  LIMAGE(1)  LINEW(3)  LINETYPE(4)  LINECOLOR(64)      COLOR(66, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BTTN(90, 6, 109, 26)  TP_PUSH|IMAGE|AL_STRETCH      COLOR(45, 0)  CUR(0)    "검색.BMP"    TABORDER(1)  ENABLE  &
+  VISIBLE  IMAGE  HOVER  HINTTYPE(IH_NONE)
+CONTROL  17413(168, 6, 328, 26)    "CX_Symbol"  "/a89/b91/c92/d69"  LEN(0)  EDIT_OUTPUT    COLOR(90, 130)  TABORDER(0)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+CONTROL  ctl_Category(109, 6, 147, 26)    "CX_Category"  "/k0/i돌려보기.BMP/t/r1301"  LEN(0)  EDIT_NOP  FONT("굴림체", 9, NORMAL)    COLOR(68, 232)  TABORDER(0)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+CONTROL  1301(25, 6, 90, 26)  |FA_PROTECT  "CX_CODECTRL"  "/u0/k검색.BMP/lAXCOMBO.BMP/p/s0/o"  LEN(6)  EDIT_INPUT    COLOR(192, 130)  TABORDER(2)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL63(-1, 32, 871, 529)  LIMAGE(0)  LINEW(3)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  OBJ(5, 39, 865, 525)    ""  TABORDER(3)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  SBTN(826, 5, 863, 25)  '조회'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, BOLD)  FOCUS  COLOR(68, 186)  CUR(0)    "조회BTN.BMP"    TABORDER(4)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+BUTTON  BUTTON4(685, 5, 749, 25)  '데이터'  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(68, 186)  CUR(0)    "3BTN.BMP"    TABORDER(5)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+BUTTON  BUTTON0(752, 5, 816, 25)  '참고사항'  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(68, 186)  CUR(0)    "3BTN.BMP"    TABORDER(6)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+CONTROL  cxMarket(4, 6, 24, 26)  |FA_SKIP  "CX_MarketPicker"  "/k2/tIB241200/u1/d1"  LEN(12)  EDIT_NOP    COLOR(192, 232)  TABORDER(0)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  1777(345, 5, 365, 25)  LEN(1)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(7)  IOORDER(4)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  edMarketTrigger(1030, 80, 1062, 100)  LEN(6)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(8)  IOORDER(5)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+'환경설정파일에 저장.
+Sub c_write_ini()
+	Dim view_kind
+
+	If BUTTON4.Text = "차트" Then
+		view_kind = "D"
+	ElseIf BUTTON4.Text = "데이터" Then
+		view_kind = "C"
+	End If
+
+	If SCREEN.CreateObject("INFO") Then
+		INFO.pushData LOGIN.Name, "userconf.ini", SCREEN.GetMapName(0), "view_kind", view_kind
+	End If
+
+End Sub
+
+'환경설정파일 읽음.
+Sub c_read_ini()
+	If SCREEN.CreateObject("INFO") Then
+		Dim view_kind
+		view_kind = Trim(INFO.PopData(LOGIN.Name, "userconf.ini", SCREEN.GetMapName(0), "view_kind"))
+	End If
+
+	If view_kind = "D" Then
+		OBJ.SetObject "IB241210"
+		BUTTON4.Text = "차트"
+	Else
+		OBJ.SetObject "IB241220"
+		BUTTON4.Text = "데이터"
+	End If
+
+	cxMarket.sCode = Trim(S1301.Data)
+	If OBJ.GetObject = "IB241220" Then
+		OBJ.Send
+		OBJ.Proc "CallProc", ""
+	Else
+		OBJ.Send
+	End If
+End Sub
+
+Sub Change_MKGubn_Main(sMKGubn)
+	cxMarket.sMarket = sMKGubn
+	'SCREEN.Send 0
+	cxMarket.sCode = Trim(S1301.Data)
+	If OBJ.GetObject = "IB241220" Then
+		OBJ.Send
+		OBJ.Proc "CallProc", ""
+	Else
+		OBJ.Send
+	End If
+
+End Sub
+
+Sub Send_Obj()
+	cxMarket.sCode = Trim(S1301.Data)
+	If OBJ.GetObject = "IB241220" Then
+		OBJ.Send
+		OBJ.Proc "CallProc", ""
+	Else
+		OBJ.Send
+	End If
+End Sub
+
+Sub Send_Screen()
+	cxMarket.sCode = Trim(S1301.Data)
+	SCREEN.Send 0
+End Sub
+
+Sub Send_Screen2()
+	cxMarket.sCode = Trim(S1301.Data)
+	SCREEN.Send 2
+End Sub
+
+_AW_ONSTART_AW_
+' 현재 화면의 시장식별자(cxMarket)에 고유 화면번호 부여
+cxMarket.Major = SCREEN.Major
+
+c_read_ini
+'SCREEN.Send 0
+
+_AW_ONENDSUB_AW_
+_AW_ONCLOSE_AW_
+c_write_ini
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(BTTN)
+_AW_ONCLICK_AW_
+Dim retn
+retn = SCREEN.GetCode(100, 1301, "hnam", 0 )
+If retn <> True Then
+       Exit Sub
+End If
+
+S1301.Trigger "", True
+SCREEN.Object("OBJ.1301").data = S1301.Data
+Send_Screen2()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(ctl_Category)
+_AW_ONCLICK_AW_
+SYSTEM.Trace "oneclick"
+
+Dim codx
+codx = ctl_Category.GetPreCode(S1301.Data)
+If Trim(codx) = "" Then
+	Exit Sub
+End If
+
+S1301.Data = codx
+S1301.Trigger "",True
+SCREEN.Send 0
+
+If OBJ.GetObject = "IB241220" Then
+	cxMarket.sCode = Trim(S1301.Data)
+	OBJ.Send
+	OBJ.Proc "CallProc", ""
+Else
+	Send_Screen2()
+End If
+
+
+'Dim codx
+'codx = ctl_Category.GetPreCode(S1301.Data)
+'If Trim(codx) = "" Then
+'	Exit Sub
+'End If
+'SYSTEM.Trace "codx = " & codx
+'S1301.Data = codx
+'S1301.Trigger "",True
+
+'SCREEN.Send 2
+
+'BUTTON0.SetFocus
+'S1301.SetFocus
+_AW_ONENDSUB_AW_
+_AW_ONDBLCLK_AW_
+SYSTEM.Trace "dbclick"
+
+Dim codx
+codx = ctl_Category.GetPreCode(S1301.Data)
+If Trim(codx) = "" Then
+	Exit Sub
+End If
+
+S1301.Data = codx
+S1301.Trigger "",True
+SCREEN.Send 0
+
+If OBJ.GetObject = "IB241220" Then
+	OBJ.Send
+	OBJ.Proc "CallProc", ""
+Else
+	SCREEN.Send 2
+End If
+'Dim codx
+'codx = ctl_Category.GetNextCode(S1301.Data)
+'If Trim(codx) = "" Then
+'	Exit Sub
+'End If
+'SYSTEM.Trace "codx = " & codx
+'S1301.Data = codx
+'S1301.Trigger "",True
+
+'SCREEN.Send 2
+_AW_ONENDSUB_AW_
+_AW_ONCHANGE_AW_
+'S1301.Data = ctl_Category.GetCurCode
+'S1301.Trigger "",True
+
+'SCREEN.Send 2
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(1301)
+_AW_ONCHANGE_AW_
+If Trim(S1301.Data) = "000000" Or Trim(S1301.Data) = "" Then
+ 	SCREEN.ClearAll 2, 2
+
+	Exit Sub
+End If
+S1301.Trigger "",True
+S1301.Trigger "",False
+Send_Obj()
+Send_Screen()
+
+
+
+'S1301.SetFocus
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(SBTN)
+_AW_ONCLICK_AW_
+cxMarket.sCode = Trim(S1301.Data)
+OBJ.Send
+
+
+S1301.SetFocus
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON4)
+_AW_ONCLICK_AW_
+If BUTTON4.Text = "차트" Then
+	OBJ.SetObject "IB241220"
+	BUTTON4.Text = "데이터"
+Else
+	OBJ.SetObject "IB241210"
+	BUTTON4.Text = "차트"
+End If
+
+cxMarket.sCode = Trim(S1301.Data)
+If OBJ.GetObject = "IB241220" Then
+	OBJ.Send
+	OBJ.Proc "CallProc", ""
+Else
+	OBJ.Send
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON0)
+_AW_ONCLICK_AW_
+SCREEN.CreateWindow 4, "IB241222 /t/s/p?/", ""
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(cxMarket)
+_AW_ONCLICK_AW_
+Change_MKGubn_Main(cxMarket.sMarket)
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(edMarketTrigger)
+_AW_ONCHANGE_AW_
+Change_MKGubn_Main(Trim(edMarketTrigger.Data))
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

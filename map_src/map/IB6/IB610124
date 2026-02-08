@@ -1,0 +1,417 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB610124)
+MAPSIZE(178, 334)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("현재가_투자")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(FLASH)
+TITLE("[6101] 투자")
+TOPATH(AXIS)
+METHOD(SEND)
+TRXCODE("no200437")
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+GRID  GRID0(0, 0, 334, 178)  VISIBLEROW(9)  CELLH(18)  MATRIX(1500, 8)  FIX(6)  MAINCOLOR(7, 0)  LINECOLOR(75)  FOCUSCOLOR(78)  FOCUSKIND(4)  ROWC(68, 77)  |FLEXIBLE|VSCROLL|NO3D|RROW|XHLINE|PAGE|HEADER|GRFTEXT    &
+	COLINFO("12021")  LEN(12)  WIDTH(70)  HEAD("RTS code")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_ALPHA|EDIT_OUTPUT  |FA_FLASH    COLOR(68, 69)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("12302")  LEN(8)  WIDTH(38)  HEAD("일자")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  EDITFORMAT("9999/99/99")    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("ITEM1")  LEN(9)  WIDTH(70)  HEAD("외국인")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_REF)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSIGN    COLOR(68, 69)  COLCUR(0, 0)  DOM(col2)    COLUMN_VISIBLE  INORMAL  IFRGB(94, 95)    HCOMBO  HCOMBOCOUNT(6)  HCOMBODISPLAY("외국인", "개인", "기관", "프로그램", "종가", "등락률")  HCOMBODATA("00", "02", "01", "03", "05", "07")    &
+	COLINFO("ITEM2")  LEN(9)  WIDTH(70)  HEAD("개인")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSIGN    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(94, 95)    HCOMBO  HCOMBOCOUNT(6)  HCOMBODISPLAY("외국인", "개인", "기관", "프로그램", "종가", "등락률")  HCOMBODATA("00", "02", "01", "03", "05", "07")    &
+	COLINFO("ITEM3")  LEN(9)  WIDTH(70)  HEAD("기관")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSIGN    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(94, 95)    HCOMBO  HCOMBOCOUNT(6)  HCOMBODISPLAY("외국인", "개인", "기관", "프로그램", "종가", "등락률")  HCOMBODATA("00", "02", "01", "03", "05", "07")    &
+	COLINFO("ITEM4")  LEN(9)  WIDTH(70)  HEAD("등락률")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSIGN    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(94, 95)    HCOMBO  HCOMBOCOUNT(6)  HCOMBODISPLAY("외국인", "개인", "기관", "프로그램", "종가", "등락률")  HCOMBODATA("00", "02", "01", "03", "05", "07")    &
+	COLINFO("Col0")  LEN(9)  WIDTH(62)  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col1")  LEN(9)  WIDTH(62)  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    TABORDER(2)  IOORDER(11)  ENABLE  &
+  VISIBLE
+
+OUT  191(601, 120, 617, 138)  LEN(1)  IO_ALPHA|AL_LEFT|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(9)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL0(654, 34, 709, 52)  '매매동향'        COLOR(195, 69)  CUR(0)    AL_CENTER  FONT("굴림", 9, NORMAL)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  o_time(622, 121, 683, 139)  LEN(10)  IO_ALPHA|AL_LEFT|    COLOR(192, 209)  CUR(0)            TABORDER(0)  IOORDER(10)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  O_temp(652, 69, 713, 87)  LEN(10)  IO_ALPHA|AL_LEFT||FA_SKIP    COLOR(192, 209)  CUR(0)            TABORDER(0)  IOORDER(12)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  obj_mm(11, 527, 126, 621)    "IB610127"  TABORDER(3)  IOORDER(13)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  1377(819, 343, 900, 363)  LEN(9)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT|FA_CORGB|SA_COSUP  FONT("굴림", 9, NORMAL)    COLOR(68, 69)  CUR(0)            IFRGB(94, 95)  TABORDER(0)  IOORDER(17)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL3(756, 343, 819, 364)  '주문단위'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  2302(821, 376, 902, 396)  LEN(9)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT|FA_CORGB|SA_COSUP  FONT("굴림", 9, NORMAL)    COLOR(68, 69)  CUR(0)            IFRGB(94, 95)  TABORDER(0)  IOORDER(18)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  1334(821, 399, 902, 419)  LEN(12)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT|FA_CORGB|SA_COSUP  FONT("굴림", 9, NORMAL)    COLOR(68, 69)  CUR(0)            IFRGB(94, 95)  TABORDER(0)  IOORDER(19)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL4(758, 375, 821, 396)  '상한가'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL5(758, 399, 821, 420)  '상장주식수'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  2025(817, 428, 898, 448)  LEN(9)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT|FA_CORGB|SA_COSUP  FONT("굴림", 9, NORMAL)    COLOR(68, 69)  CUR(0)            IFRGB(94, 95)  TABORDER(0)  IOORDER(20)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  2026(817, 451, 898, 471)  LEN(9)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT|FA_CORGB|SA_COSUP  FONT("굴림", 9, NORMAL)    COLOR(68, 69)  CUR(0)            IFRGB(94, 95)  TABORDER(0)  IOORDER(21)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL6(754, 427, 817, 448)  '매도호가'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL7(754, 451, 817, 472)  '매수호가'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL11(756, 478, 819, 499)  '현재가'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  2023(824, 476, 905, 496)  LEN(9)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT|FA_CORGB|SA_COSUP  FONT("굴림", 9, NORMAL)    COLOR(68, 69)  CUR(0)            IFRGB(94, 95)  TABORDER(0)  IOORDER(14)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  12374(820, 536, 901, 556)  LEN(15)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT|FA_CORGB|SA_COSUP  FONT("굴림", 9, NORMAL)    COLOR(68, 69)  CUR(0)            IFRGB(94, 95)  TABORDER(0)  IOORDER(15)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL0(757, 536, 820, 557)  '상장주식수'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  2320(825, 507, 906, 527)  LEN(9)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT|FA_CORGB|SA_COSUP  FONT("굴림", 9, NORMAL)    COLOR(68, 69)  CUR(0)            IFRGB(94, 95)  TABORDER(0)  IOORDER(16)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL2(762, 506, 825, 527)  '전일종가'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  ed_Item1(650, 155, 670, 174)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 130)  CUR(0)  TP_NONE          TABORDER(4)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  ed_Item2(675, 155, 695, 174)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 130)  CUR(0)  TP_NONE          TABORDER(5)  IOORDER(3)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  ed_Item3(700, 155, 720, 174)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 130)  CUR(0)  TP_NONE          TABORDER(6)  IOORDER(4)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  ed_Item4(725, 155, 745, 174)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 130)  CUR(0)  TP_NONE          TABORDER(7)  IOORDER(5)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  OBJ1(9, 458, 342, 518)    "IB610128"  TABORDER(8)  IOORDER(22)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  ed_Item5(750, 155, 770, 174)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 130)  CUR(0)  TP_NONE          TABORDER(9)  IOORDER(6)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  ed_Item6(775, 155, 795, 174)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 130)  CUR(0)  TP_NONE          TABORDER(10)  IOORDER(7)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  BUTTON0(0, 0, 1, 1)  TP_PUSH      AL_CENTER    FOCUS  COLOR(208, 232)  CUR(0)      TABORDER(11)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  head1(612, 602, 692, 622)  'Label'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  head2(690, 602, 770, 622)  'Label'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  head3(777, 603, 857, 623)  'Label'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  head4(862, 602, 942, 622)  'Label'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  1301(0, 0, 89, 18)  LEN(12)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_HAN|FA_NOR    COLOR(68, 69)  CUR(0)  TP_NONE          TABORDER(1)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  1021(90, 0, 179, 19)  LEN(12)  IO_MIXED|AL_LEFT||FA_FLASH    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(8)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Option Explicit
+Dim g_ArrItems
+Dim g_ArrData
+
+g_ArrItems = Array(ed_Item1, ed_Item2, ed_Item3, ed_Item4)
+g_ArrData = Array(Array("외국인", "0", "00"), Array("기관", "1", "01"),_
+	Array("개인", "2", "02"), Array("프로그램", "3", "03"), Array("외국계", "4", "04"),_
+	Array("종가", "5", "05"), Array("전일대비", "6", "06"), Array("등락률", "7", "07"))
+
+'-----------------------------------------------------------------------
+Sub p_write_ini()
+	If SCREEN.CreateObject("INFO") = True Then
+		Dim ArrCols, i
+		ArrCols = Array("", "", "", "")
+
+		For i = LBound(ArrCols) To UBound(ArrCols)
+			Dim tmpCol
+			tmpCol = "col" & Trim(i + 2)
+
+			INFO.PushData LOGIN.Name, "userconf.ini", "IB610124", tmpCol, GRID0.GetHead(i + 3)
+		Next
+	End If
+End Sub
+'-----------------------------------------------------------------------
+Sub p_read_ini()
+	Dim ArrCols, i, HeadData
+	If SCREEN.CreateObject("INFO") = True Then
+		ArrCols = Array("", "", "", "")
+
+		If Trim(INFO.PopData(LOGIN.Name, "userconf.ini", "IB610124", "col2")) = "" Then
+			For i = LBound(ArrCols) To UBound(ArrCols)
+				ArrCols(i) = g_arrData(i)(0)
+			Next
+		Else
+			For i = LBound(ArrCols) To UBound(ArrCols)
+				Dim tmpCol
+				tmpCol = "col" & Trim(i + 2)
+
+				ArrCols(i) = Trim(INFO.PopData(LOGIN.Name, "userconf.ini", "IB610124", tmpCol))
+			Next
+		End If
+
+		For i = LBound(ArrCols) To UBound(ArrCols)
+			GRID0.SetHead i + 3, ArrCols(i)
+			SCREEN.Object("head" & (i+1)).Text = ArrCols(i)
+		Next
+	End If
+End Sub
+'-----------------------------------------------------------------------
+Sub progMm(cvol)
+	Dim ii, tmpCvol
+	tmpCvol = cvol
+
+	For ii = 3 To GRID0.Columns
+		If GRID0.GetHead(ii) = "프로그램" Then
+			If CDbl(cvol) > 0 Then
+				tmpCvol = "+" & cvol
+			End If
+
+			GRID0.SetGridCell 1, ii, tmpCvol
+		End If
+	Next
+End Sub
+'-----------------------------------------------------------------------
+Sub SetItems()
+	Dim i, j, HeadData, PrcFlag, PrgFlag
+	PrcFlag = 0
+	PrgFlag = 0
+
+	For i = 3 To 6
+		HeadData = GRID0.GetHead(i)
+
+		If HeadData = "종가" Then
+			PrcFlag = 1
+		ElseIf HeadData = "프로그램" Then
+			PrgFlag = 1
+		ElseIf HeadData = "등락률" Then
+			PrcFlag = 1
+		End If
+
+		For j = LBound(g_ArrData) To UBound(g_ArrData)
+			If HeadData = g_ArrData(j)(0) Then
+				g_ArrItems(i - 3).Data = g_ArrData(j)(1)
+				Exit For
+			End If
+		Next
+	Next
+
+	OBJ1.Proc "SetFlag", PrcFlag
+	obj_mm.Proc "SetFlag", PrgFlag
+End Sub
+'-----------------------------------------------------------------------
+Function NullCheck(Data)
+	If Trim(data) = "" Then
+		Null_check = 0
+		Exit Function
+	End If
+	Null_check  = CLng(Data)
+End Function
+'-----------------------------------------------------------------------
+Sub ProcSetData(Data)
+	Dim ArrData, CurPrc, Rate, i, Head
+
+	ArrData = Split(Data, "|")
+	CurPrc = ArrData(1)
+	Rate = ArrData(2)
+
+	For i = 3 To 6
+		Head = GRID0.GetHead(i)
+		If Head = "종가" Then
+			Dim tmpCurPrc
+			tmpCurPrc = CDbl(Trim(CurPrc))
+
+'			SYSTEM.Trace "tmpCurPrc = " & tmpCurPrc
+
+			If tmpCurPrc < 0 Then
+				GRID0.SetGridCell 1, i, Abs(tmpCurPrc)
+				GRID0.SetTRgb 1, i, 95
+			ElseIf tmpCurPrc > 0 Then
+				GRID0.SetGridCell 1, i, tmpCurPrc
+				GRID0.SetTRgb 1, i, 94
+			Else
+				GRID0.SetGridCell 1, i, tmpCurPrc
+				GRID0.SetTRgb 1, i, 69
+			End If
+
+
+		ElseIf Head = "등락률" Then
+			GRID0.SetGridCell 1, i, Rate
+		End If
+	Next
+End Sub
+'-----------------------------------------------------------------------
+'종가일경우 마이너스 기호를 없애야 함.
+Sub jggaRemoveGiho()
+	Dim ii, jj
+
+	For jj = 3 To GRID0.Columns
+		If GRID0.GetHead(jj) = "종가" Then
+				For ii = 1 To GRID0.Rows
+					Dim tmpJgga
+					tmpJgga = Trim(GRID0.GetGridCell(ii, jj))
+
+					If tmpJgga <> "" Then
+						tmpJgga = CDbl(tmpJgga)
+
+						If tmpJgga < 0 Then
+							GRID0.SetGridCell ii, jj, Abs(GRID0.GetGridCell(ii, jj))
+							GRID0.SetTRgb ii, jj, 95
+						End If
+					End If
+				Next
+		End If
+	Next
+End Sub
+
+Sub SetHeadName()
+	Dim ii
+
+	For ii = 3 To 6
+		SCREEN.Object("head" & (ii - 2)).Text = GRID0.GetHead(ii)
+	Next
+End Sub
+
+Function getHeadName()
+	Dim ii, tmpHead
+	getHeadName = False
+
+	For ii = 3 To 6
+		If Trim(SCREEN.Object("head" & (ii - 2)).Text) <> Trim(GRID0.GetHead(ii)) Then
+			Exit Function
+		End If
+	Next
+
+	getHeadName = True
+End Function
+
+_AW_ONSTART_AW_
+Call p_read_ini()
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+SetItems
+S1301.Data = SCREEN.object("main.1301").Data
+
+If UCase(TypeName( SCREEN.Object("main.cxMarket"))) <> "NOTHING" Then
+	If SCREEN.Object("main.cxMarket").sMarket = "KRX" Then
+		S1301.Data = SCREEN.Object("main.1301").Data
+	ElseIf SCREEN.Object("main.cxMarket").sMarket = "NXT" Then
+		S1301.Data = "N." & SCREEN.Object("main.1301").Data
+	ElseIf SCREEN.Object("main.cxMarket").sMarket = "통합" Then
+		S1301.Data = "M." & SCREEN.Object("main.1301").Data
+	End If
+End If
+'If Len(Trim(S1301.Data)) <> 9 Then
+'	SCREEN.OnSend False
+'End If
+
+obj_mm.Send
+OBJ1.Send
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+Call jggaRemoveGiho()
+
+_AW_ONENDSUB_AW_
+_AW_ONSERVICE_AW_
+' DESC : 시황 입력시 FLAG('R') 수신 후 OnService 에서 데이타 Setting
+' DATE : 2007년 10월 4일
+' WRITE: IANT
+
+Dim dptr, col
+
+dptr = 1
+col  = 6
+For ii = 1 To 3
+	GRID0.SetGridCell 1, col, Trim(Mid(data, dptr, 9))
+	dptr = dptr + 9
+	col = col + 1
+Next
+o_time.Data = Trim(Mid(data, dptr, 10))
+
+_AW_ONENDSUB_AW_
+_AW_ONCLOSE_AW_
+Call p_write_ini()
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(GRID0)
+_AW_ONCLICK_AW_
+'MsgBox "a = " & SCREEN.Object("main.OBJ_order.OBJ_odr.ed_jprc").Focus
+'MsgBox GRID0.HitPos
+Dim i
+
+If SCREEN.Object("main.OBJ_order.OBJ_odr.ed_jprc").Focus = True Then
+	For i = LBound(g_ArrData) To UBound(g_ArrData)
+		If Trim(GRID0.GetHeadCell( GRID0.Column )) = g_ArrData(i)(2) Then
+			GRID0.SetHead GRID0.Column, g_ArrData(i)(0)
+			Exit For
+		End If
+	Next
+
+	If getHeadName() = False Then
+		p_write_ini
+		Call SetHeadName()
+
+		SCREEN.Send 0
+	End If
+Else
+	If GRID0.HitPos = 4 Then
+		For i = LBound(g_ArrData) To UBound(g_ArrData)
+			If Trim(GRID0.GetHeadCell( GRID0.Column )) = g_ArrData(i)(2) Then
+				GRID0.SetHead GRID0.Column, g_ArrData(i)(0)
+				Exit For
+			End If
+		Next
+
+		p_write_ini
+		Call SetHeadName()
+
+		SCREEN.Send 0
+	End If
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(1377)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(2302)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(1334)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(2025)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(2026)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(2023)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(12374)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(2320)
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

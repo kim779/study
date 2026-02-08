@@ -1,0 +1,195 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB453400)
+MAPSIZE(580, 745)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+TITLE("[4534] 선물근월물 과거 데이터")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL4(0, 0, 745, 35)        COLOR(64, 130)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL(0, 0, 740, 26)        COLOR(66, 130)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL63(0, 30, 745, 280)  LIMAGE(0)  LINEW(4)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL0(5, 5, 35, 22)  '품목'  AL_LEFT  CUR(0)      COLOR(66, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+COMBO  COMBO2(35, 3, 115, 22)  TP_SUNKEN  LEN(3)  COUNT(8)  VCOUNT(8)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_NUM|EDIT_INPUT  FONT("굴림체", 9, NORMAL)    COLOR(68, 130)  CUR(0)  DISPLAY("3년국채", "5년국채", "10년국채", "30년국채", "미국달러", "엔", "유로", "위안")  DATA("165", "166", "167", "170", "175", "176", "177", "178")    TABORDER(1)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL1(130, 5, 160, 22)  '시간'  AL_LEFT  CUR(0)      COLOR(66, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL2(245, 5, 280, 22)  '일자'  AL_LEFT  CUR(0)      COLOR(66, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  date_a(275, 3, 363, 23)  LEN(8)  IO_NUM|EDIT_INPUT|FA_SKIP|FA_DATE  FONT("굴림체", 9, NORMAL)    COLOR(192, 130)  CUR(0)  TP_SUNKEN          EDITFORMAT("9999/99/99")  TABORDER(2)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL0(0, 280, 745, 580)  LIMAGE(0)  LINEW(4)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  OBJECT0(9, 37, 736, 270)    "IB453410"  TABORDER(3)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  OBJECT1(9, 290, 736, 570)    "IB453430"  TABORDER(4)  IOORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+COMBO  COMBO0(160, 3, 225, 23)  TP_SUNKEN  LEN(2)  COUNT(7)  VCOUNT(7)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_MIXED|EDIT_INPUT|FA_SKIP    COLOR(192, 232)  CUR(0)  DISPLAY("1분", "2분", "5분", "10분", "15분", "30분", "60분")  DATA("01", "02", "05", "10", "15", "30", "60")    TABORDER(5)  IOORDER(5)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  100301(760, 45, 830, 64)  LEN(8)  IO_ALPHA|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(6)  IOORDER(6)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Function r_code( idx )
+
+Dim mList(12)
+Dim yList(15)
+Dim code, name, ycode, yidx
+
+Dim curDate
+Dim curYear, curMonth
+
+curDate = Date
+curYear = Year(curDate)
+curMonth = Month(curDate)
+
+yList(1) = "K" '2015
+yList(2) = "L" '2016
+yList(3) = "M" '2017
+yList(4) = "N" '2018
+yList(5) = "P" '2019
+yList(6) = "Q" '2020
+yList(7) = "R" '2021
+yList(8) = "S" '2022
+yList(9) = "T" '2023
+yList(10) = "V" '2024
+yList(11) = "W" '2025
+yList(12) = "6" '2026
+yList(13) = "7" '2027
+yList(14) = "8" '2028
+yList(15) = "9" '2029
+
+mList(1) = "1"
+mList(2) = "2"
+mList(3) = "3"
+mList(4) = "4"
+mList(5) = "5"
+mList(6) = "6"
+mList(7) = "7"
+mList(8) = "8"
+mList(9) = "9"
+mList(10) = "A"
+mList(11) = "B"
+mList(12) = "C"
+
+yidx = CLng(curYear)-"2015"
+ycode = idx & yList(yidx+1)
+
+For i = 1 To 12
+	code = ycode & mList(i)
+	code = code & "000"
+
+	name = SCREEN.GetName( 127, code, 0 )
+	If( Len(Trim(name)) <> 0 ) Then
+		r_code	= code
+		Exit For
+	End If
+Next
+
+End Function
+
+Sub Set_date()
+
+SCREEN.Object("OBJECT0.103304").Data = date_a.Data
+SCREEN.Object("OBJECT1.108305").Data = date_a.Data
+
+End Sub
+
+Sub req_data()
+
+Dim myTime, myDate
+myTime = Time
+myDate = Date
+
+Dim curDate
+curDate = CStr(Year(myDate)) & CStr(Month(myDate)) & CStr(Day(myDate))
+
+'MsgBox "curDate " & curDate
+'MsgBox "date " & CLng(date_a.Data)
+If CLng(curDate) <= CLng(date_a.Data) Then
+	If Hour(myTime) < 9 Then
+		OBJECT0.ClearAll 0
+		OBJECT1.ClearAll 0
+		OBJECT1.Send
+		Exit Sub
+	End If
+End If
+
+SCREEN.Object("OBJECT0.103304").Data = date_a.Data
+
+OBJECT0.Send
+OBJECT1.Send
+
+End Sub
+
+_AW_ONSTART_AW_
+Set_date()
+
+S100301.Data = r_code( COMBO2.Data )
+
+req_data()
+
+'call send_f()
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+SCREEN.OnSend False
+SCREEN.OnSend False
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(COMBO2)
+_AW_ONCHANGE_AW_
+S100301.Data = r_code( COMBO2.Data )
+
+req_data()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(date_a)
+_AW_ONCHANGE_AW_
+
+Set_date()
+
+req_data()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(COMBO0)
+_AW_ONCHANGE_AW_
+req_data()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

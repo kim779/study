@@ -1,0 +1,166 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB510123)
+MAPSIZE(202, 282)
+VERSION(001)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("투자주체별일별")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+TITLE("[510123] 투자주체별 일별 매매동향")
+TOPATH(AXIS)
+METHOD(MENU)
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  SYMBOL21(0, 0, 282, 26)        COLOR(66, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+COMBO  upgb(3, 3, 83, 23)  TP_SUNKEN  LEN(2)  COUNT(6)  VCOUNT(6)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  DISPLAY("KOSPI", "KOSDAQ", "KOSPI200", "선물", "콜옵션", "풋옵션")  DATA("00", "90", "10", "22", "55", "66")    TABORDER(1)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  obj(0, 27, 282, 202)  |FA_ENUM  "IB30012C"  TABORDER(2)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  F1(89, 3, 128, 23)  '금액'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(GP1)      COLOR(66, 69)  CUR(0)      TABORDER(3)  ENABLE  &
+  VISIBLE  CHECKED  HINTTYPE(IH_NONE)
+BUTTON  F2(133, 3, 174, 23)  '수량'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(GP1)      COLOR(66, 69)  CUR(0)      TABORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  F3(193, 3, 232, 23)  '시간'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(GP2)      COLOR(66, 69)  CUR(0)      TABORDER(5)  ENABLE  &
+  VISIBLE  CHECKED  HINTTYPE(IH_NONE)
+BUTTON  F4(236, 3, 277, 23)  '일별'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(GP2)      COLOR(66, 69)  CUR(0)      TABORDER(6)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+GROUP  GP1(413, 279, 477, 310)  'Group'        COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+GROUP  GP2(480, 279, 544, 310)  'Group'        COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Const myFILE = "userconf.ini"
+Const myMAP = "IB291100"
+
+Sub p_read_ini()
+If SCREEN.CreateObject("Info") Then
+ 	CHK.text = Trim(INFO.PopData(LOGIN.Name, myFILE, myMAP, "G_CHCK"))
+End If
+End Sub
+
+
+Sub p_write_ini()
+If SCREEN.CreateObject("Info") Then
+  INFO.PushData LOGIN.Name, myFILE, myMAP, "G_CHCK", CHK.text
+End If
+End Sub
+
+Dim xstr, xvalue, xistrue
+'선물 직전월물 만기일+1  (= 현재 최근월물의 시작일)
+Sub Check_date()
+	Dim yy, mm, dd
+
+	yy = Year(Date)
+	Select Case Month(Date)
+		Case 1, 2, 3
+			yy = yy - 1 : mm = "12"
+		Case 4, 5, 6 : mm = "03"
+		Case 7, 8, 9 : mm = "06"
+		Case 10, 11, 12 : mm = "09"
+	End Select
+
+	dd = 16 - Weekday(yy&"-"&mm&"-"&"01", vbFriday)
+	If Len(dd) = 1 Then dd = "0"&dd
+	x_day = yy&mm&dd
+	S63311.Data = x_day
+End Sub
+
+Sub Check_date1()
+	t_day = EDIT0.data
+
+	yy = Mid(t_day, 1, 4)
+	mm = Mid(t_day, 5, 2)
+	dd = Mid(t_day, 7, 2)
+	x_day = yy & "-" & mm & "-" & dd
+	If IsDate(x_day) = False Then
+		Exit Sub
+	End If
+
+	x_day = DateSerial(yy-1, mm, dd)
+	yy = Year(x_day)
+	mm = Month(x_day)
+	If Len(mm) = 1 Then mm = "0"&mm
+	dd = Day(x_day)
+	If Len(dd) = 1 Then dd = "0"&dd
+	x_day = yy&mm&dd
+	S63311.Data = x_day
+End Sub
+
+_AW_ONINDECLARE_AW_
+#load IB888888
+
+_AW_ONENDSUB_AW_
+_AW_ONSTART_AW_
+SCREEN.Send 0
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+If F3.Checked = True Then
+	obj.SetOBJECT "IB51012C"
+Else
+	obj.SetOBJECT "IB51012E"
+End If
+
+obj.Send
+SCREEN.OnSend False
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(upgb)
+_AW_ONCHANGE_AW_
+
+obj.Send
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(F1)
+_AW_ONCLICK_AW_
+obj.Send
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(F2)
+_AW_ONCLICK_AW_
+obj.Send
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(F3)
+_AW_ONCLICK_AW_
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(F4)
+_AW_ONCLICK_AW_
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

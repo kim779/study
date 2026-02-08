@@ -1,0 +1,73 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(TTTEST93)
+MAPSIZE(450, 700)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("굴림", 9, NORMAL)
+TITLE("Untitled")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+CONTROL  ctl_Category(101, 16, 139, 36)    "CX_Category"  "/k0/i돌려보기.BMP/t/r1301"  LEN(0)  EDIT_NOP    COLOR(68, 130)  TABORDER(0)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON0(70, 80, 290, 150)  TP_PUSH      AL_CENTER    FOCUS  COLOR(208, 232)  CUR(0)      TABORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_SCRIPT_AW_(ctl_Category)
+_AW_ONCLICK_AW_
+Dim codx
+codx = ctl_Category.GetPreCode(S1301.Data)
+If Trim(codx) = "" Then
+	Exit Sub
+End If
+S1301.Data = codx
+S1301.Trigger "",True
+
+SCREEN.Send 0
+OBJ01.Send
+_AW_ONENDSUB_AW_
+_AW_ONDBLCLK_AW_
+Dim codx
+codx = ctl_Category.GetNextCode(S1301.Data)
+If Trim(codx) = "" Then
+	Exit Sub
+End If
+S1301.Data = codx
+S1301.Trigger "",True
+
+SCREEN.Send 0
+OBJ01.Send
+_AW_ONENDSUB_AW_
+_AW_ONCHANGE_AW_
+S1301.Data = ctl_Category.GetCurCode
+
+SCREEN.Send 0
+OBJ01.Send
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

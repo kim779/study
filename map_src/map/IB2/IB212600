@@ -1,0 +1,405 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB212600)
+MAPSIZE(595, 690)
+VERSION(001)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("거래대금분석")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(FMS|FLASH)
+TITLE("거래대금분석")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pooppoop")
+MAPTYPE(NORM)
+HEADER(NOP)
+BGROUND(BRUSH, 64)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL0(0, 0, 693, 26)        COLOR(66, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL10(-3, 24, 693, 600)  LIMAGE(0)  LINEW(6)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL0(4, 2, 66, 22)  '조회시작일'  AL_LEFT  CUR(0)      COLOR(76, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  26901(711, 70, 805, 89)  LEN(8)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_DATE    COLOR(68, 130)  CUR(0)  TP_SUNKEN          EDITFORMAT("9999/99/99")  TABORDER(1)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL1(555, 2, 640, 22)  '단위 : 백만원'  AL_LEFT  CUR(0)      COLOR(76, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+GRID  26500(7, 34, 684, 523)  VISIBLEROW(0)  CELLH(18)  MATRIX(9999, 11)  FIX(0)  MAINCOLOR(7, 0)  LINECOLOR(75)  FOCUSCOLOR(78)  FOCUSKIND(4)    FONT("굴림체", 9, NORMAL)  ROWC(68, 77)  |MERGE|SELALWAYS|FLEXIBLE|VSCROLL|INS_TOP|NO3D|RROW|XHLINE|PAGE|HEADER|KEYFOCUS|GRFTEXT    &
+	COLINFO("26302")  LEN(8)  WIDTH(69)  HEAD("일자|일자")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  EDITFORMAT("9999/99/99")    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("26028")  LEN(12)  WIDTH(73)  HEAD("KOSPI(A)|KOSPI(A)")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|SA_SPACE    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col0")  LEN(12)  WIDTH(73)  HEAD("KOSDAQ(B)|KOSDAQ(B)")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_SKIP|FA_CORGB|SA_ZERO|SA_COSIGN    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col1")  LEN(12)  WIDTH(73)  HEAD("합계~(A+B)|합계~(A+B)")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_SKIP|FA_CORGB|SA_SPACE|SA_COSIGN    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col2")  LEN(12)  WIDTH(76)  HEAD("K200(C)|K200(C)")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_SKIP|FA_CORGB|SA_ZERO|SA_COSIGN    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col3")  LEN(12)  WIDTH(74)  HEAD("KQ150(D)|KQ150(D)")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_SKIP|FA_CORGB|SA_ZERO|SA_COSIGN    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col7")  LEN(12)  WIDTH(72)  HEAD("합계~(C+D)|합계~(C+D)")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_SKIP|FA_CORGB|SA_SPACE|SA_COSIGN    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col4")  LEN(12)  WIDTH(51)  HEAD("비율(%)|(C/A)")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_SKIP|FA_CORGB|SA_ZERO|SA_COSIGN    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col5")  LEN(12)  WIDTH(50)  HEAD("비율(%)|(D/B)")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_SKIP|FA_CORGB|SA_ZERO|SA_COSIGN    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col6")  LEN(12)  WIDTH(50)  HEAD("비율(%)|(B/A)")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_SKIP|FA_CORGB|SA_ZERO|SA_COSIGN    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col8")  LEN(0)  WIDTH(69)  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_NUM|EDIT_INPUT  |FA_SKIP    COLOR(192, 232)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    TABORDER(2)  IOORDER(3)  ENABLE  &
+  VISIBLE
+
+EDIT  flag(815, 103, 844, 122)  LEN(1)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(3)  IOORDER(14)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON0(645, 2, 682, 22)  '조회'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, BOLD)  FOCUS  COLOR(208, 186)  CUR(0)    "조회BTN.BMP"    TABORDER(6)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+EDIT  rowstart(705, 135, 745, 154)  LEN(6)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("1")          TABORDER(9)  IOORDER(15)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  rowend(745, 134, 787, 153)  LEN(6)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("1")          TABORDER(10)  IOORDER(16)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  nextbtn(795, 195, 832, 215)  '다음'  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(208, 130)  CUR(0)    "2BTN.BMP"    TABORDER(11)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+EDIT  lastdate(788, 134, 883, 153)  LEN(8)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(68, 130)  CUR(0)  TP_SUNKEN          EDITFORMAT("9999/99/99")  TABORDER(12)  IOORDER(17)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  oFlag1(720, 170, 749, 189)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("0")          TABORDER(13)  IOORDER(18)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  oFlag2(755, 170, 784, 189)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("0")          TABORDER(14)  IOORDER(19)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  oFlag3(793, 165, 822, 184)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("0")          TABORDER(15)  IOORDER(20)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  oFlag4(828, 165, 857, 184)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("0")          TABORDER(16)  IOORDER(21)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  rojb0(4, 801, 191, 871)    "IB212620"  TABORDER(17)  IOORDER(9)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  rojb1(194, 801, 381, 871)    "IB212620"  TABORDER(18)  IOORDER(10)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  rojb2(384, 801, 571, 871)    "IB212620"  TABORDER(19)  IOORDER(11)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  rojb3(574, 801, 761, 871)    "IB212620"  TABORDER(20)  IOORDER(12)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  20301(811, 70, 845, 90)  LEN(3)  IO_NUM|EDIT_INPUT|FA_WRAP  FONT("굴림체", 9, NORMAL)    COLOR(68, 69)  CUR(0)  TP_NONE  INIT("001")          TABORDER(21)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  26021(720, 101, 790, 121)  LEN(5)  IO_MIXED|AL_CENTER|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  fday(67, 3, 161, 22)  LEN(8)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP|FA_DATE    COLOR(68, 130)  CUR(0)  TP_SUNKEN          EDITFORMAT("9999/99/99")  TABORDER(22)  IOORDER(13)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL2(6, 529, 65, 550)  LINECOLOR(96)  |IMAGE|AL_CENTER    COLOR(208, 232)  CUR(0)    "참고사항.BMP"  ENABLE  &
+  VISIBLE  TRANSPARENT  IMAGE  HINTTYPE(IH_NONE)
+LABEL  LABEL4(19, 552, 650, 572)  '거래대금을 종합적으로 분석하여 현황을 파악하는 화면입니다'  AL_LEFT  CUR(0)      COLOR(96, 91)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  BUTTON1(8, 558, 15, 565)  TP_PUSH|IMAGETEXT|AL_STRETCH        FOCUS  COLOR(208, 232)  CUR(0)    "텍스트화살표_하단.bmp"    TABORDER(23)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+LABEL  LABEL2(19, 570, 650, 590)  'KOSPI, KOSDAQ 시장내 KOSPI200지수 및 KOSDAQ150지수의 비율현황을 조회할 수 있습니다'  AL_LEFT  CUR(0)      COLOR(96, 91)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  BUTTON2(8, 576, 15, 583)  TP_PUSH|IMAGETEXT|AL_STRETCH        FOCUS  COLOR(208, 232)  CUR(0)    "텍스트화살표_하단.bmp"    TABORDER(24)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+OBJECT  obj0(1, 655, 188, 965)    "IB212610"  TABORDER(4)  IOORDER(5)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  obj1(191, 655, 378, 970)    "IB212610"  TABORDER(5)  IOORDER(6)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  obj2(381, 655, 568, 970)    "IB212610"  TABORDER(7)  IOORDER(7)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  obj3(571, 655, 758, 965)    "IB212610"  TABORDER(8)  IOORDER(8)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  edMarketTrigger(725, 35, 757, 55)  LEN(6)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(25)  IOORDER(22)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+'*************************************************************************
+' change_date : 시스템 일자에서 원하는만큼 일자를 옮김
+' 호출형식 예) change_date("m",-3) -> 시스템일자에서 3달전 일자를 Return
+' m : month , d : day , y : year
+'*************************************************************************
+Public Function change_date2(dat,diff, tday)
+	Dim cday, yy, mm, dd
+	Dim y, m,d, temp
+	y = Mid(tday,1,4)
+	m = Mid(tday,5,2)
+	d = Mid(tday,7,2)
+	temp = DateSerial(y, m, d)
+
+	cday = DateAdd(dat, diff, temp)
+
+	yy = Year(cday)
+	mm = Month(cday)
+	If Len(mm) = 1 Then mm = "0"&mm
+	dd = Day(cday)
+	If Len(dd) = 1 Then dd = "0"&dd
+
+	cday = yy&mm&dd
+
+	change_date2 = CDbl(cday)
+End Function
+
+Sub setting_lastdate()
+	lastdate.Data = S26500.GetGridCell(S26500.Rows, 1)
+	rowstart.Data = S26500.Rows+1
+End Sub
+
+Sub main_send()
+	Dim y, m,d, temp,diff
+	SCREEN.ClearAll 0, 2
+
+	flag.Data = "0"
+
+	y = Mid(fday.Data,1,4)
+	m = Mid(fday.Data,5,2)
+	d = Mid(fday.Data,7,2)
+	temp = DateSerial(y, m, d)
+	diff = DateDiff("d", Now, temp)
+
+	If diff = 0 Then
+		S26901.Data = change_date2("d", 1, fday.Data)
+	Else
+		S26901.Data = fday.Data
+	End If
+
+	S20301.Data = "001"
+
+	SCREEN.Send 0
+End Sub
+
+Sub first_send()
+	Dim y, m,d, temp,diff
+
+
+	rowstart.Data = 1
+	rowend.Data = 1
+
+	y = Mid(fday.Data,1,4)
+	m = Mid(fday.Data,5,2)
+	d = Mid(fday.Data,7,2)
+	temp = DateSerial(y, m, d)
+	diff = DateDiff("d", Now, temp)
+
+	If diff = 0 Then
+'		SCREEN.Object("obj0.26901").Data = change_date("d", 1)
+		SCREEN.Object("obj1.26901").Data = change_date("d", 1)
+		SCREEN.Object("obj2.26901").Data = change_date("d", 1)
+		SCREEN.Object("obj3.26901").Data = change_date("d", 1)
+	Else
+'		SCREEN.Object("obj0.26901").Data = fday.Data
+		SCREEN.Object("obj1.26901").Data = fday.Data
+		SCREEN.Object("obj2.26901").Data = fday.Data
+		SCREEN.Object("obj3.26901").Data = fday.Data
+	End If
+
+'	SCREEN.Object("obj0.20301").Data = "001"
+	SCREEN.Object("obj1.20301").Data = "201"
+	SCREEN.Object("obj2.20301").Data = "101"
+	SCREEN.Object("obj3.20301").Data = "305"
+
+	oFlag1.Data = 0
+	oFlag2.Data = 0
+	oFlag3.Data = 0
+	oFlag4.Data = 0
+
+
+'	obj0.Send
+	obj1.Send
+	obj2.Send
+	obj3.Send
+End Sub
+
+Sub continue_send()
+'	obj0.Clear
+	obj1.Clear
+	obj2.Clear
+	obj3.Clear
+
+'	SCREEN.Object("obj0.20301").Data = "001"
+'	SCREEN.Object("obj0.26901").Data = lastdate.Data
+	SCREEN.Object("obj1.20301").Data = "201"
+	SCREEN.Object("obj1.26901").Data = lastdate.Data
+	SCREEN.Object("obj2.20301").Data = "101"
+	SCREEN.Object("obj2.26901").Data = lastdate.Data
+	SCREEN.Object("obj3.20301").Data = "305"
+	SCREEN.Object("obj3.26901").Data = lastdate.Data
+
+'	oFlag1.Data = 0
+	oFlag2.Data = 0
+	oFlag3.Data = 0
+	oFlag4.Data = 0
+
+'	obj0.Send
+	obj1.Send
+	obj2.Send
+	obj3.Send
+End Sub
+
+Sub robj_send()
+	SCREEN.Object("rojb0.20301").Data = "001"
+	SCREEN.Object("rojb0.26901").Data = change_date("d", 1)
+	SCREEN.Object("rojb1.20301").Data = "201"
+	SCREEN.Object("rojb1.26901").Data = change_date("d", 1)
+	SCREEN.Object("rojb2.20301").Data = "101"
+	SCREEN.Object("rojb2.26901").Data = change_date("d", 1)
+	SCREEN.Object("rojb3.20301").Data = "305"
+	SCREEN.Object("rojb3.26901").Data = change_date("d", 1)
+
+	rojb0.Send
+	rojb1.Send
+	rojb2.Send
+	rojb3.Send
+End Sub
+
+Sub Caldata()
+	Dim kospi,kosdaq,k200,kstar, ii
+	kospi = kosdaq = k200 = kstar = 0
+
+	rows = rowstart.Data
+
+	For ii = rows To S26500.Rows
+		kospi = Trim(S26500.GetGridCell(ii, 2))
+		If kospi = "" Then
+			kospi = 0
+		End If
+
+		kosdaq = Trim(S26500.GetGridCell(ii, 3))
+		If kosdaq = "" Then
+			kosdaq = 0
+		End If
+
+		k200 = Trim(S26500.GetGridCell(ii, 5))
+		If k200 = "" Then
+			k200 = 0
+		End If
+
+		kstar = Trim(S26500.GetGridCell(ii, 6))
+		If kstar = "" Then
+			kstar = 0
+		End If
+
+		S26500.SetGridCell ii, 4, CLng(kospi)+CLng(kosdaq)
+		S26500.SetGridCell ii, 7, CLng(k200)+CLng(kstar)
+
+
+		If CLng(kospi) <> 0 Then
+			S26500.SetGridCell ii, 8, FormatNumber(CLng(k200)/CLng(kospi)*100, 2, -1, 0, 0)
+		End If
+
+		If CLng(kosdaq) <> 0 Then
+			S26500.SetGridCell ii, 9, FormatNumber(CLng(kstar)/CLng(kosdaq)*100, 2, -1, 0, 0)
+		End If
+
+		If CLng(kospi) <> 0 Then
+			S26500.SetGridCell ii, 10,FormatNumber(CLng(kosdaq)/CLng(kospi)*100, 2, -1, 0, 0)
+		End If
+	Next
+End Sub
+
+'실시간 처리
+Sub CalRealdata()
+	Dim kospi,kosdaq,k200,kstar, ii
+	kospi = kosdaq = k200 = kstar = 0
+
+	kospi = Trim(S26500.GetGridCell(1, 2))
+	If kospi = "" Then
+		kospi = 0
+	End If
+
+	kosdaq = Trim(S26500.GetGridCell(1, 3))
+	If kosdaq = "" Then
+		kosdaq = 0
+	End If
+
+	k200 = Trim(S26500.GetGridCell(1, 5))
+	If k200 = "" Then
+		k200 = 0
+	End If
+
+	kstar = Trim(S26500.GetGridCell(1, 6))
+	If kstar = "" Then
+		kstar = 0
+	End If
+
+	S26500.SetGridCell 1, 4, CLng(kospi)+CLng(kosdaq)
+	S26500.SetGridCell 1, 7, CLng(k200)+CLng(kstar)
+
+	If CLng(kospi) <> 0 Then
+		S26500.SetGridCell 1, 8, FormatNumber(CLng(k200)/CLng(kospi)*100, 2, -1, 0, 0)
+	End If
+
+	If CLng(kosdaq) <> 0 Then
+		S26500.SetGridCell 1, 9, FormatNumber(CLng(kstar)/CLng(kosdaq)*100, 2, -1, 0, 0)
+	End If
+
+	If CLng(kospi) <> 0 Then
+		S26500.SetGridCell 1, 10,FormatNumber(CLng(kosdaq)/CLng(kospi)*100, 2, -1, 0, 0)
+	End If
+End Sub
+
+Sub Change_MKGubn_Main(sMKGubn)
+	cxMarket.sMarket = sMKGubn
+	SCREEN.Send 0
+End Sub
+
+_AW_ONINDECLARE_AW_
+#load IB888888
+
+_AW_ONENDSUB_AW_
+_AW_ONSTART_AW_
+
+Call main_send()
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+If flag.Data = "0" Then
+	SYSTEM.Trace ""
+	Call first_send()
+Else
+	Call continue_send()
+
+End If
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(26901)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(26500)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON0)
+_AW_ONCLICK_AW_
+Call main_send()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(nextbtn)
+_AW_ONCLICK_AW_
+Call continue_send()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(lastdate)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(fday)
+_AW_ONCHANGE_AW_
+Call main_send()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(edMarketTrigger)
+_AW_ONCHANGE_AW_
+Change_MKGubn_Main(Trim(edMarketTrigger.Data))
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

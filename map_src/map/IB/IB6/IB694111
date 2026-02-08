@@ -1,0 +1,81 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB694111)
+MAPSIZE(16, 122)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("±º∏≤√º", 9, NORMAL)
+OPTIONS(FMS)
+TITLE("Untitled")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pooppoop")
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+EDIT  1301(0, 0, 120, 19)  LEN(12)  IO_MIXED|EDIT_INOUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(1)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  1777(155, 30, 175, 50)  LEN(1)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(2)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Option Explicit
+
+Dim pos, grid, rowPos
+Set grid = SCREEN.Object("parent.viewGrid")
+
+Sub send_f(gridPos)
+	SCREEN.ClearAll 0, 2
+	pos = gridPos
+
+	If SCREEN.GetMapName(1) = "IB694100" Then
+		rowPos = 2
+	ElseIf SCREEN.GetMapName(1) = "IB150400" Then
+		rowPos = 6
+	End If
+
+	S1301.Data = Trim(grid.GetGridCell(pos, rowPos))
+	SCREEN.Send 0
+End Sub
+
+_AW_ONSEND_AW_
+If UCase(TypeName( SCREEN.Object("main.cxMarket"))) <> "NOTHING" Then
+	If SCREEN.Object("main.cxMarket").sMarket = "KRX" Then
+		S1777.Data = "1"
+	ElseIf SCREEN.Object("main.cxMarket").sMarket = "NXT" Then
+		S1777.Data =  "2"
+	ElseIf SCREEN.Object("main.cxMarket").sMarket = "≈Î«’" Then
+		S1777.Data =  "3"
+	End If
+End If
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+grid.SetGridCell pos, rowPos, Trim(S1301.Data)
+
+If CLng(pos) < CLng(grid.Rows) Then
+	Call send_f(pos + 1)
+End If
+
+_AW_ONENDSUB_AW_
+}
+
+
+

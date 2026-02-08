@@ -1,0 +1,100 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB2821F0)
+MAPSIZE(197, 604)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("[obja]주식 체결내역")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(CR2TAB|INTER)
+TITLE("[2821] ETF/ETN 체결내역")
+TOPATH(AXIS)
+METHOD(MENU)
+MAPTYPE(NORM)
+HEADER(LEDGER)
+}
+
+
+
+FORM DIVISION
+{
+
+EDIT  pswd(654, 40, 754, 60)  LEN(8)  IO_ALPHA|EDIT_INPUT|FA_PASSWD|FA_WRAP|FA_ENUM    COLOR(192, 232)  CUR(0)  TP_NONE    ENCRYPT("en_accn")        TABORDER(1)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  AN1A(654, 15, 754, 35)  LEN(11)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(2)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  OBJ0(0, 0, 336, 196)    "IB1001FA"  TABORDER(3)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  OBJ1(337, 0, 604, 196)    "IB1001FB"  TABORDER(4)  IOORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+'***************************************************************************
+' DESC : send Error Check
+'***************************************************************************
+Function Error_check()
+	Error_check = False
+	If Trim(AN1A.Data) = "" Then
+		SCREEN.Object("main.OBJ_order.AN1A").SetFocus
+		Call guide_msg("계좌번호를 확인하십시오")
+		Exit Function
+	End If
+
+	If SYSTEM.ConnectBy = "1" Then
+		If Len(Trim(pswd.Data)) < 4 Then
+			SCREEN.Object("main.OBJ_order.ed_pswd").SetFocus
+			Call guide_msg("비밀번호를 확인하십시오")
+			Exit Function
+		End If
+	End If
+	Error_check = True
+End Function
+
+_AW_ONINDECLARE_AW_
+#load IB888833
+#load IB888888
+#load IB888889
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+SCREEN.OnSend = False
+OBJ0.ClearAll 2
+OBJ1.ClearAll 2
+SCREEN.Proc "main.set_guide", " "
+
+AN1A.Data = Trim(SCREEN.Object("main.OBJ_order.AN1A").Data)
+Call Password_initSetting(pswd)
+
+If Error_check() = False Then				'보내기전 에러체크
+	SCREEN.Object("main.OBJ_order.ed_pswd").SetFocus
+	Exit Sub
+End If
+
+'잔고부터 호출(패스워드 체크TR 안타도록 한다)
+OBJ1.Send
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(pswd)
+_AW_ONKEYCHANGE_AW_
+
+If SCREEN.Key = 13 And Trim(pswd.Data) <> "" Then
+	first_send()
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

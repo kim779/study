@@ -1,0 +1,416 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB650184)
+MAPSIZE(161, 642)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(ENCODE|CR2TAB)
+TITLE("[6501] 채권주문가능수량")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("piboPBxQ")
+MAPTYPE(FIXED)
+HEADER(LEDGER)
+TRXH("31CSONAQ207")
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL0(0, 0, 642, 50)        COLOR(66, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  RADIO0(4, 3, 116, 23)  '최대매수가능수량'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(GP)      COLOR(66, 130)  CUR(0)      TABORDER(1)  ENABLE  &
+  VISIBLE  CHECKED  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  RADIO1(125, 3, 225, 23)  '금액매수수량'  TP_RADIO|RD_NORMAL|EDIT_NOP    |FA_NOR  GROUP(GP)      COLOR(66, 130)  CUR(0)  |FA_NOR    TABORDER(2)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+GROUP  GP(821, 590, 941, 640)  'Group'        COLOR(-1, 232)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL1(4, 27, 59, 47)  '매수가격'        COLOR(208, 232)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  OrdPrc(58, 27, 156, 47)  LEN(12)  IO_NUM|EDIT_INPUT|FA_COMMA|FA_RIGHT|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_SUNKEN          TABORDER(3)  IOORDER(37)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL2(330, 27, 360, 47)  '금액'        COLOR(208, 232)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  price(361, 27, 471, 47)  LEN(13)  IO_NUM|EDIT_INPUT|FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_SKIP|SA_SPACE    COLOR(192, 232)  CUR(0)  TP_SUNKEN          TABORDER(4)  IOORDER(38)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL12(0, 50, 130, 70)  '예수금'        COLOR(96, 69)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL13(0, 70, 130, 90)  '가능수량'        COLOR(96, 69)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  Out_Dps(129, 50, 324, 70)  LEN(16)  IO_NUM|AL_RIGHT||FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_SKIP|FA_CORGB|SA_SPACE|SA_COSIGN    COLOR(192, 69)  CUR(0)            IFRGB(69, 69)  TABORDER(0)  IOORDER(32)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL3(324, 50, 469, 70)  '주문가능금액'        COLOR(96, 69)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  out_AbleAmt(468, 50, 642, 70)  LEN(16)  IO_NUM|AL_RIGHT||FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_SKIP|FA_CORGB|SA_SPACE|SA_COSIGN    COLOR(192, 69)  CUR(0)            IFRGB(69, 69)  TABORDER(0)  IOORDER(33)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  OUT_OrdAbleQty(129, 70, 645, 90)  LEN(16)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT|FA_SKIP|FA_CORGB|SA_COSIGN    COLOR(192, 69)  CUR(0)            IFRGB(69, 69)  TABORDER(0)  IOORDER(34)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL6(1, 245, 131, 265)  '입력(레코드갯수)'        COLOR(96, 69)  CUR(0)    AL_LEFT    ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  In_data(131, 245, 251, 265)  LEN(5)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("00001")          TABORDER(5)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL7(1, 265, 131, 285)  '매매구분'        COLOR(96, 69)  CUR(0)    AL_LEFT    ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  BnsTp(131, 265, 251, 285)  LEN(1)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(6)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL8(1, 286, 131, 306)  '계좌번호'        COLOR(96, 69)  CUR(0)    AL_LEFT    ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  AcntNo(131, 286, 201, 306)  LEN(11)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(7)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL9(1, 307, 131, 327)  '비밀번호'        COLOR(96, 69)  CUR(0)    AL_LEFT    ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  pwd(131, 307, 251, 327)  LEN(8)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(8)  IOORDER(5)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL10(1, 328, 131, 348)  '종목번호'        COLOR(96, 69)  CUR(0)    AL_LEFT    ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  IsuNo(131, 328, 251, 348)  LEN(12)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(9)  IOORDER(6)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL11(1, 349, 131, 369)  '소액채권시장참여구분'        COLOR(96, 69)  CUR(0)    AL_LEFT    ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  SmbndMktPtcnTp(131, 349, 251, 369)  LEN(1)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(10)  IOORDER(7)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL14(2, 370, 132, 390)  '주문가'        COLOR(96, 69)  CUR(0)    AL_LEFT    ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  orderPrice(146, 370, 251, 390)  LEN(13)  IO_NUM|EDIT_INPUT    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(11)  IOORDER(8)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL15(1, 391, 131, 411)  '통신매체코드'        COLOR(96, 69)  CUR(0)    AL_LEFT    ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  CommdaCode(131, 391, 251, 411)  LEN(2)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(12)  IOORDER(9)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL16(1, 412, 131, 432)  '매수일'        COLOR(96, 69)  CUR(0)    AL_LEFT    ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  BuyDt(131, 412, 251, 432)  LEN(8)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(13)  IOORDER(10)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL17(0, 433, 130, 453)  '과세구분'        COLOR(96, 69)  CUR(0)    AL_LEFT    ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  TaxChrTp(131, 433, 251, 453)  LEN(1)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(14)  IOORDER(11)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL18(2, 454, 132, 474)  '입력수수료율'        COLOR(96, 69)  CUR(0)    AL_LEFT    ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  inptCmsnAmtRat(131, 454, 251, 474)  LEN(11)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(15)  IOORDER(12)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL19(1, 476, 131, 496)  '추가수수료징수금액'        COLOR(96, 69)  CUR(0)    AL_LEFT    ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  AddCmsnAmtLevyAmt(131, 476, 251, 496)  LEN(16)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(16)  IOORDER(13)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL20(1, 498, 131, 518)  '수량단위구분'        COLOR(96, 69)  CUR(0)    AL_LEFT    ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  QtyUnitTp(131, 498, 251, 518)  LEN(1)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(17)  IOORDER(14)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL21(365, 245, 495, 265)  '출력(레코드갯수)'        COLOR(96, 69)  CUR(0)    AL_LEFT    ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  OUTPUT2(493, 245, 683, 265)  LEN(5)  IO_NUM|AL_CENTER|    COLOR(192, 69)  CUR(0)            TABORDER(0)  IOORDER(16)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL22(365, 265, 495, 285)  '계좌명'        COLOR(96, 69)  CUR(0)    AL_LEFT    ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  AcntNm(493, 265, 683, 285)  LEN(40)  IO_MIXED|AL_CENTER|    COLOR(192, 69)  CUR(0)            TABORDER(0)  IOORDER(17)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL23(365, 285, 495, 305)  '종목명'        COLOR(96, 69)  CUR(0)    AL_LEFT    ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  IsuNm(493, 285, 683, 305)  LEN(40)  IO_MIXED|AL_CENTER|    COLOR(192, 69)  CUR(0)            TABORDER(0)  IOORDER(18)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL24(365, 305, 495, 325)  '가능금액'        COLOR(96, 69)  CUR(0)    AL_LEFT    ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  AbleAmt(493, 305, 683, 325)  LEN(16)  IO_NUM|AL_CENTER|    COLOR(192, 69)  CUR(0)            TABORDER(0)  IOORDER(19)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  sign(131, 370, 146, 390)  LEN(1)  IO_MIXED|EDIT_INPUT|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("+")          TABORDER(18)  IOORDER(36)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  ord_prc(126, 585, 214, 605)  LEN(12)  IO_NUM|EDIT_INPUT|FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_SKIP|SA_SPACE    COLOR(192, 232)  CUR(0)  TP_SUNKEN          TABORDER(19)  IOORDER(35)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  EDIT1(221, 286, 246, 306)  LEN(9)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(20)  IOORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL25(365, 325, 495, 345)  '주문가능수량'        COLOR(96, 69)  CUR(0)    AL_LEFT    ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  OrdAbleQty(493, 325, 683, 345)  LEN(16)  IO_NUM|AL_CENTER|    COLOR(192, 69)  CUR(0)            TABORDER(0)  IOORDER(20)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL26(365, 345, 495, 365)  '예수금'        COLOR(96, 69)  CUR(0)    AL_LEFT    ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  Dps(493, 345, 683, 365)  LEN(16)  IO_NUM|AL_CENTER|    COLOR(192, 69)  CUR(0)            TABORDER(0)  IOORDER(21)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL27(365, 365, 495, 385)  '대용금액'        COLOR(96, 69)  CUR(0)    AL_LEFT    ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  SubstAmt(493, 365, 683, 385)  LEN(16)  IO_NUM|AL_CENTER|    COLOR(192, 69)  CUR(0)            TABORDER(0)  IOORDER(22)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL28(365, 385, 495, 405)  '현금증거금액'        COLOR(96, 69)  CUR(0)    AL_LEFT    ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  MnyMgn(493, 385, 683, 405)  LEN(16)  IO_NUM|AL_CENTER|    COLOR(192, 69)  CUR(0)            TABORDER(0)  IOORDER(23)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL29(365, 405, 495, 425)  '대용증거금액'        COLOR(96, 69)  CUR(0)    AL_LEFT    ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  SubstMgn(493, 405, 683, 425)  LEN(16)  IO_NUM|AL_CENTER|    COLOR(192, 69)  CUR(0)            TABORDER(0)  IOORDER(24)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL30(365, 425, 495, 445)  '현금담보금액'        COLOR(96, 69)  CUR(0)    AL_LEFT    ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  MnyPldgAmt(493, 425, 683, 445)  LEN(16)  IO_NUM|AL_CENTER|    COLOR(192, 69)  CUR(0)            TABORDER(0)  IOORDER(25)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL31(365, 445, 495, 465)  '대용현금담보금액'        COLOR(96, 69)  CUR(0)    AL_LEFT    ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  SubstMnyPldgAmt(493, 445, 683, 465)  LEN(16)  IO_NUM|AL_CENTER|    COLOR(192, 69)  CUR(0)            TABORDER(0)  IOORDER(26)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL32(365, 465, 495, 485)  '매도대용차감금액'        COLOR(96, 69)  CUR(0)    AL_LEFT    ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  SellSubstOfstAmt(493, 465, 683, 485)  LEN(16)  IO_NUM|AL_CENTER|    COLOR(192, 69)  CUR(0)            TABORDER(0)  IOORDER(27)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL33(365, 485, 495, 505)  '미수합계금액'        COLOR(96, 69)  CUR(0)    AL_LEFT    ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  RcvblSumAmt(493, 485, 683, 505)  LEN(16)  IO_NUM|AL_CENTER|    COLOR(192, 69)  CUR(0)            TABORDER(0)  IOORDER(28)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL34(365, 505, 495, 525)  '수수료율'        COLOR(96, 69)  CUR(0)    AL_LEFT    ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  CmsnAmtRat(493, 505, 683, 525)  LEN(11)  IO_NUM|AL_CENTER|    COLOR(192, 69)  CUR(0)            TABORDER(0)  IOORDER(29)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL35(365, 525, 495, 545)  '추가수수료징수금액'        COLOR(96, 69)  CUR(0)    AL_LEFT    ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  AddCmsnAmtLevyAmtT(493, 525, 683, 545)  LEN(16)  IO_NUM|AL_CENTER|    COLOR(192, 69)  CUR(0)            TABORDER(0)  IOORDER(30)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL36(365, 545, 495, 565)  '한도금액'        COLOR(96, 69)  CUR(0)    AL_LEFT    ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  LmtAmt(493, 545, 683, 565)  LEN(16)  IO_NUM|AL_CENTER|    COLOR(192, 69)  CUR(0)            TABORDER(0)  IOORDER(31)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BOX  BOX0(0, 50, 642, 51)    COLOR(75, 75)  LINEW(1)  BX_LINE    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL37(365, 225, 495, 245)  '출력(입력데이터)'        COLOR(96, 69)  CUR(0)    AL_LEFT    ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  OUTPUT18(494, 225, 684, 245)  LEN(99)  IO_MIXED|AL_CENTER|    COLOR(192, 69)  CUR(0)            TABORDER(0)  IOORDER(15)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL38(1, 90, 642, 110)  '  주문수량은 [원] 단위로 산정됩니다'        COLOR(181, 130)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON5(4, 95, 11, 102)  TP_PUSH|IMAGETEXT|AL_STRETCH        FOCUS  COLOR(208, 232)  CUR(0)    "텍스트화살표_하단.bmp"    TABORDER(21)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+BOX  BOX4(0, 90, 642, 91)    COLOR(75, 75)  LINEW(1)  BX_LINE    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL4(0, 107, 641, 127)  '  가능수량은 수수료는 감안하지 않은 수량입니다'        COLOR(181, 130)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON0(3, 112, 10, 119)  TP_PUSH|IMAGETEXT|AL_STRETCH        FOCUS  COLOR(208, 232)  CUR(0)    "텍스트화살표_하단.bmp"    TABORDER(22)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Sub BnsType()
+	If SCREEN.Object("main.tab_order").ID = "1" Then
+		BnsTp.Data = "1"		' 매도
+	ElseIf SCREEN.Object("main.tab_order").ID = "2" Then
+		BnsTp.Data = "2"		' 매수
+	End If
+End Sub
+
+Sub send_f()
+	SCREEN.ClearAll 0, 2
+	LEDGER.Fkey = "C"
+	SCREEN.Send 0
+End Sub
+
+Sub clear()
+	Out_Dps.Clear
+	out_AbleAmt.Clear
+	OUT_OrdAbleQty.clear
+End Sub
+
+Sub ChgRadio()
+	If RADIO0.Checked = True Then
+		PANEL2.Visible = False
+		price.Visible = False
+	Else
+		PANEL2.Visible = True
+		price.Visible = True
+	End If
+End Sub
+
+Function RoundEx(dblNumber, lngNumberDigitAfterDecimal)
+
+	Dim dblRoundValue
+
+    dblRoundValue = 0
+
+
+    RoundEx = Int((dblNumber * 10 ^ lngNumberDigitAfterDecimal) + dblRoundValue) / 10 ^ lngNumberDigitAfterDecimal
+
+End Function
+
+_AW_ONINDECLARE_AW_
+#load IB888833
+
+_AW_ONENDSUB_AW_
+_AW_ONSTART_AW_
+SCREEN.Object("main.guide").text = ""
+BnsType()
+ChgRadio()
+If SCREEN.Object("main.tab_sise").ID = 1 Then
+	OrdPrc.Data = SCREEN.Object("main.obj_hoga.obj_sise.023").data
+End If
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+SCREEN.OnSend = False
+
+SCREEN.ClearAll 0, 2
+LEDGER.Fkey = "C"
+
+
+AcntNo.Data = SCREEN.Object("main.AN1A").data
+pwd.Data = SCREEN.object("main.ed_pswd").data
+IsuNo.Data = SCREEN.Object("main.obj_jumn.cgcd").data
+
+If SCREEN.Object("main.tab_order").ID = "1" Or SCREEN.Object("main.tab_order").ID = "2" Then
+
+	If SCREEN.Object("main.obj_jumn.sysjCombo").data = 0 Then
+		SmbndMktPtcnTp.Data = "0"	'소액채권시장참여구분 0:일반 1:소액 2:소매
+	Else
+		SmbndMktPtcnTp.Data = "1"	'소액채권시장참여구분 0:일반 1:소액 2:소매
+	End If
+Else
+	Exit Sub
+End If
+
+'SYSTEM.Trace "시장구분: " & SmbndMktPtcnTp.Data
+
+
+
+BnsTp.Data = "2"		' 매수
+If OrdPrc.Data = 0  Or OrdPrc.Data < 0 Then
+	SCREEN.Object("main.Guide").text = "매수가격을 확인해 주세요."
+	SCREEN.Object("main.Guide").Trgb = 94
+	OrdPrc.Data = 0
+	OrdPrc.SetFocus
+	Exit Sub
+End If
+
+
+
+Dim data, data2
+ord_prc.Data = OrdPrc.Data
+data = str2flt(ord_prc)
+ord_prc.Data = data
+data2 = l_zeropad(ord_prc)
+
+orderPrice.Data = sign.data & data2
+
+
+If SCREEN.Object("main.tab_order").ID = "1" Then
+	BuyDt.Data = SCREEN.Object("main.obj_jumn.ed_date").data
+	TaxChrTp.Data = "1"
+End If
+
+
+
+inptCmsnAmtRat.Data = "+0.00000000"
+AddCmsnAmtLevyAmt.Data = "+000000000000000"
+
+
+QtyUnitTp.Data = "0"		'수량단위 구분 - 0:원단위 1:천단위 '원단위만 사용
+
+If RADIO1.Checked = True Then
+	If price.Data = 0 Then
+		MsgBox "금액을 입력하여 주십시오", ,"IBK투자증권"
+		Exit Sub
+	End If
+End If
+
+SCREEN.OnSend = True
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+Out_Dps.Data = Dps.Data
+out_AbleAmt.Data = AbleAmt.Data
+OUT_OrdAbleQty.Data = OrdAbleQty.Data
+
+Dim input_pirce, danga
+Dim temp, ii, sum, data, rdata
+
+If RADIO1.Checked = True Then
+	danga = OrdPrc.Data
+
+	If danga = 0 Then
+		MsgBox "매수가격을 확인하여 주십시오", , "IBk투자증권"
+		Exit Sub
+	End If
+
+	input_price = price.Data
+
+	out_AbleAmt.Data = price.Data
+	temp = input_price / danga * 10000
+
+	If SCREEN.Object("main.obj_jumn.sysjCombo").data = 0 Then		' 시장구분이 일반일
+		If Roundex(temp, -5) < 100000 Then							' 일반채군, 주식채권은 십만원 단위로 매매
+		 	OUT_OrdAbleQty.Data = 0
+		Else
+			OUT_OrdAbleQty.Data = roundex(temp, -5)
+		End If
+	Else															'소액채권, 소매채권은 1천원 단위로 매매
+		If Roundex(temp, -3) < 1000 Then
+		 	OUT_OrdAbleQty.Data = 0
+		Else
+			OUT_OrdAbleQty.Data = roundex(temp, -3)
+		End If
+	End If
+Else
+	data = Trim(OUT_OrdAbleQty.data)
+
+	If IsNumeric(data) = True Then			'숫자인지 판별
+		rdata = data
+	End If
+
+	If SCREEN.Object("main.tab_order").ID <> 1 Then
+
+		If SCREEN.Object("main.obj_jumn.sysjCombo").data = 0 Then
+			If rdata < 100000 Then
+				OUT_OrdAbleQty.Data = 0
+			End If
+		Else
+			If rdata < 1000 Then
+				OUT_OrdAbleQty.Data = 0
+			End If
+		End If
+	End If
+End If
+
+
+
+'If  CInt(data) < 1000 Then
+'	OUT_OrdAbleQty.Data = 0
+'End If
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(RADIO0)
+_AW_ONCLICK_AW_
+ChgRadio()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(RADIO1)
+_AW_ONCLICK_AW_
+ChgRadio()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(Out_Dps)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(out_AbleAmt)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(OUT_OrdAbleQty)
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

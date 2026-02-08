@@ -1,0 +1,273 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB121300)
+MAPSIZE(521, 858)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+TITLE("[1213]대용잔고")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL(-1, 0, 857, 26)  LINETYPE(3)  LINECOLOR(64)      COLOR(66, 67)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL0(5, 3, 53, 23)  '계좌번호'  AL_CENTER  CUR(0)      COLOR(66, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+CONTROL  AN1A(59, 3, 199, 23)    "CX_Account"  "/w0"  LEN(11)  EDIT_INPUT    COLOR(68, 130)  TABORDER(1)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  ACNM(200, 3, 264, 23)  LEN(20)  IO_MIXED|AL_LEFT||FA_SKIP    COLOR(160, 130)  CUR(0)  LINECOLOR(89)          TABORDER(0)  IOORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL1(268, 3, 325, 23)  '비밀번호'  AL_CENTER  CUR(0)      COLOR(66, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  zPwd(334, 3, 390, 23)  LEN(8)  IO_MIXED|EDIT_INPUT|FA_PASSWD|FA_WRAP    COLOR(192, 130)  CUR(0)  TP_SUNKEN          TABORDER(2)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  send_btn(815, 3, 851, 23)  '조회'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, BOLD)  FOCUS  COLOR(208, 186)  CUR(0)    "조회BTN.BMP"    TABORDER(3)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+LABEL  LABEL2(16, 764, 70, 784)  '잔고구분'  AL_CENTER  CUR(0)      COLOR(66, 130)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_NONE)
+COMBO  zD2balBaseQryTp(73, 764, 230, 784)  TP_SUNKEN  LEN(1)  COUNT(2)  VCOUNT(2)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_NUM|EDIT_INPUT    COLOR(192, 130)  CUR(0)  DISPLAY("D+2잔고 0이면 출력안함", "전체조회")  DATA("1", "0")    TABORDER(4)  IOORDER(3)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  BUTTON1(793, 3, 814, 23)  TP_PUSH|IMAGE|AL_STRETCH      FOCUS  COLOR(208, 69)  CUR(0)    "엑셀.BMP"    TABORDER(5)  ENABLE  &
+  VISIBLE  IMAGE  HINTTYPE(IH_NONE)
+COMBO  taxTp(348, 764, 451, 784)  TP_SUNKEN  LEN(1)  COUNT(2)  VCOUNT(2)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_NUM|EDIT_INPUT|FA_SKIP    COLOR(192, 130)  CUR(0)  DISPLAY("수수료적용", "수수료미적용")  DATA("0", "1")    TABORDER(6)  IOORDER(5)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL9(284, 764, 347, 784)  '수수료적용'  AL_CENTER  CUR(0)      COLOR(66, 130)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_NONE)
+COMBO  machaeTp(577, 764, 680, 784)  TP_SUNKEN  LEN(1)  COUNT(3)  VCOUNT(3)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_NUM|EDIT_INPUT|FA_SKIP    COLOR(192, 130)  CUR(0)  DISPLAY("HTS/홈페이지", "영업점/콜센타", "ARS")  DATA("1", "2", "3")    TABORDER(7)  IOORDER(6)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL10(518, 764, 581, 784)  '매체구분'  AL_CENTER  CUR(0)      COLOR(66, 130)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  cautionBtn(736, 3, 792, 23)  '참고사항'  TP_PUSH|IMAGETEXT|AL_STRETCH        FOCUS  COLOR(208, 186)  CUR(0)    "4btn.bmp"    TABORDER(8)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+BUTTON  print(699, 3, 735, 23)  '인쇄'  TP_PUSH|IMAGETEXT|AL_STRETCH        FOCUS  COLOR(208, 186)  CUR(0)    "2btn.bmp"    TABORDER(9)  &
+  IMAGETEXT  HINTTYPE(IH_NONE)
+PANEL  PANEL0(-3, 26, 861, 499)  LIMAGE(0)  LINEW(5)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 130)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL8(-2, 497, 860, 521)  LIMAGE(0)  LINEW(3)  LINETYPE(4)  LINECOLOR(64)      COLOR(34, 232)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL7(4, 502, 18, 516)    |IMAGE|AL_STRETCH    COLOR(34, 232)  CUR(0)    "알림_ic.bmp"  ENABLE  &
+  VISIBLE  IMAGE  HINTTYPE(IH_NONE)
+PANEL  GUIDE(23, 502, 823, 518)        COLOR(34, 130)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  obj(6, 36, 852, 492)    "IB121301"  TABORDER(10)  IOORDER(7)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  editSearch(375, 615, 395, 635)  LEN(1)  IO_NUM|EDIT_INOUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(11)  IOORDER(9)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL3(10, 579, 130, 599)  'obj_taxRate'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  obj_taxRate(135, 579, 255, 599)    "IB120230"  TABORDER(12)  IOORDER(8)  ENABLE  &
+  HINTTYPE(IH_NONE)
+CONTROL  CONTROL0(665, 600, 815, 670)  |FA_PROTECT  "CX_D2Print"  ""  LEN(0)  EDIT_NOP    COLOR(192, 130)  TABORDER(0)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Option Explicit
+
+Sub Set_account()
+	SCREEN.ClearAll 0, 2
+	obj.ClearAll 0
+	GUIDE.Text = ""
+
+	If Len(Trim(AN1A.Data)) = 11 Then
+		ACNM.Data = Trim(AN1A.Name)
+		zPwd.Data = Trim(AN1A.Password)
+
+		If SYSTEM.ConnectBy = 0 And zPwd.Enable = False And Trim(zPwd.Data) = "" Then
+			zPwd.Data = "9999"
+		End If
+
+		If SYSTEM.ConnectBy = 1 And Len(Trim(zPwd.Data)) < 4 Then
+			zPwd.SetFocus
+			Exit Sub
+		End If
+
+		Call send_f()
+	Else
+		AN1A.SetFocus
+		Exit Sub
+	End If
+End Sub
+
+Sub send_f()
+	If Trim(taxTp.Data) = "0" Then
+		SCREEN.Proc "obj_taxRate.send_f", ""
+	Else
+		SCREEN.Proc "obj.send_f", ""
+	End If
+
+	editSearch.Data = "1"
+End Sub
+
+Sub p_write_ini()
+	If SCREEN.CreateObject("INFO") Then
+		INFO.PushData LOGIN.Name, "userconf.ini", SCREEN.GetMapName(0), "jango", Trim(zD2balBaseQryTp.Index)
+		INFO.PushData LOGIN.Name, "userconf.ini", SCREEN.GetMapName(0), "taxx", Trim(taxTp.Index)
+		INFO.PushData LOGIN.Name, "userconf.ini", SCREEN.GetMapName(0), "tp", Trim(machaeTp.Index)
+	End If
+End Sub
+
+Sub p_read_ini()
+	If SCREEN.CreateObject("INFO") Then
+		Dim jangoGb, taxGb, machaeGb
+
+		jangoGb = Trim(INFO.PopData(LOGIN.Name, "userconf.ini", SCREEN.GetMapName(0), "jango"))
+		taxGb = Trim(INFO.PopData(LOGIN.Name, "userconf.ini", SCREEN.GetMapName(0), "taxx"))
+		machaeGb = Trim(INFO.PopData(LOGIN.Name, "userconf.ini", SCREEN.GetMapName(0), "tp"))
+
+		If jangoGb = "" Then
+			jangoGb = 0
+		End If
+
+		zD2balBaseQryTp.Index = jangoGb
+
+		If taxGb = "" Then
+			taxGb = 0
+		End If
+
+		taxTp.Index = taxGb
+
+		If machaeGb = "" Then
+			machaeGb = 0
+		End If
+
+		machaeTp.Index = machaeGb
+	End If
+
+	Call SelectTaxTp()
+End Sub
+
+Sub SelectTaxTp()
+	If Trim(taxTp.Data) = "0" Then
+		machaeTp.Enable = True
+	Else
+		machaeTp.Enable = False
+	End If
+End Sub
+
+_AW_ONINDECLARE_AW_
+#Load IB888833
+
+_AW_ONENDSUB_AW_
+_AW_ONSTART_AW_
+Call Check_LoginType(zPwd)		'직원/고객에 따른 비밀번호 컨트롤 설정
+Call p_read_ini()
+If SCREEN.GetMapName(0) <> "IB121300" Then
+	print.Visible = False
+End If
+
+editSearch.Data = "0"
+
+SCREEN.SetTimer 5, False
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+SCREEN.OnSend = False
+
+_AW_ONENDSUB_AW_
+_AW_ONTIMER_AW_
+If Trim(AN1A.Data) <> "" Then
+	Exit Sub
+End If
+
+Call Set_account()
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(AN1A)
+_AW_ONCHANGE_AW_
+Call Set_account()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(zPwd)
+_AW_ONKEYCHANGE_AW_
+'== 비밀번호 변경시 조회 버튼 기능 수행.
+If SCREEN.Key = "13" Then  '-- Enter 키 입력
+	Call send_f()
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(send_btn)
+_AW_ONCLICK_AW_
+Call send_f()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(zD2balBaseQryTp)
+_AW_ONCHANGE_AW_
+Call p_write_ini()
+Call send_f()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON1)
+_AW_ONCLICK_AW_
+SCREEN.Object("obj.GRID1").Excel True, True, ""
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(taxTp)
+_AW_ONCHANGE_AW_
+Call p_write_ini()
+Call SelectTaxTp()
+Call send_f()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(machaeTp)
+_AW_ONCHANGE_AW_
+Call p_write_ini()
+Call send_f()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(cautionBtn)
+_AW_ONCLICK_AW_
+SCREEN.CreateWindow 3, "IB120240 /t /p5", ""
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(print)
+_AW_ONCLICK_AW_
+If editSearch.Data = "1" And Trim(SCREEN.Object("obj.zDps").Text) <> "" Then
+	SCREEN.Proc "obj.GetPrintData",""
+
+	CONTROL0.StartPrint ""
+Else
+	GUIDE.Text = "인쇄할 데이터가 없습니다."
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

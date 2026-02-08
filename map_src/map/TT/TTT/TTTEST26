@@ -1,0 +1,190 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(TTTEST26)
+MAPSIZE(450, 700)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("MS Sans Serif", 9, NORMAL)
+TITLE("Untitled")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL0(0, 0, 700, 450)  TP_RAISED      COLOR(208, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON0(15, 75, 95, 115)  'ENCODING'  TP_PUSH      AL_CENTER    FOCUS  COLOR(208, 232)  CUR(0)      TABORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  EDIT0(80, 45, 355, 64)  LEN(40)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("우리나라*&^%||너희나라*")          TABORDER(2)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL0(10, 45, 75, 65)  '입력문자열'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL1(120, 90, 440, 110)  'Label'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON1(15, 155, 95, 195)  'DECODING'  TP_PUSH      AL_CENTER    FOCUS  COLOR(208, 232)  CUR(0)      TABORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL2(120, 170, 440, 190)  'Label'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL3(355, 290, 630, 350)  'Label'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Dim g_arrData
+Dim g_cDelim
+
+ReDim g_arrData(31)
+
+g_cDelim = "|"
+InitArrData g_cDelim
+
+'-----------------------------------------------------------------------------
+Function GetEncChr(iIdx)
+	sRet = " "
+
+	If iIdx <= 26 Then
+		sRet = Chr(65 + iIdx)
+	Else
+		sRet = Chr(97 + iIdx - 26)
+	End If
+
+	GetEncChr = sRet
+End Function
+'-----------------------------------------------------------------------------
+Sub InitArrData(InitChr)
+	iCnt = 0
+
+	For i = 33 To 47
+		g_arrData(iCnt) = Array(Chr(i), InitChr & GetEncChr(iCnt))
+		iCnt = iCnt + 1
+	Next
+
+	For i = 58 To 64
+		g_arrData(iCnt) = Array(Chr(i), InitChr & GetEncChr(iCnt))
+		iCnt = iCnt + 1
+	Next
+
+	For i = 91 To 96
+		g_arrData(iCnt) = Array(Chr(i), InitChr & GetEncChr(iCnt))
+		iCnt = iCnt + 1
+	Next
+
+	For i = 123 To 126
+		g_arrData(iCnt) = Array(Chr(i), InitChr & GetEncChr(iCnt))
+		iCnt = iCnt + 1
+	Next
+
+
+End Sub
+'-----------------------------------------------------------------------------
+Function GetEncStr(cChr)
+	GetEncStr = ""
+	'MsgBox cChr
+	For i = LBound(g_arrData) To UBound(g_arrData)
+		'LABEL3.Data = i
+		If cChr = g_arrData(i)(0) Then
+			'MsgBox g_arrData(i)(1)
+			GetEncStr = g_arrData(i)(1)
+			Exit Function
+		End If
+	Next
+End Function
+
+'-----------------------------------------------------------------------------
+Function EncStr(sSrc)
+	sRet = ""
+	iPos = 1
+	For i = 1 To Len(sSrc)
+		sStd = Mid(sSrc, i, 1)
+		sStr = GetEncStr(sStd)
+
+		If Len(sStr) > 0 Then
+			sRet = sRet & sStr
+		Else
+			sRet = sRet & sStd
+		End If
+	Next
+	EncStr = sRet
+	LABEL3.Data = sRet
+End Function
+'-----------------------------------------------------------------------------
+Function GetDecChr(sStr)
+	GetDecChr = ""
+	'MsgBox cChr
+	For i = LBound(g_arrData) To UBound(g_arrData)
+		'LABEL3.Data = i
+		If sStr = g_arrData(i)(1) Then
+			'MsgBox g_arrData(i)(1)
+			GetDecChr = g_arrData(i)(0)
+			Exit Function
+		End If
+	Next
+End Function
+'-----------------------------------------------------------------------------
+Function DecStr(sEnc)
+	sRet = ""
+	iPos = 1
+	j = 1
+	For i = 1 To Len(sEnc)
+		If i = j Then
+			sStd = Mid(sEnc, j, 1)
+			sStr = ""
+			If sStd = g_cDelim Then
+				If (j + 1) > Len(sEnc) Then
+					Exit Function
+				Else
+					sStr = GetDecChr(Mid(sEnc, j, 2))
+				End If
+			End If
+
+			If Len(sStr) > 0 Then
+				sRet = sRet & sStr
+				j = j + 1
+			Else
+				sRet = sRet & sStd
+			End If
+			j = j + 1
+		End If
+
+	Next
+	DecStr = sRet
+End Function
+
+_AW_SCRIPT_AW_(BUTTON0)
+_AW_ONCLICK_AW_
+A = EncStr(Trim(EDIT0.Data))
+
+LABEL1.Data = A
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON1)
+_AW_ONCLICK_AW_
+A = DecStr(Trim(LABEL1.Data))
+
+LABEL2.Data = A
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

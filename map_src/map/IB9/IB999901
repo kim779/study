@@ -1,0 +1,958 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB999901)
+MAPSIZE(773, 1085)
+VERSION(000)
+MAPKIND(PROCEDURES)
+MAPGROUP(0)
+MAPDESC("additional Market")
+MAPPUBLIC(";")
+FONT("굴림", 9, NORMAL)
+TITLE("additional Market (NXT)")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+
+Dim MK_TYPE_TOTAL
+Dim MK_TYPE_NXT
+Dim MK_TYPE_KRX
+Dim myFILENAME
+Dim myMAPNAME
+
+MK_TYPE_TOTAL = "통합"
+MK_TYPE_NXT = "NXT"
+MK_TYPE_KRX = "KRX"
+
+myFILENAME = "userconf.ini"
+myMAPNAME = SCREEN.GetMapName(0)
+
+
+
+
+Function GetMkCode(scode)
+	GetMkCode = scode
+
+	If UCase(TypeName( SCREEN.Object("1777") )) <> "NOTHING" Then
+	'화면내부에 거래소 선택컨트롤 시장변경
+		If SCREEN.Object("1777").Data = "2" Then
+			GetMkCode = "N." & scode
+		ElseIf SCREEN.Object("1777").Data = "3" Then
+			GetMkCode = "M." & scode
+		End If
+	End If
+
+	If UCase(TypeName( SCREEN.Object("main.cxMarket") )) <> "NOTHING" Then
+	'화면내부에 거래소 선택컨트롤 시장변경
+		If SCREEN.Object("main.cxMarket").sMarket = "NXT" Then
+			GetMkCode = "N." & scode
+		ElseIf SCREEN.Object("main.cxMarket").sMarket = "통합" Then
+			GetMkCode = "M." & scode
+		End If
+	End If
+
+End Function
+
+
+
+
+
+Sub Change_MKGubn_OBJ(sMarket)
+TRACEOUT "        [IB999901] -------------------------------"
+TRACEOUT "        [IB999901] Change_MKGubn_OBJ sMarket = " & SCREEN.GetMapName(0) & vbTab & sMarket
+	
+	If UCase(TypeName( SCREEN.Object("OBJ_hnam"))) <> "NOTHING" Then
+		SCREEN.Object("OBJ_hnam").Send
+	End If
+
+	If UCase(TypeName( SCREEN.Object("cxMarket") )) <> "NOTHING" Then
+		'화면내부에 거래소 선택컨트롤 시장변경
+		cxMarket.sCode = SCREEN.Object("Main.cxMarket").sCode
+		cxMarket.sMarket = sMarket
+TRACEOUT "        [IB999901] Change_MKGubn_OBJ cxMarket = " & cxMarket.sMarket & vbTab & SCREEN.GetMapName(0)
+	End If
+
+	If UCase(TypeName( SCREEN.Object("200777") )) <> "NOTHING" Then
+	'화면내부에 거래소 선택컨트롤 시장변경
+		If sMarket = "KRX" Then
+			S200777.Data = "1"
+		ElseIf sMarket = "NXT" Then
+			S200777.Data = "2"
+		ElseIf sMarket = "통합" Then
+			S200777.Data = "3"
+		End If
+	End If
+
+	If UCase(TypeName( SCREEN.Object("1777") )) <> "NOTHING" Then
+	'화면내부에 거래소 선택컨트롤 시장변경
+		If sMarket = "KRX" Then
+			S1777.Data = "1"
+		ElseIf sMarket = "NXT" Then
+			S1777.Data = "2"
+		ElseIf sMarket = "통합" Then
+			S1777.Data = "3"
+		End If
+	End If  '
+
+	If UCase(TypeName( SCREEN.Object("mkcd") )) <> "NOTHING" Then
+	'화면내부에 거래소 선택컨트롤 시장변경
+		If sMarket = "KRX" Then
+			mkcd.Data = "1"
+		ElseIf sMarket = "NXT" Then
+			mkcd.Data = "2"
+		ElseIf sMarket = "통합" Then
+			mkcd.Data = "3"
+		End If
+	End If
+
+	'====================================
+	' 주문화면단 현재 선택 시장 문구 표기
+	'====================================
+	Change_market_text(sMarket)
+
+End Sub
+
+
+
+
+
+Sub TRACEOUT(skey)
+	SYSTEM.Trace skey
+End Sub
+
+
+
+
+
+Sub TraceLog(skey, sVal)
+	SYSTEM.Trace skey & "  "  & sVal
+'	If UCase(TypeName( SCREEN.Object("main.cxMarket") )) <> "NOTHING" Then
+'		SCREEN.Object("main.cxMarket").TraceLog sVal,skey
+'	End If
+End Sub
+
+
+
+
+
+
+
+
+Sub Set777(sMarket)
+	If UCase(TypeName( SCREEN.Object("200777") )) <> "NOTHING" Then
+'화면내부에 거래소 선택컨트롤 시장변경
+		If sMarket = "KRX" Then
+			S200777.Data = "1"
+		ElseIf sMarket = "NXT" Then
+			S200777.Data = "2"
+		ElseIf sMarket = "통합" Then
+			S200777.Data = "3"
+		End If
+	End If
+
+	If UCase(TypeName( SCREEN.Object("1777") )) <> "NOTHING" Then
+	'화면내부에 거래소 선택컨트롤 시장변경
+		If sMarket = "KRX" Then
+			S1777.Data = "1"
+		ElseIf sMarket = "NXT" Then
+			S1777.Data = "2"
+		ElseIf sMarket = "통합" Then
+			S1777.Data = "3"
+		End If
+	End If
+End Sub
+
+
+
+
+
+
+
+Sub SaveMKGubn(sMKGubn)
+TRACEOUT "[IB999901] SaveMKGubn map = " & myMAPNAME
+
+	Select Case myMAPNAME
+		Case "IB2004T0" myMAPNAME = "IB100000"  '주식현2
+		Case "IB2005T0" myMAPNAME = "IB100000"  '미니현재
+		Case "IB2001T0" myMAPNAME = "IB100000"  '주식현재
+		Case "IB2007T0" myMAPNAME = "IB100000"  '시간시세
+		Case "IB2007T1" myMAPNAME = "IB100000"  '시간시세
+		Case "IB2008T0" myMAPNAME = "IB100000"  '시간시2
+		Case "IB2009T0" myMAPNAME = "IB100000"  '일별흐름
+		Case "IB2024T0" myMAPNAME = "IB100000"  '외기종목
+		Case "IB2025T0" myMAPNAME = "IB100000"  '종목매매
+
+		Case "IB1011T2" myMAPNAME = "IB100000"  '매도
+		Case "IB1021T2" myMAPNAME = "IB100000"  '매도상환
+		Case "IB1021T3" myMAPNAME = "IB100000"  '매도상환정취
+		Case "IB1011T3" myMAPNAME = "IB100000"  '매수
+		Case "IB1011T4" myMAPNAME = "IB100000"  '정취
+
+		Case "IB2108T0" myMAPNAME = "IB100000"  '등락순위
+		Case "IB2109T0" myMAPNAME = "IB100000"  '상승률순
+		Case "IB2110T0" myMAPNAME = "IB100000"  '하락률순
+		Case "IB2113T0" myMAPNAME = "IB100000"  '거래증순
+		Case "IB2116T0" myMAPNAME = "IB100000"  '거래액순
+		Case "IB2119T0" myMAPNAME = "IB100000"  '잔량순위
+
+		Case "IB2302T0" myMAPNAME = "IB100000"  '(거)동향
+		Case "IB2303T0" myMAPNAME = "IB100000"  '(거)분석
+		Case "IB2304T0" myMAPNAME = "IB100000"  '(거)종목
+		Case "IB2305T0" myMAPNAME = "IB100000"  '(거)순위
+		Case "IB2402T0" myMAPNAME = "IB100000"  '(거)상위
+		Case "IB2403T0" myMAPNAME = "IB100000"  '(외)종목
+		Case "IB2407T0" myMAPNAME = "IB100000"  '(외)상위
+		Case "IB2983T0" myMAPNAME = "IB100000"  '예상지수
+		Case "IB2908T0" myMAPNAME = "IB100000"  '(투)동향
+		Case "IB2909T0" myMAPNAME = "IB100000"  '(투)현황
+		Case "IB2921T0" myMAPNAME = "IB100000"  '(투)동향2
+		Case "IB2915T0" myMAPNAME = "IB100000"  '(투)순시
+		Case "IB2918T0" myMAPNAME = "IB100000"  '(투)시장
+		Case "IB2919T0" myMAPNAME = "IB100000"  '(투)시상
+		Case "IB2920T0" myMAPNAME = "IB100000"  '(투)시순
+		Case "IB2910T0" myMAPNAME = "IB100000"  '(투)시간
+		Case "IB1201T0" myMAPNAME = "IB100000"  '실시간 잔고
+		Case "IB2022T0" myMAPNAME = "IB100000"  '관심종목
+		Case Else
+			myMAPNAME = myMAPNAME
+	End Select
+
+	'====================================
+	' 주문화면단 현재 선택 시장 문구 표기
+	'====================================
+	'Call Change_market_text()
+	If UCase(TypeName( SCREEN.Object("Main.cxMarket"))) <> "NOTHING" Then
+		Dim tmp_mkgb
+		tmp_mkgb = SCREEN.Object("Main.cxMarket").sMarket
+		Call Change_market_text(tmp_mkgb)
+	End If
+
+End Sub
+
+
+
+
+
+Function LoadMKGubn()
+TRACEOUT "[IB999901] LoadMKGubn map = " & myMAPNAME
+
+	Select Case myMAPNAME
+		Case "IB2004T0" myMAPNAME = "IB100000"  '주식현2
+		Case "IB2005T0" myMAPNAME = "IB100000"  '미니현재
+		Case "IB2001T0" myMAPNAME = "IB100000"  '주식현재
+		Case "IB2007T0" myMAPNAME = "IB100000"  '시간시세
+		Case "IB2007T1" myMAPNAME = "IB100000"  '시간시세
+		Case "IB2008T0" myMAPNAME = "IB100000"  '시간시2
+		Case "IB2009T0" myMAPNAME = "IB100000"  '일별흐름
+		Case "IB1011T2" myMAPNAME = "IB100000"  '매도
+		Case "IB1021T2" myMAPNAME = "IB100000"  '매도상환
+		Case "IB1021T3" myMAPNAME = "IB100000"  '매도상환정취
+		Case "IB1011T3" myMAPNAME = "IB100000"  '매수
+		Case "IB1011T4" myMAPNAME = "IB100000"  '정취
+		Case "IB2024T0" myMAPNAME = "IB100000"  '외기종목
+		Case "IB2025T0" myMAPNAME = "IB100000"  '종목매매
+		Case "IB2108T0" myMAPNAME = "IB100000"  '등락순위
+		Case "IB2109T0" myMAPNAME = "IB100000"  '상승률순
+		Case "IB2110T0" myMAPNAME = "IB100000"  '하락률순
+		Case "IB2113T0" myMAPNAME = "IB100000"  '거래증순
+		Case "IB2116T0" myMAPNAME = "IB100000"  '거래액순
+		Case "IB2119T0" myMAPNAME = "IB100000"  '잔량순위
+		Case "IB2302T0" myMAPNAME = "IB100000"  '(거)동향
+		Case "IB2303T0" myMAPNAME = "IB100000"  '(거)분석
+		Case "IB2304T0" myMAPNAME = "IB100000"  '(거)종목
+		Case "IB2305T0" myMAPNAME = "IB100000"  '(거)순위
+		Case "IB2402T0" myMAPNAME = "IB100000"  '(거)상위
+		Case "IB2403T0" myMAPNAME = "IB100000"  '(외)종목
+		Case "IB2407T0" myMAPNAME = "IB100000"  '(외)상위
+		Case "IB2983T0" myMAPNAME = "IB100000"  '예상지수
+		Case "IB2908T0" myMAPNAME = "IB100000"  '(투)동향
+		Case "IB2909T0" myMAPNAME = "IB100000"  '(투)현황
+		Case "IB2921T0" myMAPNAME = "IB100000"  '(투)동향2
+		Case "IB2915T0" myMAPNAME = "IB100000"  '(투)순시
+		Case "IB2918T0" myMAPNAME = "IB100000"  '(투)시장
+		Case "IB2919T0" myMAPNAME = "IB100000"  '(투)시상
+		Case "IB2920T0" myMAPNAME = "IB100000"  '(투)시순
+		Case "IB2910T0" myMAPNAME = "IB100000"  '(투)시간
+		Case "IB1201T0" myMAPNAME = "IB100000"  '실시간 잔고
+		Case "IB2022T0" myMAPNAME = "IB100000"  '관심종목
+		Case "IB2006T0" myMAPNAME = "IB100000"  '복수현재
+		Case "IB2006T9" myMAPNAME = "IB100000"  '복수현재
+		Case Else
+			myMAPNAME = myMAPNAME
+	End Select
+
+	'====================================
+	' 주문화면단 현재 선택 시장 문구 표기
+	'====================================
+	'Call Change_market_text()
+	If UCase(TypeName( SCREEN.Object("Main.cxMarket"))) <> "NOTHING" Then
+		Dim tmp_mkgb
+		tmp_mkgb = SCREEN.Object("Main.cxMarket").sMarket
+		Call Change_market_text(tmp_mkgb)
+	End If
+
+	LoadMKGubn = ""
+	If SCREEN.CreateObject("Info") Then
+		LoadMKGubn = Trim(INFO.popData (LOGIN.Name, myFILENAME, myMAPNAME, "MKgubn"))
+	End If
+TRACEOUT "[IB999901] LoadMKGubn  =  [" & LoadMKGubn 	& "] myMAPNAME = " & myMAPNAME
+'	Set777(LoadMKGubn)
+End Function
+
+
+
+
+
+
+'3600 화면내부 cxMarket 컨트롤의 기능 활용
+Function IsNXTable(scode)
+	IsNXTable = False
+
+	If SCREEN.Object("main.cxMarket").IsNXTAble(S1301.Data) = 1 Then
+		IsNXTable = True
+		TRACEOUT "[IB999901] IsNXTAble ---> true <---" & scode
+	Else
+		IsNXTable = False
+		TRACEOUT "[IB999901] IsNXTAble ---> false <---" & scode
+	End If
+End Function
+
+
+
+
+
+
+'오브젝트에서 메인화면의 cxMarket 참조
+Function Get_Main_MarketPicker()
+	Get_Main_MarketPicker = SCREEN.Object("main.1301").sMKtype
+End Function
+
+
+
+
+
+
+
+Sub Change_OBJ_MarketPicker()
+	SCREEN.Proc "main.OBJ_order.Change_MarketPicker_FM", ""
+End Sub
+
+
+
+
+
+
+Sub Set_Market_cbOrder(iMarket)
+   Dim items
+TRACEOUT "------ Set_Market_cbOrder = " & iMarket
+   If iMarket = "통합" Then
+   		 items = "02" & vbTab & "0000 보통" & vbTab & _
+	  		  "0303 시장가" & vbTab & _
+	          "0606 최유리지정가" & vbTab & _
+	          "0707 최우선지정가" & vbTab &_
+	          "0808 중간가"
+   ElseIf iMarket = "KRX" Then
+	   items = "02" & vbTab & "0000 보통" & vbTab & _
+	  		  "0303 시장가" & vbTab & _
+	  		  "0505 조건부지정가" & vbTab & _
+	          "0606 최유리지정가" & vbTab & _
+	          "0707 최우선지정가" & vbTab &_
+	          "1010 지정가(IOC)" & vbTab & _
+	          "1313 시장가(IOC)" & vbTab & _
+	          "1616 최유리(IOC)" & vbTab & _
+	          "2020 지정가(FOK)" & vbTab & _
+	          "2323 시장가(FOK)" & vbTab & _
+	          "2626 최유리(FOK)" & vbTab & _
+	          "8181 장후시간외" & vbTab & _
+	          "6161 장전시간외" & vbTab & _
+	          "6565 경매매"
+	Else
+		 items = "02" & vbTab & "0000 보통" & vbTab & _
+	  		  "0303 시장가" & vbTab & _
+	          "0606 최유리지정가" & vbTab & _
+	          "0707 최우선지정가" & vbTab &_
+	          "0808 최우선지정가" & vbTab &_
+	          "0909 스톱지정가"
+	End If
+
+
+  	shogb.SetItems(items)
+
+End Sub
+
+
+
+
+
+Sub Change_OBJ_MarketPicker()
+	SCREEN.Proc "main.OBJ_order.Change_MarketPicker_FM", ""
+End Sub
+
+
+
+
+
+
+'거래소에 따라 주문설정이 달라짐
+Sub Set_AfterMarket_cbOrder(iMarket)
+   Dim items
+TRACEOUT "------ Set_AfterMarket_cbOrder = " & iMarket
+
+   items = "00" & vbTab & "0000 지정가" & vbTab & _
+  		  "0303 시장가" & vbTab & _
+  		  "0202 중간가(NXT)" & vbTab & _
+  		  "0101 스톱지정가(NXT)" & vbTab & _
+          "0606 최유리지정가" & vbTab &_
+          "0707 최우선지정가" & vbTab &_
+          "1313 시장가(IOC)"
+  	shogb.SetItems(items)
+
+End Sub
+
+
+
+
+
+Function GetMarketGubn()
+	GetMarketGubn = cxMarket.GetMarketType()
+End Function
+
+
+
+
+
+
+
+Sub InitMarketCombo(sMap)
+TRACEOUT "------ InitMarketCombo = " & sMap
+End Sub
+
+
+
+
+
+
+
+'OBJECT 에서  send 할때 대표화면의 시장구분자 참조
+Sub SetMKGubn777()
+	Dim sMarket
+	If UCase(TypeName( SCREEN.Object("200777") )) <> "NOTHING" Then
+		If UCase(TypeName( SCREEN.Object("Main.cxMarket") )) <> "NOTHING" Then
+			sMarket = SCREEN.Object("Main.cxMarket").sMarket
+'SYSTEM.Trace "SetMKGubn200777 	sMarket = " & 	SCREEN.Object("Main.cxMarket").sMarket & "   <" & SCREEN.GetMapName(0) & ">"
+			If sMarket = "KRX" Then
+				S200777.Data = "1"
+			ElseIf sMarket = "NXT" Then
+				S200777.Data = "2"
+			ElseIf sMarket = "통합" Then
+				S200777.Data = "3"
+			End If
+		End If
+	End If
+
+	If UCase(TypeName( SCREEN.Object("1777") )) <> "NOTHING" Then
+		If UCase(TypeName( SCREEN.Object("Main.cxMarket") )) <> "NOTHING" Then
+			sMarket = SCREEN.Object("Main.cxMarket").sMarket
+'SYSTEM.Trace "SetMKGubn1777 	sMarket = " & 	SCREEN.Object("Main.cxMarket").sMarket & "   <" & SCREEN.GetMapName(0) & ">"
+			If sMarket = "KRX" Then
+				S1777.Data = "1"
+			ElseIf sMarket = "NXT" Then
+				S1777.Data = "2"
+			ElseIf sMarket = "통합" Then
+				S1777.Data = "3"
+			End If
+		End If
+	End If
+
+	If UCase(TypeName( SCREEN.Object("300777") )) <> "NOTHING" Then
+		If UCase(TypeName( SCREEN.Object("Main.cxMarket") )) <> "NOTHING" Then
+			sMarket = SCREEN.Object("Main.cxMarket").sMarket
+'SYSTEM.Trace "SetMKGubn300777 	sMarket = " & 	SCREEN.Object("Main.cxMarket").sMarket & "   <" & SCREEN.GetMapName(0) & ">"
+			If sMarket = "KRX" Then
+				S300777.Data = "1"
+			ElseIf sMarket = "NXT" Then
+				S300777.Data = "2"
+			ElseIf sMarket = "통합" Then
+				S300777.Data = "3"
+			End If
+		End If
+	End If
+
+	If UCase(TypeName( SCREEN.Object("mkcd") )) <> "NOTHING" Then
+		If UCase(TypeName( SCREEN.Object("Main.cxMarket") )) <> "NOTHING" Then
+			sMarket = SCREEN.Object("Main.cxMarket").sMarket
+'SYSTEM.Trace "SetMKGubn mkcd 	sMarket = " & 	SCREEN.Object("Main.cxMarket").sMarket & "   <" & SCREEN.GetMapName(0) & ">"
+			If sMarket = "KRX" Then
+				mkcd.Data = "1"
+			ElseIf sMarket = "NXT" Then
+				mkcd.Data = "2"
+			ElseIf sMarket = "통합" Then
+				mkcd.Data = "3"
+			End If
+		End If
+	End If
+End Sub
+
+Function GetMainMKGubn()
+	GetMainMKGubn = "KRX"
+
+	If SCREEN.GetMapName(0) = "IB102100" Then
+		Exit Function
+	End If
+
+	If UCase(TypeName( SCREEN.Object("Main.cxMarket") )) <> "NOTHING" Then
+		GetMainMKGubn = SCREEN.Object("Main.cxMarket").sMarket
+	Else
+		Exit Function
+	End If
+	TraceLog "GetMainMKGubn  GetMKGubn = " , GetMainMKGubn
+End Function
+
+Function GetParent1777()
+	GetParent1777 = ""
+	If UCase(TypeName(SCREEN.Object("parent.1777") )) <> "NOTHING" Then
+		GetParent1777 = SCREEN.Object("parent.1777").Data
+	Else
+		TraceLog "GetParent777 777없다" , GetMainMKGubn
+	End If
+	TraceLog "GetParent777 777" , GetParent1777
+End Function
+
+Sub SetMarketTo777()
+	sMarket = SCREEN.Object("Main.cxMarket").sMarket
+	If UCase(TypeName( SCREEN.Object("Main.1777") )) <> "NOTHING" Then
+		If sMarket = "KRX" Then
+			S1777.Data = "1"
+		ElseIf sMarket = "NXT" Then
+			S1777.Data = "2"
+		ElseIf sMarket = "통합" Then
+			S1777.Data = "3"
+		End If
+	End If
+End Sub
+
+'1000 에서 사용됨 다른 오브젝트에서 시장 변경 했을경우
+Sub OnFromDLLMarket(sKey, sVal)
+'SYSTEM.Trace "[MKGUBN][OnFromDLLMarket] sKey = " & sKey & "  sVal = " & sVal & "    map = " &  SCREEN.GetMapName(0)
+'	If UCase(TypeName( SCREEN.Object("cxMarket") )) <> "NOTHING" Then
+'		SCREEN.Object("cxMarket").sMarket = sVal
+'	End If
+
+'	SCREEN.Send 0
+End Sub
+
+Function OnSave_To_1000DLL(brecv, sKey, sVal)
+
+'	Dim sData, sTmp
+
+'	sTmp = SCREEN.Object("obj_Buf.edt_MapNo").Data & vbTab '& vbTab & sKey & vbTab & sVal & vbTab
+'SYSTEM.Trace "[MKGUBN][IB100000] OnSave_ToDLL sTmp = " & sTmp
+'	If brecv Then
+'		sTmp = sTmp & "SEND" & vbTab
+'	End If
+
+'	sTmp = sTmp & sKey & vbTab & sVal & vbTab
+
+'	sData = "BUF_1000" & vbTab & sTmp
+
+'SYSTEM.Trace "[MKGUBN][IB100000] OnSave_ToDLL brecv = " & brecv
+'SYSTEM.Trace "[MKGUBN][IB100000] OnSave_ToDLL sKey = " & sKey
+'SYSTEM.Trace "[MKGUBN][IB100000] OnSave_ToDLL sVal = " & sVal
+'SYSTEM.Trace "[MKGUBN][IB100000] OnSave_ToDLL BUF_1000 = " & sData
+
+'	SCREEN.Object("obj_Buf.edtBuf").Trigger sData, True
+End Function
+
+'====================================
+' 주문화면단 현재 선택 시장 문구 표기
+'====================================
+Sub Change_market_text(sMKGubn)
+	Dim tMKGubn
+
+	If UCase(TypeName( SCREEN.Object("pMarket"))) = "NOTHING" Then
+		Exit Sub
+	End If
+
+	' 주문화면 내 시장 표기
+	Select Case Trim(sMKGubn)
+	Case "KRX"	' KRX
+		tMKGubn = "KRX"
+
+	Case "NXT"	' NXT
+		tMKGubn = "NXT"
+
+	Case "통합"	' SOR
+		If cxMarket.IsNXTAble(S1301.Data) = 1 Then	' NXT ABLE
+			tMKGubn = "SOR"
+		Else
+			tMKGubn = "KRX"
+		End If
+
+	Case Else
+		tMKGubn = "KRX"
+	End Select
+
+	' 화면 노출 시장문구 변경
+	pMarket.Text = Trim(tMKGubn)
+
+	' 시장별 주문 호가 접수 유형 세팅
+	Call Set_shogb()
+
+	' 시장식별자에 현재 종목의 NXT 주문 가능 여부를 알려줌
+	cxMarket.MNum = SCREEN.GetMapName(1)
+End Sub
+
+
+
+
+
+
+'====================================
+' 시장별 주문 호가 접수 유형 세팅
+'====================================
+Sub Set_shogb()
+	Dim items, mkodr, itype
+
+	mkodr = "시장가"
+	Select Case SCREEN.GetCodeType(S1301.Data)
+	Case "3", "9"   '3 KOTC ,  9 ELW
+		items = "00" & vbTab & _
+				"0000 지정가" 		& vbTab & _
+  		  		"0303 시장가" 		& vbTab & _
+  		  		"0505 조건부지정가" & vbTab & _
+          		"0606 최유리지정가" & vbTab & _
+          		"0707 최우선지정가" & vbTab &_
+          		"1010 지정가(IOC)" 	& vbTab & _
+          		"1313 시장가(IOC)" 	& vbTab & _
+          		"1616 최유리(IOC)" 	& vbTab & _
+          		"2020 지정가(FOK)" 	& vbTab & _
+          		"2323 시장가(FOK)" 	& vbTab & _
+          		"2626 최유리(FOK)" 	& vbTab & _
+          		"8181 장후시간외" 	& vbTab & _
+          		"6161 장전시간외"
+
+    Case Else
+		If UCase(TypeName( SCREEN.Object("cxMarket"))) <> "NOTHING" Then
+			Select Case Trim(cxMarket.sMarket)
+			Case "KRX"	' KRX
+			items = "00" & vbTab & _
+		 		"0000 지정가" & vbTab & _
+  		  		"0303 시장가" & vbTab & _
+  		  		"0202 중간가" & vbTab & _
+  		  		"0101 스톱지정가" & vbTab & _
+  		  		"0505 조건부지정가" & vbTab & _
+          		"0606 최유리지정가" & vbTab & _
+          		"0707 최우선지정가" & vbTab &_
+          		"1010 지정가(IOC)" & vbTab & _
+          		"1313 시장가(IOC)" & vbTab & _
+          		"1212 중간가(IOC)" & vbTab & _
+          		"1616 최유리(IOC)" & vbTab & _
+          		"2020 지정가(FOK)" & vbTab & _
+          		"2323 시장가(FOK)" & vbTab & _
+          		"2222 중간가(FOK)" & vbTab & _
+          		"2626 최유리(FOK)" & vbTab & _
+          		"8181 장후시간외" & vbTab & _
+          		"6161 장전시간외"
+
+          		' 화면별 특성화
+      			Select Case SCREEN.GetMapName(0)	' 개별화면번호
+				Case "IB102150", "IB102170", "IB100850" ' 대출매도상환 매도/정정 화면
+					'담보대출상환주문 화면에만 시간외단일가주문구분 추가
+					items = items & vbTab &  "8282 시간외단일가"
+
+				Case Else
+					Select Case SCREEN.GetMapName(1)	' 대표화면번호
+					Case "IB882000", "IB500000"	' 법인영업전용 주문화면
+						items = items & vbTab &  "8282 시간외단일가"
+					End Select
+				End Select
+
+				' KONEX 종목 여부 판단
+				itype = SCREEN.GetName(199, S1301.Data,0)	' KONEX 종목 여부 판단 (28이면 KONEX)
+				If IsNumeric(itype) = True Then
+					If itype = 28 Then	' KONEX 종목 판단 완료시, 6565경매매 호가유형 추가
+						items = items & vbTab &  "6565 경매매"
+					End If
+				End If
+
+          		mkodr = "시장가"
+
+			Case "NXT"	' NXT
+			items = "00" & vbTab & _
+		 		"0000 지정가" & vbTab & _
+  		  		"0202 중간가" & vbTab & _
+  		  	'	"0101 스톱지정가" & vbTab & _
+          		"0606 최유리지정가" & vbTab & _
+          		"0707 최우선지정가" & vbTab &_
+          		"1010 지정가(IOC)" & vbTab & _
+          		"1313 시장가(IOC)" & vbTab & _
+          		"1212 중간가(IOC)" & vbTab & _
+          		"1616 최유리(IOC)" & vbTab & _
+          		"2020 지정가(FOK)" & vbTab & _
+          		"2323 시장가(FOK)" & vbTab & _
+          		"2222 중간가(FOK)" & vbTab & _
+          		"2626 최유리(FOK)" & vbTab & _
+          		"8181 종가매매"
+          		mkodr = "시장가(IOC)"
+
+			Case "통합"	' SOR
+			items = "00" & vbTab & _
+		 		"0000 지정가" & vbTab & _
+'  		  		"0303 시장가" & vbTab & _
+          		"0606 최유리지정가" & vbTab & _
+          		"0707 최우선지정가" & vbTab &_
+          		"1010 지정가(IOC)" & vbTab & _
+          		"1313 시장가(IOC)" & vbTab & _
+          		"1616 최유리(IOC)"
+          		mkodr = "시장가(IOC)"
+			End Select
+
+		Else	' KRX로 간주
+			items = "00" & vbTab & _
+		 		"0000 지정가" & vbTab & _
+  		  		"0303 시장가" & vbTab & _
+  		  		"0202 중간가" & vbTab & _
+  		  		"0101 스톱지정가" & vbTab & _
+  		  		"0505 조건부지정가" & vbTab & _
+          		"0606 최유리지정가" & vbTab & _
+          		"0707 최우선지정가" & vbTab &_
+          		"1010 지정가(IOC)" & vbTab & _
+          		"1313 시장가(IOC)" & vbTab & _
+          		"1212 중간가(IOC)" & vbTab & _
+          		"1616 최유리(IOC)" & vbTab & _
+          		"2020 지정가(FOK)" & vbTab & _
+          		"2323 시장가(FOK)" & vbTab & _
+          		"2222 중간가(FOK)" & vbTab & _
+          		"2626 최유리(FOK)" & vbTab & _
+          		"8181 장후시간외" & vbTab & _
+          		"6161 장전시간외"
+          		' 화면별 특성화
+      			Select Case SCREEN.GetMapName(0)
+				Case "IB102150", "IB102170", "IB100850" ' 대출매도상환 매도/정정 화면
+					'담보대출상환주문 화면에만 시간외단일가주문구분 추가
+					items = items & vbTab &  "8282 시간외단일가"
+
+				Case Else
+					Select Case SCREEN.GetMapName(1)	' 대표화면번호
+					Case "IB882000", "IB500000"	' 법인영업전용 주문화면
+						items = items & vbTab &  "8282 시간외단일가"
+					End Select
+				End Select
+
+				' KONEX 종목 여부 판단
+				itype = SCREEN.GetName(199, S1301.Data,0)	' KONEX 종목 여부 판단 (28이면 KONEX)
+				If IsNumeric(itype) = True Then
+					If itype = 28 Then	' KONEX 종목 판단 완료시, 6565경매매 호가유형 추가
+						items = items & vbTab &  "6565 경매매"
+					End If
+				End If
+
+          		mkodr = "시장가"
+		End If
+	End Select
+
+	' Set ITEMS to COMBO BOX
+	If Len(items) > 0 Then
+		shogb.SetItems(items)
+
+		Select Case SCREEN.GetMapName(1)
+		Case "IB500000"	' 시간외단일가
+			shogb.Data = "82"
+
+		Case Else	' Default : 지정가
+			shogb.Index(0)
+		End Select
+
+
+		' 주문단 화면에 현재 선택된 시장에 따라 "시장가 체크박스" 문구 변경
+		If UCase(TypeName( SCREEN.Object("c_hogb") )) <> "NOTHING" Then
+			c_hogb.Caption  = mkodr
+			c_hogb.Checked = False
+		End If
+		ed_hogb.Data = shogb.Data
+		Set_comb_hogb()
+	End If
+
+End Sub
+
+
+'종목코드 있는 거래소 변경 화면에서 조회 시 거래소 컨트롤에 종목코드 셋팅을 해야하기 위하여 추가.
+Sub Select_Send(sData)
+	cxMarket.sCode = Trim(S1301.Data)
+	'sData = "Screen.Send 0" 입력 시 처리할 수 있도록되어 있는 Vbs Statement 입니다. ( 출처 Caht Gpt )
+	execute(sData)
+End Sub
+
+
+
+
+'=============================================================================
+' 미체결내역 클릭 시, 종목에 따른 NXT 지원 여부에 따라 Main 시장을 변경하거나
+' 현재 선택한 시장과 Main의 시장이 다른경우 선택한 시장을 전파
+' ------------------------------ 주의 ----------------------------
+' 현재 함수 수정 시, IB999901과 IB999913 공통 동시에 수정이 필요함
+' ----------------------------------------------------------------
+'=============================================================================
+Sub Spread_mkgb(codx, mkgb)
+	Dim sMKGubn, tMKGubn, t_mkgb, iret
+
+	'==============================================
+	' 현재 입력받은 시장구분자
+	'==============================================
+	' 미체결에서 호출 시 : 1   2   S
+	' 일반화면   호출 시 : KRX NXT 통합 (cxMarket)
+	'==============================================
+	Select Case mkgb
+	Case "KRX"
+		t_mkgb = "1"
+	Case "NXT"
+		t_mkgb = "2"
+	Case "통합"
+		t_mkgb = "S"
+	Case "SOR"
+		t_mkgb = "S"
+	Case Else
+		t_mkgb = mkgb
+	End Select
+
+
+
+	If UCase(TypeName( SCREEN.Object("Main.cxMarket") ) ) <> "NOTHING" Then
+
+		SCREEN.IgnoreChange True
+
+		'===============================
+		' Main의 직전 시장정보 임시 저장
+		'===============================
+		tMKGubn = SCREEN.Object("Main.cxMarket").sMarket
+
+		'=========================
+		' 현재 입력받은 시장구분자
+		'=========================
+		Select Case Trim(t_mkgb)
+		Case "1"	' KRX
+			sMKGubn = "KRX"
+
+		Case "2"	' NXT
+			sMKGubn = "NXT"
+
+		Case "S"	' SOR
+			sMKGubn = "통합"
+
+		Case Else
+			sMKGubn = "KRX"
+		End Select
+
+SYSTEM.Trace "      [999901]Spread_mkgb() B4 : " & SCREEN.Object("Main.cxMarket").sMarket
+		'============================================
+		' 현재 종목에 맞는 Main 시장 변경 (차후 원복)
+		'============================================
+		If Trim(codx) <> "" Then
+			SCREEN.Object("Main.cxMarket").sCode = codx
+		End If
+
+
+
+		'==================================
+		' 화면 권한에 따른 "통합" 처리 분기
+		'==================================
+		iret = SCREEN.Object("Main.cxMarket").GetMapPermission(SCREEN.GetMapName(1))	' 대표화면번호로 화면 권한 획득
+SYSTEM.Trace "      [999901]Spread_mkgb() AF : " & SCREEN.Object("Main.cxMarket").sMarket & vbTab & iret
+
+		Select Case iret
+		Case 1	' KRX
+			sMKGubn = "KRX"	' KRX 강제 변환
+			tMKGubn = "통합"
+
+		Case 2	' NXT
+			sMKGubn = "NXT"	' NXT 강제 변환
+			tMKGubn = "통합"
+
+		Case 3	' KRX|NXT (SOR 미지원)
+			'=================================================
+			' NXT 불가종목인데 시장선택이 NXT로 되어 있을 경우
+			' 시장구분을 통합으로 변경
+			'=================================================
+			If SCREEN.Object("Main.cxMarket").IsNXTAble(S1301.Data) <> 1 Then	' NXT 불가종목
+				If sMKGubn = "NXT" Then
+					sMKGubn = "KRX"
+					tMKGubn = "통합"
+				End If
+			End If
+
+			' KRX|NXT 화면에서는 통합이 노출되면 안된다
+			' 화면 권한이 SOR 미지원 화면인경우, SOR인 경우에 직전 시장구분자 유지
+			If sMKGubn = "통합" Then
+				sMKGubn = tMKGubn	' 직전 시장을 유지
+				tMKGubn = "통합"
+			End If
+
+			' 그래도 통합이 남아 있으면 강제로 KRX로 변경
+			If sMKGubn = "통합" Then
+				sMKGubn = "KRX"
+				tMKGubn = "통합"
+			End If
+
+
+		Case 7	' KRX|NXT|SOR
+			'=================================================
+			' NXT 불가종목인데 시장선택이 NXT로 되어 있을 경우
+			' 시장구분을 통합으로 변경
+			' 아직 Main의 1301이 변경되지 않은 시점이라 codx 사용
+			'=================================================
+			If Trim(codx) <> "" And SCREEN.Object("Main.cxMarket").IsNXTAble(codx) <> 1 Then	' NXT 불가종목
+				If sMKGubn = "NXT" Then
+					sMKGubn = "통합"
+					tMKGubn = "KRX"
+				End If
+			End If
+		End Select
+
+
+
+		'====================================
+		' 현재 클릭한 화면에 변경 시장 선적용
+		'====================================
+		If UCase(TypeName( SCREEN.Object("cxMarket") ) ) <> "NOTHING" Then
+			cxMarket.MNum = SCREEN.GetMapName(1)
+			cxMarket.sCode = SCREEN.Object("Main.cxMarket").sCode
+			'cxMarket.sMarket = sMKGubn
+		End If
+
+		'================================
+		' 현재 선택된(보정된) 시장 전파
+		'================================
+		SCREEN.Object("Main.cxMarket").sMarket = tMKGubn	' Main 화면 시장 원복
+SYSTEM.Trace "      [999901]Spread_mkgb() FINAL : " & SCREEN.Object("Main.cxMarket").sMarket & vbTab & sMKGubn
+		SCREEN.Proc "Main.Change_MKGubn_Main_Limited", sMKGubn
+
+'		' 시장별 주문 호가 접수 유형 세팅
+		If UCase(TypeName( SCREEN.Object("shogb") ) ) <> "NOTHING" Then
+			Call Set_shogb()
+		End If
+
+		SCREEN.IgnoreChange False
+	End If
+End Sub
+
+}
+
+
+

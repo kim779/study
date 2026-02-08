@@ -1,0 +1,423 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB840220)
+MAPSIZE(169, 345)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("[온라인]청약증거금")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(ENCODE)
+TITLE("청약증거금")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("piboPBxQ")
+MAPTYPE(RESIZEX)
+HEADER(LEDGER)
+TRXH("31CSPBSQ004")
+BGROUND(BRUSH, 181)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL5(0, 68, 345, 93)        COLOR(66, 67)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL(0, 0, 345, 25)        COLOR(66, 67)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL0(27, 239, 89, 258)  '청약개시일'  AL_LEFT  CUR(0)      COLOR(66, 130)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  zAppySrtDt(90, 238, 176, 258)  LEN(8)  IO_NUM|EDIT_INPUT|FA_DATE    COLOR(192, 130)  CUR(0)  TP_SUNKEN          EDITFORMAT("9999/99/99")  TABORDER(1)  IOORDER(3)  &
+  HINTTYPE(IH_NONE)
+EDIT  zAppyIsuNo(139, 307, 220, 326)  LEN(12)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_NOR    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(2)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  send_btn(305, 3, 342, 23)  '조회'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, BOLD)  FOCUS  COLOR(208, 186)  CUR(10)    "조회BTN.BMP"    TABORDER(3)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+PANEL  PANEL13(0, 27, 70, 47)  '종 목 명'        COLOR(96, 130)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  d3GrpAppyMgnrt(343, 317, 443, 337)  LEN(7)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSIGN    COLOR(68, 69)  CUR(0)  LINECOLOR(75)          IFRGB(94, 95)  TABORDER(0)  IOORDER(10)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL0(166, 27, 246, 47)  '청약증거금율'        COLOR(96, 130)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  Out(404, 382, 457, 398)  LEN(5)  IO_NUM|AL_CENTER|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(6)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL2(0, 46, 70, 66)  '발 행 가'        COLOR(96, 130)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL3(166, 46, 246, 66)  '청약한도수량'        COLOR(96, 130)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  lAppyMgn(539, 411, 677, 431)  LEN(16)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSIGN    COLOR(68, 69)  CUR(0)  LINECOLOR(75)          IFRGB(69, 69)  TABORDER(0)  IOORDER(12)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL4(404, 411, 540, 431)  '청약증거금액'  LINECOLOR(75)      COLOR(96, 97)  CUR(0)    AL_CENTER    ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  in_out(23, 421, 349, 441)  LEN(41)  IO_MIXED|AL_CENTER|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(5)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  zlAppyQty(138, 328, 257, 347)  LEN(16)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_NOR    COLOR(192, 69)  CUR(0)  TP_SUNKEN  INIT("000000000000000")          TABORDER(4)  IOORDER(4)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  Out1(465, 382, 509, 398)  LEN(1)  IO_NUM|AL_CENTER|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(13)  ENABLE  &
+  HINTTYPE(IH_NONE)
+GRID  GRID0(0, 95, 345, 168)  VISIBLEROW(0)  CELLH(18)  MATRIX(20000, 2)  FIX(0)  MAINCOLOR(68, 232)  LINECOLOR(75)  FOCUSCOLOR(78)  FOCUSKIND(4)  ROWC(68, 77)  |FLEXIBLE|VSCROLL|NO3D|RROW|XHLINE|GRFTEXT    &
+	COLINFO("lAppyUnitQty")  LEN(16)  WIDTH(164)  HEAD("청약단위 (주)")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_SKIP|FA_CORGB|SA_SPACE|SA_COSUP    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(69, 69)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("lAppyMgn")  LEN(16)  WIDTH(165)  HEAD("청약증거금 (원)")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_SKIP|FA_CORGB|SA_SPACE|SA_COSUP    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(69, 69)    HNORMAL  SORTSTARTPOS(0)    TABORDER(5)  IOORDER(15)  ENABLE  &
+  VISIBLE
+
+EDIT  zIn(140, 285, 182, 304)  LEN(5)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_NOR    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("00001")          TABORDER(6)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  OUTPUT0(103, 474, 139, 488)  LEN(3)  IO_NUM|AL_CENTER|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(9)  ENABLE  &
+  HINTTYPE(IH_NONE)
+GROUP  GROUP2(55, 510, 500, 810)  '예수금및한도조회'        COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL3(144, 71, 225, 91)  '청약단위 조회'  AL_LEFT  CUR(0)      COLOR(66, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+GRID  GRID1(351, 3, 698, 204)  VISIBLEROW(0)  CELLH(19)  MATRIX(20000, 2)  FIX(0)  MAINCOLOR(68, 232)  LINECOLOR(75)  FOCUSCOLOR(78)  FOCUSKIND(4)  ROWC(68, 77)  |FLEXIBLE|VSCROLL|NO3D|RROW|GRFTEXT    &
+	COLINFO("lAppyUnitQty")  LEN(16)  WIDTH(165)  HEAD("청약단위 (주)")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSUP    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(69, 69)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("lAppyMgn")  LEN(16)  WIDTH(166)  HEAD("청약증거금 (원)")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSUP    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(69, 69)    HNORMAL  SORTSTARTPOS(0)    TABORDER(8)  IOORDER(14)  ENABLE
+EDIT  lAppyQty(225, 71, 344, 90)  LEN(15)  IO_NUM|EDIT_INPUT|FA_COMMA|FA_RIGHT|FA_WRAP|FA_SKIP    COLOR(192, 130)  CUR(0)  TP_SUNKEN  INIT("0")          TABORDER(7)  IOORDER(16)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL2(17, 71, 92, 91)  '청약증거금'  AL_LEFT  FONT("굴림체", 9, BOLD)  CUR(0)      COLOR(66, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+OUT  zIsuNm(69, 27, 169, 47)  LEN(40)  IO_MIXED|AL_LEFT||FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSUP    COLOR(68, 69)  CUR(0)            IFRGB(69, 69)  TABORDER(0)  IOORDER(7)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  dFltnPrc(69, 46, 169, 66)  LEN(10)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSIGN    COLOR(68, 69)  CUR(0)            IFRGB(69, 69)  TABORDER(0)  IOORDER(8)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  viewD3GrpAppyMgnrt(245, 27, 345, 47)  LEN(7)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_SKIP|FA_CORGB|SA_SPACE|SA_COSIGN    COLOR(68, 69)  CUR(0)            IFRGB(94, 95)  TABORDER(0)  IOORDER(17)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  l3GrpAppyLmtQty(335, 340, 435, 360)  LEN(16)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSIGN    COLOR(68, 69)  CUR(0)            IFRGB(69, 69)  TABORDER(0)  IOORDER(11)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BOX  BOX0(0, 27, 345, 28)    COLOR(75, 232)  LINEW(1)  BX_LINE    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL99(4, 75, 15, 86)  LINECOLOR(66)  |IMAGE|AL_CENTER    COLOR(208, 232)  CUR(0)    "title_ic.bmp"  ENABLE  &
+  VISIBLE  TRANSPARENT  IMAGE  HINTTYPE(IH_NONE)
+BOX  BOX1(0, 65, 345, 66)    COLOR(75, 232)  LINEW(1)  BX_LINE    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  next_btn(290, 245, 326, 265)  '다음'  TP_PUSH|IMAGETEXT|AL_STRETCH        FOCUS  COLOR(208, 186)  CUR(10)    "2BTN.BMP"    TABORDER(9)  &
+  IMAGETEXT  HINTTYPE(IH_NONE)
+EDIT  gridPos(313, 488, 380, 506)  LEN(8)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(10)  IOORDER(18)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL1(16, 285, 136, 305)  '레코드갯수'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL4(16, 307, 136, 327)  '청약종목번호'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL5(15, 328, 135, 348)  '청약수량'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL22(10, 3, 272, 23)  '등급에 따른 청약한도 수량  입니다.'  AL_LEFT  CUR(0)      COLOR(208, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+PANEL  PANEL6(1, 8, 10, 17)    |IMAGE|AL_CENTER    COLOR(208, 232)  CUR(0)    "텍스트화살표_하단.BMP"  ENABLE  &
+  VISIBLE  TRANSPARENT  IMAGE  HINTTYPE(IH_NONE)
+OBJECT  OBJECT0(95, 545, 425, 770)    "IB840222"  TABORDER(11)  IOORDER(19)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  newHando(245, 45, 345, 65)  LEN(16)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_SKIP|FA_CORGB|SA_SPACE|SA_COSIGN    COLOR(68, 69)  CUR(0)            IFRGB(69, 69)  TABORDER(0)  IOORDER(20)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Option Explicit
+
+Dim flag
+
+'== 첫 조회
+Sub send_f()
+	flag = "C"
+	GRID0.Clear
+	GRID1.Clear
+	gridPos.Data = 1
+	LEDGER.Fkey = "C"
+	SCREEN.Send 0
+End Sub
+
+'== 연속 조회
+Sub send_c()
+	flag = "7"
+	LEDGER.Fkey = "7"
+	GRID1.SetDataPosition 2
+	SCREEN.Send 0
+End Sub
+
+'청약단위 조회
+Sub getAppyQty()
+	GRID0.Clear
+
+	Dim ii, jj
+
+	jj = 1
+	For ii = 1 To GRID1.Rows
+		If CDbl(Trim(lAppyQty.Data)) <= CDbl(Trim(GRID1.GetGridCell(ii, 1))) Then
+			GRID0.InsertRow -1
+			GRID0.SetGridCell jj, 1, GRID1.GetGridCell(ii, 1)
+			GRID0.SetGridCell jj, 2, GRID1.GetGridCell(ii, 2)
+			jj = jj + 1
+		End If
+	Next
+End Sub
+
+_AW_ONINDECLARE_AW_
+#load IB888833
+#Load IB888888
+
+_AW_ONENDSUB_AW_
+_AW_ONSTART_AW_
+LEDGER.Rcnt = "0100"
+lAppyQty.Data = ""
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+SCREEN.OnSend = False
+
+zIn.Data = "00001"
+
+If Trim(zAppyIsuNo.Data) <> "" Then
+	SCREEN.OnSend = True
+Else
+	Call alert_msg("왼쪽 청약내역화면에서 종목을 더블클릭하여 주십시오.")
+End If
+
+zlAppyQty.Data = "+000000000000000"
+
+If SCREEN.GetMapName(1) = "IB872500" Then
+	If SCREEN.Object("main.UTAB0").ID <> 2 Then
+		SCREEN.Object("object0.zAppyAcntNo").data = SCREEN.Object("main.obj3.AN1A").Data
+	Else
+		Exit Sub
+	End If
+Else
+	SCREEN.Object("object0.zAppyAcntNo").data = SCREEN.Object("main.obj1.AN1A").Data
+End If
+
+SCREEN.OnSend = True
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+If Left(LEDGER.Ecod, 1) = "0" Then
+	If LEDGER.Next = "Y" Then
+		' 연속조회가 남아 있는 경우 끝까지 조회 후 GRID 처리
+		Call send_c()
+	Else
+
+		Dim ii, cnt
+		cnt = 1
+
+		If GRID1.Rows > 0 Then
+			If Trim(lAppyQty.Data) = "000000000000000" Then
+				'----------------------------------------------------------------------
+				' 청약 단위 지정조회가 없는 경우 Bypass로 화면 표기 GRID에 데이터 세팅
+				'----------------------------------------------------------------------
+				For ii = gridPos.Data To GRID1.Rows
+					GRID0.InsertRow -1
+					GRID0.SetGridCell ii, 1, Trim(GRID1.GetGridCell(ii, 1))
+					GRID0.SetGridCell ii, 2, Trim(GRID1.GetGridCell(ii, 2))
+				Next
+
+				gridPos.Data = GRID1.Rows + 1
+			Else
+				'-------------------------------------------------------------------------------------------
+				' 청약 단위 지정조회가 있는 경우 청약단위 조회 미만은 필터링 후 화면 표기 GRID에 데이터 세팅
+				'-------------------------------------------------------------------------------------------
+				If IsNumeric(lAppyQty.Data) = True Then
+					' 조회그리드에 데이터 있는지 CHK
+					If Trim(GRID1.GetGridCell(GRID1.Rows, 1)) = "" Then
+						Exit Sub
+					End If
+
+					'------------------------------------------------------------------
+					' 조회된 가장 마지막 데이터가 청약단위 조회 미만인 경우 연속조회
+					' 2023.12.20 무조건 연속조회 끝까지 하는것으로 변경해서 여기 안탐
+					'------------------------------------------------------------------
+					If CDbl(lAppyQty.Data) > CDbl(GRID1.GetGridCell(GRID1.Rows, 1)) Then
+						If LEDGER.Next = "Y" Then
+							GRID1.Clear
+							gridPos.Data = 1
+							Call send_c()
+							Exit Sub
+						End If
+					End If
+
+
+					For ii = gridPos.Data To GRID1.Rows
+						' 조회그리드에 데이터 있는지 CHK
+						If Trim(GRID1.GetGridCell(ii, 1)) = "" Then
+							Exit For
+						End If
+
+						'------------------------------------------------------------------
+						' 현재 ROW의 청약단위 데이터가 청약단위조회 미만인 경우 해당 ROW DELETE
+						'------------------------------------------------------------------
+						If CDbl(lAppyQty.Data) > CDbl(Trim(GRID1.GetGridCell(ii, 1))) Then
+							GRID1.RemoveRow ii - 1
+							ii = ii - 1
+						Else
+							Exit For
+						End If
+					Next
+
+					For ii = gridPos.Data To GRID1.Rows
+						GRID0.InsertRow -1
+						GRID0.SetGridCell ii, 1, Trim(GRID1.GetGridCell(ii, 1))
+						GRID0.SetGridCell ii, 2, Trim(GRID1.GetGridCell(ii, 2))
+					Next
+
+					gridPos.Data = GRID1.Rows + 1
+				End If
+			End If
+		End If
+
+		SCREEN.SetTimer 2, False
+
+		' 화면 표기 그리드에 빈 값이 있으면 제거
+		For ii = GRID0.Rows To 1 Step -1
+			If Trim(GRID0.GetGridCell(ii, 1)) = "" Then
+				GRID0.RemoveRow ii - 1
+			End If
+		Next
+
+		OBJECT0.Send
+	End If
+End If
+
+_AW_ONENDSUB_AW_
+_AW_ONTIMER_AW_
+If Is_numeric(d3GrpAppyMgnrt.Data) = True Then
+	Dim tmp
+	tmp = FormatNumber((d3GrpAppyMgnrt.Data), 2, 0, 0, 0)
+	tmp = CDbl(tmp) * 100
+	viewD3GrpAppyMgnrt.Data = FormatNumber(tmp, 0, 0, 0, 0) & "%"
+
+	If SCREEN.GetMapName(1) = "IB840200" Then
+		If SCREEN.Object("main.UTAB1").ID = "0" Then
+			If tmp = 100 Then
+				If UCase(TypeName( SCREEN.Object("main.obj1.obj0.invest_info1") )) <> "NOTHING" Then
+					SCREEN.Object("main.obj1.obj0.invest_info1").Visible = False
+					SCREEN.Object("main.obj1.obj0.invest_info2").Visible = False
+					SCREEN.Object("main.obj1.obj0.invest_info3").Visible = False
+					SCREEN.Object("main.obj1.obj0.invest_info4").Visible = False
+					SCREEN.Object("main.obj1.obj0.invest_info5").Visible = False
+					SCREEN.Object("main.obj1.obj0.tjsmChk4").Visible = False
+					SCREEN.Object("main.obj1.obj0.tjsmChk4").Checked = True
+				End If
+			Else
+				If UCase(TypeName( SCREEN.Object("main.obj1.obj0.invest_info1") )) <> "NOTHING" Then
+					SCREEN.Object("main.obj1.obj0.invest_info1").Visible = True
+					SCREEN.Object("main.obj1.obj0.invest_info2").Visible = True
+					SCREEN.Object("main.obj1.obj0.invest_info3").Visible = True
+					SCREEN.Object("main.obj1.obj0.invest_info4").Visible = True
+					SCREEN.Object("main.obj1.obj0.invest_info5").Visible = True
+					SCREEN.Object("main.obj1.obj0.tjsmChk4").Visible = True
+					SCREEN.Object("main.obj1.obj0.tjsmChk4").Checked = False
+				End If
+			End If
+	
+			SCREEN.Object("main.obj1.obj0.viewD3GrpAppyMgnrt").Data = viewD3GrpAppyMgnrt.Data
+		End If
+	End If
+End If
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(zAppySrtDt)
+_AW_ONCHANGE_AW_
+SCREEN.CreateObject("Info")
+INFO.pushData LOGIN.Name, "userconf.ini", SCREEN.GetMapName(1), "CB_IB840220", zAppySrtDt.Data
+_AW_ONENDSUB_AW_
+_AW_ONKEYCHANGE_AW_
+If SCREEN.key = 13 Then
+	Call send_f()
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(send_btn)
+_AW_ONCLICK_AW_
+Call send_f()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(d3GrpAppyMgnrt)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(lAppyMgn)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(zlAppyQty)
+_AW_ONKEYCHANGE_AW_
+'If SCREEN.key = "13" Then
+'   Call send_f()
+'   SYSTEM.Trace "=====   Call send_f()   ====="
+'End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(GRID0)
+_AW_ONCLICK_AW_
+If GRID0.Rows < 1 Then
+	Exit Sub
+End If
+
+If SCREEN.GetMapName(1) = "IB840200" Then
+	If GRID0.HitPos = 3 Then
+		If SCREEN.Object("main.UTAB1").Index = 0 Then
+			SCREEN.Object("main.obj1.lAppyQty").Data = Trim(GRID0.GetGridCell(GRID0.row, 1))
+			SCREEN.Object("main.obj1.lAppyAmt").Data = Trim(GRID0.GetGridCell(GRID0.row, 2))
+		End If
+	End If
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(GRID1)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(lAppyQty)
+_AW_ONKEYCHANGE_AW_
+If SCREEN.key = "13" Then
+   'Call getAppyQty()
+   Call send_f()
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(zIsuNm)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(dFltnPrc)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(viewD3GrpAppyMgnrt)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(l3GrpAppyLmtQty)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(next_btn)
+_AW_ONCLICK_AW_
+Call send_c()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(newHando)
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

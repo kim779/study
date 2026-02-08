@@ -1,0 +1,488 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB202400)
+MAPSIZE(514, 809)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("종목별외국인/기관")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(FMS|FLASH)
+TITLE("[2024] 종목별 외국인/기관 매매동향")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pooppoop")
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL63(-2, 28, 811, 408)  LIMAGE(0)  LINEW(4)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL1(0, 0, 810, 29)        COLOR(64, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL2(1, 0, 808, 26)        COLOR(66, 69)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  TEXT(726, 3, 766, 23)  '데이터'  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(68, 69)  CUR(0)    "3BTN.BMP"    TABORDER(10)  ENABLE  &
+  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+BUTTON  CHART(726, 3, 766, 23)  '차트'  TP_PUSH|IMAGETEXT|AL_STRETCH        FOCUS  COLOR(68, 186)  CUR(0)    "3BTN.BMP"    TABORDER(9)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+BUTTON  BTTN(90, 3, 109, 23)  TP_PUSH|IMAGE|AL_STRETCH      COLOR(45, 0)  CUR(0)    "검색.BMP"    TABORDER(2)  ENABLE  &
+  VISIBLE  IMAGE  HOVER  HINTTYPE(IH_NONE)
+EDIT  12901_D(484, 3, 570, 23)  LEN(8)  IO_NUM|EDIT_INPUT|FA_SKIP|FA_DATE    COLOR(68, 130)  CUR(0)  TP_SUNKEN  INIT("00000000")          EDITFORMAT("9999/99/99")  TABORDER(6)  IOORDER(5)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+GROUP  GP2(880, 161, 936, 181)  'Group'        COLOR(-1, 0)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  SBTN(767, 3, 804, 23)  '조회'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, BOLD)  FOCUS  COLOR(68, 186)  CUR(0)    "조회BTN.BMP"    TABORDER(11)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+LABEL  LABEL0(379, 3, 434, 23)  '(주,천원)'  AL_LEFT  CUR(0)      COLOR(68, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+OBJECT  OBJ(5, 36, 803, 400)    "IB202410"  TABORDER(12)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+COMBO  KFGB(434, 3, 482, 23)  TP_SUNKEN  LEN(1)  COUNT(2)  VCOUNT(2)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_NUM|EDIT_INPUT|FA_SKIP    COLOR(68, 130)  CUR(0)  DISPLAY("기관", "외인")  DATA("1", "2")    TABORDER(5)  IOORDER(6)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  GUBN(865, 31, 907, 50)  LEN(1)  IO_ALPHA|EDIT_INPUT|FA_WRAP|FA_SKIP|FA_PASS    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("1")          TABORDER(13)  IOORDER(4)  &
+  HINTTYPE(IH_NONE)
+LABEL  CHK(881, 201, 916, 214)  'Label'  AL_LEFT  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(4, 0)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  BUTTON2(671, 3, 725, 23)  '참고사항'  TP_PUSH|IMAGETEXT|AL_STRETCH        FOCUS  COLOR(208, 186)  CUR(0)    "4BTN.BMP"    TABORDER(8)  ENABLE  &
+  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+CONTROL  17413(148, 3, 262, 23)    "CX_Symbol"  "/a89/b91/c92/d69"  LEN(0)  EDIT_OUTPUT  FONT("굴림체", 9, NORMAL)    COLOR(90, 130)  TABORDER(0)  IOORDER(7)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  hnam(895, 302, 930, 315)  AL_LEFT  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(4, 0)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  12901_E(583, 3, 669, 23)  LEN(8)  IO_NUM|EDIT_INPUT|FA_SKIP|FA_DATE    COLOR(68, 130)  CUR(0)  TP_SUNKEN  INIT("00000000")          EDITFORMAT("9999/99/99")  TABORDER(7)  IOORDER(8)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL1(570, 3, 580, 23)  '~'  AL_CENTER  CUR(0)      COLOR(66, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+COMBO  cb_DataTp1(267, 3, 320, 22)  TP_SUNKEN  LEN(1)  COUNT(2)  VCOUNT(2)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_NUM|EDIT_INPUT|FA_SKIP    COLOR(68, 130)  CUR(0)  DISPLAY("수량", "대금")  DATA("1", "2")    TABORDER(3)  IOORDER(9)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+COMBO  cb_DataTp2(322, 3, 375, 22)  TP_SUNKEN  LEN(1)  COUNT(2)  VCOUNT(2)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_NUM|EDIT_INPUT|FA_SKIP    COLOR(68, 130)  CUR(0)  DISPLAY("일별", "누적")  DATA("1", "2")    TABORDER(4)  IOORDER(10)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  GUBN2(865, 55, 907, 74)  LEN(1)  IO_ALPHA|EDIT_INPUT|FA_WRAP|FA_SKIP|FA_PASS    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("1")          TABORDER(14)  IOORDER(11)  &
+  HINTTYPE(IH_NONE)
+CONTROL  ctl_Category(109, 3, 147, 23)    "CX_Category"  "/k0/i돌려보기.BMP/t/r1301"  LEN(0)  EDIT_NOP    COLOR(68, 130)  TABORDER(0)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+CONTROL  1301(25, 3, 90, 23)  |FA_PROTECT  "CX_CODECTRL"  "/u0/k검색.BMP/lAXCOMBO.BMP/p/s0/o"  LEN(6)  EDIT_INOUT    COLOR(192, 130)  TABORDER(1)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL0(0, 408, 810, 514)  LIMAGE(0)  LINEW(4)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL3(8, 416, 802, 506)  LINECOLOR(65)      COLOR(96, 69)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL2(25, 442, 705, 462)  '위 자료는 장중에는 추정치로 제공되며, 장종료 후 증권거래소 및 코스닥시장에서 확정치를 수신하여 제공합니다.'  AL_LEFT  CUR(0)      COLOR(208, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL3(25, 462, 785, 482)  '장전(후)매매분, 장외거래는 제외된 자료이므로, 좀더 자세한 외국인 매매내역을 위해서는 [2403]종목별 외국인 거래동향 화면을'  AL_LEFT  CUR(0)      COLOR(208, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL4(25, 482, 576, 502)  '참고하시기 바랍니다.'  AL_LEFT  CUR(0)      COLOR(208, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  BUTTON0(14, 422, 71, 441)  TP_PUSH|IMAGE|AL_STRETCH      COLOR(208, 232)  CUR(0)    "참고사항.BMP"    TABORDER(15)  &
+  VISIBLE  IMAGE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON1(14, 447, 21, 454)  TP_PUSH|IMAGE|AL_CENTER      FOCUS  COLOR(208, 232)  CUR(0)    "텍스트화살표_하단.BMP"    TABORDER(16)  ENABLE  &
+  VISIBLE  IMAGE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON3(532, 462, 707, 482)  '[2403]종목별 외국인 거래동향'  TP_PUSH|IMAGETEXT|AL_STRETCH        FOCUS  COLOR(208, 186)  CUR(0)    "16BTN.BMP"    TABORDER(17)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+BUTTON  BUTTON4(14, 466, 21, 473)  TP_PUSH|IMAGE|AL_CENTER      FOCUS  COLOR(208, 232)  CUR(0)    "텍스트화살표_하단.BMP"    TABORDER(18)  ENABLE  &
+  VISIBLE  IMAGE  HINTTYPE(IH_NONE)
+OUT  1021(885, 340, 963, 358)  LEN(16)  IO_NUM|AL_CENTER||FA_FLASH    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+CONTROL  cxMarket(4, 3, 24, 23)  |FA_SKIP  "CX_MarketPicker"  "/k2/tIB202400/u1/d1"  LEN(12)  EDIT_NOP    COLOR(192, 232)  TABORDER(0)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  1777(865, 80, 907, 99)  LEN(1)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_PASS    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("1")          TABORDER(19)  IOORDER(12)  &
+  HINTTYPE(IH_NONE)
+EDIT  edMarketTrigger(650, 150, 682, 170)  LEN(6)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(20)  IOORDER(13)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Dim dat
+Dim dat2
+Dim g_First
+
+'dat = change_date ("d" , -1 )
+'dat2 = week_check( dat)
+'S12901_D.Data = dat2
+
+Const myFILE = "userconf.ini"
+Const myMAP = "IB202400"
+
+g_First = True
+
+Sub p_read_ini()
+If SCREEN.CreateObject("Info") Then
+ 	CHK.TEXT = Trim(INFO.PopData(LOGIN.Name, myFILE, myMAP, "G_CHCK"))
+	If CHK.TEXT = "그래프" Then
+		OBJ.SetObject "IB202420"
+		TEXT.Visible = True
+		CHART.Visible = False
+		KFGB.Visible = True
+		CHK.TEXT = CHART.TEXT
+	ElseIf CHK.TEXT = "텍스트" Then
+		OBJ.SetObject "IB202410"
+		TEXT.Visible = False
+		CHART.Visible = True
+		KFGB.Visible = False
+		CHK.TEXT = TEXT.TEXT
+	Else
+		OBJ.SetObject "IB202420"
+		TEXT.Visible = True
+		CHART.Visible = False
+		KFGB.Visible = True
+		CHK.TEXT = CHART.TEXT
+	End If
+	SCREEN.Object("obj.gubn").data = GUBN.Data
+	cxMarket.sCode = Trim(S1301.Data)
+	OBJ.Send
+End If
+End Sub
+'-------------------------------------------------------------------
+Sub p_write_ini()
+If SCREEN.CreateObject("Info") Then
+  INFO.PushData LOGIN.Name, myFILE, myMAP, "G_CHCK", CHK.TEXT
+End If
+End Sub
+
+Sub SetFirstData()
+	AYear = Year(DateAdd("m", -1, Date))
+	AMon = Month(DateAdd("m", -1, Date))
+	If Len(AMon) = 1 Then
+		AMon = "0" & AMon
+	End If
+	ADay = Day(DateAdd("m", -1, Date))
+	If Len(ADay) = 1 Then
+		ADay = "0" & ADay
+	End If
+
+	S12901_D.Data = AYear & AMon & ADay
+End Sub
+'-------------------------------------------------------------------
+Sub SetStartDate()
+	If cb_DataTp2.Data = 1 Then
+		If CHART.Visible = True Then
+			S12901_D.Enable = False
+		Else
+			S12901_D.Enable = True
+		End If
+	Else
+		S12901_D.Enable = True
+	End If
+End Sub
+
+Sub Change_MKGubn_Main(sMKGubn)
+
+SYSTEM.Trace "[IB202400]Change_MKGubn_Main sMKGubn = " & sMKGubn
+	cxMarket.sMarket = sMKGubn
+	cxMarket.sCode = Trim(S1301.Data)
+	SCREEN.Send 0
+End Sub
+
+Sub Send_Screen()
+	cxMarket.sCode = Trim(S1301.Data)
+	SCREEN.Send 0
+	OBJ.Send
+End Sub
+
+Sub Send_obj()
+	cxMarket.sCode = Trim(S1301.Data)
+	OBJ.Send
+End Sub
+
+_AW_ONINDECLARE_AW_
+#load IB888888
+
+_AW_ONENDSUB_AW_
+_AW_ONSTART_AW_
+' 현재 화면의 시장식별자(cxMarket)에 고유 화면번호 부여
+cxMarket.Major = SCREEN.Major
+
+SetStartDate
+'p_read_ini()
+
+'OBJ.Send
+SBTN.SetFocus
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+If g_First Then
+	SetFirstData
+	g_First = False
+End If
+
+If UCase(TypeName( SCREEN.Object("cxMarket"))) <> "NOTHING" Then
+	If SCREEN.Object("cxMarket").sMarket = "KRX" Then
+		S1777.Data = "1"
+	ElseIf SCREEN.Object("cxMarket").sMarket = "NXT" Then
+		S1777.Data = "2"
+	ElseIf SCREEN.Object("cxMarket").sMarket = "통합" Then
+		S1777.Data = "3"
+	End If
+End If
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+'S1301.SetFocus
+
+_AW_ONENDSUB_AW_
+_AW_ONCLOSE_AW_
+p_write_ini()
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(TEXT)
+_AW_ONCLICK_AW_
+OBJ.SetObject "IB202410"
+TEXT.Visible = False
+CHART.Visible = True
+KFGB.Visible = False
+CHK.TEXT = TEXT.TEXT
+
+SCREEN.Object("obj.gubn").data = GUBN.Data
+
+OBJ.Send
+
+If GUBN.Data = "1" Then
+	'SCREEN.Object("OBJ.GRID").SetHead 6, "기관|매도수량"
+	'SCREEN.Object("OBJ.GRID").SetHead 7, "기관|매수수량"
+	'SCREEN.Object("OBJ.GRID").SetHead 8, "기관|순매수수량"
+	'SCREEN.Object("OBJ.GRID").SetHead 9, "외국인(장내거래)|매도수량"
+	'SCREEN.Object("OBJ.GRID").SetHead 10, "외국인(장내거래)|매수수량"
+	'SCREEN.Object("OBJ.GRID").SetHead 11, "외국인(장내거래)|순매수수량"
+Else
+	'SCREEN.Object("OBJ.GRID").SetHead 6, "기관|매도금액"
+	'SCREEN.Object("OBJ.GRID").SetHead 7, "기관|매수금액"
+	'SCREEN.Object("OBJ.GRID").SetHead 8, "기관|순매수금액"
+	'SCREEN.Object("OBJ.GRID").SetHead 9, "외국인(장내거래)|매도금액"
+	'SCREEN.Object("OBJ.GRID").SetHead 10, "외국인(장내거래)|매수금액"
+	'SCREEN.Object("OBJ.GRID").SetHead 11, "외국인(장내거래)|순매수금액"
+End If
+SetStartDate
+CHART.SetFocus
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(CHART)
+_AW_ONCLICK_AW_
+OBJ.SetObject "IB202420"
+TEXT.Visible = True
+CHART.Visible = False
+KFGB.Visible = True
+CHK.TEXT = CHART.TEXT
+SCREEN.Object("obj.gubn").data = GUBN.Data
+
+Send_obj()
+
+If GUBN.Data = "1" Then
+	'SCREEN.Object("OBJ.GRID").SetHead 6, "기관|매도수량"
+	'SCREEN.Object("OBJ.GRID").SetHead 7, "기관|매수수량"
+	'SCREEN.Object("OBJ.GRID").SetHead 8, "기관|순매수수량"
+	'SCREEN.Object("OBJ.GRID").SetHead 9, "외국인(장내거래)|매도수량"
+	'SCREEN.Object("OBJ.GRID").SetHead 10, "외국인(장내거래)|매수수량"
+	'SCREEN.Object("OBJ.GRID").SetHead 11, "외국인(장내거래)|순매수수량"
+Else
+	'SCREEN.Object("OBJ.GRID").SetHead 6, "기관|매도금액"
+	'SCREEN.Object("OBJ.GRID").SetHead 7, "기관|매수금액"
+	'SCREEN.Object("OBJ.GRID").SetHead 8, "기관|순매수금액"
+	'SCREEN.Object("OBJ.GRID").SetHead 9, "외국인(장내거래)|매도금액"
+	'SCREEN.Object("OBJ.GRID").SetHead 10, "외국인(장내거래)|매수금액"
+	'SCREEN.Object("OBJ.GRID").SetHead 11, "외국인(장내거래)|순매수금액"
+End If
+SetStartDate
+TEXT.SetFocus
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BTTN)
+_AW_ONCLICK_AW_
+Dim retn
+retn = SCREEN.GetCode (100, "1301", "hnam", 0)
+If retn <> True Then
+	Exit Sub
+End If
+
+cxMarket.sCode = Trim(S1301.Data)
+SCREEN.Send 0
+If (hnam.TEXT <> "") Then
+	S1301.Trigger "", True
+	Send_obj()
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(12901_D)
+_AW_ONCHANGE_AW_
+'SCREEN.Object("OBJ.12901").data = S12901_D.Data
+Send_obj()
+
+
+S12901_D.SetFocus
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(SBTN)
+_AW_ONCLICK_AW_
+Send_obj()
+S1301.SetFocus
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(KFGB)
+_AW_ONCHANGE_AW_
+Send_obj()
+KFGB.SetFocus
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON2)
+_AW_ONCLICK_AW_
+SCREEN.CreateWindow 2, "IB202401 /s/p5", ""
+BUTTON2.SetFocus
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(12901_E)
+_AW_ONCHANGE_AW_
+'SCREEN.Object("OBJ.12901").data = S12901_D.Data
+Send_obj()
+
+
+S12901_E.SetFocus
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(cb_DataTp1)
+_AW_ONCHANGE_AW_
+GUBN.Data = cb_DataTp1.Data
+
+SCREEN.Object("OBJ.GUBN").Data = GUBN.Data
+'SCREEN.Object("OBJ.GRID").SetHead 6, "기관|매도수량"
+'SCREEN.Object("OBJ.GRID").SetHead 7, "기관|매수수량"
+'SCREEN.Object("OBJ.GRID").SetHead 8, "기관|순매수수량"
+'SCREEN.Object("OBJ.GRID").SetHead 9, "외국인(장내거래)|매도수량"
+'SCREEN.Object("OBJ.GRID").SetHead 10, "외국인(장내거래)|매수수량"
+'SCREEN.Object("OBJ.GRID").SetHead 11, "외국인(장내거래)|순매수수량"
+Send_obj()
+
+cb_DataTp1.SetFocus
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(cb_DataTp2)
+_AW_ONCHANGE_AW_
+GUBN2.Data = cb_DataTp2.Data
+SetStartDate
+
+SCREEN.Object("OBJ.GUBN2").Data = GUBN2.Data
+'SCREEN.Object("OBJ.GRID").SetHead 6, "기관|매도수량"
+'SCREEN.Object("OBJ.GRID").SetHead 7, "기관|매수수량"
+'SCREEN.Object("OBJ.GRID").SetHead 8, "기관|순매수수량"
+'SCREEN.Object("OBJ.GRID").SetHead 9, "외국인(장내거래)|매도수량"
+'SCREEN.Object("OBJ.GRID").SetHead 10, "외국인(장내거래)|매수수량"
+'SCREEN.Object("OBJ.GRID").SetHead 11, "외국인(장내거래)|순매수수량"
+Send_obj()
+
+cb_DataTp2.SetFocus
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(ctl_Category)
+_AW_ONCLICK_AW_
+Dim codx
+codx = ctl_Category.GetPreCode(S1301.Data)
+If Trim(codx) = "" Then
+	Exit Sub
+End If
+S1301.Data = codx
+S1301.Trigger "",True
+Send_Screen()
+_AW_ONENDSUB_AW_
+_AW_ONDBLCLK_AW_
+Dim codx
+codx = ctl_Category.GetNextCode(S1301.Data)
+If Trim(codx) = "" Then
+	Exit Sub
+End If
+S1301.Data = codx
+S1301.Trigger "",True
+
+SCREEN.Send 0
+OBJ.Send
+_AW_ONENDSUB_AW_
+_AW_ONCHANGE_AW_
+S1301.Data = ctl_Category.GetCurCode
+S1301.Trigger "",True
+
+SCREEN.Send 0
+OBJ.Send
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(1301)
+_AW_ONCHANGE_AW_
+'Dim name
+'name = SCREEN.GetName(100, S1301.data, 0)
+'If (name <> "") Then
+'	hnam.TEXT = name
+'	S1301.Trigger "", True
+'	OBJ.Send
+'	SCREEN.Send 2
+'	S1301.SetFocus
+'End If
+
+If Trim(S1301.Data) = "000000" Then
+	Exit Sub
+End If
+S1301.Trigger "",True
+Send_Screen()
+
+'S1301.SetFocus
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON3)
+_AW_ONCLICK_AW_
+SCREEN.CreateWindow 1, "IB240300 /t /s /p5", ""
+'SCREEN.CloseWindow
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(cxMarket)
+_AW_ONCLICK_AW_
+Send_Screen()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(edMarketTrigger)
+_AW_ONCHANGE_AW_
+Change_MKGubn_Main(Trim(edMarketTrigger.Data))
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

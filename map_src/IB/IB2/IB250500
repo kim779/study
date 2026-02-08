@@ -1,0 +1,218 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB250500)
+MAPSIZE(429, 828)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("시간외단일가_일별")
+MAPPUBLIC(";")
+FONT("굴림", 9, NORMAL)
+OPTIONS(FLASH|CR2TAB)
+TITLE("[2505]CFD거래현황")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  SYMBOL9(0, 0, 835, 30)        COLOR(66, 69)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL10(0, 27, 830, 430)  LIMAGE(0)  LINEW(4)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  SYMBOL7(225, 3, 265, 23)  '기준일'  AL_CENTER  CUR(0)      COLOR(68, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  SYMBOL12(5, 3, 33, 23)  '종목'  AL_CENTER  CUR(0)      COLOR(68, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  1302(270, 3, 365, 23)  LEN(8)  IO_NUM|EDIT_INPUT|FA_SKIP|FA_DATE    COLOR(68, 130)  CUR(0)  TP_SUNKEN          EDITFORMAT("9999/99/99")  TABORDER(1)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON2(103, 3, 122, 23)  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(15, 63)  CUR(0)    "검색.bmp"    TABORDER(2)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+CONTROL  1301(38, 3, 103, 23)  |FA_PROTECT|FA_SKIP  "CX_CODECTRL"  "/u0/k검색.BMP/lAXCOMBO.BMP/p/s0/o"  LEN(6)  EDIT_INPUT    COLOR(192, 130)  TABORDER(7)  IOORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  OBJ_hnam(120, 2, 225, 22)    "IB999919"  TABORDER(3)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  RADIO0(495, 3, 560, 23)  '수량(주)'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(grp1)      COLOR(192, 232)  CUR(0)      TABORDER(4)  ENABLE  &
+  VISIBLE  CHECKED  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  RADIO1(565, 3, 640, 23)  '금액(만원)'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(grp1)      COLOR(192, 232)  CUR(0)      TABORDER(5)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+COMBO  COMBO0(385, 3, 480, 22)  TP_NONE  LEN(1)  COUNT(2)  VCOUNT(2)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_NUM|EDIT_INOUT|FA_SKIP    COLOR(192, 232)  CUR(0)  DISPLAY("거래금액", "잔고내역")  DATA("1", "2")    TABORDER(6)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+GROUP  grp1(46, 618, 166, 668)  'Group'        COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  OBJECT0(8, 35, 823, 417)    "IB250510"  TABORDER(8)  IOORDER(5)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  edMarketTrigger(885, 40, 917, 60)  LEN(6)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(9)  IOORDER(6)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Dim cod2input
+Dim dateinput
+
+Sub Set_map()
+
+    If COMBO0.Data = 1 And RADIO0.Checked = True Then
+       SYSTEM.Trace "step1"
+       OBJECT0.SetObject "IB250511"
+    ElseIf COMBO0.Data = 1 And RADIO1.Checked = True Then
+       SYSTEM.Trace "step2"
+       OBJECT0.SetObject "IB250512"
+    ElseIf COMBO0.Data = 2 Then
+       SYSTEM.Trace "step3"
+       OBJECT0.SetObject "IB250513"
+    Else
+       SYSTEM.Trace "step4"
+       OBJECT0.SetObject "IB250510"
+    End If
+End Sub
+
+Sub Go_map()
+
+	SCREEN.Object("OBJECT0.cod2input").Data = cod2input
+	SCREEN.Object("OBJECT0.dateinput").Data = dateinput
+	SCREEN.Object("OBJECT0.GRID0").Clear              '데이터 그리드 클리어
+	SCREEN.Object("OBJECT0.GRID0").SetDataPosition(2) '데이터 연속조회용
+	OBJECT0.Send
+
+End Sub
+
+_AW_ONSTART_AW_
+SYSTEM.Trace "start"
+
+OBJ_hnam.Send
+
+cod2input = SCREEN.Object("1301").Data
+dateinput = SCREEN.Object("1302").Data
+
+
+If Len(Trim(cod2input)) <> 6 Then
+	Exit Sub
+End If
+
+Set_map()
+Go_map()
+
+SYSTEM.Trace "end"
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+cod2input = SCREEN.Object("1301").Data
+dateinput = SCREEN.Object("1302").Data
+
+If Len(Trim(cod2input.Data)) <> 6 Then
+	SCREEN.OnSend False
+End If
+
+Set_map()
+Go_map()
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(1302)
+_AW_ONCHANGE_AW_
+OBJ_hnam.Send
+cod2input = SCREEN.Object("1301").Data
+dateinput = SCREEN.Object("1302").Data
+
+
+If Len(Trim(cod2input)) <> 6 Then
+	Exit Sub
+End If
+
+Set_map()
+Go_map()
+
+SCREEN.Object("OBJECT0.cod2input").Data = cod2input
+SCREEN.Object("OBJECT0.dateinput").Data = dateinput
+OBJECT0.Send
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON2)
+_AW_ONCLICK_AW_
+Dim retn
+retn = SCREEN.GetCode(100, "1301", "1022", 0 )
+OBJ_hnam.Send
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(1301)
+_AW_ONCHANGE_AW_
+OBJ_hnam.Send
+cod2input = SCREEN.Object("1301").Data
+dateinput= SCREEN.Object("1302").Data
+
+If Len(Trim(cod2input)) <> 6 Then
+	Exit Sub
+End If
+
+Set_map()
+Go_map()
+
+SCREEN.Object("OBJECT0.cod2input").Data = cod2input
+SCREEN.Object("OBJECT0.dateinput").Data = dateinput
+OBJECT0.Send
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(RADIO0)
+_AW_ONCLICK_AW_
+Set_map()
+Go_map()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(RADIO1)
+_AW_ONCLICK_AW_
+Set_map()
+Go_map()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(COMBO0)
+_AW_ONCHANGE_AW_
+SYSTEM.Trace COMBO0.Data
+
+If COMBO0.Data = 1 Then
+   RADIO0.Visible = True
+   RADIO1.Visible = True
+Else
+   RADIO0.Visible = False
+   RADIO1.Visible = False
+End If
+
+
+Set_map()
+Go_map()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(edMarketTrigger)
+_AW_ONCHANGE_AW_
+Change_MKGubn_Main(Trim(edMarketTrigger.Data))
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

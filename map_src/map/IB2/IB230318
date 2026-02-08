@@ -1,0 +1,122 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB230318)
+MAPSIZE(148, 150)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("일별차트_입체분석")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(FLASH|XFONT)
+TITLE("[230318] 일자별차트")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("bg230316")
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+EDIT  1301(178, 252, 264, 276)  LEN(6)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(1)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  trcd(181, 281, 263, 304)  LEN(3)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(2)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+CONTROL  CONTROL0(1, 18, 150, 148)  |FA_PROTECT|FA_FLASH  "C_UserGrp"  "/i40000006000060010100000000000000000030000000000910003355468710000000"  LEN(0)  EDIT_INOUT    COLOR(192, 232)  TABORDER(3)  IOORDER(7)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  tvol(185, 399, 335, 417)  LEN(9)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSIGN    COLOR(74, 69)  CUR(0)  LINECOLOR(75)          IFRGB(94, 95)  TABORDER(0)  IOORDER(6)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  tnam(181, 335, 263, 353)  LEN(16)  IO_NUM|AL_CENTER||FA_WRAP    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(5)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BOX  BOX0(0, 17, 150, 147)    COLOR(75, 75)  LINEW(1)  BX_LINE    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  knd(305, 309, 335, 332)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("0")          TABORDER(4)  IOORDER(3)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  OUTPUT0(0, 0, 150, 18)  LEN(15)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_SKIP|FA_CORGB|SA_SPACE|SA_COSIGN    COLOR(90, 69)  CUR(0)  LINECOLOR(75)          IFRGB(94, 95)  TABORDER(0)  IOORDER(8)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  check(270, 225, 300, 246)  LEN(1)  IO_MIXED|AL_CENTER|    COLOR(192, 23)  CUR(0)            TABORDER(0)  IOORDER(4)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+'Sub Query_Chart()
+'	ctl0.ClearAllData
+'	ctl0.Setchartperiod 0, 2
+'	ctl0.SetUserIndexPeriod 0, 1
+'	ctl0.SetInputValue 0,0, "codx", S1301.Data
+'	ctl0.SetInputValue 0,0, "trgd", trcd.Data
+'	ctl0.RequestData 0,0
+'End Sub
+
+_AW_ONINDECLARE_AW_
+#Load IB888888
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+S1301.Data = SCREEN.Object("main.1301").Data
+trcd.Data = SCREEN.Object("parent.trcd").Data
+CONTROL0.Clear
+If Trim(trcd.Data) = "0" Then
+	SCREEN.OnSend False
+	Exit Sub
+End If
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+SCREEN.Object("parent.tnam").Data = Trim(tnam.Data)
+
+If check.Data = "F" Then
+	CONTROL0.Clear
+End If
+
+Dim fogb
+If Trim(tnam.Data) = "" Then
+	Exit Sub
+End If
+
+fogb = Mid(tnam.Data, 2, 1)
+
+SCREEN.Proc "main.set_color", ""
+
+'테두리 및 외국계증권사명 색지정
+'If Trim(tvol.Data) = "" Then
+'	SCREEN.Object("parent.BOX0").PRgb = 64
+'ElseIf fn_nvl(tvol.Data) < 0 Then
+'	SCREEN.Object("parent.BOX0").PRgb = 95
+'	If fogb = "+" Then
+'		SCREEN.Object("parent.tnam").Trgb = 95
+'	End If
+'ElseIf fn_nvl(tvol.Data) > 0 Then
+'	SCREEN.Object("parent.BOX0").PRgb = 94
+'	If fogb = "+" Then
+'		SCREEN.Object("parent.tnam").Trgb = 94
+'	End If
+'End If
+
+
+SCREEN.Proc "main.OBJ.eachsend1","1"
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(tvol)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(OUTPUT0)
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

@@ -1,0 +1,287 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB213302)
+MAPSIZE(400, 500)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("시장지도 업종내종목")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+TITLE("[213302]업종내종목 ")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pibo2911")
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+GRID  StockGrid(0, 0, 500, 400)  VISIBLEROW(18)  CELLH(20)  MATRIX(100, 12)  FIX(12)  MAINCOLOR(7, 0)  LINECOLOR(75)  FOCUSCOLOR(78)  FOCUSKIND(3)    FONT("굴림체", 9, NORMAL)  ROWC(68, 77)  |SELALWAYS|FLEXIBLE|VSCROLL|HSCROLL|NO3D|RROW|XHLINE|PAGE|KEYFOCUS|GRFTEXT    &
+	COLINFO("col1")  LEN(3)  WIDTH(65)  HEAD("업종코드")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("col2")  LEN(12)  WIDTH(80)  HEAD("종목코드")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT  |FA_FLASH    COLOR(68, 69)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("col3")  LEN(40)  WIDTH(120)  HEAD("종목명")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_REF)  COLHELPTEXT("1301")  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT  |FA_REF|FA_DRAG    COLOR(68, 69)  COLCUR(0, 0)  REFERENCE(1301)    COLUMN_VISIBLE  COLUMN_SORT  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("col4")  LEN(7)  WIDTH(70)  HEAD("현재가")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSUP    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  COLUMN_SORT  INORMAL  IFRGB(94, 95)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("col5")  LEN(7)  WIDTH(66)  HEAD("대비")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|FA_CONTRAST|SA_SPACE|SA_CORAW|SA_TEXT    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  COLUMN_SORT  INORMAL  IFRGB(94, 95)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("col6")  LEN(7)  WIDTH(50)  HEAD("등락률")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSIGN    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  COLUMN_SORT  INORMAL  IFRGB(94, 95)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("col7")  LEN(12)  WIDTH(90)  HEAD("거래량")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|SA_SPACE    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_SORT  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col0")  LEN(12)  WIDTH(90)  HEAD("시가총액(억)")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_SKIP    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  COLUMN_SORT  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col8")  LEN(12)  WIDTH(90)  HEAD("거래대금")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_SKIP    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_SORT  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col9")  LEN(12)  WIDTH(90)  HEAD("비중")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_SKIP|SA_SPACE    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  COLUMN_SORT  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col10")  LEN(20)  WIDTH(90)  HEAD("외국인")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_SKIP|FA_CORGB|SA_CORAW    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_SORT  INORMAL  IFRGB(209, 214)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col11")  LEN(20)  WIDTH(90)  HEAD("기관계")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_SKIP|FA_CORGB|SA_CORAW    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_SORT  INORMAL  IFRGB(209, 214)    HNORMAL  SORTSTARTPOS(0)    TABORDER(1)  IOORDER(2)  ENABLE  &
+  VISIBLE
+
+EDIT  edUpcode(570, 5, 645, 25)  LEN(3)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("20")          TABORDER(2)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Option Explicit
+Dim fsFlag 	'처음실행 플래그
+Dim mGubn   '0 시가총액 1 거래량 2 거래대금 3 외국인 순매수량 4 외국인순매수대금
+
+'--------------------------------------------------------------------------------------------------------------
+Sub send_f()
+	edUpcode.Data = SCREEN.Object("parent.edUpcode").data
+	StockGrid.Clear
+	SCREEN.Send 0
+End Sub
+
+
+'--------------------------------------------------------------------------------------------------------------
+Sub SetGridColumn()
+	mGubn = SCREEN.Object("parent.edgubn").data
+
+	If mGubn = "0" Then   '시가총액
+		StockGrid.SetColumnVisible 7, False
+		StockGrid.SetColumnVisible 8, True
+		StockGrid.SetColumnVisible 9, False
+		StockGrid.SetColumnVisible 10, True
+		StockGrid.SetColumnVisible 11, False
+		StockGrid.SetColumnVisible 12, False
+
+	ElseIf mGubn = "1" Then '거래량
+		StockGrid.SetColumnVisible 7, True
+		StockGrid.SetColumnVisible 8, False
+		StockGrid.SetColumnVisible 9, False
+		StockGrid.SetColumnVisible 10, True
+		StockGrid.SetColumnVisible 11, False
+		StockGrid.SetColumnVisible 12, False
+
+	ElseIf mGubn = "2" Then '거래대금
+		StockGrid.SetColumnVisible 7, False
+		StockGrid.SetColumnVisible 8, False
+		StockGrid.SetColumnVisible 9, True
+		StockGrid.SetColumnVisible 10, True
+		StockGrid.SetColumnVisible 11, False
+		StockGrid.SetColumnVisible 12, False
+
+	ElseIf mGubn = "3" Or mGubn = "4" Then '외국인 기관계 순매수량 , 순매수대금
+		StockGrid.SetColumnVisible 7, False
+		StockGrid.SetColumnVisible 8, False
+		StockGrid.SetColumnVisible 9, False
+		StockGrid.SetColumnVisible 10, False
+		StockGrid.SetColumnVisible 11, True
+		StockGrid.SetColumnVisible 12, True
+	End If
+
+End Sub
+
+
+'--------------------------------------------------------------------------------------------------------------
+'pibo2911 업종에 따른 종목조회 후 호출됨, 모화면의 콤보변경시 호출
+Sub GetColumnDataFromCtrl()
+	Dim strdata, ii, strtmp
+	strdata = edUpcode.Data & ":"
+
+	mGubn = SCREEN.Object("parent.edgubn").data
+
+	For ii = 1 To StockGrid.Rows
+		If Len(Trim(StockGrid.GetGridText(ii,2))) > 0 Then
+			strtmp = Trim(StockGrid.GetGridText(ii,2))
+			strtmp = Mid(strtmp,2,Len(strtmp) - 1)
+			strdata = strdata & strtmp & ":"
+		End If
+	Next
+
+	If mGubn = "0" Then												'시가총액
+		SCREEN.Proc  "Main.GetSigaArr", strdata & "," &  mGubn
+
+	ElseIf mGubn = "1" Then											'거래량 (현재 거래량은 맵에서 조회해옴)
+		SCREEN.Proc  "Main.GetBijungArr", strdata & "," &  "6"		'거래량 비중 조회해오기
+
+	ElseIf mGubn = "2" Then 										'거래대금
+		SCREEN.Proc  "Main.GetTradeArr", strdata & "," &  mGubn
+
+	ElseIf mGubn = "3" Then
+		SCREEN.Proc  "Main.Getforgi",     strdata & "," &  mGubn       '외국인 기관계 순매수량 조회해오기
+
+	ElseIf mGubn = "4" Then
+		SCREEN.Proc  "Main.Getforgi",     strdata & "," &  mGubn       '외국인 기관계 순매수대금 조회해오기
+
+	End If
+
+End Sub
+
+
+'--------------------------------------------------------------------------------------------------------------
+'모화면에서 외국인 , 기관 데이터 조회 요청후 조회가 완료되면 호출됨
+Sub SetForeGignArr()
+	Dim sArr, sArr2, ii, jj, stmp
+
+	For ii = 1 To SCREEN.Object("parent.Grid0").Rows
+		If Len(Trim(SCREEN.Object("parent.Grid0").GetGridText(ii,1))) > 0 Then
+			For jj = 1 To StockGrid.Rows
+				stmp = Trim(StockGrid.GetGridText(jj,2))
+				If Trim(SCREEN.Object("parent.Grid0").GetGridText(ii,1)) = Mid(stmp,2,Len(stmp) - 1) Then
+					StockGrid.SetGridCell jj, 11, Trim(SCREEN.Object("parent.Grid0").GetGridText(ii,2))
+					StockGrid.SetGridCell jj, 12, Trim(SCREEN.Object("parent.Grid0").GetGridText(ii,3))
+				End If
+			Next
+		End If
+	Next
+
+	SetSort()
+End Sub
+
+
+'--------------------------------------------------------------------------------------------------------------
+'컨트롤에서 해당 시가총액을 구해온뒤 호출함
+'시가총액 적용후 시가총액에 따른 비중값을 다시 컨트롤에 요청
+Sub SetSigaArr()
+	Dim sArr, sArr2, ii, jj, stmp, strdata
+
+	For ii = 1 To SCREEN.Object("parent.Grid0").Rows
+		For jj = 1 To StockGrid.Rows
+			stmp = Trim(StockGrid.GetGridText(jj,2))
+			If Trim(SCREEN.Object("parent.Grid0").GetGridText(ii,1)) = Mid(stmp,2,Len(stmp) - 1) Then
+				StockGrid.SetGridCell jj, 8, Trim(SCREEN.Object("parent.Grid0").GetGridText(ii,2))
+			End If
+		Next
+	Next
+
+
+'시가총액에 따른 비중값 컨트롤에 요청
+	strdata = edUpcode.Data & ":"
+	mGubn = SCREEN.Object("parent.edgubn").data
+
+	For ii = 1 To StockGrid.Rows
+		If Len(Trim(StockGrid.GetGridText(ii,2))) > 0 Then
+			stmp = Trim(StockGrid.GetGridText(ii,2))
+			stmp = Mid(stmp,2,Len(stmp) - 1)
+			strdata = strdata & stmp & ":"
+		End If
+	Next
+
+	SCREEN.Proc  "Main.GetBijungArr", strdata & "," &  "5"      '시가총액 비중 컨트롤에서 조회해오기
+End Sub
+
+
+'--------------------------------------------------------------------------------------------------------------
+'컨트롤에서 해당 거래대금을 구해온뒤 호출함
+'거래대금 적용후 거래대금에 따른 비중값을 다시 컨트롤에 요청
+Sub SetTradeArr()
+	Dim sArr, sArr2, ii, jj, stmp, strdata
+
+	For ii = 1 To SCREEN.Object("parent.Grid0").Rows
+		For jj = 1 To StockGrid.Rows
+			stmp = Trim(StockGrid.GetGridText(jj,2))
+			If Trim(SCREEN.Object("parent.Grid0").GetGridText(ii,1)) = Mid(stmp,2,Len(stmp) - 1) Then
+				StockGrid.SetGridCell jj, 9, Trim(SCREEN.Object("parent.Grid0").GetGridText(ii,2))
+			End If
+		Next
+	Next
+
+
+'거래대금에 따른 비중값 컨트롤에 요청
+	strdata = edUpcode.Data & ":"
+	mGubn = SCREEN.Object("parent.edgubn").data
+
+	For ii = 1 To StockGrid.Rows
+		If Len(Trim(StockGrid.GetGridText(ii,2))) > 0 Then
+			stmp = Trim(StockGrid.GetGridText(ii,2))
+			stmp = Mid(stmp,2,Len(stmp) - 1)
+			strdata = strdata & stmp & ":"
+		End If
+	Next
+
+	SCREEN.Proc  "Main.GetBijungArr", strdata & "," &  "7"      '거래금액 비중 컨트롤에서 조회해오기
+End Sub
+
+
+'--------------------------------------------------------------------------------------------------------------
+'모화면에 비중데이터 조회 요청후 조회가 완료되면 호출됨
+Sub SetBijungArr()
+	Dim sArr, sArr2, ii, jj, stmp
+
+	For ii = 1 To SCREEN.Object("parent.Grid0").Rows
+		If Len(Trim(SCREEN.Object("parent.Grid0").GetGridText(ii,1))) > 0 Then
+			For jj = 1 To StockGrid.Rows
+				stmp = Trim(StockGrid.GetGridText(jj,2))
+				If Trim(SCREEN.Object("parent.Grid0").GetGridText(ii,1)) = Mid(stmp,2,Len(stmp) - 1) Then
+					StockGrid.SetGridCell jj, 10, Trim(SCREEN.Object("parent.Grid0").GetGridText(ii,2))
+				End If
+			Next
+		End If
+	Next
+
+	SetSort()
+End Sub
+
+
+'--------------------------------------------------------------------------------------------------------------
+Sub SetSort()
+	Dim ii
+
+	mGubn = SCREEN.Object("parent.edgubn").data
+	If mGubn = "0" Then					    '시가총액
+		StockGrid.Sort 8, False, False
+
+	ElseIf mGubn = "1" Then			  	    '거래량
+		StockGrid.Sort 7, False, False
+
+	ElseIf mGubn = "2" Then 			     '거래대금
+		StockGrid.Sort 9, False, False
+
+	ElseIf mGubn = "3" Or mGubn = "4" Then	 '외국인
+
+		StockGrid.Sort 11, False, False
+	End If
+
+	For ii = 1 To StockGrid.Rows
+		StockGrid.SetGridCell ii, 3, Trim(StockGrid.GetGridText(ii,3))
+	Next
+End Sub
+
+_AW_ONINDECLARE_AW_
+#load IB888888
+
+_AW_ONENDSUB_AW_
+_AW_ONSTART_AW_
+GetColumnDataFromCtrl()
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+GetColumnDataFromCtrl()
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(StockGrid)
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

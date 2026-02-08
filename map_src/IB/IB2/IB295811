@@ -1,0 +1,731 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB295811)
+MAPSIZE(206, 584)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("프로그램 매매현황")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(FMS|FLASH)
+TITLE("[2958] 프로그램 매매현황 차트")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pibf0031")
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL0(0, 0, 585, 20)        COLOR(37, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  b_day(8, 2, 24, 18)  '일'  TP_PUSH      AL_CENTER    FOCUS  COLOR(208, 232)  CUR(0)      TABORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  b_week(24, 2, 40, 18)  '주'  TP_PUSH      AL_CENTER    FOCUS  COLOR(208, 232)  CUR(0)      TABORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  b_mon(40, 2, 56, 18)  '월'  TP_PUSH      AL_CENTER    FOCUS  COLOR(208, 232)  CUR(0)      TABORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  b_min(72, 2, 88, 18)  '분'  TP_PUSH      AL_CENTER    FOCUS  COLOR(208, 232)  CUR(0)      TABORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  b_tick(88, 2, 104, 18)  '틱'  TP_PUSH      AL_CENTER    FOCUS  COLOR(208, 232)  CUR(0)      TABORDER(5)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  b_1(115, 2, 132, 18)  '1'  TP_PUSH      AL_CENTER  FONT("굴림체", 8, NORMAL)  FOCUS  COLOR(208, 232)  CUR(0)      TABORDER(6)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  b_5(132, 2, 149, 18)  '5'  TP_PUSH      AL_CENTER  FONT("굴림체", 8, NORMAL)  FOCUS  COLOR(208, 232)  CUR(0)      TABORDER(7)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  b_10(149, 2, 166, 18)  '10'  TP_PUSH      AL_CENTER  FONT("굴림체", 8, NORMAL)  FOCUS  COLOR(208, 232)  CUR(0)      TABORDER(8)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  b_30(166, 2, 183, 18)  '30'  TP_PUSH      AL_CENTER  FONT("굴림체", 8, NORMAL)  FOCUS  COLOR(208, 232)  CUR(0)      TABORDER(9)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  request_count(272, 2, 332, 18)  LEN(5)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_SUNKEN          TABORDER(10)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL0(242, 5, 272, 17)  '기간'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  EDIT0(274, 543, 336, 561)  LEN(12)  IO_MIXED|EDIT_INPUT|FA_SKIP    COLOR(10, 63)  CUR(0)  TP_NONE          TABORDER(11)  IOORDER(3)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  BUTTON1(197, 749, 216, 769)  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, NORMAL)  COLOR(208, 232)  CUR(0)    "관심.BMP"    TABORDER(12)  ENABLE  &
+  IMAGETEXT  HINTTYPE(IH_NONE)
+OUT  1021(270, 575, 344, 595)  LEN(16)  IO_ALPHA|AL_LEFT||FA_SKIP|FA_FLASH  FONT("굴림체", 9, NORMAL)    COLOR(211, 232)  CUR(0)            TABORDER(0)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  mtgubn(160, 475, 212, 494)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("1")          TABORDER(13)  IOORDER(4)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  e_gubn(160, 505, 227, 524)  LEN(2)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(14)  IOORDER(5)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  EDIT1(160, 535, 222, 554)  LEN(0)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(15)  IOORDER(6)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  sendf(160, 560, 222, 579)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("0")          TABORDER(16)  IOORDER(7)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  101308(160, 600, 222, 619)  LEN(2)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(17)  IOORDER(8)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  label(160, 630, 215, 650)  'Label'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  2030(160, 660, 235, 680)  LEN(10)  IO_NUM|AL_CENTER||FA_SKIP    COLOR(192, 69)  CUR(0)            TABORDER(0)  IOORDER(9)  ENABLE  &
+  HINTTYPE(IH_NONE)
+CONTROL  drChart(0, 19, 586, 206)  |FA_FLASH  "CX_DRCHART"  "/iTT000003"  LEN(0)  EDIT_INOUT    COLOR(192, 232)  TABORDER(18)  IOORDER(10)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  unit_state(630, 365, 750, 384)  LEN(2)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_SUNKEN          TABORDER(19)  IOORDER(11)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  bungap(630, 395, 750, 414)  LEN(2)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_SUNKEN          TABORDER(20)  IOORDER(12)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  tickgap(625, 470, 745, 489)  LEN(2)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_SUNKEN          TABORDER(21)  IOORDER(13)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  data_count(1185, 455, 1305, 474)  LEN(5)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_SUNKEN          TABORDER(22)  IOORDER(14)  ENABLE  &
+  HINTTYPE(IH_NONE)
+COMBO  COMBO0(184, 2, 234, 18)  TP_SUNKEN  LEN(3)  COUNT(11)  VCOUNT(11)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_NUM|EDIT_INPUT|FA_SKIP    COLOR(68, 69)  CUR(0)  DISPLAY("1", "2", "3", "5", "10", "15", "20", "30", "60", "90", "120")  DATA("001", "002", "003", "005", "010", "015", "020", "030", "060", "090", "120")    TABORDER(23)  IOORDER(15)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  temp_btn(905, 340, 985, 380)  TP_PUSH      AL_CENTER    FOCUS  COLOR(208, 232)  CUR(0)      TABORDER(24)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  b_year(56, 2, 72, 18)  '년'  TP_PUSH      AL_CENTER    FOCUS  COLOR(208, 232)  CUR(0)      TABORDER(25)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Dim g_gubn, unit, map_name, startf, bun_gap, tick_gap
+map_name = Trim(SCREEN.GetMapName(1))
+Dim g_gunit
+g_gunit = "001"
+g_gubn = "1"
+
+Sub change_chart(key)
+	'	drChart.DelAllBozoMsg()'
+	'	drChart.AddBozoMsg 1, "UD", key
+
+
+	Dim inputData
+
+	Dim    cod2 	'[15];            종목코드
+	Dim    sDate 	'[8];             검색시작일
+	Dim    nrec		'[4];             조회건수
+	Dim    unit		'[3];             조회단위 1분봉, 3분봉
+	Dim    gubn		'[1];             조회구분
+					'				  0 : 틱, 1 : 분, 2 : 일
+					'				  3 : 주, 4 : 월
+	Dim    egbn		'[1];             수정주가 구분
+	Dim    smod		'[1];             조회모드
+	Dim    nkey		'[23];      Next Key
+	Dim    bgbn		'[1];             허봉, 실봉구분
+					'				  0: 허봉 1: 실봉
+	Dim    dgbn		'[1];             당일 구분
+	Dim    temp
+	CStr   str
+	Select Case key
+			Case 1 gubn = "2"
+			Case 2 gubn = "3"
+			Case 3 gubn = "4"
+			Case 4 gubn = "1"
+			Case 5 gubn = "0"
+			Case 6 gubn = "5"
+			End Select
+	g_gubn = key
+	cod2 = SCREEN.Object("main.ed_focod").data & "       "
+	sDate = "        "
+	temp = request_count.Text
+	nrec=Trim(temp)
+
+	SYSTEM.Trace "nrec[" & nrec & "]"
+
+	If(Len(nrec)=3) Then
+	    str = " "
+		nrec = str & nrec
+	End If
+	If(Len(nrec)=2) Then
+	    str = "  "
+		nrec = str & nrec
+	End If
+	If(Len(nrec)=1) Then
+	    str = "   "
+		nrec = str & nrec
+	End If
+
+	If(Len(nrec)=0) Then
+		nrec = " 120"
+		request_count.Data = 120
+	End If
+
+	unit = g_gunit
+	'gubn = "2"
+	egbn = "1"
+	smod = "1"
+	nkey = "                       "
+	bgbn = "1"
+	dgbn = "0"
+
+	SYSTEM.Trace "change_chart unit : " & unit & " g_unit : " & g_gunit
+	'drChart.SetSubMsg "UM", "E"
+	inputData = cod2 & sDate & nrec & unit & gubn & egbn & smod & nkey & bgbn & dgbn
+
+	Dim szTR
+	szTR = "pibf0031"
+	drChart.SendTr szTR, SCREEN.Object("main.ed_focod").data, inputData,1
+
+End Sub
+
+Sub change_chart_gap(key, gap)
+
+End Sub
+
+Sub Call_sub(data)
+
+	gubn = e_gubn.Data
+	SYSTEM.Trace "call_sub() gubn : " & gubn
+	Select Case gubn
+		Case 1
+			Call Query_Chart(gubn, 0)
+		Case 2
+			Call Query_Chart(gubn, 0)
+		Case 3
+			Call Query_Chart(gubn, 0)
+		Case 6
+			Call Query_Chart(gubn, 0)
+		Case 4
+			unit = bungap.Data
+			Call Query_Chart(gubn, unit)
+		Case 5
+			unit = tickgap.Data
+			Call Query_Chart(gubn, unit)
+		Case Else
+			Exit Sub
+	End Select
+End Sub
+
+Sub Query_Chart(gubn, unit)
+	startf = 1
+
+	SYSTEM.Trace "query_chart step 1 gubn : " & gubn & " unit : " & unit
+
+
+
+	Call Bt_Period_Init() '주기 버튼 전체 초기화
+
+
+'	Call Bt_Gap_Init()  'GAP 버튼 전체 초기화
+
+
+	mtgubn.Data = 0   '분/틱 구분 초기화
+'	drChart.ChangeMinorFID "610"    '일,주,월 차트
+	e_gubn.Data = gubn  '파일저장용
+
+	'SYSTEM.Trace "Query_chart STEP1 gubn : " & e_gubn.Data & " gubn1 : " & gubn
+	'SYSTEM.Trace "Query_chart STEP2 unit : " & unit
+
+	Select Case gubn
+		Case 1
+			Call change_chart(1)
+			Call Bt_Period_Set()
+			S101308.Data = "01"       '101308 = 일,주,월 구분 Symbol
+			b_day.PRgb = 37736184
+			'b_day.Visible = False
+		Case 2
+			Call change_chart(2)
+			Call Bt_Period_Set()
+			S101308.Data = "02"
+			b_week.PRgb = 37736184
+			'b_week.Visible = False
+		Case 3
+			Call change_chart(3)
+			Call Bt_Period_Set()
+			S101308.Data = "03"
+			b_mon.PRgb = 37736184
+		Case 6
+			Call change_chart(6)
+			Call Bt_Period_Set()
+			S101308.Data = "01"
+			b_year.PRgb = 37736184
+		Case 4
+			'SYSTEM.Trace "Query_chart STEP3"
+			Call Bt_Gap_Init()
+			Call Set_bgk_Color(unit)
+			Call change_chart(4)
+			'SYSTEM.Trace "Query_chart STEP4"
+
+
+			'drChart.ChangeMinorFID "510"  '분 차트
+			mtgubn.data = 1
+
+			b_min.PRgb = 37736184
+			'b_min.Visible = False
+		Case 5
+			Call Bt_Gap_Init()
+			Call Set_bgk_Color(unit)
+			Call change_chart(5)
+
+
+
+			mtgubn.data = 2
+
+			b_tick.PRgb = 37736184
+			'b_tick.Visible = False
+		Case Else
+			Exit Sub
+	End Select
+	'SCREEN.Send 0
+End Sub
+
+Sub Set_bgk_Color(unit)
+
+	If e_gubn.Data = 4 Then
+		bungap.Data = unit
+	ElseIf e_gubn.Data = 5 Then
+		tickgap.Data = unit
+	End If
+
+
+	'SYSTEM.Trace "Set_bgk_color gap unit : " & unit
+	Select Case unit       '해당 Gap 버튼만 눌림표시
+		Case 1
+			g_gunit = "001"
+			COMBO0.Data = "001"
+			b_1.PRgb = 37736184
+
+		Case 5
+			g_gunit = "005"
+			COMBO0.Data = "005"
+			'b_5.Visible = False
+			b_5.PRgb = 37736184
+		Case 10
+			g_gunit = "010"
+			COMBO0.Data = "010"
+			'b_10.Visible = False
+			b_10.PRgb = 37736184
+		Case 30
+			g_gunit = "030"
+			COMBO0.Data = "030"
+			'b_30.Visible = False
+			b_30.PRgb = 37736184
+		Case Else
+			g_gunit = l_format(unit, "0", 3)
+			COMBO0.Data = g_gunit
+			'Exit Sub
+	End Select
+End Sub
+
+Sub Set_Gap(unit)
+	'SYSTEM.Trace "Set_Gap START!!!"
+	S101308.Data = unit       '101308 = 분,틱일 경우 Gap 조절 Symbol
+
+	If e_gubn.Data = 4 Then
+		bungap.Data = unit
+	ElseIf e_gubn.Data = 5 Then
+		tickgap.Data = unit
+	End If
+
+	Call Bt_Gap_Init()
+	'SYSTEM.Trace "Set_gap unit : " & unit & " bungap.Data : " & bungap.Data
+	Select Case unit       '해당 Gap 버튼만 눌림표시
+		Case 1
+			g_gunit = "001"
+			COMBO0.Data = "001"
+			SYSTEM.Trace "set_gap unit 1"
+			b_1.PRgb = 37736184
+			'b_1.Visible = False
+		Case 5
+			g_gunit = "005"
+			'b_5.Visible = False
+			COMBO0.Data = "005"
+			b_5.PRgb = 37736184
+		Case 10
+			g_gunit = "010"
+			'b_10.Visible = False
+			COMBO0.Data = "010"
+			b_10.PRgb = 37736184
+		Case 30
+			g_gunit = "030"
+			COMBO0.Data = "030"
+			'b_30.Visible = False
+			b_30.PRgb = 37736184
+		Case Else
+			SYSTEM.Trace "Set_gap unit : " & unit
+			g_gunit = l_format(unit, "0", 3)
+			'Exit Sub
+	End Select
+	Call Query_Chart(g_gubn, unit)
+End Sub
+
+Sub Bt_Period_Set()
+	b_1.Visible = False
+	b_5.Visible = False
+	b_10.Visible = False
+	b_30.Visible = False
+	COMBO0.Visible = False
+End Sub
+
+Sub Bt_Period_Init()
+	b_day.PRgb = 208
+	b_week.PRgb = 208
+	b_mon.PRgb = 208
+	b_year.PRgb = 208
+	b_min.PRgb = 208
+	b_tick.PRgb = 208
+
+	b_day.Visible = True
+	b_week.Visible = True
+	b_mon.Visible = True
+	b_year.Visible = True
+	b_min.Visible = True
+	b_tick.Visible = True
+	COMBO0.Visible = True
+End Sub
+
+Sub Bt_Gap_Init()
+	b_1.PRgb = 208
+	b_5.PRgb = 208
+	b_10.PRgb = 208
+	b_30.PRgb = 208
+
+	b_1.Visible = True
+	b_5.Visible = True
+	b_10.Visible = True
+	b_30.Visible = True
+End Sub
+
+Sub load_config()
+	'SYSTEM.Trace "load_config START!!"
+	If SCREEN.CreateObject("INFO") Then
+		'SYSTEM.Trace "load_config  STEP1"
+		gubn = Trim(INFO.PopData(LOGIN.Name, "userconf.ini", map_name, "GUBN"))
+		bun_gap = Trim(INFO.PopData(LOGIN.Name, "userconf.ini", map_name, "BUNGAP"))
+		tick_gap = Trim(INFO.PopData(LOGIN.Name, "userconf.ini", map_name, "TICKGAP"))
+
+		If Trim(gubn) = "" Then
+			'SYSTEM.Trace "unit is NULL"
+			gubn = 1
+		End If
+
+		If Trim(bun_gap) = "" Then
+			'SYSTEM.Trace "bun_gap is NULL"
+			bun_gap = 1
+		End If
+
+		If Trim(tick_gap) = "" Then
+			'SYSTEM.Trace "tick_gap is NULL"
+			tick_gap = 1
+		End If
+
+		bungap.Data = bun_gap
+		tickgap.Data = tick_gap
+
+		Select Case gubn
+		Case 1
+			Call Query_Chart(gubn, 0)
+		Case 2
+			Call Query_Chart(gubn, 0)
+		Case 3
+			Call Query_Chart(gubn, 0)
+		Case 6
+			Call Query_Chart(gubn, 0)
+		Case 4
+			unit = bun_gap
+			SYSTEM.Trace "load_config unit : " & l_format(unit, "0", 3)
+			COMBO0.Data = l_format(unit, "0", 3)
+			Call Query_Chart(gubn, unit)
+		Case 5
+			unit = tick_gap
+			COMBO0.Data = l_format(unit, "0", 3)
+			Call Query_Chart(gubn, unit)
+		Case Else
+			Exit Sub
+		End Select
+
+
+	End If
+End Sub
+
+Sub save_config()
+	'SYSTEM.Trace "save_config() map_name : " & map_name
+	'SYSTEM.Trace "save_config() step1 gubn : " & e_gubn.Data
+
+'	If e_gubn.Data = 4 Then
+'		bungap.Data = Int(COMBO0.Data)
+'	ElseIf e_gubn.Data = 5 Then
+'		tickgap.Data = Int(COMBO0.Data)
+'	End If
+
+	If SCREEN.CreateObject("Info") Then
+		'SYSTEM.Trace "save_config() step1 bungap : " & bungap.Data
+		INFO.PushData LOGIN.name, "userconf.ini", map_name, "GUBN", Trim(e_gubn.Data)
+		INFO.PushData LOGIN.name, "userconf.ini", map_name, "BUNGAP", bungap.Data
+		INFO.PushData LOGIN.name, "userconf.ini", map_name, "TICKGAP", tickgap.Data
+		'DX_INFO.PushData LOGIN.name, "userconf.ini", map_name, "UNIT", Trim(e_unit.Data)
+	End If
+End Sub
+
+_AW_ONINDECLARE_AW_
+#load IB888888
+
+_AW_ONENDSUB_AW_
+_AW_ONSTART_AW_
+Dim szPropName
+
+szPropName = "bShowPriceMinMaxText(0)"
+drChart.GetChartProperty( szPropName )
+Call load_config()
+
+'Call Query_Chart(1, 0)
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+'S5301.Data = SCREEN.Object("main.1301").Data
+cod2 = SCREEN.Object("main.ed_focod").data
+'SYSTEM.Trace "Onsend data : " & cod2
+If Trim(cod2) = "" Then
+SCREEN.OnSend False
+	Exit Sub
+End If
+
+'SYSTEM.Trace "sendf.Data : " & sendf.Data
+
+'If sendf.Data = 0 Then
+'	SCREEN.OnSend = False
+'	sendf.Data = 1
+'	Call load_config()
+'End If
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+'Call save_config()
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(b_day)
+_AW_ONCLICK_AW_
+
+Call Query_Chart(1, 0)
+Call save_config()
+temp_btn.SetFocus()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(b_week)
+_AW_ONCLICK_AW_
+
+Call Query_Chart(2, 0)
+Call save_config()
+temp_btn.SetFocus()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(b_mon)
+_AW_ONCLICK_AW_
+
+Call Query_Chart(3, 0)
+Call save_config()
+temp_btn.SetFocus()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(b_min)
+_AW_ONCLICK_AW_
+If SCREEN.CreateObject("Info") Then
+	bun_gap = Trim(INFO.PopData(LOGIN.Name, "userconf.ini", map_name, "BUNGAP"))
+
+	If Trim(bun_gap) = "" Then
+	SYSTEM.Trace "tick_gap is NULL"
+		bun_gap = 1
+	End If
+End If
+
+Call Query_Chart(4, bun_gap)
+
+
+Call save_config()
+temp_btn.SetFocus()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(b_tick)
+_AW_ONCLICK_AW_
+If SCREEN.CreateObject("Info") Then
+	tick_gap = Trim(INFO.PopData(LOGIN.Name, "userconf.ini", map_name, "TICKGAP"))
+
+	If Trim(tick_gap) = "" Then
+		SYSTEM.Trace "tick_gap is NULL"
+		tick_gap = 1
+	End If
+End If
+
+
+Call Query_Chart(5, tick_gap)
+Call save_config()
+'Call load_config()
+temp_btn.SetFocus()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(b_1)
+_AW_ONCLICK_AW_
+
+Call Set_Gap(1)
+Call save_config()
+temp_btn.SetFocus()
+'SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(b_5)
+_AW_ONCLICK_AW_
+
+Call Set_Gap(5)
+Call save_config()
+temp_btn.SetFocus()
+'SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(b_10)
+_AW_ONCLICK_AW_
+
+Call Set_Gap(10)
+Call save_config()
+temp_btn.SetFocus()
+'SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(b_30)
+_AW_ONCLICK_AW_
+
+Call Set_Gap(30)
+Call save_config()
+temp_btn.SetFocus()
+'SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(request_count)
+_AW_ONCHANGE_AW_
+SYSTEM.Trace "SetonePageDataCount data_count : " & data_count.Data
+
+If Trim(data_count.Data) = "" Then
+	data_count.Data = request_count.Data
+End If
+
+drChart.GetChartProperty( "SetOnePageDataCount("&data_count.Data&")" )
+
+SCREEN.IgnoreChange False
+data_count.Data = drChart.GetChartProperty( "GetOnePageDataCount" )
+SCREEN.IgnoreChange True
+
+data_count.SetFocus
+_AW_ONENDSUB_AW_
+_AW_ONKEYCHANGE_AW_
+If SCREEN.Key = 13 Then
+	SYSTEM.Trace "enter key"
+	'Call load_config()
+	gubn = e_gubn.Data
+	Call change_chart(gubn)
+
+
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON1)
+_AW_ONCLICK_AW_
+SCREEN.CreateWindow 1, "IB202201 /t/s/p5/d", "appendCODE" & _
+			vbTab & S5301.Data & vbLf
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(drChart)
+_AW_ONCHANGE_AW_
+'drChart.GetChartState() 리턴값
+'STATE_NONE					0
+'STATE_STARTRECEIVE			1 	TR받은 직후
+'STATE_ENDRECEIVE			2 	조회결과를 차트컨트롤에 그린 후
+'STATE_CHANGEONPAGECNT		3	데이터 조회 스크롤 시
+'STATE_SENDTR				4	TR 전송시
+'STATE_DESTROYCHART			5	차트화면 내려갈때
+
+Dim TotCnt
+Dim DataCnt
+Dim ret
+ret = drChart.GetChartState()
+TotCnt = drChart.GetChartProperty("GetDataCount")
+DataCnt = drChart.GetChartProperty( "GetOnePageDataCount" )
+
+SYSTEM.Trace "ret[" & ret & "] TotCnt[" & TotCnt & "] DataCnt[" & DataCnt & "]"
+
+If ret = 2 Then
+	SCREEN.IgnoreChange False
+	'request_count.Data = TotCnt
+	SCREEN.IgnoreChange True
+End If
+
+If ret =  3 Then
+	SCREEN.IgnoreChange False
+	data_count.Data = DataCnt
+	SCREEN.IgnoreChange True
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(data_count)
+_AW_ONCHANGE_AW_
+
+Select Case g_gubn
+Case 1
+	Call Query_Chart(g_gubn, 0)
+Case 2
+	Call Query_Chart(g_gubn, 0)
+Case 3
+	Call Query_Chart(g_gubn, 0)
+Case 4
+	Call Query_Chart(g_gubn, bungap.Data)
+Case 5
+	Call Query_Chart(g_gubn, tickgap.Data)
+Case Else
+	Exit Sub
+End Select
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(COMBO0)
+_AW_ONCHANGE_AW_
+Dim data
+data =  Int(COMBO0.Data)
+
+SYSTEM.Trace "combo change : " & data
+Call Set_Gap(data)
+Call save_config()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(b_year)
+_AW_ONCLICK_AW_
+
+Call Query_Chart(6, 0)
+Call save_config()
+temp_btn.SetFocus()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

@@ -1,0 +1,148 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(TT111160)
+MAPSIZE(609, 681)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("±¼¸²Ã¼", 9, NORMAL)
+OPTIONS(FLASH)
+TITLE("°ãÄ§ºÐ ºñ±³Â÷Æ®(Æ½)")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("tt111102")
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL20(0, 0, 681, 609)  LIMAGE(2)  LINEW(4)  STRESS(44)  STRESSW(3)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+CONTROL  CONTROL0(5, 6, 675, 603)  |FA_PROTECT|FA_FLASH  "C_UserGrp"  "/i511000300003000501000000000000000000210000000001100033554687200000000110003361971220000000011000502661122000000001100000000000200000000110000003289620000000"  LEN(0)  EDIT_INOUT    COLOR(192, 232)  TABORDER(1)  IOORDER(16)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  cod1(353, 748, 469, 770)  LEN(8)  IO_ALPHA|EDIT_INPUT    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(2)  IOORDER(4)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  cod2(353, 777, 469, 799)  LEN(8)  IO_ALPHA|EDIT_INPUT    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(3)  IOORDER(5)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  cod3(353, 806, 469, 828)  LEN(8)  IO_ALPHA|EDIT_INPUT    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(4)  IOORDER(6)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  cod4(353, 835, 469, 857)  LEN(8)  IO_ALPHA|EDIT_INPUT    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(5)  IOORDER(7)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  cod5(353, 864, 469, 886)  LEN(8)  IO_ALPHA|EDIT_INPUT    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(6)  IOORDER(8)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  gubn1(479, 748, 519, 773)  LEN(1)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("S")          TABORDER(7)  IOORDER(9)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  gubn2(479, 777, 519, 802)  LEN(1)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("S")          TABORDER(8)  IOORDER(10)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  gubn3(479, 806, 519, 831)  LEN(1)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("S")          TABORDER(9)  IOORDER(11)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  gubn4(479, 835, 519, 860)  LEN(1)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("S")          TABORDER(10)  IOORDER(12)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  gubn5(479, 864, 519, 889)  LEN(1)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("S")          TABORDER(11)  IOORDER(13)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  tick(352, 715, 389, 734)  LEN(4)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(12)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  date(438, 708, 561, 728)  LEN(8)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(13)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  cond(590, 660, 638, 681)  LEN(1)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("F")          TABORDER(14)  IOORDER(14)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  check(842, 649, 884, 669)  LEN(1)  IO_MIXED|AL_CENTER|    COLOR(192, 69)  CUR(0)            TABORDER(0)  IOORDER(15)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  bun(289, 716, 326, 735)  LEN(2)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(15)  IOORDER(3)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONSTART_AW_
+cod1.clear
+cod2.clear
+cod3.clear
+cod4.clear
+cod5.clear
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+Dim str, input
+SCREEN.OnSend False
+If SCREEN.Object("main.cond").Data = "F" Then
+	Exit Sub
+End If
+
+tick.Data = SCREEN.Object("main.tick").data
+date.Data = SCREEN.Object("main.date").data
+bun.Data = SCREEN.Object("main.time").data
+
+gubn1.Data = SCREEN.Object("main.obj1.gubn").data
+gubn2.Data = SCREEN.Object("main.obj2.gubn").data
+gubn3.Data = SCREEN.Object("main.obj3.gubn").data
+gubn4.Data = SCREEN.Object("main.obj4.gubn").data
+gubn5.Data = SCREEN.Object("main.obj5.gubn").data
+
+If gubn1.Data = "o" Then
+	str = "main.obj1." & "f" & "cod"
+Else
+	str = "main.obj1." & gubn1.data & "cod"
+End If
+cod1.Data = SCREEN.Object(str).data
+
+If gubn2.Data = "o" Then
+	str = "main.obj2." & "f" & "cod"
+Else
+	str = "main.obj2." & gubn2.data & "cod"
+End If
+cod2.Data = SCREEN.Object(str).data
+
+If gubn3.Data = "o" Then
+	str = "main.obj3." & "f" & "cod"
+Else
+	str = "main.obj3." & gubn3.data & "cod"
+End If
+cod3.Data = SCREEN.Object(str).data
+
+If gubn4.Data = "o" Then
+	str = "main.obj4." & "f" & "cod"
+Else
+	str = "main.obj4." & gubn4.data & "cod"
+End If
+cod4.Data = SCREEN.Object(str).data
+
+If gubn5.Data = "o" Then
+	str = "main.obj5." & "f" & "cod"
+Else
+	str = "main.obj5." & gubn5.data & "cod"
+End If
+cod5.Data = SCREEN.Object(str).data
+
+input =  cod1.Data & " " &cod2.Data & " "& cod3.Data & " "&cod4.Data & " "&cod5.Data
+
+If (Trim(input) <> "") Then
+	SCREEN.OnSend True
+Else
+	CONTROL0.Clear
+End If
+
+If CInt(Trim(bun.Data)) <> 0 Then
+	SCREEN.SetTimer 600 * CInt(Trim(bun.Data)), False
+End If
+
+_AW_ONENDSUB_AW_
+_AW_ONTIMER_AW_
+SCREEN.Send 0
+
+_AW_ONENDSUB_AW_
+}
+
+
+

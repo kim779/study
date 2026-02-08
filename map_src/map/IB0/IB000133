@@ -1,0 +1,204 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB000133)
+MAPSIZE(477, 618)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("종합_투자")
+MAPPUBLIC(";")
+FONT("굴림", 9, NORMAL)
+OPTIONS(FMS|FLASH|CR2TAB)
+TITLE("종합_투자")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL0(0, 0, 618, 28)        COLOR(66, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  r2_1(144, 4, 182, 24)  '수량'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(GP2)      COLOR(16, 130)  CUR(0)      TABORDER(1)  ENABLE  &
+  VISIBLE  CHECKED  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  r2_2(188, 4, 226, 24)  '금액'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(GP2)      COLOR(16, 130)  CUR(0)      TABORDER(2)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+GROUP  GP1(679, 59, 719, 84)  'GP1'        COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  OBJ1(0, 28, 618, 137)    "IB00013U"  TABORDER(3)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON0(550, 3, 610, 24)  '상세보기'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, NORMAL)  FOCUS  COLOR(208, 69)  CUR(0)    "4BTN.BMP"    TABORDER(4)  ENABLE  &
+  IMAGETEXT  HINTTYPE(IH_NONE)
+LABEL  SYMBOL11(488, 4, 616, 24)  '(단위 천주, 계약, 억원)'  AL_LEFT  CUR(0)      COLOR(68, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+OBJECT  OBJ2(0, 137, 618, 477)    "IB00013V"  TABORDER(5)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL6(140, 4, 230, 24)  LINECOLOR(165)      COLOR(66, 130)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  r1_1(58, 5, 97, 23)  '매수'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(GP1)    FONT("굴림체", 9, NORMAL)  COLOR(68, 130)  CUR(0)      TABORDER(6)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+PANEL  PANEL1(3, 4, 138, 24)  LINECOLOR(165)      COLOR(66, 130)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  r1_2(98, 5, 137, 23)  '매도'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(GP1)    FONT("굴림체", 9, NORMAL)  COLOR(68, 130)  CUR(0)      TABORDER(7)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  r1_3(5, 5, 55, 23)  '순매수'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(GP1)    FONT("굴림체", 9, NORMAL)  COLOR(68, 130)  CUR(0)      TABORDER(8)  ENABLE  &
+  VISIBLE  CHECKED  TRANSPARENT  HINTTYPE(IH_NONE)
+GROUP  GP2(679, 86, 719, 111)  'GP2'        COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Sub send_f()
+	p_write_ini()
+	OBJ1.Send
+	OBJ2.Send
+End Sub
+
+Sub p_write_ini()
+	Dim msgb, vagb, cagb
+
+	If r1_1.Checked Then
+		msgb = "1"
+	ElseIf r1_2.Checked Then
+	 	msgb = "2"
+	Else
+		msgb = "3"
+	End If
+
+	If r2_1.Checked Then
+		vagb = "1"
+	Else
+		vagb = "2"
+	End If
+
+	If SCREEN.CreateObject("Info") Then
+		INFO.pushData LOGIN.Name, "userconf.ini", SCREEN.GetMapName(0), "msgb", msgb
+		INFO.pushData LOGIN.Name, "userconf.ini", SCREEN.GetMapName(0), "vagb", vagb
+	End If
+End Sub
+
+Sub p_read_ini()
+	If SCREEN.CreateObject("INFO") Then
+		Dim msgb, vagb
+		msgb = Trim(INFO.PopData(LOGIN.Name, "userconf.ini", SCREEN.GetMapName(0), "msgb"))
+		vagb = Trim(INFO.PopData(LOGIN.Name, "userconf.ini", SCREEN.GetMapName(0), "vagb"))
+
+		If msgb <> "" Then
+			For ii=1 To 3
+				If CLng(msgb) = ii Then
+					SCREEN.Object("r1_"&ii).Checked = True
+				Else
+					SCREEN.Object("r1_"&ii).Checked = False
+				End If
+			Next
+		Else
+			For ii=1 To 3
+				If ii = 3 Then
+					SCREEN.Object("r1_"&ii).Checked = True
+				Else
+					SCREEN.Object("r1_"&ii).Checked = False
+				End If
+			Next
+		End If
+
+		If vagb <> "" Then
+			For ii=1 To 2
+				If CLng(vagb) = ii Then
+					SCREEN.Object("r2_"&ii).Checked = True
+				Else
+					SCREEN.Object("r2_"&ii).Checked = False
+				End If
+			Next
+		Else
+			For ii=1 To 2
+				If ii = 2 Then
+					SCREEN.Object("r2_"&ii).Checked = True
+				Else
+					SCREEN.Object("r2_"&ii).Checked = False
+				End If
+			Next
+		End If
+	End If
+End Sub
+
+Sub OBJSend()
+	OBJ1.Send
+	OBJ2.Send
+End Sub
+
+_AW_ONSTART_AW_
+p_read_ini()
+send_f()
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+SCREEN.OnSend False
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(r2_1)
+_AW_ONCLICK_AW_
+Call send_f()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(r2_2)
+_AW_ONCLICK_AW_
+Call send_f()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON0)
+_AW_ONCLICK_AW_
+'Dim gubn, msg
+'
+'If rVol.Checked = True Then
+'	gubn = 1
+'Else
+'	gubn = 2
+'End If
+'
+'msg = "sect" & vbTab & gubn & vbLf
+
+SCREEN.CreateWindow 1, "IB290800 /p5 /d", ""
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(r1_1)
+_AW_ONCLICK_AW_
+Call send_f()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(r1_2)
+_AW_ONCLICK_AW_
+Call send_f()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(r1_3)
+_AW_ONCLICK_AW_
+Call send_f()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

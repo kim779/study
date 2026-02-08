@@ -1,0 +1,115 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(TT111102)
+MAPSIZE(439, 772)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+TITLE("겹침 비교차트[일,주,월]")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("tt111101")
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+CONTROL  CONTROL0(0, 0, 772, 439)  |FA_PROTECT  "C_UserGrp"  "/i311000300003000501000000000000000000310000000001110033554687102000000111003361971210200000011100502661121020000001110016711808102000000111000003289610200000"  LEN(0)  EDIT_INOUT    COLOR(192, 232)  TABORDER(1)  IOORDER(16)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  day(260, 555, 297, 574)  LEN(1)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("d")          TABORDER(2)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  cod1(262, 614, 378, 636)  LEN(8)  IO_ALPHA|EDIT_INPUT    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(3)  IOORDER(4)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  cod2(262, 643, 378, 665)  LEN(8)  IO_ALPHA|EDIT_INPUT    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(4)  IOORDER(5)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  cod3(262, 672, 378, 694)  LEN(8)  IO_ALPHA|EDIT_INPUT    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(5)  IOORDER(6)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  cod4(262, 701, 378, 723)  LEN(8)  IO_ALPHA|EDIT_INPUT    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(6)  IOORDER(7)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  cod5(262, 730, 378, 752)  LEN(8)  IO_ALPHA|EDIT_INPUT    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(7)  IOORDER(8)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  gubn1(388, 614, 428, 639)  LEN(1)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("S")          TABORDER(8)  IOORDER(9)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  gubn2(388, 643, 428, 668)  LEN(1)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("S")          TABORDER(9)  IOORDER(10)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  gubn3(388, 672, 428, 697)  LEN(1)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("S")          TABORDER(10)  IOORDER(11)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  gubn4(388, 701, 428, 726)  LEN(1)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("S")          TABORDER(11)  IOORDER(12)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  gubn5(388, 730, 428, 755)  LEN(1)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("S")          TABORDER(12)  IOORDER(13)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  tick(261, 581, 298, 600)  LEN(2)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(13)  IOORDER(3)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  date(347, 574, 470, 594)  LEN(8)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(14)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  cond(499, 526, 547, 547)  LEN(1)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("F")          TABORDER(15)  IOORDER(14)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  check(751, 515, 793, 535)  LEN(1)  IO_MIXED|AL_CENTER|    COLOR(192, 69)  CUR(0)  TP_NONE          TABORDER(0)  IOORDER(15)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONSTART_AW_
+cod1.clear
+cod2.clear
+cod3.clear
+cod4.clear
+cod5.clear
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+Dim str, input
+SCREEN.OnSend False
+If cond.Data = "F" Then
+	Exit Sub
+End If
+
+day.Data = SCREEN.Object("main.day").data
+tick.Data = SCREEN.Object("main.tick").data
+date.Data = SCREEN.Object("main.date").data
+
+gubn1.Data = SCREEN.Object("main.obj1.gubn").data
+gubn2.Data = SCREEN.Object("main.obj2.gubn").data
+gubn3.Data = SCREEN.Object("main.obj3.gubn").data
+gubn4.Data = SCREEN.Object("main.obj4.gubn").data
+gubn5.Data = SCREEN.Object("main.obj5.gubn").data
+
+str = "main.obj1." & gubn1.data & "cod"
+cod1.Data = SCREEN.Object(str).data
+
+str = "main.obj2." & gubn2.data & "cod"
+cod2.Data = SCREEN.Object(str).data
+
+str = "main.obj3." & gubn3.data & "cod"
+cod3.Data = SCREEN.Object(str).data
+
+str = "main.obj4." & gubn4.data & "cod"
+cod4.Data = SCREEN.Object(str).data
+
+str = "main.obj5." & gubn5.data & "cod"
+cod5.Data = SCREEN.Object(str).data
+
+input =  cod1.Data & " " &cod2.Data & " "& cod3.Data & " "&cod4.Data & " "&cod5.Data
+
+If (Trim(input) <> "") Then
+	SCREEN.OnSend True
+End If
+
+_AW_ONENDSUB_AW_
+}
+
+
+

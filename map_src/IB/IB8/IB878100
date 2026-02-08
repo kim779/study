@@ -1,0 +1,114 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB878100)
+MAPSIZE(171, 398)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+TITLE("[8781]K1 Tech 폰패드")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL0(-15, -5, 617, 383)  TP_RAISED      COLOR(192, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL1(17, 52, 73, 72)  '입력번호'        COLOR(192, 232)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON0(150, 145, 330, 165)  '화면에 입력된 비밀번호 입력'  TP_PUSH|IMAGETEXT|AL_CENTER        FOCUS  COLOR(208, 232)  CUR(0)    "14btn.bmp"    TABORDER(2)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+CONTROL  k1pad(687, 513, 821, 583)  |FA_PROTECT  "CX_K1driver"  ""  LEN(0)  EDIT_NOP    COLOR(192, 232)  TABORDER(0)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON1(10, 7, 131, 28)  '비밀번호 입력요청'  TP_PUSH|IMAGETEXT|AL_CENTER        FOCUS  COLOR(192, 232)  CUR(0)    "9btn.bmp"    TABORDER(1)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+BUTTON  BUTTON2(335, 146, 395, 166)  '닫기'  TP_PUSH|IMAGETEXT|AL_CENTER        FOCUS  COLOR(208, 232)  CUR(0)    "4btn.bmp"    TABORDER(3)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+GROUP  GROUP0(10, 35, 395, 139)  '출력'        COLOR(-1, 232)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL2(18, 73, 74, 93)  '메세지'        COLOR(192, 232)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  msg(72, 79, 386, 128)  LEN(100)  IO_MIXED|AL_LEFT|    COLOR(192, 232)  CUR(0)  LINECOLOR(232)          TABORDER(0)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  get_passwd(72, 52, 192, 72)  LEN(20)  IO_MIXED|EDIT_INPUT|FA_PASSWD|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_SUNKEN          TABORDER(4)  IOORDER(2)  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Sub Set_pwd(data)
+'	get_passwd.Clear
+
+	get_passwd.Data = data
+End Sub
+
+Sub Set_msg(data)
+	msg.Clear
+	msg.Data = data
+End Sub
+
+_AW_ONSTART_AW_
+k1pad.Start
+
+_AW_ONENDSUB_AW_
+_AW_ONCLOSE_AW_
+k1pad.Close
+
+_AW_ONENDSUB_AW_
+_AW_ONKEY_AW_
+If SCREEN.Key = "13" Then
+	Exit Sub
+End If
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(BUTTON0)
+_AW_ONCLICK_AW_
+
+get_passwd.Trigger "ed_pswd", False
+get_passwd.Trigger "ed_pswd", True
+
+get_passwd.Trigger "zPwd", False
+get_passwd.Trigger "zPwd", True
+
+get_passwd.Trigger "pswd", False
+get_passwd.Trigger "pswd", True
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON1)
+_AW_ONCLICK_AW_
+get_passwd.Clear
+msg.Clear
+
+k1pad.GetPasswd
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON2)
+_AW_ONCLICK_AW_
+k1pad.Close
+SCREEN.CloseWindow
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

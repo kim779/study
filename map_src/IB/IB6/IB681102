@@ -1,0 +1,89 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB681102)
+MAPSIZE(140, 273)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(FMS|FLASH)
+TITLE("Untitled")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pooppoop")
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL4(10, 10, 267, 136)  LINETYPE(3)  LINECOLOR(64)      COLOR(66, 67)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  1301(30, 19, 110, 39)  LEN(6)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_NOR  FONT("굴림체", 9, NORMAL)    COLOR(99, 69)  CUR(0)  TP_SUNKEN          TABORDER(1)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL0(30, 47, 135, 67)  '현재가'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  2023(30, 72, 255, 92)  LEN(13)  IO_NUM|AL_CENTER|    COLOR(192, 69)  CUR(0)            TABORDER(0)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  2021(131, 97, 261, 127)  LEN(7)  IO_NUM|AL_CENTER||FA_FLASH    COLOR(192, 69)  CUR(0)            TABORDER(0)  IOORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  1021(147, 16, 247, 36)  LEN(16)  IO_ALPHA|AL_LEFT||FA_FLASH    COLOR(130, 131)  CUR(0)            TABORDER(0)  IOORDER(5)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  1777(140, 45, 241, 65)  LEN(1)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_HAN|FA_NOR    COLOR(99, 69)  CUR(0)  TP_NONE          TABORDER(2)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+
+Sub send_()
+	SCREEN.SetTimer 3 , False
+End Sub
+
+Sub OnAlert()
+	'Call send_()
+	S1301.Data = Mid(SCREEN.Object("parent.1379").Data, 4, 6)
+	SCREEN.Send 0
+End Sub
+
+_AW_ONSEND_AW_
+If UCase(TypeName( SCREEN.Object("main.cxMarket"))) <> "NOTHING" Then
+	If SCREEN.Object("main.cxMarket").sMarket = "KRX" Then
+		S1777.Data = "1"
+	ElseIf SCREEN.Object("main.cxMarket").sMarket = "NXT" Then
+		S1777.Data = "2"
+	ElseIf SCREEN.Object("main.cxMarket").sMarket = "통합" Then
+		S1777.Data = "3"
+	End If
+	'SYSTEM.Trace "IB681102  yes cxMarket"
+Else
+	SYSTEM.Trace "IB681102  no cxMarket"
+End If
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+If Len(Trim(S2023.data)) > 0 Then
+	SCREEN.Proc "main.send_amt", ""
+End If
+
+_AW_ONENDSUB_AW_
+_AW_ONTIMER_AW_
+	S1301.Data = Mid(SCREEN.Object("parent.1379").Data, 4, 6)
+	SCREEN.Send 0
+
+_AW_ONENDSUB_AW_
+}
+
+
+

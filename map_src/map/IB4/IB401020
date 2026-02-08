@@ -1,0 +1,300 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB401020)
+MAPSIZE(280, 129)
+VERSION(001)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("[4010] 시간대별 체�")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(FMS|FLASH|CR2TAB|DOMINO)
+TITLE("[4010] 시간대별 체결내역")
+TOPATH(AXIS)
+METHOD(MENU)
+MAPTYPE(RESIZEX)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL10(-2, 54, 131, 280)  LIMAGE(0)  LINEW(4)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  SYMBOL12(-2, 0, 131, 55)  LIMAGE(0)  LINEW(3)  LINETYPE(4)  LINECOLOR(64)      COLOR(66, 74)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  SYMBOL14(103, 6, 122, 26)  TP_PUSH|IMAGE|AL_STRETCH      COLOR(23, 232)  CUR(0)    "다음.BMP"    TABORDER(1)  ENABLE  &
+  VISIBLE  IMAGE  HOVER  HINTTYPE(IH_NONE)  HELPTEXT("넓히기")HELPTEXT("넓히기")
+OBJECT  OBJ(6, 61, 122, 273)    "IB401021"  TABORDER(2)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  HNAM(6, 29, 122, 49)  LEN(18)  IO_MIXED|AL_LEFT||SUM    FONT("굴림체", 9, BOLD)    COLOR(90, 130)  CUR(0)  LINECOLOR(89)          TABORDER(0)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  SYMBOL7(81, 6, 100, 26)  TP_PUSH|IMAGE|AL_STRETCH      COLOR(24, 0)  CUR(0)    "검색.BMP"    TABORDER(3)  ENABLE  &
+  VISIBLE  IMAGE  HOVER  HINTTYPE(IH_NONE)
+EDIT  ed_focod(6, 6, 81, 26)  LEN(8)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_UPPER|CODE      COLOR(192, 130)  CUR(0)  TP_SUNKEN          TABORDER(4)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+'Dim ss_ed_focod
+'Dim ss_MapName, ss_FutureObjectName, ss_OptionObjectName
+'Dim ss_LotationTarget
+'Dim ss_IsChanged
+'
+'ss_LotationTarget = "IB401004"
+'ss_MapName = Left(SCREEN.GetMapName(0), 6)
+'ss_FutureObjectName = ss_MapName & "52"
+'ss_OptionObjectName = ss_MapName & "62"
+'
+'Private Sub Changeed_focod()
+'	Dim ls_hnam, ls_goodsdiv, ls_cdmm, ls_cdtm
+'
+'   ls_cdmm = CDMM.Data
+'   ls_cdmm = Left(Trim(ls_cdmm) & "00000", 5)
+'   ls_cdtm = CDTM.data
+'   ss_ed_focod = ls_cdmm & Right("000" & Trim(ls_cdtm), 3)
+'   ls_goodsdiv = ss_ed_focod
+'   ls_goodsdiv = Left(Trim(ls_goodsdiv), 1)
+'	Select Case ls_goodsdiv
+'		Case "1"
+'           SetCaseOfFutures()
+'		Case "2"
+'           SetCaseOfCallOptions()
+'		Case "3"
+'           SetCaseOfPutOptions()
+'		Case "4"
+''           SetCaseOfSpreads()
+''           CDMM.SetFocus()
+'	End Select
+'
+'   OBJ.Send
+'End Sub
+'
+'Private Sub SetCaseOfCallOptions()
+'   Dim ls_hnam
+'
+'	OBJ.SetObject ss_OptionObjectName
+'	HNAM.TRGB = 6
+'	CDTM.ENABLE = True
+'	CDMM.Data = Left(Trim(ss_ed_focod), 5)
+'	CDTM.Data = Right(Trim(ss_ed_focod), 3)
+'
+'	ls_hnam = SCREEN.GetName(102, Trim(ss_ed_focod), 0)
+'	If (Trim(ls_hnam) = "") Then
+'		GetValidCallOptions()
+'   Else
+'      HNAM.Data = Trim(ls_hnam)
+'      ed_focod.Data = Trim(ss_ed_focod)
+'   End If
+'
+'   ed_focod.Push("C_ed_focod")
+'
+'	SCREEN.Object("MAIN.OBJ.40301").data = Trim(ss_ed_focod)
+'End Sub
+'
+'Private Sub SetCaseOfPutOptions()
+'   Dim ls_hnam
+'
+'	OBJ.SetObject ss_OptionObjectName
+'	HNAM.TRGB = 7
+'	CDTM.ENABLE = True
+'	CDMM.Data = Left(Trim(ss_ed_focod), 5)
+'	CDTM.Data = Right(Trim(ss_ed_focod), 3)
+'
+'	ls_hnam = SCREEN.GetName(102, Trim(ss_ed_focod), 0)
+'	If (Trim(ls_hnam) = "") Then
+'		GetValidPutOptions()
+'   Else
+'      HNAM.Data = Trim(ls_hnam)
+'      ed_focod.Data = Trim(ss_ed_focod)
+'	End If
+'
+'   ed_focod.Push("P_ed_focod")
+'
+'	SCREEN.Object("MAIN.OBJ.40301").data = Trim(ss_ed_focod)
+'End Sub
+'
+'Private Sub GetValidCallOptions ()
+'    Dim lb_rtn, ls_hnam
+'
+'    ed_focod.Pop("C_ed_focod")
+'
+'    ss_ed_focod = ed_focod.data
+'    ss_ed_focod = Trim(ss_ed_focod)
+'    ls_hnam = SCREEN.GetName(102, ss_ed_focod, 0)
+'    If Trim(ls_hnam) = "" Or Left(Trim(ls_hnam), 1) <> "콜" Then
+'       lb_rtn = SCREEN.GetCode(112, "ed_focod", "HNAM", 0)
+'       ss_ed_focod = ed_focod.data
+'       ss_ed_focod = Trim(ss_ed_focod)
+'       ls_hnam = SCREEN.GetName(102, ss_ed_focod, 0)
+'    End If
+'    HNAM.Data = Trim(ls_hnam)
+'    CDMM.Data = Left(ss_ed_focod, 5)
+'    CDTM.Data = Right(ss_ed_focod, 3)
+'End Sub
+'
+'Private Sub GetValidPutOptions ()
+'    Dim lb_rtn, ls_hnam
+'
+'    ed_focod.Pop("P_ed_focod")
+'
+'    ss_ed_focod = ed_focod.data
+'    ss_ed_focod = Trim(ss_ed_focod)
+'    ls_hnam = SCREEN.GetName(102, ss_ed_focod, 0)
+'    If Trim(ls_hnam) = "" Or Left(Trim(ls_hnam), 1) <> "풋" Then
+'       lb_rtn = SCREEN.GetCode(113, "ed_focod", "HNAM", 0)
+'       ss_ed_focod = ed_focod.data
+'       ss_ed_focod = Trim(ss_ed_focod)
+'       ls_hnam = SCREEN.GetName(102, ss_ed_focod, 0)
+'    End If
+'    HNAM.Data = Trim(ls_hnam)
+'    CDMM.Data = Left(ss_ed_focod, 5)
+'    CDTM.Data = Right(ss_ed_focod, 3)
+'End Sub
+'
+'Private Sub SetCaseOfFutures()
+'   Dim ls_hnam
+'
+'	OBJ.SetObject ss_FutureObjectName
+'
+'   HNAM.TRGB = 5
+'	CDMM.Data = Left(ss_ed_focod, 5)
+'   CDTM.Data = "000"
+'   CDTM.Enable = False
+'
+'	ls_hnam = SCREEN.GetName(101, ss_ed_focod , 0)
+'	If (Trim(ls_hnam) = "") Then
+'		HNAM.Data = ""
+'	   GetValidFutures()
+'	Else
+'		HNAM.Data = ls_hnam
+'      ed_focod.Data = ss_ed_focod
+'	End If
+'
+'   ed_focod.Push("F_ed_focod")
+'
+'	SCREEN.Object("MAIN.OBJ.30301").data = ss_ed_focod
+'End Sub
+'
+'Private Sub SetCaseOfSpreads()
+'   Dim ls_hnam
+'
+'	OBJ.SetObject ss_FutureObjectName
+'
+'	HNAM.TRGB = 5
+'   CDTM.ENABLE = True
+'   CDMM.Data = Left(ss_ed_focod, 5)
+'   CDTM.Data = Right("000" & ss_ed_focod, 3)
+'
+'	ls_hnam = SCREEN.GetName(101, ss_ed_focod , 0)
+'	If (Trim(ls_hnam) = "") Then
+'		HNAM.Data = ""
+'	   GetValidFutures()
+'	Else
+'		HNAM.Data = ls_hnam
+'      ed_focod.Data = ss_ed_focod
+'	End If
+'
+'	SCREEN.Object("MAIN.OBJ.30301").data = ss_ed_focod
+'End Sub
+'
+'Private Sub GetValidFutures ()
+'Dim lb_rtn, ls_hnam
+'
+'    ed_focod.Pop("F_ed_focod")
+'
+'    ss_ed_focod = ed_focod.data
+'    ss_ed_focod = Trim(ss_ed_focod)
+'    ls_hnam = SCREEN.GetName(101, ss_ed_focod, 0)
+'    If Trim(ls_hnam) = "" Or Left(Trim(ls_hnam), 1) <> "선" Then
+'       lb_rtn = SCREEN.GetCode(111, "ed_focod", "HNAM", 0)
+'       ss_ed_focod = ed_focod.data
+'       ss_ed_focod = Trim(ss_ed_focod)
+'       ls_hnam = SCREEN.GetName(101, ss_ed_focod, 0)
+'    End If
+'
+'    HNAM.Data = Trim(ls_hnam)
+'    CDMM.Data = Left(ss_ed_focod, 5)
+'    CDTM.Data = Right(ss_ed_focod, 3)
+'End Sub
+
+_AW_ONSTART_AW_
+OBJ.SetObject ""
+SCREEN.Send 0
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+Dim code
+
+code = Left(ed_focod.Data, 1)
+
+If code = "1" Or code = "4" Or code = "A" Or code = "D" Then
+	HNAM.Data = SCREEN.GetName (101, ed_focod.Data, 0)
+	OBJ.SetObject "IB401021"
+	SCREEN.Object("obj.30301").data = ed_focod.Data
+	If Trim(HNAM.Data) =  "" Then
+		ed_focod.Data = ""
+	Else
+		ed_focod.Trigger "ed_focod", True
+		ed_focod.Trigger "30301", True
+		SYSTEM.SetHistory "30301", ed_focod.Data
+		SYSTEM.SetHistory "ed_focod", ed_focod.Data
+	End If
+Else
+	HNAM.Data = SCREEN.GetName (102, ed_focod.Data, 0)
+	OBJ.SetObject "IB401022"
+	SCREEN.Object("obj.40301").data = ed_focod.Data
+	If Trim(HNAM.Data) =  "" Then
+		ed_focod.Data = ""
+	Else
+		ed_focod.Trigger "ed_focod", True
+		ed_focod.Trigger "40301", True
+		SYSTEM.SetHistory "40301", ed_focod.Data
+		SYSTEM.SetHistory "ed_focod", ed_focod.Data
+	End If
+End If
+
+OBJ.Send
+SCREEN.OnSend = False
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(SYMBOL14)
+_AW_ONCLICK_AW_
+SCREEN.CHANGEMAP "IB401030"
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(SYMBOL7)
+_AW_ONCLICK_AW_
+Dim ed_focod
+
+ed_focod = SCREEN.GetCode (103, "ed_focod", "HNAM", 2)
+If ed_focod <>  True Then
+	Exit Sub
+End If
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(ed_focod)
+_AW_ONCHANGE_AW_
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

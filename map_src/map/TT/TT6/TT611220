@@ -1,0 +1,387 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(TT611220)
+MAPSIZE(531, 346)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("펀드기준가추이")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(CR2TAB)
+TITLE("[611220] 펀드기준가추이")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("piboPBxQ")
+MAPTYPE(NORM)
+HEADER(LEDGER)
+TRXH("31CSOFFQ102")
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL3(0, 0, 348, 30)  LIMAGE(0)  LINEW(5)  STRESS(0)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL1(-3, 240, 348, 508)  LIMAGE(0)  LINEW(5)  STRESS(0)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL2(-3, 26, 348, 244)  LIMAGE(0)  LINEW(5)  STRESS(0)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL0(1, 0, 345, 26)        COLOR(66, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL1(7, 3, 58, 23)  '조회기간'  AL_LEFT  CUR(0)      COLOR(66, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  zSrtDt(60, 3, 151, 23)  LEN(8)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_DATE    COLOR(192, 130)  CUR(0)  TP_SUNKEN          EDITFORMAT("9999/99/99")  TABORDER(1)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  zEndDt(169, 3, 260, 23)  LEN(8)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP|FA_DATE    COLOR(192, 130)  CUR(0)  TP_SUNKEN          EDITFORMAT("9999/99/99")  TABORDER(2)  IOORDER(14)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  send_btn(273, 3, 306, 23)  '조회'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, BOLD)  FOCUS  COLOR(208, 69)  CUR(0)    "조회BTN.BMP"    TABORDER(3)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+BUTTON  next_btn(310, 3, 342, 23)  '다음'  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(208, 69)  CUR(0)    "2btn.bmp"    TABORDER(4)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+EDIT  In(97, 585, 180, 605)  LEN(5)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_SUNKEN  INIT("00001")          TABORDER(5)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL5(19, 586, 87, 606)  '레코드갯수'  AL_LEFT  CUR(0)      COLOR(66, 69)  ENABLE  &
+  HINTTYPE(IH_NONE)
+GROUP  GROUP0(13, 558, 304, 666)  'Input'        COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL13(156, 3, 166, 23)  '~'  AL_LEFT  CUR(0)      COLOR(66, 69)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL0(17, 636, 67, 656)  '펀드코드'  AL_LEFT  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(66, 69)  ENABLE  &
+  HINTTYPE(IH_NONE)
+COMBO  SPGB(81, 608, 181, 628)  TP_SUNKEN  LEN(1)  COUNT(2)  VCOUNT(2)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_NUM|EDIT_INPUT|FA_SKIP    COLOR(192, 69)  CUR(0)  DISPLAY("전체", "거래형성일")  DATA("0", "1")    TABORDER(7)  IOORDER(3)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL2(18, 612, 78, 632)  '조회구분'  AL_LEFT  CUR(0)      COLOR(141, 240)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  OUTREC(378, 604, 478, 624)  LEN(1)  IO_MIXED|AL_CENTER|    COLOR(192, 232)  CUR(0)  LINECOLOR(0)          TABORDER(0)  IOORDER(10)  ENABLE  &
+  HINTTYPE(IH_NONE)
+GROUP  GROUP1(310, 565, 514, 652)  'OUT'        COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  OUTDUMP(378, 583, 510, 603)  LEN(25)  IO_MIXED|AL_CENTER|    COLOR(192, 232)  CUR(0)  LINECOLOR(0)          TABORDER(0)  IOORDER(5)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  OUTPUT(316, 583, 376, 603)  'OUTPUT'  AL_LEFT  CUR(0)      COLOR(141, 240)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL4(316, 604, 376, 624)  '레코드'  AL_LEFT  CUR(0)      COLOR(141, 240)  ENABLE  &
+  HINTTYPE(IH_NONE)
+CONTROL  ctl_C_UserGrp(4, 57, 342, 237)  |FA_PROTECT|FA_SKIP  "C_UserGrp"  "/i51300030000300010100000000000000000030000000000113003355468710000000"  LEN(0)  EDIT_INOUT    COLOR(192, 232)  TABORDER(8)  IOORDER(15)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL4(-3, 504, 348, 533)  LIMAGE(0)  LINEW(5)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(34, 69)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL5(5, 511, 19, 525)    |IMAGE|AL_STRETCH    COLOR(208, 232)  CUR(0)    "알림_ic.bmp"  ENABLE  &
+  VISIBLE  TRANSPARENT  IMAGE  HINTTYPE(IH_NONE)
+PANEL  GUIDE(21, 508, 338, 528)        COLOR(203, 69)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL16(17, 451, 342, 468)  '펀드편입자산내 외국상장주식 매매차익 과세변경에'  AL_LEFT  CUR(0)      COLOR(181, 69)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON4(6, 455, 13, 462)  TP_PUSH|IMAGE|AL_CENTER      COLOR(208, 232)  CUR(0)    "텍스트화살표_하단.BMP"    TABORDER(9)  ENABLE  &
+  VISIBLE  IMAGE  HINTTYPE(IH_NONE)
+LABEL  LABEL3(17, 469, 338, 485)  '따라 해당펀드의 과표기준가가 <거주자용>과'  AL_LEFT  CUR(0)      COLOR(181, 69)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL6(16, 488, 330, 503)  '<비거주자,법인(내국/외국법인)용> 으로 구분됩니다.'  AL_LEFT  CUR(0)      COLOR(181, 69)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+TABLE  TABLE0(9, 34, 335, 54)  MATRIX(1, 1)  LINECOLOR(75)  CELLH(20)  AUTOSIZE  |MULTI  EDIT_OUTPUT    &
+	COLINFO("Row0")  LEN(40)  WIDTH(61)  HEAD("펀드명")  COLALIGN(AL_CENTER, AL_LEFT)  HEADCOLOR(96, 97)  IO_MIXED|FA_ZEROSUP|FA_SKIP|FA_CORGB|SA_SPACE|SA_COSUP    COLOR(68, 97)  COLCUR(0, 0)  COLHINTTYPE(IH_NONE)    COLUMN_VISIBLE  IFRGB(69, 69)  IOORDER(12)  ENABLE  &
+  VISIBLE
+
+EDIT  ed_name(125, 636, 295, 656)  LEN(40)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 69)  CUR(0)  TP_SUNKEN          TABORDER(10)  IOORDER(13)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  OUTPUT0(410, 310, 570, 345)  LEN(13)  IO_MIXED|AL_CENTER|    COLOR(192, 69)  CUR(0)            TABORDER(0)  IOORDER(6)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  OUTPUT1(410, 350, 570, 385)  LEN(20)  IO_MIXED|AL_CENTER|    COLOR(192, 69)  CUR(0)            TABORDER(0)  IOORDER(7)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  OUTPUT2(413, 394, 573, 429)  LEN(8)  IO_MIXED|AL_CENTER|    COLOR(192, 69)  CUR(0)            TABORDER(0)  IOORDER(8)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  OUTPUT3(413, 434, 573, 469)  LEN(20)  IO_MIXED|AL_CENTER|    COLOR(192, 69)  CUR(0)            TABORDER(0)  IOORDER(9)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+GRID  GRID0(4, 249, 341, 446)  VISIBLEROW(14)  CELLH(20)  MATRIX(1000, 10)  FIX(0)  MAINCOLOR(64, 232)  LINECOLOR(75)  FOCUSCOLOR(78)  FOCUSKIND(4)    FONT("굴림체", 9, NORMAL)  ROWC(68, 77)  |MERGE|FLEXIBLE|VSCROLL|HSCROLL|NO3D|RROW|XHLINE|GRFTEXT    &
+	COLINFO("Col2")  LEN(8)  WIDTH(67)  HEAD("일자")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_ZEROSUP|SA_SPACE    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  EDITFORMAT("9999/99/99")    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col1")  LEN(20)  WIDTH(85)  HEAD("기준가")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  FLOAT(2)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|FA_FLOAT|SA_SPACE|SA_COSIGN    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(69, 69)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col15")  LEN(20)  WIDTH(85)  HEAD("과표기준가")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  FLOAT(2)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|FA_FLOAT|SA_SPACE|SA_COSIGN    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(69, 69)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col6")  LEN(40)  WIDTH(0)  HEAD("소득구분명")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col0")  LEN(10)  WIDTH(85)  HEAD("등락")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  FLOAT(2)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|FA_FLOAT|FA_CONTRAST|SA_SPACE|SA_CORAW|SA_TEXT    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(94, 95)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col7")  LEN(12)  WIDTH(0)  HEAD("수익률")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_ZEROSUP|SA_ZERO    COLOR(68, 69)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col16")  LEN(12)  WIDTH(70)  HEAD("매매수익률")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_ZEROSUP|SA_SPACE    COLOR(68, 69)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col3")  LEN(12)  WIDTH(70)  HEAD("수익률12")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_ZEROSUP|SA_SPACE    COLOR(68, 69)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col4")  LEN(6)  WIDTH(67)  HEAD("기준년월")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_NUM|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col5")  LEN(20)  WIDTH(67)  HEAD("비거주과표기준가")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_NUM|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    TABORDER(11)  IOORDER(11)  ENABLE  &
+  VISIBLE
+
+EDIT  fundcode(270, 25, 326, 45)  LEN(12)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 69)  CUR(0)  TP_SUNKEN          TABORDER(6)  IOORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Option Explicit
+
+''///Head   169
+	Dim	nHead          ''[2];	    '// data Head 개수
+	Dim	nData          ''[6];	    '// 수신 data 개수
+	Dim	irSize         ''[2];	    '// 1 index 데이타 크기
+	Dim	drSize         ''[2];	    '// 1 value 데이타 크기
+	Dim	pday           ''[8];	    '// 최근영업일자
+	Dim	mgap           ''[4];	    '// 분봉갭
+	Dim	xtype          ''   ;		'// 시계열의 문자열여부
+	Dim	xUnit(3)       ''[3][16];	'// 하/좌/우단 단위
+	Dim	tipName        ''[64];	    '// tooltip name(비시계열에 사용)
+	Dim	reserve        ''[32];	    '// reserve
+
+''//BODY  84
+	Dim	filler				'''[2];	'//"XX"				*/
+	Dim	name				'''[32];	'//이름				*/
+	Dim	digit				'''[2];	'//소수점 자리수		*/
+	Dim	rtscode				'''[12];	'//실시간 코드			*/
+	Dim	symbol				'''[5];	'//실시간 심볼			*/
+	Dim	rtsSign				'''[1];	'//' ' 0 1실시간 데이타의 부호필드 여부*/
+	Dim	pivot				'''[14];	'//기준값			*/
+	Dim	reserve2			'''[16];	'//reserve			*/
+
+Dim sTot,Test1,idx,yyyymmdd,a,workday,sTemp
+
+'''graph
+Sub drawGraph()
+	If GRID0.rows > 0 Then
+
+If Trim(LOGIN.Day0) <> "" And Trim(LOGIN.Day1) <> "" And Trim(LOGIN.Day2) <> "" Then
+	yyyymmdd = Left(LOGIN.Day1, 4) & "/" & Mid(LOGIN.Day1, 5, 2) & "/" & Mid(LOGIN.Day1, 7, 2)
+
+	a = Weekday(CDate(Trim(yyyymmdd)))
+
+	workday = Date
+	'오늘이 토요일 이거나 일요일 이면 전영업일로 초기화
+	If a = 7 Or a = 1 Then
+		workday = LOGIN.Day0
+	End If
+End If
+
+	nHead  = 1
+	nData  = GRID0.rows
+	irSize = 14
+	drSize = 14
+	pday   = workday
+	mgap   = "0000"
+	xtype  = " "
+	xUnit(0)= " "
+	xUnit(1)= " "
+	xUnit(2)= " "
+	tipName = " "
+	reserve = " "
+
+	sTot = cp_lpad(nHead,2," ")
+	sTot = sTot & cp_lpad(nData ,6 ," ")
+	sTot = sTot & cp_lpad(irSize,2 ," ")
+	sTot = sTot & cp_lpad(drSize,2 ," ")
+	sTot = sTot & cp_rpad(pday  ,8 ," ")
+	sTot = sTot & cp_rpad(mgap  ,4 ," ")
+	sTot = sTot & xtype
+	sTot = sTot & cp_rpad(xUnit(0),16," ")
+	sTot = sTot & cp_rpad(xUnit(1),16," ")
+	sTot = sTot & cp_rpad(xUnit(2),16," ")
+	sTot = sTot & cp_rpad(tipName ,64," ")
+	sTot = sTot & cp_rpad(reserve ,32," ")
+
+	For idx = 1 To GRID0.Rows  '''val = Trim(VIEWGRID.GetGridCell(VIEWGRID.Row, 4))
+		sTemp = Trim(GRID0.GetGridCell(idx,1))
+		sTot = sTot & cp_rpad(sTemp,14," ")
+	Next
+
+	filler = "XX"
+	name = "기준가변동그래프"
+	digit=02
+	rtscode=" "
+	symbol=005
+	rtsSign = " "
+	pivot	= " "
+	reserve2 = " "
+
+	sTot = sTot & filler
+	sTot = sTot & cp_rpad(name,32," ")
+	sTot = sTot & cp_lpad(digit,2,"0")
+	sTot = sTot & cp_rpad(rtscode	,12," ")
+	sTot = sTot & cp_rpad(symbol,5," ")
+	sTot = sTot & rtsSign
+	sTot = sTot & cp_rpad(pivot	,14," ")
+	sTot = sTot & cp_rpad(reserve2,16," ")
+
+	For idx = 1 To GRID0.Rows  '''val = Trim(VIEWGRID.GetGridCell(VIEWGRID.Row, 4))
+		sTot = sTot & cp_lpad(Replace(Replace(FormatNumber(GRID0.GetGridCell(idx,2),0),".",""),",",""),14," ")
+	Next
+
+	ctl_C_UserGrp.SetData(sTot)
+	End If
+End Sub
+
+
+'== 첫 조회
+Sub send_f()
+	GRID0.Clear
+	LEDGER.Fkey = "C"
+	next_btn.Enable = False
+	SCREEN.Send 0
+End Sub
+
+'== 연속 조회
+Sub send_c()
+	LEDGER.Fkey = "7"
+	GRID0.SetDataPosition(2)
+	SCREEN.Send 0
+End Sub
+
+'**********************************************************************
+' 기능     : Size만큼 filler 값으로 오른쪽 채움
+' 파라메터 : as_string : 문자열
+'            as_cnt    : 문자열의 길이
+'            as_filler : filler
+' 리턴값   : cp_rpad
+' 개발자   : 김동겸	04/09/08
+' 수정자1  :
+'**********************************************************************
+Public Function cp_rpad(as_string, ai_count, as_filler)
+	Dim ls_str, li_cnt
+	'대상 String이 NULL이면 Filler로 채운 문자열 Return
+	If IsNull(as_string) Then
+		cp_rpad = String(ai_count, as_filler)
+	Else
+		ls_str = Trim(as_string) ' 공백 Trimming
+		SCREEN.CreateObject("DX_CSTRING")
+		DX_CSTRING.Text = ls_str
+		li_cnt = ai_count - DX_CSTRING.GetLength()
+		If li_cnt >= 0 Then
+			cp_rpad = ls_str & String(li_cnt, as_filler)
+		Else
+			cp_rpad = Left(ls_str, ai_count)
+		End If
+	End If
+End Function
+
+'**********************************************************************
+' 기능     : Size만큼 filler 값으로 왼쪽 채움
+' 파라메터 : as_string : 문자열
+'            as_cnt    : 문자열의 길이
+'            as_filler : filler
+' 리턴값   : cp_lpad
+' 개발자   : 김동겸	04/09/08
+' 수정자1  :
+'**********************************************************************
+Public Function cp_lpad(as_string, ai_count, as_filler)
+	Dim ls_str, li_cnt
+    '대상 String이 NULL이면 Filler로 채운 문자열 Return
+	If IsNull(as_string) Then
+		cp_lpad = String(ai_count, as_filler)
+	Else
+		ls_str = Trim(as_string) ' 공백 Trimming
+		SCREEN.CreateObject("DX_CSTRING")
+		DX_CSTRING.Text = ls_str
+		li_cnt = ai_count - DX_CSTRING.GetLength()
+		If li_cnt >= 0 Then
+			cp_lpad = String(li_cnt, as_filler) & ls_str
+		Else
+			cp_lpad = Right(ls_str, ai_count)
+		End If
+	End If
+End Function
+
+_AW_ONINDECLARE_AW_
+#Load IB888833
+
+_AW_ONENDSUB_AW_
+_AW_ONSTART_AW_
+LEDGER.Rcnt = "0030"
+
+Dim NewDate,yy,mm,dd
+NewDate = DateAdd("m", -1, Date)
+
+yy = Year(NewDate)
+mm = Month(NewDate)
+If Len(mm) = 1 Then mm = "0"&mm
+
+dd = Day(NewDate)
+If Len(dd) = 1 Then dd = "0"&dd
+
+NewDate = yy&mm&dd
+zSrtDt.Data = CDbl(NewDate)
+
+TABLE0.ROW = 1
+TABLE0.Data  = ed_name.Data
+
+''send_f()
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+
+If LEDGER.ecod = "0136" Then
+	next_btn.Enable False
+Else
+	next_btn.Enable True
+End If
+
+Call drawGraph()
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(zSrtDt)
+_AW_ONCHANGE_AW_
+send_f()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(zEndDt)
+_AW_ONCHANGE_AW_
+send_f()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(send_btn)
+_AW_ONCLICK_AW_
+
+
+send_f()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(next_btn)
+_AW_ONCLICK_AW_
+send_c()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(ed_name)
+_AW_ONKEYCHANGE_AW_
+If SCREEN.Key = "13" Then  '-- Enter 키 입력
+	Call send_f()
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(GRID0)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(fundcode)
+_AW_ONCHANGE_AW_
+Call send_f()
+_AW_ONENDSUB_AW_
+_AW_ONKEYCHANGE_AW_
+If SCREEN.Key = "13" Then  '-- Enter 키 입력
+	Call send_f()
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

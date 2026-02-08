@@ -1,0 +1,1738 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB102003)
+MAPSIZE(270, 990)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("매수조건설정")
+MAPPUBLIC(";")
+FONT("굴림", 9, NORMAL)
+TITLE("매수조건")
+TOPATH(AXIS)
+METHOD(MENU)
+TRXCODE("piat1000")
+MAPTYPE(FIXED)
+HEADER(NOP)
+BGROUND(BRUSH, 72)
+}
+
+
+
+FORM DIVISION
+{
+
+LABEL  LABEL0(5, 40, 90, 60)  '주문구분'  AL_CENTER  CUR(0)      COLOR(54, 192)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  RADIO0(95, 40, 145, 60)  '현금'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(ORD_GB)      COLOR(72, 232)  CUR(0)      TABORDER(1)  ENABLE  &
+  VISIBLE  CHECKED  HINTTYPE(IH_NONE)
+BUTTON  RADIO1(145, 40, 195, 60)  '신용'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(ORD_GB)      COLOR(72, 232)  CUR(0)      TABORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+GROUP  ORD_GB(481, 338, 601, 358)  '주문구분'        COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+COMBO  cmb_ordtype(195, 40, 275, 59)  TP_NONE  LEN(1)  COUNT(2)  VCOUNT(2)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_NUM|EDIT_INPUT|FA_SKIP    COLOR(192, 232)  CUR(0)  DISPLAY("유통융자", "자기융자")  DATA("1", "2")    TABORDER(3)  IOORDER(1)  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL1(5, 65, 90, 85)  '종목명'  AL_CENTER  CUR(0)      COLOR(54, 192)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LB_NAME(95, 65, 315, 85)  '삼성전자 테스트'  AL_LEFT  CUR(0)      COLOR(72, 232)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL4(5, 90, 90, 110)  '감시조건설정'  AL_CENTER  CUR(0)      COLOR(54, 192)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  chk_cond_1(10, 115, 100, 135)  '이하조건'  TP_CHECK|EDIT_NOP          COLOR(72, 232)  CUR(0)      TABORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  chk_cond_2(10, 145, 100, 165)  '이상조건'  TP_CHECK|EDIT_NOP          COLOR(72, 232)  CUR(0)      TABORDER(7)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  chk_cond_3(10, 205, 100, 225)  'Trailing Stop'  TP_CHECK|EDIT_NOP          COLOR(72, 232)  CUR(0)      TABORDER(15)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  chk_cond_4(10, 235, 325, 255)  '호가분할주문 사용 ⓘ : 지정한 가격부터 낮은 방향으로'  TP_CHECK|EDIT_NOP          COLOR(72, 232)  CUR(0)      TABORDER(19)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_STRING)  HELPTEXT("주문가격을 1개 호가가 아닌 2개 이상의 \n가격으로 분할하여 주문하는 기능입니다.\n매수는 지정한 가격부터 낮은 방향으로,\n매도는 지정한 가격부터 높은 방향으로 \n분할하여 주문이 실행됩니다.")HELPTEXT("주문가격을 1개 호가가 아닌 2개 이상의 \n가격으로 분할하여 주문하는 기능입니다.\n매수는 지정한 가격부터 낮은 방향으로,\n매도는 지정한 가격부터 높은 방향으로 \n분할하여 주문이 실행됩니다.")
+COMBO  cmb_cond_1(105, 115, 185, 134)  TP_NONE  LEN(1)  COUNT(3)  VCOUNT(3)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_NUM|EDIT_INPUT|FA_SKIP    COLOR(192, 232)  CUR(0)  DISPLAY("현재가", "매도1호가", "매수1호가")  DATA("0", "1", "2")    TABORDER(5)  IOORDER(2)  &
+  VISIBLE  HINTTYPE(IH_NONE)
+COMBO  cmb_cond_2(105, 145, 185, 164)  TP_NONE  LEN(1)  COUNT(3)  VCOUNT(3)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_NUM|EDIT_INPUT|FA_SKIP    COLOR(192, 232)  CUR(0)  DISPLAY("현재가", "매도1호가", "매수1호가")  DATA("0", "1", "2")    TABORDER(8)  IOORDER(3)  &
+  VISIBLE  HINTTYPE(IH_NONE)
+COMBO  cmb_cond_3(420, 205, 460, 224)  TP_NONE  LEN(1)  COUNT(3)  VCOUNT(3)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_NUM|EDIT_INPUT|FA_SKIP    COLOR(192, 232)  CUR(0)  DISPLAY("원", "틱", "%")  DATA("0", "1", "2")    TABORDER(18)  IOORDER(4)  &
+  VISIBLE  HINTTYPE(IH_NONE)
+COMBO  cmb_cond_4(330, 235, 410, 254)  TP_NONE  LEN(1)  COUNT(5)  VCOUNT(5)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_NUM|EDIT_INPUT|FA_SKIP    COLOR(192, 232)  CUR(0)  DISPLAY(" ", "2회", "3회", "4회", "5회")  DATA("1", "2", "3", "4", "5")    TABORDER(20)  IOORDER(5)  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  edt_cond_1(190, 115, 280, 134)  LEN(9)  IO_NUM|EDIT_INPUT|FA_COMMA|FA_RIGHT|FA_SKIP|FA_XFLOAT  SPIN(1)      COLOR(192, 232)  CUR(0)  TP_SUNKEN          TABORDER(6)  IOORDER(6)  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  edt_cond_2(190, 145, 280, 164)  LEN(9)  IO_NUM|EDIT_INPUT|FA_COMMA|FA_RIGHT|FA_SKIP|FA_XFLOAT  SPIN(1)      COLOR(192, 232)  CUR(0)  TP_SUNKEN          TABORDER(9)  IOORDER(7)  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  edt_cond_3_1(105, 205, 195, 224)  LEN(9)  IO_NUM|EDIT_INPUT|FA_COMMA|FA_RIGHT|FA_SKIP|FA_XFLOAT  SPIN(1)      COLOR(192, 232)  CUR(0)  TP_SUNKEN          TABORDER(16)  IOORDER(8)  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL5(285, 115, 330, 135)  '원 이하'  AL_LEFT  CUR(0)      COLOR(72, 232)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL6(285, 145, 330, 165)  '원 이상'  AL_LEFT  CUR(0)      COLOR(72, 232)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL7(200, 205, 245, 225)  '원 이하'  AL_LEFT  CUR(0)      COLOR(72, 232)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  edt_cond_3_2(327, 205, 417, 224)  LEN(9)  IO_NUM|EDIT_INPUT|FA_COMMA|FA_RIGHT|FA_SKIP|FA_XFLOAT  SPIN(1)      COLOR(192, 232)  CUR(0)  TP_SUNKEN          TABORDER(17)  IOORDER(9)  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL8(465, 205, 495, 225)  '상승'  AL_LEFT  CUR(0)      COLOR(72, 232)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL9(415, 235, 445, 255)  '회'  AL_LEFT  CUR(0)      COLOR(72, 232)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL10(500, 30, 501, 270)  AL_CENTER  CUR(0)      COLOR(54, 192)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL11(510, 40, 595, 60)  '주문유형'  AL_CENTER  CUR(0)      COLOR(54, 192)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL12(510, 70, 595, 90)  '주문수량'  AL_CENTER  CUR(0)      COLOR(54, 192)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL13(510, 100, 595, 120)  '주문가격'  AL_CENTER  CUR(0)      COLOR(54, 192)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL14(510, 155, 595, 175)  '주문유효기간'  AL_CENTER  CUR(0)      COLOR(54, 192)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  RADIO3(605, 40, 660, 60)  '지정가'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(HOGA_GB)      COLOR(72, 232)  CUR(0)      TABORDER(21)  ENABLE  &
+  VISIBLE  CHECKED  HINTTYPE(IH_NONE)
+GROUP  HOGA_GB(481, 358, 601, 378)  '호가구분'        COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  RADIO4(665, 40, 720, 60)  '시장가'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(HOGA_GB)      COLOR(72, 232)  CUR(0)      TABORDER(22)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  RADIO5(725, 40, 860, 60)  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(HOGA_GB)      COLOR(72, 232)  CUR(0)      TABORDER(23)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+COMBO  cmb_hoga(740, 40, 860, 59)  TP_NONE  LEN(1)  COUNT(3)  VCOUNT(3)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_NUM|EDIT_INPUT|FA_SKIP    COLOR(192, 232)  CUR(0)  DISPLAY("조건부지정가", "최유리지정가", "최우선지정가")  DATA("0", "1", "3")    TABORDER(24)  IOORDER(10)  &
+  VISIBLE  HINTTYPE(IH_NONE)
+GROUP  QTY_GB(481, 383, 601, 403)  '수량구분'        COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  RADIO6(605, 70, 695, 90)  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(QTY_GB)      COLOR(72, 232)  CUR(0)      TABORDER(25)  ENABLE  &
+  VISIBLE  CHECKED  HINTTYPE(IH_NONE)
+COMBO  cmb_qtyper(620, 70, 720, 89)  TP_NONE  LEN(1)  COUNT(2)  VCOUNT(2)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_NUM|EDIT_INPUT|FA_SKIP    COLOR(192, 232)  CUR(0)  DISPLAY("주문금액", "직접입력")  DATA("0", "1")    TABORDER(26)  IOORDER(11)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  ed_jqty(725, 70, 832, 90)  LEN(9)  IO_NUM|EDIT_INPUT|FA_COMMA|FA_RIGHT|FA_SKIP|FA_XFLOAT  SPIN(1)      COLOR(68, 130)  CUR(0)  TP_SUNKEN  INIT("0")          TABORDER(27)  IOORDER(12)  ENABLE  &
+  VISIBLE  HOVER  HINTTYPE(IH_NONE)
+BUTTON  RADIO8(605, 100, 670, 120)  '단가선택'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(PRC_GB)      COLOR(72, 232)  CUR(0)      TABORDER(28)  ENABLE  &
+  VISIBLE  CHECKED  HINTTYPE(IH_NONE)
+BUTTON  RADIO9(775, 100, 840, 120)  '직접입력'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(PRC_GB)      COLOR(72, 232)  CUR(0)      TABORDER(29)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+GROUP  PRC_GB(481, 408, 601, 428)  '수량구분'        COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+COMBO  cmb_prc(670, 100, 760, 119)  TP_NONE  LEN(2)  COUNT(13)  VCOUNT(13)  INDEX(6)  MATCHKEY(NOTMAPPING)  IO_NUM|EDIT_INPUT|FA_SKIP    COLOR(192, 232)  CUR(0)  DISPLAY("상한가", "현재가+5틱", "현재가+4틱", "현재가+3틱", "현재가+2틱", "현재가+1틱", "현재가", "현재가-1틱", "현재가-2틱", "현재가-3틱", "현재가-4틱", "현재가-5틱", "하한가")  DATA("++", "+5", "+4", "+3", "+2", "+1", "00", "-1", "-2", "-3", "-4", "-5", "--")    TABORDER(30)  IOORDER(13)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  ed_jprc(843, 100, 950, 120)  LEN(9)  IO_NUM|EDIT_INPUT|FA_COMMA|FA_RIGHT|FA_SKIP|FA_XFLOAT  SPIN(1)    FONT("굴림체", 9, NORMAL)    COLOR(78, 130)  CUR(0)  TP_SUNKEN  INIT("0")          TABORDER(31)  IOORDER(14)  &
+  VISIBLE  HOVER  HINTTYPE(IH_NONE)
+LABEL  LABEL15(695, 160, 703, 172)  '~'  AL_LEFT  CUR(0)      COLOR(72, 69)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  zOrdStrDt(605, 155, 692, 175)  LEN(8)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP|FA_DATE    COLOR(192, 232)  CUR(0)  TP_SUNKEN          EDITFORMAT("9999/99/99")  TABORDER(32)  IOORDER(15)  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  zOrdEndDt(706, 155, 793, 175)  LEN(8)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP|FA_DATE    COLOR(192, 232)  CUR(0)  TP_SUNKEN          EDITFORMAT("9999/99/99")  TABORDER(33)  IOORDER(16)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  btn_tday(797, 155, 833, 175)  '당일'  TP_PUSH|IMAGETEXT|AL_STRETCH        FOCUS  COLOR(208, 186)  CUR(0)    "2btn.bmp"    TABORDER(34)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+BUTTON  btn_5day(837, 155, 873, 175)  '5일'  TP_PUSH|IMAGETEXT|AL_STRETCH        FOCUS  COLOR(208, 186)  CUR(0)    "2btn.bmp"    TABORDER(35)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+BUTTON  btn_15day(877, 155, 913, 175)  '15일'  TP_PUSH|IMAGETEXT|AL_STRETCH        FOCUS  COLOR(208, 186)  CUR(0)    "2btn.bmp"    TABORDER(36)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+BUTTON  btn_30day(917, 155, 953, 175)  '30일'  TP_PUSH|IMAGETEXT|AL_STRETCH        FOCUS  COLOR(208, 186)  CUR(0)    "2btn.bmp"    TABORDER(37)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+LABEL  LABEL16(600, 180, 905, 210)  '＊ 주문유효기간은 최대30일까지 설정하실 수 있어요\n    (만료일이 휴일인 경우 연장되지 않아요) '  AL_LEFT  FONT("굴림", 9, NORMAL)  CUR(0)      COLOR(72, 232)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON0(625, 225, 980, 265)  '자동매수 조건추가'  TP_PUSH      AL_CENTER  FONT("굴림", 10, BOLD)  FOCUS  COLOR(54, 192)  CUR(0)      TABORDER(38)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON1(510, 225, 620, 265)  '초기화'  TP_PUSH      AL_CENTER  FONT("굴림", 10, BOLD)  FOCUS  COLOR(224, 192)  CUR(0)      TABORDER(39)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL17(247, 205, 327, 225)  'AND 저점대비'  AL_LEFT  CUR(0)      COLOR(72, 232)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  chk_cond_5(10, 175, 100, 195)  '대비조건'  TP_CHECK|EDIT_NOP          COLOR(72, 232)  CUR(0)      TABORDER(10)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL2(105, 175, 155, 195)  '현재가가'  AL_LEFT  CUR(0)      COLOR(72, 232)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+COMBO  cmb_cond_5_1(160, 175, 240, 194)  TP_NONE  LEN(1)  COUNT(2)  VCOUNT(2)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_NUM|EDIT_INPUT|FA_SKIP    COLOR(192, 232)  CUR(0)  DISPLAY("전일종가", "당일시가")  DATA("0", "1")    TABORDER(11)  IOORDER(17)  &
+  VISIBLE  HINTTYPE(IH_NONE)
+COMBO  cmb_cond_5_2(367, 175, 407, 194)  TP_NONE  LEN(1)  COUNT(3)  VCOUNT(3)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_NUM|EDIT_INPUT|FA_SKIP    COLOR(192, 232)  CUR(0)  DISPLAY("원", "틱", "%")  DATA("0", "1", "2")    TABORDER(13)  IOORDER(18)  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  edt_cond_5(277, 175, 365, 194)  LEN(9)  IO_NUM|EDIT_INPUT|FA_COMMA|FA_RIGHT|FA_SKIP|FA_XFLOAT  SPIN(1)      COLOR(192, 232)  CUR(0)  TP_SUNKEN          TABORDER(12)  IOORDER(19)  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL18(412, 175, 442, 195)  '이상'  AL_LEFT  CUR(0)      COLOR(72, 232)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL19(245, 175, 270, 195)  '대비'  AL_LEFT  CUR(0)      COLOR(72, 232)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+COMBO  cmb_cond_5_3(442, 175, 492, 194)  TP_NONE  LEN(1)  COUNT(2)  VCOUNT(2)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_NUM|EDIT_INPUT|FA_SKIP    COLOR(192, 232)  CUR(0)  DISPLAY("상승", "하락")  DATA("0", "1")    TABORDER(14)  IOORDER(20)  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL20(840, 70, 955, 90)  '원 에 해당하는 수량'  AL_LEFT  CUR(0)      COLOR(72, 232)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL21(0, 0, 500, 30)  '       감시조건'  AL_LEFT  CUR(0)      COLOR(54, 192)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL22(7, 6, 25, 24)  '1'  AL_CENTER  CUR(0)      COLOR(192, 192)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL23(8, 7, 24, 23)  '1'  AL_CENTER  CUR(0)      COLOR(54, 192)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL24(500, 0, 990, 30)  '       주문조건'  AL_LEFT  CUR(0)      COLOR(54, 192)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL25(505, 6, 523, 24)  '1'  AL_CENTER  CUR(0)      COLOR(192, 192)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL26(506, 7, 522, 23)  '2'  AL_CENTER  CUR(0)      COLOR(54, 192)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  E_acnt_no(1173, 16, 1293, 35)  LEN(11)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(40)  IOORDER(21)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL27(1048, 16, 1168, 35)  '계좌번호'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  E_sq(1173, 36, 1293, 55)  LEN(18)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(41)  IOORDER(22)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL28(1048, 36, 1168, 55)  '일련번호'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  E_shrt_cd(1173, 56, 1293, 75)  LEN(9)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(42)  IOORDER(23)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL29(1048, 56, 1168, 75)  '단축코드'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  E_end_dt(1173, 76, 1293, 95)  LEN(8)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(43)  IOORDER(24)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL30(1048, 76, 1168, 95)  '종료일자'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  E_cndt_rstn_est_f1(1173, 101, 1293, 120)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(44)  IOORDER(25)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL31(1047, 102, 1167, 121)  '이하조건설정여부'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  E_cndt_est_prc_clsf1(1173, 121, 1293, 140)  LEN(2)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(45)  IOORDER(26)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL32(1047, 122, 1167, 141)  '가격구분'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  E_cndt_rstn_est_vl1(1173, 141, 1293, 160)  LEN(11)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(46)  IOORDER(27)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL33(1047, 142, 1167, 161)  '설정값'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  E_cndt_est_unt1(1173, 161, 1293, 180)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(47)  IOORDER(28)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL34(1047, 162, 1167, 181)  '설정단위'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  E_cndt_up_down_clsf1(1173, 181, 1293, 200)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(48)  IOORDER(29)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL35(1047, 182, 1167, 201)  '이상이하'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  E_cndt_rstn_est_f2(1173, 213, 1293, 232)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(49)  IOORDER(30)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL36(1047, 214, 1167, 233)  '이상조건설정여부'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  E_cndt_est_prc_clsf2(1173, 233, 1293, 252)  LEN(2)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(50)  IOORDER(31)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL37(1047, 234, 1167, 253)  '가격구분'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  E_cndt_rstn_est_vl2(1173, 253, 1293, 272)  LEN(11)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(51)  IOORDER(32)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL38(1047, 254, 1167, 273)  '설정값'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  E_cndt_est_unt2(1173, 273, 1293, 292)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(52)  IOORDER(33)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL39(1047, 274, 1167, 293)  '설정단위'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  E_cndt_up_down_clsf2(1173, 293, 1293, 312)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(53)  IOORDER(34)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL40(1047, 294, 1167, 313)  '이상이하'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  E_cndt_rstn_est_f3(1173, 315, 1293, 334)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(54)  IOORDER(35)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL41(1047, 316, 1167, 335)  '이상조건설정여부'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  E_cndt_est_prc_clsf3(1173, 335, 1293, 354)  LEN(2)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(55)  IOORDER(36)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL42(1047, 336, 1167, 355)  '가격구분'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  E_cndt_rstn_est_vl3(1173, 355, 1293, 374)  LEN(11)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(56)  IOORDER(37)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL43(1047, 356, 1167, 375)  '설정값'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  E_cndt_est_unt3(1173, 375, 1293, 394)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(57)  IOORDER(38)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL44(1047, 376, 1167, 395)  '설정단위'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  E_cndt_up_down_clsf3(1173, 395, 1293, 414)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(58)  IOORDER(39)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL45(1047, 396, 1167, 415)  '이상이하'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  E_t_s_prft_rstn_est_f(1173, 417, 1293, 436)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(59)  IOORDER(40)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL46(1047, 418, 1167, 437)  'TS설정여부'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  E_t_s_prft_rstn_est_clsf(1173, 437, 1293, 456)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(60)  IOORDER(41)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL47(1047, 438, 1167, 457)  '설정구분'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  E_t_s_prft_rstn_est_prc_clsf(1173, 457, 1293, 476)  LEN(2)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(61)  IOORDER(42)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL48(1047, 458, 1167, 477)  '가격구분'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  E_t_s_prft_rstn_est_vl(1173, 477, 1293, 496)  LEN(11)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(62)  IOORDER(43)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL49(1047, 478, 1167, 497)  '설정값'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  E_t_s_prft_rstn_est_unt(1173, 497, 1293, 516)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(63)  IOORDER(44)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL50(1047, 498, 1167, 517)  '설정단위'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  E_t_s_hgh_mrk_cmpr_est_vl(1173, 517, 1293, 536)  LEN(11)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(64)  IOORDER(45)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL51(1047, 518, 1167, 537)  '대비값'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  E_t_s_hgh_mrk_cmpr_est_unt(1173, 537, 1293, 556)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(65)  IOORDER(46)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL52(1047, 538, 1167, 557)  '대비단위'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  E_askprc_prtn_ordr_f(1174, 566, 1294, 585)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(66)  IOORDER(47)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL53(1048, 567, 1168, 586)  '호가분할설정여부'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  E_prtn_ordr_tno(1174, 586, 1294, 605)  LEN(4)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(67)  IOORDER(48)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL54(1048, 587, 1168, 606)  '주문횟수'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  E_trd_ccd(1446, 15, 1566, 34)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(68)  IOORDER(49)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL55(1320, 16, 1440, 35)  '매매구분'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  E_ordr_typ_cd(1446, 35, 1566, 54)  LEN(2)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(69)  IOORDER(50)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL56(1320, 36, 1440, 55)  '주문유형'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  E_ordr_cnd_dcd(1446, 55, 1566, 74)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(70)  IOORDER(51)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL57(1320, 56, 1440, 75)  '주문조건구분코드'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  E_crdt_typ_cd(1446, 75, 1566, 94)  LEN(2)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(71)  IOORDER(52)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL58(1320, 76, 1440, 95)  '신용구분'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  E_ln_dt(1446, 115, 1566, 134)  LEN(8)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(72)  IOORDER(53)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL60(1320, 116, 1440, 135)  '대출일자'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  E_ordr_prc_est_clsf(1446, 135, 1566, 154)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(73)  IOORDER(54)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL61(1320, 136, 1440, 155)  '주문가격설정구분'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  E_ordr_prc_est_vl(1446, 155, 1566, 174)  LEN(11)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(74)  IOORDER(55)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL62(1320, 156, 1440, 175)  '주문가격설정값'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  E_ordr_q_est_clsf(1446, 175, 1566, 194)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(75)  IOORDER(56)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL63(1320, 176, 1440, 195)  '주문수량설정구분'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  E_ordr_q_est_vl(1446, 195, 1566, 214)  LEN(11)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(76)  IOORDER(57)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL64(1320, 196, 1440, 215)  '주문수량설정값'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  E_proc_sec(1446, 215, 1566, 234)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(77)  IOORDER(58)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL65(1320, 216, 1440, 235)  '처리구분'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  e_jcode(831, 400, 951, 419)  LEN(20)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(78)  IOORDER(59)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  e_jname(830, 415, 950, 434)  LEN(100)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(79)  IOORDER(60)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  e_crdt(831, 440, 951, 459)  LEN(20)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(80)  IOORDER(61)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  e_ldate(831, 460, 951, 479)  LEN(20)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(81)  IOORDER(62)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  e_avprc(831, 480, 951, 499)  LEN(20)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(82)  IOORDER(63)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  OUTPUT0(1340, 263, 1460, 283)  LEN(11)  IO_MIXED|AL_LEFT|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(64)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  OUTPUT1(1340, 283, 1460, 303)  LEN(18)  IO_MIXED|AL_LEFT|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(65)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  OUTPUT2(1340, 303, 1460, 323)  LEN(9)  IO_MIXED|AL_LEFT|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(66)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  OUTPUT3(1340, 323, 1460, 343)  LEN(4)  IO_MIXED|AL_LEFT|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(67)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  OUTPUT4(1340, 345, 1460, 365)  LEN(64)  IO_MIXED|AL_LEFT|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(68)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  obj_cond(535, 555, 640, 660)    "IB102040"  TABORDER(83)  IOORDER(69)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  e_sp(830, 500, 950, 519)  LEN(20)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(84)  IOORDER(70)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  obj_exec_SVR(840, 590, 945, 695)    "IB102031"  TABORDER(85)  IOORDER(71)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL59(600, 125, 905, 155)  '＊ 주문 실행 시점의 현재가가 호가가격단위에 맞지 않는 경우\n    호가단위에 맞춰 올림 처리됩니다.'  AL_LEFT  FONT("굴림", 9, NORMAL)  CUR(0)      COLOR(72, 232)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+'========================================================
+'신규 매수 조건 단건조회
+'=======================================================
+Sub LoadCond()
+obj_cond.Clearall 0
+SCREEN.Object("obj_cond.e_acnt_no").data = Trim(SCREEN.Object("main.AN5A").Data)
+SCREEN.Object("obj_cond.e_sq").data = E_sq.Data
+obj_cond.Send
+
+End Sub
+
+
+'========================================================
+'주문유형에 따른 주문가격컨트롤 활성/비활성화
+'=======================================================
+Sub SetOrdPrcCtrlByOrdType()
+	Dim bEnablePrc
+	bEnablePrc = True
+	If RADIO4.Checked = True Then
+		'시장가
+		bEnablePrc = False
+	ElseIf RADIO5.Checked = True Then
+		If cmb_hoga.Index = 1 Then
+			'최유리 지정가
+			bEnablePrc = False
+		ElseIf cmb_hoga.Index = 2 Then
+			'최우선 지정가
+			bEnablePrc = False
+		End If
+	End If
+
+	If bEnablePrc = True Then
+		RADIO8.Enable = True
+		RADIO9.Enable = True
+		If RADIO8.Checked = True Then
+			cmb_prc.Enable = True
+			ed_jprc.Enable = False
+		Else
+			cmb_prc.Enable = False
+			ed_jprc.Enable = True
+		End If
+	Else
+		InitCondCtrls("ORD_PRC")
+		cmb_prc.Enable = False
+		ed_jprc.Enable = False
+		RADIO8.Enable = False
+		RADIO9.Enable = False
+	End If
+
+End Sub
+
+'========================================================
+'신규 매수 조건 단건조회데이터 파싱
+'=======================================================
+Sub SetCondData()
+
+Dim szData
+'주문구분=====================================================
+szData = Trim(SCREEN.Object("obj_cond.o_crdt_typ_cd").data)
+If szData = "00" Then
+	RADIO0.Checked = True
+	cmb_ordtype.Enable = False
+Else
+	If szData = "03" Then
+		RADIO1.Checked = True
+		cmb_ordtype.Enable = True
+		cmb_ordtype.Index = 1
+
+	ElseIf szData = "01" Then
+		RADIO1.Checked = True
+		cmb_ordtype.Enable = True
+		cmb_ordtype.Index = 0
+	End If
+End If
+'이하조건=====================================================
+szData = Trim(SCREEN.Object("obj_cond.o_cndt_rstn_est_f1").data)
+If szData = "1" Then
+	chk_cond_1.Checked = True
+	cmb_cond_1.Enable = True
+	edt_cond_1.Enable = True
+
+	szData = Trim(SCREEN.Object("obj_cond.o_cndt_est_prc_clsf1").data)
+	If szData = "01" Then
+		'현재가
+		cmb_cond_1.Index = 0
+	ElseIf szData = "02" Then
+		'매도1호가
+		cmb_cond_1.Index = 1
+	ElseIf szData = "03" Then
+		'매수1호가
+		cmb_cond_1.Index = 2
+	End If
+	szData = Trim(SCREEN.Object("obj_cond.o_cndt_rstn_est_vl1").data)
+	edt_cond_1.Data = szData
+End If
+
+'이상조건=====================================================
+szData = Trim(SCREEN.Object("obj_cond.o_cndt_rstn_est_f2").data)
+If szData = "1" Then
+	chk_cond_2.Checked = True
+	cmb_cond_2.Enable = True
+	edt_cond_2.Enable = True
+
+	szData = Trim(SCREEN.Object("obj_cond.o_cndt_est_prc_clsf2").data)
+	If szData = "01" Then
+		'현재가
+		cmb_cond_2.Index = 0
+	ElseIf szData = "02" Then
+		'매도1호가
+		cmb_cond_2.Index = 1
+	ElseIf szData = "03" Then
+		'매수1호가
+		cmb_cond_2.Index = 2
+	End If
+	szData = Trim(SCREEN.Object("obj_cond.o_cndt_rstn_est_vl2").data)
+	edt_cond_2.Data = szData
+End If
+'대비조건=====================================================
+szData = Trim(SCREEN.Object("obj_cond.o_cndt_rstn_est_f3").data)
+If szData = "1" Then
+	chk_cond_5.Checked = True
+	cmb_cond_5_1.Enable = True
+	edt_cond_5.Enable = True
+	cmb_cond_5_2.Enable = True
+	cmb_cond_5_3.Enable = True
+
+	'/* 조건설정단위1 *//* 1:가격 2:율 3:Tick 4:주 */
+	szData = Trim(SCREEN.Object("obj_cond.o_cndt_est_unt3").data)
+	If szData = "1" Then
+		cmb_cond_5_2.Index = 0
+	ElseIf szData = "2" Then
+		cmb_cond_5_2.Index = 2
+		edt_cond_5.SetType 99
+	ElseIf szData = "3" Then
+		cmb_cond_5_2.Index = 1
+		edt_cond_5.SetType 99
+	End If
+	'/* 조건설정가격구분2 *//* 04 전일종가  05 당일시가*/
+	szData = Trim(SCREEN.Object("obj_cond.o_cndt_est_prc_clsf3").data)
+	If szData = "04" Then
+		cmb_cond_5_1.Index = 0
+	ElseIf szData = "05" Then
+		cmb_cond_5_1.Index = 1
+	End If
+
+	'설정값
+	szData = Trim(SCREEN.Object("obj_cond.o_cndt_rstn_est_vl3").data)
+	edt_cond_5.Data = szData
+	'/* 조건가격이상이하구분2 *//* 1:이상 2:이하 */
+	szData = Trim(SCREEN.Object("obj_cond.o_cndt_up_down_clsf3").data)
+	If szData = "1" Then
+		cmb_cond_5_3.Index = 0
+	ElseIf szData = "2" Then
+		cmb_cond_5_3.Index = 1
+	End If
+End If
+'TS=====================================================
+szData = Trim(SCREEN.Object("obj_cond.o_t_s_prft_rstn_est_f").data)
+If szData = "1" Then
+	chk_cond_3.Checked = True
+	cmb_cond_3.Enable = True
+ 	edt_cond_3_1.Enable = True
+ 	edt_cond_3_2.Enable = True
+ 	'TS 저점 설정값
+ 	szData = Trim(SCREEN.Object("obj_cond.o_t_s_prft_rstn_est_vl").data)
+ 	edt_cond_3_1.Data = szData
+
+ 	'저점 대비 설정값
+ 	szData = Trim(SCREEN.Object("obj_cond.o_t_s_hgh_mrk_cmpr_est_vl").data)
+ 	edt_cond_3_2.Data = szData
+
+ 	'저점대비설정단위 /* 1:가격 2:율 3:Tick */
+ 	szData = Trim(SCREEN.Object("obj_cond.o_t_s_hgh_mrk_cmpr_est_unt").data)
+ 	If szData = "1" Then
+ 		cmb_cond_3.Index = 0
+ 	ElseIf szData = "2" Then
+ 		cmb_cond_3.Index = 2
+ 		edt_cond_3_2.SetType 99
+ 	ElseIf szData = "3" Then
+ 		cmb_cond_3.Index = 1
+ 		edt_cond_3_2.SetType 99
+ 	End If
+End If
+
+'호가분할=====================================================
+szData = Trim(SCREEN.Object("obj_cond.o_askprc_prtn_ordr_f").data)
+If szData = "1" Then
+	chk_cond_4.Checked = True
+	cmb_cond_4.Enable = True
+	szData = Trim(SCREEN.Object("obj_cond.o_prtn_ordr_tno").data)
+	cmb_cond_4.Index = CInt(szData) - 1
+End If
+
+'호가구분=====================================================
+szData = Trim(SCREEN.Object("obj_cond.o_ordr_typ_cd").data)
+cmb_hoga.Enable = False
+If szData = "00" Then
+	'지정가
+	RADIO3.Checked = True
+ElseIf szData = "03" Then
+	'시장가
+	RADIO4.Checked = True
+ElseIf szData = "05" Then
+	'조건부 지정가
+	RADIO5.Checked = True
+	cmb_hoga.Enable = True
+	cmb_hoga.Index = 0
+ElseIf szData = "06" Then
+	'최유리 지정가
+	RADIO5.Checked = True
+	cmb_hoga.Enable = True
+	cmb_hoga.Index = 1
+ElseIf szData = "07" Then
+	'최우선 지정가
+	RADIO5.Checked = True
+	cmb_hoga.Enable = True
+	cmb_hoga.Index = 2
+End If
+'주문수량=====================================================
+szData = Trim(SCREEN.Object("obj_cond.o_ordr_q_est_clsf").data)
+'/* 주문수량설정구분/* 1:잔고대비율 2:주 3금액*/
+If szData = "2" Then
+	cmb_qtyper.Index = 1
+	LABEL20.Text = "주"
+ElseIf szData = "3" Then
+	cmb_qtyper.Index = 0
+	LABEL20.Text = "원 에 해당하는 수량"
+End If
+
+
+szData = Trim(SCREEN.Object("obj_cond.o_ordr_q_est_vl").data)
+ed_jqty.Data = szData
+
+'주문가격=====================================================
+If RADIO4.Checked = False Then	'시장가 아닐때만 유효함
+	'/* 주문가격설정구분 /* 1:TICK 2:지정가 3:상한가 4:하한가*/*/
+	szData = Trim(SCREEN.Object("obj_cond.o_ordr_prc_est_clsf").data)
+	If szData = "1" Then
+		RADIO8.Checked = True
+		cmb_prc.Enable = True
+		ed_jprc.Enable = False
+		szData = Trim(SCREEN.Object("obj_cond.o_ordr_prc_est_vl").data)
+		If szData = "5" Then
+			cmb_prc.Index = 1
+		ElseIf szData = "4" Then
+			cmb_prc.Index = 2
+		ElseIf szData = "3" Then
+			cmb_prc.Index = 3
+		ElseIf szData = "2" Then
+			cmb_prc.Index = 4
+		ElseIf szData = "1" Then
+			cmb_prc.Index = 5
+		ElseIf szData = "0" Then
+			cmb_prc.Index = 6
+		ElseIf szData = "-1" Then
+			cmb_prc.Index = 7
+		ElseIf szData = "-2" Then
+			cmb_prc.Index = 8
+		ElseIf szData = "-3" Then
+			cmb_prc.Index = 9
+		ElseIf szData = "-4" Then
+			cmb_prc.Index = 10
+		ElseIf szData = "-5" Then
+			cmb_prc.Index = 11
+		End If
+	ElseIf szData = "2" Then
+		RADIO9.Checked = True
+		cmb_prc.Index = 6
+		cmb_prc.Enable = False
+		ed_jprc.Enable = True
+		szData = Trim(SCREEN.Object("obj_cond.o_ordr_prc_est_vl").data)
+		ed_jprc.Data = szData
+	ElseIf szData = "3" Then
+		RADIO8.Checked = True
+		cmb_prc.Enable = True
+		ed_jprc.Enable = False
+		cmb_prc.Index = 0
+	ElseIf szData = "4" Then
+		RADIO8.Checked = True
+		cmb_prc.Enable = True
+		ed_jprc.Enable = False
+		cmb_prc.Index = 12
+	End If
+
+
+End If
+'유효기간=====================================================
+szData = Trim(SCREEN.Object("obj_cond.o_end_dt").data)
+zOrdEndDt.Data = szData
+
+Call SetOrdPrcCtrlByOrdType()
+
+BUTTON0.Text = "자동매수 조건변경"
+
+End Sub
+
+'========================================================
+'신규 매수 조건 초기화
+'========================================================
+Sub InitCondCtrls(szType)
+'--------------------------------------
+'이하 조건 시작
+If szType = "ALL" Or szType = "COND_1" Then
+	chk_cond_1.Checked = False
+	cmb_cond_1.Index = 0
+	edt_cond_1.Data = ""
+	cmb_cond_1.Enable = False
+	edt_cond_1.Enable = False
+End If
+
+'--------------------------------------
+'이상 조건 시작
+If szType = "ALL" Or szType = "COND_2" Then
+	chk_cond_2.Checked = False
+	cmb_cond_2.Index = 0
+	edt_cond_2.Data = ""
+	cmb_cond_2.Enable = False
+	edt_cond_2.Enable = False
+End If
+'--------------------------------------
+'대비 조건 시작
+If szType = "ALL" Or szType = "COND_5" Then
+	chk_cond_5.Checked = False
+	cmb_cond_5_1.Index = 0
+	edt_cond_5.Data = ""
+	cmb_cond_5_2.Index = 0
+	cmb_cond_5_3.Index = 0
+
+	cmb_cond_5_1.Enable = False
+	edt_cond_5.Enable = False
+	cmb_cond_5_2.Enable = False
+	cmb_cond_5_3.Enable = False
+End If
+
+'--------------------------------------
+'TS 조건 시작
+If szType = "ALL" Or szType = "COND_3" Then
+	chk_cond_3.Checked = False
+	cmb_cond_3.Index = 0
+	edt_cond_3_1.Data = ""
+	edt_cond_3_2.Data = ""
+
+	cmb_cond_3.Enable = False
+ 	edt_cond_3_1.Enable = False
+ 	edt_cond_3_2.Enable = False
+End If
+'--------------------------------------
+'호가분할주문 조건 시작
+If szType = "ALL" Or szType = "COND_4" Then
+	chk_cond_4.Checked = False
+	cmb_cond_4.Index = 0
+	cmb_cond_4.Enable = False
+End If
+
+
+If szType = "ALL" Or szType = "ORD_PRC" Then
+	'주문 가격
+	RADIO8.Checked = True
+	cmb_prc.Index = 6
+	ed_jprc.Data = ""
+	cmb_prc.Enable = True
+	ed_jprc.Enable = False
+	RADIO8.Enable = True
+	RADIO9.Enable = True
+End If
+
+If szType = "ALL" Or szType = "ORDER" Then
+	'--------------------------------------
+	'호가구분
+	RADIO3.Checked = True
+	cmb_hoga.Index = 0
+	cmb_hoga.Enable = False
+	'--------------------------------------
+	'주문 수량
+	cmb_qtyper.Index = 0
+	LABEL20.Text = "원 에 해당하는 수량"
+	ed_jqty.Data = ""
+	'--------------------------------------
+	'주문 가격
+	RADIO8.Checked = True
+	cmb_prc.Index = 6
+	ed_jprc.Data = ""
+	cmb_prc.Enable = True
+	ed_jprc.Enable = False
+	'--------------------------------------
+	'유효 기간
+	Dim Today
+	Today = Date
+	Today = Replace(Today, "-", "")
+	zOrdStrDt.Data = Today
+	Dim Day1, Day2
+	Day2 = getDateSerial(zOrdStrDt.Data)
+	Day1 = change_indate("d", 29, Day2)
+	zOrdEndDt.data = Day1
+End If
+If szType = "ALL" Then
+	BUTTON0.Text = "자동매수 조건추가"
+	E_sq.Data = ""
+End If
+
+End Sub
+'========================================================
+'신규 매수 조건 저장
+'========================================================
+Sub SaveCond()
+Dim accn, pass
+
+Dim szData
+Dim nRdoIndex
+'/* 계좌번호 */
+accn = Trim(SCREEN.Object("main.AN5A").Data)
+If Len(accn) <> 11 Then
+	SCREEN.Object("main.guide").text = "계좌번호를 확인해 주십시오."
+	Exit Sub
+Else
+	E_acnt_no.Data = accn
+End If
+'비밀번호 체크만...
+If SYSTEM.ConnectBy = "0" Then
+	pass = "9999"
+Else
+	pass = Trim(SCREEN.Object("main.pswd2").Data)
+End If
+
+If Len(pass) < 4 Then
+	SCREEN.Object("main.guide").text = "비밀번호를 확인해 주십시오."
+	Exit Sub
+End If
+
+'========================================================
+'미리 셋팅 되야 하는 데이터
+'========================================================
+'일련번호  없으면 신규 저장
+'/* 처리구분 *//* 1:저장 2:정정 */
+If Len(Trim(E_sq.Data)) < 18 Then
+	E_proc_sec.Data = "1"
+Else
+	E_proc_sec.Data = "2"
+End If
+'
+'/* 단축코드 */
+If Len(Trim(E_shrt_cd.Data)) = 0  Then
+	MsgBox "종목을 선택해 주십시오.", , "IBK투자증권"
+	SCREEN.Object("main.guide").text = "종목을 선택해 주십시오."
+	Exit Sub
+End If
+
+'호가분할 제외 감시조건을 적어도 한개는 걸어야 저장 가능함
+If chk_cond_1.Checked = False And  chk_cond_2.Checked = False And  chk_cond_3.Checked = False And  chk_cond_5.Checked = False Then
+	MsgBox "설정한 감시조건이 없습니다.", , "IBK투자증권"
+	SCREEN.Object("main.guide").text = "설정한 감시조건이 없습니다."
+	Exit Sub
+End If
+
+
+'/* 종료일자 * ToDAY/
+If CDbl(zOrdStrDt.Data) > CDbl(zOrdEndDt.Data) Then
+	MsgBox "주문유효기간은 금일 이전일 수 없습니다.", , "IBK투자증권"
+	SCREEN.Object("main.guide").text = "주문유효기간은 금일 이전일 수 없습니다."
+	Exit Sub
+End If
+
+'/* 종료일자 * MAX/
+Dim MaxDate : MaxDate = change_indate("d", 30, getDateSerial(zOrdStrDt.Data))
+If CDbl(MaxDate) < CDbl(zOrdEndDt.Data) Then
+	MsgBox "주문유효기간은 최대30일까지 설정하실 수 있습니다.", , "IBK투자증권"
+	SCREEN.Object("main.guide").text = "주문유효기간은 최대30일까지 설정하실 수 있습니다."
+	Exit Sub
+Else
+	E_end_dt.Data = zOrdEndDt.Data
+End If
+
+
+If E_proc_sec.Data = "1" Then
+	szok = MsgBox("신규주문조건을 저장하시겠습니까?" ,1, "IBK투자증권")
+	If szok <> "1" Then
+		Exit Sub
+	End If
+Else
+	szok = MsgBox("주문조건을 변경하시겠습니까?" ,1, "IBK투자증권")
+	If szok <> "1" Then
+		Exit Sub
+	End If
+End If
+'그외 서버자동주문 가능 종목 체크
+'코스피: 1 코스닥 :2 ETF:6 ETN : 27 만 가능
+Dim szCheckType
+'szCheckType = SCREEN.GetCodeType(Trim(E_shrt_cd.Data))
+szCheckType = SCREEN.GetName(199,Trim(E_shrt_cd.Data),0)
+If  szCheckType = 1 Or szCheckType = 2 Or szCheckType = 6 Or szCheckType = 27 Then
+Else
+	MsgBox "코스피, 코스닥, ETF, ETN 종목만" & vbCrLf &"주식자동주문 설정이 가능합니다.", , "IBK투자증권"
+	Exit Sub
+End If
+'
+'/* 주문조건구분코드 0:없음 /* 1:IOC 2:FOK */
+'서버자동주문  조건구분코드 사용 안함 20240523
+E_ordr_cnd_dcd.Data = "0"
+
+'/* 신용구분 00:보통매매 */
+If RADIO0.Checked = True Then
+	E_crdt_typ_cd.Data = "00"
+Else
+	If 	cmb_ordtype.Index = 1 Then
+		E_crdt_typ_cd.Data = "03"
+
+	ElseIf cmb_ordtype.Index = 0 Then
+		E_crdt_typ_cd.Data = "01"
+	End If
+End If
+'
+'/* 대출일련번호 */
+'E_ln_sq
+'/* 대출일자 */
+'E_ln_dt
+'========================================================
+
+
+'========================================================
+'조건 설정 데이터
+'========================================================
+
+'--------------------------------------
+'이하 조건 시작
+'/* 조건설정여부1 *//* 0:미설정 1:설정*/
+If chk_cond_1.Checked = True Then
+	E_cndt_rstn_est_f1.Data = "1"
+
+	'/* 조건설정단위1 *//* 1:가격 2:율 3:Tick 4:주 */
+	'신규 매수는 항상 가격 감시
+	E_cndt_est_unt1.Data = "1"
+'/* 조건설정가격구분1 *//* 01:현재가 02 : 매도1호가 03:매수1호가 */
+	If cmb_cond_1.Index = 0 Then
+		'현재가
+		E_cndt_est_prc_clsf1.Data = "01"
+	ElseIf cmb_cond_1.Index = 1 Then
+		'매도1호가
+		E_cndt_est_prc_clsf1.Data = "02"
+	ElseIf cmb_cond_1.Index = 2 Then
+		'매수1호가
+		E_cndt_est_prc_clsf1.Data = "03"
+	End If
+'/* 조건설정값1 */
+	szData = Trim(edt_cond_1.Data)
+	If szData = "" Or szData = "0" Then
+		MsgBox "이하조건 설정값을 확인 하세요.", , "IBK투자증권"
+		SCREEN.Object("main.guide").text = "이하조건 설정값을 확인 하세요."
+		Exit Sub
+	End If
+	E_cndt_rstn_est_vl1.Data = szData
+'/* 조건가격이상이하구분1 *//* 1:이상 2:이하 */
+	E_cndt_up_down_clsf1.Data = "2"
+Else
+	E_cndt_rstn_est_f1.Data = "0"
+
+	E_cndt_est_unt1.Data = ""
+	E_cndt_est_prc_clsf1.Data = ""
+	E_cndt_rstn_est_vl1.Data = ""
+	E_cndt_up_down_clsf1.Data = ""
+End If
+'이하 조건 끝
+'--------------------------------------
+
+
+'--------------------------------------
+'이상조건 시작
+'/* 조건설정여부2 *//* 0:미설정 1:설정*/
+If chk_cond_2.Checked = True Then
+	E_cndt_rstn_est_f2.Data = "1"
+	'/* 조건설정단위1 *//* 1:가격 2:율 3:Tick 4:주 */
+	'신규 매수는 항상 가격 감시
+	E_cndt_est_unt2.Data = "1"
+'/* 조건설정가격구분2 *//* 01:현재가 02 : 매도1호가 03:매수1호가 */
+	If cmb_cond_2.Index = 0 Then
+		'현재가
+		E_cndt_est_prc_clsf2.Data = "01"
+	ElseIf cmb_cond_2.Index = 1 Then
+		'매도1호가
+		E_cndt_est_prc_clsf2.Data = "02"
+	ElseIf cmb_cond_2.Index = 2 Then
+		'매수1호가
+		E_cndt_est_prc_clsf2.Data = "03"
+	End If
+'/* 조건설정값2 */
+	szData = Trim(edt_cond_2.Data)
+	If szData = "" Or szData = "0" Then
+		MsgBox "이상조건 설정값을 확인 하세요.", , "IBK투자증권"
+		SCREEN.Object("main.guide").text = "이상조건 설정값을 확인 하세요."
+		Exit Sub
+	End If
+	E_cndt_rstn_est_vl2.Data = szData
+'/* 조건가격이상이하구분2 *//* 1:이상 2:이하 */
+	E_cndt_up_down_clsf2.Data = "1"
+Else
+	E_cndt_rstn_est_f2.Data = "0"
+
+	E_cndt_est_unt2.Data = ""
+	E_cndt_est_prc_clsf2.Data = ""
+	E_cndt_rstn_est_vl2.Data = ""
+	E_cndt_up_down_clsf2.Data = ""
+End If
+'이상조건 끝
+'--------------------------------------
+
+
+'--------------------------------------
+'대비조건 시작
+'/* 조건설정여부2 *//* 0:미설정 1:설정*/
+If chk_cond_5.Checked = True Then
+	E_cndt_rstn_est_f3.Data = "1"
+	'/* 조건설정단위1 *//* 1:가격 2:율 3:Tick 4:주 */
+	If cmb_cond_5_2.Index = 0 Then
+		E_cndt_est_unt3.Data = "1"
+	ElseIf cmb_cond_5_2.Index = 1 Then
+		E_cndt_est_unt3.Data = "3"
+	ElseIf cmb_cond_5_2.Index = 2 Then
+		E_cndt_est_unt3.Data = "2"
+	End If
+
+'/* 조건설정가격구분2 *//* 04 전일종가  05 당일시가*/
+	If cmb_cond_5_1.Index = 0 Then
+		'현재가
+		E_cndt_est_prc_clsf3.Data = "04"
+	ElseIf cmb_cond_5_1.Index = 1 Then
+		'매도1호가
+		E_cndt_est_prc_clsf3.Data = "05"
+	End If
+'/* 조건설정값2 */
+	szData = Trim(edt_cond_5.Data)
+	If szData = "" Or szData = "0" Then
+		MsgBox "대비조건 설정값을 확인 하세요.", , "IBK투자증권"
+		SCREEN.Object("main.guide").text = "대비조건 설정값을 확인 하세요."
+		Exit Sub
+	End If
+	E_cndt_rstn_est_vl3.Data = szData
+'/* 조건가격이상이하구분2 *//* 1:이상 2:이하 */
+	If cmb_cond_5_3.Index = 0 Then
+		E_cndt_up_down_clsf3.Data = "1"
+	Else
+		E_cndt_up_down_clsf3.Data = "2"
+	End If
+Else
+	E_cndt_rstn_est_f3.Data = "0"
+
+	E_cndt_est_unt3.Data = ""
+	E_cndt_est_prc_clsf3.Data = ""
+	E_cndt_rstn_est_vl3.Data = ""
+	E_cndt_up_down_clsf3.Data = ""
+End If
+'대비조건 끝
+'--------------------------------------
+
+
+
+'--------------------------------------
+'TS 시작
+'/* TS이익실현설정여부 *//* 0:미설정 1:설정*/
+If chk_cond_3.Checked = True Then
+	E_t_s_prft_rstn_est_f.Data = "1"
+	'/* TS이익실현설정구분 *//* 1:TS 2:이익보존 */
+	E_t_s_prft_rstn_est_clsf.Data = "1"
+	'/* TS이익실현설정가격구분 *//* 01:현재가 10:이익 11:주당이익 */
+	'신규 매수는 항상 현재가
+	'현재가
+	E_t_s_prft_rstn_est_prc_clsf.Data = "01"
+	'/* TS이익실현설정단위 *//* 1:가격 2:율 3:Tick */
+	E_t_s_prft_rstn_est_unt.Data = "1"
+
+	'/* TS이익실현설정값 */
+	szData = Trim(edt_cond_3_1.Data)
+	If szData = "" Or szData = "0" Then
+		MsgBox "TS 저점 설정값을 확인 하세요.", , "IBK투자증권"
+		SCREEN.Object("main.guide").text = "TS 저점 설정값을 확인 하세요."
+		edt_cond_3_1.Focus
+		Exit Sub
+	End If
+	E_t_s_prft_rstn_est_vl.Data = szData
+
+	'/* TS고점대비설정값 */
+	szData = Trim(edt_cond_3_2.Data)
+	If szData = "" Or szData = "0" Then
+		MsgBox "TS 저점대비 설정값을 확인 하세요.", , "IBK투자증권"
+		SCREEN.Object("main.guide").text = "TS 저점대비 설정값을 확인 하세요."
+		edt_cond_3_2.Focus
+		Exit Sub
+	End If
+	E_t_s_hgh_mrk_cmpr_est_vl.Data = szData
+	'/* TS고점대비설정단위/* 1:가격 2:율 3:Tick */
+	If cmb_cond_3.Index = 0 Then
+		'원
+		E_t_s_hgh_mrk_cmpr_est_unt.Data = "1"
+	ElseIf cmb_cond_3.Index = 1 Then
+		'틱
+		E_t_s_hgh_mrk_cmpr_est_unt.Data = "3"
+	Else
+		'%
+		E_t_s_hgh_mrk_cmpr_est_unt.Data = "2"
+	End If
+Else
+	E_t_s_prft_rstn_est_f.Data = "0"
+	E_t_s_prft_rstn_est_clsf.Data = ""
+	E_t_s_prft_rstn_est_prc_clsf.Data = ""
+	E_t_s_prft_rstn_est_unt.Data = ""
+	E_t_s_prft_rstn_est_vl.Data = ""
+	E_t_s_hgh_mrk_cmpr_est_vl.Data = ""
+	E_t_s_hgh_mrk_cmpr_est_unt.Data = ""
+End If
+
+'TS 끝
+'--------------------------------------
+
+'/* 호가분할주문여부 *//* 0:미설정 1:설정*/
+If chk_cond_4.Checked = True Then
+	E_askprc_prtn_ordr_f.Data = "1"
+	'/* 호가분할주문횟수 */
+	szData = cmb_cond_4.Index
+	If CInt(szData) = 0 Then
+		MsgBox "호가분할 설정값을 확인 하세요.", , "IBK투자증권"
+		SCREEN.Object("main.guide").text = "호가분할 설정값을 확인 하세요."
+		cmb_cond_4.SetFocus
+		Exit Sub
+	Else
+		E_prtn_ordr_tno.Data = l_format(CInt(szData) + 1, "0", 4)
+	End If
+Else
+	E_askprc_prtn_ordr_f.Data = "0"
+	E_prtn_ordr_tno.Data = ""
+End If
+
+'
+'/* 매매구분 /* 1:매도 2:매수 */
+E_trd_ccd.Data = "2"
+
+'/* 주문유형 */
+If RADIO3.Checked = True Then
+	'지정가
+	E_ordr_typ_cd.Data = "00"
+ElseIf RADIO4.Checked = True Then
+	'시장가
+	E_ordr_typ_cd.Data = "03"
+ElseIf RADIO5.Checked = True Then
+	If cmb_hoga.Index = 0 Then
+		'조건부 지정가
+		E_ordr_typ_cd.Data = "05"
+	ElseIf cmb_hoga.Index = 1 Then
+		'최유리 지정가
+		E_ordr_typ_cd.Data = "06"
+	ElseIf cmb_hoga.Index = 2 Then
+		'최우선 지정가
+		E_ordr_typ_cd.Data = "07"
+	End If
+End If
+
+'호가분할 주문 가능 주문유형 체크
+If chk_cond_4.Checked = True Then
+	'시장가 최유리지정가 최우선지정가는 호가분할 불가능하다
+	If E_ordr_typ_cd.Data = "03" Or E_ordr_typ_cd.Data = "06" Or E_ordr_typ_cd.Data = "07" Then
+		MsgBox "호가분할주문이 불가능한 주문유형 입니다.", , "IBK투자증권"
+		SCREEN.Object("main.guide").text = "호가분할주문이 불가능한 주문유형 입니다."
+		Exit Sub
+	End If
+End If
+
+
+'/* 주문수량설정구분/* 1:잔고대비율 2:주 3금액*/
+
+If cmb_qtyper.Index = 0 Then
+	E_ordr_q_est_clsf.Data = "3"
+Else
+
+	E_ordr_q_est_clsf.Data = "2"
+End If
+'/* 주문수량설정값 */
+szData = Trim(ed_jqty.Data)
+If szData = "" Or szData = "0" Then
+	MsgBox "주문수량 설정값을 확인 하세요.", , "IBK투자증권"
+	SCREEN.Object("main.guide").text = "주문수량 설정값을 확인 하세요."
+	ed_jqty.Focus
+	Exit Sub
+End If
+
+E_ordr_q_est_vl.Data = szData
+'시장가
+If E_ordr_typ_cd.Data = "03" Or E_ordr_typ_cd.Data = "06" Or E_ordr_typ_cd.Data = "07" Then
+	'/* 주문가격설정구분 /* 1:TICK 2:지정가 3:상한가 4:하한가*/
+	E_ordr_prc_est_clsf.Data = ""
+	E_ordr_prc_est_vl.Data = ""
+Else
+	If RADIO8.Checked = True Then
+		'/* 주문가격설정구분 /* 1:TICK 2:지정가 3:상한가 4:하한가*/
+		E_ordr_prc_est_clsf.Data = "1"
+		'/* 주문가격설정값 */
+		nRdoIndex = cmb_prc.Index
+		If nRdoIndex = 0 Then
+			'상한가
+			E_ordr_prc_est_clsf.Data = "3"
+			E_ordr_prc_est_vl.Data = ""
+		ElseIf nRdoIndex = 1 Then
+			'+5틱
+			E_ordr_prc_est_vl.Data = "5"
+		ElseIf nRdoIndex = 2 Then
+			'+4틱
+			E_ordr_prc_est_vl.Data = "4"
+		ElseIf nRdoIndex = 3 Then
+			'+3틱
+			E_ordr_prc_est_vl.Data = "3"
+		ElseIf nRdoIndex = 4 Then
+			'+2틱
+			E_ordr_prc_est_vl.Data = "2"
+		ElseIf nRdoIndex = 5 Then
+			'+1틱
+			E_ordr_prc_est_vl.Data = "1"
+		ElseIf nRdoIndex = 6 Then
+			'현재가
+			E_ordr_prc_est_vl.Data = "0"
+		ElseIf nRdoIndex = 7 Then
+			'-1틱
+			E_ordr_prc_est_vl.Data = "-1"
+		ElseIf nRdoIndex = 8 Then
+			'-2틱
+			E_ordr_prc_est_vl.Data = "-2"
+		ElseIf nRdoIndex = 9 Then
+			'-3틱
+			E_ordr_prc_est_vl.Data = "-3"
+		ElseIf nRdoIndex = 10 Then
+			'-4틱
+			E_ordr_prc_est_vl.Data = "-4"
+		ElseIf nRdoIndex = 11 Then
+			'-5틱
+			E_ordr_prc_est_vl.Data = "-5"
+		ElseIf nRdoIndex = 12 Then
+			'하한가
+			E_ordr_prc_est_clsf.Data = "4"
+			E_ordr_prc_est_vl.Data = ""
+		End If
+	Else
+		'/* 주문가격설정구분 /* 1:TICK 2:지정가 */
+		E_ordr_prc_est_clsf.Data = "2"
+
+		'/* 주문가격설정값 */
+		szData = Trim(ed_jprc.Data)
+		If szData = "" Or szData = "0" Then
+			MsgBox "주문가격 설정값을 확인 하세요.", , "IBK투자증권"
+			SCREEN.Object("main.guide").text = "주문가격 설정값을 확인 하세요."
+			ed_jprc.Focus
+			Exit Sub
+		End If
+		E_ordr_prc_est_vl.Data = szData
+	End If
+End If
+
+'시장가/최유리/최우선 일때는 주문 조건 안올림
+If E_ordr_typ_cd.Data = "03" Or E_ordr_typ_cd.Data = "06" Or E_ordr_typ_cd.Data = "07"Then
+	E_ordr_prc_est_vl.Data = ""
+	E_ordr_prc_est_clsf.Data = ""
+End If
+
+
+
+	SCREEN.Send 0
+
+End Sub
+
+Sub SetJanInfo(szVal)
+	Dim szCrdt
+	If szVal = "JANGOINFO" Then
+		'잔고더블 클릭으로 들어온 정보 처리
+		'종목코드
+		E_shrt_cd.Data = e_jcode.Data
+		Set_EDIT_mkgb(Trim (e_jcode.Data))
+		'종목명
+		LB_NAME.Data = e_jname.Data
+
+		'잔고신용구분  00:현금 03:자기융자 01:유통융자 80:대출
+		szCrdt = Trim(e_crdt.Data)
+		E_crdt_typ_cd.Data = szCrdt
+		If szCrdt = "00" Then
+			RADIO0.Checked = True
+			cmb_ordtype.Enable = False
+		Else
+			If szCrdt = "03" Then
+				RADIO1.Checked = True
+				cmb_ordtype.Enable = True
+				cmb_ordtype.Index = 1
+
+			ElseIf szCrdt = "01" Then
+				RADIO1.Checked = True
+				cmb_ordtype.Enable = True
+				cmb_ordtype.Index = 0
+			End If
+		End If
+
+		'대출일자 신규주문은 없다 비우자
+		E_ln_dt.Data = ""
+	ElseIf szVal = "ITEMCHANGE" Then
+		'화면 종목 변경으로 들어온 정보 처리
+		'종목코드
+		E_shrt_cd.Data = e_jcode.Data
+		Set_EDIT_mkgb(Trim (e_jcode.Data))
+		'종목명
+		LB_NAME.Data = e_jname.Data
+		'잔고신용구분  00:현금 03:자기융자 01:유통융자 80:대출
+		szCrdt = Trim(e_crdt.Data)
+		RADIO0.Checked = True
+		cmb_ordtype.Enable = False
+		E_ln_dt.Data = ""
+		Call InitCondCtrls("ALL")
+	End If
+
+End Sub
+
+
+'***************************************************************************
+' DESEC: 시장구분 Setting
+'1:거래소 2:코스닥 3:프리보드 4:장외
+'***************************************************************************
+Function Set_EDIT_mkgb(code)
+	Dim retn
+	Set_EDIT_mkgb = True
+	ed_jprc.SetType 0
+	edt_cond_1.SetType 0
+	edt_cond_2.SetType 0
+	edt_cond_3_1.SetType 0
+	edt_cond_3_2.SetType 0
+	edt_cond_5.SetType 0
+	retn = SCREEN.GetCodeType(code)
+	Select Case retn
+		Case 1
+			'거래소
+			ed_jprc.SetType 100
+			edt_cond_1.SetType 100
+			edt_cond_2.SetType 100
+			edt_cond_3_1.SetType 100
+			edt_cond_3_2.SetType 100
+			edt_cond_5.SetType 100
+		Case 2
+			'코스닥
+			ed_jprc.SetType 200
+			edt_cond_1.SetType 200
+			edt_cond_2.SetType 200
+			edt_cond_3_1.SetType 200
+			edt_cond_3_2.SetType 200
+			edt_cond_5.SetType 200
+		Case 3
+			'프리보드
+		Case 4, 5, 7
+			'장외
+		Case 6, 27
+			'ETF
+			ed_jprc.SetType 240
+			edt_cond_1.SetType 240
+			edt_cond_2.SetType 240
+			edt_cond_3_1.SetType 240
+			edt_cond_3_2.SetType 240
+			edt_cond_5.SetType 240
+		Case 9
+			'ELW
+			ed_jprc.SetType 250
+			edt_cond_1.SetType 250
+			edt_cond_2.SetType 250
+			edt_cond_3_1.SetType 250
+			edt_cond_3_2.SetType 250
+			edt_cond_5.SetType 250
+		Case Else
+			Set_EDIT_mkgb = False
+	End Select
+End Function
+
+'***************************************************************************
+Function Get_Edt_Type()
+	Get_Edt_Type = 0
+	retn = SCREEN.GetCodeType(Trim(E_shrt_cd.Data))
+	Select Case retn
+		Case 1
+			'거래소
+			Get_Edt_Type = 100
+		Case 2
+			'코스닥
+			Get_Edt_Type = 200
+		Case 3
+			'프리보드
+		Case 4, 5, 7
+			'장외
+		Case 6, 27
+			'ETF
+			Get_Edt_Type = 240
+		Case 9
+			'ELW
+			Get_Edt_Type = 250
+		Case Else
+			Get_Edt_Type = 0
+	End Select
+
+End Function
+
+
+Sub refreshList()
+	SCREEN.Proc "main.refreshList", ""
+End Sub
+
+_AW_ONINDECLARE_AW_
+#Load IB888888
+
+_AW_ONENDSUB_AW_
+_AW_ONSTART_AW_
+Dim Day1, Day2
+
+Day2 = getDateSerial(zOrdStrDt.Data)
+Day1 = change_indate("d", 29, Day2)
+
+zOrdEndDt.data = Day1
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+If Trim(OUTPUT3.Data) = "0000" Then
+	szok = MsgBox("설정한 조건이 저장되었습니다."& vbCrLf &"바로 감시를 실행하시겠어요?" ,1, "IBK투자증권")
+	If szok <> "1" Then
+		SCREEN.Proc "main.refreshList", ""
+	Else
+		'==========================================================================================
+		'조건 실행
+		'==========================================================================================
+		'일련번호
+		SCREEN.Object("obj_exec_SVR.e_sq").Data = Trim(OUTPUT1.Data)
+		'계좌번호
+		SCREEN.Object("obj_exec_SVR.e_acnt_no").Data = Trim(OUTPUT0.Data)
+		obj_exec_SVR.Send
+	End If
+Else
+	SCREEN.Object("main.guide").text = "[서버자동주문] " & Trim(OUTPUT4.Data)
+	MsgBox Trim(OUTPUT4.Data)
+End If
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(RADIO0)
+_AW_ONCLICK_AW_
+cmb_ordtype.Enable = False
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(RADIO1)
+_AW_ONCLICK_AW_
+cmb_ordtype.Enable = True
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(chk_cond_1)
+_AW_ONCLICK_AW_
+ If chk_cond_1.Checked = True Then
+ 	cmb_cond_1.Enable = True
+ 	edt_cond_1.Enable = True
+	edt_cond_1.Data = SCREEN.Object("main.obj_currSise.curr").Data
+ 	edt_cond_1.SetFocus
+ Else
+ 	InitCondCtrls("COND_1")
+ End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(chk_cond_2)
+_AW_ONCLICK_AW_
+ If chk_cond_2.Checked = True Then
+ 	cmb_cond_2.Enable = True
+ 	edt_cond_2.Enable = True
+	edt_cond_2.Data = SCREEN.Object("main.obj_currSise.curr").Data
+ 	edt_cond_2.SetFocus
+ Else
+ 	InitCondCtrls("COND_2")
+ End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(chk_cond_3)
+_AW_ONCLICK_AW_
+ If chk_cond_3.Checked = True Then
+ 	cmb_cond_3.Enable = True
+ 	edt_cond_3_1.Enable = True
+ 	edt_cond_3_2.Enable = True
+	edt_cond_3_1.Data = SCREEN.Object("main.obj_currSise.curr").Data
+ 	edt_cond_3_1.SetFocus
+ Else
+ InitCondCtrls("COND_3")
+
+ End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(chk_cond_4)
+_AW_ONCLICK_AW_
+ If chk_cond_4.Checked = True Then
+ 	cmb_cond_4.Enable = True
+	cmb_cond_4.SetFocus
+ Else
+	InitCondCtrls("COND_4")
+ End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(cmb_cond_1)
+_AW_ONCHANGE_AW_
+edt_cond_1.SetFocus
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(cmb_cond_2)
+_AW_ONCHANGE_AW_
+edt_cond_2.SetFocus
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(cmb_cond_3)
+_AW_ONCHANGE_AW_
+
+If cmb_cond_3.Index = 0 Then
+	'종목코드에 따른 호가틱 타입
+	Call edt_cond_3_2.SetType (Get_Edt_Type())
+Else
+	edt_cond_3_2.SetType 99
+End If
+
+edt_cond_3_2.Data = ""
+edt_cond_3_2.SetFocus
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(edt_cond_3_2)
+_AW_ONCHANGE_AW_
+'이익률 MAX 값 검사
+If cmb_cond_3.Index = 2 Then
+	szValue = Trim(edt_cond_3_2.Data)
+	If CLng(szValue) > 90 Then
+		MsgBox "입력 가능한 범위를 초과했어요." & vbCrLf &"다시 입력해 주세요.", , "IBK투자증권"
+		edt_cond_3_2.Data = ""
+	End If
+ElseIf cmb_cond_3.Index = 1 Then
+	szValue = Trim(edt_cond_3_2.Data)
+	If CLng(szValue) > 9000 Then
+		MsgBox "입력 가능한 범위를 초과했어요." & vbCrLf &"다시 입력해 주세요.", , "IBK투자증권"
+		edt_cond_3_2.Data = ""
+	End If
+End If
+_AW_ONENDSUB_AW_
+_AW_ONCHARCHANGE_AW_
+'이익률 MAX 값 검사
+If cmb_cond_3.Index = 2 Then
+	szValue = Trim(edt_cond_3_2.Data)
+	If CLng(szValue) > 90 Then
+		MsgBox "입력 가능한 범위를 초과했어요." & vbCrLf &"다시 입력해 주세요.", , "IBK투자증권"
+		edt_cond_3_2.Data = ""
+	End If
+ElseIf cmb_cond_3.Index = 1 Then
+	szValue = Trim(edt_cond_3_2.Data)
+	If CLng(szValue) > 9000 Then
+		MsgBox "입력 가능한 범위를 초과했어요." & vbCrLf &"다시 입력해 주세요.", , "IBK투자증권"
+		edt_cond_3_2.Data = ""
+	End If
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(RADIO3)
+_AW_ONCLICK_AW_
+cmb_hoga.Enable = False
+
+Call SetOrdPrcCtrlByOrdType()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(RADIO4)
+_AW_ONCLICK_AW_
+cmb_hoga.Enable = False
+
+Call SetOrdPrcCtrlByOrdType()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(RADIO5)
+_AW_ONCLICK_AW_
+cmb_hoga.Enable = True
+
+Call SetOrdPrcCtrlByOrdType()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(cmb_hoga)
+_AW_ONCHANGE_AW_
+
+Call SetOrdPrcCtrlByOrdType()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(cmb_qtyper)
+_AW_ONCHANGE_AW_
+If cmb_qtyper.Index = 0 Then
+	LABEL20.Text = "원 에 해당하는 수량"
+
+Else
+	LABEL20.Text = "주"
+End If
+
+ed_jqty.SetFocus
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(RADIO8)
+_AW_ONCLICK_AW_
+cmb_prc.Enable = True
+ed_jprc.Enable = False
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(RADIO9)
+_AW_ONCLICK_AW_
+cmb_prc.Enable = False
+ed_jprc.Enable = True
+ed_jprc.SetFocus
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(zOrdStrDt)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(zOrdEndDt)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(btn_tday)
+_AW_ONCLICK_AW_
+
+Dim Today
+Today = Date
+Today = Replace(Today, "-", "")
+zOrdEndDt.Data = Today
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(btn_5day)
+_AW_ONCLICK_AW_
+Dim Day1, Day2
+
+Day2 = getDateSerial(zOrdStrDt.Data)
+Day1 = change_indate("d", 4, Day2)
+
+zOrdEndDt.data = Day1
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(btn_15day)
+_AW_ONCLICK_AW_
+Dim Day1, Day2
+
+Day2 = getDateSerial(zOrdStrDt.Data)
+Day1 = change_indate("d", 14, Day2)
+
+zOrdEndDt.data = Day1
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(btn_30day)
+_AW_ONCLICK_AW_
+Dim Day1, Day2
+
+Day2 = getDateSerial(zOrdStrDt.Data)
+Day1 = change_indate("d", 29, Day2)
+
+zOrdEndDt.data = Day1
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON0)
+_AW_ONCLICK_AW_
+Call SaveCond()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON1)
+_AW_ONCLICK_AW_
+	Call InitCondCtrls("ALL")
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(chk_cond_5)
+_AW_ONCLICK_AW_
+ If chk_cond_5.Checked = True Then
+ 	cmb_cond_5_1.Enable = True
+ 	cmb_cond_5_2.Enable = True
+ 	cmb_cond_5_3.Enable = True
+ 	edt_cond_5.Enable = True
+
+ 	edt_cond_5.SetFocus
+ Else
+ 	InitCondCtrls("COND_5")
+ End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(cmb_cond_5_1)
+_AW_ONCHANGE_AW_
+edt_cond_5.SetFocus
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(cmb_cond_5_2)
+_AW_ONCHANGE_AW_
+
+If cmb_cond_5_2.Index = 0 Then
+	'종목코드에 따른 호가틱 타입
+	Call edt_cond_5.SetType (Get_Edt_Type())
+Else
+	edt_cond_5.SetType 99
+End If
+
+edt_cond_5.Data = ""
+edt_cond_5.SetFocus
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(edt_cond_5)
+_AW_ONCHANGE_AW_
+'이익률 MAX 값 검사
+If cmb_cond_5_2.Index = 2 Then
+	szValue = Trim(edt_cond_5.Data)
+	If CLng(szValue) > 90 Then
+		MsgBox "입력 가능한 범위를 초과했어요." & vbCrLf &"다시 입력해 주세요.", , "IBK투자증권"
+		edt_cond_5.Data = ""
+	End If
+ElseIf cmb_cond_5_2.Index = 1 Then
+	szValue = Trim(edt_cond_5.Data)
+	If CLng(szValue) > 9000 Then
+		MsgBox "입력 가능한 범위를 초과했어요." & vbCrLf &"다시 입력해 주세요.", , "IBK투자증권"
+		edt_cond_5.Data = ""
+	End If
+End If
+_AW_ONENDSUB_AW_
+_AW_ONCHARCHANGE_AW_
+'이익률 MAX 값 검사
+If cmb_cond_5_2.Index = 2 Then
+	szValue = Trim(edt_cond_5.Data)
+	If CLng(szValue) > 90 Then
+		MsgBox "입력 가능한 범위를 초과했어요." & vbCrLf &"다시 입력해 주세요.", , "IBK투자증권"
+		edt_cond_5.Data = ""
+	End If
+ElseIf cmb_cond_5_2.Index = 1 Then
+	szValue = Trim(edt_cond_5.Data)
+	If CLng(szValue) > 9000 Then
+		MsgBox "입력 가능한 범위를 초과했어요." & vbCrLf &"다시 입력해 주세요.", , "IBK투자증권"
+		edt_cond_5.Data = ""
+	End If
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

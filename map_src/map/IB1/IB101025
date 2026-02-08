@@ -1,0 +1,416 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB101025)
+MAPSIZE(460, 656)
+VERSION(003)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("일자별 시세")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(FMS|FLASH|SAVE)
+TITLE("[1010] 일자별 시세")
+TOPATH(AXIS)
+METHOD(SEND)
+TRXCODE("pooppoop")
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL11(0, 0, 660, 30)        COLOR(64, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL63(-2, 29, 656, 80)  LIMAGE(0)  LINEW(4)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  obj(0, 75, 656, 460)    "IB10102C"  TABORDER(4)  IOORDER(12)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL_bg(1, 0, 658, 27)        COLOR(66, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  SAVE(236, 621, 282, 637)  AL_LEFT  CUR(0)      COLOR(131, 1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  BUFF(158, 616, 204, 632)  AL_LEFT  CUR(0)      COLOR(131, 1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  HCOD(394, 589, 464, 613)  AL_LEFT  CUR(0)      COLOR(194, 0)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  1021(283, 592, 383, 612)  LEN(16)  IO_ALPHA|AL_LEFT||FA_FLASH    COLOR(130, 131)  CUR(0)            TABORDER(0)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  1022(144, 588, 274, 608)  LEN(20)  IO_MIXED|AL_LEFT|    COLOR(131, 1)  CUR(0)  TP_SUNKEN          TABORDER(0)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  12901(411, 3, 499, 23)  LEN(8)  IO_NUM|EDIT_INPUT|FA_SKIP|FA_DATE    COLOR(99, 130)  CUR(0)  TP_SUNKEN  INIT("00000000")          EDITFORMAT("9999/99/99")  TABORDER(1)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  5311(112, 36, 222, 55)  LEN(8)  IO_NUM|AL_RIGHT||FA_COMMA|FA_CORGB|SA_CORAW  FONT("굴림체", 9, NORMAL)    COLOR(68, 94)  CUR(0)  LINECOLOR(75)          IFRGB(94, 95)  TABORDER(0)  IOORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  5321(221, 36, 331, 55)  LEN(8)  IO_NUM|AL_CENTER|  FONT("굴림체", 9, NORMAL)    COLOR(68, 69)  CUR(0)  LINECOLOR(75)          EDITFORMAT("9999/99/99")  TABORDER(0)  IOORDER(5)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  5312(431, 36, 541, 55)  LEN(8)  IO_NUM|AL_RIGHT||FA_COMMA|FA_CORGB|SA_CORAW  FONT("굴림체", 9, NORMAL)    COLOR(68, 95)  CUR(0)  LINECOLOR(75)          IFRGB(94, 95)  TABORDER(0)  IOORDER(6)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  5322(540, 36, 650, 55)  LEN(8)  IO_NUM|AL_CENTER|  FONT("굴림체", 9, NORMAL)    COLOR(68, 69)  CUR(0)  LINECOLOR(75)          EDITFORMAT("9999/99/99")  TABORDER(0)  IOORDER(7)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL3(308, 619, 343, 632)  AL_LEFT  FONT("굴림체", 10, NORMAL)  CUR(0)      COLOR(4, 0)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  BUTTON0(71, 3, 90, 23)  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(15, 63)  CUR(0)    "검색.bmp"    TABORDER(2)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+CONTROL  17413(111, 3, 244, 23)    "CX_Symbol"  "/a89/b91/c92/d69"  LEN(0)  EDIT_OUTPUT    COLOR(90, 130)  TABORDER(0)  IOORDER(8)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL0(368, 3, 410, 23)  '시작일'        COLOR(68, 130)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  C_GAMT(510, 3, 611, 23)  '거래대금(백만)'  TP_CHECK|EDIT_NOP          COLOR(208, 130)  CUR(0)      TABORDER(3)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+OUT  5313(112, 54, 222, 73)  LEN(8)  IO_NUM|AL_RIGHT||FA_COMMA|FA_CORGB|SA_CORAW  FONT("굴림체", 9, NORMAL)    COLOR(68, 94)  CUR(0)  LINECOLOR(75)          IFRGB(94, 95)  TABORDER(0)  IOORDER(9)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  5323(221, 54, 331, 73)  LEN(8)  IO_NUM|AL_CENTER|  FONT("굴림체", 9, NORMAL)    COLOR(68, 69)  CUR(0)  LINECOLOR(75)          EDITFORMAT("9999/99/99")  TABORDER(0)  IOORDER(10)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  5314(431, 54, 541, 73)  LEN(8)  IO_NUM|AL_RIGHT||FA_COMMA|FA_CORGB|SA_CORAW  FONT("굴림체", 9, NORMAL)    COLOR(68, 95)  CUR(0)  LINECOLOR(75)          IFRGB(94, 95)  TABORDER(0)  IOORDER(11)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  5324(540, 54, 650, 73)  LEN(8)  IO_NUM|AL_CENTER|  FONT("굴림체", 9, NORMAL)    COLOR(68, 69)  CUR(0)  LINECOLOR(75)          EDITFORMAT("9999/99/99")  TABORDER(0)  IOORDER(13)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON1(610, 3, 650, 23)  '차트'  TP_PUSH|IMAGETEXT|AL_STRETCH        FOCUS  COLOR(208, 186)  CUR(0)    "3btn.bmp"    TABORDER(5)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+PANEL  PANEL1(8, 36, 113, 55)  '52주최고가'  LINECOLOR(75)      COLOR(96, 97)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL2(330, 36, 432, 55)  '52주최저가'  LINECOLOR(75)      COLOR(96, 97)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL3(8, 54, 113, 73)  '년중최고가'  LINECOLOR(75)      COLOR(96, 97)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL4(330, 54, 432, 73)  '년중최저가'  LINECOLOR(75)      COLOR(96, 97)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+GROUP  gp(548, 649, 668, 699)  'Group'        COLOR(-1, 232)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  RADIO0(262, 3, 291, 23)  '일'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(gp)      COLOR(208, 130)  CUR(0)      TABORDER(6)  ENABLE  &
+  VISIBLE  CHECKED  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  RADIO1(295, 3, 324, 23)  '주'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(gp)      COLOR(208, 130)  CUR(0)      TABORDER(7)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  RADIO2(328, 3, 357, 23)  '월'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(gp)      COLOR(208, 130)  CUR(0)      TABORDER(8)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  BUTTON3(90, 3, 109, 23)  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(208, 130)  CUR(0)    "관심.BMP"    TABORDER(9)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+CONTROL  1301(6, 3, 71, 23)  |FA_PROTECT  "CX_CODECTRL"  "/u0/k검색.BMP/lAXCOMBO.BMP/p/s0/o"  LEN(6)  EDIT_INPUT    COLOR(192, 69)  TABORDER(10)  IOORDER(14)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BOX  BOX3(253, 3, 362, 23)    COLOR(165, 66)  LINEW(1)  BX_LINE    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL5(15, 10, 630, 445)  '미사용'  TP_RAISED      COLOR(208, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Const myFILE = "userconf.ini"
+Const myMAP = "IB101025"
+
+Sub p_read_com()
+If SCREEN.CreateObject("Info") Then
+
+ 	BUTTON1.text = Trim(INFO.PopData(LOGIN.Name, myFILE, myMAP, "COMBO1"))
+ 	Dim tmp
+ 	tmp = Trim(INFO.PopData(LOGIN.Name, myFILE, myMAP, "COMBO2"))
+ 	If tmp = "1" Then
+  		RADIO0.Checked = True
+	ElseIf tmp = "2" Then
+	  	RADIO1.Checked = True
+	ElseIf tmp = "3" Then
+	  	RADIO2.Checked = True
+	End If
+
+End If
+End Sub
+
+Sub p_write_com()
+If SCREEN.CreateObject("Info") Then
+
+  INFO.PushData LOGIN.Name, myFILE, myMAP, "COMBO1", BUTTON1.Text
+
+End If
+End Sub
+
+Sub changeObj()
+	If BUTTON1.text = "차트" Then
+		If RADIO0.Checked = True Then
+			obj.SetObject ("IB10102C")
+		ElseIf RADIO1.Checked = True Then
+			obj.SetObject ("IB10102D")
+		Else
+			obj.SetObject ("IB10102E")
+		End If
+		'SCREEN.SetSize 824, 408
+		BUTTON1.text = "데이터"
+	Else
+		If RADIO0.Checked = True Then
+			obj.SetObject ("IB10102F")
+		ElseIf RADIO1.Checked = True Then
+			obj.SetObject ("IB10102G")
+		Else
+			obj.SetObject ("IB10102H")
+		End If
+		'SCREEN.SetSize 824, 408
+		BUTTON1.text = "차트"
+	End If
+
+
+	'SYSTEM.Push "BUTTON1_f", BUTTON1.text
+
+	obj.Send
+End Sub
+
+
+Sub changeObj2()
+	If BUTTON1.text = "데이터" Then
+		If RADIO0.Checked = True Then
+			obj.SetObject ("IB10102C")
+		ElseIf RADIO1.Checked = True Then
+			obj.SetObject ("IB10102D")
+		Else
+			obj.SetObject ("IB10102E")
+		End If
+		'SCREEN.SetSize 824, 408
+ 	BUTTON1.text = "데이터"
+	Else
+		If RADIO0.Checked = True Then
+			obj.SetObject ("IB10102F")
+		ElseIf RADIO1.Checked = True Then
+			obj.SetObject ("IB10102G")
+		Else
+			obj.SetObject ("IB10102H")
+		End If
+	'	'SCREEN.SetSize 824, 408
+ 	BUTTON1.text = "차트"
+	End If
+
+
+	'SYSTEM.Push "BUTTON1_f", BUTTON1.text
+
+	'obj.Send
+End Sub
+
+_AW_ONSTART_AW_
+'SYSTEM.Trace "구분:"&SYSTEM.Pop("BUTTON1_f")
+
+Call p_read_com()
+'Call changeObj()
+SCREEN.SetTimer 2, False
+
+'If SYSTEM.Pop("ra_f") = "1" Then
+'	RADIO0.Checked = True
+'ElseIf SYSTEM.Pop("ra_f") = "2" Then
+'	RADIO1.Checked = True
+'ElseIf SYSTEM.Pop("ra_f") = "3" Then
+'	RADIO2.Checked = True
+'End If
+'
+
+'
+'BUTTON1.text = SYSTEM.Pop("BUTTON1_f")
+'  If BUTTON1.text = "데이터" Then
+'	If SYSTEM.Pop("ra_f") = "1" Then
+'		obj.SetObject ("IB201111")
+'	ElseIf SYSTEM.Pop("ra_f") = "2" Then
+'		obj.SetObject ("IB201121")
+'	ElseIf SYSTEM.Pop("ra_f") = "3" Then
+'		obj.SetObject ("IB201131")
+'	End If
+'	BUTTON1.text = "데이터"
+'Else
+'	If SYSTEM.Pop("ra_f") = "1" Then
+'		obj.SetObject ("IB201110")
+'	ElseIf SYSTEM.Pop("ra_f") = "2" Then
+'		obj.SetObject ("IB201120")
+'	ElseIf SYSTEM.Pop("ra_f") = "3" Then
+'		obj.SetObject ("IB201130")
+'	End If
+'	BUTTON1.text = "차트"
+'End If
+
+
+
+obj.Send
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+
+obj.Send
+
+_AW_ONENDSUB_AW_
+_AW_ONTIMER_AW_
+Call changeObj()
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(12901)
+_AW_ONCHANGE_AW_
+SCREEN.Object("obj.12901").data = S12901.Data
+obj.Send
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(5311)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(5321)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(5312)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(5322)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON0)
+_AW_ONCLICK_AW_
+Dim retn
+retn = SCREEN.GetCode(100, "1301", "hnam", 0 )
+If retn <> True Then
+       Exit Sub
+End If
+
+SCREEN.Send 2
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(C_GAMT)
+_AW_ONCLICK_AW_
+If RADIO0.Checked = True Then
+	If C_GAMT.Checked = True Then
+		SCREEN.Object("obj.12500").SetColumnVisible 9, False
+		SCREEN.Object("obj.12500").SetColumnVisible 10, True
+	Else
+		SCREEN.Object("obj.12500").SetColumnVisible 9, True
+		SCREEN.Object("obj.12500").SetColumnVisible 10, False
+	End If
+ElseIf RADIO1.Checked = True Then
+	If C_GAMT.Checked = True Then
+		SCREEN.Object("obj.12501").SetColumnVisible 9, False
+		SCREEN.Object("obj.12501").SetColumnVisible 10, True
+	Else
+		SCREEN.Object("obj.12501").SetColumnVisible 9, True
+		SCREEN.Object("obj.12501").SetColumnVisible 10, False
+	End If
+Else
+	If C_GAMT.Checked = True Then
+		SCREEN.Object("obj.12502").SetColumnVisible 9, False
+		SCREEN.Object("obj.12502").SetColumnVisible 10, True
+	Else
+		SCREEN.Object("obj.12502").SetColumnVisible 9, True
+		SCREEN.Object("obj.12502").SetColumnVisible 10, False
+	End If
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(5313)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(5323)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(5314)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(5324)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON1)
+_AW_ONCLICK_AW_
+Call p_write_com()
+Call changeObj()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(RADIO0)
+_AW_ONCLICK_AW_
+If BUTTON1.Text = "데이터" Then
+	obj.SetObject "IB10102C"
+Else
+	obj.SetObject "IB10102F"
+End If
+
+
+'SYSTEM.Push "ra_f", "1"
+INFO.PushData LOGIN.Name, myFILE, myMAP, "COMBO2", 1
+'Call changeObj()
+obj.Send
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(RADIO1)
+_AW_ONCLICK_AW_
+If BUTTON1.Text = "데이터" Then
+	obj.SetObject "IB10102D"
+Else
+	obj.SetObject "IB10102G"
+End If
+
+
+'SYSTEM.Push "ra_f", "2"
+INFO.PushData LOGIN.Name, myFILE, myMAP, "COMBO2", 2
+'Call changeObj()
+obj.Send
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(RADIO2)
+_AW_ONCLICK_AW_
+If BUTTON1.Text = "데이터" Then
+	obj.SetObject "IB10102E"
+Else
+	obj.SetObject "IB10102H"
+End If
+
+
+'SYSTEM.Push "ra_f", "3"
+INFO.PushData LOGIN.Name, myFILE, myMAP, "COMBO2", 3
+'Call changeObj()
+obj.Send
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON3)
+_AW_ONCLICK_AW_
+'Dim mapname, data
+'
+'mapname = "IB202200" & "/d"
+'data = "appendCODE" & vbTab & S1301.Data & vbLf
+'
+'SCREEN.CreateWindow 1, mapname, data
+
+SCREEN.CreateWindow 1, "IB202201 /t/s/p5/d", "appendCODE" & _
+			vbTab & S1301.Data & vbLf & "map" & vbTab & "1" & vbLf
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(1301)
+_AW_ONCHANGE_AW_
+SCREEN.Send 0
+
+S1301.SetFocus
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

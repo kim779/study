@@ -1,0 +1,59 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB681321)
+MAPSIZE(265, 639)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("±¼¸²Ã¼", 9, NORMAL)
+OPTIONS(FLASH)
+TITLE("Untitled")
+TOPATH(AXIS)
+METHOD(SEND)
+TRXCODE("bg201121")
+MAPTYPE(FIXEDEX)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+CONTROL  18412(0, 0, 639, 264)  |FA_PROTECT|FA_FLASH  "C_Total"  "/nIB20011799/r200/d100/i1/u1/t2/j1/m15/m220/m30/m40/g15/g220/g30/g40"  LEN(0)  EDIT_INOUT  FONT("±¼¸²Ã¼", 9, NORMAL)    COLOR(192, 232)  TABORDER(1)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONSEND_AW_
+Dim str, str2
+'S1301.Data = SCREEN.Object("parent.1301").Data
+SCREEN.OnSend = False
+str = "1" & vbTab & SCREEN.Object("parent.1301").Data & vbTab
+S18412.RequestTR str
+
+'str2 = "1" & vbTab & SCREEN.Object("parent.1301").Data & vbTab & "1" & vbTab
+'
+'If SCREEN.Object("main.RADIO0").Checked = True Then
+'	str2 = "1" & vbTab & SCREEN.Object("parent.1301").Data & vbTab & "1" & vbTab
+'ElseIf SCREEN.Object("main.RADIO1").Checked = True Then
+'	str2 = "1" & vbTab & SCREEN.Object("parent.1301").Data & vbTab & "2" & vbTab
+'ElseIf SCREEN.Object("main.RADIO2").Checked = True Then
+'	str2 = "1" & vbTab & SCREEN.Object("parent.1301").Data & vbTab & "3" & vbTab
+'End If
+'
+'S18412.RequestTR2 str2
+
+_AW_ONENDSUB_AW_
+}
+
+
+

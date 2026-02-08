@@ -1,0 +1,353 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB951511)
+MAPSIZE(164, 800)
+VERSION(001)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("22")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(FLASH)
+TITLE("일자별 통계2")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pmhoserv")
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL7(-2, 0, 802, 165)        COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  CH2(57, 6, 97, 18)  'BP11'  TP_CHECK|EDIT_NOP          COLOR(14, 69)  CUR(0)      TABORDER(1)  ENABLE  &
+  VISIBLE  CHECKED  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  CH1(12, 6, 52, 18)  'FEP'  TP_CHECK|EDIT_NOP          COLOR(14, 69)  CUR(0)      TABORDER(2)  ENABLE  &
+  VISIBLE  CHECKED  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  CH3(102, 6, 142, 18)  'BP12'  TP_CHECK|EDIT_NOP          COLOR(14, 69)  CUR(0)      TABORDER(3)  ENABLE  &
+  VISIBLE  CHECKED  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  CH5(192, 6, 232, 18)  'BP22'  TP_CHECK|EDIT_NOP          COLOR(14, 69)  CUR(0)      TABORDER(4)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  CH6(237, 6, 277, 18)  'IS11'  TP_CHECK|EDIT_NOP          COLOR(14, 69)  CUR(0)      TABORDER(5)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  CH4(147, 6, 187, 18)  'BP21'  TP_CHECK|EDIT_NOP          COLOR(14, 69)  CUR(0)      TABORDER(6)  ENABLE  &
+  VISIBLE  CHECKED  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  CH7(282, 6, 322, 18)  'IS12'  TP_CHECK|EDIT_NOP          COLOR(14, 69)  CUR(0)      TABORDER(7)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+CONTROL  CONTROL0(0, 24, 800, 164)  |FA_PROTECT  "C_UserGrp"  "/i71100002800025040100000000000000000031000000000113000000000020200000011300502661121020000001130033554687102000000113000003276810200000"  LEN(0)  EDIT_INOUT    COLOR(192, 232)  TABORDER(15)  IOORDER(9)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  tjcd1(420, 334, 442, 353)  LEN(2)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(8)  IOORDER(4)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  tjcd2(420, 357, 442, 376)  LEN(2)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(9)  IOORDER(5)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  tjcd3(421, 378, 443, 397)  LEN(2)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(10)  IOORDER(6)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  tjcd4(421, 398, 443, 417)  LEN(2)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(11)  IOORDER(7)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  regdate(419, 445, 487, 464)  LEN(8)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("20110810")          TABORDER(12)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  dttp(296, 313, 329, 332)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("1")          TABORDER(13)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  ckdt(295, 438, 363, 457)  LEN(8)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(14)  IOORDER(8)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  CH8(327, 6, 367, 18)  'IS21'  TP_CHECK|EDIT_NOP          COLOR(14, 69)  CUR(0)      TABORDER(16)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  CH9(372, 6, 412, 18)  'IS22'  TP_CHECK|EDIT_NOP          COLOR(14, 69)  CUR(0)      TABORDER(17)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  typea(468, 2, 497, 21)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_PASS    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("1")          TABORDER(18)  IOORDER(3)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Dim cnt, sum_data
+Dim s_cnt
+Dim temp
+
+Sub chk_cnt(ch_num)
+	Select Case s_cnt
+	Case 0 : SCREEN.OnSend False
+	Case 1 : tjcd1.Data = ch_num
+	Case 2 : tjcd2.Data = ch_num
+	Case 3 : tjcd3.Data = ch_num
+	Case 4 : tjcd4.Data = ch_num
+	Case Else : SCREEN.OnSend False
+	End Select
+End Sub
+
+Sub cal_checkbox()
+	CONTROL0.Clear
+	sum_data = 0
+  If CH1.Checked = True Then
+  	sum_data = sum_data + 1
+  End If
+
+  If CH2.Checked = True Then
+  	sum_data = sum_data + 1
+  End If
+
+  If CH3.Checked = True Then
+  	sum_data = sum_data + 1
+  End If
+
+  If CH4.Checked = True Then
+  	sum_data = sum_data + 1
+  End If
+
+  If CH5.Checked = True Then
+  	sum_data = sum_data + 1
+  End If
+
+  If CH6.Checked = True Then
+  	sum_data = sum_data + 1
+  End If
+
+  If CH7.Checked = True Then
+  	sum_data = sum_data + 1
+  End If
+
+  If CH8.Checked = True Then
+  	sum_data = sum_data + 1
+  End If
+
+  If CH9.Checked = True Then
+  	sum_data = sum_data + 1
+  End If
+
+  Call check_control()
+
+End Sub
+
+Sub check_control()
+
+	If sum_data > 3 Then
+		'MsgBox("최대 4개까지 선택 가능합니다")
+          If CH1.Checked = False Then
+          		  CH1.Enable = False
+          End If
+          If CH2.Checked = False Then
+                  CH2.Enable = False
+          End If
+          If CH3.Checked = False Then
+                  CH3.Enable = False
+          End If
+          If CH4.Checked = False Then
+                  CH4.Enable = False
+          End If
+          If CH5.Checked = False Then
+                  CH5.Enable = False
+          End If
+          If CH6.Checked = False Then
+                  CH6.Enable = False
+          End If
+          If CH7.Checked = False Then
+                  CH7.Enable = False
+          End If
+          If CH8.Checked = False Then
+                  CH8.Enable = False
+          End If
+          If CH9.Checked = False Then
+                  CH9.Enable = False
+          End If
+
+	Else
+
+   	     	   CH1.Enable = True
+                  CH2.Enable = True
+                  CH3.Enable = True
+                  CH4.Enable = True
+                  CH5.Enable = True
+                  CH6.Enable = True
+                  CH7.Enable = True
+                  CH8.Enable = True
+                  CH9.Enable = True
+	End If
+End Sub
+
+_AW_ONSTART_AW_
+
+
+cal_checkbox()
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+tjcd1.Data = "99"
+tjcd2.Data = "99"
+tjcd3.Data = "99"
+tjcd4.Data = "99"
+
+ regdate.Data = SCREEN.Object("main.regdate").Data
+ typea.Data = SCREEN.Object("parent.typea").Data
+
+If SCREEN.Object("parent.typea").Data <> 0 Then
+	CH1.Checked = False
+	CH1.Visible = False
+	cal_checkbox()
+Else
+	CH1.Visible = True
+End If
+
+s_cnt = 0
+If CH1.Checked = True Then
+	s_cnt = s_cnt + 1
+	chk_cnt(0)
+End If
+If CH2.Checked = True Then
+	s_cnt = s_cnt + 1
+	chk_cnt(1)
+End If
+If CH3.Checked = True Then
+	s_cnt = s_cnt + 1
+	chk_cnt(2)
+End If
+If CH4.Checked = True Then
+	s_cnt = s_cnt + 1
+	chk_cnt(3)
+End If
+If CH5.Checked = True Then
+	s_cnt = s_cnt + 1
+	chk_cnt(4)
+End If
+If CH6.Checked = True Then
+	s_cnt = s_cnt + 1
+	chk_cnt(5)
+End If
+If CH7.Checked = True Then
+	s_cnt = s_cnt + 1
+	chk_cnt(6)
+End If
+If CH8.Checked = True Then
+	s_cnt = s_cnt + 1
+	chk_cnt(7)
+End If
+If CH9.Checked = True Then
+	s_cnt = s_cnt + 1
+	chk_cnt(8)
+End If
+If s_cnt = 0 Or s_cnt > 4 Then
+	SCREEN.OnSend False
+End If
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(CH2)
+_AW_ONCLICK_AW_
+cal_checkbox()
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ONDBLCLK_AW_
+cal_checkbox()
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(CH1)
+_AW_ONCLICK_AW_
+cal_checkbox()
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ONDBLCLK_AW_
+cal_checkbox()
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(CH3)
+_AW_ONCLICK_AW_
+cal_checkbox()
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ONDBLCLK_AW_
+cal_checkbox()
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(CH5)
+_AW_ONCLICK_AW_
+cal_checkbox()
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ONDBLCLK_AW_
+cal_checkbox()
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(CH6)
+_AW_ONCLICK_AW_
+cal_checkbox()
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ONDBLCLK_AW_
+cal_checkbox()
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(CH4)
+_AW_ONCLICK_AW_
+cal_checkbox()
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ONDBLCLK_AW_
+cal_checkbox()
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(CH7)
+_AW_ONCLICK_AW_
+cal_checkbox()
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ONDBLCLK_AW_
+cal_checkbox()
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(CH8)
+_AW_ONCLICK_AW_
+cal_checkbox()
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ONDBLCLK_AW_
+cal_checkbox()
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(CH9)
+_AW_ONCLICK_AW_
+cal_checkbox()
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ONDBLCLK_AW_
+cal_checkbox()
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

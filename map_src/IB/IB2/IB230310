@@ -1,0 +1,80 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB230310)
+MAPSIZE(362, 653)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("회원매매입체분석")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(FMS|FLASH)
+TITLE("[230310]시간별")
+TOPATH(AXIS)
+METHOD(MENU)
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+OBJECT  OBJ1(0, 1, 164, 182)    "IB230311"  TABORDER(1)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  OBJ2(163, 1, 327, 182)    "IB230311"  TABORDER(2)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  OBJ3(326, 1, 490, 182)    "IB230311"  TABORDER(3)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  OBJ4(489, 1, 653, 182)    "IB230311"  TABORDER(4)  IOORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  OBJ5(0, 181, 164, 362)    "IB230311"  TABORDER(5)  IOORDER(5)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  OBJ6(163, 181, 327, 362)    "IB230311"  TABORDER(6)  IOORDER(6)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  OBJ7(326, 181, 490, 362)    "IB230311"  TABORDER(7)  IOORDER(7)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  OBJ8(489, 181, 653, 362)    "IB230311"  TABORDER(8)  IOORDER(8)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  sendnum(10, 435, 70, 450)  LEN(1)  IO_NUM|AL_CENTER||FA_SKIP    COLOR(192, 69)  CUR(0)            TABORDER(0)  IOORDER(9)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Dim revct
+Sub Eachsend()
+	SYSTEM.Trace "firstsend"
+	Call Eachsend1(2)
+
+End Sub
+Sub Eachsend1(data)
+'	revct = revct + data
+'	If revct = 2 Then
+'		revct = 0
+		If Len(Trim(sendnum.Data)) = 0 Then
+			Exit Sub
+		End If
+
+		If sendnum.Data < 8 Then
+			SCREEN.Object("OBJ"&sendnum.Data&".OBJ").send
+			sendnum.Data = sendnum.Data + 1
+			SCREEN.Object("OBJ"&sendnum.Data&".OBJ").send
+			sendnum.Data = sendnum.Data + 1
+		Else
+			sendnum.Data = ""
+		End If
+'	End If
+End Sub
+
+}
+
+
+

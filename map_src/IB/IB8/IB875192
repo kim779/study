@@ -1,0 +1,60 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB875192)
+MAPSIZE(153, 174)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("±¼¸²", 9, NORMAL)
+TITLE("Untitled")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pihsrels")
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+EDIT  ed_DispId(23, 37, 143, 56)  LEN(6)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 130)  CUR(0)  TP_NONE  INIT("875100")          TABORDER(1)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  ed_DIdx(23, 16, 143, 35)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 130)  CUR(0)  TP_NONE  INIT("6")          TABORDER(2)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  ed_date(20, 60, 140, 79)  LEN(8)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 130)  CUR(0)  TP_NONE          TABORDER(3)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  o_cdrt(90, 105, 155, 135)  LEN(6)  IO_MIXED|AL_CENTER|    COLOR(192, 69)  CUR(0)            TABORDER(0)  IOORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+'------------------------------------------------------
+Sub SendData(StrDate)
+	ed_date.Data = StrDate
+	SCREEN.Send 0
+End Sub
+'------------------------------------------------------
+
+_AW_ONSEND_AW_
+ed_date.Data = SCREEN.Object("parent.o_date").Data
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+SCREEN.Proc "parent.cdrt_qry_done", ""
+
+_AW_ONENDSUB_AW_
+}
+
+
+

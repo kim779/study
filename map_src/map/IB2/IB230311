@@ -1,0 +1,138 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB230311)
+MAPSIZE(181, 164)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("회원매매입체분석")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(XFONT)
+TITLE("[230311]")
+TOPATH(AXIS)
+METHOD(MENU)
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL1(6, 7, 155, 27)  LINECOLOR(75)      COLOR(96, 63)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  obj(6, 26, 156, 174)    "IB230315"  TABORDER(4)  IOORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  tnam(27, 9, 150, 26)  LEN(16)  IO_MIXED|AL_CENTER||FA_CORGB|SA_COSUP  FONT("굴림체", 9, NORMAL)    COLOR(96, 69)  CUR(0)            IFRGB(69, 69)  TABORDER(0)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  1301(221, 0, 307, 24)  LEN(6)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(1)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  trcd(224, 29, 306, 52)  LEN(3)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("0")          TABORDER(2)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  BUTTON2(226, 66, 245, 84)  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(15, 63)  CUR(0)    "수량.bmp"    TABORDER(3)  ENABLE  &
+  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+BUTTON  chck(10, 10, 24, 25)  'Check'  TP_CHECK|EDIT_NOP          COLOR(208, 232)  CUR(0)      TABORDER(5)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BOX  BOX0(0, 0, 163, 180)    COLOR(90, 232)  LINEW(5)  BX_BORDER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  num(220, 110, 335, 135)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("1")          TABORDER(6)  IOORDER(5)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONSEND_AW_
+'SCREEN.ClearAll 0, 2
+'Dim tcd
+'
+'S1301.Data = SCREEN.Object ("main.1301").data
+'If S1301.Data = "      " Then
+'	SCREEN.OnSend = False
+'End If
+'
+'tcd = Trim(trcd.Data)
+'If tcd = "0" Or tcd = "" Then
+'	SCREEN.OnSend = False
+'End If
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(tnam)
+_AW_ONCLICK_AW_
+Dim vol
+vol = SCREEN.Object("obj.output0").data
+
+If chck.Checked = False Then
+	chck.Checked = True
+	obj.SetObject("IB230316")		'일자별
+	SCREEN.Object("obj.output0").data = vol
+Else
+	chck.Checked = False
+	obj.SetObject("IB230315")		'시간별
+	SCREEN.Object("obj.output0").data = vol
+End If
+
+SCREEN.Proc "main.send_1obj", num.Data
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON2)
+_AW_ONCLICK_AW_
+Dim tcd, map, Mode
+
+S1301.Data = SCREEN.Object("main.1301").data
+
+tcd = Trim(trcd.Data)
+If tcd = "0" Or tcd = "" Then
+	Exit Sub
+End If
+
+If Trim(S1301.Data) = "" Then
+	Exit Sub
+End If
+
+
+map = obj.GetObject()
+'If map = "KE121416" Then
+'	Mode = "T"
+'Else
+'	Mode = "D"
+'End If
+'
+'
+'SCREEN.CreateWindow 4, "KE121412 /d/p?", "trcd" &vbTab & trcd.Data & vbLf _
+'														& "1301" & vbTab & S1301.Data & vbLf _
+'														& "mode" & vbTab & Mode
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(chck)
+_AW_ONCLICK_AW_
+Dim vol
+vol = SCREEN.Object("obj.output0").data
+
+If chck.Checked = True Then
+	obj.SetObject("IB230316")		'일자별
+	SCREEN.Object("obj.output0").data = vol
+Else
+	obj.SetObject("IB230315")		'시간별
+	SCREEN.Object("obj.output0").data = vol
+End If
+
+SCREEN.Proc "main.send_1obj", num.Data
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

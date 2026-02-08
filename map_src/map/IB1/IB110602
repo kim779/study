@@ -1,0 +1,110 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB110602)
+MAPSIZE(150, 703)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("실시간매매-02")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+TITLE("[1106]실시간매매-02")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+OBJECT  obj01(3, 1, 355, 151)    "IB11060A"  TABORDER(1)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  obj02(355, 0, 707, 150)    "IB11060B"FIXEDSIZE  TABORDER(2)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  pswd(349, 358, 409, 378)  LEN(8)  IO_ALPHA|EDIT_INPUT|FA_PASSWD|FA_WRAP|FA_ENUM    COLOR(192, 130)  CUR(0)  TP_SUNKEN    ENCRYPT("en_accn")        TABORDER(3)  IOORDER(3)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  AN1A(220, 354, 340, 373)  LEN(11)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(4)  IOORDER(4)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+'실시간 매매용 DLL Function...
+Sub OnDllValue(sData)
+	Dim slist
+	slist = Split(sData, vbTab, -1, 1)
+	Select Case slist(0)
+		Case "SetValue"	'send
+			'AccNo-slist(1), PWD-slist(2)
+			AN1A.Data = slist(1)
+			pswd.Data = slist(2)
+			Call obj_send()
+		Case "MoveWnd"	'resize
+			ResizeControl CLng(slist(1)), CLng(slist(2))
+	End Select
+End Sub
+Function ResizeControl(iwidth, iheight)
+	Dim igridw, arRate, idx, lval, lcalc, iobjw, sparam
+	iobjw = iwidth / 2
+
+	sparam = CStr(iobjw) &  "," & CStr(iheight)
+	obj01.Proc "Resize", sparam
+	obj02.Proc "Resize", sparam
+
+	'obj01.SetRect 0, 0,400,  300
+
+'
+'	obj01.SetRect 0, 0,iobjw,  iheight
+'	obj02.SetRect iobjw, 0,iwidth,  iheight
+
+
+	arRate = Array(0.0568,0.0892,0.142,0.1038,0.0974,0.0876,0.0974,0.0892,0.0892,0.1168)
+	igridw = iwidth - 10 'left, right space
+'
+'	PANEL1.Bottom = iheight+2
+'	idx = 0
+'	For ii = 1 To VIEWGRID.Columns
+'		lval = VIEWGRID.GetColumnWidth(ii)
+'
+'		If  lval > 0 Then
+'			lcalc = CDbl  (arRate(idx) ) * CDbl(igridw)
+'			idx = idx + 1
+'			VIEWGRID.SetColumnWidth ii, CLng(lcalc)
+'		End If
+'	Next
+'	VIEWGRID.Refresh
+End Function
+
+Sub obj_send()
+	SCREEN.Object("obj01.AN1A").Data = AN1A.Data
+	SCREEN.Object("obj01.pswd").Data = pswd.Data
+
+	SCREEN.Object("obj02.AN1A").Data = AN1A.Data
+	SCREEN.Object("obj02.pswd").Data = pswd.Data
+
+	obj01.Send
+	obj02.Send
+End Sub
+
+_AW_SCRIPT_AW_(pswd)
+_AW_ONKEYCHANGE_AW_
+If SCREEN.Key = 13 And Trim(pswd.Data) <> "" Then
+	first_send()
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

@@ -1,0 +1,166 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB883100)
+MAPSIZE(528, 606)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("선물옵션주문")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(CR2TAB|SAVE)
+TITLE("[8831]선물옵션주문2")
+TOPATH(AXIS)
+METHOD(MENU)
+MAPTYPE(NORM)
+HEADER(LEDGER)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL4(-2, 274, 608, 285)        COLOR(64, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL7(288, 32, 294, 462)        COLOR(64, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL0(-1, 278, 607, 507)  LIMAGE(0)  LINEW(3)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL63(-1, 32, 290, 277)  LIMAGE(0)  LINEW(3)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL_bg(-2, 0, 608, 32)  LIMAGE(1)  LINEW(3)  LINETYPE(4)  LINECOLOR(64)      COLOR(66, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  HNAM(835, 548, 969, 568)  LEN(18)  IO_MIXED|AL_LEFT||SUM    FONT("굴림체", 9, BOLD)    COLOR(90, 69)  CUR(0)  LINECOLOR(65)          TABORDER(0)  IOORDER(3)  ENABLE  &
+  HINTTYPE(IH_NONE)
+USRTAB  tab_account(8, 284, 600, 310)  FOCUS  INDEX(0)  COUNT(4)  AL_TOP  TAB_IMAGE      FONT("굴림체", 9, NORMAL)    COLOR(3, 70)  CUR(0)  TABIMAGE("TAB.bmp")  FCOLOR(3, 71)  CAPTION(" 주문내역", " 미체결 ", " 체결 ", " 잔고 ")  TABINFO("1:1", "1:2", "1:3", "1:4")  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  OBJ_account(8, 310, 600, 498)    "IB883137"  TABORDER(3)  IOORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  OBJ_sise(296, 43, 601, 269)    "IB883110"  TABORDER(1)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL11(0, 527, 609, 530)        COLOR(64, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  GUIDE1(-2, 504, 608, 528)  LIMAGE(1)  LINEW(3)  STRESS(0)  STRESSW(0)  LINETYPE(4)  LINECOLOR(64)      COLOR(34, 69)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL2(9, 508, 23, 522)    |IMAGE|AL_STRETCH    COLOR(208, 232)  CUR(0)    "알림_ic.bmp"  ENABLE  &
+  VISIBLE  TRANSPARENT  IMAGE  HINTTYPE(IH_NONE)
+PANEL  GUIDE(21, 504, 596, 528)        COLOR(228, 130)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+PANEL  PANEL3(291, 32, 607, 277)  LIMAGE(0)  LINEW(3)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  ed_cfocod(844, 572, 924, 592)  LEN(8)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_UPPER|CODE      COLOR(192, 69)  CUR(0)  TP_NONE          TABORDER(2)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  OBJ_order(3, 3, 285, 272)    "IB883190"  TABORDER(4)  IOORDER(5)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Sub send_sise_all(gubn)
+
+	Dim code, fogb, rsymb, acnm
+	code = Left(ed_cfocod.Data, 1)
+	If code = "1" Or code = "4" Or code = "A" Or code = "D" Then
+		'fogb = 101
+		If Mid(ed_cfocod.Data, 2, 1) = "0" Then
+			rsymb = "30301"
+			OBJ_sise.SetObject("IB883110")
+		Else
+			rsymb = "100301"
+			OBJ_sise.SetObject("IB883111")
+		End If
+
+	ElseIf code = "2" Or code = "3" Or code = "B" Or code = "C" Then
+		'fogb = 102
+		If Mid(ed_cfocod.Data, 2, 1) = "0" Then
+			rsymb = "40301"
+			OBJ_sise.SetObject("IB883115")
+		Else
+			rsymb = "101301"
+			OBJ_sise.SetObject("IB883112")
+		End If
+
+	End If
+
+	HNAM.Data = SCREEN.GetName (115, ed_cfocod.Data, 0)
+	SCREEN.Object("OBJ_order.OBJ_odr.hnam").data = HNAM.data
+
+	If gubn = "main" Then
+		SCREEN.IgnoreChange True
+		SCREEN.Object("OBJ_order.OBJ_odr.ed_cfocod").data = ed_cfocod.data
+		SCREEN.IgnoreChange False
+	End If
+
+	Call tab_info_change()
+
+	acnm = Trim(SCREEN.Object("OBJ_order.acnm").data)
+	If Trim(HNAM.Data) =  "" Then
+		SCREEN.ClearAll 2, 2
+		SCREEN.Object("OBJ_order.acnm").data = acnm
+		OBJ_sise.Send
+		'OBJ_info.Send
+		Exit Sub
+	Else
+		ed_cfocod.Trigger "ed_cfocod", True
+		ed_cfocod.Trigger rsymb, True
+		ed_cfocod.Trigger rsymb, False
+		SYSTEM.SetHistory rsymb, ed_cfocod.Data
+		SYSTEM.SetHistory "ed_cfocod", ed_cfocod.Data
+	End If
+
+	OBJ_sise.Send
+	SCREEN.Proc "OBJ_order.AddHistory", ed_cfocod.Data
+	'OBJ_info.Send
+
+End Sub
+
+Sub OBJ_account_send()
+	MsgBox "Account Send"
+End Sub
+
+_AW_ONINDECLARE_AW_
+'== 선물옵션주문obj를포함한 main의 공통함수
+#LOAD IB999933
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+SCREEN.OnSend = False
+
+_AW_ONENDSUB_AW_
+_AW_ONTIMER_AW_
+'주문성공후 커서 위치
+SCREEN.Proc "OBJ_order.OBJ_odr.Set_cursor", ""
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(tab_account)
+_AW_ONCLICK_AW_
+Select Case tab_account.ID
+	Case 1 : OBJ_account.SetObject("IB883137")
+	Case 2 : OBJ_account.SetObject("IB883132")
+	Case 3 : OBJ_account.SetObject("IB883136")
+	Case 4 : OBJ_account.SetObject("IB883134")
+End Select
+
+GUIDE.Text = ""
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(ed_cfocod)
+_AW_ONCHANGE_AW_
+Call send_sise_all("main")
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

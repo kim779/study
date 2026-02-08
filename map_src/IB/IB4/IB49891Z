@@ -1,0 +1,84 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB49891Z)
+MAPSIZE(203, 330)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("투자자정보확인서 재")
+MAPPUBLIC(";")
+FONT("굴림", 9, NORMAL)
+TITLE("모집매수 펀드 확인사항")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL12(0, 0, 330, 205)        COLOR(241, 69)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  btnOk(40, 155, 160, 186)  '모집매수'  TP_PUSH      AL_CENTER    FOCUS  COLOR(94, 192)  CUR(0)      TABORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  btnClose(170, 155, 290, 186)  '취소'  TP_PUSH      AL_CENTER    FOCUS  COLOR(68, 97)  CUR(0)      TABORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  lbInfo(30, 15, 300, 50)  AL_LEFT  CUR(0)      COLOR(241, 232)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL1(30, 55, 300, 100)  '모집매수 기간 중 매수신청하신 금액에\n대해서는 예탁금이용료가 지급됩니다.\n* 예탁금이용료율 : 연 (기준금리 X 0.98)%'  AL_LEFT  CUR(0)      COLOR(241, 232)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL2(30, 110, 300, 145)  '※ 예탁금이용료는 매수완료일에 지급되며,\n매수 취소시 지급되지 않습니다.'  AL_LEFT  CUR(0)      COLOR(241, 251)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Function FormatDateYYYYMMDD(s)
+ s = Trim(CStr(s))
+	If Len(s) <> 8 Or Not IsNumeric(s) Then
+	 	FormatDateYYYYMMDD = s
+	 	Exit Function
+	End If
+
+	FormatDateYYYYMMDD = _
+	Left(s, 4) & "." & Mid(s, 5, 2) & "." & Right(s,2)
+End Function
+
+_AW_ONSTART_AW_
+
+Dim szOfrSetupDt
+szOfrSetupDt = SYSTEM.Pop("OBJ_mj_zOfrSetupDt")
+szOfrSetupDt = FormatDateYYYYMMDD(szOfrSetupDt)
+lbInfo.Text = "현재는 모집매수 기간으로 매수 신청 시 펀드의\n최초설정일인 " & szOfrSetupDt & " 매수 완료됩니다."
+SYSTEM.Push "OBJ_mj_zOfrSetupDt", ""
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(btnOk)
+_AW_ONCLICK_AW_
+SYSTEM.Push "OBJ_mj_OK", "1"
+SCREEN.CloseWindow()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(btnClose)
+_AW_ONCLICK_AW_
+SYSTEM.Push "OBJ_mj_OK", "0"
+SCREEN.CloseWindow()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

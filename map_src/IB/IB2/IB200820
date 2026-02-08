@@ -1,0 +1,68 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB200820)
+MAPSIZE(287, 515)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(2)
+MAPDESC("가격대별 매매비중")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+TITLE("[200820]가격대별체결비중")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(NORM)
+HEADER(NOP)
+BGROUND(BRUSH, 64)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL0(0, 0, 512, 28)  '체   결   비   중'  LINECOLOR(67)      COLOR(66, 69)  CUR(0)    AL_CENTER  FONT("굴림체", 9, NORMAL)  ENABLE  &
+  VISIBLE  HOVER  GRADIENT(0, 0)  HINTTYPE(IH_NONE)
+EDIT  codx(580, 4, 667, 26)  LEN(6)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(1)  IOORDER(1)  &
+  HINTTYPE(IH_NONE)
+OUT  2320(580, 35, 647, 58)  LEN(9)  IO_NUM|AL_CENTER|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL1(4, 34, 513, 283)  '차트'  TP_RAISED      COLOR(208, 232)  CUR(0)    AL_CENTER  FONT("굴림체", 20, NORMAL)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Sub Query_Chart()
+	ctl0.ClearAllData
+'	ctl0.SetUserIndexBaseLineValue 0, 0, S2320.data
+'	MsgBox S2320.Data
+	ctl0.SetInputValue 0,0,"codx",codx.data
+	ctl0.RequestData 0,0
+
+End Sub
+
+_AW_ONSEND_AW_
+codx.Data = SCREEN.Object ("main.1301").data
+S2320.Data = SCREEN.Object ("main.2320").data
+Query_Chart()
+SCREEN.OnSend  = False
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(codx)
+_AW_ONCHANGE_AW_
+'SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

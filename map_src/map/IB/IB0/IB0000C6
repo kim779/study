@@ -1,0 +1,113 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB0000C6)
+MAPSIZE(289, 448)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("굴림", 9, NORMAL)
+OPTIONS(FLASH)
+TITLE("건전주문팝업")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pidogood")
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL63(-50, -60, 850, 655)  LIMAGE(0)  LINEW(3)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON1(400, 10, 437, 30)  '조회'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, BOLD)  FOCUS  COLOR(208, 186)  CUR(0)    "조회btn.bmp"    TABORDER(1)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+GRID  VIEWGRID(5, 35, 445, 285)  VISIBLEROW(0)  CELLH(20)  MATRIX(9999, 1)  FIX(0)  MAINCOLOR(208, 232)  LINECOLOR(0)  FOCUSCOLOR(0)  FOCUSKIND(0)  |VSCROLL|HSCROLL|NOHEAD    &
+	COLINFO("data")  LEN(100)  WIDTH(500)  HEAD("Data")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_MIXED|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    TABORDER(2)  IOORDER(4)  ENABLE  &
+  VISIBLE
+
+EDIT  usid(5, 5, 145, 25)  LEN(12)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(3)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  nrec(240, 5, 345, 25)  LEN(4)  IO_NUM|AL_CENTER|    COLOR(192, 69)  CUR(0)            TABORDER(0)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  num(745, 280, 845, 300)  LEN(3)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 69)  CUR(0)  TP_SUNKEN          TABORDER(4)  IOORDER(5)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL8(670, 280, 743, 300)  'NUM'  AL_CENTER  CUR(0)      COLOR(141, 192)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  CDAT(500, 445, 620, 464)  LEN(8)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP|FA_DATE    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(5)  IOORDER(6)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  gubn(150, 5, 175, 25)  LEN(1)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("0")          TABORDER(6)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONSEND_AW_
+If Trim(usid.Text) = "" Then
+	usid.Data = Trim(LOGIN.User)
+End If
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+Dim cnt, data, s_data
+
+cnt = 0
+
+For ii = 1 To VIEWGRID.Rows
+	If Trim(VIEWGRID.GetGridCell(ii ,1)) <> "" Then
+		cnt = cnt + 1
+		data = VIEWGRID.GetGridCell(ii, 1)			'DATA
+
+		s_data = "#" & s_data
+		s_data = ii & "|" & s_data
+		s_data = data & "|" & s_data
+	End If
+Next
+
+num.data = cnt
+
+If cnt > 0 Then
+	SCREEN.CreateWindow 1, "AM070101 /p5 /d /s", ""
+'   기존화면을 팝업하는 것으로 변경
+'	If SCREEN.CreateObject("Info") Then
+' 		Today = INFO.PopData("", "POPUPCONFIG.ini", "00C7", "TODAY")
+' 		First = INFO.PopData("", "POPUPCONFIG.ini", "00C7", "FIRST")
+'
+' 		num.Push ""
+'		s_data = Replace(s_data, "/", "／")
+'
+'	 	If Today = "0" Then
+'	 		SCREEN.CreateWindow 1, "IB0000C7 /p5 /d", "s_data" & vbTab & s_data & vbLf
+'	 	ElseIf Today = CDAT.Data Then
+'	 		If First = "1" Then
+'	 			SCREEN.CreateWindow 1, "IB0000C7 /p5 /d", "s_data" & vbTab & s_data & vbLf
+'	 		End If
+'		Else
+'			INFO.PushData "", "POPUPCONFIG.ini", "00C7", "FIRST", "1"
+'			SCREEN.CreateWindow 1, "IB0000C7 /p5 /d", "s_data" & vbTab & s_data & vbLf
+'	 	End If
+'	End If
+End If
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(BUTTON1)
+_AW_ONCLICK_AW_
+'CellArray()
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

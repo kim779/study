@@ -1,0 +1,112 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(AM080100)
+MAPSIZE(470, 377)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("MS Sans Serif", 9, NORMAL)
+TITLE("공지사항")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(FIXED)
+HEADER(NOP)
+BGROUND(BRUSH, 240)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL1(0, 445, 380, 480)  TP_RAISED      COLOR(240, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  imgPanel(0, 0, 378, 445)  TP_RAISED  |IMAGE|AL_CENTER    COLOR(181, 232)  CUR(0)    "event01.bmp"  ENABLE  &
+  VISIBLE  IMAGE  HINTTYPE(IH_NONE)
+BUTTON  nomore(10, 448, 130, 468)  '더이상 보지 않음'  TP_CHECK|EDIT_NOP        FONT("굴림체", 9, NORMAL)  COLOR(208, 130)  CUR(0)      TABORDER(1)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  btnClose(339, 448, 374, 468)  '닫기'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, NORMAL)  FOCUS  COLOR(181, 186)  CUR(0)    "2BTN.BMP"    TABORDER(2)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+BUTTON  btnLink(275, 448, 335, 468)  '바로가기'  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(208, 186)  CUR(0)    "6BTN.BMP"    TABORDER(3)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONSTART_AW_
+Dim W,H
+
+If SCREEN.CreateObject("Info") Then
+ 	W = Trim(INFO.PopData("", "notice.ini", "B0", "WIDTH"))
+ 	H = Trim(INFO.PopData("", "notice.ini", "B0", "HEIGHT"))
+
+ 	SCREEN.SetSize W,H + 25
+End If
+
+imgPanel.Left = 0
+imgPanel.Top = 0
+imgPanel.Right = W
+imgPanel.Bottom = H
+
+PANEL1.Left = 0
+PANEL1.Top = H
+PANEL1.Right = W
+
+btnLink.Top = H + 3
+btnLink.Left = W - 35 - 6 - 60
+btnLink.Bottom = btnLink.Top + 20
+btnLink.Right = btnLink.Left + 60
+
+btnClose.Top = H + 3
+btnClose.Left = W - 35 - 3
+btnClose.Bottom = btnClose.Top + 20
+btnClose.Right = btnClose.Left + 35
+
+nomore.Top = H + 3
+nomore.Left = 10
+nomore.Right = nomore.Left + 120
+nomore.Bottom = nomore.Top + 20
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(nomore)
+_AW_ONCLICK_AW_
+If SCREEN.CreateObject("Info") Then
+ 	INFO.PushData "", "notice.ini", "B0", "NOMORE", nomore.Checked
+End If
+
+SCREEN.CloseWindow
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(btnClose)
+_AW_ONCLICK_AW_
+SCREEN.CloseWindow
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(btnLink)
+_AW_ONCLICK_AW_
+If SCREEN.CreateObject("Info") Then
+ 	Dim link
+
+ 	link = Trim(INFO.PopData("", "notice.ini", "B0", "url"))
+
+ 	SYSTEM.Navigate link & vbTab & "1000" & vbTab & "800"
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

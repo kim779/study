@@ -1,0 +1,96 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB101027)
+MAPSIZE(233, 640)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("일별가격흐름 차트")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(FLASH)
+TITLE("[101027] 일별가격흐름")
+TOPATH(AXIS)
+METHOD(SEND)
+TRXCODE("ng200920")
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+CONTROL  ctl(0, 20, 640, 253)  |FA_PROTECT|FA_FLASH  "C_UserGrp"  "/i6132003600000003020000000000000000002000000000091200000000001000000009220033554687100000000220001263225610000000"  LEN(0)  EDIT_INOUT    COLOR(192, 232)  TABORDER(1)  IOORDER(6)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  cod2(0, 0, 99, 20)  LEN(12)  IO_MIXED|EDIT_INPUT|FA_ZEROSUP|FA_WRAP|FA_HAN|SA_SPACE|CODE      COLOR(99, 69)  CUR(0)  TP_NONE          TABORDER(2)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  bday(58, 420, 137, 443)  LEN(8)  IO_NUM|EDIT_INPUT    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(3)  IOORDER(3)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  check(142, 422, 172, 443)  LEN(1)  IO_MIXED|AL_CENTER|    COLOR(192, 23)  CUR(0)            TABORDER(0)  IOORDER(5)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  GUBN(216, 427, 241, 446)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(4)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  isreal(260, 431, 285, 450)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(5)  IOORDER(4)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+'Sub send()
+'	SCREEN.Send 0
+'End Sub
+
+_AW_ONSEND_AW_
+cod2.Data = SCREEN.Object("parent.1301").Data
+
+If UCase(TypeName( SCREEN.Object("parent.cxMarket"))) <> "NOTHING" Then
+	If SCREEN.Object("parent.cxMarket").sMarket = "KRX" Then
+		cod2.Data = SCREEN.Object("parent.1301").Data
+	ElseIf SCREEN.Object("parent.cxMarket").sMarket = "NXT" Then
+		cod2.Data = "N." & SCREEN.Object("parent.1301").Data
+	ElseIf SCREEN.Object("parent.cxMarket").sMarket = "통합" Then
+		cod2.Data = "M." & SCREEN.Object("parent.1301").Data
+	End If
+End If
+
+bday.Data = SCREEN.Object("parent.o_date").Data
+
+GUBN.Data = "1"
+
+If SCREEN.Object("parent.is_real").checked = True Then
+	isreal.Data = "1"
+Else
+	isreal.Data = "0"
+End If
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+If check.Data = "F" Then
+	ctl.Clear
+End If
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(cod2)
+_AW_ONCHANGE_AW_
+'S1301.Trigger "",True
+'S1301.Trigger "",False
+'SCREEN.Object("OBJ01.GUBN").Data = "1"
+'GUBN.data = "1"
+'Set_mkgb(S1301.data)
+'SCREEN.Send 2
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

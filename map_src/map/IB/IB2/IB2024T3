@@ -1,0 +1,106 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB2024T3)
+MAPSIZE(137, 513)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("종목별기관차트")
+MAPPUBLIC(";")
+FONT("굴림", 9, NORMAL)
+TITLE("[2024T3]종목별기관매매동향 차트")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("ng202421")
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+EDIT  1301(55, 155, 132, 175)  LEN(12)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_NOR    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(1)  IOORDER(1)  &
+  HINTTYPE(IH_NONE)
+EDIT  gubn(124, 272, 178, 293)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("1")          TABORDER(2)  IOORDER(3)  &
+  HINTTYPE(IH_NONE)
+CONTROL  CONTROL0(0, 0, 513, 137)  |FA_PROTECT  "C_UserGrp"  "/i700200300003000201000000000000000000300000000001110000032768100000000712003355468710000000"  LEN(0)  EDIT_INOUT    COLOR(192, 232)  TABORDER(3)  IOORDER(8)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  12901(301, 277, 389, 297)  LEN(8)  IO_NUM|EDIT_INPUT|FA_DATE    COLOR(41, 1)  CUR(0)  TP_NONE  INIT("00000000")          EDITFORMAT("9999/99/99")  TABORDER(4)  IOORDER(2)  &
+  HINTTYPE(IH_NONE)
+EDIT  kfgb(126, 296, 180, 317)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("1")          TABORDER(5)  IOORDER(4)  &
+  HINTTYPE(IH_NONE)
+OUT  check(185, 295, 215, 316)  LEN(1)  IO_MIXED|AL_CENTER|    COLOR(192, 23)  CUR(0)            TABORDER(0)  IOORDER(7)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  12901_E(310, 300, 398, 320)  LEN(8)  IO_NUM|EDIT_INPUT|FA_DATE    COLOR(41, 1)  CUR(0)  TP_NONE  INIT("00000000")          EDITFORMAT("9999/99/99")  TABORDER(6)  IOORDER(6)  &
+  HINTTYPE(IH_NONE)
+EDIT  GUBN2(136, 306, 190, 327)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("1")          TABORDER(7)  IOORDER(5)  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Sub Query_Chart()
+	ctl0.ClearAllData
+
+	ctl0.Setchartperiod 0, 2
+	ctl0.SetInputValue 0,0,"cod2",S1301.data
+	ctl0.SetInputValue 0,0,"gubn",TRGB.data
+	ctl0.SetInputValue 0,0,"date",S12901.data
+	ctl0.RequestData 0,0
+	If kfgb.Data = 1 Then
+		ctl0.showgraph 0, 1, 1
+		ctl0.showgraph 0, 2, 0
+		ctl0.SetRightLabel 0, 1
+	Else
+		ctl0.showgraph 0, 1, 0
+		ctl0.showgraph 0, 2, 1
+		ctl0.SetRightLabel 0, 2
+	End If
+	ctl0.update
+End Sub
+
+_AW_ONSEND_AW_
+S1301.Data = SCREEN.Object("main.1301").Data
+gubn.Data = SCREEN.Object("PARENT.gubn").data
+kfgb.Data = SCREEN.Object("PARENT.KFGB").data
+S12901.Data = SCREEN.Object("PARENT.12901").data
+GUBN2.Data = SCREEN.Object("PARENT.GUBN2").data
+S12901_E.Data = SCREEN.Object("PARENT.12901_E").data
+
+If UCase(TypeName( SCREEN.Object("main.cxMarket"))) <> "NOTHING" Then
+	If SCREEN.Object("main.cxMarket").sMarket = "KRX" Then
+		S1301.Data = SCREEN.Object("main.1301").Data
+	ElseIf SCREEN.Object("main.cxMarket").sMarket = "NXT" Then
+		S1301.Data = "N." & SCREEN.Object("main.1301").Data
+	ElseIf SCREEN.Object("main.cxMarket").sMarket = "통합" Then
+		S1301.Data = "M." & SCREEN.Object("main.1301").Data
+	End If
+End If
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+If check.Data = "F" Then
+	CONTROL0.Clear
+End If
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(12901)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(12901_E)
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

@@ -1,0 +1,300 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB821100)
+MAPSIZE(309, 575)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("이중접속 설정/해지")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(ENCODE|CERTIFY)
+TITLE("이중접속 설정/해지")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("piboPBxQ")
+MAPTYPE(NORM)
+HEADER(LEDGER)
+TRXH("31CSBPGT109")
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL63(0, 30, 577, 285)  LIMAGE(0)  LINEW(3)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL_bg(-2, 0, 577, 32)  LIMAGE(1)  LINEW(3)  LINETYPE(4)  LINECOLOR(64)      COLOR(66, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  lb_id(8, 375, 113, 392)  'login ID'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  In_in(120, 407, 240, 426)  LEN(5)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_PASS    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("00001")          TABORDER(2)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL0(8, 428, 113, 445)  'In 거래매체코드'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  TrdmdaCode_in(120, 428, 240, 447)  LEN(2)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_PASS    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("00")          TABORDER(3)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL2(8, 451, 113, 468)  'In 신청거부구분'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  PrslRjtTp_in(120, 452, 240, 471)  LEN(1)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_PASS    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("Q")          TABORDER(4)  IOORDER(3)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL4(6, 97, 63, 116)    |IMAGETEXT|AL_STRETCH    COLOR(208, 232)  CUR(0)    "참고사항.bmp"  ENABLE  &
+  VISIBLE  TRANSPARENT  IMAGETEXT  HINTTYPE(IH_NONE)
+LABEL  LABEL21(20, 117, 560, 137)  '금융감독원의 지침에 따라 전자금융서비스간 이중접속을 원칙적으로 제한하고 있습니다.'  AL_LEFT  CUR(0)      COLOR(228, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL5(20, 151, 567, 171)  '이중접속 설정 허용 시 동시 로그인은 최대 10대까지 가능합니다.'  AL_LEFT  CUR(0)      COLOR(228, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL6(20, 171, 568, 191)  '단말기별 최종 접속을 최우선하여 유효한 로그인으로 처리되며, 먼저 접속한 매체에서는 접속종료'  AL_LEFT  CUR(0)      COLOR(228, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL7(20, 208, 545, 228)  '이중접속 기능은 고객님께 매매편의를 지원해 드리기 위해 신청고객에 한해 제공됩니다.'  AL_LEFT  CUR(0)      COLOR(228, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL8(20, 226, 555, 246)  '고객님의 부주의 또는 실수로 인하여 뜻하지 않은 손실을 발생 시킬 수 있으므로 사용에 주의'  AL_LEFT  CUR(0)      COLOR(228, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL9(110, 36, 291, 64)  '현재 이중접속이 ['  AL_LEFT  FONT("굴림체", 12, NORMAL)  CUR(0)      COLOR(208, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  BUTTON0(530, 5, 566, 25)  '조회'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, BOLD)  FOCUS  COLOR(208, 186)  CUR(0)    "조회BTN.BMP"    TABORDER(1)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+LABEL  state(265, 36, 307, 65)  AL_LEFT  FONT("굴림", 12, BOLD)  CUR(0)      COLOR(208, 94)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL11(332, 36, 463, 65)  '] 된 상태입니다.'  AL_LEFT  FONT("굴림체", 12, NORMAL)  CUR(0)      COLOR(208, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+OUT  In_out(446, 378, 507, 395)  LEN(5)  IO_NUM|AL_CENTER|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(4)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  TrdmdaCode_out(446, 404, 482, 418)  LEN(2)  IO_MIXED|AL_CENTER|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(5)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  PrslRjtTp_out(446, 427, 497, 443)  LEN(1)  IO_MIXED|AL_CENTER|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(6)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL11(0, 308, 579, 311)        COLOR(64, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  GUIDE1(-1, 285, 578, 309)  LIMAGE(1)  LINEW(3)  STRESS(0)  STRESSW(0)  LINETYPE(4)  LINECOLOR(64)      COLOR(34, 69)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL0(6, 290, 20, 304)    |IMAGE|AL_STRETCH    COLOR(208, 232)  CUR(0)    "알림_ic.bmp"  ENABLE  &
+  VISIBLE  TRANSPARENT  IMAGE  HINTTYPE(IH_NONE)
+PANEL  GUIDE(22, 285, 561, 309)        COLOR(228, 130)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+PANEL  PANEL99(6, 121, 15, 130)    |IMAGE|AL_CENTER    COLOR(208, 232)  CUR(0)    "텍스트화살표_하단.BMP"  ENABLE  &
+  VISIBLE  TRANSPARENT  IMAGE  HINTTYPE(IH_NONE)
+PANEL  PANEL2(6, 156, 15, 165)    |IMAGE|AL_CENTER    COLOR(208, 232)  CUR(0)    "텍스트화살표_하단.BMP"  ENABLE  &
+  VISIBLE  TRANSPARENT  IMAGE  HINTTYPE(IH_NONE)
+PANEL  PANEL3(6, 176, 15, 185)    |IMAGE|AL_CENTER    COLOR(208, 232)  CUR(0)    "텍스트화살표_하단.BMP"  ENABLE  &
+  VISIBLE  TRANSPARENT  IMAGE  HINTTYPE(IH_NONE)
+PANEL  PANEL5(6, 213, 15, 222)    |IMAGE|AL_CENTER    COLOR(208, 232)  CUR(0)    "텍스트화살표_하단.BMP"  ENABLE  &
+  VISIBLE  TRANSPARENT  IMAGE  HINTTYPE(IH_NONE)
+BUTTON  accessBtn(138, 71, 268, 91)  '이중접속 허용'  TP_PUSH|IMAGETEXT|AL_STRETCH        FOCUS  COLOR(208, 232)  CUR(0)    "10BTN.BMP"    TABORDER(5)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+BUTTON  denyBtn(295, 70, 425, 90)  '이중접속 불가'  TP_PUSH|IMAGETEXT|AL_STRETCH        FOCUS  COLOR(208, 232)  CUR(0)    "10BTN.BMP"    TABORDER(6)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+LABEL  custIDLabel(33, 36, 145, 64)  AL_LEFT  FONT("굴림체", 12, NORMAL)  CUR(0)      COLOR(208, 130)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL3(6, 6, 46, 26)  '고객명'  AL_LEFT  CUR(0)      COLOR(208, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  custID(120, 375, 201, 395)  LEN(12)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 130)  CUR(0)  TP_SUNKEN          TABORDER(7)  IOORDER(7)  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL4(158, 6, 233, 26)  '접속비밀번호'  AL_LEFT  CUR(0)      COLOR(208, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  zPwd(233, 6, 315, 26)  LEN(12)  IO_MIXED|EDIT_INPUT|FA_PASSWD|FA_WRAP|FA_SKIP    COLOR(192, 130)  CUR(0)  TP_SUNKEN          TABORDER(8)  IOORDER(8)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  confirmPwd(557, 377, 619, 400)  'N'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL10(20, 189, 325, 209)  '알림 창이 팝업 되며, 자동으로 로그아웃 처리됩니다.'  AL_LEFT  CUR(0)      COLOR(228, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+OBJECT  obj0(120, 545, 170, 595)    "IB8888XX"  TABORDER(9)  IOORDER(9)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  gubn(120, 495, 240, 514)  LEN(1)  IO_MIXED|EDIT_INPUT|FA_SKIP|FA_PASS    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("0")          TABORDER(10)  IOORDER(10)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL12(265, 5, 535, 25)  '*조회버튼 클릭하여 상태조회 후 변경해주세요.'  AL_LEFT  CUR(0)      COLOR(208, 130)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL13(20, 244, 575, 264)  '하여 주시고, 해당 기능 사용시 발생될 수 있는 타인의 사용으로 인한 고객님의 손실에 대한 '  AL_LEFT  CUR(0)      COLOR(228, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL14(20, 261, 575, 281)  '책임은 당사에 없음을 알려 드립니다.'  AL_LEFT  CUR(0)      COLOR(228, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL15(20, 132, 560, 152)  '(전자금융 거래시 동일ID를 이용한 이중접속 제한)'  AL_LEFT  CUR(0)      COLOR(228, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  EDIT0(50, 6, 131, 26)  LEN(12)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 130)  CUR(0)  TP_SUNKEN          TABORDER(11)  IOORDER(11)  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL16(8, 410, 113, 427)  'In RecortCount'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Option Explicit
+
+'PrslRjtTp. Q : 조회, P : 허가, A : 불가
+
+Sub send_f()
+	SCREEN.Certify False
+	SCREEN.ClearAll 0, 2
+	LEDGER.Fkey = "C"
+	PrslRjtTp_in.Data = "Q"
+	SCREEN.Send 0
+End Sub
+
+Sub send_o()
+'	Call checkPwd()
+'
+'	If Trim(confirmPwd.Text) = "N" Then
+'		Exit Sub
+'	End If
+
+'	If gubn.Data = 0 Then
+'		SCREEN.Certify True
+'	End If
+	LEDGER.Fkey = "5"
+	SCREEN.Send 0
+End Sub
+
+Sub DoRecieve()
+	If Trim(PrslRjtTp_out.Data) = "P" Then
+		state.Text = " 허용 "
+	Else
+		state.Text = " 불가 "
+	End If
+
+	accessBtn.Enable = False
+	denyBtn.Enable = False
+
+	If Trim(confirmPwd.Text) = "Y" Then
+		Call SetBtnState()
+	End If
+End Sub
+
+Sub fullpass_send()
+	confirmPwd.Text = "Y"
+	Call SetBtnState()
+End Sub
+
+Sub SetBtnState()
+	If Trim(PrslRjtTp_out.Data) = "P" Then
+		accessBtn.Enable = False
+		denyBtn.Enable = True
+		denyBtn.SetFocus
+	Else
+		accessBtn.Enable = True
+		denyBtn.Enable = False
+		accessBtn.SetFocus
+	End If
+End Sub
+
+Sub checkPwd()
+	Dim IsYn
+	IsYn = SYSTEM.CheckPasswd(Trim(zPwd.Data))
+
+	If IsYn = True Then
+		confirmPwd.Text = "Y"
+		Call SetBtnState()
+	Else
+		MsgBox "접속비밀번호를 잘못 입력하셨습니다. 접속비밀번호를 확인하여 주십시오.", , "IBK투자증권"
+		confirmPwd.Text = "N"
+		GUIDE.Text = ""
+		accessBtn.Enable = False
+		denyBtn.Enable = False
+		zPwd.Clear
+		zPwd.SetFocus
+		Exit Sub
+	End If
+End Sub
+
+_AW_ONSTART_AW_
+confirmPwd.Text = "N"
+
+accessBtn.Enable = False
+denyBtn.Enable = False
+
+EDIT0.Data = Trim(LOGIN.Name)
+custID.Data = Trim(SYSTEM.UserID)
+custIDLabel.Text = "[ " & Trim(SYSTEM.UserID) & " ]"
+
+Dim Logintype
+
+If SCREEN.CreateObject("INFO") Then
+	Logintype = Trim(INFO.PopData("", "AXISENC.INI", "LOGINTYPE", "TYPE"))
+End If
+
+If Logintype = "0" Then
+	gubn.Data = "1"
+	zPwd.Visible = False
+	LABEL4.Visible = False
+	LABEL12.Visible = True
+End If
+
+
+Call send_f()
+zPwd.SetFocus
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+SCREEN.OnSend = False
+GUIDE.Text = ""
+
+In_in.Data = "00001"
+
+
+SCREEN.OnSend = True
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+If Left(Trim(LEDGER.Ecod), 1) = "0" Then
+	Call DoRecieve()
+End If
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(BUTTON0)
+_AW_ONCLICK_AW_
+If gubn.Data = 1 Then
+	obj0.proc "certsend" ,""
+Else
+	If Len(Trim(zPwd.Data)) > 3 Then
+		TrdmdaCode_in.Data = "00"
+		Call checkPwd()
+	Else
+		MsgBox "접속비밀번호를 확인하여 주십시오.", , "IBK투자증권"
+		zPwd.SetFocus
+	End If
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(accessBtn)
+_AW_ONCLICK_AW_
+TrdmdaCode_in.Data = "00"
+PrslRjtTp_in.Data = "P"
+Call send_o()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(denyBtn)
+_AW_ONCLICK_AW_
+PrslRjtTp_in.Data = "A"
+TrdmdaCode_in.Data = "00"
+Call send_o()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(zPwd)
+_AW_ONKEYCHANGE_AW_
+If SCREEN.Key = "13" Then
+	If Len(Trim(zPwd.Data)) > 3 Then
+		Call checkPwd()
+	Else
+		zPwd.SetFocus
+	End If
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

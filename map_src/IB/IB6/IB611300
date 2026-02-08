@@ -1,0 +1,194 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB611300)
+MAPSIZE(418, 858)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("펀드종합매매")
+MAPPUBLIC(";")
+FONT("굴림", 9, NORMAL)
+OPTIONS(SAVE)
+TITLE("펀드종합매매")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL0(0, 0, 860, 29)        COLOR(64, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL105(-2, 29, 860, 395)  LIMAGE(0)  LINEW(4)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL(1, 0, 857, 27)        COLOR(66, 67)  CUR(0)    AL_CENTER  FONT("굴림체", 9, NORMAL)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL0(8, 4, 56, 24)  '계좌번호'  AL_CENTER  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(66, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+CONTROL  AN50(62, 4, 202, 24)    "CX_Account"  "/w0"  LEN(11)  EDIT_INPUT  FONT("굴림체", 9, NORMAL)    COLOR(68, 130)  TABORDER(1)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  ANCM(203, 4, 267, 24)  LEN(20)  IO_MIXED|AL_LEFT||FA_SKIP  FONT("굴림체", 9, NORMAL)    COLOR(49, 130)  CUR(0)  LINECOLOR(48)          TABORDER(0)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL1(282, 4, 339, 24)  '비밀번호'  AL_CENTER  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(66, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  zPwd(340, 4, 396, 24)  LEN(8)  IO_MIXED|EDIT_INPUT|FA_PASSWD|FA_WRAP  FONT("굴림체", 9, NORMAL)    COLOR(192, 69)  CUR(0)  TP_SUNKEN          TABORDER(2)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  send_btn(779, 4, 816, 24)  '조회'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, BOLD)  FOCUS  COLOR(208, 186)  CUR(0)    "조회BTN.BMP"    TABORDER(3)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+EDIT  h_acnm(4, 513, 124, 532)  LEN(12)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(4)  IOORDER(4)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  fundcode(7, 481, 127, 500)  LEN(12)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(5)  IOORDER(5)  ENABLE  &
+  HINTTYPE(IH_NONE)
+USRTAB  UTAB0(6, 37, 852, 63)  FOCUS  INDEX(0)  COUNT(3)  AL_TOP  TAB_IMAGE        COLOR(208, 70)  CUR(0)  TABIMAGE("TAB.BMP")  FCOLOR(208, 71)  CAPTION("매수", "매도", "취소")  TABINFO("1:0", "1:1", "1:2")  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  obj(6, 63, 852, 387)    "IB611310"  TABORDER(6)  IOORDER(6)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  next(817, 4, 853, 24)  '다음'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, NORMAL)  FOCUS  COLOR(208, 186)  CUR(0)    "2BTN.BMP"    TABORDER(7)  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+PANEL  GUIDE1(-2, 394, 860, 418)  LIMAGE(1)  LINEW(3)  STRESS(0)  STRESSW(0)  LINETYPE(4)  LINECOLOR(64)      COLOR(34, 69)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL7(4, 399, 18, 413)    |IMAGE|AL_STRETCH    COLOR(208, 232)  CUR(0)    "알림_ic.bmp"  ENABLE  &
+  VISIBLE  TRANSPARENT  IMAGE  HINTTYPE(IH_NONE)
+PANEL  GUIDE(19, 397, 841, 415)        COLOR(34, 69)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  ord_btn(139, 479, 171, 499)  '주문'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, NORMAL)  FOCUS  COLOR(208, 69)  CUR(0)    "2BTN.BMP"    TABORDER(8)  ENABLE  &
+  IMAGETEXT  HINTTYPE(IH_NONE)
+LABEL  LABEL14(277, 493, 370, 517)  '금융상품매매대리인'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  agentchk(373, 497, 408, 516)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_SUNKEN  INIT("0")          TABORDER(9)  IOORDER(7)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+'== 계좌명, 비밀번호 설정
+Sub Set_account()
+	SCREEN.ClearAll 0, 2
+	obj.ClearAll 2
+	SCREEN.Proc "obj.cls", ""
+	GUIDE.Text = ""
+	ANCM.Data = AN50.Name
+	h_acnm.Data = AN50.Name
+	zPwd.Data = AN50.Password
+
+	If AN50.IsAccAgent("", 5) Then '해당계좌가 금융상품매매대리인(5)인지 확인하고 맞으면 메세지 박스
+		agentchk.Data = 1
+	Else
+		agentchk.Data = 0
+	End If
+
+	If Trim(AN50.Data) = "" Or Len(Trim(AN50.Data)) < 11 Then
+		AN50.SetFocus
+		Exit Sub
+	End If
+
+	If Trim(zPwd.Data) = "" Or Len(Trim(zPwd.Data)) < 4 Then
+		zPwd.SetFocus
+		Exit Sub
+	End If
+End Sub
+
+Sub INFO_send()
+	SCREEN.Object("obj.obj0").send
+End Sub
+
+_AW_ONSTART_AW_
+'If SCREEN.GetMapName(1) = "IB611300" Then
+	AN50.AgentType = 5	'금융상품매매대리인(5), 자금대체 대리인(6) RP매도매수는(9) 세팅
+'End If
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(AN50)
+_AW_ONCHANGE_AW_
+Call Set_account()	'-- 계좌명, 비밀번호 설정
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(zPwd)
+_AW_ONKEYCHANGE_AW_
+'== 비밀번호 변경시 조회 버튼 기능 수행.
+If SCREEN.Key = "13" Then  '-- Enter 키 입력
+	SCREEN.Object("obj.obj1.leg").data = "N"
+	SCREEN.Proc "obj.obj1.send_f", ""
+	'SCREEN.object("obj.obj1").send
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(send_btn)
+_AW_ONCLICK_AW_
+SCREEN.Object("obj.obj1.leg").data = "N"
+SCREEN.Proc "obj.obj1.send_f", ""
+'SCREEN.object("obj.obj1").send
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(UTAB0)
+_AW_ONCLICK_AW_
+GUIDE.Text = ""
+
+Select  Case (UTAB0.Index)
+	Case "0" : obj.SetObject "IB611310"
+	Case "1" : obj.SetObject "IB611320"
+	Case "2" : obj.SetObject "IB611330"
+End Select
+
+zPwd.SetFocus
+
+SCREEN.Object("obj.obj1.leg").data = "N"
+
+'If Len(Trim(zPwd.data)) > 3 Then
+	'SCREEN.Proc "obj.obj1.send_f", ""
+'	SCREEN.object("obj.obj1").send
+'End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(next)
+_AW_ONCLICK_AW_
+SCREEN.Proc "obj.obj1.send_c", ""
+'SCREEN.object("obj.obj1").send
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(ord_btn)
+_AW_ONCLICK_AW_
+If Len(Trim(AN50.data)) < 11 Then
+	MsgBox "계좌번호를 확인 하십시오.", ,"IBK 투자증권"
+	Exit Sub
+End If
+
+If Len(Trim(zPwd.data)) < 4 Then
+	MsgBox "비밀번호를 확인 하십시오.", , "IBK 투자증권"
+	Exit Sub
+End If
+
+'주문 날리기전에 메세지창 띄운다
+If obj.GetObject = "IB611310" Then
+	obj.Proc "Order", ""
+Else
+	obj.Send
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

@@ -1,0 +1,402 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB2821F6)
+MAPSIZE(197, 604)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("종목별증거금율/주문")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(CR2TAB)
+TITLE("종목별증거금율/주문가능수량")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL0(0, 0, 604, 27)        COLOR(66, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL1(165, 364, 215, 384)  '비밀번호'  AL_LEFT  CUR(0)      COLOR(66, 69)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  zPwd(218, 364, 275, 384)  LEN(8)  IO_DIGIT|EDIT_INPUT|FA_PASSWD|FA_WRAP|FA_XFLOAT|FA_PASS    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(4)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  AN1A(23, 365, 150, 383)  LEN(11)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_PASS    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(5)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL32(8, 3, 58, 23)  '매수가격'  AL_LEFT  CUR(0)      COLOR(66, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  ed_jprc(59, 3, 131, 23)  LEN(10)  IO_NUM|EDIT_INPUT|FA_COMMA|FA_RIGHT|FA_WRAP|FA_XFLOAT    COLOR(192, 130)  CUR(0)  TP_SUNKEN          TABORDER(1)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  b_send(564, 3, 600, 23)  '조회'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, BOLD)  COLOR(208, 186)  CUR(0)    "조회btn.bmp"    TABORDER(2)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+OBJECT  obj0(0, 27, 604, 149)    "IB1001FE"  TABORDER(3)  IOORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL33(145, 3, 225, 23)  '현금/신용구분'  AL_LEFT  CUR(0)      COLOR(66, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL0(23, 331, 73, 351)  '종목코드'  AL_LEFT  CUR(0)      COLOR(66, 69)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  jmcd(74, 328, 154, 352)  LEN(6)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_NOR    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(6)  IOORDER(5)  ENABLE  &
+  HINTTYPE(IH_NONE)
+COMBO  com_sygubn(226, 3, 290, 23)  TP_SUNKEN  LEN(1)  COUNT(2)  VCOUNT(2)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_NUM|EDIT_INPUT    COLOR(192, 130)  CUR(0)  DISPLAY("현금", "신용")  DATA("0", "1")    TABORDER(7)  IOORDER(6)  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  mmgbLabel(22, 427, 69, 447)  '매매구분'  AL_LEFT  CUR(0)      COLOR(66, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+COMBO  com_mmgb(73, 427, 133, 447)  TP_SUNKEN  LEN(1)  COUNT(2)  VCOUNT(2)  INDEX(1)  MATCHKEY(NOTMAPPING)  IO_NUM|EDIT_INPUT    COLOR(192, 130)  CUR(0)  DISPLAY("매도", "매수")  DATA("1", "2")    TABORDER(8)  IOORDER(7)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  mmgb(75, 267, 155, 291)  LEN(1)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_NOR    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(9)  IOORDER(8)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL2(24, 268, 74, 288)  '매매구분'  AL_LEFT  CUR(0)      COLOR(66, 69)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  syDateLabel(296, 3, 323, 23)  '일자'  AL_LEFT  CUR(0)      COLOR(66, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  syDate(325, 3, 411, 23)  LEN(8)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_DATE    COLOR(192, 130)  CUR(0)  TP_SUNKEN          EDITFORMAT("9999/99/99")  TABORDER(10)  IOORDER(9)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  sygubn(74, 296, 154, 320)  LEN(1)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_NOR    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(11)  IOORDER(10)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL3(23, 299, 73, 319)  '신용구분'  AL_LEFT  CUR(0)      COLOR(66, 69)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  obj_currentVal(153, 394, 258, 419)    "IB10013E"  TABORDER(12)  IOORDER(11)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL4(23, 396, 152, 416)  '현재가 obj_currentVal'  AL_LEFT  CUR(0)      COLOR(66, 69)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  r1(433, 3, 487, 23)  '정규장'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(GP1)      COLOR(146, 130)  CUR(0)      TABORDER(13)  &
+  CHECKED  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  r2(490, 3, 544, 23)  '시간외'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(GP1)      COLOR(146, 130)  CUR(0)      TABORDER(14)  &
+  TRANSPARENT  HINTTYPE(IH_NONE)
+GROUP  GP1(165, 330, 221, 350)  'GP1'        COLOR(-1, 0)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Option Explicit
+Dim IsClick
+
+IsClick = False
+
+'================================================================================
+' 메인에서 send_sise_all()시 호출됨. tab_account전환시 호출
+' 화면이 처음뜰 때 obj_currentVal에서 매수가격(현재가)를 가져온 후 chkCondition()으로..
+'================================================================================
+Sub send_main()
+	jmcd.Data = Trim(SCREEN.Object("main.1301").Data)
+	obj_currentVal.Send
+End Sub
+
+
+'================================================================================
+' 현금/신용 구분 및 매매구분으로 화면 세팅값 가져옴.
+'================================================================================
+Sub chkCondition()
+	Dim OrderMap
+
+	OrderMap = SCREEN.Object("main.OBJ_order.OBJ_odr").GetObject()
+
+	Call getMapInfo(OrderMap)
+
+	If Trim(mmgb.Data) = "1" Or Trim(mmgb.Data) = "2" Then
+		com_mmgb.Data = mmgb.Data
+	End If
+End Sub
+
+
+'===============================================================================
+' IB100100일 때 현금/신용구분 및 매매구분값 가져옴.
+' 주문화면보다 tab_ordertyp이 늦게 뜨기 때문에 하나하나 풀어서 적음.
+'===============================================================================
+Sub getMapInfo(mapNm)
+	Select Case Trim(mapNm)
+		Case "IB100150"
+			mmgb.Data = "1"
+
+			If SCREEN.Object("main.OBJ_order.OBJ_odr.r_cash").Checked = True Then
+				sygubn.Data = "0"
+			Else
+				sygubn.Data = "1"
+			End If
+			com_sygubn.Data = sygubn.Data
+		Case "IB100160"
+			mmgb.Data = "2"
+
+			If SCREEN.Object("main.OBJ_order.OBJ_odr.r_cash").Checked = True Then
+				sygubn.Data = "0"
+			Else
+				sygubn.Data = "1"
+			End If
+			com_sygubn.Data = sygubn.Data
+		Case "IB100170"
+			mmgb.Data = "3"
+		Case "IB102150"
+			mmgb.Data = "1"
+			sygubn.Data = "1"
+		Case "IB102170"
+			mmgb.Data = "3"
+			com_mmgb.Data = "1"
+			sygubn.Data = "1"
+		Case "IB103011"
+			mmgb.Data = "1"
+			sygubn.Data = "0"
+		Case "IB103012"
+			mmgb.Data = "3"
+			com_mmgb.Data = "1"
+			sygubn.Data = "0"
+	End Select
+End Sub
+
+Sub setRadio(data)
+	'SYSTEM.Trace "setRadio : " & data
+	If data = 1 Then
+		r1.Checked False
+		r2.Checked True
+	Else
+		r1.Checked True
+		r2.Checked False
+	End If
+End Sub
+'===============================================================================
+' 현금/신용구분, 매매구분으로 화면 세팅
+'===============================================================================
+Sub SetSrc()
+	com_sygubn.Enable = True
+	com_mmgb.Enable = True
+
+
+	If Trim(mmgb.Data) = "1" Or Trim(mmgb.Data) = "2" Then
+		com_sygubn.Enable = False
+
+		mmgbLabel.Visible = False
+		com_mmgb.Visible = False
+
+		If mmgb.Data = "1" And sygubn.Data = "1" Then
+			syDateLabel.Visible = True
+			syDate.Visible = True
+			syDate.Data = Trim(SCREEN.Object("main.OBJ_order.OBJ_odr.ed_date").Data)
+		Else
+			syDateLabel.Visible = False
+			syDate.Visible = False
+		End If
+	Else
+		com_sygubn.Enable = True
+		com_mmgb.Enable = True
+
+		mmgbLabel.Visible = True
+		com_mmgb.Visible = True
+
+		If sygubn.Data = "0" Then
+			syDateLabel.Visible = False
+			syDate.Visible = False
+		Else
+			If com_mmgb.Data = "1" Then
+				syDateLabel.Visible = True
+				syDate.Visible = True
+			Else
+				syDateLabel.Visible = False
+				syDate.Visible = False
+			End If
+
+			If SCREEN.Object("main.OBJ_order.OBJ_odr").GetObject() = "IB102170" Then
+				com_mmgb.Data = 1
+				com_mmgb.Enable = False
+				com_sygubn.Data = 1
+				com_sygubn.Enable = False
+			ElseIf SCREEN.Object("main.OBJ_order.OBJ_odr").GetObject() = "IB103012" Then
+				com_mmgb.Data = 1
+				com_mmgb.Enable = False
+				com_sygubn.Data = 0
+				com_sygubn.Enable = False
+			End If
+		End If
+	End If
+
+	If Trim(sygubn.Data) = "" Then
+		sygubn.Data = Trim(com_sygubn.Data)
+	End If
+
+	Dim checkCombo
+	'호가유형타잎 결정
+	If sygubn.Data = "0" Then
+		obj0.SetObject("IB1001FE")
+
+		If IsClick = True Then
+			If r2.Checked = True Then
+				SCREEN.Object("obj0.zCommdaCode").data = "99"
+			Else
+				SCREEN.Object("obj0.zCommdaCode").data = "00"
+			End If
+			IsClick = False
+		Else
+
+			checkCombo = Trim(SCREEN.Object("main.OBJ_order.OBJ_odr.shogb").Data)
+
+			If checkCombo = "81" Or checkCombo = "82" Or checkCombo = "61" Then
+				r1.Checked = False
+				r2.Checked = True
+				SCREEN.Object("obj0.zCommdaCode").data = "99"
+			Else
+				r1.Checked = True
+				r2.Checked = False
+				SCREEN.Object("obj0.zCommdaCode").data = "00"
+			End If
+		End If
+
+	Else
+		obj0.SetObject("IB1001FF")
+
+		If IsClick = True Then
+			If r2.Checked = True Then
+				SCREEN.Object("obj0.EDIT0").data = "81"
+			Else
+				SCREEN.Object("obj0.EDIT0").data = Trim(SCREEN.Object("main.OBJ_order.OBJ_odr.shogb").Data)
+			End If
+			IsClick = False
+		Else
+			checkCombo = Trim(SCREEN.Object("main.OBJ_order.OBJ_odr.shogb").Data)
+
+			If checkCombo = "81" Or checkCombo = "82" Or checkCombo = "61" Then
+				r1.Checked = False
+				r2.Checked = True
+				SCREEN.Object("obj0.EDIT0").data = "81"
+			Else
+				r1.Checked = True
+				r2.Checked = False
+				SCREEN.Object("obj0.EDIT0").data = checkCombo
+			End If
+		End If
+
+	End If
+
+End Sub
+
+
+Sub send_f()
+	Call chkCondition()
+	Call SetSrc()
+
+	If sygubn.Data = "0" Then
+		obj0.SetObject("IB1001FE")
+	Else
+		obj0.SetObject("IB1001FF")
+	End If
+
+	If IsNumeric(ed_jprc.Data) = True Then
+		If CDbl(ed_jprc.Data) = 0 Then
+			ed_jprc.Data = SCREEN.Object("main.OBJ_sise.2023").Data
+		End If
+
+		SCREEN.Proc "obj0.send_f", ""
+	Else
+		Call guide_msg(Trim(com_mmgb.Text) & "가격을 확인하여 주십시오.")
+		ed_jprc.SetFocus
+	End If
+End Sub
+
+_AW_ONINDECLARE_AW_
+#Load IB888833
+#Load IB888888
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+SCREEN.OnSend = False
+
+If Len(Trim(SCREEN.Object("main.OBJ_order.ed_pswd").Data)) < 4 Then
+	Exit Sub
+End If
+
+Call send_f()
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(zPwd)
+_AW_ONKEYCHANGE_AW_
+'== 비밀번호 변경시 조회 버튼 기능 수행.
+If SCREEN.Key = "13" Then  '-- Enter 키 입력
+	Call send_f()
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(ed_jprc)
+_AW_ONCHARCHANGE_AW_
+Dim prc
+prc = Trim(ed_jprc.Data)
+
+If Left(prc, 1) = "+" Or Left(prc, 1) = "-" Then
+	ed_jprc.Data = Mid(prc, 2)
+End If
+_AW_ONENDSUB_AW_
+_AW_ONKEYCHANGE_AW_
+If SCREEN.Key = "13" Then
+	If Trim(ed_jprc.Data) <> "" Then
+		If Is_numeric(ed_jprc.Data) = True Then
+			Call send_f()
+		Else
+			Call guide_msg("매수가격을 확인하여 주십시오.")
+		End If
+	End If
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(b_send)
+_AW_ONCLICK_AW_
+IsClick = True
+Call send_f()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(com_sygubn)
+_AW_ONCHANGE_AW_
+sygubn.Data = com_sygubn.Data
+Call send_f()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(com_mmgb)
+_AW_ONCHANGE_AW_
+Call send_f()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(syDate)
+_AW_ONCHANGE_AW_
+Call send_f()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(r1)
+_AW_ONCLICK_AW_
+IsClick = True
+Call send_f()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(r2)
+_AW_ONCLICK_AW_
+IsClick = True
+Call send_f()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

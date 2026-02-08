@@ -1,0 +1,207 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB290830)
+MAPSIZE(242, 881)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("투자자시장종합")
+MAPPUBLIC(";")
+FONT("굴림", 9, NORMAL)
+TITLE("투자자시장종합")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL3(875, 0, 881, 26)        COLOR(64, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL10(-2, 26, 885, 242)  LIMAGE(0)  LINEW(6)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+GROUP  grp1(840, 34, 868, 58)  'grp1'        COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  obj1(6, 36, 876, 232)    "IB290831"  TABORDER(1)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL0(0, 0, 885, 26)        COLOR(66, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  btn1(25, 3, 44, 23)  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(208, 69)  CUR(0)    "창조절좌우.bmp"    TABORDER(2)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)  HELPTEXT("좌우축소")HELPTEXT("좌우축소")
+BUTTON  btn2(45, 3, 64, 23)  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(208, 69)  CUR(0)    "창조절상하.bmp"    TABORDER(3)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)  HELPTEXT("상하확대")HELPTEXT("상하확대")
+BUTTON  BUTTON0(840, 3, 876, 23)  '조회'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림", 9, BOLD)  COLOR(208, 186)  CUR(0)    "조회BTN.BMP"    TABORDER(4)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+PANEL  PANEL2(0, 0, 1, 26)        COLOR(64, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON7(781, 3, 837, 23)  '참고사항'  TP_PUSH|IMAGETEXT|AL_STRETCH        FOCUS  COLOR(208, 69)  CUR(0)    "4btn.bmp"    TABORDER(5)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+COMBO  stock(90, 3, 172, 23)  TP_SUNKEN  LEN(1)  COUNT(2)  VCOUNT(2)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_NUM|EDIT_INPUT  FONT("굴림체", 9, NORMAL)    COLOR(68, 69)  CUR(0)  DISPLAY("금액(억원)", "수량(천주)")  DATA("1", "2")    TABORDER(6)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL1(66, 3, 91, 23)  '주식'  AL_LEFT  CUR(0)      COLOR(66, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+COMBO  future(196, 3, 278, 23)  TP_SUNKEN  LEN(1)  COUNT(2)  VCOUNT(2)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_NUM|EDIT_INPUT  FONT("굴림체", 9, NORMAL)    COLOR(68, 69)  CUR(0)  DISPLAY("금액(억원)", "수량(계약)")  DATA("1", "2")    TABORDER(7)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL23(172, 3, 197, 23)  '선물'  AL_LEFT  CUR(0)      COLOR(66, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+COMBO  coption(302, 3, 384, 23)  TP_SUNKEN  LEN(1)  COUNT(2)  VCOUNT(2)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_NUM|EDIT_INPUT  FONT("굴림체", 9, NORMAL)    COLOR(68, 69)  CUR(0)  DISPLAY("금액(억원)", "수량(계약)")  DATA("1", "2")    TABORDER(8)  IOORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL3(278, 3, 303, 23)  '옵션'  AL_LEFT  CUR(0)      COLOR(66, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+CONTROL  cxMarket(4, 3, 24, 23)  |FA_SKIP  "CX_MarketPicker"  "/k2/t/u1/d1"  LEN(12)  EDIT_NOP    COLOR(192, 232)  TABORDER(0)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  edMarketTrigger(575, 5, 607, 25)  LEN(6)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(9)  IOORDER(5)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Sub p_write_ini(data)
+	If SCREEN.CreateObject("INFO") Then
+		INFO.PushData LOGIN.Name, "userconf.ini", "IB290800", "mapName", data
+	End If
+End Sub
+
+
+Sub p_write_ini2()
+	If SCREEN.CreateObject("INFO") Then
+		INFO.PushData LOGIN.Name, "userconf.ini", "IB290800", "vol", stock.data
+		INFO.PushData LOGIN.Name, "userconf.ini", "IB290800", "amt", future.data
+		INFO.PushData LOGIN.Name, "userconf.ini", "IB290800", "acc", coption.data
+	End If
+End Sub
+
+Sub p_read_ini2()
+	If SCREEN.CreateObject("INFO") Then
+		Dim vol, amt, acc
+		vol = Trim(INFO.PopData(LOGIN.Name, "userconf.ini", "IB290800", "vol"))
+		amt = Trim(INFO.PopData(LOGIN.Name, "userconf.ini", "IB290800", "amt"))
+		acc = Trim(INFO.PopData(LOGIN.Name, "userconf.ini", "IB290800", "acc"))
+	End If
+
+	If vol <> "0" Then
+		stock.data = vol
+		future.Data = amt
+		coption.data = acc
+	ElseIf amt<> "0" Then
+		stock.data = vol
+		future.Data = amt
+		coption.data = acc
+	ElseIf acc <> "0" Then
+		stock.data = vol
+		future.data = amt
+		coption.data = acc
+	Else
+		stock.data = vol
+		future.Data = amt
+		coption.data = acc
+	End If
+
+	obj1.Send
+
+End Sub
+
+Sub Change_MKGubn_Main(sMKGubn)
+
+SYSTEM.Trace "[IB250400]Change_MKGubn_Main sMKGubn = " & sMKGubn
+	cxMarket.sMarket = sMKGubn
+	obj1.Send
+End Sub
+
+_AW_ONINDECLARE_AW_
+#load SE799999
+
+_AW_ONENDSUB_AW_
+_AW_ONSTART_AW_
+' 현재 화면의 시장식별자(cxMarket)에 고유 화면번호 부여
+cxMarket.Major = SCREEN.Major
+cxMarket.MNum = SCREEN.GetMapName(1)
+cxMarket.sMarket = "통합"
+
+p_read_ini2()
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(btn1)
+_AW_ONCLICK_AW_
+p_write_ini("IB290850")
+SCREEN.ChangeMap "IB290850"
+'SCREEN.SetSize 365, 166
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(btn2)
+_AW_ONCLICK_AW_
+p_write_ini("IB290800")
+SCREEN.ChangeMap "IB290800"
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON0)
+_AW_ONCLICK_AW_
+'SCREEN.Object("obj1.obj2").Send
+obj1.Send
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON7)
+_AW_ONCLICK_AW_
+SCREEN.CreateWindow 1, "IB291603 /s /p5", ""
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(stock)
+_AW_ONCHANGE_AW_
+Call p_write_ini2()
+obj1.Send
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(future)
+_AW_ONCHANGE_AW_
+Call p_write_ini2()
+obj1.Send
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(coption)
+_AW_ONCHANGE_AW_
+Call p_write_ini2()
+obj1.Send
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(cxMarket)
+_AW_ONCLICK_AW_
+obj1.send
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(edMarketTrigger)
+_AW_ONCHANGE_AW_
+Change_MKGubn_Main(Trim(edMarketTrigger.Data))
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

@@ -1,0 +1,92 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB190192)
+MAPSIZE(387, 280)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("MS Sans Serif", 9, NORMAL)
+OPTIONS(ENCODE)
+TITLE("계좌번호 업데이트")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pibfutp1")
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+LABEL  LABEL0(15, 40, 100, 59)  '레코드 갯수'  AL_CENTER  CUR(0)      COLOR(168, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  zIn(100, 40, 220, 60)  LEN(4)  IO_MIXED|EDIT_INPUT    COLOR(192, 232)  CUR(0)  TP_SUNKEN  INIT("00001")          TABORDER(1)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL1(14, 14, 99, 33)  '아이디'  AL_CENTER  CUR(0)      COLOR(168, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  EDIT0(100, 15, 220, 35)  LEN(8)  IO_MIXED|EDIT_INPUT    COLOR(192, 232)  CUR(0)  TP_SUNKEN          TABORDER(2)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+GRID  GRID0(25, 85, 225, 350)  VISIBLEROW(0)  CELLH(20)  MATRIX(2000, 2)  FIX(0)  MAINCOLOR(208, 232)  LINECOLOR(0)  FOCUSCOLOR(0)  FOCUSKIND(0)  |FLEXIBLE|VSCROLL    &
+	COLINFO("Acct")  LEN(11)  WIDTH(76)  HEAD("계좌번호")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_MIXED|EDIT_INPUT      COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Pswd")  LEN(44)  WIDTH(80)  HEAD("비밀번호")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_MIXED|EDIT_INPUT      COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    TABORDER(3)  IOORDER(3)  ENABLE  &
+  VISIBLE
+
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Sub SetData()
+	Dim ii, strTemp
+
+	For ii = 1 To SCREEN.Object("parent.GRID0").Rows
+		'SYSTEM.Trace "parent row[" & ii & "] accn[" & SCREEN.Object("parent.GRID0").GetGridCell(ii,3) & "] pswd[" & SCREEN.Object("parent.GRID0").GetGridCell(ii,5) & "]"
+		GRID0.InsertRow(-1)
+		GRID0.SetGridCell ii,1,SCREEN.Object("parent.GRID0").GetGridCell(ii,3)	'accn
+		GRID0.SetGridCell ii,2,SCREEN.Object("parent.GRID0").GetGridCell(ii,5)	'pswd
+	Next
+
+'	GRID0.SetGridCell GetGridRows,1,acct
+'	GRID0.SetGridCell GetGridRows,2,pswd
+End Sub
+
+'데이터가 있는 그리드 Row 리턴
+Function GetGridRows()
+	Dim ii, strTemp
+	For ii = 1 To GRID0.Rows
+		strTemp = GRID0.GetGridCell(ii, 1)
+
+		'SYSTEM.Trace "object row[" & ii & "] accn[" & GRID0.GetGridCell(ii,1) & "] pswd[" & GRID0.GetGridCell(ii,2) & "]"
+
+		If Trim(strTemp) = "" Then
+			Exit For
+		End If
+	Next
+
+	GetGridRows = ii
+End Function
+
+_AW_ONSEND_AW_
+SCREEN.OnSend False
+
+EDIT0.Data = LOGIN.User
+zIn.Data = GetGridRows() - 1
+
+'SYSTEM.Trace "onSend ID[" & EDIT0.Data & "] In[" & zIn.Data & "]"
+
+SCREEN.OnSend True
+
+_AW_ONENDSUB_AW_
+}
+
+
+

@@ -1,0 +1,141 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB191014)
+MAPSIZE(450, 698)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+TITLE("CX_DATATRANS")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL0(0, 0, 700, 450)  TP_RAISED      COLOR(208, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+CONTROL  CONTROL0(0, 0, 150, 70)  |FA_PROTECT  "CX_DATATRANS"  ""  LEN(0)  EDIT_NOP    COLOR(192, 232)  TABORDER(0)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+GRID  GRID0(0, 95, 541, 415)  VISIBLEROW(200)  CELLH(20)  MATRIX(200, 4)  FIX(0)  MAINCOLOR(208, 232)  LINECOLOR(0)  FOCUSCOLOR(0)  FOCUSKIND(0)  |VSCROLL    &
+	COLINFO("계좌번호")  LEN(20)  WIDTH(160)  HEAD("계좌번호")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_MIXED|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("계좌명|계좌별명")  LEN(40)  WIDTH(177)  HEAD("계좌명")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_MIXED|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("본인계좌플래그")  LEN(1)  WIDTH(95)  HEAD("본인계좌플래그")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_MIXED|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("FILLER")  LEN(2)  WIDTH(80)  HEAD("FILLER")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_MIXED|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    TABORDER(1)  IOORDER(1)  ENABLE  &
+  VISIBLE
+
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONINDECLARE_AW_
+#Load IB888833
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+SCREEN.OnSend = False
+
+GRID0.Clear
+
+Dim accList, a, b, g, idx, d
+Dim accnInfo, accnNo, accnNm, accnNick, accnStatus, insertFlag
+
+accList = CONTROL0.GetTypeData("4", "")
+a = 1
+idx = 1
+
+Do While a < Len(accList)
+	b = InStr(a, accList, vbLf, 0)
+
+	If b = 0 Then
+		Exit Do
+	End If
+
+	g = Mid(accList, a, b-a )
+
+	a = b + 1
+	d = Mid(g, 4, 2)
+
+	accnInfo = Split(g, "|")
+
+	accnNo = accnInfo(0)
+
+	'계좌별명이 길 경우 본인여부가 없을수도 있음.
+	If UBound(accnInfo) < 2 Then
+		accnStatus = ""
+	Else
+		accnStatus = accnInfo(2)
+	End If
+
+'	If d = "20" Or d = "21" Then
+'		GRID0.SetGridCell idx, 1, Left(g,11)
+'		GRID0.SetGridCell idx, 2, Right(g,Len(g)-11)
+'		idx = idx + 1
+'	End If
+
+	insertFlag = True
+	insertFlag = True
+
+'	SYSTEM.Trace accnNo & " => "
+	'고객용일때 본인계좌만 미등록계좌에 보이도록 수정
+	'단, 투자자문사때는 전부 등록.
+	'단, 랩계좌는 추가가 안되도록 수정
+'	If SYSTEM.ConnectBy = 0 Then
+'		If Trim(accnStatus) = "1" Then	'본인계좌
+'			insertFlag = True
+'		Else
+'			insertFlag = False
+'		End If
+'
+'		If LOGIN.Otpf = 1 Then
+'			insertFlag = True
+'		End If
+'	End If
+
+'	If chkNumericData(accnStatus) = True Then
+'		If CLng(accnStatus) = 0 Or CLng(accnStatus) = 1 Then
+'			insertFlag = True
+'		Else
+'			insertFlag = False
+'		End If
+'	Else
+'		insertFlag = False
+'	End If
+
+	If (d = "20" Or d = "21") And insertFlag = True Then
+		GRID0.SetGridCell idx, 1, Left(accnNo, 11)
+		GRID0.SetGridCell idx, 2, Trim(Mid(accnNo, 14))
+		GRID0.SetGridCell idx, 3, accnStatus
+		idx = idx + 1
+	End If
+Loop
+
+
+SCREEN.Proc "main.accn_list_done", ""
+
+'Dim accnGr
+'Dim ii
+'
+'accnGr = CONTROL0.GetTypeData("4", "")
+'
+'For ii = 1 To (accnGr - 1)
+'
+'Next
+
+_AW_ONENDSUB_AW_
+}
+
+
+

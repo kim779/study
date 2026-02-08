@@ -1,0 +1,276 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB810182)
+MAPSIZE(195, 570)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("최근입금계좌")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(ENCODE|CR2TAB)
+TITLE("최근입금계좌")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("piboPBxQ")
+MAPTYPE(NORM)
+HEADER(LEDGER)
+TRXH("31CSDPNQ503")
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  bgPanel(0, 0, 570, 173)  LIMAGE(0)  LINEW(3)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 69)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+GROUP  grp1(25, 490, 219, 602)  'INPUT'        COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  zIn(114, 512, 199, 528)  LEN(5)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("00001")          TABORDER(1)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL9(33, 512, 111, 528)  '레코드갯수'        COLOR(66, 76)  CUR(0)    AL_LEFT    ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  ClntNo(117, 555, 202, 571)  LEN(20)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(2)  IOORDER(3)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL2(35, 555, 113, 571)  '고객번호'        COLOR(66, 76)  CUR(0)    AL_LEFT    ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  OUTPUT(245, 511, 480, 527)  LEN(26)  IO_MIXED|AL_LEFT|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(4)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  Out(335, 529, 425, 547)  LEN(1)  IO_NUM|AL_LEFT|    COLOR(192, 232)  CUR(0)  LINECOLOR(75)          TABORDER(0)  IOORDER(5)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL10(244, 529, 334, 547)  '레코드갯수'  LINECOLOR(0)      COLOR(74, 76)  CUR(0)    AL_LEFT    ENABLE  &
+  HINTTYPE(IH_NONE)
+GROUP  GROUP0(231, 491, 553, 610)  'OUTPUT'        COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+GRID  GRID0(6, 10, 565, 160)  VISIBLEROW(0)  CELLH(18)  MATRIX(200, 8)  FIX(0)  MAINCOLOR(7, 232)  LINECOLOR(75)  FOCUSCOLOR(78)  FOCUSKIND(4)    FONT("굴림체", 9, NORMAL)  ROWC(68, 77)  |MERGE|FLEXIBLE|VSCROLL|NO3D|RROW|GRFTEXT    &
+	COLINFO("BkeepPtnCode")  LEN(2)  WIDTH(80)  HEAD("대체유형코드")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_NUM|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("OppIttCode")  LEN(3)  WIDTH(56)  HEAD("상대기관코드")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(10, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("BnkNm1")  LEN(40)  WIDTH(110)  HEAD("금융기관")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(10, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("OppAcntNo")  LEN(20)  WIDTH(130)  HEAD("계좌번호")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(10, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("OppAcntNm")  LEN(40)  WIDTH(123)  HEAD("계좌명")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(10, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("RecntTrdDt2")  LEN(8)  WIDTH(123)  HEAD("최근거래일2")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(10, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("favorite")  LEN(0)  WIDTH(120)  HEAD("등록")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_NOP      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_IMGTEXT  COLUMN_VISIBLE  IBUTTON  BUTTONSTR("자주쓰는계좌등록")  BUTTONIMG("8BTN.BMP")    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("del")  LEN(0)  WIDTH(60)  HEAD("삭제")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_NOP      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_IMGTEXT  COLUMN_VISIBLE  IBUTTON  BUTTONSTR("삭제")  BUTTONIMG("3BTN.BMP")    HNORMAL  SORTSTARTPOS(0)    TABORDER(3)  IOORDER(6)  ENABLE  &
+  VISIBLE
+
+PANEL  guideAround(0, 172, 570, 198)  LIMAGE(1)  LINEW(3)  STRESS(0)  STRESSW(0)  LINETYPE(4)  LINECOLOR(64)      COLOR(34, 69)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL39(6, 178, 20, 192)    |IMAGE|AL_STRETCH    COLOR(208, 232)  CUR(0)    "알림_ic.bmp"  ENABLE  &
+  VISIBLE  TRANSPARENT  IMAGE  HINTTYPE(IH_NONE)
+PANEL  GUIDE(25, 175, 541, 195)        COLOR(203, 69)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+PANEL  PANEL0(34, 534, 112, 550)  '조회구분'        COLOR(66, 76)  CUR(0)    AL_LEFT    ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  QryTp(115, 535, 200, 551)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(4)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+GROUP  tpGr(205, 365, 325, 415)  'Group'        COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  obj_favoriteReg(460, 285, 565, 390)    "IB810183"  TABORDER(5)  IOORDER(7)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  zAcntNo(250, 560, 370, 580)  LEN(20)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(6)  IOORDER(8)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  Tp(375, 560, 395, 580)  LEN(1)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(7)  IOORDER(9)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  gubn(400, 560, 430, 580)  LEN(1)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(8)  IOORDER(10)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  OBJECT0(595, 280, 700, 385)    "IB810185"  TABORDER(9)  IOORDER(11)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  obj_TransDel(730, 280, 835, 385)    "IB810186"  TABORDER(10)  IOORDER(12)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+'== 첫 조회
+Sub send_f()
+	SCREEN.ClearAll 0, 2
+	LEDGER.Fkey = "C"
+	SCREEN.Send 0
+End Sub
+
+Sub send_tr(str)
+	ClntNo.Data = Trim(str)
+	send_f()
+End Sub
+
+'== 연속 조회
+Sub send_c()
+	LEDGER.Fkey = "7"
+	GRID0.SetDataPosition(2)
+	SCREEN.Send 0
+End Sub
+
+Sub addCompany()
+	Dim ii
+	For ii = 1 To GRID0.Rows
+		If Trim(QryTp.Data) = "3" Then '대체
+			'GRID0.SetGridCell ii, 2, "068"
+			GRID0.SetGridCell ii, 3, "IBK투자증권"
+			GRID0.SetFormat ii, 4, "999-99-999999"
+		Else
+			GRID0.SetFormat ii, 4, "99999999999999999999"
+		End If
+	Next
+End Sub
+
+'gubn은 자주쓰는계좌관리등록버튼을 보여주는지 안보여줄지를
+'판단하는 플래그. 당사->타금융기관탭에서는 보여주고
+'자주쓰는계좌관리에서는 보여주지 않음.
+'TP는 이체와 대체 구분. 1 : 이체, 2 : 대체
+Sub SetScreen()
+	If Trim(gubn.Data) = "Y" Then
+		GRID0.SetColumnVisible 6, True
+		SCREEN.SetSize 514, 196
+		bgPanel.SetRect 0, 0, 517, 173
+		GRID0.SetRect 8, 31, 508, 165
+		guideAround.SetRect 0, 172, 517, 198
+		GUIDE.SetRect 25, 175, 509, 195
+	Else
+		GRID0.SetColumnVisible 6, False
+		SCREEN.SetSize 514 - 120, 196
+		bgPanel.SetRect 0, 0, 517 - 120, 173
+		GRID0.SetRect 8, 31, 508 - 120, 165
+		guideAround.SetRect 0, 172, 517 - 120, 198
+		GUIDE.SetRect 25, 175, 509 - 120, 195
+	End If
+End Sub
+
+_AW_ONINDECLARE_AW_
+#LOAD IB888833
+
+_AW_ONENDSUB_AW_
+_AW_ONSTART_AW_
+LEDGER.Rcnt = "0010"
+SYSTEM.Push "recent", "Cancel"
+'ClntNo.Data = LOGIN.Juno
+'Call SetScreen()
+SCREEN.Proc "OBJECT0.send_f", ""
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+SCREEN.OnSend = False
+
+zIn.Data = "00001"
+
+'QryTp 1:전체 2: 이체  3: 대체
+
+'iTp 1:계좌별 이체 2: 계좌별대체  3: 아이디별 이체, 4:아이디별 대체
+
+'If tpRadio_id.Checked = True Then
+'	' 아이디별 이체/대체
+'	acct.Data = Trim(LOGIN.User)
+
+'	If Trim(Tp.Data) = "1" Then
+'		iTp.Data = "3"	' 타금융
+'	Else
+'		iTp.Data = "4"	' 당사
+'	End If
+'Else
+'	' 계좌별 이체/대체
+'	acct.Data = Trim(zAcntNo.Data)
+
+'	If Trim(Tp.Data) = "1" Then
+'		iTp.Data = "1"	' 타금융
+'	Else
+'		iTp.Data = "2"	' 당사
+'	End If
+'End If
+
+'iKindTp.Data = "2"
+
+SCREEN.OnSend = True
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+If Left(Trim(LEDGER.Ecod), 1) = "0" Then
+	If LEDGER.Next = "Y" Then
+		Call send_c()
+	Else
+		Call addCompany()
+	End If
+Else
+
+End If
+
+_AW_ONENDSUB_AW_
+_AW_ONTIMER_AW_
+SCREEN.Send 0
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(GRID0)
+_AW_ONCLICK_AW_
+If GRID0.HitPos <> 3 Then
+	Exit Sub
+End If
+
+Dim bnkCode, bnkName, bnkAcntNo, bnkAcntNm, bnkAcntNick,BkeepPtnCode
+BkeepPtnCode = Trim(GRID0.GetGridCell(GRID0.Row, 1))
+bnkCode = Trim(GRID0.GetGridCell(GRID0.Row, 2))
+bnkName = Trim(GRID0.GetGridCell(GRID0.Row, 3))
+bnkAcntNo = Trim(GRID0.GetGridCell(GRID0.Row, 4))
+bnkAcntNm = Trim(GRID0.GetGridCell(GRID0.Row, 5))
+'bnkAcntNick = Trim(GRID0.GetGridCell(GRID0.Row, 5))
+
+If GRID0.Column = "7" Then '자주쓰는계좌등록
+
+	SCREEN.Object("obj_favoriteReg.zBnkName").Data = bnkName
+	SCREEN.Object("obj_favoriteReg.zBnkAcntNo").Data = bnkAcntNo
+	SCREEN.Object("obj_favoriteReg.zBnkAcntNick").Data = bnkAcntNm
+	SCREEN.Object("obj_favoriteReg.zBnkAcntNm").Data = bnkAcntNm
+
+	If QryTp.data = "2" Then '타->당 조회시
+		SCREEN.Object("obj_favoriteReg.zTp").Data = "1"
+		SCREEN.Object("obj_favoriteReg.zBnkCode").Data = bnkCode
+	ElseIf QryTp.data = "3" Then '당->당 조회시
+		SCREEN.Object("obj_favoriteReg.zTp").Data = "2"
+		SCREEN.Object("obj_favoriteReg.zBnkCode").Data = "068"
+		SCREEN.Object("obj_favoriteReg.zBnkAcntNm").Data = bnkAcntNm
+
+	End If
+	SCREEN.Proc "obj_favoriteReg.confirm", ""
+
+ElseIf GRID0.Column = "8" Then '최근입금계좌 삭제
+
+
+	msgAns = MsgBox ("선택하신 최근 입금 계좌를 삭제하시겠습니까?",1,"최근입금계좌 삭제 확인")
+
+	If msgAns = 1 Then '확인
+		SCREEN.Object("obj_TransDel.zClntNo").Data = ClntNo.Data
+		SCREEN.Object("obj_TransDel.zBkeepPtnCode").Data = BkeepPtnCode
+		SCREEN.Object("obj_TransDel.zOppIttCode").Data = bnkCode
+		SCREEN.Object("obj_TransDel.zOppAcntNo").Data = bnkAcntNo
+		'SCREEN.Object("obj_favoriteReg.zBnkAcntNick").Data = bnkAcntNick
+
+		SCREEN.Proc "obj_TransDel.send_o", ""
+	Else
+		Exit Sub
+	End If
+
+
+
+Else
+	SYSTEM.Push "recent", "OK"
+	SYSTEM.Push "bank_code", bnkCode
+	SYSTEM.Push "bank_name", Trim(GRID0.GetGridCell(GRID0.row, 3))
+	SYSTEM.Push "bank_acctNum", bnkAcntNo
+	SYSTEM.Push "bnkAcntNm", Trim(bnkAcntNm)
+	'SYSTEM.Push "bank_Nick", Trim(GRID0.GetGridCell(GRID0.row, 5))
+
+	SCREEN.CloseWindow
+
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

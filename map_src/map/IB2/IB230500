@@ -1,0 +1,301 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB230500)
+MAPSIZE(424, 702)
+VERSION(002)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("거래원 종목별거래순")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(FMS|FLASH)
+TITLE("[2305] 거래원 종목별거래순위")
+TOPATH(AXIS)
+METHOD(MENU)
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL10(-4, 26, 706, 426)  LIMAGE(0)  LINEW(6)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  SYMBOL8(0, 0, 702, 26)        COLOR(66, 69)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  SYMBOL2(90, 3, 109, 23)  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(68, 69)  CUR(0)    "검색.BMP"    TABORDER(2)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+LABEL  SYMBOL6(499, 3, 513, 23)  '∼'  AL_CENTER  CUR(0)      COLOR(68, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+OUT  HNAM(755, 76, 880, 94)  LEN(20)  IO_MIXED|AL_LEFT|    COLOR(131, 1)  CUR(0)  TP_SUNKEN          TABORDER(0)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  sday(410, 3, 498, 23)  LEN(8)  IO_NUM|EDIT_INOUT|FA_WRAP|FA_DATE    COLOR(99, 130)  CUR(0)  TP_SUNKEN          EDITFORMAT("9999/99/99")  TABORDER(6)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  eday(514, 3, 602, 23)  LEN(8)  IO_NUM|EDIT_INOUT|FA_WRAP|FA_DATE    COLOR(99, 130)  CUR(0)  TP_SUNKEN          EDITFORMAT("9999/99/99")  TABORDER(7)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  OBJ01(130, 3, 295, 23)    "IB999918"  TABORDER(4)  IOORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  OBJ02(6, 36, 351, 416)    RESIZABLE  "IB230501"  TABORDER(8)  IOORDER(5)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  OBJ03(351, 36, 696, 416)    RESIZABLE  "IB230502"  TABORDER(9)  IOORDER(6)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL0(298, 3, 328, 23)  '기간'  AL_CENTER  CUR(0)      COLOR(68, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+COMBO  BEFORE(329, 3, 409, 23)  TP_SUNKEN  LEN(1)  COUNT(5)  VCOUNT(5)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_NUM|EDIT_INPUT    COLOR(99, 130)  CUR(0)  DISPLAY("직접지정", "전일", "5일", "15일", "20일")  DATA("1", "3", "4", "5", "6")    TABORDER(5)  IOORDER(7)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON1(109, 3, 128, 23)  TP_PUSH|IMAGE|AL_STRETCH      COLOR(208, 232)  CUR(0)    "관심.BMP"    TABORDER(3)  ENABLE  &
+  VISIBLE  IMAGE  HINTTYPE(IH_NONE)
+PANEL  PANEL3(0, 0, 1, 26)        COLOR(64, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL0(701, 0, 703, 26)        COLOR(64, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+CONTROL  1301(25, 3, 90, 23)  |FA_PROTECT  "CX_CODECTRL"  "/u0/k검색.BMP/lAXCOMBO.BMP/p/s0/o"  LEN(6)  EDIT_INPUT    COLOR(192, 130)  TABORDER(1)  IOORDER(8)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTN(660, 3, 696, 23)  '조회'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, BOLD)  FOCUS  COLOR(208, 186)  CUR(0)    "조회BTN.BMP"    TABORDER(10)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+CONTROL  cxMarket(4, 3, 24, 23)  |FA_SKIP  "CX_MarketPicker"  "/k2/tIB230500/u1/d1"  LEN(12)  EDIT_NOP    COLOR(192, 232)  TABORDER(0)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  edMarketTrigger(800, 28, 832, 48)  LEN(6)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(11)  IOORDER(9)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL6(735, 28, 795, 48)  '거래소'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Dim xstr, xvalue, xistrue
+
+Dim g_dayx
+g_dayx = Trim(SYSTEM.pop("val_2312"))
+If g_dayx <> "" Then
+	BEFORE.Data = g_dayx
+End If
+
+SYSTEM.Push "val_2312", ""
+
+
+Sub Change_MKGubn_Main(sMKGubn)
+
+SYSTEM.Trace "[IB230500]Change_MKGubn_Main sMKGubn = " & sMKGubn
+	cxMarket.sMarket = sMKGubn
+SCREEN.Object("OBJ01.1301").data = S1301.Data
+SCREEN.Object("OBJ02.CODE_1").data = S1301.Data
+SCREEN.Object("OBJ03.CODE_2").data = S1301.Data
+
+SCREEN.Object("OBJ02.sday").data = sday.Data
+SCREEN.Object("OBJ03.sday").data = sday.Data
+SCREEN.Object("OBJ02.eday").data = eday.Data
+SCREEN.Object("OBJ03.eday").data = eday.Data
+
+SCREEN.Object("OBJ02.BEFORE").data = BEFORE.Data
+SCREEN.Object("OBJ03.BEFORE").data = BEFORE.Data
+
+If Trim(S1301.Data) = "000000" Then
+	S1301.SetFocus
+	Exit Sub
+End If
+S1301.Trigger "",True
+
+OBJ01.send
+OBJ02.Send
+OBJ03.Send
+
+S1301.SetFocus
+
+
+End Sub
+
+Sub Send_OBJ()
+	cxMarket.sCode = Trim(S1301.Data)
+	OBJ01.send
+	OBJ02.Send
+	OBJ03.Send
+End Sub
+
+Sub Send_All()
+	cxMarket.sCode = Trim(S1301.Data)
+	'SCREEN.Send ALL
+	Send_OBJ()
+End Sub
+
+Sub Send_OBJ2()
+	OBJ02.Send
+	OBJ03.Send
+End Sub
+
+
+Sub Change_MKGubn_Main(sMKGubn)
+	cxMarket.sMarket = sMKGubn
+	If UCase(TypeName( SCREEN.Object("cbSOrder") )) <> "NOTHING" Then
+		If cxMarket.sMarket = "통합" Then
+'			cbSOrder.Data = "S"
+		ElseIf cxMarket.sMarket = "KRX" Then
+'			cbSOrder.Data = "1"
+		ElseIf cxMarket.sMarket = "NXT" Then
+'			cbSOrder.Data = "N"
+		End If
+	End If
+	Send_All()
+
+End Sub
+
+_AW_ONSTART_AW_
+' 현재 화면의 시장식별자(cxMarket)에 고유 화면번호 부여
+cxMarket.Major = SCREEN.Major
+
+Send_All()
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+SCREEN.Object("OBJ02.CODE_1").data = S1301.Data
+SCREEN.Object("OBJ03.CODE_2").data = S1301.Data
+SCREEN.OnSend = False
+Exit Sub
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(SYMBOL2)
+_AW_ONCLICK_AW_
+Dim retn
+retn = SCREEN.GetCode(100, "1301", "hnam", 0 )
+If retn <> True Then
+       Exit Sub
+End If
+
+Send_All()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(sday)
+_AW_ONCHANGE_AW_
+SCREEN.Object("OBJ02.sday").data = sday.Data
+SCREEN.Object("OBJ03.sday").data = sday.Data
+Send_OBJ2()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(eday)
+_AW_ONCHANGE_AW_
+SCREEN.Object("OBJ02.eday").data = eday.Data
+SCREEN.Object("OBJ03.eday").data = eday.Data
+Send_OBJ2()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BEFORE)
+_AW_ONCHANGE_AW_
+If BEFORE.Data = "1" Then
+	sday.Enable = True
+	eday.Enable = True
+Else
+	sday.Enable = False
+	eday.Enable = False
+End If
+
+
+SCREEN.Object("OBJ02.BEFORE").data = BEFORE.Data
+SCREEN.Object("OBJ03.BEFORE").data = BEFORE.Data
+
+Send_OBJ2()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON1)
+_AW_ONCLICK_AW_
+'Dim mapname, data
+'
+'mapname = "IB202200" & "/d"
+'data = "appendCODE" & vbTab & S1301.Data & vbLf
+'
+'SCREEN.CreateWindow 1, mapname, data
+
+SCREEN.CreateWindow 1, "IB202201 /t/s/p5/d", "appendCODE" & _
+			vbTab & S1301.Data & vbLf & "map" & vbTab & "1" & vbLf
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(1301)
+_AW_ONCHANGE_AW_
+SCREEN.Object("OBJ01.1301").data = S1301.Data
+SCREEN.Object("OBJ02.CODE_1").data = S1301.Data
+SCREEN.Object("OBJ03.CODE_2").data = S1301.Data
+
+SCREEN.Object("OBJ02.sday").data = sday.Data
+SCREEN.Object("OBJ03.sday").data = sday.Data
+SCREEN.Object("OBJ02.eday").data = eday.Data
+SCREEN.Object("OBJ03.eday").data = eday.Data
+
+SCREEN.Object("OBJ02.BEFORE").data = BEFORE.Data
+SCREEN.Object("OBJ03.BEFORE").data = BEFORE.Data
+
+If Trim(S1301.Data) = "000000" Then
+	S1301.SetFocus
+	Exit Sub
+End If
+S1301.Trigger "",True
+
+Send_OBJ()
+
+S1301.SetFocus
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTN)
+_AW_ONCLICK_AW_
+SCREEN.Object("OBJ01.1301").data = S1301.Data
+SCREEN.Object("OBJ02.CODE_1").data = S1301.Data
+SCREEN.Object("OBJ03.CODE_2").data = S1301.Data
+
+SCREEN.Object("OBJ02.sday").data = sday.Data
+SCREEN.Object("OBJ03.sday").data = sday.Data
+SCREEN.Object("OBJ02.eday").data = eday.Data
+SCREEN.Object("OBJ03.eday").data = eday.Data
+
+SCREEN.Object("OBJ02.BEFORE").data = BEFORE.Data
+SCREEN.Object("OBJ03.BEFORE").data = BEFORE.Data
+
+If Trim(S1301.Data) = "000000" Then
+	S1301.SetFocus
+	Exit Sub
+End If
+S1301.Trigger "",True
+
+Send_OBJ()
+
+S1301.SetFocus
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(cxMarket)
+_AW_ONCLICK_AW_
+'Change_MKGubn_Main(Trim(edMarketTrigger.Data))
+Send_All()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(edMarketTrigger)
+_AW_ONCHANGE_AW_
+Change_MKGubn_Main(Trim(edMarketTrigger.Data))
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

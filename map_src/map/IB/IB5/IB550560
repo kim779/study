@@ -1,0 +1,111 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB550560)
+MAPSIZE(280, 825)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("±Û·Î¹ú´º½º")
+MAPPUBLIC(";")
+FONT("±¼¸²", 9, NORMAL)
+TITLE("5500 ±Û·Î¹ú´º½º")
+TOPATH(AXIS)
+METHOD(MENU)
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+EDIT  IMAXGROUP(199, 309, 224, 329)  LEN(2)  IO_MIXED|EDIT_INOUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(1)  IOORDER(1)  &
+  HINTTYPE(IH_NONE)
+EDIT  IMAXSKIN(233, 311, 258, 331)  LEN(1)  IO_MIXED|EDIT_INOUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(2)  IOORDER(2)  &
+  HINTTYPE(IH_NONE)
+BROWSER  BROWSER0(0, 0, 825, 280)  EDIT_NOP    ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  IMAXEXID(128, 307, 178, 322)  LEN(12)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(3)  IOORDER(3)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Sub InitIMAX
+
+End Sub
+
+
+Sub SetGroup(groupID)
+	ctrl_jango.SetIMAXGroup(groupID)
+End Sub
+
+_AW_ONINDECLARE_AW_
+#load IB999938
+
+_AW_ONENDSUB_AW_
+_AW_ONSTART_AW_
+IMAXEXID.Data = SCREEN.Object("Main.OBJ_order.OBJ_odr.IMAXEXID").Data
+SYSTEM.Trace "NEWS onstart exid =" & IMAXEXID.Data
+
+If Trim(IMAXEXID.Data) = "215" Or Trim(IMAXEXID.Data) = "214" Then
+	surl = "http://globalmonitor.einfomax.co.kr/infomax_db_em.html#/CHINA/1/1"
+ElseIf Trim(IMAXEXID.Data) = "321" Or Trim(IMAXEXID.Data) = "537" Or Trim(IMAXEXID.Data) = "66" Then
+	surl = "http://globalmonitor.einfomax.co.kr/infomax_db_em.html#/USA/1/1"
+Else
+	surl = "http://globalmonitor.einfomax.co.kr/infomax_db_em.html#/USA/1/1"
+End If
+
+BROWSER0.Navigate(surl)
+BROWSER0.Visible = True
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+SCREEN.OnSend = False
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(IMAXGROUP)
+_AW_ONCHANGE_AW_
+SYSTEM.Trace "IB550510 groupid =" & IMAXGROUP.Data
+'ctrl_jango.SetIMAXGroup IMAXGROUP.Data
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(IMAXSKIN)
+_AW_ONCHANGE_AW_
+'ctrl_jango.SetIMAXSkin IMAXSKIN.Data
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(IMAXEXID)
+_AW_ONCHANGE_AW_
+Dim surl
+SYSTEM.Trace "NEWS onchange exid =" & IMAXEXID.Data
+
+If Trim(IMAXEXID.Data) = "215" Or Trim(IMAXEXID.Data) = "214" Then
+	surl = "http://globalmonitor.einfomax.co.kr/infomax_db_em.html#/CHINA/1/1"
+ElseIf Trim(IMAXEXID.Data) = "321" Or Trim(IMAXEXID.Data) = "537" Or Trim(IMAXEXID.Data) = "66" Then
+	surl = "http://globalmonitor.einfomax.co.kr/infomax_db_em.html#/USA/1/1"
+Else
+	surl = "http://globalmonitor.einfomax.co.kr/infomax_db_em.html#/USA/1/1"
+End If
+
+SYSTEM.Trace surl
+BROWSER0.Navigate(surl)
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

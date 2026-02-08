@@ -1,0 +1,414 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB920002)
+MAPSIZE(419, 634)
+VERSION(000)
+MAPKIND(PROCEDURES)
+MAPGROUP(1)
+MAPDESC("함수-문자열관련")
+MAPPUBLIC(";")
+FONT("굴림", 9, NORMAL)
+TITLE("Procedures")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Option Explicit
+
+'**********************************************************************
+' 기능     : Source String에서 Target String의 갯수를 Count한다
+' 파라메터 : str   : 찾을 문자열
+'            tgstr : 찾기 대상문자열
+'        eg) IammBoy 에서 m 의 갯수를 구하고 할 때
+' 리턴값   : cp_chrcount
+' 개발자   : 김동겸	04/09/08
+' 수정자1  :
+'**********************************************************************
+Function cp_chrcount (str, tgstr)
+	Dim ll_pos, ll_cnt
+	If IsNull(str) Or IsEmpty(str) Then return 0
+	ll_pos = 0
+	ll_cnt = 0
+	Do
+		ll_pos = InStr(ll_pos + 1,str, tgstr)
+		ll_cnt = ll_cnt + 1
+	Loop UNTIL ll_pos <= 0
+	cp_chrcount = ll_cnt - 1
+End Function
+
+'**********************************************************************
+' 기능     : Source에서 Separator까지의 문자열 Return
+' 파라메터 : Source : 대상문자열
+'            Separator : 구분자
+'    eg) Iamm\tBoy 에서 tab으로 구분되는 값을 찾고자 할 떄 --> Iamm 리턴
+' 리턴값   : cp_get_token
+' 개발자   : 김동겸	04/09/08
+' 수정자1  :
+'**********************************************************************
+Function cp_get_token(byref Source, Separator)
+	Dim ll_len, ll_p, ls_ret
+	SCREEN.CreateObject("DX_CSTRING")
+
+	DX_CSTRING.Text = separator
+	ll_len = DX_CSTRING.GetLength()
+	ll_p = InStr(source, separator)      'Get the position of the separator
+	If ll_p = 0 Then                     'If no separator,
+		ls_ret = source                   'return the whole source string  and
+		source = ""                       'make the original source of zero length
+	Else
+		ls_ret = Left(source, ll_p - 1)   'otherwise, return just the token And strip it & the separator
+		source = Mid(source, ll_p + ll_len)
+   End If
+  	cp_get_token = ls_ret
+End Function
+
+'**********************************************************************
+' 기능     : 문자열 치환
+' 파라메터 : str     : 문자열
+'            patrn   : 치환될 문자(열)
+'            replStr : 치환할 문자(열)
+'            cap     : 대소문자구분여부
+'    eg) IammBoy 에서 m을 o로 대체 하고자 할 떄 --> IaooBoy 리턴
+' 리턴값   : cp_replace
+' 개발자   : 김동겸	04/09/08
+' 수정자1  :
+'**********************************************************************
+Function cp_replace(str, patrn, replStr, cap)
+	Dim regEx
+	Set regEx = New RegExp       ' 정규식을 만듭니다.
+	regEx.Pattern = patrn        ' 패턴을 설정합니다.
+	regEx.IgnoreCase = cap       ' 대/소문자를 구분여부.
+	cp_replace = regEx.Replace(str, replStr)
+	Set regEx = Nothing
+End Function
+
+'**********************************************************************
+' 기능     : 주민번호,사업자번호 Check Digit
+' 파라메터 : idno [주민등록번호 또는 사업자번호]
+' 리턴값   : true 또는 false
+' 개발자   : 김동겸	04/09/08
+' 수정자1  :
+'**********************************************************************
+Function cp_chkIdno(idno)
+	Dim ll_idno, n, ll_sum, ll_digit, ll_x, ll_mod, ll_r_sum, ll_rv_sum
+	ll_idno = cp_replace(Trim(idno), "-", "", True)
+	'숫자이외 문자 체크
+	If Not IsNumeric(ll_idno) Then
+		MsgBox ("주민번호나 실명번호가 아닙니다!")
+		cp_chkIdno = False
+   End If
+
+	' 주민번호 체크
+	If Len(ll_idno) = 13 Then
+		For n = 1 To 12
+			ll_x = ((n - 1) Mod 8) + 2
+			ll_sum = ll_sum + Mid(ll_idno, n, 1) * ll_x
+		Next
+		ll_mod = ll_sum Mod 11
+		ll_digit = 11 - ll_mod
+		If ll_digit >= 10 Then
+			ll_digit = ll_digit - 10
+		End If
+		If CStr(ll_digit) = Right(ll_idno, 1) Then
+			cp_chkIdno = True
+			Exit Function
+		End If
+	' 사업자번호 체크
+	ElseIf Len(ll_idno) = 10 Then
+		For n = 1 To 9
+			Select Case n
+				Case 1, 4, 7
+					ll_x = 1
+				Case 2, 5, 8
+					ll_x = 3
+				Case 3, 6
+					ll_x = 7
+				Case 9
+					ll_x = 5
+			End Select
+			ll_r_sum = Mid(ll_idno, n, 1) * ll_x
+			If n < 9 Then
+				ll_rv_sum = ll_r_sum Mod 10
+			Else
+				ll_rv_sum = ll_r_sum / 10 + (ll_r_sum Mod 10)
+			End If
+			ll_sum = ll_sum + ll_rv_sum
+		Next
+		ll_mod = ll_sum Mod 10
+		ll_digit = 10 - ll_mod
+		If ll_digit >= 10 Then
+			ll_digit = ll_digit - 10
+		End If
+		If CStr(ll_digit) = Right(ll_idno, 1) Then
+			cp_chkIdno = True
+			Exit Function
+		End If
+	End If
+	cp_chkIdno = False
+End Function
+
+'**********************************************************************
+' 기능     : Size만큼 filler 값으로 오른쪽 채움
+' 파라메터 : as_string : 문자열
+'            as_cnt    : 문자열의 길이
+'            as_filler : filler
+' 리턴값   : cp_rpad
+' 개발자   : 김동겸	04/09/08
+' 수정자1  :
+'**********************************************************************
+Public Function cp_rpad(as_string, ai_count, as_filler)
+	Dim ls_str, li_cnt
+	'대상 String이 NULL이면 Filler로 채운 문자열 Return
+	If IsNull(as_string) Then
+		cp_rpad = String(ai_count, as_filler)
+	Else
+		ls_str = Trim(as_string) ' 공백 Trimming
+		SCREEN.CreateObject("DX_CSTRING")
+		DX_CSTRING.Text = ls_str
+		li_cnt = ai_count - DX_CSTRING.GetLength()
+		If li_cnt >= 0 Then
+			cp_rpad = ls_str & String(li_cnt, as_filler)
+		Else
+			cp_rpad = Left(ls_str, ai_count)
+		End If
+	End If
+End Function
+
+'**********************************************************************
+' 기능     : Size만큼 filler 값으로 왼쪽 채움
+' 파라메터 : as_string : 문자열
+'            as_cnt    : 문자열의 길이
+'            as_filler : filler
+' 리턴값   : cp_lpad
+' 개발자   : 김동겸	04/09/08
+' 수정자1  :
+'**********************************************************************
+Public Function cp_lpad(as_string, ai_count, as_filler)
+	Dim ls_str, li_cnt
+    '대상 String이 NULL이면 Filler로 채운 문자열 Return
+	If IsNull(as_string) Then
+		cp_lpad = String(ai_count, as_filler)
+	Else
+		ls_str = Trim(as_string) ' 공백 Trimming
+		SCREEN.CreateObject("DX_CSTRING")
+		DX_CSTRING.Text = ls_str
+		li_cnt = ai_count - DX_CSTRING.GetLength()
+		If li_cnt >= 0 Then
+			cp_lpad = String(li_cnt, as_filler) & ls_str
+		Else
+			cp_lpad = Right(ls_str, ai_count)
+		End If
+	End If
+End Function
+
+'**********************************************************************
+' 기능     : 원 소스값이 null 인 경우 특정한 값으로 대체
+' 파라메터 : as_val    : 값
+'            as_repl   : 문자열의 길이
+' 리턴값   : cp_nvl
+' 개발자   : 김동겸	04/09/08
+' 수정자1  :
+'**********************************************************************
+Function cp_nvl(as_val, as_repl)
+	If IsNull(as_val) Or IsEmpty(as_val) Or Len(Trim(as_val)) = 0 Or Trim(as_val) = "" Then
+		cp_nvl = as_repl
+	Else
+		cp_nvl = as_val
+	End If
+End Function
+
+'**********************************************************************
+' 기능     : Grid의 컬럼명에 대한 Index를 Return함.
+' 파라메터 : ao_gd       : Grid
+'            as_col_nm   : 그리드 컬럼 명.
+' 리턴값   : Grid Index
+' 개발자   : 이종광.[04/09/08]
+' 수정자1  : 김동겸.[04/09/08]
+'**********************************************************************
+Function cp_idx(ao_gd, as_col_nm)
+	Dim i, b_yn
+	b_yn = False
+	as_col_nm = Trim(cp_nvl(as_col_nm, " "))
+	For i= 1 To ao_gd.columns
+		If ao_gd.GetColumnName(i) = as_col_nm Then
+			cp_idx = i 'Return Row...
+			b_yn = True
+			Exit For
+		End If
+	Next
+	If Not b_yn Then
+		Guide.Text = " 해당 컬럼["&as_col_nm&"]이 존재하지 않습니다."
+		MsgBox Guide.Text
+		cp_idx = -1
+	End If
+End Function
+'***************************************************
+' function name	: cp_msg_clear
+' arguments 		:
+' date 				: 2004/09/01
+'***************************************************
+Public Function cp_msg_clr()
+	Guide.Text = ""
+End Function
+'**********************************************************************
+' 기능     : 날짜체크
+' 파라메터 : as_val    : 값
+'
+' 리턴값   : cp_nvl (true/false)
+' 개발자   : 김동겸	04/09/08
+' 수정자1  :
+'**********************************************************************
+Function cp_isdate(as_val)
+	If IsDate( Mid(as_val,1,4) & "/" & Mid(as_val,5,2) & "/" &  Mid(as_val,7,2) ) Then
+		cp_isdate = True
+	Else
+		cp_isdate = False
+	End If
+End Function
+
+
+
+'**********************************************************************
+' 기능     : 날짜체크
+' 파라메터 : s_title    : 제목
+'            s_message  : 팝업창에 나타날 내용
+'            i_button_gubun : 팝업창에 보여질 버튼 모양 (유효값 범위 : 1 ~ 5)
+'            i_default_button : 팝업창이 보여질 때 default로  선택될 버튼 (유효값 범위 : 1 ~ 4)
+'            i_defalut_style  : 아이콘 모양 (유효값 범위 : 1 ~ 4)
+' 리턴값   : 눌러진 버튼값
+' 개발자   : 이상기	04/12/13
+' 수정자1  :
+'**********************************************************************
+Function cp_MsgBox(s_title, s_message, i_button_gubun, i_default_button, i_default_style)
+	Dim	i_button_kind , i_style ,s_kind_and_style_and_default
+	If(Len(Trim(s_message)) = 0 ) Then
+				MsgBox "입력된 메세지가 없습니다.", vbOKOnly+vbExclamation, "[메세지호출에러]"
+				Exit Function
+	End If
+
+	If(Len(Trim(s_title)) = 0) Then
+				s_title = "알림박스입니다."
+	End If
+
+
+	If(i_default_button = 1) Then
+			i_default_button = vbDefaultButton1
+	ElseIf(i_default_button = 2) Then
+			i_default_button = vbDefaultButton2
+	ElseIf(i_default_button = 3) Then
+			i_default_button = vbDefaultButton3
+	ElseIf(i_default_button = 4) Then
+			i_default_button = vbDefaultButton4
+	Else
+			i_deafult_button = vbDefaultButton1
+   End If
+
+
+	If i_button_gubun = 1 Then
+			i_button_kind = vbYesNo
+			If(i_default_button > vbDefaultButton2) Then
+						i_default_button = vbDefaultButton1
+			End If
+	ElseIf i_button_gubun = 2 Then
+			i_button_kind = vbOKOnly
+			If(i_default_button > 0) Then
+						i_default_button = vbDefaultButton1
+			End If
+	ElseIf i_button_gubun = 3 Then
+			i_button_kind = vbRetryCancel
+			If(i_default_button > vbDefaultButton2) Then
+						i_default_button = vbDefaultButton1
+			End If
+	ElseIf i_button_gubun = 4 Then
+			i_button_kind = vbOKCancel
+			If(i_default_button > vbDefaultButton2) Then
+						i_default_button = vbDefaultButton1
+			End If
+	ElseIf i_button_gubun = 5 Then
+			i_button_kind = vbAbortRetryIgnore
+			If(i_default_button > vbDefaultButton3) Then
+						i_default_button = vbDefaultButton1
+			End If
+	ElseIf i_button_gubun = 6 Then
+			i_button_kind = vbYesNoCancel
+			If(i_default_button > vbDefaultButton3) Then
+						i_default_button = vbDefaultButton1
+			End If
+	Else
+			i_button_kind = vbOKCancel
+			If(i_default_button > vbDefaultButton1) Then
+						i_default_button = vbDefaultButton1
+			End If
+	End If
+
+	If(i_default_style = 1) Then
+				i_style = vbQuestion
+	ElseIf(i_default_style = 2) Then
+				i_style = vbInformation
+	ElseIf(i_default_style = 3) Then
+				i_style = vbExclamation
+	ElseIf(i_default_style = 4) Then
+				i_style = vbCritical
+	Else i_style = vbQuestion
+	End If
+
+   s_kind_and_style_and_default = i_button_kind + i_style + i_default_button
+   cp_MsgBox = MsgBox(s_message, s_kind_and_style_and_default, s_title)
+End Function
+
+'**********************************************************************
+' 기능     : 천단위 콤마찍기
+' 파라메터 : as_val    : 값
+'
+' 리턴값   : cp_asterisk_right
+' 개발자   : 김동겸	04/09/08
+' 수정자1  :
+'**********************************************************************
+Function cp_asterisk_right(as_val, ai_count, mark)
+
+      Dim i, mok, div, size, str
+
+      size = Len(as_val)
+
+      If  as_val = "" Or size <= 3 Then
+         cp_asterisk_right = as_val
+      End If
+
+      div = size / 3
+      mok = size Mod 3
+      str = Mid(as_val, 1, mok )
+
+      For i = 0 To div-1
+         If  i = 0 And  mok = 0 Then
+            str = Mid(as_val,  mok + 1, mok + 3 )
+         Else
+            str = str & "," & Mid(as_val, (i * 3) + mok + 1,  3 )
+         End If
+      Next
+      str= mark & str
+      str = cp_lpad(str, ai_count, " ")
+      cp_asterisk_right = str
+
+End Function
+
+}
+
+
+

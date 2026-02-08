@@ -1,0 +1,192 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB8101OZ)
+MAPSIZE(203, 546)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("본인확인검증")
+MAPPUBLIC(";")
+FONT("굴림", 9, NORMAL)
+OPTIONS(ENCODE|CR2TAB)
+TITLE("OTP-OPIN거래인증요청")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("piboPBxQ")
+MAPTYPE(FIXED)
+HEADER(LEDGER)
+TRXH("31CSBPGT385")
+}
+
+
+
+FORM DIVISION
+{
+
+GROUP  grp1(19, 20, 213, 155)  'INPUT'        COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  In(108, 42, 193, 58)  LEN(5)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("00001")          TABORDER(1)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL9(27, 42, 105, 58)  '레코드갯수'        COLOR(66, 76)  CUR(0)    AL_LEFT    ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  lOnesfCnfTrxSeqno(108, 58, 193, 74)  LEN(5)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(2)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL0(27, 59, 105, 75)  '본인확인처리일련번호'        COLOR(66, 76)  CUR(0)    AL_LEFT    ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  zMdaSeqno(108, 74, 193, 90)  LEN(16)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_SUNKEN          TABORDER(3)  IOORDER(3)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL2(27, 75, 105, 91)  '매체일련번호'        COLOR(66, 76)  CUR(0)    AL_LEFT    ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  OUTPUT(250, 41, 485, 57)  LEN(294)  IO_MIXED|AL_LEFT|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(6)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  Out(340, 59, 430, 77)  LEN(5)  IO_NUM|AL_LEFT|    COLOR(192, 232)  CUR(0)  LINECOLOR(75)          TABORDER(0)  IOORDER(7)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  lRetryAbleCnt(340, 75, 430, 93)  LEN(2)  IO_NUM|AL_LEFT|    COLOR(192, 232)  CUR(0)  LINECOLOR(75)          IFRGB(232, 232)  TABORDER(0)  IOORDER(8)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  zErrMsgCode(340, 92, 430, 110)  LEN(4)  IO_MIXED|AL_LEFT|    COLOR(192, 232)  CUR(0)  LINECOLOR(75)          IFRGB(232, 232)  TABORDER(0)  IOORDER(9)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL10(249, 59, 339, 77)  '레코드갯수'  LINECOLOR(0)      COLOR(74, 76)  CUR(0)    AL_LEFT    ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL11(249, 77, 339, 95)  '재시도가능횟수'  LINECOLOR(0)      COLOR(74, 76)  CUR(0)    AL_LEFT    ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL13(249, 92, 339, 110)  '오류메시지코드'  LINECOLOR(0)      COLOR(74, 76)  CUR(0)    AL_LEFT    ENABLE  &
+  HINTTYPE(IH_NONE)
+GROUP  GROUP0(232, 20, 502, 169)  'INPUT'        COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  zErrMsgCnts(340, 110, 430, 128)  LEN(100)  IO_MIXED|AL_LEFT|    COLOR(192, 232)  CUR(0)  LINECOLOR(75)          IFRGB(232, 232)  TABORDER(0)  IOORDER(10)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL4(249, 110, 339, 128)  '오류메시지내용'  LINECOLOR(0)      COLOR(74, 76)  CUR(0)    AL_LEFT    ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  send_btn(508, 18, 540, 38)  '조회'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, NORMAL)  COLOR(208, 232)  CUR(0)    "2btn.bmp"    TABORDER(4)  ENABLE  &
+  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+EDIT  TrdInfo(108, 106, 193, 122)  LEN(256)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(5)  IOORDER(5)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL6(27, 105, 105, 121)  '거래정보'        COLOR(66, 76)  CUR(0)    AL_LEFT    ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  zOtpVrfVal(108, 90, 193, 106)  LEN(12)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_SUNKEN          TABORDER(6)  IOORDER(4)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL5(27, 91, 105, 107)  'OTP검증값'        COLOR(66, 76)  CUR(0)    AL_LEFT    ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  searchMsg(20, 240, 500, 266)  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Dim sendCnt
+sendCnt = 0
+
+_AW_ONINDECLARE_AW_
+#Load IB888833
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+SCREEN.OnSend = False
+
+lOnesfCnfTrxSeqno.Data = Trim(SCREEN.Object("parent.lOnesfCnfTrxSeqno").data)
+zMdaSeqno.Data = Trim(SCREEN.Object("parent.zMdaSeqno").data)
+zOtpVrfVal.Data = Trim(SCREEN.Object("parent.zOtpVrfVal").data)
+TrdInfo.Data = Trim(SCREEN.Object("parent.TrdInfo").data)
+
+If Trim(lOnesfCnfTrxSeqno.Data) = "" Then
+	MsgBox Trim(searchMsg.Text), , "IBK투자증권"
+	Exit Sub
+End If
+
+If Trim(zOtpVrfVal.Data) = "" Then
+	alert_msg("OTP생성번호를 입력하세요")
+	zOtpVrfVal.SetFocus
+	Exit Sub
+End If
+
+sendCnt = sendCnt + 1
+
+If sendCnt > 1 Then
+	Exit Sub
+End If
+
+SCREEN.OnSend = True
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+If Left(Trim(LEDGER.Ecod),1) = "0" Then
+	If Trim(zErrMsgCode.Data) = "0000" Then
+		SCREEN.Object("parent.zOtpVrfVal").Clear
+		SCREEN.ClearAll 0, 2
+		SCREEN.SetTimer 4, False
+	Else
+		sendCnt = 0
+
+		Dim msg
+		msg = Trim(zErrMsgCnts.Data)
+
+		If Trim(zErrMsgCnts.Data) <> "" Then
+			If Trim(zErrMsgCode.Data) = "3517" Then
+				msg = msg & vbLf & vbLf & "재시도 가능횟수는 "& Trim(lRetryAbleCnt.Data) & "회 남았습니다."
+			End If
+
+			alert_msg(msg)
+		End If
+
+		If SCREEN.Object("parent.gubndata").data = "8101" Then
+			SCREEN.Object("parent.parent.OBJ_otp1").Send
+		Else
+			SCREEN.Proc "parent.obj_gen.send_f", ""
+		End If
+	End If
+Else
+	sendCnt = 0
+		If SCREEN.Object("parent.gubndata").data = "8101" Then
+			SCREEN.Object("parent.parent.OBJ_otp1").Send
+		Else
+			SCREEN.Object("main.GUIDE").TRgb = 94
+			Call guide_msg(msg)
+			SCREEN.Proc "parent.obj_gen.send_f", ""
+		End If
+
+	alert_msg(LEDGER.Emsg)
+End If
+
+_AW_ONENDSUB_AW_
+_AW_ONTIMER_AW_
+sendCnt = 0
+If SCREEN.Object("parent.gubndata").data = "8101" Then
+	SCREEN.Proc "parent.parent.send", ""
+	SCREEN.Proc "parent.parent.OTP_hide", ""
+Else
+	zOtpVrfVal.Clear
+	SCREEN.ClearAll 0, 2
+	SCREEN.Proc "parent.parent.obj_snd.send_o", ""
+	SCREEN.Object("parent.parent.obj_showCerti").Visible = False
+End If
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(lRetryAbleCnt)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(zErrMsgCode)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(zErrMsgCnts)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(send_btn)
+_AW_ONCLICK_AW_
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

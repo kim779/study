@@ -1,0 +1,647 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(TT110199)
+MAPSIZE(655, 729)
+VERSION(000)
+MAPKIND(PROCEDURES)
+MAPGROUP(1)
+MAPDESC("선/옵주문공통 proc")
+MAPPUBLIC(";")
+FONT("굴림", 9, NORMAL)
+TITLE("Procedures")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+'***************************************************************
+'주문유형 (char->string)
+'***************************************************************
+Function Get_hogb(hogb)
+	Select Case hogb
+		Case "L", "00"
+			Get_hogb = "지정가"
+		Case "M", "03"
+			Get_hogb = "시장가"
+		Case "C", "05"
+			Get_hogb = "조건부지정가"
+		Case "B", "06"
+			Get_hogb = "최유리지정가"
+	End Select
+End Function
+
+'***************************************************************************
+' 선물/옵션 주문유형 (2자리 -> 1자리)
+'***************************************************************************
+Function change_hogb (hogb)
+	Dim retn
+	Select Case hogb
+		Case "00" : retn = "1"			'지정가
+		Case "03" : retn = "3"			'시장가
+		Case "05" : retn = "2"			'조건부지정가
+		Case "06" : retn = "4"			'최유리지정가
+	End Select
+	change_hogb = retn
+End Function
+
+'***************************************************************************
+' 선물/옵션 주문수량 숫자여부
+'***************************************************************************
+Function Is_numeric(data)
+	Dim num
+	num = Trim(data)
+
+	If num = "" Then
+		num = 0
+	End If
+
+'	If CDbl(num) <= 0 Then
+'		Is_numeric = False
+'		Exit Function
+'	End If
+
+	If IsNumeric(num) = False Then
+		Is_numeric = False
+		Exit Function
+	End If
+	Is_numeric = True
+End Function
+
+'***************************************************************************
+'계좌정보 조회시 공통 체크 (계좌와 비밀번호만)
+'***************************************************************************
+Function Common_check()
+
+	If Trim(AN20.Data) = "" Then
+		MsgBox "계좌번호를 확인하세요", , "주문에러"
+		AN20.Setfocus
+		Common_check = False
+		Exit Function
+	End If
+
+	If Trim(ed_pswd.Data) = "" Then
+		MsgBox "비밀번호를 확인하세요", , "주문에러"
+		ed_pswd.Setfocus
+		Common_check = False
+		Exit Function
+'	Else
+'		If AN21.ConfirmPswd(ed_pswd.data) = False Then
+'			MsgBox "비밀번호오류입니다.", , "주문에러"
+'			ed_pswd.data = ""
+'			ed_pswd.Setfocus
+'			Common_check = False
+'			Exit Function
+'		End If
+	End If
+	Common_check = True
+End Function
+
+'***************************************************************************
+' 선물/옵션 주문요청시 셋팅값 체크
+'		첫번째 인자(gubn) - 0: 주문
+'					  			 - 1: 주문가능수량
+'								 - 2: 청산가능수량
+'		두번째 인자(set_acnt) : 패스워드/계좌 필드가 main? this?
+'***************************************************************************
+Function Jumun_Chk(gubn, set_acnt)
+	Dim obj_name
+
+	obj_name = "obj"&gubn
+
+	If IsNull(set_acnt) = True Then
+		If Trim(AN20.Data) = "" Then
+			MsgBox "계좌번호를 확인하세요", , "주문에러"
+			AN20.Setfocus
+			Jumun_Chk = False
+			Exit Function
+		End If
+	Else
+		If Trim(SCREEN.Object(set_acnt&".AN20").Data) = "" Then
+			MsgBox "계좌번호를 확인하세요", , "주문에러"
+			AN20.SetFocus
+			Jumun_Chk = False
+			Exit Function
+		End If
+	End If
+
+	If IsNull(set_acnt) = True Then
+		If Trim(ed_pswd.Data) = "" Then
+			MsgBox "비밀번호를 확인하세요", , "주문에러"
+			ed_pswd.Setfocus
+			Jumun_Chk = False
+			Exit Function
+'		Else
+'			If AN21.ConfirmPswd(ed_pswd.data) = False Then
+'				MsgBox "비밀번호오류입니다.", , "주문에러"
+'				ed_pswd.data = ""
+'				ed_pswd.Setfocus
+'				Jumun_Chk = False
+'				Exit Function
+'			End If
+		End If
+	Else
+		If Trim(SCREEN.Object(set_acnt&".ed_pswd").data) = "" Then
+			MsgBox "비밀번호를 확인하세요", , "주문에러"
+			SCREEN.Object(set_acnt&".ed_pswd").Setfocus
+			Jumun_Chk = False
+			Exit Function
+'		Else
+'			If SCREEN.Object(set_acnt&".AN21").ConfirmPswd(SCREEN.Object(set_acnt&".ed_pswd").data) = False Then
+'				MsgBox "비밀번호오류입니다.", , "주문에러"
+'				SCREEN.Object(set_acnt&".ed_pswd").data = ""
+'				SCREEN.Object(set_acnt&".ed_pswd").Setfocus
+'				Jumun_Chk = False
+'				Exit Function
+'			End If
+		End If
+	End If
+
+   '종목코드 check
+	flag = Left(ed_focod.Data, 1)
+	If flag = "1" Or flag = "4" Then
+		hanm = SCREEN.GetName (101, ed_focod.Data, 0)
+		If Trim(hanm) = "" Then
+			MsgBox "종목코드를 확인하세요", , "주문에러"
+			If Mid(SCREEN.GetMapName(1), 3,4) = "1121" Then
+				SCREEN.Object("main.hnam").data = ""
+				SCREEN.Object("main.ed_focod").clear
+				SCREEN.Object("main.ed_focod").Setfocus
+			Else
+				hnam.data = ""
+				ed_focod.clear
+				ed_focod.Setfocus
+			End If
+			Jumun_Chk = False
+			Exit Function
+		End If
+	Else
+		hanm = SCREEN.GetName (102, ed_focod.Data, 0)
+		If Trim(hanm) = "" Then
+			MsgBox "종목코드를 확인하세요", , "주문에러"
+			If Mid(SCREEN.GetMapName(1), 3,4) = "1121" Then
+				SCREEN.Object("main.hnam").data = ""
+				SCREEN.Object("main.ed_focod").clear
+				SCREEN.Object("main.ed_focod").Setfocus
+			Else
+				hnam.data = ""
+			 	ed_focod.clear
+				ed_focod.Setfocus
+			End If
+			Jumun_Chk = False
+			Exit Function
+		End If
+	End If
+
+	'청산가능수량시 아래 체크는 필요없음
+	If gubn > 1 Then
+		Jumun_Chk = True
+		Exit Function
+	End If
+
+	'주문수량 check(주문가능수량시 skip)
+	If ed_jqty.enable = True And Is_numeric(ed_jqty.Data) = False And 	gubn = 0 Then
+		MsgBox "주문수량을 입력하세요", , "주문에러"
+		ed_jqty.SetFocus
+		Jumun_Chk = False
+		Exit Function
+	End If
+
+	'주문단가 check (취소시 skip)
+	If SCREEN.Object(obj_name&".ed_mmgb").data < 4 Then
+		If ed_jprc.Enable = True And Is_numeric(ed_jprc.Data) = False Then
+			MsgBox "주문단가를 입력하세요", , "주문에러"
+			ed_jprc.SetFocus
+			Jumun_Chk = False
+			Exit Function
+		End If
+	End If
+
+	'원주문번호 chkeck (정정/취소시만 chkeck)
+	If SCREEN.Object(obj_name&".ed_mmgb").data > 2 Then
+		If Trim(ed_ogno.Data) = "" Then
+			MsgBox "원주문번호를 입력하세요", , "주문에러"
+			ed_ogno.SetFocus
+			Jumun_Chk = False
+			Exit Function
+		End If
+	End If
+	Jumun_Chk = True
+
+End Function
+'***************************************************************************
+' 선물/옵션 탭관련 설정
+' 인자 : 셋팅할 코드 이름
+'***************************************************************************
+Sub SetConfig(code)
+	AN21.TabStop = CONFIG.TabAccount
+	ed_pswd.TabStop = CONFIG.TabPassword
+	SCREEN.Object(code).TabStop = CONFIG.TabCode
+	ed_jqty.TabStop = CONFIG.TabQty
+	ed_jprc.TabStop = CONFIG.TabPrc
+	ed_hogb.TabStop = CONFIG.TabMMGB
+	JUMUN_B.TabStop = CONFIG.TabButton
+End Sub
+
+'***************************************************************************
+' 선물/옵션 주문수량설정 컨트롤 초기화
+'***************************************************************************
+Sub QueryOption()
+	Dim qtyOpt, gubn, cfg_name, jqty
+
+	'주문구분 - 0:매도, 1:매수, 2:정정
+	Select Case CONFIG.OrderGB
+		Case "0", "1", "2"
+			CONFIG.QueryHoga
+		Case Else
+			Exit Sub
+	End Select
+
+	'주문구분 - 0:매도, 1:매수, 2:정정
+	Select Case CONFIG.OrderGB
+		Case "0"
+			cfg_name = "SellQtyGB"
+		Case "1"
+			cfg_name = "BuyQtyGB"
+		Case "2"
+			If CONFIG.ReadCfg("JJPrcGb") = "2" Then
+				'정정주문의 주문단가 조회
+				'CONFIG.Price
+			End If
+			Exit Sub
+	End Select
+
+
+	jqty = SYSTEM.Pop ("1101_jqty")
+	If Trim(jqty) = "" Then
+		qtyOpt = CONFIG.ReadCfg(cfg_name)
+		If qtyOpt = "1" Then				'주문가능수량
+			If Trim(AN20.data) <> "" And Trim(ed_pswd.data) <> "" Then
+'				If Is_numeric(ed_jprc.Data) <> True Then
+'					ed_jprc.data = CONFIG.price
+'				End If
+
+				If Is_numeric(ed_jprc.Data) = True Then
+					Jumun_vol(0)
+				Else
+					ed_jqty.data = 0
+				End If
+			End If
+		Else
+			CONFIG.QueryQty
+		End If
+	Else
+		ed_jqty.data = jqty
+	End If
+
+End Sub
+
+'***************************************************************************
+' 선물/옵션 주문설정 컨트롤 초기화
+'***************************************************************************
+Sub Jumun_Init()
+	Dim clean_nm
+
+	SYSTEM.Push "1101_jqty", ""
+	CONFIG.PushPrefix = CStr(SCREEN.Major)
+	CONFIG.OrderGB = CStr(Trim(mmgb.text)) 'OrderGB Map화면 주문구분(0:매도, 1:매수, 2:정정)
+	CONFIG.LoadInfo
+
+	Select Case CONFIG.OrderGB
+		Case "0" 			'매도
+			clean_nm = "parent.clearpush_sell"
+		Case "1"				'매수
+			clean_nm = "parent.clearpush_buy"
+		Case "2"				'정정
+			clean_nm = "parent.clearpush_jj"
+		Case "3"				'취소
+			clean_nm = "parent.clearpush_cancel"
+	End Select
+
+	If SCREEN.Object(clean_nm).data = "1" Then
+		SCREEN.Object(clean_nm).data = "0"
+		'첫번째 화면실행시에는 메모리정보 Clear
+		CONFIG.ClearPush
+	Else
+		CONFIG.Pop
+	End If
+'	CONFIG.ItemCd = ed_focod.data
+'	QueryOption()
+End Sub
+
+'***************************************************************************
+' 선물/옵션 send시 주문창 여부
+'***************************************************************************
+Function Jumun_send()
+	Dim mmgb			'매도/매수/정정/취소 구분
+	Dim accm, hnam, retn, hogb, mdgb, jqty, jmgb
+	Dim qtyOpt, gubn, cfg_name
+
+	'주문후 단가/수량 저장을 위한
+	SCREEN.Object("parent.CONFIG").Price = ed_jprc.Data
+	SCREEN.Object("parent.CONFIG").Qty = ed_jqty.data
+	SCREEN.Object("parent.CONFIG").Push
+
+	'주문창 여부
+	If SCREEN.Object("parent.CONFIG").OrderConfirm <> True Then
+		Jumun_send = True
+		Exit Function
+	End If
+
+	accm = Trim(SCREEN.Object("parent.out_accm").data)
+	hnam = Trim(SCREEN.Object("parent.hnam").data)
+	hogb = Get_hogb(ed_hogb.data)
+	jqty = ed_jqty.data
+
+	jmgb=""
+	If ed_jmgb.data = "01" Then
+		jmgb = " (IOC)"
+	ElseIf ed_jmgb.data = "02" Then
+		jmgb = " (FOK)"
+	End If
+
+	If Trim(ed_mdgb.data) = "2" Then
+		mdgb = "전부"
+		jqty = ""
+	Else
+		mdgb = "일부"
+	End If
+	Select Case Trim(ed_mmgb.data)
+		Case "1"	'매도
+			SCREEN.CreateWindow 2, "DH11019A /d/p5","ed_acno"&vbTab&ed_acno.data&vbLf _
+ 					&"out_accm"&vbTab&accm&vbLf&"hnam"&vbTab&hnam&vbLf _
+					&"ed_hogb"&vbTab&hogb&jmgb&vbLf&"ed_jqty"&vbTab&jqty&vbLf _
+					&"ed_jprc"&vbTab&ed_jprc.data&vbLf
+		Case "2"	'매수
+			SCREEN.CreateWindow 2, "DH11019B /d/p5","ed_acno"&vbTab&ed_acno.data&vbLf _
+ 					&"out_accm"&vbTab&accm&vbLf&"hnam"&vbTab&hnam&vbLf _
+					&"ed_hogb"&vbTab&hogb&jmgb&vbLf&"ed_jqty"&vbTab&jqty&vbLf _
+					&"ed_jprc"&vbTab&ed_jprc.data&vbLf
+		Case "3"			'정정
+			SCREEN.CreateWindow 2, "DH11019C /d/p5","ed_acno"&vbTab&ed_acno.data&vbLf _
+ 					&"out_accm"&vbTab&accm&vbLf&"hnam"&vbTab&hnam&vbLf _
+					&"ed_ogno"&vbTab&ed_ogno.data&vbLf&"ed_jqty"&vbTab&jqty&vbLf _
+					&"ed_jprc"&vbTab&ed_jprc.data&vbLf&"mmgb"&vbTab&ed_mmgb.data &vbLf _
+					&"ed_mdgb"&vbTab&mdgb&vbLf&"ed_hogb"&vbTab&hogb&vbLf
+		Case "4"			'취소
+			SCREEN.CreateWindow 2, "DH11019D /d/p5","ed_acno"&vbTab&ed_acno.data&vbLf _
+ 					&"out_accm"&vbTab&accm&vbLf&"hnam"&vbTab&hnam&vbLf _
+					&"ed_ogno"&vbTab&ed_ogno.data&vbLf&"ed_jqty"&vbTab&jqty&vbLf _
+					&"mmgb"&vbTab&ed_mmgb.data &vbLf &"ed_mdgb"&vbTab&mdgb&vbLf
+	End Select
+
+	retn = SYSTEM.Pop("OKOK")
+	If retn <> "Y" Then
+		Jumun_send = False
+		Exit Function
+	End If
+
+	SYSTEM.Push "OKOK", "N"
+	Jumun_send = True
+
+	SCREEN.Object("parent.CONFIG").LoadInfo()
+	Select Case SCREEN.Object("parent.CONFIG").OrderGB
+		Case "0"
+			cfg_name = "SellQtyGB"
+		Case "1"
+			cfg_name = "BuyQtyGB"
+	End Select
+
+	If SCREEN.Object("parent.CONFIG").KeepQty = True Then '수량유지
+		SCREEN.Object("parent.ed_jqty").data = SCREEN.Object("parent.CONFIG").Qty
+	Else
+		qtyOpt = SCREEN.Object("parent.CONFIG").ReadCfg(cfg_name)
+		If qtyOpt <> "1"Then
+			SCREEN.Object("parent.CONFIG").QueryQty
+		Else
+			SCREEN.Proc "parent.Jumun_vol", ""
+		End If
+	End If
+
+	If SCREEN.Object("parent.CONFIG").KeepPrc = True  Then '가격유지
+		SCREEN.Object("parent.ed_jprc").data = SCREEN.Object("parent.CONFIG").Price
+	Else
+		SCREEN.Object("parent.ed_hogb").Data = "00"
+		SCREEN.Object("parent.ed_jprc").enable = True
+		SCREEN.Object("parent.CONFIG").QueryHoga
+	End If
+
+End Function
+'***************************************************************************
+' 선물/옵션 주문후 커서 설정
+' 인자 : who - 0: 계좌 , 1: 코드
+'        pos - main? parent?
+'			code - 코드명
+'***************************************************************************
+Sub Set_cursor(who, pos, code)
+	Dim cPos
+
+	cPos = CONFIG.ReadCfg("CursorPos")
+	Select Case cPos
+		Case "0"
+			If who = "0" Then
+				SCREEN.Object(pos&".AN20").SetFocus()
+			Else
+				AN21.SetFocus()
+			End If
+		Case "1"
+			If who = "0" Then
+				SCREEN.Object(pos&".ed_pswd").SetFocus()
+			Else
+				ed_pswd.SetFocus()
+			End If
+		Case "2"
+			If who = "1" Then
+				SCREEN.Object(pos&"."&code).SetFocus()
+			Else
+				SCREEN.Object(code).SetFocus()
+			End If
+		Case "3"
+			ed_jqty.SetFocus()
+		Case "4"
+			ed_jprc.SetFocus()
+	End Select
+End Sub
+'***************************************************************************
+' 선물/옵션 start시 계좌/주문콘트롤 셋팅
+'***************************************************************************
+Sub Set_start()
+'	If LOGIN.whoi = 0 Then	'직원용
+'
+'	Else	'고객용
+'		ed_pswd.data = SYSTEM.GetAccountPass (AN21.data)
+''	End If
+'	out_accm.data = SYSTEM.GetAccountName (AN21.data)
+	ed_pswd.Data = AN20.pswd
+	out_accm.Data = AN20.name
+End Sub
+
+'***************************************************************************
+' 선물/옵션 정정/취소시 원주문번호,주문단가 셋팅
+'***************************************************************************
+Sub Get_jmno ()
+	Dim ret, prc, num, cPos, indata, code_sym
+
+	out_jmno.data = ""
+	num = SYSTEM.Pop ("FO_jmno")
+	prc = SYSTEM.Pop ("FO_jprc")
+	If Trim(num) <> "000000" Or Trim(num) <> ""Then
+		ed_ogno.data = num
+	End If
+	If SCREEN.Object("main.TAB1").index = 3 Or SCREEN.Object("main.TAB1").index = 5 Then
+		If Trim(prc) <> "" Then
+			Select Case CONFIG.ReadCfg("JJPrcGb")
+			Case "2"	: ed_jprc.data = prc			'정정주문의 주문단가 조회
+			Case "1"
+				Call l_fuop_gb(ed_focod.Data, code_sym)
+				indata = code_sym & Chr(127) & ed_focod.Data & vbTab & Left(code_sym,1)&"1023" & vbTab
+				ed_jprc.data = Abs(SCREEN.ServiceEx("pooppoop", indata, Len(indata), &H02, 2000))
+			End Select
+		End If
+	End If
+End Sub
+'==============================================
+' name : l_fuop_gb
+' desc : 종목코드로 (선물/주식선물/옵션)구분자 리턴
+' IN   : (종목코드, ByRef code_symbol)
+'DH888899 에 정의됨. 주식선물 잡업시 유의
+Function l_fuop_gb(code, focod)
+	Select Case Left(code, 1)
+		Case "1", "4"		'선물, 주식선물
+			If Mid(code, 2, 1) = "0" Then			'선물
+				If IsNull(focod) = False Then focod = "30301"
+'				l_fuop_gb = lv_kind_fu
+			Else											'주식선물
+				If IsNull(focod) = False Then focod = "50301"
+'				l_fuop_gb = lv_kind_sf
+			End If
+		Case "2", "3"								'옵션
+			If IsNull(focod) = False Then focod = "40301"
+'			l_fuop_gb = lv_kind_op
+		Case Else
+			focod = ""
+'			l_fuop_gb = -1
+	End Select
+End Function
+
+'***************************************************************************
+' 선물/옵션 호가단위 셋팅
+'			- 인자 : 종목코드 8자리
+'***************************************************************************
+Sub Hoga_unit(fogb)
+	Dim code
+	If Trim(fogb) = "" Then Exit Sub
+	code = Left(Trim(fogb), 3)
+	Select Case code
+		Case "101","401" : ed_jprc.SetType(110)		'지수선물
+		Case "103","403" : ed_jprc.SetType(101)		'스타선물
+		Case "201","301" : ed_jprc.SetType(130)		'옵션
+		Case Else
+			If Int(Mid(code, 1, 2)) > 10 Then
+				ed_jprc.SetType(100)
+			End If
+	End Select
+End Sub
+
+'***************************************************************************
+' 선물/옵션 코드변경시
+' 리턴값 : 커서유지 여부
+'***************************************************************************
+Function ChangeCode()
+	Dim cPos
+
+	ChangeCode = False
+	ed_jprc.data = 0
+
+	CONFIG.ItemCd = ed_focod.Data
+	QueryOption()
+
+	cPos = CONFIG.ReadCfg("NotMoveCode")
+	If cPos = "1" Then	'커서유지
+		ed_focod.Setfocus
+		ChangeCode = True
+	End If
+
+End Function
+
+'***************************************************************************
+' 선물/옵션 price컨트롤 셋팅
+'			- 인자 : 종목코드 8자리
+'***************************************************************************
+Sub Set_price(fogb)
+	Dim code
+	code = Left(Trim(fogb), 1)
+	Select Case code
+		Case "1", "4"		'지수선물
+			HOGA.type = Asc("F")
+			HOGA.jcode = fogb
+		Case "2","3"		'옵션
+			HOGA.type = Asc("O")
+			HOGA.jcode = fogb
+		Case Else
+			Exit Sub
+	End Select
+End Sub
+
+'***************************************************************************
+' 선물/옵션 주문 포커스 관리(정정/취소)
+' 인자 : code => 포커스 셋팅할 종목코드
+'		   flag => 원주문 셋팅 여부
+'***************************************************************************
+Sub Jumun_focus(code, flag)
+	Dim cPos
+
+	If flag = "True" Then
+		flag = True
+	Else
+		flag = False
+	End If
+
+	If flag = True Then
+		If Trim(AN20.data) = "" Or Trim(ed_pswd.data) = "" Then
+			SCREEN.SetTimer 1, False
+			Exit Sub
+		End If
+
+		If CONFIG.OrderGB = "2" Then					'정정일때만 커서 셋팅
+			cPos = CONFIG.ReadCfg("JJCursorPos")	'수량,유형,가격
+			Select Case cPos
+				Case "0" : ed_jqty.Setfocus
+				Case "1" : ed_hogb.Setfocus
+				Case "2" : ed_jprc.Setfocus
+			End Select
+		ElseIf CONFIG.OrderGB = "3" Then
+			JUMUN_B.Setfocus
+		End If
+	Else
+		cPos = CONFIG.ReadCfg("NotMoveCode") '커서유지
+		If cPos = "1"Then
+			SCREEN.Object(code).Setfocus
+		Else
+			If SYSTEM.pop ("1101_click") <> "click" Then
+				SCREEN.SetTimer 2, False
+			End If
+		End If
+	End If
+	SYSTEM.Push "1101_click", ""
+End Sub
+
+}
+
+
+

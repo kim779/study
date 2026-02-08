@@ -1,0 +1,269 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB230360)
+MAPSIZE(172, 505)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("거래원순매수정보")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+TITLE("거래원순매수정보")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pibo2301")
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+EDIT  1301(50, 0, 150, 18)  LEN(6)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_HAN|FA_NOR|CODE      COLOR(99, 69)  CUR(0)  TP_NONE          TABORDER(1)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  1021(215, 0, 315, 18)  LEN(7)  IO_MIXED|AL_LEFT||FA_FLASH  FONT("굴림체", 9, NORMAL)    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL0(0, 0, 50, 18)  '종목번호'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  실시간심볼(151, 0, 215, 18)  '실시간심볼'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+GRID  GRID0(0, 18, 506, 173)  VISIBLEROW(0)  CELLH(16)  MATRIX(5000, 8)  FIX(0)  MAINCOLOR(208, 232)  LINECOLOR(0)  FOCUSCOLOR(0)  FOCUSKIND(0)  |FLEXIBLE|VSCROLL|NO3D    &
+	COLINFO("Col0")  LEN(3)  WIDTH(37)  HEAD("코드")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_MIXED|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col1")  LEN(20)  WIDTH(70)  HEAD("거래원명")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_MIXED|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col2")  LEN(9)  WIDTH(74)  HEAD("매도량")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_ZERO|SA_COSIGN    COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col3")  LEN(9)  WIDTH(73)  HEAD("매수량")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_ZERO|SA_COSIGN    COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col4")  LEN(9)  WIDTH(68)  HEAD("순매수량")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_ZERO|SA_COSIGN    COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col5")  LEN(9)  WIDTH(72)  HEAD("변동량")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSIGN    COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col6")  LEN(6)  WIDTH(50)  HEAD("수신시간")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_NUM|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  EDITFORMAT("99:99")    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col7")  LEN(5)  WIDTH(46)  HEAD("비중")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_ZERO|SA_COSIGN    COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    TABORDER(2)  IOORDER(3)  ENABLE  &
+  VISIBLE
+
+BUTTON  BUTTON0(315, 0, 505, 18)  TP_PUSH      AL_CENTER    FOCUS  COLOR(208, 232)  CUR(0)      TABORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+'화면상의 증권사 코드
+g_ArrSecCode = Array("", "", "", "", "", "", "", "")
+'화면상의 순매수량
+g_ArrVol = Array("", "", "", "", "", "", "", "")
+'화면상의 직전대비
+g_ArrDiff = Array("", "", "", "", "", "", "", "")
+'화면상의 수신시간
+g_ArrTime = Array("", "", "", "", "", "", "", "")
+
+'화면No : sec  vol : 거래량  diff : 직전대비 rcvTime : 수신 시간
+Sub settingM(sec, vol, diff, rcvTime)
+
+	Select Case sec
+	Case 1
+			If Trim(SCREEN.Object("main.obj.obj1.tnam").data) = "" Then
+				Exit Sub
+			End If
+
+			If Trim(vol) <> Trim(SCREEN.Object("main.obj.obj1.obj.OUTPUT0").data) Then
+				SCREEN.Object("main.obj.obj1.obj.OUTPUT0").data = vol
+			End If
+
+			If Trim(diff) <> Trim(SCREEN.Object("main.obj.obj1.obj.GRD").GetGridCell(1,2)) Then
+				SCREEN.Object("main.obj.obj1.obj.GRD").InsertRow 0
+				SCREEN.Object("main.obj.obj1.obj.GRD").SetGridCell 1, 1, rcvTime
+				SCREEN.Object("main.obj.obj1.obj.GRD").SetGridCell 1, 2, diff
+			End If
+	Case 2
+			If Trim(SCREEN.Object("main.obj.obj2.tnam").data) = "" Then
+				Exit Sub
+			End If
+
+			If Trim(vol) <> Trim(SCREEN.Object("main.obj.obj2.obj.OUTPUT0").data) Then
+				SCREEN.Object("main.obj.obj2.obj.OUTPUT0").data = vol
+			End If
+
+			If Trim(diff) <> Trim(SCREEN.Object("main.obj.obj2.obj.GRD").GetGridCell(1,2)) Then
+				SCREEN.Object("main.obj.obj2.obj.GRD").InsertRow 0
+				SCREEN.Object("main.obj.obj2.obj.GRD").SetGridCell 1, 1, rcvTime
+				SCREEN.Object("main.obj.obj2.obj.GRD").SetGridCell 1, 2, diff
+			End If
+	Case 3
+			If Trim(SCREEN.Object("main.obj.obj3.tnam").data) = "" Then
+				Exit Sub
+			End If
+
+			If Trim(vol) <> Trim(SCREEN.Object("main.obj.obj3.obj.OUTPUT0").data) Then
+				SCREEN.Object("main.obj.obj3.obj.OUTPUT0").data = vol
+			End If
+
+			If Trim(diff) <> Trim(SCREEN.Object("main.obj.obj3.obj.GRD").GetGridCell(1,2)) Then
+				SCREEN.Object("main.obj.obj3.obj.GRD").InsertRow 0
+				SCREEN.Object("main.obj.obj3.obj.GRD").SetGridCell 1, 1, rcvTime
+				SCREEN.Object("main.obj.obj3.obj.GRD").SetGridCell 1, 2, diff
+			End If
+	Case 4
+			If Trim(SCREEN.Object("main.obj.obj4.tnam").data) = "" Then
+				Exit Sub
+			End If
+
+			If Trim(vol) <> Trim(SCREEN.Object("main.obj.obj4.obj.OUTPUT0").data) Then
+				SCREEN.Object("main.obj.obj4.obj.OUTPUT0").data = vol
+			End If
+
+			If Trim(diff) <> Trim(SCREEN.Object("main.obj.obj4.obj.GRD").GetGridCell(1,2)) Then
+				SCREEN.Object("main.obj.obj4.obj.GRD").InsertRow 0
+				SCREEN.Object("main.obj.obj4.obj.GRD").SetGridCell 1, 1, rcvTime
+				SCREEN.Object("main.obj.obj4.obj.GRD").SetGridCell 1, 2, diff
+			End If
+	Case 5
+
+			If Trim(SCREEN.Object("main.obj.obj5.tnam").data) = "" Then
+				Exit Sub
+			End If
+
+			If Trim(vol) <> Trim(SCREEN.Object("main.obj.obj5.obj.OUTPUT0").data) Then
+				SCREEN.Object("main.obj.obj5.obj.OUTPUT0").data = vol
+			End If
+
+			If Trim(diff) <> Trim(SCREEN.Object("main.obj.obj5.obj.GRD").GetGridCell(1,2)) Then
+				SCREEN.Object("main.obj.obj5.obj.GRD").InsertRow 0
+				SCREEN.Object("main.obj.obj5.obj.GRD").SetGridCell 1, 1, rcvTime
+				SCREEN.Object("main.obj.obj5.obj.GRD").SetGridCell 1, 2, diff
+			End If
+	Case 6
+			If Trim(SCREEN.Object("main.obj.obj6.tnam").data) = "" Then
+				Exit Sub
+			End If
+
+			If Trim(vol) <> Trim(SCREEN.Object("main.obj.obj6.obj.OUTPUT0").data) Then
+				SCREEN.Object("main.obj.obj6.obj.OUTPUT0").data = vol
+			End If
+
+			If Trim(diff) <> Trim(SCREEN.Object("main.obj.obj6.obj.GRD").GetGridCell(1,2)) Then
+				SCREEN.Object("main.obj.obj6.obj.GRD").InsertRow 0
+				SCREEN.Object("main.obj.obj6.obj.GRD").SetGridCell 1, 1, rcvTime
+				SCREEN.Object("main.obj.obj6.obj.GRD").SetGridCell 1, 2, diff
+			End If
+	Case 7
+			If Trim(SCREEN.Object("main.obj.obj7.tnam").data) = "" Then
+				Exit Sub
+			End If
+
+			If Trim(vol) <> Trim(SCREEN.Object("main.obj.obj7.obj.OUTPUT0").data) Then
+				SCREEN.Object("main.obj.obj7.obj.OUTPUT0").data = vol
+			End If
+
+			If Trim(diff) <> Trim(SCREEN.Object("main.obj.obj7.obj.GRD").GetGridCell(1,2)) Then
+				SCREEN.Object("main.obj.obj7.obj.GRD").InsertRow 0
+				SCREEN.Object("main.obj.obj7.obj.GRD").SetGridCell 1, 1, rcvTime
+				SCREEN.Object("main.obj.obj7.obj.GRD").SetGridCell 1, 2, diff
+			End If
+	Case 8
+			If Trim(SCREEN.Object("main.obj.obj8.tnam").data) = "" Then
+				Exit Sub
+			End If
+
+			If Trim(vol) <>  Trim(SCREEN.Object("main.obj.obj8.obj.OUTPUT0").data) Then
+				SCREEN.Object("main.obj.obj8.obj.OUTPUT0").data = vol
+			End If
+
+			If Trim(diff) <> Trim(SCREEN.Object("main.obj.obj8.obj.GRD").GetGridCell(1,2)) Then
+				SCREEN.Object("main.obj.obj8.obj.GRD").InsertRow 0
+				SCREEN.Object("main.obj.obj8.obj.GRD").SetGridCell 1, 1, rcvTime
+				SCREEN.Object("main.obj.obj8.obj.GRD").SetGridCell 1, 2, diff
+			End If
+	End Select
+
+End Sub
+
+Sub Setting()
+
+	g_ArrSecCode(0) = Trim(SCREEN.Object("main.obj.obj1.trcd").data)
+	g_ArrSecCode(1) = Trim(SCREEN.Object("main.obj.obj2.trcd").data)
+	g_ArrSecCode(2) = Trim(SCREEN.Object("main.obj.obj3.trcd").data)
+	g_ArrSecCode(3) = Trim(SCREEN.Object("main.obj.obj4.trcd").data)
+	g_ArrSecCode(4) = Trim(SCREEN.Object("main.obj.obj5.trcd").data)
+	g_ArrSecCode(5) = Trim(SCREEN.Object("main.obj.obj6.trcd").data)
+	g_ArrSecCode(6) = Trim(SCREEN.Object("main.obj.obj7.trcd").data)
+	g_ArrSecCode(7) = Trim(SCREEN.Object("main.obj.obj8.trcd").data)
+
+	g_ArrVol(0) = Trim(SCREEN.Object("main.obj.obj1.obj.OUTPUT0").data)
+	g_ArrVol(1) = Trim(SCREEN.Object("main.obj.obj2.obj.OUTPUT0").data)
+	g_ArrVol(2) = Trim(SCREEN.Object("main.obj.obj3.obj.OUTPUT0").data)
+	g_ArrVol(3) = Trim(SCREEN.Object("main.obj.obj4.obj.OUTPUT0").data)
+	g_ArrVol(4) = Trim(SCREEN.Object("main.obj.obj5.obj.OUTPUT0").data)
+	g_ArrVol(5) = Trim(SCREEN.Object("main.obj.obj6.obj.OUTPUT0").data)
+	g_ArrVol(6) = Trim(SCREEN.Object("main.obj.obj7.obj.OUTPUT0").data)
+	g_ArrVol(7) = Trim(SCREEN.Object("main.obj.obj8.obj.OUTPUT0").data)
+
+	g_Arrdiff(0) = Trim(SCREEN.Object("main.obj.obj1.obj.GRD").GetGridCell(1,2))
+	g_Arrdiff(1) = Trim(SCREEN.Object("main.obj.obj2.obj.GRD").GetGridCell(1,2))
+	g_Arrdiff(2) = Trim(SCREEN.Object("main.obj.obj3.obj.GRD").GetGridCell(1,2))
+	g_Arrdiff(3) = Trim(SCREEN.Object("main.obj.obj4.obj.GRD").GetGridCell(1,2))
+	g_Arrdiff(4) = Trim(SCREEN.Object("main.obj.obj5.obj.GRD").GetGridCell(1,2))
+	g_Arrdiff(5) = Trim(SCREEN.Object("main.obj.obj6.obj.GRD").GetGridCell(1,2))
+	g_Arrdiff(6) = Trim(SCREEN.Object("main.obj.obj7.obj.GRD").GetGridCell(1,2))
+	g_Arrdiff(7) = Trim(SCREEN.Object("main.obj.obj8.obj.GRD").GetGridCell(1,2))
+
+	g_ArrTime(0) = Trim(SCREEN.Object("main.obj.obj1.obj.GRD").GetGridCell(1,1))
+	g_ArrTime(1) = Trim(SCREEN.Object("main.obj.obj2.obj.GRD").GetGridCell(1,1))
+	g_ArrTime(2) = Trim(SCREEN.Object("main.obj.obj3.obj.GRD").GetGridCell(1,1))
+	g_ArrTime(3) = Trim(SCREEN.Object("main.obj.obj4.obj.GRD").GetGridCell(1,1))
+	g_ArrTime(4) = Trim(SCREEN.Object("main.obj.obj5.obj.GRD").GetGridCell(1,1))
+	g_ArrTime(5) = Trim(SCREEN.Object("main.obj.obj6.obj.GRD").GetGridCell(1,1))
+	g_ArrTime(6) = Trim(SCREEN.Object("main.obj.obj7.obj.GRD").GetGridCell(1,1))
+	g_ArrTime(7) = Trim(SCREEN.Object("main.obj.obj8.obj.GRD").GetGridCell(1,1))
+
+End Sub
+
+_AW_ONSTART_AW_
+If Trim(SCREEN.Object("main.dayb1").Text) <> "데이터" Then
+	Setting()
+End If
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+S1301.Data = SCREEN.Object("main.1301").Data
+If Trim(SCREEN.Object("main.dayb1").Text) <> "데이터" Then
+	Call Setting()
+End If
+
+If Trim(S1301.Data) = "" Then
+	SCREEN.OnSend = False
+	Exit Sub
+End If
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+Dim ii, kk, vol, code, diff, rcvTime
+
+'화면마다 돌면서 찾아서 집어넣기
+For ii=0 To 7
+	For kk=1 To GRID0.Rows
+		code = Trim(GRID0.GetGridCell(kk, 1))
+
+'		SYSTEM.Trace "g_ArrSecCode(ii) : " & g_ArrSecCode(ii) & " code : " & code
+		If Trim(g_ArrSecCode(ii)) = code Then
+
+			vol = Trim(GRID0.GetGridCell (kk, 5))
+			diff = Trim(GRID0.GetGridCell (kk, 6))
+			rcvTime = Trim(GRID0.GetGridCell (kk, 7))
+
+			Call settingM(ii+1, vol, diff, rcvTime)
+
+			Exit For
+		End If
+	Next
+Next
+
+_AW_ONENDSUB_AW_
+}
+
+
+

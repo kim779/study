@@ -1,0 +1,109 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB212620)
+MAPSIZE(74, 200)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("기간별업종시세")
+MAPPUBLIC(";")
+FONT("굴림", 9, NORMAL)
+OPTIONS(FMS|FLASH)
+TITLE("[212620]")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pooppoop")
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+GRID  26500(0, 20, 200, 75)  VISIBLEROW(0)  CELLH(18)  MATRIX(2, 3)  FIX(0)  MAINCOLOR(7, 0)  LINECOLOR(75)  FOCUSCOLOR(78)  FOCUSKIND(4)    FONT("굴림체", 9, NORMAL)  ROWC(68, 77)  |SELALWAYS|FLEXIBLE|INS_TOP|NO3D|RROW|XHLINE|PAGE|HEADER|KEYFOCUS|GRFTEXT    &
+	COLINFO("26302")  LEN(8)  WIDTH(66)  HEAD("일자")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  EDITFORMAT("9999/99/99")    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("26021")  LEN(5)  WIDTH(35)  HEAD("RTS")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_ALPHA|EDIT_OUTPUT  |FA_FLASH    COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("26028")  LEN(12)  WIDTH(82)  HEAD("거래대금(백만)")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|SA_SPACE    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    TABORDER(1)  IOORDER(4)  ENABLE  &
+  VISIBLE
+
+EDIT  20301(0, 0, 34, 20)  LEN(3)  IO_NUM|EDIT_INPUT|FA_WRAP  FONT("굴림체", 9, NORMAL)    COLOR(68, 69)  CUR(0)  TP_NONE          TABORDER(2)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  26901(35, 0, 150, 20)  LEN(8)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_DATE  FONT("굴림체", 9, NORMAL)    COLOR(192, 130)  CUR(0)  TP_SUNKEN          EDITFORMAT("9999/99/99")  TABORDER(3)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  200777(150, 0, 170, 20)  LEN(1)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(4)  IOORDER(3)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Sub Onalert()
+	Dim y, m,d, temp,diff
+
+	SYSTEM.Trace " cell : " & SCREEN.Object("main.26500").GetgridCell(1,1)
+
+	If Trim(SCREEN.Object("main.26500").GetgridCell(1,1)) = "" Then
+		Exit Sub
+	End If
+
+	y = Mid(SCREEN.Object("main.26500").GetgridCell(1,1),1,4)
+	m = Mid(SCREEN.Object("main.26500").GetgridCell(1,1),5,2)
+	d = Mid(SCREEN.Object("main.26500").GetgridCell(1,1),7,2)
+	temp = DateSerial(y, m, d)
+	diff = DateDiff("d", Now, temp)
+
+	If diff <> 0 Then
+		Exit Sub
+	End If
+
+	If S20301.Data = "001" Then
+			SCREEN.Object("main.26500").SetGridcell 1, 2, (S26500.GetGridCell(1, 3))
+	ElseIf S20301.Data = "201" Then
+			SCREEN.Object("main.26500").SetGridcell 1, 3, (S26500.GetGridCell(1, 3))
+	ElseIf S20301.Data = "101" Then
+			SCREEN.Object("main.26500").SetGridcell 1, 5, (S26500.GetGridCell(1, 3))
+	ElseIf S20301.Data = "305" Then
+			SCREEN.Object("main.26500").SetGridcell 1, 6, (S26500.GetGridCell(1, 3))
+	End If
+
+	SCREEN.Proc "main.CalRealdata", ""
+End Sub
+
+_AW_ONINDECLARE_AW_
+#load IB888888
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+If UCase(TypeName( SCREEN.Object("main.cxMarket"))) <> "NOTHING" Then
+	If SCREEN.Object("main.cxMarket").sMarket = "KRX" Then
+		S200777.Data = "1"
+	ElseIf SCREEN.Object("main.cxMarket").sMarket = "NXT" Then
+		S200777.Data =  "2"
+	ElseIf SCREEN.Object("main.cxMarket").sMarket = "통합" Then
+		S200777.Data =  "3"
+	End If
+	SYSTEM.Trace "yes cxMarket S200777 = " & S200777.Data  & "    20301="  & S20301.Data
+Else
+	SYSTEM.Trace "no cxMarket map = " & SCREEN.GetMapName(0)
+End If
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(26500)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(26901)
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

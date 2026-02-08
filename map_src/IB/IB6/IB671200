@@ -1,0 +1,171 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB671200)
+MAPSIZE(392, 703)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(24)
+MAPDESC("[6313] 채권일별")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+TITLE("[6712] 주식관련사채 일별시세")
+TOPATH(AXIS)
+METHOD(MENU)
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL1(-4, 26, 707, 394)  LIMAGE(0)  LINEW(5)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL0(0, 0, 703, 27)  LINETYPE(3)  LINECOLOR(64)      COLOR(66, 69)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  jscd(7, 3, 117, 23)  LEN(12)  IO_ALPHA|EDIT_INPUT|FA_WRAP|FA_UPPER|CODE      COLOR(192, 130)  CUR(0)  TP_SUNKEN          TABORDER(1)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  021(795, 31, 920, 48)  LEN(12)  IO_ALPHA|AL_CENTER|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(3)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  SND_FLAG(795, 50, 829, 65)  'N'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  BUTTON0(117, 3, 136, 23)  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(15, 63)  CUR(0)    "검색.BMP"    TABORDER(2)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+OUT  cgname(139, 3, 280, 23)  LEN(30)  IO_MIXED|AL_LEFT||FA_SKIP    COLOR(90, 130)  CUR(0)  LINECOLOR(89)          TABORDER(0)  IOORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+COMBO  DGUB(340, 3, 404, 23)  TP_SUNKEN  LEN(1)  COUNT(3)  VCOUNT(3)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_NUM|EDIT_INPUT    COLOR(192, 130)  CUR(0)  DISPLAY("일간", "주간", "월간")  DATA("1", "2", "3")    TABORDER(3)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL0(285, 3, 335, 23)  '기간구분'  AL_LEFT  CUR(0)      COLOR(208, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  b_quri(659, 3, 696, 23)  '조회'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, BOLD)  COLOR(208, 186)  CUR(0)    "조회btn.bmp"    TABORDER(4)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+BUTTON  b_excl(638, 3, 658, 23)  TP_PUSH|IMAGE|AL_STRETCH      COLOR(208, 232)  CUR(0)    "엑셀.bmp"    TABORDER(5)  ENABLE  &
+  VISIBLE  IMAGE  HOVER  HINTTYPE(IH_NONE)
+OBJECT  OBJ(5, 36, 696, 384)    "IB671210"  TABORDER(6)  IOORDER(5)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  CHG_BTN(589, 3, 637, 23)  '차트'  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(208, 186)  CUR(0)    "3BTN.bmp"    TABORDER(7)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+BUTTON  BUTTON1(552, 3, 588, 23)  '상세'  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(208, 186)  CUR(0)    "2BTN.bmp"    TABORDER(8)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONSEND_AW_
+SCREEN.OnSend = False
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(jscd)
+_AW_ONCHANGE_AW_
+If Len(jscd.Data) <> 12 Then
+	jscd.Clear
+End If
+
+Dim hman
+cgname.Data = SCREEN.GetName (105, jscd.Data, 0)
+jscd.Trigger "jscd", True
+jscd.Trigger "cgcd", True
+OBJ.send
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON0)
+_AW_ONCLICK_AW_
+Dim retn
+retn = SCREEN.GetCode(105, "jscd", "cgname", 1 )
+If retn <> True Then
+       Exit Sub
+End If
+
+jscd.Trigger "jscd", True
+jscd.Trigger "cgcd", True
+OBJ.Send
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(DGUB)
+_AW_ONCHANGE_AW_
+OBJ.Send
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(b_quri)
+_AW_ONCLICK_AW_
+If Len(jscd.Data) <> 12 Then
+	jscd.Clear
+End If
+OBJ.Send
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(b_excl)
+_AW_ONCLICK_AW_
+SCREEN.Object("OBJ.GRID").Excel True,True,""
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(CHG_BTN)
+_AW_ONCLICK_AW_
+If Len(jscd.Data) <> 12 Then
+	jscd.Clear
+End If
+
+If CHG_BTN.Text = "차트" Then
+	CHG_BTN.Text = "데이터"
+	OBJ.SetObject "IB671220"
+	b_excl.Enable = False
+Else
+	CHG_BTN.Text = "차트"
+	OBJ.SetObject "IB671210"
+	b_excl.Enable = True
+End If
+
+OBJ.Send
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON1)
+_AW_ONCLICK_AW_
+If Len(jscd.Data) <> 12 Then
+	jscd.Clear
+End If
+
+Dim menu, item, codx
+
+codx = Mid(jscd.Data, 4, 5) & "0"
+menu = "주식현재가|1" &vbTab& "주식관련사채 매도주문|2" &vbTab&_
+		"주식관련사채 매수주문|3" &vbTab& "기업분석|4"
+
+item = SCREEN.PopupMenu (menu, "")
+Select Case item
+	Case "1"
+		SCREEN.CreateWindow 1, "IB201400 /p99 /d /t", "1301" &vbTab& codx
+	Case "2"
+		'SCREEN.CreateWindow 1, "IB670100 /p99 /d /t", "jscd" &vbTab& jscd.Data &vbLf& "jm_gubn" &vbTab& "1"
+		SCREEN.ChangeMap "IB670100"
+	Case "3"
+		'SCREEN.CreateWindow 1, "IB670100 /p99 /d /t", "jscd" &vbTab& jscd.Data &vbLf& "jm_gubn" &vbTab& "2"
+		SCREEN.ChangeMap "IB670100"
+	Case "4"
+		SCREEN.CreateWindow 1, "IB202300 /p99 /d /t", "1301" &vbTab& codx
+End Select
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

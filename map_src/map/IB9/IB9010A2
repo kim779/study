@@ -1,0 +1,350 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB9010A2)
+MAPSIZE(477, 484)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(ENCODE|CR2TAB)
+TITLE("고객CDD정보입력")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pibopbxq")
+MAPTYPE(FIXED)
+HEADER(LEDGER)
+TRXH("11CSAMCT008")
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL(-2, 0, 486, 280)  LIMAGE(0)  LINEW(3)  LINETYPE(4)  LINECOLOR(64)      COLOR(66, 67)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL5(20, 125, 47, 145)  '직업'  AL_LEFT  CUR(0)      COLOR(64, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+COMBO  COMBO0(49, 125, 298, 145)  TP_SUNKEN  LEN(2)  COUNT(25)  VCOUNT(25)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_MIXED|EDIT_INPUT|FA_SKIP    COLOR(68, 69)  CUR(0)  DISPLAY("선택하세요", "일반회사원", "변호사(급여소득자)", "회계사(급여소득자)", "세무사(급여소득자)", "부동산중계인(급여소득자)", "투자자문가(자영업자)", "기타 급여소득을 받는 전문직 종사자", "일반자영업자", "변호사(자영업자)", "회계사(자영업자)", "세무사(자영업자)", "부동산중계인(자영업자)", "투자자문가(자영업자)", "기타 자영업을 영위하는 전문직 종사자", "공무원", "연금생활자", "학생", "주부", "카지노사업자,대부업자,환전상(EDD대상)", "고가의 귀금속판매상(EDD대상)", "가상통화업자(EDD대상)", "일반 자영업자 - 경매사(농수축산물 경매사), 골동품 및 예술품 판매업", "일반 자영업자 - 현금 집중거래 사업자", "일반 자영업자 - 부패위험이 높은 사업자(건설업 관련 사업자)")  DATA("00", "10", "21", "22", "23", "24", "25", "26", "30", "41", "42", "43", "44", "45", "46", "50", "61", "62", "63", "71", "72", "73", "74", "75", "77")    TABORDER(1)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL115(-2, 453, 486, 479)  LIMAGE(0)  LINEW(3)  LINETYPE(4)  LINECOLOR(64)      COLOR(34, 232)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL116(16, 458, 30, 472)    |IMAGE|AL_STRETCH    COLOR(34, 232)  CUR(0)    "알림_ic.bmp"  ENABLE  &
+  VISIBLE  IMAGE  HINTTYPE(IH_NONE)
+PANEL  GUIDE(34, 458, 477, 474)        COLOR(34, 130)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  send_btn(370, 250, 420, 270)  '확인'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, BOLD)  FOCUS  COLOR(208, 186)  CUR(0)    "6BTN_조회.BMP"    TABORDER(7)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+BUTTON  close(423, 250, 473, 270)  '닫기'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, BOLD)  FOCUS  COLOR(208, 186)  CUR(0)    "4BTN.bmp"    TABORDER(8)  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+EDIT  in(541, 184, 603, 203)  LEN(5)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("00001")          TABORDER(9)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  out(541, 274, 592, 297)  LEN(5)  IO_NUM|AL_CENTER|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(17)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  inout(541, 241, 607, 267)  LEN(211)  IO_MIXED|AL_CENTER|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(16)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL2(7, 130, 16, 139)    |IMAGE|AL_CENTER    COLOR(208, 232)  CUR(0)    "텍스트화살표_하단.BMP"  ENABLE  &
+  VISIBLE  TRANSPARENT  IMAGE  HINTTYPE(IH_NONE)
+PANEL  PANEL97(-2, 280, 486, 453)  LIMAGE(0)  LINEW(3)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  Rmnno(632, 299, 731, 319)  LEN(13)  IO_NUM|AL_LEFT|    COLOR(68, 69)  CUR(0)            EDITFORMAT("999999-9999999")  TABORDER(0)  IOORDER(18)  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL13(541, 299, 630, 319)  '실명번호'        COLOR(96, 130)  CUR(0)    AL_CENTER    ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  Rmn(98, 288, 478, 308)  LEN(40)  IO_MIXED|AL_LEFT|    COLOR(68, 69)  CUR(0)            TABORDER(0)  IOORDER(19)  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  zip(98, 368, 478, 388)  LEN(6)  IO_NUM|AL_LEFT|    COLOR(68, 69)  CUR(0)            EDITFORMAT("999-999")  TABORDER(0)  IOORDER(30)  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  addr1(98, 388, 285, 408)  LEN(100)  IO_MIXED|AL_LEFT|    COLOR(77, 69)  CUR(0)            TABORDER(0)  IOORDER(31)  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  addr2(285, 388, 478, 408)  LEN(100)  IO_MIXED|AL_LEFT|    COLOR(77, 69)  CUR(0)            TABORDER(0)  IOORDER(32)  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL0(9, 388, 98, 408)  '주    소'        COLOR(96, 130)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL4(9, 328, 98, 348)  '전화번호/내선'        COLOR(96, 130)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  phone(98, 328, 200, 348)  LEN(14)  IO_NUM|AL_LEFT||FA_SKIP    COLOR(68, 69)  CUR(0)            TABORDER(0)  IOORDER(27)  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  home_in(196, 328, 478, 348)  LEN(4)  IO_NUM|AL_LEFT|    COLOR(68, 69)  CUR(0)            TABORDER(0)  IOORDER(28)  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL5(9, 308, 98, 328)  '휴 대 폰'        COLOR(96, 130)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  HP(98, 308, 478, 328)  LEN(14)  IO_NUM|AL_LEFT||FA_SKIP    COLOR(77, 69)  CUR(0)            TABORDER(0)  IOORDER(23)  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL6(9, 348, 98, 368)  '이 메 일'        COLOR(96, 130)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  email(98, 348, 478, 368)  LEN(100)  IO_MIXED|AL_LEFT|    COLOR(77, 69)  CUR(0)            TABORDER(0)  IOORDER(29)  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL7(9, 428, 98, 448)  '고객분류'        COLOR(96, 130)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  cust_type(98, 428, 478, 448)  LEN(40)  IO_MIXED|AL_LEFT|    COLOR(77, 69)  CUR(0)            TABORDER(0)  IOORDER(34)  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  nationname(98, 408, 478, 428)  LEN(40)  IO_MIXED|AL_LEFT|    COLOR(68, 69)  CUR(0)            TABORDER(0)  IOORDER(33)  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL8(9, 408, 98, 428)  '국    적'        COLOR(96, 130)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL1(188, 328, 197, 348)  '/'  AL_LEFT  CUR(0)      COLOR(68, 69)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL10(9, 288, 98, 308)  '성    명'        COLOR(96, 130)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  EDIT0(541, 205, 613, 226)  LEN(4)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("0000")          TABORDER(10)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL12(9, 368, 98, 388)  '우편번호'        COLOR(96, 130)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  hp1(541, 99, 577, 118)  LEN(4)  IO_NUM|AL_CENTER|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(20)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  hp2(542, 124, 578, 143)  LEN(4)  IO_NUM|AL_CENTER|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(21)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  hp3(541, 154, 577, 173)  LEN(4)  IO_NUM|AL_CENTER|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(22)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  p1(542, 69, 578, 88)  LEN(4)  IO_NUM|AL_CENTER|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(24)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  p2(541, 44, 577, 63)  LEN(4)  IO_NUM|AL_CENTER|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(25)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  p3(541, 19, 577, 38)  LEN(4)  IO_NUM|AL_CENTER|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(26)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL3(8, 7, 475, 116)        COLOR(96, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL14(16, 17, 30, 31)    |IMAGE|AL_STRETCH    COLOR(208, 232)  CUR(0)    "알림_ic.bmp"  ENABLE  &
+  VISIBLE  TRANSPARENT  IMAGE  HINTTYPE(IH_NONE)
+PANEL  GUIDE2(31, 12, 444, 36)  '특정금융거래정보의 보고 및 이용 등에 관한 법률에 의하여 당사는'        COLOR(228, 209)  CUR(0)    AL_LEFT  FONT("굴림", 9, BOLD)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+PANEL  PANEL15(31, 31, 401, 55)  '고객의 신원정보를 확인하도록 의무화하고 있습니다.'        COLOR(228, 209)  CUR(0)    AL_LEFT  FONT("굴림", 9, BOLD)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+PANEL  PANEL16(31, 50, 447, 74)  '이에 은행에서 계좌를 개설하신 고객께서는 아래사항를 입력하셔야'        COLOR(228, 209)  CUR(0)    AL_LEFT  FONT("굴림", 9, BOLD)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+PANEL  PANEL17(31, 69, 447, 93)  'HTS 사용이 가능합니다.'        COLOR(228, 209)  CUR(0)    AL_LEFT  FONT("굴림", 9, BOLD)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+PANEL  PANEL18(31, 90, 447, 114)  '(아래사항을 선택하신 후 확인버튼을 누르면 [닫기]버튼이 활성화 됩니다.)'        COLOR(228, 95)  CUR(0)    AL_LEFT  FONT("굴림", 9, NORMAL)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  RealRmn(115, 200, 215, 220)  LEN(40)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_SUNKEN          TABORDER(4)  IOORDER(7)  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  RealRmk(640, 500, 690, 520)  LEN(100)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_SUNKEN          TABORDER(11)  IOORDER(10)  &
+  VISIBLE  HINTTYPE(IH_NONE)
+COMBO  RealNtltCntryCode_(115, 250, 265, 270)  TP_SUNKEN  LEN(3)  COUNT(252)  VCOUNT(252)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(68, 69)  CUR(0)  DISPLAY("　", "대한민국", "미국", "영국", "일본", "독일", "프랑스", "중화인민공화국", "중화민국", "캐나다", "홍콩", "스위스", "오스트리아", "필리핀", "네덜란드", "덴마크", "뉴질랜드", "인도", "오스트레일리아", "말레이시아", "아르헨티나", "스웨덴", "싱가포르", "룩셈부르크", "아일랜드", "방글라데시", "파키스탄", "인도네시아", "타이", "튀니지", "벨기에", "노르웨이", "터키", "쿠웨이트", "기타", "브라질", "체코", "폴란드", "칠레", "핀란드", "헝가리", "그리스", "포르투갈", "남아프리카공화국", "이탈리아", "스페인", "멕시코", "스리랑카", "리히텐슈타인", "파나마", "버뮤다", "바하마", "페루", "파라과이", "이스라엘", "네팔", "아랍에미리트", "코트디부아르", "사우디아라비아", "푸에르토리코", "바레인", "건지", "채널아일랜드", "미국령버진아일랜드", "요르단", "알제리", "나이지리아", "러시아", "저지", "브루나이", "베트남", "라이베리아", "국제기구", "케이맨제도", "불가리아", "루마니아", "피지", "이집트", "몽골", "영국령버진아일랜드", "네덜란드령안틸레스", "맨섬", "쿡제도", "키프로스", "지브롤터", "몰타", "모리셔스", "세인트빈센트그레나딘", "슬로베니아", "우즈베키스탄", "모나코", "마셜제도", "말레이지아라부안(미승인)", "대한민국국민인해외영주권자", "아프가니스탄", "알바니아", "남극", "미얀마", "아메리칸사모아", "안도라", "앙골라", "부룬디", "앤티가바부다", "아제르바이잔", "아르메니아", "벨라루스", "바베이도스", "부탄", "볼리비아", "캄보디아", "보스니아헤르체고비나", "보츠와나", "부베섬", "카메룬", "벨리즈", "영국령인도양지역", "솔로몬제도", "카보베르데", "중앙아프리카공화국", "차드", "크리스마스섬", "코코스제도", "콜롬비아", "코모로", "마요트", "콩고공화국", "콩고민주공화국", "코스타리카", "크로아티아", "쿠바", "유럽연합", "베냉", "도미니카", "도미니카공화국", "에콰도르", "엘살바도르", "적도기니", "에티오피아", "에리트레아", "에스토니아", "페로제도", "포클랜드제도", "사우스조지아사우스샌드위치제도", "올란드제도", "프랑스령기아나", "프랑스령폴리네시아", "프랑스령남부지역", "지부티", "가봉", "그루지야", "감비아", "팔레스타인", "가나", "키리바시", "그린란드", "그레나다", "과들루프", "괌", "과테말라", "기니", "가이아나", "아이티", "허드맥도널드제도", "바티칸시국", "온두라스", "아이슬란드", "이란", "이라크", "자메이카", "카자흐스탄", "케냐", "조선민주주의인민공화국", "키르기스스탄", "라오스", "레바논", "레소토", "라트비아", "리비아", "리투아니아", "마카오", "마다가스카르", "말라위", "몰디브", "말리", "마르티니크", "모리타니", "몰도바", "몬테네그로", "몬트세랫", "모로코", "모잠비크", "오만", "나미비아", "나우루", "아루바", "누벨칼레도니", "바누아투", "니카라과", "니제르", "니우에", "노퍽섬", "북마리아나제도", "미국령군소제도", "미크로네시아연방", "팔라우", "파푸아뉴기니", "핏케언섬", "기니비사우", "동티모르", "카타르", "레위니옹", "르완다", "세인트헬레나", "세인트키츠네비스", "앵귈라", "세인트루시아", "생피에르미클롱", "산마리노", "상투메프린시페", "세네갈", "세르비아", "세이셸", "시에라리온", "슬로바키아", "소말리아", "짐바브웨", "서사하라", "수단", "수리남", "스발바르얀마옌", "스와질란드", "시리아", "타지키스탄", "토고", "토켈라우제도", "통가", "트리니다드토바고", "투르크메니스탄", "터크스케이커스제도", "투발루", "우간다", "우크라이나", "마케도니아공화국", "탄자니아", "부르키나파소", "우루과이", "베네수엘라", "월리스푸투나", "사모아", "예멘", "세르비아몬테네그로", "잠비아")  DATA("999", "000", "001", "002", "003", "004", "005", "006", "007", "008", "009", "010", "011", "012", "013", "014", "015", "016", "017", "018", "019", "020", "021", "022", "023", "024", "025", "026", "027", "028", "029", "030", "031", "032", "033", "034", "035", "036", "037", "038", "039", "040", "041", "042", "043", "044", "045", "046", "047", "048", "049", "050", "051", "052", "053", "054", "055", "056", "057", "058", "059", "060", "061", "062", "063", "064", "065", "066", "067", "068", "069", "070", "071", "072", "073", "074", "075", "076", "077", "078", "079", "080", "081", "082", "083", "084", "085", "086", "087", "088", "089", "090", "091", "099", "101", "102", "103", "104", "105", "106", "107", "108", "109", "110", "111", "112", "113", "114", "115", "116", "117", "118", "119", "120", "121", "122", "123", "132", "140", "148", "162", "166", "170", "174", "175", "178", "180", "188", "191", "192", "200", "204", "212", "214", "218", "222", "226", "231", "232", "233", "234", "238", "239", "248", "254", "258", "260", "262", "266", "268", "270", "275", "288", "296", "304", "308", "312", "316", "320", "324", "328", "332", "334", "336", "340", "352", "364", "368", "388", "398", "404", "408", "417", "418", "422", "426", "428", "434", "440", "446", "450", "454", "462", "466", "474", "478", "498", "499", "500", "504", "508", "512", "516", "520", "533", "540", "548", "558", "562", "570", "574", "580", "581", "583", "585", "598", "612", "624", "626", "634", "638", "646", "654", "659", "660", "662", "666", "674", "678", "686", "688", "690", "694", "703", "706", "716", "732", "736", "740", "744", "748", "760", "762", "768", "772", "776", "780", "795", "796", "798", "800", "804", "807", "834", "854", "858", "862", "876", "882", "887", "891", "894")    TABORDER(6)  IOORDER(5)  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL94(20, 175, 145, 195)  '실소유자 입력사항'  AL_LEFT  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(240, 232)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL95(20, 200, 50, 220)  '성명'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL97(20, 250, 105, 270)  '국적(외국인만)'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  RADIO0(166, 150, 221, 170)  '예'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(GROUP0)      COLOR(208, 232)  CUR(0)      TABORDER(2)  ENABLE  &
+  VISIBLE  CHECKED  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL99(20, 150, 123, 170)  '실소유자 본인여부'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  RADIO1(238, 150, 293, 170)  '아니오'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(GROUP0)      COLOR(208, 232)  CUR(0)      TABORDER(3)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL54(541, 340, 641, 360)  '실소유자여부'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  RealOwnPsnYn(641, 341, 691, 361)  LEN(1)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_SUNKEN          TABORDER(12)  IOORDER(4)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL89(541, 420, 641, 440)  '실소유자국적코드'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL90(541, 440, 641, 460)  '실소유자 성명'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  RealRmnno(115, 225, 215, 245)  LEN(13)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_SUNKEN          TABORDER(5)  IOORDER(8)  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL91(541, 460, 641, 480)  '실소유자 주민번호(생년월일)'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  RealRank(641, 480, 691, 500)  LEN(1)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(13)  IOORDER(9)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL92(541, 480, 641, 500)  '법인 실소유자 확인단계'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL93(541, 500, 641, 520)  '실소유자 비고'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL19(7, 155, 16, 164)    |IMAGE|AL_CENTER    COLOR(208, 232)  CUR(0)    "텍스트화살표_하단.BMP"  ENABLE  &
+  VISIBLE  TRANSPARENT  IMAGE  HINTTYPE(IH_NONE)
+GROUP  GROUP0(540, 530, 740, 565)  'Group'        COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL20(7, 180, 16, 189)    |IMAGE|AL_CENTER    COLOR(208, 232)  CUR(0)    "텍스트화살표_하단.BMP"  ENABLE  &
+  VISIBLE  TRANSPARENT  IMAGE  HINTTYPE(IH_NONE)
+LABEL  LABEL0(20, 225, 95, 245)  '실명확인번호'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  RealNtltCntryCode(641, 420, 691, 440)  LEN(3)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(14)  IOORDER(6)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL103(220, 200, 475, 220)  '*실소유자가 외국인이면 국적선택하고 실명'  AL_LEFT  CUR(0)      COLOR(208, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL2(225, 220, 480, 240)  '확인번호 난에 생년월일(ex.19990101)을 입력'  AL_LEFT  CUR(0)      COLOR(208, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+PANEL  PANEL21(486, 0, 496, 489)        COLOR(64, 67)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL24(0, 479, 492, 489)        COLOR(64, 232)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL3(318, 125, 355, 145)  '영문명'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+PANEL  PANEL22(305, 130, 314, 139)    |IMAGE|AL_CENTER    COLOR(208, 232)  CUR(0)    "텍스트화살표_하단.BMP"  ENABLE  &
+  VISIBLE  TRANSPARENT  IMAGE  HINTTYPE(IH_NONE)
+LABEL  LABEL4(318, 150, 369, 170)  '상품유형'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+PANEL  PANEL23(305, 155, 314, 164)    |IMAGE|AL_CENTER    COLOR(208, 232)  CUR(0)    "텍스트화살표_하단.BMP"  ENABLE  &
+  VISIBLE  TRANSPARENT  IMAGE  HINTTYPE(IH_NONE)
+EDIT  EngNm(369, 125, 475, 145)  LEN(40)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_SUNKEN          TABORDER(15)  IOORDER(11)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+COMBO  COMBO1(370, 150, 475, 170)  TP_SUNKEN  LEN(2)  COUNT(7)  VCOUNT(7)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_MIXED|EDIT_INPUT|FA_SKIP    COLOR(68, 69)  CUR(0)  DISPLAY("종합계좌", "위탁상품", "저축상품", "선물옵션상품", "투신상품", "일반퇴직연금", "일반신탁")  DATA("00", "01", "02", "03", "04", "06", "07")    TABORDER(16)  IOORDER(12)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+COMBO  COMBO2(370, 174, 475, 194)  TP_SUNKEN  LEN(2)  COUNT(0)  VCOUNT(0)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_MIXED|EDIT_INPUT|FA_SKIP    COLOR(68, 69)  CUR(0)    TABORDER(17)  IOORDER(14)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  PdptnTp(643, 180, 715, 201)  LEN(2)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("0000")          TABORDER(18)  IOORDER(13)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  PrdtDtlCode(645, 205, 717, 226)  LEN(2)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("0000")          TABORDER(19)  IOORDER(15)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Sub send_f()
+	LEDGER.Fkey = "C"
+	EDIT0.Data = COMBO0.Data
+	PdptnTp.Data = COMBO1.Data
+	PrdtDtlCode.Data = COMBO2.Data
+	SCREEN.Send 0
+End Sub
+
+Sub send_c()
+	LEDGER.Fkey = "5"
+	EDIT0.Data = COMBO0.Data
+	PdptnTp.Data = COMBO1.Data
+	PrdtDtlCode.Data = COMBO2.Data
+	SCREEN.Send 0
+End Sub
+
+Sub Set_Combo()
+	Dim items
+	COMBO2.Clear
+	If COMBO1.Data = "00" Then
+		items = vbTab & "00종합계좌"
+		COMBO2.SetItems(items)
+	ElseIf COMBO1.Data = "01" Then
+		items = vbTab & "01종합매매계좌" & vbTab & "05rp전용계좌" & vbTab & "06외화증권전용계좌" & vbTab & "09MMF연계RP전용계좌" &_
+				vbTab & "16채권매도대행(국고채)" & vbTab & "17ELW전용" & vbTab & "19RP투자전용CMA" & vbTab & "24코넥스 소액투자전용계좌"
+		COMBO2.SetItems(items)
+	ElseIf COMBO1.Data = "02" Then
+		items = vbTab & "37비과세종합저축"
+		COMBO2.SetItems(items)
+	ElseIf COMBO1.Data = "03" Then
+		items = vbTab & "51KSE계좌" & vbTab & "55해외선물(온라인)" & vbTab & "56FX마진" & vbTab & "57해외선물(오프라인)"
+		COMBO2.SetItems(items)
+	ElseIf COMBO1.Data = "04" Then
+		items = vbTab & "61투신상품" & vbTab & "62비과세종합저축" & vbTab & "67연금저축" & vbTab & "73MMF" &_
+				vbTab & "77신연금저축" & vbTab & "80해외뮤추얼펀드" & vbTab & "84벤처투자신탁" & vbTab & "89투자신탁통장"
+		COMBO2.SetItems(items)
+	ElseIf COMBO1.Data = "06" Then
+		items = vbTab & "A0퇴직연금일반"
+		COMBO2.SetItems(items)
+	ElseIf COMBO1.Data = "07" Then
+		items = vbTab & "B0신탁일반" & vbTab & "B1금전신탁" & vbTab & "B2재산신탁"
+		COMBO2.SetItems(items)
+	End If
+End Sub
+
+_AW_ONSTART_AW_
+Call Set_Combo()
+Call send_f()
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+If RADIO0.Checked = True Then
+	RealOwnPsnYn.Data = 1
+ElseIf RADIO1.Checked = True Then
+	RealOwnPsnYn.Data = 0
+End If
+
+If RealNtltCntryCode_.Data <> "999" Then
+	RealNtltCntryCode.Data = RealNtltCntryCode_.Data
+Else
+	RealNtltCntryCode.Data = ""
+End If
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+If Trim(home_in.data) = "" Then
+	LABEL1.Visible False
+Else
+	LABEL1.Visible True
+End If
+
+If Trim(hp1.data) <> "" Then
+	HP.Data = Trim(hp1.data) & "-" & Trim(hp2.data) & "-" & "****"
+End If
+
+If Trim(p1.data) <> "" Then
+	phone.Data = Trim(p1.data) & "-" & Trim(p2.data) & "-" & "****"
+End If
+
+_AW_ONENDSUB_AW_
+_AW_ONTIMER_AW_
+Call send_f()
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(send_btn)
+_AW_ONCLICK_AW_
+close.Enable = True
+
+If Trim(COMBO0.Data) = "00" Then
+	MsgBox "직업을 선택하세요.", ,"IBK투자증권"
+	Exit Sub
+End If
+
+
+Call send_c()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(close)
+_AW_ONCLICK_AW_
+SCREEN.CloseWindow
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(Rmnno)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(zip)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(RADIO0)
+_AW_ONCLICK_AW_
+If RADIO0.Checked = True Then
+	RealRmn.Enable = False
+	RealNtltCntryCode_.Enable = False
+	RealRmnno.Enable = False
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(RADIO1)
+_AW_ONCLICK_AW_
+If RADIO1.Checked = True Then
+	RealRmn.Enable = True
+	RealNtltCntryCode_.Enable = True
+	RealRmnno.Enable = True
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(COMBO1)
+_AW_ONCHANGE_AW_
+Call Set_Combo()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

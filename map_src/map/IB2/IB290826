@@ -1,0 +1,97 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB290826)
+MAPSIZE(20, 68)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("풋옵션")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(FMS|FLASH)
+TITLE("풋옵션")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pooppoop")
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+OUT  40021(89, 25, 175, 40)  LEN(12)  IO_NUM|AL_CENTER||FA_FLASH    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  40301(88, 5, 188, 23)  LEN(8)  IO_ALPHA|EDIT_INPUT|FA_SEND|SA_ALL    COLOR(68, 63)  CUR(0)  TP_NONE  INIT("3")          TABORDER(1)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  BUTTON0(0, 0, 68, 20)  TP_PUSH      AL_CENTER    FOCUS  COLOR(68, 69)  CUR(10)      TABORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  41023(0, 0, 68, 20)  LEN(12)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT|FA_CORGB|SA_COSUP    COLOR(68, 69)  CUR(0)            IFRGB(94, 95)  TABORDER(0)  IOORDER(3)  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BOX  BOX0(0, 0, 69, 21)    COLOR(75, 75)  LINEW(1)  BX_LINE    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONSTART_AW_
+'SCREEN.Trigger False
+SCREEN.Send 0
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+' 2908 화면 크기에 따른 시장 구분자 별 입력값 세팅
+
+If SCREEN.GetMapName(1) = "IB290800" Or SCREEN.GetMapName(1) = "IB290840" Then
+	Select Case Left(Trim(SCREEN.Object("parent.LABEL4").data) , 1)
+	Case "콜"	' KP200 옵션
+		S40301.Data = "3"
+	Case "미"	' KP200 미니 옵션
+		S40301.Data = "9"
+	Case "W"	' KP200 위클리 옵션 (목)
+		S40301.Data = "7"
+	Case "M"	' KP200 위클리 옵션 (월)
+		S40301.Data = "B"
+	Case Else
+		S40301.Data = "3"
+	End Select
+
+ElseIf  SCREEN.GetMapName(1) = "IB290830" Or SCREEN.GetMapName(1) = "IB290850" Then
+	Select Case Left(Trim(SCREEN.Object("parent.TABLE28").GetHead(1)) , 1)
+	Case "콜"	' KP200 옵션
+		S40301.Data = "3"
+	Case "미"	' KP200 미니 옵션
+		S40301.Data = "9"
+	Case "W"	' KP200 위클리 옵션 (목)
+		S40301.Data = "7"
+	Case "M"	' KP200 위클리 옵션 (월)
+		S40301.Data = "B"
+	Case Else
+		S40301.Data = "3"
+	End Select
+
+End If
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(BUTTON0)
+_AW_ONCLICK_AW_
+SCREEN.CreateWindow 1, "IB400200 /t /s /p5 /d", "40301" & vbTab & S40021.Data & vbLf
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(41023)
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

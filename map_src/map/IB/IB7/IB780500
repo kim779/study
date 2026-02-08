@@ -1,0 +1,122 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB780500)
+MAPSIZE(679, 790)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("굴림", 9, NORMAL)
+TITLE("[7805]해외증시 브리핑")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL0(-5, -5, 800, 685)        COLOR(42948400, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  CHECK0(635, 662, 790, 679)  '오늘은 이창을 열지 않음'  TP_CHECK|EDIT_NOP          COLOR(208, 192)  CUR(10)      TABORDER(1)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  CDAT(835, 645, 955, 664)  LEN(8)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP|FA_DATE    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(2)  IOORDER(1)  &
+  HINTTYPE(IH_NONE)
+BROWSER  BROWSER0(0, 0, 790, 655)  EDIT_NOP    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Sub Set_Ini()
+	Dim Today, Check
+
+	If SCREEN.CreateObject("Info") Then
+
+	 	Today = INFO.PopData("", "NOTICECOOKIE.ini", "7805", "TODAY")
+
+	 	If Today = "0" Then
+	 		INFO.PushData "", "NOTICECOOKIE.INI", "7805", "TODAY", CDAT.Data
+			INFO.PushData "", "NOTICECOOKIE.ini", "7805", "FIRST", "1"
+	 	Else
+	 		INFO.PushData "", "NOTICECOOKIE.INI", "7805", "TODAY", CDAT.Data
+	 	End If
+
+	 	Check = INFO.PopData("", "NOTICECOOKIE.ini", "7805", "FIRST")
+
+	 	If Check = "0" Then
+	 		CHECK0.Checked = True
+			INFO.PushData "", "NOTICECOOKIE.ini", "7805", "FIRST", "0"
+	 	Else
+	 		CHECK0.Checked = False
+			INFO.PushData "", "NOTICECOOKIE.ini", "7805", "FIRST", "1"
+	 	End If
+	End If
+
+End Sub
+
+_AW_ONSTART_AW_
+Call Set_Ini()
+'BROWSER0.Navigate "http://www.ibks.com/worldstocks/ws_list.do?popup=Y"
+
+Dim shost
+shost = SYSTEM.Host
+
+Dim myDay, myHour, myMinute
+myDay = Date
+myTime = Time
+
+If Mid(shost,1,6) = "172.17" Then
+	BROWSER0.Navigate "https://www.ibks.com/files/worldstocks/ws_list.html" & "?" & Mid(myDay, 1, 4) & Mid(myDay, 6, 2) & Mid(myDay, 9, 2) & Hour(myTime) & Minute(myTime)
+Else
+	BROWSER0.Navigate "http://download.ibks.com/worldstocks/ws_list.html" & "?" & Mid(myDay, 1, 4) & Mid(myDay, 6, 2) & Mid(myDay, 9, 2) & Hour(myTime) & Minute(myTime)
+End If
+'BROWSER0.Navigate "http://download.ibks.com/worldstocks/ws_list.html" & "?" & Mid(myDay, 1, 4) & Mid(myDay, 6, 2) & Mid(myDay, 9, 2) & Hour(myTime) & Minute(myTime)
+'
+'    -    CDN서버 url : http://download.ibks.com/worldstocks/ws_list.html
+'    -    업무망  url : https://www.ibks.com/files/worldstocks/ws_lit.html
+'
+'MsgBox(SYSTEM.Host)
+'BROWSER0.Navigate "https://www.ibks.com/files/worldstocks/ws_lit.html" & "?" & Mid(myDay, 1, 4) & Mid(myDay, 6, 2) & Mid(myDay, 9, 2) & Hour(myTime) & Minute(myTime)
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(CHECK0)
+_AW_ONCLICK_AW_
+Dim Today
+
+'FIRST가 1이면 체크안된거고, 0이면 체크된거임.
+'TODAY가 없으면 FIRST를 1로 세팅한다.
+
+If SCREEN.CreateObject("Info") Then
+
+ 	Today = INFO.PopData("", "NOTICECOOKIE.ini", "7805", "TODAY")
+
+ 	If Today = "0" Then
+ 		INFO.PushData "", "NOTICECOOKIE.INI", "7805", "TODAY", CDAT.Data
+		INFO.PushData "", "NOTICECOOKIE.ini", "7805", "FIRST", "1"
+ 	Else
+ 		INFO.PushData "", "NOTICECOOKIE.INI", "7805", "TODAY", CDAT.Data
+		INFO.PushData "", "NOTICECOOKIE.ini", "7805", "FIRST", "0"
+ 	End If
+
+End If
+
+SCREEN.CloseWindow
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

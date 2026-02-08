@@ -1,0 +1,558 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB999988)
+MAPSIZE(434, 716)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("굴림", 9, NORMAL)
+OPTIONS(FMS|FLASH)
+TITLE("IB999988 TEST")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pooppoop")
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+LABEL  LABEL0(0, 0, 1620, 450)  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL4(40, 30, 220, 50)  '[필수]주식 자동주문 이용동의문 '  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  check_pdf1(225, 30, 265, 50)  '확인'  TP_CHECK|EDIT_NOP        FONT("굴림", 9, NORMAL)  COLOR(208, 130)  CUR(0)      TABORDER(1)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+GRID  VIEWGRID(45, 90, 572, 266)  VISIBLEROW(11)  CELLH(18)  MATRIX(200, 8)  FIX(0)  MAINCOLOR(7, 0)  LINECOLOR(75)  FOCUSCOLOR(78)  FOCUSKIND(4)    FONT("굴림체", 9, NORMAL)  ROWC(68, 77)  |SELALWAYS|FLEXIBLE|VSCROLL|HSCROLL|NO3D|RROW|XHLINE|PAGE|GRFTEXT    &
+	COLINFO("chk")  LEN(1)  WIDTH(30)  HEAD("실행")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_NOP  |FA_SKIP    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_IMAGE  COLUMN_VISIBLE  COLUMN_SORT  IBUTTON  BUTTONIMG("axScrRight.bmp")    HBUTTON  HBUTTONIMG("")    &
+	COLINFO("col1")  LEN(1)  WIDTH(30)  HEAD("삭제")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_NOP  |FA_SKIP    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_IMAGE  COLUMN_VISIBLE  COLUMN_SORT  IBUTTON  BUTTONIMG("취소_BTN.BMP")    HBUTTON  HBUTTONIMG("")    &
+	COLINFO("col2")  LEN(6)  WIDTH(30)  HEAD("상세")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_NOP      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_IMAGE  COLUMN_VISIBLE  COLUMN_SORT  IBUTTON  BUTTONIMG("H_상세보기.BMP")    HBUTTON  HBUTTONIMG("")    &
+	COLINFO("Col0")  LEN(1)  WIDTH(54)  HEAD("체크상태")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_NUM|EDIT_OUTPUT  |FA_SKIP    COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("col3")  LEN(20)  WIDTH(60)  HEAD("등록번호")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("col4")  LEN(10)  WIDTH(60)  HEAD("처리상태")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("col5")  LEN(20)  WIDTH(150)  HEAD("종목코드")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("col6")  LEN(40)  WIDTH(150)  HEAD("종목명")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    TABORDER(2)  IOORDER(1)  ENABLE  &
+  VISIBLE
+
+LABEL  LABEL1(45, 60, 345, 85)  '실행쪽 컬럼 클릭시 이미지 변경'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  edServerMsg(525, 35, 625, 60)  LEN(10)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(3)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL2(380, 35, 520, 60)  '서버푸쉬메시지 발생시 -> '  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL3(525, 5, 710, 30)  '객체명 edServerMsg !!!'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+CONTROL  ctrl_webpop(580, 90, 680, 135)  |FA_PROTECT  "CX_Thtmlex"  "/w"  LEN(0)  EDIT_NOP    COLOR(192, 232)  TABORDER(0)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON0(585, 140, 640, 175)  TP_PUSH      AL_CENTER    FOCUS  COLOR(208, 232)  CUR(0)      TABORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  edcode(585, 205, 685, 225)  LEN(12)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(5)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON1(585, 230, 640, 265)  TP_PUSH      AL_CENTER    FOCUS  COLOR(208, 232)  CUR(0)      TABORDER(6)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  ed_jprc(45, 275, 135, 295)  LEN(9)  IO_NUM|EDIT_INPUT|FA_COMMA|FA_RIGHT|FA_SKIP|FA_XFLOAT  SPIN(1)    FONT("굴림체", 9, NORMAL)    COLOR(78, 130)  CUR(0)  TP_SUNKEN  INIT("0")          TABORDER(7)  IOORDER(5)  ENABLE  &
+  VISIBLE  HOVER  HINTTYPE(IH_NONE)
+BUTTON  BUTTON2(140, 270, 185, 305)  TP_PUSH      AL_CENTER    FOCUS  COLOR(208, 232)  CUR(0)      TABORDER(8)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+CONTROL  cx_log(10, 310, 85, 345)  |FA_PROTECT  "CX_log"  ""  LEN(0)  EDIT_NOP    COLOR(192, 232)  TABORDER(0)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON3(95, 310, 180, 355)  '복호화'  TP_PUSH      AL_CENTER    FOCUS  COLOR(208, 232)  CUR(0)      TABORDER(9)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+CONTROL  cx_upload(610, 410, 745, 470)  |FA_PROTECT  "CX_UPLOAD"  ""  LEN(0)  EDIT_NOP    COLOR(192, 130)  TABORDER(0)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON4(630, 285, 695, 325)  '파일업로드'  TP_PUSH      AL_CENTER    FOCUS  COLOR(208, 232)  CUR(0)      TABORDER(10)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON5(490, 285, 595, 425)  '디스플레이 정보'  TP_PUSH      AL_CENTER    FOCUS  COLOR(208, 232)  CUR(0)      TABORDER(11)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  lb_screenX(430, 290, 485, 310)  'Label'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL5(315, 290, 425, 310)  '해상도 X'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  lb_screenY(430, 313, 485, 333)  'Label'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL7(315, 313, 425, 333)  '해상도 Y'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  lb_DPIX(430, 335, 485, 355)  'Label'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL8(315, 336, 425, 356)  'DPI X'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  lb_DPIY(430, 359, 485, 379)  'Label'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL9(315, 359, 425, 379)  'DPI Y'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+CONTROL  CONTROL0(740, 50, 1120, 445)  |FA_PROTECT  "cx_image"  "/k1"  LEN(0)  EDIT_NOP    COLOR(192, 232)  TABORDER(0)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+CONTROL  CONTROL1(1150, 55, 1530, 450)  |FA_PROTECT  "cx_image"  "/k2"  LEN(0)  EDIT_NOP    COLOR(192, 232)  TABORDER(0)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL1(1265, 25, 1440, 45)  'GDI+'  TP_RAISED      COLOR(208, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON6(745, 10, 800, 45)  'GDI'  TP_PUSH      AL_CENTER    FOCUS  COLOR(208, 232)  CUR(0)      TABORDER(12)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON7(10, 375, 95, 420)  'serviceEX'  TP_PUSH      AL_CENTER    FOCUS  COLOR(208, 232)  CUR(0)      TABORDER(13)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+CONTROL  AN1A(105, 380, 245, 400)    "CX_Account"  "/w0"  LEN(11)  EDIT_INPUT    COLOR(68, 69)  TABORDER(14)  IOORDER(6)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  zpwd(105, 405, 161, 425)  LEN(8)  IO_MIXED|EDIT_INPUT|FA_PASSWD|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_SUNKEN          TABORDER(15)  IOORDER(7)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON8(10, 35, 30, 55)  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(132, 232)  CUR(0)    "APPLE.BMP"    TABORDER(16)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)  HELPTEXT("tooltip")HELPTEXT("tooltip")
+BUTTON  BUTTON9(170, 0, 225, 20)  TP_PUSH      AL_CENTER    FOCUS  COLOR(208, 232)  CUR(0)      TABORDER(17)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  lb_version(365, 60, 760, 85)  'NXT | IB100220 | 0619 | c_total'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  BUTTON10(375, 0, 440, 20)  'poop0090'  TP_PUSH      AL_CENTER    FOCUS  COLOR(208, 232)  CUR(0)      TABORDER(18)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON11(630, 35, 685, 55)  TP_PUSH      AL_CENTER    FOCUS  COLOR(208, 232)  CUR(0)      TABORDER(19)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+CONTROL  cxMarket(355, 20, 373, 40)  |FA_SKIP  "CX_MarketPicker"  "/k2/t/u1/d1"  LEN(12)  EDIT_NOP    COLOR(192, 232)  TABORDER(0)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON12(450, 0, 500, 35)  TP_PUSH      AL_CENTER    FOCUS  COLOR(208, 232)  CUR(0)      TABORDER(20)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+CONTROL  17413(585, 185, 711, 205)    "CX_Symbol"  "/a89/b91/c92/d69"  LEN(0)  EDIT_OUTPUT    COLOR(90, 130)  TABORDER(0)  IOORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  edMarketTrigger(325, 20, 357, 40)  LEN(6)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(21)  IOORDER(8)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL6(265, 20, 325, 40)  '거래소'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON13(235, 0, 290, 20)  '1777'  TP_PUSH      AL_CENTER    FOCUS  COLOR(208, 232)  CUR(0)      TABORDER(22)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  1777(95, 0, 115, 20)  LEN(1)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(23)  IOORDER(9)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  BUTTON14(0, 0, 80, 25)  'DEV 확인'  TP_PUSH      AL_CENTER    FOCUS  COLOR(208, 232)  CUR(0)      TABORDER(24)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  edMap(215, 285, 295, 305)  LEN(12)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(25)  IOORDER(10)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON15(215, 310, 290, 325)  '거래소 권한'  TP_PUSH      AL_CENTER    FOCUS  COLOR(208, 232)  CUR(0)      TABORDER(26)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Sub Test_gridDataSet()
+	VIEWGRID.InsertRow 0
+	VIEWGRID.SetGridCell 1, 4, "1"
+	VIEWGRID.SetGridCell 1, 5, "번호1"
+	VIEWGRID.SetGridCell 1, 6, "감시중"
+	VIEWGRID.SetGridCell 1, 7, "종목코드"
+	VIEWGRID.SetGridCell 1, 8, "종목명"
+
+
+	VIEWGRID.InsertRow 0
+	VIEWGRID.SetGridCell 1, 4, "1"
+	VIEWGRID.SetGridCell 1, 5, "번호2"
+	VIEWGRID.SetGridCell 1, 6, "감시전"
+	VIEWGRID.SetGridCell 1, 7, "종목코드"
+	VIEWGRID.SetGridCell 1, 8, "종목명"
+
+
+	VIEWGRID.InsertRow 0
+
+	VIEWGRID.SetGridCell 1, 4, "1"
+	VIEWGRID.SetGridCell 1, 5, "번호3"
+	VIEWGRID.SetGridCell 1, 6, "감시중"
+	VIEWGRID.SetGridCell 1, 7, "종목코드"
+	VIEWGRID.SetGridCell 1, 8, "종목명"
+End Sub
+
+Public Function cp_lpad(as_string, ai_count, as_filler)
+	Dim ls_str, li_cnt
+    '대상 String이 NULL이면 Filler로 채운 문자열 Return
+	If IsNull(as_string) Then
+		cp_lpad = String(ai_count, as_filler)
+	Else
+		ls_str = Trim(as_string) ' 공백 Trimming
+		SCREEN.CreateObject("DX_CSTRING")
+		DX_CSTRING.Text = ls_str
+		li_cnt = ai_count - DX_CSTRING.GetLength()
+		If li_cnt >= 0 Then
+			cp_lpad = String(li_cnt, as_filler) & ls_str
+		Else
+			cp_lpad = Right(ls_str, ai_count)
+		End If
+	End If
+End Function
+
+_AW_ONSTART_AW_
+cxMarket.MNum = SCREEN.GetMapName(1)
+
+VIEWGRID.LoadButtonImage "chk", "", "axScrRight.bmp", "axScrLeft.bmp"
+Test_gridDataSet()
+CONTROL0.SetImageFile "event01.bmp"
+CONTROL1.SetImageFile "event01.bmp"
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(check_pdf1)
+_AW_ONCLICK_AW_
+If check_pdf1.Checked = True Then
+	Dim url
+	url = "incometax.pdf"
+
+	Dim title, dmsg
+	title = "주식 자동주문 이용 동의문"
+
+	dmsg  = "ed_url"  & vbTab & Trim(url)   & vbLf &_
+	    	"ed_title" & vbTab & Trim(title) & vbLf
+
+	SCREEN.CreateWindow 2, "IB999987 /p5 /d", dmsg
+
+	If SYSTEM.Pop("9999GlobalVariable") <> "YES" Then
+		MsgBox Trim(title)& "에 동의를 안했음.", , "IBK투자증권"
+		check_pdf1.Checked = False
+		Exit Sub
+	Else
+		check_pdf1.Checked = True
+	End If
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(VIEWGRID)
+_AW_ONCLICK_AW_
+Dim msg
+If VIEWGRID.HitPos = 3 Then
+	If VIEWGRID.Column = 1 Then
+		If	VIEWGRID.GetGridCell(VIEWGRID.Row, 4) = "1" Then  '감시상태정보를 따로 컬럼에 저장하고 이미지컬럼과 동기화
+			VIEWGRID.DispButtonImage VIEWGRID.Row, VIEWGRID.Column, 3
+			VIEWGRID.SetGridCell VIEWGRID.Row, 4,  "2"
+		Else
+			VIEWGRID.DispButtonImage VIEWGRID.Row, VIEWGRID.Column, 2
+			VIEWGRID.SetGridCell VIEWGRID.Row, 4,  "1"
+		End If
+
+		Exit Sub
+	End If
+
+	If VIEWGRID.Column = 2 Then
+		msg = "이미지 위치 -> HTS 설치폴더\image\취소_BTN.BMP"
+		MsgBox msg
+		VIEWGRID.RemoveRow VIEWGRID.Row - 1
+		Exit Sub
+	End If
+
+	If VIEWGRID.Column = 3 Then
+		dmsg  = "o_regnum"  & vbTab & Trim(VIEWGRID.GetGridText(VIEWGRID.Row, 4))   & vbLf &_
+	    		"o_state"  & vbTab & Trim(VIEWGRID.GetGridText(VIEWGRID.Row, 5))   & vbLf &_
+	    		"o_code"  & vbTab & Trim(VIEWGRID.GetGridText(VIEWGRID.Row, 6))   & vbLf &_
+	    		"o_hnam"  & vbTab & Trim(VIEWGRID.GetGridText(VIEWGRID.Row, 7))   & vbLf &_
+	    		"o_gb"  & vbTab & "구분"   & vbLf &_
+	    		"o_jqty"  & vbTab & "9999"   & vbLf
+		SCREEN.CreateWindow 2, "IB999986 /p5 /d", dmsg
+		Exit Sub
+	End If
+
+
+End If
+_AW_ONENDSUB_AW_
+_AW_ONDBLCLK_AW_
+Dim s_code
+
+If VIEWGRID.HitPos = 3 Then
+
+	If Trim(VIEWGRID.GetGridCell (VIEWGRID.Row, c_code)) = "" Then
+		Exit Sub
+	End If
+
+	s_code = Trim(VIEWGRID.GetGridCell(VIEWGRID.Row, c_code))				'주문코드
+	ed_focod.data = s_code
+	ed_focod.Trigger "", True
+	Select Case Left(ed_focod.Data,1)
+	Case "1", "4", "A", "D"
+		ed_focod.trigger "30301", True
+	Case Else
+		ed_focod.Trigger "40301", True
+	End Select
+
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(edServerMsg)
+_AW_ONCHANGE_AW_
+If edServerMsg.Data = "0" Then   '재조회
+
+ElseIf edServerMsg.Data = "1" Then '서비스 신청되었음
+
+ElseIf edServerMsg.Data = "2" Then '서비스 해지
+
+ElseIf edServerMsg.Data = "3" Then  '//(매도) 감시조건을 충족  /주문내역보기
+
+ElseIf edServerMsg.Data = "4" Then   '//(매수) 감시조건을 충족  /주문내역보기
+
+ElseIf edServerMsg.Data = "5" Then   '//(신규편입매도) 감시조건을 충족  /주문내역보기
+
+ElseIf edServerMsg.Data = "6" Then   ' //조건만료  /감시내역보기
+
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON0)
+_AW_ONCLICK_AW_
+'ctrl_webpop.PopUpUrl("https://download.ibks.com/customer/IBK_INVMAGREE.pdf")
+ctrl_webpop.Seturl3("https://download.ibks.com/customer/IBK_INVMAGREE.pdf")
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON1)
+_AW_ONCLICK_AW_
+'MsgBox(SCREEN.GetName(199,edcode.Data,0) &"   | " & SCREEN.GetCodeType(edcode.Data) )
+'MsgBox(SCREEN.GetName(199,edcode.Data,0))
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON2)
+_AW_ONCLICK_AW_
+ed_jprc.SetType 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON3)
+_AW_ONCLICK_AW_
+cx_log.DecFileFromDlg()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(cx_upload)
+_AW_ONCHANGE_AW_
+'EMSG.Data = "파일전송 완료"
+MsgBox "파일 업로드 완료" & vbCrLf & "등록 및 수정 필요합니다."
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON4)
+_AW_ONCLICK_AW_
+cx_upload.UploadTR_FILE "PMHOUPLD","NGINX.ZIP"
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON5)
+_AW_ONCLICK_AW_
+lb_screenX.Data = cx_log.GetScreenWidth()
+lb_screenY.Data = cx_log.GetScreenHeight()
+lb_DPIX.Data = cx_log.GetDPIX()
+lb_DPIY.Data = cx_log.GetDPIY()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON6)
+_AW_ONCLICK_AW_
+CONTROL0.SetRect 0,0,100,100
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON7)
+_AW_ONCLICK_AW_
+sdata = AN1A.Data&zpwd.Data
+ret = SCREEN.ServiceEx("pibopswd", AN1A.Data&zpwd.Data, Len(sdata), 0, 600000)
+MsgBox(ret)
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(zpwd)
+_AW_ONKEYCHANGE_AW_
+'== 비밀번호 변경시 조회 버튼 기능 수행.
+'If SCREEN.Key = "13" Then  '-- Enter 키 입력
+'	SCREEN.Object("main.sec").data  = "1"
+'	Call send_f()
+
+'End If
+
+If CheckInput(AN1A, zpwd) = False Then
+ 	Exit Sub
+End If
+
+Dim ret, msg
+
+If SCREEN.Key = 13 And Trim(zpwd.Data) <> "" Then
+			ret = SCREEN.ServiceEx("pibopswd", accn&pswd, Len(sdata), 0, 600000)
+	ret = P_pswdConfirm(AN1A.data, zpwd.data, msg)
+	If ret <> True Then
+		zpwd.SetFocus
+		zpwd.Data = ""
+		GUIDE.Text = msg
+		Exit Sub
+	End If
+	OBJECT1.Send
+	OBJECT2.Send
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON8)
+_AW_ONCLICK_AW_
+Select Case tab_account.ID
+Case 1
+        SCREEN.CreateWindow 1, "IB110100 /t/d/p5/S", _
+        "TDATA" & vbTab & SCREEN.Object("OBJ_order.AN1A").data & "|" & S1301.Data
+Case 2
+        SCREEN.CreateWindow 1, "IB120100 /t/d/s/p5", _
+        "ACCN" & vbTab & SCREEN.Object("OBJ_order.AN1A").data & vbLf
+Case 4
+         SCREEN.CreateWindow 1, "IB120600 /t/d/p5/S", _
+        "ACCN" & vbTab & SCREEN.Object("OBJ_order.AN1A").data & vbLf
+Case 5
+         SCREEN.CreateWindow 1, "IB140200 /t/d/p5/S", _
+		"TDATA" & vbTab & SCREEN.Object("OBJ_order.AN1A").data & "|" & S1301.Data
+Case 6
+         SCREEN.CreateWindow 1, "IB130100 /t/d/p5/S", _
+        "ACCN" & vbTab & SCREEN.Object("OBJ_order.AN1A").data & vbLf
+Case 7
+         SCREEN.CreateWindow 1, "IB120800 /t/d/p5/S", _
+        "ACCN" & vbTab & SCREEN.Object("OBJ_order.AN1A").data & vbLf &_
+		"1301" & vbTab & S1301.Data
+Case 8
+         SCREEN.CreateWindow 1, "IB110200 /t/d/p5/S", _
+        "TDATA" & vbTab & SCREEN.Object("OBJ_order.AN1A").data & "|" & S1301.Data
+Case Else
+         Exit Sub
+End Select
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON9)
+_AW_ONCLICK_AW_
+If UCase(TypeName( SCREEN.Object("main.cxMarket"))) <> "NOTHING" Then
+	If SCREEN.Object("main.cxMarket").sMarket = "KRX" Then
+		S1301.Data = SCREEN.Object("main.1301").Data
+	ElseIf SCREEN.Object("main.cxMarket").sMarket = "NXT" Then
+		S1301.Data = "N." & SCREEN.Object("main.1301").Data
+	ElseIf SCREEN.Object("main.cxMarket").sMarket = "통합" Then
+		S1301.Data = "M." & SCREEN.Object("main.1301").Data
+	End If
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON10)
+_AW_ONCLICK_AW_
+	Dim sdata, market
+
+	codes = "005930"
+
+	If cxMarket.sMarket = "KRX" Then
+		market = "1"
+	ElseIf cxMarket.sMarket = "NXT" Then
+		market = "2"
+	ElseIf cxMarket.sMarket = "통합" Then
+		market = "3"
+	End If
+
+	sdata = "$90303" & Chr(127) & cp_lpad(1,2,"0") & cp_lpad(1,4,"0") & _
+					"020" & Space(16) & "00000" & Space(80) & _
+					"1301" & Chr(127) & codes & Chr(10) & "900777" & Chr(127) & market & Chr(10) & "2023" & Chr(10) & "1021" & Chr(10) &vbTab
+
+					Call SCREEN.Service("poop0090", sdata, Len(sdata), &H02)
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON11)
+_AW_ONCLICK_AW_
+Dim dmsg
+'SCREEN.CreateWindow 2, "IB620209 /p5 /d", dmsg
+cx_log.DoSomething "SendMessage_To_Main", "modalpop"&vbTab&"IB620209"
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(cxMarket)
+_AW_ONCLICK_AW_
+SCREEN.Proc "main.Change_MKGubn_Main", cxMarket.sMarket
+
+If UCase(TypeName( SCREEN.Object("cbSOrder") )) <> "NOTHING" Then
+	If cxMarket.sMarket = "통합" Then
+		cbSOrder.Data = "S"
+	ElseIf cxMarket.sMarket = "KRX" Then
+		cbSOrder.Data = "1"
+	ElseIf cxMarket.sMarket = "NXT" Then
+		cbSOrder.Data = "N"
+	End If
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON12)
+_AW_ONCLICK_AW_
+SCREEN.CreateWindow 1, "IB910000 /t/s/p5", ""
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(edMarketTrigger)
+_AW_ONCHANGE_AW_
+Change_MKGubn_Main(Trim(edMarketTrigger.Data))
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON13)
+_AW_ONCLICK_AW_
+'If UCase(TypeName( SCREEN.Object("main.cxMarket"))) <> "NOTHING" Then
+'	If SCREEN.Object("main.cxMarket").sMarket = "KRX" Then
+'		S1777.Data = "1"
+'	ElseIf SCREEN.Object("main.cxMarket").sMarket = "NXT" Then
+'		S1777.Data =  "2"
+'	ElseIf SCREEN.Object("main.cxMarket").sMarket = "통합" Then
+'		S1777.Data =  "3"
+'	End If
+'	SYSTEM.Trace "yes cxMarket 1777 = " & S1777.Data
+'Else
+'	SYSTEM.Trace "no cxMarket map = " & SCREEN.GetMapName(0)
+'End If
+
+'Sub Change_MKGubn_Main(sMKGubn)
+'	cxMarket.sMarket = sMKGubn
+'	SCREEN.Send 0
+'End Sub
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON14)
+_AW_ONCLICK_AW_
+If SCREEN.CreateObject("Info") Then
+MsgBox Trim(INFO.PopData(LOGIN.Name, cx_log.IDtoSha(LOGIN.Name) & ".ini" , "MODE", "DEV"))
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON15)
+_AW_ONCLICK_AW_
+MsgBox cxMarket.GetMapPermission(edMap.Data)
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

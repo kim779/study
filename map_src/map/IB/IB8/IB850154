@@ -1,0 +1,227 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB850154)
+MAPSIZE(225, 700)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(ENCODE|CR2TAB)
+TITLE("SLNAQ055")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("piboPbxQ")
+MAPTYPE(FIXED)
+HEADER(LEDGER)
+TRXH("31CSLNAQ055")
+}
+
+
+
+FORM DIVISION
+{
+
+LABEL  LABEL0(39, 24, 159, 44)  '입력갯수'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  zIn(169, 24, 289, 44)  LEN(5)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("00001")          TABORDER(1)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL1(38, 46, 158, 66)  '계좌번호'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  zAcntNo(168, 46, 288, 66)  LEN(20)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(2)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL2(38, 70, 158, 90)  '비밀번호'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  zPwd(168, 70, 288, 90)  LEN(8)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(3)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL3(38, 110, 158, 130)  '종목번호'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  zIsuNo(168, 110, 288, 130)  LEN(12)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(4)  IOORDER(5)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL4(38, 132, 158, 152)  '대출상세분류코드'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  zLoanDtlClssCode(168, 132, 288, 152)  LEN(2)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(5)  IOORDER(6)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL5(38, 154, 158, 174)  '대출수량'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  zLoanQty(185, 154, 288, 174)  LEN(15)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(6)  IOORDER(8)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL6(39, 178, 159, 198)  '가능금액'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  zAbleAmt(169, 178, 289, 198)  LEN(16)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(7)  IOORDER(9)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  inputVal(456, 2, 576, 22)  LEN(89)  IO_MIXED|AL_CENTER|    COLOR(192, 69)  CUR(0)            TABORDER(0)  IOORDER(11)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL7(334, 2, 454, 22)  '입력내용'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  zOut(458, 23, 578, 43)  LEN(5)  IO_MIXED|AL_CENTER|    COLOR(192, 69)  CUR(0)            TABORDER(0)  IOORDER(12)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL8(336, 23, 456, 43)  '출력갯수'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  zRfundAmt(458, 47, 578, 67)  LEN(16)  IO_NUM|AL_CENTER|    COLOR(192, 69)  CUR(0)            TABORDER(0)  IOORDER(13)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL9(336, 47, 456, 67)  '상환금액'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  zCrdtIntrstAmt(457, 69, 577, 89)  LEN(16)  IO_NUM|AL_CENTER|    COLOR(192, 69)  CUR(0)            TABORDER(0)  IOORDER(14)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL10(335, 69, 455, 89)  '신용이자금액'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  zOvdIntrstSumAmt(457, 90, 577, 110)  LEN(16)  IO_NUM|AL_CENTER|    COLOR(192, 69)  CUR(0)            TABORDER(0)  IOORDER(15)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL11(335, 90, 455, 110)  '연체이자합계금액'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  zTotRfundRqrdAmt(458, 110, 578, 130)  LEN(16)  IO_NUM|AL_CENTER|    COLOR(192, 69)  CUR(0)            TABORDER(0)  IOORDER(16)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL12(336, 110, 456, 130)  '총상환소요금액총상환소요금액'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  zRfundAbleQty(457, 132, 577, 152)  LEN(16)  IO_NUM|AL_CENTER|    COLOR(192, 69)  CUR(0)            TABORDER(0)  IOORDER(17)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL13(335, 132, 455, 152)  '상환가능수량'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL14(39, 92, 159, 112)  '대출일'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  zLoanDt(169, 92, 289, 112)  LEN(8)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(8)  IOORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  zLoanQty_giho(168, 154, 183, 174)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(9)  IOORDER(7)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  GUIDE(162, 204, 282, 217)        COLOR(208, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  zFcurrMktCode(170, 225, 195, 245)  LEN(2)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(10)  IOORDER(10)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Option Explicit
+
+Sub send_f()
+SCREEN.ClearAll 0, 2
+LEDGER.Fkey = "C"
+SCREEN.Send 0
+End Sub
+
+_AW_ONINDECLARE_AW_
+#Load IB888888
+#Load IB888833
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+SCREEN.OnSend = False
+
+zIn.Data = "00001"
+
+If SCREEN.GetMapName(1) = "IB850300" Then
+	zAcntNo.Data = Trim(SCREEN.Object("parent.AN19").Data)
+ElseIf SCREEN.GetMapName(1) = "IB103200" Or SCREEN.GetMapName(1) = "IB103300" Then
+	zAcntNo.Data = Trim(SCREEN.Object("main.AN1A").Data)
+Else
+	zAcntNo.Data = Trim(SCREEN.Object("parent.AN1A").Data)
+End If
+
+If Len(Trim(zAcntNo.Data)) <> 11 Then
+	MsgBox "계좌번호를 확인하여 주십시오.", , "IBK투자증권"
+
+	If SCREEN.GetMapName(1) = "IB850300" Then
+		SCREEN.Object("parent.AN19").SetFocus
+	ElseIf SCREEN.GetMapName(1) = "IB103200" Or SCREEN.GetMapName(1) = "IB103300" Then
+		SCREEN.Object("main.AN1A").SetFocus
+	Else
+		SCREEN.Object("parent.AN1A").SetFocus
+	End If
+
+	Exit Sub
+End If
+
+zPwd.Data = Trim(SCREEN.Object("parent.zPwd").Data)
+
+If Len(Trim(zPwd.Data)) < 4 Then
+	MsgBox "비밀번호를 확인하여 주십시오.", , "IBK투자증권"
+	SCREEN.Object("parent.zPwd").SetFocus
+	Exit Sub
+End If
+
+zLoanDt.Data = Trim(SCREEN.Object("parent.zLoanDt").Data)
+
+Dim jmcd
+
+If SCREEN.GetMapName(1) = "IB103200" Or SCREEN.GetMapName(1) = "IB103300" Then
+	jmcd = Trim(SCREEN.Object("parent.zIsuNo").Data)
+Else
+	jmcd = Trim(SCREEN.Object("parent.1301").Data)
+End If
+
+If SCREEN.GetCodeType(jmcd) = "9" Then
+	zIsuNo.Data = "J" & jmcd
+ElseIf SCREEN.GetCodeType(jmcd) = "27" Then
+	zIsuNo.Data = "Q" & jmcd
+Else
+	zIsuNo.Data = "A" & jmcd
+End If
+
+If Len(Trim(zIsuNo.Data)) < 6 Then
+	MsgBox "종목번호를 확인하여 주십시오.", , "IBK투자증권"
+
+	If SCREEN.GetMapName(1) = "IB103200" Or SCREEN.GetMapName(1) = "IB103300" Then
+		SCREEN.Object("main.1301").SetFocus
+	Else
+		SCREEN.Object("parent.1301").SetFocus
+	End If
+
+	Exit Sub
+End If
+
+zLoanDtlClssCode.Data = Trim(SCREEN.Object("parent.zLoanDtlClssCode").Data)
+zLoanQty.Data = Trim(SCREEN.Object("parent.lRfundQty").Data)
+
+If Is_numeric(zLoanQty.Data) = False Then
+	MsgBox "상환수량을 확인하여 주십시오.", , "IBK투자증권"
+	SCREEN.Object("parent.lRfundQty").SetFocus
+	Exit Sub
+End If
+
+zLoanQty_giho.Data = "+"
+zLoanQty.Data = l_zeropad(zLoanQty)
+zAbleAmt.Data = "+000000000000000"
+
+SCREEN.OnSend = True
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+If Left(Trim(LEDGER.Ecod), 1) = "0" Then
+	If Trim(zRfundAmt.Data) = "" Then
+		zRfundAmt.Data = 0
+	End If
+
+	If Trim(zCrdtIntrstAmt.Data) = "" Then
+		zCrdtIntrstAmt.Data = 0
+	End If
+
+	Dim getMoney, ret
+	getMoney = CDbl(zRfundAmt.Data) + CDbl(zCrdtIntrstAmt.Data)
+
+	SCREEN.Proc "parent.obj_getMoney.contributionBnk", getMoney
+
+'	ret = MsgBox(getmoney & "원을 상환하시겠습니까?", vbOKCancel, "IBK투자증권")
+
+'	If ret = 1 Then
+'		SCREEN.Proc "parent.obj_getMoney.contributionBnk", getMoney
+'	Else
+
+'	End If
+Else
+	MsgBox Trim(LEDGER.Emsg), , "IBK투자증권"
+	SCREEN.Object("main.GUIDE").Text = Trim(LEDGER.Emsg)
+End If
+
+_AW_ONENDSUB_AW_
+}
+
+
+

@@ -1,0 +1,76 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB2008T3)
+MAPSIZE(144, 513)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("차트")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(FLASH)
+TITLE("[IB2008T3]")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("ping2008")
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+CONTROL  ctr_C_UserGrp(0, 0, 513, 144)  |FA_PROTECT|FA_FLASH  "C_UserGrp"  "/i613200000000000201000000000000000000200000000009130033554687200000000210001263225620000000"  LEN(0)  EDIT_INOUT    COLOR(192, 232)  TABORDER(2)  IOORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  upcd(0, 160, 84, 180)  LEN(12)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(1)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  1021(336, 275, 421, 299)  LEN(12)  IO_MIXED|AL_LEFT||FA_FLASH|FA_XDELETE    COLOR(203, 1)  CUR(0)            TABORDER(0)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  check(334, 329, 364, 350)  LEN(1)  IO_MIXED|AL_CENTER|    COLOR(192, 23)  CUR(0)            TABORDER(0)  IOORDER(3)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+
+Sub MKTriggerFromMain(sdata)
+	cxMarket.sMarket = sdata
+	SCREEN.Send 0
+End Sub
+
+_AW_ONSEND_AW_
+upcd.Data = SCREEN.Object("main.1301").Data
+Dim sval
+'sval = LoadMKGubn()
+sval = SCREEN.Object("main.cxMarket").sMarket
+'If sval = "NXT" Then
+
+If UCase(TypeName( SCREEN.Object("main.cxMarket"))) <> "NOTHING" Then
+	If SCREEN.Object("main.cxMarket").sMarket = "KRX" Then
+		upcd.Data = SCREEN.Object("main.1301").Data
+	ElseIf SCREEN.Object("main.cxMarket").sMarket = "NXT" Then
+		upcd.Data = "N." & SCREEN.Object("main.1301").Data
+	ElseIf SCREEN.Object("main.cxMarket").sMarket = "통합" Then
+		upcd.Data = "M." & SCREEN.Object("main.1301").Data
+	End If
+End If
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+If check.Data = "F" Then
+	ctr_C_UserGrp.Clear
+End If
+
+_AW_ONENDSUB_AW_
+}
+
+
+

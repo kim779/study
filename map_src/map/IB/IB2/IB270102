@@ -1,0 +1,118 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB270102)
+MAPSIZE(450, 700)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("MS Sans Serif", 9, NORMAL)
+TITLE("Untitled")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pino2701")
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL0(0, 0, 700, 450)  TP_RAISED      COLOR(208, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+GRID  GRID0(10, 15, 590, 395)  VISIBLEROW(0)  CELLH(20)  MATRIX(1000, 2)  FIX(0)  MAINCOLOR(208, 232)  LINECOLOR(0)  FOCUSCOLOR(0)  FOCUSKIND(0)  |VSCROLL    &
+	COLINFO("Col0")  LEN(4)  WIDTH(80)  HEAD("테마코드")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_MIXED|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col1")  LEN(50)  WIDTH(250)  HEAD("DESC")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_MIXED|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    TABORDER(1)  IOORDER(6)  ENABLE  &
+  VISIBLE
+
+EDIT  FUNC(610, 55, 690, 74)  LEN(1)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("L")          TABORDER(2)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  EDIT0(610, 85, 690, 104)  LEN(4)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(3)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  EDIT1(610, 120, 690, 139)  LEN(20)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(4)  IOORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  COGB(609, 150, 653, 169)  LEN(1)  IO_ALPHA|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("H")          TABORDER(5)  IOORDER(5)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  mkcd(40, 10, 75, 29)  LEN(1)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(6)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Dim g_Flag
+
+g_Flag = True
+'-------------------------------------------------------------
+Sub SetFlag(Flag)
+	If Flag = 1 Then
+		g_Flag = True
+	Else
+		g_Flag = False
+	End If
+End Sub
+
+Sub SetCOMBOALL()
+	Data = ""
+
+	For i = 1 To GRID0.Rows
+		TmCd = GRID0.GetGridCell(i, 1)
+		Desc = GRID0.GetGridCell(i, 2)
+		Data = TmCd & Desc
+		If Len(Trim(Data)) = 0 Then
+			SCREEN.Proc "Main.SetComboData", "END"
+			Exit For
+		End If
+
+		If i = 1 Then
+			SCREEN.Proc "Main.SetComboData", "START" & "|" & Data
+		Else
+			SCREEN.Proc "Main.SetComboData", Data
+		End If
+	Next
+End Sub
+
+_AW_ONSTART_AW_
+SCREEN.Send 0
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+If Not g_Flag Then
+	SCREEN.OnSend = False
+	Exit Sub
+End If
+GRID0.Clear
+g_Flag = False
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+Data = ""
+
+For i = 1 To GRID0.Rows
+	TmCd = GRID0.GetGridCell(i, 1)
+	Desc = Trim(GRID0.GetGridCell(i, 2))
+	Data = TmCd & Desc
+	If Len(Trim(Data)) = 0 Then
+		SCREEN.Proc "Main.SetComboData", "END"
+		Exit For
+	End If
+	If i = 1 Then
+		SCREEN.Proc "Main.SetComboData", "START" & "|" & Data
+	Else
+		SCREEN.Proc "Main.SetComboData", Data
+	End If
+Next
+
+_AW_ONENDSUB_AW_
+}
+
+
+

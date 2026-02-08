@@ -1,0 +1,447 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB295200)
+MAPSIZE(404, 802)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("프로그램매매일중추�")
+MAPPUBLIC(";")
+FONT("굴림", 9, NORMAL)
+OPTIONS(FLASH|CR2TAB|INTER)
+TITLE("[2952] 프로그램매매 일중추이")
+TOPATH(AXIS)
+METHOD(MENU)
+TRXCODE("pibo2952")
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL11(0, 0, 803, 30)        COLOR(64, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL_bg(1, 0, 801, 26)        COLOR(66, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL0(616, 3, 707, 23)  '(천주, 백만원)'  AL_CENTER  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(11, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+GROUP  gp1(465, 598, 567, 622)        COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  r3(145, 3, 183, 23)  '금액'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(gp1)    FONT("굴림체", 9, NORMAL)  COLOR(16, 130)  CUR(0)      TABORDER(1)  ENABLE  &
+  VISIBLE  CHECKED  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  r4(190, 3, 231, 23)  '수량'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(gp1)    FONT("굴림체", 9, NORMAL)  COLOR(16, 130)  CUR(0)      TABORDER(2)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  vggb(467, 629, 482, 647)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("1")          TABORDER(4)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL2(486, 631, 533, 649)  '금액'  AL_CENTER  CUR(0)      COLOR(11, 63)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  c_diff(239, 3, 328, 23)  '직전대비증감'  TP_CHECK|EDIT_NOP        FONT("굴림체", 9, NORMAL)  COLOR(208, 130)  CUR(0)      TABORDER(3)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  dfgb(467, 651, 482, 669)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("0")          TABORDER(5)  IOORDER(3)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL3(486, 653, 568, 671)  '직전대비증감'  AL_CENTER  CUR(0)      COLOR(11, 63)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BOX  BOX1(142, 3, 233, 23)    COLOR(89, 66)  LINEW(1)  BX_LINE    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  b_chat(712, 3, 761, 23)  '차 트'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, NORMAL)  FOCUS  COLOR(128, 130)  CUR(0)    "3BTN.BMP"    TABORDER(6)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+BUTTON  SBTN(761, 3, 798, 23)  '조회'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, BOLD)  FOCUS  COLOR(1, 130)  CUR(0)    "조회BTN.BMP"    TABORDER(7)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+LABEL  CHK(467, 680, 502, 693)  '2'  AL_LEFT  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(4, 0)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  obj(0, 30, 804, 369)    "IB295210"  TABORDER(8)  IOORDER(5)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  upgb(339, 569, 359, 588)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("1")          TABORDER(9)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+GROUP  gp2(266, 613, 386, 663)  'Group'        COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  RADIO0(31, 3, 77, 23)  'KOSPI'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(gp2)    FONT("굴림체", 9, NORMAL)  COLOR(208, 130)  CUR(0)      TABORDER(10)  ENABLE  &
+  VISIBLE  CHECKED  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  RADIO1(81, 3, 136, 23)  'KOSDAQ'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(gp2)    FONT("굴림체", 9, NORMAL)  COLOR(208, 130)  CUR(0)      TABORDER(11)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BOX  BOX0(27, 3, 137, 23)    COLOR(89, 66)  LINEW(1)  BX_LINE    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  CHECK0(332, 3, 384, 23)  '전일분'  TP_CHECK|EDIT_NOP        FONT("굴림체", 9, NORMAL)  COLOR(208, 130)  CUR(0)      TABORDER(12)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  jgga(308, 680, 340, 699)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(13)  IOORDER(4)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL63(0, 369, 802, 404)  LIMAGE(0)  LINEW(3)  STRESS(0)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL2(8, 377, 68, 398)  LINECOLOR(96)  |IMAGE|AL_CENTER    COLOR(208, 232)  CUR(0)    "참고사항.BMP"  ENABLE  &
+  VISIBLE  IMAGE  HINTTYPE(IH_NONE)
+LABEL  LABEL6(74, 377, 524, 397)  '직전대비 증감은 실시간처리가 되지 않으니 조회버튼을 눌러 확인해 주십시오.'  AL_LEFT  CUR(0)      COLOR(68, 69)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  edMarketTrigger(850, 55, 882, 75)  LEN(6)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(14)  IOORDER(6)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL1(825, 15, 885, 35)  '거래소'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+CONTROL  cxMarket(4, 3, 24, 23)  |FA_SKIP  "CX_MarketPicker"  "/k2/tIB295200/u1/d1/y1/f"  LEN(12)  EDIT_NOP    COLOR(192, 232)  TABORDER(0)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Const myFILE = "userconf.ini"
+Const myMAP = "IB295200"
+
+Sub p_read_ini()
+If SCREEN.CreateObject("Info") Then
+ 	CHK.text = Trim(INFO.PopData(LOGIN.Name, myFILE, myMAP, "G_CHCK"))
+
+End If
+End Sub
+
+
+Sub p_write_ini()
+If SCREEN.CreateObject("Info") Then
+  INFO.PushData LOGIN.Name, myFILE, myMAP, "G_CHCK", CHK.text
+End If
+End Sub
+
+
+Sub Change_MKGubn_Main(sMKGubn)
+	cxMarket.sMarket = sMKGubn
+	obj.Send
+End Sub
+
+_AW_ONSTART_AW_
+' 현재 화면의 시장식별자(cxMarket)에 고유 화면번호 부여
+cxMarket.Major = SCREEN.Major
+
+
+Dim hhmm
+
+p_read_ini()
+'
+If CHK.text = "1" Then
+	b_chat.TEXT = "데이터"
+	If RADIO0.Checked = True Then
+		If r3.Checked = True Then
+			obj.SetObject("IB295220")						'CHAT
+		Else
+			obj.SetObject("IB29522A")						'CHAT
+		End If
+	Else
+		If r3.Checked = True Then
+			obj.SetObject("IB295230")						'CHAT
+		Else
+			obj.SetObject("IB29523A")						'CHAT
+		End If
+	End If
+Else
+	b_chat.TEXT = "차 트"
+	If RADIO0.Checked = True Then
+		If r3.Checked = True Then
+			obj.SetObject("IB295210")						'TEXT
+		Else
+			obj.SetObject("IB29521A")						'TEXT
+		End If
+	Else
+		If r3.Checked = True Then
+			obj.SetObject("IB295211")						'TEXT
+		Else
+			obj.SetObject("IB29521B")						'TEXT
+		End If
+	End If
+End If
+
+If CHECK0.Checked = True Then
+	jgga.Data = "1"
+Else
+	jgga.Data = "0"
+End If
+
+obj.Send
+
+'If CHECK0.Checked = False Then
+'	hhmm = Hour(Now)*100 + Minute(Now)
+'	If hhmm < 700 Or hhmm > 1820 Then
+'		Exit Sub
+'	End If
+'
+'	SCREEN.SetTimer 200, False
+'End If
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+SCREEN.OnSend = False
+
+_AW_ONENDSUB_AW_
+_AW_ONTIMER_AW_
+'Dim hhmm
+'
+'obj.Send
+'
+'If CHECK0.Checked = False Then
+'	hhmm = Hour(Now)*100 + Minute(Now)
+'	If hhmm < 700 Or hhmm > 1820 Then
+'		Exit Sub
+'	End If
+'
+'	SCREEN.SetTimer 200, False
+'End If
+
+_AW_ONENDSUB_AW_
+_AW_ONCLOSE_AW_
+p_write_ini()
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(r3)
+_AW_ONCLICK_AW_
+vggb.Data = "1"
+If RADIO0.Checked = True Then
+	If b_chat.Text = "데이터" Then
+		obj.SetObject("IB295220")
+	Else
+		obj.SetObject("IB295210")
+	End If
+Else
+	If b_chat.Text = "데이터" Then
+		obj.SetObject("IB295230")
+	Else
+		obj.SetObject("IB295211")
+	End If
+End If
+obj.Send
+
+'If CHECK0.Checked = False Then
+'	hhmm = Hour(Now)*100 + Minute(Now)
+'	If hhmm < 700 Or hhmm > 1820 Then
+'		Exit Sub
+'	End If
+'
+'	SCREEN.SetTimer 200, False
+'End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(r4)
+_AW_ONCLICK_AW_
+vggb.Data = "2"
+If RADIO0.Checked = True Then
+	If b_chat.Text = "데이터" Then
+		obj.SetObject("IB29522A")
+	Else
+		obj.SetObject("IB29521A")
+	End If
+Else
+	If b_chat.Text = "데이터" Then
+		obj.SetObject("IB29523A")
+	Else
+		obj.SetObject("IB29521B")
+	End If
+End If
+obj.Send
+
+'If CHECK0.Checked = False Then
+'	hhmm = Hour(Now)*100 + Minute(Now)
+'	If hhmm < 700 Or hhmm > 1820 Then
+'		Exit Sub
+'	End If
+'
+'	SCREEN.SetTimer 200, False
+'End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(c_diff)
+_AW_ONCLICK_AW_
+If c_diff.Checked = True Then
+	dfgb.Data = "1"
+Else
+	dfgb.Data = "0"
+End If
+'SCREEN.Object("obj.focus").text = "4"
+obj.Send
+
+'If CHECK0.Checked = False Then
+'	hhmm = Hour(Now)*100 + Minute(Now)
+'	If hhmm < 700 Or hhmm > 1820 Then
+'		Exit Sub
+'	End If
+'
+'	SCREEN.SetTimer 200, False
+'End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(b_chat)
+_AW_ONCLICK_AW_
+SCREEN.Object("obj.focus").text = "2"
+If CHK.text = "2" Then
+	CHK.text = "1"
+	'c_diff.Enable = False
+	b_chat.TEXT = "데이터"
+	If RADIO0.Checked = True Then
+		If r3.Checked = True Then
+			obj.SetObject("IB295220")
+		Else
+			obj.SetObject("IB29522A")
+		End If
+	Else
+		If r3.Checked = True Then
+			obj.SetObject("IB295230")
+		Else
+			obj.SetObject("IB29523A")
+		End If
+	End If
+Else
+	CHK.text = "2"
+	'c_diff.Enable = True
+	b_chat.TEXT = "차 트"
+
+	If RADIO0.Checked = True Then
+		If r3.Checked = True Then
+			obj.SetObject("IB295210")
+		Else
+			obj.SetObject("IB29521A")
+		End If
+	Else
+		If r3.Checked = True Then
+			obj.SetObject("IB295211")
+		Else
+			obj.SetObject("IB29521B")
+		End If
+	End If
+End If
+
+c_diff.Enable = True
+
+obj.Send
+
+'If CHECK0.Checked = False Then
+'	hhmm = Hour(Now)*100 + Minute(Now)
+'	If hhmm < 700 Or hhmm > 1820 Then
+'		Exit Sub
+'	End If
+'
+'	SCREEN.SetTimer 200, False
+'End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(SBTN)
+_AW_ONCLICK_AW_
+SCREEN.Object("obj.focus").text = "3"
+obj.Send
+
+'If CHECK0.Checked = False Then
+'	hhmm = Hour(Now)*100 + Minute(Now)
+'	If hhmm < 700 Or hhmm > 1820 Then
+'		Exit Sub
+'	End If
+'
+'	SCREEN.SetTimer 200, False
+'End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(RADIO0)
+_AW_ONCLICK_AW_
+upgb.Data = "1"
+
+If b_chat.TEXT = "데이터" Then
+	If r3.Checked = True Then
+		obj.SetObject ("IB295220")
+	Else
+		obj.SetObject ("IB29522A")
+	End If
+Else
+	If r3.Checked = True Then
+		obj.SetObject ("IB295210")
+	Else
+		obj.SetObject ("IB29521A")
+	End If
+End If
+obj.send
+
+'If CHECK0.Checked = False Then
+'	hhmm = Hour(Now)*100 + Minute(Now)
+'	If hhmm < 700 Or hhmm > 1820 Then
+'		Exit Sub
+'	End If
+'
+'	SCREEN.SetTimer 200, False
+'End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(RADIO1)
+_AW_ONCLICK_AW_
+upgb.Data = "2"
+
+If b_chat.TEXT = "데이터" Then
+	If r3.Checked = True Then
+		obj.SetObject ("IB295230")
+	Else
+		obj.SetObject ("IB29523A")
+	End If
+Else
+	If r3.Checked = True Then
+		obj.SetObject ("IB295211")
+	Else
+		obj.SetObject ("IB29521B")
+	End If
+End If
+obj.Send
+
+'If CHECK0.Checked = False Then
+'	hhmm = Hour(Now)*100 + Minute(Now)
+'	If hhmm < 700 Or hhmm > 1820 Then
+'		Exit Sub
+'	End If
+'
+'	SCREEN.SetTimer 200, False
+'End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(CHECK0)
+_AW_ONCLICK_AW_
+If CHECK0.Checked = True Then
+	jgga.Data = "1"
+Else
+	jgga.Data = "0"
+End If
+
+SCREEN.Object("obj.focus").text = "4"
+obj.Send
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(edMarketTrigger)
+_AW_ONCHANGE_AW_
+Change_MKGubn_Main(Trim(edMarketTrigger.Data))
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(cxMarket)
+_AW_ONCLICK_AW_
+'Change_MKGubn_Main(Trim(edMarketTrigger.Data))
+obj.Send
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

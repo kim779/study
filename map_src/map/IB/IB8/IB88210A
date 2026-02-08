@@ -1,0 +1,156 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB88210A)
+MAPSIZE(135, 290)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("MS Sans Serif", 9, NORMAL)
+OPTIONS(FMS|FLASH)
+TITLE("[IB88210A] 선물")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pooppoop")
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL0(0, 0, 290, 135)  TP_RAISED      COLOR(208, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  30301(5, 5, 85, 25)  LEN(8)  IO_ALPHA|EDIT_INOUT|FA_UPPER|CODE    FONT("굴림체", 9, NORMAL)    COLOR(192, 130)  CUR(0)  TP_SUNKEN          TABORDER(1)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  30021(145, 5, 280, 25)  LEN(8)  IO_MIXED|AL_CENTER||FA_FLASH    COLOR(192, 69)  CUR(0)            TABORDER(0)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  32051(145, 30, 280, 50)  LEN(8)  IO_MIXED|AL_CENTER|    COLOR(192, 69)  CUR(0)            TABORDER(0)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL0(5, 30, 130, 50)  '선물매도호가'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL1(5, 55, 130, 75)  '선물매도호가 수량'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  32041(145, 55, 280, 75)  LEN(8)  IO_MIXED|AL_CENTER|    COLOR(192, 69)  CUR(0)            TABORDER(0)  IOORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL2(5, 80, 130, 100)  '선물매수호가'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  32071(145, 80, 280, 100)  LEN(8)  IO_MIXED|AL_CENTER|    COLOR(192, 69)  CUR(0)            TABORDER(0)  IOORDER(5)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL3(5, 105, 130, 125)  '선물매수호가 수량'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  32061(145, 105, 280, 125)  LEN(8)  IO_MIXED|AL_CENTER|    COLOR(192, 69)  CUR(0)            TABORDER(0)  IOORDER(6)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Dim g_ArrData
+Dim g_ArrCtrls
+Dim g_Flag
+
+'Index :
+'	0 - 종목코드
+'	1 - 선물매도호가
+'	2 - 선물매도호가 수량
+'	3 - 선물매수호가
+'	4 - 선물매수호가 수량
+'	5 - DUMMY
+'	6 - DUMMY
+g_ArrData = Array("", 0, 0, 0, 0, "0", "0")
+
+'Index :
+'	0 - 선물매도호가
+'	1 - 선물매도호가 수량
+'	2 - 선물매수호가
+'	3 - 선물매수호가 수량
+g_ArrCtrls = Array(S32051, S32041, S32071, S32061)
+g_Flag = False
+'-------------------------------------------------------------------------------------
+Sub SendFutData(ItemCd)
+	g_ArrData(0) = ItemCd
+	S30301.Data = ItemCd
+	g_Flag = True
+	SCREEN.Send 0
+End Sub
+'-------------------------------------------------------------------------------------
+Sub OnAlert()
+	CalcFutData()
+	'SCREEN.SetTimer 1, False
+End Sub
+'-------------------------------------------------------------------------------------
+Function GetData(StrData, DataType)
+	GetData = 0
+
+	Data = Trim(StrData)
+	If Len(Data) = 0 Then
+		Exit Function
+	Else
+		If DataType = 1 Then			'CDBL
+			GetData = CDbl(Data)
+		Else							'CLNG
+			GetData = CLng(Data)
+		End If
+	End If
+End Function
+'-------------------------------------------------------------------------------------
+Sub CalcFutData()
+	AskPrc = GetData(g_ArrCtrls(0).Data, 1)
+	BidPrc = GetData(g_ArrCtrls(2).Data, 1)
+	AskVol = GetData(g_ArrCtrls(1).Data, 2)
+	BidVol = GetData(g_ArrCtrls(3).Data, 2)
+
+	ArrData = Array(AskPrc, AskVol, BidPrc, BidVol)
+
+
+	For i = LBound(ArrData) To UBound(Arrdata)
+		g_ArrData(i + 1) = CDbl(ArrData(i))
+	Next
+
+	Data = Join(g_ArrData, "|")
+	SCREEN.Proc "Parent.SetData", Data
+
+
+End Sub
+
+_AW_ONSEND_AW_
+If Not g_Flag Then
+	SCREEN.OnSend = False
+	S30301.Data = ""
+End If
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+g_Flag = False
+CalcFutData
+
+_AW_ONENDSUB_AW_
+_AW_ONTIMER_AW_
+CalcFutData()
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(30301)
+_AW_ONCHANGE_AW_
+S30301.Trigger "", True
+S30301.Trigger "ed_focod", True
+S30301.Trigger "zFnoIsuNo", True
+SYSTEM.SetHistory "ed_focod", S30301.Data
+SYSTEM.SetHistory "zFnoIsuNo", S30301.Data
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

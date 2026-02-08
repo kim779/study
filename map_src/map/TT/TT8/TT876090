@@ -1,0 +1,108 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(TT876090)
+MAPSIZE(342, 336)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("굴림", 9, NORMAL)
+TITLE("ELS확률_종목코드리스트")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("piboiels")
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+GRID  GRID0(0, 0, 336, 342)  VISIBLEROW(0)  CELLH(18)  MATRIX(9999, 2)  FIX(0)  MAINCOLOR(208, 232)  LINECOLOR(0)  FOCUSCOLOR(78)  FOCUSKIND(4)    FONT("굴림", 9, NORMAL)  ROWC(68, 77)  |FLEXIBLE|VSCROLL|NO3D|RROW|XHLINE|PAGE|GRFTEXT    &
+	COLINFO("Col0")  LEN(16)  WIDTH(100)  HEAD("종목코드")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  COLUMN_SORT  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col1")  LEN(48)  WIDTH(220)  HEAD("종목명")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  COLUMN_SORT  INORMAL    HNORMAL  SORTSTARTPOS(0)    TABORDER(1)  IOORDER(6)  ENABLE  &
+  VISIBLE
+
+EDIT  gubn(40, 420, 90, 439)  LEN(1)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 130)  CUR(0)  TP_SUNKEN  INIT("F")          TABORDER(2)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  o_cont(97, 444, 147, 464)  LEN(1)  IO_MIXED|AL_LEFT|    COLOR(192, 232)  CUR(0)  LINECOLOR(0)          TABORDER(0)  IOORDER(4)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  o_npos(153, 444, 203, 464)  LEN(4)  IO_MIXED|AL_LEFT|    COLOR(192, 232)  CUR(0)  LINECOLOR(0)          TABORDER(0)  IOORDER(5)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  cont(97, 420, 147, 439)  LEN(1)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 130)  CUR(0)  TP_SUNKEN          TABORDER(3)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  npos(153, 420, 203, 439)  LEN(4)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 130)  CUR(0)  TP_SUNKEN          TABORDER(4)  IOORDER(3)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Dim ArrData
+
+ArrData = Array()
+ReDim ArrData( GRID0.Rows - 1)
+'----------------------------------------------------------------------
+Sub GetHNamList()
+	ArrItem = Array("", "")
+
+	For i = 1 To GRID0.Rows
+		HNam = Trim(GRID0.GetGridCell( i, 2 ))
+		If Len(HNam) = 0 Then
+			Exit For
+		End If
+		Code = GRID0.GetGridCell( i, 1 )
+		CdTp = Trim(GRID0.GetGridCell( i, 3 ))
+
+		Data  = Code & CdTp
+		ArrItem(0) = Data
+		ArrItem(1) = HNam
+
+
+		Item = Join(ArrItem, "~")
+		SYSTEM.Trace Item
+		ArrData(i - 1) = Item
+	Next
+	Data = Join(ArrData, "|")
+	Cnt = i
+
+	SCREEN.Proc "main.SetCodeList", Data & ", " & Cnt
+End Sub
+
+Sub send_f()
+	GRID0.SetDataPosition 0
+	SCREEN.Send 0
+End Sub
+
+_AW_ONSTART_AW_
+'SCREEN.Send 0
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+If o_cont.Data = "Y" Then
+	cont.Data = "Y"
+	npos.Data = o_npos.Data
+	GRID0.SetDataPosition 2
+	SCREEN.Send 0
+Else
+	cont.Data = ""
+	npos.Data = ""
+End If
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(GRID0)
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

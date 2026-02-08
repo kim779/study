@@ -1,0 +1,2119 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB620200)
+MAPSIZE(586, 800)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("RP 매수")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(ENCODE|CR2TAB|INTER)
+TITLE("[6202]RP매수")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("piboPBxO")
+MAPTYPE(NORM)
+HEADER(LEDGER)
+TRXH("115SOFRT116")
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL35(396, 205, 800, 432)  LIMAGE(0)  LINEW(4)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL39(0, 26, 310, 134)  LIMAGE(0)  LINEW(4)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL15(235, 815, 795, 860)  LIMAGE(0)  LINEW(4)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL18(0, 0, 800, 27)  LINETYPE(3)  LINECOLOR(64)      COLOR(66, 0)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  zPwd(326, 3, 386, 23)  LEN(8)  IO_MIXED|EDIT_INPUT|FA_PASSWD|FA_WRAP|FA_ENUM  FONT("굴림체", 9, NORMAL)    COLOR(192, 130)  CUR(0)  TP_SUNKEN    ENCRYPT("ACCN")        TABORDER(2)  IOORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+CONTROL  AN51(57, 3, 197, 23)    "CX_Account"  "/w3"  LEN(11)  EDIT_INPUT  FONT("굴림체", 9, NORMAL)    COLOR(68, 130)  TABORDER(1)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  ACNM(198, 3, 262, 23)  LEN(20)  IO_MIXED|AL_LEFT||FA_SKIP  FONT("굴림체", 9, NORMAL)    COLOR(160, 130)  CUR(0)  LINECOLOR(89)          TABORDER(0)  IOORDER(33)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL1(6, 3, 54, 23)  '계좌번호'  AL_LEFT  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(208, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL3(274, 3, 322, 23)  '비밀번호'  AL_LEFT  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(208, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+OUT  OUTPUT(1200, 330, 1572, 346)  LEN(184)  IO_MIXED|AL_LEFT|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(22)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  Out(1279, 352, 1369, 370)  LEN(5)  IO_NUM|AL_CENTER|    COLOR(192, 232)  CUR(0)  LINECOLOR(75)          TABORDER(0)  IOORDER(23)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  O_lBnsQty(1279, 371, 1369, 389)  LEN(16)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSUP    COLOR(192, 232)  CUR(0)  LINECOLOR(75)          IFRGB(232, 232)  TABORDER(0)  IOORDER(25)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  O_zRpRpPreargDt(1279, 390, 1369, 408)  LEN(8)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSUP    COLOR(192, 232)  CUR(0)  LINECOLOR(75)          IFRGB(232, 232)  TABORDER(0)  IOORDER(26)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL10(1188, 352, 1278, 370)  '레코드갯수'  LINECOLOR(0)      COLOR(74, 76)  CUR(0)    AL_LEFT    ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL11(1188, 371, 1278, 389)  '매매수량'  LINECOLOR(0)      COLOR(74, 76)  CUR(0)    AL_LEFT    ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL13(1188, 390, 1278, 408)  'RP환매예정일'  LINECOLOR(0)      COLOR(74, 76)  CUR(0)    AL_LEFT    ENABLE  &
+  HINTTYPE(IH_NONE)
+GROUP  grp1(856, 293, 1105, 568)  'INPUT'        COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+GROUP  GROUP0(1180, 318, 1485, 483)  'OUTPUT'        COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  In(945, 315, 1089, 333)  LEN(5)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_PASS    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("00001")          TABORDER(15)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL9(864, 315, 943, 333)  '레코드갯수'        COLOR(66, 76)  CUR(0)    AL_LEFT    ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  zPdptnCode(945, 332, 1089, 350)  LEN(9)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_PASS    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(16)  IOORDER(3)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL0(864, 332, 943, 350)  '계좌번호'        COLOR(66, 76)  CUR(0)    AL_LEFT    ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL2(864, 349, 943, 367)  'RP매매구분'        COLOR(66, 76)  CUR(0)    AL_LEFT    ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  lRpDays(945, 366, 1089, 384)  LEN(6)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_PASS    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(17)  IOORDER(6)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL3(864, 366, 943, 384)  'RP일수'        COLOR(66, 76)  CUR(0)    AL_LEFT    ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL17(868, 757, 1028, 777)  '거래번호'        COLOR(96, 97)  CUR(0)    AL_CENTER    ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  lBnsAmt(945, 383, 1089, 401)  LEN(16)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_PASS    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(18)  IOORDER(7)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL19(864, 383, 943, 401)  '매매금액'        COLOR(66, 76)  CUR(0)    AL_LEFT    ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  dRpIntrat(959, 400, 1088, 418)  LEN(10)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_PASS    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(19)  IOORDER(9)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL20(864, 400, 943, 418)  'RP이율'        COLOR(66, 76)  CUR(0)    AL_LEFT    ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  before(958, 416, 1102, 434)  LEN(10)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_PASS    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("0.00000000")          TABORDER(20)  IOORDER(11)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL21(864, 417, 943, 435)  'RP이전이율'        COLOR(66, 76)  CUR(0)    AL_LEFT    ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  after(960, 434, 1104, 452)  LEN(10)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_PASS    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("0.00000000")          TABORDER(21)  IOORDER(13)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL22(864, 434, 943, 452)  'RP이후이율'        COLOR(66, 76)  CUR(0)    AL_LEFT    ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  dBnsBndUprc(945, 451, 1023, 469)  LEN(10)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_PASS    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("+000000000.0000")          TABORDER(22)  IOORDER(14)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL23(864, 451, 943, 469)  '매매채권단가'        COLOR(66, 76)  CUR(0)    AL_LEFT    ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  EDIT7(945, 468, 1089, 486)  LEN(20)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_PASS    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(23)  IOORDER(16)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL24(864, 468, 943, 486)  '대체계좌번호'        COLOR(66, 76)  CUR(0)    AL_LEFT    ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  EDIT8(945, 485, 1089, 503)  LEN(12)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_PASS    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(24)  IOORDER(17)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL25(864, 485, 943, 503)  '대체종목번호'        COLOR(66, 76)  CUR(0)    AL_LEFT    ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  EDIT9(945, 502, 1089, 520)  LEN(10)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_PASS    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("+000000000")          TABORDER(25)  IOORDER(18)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL26(864, 502, 943, 520)  '종목일련번호'        COLOR(66, 76)  CUR(0)    AL_LEFT    ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  EDIT10(945, 519, 1089, 537)  LEN(9)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_PASS    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(26)  IOORDER(19)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL27(864, 519, 943, 537)  '관리사원번호'        COLOR(66, 76)  CUR(0)    AL_LEFT    ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL28(868, 777, 1028, 797)  'RP잔고전잔'  LINECOLOR(96)      COLOR(96, 97)  CUR(0)    AL_CENTER    ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL30(868, 797, 1028, 817)  'RP잔고금잔'  LINECOLOR(96)      COLOR(96, 97)  CUR(0)    AL_CENTER    ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  lSecBfbalQty(1029, 777, 1207, 797)  LEN(16)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSUP    COLOR(77, 69)  CUR(0)            IFRGB(69, 69)  TABORDER(0)  IOORDER(29)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  lSecCrbalQty(1029, 797, 1207, 817)  LEN(16)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSUP    COLOR(68, 69)  CUR(0)            IFRGB(69, 69)  TABORDER(0)  IOORDER(30)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  lDpsCrbalAmt(1367, 777, 1543, 797)  LEN(16)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSUP    COLOR(77, 69)  CUR(0)            IFRGB(69, 69)  TABORDER(0)  IOORDER(28)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  lSettNo(1280, 409, 1370, 427)  LEN(9)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSUP    COLOR(192, 232)  CUR(0)  LINECOLOR(75)          IFRGB(232, 232)  TABORDER(0)  IOORDER(31)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL12(1188, 409, 1278, 427)  '결제번호'  LINECOLOR(0)      COLOR(74, 76)  CUR(0)    AL_LEFT    ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL2(1060, 176, 1108, 196)  '매매단가'  AL_LEFT  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(208, 130)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  i_dBnsBndUprc(1109, 176, 1174, 196)  LEN(9)  IO_NUM|EDIT_INPUT|FA_COMMA|FA_RIGHT|FA_WRAP|FA_SKIP    COLOR(192, 130)  CUR(0)  TP_SUNKEN          TABORDER(9)  IOORDER(36)  &
+  HINTTYPE(IH_NONE)
+EDIT  EDIT0(1022, 451, 1069, 469)  LEN(5)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_PASS    COLOR(192, 232)  CUR(0)  TP_NONE  INIT(".0000")          TABORDER(27)  IOORDER(15)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  dRpIntrat_sign(946, 398, 961, 419)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_PASS    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("+")          TABORDER(28)  IOORDER(8)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  zRpBnsTp(945, 349, 1024, 367)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_PASS    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(29)  IOORDER(5)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  EDIT2(946, 413, 961, 434)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_PASS    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("+")          TABORDER(30)  IOORDER(10)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  EDIT3(946, 430, 961, 451)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_PASS    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("+")          TABORDER(31)  IOORDER(12)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL4(864, 541, 943, 559)  '펀드운용계좌번호'        COLOR(66, 76)  CUR(0)    AL_LEFT    ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  EDIT4(946, 542, 1090, 560)  LEN(20)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_PASS    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(32)  IOORDER(20)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL5(0, 560, 800, 584)  LIMAGE(0)  LINEW(3)  LINETYPE(4)  LINECOLOR(64)      COLOR(34, 97)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL6(12, 565, 26, 579)    |IMAGE|AL_STRETCH    COLOR(34, 232)  CUR(0)    "알림_ic.bmp"  ENABLE  &
+  VISIBLE  TRANSPARENT  IMAGE  HINTTYPE(IH_NONE)
+PANEL  GUIDE(29, 563, 669, 581)        COLOR(34, 97)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL11(2, 583, 800, 585)  AL_LEFT  CUR(0)      COLOR(64, 232)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  lDpsBfbalAmt(1366, 757, 1543, 777)  LEN(16)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSUP    COLOR(68, 69)  CUR(0)            IFRGB(69, 69)  TABORDER(0)  IOORDER(27)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  OBJECT0(1307, 585, 1428, 605)    "IB620201"  TABORDER(33)  IOORDER(38)  ENABLE  &
+  HINTTYPE(IH_NONE)
+GROUP  rpGubnGR(873, 593, 993, 643)  'Group'        COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  send_btn(750, 3, 787, 23)  '조회'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, BOLD)  FOCUS  COLOR(208, 186)  CUR(10)    "조회btn.bmp"    TABORDER(6)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+BUTTON  next_btn(880, 660, 916, 680)  '다음'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, NORMAL)  COLOR(208, 186)  CUR(10)    "2btn.bmp"    TABORDER(7)  &
+  IMAGETEXT  HINTTYPE(IH_NONE)
+LABEL  panel_bottom(890, 698, 1580, 699)  AL_LEFT  CUR(0)      COLOR(64, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL7(1028, 757, 1029, 817)  AL_LEFT  CUR(0)      COLOR(75, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  i_dRpIntrat(1054, 222, 1183, 240)  LEN(10)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP|FA_PASS    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(34)  IOORDER(39)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  i_before(1054, 239, 1198, 257)  LEN(10)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP|FA_PASS    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("0.00000000")          TABORDER(35)  IOORDER(40)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  i_after(1054, 256, 1198, 274)  LEN(10)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP|FA_PASS    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("0.00000000")          TABORDER(36)  IOORDER(41)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL31(1207, 777, 1367, 797)  '예수금금잔'  LINECOLOR(96)      COLOR(96, 97)  CUR(0)    AL_CENTER    ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL29(1207, 757, 1367, 777)  '예수금전잔'  LINECOLOR(96)      COLOR(96, 97)  CUR(0)    AL_CENTER    ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL8(1367, 757, 1368, 796)  AL_LEFT  CUR(0)      COLOR(75, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BOX  BOX1(867, 756, 1543, 817)    COLOR(75, 181)  LINEW(1)  BX_2CLR    ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  obj_getMoney(1312, 501, 1412, 521)    "IB9999C0"  TABORDER(37)  IOORDER(42)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL20(1183, 496, 1303, 516)  'obj_getMoney'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  obj_cancelMoney(1312, 524, 1412, 544)    "IB850155"  TABORDER(38)  IOORDER(43)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL21(1183, 519, 1303, 539)  'obj_cancelMoney'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  obj_cusstatus(1308, 541, 1429, 561)    "IB620207"  TABORDER(40)  IOORDER(44)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL12(1185, 540, 1305, 560)  'obj_cusstatus'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  EDIT5(1072, 97, 1128, 116)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("0")          TABORDER(42)  IOORDER(45)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  OBJ3(1307, 563, 1428, 583)    "IB620600"  TABORDER(44)  IOORDER(46)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL15(1184, 562, 1304, 582)  'RP동의여부'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+CONTROL  CX_DTS(858, 34, 1033, 274)  |FA_PROTECT  "CX_DATATRANS"  ""  LEN(0)  EDIT_NOP    COLOR(192, 232)  TABORDER(0)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL16(81, 798, 581, 813)  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_NONE)
+PANEL  PANEL16(18, 763, 204, 803)  '  RP 상품위험등급'        COLOR(96, 97)  CUR(0)    AL_LEFT  FONT("굴림체", 9, BOLD)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BOX  BOX0(364, 764, 365, 804)    COLOR(75, 232)  LINEW(1)  BX_LINE    ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  msg(54, 737, 679, 752)  '-'  AL_CENTER  FONT("굴림체", 9, BOLD)  CUR(0)      COLOR(168, 130)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_NONE)
+PANEL  PANEL34(204, 764, 363, 804)  '  낮은위험'        COLOR(68, 69)  CUR(0)    AL_LEFT  FONT("굴림체", 9, BOLD)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BOX  BOX4(204, 764, 205, 804)    COLOR(75, 232)  LINEW(1)  BX_LINE    ENABLE  &
+  HINTTYPE(IH_NONE)
+BOX  BOX3(18, 723, 723, 724)    COLOR(50, 232)  LINEW(1)  BX_LINE    ENABLE  &
+  HINTTYPE(IH_NONE)
+BOX  BOX5(18, 803, 723, 804)    COLOR(50, 232)  LINEW(1)  BX_LINE    ENABLE  &
+  HINTTYPE(IH_NONE)
+BOX  BOX6(18, 763, 723, 764)    COLOR(50, 232)  LINEW(1)  BX_LINE    ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  GRADE(409, 768, 679, 788)    |IMAGE|AL_CENTER    COLOR(181, 232)  CUR(0)    "bar_riskclass_2.bmp"  ENABLE  &
+  IMAGE  HINTTYPE(IH_NONE)
+PANEL  PANEL33(0, 205, 396, 435)  LIMAGE(0)  LINEW(4)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(170, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  OBJ2(435, 275, 765, 385)    "IB620203"  TABORDER(8)  IOORDER(32)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  DESC1(450, 220, 675, 240)  'RP 상품위험등급'  AL_LEFT  FONT("굴림체", 9, BOLD)  CUR(0)      COLOR(208, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+PANEL  PANEL36(435, 226, 444, 235)    |IMAGE|AL_CENTER    COLOR(208, 232)  CUR(0)    "텍스트화살표_하단.BMP"  ENABLE  &
+  VISIBLE  TRANSPARENT  IMAGE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON1(534, 400, 666, 420)  'RP매수가능한도조회'  TP_PUSH|IMAGETEXT|AL_CENTER        FOCUS  COLOR(208, 232)  CUR(10)    "10btn.bmp"    TABORDER(39)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+PANEL  PANEL37(20, 214, 365, 238)  '상품선택'  TP_NONE      COLOR(208, 232)  CUR(0)    AL_LEFT  FONT("굴림체", 9, BOLD)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+PANEL  PANEL38(20, 242, 365, 266)  'RP약정일'  TP_NONE      COLOR(208, 232)  CUR(0)    AL_LEFT  FONT("굴림체", 9, BOLD)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+PANEL  PANEL40(20, 270, 365, 294)  '매수금액'  TP_NONE      COLOR(208, 232)  CUR(0)    AL_LEFT  FONT("굴림체", 9, BOLD)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+PANEL  PANEL42(225, 378, 285, 402)  '거래번호'  TP_NONE      COLOR(208, 232)  CUR(0)    AL_LEFT  FONT("굴림체", 9, BOLD)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+PANEL  PANEL43(255, 242, 385, 266)  '약정이율'  TP_NONE      COLOR(208, 232)  CUR(0)    AL_LEFT  FONT("굴림체", 9, BOLD)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+PANEL  PANEL44(95, 214, 365, 238)  LINECOLOR(130)      COLOR(192, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  RADIO2(250, 216, 317, 236)  '수익자유'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(rpGubnGR)      COLOR(192, 130)  CUR(10)      TABORDER(5)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  RADIO1(185, 216, 232, 236)  '일반'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(rpGubnGR)      COLOR(192, 130)  CUR(10)      TABORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  RADIO0(120, 216, 171, 236)  '수시'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(rpGubnGR)      COLOR(192, 130)  CUR(10)      TABORDER(3)  ENABLE  &
+  VISIBLE  CHECKED  HINTTYPE(IH_NONE)
+EDIT  i_lRpDays(95, 242, 151, 266)  LEN(5)  IO_NUM|EDIT_INPUT|FA_COMMA|FA_RIGHT|FA_WRAP|FA_SKIP    COLOR(192, 130)  CUR(0)  TP_SUNKEN          TABORDER(10)  IOORDER(37)  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  cc(315, 242, 365, 266)  LEN(5)  IO_NUM|EDIT_INPUT|FA_COMMA|FA_RIGHT|FA_WRAP|FA_SKIP|FA_FLOAT    COLOR(192, 130)  CUR(0)  TP_SUNKEN        FLOAT(2)    EDITFORMAT("999.99%")  TABORDER(11)  IOORDER(35)  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  price(95, 270, 255, 294)  LEN(15)  IO_NUM|EDIT_INPUT|FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_WRAP|FA_SKIP|SA_SPACE    COLOR(192, 130)  CUR(10)  TP_SUNKEN          TABORDER(12)  IOORDER(34)  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL45(255, 270, 275, 294)  '원'  TP_NONE      COLOR(208, 232)  CUR(0)    AL_LEFT  FONT("굴림체", 9, BOLD)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  availAmtBtn(315, 270, 365, 294)  '전액'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, NORMAL)  FOCUS  COLOR(208, 186)  CUR(10)    "4btn.bmp"    TABORDER(13)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+PANEL  SUMMARY(20, 350, 180, 374)  LINECOLOR(130)      COLOR(192, 232)  CUR(10)    AL_LEFT    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  CHECK2(25, 352, 175, 372)  'RP 핵심(요약)설명서'  TP_CHECK|EDIT_NOP        FONT("굴림", 9, NORMAL)  COLOR(208, 130)  CUR(10)      TABORDER(41)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  MASU(230, 324, 365, 369)  'RP매수'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 12, BOLD)  FOCUS  COLOR(208, 68)  CUR(10)    "매수.bmp"    TABORDER(14)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+OUT  lTrdNo(287, 378, 365, 402)  LEN(10)  IO_NUM|AL_CENTER||FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSUP  FONT("굴림체", 9, BOLD)    COLOR(162, 69)  CUR(0)  LINECOLOR(163)          IFRGB(69, 69)  TABORDER(0)  IOORDER(24)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL8(0, 432, 800, 560)  LIMAGE(0)  LINEW(4)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL98(11, 443, 71, 465)    |IMAGE|AL_CENTER    COLOR(208, 232)  CUR(0)    "참고사항.BMP"  ENABLE  &
+  VISIBLE  TRANSPARENT  IMAGE  HINTTYPE(IH_NONE)
+PANEL  PANEL7(11, 480, 20, 489)    |IMAGE|AL_CENTER    COLOR(208, 232)  CUR(0)    "텍스트화살표_하단.BMP"  ENABLE  &
+  VISIBLE  TRANSPARENT  IMAGE  HINTTYPE(IH_NONE)
+PANEL  PANEL14(11, 504, 20, 513)    |IMAGE|AL_CENTER    COLOR(208, 232)  CUR(0)    "텍스트화살표_하단.BMP"  ENABLE  &
+  VISIBLE  TRANSPARENT  IMAGE  HINTTYPE(IH_NONE)
+PANEL  PANEL47(30, 472, 715, 496)  'RP매수/매도 가능시간 : 영업일 08:30~17:00'  TP_NONE      COLOR(208, 232)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+PANEL  PANEL48(30, 496, 715, 520)  '비밀번호 입력 후 조회 버튼을 클릭하면 RP이율이 조회됩니다.'  TP_NONE      COLOR(208, 232)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+PANEL  PANEL49(30, 520, 715, 544)  '수시RP는 일정기간마다 자동 재투자됩니다.'  TP_NONE      COLOR(208, 232)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+PANEL  PANEL52(11, 525, 20, 534)    |IMAGE|AL_CENTER    COLOR(208, 232)  CUR(0)    "텍스트화살표_하단.BMP"  ENABLE  &
+  VISIBLE  TRANSPARENT  IMAGE  HINTTYPE(IH_NONE)
+PANEL  PANEL32(0, 134, 800, 205)  LIMAGE(0)  LINEW(4)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  buhab1(175, 148, 704, 172)  '고객님의 투자성향 대비 더 높은 위험상품이 노출됩니다.'  TP_NONE      COLOR(208, 232)  CUR(0)    AL_LEFT  FONT("굴림체", 9, NORMAL)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL0(1185, 585, 1305, 605)  'RP매수가능금액조회'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL57(151, 242, 171, 266)  '일'  TP_NONE      COLOR(208, 232)  CUR(0)    AL_LEFT  FONT("굴림체", 9, BOLD)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  ORDF(520, 5, 545, 25)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("0")          TABORDER(46)  IOORDER(47)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  AGREE(541, 660, 761, 684)  ' RP 사전동의서'  LINECOLOR(130)      COLOR(192, 232)  CUR(10)    AL_LEFT    ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  check_pdf2(761, 662, 801, 682)  '확인'  TP_CHECK|EDIT_NOP        FONT("굴림", 9, NORMAL)  COLOR(208, 130)  CUR(0)      TABORDER(43)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  BUTTON5(190, 679, 470, 699)  '투자자정보확인서 화면 바로가기'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, BOLD)  COLOR(208, 186)  CUR(0)    "10btn.bmp"    TABORDER(45)  ENABLE  &
+  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+PANEL  PANEL58(607, 791, 617, 801)    |IMAGE|AL_CENTER    COLOR(208, 232)  CUR(0)    "arrow_rickclass.bmp"  ENABLE  &
+  TRANSPARENT  IMAGE  HINTTYPE(IH_NONE)
+PANEL  PANEL59(865, 560, 944, 578)  '권유사원번호'        COLOR(66, 76)  CUR(0)    AL_LEFT    ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  CnvsEmpNo(947, 561, 1091, 579)  LEN(9)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_PASS    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(47)  IOORDER(21)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL60(310, 27, 800, 134)  LIMAGE(0)  LINEW(4)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL6(360, 40, 785, 60)  '이 금융상품은 예금자보호법에 따라 보호되지 않습니다.'  AL_LEFT  CUR(0)      COLOR(208, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL4(360, 70, 785, 90)  '상담/문의 : IBK투자증권 관리영업점 또는 고객센터(1588-0030, 1544-0050)'  AL_LEFT  CUR(0)      COLOR(208, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL5(360, 100, 410, 120)  '바로가기'  AL_LEFT  CUR(0)      COLOR(208, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  BUTTON2(560, 100, 655, 120)  'RP가이드'  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(208, 186)  CUR(0)    "8btn.bmp"    TABORDER(48)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+BUTTON  BUTTON3(425, 100, 555, 120)  '투자자정보확인서'  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(208, 186)  CUR(0)    "8btn.bmp"    TABORDER(49)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+PANEL  PANEL61(325, 68, 350, 93)    |IMAGE|AL_STRETCH    COLOR(181, 232)  CUR(0)    "미스터리쇼핑_RP매수_icon_02(x3).bmp"  ENABLE  &
+  VISIBLE  IMAGE  HINTTYPE(IH_NONE)
+PANEL  PANEL62(325, 98, 350, 123)    |IMAGE|AL_STRETCH    COLOR(181, 232)  CUR(0)    "미스터리쇼핑_RP매수_icon_03(x3).bmp"  ENABLE  &
+  VISIBLE  IMAGE  HINTTYPE(IH_NONE)
+PANEL  PANEL63(325, 38, 350, 63)    |IMAGE|AL_STRETCH    COLOR(181, 232)  CUR(0)    "미스터리쇼핑_RP매수_icon_01(x3).bmp"  ENABLE  &
+  VISIBLE  IMAGE  HINTTYPE(IH_NONE)
+PANEL  PANEL64(10, 40, 155, 80)        COLOR(96, 97)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL65(10, 80, 155, 120)        COLOR(96, 97)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BOX  BOX2(290, 40, 291, 120)    COLOR(75, 232)  LINEW(1)  BX_LINE    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL9(20, 53, 140, 68)  '내 투자성향'  AL_CENTER  CUR(0)      COLOR(168, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL10(20, 93, 140, 108)  '적합한 상품위험등급'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+PANEL  PANEL66(155, 41, 300, 81)        COLOR(68, 97)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL67(155, 81, 300, 121)        COLOR(68, 97)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  tujaNM(163, 40, 270, 80)  LEN(40)  IO_MIXED|AL_LEFT|    COLOR(68, 69)  CUR(0)            TABORDER(0)  IOORDER(48)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BOX  BOX7(155, 40, 156, 120)    COLOR(75, 232)  LINEW(1)  BX_LINE    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  tujaGD(163, 80, 270, 120)  LEN(40)  IO_MIXED|AL_LEFT|    COLOR(68, 69)  CUR(0)            TABORDER(0)  IOORDER(49)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BOX  BOX8(10, 80, 300, 81)    COLOR(50, 232)  LINEW(1)  BX_LINE    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BOX  BOX10(167, 67, 237, 68)    COLOR(50, 232)  LINEW(1)  BX_LINE    ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  tujaNM2(227, 54, 242, 66)  LEN(40)  IO_MIXED|AL_LEFT|    COLOR(68, 69)  CUR(0)            TABORDER(0)  IOORDER(50)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BOX  BOX9(10, 120, 300, 121)    COLOR(50, 232)  LINEW(1)  BX_LINE    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BOX  BOX11(10, 40, 300, 41)    COLOR(50, 232)  LINEW(1)  BX_LINE    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  buhab2(175, 170, 704, 194)  '투자성향에 부적합한 위험등급 상품을 선택 시 예상보다 더 큰 손실이 발생할 수 있습니다.'  TP_NONE      COLOR(208, 232)  CUR(0)    AL_LEFT  FONT("굴림체", 9, NORMAL)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  buhab_img(115, 147, 160, 192)  TP_PUSH|IMAGE|AL_STRETCH      COLOR(15, 63)  CUR(0)    "ICO_WARNING_90.bmp"    TABORDER(50)  &
+  IMAGE  HINTTYPE(IH_NONE)
+PANEL  buhab3(228, 150, 428, 170)  '투자성향 대비 더 높은 위험상품이'  TP_NONE      COLOR(208, 232)  CUR(0)    AL_LEFT  FONT("굴림체", 9, NORMAL)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_NONE)
+PANEL  buhab4(438, 170, 723, 194)  '예상보다 더 큰 손실이 발생할 수 있습니다.'  TP_NONE      COLOR(208, 232)  CUR(0)    AL_LEFT  FONT("굴림체", 9, NORMAL)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_NONE)
+PANEL  jukhab1(85, 148, 780, 172)  '상품가입 시 상품설명서의 주요내용에 대해 확인을 하셔야 합니다.'  TP_NONE      COLOR(208, 232)  CUR(0)    AL_LEFT  FONT("굴림체", 9, NORMAL)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+PANEL  jukhab2(85, 170, 765, 194)  'RP매수 전 상품내용을 충분히 숙지하시고 이해하신 다음, 고객투자성향 등을 감안하여 투자를 결정해 주세요.'  TP_NONE      COLOR(208, 232)  CUR(0)    AL_LEFT  FONT("굴림체", 9, BOLD)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  jukhab_img(30, 147, 75, 192)  TP_PUSH|IMAGE|AL_STRETCH      COLOR(15, 63)  CUR(0)    "ICO_WARNING_90.bmp"    TABORDER(51)  &
+  VISIBLE  IMAGE  HINTTYPE(IH_NONE)
+PANEL  PANEL55(20, 378, 180, 402)  LINECOLOR(130)      COLOR(192, 232)  CUR(10)    AL_LEFT    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  CHECK3(25, 380, 175, 400)  'RP약관'  TP_CHECK|EDIT_NOP        FONT("굴림", 9, NORMAL)  COLOR(208, 130)  CUR(10)      TABORDER(52)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+PANEL  PANEL56(20, 322, 180, 346)  LINECOLOR(130)      COLOR(192, 232)  CUR(10)    AL_LEFT    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  CHECK1(25, 324, 175, 344)  '주요내용 고객확인'  TP_CHECK|EDIT_NOP        FONT("굴림", 9, NORMAL)  COLOR(208, 130)  CUR(10)      TABORDER(53)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+PANEL  PANEL41(560, 220, 660, 240)  '매우 낮은 위험'  LINECOLOR(46100224)      COLOR(192, 46100224)  CUR(10)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  DESC(450, 245, 675, 265)  '수시 RP수익률(연,세전)'  AL_LEFT  FONT("굴림체", 9, BOLD)  CUR(0)      COLOR(208, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+PANEL  PANEL68(435, 251, 444, 260)    |IMAGE|AL_CENTER    COLOR(208, 232)  CUR(0)    "텍스트화살표_하단.BMP"  ENABLE  &
+  VISIBLE  TRANSPARENT  IMAGE  HINTTYPE(IH_NONE)
+OBJECT  obj_checkList(1257, 616, 1443, 637)    "IB6202CK"  TABORDER(54)  IOORDER(51)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL46(1015, 665, 1110, 685)  'obj_checkList'  TP_NONE      COLOR(68, 130)  CUR(0)    AL_LEFT  FONT("굴림체", 9, BOLD)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_NONE)
+OBJECT  obj_tojaSearch(1315, 622, 1440, 647)    "IB620214"  TABORDER(55)  IOORDER(52)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL14(1189, 624, 1309, 644)  'obj_tojaSearch'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL17(1190, 645, 1310, 665)  'obj_SACMT111'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  obj_SACMT111(1310, 643, 1435, 668)    "IB620212"  TABORDER(56)  IOORDER(53)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL13(1190, 665, 1310, 685)  'obj_SACMT119'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  obj_SACMT119(1315, 665, 1440, 690)    "IB620211"  TABORDER(57)  IOORDER(54)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  ckTest(5, 545, 55, 565)  'test'  TP_CHECK|EDIT_NOP          COLOR(208, 232)  CUR(0)      TABORDER(58)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Dim emsg
+Dim PolicyPhase
+PolicyPhase = 2
+
+Function P_pswdConfirm(accn, pswd, msg)
+	Dim ret, sdata1
+	GUIDE.Text = ""
+	P_pswdConfirm = False
+
+	If SYSTEM.ConnectBy = "0" Then
+		If Len(Trim(accn)) <> 11 Then
+			msg = "계좌번호를 확인하여 주십시오."
+			MsgBox msg, , "IBK투자증권"
+			Exit Function
+		End If
+
+		If Len(Trim(pswd)) > 8 Or Len(Trim(pswd)) < 4 Then
+			msg = "비밀번호를 확인하여 주십시오."
+			MsgBox msg, , "IBK투자증권"
+			Exit Function
+		End If
+		msg = ""
+
+		sdata = accn&pswd
+		ret = SCREEN.ServiceEx("pibopswd", accn&pswd, Len(sdata), 0, 600000)
+		If Left(ret,1) <> "1" Then
+			msg = Mid(ret,2,99)
+			If Trim(msg) = "" Then
+				msg = "대기 시간 초과입니다. 결과를 꼭 확인 바랍니다."
+			End If
+
+			If InStr(msg, "3669") > 0 Then
+				MsgBox msg, , "IBK투자증권"
+			End If
+
+			GUIDE.Text = Trim(msg)
+			Exit Function
+		End If
+	End If
+
+	P_pswdConfirm = True
+End Function
+
+Sub Set_account()
+	price.Enable = False
+	SCREEN.ClearAll 0, 2
+	SCREEN.SetTimer 5, False
+
+	ACNM.Data = AN51.Name
+	zPwd.Data = AN51.Password
+
+	If Len(Trim(AN51.Data)) < 11 Then
+		AN51.SetFocus
+		Exit Sub
+	End If
+
+	If Len(Trim(zPwd.Data)) < 4 Then
+		zPwd.SetFocus
+		Exit Sub
+	End If
+End Sub
+
+
+
+Function Error_check()
+	Error_check = False
+
+	If Len(Trim(AN51.Data)) < 11 Then
+		MsgBox "계좌번호를 확인하십시오.", , "IBK투자증권"
+		AN51.SetFocus
+		Exit Function
+	End If
+
+	If Len(Trim(zPwd.Data)) < 4 Then
+		MsgBox "계좌 비밀번호를 입력 후 조회 버튼을 클릭해 주세요.", , "IBK투자증권"
+		zPwd.SetFocus
+		Exit Function
+	End If
+
+	' 계좌 비밀번호 검증
+	If P_pswdConfirm(AN51.Data, zPwd.Data, emsg) = False Then
+		GUIDE.Text = Trim(emsg)
+		zPwd.SetFocus()
+		Exit Function
+	End If
+
+	Error_check = True
+End Function
+
+Sub Set_Focus()
+	If Len(Trim(AN51.Data)) < 11 Then
+		AN51.SetFocus
+		Exit Sub
+	End If
+
+	If Len(Trim(zPwd.Data)) < 4 Then
+		zPwd.SetFocus
+		Exit Sub
+	End If
+
+	If CDbl(price.Data) = 0 Then
+		price.SetFocus
+		Exit Sub
+	End If
+
+	If CDbl(i_dBnsBndUprc.Data) = 0 Then
+		i_dBnsBndUprc.SetFocus
+		Exit Sub
+	End If
+
+	If CDbl(i_lRpDays.Data) = 0 Then
+		i_lRpDays.SetFocus
+		Exit Sub
+	End If
+End Sub
+
+Sub changeRPGubn()
+
+	If RADIO0.Checked = True Then
+		DESC.Text = "수시 RP수익률(연,세전)"
+	ElseIf RADIO1.Checked = True Then
+		DESC.Text = "일반 RP수익률(연,세전)"
+	Else
+		DESC.Text = "수익자유 RP수익률(연,세전)"
+	End If
+
+	' 일반은 89일로 조회, 나머지(수시, 수익자유)는 90일로 조회
+	If RADIO1.Checked = True Then
+		i_lRpDays.Data = 89
+	Else
+		i_lRpDays.Data = 90
+	End If
+	'cc.Data = ""
+
+	lTrdNo.Clear()
+
+	' 수익자유 && LoadAccounts (True:개인, False:법인)
+	If RADIO2.Checked = True And LoadAccounts() = True Then
+		RADIO0.Checked = True
+		Call alert_msg("수익자유 RP는 법인만 매수할 수 있습니다.")
+		changeRPGubn()
+		Exit Sub
+	End If
+
+'	If Len(Trim(zPwd.Data)) < 4 Then
+'		zPwd.SetFocus
+'		Exit Sub
+'	End If
+
+	SCREEN.Proc "OBJ2.send_f", ""
+	SCREEN.Proc "OBJ3.send_f", ""
+End Sub
+
+' RP 핵심요약 설명서 다운로드 체크
+Function con_chk()
+	con_chk = False
+
+	If CHECK1.Checked = False Then
+		MsgBox "주요내용 고객확인을 확인 후 진행하여 주십시오."
+		CHECK1.SetFocus
+		Exit Function
+	End If
+
+    If CHECK2.Checked = False Then
+		MsgBox "RP 핵심(요약)설명서를 확인 후 진행하여 주십시오."
+		CHECK2.SetFocus
+		Exit Function
+	End If
+
+    If CHECK3.Checked = False Then
+		MsgBox "RP약관을 확인 후 진행하여 주십시오."
+		CHECK3.SetFocus
+		Exit Function
+	End If
+
+	con_chk = True
+End Function
+
+
+Sub complete_RPAgree()
+	Dim flag
+
+	' 동의 인 경우 Visible False
+	' 미동의 인 경우 Visible True
+	flag = Trim(SCREEN.Object("OBJ3.OUTPUT27").Data) <> "동의"
+
+	check_pdf2.Visible = flag
+	AGREE.Visible = flag
+
+End Sub
+
+
+Function LoadAccounts()
+	LoadAccounts = True '개인
+	Dim accList, ii, acc, acno, ACNM, acid, actp, idx, myAcntFlag, value
+	accList = Split(CX_DTS.GetTypeData ("4","1" ), vbLf, -1, vbTextCompare)  ''accoutcc 로 전계좌 불러오기 0->1
+
+	For ii=0 To UBound(accList)
+		acc = Trim(accList(ii))
+		If Len(acc)>11 Then
+			acc = Split(acc, "|", -1, vbTextCompare)
+			acno = Trim(Mid(acc(0), 1, 11))
+			ACNM = Mid(acc(0), 12)
+			ACNM = Replace(ACNM, vbTab, "")
+			ACNM = Trim(ACNM)
+			acid = Trim(acc(1))
+			actp = Mid(acno, 4, 2)
+			myAcntFlag = acc(2)
+
+			If acno = Trim(Trim(AN51.Data)) Then
+
+				'VIP전용화면으로 고객용으로만 조회가능
+				'계좌플래그 2 또는 3 이면 랩계좌      법인계좌 타입 = 4
+				'랩계좌 제외
+				If chkNumericData(myAcntFlag) = True Then
+					value = myAcntFlag And 4
+				    If value = 4 Then
+						LoadAccounts = False '법인
+					End If
+				End If
+			End If
+		End If
+	Next
+
+End Function
+
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+' 사용자 투자정보 내역 조회 후 사용자 안내
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Sub complete_cusstatus()
+SYSTEM.Trace "[6202] complete_cusstatus start!!"
+
+	BOX10.Visible = False
+	tujaNM2.Visible = False
+	tujaNM2.data = ">"
+	Dim char,check_char,tmptujaYN,tmpinfoYN,tmptujaNM,tmptujaGD,tempYN
+
+	tmptujaYN = Trim(SCREEN.Object("obj_cusstatus.OUTPUT7").Data)
+	tmpinfoYN = Trim(SCREEN.Object("obj_cusstatus.OUTPUT8").Data)
+	tmptujaNM = Trim(SCREEN.Object("obj_cusstatus.zGrdNm").Data)
+
+	'SCREEN.Object("obj_cusstatus.chkGrdNm").Data = "N"
+	'tmpinfoYN = "0"
+	If Trim(SCREEN.Object("obj_cusstatus.chkGrdNm").Data)  = "N" Then
+		If tmpinfoYN <> "0" Then '미등록시,만료시 팝업
+			SCREEN.CreateWindow 1, "IB6202A6 /t/s/p5", ""
+			SCREEN.CloseWindow() '' 투자자정보확인서 미등록 미제공시 팝업 후 종료로 변경 23.05.11
+			Exit Sub
+		Else '미제공
+			SCREEN.CreateWindow 2, "IB6610A7 /p99 /d", "" '미제공팝업
+			If SYSTEM.Pop("bond_IB6610A7") = "OK" Then
+
+				SCREEN.CreateWindow 2, "IB6610A8 /p99 /d", ""
+
+				If SYSTEM.Pop("bond_IB6610A8") <> "OK" Then
+					SCREEN.CloseWindow()
+					Exit Sub
+				End If
+
+			ElseIf SYSTEM.Pop("bond_IB6610A7") = "TUJA" Then
+				'SCREEN.CreateWindow 1, "IB821200 /t/p5", ""
+				SCREEN.SetTimerx 1, 10, False
+
+
+				Exit Sub
+			Else
+				SCREEN.CloseWindow()
+				Exit Sub
+			End If
+		End If
+		check_char = 1
+	Else
+		If tmptujaNM = "안정형" Then '부적합 투자자
+			SCREEN.CreateWindow 2, "IB6202A7 /p99 /d", ""
+			If SYSTEM.Pop("bond_IB6202A7") <> "OK" Then
+				SCREEN.CloseWindow()
+				Exit Sub
+			End If
+
+			buhab1.Visible = True
+			buhab2.Visible = True
+			buhab3.Visible = True
+			buhab4.Visible = True
+			buhab_img.Visible = True
+			jukhab1.Visible = False
+			jukhab2.Visible = False
+			jukhab_img.Visible = False
+		Else '적합
+			buhab1.Visible = False
+			buhab2.Visible = False
+			buhab3.Visible = False
+			buhab4.Visible = False
+			buhab_img.Visible = False
+			jukhab1.Visible = True
+			jukhab2.Visible = True
+			jukhab_img.Visible = True
+		End If
+	End If
+
+	If Trim(tmptujaYN) = "0" Then
+		tmptujaYN = "미희망"
+	Else
+		tmptujaYN = "희망"
+	End If
+
+	If Trim(SCREEN.Object("obj_cusstatus.OUTPUT6").Data)  = "0" Then '전문 투자자
+			check_char = 1 '전문투자자는 최고위험이하 상품표시
+	Else
+		If tmptujaNM = "안정형" Then
+			check_char = 6
+		ElseIf tmptujaNM = "안정추구형" Then
+			check_char = 4
+		ElseIf tmptujaNM = "위험중립형" Then
+			check_char = 3
+		ElseIf tmptujaNM = "적극투자형" Then
+			check_char = 2
+		ElseIf tmptujaNM = "공격투자형" Then
+			check_char = 1
+		End If
+	End If
+
+	If Trim(tmpinfoYN) = "0" Then
+		tmptujaNM = ""
+		tmpinfoYN = "미제공"
+		'check_char = 7
+	Else
+		tmpinfoYN = "제공"
+	End If
+
+	Select Case check_char
+		Case 6 :
+			tmptujaGD = "매우낮은위험이하"
+		Case 4 :
+			tmptujaGD = "보통위험이하"
+		Case 3 :
+			tmptujaGD = "다소높은위험이하"
+		Case 2 :
+			tmptujaGD = "높은위험이하"
+		Case 1 :
+			tmptujaGD = "매우높은위험이하"
+'		Case 7 :
+'			tmptujaGD = ""
+	End Select
+
+	If Trim(SCREEN.Object("obj_cusstatus.LEDGER").Ecod) = "3956" Then '"미등록"
+			tujaNM.Data = "없음(미등록)"
+			tujaGD.Data = "-"
+			NotujaCase()
+			Exit Sub
+	ElseIf CDbl(SCREEN.Object("obj_cusstatus.zToday").Data) > CDbl(SCREEN.Object("obj_cusstatus.zDueDate").Data) Then '만료일
+		tujaNM.Data = "없음(만료)"
+		tujaGD.Data = "-"
+		NotujaCase()
+		Exit Sub
+
+	ElseIf Trim(SCREEN.Object("obj_cusstatus.OUTPUT6").Data) = "0" Then ' 전문금융소비자 일경우 스킵
+		tujaNM.Data = "전문금융소비자"
+		tujaGD.Data = "매우높은위험이하"
+		'grdimg1.Visible = True
+
+	ElseIf tmpinfoYN = "미제공" Then '미희망은 요건 없어짐
+			tujaNM.Data = "투자자정보 미제공"
+			tujaGD.Data = "-"
+			BOX6.Visible = False
+			BUTTON1.Visible = True
+
+	Else '일반금융소비자
+		'tujaYN.Data = tmptujaYN
+		'infoYN.Data = tmpinfoYN
+		tujaNM.Data = tmptujaNM
+		tujaGD.Data = tmptujaGD
+
+		Select Case check_char
+		Case 6 :
+			'tmptujaGD = "매우낮은위험"
+			'tujaimg5.Visible = True
+			'grdimg6.Visible = True
+			tujaNM.TRgb = "39853824"
+			BOX10.PRgb = "39853824"
+			tujaNM2.TRgb = "39853824"
+		Case 4 :
+			'tmptujaGD = "보통위험이하"
+			'tujaimg4.Visible = True
+			'grdimg4.Visible = True
+			tujaNM.TRgb = "38842368"
+			BOX10.PRgb = "38842368"
+			tujaNM2.TRgb = "38842368"
+		Case 3 :
+			'tmptujaGD = "다소높은위험이하"
+			'tujaimg3.Visible = True
+			'grdimg3.Visible = True
+			tujaNM.TRgb = "33603839"
+			BOX10.PRgb = "33603839"
+			tujaNM2.TRgb = "33603839"
+		Case 2 :
+			'tmptujaGD = "높은위험이하"
+			'tujaimg2.Visible = True
+			'grdimg2.Visible = True
+			tujaNM.TRgb = "33580799"
+			BOX10.PRgb = "33580799"
+			tujaNM2.TRgb = "33580799"
+		Case 1 :
+			'tmptujaGD = "매우높은위험이하"
+			'tujaimg1.Visible = True
+			'grdimg1.Visible = True
+			tujaNM.TRgb = "33554687"
+			BOX10.PRgb = "33554687"
+			tujaNM2.TRgb = "33554687"
+
+	End Select
+		BOX10.Visible = True
+		tujaNM2.Visible = True
+	End If
+
+
+'	Dim char,check_char,tmptujaYN,tmpinfoYN,tmptujaNM,tmptujaGD,tempYN
+
+'	tmptujaYN = Trim(SCREEN.Object("obj_cusstatus.OUTPUT7").Data)	' 투자권유구분
+'	tmpinfoYN = Trim(SCREEN.Object("obj_cusstatus.OUTPUT8").Data)	' 정보제공구분
+'	tmptujaNM = Trim(SCREEN.Object("obj_cusstatus.zGrdNm").Data)	' 고객투자성향
+
+'	If Trim(tmptujaYN) = "0" Then
+'		tmptujaYN = "미희망"
+'	Else
+'		tmptujaYN = "희망"
+'	End If
+
+'	If tmptujaNM = "안정형" Then
+'		check_char = 1
+'	ElseIf tmptujaNM = "안정추구형" Then
+'		check_char = 2
+'	ElseIf tmptujaNM = "위험중립형" Then
+'		check_char = 3
+'	ElseIf tmptujaNM = "적극투자형" Then
+'		check_char = 4
+'	ElseIf tmptujaNM = "공격투자형" Then
+'		check_char = 6
+'	End If
+
+'	If Trim(tmpinfoYN) = "0" Then
+'		tmptujaNM = ""
+'		tmpinfoYN = "미제공"
+'		'check_char = 7
+'	Else
+'		tmpinfoYN = "제공"
+'	End If
+
+'	Select Case check_char
+'		Case 1 :
+'			tmptujaGD = "매우낮은위험이하"
+'		Case 2 :
+'			tmptujaGD = "낮은위험이하"
+'		Case 3 :
+'			tmptujaGD = "보통위험이하"
+'		Case 4 :
+'			tmptujaGD = "다소높은위험이하"
+'		Case 6 :
+'			tmptujaGD = "매우높은위험이하"
+'		Case 7 :
+'			tmptujaGD = ""
+'	End Select
+
+
+'	If Trim(SCREEN.Object("obj_cusstatus.zToday").Data) = "" Or Trim(SCREEN.Object("obj_cusstatus.zDueDate").Data) = "" Then '만료일
+'		msg.Text = "투자자정보확인서가 작성되지 않았거나, 유효기간이 만료되었습니다."
+'		Exit Sub
+
+'	ElseIf CDbl(SCREEN.Object("obj_cusstatus.zToday").Data) > CDbl(SCREEN.Object("obj_cusstatus.zDueDate").Data) Then '만료일
+'		msg.Text = "투자자정보확인서가 작성되지 않았거나, 유효기간이 만료되었습니다."
+'		Exit Sub
+
+'	ElseIf Trim(SCREEN.Object("obj_cusstatus.LEDGER").Ecod) = "3956" Then '"미등록"
+'		msg.Text = "투자자정보확인서가 작성되지 않았거나, 유효기간이 만료되었습니다."
+'		Exit Sub
+
+'	ElseIf Trim(SCREEN.Object("obj_cusstatus.OUTPUT6").Data) = "0" Then ' 전문금융소비자 일경우 스킵
+'		msg.Text = "고객님은 전문금융소비자로, 매우높은위험 이하 등급의 상품이 적합합니다."
+
+'	ElseIf tmpinfoYN = "미제공" Then '미희망은 요건 없어짐
+'		msg.Text = "당사에 투자자정보 제공을 원하지 않으세요."
+
+'	Else '일반금융소비자
+'		Select Case check_char
+'		Case 1 : ' "안정형"
+'			msg.Text = "고객님의 투자성향은 안정형으로, 낮은위험 이하 등급의 상품이 적합합니다."
+
+'		Case 2 : ' "안정추구형"
+'			msg.Text = "고객님의 투자성향은 안정추구형으로, 보통위험 이하 등급의 상품이 적합합니다."
+
+'		Case 3 : ' "위험중립형"
+'			msg.Text = "고객님의 투자성향은 위험중립형으로, 다소높은위험 이하 등급의 상품이 적합합니다."
+
+'		Case 4 : ' "적극투자형"
+'			msg.Text = "고객님의 투자성향은 적극투자형으로, 높은위험 이하 등급의 상품이 적합합니다."
+
+'		Case 6 : ' "공격투자형"
+'			msg.Text = "고객님의 투자성향은 공격투자형으로, 매우높은위험 이하 등급의 상품이 적합합니다."
+'		End Select
+'	End If
+
+End Sub
+
+
+
+
+' 주문
+Sub DoOrder()
+	dmsg = "mapN" & vbTab & "IB620200"
+	SCREEN.CreateWindow 2, "IB6202A9 /p99 /d", dmsg
+	If SYSTEM.Pop("RP_IB6202A9") <> "OK" Then
+		Exit Sub
+	End If
+
+	' 매매단가 :: Default 10,000
+	i_dBnsBndUprc.Data = 10000
+
+	SYSTEM.Push "rp_masu_order", ""
+
+	Dim dmsg, rpGubn
+
+	If RADIO0.Checked = True Then
+		rpGubn = "수시"
+	ElseIf RADIO1.Checked = True Then
+		rpGubn = "일반"
+	Else
+		rpGubn = "수익자유"
+	End If
+
+	dmsg = "o_acno" & vbTab & AN51.Data & vbLf &_
+		   "o_acnm" & vbTab & ACNM.Data & vbLf &_
+		   "o_gubn" & vbTab & rpGubn & vbLf &_
+		   "o_pric" & vbTab & price.data & vbLf
+
+	SCREEN.CreateWindow 2, "IB620205 /p5 /d", dmsg
+
+	If SYSTEM.Pop("rp_masu_order") <> "OK" Then
+		Exit Sub
+	End If
+
+	If IsBnkAccnType(AN51) = True Then
+		SCREEN.Proc "obj_getMoney.contributionBnk", Trim(price.Data)
+	Else
+		Call send_o()		'주문전송
+	End If
+End Sub
+
+Sub send_o()
+	LEDGER.Fkey = "C"
+	SCREEN.Send 0
+End Sub
+
+
+
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+' 주문 직전 사용자 투자성향 CHECK (Call By obj_cusstatus)
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Sub complete_order()
+
+	Dim char,check_char,tmptujaNM,tmptujaGD,tempYN, donimo_char, dmsg, result
+
+	' 투정 미등록
+	If Trim(SCREEN.Object("obj_cusstatus.LEDGER").Ecod) = "3956" Then '"미등록"
+		SCREEN.CreateWindow 1, "IB620210 /t/s/p5", ""
+		GUIDE.Text = "투자자정보확인서가 작성되지 않았거나, 유효기간이 만료되었습니다."
+		Exit Sub
+	End If
+
+	' 투정 약정일자 만료
+	If CDbl(SCREEN.Object("obj_cusstatus.zToday").Data) > CDbl(SCREEN.Object("obj_cusstatus.zDueDate").Data) Then '만료일
+		SCREEN.CreateWindow 1, "IB620210 /t/s/p5", ""
+		GUIDE.Text = "투자자정보확인서가 작성되지 않았거나, 유효기간이 만료되었습니다."
+		Exit Sub
+	End If
+
+	' 입력 필드 CHECK
+	If CDbl(price.Data) = 0 Then
+		MsgBox "매수금액을 확인하십시오.", , "IBK투자증권"
+		price.SetFocus
+		Exit Sub
+	End If
+
+	If CDbl(i_dBnsBndUprc.Data) = 0 Then
+		MsgBox "매매단가를 확인하십시오.", , "IBK투자증권"
+		i_dBnsBndUprc.SetFocus
+		Exit Sub
+	End If
+
+	If CDbl(i_lRpDays.Data) = 0 Then
+		MsgBox "RP일수를 확인하십시오.", , "IBK투자증권"
+		i_lRpDays.SetFocus
+		Exit Sub
+	End If
+
+	If Trim(cc.Data) = "00000" Or Trim(cc.Data) = "" Then
+		MsgBox "약정이율을 확인하십시오.", , "IBK투자증권"
+		cc.SetFocus
+		Exit Sub
+	End If
+
+	' 설명서 및 사전동의서 Check
+	If con_chk() = False Then
+		GUIDE.Text = "설명서를 확인해 주세요."
+		Exit Sub
+	End If
+
+	Call DoOrder()
+	' 전문금융소비자가 아닌 일반 고객인경우 상품위험등급(보통)과 고객투자성향 비교
+'	If Trim(SCREEN.Object("obj_cusstatus.OUTPUT6").Data) <> "0" Then
+'		' RP 상품위험등급 - 보통 위험 :: 2
+'		' RP 상품위험등급 - 낮은 위험 :: 3에서 2로 변경 20231229 온라인설명의무
+'		donimo_char = 2
+
+'		' 고객투자성향
+'		tmptujaNM = Trim(SCREEN.Object("obj_cusstatus.zGrdNm").Data)
+'		If     tmptujaNM = "안정형"     Then
+'			check_char = 1
+'		ElseIf tmptujaNM = "안정추구형" Then
+'			check_char = 2
+'		ElseIf tmptujaNM = "위험중립형" Then
+'			check_char = 3
+'		ElseIf tmptujaNM = "적극투자형" Then
+'			check_char = 4
+'		ElseIf tmptujaNM = "공격투자형" Then
+'			check_char = 6
+'		End If
+
+'		If check_char < donimo_char Then '안정추구형 이상 체크
+'			SCREEN.SetTimerx 2, 50, False
+'		Else
+'			' 주문 집행
+'			Call DoOrder()
+'		End If
+'	Else
+'		' 주문 집행
+'		Call DoOrder()
+'	End If
+
+
+
+
+End Sub
+
+Sub NotujaCase()
+	BOX6.Visible = False
+	BUTTON1.Visible = True
+End Sub
+
+
+
+Sub CHECK2_CHK()
+	CHECK2.Checked = True
+End Sub
+
+Sub PopSuitable()  '부적합 화면 팝업 및 추가인증 처리
+SYSTEM.Trace "[6202]  부적합화면[IB620212]을 띄워서 추가인증 여부를 확인해야 한다. "
+	If Len(Trim(zPwd.Data)) <= 8 And Len(Trim(zPwd.Data)) >= 4 Then
+			dmsg = "zGrdNm" & vbTab & Trim(SCREEN.Object("obj_cusstatus.zGrdNm").Data) & vbLf &_
+					"mapN" & vbTab & "IB620200" &  vbLf &_
+				   "EDIT3" & vbTab & Trim(AN51.Data) &  vbLf &_
+				   "EDIT4" & vbTab & Trim(zPwd.Data) &  vbLf &_
+				   "outQ2" & vbTab & Trim(SCREEN.Object("obj_tojaSearch.Quest2").Data) & vbLf &_
+				   "outQ3" & vbTab & Trim(SCREEN.Object("obj_tojaSearch.Quest3").Data) & vbLf &_
+				   "outQ4" & vbTab & Trim(SCREEN.Object("obj_tojaSearch.Quest4").Data)
+
+			SCREEN.CreateWindow 3, "IB620212 /p5 /d", dmsg
+	Else
+		sVal = "비밀번호를 확인하여 주십시오."
+		MsgBox sVal, , "IBK투자증권"
+	End If
+End Sub
+
+Function GetToday()
+	AYear = Year(Date)
+	AMonth = Month(Date)
+	If Len(AMonth) = 1 Then
+		AMonth = "0" & AMonth
+	End If
+	ADay = Day(Date)
+	If Len(ADay) = 1 Then
+		ADay = "0" & ADay
+	End If
+	GetToday = AYear & AMonth & ADay
+End Function
+
+Function CheckTodayRegist()
+	CheckTodayRegist = False
+
+	Dim RegDay, regcode
+	If SCREEN.CreateObject("Info") Then
+		'RegDay = Trim(INFO.PopData(LOGIN.Name, "userconf.ini", "InvestTuja _IB620200", "RegistDay"))
+		RegDay = Trim(INFO.PopData(LOGIN.Name, "userconf.ini", "InvestTuja", "RegistDay"))
+		'regcode = Trim(INFO.PopData(LOGIN.Name, "userconf.ini", "InvestTuja _IB620200", "regcode"))
+		regcode = Trim(INFO.PopData(LOGIN.Name, "userconf.ini", "InvestTuja", "regcode"))
+	End If
+SYSTEM.Trace "[6202]투자자금성향 정보 등록 날짜(PC) = " & RegDay
+SYSTEM.Trace "[6202]오늘날짜 = " & GetToday()
+SYSTEM.Trace "[6202]regcode = " & regcode
+
+	If GetToday() <> RegDay Then
+SYSTEM.Trace "[6202]  --------------등록 날짜가 금일이 아니다  exit Function"
+		Exit Function
+	End If
+SYSTEM.Trace "[6202]  -------------등록 날짜가 금일이다"
+
+	CheckTodayRegist = True
+End Function
+
+Sub CheckCustomInfo_First() '123
+SYSTEM.Trace "[.]  								 "
+SYSTEM.Trace "[6202] !!!!! CheckCustomInfo_First  !!!!!!"
+	'SCREEN.Object("obj_cusstatus.OUTPUT6").Data  = "1"   '전문투자자 test
+	'SCREEN.Object("obj_cusstatus.zQryYn1_out").Data  = "1"  '취약금융소비자 test
+
+			'전문투자자
+			If Trim(SCREEN.Object("obj_cusstatus.OUTPUT6").Data)  = "0" Then
+		SYSTEM.Trace "[6202] 전문투자자!!!!!"
+				price.Enable = True
+				Exit Sub
+			Else
+				SYSTEM.Trace "[6620] ------------  전문투자자 아님!!!!!"
+			End If
+
+
+
+			'취약금융소비자
+			If Trim(SCREEN.Object("obj_cusstatus.zQryYn1_out").Data)  = "1" Then
+		SYSTEM.Trace "[6202] ------------  취약금융소비자 !!!!"
+				SYSTEM.Push "IB620211_OK", ""
+				dmsg = "EDIT1" & vbTab & "4"  & vbLf &_
+					   "EDIT3" & vbTab & AN51.Data  & vbLf &_
+					   "EDIT4" & vbTab & zPwd.Data
+
+				SCREEN.CreateWindow 2, "IB620211 /p5 /d", dmsg
+				tmpYN = SYSTEM.Pop("IB620211_OK")
+				If tmpYN = "Y" Then
+					SCREEN.Object("obj_SACMT119.EDIT1").Data = "4"
+					SCREEN.Object("obj_SACMT119.EDIT3").Data = AN51.Data
+					SCREEN.Object("obj_SACMT119.EDIT4").Data = zPwd.Data
+					obj_SACMT119.Send
+				Else
+		SYSTEM.Trace "	[6202] !!!!! 취약금융자 추가설명 SACMT119 등록 안함 !!!!!!"
+					Exit Sub
+				End If
+			Else
+		SYSTEM.Trace "[6620] ------------  취약금융소비자 아님!!!!!"
+			CheckCustomInfo_Secound()
+			End If
+
+End Sub
+
+Sub SetAuth_IB620200()
+SYSTEM.Trace "[.]  								 "
+SYSTEM.Trace "[6202] !!!!! 추가인증 완료 !!!! SetAuth "
+SYSTEM.Trace "[6202]  추가인증 완료후 	SACMT111 전송"
+	SCREEN.Object("obj_SACMT111.EDIT0").Data = "1"  '처리구분
+	SCREEN.Object("obj_SACMT111.EDIT1").Data = "4"  '종목분류
+	obj_SACMT111.Send 'IB620212
+	price.Enable = True
+End Sub
+
+Sub CheckCustomInfo_Secound() '456
+SYSTEM.Trace "[.]  								 "
+SYSTEM.Trace "[6202] !!!!! CheckCustomInfo_Secound start !!!!!! sStep = " & sStep
+
+	'SCREEN.Object("obj_cusstatus.OUTPUT8").Data = "0" '투자자정보제공여부
+
+	'투자자정보미제공
+		If Trim(SCREEN.Object("obj_cusstatus.OUTPUT8").Data) = "0" Then
+	SYSTEM.Trace "[6620] ------------  투자자정보미제공!!!!!"
+			SYSTEM.Trace "[6202]  부적합화면[IB620212]을 띄워서 추가인증 여부를 확인해야 한다. "
+			PopSuitable()
+			Exit Sub
+		Else
+			SYSTEM.Trace "[6620] ------------  투자자정보 제공!!!!!"
+			If PolicyPhase = 2 Then
+				price.Enable = True
+			End If
+		End If
+
+
+		If PolicyPhase = 1 Then
+SYSTEM.Trace "[6202] !!!!! CheckCustomInfo_Secound !!!!!! PolicyPhase = " & PolicyPhase
+			 '금일 투자정보확인서 등록 여부
+			If CheckTodayRegist = True Then
+		        '금일 투자확인서 등록 조회로 띄운다
+		        SYSTEM.Push "9320Acnt", AN51.Data
+		        SYSTEM.Push "9320Pwd", Trim(zPwd.Data)
+		        SYSTEM.Push "9320Type", "9"
+		        SYSTEM.Push "9320Code",""
+		        SCREEN.Object("obj_tojaSearch.mapN").Data = "IB620200"
+		        obj_tojaSearch.Proc "SearchSend", ""
+			Else '등록으로 띄운다
+				Pop_TujaMap("0")
+			End If
+		Else
+SYSTEM.Trace "[6202] !!!!! CheckCustomInfo_Secound !!!!!! PolicyPhase = " & PolicyPhase
+		End If
+End Sub
+
+Sub CheckIvToday()
+	 '금일 투자정보확인서 등록 여부
+	If CheckTodayRegist = True Then
+        '금일 투자확인서 등록 조회로 띄운다
+        SYSTEM.Push "9320Acnt", AN51.Data
+        SYSTEM.Push "9320Pwd", Trim(zPwd.Data)
+        SYSTEM.Push "9320Type", "9"
+        SYSTEM.Push "9320Code",""
+        SCREEN.Object("obj_tojaSearch.mapN").Data = "IB620200"
+        obj_tojaSearch.Proc "SearchSend", ""
+	Else '등록으로 띄운다
+		Pop_TujaMap("0")
+	End If
+End Sub
+
+Sub Pop_TujaMap(bSearch) '456 0 등록으로 띄운다  1 조회로 띄운다
+SYSTEM.Trace "[6202]  Pop_TujaMap bSearch =" & bSearch
+
+	If bSearch = "1" Then
+		SYSTEM.Trace "[6202]  Pop_TujaMap 조회로 띄운다"
+	Else
+		SYSTEM.Trace "[6202]  Pop_TujaMap 등록으로 띄운다"
+	End If
+
+	If bSearch = "1" Then
+		dmsg = "mapN" & vbTab & "IB620200" &  vbLf &_
+				"TrxTp" & vbTab & "3"
+	Else
+		dmsg = "mapN" & vbTab & "IB620200" &  vbLf &_
+				"TrxTp" & vbTab & "1"
+	End If
+
+	SYSTEM.Push "IB620215_OK", "N"
+	SCREEN.CreateWindow 2, "IB620215 /p5 /d", dmsg
+
+	tmpYN = SYSTEM.Pop("IB620215_OK")
+
+SYSTEM.Trace "[6202]  Pop_TujaMap IB620215_OK = "	& tmpYN
+
+	If Trim(tmpYN) = "Y" Then
+		SYSTEM.Push "9320Acnt", AN51.Data
+        SYSTEM.Push "9320Pwd", Trim(zPwd.Data)
+        SYSTEM.Push "9320Type", "9"
+        SYSTEM.Push "9320Code",""
+        SCREEN.Object("obj_tojaSearch.mapN").Data = "IB620200"
+		obj_tojaSearch.Proc "RegisterSend", ""
+	End If
+End Sub
+
+Function IsDangerSix(sVal)
+	If InStr(sVal , "매우") > 0 And InStr(sVal , "낮은") > 0 Then
+		IsDangerSix = True
+SYSTEM.Trace "[6202] 상품위험등급 sVal = " & sVal  & " 위험등급이 6등이다 "
+	Else
+		IsDangerSix = False
+SYSTEM.Trace "[6202] 상품위험등급 sVal = " & sVal  & " 위험등급이 6등급 아니다 "
+	End If
+End Function
+
+Sub RegComplete()
+	'Quest2 = Trim(INFO.PopData(LOGIN.Name, "userconf.ini", "InvestTuja _IB620200", "Quest2"))
+	Quest2 = Trim(INFO.PopData(LOGIN.Name, "userconf.ini", "InvestTuja", "Quest2"))
+
+SYSTEM.Trace "[6202]  RegComplete Quest2 =" & Quest2
+
+	If Quest2 = "1" Then '1 원금보존 추구  ,  2 원금보존 안함
+SYSTEM.Trace "[6202] 원금보존 추구 상품위험등급이 6등급이면?"
+
+		If IsDangerSix("낮은 위험") = True Then
+			price.Enable = True
+		Else
+	 		PopSuitable()
+	 	End If
+
+	Else '원금보존 추구 하지 않으면 고객성향이 상품위험 등급보다 큰지 확인
+		tmptujaNM = Trim(SCREEN.Object("obj_cusstatus.zGrdNm").Data)
+SYSTEM.Trace "[6202] 원금보존 추구 안함"
+		If IsCusPrfsmallThanPrdRisk(tmptujaNM, "2") = True Then
+SYSTEM.Trace "[6202] 고객투자성향이 상품위험등급보다 낮아서 부적합화면 팝업"
+			PopSuitable()
+		Else
+			price.Enable = True
+		End If
+	End If
+End Sub
+
+'고객성향이 상품위험 등급보다 큰지 확인
+Function IsCusPrfsmallThanPrdRisk(sCus, sPrdRisk) '789
+SYSTEM.Trace "[6202] IsCusPrfsmallThanPrdRisk(고객성향과 상품등급 비교)  sCus = " & sCus
+
+	If sCus = "안정형" Then
+		check_char = 1
+	ElseIf sCus = "안정추구형" Then
+		check_char = 2
+	ElseIf sCus = "위험중립형" Then
+		check_char = 3
+	ElseIf sCus = "적극투자형" Then
+		check_char = 4
+	ElseIf sCus = "공격투자형" Then
+		check_char = 6
+	End If
+
+SYSTEM.Trace "[6202] IsCusPrfsmallThanPrdRisk(고객성향과 상품등급 비교) check_char = " & check_char & " |  상품 = " & sPrdRisk
+
+	'RP 낮은 위험  안정형(1)이면
+	If check_char < CInt(sPrdRisk) Then
+		IsCusPrfsmallThanPrdRisk = True
+		 'IsCusPrfsmallThanPrdRisk = False  'test
+		Exit Function
+	End If
+	IsCusPrfsmallThanPrdRisk = False
+
+
+End Function
+
+Sub complete_cusTuja()
+
+	BOX10.Visible = False
+	tujaNM2.Visible = False
+	tujaNM2.data = ">"
+	Dim char,check_char,tmptujaYN,tmpinfoYN,tmptujaNM,tmptujaGD,tempYN
+
+	tmptujaYN = Trim(SCREEN.Object("obj_cusstatus.OUTPUT7").Data)
+	tmpinfoYN = Trim(SCREEN.Object("obj_cusstatus.OUTPUT8").Data)
+	tmptujaNM = Trim(SCREEN.Object("obj_cusstatus.zGrdNm").Data)
+
+SYSTEM.Trace "[.]"
+SYSTEM.Trace "[6202] tmptujaYN(투자권유희망)(obj_cusstatus.OUTPUT7) = " &  tmptujaYN
+SYSTEM.Trace "[6202] tmpinfoYN(정보제공구분)(obj_cusstatus.OUTPUT8) = " &  tmpinfoYN
+SYSTEM.Trace "[6202] tmptujaNM(고객투자성향)(obj_cusstatus.zGrdNm) = " &  tmptujaNM
+SYSTEM.Trace "[6202] (obj_cusstatus.chkGrdNm) = " &  SCREEN.Object("obj_cusstatus.chkGrdNm").Data
+
+	 CheckCustomInfo_First()
+
+'	If Trim(SCREEN.Object("obj_cusstatus.chkGrdNm").Data)  = "N" Then
+'		If tmpinfoYN <> "0" Then '미등록시,만료시 팝업
+'			SCREEN.CreateWindow 1, "IB6202A6 /t/s/p5", ""
+'			SCREEN.CloseWindow() '' 투자자정보확인서 미등록 미제공시 팝업 후 종료로 변경 23.05.11
+'			Exit Sub
+'		Else '미제공
+
+'		End If
+'		check_char = 1
+'	Else
+'
+'		If tmptujaNM = "안정형" Then '부적합 투자자
+'			SCREEN.CreateWindow 2, "IB6202A7 /p99 /d", ""
+'			If SYSTEM.Pop("bond_IB6202A7") <> "OK" Then
+'				SCREEN.CloseWindow()
+'				Exit Sub
+'			End If
+
+'			buhab1.Visible = True
+'			buhab2.Visible = True
+'			buhab3.Visible = True
+'			buhab4.Visible = True
+'			buhab_img.Visible = True
+'			jukhab1.Visible = False
+'			jukhab2.Visible = False
+'			jukhab_img.Visible = False
+'		Else '적합
+'			buhab1.Visible = False
+'			buhab2.Visible = False
+'			buhab3.Visible = False
+'			buhab4.Visible = False
+'			buhab_img.Visible = False
+'			jukhab1.Visible = True
+'			jukhab2.Visible = True
+'			jukhab_img.Visible = True
+'		End If
+'	End If
+
+'	If Trim(tmptujaYN) = "0" Then
+'		tmptujaYN = "미희망"
+'	Else
+'		tmptujaYN = "희망"
+'	End If
+
+'	If Trim(SCREEN.Object("obj_cusstatus.OUTPUT6").Data)  = "0" Then '전문 투자자
+'			check_char = 1 '전문투자자는 최고위험이하 상품표시
+'	Else
+'		If tmptujaNM = "안정형" Then
+'			check_char = 6
+'		ElseIf tmptujaNM = "안정추구형" Then
+'			check_char = 4
+'		ElseIf tmptujaNM = "위험중립형" Then
+'			check_char = 3
+'		ElseIf tmptujaNM = "적극투자형" Then
+'			check_char = 2
+'		ElseIf tmptujaNM = "공격투자형" Then
+'			check_char = 1
+'		End If
+'	End If
+
+'	If Trim(tmpinfoYN) = "0" Then
+'		tmptujaNM = ""
+'		tmpinfoYN = "미제공"
+'	Else
+'		tmpinfoYN = "제공"
+'	End If
+
+'	Select Case check_char
+'		Case 6 :
+'			tmptujaGD = "매우낮은위험이하"
+'		Case 4 :
+'			tmptujaGD = "보통위험이하"
+'		Case 3 :
+'			tmptujaGD = "다소높은위험이하"
+'		Case 2 :
+'			tmptujaGD = "높은위험이하"
+'		Case 1 :
+'			tmptujaGD = "매우높은위험이하"
+'	End Select
+
+'	If Trim(SCREEN.Object("obj_cusstatus.LEDGER").Ecod) = "3956" Then '"미등록"
+'			tujaNM.Data = "없음(미등록)"
+'			tujaGD.Data = "-"
+'			NotujaCase()
+'			Exit Sub
+'	ElseIf CDbl(SCREEN.Object("obj_cusstatus.zToday").Data) > CDbl(SCREEN.Object("obj_cusstatus.zDueDate").Data) Then '만료일
+'		tujaNM.Data = "없음(만료)"
+'		tujaGD.Data = "-"
+'		NotujaCase()
+'		Exit Sub
+
+'	ElseIf Trim(SCREEN.Object("obj_cusstatus.OUTPUT6").Data) = "0" Then ' 전문금융소비자 일경우 스킵
+'		tujaNM.Data = "전문금융소비자"
+'		tujaGD.Data = "매우높은위험이하"
+'
+'	ElseIf tmpinfoYN = "미제공" Then '미희망은 요건 없어짐
+'			tujaNM.Data = "투자자정보 미제공"
+'			tujaGD.Data = "-"
+'			BOX6.Visible = False
+'			BUTTON1.Visible = True
+
+'	Else '일반금융소비자
+'		tujaNM.Data = tmptujaNM
+'		tujaGD.Data = tmptujaGD
+
+'		Select Case check_char
+'		Case 6 :
+'			tujaNM.TRgb = "39853824"
+'			BOX10.PRgb = "39853824"
+'			tujaNM2.TRgb = "39853824"
+'		Case 4 :
+'			tujaNM.TRgb = "38842368"
+'			BOX10.PRgb = "38842368"
+'			tujaNM2.TRgb = "38842368"
+'		Case 3 :
+'			tujaNM.TRgb = "33603839"
+'			BOX10.PRgb = "33603839"
+'			tujaNM2.TRgb = "33603839"
+'		Case 2 :
+'			tujaNM.TRgb = "33580799"
+'			BOX10.PRgb = "33580799"
+'			tujaNM2.TRgb = "33580799"
+'		Case 1 :
+'			tujaNM.TRgb = "33554687"
+'			BOX10.PRgb = "33554687"
+'			tujaNM2.TRgb = "33554687"
+
+'	End Select
+'		BOX10.Visible = True
+'		tujaNM2.Visible = True
+'	End If
+
+End Sub
+
+_AW_ONINDECLARE_AW_
+#LOAD IB888833
+
+_AW_ONENDSUB_AW_
+_AW_ONSTART_AW_
+'If SCREEN.GetMapName(1) = "IB620200" Then
+	AN51.AgentType = 5	'금융상품매매대리인(5), 자금대체 대리인(6) 세팅
+'End If
+
+
+
+
+
+SCREEN.SetTimer 5, False
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+SCREEN.OnSend = False
+GUIDE.Text = ""
+
+
+
+If CheckInput(AN51, zPwd) = True Then
+	Dim val
+
+	lRpDays.Data = "+" & l_zeropad(i_lRpDays)	'RP일수, RP일수
+	lBnsAmt.Data = "+" & l_zeropad(price)		'매매금액, 매매금액
+
+	dRpIntrat.Data = FormatNumber(CDbl(i_dRpIntrat.Data) * 0.01,8)		'RP이율
+	before.data    = FormatNumber(CDbl(i_before.data)    * 0.01,8)		'RP이전이율
+	after.Data 	   = FormatNumber(CDbl(i_after.Data)     * 0.01,8)		'RP이후이율
+
+	If RADIO0.Checked = True Then
+		zRpBnsTp.Data = "2"
+	ElseIf RADIO1.Checked = True Then
+		zRpBnsTp.Data = "1"
+	Else
+		zRpBnsTp.Data = "7"
+	End If
+
+	dBnsBndUprc.Data = "+" & l_zeropad(i_dBnsBndUprc)	'채권단가, 매매단가
+	SCREEN.OnSend True
+End If
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+If Left(Trim(LEDGER.Ecod), 1) = "0" Then
+	price.Clear
+Else
+	Call alert_msg(Trim(LEDGER.Emsg))
+	GUIDE.Text = Trim(LEDGER.Emsg)
+
+	If IsBnkAccnType(AN51) = True Then
+		SCREEN.Proc "obj_cancelMoney.send_f", ""
+	End If
+End If
+
+Call Set_Focus()
+
+_AW_ONENDSUB_AW_
+_AW_ONTIMER_AW_
+'i_dBnsBndUprc.Data = 10000	'매수단가
+'cc.Data = ""				'약정이율
+'i_lRpDays.Data = 90			'RP일수
+'SCREEN.Proc "OBJ2.send_f", ""
+ORDF.Data = "0"	' 주문전문 여부 1:주문전문, 0:통상조회
+obj_cusstatus.Proc "send_f", ""
+
+' 그리드 조회
+Call changeRPGubn()
+
+_AW_ONENDSUB_AW_
+_AW_ONTIMERX_AW_
+If id = 1 Then
+	SCREEN.CreateWindow 1, "IB821200 /t/p5", ""
+	SCREEN.CloseWindow()
+ElseIf id = 2 Then
+
+	SYSTEM.Push "rp_masu_confirm", "NO"
+
+	'투자성향보다 위험도가 높은 상품 선택시 위험 고지창 띄움
+	dmsg = "zGrdNm" & vbTab & Trim(SCREEN.Object("obj_cusstatus.zGrdNm").Data) & vbLf & "EDIT3" & vbTab & Trim(AN51.Data) &  vbLf
+	SCREEN.CreateWindow 2, "IB620209 /p5 /d", dmsg
+	result = SYSTEM.Pop ("rp_masu_confirm")
+	If Trim(result) <> "YES" Then
+		MsgBox "RP매수를 위해서는 " & vbLf &_
+		       "투자성향에 적합(적정)하지 않은 상품에 대한 " & vbLf &_
+		       "거래 의사 확인이 필요합니다."  & vbLf & vbLf &_
+		       "매수를 다시 진행하여 주십시오.", , "IBK투자증권"
+		Exit Sub
+	End If
+	' 주문 집행
+	Call DoOrder()
+End If
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(zPwd)
+_AW_ONKEYCHANGE_AW_
+If SCREEN.Key = "13" Then
+	If Len(Trim(zPwd.Data)) >= 4 Then
+		send_btn.SetFocus
+	End If
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(AN51)
+_AW_ONCHANGE_AW_
+Call Set_account()	'-- 계좌명, 비밀번호 설정
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(O_lBnsQty)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(O_zRpRpPreargDt)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(lSecBfbalQty)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(lSecCrbalQty)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(lDpsCrbalAmt)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(lSettNo)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(lDpsBfbalAmt)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(send_btn)
+_AW_ONCLICK_AW_
+Dim emsg
+If P_pswdConfirm(AN51.Data, zPwd.Data, emsg) = False Then
+	GUIDE.Text = Trim(emsg)
+	zPwd.SetFocus()
+	Exit Sub
+End If
+ORDF.Data = "2"	' 주문전문 여부 1:주문전문, 0:통상조회, 2 : 투자성향 확인
+obj_cusstatus.Proc "send_f", ""
+price.Enable = False
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(next_btn)
+_AW_ONCLICK_AW_
+SCREEN.Proc "OBJ2.send_c", ""
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON1)
+_AW_ONCLICK_AW_
+'SCREEN.CreateWindow 5, "IB620206 /t /s /p?", ""
+SCREEN.CreateWindow 5, "IB620206 /t /s /p?", ""
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(RADIO2)
+_AW_ONCLICK_AW_
+Call changeRPGubn()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(RADIO1)
+_AW_ONCLICK_AW_
+Call changeRPGubn()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(RADIO0)
+_AW_ONCLICK_AW_
+Call changeRPGubn()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(cc)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(availAmtBtn)
+_AW_ONCLICK_AW_
+Dim emsg
+If P_pswdConfirm(AN51.Data, zPwd.Data, emsg) = False Then
+	GUIDE.Text = Trim(emsg)
+	zPwd.SetFocus()
+	Exit Sub
+End If
+
+Dim acct
+acct = Trim(AN51.data)
+
+'SCREEN.CreateWindow 2, "IB620201 /t/d/p5/S", _
+'		"zAcntNo" & vbTab & acct
+
+If price.Enable = True Then
+	SCREEN.Proc "OBJECT0.send_f", ""
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(SUMMARY)
+_AW_ONDBLCLK_AW_
+Dim url, title, dmesg
+
+title = "RP 핵심(요약)설명서"
+url   = "https:\\download.ibks.com\customer\ibk_rp_main.pdf"
+dmsg  = "ed_url"   & vbTab & Trim(url)   & vbLf &_
+	    "ed_title" & vbTab & Trim(title) & vbLf
+
+SYSTEM.Push "DOYOUAGREE", "NO"
+
+SCREEN.CreateWindow 2, "IB999991 /p5 /d", dmsg
+
+If SYSTEM.Pop("DOYOUAGREE") <> "YES" Then
+	MsgBox Trim(title)& "에 동의를 하신 후 RP매수가 가능합니다.", , "IBK투자증권"
+	Exit Sub
+End If
+
+If Trim(EDIT5.Data) <> "" Then
+	EDIT5.Data = CLng(EDIT5.Data) +1
+Else
+	EDIT5.Data = "1"
+End If
+
+
+check_pdf1.Checked = True
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(CHECK2)
+_AW_ONCLICK_AW_
+Dim url, title, dmesg
+
+title = "RP 핵심(요약)설명서"
+url   = "https:\\download.ibks.com\customer\ibk_rp_main.pdf"
+dmsg  = "ed_url"   & vbTab & Trim(url)   & vbLf &_
+	    "ed_title" & vbTab & Trim(title) & vbLf
+
+SYSTEM.Push "DOYOUAGREE", "NO"
+CHECK2.Checked = False
+
+SCREEN.CreateWindow 2, "IB999991 /p5 /d", dmsg
+
+If SYSTEM.Pop("DOYOUAGREE") <> "YES" Then
+	MsgBox Trim(title)& "에 동의를 하신 후 RP매수가 가능합니다.", , "IBK투자증권"
+	Exit Sub
+End If
+
+'-2146 RP 미등록시 RP 매수/매도 불가 요청
+'-비대면채널은 RP 매수시 2146 등록
+
+SCREEN.Object("obj_checkList.acct").data = Trim(AN51.Data)
+SCREEN.Proc "obj_checkList.send_f", ""
+_AW_ONENDSUB_AW_
+_AW_ONDBLCLK_AW_
+Dim url, title, dmesg
+
+title = "RP 핵심(요약)설명서"
+url   = "https:\\download.ibks.com\customer\ibk_rp_main.pdf"
+dmsg  = "ed_url"   & vbTab & Trim(url)   & vbLf &_
+	    "ed_title" & vbTab & Trim(title) & vbLf
+
+SYSTEM.Push "DOYOUAGREE", "NO"
+
+SCREEN.CreateWindow 2, "IB999991 /p5 /d", dmsg
+
+If SYSTEM.Pop("DOYOUAGREE") <> "YES" Then
+	MsgBox Trim(title)& "에 동의를 하신 후 RP매수가 가능합니다.", , "IBK투자증권"
+	Exit Sub
+End If
+
+If Trim(EDIT5.Data) <> "" Then
+	EDIT5.Data = CLng(EDIT5.Data) +1
+Else
+	EDIT5.Data = "1"
+End If
+
+
+check_pdf1.Checked = True
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(MASU)
+_AW_ONCLICK_AW_
+i_dBnsBndUprc.Data = 10000	'매수단가
+
+' 주문 전 계좌번호, 비밀번호, 비밀번호 검증 Check
+
+If ckTest.Checked = True Then
+	DoOrder()
+	Exit Sub
+End If
+
+
+If Error_check() = False Then
+	Exit Sub
+End If
+
+' 주문 전 사용자 투자 성향 CHECK
+ORDF.Data = "1"	' 주문전문 여부 1:주문전문, 0:통상조회
+obj_cusstatus.Proc "send_f", ""
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(lTrdNo)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(AGREE)
+_AW_ONCLICK_AW_
+SYSTEM.Push "DOYOUAGREE", "NO"
+check_pdf2.Checked = False
+
+SCREEN.CreateWindow 2, "IB620600 /t /s /p5", ""
+
+If SYSTEM.Pop("DOYOUAGREE") <> "YES" Then
+	MsgBox Trim(AGREE.Text)& "에 동의를 하신 후 RP매수가 가능합니다.", , "IBK투자증권"
+	Exit Sub
+End If
+
+
+check_pdf2.Checked = True
+_AW_ONENDSUB_AW_
+_AW_ONDBLCLK_AW_
+SCREEN.CreateWindow 2, "IB620600 /t /s /p5", ""
+check_pdf2.Checked = True
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(check_pdf2)
+_AW_ONCLICK_AW_
+SYSTEM.Push "DOYOUAGREE", "NO"
+check_pdf2.Checked = False
+
+SCREEN.CreateWindow 2, "IB620600 /t /s /p5", ""
+
+If SYSTEM.Pop("DOYOUAGREE") <> "YES" Then
+	MsgBox Trim(AGREE.Text)& "에 동의를 하신 후 RP매수가 가능합니다.", , "IBK투자증권"
+	Exit Sub
+End If
+
+
+check_pdf2.Checked = True
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON5)
+_AW_ONCLICK_AW_
+'SCREEN.CreateWindow 1, "IB821200 /t/p5", ""
+If checktest("10") Then
+	MsgBox "true"
+Else
+	MsgBox "False"
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON2)
+_AW_ONCLICK_AW_
+SCREEN.CreateWindow 1, "IB620000 /t/p5", ""
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON3)
+_AW_ONCLICK_AW_
+SCREEN.CreateWindow 1, "IB821200 /t/p5", ""
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(tujaNM)
+_AW_ONCLICK_AW_
+If (InStr(tujaNM.Data,"없음") > 0 Or InStr(tujaNM.Data,"미제공") > 0 Or InStr(tujaNM.Data,"전문금융소비자") > 0) = False Then
+Dim msg_domino
+	msg_domino = "tujaNM" & vbTab & tujaNM.Data & vbLf &_
+					"tujaGD" & vbTab & tujaGD.Data & vbLf &_
+					"DclsrDt" & vbTab & SCREEN.Object("obj_cusstatus.zDueDate").Data & vbLf
+SCREEN.CreateWindow 1, "IB66990Z /p99 /d", msg_domino
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(tujaNM2)
+_AW_ONCLICK_AW_
+If (InStr(tujaNM.Data,"없음") > 0 Or InStr(tujaNM.Data,"미제공") > 0 Or InStr(tujaNM.Data,"전문금융소비자") > 0) = False Then
+Dim msg_domino
+	msg_domino = "tujaNM" & vbTab & tujaNM.Data & vbLf &_
+					"tujaGD" & vbTab & tujaGD.Data & vbLf &_
+					"DclsrDt" & vbTab & SCREEN.Object("obj_cusstatus.zDueDate").Data & vbLf
+SCREEN.CreateWindow 1, "IB66990Z /p99 /d", msg_domino
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(PANEL55)
+_AW_ONDBLCLK_AW_
+Dim url, title, dmesg
+
+title = "RP 핵심(요약)설명서"
+url   = "https:\\download.ibks.com\customer\ibk_rp_main.pdf"
+dmsg  = "ed_url"   & vbTab & Trim(url)   & vbLf &_
+	    "ed_title" & vbTab & Trim(title) & vbLf
+
+SYSTEM.Push "DOYOUAGREE", "NO"
+
+SCREEN.CreateWindow 2, "IB999991 /p5 /d", dmsg
+
+If SYSTEM.Pop("DOYOUAGREE") <> "YES" Then
+	MsgBox Trim(title)& "에 동의를 하신 후 RP매수가 가능합니다.", , "IBK투자증권"
+	Exit Sub
+End If
+
+If Trim(EDIT5.Data) <> "" Then
+	EDIT5.Data = CLng(EDIT5.Data) +1
+Else
+	EDIT5.Data = "1"
+End If
+
+
+check_pdf1.Checked = True
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(CHECK3)
+_AW_ONCLICK_AW_
+Dim url, title, dmesg
+
+title = "RP 약관"
+url   = "https:\\download.ibks.com\customer\mts\ibks_RP_terms.pdf"
+dmsg  = "ed_url"   & vbTab & Trim(url)   & vbLf &_
+	    "ed_title" & vbTab & Trim(title) & vbLf
+
+SYSTEM.Push "DOYOUAGREE", "NO"
+CHECK3.Checked = False
+
+SCREEN.CreateWindow 2, "IB999991 /p5 /d", dmsg
+
+If SYSTEM.Pop("DOYOUAGREE") <> "YES" Then
+	MsgBox Trim(title)& "에 동의를 하신 후 RP매수가 가능합니다.", , "IBK투자증권"
+	Exit Sub
+End If
+
+
+CHECK3.Checked = True
+_AW_ONENDSUB_AW_
+_AW_ONDBLCLK_AW_
+Dim url, title, dmesg
+
+title = "RP 핵심(요약)설명서"
+url   = "https:\\download.ibks.com\customer\ibk_rp_main.pdf"
+dmsg  = "ed_url"   & vbTab & Trim(url)   & vbLf &_
+	    "ed_title" & vbTab & Trim(title) & vbLf
+
+SYSTEM.Push "DOYOUAGREE", "NO"
+
+SCREEN.CreateWindow 2, "IB999991 /p5 /d", dmsg
+
+If SYSTEM.Pop("DOYOUAGREE") <> "YES" Then
+	MsgBox Trim(title)& "에 동의를 하신 후 RP매수가 가능합니다.", , "IBK투자증권"
+	Exit Sub
+End If
+
+If Trim(EDIT5.Data) <> "" Then
+	EDIT5.Data = CLng(EDIT5.Data) +1
+Else
+	EDIT5.Data = "1"
+End If
+
+
+check_pdf1.Checked = True
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(PANEL56)
+_AW_ONDBLCLK_AW_
+Dim url, title, dmesg
+
+title = "RP 핵심(요약)설명서"
+url   = "https:\\download.ibks.com\customer\ibk_rp_main.pdf"
+dmsg  = "ed_url"   & vbTab & Trim(url)   & vbLf &_
+	    "ed_title" & vbTab & Trim(title) & vbLf
+
+SYSTEM.Push "DOYOUAGREE", "NO"
+
+SCREEN.CreateWindow 2, "IB999991 /p5 /d", dmsg
+
+If SYSTEM.Pop("DOYOUAGREE") <> "YES" Then
+	MsgBox Trim(title)& "에 동의를 하신 후 RP매수가 가능합니다.", , "IBK투자증권"
+	Exit Sub
+End If
+
+If Trim(EDIT5.Data) <> "" Then
+	EDIT5.Data = CLng(EDIT5.Data) +1
+Else
+	EDIT5.Data = "1"
+End If
+
+
+check_pdf1.Checked = True
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(CHECK1)
+_AW_ONCLICK_AW_
+SYSTEM.Push "bond_check_radio", ""
+
+If CHECK1.Checked = True Then
+	SCREEN.CreateWindow 2, "IB66990B /p99 /d", "" '거래위험고지
+
+	If SYSTEM.Pop("bond_check_radio") <> "OK" Then
+		MsgBox "주요내용 고객확인에 동의를 하신 후 RP매수가 가능합니다.", , "IBK투자증권"
+			CHECK1.Checked = False
+		Exit Sub
+	End If
+
+	CHECK1.Checked = True
+Else
+	CHECK1.Checked = False
+End If
+_AW_ONENDSUB_AW_
+_AW_ONDBLCLK_AW_
+Dim url, title, dmesg
+
+title = "RP 핵심(요약)설명서"
+url   = "https:\\download.ibks.com\customer\ibk_rp_main.pdf"
+dmsg  = "ed_url"   & vbTab & Trim(url)   & vbLf &_
+	    "ed_title" & vbTab & Trim(title) & vbLf
+
+SYSTEM.Push "DOYOUAGREE", "NO"
+
+SCREEN.CreateWindow 2, "IB999991 /p5 /d", dmsg
+
+If SYSTEM.Pop("DOYOUAGREE") <> "YES" Then
+	MsgBox Trim(title)& "에 동의를 하신 후 RP매수가 가능합니다.", , "IBK투자증권"
+	Exit Sub
+End If
+
+If Trim(EDIT5.Data) <> "" Then
+	EDIT5.Data = CLng(EDIT5.Data) +1
+Else
+	EDIT5.Data = "1"
+End If
+
+
+'check_pdf1.Checked = True
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(PANEL41)
+_AW_ONCLICK_AW_
+Dim url, title, dmesg
+
+title = "RP 핵심(요약)설명서"
+url   = "https:\\download.ibks.com\customer\ibk_rp_main.pdf"
+dmsg  = "ed_url"   & vbTab & Trim(url)   & vbLf &_
+	    "ed_title" & vbTab & Trim(title) & vbLf
+
+SYSTEM.Push "DOYOUAGREE", "NO"
+check_pdf1.Checked = False
+
+SCREEN.CreateWindow 2, "IB999991 /p5 /d", dmsg
+
+If SYSTEM.Pop("DOYOUAGREE") <> "YES" Then
+	MsgBox Trim(title)& "에 동의를 하신 후 RP매수가 가능합니다.", , "IBK투자증권"
+	Exit Sub
+End If
+
+If Trim(EDIT5.Data) <> "" Then
+	EDIT5.Data = CLng(EDIT5.Data) +1
+Else
+	EDIT5.Data = "1"
+End If
+
+
+check_pdf1.Checked = True
+_AW_ONENDSUB_AW_
+_AW_ONDBLCLK_AW_
+Dim url, title, dmesg
+
+title = "RP 핵심(요약)설명서"
+url   = "https:\\download.ibks.com\customer\ibk_rp_main.pdf"
+dmsg  = "ed_url"   & vbTab & Trim(url)   & vbLf &_
+	    "ed_title" & vbTab & Trim(title) & vbLf
+
+SYSTEM.Push "DOYOUAGREE", "NO"
+
+SCREEN.CreateWindow 2, "IB999991 /p5 /d", dmsg
+
+If SYSTEM.Pop("DOYOUAGREE") <> "YES" Then
+	MsgBox Trim(title)& "에 동의를 하신 후 RP매수가 가능합니다.", , "IBK투자증권"
+	Exit Sub
+End If
+
+If Trim(EDIT5.Data) <> "" Then
+	EDIT5.Data = CLng(EDIT5.Data) +1
+Else
+	EDIT5.Data = "1"
+End If
+
+
+check_pdf1.Checked = True
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

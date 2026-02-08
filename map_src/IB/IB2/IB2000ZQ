@@ -1,0 +1,134 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB2000ZQ)
+MAPSIZE(137, 217)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(FMS|FLASH)
+TITLE("실시간호가")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pooppoop")
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL0(-30, -10, 260, 135)  TP_RAISED      COLOR(208, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  2023(10, 25, 205, 45)  LEN(9)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT|FA_CORGB|SA_COSUP  FONT("굴림", 9, BOLD)    COLOR(68, 69)  CUR(0)            IFRGB(94, 95)  TABORDER(0)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_STRING)  HELPTEXT("현재가")HELPTEXT("현재가")
+OUT  2025(10, 45, 215, 65)  LEN(9)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT|FA_CORGB|SA_COSUP  FONT("굴림", 9, NORMAL)    COLOR(68, 69)  CUR(0)            IFRGB(94, 95)  TABORDER(0)  IOORDER(3)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  2026(10, 61, 203, 81)  LEN(9)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT|FA_CORGB|SA_COSUP  FONT("굴림", 9, NORMAL)    COLOR(68, 69)  CUR(0)            IFRGB(94, 95)  TABORDER(0)  IOORDER(4)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  1021(10, 75, 110, 95)  LEN(16)  IO_ALPHA|AL_LEFT||FA_FLASH    COLOR(130, 131)  CUR(0)            TABORDER(0)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  1301(10, 5, 210, 25)  LEN(12)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(1)  IOORDER(5)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  2303(10, 95, 91, 115)  LEN(9)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT|FA_CORGB|SA_COSUP  FONT("굴림체", 9, NORMAL)    COLOR(68, 69)  CUR(0)            IFRGB(94, 95)  TABORDER(0)  IOORDER(6)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  2302(10, 115, 91, 135)  LEN(9)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT|FA_CORGB|SA_COSUP  FONT("굴림체", 9, NORMAL)    COLOR(68, 69)  CUR(0)            IFRGB(94, 95)  TABORDER(0)  IOORDER(7)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  1777(204, 185, 224, 205)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("2")          TABORDER(2)  IOORDER(8)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL2(35, 185, 205, 205)  '시장구분 1:KRX 2:NXT 3:통합'  LINECOLOR(238)      COLOR(200, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Sub OnAlert()
+	Dim tmp, shogb
+
+	Select Case SCREEN.GetMapName(1)
+	Case "IB100100", "IB800000", "IB100200", "IB000100"
+		If SCREEN.Object("parent.tab_ordtyp").ID = "0"  Then
+			tmp = "Y"
+		Else
+			Exit Sub
+		End If
+
+	Case "IB303000"
+		If SCREEN.Object("parent.OBJ_order.tab_order").ID = "1" Then
+			tmp = "Y"
+		Else
+			Exit Sub
+		End If
+
+	Case Else
+		If ( SCREEN.Object("parent.OBJ_order.tab_order").ID = "1" Or SCREEN.Object("parent.OBJ_order.tab_order").ID = "2") Then
+			tmp = "Y"
+		Else
+			Exit Sub
+		End If
+	End Select
+
+	If tmp = "Y" Then
+		shogb = SCREEN.Object("parent.parent.OBJ_order.OBJ_odr.shogb").data
+		If shogb = "05" Or Right(shogb,1) = "0" Or shogb = "01" Then
+			If SCREEN.Object("parent.OBJ_order.OBJ_odr.CHK_auto").Checked = True And SCREEN.Object("parent.OBJ_order.OBJ_odr.c_hogb").Checked = False Then
+				If SCREEN.Object("main.OBJ_order.OBJ_odr.flash_fg").Data = 0 Then
+					Select Case SCREEN.Object("parent.OBJ_order.OBJ_odr.cboPrice").Data
+					Case "2025" : SCREEN.Object("parent.OBJ_order.OBJ_odr.ed_jprc").Data = S2025.Data
+					Case "2023" : SCREEN.Object("parent.OBJ_order.OBJ_odr.ed_jprc").Data = S2023.Data
+					Case "2026" : SCREEN.Object("parent.OBJ_order.OBJ_odr.ed_jprc").Data = S2026.Data
+					Case "2302" : SCREEN.Object("parent.OBJ_order.OBJ_odr.ed_jprc").Data = S2302.Data
+					Case "2303" : SCREEN.Object("parent.OBJ_order.OBJ_odr.ed_jprc").Data = S2303.Data
+					End Select
+					SCREEN.Proc "parent.OBJ_order.OBJ_odr.OBJ_JUNGSAN.CalcJungsan", ""
+				End If
+			End If
+		End If
+	End If
+
+	tmp = "N"
+End Sub
+
+_AW_ONINDECLARE_AW_
+#load IB999901
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+S1301.Data = SCREEN.Object("Main.1301").Data
+SetMKGubn777()
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(2023)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(2025)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(2026)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(2303)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(2302)
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

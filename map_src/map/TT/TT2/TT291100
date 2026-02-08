@@ -1,0 +1,468 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(TT291100)
+MAPSIZE(400, 798)
+VERSION(001)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("투자주체별일별")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+TITLE("[2911] test_투자주체별 일별 매매동향")
+TOPATH(AXIS)
+METHOD(MENU)
+MAPTYPE(RESIZEX)
+HEADER(NOP)
+BGROUND(BRUSH, 64)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  SYMBOL21(0, 0, 800, 25)        COLOR(66, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  HNAM(186, 3, 266, 23)  AL_LEFT  CUR(0)      COLOR(131, 69)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  GP_BTN(749, 3, 797, 23)  '데이터'  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(1, 69)  CUR(0)    "3BTN.BMP"    TABORDER(6)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+BUTTON  UBTN(158, 3, 177, 23)  TP_PUSH|IMAGE|AL_STRETCH      COLOR(194, 232)  CUR(0)    "검색.BMP"    TABORDER(2)  ENABLE  &
+  VISIBLE  IMAGE  HOVER  HINTTYPE(IH_NONE)
+LABEL  CHGB(908, 89, 938, 101)  AL_LEFT  CUR(0)      COLOR(199, 255)  &
+  HINTTYPE(IH_NONE)
+LABEL  SYMBOL12(477, 3, 533, 23)  '시작일자'  AL_CENTER  CUR(0)      COLOR(131, 69)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  ULAL(86, 3, 116, 23)  '업종'  AL_CENTER  CUR(0)      COLOR(131, 69)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  SYMBOL15(379, 3, 470, 23)  '단위:천주,억원'  AL_LEFT  CUR(0)      COLOR(131, 69)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  63302(82, 424, 104, 444)  LEN(2)  IO_NUM|EDIT_INPUT    COLOR(192, 255)  CUR(0)  TP_NONE  INIT("10")          TABORDER(9)  IOORDER(1)  &
+  HINTTYPE(IH_NONE)
+EDIT  20301(114, 3, 158, 23)  LEN(3)  IO_NUM|EDIT_INPUT|FA_SEND|SA_ALL|CODE      COLOR(192, 69)  CUR(0)  TP_SUNKEN  INIT("001")          TABORDER(1)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  63307(11, 424, 31, 444)  LEN(1)  IO_NUM|EDIT_INPUT    COLOR(192, 255)  CUR(0)  TP_NONE  INIT("1")          TABORDER(10)  IOORDER(3)  &
+  HINTTYPE(IH_NONE)
+EDIT  63308(39, 424, 59, 444)  LEN(1)  IO_NUM|EDIT_INPUT    COLOR(192, 255)  CUR(0)  TP_NONE  INIT("3")          TABORDER(11)  IOORDER(4)  &
+  HINTTYPE(IH_NONE)
+EDIT  63311(533, 3, 624, 23)  LEN(8)  IO_NUM|EDIT_INPUT|FA_DATE    COLOR(192, 69)  CUR(0)  TP_SUNKEN          EDITFORMAT("9999/99/99")  TABORDER(4)  IOORDER(5)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+COMBO  upgb(3, 3, 83, 23)  TP_SUNKEN  LEN(2)  COUNT(6)  VCOUNT(6)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  DISPLAY("KOSPI", "KOSDAQ", "KOSPI200", "선물", "콜옵션", "풋옵션")  DATA("00", "90", "10", "22", "55", "66")    TABORDER(8)  IOORDER(6)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+COMBO  GUBN(270, 3, 374, 23)  TP_SUNKEN  LEN(1)  COUNT(6)  VCOUNT(0)  INDEX(6)  MATCHKEY(NOTMAPPING)  IO_NUM|EDIT_INPUT|FA_SKIP    COLOR(192, 69)  CUR(0)  DISPLAY("순매수량", "매도거래량", "매수거래량", "매도거래대금", "매수거래대금", "순매수대금")  DATA("3", "1", "2", "4", "5", "6")    TABORDER(3)  IOORDER(7)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON1(716, 3, 748, 23)  '누적'  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(208, 69)  CUR(0)    "2BTN.BMP"    TABORDER(5)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+EDIT  63310(12, 481, 54, 501)  LEN(2)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("01")          TABORDER(12)  IOORDER(8)  &
+  HINTTYPE(IH_NONE)
+EDIT  63312(118, 424, 140, 444)  LEN(1)  IO_NUM|EDIT_INPUT    COLOR(192, 255)  CUR(0)  TP_NONE  INIT("0")          TABORDER(13)  IOORDER(9)  &
+  HINTTYPE(IH_NONE)
+EDIT  EDIT0(147, 423, 233, 441)  LEN(8)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_DATE    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(14)  IOORDER(10)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  obj(2, 27, 797, 397)    "TT291110"  TABORDER(7)  IOORDER(11)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  CHK(823, 24, 858, 37)  'Label'  AL_LEFT  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(4, 0)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  upjong(111, 513, 153, 533)  LEN(3)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_NOR    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(15)  IOORDER(12)  &
+  HINTTYPE(IH_NONE)
+EDIT  jisu(112, 486, 154, 506)  LEN(2)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_NOR    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("00")          TABORDER(16)  IOORDER(13)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL0(72, 486, 111, 504)  '지수'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL1(72, 516, 111, 534)  '업종'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Const myFILE = "userconf.ini"
+Const myMAP = "IB291100"
+
+Sub p_read_ini()
+If SCREEN.CreateObject("Info") Then
+ 	CHK.text = Trim(INFO.PopData(LOGIN.Name, myFILE, myMAP, "G_CHCK"))
+End If
+End Sub
+
+
+Sub p_write_ini()
+If SCREEN.CreateObject("Info") Then
+  INFO.PushData LOGIN.Name, myFILE, myMAP, "G_CHCK", CHK.text
+End If
+End Sub
+
+Dim xstr, xvalue, xistrue
+'선물 직전월물 만기일+1  (= 현재 최근월물의 시작일)
+Sub Check_date()
+	Dim yy, mm, dd
+
+	yy = Year(Date)
+	Select Case Month(Date)
+		Case 1, 2, 3
+			yy = yy - 1 : mm = "12"
+		Case 4, 5, 6 : mm = "03"
+		Case 7, 8, 9 : mm = "06"
+		Case 10, 11, 12 : mm = "09"
+	End Select
+
+	dd = 16 - Weekday(yy&"-"&mm&"-"&"01", vbFriday)
+	If Len(dd) = 1 Then dd = "0"&dd
+	x_day = yy&mm&dd
+	S63311.Data = x_day
+End Sub
+
+Sub Check_date1()
+	t_day = EDIT0.data
+
+	yy = Mid(t_day, 1, 4)
+	mm = Mid(t_day, 5, 2)
+	dd = Mid(t_day, 7, 2)
+	x_day = yy & "-" & mm & "-" & dd
+	If IsDate(x_day) = False Then
+		Exit Sub
+	End If
+
+	x_day = DateSerial(yy-1, mm, dd)
+	yy = Year(x_day)
+	mm = Month(x_day)
+	If Len(mm) = 1 Then mm = "0"&mm
+	dd = Day(x_day)
+	If Len(dd) = 1 Then dd = "0"&dd
+	x_day = yy&mm&dd
+	S63311.Data = x_day
+End Sub
+
+_AW_ONINDECLARE_AW_
+#load IB888888
+
+_AW_ONENDSUB_AW_
+_AW_ONSTART_AW_
+'RECV_POP.POP("025400")
+'If RECV_POP.Text = "025401" Then
+'	SCREEN.ChangeMap "ZZ025401"
+'End If
+'SCREEN.Send 0
+HNAM.text = SCREEN.GetName(104, S20301.data, 0)
+
+p_read_ini()
+
+If CHK.text = "1" Then
+	CHK.text = "1"
+	obj.SetObject "TT291101"
+	GP_BTN.Text = "차트"
+Else
+	CHK.text = "2"
+	obj.SetObject "TT291110"
+	GP_BTN.Text = "데이터"
+End If
+
+If Trim(jisu.Data) <> "" Then
+	upgb.Data = jisu.Data
+'	SCREEN.Send 0
+'	SYSTEM.Trace upgb.data
+End If
+
+If Trim(upjong.Data) <> "" Then
+	S20301.Data = upjong.Data
+End If
+
+SCREEN.Send 2
+obj.Send
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+Select Case GUBN.Data
+Case "1"
+	S63307.Data = "0"
+	S63308.Data = "1"
+Case "2"
+	S63307.Data = "0"
+	S63308.Data = "2"
+Case "3"
+	S63307.Data = "0"
+	S63308.Data = "3"
+Case "4"
+	S63307.Data = "1"
+	S63308.Data = "1"
+Case "5"
+	S63307.Data = "1"
+	S63308.Data = "2"
+Case "6"
+	S63307.Data = "1"
+	S63308.Data = "3"
+End Select
+
+If CHGB.Text <> "1" Then
+	S63302.Data = "1"
+
+	Select Case upgb.Data
+	Case "00"
+		xvalue = 0
+		ls_upcd = Trim(S20301.DATA)
+		xstr = SCREEN.GetName(104, ls_upcd, 0)
+		If xstr = False Then
+			SCREEN.OnSend = False
+			Exit Sub
+		End If
+		HNAM.Text = ""
+		HNAM.Text = xstr
+		UBTN.Visible = True
+      ULAL.Visible = True
+      HNAM.Visible = True
+      S20301.Visible = True
+	Case "10"
+		S63302.Data = "10"
+		xvalue = 1
+		ls_upcd = Trim(S20301.DATA)
+		xstr = SCREEN.GetName(104, ls_upcd, 9)
+		If xstr = False Then
+			Exit Sub
+		End If
+		HNAM.Text = ""
+		HNAM.Text = xstr
+      UBTN.Visible = True
+      ULAL.Visible = True
+      HNAM.Visible = True
+	Case "90"
+		S63302.Data = "90"
+		xvalue = 9
+		ls_upcd = Trim(S20301.DATA)
+		xstr = SCREEN.GetName(104, ls_upcd, 99)
+		If xstr = False Then
+			Exit Sub
+		End If
+		HNAM.Text = ""
+		HNAM.Text = xstr
+      UBTN.Visible = True
+      ULAL.Visible = True
+      HNAM.Visible = True
+      S20301.Visible = True
+	Case "22"
+   	S63302.Data = "2"
+      UBTN.Visible = False
+      ULAL.Visible = False
+      HNAM.Visible = False
+      S20301.Visible = False
+	Case "55"
+      S63302.Data = "5"
+      UBTN.Visible = False
+      ULAL.Visible = False
+      HNAM.Visible = False
+      S20301.Visible = False
+   Case "66"
+      S63302.Data = "6"
+   	UBTN.Visible = False
+      ULAL.Visible = False
+      HNAM.Visible = False
+      S20301.Visible = False
+	End Select
+End If
+
+SCREEN.Onsend = False
+
+_AW_ONENDSUB_AW_
+_AW_ONCLOSE_AW_
+ p_write_ini()
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(GP_BTN)
+_AW_ONCLICK_AW_
+If CHK.text = "1" Then
+	CHK.text = "2"
+	obj.SetObject "TT291110"
+	GP_BTN.Text = "데이터"
+Else
+	CHK.text = "1"
+	obj.SetObject "TT291101"
+	GP_BTN.Text = "차트"
+End If
+
+SCREEN.Send 0
+obj.Send
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(UBTN)
+_AW_ONCLICK_AW_
+Select Case upgb.Data
+	Case "00"
+		SCREEN.GetCode 104, "20301", "HNAM", 00
+	Case "90"
+		SCREEN.GetCode 104, "20301", "HNAM", 9
+End Select
+
+CHGB.Text = "1"
+SCREEN.Send 2
+'obj.Send
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(20301)
+_AW_ONCHANGE_AW_
+Dim   r_upgb
+
+SCREEN.IgnoreChange True
+	r_upgb = P_GetBigCd(S20301.Data)
+	Select Case r_upgb
+		Case "001"		'KOSPI
+			UBTN.Enable = True
+		Case "101"		'KOSPI200
+			S20301.Data = "101"
+			UBTN.Enable = False
+		Case "201"		'KOSDAQ
+			UBTN.Enable = True
+		Case Else
+			S20301.Data = "001"
+			UBTN.Enable = True
+	End Select
+SCREEN.IgnoreChange False
+
+'
+If CHGB.Text <> "1" Then
+	Select Case upgb.Data
+	Case "00"
+		xvalue = 0
+	Case "10"
+		xvalue = 2
+	Case "90"
+		xvalue = 9
+	End Select
+
+	If xistrue = False Then
+		Exit Sub
+	End If
+End If
+
+SYSTEM.SetHistory "20301", S20301.Data
+SCREEN.Send 0
+obj.Send
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(63311)
+_AW_ONCHANGE_AW_
+SCREEN.Send 0
+obj.Send
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(upgb)
+_AW_ONCHANGE_AW_
+Select Case upgb.Data
+Case "00"
+    S20301.data="001"
+	S20301.Visible = True
+	ULAL.Visible = True
+	UBTN.Visible = True
+	HNAM.Visible = True
+
+	If Trim(upjong.Data) <> "" Then
+		S20301.data = upjong.Data
+	End If
+Case "90"
+    S20301.data="201"
+	S20301.Visible = True
+	ULAL.Visible = True
+	UBTN.Visible = True
+	HNAM.Visible = True
+
+	If Trim(upjong.Data) <> "" Then
+		S20301.data = upjong.Data
+	End If
+
+Case "10"
+    S20301.data="101"
+ 	S20301.Visible = True
+	ULAL.Visible = True
+	UBTN.Visible = True
+	HNAM.Visible = True
+
+Case "22"
+	CHGB.Text = "0"
+	S20301.Visible = False
+	ULAL.Visible = False
+	UBTN.Visible = False
+	HNAM.Visible = False
+
+Case "55"
+	CHGB.Text = "0"
+	S20301.Visible = False
+	ULAL.Visible = False
+	UBTN.Visible = False
+	HNAM.Visible = False
+
+Case "66"
+	CHGB.Text = "0"
+	S20301.Visible = False
+	ULAL.Visible = False
+	UBTN.Visible = False
+	HNAM.Visible = False
+End Select
+
+'xstr = SCREEN.GetName(104, S20301.Data, 0)
+'If xistrue = False Then
+'	Exit Sub
+'End If
+'
+'HNAM.Data = xstr
+
+S63310.Data = upgb.Data
+SCREEN.Send 2
+obj.Send
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(GUBN)
+_AW_ONCHANGE_AW_
+SCREEN.Send 0
+obj.Send
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON1)
+_AW_ONCLICK_AW_
+Select Case BUTTON1.Text
+Case "당일"
+	SYMBOL12.Data = "시작일자"
+	BUTTON1.Text = "누적"
+	S63312.Data = "0"
+	S63311.Data = EDIT0.data
+Case "누적"
+	SYMBOL12.Data = "누적시작"
+	BUTTON1.Text = "당일"
+	S63312.Data = "1"
+	' 직전월물 만기일 + 1
+	Check_date()
+End Select
+
+SCREEN.Send 0
+obj.Send
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(jisu)
+_AW_ONCHANGE_AW_
+'upgb.data = jisu.Data
+'COMBO0.data = jisu.Data
+'upgb.data = "90"
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

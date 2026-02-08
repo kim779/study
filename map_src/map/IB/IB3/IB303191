@@ -1,0 +1,132 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB303191)
+MAPSIZE(60, 450)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("[303191] 계좌컨트롤")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(ENCODE|CR2TAB|SAVE)
+TITLE("[303191] 계좌컨트롤")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(FIXED)
+HEADER(LEDGER)
+}
+
+
+
+FORM DIVISION
+{
+
+LABEL  LABEL0(0, 0, 74, 20)  '선물계좌번호'  AL_RIGHT  CUR(0)      COLOR(66, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL1(0, 24, 74, 44)  '현물계좌번호'  AL_RIGHT  CUR(0)      COLOR(66, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+CONTROL  AN20(82, 0, 222, 20)  |FA_SKIP  "CX_Account"  "/w0"  LEN(20)  EDIT_INPUT    COLOR(68, 130)  TABORDER(1)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  ACNM(223, 0, 281, 20)  LEN(20)  IO_MIXED|AL_LEFT||FA_SKIP    COLOR(160, 130)  CUR(0)  LINECOLOR(89)          TABORDER(0)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  ed_pswd(342, 0, 398, 20)  LEN(8)  IO_MIXED|EDIT_INPUT|FA_PASSWD|FA_WRAP    COLOR(192, 130)  CUR(0)  TP_SUNKEN          TABORDER(2)  IOORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+COMBO  cmb_acnt(82, 24, 188, 44)  TP_SUNKEN  LEN(20)  COUNT(0)  VCOUNT(0)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_NUM|EDIT_INPUT|FA_SKIP    COLOR(68, 69)  CUR(0)    TABORDER(3)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL31(292, 0, 340, 20)  '비밀번호'  AL_LEFT  CUR(0)      COLOR(208, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Sub Set_account()
+	ACNM.Data = AN20.name
+	ed_pswd.Data = AN20.Password
+	SCREEN.Object("main.OBJ3.facno").Data = AN20.Data
+	SCREEN.Object("main.OBJ3").Send
+End Sub
+
+Sub acno_list_done()
+	Dim grid, item, acnt, acnt20, txt
+	item = ""
+	Set grid = SCREEN.Object("main.OBJ3.GRID1")
+	For ii=1 To grid.Rows
+		acnt = Trim(grid.GetGridCell(ii, 1))
+		acnt20 = grid.GetGridCell(ii, 1)
+		If acnt = "" Then
+			Exit For
+		End If
+		txt = Mid(acnt,1,3) & "-" & Mid(acnt, 4, 2) & "-" & Mid(acnt, 6)
+		item = item & acnt20 & txt & vbTab
+		If ii=1 Then
+			item = acnt20 & vbTab & item
+		End If
+	Next
+
+	SCREEN.Object("cmb_acnt").SetItems item
+
+	If SYSTEM.ConnectBy = "1" Then
+		If Len(Trim(ed_pswd.Data)) >= 4 Then
+			Call cmb_onchange()
+		End If
+	Else
+		Call cmb_onchange()
+	End If
+End Sub
+
+Sub cmb_onchange()
+	Dim cmbacnt, temp
+	cmbacnt = Trim(cmb_acnt.Data)
+	temp = SCREEN.Object("main.OBJ2.ed_accn").Data
+	If temp <> cmbacnt Then
+		SCREEN.Proc "main.OBJ2.send_f", ""
+	End If
+End Sub
+
+_AW_ONINDECLARE_AW_
+#load IB888888
+#load IB888833
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+SCREEN.OnSend = False
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+Dim errcd
+errcd = LEDGER.Ecod
+
+If CLng(errcd) < 1000 Then
+
+	InitScreen()
+
+	If SCREEN.Object("main.tab_bottom").ID = 1 Then
+		SCREEN.Proc "main.OBJ2.send_f", ""
+	End If
+End If
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(AN20)
+_AW_ONCHANGE_AW_
+Call Set_account()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(cmb_acnt)
+_AW_ONCHANGE_AW_
+Call cmb_onchange()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

@@ -1,0 +1,392 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB498980)
+MAPSIZE(660, 430)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("일별기준가")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(ENCODE)
+TITLE("[4989] 일별기준가")
+TOPATH(AXIS)
+METHOD(MENU)
+MAPTYPE(FIXED)
+HEADER(LEDGER)
+}
+
+
+
+FORM DIVISION
+{
+
+EDIT  REC(686, 82, 786, 102)  LEN(5)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_SUNKEN  INIT("00001")          TABORDER(4)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  OUTREC(688, 250, 788, 270)  LEN(1)  IO_MIXED|AL_CENTER|    COLOR(192, 232)  CUR(0)  LINECOLOR(0)          TABORDER(0)  IOORDER(6)  ENABLE  &
+  HINTTYPE(IH_NONE)
+GROUP  GROUP0(611, 60, 815, 204)  'IN'        COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+GROUP  GROUP1(611, 209, 815, 296)  'OUT'        COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  OUTDUMP(688, 229, 788, 249)  LEN(26)  IO_MIXED|AL_CENTER|    COLOR(192, 232)  CUR(0)  LINECOLOR(0)          TABORDER(0)  IOORDER(5)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL0(624, 82, 684, 102)  '레코드'  AL_LEFT  CUR(0)      COLOR(141, 240)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL3(624, 103, 684, 123)  '조회일'  AL_LEFT  CUR(0)      COLOR(141, 240)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  OUTPUT(626, 229, 686, 249)  'OUTPUT'  AL_LEFT  CUR(0)      COLOR(141, 240)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL4(626, 250, 686, 270)  '레코드'  AL_LEFT  CUR(0)      COLOR(141, 240)  ENABLE  &
+  HINTTYPE(IH_NONE)
+COMBO  SPGB(686, 124, 786, 144)  TP_SUNKEN  LEN(1)  COUNT(2)  VCOUNT(2)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_NUM|EDIT_INPUT    COLOR(192, 69)  CUR(0)  DISPLAY("전체", "거래형성일")  DATA("0", "1")    TABORDER(5)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL2(624, 124, 684, 144)  '조회구분'  AL_LEFT  CUR(0)      COLOR(141, 240)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL8(624, 145, 684, 165)  '투신펀드코드'  AL_LEFT  CUR(0)      COLOR(141, 240)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL1(9, 4, 89, 24)  '조회시작일자'  AL_LEFT  CUR(0)      COLOR(141, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  startDt(85, 4, 170, 24)  LEN(8)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_DATE    COLOR(192, 130)  CUR(0)  TP_SUNKEN          EDITFORMAT("9999/99/99")  TABORDER(2)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON1(575, 310, 611, 330)  '조회'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, BOLD)  COLOR(208, 186)  CUR(0)    "조회BTN.bmp"    TABORDER(3)  ENABLE  &
+  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+BUTTON  b_next(390, 4, 426, 24)  '다음'  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(208, 186)  CUR(0)    "2btn.bmp"    TABORDER(6)  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+LABEL  LABEL12(572, 345, 622, 365)  '펀드코드'  AL_LEFT  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(66, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  BUTTON0(677, 345, 697, 365)  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(208, 232)  CUR(0)    "검색.BMP"    TABORDER(7)  ENABLE  &
+  IMAGETEXT  HINTTYPE(IH_NONE)
+EDIT  fundcode(622, 345, 678, 365)  LEN(12)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 130)  CUR(0)  TP_SUNKEN          TABORDER(1)  IOORDER(4)  &
+  HINTTYPE(IH_NONE)
+PANEL  FundName(698, 345, 808, 365)  LINECOLOR(89)      COLOR(160, 130)  CUR(0)    AL_LEFT    ENABLE  &
+  HINTTYPE(IH_REF)  HELPTEXT("FundName")HELPTEXT("FundName")
+BUTTON  viewBtn(302, 4, 382, 24)  '데이터보기'  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(208, 186)  CUR(0)    "8btn.bmp"    TABORDER(8)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+OBJECT  obj(0, 28, 430, 688)    ""  TABORDER(9)  IOORDER(7)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Option Explicit
+
+Const MYFILE = "userconf.ini"
+Const MYMAP = "IB498980"
+
+''///Head   169
+	Dim	nHead          ''[2];	    '// data Head 개수
+	Dim	nData          ''[6];	    '// 수신 data 개수
+	Dim	irSize         ''[2];	    '// 1 index 데이타 크기
+	Dim	drSize         ''[2];	    '// 1 value 데이타 크기
+	Dim	pday           ''[8];	    '// 최근영업일자
+	Dim	mgap           ''[4];	    '// 분봉갭
+	Dim	xtype          ''   ;		'// 시계열의 문자열여부
+	Dim	xUnit(3)       ''[3][16];	'// 하/좌/우단 단위
+	Dim	tipName        ''[64];	    '// tooltip name(비시계열에 사용)
+	Dim	reserve        ''[32];	    '// reserve
+
+''//BODY  84
+	Dim	filler				'''[2];	'//"XX"				*/
+	Dim	name				'''[32];	'//이름				*/
+	Dim	digit				'''[2];	'//소수점 자리수		*/
+	Dim	rtscode				'''[12];	'//실시간 코드			*/
+	Dim	symbol				'''[5];	'//실시간 심볼			*/
+	Dim	rtsSign				'''[1];	'//' ' 0 1실시간 데이타의 부호필드 여부*/
+	Dim	pivot				'''[14];	'//기준값			*/
+	Dim	reserve2			'''[16];	'//reserve			*/
+
+Dim sTot,Test1,idx,yyyymmdd,a,workday,sTemp
+
+
+'== 첫 조회
+Sub send_f()
+	SCREEN.ClearAll 0, 2
+	SCREEN.Proc "obj.send_f", ""
+	'LEDGER.Fkey = "C"
+	'SCREEN.Send 0
+End Sub
+
+'== 연속 조회
+Sub send_c()
+	LEDGER.Fkey = "7"
+	GRID0.SetDataPosition(2)
+	SCREEN.Send 0
+End Sub
+
+Sub main_send()
+	fundcode.Data = SCREEN.Object("main.fundcode").Data
+	FundName.Text = SCREEN.Object("main.FundName").Text
+	send_f()
+End Sub
+
+Sub SetMode()
+	If Trim(viewBtn.Text) = "차트" Then
+		viewBtn.Text = "데이터보기"
+		obj.SetObject "IB498984"
+	Else
+		viewBtn.Text = "차트"
+		obj.SetObject "IB498983"
+	End If
+
+	SCREEN.Proc "obj.send_f", ""
+
+	Call p_write_ini()
+End Sub
+
+'''graph
+Sub drawGraph()
+	If GRID0.rows > 0 Then
+		If Trim(LOGIN.Day0) <> "" And Trim(LOGIN.Day1) <> "" And Trim(LOGIN.Day2) <> "" Then
+			yyyymmdd = DateSerial(Left(LOGIN.Day1, 4), Mid(LOGIN.Day1, 5, 2), Mid(LOGIN.Day1, 7, 2))
+
+			a = Weekday(CDate(Trim(yyyymmdd)))
+
+			workday = Date
+			'오늘이 토요일 이거나 일요일 이면 전영업일로 초기화
+			If a = 7 Or a = 1 Then
+				workday = LOGIN.Day0
+			End If
+		End If
+
+		nHead  = 1
+		nData  = GRID0.rows
+		irSize = 14
+		drSize = 14
+		pday   = workday
+		mgap   = "0000"
+		xtype  = " "
+		xUnit(0)= " "
+		xUnit(1)= " "
+		xUnit(2)= " "
+		tipName = " "
+		reserve = " "
+
+		sTot = cp_lpad(nHead,2," ")
+		sTot = sTot & cp_lpad(nData ,6 ," ")
+		sTot = sTot & cp_lpad(irSize,2 ," ")
+		sTot = sTot & cp_lpad(drSize,2 ," ")
+		sTot = sTot & cp_rpad(pday  ,8 ," ")
+		sTot = sTot & cp_rpad(mgap  ,4 ," ")
+		sTot = sTot & xtype
+		sTot = sTot & cp_rpad(xUnit(0),16," ")
+		sTot = sTot & cp_rpad(xUnit(1),16," ")
+		sTot = sTot & cp_rpad(xUnit(2),16," ")
+		sTot = sTot & cp_rpad(tipName ,64," ")
+		sTot = sTot & cp_rpad(reserve ,32," ")
+
+		Dim idx
+
+		For idx = GRID0.Rows To 1 Step -1  '''val = Trim(VIEWGRID.GetGridCell(VIEWGRID.Row, 4))
+			sTemp = Trim(GRID0.GetGridCell(idx,1))
+			sTot = sTot & cp_rpad(sTemp,14," ")
+		Next
+
+		filler = "XX"
+		name = "기준가변동그래프"
+		digit=02
+		rtscode=" "
+		symbol=005
+		rtsSign = " "
+		pivot	= " "
+		reserve2 = " "
+
+		sTot = sTot & filler
+		sTot = sTot & cp_rpad(name,32," ")
+		sTot = sTot & cp_lpad(digit,2,"0")
+		sTot = sTot & cp_rpad(rtscode	,12," ")
+		sTot = sTot & cp_rpad(symbol,5," ")
+		sTot = sTot & rtsSign
+		sTot = sTot & cp_rpad(pivot	,14," ")
+		sTot = sTot & cp_rpad(reserve2,16," ")
+
+		For idx = GRID0.Rows To 1 Step -1  '''val = Trim(VIEWGRID.GetGridCell(VIEWGRID.Row, 4))
+			sTot = sTot & cp_lpad(Replace(Replace(Trim(GRID0.GetGridCell(idx,3)),".",""),",",""),14," ")
+		Next
+
+		ctl_C_UserGrp.SetData(sTot)
+	End If
+End Sub
+
+
+'**********************************************************************
+' 기능     : Size만큼 filler 값으로 왼쪽 채움
+' 파라메터 : as_string : 문자열
+'            as_cnt    : 문자열의 길이
+'            as_filler : filler
+' 리턴값   : cp_lpad
+' 개발자   : 김동겸	04/09/08
+' 수정자1  :
+'**********************************************************************
+Public Function cp_lpad(as_string, ai_count, as_filler)
+	Dim ls_str, li_cnt
+    '대상 String이 NULL이면 Filler로 채운 문자열 Return
+	If IsNull(as_string) Then
+		cp_lpad = String(ai_count, as_filler)
+	Else
+		ls_str = Trim(as_string) ' 공백 Trimming
+		SCREEN.CreateObject("DX_CSTRING")
+		DX_CSTRING.Text = ls_str
+		li_cnt = ai_count - DX_CSTRING.GetLength()
+		If li_cnt >= 0 Then
+			cp_lpad = String(li_cnt, as_filler) & ls_str
+		Else
+			cp_lpad = Right(ls_str, ai_count)
+		End If
+	End If
+End Function
+
+
+'**********************************************************************
+' 기능     : Size만큼 filler 값으로 오른쪽 채움
+' 파라메터 : as_string : 문자열
+'            as_cnt    : 문자열의 길이
+'            as_filler : filler
+' 리턴값   : cp_rpad
+' 개발자   : 김동겸	04/09/08
+' 수정자1  :
+'**********************************************************************
+Public Function cp_rpad(as_string, ai_count, as_filler)
+	Dim ls_str, li_cnt
+	'대상 String이 NULL이면 Filler로 채운 문자열 Return
+	If IsNull(as_string) Then
+		cp_rpad = String(ai_count, as_filler)
+	Else
+		ls_str = Trim(as_string) ' 공백 Trimming
+		SCREEN.CreateObject("DX_CSTRING")
+		DX_CSTRING.Text = ls_str
+		li_cnt = ai_count - DX_CSTRING.GetLength()
+		If li_cnt >= 0 Then
+			cp_rpad = ls_str & String(li_cnt, as_filler)
+		Else
+			cp_rpad = Left(ls_str, ai_count)
+		End If
+	End If
+End Function
+
+
+Sub p_write_ini()
+	If SCREEN.CreateObject("INFO") = True Then
+		INFO.PushData LOGIN.Name, MYFILE, MYMAP, "mode", Trim(viewBtn.Text)
+	End If
+End Sub
+
+Sub p_read_ini()
+	If SCREEN.CreateObject("INFO") = True Then
+		Dim Mode
+		Mode = Trim(INFO.PopData(LOGIN.Name, MYFILE, MYMAP, "mode"))
+
+		If Mode = "" Then
+			Mode = "데이터보기"
+		End If
+
+		viewBtn.Text = Mode
+
+		If Mode = "데이터보기" Then
+			obj.SetObject "IB498984"
+		Else
+			obj.SetObject "IB498983"
+		End If
+	End If
+End Sub
+
+_AW_ONINDECLARE_AW_
+#Load IB888833
+#Load IB888888
+
+_AW_ONENDSUB_AW_
+_AW_ONSTART_AW_
+Dim yy, mm, dd, cday, MyWeek
+
+	cday = DateAdd("d", -30, Date)
+	MyWeek = Weekday(cday)
+	yy = Year(cday)
+	mm = Month(cday)
+	dd = Day(cday)
+
+	If Len(mm) = 1 Then mm = "0"&mm
+	If Len(dd) = 1 Then dd = "0"&dd
+
+	cday = yy&mm&dd
+	startDt.Data = CDbl(cday)
+Call p_read_ini()
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+SCREEN.OnSend = False
+
+'SCREEN.Proc "obj.send_f", ""
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(startDt)
+_AW_ONCHANGE_AW_
+SCREEN.Proc "obj.send_f", ""
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON1)
+_AW_ONCLICK_AW_
+SCREEN.Proc "obj.send_f", ""
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(b_next)
+_AW_ONCLICK_AW_
+SCREEN.Proc "obj.send_c", ""
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON0)
+_AW_ONCLICK_AW_
+Dim msg
+Dim getdata
+
+SYSTEM.Push "fundmsg", ""
+
+SCREEN.CreateWindow 2, "IB498981  /t /s /p?", ""
+
+msg = SYSTEM.Pop("fundmsg")
+If msg = "NO" Then
+	Exit Sub
+End If
+
+getdata = Split(msg, "|", -1, 1)
+fundcode.Data = getdata(0)
+FundName.Text = Trim(getdata(1))
+
+If fundcode.Data <> "" Then
+	SCREEN.Proc "obj.send_f", ""
+	SCREEN.Object("parent.fundcode").Data = fundcode.Data
+	SCREEN.Object("parent.FundName").Text = FundName.Text
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(fundcode)
+_AW_ONCHANGE_AW_
+SCREEN.Proc "obj.send_f", ""
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(viewBtn)
+_AW_ONCLICK_AW_
+Call SetMode()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

@@ -1,0 +1,396 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB885100)
+MAPSIZE(493, 936)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("주식주문 main 3차")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(CR2TAB|SAVE)
+TITLE("[8851] 주식주문 (3차)")
+TOPATH(AXIS)
+METHOD(MENU)
+MAPTYPE(NORM)
+HEADER(LEDGER)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL3(0, -4, 329, 4)        COLOR(64, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL7(316, 0, 322, 468)        COLOR(64, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL2(319, 233, 938, 470)  LIMAGE(0)  LINEW(4)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL1(619, 0, 938, 234)  LIMAGE(0)  LINEW(4)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL63(319, 0, 620, 234)  LIMAGE(0)  LINEW(4)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL0(0, 2, 318, 468)  LIMAGE(2)  LINEW(4)  STRESS(44)  STRESSW(3)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  OBJ_order(326, 8, 613, 222)    "IB100190"FIXEDSIZE  TABORDER(1)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  OBJ_info(628, 32, 929, 227)    "IB100121"  TABORDER(2)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  1301(342, 640, 407, 660)  LEN(6)  IO_MIXED|EDIT_INOUT|FA_WRAP|FA_HAN|CODE    FONT("굴림체", 9, NORMAL)    COLOR(28, 232)  CUR(0)  TP_NONE          TABORDER(3)  IOORDER(3)  ENABLE  &
+  HINTTYPE(IH_NONE)
+USRTAB  tab_account(326, 239, 927, 265)  FOCUS  INDEX(1)  COUNT(9)  AL_TOP  TAB_IMAGE      FONT("굴림체", 9, NORMAL)    COLOR(3, 70)  CUR(0)  TABIMAGE("TAB.bmp")  FCOLOR(3, 71)  CAPTION("미체결|잔고", "미체결", "실시간잔고", "예수금", "매매일지", "당일손익", "주문가능", "체결", "잔고")  TABINFO("0:1", "1:2", "0:3", "0:4", "0:5", "0:6", "0:7", "1:8", "1:9")  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  OBJ_account(326, 265, 930, 462)    "IB100132"  TABORDER(4)  IOORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+USRTAB  TAB(628, 6, 929, 32)  FOCUS  INDEX(0)  COUNT(6)  AL_TOP  TAB_IMAGE      FONT("굴림체", 9, NORMAL)    COLOR(3, 70)  CUR(0)  TABIMAGE("TAB.bmp")  FCOLOR(3, 71)  CAPTION("뉴스", "회원", "일간", "차트", "재무", "상세")  TABINFO("1:1", "1:2", "1:3", "1:4", "1:5", "1:6")  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  xbtn2(959, 3, 979, 23)  '분'  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(132, 232)  CUR(0)    "1btn.BMP"    TABORDER(5)  ENABLE  &
+  IMAGETEXT  HOVER  HINTTYPE(IH_STRING)  HELPTEXT("분기")HELPTEXT("분기")
+BUTTON  xbtn(959, 27, 979, 47)  '결'  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(132, 232)  CUR(0)    "1btn.BMP"    TABORDER(6)  ENABLE  &
+  IMAGETEXT  HOVER  HINTTYPE(IH_STRING)  HELPTEXT("결산")HELPTEXT("결산")
+BUTTON  OPEN_BTN1(909, 9, 929, 29)  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(132, 232)  CUR(10)    "LINK.BMP"    TABORDER(7)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+BUTTON  OPEN_BTN3(907, 241, 927, 261)  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(132, 232)  CUR(0)    "LINK.BMP"    TABORDER(8)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+BUTTON  RADIO0(467, 636, 506, 652)  '결산'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(GROUP0)      COLOR(208, 232)  CUR(0)      TABORDER(9)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  RADIO1(427, 636, 464, 652)  '분기'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(GROUP0)      COLOR(208, 232)  CUR(0)      TABORDER(10)  ENABLE  &
+  CHECKED  TRANSPARENT  HINTTYPE(IH_NONE)
+GROUP  GROUP0(576, 626, 696, 676)  'Group'        COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+COMBO  jaemu_select(872, 9, 908, 28)  TP_SUNKEN  LEN(1)  COUNT(2)  VCOUNT(2)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_NUM|EDIT_INPUT    COLOR(192, 232)  CUR(0)  DISPLAY("분", "결")  DATA("1", "D")    TABORDER(12)  IOORDER(5)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL4(0, 492, 940, 496)        COLOR(64, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  GUIDE1(-2, 469, 938, 493)  LIMAGE(1)  LINEW(3)  STRESS(0)  STRESSW(0)  LINETYPE(4)  LINECOLOR(64)      COLOR(34, 69)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL5(4, 474, 18, 488)    |IMAGE|AL_STRETCH    COLOR(208, 232)  CUR(0)    "알림_ic.bmp"  ENABLE  &
+  VISIBLE  TRANSPARENT  IMAGE  HINTTYPE(IH_NONE)
+PANEL  GUIDE(20, 467, 926, 495)        COLOR(228, 69)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  btn_send(868, 241, 905, 261)  '조회'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, BOLD)  COLOR(132, 186)  CUR(0)    "조회btn.BMP"    TABORDER(11)  ENABLE  &
+  IMAGETEXT  HOVER  HINTTYPE(IH_STRING)
+OBJECT  OBJ_sise(7, 10, 310, 462)    "IB100210"  TABORDER(13)  IOORDER(6)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL8(0, 468, 319, 469)        COLOR(64, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL9(15, 10, 925, 485)  '미사용'  TP_RAISED      COLOR(208, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Sub send_sise_all(xval)
+SCREEN.IgnoreChange True
+	S1301.Trigger "", True
+
+	If xval <> "jumun" Then
+		Call Ord_ChangeCode(S1301.Data)
+	End If
+
+	If Trim(S1301.Data) <> Trim(SCREEN.Object("OBJ_sise.1301").data) Then
+		'If tab_sise.ID = 0 Then
+			SCREEN.Object("OBJ_sise.1301").data = Trim(S1301.Data)
+	'	End If
+		OBJ_sise.Send
+	End If
+
+	OBJ_info.Send
+
+SCREEN.IgnoreChange False
+End Sub
+
+Sub all_account()
+	OBJ_account.Send
+End Sub
+
+'모든 obj 1301에 종목정보 전송
+Sub Send_sise_all2(code)
+	S1301.Trigger "1301", True
+
+	If xval <> "jumun" Then
+		SCREEN.IgnoreChange True
+		SCREEN.Object("OBJ_order.obj_odr.1301").Data = code
+		SCREEN.IgnoreChange False
+		SCREEN.Proc "OBJ_order.obj_odr.ChangeCode", ""
+	End If
+
+	OBJ_info.Send
+End Sub
+'Sub send_sise_all(xval)
+'SCREEN.IgnoreChange True
+'	S1301.Trigger "", True
+'
+'	If xval <> "jumun" Then
+'		Call Ord_ChangeCode(S1301.Data)
+'	End If
+'	OBJ_sise.Send
+'	'OBJ_sise1.Send
+'	OBJ_info.Send
+'SCREEN.IgnoreChange False
+'End Sub
+'
+'Sub all_account()
+'	OBJ_account.Send
+'End Sub
+
+_AW_ONINDECLARE_AW_
+'== 주문obj를포함한 main의 공통함수
+#LOAD IB999913
+
+_AW_ONENDSUB_AW_
+_AW_ONSTART_AW_
+Call send_sise_all("main")
+
+Select Case tab_account.ID
+Case 4 : btn_send.Visible True
+Case Else : btn_send.Visible False
+End Select
+
+Select Case tab_account.ID
+	Case 1 : OPEN_BTN3.Visible False
+	Case Else : OPEN_BTN3.Visible True
+End Select
+
+Select Case TAB.ID
+Case 5
+		 RADIO0.Visible = True
+		 RADIO1.Visible = True
+		 jaemu_select.Visible = True
+		 OPEN_BTN1.Visible = True
+Case 6
+		 RADIO0.Visible = False
+		 RADIO1.Visible = False
+		 jaemu_select.Visible = False
+		 OPEN_BTN1.Visible = False
+Case Else
+		 RADIO0.Visible = False
+		 RADIO1.Visible = False
+		 jaemu_select.Visible = False
+		 OPEN_BTN1.Visible = True
+    Exit Sub
+End Select
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(1301)
+_AW_ONCHANGE_AW_
+Dim Myvar, name
+
+name = SCREEN.GetName(100, S1301.data, 0)
+If (name <> "") Then
+	Call send_sise_all("main")
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(tab_account)
+_AW_ONCLICK_AW_
+Select Case tab_account.ID
+Case 1 : OBJ_account.SetObject("IB100131")
+		 OPEN_BTN3.Visible = False
+		 btn_send.Visible = False
+Case 2 : OBJ_account.SetObject("IB100132")
+		 OPEN_BTN3.Visible = True
+		 btn_send.Visible = False
+Case 3 : OBJ_account.SetObject("IB100133")
+		 OPEN_BTN3.Visible = True
+		 btn_send.Visible = False
+Case 4 : OBJ_account.SetObject("IB100134")
+		 OPEN_BTN3.Visible = True
+		 btn_send.Visible = True
+Case 5 : OBJ_account.SetObject("IB100135")
+		 OPEN_BTN3.Visible = True
+		 btn_send.Visible = False
+Case 6 : OBJ_account.SetObject("IB100136")
+		 OPEN_BTN3.Visible = True
+		 btn_send.Visible = False
+Case 7 : OBJ_account.SetObject("IB100137")
+		 OPEN_BTN3.Visible = True
+		 btn_send.Visible = False
+Case 8 : OBJ_account.SetObject("IB100130")
+		 OPEN_BTN3.Visible = True
+		 btn_send.Visible = False
+Case 9 : OBJ_account.SetObject("IB885110")
+		 OPEN_BTN3.Visible = True
+		 btn_send.Visible = False
+End Select
+
+OBJ_account.Send
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(TAB)
+_AW_ONCLICK_AW_
+Select Case TAB.ID
+Case 1
+	 RADIO0.Visible = False
+	 RADIO1.Visible = False
+	 jaemu_select.Visible = False
+	 OPEN_BTN1.Visible = True
+	OBJ_info.SetObject ("IB100121")
+Case 2
+	 RADIO0.Visible = False
+	 RADIO1.Visible = False
+	 jaemu_select.Visible = False
+	 OPEN_BTN1.Visible = True
+	OBJ_info.SetObject ("IB100122")
+Case 3
+     RADIO0.Visible = False
+	 RADIO1.Visible = False
+	 jaemu_select.Visible = False
+	 OPEN_BTN1.Visible = True
+	OBJ_info.SetObject ("IB100123")
+Case 4
+	 RADIO0.Visible = False
+	 RADIO1.Visible = False
+	 jaemu_select.Visible = False
+	 OPEN_BTN1.Visible = True
+	OBJ_info.SetObject ("IB100124")
+Case 5
+	 RADIO0.Visible = True
+	 RADIO1.Visible = True
+	 jaemu_select.Visible = True
+	 OPEN_BTN1.Visible = True
+	OBJ_info.SetObject ("IB100125")
+Case 6
+	 RADIO0.Visible = False
+	 RADIO1.Visible = False
+	 jaemu_select.Visible = False
+	 OPEN_BTN1.Visible = False
+	OBJ_info.SetObject ("IB100126")
+Case Else
+	 RADIO0.Visible = False
+	 RADIO1.Visible = False
+	 jaemu_select.Visible = False
+    Exit Sub
+End Select
+
+OBJ_info.Send
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(xbtn2)
+_AW_ONCLICK_AW_
+SCREEN.Object("main.OBJ_info.xflg").data = "1"
+xbtn.Visible = True
+xbtn2.Visible = False
+OBJ_info.Send
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(xbtn)
+_AW_ONCLICK_AW_
+SCREEN.Object("main.OBJ_info.xflg").data = "D"
+xbtn.Visible = False
+xbtn2.Visible = True
+OBJ_info.Send
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(OPEN_BTN1)
+_AW_ONCLICK_AW_
+Select Case TAB.ID
+Case 1
+        SCREEN.CreateWindow 1, "IB771000 /S /d", "1301" & vbTab & S1301.Data
+Case 2
+        SCREEN.CreateWindow 1, "IB230100 /t/s/p5/d", _
+        "1301" & vbTab & S1301.Data & vbLf
+Case 3
+        SCREEN.CreateWindow 1, "IB201100 /t/p5/S/d", _
+        "1301" & vbTab & S1301.Data
+Case 4
+         SCREEN.CreateWindow 1, "IB711200 /t/S/p5/d", _
+        "1301" & vbTab & S1301.Data & vbLf
+Case 5
+        SCREEN.CreateWindow 1, "IB202300 /t/d/p5/S", _
+        "1301" & vbTab & S1301.Data
+Case Else
+         Exit Sub
+End Select
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(OPEN_BTN3)
+_AW_ONCLICK_AW_
+Select Case tab_account.ID
+Case 2
+        SCREEN.CreateWindow 1, "IB110100 /t/d/p5/S", _
+		"1301" & vbTab & S1301.data
+Case 3
+        SCREEN.CreateWindow 1, "IB120100 /t/s/p5", _
+        "1301" & vbTab & S1301.Data & vbLf
+Case 4
+         SCREEN.CreateWindow 1, "IB120600 /t/d/p5/S", _
+        "1301" & vbTab & S1301.Data
+Case 5
+         SCREEN.CreateWindow 1, "IB140200 /t/d/p5/S", _
+        "1301" & vbTab & S1301.Data
+Case 6
+         SCREEN.CreateWindow 1, "IB130100 /t/d/p5/S", _
+        "1301" & vbTab & S1301.Data
+Case 7
+         SCREEN.CreateWindow 1, "IB120800 /t/d/p5/S", _
+        "1301" & vbTab & S1301.Data
+Case 8
+         SCREEN.CreateWindow 1, "IB110200 /t/d/p5/S", _
+        "1301" & vbTab & S1301.Data
+Case Else
+         Exit Sub
+End Select
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(RADIO0)
+_AW_ONCLICK_AW_
+SCREEN.Object("main.OBJ_info.xflg").data = "D"
+OBJ_info.Send
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(RADIO1)
+_AW_ONCLICK_AW_
+SCREEN.Object("main.OBJ_info.xflg").data = "1"
+OBJ_info.Send
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(jaemu_select)
+_AW_ONCHANGE_AW_
+If jaemu_select.Data = "1" Then
+	SCREEN.Object("main.OBJ_info.xflg").data = "1"
+Else
+	SCREEN.Object("main.OBJ_info.xflg").data = "D"
+End If
+
+OBJ_info.Send
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(btn_send)
+_AW_ONCLICK_AW_
+OBJ_account.Send
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

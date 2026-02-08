@@ -1,0 +1,119 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB77004B)
+MAPSIZE(200, 340)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("MS Sans Serif", 9, NORMAL)
+TITLE("공지사항")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(FIXED)
+HEADER(NOP)
+BGROUND(BRUSH, 240)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  imgPanel(0, 0, 340, 200)    |IMAGE|AL_CENTER    COLOR(181, 232)  CUR(10)    "BANNER_IMG_02.BMP"  ENABLE  &
+  VISIBLE  IMAGE  HINTTYPE(IH_NONE)
+LABEL  LABEL0(510, 235, 540, 247)  'Label'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Dim mIndex
+mIndex = "0"
+
+_AW_ONSTART_AW_
+'SCREEN.SetTimer 50, False
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+SCREEN.OnSend False
+
+_AW_ONENDSUB_AW_
+_AW_ONTIMER_AW_
+'If mIndex = "0" Then
+'	imgPanel.Text = "BANNER_IMG_02_2.BMP"
+'	mIndex = "1"
+'
+'ElseIf mIndex = "1" Then
+'	imgPanel.Text = "Banner_Img_02.bmp"
+'	mIndex = "0"
+'
+'End If
+'
+'SCREEN.SetTimer 50, False
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(imgPanel)
+_AW_ONCLICK_AW_
+'If SCREEN.CreateObject("Info") Then
+' 	Dim link
+
+' 	link = Trim(INFO.PopData("", "notice7700.ini", "1", "url"))
+
+'	If InStr(link,"HTS:") > 0 Then
+'		link = Mid(link,5,8)
+'		SCREEN.CreateWindow 1, link & " /t/d/p5/S", ""
+'	Else
+' 		SYSTEM.Navigate link & vbTab & "1000" & vbTab & "800"
+' 	End If
+'End If
+
+SCREEN.CreateWindow 1, "IB980001 /t/d", "url" & vbTab & "www.ibks.com" &vbLf 
+
+
+'Dim WS
+'Set WS = CreateObject("WScript.Shell")
+
+'LABEL0.Data = "False"
+'On Error Resume Next
+'LABEL0.Data = WS.RegRead("HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Edge\IEToEdge\SiteListUrlBucket")
+
+'If LABEL0.Data = "False" Then
+'	Dim link
+'	link = "https://www.ibks.com/notice/notice_view.do?seq=4820&popup=Y"
+'	SYSTEM.Navigate link & vbTab & "850" & vbTab & "750"
+'Else
+'	Dim EDGE
+'	Set EDGE = CreateObject("WScript.Shell")
+'	On Error Resume Next
+'	EDGE.Run "msedge https://www.ibks.com/notice/notice_view.do?seq=4820&popup=Y"
+'End If
+_AW_ONENDSUB_AW_
+_AW_ONDBLCLK_AW_
+If SCREEN.CreateObject("Info") Then
+ 	Dim link
+
+ 	link = Trim(INFO.PopData("", "notice7700.ini", "1", "url"))
+
+	If InStr(link,"HTS:") > 0 Then
+		link = Mid(link,5,8)
+		SCREEN.CreateWindow 1, link & " /t/d/p5/S", ""
+	Else
+ 		SYSTEM.Navigate link & vbTab & "1000" & vbTab & "800"
+ 	End If
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

@@ -1,0 +1,774 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB190916)
+MAPSIZE(212, 602)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("현재가_뉴스")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(FLASH|CR2TAB)
+TITLE("뉴스")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pibo7710")
+MAPTYPE(NORM)
+HEADER(NOP)
+BGROUND(BRUSH, 181)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL3(0, 240, 636, 247)        COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL1(0, 0, 604, 26)        COLOR(66, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+TABLE  TABLE0(264, 257, 528, 414)  MATRIX(11, 1)  LINECOLOR(232)  CELLH(20)  AUTOSIZE  |MULTI  EDIT_OUTPUT    &
+	COLINFO("021")  LEN(6)  WIDTH(56)  HEAD("RTS코드")  COLALIGN(AL_CENTER, AL_LEFT)  HEADCOLOR(208, 232)  IO_ALPHA|FA_FLASH    COLOR(192, 232)  COLCUR(0, 0)  COLHINTTYPE(IH_NONE)    COLUMN_VISIBLE  &
+	COLINFO("015")  LEN(80)  WIDTH(56)  HEAD("제목")  COLALIGN(AL_CENTER, AL_LEFT)  HEADCOLOR(208, 232)  IO_MIXED    COLOR(192, 232)  COLCUR(0, 0)  COLHINTTYPE(IH_NONE)    COLUMN_VISIBLE  &
+	COLINFO("014")  LEN(7)  WIDTH(56)  HEAD("RECN")  COLALIGN(AL_CENTER, AL_LEFT)  HEADCOLOR(208, 232)  IO_ALPHA    COLOR(192, 232)  COLCUR(0, 0)  COLHINTTYPE(IH_NONE)    COLUMN_VISIBLE  &
+	COLINFO("301")  LEN(7)  WIDTH(56)  HEAD("종목코드")  COLALIGN(AL_CENTER, AL_LEFT)  HEADCOLOR(208, 232)  IO_ALPHA    COLOR(192, 232)  COLCUR(0, 0)  COLHINTTYPE(IH_NONE)    COLUMN_VISIBLE  &
+	COLINFO("022")  LEN(16)  WIDTH(56)  HEAD("종목명")  COLALIGN(AL_CENTER, AL_LEFT)  HEADCOLOR(208, 232)  IO_MIXED    COLOR(192, 232)  COLCUR(0, 0)  COLHINTTYPE(IH_NONE)    COLUMN_VISIBLE  &
+	COLINFO("044")  LEN(6)  WIDTH(56)  HEAD("시간")  COLALIGN(AL_CENTER, AL_LEFT)  HEADCOLOR(208, 232)  IO_NUM    COLOR(192, 232)  COLCUR(0, 0)  COLHINTTYPE(IH_NONE)    COLUMN_VISIBLE  &
+	COLINFO("046")  LEN(10)  WIDTH(56)  HEAD("제공원")  COLALIGN(AL_CENTER, AL_LEFT)  HEADCOLOR(208, 232)  IO_MIXED    COLOR(192, 232)  COLCUR(0, 0)  COLHINTTYPE(IH_NONE)    COLUMN_VISIBLE  &
+	COLINFO("041")  LEN(2)  WIDTH(56)  HEAD("구분1")  COLALIGN(AL_CENTER, AL_LEFT)  HEADCOLOR(208, 232)  IO_ALPHA    COLOR(192, 232)  COLCUR(0, 0)  COLHINTTYPE(IH_NONE)    COLUMN_VISIBLE  &
+	COLINFO("042")  LEN(3)  WIDTH(56)  HEAD("구분2")  COLALIGN(AL_CENTER, AL_LEFT)  HEADCOLOR(208, 232)  IO_ALPHA    COLOR(192, 232)  COLCUR(0, 0)  COLHINTTYPE(IH_NONE)    COLUMN_VISIBLE  &
+	COLINFO("047")  LEN(1)  WIDTH(56)  HEAD("FLAG")  COLALIGN(AL_CENTER, AL_LEFT)  HEADCOLOR(208, 232)  IO_NUM    COLOR(192, 232)  COLCUR(0, 0)  COLHINTTYPE(IH_NONE)    COLUMN_VISIBLE  &
+	COLINFO("016")  LEN(24)  WIDTH(56)  HEAD("KEYV")  COLALIGN(AL_CENTER, AL_LEFT)  HEADCOLOR(208, 232)  IO_NUM    COLOR(192, 232)  COLCUR(0, 0)  COLHINTTYPE(IH_NONE)    COLUMN_VISIBLE  IOORDER(29)  ENABLE
+GROUP  GROUP0(52, 506, 172, 556)  'Group'        COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  r1_one(76, 3, 145, 23)  '종목뉴스'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(GROUP0)      COLOR(208, 130)  CUR(0)      TABORDER(1)  ENABLE  &
+  VISIBLE  CHECKED  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  r1_all(7, 3, 76, 23)  '전체뉴스'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(GROUP0)      COLOR(208, 130)  CUR(0)      TABORDER(2)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  BUTTON(776, 4, 795, 24)  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(15, 63)  CUR(0)    "검색.BMP"    TABORDER(3)  ENABLE  &
+  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+CONTROL  jcod(711, 4, 776, 24)  |FA_PROTECT|FA_SKIP  "CX_CODECTRL"  "/u0/k검색.BMP/lAXCOMBO.BMP/p/s0/o"  LEN(6)  EDIT_INPUT    COLOR(192, 130)  TABORDER(4)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  OBJ_hnam(795, 4, 911, 24)    "IB999919"FIXEDSIZE  TABORDER(5)  IOORDER(30)  ENABLE  &
+  HINTTYPE(IH_NONE)
+GROUP  GROUP1(62, 516, 182, 566)  'Group'        COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  r2_3(234, 4, 274, 22)  '시황'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(GROUP1)      COLOR(208, 130)  CUR(0)      TABORDER(6)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  r2_2(192, 4, 232, 22)  '공시'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(GROUP1)      COLOR(208, 130)  CUR(0)      TABORDER(7)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  r2_1(149, 4, 189, 22)  '전체'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(GROUP1)      COLOR(208, 130)  CUR(0)      TABORDER(8)  ENABLE  &
+  VISIBLE  CHECKED  TRANSPARENT  HINTTYPE(IH_NONE)
+PANEL  PANEL2(144, 3, 277, 23)  LINECOLOR(165)      COLOR(66, 130)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+GRID  GRID0(0, 26, 604, 211)  VISIBLEROW(0)  CELLH(19)  MATRIX(1500, 11)  FIX(0)  MAINCOLOR(7, 0)  LINECOLOR(75)  FOCUSCOLOR(78)  FOCUSKIND(3)    FONT("굴림체", 9, NORMAL)  ROWC(68, 77)  |SELALWAYS|FLEXIBLE|VSCROLL|INS_TOP|NO3D|RROW|XHLINE|PAGE|HEADER|GRFTEXT    &
+	COLINFO("Col6")  LEN(8)  WIDTH(38)  HEAD("날짜")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(10, 0)    COLUMN_VISIBLE  INORMAL  EDITFORMAT("9999/99/99")    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col0")  LEN(4)  WIDTH(39)  HEAD("시간")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(10, 0)    COLUMN_VISIBLE  INORMAL  EDITFORMAT("99:99:99")    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col2")  LEN(132)  WIDTH(431)  HEAD("제목")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(10, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col1")  LEN(12)  WIDTH(79)  HEAD("정보구분")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(10, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col3")  LEN(20)  WIDTH(60)  HEAD("분류코드명")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(10, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col4")  LEN(12)  WIDTH(65)  HEAD("종목코드")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(10, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col5")  LEN(20)  WIDTH(80)  HEAD("종목명")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(10, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col7")  LEN(10)  WIDTH(37)  HEAD("CRN(grid)")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col8")  LEN(10)  WIDTH(37)  HEAD("CRN(본문조회)")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col9")  LEN(24)  WIDTH(37)  HEAD("본문조회용key")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col10")  LEN(1)  WIDTH(37)  HEAD("HTML여부")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    TABORDER(9)  IOORDER(27)  ENABLE  &
+  VISIBLE
+
+LABEL  LABEL1(32, 310, 89, 330)  '조회일자'  AL_LEFT  CUR(0)      COLOR(64, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  fday(92, 309, 169, 329)  LEN(8)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_DATE    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(10)  IOORDER(4)  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL3(32, 333, 89, 353)  '검색어'  AL_LEFT  CUR(0)      COLOR(64, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL4(32, 355, 89, 375)  '분류코드'  AL_LEFT  CUR(0)      COLOR(64, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  EDIT0(92, 333, 225, 353)  LEN(20)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(11)  IOORDER(25)  &
+  HINTTYPE(IH_NONE)
+EDIT  EDIT1(92, 355, 124, 375)  LEN(3)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("999")          TABORDER(12)  IOORDER(26)  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL0(32, 287, 89, 307)  '종목코드'  AL_LEFT  CUR(0)      COLOR(64, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  cod2(92, 287, 169, 307)  LEN(6)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_NOR    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(13)  IOORDER(3)  &
+  HINTTYPE(IH_NONE)
+EDIT  editFilter(335, 450, 415, 470)  LEN(200)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(14)  IOORDER(31)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  1301(641, 178, 706, 198)  LEN(6)  IO_MIXED|EDIT_INPUT|FA_SKIP    COLOR(192, 130)  CUR(0)  TP_SUNKEN  CURSOR        TABORDER(15)  IOORDER(2)  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL4(3, 3, 142, 23)  LINECOLOR(165)      COLOR(66, 130)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL5(31, 378, 88, 398)  '분류타입'  AL_LEFT  CUR(0)      COLOR(64, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  type(91, 378, 123, 398)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("0")          TABORDER(16)  IOORDER(28)  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL0(558, 306, 696, 693)  LINECOLOR(29)      COLOR(200, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  GUBN1(586, 312, 640, 324)  '시황'  TP_CHECK|EDIT_INPUT          COLOR(208, 232)  CUR(0)      TABORDER(17)  IOORDER(5)  ENABLE  &
+  CHECKED  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  GUBN2(586, 331, 670, 343)  '증전공시'  TP_CHECK|EDIT_INPUT          COLOR(208, 232)  CUR(0)      TABORDER(18)  IOORDER(6)  ENABLE  &
+  CHECKED  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  GUBN3(586, 350, 672, 362)  '이투데이'  TP_CHECK|EDIT_INPUT          COLOR(208, 232)  CUR(0)      TABORDER(19)  IOORDER(7)  ENABLE  &
+  CHECKED  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  GUBN4(586, 369, 670, 381)  '인포스탁'  TP_CHECK|EDIT_INPUT          COLOR(208, 232)  CUR(0)      TABORDER(20)  IOORDER(8)  ENABLE  &
+  CHECKED  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  GUBN5(586, 388, 670, 400)  '전자신문'  TP_CHECK|EDIT_INPUT          COLOR(208, 232)  CUR(0)      TABORDER(21)  IOORDER(9)  ENABLE  &
+  CHECKED  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  GUBN6(586, 407, 657, 419)  '이데일리'  TP_CHECK|EDIT_INPUT          COLOR(208, 232)  CUR(0)      TABORDER(22)  IOORDER(10)  ENABLE  &
+  CHECKED  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  GUBN8(586, 445, 670, 457)  '연합뉴스'  TP_CHECK|EDIT_INPUT          COLOR(208, 232)  CUR(0)      TABORDER(23)  IOORDER(12)  ENABLE  &
+  CHECKED  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  GUBN7(586, 426, 680, 438)  '월드인덱스'  TP_CHECK|EDIT_INPUT          COLOR(208, 232)  CUR(0)      TABORDER(24)  IOORDER(11)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  GUBN9(586, 464, 661, 476)  '머니투데이'  TP_CHECK|EDIT_INPUT          COLOR(208, 232)  CUR(0)      TABORDER(25)  IOORDER(13)  ENABLE  &
+  CHECKED  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  GUBN10(586, 483, 655, 495)  '한경뉴스'  TP_CHECK|EDIT_INPUT          COLOR(208, 232)  CUR(0)      TABORDER(26)  IOORDER(14)  ENABLE  &
+  CHECKED  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  GUBN11(586, 502, 651, 514)  '매경뉴스'  TP_CHECK|EDIT_INPUT          COLOR(208, 232)  CUR(0)      TABORDER(27)  IOORDER(15)  ENABLE  &
+  CHECKED  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  GUBN12(586, 521, 640, 533)  '아시아경제'  TP_CHECK|EDIT_INPUT          COLOR(208, 232)  CUR(0)      TABORDER(28)  IOORDER(16)  ENABLE  &
+  CHECKED  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  GUBN13(586, 540, 671, 552)  '헤럴드경제'  TP_CHECK|EDIT_INPUT          COLOR(208, 232)  CUR(0)      TABORDER(29)  IOORDER(17)  ENABLE  &
+  CHECKED  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  GUBN14(586, 559, 671, 571)  '촉n토크'  TP_CHECK|EDIT_INPUT          COLOR(208, 232)  CUR(0)      TABORDER(30)  IOORDER(18)  ENABLE  &
+  CHECKED  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  GUBN15(586, 578, 671, 590)  'IR GO'  TP_CHECK|EDIT_INPUT          COLOR(208, 232)  CUR(0)      TABORDER(31)  IOORDER(19)  ENABLE  &
+  CHECKED  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  GUBN16(586, 597, 671, 609)  '컨슈머타임스'  TP_CHECK|EDIT_INPUT          COLOR(208, 232)  CUR(0)      TABORDER(32)  IOORDER(20)  ENABLE  &
+  CHECKED  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  GUBN17(586, 616, 671, 628)  '뉴스웨이'  TP_CHECK|EDIT_INPUT          COLOR(208, 232)  CUR(0)      TABORDER(33)  IOORDER(21)  ENABLE  &
+  CHECKED  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  GUBN18(586, 635, 671, 647)  '공백'  TP_CHECK|EDIT_INPUT          COLOR(208, 232)  CUR(0)      TABORDER(34)  IOORDER(22)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  GUBN19(586, 654, 671, 666)  '공백'  TP_CHECK|EDIT_INPUT          COLOR(208, 232)  CUR(0)      TABORDER(35)  IOORDER(23)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  GUBN20(586, 673, 671, 685)  '공백'  TP_CHECK|EDIT_INPUT          COLOR(208, 232)  CUR(0)      TABORDER(36)  IOORDER(24)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Dim myFILE, myMAP
+Dim Isstarted
+myFILE = "userconf.ini"
+myMAP = SCREEN.GetMapName(0)
+Isstarted = False
+ArrNews = Array("", "시황", "공시","이투데이","인포스탁","전자신문",_
+"이데일리","월드인덱스","연합뉴스","머니투데이","한경뉴스",_
+"매경뉴스","아시아경제","헤럴드경제", "촉n토크", "IR GO",_
+"컨슈머타임스","뉴스웨이")
+
+
+
+Sub showgrid(val)
+	GRID0.Clear
+	If val = "1" Then
+		BUTTON.Enable False
+		jcod.Enable False
+		GRID0.SetColumnVisible 7, True
+		GRID0.SetColumnWidth 3, 365
+		r2_1.Enable False
+		r2_2.Enable False
+		r2_3.Enable False
+		For ii=1 To 20
+			SCREEN.Object("GUBN"&ii).Checked = True
+		Next
+	Else
+		BUTTON.Enable True
+		jcod.Enable True
+		GRID0.SetColumnVisible 7, False
+		GRID0.SetColumnWidth 3, 445
+		r2_1.Enable True
+		r2_2.Enable True
+		r2_3.Enable True
+		rd_click()
+	End If
+End Sub
+
+Sub rd_click()
+	Dim ii
+
+	If r2_1.Checked Then
+		For ii=1 To 20
+			If ii = 7 Then
+				SCREEN.Object("GUBN"&ii).Checked = False
+			Else
+				SCREEN.Object("GUBN"&ii).Checked = True
+			End If
+		Next
+	ElseIf r2_2.Checked Then
+		For ii=1 To 20
+			If ii = 2 Then
+				SCREEN.Object("GUBN"&ii).Checked = True
+			Else
+				SCREEN.Object("GUBN"&ii).Checked = False
+			End If
+		Next
+	ElseIf r2_3.Checked Then
+		For ii=1 To 20
+			If ii = 2 Or ii = 7 Then
+				SCREEN.Object("GUBN"&ii).Checked = False
+			Else
+				SCREEN.Object("GUBN"&ii).Checked = True
+			End If
+		Next
+	Else
+
+	End If
+End Sub
+
+Const file = "newsinfo.ini"
+
+Function ReadConf()
+	If SCREEN.CreateObject("Info") Then
+	 	ReadConf = Trim(INFO.PopData(LOGIN.Name, file, "SELITEM", "ITEMS"))
+	Else
+		ReadConf = ""
+	End If
+End Function
+
+Function ReadVersion()
+	If SCREEN.CreateObject("Info") Then
+	 	ReadVersion = Trim(INFO.PopData(LOGIN.Name, file, "SELITEM", "VERSION"))
+	Else
+		ReadVersion = ""
+	End If
+End Function
+
+Sub Onalert()
+	Dim	v_gubn
+	Dim strKeys
+	Dim v_subgubn
+
+	ArrData = Array("",_
+	Trim(TABLE0.GetTableCell(1)),_
+	Trim(TABLE0.GetTableCell(2)),_
+	Trim(TABLE0.GetTableCell(3)),_
+	Trim(TABLE0.GetTableCell(4)),_
+	Trim(TABLE0.GetTableCell(5)),_
+	Trim(TABLE0.GetTableCell(6)),_
+	Trim(TABLE0.GetTableCell(7)),_
+	Trim(TABLE0.GetTableCell(8)),_
+	Trim(TABLE0.GetTableCell(9)),_
+	Trim(TABLE0.GetTableCell(10)),_
+	Trim(TABLE0.GetTableCell(11))_
+	)
+
+	'종목코드 체크
+	If r1_one.Checked Then
+		If ArrData(4) <> Trim(S1301.data) Then
+			Exit Sub
+		End If
+	End If
+
+	'뉴스 제공사 체크
+	If ArrData(2) = "" Then
+		Exit Sub
+	End If
+
+	If IsNumeric(ArrData(8)) = False Then
+		Exit Sub
+	End If
+
+	v_gubn = CLng(ArrData(8))
+
+	If v_gubn < 1 Or v_gubn > 20 Then
+		Exit Sub
+	End If
+
+	If SCREEN.Object("GUBN"&v_gubn).Checked = False Then
+		Exit Sub
+	End If
+
+	Select Case v_gubn
+		Case 1
+			If GUBN1.Checked = False Then
+				Exit Sub
+			End If
+			v_name = "시황"
+		Case 2
+			If GUBN2.Checked = False Then
+				Exit Sub
+			End If
+			v_name = "공시"
+
+			v_subgubn = CLng(ArrData(9))
+
+			If v_subgubn = 99 Then
+				v_name = "코스닥공시"
+			ElseIf v_subgubn = 88 Then
+				v_name = "프리보드공시"
+			Else
+				v_name = "거래소공시"
+			End If
+		Case 3
+			If GUBN3.Checked = False Then
+				Exit Sub
+			End If
+			v_name = "이투데이"
+		Case 4
+			If GUBN4.Checked = False Then
+				Exit Sub
+			End If
+			v_name = "시황속보"
+		Case 5
+			If GUBN5.Checked = False Then
+				Exit Sub
+			End If
+			v_name = "전자신문"
+		Case 6
+			If GUBN6.Checked = False Then
+				Exit Sub
+			End If
+			v_name = "이데일리"
+		Case 7
+			If GUBN7.Checked = False Then
+				Exit Sub
+			End If
+			v_name = "월드인덱스"
+		Case 8
+			If GUBN8.Checked = False Then
+				Exit Sub
+			End If
+			v_name = "연합뉴스"
+		Case 9
+			If GUBN9.Checked = False Then
+				Exit Sub
+			End If
+			v_name = "머니투데이"
+		Case 10
+			If GUBN10.Checked = False Then
+				Exit Sub
+			End If
+			v_name = "한경뉴스"
+		Case 11
+			If GUBN11.Checked = False Then
+				Exit Sub
+			End If
+			v_name = "매경뉴스"
+		Case 12
+			If GUBN12.Checked = False Then
+				Exit Sub
+			End If
+			v_name = "아시아경제"
+		Case 13
+			If GUBN13.Checked = False Then
+				Exit Sub
+			End If
+			v_name = "헤럴드경제"
+		Case 14
+			If GUBN14.Checked = False Then
+				Exit Sub
+			End If
+			v_name = "촉n토크"
+		Case 15
+			If GUBN15.Checked = False Then
+				Exit Sub
+			End If
+			v_name = "IR GO"
+		Case 16
+			If GUBN16.Checked = False Then
+				Exit Sub
+			End If
+			v_name = "컨슈머타임스"
+		Case 17
+			If GUBN17.Checked = False Then
+				Exit Sub
+			End If
+			v_name = "뉴스웨이"
+	End Select
+
+	strKeys = editFilter.Data
+
+	If Trim(strKeys) <> "ALL" Then
+		If InStr(strKeys,Trim(v_name)) < 1 Then
+			Exit Sub
+		End If
+	End If
+
+	' add GRID row
+	GRID0.InsertRow 0
+	' set GRID data
+	GRID0.SetGridCell 1, 1, Mid(ArrData(11), 1, 8)
+	GRID0.SetGridCell 1, 2, ArrData(6)			'뉴스 시간
+	GRID0.SetGridCell 1, 3, ArrData(2)			'뉴스 제목
+	GRID0.SetGridCell 1, 4, ArrNews(v_gubn)		'뉴스 사명
+	GRID0.SetGridCell 1, 6, ArrData(4)
+	GRID0.SetGridCell 1, 7, ArrData(5)
+	'GRID0.SetGridCell 1, 5, ArrData(3)			'뉴스 RECN
+	'GRID0.SetGridCell 1, 6, ArrData(10)			'Flag
+	'GRID0.SetGridCell 1, 7, ArrData(11)			'KEY VALUE
+	GRID0.SetGridCell 1, 10, ArrData(11)
+
+	GRID0.Index = 0
+'	If GRID0.Index < 1000 Then
+'		GRID0.Index = GRID0.Index + 1
+'	End If
+End Sub
+
+_AW_ONSTART_AW_
+If SCREEN.CreateObject("Info") Then
+	Dim rd_val
+	Dim chkval
+	rd_val = Trim(INFO.popData (LOGIN.Name, myFILE, myMAP, "RD_CHK"))
+
+	If rd_val = "" Then
+		rd_val = "1"
+	End If
+	Select Case rd_val
+	Case 1
+		r2_1.Checked = True
+		r2_2.Checked = False
+		r2_3.Checked = False
+	Case 2
+		r2_1.Checked = False
+		r2_2.Checked = True
+		r2_3.Checked = False
+	Case 3
+		r2_1.Checked = False
+		r2_2.Checked = False
+		r2_3.Checked = True
+	End Select
+	chkval = Trim(INFO.popData (LOGIN.Name, myFILE, myMAP, "chkval"))
+	If chkval = "" Then
+		chkval = "1"
+	End If
+	If chkval = "1" Then
+		r1_all.Checked = True
+		r1_one.Checked = False
+	Else
+		r1_all.Checked = False
+		r1_one.Checked = True
+	End If
+	showgrid(chkval)
+Else
+	r2_1.Checked = True
+	r2_2.Checked = False
+	r2_3.Checked = False
+End If
+
+Filterversion = ReadVersion()
+
+If Filterversion = "" Then
+	editFilter.Data = "ALL"
+Else
+	editFilter.Data = ReadConf()
+End If
+
+rd_click()
+TABLE0.SetTableCell 1, "S0000"
+SCREEN.Send 0
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+jcod.Data = SCREEN.Object("main.1301").Data
+S1301.Data = jcod.Data
+OBJ_hnam.Send
+If Isstarted = True And r1_all.Checked = True Then
+	SCREEN.OnSend False
+	Exit Sub
+End If
+If r1_one.Checked = True Then
+	cod2.Data = jcod.Data
+Else
+	cod2.Data = ""
+End If
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+'Isstarted = True
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(r1_one)
+_AW_ONCLICK_AW_
+If SCREEN.CreateObject("Info") Then
+	INFO.pushData LOGIN.Name, myFILE, myMAP, "chkval", "2"
+End If
+Isstarted = False
+showgrid("2")
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(r1_all)
+_AW_ONCLICK_AW_
+If SCREEN.CreateObject("Info") Then
+	INFO.pushData LOGIN.Name, myFILE, myMAP, "chkval", "1"
+End If
+Isstarted = False
+showgrid("1")
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON)
+_AW_ONCLICK_AW_
+Dim retn
+retn = SCREEN.GetCode(100, "jcod", "hnam", 0 )
+If retn <> True Then
+      Exit Sub
+End If
+
+SCREEN.Object("OBJ_hnam").Send
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(jcod)
+_AW_ONCHANGE_AW_
+If Trim(jcod.Data) = "000000" Or Trim(jcod.Data) = "" Then
+	SCREEN.ClearAll 0, 2
+	Exit Sub
+End If
+S1301.Data = jcod.Data
+SCREEN.Object("main.1301").Data = jcod.Data
+SCREEN.Proc "main.code_change", "main"
+jcod.SetFocus
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(r2_3)
+_AW_ONCLICK_AW_
+Dim ii
+If SCREEN.CreateObject("Info") Then
+	INFO.pushData LOGIN.Name, myFILE, myMAP, "RD_CHK", "3"
+End If
+rd_click()
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(r2_2)
+_AW_ONCLICK_AW_
+Dim ii
+If SCREEN.CreateObject("Info") Then
+	INFO.pushData LOGIN.Name, myFILE, myMAP, "RD_CHK", "2"
+End If
+rd_click()
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(r2_1)
+_AW_ONCLICK_AW_
+Dim ii
+If SCREEN.CreateObject("Info") Then
+	INFO.pushData LOGIN.Name, myFILE, myMAP, "RD_CHK", "1"
+End If
+rd_click()
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(GRID0)
+_AW_ONCLICK_AW_
+If GRID0.HitPos = 3 Then
+	If GRID0.Column = 7 Then
+		codx = Trim(GRID0.GetGridCell(GRID0.Row, 6))
+		If codx <> "" Then
+			If Len(codx) = 7 Then
+				codx = Mid(codx, 2, 6)
+			End If
+
+			SCREEN.Object("main.1301").Data = codx
+			SCREEN.Proc "main.code_change", "main"
+		End If
+		Exit Sub
+	End If
+
+	Dim	key_value, key_text
+	key_value = GRID0.GetGridCell(GRID0.Row, 10) 'keyv
+	If Trim(key_value) <= "" Then
+		Exit Sub
+	End If
+	key_text = GRID0.GetGridCell(GRID0.Row, 3) '제목
+
+	If Trim(key_text) <= "" Then
+		Exit Sub
+	End If
+
+	key_text = Replace(key_text, "/", "-")	' '/'문자있으면 도미노로 넘겨주지 못함.
+		SCREEN.CreateWindow 4, "IBNEWSXX /S/d/p1", "015"& vbTab & key_text & vbLf & _
+		"016" & vbTab & key_value & vbLf & "1301" & vbTab & GRID0.GetGridCell(GRID0.row, 6)
+
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(GUBN1)
+_AW_ONCLICK_AW_
+isrn.Data = " "
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(GUBN2)
+_AW_ONCLICK_AW_
+isrn.Data = " "
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(GUBN3)
+_AW_ONCLICK_AW_
+isrn.Data = " "
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(GUBN4)
+_AW_ONCLICK_AW_
+isrn.Data = " "
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(GUBN5)
+_AW_ONCLICK_AW_
+isrn.Data = " "
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(GUBN6)
+_AW_ONCLICK_AW_
+isrn.Data = " "
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(GUBN8)
+_AW_ONCLICK_AW_
+isrn.Data = " "
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(GUBN7)
+_AW_ONCLICK_AW_
+isrn.Data = " "
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(GUBN9)
+_AW_ONCLICK_AW_
+isrn.Data = " "
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(GUBN10)
+_AW_ONCLICK_AW_
+isrn.Data = " "
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(GUBN11)
+_AW_ONCLICK_AW_
+isrn.Data = " "
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(GUBN12)
+_AW_ONCLICK_AW_
+isrn.Data = " "
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(GUBN13)
+_AW_ONCLICK_AW_
+isrn.Data = " "
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(GUBN14)
+_AW_ONCLICK_AW_
+isrn.Data = " "
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(GUBN15)
+_AW_ONCLICK_AW_
+isrn.Data = " "
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(GUBN16)
+_AW_ONCLICK_AW_
+isrn.Data = " "
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(GUBN17)
+_AW_ONCLICK_AW_
+isrn.Data = " "
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(GUBN18)
+_AW_ONCLICK_AW_
+isrn.Data = " "
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(GUBN19)
+_AW_ONCLICK_AW_
+isrn.Data = " "
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(GUBN20)
+_AW_ONCLICK_AW_
+isrn.Data = " "
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

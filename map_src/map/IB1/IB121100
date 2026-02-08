@@ -1,0 +1,541 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB121100)
+MAPSIZE(476, 828)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("시뮬레이션")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(ENCODE)
+TITLE("[1211]시뮬레이션(매매/입출금)")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL2(-2, 372, 830, 454)  LIMAGE(0)  LINEW(4)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL11(598, 217, 832, 375)  LIMAGE(0)  LINEW(6)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL9(598, 26, 832, 222)  LIMAGE(0)  LINEW(6)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL5(2, 476, 902, 479)        COLOR(64, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL3(-4, 26, 603, 375)  LIMAGE(0)  LINEW(6)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL0(0, 0, 828, 26)        COLOR(66, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL0(7, 3, 57, 23)  '계좌번호'  AL_LEFT  CUR(0)      COLOR(66, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL1(271, 3, 321, 23)  '비밀번호'  AL_LEFT  CUR(0)      COLOR(66, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  zPwd(321, 3, 377, 23)  LEN(8)  IO_MIXED|EDIT_INPUT|FA_PASSWD|FA_WRAP    COLOR(192, 130)  CUR(0)  TP_SUNKEN          TABORDER(2)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  button0(380, 3, 464, 23)  '가상매매시작'  TP_PUSH|IMAGETEXT|AL_STRETCH        FOCUS  COLOR(208, 186)  CUR(0)    "6BTN_조회.bmp"    TABORDER(3)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+USRTAB  UTAB1(608, 36, 822, 65)  FOCUS  INDEX(0)  COUNT(4)  AL_TOP  TAB_IMAGE  |FA_SKIP|FA_UPPER      COLOR(3, 130)  CUR(0)  TABIMAGE("OTAB.bmp")  FCOLOR(3, 130)  CAPTION("매수", "매도", "신용매수", "신용매도")  TABINFO("1:2", "1:1", "1:6", "1:5")  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+CONTROL  AN10(57, 3, 197, 23)    "CX_Account"  "/w0"  LEN(11)  EDIT_INPUT    COLOR(192, 130)  TABORDER(1)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  OBJECT0(6, 62, 593, 364)    "IB121111"  TABORDER(4)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  ACNM(200, 3, 264, 23)  LEN(30)  IO_MIXED|AL_LEFT||FA_SKIP    COLOR(49, 130)  CUR(0)  LINECOLOR(48)          TABORDER(0)  IOORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+USRTAB  UTAB0(7, 36, 592, 62)  FOCUS  INDEX(1)  COUNT(2)  AL_TOP  TAB_IMAGE        COLOR(3, 130)  CUR(0)  TABIMAGE("tab.bmp")  FCOLOR(3, 130)  CAPTION("최초상태", "현재상태")  TABINFO("0:0", "1:1")  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  OBJECT1(608, 65, 822, 205)    "IB121120"  TABORDER(5)  IOORDER(5)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+USRTAB  UTAB2(608, 227, 809, 253)  FOCUS  INDEX(0)  COUNT(1)  AL_TOP  TAB_IMAGE        COLOR(3, 70)  CUR(0)  TABIMAGE("tab.bmp")  FCOLOR(3, 232)  CAPTION("입출금")  TABINFO("1:0")  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  OBJECT2(610, 253, 810, 365)    "IB121130"  TABORDER(6)  IOORDER(6)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  temp_ACNM(12, 581, 132, 600)  LEN(30)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(7)  IOORDER(7)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL12(6, 380, 822, 446)  LINECOLOR(75)      COLOR(96, 69)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL10(11, 385, 68, 404)  LINECOLOR(96)  |IMAGE|AL_CENTER    COLOR(208, 232)  CUR(0)    "참고사항.BMP"  ENABLE  &
+  VISIBLE  TRANSPARENT  IMAGE  HINTTYPE(IH_NONE)
+LABEL  LABEL2(21, 405, 534, 423)  '계좌번호와 비밀번호를 입력하신 후 반드시 [가상매매시작] 버튼을 클릭하여 주십시오.'  AL_LEFT  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(96, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL3(21, 423, 799, 441)  '본 화면은 가상매매를 통한 주문관련 정보를 추정하므로 실제 매매 후 정보와는 상이할 수 있으므로 참고용으로 사용하시기 바랍니다.'  AL_LEFT  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(96, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON1(11, 410, 18, 417)  TP_PUSH|IMAGETEXT|AL_STRETCH        FOCUS  COLOR(208, 232)  CUR(0)    "텍스트화살표_하단.bmp"    TABORDER(8)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+BUTTON  BUTTON2(11, 428, 18, 435)  TP_PUSH|IMAGETEXT|AL_STRETCH        FOCUS  COLOR(208, 232)  CUR(0)    "텍스트화살표_하단.bmp"    TABORDER(9)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+EDIT  sec(12, 604, 34, 622)  LEN(1)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("1")          TABORDER(10)  IOORDER(8)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  send_btn(518, 40, 554, 60)  '조회'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, BOLD)  FOCUS  COLOR(208, 186)  CUR(0)    "조회btn.bmp"    TABORDER(11)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+BUTTON  next_btn(555, 40, 591, 60)  '다음'  TP_PUSH|IMAGETEXT|AL_STRETCH        FOCUS  COLOR(208, 186)  CUR(0)    "2btn.bmp"    TABORDER(12)  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+PANEL  PANEL8(-2, 453, 830, 477)  LIMAGE(0)  LINEW(3)  LINETYPE(4)  LINECOLOR(64)      COLOR(34, 232)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL7(4, 458, 18, 472)    |IMAGE|AL_STRETCH    COLOR(34, 232)  CUR(0)    "알림_ic.bmp"  ENABLE  &
+  VISIBLE  IMAGE  HINTTYPE(IH_NONE)
+PANEL  GUIDE(24, 457, 808, 473)        COLOR(34, 130)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL4(0, 0, 1, 26)        COLOR(64, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL6(827, 0, 829, 26)        COLOR(64, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  preAccn_0(293, 493, 383, 513)  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  preAccn_1(387, 494, 477, 514)  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  preAccn_2(478, 494, 568, 514)  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  preAccn_3(570, 490, 660, 510)  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  preAccn_4(662, 492, 752, 512)  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  isInitial(127, 623, 173, 654)  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Const MYFILE = "userconf.ini"
+Const MYMAP = "IB121100"
+
+Dim accnCnt
+accnCnt = 0
+
+Sub viewNowStatus(data)
+	UTAB0.Index = data
+	SCREEN.Proc "OBJECT0.send_f", ""
+
+'	OBJECT0.SetObject("IB121111")
+'	SCREEN.Object("OBJECT0.LEDGER").FKey = "C"
+'	SCREEN.Object("OBJECT0.zAcntNo").data = AN10.Data
+'	SCREEN.Object("OBJECT0.zPwd").data = zPwd.Data
+'	OBJECT0.Send
+End Sub
+
+Sub SetFocusBtn(data)
+	If data = "1" Then
+		'매수, 매도탭
+		If UTAB1.Index = "0" Then
+			SCREEN.Object("OBJECT" & data & ".BUTTON0").SetFocus	'매수
+		ElseIf UTAB1.Index = "1" Then
+			SCREEN.Object("OBJECT" & data & ".BUTTON1").SetFocus	'매도
+		ElseIf UTAB1.Index = "2" Then
+			SCREEN.Object("OBJECT" & data & ".BUTTON2").SetFocus	'신용매수
+		ElseIf UTAB1.Index = "3" Then
+			SCREEN.Object("OBJECT" & data & ".BUTTON2").SetFocus	'신용매도
+		End If
+	Else
+		SCREEN.Object("OBJECT" & data & ".BUTTON0").SetFocus
+	End If
+End Sub
+
+
+Sub setOrder(OrderCase, jongmok_code, capacity, price)
+
+	If OrderCase = "creditOrder" Then
+		'신용매도에 데이터 출력
+		UTAB1.Index = 5
+		OBJECT1.SetObject("IB121121")
+		SCREEN.Object("OBJECT1.OBJECT0.1301").data = jongmok_code
+		OBJECT1.Proc "ctl_Object", "1"
+		SCREEN.Object("OBJECT1.IOrdQty").data = capacity
+	ElseIf OrderCase = "Order" Then
+		'매도에 데이터 출력
+		UTAB1.Index = 1
+		OBJECT1.SetObject("IB121123")
+		SCREEN.Object("OBJECT1.OBJECT0.1301").data = jongmok_code
+		OBJECT1.Proc "ctl_Object", "1"
+		SCREEN.Object("OBJECT1.IOrdQty").data = capacity
+		SCREEN.Object("OBJECT1.dOrdPrc").data = ""
+		SCREEN.Object("OBJECT1.dOrdPrc").SetFocus
+		'SCREEN.Object("OBJECT1.BUTTON1").visible = True
+		'SCREEN.Object("OBJECT1.BUTTON0").visible = False
+		'SCREEN.Object("OBJECT1.BUTTON2").visible = False
+	End If
+End Sub
+
+Sub CreditOrder(OrderCase, jongmok_code, capacity, ldate, price)
+
+	If OrderCase = "creditOrder" Then
+		'신용매도에 데이터 출력
+		UTAB1.Index = 5
+		OBJECT1.SetObject("IB121121")
+		SCREEN.Object("OBJECT1.OBJECT0.1301").data = jongmok_code
+		OBJECT1.Proc "ctl_Object", "1"
+		SCREEN.Object("OBJECT1.IOrdQty").data = capacity
+		SCREEN.Object("OBJECT1.zLoanDt").data = ldate
+	ElseIf OrderCase = "Order" Then
+		'매도에 데이터 출력
+		UTAB1.Index = 1
+		OBJECT1.SetObject("IB121123")
+		SCREEN.Object("OBJECT1.OBJECT0.1301").data = jongmok_code
+		OBJECT1.Proc "ctl_Object", "1"
+		SCREEN.Object("OBJECT1.IOrdQty").data = capacity
+		SCREEN.Object("OBJECT1.dOrdPrc").data = ""
+		SCREEN.Object("OBJECT1.dOrdPrc").SetFocus
+		'SCREEN.Object("OBJECT1.BUTTON1").visible = True
+		'SCREEN.Object("OBJECT1.BUTTON0").visible = False
+		'SCREEN.Object("OBJECT1.BUTTON2").visible = False
+	End If
+End Sub
+
+'== 계좌명, 비밀번호 설정
+Sub Set_account()
+	SCREEN.ClearAll 2, 2
+	'오브젝트 Input 지우기
+	SCREEN.Object("OBJECT1.IOrdQty").Clear
+	SCREEN.Object("OBJECT1.dOrdPrc").Clear
+	SCREEN.Object("OBJECT2.EDIT0").Clear
+	SCREEN.Object("OBJECT2.EDIT1").Clear
+
+	ACNM.Data = AN10.Name
+	zPwd.Data = AN10.Password
+	If Trim(AN10.Data) = "" Then
+		AN10.SetFocus
+		Exit Sub
+	End If
+
+	Call EachBtnEnable()
+
+	If Len(Trim(zPwd.Data)) < 4 Then
+		zPwd.SetFocus
+		Exit Sub
+	End If
+
+'	Call send_f()
+End Sub
+
+'== 첫 조회
+Sub send_f()
+	temp_ACNM.Data = ACNM.Data
+    SCREEN.Object("OBJECT0.Ledger").FKey = "3"
+    next_btn.Enable = False
+	SCREEN.Send 0
+End Sub
+
+'== 조회
+Sub send_c()
+	temp_ACNM.Data = ACNM.Data
+    SCREEN.Object("OBJECT0.Ledger").FKey = "C"
+	SCREEN.Send 0
+End Sub
+
+'== 다음
+Sub send_n()
+	temp_ACNM.Data = ACNM.Data
+    SCREEN.Object("OBJECT0.Ledger").FKey = "7"
+    SCREEN.Object("OBJECT0.GRID0").SetDataPosition(2)
+	SCREEN.Send 0
+End Sub
+
+Sub clearOutput()
+	OBJECT0.Clearall 2
+End Sub
+
+Sub SelectUtab1()
+	Select Case UTAB1.Index
+		Case 2		'매수
+			OBJECT1.SetObject "IB121120"
+			SCREEN.Object("OBJECT1.BUTTON0").visible = True
+			SCREEN.Object("OBJECT1.BUTTON1").visible = False
+			SCREEN.Object("OBJECT1.BUTTON2").visible = False
+		Case 1		'매도
+			OBJECT1.SetObject "IB121123"
+		Case 6		'신용매수
+			OBJECT1.SetObject "IB121120"
+			SCREEN.Object("OBJECT1.BUTTON0").visible = False
+			SCREEN.Object("OBJECT1.BUTTON1").visible = False
+			SCREEN.Object("OBJECT1.BUTTON2").visible = True
+		Case 5		'신용매도
+			OBJECT1.SetObject "IB121121"
+		Case Else
+			Exit Sub
+	End Select
+
+	OBJECT1.Proc "ctl_Object", "1"
+End Sub
+
+Sub checkSend()
+	If initialCheck() = True Then
+		SCREEN.Proc "OBJECT0.send_f", ""
+	Else
+		SCREEN.Proc "OBJECT0.send_initial", ""
+	End If
+End Sub
+
+Function initialCheck()
+	initialCheck = False
+
+	Dim ii, tmpAccn, tmpCnt
+
+	For ii = 0 To 4
+		tmpCnt = "accn1211_" & ii
+		SCREEN.Object("preAccn_" & ii).Text = Trim(SYSTEM.Pop(tmpCnt))
+	Next
+
+	For ii = 0 To 4
+		tmpCnt = "accn1211_" & ii
+		tmpAccn = SCREEN.Object("preAccn_" & ii).Text
+
+		If Trim(AN10.Data) = Trim(tmpAccn) Then
+			initialCheck = True
+			Exit Function
+		End If
+	Next
+
+	initialCheck = False
+End Function
+
+Sub SetInicialAccn()
+	Dim ii, tmpAccn, tmpCnt
+
+	For ii = 0 To 4
+		tmpCnt = "accn1211_" & ii
+		tmpAccn = Trim(SYSTEM.Pop(tmpCnt))
+
+		If Trim(tmpAccn) = Trim(AN10.Data) Then
+			Exit For
+		End If
+
+		If tmpAccn = "" Then
+			SYSTEM.Push tmpCnt, Trim(AN10.Data)
+			Exit For
+		End If
+
+		If ii = 4 And tmpAccn <> "" Then
+			SYSTEM.Push "accn1211_0", Trim(AN10.Data)
+		End If
+	Next
+
+	For ii = 0 To 4
+		tmpCnt = "accn1211_" & ii
+		SCREEN.Object("preAccn_" & ii).Text = Trim(SYSTEM.Pop(tmpCnt))
+	Next
+End Sub
+
+'가상매매시작버튼을 클릭하지 않고 주문을 할 경우 '1162 계좌정보가 등록되지 않았습니다.' 메세지 출력되어
+'조회를 먼저 하도록 수정
+Sub beforeOrderCheck()
+	Dim ii, tmpAccn, tmpCnt, flag
+	flag = "N"
+
+	For ii = 0 To 4
+		tmpCnt = "accn1211_" & ii
+		tmpAccn = SCREEN.Object("preAccn_" & ii).Text
+
+		If Trim(AN10.Data) = Trim(tmpAccn) Then
+			flag = "Y"
+			Exit For
+		End If
+	Next
+
+	If flag = "N" Then
+		MsgBox "가상매매시작버튼을 클릭하여 주십시오.", , "IBK투자증권"
+		button0.SetFocus
+		Exit Sub
+	End If
+End Sub
+
+
+'초기화를 한 계좌라면 주문화면의 각 주문버튼 활성화, 입출금탭의 확인버튼 활성화
+'계좌변경시, send_initial함수 호출시.
+Sub EachBtnEnable()
+	Dim bool, ii, tmpAccn, flag
+	flag = "N"
+
+	For ii = 0 To 4
+		tmpAccn = SCREEN.Object("preAccn_" & ii).Text
+
+		If Trim(AN10.Data) = Trim(tmpAccn) Then
+			flag = "Y"
+			Exit For
+		End If
+	Next
+
+	If flag = "N" Then
+		isInitial.Text = "False"
+		bool = False
+	Else
+		isInitial.Text = "True"
+		bool = True
+	End If
+
+	send_btn.Enable = bool
+
+	If bool = False Then
+		next_btn.Enable = bool
+	End If
+
+	Select Case UTAB1.ID
+	Case 2 SCREEN.Object("OBJECT1.BUTTON0").Enable = bool
+	Case 1 SCREEN.Object("OBJECT1.BUTTON1").Enable = bool
+	Case 6 SCREEN.Object("OBJECT1.BUTTON2").Enable = bool
+	Case 5 SCREEN.Object("OBJECT1.BUTTON2").Enable = bool
+	End Select
+
+	SCREEN.Object("OBJECT2.BUTTON0").Enable = bool
+End Sub
+
+Sub checkInitial()
+	Dim ii, tmpAccn, tmpPreAccn
+
+	For ii = 0 To 4
+		tmpAccn = "accn1211_" & ii
+		tmpPreAccn = "preAccn_" & ii
+
+		If Trim(SYSTEM.Pop(tmpAccn)) <> "" Then
+			SCREEN.Object(tmpPreAccn).Text = Trim(SYSTEM.Pop(tmpAccn))
+		End If
+	Next
+
+	Call EachBtnEnable()
+End Sub
+
+_AW_ONINDECLARE_AW_
+#LOAD IB888833
+
+_AW_ONENDSUB_AW_
+_AW_ONSTART_AW_
+Call checkInitial()
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+SCREEN.OnSend = False
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(zPwd)
+_AW_ONKEYCHANGE_AW_
+'== 비밀번호 변경시 조회 버튼 기능 수행.
+If SCREEN.Key = "13" Then  '-- Enter 키 입력
+	sec.Data = "1"
+	If Len(Trim(zPwd.Data)) > 3 Then
+		Call checkSend()
+	Else
+		zPwd.SetFocus
+		Exit Sub
+	End If
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(button0)
+_AW_ONCLICK_AW_
+SCREEN.SetCaption "[1211]시뮬레이션(매매/입출금)"
+'send_f()
+SCREEN.Proc "OBJECT0.send_initial", ""
+sec.Data = "2"
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(UTAB1)
+_AW_ONCLICK_AW_
+Select Case UTAB1.Index
+	Case 2		'매수
+		OBJECT1.SetObject "IB121120"
+'		SCREEN.Object("OBJECT1.button2").TRgb = 94
+		SCREEN.Object("OBJECT1.BUTTON0").visible = True
+		SCREEN.Object("OBJECT1.BUTTON1").visible = False
+		SCREEN.Object("OBJECT1.BUTTON2").visible = False
+	Case 1		'매도
+		OBJECT1.SetObject "IB121123"
+'		SCREEN.Object("OBJECT1.button2").TRgb = 95
+'		SCREEN.Object("OBJECT1.BUTTON0").visible = False
+'		SCREEN.Object("OBJECT1.BUTTON1").visible = True
+'		SCREEN.Object("OBJECT1.BUTTON2").visible = False
+	Case 6		'신용매수
+		OBJECT1.SetObject "IB121120"
+'		SCREEN.Object("OBJECT1.button2").TRgb = 94
+		SCREEN.Object("OBJECT1.BUTTON0").visible = False
+		SCREEN.Object("OBJECT1.BUTTON1").visible = False
+		SCREEN.Object("OBJECT1.BUTTON2").visible = True
+	Case 5		'신용매도
+		OBJECT1.SetObject "IB121121"
+'		SCREEN.Object("OBJECT1.button2").TRgb = 95
+	Case Else
+		Exit Sub
+End Select
+
+OBJECT1.Proc "ctl_Object", "1"
+
+Dim bool
+
+If Trim(isInitial.Text) = "True" Then
+	bool = True
+Else
+	bool = False
+End If
+
+Select Case UTAB1.ID
+Case 2 SCREEN.Object("OBJECT1.BUTTON0").Enable = bool
+Case 1 SCREEN.Object("OBJECT1.BUTTON1").Enable = bool
+Case 6 SCREEN.Object("OBJECT1.BUTTON2").Enable = bool
+Case 5 SCREEN.Object("OBJECT1.BUTTON2").Enable = bool
+End Select
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(AN10)
+_AW_ONCHANGE_AW_
+Set_account()
+button0.Enable = True
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(UTAB0)
+_AW_ONCLICK_AW_
+'Select Case UTAB0.Index
+'	Case "0"
+'		OBJECT0.SetObject "IB121110"
+'	Case "1"
+'		OBJECT0.SetObject "IB121111"
+'
+'	Case Else
+'		Exit Sub
+'End Select
+'
+'send_f()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(send_btn)
+_AW_ONCLICK_AW_
+'send_c()
+
+sec.Data = "8"
+Call checkSend()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(next_btn)
+_AW_ONCLICK_AW_
+'send_n()
+SCREEN.Proc "OBJECT0.send_c", ""
+sec.Data = "9"
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

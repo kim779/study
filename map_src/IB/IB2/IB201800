@@ -1,0 +1,78 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB201800)
+MAPSIZE(811, 772)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("±º∏≤", 9, NORMAL)
+TITLE("ªÛ«—∞° TOP10")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+CONTROL  BROWSER0(0, 20, 770, 830)  |FA_PROTECT  "CX_WEBEDGE"  "/k2"  LEN(0)  EDIT_NOP    COLOR(192, 232)  TABORDER(0)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON0(0, 0, 35, 20)  TP_PUSH      AL_CENTER    FOCUS  COLOR(208, 232)  CUR(0)      TABORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON1(675, 0, 710, 20)  TP_PUSH      AL_CENTER    FOCUS  COLOR(208, 232)  CUR(0)      TABORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  edmap(720, 0, 768, 20)  LEN(4)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("8201")          TABORDER(3)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  edurl(40, 0, 630, 20)  LEN(200)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(4)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Sub refresh()
+	CONTROL0.Navigate2 "http://www.ibks.com/customer/ranking/index.jsp?popup=Y&hts=Y",False
+End Sub
+
+_AW_ONSTART_AW_
+If Len(Trim(edurl.Data)) = 0 Then
+	edurl.Data = "http://www.ibks.com/customer/ranking/index.jsp?popup=Y&hts=Y"
+End If
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(BUTTON0)
+_AW_ONCLICK_AW_
+BROWSER0.Navigate(edurl.Data)
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON1)
+_AW_ONCLICK_AW_
+BROWSER0.Navigate2 1, edmap.Data
+
+Dim width
+Dim height
+If SCREEN.CreateObject("Info") Then
+width = Trim(INFO.PopData("", "WEBINFO.INI", edmap.Data, "width"))
+height = Trim(INFO.PopData("", "WEBINFO.INI", edmap.Data, "height"))
+SCREEN.SetSize width, height + 20
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

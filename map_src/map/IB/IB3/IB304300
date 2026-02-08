@@ -1,0 +1,112 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB304300)
+MAPSIZE(488, 755)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("선물옵션정정")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+TITLE("[3043] 선물옵션정정")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(FIXED)
+HEADER(NOP)
+BGROUND(BRUSH, 240)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL63(0, 0, 755, 471)        COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  GUIDE(1, 466, 755, 489)        COLOR(66, 69)  CUR(0)    AL_LEFT  FONT("굴림체", 9, BOLD)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  obj_sise(424, 115, 754, 321)    "IB304140"  TABORDER(1)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  OBJ_order(1, 1, 421, 320)    "IB304310"  TABORDER(2)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  OBJ_info(423, 0, 753, 112)    "IB304320"  TABORDER(3)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  ed_focod(325, 552, 405, 572)  LEN(8)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_UPPER|CODE      COLOR(192, 69)  CUR(0)  TP_NONE          TABORDER(4)  IOORDER(4)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  HNAM(185, 552, 319, 572)  LEN(18)  IO_MIXED|AL_LEFT||SUM    FONT("굴림체", 9, BOLD)    COLOR(90, 69)  CUR(0)  LINECOLOR(65)          TABORDER(0)  IOORDER(5)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  OBJ_account(1, 322, 755, 464)    "IB304330"  TABORDER(5)  IOORDER(6)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Sub send_sise_all(gubn)
+	Dim code, fogb, rsymb, acnm
+	code = Left(ed_focod.Data, 1)
+	If code = "1" Or code = "4" Or code = "A" Or code = "D" Then
+		fogb = 101
+		rsymb = "30301"
+		obj_sise.SetObject("IB304140")
+		OBJ_info.SetObject("IB304320")
+	ElseIf code = "2" Or code = "3" Or code = "B" Or code = "C" Then
+		fogb = 102
+		rsymb = "40301"
+		obj_sise.SetObject("IB304141")
+		OBJ_info.SetObject("IB304321")
+	End If
+
+	HNAM.Data = SCREEN.GetName (fogb, ed_focod.Data, 0)
+	SCREEN.Object("OBJ_order.OBJ_odr.hnam").data = HNAM.data
+
+	If gubn = "main" Then
+		SCREEN.IgnoreChange True
+		SCREEN.Object("OBJ_order.OBJ_odr.ed_focod").data = ed_focod.data
+		SCREEN.IgnoreChange False
+	End If
+
+	'Call tab_info_change()
+
+	acnm = Trim(SCREEN.Object("OBJ_order.acnm").data)
+	If Trim(HNAM.Data) =  "" Then
+		SCREEN.ClearAll 2, 2
+		SCREEN.Object("OBJ_order.acnm").data = acnm
+		obj_sise.Send
+		OBJ_info.Send
+		Exit Sub
+	Else
+		ed_focod.Trigger "ed_focod", True
+		ed_focod.Trigger rsymb, True
+		ed_focod.Trigger rsymb, False
+		SYSTEM.SetHistory rsymb, ed_focod.Data
+		SYSTEM.SetHistory "ed_focod", ed_focod.Data
+	End If
+
+	obj_sise.Send
+	SCREEN.Proc "OBJ_order.AddHistory", ed_focod.Data
+	OBJ_info.Send
+
+End Sub
+
+_AW_ONINDECLARE_AW_
+'== 선물옵션주문obj를포함한 main의 공통함수
+#LOAD IB999923
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(ed_focod)
+_AW_ONCHANGE_AW_
+Call send_sise_all("main")
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

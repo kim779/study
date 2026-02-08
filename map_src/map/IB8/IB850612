@@ -1,0 +1,521 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB850612)
+MAPSIZE(148, 788)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(ENCODE|CR2TAB)
+TITLE("수익증권 환매대금 담보대출 해지")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pibopbxq")
+MAPTYPE(FIXED)
+HEADER(LEDGER)
+TRXH("11CSLNBQ005")
+}
+
+
+
+FORM DIVISION
+{
+
+LABEL  LABEL8(0, 26, 788, 28)  AL_LEFT  CUR(0)      COLOR(64, 232)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL0(0, 0, 788, 27)        COLOR(66, 232)  CUR(0)    AL_CENTER  FONT("굴림체", 10, NORMAL)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL1(38, 734, 88, 754)  '계좌번호'  AL_LEFT  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(66, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL4(335, 734, 385, 754)  '비밀번호'  AL_LEFT  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(66, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  zPwd(390, 734, 450, 754)  LEN(8)  IO_MIXED|EDIT_INPUT|FA_PASSWD|FA_WRAP    COLOR(192, 130)  CUR(0)  TP_SUNKEN          TABORDER(1)  IOORDER(4)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  ACNM(235, 734, 299, 754)  LEN(20)  IO_MIXED|AL_LEFT||FA_SKIP  FONT("굴림체", 9, NORMAL)    COLOR(49, 130)  CUR(0)  LINECOLOR(48)          TABORDER(0)  IOORDER(13)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  BUTTON1(6, 3, 108, 23)  '대출신청내역'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, BOLD)  FOCUS  COLOR(208, 186)  CUR(0)    "6BTN_조회.BMP"    TABORDER(2)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+EDIT  in(40, 535, 107, 556)  LEN(5)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("00001")          TABORDER(3)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  accn_blk(38, 563, 149, 585)  LEN(9)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(4)  IOORDER(3)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  out(426, 564, 493, 587)  LEN(5)  IO_NUM|AL_CENTER|    COLOR(192, 69)  CUR(0)            TABORDER(0)  IOORDER(9)  ENABLE  &
+  HINTTYPE(IH_NONE)
+GRID  GRID0(0, 26, 788, 149)  VISIBLEROW(0)  CELLH(18)  MATRIX(2000, 18)  FIX(0)  MAINCOLOR(181, 232)  LINECOLOR(75)  FOCUSCOLOR(78)  FOCUSKIND(4)  ROWC(68, 77)  |FLEXIBLE|VSCROLL|NO3D|RROW|XHLINE|GRFTEXT    &
+	COLINFO("LoanSeqno")  LEN(10)  WIDTH(97)  HEAD("대출일련번호")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSUP    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(69, 69)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("IsuNo")  LEN(12)  WIDTH(113)  HEAD("종목번호")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("DpslRestrcAmt")  LEN(16)  WIDTH(113)  HEAD("처분제한금액")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("LoanSetupBfbal")  LEN(16)  WIDTH(113)  HEAD("대출설정전잔")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("ChgisuNo")  LEN(12)  WIDTH(113)  HEAD("교체종목번호")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("LoanTrdAmt")  LEN(16)  WIDTH(160)  HEAD("대출거래금액")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSUP    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(69, 69)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("TrxTime")  LEN(9)  WIDTH(113)  HEAD("처리시간")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("TrxBrnNo_r")  LEN(3)  WIDTH(65)  HEAD("처리지점")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("TrxBrnNo")  LEN(40)  WIDTH(167)  HEAD("처리지점")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT  |FA_SKIP    COLOR(68, 69)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("SetupDt")  LEN(8)  WIDTH(113)  HEAD("설정일")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("IsuNm")  LEN(40)  WIDTH(113)  HEAD("종목명")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("LoanDt")  LEN(8)  WIDTH(100)  HEAD("대출일")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  EDITFORMAT("9999/99/99")    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("DueDt")  LEN(8)  WIDTH(100)  HEAD("만기일")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  EDITFORMAT("9999/99/99")    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("LoanSetupCrbal")  LEN(16)  WIDTH(113)  HEAD("대출설정금잔")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("ChgisuNm")  LEN(40)  WIDTH(113)  HEAD("교체종목명")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("ChgloanQty")  LEN(16)  WIDTH(113)  HEAD("교체대체수량")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("TrxtrId")  LEN(16)  WIDTH(113)  HEAD("조작자")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("AbndTpNm")  LEN(40)  WIDTH(315)  HEAD("해지구분")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    TABORDER(5)  IOORDER(12)  ENABLE  &
+  VISIBLE
+
+EDIT  an50(97, 734, 233, 754)  LEN(11)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(6)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL3(120, 3, 168, 24)  '조회기간'  AL_LEFT  CUR(0)      COLOR(66, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL2(262, 7, 269, 19)  '~'  AL_LEFT  CUR(0)      COLOR(66, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  zOrdStrDt(173, 3, 259, 23)  LEN(8)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_DATE    COLOR(192, 69)  CUR(0)  TP_SUNKEN          EDITFORMAT("9999/99/99")  TABORDER(7)  IOORDER(5)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  zOrdEndDt(272, 3, 358, 23)  LEN(8)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_DATE    COLOR(192, 69)  CUR(0)  TP_SUNKEN          EDITFORMAT("9999/99/99")  TABORDER(8)  IOORDER(6)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  RADIO0(375, 3, 422, 23)  '당 일'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(gp)      COLOR(66, 130)  CUR(0)      TABORDER(9)  ENABLE  &
+  VISIBLE  CHECKED  HINTTYPE(IH_NONE)
+BUTTON  RADIO1(424, 3, 471, 23)  '1개월'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(gp)      COLOR(66, 130)  CUR(0)      TABORDER(10)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  RADIO2(473, 3, 520, 23)  '2개월'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(gp)      COLOR(66, 130)  CUR(0)      TABORDER(11)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BOX  BOX2(370, 3, 575, 23)    COLOR(165, 232)  LINEW(1)  BX_LINE    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  RADIO3(522, 3, 569, 23)  '3개월'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(gp)      COLOR(66, 130)  CUR(0)      TABORDER(12)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  LoanPtnCode(297, 602, 321, 633)  LEN(2)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("L0")          TABORDER(13)  IOORDER(7)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  inout(39, 792, 439, 815)  LEN(51)  IO_MIXED|AL_LEFT|    COLOR(192, 69)  CUR(0)            TABORDER(0)  IOORDER(8)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  AcntNm(442, 600, 656, 623)  LEN(40)  IO_MIXED|AL_CENTER|    COLOR(192, 69)  CUR(0)            TABORDER(0)  IOORDER(10)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  out2(729, 603, 796, 626)  LEN(1)  IO_NUM|AL_CENTER|    COLOR(192, 69)  CUR(0)            TABORDER(0)  IOORDER(11)  ENABLE  &
+  HINTTYPE(IH_NONE)
+GROUP  gp(573, 687, 693, 737)  'Group'        COLOR(-1, 232)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+'== 전송
+Sub send_f2()
+	LEDGER.Fkey = "5"
+	SCREEN.Send 0
+End Sub
+
+'== 첫 조회
+Sub send_f()
+	SCREEN.Object("main.guide").text = ""
+	LEDGER.Fkey = "C"
+	SCREEN.Send 0
+End Sub
+
+'== 연속 조회
+Sub send_c()
+	LEDGER.Fkey = "7"
+	GRID0.SetDataPosition(2)
+	SCREEN.Send 0
+End Sub
+
+Sub Set_account()
+	SCREEN.ClearAll 2, 2
+	ACNM.Data = SCREEN.object("main.acnm").data
+	zPwd.Data = an50.Password
+
+	If Trim(an50.Data) = "" Then
+		an50.SetFocus
+		Exit Sub
+	End If
+	If Trim(zPwd.Data) = "" Then
+		zPwd.SetFocus
+		Exit Sub
+	End If
+
+	Call send_f()
+End Sub
+
+Function branch(data)
+	branch = data
+	Select Case data
+		Case "000" branch = "회사전체"
+		Case "001" branch = "영업부"
+		Case "002" branch = "IBK본점"
+		Case "003" branch = "대치지점"
+		Case "004" branch = "분당지점"
+		Case "005" branch = "압구정지점"
+		Case "006" branch = "목동지점"
+		Case "007" branch = "인천지점"
+		Case "008" branch = "남동공단점"
+		Case "009" branch = "가산디지털지점"
+		Case "010" branch = "대구지점"
+		Case "011" branch = "성서공단점"
+		Case "012" branch = "논현지점"
+		Case "013" branch = "역삼지점"
+		Case "014" branch = "잠실지점"
+		Case "015" branch = "부산지점"
+		Case "016" branch = "부산 E-MART World 서면점"
+		Case "017" branch = "평촌지점"
+		Case "018" branch = "서초지점"
+		Case "019" branch = "반포지점"
+		Case "020" branch = "분당 E-MART World 죽전점"
+		Case "021" branch = "삼성동지점"
+		Case "022" branch = "광화문지점"
+		Case "023" branch = "안산점"
+		Case "024" branch = "구미점"
+		Case "025" branch = "타임스퀘어센터"
+		Case "026" branch = "일산지점"
+		Case "500" branch = "은행연계계좌 전체"
+		Case "501" branch = "기업은행"
+		Case "502" branch = "우리은행"
+		Case "503" branch = "하나은행"
+		Case "504" branch = "국민은행"
+		Case "551" branch = "기업은행1"
+		Case "552" branch = "기업은행2"
+		Case "553" branch = "기업은행3"
+		Case "554" branch = "기업은행4"
+		Case "555" branch = "기업은행5"
+		Case "601" branch = "신탁운용테스트"
+		Case "701" branch = "전략기획실"
+		Case "702" branch = "경영지원실"
+		Case "703" branch = "IB사업본부"
+		Case "704" branch = "기업금융담당"
+		Case "705" branch = "투자금융담당"
+		Case "706" branch = "중소기업IB센터"
+		Case "707" branch = "GFM사업본부"
+		Case "708" branch = "FID담당"
+		Case "709" branch = "트레이딩1담당"
+		Case "710" branch = "자산관리사업부"
+		Case "711" branch = "Retail사업본부"
+		Case "714" branch = "리서치센터"
+		Case "715" branch = "마케팅본부"
+		Case "716" branch = "법인영업본부"
+		Case "717" branch = "PI담당"
+		Case "718" branch = "경영인프라본부"
+		Case "720" branch = "Wholesale총괄"
+		Case "721" branch = "금융상품영업담당"
+		Case "722" branch = "법인영업담당"
+		Case "723" branch = "Retail지원담당"
+		Case "724" branch = "홍보/IR담당"
+		Case "725" branch = "Retail영업추진담당"
+		Case "726" branch = "Retail 1그룹"
+		Case "727" branch = "Retail 2그룹"
+		Case "728" branch = "Retail 3그룹"
+		Case "729" branch = "금융상품영업본부"
+		Case "730" branch = "트레이딩2담당"
+		Case "731" branch = "CIO"
+		Case "732" branch = "CRO"
+		Case "733" branch = "전략기획담당"
+		Case "777" branch = "지점전체"
+		Case "800" branch = "공통부문"
+		Case "801" branch = "ECM팀"
+		Case "802" branch = "DCM팀"
+		Case "804" branch = "IPO팀"
+		Case "805" branch = "M&A/PE팀"
+		Case "807" branch = "채권영업팀"
+		Case "808" branch = "자본시장팀"
+		Case "809" branch = "채권운용팀"
+		Case "810" branch = "주식운용팀"
+		Case "811" branch = "법인영업1팀"
+		Case "812" branch = "법인영업2팀"
+		Case "813" branch = "파생상품영업2팀"
+		Case "828" branch = "파생상품영업1팀"
+		Case "814" branch = "금융상품영업팀"
+		Case "815" branch = "Algorithm Trading팀"
+		Case "816" branch = "중소기업IB센터"
+		Case "817" branch = "전략Book"
+		Case "818" branch = "PI팀"
+		Case "819" branch = "Structured Trading팀"
+		Case "820" branch = "Coverage센터"
+		Case "821" branch = "부동산 금융팀"
+		Case "822" branch = "스타프라자"
+		Case "823" branch = "Project Trading T/F팀"
+		Case "824" branch = "퇴직연금 T/F팀"
+		Case "825" branch = "IB Syndicate팀"
+		Case "826" branch = "Retail 채권팀"
+		Case "888" branch = "본점전체"
+		Case "899" branch = "본사영업전체"
+		Case "900" branch = "지원부서 전체"
+		Case "901" branch = "기획팀"
+		Case "902" branch = "리스크관리팀"
+		Case "903" branch = "정보전략팀"
+		Case "904" branch = "경영관리팀"
+		Case "905" branch = "인사팀"
+		Case "906" branch = "총무지원팀"
+		Case "907" branch = "재무팀"
+		Case "908" branch = "영업관리팀"
+		Case "909" branch = "Leading Tomorrow팀"
+		Case "910" branch = "Market Frontier팀"
+		Case "912" branch = "E-Biz영업팀"
+		Case "913" branch = "상품마켓팅팀"
+		Case "914" branch = "컴플라이언스팀"
+		Case "915" branch = "감사팀"
+		Case "916" branch = "고객만족팀"
+		Case "917" branch = "GFM 기획팀"
+		Case "918" branch = "홍보팀"
+		Case "919" branch = "자산관리사업부기획팀"
+		Case "920" branch = "IT기획팀"
+		Case "921" branch = "결제업무팀"
+		Case "922" branch = "Leading Company팀"
+		Case "923" branch = "영업지원팀"
+		Case "924" branch = "자금팀"
+		Case "925" branch = "소통공감팀"
+		Case "926" branch = "시너지 추진단"
+		Case "927" branch = "Hidden Champion"
+		Case "928" branch = "영업추진팀"
+		Case "929" branch = "Retail기획팀"
+		Case "930" branch = "신채널 T/F"
+		Case "931" branch = "신탁추진 T/F"
+		Case "932" branch = "IB 지원팀"
+		Case "950" branch = "임원전체"
+		Case "951" branch = "CEO"
+		Case "952" branch = "감사"
+		Case "953" branch = "IB사업본부장"
+		Case "954" branch = "GFM사업본부장"
+		Case "955" branch = "자산관리사업부장"
+		Case "956" branch = "전략기획실장"
+		Case "957" branch = "경영지원실장"
+		Case "958" branch = "FID담당"
+		Case "959" branch = "트레이딩1담당"
+		Case "960" branch = "리테일 본부(폐쇄)"
+		Case "961" branch = "법인본부(폐쇄)"
+		Case "962" branch = "IB사업본부 기업금융담당"
+		Case "963" branch = "투자금융담당"
+		Case "964" branch = "중소기업IB센터장"
+		Case "965" branch = "Retail사업본부 Retail지원담당"
+		Case "966" branch = "리서치센터장"
+		Case "967" branch = "Retail사업본부장"
+		Case "968" branch = "준법감시인"
+		Case "969" branch = "사외이사"
+		Case "970" branch = "Wholesale사업본부 임원"
+		Case "971" branch = "PI담당"
+		Case "973" branch = "고문1"
+		Case "974" branch = "경영인프라본부장"
+		Case "976" branch = "Wholesale총괄"
+		Case "977" branch = "금융상품영업담당"
+		Case "978" branch = "법인영업담당"
+		Case "979" branch = "홍보/IR담당"
+		Case "980" branch = "시너지추진단장"
+		Case "981" branch = "Wholesale사업본부 임원2"
+		Case "982" branch = "Retail영업추진담당"
+		Case "983" branch = "Retail 1그룹장"
+		Case "984" branch = "Retail 2그룹장"
+		Case "985" branch = "Retail 3그룹장"
+		Case "986" branch = "트레이딩2담당"
+		Case "987" branch = "법인영업본부장"
+		Case "988" branch = "금융상품영업본부장"
+		Case "989" branch = "전략기획담당"
+		Case "990" branch = "CIO"
+		Case "991" branch = "CRO"
+		Case "999" branch = "상품부"
+	End Select
+End Function
+
+_AW_ONINDECLARE_AW_
+#load IB888833
+#load IB888888
+
+_AW_ONENDSUB_AW_
+_AW_ONSTART_AW_
+LEDGER.Rcnt = "0010"
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+SCREEN.OnSend = False
+
+' 기본값[9999] - 09/07/15
+'If SYSTEM.ConnectBy = "0" And Trim(zPwd.Data) = "" Then
+'   zPwd.Data = "9999"
+'End If
+
+an50.Data = SCREEN.Object("parent.an50").data
+zPwd.Data = SCREEN.Object("parent.zpwd").data
+
+If CheckInput(an50, zPwd) = True Then
+	SCREEN.onsend = True
+End If
+
+LoanPtnCode.Data = "L0"
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+	If LEDGER.Ecod = "3669" Then
+		SCREEN.ClearAll 0, 2
+		ACNM.Data = SCREEN.object("parent.acnm").Data
+	End If
+
+	If LEDGER.Next = "Y" And LEDGER.Ecod <> "0136" Then
+		Call send_c()
+	Else
+		GRID0.SetFocus
+	End If
+
+Dim ii, data
+For ii =1 To GRID0.Rows
+	data = Trim(GRID0.GetGridCell (ii, 1))
+	If data <> "" Then
+		GRID0.SetGridCell ii, 1, CLng(data)
+	End If
+'	data = Trim(GRID0.GetGridCell (ii, 8))
+'	If data <> "" Then
+'		GRID0.SetGridCell ii, 9, branch(data)
+'	End If
+Next
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(zPwd)
+_AW_ONKEYCHANGE_AW_
+'== 비밀번호 변경시 조회 버튼 기능 수행.
+If SCREEN.Key = "13" Then  '-- Enter 키 입력
+	SCREEN.Object("main.zPwd").Data = Trim(zPwd.Data)
+	Call send_f()
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON1)
+_AW_ONCLICK_AW_
+
+Call send_f()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(GRID0)
+_AW_ONCLICK_AW_
+
+'If GRID0.HitPos = 3 Then
+'	TrxBrnNo.Data = Trim(GRID0.GetGridCell(GRID0.row, 3))
+'	TrxNo.Data = Trim(GRID0.GetGridCell(GRID0.row, 4))
+'	FundOpAcntNo.Data = Trim(GRID0.getgridcell(GRID0.row, 1))
+'	RfundDt.Data = Trim(GRID0.getgridcell(GRID0.row, 11))
+'End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(zOrdStrDt)
+_AW_ONCHANGE_AW_
+'SCREEN.Object("obj0.zOrdStrDt").Data = Trim(zOrdStrDt.Data)
+
+
+Call send_f()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(zOrdEndDt)
+_AW_ONCHANGE_AW_
+'SCREEN.Object("obj0.zOrdEndDt").Data = Trim(zOrdEndDt.Data)
+Call send_f()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(RADIO0)
+_AW_ONCLICK_AW_
+Dim Today
+
+today = LOGIN.Day0
+SCREEN.IgnoreChange True
+zOrdStrDt.Data = Today
+zOrdEndDt.Data = Today
+SCREEN.IgnoreChange False
+
+Call send_f()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(RADIO1)
+_AW_ONCLICK_AW_
+Dim Day1, Day2, mm, dd
+Day2 = getDateSerial(zOrdEndDt.Data)
+Day1 = DateAdd("m", -1, Day2)
+
+If Month(Day1) < 10 Then
+	mm = "0" & Month(Day1)
+Else
+	mm = Month(Day1)
+End If
+
+If Day(Day1) < 10 Then
+	dd = "0" & Day(Day1)
+Else
+	dd = Day(Day1)
+End If
+
+SCREEN.IgnoreChange True
+zOrdStrDt.data = Year(Day1) & mm & dd
+SCREEN.IgnoreChange False
+
+Call send_f()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(RADIO2)
+_AW_ONCLICK_AW_
+Dim Day1, Day2, mm, dd
+Day2 = getDateSerial(zOrdEndDt.Data)
+Day1 = DateAdd("m", -2, Day2)
+
+If Month(Day1) < 10 Then
+	mm = "0" & Month(Day1)
+Else
+	mm = Month(Day1)
+End If
+
+If Day(Day1) < 10 Then
+	dd = "0" & Day(Day1)
+Else
+	dd = Day(Day1)
+End If
+
+SCREEN.IgnoreChange True
+zOrdStrDt.data = Year(Day1) & mm & dd
+SCREEN.IgnoreChange False
+
+Call send_f()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(RADIO3)
+_AW_ONCLICK_AW_
+Dim Day1, Day2, mm, dd
+Day2 = getDateSerial(zOrdEndDt.Data)
+Day1 = DateAdd("m", -3, Day2)
+
+If Month(Day1) < 10 Then
+	mm = "0" & Month(Day1)
+Else
+	mm = Month(Day1)
+End If
+
+If Day(Day1) < 10 Then
+	dd = "0" & Day(Day1)
+Else
+	dd = Day(Day1)
+End If
+
+SCREEN.IgnoreChange True
+zOrdStrDt.data = Year(Day1) & mm & dd
+SCREEN.IgnoreChange False
+
+Call send_f()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

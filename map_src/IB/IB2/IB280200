@@ -1,0 +1,493 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB280200)
+MAPSIZE(532, 661)
+VERSION(002)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("ELW 현재가")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(FMS|FLASH|DROP|USER|SAVE)
+TITLE("[2802] ELW 현재가")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pooppoop")
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL9(0, 531, 662, 534)        COLOR(64, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL8(-2, 465, 341, 532)  LIMAGE(0)  LINEW(3)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL7(341, 320, 662, 532)  LIMAGE(0)  LINEW(3)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL6(341, 174, 662, 321)  LIMAGE(0)  LINEW(3)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL4(341, 29, 662, 175)  LIMAGE(0)  LINEW(3)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL10(-1, 29, 342, 466)  LIMAGE(2)  LINEW(5)  STRESS(44)  STRESSW(3)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  1847(262, 507, 334, 525)  LEN(13)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT  FONT("굴림", 9, NORMAL)    COLOR(192, 69)  CUR(0)            TABORDER(0)  IOORDER(10)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_STRING)  HELPTEXT("* LP의 보유물량(비율)은 발행증권회사가 전일 18시까지 거래소에 신고한 내용임")HELPTEXT("* LP의 보유물량(비율)은 발행증권회사가 전일 18시까지 거래소에 신고한 내용임")
+OUT  1846(262, 489, 334, 507)  LEN(13)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT  FONT("굴림", 9, NORMAL)    COLOR(192, 69)  CUR(0)            TABORDER(0)  IOORDER(11)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_STRING)  HELPTEXT("* LP의 보유물량(비율)은 발행증권회사가 전일 18시까지 거래소에 신고한 내용임")HELPTEXT("* LP의 보유물량(비율)은 발행증권회사가 전일 18시까지 거래소에 신고한 내용임")
+PANEL  PANEL0(0, 0, 660, 26)        COLOR(66, 69)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  obj2(348, 353, 655, 525)    "IB200430"  TABORDER(10)  IOORDER(7)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON0(72, 3, 91, 23)  TP_PUSH|IMAGETEXT|AL_STRETCH        FOCUS  COLOR(15, 63)  CUR(0)    "검색.bmp"    TABORDER(2)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+CONTROL  17413(94, 3, 340, 23)    "CX_Symbol"  "/a89/b91/c92/d69"  LEN(0)  EDIT_OUTPUT    COLOR(90, 130)  TABORDER(0)  IOORDER(8)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+USRTAB  MTAB(348, 327, 655, 353)  FOCUS  INDEX(0)  COUNT(6)  AL_TOP  TAB_IMAGE        COLOR(3, 130)  CUR(0)  TABIMAGE("TAB.BMP")  FCOLOR(3, 130)  CAPTION("체결", "1분", "일간", "상세", "공시", "조기종료평가")  TABINFO("1:1", "1:2", "1:3", "1:4", "1:5", "1:6")  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  1021(725, 50, 803, 73)  LEN(7)  IO_ALPHA|AL_CENTER||FA_FLASH    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  2320(766, 80, 833, 103)  LEN(9)  IO_NUM|AL_CENTER|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(6)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  company(472, 3, 532, 23)  '기초자산'  TP_PUSH|IMAGETEXT|AL_STRETCH        FOCUS  COLOR(208, 186)  CUR(0)    "4BTN.BMP"    TABORDER(3)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+BUTTON  investment(690, 10, 750, 30)  '투자지표'  TP_PUSH|IMAGETEXT|AL_STRETCH        FOCUS  COLOR(208, 186)  CUR(0)    "4BTN.BMP"    TABORDER(4)  ENABLE  &
+  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+BUTTON  explanation(533, 3, 593, 23)  '지표설명'  TP_PUSH|IMAGETEXT|AL_STRETCH        FOCUS  COLOR(208, 186)  CUR(0)    "4BTN.BMP"    TABORDER(5)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+CONTROL  17412(9, 89, 334, 458)    "CX_Depth"  "/u1/d10/p0/b/s1/l/c/h3/o/g/a1/f/r"  LEN(0)  EDIT_OUTPUT    COLOR(193, 232)  TABORDER(0)  IOORDER(9)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+CONTROL  elw_ctrl(779, 137, 817, 165)  |FA_PROTECT  "CX_ELW"  ""  LEN(0)  EDIT_NOP    COLOR(192, 232)  TABORDER(0)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  elw_gcjs(779, 173, 844, 193)  'Label'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+TABLE  TABLE2(347, 36, 502, 169)  MATRIX(7, 1)  LINECOLOR(75)  CELLH(18)    FONT("굴림체", 9, NORMAL)|MULTI|XVLINE|XHLINE  EDIT_OUTPUT    &
+	COLINFO("1352")  LEN(10)  WIDTH(68)  HEAD("행사가격")  COLALIGN(AL_CENTER, AL_RIGHT)  HEADCOLOR(96, 130)  IO_NUM|FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSUP    COLOR(68, 69)  COLCUR(0, 0)  COLHINTTYPE(IH_NONE)    COLUMN_VISIBLE  &
+	COLINFO("1823")  LEN(8)  WIDTH(68)  HEAD("기초자산")  COLALIGN(AL_CENTER, AL_RIGHT)  HEADCOLOR(96, 130)  IO_NUM|FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSUP    COLOR(68, 69)  COLCUR(0, 0)  COLHINTTYPE(IH_NONE)    COLUMN_VISIBLE  IFRGB(69, 69)  &
+	COLINFO("1855")  LEN(9)  WIDTH(68)  HEAD("전환비율")  COLALIGN(AL_CENTER, AL_RIGHT)  HEADCOLOR(96, 130)  IO_NUM|FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSUP    COLOR(68, 69)  COLCUR(0, 0)  COLHINTTYPE(IH_NONE)    COLUMN_VISIBLE  &
+	COLINFO("2897")  LEN(8)  WIDTH(68)  HEAD("기어링비율")  COLALIGN(AL_CENTER, AL_RIGHT)  HEADCOLOR(96, 130)  IO_NUM|FA_COMMA|FA_RIGHT    COLOR(68, 69)  COLCUR(0, 0)  COLHINTTYPE(IH_NONE)    COLUMN_VISIBLE  &
+	COLINFO("2896")  LEN(8)  WIDTH(68)  HEAD("패리티")  COLALIGN(AL_CENTER, AL_RIGHT)  HEADCOLOR(96, 130)  IO_NUM|FA_COMMA|FA_RIGHT    COLOR(68, 69)  COLCUR(0, 0)  COLHINTTYPE(IH_NONE)    COLUMN_VISIBLE  &
+	COLINFO("2899")  LEN(8)  WIDTH(68)  HEAD("자본지지점")  COLALIGN(AL_CENTER, AL_RIGHT)  HEADCOLOR(96, 130)  IO_NUM|FA_COMMA|FA_RIGHT    COLOR(68, 69)  COLCUR(0, 0)  COLHINTTYPE(IH_NONE)    COLUMN_VISIBLE  &
+	COLINFO("1397")  LEN(8)  WIDTH(68)  HEAD("K.O 배리어")  COLALIGN(AL_CENTER, AL_RIGHT)  HEADCOLOR(96, 130)  IO_NUM|FA_COMMA|FA_RIGHT    COLOR(68, 69)  COLCUR(0, 0)  COLHINTTYPE(IH_NONE)    COLUMN_VISIBLE  IOORDER(12)  ENABLE  &
+  VISIBLE
+
+TABLE  TABLE3(501, 36, 656, 169)  MATRIX(7, 1)  LINECOLOR(75)  CELLH(18)    FONT("굴림체", 9, NORMAL)|MULTI|XVLINE|XHLINE|CXDELETE  EDIT_OUTPUT    &
+	COLINFO("2936")  LEN(9)  WIDTH(68)  HEAD("손익분기점")  COLALIGN(AL_CENTER, AL_RIGHT)  HEADCOLOR(96, 130)  IO_NUM|FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSIGN    COLOR(68, 69)  COLCUR(0, 0)  COLHINTTYPE(IH_NONE)    COLUMN_VISIBLE  &
+	COLINFO("2898")  LEN(9)  WIDTH(68)  HEAD("손익분기율")  COLALIGN(AL_CENTER, AL_RIGHT)  HEADCOLOR(96, 130)  IO_NUM|FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSIGN    COLOR(68, 69)  COLCUR(0, 0)  COLHINTTYPE(IH_NONE)    COLUMN_VISIBLE  &
+	COLINFO("2884")  LEN(9)  WIDTH(68)  HEAD("델타")  COLALIGN(AL_CENTER, AL_RIGHT)  HEADCOLOR(96, 130)  IO_NUM    COLOR(68, 69)  COLCUR(0, 0)  COLHINTTYPE(IH_NONE)    COLUMN_VISIBLE  &
+	COLINFO("1854")  LEN(8)  WIDTH(68)  HEAD("최종거래")  COLALIGN(AL_CENTER, AL_RIGHT)  HEADCOLOR(96, 130)  IO_NUM|FA_COMMA    COLOR(68, 69)  COLCUR(0, 0)  COLHINTTYPE(IH_NONE)    COLUMN_VISIBLE  EDITFORMAT("9999/99/99")  &
+	COLINFO("1344")  LEN(8)  WIDTH(68)  HEAD("만기일")  COLALIGN(AL_CENTER, AL_RIGHT)  HEADCOLOR(96, 130)  IO_NUM    COLOR(68, 69)  COLCUR(0, 0)  COLHINTTYPE(IH_NONE)    COLUMN_VISIBLE  EDITFORMAT("9999/99/99")  &
+	COLINFO("1842")  LEN(4)  WIDTH(68)  HEAD("잔존일수")  COLALIGN(AL_CENTER, AL_RIGHT)  HEADCOLOR(96, 130)  IO_NUM|FA_COMMA|FA_RIGHT    COLOR(68, 69)  COLCUR(0, 0)  COLHINTTYPE(IH_NONE)    COLUMN_VISIBLE  &
+	COLINFO("COL0")  LEN(8)  WIDTH(68)  HEAD("K.O 접근도")  COLALIGN(AL_CENTER, AL_RIGHT)  HEADCOLOR(96, 130)  IO_NUM    COLOR(68, 69)  COLCUR(0, 0)  COLHINTTYPE(IH_NONE)    COLUMN_VISIBLE  EDITFORMAT("99999999%")  IOORDER(13)  ENABLE  &
+  VISIBLE
+
+OUT  1852(778, 229, 815, 252)  LEN(4)  IO_MIXED|AL_CENTER||FA_FLASH    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(14)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  2023(778, 200, 849, 223)  LEN(9)  IO_NUM|AL_CENTER|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(15)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  details(594, 3, 654, 23)  '종목상세'  TP_PUSH|IMAGETEXT|AL_STRETCH        FOCUS  COLOR(208, 186)  CUR(0)    "4BTN.BMP"    TABORDER(6)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+OUT  1861(777, 286, 855, 305)  LEN(20)  IO_MIXED|AL_CENTER|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(16)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  1862(777, 306, 855, 325)  LEN(20)  IO_MIXED|AL_CENTER|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(17)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  1863(777, 326, 855, 345)  LEN(20)  IO_MIXED|AL_CENTER|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(18)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  1864(777, 346, 855, 365)  LEN(20)  IO_MIXED|AL_CENTER|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(19)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  1865(777, 367, 855, 386)  LEN(20)  IO_MIXED|AL_CENTER|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(20)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  1881(867, 287, 945, 306)  LEN(12)  IO_MIXED|AL_CENTER|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(21)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  1882(867, 307, 945, 326)  LEN(12)  IO_MIXED|AL_CENTER|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(22)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  1883(867, 327, 945, 346)  LEN(12)  IO_MIXED|AL_CENTER|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(23)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  1884(867, 346, 945, 365)  LEN(12)  IO_MIXED|AL_CENTER|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(24)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  1885(867, 366, 945, 385)  LEN(12)  IO_MIXED|AL_CENTER|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(25)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  obj1(4, 472, 231, 525)    "IB280210"  TABORDER(8)  IOORDER(26)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  1841(822, 231, 893, 250)  LEN(6)  IO_NUM|AL_CENTER|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(27)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  J1301(869, 258, 933, 277)  LEN(6)  IO_NUM|EDIT_INOUT|FA_NOR|FA_PASS|CODE      COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(11)  IOORDER(28)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  obj0(348, 182, 655, 315)    "IB280120"  TABORDER(9)  IOORDER(29)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  focus(842, 130, 877, 154)  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL0(231, 489, 262, 507)  '물량'  AL_CENTER  FONT("굴림", 9, NORMAL)  CUR(0)      COLOR(96, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_STRING)  HELPTEXT("* LP의 보유물량(비율)은 발행증권회사가 전일 18시까지 거래소에 신고한 내용임")HELPTEXT("* LP의 보유물량(비율)은 발행증권회사가 전일 18시까지 거래소에 신고한 내용임")
+LABEL  LABEL1(231, 507, 262, 525)  '비율'  AL_CENTER  FONT("굴림", 9, NORMAL)  CUR(0)      COLOR(96, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_STRING)  HELPTEXT("* LP의 보유물량(비율)은 발행증권회사가 전일 18시까지 거래소에 신고한 내용임")HELPTEXT("* LP의 보유물량(비율)은 발행증권회사가 전일 18시까지 거래소에 신고한 내용임")
+OUT  1874(262, 472, 334, 490)  LEN(12)  IO_MIXED|AL_LEFT||FA_CORGB|SA_COSUP  FONT("굴림체", 9, NORMAL)    COLOR(68, 69)  CUR(0)            IFRGB(94, 7)  TABORDER(0)  IOORDER(30)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_STRING)  HELPTEXT("* LP의 보유물량(비율)은 발행증권회사가 전일 18시까지 거래소에 신고한 내용임")HELPTEXT("* LP의 보유물량(비율)은 발행증권회사가 전일 18시까지 거래소에 신고한 내용임")
+PANEL  PANEL3(660, 0, 662, 26)        COLOR(64, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL2(0, 0, 1, 26)        COLOR(64, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL5(0, 26, 662, 29)        COLOR(64, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL2(231, 472, 262, 490)  'LP'  AL_CENTER  FONT("굴림", 9, NORMAL)  CUR(0)      COLOR(96, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_STRING)  HELPTEXT("* LP의 보유물량(비율)은 발행증권회사가 전일 18시까지 거래소에 신고한 내용임")HELPTEXT("* LP의 보유물량(비율)은 발행증권회사가 전일 18시까지 거래소에 신고한 내용임")
+BOX  BOX1(231, 524, 334, 525)    COLOR(75, 75)  LINEW(1)  BX_LINE    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BOX  BOX0(231, 472, 334, 473)    COLOR(75, 75)  LINEW(1)  BX_LINE    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BOX  BOX4(261, 472, 262, 525)    COLOR(75, 75)  LINEW(1)  BX_LINE    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+CONTROL  E1301(720, 255, 785, 275)  |FA_PROTECT|FA_SKIP  "CX_CODECTRL"  "/u6/k검색.BMP/lAXCOMBO.BMP/p/s0"  LEN(6)  EDIT_INOUT    COLOR(192, 130)  TABORDER(1)  IOORDER(31)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL3(792, 258, 864, 278)  '기초자산'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  obj(8, 36, 333, 88)    "IB10501B"  TABORDER(7)  IOORDER(32)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  1199(570, 150, 645, 167)  LEN(8)  IO_NUM|AL_RIGHT||FA_COMMA|FA_RIGHT    COLOR(192, 69)  CUR(0)            TABORDER(0)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL4(645, 150, 655, 167)  '%'  AL_LEFT  CUR(0)      COLOR(192, 69)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  2190(344, 3, 409, 23)  LEN(18)  IO_MIXED|AL_LEFT|  FONT("굴림체", 9, BOLD)    COLOR(211, 232)  CUR(0)            TABORDER(0)  IOORDER(4)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  2191(760, 420, 825, 440)  LEN(18)  IO_MIXED|AL_LEFT|  FONT("굴림체", 9, BOLD)    COLOR(211, 232)  CUR(0)            TABORDER(0)  IOORDER(5)  ENABLE  &
+  HINTTYPE(IH_NONE)
+CONTROL  1301(7, 3, 72, 23)  |FA_PROTECT  "CX_CODECTRL"  "/u6/k검색.BMP/lAXCOMBO.BMP/p/s0/o"  LEN(6)  EDIT_INPUT    COLOR(192, 130)  TABORDER(12)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Const myFILE = "userconf.ini"
+Const myMAP = "IB280200"
+Dim g_BefKO
+
+g_BefKO = ""
+'----------------------------------------------------------------------------------------
+Sub Query_Chart()
+'	ctl0.ClearAllData
+'	If Len(Trim(S1301.Data)) <> 6 Or S1301.Data = "000000" Then
+'		Exit Sub
+'	End If
+'
+'	ctl0.Setticksize 0, 0.05
+'	ctl0.SetChartPeriod 0, 2
+'	ctl0.SetInputValue 0,0, "1301", S1301.Data
+'	ctl0.RequestData 0,0
+End Sub
+
+Sub OnAlert()
+	'KO 확인
+	KO = Trim(S2191.Data)
+	If Len(KO) <> 0 And g_BefKO <> KO Then
+		If KO = "99" Then
+			S2190.Visible = True
+		End If
+	End If
+
+	'환산가 계산
+	Dim hsga, hsgg, curr, jhrt, cpgb, temp, jjjj, tmpLen	'tmpLen : 행사가격의 소수점자리의 길이
+
+	cpgb = Trim(S1852.Data)					'ELW권리유형
+	temp = Trim(TABLE2.GetTableCell(1))		'행사가격
+
+	If temp = "" Then
+		Exit Sub
+	End If
+
+'	If Mid(temp, Len(temp)-2, 1) = "." Then
+'		hsgg = Left(temp, Len(temp)-3)
+'	Else
+'		hsgg = temp
+'	End If
+
+	If InStr(temp, ".") > 0 Then
+		Dim tmpArr
+		tmpArr = Split(temp, ".")
+		tmpLen =  Len(Trim(tmpArr(1)))
+
+		hsgg = Left(temp, Len(temp) - (tmpLen + 1))	'소수점 포함위해 + 1
+	Else
+		hsgg = temp
+	End If
+
+	curr = Trim(S2023.Data)					'현재가
+	jhrt = Trim(TABLE2.GetTableCell(3))		'전환비율
+
+'	If Is_numeric(jhrt) = False Then
+'		Exit Sub
+'	End If
+
+	If cpgb = "콜" Then
+		If curr > 0 Then
+			hsga = hsgg + (curr / jhrt)
+		Else
+			hsga = hsgg - (curr / jhrt)
+		End If
+	Else
+		If curr > 0 Then
+			hsga = hsgg - (curr / jhrt)
+		Else
+			hsga = hsgg + (curr / jhrt)
+		End If
+	End If
+
+'	If Mid(temp, Len(temp)-2, 1) = "." Then
+'		If Mid(hsga, Len(hsga)-1, 1) = "." Then
+'			hsga = hsga & "0"
+'		ElseIf Mid(hsga, Len(hsga)-2, 1) <> "." Then
+'			hsga = hsga & ".00"
+'		End If
+'	End If
+
+	If tmpLen > 0 Then
+		If InStr(hsga, ".") > 0 Then
+			Dim tmpLen2
+			tmpArr = Split(hsga, ".")
+			tmpLen2 = Len(Trim(tmpArr(1)))
+
+			If tmpLen2 = 1 Then
+				hsga = hsga & "0"
+			End If
+		Else
+			hsga = hsga & ".00"
+		End If
+	End If
+
+	'TABLE3.SetTableCell 1, hsga		'손익분기점
+End Sub
+
+
+Sub p_onstart()
+	'If p_read_ini() = 1 Then
+	'	Exit Sub
+	'End If
+
+	If Trim(S1301.Data) = "" Then
+		Exit Sub
+	End If
+
+	SCREEN.Send 0
+	obj2.Send
+End Sub
+
+
+Function p_read_ini()
+	p_read_ini = 0
+	If SCREEN.CreateObject("Info") Then
+ 		If INFO.PopData(LOGIN.Name, myFILE, myMAP, "ELWMAP") = "IB280100" Then
+			SCREEN.ChangeMap "IB280100"
+			p_read_ini = 1
+		End If
+	End If
+End Function
+
+
+Sub p_write_ini()
+	If SCREEN.CreateObject("Info") Then
+  		INFO.PushData LOGIN.Name, myFILE, myMAP, "ELWMAP", "IB280100"
+	End If
+End Sub
+
+_AW_ONINDECLARE_AW_
+#load IB888888.Is_numeric
+
+_AW_ONENDSUB_AW_
+_AW_ONSTART_AW_
+'SCREEN.SetTimer 7, False
+'focus.Text = "5"
+'obj0.Send
+'obj.Send
+
+Data = Trim(SYSTEM.Pop("2802_GONGSI"))
+If Data = "Y" Then
+	MTAB.Index = 5
+	obj2.SetObject "IB280215"
+	obj2.Send
+End If
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+Dim gcjs
+
+gcjs = Trim(elw_ctrl.GetGcjs(S1301.Data))
+If gcjs = "KOSPI200" Then
+	obj1.SetObject("IB280211")
+	company.Enable = False
+Else
+	obj1.SetObject("IB280210")
+	company.Enable = True
+	elw_gcjs.Text = Mid(gcjs, 2, 6)
+End If
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+g_BefKO = Trim(S2191.Data)
+
+If Trim(S1861.Data) = "KOSPI200" Then
+	obj1.Send
+Else
+	obj1.Proc "set_combo", ""
+End If
+
+'S1301.Trigger "1301", True
+
+J1301.Data = S1841.Data
+'If Len(Trim(S1841.Data)) > 5 Then
+'	J1301.Trigger "1301", True
+'End If
+
+
+Query_Chart()
+OnAlert()
+
+'S1301.Setfocus
+'
+'Select Case focus.Text
+'	Case "1"	company.SetFocus()
+'	Case "2"	investment.SetFocus()
+'	Case "3"	explanation.SetFocus()
+'	Case "4"	details.SetFocus()
+'	Case "5"	E1301.SetFocus()
+'End Select
+
+SCREEN.SetTimer 4, False
+
+_AW_ONENDSUB_AW_
+_AW_ONTIMER_AW_
+'Call p_onstart()
+S1301.SetFocus
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(BUTTON0)
+_AW_ONCLICK_AW_
+Dim retn
+retn = SCREEN.GetCode (120, "1301", "1022", 0)
+If retn <> True Then
+	Exit Sub
+End If
+
+SCREEN.Send 0
+obj2.Send
+obj.Send
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(MTAB)
+_AW_ONCLICK_AW_
+Select  Case (MTAB.Index)
+	Case "1"
+		obj2.SetObject "IB280212"
+	Case "2"
+		obj2.SetObject "IB280112"
+	Case "3"
+		obj2.SetObject "IB280213"
+	Case "4"
+		obj2.SetObject "IB280140"
+	Case "5"
+		obj2.SetObject "IB280215"
+	Case "6"
+		obj2.SetObject "IB280214"
+End Select
+
+obj2.Send
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(company)
+_AW_ONCLICK_AW_
+focus.Text = "1"
+Dim codx
+codx = J1301.Data
+codx = Trim(codx)
+
+SCREEN.CreateWindow 1, "IB200100 /t/d/p5/S", "1301" & vbTab & codx
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(investment)
+_AW_ONCLICK_AW_
+Dim codx
+codx = S1301.Data
+codx = Trim(codx)
+focus.Text = "2"
+SCREEN.ChangeMap "IB280600"
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(explanation)
+_AW_ONCLICK_AW_
+focus.Text = "3"
+SCREEN.CreateWindow 1, "IB280701 /t/p5/s", ""
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(details)
+_AW_ONCLICK_AW_
+focus.Text = "4"
+
+Dim codx
+codx = S1301.Data
+codx = Trim(codx)
+
+SCREEN.CreateWindow 1, "IB281400 /t/d/p5/S", "1301" & vbTab & codx
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(J1301)
+_AW_ONCHANGE_AW_
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(1874)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(1301)
+_AW_ONCHANGE_AW_
+If Trim(S1301.data) = "" Then
+	S1301.Clear
+	S1301.SetFocus
+	SCREEN.ClearAll 2, 0
+	Exit Sub
+End If
+'If E1301.Data < 500000 Then
+If SCREEN.GetCodeType(S1301.Data) <> 9 Then
+	S1301.Clear
+	S1301.SetFocus
+	Exit Sub
+End If
+
+focus.Text = "5"
+E1301.Data = S1301.Data
+S1301.Trigger "1301", True
+SCREEN.Send 0
+obj0.Send
+obj2.Send
+obj.Send
+
+S1301.SetFocus
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

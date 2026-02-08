@@ -1,0 +1,211 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB620203)
+MAPSIZE(110, 330)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("RP환매 이율표 조회")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(ENCODE|CR2TAB)
+TITLE("[620203]RP환매 이율표 조회")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("piboPBxQ")
+MAPTYPE(FIXED)
+HEADER(LEDGER)
+TRXH("11CSSERQ474")
+}
+
+
+
+FORM DIVISION
+{
+
+GRID  GRID0(0, 0, 330, 110)  VISIBLEROW(0)  CELLH(18)  MATRIX(1000, 5)  FIX(0)  MAINCOLOR(64, 232)  LINECOLOR(75)  FOCUSCOLOR(78)  FOCUSKIND(4)    FONT("굴림체", 9, NORMAL)  ROWC(68, 77)  |MERGE|FLEXIBLE|VSCROLL|NO3D|RROW|XHLINE|GRFTEXT    &
+	COLINFO("Col2")  LEN(6)  WIDTH(105)  HEAD("시작일수")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_CORGB|SA_COSUP    COLOR(68, 69)  COLCUR(0, 0)    INORMAL  IFRGB(69, 69)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col3")  LEN(6)  WIDTH(102)  HEAD("약정일")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_CORGB|SA_COSUP    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  COLUMN_SORT  INORMAL  IFRGB(69, 69)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col4")  LEN(11)  WIDTH(110)  HEAD("약정전 이율")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSUP    COLOR(68, 69)  COLCUR(0, 0)    INORMAL  IFRGB(69, 69)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col5")  LEN(11)  WIDTH(106)  HEAD("약정이율")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_CORGB|SA_COSUP    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  COLUMN_SORT  INORMAL  IFRGB(69, 69)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col6")  LEN(11)  WIDTH(106)  HEAD("약정후 이율")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSUP    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  COLUMN_SORT  INORMAL  IFRGB(69, 69)    HNORMAL  SORTSTARTPOS(0)    TABORDER(4)  IOORDER(6)  ENABLE  &
+  VISIBLE
+
+PANEL  PANEL24(307, 217, 434, 235)  '레코드'  LINECOLOR(75)      COLOR(74, 76)  CUR(0)    AL_CENTER    ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL45(49, 200, 152, 220)  '레코드갯수'  LINECOLOR(75)      COLOR(74, 76)  CUR(0)    AL_CENTER    ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  In(151, 200, 266, 220)  LEN(5)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_SUNKEN  INIT("00001")          TABORDER(1)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  out(433, 217, 536, 235)  LEN(1)  IO_NUM|AL_CENTER|    COLOR(192, 232)  CUR(0)  LINECOLOR(75)          TABORDER(0)  IOORDER(5)  ENABLE  &
+  HINTTYPE(IH_NONE)
+GROUP  GROUP0(32, 182, 275, 366)  'In'        COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+GROUP  GROUP1(289, 183, 571, 366)  'Out'        COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL23(307, 200, 434, 218)  'out'  LINECOLOR(75)      COLOR(74, 76)  CUR(0)    AL_CENTER    ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  OUTPUT(433, 200, 536, 218)  LEN(14)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSUP    COLOR(68, 69)  CUR(0)  LINECOLOR(75)          IFRGB(69, 69)  TABORDER(0)  IOORDER(4)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL6(49, 219, 152, 239)  '기준일자'  LINECOLOR(75)      COLOR(74, 76)  CUR(0)    AL_CENTER    ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL14(49, 238, 152, 258)  'RP매매구분'  LINECOLOR(75)      COLOR(74, 76)  CUR(0)    AL_CENTER    ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  zBaseDate(151, 219, 266, 239)  LEN(8)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_SUNKEN  INIT("0")          TABORDER(2)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  zRpBnsTp(151, 238, 266, 258)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_SUNKEN          TABORDER(3)  IOORDER(3)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Option Explicit
+
+Sub send_f()
+	SCREEN.ClearAll 0, 2
+	LEDGER.Fkey = "C"
+	SCREEN.Send 0
+End Sub
+
+'== 연속 조회
+Sub send_c()
+	LEDGER.Fkey = "7"
+	GRID0.SetDataPosition 2
+	SCREEN.Send 0
+End Sub
+
+_AW_ONINDECLARE_AW_
+#load IB888833
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+SCREEN.OnSend = False
+SCREEN.Object("main.GUIDE").Text = ""
+
+'If Len(Trim(SCREEN.Object("parent.zPwd").Data)) < 4 Then
+'	MsgBox "비밀번호를 확인하십시오.", , "IBK투자증권"
+'	SCREEN.Object("parent.zPwd").SetFocus
+'	Exit Sub
+'End If
+
+If SCREEN.Object("parent.RADIO0").Checked = True Then
+	zRpBnsTp.Data = "2"
+ElseIf SCREEN.Object("parent.RADIO1").Checked = True Then
+	zRpBnsTp.Data = "1"
+Else
+	zRpBnsTp.Data = "7"
+End If
+
+SCREEN.OnSend = True
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+Dim ecod, ii, iday, bef, rat, aft, parent_iday
+
+ecod = Trim(LEDGER.Ecod)
+If ecod = "3669" Then
+	SCREEN.ClearAll 0, 2
+	Exit Sub
+End If
+
+If LEDGER.Next = "Y" And ecod <> "0136" Then
+	Call send_c()
+Else
+	parent_iday = Trim(SCREEN.Object("Main.i_lRpDays").Data)
+	If Len(parent_iday) > 0 Then
+		parent_iday = CInt(parent_iday)
+	End If
+
+	' Reformatting & Assign Data to Parent Map
+	For ii = GRID0.Rows To 1 Step -1
+		iday = Trim(GRID0.GetGridCell(ii, 2))	' 약정일
+		bef  = Trim(GRID0.GetGridCell(ii, 3))	' 약정 전 이율
+		rat  = Trim(GRID0.GetGridCell(ii, 4))	' 약정    이율
+		aft  = Trim(GRID0.GetGridCell(ii, 5))	' 약정 후 이율
+
+		If bef = "" Or rat = "" Or aft = "" Or iday = "" Then
+			Exit Sub
+		End If
+
+
+
+		' 약정일수
+		If Len(Trim(iday)) <> "" Then
+			If IsNumeric(iday) = True Then
+				iday = CInt(iday)
+			End If
+		End If
+
+		' 약정일수가 0인경우 해당 row는 보여주지 않음 (의미 없는 데이터)
+		If iday = 0 Then
+			GRID0.RemoveRow ii - 1
+		Else
+			' Formatting To Grid
+			GRID0.SetGridCell ii, 3, FormatNumber(bef * 100, 2)
+			GRID0.SetGridCell ii, 4, FormatNumber(rat * 100, 2)
+			GRID0.SetGridCell ii, 5, FormatNumber(aft * 100, 2)
+
+			' Default Data shoot To MainMap
+			If parent_iday = iday Then
+				iday = Trim(GRID0.GetGridCell(ii, 2))	'약정일
+				bef  = Trim(GRID0.GetGridCell(ii, 3))	'약정전이율
+				rat  = Trim(GRID0.GetGridCell(ii, 4))	'약정이율
+				aft  = Trim(GRID0.GetGridCell(ii, 5))	'약정후이율
+
+				SCREEN.Object("parent.cc").data          = rat
+				SCREEN.Object("parent.i_before").data    = bef
+				SCREEN.Object("parent.i_dRpIntrat").data = rat
+				SCREEN.Object("parent.i_after").data     = aft
+				SCREEN.Object("parent.i_lRpDays").data   = iday
+			End If
+		End If
+	Next
+
+	SCREEN.Proc "main.Set_Focus", ""
+End If
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(GRID0)
+_AW_ONCLICK_AW_
+If GRID0.HitPos <> 3 Then
+	Exit Sub
+End If
+
+If GRID0.Rows < 1 Then
+	Exit Sub
+End If
+
+Dim bef, rat, aft, iday, val
+iday = Trim(GRID0.GetGridCell(GRID0.row, 2))	'약정일
+bef = Trim(GRID0.GetGridCell(GRID0.row, 3))		'약정전이율
+rat = Trim(GRID0.GetGridCell(GRID0.row, 4))		'약정이율
+aft = Trim(GRID0.GetGridCell(GRID0.row, 5))		'약정후이율
+
+If bef = "" Or rat= "" Or aft = "" Or iday = "" Then
+	Exit Sub
+End If
+
+SCREEN.Object("parent.cc").data = rat
+SCREEN.Object("parent.i_before").data = bef
+SCREEN.Object("parent.i_dRpIntrat").data = rat
+SCREEN.Object("parent.i_after").data = aft
+SCREEN.Object("parent.i_lRpDays").data = iday
+SCREEN.Object("parent.price").SetFocus
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(OUTPUT)
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

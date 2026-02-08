@@ -1,0 +1,74 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(TTPCLASS)
+MAPSIZE(344, 574)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("±¼¸²", 9, NORMAL)
+TITLE("CLASS")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+BUTTON  BUTTON0(0, 0, 573, 344)  'CLASS'  TP_PUSH      AL_CENTER    FOCUS  COLOR(208, 232)  CUR(0)      TABORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Class TVProgram
+    Public StartTime
+    Public ProgramDate
+    Public ProgramTitle
+    Private Sub Class_Initialize() 
+		MsgBox "start"
+	End Sub 
+	Private Sub Class_Terminate() 
+		MsgBox "close"
+	End Sub 
+
+End Class
+
+Dim objTVShow
+
+_AW_ONSTART_AW_
+Set objTVShow = New TVProgram
+
+
+_AW_ONENDSUB_AW_
+_AW_ONCLOSE_AW_
+Set objTVShow = Nothing 
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(BUTTON0)
+_AW_ONCLICK_AW_
+objTVShow.StartTime = CDate("17:30")
+objTVShow.ProgramDate = DateSerial(2001,7,02)
+objTVShow.ProgramTitle = "ÄÚ¸®¾ÆÀÎÅÍ³Ý´åÄÄ Æä½ºÆ¼¹ú"
+
+MsgBox objTVShow.starttime & objTVShow.ProgramDate & objTVShow.ProgramTitle
+
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

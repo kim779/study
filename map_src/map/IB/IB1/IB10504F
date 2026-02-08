@@ -1,0 +1,229 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB10504F)
+MAPSIZE(277, 699)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("종목별증거금율/주문")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(CR2TAB)
+TITLE("종목별증거금율/주문가능수량")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL0(0, 0, 699, 27)        COLOR(66, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL1(146, 398, 196, 418)  '비밀번호'  AL_LEFT  CUR(0)      COLOR(66, 69)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  zPwd(199, 398, 256, 418)  LEN(8)  IO_DIGIT|EDIT_INPUT|FA_PASSWD|FA_WRAP|FA_XFLOAT|FA_PASS    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(6)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  BUTTON0(1098, 515, 1134, 535)  '조회'  TP_PUSH|IMAGETEXT|AL_CENTER        FOCUS  COLOR(208, 232)  CUR(0)    "2btn.bmp"    TABORDER(7)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+BUTTON  BUTTON1(1133, 515, 1177, 535)  '현재가'  TP_PUSH|IMAGETEXT|AL_CENTER        FOCUS  COLOR(208, 232)  CUR(0)    "3btn.bmp"    TABORDER(8)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+EDIT  AN1A(4, 399, 131, 417)  LEN(11)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_PASS    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(9)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL32(8, 3, 58, 23)  '매수가격'  AL_LEFT  CUR(0)      COLOR(66, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  ed_jprc(59, 3, 131, 23)  LEN(10)  IO_NUM|EDIT_INPUT|FA_COMMA|FA_RIGHT|FA_WRAP|FA_XFLOAT    COLOR(192, 130)  CUR(0)  TP_SUNKEN          TABORDER(1)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  b_send(661, 3, 697, 23)  '조회'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, BOLD)  COLOR(208, 186)  CUR(0)    "조회btn.bmp"    TABORDER(4)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+OBJECT  obj0(0, 27, 699, 149)    "IB10013C"  TABORDER(5)  IOORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL33(172, 3, 252, 23)  '현금/신용구분'  AL_LEFT  CUR(0)      COLOR(66, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL0(278, 399, 328, 419)  '종목코드'  AL_LEFT  CUR(0)      COLOR(66, 69)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  jmcd(329, 396, 409, 420)  LEN(6)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_NOR|FA_PASS    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(10)  IOORDER(5)  ENABLE  &
+  HINTTYPE(IH_NONE)
+COMBO  com_sygubn(253, 3, 317, 23)  TP_SUNKEN  LEN(1)  COUNT(2)  VCOUNT(2)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_NUM|EDIT_INPUT    COLOR(192, 130)  CUR(0)  DISPLAY("현금", "신용")  DATA("0", "1")    TABORDER(2)  IOORDER(6)  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  mmgbLabel(521, 3, 568, 23)  '매매구분'  AL_LEFT  CUR(0)      COLOR(66, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+COMBO  com_mmgb(572, 3, 632, 23)  TP_SUNKEN  LEN(1)  COUNT(2)  VCOUNT(2)  INDEX(1)  MATCHKEY(NOTMAPPING)  IO_NUM|EDIT_INPUT    COLOR(192, 130)  CUR(0)  DISPLAY("매도", "매수")  DATA("1", "2")    TABORDER(3)  IOORDER(7)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  mmgb(81, 419, 161, 443)  LEN(1)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_NOR|FA_PASS    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(11)  IOORDER(8)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL2(30, 420, 80, 440)  '매매구분'  AL_LEFT  CUR(0)      COLOR(66, 69)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  sygubn(225, 419, 305, 443)  LEN(1)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_NOR|FA_PASS    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(12)  IOORDER(9)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL3(174, 422, 224, 442)  '신용구분'  AL_LEFT  CUR(0)      COLOR(66, 69)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  obj_currentVal(138, 601, 243, 626)    "IB10013E"  TABORDER(13)  IOORDER(10)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL4(8, 603, 137, 623)  '현재가 obj_currentVal'  AL_LEFT  CUR(0)      COLOR(66, 69)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Option Explicit
+Dim sendCnt
+sendCnt = 0
+
+'================================================================================
+' 메인에서 send_sise_all()시 호출됨. tab_account전환시 호출
+' 화면이 처음뜰 때 obj_currentVal에서 매수가격(현재가)를 가져온 후 chkCondition()으로..
+'================================================================================
+Sub send_main()
+	jmcd.Data = Trim(SCREEN.Object("main.1301").Data)
+	obj_currentVal.Send
+End Sub
+
+
+'================================================================================
+' 현금/신용 구분 및 매매구분으로 화면 세팅값 가져옴.
+'================================================================================
+Sub chkCondition()
+	mmgb.Data = SCREEN.Object("main.OBJ_order.OBJ_odr.ed_mmgb").Data
+	sygubn.Data = "0"
+	com_sygubn.Data = sygubn.Data
+
+	If Trim(mmgb.Data) = "1" Or Trim(mmgb.Data) = "2" Then
+		com_mmgb.Data = mmgb.Data
+	End If
+End Sub
+
+'===============================================================================
+' 현금/신용구분, 매매구분으로 화면 세팅
+'===============================================================================
+Sub SetSrc()
+	If Trim(mmgb.Data) <> "3" Then
+		com_sygubn.Enable = False
+
+		mmgbLabel.Visible = False
+		com_mmgb.Visible = False
+	Else
+		com_sygubn.Enable = False
+
+		mmgbLabel.Visible = True
+		com_mmgb.Visible = True
+	End If
+End Sub
+
+
+Sub send_f()
+	sendCnt = sendCnt + 1
+
+	If sendCnt > 1 Then
+		sendCnt = 0
+		Exit Sub
+	End If
+
+	Call chkCondition()
+	Call SetSrc()
+
+	If IsNumeric(ed_jprc.Data) = True Then
+		If CDbl(ed_jprc.Data) = 0 Then
+			ed_jprc.Data = SCREEN.Object("main.OBJ_sise.2023").Data
+		End If
+
+		SCREEN.Proc "obj0.send_f", ""
+	Else
+		Call guide_msg(Trim(com_mmgb.Text) & "가격을 확인하여 주십시오.")
+		ed_jprc.SetFocus
+	End If
+
+	sendCnt = 0
+End Sub
+
+_AW_ONINDECLARE_AW_
+#Load IB888833
+#Load IB888888
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+SCREEN.OnSend = False
+Call send_main()
+Call send_f()
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(zPwd)
+_AW_ONKEYCHANGE_AW_
+'== 비밀번호 변경시 조회 버튼 기능 수행.
+If SCREEN.Key = "13" Then  '-- Enter 키 입력
+	Call send_f()
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON0)
+_AW_ONCLICK_AW_
+send_f()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON1)
+_AW_ONCLICK_AW_
+SCREEN.CreateWindow 1, "IB200100 /s/p5 /t", ""
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(ed_jprc)
+_AW_ONCHARCHANGE_AW_
+If Mid(Trim(ed_jprc.Data),1,1) = "+" Or Mid(Trim(ed_jprc.Data),1,1) = "-" Then
+	ed_jprc.Clear
+End If
+_AW_ONENDSUB_AW_
+_AW_ONKEYCHANGE_AW_
+If SCREEN.Key = "13" Then
+	If Trim(ed_jprc.Data) <> "" Then
+		If IsNumeric(ed_jprc.Data) = True Then
+			Call send_f()
+		End If
+	End If
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(b_send)
+_AW_ONCLICK_AW_
+'버튼클릭자료수집
+Call btnClickCnt(b_send)
+
+Call send_f()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(com_sygubn)
+_AW_ONCHANGE_AW_
+sygubn.Data = com_sygubn.Data
+Call send_f()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(com_mmgb)
+_AW_ONCHANGE_AW_
+Call send_f()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

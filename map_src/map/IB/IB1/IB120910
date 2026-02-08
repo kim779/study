@@ -1,0 +1,94 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB120910)
+MAPSIZE(20, 270)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(FMS|CR2TAB)
+TITLE("[120910]")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pooppoop")
+MAPTYPE(FIXED)
+HEADER(NOP)
+BGROUND(BRUSH, 66)
+}
+
+
+
+FORM DIVISION
+{
+
+BUTTON  BUTTON0(117, 0, 136, 20)  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(15, 63)  CUR(0)    "검색.BMP"    TABORDER(1)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+EDIT  1301(52, 0, 117, 20)  LEN(6)  IO_MIXED|EDIT_INOUT|FA_WRAP|FA_HAN|FA_NOR|CODE      COLOR(99, 69)  CUR(0)  TP_SUNKEN          TABORDER(2)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+CONTROL  17413(137, 0, 270, 20)    "CX_Symbol"  "/a89/b91/c92/d69"  LEN(0)  EDIT_OUTPUT  FONT("굴림체", 9, NORMAL)    COLOR(90, 130)  TABORDER(0)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL0(0, 0, 50, 20)  '종목코드'  AL_LEFT  CUR(0)      COLOR(64, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONINDECLARE_AW_
+#Load IB888833
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(BUTTON0)
+_AW_ONCLICK_AW_
+Dim retn
+retn = SCREEN.GetCode(100, "1301", "hnam", 0 )
+If retn <> True Then
+      Exit Sub
+End If
+
+SCREEN.Send 0
+'SCREEN.Proc "parent.send_sise", "sise" & "," & S1301.Data
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(1301)
+_AW_ONCHANGE_AW_
+S1301.Trigger "",True
+
+'S1301.Trigger "", False
+SCREEN.Object("main.dPchsPrc_before").Clear
+SCREEN.Object("main.dPchsPrc").Clear
+SCREEN.Object("main.dPchsPrc_out").Clear
+SCREEN.Object("main.zIsuNo").data = S1301.Data
+SCREEN.Object("main.ACNM").data = SCREEN.Object("main.AN1A").Name
+
+SCREEN.Send 0
+
+If Trim(S1301.Data) = "" Then
+	Call alert_msg("종목코드를 입력하세요")
+	S1301.SetFocus
+	Exit Sub
+Else
+	SCREEN.Object("main.LEDGER").Fkey = "C"
+	SCREEN.Object("main.zTrxTp").Data = "1"
+	SCREEN.Proc "main.Sendmain", ""
+End If
+_AW_ONENDSUB_AW_
+_AW_ONKEYCHANGE_AW_
+SCREEN.Object("main.BUTTON0").SetFocus
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

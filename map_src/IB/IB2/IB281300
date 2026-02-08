@@ -1,0 +1,75 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB281300)
+MAPSIZE(434, 665)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("ELW 기초자산 비교")
+MAPPUBLIC(";")
+FONT("굴림", 9, NORMAL)
+OPTIONS(CR2TAB)
+TITLE("ELW 기초자산 비교")
+TOPATH(AXIS)
+METHOD(MENU)
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  panel_up(0, 0, 665, 5)        COLOR(64, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  obj(0, 29, 664, 434)    "IB281310"FIXEDSIZE  TABORDER(1)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+USRTAB  tab_order(1, 3, 665, 29)  FOCUS  INDEX(0)  COUNT(4)  AL_TOP  TAB_IMAGE  |FA_NOR      COLOR(3, 130)  CUR(0)  TABIMAGE("tab.bmp")  FCOLOR(3, 130)  CAPTION("   호 가   ", "   시간대별   ", "   일자별   ", "   비교차트   ")  TABINFO("1:1", "1:2", "1:3", "1:4")  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL0(797, 169, 827, 181)  'Label'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  panel_left(0, 5, 1, 29)        COLOR(64, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL0(664, 0, 665, 54)        COLOR(64, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL4(5, 5, 755, 415)  '미사용'  TP_RAISED      COLOR(208, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONSTART_AW_
+obj.Send
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(tab_order)
+_AW_ONCLICK_AW_
+Select Case tab_order.ID
+	Case 1		'호가
+		obj.SetObject("IB281310")
+
+	Case 2		'시간대별
+		obj.SetObject("IB281320")
+
+	Case 3		'일별
+		obj.SetObject("IB281330")
+
+	Case 4		'비교차트
+		obj.SetObject("IB281340")
+End Select
+
+obj.Send
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

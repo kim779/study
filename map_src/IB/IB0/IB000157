@@ -1,0 +1,866 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB000157)
+MAPSIZE(224, 618)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("관심")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(FMS|FLASH|CR2TAB)
+TITLE("[000157]관심")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(NORM)
+HEADER(NOP)
+BGROUND(BRUSH, 181)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL0(0, 0, 618, 30)        COLOR(66, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON0(456, 4, 492, 24)  '설정'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, NORMAL)  COLOR(181, 186)  CUR(0)    "2BTN.BMP"    TABORDER(1)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+BUTTON  BUTTON1(275, 427, 307, 447)  '예상'  TP_PUSH|IMAGETEXT|AL_CENTER      FONT("굴림체", 9, NORMAL)  COLOR(208, 69)  CUR(0)    "2BTN.BMP"    TABORDER(2)  ENABLE  &
+  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+COMBO  intercombo(3, 4, 143, 24)  TP_SUNKEN  LEN(2)  COUNT(0)  VCOUNT(20)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_NUM|EDIT_INPUT|FA_SKIP  FONT("굴림체", 9, NORMAL)    COLOR(192, 130)  CUR(0)    TABORDER(3)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  RADIO0(270, 4, 348, 24)  '상세보기'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(GROUP0)    FONT("굴림체", 9, NORMAL)  COLOR(16, 130)  CUR(0)      TABORDER(4)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  RADIO1(185, 4, 267, 24)  '100종목보기'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(GROUP0)    FONT("굴림체", 9, NORMAL)  COLOR(16, 130)  CUR(0)      TABORDER(5)  ENABLE  &
+  VISIBLE  CHECKED  TRANSPARENT  HINTTYPE(IH_NONE)
+GROUP  GROUP0(110, 490, 190, 508)  'Group'        COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+COMBO  COMBO0(113, 377, 176, 397)  TP_SUNKEN  LEN(1)  COUNT(2)  VCOUNT(2)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_NUM|EDIT_INPUT|FA_SKIP  FONT("굴림체", 9, NORMAL)    COLOR(192, 69)  CUR(0)  DISPLAY("일반", "확장")  DATA("0", "1")    TABORDER(6)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  sent_btn(145, 4, 177, 24)  '조회'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, BOLD)  COLOR(208, 186)  CUR(0)    "조회BTN.BMP"    TABORDER(7)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+BUTTON  e2(116, 415, 148, 435)  '예상'  TP_RADIO|RD_PUSH|EDIT_NOP      GROUP(GROUP1)"2BTN.bmp"      FONT("굴림체", 9, NORMAL)  COLOR(208, 232)  CUR(0)      TABORDER(8)  ENABLE  &
+  CHECKED  HINTTYPE(IH_NONE)
+BUTTON  e1(116, 415, 148, 435)  '예상'  TP_RADIO|RD_PUSH|EDIT_NOP      GROUP(GROUP1)"2BTN.bmp"      FONT("굴림체", 9, NORMAL)  COLOR(208, 232)  CUR(0)      TABORDER(9)  ENABLE  &
+  HINTTYPE(IH_NONE)
+GROUP  GROUP1(180, 417, 225, 432)  'Group'        COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  expect(780, 95, 820, 115)  '예상'  TP_CHECK|EDIT_NOP        FONT("굴림체", 9, NORMAL)  COLOR(208, 130)  CUR(0)      TABORDER(10)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_STRING)  HELPTEXT("예상체결가")HELPTEXT("예상체결가")
+BUTTON  BUTTON5(435, 4, 455, 24)  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, NORMAL)  COLOR(181, 186)  CUR(0)    "GTI_MATRIX2.BMP"    TABORDER(11)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_STRING)  HELPTEXT("복수현재가2 종목연동")HELPTEXT("복수현재가2 종목연동")
+COMBO  arrange(670, 5, 740, 25)  TP_SUNKEN  LEN(2)  COUNT(4)  VCOUNT(4)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_NUM|EDIT_INPUT|FA_SKIP  FONT("굴림체", 9, NORMAL)    COLOR(192, 130)  CUR(0)  DISPLAY("등록순", "업종순", "종목명순", "종목코드순")  DATA("00", "01", "02", "03")    TABORDER(12)  IOORDER(3)  ENABLE  &
+  HINTTYPE(IH_NONE)
+CONTROL  CONTROL0(0, 30, 618, 221)  |FA_PROTECT|FA_FLASH  "CX_INTEREST"  "/fWIDE:0002:00;2024;2033;2027;:55,54,57,46,61,0:00;2024;2033;2027;2204;2029;2030;2031;:85,80,68,55,68,55,59,55,57,0"  LEN(0)  EDIT_INOUT    COLOR(192, 130)  TABORDER(16)  IOORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON2(494, 4, 530, 24)  '저장'  TP_PUSH|IMAGETEXT|AL_STRETCH        FOCUS  COLOR(208, 186)  CUR(0)    "2BTN.BMP"    TABORDER(13)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+BUTTON  BUTTON3(531, 4, 579, 24)  '투자자'  TP_PUSH|IMAGETEXT|AL_STRETCH        FOCUS  COLOR(208, 186)  CUR(0)    "3BTN.BMP"    TABORDER(14)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+BUTTON  BUTTON4(580, 4, 616, 24)  '차트'  TP_PUSH|IMAGETEXT|AL_STRETCH        FOCUS  COLOR(208, 186)  CUR(0)    "3BTN.BMP"    TABORDER(15)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+EDIT  trData(770, 300, 1005, 325)  LEN(4000)  IO_MIXED|EDIT_INOUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(17)  IOORDER(5)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  CfgFile(775, 250, 1010, 275)  LEN(200)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(18)  IOORDER(6)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  DataLen(835, 365, 865, 385)  LEN(1000)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(19)  IOORDER(7)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  BookFile(770, 190, 1005, 215)  LEN(200)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(20)  IOORDER(8)  ENABLE  &
+  HINTTYPE(IH_NONE)
+CONTROL  AN1A(770, 145, 910, 165)    "CX_Account"  "/w0"  LEN(11)  EDIT_INPUT    COLOR(68, 130)  TABORDER(21)  IOORDER(9)  ENABLE  &
+  HINTTYPE(IH_NONE)
+CONTROL  CONTROL1(635, 545, 955, 761)  |FA_PROTECT|FA_FLASH  "CX_INTEREST"  "/fSMALL:0002:00;2024;2033;2027;:55,54,57,46,61,0:00;2024;2033;2027;2204;2029;2030;2031;:85,80,68,55,68,55,59,55,57,0"  LEN(0)  EDIT_NOP    COLOR(192, 130)  TABORDER(0)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  auto(827, 95, 867, 115)  '자동'  TP_CHECK|EDIT_NOP        FONT("굴림체", 9, NORMAL)  COLOR(208, 130)  CUR(0)      TABORDER(22)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_STRING)  HELPTEXT("동시호가 시간대에 자동으로 예상체결가로 전환됩니다")HELPTEXT("동시호가 시간대에 자동으로 예상체결가로 전환됩니다")
+CONTROL  DX_INTEREST(940, 140, 1040, 170)  |FA_PROTECT  "CX_PORTFOLIO"  ""  LEN(0)  EDIT_NOP    COLOR(192, 232)  TABORDER(0)  ENABLE  &
+  HINTTYPE(IH_NONE)
+CONTROL  cxMarket(400, 3, 420, 23)  |FA_SKIP  "CX_MarketPicker"  "/k2/t/u1/d1"  LEN(12)  EDIT_NOP    COLOR(192, 232)  TABORDER(0)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+COMBO  COMBO1(337, 3, 398, 23)  TP_SUNKEN  LEN(1)  COUNT(3)  VCOUNT(3)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_NUM|EDIT_INPUT|FA_SKIP  FONT("굴림체", 9, NORMAL)    COLOR(192, 130)  CUR(0)  DISPLAY("자동", "예상", "정규장")  DATA("0", "1", "2")    TABORDER(23)  IOORDER(10)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Dim bNowPrice
+
+Sub FileCopy(srcFile)
+	Dim fso,MyFile
+
+	Set fso = CreateObject("Scripting.FileSystemObject")
+
+	If fso.FileExists(srcFile & ".org") Then
+		Set MyFile = fso.GetFile(srcFile& ".org")
+		MyFile.Copy (srcFile)
+	End If
+End Sub
+
+Sub FileDelete(srcFile)
+	Dim fso,MyFile
+
+	Set fso = CreateObject("Scripting.FileSystemObject")
+
+	If fso.FileExists(srcFile & ".org") Then
+		Set MyFile = fso.GetFile(srcFile & ".org")
+		MyFile.Delete
+	End If
+End Sub
+
+Sub OnPortfolio(confirm)
+	If intercombo.Index = 0 Then
+		CONTROL0.SetAccount SCREEN.Object("main.OBJ_order.AN1A").Data
+		CONTROL0.SetPass SCREEN.Object("main.OBJ_order.ed_pswd").Data
+	End If
+	SCREEN.SetTimerx 1, 1, False
+End Sub
+
+Sub OnPort(confirm)
+	Dim groupNames, parseData, Items, codelist, row, countGroup
+
+	If UCase(confirm) <> "OK" And UCase(confirm) <> "START" Then
+		Exit Sub
+	End If
+
+	If intercombo.Index = 0 Then
+		CONTROL0.SetAccount SCREEN.Object("main.OBJ_order.AN1A").Data
+		CONTROL0.SetPass SCREEN.Object("main.OBJ_order.ed_pswd").Data
+	End If
+
+	Items = ""
+	DX_INTEREST.SetUserName(LOGIN.Name)
+	groupNames = DX_INTEREST.LoadGroupNames()
+
+	countGroup = 0
+	Do While Len(groupNames) > 0
+
+		parseData = Mid(groupNames, 1, InStr(groupNames, vbTab) -1)
+		groupNames = Mid(groupNames, InStr(groupNames, vbTab) + 1)
+		Items = parseData & vbTab & Items
+		countGroup = countGroup + 1
+	Loop
+
+	'계좌 보유종목 조회
+	If countGroup < 100 Then
+		Items = "00 보유종목" & vbTab & Items
+	End If
+
+	If Items = "" Then
+		intercombo.SetItems("")
+	Else
+		intercombo.SetItems(vbTab & Items)
+	End If
+
+	Call p_read_com()
+'	intercombo.Data = SYSTEM.Pop("cxPortfolioItem")
+	SCREEN.Proc "OBJ1.OnGroup", intercombo.Data
+
+
+    'Call p_write_com()
+	'축소화면도 같이 업데이트
+	'SCREEN.Proc "main.obj_reduce1.OnPortfolio", confirm
+
+	CONTROL0.SetGroup intercombo.Data - 1
+	CONTROL0.OnPortfolio confirm
+
+	If UCase(confirm) <> "START" Then
+		CONTROL0.ChangeGroup intercombo.Data
+	End If
+End Sub
+
+Sub SyncComboBox()
+	If SCREEN.Object("main.tab_tuja").ID <> 0 Then
+		Exit Sub
+	End If
+
+	If intercombo.Data = SCREEN.Object("main.OBJ_Interest.intercombo").Data Then
+		SCREEN.Object("main.OBJ_Interest.CONTROL0").ChangeGroup intercombo.Data
+	End If
+End Sub
+
+
+Sub p_read_com()
+	If SCREEN.CreateObject("Info") Then
+	 	Dim data
+	 	data = Trim(INFO.PopData(LOGIN.Name, "intercfg.ini", "MAIN", "SELECTGROUP_MAP"))
+		If data = "" Then
+			intercombo.Data = "01"
+		Else
+			intercombo.Data = data
+		End If
+
+'		data = Trim(INFO.PopData(LOGIN.Name, "intercfg.ini", "MAIN", "SELECT_ARRANGE"))
+'		If data = "" Then
+'			arrange.Data = "00"
+'		Else
+'			arrange.Data = data
+'		End If
+		arrange.Data = "00"
+	End If
+End Sub
+
+Sub OptionLoad()
+	Dim data
+
+	data = Trim(INFO.PopData(LOGIN.Name, "intercfg.ini", "MAIN", "INTERAUTO"))
+
+	If data = "" Then
+		data = 1
+	End If
+
+	If data = 1 Then
+		auto.Checked = True
+	Else
+		auto.Checked = False
+
+		data = Trim(INFO.PopData(LOGIN.Name, "intercfg.ini", "MAIN", "INTEREXPECT"))
+
+		If data = "" Then
+			data = 0
+		End If
+
+		If data = 1 Then
+			expect.Checked = True
+		Else
+			expect.Checked = False
+		End If
+	End If
+
+	If auto.Checked = True Then
+		CONTROL0.SetAutoCheck True
+		CONTROL0.SetExpect False
+
+		expect.Enable = False
+		expect.Checked = False
+	Else
+		CONTROL0.SetAutoCheck False
+		CONTROL0.SetExpect False
+
+		expect.Enable = True
+	End If
+
+	If intercombo.Index = 0 Then
+		CONTROL0.SetAccount SCREEN.Object("main.OBJ_order.AN1A").Data
+		CONTROL0.SetPass SCREEN.Object("main.OBJ_order.ed_pswd").Data
+	End If
+
+	If expect.Checked = True Then
+		CONTROL0.SetExpect True
+
+		If RADIO1.Checked = True Then
+			CONTROL0.ChangeGroup intercombo.Data
+		End If
+	Else
+		CONTROL0.SetExpect False
+
+		If RADIO1.Checked = True Then
+			CONTROL0.ChangeGroup intercombo.Data
+		End If
+	End If
+End Sub
+
+Sub p_write_com()
+	Dim data
+
+	If SCREEN.CreateObject("Info") Then
+	  INFO.PushData LOGIN.Name, "intercfg.ini", "MAIN", "SELECTGROUP_MAP", intercombo.Data
+	  INFO.PushData LOGIN.Name, "intercfg.ini", "MAIN", "SELECT_ARRANGE", arrange.Data
+
+	  If auto.Checked = True Then
+	  	data = 1
+	  Else
+	  	data = 0
+	  End If
+
+	  INFO.PushData LOGIN.Name, "intercfg.ini", "MAIN", "INTERAUTO", data
+
+	  If expect.Checked = True Then
+	  	data = 1
+	  Else
+	  	data = 0
+	  End If
+
+	  INFO.PushData LOGIN.Name, "intercfg.ini", "MAIN", "INTEREXPECT", data
+	End If
+End Sub
+
+Sub Settrigger(data)
+'	SYSTEM.Trace("rr :"&data)
+End Sub
+
+Sub RefreshCX(key)
+	If RADIO1.Checked = True Then
+		CONTROL0.RefreshCX key,"1"
+	End If
+End Sub
+
+Sub OnGroup(group)
+	Dim accnt
+
+	accnt = SCREEN.Object("main.OBJ_order.AN1A").Data
+
+	If intercombo.Index = 0 Then
+		CONTROL0.ClearGrid
+
+		CONTROL0.SetAccount accnt
+		CONTROL0.SetPass SCREEN.Object("main.OBJ_order.ed_pswd").Data
+
+		If Trim(intercombo.Data) <> "" Then
+			CONTROL0.ChangeGroup intercombo.Data
+		End If
+	End If
+End Sub
+
+Sub ChangeMarket(sMarket)
+	cxMarket.sMarket = sMarket
+	
+	If UCase(TypeName( SCREEN.Object("main.1301"))) <> "NOTHING" Then
+		cxMarket.sCode = SCREEN.Object("main.1301").Data
+	End If
+
+	CONTROL0.Setmarket sMarket
+	
+'	If cxMarket.IsNXTAble(cxMarket.sCode) = 1 Then
+'		CONTROL0.Setmarket sMarket
+'	Else
+'		If sMarket = "NXT" Then
+'			CONTROL0.Setmarket "통합"
+'		End If
+'	End If
+
+	If Trim(intercombo.Data) <> "" Then
+		If intercombo.Index = 0 Then
+			CONTROL0.SetAccount SCREEN.Object("main.OBJ_order.AN1A").Data
+			CONTROL0.SetPass SCREEN.Object("main.OBJ_order.ed_pswd").Data
+		End If
+
+		CONTROL0.ChangeGroup intercombo.Data
+	End If
+End Sub
+
+_AW_ONINDECLARE_AW_
+#load IB999901
+
+_AW_ONENDSUB_AW_
+_AW_ONSTART_AW_
+cxMarket.MNum = SCREEN.GetMapName(1)
+
+CONTROL0.SetMapHandle SCREEN.Major & SCREEN.Minor
+
+'CONTROL0.SetAutoCheck False
+SCREEN.SetTimer 1, False
+
+_AW_ONENDSUB_AW_
+_AW_ONTIMER_AW_
+OnPort("start")
+
+Call OptionLoad
+
+CONTROL0.SetMarket cxMarket.sMarket
+
+If intercombo.Index = 0 Then
+	CONTROL0.SetAccount SCREEN.Object("main.OBJ_order.AN1A").Data
+	CONTROL0.SetPass SCREEN.Object("main.OBJ_order.ed_pswd").Data
+End If
+
+If SYSTEM.Pop("cxPortfolioType") = "2" Then
+	RADIO1.Checked = True
+
+	CONTROL0.ChangeView 0, intercombo.Data
+Else
+	RADIO0.Checked = True
+
+	CONTROL0.ChangeView 1, intercombo.Data
+End If
+
+'Call OptionLoad
+
+trData.Data = ""
+
+bNowPrice = True
+
+_AW_ONENDSUB_AW_
+_AW_ONTIMERX_AW_
+OnPort("OK")
+
+_AW_ONENDSUB_AW_
+_AW_ONCLOSE_AW_
+Dim msgAns,data
+
+'SYSTEM.Trace "20003A OnClose -> " & CONTROL1.IsWindow
+If Trim(trData.Data) <> "" Then
+	data = trData.Data
+	'MsgBox data
+
+	If data <> "" Then
+		msgAns = MsgBox ("[관심종목]변경 사항을 저장하시겠습니까?",1,"관심종목 저장 확인창")
+
+		If msgAns = 1 Then
+			SCREEN.Service "pidomyst",data,DataLen.Data,&H02
+		Else
+			FileCopy Trim(CfgFile.Data)
+			FileCopy Trim(BookFile.Data)
+			'SCREEN.Object("obj_reduce1.CONTROL1").ChangeGroup SCREEN.Object("obj_reduce1.intercombo").Data
+		End If
+	End If
+End If
+
+FileDelete Trim(CfgFile.Data)
+FileDelete Trim(BookFile.Data)
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(BUTTON0)
+_AW_ONCLICK_AW_
+Dim data, idx
+Dim strType
+
+'idx = Trim(SCREEN.Object("OBJ1.90303").index) + 1
+'data = Trim(SCREEN.Object("OBJ1.90303").GetGridCell(idx, 2))
+'SCREEN.CreateWindow 1, "IB202201 /t/s/p5/d", "appendCODE" & _
+'			vbTab & data & vbLf & "map" & vbTab & "1" & vbLf
+
+If Trim(intercombo.Data) = "" Then
+	idx = 0
+Else
+	If Trim(intercombo.Data) -1 < 0 Then
+		idx = 0
+	Else
+		idx = Trim(intercombo.Data) - 1
+	End If
+End If
+
+data = SCREEN.Object("main.1301").data
+
+If RADIO0.Checked Then
+	strType = "LARGE"
+Else
+	strType = "SMALL"
+End If
+
+SCREEN.CreateWindow 1, "IB202202 /t /p5 /S /d", "selectGROUPNCTRLNOT2000" & vbTab & idx & vbLf & "NO" & vbTab & strType & vbTab & "0002" & vbTab
+
+Call p_write_com()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON1)
+_AW_ONCLICK_AW_
+bNowPrice = Not bNowPrice
+
+If bNowPrice = True Then
+	SCREEN.Proc "OBJ1.OnPredict", "1"
+Else
+	SCREEN.Proc "OBJ1.OnPredict", "0"
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(intercombo)
+_AW_ONCHANGE_AW_
+
+SYSTEM.Push "cxPortfolioItem", intercombo.Data
+
+Dim msgAns
+
+If CONTROL0.CheckSaveStatus Then
+	msgAns = MsgBox ("[관심종목]변경 사항을 저장하시겠습니까?" & vbCrLf,vbOKCancel,"관심종목 저장 확인창")
+
+	If msgAns = vbOK Then
+		CONTROL0.Save
+
+		CONTROL0.DeleteOrgFile
+	Else
+		CONTROL0.Recover
+	End If
+
+	trData.Data = ""
+End If
+
+CONTROL0.ClearGrid
+
+If intercombo.Index = 0 Then
+	CONTROL0.SetAccount SCREEN.Object("main.OBJ_order.AN1A").Data
+	CONTROL0.SetPass SCREEN.Object("main.OBJ_order.ed_pswd").Data
+End If
+
+
+If Trim(intercombo.Data) <> "" Then
+	CONTROL0.ChangeGroup intercombo.Data
+End If
+
+
+
+'종합화면의 관심그룹 모두 같은걸로 보이도록
+'Call SyncComboBox()
+
+Call p_write_com()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(RADIO0)
+_AW_ONCLICK_AW_
+SYSTEM.Push "cxPortfolioType", "1"
+
+'SYSTEM.Trace "RADIO0 : " & SYSTEM.Pop("cxPortfolioType")
+
+CONTROL0.ChangeView 1, intercombo.Data
+
+If intercombo.Index = 0 Then
+
+	If intercombo.Index = 0 Then
+		CONTROL0.SetAccount SCREEN.Object("main.OBJ_order.AN1A").Data
+
+		CONTROL0.SetPass SCREEN.Object("main.OBJ_order.ed_pswd").Data
+	End If
+
+	CONTROL0.ChangeGroup intercombo.Data
+End If
+
+If expect.Checked = True Then
+	expect.Checked = False
+End If
+'종합화면의 관심그룹 모두 같은걸로 보이도록
+'Call SyncComboBox()
+
+Call p_write_com()
+
+'If expect.Checked = True Then
+'	expect.Checked = False
+'End If
+
+'Call OptionLoad
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(RADIO1)
+_AW_ONCLICK_AW_
+SYSTEM.Push "cxPortfolioType", "2"
+'SYSTEM.Trace "RADIO1 : " & SYSTEM.Pop("cxPortfolioType")
+CONTROL0.ChangeView 0, intercombo.Data
+
+If intercombo.Index = 0 Then
+	If intercombo.Index = 0 Then
+		CONTROL0.SetAccount SCREEN.Object("main.OBJ_order.AN1A").Data
+
+		CONTROL0.SetPass SCREEN.Object("main.OBJ_order.ed_pswd").Data
+	End If
+	CONTROL0.ChangeGroup intercombo.Data
+End If
+
+'If expect.Checked = True Then
+'	expect.Checked = False
+'End If
+'종합화면의 관심그룹 모두 같은걸로 보이도록
+'Call SyncComboBox()
+
+Call p_write_com()
+
+Call OptionLoad
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(sent_btn)
+_AW_ONCLICK_AW_
+If SCREEN.CreateObject("DX_INTEREST") = False Then
+	Exit Sub
+End If
+SYSTEM.Push "cxPortfolioItem", intercombo.Data
+'SCREEN.Proc "OBJ1.SetStaticData", ""
+'SCREEN.Proc "OBJ1.OnGroup", intercombo.Data
+
+Dim msgAns
+
+If CONTROL0.CheckSaveStatus Then
+	msgAns = MsgBox ("[관심종목]변경 사항을 저장하시겠습니까?" & vbCrLf,vbOKCancel,"관심종목 저장 확인창")
+
+	If msgAns = vbOK Then
+		CONTROL0.Save
+
+		CONTROL0.DeleteOrgFile
+	Else
+		CONTROL0.Recover
+	End If
+
+	trData.Data = ""
+End If
+
+'CONTROL0.ClearGrid
+
+If intercombo.Index = 0 Then
+	CONTROL0.SetAccount SCREEN.Object("main.OBJ_order.AN1A").Data
+	CONTROL0.SetPass SCREEN.Object("main.OBJ_order.ed_pswd").Data
+End If
+
+CONTROL0.ChangeGroup intercombo.Data
+
+
+'종합화면의 관심그룹 모두 같은걸로 보이도록
+Call SyncComboBox()
+
+Call p_write_com()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(e2)
+_AW_ONCLICK_AW_
+e1.Visible True
+e2.Visible False
+e1.Checked False
+
+SCREEN.Proc "OBJ1.OnPredict", "1"
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(e1)
+_AW_ONCLICK_AW_
+e1.Visible False
+e2.Visible True
+e2.Checked True
+
+SCREEN.Proc "OBJ1.OnPredict", "0"
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(expect)
+_AW_ONCLICK_AW_
+'If expect.Checked = True Then
+'	CONTROL0.SetAutoCheck True
+'Else
+'	CONTROL0.SetAutoCheck False
+'End If
+If intercombo.Index = 0 Then
+	CONTROL0.SetAccount AN1A.Data
+End If
+
+If expect.Checked = True Then
+	CONTROL0.SetExpect True
+
+	If RADIO1.Checked = True Then
+		CONTROL0.ChangeGroup intercombo.Data
+	End If
+Else
+	CONTROL0.SetExpect False
+
+	If RADIO1.Checked = True Then
+		CONTROL0.ChangeGroup intercombo.Data
+	End If
+End If
+
+Call p_write_com
+_AW_ONENDSUB_AW_
+_AW_ONDBLCLK_AW_
+If expect.Checked = True Then
+	SCREEN.Proc "OBJ1.OnPredict", "0"
+Else
+	SCREEN.Proc "OBJ1.OnPredict", "1"
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON5)
+_AW_ONCLICK_AW_
+Dim codelist, ii, code
+
+codelist = ""
+
+
+If InStr(Trim(intercombo.Data), "00") > 0 Then
+'	If RADIO1.Checked = True Then
+'		For ii=1 To 12
+'			code = Trim(SCREEN.Object("OBJ1.90303").GetGridCell(ii, 2))
+'
+'			If code <> "" Then
+'				codelist = codelist & code
+'				codelist = codelist & vbTab
+'			End If
+'		Next
+'
+'		For ii=1 To SCREEN.Object("OBJ1.OBJ1.90303").Rows
+'			code = Trim(SCREEN.Object("OBJ1.OBJ1.90303").GetGridCell(ii, 2))
+'
+'			If code <> "" Then
+'				codelist = codelist & code
+'				codelist = codelist & vbTab
+'			End If
+'		Next
+'	Else
+'		For ii=1 To SCREEN.Object("OBJ1.90303").Rows
+'			code = Trim(SCREEN.Object("OBJ1.90303").GetGridCell(ii, 2))
+'
+'			If code <> "" Then
+'				codelist = codelist & code
+'				codelist = codelist & vbTab
+'			End If
+'		Next
+'	End If
+	codelist = CONTROL0.GetRemainCode()
+End If
+
+SCREEN.CreateWindow 2, "IB900012 /t/s/p5/d", "intergroup" & vbTab & Trim(intercombo.Data) & vbLf & "dmsg" & vbTab & codelist & vbLf
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(arrange)
+_AW_ONCHANGE_AW_
+CONTROL0.ChangeArrange arrange.Data
+
+'종합화면의 관심그룹 모두 같은걸로 보이도록
+Call SyncComboBox()
+
+Call p_write_com()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON2)
+_AW_ONCLICK_AW_
+'Dim data, idx
+'
+'data = CONTROL0.GetCode
+'
+'SCREEN.CreateWindow 1, "IB230100 /t/s/p5", "1301" & vbTab & data
+CONTROL0.Save
+
+trData.Data = ""
+
+Call SyncComboBox
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON3)
+_AW_ONCLICK_AW_
+Dim data, idx
+
+data = CONTROL0.GetCode
+
+SCREEN.CreateWindow 1, "IB202500 /t/s/p5", "1301" & vbTab & data
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON4)
+_AW_ONCLICK_AW_
+Dim data, idx
+
+data = CONTROL0.GetCode
+
+SCREEN.CreateWindow 1, "IB711200 /t/s/p5", "1301" & vbTab & data
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(AN1A)
+_AW_ONCHANGE_AW_
+If intercombo.Index = 0 Then
+
+	CONTROL0.SetAccount AN1A.Data
+
+	CONTROL0.SetPass SCREEN.Object("main.OBJ_order.ed_pswd").Data
+
+	CONTROL0.ClearGrid
+
+	If Trim(intercombo.Data) <> "" Then
+		CONTROL0.ChangeGroup intercombo.Data
+	End If
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(auto)
+_AW_ONCLICK_AW_
+If auto.Checked = True Then
+	CONTROL0.SetAutoCheck True
+	CONTROL0.SetExpect False
+
+	expect.Enable = False
+	expect.Checked = False
+Else
+	CONTROL0.SetAutoCheck False
+	CONTROL0.SetExpect False
+
+	expect.Enable = True
+End If
+
+Call p_write_com
+_AW_ONENDSUB_AW_
+_AW_ONDBLCLK_AW_
+If expect.Checked = True Then
+	SCREEN.Proc "OBJ1.OnPredict", "0"
+Else
+	SCREEN.Proc "OBJ1.OnPredict", "1"
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(cxMarket)
+_AW_ONCLICK_AW_
+SCREEN.Proc "main.Change_MKGubn_Main", cxMarket.sMarket
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(COMBO1)
+_AW_ONCHANGE_AW_
+SYSTEM.Trace "combo data = " &  COMBO1.Data
+
+If COMBO1.Data = "0" Then '자동
+
+	expect.Enable = False
+	expect.Checked = False
+
+	CONTROL0.SetAutoCheck True
+	CONTROL0.SetExpect False
+
+	If RADIO1.Checked = True Then
+		CONTROL0.ChangeGroup intercombo.Data
+	End If
+
+ElseIf COMBO1.Data = "1" Then  '예상
+
+	CONTROL0.SetExpect True
+	CONTROL0.SetAutoCheck False
+
+	If RADIO1.Checked = True Then
+		CONTROL0.ChangeGroup intercombo.Data
+	End If
+
+ElseIf COMBO1.Data = "2" Then '정규장
+
+	CONTROL0.SetExpect False
+	CONTROL0.SetAutoCheck False
+
+	If RADIO1.Checked = True Then
+		CONTROL0.ChangeGroup intercombo.Data
+	End If
+
+End If
+
+Call p_write_com
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

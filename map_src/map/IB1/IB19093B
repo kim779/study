@@ -1,0 +1,256 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB19093B)
+MAPSIZE(149, 604)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("주식 시간대별시세")
+MAPPUBLIC(";")
+FONT("굴림", 9, NORMAL)
+OPTIONS(FMS)
+TITLE("[19093B] 시간대별 시세(분)")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pooppoop")
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+GRID  11310(0, 0, 604, 148)  VISIBLEROW(10)  CELLH(19)  MATRIX(9999, 8)  FIX(1)  MAINCOLOR(7, 0)  LINECOLOR(75)  FOCUSCOLOR(78)  FOCUSKIND(4)    FONT("굴림체", 9, NORMAL)  VARIANT("$?")  ROWC(68, 77)  |FLEXIBLE|VSCROLL|INS_TOP|NO3D|RROW|XHLINE|PAGE|HEADER|GRFTEXT    &
+	COLINFO("11034")  LEN(6)  WIDTH(57)  HEAD("시간")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  COLHELPTEXT("클릭하시면 시간 구간별 검색이 가능합니다.")  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  EDITFORMAT("99:99:99")    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("2023")  LEN(8)  WIDTH(67)  HEAD("현재가")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_CORGB|SA_COSUP    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(94, 95)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("2024")  LEN(8)  WIDTH(67)  HEAD("전일대비")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_CORGB|FA_CONTRAST|SA_CORAW|SA_TEXT    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(94, 95)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("2033")  LEN(8)  WIDTH(62)  HEAD("등락률")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSIGN    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(94, 95)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("2032")  LEN(8)  WIDTH(67)  HEAD("체결량")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSUP    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(69, 69)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("2020")  LEN(8)  WIDTH(97)  HEAD("매도체결")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSIGN    COLOR(68, 95)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(94, 95)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("2019")  LEN(8)  WIDTH(97)  HEAD("매수체결")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSUP    COLOR(68, 94)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(94, 95)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("2027")  LEN(12)  WIDTH(74)  HEAD("거래량")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    TABORDER(1)  IOORDER(7)  ENABLE  &
+  VISIBLE
+
+EDIT  1301(18, 404, 89, 424)  LEN(6)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_HAN    COLOR(28, 232)  CUR(0)  TP_NONE          TABORDER(2)  IOORDER(1)  &
+  HINTTYPE(IH_NONE)
+EDIT  11306(18, 446, 121, 464)  LEN(2)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(3)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  11309(18, 465, 127, 485)  LEN(8)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(4)  IOORDER(3)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  1021(18, 425, 92, 443)  LEN(12)  IO_NUM|AL_CENTER||FA_SKIP|FA_FLASH    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(6)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  obj_real(0, 184, 607, 396)    "IB19093C"  TABORDER(5)  IOORDER(8)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  11307(72, 493, 112, 513)  LEN(4)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_SUNKEN          EDITFORMAT("99:99")  TABORDER(6)  IOORDER(4)  &
+  HINTTYPE(IH_NONE)
+EDIT  11304(20, 493, 60, 513)  LEN(4)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_SUNKEN          EDITFORMAT("99:99")  TABORDER(7)  IOORDER(5)  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+
+Dim g_ArrInput, Giho, min, cvol, mdvl, msvl
+
+'시간 혹은 일자
+g_ArrInput = Array("", "")
+'TimeType, GridLastDate or GridLastTime
+'-----------------------------------------------------------------------
+Function Null_check(Data)
+	If Trim(data) = "" Then
+		Null_check = 0
+		Exit Function
+	End If
+	Null_check  = CLng(Data)
+End Function
+'-----------------------------------------------------------------------
+Function SetPrcSign(Diff, Data)
+	Giho = Mid(LTrim(Diff), 1, 1)
+	If Giho = "1" Or Giho = "2" Then
+		SetPrcSign = "+" & LTrim(Data)
+	ElseIf Giho = "4" Or Giho = "5" Then
+		SetPrcSign = "-" & LTrim(Data)
+	Else
+		SetPrcSign = Data
+	End If
+End Function
+'-----------------------------------------------------------------------
+Function SetSign(Data)
+	SetSign = Data
+	If Data > 0 Then
+		SetSign = "+" & Data
+	End If
+End Function
+'-----------------------------------------------------------------------
+Function SetTimeElement(Element)
+	If Len(Element) = 1 Then
+		Element = "0" & Element
+	End If
+	SetTimeElement = Element
+End Function
+'-----------------------------------------------------------------------
+Function GetTime(SrcTime, MinGap)
+	SrcTime = SrcTime - SrcTime Mod MinGap + MinGap
+	If Len(SrcTime) = 5 Then
+		SrcTime = "0" & SrcTime
+	End If
+
+	AHour = Mid(SrcTime, 1, 2)
+	AMin = CLng(Mid(SrcTime, 3, 2))
+	AMin = AMin - AMin Mod MinGap
+
+	ADate = TimeSerial(AHour, AMin + MinGap, ASec)
+
+	AHour = SetTimeElement(Hour(ADate))
+	AMin = SetTimeElement(Minute(ADate))
+	ASec = SetTimeElement(Second(ADate))
+
+
+	GetTime = AHour & AMin & ASec
+End Function
+'-----------------------------------------------------------------------
+'Sub ProcSendData(StdCode, TimeType, ADate)
+'	ed_StdCode.Data = StdCode
+'	ed_TimeType.Data = TimeType
+'
+'	g_ArrInput(0) = TimeType
+'	Date.Data = ADate
+'
+'	If TimeType = "0000" Then
+'		GRID0.SetColumnVisible 1, False
+'		GRID0.SetColumnVisible 2, True
+'	Else
+'		GRID0.SetColumnVisible 1, True
+'		GRID0.SetColumnVisible 2, False
+'	End If
+'	GRID0.Clear
+'	SCREEN.Send 0
+'End Sub
+'-----------------------------------------------------------------------
+Sub ProcSetData(Data)
+	min = CLng(SCREEN.Object("parent.cb_Freq").data) * 60
+
+	ArrData = Split(Data, "|")
+
+	ADateTime = GetTime(ArrData(0), min / 60)
+
+	If ADateTime <> Trim(S11310.GetGridCell(1, 1)) Then
+		S11310.InsertRow 0
+	End If
+
+	cvol = Null_check(S11310.getgridcell(1, 5))
+	mdvl = Null_check(S11310.getgridcell(1, 6))
+	msvl = Null_check(S11310.getgridcell(1, 7))
+
+	S11310.SetGridCell 1, 1, ADateTime
+	S11310.SetGridCell 1, 2, ArrData(1)
+	S11310.SetGridCell 1, 3, ArrData(2)
+	S11310.SetGridCell 1, 4, ArrData(3)
+	S11310.SetGridCell 1, 5, Null_check(ArrData(4)) + cvol
+ 	S11310.SetGridCell 1, 6, Null_check(ArrData(6)) + mdvl
+	S11310.SetGridCell 1, 7, Null_check(ArrData(7)) + msvl
+	S11310.SetGridCell 1, 8, ArrData(5)
+
+	g_ArrInput(1) = ADateTime
+End Sub
+'-----------------------------------------------------------------------
+
+_AW_ONSEND_AW_
+S1301.Data = SCREEN.Object("main.1301").data
+S11306.Data = SCREEN.Object("parent.11306").data
+S11309.data = SCREEN.Object("parent.11309").data
+If SCREEN.Object("parent.range").Checked = True Then
+	S11304.Data = SCREEN.Object("parent.stime").data
+	S11307.data = SCREEN.Object("parent.etime").data
+Else
+	S11304.Clear
+	S11307.Clear
+End If
+
+If Trim(S1301.Data) = "" Then
+	SCREEN.OnSend = False
+	Exit Sub
+End If
+
+obj_real.send
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+'Dim tm
+'tm = CLng(SCREEN.Object("main.11306").data)
+'tm = tm * 600
+'
+'If SCREEN.Object("main.is_real").checked = True Then
+'	SCREEN.SetTimer tm, False
+'End If
+
+	If Trim(S11310.getgridcell (1, 1)) <> "" Then
+		SCREEN.Object("parent.etime").data = S11310.getgridcell (1, 1)
+	Else
+		SCREEN.Object("parent.etime").data = "1530"
+	End If
+
+
+If S11310.Rows > 0 Then
+	g_ArrInput(1) = S11310.GetGridCell(1, 1)
+	obj_real.Proc "SetAccVol", S11310.GetGridCell(1, 8)
+End If
+
+_AW_ONENDSUB_AW_
+_AW_ONTIMER_AW_
+'SCREEN.Send 0
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(11310)
+_AW_ONCLICK_AW_
+'Dim dmsg
+'
+'If S11310.HitPos = 4 Then
+'	If S11310.Column = 1 Then
+'		dmsg = "etim" & vbTab & Trim(S11310.GetGridCell(1, 1)) & vbLf
+'		SCREEN.CreateWindow 2, "IB2007AA /p5 /d", dmsg
+'		S11304.Data = Trim(SYSTEM.Pop("2007AA_stim"))
+'		S11307.Data = Trim(SYSTEM.Pop("2007AA_etim"))
+'		If Trim(SYSTEM.Pop("2007AA_real")) = "NO" Then
+'			SCREEN.Object("main.is_real").checked = False
+'		Else
+'			SCREEN.Object("main.is_real").checked = True
+'		End If
+'		SCREEN.Send 0
+'	End If
+'End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(11307)
+_AW_ONCHANGE_AW_
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(11304)
+_AW_ONCHANGE_AW_
+If Trim(S11307.data) <> "" Then
+	If CLng(S11304.data) > CLng(S11307.data) Then
+		MsgBox "조회시작 시간이 끝시간보다 더 늦은 시간 입니다.", 0, "IBK 투자증권"
+		Exit Sub
+	End If
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

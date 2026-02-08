@@ -1,0 +1,441 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB920003)
+MAPSIZE(436, 619)
+VERSION(000)
+MAPKIND(PROCEDURES)
+MAPGROUP(1)
+MAPDESC("함수-servicecall관�")
+MAPPUBLIC(";")
+FONT("굴림", 9, NORMAL)
+TITLE("Procedures")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Option Explicit
+
+Public ci_svc_no    'service_call 호출시 서비스 고유 번호
+
+'**********************************************************************
+' 기능     : SCREEN.service 에서 사용할 공통헤더 생성
+' 파라메터 : as_job_cd     : 작업구분(1 조회, 2 입력, 3 수정, 4 삭제)
+'            as_svc_name   : 턱시도 서비스명
+'            as_tr_cont_yn : 연속거래구분
+'            as_last_key   : 연속거래키
+' 리턴값   : cp_make_head
+' 개발자   : 김동겸	04/09/08
+' 수정자1  :
+'**********************************************************************
+Public Function cp_make_head(as_job_cd, as_svc_name, as_tr_cont_yn, as_last_key, as_svc_no)
+	' 대투증권 원장헤더 / 하나증권 원장헤더
+	If (SYSTEM.SystemID = "D") Then
+		cp_make_head = cp_make_DThead(as_job_cd, as_svc_name, as_tr_cont_yn, as_last_key, as_svc_no)
+	Else
+		cp_make_head = cp_make_HNhead(as_job_cd, as_svc_name, as_tr_cont_yn, as_last_key, as_svc_no)
+	End If
+End Function
+
+Public Function cp_make_DThead(as_job_cd, as_svc_name, as_tr_cont_yn, as_last_key, as_svc_no)
+' 공통헤더 구조 (CArray)
+	Dim ls_ret
+	Dim ls_term_id, ls_ip_no, ls_tr_code, ls_pgmid, ls_id_no, ls_reg_no, ls_dept_cd, Is_src_svr
+	Dim ls_nextkey, ls_trcontyn, as_mgr_appr_tp, as_mgr_appr_seqno, as_mgr_appr_empno
+
+'   char tr_code                 [  4];      /* TR CODE                       */
+'   char svc_name                [ 10];      /* tuxedo service 명             */
+'   char src_svr                 [  2];      /* Channel Server                */
+'   char pgm_id                  [  8];      /* 프로그램ID                    */
+'   char id_no                   [ 12];      /* 사번                          */
+'   char reg_no                  [ 13];      /* 사용자 주민등록번호           */
+'   char emp_grp                 [  2];      /* 사용자그룹                    */
+'   char open_dept               [  3];      /* 소속점                        */
+'   char dept_cd                 [  3];      /* 부서(처리점=대행점)           */
+'   char term_id                 [  8];      /* 단말기번호                    */
+'   char ip_no                   [ 15];      /* IP                            */
+'   /*------------------------------------------------------------------------*/
+'   char mdr_cd                  [  1];      /* 입력매체 구분                 */
+'                                            /* 0:수기 1:카드                 */
+'                                            /* 2:통장 3:구통장               */
+'   char job_cd                  [  1];      /* 작업구분                      */
+'                                            /* 1:Query  2:Insert             */
+'                                            /* 3:Update 4:Delete             */
+'   char max_row                 [  3];      /* GRID  MAX ROW                 */
+'   char book_seq                [ 10];      /* 통장번호                      */
+'   char card_seq                [  8];      /* 카드일련번호                  */
+'   char rpt_tool_use_cd         [  1];      /* 레포팅툴 사용구분             */
+'                                            /* 0:TR 1:tool use               */
+'   char mgr_appr_tp             [  1];      /* 책임자승인 구분               */
+'                                            /* 0:방생전   1:대상 및 요청     */
+'                                            /* 2:승인     3:취소             */
+'   char mgr_appr_empno          [  5];      /* 승인책임자 사번               */
+'   char mgr_appr_term_id        [  8];      /* 책임자승인단말번호            */
+'   char mgr_appr_seqno          [  5];      /* 책임자승인 번호               */
+'   char mgr_appr_cnt            [  1];      /* 책임자승인건수                */
+'   char mgr_job_cd              [  1];      /* 책임자 업무구분               */
+'   char mgr_card_cd             [  1];      /* 책임자카드구분                */
+'                                            /* 1:지점장 3:책임자             */
+'   /*------------------------------------------------------------------------*/
+'   char tr_fnkey                [  1];      /* 처리기능 구분 (사용자지정)    */
+'   char tr_err_code             [  6];      /* 에러코드                      */
+'   char tr_err_cd               [  1];      /* 에러구분                      */
+'                                            /* 0:상태바,1:메세지박스,2:정상  */
+'   char tr_err_msg              [130];      /* 에러메시지                    */
+'   char tr_cont_yn              [  1];      /* 연속거래구분                  */
+'                                            /* 0:정상 1:연속거래             */
+'   char tr_cnt                  [  4];      /* 처리건수                      */
+'   char lst_key                 [  6];      /* Last Key                      */
+'   char next_key                [ 50];      /* Next key value                */
+'   char svc_no                  [  4];      /* service no                    */
+'   char filler                  [ 71];      /* filler                        */
+
+	ls_term_id   = Trim(LOGIN.Term)
+	ls_ip_no     = Trim(SYSTEM.Host)
+   ls_tr_code   = Mid(as_svc_name, 3, 4)
+   ls_pgmid     = Mid(as_svc_name, 1, 8)
+   ls_id_no     = SYSTEM.UserID
+   ls_reg_no    = Trim(LOGIN.RegNo)
+   ls_dept_cd   = LEDGER.DeptCd
+	If (SYSTEM.ConnectBy = 0) Then	'고객
+		Is_src_svr = "H2"
+	Else
+		Is_src_svr = "H1"
+	End If
+
+	as_mgr_appr_tp    	= LEDGER.MgrApprTp
+	as_mgr_appr_empno 	= LEDGER.MgrApprEmpno
+	as_mgr_appr_seqno 	= LEDGER.MgrApprSeqno
+
+   ls_nextkey  = LEDGER.NextKey
+   ls_trcontyn  = LEDGER.TrContYn
+   as_last_key   = LEDGER.LstKey
+  '  ls_dept_cd   = Trim(LOGIN.PostCode)
+
+
+	'수기입력인 경우 통장번호와 카드번호를 초기화한다.
+	If LEDGER.MdrCd = "0" Then
+		LEDGER.BookSeq = Space(10)
+		LEDGER.CardSeq = Space(8)
+	End If
+	cp_make_DThead = ls_tr_code                   & _
+	               cp_rpad(as_svc_name,10 ," ") & _
+	               Is_src_svr                   & _
+	               cp_rpad(ls_pgmid, 8, " ")    & _
+	               cp_rpad(ls_id_no, 12," ")       & _
+	               cp_rpad(ls_Reg_no,13," ")       & _
+	               cp_rpad(LEDGER.EmpGrp,2," ")    & _
+	               cp_rpad(LEDGER.OpenDept,3," ")  & _
+	               cp_rpad(ls_dept_cd,3," ")    & _
+	               cp_rpad(ls_term_id,8," ")    & _
+	               cp_rpad(ls_ip_no, 15," ")    & _
+	               cp_rpad(LEDGER.MdrCd,1," ")  & _
+	               as_job_cd                    & _
+	               Space(3)                     & _
+	               cp_rpad(LEDGER.BookSeq,10," ")    & _
+	               cp_rpad(LEDGER.CardSeq,8," ")    & _
+	               Space(1)                     & _
+'                 added by ricky
+						cp_rpad(as_mgr_appr_tp, 1, " ") & _
+						cp_rpad(as_mgr_appr_empno, 5, " ") & _
+	               Space(8)                     & _
+' 						added by ricky
+						cp_rpad(as_mgr_appr_seqno, 5, " ") & _
+	               Space(1)                     & _
+	               Space(1)                     & _
+	               Space(1)                     & _
+						LEDGER.TrFnkey                & _
+'	               Space(1)                     & _
+	               Space(6)                     & _
+	               Space(1)                     & _
+	               Space(130)                    & _
+	               ls_trcontyn                  & _
+	               Space(4)                     & _
+	               cp_lpad(as_last_key, 6, "0") & _
+	               cp_rpad(ls_nextkey, 50, " ") & _
+	               cp_lpad(as_svc_no  , 4, "0") & _
+                  Space(71)
+
+End Function
+
+Public Function cp_make_HNhead(as_job_cd, as_svc_name, as_tr_cont_yn, as_last_key, as_svc_no)
+' 공통헤더 구조 (CArray)
+	Dim ls_ret
+	Dim ls_term_id, ls_ip_no, ls_tr_code, ls_pgmid, ls_id_no, ls_reg_no, ls_dept_cd, Is_src_svr
+	Dim ls_nextkey, ls_trcontyn, as_mgr_appr_tp, as_mgr_appr_seqno, as_mgr_appr_empno
+'		char	trxc		[  8];		/* Transaction code				8	*/
+'		char	gubn		[  1];		/* 작업구분							9	*/
+'		char	recn		[  6];		/* 처리요청건수					15	*/
+'		char	ecod		[  6];		/* 에러코드(0:정상)				21	*/
+'		char	egub		[  1];		/* 에러구분							22	*/
+'											/* 0:정상 1:상태바 2:메세지BOX	*/
+'		char	Next		[  1];		/* 연속구분(0: 정상, 1: 연속)	23	*/
+'		char	emsg		[130];		/* 에러메세지						153*/
+'		char	cont		[ 50];		/* 연속거래 key					203*/
+'		char	usid		[ 12];		/* user-id Or 사번				215*/
+'		char	cogb		[  2];		/* 매체구분							217*/
+'		char	term		[  8];		/* 단말번호							225*/
+'		char	ipad		[ 15];		/* 단말 IP-(Or전화번호)			240*/
+'		char	maca		[ 15];		/*										255*/
+'		char	pkgb		[  1];		/* 공인인증키포함여부(1:포함)256*/
+'		char	rtim		[ 12];		/* 수신시간							268*/
+'		char	stim		[ 12];		/* 송신시간							280*/
+'		char	mapn		[  4];		/* 화면번호							284*/
+'		char	bran		[  3];		/* 소속점							287*/
+'		char  psbr		[  3];		/* 처리점                    290*/
+'		char	svcn		[  4];		/* service Call no				294*/
+'		char	epos		[  3];		/* 에러위치							297*/
+'		char	idev		[  1];		/* 입력매체구분					298*/
+'		char	mgub		[  3];		/* 책임자/승인업무구분			301*/
+'		char	mcgb		[  1];		/* 책임자카드/승인구분			302*/
+'		char	mcno		[  3];		/* 책임자카드일련번호			305*/
+'		char	mtrm		[  8];		/* 책임자/승인단말번호			313*/
+'		char	mcnt		[  1];		/* 책임자승인건수					314*/
+'											/* 이하 대투포멧					*/
+'		char  srvcnm	[ 10];		/* tuxedo service 명         324*/
+'		char  chnsvr	[  2];		/* channel server            326*/
+'		char  jminno	[ 13];		/* 주민등록번호              339*/
+'		char  usrgrp	[  2];		/* 사용자 그룹               341*/
+'		char  imdgbn	[  1];		/* 입력매체 구분             342*/
+'					       			 	/* 0:수기,1:카드,2:통장,3구통장 */
+'		char  grdrow	[  3];		/* Grid Max Row              345*/
+'		char	psbkno	[ 10];		/* 통장번호                  355*/
+'		char	cdseno	[  8];		/* 카드일련번호              363*/
+'		char	rptshp	[  1];		/* 레포팅툴 사용구분         364*/
+'		char 	mgruid	[  5];		/* 승인책임자사번            369*/
+'		char  mgrapn	[  5];		/* 책임자승인번호            374*/
+'		char	mgrjgb	[  1];		/* 책임자업무구분            375*/
+'		char	trfnky	[  1];		/* 처리기능구분(사용자지정)  376*/
+'		char  trrecn	[  4];		/* 처리건수                  380*/
+'		char	lstkey	[  6];		/* row처리 last key          386*/
+'		char	filler	[ 64];		/* FILLER							450*/
+
+	ls_term_id   = Trim(LOGIN.Term)
+	ls_ip_no     = Trim(SYSTEM.Host)
+   ls_tr_code   = Mid(as_svc_name, 3, 4)
+   ls_pgmid     = Mid(as_svc_name, 1, 8)
+   ls_id_no     = SYSTEM.UserID
+   ls_reg_no    = Trim(LOGIN.RegNo)
+   ls_dept_cd   = LEDGER.DeptCd
+	If (SYSTEM.ConnectBy = 0) Then	'고객
+		Is_src_svr = "41"
+	Else
+		Is_src_svr = "11"
+	End If
+
+	as_mgr_appr_tp    	= LEDGER.MgrApprTp
+	as_mgr_appr_empno 	= LEDGER.MgrApprEmpno
+	as_mgr_appr_seqno 	= LEDGER.MgrApprSeqno
+
+   ls_nextkey  = LEDGER.NextKey
+   ls_trcontyn  = LEDGER.TrContYn
+   as_last_key   = LEDGER.LstKey
+  '  ls_dept_cd   = Trim(LOGIN.PostCode)
+
+
+	'수기입력인 경우 통장번호와 카드번호를 초기화한다.
+	If LEDGER.MdrCd = "0" Then
+		LEDGER.BookSeq = Space(10)
+		LEDGER.CardSeq = Space(8)
+	End If
+
+	cp_make_HNhead = 	cp_rpad(as_svc_name, 8, " ")	& _
+							as_job_cd                    & _
+		               "000001"                     & _
+							Space(6)                     & _
+		               Space(1)                     & _
+		               ls_trcontyn                  & _
+		               Space(130)                    & _
+		               cp_rpad(ls_nextkey, 50, " ") & _
+		               cp_rpad(ls_id_no, 12," ")       & _
+		               Is_src_svr                   & _
+		               cp_rpad(ls_term_id,8," ")    & _
+		               cp_rpad(ls_ip_no, 15," ")    & _
+		               Space(15)                    & _
+							"0"									& _
+		               Space(12)                    & _
+		               Space(12)                    & _
+							Space(4)                    & _
+		               cp_rpad(ls_dept_cd,3," ")    & _
+		               cp_rpad(ls_dept_cd,3," ")    & _
+		               cp_lpad(as_svc_no  , 4, "0") & _
+							Space(3)								& _
+		               cp_rpad(LEDGER.MdrCd,1," ")  & _
+							Space(3)								& _
+							Space(1)								& _
+							Space(3)								& _
+							Space(8)								& _
+							Space(1)								& _
+		               cp_rpad(as_svc_name,10 ," ") & _
+		               "11"                         & _
+		               cp_rpad(ls_Reg_no,13," ")       & _
+		               cp_rpad(LEDGER.EmpGrp,2," ")    & _
+		               cp_rpad(LEDGER.MdrCd,1," ")  & _
+		               Space(3)                     & _
+		               cp_rpad(LEDGER.BookSeq,10," ")    & _
+		               cp_rpad(LEDGER.CardSeq,8," ")    & _
+		               Space(1)                     & _
+							cp_rpad(as_mgr_appr_empno, 5, " ") & _
+							cp_rpad(as_mgr_appr_seqno, 5, " ") & _
+		               Space(1)                     & _
+							LEDGER.TrFnkey                & _
+		               Space(4)                     & _
+		               cp_lpad(as_last_key, 6, "0") & _
+		               Space(64)
+
+End Function
+
+'**********************************************************************
+' 기능     : SCREEN.service 호출 함수
+' 파라메터 : as_svc_name   : 턱시도 서비스명
+'            as_job_cd     : 작업구분(1 조회, 2 입력, 3 수정, 4 삭제)
+'            as_input      : 입력데이타
+'            as_last_key   : 연속거래키
+' 리턴값   : cp_make_head
+' 개발자   : 김동겸	04/09/08
+' 수정자1  :
+'**********************************************************************
+
+Public Function cp_service_call(as_svc_name, as_job_cd, as_tr_cont_yn, as_last_key, as_input, byref as_errmsg)
+
+	Dim ll_ret, ls_head, ls_input, ll_pos, ls_bp_protocol
+	Dim TIMEOUT
+
+	ci_svc_no = cp_lpad(cp_nvl(ci_svc_no, 0) + 1, 4, "0") 'service no 부여함.
+
+	ls_bp_protocol = "pibotuxq"
+'	통신Packet Header 구성
+	ls_head = cp_make_head(as_job_cd, as_svc_name, as_tr_cont_yn, as_last_key, ci_svc_no)
+	ls_input = ls_head & as_input
+	SCREEN.CreateObject("DX_CSTRING")
+	DX_CSTRING.Text = ls_input
+
+	If Not SCREEN.service(ls_bp_protocol, ls_input, DX_CSTRING.GetLength(), 0) Then
+		as_errmsg	= "서버와의 통신(Service Call)에 실패했습니다."
+		cp_service_call = -1
+	Else
+		as_ErrMsg = ""
+		cp_service_call = ci_svc_no
+	End If
+End Function
+'**********************************************************************
+' 기능     : SCREEN.service 호출 함수
+' 파라메터 : as_svc_name   : 턱시도 서비스명
+'            as_job_cd     : 작업구분(1 조회, 2 입력, 3 수정, 4 삭제)
+'            as_input      : 입력데이타
+'            as_last_key   : 연속거래키
+' 리턴값   : cp_make_head
+' 개발자   : 김동겸	04/09/08
+' 수정자1  :
+'**********************************************************************
+
+Public Function cp_serviceEx_call(as_svc_name, as_job_cd, as_tr_cont_yn, as_last_key, as_input, byref as_errmsg, as_timeout)
+
+	Dim ll_ret, ls_head, ls_input, ll_pos, ls_bp_protocol, n_len, ls_data
+	Dim TIMEOUT
+
+	ci_svc_no = cp_lpad(cp_nvl(ci_svc_no, 0) + 1, 4, "0") 'service no 부여함.
+
+	ls_bp_protocol = "pibotcal"
+'	통신Packet Header 구성
+	ls_head = cp_make_head(as_job_cd, as_svc_name, as_tr_cont_yn, as_last_key, ci_svc_no)
+	ls_input = ls_head & as_input
+	SCREEN.CreateObject("DX_CSTRING")
+	DX_CSTRING.Text = ls_input
+   ls_data = SCREEN.serviceEX(ls_bp_protocol, ls_input, DX_CSTRING.GetLength(), 0, as_timeout)
+
+	SCREEN.CreateObject("DX_CSTRING")
+	DX_CSTRING.Text = ls_data
+
+	n_len = DX_CSTRING.GetLength()
+	If (SYSTEM.SystemID = "D") Then
+	   cp_serviceEx_call  = DX_CSTRING.Mid(400, n_len - 400)
+	Else
+	   cp_serviceEx_call  = DX_CSTRING.Mid(450, n_len - 450)
+	End If
+End Function
+
+
+'**********************************************************************
+' 기능     : SCREEN.service 호출 함수
+' 파라메터 : as_svc_name   : 턱시도 서비스명
+'            as_job_cd     : 작업구분(1 조회, 2 입력, 3 수정, 4 삭제)
+'            as_input      : 입력데이타
+'            as_last_key   : 연속거래키
+' 리턴값   : cp_make_head
+' 개발자   : 김동겸	04/09/08
+' 수정자1  :
+'**********************************************************************
+Public Function cp_service_data(as_output, byref as_ErrCode, byref as_ErrMsg, byref as_Data, byref as_svc_no)
+	Dim s_err_tp, n_len, ls_data
+
+	SCREEN.CreateObject("DX_CSTRING")
+	ls_data = as_output
+	DX_CSTRING.Text = ls_data
+	n_len = DX_CSTRING.GetLength()
+	If DX_CSTRING.Right(1) = vbLf Then
+		ls_data = DX_CSTRING.Left(n_len - 1)
+		DX_CSTRING.Text = ls_data
+		n_len = 0
+		n_len = DX_CSTRING.GetLength()
+	End If
+
+	If Right(ls_data, 1) = vbTab Then
+		ls_data = DX_CSTRING.Left(n_len - 1)
+		DX_CSTRING.Text = ls_data
+		n_len = 0
+		n_len = DX_CSTRING.GetLength()
+	End If
+
+	If (SYSTEM.SystemID = "D") Then			'// 대투 원장 헤더
+		LEDGER.MgrApprTp 		=	DX_CSTRING.Mid(104, 1)
+		LEDGER.MgrApprEmpno	=	DX_CSTRING.Mid(105, 5)
+		LEDGER.MgrApprSeqno	=	DX_CSTRING.Mid(118, 5)
+
+	   as_errcode = DX_CSTRING.Mid(127, 6)
+	   as_ErrMsg  = DX_CSTRING.Mid(134, 130)
+	   LEDGER.LstKey  = DX_CSTRING.Mid(269, 6)
+
+	   as_svc_no  = DX_CSTRING.Mid(325, 4)
+	   LEDGER.NextKey = DX_CSTRING.Mid(275, 50)
+	   LEDGER.trcontyn = DX_CSTRING.Mid(264, 1)
+		as_Data    = DX_CSTRING.Mid(400, n_len - 400)
+	Else												'// 하나 원장 헤더
+		LEDGER.MgrApprTp 		=	DX_CSTRING.Mid(301, 1)
+		LEDGER.MgrApprEmpno	=	DX_CSTRING.Mid(364, 5)
+		LEDGER.MgrApprSeqno	=	DX_CSTRING.Mid(369, 5)
+
+	   as_errcode = DX_CSTRING.Mid(15, 6)
+	   as_ErrMsg  = DX_CSTRING.Mid(23, 130)
+	   LEDGER.LstKey  = DX_CSTRING.Mid(380, 6)
+
+	   as_svc_no  = DX_CSTRING.Mid(290, 4)
+	   LEDGER.NextKey = DX_CSTRING.Mid(153, 50)
+	   LEDGER.trcontyn = DX_CSTRING.Mid(22, 1)
+		as_Data    = DX_CSTRING.Mid(450, n_len - 450)
+	End If
+
+	cp_service_data = 0
+
+End Function
+
+}
+
+
+

@@ -1,0 +1,316 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(AX000000)
+MAPSIZE(484, 807)
+VERSION(001)
+MAPKIND(NORMAL)
+MAPGROUP(4)
+MAPDESC("관리자 메인")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(XFONT)
+TITLE("AXIS ADMIN")
+TOPATH(AXIS)
+METHOD(SEND)
+TRXCODE("AXISADM")
+MAPTYPE(NORM)
+HEADER(NOP)
+BGROUND(BRUSH, 242)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL2(0, 50, 807, 484)  TP_ETCHED      COLOR(200, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+USRTAB  UT01(3, 1, 806, 25)  FOCUS  INDEX(0)  COUNT(6)  AL_TOP  TAB_3D        COLOR(3, 70)  CUR(0)  FCOLOR(3, 71)  CAPTION("Configuration", "Process", "Securities", "Remote Control", "Users", "Log Message")  TABINFO("1:10", "1:20", "0:30", "1:40", "1:50", "1:60")  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+USRTAB  UT02(3, 26, 806, 48)  FOCUS  INDEX(9)  COUNT(10)  AL_TOP  TAB_3D        COLOR(3, 70)  CUR(0)  FCOLOR(3, 71)  CAPTION("System", "Servers", "Clients", "Host & Naming Rule", "Tab4", "Tab5", "Tab6", "Tab7", "Tab8", "Tab9")  TABINFO("1:1", "1:2", "1:3", "1:4", "0:5", "0:6", "0:7", "0:8", "0:9", "0:9")  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL0(0, 50, 60, 75)  'No'  TP_ETCHED      COLOR(208, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL1(59, 50, 171, 75)  'Name'  TP_ETCHED      COLOR(208, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+TREEVIEW  SERVERS(0, 75, 170, 481)  LEN(3)  IO_ALPHA|FA_ENUM    MULTISEL    COLOR(192, 232)  IOORDER(3)  ENABLE  &
+  VISIBLE  HASLINE  HOVER  HINTTYPE(IH_NONE)
+OBJECT  OBJ01(173, 55, 803, 485)    "AX110101"  TABORDER(3)  IOORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  SVNO(535, 2, 590, 22)  LEN(3)  IO_NUM|EDIT_INOUT|FA_WRAP|FA_NOR|FA_XDELETE    COLOR(204, 232)  CUR(0)  TP_NONE  INIT("000")          TABORDER(2)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  SCRN(606, 3, 661, 23)  LEN(4)  IO_NUM|EDIT_INOUT|FA_WRAP|FA_NOR|FA_XDELETE    COLOR(204, 232)  CUR(0)  TP_NONE  INIT("0000")          TABORDER(1)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  MAPN(676, 3, 731, 18)  '1101'  AL_LEFT  CUR(0)  |FA_XDELETE    COLOR(202, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  MINOR(735, 2, 790, 17)  '0001'  AL_LEFT  CUR(0)  |FA_XDELETE    COLOR(202, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  WHAT(678, 22, 733, 37)  '1'  AL_LEFT  CUR(0)  |FA_XDELETE    COLOR(202, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  MAJOR(739, 23, 794, 38)  '1100'  AL_LEFT  CUR(0)  |FA_XDELETE    COLOR(202, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BOX  BOX0(0, 73, 170, 482)    COLOR(248, 232)  LINEW(1)  BX_LINE    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONSTART_AW_
+'SCREEN.CreateWindow 2, " /p5",""
+'SCREEN.CreateWindow 2, "SE710200 /p5/S", "1301" &vbTab&S1301.data
+'
+'SCREEN.CreateWindow 2, "AX000001 /t /s /p5",""
+'If (SYSTEM.Pop("AXISPASS")) <> "OK" Then
+'	SCREEN.CloseWindow
+'End If
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(UT01)
+_AW_ONCLICK_AW_
+For ii = 1 To 9
+	UT02.Change ii, False, ""
+Next
+
+Select Case UT01.Id
+Case 10
+	UT02.Change 1, True, "System"
+	UT02.Change 2, True, "Servers"
+	UT02.Change 3, True, "Clients"
+	UT02.Index = 1
+	WHAT.Text = "1"
+	MAJOR.Text = "1100"
+	OBJ01.SetObject "AX110101"
+Case 20
+	UT02.Change 1, True, "Process"
+	UT02.Change 2, True, "Process Group"
+	UT02.Change 3, True, "TP Service"
+	UT02.Change 4, True, "OO Service"
+	UT02.Change 5, True, "Service Status"
+	UT02.Change 6, True, "Traffic Account"
+	UT02.Index = 1
+	WHAT.TEXT = "3"
+	MAJOR.TEXT = "1200"
+	OBJ01.SetObject "AX120101"
+Case 30
+	UT02.Change 1, True, "Items"
+	UT02.Change 2, True, "Screen"
+	UT02.Index = 1
+	WHAT.Text = "1"
+	MAJOR.Text = "1300"
+	OBJ01.SetObject "AX130101"
+Case 40
+	UT02.Change 1, True, "Download"
+	UT02.Change 2, True, "Command"
+	UT02.Change 3, True, "Downloading Status"
+	UT02.Change 4, True, "Alerting Messages"
+	UT02.Change 5, True, "Remote Query"
+	UT02.Index = 1
+	WHAT.Text = "4"
+	MAJOR.Text = "1400"
+	OBJ01.SetObject "AX140101"
+Case 50
+	UT02.Change 1, True, "Listup"
+	UT02.Change 2, True, "Emergency Message"
+	UT02.Index = 1
+	WHAT.Text = "1"
+	MAJOR.Text = "1500"
+	OBJ01.SetObject "AX150101"
+Case 60
+	UT02.Change 1, True, "System Log"
+	UT02.Change 2, True, "Users Log"
+	UT02.Index = 1
+	WHAT.Text = "1"
+	MAJOR.Text = "1600"
+	OBJ01.SetObject "AX160101"
+Case Else
+	Exit Sub
+End Select
+OBJ01.Send
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(UT02)
+_AW_ONCLICK_AW_
+MAPN.TEXT = MAJOR.TEXT
+Select Case UT02.Id
+Case 1
+	MINOR.Text = "001"
+	MAPN.Text = MAPN.Text + 1
+Case 2
+	MINOR.Text = "002"
+	MAPN.Text = MAPN.Text + 2
+Case 3
+	MINOR.Text = "003"
+	MAPN.Text = MAPN.Text + 3
+Case 4
+	MINOR.Text = "004"
+	MAPN.Text = MAPN.Text + 4
+Case 5
+	MINOR.Text = "005"
+	MAPN.Text = MAPN.Text + 5
+Case 6
+	MINOR.Text = "006"
+	MAPN.Text = MAPN.Text + 6
+Case 7
+	MINOR.Text = "007"
+	MAPN.Text = MAPN.Text + 7
+Case 8
+	MINOR.Text = "008"
+	MAPN.Text = MAPN.Text + 8
+Case 9
+	MINOR.Text = "009"
+	MAPN.Text = MAPN.Text + 9
+End Select
+
+Select Case MAPN.Text
+Case "1101"
+	OBJ01.SetObject "AX110101"
+	WHAT.Text = "1"
+Case "1102"
+	OBJ01.SetObject "AX110201"
+	WHAT.Text = "2"
+Case "1103"
+	OBJ01.SetObject "AX110301"
+	WHAT.Text = "3"
+Case "1104"
+	OBJ01.SetObject "AX110401"
+	WHAT.Text = "4"
+Case "1201"
+	OBJ01.SetObject "AX120101"
+	WHAT.Text = "3"
+Case "1202"
+	OBJ01.SetObject "AX120201"
+	WHAT.Text = "3"
+Case "1203"
+	OBJ01.SetObject "AX120301"
+	WHAT.Text = "3"
+Case "1204"
+	OBJ01.SetObject "AX120401"
+	WHAT.Text = "3"
+Case "1205"
+	OBJ01.SetObject "AX120501"
+	WHAT.Text = "1"
+Case "1206"
+	OBJ01.SetObject "AX120601"
+	WHAT.Text = "1"
+Case "1301"
+	OBJ01.SetObject "AX130101"
+Case "1302"
+	OBJ01.SetObject "AX130201"
+Case "1303"
+	OBJ01.SetObject "AX130301"
+Case "1304"
+	OBJ01.SetObject "AX130401"
+Case "1401"
+	OBJ01.SetObject "AX140101"
+	WHAT.Text = "4"
+Case "1402"
+	OBJ01.SetObject "AX140201"
+	WHAT.Text = "4"
+Case "1403"
+	OBJ01.SetObject "AX140301"
+	WHAT.Text = "4"
+Case "1404"
+	OBJ01.SetObject "AX140401"
+	WHAT.Text = "4"
+Case "1405"
+	OBJ01.SetObject "AX140501"
+	WHAT.Text = "2"
+Case "1501"
+	OBJ01.SetObject "AX150101"
+Case "1502"
+	OBJ01.SetObject "AX150201"
+Case "1601"
+	OBJ01.SetObject "AX160101"
+Case "1602"
+	OBJ01.SetObject "AX160201"
+Case Else
+	Exit Sub
+End Select
+OBJ01.Send
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(SERVERS)
+_AW_ONCLICK_AW_
+If SERVERS.Hitpos <> 3 And SERVERS.Hitpos <> 8 Then
+		Exit Sub
+End If
+If SERVERS.Data = "" Then
+	Exit Sub
+End If
+SVNO.Data = SERVERS.Data
+If Left(SVNO.Data, 1) = "G" Then
+	Exit Sub
+End If
+SVNO.Push("SVNO")
+Select Case WHAT.Text
+Case "1"	'000 & Server Number
+	If SVNO.Data = "999" Then
+		MsgBox "대상서버번호를 선택하세요", 0, "확인"
+		Exit Sub
+	End If
+	If SVNO.Data = "000" Then
+         SCREEN.Object("OBJ01.SVNO").data = SVNO.Data
+		OBJ01.Send
+		Exit Sub
+	End If
+	If CInt(SVNO.Data) = 0 Then
+		Exit Sub
+	End If
+   SCREEN.Object("OBJ01.SVNO").data = SVNO.Data
+	OBJ01.Send
+	Exit Sub
+Case "2"	'Only Server Number
+	If SVNO.Data = "999" Then
+		MsgBox "대상서버번호를 선택하세요", 0, "확인"
+		Exit Sub
+	End If
+	If CInt(SVNO.Data) = 0 Then
+		Exit Sub
+	End If
+   SCREEN.Object("OBJ01.SVNO").data = SVNO.Data
+	OBJ01.Send
+	Exit Sub
+Case "3"	'000 & 999 & Server Number
+	If SVNO.Data = "000" Then
+         SCREEN.Object("OBJ01.SVNO").data = SVNO.Data
+		OBJ01.Send
+		Exit Sub
+	End If
+	If CInt(SVNO.Data) = 0 Then
+		Exit Sub
+	End If
+   SCREEN.Object("OBJ01.SVNO").data = SVNO.Data
+	OBJ01.Send
+	Exit Sub
+Case "4"	'999 & Group Number & Server Number
+	If SVNO.Data = "000" Then
+		MsgBox "서버번호를 선택하세요", 0,  "확인"
+		Exit Sub
+	End If
+   SCREEN.Object("OBJ01.SVNO").data = SVNO.Data
+	OBJ01.Send
+	Exit Sub
+Case "5"	'999 & Group Number & Server Number & MyServer
+   SCREEN.Object("OBJ01.SVNO").data = SVNO.Data
+	OBJ01.Send
+	Exit Sub
+Case Else
+	Exit Sub
+End Select
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

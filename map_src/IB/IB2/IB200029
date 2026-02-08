@@ -1,0 +1,98 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB200029)
+MAPSIZE(218, 115)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+TITLE("Untitled")
+TOPATH(AXIS)
+METHOD(SEND)
+TRXCODE("bo200055")
+MAPTYPE(FIXED)
+HEADER(NOP)
+BGROUND(BRUSH, 181)
+}
+
+
+
+FORM DIVISION
+{
+
+GRID  GRID1(0, 0, 109, 218)  VISIBLEROW(0)  CELLH(18)  MATRIX(200, 2)  FIX(0)  MAINCOLOR(7, 232)  LINECOLOR(75)  FOCUSCOLOR(78)  FOCUSKIND(3)  ROWC(68, 77)  |SELALWAYS|FLEXIBLE|VSCROLL|NO3D|RROW|XHLINE|PAGE|KEYFOCUS|GRFTEXT    &
+	COLINFO("Col0")  LEN(4)  WIDTH(60)  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col1")  LEN(50)  WIDTH(93)  HEAD("섹터명")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  COLHELPTEXT("Col0")  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT  |FA_REF    COLOR(68, 69)  COLCUR(0, 0)  REFERENCE(Col0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    TABORDER(1)  IOORDER(2)  ENABLE  &
+  VISIBLE
+
+EDIT  ed_start(287, 353, 317, 388)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(202, 232)  CUR(0)  TP_NONE  INIT("F")          TABORDER(2)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONSTART_AW_
+ed_start.Data = "F"
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+If ed_start.Data <> "F" Then
+	SCREEN.OnSend False
+	Exit Sub
+End If
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+If ed_start.Data = "F" Then
+	GRID1.Index = Trim(SCREEN.Object("main.theme_index").data)
+	GRID1.SetFocus
+
+	If GRID1.Index = 0 Then
+		SCREEN.Object("parent.TMNAM").Data = "[" & Trim(GRID1.GetGridCell(1, 1)) & _
+		 "] "& GRID1.GetGridCell(1, 2)
+		SCREEN.Object("parent.TMCB").Data = GRID1.GetGridCell(1, 1)
+	Else
+		SCREEN.Object("parent.TMNAM").Data = "[" & Trim(GRID1.GetGridCell(GRID1.Index+1, 1)) & _
+		 "] "& GRID1.GetGridCell(GRID1.Index+1, 2)
+		SCREEN.Object("parent.TMCB").Data = GRID1.GetGridCell(GRID1.Index+1, 1)
+	End If
+
+'	SCREEN.Object("parent.TMNAM").Data = "[" & Trim(GRID1.GetGridCell(GRID1.Row, 1)) & _
+'	 "] "& GRID1.GetGridCell(GRID1.Row, 2)
+'	SCREEN.Object("parent.TMCB").Data = GRID1.GetGridCell(GRID1.Row, 1)
+
+'	SCREEN.Proc "parent.OBJ_send", ""
+'	SCREEN.Object("parent.TMNAM").Data = GRID1.GetGridCell(1, 2)
+	ed_start.Data = "N"
+End If
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(GRID1)
+_AW_ONCLICK_AW_
+If GRID1.HitPos = 3 Then
+	'테마 탭이동시 마지막 선택값 보여줄 수 있도록 선택값 저장
+	SCREEN.Object("main.theme_code").data = Trim(GRID1.GetGridCell(GRID1.Row, 1))
+	SCREEN.Object("main.theme_index").data = GRID1.Index
+	SCREEN.Object("main.TMNAM").data = "[" & Trim(GRID1.GetGridCell(GRID1.Row, 1)) & _
+	 "] "& GRID1.GetGridCell(GRID1.Row, 2)
+	SCREEN.Object("parent.TMNAM").Data = "[" & Trim(GRID1.GetGridCell(GRID1.Row, 1)) & _
+	 "] "& GRID1.GetGridCell(GRID1.Row, 2)
+	SCREEN.Object("parent.TMCB").Data = GRID1.GetGridCell(GRID1.Row, 1)
+	SCREEN.Proc "parent.OBJ_send", ""
+
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

@@ -1,0 +1,411 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB871900)
+MAPSIZE(401, 798)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("권리현황")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(ENCODE|CR2TAB|XPRINT)
+TITLE("관리계좌 권리현황")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("piboPBxQ")
+MAPTYPE(NORM)
+HEADER(LEDGER)
+TRXH("11CSRGSQ917")
+}
+
+
+
+FORM DIVISION
+{
+
+EDIT  In(97, 527, 253, 547)  LEN(5)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 69)  CUR(0)  TP_SUNKEN  INIT("00001")          TABORDER(6)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL7(24, 527, 96, 547)  '레코드갯수'  AL_CENTER  CUR(0)      COLOR(141, 192)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL9(255, 525, 327, 545)  'inout'  AL_CENTER  CUR(0)      COLOR(141, 192)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  inout(330, 527, 459, 547)  LEN(50)  IO_MIXED|AL_LEFT|    COLOR(192, 69)  CUR(0)            TABORDER(0)  IOORDER(7)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL0(0, 0, 800, 60)        COLOR(66, 67)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  btn_Send(755, 35, 794, 55)  '조회'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, BOLD)  FOCUS  COLOR(208, 186)  CUR(0)    "조회BTN.bmp"    TABORDER(5)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+PANEL  PANEL1(-2, 60, 800, 381)  LIMAGE(0)  LINEW(4)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  GUIDE_around(-2, 378, 800, 402)  LIMAGE(0)  LINEW(3)  LINETYPE(4)  LINECOLOR(64)      COLOR(34, 232)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL7(8, 383, 22, 397)    |IMAGE|AL_STRETCH    COLOR(34, 232)  CUR(0)    "알림_ic.bmp"  ENABLE  &
+  VISIBLE  IMAGE  HINTTYPE(IH_NONE)
+PANEL  GUIDE(24, 383, 791, 399)        COLOR(34, 130)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL0(10, 10, 58, 30)  '관리사원'  AL_LEFT  CUR(0)      COLOR(66, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  zEmpPwd(210, 10, 315, 30)  LEN(16)  IO_MIXED|EDIT_INPUT|FA_PASSWD|FA_WRAP    COLOR(192, 130)  CUR(0)  TP_SUNKEN          TABORDER(2)  IOORDER(6)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  MgempNo(60, 10, 123, 30)  LEN(9)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_XFLOAT    COLOR(192, 130)  CUR(0)  TP_SUNKEN          TABORDER(1)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL1(135, 10, 207, 30)  '접속비밀번호'  AL_LEFT  CUR(0)      COLOR(66, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL2(553, 10, 603, 31)  '권리일자'  AL_LEFT  CUR(0)      COLOR(66, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  zStrDt(605, 10, 692, 30)  LEN(8)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_DATE    COLOR(192, 130)  CUR(0)  TP_SUNKEN          EDITFORMAT("9999/99/99")  TABORDER(3)  IOORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  zEndDt(707, 10, 794, 30)  LEN(8)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_DATE    COLOR(192, 130)  CUR(0)  TP_SUNKEN          EDITFORMAT("9999/99/99")  TABORDER(4)  IOORDER(5)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL4(696, 10, 702, 30)  '~'  AL_LEFT  CUR(0)      COLOR(208, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  RgptnCode(97, 556, 253, 576)  LEN(2)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 69)  CUR(0)  TP_SUNKEN  INIT("00")          TABORDER(7)  IOORDER(3)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL5(24, 556, 96, 576)  '권리유형코드'  AL_CENTER  CUR(0)      COLOR(141, 192)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL6(260, 556, 332, 576)  'grid'  AL_CENTER  CUR(0)      COLOR(141, 192)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  gridO(335, 558, 464, 578)  LEN(1)  IO_MIXED|AL_LEFT|    COLOR(192, 69)  CUR(0)            TABORDER(0)  IOORDER(8)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  RADIO0(19, 36, 83, 56)  '권리내역'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(rightGR)      COLOR(66, 130)  CUR(0)      TABORDER(8)  ENABLE  &
+  VISIBLE  CHECKED  HINTTYPE(IH_NONE)
+BUTTON  RADIO1(91, 36, 131, 56)  '유상'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(rightGR)      COLOR(66, 130)  CUR(0)      TABORDER(9)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  RADIO2(138, 36, 178, 56)  '무상'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(rightGR)      COLOR(66, 130)  CUR(0)      TABORDER(10)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  RADIO3(187, 36, 227, 56)  '배당'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(rightGR)      COLOR(66, 130)  CUR(0)      TABORDER(11)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  RADIO4(236, 36, 300, 56)  '매수청구'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(rightGR)      COLOR(66, 130)  CUR(0)      TABORDER(12)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  RADIO5(311, 36, 399, 56)  '주식관련사채'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(rightGR)      COLOR(66, 130)  CUR(0)      TABORDER(13)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  RADIO6(405, 36, 475, 56)  '청산/결산'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(rightGR)      COLOR(66, 130)  CUR(0)      TABORDER(14)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  RADIO7(483, 36, 555, 56)  '합병/감자'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(rightGR)      COLOR(66, 130)  CUR(0)      TABORDER(15)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BOX  rightGR(14, 36, 565, 56)    COLOR(165, 232)  LINEW(1)  BX_LINE    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  obj_content(5, 65, 795, 374)    "IB871910"  TABORDER(16)  IOORDER(9)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  dd(109, 598, 265, 618)  LEN(2)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 69)  CUR(0)  TP_SUNKEN  INIT("00")          TABORDER(17)  IOORDER(10)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL3(325, 10, 420, 30)  '권리일자유형코드'  AL_CENTER  CUR(0)      COLOR(66, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+COMBO  RgtDatePtnCode(425, 10, 545, 30)  TP_SUNKEN  LEN(2)  COUNT(0)  VCOUNT(0)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_NUM|EDIT_INOUT    COLOR(68, 69)  CUR(0)    TABORDER(18)  IOORDER(11)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL8(585, 530, 770, 565)  '전문변경16.04.01'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Sub send_f()
+	GUIDE.Text = ""
+	obj_content.Proc "send_f",""
+End Sub
+
+_AW_ONSTART_AW_
+RADIO0.Checked = True
+MgempNo.Data = SYSTEM.UserID
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(btn_Send)
+_AW_ONCLICK_AW_
+If Trim(MgempNo.Data) = "" Then
+	 GUIDE.Text = "사원번호를 입력하세요"
+	 GUIDE.TRgb = 94
+Else
+	If Trim(zEmpPwd.Data) = "" Then
+		GUIDE.Text = "접속비밀번호를 입력하세요"
+		GUIDE.TRgb = 94
+	Else
+		Call send_f()
+	End If
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(zEmpPwd)
+_AW_ONKEYCHANGE_AW_
+'== 비밀번호 변경시 조회 버튼 기능 수행.
+If SCREEN.Key = "13" Then  '-- Enter 키 입력
+	Call send_f()
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(zStrDt)
+_AW_ONCHANGE_AW_
+If Trim(MgempNo.Data) = "" Then
+	 GUIDE.Text = "사원번호를 입력하세요"
+	 GUIDE.TRgb = 94
+Else
+	If Trim(zEmpPwd.Data) = "" Then
+		GUIDE.Text = "접속비밀번호를 입력하세요"
+		GUIDE.TRgb = 94
+	Else
+		Call send_f()
+	End If
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(zEndDt)
+_AW_ONCHANGE_AW_
+If Trim(MgempNo.Data) = "" Then
+	 GUIDE.Text = "사원번호를 입력하세요"
+	 GUIDE.TRgb = 94
+Else
+	If Trim(zEmpPwd.Data) = "" Then
+		GUIDE.Text = "접속비밀번호를 입력하세요"
+		GUIDE.TRgb = 94
+	Else
+		Call send_f()
+	End If
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(RADIO0)
+_AW_ONCLICK_AW_
+obj_content.SetObject "IB871910"
+
+LABEL3.Visible = False
+RgtDatePtnCode.Visible = False
+
+If Trim(MgempNo.Data) = "" Then
+	 GUIDE.Text = "사원번호를 입력하세요"
+	 GUIDE.TRgb = 94
+Else
+	If Trim(zEmpPwd.Data) = "" Then
+		GUIDE.Text = "접속비밀번호를 입력하세요"
+		GUIDE.TRgb = 94
+	Else
+		Call send_f()
+	End If
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(RADIO1)
+_AW_ONCLICK_AW_
+Dim items
+
+LABEL3.Visible = True
+RgtDatePtnCode.Visible = True
+
+
+items = "00" & vbTab & "001.기준일" & vbTab & "112.청약시작일" & vbTab & "053.상장일"
+RgtDatePtnCode.SetItems(items)
+
+obj_content.SetObject "IB871920"
+
+If Trim(MgempNo.Data) = "" Then
+	 GUIDE.Text = "사원번호를 입력하세요"
+	 GUIDE.TRgb = 94
+Else
+	If Trim(zEmpPwd.Data) = "" Then
+		GUIDE.Text = "접속비밀번호를 입력하세요"
+		GUIDE.TRgb = 94
+	Else
+		Call send_f()
+	End If
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(RADIO2)
+_AW_ONCLICK_AW_
+Dim items
+
+LABEL3.Visible = True
+RgtDatePtnCode.Visible = True
+
+items = "00" & vbTab & "001.기준일" & vbTab & "072.단주대금지급일" & vbTab & "053.상장일"
+RgtDatePtnCode.SetItems(items)
+
+obj_content.SetObject "IB871930"
+
+If Trim(MgempNo.Data) = "" Then
+	 GUIDE.Text = "사원번호를 입력하세요"
+	 GUIDE.TRgb = 94
+Else
+	If Trim(zEmpPwd.Data) = "" Then
+		GUIDE.Text = "접속비밀번호를 입력하세요"
+		GUIDE.TRgb = 94
+	Else
+		Call send_f()
+	End If
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(RADIO3)
+_AW_ONCLICK_AW_
+Dim items
+
+LABEL3.Visible = True
+RgtDatePtnCode.Visible = True
+
+items = "00" & vbTab & "001.기준일" & vbTab & "092.배당지급일" & vbTab & "073.단주대금지급일" & vbTab & "054.상장일"
+RgtDatePtnCode.SetItems(items)
+
+obj_content.SetObject "IB871940"
+
+If Trim(MgempNo.Data) = "" Then
+	 GUIDE.Text = "사원번호를 입력하세요"
+	 GUIDE.TRgb = 94
+Else
+	If Trim(zEmpPwd.Data) = "" Then
+		GUIDE.Text = "접속비밀번호를 입력하세요"
+		GUIDE.TRgb = 94
+	Else
+		Call send_f()
+	End If
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(RADIO4)
+_AW_ONCLICK_AW_
+Dim items
+
+LABEL3.Visible = True
+RgtDatePtnCode.Visible = True
+
+items = "00" & vbTab & "001.기준일" & vbTab & "142.반대의사접수종료일" & vbTab & "163.매수청구접수종료일" & vbTab & "104.매수청구대금지급일"
+RgtDatePtnCode.SetItems(items)
+
+obj_content.SetObject "IB871950"
+
+If Trim(MgempNo.Data) = "" Then
+	 GUIDE.Text = "사원번호를 입력하세요"
+	 GUIDE.TRgb = 94
+Else
+	If Trim(zEmpPwd.Data) = "" Then
+		GUIDE.Text = "접속비밀번호를 입력하세요"
+		GUIDE.TRgb = 94
+	Else
+		Call send_f()
+	End If
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(RADIO5)
+_AW_ONCLICK_AW_
+Dim items
+
+LABEL3.Visible = True
+RgtDatePtnCode.Visible = True
+
+items = "01" & vbTab & "011.권리행사시작일" & vbTab & "022.신청시작일" & vbTab & "033.주식상장일" & vbTab & "074.단주대금지급일"
+RgtDatePtnCode.SetItems(items)
+
+obj_content.SetObject "IB871960"
+
+If Trim(MgempNo.Data) = "" Then
+	 GUIDE.Text = "사원번호를 입력하세요"
+	 GUIDE.TRgb = 94
+Else
+	If Trim(zEmpPwd.Data) = "" Then
+		GUIDE.Text = "접속비밀번호를 입력하세요"
+		GUIDE.TRgb = 94
+	Else
+		Call send_f()
+	End If
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(RADIO6)
+_AW_ONCLICK_AW_
+Dim items
+
+LABEL3.Visible = True
+RgtDatePtnCode.Visible = True
+
+items = "00" & vbTab & "001.기준일" & vbTab & "092.대금지급일"
+RgtDatePtnCode.SetItems(items)
+
+obj_content.SetObject "IB871970"
+
+If Trim(MgempNo.Data) = "" Then
+	 GUIDE.Text = "사원번호를 입력하세요"
+	 GUIDE.TRgb = 94
+Else
+	If Trim(zEmpPwd.Data) = "" Then
+		GUIDE.Text = "접속비밀번호를 입력하세요"
+		GUIDE.TRgb = 94
+	Else
+		Call send_f()
+	End If
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(RADIO7)
+_AW_ONCLICK_AW_
+Dim items
+
+LABEL3.Visible = True
+RgtDatePtnCode.Visible = True
+
+items = "00" & vbTab & "001.기준일" & vbTab & "072.단주대금지급일" & vbTab & "053.상장일"
+RgtDatePtnCode.SetItems(items)
+
+obj_content.SetObject "IB871980"
+
+If Trim(MgempNo.Data) = "" Then
+	 GUIDE.Text = "사원번호를 입력하세요"
+	 GUIDE.TRgb = 94
+Else
+	If Trim(zEmpPwd.Data) = "" Then
+		GUIDE.Text = "접속비밀번호를 입력하세요"
+		GUIDE.TRgb = 94
+	Else
+		Call send_f()
+	End If
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(RgtDatePtnCode)
+_AW_ONCHANGE_AW_
+If Trim(MgempNo.Data) = "" Then
+	 GUIDE.Text = "사원번호를 입력하세요"
+	 GUIDE.TRgb = 94
+Else
+	If Trim(zEmpPwd.Data) = "" Then
+		GUIDE.Text = "접속비밀번호를 입력하세요"
+		GUIDE.TRgb = 94
+	Else
+		Call send_f()
+	End If
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

@@ -1,0 +1,193 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB3005C4)
+MAPSIZE(345, 374)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("주문환경설정")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+TITLE("[IB3005C4]주문환경설정")
+TOPATH(AXIS)
+METHOD(MENU)
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+GROUP  G0(0, 0, 375, 78)  ' 주문전송후 커서위치 '        COLOR(-1, 232)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+GROUP  G2(0, 256, 375, 337)  '                      '        COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+GROUP  G1(0, 90, 375, 146)  ' 정정주문창에서 원주문내용이 자동입력된후 커서위치 '        COLOR(-1, 232)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+GROUP  G3(551, 280, 639, 310)  '매도수량그룹'        COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  R0_0(22, 22, 92, 40)  '계좌번호'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(G0)      COLOR(141, 69)  CUR(0)      TABORDER(1)  ENABLE  &
+  VISIBLE  CHECKED  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  R0_1(138, 22, 208, 40)  '비밀번호'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(G0)      COLOR(141, 69)  CUR(0)      TABORDER(2)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  R0_2(248, 22, 318, 40)  '종목코드'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(G0)      COLOR(141, 69)  CUR(0)      TABORDER(3)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  R0_3(22, 42, 92, 60)  '주문수량'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(G0)      COLOR(141, 69)  CUR(0)      TABORDER(4)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  R0_4(138, 42, 208, 60)  '주문가격'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(G0)      COLOR(141, 69)  CUR(0)      TABORDER(5)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  R1_0(22, 111, 92, 129)  '주문수량'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(G1)      COLOR(141, 69)  CUR(0)      TABORDER(6)  ENABLE  &
+  VISIBLE  CHECKED  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  R1_1(138, 111, 208, 129)  '주문유형'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(G1)      COLOR(141, 69)  CUR(0)      TABORDER(7)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  R1_2(248, 111, 318, 129)  '주문가격'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(G1)      COLOR(141, 69)  CUR(0)      TABORDER(8)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  chk2(8, 256, 125, 273)  '즉시 실행 키 사용'  TP_CHECK|EDIT_NOP          COLOR(0, 232)  CUR(0)      TABORDER(9)  ENABLE  &
+  CHECKED  HINTTYPE(IH_NONE)
+LABEL  LBLIOC(22, 281, 367, 302)  'IOC(주문즉시 체결 그리고 잔량자동취소) : 숫자패드 / 키'  AL_LEFT  CUR(0)      COLOR(141, 232)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LBLFOK(22, 303, 367, 324)  'FOK(주문즉시 전부체결 또는 전부자동취소) : 숫자패드 * 키'  AL_LEFT  CUR(0)      COLOR(141, 232)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_NONE)
+GROUP  GROUP0(0, 158, 375, 232)  ' 기타 설정 '        COLOR(-1, 232)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  chk3_0(22, 181, 360, 199)  '종목코드 입력 후 커서를 옮기지 않음'  TP_CHECK|EDIT_NOP          COLOR(141, 232)  CUR(0)      TABORDER(10)  ENABLE  &
+  VISIBLE  CHECKED  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  CursorPos(846, 109, 903, 130)  LEN(1)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(11)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL7(580, 112, 839, 129)  '주문전송후 커서위치(계좌,비번,종목,수량,가격)'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  JJCursorPos(846, 134, 903, 155)  LEN(1)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(12)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL8(580, 137, 841, 154)  '정정주문 원주문 자동입력후 커서위치(수량,유형,가격)'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  ShortCutKey(846, 160, 903, 181)  LEN(1)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(13)  IOORDER(3)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL9(581, 163, 842, 180)  '즉시주문키사용'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  NotMoveCode(846, 184, 903, 205)  LEN(1)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(14)  IOORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL10(581, 187, 842, 204)  '종목입력 후 커서 옮기지 않음'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  chk3_1(22, 203, 360, 221)  '주문 오류메세지 팝업 해지'  TP_CHECK|EDIT_NOP          COLOR(141, 232)  CUR(0)      TABORDER(15)  ENABLE  &
+  VISIBLE  CHECKED  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  msgPopup(846, 207, 903, 228)  LEN(1)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(16)  IOORDER(5)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL0(581, 209, 842, 226)  '주문오류메세지 팝업해지'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Sub SetCfg()
+	Select Case CursorPos.Data
+	Case "1"
+		R0_1.Checked = True
+	Case "2"
+		R0_2.Checked = True
+	Case "3"
+		R0_3.Checked = True
+	Case "4"
+		R0_4.Checked = True
+	'Case "0"
+	Case Else
+		R0_0.Checked = True
+	End Select
+
+	Select Case JJCursorPos.Data
+	Case "1"
+		R1_1.Checked = True
+	Case "2"
+		R1_2.Checked = True
+	'Case "3"
+	'	R1_3.Checked = True
+	'Case "0"
+	Case Else
+		R1_0.Checked = True
+	End Select
+
+	If ShortCutKey.Data = "1" Then
+		chk2.Checked = True
+	Else
+		chk2.Checked = False
+	End If
+
+	If NotMoveCode.Data = "1" Then
+		chk3_0.Checked = True
+	Else
+		chk3_0.Checked = False
+	End If
+
+	If msgPopup.Data = "1" Then
+		chk3_1.Checked = True
+	Else
+		chk3_1.Checked = False
+	End If
+End Sub
+
+Sub SaveCfg()
+	If R0_1.Checked Then
+		CursorPos.Data = "1"
+	ElseIf R0_2.Checked Then
+		CursorPos.Data = "2"
+	ElseIf R0_3.Checked Then
+		CursorPos.Data = "3"
+	ElseIf R0_4.Checked Then
+		CursorPos.Data = "4"
+	Else
+		CursorPos.Data = "0"
+	End If
+
+	If R1_1.Checked Then
+		JJCursorPos.Data = "1"
+	ElseIf R1_2.Checked Then
+		JJCursorPos.Data = "2"
+	Else
+		JJCursorPos.Data = "0"
+	End If
+
+	If chk2.Checked Then
+		ShortCutKey.Data = "1"
+	Else
+		ShortCutKey.Data = "0"
+	End If
+
+	If chk3_0.Checked Then
+		NotMoveCode.Data = "1"
+	Else
+		NotMoveCode.Data = "0"
+	End If
+
+	If chk3_1.Checked Then
+		msgPopup.Data = "1"
+	Else
+		msgPopup.Data = "0"
+	End If
+
+	CursorPos.Trigger "", False
+	JJCursorPos.Trigger "", False
+	ShortCutKey.Trigger "", False
+	NotMoveCode.Trigger "", False
+	msgPopup.Trigger "", False
+End Sub
+
+_AW_ONSTART_AW_
+LBLIOC.Data = "- IOC(주문즉시 체결 그리고 잔량자동취소) : 숫자패드 ""/"" 키"
+LBLFOK.Data = "- FOK(주문즉시 전부체결 또는 전부자동취소) : 숫자패드 ""*"" 키"
+
+_AW_ONENDSUB_AW_
+_AW_ONCLOSE_AW_
+SaveCfg()
+
+_AW_ONENDSUB_AW_
+}
+
+
+

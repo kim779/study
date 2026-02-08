@@ -1,0 +1,113 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB315380)
+MAPSIZE(118, 143)
+VERSION(001)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("선물옵션 시세")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(FMS|FLASH)
+TITLE("[3153] 수량설정")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(NORM)
+HEADER(NOP)
+BGROUND(BRUSH, 64)
+}
+
+
+
+FORM DIVISION
+{
+
+LABEL  LABEL0(13, 4, 85, 16)  '수량값 변경'  AL_LEFT  FONT("굴림체", 9, BOLD)  CUR(0)      COLOR(168, 69)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL5(2, 2, 13, 16)    |IMAGE|AL_CENTER    COLOR(0, 232)  CUR(0)    "텍스트화살표_하단.BMP"  ENABLE  &
+  VISIBLE  TRANSPARENT  IMAGE  HINTTYPE(IH_NONE)
+BUTTON  BTN_OK(50, 97, 94, 115)  '변경'  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(208, 69)  CUR(10)    "3btn.bmp"    TABORDER(1)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+GRID  GRID0(2, 18, 142, 95)  VISIBLEROW(0)  CELLH(18)  MATRIX(3, 2)  FIX(0)  MAINCOLOR(68, 232)  LINECOLOR(75)  FOCUSCOLOR(78)  FOCUSKIND(4)  ROWC(68, 77)  |NO3D|RROW|GRVALID|GRFTEXT    &
+	COLINFO("lAppyUnitQty")  LEN(16)  WIDTH(70)  HEAD("현재값")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_NOP  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSUP    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(69, 69)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("lAppyMgn")  LEN(16)  WIDTH(70)  HEAD("변경값")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_INPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSUP    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(69, 69)    HNORMAL  SORTSTARTPOS(0)    TABORDER(2)  IOORDER(1)  ENABLE  &
+  VISIBLE
+
+BUTTON  BTN_CANC(97, 97, 141, 115)  '취소'  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(208, 69)  CUR(10)    "3btn.bmp"    TABORDER(3)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Sub ReadQtyConfig
+	Dim data, array, j, i
+	If SCREEN.CreateObject("Info") Then
+		data = Trim(INFO.PopData(LOGIN.Name, "ordcfg.ini", "IB315300", "812_QtyConfig"))
+	End If
+'	SYSTEM.Trace "data: " & data
+	If Trim(data) = "" Then
+		data = "1|2|3|4|5"
+	End If
+	array = Split(data, "|", -1, 1)
+
+	j=0
+	For Each i in array
+	 j = j+1
+
+	 If Trim(array(j-1)) <> "" Then
+	 	'GRID0.SetGridCell j, 1, CStr(CLng(array(j-1)))
+	 	'GRID0.SetGridCell j, 2, CStr(CLng(array(j-1)))
+'	 	SYSTEM.Trace array(j-1)
+	 	GRID0.SetGridCell j, 1, array(j-1)
+	 	GRID0.SetGridCell j, 2, array(j-1)
+	 End If
+	Next
+End Sub
+
+_AW_ONSTART_AW_
+Call ReadQtyConfig()
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+SCREEN.OnSend = False
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(BTN_OK)
+_AW_ONCLICK_AW_
+
+Dim data
+If SCREEN.CreateObject("Info") Then
+	data = GRID0.GetGridCell(1,2) & "|" & GRID0.GetGridCell(2,2) & "|" & GRID0.GetGridCell(3,2)
+	INFO.PushData LOGIN.Name, "ordcfg.ini", "IB315300", "812_QtyConfig", data
+	'data = Trim(INFO.PopData(LOGIN.Name, "ordcfg.ini", "812_QtyConfig", "10|100|1000|10000|"))
+End If
+'SYSTEM.Trace "data: " & data
+
+'SYSTEM.Push "812_QtyConfig", GRID0.GetGridCell(1,2) & "|" & GRID0.GetGridCell(2,2) & "|" & GRID0.GetGridCell(3,2) & "|" & GRID0.GetGridCell(4,2) & "|"
+SYSTEM.Push "812_QtyConfig", "OK"
+SCREEN.CloseWindow
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(GRID0)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BTN_CANC)
+_AW_ONCLICK_AW_
+SCREEN.CloseWindow
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

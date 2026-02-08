@@ -1,0 +1,100 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB200000)
+MAPSIZE(617, 1006)
+VERSION(001)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("주식종합화면")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+TITLE("[2000] 종합화면")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(NORM)
+HEADER(NOP)
+BGROUND(BRUSH, 181)
+}
+
+
+
+FORM DIVISION
+{
+
+LABEL  LABEL0(0, 0, 1006, 617)  '화면을 구성중입니다'  AL_CENTER  FONT("굴림체", 9, BOLD)  CUR(0)      COLOR(181, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Const myFILE = "userconf.ini"
+Const myMAP = "IB200800"
+
+Sub p_read_ini()
+If SCREEN.CreateObject("Info") Then
+ 	CHK.text = Trim(INFO.PopData(LOGIN.Name, myFILE, myMAP, "G_CHCK"))
+End If
+End Sub
+
+Sub p_write_ini()
+If SCREEN.CreateObject("Info") Then
+  INFO.PushData LOGIN.Name, myFILE, myMAP, "G_CHCK", CHK.text
+End If
+End Sub
+
+Sub OnAlert()
+	Dim	srat
+
+	If Trim(S2311.Data) = "" Or Trim(S2314.Data) = "" Then
+		Exit Sub
+	End If
+
+	srat = (S2314.Data / S2027.Data)*100
+	S2352.Data = FormatNumber(srat, 2, -1)
+
+	If Trim(S2352.data) < 50 Then
+		S2352.TRgb = 95
+	ElseIf Trim(S2352.data) = 50 Then
+		S2352.TRgb = 69
+	ElseIf Trim(S2352.data) > 50 Then
+		S2352.TRgb = 94
+	End If
+End Sub
+
+_AW_ONINDECLARE_AW_
+#load IB888888
+
+_AW_ONENDSUB_AW_
+_AW_ONSTART_AW_
+SCREEN.SetTimer 0.5, False
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+SCREEN.OnSend False
+
+_AW_ONENDSUB_AW_
+_AW_ONTIMER_AW_
+Dim tujatab_status
+If SCREEN.CreateObject("Info") Then
+	tujatab_status = Trim(INFO.PopData(LOGIN.Name, "userconf.ini", "IB200000", "tujatab_status"))
+Else
+	tujatab_status = "0"
+End If
+
+If tujatab_status = "0" Then
+	SCREEN.CreateWindow 1, "IB2000YY /t/d/c/S", ""
+Else
+	SCREEN.CreateWindow 1, "IB2000XX /t/d/c/S", ""
+End If
+
+_AW_ONENDSUB_AW_
+}
+
+
+

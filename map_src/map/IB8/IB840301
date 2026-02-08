@@ -1,0 +1,148 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB840301)
+MAPSIZE(190, 531)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("채권기본정보 조회")
+MAPPUBLIC(";")
+FONT("MS Sans Serif", 9, NORMAL)
+OPTIONS(ENCODE)
+TITLE("채권기본정보조회")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("piboPBxQ")
+MAPTYPE(FIXED)
+HEADER(LEDGER)
+TRXH("11CSCMBQ043")
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL3(0, 0, 530, 190)        COLOR(66, 67)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON0(402, 115, 482, 155)  TP_PUSH      AL_CENTER    FOCUS  COLOR(208, 232)  CUR(0)      TABORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  GUIDE(12, 161, 527, 181)  TP_RAISED      COLOR(208, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL105(16, 15, 126, 35)  '입력'  LINECOLOR(75)      COLOR(74, 76)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL0(16, 34, 126, 54)  '종목번호'  LINECOLOR(75)      COLOR(74, 76)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  In(125, 16, 235, 36)  LEN(5)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("00001")          TABORDER(2)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  IsuNo(125, 34, 235, 54)  LEN(12)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(3)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL5(268, 15, 378, 35)  '입력값'  LINECOLOR(75)      COLOR(74, 76)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL4(267, 44, 377, 64)  '출력'  LINECOLOR(75)      COLOR(74, 76)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL6(267, 65, 377, 85)  '종목구분'  LINECOLOR(75)      COLOR(74, 76)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  OUTPUT6(377, 15, 487, 35)  LEN(17)  IO_MIXED|AL_CENTER|    COLOR(192, 69)  CUR(0)  LINECOLOR(0)          TABORDER(0)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  out(376, 44, 486, 64)  LEN(26)  IO_MIXED|AL_CENTER|    COLOR(192, 69)  CUR(0)  LINECOLOR(0)          TABORDER(0)  IOORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  MktTpNm(376, 65, 486, 85)  LEN(20)  IO_MIXED|AL_CENTER|    COLOR(192, 69)  CUR(0)  LINECOLOR(0)          TABORDER(0)  IOORDER(5)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL2(267, 87, 377, 107)  '출력'  LINECOLOR(75)      COLOR(74, 76)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  out1(376, 87, 486, 107)  LEN(2064)  IO_MIXED|AL_CENTER|    COLOR(192, 69)  CUR(0)  LINECOLOR(0)          TABORDER(0)  IOORDER(6)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Sub Set_Mknm()
+	SCREEN.Object("main.MktTpNm").Data = MktTpNm.Data
+End Sub
+
+_AW_ONINDECLARE_AW_
+#LOAD IB888833
+
+_AW_ONENDSUB_AW_
+_AW_ONSTART_AW_
+'SACMT207 -> SACMT238로 변경
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+'Dim acnt
+'SCREEN.OnSend = False
+'
+'
+'acnt = Trim(IntaccNo.Data)
+'acnt = Mid(acnt,1,3) & "00" & Mid(acnt, 6, 6)
+'IntaccNo.Data = acnt
+
+'If SYSTEM.UserPass <> Trim(Pwd.Data) Then
+'	If Trim(Pwd.Data) <> "HEAD" And Len(Trim(Pwd.data)) >= 4 Then
+'		LEDGER.Hsiz = 44
+'		LEDGER.EPwd = SYSTEM.EncryptSHA(Trim(Pwd.Data))
+'		Pwd.Data = "HEAD"
+'	End If
+'
+'	If Trim(Pwd.Data) = "HEAD" Then
+'		If Len(Trim(LEDGER.EPwd)) <> 44 Then
+'			SCREEN.Object("main.GUIDE").Text = "일방향암호화에 실패하였습니다. 비밀번호를 다시 입력해 주세요."
+'			SCREEN.OnSend = False
+'			Exit Sub
+'		End If
+'	End If
+'End If
+
+SCREEN.OnSend = True
+'SCREEN.Send
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+'SACMT207 사용했을 때
+'	If Left(Trim(LEDGER.Ecod), 1) = "0" Then
+'		Select Case chk.Data
+'		Case 1
+'			SCREEN.Proc "parent.AllSell", ""
+'		Case 2
+'			SCREEN.Proc "parent.AllCancel", ""
+'		Case 3
+'			SCREEN.Proc "parent.AllModify", ""
+'		Case Else
+'			Exit Sub
+'		End Select
+'	Else
+'		alert_msg(Trim(LEDGER.emsg))
+'	End If
+
+
+'SACMT238
+
+'SYSTEM.Trace "zAval = " & zAvalYn.Data
+'If Trim(zAvalYn.Data) = "Y" Then
+'	SCREEN.Proc "parent.TaxRateSend", ""
+'Else
+'
+'End If
+
+Set_Mknm()
+SCREEN.Object("main.GUIDE").Text = LEDGER.Emsg
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(BUTTON0)
+_AW_ONCLICK_AW_
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

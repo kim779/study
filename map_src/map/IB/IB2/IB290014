@@ -1,0 +1,356 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB290014)
+MAPSIZE(289, 629)
+VERSION(001)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("투자자별 시간대별")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(FMS|FLASH)
+TITLE("투자자별 시간대별 매매동향")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pooppoop")
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL3(0, 0, 629, 289)        COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL2(0, 0, 629, 25)        COLOR(66, 69)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  r2_2(182, 4, 221, 22)  '금액'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(GP2)    FONT("굴림체", 9, NORMAL)  COLOR(68, 130)  CUR(0)      TABORDER(1)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+PANEL  PANEL6(138, 3, 222, 23)  LINECOLOR(165)      COLOR(66, 130)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+GROUP  GP1(104, 354, 143, 370)  'Group'        COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  r2_1(140, 4, 179, 22)  '수량'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(GP2)    FONT("굴림체", 9, NORMAL)  COLOR(68, 130)  CUR(0)      TABORDER(2)  ENABLE  &
+  VISIBLE  CHECKED  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  r1_1(4, 4, 43, 22)  '매수'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(GP1)    FONT("굴림체", 9, NORMAL)  COLOR(68, 130)  CUR(0)      TABORDER(3)  ENABLE  &
+  VISIBLE  CHECKED  TRANSPARENT  HINTTYPE(IH_NONE)
+PANEL  PANEL0(2, 3, 137, 23)  LINECOLOR(165)      COLOR(66, 130)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  r1_2(44, 4, 83, 22)  '매도'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(GP1)    FONT("굴림체", 9, NORMAL)  COLOR(68, 130)  CUR(0)      TABORDER(4)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  r1_3(84, 4, 134, 22)  '순매수'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(GP1)    FONT("굴림체", 9, NORMAL)  COLOR(68, 130)  CUR(0)      TABORDER(5)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+GROUP  GP2(145, 354, 184, 370)  'Group'        COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+COMBO  time(307, 3, 357, 23)  TP_SUNKEN  LEN(2)  COUNT(7)  VCOUNT(7)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_NUM|EDIT_INPUT    COLOR(68, 130)  CUR(0)  DISPLAY("30초", "1분", "5분", "10분", "30분", "60분", "일별")  DATA("00", "01", "05", "10", "30", "60", "99")    TABORDER(6)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  r3_2(267, 4, 306, 22)  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(GP3)    FONT("굴림체", 9, NORMAL)  COLOR(68, 130)  CUR(0)      TABORDER(7)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+PANEL  PANEL1(223, 3, 306, 23)  LINECOLOR(165)      COLOR(66, 130)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  r3_1(225, 4, 264, 22)  '누적'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(GP3)    FONT("굴림체", 9, NORMAL)  COLOR(68, 130)  CUR(0)      TABORDER(8)  ENABLE  &
+  VISIBLE  CHECKED  TRANSPARENT  HINTTYPE(IH_NONE)
+GROUP  GP3(186, 354, 225, 370)  'Group'        COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  OBJ(0, 25, 629, 289)    "IB290021"  TABORDER(9)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  sdate(404, 3, 487, 23)  LEN(8)  IO_NUM|EDIT_INPUT|FA_DATE  FONT("굴림체", 9, NORMAL)    COLOR(192, 130)  CUR(0)  TP_SUNKEN          EDITFORMAT("9999/99/99")  TABORDER(10)  IOORDER(3)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  edate(496, 3, 579, 23)  LEN(8)  IO_NUM|EDIT_INPUT|FA_DATE  FONT("굴림체", 9, NORMAL)    COLOR(192, 130)  CUR(0)  TP_SUNKEN          EDITFORMAT("9999/99/99")  TABORDER(11)  IOORDER(4)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  link(488, 3, 495, 23)  '~'  AL_LEFT  CUR(0)      COLOR(76, 130)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL0(280, 4, 304, 22)  '증감'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  BUTTON1(358, 3, 403, 23)  '차트'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, NORMAL)  FOCUS  COLOR(68, 186)  CUR(0)    "3BTN.BMP"    TABORDER(12)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Sub send_f()
+	p_write_ini()
+	OBJ.Proc "send_f", ""
+End Sub
+
+Sub p_write_ini()
+	Dim msgb, vagb, cagb
+
+	If r1_1.Checked Then
+		msgb = "1"
+	ElseIf r1_2.Checked Then
+	 	msgb = "2"
+	Else
+		msgb = "3"
+	End If
+
+	If r2_1.Checked Then
+		vagb = "1"
+	Else
+		vagb = "2"
+	End If
+
+	If r3_1.Checked Then
+		cagb = "1"
+	Else
+		cagb = "2"
+	End If
+
+	If SCREEN.CreateObject("Info") Then
+		INFO.pushData LOGIN.Name, "userconf.ini", SCREEN.GetMapName(0), "msgb", msgb
+		INFO.pushData LOGIN.Name, "userconf.ini", SCREEN.GetMapName(0), "vagb", vagb
+		INFO.pushData LOGIN.Name, "userconf.ini", SCREEN.GetMapName(0), "cagb", cagb
+		INFO.pushData LOGIN.Name, "userconf.ini", SCREEN.GetMapName(0), "tmgb", time.Data
+	End If
+End Sub
+
+Sub p_read_ini()
+	If SCREEN.CreateObject("INFO") Then
+		Dim msgb, vagb, cagb, ii
+		msgb = Trim(INFO.PopData(LOGIN.Name, "userconf.ini", SCREEN.GetMapName(0), "msgb"))
+		vagb = Trim(INFO.PopData(LOGIN.Name, "userconf.ini", SCREEN.GetMapName(0), "vagb"))
+		cagb = Trim(INFO.PopData(LOGIN.Name, "userconf.ini", SCREEN.GetMapName(0), "cagb"))
+		tmgb = Trim(INFO.PopData(LOGIN.Name, "userconf.ini", SCREEN.GetMapName(0), "tmgb"))
+
+		If msgb <> "" Then
+			For ii=1 To 3
+				If CLng(msgb) = ii Then
+					SCREEN.Object("r1_"&ii).Checked = True
+				Else
+					SCREEN.Object("r1_"&ii).Checked = False
+				End If
+			Next
+		Else
+			For ii=1 To 3
+				If ii = 3 Then
+					SCREEN.Object("r1_"&ii).Checked = True
+				Else
+					SCREEN.Object("r1_"&ii).Checked = False
+				End If
+			Next
+		End If
+
+		If vagb <> "" Then
+			For ii=1 To 2
+				If CLng(vagb) = ii Then
+					SCREEN.Object("r2_"&ii).Checked = True
+				Else
+					SCREEN.Object("r2_"&ii).Checked = False
+				End If
+			Next
+		Else
+			For ii=1 To 2
+				If ii = 2 Then
+					SCREEN.Object("r2_"&ii).Checked = True
+				Else
+					SCREEN.Object("r2_"&ii).Checked = False
+				End If
+			Next
+		End If
+
+		If cagb <> "" Then
+			For ii=1 To 2
+				If CLng(cagb) = ii Then
+					SCREEN.Object("r3_"&ii).Checked = True
+				Else
+					SCREEN.Object("r3_"&ii).Checked = False
+				End If
+			Next
+		Else
+			For ii=1 To 2
+				If ii = 1 Then
+					SCREEN.Object("r3_"&ii).Checked = True
+				Else
+					SCREEN.Object("r3_"&ii).Checked = False
+				End If
+			Next
+		End If
+
+		If tmgb <> "" Then
+			time.Data = tmgb
+		Else
+			time.Data = "00"
+		End If
+
+		If time.Data <> "99" Then
+			If OBJ.GetObject <> "IB290021" Then
+				OBJ.SetObject("IB290021")
+			End If
+			sdate.Visible = False
+			edate.Visible = False
+			link.Visible = False
+			LABEL0.Text = "증감"
+		Else
+			If OBJ.GetObject <> "IB290022" Then
+				OBJ.SetObject("IB290022")
+			End If
+
+			If r3_1.Checked Then
+				sdate.Enable = True
+			Else
+				sdate.Enable = False
+			End If
+			sdate.Visible = True
+			edate.Visible = True
+			link.Visible = True
+			LABEL0.Text = "일별"
+			sdate.Data = change_date("m", -3)
+		End If
+	End If
+End Sub
+
+_AW_ONINDECLARE_AW_
+#load IB888888
+
+_AW_ONENDSUB_AW_
+_AW_ONSTART_AW_
+p_read_ini()
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(r2_2)
+_AW_ONCLICK_AW_
+Call send_f()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(r2_1)
+_AW_ONCLICK_AW_
+Call send_f()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(r1_1)
+_AW_ONCLICK_AW_
+Call send_f()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(r1_2)
+_AW_ONCLICK_AW_
+Call send_f()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(r1_3)
+_AW_ONCLICK_AW_
+Call send_f()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(time)
+_AW_ONCHANGE_AW_
+If time.Data <> "99" Then
+	If BUTTON1.Text = "데이터" Then
+		If OBJ.GetObject <> "IB290023" Then
+			OBJ.SetObject("IB290023")
+		End If
+	Else
+		If OBJ.GetObject <> "IB290021" Then
+			OBJ.SetObject("IB290021")
+		End If
+	End If
+	sdate.Visible = False
+	edate.Visible = False
+	link.Visible = False
+	LABEL0.Text = "증감"
+Else
+	If BUTTON1.Text = "데이터" Then
+		If OBJ.GetObject <> "IB290024" Then
+			OBJ.SetObject("IB290024")
+		End If
+	Else
+		If OBJ.GetObject <> "IB290022" Then
+			OBJ.SetObject("IB290022")
+		End If
+	End If
+	If r3_1.Checked Then
+		sdate.Enable = True
+	Else
+		sdate.Enable = False
+	End If
+	sdate.Visible = True
+	edate.Visible = True
+	link.Visible = True
+	LABEL0.Text = "일별"
+	sdate.Data = change_date("m", -3)
+End If
+Call send_f()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(r3_2)
+_AW_ONCLICK_AW_
+If time.Data = "99" Then
+	sdate.Enable = False
+End If
+Call send_f()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(r3_1)
+_AW_ONCLICK_AW_
+If time.Data = "99" Then
+	sdate.Enable = True
+End If
+Call send_f()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(sdate)
+_AW_ONCHANGE_AW_
+Call send_f()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(edate)
+_AW_ONCHANGE_AW_
+Call send_f()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON1)
+_AW_ONCLICK_AW_
+' 0- 데이터 1- 차트
+If BUTTON1.Text = "차트" Then
+	If time.Data <> "99" Then
+		OBJ.SetObject("IB290023")
+	Else
+		OBJ.SetObject("IB290024")
+	End If
+	BUTTON1.Text = "데이터"
+Else
+	If time.Data <> "99" Then
+		OBJ.SetObject("IB290021")
+	Else
+		OBJ.SetObject("IB290022")
+	End If
+	BUTTON1.Text = "차트"
+End If
+
+Call send_f()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

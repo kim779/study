@@ -1,0 +1,86 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB0000C8)
+MAPSIZE(75, 181)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("MS Sans Serif", 9, NORMAL)
+TITLE("IE버전체크")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+LABEL  LABEL0(25, 15, 105, 40)  'Label'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL1(25, 45, 105, 70)  'Label'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL2(115, 40, 135, 65)  'Label'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONSTART_AW_
+Dim WS,osbit
+
+Set WS = CreateObject("WScript.Shell")
+
+LABEL0.Data = "False"
+On Error Resume Next
+
+    LABEL0.Data = WS.RegRead("HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Internet Explorer\svcVersion")
+
+If LABEL0.Data = "False" Then
+    On Error Resume Next
+        LABEL0.Data = WS.RegRead("HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Internet Explorer\Version")
+    If LABEL0.Data <> "False" Then
+        tupData = Split(LABEL0.Data, ".")
+        LABEL0.Data = tupData(0)
+    End If
+Else
+    tupData = Split(LABEL0.Data, ".")
+    LABEL0.Data = tupData(0)
+End If
+
+If LABEL0.Data = "False" Then
+    LABEL1.Data = "값 구하기 실패"
+ElseIf LABEL0.Data > 7 Then
+	LABEL1.Data = "익스플로러 8이상의 버전"
+'	SCREEN.CreateWindow 3, "AM080501 /t /p5", ""
+Else
+    LABEL1.Data = "익스플로러 7이하의 버전"
+    SCREEN.CreateWindow 3, "AM080501 /t /p5", ""
+End If
+
+osbit = WS.RegRead("HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\Environment\PROCESSOR_ARCHITECTURE")
+
+Trim(osbit)
+LABEL2.Text = osbit
+
+WS.RegWrite "HKEY_CURRENT_USER\SOFTWARE\Microsoft\Internet Explorer\Main\FeatureControl\FEATURE_BROWSER_EMULATION\" & "axis.exe", 11000, "REG_DWORD"
+
+WS.RegWrite "HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\Internet Explorer\Main\FeatureControl\FEATURE_BROWSER_EMULATION\" & "axis.exe", 11000, "REG_DWORD"
+
+
+WS = Nothing
+
+_AW_ONENDSUB_AW_
+}
+
+
+

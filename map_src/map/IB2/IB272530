@@ -1,0 +1,97 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB272530)
+MAPSIZE(255, 770)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+TITLE("업종 일별 대차 차트")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pibo2725")
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+EDIT  ed_dttp(625, 411, 660, 430)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("1")          TABORDER(1)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  ed_cttp(665, 411, 700, 430)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("0")          TABORDER(2)  IOORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+CONTROL  CTL(0, 0, 770, 255)  |FA_PROTECT|FA_FLASH  "C_UserGrp"  "/i711200100000000201000000000000000000300000000001110033554687200000000212000842144010000000"  LEN(0)  EDIT_INOUT    COLOR(192, 232)  TABORDER(4)  IOORDER(6)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  b_send(720, 411, 757, 431)  '조회'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, BOLD)  FOCUS  COLOR(208, 186)  CUR(0)    "조회BTN.BMP"    TABORDER(3)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+EDIT  ed_code(80, 411, 200, 430)  LEN(3)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("001")          TABORDER(5)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  ed_ckdt(420, 415, 540, 434)  LEN(8)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("99999999")          TABORDER(6)  IOORDER(5)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  ed_date(295, 420, 415, 439)  LEN(8)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("99999999")          TABORDER(7)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+'----------------------------------------------------------
+Sub SendData(Data)
+	ArrData = Split(Data, "|")
+	If UBound(ArrData) < 1 Then
+		Exit Sub
+	End If
+	If ArrData(0) = "1" Then
+		ed_cttp.Data = ArrData(1)
+	Else
+		'ArrData - 0:Type, 1:종목코드, 2:차트타입, 3:연속일자
+		ed_code.Data = ArrData(1)
+		ed_cttp.Data = ArrData(2)
+		ed_ckdt.Data = ArrData(3)
+		If Len(Trim(ed_ckdt.Data)) = 0 Then
+			Exit Sub
+		End If
+		ed_date.Data = ArrData(4)
+	End If
+	SCREEN.Send 0
+End Sub
+'----------------------------------------------------------
+Sub SetInit()
+	AYear = Year(Date)
+	AMon = Month(Date)
+	If Len(AMon) = 1 Then
+		AMon = "0" & AMon
+	End If
+	ADay = Day(Date)
+	If Len(ADay) = 1 Then
+		ADay = "0" & ADay
+	End If
+
+	ed_date.Data = AYear & AMon & ADay
+End Sub
+
+_AW_ONSTART_AW_
+'SetInit
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(b_send)
+_AW_ONCLICK_AW_
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

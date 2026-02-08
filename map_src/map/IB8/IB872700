@@ -1,0 +1,187 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB872700)
+MAPSIZE(488, 975)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(ENCODE|XPRINT)
+TITLE("Untitled")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL(0, 0, 976, 27)  LINETYPE(3)  LINECOLOR(64)      COLOR(66, 67)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL1(-2, 27, 976, 469)  LIMAGE(0)  LINEW(5)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    RESIZABLE  AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL0(9, 3, 57, 23)  '사원번호'  AL_LEFT  CUR(0)      COLOR(66, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  zEmpNo(60, 3, 106, 23)  LEN(6)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_XFLOAT    COLOR(192, 130)  CUR(0)  TP_SUNKEN          TABORDER(1)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  zEmpPwd(204, 3, 309, 23)  LEN(16)  IO_MIXED|EDIT_INPUT|FA_PASSWD|FA_WRAP    COLOR(192, 130)  CUR(0)  TP_SUNKEN          TABORDER(2)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL1(129, 3, 201, 23)  '접속비밀번호'  AL_LEFT  CUR(0)      COLOR(66, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL3(420, 3, 470, 24)  '만 기 일'  AL_LEFT  CUR(0)      COLOR(66, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  zStrDt(469, 3, 556, 23)  LEN(8)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_DATE    COLOR(192, 130)  CUR(0)  TP_SUNKEN          EDITFORMAT("9999/99/99")  TABORDER(3)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  zEndDt(571, 3, 658, 23)  LEN(8)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_DATE    COLOR(192, 130)  CUR(0)  TP_SUNKEN          EDITFORMAT("9999/99/99")  TABORDER(4)  IOORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL4(560, 3, 566, 23)  '~'  AL_LEFT  CUR(0)      COLOR(208, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  chkDate(671, 3, 771, 23)  '모든일자조회'  TP_CHECK|EDIT_NOP          COLOR(208, 232)  CUR(0)      TABORDER(5)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  send_btn(897, 3, 933, 23)  '조회'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, BOLD)  FOCUS  COLOR(208, 186)  CUR(0)    "조회btn.bmp"    TABORDER(6)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+BUTTON  next_btn(934, 3, 970, 23)  '다음'  TP_PUSH|IMAGETEXT|AL_STRETCH        FOCUS  COLOR(208, 186)  CUR(0)    "2btn.bmp"    TABORDER(7)  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+OBJECT  OBJECT0(8, 59, 966, 459)    "IB872710"  TABORDER(8)  IOORDER(5)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  GUIDE1(0, 465, 977, 489)  LIMAGE(1)  LINEW(3)  STRESS(0)  STRESSW(0)  LINETYPE(4)  LINECOLOR(64)      COLOR(34, 69)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL0(5, 470, 19, 484)    |IMAGE|AL_STRETCH    COLOR(208, 232)  CUR(0)    "알림_ic.bmp"  ENABLE  &
+  VISIBLE  TRANSPARENT  IMAGE  HINTTYPE(IH_NONE)
+PANEL  GUIDE(20, 465, 855, 489)        COLOR(228, 130)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+USRTAB  tab(7, 35, 967, 59)  FOCUS  INDEX(0)  COUNT(8)  AL_TOP  TAB_IMAGE      FONT("굴림체", 9, NORMAL)    COLOR(3, 70)  CUR(0)  TABIMAGE("tab.bmp")  FCOLOR(3, 71)  CAPTION("펀드", "채권/ELS", "CMA/RP", "신탁", "Wrap", "CD", "CP", "ELS/T/F")  TABINFO("1:1", "1:2", "1:3", "1:4", "0:5", "1:6", "1:7", "1:8")  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Sub send_f()
+	next_btn.Enable False
+	SCREEN.ClearAll 0, 2
+	OBJECT0.proc "send_f", ""
+End Sub
+
+Sub send_c()
+	OBJECT0.proc "send_c", ""
+End Sub
+
+_AW_ONSTART_AW_
+SCREEN.OnSend = False
+'If Trim(LOGIN.Brno) <> "" Then
+'	If Trim(LOGIN.Brno) = 903  Or Trim(LOGIN.Brno) = 913 Then
+'		tab.SetTabVisible 8, True
+'	End If
+'End If
+
+zEmpNo.Data = SYSTEM.UserID
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+SCREEN.OnSend = False
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(zEmpPwd)
+_AW_ONKEYCHANGE_AW_
+'== 비밀번호 변경시 조회 버튼 기능 수행.
+If SCREEN.Key = "13" Then  '-- Enter 키 입력
+	If Trim(zEmpPwd.Data)= "" Then
+		MsgBox "비밀번호를 입력하십시오.",0,"IBK투자증권"
+	Else
+		Call send_f()
+	End If
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(zStrDt)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(zEndDt)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(chkDate)
+_AW_ONCLICK_AW_
+If chkDate.Checked = True Then
+	zStrDt.Enable = False
+	zEndDt.Enable = False
+Else
+	zStrDt.Enable = True
+	zEndDt.Enable = True
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(send_btn)
+_AW_ONCLICK_AW_
+If Trim(zEmpPwd.Data) = "" Then
+	MsgBox "비밀번호를 입력하십시오.",0,"IBK투자증권"
+Else
+	Call send_f()
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(next_btn)
+_AW_ONCLICK_AW_
+Call send_c()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(tab)
+_AW_ONCLICK_AW_
+GUIDE.Text = ""
+chkDate.Visible = True
+Select Case tab.ID
+	Case 1 :
+			OBJECT0.Setobject "IB872710"
+	Case 2 :
+			OBJECT0.Setobject "IB872720"
+	Case 3 :
+			OBJECT0.Setobject "IB872730"
+	Case 4 :
+			OBJECT0.Setobject "IB872740"
+	Case 5 :
+			MsgBox "준비중입니다"
+'			OBJECT0.Setobject "IB872750"
+	Case 6 :
+			OBJECT0.Setobject "IB872720"
+	Case 7 :
+			OBJECT0.Setobject "IB872720"
+	Case 8 :
+			OBJECT0.Setobject "IB875499"
+			chkDate.Visible = False
+			zStrDt.Enable = True
+			zEndDt.Enable = True
+End Select
+
+If Len(Trim(zEmpPwd.Data)) > 5 Then
+
+Call send_f()
+
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

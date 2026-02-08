@@ -1,0 +1,161 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB280623)
+MAPSIZE(328, 608)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("ELW시간별차트")
+MAPPUBLIC(";")
+FONT("굴림", 9, NORMAL)
+TITLE("ELW 시간별 투자지표 차트")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("ho280623")
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+CONTROL  CONTROL0(2, 25, 607, 327)  |FA_PROTECT  "C_UserGrp"  "/i50000200000500040400000000000000000020000000000111000000000010000000012100000000001000000001310000000000100000000141000000000010000000"  LEN(0)  EDIT_INOUT    COLOR(192, 232)  TABORDER(6)  IOORDER(7)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  1301(739, 28, 819, 46)  LEN(6)  IO_MIXED|EDIT_INPUT    COLOR(68, 69)  CUR(0)  TP_NONE          TABORDER(1)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  CHECK0(3, 3, 55, 23)  '패리티'  TP_CHECK|EDIT_INPUT        FONT("굴림체", 9, NORMAL)  COLOR(64, 130)  CUR(0)      TABORDER(2)  IOORDER(2)  ENABLE  &
+  VISIBLE  CHECKED  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  CHECK1(65, 3, 141, 23)  '기어링비율'  TP_CHECK|EDIT_INPUT        FONT("굴림체", 9, NORMAL)  COLOR(64, 130)  CUR(0)      TABORDER(3)  IOORDER(3)  ENABLE  &
+  VISIBLE  CHECKED  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  CHECK2(151, 3, 227, 23)  '손익분기율'  TP_CHECK|EDIT_INPUT        FONT("굴림체", 9, NORMAL)  COLOR(64, 130)  CUR(0)      TABORDER(4)  IOORDER(4)  ENABLE  &
+  VISIBLE  CHECKED  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  CHECK3(237, 3, 313, 23)  '자본지지점'  TP_CHECK|EDIT_INPUT        FONT("굴림체", 9, NORMAL)  COLOR(64, 130)  CUR(0)      TABORDER(5)  IOORDER(5)  ENABLE  &
+  VISIBLE  CHECKED  TRANSPARENT  HINTTYPE(IH_NONE)
+OUT  rcod(739, 57, 822, 76)  LEN(12)  IO_MIXED|AL_CENTER|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(6)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Dim save, cnt
+save = ""
+
+Sub Check_one()
+cnt = 0
+If CHECK0.Checked = True Then
+	cnt = cnt + 1
+End If
+If CHECK1.Checked = True Then
+	cnt = cnt + 1
+End If
+If CHECK2.Checked = True Then
+	cnt = cnt + 1
+End If
+If CHECK3.Checked = True Then
+	cnt = cnt + 1
+End If
+
+If cnt = 1 Then
+	If CHECK0.Checked = True Then
+		CHECK0.Enable = False
+	End If
+	If CHECK1.Checked = True Then
+		CHECK1.Enable = False
+	End If
+	If CHECK2.Checked = True Then
+		CHECK2.Enable = False
+	End If
+	If CHECK3.Checked = True Then
+		CHECK3.Enable = False
+	End If
+Else
+	CHECK0.Enable = True
+	CHECK1.Enable = True
+	CHECK2.Enable = True
+	CHECK3.Enable = True
+End If
+End Sub
+
+_AW_ONSEND_AW_
+S1301.Data = SCREEN.object("main.E1301").Data
+If Len(Trim(S1301.Data)) <> 6 Then
+	SCREEN.OnSend False
+End If
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(CHECK0)
+_AW_ONCLICK_AW_
+If CHECK1.Checked = False And CHECK2.Checked = False And CHECK3.Checked = False Then
+	CHECK0.Checked = True
+End If
+
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ONDBLCLK_AW_
+If CHECK1.Checked = False And CHECK2.Checked = False And CHECK3.Checked = False Then
+	CHECK0.Checked = True
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(CHECK1)
+_AW_ONCLICK_AW_
+If CHECK0.Checked = False And CHECK2.Checked = False And CHECK3.Checked = False Then
+	CHECK1.Checked = True
+End If
+
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ONDBLCLK_AW_
+If CHECK0.Checked = False And CHECK2.Checked = False And CHECK3.Checked = False Then
+	CHECK1.Checked = True
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(CHECK2)
+_AW_ONCLICK_AW_
+If CHECK0.Checked = False And CHECK1.Checked = False And CHECK3.Checked = False Then
+	CHECK2.Checked = True
+End If
+
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ONDBLCLK_AW_
+If CHECK0.Checked = False And CHECK1.Checked = False And CHECK3.Checked = False Then
+	CHECK2.Checked = True
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(CHECK3)
+_AW_ONCLICK_AW_
+If CHECK0.Checked = False And CHECK1.Checked = False And CHECK2.Checked = False Then
+	CHECK3.Checked = True
+End If
+
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ONDBLCLK_AW_
+If CHECK0.Checked = False And CHECK1.Checked = False And CHECK2.Checked = False Then
+	CHECK3.Checked = True
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

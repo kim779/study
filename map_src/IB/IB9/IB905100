@@ -1,0 +1,110 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB905100)
+MAPSIZE(221, 434)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("굴림", 9, NORMAL)
+TITLE("BTN클릭자료 수집 모듈")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+OBJECT  OBJ_UINI(0, 0, 434, 171)    "IB905000"  TABORDER(1)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL0(45, 40, 375, 175)  '미사용'  TP_RAISED      COLOR(208, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Dim bCollect, cdata, bClose, stim, etim
+
+bCollect = False
+bClose = False
+stim = ""
+etim = ""
+Set cdata = CreateObject("Scripting.Dictionary")
+
+Sub OnPIDOUINI()
+	bCollect = (Len(Trim(SCREEN.Object("OBJ_UINI.IN_DATE").Data))>0)
+	If bCollect = True Then
+		stim = FormatDateTime(Now, 3)
+	End If
+End Sub
+
+Sub Add(key)
+	'SYSTEM.Trace "Add " & key & ", " & bCollect
+	If bCollect = True Then
+		If cdata.Exists(key) Then
+			cdata.Item(key) = cdata.Item(key) + 1
+		Else
+			cdata.Item(key) = 1
+		End If
+	End If
+End Sub
+
+Function GetYYYYMMDD()
+	Dim yyyy, mm, dd
+	yyyy = "" & Year(Now)
+	yyyy = String(4-Len(yyyy), "0") & yyyy
+	mm = "" & Month(Now)
+	mm = String(2-Len(mm), "0") & mm
+	dd = "" & Day(Now)
+	dd = String(2-Len(dd), "0") & dd
+	GetYYYYMMDD = yyyy & mm & dd
+End Function
+
+Sub CheckSend()
+	'SCREEN.Proc "OBJ_UINI.Query", "COLLECT,BN_CLICK,COUNT," & GetYYYYMMDD()
+End Sub
+
+Sub UpdateData()
+	Dim data
+
+	data = ""
+	For Each key in cdata.Keys
+		data = data & key & "=" & cdata.Item(key) & "|"
+	Next
+
+	etim = FormatDateTime(Now, 3)
+	SCREEN.Proc "OBJ_UINI.Insert", "COLLECT,BN_CLICK,COUNT " & Date & " " & stim & " - " & etim & "," & data
+End Sub
+
+_AW_ONSTART_AW_
+Call CheckSend()
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+SCREEN.OnSend = False
+
+_AW_ONENDSUB_AW_
+_AW_ONCLOSE_AW_
+If bCollect = True Then
+	If bClose = False Then
+		Call UpdateData()
+		bClose = True
+	End If
+End If
+
+_AW_ONENDSUB_AW_
+}
+
+
+

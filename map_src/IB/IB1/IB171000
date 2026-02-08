@@ -1,0 +1,223 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB171000)
+MAPSIZE(367, 708)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("계좌현황정보")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(ENCODE)
+TITLE("[1710]계좌현황정보")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL95(0, 34, 708, 347)  LIMAGE(0)  LINEW(4)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL0(0, 0, 712, 34)        COLOR(66, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL0(7, 7, 57, 27)  '계좌번호'  AL_LEFT  CUR(0)      COLOR(66, 69)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+CONTROL  AN99(57, 7, 197, 27)    "CX_Account"  "/w0"  LEN(11)  EDIT_INPUT    COLOR(192, 232)  TABORDER(1)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL6(267, 7, 317, 27)  '비밀번호'  AL_LEFT  CUR(0)      COLOR(66, 69)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  zPwd(317, 7, 373, 27)  LEN(8)  IO_MIXED|EDIT_INPUT|FA_PASSWD|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_SUNKEN          TABORDER(2)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  send_btn(666, 7, 702, 27)  '조회'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, BOLD)  FOCUS  COLOR(208, 186)  CUR(0)    "조회btn.bmp"    TABORDER(3)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+OUT  ACNM(198, 7, 262, 27)  LEN(30)  IO_NUM|AL_LEFT||FA_SKIP    COLOR(160, 69)  CUR(0)  LINECOLOR(89)          TABORDER(0)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL96(-2, 343, 710, 367)  LIMAGE(0)  LINEW(3)  LINETYPE(4)  LINECOLOR(64)      COLOR(34, 232)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL97(7, 348, 21, 362)    |IMAGE|AL_STRETCH    COLOR(34, 232)  CUR(0)    "알림_ic.bmp"  ENABLE  &
+  VISIBLE  IMAGE  HINTTYPE(IH_NONE)
+PANEL  GUIDE(26, 347, 697, 363)        COLOR(34, 69)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  sect(755, 31, 774, 56)  LEN(1)  IO_NUM|EDIT_INPUT|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("1")          TABORDER(4)  IOORDER(4)  ENABLE  &
+  HINTTYPE(IH_NONE)
+CONTROL  AN98(57, 7, 197, 27)    "CX_Account"  "/w0"  LEN(11)  EDIT_INPUT    COLOR(192, 232)  TABORDER(5)  IOORDER(5)  ENABLE  &
+  HINTTYPE(IH_NONE)
+USRTAB  tab(6, 40, 288, 66)  FOCUS  INDEX(0)  COUNT(2)  AL_TOP  TAB_IMAGE      FONT("굴림체", 9, NORMAL)    COLOR(3, 70)  CUR(0)  TABIMAGE("TAB.bmp")  FCOLOR(3, 71)  CAPTION("종합계좌현황", "개별계좌현황")  TABINFO("1:1", "1:2")  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  mobj(9, 68, 699, 337)    "IB171010"  TABORDER(6)  IOORDER(6)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BOX  BOX0(6, 65, 703, 340)    COLOR(165, 165)  LINEW(1)  BX_LINE    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+'== 계좌명, 비밀번호 설정
+Sub Set_account1()
+	SCREEN.ClearAll 2, 2
+	ACNM.Data = AN99.Name
+	zPwd.Data = AN99.Password
+	If Trim(AN99.Data) = "" Then
+		AN99.SetFocus
+		Exit Sub
+	End If
+	If Trim(zPwd.Data) = "" Then
+		zPwd.SetFocus
+		Exit Sub
+	End If
+
+	'Call send_f()
+End Sub
+
+'== 계좌명, 비밀번호 설정
+Sub Set_account2()
+	SCREEN.ClearAll 2, 2
+	ACNM.Data = AN98.Name
+	zPwd.Data = AN98.Password
+	If Trim(AN98.Data) = "" Then
+		AN98.SetFocus
+		Exit Sub
+	End If
+	If Trim(zPwd.Data) = "" Then
+		zPwd.SetFocus
+		Exit Sub
+	End If
+
+	'Call send_f()
+End Sub
+
+'== 첫 조회
+Sub send_f()
+	LEDGER.Fkey = "C"
+	SCREEN.Send 0
+End Sub
+
+'== 연속 조회
+Sub send_c()
+	LEDGER.Fkey = "7"
+
+	SCREEN.Send 0
+End Sub
+
+_AW_ONINDECLARE_AW_
+#Load IB888833
+
+_AW_ONENDSUB_AW_
+_AW_ONSTART_AW_
+Call Check_LoginType(zPwd)
+
+
+sect.Data = "1"
+
+AN98.Visible = False
+AN99.visible = True
+
+If Trim(AN98.data) = "" Then
+
+	ACNM.data = ""
+End If
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+' -- TR 보내기전 입력 필드 확인
+
+SCREEN.OnSend = False
+
+If sect.data = "1" Then
+	If SYSTEM.ConnectBy = 1 Then
+		If CheckInput(AN99, zPwd) = True Then
+			mobj.Send
+			'Exit Sub
+		End If
+	Else
+		zPwd.Data = "9999"
+		mobj.Send
+	End If
+ElseIf sect.data = "2" Then
+	If SYSTEM.ConnectBy = 1 Then
+		If CheckInput(AN98, zPwd) = True Then
+			mobj.Send
+			'Exit Sub
+		End If
+	Else
+		zPwd.Data = "9999"
+		mobj.Send
+
+	End If
+End If
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(AN99)
+_AW_ONCHANGE_AW_
+Set_account1()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(zPwd)
+_AW_ONKEYCHANGE_AW_
+'== 비밀번호 변경시 조회 버튼 기능 수행.
+If SCREEN.Key = "13" Then  '-- Enter 키 입력
+	SCREEN.Send 0
+
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(send_btn)
+_AW_ONCLICK_AW_
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(AN98)
+_AW_ONCHANGE_AW_
+Set_account2()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(tab)
+_AW_ONCLICK_AW_
+'AN99 : 종합계좌
+'AN98 : 개별계좌
+
+Select Case tab.ID
+Case 1
+		 AN98.Visible = False
+		 AN99.visible = True
+		 sect.Data = "1"
+		 mobj.SetObject "IB171010"
+		 GUIDE.Text = ""
+Case 2
+		 AN98.Visible = True
+		 AN99.visible = False
+		 sect.Data = "2"
+		 mobj.SetObject "IB171020"
+		 GUIDE.Text = ""
+Case Else
+         Exit Sub
+End Select
+
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

@@ -1,0 +1,67 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB68111A)
+MAPSIZE(143, 328)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("신주인수권 거래원")
+MAPPUBLIC(";")
+FONT("굴림", 9, NORMAL)
+OPTIONS(FMS|FLASH)
+TITLE("신주인수권 거래원")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pooppoop")
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+EDIT  1301(374, 265, 461, 285)  LEN(12)  IO_MIXED|EDIT_INOUT    COLOR(28, 63)  CUR(0)  TP_NONE          TABORDER(1)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+CONTROL  CONTROL7(0, 0, 328, 143)  |FA_PROTECT|FA_FLASH  "CX_Market"  "/s1/c0/l"  LEN(0)  EDIT_NOP    COLOR(192, 232)  TABORDER(0)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Sub Onalert()
+
+Dim cen_val, giho,  smsu
+smsu = Trim(t_smsu.GetTableCell(1))
+If Len(smsu) > 0 Then
+	If InStr(1, smsu, "+") > 0 Then
+		giho = "+"
+	ElseIf InStr(1, smsu, "-") > 0 Then
+		giho = "-"
+	End If
+	smsu = Replace(smsu, giho, "")
+	smsu = FormatCurrency(smsu)
+	smsu = Mid(smsu, 2, Len(smsu)-1)
+	TABLE5.SetTableCell 1, giho&smsu
+End If
+End Sub
+
+_AW_ONSEND_AW_
+S1301.Data = SCREEN.object("main.1301").Data
+Dim scode
+scode = SCREEN.object("main.scode").Data
+CONTROL7.Send scode
+SCREEN.OnSend = False
+
+_AW_ONENDSUB_AW_
+}
+
+
+

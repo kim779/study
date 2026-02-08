@@ -1,0 +1,120 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(TT647000)
+MAPSIZE(318, 639)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("채권발행정보")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+TITLE("[6470] 채권발행정보")
+TOPATH(AXIS)
+METHOD(MENU)
+TRXCODE("pibo6470")
+MAPTYPE(RESIZE)
+HEADER(NOP)
+BGROUND(BRUSH, 64)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL0(0, 0, 713, 25)        COLOR(66, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON2(603, 2, 635, 22)  '조회'  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(208, 69)  CUR(0)    "2btn.bmp"    TABORDER(1)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+LABEL  LABEL1(2, 2, 50, 22)  '종목번호'  AL_LEFT  CUR(0)      COLOR(141, 69)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_STRING)  HELPTEXT("전종목 조회")HELPTEXT("전종목 조회")
+EDIT  CKNO(50, 2, 150, 22)  LEN(12)  IO_MIXED|EDIT_INOUT|FA_WRAP|CODE      COLOR(192, 69)  CUR(0)  TP_SUNKEN          TABORDER(2)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON0(151, 3, 183, 23)  '검색'  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(208, 69)  CUR(0)    "2btn.bmp"    TABORDER(3)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+OUT  CKNA(185, 3, 383, 23)  LEN(40)  IO_MIXED|AL_LEFT|    COLOR(160, 69)  CUR(0)  LINECOLOR(89)          TABORDER(0)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+USRTAB  utab(2, 28, 686, 48)  FOCUS  INDEX(0)  COUNT(7)  AL_TOP  TAB_IMAGE        COLOR(3, 70)  CUR(0)  TABIMAGE("tab.bmp")  FCOLOR(3, 71)  CAPTION("채권분류", "발행조건", "이자/관련기관", "주식관련사채상세", "변동금리/상환방법", "옵션상세", "ELS/DLS채권상세")  TABINFO("1:0", "1:1", "1:2", "1:3", "1:4", "1:5", "1:6")  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  obj(2, 46, 637, 317)    "TT647010"  TABORDER(4)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONSTART_AW_
+SCREEN.Send 0
+obj.Send
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+'CKNA.Data = Trim(OUTPUT53.Data)
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(BUTTON2)
+_AW_ONCLICK_AW_
+SCREEN.Send 0
+obj.Send
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(CKNO)
+_AW_ONCHANGE_AW_
+If Len(Trim(CKNO.Data)) < 1 Or Trim(CKNO.Data) = "" Then
+	Exit Sub
+End If
+
+SCREEN.Send 0
+obj.Send
+
+'If Trim(CKNO.Data) <> "" Then
+'	BROWSER0.Navigate("http://isin.krx.co.kr/jsp/BA_VW011.jsp?isu_cd=" + Trim(CKNO.Data) + "&modi=f&req_no=200307250005 &popup=Y")
+'Else
+'End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON0)
+_AW_ONCLICK_AW_
+Dim data, name
+
+SCREEN.CreateWindow 2, "IB641199  /t /s /p?", ""
+
+data = SYSTEM.Pop("ckmsg")
+name = SYSTEM.Pop("ckname")
+
+CKNO.Data = data
+CKNA.Data = name
+
+SCREEN.Send 0
+obj.Send
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(utab)
+_AW_ONCLICK_AW_
+Select Case utab.ID
+	Case 0 : obj.SetObject "TT647010"
+	Case 1 : obj.SetObject "TT647020"
+	Case 2 : obj.SetObject "TT647030"
+	Case 3 : obj.SetObject "TT647040"
+	Case 4 : obj.SetObject "TT647050"
+	Case 5 : obj.SetObject "TT647060"
+	Case 6 : obj.SetObject "TT647070"
+End Select
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

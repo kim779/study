@@ -1,0 +1,223 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(AM080401)
+MAPSIZE(470, 377)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("MS Sans Serif", 9, NORMAL)
+TITLE("공지사항")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(FIXED)
+HEADER(NOP)
+BGROUND(BRUSH, 240)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL1(0, 445, 380, 480)  TP_RAISED      COLOR(240, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  imgPanel(0, 0, 378, 445)    |IMAGE|AL_CENTER    COLOR(181, 232)  CUR(10)    "event04.bmp"  ENABLE  &
+  VISIBLE  IMAGE  HINTTYPE(IH_NONE)
+BUTTON  nomore(10, 448, 135, 468)  '더 이상 보지않음'  TP_CHECK|EDIT_NOP        FONT("굴림체", 9, NORMAL)  COLOR(208, 130)  CUR(0)      TABORDER(1)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  btnClose(339, 448, 374, 468)  '닫기'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, NORMAL)  FOCUS  COLOR(181, 186)  CUR(0)    "2BTN.BMP"    TABORDER(2)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+BUTTON  btnLink(275, 448, 335, 468)  '바로가기'  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(208, 186)  CUR(0)    "6BTN.BMP"    TABORDER(3)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+PANEL  imgBottom(405, 0, 783, 445)    |IMAGE|AL_CENTER    COLOR(181, 232)  CUR(10)    "event04b.bmp"  ENABLE  &
+  VISIBLE  IMAGE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONSTART_AW_
+Dim W,H,LH,linkN,TotalH
+
+Dim nomoreType
+
+If SCREEN.CreateObject("Info") Then
+ 	W = Trim(INFO.PopData("", "noticeconf.ini", "STAFF", "WIDTH"))
+ 	H = Trim(INFO.PopData("", "noticeconf.ini", "STAFF", "HEIGHT"))
+ 	LH = Trim(INFO.PopData("", "noticeconf.ini", "STAFF", "LINKHEIGHT"))
+
+	linkN = Trim(INFO.PopData("", "noticeconf.ini", "STAFF", "linkN"))
+
+	If linkN = 1 Then
+		TotalH = CInt(H) + CInt(LH)
+
+		SCREEN.SetSize W,TotalH + 25
+	Else
+		TotalH = H
+
+ 		SCREEN.SetSize W,TotalH + 25
+ 	End If
+
+ 	nomoreType = INFO.PopData("", "noticeconf.ini", "STAFF", "READTYPE")
+
+ 	If nomoreType = "0" Then
+ 		nomore.Text = "일주일간 보지않음"
+ 	Else
+ 		nomore.Text = "더 이상 보지않음"
+ 	End If
+End If
+
+imgPanel.Left = 0
+imgPanel.Top = 0
+imgPanel.Right = W
+imgPanel.Bottom = H
+
+
+If linkN = 1 Then
+	imgBottom.SetRect 0,H,W,TotalH
+
+	btnLink.Visible = False
+End If
+
+PANEL1.SetRect 0,TotalH,W,TotalH + 25
+'---------------------------------------------------------------수정전
+'btnLink.Top = TotalH + 3
+'btnLink.Left = W - 35 - 6 - 60
+'btnLink.Bottom = TotalH + 23
+'btnLink.Right = btnLink.Left + 60
+'
+''btnLink.SetRect W - 35 - 6 - 60,TotalH + 3,btnLink.Left + 60,TotalH + 23
+'
+'btnClose.Top = TotalH + 3
+'btnClose.Left = W - 35 - 3
+'btnClose.Bottom = TotalH + 23
+'btnClose.Right = btnClose.Left + 35
+'
+''btnClose.SetRect W-35-3,TotalH + 3,btnClose.Left + 35,TotalH + 23
+'
+'nomore.Top = CInt(TotalH) + 3
+'nomore.Left = 10
+'nomore.Right = nomore.Left + 120
+'nomore.Bottom = CInt(TotalH) + 23
+'
+''nomore.SetRect 10,TotalH + 3,nomore.Left + 120,TotalH + 23
+
+'---------------------------------------------------------------수정전
+
+
+
+'btnLink.Top = TotalH + 3
+'btnLink.Left = W - 35 - 6 - 60
+'btnLink.Bottom = TotalH + 23
+'btnLink.Right = btnLink.Left + 60
+btnLink.SetRect W - 35 - 6 - 60,TotalH + 3,W - 35 - 6,TotalH + 23
+
+'btnClose.Top = TotalH + 3
+'btnClose.Left = W - 35 - 3
+'btnClose.Bottom = TotalH + 23
+'btnClose.Right = btnClose.Left + 35
+btnClose.SetRect W-35-3,TotalH + 3,W-3,TotalH + 23
+
+'nomore.Top = CInt(TotalH) + 3
+'nomore.Left = 10
+'nomore.Right = nomore.Left + 120
+'nomore.Bottom = CInt(TotalH) + 23
+nomore.SetRect 10,TotalH + 3,130,TotalH + 23
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(imgPanel)
+_AW_ONCLICK_AW_
+If SCREEN.CreateObject("Info") Then
+ 	Dim link
+
+ 	link = Trim(INFO.PopData("", "noticeconf.ini", "STAFF", "url"))
+
+	If InStr(link,"HTS:") > 0 Then
+		link = Mid(link,5,8)
+		SCREEN.CreateWindow 1, link & " /t/d/p5/S", ""
+	Else
+ 		SYSTEM.Navigate link & vbTab & "1000" & vbTab & "800"
+ 	End If
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(nomore)
+_AW_ONCLICK_AW_
+Dim nomoreType
+
+If SCREEN.CreateObject("Info") Then
+	Dim dtYesterday : dtYesterday = DateAdd( "d", 6, Date() )
+	Dim sYYYYMMDD
+	sYYYYMMDD =   Right( "0" & Year( dtYesterday ), 4 ) _
+	& Right( "0" & Month( dtYesterday ), 2 ) _
+	& Right( "0" & Day(   dtYesterday ), 2 )
+
+ 	INFO.PushData "", "NOTICECOOKIE.ini", "STAFF", "NOMORE", nomore.Checked
+
+ 	nomoreType = INFO.PopData("", "noticeconf.ini", "STAFF", "READTYPE")
+
+ 	If nomoreType = "0" And nomore.Checked = True Then
+ 		INFO.PushData "", "NOTICECOOKIE.INI", "STAFF", "TO",sYYYYMMDD
+ 	End If
+End If
+
+SCREEN.CloseWindow
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(btnClose)
+_AW_ONCLICK_AW_
+SCREEN.CloseWindow
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(btnLink)
+_AW_ONCLICK_AW_
+If SCREEN.CreateObject("Info") Then
+ 	Dim link
+
+ 	link = Trim(INFO.PopData("", "noticeconf.ini", "STAFF", "url"))
+
+	If InStr(link,"HTS:") > 0 Then
+		link = Mid(link,5,8)
+		SCREEN.CreateWindow 1, link & " /t/d/p5/S", ""
+	Else
+ 		SYSTEM.Navigate link & vbTab & "1000" & vbTab & "800"
+ 	End If
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(imgBottom)
+_AW_ONCLICK_AW_
+If SCREEN.CreateObject("Info") Then
+ 	Dim link
+
+ 	link = Trim(INFO.PopData("", "noticeconf.ini", "STAFF", "urlN"))
+
+	If InStr(link,"HTS:") > 0 Then
+		link = Mid(link,5,8)
+		SCREEN.CreateWindow 1, link & " /t/d/p5/S", ""
+	Else
+ 		SYSTEM.Navigate link & vbTab & "1000" & vbTab & "800"
+ 	End If
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

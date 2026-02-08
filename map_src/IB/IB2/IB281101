@@ -1,0 +1,507 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB281101)
+MAPSIZE(475, 805)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("ELW 종목검색")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+TITLE("[281101]ELW 종목검색")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pibo2811")
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+GRID  grd(6, 102, 795, 463)  VISIBLEROW(17)  CELLH(17)  MATRIX(200, 26)  FIX(6)  MAINCOLOR(7, 0)  LINECOLOR(75)  FOCUSCOLOR(78)  FOCUSKIND(3)    FONT("굴림체", 9, NORMAL)  ROWC(68, 77)  |SELALWAYS|FLEXIBLE|VSCROLL|HSCROLL|INS_TOP|NO3D|RROW|XHLINE|PAGE|HEADER    &
+	COLINFO("seqn")  LEN(4)  WIDTH(35)  HEAD("번호")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_SORT  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("1021")  LEN(7)  WIDTH(35)  HEAD("COD2")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_ALPHA|EDIT_OUTPUT  |FA_FLASH    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_SORT  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("1301")  LEN(6)  WIDTH(55)  HEAD("종목코드")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_ALPHA|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("022")  LEN(20)  WIDTH(132)  HEAD("종  목  명")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_REF)  COLHELPTEXT("1301")  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)  REFERENCE(1301)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("023")  LEN(8)  WIDTH(61)  HEAD("현재가")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_CORAW    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(94, 95)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("024")  LEN(9)  WIDTH(66)  HEAD("대 비")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_CORAW    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(94, 95)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("033")  LEN(10)  WIDTH(54)  HEAD("등락률")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSIGN    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(94, 95)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("027")  LEN(9)  WIDTH(73)  HEAD("거래량")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|SA_SPACE    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  COLUMN_SORT  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("028")  LEN(12)  WIDTH(97)  HEAD("거래대금")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|SA_SPACE    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  COLUMN_SORT  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col4")  LEN(7)  WIDTH(64)  HEAD("이론가")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|SA_SPACE    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  COLUMN_SORT  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col5")  LEN(11)  WIDTH(55)  HEAD("괴리율")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_RIGHT|FA_ZEROSUP|SA_SPACE    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  COLUMN_SORT  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col0")  LEN(7)  WIDTH(54)  HEAD("프리미엄")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_RIGHT|FA_ZEROSUP|SA_SPACE    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  COLUMN_SORT  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col6")  LEN(7)  WIDTH(55)  HEAD("패리티")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_RIGHT|FA_ZEROSUP|SA_SPACE    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  COLUMN_SORT  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col7")  LEN(12)  WIDTH(57)  HEAD("기어링")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_RIGHT|FA_ZEROSUP|SA_SPACE    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  COLUMN_SORT  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col8")  LEN(7)  WIDTH(64)  HEAD("손익분기율")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_RIGHT|FA_ZEROSUP|SA_SPACE    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  COLUMN_SORT  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col9")  LEN(7)  WIDTH(70)  HEAD("자본지지점")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_RIGHT|FA_ZEROSUP|SA_SPACE    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  COLUMN_SORT  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col10")  LEN(18)  WIDTH(90)  HEAD("기초자산")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT  |FA_ZEROSUP|SA_SPACE    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  COLUMN_SORT  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col11")  LEN(20)  WIDTH(110)  HEAD("발행사")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  COLUMN_SORT  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col12")  LEN(6)  WIDTH(60)  HEAD("잔존일수")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_ZEROSUP|SA_SPACE    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  COLUMN_SORT  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("2895")  LEN(12)  WIDTH(69)  HEAD("손익분기점")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|SA_SPACE    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  COLUMN_SORT  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("1352")  LEN(12)  WIDTH(65)  HEAD("행사가격")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|SA_SPACE    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  COLUMN_SORT  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("1855")  LEN(9)  WIDTH(70)  HEAD("전환비율")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_ZEROSUP|SA_SPACE    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  COLUMN_SORT  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("2884")  LEN(9)  WIDTH(70)  HEAD("델타")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_ZEROSUP|SA_SPACE    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  COLUMN_SORT  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("2900")  LEN(9)  WIDTH(69)  HEAD("e*기어링")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_ZEROSUP|SA_SPACE    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  COLUMN_SORT  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("2835")  LEN(9)  WIDTH(50)  HEAD("틱환산")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|SA_SPACE    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("1847")  LEN(12)  WIDTH(35)  HEAD("LP보유비율")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    TABORDER(13)  IOORDER(34)  ENABLE
+LABEL  LABEL2(86, 6, 123, 26)  '발행사'  AL_LEFT  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(11, 130)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL3(554, 6, 591, 26)  '잔존일'  AL_LEFT  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(11, 130)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL4(385, 6, 436, 26)  '권리유형'  AL_LEFT  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(11, 130)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL0(225, 6, 273, 26)  '기초자산'  AL_LEFT  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(11, 130)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  c_curr(11, 30, 81, 48)  ' 현 재 가'  TP_CHECK|EDIT_INPUT        FONT("굴림체", 9, NORMAL)  COLOR(208, 130)  CUR(0)      TABORDER(1)  IOORDER(7)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  e_curr0(89, 29, 154, 47)  LEN(7)  IO_NUM|EDIT_INPUT|FA_COMMA|FA_RIGHT  FONT("굴림체", 9, NORMAL)    COLOR(192, 130)  CUR(0)  TP_SUNKEN  INIT("0")          TABORDER(2)  IOORDER(16)  &
+  HINTTYPE(IH_NONE)
+LABEL  l_curr(163, 31, 178, 48)  '~'  AL_LEFT  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(208, 130)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  e_curr1(184, 29, 249, 47)  LEN(7)  IO_NUM|EDIT_INPUT|FA_COMMA|FA_RIGHT  FONT("굴림체", 9, NORMAL)    COLOR(192, 130)  CUR(0)  TP_SUNKEN  INIT("1000000")          TABORDER(3)  IOORDER(17)  &
+  HINTTYPE(IH_NONE)
+BUTTON  c_gvol(11, 51, 81, 69)  ' 거 래 량'  TP_CHECK|EDIT_INPUT        FONT("굴림체", 9, NORMAL)  COLOR(208, 130)  CUR(0)      TABORDER(4)  IOORDER(8)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  e_gvol0(89, 50, 154, 68)  LEN(9)  IO_NUM|EDIT_INPUT|FA_COMMA|FA_RIGHT  FONT("굴림체", 9, NORMAL)    COLOR(192, 130)  CUR(0)  TP_SUNKEN  INIT("0")          TABORDER(5)  IOORDER(18)  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL1(163, 51, 178, 68)  '~'  AL_LEFT  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(208, 130)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  e_gvol1(184, 50, 260, 68)  LEN(9)  IO_NUM|EDIT_INPUT|FA_COMMA|FA_RIGHT  FONT("굴림체", 9, NORMAL)    COLOR(192, 130)  CUR(0)  TP_SUNKEN  INIT("99999999")          TABORDER(6)  IOORDER(19)  &
+  HINTTYPE(IH_NONE)
+BUTTON  c_rate(11, 72, 81, 90)  ' 등 락 율'  TP_CHECK|EDIT_INPUT        FONT("굴림체", 9, NORMAL)  COLOR(208, 130)  CUR(0)      TABORDER(7)  IOORDER(9)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  e_rate0(89, 71, 154, 89)  LEN(7)  IO_NUM|EDIT_INPUT|FA_RIGHT  FONT("굴림체", 9, NORMAL)    COLOR(192, 130)  CUR(0)  TP_SUNKEN  INIT("-100.00")          TABORDER(8)  IOORDER(20)  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL5(163, 73, 178, 90)  '~'  AL_LEFT  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(208, 130)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  e_rate1(184, 71, 249, 89)  LEN(7)  IO_NUM|EDIT_INPUT|FA_RIGHT  FONT("굴림체", 9, NORMAL)    COLOR(192, 130)  CUR(0)  TP_SUNKEN  INIT("100.00")          TABORDER(9)  IOORDER(21)  &
+  HINTTYPE(IH_NONE)
+BUTTON  c_hsga(281, 30, 351, 48)  ' 행 사 가'  TP_CHECK|EDIT_INPUT        FONT("굴림체", 9, NORMAL)  COLOR(208, 130)  CUR(0)      TABORDER(10)  IOORDER(10)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  e_hsga0(364, 29, 429, 47)  LEN(7)  IO_NUM|EDIT_INPUT|FA_COMMA|FA_RIGHT  FONT("굴림체", 9, NORMAL)    COLOR(192, 130)  CUR(0)  TP_SUNKEN  INIT("0")          TABORDER(11)  IOORDER(22)  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL6(435, 30, 450, 47)  '~'  AL_LEFT  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(208, 130)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  e_hsga1(453, 29, 518, 47)  LEN(7)  IO_NUM|EDIT_INPUT|FA_COMMA|FA_RIGHT  FONT("굴림체", 9, NORMAL)    COLOR(192, 130)  CUR(0)  TP_SUNKEN  INIT("1000000")          TABORDER(12)  IOORDER(23)  &
+  HINTTYPE(IH_NONE)
+BUTTON  c_prim(549, 30, 619, 48)  ' 프리미엄'  TP_CHECK|EDIT_INPUT        FONT("굴림체", 9, NORMAL)  COLOR(208, 130)  CUR(0)      TABORDER(14)  IOORDER(13)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  e_prim0(632, 29, 697, 47)  LEN(7)  IO_NUM|EDIT_INPUT|FA_RIGHT  FONT("굴림체", 9, NORMAL)    COLOR(192, 130)  CUR(0)  TP_SUNKEN  INIT("-50.00")          TABORDER(15)  IOORDER(28)  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL7(705, 31, 720, 48)  '~'  AL_LEFT  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(208, 130)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  e_prim1(723, 29, 788, 47)  LEN(7)  IO_NUM|EDIT_INPUT|FA_RIGHT  FONT("굴림체", 9, NORMAL)    COLOR(192, 69)  CUR(0)  TP_SUNKEN  INIT("50.00")          TABORDER(16)  IOORDER(29)  &
+  HINTTYPE(IH_NONE)
+BUTTON  c_prty(549, 51, 619, 69)  ' 패 리 티'  TP_CHECK|EDIT_INPUT        FONT("굴림체", 9, NORMAL)  COLOR(208, 130)  CUR(0)      TABORDER(17)  IOORDER(14)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  e_prty0(632, 50, 697, 68)  LEN(7)  IO_NUM|EDIT_INPUT|FA_RIGHT  FONT("굴림체", 9, NORMAL)    COLOR(192, 130)  CUR(0)  TP_SUNKEN  INIT("0.00")          TABORDER(18)  IOORDER(30)  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL8(705, 51, 720, 68)  '~'  AL_LEFT  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(208, 130)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  e_prty1(723, 50, 788, 68)  LEN(7)  IO_NUM|EDIT_INPUT|FA_RIGHT  FONT("굴림체", 9, NORMAL)    COLOR(192, 69)  CUR(0)  TP_SUNKEN  INIT("300.00")          TABORDER(19)  IOORDER(31)  &
+  HINTTYPE(IH_NONE)
+BUTTON  c_lvrg(549, 72, 619, 90)  ' e*기어링'  TP_CHECK|EDIT_INPUT        FONT("굴림체", 9, NORMAL)  COLOR(208, 130)  CUR(0)      TABORDER(20)  IOORDER(15)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  e_lvrg0(632, 71, 697, 89)  LEN(7)  IO_NUM|EDIT_INPUT|FA_RIGHT  FONT("굴림체", 9, NORMAL)    COLOR(192, 130)  CUR(0)  TP_SUNKEN  INIT("-50.00")          TABORDER(21)  IOORDER(32)  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL9(705, 72, 720, 89)  '~'  AL_LEFT  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(208, 130)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  e_lvrg1(723, 71, 788, 89)  LEN(7)  IO_NUM|EDIT_INPUT|FA_RIGHT  FONT("굴림체", 9, NORMAL)    COLOR(192, 130)  CUR(0)  TP_SUNKEN  INIT("50.00")          TABORDER(22)  IOORDER(33)  &
+  HINTTYPE(IH_NONE)
+BUTTON  c_jhre(281, 72, 351, 90)  ' 전환비율'  TP_CHECK|EDIT_INPUT        FONT("굴림체", 9, NORMAL)  COLOR(208, 130)  CUR(0)      TABORDER(23)  IOORDER(12)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  e_jhre0(364, 71, 429, 89)  LEN(7)  IO_NUM|EDIT_INPUT|FA_RIGHT  FONT("굴림체", 9, NORMAL)    COLOR(192, 130)  CUR(0)  TP_SUNKEN  INIT("0.01")          TABORDER(24)  IOORDER(26)  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL10(435, 73, 450, 90)  '~'  AL_LEFT  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(208, 130)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  e_jhre1(453, 71, 518, 89)  LEN(7)  IO_NUM|EDIT_INPUT|FA_RIGHT  FONT("굴림체", 9, NORMAL)    COLOR(192, 130)  CUR(0)  TP_SUNKEN  INIT("100.00")          TABORDER(25)  IOORDER(27)  &
+  HINTTYPE(IH_NONE)
+BUTTON  c_lprt(281, 51, 351, 69)  ' LP보유율'  TP_CHECK|EDIT_INPUT        FONT("굴림체", 9, NORMAL)  COLOR(208, 130)  CUR(0)      TABORDER(26)  IOORDER(11)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  e_lprt0(364, 50, 429, 68)  LEN(7)  IO_NUM|EDIT_INPUT|FA_RIGHT  FONT("굴림체", 9, NORMAL)    COLOR(192, 130)  CUR(0)  TP_SUNKEN  INIT("0.00")          TABORDER(27)  IOORDER(24)  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL11(435, 51, 450, 68)  '~'  AL_LEFT  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(208, 130)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  e_lprt1(453, 50, 518, 68)  LEN(7)  IO_NUM|EDIT_INPUT|FA_RIGHT  FONT("굴림체", 9, NORMAL)    COLOR(192, 130)  CUR(0)  TP_SUNKEN  INIT("100.00")          TABORDER(28)  IOORDER(25)  &
+  HINTTYPE(IH_NONE)
+EDIT  ed_sort(60, 5, 82, 24)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP  FONT("굴림체", 9, NORMAL)    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("0")          TABORDER(29)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  CO_SORT(10, 5, 55, 24)  LEN(2)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_SUNKEN          TABORDER(30)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  ELWLP(125, 5, 205, 24)  LEN(12)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_SUNKEN          TABORDER(31)  IOORDER(3)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  ELWUD(275, 5, 355, 24)  LEN(12)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_SUNKEN          TABORDER(32)  IOORDER(4)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  CBKCOD(440, 5, 520, 24)  LEN(1)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_SUNKEN          TABORDER(33)  IOORDER(5)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  JJIS(590, 5, 670, 24)  LEN(1)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_SUNKEN          TABORDER(34)  IOORDER(6)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Option Explicit
+
+Dim componentArr, sendFlag
+componentArr = Array("c_curr", "e_curr0", "e_curr1", "l_curr", "c_gvol", "e_gvol0", "e_gvol1", "l_gvol",_
+					 "c_rate", "e_rate0", "e_rate1", "l_rate", "c_hsga", "e_hsga0", "e_hsga1", "l_hsga",_
+					 "c_lprt", "e_lprt0", "e_lprt1", "l_lprt", "c_jhre", "e_jhre0", "e_jhre1", "l_jhre",_
+					 "c_prim", "e_prim0", "e_prim1", "l_prim", "c_prty", "e_prty0", "e_prty1", "l_prty",_
+					 "c_lvrg", "e_lvrg0", "e_lvrg1", "l_lvrg")
+
+sendFlag = "N"
+
+Function getHeadColNo(headNm)
+	Select Case headNm
+		Case "등락률" 	  : getHeadColNo =  7
+		Case "거래량" 	  : getHeadColNo =  8
+		Case "거래대금"   : getHeadColNo =  9
+		Case "이론가" 	  : getHeadColNo = 10
+		Case "괴리율" 	  : getHeadColNo = 11
+		Case "프리미엄"   : getHeadColNo = 12
+		Case "패리티" 	  : getHeadColNo = 13
+		Case "기어링" 	  : getHeadColNo = 14
+		Case "손익분기율" : getHeadColNo = 15
+		Case "자본지지점" : getHeadColNo = 16
+		Case "기초자산"   : getHeadColNo = 17
+		Case "발행사" 	  : getHeadColNo = 18
+		Case "잔존일수"   : getHeadColNo = 19
+		Case "손익분기점" : getHeadColNo = 20
+		Case "행사가격"   : getHeadColNo = 21
+		Case "전환비율"   : getHeadColNo = 22
+		Case "델타" 	    : getHeadColNo = 23
+		Case "e*기어링"   : getHeadColNo = 24
+		Case "틱환산"     : getHeadColNo = 25
+		Case "LP보유비율" : getHeadColNo = 26
+	End Select
+End Function
+
+Function getHeadColWidth(headNm)
+	Select Case headNm
+		Case "등락률" 	  : getHeadColWidth = 56
+		Case "거래량" 	  : getHeadColWidth = 73
+		Case "거래대금"   : getHeadColWidth = 97
+		Case "이론가" 	  : getHeadColWidth = 54
+		Case "괴리율" 	  : getHeadColWidth = 74
+		Case "프리미엄"   : getHeadColWidth = 54
+		Case "패리티" 	  : getHeadColWidth = 55
+		Case "기어링" 	  : getHeadColWidth = 57
+		Case "손익분기율" : getHeadColWidth = 64
+		Case "자본지지점" : getHeadColWidth = 70
+		Case "기초자산"   : getHeadColWidth = 94
+		Case "발행사" 	  : getHeadColWidth = 110
+		Case "잔존일수"   : getHeadColWidth = 60
+		Case "손익분기점" : getHeadColWidth = 69
+		Case "행사가격"   : getHeadColWidth = 62
+		Case "전환비율"   : getHeadColWidth = 60
+		Case "델타" 	    : getHeadColWidth = 70
+		Case "e*기어링"   : getHeadColWidth = 60
+		Case "틱환산"     : getHeadColWidth = 60
+		Case "LP보유비율"     : getHeadColWidth = 70
+	End Select
+End Function
+
+
+Sub send_f()
+	sendFlag = "Y"
+	SCREEN.ClearAll 0, 2
+	SCREEN.Send 0
+End Sub
+
+_AW_ONINDECLARE_AW_
+#Load IB888833
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+Dim tmpCom, ii, compTp, IsChecked
+
+grd.clear
+
+CO_SORT.Data = Trim(SCREEN.Object("parent.CO_SORT").Data)
+
+If SCREEN.Object("parent.R_TOP").Checked = True Then
+	ed_sort.Data = "0"
+Else
+	ed_sort.Data = "1"
+End If
+
+ELWLP.Data = Trim(SCREEN.Object("parent.ELWLP").Data)
+ELWUD.Data = Trim(SCREEN.Object("parent.ELWUD").Data)
+CBKCOD.Data = Trim(SCREEN.Object("parent.CBKCOD").Data)
+JJIS.Data = Trim(SCREEN.Object("parent.JJIS").Data)
+
+For ii = LBound(componentArr) To UBound(componentArr)
+	tmpCom = Trim(componentArr(ii))
+	compTp = Left(tmpCom, 1)
+
+	If compTp <> "l" Then
+		If compTp = "c" Then
+			SCREEN.Object(tmpCom).Checked SCREEN.Object("parent." & tmpCom).Checked
+		Else
+			SCREEN.Object(tmpCom).Data = Trim(SCREEN.Object("parent." & tmpCom).Data)
+		End If
+	End If
+Next
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+Dim ii, jj, kk, grid, headNm, viewHeadNm, headInfoArr, col, width, data, tColor, gridRow
+Set grid = SCREEN.Object("parent.grd")
+
+For ii = 1 To grd.Rows
+
+	If sendFlag = "Y" Then
+		If ii < grid.Rows Then
+			gridRow = ii
+		Else
+			grid.InsertRow - 1
+			gridRow = grid.Rows
+		End If
+	Else
+		grid.InsertRow -1
+		gridRow = grid.Rows
+'		SYSTEM.Trace "gridRow = " & gridRow
+	End If
+
+	For jj = 1 To grd.Columns
+		If jj <= 6 Then
+			grid.SetGridCell gridRow, jj, Trim(grd.GetGridCell(ii, jj))
+		Else
+			headNm = Trim(grid.GetHead(jj))
+
+			If headNm <> "" Then
+				col = getHeadColNo(headNm)
+				data = Trim(grd.GetGridText(ii, col))
+
+				grid.SetGridCell gridRow, jj, data
+
+				If ii = 1 Then
+					width = getHeadColWidth(headNm)
+					grid.SetColumnWidth jj, width
+				End If
+
+				If headNm = "등락률" Then
+					If chkNumericData(data) = True Then
+						If CLng(data) > 0 Then
+							tColor = 94
+						ElseIf CLng(data) < 0 Then
+							tColor = 95
+						Else
+							tColor = 69
+						End If
+
+						grid.SetTrgb gridRow, jj, tColor
+					End If
+				ElseIf headNm = "발행사" Then
+					If Left(data, 1) = "+" Then
+						data = Mid(data, 2)
+						grid.SetGridCell gridRow, jj, data
+						tColor = 94
+					Else
+						tColor = 69
+					End If
+
+					grid.SetTrgb gridRow, jj, tColor
+				End If
+			End If
+		End If
+	Next
+Next
+
+If sendFlag = "Y" Then
+	If ii < grid.Rows Then
+		For jj = grid.Rows To ii Step -1
+			grid.RemoveRow jj - 1
+		Next
+	End If
+
+	grid.SetFocus
+	grid.Index grid.Rows - 1
+	grid.Index grid.Rows - 2
+	grid.Index grid.Rows - 3
+	grid.Index grid.Rows - 4
+	grid.Index 0
+	grid.Index 0
+	grid.Index 0
+End If
+
+sendFlag = "N"
+SCREEN.Object("parent.btn_send").SetFocus
+
+If Trim(SCREEN.GetMapName(1)) = "IB105000" Then
+	If grid.Rows <= 0 Then
+		SCREEN.Object("Main.GUIDE").Text = "조회내역이 없습니다"
+	Else
+		SCREEN.Object("Main.GUIDE").Text = "조회가 완료되었습니다"
+	End If
+Else
+	If grid.Rows <= 0 Then
+		SCREEN.Object("parent.mesg").Data = "조회내역이 없습니다"
+	Else
+		SCREEN.Object("parent.mesg").Data = "조회가 완료되었습니다"
+	End If
+End If
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(grd)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(c_curr)
+_AW_ONCLICK_AW_
+If c_curr.Checked = True Then
+	e_curr0.Enable = True
+	e_curr1.Enable = True
+Else
+	e_curr0.Enable = False
+	e_curr1.Enable = False
+End If
+
+
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(c_gvol)
+_AW_ONCLICK_AW_
+If c_gvol.Checked = True Then
+	e_gvol0.Enable = True
+	e_gvol1.Enable = True
+Else
+	e_gvol0.Enable = False
+	e_gvol1.Enable = False
+End If
+
+
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(c_rate)
+_AW_ONCLICK_AW_
+If c_rate.Checked = True Then
+	e_rate0.Enable = True
+	e_rate1.Enable = True
+Else
+	e_rate0.Enable = False
+	e_rate1.Enable = False
+End If
+
+
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(c_hsga)
+_AW_ONCLICK_AW_
+If c_hsga.Checked = True Then
+	e_hsga0.Enable = True
+	e_hsga1.Enable = True
+Else
+	e_hsga0.Enable = False
+	e_hsga1.Enable = False
+End If
+
+
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(c_prim)
+_AW_ONCLICK_AW_
+If c_prim.Checked = True Then
+	e_prim0.Enable = True
+	e_prim1.Enable = True
+Else
+	e_prim0.Enable = False
+	e_prim1.Enable = False
+End If
+
+
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(c_prty)
+_AW_ONCLICK_AW_
+If c_prty.Checked = True Then
+	e_prty0.Enable = True
+	e_prty1.Enable = True
+Else
+	e_prty0.Enable = False
+	e_prty1.Enable = False
+End If
+
+
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(c_lvrg)
+_AW_ONCLICK_AW_
+If c_lvrg.Checked = True Then
+	e_lvrg0.Enable = True
+	e_lvrg1.Enable = True
+Else
+	e_lvrg0.Enable = False
+	e_lvrg1.Enable = False
+End If
+
+
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(c_jhre)
+_AW_ONCLICK_AW_
+If c_jhre.Checked = True Then
+	e_jhre0.Enable = True
+	e_jhre1.Enable = True
+Else
+	e_jhre0.Enable = False
+	e_jhre1.Enable = False
+End If
+
+
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(c_lprt)
+_AW_ONCLICK_AW_
+If c_lprt.Checked = True Then
+	e_lprt0.Enable = True
+	e_lprt1.Enable = True
+Else
+	e_lprt0.Enable = False
+	e_lprt1.Enable = False
+End If
+
+
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

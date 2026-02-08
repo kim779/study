@@ -1,0 +1,408 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB810112)
+MAPSIZE(314, 556)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("자금대체대리인조회")
+MAPPUBLIC(";")
+FONT("굴림", 9, NORMAL)
+OPTIONS(ENCODE|CR2TAB)
+TITLE("자금대체대리인조회")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("piboPBxQ")
+MAPTYPE(FIXED)
+HEADER(LEDGER)
+TRXH("31CSACMQ329")
+}
+
+
+
+FORM DIVISION
+{
+
+EDIT  YChk(592, 182, 612, 201)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("0")          TABORDER(1)  IOORDER(5)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL0(327, 182, 592, 202)  'SACAQ519서비스에서약정된계좌가나왔는지체크'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+GRID  GRID0(70, 400, 760, 560)  VISIBLEROW(0)  CELLH(18)  MATRIX(200, 10)  FIX(0)  MAINCOLOR(7, 232)  LINECOLOR(75)  FOCUSCOLOR(78)  FOCUSKIND(4)    FONT("굴림체", 9, NORMAL)  ROWC(68, 77)  |MERGE|FLEXIBLE|VSCROLL|NO3D|RROW|GRFTEXT    &
+	COLINFO("BnkCode")  LEN(20)  WIDTH(67)  HEAD("계좌번호")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col0")  LEN(40)  WIDTH(67)  HEAD("계좌명")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col1")  LEN(1)  WIDTH(67)  HEAD("약정여부")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col2")  LEN(1)  WIDTH(67)  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col3")  LEN(1)  WIDTH(67)  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col4")  LEN(1)  WIDTH(67)  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col5")  LEN(1)  WIDTH(67)  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col6")  LEN(1)  WIDTH(67)  HEAD("자금대체약정")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col7")  LEN(1)  WIDTH(67)  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col8")  LEN(1)  WIDTH(67)  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    TABORDER(2)  IOORDER(4)  ENABLE
+GROUP  grp1(74, 247, 274, 386)  'INPUT'        COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  zIn(166, 270, 269, 286)  LEN(5)  IO_NUM|EDIT_INOUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("00001")          TABORDER(3)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL9(85, 270, 163, 286)  '레코드갯수'        COLOR(66, 76)  CUR(0)    AL_LEFT    ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  ElecfnUserId(166, 290, 269, 306)  LEN(16)  IO_NUM|EDIT_INOUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(4)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL2(85, 290, 163, 306)  '고객정보구분'        COLOR(66, 76)  CUR(0)    AL_LEFT    ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  Out(461, 296, 551, 314)  LEN(1)  IO_NUM|AL_LEFT|    COLOR(192, 232)  CUR(0)  LINECOLOR(75)          TABORDER(0)  IOORDER(3)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL10(370, 296, 460, 314)  '레코드갯수'  LINECOLOR(0)      COLOR(74, 76)  CUR(0)    AL_LEFT    ENABLE  &
+  HINTTYPE(IH_NONE)
+GROUP  GROUP0(357, 258, 679, 377)  'OUTPUT'        COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  guideAround(33, 181, 313, 207)  LIMAGE(1)  LINEW(3)  STRESS(0)  STRESSW(0)  LINETYPE(4)  LINECOLOR(64)      COLOR(34, 69)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL39(39, 187, 53, 201)    |IMAGE|AL_STRETCH    COLOR(208, 232)  CUR(0)    "알림_ic.bmp"  ENABLE  &
+  VISIBLE  TRANSPARENT  IMAGE  HINTTYPE(IH_NONE)
+PANEL  GUIDE(58, 184, 303, 204)        COLOR(203, 69)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  zAcntNo(376, 327, 496, 347)  LEN(20)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(5)  IOORDER(6)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  Tp(501, 327, 521, 347)  LEN(1)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(6)  IOORDER(7)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  gubn(526, 327, 556, 347)  LEN(1)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(7)  IOORDER(8)  ENABLE  &
+  HINTTYPE(IH_NONE)
+GRID  VIEWGRID(0, 5, 480, 158)  VISIBLEROW(0)  CELLH(18)  MATRIX(500, 5)  FIX(0)  MAINCOLOR(7, 232)  LINECOLOR(75)  FOCUSCOLOR(78)  FOCUSKIND(4)    FONT("굴림체", 9, NORMAL)  ROWC(68, 77)  |MERGE|FLEXIBLE|VSCROLL|NO3D|RROW|GRFTEXT    &
+	COLINFO("Col0")  LEN(3)  WIDTH(92)  HEAD("은행코드")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_SKIP    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col1")  LEN(20)  WIDTH(92)  HEAD("금융기관")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT  |FA_SKIP    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col2")  LEN(20)  WIDTH(92)  HEAD("계좌번호")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_SKIP    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  EDITFORMAT("999-99-999999")    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col3")  LEN(10)  WIDTH(92)  HEAD("구분")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT  |FA_SKIP    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col4")  LEN(20)  WIDTH(92)  HEAD("계좌명")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_SKIP    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    TABORDER(8)  IOORDER(9)  ENABLE  &
+  VISIBLE
+
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+'== 첫 조회
+Sub send_f()
+	GRID0.Clear()
+	VIEWGRID.Clear()
+	LEDGER.Fkey = "C"
+	SCREEN.Send 0
+End Sub
+
+'== 연속 조회
+Sub send_c()
+	LEDGER.Fkey = "7"
+	GRID0.SetDataPosition(2)
+	SCREEN.Send 0
+End Sub
+
+' 종합계좌간 자금대체 대리인 계좌 리스트
+Sub addCompany()
+	Dim ii, indx, chk, accn, text, acnm, ding, user_acc
+
+	user_acc = SCREEN.Object("Parent.CMB_ACCT").Data
+
+
+	VIEWGRID.Clear()
+
+	' VIEWGRID Start Count
+	indx = 1
+
+	' GRID0 Data to VIEWGRID
+	For ii = 1 To GRID0.Rows
+		accn  = Trim(GRID0.GetGridCell (ii, 1))	' 계좌
+		acnm  = Trim(GRID0.GetGridCell (ii, 2)) ' 계좌명
+
+		Select Case Mid(Trim(accnCell), 4, 2)
+			Case "10" : text = "주식/채권"
+			Case "11" : text = "ELW전용  "
+			Case "12" : text = "코넥스  "
+			Case "20" : text = "선물옵션"
+			Case "21" : text = "옵션전용"
+			Case "30" : text = "일반저축"
+			Case "51" : text = "CMA     "
+			Case "52" : text = "RP전용  "
+			Case "53" : text = "수익증권"
+			Case "55" : text = "연금저축"
+			Case "57" : text = "ISA펀드 "
+			Case "70" : text = "신탁    "
+			Case "37" : text = "ISA     "
+			Case Else : text = "        "
+		End Select
+
+		ding  = Trim(GRID0.GetGridCell (ii, 8)) ' 자금대체대리인 약정 여부
+
+		' 2022.07.19 요건사항 협의(윤영선차장님, 김지영차장님)에 의해
+		' 출금계좌가 자금대체대리인 약정인 계좌인 경우는
+		' 1. 자금대체대리인 약정이 맺어져 있는 계좌 중
+		' 2. 출금계좌와 동일한 계좌는 제외하고,
+		' 3. 출금계좌의 종합계좌에 소속된 계좌만
+		' 입금계좌로 세팅
+		If ding = "1" And Trim(user_acc) <> Trim(accn) And Right(Trim(user_acc), 6) = Right(Trim(accn), 6) Then
+			' VIEWGRID에 데이터 삽입
+			Call insert_row (indx, accn, text, acnm)
+			indx = indx + 1
+		End If
+	Next
+
+	' 상위 맵(Parent)에 내계좌 콤보 세팅 :: 자금대체 대리인
+	Call AcctSetting()
+
+End Sub
+
+' VIEWGRID에 계좌 삽입
+Sub insert_row(i_indx, i_accn, i_text, i_acnm)
+	VIEWGRID.InsertRow (i_indx)
+	VIEWGRID.SetGridCell i_indx, 1, "068"			' 당사코드
+	VIEWGRID.SetGridCell i_indx, 2, "IBK투자증권"	' 당사명
+	VIEWGRID.SetGridCell i_indx, 3, Trim(i_accn)	' 계좌번호
+	VIEWGRID.SetGridCell i_indx, 4, Trim(i_text)	' 계좌구분
+	VIEWGRID.SetGridCell i_indx, 5, Trim(i_acnm)	' 계좌명
+End Sub
+
+
+
+' 출금계좌가 내 계좌인 경우 내 계좌 리스트 세팅
+Sub addMyAccount()
+	Dim ii, t_accn, t_acnm, my_accn, text, user_acc
+
+	user_acc = Trim(SCREEN.Object("parent.CMB_ACCT").Data)
+
+	GRID0.Clear()
+	VIEWGRID.Clear()
+	indx = 1
+	For ii = 1 To SCREEN.Object("Main.OBJ_acct.GRID0").Rows
+		' 사용자 보유 전체 계좌 리스트
+		t_accn = Trim( SCREEN.Object("Main.OBJ_acct.GRID0").GetGridCell (ii,  9) )	' 계좌번호
+		t_acnm = Trim( SCREEN.Object("Main.OBJ_acct.GRID0").GetGridCell (ii, 10) )	' 계좌명
+		my_accn = Trim(SCREEN.Object("Main.OBJ_acct.GRID0").GetGridCell (ii, 12) )	' 동일인 여부
+
+		' 상품명
+		Select Case Mid(Trim(accnCell), 4, 2)
+				Case "10" : text     = "주식/채권"
+				Case "11" : text     = "ELW전용 "
+				Case "12" : text     = "코넥스  "
+				Case "20" : text     = "선물옵션"
+				Case "21" : text     = "옵션전용"
+				Case "30" : text     = "일반저축"
+				Case "51" : text     = "CMA     "
+				Case "52" : text     = "RP전용  "
+				Case "53" : text     = "수익증권"
+				Case "55" : text     = "연금저축"
+				Case "57" : text     = "ISA펀드 "
+				Case "70" : text     = "신탁    "
+				Case "37" : text     = "ISA     "
+				Case Else : text     = "        "
+		End Select
+
+		' 계좌가 있을때만 & 해당 계좌가 동일인 (내계좌) 일때만 & 출금계좌로 선택된 계좌는 제외
+		If Trim(t_accn) <> "" And Trim(my_accn) = "동일인" And Trim(t_accn) <> Trim(user_acc) Then
+			Call insert_row (indx, t_accn, text, t_acnm)
+			indx = indx + 1
+		End If
+	Next
+
+	Call AcctSetting()
+End Sub
+
+
+
+
+'***************************************************************
+' FINAL : 상단맵의 입금대상 계좌 콤보에 조회해온 데이터 세팅
+'***************************************************************
+Sub AcctSetting()
+	Dim user_acc, item, items, accn_type, textname
+
+
+	' 출금계좌
+	user_acc = Trim(SCREEN.Object("parent.CMB_ACCT").Data) '55번 없음
+    '->   user_acc = SCREEN.Object("Parent.AN00").IsAcnt()
+
+	' accn_type : TRUE(자금대체대리인), FALSE(내계좌)
+	accn_type = SCREEN.Object("Parent.AN00").IsAccAgent(Trim(user_acc), 6)
+
+
+	item = ""
+	items = ""
+
+
+	For ii = 1 To VIEWGRID.Rows
+		item = Trim(VIEWGRID.GetGridText(ii,3))	' 계좌번호
+		If Trim(item) <> "" Then
+			' 종합계좌가 아니면서 길이가 13Bytes(하이픈-포함)인 계좌만 유효
+
+			Select Case accn_type
+			Case True	' 자금대체 대리인 계좌 :: addCompany()에서 데이터 세팅
+				items = items & vbTab & item
+			Case False	' 내계좌 :: addMyAccount() 에서 Data Setting
+				'MsgBox "user_acc:"&user_acc
+			    'MsgBox "items:"&items
+			    'MsgBox "Trim(Mid(item,1,3)):"&Trim(Mid(item,1,3))
+			    'MsgBox "Trim(Mid(user_acc,1,3)):"&Trim(Mid(user_acc,1,3))
+				'MsgBox "Trim(Mid(item,8,6)):"&Trim(Mid(item,8,6))
+				'MsgBox "Trim(Mid(user_acc,6,6)):"&Trim(Mid(user_acc,6,6))
+
+				Select Case Trim(Mid(item,5,2))
+					Case "10" : textname = "주식/채권"
+					Case "11" : textname = "ELW전용 "
+					Case "12" : textname = "코넥스  "
+					Case "20" : textname = "선물옵션"
+					Case "21" : textname = "옵션전용"
+					Case "30" : textname = "일반저축"
+					Case "51" : textname = "CMA     "
+					Case "52" : textname = "RP전용  "
+					Case "53" : textname = "수익증권"
+					Case "55" : textname = "연금저축"
+					Case "57" : textname = "ISA펀드 "
+					Case "70" : textname = "신탁    "
+					Case "37" : textname = "ISA     "
+					Case Else : textname = "        "
+				End Select
+
+			    If Trim(Mid(user_acc,4,2)) <> "51" Then
+					Select Case Trim(Mid(item,5,2))
+					Case "10", "11", "12", "20", "21", "37", "51", "52", "53"
+						If (CLng(Left(Trim(item), 3)) < 551 Or CLng(Left(Trim(item), 3)) > 561) Then	' 551 ~ 561 계좌는 SKIP
+							items = items & vbTab & item & " " &textname
+						End If
+					End Select
+			    Else '51번 계좌일때
+			    	Select Case Trim(Mid(item,5,2))
+					Case "10", "11", "12", "20", "21", "37", "51", "52", "53", "55"
+						If Trim(Mid(item,5,2)) = "55" Then '55번 계좌중에서도 앞 3자리,뒤 6자리 같은경우만 보여주도록 수정 요청- 윤영선차장
+							If Trim(Mid(item,1,3)) = Trim(Mid(user_acc,1,3)) And Trim(Mid(item,8,6)) = Trim(Mid(user_acc,6,6)) Then
+								items = items & vbTab & item & " " &textname
+							End If
+						ElseIf (CLng(Left(Trim(item), 3)) < 551 Or CLng(Left(Trim(item), 3)) > 561) Then	' 551 ~ 561 계좌는 SKIP
+							items = items & vbTab & item & " " &textname
+						End If
+					End Select
+				End If
+				' 내계좌인 경우 다음 상품에 대해 데이터 세팅
+				'Select Case Trim(Mid(item,5,2))
+				'Case "10", "11", "12", "20", "21", "37", "51", "52", "53", "55"
+				'	If (CLng(Left(Trim(item), 3)) < 551 Or CLng(Left(Trim(item), 3)) > 561) Then	' 551 ~ 561 계좌는 SKIP
+				'		items = items & vbTab & item
+				'	End If
+				'End Select
+
+			End Select
+		End If
+	Next
+
+
+	' 상단맵의 입금대상계좌 콤보 데이터 세팅
+	SCREEN.Object("parent.CMB_ACCT2").SetItems(items)
+
+	' 상단 맵의 지연이체 여부 확인
+	If SCREEN.Object("parent.DlyMtrsfTp").visible = True Then
+		SCREEN.Object("parent.DlyMtrsfTp").SetFocus()
+	Else
+		SCREEN.Object("parent.AMT").SetFocus()
+	End If
+
+	SCREEN.Proc "Parent.getName", ""
+End Sub
+
+_AW_ONSTART_AW_
+LEDGER.Rcnt = "0010"
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+SCREEN.OnSend = False
+
+' 출금계좌가 본인 계좌인 경우,
+' MAIN.Obj_acct의 SACMQ913의 데이터 중 "동일인" 계좌만 추려서
+' 입금대상계좌로 세팅,
+' 출금계좌가 종합계좌간자금대체대리인 경우,
+' 현재 전문 (SACMQ241)로 해당 출금계좌의 종합계좌에 소속된 서브 계좌를 조회해서
+' 입금대상계좌로 세팅
+
+' 출금계좌가 자금대체대리인(6)인지 확인
+If SCREEN.Object("Parent.AN00").IsAccAgent(Trim(SCREEN.Object("Parent.CMB_ACCT").Data), 6) <> True Then
+	Call addMyAccount()	' 입금대상 계좌 리스트에 내 계좌 세팅
+	Exit Sub
+End If
+
+
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+' 이하는 출금계좌가 종합계좌간 자금대체대리인인경우
+' SACMQ329로 내 ID에 약정된 자금대체대리인 계좌 전체 리스트 조회
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+zIn.Data = "00001"
+
+ElecfnUserId.Data = Trim(SYSTEM.UserID)
+
+SCREEN.OnSend = True
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+If Left(Trim(LEDGER.Ecod), 1) = "0" Then
+	If Trim(LEDGER.Next) = "Y" Then
+		Call send_c()
+	Else
+		' 당사 코드 세팅
+		Call addCompany()
+	End If
+End If
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(GRID0)
+_AW_ONCLICK_AW_
+If GRID0.HitPos <> 3 Then
+	Exit Sub
+End If
+
+Dim bnkCode, bnkName, bnkAcntNo, bnkAcntNm, bnkAcntNick
+bnkCode = Trim(GRID0.GetGridCell(GRID0.Row, 1))
+bnkName = Trim(GRID0.GetGridCell(GRID0.Row, 2))
+bnkAcntNo = Trim(GRID0.GetGridCell(GRID0.Row, 3))
+bnkAcntNm = Trim(GRID0.GetGridCell(GRID0.Row, 4))
+bnkAcntNick = Trim(GRID0.GetGridCell(GRID0.Row, 5))
+
+If GRID0.Column <> "6" Then
+	SYSTEM.Push "MyACCN", "OK"
+	SYSTEM.Push "bank_code", bnkCode
+	SYSTEM.Push "bank_name", Trim(GRID0.GetGridCell(GRID0.row, 2))
+	SYSTEM.Push "bank_acctNum", bnkAcntNo
+	SYSTEM.Push "bank_Nick", Trim(GRID0.GetGridCell(GRID0.row, 5))
+	SCREEN.CloseWindow
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(VIEWGRID)
+_AW_ONCLICK_AW_
+If VIEWGRID.HitPos <> 3 Then
+	Exit Sub
+End If
+
+Dim bnkCode, bnkName, bnkAcntNo, bnkAcntNm, bnkAcntNick
+bnkCode = Trim(VIEWGRID.GetGridCell(VIEWGRID.Row, 1))			' 금융코드
+bnkName = Trim(VIEWGRID.GetGridCell(VIEWGRID.Row, 2))			' 금융기관명
+bnkAcntNo = Trim(VIEWGRID.GetGridCell(VIEWGRID.Row, 3))			' 계좌번호
+bnkAcntNm = Trim(VIEWGRID.GetGridCell(VIEWGRID.Row, 5))			' 계좌구분
+bnkAcntNick = Trim(VIEWGRID.GetGridCell(VIEWGRID.Row, 4))		' 계좌명
+
+
+SYSTEM.Push "MyACCN", "OK"
+SYSTEM.Push "bank_code", bnkCode
+SYSTEM.Push "bank_name", bnkName
+SYSTEM.Push "bank_acctNum", bnkAcntNo
+SYSTEM.Push "bank_Nick", Trim(VIEWGRID.GetGridCell(VIEWGRID.row, 4))
+SYSTEM.Push "bnkAcntNm", Trim(bnkAcntNm)
+
+SCREEN.CloseWindow
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

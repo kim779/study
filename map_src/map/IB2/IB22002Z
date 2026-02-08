@@ -1,0 +1,256 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB22002Z)
+MAPSIZE(20, 383)
+VERSION(001)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("선옵주문-선물호가")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(FMS|FLASH)
+TITLE("[2200] 선물정보")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pooppoop")
+MAPTYPE(NORM)
+HEADER(NOP)
+HELPFILE("?")
+}
+
+
+
+FORM DIVISION
+{
+
+OUT  31023(81, 0, 164, 20)  LEN(9)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT|FA_CORGB|SA_COSUP  FONT("굴림체", 9, BOLD)    COLOR(68, 69)  CUR(0)            IFRGB(94, 95)  TABORDER(0)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_STRING)  HELPTEXT("현재가")HELPTEXT("현재가")
+OUT  31112(303, 0, 383, 20)  LEN(12)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT    COLOR(192, 69)  CUR(0)            IFRGB(94, 95)  TABORDER(0)  IOORDER(15)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_STRING)  HELPTEXT("예상량")HELPTEXT("예상량")
+OUT  31116(227, 0, 293, 20)  LEN(8)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT|FA_CORGB|SA_COSUP    COLOR(192, 69)  CUR(0)            IFRGB(94, 95)  TABORDER(0)  IOORDER(14)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_STRING)  HELPTEXT("등락률")HELPTEXT("등락률")
+OUT  31115(161, 0, 229, 20)  LEN(7)  IO_NUM|AL_CENTER||FA_RIGHT|FA_CORGB|FA_CONTRAST|SA_CORAW|SA_TEXT    COLOR(192, 69)  CUR(0)            IFRGB(94, 95)  TABORDER(0)  IOORDER(13)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_STRING)  HELPTEXT("전일대비")HELPTEXT("전일대비")
+OUT  31111(81, 0, 164, 20)  LEN(9)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT|FA_CORGB|SA_COSUP  FONT("굴림체", 9, BOLD)    COLOR(68, 69)  CUR(0)            IFRGB(94, 95)  TABORDER(0)  IOORDER(12)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_STRING)  HELPTEXT("예상가")HELPTEXT("예상가")
+EDIT  30303(389, 285, 464, 305)  LEN(2)  IO_ALPHA|EDIT_INOUT|FA_WRAP|FA_NOR  FONT("굴림체", 9, NORMAL)    COLOR(203, 0)  CUR(0)  TP_NONE  INIT("1")          TABORDER(1)  IOORDER(1)  &
+  HINTTYPE(IH_NONE)
+OUT  30021(107, 241, 167, 261)  LEN(8)  IO_ALPHA|AL_LEFT||FA_FLASH    COLOR(74, 69)  CUR(0)            TABORDER(0)  IOORDER(2)  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL2(292, 0, 304, 20)  '%'  AL_CENTER  CUR(0)      COLOR(68, 232)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL4(103, 502, 183, 522)  'RTS KEY'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BOX  BOX0(72, 357, 377, 377)    COLOR(65, 65)  LINEW(1)  BX_LINE    ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  31025(489, 255, 572, 272)  LEN(9)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT|FA_CORGB|SA_COSUP  FONT("굴림", 9, BOLD)    COLOR(68, 69)  CUR(0)            IFRGB(94, 95)  TABORDER(0)  IOORDER(4)  ENABLE  &
+  HINTTYPE(IH_STRING)  HELPTEXT("현재가")HELPTEXT("현재가")
+OUT  31026(346, 242, 429, 259)  LEN(9)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT|FA_CORGB|SA_COSUP  FONT("굴림", 9, BOLD)    COLOR(68, 69)  CUR(0)            IFRGB(94, 95)  TABORDER(0)  IOORDER(5)  ENABLE  &
+  HINTTYPE(IH_STRING)  HELPTEXT("현재가")HELPTEXT("현재가")
+LABEL  LABEL0(110, 165, 173, 183)  AL_CENTER  CUR(0)      COLOR(200, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  obj_getFutureCode(490, 340, 595, 445)    "IB22003K"  TABORDER(2)  IOORDER(6)  ENABLE  &
+  HINTTYPE(IH_NONE)
+COMBO  cFCod(0, 0, 78, 20)  TP_SUNKEN  LEN(2)  COUNT(0)  VCOUNT(0)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_NUM|EDIT_INPUT    COLOR(68, 130)  CUR(0)    TABORDER(3)  IOORDER(7)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  futureList(55, 555, 535, 575)  LEN(80)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(4)  IOORDER(8)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL1(78, 0, 80, 20)        COLOR(66, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  startFlag(265, 655, 295, 667)  '0'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  31024(161, 0, 229, 20)  LEN(7)  IO_NUM|AL_CENTER||FA_RIGHT|FA_CORGB|FA_CONTRAST|SA_CORAW|SA_TEXT    COLOR(192, 69)  CUR(0)            IFRGB(94, 95)  TABORDER(0)  IOORDER(9)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_STRING)  HELPTEXT("전일대비")HELPTEXT("전일대비")
+OUT  31033(227, 0, 293, 20)  LEN(8)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT|FA_CORGB|SA_COSUP    COLOR(192, 69)  CUR(0)            IFRGB(94, 95)  TABORDER(0)  IOORDER(10)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_STRING)  HELPTEXT("등락률")HELPTEXT("등락률")
+OUT  31027(303, 0, 383, 20)  LEN(12)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT    COLOR(192, 69)  CUR(0)            IFRGB(94, 95)  TABORDER(0)  IOORDER(11)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_STRING)  HELPTEXT("거래량")HELPTEXT("거래량")
+BOX  BOX01(80, 0, 383, 20)    COLOR(0, 65)  LINEW(1)  BX_LINE    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Sub setFutureCode()
+	futureList.Clear
+	futureList.Data = Trim(SCREEN.Object("obj_getFutureCode.futureList").Data)
+	Dim fcodeArr, ii, items, fdata, idx, fcod
+	items = ""
+	fcodeArr = Split(Trim(futureList.Data), "|")
+
+	For ii = LBound(fcodeArr)+1 To UBound(fcodeArr)
+			fdata = Trim(fcodeArr(ii))
+			idx = Left(fdata, 2)
+			fcod = Mid(fdata, 3)
+
+			If items = "" Then
+				items = idx
+			End If
+
+			items = items & vbTab & idx & fcod
+	Next
+
+	cFCod.SetItems items
+	SCREEN.Send 0
+End Sub
+
+Sub codeTrigger()
+
+'	SYSTEM.Trace "cFCod.Text [" & cFCod.Text & "]parent.ed_focod [" & SCREEN.Object("parent.ed_focod").Data & "] main.ed_focod[" & SCREEN.Object("main.ed_focod").data & "]"
+	' 2009/03/31 선물코드 클릭시 종목이 트리거될 수 있도록 수정
+	ls_codx = Trim(cFCod.Text)
+	If SCREEN.Object("main.ed_focod").Data <> ls_codx Then
+		SCREEN.Object("parent.ed_focod").Data = ls_codx
+		SCREEN.Object("main.ed_focod").data = ls_codx
+		SCREEN.Proc "main.send_sise_all", "main"
+	End If
+End Sub
+
+Sub SetPredict(chkPrd)
+	'SYSTEM.Trace "SETPREDICT " & chkPrd
+	If chkPrd <> 0 Then
+		S31023.Visible = False
+		S31024.Visible = False
+		S31033.Visible = False
+		S31027.Visible = False
+
+		S31111.Visible = True
+		S31116.Visible = True
+		S31115.Visible = True
+		S31112.Visible = True
+	Else
+		S31023.Visible = True
+		S31024.Visible = True
+		S31033.Visible = True
+		S31027.Visible = True
+
+		S31111.Visible = False
+		S31116.Visible = False
+		S31115.Visible = False
+		S31112.Visible = False
+	End If
+End Sub
+
+Sub start()
+	startFlag.Text = "0"
+
+	SCREEN.Proc "obj_getFutureCode.send_f", ""
+
+	SetPredict(False)
+End Sub
+
+_AW_ONSEND_AW_
+SCREEN.OnSend False
+SCREEN.ClearAll 0, 2
+S30303.Data = cFCod.Data
+If Trim(S30303.Data) <> "" Then
+	SCREEN.OnSend True
+End If
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+' 2009/03/31 선물코드 클릭시 종목이 트리거될 수 있도록 수정
+LABEL0.Data = S30021.Data
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(31023)
+_AW_ONCLICK_AW_
+Call codeTrigger()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(31112)
+_AW_ONCLICK_AW_
+Call codeTrigger()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(31116)
+_AW_ONCLICK_AW_
+Call codeTrigger()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(31115)
+_AW_ONCLICK_AW_
+Call codeTrigger()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(31111)
+_AW_ONCLICK_AW_
+Call codeTrigger()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(31025)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(31026)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(LABEL0)
+_AW_ONCLICK_AW_
+' 2009/03/31 선물코드 클릭시 종목이 트리거될 수 있도록 수정
+ls_codx = Trim(S30021.Data)
+If SCREEN.Object("parent.ed_focod").Data <> ls_codx Then
+	SCREEN.Object("parent.ed_focod").Data = ls_codx
+	SCREEN.Object("main.ed_focod").data = ls_codx
+	SCREEN.Proc "main.send_sise_all", "main"
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(cFCod)
+_AW_ONCHANGE_AW_
+SCREEN.Send 0
+
+If Trim(startFlag.Text) = "0" Then
+	startFlag.Text = "1"
+	Exit Sub
+End If
+
+Call codeTrigger()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(31024)
+_AW_ONCLICK_AW_
+Call codeTrigger()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(31033)
+_AW_ONCLICK_AW_
+Call codeTrigger()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(31027)
+_AW_ONCLICK_AW_
+Call codeTrigger()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

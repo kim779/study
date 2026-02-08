@@ -1,0 +1,63 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(TT888833)
+MAPSIZE(625, 652)
+VERSION(000)
+MAPKIND(PROCEDURES)
+MAPGROUP(0)
+MAPDESC("PB 계정계")
+MAPPUBLIC(";")
+FONT("굴림", 9, NORMAL)
+TITLE("PB Procedures")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+'-- PowerBase 계정계화면 공통함수
+'--
+'--
+
+'== 소수 2자리 add
+Function str2flt(edit1)
+	str2flt = CDbl(Trim(edit1.data))
+	str2flt = Trim(FormatNumber(str2flt, 2, 0, 0, 0))
+	edit1.data = str2flt
+End Function
+
+'==계좌번호, 비밀번호 체크
+Function CheckInput(ANCT, zPwd)
+ 	CheckInput = False
+ 	If Trim(ANCT.data) = "" Then
+ 		MsgBox "계좌번호를 확인하세요", , SCREEN.GetCaption()
+  		ANCT.Setfocus
+  		Exit Function
+ 	End If
+ 	If Len(Trim(zPwd.data)) < 4 Then
+  		MsgBox "비밀번호를 확인하세요", ,  SCREEN.GetCaption()
+  		zPwd.Setfocus
+  		Exit Function
+ 	End If
+ 	CheckInput = True
+End Function
+
+}
+
+
+

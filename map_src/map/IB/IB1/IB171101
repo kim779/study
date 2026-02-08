@@ -1,0 +1,72 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB171101)
+MAPSIZE(75, 182)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("MS Sans Serif", 9, NORMAL)
+TITLE("IBKS투자비서팝업")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pibo1711")
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+EDIT  i_usid(10, 10, 70, 30)  LEN(16)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(1)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  o_cnt(10, 40, 50, 65)  LEN(4)  IO_NUM|AL_CENTER|    COLOR(192, 69)  CUR(0)            TABORDER(0)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  o_status(60, 40, 135, 65)  LEN(3)  IO_MIXED|AL_CENTER|    COLOR(192, 69)  CUR(0)            TABORDER(0)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  CDAT(405, 455, 525, 474)  LEN(8)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP|FA_DATE    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(2)  IOORDER(4)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONSEND_AW_
+i_usid.Data = LOGIN.User
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+Dim res, Today, Check
+
+res = o_status.Data
+
+If SCREEN.CreateObject("Info") Then
+	Today = INFO.PopData("", "NOTICECOOKIE.ini", "1711", "TODAY")
+
+	If Today = "0" Or (Today <> CDAT.Data) Then
+		INFO.PushData "", "NOTICECOOKIE.INI", "1711", "TODAY", CDAT.Data
+		INFO.PushData "", "NOTICECOOKIE.ini", "1711", "FIRST", "1"
+	Else
+	 	INFO.PushData "", "NOTICECOOKIE.INI", "1711", "TODAY", CDAT.Data
+	End If
+
+	Check = INFO.PopData("", "NOTICECOOKIE.ini", "1711", "FIRST")
+
+	If InStr(res, "O") > 0 And Check = "1" Then
+		SCREEN.CreateWindow 1, "IB171100 /p1", ""
+	End If
+
+End If
+
+_AW_ONENDSUB_AW_
+}
+
+
+

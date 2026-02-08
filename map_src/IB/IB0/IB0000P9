@@ -1,0 +1,90 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB0000P9)
+MAPSIZE(543, 525)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("원장스위칭")
+MAPPUBLIC(";")
+FONT("MS Sans Serif", 9, NORMAL)
+TITLE("해외주식 업무마감 작업안내")
+TOPATH(AXIS)
+METHOD(MENU)
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  BASE_PANEL(-43, -24, 527, 545)  TP_RAISED      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL0(0, -139, 527, 544)        COLOR(64, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  korea_notice(0, 0, 527, 543)  LIMAGE(1)  LINEW(3)  LINETYPE(4)  LINECOLOR(64)  |IMAGE|AL_CENTER    COLOR(66, 232)  CUR(0)    "korea_notice.BMP"  ENABLE  &
+  IMAGE  HINTTYPE(IH_NONE)
+EDIT  KIND(28, 552, 223, 575)  LEN(16)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("해외서머해제")          TABORDER(1)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  BUTTON0(546, 8, 566, 28)  TP_PUSH|IMAGE|AL_STRETCH      FOCUS  COLOR(238, 240)  CUR(10)    "닫기1.BMP"    TABORDER(2)  ENABLE  &
+  IMAGE  HOVER  HINTTYPE(IH_NONE)
+PANEL  global_notice_summer(0, 0, 527, 543)  LIMAGE(1)  LINEW(3)  LINETYPE(4)  LINECOLOR(64)  |IMAGE|AL_CENTER    COLOR(66, 232)  CUR(0)    "global_notice.BMP"  ENABLE  &
+  IMAGE  HINTTYPE(IH_NONE)
+PANEL  global_notice_nosummer(0, 0, 527, 543)  LIMAGE(1)  LINEW(3)  LINETYPE(4)  LINECOLOR(64)  |IMAGE|AL_CENTER    COLOR(66, 232)  CUR(0)    "global_notice1.BMP"  ENABLE  &
+  IMAGE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONSTART_AW_
+Select Case Trim(KIND.Data)
+Case "국내"
+	korea_notice.Visible = True
+Case "해외서머"
+	global_notice_summer.Visible = True
+Case "해외서머해제"
+	global_notice_nosummer.Visible = True
+Case Else
+	korea_notice.Visible = True
+End Select
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(korea_notice)
+_AW_ONCLICK_AW_
+SCREEN.CloseWindow()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON0)
+_AW_ONCLICK_AW_
+SCREEN.CloseWindow()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(global_notice_summer)
+_AW_ONCLICK_AW_
+SCREEN.CloseWindow()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(global_notice_nosummer)
+_AW_ONCLICK_AW_
+SCREEN.CloseWindow()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

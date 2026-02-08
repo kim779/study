@@ -1,0 +1,536 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB315351)
+MAPSIZE(237, 981)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("펀드정정주문리스트")
+MAPPUBLIC(";")
+FONT("굴림", 9, NORMAL)
+OPTIONS(ENCODE)
+TITLE("[3153]펀드주문체결")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("piboPBxQ")
+MAPTYPE(FIXED)
+HEADER(LEDGER)
+TRXH("21CSONBQ701")
+}
+
+
+
+FORM DIVISION
+{
+
+EDIT  In(515, 455, 671, 475)  LEN(5)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 69)  CUR(0)  TP_SUNKEN  INIT("00001")          TABORDER(1)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL7(443, 455, 515, 475)  '레코드갯수'  AL_LEFT  CUR(0)      COLOR(141, 192)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  zFundOrdUserId(515, 474, 671, 494)  LEN(16)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 69)  CUR(0)  TP_SUNKEN  INIT("00001")          TABORDER(2)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL0(443, 474, 515, 494)  '펀드사용자ID'  AL_LEFT  CUR(0)      COLOR(141, 192)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  zFundId(515, 493, 671, 513)  LEN(12)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 69)  CUR(0)  TP_SUNKEN          TABORDER(3)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL1(443, 493, 515, 513)  '펀드ID'  AL_LEFT  CUR(0)      COLOR(141, 192)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL2(443, 512, 515, 532)  '펀드주문번호'  AL_LEFT  CUR(0)      COLOR(141, 192)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL3(445, 634, 517, 654)  '인풋값'  AL_LEFT  CUR(0)      COLOR(141, 192)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  OUTPUT0(517, 634, 787, 653)  LEN(43)  IO_MIXED|AL_CENTER|    COLOR(192, 69)  CUR(0)            TABORDER(0)  IOORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL4(445, 658, 517, 678)  '레코드갯수'  AL_LEFT  CUR(0)      COLOR(141, 192)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  OUTPUT1(517, 658, 560, 677)  LEN(1)  IO_NUM|AL_CENTER|    COLOR(192, 69)  CUR(0)            TABORDER(0)  IOORDER(5)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+GRID  GRID0(0, 26, 981, 237)  VISIBLEROW(0)  CELLH(18)  MATRIX(1000, 18)  FIX(0)  MAINCOLOR(7, 232)  LINECOLOR(75)  FOCUSCOLOR(78)  FOCUSKIND(4)    FONT("굴림체", 9, NORMAL)  ROWC(68, 77)  |FLEXIBLE|VSCROLL|HSCROLL|NO3D|RROW|XHLINE|GRFTEXT    &
+	COLINFO("zAcntNo")  LEN(20)  WIDTH(86)  HEAD("계좌번호")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  EDITFORMAT("999-99-999999")    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("lOrdNo")  LEN(10)  WIDTH(55)  HEAD("주문번호")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_CORGB|SA_COSUP    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(69, 69)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("zBnsTp")  LEN(1)  WIDTH(21)  HEAD("매매구분")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("zBnsTpNm")  LEN(10)  WIDTH(62)  HEAD("매매")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("zFnoIsuNo")  LEN(32)  WIDTH(74)  HEAD("종목번호")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("lOrdQty")  LEN(16)  WIDTH(60)  HEAD("주문수")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSUP    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(69, 69)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("dOrdPrc")  LEN(13)  WIDTH(75)  HEAD("원주문가격")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  FLOAT(2)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|FA_FLOAT|SA_SPACE|SA_COSUP    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(69, 69)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("lExecQty")  LEN(16)  WIDTH(64)  HEAD("체결량")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSUP    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(69, 69)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("dExecAvrPrc")  LEN(13)  WIDTH(69)  HEAD("체결단가")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  FLOAT(2)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|FA_FLOAT|SA_SPACE|SA_COSUP    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(69, 69)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("lOrgOrdNo")  LEN(10)  WIDTH(34)  HEAD("주문번호")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSUP    COLOR(68, 69)  COLCUR(0, 0)    INORMAL  IFRGB(69, 69)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("lUnercQty")  LEN(16)  WIDTH(64)  HEAD("미체결")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSUP    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(69, 69)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("zOrdTime")  LEN(9)  WIDTH(34)  HEAD("주문시각")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT  |FA_CORGB|SA_CORAW    COLOR(68, 69)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("zOrdTpNm")  LEN(10)  WIDTH(34)  HEAD("주문구분명")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col6")  LEN(1)  WIDTH(21)  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_INOUT  |FA_SKIP    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_HIMGTEXT  COLUMN_VISIBLE  ICHECK    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col7")  LEN(13)  WIDTH(64)  HEAD("정정가격")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  FLOAT(2)  IO_NUM|EDIT_INOUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_SKIP|FA_CORGB|FA_FLOAT|SA_SPACE|SA_COSUP    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(69, 69)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col8")  LEN(16)  WIDTH(62)  HEAD("정/취수량")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_INOUT  |FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_SKIP|FA_CORGB|SA_SPACE|SA_COSUP    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(69, 69)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col9")  LEN(20)  WIDTH(60)  HEAD("정취주문#")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT  |FA_SKIP    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col10")  LEN(100)  WIDTH(298)  HEAD("처리메세지")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT  |FA_SKIP    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    TABORDER(4)  IOORDER(6)  ENABLE  &
+  VISIBLE
+
+PANEL  GUIDE(5, 270, 764, 288)  LINECOLOR(0)      COLOR(208, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL0(0, 0, 981, 26)        COLOR(66, 130)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  Qty3(195, 3, 245, 23)  '초기화'  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(132, 232)  CUR(10)    "3BTN.BMP"    TABORDER(5)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+BUTTON  BUTTON0(295, 5, 327, 25)  '다음'  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(132, 232)  CUR(0)    "2BTN.BMP"    TABORDER(6)  &
+  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+COMBO  COMBO0(7, 4, 127, 23)  TP_SUNKEN  LEN(10)  COUNT(0)  VCOUNT(0)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_NUM|EDIT_INPUT    COLOR(68, 69)  CUR(0)    TABORDER(7)  IOORDER(7)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  OBJ_CMB(65, 70, 321, 293)    "IB315352"  TABORDER(8)  IOORDER(8)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  BUTTON1(132, 3, 190, 23)  '새로고침'  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(132, 232)  CUR(10)    "4BTN.BMP"    TABORDER(9)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+BUTTON  BTN_MODIFY(767, 3, 827, 23)  '가격정정'  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(132, 232)  CUR(10)    "4BTN.BMP"    TABORDER(10)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+BUTTON  BUTTON2(830, 3, 902, 23)  '시장가정정'  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(132, 232)  CUR(10)    "5BTN.BMP"    TABORDER(11)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+BUTTON  BUTTON3(905, 3, 977, 23)  '모두취소'  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(132, 232)  CUR(10)    "4BTN.BMP"    TABORDER(12)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+BUTTON  allCheck(5, 25, 24, 47)  TP_CHECK|EDIT_NOP          COLOR(208, 232)  CUR(0)      TABORDER(13)  ENABLE  &
+  VISIBLE  CHECKED  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  CHECK0(132, 282, 312, 294)  '신규주문확인창 없음'  TP_CHECK|EDIT_NOP          COLOR(181, 232)  CUR(0)      TABORDER(14)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  CHECK1(132, 303, 312, 315)  '그룹별 정정주문확인창 없음'  TP_CHECK|EDIT_NOP          COLOR(181, 232)  CUR(0)      TABORDER(15)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  CHECK2(132, 323, 312, 335)  '그룹별 취소주문확인창 없음'  TP_CHECK|EDIT_NOP          COLOR(181, 232)  CUR(0)      TABORDER(16)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  CHECK3(327, 281, 507, 293)  '주문전송 후 수량지움'  TP_CHECK|EDIT_NOP          COLOR(181, 232)  CUR(0)      TABORDER(17)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  CHECK4(327, 303, 507, 315)  '주문전송 후 가격지움'  TP_CHECK|EDIT_NOP          COLOR(181, 232)  CUR(0)      TABORDER(18)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  CHECK5(327, 323, 507, 335)  '주문전송 후 체크표시 유지'  TP_CHECK|EDIT_NOP          COLOR(181, 232)  CUR(0)      TABORDER(19)  ENABLE  &
+  CHECKED  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Sub send_f()
+
+	'next_btn.Enable = False
+	SCREEN.ClearAll 0, 2
+	GRID0.SetDataPosition(0)
+	LEDGER.Fkey = "C"
+
+	SCREEN.Send 0
+End Sub
+
+'== 연속 조회
+Sub send_c()
+	LEDGER.Fkey = "7"
+	GRID0.SetDataPosition(2)
+	SCREEN.Send 0
+End Sub
+
+Function MakeQty(str)
+	If Trim(str) = "" Then
+		MakeQty = "+000000000000000"
+		Exit Function
+	End If
+	str = "+"&Mid(str,2)
+
+	MakeQty = str
+End Function
+
+Function MakeJuNo(str)
+	Dim slen
+	If Trim(str) = "" Then
+		MakeQty = "+000000000"
+		Exit Function
+	End If
+	str = Trim(Mid(str,2))
+	slen = Len(str)
+	For ii=slen+1 To 9
+		str = "0"&str
+	Next
+
+
+	str = "+"&str
+
+	MakeJuNo = str
+End Function
+
+Function MakePrice(str)
+	If Trim(str)="" Then
+		MakePrice = "+000000000.00"
+		Exit Function
+	End If
+	str = "+"&Mid(str, 3,Len(str)-4)&"."&Mid(str, Len(str)-1,2)
+
+	MakePrice = str
+End Function
+
+Sub DoModify(tval)
+	Dim trow, irow, ii, val, chk, val_cnt, juno
+	SCREEN.Object("main.OBJ_MODIFY.zFundId").data = Mid(SCREEN.Object("main.OBJ_ODR.cmb_fund").Data,2)
+	trow = GRID0.rows
+	SCREEN.Object("main.OBJ_MODIFY.in2").data = CStr(trow)
+
+	If trow > 0 Then
+		val_cnt = 1
+		Call SCREEN.Object("main.OBJ_MODIFY.Grid0").Clear
+		SCREEN.Object("main.OBJ_MODIFY.Grid0").SetRows trow
+		For ii = 1 To trow
+			chk = GRID0.GetGridCell(ii, 14)
+			If chk = 1 Then
+				Call SCREEN.Object("main.OBJ_MODIFY.Grid0").SetGridCell(val_cnt, 1,  GRID0.GetGridCell(ii, 1))
+				Call SCREEN.Object("main.OBJ_MODIFY.Grid0").SetGridCell(val_cnt, 2,  "")
+				Call SCREEN.Object("main.OBJ_MODIFY.Grid0").SetGridCell(val_cnt, 3,  GRID0.GetGridCell(ii, 5))
+				val = GRID0.GetGridCell(ii, 2)
+				val = makejuno(val)
+				Call SCREEN.Object("main.OBJ_MODIFY.Grid0").SetGridCell(val_cnt, 4,  val)
+				If tval=1 Then
+					Call SCREEN.Object("main.OBJ_MODIFY.Grid0").SetGridCell(val_cnt, 5,  "00")
+				ElseIf tval=0 Then
+					Call SCREEN.Object("main.OBJ_MODIFY.Grid0").SetGridCell(val_cnt, 5,  "03")
+				End If
+				val = GRID0.GetGridCell(ii, 16)
+
+				val = makeqty(val)
+
+				Call SCREEN.Object("main.OBJ_MODIFY.Grid0").SetGridCell(val_cnt, 6,  val)'"+000000000000002")
+				val = GRID0.GetGridCell(ii, 15)
+				If tval=1 Then
+					val = makeprice(val)
+				ElseIf tval=0 Then
+					val = makeprice("")
+					Call GRID0.SetGridCell(ii, 15, "+000000000.00")
+				End If
+				Call SCREEN.Object("main.OBJ_MODIFY.Grid0").SetGridCell(val_cnt, 7,  val)'"+000000203.05")'
+				Call GRID0.SetGridCell(ii, 17, "")
+				Call GRID0.SetGridCell(ii, 18, "")
+				val_cnt = val_cnt+1
+			End If
+		Next
+		SCREEN.Object("main.OBJ_MODIFY.Grid0").SetRows val_cnt-1
+		SCREEN.Object("main.OBJ_MODIFY.in2").data = CStr(val_cnt-1)
+	End If
+	If OrderConform(tval) Then
+		Call SCREEN.Object("main.OBJ_MODIFY").Send
+	End If
+End Sub
+
+Function OrderConform(tval)
+	If CHECK1.Checked Then
+		OrderConform = True
+		Exit Function
+	End If
+	Dim acnt, cnt, code, jprc, s_data, mmgb, hogb, ret, jqty, ii, cf, Orno
+
+	For ii = 1 To GRID0.Rows
+		If GRID0.GetGridCell(ii ,14) = 1 Then
+			cnt = cnt + 1
+			Orno = GRID0.GetGridCell(ii, 2)			'원부문번호
+			acnt = GRID0.GetGridCell(ii, 1)			'계좌번호
+			mmgb = GRID0.GetGridCell(ii, 4)			'매매구분
+			If tval = 1 Then
+				hogb = "지정가"
+			Else
+				hogb = "시장가"
+			End If
+			code = GRID0.GetGridCell(ii, 5)			'종목코드
+			jqty = GRID0.GetGridCell(ii, 16)			'주문수량
+			jprc = GRID0.GetGridCell(ii, 15)			'주문단가
+
+			s_data = "#" & s_data
+			s_data = jprc & "|" & s_data				'주문단가
+			s_data = jqty & "|" & s_data				'주문수량
+			s_data = code & "|" & s_data				'종목코드
+			s_data = hogb & "|" & s_data				'호가구분
+			s_data = mmgb & "|" & s_data				'매매구분
+			s_data = Orno & "|" & s_data				'원주문번호
+			s_data = acnt & "|" & s_data				'계좌번호
+		End If
+	Next
+
+	If cnt > 0 Then
+		SYSTEM.Push "num", cnt
+		'SCREEN.CreateWindow 2, "IB310103 /p5 /d", "s_data" & vbTab & s_data
+		SCREEN.CreateWindow 2, "IB315396 /p5 /d", "s_data" & vbTab & s_data & vbLf
+	End If
+	cf = SYSTEM.Pop("C3153")
+	If cnt = 0 Then
+		MsgBox "주문 낼 항목을 선택하십시오.",,"IBK투자증권"
+		cf = "NO"
+	End If
+	If cf = "OK" Then
+		OrderConform = True
+	Else
+		OrderConform = False
+	End If
+End Function
+
+Function OrderConform2()
+	If CHECK2.Checked Then
+		OrderConform2 = True
+		Exit Function
+	End If
+	Dim acnt, cnt, code, jprc, s_data, mmgb, hogb, ret, jqty, ii, cf, Orno
+
+	For ii = 1 To GRID0.Rows
+		If GRID0.GetGridCell(ii ,14) = 1 Then
+			cnt = cnt + 1
+			Orno = GRID0.GetGridCell(ii, 2)			'원부문번호
+			acnt = GRID0.GetGridCell(ii, 1)			'계좌번호
+			mmgb = GRID0.GetGridCell(ii, 4)			'매매구분
+			hogb = " "
+
+			code = GRID0.GetGridCell(ii, 5)			'종목코드
+			jqty = GRID0.GetGridCell(ii, 16)			'주문수량
+			jprc = GRID0.GetGridCell(ii, 15)			'주문단가
+
+			s_data = "#" & s_data
+			s_data = jprc & "|" & s_data				'주문단가
+			s_data = jqty & "|" & s_data				'주문수량
+			s_data = code & "|" & s_data				'종목코드
+			s_data = hogb & "|" & s_data				'호가구분
+			s_data = mmgb & "|" & s_data				'매매구분
+			s_data = Orno & "|" & s_data				'원주문번호
+			s_data = acnt & "|" & s_data				'계좌번호
+		End If
+	Next
+
+	If cnt > 0 Then
+		SYSTEM.Push "num", cnt
+		'SCREEN.CreateWindow 2, "IB310103 /p5 /d", "s_data" & vbTab & s_data
+		SCREEN.CreateWindow 2, "IB315397 /p5 /d", "s_data" & vbTab & s_data & vbLf
+	End If
+	cf = SYSTEM.Pop("C3153")
+	If cnt = 0 Then
+		MsgBox "주문 낼 항목을 선택하십시오.",,"IBK투자증권"
+		cf = "NO"
+	End If
+	If cf = "OK" Then
+		OrderConform2 = True
+	Else
+		OrderConform2 = False
+	End If
+End Function
+
+Sub DoCancel()
+	Dim trow, irow, ii, val, chk, val_cnt, juno
+	SCREEN.Object("main.OBJ_CANCEL.zFundId").data = Mid(SCREEN.Object("main.OBJ_ODR.cmb_fund").Data,2)
+	trow = GRID0.rows
+	SCREEN.Object("main.OBJ_CANCEL.in2").data = CStr(trow)
+
+	If trow > 0 Then
+		val_cnt = 1
+		Call SCREEN.Object("main.OBJ_CANCEL.Grid0").Clear
+		SCREEN.Object("main.OBJ_CANCEL.Grid0").SetRows trow
+		For ii = 1 To trow
+			chk = GRID0.GetGridCell(ii, 14)
+			If chk = 1 Then
+				Call SCREEN.Object("main.OBJ_CANCEL.Grid0").SetGridCell(val_cnt, 1,  GRID0.GetGridCell(ii, 1))
+				Call SCREEN.Object("main.OBJ_CANCEL.Grid0").SetGridCell(val_cnt, 2,  "")
+				Call SCREEN.Object("main.OBJ_CANCEL.Grid0").SetGridCell(val_cnt, 3,  GRID0.GetGridCell(ii, 5))
+				val = GRID0.GetGridCell(ii, 2)
+				val = makejuno(val)
+				Call SCREEN.Object("main.OBJ_CANCEL.Grid0").SetGridCell(val_cnt, 4,  val)
+
+				val = GRID0.GetGridCell(ii, 16)
+				val = makeqty(val)
+				Call SCREEN.Object("main.OBJ_CANCEL.Grid0").SetGridCell(val_cnt,5,  val)'"+000000000000002")
+				Call GRID0.SetGridCell(ii, 17, "")
+				Call GRID0.SetGridCell(ii, 18, "")
+				val_cnt = val_cnt+1
+			End If
+		Next
+		SCREEN.Object("main.OBJ_CANCEL.Grid0").SetRows val_cnt-1
+		SCREEN.Object("main.OBJ_CANCEL.in2").data = CStr(val_cnt-1)
+	End If
+	If OrderConform2() Then
+		Call SCREEN.Object("main.OBJ_CANCEL").Send
+	End If
+End Sub
+
+Sub LoadCfg()
+	Dim ii, str
+	If SCREEN.CreateObject("Info") Then
+		str = Trim(INFO.PopData(LOGIN.Name, "userconf.ini", "IB315300", "config"))
+		If Len(str) < 6 Then
+			str = "000001"
+		End If
+		For ii=0 To 5
+
+			If Mid(str, ii+1, 1) = "1" Then
+				SCREEN.Object("CHECK"&CStr(ii)).Checked = True
+			Else
+				SCREEN.Object("CHECK"&CStr(ii)).Checked = False
+			End If
+		Next
+		'INFO.PushData LOGIN.Name, "userconf.ini", "IB315300", "config", str
+	End If
+End Sub
+
+Sub AfterOrder()
+	If Not CHECK5.Checked Then
+		Call SetAllCheck("0")
+	End If
+End Sub
+
+Sub SetAllCheck(Istr)
+	Dim val, ii, sval
+	If Istr = "1" Then
+		allCheck.Checked = True
+	Else
+		allCheck.Checked = False
+	End If
+
+
+	If allCheck.Checked Then
+		sval = "1"
+	Else
+		sval = "0"
+	End If
+
+	If GRID0.Rows > 0 Then
+
+		For ii=1 To GRID0.Rows
+			Call GRID0.SetGridCell(ii, 14, sval)
+		Next
+	End If
+End Sub
+
+Sub RefreshData
+	'MsgBox Trim(zFundId.Data) &")"&Trim(SCREEN.Object("main.OBJ_ODR.CMB_FUND").data)
+	If Trim(SCREEN.Object("OBJ_CMB.zFundId").Data) <> Trim(SCREEN.Object("main.OBJ_ODR.CMB_FUND").data) Then
+		SCREEN.Proc "OBJ_CMB.Send_f", ""
+	End If
+End Sub
+
+_AW_ONSTART_AW_
+Dim ret
+
+zFundOrdUserId.Data = SYSTEM.UserID
+Call LoadCfg()
+'If SYSTEM.ConnectBy = 1 Then
+'	zUserTp.Data = "1"
+'Else
+'	zUserTp.Data = "2"
+'End If
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+SCREEN.OnSend = False
+LEDGER.Rcnt = "0022"
+zFundId.Data = SCREEN.Object("main.OBJ_ODR.CMB_FUND").data
+If Trim(COMBO0.Data) = "" Then
+	Exit Sub
+End If
+SCREEN.OnSend = True
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+
+SCREEN.Object("main.GUIDE").Text = GUIDE.Text
+Dim ii, val
+If LEDGER.Next = "Y" Then
+	Call Send_c()
+Else
+	If GRID0.Rows > 0 Then
+		For ii=1 To GRID0.Rows
+			val = Trim(GRID0.GetGridCell(ii, 11))
+			If val <> "" Then
+				Call GRID0.SetGridCell(ii, 14, "1")
+			End If
+		Next
+	End If
+End If
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(GRID0)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(Qty3)
+_AW_ONCLICK_AW_
+Call Send_f()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON0)
+_AW_ONCLICK_AW_
+Call Send_f()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(COMBO0)
+_AW_ONCHANGE_AW_
+Call Send_f()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON1)
+_AW_ONCLICK_AW_
+SCREEN.Proc "OBJ_CMB.Send_f", ""
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BTN_MODIFY)
+_AW_ONCLICK_AW_
+Call DoModify(1)
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON2)
+_AW_ONCLICK_AW_
+Call DoModify(0)
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON3)
+_AW_ONCLICK_AW_
+Call DoCancel()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(allCheck)
+_AW_ONCLICK_AW_
+Dim val, ii, sval
+If allCheck.Checked Then
+	sval = "1"
+Else
+	sval = "0"
+End If
+
+If GRID0.Rows > 0 Then
+
+	For ii=1 To GRID0.Rows
+		Call GRID0.SetGridCell(ii, 14, sval)
+	Next
+End If
+_AW_ONENDSUB_AW_
+_AW_ONDBLCLK_AW_
+Dim val, ii, sval
+If allCheck.Checked Then
+	sval = "1"
+Else
+	sval = "0"
+End If
+
+If GRID0.Rows > 0 Then
+
+	For ii=1 To GRID0.Rows
+		Call GRID0.SetGridCell(ii, 14, sval)
+	Next
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

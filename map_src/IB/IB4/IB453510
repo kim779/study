@@ -1,0 +1,151 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB453510)
+MAPSIZE(20, 250)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("±¼¸²", 9, NORMAL)
+OPTIONS(FMS|FLASH)
+TITLE("453510")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pooppoop")
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+EDIT  100301(0, 0, 80, 20)  LEN(8)  IO_ALPHA|EDIT_INOUT|FA_UPPER|CODE    FONT("±¼¸²Ã¼", 9, NORMAL)    COLOR(192, 130)  CUR(0)  TP_SUNKEN          TABORDER(1)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  100021(240, 105, 375, 125)  LEN(30)  IO_MIXED|AL_LEFT||FA_FLASH  FONT("±¼¸²Ã¼", 9, BOLD)    COLOR(90, 69)  CUR(0)  LINECOLOR(89)          TABORDER(0)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL13(19, 51, 92, 68)  'ÇöÀç°¡'        COLOR(96, 130)  CUR(0)    AL_CENTER  FONT("±¼¸²Ã¼", 9, NORMAL)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  101023(93, 51, 180, 70)  LEN(8)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSUP  FONT("±¼¸²Ã¼", 9, BOLD)    COLOR(76, 69)  CUR(0)            IFRGB(94, 95)  TABORDER(0)  IOORDER(4)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL67(19, 68, 92, 86)  'ÀüÀÏ´ëºñ'        COLOR(96, 130)  CUR(0)    AL_CENTER  FONT("±¼¸²Ã¼", 9, NORMAL)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  101024(93, 69, 180, 88)  LEN(8)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT|FA_ZEROSUP|SA_SPACE  FONT("±¼¸²Ã¼", 9, BOLD)    COLOR(188, 69)  CUR(0)            IFRGB(94, 95)  TABORDER(0)  IOORDER(5)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  SYMBOL26(20, 85, 95, 106)  'ÀÌ ·Ð °¡'  AL_CENTER  FONT("±¼¸²Ã¼", 9, NORMAL)  CUR(0)      COLOR(77, 97)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  101202(95, 90, 185, 111)  LEN(8)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSIGN  FONT("±¼¸²Ã¼", 9, NORMAL)    COLOR(76, 69)  CUR(0)            IFRGB(94, 95)  TABORDER(0)  IOORDER(3)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  SYMBOL7(80, 0, 99, 20)  TP_PUSH|IMAGE|AL_STRETCH      COLOR(24, 0)  CUR(0)    "°Ë»ö.BMP"    TABORDER(2)  ENABLE  &
+  VISIBLE  IMAGE  HOVER  HINTTYPE(IH_NONE)
+OUT  100022(100, 0, 250, 20)  LEN(30)  IO_MIXED|AL_LEFT|  FONT("±¼¸²Ã¼", 9, BOLD)    COLOR(160, 130)  CUR(0)  LINECOLOR(89)          TABORDER(0)  IOORDER(6)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  101027(95, 110, 175, 131)  LEN(12)  IO_NUM|AL_RIGHT||FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSUP    COLOR(68, 69)  CUR(0)  LINECOLOR(75)          IFRGB(94, 95)  TABORDER(0)  IOORDER(7)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL2(20, 110, 95, 131)  '´©Àû°Å·¡·®'  AL_CENTER  FONT("±¼¸²Ã¼", 9, NORMAL)  CUR(0)      COLOR(77, 97)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Dim g_IsFirst
+Dim g_BefAccVol
+
+g_IsFirst = True
+g_BefAccVol = 0
+
+'-----------------------------------------------------------------------
+Sub S100301Change()
+	S100301.Trigger "", True
+	S100301.Trigger "ed_fcod", True
+	SYSTEM.SetHistory "ed_fcod", S100301.Data
+	SCREEN.Send 0
+End Sub
+'-----------------------------------------------------------------------
+Sub OnAlert()
+	If Len(Trim(S101027.Data)) = 0 Then
+		Exit Sub
+	End If
+	AccVol = CLng(S101027.Data)
+	If g_BefAccVol = AccVol Then
+		Exit Sub
+	End If
+	SCREEN.Proc "Main.ProcCompData", S101023.Data & ", " & S101024.Data & ", " & S101202.Data
+End Sub
+'-----------------------------------------------------------------------
+'4533  È­¸é¿¡¼­ »ç¿ë
+Sub SetCompCode(Code)
+	S100301.Data = Code
+	S100301Change
+End Sub
+'-----------------------------------------------------------------------
+
+_AW_ONRECEIVE_AW_
+S101024.Data = Replace(S101024.Data, "+", "2")
+S101024.Data = Replace(S101024.Data, "-", "5")
+
+SCREEN.Proc "Main.ProcCompData", S101023.Data & ", " & S101024.Data & ", " & S101202.Data
+If Len(Trim(S101027.Data)) = 0 Then
+	g_BefAccVol = 0
+Else
+	g_BefAccVol = CLng(S101027.Data)
+End If
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(100301)
+_AW_ONCHANGE_AW_
+If g_IsFirst Then
+	S100301.Data = ""
+	g_IsFirst = False
+End If
+
+SCREEN.Proc "Main.ProcSetComCode", S100301.Data
+
+If S100301.Data <> "" Then
+	S100301Change
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(101023)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(101024)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(101202)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(SYMBOL7)
+_AW_ONCLICK_AW_
+Dim CODX
+
+CODX = SCREEN.GetCode (127, "100301" , "100022", 1)
+If CODX <>  True Then
+	Exit Sub
+End If
+SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(101027)
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

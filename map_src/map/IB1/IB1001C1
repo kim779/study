@@ -1,0 +1,390 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB1001C1)
+MAPSIZE(345, 374)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("주문수량단가설정")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+TITLE("[IB1001C1]수량/단가설정")
+TOPATH(AXIS)
+METHOD(MENU)
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL3(8, 16, 186, 167)  LINECOLOR(165)      COLOR(171, 69)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL4(189, 16, 367, 167)  LINECOLOR(163)      COLOR(170, 69)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL2(250, 220, 367, 292)  LINECOLOR(167)      COLOR(172, 69)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL1(129, 220, 246, 292)  LINECOLOR(163)      COLOR(170, 69)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL0(8, 220, 125, 292)  LINECOLOR(165)      COLOR(171, 69)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+GROUP  G0(0, 0, 375, 175)  '기본입력수량 설정'        COLOR(-1, 69)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+GROUP  G2(0, 180, 375, 300)  '기본입력단가 설정'        COLOR(-1, 69)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL2(320, 146, 339, 158)  '원'  AL_LEFT  CUR(0)      COLOR(0, 232)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  R0_0(200, 54, 216, 67)  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(G0)      COLOR(0, 232)  CUR(0)      TABORDER(15)  ENABLE  &
+  VISIBLE  CHECKED  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  R0_1(200, 78, 324, 90)  '매수주문 가능수량'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(G0)      COLOR(0, 232)  CUR(0)      TABORDER(16)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  R0_2(200, 101, 349, 116)  '최대가능수량(미수)매수'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(G0)      COLOR(0, 232)  CUR(0)      TABORDER(17)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  R0_3(200, 125, 270, 138)  '금액매수'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(G0)      COLOR(0, 232)  CUR(0)      TABORDER(18)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+GROUP  G1(497, 18, 586, 48)  '매도수량그룹'        COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+GROUP  G3(499, 198, 587, 228)  '매도수량그룹'        COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL3(149, 146, 168, 158)  '원'  AL_LEFT  CUR(0)      COLOR(0, 232)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  R1_0(29, 53, 46, 68)  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(G1)      COLOR(0, 232)  CUR(0)      TABORDER(19)  ENABLE  &
+  VISIBLE  CHECKED  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  R1_1(29, 78, 153, 90)  '매도주문 가능수량'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(G1)      COLOR(0, 232)  CUR(0)      TABORDER(20)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  R1_2(29, 125, 101, 137)  '금액매도'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(G1)      COLOR(0, 232)  CUR(0)      TABORDER(21)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+COMBO  cboPrice3(22, 252, 114, 272)  TP_SUNKEN  LEN(4)  COUNT(3)  VCOUNT(3)  INDEX(1)  MATCHKEY(NOTMAPPING)  IO_NUM|EDIT_INPUT    COLOR(192, 232)  CUR(0)  DISPLAY("매도호가", "현재가", "매수호가")  DATA("2025", "2023", "2026")    TABORDER(5)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  BuyQtyGB(859, 35, 918, 58)  LEN(1)  IO_NUM|EDIT_INPUT|FA_RIGHT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("0")          TABORDER(7)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  Label(587, 37, 847, 54)  '매수수량설정'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL6(587, 66, 847, 83)  '사용자설정 매수수량'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL7(587, 96, 847, 113)  '금액매수'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL8(587, 124, 847, 141)  '매수단가설정(현재가2023,매도2025,매수2026)'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  BuyFixQty(215, 48, 283, 68)  LEN(10)  IO_NUM|EDIT_INPUT|FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_WRAP|SA_ZERO    COLOR(192, 232)  CUR(0)  TP_SUNKEN  INIT("0")          TABORDER(3)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  BuyFixPrcQty(215, 141, 319, 161)  LEN(10)  IO_NUM|EDIT_INPUT|FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_WRAP|SA_ZERO    COLOR(192, 232)  CUR(0)  TP_SUNKEN  INIT("0")          TABORDER(4)  IOORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  BuyPrcGB(862, 118, 921, 141)  LEN(4)  IO_NUM|EDIT_INPUT|FA_RIGHT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("0")          TABORDER(8)  IOORDER(5)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  SellQtyGB(859, 159, 918, 182)  LEN(1)  IO_NUM|EDIT_INPUT|FA_RIGHT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("0")          TABORDER(9)  IOORDER(6)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL9(587, 161, 847, 178)  '매도수량설정'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL10(587, 190, 847, 207)  '사용자설정 매도수량'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL11(587, 220, 847, 237)  '금액매도'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL12(587, 248, 847, 265)  '매도단가설정(현재가2023,매도2025,매수2026)'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  SellFixPrcQty(43, 142, 147, 162)  LEN(10)  IO_NUM|EDIT_INPUT|FA_COMMA|FA_RIGHT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_SUNKEN  INIT("0")          TABORDER(2)  IOORDER(7)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  SellPrcGB(859, 246, 918, 269)  LEN(4)  IO_NUM|EDIT_INPUT|FA_RIGHT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("0")          TABORDER(10)  IOORDER(8)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  SellFixQty(44, 48, 112, 68)  LEN(10)  IO_NUM|EDIT_INPUT|FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_WRAP|SA_ZERO    COLOR(192, 232)  CUR(0)  TP_SUNKEN  INIT("0")          TABORDER(1)  IOORDER(9)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL13(286, 53, 326, 67)  '로 설정'  AL_LEFT  CUR(0)      COLOR(0, 232)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL14(113, 52, 153, 66)  '로 설정'  AL_LEFT  CUR(0)      COLOR(0, 232)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+COMBO  cboPrice2(137, 252, 229, 272)  TP_SUNKEN  LEN(4)  COUNT(3)  VCOUNT(3)  INDEX(1)  MATCHKEY(NOTMAPPING)  IO_NUM|EDIT_INPUT    COLOR(192, 232)  CUR(0)  DISPLAY("매도호가", "현재가", "매수호가")  DATA("2025", "2023", "2026")    TABORDER(6)  IOORDER(10)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  R4_0(264, 227, 352, 239)  '주문단가'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(G4)      COLOR(0, 232)  CUR(0)      TABORDER(11)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  R4_1(264, 249, 328, 261)  '현재가'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(G4)      COLOR(0, 232)  CUR(0)      TABORDER(12)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  R4_2(264, 269, 346, 285)  '0으로 설정'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(G4)      COLOR(0, 232)  CUR(0)      TABORDER(13)  ENABLE  &
+  VISIBLE  CHECKED  TRANSPARENT  HINTTYPE(IH_NONE)
+GROUP  G4(499, 243, 587, 273)  '정정수량그룹'        COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL16(589, 299, 849, 316)  '정정단가설정(0값,현재가,주문단가)'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  JJPrcGB(856, 296, 915, 319)  LEN(2)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("0")          TABORDER(14)  IOORDER(11)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL5(8, 16, 186, 40)  '매도수량'  LINECOLOR(165)      COLOR(175, 69)  CUR(0)    AL_CENTER  FONT("굴림체", 9, BOLD)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL6(189, 16, 367, 40)  '매수수량'  LINECOLOR(163)      COLOR(174, 69)  CUR(0)    AL_CENTER  FONT("굴림체", 9, BOLD)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL7(129, 197, 246, 221)  '매수단가'  LINECOLOR(163)      COLOR(174, 69)  CUR(0)    AL_CENTER  FONT("굴림체", 9, BOLD)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL8(8, 197, 125, 221)  '매도단가'  LINECOLOR(165)      COLOR(175, 69)  CUR(0)    AL_CENTER  FONT("굴림체", 9, BOLD)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL9(250, 197, 367, 221)  '정정단가'  LINECOLOR(167)      COLOR(176, 69)  CUR(0)    AL_CENTER  FONT("굴림체", 9, BOLD)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+GROUP  GROUP0(0, 305, 375, 343)  '주문전송 후 단가/수량 처리'        COLOR(-1, 69)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  KeepPrc(7, 323, 107, 335)  '단가저장'  TP_CHECK|EDIT_NOP          COLOR(208, 232)  CUR(0)      TABORDER(22)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  KeepQty(135, 323, 235, 335)  '수량저장'  TP_CHECK|EDIT_NOP          COLOR(208, 232)  CUR(0)      TABORDER(23)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL0(92, 125, 182, 137)  '(수수료 미반영)'  AL_LEFT  CUR(0)      COLOR(171, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL4(264, 125, 354, 137)  '(수수료 미반영)'  AL_LEFT  CUR(0)      COLOR(170, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Sub SetCfg()
+	Dim val
+
+	Select Case BuyQtyGB.Data
+	Case "1" : R0_1.Checked = True
+	Case "2" : R0_3.Checked = True
+	Case "3" : R0_2.Checked = True
+	Case Else : R0_0.Checked = True
+	End Select
+	ChangeR0()
+
+	If Trim(BuyPrcGB.Data) = "" Then
+		BuyPrcGB.Data = "2023"
+	End If
+	cboPrice2.Data = BuyPrcGB.Data
+
+	Select Case SellQtyGB.Data
+	Case "1" : R1_1.Checked = True
+	Case "2" : R1_2.Checked = True
+	Case Else : R1_0.Checked = True
+	End Select
+	ChangeR1()
+
+	If Trim(SellPrcGB.Data) = "" Then
+		SellPrcGB.Data = "2023"
+	End If
+	cboPrice3.Data = SellPrcGB.Data
+
+	If (Trim(JJPrcGB.Data) = "") Then
+		JJPrcGB.Data = "1"
+	End If
+	Select Case CLng(JJPrcGB.Data)
+	Case 0
+		R4_2.Checked = True
+	Case 1
+		R4_1.Checked = True
+	Case Else
+		R4_0.Checked = True
+	End Select
+	If SCREEN.Object("parent.KeepPrc").Data = "1" Then
+		SCREEN.Proc "SetOD_PRC", "0"
+	Else
+		SCREEN.Proc "SetOD_PRC", "1"
+	End If
+	If SCREEN.Object("parent.KeepQty").Data = "1" Then
+		SCREEN.Proc "SetOD_QTY", "0"
+	Else
+		SCREEN.Proc "SetOD_QTY", "1"
+	End If
+End Sub
+
+Sub SaveCfg()
+	If R0_0.Checked Then
+		BuyQtyGB.Data = "0"
+	ElseIf R0_1.Checked Then
+		BuyQtyGB.Data = "1"
+	ElseIf R0_2.Checked Then
+		BuyQtyGB.Data = "3"
+	ElseIf R0_3.Checked Then
+		BuyQtyGB.Data = "2"
+	End If
+
+	If R1_0.Checked Then
+		SellQtyGB.Data = "0"
+	ElseIf R1_1.Checked Then
+		SellQtyGB.Data = "1"
+	ElseIf R1_2.Checked Then
+		SellQtyGB.Data = "2"
+	End If
+
+	BuyPrcGB.Data = cboPrice2.Data
+	SellPrcGB.Data = cboPrice3.Data
+
+	If R4_0.Checked Then
+		JJPrcGB.Data = 2
+	ElseIf R4_1.Checked Then
+		JJPrcGB.Data = 1
+	ElseIf R4_2.Checked Then
+		JJPrcGB.Data = 0
+	End If
+
+	BuyQtyGB.Trigger "", False
+	BuyFixQty.Trigger "", False
+	BuyFixPrcQty.Trigger "", False
+	BuyPrcGB.Trigger "", False
+	SellQtyGB.Trigger "", False
+	SellFixQty.Trigger "", False
+	SellFixPrcQty.Trigger "", False
+	SellPrcGB.Trigger "", False
+	JJPrcGB.Trigger "", False
+	'KeepQty.Trigger "", False
+	'KeepPrc.Trigger "", False
+End Sub
+
+Sub ChangeR0()
+	BuyFixQty.Enable = R0_0.Checked
+	BuyFixPrcQty.Enable = R0_3.Checked
+End Sub
+
+Sub ChangeR2()
+End Sub
+
+Sub ChangeR1()
+	SellFixQty.Enable = R1_0.Checked
+	SellFixPrcQty.Enable = R1_2.Checked
+End Sub
+
+Sub ChangeR3()
+End Sub
+
+Sub ChangeR4()
+End Sub
+
+Sub SetOD_QTY(bQty)
+	'매도수량
+	R1_0.Enable = bQty
+	R1_1.Enable = bQty
+	R1_2.Enable = bQty
+	'매수수량
+	R0_0.Enable = bQty
+	R0_1.Enable = bQty
+	R0_2.Enable = bQty
+	R0_3.Enable = bQty
+
+
+'	If Not bQty Then
+'		SellFixQty.Enable    = False
+'		SellFixPrcQty.Enable = False
+'		BuyFixQty.Enable     = False
+'		BuyFixPrcQty.Enable  = False
+'	End If
+	SellFixQty.Enable    = R1_0.Checked
+	SellFixPrcQty.Enable = R1_2.Checked
+	BuyFixQty.Enable     = R0_0.Checked
+	BuyFixPrcQty.Enable  = R0_3.Checked
+End Sub
+
+Sub SetOD_PRC(bPrc)
+	R4_0.Enable = bPrc
+	R4_1.Enable = bPrc
+	R4_2.Enable = bPrc
+	cboPrice3.Enable = bPrc
+	cboPrice2.Enable = bPrc
+End Sub
+
+_AW_ONCLOSE_AW_
+SaveCfg()
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(R0_0)
+_AW_ONCLICK_AW_
+ChangeR0()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(R0_1)
+_AW_ONCLICK_AW_
+ChangeR0()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(R0_2)
+_AW_ONCLICK_AW_
+ChangeR0()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(R0_3)
+_AW_ONCLICK_AW_
+ChangeR0()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(R1_0)
+_AW_ONCLICK_AW_
+ChangeR1()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(R1_1)
+_AW_ONCLICK_AW_
+ChangeR1()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(R1_2)
+_AW_ONCLICK_AW_
+ChangeR1()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(R4_0)
+_AW_ONCLICK_AW_
+ChangeR4()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(R4_1)
+_AW_ONCLICK_AW_
+ChangeR4()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(R4_2)
+_AW_ONCLICK_AW_
+ChangeR4()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(KeepPrc)
+_AW_ONCLICK_AW_
+If KeepPrc.Checked Then
+	SCREEN.Object("parent.KeepPrc").Data = "1"
+	SetOD_PRC(False)
+Else
+	SCREEN.Object("parent.KeepPrc").Data = "0"
+	SetOD_PRC(True)
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(KeepQty)
+_AW_ONCLICK_AW_
+Dim bCheck
+If KeepQty.Checked Then
+	SCREEN.Object("parent.KeepQty").Data = "1"
+	SetOD_QTY(False)
+Else
+	SCREEN.Object("parent.KeepQty").Data = "0"
+	SetOD_QTY(True)
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

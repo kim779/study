@@ -1,0 +1,92 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB980000)
+MAPSIZE(481, 606)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("웹링크용 대표화면")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+TITLE("웹링크용 맵")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+OUT  1021(210, 425, 310, 445)  LEN(16)  IO_ALPHA|AL_LEFT||FA_FLASH    COLOR(31, 2)  CUR(0)            TABORDER(0)  IOORDER(1)  &
+  HINTTYPE(IH_NONE)
+EDIT  1301(140, 425, 205, 445)  LEN(6)  IO_MIXED|EDIT_INOUT|FA_ZEROSUP|FA_WRAP|FA_HAN|FA_SKIP|FA_NOR|SA_SPACE|CODE      COLOR(68, 69)  CUR(0)  TP_SUNKEN          TABORDER(1)  IOORDER(2)  &
+  VISIBLE  HINTTYPE(IH_NONE)
+CONTROL  WebCtrl(60, 50, 310, 240)  |FA_PROTECT  "CX_WebLink"  ""  LEN(0)  EDIT_NOP    COLOR(192, 232)  TABORDER(0)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Dim dmsg
+
+_AW_ONSELECT_AW_
+Dim map, title, bEdge, url
+
+WebCtrl.Home = SYSTEM.Home
+WebCtrl.Menu = data
+WebCtrl.UserID = LOGIN.User
+
+If SCREEN.CreateObject("Info") Then
+	bEdge = Trim(INFO.PopData("", "WEBINFO.INI", data, "EDGE"))
+	url = Trim(INFO.PopData("", "WEBINFO.INI", data, "EDGE_URL"))
+End If
+
+SYSTEM.Trace "[IB980000[EDGE] OnSelect data = " & data & "  bEdge = " & bEdge & " url = " & url
+
+If bEdge = "1" Then
+	dmsg = "edmap" & vbTab & data
+	SCREEN.SetTimerX 4,5, False
+	Exit Sub
+End If
+
+WebCtrl.ItemCode = SYSTEM.GetHistory(True, "1301")
+
+WebCtrl.Navigate
+
+SCREEN.SetSize WebCtrl.Width-4, WebCtrl.Height-4
+SCREEN.SetTimerX 5,5, False
+SCREEN.SetCaption WebCtrl.GetCaption
+
+_AW_ONENDSUB_AW_
+_AW_ONTIMERX_AW_
+If id = 5 Then
+	SCREEN.SetSize WebCtrl.Width-3, WebCtrl.Height-3
+ElseIf id = 4 Then
+
+	SYSTEM.Trace "[IB980000]ontimer  dmsg = " & dmsg
+	SCREEN.CreateWindow 1, "IB980002 /p5 /d", dmsg
+
+	SCREEN.CloseWindow
+End If
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(1301)
+_AW_ONCHANGE_AW_
+WebCtrl.ItemCode = S1301.Data
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

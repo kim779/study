@@ -1,0 +1,70 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB865100)
+MAPSIZE(730, 810)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Open API")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(FMS)
+TITLE("[8651]IBK Open API")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pooppoop")
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL0(0, 0, 1, 58)        COLOR(64, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+USRTAB  tab(0, 0, 810, 26)  FOCUS  INDEX(0)  COUNT(6)  AL_TOP  TAB_IMAGE      FONT("굴림체", 9, NORMAL)    COLOR(3, 70)  CUR(0)  TABIMAGE("tab.bmp")  FCOLOR(3, 71)  CAPTION("서비스안내", "개발가이드", "공지사항", "Q&A", "사용신청", "테스트신청")  TABINFO("1:0", "1:1", "1:2", "1:3", "1:4", "1:5")  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL63(-2, 26, 808, 733)  LIMAGE(0)  LINEW(4)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+CONTROL  CONTROL0(1, 27, 811, 727)  |FA_PROTECT  "CX_WebLink"  ""  LEN(0)  EDIT_NOP    COLOR(192, 232)  TABORDER(0)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONSTART_AW_
+CONTROL0.Navigate2 "http://www.ibks.com/customer/dealing/IOA00001_00.jsp?popup=Y",False
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(tab)
+_AW_ONCLICK_AW_
+Select Case tab.ID
+	Case 0
+		CONTROL0.Navigate2 "http://www.ibks.com/customer/dealing/IOA00001_00.jsp?popup=Y",False
+	Case 1
+		CONTROL0.Navigate2 "http://www.ibks.com/customer/dealing/IOA00002_01.jsp?popup=Y",False
+	Case 2
+		CONTROL0.Navigate2 "http://www.ibks.com/customer/dealing/openapiNotice_list.do?popup=Y",False
+	Case 3
+		CONTROL0.Navigate2 "/customer/faq/api_qna_writeForm.do",True
+	Case 4
+		CONTROL0.Navigate2 "/online/SR/ISR00028_00.jsp",True
+	Case 5
+		CONTROL0.Navigate2 "/customer/dealing/IOA00003_00.jsp",True
+
+End Select
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

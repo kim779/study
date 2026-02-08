@@ -1,0 +1,51 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB714500)
+MAPSIZE(630, 760)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("¿Á¼®°¡¸®±â Â÷Æ®")
+MAPPUBLIC(";")
+FONT("±¼¸²Ã¼", 9, NORMAL)
+TITLE("WINE-S1(JS°ñµå¹Ú½º)")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+BROWSER  BROWSER0(0, 0, 760, 630)  EDIT_NOP    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  URLDATA(300, 755, 420, 774)  LEN(100)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(1)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  Gubn(295, 710, 415, 729)  LEN(1)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("1")          TABORDER(2)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONSTART_AW_
+'SYSTEM.Trace "Gubn[" & Gubn.Data & "]"
+
+If Gubn.Data = "1" Then	'°¡ÀÔ°í°´
+	BROWSER0.Navigate "http://www.futurewiz.co.kr/ibk/winechart/kjs/index.asp" & URLDATA.Data
+Else	' ¹Ì°¡ÀÔ°í°´
+	BROWSER0.Navigate "http://www.futurewiz.co.kr/ibk/winechart/kjs/reg.asp" & URLDATA.Data
+End If
+
+_AW_ONENDSUB_AW_
+}
+
+
+

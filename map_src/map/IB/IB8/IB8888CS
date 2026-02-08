@@ -1,0 +1,477 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB8888CS)
+MAPSIZE(805, 1040)
+VERSION(000)
+MAPKIND(PROCEDURES)
+MAPGROUP(0)
+MAPDESC("공통 Chat LIBRAY")
+MAPPUBLIC(";")
+FONT("굴림", 9, NORMAL)
+TITLE("[8888]공통주식차트")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Dim g_gubn, unit, map_name, startf, bun_gap, tick_gap
+map_name = Trim(SCREEN.GetMapName(1))
+Dim g_gunit
+g_gunit = "001"
+g_gubn = "1"
+
+Sub change_chart(key)
+
+SYSTEM.Trace "MAP NAME : " & map_name
+	Dim inputData
+
+	Dim    cod2 	'[15];            종목코드
+	Dim    sDate 	'[8];             검색시작일
+	Dim    nrec		'[4];             조회건수
+	Dim    unit		'[3];             조회단위 1분봉, 3분봉
+	Dim    gubn		'[1];             조회구분
+					'				  0 : 틱, 1 : 분, 2 : 일
+					'				  3 : 주, 4 : 월
+	Dim    egbn		'[1];             수정주가 구분
+	Dim    smod		'[1];             조회모드
+	Dim    nkey		'[23];      Next Key
+	Dim    bgbn		'[1];             허봉, 실봉구분
+					'				  0: 허봉 1: 실봉
+	Dim    dgbn		'[1];             당일 구분
+	Dim    temp
+	CStr   str
+	Select Case key
+			Case 1 gubn = "2"
+			Case 2 gubn = "3"
+			Case 3 gubn = "4"
+			Case 4 gubn = "1"
+			Case 5 gubn = "0"
+			End Select
+	g_gubn = key
+
+	'If SCREEN.GetMapName(1) = "IB360000" Then
+		If UCase(TypeName( SCREEN.Object("main.cxMarket") )) <> "NOTHING" Then
+			Select Case Trim(SCREEN.Object("main.cxMarket").sMarket)
+			Case "KRX"
+				cod2 = Trim(SCREEN.Object("main.1301").data) & "         "
+				SYSTEM.Trace "CURRENT MARKET : KRX " & vbTab & cod2
+			Case "NXT"
+				cod2 = "N." & Trim(SCREEN.Object("main.1301").data) & "         "
+				SYSTEM.Trace "CURRENT MARKET : NXT " & vbTab & cod2
+			Case "통합"
+				cod2 = "M." & Trim(SCREEN.Object("main.1301").Data) & "       "
+				SYSTEM.Trace "CURRENT MARKET : 통합 " & vbTab & cod2
+			End Select
+		Else
+			cod2 = SCREEN.Object("main.1301").data & "         "
+		End If
+
+'	Else
+'		cod2 = SCREEN.Object("main.1301").data & "         "
+'	End If
+
+SYSTEM.Trace "CURRENT CODE["&cod2&"]"
+
+	'cod2 = SCREEN.Object("main.1301").data & "         "
+	sDate  ="        "
+	temp = request_count.Text
+	nrec=Trim(temp)
+
+	If(Len(nrec)=3) Then
+	    str = " "
+		nrec = str & nrec
+	End If
+	If(Len(nrec)=2) Then
+	    str = "  "
+		nrec = str & nrec
+	End If
+	If(Len(nrec)=1) Then
+	    str = "   "
+		nrec = str & nrec
+	End If
+
+	If(Len(nrec)=0) Then
+		nrec = " 120"
+		request_count.Data = 120
+	End If
+
+	unit = g_gunit
+	egbn = "1"
+	smod = "1"
+	nkey = "                       "
+	bgbn = "1"
+	dgbn = "0"
+
+	' INPUT DATA
+	inputData = cod2 & sDate & nrec & unit & gubn & egbn & smod & nkey & bgbn & dgbn
+
+	' 실시간 KEY
+
+	If UCase(TypeName( SCREEN.Object("main.cxMarket") )) <> "NOTHING" Then
+		' NXT 조회 가능 화면
+		If UCase(TypeName( SCREEN.Object("1021") )) <> "NOTHING" Then
+			' NXT 조회 가능 화면은 실시간 키 (N.A005930)으로 RTS를 등록)
+			' SendTr의 조회용 코드와 실시간용 코드가 일치하여야만 한다
+			' NXT 조회용은 N.005930인데 실시간은 N.A005930으로 다름
+			' 한국금융IT의 가이드라인과는 조금 차이가 있음
+			If Trim(S1021.Data) <> "" Then
+				cod2 = Trim(S1021.Data)
+			End If
+SYSTEM.Trace "USING RTS SYMBOL S1021 DATA ["&cod2&"]"
+		End If
+	Else
+		' 기존 KRX용 조회
+		' SendTr의 조회용 코드와 실시간용 코드가 일치하여야만 한다
+		' 추후 개편시, 실시간용 RTS 룰을 정확히 적용해달라고 요청할 필요성이 있음
+		cod2 = SCREEN.Object("main.1301").data
+	End If
+
+SYSTEM.Trace "FINAL RTS SYMBOL FOR CHART ["&cod2&"]"
+
+	Dim szTR
+	szTR = "pibf0011"
+	drChart.SendTr szTR, Trim(cod2), inputData,1
+
+End Sub
+
+Sub Call_sub(data)
+	gubn = e_gubn.Data
+
+	Select Case gubn
+		Case 1
+			Call Query_Chart(gubn, 0)
+		Case 2
+			Call Query_Chart(gubn, 0)
+		Case 3
+			Call Query_Chart(gubn, 0)
+		Case 6
+			Call Query_Chart(gubn, 0)
+		Case 4
+			unit = bungap.Data
+			Call Query_Chart(gubn, unit)
+		Case 5
+			unit = tickgap.Data
+			Call Query_Chart(gubn, unit)
+		Case Else
+			Exit Sub
+	End Select
+End Sub
+
+Sub Query_Chart(gubn, unit)
+	startf = 1
+
+	Call Bt_Period_Init() '주기 버튼 전체 초기화
+
+	mtgubn.Data = 0   '분/틱 구분 초기화
+	e_gubn.Data = gubn  '파일저장용
+
+	Select Case gubn
+		Case 1
+			Call change_chart(1)
+			Call Bt_Period_Set()
+			S101308.Data = "01"       '101308 = 일,주,월 구분 Symbol
+			b_day.PRgb = 37736184
+		Case 2
+			Call change_chart(2)
+			Call Bt_Period_Set()
+			S101308.Data = "02"
+			b_week.PRgb = 37736184
+		Case 3
+			Call change_chart(3)
+			Call Bt_Period_Set()
+			S101308.Data = "03"
+			b_mon.PRgb = 37736184
+		Case 4
+			Call Bt_Gap_Init()
+			Call Set_bgk_Color(unit)
+			Call change_chart(4)
+			mtgubn.data = 1
+			b_min.PRgb = 37736184
+		Case 5
+			Call Bt_Gap_Init()
+			Call Set_bgk_Color(unit)
+			Call change_chart(5)
+			mtgubn.data = 2
+			b_tick.PRgb = 37736184
+		Case Else
+			Exit Sub
+	End Select
+End Sub
+
+Sub Set_bgk_Color(unit)
+
+	If e_gubn.Data = 4 Then
+		bungap.Data = unit
+	ElseIf e_gubn.Data = 5 Then
+		tickgap.Data = unit
+	End If
+
+	Select Case unit       '해당 Gap 버튼만 눌림표시
+		Case 1
+			g_gunit = "001"
+			COMBO0.Data = "001"
+			b_1.PRgb = 37736184
+
+		Case 5
+			g_gunit = "005"
+			COMBO0.Data = "005"
+			b_5.PRgb = 37736184
+		Case 10
+			g_gunit = "010"
+			COMBO0.Data = "010"
+			b_10.PRgb = 37736184
+		Case 30
+			g_gunit = "030"
+			COMBO0.Data = "030"
+			b_30.PRgb = 37736184
+		Case Else
+			g_gunit = l_format(unit, "0", 3)
+			COMBO0.Data = g_gunit
+	End Select
+End Sub
+
+Sub Set_Gap(unit)
+	S101308.Data = unit       '101308 = 분,틱일 경우 Gap 조절 Symbol
+
+	If e_gubn.Data = 4 Then
+		bungap.Data = unit
+	ElseIf e_gubn.Data = 5 Then
+		tickgap.Data = unit
+	End If
+
+	Call Bt_Gap_Init()
+
+	Select Case unit       '해당 Gap 버튼만 눌림표시
+		Case 1
+			g_gunit = "001"
+			COMBO0.Data = "001"
+			b_1.PRgb = 37736184
+		Case 5
+			g_gunit = "005"
+			COMBO0.Data = "005"
+			b_5.PRgb = 37736184
+		Case 10
+			g_gunit = "010"
+			COMBO0.Data = "010"
+			b_10.PRgb = 37736184
+		Case 30
+			g_gunit = "030"
+			COMBO0.Data = "030"
+			b_30.PRgb = 37736184
+		Case Else
+			g_gunit = l_format(unit, "0", 3)
+	End Select
+	Call Query_Chart(g_gubn, unit)
+End Sub
+
+Sub Bt_Period_Set()
+	b_1.Visible = False
+	b_5.Visible = False
+	b_10.Visible = False
+	b_30.Visible = False
+	COMBO0.Visible = False
+End Sub
+
+Sub Bt_Period_Init()
+	b_day.PRgb = 208
+	b_week.PRgb = 208
+	b_mon.PRgb = 208
+	b_min.PRgb = 208
+	b_tick.PRgb = 208
+
+	b_day.Visible = True
+	b_week.Visible = True
+	b_mon.Visible = True
+	b_min.Visible = True
+	b_tick.Visible = True
+	COMBO0.Visible = True
+End Sub
+
+Sub Bt_Gap_Init()
+	b_1.PRgb = 208
+	b_5.PRgb = 208
+	b_10.PRgb = 208
+	b_30.PRgb = 208
+
+	b_1.Visible = True
+	b_5.Visible = True
+	b_10.Visible = True
+	b_30.Visible = True
+End Sub
+
+Sub load_config()
+SYSTEM.Trace "[3600] --------- load_config map = " & SCREEN.GetMapName(0) & "  map_name = " & map_name
+	If SCREEN.CreateObject("INFO") Then
+		If SCREEN.GetMapName(0) = "IB2000CT" Then
+			gubn = Trim(INFO.PopData(LOGIN.Name, "userconf.ini", map_name, "GUBNA"))
+			bun_gap = Trim(INFO.PopData(LOGIN.Name, "userconf.ini", map_name, "BUNGAPA"))
+			tick_gap = Trim(INFO.PopData(LOGIN.Name, "userconf.ini", map_name, "TICKGAPA"))
+			nrec = Trim(INFO.PopData(LOGIN.Name, "userconf.ini", map_name, "rccountA"))
+		ElseIf SCREEN.GetMapName(0) = "IB2000X9" Then
+			gubn = Trim(INFO.PopData(LOGIN.Name, "userconf.ini", map_name, "GUBNB"))
+			bun_gap = Trim(INFO.PopData(LOGIN.Name, "userconf.ini", map_name, "BUNGAPB"))
+			tick_gap = Trim(INFO.PopData(LOGIN.Name, "userconf.ini", map_name, "TICKGAPB"))
+			nrec = Trim(INFO.PopData(LOGIN.Name, "userconf.ini", map_name, "rccountB"))
+		Else
+			gubn = Trim(INFO.PopData(LOGIN.Name, "userconf.ini", map_name, "GUBN"))
+			bun_gap = Trim(INFO.PopData(LOGIN.Name, "userconf.ini", map_name, "BUNGAP"))
+			tick_gap = Trim(INFO.PopData(LOGIN.Name, "userconf.ini", map_name, "TICKGAP"))
+			nrec = Trim(INFO.PopData(LOGIN.Name, "userconf.ini", map_name, "rccount"))
+
+SYSTEM.Trace "[3600] load_config gubn = " & gubn
+SYSTEM.Trace "[3600] load_config bun_gap = " & bun_gap
+SYSTEM.Trace "[3600] load_config tick_gap = " & tick_gap
+SYSTEM.Trace "[3600] load_config nrec = " & nrec
+
+		End If
+
+		request_count.data = nrec
+
+		If Trim(gubn) = "" Then
+			gubn = 1
+		End If
+
+		If Trim(bun_gap) = "" Then
+			bun_gap = 1
+		End If
+
+		If Trim(tick_gap) = "" Then
+			tick_gap = 1
+		End If
+
+		bungap.Data = bun_gap
+		tickgap.Data = tick_gap
+
+		Select Case gubn
+		Case 1
+			Call Query_Chart(gubn, 0)
+		Case 2
+			Call Query_Chart(gubn, 0)
+		Case 3
+			Call Query_Chart(gubn, 0)
+		Case 6
+			Call Query_Chart(gubn, 0)
+		Case 4
+			unit = bun_gap
+			COMBO0.Data = l_format(unit, "0", 3)
+			Call Query_Chart(gubn, unit)
+		Case 5
+			unit = tick_gap
+			COMBO0.Data = l_format(unit, "0", 3)
+			Call Query_Chart(gubn, unit)
+		Case Else
+			Exit Sub
+		End Select
+
+
+	End If
+End Sub
+
+Sub save_config()
+SYSTEM.Trace "[3600] !!!!!!!! save_config map = " & SCREEN.GetMapName(0) & "  map_name = " & map_name
+	If SCREEN.CreateObject("Info") Then
+		If SCREEN.GetMapName(0) = "IB2000CT" Then
+			INFO.PushData LOGIN.name, "userconf.ini", map_name, "GUBNA", Trim(e_gubn.Data)
+			INFO.PushData LOGIN.name, "userconf.ini", map_name, "BUNGAPA", bungap.Data
+			INFO.PushData LOGIN.name, "userconf.ini", map_name, "TICKGAPA", tickgap.Data
+			INFO.PushData LOGIN.name, "userconf.ini", map_name, "rccountA", request_count.data
+		ElseIf SCREEN.GetMapName(0) = "IB2000X9" Then
+			INFO.PushData LOGIN.name, "userconf.ini", map_name, "GUBNB", Trim(e_gubn.Data)
+			INFO.PushData LOGIN.name, "userconf.ini", map_name, "BUNGAPB", bungap.Data
+			INFO.PushData LOGIN.name, "userconf.ini", map_name, "TICKGAPB", tickgap.Data
+			INFO.PushData LOGIN.name, "userconf.ini", map_name, "rccountB", request_count.data
+		Else
+			INFO.PushData LOGIN.name, "userconf.ini", map_name, "GUBN", Trim(e_gubn.Data)
+			INFO.PushData LOGIN.name, "userconf.ini", map_name, "BUNGAP", bungap.Data
+			INFO.PushData LOGIN.name, "userconf.ini", map_name, "TICKGAP", tickgap.Data
+			INFO.PushData LOGIN.name, "userconf.ini", map_name, "rccount", request_count.data
+		End If
+	End If
+End Sub
+
+
+Sub save_map_config(smap)
+	If SCREEN.CreateObject("Info") Then
+	SYSTEM.Trace "[3600] !!!!!!!! save_map_config map = " & SCREEN.GetMapName(0) & "  smap = " & smap
+		INFO.PushData LOGIN.name, "userconf.ini", smap, "GUBN", Trim(e_gubn.Data)
+		INFO.PushData LOGIN.name, "userconf.ini", smap, "BUNGAP", bungap.Data
+		INFO.PushData LOGIN.name, "userconf.ini", smap, "TICKGAP", tickgap.Data
+		INFO.PushData LOGIN.name, "userconf.ini", smap, "rccount", request_count.data
+	End If
+End Sub
+
+Sub load_map_config(smap)
+	If SCREEN.CreateObject("INFO") Then
+SYSTEM.Trace "[3600] --------- load_map_config map = " & SCREEN.GetMapName(0) & "  smap = " & map_name
+		gubn = Trim(INFO.PopData(LOGIN.Name, "userconf.ini", smap, "GUBN"))
+		bun_gap = Trim(INFO.PopData(LOGIN.Name, "userconf.ini", smap, "BUNGAP"))
+		tick_gap = Trim(INFO.PopData(LOGIN.Name, "userconf.ini", smap, "TICKGAP"))
+		nrec = Trim(INFO.PopData(LOGIN.Name, "userconf.ini", smap, "rccount"))
+
+SYSTEM.Trace "[3600] load_config gubn = " & gubn
+SYSTEM.Trace "[3600] load_config bun_gap = " & bun_gap
+SYSTEM.Trace "[3600] load_config tick_gap = " & tick_gap
+SYSTEM.Trace "[3600] load_config nrec = " & nrec
+
+		request_count.data = nrec
+
+		If Trim(gubn) = "" Then
+			gubn = 1
+		End If
+
+		If Trim(bun_gap) = "" Then
+			bun_gap = 1
+		End If
+
+		If Trim(tick_gap) = "" Then
+			tick_gap = 1
+		End If
+
+		bungap.Data = bun_gap
+		tickgap.Data = tick_gap
+
+		Select Case gubn
+		Case 1
+			Call Query_Chart(gubn, 0)
+		Case 2
+			Call Query_Chart(gubn, 0)
+		Case 3
+			Call Query_Chart(gubn, 0)
+		Case 6
+			Call Query_Chart(gubn, 0)
+		Case 4
+			unit = bun_gap
+			COMBO0.Data = l_format(unit, "0", 3)
+			Call Query_Chart(gubn, unit)
+		Case 5
+			unit = tick_gap
+			COMBO0.Data = l_format(unit, "0", 3)
+			Call Query_Chart(gubn, unit)
+		Case Else
+			Exit Sub
+		End Select
+
+
+	End If
+End Sub
+
+}
+
+
+

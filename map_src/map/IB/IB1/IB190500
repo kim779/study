@@ -1,0 +1,263 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB190500)
+MAPSIZE(498, 395)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("보유계좌 ID설정")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+TITLE("[1905] 보유계좌 ID설정")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pidoacid")
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL0(0, 496, 397, 516)  LINECOLOR(64)      COLOR(64, 0)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL1(0, 35, 397, 477)  LIMAGE(0)  LINEW(4)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL3(0, 475, 397, 499)  LIMAGE(0)  LINEW(4)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(34, 69)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL97(7, 480, 21, 494)    |IMAGE|AL_STRETCH    COLOR(34, 232)  CUR(0)    "알림_ic.bmp"  ENABLE  &
+  VISIBLE  IMAGE  HINTTYPE(IH_NONE)
+PANEL  GUIDE(23, 480, 383, 496)        COLOR(34, 69)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL(0, 0, 397, 39)  LIMAGE(0)  LINEW(4)  LINETYPE(4)  LINECOLOR(64)      COLOR(66, 0)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+GRID  VGRID(9, 45, 388, 467)  VISIBLEROW(0)  CELLH(20)  MATRIX(500, 4)  FIX(0)  MAINCOLOR(7, 0)  LINECOLOR(65)  FOCUSCOLOR(78)  FOCUSKIND(4)  ROWC(68, 77)  |SELALWAYS|VSCROLL|NO3D|RROW|XHLINE|GRFTEXT    &
+	COLINFO("acno")  LEN(11)  WIDTH(101)  HEAD("계좌번호")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_ALPHA|EDIT_NOP  |FA_SKIP    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  COLUMN_SORT  INORMAL  EDITFORMAT("999-99-999999")    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("acnm")  LEN(20)  WIDTH(168)  HEAD("계좌명")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_NOP  |FA_SKIP    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  COLUMN_SORT  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("acid")  LEN(20)  WIDTH(94)  HEAD("계좌코드")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_INPUT  |FA_SKIP    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  COLUMN_SORT  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("org_acid")  LEN(20)  WIDTH(101)  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_NOP  |FA_SKIP    COLOR(68, 69)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    TABORDER(1)  IOORDER(5)  ENABLE  &
+  VISIBLE
+
+CONTROL  CX_DTS(365, 535, 540, 775)  |FA_PROTECT  "CX_DATATRANS"  ""  LEN(0)  EDIT_NOP    COLOR(192, 232)  TABORDER(0)  ENABLE  &
+  HINTTYPE(IH_NONE)
+GRID  IOGRID(10, 545, 225, 757)  VISIBLEROW(0)  CELLH(20)  MATRIX(2000, 2)  FIX(0)  MAINCOLOR(7, 0)  LINECOLOR(65)  FOCUSCOLOR(78)  FOCUSKIND(4)  ROWC(68, 77)  |VSCROLL|NO3D|RROW|XHLINE|GRFTEXT    &
+	COLINFO("acno")  LEN(11)  WIDTH(101)  HEAD("계좌번호")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_ALPHA|EDIT_INOUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  EDITFORMAT("999-99-999999")    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("acid")  LEN(20)  WIDTH(94)  HEAD("ID")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_INOUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    TABORDER(2)  IOORDER(4)  ENABLE  &
+  VISIBLE
+
+EDIT  NREC(60, 525, 225, 544)  LEN(4)  IO_NUM|EDIT_INOUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("0000")          TABORDER(3)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  ACTF(10, 525, 60, 544)  LEN(1)  IO_MIXED|EDIT_INOUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(4)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  EMSG(10, 760, 225, 780)  LEN(80)  IO_MIXED|AL_LEFT|    COLOR(192, 69)  CUR(0)            TABORDER(0)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BTN_UPDATE(350, 9, 386, 29)  '적용'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, BOLD)  FOCUS  COLOR(68, 186)  CUR(0)    "조회btn.bmp"    TABORDER(5)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Sub QueryAccID()
+	Dim row, idx
+
+	idx = 0
+	IOGRID.SetRows 1000
+
+	ACTF.Data = "D"
+	For row=1 To VGRID.Rows
+		If Len(Trim(VGRID.GetGridCell(row, 1)))=0 Then
+			Exit For
+		End If
+
+		idx = idx + 1
+		IOGRID.SetGridCell idx, 1, VGRID.GetGridCell(row, 1)
+	Next
+
+	IOGRID.SetRows idx
+	NREC.Data = idx
+
+	SCREEN.Send 0
+End Sub
+
+Sub UpdateAccID()
+	Dim row, idx
+
+	idx = 0
+	IOGRID.SetRows 1000
+
+	ACTF.Data = "U"
+	For row=1 To VGRID.Rows
+		If Len(Trim(VGRID.GetGridCell(row, 1)))=0 Then
+			Exit For
+		End If
+
+		If VGRID.GetGridCell(row,3)<>VGRID.GetGridCell(row,4) Then
+			idx = idx + 1
+			IOGRID.SetGridCell idx, 1, VGRID.GetGridCell(row, 1)
+			IOGRID.SetGridCell idx, 2, VGRID.GetGridCell(row, 3)
+		End If
+	Next
+	If idx<1 Then
+		MsgBox "변경된 내용이 존재하지 않습니다.", vbOKOnly, "IBK투자증권"
+		Exit Sub
+	End If
+	IOGRID.SetRows idx
+	NREC.Data = idx
+
+	SCREEN.Send 0
+End Sub
+
+Sub LoadAccounts()
+	VGRID.Clear
+
+	Dim accList, ii, acc, acno, acnm, acid, actp, idx, myAcntFlag, value
+	accList = Split(CX_DTS.GetTypeData ("4","1" ), vbLf, -1, vbTextCompare)  ''accoutcc 로 전계좌 불러오기 0->1
+	idx = 1
+
+	For ii=0 To UBound(accList)
+		acc = Trim(accList(ii))
+		If Len(acc)>11 Then
+			acc = Split(acc, "|", -1, vbTextCompare)
+			acno = Trim(Mid(acc(0), 1, 11))
+			acnm = Mid(acc(0), 12)
+			acnm = Replace(acnm, vbTab, "")
+			acnm = Trim(acnm)
+			acid = Trim(acc(1))
+			actp = Mid(acno, 4, 2)
+			myAcntFlag = acc(2)
+
+			'VIP전용화면으로 고객용으로만 조회가능
+			'계좌플래그 2 또는 3 이면 랩계좌      법인계좌 타입 = 4
+			'랩계좌 제외
+			If chkNumericData(myAcntFlag) = True Then
+			'	If CLng(myAcntFlag) = 0 Or CLng(myAcntFlag) = 1 Then
+				value = myAcntFlag And 2    '랩계좌 2 와 And 연산
+			    If value = 0 Then
+					If actp="10" Or actp="51" Then
+						VGRID.SetGridCell idx, 1, acno
+						VGRID.SetGridCell idx, 2, acnm
+						VGRID.SetGridCell idx, 3, acid
+						VGRID.SetGridCell idx, 4, acid
+						idx = idx + 1
+					End If
+				End If
+			End If
+		End If
+	Next
+
+	If idx>20 Then
+		VGRID.SetRows idx
+	Else
+		VGRID.SetRows 21
+	End If
+End Sub
+
+Sub GridCheck()
+'	For i=1 To VGRID.Row
+'		If VGRID.GetGridCell(i, 3)<>VGRID.GetGridCell(i,4) Then
+'			VGRID.SetTRgb i, 3, 209
+'		End If
+'	Next
+	Dim row
+	row = VGRID.Row
+	If Trim(VGRID.GetGridCell(row, 3))<>Trim(VGRID.GetGridCell(row,4)) Then
+		VGRID.SetTRgb row, 3, 209
+	Else
+		VGRID.SetTRgb row, 3, 69
+	End If
+End Sub
+
+Sub ApplyTo(target, t_acno_idx, t_acid_idx)
+	Dim tgrid
+	Set tgrid = SCREEN.Object(target)
+	If IsNull(tgrid) Then
+		Exit Sub
+	End If
+	'SYSTEM.Trace "Target Index : " & t_acid_idx
+	For i=1 To tgrid.Rows
+		For j=1 To VGRID.Rows
+			If Trim(tgrid.GetGridCell(i, t_acno_idx))=Trim(VGRID.GetGridCell(j, 1)) Then
+				'SYSTEM.Trace "Find |" & Trim(tgrid.GetGridCell(i, t_acno_idx)) & "|" & Trim(VGRID.GetGridCell(j, 1)) & "|"
+				tgrid.SetGridCell i, t_acid_idx, VGRID.GetGridCell(j, 3)
+				Exit For
+			End If
+		Next
+	Next
+
+	'20250327 1904는 혁신부 요청 코스콤 오름차순으로 그대로 조회 1903은 그대로 놔둠
+	If SCREEN.GetMapName(0) = "IB190300" Then
+		SCREEN.Object("parent.GRID0").Sort 5, True, True
+	End If
+End Sub
+
+Sub Refresh()
+	Call LoadAccounts()
+	Call QueryAccID()
+End Sub
+
+_AW_ONINDECLARE_AW_
+#Load IB888833
+
+_AW_ONENDSUB_AW_
+_AW_ONSTART_AW_
+Call LoadAccounts()
+Call QueryAccID()
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+
+GUIDE.Text = EMSG.Data
+
+If ACTF.Data = "D" Then
+	For i=1 To IOGRID.Rows
+		If IOGRID.GetGridCell(i, 1)=VGRID.GetGridCell(i,1) Then
+			VGRID.SetGridCell i, 3, IOGRID.GetGridCell(i, 2)
+			VGRID.SetGridCell i, 4, IOGRID.GetGridCell(i, 2)
+		End If
+	Next
+End If
+
+If ACTF.Data = "U" Then
+	' 성공하면 기존ID컬럼을 갱신한다.
+	If Mid(EMSG.Data, 1, 1)="0" Then
+		For i=1 To VGRID.Rows
+			VGRID.SetGridCell i, 4, VGRID.GetGridCell(i, 3)
+			VGRID.SetTRgb i, 3, 69
+		Next
+	End If
+End If
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(VGRID)
+_AW_ONCHANGE_AW_
+Call GridCheck()
+_AW_ONENDSUB_AW_
+_AW_ONKEYCHANGE_AW_
+'
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(IOGRID)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BTN_UPDATE)
+_AW_ONCLICK_AW_
+Call UpdateAccID()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

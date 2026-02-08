@@ -1,0 +1,283 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB900200)
+MAPSIZE(502, 830)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+TITLE("관리계좌등록")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL63(0, 31, 830, 502)  LIMAGE(0)  LINEW(4)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+GRID  accn_list(6, 45, 318, 477)  VISIBLEROW(0)  CELLH(18)  MATRIX(10000, 4)  FIX(0)  MAINCOLOR(208, 232)  LINECOLOR(75)  FOCUSCOLOR(78)  FOCUSKIND(4)  ROWC(68, 77)  |VSCROLL|NO3D|RROW|XHLINE|HEADER|GRFTEXT    &
+	COLINFO("Col0")  LEN(1)  WIDTH(18)  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_INPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  ICHECK    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("accn")  LEN(11)  WIDTH(89)  HEAD("계좌번호")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  EDITFORMAT("999-99-999999")    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("acnm")  LEN(40)  WIDTH(189)  HEAD("계  좌  명")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("zpwd")  LEN(8)  WIDTH(93)  HEAD("비밀번호")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_REF)  COLHELPTEXT("accn")  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT  |FA_PASSWD    COLOR(68, 69)  COLCUR(10, 0)  REFERENCE(accn)    INORMAL    HNORMAL  SORTSTARTPOS(0)    TABORDER(1)  IOORDER(1)  ENABLE  &
+  VISIBLE
+
+PANEL  PANEL_bg(0, 0, 830, 32)  LIMAGE(1)  LINEW(3)  LINETYPE(4)  LINECOLOR(64)      COLOR(66, 130)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL0(11, 6, 133, 26)  '계좌번호/계좌명 찾기'  AL_CENTER  CUR(0)      COLOR(228, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  s_input(137, 6, 265, 26)  LEN(40)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_SUNKEN          TABORDER(2)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  add(332, 207, 404, 227)  '추   가'  TP_PUSH|IMAGETEXT|AL_CENTER        FOCUS  COLOR(208, 130)  CUR(0)    "5BTN.bmp"    TABORDER(3)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+BUTTON  del(333, 257, 405, 277)  '삭   제'  TP_PUSH|IMAGETEXT|AL_CENTER        FOCUS  COLOR(208, 130)  CUR(0)    "5BTN.bmp"    TABORDER(4)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+BUTTON  all_add(328, 404, 400, 424)  '전체추가'  TP_PUSH|IMAGETEXT|AL_CENTER        FOCUS  COLOR(208, 130)  CUR(0)    "5BTN.bmp"    TABORDER(5)  ENABLE  &
+  IMAGETEXT  HINTTYPE(IH_NONE)
+BUTTON  alll_del(328, 432, 400, 452)  '전체삭제'  TP_PUSH|IMAGETEXT|AL_CENTER        FOCUS  COLOR(208, 130)  CUR(0)    "5BTN.bmp"    TABORDER(6)  ENABLE  &
+  IMAGETEXT  HINTTYPE(IH_NONE)
+OBJECT  obj0(475, 38, 823, 66)    "IB900210"  TABORDER(7)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+CONTROL  CONTROL0(23, 569, 138, 599)  |FA_PROTECT  "CX_DATATRANS"  ""  LEN(0)  EDIT_NOP    COLOR(192, 232)  TABORDER(0)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  obj1(413, 69, 823, 466)    "IB900220"  TABORDER(8)  IOORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON0(269, 6, 305, 26)  '검색'  TP_PUSH|IMAGETEXT|AL_CENTER        FOCUS  COLOR(208, 130)  CUR(0)    "2BTN.bmp"    TABORDER(9)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+BUTTON  BUTTON1(751, 472, 823, 492)  '닫   기'  TP_PUSH|IMAGETEXT|AL_CENTER        FOCUS  COLOR(208, 130)  CUR(0)    "5BTN.bmp"    TABORDER(10)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+BUTTON  allCheck(9, 44, 27, 66)  TP_CHECK|EDIT_NOP          COLOR(208, 232)  CUR(0)      TABORDER(11)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  BUTTON2(335, 45, 407, 65)  'refresh'  TP_PUSH|IMAGETEXT|AL_CENTER        FOCUS  COLOR(208, 130)  CUR(0)    "5BTN.bmp"    TABORDER(12)  ENABLE  &
+  IMAGETEXT  HINTTYPE(IH_NONE)
+BUTTON  BUTTON3(418, 472, 514, 492)  '비밀번호 저장'  TP_PUSH|IMAGETEXT|AL_CENTER        FOCUS  COLOR(208, 130)  CUR(0)    "7BTN.bmp"    TABORDER(13)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+LABEL  LABEL1(569, 6, 821, 26)  '한 그룹당 500개의 계좌 등록이 가능합니다.'  AL_CENTER  CUR(0)      COLOR(228, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Dim ii, cnt
+
+Sub addition()
+	cnt = 0
+	For ii =1 To accn_list.rows
+		If Trim(accn_list.GetGridCell(ii, 1)) = 1 Then
+			cnt = cnt + 1
+			SCREEN.Proc "main.obj1.attach", accn_list.GetGridCell(ii, 2) &","& accn_list.GetGridCell(ii, 3) &","& accn_list.GetGridCell(ii, 4)
+		End If
+	Next
+	'SCREEN.Object ("main.obj1.act").data = "U"
+	If cnt < 1 Then
+		MsgBox "추가할 계좌의 체크박스를 선택하여 주십시오.", 0, "IBK 투자증권"
+	Else
+		SCREEN.Object ("main.obj1").send
+	End If
+End Sub
+
+Sub delete()
+	SCREEN.proc "main.obj1.del", ""
+End Sub
+
+Sub search()
+	Dim pos
+	pos = 0
+Call Total_query()
+	If IsNumeric(Trim(s_input.data)) = True Then
+		For ii = accn_list.rows To 1 Step -1
+			pos = InStr(Trim(accn_list.GetGridCell(ii, 2)), Trim(s_input.data))
+
+			If pos = 0 Then
+				accn_list.RemoveRow ii-1
+			End If
+		Next
+	Else
+			For ii = accn_list.rows To 1 Step -1
+			pos = InStr(Trim(accn_list.GetGridCell(ii, 3)), Trim(s_input.data))
+
+			If pos = 0 Then
+				accn_list.RemoveRow ii-1
+			End If
+		Next
+	End If
+End Sub
+
+Sub Total_query()
+	Dim data
+	'전체조회때는 인풋없이
+	data = CONTROL0.Get813Account("")
+	'특정그룹 조회
+	'data = CONTROL0.Get813Account("0001")
+	accn_list.Clear
+	accn_list.InsertRows 0, data, True
+End Sub
+
+'***************************************************************************
+' DESC: grid chk = ALL
+'***************************************************************************
+Sub all_Check(Flag)
+	For ii = 1 To accn_list.Rows
+		If Trim(accn_list.GetGridCell (ii, 2)) = "" Then
+			Exit For
+		End If
+		If Len(Trim(accn_list.GetGridCell (ii, 2))) > 10 Then
+			accn_list.SetGridCell ii, 1, Flag
+		End If
+
+	Next
+End Sub
+
+_AW_ONSTART_AW_
+'accn_list.setColumnVisible 4, False
+Call Total_query()
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+SCREEN.OnSend = False
+
+_AW_ONENDSUB_AW_
+_AW_ONTIMER_AW_
+If Trim(SCREEN.Object("main.obj1.obj0.ecod").data) = "0000" Then
+	MsgBox "저장 완료", 0, "IBK 투자증권"
+Else
+	MsgBox "저장 실패", 0, "IBK 투자증권"
+End If
+
+_AW_ONENDSUB_AW_
+_AW_ONCLOSE_AW_
+Call CONTROL0.Refresh813(0)
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(accn_list)
+_AW_ONDBLCLK_AW_
+If Trim(accn_list.GetGridCell(accn_list.row, 2)) <> "" Then
+	If Trim(accn_list.GetGridCell(accn_list.row, 1)) = 1 Then
+		accn_list.SetGridCell accn_list.row, 1, 0
+	Else
+		accn_list.SetGridCell accn_list.row, 1, 1
+	End If
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(s_input)
+_AW_ONKEYCHANGE_AW_
+If SCREEN.Key = 13 Then
+	If Trim(s_input.Data) = "" Then
+		Call Total_query()
+	Else
+		Call search()
+	End If
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(add)
+_AW_ONCLICK_AW_
+Call addition()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(del)
+_AW_ONCLICK_AW_
+Call delete()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(CONTROL0)
+_AW_ONDBLCLK_AW_
+'MsgBox "Control: "+CONTROL0.data
+Dim DataList, spos, dpos, symb, data, cnt
+cnt = 1
+DataList = CONTROL0.data
+'MsgBox "DataList: "+ DataList
+dpos = 0
+spos = InStr(DataList, "|")
+While spos <> 0
+	symb = Mid(DataList,dpos+1,spos-dpos-1)
+	'MsgBox "symb: "+ symb
+	dpos = InStr(spos+1,DataList, "|")
+	data = Mid(DataList, spos+1, dPos-spos-1)
+	spos = InStr(dpos+1,DataList, "|")
+	SCREEN.Object(symb).data = data
+
+Wend
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON0)
+_AW_ONCLICK_AW_
+	If Trim(s_input.Data) = "" Then
+		Call Total_query()
+	Else
+		Call search()
+	End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON1)
+_AW_ONCLICK_AW_
+Call CONTROL0.Refresh813(0)
+SCREEN.CloseWindow
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(allCheck)
+_AW_ONCLICK_AW_
+If allCheck.Checked = True Then
+	all_check("1")
+Else
+	all_check("0")
+End If
+_AW_ONENDSUB_AW_
+_AW_ONDBLCLK_AW_
+If allCheck.Checked = True Then
+	all_check("1")
+Else
+	all_check("0")
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON2)
+_AW_ONCLICK_AW_
+Call CONTROL0.Refresh813(0)
+Call Total_query()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON3)
+_AW_ONCLICK_AW_
+SCREEN.Object("main.obj1").send
+SCREEN.SetTimer 4, False
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

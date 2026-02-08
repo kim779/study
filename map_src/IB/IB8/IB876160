@@ -1,0 +1,122 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB876160)
+MAPSIZE(104, 580)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("±º∏≤√º", 9, NORMAL)
+TITLE("Untitled")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL1(0, 0, 580, 110)        COLOR(192, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LB_DateTime(212, 0, 522, 110)  'mm/dd 00:00:'  AL_RIGHT  FONT("Digital-7", 85, BOLD)  CUR(0)      COLOR(192, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  TempMin(680, 160, 710, 185)  '0'  AL_CENTER  CUR(0)      COLOR(192, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LB_Second(521, 0, 641, 110)  '00'  AL_LEFT  FONT("Digital-7", 85, BOLD)  CUR(0)      COLOR(192, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  SYMBOL97(-30, 11, 115, 96)  '√÷∞Ì'        COLOR(192, 209)  CUR(0)    AL_CENTER  FONT("»ﬁ∏’µ’±Ÿ«ÏµÂ∂Û¿Œ", 47, NORMAL)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL0(-2, -20, 3, 130)  'Label'  AL_LEFT  CUR(0)      COLOR(232, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL1(248, 0, 249, 150)  'Label'  AL_LEFT  CUR(0)      COLOR(232, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL2(576, -20, 581, 130)  'Label'  AL_LEFT  CUR(0)      COLOR(232, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  MaxCntTrigger(72, 10, 227, 95)  LEN(10)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT  FONT("»ﬁ∏’µ’±Ÿ«ÏµÂ∂Û¿Œ", 43, NORMAL)    COLOR(192, 209)  CUR(0)  TP_NONE          TABORDER(0)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Function DateTimeConvert(Str)
+	If Len(Str) = 1 Then
+		Str = "0" & Str
+	End If
+
+'	If Trim(Str) = "11" Then
+'		Str = "1 1"
+'	ElseIf Mid(Str, 2, 1) = "1" Then
+'		Str = Mid(Str, 1, 1) + " 1"
+'	End If
+
+	If Left(Str, 1) = "1" Then
+		Str = " " & Str
+	End If
+
+	If Right(Str, 1) = "1" Then
+		Str = Mid(Str, 1, Len(Str)-1) & " 1"
+	End If
+
+	DateTimeConvert = Str
+End Function
+
+
+Function DateTimeConvert_1(Str)
+	If Len(Str) = 1 Then
+		Str = "0" & Str
+	End If
+
+	If Right(Str, 1) = "1" Then
+		Str = Mid(Str, 1, Len(Str)-1) & " 1"
+	End If
+
+	DateTimeConvert_1 = Str
+End Function
+
+_AW_ONSTART_AW_
+SCREEN.SetTimer 10, True
+
+_AW_ONENDSUB_AW_
+_AW_ONTIMER_AW_
+Dim sAmPm, sYear, sMonth, sDay, sHour, sMinute
+sYear = DateTimeConvert(Year(Now))
+sMonth = DateTimeConvert(Month(Now))
+sDay = DateTimeConvert(Day(Now))
+sHour = DateTimeConvert_1(Hour(Now))
+sMinute = DateTimeConvert(Minute(Now))
+sSecond = DateTimeConvert(Second(Now))
+'sAmPm = Left(Time, 2)
+
+If TempMin.Text = 0 Or (TempMin.Text < Second(Now)) Then
+'	If sAmPm = "ø¿»ƒ" Then
+'		sAmPm = "PM"
+'	ElseIf sAmPm = "ø¿¿¸" Then
+'		sAmPm = "AM"
+'	Else
+'		sAmPm = ""
+'	End If
+
+	LB_DateTime.Text = sMonth & "/" & sDay & "  " & sHour & ":" & sMinute & ":"
+	LB_Second.Text = sSecond
+	'LB_DateTime.Text = sMonth & "/" & sDay & "  " & sHour & ":" & sMinute & " " & sAmPm
+Else
+	TempMin.Text = Second(Time)
+End If
+
+SCREEN.SetTimer 10, True
+
+_AW_ONENDSUB_AW_
+}
+
+
+

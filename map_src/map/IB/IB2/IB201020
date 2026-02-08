@@ -1,0 +1,91 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB201020)
+MAPSIZE(359, 536)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(2)
+MAPDESC("가격대별 매매비중")
+MAPPUBLIC(";")
+FONT("굴림", 9, NORMAL)
+TITLE("[201020]가격대별체결비중")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("ng201020")
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL0(0, 2, 536, 20)  '체   결   비   중'        COLOR(66, 130)  CUR(0)    AL_CENTER  FONT("굴림", 9, NORMAL)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  upcd(340, 0, 465, 22)  LEN(12)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(1)  IOORDER(1)  &
+  HINTTYPE(IH_NONE)
+OUT  2320(580, 35, 647, 58)  LEN(9)  IO_NUM|AL_CENTER||FA_SKIP    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(4)  ENABLE  &
+  HINTTYPE(IH_NONE)
+CONTROL  CONTROL0(2, 30, 536, 368)  |FA_PROTECT|FA_FLASH  "C_UserGrp"  "/i50040010000030010100000000000000000030000000001011003355468730000000"  LEN(0)  EDIT_INOUT    COLOR(192, 232)  TABORDER(2)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  check(582, 67, 612, 88)  LEN(1)  IO_MIXED|AL_CENTER|    COLOR(192, 23)  CUR(0)            TABORDER(0)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Sub Query_Chart()
+'	ctl0.ClearAllData
+'	ctl0.SetUserIndexBaseLineValue 0, 0, S2320.data
+'	MsgBox S2320.Data
+'	ctl0.SetInputValue 0,0,"codx",codx.data
+'	ctl0.RequestData 0,0
+
+End Sub
+
+_AW_ONINDECLARE_AW_
+Load IB888888
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+'codx.Data = SCREEN.Object ("main.1301").data
+'S2320.Data = SCREEN.Object ("main.2320").data
+'Query_Chart()
+'SCREEN.OnSend  = False
+upcd.Data = SCREEN.Object ("main.1301").data
+
+If UCase(TypeName( SCREEN.Object("main.cxMarket"))) <> "NOTHING" Then
+	If SCREEN.Object("main.cxMarket").sMarket = "KRX" Then
+		upcd.Data = SCREEN.Object("main.1301").Data
+	ElseIf SCREEN.Object("main.cxMarket").sMarket = "NXT" Then
+		upcd.Data = "N." & SCREEN.Object("main.1301").Data
+	ElseIf SCREEN.Object("main.cxMarket").sMarket = "통합" Then
+		upcd.Data = "M." & SCREEN.Object("main.1301").Data
+	End If
+End If
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+If check.Data = "F" Then
+	CONTROL0.Clear
+End If
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(upcd)
+_AW_ONCHANGE_AW_
+'SCREEN.Send 0
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

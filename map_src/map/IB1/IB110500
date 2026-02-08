@@ -1,0 +1,284 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB110500)
+MAPSIZE(431, 777)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("미결제매매내역")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(ENCODE|CR2TAB)
+TITLE("[1105]미결제매매내역")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(NORM)
+HEADER(LEDGER)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  panel_bottom(0, 49, 781, 51)        COLOR(64, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL63(-2, 51, 779, 408)  LIMAGE(0)  LINEW(4)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL0(1, 0, 776, 49)        COLOR(66, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL0(8, 3, 58, 23)  '계좌번호'  AL_LEFT  CUR(0)      COLOR(66, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+CONTROL  AN1A(58, 3, 198, 23)    "CX_Account"  "/w0"  LEN(11)  EDIT_INPUT    COLOR(192, 130)  TABORDER(1)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL1(307, 3, 357, 23)  '비밀번호'  AL_LEFT  CUR(0)      COLOR(66, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  zPwd(357, 3, 413, 23)  LEN(8)  IO_MIXED|EDIT_INPUT|FA_PASSWD|FA_WRAP    COLOR(192, 130)  CUR(0)  TP_SUNKEN          TABORDER(2)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  send_btn(696, 3, 733, 23)  '조회'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, BOLD)  FOCUS  COLOR(208, 186)  CUR(0)    "조회btn.bmp"    TABORDER(5)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+BUTTON  next_btn(734, 3, 770, 23)  '다음'  TP_PUSH|IMAGETEXT|AL_STRETCH        FOCUS  COLOR(208, 186)  CUR(0)    "2btn.bmp"    TABORDER(6)  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+OUT  ACNM(200, 3, 264, 23)  LEN(30)  IO_MIXED|AL_LEFT||FA_SKIP    COLOR(49, 130)  CUR(0)  LINECOLOR(48)          TABORDER(0)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON0(138, 26, 157, 46)  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(15, 63)  CUR(0)    "검색.BMP"    TABORDER(9)  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+OBJECT  obj_hnam(160, 26, 300, 46)    "IB110410"  TABORDER(10)  IOORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  CHECK0(8, 26, 70, 46)  '종목번호'  TP_CHECK|EDIT_NOP          COLOR(68, 130)  CUR(0)      TABORDER(7)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+GROUP  GROUP0(88, 580, 128, 600)  'Group'        COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  RADIO0(463, 4, 511, 22)  '당일'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(GROUP0)      COLOR(208, 130)  CUR(0)      TABORDER(3)  ENABLE  &
+  VISIBLE  CHECKED  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  RADIO1(507, 4, 552, 22)  '전일'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(GROUP0)      COLOR(208, 130)  CUR(0)      TABORDER(4)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+OBJECT  OBJECT0(6, 58, 771, 399)    "IB110510"  TABORDER(11)  IOORDER(5)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  sec(62, 580, 84, 598)  LEN(1)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_SKIP|FA_PASS    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("1")          TABORDER(12)  IOORDER(6)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL8(-2, 407, 779, 431)  LIMAGE(0)  LINEW(3)  LINETYPE(4)  LINECOLOR(64)      COLOR(34, 232)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL7(4, 412, 18, 426)    |IMAGE|AL_STRETCH    COLOR(34, 232)  CUR(0)    "알림_ic.bmp"  ENABLE  &
+  VISIBLE  IMAGE  HINTTYPE(IH_NONE)
+PANEL  GUIDE(20, 412, 720, 428)        COLOR(34, 130)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  panel_left(0, 0, 1, 49)        COLOR(64, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  panel_rigth(776, 0, 779, 49)        COLOR(64, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BOX  BOX0(455, 3, 560, 23)    COLOR(165, 232)  LINEW(1)  BX_LINE    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+CONTROL  jmcd1104(73, 26, 138, 46)  |FA_PROTECT|FA_SKIP  "CX_CODECTRL"  "/u0/k검색.BMP/lAXCOMBO.BMP/p/s0"  LEN(6)  EDIT_INPUT  FONT("굴림체", 9, NORMAL)    COLOR(192, 130)  TABORDER(8)  IOORDER(7)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+'== 계좌명, 비밀번호 설정
+Sub Set_account()
+	SCREEN.ClearAll 2, 2
+	ACNM.Data = AN1A.Name
+	zPwd.Data = AN1A.Password
+
+	If Len(Trim(AN1A.Data)) <> 11 Then
+		AN1A.SetFocus
+		Exit Sub
+	End If
+
+	If CLng(SYSTEM.ConnectBy) = 0 Then
+		If Trim(zPwd.Data) = "" Then
+			zPwd.Data = "9999"
+		End If
+	End If
+
+	If Trim(zPwd.Data) = "" Then
+		zPwd.SetFocus
+		Exit Sub
+	End If
+
+	SCREEN.Proc "OBJECT0.send_f", ""
+End Sub
+
+'== 첫 조회
+Sub send_f()
+	OBJECT0.ClearAll 2
+	GUIDE.Text = ""
+	SCREEN.Object("OBJECT0.Ledger").FKey = "C"
+	SCREEN.Send 0
+End Sub
+
+'== 연속 조회
+Sub send_c()
+	SCREEN.Object("OBJECT0.Ledger").FKey = "7"
+	SCREEN.Object("OBJECT0.GRID0").SetDataPosition(2)
+	OBJECT0.Send
+End Sub
+
+_AW_ONINDECLARE_AW_
+#Load IB888833
+
+_AW_ONENDSUB_AW_
+_AW_ONSTART_AW_
+' 현재 화면의 시장식별자(cxMarket)에 고유 화면번호 부여
+'xMarket.Major = SCREEN.Major
+
+Call Check_LoginType(zPwd)		'직원/고객에 따른 비밀번호 컨트롤 설정
+
+SCREEN.IgnoreChange True
+jmcd1104.Enable False
+BUTTON0.Enable = False
+obj_hnam.Enable = False
+'jmcd1104.Clear
+SCREEN.IgnoreChange False
+
+SCREEN.SetTimer 3, False
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+SCREEN.OnSend = False
+
+' 기본값[9999] - 09/07/15
+If SYSTEM.ConnectBy = "0" And Trim(zPwd.Data) = "" Then
+   zPwd.Data = "9999"
+End If
+
+'오브젝트에 데이터 날리기
+If CheckInput(AN1A, zPwd) = True Then
+	SCREEN.Object("OBJECT0.zAcntNo").data = AN1A.Data
+	If RADIO1.Checked = True Then
+		SCREEN.Object("OBJECT0.zPwd").data = zPwd.data
+	End If
+
+	If CHECK0.Checked = True Then
+		SCREEN.Object("OBJECT0.zIsuNo").data = "A" + S1301.Data
+	Else
+		SCREEN.Object("OBJECT0.zIsuNo").clear
+	End If
+
+	OBJECT0.Send
+End If
+
+_AW_ONENDSUB_AW_
+_AW_ONTIMER_AW_
+obj_hnam.Send
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(AN1A)
+_AW_ONCHANGE_AW_
+Set_account()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(zPwd)
+_AW_ONKEYCHANGE_AW_
+'== 비밀번호 변경시 조회 버튼 기능 수행.
+If SCREEN.Key = "13" Then  '-- Enter 키 입력
+	If Len(Trim(zPwd.Data)) > 3 Then
+		sec.Data = "4"
+		SCREEN.Proc "OBJECT0.send_f", ""
+	End If
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(send_btn)
+_AW_ONCLICK_AW_
+sec.Data = "1"
+
+SCREEN.Proc "OBJECT0.send_f", ""
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(next_btn)
+_AW_ONCLICK_AW_
+sec.Data = "2"
+
+SCREEN.Proc "OBJECT0.send_c", ""
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON0)
+_AW_ONCLICK_AW_
+Dim retn
+retn = SCREEN.GetCode(100, "jmcd1104", "hnam", 0 )
+If retn <> True Then
+      Exit Sub
+End If
+
+jmcd1104.SetFocus
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(CHECK0)
+_AW_ONCLICK_AW_
+If CHECK0.Checked = False Then
+	jmcd1104.Clear
+	obj_hnam.Send
+	jmcd1104.Enable False
+	BUTTON0.Enable = False
+	obj_hnam.Enable = False
+
+	SCREEN.Proc "OBJECT0.send_f", ""
+Else
+	jmcd1104.Enable  True
+	BUTTON0.Enable = True
+	obj_hnam.Enable = True
+	jmcd1104.SetFocus()
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(RADIO0)
+_AW_ONCLICK_AW_
+OBJECT0.SetObject("IB110510")
+
+If SYSTEM.ConnectBy = 1 And Len(Trim(zPwd.Data)) < 4 Then
+	zPwd.SetFocus
+	Exit Sub
+End If
+
+SCREEN.Proc "OBJECT0.send_f", ""
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(RADIO1)
+_AW_ONCLICK_AW_
+OBJECT0.SetObject("IB110520")
+
+If SYSTEM.ConnectBy = 1 And Len(Trim(zPwd.Data)) < 4 Then
+	zPwd.SetFocus
+	Exit Sub
+End If
+
+SCREEN.Proc "OBJECT0.send_f", ""
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(jmcd1104)
+_AW_ONCHANGE_AW_
+sec.Data = "3"
+obj_hnam.Send
+SCREEN.Proc "OBJECT0.send_f", ""
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

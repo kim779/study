@@ -1,0 +1,58 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB884100)
+MAPSIZE(104, 141)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("굴림", 9, NORMAL)
+TITLE("위너스클럽VIP상담관리")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+CONTROL  CONTROL0(0, 5, 145, 105)  |FA_PROTECT  "CX_log"  ""  LEN(0)  EDIT_NOP    COLOR(192, 232)  TABORDER(0)  ENABLE  &
+  HINTTYPE(IH_NONE)
+CONTROL  CONTROL1(70, 165, 135, 230)  |FA_PROTECT  "CX_Thtmlex"  "/w"  LEN(0)  EDIT_NOP    COLOR(192, 232)  TABORDER(0)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONSTART_AW_
+Dim path
+path = SYSTEM.Home & "\exe\WINNERS.exe"
+SYSTEM.Trace path
+
+If SCREEN.CreateObject("INFO") Then
+	INFO.pushdata "", "AXIS.INI", "WINNERS", "ID", LOGIN.User
+	CONTROL0.ExcuteFile(path)
+End If
+
+
+SCREEN.CloseWindow
+
+'Dim strurl
+'strurl = "http://172.16.210.62:9000/login.do?htsUserId=" & LOGIN.User
+'CONTROL1.PopUpUrl(strurl)
+'SCREEN.CloseWindow
+
+_AW_ONENDSUB_AW_
+}
+
+
+

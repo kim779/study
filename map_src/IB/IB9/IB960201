@@ -1,0 +1,116 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB960201)
+MAPSIZE(248, 229)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("MS Sans Serif", 9, NORMAL)
+TITLE("Untitled")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pidorank")
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL0(0, 0, 229, 248)        COLOR(192, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+GRID  GRID0(0, 0, 229, 221)  VISIBLEROW(10)  CELLH(20)  MATRIX(10, 2)  FIX(0)  MAINCOLOR(208, 232)  LINECOLOR(75)  FOCUSCOLOR(0)  FOCUSKIND(0)  ROWC(68, 77)  |NO3D|RROW|XHLINE    &
+	COLINFO("Col0")  LEN(12)  WIDTH(149)  HEAD("종목코드")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_INPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col1")  LEN(2)  WIDTH(80)  HEAD("순위")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_INPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    TABORDER(1)  IOORDER(4)  ENABLE  &
+  VISIBLE
+
+EDIT  Gubn(81, 506, 201, 526)  LEN(1)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(2)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL0(16, 506, 76, 526)  '입력구분'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL1(16, 528, 76, 548)  '날짜'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  Ddate(81, 528, 169, 548)  LEN(8)  IO_NUM|EDIT_INPUT|FA_DATE    COLOR(68, 130)  CUR(0)  TP_SUNKEN  INIT("00000000")          EDITFORMAT("9999/99/99")  TABORDER(3)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL2(16, 553, 76, 573)  '날짜'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  NCNT(81, 553, 201, 573)  LEN(4)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(4)  IOORDER(3)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  OUTPUT0(60, 227, 385, 247)  LEN(80)  IO_MIXED|AL_LEFT|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(5)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL3(0, 227, 60, 247)  '처리결과'  AL_LEFT  CUR(0)      COLOR(200, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Dim array
+
+Sub parsing(data)
+
+	array = Split(data, " ", -1, 1)
+	arraylen = UBound(array) - LBound(array) + 1
+
+	SYSTEM.Trace data
+	arraylen = UBound(array) - LBound(array) + 1
+
+	If arraylen <> 10 Then
+		SCREEN.OnSend  = False
+		MsgBox "종목을 모두 입력해 주세요", 0, "IBK 투자증권"
+		Exit Sub
+	End If
+
+	For ii = 0 To GRID0.Rows - 1
+
+	'data = Trim(GRID0.GetGridCell(ii+1, 1))
+	code = array(ii)
+
+	GRID0.SetGridCell ii+1, 1, code
+	GRID0.SetGridCell ii+1, 2, ii+1
+
+	Next
+
+	NCNT.Data = ii
+
+End Sub
+
+_AW_ONSEND_AW_
+If SCREEN.Object("main.UTAB1").Index = 0 Then
+	Gubn.Data = "1"
+ElseIf SCREEN.Object("main.UTAB1").Index  = 1 Then
+	Gubn.Data = "4"
+End If
+
+
+
+For ii = 1 To GRID0.Rows
+	code = GRID0.GetGridCell (ii, 1)
+	code = Trim(code)
+	SYSTEM.Trace code
+	If code = "" Then
+		SCREEN.OnSend  = False
+		MsgBox "종목을 모두 입력해 주세요", 0, "IBK 투자증권"
+		Exit For
+	End If
+
+Next
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(Ddate)
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

@@ -1,0 +1,108 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB9010A0)
+MAPSIZE(436, 450)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("±¼¸²", 9, NORMAL)
+TITLE("CX_DATATRANS")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL0(0, 0, 700, 450)  TP_RAISED      COLOR(208, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+CONTROL  CONTROL0(0, 0, 150, 70)  |FA_PROTECT  "CX_DATATRANS"  ""  LEN(0)  EDIT_NOP    COLOR(192, 232)  TABORDER(0)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+GRID  GRID0(0, 95, 439, 415)  VISIBLEROW(200)  CELLH(20)  MATRIX(200, 4)  FIX(0)  MAINCOLOR(208, 232)  LINECOLOR(0)  FOCUSCOLOR(0)  FOCUSKIND(0)  |VSCROLL    &
+	COLINFO("°èÁÂ¹øÈ£")  LEN(11)  WIDTH(80)  HEAD("°èÁÂ¹øÈ£")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_MIXED|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("°èÁÂ¸í|°èÁÂº°¸í")  LEN(45)  WIDTH(80)  HEAD("°èÁÂ¸í|°èÁÂº°¸í")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_MIXED|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("º»ÀÎ°èÁÂÇÃ·¡±×")  LEN(1)  WIDTH(80)  HEAD("º»ÀÎ°èÁÂÇÃ·¡±×")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_MIXED|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("FILLER")  LEN(2)  WIDTH(80)  HEAD("FILLER")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_MIXED|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    TABORDER(1)  IOORDER(1)  ENABLE  &
+  VISIBLE
+
+OBJECT  obj(409, 256, 536, 381)    "IB9010A1"  TABORDER(2)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONSEND_AW_
+SCREEN.OnSend = False
+
+GRID0.Clear
+
+If SYSTEM.ConnectBy = 1 Then   'Á÷¿ø
+	SCREEN.OnSend = False
+	SCREEN.Proc "parent.setbank", ""
+	Exit Sub
+Else
+
+	Dim accList,a,b,g,idx,d
+
+	accList = CONTROL0.GetTypeData ("4","" )
+	a = 1
+	idx = 1
+
+	Do While a < Len(accList)
+		b = InStr(a,accList,vbLf,0)
+		If b = 0 Then
+			Exit Do
+		End If
+
+		g = Mid( accList, a, b-a )
+		a = b + 1
+
+		d = Mid(g,4,2)
+		If d = "10" Or d ="00" Then
+			GRID0.SetGridCell idx, 1, Left(g,11)
+			GRID0.SetGridCell idx, 2, Right(g,Len(g)-11)
+			idx = idx + 1
+		End If
+	Loop
+
+End If
+
+Dim ii, chk
+chk = 0
+
+For ii =1 To GRID0.Rows
+	If Trim(GRID0.getgridcell(ii, 1)) = "" Then
+		Exit For
+	End If
+
+	If Left(Trim(GRID0.getgridcell(ii, 1)), 1) <> "5" Then
+		chk = 1
+	End If
+Next
+
+If chk = 0 Then
+	obj.Send
+Else
+	SCREEN.Proc "parent.setbank", ""
+End If
+
+
+
+'SCREEN.Proc "main.accn_list_done", ""
+
+_AW_ONENDSUB_AW_
+}
+
+
+

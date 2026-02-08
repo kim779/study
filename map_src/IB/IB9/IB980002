@@ -1,0 +1,97 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB980002)
+MAPSIZE(811, 772)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("±¼¸²", 9, NORMAL)
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+CONTROL  BROWSER0(0, 0, 770, 810)  |FA_PROTECT  "CX_WEBEDGE"  "/k2"  LEN(0)  EDIT_NOP    COLOR(192, 232)  TABORDER(0)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON0(785, 7, 820, 27)  TP_PUSH      AL_CENTER    FOCUS  COLOR(208, 232)  CUR(0)      TABORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON1(1460, 7, 1495, 27)  TP_PUSH      AL_CENTER    FOCUS  COLOR(208, 232)  CUR(0)      TABORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  edmap(1505, 7, 1553, 27)  LEN(4)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(3)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  edurl(825, 7, 1415, 27)  LEN(200)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(4)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Sub refresh()
+	CONTROL0.Navigate2 "http://www.ibks.com/customer/ranking/index.jsp?popup=Y&hts=Y",False
+End Sub
+
+_AW_SCRIPT_AW_(BROWSER0)
+_AW_ONDBLCLK_AW_
+If SCREEN.CreateObject("Info") Then
+	bEdge = Trim(INFO.PopData("", "WEBINFO.INI", Trim(edmap.Data), "EDGE"))
+	url = Trim(INFO.PopData("", "WEBINFO.INI", Trim(edmap.Data), "EDGE_URL"))
+End If
+
+SYSTEM.Trace "[IB980000][EDGE] OnStart  bEdge = " & bEdge & " url = " & url
+SYSTEM.Trace "[IB980000][EDGE] OnStart  edmap.Data = " & Trim(edmap.Data)
+
+If SCREEN.CreateObject("Info") Then
+	width = Trim(INFO.PopData("", "WEBINFO.INI", edmap.Data, "width"))
+	height = Trim(INFO.PopData("", "WEBINFO.INI", edmap.Data, "height"))
+	SCREEN.SetSize width, height
+End If
+
+If  Len(Trim(url)) = 0 Then
+	BROWSER0.Navigate2 1, edmap.Data
+Else
+	edurl.Data = url
+	BROWSER0.Navigate(edurl.Data)
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON0)
+_AW_ONCLICK_AW_
+BROWSER0.Navigate(edurl.Data)
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON1)
+_AW_ONCLICK_AW_
+BROWSER0.Navigate2 1, edmap.Data
+
+Dim width
+Dim height
+If SCREEN.CreateObject("Info") Then
+width = Trim(INFO.PopData("", "WEBINFO.INI", edmap.Data, "width"))
+height = Trim(INFO.PopData("", "WEBINFO.INI", edmap.Data, "height"))
+SCREEN.SetSize width, height + 20
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

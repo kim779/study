@@ -1,0 +1,78 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB2403T3)
+MAPSIZE(140, 513)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("외국인거래동향")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+TITLE("[2403]종목별 외국인 거래동향")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("ping2403")
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+EDIT  12901(73, 242, 177, 262)  LEN(8)  IO_NUM|EDIT_INPUT|FA_DATE    COLOR(192, 232)  CUR(0)  TP_NONE          EDITFORMAT("9999/99/99")  TABORDER(1)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+CONTROL  CONTROL0(1, 0, 514, 140)  |FA_FLASH  "C_UserGrp"  "/i700200100000300201000000000000000000300000000001110050266112200000000712003355468730000000"  LEN(0)  EDIT_INOUT    COLOR(192, 232)  TABORDER(3)  IOORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  cod2(0, 245, 95, 263)  LEN(12)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(2)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  check(69, 269, 99, 290)  LEN(1)  IO_MIXED|AL_CENTER|    COLOR(192, 23)  CUR(0)            TABORDER(0)  IOORDER(3)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Sub Query_Chart()
+'	ctl0.ClearAllData
+'
+'	ctl0.Setchartperiod 0, 2
+'	ctl0.SetInputValue 0,0,"1301",S1301.data
+'	ctl0.RequestData 0,0
+End Sub
+
+_AW_ONSEND_AW_
+cod2.Data = SCREEN.Object("main.1301").Data
+S12901.Data = SCREEN.Object("PARENT.12901").Data
+
+If UCase(TypeName( SCREEN.Object("main.cxMarket"))) <> "NOTHING" Then
+	If SCREEN.Object("main.cxMarket").sMarket = "KRX" Then
+		cod2.Data = SCREEN.Object("main.1301").Data
+	ElseIf SCREEN.Object("main.cxMarket").sMarket = "NXT" Then
+		cod2.Data = "N." & SCREEN.Object("main.1301").Data
+	ElseIf SCREEN.Object("main.cxMarket").sMarket = "통합" Then
+		cod2.Data = "M." & SCREEN.Object("main.1301").Data
+	End If
+End If
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+If check.Data = "F" Then
+	CONTROL0.Clear
+End If
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(12901)
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

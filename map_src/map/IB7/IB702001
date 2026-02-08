@@ -1,0 +1,98 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB702001)
+MAPSIZE(283, 401)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("¸ÖÆ¼Â÷Æ®2")
+MAPPUBLIC(";")
+FONT("±¼¸²Ã¼", 9, NORMAL)
+OPTIONS(FMS|FLASH)
+TITLE("[7021]¸ÖÆ¼Â÷Æ®2")
+TOPATH(AXIS)
+METHOD(MENU)
+MAPTYPE(RESIZE)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+EDIT  1301(405, 170, 467, 188)  LEN(12)  IO_MIXED|EDIT_INPUT|FA_NOR  FONT("±¼¸²Ã¼", 10, NORMAL)    COLOR(10, 63)  CUR(0)  TP_NONE          TABORDER(1)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  1021(405, 190, 511, 210)  LEN(12)  IO_ALPHA|AL_LEFT||FA_FLASH  FONT("±¼¸²Ã¼", 10, NORMAL)    COLOR(211, 232)  CUR(0)            TABORDER(0)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+CONTROL  18412(0, 0, 400, 283)  |FA_PROTECT|FA_FLASH  "C_Total"  "/nIB702001/r200/d100/i1/u1/t3/j1/m15/m220/m30/m40/v/g15/g220/g30/g40"  LEN(0)  EDIT_INOUT  FONT("±¼¸²Ã¼", 10, NORMAL)    COLOR(192, 232)  TABORDER(2)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+
+Dim gubn
+
+Sub change_code( code )
+S18412.RequestTR2 code&vbTab
+
+gubn = Left(code,1)
+
+End Sub
+
+Sub change_code2( code )
+S18412.RequestTR2 code&vbTab
+End Sub
+
+_AW_ONSTART_AW_
+'Dim str
+
+'str = "3"& vbTab &"101E3000" & vbTab & "4" & vbTab & "5" & vbTab
+
+'change_code(str)
+
+gubn = "1"
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+Dim str
+S1301.Data = SCREEN.Object("main.1301").Data
+SCREEN.OnSend = False
+
+Dim code, strLeft
+
+code = Trim(S1301.Data)
+
+If Len(code) > 6 Then
+	strLeft = Left( code, 3 )
+	If strLeft = "201" Or strLeft = "301" Or strLeft = "B01" Or strLeft = "C01" Then
+		str = "4" & vbTab & S1301.Data & vbTab
+	Else
+		str = "3" & vbTab & S1301.Data & vbTab
+	End If
+ElseIf Len(code) = 3 Then
+	str = "2" & vbTab & S1301.Data & vbTab
+Else
+	str = "1" & vbTab & S1301.Data & vbTab
+End If
+
+'str = gubn & vbTab & S1301.Data & vbTab
+
+S18412.RequestTR2 str
+
+_AW_ONENDSUB_AW_
+_AW_ONFOCUS_AW_
+SYSTEM.Push "7021_FOCUS",  SCREEN.GetMapName(0)
+
+_AW_ONENDSUB_AW_
+}
+
+
+

@@ -1,0 +1,68 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB00015K)
+MAPSIZE(114, 618)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("차트")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(FLASH)
+TITLE("[IB00015K]")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("ping2120")
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+CONTROL  ugrp(0, 0, 618, 114)  |FA_FLASH  "C_UserGrp"  "/i61300120000500010100000000000000000010000000000113003355468720000000"  LEN(0)  EDIT_INOUT    COLOR(192, 232)  TABORDER(2)  IOORDER(4)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  upcd(455, 225, 539, 245)  LEN(12)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(1)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  1021(358, 220, 443, 244)  LEN(12)  IO_MIXED|AL_LEFT||FA_FLASH|FA_XDELETE    COLOR(203, 1)  CUR(0)            TABORDER(0)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  check(357, 276, 387, 297)  LEN(1)  IO_MIXED|AL_CENTER|    COLOR(192, 23)  CUR(0)            TABORDER(0)  IOORDER(3)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONSEND_AW_
+upcd.Data = SCREEN.Object("main.1301").data
+
+If UCase(TypeName( SCREEN.Object("main.cxMarket"))) <> "NOTHING" Then
+	If SCREEN.Object("main.cxMarket").sMarket = "KRX" Then
+		upcd.Data = SCREEN.Object("main.1301").data
+		'ugrp.sMarket = "KRX"
+	ElseIf SCREEN.Object("main.cxMarket").sMarket = "NXT" Then
+		upcd.Data = "N." & SCREEN.Object("main.1301").data
+		'ugrp.sMarket = "NXT"
+	ElseIf SCREEN.Object("main.cxMarket").sMarket = "통합" Then
+		upcd.Data = "M." & SCREEN.Object("main.1301").data
+		'ugrp.sMarket = "통합"
+	End If
+End If
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+If check.Data = "F" Then
+	ugrp.Clear
+End If
+
+_AW_ONENDSUB_AW_
+}
+
+
+

@@ -1,0 +1,408 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB281102)
+MAPSIZE(413, 389)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+TITLE("항목편집")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL0(0, 0, 391, 415)  LIMAGE(0)  LINEW(3)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 130)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+GROUP  GROUP0(15, 10, 148, 377)  '등록대상필드항목'        COLOR(-1, 232)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+GRID  listGrid(21, 27, 141, 370)  VISIBLEROW(0)  CELLH(18)  MATRIX(50, 1)  FIX(0)  MAINCOLOR(181, 232)  LINECOLOR(75)  FOCUSCOLOR(78)  FOCUSKIND(3)  ROWC(68, 77)  |SELALWAYS|FLEXIBLE|VSCROLL|NOHEAD|NO3D|RROW|XHLINE|GRFTEXT|GLINE    &
+	COLINFO("Col0")  LEN(40)  WIDTH(104)  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    TABORDER(1)  IOORDER(1)  ENABLE  &
+  VISIBLE
+
+BUTTON  btn_insert(162, 85, 230, 105)  '추가'  TP_PUSH|IMAGETEXT|AL_STRETCH        FOCUS  COLOR(208, 186)  CUR(0)    "4BTN.BMP"    TABORDER(2)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+BUTTON  btn_delete(162, 110, 230, 130)  '삭제'  TP_PUSH|IMAGETEXT|AL_STRETCH        FOCUS  COLOR(208, 186)  CUR(0)    "4BTN.BMP"    TABORDER(3)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+BUTTON  btn_setUp(162, 160, 230, 180)  '위로'  TP_PUSH|IMAGETEXT|AL_STRETCH        FOCUS  COLOR(208, 186)  CUR(0)    "4BTN.BMP"    TABORDER(4)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+BUTTON  btn_setDown(162, 185, 230, 205)  '아래로'  TP_PUSH|IMAGETEXT|AL_STRETCH        FOCUS  COLOR(208, 186)  CUR(0)    "4BTN.BMP"    TABORDER(5)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+BUTTON  btn_setBase(162, 230, 230, 250)  '기본필드'  TP_PUSH|IMAGETEXT|AL_STRETCH        FOCUS  COLOR(208, 186)  CUR(0)    "4BTN.BMP"    TABORDER(6)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+GROUP  GROUP1(244, 13, 377, 377)  '등록완료필드항목'        COLOR(-1, 232)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+GRID  viewGrid(250, 27, 370, 370)  VISIBLEROW(0)  CELLH(18)  MATRIX(50, 1)  FIX(0)  MAINCOLOR(181, 232)  LINECOLOR(75)  FOCUSCOLOR(78)  FOCUSKIND(3)  ROWC(68, 77)  |SELALWAYS|FLEXIBLE|VSCROLL|NOHEAD|NO3D|RROW|XHLINE|GRFTEXT|GLINE    &
+	COLINFO("Col0")  LEN(40)  WIDTH(104)  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    TABORDER(7)  IOORDER(2)  ENABLE  &
+  VISIBLE
+
+BUTTON  btn_allDelete(162, 135, 230, 155)  '전체삭제'  TP_PUSH|IMAGETEXT|AL_STRETCH        FOCUS  COLOR(208, 186)  CUR(0)    "4BTN.BMP"    TABORDER(8)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+BUTTON  btn_confirm(239, 384, 307, 404)  '확인'  TP_PUSH|IMAGETEXT|AL_STRETCH        FOCUS  COLOR(208, 232)  CUR(0)    "4BTN.BMP"    TABORDER(9)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+BUTTON  btn_cancel(309, 384, 377, 404)  '취소'  TP_PUSH|IMAGETEXT|AL_STRETCH        FOCUS  COLOR(208, 232)  CUR(0)    "4BTN.BMP"    TABORDER(10)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+EDIT  headList(10, 550, 505, 570)  LEN(200)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_SUNKEN          TABORDER(11)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  btn_dominoBtn(162, 255, 230, 275)  '수정전항목'  TP_PUSH|IMAGETEXT|AL_STRETCH        FOCUS  COLOR(208, 186)  CUR(0)    "4BTN.BMP"    TABORDER(12)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Option Explicit
+
+Const MYFILE = "userinfo.ini"
+Const MYMAP = "IB105041"
+
+'Dim baseColumn
+'baseColumn = "등락률|거래량|거래대금|잔존일수|이론가|괴리율|행사가격|전환비율|" &_
+'             "손익분기점|손익분기율|자본지지점|델타|프리미엄|패리티|기어링|e*기어링|" &_
+'             "틱환산|기초자산|발행사|LP보유비율"
+
+Dim baseColumnArr
+'baseColumnArr = Array("종목명", "현재가", "대비", "등락률", "거래량", "거래대금",_
+baseColumnArr = Array("등락률", "거래량", "거래대금",_
+                      "잔존일수", "이론가", "괴리율", "행사가격", "전환비율",_
+                      "손익분기점", "손익분기율", "자본지지점", "델타", "프리미엄",_
+                      "패리티", "기어링", "e*기어링", "틱환산", "기초자산", "발행사", "LP보유비율")
+
+
+'*****************************************************************************
+'SetBaseColumn(param)
+'param - 헤더명을 복사할 그리드 이름
+'기본헤더명을 복사. 화면 실행시 또는 부모창에서 넘어온 헤더 내용이 NULL값일 경우
+'*****************************************************************************
+Sub SetBaseColumn(param)
+	Dim ii, colNm, target
+	Set target = SCREEN.Object(param)
+
+	For ii = LBound(baseColumnArr) To UBound(baseColumnArr)
+		colNm = Trim(baseColumnArr(ii))
+
+		target.InsertRow -1
+		target.SetGridCell target.Rows, 1, colNm
+	Next
+End Sub
+
+
+'*****************************************************************************
+'SetViewGridItem()
+'부모창에서 받아온 값 구분
+'*****************************************************************************
+Sub SetViewGridItem()
+	Dim viewListArr
+
+	If Trim(headList.Data) = "" Then
+		Call SetBaseColumn("viewGrid")
+	Else
+		Call SetDominoColumn()
+	End If
+End Sub
+
+'*****************************************************************************
+'SetDominoColumn()
+'부모창에서 넘어온 그리드 헤더 세팅
+'*****************************************************************************
+Sub SetDominoColumn()
+	Dim ii, headListArr, headItem
+	headListArr = Split(Trim(headList.Data), "|")
+
+	viewGrid.Clear
+
+	For ii = LBound(headListArr) To UBound(headListArr)
+		viewGrid.InsertRow -1
+		headItem = Trim(headListArr(ii))
+
+		viewGrid.SetGridCell ii + 1, 1, headItem
+	Next
+End Sub
+
+
+Sub DoInsert()
+	Dim item, ii
+	item = Trim(listGrid.GetGridCell(listGrid.Index + 1, 1))
+
+	For ii = 1 To viewGrid.Rows
+		If item = Trim(viewGrid.GetGridCell(ii, 1)) Then
+			Call alert_msg("동일한 항목이 존재합니다.")
+			Exit Sub
+		End If
+	Next
+
+	viewGrid.InsertRow -1
+	viewGrid.SetGridCell viewGrid.Rows, 1, item
+	viewGrid.Index viewGrid.Rows - 1
+
+	Call chkItem()
+End Sub
+
+
+Sub DoDelete()
+	If Trim(viewGrid.GetGridCell(viewGrid.Index + 1, 1)) = "" Then
+		viewGrid.Index viewGrid.Rows - 1
+		Exit Sub
+	End If
+
+	viewGrid.RemoveRow viewGrid.Index
+	viewGrid.Index viewGrid.Index - 1
+
+	Call chkItem()
+End Sub
+
+
+Sub DoAllDelete()
+	viewGrid.Clear
+
+	Call chkItem()
+End Sub
+
+
+Sub DoSetUp()
+	Dim tmp
+	tmp = Trim(viewGrid.GetGridCell(viewGrid.Index + 1, 1))
+
+	viewGrid.SetGridCell viewGrid.Index + 1, 1, Trim(viewGrid.GetGridCell(viewGrid.Index , 1))
+	viewGrid.SetGridCell viewGrid.Index, 1, tmp
+
+	viewGrid.Index viewGrid.Index - 1
+
+	Call chkItem()
+End Sub
+
+
+Sub DoSetDown()
+	Dim tmp
+	tmp = Trim(viewGrid.GetGridCell(viewGrid.Index + 1, 1))
+
+	viewGrid.SetGridCell viewGrid.Index + 1, 1, Trim(viewGrid.GetGridCell(viewGrid.Index + 2, 1))
+	viewGrid.SetGridCell viewGrid.Index + 2, 1, tmp
+
+	viewGrid.Index viewGrid.Index + 1
+
+	Call chkItem()
+End Sub
+
+
+Sub DoBase()
+	viewGrid.Clear
+	Call SetBaseColumn("viewGrid")
+	Call chkItem()
+End Sub
+
+
+Sub chkItem()
+	If viewGrid.Index = 0 Then
+		btn_setUp.Enable = False
+	Else
+		btn_setUp.Enable = True
+	End If
+
+	If viewGrid.Index = viewGrid.Rows - 1 Then
+		btn_setDown.Enable = False
+	Else
+		btn_setDown.Enable = True
+	End If
+
+	If viewGrid.Rows < 1 Then
+		btn_insert.Enable = True
+	Else
+		Dim selItem, ii
+		selItem = Trim(listGrid.GetGridCell(listGrid.Index + 1, 1))
+
+		For ii = 1 To viewGrid.Rows
+			If selItem = Trim(viewGrid.GetGridCell(ii, 1)) Then
+				btn_insert.Enable = False
+				Exit Sub
+			Else
+				btn_insert.Enable = True
+			End If
+		Next
+	End If
+End Sub
+
+
+Sub DoConfirm()
+	SYSTEM.Push "modify_2811", ""
+
+	Dim ii, Domino
+	Domino = ""
+
+	For ii = 1 To viewGrid.Rows
+		If Domino = "" Then
+			Domino = Trim(viewGrid.GetGridCell(ii, 1))
+		Else
+			Domino = Domino & "|" & Trim(viewGrid.GetGridCell(ii, 1))
+		End If
+	Next
+
+	If Domino = "" Then
+		Call alert_msg("등록된 항목이 없습니다.")
+		Exit Sub
+	End If
+
+	If Trim(headList.Data) = Trim(Domino) Then
+		SYSTEM.Push "modify_2811", ""
+	Else
+		Call p_write_ini(Domino)
+		SYSTEM.Push "modify_2811", Domino
+	End If
+
+	SCREEN.CloseWindow
+End Sub
+
+
+Sub p_write_ini(headNm)
+	If SCREEN.CreateObject("INFO") = True Then
+		INFO.PushData LOGIN.Name, MYFILE, MYMAP, "viewList", Trim(headNm)
+	End If
+End Sub
+
+_AW_ONINDECLARE_AW_
+#Load IB888833
+
+_AW_ONENDSUB_AW_
+_AW_ONSTART_AW_
+Call SetBaseColumn("listGrid")
+Call SetViewGridItem()
+Call chkItem()
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(listGrid)
+_AW_ONCLICK_AW_
+If listGrid.HitPos <> 3 Then
+	Exit Sub
+End If
+
+Call chkItem()
+_AW_ONENDSUB_AW_
+_AW_ONDBLCLK_AW_
+If listGrid.HitPos <> 3 Then
+	Exit Sub
+End If
+
+Dim listNm
+listNm = Trim(listGrid.GetGridCell(listGrid.Row, 1))
+
+If listNm = "" Then
+	Exit Sub
+End If
+
+Call chkItem()
+Call DoInsert()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(btn_insert)
+_AW_ONCLICK_AW_
+Call DoInsert()
+_AW_ONENDSUB_AW_
+_AW_ONDBLCLK_AW_
+Call DoInsert()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(btn_delete)
+_AW_ONCLICK_AW_
+Call DoDelete()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(btn_setUp)
+_AW_ONCLICK_AW_
+Call DoSetUp()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(btn_setDown)
+_AW_ONCLICK_AW_
+Call DoSetDown()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(btn_setBase)
+_AW_ONCLICK_AW_
+Call DoBase()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(viewGrid)
+_AW_ONCLICK_AW_
+If viewGrid.HitPos <> 3 Then
+	Exit Sub
+End If
+
+If Trim(viewGrid.GetGridCell(viewGrid.Row, 1)) = "" Then
+	Exit Sub
+End If
+
+Call chkItem()
+_AW_ONENDSUB_AW_
+_AW_ONDBLCLK_AW_
+If viewGrid.HitPos <> 3 Then
+	Exit Sub
+End If
+
+If Trim(viewGrid.GetGridCell(viewGrid.Row, 1)) = "" Then
+	Exit Sub
+End If
+
+Call chkItem()
+Call DoDelete()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(btn_allDelete)
+_AW_ONCLICK_AW_
+Call DoAllDelete()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(btn_confirm)
+_AW_ONCLICK_AW_
+Call DoConfirm()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(btn_cancel)
+_AW_ONCLICK_AW_
+SYSTEM.Push "modify_2811", ""
+SCREEN.CloseWindow
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(btn_dominoBtn)
+_AW_ONCLICK_AW_
+Call SetDominoColumn()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

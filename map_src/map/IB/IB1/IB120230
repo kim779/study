@@ -1,0 +1,255 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB120230)
+MAPSIZE(276, 598)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("계좌별 수수료율조회")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(ENCODE|CR2TAB)
+TITLE("[1202]계좌별 수수료율조회")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pihocfee")
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+GROUP  GROUP0(15, 20, 300, 180)  'In'        COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL0(25, 40, 95, 60)  '레코드갯수'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL1(25, 61, 95, 81)  '계좌번호'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL2(25, 82, 95, 102)  '비밀버호'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL3(25, 103, 95, 123)  '조회구분'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+GROUP  GROUP1(307, 9, 597, 274)  'Out'        COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  zIn(111, 40, 231, 59)  LEN(5)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("00001")          TABORDER(1)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  zAcntNo(111, 60, 231, 79)  LEN(20)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(2)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  zPwd(111, 81, 231, 100)  LEN(8)  IO_MIXED|EDIT_INPUT|FA_PASSWD|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(3)  IOORDER(3)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  zQryTp(111, 103, 231, 122)  LEN(1)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("2")          TABORDER(4)  IOORDER(4)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  zInptVal(20, 195, 295, 213)  LEN(34)  IO_MIXED|AL_CENTER||FA_PASSWD|FA_WRAP    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(7)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL4(317, 21, 437, 41)  '레코드갯수'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL5(317, 43, 437, 63)  '계좌번호'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL6(317, 65, 437, 85)  '영업점/콜센터'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL7(317, 87, 437, 107)  'HTS/홈페이지'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL8(317, 109, 437, 129)  'ARS'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  zOut(443, 21, 572, 39)  LEN(5)  IO_MIXED|AL_CENTER|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(8)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  o_acno(443, 43, 572, 61)  LEN(20)  IO_MIXED|AL_CENTER|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(9)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  o_call(443, 65, 572, 83)  LEN(11)  IO_NUM|AL_CENTER||FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSUP    COLOR(192, 232)  CUR(0)            IFRGB(69, 69)  TABORDER(0)  IOORDER(10)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  o_hts(443, 86, 572, 104)  LEN(11)  IO_NUM|AL_CENTER||FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSUP    COLOR(192, 232)  CUR(0)            IFRGB(69, 69)  TABORDER(0)  IOORDER(11)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  o_ars(443, 108, 572, 126)  LEN(11)  IO_NUM|AL_CENTER||FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSUP    COLOR(192, 232)  CUR(0)            IFRGB(69, 69)  TABORDER(0)  IOORDER(12)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL9(315, 132, 435, 152)  '영업점/콜센터 SAVE'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL10(315, 154, 435, 174)  'HTS/홈페이지 SAVE'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL11(315, 176, 435, 196)  'ARS SAVE'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  o_save_call(441, 132, 570, 150)  LEN(16)  IO_NUM|AL_CENTER||FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSUP    COLOR(192, 232)  CUR(0)            IFRGB(69, 69)  TABORDER(0)  IOORDER(13)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  o_save_hts(441, 153, 570, 171)  LEN(16)  IO_NUM|AL_CENTER||FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSUP    COLOR(192, 232)  CUR(0)            IFRGB(69, 69)  TABORDER(0)  IOORDER(14)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  o_save_ars(441, 175, 570, 193)  LEN(16)  IO_NUM|AL_CENTER||FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSUP    COLOR(192, 232)  CUR(0)            IFRGB(69, 69)  TABORDER(0)  IOORDER(15)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  chek(440, 195, 575, 215)  LEN(1)  IO_NUM|AL_CENTER|    COLOR(192, 232)  CUR(0)  LINECOLOR(0)          TABORDER(0)  IOORDER(16)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  ID(100, 129, 219, 148)  LEN(8)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("         ")          TABORDER(5)  IOORDER(5)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL12(28, 127, 96, 147)  'ID'  AL_LEFT  CUR(0)      COLOR(66, 69)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL13(30, 153, 98, 173)  '시장구분'  AL_LEFT  CUR(0)      COLOR(66, 69)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  sjgb(104, 153, 223, 172)  LEN(1)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("1")          TABORDER(6)  IOORDER(6)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Option Explicit
+
+Sub send_f()
+	SCREEN.ClearAll 0, 2
+	SCREEN.Send 0
+End Sub
+
+Function chkNumData(data)
+	chkNumData = False
+
+	If Trim(data) = "" Then
+		Exit Function
+	End If
+
+	If IsNumeric(data) = False Then
+		Exit Function
+	End If
+
+	chkNumData = True
+
+End Function
+
+_AW_ONINDECLARE_AW_
+#Load IB888833
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+SCREEN.OnSend = False
+SCREEN.Object("parent.GUIDE").Text = ""
+
+zIn.Data = "00001"
+zAcntNo.Data = Trim(SCREEN.Object("parent.AN1A").Data)
+
+If Len(Trim(zAcntNo.Data)) <> 11 Then
+	SCREEN.Object("parent.GUIDE").Text = "계좌번호를 확인하여 주십시오."
+	SCREEN.Object("parent.AN1A").SetFocus
+	Exit Sub
+End If
+
+' 기본값[9999] - 09/07/15
+If SYSTEM.ConnectBy = "0" And Trim(SCREEN.Object("parent.zPwd").Data) = "" Then
+   zPwd.Data = "9999"
+Else
+	zPwd.Data = Trim(SCREEN.Object("parent.zPwd").Data)
+End If
+
+If Len(Trim(zPwd.Data)) < 4 Then
+	SCREEN.Object("parent.GUIDE").Text = "비밀번호를 확인하여 주십시오."
+	SCREEN.Object("parent.zPwd").SetFocus
+	Exit Sub
+End If
+
+zQryTp.Data = "2"
+ID.Data = SYSTEM.UserID
+
+SCREEN.OnSend = True
+
+If UCase(TypeName( SCREEN.Object("main.cxMarket"))) <> "NOTHING" Then
+	If SCREEN.Object("main.cxMarket").sMarket = "KRX" Then
+		sjgb.Data = "1"
+	ElseIf SCREEN.Object("main.cxMarket").sMarket = "NXT" Then
+		sjgb.Data =  "2"
+	ElseIf SCREEN.Object("main.cxMarket").sMarket = "통합" Then
+		sjgb.Data =  "3"
+	End If
+	'SYSTEM.Trace "yes cxMarket sjgb = " & sjgb.Data & " map = " &  SCREEN.GetMapName(0)
+Else
+	SYSTEM.Trace "no cxMarket map = " & SCREEN.GetMapName(0)
+End If
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+Dim machaeGb, fee, fee_save
+
+machaeGb = "00"
+
+If SCREEN.CreateObject("INFO") Then
+	machaeGb = Trim(INFO.PopData(LOGIN.Name, "userconf.ini", "120200", "maeche"))
+End If
+
+Select Case machaeGb
+	Case "01"	'HTS / 홈페이지
+			fee = Trim(o_hts.Data)
+			fee_save = Trim(o_save_hts.Data)
+
+			If chkNumData(fee) = False Then
+				fee = "0.00100000"
+				fee_save = "0000000000000000"
+			End If
+	Case "02"	'HTS / 홈페이지
+			fee = Trim(o_hts.Data)
+			fee_save = Trim(o_save_hts.Data)
+
+			If chkNumData(fee) = False Then
+				fee = "0.00100000"
+				fee_save = "0000000000000000"
+			End If
+	Case "00"	'영업점 / 콜센터
+			fee = Trim(o_call.Data)
+			fee_save = Trim(o_save_call.Data)
+
+			If chkNumData(fee) = False Then
+				fee = "0.00500000"
+				fee_save = "0000000000000000"
+			End If
+	Case "06"	'영업점 / 콜센터
+			fee = Trim(o_call.Data)
+			fee_save = Trim(o_save_call.Data)
+
+			If chkNumData(fee) = False Then
+				fee = "0.00500000"
+				fee_save = "0000000000000000"
+			End If
+	Case "07"	'ars
+			fee = Trim(o_ars.Data)
+			fee_save = Trim(o_save_ars.Data)
+
+			If chkNumData(fee) = False Then
+				fee = "0.00250000"
+				fee_save = "0000000000000000"
+			End If
+End Select
+
+SCREEN.Object("parent.obj.fee").Data = fee
+SCREEN.Object("parent.obj.fee_save").Data = fee_save
+
+SCREEN.Proc "parent.obj.send_f", ""
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(o_call)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(o_hts)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(o_ars)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(o_save_call)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(o_save_hts)
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(o_save_ars)
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

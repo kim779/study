@@ -1,0 +1,124 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB861330)
+MAPSIZE(450, 698)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+TITLE("CX_DATATRANS")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+CONTROL  CONTROL0(0, 0, 150, 70)  |FA_PROTECT  "CX_DATATRANS"  ""  LEN(0)  EDIT_NOP    COLOR(192, 232)  TABORDER(0)  ENABLE  &
+  HINTTYPE(IH_NONE)
+GRID  GRID0(0, 95, 635, 415)  VISIBLEROW(200)  CELLH(20)  MATRIX(2000, 5)  FIX(0)  MAINCOLOR(208, 232)  LINECOLOR(0)  FOCUSCOLOR(0)  FOCUSKIND(0)  |FLEXIBLE|VSCROLL|HSCROLL|KEYFOCUS    &
+	COLINFO("accn")  LEN(20)  WIDTH(133)  HEAD("계좌번호")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_MIXED|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("acnm")  LEN(40)  WIDTH(177)  HEAD("계좌명")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_MIXED|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("nick")  LEN(40)  WIDTH(133)  HEAD("닉네임")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_MIXED|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("myaccn")  LEN(1)  WIDTH(95)  HEAD("본인계좌플래그")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_MIXED|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("FILLER")  LEN(2)  WIDTH(80)  HEAD("FILLER")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_MIXED|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    TABORDER(1)  IOORDER(1)  ENABLE
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Option Explicit
+
+'==========================================================
+'CX_DATATRANS에서 계좌목록 조회
+'==========================================================
+Sub send_f()
+	Dim accnGrp, accnList, accnInfo, acntacnm
+	Dim ii, tmpAcnt, acnt, acnm, nick, myFlag
+	accnGrp = CONTROL0.GetTypeData("4", "")
+
+	GRID0.Clear
+
+	If Trim(accnGrp) = "" Then
+		Exit Sub
+	End If
+
+	accnList = Split(accnGrp, vbLf)
+
+	For ii = LBound(accnList) To UBound(accnList) - 1
+		accnInfo = Split(accnList(ii), "|")
+		tmpAcnt = Trim(accnInfo(0))
+
+		If tmpAcnt <> "" Then
+			acntacnm = Split(tmpAcnt,vbTab)
+			acnt = Trim(acntacnm(0))
+			acnm = Trim(acntacnm(2))
+			nick = Trim(accnInfo(1))
+			myFlag = Trim(accnInfo(2))
+
+
+			If nick <> "" Then
+				acnm = nick
+			End If
+
+			GRID0.InsertRow -1
+			GRID0.SetGridCell GRID0.Rows, 1, acnt
+			GRID0.SetGridCell GRID0.Rows, 2, acnm
+			GRID0.SetGridCell GRID0.Rows, 3, nick
+			GRID0.SetGridCell GRID0.Rows, 4, myFlag
+		End If
+	Next
+
+	Call findAcnt()
+End Sub
+
+'==========================================================
+'본인계좌이면서 은행예수금방식계좌만 찾아 계좌컨트롤에 세팅
+'==========================================================
+Sub findAcnt()
+	Dim ii, acnt, acnm, nick, myFlag, acntTp, acntItems, acnmItems, acntView
+	acntItems = ""
+	acnmItems = ""
+
+	For ii = 1 To GRID0.Rows
+		acnt = Trim(GRID0.GetGridCell(ii, 1))
+
+		If Len(acnt) = 11 Then
+			acntTp = Left(acnt, 3)
+
+			If ((CLng(acntTp) >= 551 And CLng(acntTp) <= 561)) And Mid(acnt, 4, 2) = "10" Then	'160119 557계좌 추가	'201006 558계좌 추가(은행예수금계좌, IBK주거래생활금융통장)
+				If acntItems = "" Then
+					acntItems = acnt
+				End If
+
+				acntView = Left(acnt, 3) & "-" & Mid(acnt, 4, 2) & "-" & Right(acnt, 6)
+				acnm = Trim(GRID0.GetGridCell(ii, 2))
+
+				acntItems = acntItems & vbTab & acnt & acntView & " 위탁 " & acnm
+			End If
+		End If
+	Next
+
+	If acntItems <> "" Then
+		SCREEN.Object("parent.CMB_ACCT").SetItems acntItems
+		SCREEN.Proc "parent.acct_set", ""
+	Else
+		SCREEN.Object("parent.CMB_ACCT").SetFocus
+	End If
+End Sub
+
+}
+
+
+

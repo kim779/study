@@ -1,0 +1,167 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB594029)
+MAPSIZE(332, 242)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("은행리스트조회")
+MAPPUBLIC(";")
+FONT("굴림", 9, NORMAL)
+OPTIONS(ENCODE)
+TITLE("[5940]은행리스트조회")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("piboPBxQ")
+MAPTYPE(FIXED)
+HEADER(LEDGER)
+TRXH("31CSDPNQ060")
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL1(0, 0, 242, 25)        COLOR(66, 69)  CUR(0)    AL_CENTER  FONT("굴림체", 9, NORMAL)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL9(176, 442, 254, 458)  '레코드갯수'        COLOR(66, 76)  CUR(0)    AL_LEFT  FONT("굴림체", 9, NORMAL)  ENABLE  &
+  HINTTYPE(IH_NONE)
+GROUP  GROUP0(170, 414, 440, 503)  'OUTPUT'    FONT("굴림체", 9, NORMAL)      COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+GRID  GRID0(0, 27, 242, 332)  VISIBLEROW(0)  CELLH(18)  MATRIX(2000, 4)  FIX(0)  MAINCOLOR(7, 232)  LINECOLOR(75)  FOCUSCOLOR(78)  FOCUSKIND(4)    FONT("굴림체", 9, NORMAL)  ROWC(68, 77)  |FLEXIBLE|VSCROLL|NO3D|RROW|GRFTEXT    &
+	COLINFO("Col0")  LEN(3)  WIDTH(80)  HEAD("은행번호")  COLALIGN(AL_CENTER, AL_CENTER)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col1")  LEN(40)  WIDTH(146)  HEAD("은행명")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_MIXED|EDIT_OUTPUT  |FA_CORGB|SA_COSUP    COLOR(68, 69)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL  IFRGB(69, 69)    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col2")  LEN(1)  WIDTH(146)  HEAD("장애여부")  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col3")  LEN(1)  WIDTH(80)  HEAD("색상구분")  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(74, 76)  IO_NUM|EDIT_OUTPUT      COLOR(68, 69)  COLCUR(0, 0)    INORMAL    HNORMAL  SORTSTARTPOS(0)    TABORDER(1)  IOORDER(2)  ENABLE
+OUT  Out(256, 442, 346, 460)  LEN(1)  IO_NUM|AL_CENTER|  FONT("굴림체", 9, NORMAL)    COLOR(192, 232)  CUR(0)  LINECOLOR(75)          TABORDER(0)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  BUTTON2(207, 3, 239, 23)  '닫기'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, NORMAL)  COLOR(208, 69)  CUR(0)    "2btn.bmp"    TABORDER(2)  ENABLE  &
+  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+'== 첫 조회
+Sub send_f()
+	GRID0.Clear
+	LEDGER.Fkey = "C"
+	SCREEN.Send 0
+End Sub
+
+'== 연속 조회
+Sub send_c()
+	LEDGER.Fkey = "7"
+	GRID0.SetDataPosition(2)
+	SCREEN.Send 0
+End Sub
+
+Dim DominoB, DominoC
+
+Sub Setting_Acct()
+	Dim ii, items, bank_name, bank_code, first_code, first_name
+
+	count = 0
+	cnt = 0
+
+	first_code = Trim(GRID0.GetGridCell(1, 1))
+
+'	items = first_code & vbTab
+	items = first_code
+	For ii=1 To GRID0.Rows
+		bank_name = Trim(GRID0.GetGridCell(ii, 2))
+		bank_code = Trim(GRID0.GetGridCell(ii, 1))
+
+		If Mid(Trim(GRID0.GetGridCell(ii, 2)), 5) = "기업은행" Then
+			DominoB = Mid(Trim(GRID0.GetGridCell(ii, 2)), 5)
+			DominoC = Trim(GRID0.GetGridCell(ii, 1))
+		End If
+
+		If bank_name <> "" Then
+			items = items & vbTab & bank_code & bank_name
+		End If
+
+	Next
+
+
+	SCREEN.Object("parent.CMB_MY").SetItems(items)
+
+
+	If SCREEN.Object("main.UTAB0").ID = "1" Or SCREEN.Object("main.UTAB0").ID = "3" Then
+		SCREEN.Object("parent.CMB_MY").data = DominoC
+		SCREEN.Object("parent.bank_code").data = DominoC
+		SCREEN.Object("parent.SELECTBANK").Text = DominoB
+	End If
+End Sub
+
+_AW_ONINDECLARE_AW_
+#LOAD IB888833
+
+_AW_ONENDSUB_AW_
+_AW_ONSTART_AW_
+LEDGER.Rcnt = "0050"
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+Dim ecod
+ecod = Trim(LEDGER.Ecod)
+
+SYSTEM.Trace "IB594000은행리스트조회 - [" & ecod  & "]   " & LEDGER.Emsg
+
+If ecod = "" Then
+	Exit Sub
+End If
+
+If Left(ecod, 1) = "0" Then
+	If LEDGER.Next = "Y" Then
+		Call send_c()
+	Else
+		Call Setting_Acct()
+	End If
+Else
+	SCREEN.Object("main.GUIDE.GUIDE").Text = Trim(LEDGER.Emsg)
+End If
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(GRID0)
+_AW_ONCLICK_AW_
+If GRID0.HitPos <> 3 Then
+	Exit Sub
+End If
+
+Dim msg
+msg = GRID0.GetGridCell(GRID0.row, 1) & "|" & _
+	GRID0.GetGridCell(GRID0.row, 2)
+
+SYSTEM.Push "bankno", msg
+
+SCREEN.CloseWindow
+_AW_ONENDSUB_AW_
+_AW_ONDBLCLK_AW_
+Dim name
+name = GRID0.GetGridCell(GRID0.row, 3)
+
+SYSTEM.Push "KNAME", name
+
+SCREEN.CloseWindow
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON2)
+_AW_ONCLICK_AW_
+SCREEN.CloseWindow
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

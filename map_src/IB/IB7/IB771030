@@ -1,0 +1,381 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB771030)
+MAPSIZE(284, 690)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("시황 - 외국인/기관")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(FMS|FLASH)
+TITLE("[7710] 종목별 외국인/기관 매매동향")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pooppoop")
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL1(0, 0, 690, 284)        COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL2(0, 0, 690, 27)        COLOR(66, 69)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  TEXT(610, 4, 650, 24)  '데이터'  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(68, 69)  CUR(0)    "4BTN.BMP"    TABORDER(8)  ENABLE  &
+  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+BUTTON  CHART(610, 4, 650, 24)  '차트'  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(68, 69)  CUR(0)    "4BTN.BMP"    TABORDER(7)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+LABEL  SYMBOL25(3, 4, 27, 24)  '종목'  AL_LEFT  FONT("굴림", 9, NORMAL)  CUR(0)      COLOR(68, 69)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  BTTN(96, 4, 115, 24)  TP_PUSH|IMAGE|AL_STRETCH      COLOR(45, 0)  CUR(0)    "검색.BMP"    TABORDER(1)  ENABLE  &
+  VISIBLE  IMAGE  HOVER  HINTTYPE(IH_NONE)
+CONTROL  ctl_Category(843, 462, 881, 482)    "CX_Category"  "/k0/i돌려보기.BMP/t/r1301"  LEN(0)  EDIT_NOP    COLOR(192, 232)  TABORDER(0)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  R1(210, 360, 260, 380)  '거래량'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(GP2)      COLOR(68, 69)  CUR(0)      TABORDER(2)  ENABLE  &
+  VISIBLE  CHECKED  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  R2(345, 375, 407, 395)  '거래대금'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(GP2)      COLOR(68, 69)  CUR(0)      TABORDER(3)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+GROUP  GP2(874, 53, 930, 73)  'Group'        COLOR(-1, 0)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  hnam(862, 251, 927, 271)  AL_LEFT  CUR(0)      COLOR(68, 69)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  SBTN(651, 4, 688, 24)  '조회'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, BOLD)  COLOR(68, 69)  CUR(0)    "조회BTN.BMP"    TABORDER(5)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+LABEL  LABEL0(836, 133, 913, 151)  '(단위:주,천원)'  AL_LEFT  CUR(0)      COLOR(68, 69)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+OBJECT  OBJ(0, 28, 690, 283)    "IB771031"  TABORDER(6)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+COMBO  KFGB(904, 214, 952, 234)  TP_SUNKEN  LEN(1)  COUNT(2)  VCOUNT(2)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_NUM|EDIT_INPUT|FA_SKIP    COLOR(68, 69)  CUR(0)  DISPLAY("기관", "외인")  DATA("1", "2")    TABORDER(9)  IOORDER(4)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  GUBN(865, 31, 907, 50)  LEN(1)  IO_ALPHA|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("1")          TABORDER(4)  IOORDER(3)  &
+  HINTTYPE(IH_NONE)
+LABEL  CHK(875, 93, 910, 106)  'Label'  AL_LEFT  FONT("굴림체", 9, NORMAL)  CUR(0)      COLOR(4, 0)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  BUTTON2(553, 4, 609, 24)  '참고사항'  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(208, 69)  CUR(0)    "4BTN.BMP"    TABORDER(10)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+CONTROL  17413(116, 4, 249, 24)    "CX_Symbol"  "/a89/b91/c92/d69"  LEN(0)  EDIT_OUTPUT  FONT("굴림체", 9, NORMAL)    COLOR(90, 130)  TABORDER(0)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  1301(32, 4, 96, 24)  LEN(6)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_SUNKEN          TABORDER(11)  IOORDER(5)  &
+  VISIBLE  HINTTYPE(IH_NONE)
+COMBO  cb_DataTp1(250, 5, 303, 24)  TP_SUNKEN  LEN(1)  COUNT(2)  VCOUNT(2)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_NUM|EDIT_INPUT|FA_SKIP    COLOR(68, 69)  CUR(0)  DISPLAY("수량", "대금")  DATA("1", "2")    TABORDER(12)  IOORDER(6)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  12901_E(460, 4, 546, 24)  LEN(8)  IO_NUM|EDIT_INPUT|FA_SKIP|FA_DATE    COLOR(68, 130)  CUR(0)  TP_SUNKEN  INIT("00000000")          EDITFORMAT("9999/99/99")  TABORDER(13)  IOORDER(7)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  12901_D(360, 4, 446, 24)  LEN(8)  IO_NUM|EDIT_INPUT|FA_SKIP|FA_DATE    COLOR(68, 130)  CUR(0)  TP_SUNKEN  INIT("00000000")          EDITFORMAT("9999/99/99")  TABORDER(14)  IOORDER(8)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  GUBN2(815, 30, 857, 49)  LEN(1)  IO_ALPHA|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("1")          TABORDER(15)  IOORDER(9)  &
+  HINTTYPE(IH_NONE)
+COMBO  cb_DataTp2(305, 4, 358, 23)  TP_SUNKEN  LEN(1)  COUNT(2)  VCOUNT(2)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_NUM|EDIT_INPUT|FA_SKIP    COLOR(68, 69)  CUR(0)  DISPLAY("일별", "누적")  DATA("1", "2")    TABORDER(16)  IOORDER(10)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL1(450, 4, 457, 24)  '~'  AL_CENTER  CUR(0)      COLOR(66, 130)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  1777(795, 150, 815, 170)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("2")          TABORDER(17)  IOORDER(11)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Dim dat
+Dim dat2
+Dim g_First
+
+g_First = True
+
+dat = change_date ("d" , -1 )
+dat2 = week_check( dat)
+'S12901_D.Data = dat2
+
+Const myFILE = "userconf.ini"
+Const myMAP = "IB202400"
+
+Sub p_read_ini()
+If SCREEN.CreateObject("Info") Then
+ 	CHK.TEXT = Trim(INFO.PopData(LOGIN.Name, myFILE, myMAP, "G_CHCK"))
+	If CHK.TEXT = "그래프" Then
+		OBJ.SetObject "IB202420"
+		TEXT.Visible = True
+		CHART.Visible = False
+		KFGB.Visible = True
+		CHK.TEXT = CHART.TEXT
+	ElseIf CHK.TEXT = "텍스트" Then
+		OBJ.SetObject "IB202410"
+		TEXT.Visible = False
+		CHART.Visible = True
+		KFGB.Visible = False
+		CHK.TEXT = TEXT.TEXT
+	Else
+		OBJ.SetObject "IB202420"
+		TEXT.Visible = True
+		CHART.Visible = False
+		KFGB.Visible = True
+		CHK.TEXT = CHART.TEXT
+	End If
+	SCREEN.Object("obj.gubn").data = GUBN.Data
+	OBJ.Send
+End If
+End Sub
+
+
+Sub p_write_ini()
+If SCREEN.CreateObject("Info") Then
+  INFO.PushData LOGIN.Name, myFILE, myMAP, "G_CHCK", CHK.TEXT
+End If
+End Sub
+
+Sub SetFirstData()
+	AYear = Year(DateAdd("m", -1, Date))
+	AMon = Month(DateAdd("m", -1, Date))
+	If Len(AMon) = 1 Then
+		AMon = "0" & AMon
+	End If
+	ADay = Day(DateAdd("m", -1, Date))
+	If Len(ADay) = 1 Then
+		ADay = "0" & ADay
+	End If
+
+	S12901_D.Data = AYear & AMon & ADay
+End Sub
+
+_AW_ONINDECLARE_AW_
+#load IB888888
+
+_AW_ONENDSUB_AW_
+_AW_ONSTART_AW_
+'p_read_ini()
+
+S1301.Enable False
+BTTN.Enable False
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+
+S1777.Data = "1"
+If g_First Then
+	SetFirstData
+	g_First = False
+End If
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+'S1301.SetFocus
+
+_AW_ONENDSUB_AW_
+_AW_ONCLOSE_AW_
+p_write_ini()
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(TEXT)
+_AW_ONCLICK_AW_
+OBJ.SetObject "IB771031"
+TEXT.Visible = False
+CHART.Visible = True
+KFGB.Visible = False
+CHK.TEXT = TEXT.TEXT
+
+SCREEN.Object("obj.gubn").data = GUBN.Data
+
+OBJ.Send
+
+'S1301.SetFocus
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(CHART)
+_AW_ONCLICK_AW_
+OBJ.SetObject "IB771032"
+TEXT.Visible = True
+CHART.Visible = False
+KFGB.Visible = True
+CHK.TEXT = CHART.TEXT
+SCREEN.Object("obj.gubn").data = GUBN.Data
+
+OBJ.Send
+
+'S1301.SetFocus
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BTTN)
+_AW_ONCLICK_AW_
+Dim retn
+retn = SCREEN.GetCode(100, 1301, "hnam", 0 )
+If retn <> True Then
+       Exit Sub
+End If
+If (hnam.TEXT <> "") Then
+	S1301.Trigger "", True
+	OBJ.Send
+
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(ctl_Category)
+_AW_ONCHANGE_AW_
+S1301.Data = ctl_Category.GetCurCode
+
+name = SCREEN.GetName(100, S1301.data, 0)
+If (name <> "") Then
+	hnam.TEXT = name
+	S1301.Trigger "", True
+	OBJ.Send
+	'S1301.SetFocus
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(R1)
+_AW_ONCLICK_AW_
+GUBN.Data = "1"
+
+SCREEN.Object("OBJ.GUBN").Data = GUBN.Data
+SCREEN.Object("OBJ.GRID").SetHead 6, "기관|매도수량"
+SCREEN.Object("OBJ.GRID").SetHead 7, "기관|매수수량"
+SCREEN.Object("OBJ.GRID").SetHead 8, "기관|순매수수량"
+SCREEN.Object("OBJ.GRID").SetHead 9, "외국인(장내거래)|매도수량"
+SCREEN.Object("OBJ.GRID").SetHead 10, "외국인(장내거래)|매수수량"
+SCREEN.Object("OBJ.GRID").SetHead 11, "외국인(장내거래)|순매수수량"
+
+OBJ.Send
+
+'S1301.SetFocus
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(R2)
+_AW_ONCLICK_AW_
+GUBN.Data = "2"
+
+SCREEN.Object("OBJ.GUBN").Data = GUBN.Data
+
+SCREEN.Object("OBJ.GRID").SetHead 6, "기관|매도금액"
+SCREEN.Object("OBJ.GRID").SetHead 7, "기관|매수금액"
+SCREEN.Object("OBJ.GRID").SetHead 8, "기관|순매수금액"
+SCREEN.Object("OBJ.GRID").SetHead 9, "외국인(장내거래)|매도금액"
+SCREEN.Object("OBJ.GRID").SetHead 10, "외국인(장내거래)|매수금액"
+SCREEN.Object("OBJ.GRID").SetHead 11, "외국인(장내거래)|순매수금액"
+
+OBJ.Send
+
+'S1301.SetFocus
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(SBTN)
+_AW_ONCLICK_AW_
+OBJ.Send
+'S1301.SetFocus
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(KFGB)
+_AW_ONCHANGE_AW_
+OBJ.Send
+'S1301.SetFocus
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON2)
+_AW_ONCLICK_AW_
+SCREEN.CreateWindow 2, "IB202401 /s/p5", ""
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(1301)
+_AW_ONCHANGE_AW_
+Dim name
+name = SCREEN.GetName(100, S1301.data, 0)
+If (name <> "") Then
+	hnam.TEXT = name
+	S1301.Trigger "", True
+	SCREEN.Send 0
+	OBJ.Send
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(cb_DataTp1)
+_AW_ONCHANGE_AW_
+GUBN.Data = cb_DataTp1.Data
+
+SCREEN.Object("OBJ.GUBN").Data = GUBN.Data
+'SCREEN.Object("OBJ.GRID").SetHead 6, "기관|매도수량"
+'SCREEN.Object("OBJ.GRID").SetHead 7, "기관|매수수량"
+'SCREEN.Object("OBJ.GRID").SetHead 8, "기관|순매수수량"
+'SCREEN.Object("OBJ.GRID").SetHead 9, "외국인(장내거래)|매도수량"
+'SCREEN.Object("OBJ.GRID").SetHead 10, "외국인(장내거래)|매수수량"
+'SCREEN.Object("OBJ.GRID").SetHead 11, "외국인(장내거래)|순매수수량"
+
+OBJ.Send
+
+S1301.SetFocus
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(12901_E)
+_AW_ONCHANGE_AW_
+'SCREEN.Object("OBJ.12901").data = S12901_D.Data
+OBJ.Send
+
+
+S1301.SetFocus
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(12901_D)
+_AW_ONCHANGE_AW_
+'SCREEN.Object("OBJ.12901").data = S12901_D.Data
+OBJ.Send
+
+
+'S1301.SetFocus
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(cb_DataTp2)
+_AW_ONCHANGE_AW_
+GUBN2.Data = cb_DataTp2.Data
+
+SCREEN.Object("OBJ.GUBN2").Data = GUBN2.Data
+'SCREEN.Object("OBJ.GRID").SetHead 6, "기관|매도수량"
+'SCREEN.Object("OBJ.GRID").SetHead 7, "기관|매수수량"
+'SCREEN.Object("OBJ.GRID").SetHead 8, "기관|순매수수량"
+'SCREEN.Object("OBJ.GRID").SetHead 9, "외국인(장내거래)|매도수량"
+'SCREEN.Object("OBJ.GRID").SetHead 10, "외국인(장내거래)|매수수량"
+'SCREEN.Object("OBJ.GRID").SetHead 11, "외국인(장내거래)|순매수수량"
+
+OBJ.Send
+
+S1301.SetFocus
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

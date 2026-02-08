@@ -1,0 +1,86 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB2025T3)
+MAPSIZE(185, 508)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("[obj]매매동향전체GR")
+MAPPUBLIC(";")
+FONT("굴림", 9, NORMAL)
+TITLE("[2025T3]종목별매매동향전체(GRP)")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+EDIT  1301(964, 0, 1042, 20)  LEN(6)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_NOR    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(1)  IOORDER(2)  &
+  HINTTYPE(IH_NONE)
+EDIT  12901(964, 24, 1068, 44)  LEN(8)  IO_NUM|EDIT_INPUT|FA_DATE    COLOR(192, 232)  CUR(0)  TP_NONE          EDITFORMAT("9999/99/99")  TABORDER(2)  IOORDER(3)  &
+  HINTTYPE(IH_NONE)
+CONTROL  ctl0(1, 1, 509, 185)    "C_FBChartCtrl"  "/edit종목별매매동향전체"  LEN(0)  EDIT_INOUT    COLOR(192, 232)  TABORDER(3)  IOORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  TRGB(964, 44, 1018, 65)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("2")          TABORDER(4)  IOORDER(1)  &
+  HINTTYPE(IH_NONE)
+EDIT  KFGB(964, 68, 1018, 89)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("1")          TABORDER(5)  IOORDER(5)  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Sub Query_Chart()
+	ctl0.ClearAllData
+
+	ctl0.Setchartperiod 0, 2
+	ctl0.SetInputValue 0,0,"cod2",S1301.data
+	ctl0.SetInputValue 0,0,"gubn",TRGB.data
+	ctl0.SetInputValue 0,0,"date",S12901.data
+	ctl0.RequestData 0,0
+	If KFGB.Data = 1 Then
+'		ctl0.showgraph 0, 1, 1
+'		ctl0.showgraph 0, 2, 0
+		ctl0.SetRightLabel 0, 1
+	Else
+'		ctl0.showgraph 0, 1, 0
+'		ctl0.showgraph 0, 2, 1
+		ctl0.SetRightLabel 0, 2
+	End If
+	ctl0.update
+End Sub
+
+_AW_ONSEND_AW_
+SCREEN.OnSend  = False
+If Trim(S1301.Data) = Trim(SCREEN.Object("PARENT.1301").Data) Then
+	If KFGB.Data = SCREEN.Object("PARENT.KFGB").data Then
+		Exit Sub
+	End If
+End If
+
+S1301.Data = SCREEN.Object("PARENT.1301").Data
+S12901.Data = SCREEN.Object("PARENT.12901").data
+TRGB.Data = SCREEN.Object("PARENT.AMTF").data
+KFGB.Data = SCREEN.Object("PARENT.KFGB").data
+	Query_Chart()
+SCREEN.OnSend  = False
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(12901)
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

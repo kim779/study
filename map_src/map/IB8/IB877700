@@ -1,0 +1,181 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB877700)
+MAPSIZE(210, 402)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+TITLE("[8777]NatingTel 폰패드")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL0(-15, -5, 617, 383)  TP_RAISED      COLOR(192, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL1(17, 72, 73, 92)  '입력번호'        COLOR(192, 232)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON0(150, 187, 330, 207)  '화면에 입력된 비밀번호 입력'  TP_PUSH|IMAGETEXT|AL_CENTER        FOCUS  COLOR(208, 232)  CUR(0)    "14btn.bmp"    TABORDER(2)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+CONTROL  natingpad(687, 513, 821, 583)  |FA_PROTECT  "CX_NATINGTEL"  ""  LEN(0)  EDIT_NOP    COLOR(192, 232)  TABORDER(0)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON1(10, 7, 131, 28)  '비밀번호 입력요청'  TP_PUSH|IMAGETEXT|AL_CENTER        FOCUS  COLOR(192, 232)  CUR(0)    "9btn.bmp"    TABORDER(1)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+BUTTON  BUTTON2(335, 187, 395, 207)  '닫기'  TP_PUSH|IMAGETEXT|AL_CENTER        FOCUS  COLOR(208, 232)  CUR(0)    "4btn.bmp"    TABORDER(3)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+GROUP  GROUP0(10, 55, 395, 159)  '출력'        COLOR(-1, 232)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL2(18, 100, 74, 120)  '메세지'        COLOR(192, 232)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  msg(72, 99, 386, 148)  LEN(100)  IO_MIXED|AL_LEFT|    COLOR(192, 232)  CUR(0)  LINECOLOR(232)          TABORDER(0)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  get_passwd(72, 72, 192, 92)  LEN(20)  IO_MIXED|EDIT_INPUT|FA_PASSWD|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_SUNKEN          TABORDER(4)  IOORDER(2)  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON3(135, 7, 256, 28)  '비밀번호 입력중지'  TP_PUSH|IMAGETEXT|AL_CENTER        FOCUS  COLOR(192, 232)  CUR(0)    "9btn.bmp"    TABORDER(5)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+LABEL  LABEL0(15, 165, 335, 185)  '*본 화면은 ESC키로 종료 시킬 수 없습니다.  '  AL_LEFT  CUR(0)      COLOR(240, 209)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL1(15, 32, 305, 52)  '비밀번호 종료문자는 * 를 입력하시기 바랍니다.'  AL_LEFT  CUR(0)      COLOR(240, 209)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Sub Set_pwd(data)
+'	get_passwd.Clear
+
+	get_passwd.Data = data
+End Sub
+
+Sub Set_msg(data)
+	msg.Clear
+	msg.Data = data
+End Sub
+
+_AW_ONSTART_AW_
+natingpad.Load
+
+BUTTON0.Enable = False
+
+_AW_ONENDSUB_AW_
+_AW_ONKEY_AW_
+If SCREEN.Key = "13" Then
+	Exit Sub
+End If
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(BUTTON0)
+_AW_ONCLICK_AW_
+Dim bIPC, bKillprocess
+
+If SCREEN.CreateObject("info") Then
+	bIPC = INFO.PopData("", "AXIS.INI", "PHONEPAD", "IPC")
+End If
+
+'bIPC = 1  입력 받은 비번만 메인에 직접 전송 모듈삭제는 기존방식
+'bIPC = 2  입력 받은 비번 메인에 직접 전송 모듈삭제 KillProcess
+
+
+If bIPC = "1" Then
+	If Trim(Len(get_passwd.Data)) > 0 Then
+		natingpad.SendMSgToMain(get_passwd.Data)
+	End If
+
+	If natingpad.GetStatus = 5 Then
+		msg.Data = "입력 요청중입니다.완료 된 후 다시 눌러주세요."
+	Else
+		natingpad.ExitPhonePad
+		SCREEN.CloseWindow
+	End If
+
+ElseIf bIPC = "2" Then
+	If Trim(Len(get_passwd.Data)) > 0 Then
+		natingpad.SendMSgToMain(get_passwd.Data)
+	End If
+	natingpad.KillProcess("PhonePad.exe")
+	SCREEN.CloseWindow
+Else
+	get_passwd.Trigger "$PHONEPAD", False
+	get_passwd.Trigger "$PHONEPAD", True
+
+	If natingpad.GetStatus = 5 Then
+		msg.Data = "입력 요청중입니다.완료 된 후 다시 눌러주세요."
+	Else
+		natingpad.ExitPhonePad
+		SCREEN.CloseWindow
+	End If
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON1)
+_AW_ONCLICK_AW_
+get_passwd.Clear
+msg.Clear
+
+get_passwd.Data = natingpad.Request
+
+BUTTON0.Enable = True
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON2)
+_AW_ONCLICK_AW_
+Dim bIPC, bKillprocess
+
+If SCREEN.CreateObject("info") Then
+	bIPC = INFO.PopData("", "AXIS.INI", "PHONEPAD", "IPC")
+End If
+
+'bIPC = 1  입력 받은 비번만 메인에 직접 전송 모듈삭제는 기존방식
+'bIPC = 2  입력 받은 비번 메인에 직접 전송 모듈삭제 KillProcess
+
+If bIPC = "2" Then
+	natingpad.KillProcess("PhonePad.exe")
+	SCREEN.CloseWindow
+Else
+	msg.Data = "폰패드 종료 준비중입니다..."
+	BUTTON2.Enable = False
+
+	If natingpad.GetStatus = 5 Then
+		msg.Data = "폰패드가 동작중입니다.입력중지를 먼저 실행해 주세요."
+		BUTTON2.Enable = True
+	Else
+		msg.Data = "잠시만 기다려주세요.폰패드를 종료중입니다...."
+		natingpad.ExitPhonePad
+
+		SCREEN.CloseWindow
+	End If
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON3)
+_AW_ONCLICK_AW_
+natingpad.StopRequest
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

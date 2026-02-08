@@ -1,0 +1,522 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB2009T0)
+MAPSIZE(367, 513)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("일별가격흐름")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(FMS|FLASH)
+TITLE("[2009]일별가격흐름")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pooppoop")
+MAPTYPE(NORM)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+CONTROL  1301(25, 3, 90, 23)  |FA_PROTECT  "CX_CODECTRL"  "/u0/k검색.BMP/lAXCOMBO.BMP/p/s0/o"  LEN(6)  EDIT_INOUT    COLOR(192, 232)  TABORDER(19)  IOORDER(7)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL0(-2, 317, 606, 568)  LIMAGE(0)  LINEW(4)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL63(0, 0, 513, 370)  LIMAGE(0)  LINEW(4)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL_bg(0, 0, 515, 25)        COLOR(66, 69)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON2(709, 3, 729, 23)  '당'  TP_PUSH|IMAGETEXT|AL_CENTER      FONT("굴림체", 9, NORMAL)  FOCUS  COLOR(208, 232)  CUR(0)    "1BTN.BMP"    TABORDER(1)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+BUTTON  BUTTON3(730, 3, 750, 23)  '-1'  TP_PUSH|IMAGETEXT|AL_CENTER      FONT("굴림체", 9, NORMAL)  COLOR(208, 232)  CUR(0)    "1BTN.BMP"    TABORDER(2)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+BUTTON  BUTTON4(751, 3, 771, 23)  '-2'  TP_PUSH|IMAGETEXT|AL_CENTER      FONT("굴림체", 9, NORMAL)  COLOR(208, 232)  CUR(0)    "1BTN.BMP"    TABORDER(3)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+BUTTON  BUTTON5(772, 3, 792, 23)  '-3'  TP_PUSH|IMAGETEXT|AL_CENTER      FONT("굴림체", 9, NORMAL)  COLOR(208, 232)  CUR(0)    "1BTN.BMP"    TABORDER(4)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+BUTTON  BUTTON6(793, 3, 813, 23)  '-4'  TP_PUSH|IMAGETEXT|AL_CENTER      FONT("굴림체", 9, NORMAL)  COLOR(208, 232)  CUR(0)    "1BTN.BMP"    TABORDER(5)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+BUTTON  BUTTON7(814, 3, 834, 23)  '-5'  TP_PUSH|IMAGETEXT|AL_CENTER      FONT("굴림체", 9, NORMAL)  COLOR(208, 232)  CUR(0)    "1BTN.BMP"    TABORDER(6)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+OBJECT  OBJ01(0, 273, 513, 366)    RESIZABLE  "IB2009T1"  TABORDER(7)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL5(359, 3, 417, 23)  '조회일자'        COLOR(74, 130)  CUR(0)    AL_CENTER  FONT("굴림체", 9, NORMAL)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  GUBN(700, 95, 725, 114)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("1")          TABORDER(8)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON0(90, 3, 109, 23)  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(15, 130)  CUR(0)    "검색.bmp"    TABORDER(9)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+CONTROL  17413(129, 3, 262, 23)    "CX_Symbol"  "/a89/b91/c92/d69"  LEN(0)  EDIT_OUTPUT    COLOR(90, 130)  TABORDER(0)  IOORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  2304(776, 193, 865, 217)  LEN(8)  IO_MIXED|AL_CENTER|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(5)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  BUTTON1(109, 3, 128, 23)  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(208, 130)  CUR(0)    "관심.BMP"    TABORDER(10)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+OBJECT  OBJ_chart(0, 27, 513, 272)    "IB2009T2"  TABORDER(11)  IOORDER(6)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  RADIO0(731, 264, 755, 284)  '당'  TP_RADIO|RD_PUSH|EDIT_NOP      GROUP(GROUP0)"1BTN.BMP"        COLOR(228, 130)  CUR(0)      TABORDER(12)  ENABLE  &
+  CHECKED  HINTTYPE(IH_NONE)
+BUTTON  RADIO1(756, 264, 780, 284)  '-1'  TP_RADIO|RD_PUSH|EDIT_NOP      GROUP(GROUP0)"1BTN.BMP"        COLOR(228, 130)  CUR(0)      TABORDER(13)  ENABLE  &
+  HINTTYPE(IH_NONE)
+GROUP  GROUP0(741, 36, 861, 86)  'Group'        COLOR(-1, 232)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  RADIO2(781, 264, 805, 284)  '-2'  TP_RADIO|RD_PUSH|EDIT_NOP      GROUP(GROUP0)"1BTN.BMP"        COLOR(228, 130)  CUR(0)      TABORDER(14)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  RADIO3(806, 264, 830, 284)  '-3'  TP_RADIO|RD_PUSH|EDIT_NOP      GROUP(GROUP0)"1BTN.BMP"        COLOR(228, 130)  CUR(0)      TABORDER(15)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  RADIO4(831, 264, 855, 284)  '-4'  TP_RADIO|RD_PUSH|EDIT_NOP      GROUP(GROUP0)"1BTN.BMP"        COLOR(228, 130)  CUR(0)      TABORDER(16)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  RADIO5(856, 264, 880, 284)  '-5'  TP_RADIO|RD_PUSH|EDIT_NOP      GROUP(GROUP0)"1BTN.BMP"        COLOR(228, 130)  CUR(0)      TABORDER(17)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  is_real(765, 105, 817, 117)  '실시간'  TP_CHECK|EDIT_NOP        FONT("굴림체", 9, NORMAL)  COLOR(69, 130)  CUR(0)      TABORDER(18)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_STRING)  HELPTEXT("실시간 체결데이터 수신")HELPTEXT("실시간 체결데이터 수신")
+EDIT  o_date(422, 3, 509, 23)  LEN(8)  IO_NUM|EDIT_INOUT|FA_SKIP|FA_DATE    COLOR(192, 232)  CUR(0)  TP_SUNKEN          EDITFORMAT("9999/99/99")  TABORDER(20)  IOORDER(8)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON8(830, 130, 850, 150)  TP_PUSH|IMAGE|AL_CENTER      FOCUS  COLOR(208, 232)  CUR(0)    "CODEPREV.BMP"    TABORDER(21)  ENABLE  &
+  VISIBLE  IMAGE  HINTTYPE(IH_STRING)  HELPTEXT("이전일로 이동")HELPTEXT("이전일로 이동")
+BUTTON  BUTTON9(830, 105, 850, 125)  TP_PUSH|IMAGE|AL_CENTER      FOCUS  COLOR(208, 232)  CUR(0)    "CODENEXT.BMP"    TABORDER(22)  ENABLE  &
+  VISIBLE  IMAGE  HINTTYPE(IH_STRING)  HELPTEXT("다음일로 이동")HELPTEXT("다음일로 이동")
+OUT  2021(775, 290, 853, 308)  LEN(16)  IO_NUM|AL_CENTER||FA_FLASH    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+CONTROL  cxMarket(4, 3, 24, 23)  |FA_SKIP  "CX_MarketPicker"  "/k2/tIB200900/u1/d1"  LEN(12)  EDIT_NOP    COLOR(192, 232)  TABORDER(0)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  edMarketTrigger(675, 5, 707, 25)  LEN(6)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(23)  IOORDER(9)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  Start(870, 715, 890, 735)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("0")          TABORDER(24)  IOORDER(10)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Function GetToday()
+	YY = Year(Date)
+	MM = Month(Date)
+	If Len(MM) = 1 Then
+		MM = "0" & MM
+	End If
+	DD = Day(Date)
+	If Len(DD) = 1 Then
+		DD = "0" & DD
+	End If
+	GetToday = YY & MM & DD
+End Function
+
+Sub MKTriggerFromMain(sdata)
+	cxMarket.sMarket = sdata
+	SCREEN.Object("main.OBJ_chart").Send
+	OBJ01.Send
+End Sub
+
+_AW_ONINDECLARE_AW_
+#load IB888888
+#load IB999901
+
+_AW_ONENDSUB_AW_
+_AW_ONSTART_AW_
+' 현재 화면의 시장식별자(cxMarket)에 고유 화면번호 부여
+cxMarket.sMarket = LoadMKGubn()
+cxMarket.MNum = "IB100000"
+SCREEN.SetTimer 600, False
+S1301.SetFocus
+Select_Send("OBJ01.Send")
+Select_Send("OBJ_chart.Send")
+
+_AW_ONENDSUB_AW_
+_AW_ONTIMER_AW_
+If is_real.Checked = True Then
+	Select_Send("OBJ01.Send")
+
+	If Trim(S2304.data) <> "장마감" Then
+		'If Trim(SCREEN.Object("OBJ_chart.check").Data) <> "F" Then
+			SCREEN.SetTimer 600, False
+		'End If
+	End If
+End If
+
+_AW_ONENDSUB_AW_
+_AW_ONTIMERX_AW_
+If id = 2 Then
+	If Start.Data = "1" Then
+		SCREEN.Object("main.OBJ_chart.check").Data = ""
+		OBJ01.ClearAll 2
+		S1301.Trigger "",True
+		S1301.Trigger "",False
+		GUBN.data = "1"
+		RADIO0.Checked True
+		Select_Send("SCREEN.Send 0")
+		Select_Send("OBJ01.Send")
+		Select_Send("OBJ_chart.Send")
+
+		S1301.SetFocus
+	End If
+End If
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(1301)
+_AW_ONCHANGE_AW_
+If Trim(S1301.Data) = "000000" Or Trim(S1301.Data) = "" Or Len(Trim(S1301.Data)) <> 6 Then
+ 	SCREEN.ClearAll 2, 2
+	Exit Sub
+End If
+
+If Start.Data = "1" Then
+	SCREEN.Object("main.OBJ_chart.check").Data = ""
+	OBJ01.ClearAll 2
+	S1301.Trigger "",True
+	S1301.Trigger "",False
+	GUBN.data = "1"
+	RADIO0.Checked True
+	Select_Send("SCREEN.Send 0")
+	Select_Send("OBJ01.Send")
+	Select_Send("OBJ_chart.Send")
+
+	S1301.SetFocus
+Else
+	SCREEN.SetTimerX 2,2, False
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON2)
+_AW_ONCLICK_AW_
+GUBN.data = "1"
+'SCREEN.send 0
+
+OBJ01.Send
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON3)
+_AW_ONCLICK_AW_
+GUBN.data = "2"
+'SCREEN.send 0
+
+OBJ01.Send
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON4)
+_AW_ONCLICK_AW_
+GUBN.data = "3"
+'SCREEN.send 0
+
+OBJ01.Send
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON5)
+_AW_ONCLICK_AW_
+GUBN.data = "4"
+'SCREEN.send 0
+
+OBJ01.Send
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON6)
+_AW_ONCLICK_AW_
+GUBN.data = "5"
+'SCREEN.send 0
+
+OBJ01.Send
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON7)
+_AW_ONCLICK_AW_
+GUBN.data = "6"
+'SCREEN.send 0
+
+OBJ01.Send
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(PANEL5)
+_AW_ONCLICK_AW_
+OBJ_chart.Send
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON0)
+_AW_ONCLICK_AW_
+Dim retn
+retn = SCREEN.GetCode(100, "1301", "hnam", 0 )
+
+If retn <> True Then
+	Exit Sub
+End If
+
+SCREEN.Object("main.OBJ_chart.check").Data = ""
+'Call Set_mkgb(code)
+
+Select_Send("SCREEN.Send 0")
+'OBJ01.Send
+'SCREEN.Send 2
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON1)
+_AW_ONCLICK_AW_
+'Dim mapname, data
+'
+'mapname = "IB202200" & "/d"
+'data = "appendCODE" & vbTab & S1301.Data & vbLf
+'
+'SCREEN.CreateWindow 1, mapname, data
+
+SCREEN.CreateWindow 1, "IB202201 /t/s/p5/d", "appendCODE" & _
+			vbTab & S1301.Data & vbLf & "map" & vbTab & "1" & vbLf
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(RADIO0)
+_AW_ONCLICK_AW_
+
+GUBN.data = "1"
+'SCREEN.send 0
+
+OBJ01.Send
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(RADIO1)
+_AW_ONCLICK_AW_
+GUBN.data = "2"
+'SCREEN.send 0
+
+OBJ01.Send
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(RADIO2)
+_AW_ONCLICK_AW_
+GUBN.data = "3"
+'SCREEN.send 0
+
+OBJ01.Send
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(RADIO3)
+_AW_ONCLICK_AW_
+GUBN.data = "4"
+'SCREEN.send 0
+
+OBJ01.Send
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(RADIO4)
+_AW_ONCLICK_AW_
+GUBN.data = "5"
+'SCREEN.send 0
+
+OBJ01.Send
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(RADIO5)
+_AW_ONCLICK_AW_
+GUBN.data = "6"
+'SCREEN.send 0
+
+OBJ01.Send
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(is_real)
+_AW_ONCLICK_AW_
+If is_real.Checked = True Then
+	Select_Send("OBJ01.Send")
+
+	If Trim(S2304.data) = "장중" Then
+		SCREEN.SetTimer 300, False
+	End If
+End If
+
+Select_Send("OBJ_chart.Send")
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(o_date)
+_AW_ONCHANGE_AW_
+Dim dt
+
+dt = gettoday()
+If dt <> o_date.Data Then
+	is_real.Checked False
+	is_real.Enable False
+Else
+	is_real.Checked True
+	is_real.Enable True
+End If
+Select_Send("OBJ01.Send")
+Select_Send("OBJ_chart.Send")
+
+If is_real.Checked = True Then
+
+
+	If Trim(S2304.data) <> "장마감" Then
+		SCREEN.SetTimer 300, False
+	End If
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON8)
+_AW_ONCLICK_AW_
+Dim c_dt, dt, ii, tmpDt
+
+tmpDt = getDateSerial(o_date.Data)
+c_dt = change_indate("d", -1, tmpDt)
+c_dt = week_check(c_dt)
+o_date.Data = c_dt
+
+dt = gettoday()
+
+If dt <> o_date.Data Then
+	is_real.Checked False
+	is_real.Enable False
+Else
+	is_real.Checked True
+	is_real.Enable True
+End If
+Select_Send("OBJ01.Send")
+Select_Send("OBJ_chart.Send")
+
+If is_real.Checked = True Then
+
+	If Trim(S2304.data) <> "장마감" Then
+		SCREEN.SetTimer 300, False
+	End If
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON9)
+_AW_ONCLICK_AW_
+Dim c_dt, dt, t_dt, cYear, cMonth, cDay, tmp_dt, tmpDt2
+dt = gettoday()
+tmpDt2 = getDateSerial(o_date.Data)
+c_dt = DateAdd("d", 1, tmpDt2)
+
+cYear = Year(c_dt)
+cMonth = Month(c_dt)
+
+If Len(Trim(cMonth)) = 1 Then
+	cMonth = "0" & cMonth
+End If
+
+cDay = Day(c_dt)
+
+If Len(Trim(cDay)) = 1 Then
+	cDay = "0" & cDay
+End If
+
+tmp_dt = cYear & cMonth & cDay
+
+If CLng(tmp_dt) > CLng(dt) Then
+	Exit Sub
+End If
+
+For ii = 1 To 6
+	If Weekday(c_dt) = "1" Or Weekday(c_dt) = "7" Then
+		c_dt = DateAdd("d", 1, CDate(c_dt))
+	Else
+		Exit For
+	End If
+Next
+
+cYear = Year(c_dt)
+cMonth = Month(c_dt)
+
+If Len(Trim(cMonth)) = 1 Then
+	cMonth = "0" & cMonth
+End If
+
+cDay = Day(c_dt)
+
+If Len(Trim(cDay)) = 1 Then
+	cDay = "0" & cDay
+End If
+
+o_date.Data = cYear & cMonth & cDay
+
+If dt <> o_date.Data Then
+	is_real.Checked False
+	is_real.Enable False
+Else
+	is_real.Checked True
+	is_real.Enable True
+End If
+Select_Send("OBJ01.Send")
+Select_Send("OBJ_chart.Send")
+
+If is_real.Checked = True Then
+
+	If Trim(S2304.data) <> "장마감" Then
+		SCREEN.SetTimer 300, False
+	End If
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(cxMarket)
+_AW_ONCLICK_AW_
+SaveMKGubn(cxMarket.sMarket)
+SYSTEM.Trigger "edMarketTrigger_1000", cxMarket.sMarket, ""
+
+If UCase(TypeName( SCREEN.Object("cbSOrder") )) <> "NOTHING" Then
+	If cxMarket.sMarket = "통합" Then
+		cbSOrder.Data = "S"
+	ElseIf cxMarket.sMarket = "KRX" Then
+		cbSOrder.Data = "1"
+	ElseIf cxMarket.sMarket = "NXT" Then
+		cbSOrder.Data = "N"
+	End If
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(edMarketTrigger)
+_AW_ONCHANGE_AW_
+Change_MKGubn_Main(Trim(edMarketTrigger.Data))
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

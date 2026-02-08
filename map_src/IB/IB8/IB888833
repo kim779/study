@@ -1,0 +1,232 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB888833)
+MAPSIZE(576, 972)
+VERSION(000)
+MAPKIND(PROCEDURES)
+MAPGROUP(0)
+MAPDESC("PB 계정계")
+MAPPUBLIC(";")
+FONT("굴림", 9, NORMAL)
+TITLE("PB Procedures")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+'-- PowerBase 계정계화면 공통함수
+'--
+'--
+Dim guide_flag
+guide_flag = 0		'-- 메세지박스를 띄우지 않고 Guide로 출력여부
+
+'***************************************************************
+'== 소수 2자리 add
+Function str2flt(edit1)
+	str2flt = CDbl(Trim(edit1.data))
+	str2flt = Trim(FormatNumber(str2flt, 2,0,0,0))
+	edit1.data = str2flt
+End Function
+
+Function check_Jijungga()
+	check_Jijungga = True
+	Select Case SCREEN.Object("main.OBJ_order.OBJ_odr.shogb").data
+	Case 03, 06, 07, 13, 16, 23, 26, 81, 61 : check_Jijungga = False
+	Case Else : : check_Jijungga = True
+	End Select
+End Function
+
+'***************************************************************
+'==계좌번호, 비밀번호 체크
+Function CheckInput(ANCT, zPwd)
+ 	CheckInput = False
+	If Trim(ANCT.data) = "" Or Len(Trim(ANCT.data)) <> 11 Then
+		Call alert_msg("계좌번호를 확인하십시오.")
+ 		ANCT.Setfocus
+ 		Exit Function
+	End If
+
+	If Len(Trim(zPwd.data)) = 0 Then
+ 		zPwd.Setfocus
+ 		Exit Function
+	End If
+
+	If SYSTEM.ConnectBy = 1 Then 					'직원일 경우에만 체크
+		If Len(Trim(zPwd.data)) < 4 Then
+			Call alert_msg("비밀번호를 확인하십시오.")
+	 		zPwd.Setfocus
+	 		Exit Function
+		End If
+	End If
+	CheckInput = True
+End Function
+
+'***************************************************************
+'==사원번호, 비밀번호 체크
+Function CheckInput_1(ANCT, zPwd)
+ 	CheckInput_1 = False
+
+	If Trim(ANCT.data) = "" Then
+		Call alert_msg("사원번호를 확인하십시오.")
+ 		ANCT.Setfocus
+ 		Exit Function
+	End If
+
+	If Len(Trim(zPwd.data)) = 0 Then
+ 		zPwd.Setfocus
+ 		Exit Function
+	End If
+
+	If SYSTEM.ConnectBy = 1 Then
+		If Len(Trim(zPwd.data)) < 4 Then
+			Call alert_msg("비밀번호를 확인하십시오.")
+	 		zPwd.Setfocus
+	 		Exit Function
+		End If
+	End If
+	CheckInput_1 = True
+End Function
+
+Sub alert_msg(msgx)
+	If guide_flag = 1 Then
+		SCREEN.Object("main.guide").Text = msgx
+	Else
+		MsgBox msgx, , "IBK투자증권"
+	End If
+End Sub
+Sub guide_msg(msgx)
+	SCREEN.Object("main.guide").Text = msgx
+End Sub
+'***************************************************************
+'NAME: l_zeropad
+'DESC: 왼쪽을 "0"으로 자리수 맞추어 표시
+'EX)   l_zeropad(edit)   			return	"00099"
+'***************************************************************
+Function l_zeropad(ed_str)
+	Dim sln, str
+	str = Trim(ed_str.Data)
+	If str = "" Then
+		l_zeropad = ""
+		Exit Function
+	End If
+	l_zeropad = String(Len(ed_str.Data) - Len(str), "0") & str
+End Function
+
+'-----직원/고객에 따른 비밀번호 컨트롤 활성화 여부 체크
+Sub Check_LoginType(ed_str)
+	If SYSTEM.ConnectBy = "0" Then 		'고객
+		ed_str.Data = "9999"
+		ed_str.Enable = False
+	Else
+		ed_str.Enable = True
+	End If
+End Sub
+
+'---- 종합화면/주문화면 비밀번호 초기값 세팅
+Sub Password_initSetting(ed_str) 		' 기본값[9999] - 09/07/15
+	If SYSTEM.ConnectBy = "1" Then
+		ed_str.Data = SCREEN.Object("main.OBJ_order.ed_pswd").Data
+	Else
+		ed_str.Data = "9999"
+	End If
+End Sub
+
+'---- 펀드종합화면 비밀번호 초기값 세팅
+Sub Password_initFund(ed_str) 		' 기본값[9999] - 09/07/15
+	If SYSTEM.ConnectBy = "1" Then
+		ed_str.Data = Trim(SCREEN.Object("main.zPwd").Data)
+	Else
+		ed_str.Data = "9999"
+	End If
+End Sub
+
+
+'***************************************************************
+'NAME: btnClickCnt(btnNm)
+'DESC: 버튼클릭자료수집
+'btnNm: 클릭한 버튼의 이름
+' 미사용 전환 :: 2025.09.01 by LIM
+'***************************************************************
+Sub btnClickCnt(btnNm)
+'	Dim param, tabNm
+
+'	If SCREEN.GetMapName(1) = "IB100100" Or SCREEN.GetMapName(1) = "IB200000" Or SCREEN.GetMapName(1) = "IB2000XX" Or SCREEN.GetMapName(1) = "IB2000YY" Or SCREEN.GetMapName(1) = "IB800000" Or SCREEN.GetMapName(1) = "IB000100" Then
+'		tabNm = Trim(SCREEN.Object("main.tab_account").Text)
+'	ElseIf SCREEN.GetMapName(1) = "IB100200" Then
+'		tabNm = Trim(SCREEN.Object("main.tab1").Text)
+'	Else
+'		tabNm = ""
+'	End If
+
+'	If Trim(tabNm) = "" Then
+'		param = SCREEN.GetMapName(1) & "-" & Trim(btnNm.Text)
+'	Else
+'		tabNm = Replace(tabNm, "|", "")
+'		tabNm = Replace(tabNm, "/", "")
+
+'		param = SCREEN.GetMapName(1) & "-" & Trim(tabNm) & "-" & Trim(btnNm.Text)
+'	End If
+
+'	SCREEN.Proc "main.obj_btnClickCollect.Add", param
+End Sub
+
+
+'***************************************************************
+'NAME: IsBnkAccnType(accn)
+'DESC: 은행 예수금계좌인지 증권 예수금계좌인지 구분
+'accn: 계좌컨트롤
+'은행 예수금계좌이면 True, 증권 예수금계좌이면 False를 반환
+'***************************************************************
+Function IsBnkAccnType(accn)
+	IsBnkAccnType = False
+
+	Dim brnAccn
+	brnAccn = Left(Trim(accn.Data), 3)
+
+	If CLng(brnAccn) >= 551 And CLng(brnAccn) <= 561 Then '160119 557계좌 추가 190103 561계좌 추가  '201006 558계좌 추가(은행예수금계좌, IBK주거래생활금융통장)
+		IsBnkAccnType = True
+	End If
+End Function
+
+
+'***************************************************************
+'NAME: chkNumericData(num)
+'num이 숫자이면 True, Null이거나 숫자가 아니면 False를 반환
+'***************************************************************
+Function chkNumericData(num)
+	chkNumericData = False
+
+	Dim data
+	data = Trim(num)
+
+	If data = "" Then
+		Exit Function
+	End If
+
+	If IsNumeric(data) = False Then
+		Exit Function
+	End If
+
+	chkNumericData = True
+End Function
+
+}
+
+
+

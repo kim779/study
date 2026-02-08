@@ -1,0 +1,83 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB875910)
+MAPSIZE(260, 260)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("굴림", 9, NORMAL)
+TITLE("[IB875910]")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pidofuew")
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL31(0, 0, 260, 260)        COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  ed_gubn(0, 0, 120, 19)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 130)  CUR(0)  TP_NONE          TABORDER(1)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  ed_dsid(0, 20, 120, 39)  LEN(6)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 130)  CUR(0)  TP_NONE  INIT("875300")          TABORDER(2)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  ed_code(0, 40, 120, 59)  LEN(12)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 130)  CUR(0)  TP_NONE          TABORDER(3)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  ed_cdtp(0, 60, 120, 79)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 130)  CUR(0)  TP_NONE  INIT("0")          TABORDER(4)  IOORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  ed_seqn(0, 80, 120, 99)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 130)  CUR(0)  TP_NONE  INIT("1")          TABORDER(5)  IOORDER(5)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  ot_omsg(0, 110, 260, 130)  LEN(40)  IO_MIXED|AL_CENTER|    COLOR(192, 69)  CUR(0)            TABORDER(0)  IOORDER(6)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  ot_code(0, 135, 260, 155)  LEN(12)  IO_MIXED|AL_CENTER|    COLOR(192, 69)  CUR(0)            TABORDER(0)  IOORDER(7)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+'-------------------------------------------------------
+Sub SendData(Data)
+	ArrData = Split(Data, "|")
+	'0:구분, 1:종목코드
+
+	If UBound(ArrData) <> 1 Then
+		Exit Sub
+	End If
+
+	ed_gubn.Data = ArrData(0)
+	ed_code.Data = ArrData(1)
+	SCREEN.Send 0
+End Sub
+
+_AW_ONSEND_AW_
+SCREEN.Proc "Parent.SetRecvMsg", " "
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+Code = Trim(ot_code.Data)
+
+If Len(Code) = 7 Then
+	Code = Mid(Code, 2, 6)
+	SCREEN.Proc "Parent.SendData", Code
+End If
+
+RecvMsg = Trim(ot_omsg.Data)
+SCREEN.Proc "Parent.SetRecvMsg", RecvMsg
+
+_AW_ONENDSUB_AW_
+}
+
+
+

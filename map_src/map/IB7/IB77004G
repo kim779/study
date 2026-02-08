@@ -1,0 +1,60 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB77004G)
+MAPSIZE(62, 280)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("MS Sans Serif", 9, NORMAL)
+TITLE("공지사항")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(FIXED)
+HEADER(NOP)
+BGROUND(BRUSH, 240)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  imgPanel(0, 0, 280, 62)    |IMAGE|AL_CENTER    COLOR(181, 232)  CUR(10)    "Banner_Img_08.bmp"  ENABLE  &
+  VISIBLE  IMAGE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONSEND_AW_
+SCREEN.OnSend False
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(imgPanel)
+_AW_ONCLICK_AW_
+If SCREEN.CreateObject("Info") Then
+ 	Dim link
+
+ 	link = Trim(INFO.PopData("", "notice7700.ini", "5", "url"))
+
+	If InStr(link,"HTS:") > 0 Then
+		link = Mid(link,5,8)
+		SCREEN.CreateWindow 1, link & " /t/d/p5/S", ""
+	Else
+ 		SYSTEM.Navigate link & vbTab & "1000" & vbTab & "800"
+ 	End If
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

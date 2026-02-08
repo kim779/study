@@ -1,0 +1,142 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB22002Q)
+MAPSIZE(170, 490)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("±¼¸²Ã¼", 9, NORMAL)
+TITLE("IB22002Q")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("pibg2952")
+MAPTYPE(NORM)
+HEADER(NOP)
+HELPFILE("IB295223")
+}
+
+
+
+FORM DIVISION
+{
+
+CONTROL  chart1(0, 0, 490, 85)  |FA_PROTECT  "C_UserGrp"  "/i4032023300000006010000000000000000002000000000011200335546872000000001120000000000200000000112005026611220000000011100084214402000000001110016711808200000000111000003276820000000"  LEN(0)  EDIT_INOUT    COLOR(192, 232)  TABORDER(1)  IOORDER(11)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  upcd(487, 304, 545, 326)  LEN(1)  IO_NUM|EDIT_INPUT|FA_SEND|FA_WRAP|SA_ALL    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(2)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  dfgb(485, 335, 545, 354)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(3)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  chaik(195, 312, 218, 331)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("1")          TABORDER(4)  IOORDER(5)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  bichaik(196, 339, 219, 358)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("0")          TABORDER(5)  IOORDER(6)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  total(196, 367, 219, 386)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("0")          TABORDER(6)  IOORDER(7)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  KP(199, 388, 222, 407)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("0")          TABORDER(7)  IOORDER(8)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  vol(203, 418, 226, 437)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("0")          TABORDER(8)  IOORDER(10)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  basis(214, 446, 237, 465)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("0")          TABORDER(9)  IOORDER(9)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  jgga(412, 460, 448, 479)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(10)  IOORDER(4)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  vggb(423, 416, 459, 435)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(11)  IOORDER(3)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  obj(0, 85, 490, 171)    "IB22002P"  TABORDER(12)  IOORDER(12)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONSEND_AW_
+SCREEN.OnSend = False
+
+Dim ii
+ii = 0
+
+
+
+If SCREEN.Object("parent.CHECK0").Checked = True Then
+	ii = ii +1
+	chaik.Data = "1"
+
+Else
+	chaik.Data = "0"
+
+End If
+
+If SCREEN.Object("parent.CHECK1").Checked = True Then
+	ii = ii +1
+	bichaik.Data = "1"
+
+Else
+	bichaik.Data = "0"
+
+End If
+
+If SCREEN.Object("parent.CHECK2").Checked = True Then
+	ii = ii +1
+	total.Data = "1"
+
+Else
+	total.Data = "0"
+
+End If
+
+If SCREEN.Object("parent.CHECK3").Checked = True Then
+	ii = ii +1
+	KP.Data = "1"
+
+Else
+	KP.Data = "0"
+End If
+
+If SCREEN.Object("parent.CHECK4").Checked = True Then
+	ii = ii +1
+	vol.Data = "1"
+Else
+	vol.Data = "0"
+'	sum = sum + 1
+End If
+
+If SCREEN.Object("parent.CHECK5").Checked = True Then
+	ii = ii +1
+	basis.Data = "1"
+
+Else
+	basis.Data = "0"
+End If
+
+
+
+
+
+upcd.Data = SCREEN.Object("parent.upcd").data
+vggb.Data = SCREEN.Object("parent.vggb").data
+dfgb.Data = SCREEN.Object("parent.dfgb").data
+jgga.Data = SCREEN.Object("parent.jgga").data
+
+If ii < 1 Then
+	SCREEN.OnSend = False
+	chart1.Clear
+Else
+	SCREEN.OnSend = True
+
+End If
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+obj.Send
+
+_AW_ONENDSUB_AW_
+}
+
+
+
