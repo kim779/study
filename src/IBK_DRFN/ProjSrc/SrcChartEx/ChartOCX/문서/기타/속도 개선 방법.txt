@@ -1,0 +1,40 @@
+<<< 화면 로딩 >>>
+1. CString 
+2. main에 보내는 메시지를 최소화
+3. CBitmap 을 메인에서 생성하여 그 주소를 받아 처리하게 함
+4. 내부툴바의 툴팁
+
+
+<<< 실행시 >>>
+1. 내부에서 ocx에 메시지 보내는 부분 삭제 -> 상속의 방법
+2. 지표계산을 하는 시점
+   -> 현재 OnDraw 에서 함
+   -> 개선 방법 : 다른 함수를 이용해 호출함
+       TR Data - SetChartData2() - ocx
+       Real Data - OnDrdsData() - ocx
+       지표 추가시 - CGraph() - ChartObject
+3. 지표 계산 방법
+   -> 해당 packet 의 주소를 가지고 그 CList<double, double>* 에 직접 Get/Set 한다.
+   -> 해당 packet들의 주소는 항상 CPacketList에서 찾는것이 아니라 
+       계산시에서만 필요한 packet* 는 CharFormulate 에서 자기고 있는다.
+       그리고 그릴때 필요한 packet*는 인자로 받는다. 
+       (단 인자가 NULL 일 경우엔 CharFormulate 이 PacketList에서 packet을 직접 찾고 그 주소를 인자에 넣어준다)
+4. DrawAllEnvironment.dll 존재 유무
+   -> ChartObject에 삽입함
+   -> 영역 및 Min/Max 구하는 부분을 모두 ChartObject로 이동
+5. Packet* 들은 SubGraph에서 가지고 있음
+   -> 그래프를 그리거나 Min/Max를 구하거나 기타 Packet값을 참조하고 싶을 경우 매번 PacketList에서 찾는걸 하지 못하게 함
+6. 화면의 Min/Max 를 저장하고 있기
+7. ViewDraw를 GraphDraw 에 포함하기
+8. Packet 저장 방법
+   -> 서버에서 String로 받지 않기
+   -> data를 항상 RemoveAll 하지 않고 SetAt 하기
+9. CList 를 버지고 deque 쓰기
+10. CharFormulate 를 맵버변수로 가지고 있기
+   -> ChartObject에서 갖고 있음
+   -> 각 공식의 주소를 Graph에서 갖고 있음
+11. IndicatorInfo* 를 Graph에서 갖고 있음
+   -> 공식에 줌
+   -> GraphDraw 에 주기
+   -> ScaleDraw 에 주기
+12. 그리는 영역을 주고 변경된 부분만 그리기

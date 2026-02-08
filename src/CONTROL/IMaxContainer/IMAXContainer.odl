@@ -1,0 +1,52 @@
+// IMAXContainer.odl : type library source for IMAXContainer.dll
+
+// This file will be processed by the MIDL compiler to produce the
+// type library (IMAXContainer.tlb).
+
+[ uuid(7DE6B0BD-0037-4FC2-9CFF-2CE51C06EA64), version(1.0) ]
+library IMAXContainer
+{
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+
+
+	//  Primary dispatch interface for CControlWnd
+	
+	[ uuid(A59B7CBB-358C-41A3-AA9A-E22DA4D76E94) ]
+	dispinterface IControlWnd
+	{
+		properties:
+			// NOTE - ClassWizard will maintain property information here.
+			//    Use extreme caution when editing this section.
+			//{{AFX_ODL_PROP(CControlWnd)
+			//}}AFX_ODL_PROP
+			
+		methods:
+			// NOTE - ClassWizard will maintain method information here.
+			//    Use extreme caution when editing this section.
+			//{{AFX_ODL_METHOD(CControlWnd)
+			[id(1)] void SetIMAXGroup(short nGroup);
+			[id(2)] void SetIMAXCIFId(BSTR CIFId);
+			[id(3)] void SetIMAXSkin(short nIMAXSkin);
+			[id(4)] void SetIMAXData(short nKind, BSTR sData);
+			[id(5)] BSTR GetIMAXValue(BSTR sValueText);
+			[id(6)] short InitIMAX();
+			[id(7)] void SetVisible(BOOL bVisible);
+			[id(8)] void SetEnable(BOOL bEnable);
+			//}}AFX_ODL_METHOD
+
+			[id(9), propget] BSTR sJango();
+			[id(9), propput] void sJango(BSTR newVal);
+	};
+
+	//  Class information for CControlWnd
+
+	[ uuid(11A0B529-8110-4F97-92F3-9F56ED49A9AA) ]
+	coclass ControlWnd
+	{
+		[default] dispinterface IControlWnd;
+	};
+
+	//{{AFX_APPEND_ODL}}
+	//}}AFX_APPEND_ODL}}
+};

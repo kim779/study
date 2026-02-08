@@ -1,0 +1,27 @@
+// Plot15.cpp: implementation of the CPlot15 class.
+//
+//////////////////////////////////////////////////////////////////////
+
+#include "stdafx.h"
+#include "Plot15.h"
+
+#ifdef _DEBUG
+#undef THIS_FILE
+static char THIS_FILE[]=__FILE__;
+#define new DEBUG_NEW
+#endif
+
+//////////////////////////////////////////////////////////////////////
+// Construction/Destruction
+//////////////////////////////////////////////////////////////////////
+
+CPlot15::CPlot15()
+{
+	m_strName = "PLOT15";
+	m_lIndex = 14;
+}
+
+CPlot15::~CPlot15()
+{
+
+}

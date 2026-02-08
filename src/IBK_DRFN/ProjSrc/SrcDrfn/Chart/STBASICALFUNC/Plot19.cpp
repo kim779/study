@@ -1,0 +1,27 @@
+// Plot19.cpp: implementation of the CPlot19 class.
+//
+//////////////////////////////////////////////////////////////////////
+
+#include "stdafx.h"
+#include "Plot19.h"
+
+#ifdef _DEBUG
+#undef THIS_FILE
+static char THIS_FILE[]=__FILE__;
+#define new DEBUG_NEW
+#endif
+
+//////////////////////////////////////////////////////////////////////
+// Construction/Destruction
+//////////////////////////////////////////////////////////////////////
+
+CPlot19::CPlot19()
+{
+	m_strName = "PLOT19";
+	m_lIndex = 18;
+}
+
+CPlot19::~CPlot19()
+{
+
+}

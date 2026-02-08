@@ -1,0 +1,51 @@
+// CX_NATINGTEL.odl : type library source for CX_NATINGTEL.dll
+
+// This file will be processed by the MIDL compiler to produce the
+// type library (CX_NATINGTEL.tlb).
+
+[ uuid(0E0A3E9F-0F43-40B1-BC5D-92A45F95FA6B), version(1.0) ]
+library CX_NATINGTEL
+{
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+
+
+
+
+	//  Primary dispatch interface for CMainWnd
+	
+	[ uuid(9159A58B-E75F-42F8-9CB3-F97F543BF749) ]
+	dispinterface IMainWnd
+	{
+		properties:
+			// NOTE - ClassWizard will maintain property information here.
+			//    Use extreme caution when editing this section.
+			//{{AFX_ODL_PROP(CMainWnd)
+			//}}AFX_ODL_PROP
+			
+		methods:
+			// NOTE - ClassWizard will maintain method information here.
+			//    Use extreme caution when editing this section.
+			//{{AFX_ODL_METHOD(CMainWnd)
+			[id(1)] BSTR Request();
+			[id(2)] boolean Load();
+			[id(3)] void ExitPhonePad();
+			[id(4)] void StopRequest();
+			[id(5)] short GetStatus();
+			//}}AFX_ODL_METHOD
+
+			[id(6)] void SendMSgToMain(BSTR strPass);
+			[id(7)] void KillProcess(BSTR strProcess);
+	};
+
+	//  Class information for CMainWnd
+
+	[ uuid(A11CA021-F543-4A04-8BC9-4DEA753E434C) ]
+	coclass MainWnd
+	{
+		[default] dispinterface IMainWnd;
+	};
+
+	//{{AFX_APPEND_ODL}}
+	//}}AFX_APPEND_ODL}}
+};

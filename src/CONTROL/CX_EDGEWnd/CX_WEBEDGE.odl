@@ -1,0 +1,75 @@
+// CX_WEBEDGE.odl : type library source for CX_WEBEDGE.dll
+
+// This file will be processed by the MIDL compiler to produce the
+// type library (CX_WEBEDGE.tlb).
+
+[ uuid(DBE3823F-C5B0-467E-8826-6399B920E229), version(1.0) ]
+library CX_WEBEDGE
+{
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+
+
+
+
+	//  Primary dispatch interface for CMainWnd
+	
+	[ uuid(1F53C596-F91C-43E7-A3FA-98E92E2B137D) ]
+	dispinterface IMainWnd
+	{
+		properties:
+			// NOTE - ClassWizard will maintain property information here.
+			//    Use extreme caution when editing this section.
+			//{{AFX_ODL_PROP(CMainWnd)
+			//}}AFX_ODL_PROP
+			
+		methods:
+			// NOTE - ClassWizard will maintain method information here.
+			//    Use extreme caution when editing this section.
+			//{{AFX_ODL_METHOD(CMainWnd)
+			//}}AFX_ODL_METHOD
+
+			[id(1)] void Navigate(BSTR url);
+			[id(2)] void Navigatesrc(BSTR src);
+			[id(3)] void closeEdge();
+			[id(4)] void GoBack();
+			[id(5)] void GoForward();
+			[id(6)] void SetScreenZoomRate(DOUBLE dRate);
+			[id(7)] void BrowserPopup(BSTR sUrl);
+	};
+
+
+	[uuid(8F1E8118-D3F2-4D77-BAC0-2109371E8AA7)]
+	dispinterface IControlWnd
+	{
+		properties:
+			// NOTE - ClassWizard will maintain property information here.
+			//    Use extreme caution when editing this section.
+			//{{AFX_ODL_PROP(CMainWnd)
+			//}}AFX_ODL_PROP
+
+		methods:
+			// NOTE - ClassWizard will maintain method information here.
+			//    Use extreme caution when editing this section.
+			//{{AFX_ODL_METHOD(CMainWnd)
+			//}}AFX_ODL_METHOD
+
+			[id(1)] void Seturl2(BSTR url);
+			[id(2)] void Navigate(BSTR sUrl);
+	};
+	//  Class information for CMainWnd
+	[uuid(7C737475-961F-45D2-AF56-A14E47D69C89)]
+	coclass ControlWnd
+	{
+		[default] dispinterface IControlWnd;
+	};
+
+	[ uuid(45571518-C431-44C4-A2FE-47A28BD2A672) ]
+	coclass MainWnd
+	{
+		[default] dispinterface IMainWnd;
+	};
+
+	//{{AFX_APPEND_ODL}}
+	//}}AFX_APPEND_ODL}}
+};

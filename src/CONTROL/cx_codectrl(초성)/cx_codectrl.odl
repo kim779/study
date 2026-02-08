@@ -1,0 +1,60 @@
+// cx_codectrl.odl : type library source for cx_codectrl.dll
+
+// This file will be processed by the MIDL compiler to produce the
+// type library (cx_codectrl.tlb).
+
+[ uuid(6D401289-737F-4155-9DA9-32F2B5509161), version(1.0) ]
+library cx_codectrl
+{
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+
+
+	//  Primary dispatch interface for CControlWnd
+	
+	[ uuid(794B73A4-2083-426A-8F47-A897E6F98309) ]
+	dispinterface IControlWnd
+	{
+		properties:
+			// NOTE - ClassWizard will maintain property information here.
+			//    Use extreme caution when editing this section.
+			//{{AFX_ODL_PROP(CControlWnd)
+			[id(2)] BSTR Data;
+			[id(3)] boolean TabStop;
+			[id(1)] boolean Visible;
+			[id(4)] short UnitData;
+			//}}AFX_ODL_PROP
+			
+		methods:
+			// NOTE - ClassWizard will maintain method information here.
+			//    Use extreme caution when editing this section.
+			//{{AFX_ODL_METHOD(CControlWnd)
+			[id(5)] void SetProperties(BSTR sParam);
+			[id(6)] BSTR GetProperties();
+			[id(7)] void SetCode(BSTR code);
+			[id(8)] BSTR GetName();
+			[id(9)] void Text1(BSTR str);
+			[id(10)] void Text2(BSTR str);
+			[id(11)] void Text3(BSTR str);
+			[id(12)] void Text4(BSTR str);
+			[id(13)] void SetFocus();
+			[id(14)] void Trigger(BSTR name, BOOL all);
+			[id(15)] void Enable(BOOL bflags);
+			[id(16)] void Clear();
+			[id(17)] void SetUnit(short unit);
+			[id(18)] boolean IsKonex();
+			//}}AFX_ODL_METHOD
+
+	};
+
+	//  Class information for CControlWnd
+
+	[ uuid(0ABFCF1D-152E-426B-B920-ED4876B08928) ]
+	coclass ControlWnd
+	{
+		[default] dispinterface IControlWnd;
+	};
+
+	//{{AFX_APPEND_ODL}}
+	//}}AFX_APPEND_ODL}}
+};

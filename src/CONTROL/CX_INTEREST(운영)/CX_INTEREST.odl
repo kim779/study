@@ -1,0 +1,80 @@
+// CX_INTERGRID.odl : type library source for CX_INTERGRID.dll
+
+// This file will be processed by the MIDL compiler to produce the
+// type library (CX_INTERGRID.tlb).
+
+[ uuid(2D9BE1A2-64F1-47D4-A688-172CEF2ACFAF), version(1.0) ]
+library CX_INTEREST
+{
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+
+
+
+
+	//  Primary dispatch interface for CMainWnd
+	
+	[ uuid(AC991DBA-2B69-4AE5-8183-BAB58DCDB5E0) ]
+	dispinterface IMainWnd
+	{
+		properties:
+			// NOTE - ClassWizard will maintain property information here.
+			//    Use extreme caution when editing this section.
+			//{{AFX_ODL_PROP(CMainWnd)
+			[id(1)] BSTR cbGroupData;
+			//}}AFX_ODL_PROP
+			
+		methods:
+			// NOTE - ClassWizard will maintain method information here.
+			//    Use extreme caution when editing this section.
+			//{{AFX_ODL_METHOD(CMainWnd)
+			[id(2)] void SetProperties(BSTR str);
+			[id(3)] BSTR GetProperties();
+			[id(4)] void Reload();
+			[id(5)] void SetUseToolBox(boolean bUseTool);
+			[id(6)] void SetViewType(boolean bType);
+			[id(7)] void ChangeGroup(short nIndex);
+			[id(8)] void ChangeArrange(short nIndex);
+			[id(9)] void ChangeView(short nIndex, short ncbIndex);
+			[id(10)] void SetAutoCheck(boolean bAuto);
+			[id(11)] BSTR GetCode();
+			[id(12)] void OnPortfolio(BSTR result);
+			[id(13)] void RefreshCX(short key, short nIndex);
+			[id(14)] void SetGroup(short nIndex);
+			[id(15)] void Save();
+			[id(16)] boolean CheckSaveStatus();
+			[id(17)] void Recover();
+			[id(18)] void DeleteOrgFile();
+			[id(19)] void ClosingSave(short nID);
+			[id(20)] boolean IsWindow();
+			[id(21)] void ClearGrid();
+			[id(22)] void SetExpect(boolean bExpect);
+			[id(23)] void SetAccount(BSTR strAccount);
+			[id(24)] void SetOthersMap(boolean bFlag);
+			[id(25)] void SetFieldData(BSTR mapname, BSTR smallFields, BSTR smallWidth, BSTR largeFields, BSTR largeWidth);
+			[id(26)] void SetPass(BSTR sPass);
+			[id(27)] boolean CanClose();
+			[id(28)] void SetMapHandle(BSTR sHandle);
+			[id(29)] BSTR GetMapHandle();
+			[id(30)] BSTR GetRemainCode();
+			[id(31)] void SearchGroupList();
+			[id(32)] void SearchGroupCode(short index);
+	
+			//}}AFX_ODL_METHOD
+
+			//[id(33), propget] BSTR market();
+			[id(33)] void Setmarket(LPCTSTR newVal);
+			[id(34)] void Stop(boolean bflag);
+	};
+
+	//  Class information for CMainWnd
+
+	[ uuid(7EB4E3B4-0473-4C07-B83D-60A5D71F122E) ]
+	coclass MainWnd
+	{
+		[default] dispinterface IMainWnd;
+	};
+
+	//{{AFX_APPEND_ODL}}
+	//}}AFX_APPEND_ODL}}
+};

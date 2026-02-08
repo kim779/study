@@ -1,0 +1,55 @@
+// dx_Interest.odl : type library source for dx_Interest.dll
+
+// This file will be processed by the MIDL compiler to produce the
+// type library (dx_Interest.tlb).
+
+[ uuid(44AA5DCD-247C-41B7-B682-DE95D0CC5DF8), version(1.0) ]
+library dx_Interest
+{
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+
+
+
+
+	//  Primary dispatch interface for CComponent
+	
+	[ uuid(5C298934-6200-4DFD-9818-8029A7CC04FB) ]
+	dispinterface IComponent
+	{
+		properties:
+			// NOTE - ClassWizard will maintain property information here.
+			//    Use extreme caution when editing this section.
+			//{{AFX_ODL_PROP(CComponent)
+			//}}AFX_ODL_PROP
+			
+		methods:
+			// NOTE - ClassWizard will maintain method information here.
+			//    Use extreme caution when editing this section.
+			//{{AFX_ODL_METHOD(CComponent)
+			[id(1)] BSTR LoadGroupNames();
+			[id(2)] void SetUserName(BSTR sUser);
+			[id(3)] BSTR LoadCodeList(BSTR sGroup);
+			[id(4)] BSTR LoadCdNNmList(BSTR sGroup);
+			[id(5)] BSTR LoadGroupList(BSTR GroupCode, long nCount);
+			[id(6)] long GetGroupCnt();
+			[id(7)] BSTR GetNextGroupCode(BSTR GroupCode);
+			[id(8)] BSTR GetPrvGroupCode(BSTR GroupCode);
+			[id(9)] long GetGroupCodeIdx(BSTR GroupCode);
+			[id(10)] BSTR GetIdxGroupCode(BSTR sIndex);
+			[id(11)] boolean AddItemCd(BSTR GroupCode, BSTR ItemCd);
+			//}}AFX_ODL_METHOD
+
+	};
+
+	//  Class information for CComponent
+
+	[ uuid(EEF4E51B-EDC4-49F9-B8A2-F601FA9244A0) ]
+	coclass Component
+	{
+		[default] dispinterface IComponent;
+	};
+
+	//{{AFX_APPEND_ODL}}
+	//}}AFX_APPEND_ODL}}
+};

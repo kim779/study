@@ -1,0 +1,53 @@
+// CX_SimpleAuth.odl : type library source for CX_SimpleAuth.dll
+
+// This file will be processed by the MIDL compiler to produce the
+// type library (CX_SimpleAuth.tlb).
+
+[ uuid(C837F75A-E9D0-4E78-B074-ED5A62446771), version(1.0) ]
+library CX_SimpleAuth
+{
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+
+
+
+
+	//  Primary dispatch interface for CMainWnd
+	
+	[ uuid(C7DA29C9-D7D4-4AAD-A595-A42BDDDB0AD0) ]
+	dispinterface IMainWnd
+	{
+		properties:
+			// NOTE - ClassWizard will maintain property information here.
+			//    Use extreme caution when editing this section.
+			//{{AFX_ODL_PROP(CMainWnd)
+			[id(1)] BSTR ERRcode;
+			[id(2)] BSTR OTPsuccYN;
+			[id(3)] BSTR OTPMaxErrCnt;
+			[id(4)] BSTR OTPErrCnt;
+			[id(5)] short OTPState;
+			[id(6)] BSTR OTPSeqNo;
+			[id(7)] BSTR ERRMsg;
+			//}}AFX_ODL_PROP
+			
+		methods:
+			// NOTE - ClassWizard will maintain method information here.
+			//    Use extreme caution when editing this section.
+			//{{AFX_ODL_METHOD(CMainWnd)
+			[id(8)] short CertOTP(BSTR sCustNum, BSTR spinNum);
+			//}}AFX_ODL_METHOD
+
+			[id(9)] SHORT SearchOTP(BSTR custnum);
+	};
+
+	//  Class information for CMainWnd
+
+	[ uuid(84B14372-8165-4360-B1EF-A326BB6A0807) ]
+	coclass MainWnd
+	{
+		[default] dispinterface IMainWnd;
+	};
+
+	//{{AFX_APPEND_ODL}}
+	//}}AFX_APPEND_ODL}}
+};

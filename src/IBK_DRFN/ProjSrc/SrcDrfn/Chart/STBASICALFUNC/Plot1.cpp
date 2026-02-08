@@ -1,0 +1,28 @@
+// Plot1.cpp: implementation of the CPlot1 class.
+//
+//////////////////////////////////////////////////////////////////////
+
+#include "stdafx.h"
+#include "Plot1.h"
+
+#ifdef _DEBUG
+#undef THIS_FILE
+static char THIS_FILE[]=__FILE__;
+#define new DEBUG_NEW
+#endif
+
+//////////////////////////////////////////////////////////////////////
+// Construction/Destruction
+//////////////////////////////////////////////////////////////////////
+
+CPlot1::CPlot1()
+{
+	m_strName = "PLOT1";
+	m_lIndex = 0;
+}
+
+CPlot1::~CPlot1()
+{
+
+}
+

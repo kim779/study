@@ -1,0 +1,63 @@
+// CX_MarketPicker.odl : type library source for CX_MarketPicker.dll
+
+// This file will be processed by the MIDL compiler to produce the
+// type library (CX_MarketPicker.tlb).
+
+[ uuid(07E183FE-DD66-4248-96AE-35E6801BDEFA), version(1.0) ]
+library CX_MarketPicker
+{
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+
+
+
+
+	//  Primary dispatch interface for CMainWnd
+	
+	[ uuid(5A6EDD2B-E9DC-498F-BBFD-90D677E4A9EE) ]
+	dispinterface IMainWnd
+	{
+		properties:
+			// NOTE - ClassWizard will maintain property information here.
+			//    Use extreme caution when editing this section.
+			//{{AFX_ODL_PROP(CMainWnd)
+			//}}AFX_ODL_PROP
+			
+		methods:
+			// NOTE - ClassWizard will maintain method information here.
+			//    Use extreme caution when editing this section.
+			//{{AFX_ODL_METHOD(CMainWnd)
+			[id(1)] BSTR GetMarketType();
+			//}}AFX_ODL_METHOD
+
+		//	[id(2), propget] BSTR sMarket();
+			[id(2), propput] void sMarket(BSTR newVal);
+			[id(3)] void SetKey(SHORT key);
+			[id(4)] SHORT IsNXTAble(BSTR sCode);
+			[id(5)] BSTR GetBroadData(BSTR sVal);
+			[id(6)] void displayGuide(BSTR smsg);
+			[id(7)] void WriteFile(BSTR sFile, BSTR sKey, BSTR sSection, BSTR sData);
+			[id(8)] BSTR ReadFile(BSTR sFile, BSTR sKey, BSTR sSection);
+			[id(9)] void TraceLog(BSTR slog, BSTR sKey);
+			[id(10)] void visible(SHORT bShow);
+			[id(11), propput] void sCode(BSTR newVal);
+			[id(12), propput] void Major(BSTR newVal);
+			[id(13), propput] void MNum(BSTR newVal);
+			[id(14)] SHORT GetMapPermission(BSTR sVal);
+			[id(15), propput] void Minor(BSTR newVal);
+			[id(16), propput] void Permission(SHORT newVal);
+			[id(17), propput] void sNick(BSTR newVal);
+			[id(18)] SHORT IsMajor();
+	};
+
+	//  Class information for CMainWnd
+
+	[ uuid(B44F09A3-AE8E-4A5B-9C76-073F5E518C8C) ]
+	coclass MainWnd
+	{
+		[default] dispinterface IMainWnd;
+	};
+
+	//{{AFX_APPEND_ODL}}
+	//}}AFX_APPEND_ODL}}
+};

@@ -1,0 +1,118 @@
+#if !defined(AFX_CONTROLWND_H__EDA7DDF3_B67A_4E88_B42B_754A94E209CD__INCLUDED_)
+#define AFX_CONTROLWND_H__EDA7DDF3_B67A_4E88_B42B_754A94E209CD__INCLUDED_
+
+#if _MSC_VER > 1000
+#pragma once
+#endif // _MSC_VER > 1000
+// ControlWnd.h : header file
+//
+#include "CategoryPopup.h"
+/////////////////////////////////////////////////////////////////////////////
+// CControlWnd window
+
+class CParam
+{
+public:
+	int		key;			// screen key
+	CString		name;			// control symbol name
+	CRect		rect;			// control rect
+	CString		fonts;			// font name
+	int		point;			// font point
+	int		style;			// font style
+	DWORD		tRGB;			// text color index
+	DWORD		pRGB;			// paint color index
+	CString		options;		// properties
+};
+
+class CControlWnd : public CWnd
+{
+// Construction
+public:
+	CControlWnd();
+
+// Attributes
+public:
+	CWnd*		m_pParent;
+	CParam		m_Param;
+	CString		m_rtnStr, m_sCodeList;
+protected:
+private:
+	DWORD		m_dwState;
+	bool		m_capture, m_bChecked, m_bCheck;
+	BOOL		m_bHover, m_bTracking;
+	HBITMAP		m_hBitmap, m_hBitmap_dn, m_hBitmap_hv;
+	
+	CString		m_sUser, m_sRoot;
+
+	COLORREF	m_HoverColor;
+
+	CString		m_sImagePath;
+	CString		m_sText, m_sSymbol;
+
+	int		m_type, m_nKind;
+	CCategoryPopup	*m_pPopup;
+	CFont		m_font;
+// Operations
+public:
+
+// Overrides
+	// ClassWizard generated virtual function overrides
+	//{{AFX_VIRTUAL(CControlWnd)
+	public:
+	virtual void OnFinalRelease();
+	//}}AFX_VIRTUAL
+
+// Implementation
+public:
+	CString getMidString(char *pStr, int nFirst, int nLen);
+	CString loadJCode(CString path, int nKind);
+	void	SendTR(CString name, CString data, BYTE type, int key);
+	CFont* getAxFont(CString fName, int point, int style);
+	CBitmap* getBitmap(CString path);
+	CString OptionParser(CString sOption, CString sKey);
+	CString loadCodeList(int nGroup);
+	void	ShowPopup(CRect rc);
+	void	SetButtonImages();
+	CString Variant(int comm, CString data);
+	CString	Parser(CString &srcstr, CString substr);
+	void	setCheck(bool bCheck = true);
+	bool	IsChecked();
+	CSize	BitmapSize(HBITMAP hBitmap);
+	void	SetParam(struct _param *pParam);
+	LOGFONT	setFont(CString fName, int fsize, int style);
+	COLORREF GetIndexColor(int index);
+	virtual ~CControlWnd();
+
+	// Generated message map functions
+protected:
+	//{{AFX_MSG(CControlWnd)
+	afx_msg void OnPaint();
+	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
+	afx_msg void OnMouseMove(UINT nFlags, CPoint point);
+	afx_msg void OnLButtonDblClk(UINT nFlags, CPoint point);
+	afx_msg void OnLButtonUp(UINT nFlags, CPoint point);
+	afx_msg LRESULT OnMouseLeave(WPARAM wparam, LPARAM lparam);
+	afx_msg void OnMouseHover(WPARAM wparam, LPARAM lparam);
+	afx_msg BOOL OnEraseBkgnd(CDC* pDC);
+	afx_msg void OnEnable(BOOL bEnable);
+	afx_msg	void OnDestroy();
+	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
+	//}}AFX_MSG
+	afx_msg long OnMessage(WPARAM wParam, LPARAM lParam);
+	afx_msg long OnMessage1(WPARAM wParam, LPARAM lParam);
+	//}}AFX_MSG
+	DECLARE_MESSAGE_MAP()
+	// Generated OLE dispatch map functions
+	//{{AFX_DISPATCH(CControlWnd)
+	afx_msg BSTR GetJCodes();
+	//}}AFX_DISPATCH
+	DECLARE_DISPATCH_MAP()
+	DECLARE_INTERFACE_MAP()
+};
+
+/////////////////////////////////////////////////////////////////////////////
+
+//{{AFX_INSERT_LOCATION}}
+// Microsoft Visual C++ will insert additional declarations immediately before the previous line.
+
+#endif // !defined(AFX_CONTROLWND_H__EDA7DDF3_B67A_4E88_B42B_754A94E209CD__INCLUDED_)

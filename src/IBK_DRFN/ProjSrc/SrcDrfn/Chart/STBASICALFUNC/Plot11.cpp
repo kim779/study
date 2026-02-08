@@ -1,0 +1,27 @@
+// Plot11.cpp: implementation of the CPlot11 class.
+//
+//////////////////////////////////////////////////////////////////////
+
+#include "stdafx.h"
+#include "Plot11.h"
+
+#ifdef _DEBUG
+#undef THIS_FILE
+static char THIS_FILE[]=__FILE__;
+#define new DEBUG_NEW
+#endif
+
+//////////////////////////////////////////////////////////////////////
+// Construction/Destruction
+//////////////////////////////////////////////////////////////////////
+
+CPlot11::CPlot11()
+{
+	m_strName = "PLOT11";
+	m_lIndex = 10;
+}
+
+CPlot11::~CPlot11()
+{
+
+}

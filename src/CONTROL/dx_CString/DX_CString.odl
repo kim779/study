@@ -1,0 +1,63 @@
+// DX_CString.odl : type library source for DX_CString.dll
+
+// This file will be processed by the MIDL compiler to produce the
+// type library (DX_CString.tlb).
+
+[ uuid(A99D569C-F3F2-4C11-A268-78440C5E10FA), version(1.0) ]
+library DX_CString
+{
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+
+
+
+
+	//  Primary dispatch interface for CComponent
+	
+	[ uuid(853778F9-6738-47BE-991C-AD90891F75D3) ]
+	dispinterface IComponent
+	{
+		properties:
+			// NOTE - ClassWizard will maintain property information here.
+			//    Use extreme caution when editing this section.
+			//{{AFX_ODL_PROP(CComponent)
+			[id(1)] BSTR Text;
+			//}}AFX_ODL_PROP
+			
+		methods:
+			// NOTE - ClassWizard will maintain method information here.
+			//    Use extreme caution when editing this section.
+			//{{AFX_ODL_METHOD(CComponent)
+			[id(2)] long GetLength();
+			[id(3)] void Empty();
+			[id(4)] boolean IsEmpty();
+			[id(5)] void MakeUpper();
+			[id(6)] void MakeLower();
+			[id(7)] long Replace(BSTR oldStr, BSTR newStr);
+			[id(8)] BSTR Mid(long nFirst, long nCount);
+			[id(9)] BSTR Right(long nCount);
+			[id(10)] BSTR Left(long nCount);
+			[id(11)] long Insert(long nIndex, BSTR Str);
+			[id(12)] long Delete(long nIndex, long nCount);
+			[id(13)] long Compare(BSTR Str);
+			[id(14)] long CompareNoCase(BSTR Str);
+			[id(15)] short GetAt(long nIndex);
+			[id(16)] void SetAt(long nIndex, short nChar);
+			[id(17)] void TrimLeft();
+			[id(18)] void TrimRight();
+			[id(19)] long Find(BSTR pszSub, long iStart);
+			//}}AFX_ODL_METHOD
+
+	};
+
+	//  Class information for CComponent
+
+	[ uuid(AACD1863-5839-43F0-B2FD-2DD053ABB9C9) ]
+	coclass Component
+	{
+		[default] dispinterface IComponent;
+	};
+
+	//{{AFX_APPEND_ODL}}
+	//}}AFX_APPEND_ODL}}
+};

@@ -1,0 +1,62 @@
+// CX_FODepth.odl : type library source for CX_FODepth.dll
+
+// This file will be processed by the MIDL compiler to produce the
+// type library (CX_FODepth.tlb).
+
+[ uuid(5096BF88-3C0E-40FA-B65E-BC16146A627C), version(1.0) ]
+library CX_FODepth
+{
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+
+	//  Primary dispatch interface for Cdepth
+	
+	[ uuid(D31D7272-4BBD-4056-B48E-28104E17B458) ]
+	dispinterface Idepth
+	{
+		properties:
+			// NOTE - ClassWizard will maintain property information here.
+			//    Use extreme caution when editing this section.
+			//{{AFX_ODL_PROP(Cdepth)
+			[id(1)] long Type;
+			[id(2)] long HogaType;
+			[id(3)] long BeforeCompare;
+			[id(4)] long Percent;
+			[id(5)] long Graph;
+			[id(6)] long TopDisplay;
+			[id(7)] long BottomDisplay;
+			[id(8)] long Line;
+			[id(9)] long LButtonDown;
+			[id(10)] long OHLC;
+			[id(11)] boolean visible;
+			[id(12)] short BongStatus;
+			[id(13)] short CurrStatus;
+			[id(14)] boolean BoldPrice;
+			[id(15)] boolean BoldRemain;
+			[id(16)] boolean BoldRemainCount;
+			//}}AFX_ODL_PROP
+			
+		methods:
+			// NOTE - ClassWizard will maintain method information here.
+			//    Use extreme caution when editing this section.
+			//{{AFX_ODL_METHOD(Cdepth)
+			[id(17)] void SetProperties(BSTR options);
+			[id(18)] BSTR GetProperties();
+			[id(19)] void Refresh();
+			[id(20)] short ChangeInfo();
+			[id(21)] short ChangeBong();
+			[id(22)] void Clear();
+			//}}AFX_ODL_METHOD
+	};
+
+	//  Class information for Cdepth
+
+	[ uuid(62C27CCE-B03E-47CB-B4D2-6088D0B538BE) ]
+	coclass depth
+	{
+		[default] dispinterface Idepth;
+	};
+
+	//{{AFX_APPEND_ODL}}
+	//}}AFX_APPEND_ODL}}
+};

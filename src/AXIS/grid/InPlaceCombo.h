@@ -1,0 +1,64 @@
+#if !defined(AFX_INPLACECOMBO_H__8BF358F7_55A3_4790_AFD2_8CFB92A8196F__INCLUDED_)
+#define AFX_INPLACECOMBO_H__8BF358F7_55A3_4790_AFD2_8CFB92A8196F__INCLUDED_
+
+#if _MSC_VER > 1000
+#pragma once
+#endif // _MSC_VER > 1000
+// InPlaceCombo.h : header file
+//
+
+/////////////////////////////////////////////////////////////////////////////
+// CInPlaceCombo window
+#include "fxGrid.h"
+class CInPlaceCombo : public CComboBox
+{
+// Construction
+public:
+	CInPlaceCombo(CWnd* parent, CRect& rect, DWORD dwStyle, UINT nID,
+		 int nRow, int nColumn, CString sInitText, LOGFONT* logfont = NULL, int active = 0);
+
+// Attributes
+private:
+	int     m_nRow;
+	int     m_nColumn;
+	CString m_sInitText;
+	UINT    m_nLastChar;
+	BOOL    m_bExitOnArrows;
+	CRect   m_rect;
+	CFont	m_font;
+
+// Operations
+public:
+	void	EndCombo();
+private:
+	void	MessageToParent(int nMessage);
+// Overrides
+	// ClassWizard generated virtual function overrides
+	//{{AFX_VIRTUAL(CInPlaceCombo)
+	public:
+	virtual BOOL PreTranslateMessage(MSG* pMsg);
+	protected:
+	virtual void PostNcDestroy();
+	//}}AFX_VIRTUAL
+
+// Implementation
+public:
+	virtual ~CInPlaceCombo();
+
+	// Generated message map functions
+protected:
+	//{{AFX_MSG(CInPlaceCombo)
+	afx_msg void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
+	afx_msg void OnKillFocus(CWnd* pNewWnd);
+	afx_msg void OnSelchange();
+	//}}AFX_MSG
+
+	DECLARE_MESSAGE_MAP()
+};
+
+/////////////////////////////////////////////////////////////////////////////
+
+//{{AFX_INSERT_LOCATION}}
+// Microsoft Visual C++ will insert additional declarations immediately before the previous line.
+
+#endif // !defined(AFX_INPLACECOMBO_H__8BF358F7_55A3_4790_AFD2_8CFB92A8196F__INCLUDED_)

@@ -1,0 +1,17 @@
+// SymbolDraw_OnePoint_Size.cpp: implementation of the CSymbolDraw_OnePoint_Size class.
+//
+//////////////////////////////////////////////////////////////////////
+
+#include "stdafx.h"
+#include "symbol.h"
+#include "SymbolDraw_OnePoint_Size.h"
+
+#ifdef _DEBUG
+#undef THIS_FILE
+static char THIS_FILE[]=__FILE__;
+#define new DEBUG_NEW
+#endif
+
+//////////////////////////////////////////////////////////////////////
+// Construction/Destruction
+//////////////////////////////////////////////////////////////////////

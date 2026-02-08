@@ -1,0 +1,98 @@
+// CX_CURSORMAP.odl : type library source for ActiveX Control project.
+
+// This file will be processed by the Make Type Library (mktyplib) tool to
+// produce the type library (CX_CURSORMAP.tlb) that will become a resource in
+// EXTCTRL.ocx.
+
+//
+//	if you want to enum style property
+//	Example)
+//	typedef enum
+//  {
+//	[helpstring("Solid")]        Solid      = 0,
+//	[helpstring("Dash")]         Dash       = 1,
+//	[helpstring("Dot")]          Dot        = 2,
+//	[helpstring("Dash-Dot")]     DashDot    = 3,
+//	[helpstring("Dash-Dot-Dot")] DashDotDot = 4,
+//  } enumLineStyle;
+//	[id(1)] enumLineStyle Attr1;
+//
+//	if you want to make hidden property
+//	Example)
+//	[id(1), hidden]
+//
+//	if you want to make value from Common dialog
+//	Example)
+//	[id(1), helpstring("commonDialogCode::property description")]
+//	replace "commonDialogCode" to value "File", "ImageFile"
+//	if you want to color property set OLE_COLOR.
+//
+
+[ uuid(24408BC4-DEF4-4AF8-83DB-CB366E866924), version(1.0),
+  helpfile("CX_CURSORMAP.hlp"),
+  helpstring("CX_CURSORMAP ActiveX Control module"),
+  control ]
+library CX_CURSORMAPLib
+{
+	#include <olectl.h>
+	#include <idispids.h>
+
+	importlib(STDOLE_TLB);
+	importlib(STDTYPE_TLB);
+
+	//  Primary dispatch interface for CEXTCTRLCtrl
+
+	[ uuid(5ADC603A-F412-41B4-9964-F4BD0A153C92),
+	  helpstring("Dispatch interface for CX_CURSORMAP Control"), hidden ]
+	dispinterface _DEXTCTRL
+	{
+		properties:
+			// NOTE - ClassWizard will maintain property information here.
+			//    Use extreme caution when editing this section.
+			//{{AFX_ODL_PROP(CEXTCTRLCtrl)
+			//}}AFX_ODL_PROP
+
+		methods:
+			// NOTE - ClassWizard will maintain method information here.
+			//    Use extreme caution when editing this section.
+			//{{AFX_ODL_METHOD(CEXTCTRLCtrl)
+			[id(1)] BSTR GetProperties();
+			[id(2)] void SetProperties(BSTR sOptions);
+			[id(3)] void SetParams(long sParams);
+			[id(4)] boolean IsInvokeAllowed(DISPID);
+			[id(5)] void SetCursorMap(BSTR sKey, long left, long top, long right, long bottom);
+			[id(6)] void DeleteAllCursorMap();
+			[id(7)] void DeleteCursorMap(BSTR sKey);
+			//}}AFX_ODL_METHOD
+	};
+
+	//  Event dispatch interface for CEXTCTRLCtrl
+
+	[ uuid(C324A902-68A9-42BE-942C-7E668F1D325E),
+	  helpstring("Event interface for CX_CURSORMAP Control") ]
+	dispinterface _DEXTCTRLEvents
+	{
+		properties:
+			//  Event interface has no properties
+
+		methods:
+			// NOTE - ClassWizard will maintain event information here.
+			//    Use extreme caution when editing this section.
+			//{{AFX_ODL_EVENT(CEXTCTRLCtrl)
+			//}}AFX_ODL_EVENT
+	};
+
+	//  Class information for CEXTCTRLCtrl
+
+	[ uuid(AA0F54A8-970E-451A-973E-B74D98F9CF16),
+	  helpstring("CX_CURSORMAP Control"), control ]
+	coclass CX_CURSORMAP
+	{
+		[default] dispinterface _DEXTCTRL;
+		[default, source] dispinterface _DEXTCTRLEvents;
+	};
+
+
+	//{{AFX_APPEND_ODL}}
+	//}}AFX_APPEND_ODL}}
+};

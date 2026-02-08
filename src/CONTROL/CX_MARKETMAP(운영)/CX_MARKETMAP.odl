@@ -1,0 +1,53 @@
+// CX_MARKETMAP.odl : type library source for CX_MARKETMAP.dll
+
+// This file will be processed by the MIDL compiler to produce the
+// type library (CX_MARKETMAP.tlb).
+
+[ uuid(B65F8040-9824-47F6-9841-6276F1E5A670), version(1.0) ]
+library CX_MARKETMAP
+{
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+
+
+
+
+	//  Primary dispatch interface for CMainWnd
+	
+	[ uuid(8201BFF2-5214-424B-81A8-2A53F8B1A0B5) ]
+	dispinterface IMainWnd
+	{
+		properties:
+			// NOTE - ClassWizard will maintain property information here.
+			//    Use extreme caution when editing this section.
+			//{{AFX_ODL_PROP(CMainWnd)
+			//}}AFX_ODL_PROP
+			
+		methods:
+			// NOTE - ClassWizard will maintain method information here.
+			//    Use extreme caution when editing this section.
+			//{{AFX_ODL_METHOD(CMainWnd)
+			[id(1)] void SetProperties(BSTR str);
+			[id(2)] BSTR GetProperties();
+			[id(3)] void MakeMap(short type);
+			[id(4)] void LoadMap(short market, short type);
+			[id(5)] void LoadUpMap(BSTR sUpcode);
+			[id(6)] void SearchByUp(BSTR sUpCode , BSTR sGubn);
+			[id(7)] void redo();
+			[id(8)] BSTR GetDataArr(BSTR sArr, BSTR sGubn);
+			[id(9)] void Redraw(short type1, short type2, short type3, short type4, BSTR sGubn);
+			//}}AFX_ODL_METHOD
+
+	};
+
+	//  Class information for CMainWnd
+
+	[ uuid(D29D0B78-4244-492B-B463-6A0F499187A1) ]
+	coclass MainWnd
+	{
+		[default] dispinterface IMainWnd;
+	};
+
+	//{{AFX_APPEND_ODL}}
+	//}}AFX_APPEND_ODL}}
+};

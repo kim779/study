@@ -1,0 +1,44 @@
+#define		TRNO_MSTCODE				"pijs0112"
+#define		TRNO_WORKDATE				"pijs0111"
+#define		TRNO_CONDITION				"pijs0110"
+#define		TRNO_CONDIONECLK_RESULT		"pijs0370"
+#define		TRNO_SET_REAL				"pijs0380"
+#define		TRNO_ALERT_REALREG			"pijs0371"
+#define		TRNO_ITEM_DIAGNOSIS			"pijs0410"
+#define		TRNO_ORDER_SEARCH			"pijs0400"
+#define		TRNO_ORDER_ITEM_DIAGNOSIS	"ItemDiagnosisFormOderSearch"
+#define		TRNO_PATTERN_SEARCH			"pijs0430"
+#define		TRNO_DRAW_RESULT			"pijs0368"
+#define		TRNO_CANDLE_RESULT			"pijs0366"
+#define		TRNO_GROUPTOBASE_UP			"pijs0361"
+#define		TRNO_GROUPTOBASE			"pijs0362"
+#define		TRNO_VALUE_PREDICTION		"pijs0420"
+#define		TRNO_LANGUAGE				"pijs0500"
+
+
+#define		TRNO_ACCOUNTINFO			"PIBOSJGO"
+
+
+
+
+
+
+
+#define		TRKEY_MSTCODE				1
+#define		TRKEY_WORKDATE				2
+#define		TRKEY_CONDITION				3
+#define		TRKEY_CONDIONECLK_RESULT	4
+#define		TRKEY_ACCOUNTINFO			5
+#define		TRKEY_SET_REAL				6
+#define		TRKEY_ALERT_REALREG			7
+#define		TRKEY_ITEM_DIAGNOSIS		8
+#define		TRKEY_ORDER_SEARCH			9
+#define		TRKEY_ORDER_ITEM_DIAGNOSIS	10
+#define		TRKEY_PATTERN_SEARCH		11
+#define		TRKEY_DRAW_RESULT			12
+#define		TRKEY_CANDLE_RESULT			13
+#define		TRKEY_GROUPTOBASE_UP		14
+#define		TRKEY_GROUPTOBASE			15
+#define		TRKEY_VALUE_PREDICTION		16
+#define		TRKEY_LANGUAGE				17
+#define		TRKEY_ACCOUNTINFO			18

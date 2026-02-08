@@ -1,0 +1,101 @@
+// wDrChart.odl : type library source for wDrChart.dll
+
+[ uuid(6790DD3A-96F7-4CB1-A3C8-767F80E287F3), version(1.0) ]
+library WDrChart
+{
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+
+
+
+
+	//  Primary dispatch interface for CDrChartCtl
+	
+	[ uuid(75A47147-9C93-4E1D-A7A1-25C6FCAE8EE9) ]
+	dispinterface IDrChartCtl
+	{
+		properties:
+			// NOTE - ClassWizard will maintain property information here.
+			//    Use extreme caution when editing this section.
+			//{{AFX_ODL_PROP(CDrChartCtl)
+			//}}AFX_ODL_PROP
+			
+		methods:
+			// NOTE - ClassWizard will maintain method information here.
+			//    Use extreme caution when editing this section.
+			//{{AFX_ODL_METHOD(CDrChartCtl)
+			[id(1)] void SetSubMsg(BSTR strSubMsg, BSTR strParam);
+			[id(2)] BSTR GetChartProperty(BSTR szPropName);
+			[id(3)] boolean SetChartProperty(BSTR p_szPropName, BSTR p_szValue, BSTR p_szValueType);
+			[id(4)] boolean LoadAddIn(BSTR sz_AddInDllName);
+			[id(5)] short SetChartData(BSTR msg);
+			[id(6)] short SetChartData2(BSTR szMsg);
+			[id(7)] void SetChartRealData(BSTR szPacketName, double dData, short nOption);
+			[id(8)] boolean ShowBlock(BSTR szPacketName, short nOption);
+			[id(9)] IDispatch* GetDRChartDispatch();
+			[id(10)] long ChangeMajorFID(BSTR pstrMajor);
+			[id(11)] long ChangeMinorFID(BSTR pstrMinor);
+			[id(12)] void ChangeGridSymbol(BSTR pstrSymbol);
+			[id(13)] void ChangeGridSymbol2(BSTR pstrSymbol, BSTR pstrFIDCode);
+			[id(14)] long SendTR(BSTR pstrTRName, BSTR pstrInData, BOOL bNext);
+			[id(15)] long SendTrDifferReal(BSTR pstrTRName, BSTR pstrInData, BSTR pstrRealSym, BOOL bNext);
+			[id(16)] boolean AddChartItem(short nRowIdx, BSTR pstrCode, BSTR pstrName, BSTR pstrGraphName, BOOL block, BOOL bVScale);
+			[id(17)] boolean ChangeChartItem(BSTR pstrCode, BSTR pstrName);
+			[id(18)] void AddPacketRQ(BSTR pstrPacket);
+			[id(19)] void DelAllPacketRQ();
+			[id(20)] void DelChartItem(BSTR pstrItem);
+			[id(21)] long GetChartState();
+			[id(22)] boolean ChangeGraphTitleRQ(BSTR pstrCode, BSTR pstrTitle);
+			[id(23)] boolean ChangeGraphColorRQ(BSTR pstrCode, BSTR pstrColor);
+			[id(24)] boolean ChangeGraphTitle(BSTR pstrName, BSTR pstrTitle);
+			[id(25)] boolean ChangeGraphColor(BSTR pstrName, BSTR pstrColor);
+			[id(26)] void SetCurrentRQ(BSTR pstrCode);
+			[id(27)] void AddBozoMsg(short nType, BSTR pstrKey, BSTR pstrValue);
+			[id(28)] void DelAllBozoMsg();
+			[id(29)] void SetDiffGridSymbol(BSTR pstrSymbol);
+			[id(30)] void SetDiffGridSymbol2(BSTR pstrFIDCode, BSTR pstrSymbol);
+			[id(31)] void SetRowMaxCount(BSTR pstrFIDCode, long lMaxCount);
+			[id(32)] long SetValueToScale(BSTR szKey, BOOL dUse);
+			[id(33)] void SetRedrawCall(BOOL bUse);
+			[id(34)] void SetDefaultRQ(BOOL bSetDisable, BSTR szKey, BSTR szData);
+			[id(35)] BOOL SetLinePropRQ(BSTR pstrCode, BSTR pstrData);
+			[id(36)] BSTR GetLinePropRQ(BSTR pstrCode);
+			[id(37)] void UseExtraChart(BSTR szChartName, BOOL bUse);
+			[id(38)] void SetShowYScaleData(BSTR szGraphName);
+			[id(39)] void SetChartDataType(BSTR szType);
+			[id(40)] void SetIndicatorHide(BSTR szGraphName, BSTR szHideData);
+			[id(41)] BSTR GetIndicatorHide(BSTR szGraphName, short nCount);
+			[id(42)] void SetNextKey(BSTR szNextKey);
+			[id(43)] BSTR GetNextKey();
+			//}}AFX_ODL_METHOD
+	};
+
+	//  Event dispatch interface for CDrChartCtl
+
+	[ uuid(3490D5B1-840B-474a-AFBC-BB2578A4736A),
+	  helpstring("Event interface for DrChartCtl Control") ]
+	dispinterface IDrChartCtlEvents
+	{
+		properties:
+			//  Event interface has no properties
+
+		methods:
+			// NOTE - ClassWizard will maintain event information here.
+			//    Use extreme caution when editing this section.
+			//{{AFX_ODL_EVENT(CDrChartCtl)
+			//}}AFX_ODL_EVENT
+	};
+
+
+	//  Class information for CDrChartCtl
+
+	[ uuid(E1B10A45-0CE0-4682-8093-27152FB5EF1A) ]
+	coclass DrChartCtl
+	{
+		[default] dispinterface IDrChartCtl;
+		[default, source] dispinterface IDrChartCtlEvents;
+	};
+
+	//{{AFX_APPEND_ODL}}
+	//}}AFX_APPEND_ODL}}
+};

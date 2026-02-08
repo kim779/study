@@ -1,0 +1,27 @@
+// PSObject.cpp: implementation of the CPSObject class.
+//
+//////////////////////////////////////////////////////////////////////
+
+#include "stdafx.h"
+#include "ChartPeriodSummaryAddIn.h"
+#include "PSObject.h"
+
+#ifdef _DEBUG
+#undef THIS_FILE
+static char THIS_FILE[]=__FILE__;
+#define new DEBUG_NEW
+#endif
+
+//////////////////////////////////////////////////////////////////////
+// Construction/Destruction
+//////////////////////////////////////////////////////////////////////
+
+CPSObject::CPSObject()
+{
+
+}
+
+CPSObject::~CPSObject()
+{
+
+}

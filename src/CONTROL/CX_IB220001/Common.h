@@ -1,0 +1,45 @@
+#ifndef _CX_IB220001_COMMON_
+#define _CX_IB220001_COMMON_
+
+// define Color!
+#define COLOR_LINE		93
+#define COLOR_TABLE		75
+#define COLOR_BK		64
+#define COLOR_GRIDHEAD		74
+#define COLOR_GUIDEBACK		213
+#define COLOR_PANELBACK		66
+#define COLOR_BODYBACK		181
+#define COLOR_GRIDHEADTXT	76
+#define COLOR_DATA		99
+#define COLOR_TEXT		69
+#define COLOR_TABLEHEAD		96
+#define	COLOR_MDB		171		// 매도 back
+#define	COLOR_MSB		170		// 매수 back
+#define COLOR_PLUSTXT		94
+#define COLOR_MINUSTXT		95
+#define COLOR_FOCUS		78
+#define COLOR_CONTROLBACK	66
+
+#define PADDING_VALUE	(6)
+
+typedef enum { CT_NONE=0, CT_FUTURE, CT_OPTION, CT_SPREAD } CODE_TYPE;
+
+#define SCREEN_CX		(584)
+#define SCREEN_CY		(162)
+#define GRID_COLS		(11)
+#define GRID_VISIBLE_ROWS	(8)
+#define GRID_1ST_BG		(68)
+#define GRID_2ND_BG		(77)
+#define GRID_FOCUS_BG		(78)
+#define GRID_LINE_CLR		(65)
+#define GRID_HEAD_CLR		(74)
+#define GRID_HEAD_TEXT_CLR	(76)
+#define GRID_TEXT_CLR		(69)
+#define GRID_BACK_CLR		(68)
+#define GRID_CELL_HEIGHT	(18)
+#define GRID_SBAR_WIDTH		(18)
+
+enum { CC_MDIF=0, CC_MGJV, CC_GVOL, CC_DIFF, CC_CURR, C_HSGA, CP_CURR, CP_DIFF, CP_GVOL, CP_MGJV, CP_MDIF };
+enum { OC_JEGA=0, OC_KOGA, OC_SIGA, OC_GVOL, OC_CURR, O_HSGA, OP_CURR, OP_GVOL, OP_SIGA, OP_KOGA, OP_JEGA };
+
+#endif

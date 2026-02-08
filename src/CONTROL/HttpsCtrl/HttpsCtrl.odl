@@ -1,0 +1,53 @@
+// HttpsCtrl.odl : type library source for HttpsCtrl.dll
+
+// This file will be processed by the MIDL compiler to produce the
+// type library (HttpsCtrl.tlb).
+
+[ uuid(F42873CD-4F31-40A7-BADB-61CAD793C9CD), version(1.0) ]
+library HttpsCtrl
+{
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+
+
+
+
+	//  Primary dispatch interface for CControlWnd
+	
+	[ uuid(58553D20-F769-4AB6-AF78-3CAA7E115074) ]
+	dispinterface IControlWnd
+	{
+		properties:
+			// NOTE - ClassWizard will maintain property information here.
+			//    Use extreme caution when editing this section.
+			//{{AFX_ODL_PROP(CControlWnd)
+			//}}AFX_ODL_PROP
+			
+		methods:
+			// NOTE - ClassWizard will maintain method information here.
+			//    Use extreme caution when editing this section.
+			//{{AFX_ODL_METHOD(CControlWnd)
+			[id(1)] void ConnectServer(BSTR strGetPost, BSTR strServer, BSTR strExt, BSTR strPort);
+			[id(2)] BSTR SendHttps();
+			[id(3)] long SetHttpsInfo(BSTR strEmKind, BSTR strEmName, BSTR strEmData);
+			[id(4)] void SetHttpsSendMode(BSTR sKind);
+			[id(5)] BSTR ConvertUtf8(BSTR strValue);
+			[id(6)] BSTR ConvertAnsi(BSTR strValue);
+			[id(7)] BSTR Base64Encode(BSTR strValue);
+			[id(8)] BSTR Base64decode(BSTR strValue);
+			[id(9)] BSTR ConvertUtf8Len(BSTR strValue, short nLen);
+			//}}AFX_ODL_METHOD
+
+	};
+
+	//  Class information for CControlWnd
+
+	[ uuid(FA9F9D53-2456-4680-B420-DAE867CDFEF7) ]
+	coclass ControlWnd
+	{
+		[default] dispinterface IControlWnd;
+	};
+
+	//{{AFX_APPEND_ODL}}
+	//}}AFX_APPEND_ODL}}
+};

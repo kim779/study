@@ -1,0 +1,122 @@
+<html><head><title>SystemTradingHelp</title>
+
+<style>
+<!--
+font.link { color: blue; text-decoration: underline; CURSOR: hand }
+-->
+</style>
+</head>
+
+<BODY topmargin="2" leftmargin="4">
+
+<div id="contextitems" style="font-style: normal; font-variant: normal; font-weight: normal; line-height: 11pt; font-size: 12pt; font-family: Tahoma, Verdana; color: #000000; background-color: window; text-align: Left; text-indent: 0; margin-left: 0; margin-right: 0; margin-top: 0">
+  <B>EXITLONG</B>
+  <div style="line-height: 15pt;font-size: 9pt">
+    <br>Use possible script<br>
+  </div>
+  <div style="line-height: 11pt;font-size: 9pt;margin-left: 15">
+    <B>- Trade Station</B><br>
+    <B>- Yes Language</B>&nbsp;(Hanhwa Securities)<br>
+  </div>
+
+</div>
+
+<br>
+
+<table width=100% cellspacing=0 cellpadding=0 border=0>
+<tr><td width=100% height=1 bgcolor=#C6CBD4></td></tr>
+</table>
+
+<div id="contextitems" style="font-style: normal; font-variant: normal; font-weight: normal; line-height: 11pt; font-size: 9pt; font-family: Tahoma, Verdana; color: #000000; background-color: window; text-align: Left; text-indent: 0; margin-left: 0; margin-right: 0; margin-top: 0">
+  <br>
+  <div><B>EXITLONG</B> It is <u>an order function</u> which clears all buying over position.<br>
+  </div>
+</div>
+
+<br>
+
+<div id="contextitems" style="font-style: normal; font-variant: normal; font-weight: normal; line-height: 11pt; font-size: 9pt; font-family: Tahoma, Verdana; color: #000000; background-color: #DDDDDD; text-align: Left; text-indent: 0; margin-left: 0; margin-right: 0; margin-top: 0">
+  <b>EXITLONG</b> (<br>
+  &nbsp;&nbsp;<I>strName</I>, <br>
+  &nbsp;&nbsp;<I>nType</I>, <br>
+  &nbsp;&nbsp;<I>nPrice</I> <br>
+  ); <br>
+  
+  <br><B>Parameter 1</B> <I>strName</I>
+  <div style="line-height: 16pt;margin-left: 15;">
+  [strName] Enumerate the name of signal indication.
+  </div>
+  <br><B>Parameter 2</B> <I>nType</I>
+  <div style="line-height: 16pt;margin-left: 15;">
+  [nType (optional)] Select one among below signal indication types.
+  <table width="92%" cellspacing=0 cellpadding=0 border=2 height="105" style="border-collapse: collapse" bordercolor="#111111">
+    <tr><td width="14%" height=21 bgcolor=#C6CBD4 align="center"><font size="2">
+      nType</font></td><td width="86%" height=21 bgcolor=#C6CBD4 align="center">
+      <font size="2">Description</font></td></tr>
+    <tr><td width="14%" height=21 bgcolor=#C6CBD4 align="center"><font size="2">
+      ONCLOSE</font></td><td width="86%" height=21 bgcolor=#C6CBD4>
+       <font size="2">Order by close price of base BAR,Order by open price of next BAR in real trading(Default value)</font></td></tr>
+    <tr><td width="14%" height=22 bgcolor=#C6CBD4 align="center"><font size="2">
+      ATMARKET</font></td><td width="86%" height=22 bgcolor=#C6CBD4>
+      font size="2">Order by open price of next BAR</font></td></tr>
+    <tr><td width="14%" height=21 bgcolor=#C6CBD4 align="center"><font size="2">
+      ATLIMIT</font></td><td width="86%" height=21 bgcolor=#C6CBD4>
+      <font size="2">In case of buying over position order(BUY , EXITSHORT),Order below a limit(<I>nPrice</I>) in order not to be buying over entry(BUY) above specific price or selling over clearing entry(EXITSHORT).<br>
+                     In case of selling over position order(SELL , EXITLONG),Order over a limit(<I>nPrice</I>) in order not to be selling over entry(SELL) below specific price or buying over clearing entry(EXITLONG). 
+                           </font></td></tr>
+      <tr><td width="14%" height=20 bgcolor=#C6CBD4 align="center"><font size="2">
+      ATSTOP</font></td><td width="86%" height=20 bgcolor=#C6CBD4>
+       <font size="2">In case of buying over position order(BUY , EXITSHORT),When becomes over designated price ,puts in order.
+                      <br>In case of selling over position order(SELL, EXITLONG),when becomes below designated price ,puts in order. 
+           </font></td></tr>
+  </table>
+  </div>
+  <br><B>Parameter 3</B> <I>nPrice</I>
+  <div style="line-height: 16pt;margin-left: 15;">
+  [nPrice (optional)] Enumerate the order price.<br> In case of ATLIMIT or ATSTOP,an order price becomes a target price and will be ignored the order price of ONCLOSE or ATMARKET.
+                      This order price is not releation with actual order price.
+                      In ONCLOSE, ATMARKET, <I>nPrice</I> is disregarded(DEF transact).
+                      In ATLIMIT, ATSTOP,becomes limit price.
+                      Only the limit price which confirms the point of view of an order,the order by this order price doesn't put.
+                      Actual order price puts an order by the price which it sets from the attribute window of system trading. 
+   </div>
+
+  <br><B>Examples</B>
+  <div style="line-height: 16pt;margin-left: 15;">
+  VAR : bBUYCond(FALSE);<br>
+  If bBUYCond Then Begin <br>
+  &nbsp;&nbsp;BUY("B_AB");<br>
+  &nbsp;&nbsp;<b>EXITLONG</b>("EL_AB");<br>
+  End;<br>
+  // To follow in codintion of  bBUYCond, takes an order of new buying over position by ONCLOSE type and represents signal name with "B_AB"<br>
+  // To follow in codintion of  bBUYCond, takes an order of buying over position clearing by ONCLOSE type and represents signal name with "EL_AB"<br>
+  </div>
+</div>
+
+<div id="contextitems" style="font-style: normal; font-variant: normal; font-weight: normal; line-height: 11pt; font-size: 9pt; font-family: Tahoma, Verdana; color: #000000; background-color: window; text-align: Left; text-indent: 0; margin-left: 0; margin-right: 0; margin-top: 0">
+  <br>
+  <B>관련함수</B>
+  <div style="line-height: 16pt;margin-left: 15;">
+  &nbsp;&nbsp;<a href="BUY.htm">BUY</a>
+  &nbsp;&nbsp;<a href="SELL.htm">SELL</a>
+  &nbsp;&nbsp;<a href="EXITSHORT.htm">EXITSHORT</a>
+  </div>
+</div>
+
+<br>
+
+<table width=100% cellspacing=0 cellpadding=0 border=0>
+<tr><td width=100% height=1 bgcolor=#C6CBD4></td></tr>
+</table>
+
+<br>
+
+<div id="home_s"><img src="ctxhelp_hide.gif" width="16" height="16">&nbsp;<a href="reservedlist.htm">Return to list..</a>
+</div>
+
+<div id="home_s"><img src="ctxhelp_hide.gif" width="16" height="16">&nbsp;<a href="dynamic_help.htm">Return to begin..</a>
+</div>
+
+</body>
+
+</html>

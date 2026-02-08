@@ -1,0 +1,57 @@
+// BrowserCtrl.odl : type library source for BrowserCtrl.dll
+
+// This file will be processed by the MIDL compiler to produce the
+// type library (BrowserCtrl.tlb).
+
+[ uuid(F42873CD-4F31-40A7-BADB-61CAD793C9CD), version(1.0) ]
+library BrowserCtrl
+{
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+
+
+
+
+	//  Primary dispatch interface for CControlWnd
+	
+	[ uuid(58553D20-F769-4AB6-AF78-3CAA7E115074) ]
+	dispinterface IControlWnd
+	{
+		properties:
+			// NOTE - ClassWizard will maintain property information here.
+			//    Use extreme caution when editing this section.
+			//{{AFX_ODL_PROP(CControlWnd)
+			[id(8)] boolean visible;
+			[id(9)] BSTR Text;
+			[id(10)] long Left;
+			[id(11)] long Top;
+			[id(12)] long Right;
+			[id(13)] long Bottom;
+			//}}AFX_ODL_PROP
+			
+		methods:
+			// NOTE - ClassWizard will maintain method information here.
+			//    Use extreme caution when editing this section.
+			//{{AFX_ODL_METHOD(CControlWnd)
+			[id(1)] void viewURL(BSTR url);
+			[id(2)] void Print();
+			[id(3)] void Save(BSTR strType, BSTR strTitle, BSTR strCodeName, BSTR strDate, BSTR strTime, BSTR strSubType, BSTR strCode, BSTR strKey);
+			[id(4)] void PrintData(BSTR sData, BSTR sTime);
+			[id(5)] void navigate(BSTR url);
+			[id(6)] void Refresh();
+			[id(7)] void SetRect(long left, long top, long right, long bottom);
+			//}}AFX_ODL_METHOD
+
+	};
+
+	//  Class information for CControlWnd
+
+	[ uuid(FA9F9D53-2456-4680-B420-DAE867CDFEF7) ]
+	coclass ControlWnd
+	{
+		[default] dispinterface IControlWnd;
+	};
+
+	//{{AFX_APPEND_ODL}}
+	//}}AFX_APPEND_ODL}}
+};

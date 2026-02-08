@@ -1,0 +1,51 @@
+// CX_Cfg.odl : type library source for CX_Cfg.dll
+
+// This file will be processed by the MIDL compiler to produce the
+// type library (CX_Cfg.tlb).
+
+[ uuid(45FA8D9F-C417-4A2A-81B2-1E400AE63159), version(1.0) ]
+library CX_Cfg
+{
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+
+	//  Primary dispatch interface for CControlWnd
+	
+	[ uuid(CF5D97B6-E166-469E-AD3C-845A7E92859D) ]
+	dispinterface IControlWnd
+	{
+		properties:
+			// NOTE - ClassWizard will maintain property information here.
+			//    Use extreme caution when editing this section.
+			//{{AFX_ODL_PROP(CControlWnd)
+			//}}AFX_ODL_PROP
+			
+		methods:
+			// NOTE - ClassWizard will maintain method information here.
+			//    Use extreme caution when editing this section.
+			//{{AFX_ODL_METHOD(CControlWnd)
+			[id(1)] boolean SetMap(BSTR PrivateCfgName, BSTR PublicCfgName, BSTR CfgMapName);
+			[id(2)] boolean ShowDlg();
+			[id(3)] BSTR ReadCfg(BSTR Ident);
+			[id(4)] void LoadDefaultCfg();
+			[id(5)] void SaveCfg();
+			[id(6)] void WriteCfg(BSTR Ident, BSTR Value);
+			[id(7)] void LoadCfg();
+			[id(8)] void SetCfgDlg(BSTR CfgMapName);
+			[id(9)] void SetPrivateCfgName(BSTR PrivateCfgName);
+			[id(10)] void SetPublicCfgName(BSTR PublicCfgName);
+			//}}AFX_ODL_METHOD
+
+	};
+
+	//  Class information for CControlWnd
+
+	[ uuid(31F8F6B3-386D-4438-8DE2-09A1D3E0229F) ]
+	coclass ControlWnd
+	{
+		[default] dispinterface IControlWnd;
+	};
+
+	//{{AFX_APPEND_ODL}}
+	//}}AFX_APPEND_ODL}}
+};

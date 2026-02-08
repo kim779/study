@@ -1,0 +1,46 @@
+// Info.odl : type library source for Info.dll
+
+[ uuid(59ADE3EE-9DA4-4ADA-8E68-439855CF2831), version(1.0) ]
+library Info
+{
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+
+
+
+
+	//  Primary dispatch interface for CComponent
+	
+	[ uuid(983D6E36-76BE-439C-A2BE-C560978D446B) ]
+	dispinterface IComponent
+	{
+		properties:
+			// NOTE - ClassWizard will maintain property information here.
+			//    Use extreme caution when editing this section.
+			//{{AFX_ODL_PROP(CComponent)
+			//}}AFX_ODL_PROP
+			
+		methods:
+			// NOTE - ClassWizard will maintain method information here.
+			//    Use extreme caution when editing this section.
+			//{{AFX_ODL_METHOD(CComponent)
+			[id(1)] BSTR GetInfoData(long nKind, BSTR sFileName, BSTR sSearchKey);
+			[id(2)] BSTR PopData(BSTR sUserName, BSTR sIniFileName, BSTR sSectionName, BSTR sKey);
+			[id(3)] void PushData(BSTR sUserName, BSTR sIniFileName, BSTR sSectionName, BSTR sKey, BSTR sData);
+			[id(4)] BSTR Pop(BSTR sSectionName, BSTR sKey);
+			[id(5)] void Push(BSTR sSectionName, BSTR sKey, BSTR sData);
+			//}}AFX_ODL_METHOD
+
+	};
+
+	//  Class information for CComponent
+
+	[ uuid(64248148-A8EC-42A8-8533-B693299CD7E3) ]
+	coclass Component
+	{
+		[default] dispinterface IComponent;
+	};
+
+	//{{AFX_APPEND_ODL}}
+	//}}AFX_APPEND_ODL}}
+};

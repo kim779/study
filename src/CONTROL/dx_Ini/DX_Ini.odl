@@ -1,0 +1,55 @@
+// DX_Ini.odl : type library source for DX_Ini.dll
+
+// This file will be processed by the MIDL compiler to produce the
+// type library (DX_Ini.tlb).
+
+[ uuid(27D91107-C3CB-43FB-9BD1-CC40706CF7E3), version(1.0) ]
+library DX_Ini
+{
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+
+
+
+
+	//  Primary dispatch interface for CComponent
+	
+	[ uuid(7A007DA4-C484-4E1E-9405-4351E06506D4) ]
+	dispinterface IComponent
+	{
+		properties:
+			// NOTE - ClassWizard will maintain property information here.
+			//    Use extreme caution when editing this section.
+			//{{AFX_ODL_PROP(CComponent)
+			//}}AFX_ODL_PROP
+			
+		methods:
+			// NOTE - ClassWizard will maintain method information here.
+			//    Use extreme caution when editing this section.
+			//{{AFX_ODL_METHOD(CComponent)
+			[id(1)] boolean Open(BSTR FileName);
+			[id(2)] boolean SectionExists(BSTR SectionName);
+			[id(3)] long ReadInteger(BSTR Section, BSTR Ident, long Default);
+			[id(4)] BSTR ReadString(BSTR Section, BSTR Ident, BSTR Default);
+			[id(5)] double ReadFloat(BSTR Section, BSTR Ident, double Default);
+			[id(6)] boolean ReadBoolean(BSTR Section, BSTR Ident, BOOL Default);
+			[id(7)] void WriteFloat(BSTR Section, BSTR Ident, double Value);
+			[id(8)] void WriteInteger(BSTR Section, BSTR Ident, long Value);
+			[id(9)] void WriteString(BSTR Section, BSTR Ident, BSTR Value);
+			[id(10)] void WriteBoolean(BSTR Section, BSTR Ident, BOOL Value);
+			[id(11)] void Close();
+			//}}AFX_ODL_METHOD
+
+	};
+
+	//  Class information for CComponent
+
+	[ uuid(89BA91A4-71EA-437E-96E0-41340F600339) ]
+	coclass Component
+	{
+		[default] dispinterface IComponent;
+	};
+
+	//{{AFX_APPEND_ODL}}
+	//}}AFX_APPEND_ODL}}
+};

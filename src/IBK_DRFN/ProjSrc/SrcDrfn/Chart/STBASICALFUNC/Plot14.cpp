@@ -1,0 +1,27 @@
+// Plot14.cpp: implementation of the CPlot14 class.
+//
+//////////////////////////////////////////////////////////////////////
+
+#include "stdafx.h"
+#include "Plot14.h"
+
+#ifdef _DEBUG
+#undef THIS_FILE
+static char THIS_FILE[]=__FILE__;
+#define new DEBUG_NEW
+#endif
+
+//////////////////////////////////////////////////////////////////////
+// Construction/Destruction
+//////////////////////////////////////////////////////////////////////
+
+CPlot14::CPlot14()
+{
+	m_strName = "PLOT14";
+	m_lIndex = 13;
+}
+
+CPlot14::~CPlot14()
+{
+
+}

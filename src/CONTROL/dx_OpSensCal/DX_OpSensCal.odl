@@ -1,0 +1,69 @@
+// DX_OpSensCal.odl : type library source for DX_OpSensCal.dll
+
+// This file will be processed by the MIDL compiler to produce the
+// type library (DX_OpSensCal.tlb).
+
+[ uuid(8C825929-C2B5-41c1-8C0A-C7003E2627C4), version(1.0) ]
+library DX_OpSensCal
+{
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+
+	//  Primary dispatch interface for CComponent
+	
+	[ uuid(884DF6AE-C71F-4d50-8AA1-F9118DD0BD8D) ]
+	dispinterface IComponent
+	{
+		properties:
+			// NOTE - ClassWizard will maintain property information here.
+			//    Use extreme caution when editing this section.
+			//{{AFX_ODL_PROP(CComponent)
+			[id(1)] BSTR JCode;
+			[id(2)] BSTR BedangJisu;
+			[id(3)] BSTR Strike;
+			[id(4)] BSTR CurrValue;
+			[id(5)] BSTR CD;
+			[id(6)] BSTR Delta;
+			[id(7)] BSTR Gamma;
+			[id(8)] BSTR Theta;
+			[id(9)] BSTR Rho;
+			[id(10)] BSTR Vegga;
+			[id(11)] BSTR TheoryValue;
+			[id(12)] BSTR IV;
+			[id(13)] BSTR BzRemainDays;
+			[id(14)] BSTR CalRemainDays;
+			[id(15)] BSTR K200Cur;
+			[id(16)] BSTR FutureCur;
+			[id(17)] BSTR Time;
+			[id(18)] BSTR UserName;
+			//}}AFX_ODL_PROP
+			
+		methods:
+			// NOTE - ClassWizard will maintain method information here.
+			//    Use extreme caution when editing this section.
+			//{{AFX_ODL_METHOD(CComponent)
+			[id(19)] void Calc(long CalcItem);
+			[id(20)] void ReadCfg();
+			[id(21)] void SetHv(BSTR Hv90, BSTR Hv60, BSTR Hv30, BSTR Hv21);
+			[id(22)] void symIV(BSTR sym);
+			[id(23)] void symDELTA(BSTR sym);
+			[id(24)] void symGAMMA(BSTR sym);
+			[id(25)] void symTHETA(BSTR sym);
+			[id(26)] void symVEGGA(BSTR sym);
+			[id(27)] void symRHO(BSTR sym);
+			[id(28)] void CalcEx(BSTR cur, BSTR k200cur, BSTR fcur, BSTR time);
+			//}}AFX_ODL_METHOD
+
+	};
+
+	//  Class information for CComponent
+
+	[ uuid(1419CE6D-587C-4d6c-A048-E5BB52C1F566) ]
+	coclass Component
+	{
+		[default] dispinterface IComponent;
+	};
+
+	//{{AFX_APPEND_ODL}}
+	//}}AFX_APPEND_ODL}}
+};

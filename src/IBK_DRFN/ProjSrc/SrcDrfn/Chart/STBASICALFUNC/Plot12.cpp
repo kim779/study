@@ -1,0 +1,27 @@
+// Plot12.cpp: implementation of the CPlot12 class.
+//
+//////////////////////////////////////////////////////////////////////
+
+#include "stdafx.h"
+#include "Plot12.h"
+
+#ifdef _DEBUG
+#undef THIS_FILE
+static char THIS_FILE[]=__FILE__;
+#define new DEBUG_NEW
+#endif
+
+//////////////////////////////////////////////////////////////////////
+// Construction/Destruction
+//////////////////////////////////////////////////////////////////////
+
+CPlot12::CPlot12()
+{
+	m_strName = "PLOT12";
+	m_lIndex = 11;
+}
+
+CPlot12::~CPlot12()
+{
+
+}

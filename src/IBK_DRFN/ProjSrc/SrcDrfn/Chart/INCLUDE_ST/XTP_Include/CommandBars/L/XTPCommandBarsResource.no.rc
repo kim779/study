@@ -1,0 +1,234 @@
+
+#include "../XTPCommandBarsResource.h"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Cursor
+//
+
+XTP_IDC_COMMANDBARS_DRAGCOPY CURSOR  DISCARDABLE     "CommandBars/res/dragcopypro.cur"
+XTP_IDC_COMMANDBARS_DRAGMOVE CURSOR  DISCARDABLE     "CommandBars/res/dragmovepro.cur"
+XTP_IDC_COMMANDBARS_DRAGDELETE CURSOR  DISCARDABLE     "CommandBars/res/dragdeletepro.cur"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+XTP_IDD_PAGE_TOOLBARS DIALOG DISCARDABLE  0, 0, 344, 151
+STYLE WS_CHILD | WS_CAPTION
+CAPTION "Tool&bars"
+FONT 8, "MS Sans Serif"
+BEGIN
+    LISTBOX         XTP_IDC_LIST_TOOLBARS,2,16,252,132,LBS_OWNERDRAWFIXED | 
+                    LBS_HASSTRINGS | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | 
+                    WS_TABSTOP
+    PUSHBUTTON      "&New...",XTP_IDC_BUTTON_NEW,259,16,78,14
+    LTEXT           "Toolb&ars:",IDC_STATIC,2,4,191,8
+    PUSHBUTTON      "&Rename...",XTP_IDC_BUTTON_RENAME,259,35,78,14
+    PUSHBUTTON      "Delete",XTP_IDC_BUTTON_DELETE,259,53,78,14
+    PUSHBUTTON      "&Reset...",XTP_IDC_BUTTON_RESET,259,72,78,14
+END
+
+XTP_IDD_PAGE_OPTIONS DIALOG DISCARDABLE  0, 0, 344, 151
+STYLE WS_CHILD | WS_CAPTION
+CAPTION "&Options"
+FONT 8, "MS Sans Serif"
+BEGIN
+    LTEXT           "Personalized Menus and Toolbars",IDC_STATIC,7,6,108,8
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,119,10,215,1
+    CONTROL         "Always show full me&nus",XTP_IDC_CHECK_FULL_MENUS,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,16,17,290,10
+    CONTROL         "Show full menus after a short delay",
+                    XTP_IDC_CHECK_AFTERDELAY,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,27,29,290,10
+    PUSHBUTTON      "&Reset my usage data",XTP_IDC_BUTTON_RESETDATA,16,42,78,
+                    14
+    LTEXT           "Other",IDC_STATIC,7,70,18,8
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,29,74,304,1
+    CONTROL         "&Large icons",XTP_IDC_CHECK_LARGEICONS,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,16,82,290,10
+    CONTROL         "Show Screen&Tips on toolbars",XTP_IDC_CHECK_SCREENTTIPS,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,16,93,290,10
+    CONTROL         "Show s&hortcut keys in ScreenTips",
+                    XTP_IDC_CHECK_SHORTCUTS,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,28,104,290,10
+END
+
+XTP_IDD_PAGE_COMMANDS DIALOG DISCARDABLE  0, 0, 344, 151
+STYLE WS_CHILD | WS_CAPTION
+CAPTION "&Commands"
+FONT 8, "MS Sans Serif"
+BEGIN
+    LTEXT           "To add a command to a toolbar: select a category and drag the command out of this dialog  box to a toolbar.",
+                    IDC_STATIC,2,3,255,19
+    LTEXT           "Cate&gories:",IDC_STATIC,2,25,80,8
+    LISTBOX         XTP_IDC_LIST_CATEGORIES,2,35,129,103,
+                    LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Comman&ds:",IDC_STATIC,143,25,80,8
+    LISTBOX         XTP_IDC_LIST_COMMANDS,141,35,198,103,LBS_OWNERDRAWFIXED | 
+                    LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+END
+
+XTP_IDD_NEWTOOLBAR DIALOG DISCARDABLE  0, 0, 186, 52
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "New Toolbar"
+FONT 8, "MS Sans Serif"
+BEGIN
+    LTEXT           "&Toolbar name:",IDC_STATIC,4,4,100,8
+    EDITTEXT        XTP_IDC_EDIT_TOOLBARNAME,4,15,178,12,ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "OK",IDOK,78,34,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,132,34,50,14
+END
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+XTP_IDR_CUSTOMIZEMENU MENU DISCARDABLE 
+BEGIN
+    POPUP "Customize"
+    BEGIN
+        MENUITEM "&Reset",                      XTP_ID_CUSTOMIZE_RESET
+        MENUITEM "&Delete",                     XTP_ID_CUSTOMIZE_DELETE
+        MENUITEM SEPARATOR
+        MENUITEM "&Name:",                      XTP_ID_CUSTOMIZE_NAME
+        MENUITEM SEPARATOR
+        MENUITEM "&Copy Button Image",          XTP_ID_CUSTOMIZE_COPYBUTTONIMAGE
+
+        MENUITEM "&Paste Button Image",         XTP_ID_CUSTOMIZE_PASTEBUTTONIMAGE
+
+        MENUITEM "Re&set Button Image",         XTP_ID_CUSTOMIZE_RESETBUTTONIMAGE
+
+        MENUITEM "&Edit Button Image...",       XTP_ID_CUSTOMIZE_EDITBUTTONIMAGE
+
+        MENUITEM "Change &Button Image",        XTP_ID_CUSTOMIZE_CHANGEBUTTONIMAGE
+
+        MENUITEM SEPARATOR
+        MENUITEM "Defa&ult Style",              XTP_ID_CUSTOMIZE_DEFAULTSTYLE
+
+        MENUITEM "&Text Only",                  XTP_ID_CUSTOMIZE_TEXTONLY
+        MENUITEM "Image &and Text",             XTP_ID_CUSTOMIZE_IMAGEANDTEXT
+
+        MENUITEM SEPARATOR
+        MENUITEM "Begin a &Group",              XTP_ID_CUSTOMIZE_BEGINAGROUP
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    XTP_IDS_ADDORREMOVE     "Add or Remove Buttons"
+    XTP_IDS_CUSTOMIZE_CLOSE "Close"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    XTP_IDS_CUSTOMIZE       "Customize"
+    XTP_IDS_NEWMENU         "New Menu"
+    XTP_IDS_BUILTINMENUS	"Built-in Menus"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    XTP_IDS_CUSTOM_BAR      "Custom %d"
+    XTP_IDS_ERROR_BLANKNAME "The toolbar name cannot be blank. Type a name."
+    XTP_IDS_ERROR_LIMIT     "Sorry you have reached your limit."
+    XTP_IDS_ERROR_EXISTS    "A toolbar named '%s' already exists. Type another name."
+    XTP_IDS_RENAMETOOLBAR   "Rename Toolbar"
+    XTP_IDS_CONFIRM_DELETE  "Are you sure you want to delete the '%s' toolbar?"
+    XTP_IDS_ALLCOMMANDS     "All Commands"
+	XTP_IDS_CONFIRM_RESETDATA "This will delete the record of the commands you've used in this application and restore the default set of visible commands to the menus and toolbars.  It will not undo any explicit customizations.  Are you sure you want to do this?"
+	XTP_IDS_CONFIRM_RESET   "Are you sure you want to reset the changes made to the '%s' toolbar?"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    XTP_ID_CUSTOMIZE        "&Customize..."
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    XTP_IDS_CLR_INDIGO       "Indigo"
+    XTP_IDS_CLR_GRAY80       "Gray-80%"
+    XTP_IDS_CLR_DARK_RED     "Dark Red"
+    XTP_IDS_CLR_ORANGE       "Orange"
+    XTP_IDS_CLR_DARK_YELLOW  "Dark Yellow"
+    XTP_IDS_CLR_GREEN        "Green"
+    XTP_IDS_CLR_TEAL         "Teal"
+    XTP_IDS_CLR_BLUE         "Blue"
+    XTP_IDS_CLR_BLUEGRAY     "Blue Gray"
+    XTP_IDS_CLR_GRAY50       "Gray-50%"
+    XTP_IDS_CLR_RED          "Red"
+    XTP_IDS_CLR_LIGHTORANGE  "Light Orange"
+    XTP_IDS_CLR_LIME         "Lime"
+    XTP_IDS_CLR_SEA_GREEN    "Sea Green"
+    XTP_IDS_CLR_AQUA         "Aqua"
+    XTP_IDS_CLR_LIGHT_BLUE   "Light Blue"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    XTP_IDS_CLR_VIOLET       "Violet"
+    XTP_IDS_CLR_GRAY40       "Gray-40%"
+    XTP_IDS_CLR_PINK         "Pink"
+    XTP_IDS_CLR_GOLD         "Gold"
+    XTP_IDS_CLR_YELLOW       "Yellow"
+    XTP_IDS_CLR_BRIGHT_GREEN "Bright Green"
+    XTP_IDS_CLR_TURQUOISE    "Turquiose"
+    XTP_IDS_CLR_SKY_BLUE     "Sky Blue"
+    XTP_IDS_CLR_PLUM         "Plum"
+    XTP_IDS_CLR_GRAY25       "Gray-25%"
+    XTP_IDS_CLR_ROSE         "Rose"
+    XTP_IDS_CLR_TAN          "Tan"
+    XTP_IDS_CLR_LIGHT_YELLOW "Light Yellow"
+    XTP_IDS_CLR_LIGHT_GREEN  "Light Green"
+    XTP_IDS_CLR_LIGHT_TURQUOISE "Light Turquoise"
+    XTP_IDS_CLR_PALE_BLUE    "Pale Blue"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+	XTP_IDS_CLR_BLACK        "Black"
+    XTP_IDS_CLR_BROWN        "Brown"
+    XTP_IDS_CLR_OLIVE_GREEN  "Olive Green"
+    XTP_IDS_CLR_DARK_GREEN   "Dark Green"
+    XTP_IDS_CLR_DARK_TEAL    "Dark Teal"
+    XTP_IDS_CLR_DARK_BLUE    "Dark Blue"
+
+    XTP_IDS_CLR_LAVENDER     "Lavender"
+    XTP_IDS_CLR_WHITE        "White"
+    XTP_IDS_CLR_GRAY         "Gray"
+    XTP_IDS_CLR_MAROON       "Maroon"
+    XTP_IDS_CLR_OLIVE        "Olive"
+    XTP_IDS_CLR_NAVY         "Navy"
+    XTP_IDS_CLR_PURPLE       "Purple"
+    XTP_IDS_CLR_SILVER       "Silver"
+    XTP_IDS_CLR_FUCHSIA      "Fuchsia"
+
+	XTP_IDS_CLR_NOFILL       "No Color\nNo Fill"
+    XTP_IDS_AUTOMATIC        "Automatic Color\nAutomatic"
+    XTP_IDS_MORE_COLORS      "More Colors\nMore Colors..."
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+	XTP_IDS_INVALID_NUMBER      "This is not a valid number."
+    XTP_IDS_INVALID_FONTSIZE    "The number must be between 1 and 1638."
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+	XTP_ID_MENUBAR_CLOSE		"Close Window"	
+	XTP_ID_MENUBAR_RESTORE		"Restore Window"
+	XTP_ID_MENUBAR_MINIMIZE		"Minimize Window"
+	XTP_ID_TOOLBAR_EXPAND		"Toolbar Options"
+	XTP_ID_TOOLBAR_HIDE			"Close"
+END
+

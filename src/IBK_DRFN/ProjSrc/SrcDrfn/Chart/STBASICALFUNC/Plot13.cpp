@@ -1,0 +1,27 @@
+// Plot13.cpp: implementation of the CPlot13 class.
+//
+//////////////////////////////////////////////////////////////////////
+
+#include "stdafx.h"
+#include "Plot13.h"
+
+#ifdef _DEBUG
+#undef THIS_FILE
+static char THIS_FILE[]=__FILE__;
+#define new DEBUG_NEW
+#endif
+
+//////////////////////////////////////////////////////////////////////
+// Construction/Destruction
+//////////////////////////////////////////////////////////////////////
+
+CPlot13::CPlot13()
+{
+	m_strName = "PLOT13";
+	m_lIndex = 12;
+}
+
+CPlot13::~CPlot13()
+{
+
+}

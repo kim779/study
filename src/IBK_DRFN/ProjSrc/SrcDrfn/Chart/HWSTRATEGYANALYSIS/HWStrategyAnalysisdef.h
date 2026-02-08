@@ -1,0 +1,6 @@
+#define STFILEDIR		"\\STDll\\*.ST"
+
+
+
+
+

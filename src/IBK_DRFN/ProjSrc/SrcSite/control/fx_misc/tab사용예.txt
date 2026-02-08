@@ -1,0 +1,40 @@
+< tab  getBitmap() 으로 이미지적용 >
+	sy = ey + 1; ey = sy + 50; itemRC.SetRect(sx, sy, ex, ey);
+	m_pTab = new CfxTab();
+	m_pTab->Create(itemRC, this, ID_PUTGRID);
+
+	CString path, IMAGEDIR("Image"), img("TAB.BMP");
+	path.Format("%s\\%s\\l_s%s", m_sRoot, IMAGEDIR, img);	m_bmpSelL = getBitmap(path)->operator HBITMAP();
+	path.Format("%s\\%s\\s%s",   m_sRoot, IMAGEDIR, img);	m_bmpSelM = getBitmap(path)->operator HBITMAP();
+	path.Format("%s\\%s\\r_s%s", m_sRoot, IMAGEDIR, img);	m_bmpSelR = getBitmap(path)->operator HBITMAP();
+	path.Format("%s\\%s\\l_%s",  m_sRoot, IMAGEDIR, img);	m_bmpL = getBitmap(path)->operator HBITMAP();
+	path.Format("%s\\%s\\%s",    m_sRoot, IMAGEDIR, img);	m_bmpM = getBitmap(path)->operator HBITMAP();
+	path.Format("%s\\%s\\r_%s",  m_sRoot, IMAGEDIR, img);	m_bmpR = getBitmap(path)->operator HBITMAP();
+
+	path.Format("%s\\%s", m_sRoot, IMAGEDIR);
+	m_pTab->SetImage(m_bmpSelL, m_bmpSelM, m_bmpSelR, m_bmpL, m_bmpM, m_bmpR);
+	m_pTab->SetColor(RGB(255, 255, 255), NULL, RGB(0, 0, 0), NULL, RGB(255, 255, 255));
+
+	m_pTab->InsertItem(0, "체결");
+	m_pTab->InsertItem(1, "일간");
+	m_pTab->InsertItem(2, "체결가별");
+	m_pTab->InsertItem(3, "챠트");
+	m_pTab->InsertItem(4, "정보");
+	m_pTab->SetStyle(tsIMAGE, true);
+
+< tab  파일명으로 이미지적용 >
+	sy = ey + 1; ey = sy + 50; itemRC.SetRect(sx, sy, ex, ey);
+	m_pTab = new CfxTab();
+	m_pTab->Create(itemRC, this, ID_PUTGRID);
+
+	CString path;
+	path.Format("%s\\%s", m_sRoot, IMAGEDIR);
+	m_pTab->SetImage(path, "l_sTAB.BMP", "sTAB.BMP", "r_sTAB.BMP", "l_TAB.BMP", "TAB.BMP", "r_TAB.BMP");
+	m_pTab->SetColor(RGB(255, 255, 255), NULL, RGB(0, 0, 0), NULL, RGB(255, 255, 255));
+
+	m_pTab->InsertItem(0, "체결");
+	m_pTab->InsertItem(1, "일간");
+	m_pTab->InsertItem(2, "체결가별");
+	m_pTab->InsertItem(3, "챠트");
+	m_pTab->InsertItem(4, "정보");
+	m_pTab->SetStyle(tsIMAGE, true);

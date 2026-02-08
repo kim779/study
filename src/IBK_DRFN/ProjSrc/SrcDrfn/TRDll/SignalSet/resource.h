@@ -1,0 +1,126 @@
+//{{NO_DEPENDENCIES}}
+// Microsoft Developer Studio generated include file.
+// Used by SignalSet.rc
+//
+#define IDC_TAB_SET                     1000
+#define IDC_BTN_INIT                    1005
+#define IDC_BTN_OK                      1010
+#define IDC_BTN_APPLY                   1015
+#define IDC_BTN_CANCEL                  1020
+#define IDC_WND_NEWSSET                 1030
+#define IDC_WND_SYSSET                  1040
+#define IDC_WND_USERSET                 1050
+#define IDC_WND_FILTERSET               1060
+#define IDC_WND_SOUNFSET                1070
+#define IDC_BTN_SETNEWS                 1080
+#define IDC_BTN_SETSYS                  1090
+#define IDC_BTN_SETFILTER               1100
+#define IDC_STATIC_TITLEPOINT           1110
+#define IDC_SIATIC_SUBTITLEPOINT        1120
+#define IDC_SIATIC_SUBTITLE             1130
+#define IDC_STATIC_TITLENAME            1140
+#define IDC_GRID_KEYWORD                2000
+#define IDC_EDIT_FIND                   2010
+#define IDC_BTN_PRE                     2011
+#define IDC_BTN_NEXT                    2012
+#define IDC_BTN_ADD                     2020
+#define IDC_BTN_DELETE                  2030
+#define IDC_BTN_TIP                     2040
+#define IDC_BTN_LEFT                    2050
+#define IDC_BTN_LEFTALL                 2060
+#define IDC_BTN_RIGHT                   2070
+#define IDC_BTN_RIGHTALL                2080
+#define IDC_GRID_SETSIGNAL              2090
+#define IDC_TREE_CONDITION              3000
+#define IDC_BTN_LINKSRC                 3010
+#define IDC_BTN_GROUPIN                 4000
+#define IDC_BTN_INCODEGROUP             4010
+#define IDC_BTN_INCODERADIO             4020
+#define IDC_COMBO_MARKET                4030
+#define IDC_COMBO_PORTGROUP             4035
+#define IDC_BTN_GROUPPRICE              4040
+#define IDC_BTN_NOWPRICECHK             4050
+#define IDC_EDIT_NOWPRICEUP             4060
+#define IDC_EDIT_NOWPRICEDOWN           4070
+#define IDC_BTN_CHANGERATECHK           4080
+#define IDC_EDIT_CHANGERATEUP           4090
+#define IDC_EDIT_CHANGERATEDOWN         4110
+#define IDC_BTN_GROUPCHANGE             4120
+#define IDC_BTN_CHANGEVALCHK            4130
+#define IDC_BTN_GROUPDEALVOL            4140
+#define IDC_BTN_DEALVOLRADIO            4150
+#define IDC_EDIT_DEALVOL                4160
+#define IDC_BTN_DEALVOLTIMERADIO        4170
+#define IDC_BTN_SETDEALVOLTIME          4180
+#define IDC_BTN_GROUPDEALPRICE          4190
+#define IDC_BTN_DEALPRICERADIO          4200
+#define IDC_EDIT_DEALPRICE              4210
+#define IDC_BTN_DEALPRICETIMERADIO      4220
+#define IDC_BTN_SETDEALPRICETIME        4230
+#define IDC_BTN_GROUPDIRECTION          4240
+#define IDC_BTN_DIRECTIONCHK            4250
+#define IDC_BTN_GROUPOUTCODE            4260
+#define IDC_BTN_CODEADD                 4270
+#define IDC_BTN_CODEDELETE              4280
+#define IDC_BTN_CODEDELETEALL           4290
+#define IDC_GRID_OUTCODE                4300
+#define IDC_CODEINPUT                   4310
+#define IDC_BTN_GROUPNEWS               4320
+#define IDC_BTN_NEWSRADIO               4330
+#define IDC_BTN_GROUPSOUNDSET			4340
+#define IDC_CHK_SOUND					4350
+#define IDC_EDIT_SOUND					4360
+#define IDC_BTN_SOUND					4370
+#define IDC_BTN_SEARCHSOUND				4380
+#define IDC_BTN_NEWSCHK                 5000
+#define IDC_BTN_CONDITIONCHK            5010
+#define IDC_BTN_FINDCHK                 5020
+#define IDC_COMBO_SOUND                 5030
+#define IDC_BTN_PLAY                    5040
+#define IDC_BTN_FIND                    5050
+#define IDC_BTN_REGGROUP                6000
+#define IDC_EDIT_REGS                   6010
+#define IDC_EDIT_REGV                   6020
+#define IDC_COMBO_REGPOINT              6030
+#define IDC_BTN_REGOK                   6040
+#define IDC_BTN_REGCANCEL               6050
+#define IDC_GRID_SET                    7010
+#define IDI_ICON_TREE01                 7011
+#define IDI_ICON_TREE00                 7012
+#define IDI_ICON_TREE10                 7013
+#define IDI_ICON_TREE11                 7014
+#define IDI_ICON_TREE_NORMAL            7015
+#define IDI_ICON_TREE_NONALERT          7016
+#define IDI_ICON_TREE                   7017
+#define IDI_ICON_TREE_UNIT              7018
+#define IDI_ICON_TREE_ALERT             7019
+#define IDC_COMBO_TIME                  7020
+#define IDI_ICON_TREE_ALERTUNIT         7020
+#define IDC_EDIT_VAL                    7030
+#define IDC_BTN_MODIFY                  7040
+#define IDB_BTN_DEL                     8000
+#define IDB_BTN_ADD_ALL                 8010
+#define IDB_BTN_DEL_ALL                 8020
+#define IDB_BTN_ADD                     8030
+#define IDB_BTN_SEARCH                  8040
+#define IDB_BTN_PRE                     8050
+#define IDB_BTN_NEXT                    8060
+#define IDC_CODECTRL_ITEM_SELECT        8100
+#define IDC_BTN_HELPSHOW				8110
+#define IDC_EDIT_ITEMHELP				8120
+#define IDC_NORMAL_CURSOR               8130
+#define IDD_STD_DIALOG                  10000
+#define IDD_DLG_RESKEYWORD              10100
+#define IDD_DLG_SUBFILTER               10200
+#define IDC_TAB_SEARCH					10300
+
+// Next default values for new objects
+// 
+#ifdef APSTUDIO_INVOKED
+#ifndef APSTUDIO_READONLY_SYMBOLS
+#define _APS_NEXT_RESOURCE_VALUE        11002
+#define _APS_NEXT_COMMAND_VALUE         32771
+#define _APS_NEXT_CONTROL_VALUE         11000
+#define _APS_NEXT_SYMED_VALUE           11000
+#endif
+#endif

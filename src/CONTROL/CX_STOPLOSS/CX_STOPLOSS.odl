@@ -1,0 +1,57 @@
+// CX_STOPLOSS.odl : type library source for CX_STOPLOSS.dll
+
+// This file will be processed by the MIDL compiler to produce the
+// type library (CX_STOPLOSS.tlb).
+
+[ uuid(88278EF6-9CBF-45D8-A32C-EFD1B249E51A), version(1.0) ]
+library CX_STOPLOSS
+{
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+
+
+
+
+	//  Primary dispatch interface for CMainWnd
+	
+	[ uuid(E9C65AD1-95DC-474A-92F0-A6284BF9091F) ]
+	dispinterface IMainWnd
+	{
+		properties:
+			// NOTE - ClassWizard will maintain property information here.
+			//    Use extreme caution when editing this section.
+			//{{AFX_ODL_PROP(CMainWnd)
+			//}}AFX_ODL_PROP
+			
+		methods:
+			// NOTE - ClassWizard will maintain method information here.
+			//    Use extreme caution when editing this section.
+			//{{AFX_ODL_METHOD(CMainWnd)
+			[id(1)] void SetProperties(BSTR sParam);
+			[id(2)] BSTR GetProperties();
+			[id(3)] void Start(boolean bStop);
+			[id(4)] void SetCondition(BSTR index, BSTR date, BSTR code, BSTR curr);
+			[id(5)] long GetPriceSetupValue(short iunitType, short istopType, short iconfigval, short iCodeType);
+			[id(6)] void DelCondition(BSTR index, BSTR date,BSTR code);
+			[id(7)] void Run();
+			[id(8)] long GetTickPrice(long price, short tick, short codetype, short iplus);
+			[id(9)] void SetMapHandle(long key);
+			[id(10)] BSTR GetMapHandle();
+			[id(11)] void Reset();
+			[id(12)] void WriteLog(BSTR sType, BSTR sLog, BSTR sCode, BSTR sName);
+			[id(13)] void SendTestData(BSTR code, BSTR curr);
+			//}}AFX_ODL_METHOD
+
+	};
+
+	//  Class information for CMainWnd
+
+	[ uuid(DEEF515C-838A-427E-B1F4-DF945150BFF7) ]
+	coclass MainWnd
+	{
+		[default] dispinterface IMainWnd;
+	};
+
+	//{{AFX_APPEND_ODL}}
+	//}}AFX_APPEND_ODL}}
+};

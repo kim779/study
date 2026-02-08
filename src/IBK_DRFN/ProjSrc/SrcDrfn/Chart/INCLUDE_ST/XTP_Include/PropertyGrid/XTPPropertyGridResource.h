@@ -1,0 +1,5 @@
+
+#define XTP_IDC_SORT_CATEGORIZED         9950
+#define XTP_IDC_SORT_ALPHABETIC          9951
+#define XTP_IDR_TBAR_PROPGRID            9952
+

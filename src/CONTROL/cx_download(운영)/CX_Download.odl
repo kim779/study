@@ -1,0 +1,55 @@
+// CX_Download.odl : type library source for CX_Download.dll
+
+// This file will be processed by the MIDL compiler to produce the
+// type library (CX_Download.tlb).
+
+[ uuid(4AF9D109-EB5E-46C7-85C3-1BDDA4EFF218), version(1.0) ]
+library CX_Download
+{
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+
+
+
+
+	//  Primary dispatch interface for CControlWnd
+	
+	[ uuid(BAFA4894-B12F-411D-8106-C037C5C9C8D7) ]
+	dispinterface IControlWnd
+	{
+		properties:
+			// NOTE - ClassWizard will maintain property information here.
+			//    Use extreme caution when editing this section.
+			//{{AFX_ODL_PROP(CControlWnd)
+			[id(1)] BSTR address;
+			[id(2)] BSTR protocol;
+			[id(3)] BSTR username;
+			[id(4)] BSTR pw;
+			[id(5)] BSTR filename;
+			[id(6)] BSTR directory;
+			//}}AFX_ODL_PROP
+			
+		methods:
+			// NOTE - ClassWizard will maintain method information here.
+			//    Use extreme caution when editing this section.
+			//{{AFX_ODL_METHOD(CControlWnd)
+			[id(7)] void SetProperties(BSTR str);
+			[id(8)] BSTR GetProperties();
+			[id(13)] BSTR IsDownload();
+			[id(14)] void DoDownload();
+			[id(15)] long CheckURLEnable(BSTR strUrl);
+			//}}AFX_ODL_METHOD
+
+	};
+
+	//  Class information for CControlWnd
+
+	[ uuid(E20FDEA8-E60C-428F-930F-2A2639628F13) ]
+	coclass ControlWnd
+	{
+		[default] dispinterface IControlWnd;
+	};
+
+	//{{AFX_APPEND_ODL}}
+	//}}AFX_APPEND_ODL}}
+};

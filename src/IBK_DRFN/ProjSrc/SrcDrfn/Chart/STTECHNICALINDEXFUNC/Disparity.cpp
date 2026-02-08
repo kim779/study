@@ -1,0 +1,26 @@
+// Disparity.cpp: implementation of the CDisparity class.
+//
+//////////////////////////////////////////////////////////////////////
+
+#include "stdafx.h"
+#include "Disparity.h"
+
+#ifdef _DEBUG
+#undef THIS_FILE
+static char THIS_FILE[]=__FILE__;
+#define new DEBUG_NEW
+#endif
+
+//////////////////////////////////////////////////////////////////////
+// Construction/Destruction
+//////////////////////////////////////////////////////////////////////
+
+CDisparity::CDisparity()
+{
+	m_strName = "DISPARITY";
+}
+
+CDisparity::~CDisparity()
+{
+
+}

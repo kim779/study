@@ -1,0 +1,402 @@
+// IBKChart.odl : type library source for ActiveX Control project.
+
+// This file will be processed by the Make Type Library (mktyplib) tool to
+// produce the type library (IBKChart.tlb) that will become a resource in
+// IBKChart.ocx.
+
+//#include <olectl.h>
+//#include <idispids.h>
+#include "OcxIDs.h"			// for _OCX_CLSID
+
+[ uuid(_OCX_TYPE_LIBRARY_ID), version(1.0),
+  helpfile("IBKChart.hlp"),
+  helpstring("IBKChart ActiveX Control module"),
+  control ]
+library IBKChartLib
+{
+#include <olectl.h>
+#include <idispids.h>
+
+	importlib(STDOLE_TLB);
+	importlib(STDTYPE_TLB);
+
+	//  Primary dispatch interface for CIBKChartCtrl
+
+	[ uuid(_OCX_PRIMARY_DISP_ID),
+	  helpstring("Dispatch interface for IBKChart Control"), hidden ]
+	dispinterface _DIBKChart
+	{
+		properties:
+			// NOTE - ClassWizard will maintain property information here.
+			//    Use extreme caution when editing this section.
+			//{{AFX_ODL_PROP(CIBKChartCtrl)
+			[id(DISPID_ENABLED), bindable, requestedit]	boolean Enabled;
+			[id(DISPID_HWND)]	OLE_HANDLE hWnd;
+			[id(1)] short nChartMode;
+			[id(2)] boolean		bNormalizedMinuteTimeRule;
+			[id(3)] long		nBlockType;
+			[id(4)] long		nBlockCompart;
+			[id(5)] long		nBlockRowCount;
+			[id(6)] long		nBlockColumnCount;
+			[id(7)] long		nBlockGap;
+			[id(8)] long		nBlockBorderThickness;
+			[id(9)] BSTR		strAddInLoadList;
+			[id(10)] long		nBorderType;
+			[id(11)] long		nScaleLineType;
+			[id(12)] boolean	bWholeView;
+			[id(13)] long		nOnePageDataCount;
+			[id(14)] long		nUserBlockAddCount;
+			[id(15)] boolean	bGraphDragDrop;
+			[id(16)] long		nLeftMargin;
+			[id(17)] long		nRightMargin;
+			[id(18)] long		nTopMargin;
+			[id(19)] long		nBottomMargin;
+			[id(20)] boolean	bAddGraphMenuShow;
+			[id(21)] BSTR		strUserEnvironmentFileName;
+			[id(22)] BSTR		strUserIndicatorListFileName;
+			[id(23)] BSTR		strUserSeriesListFileName;
+			[id(24)] boolean	bHide;
+			[id(25)] boolean	bIsInput;
+			[id(26)] BSTR		strToolbarOption;
+			[id(27)] BSTR		strPacketOption;
+			[id(28)] BSTR		strLocalSharedList;
+			[id(29)] boolean	bUseRealData;
+			[id(30)] BSTR		strRealList;
+			[id(31)] short		nMarginBorderType;
+			[id(32)] long		nRowDoubleSizeBlock;
+			[id(33)] boolean	bUseInquiryDlgWhenUseCrossLine;
+			[id(34)] long		nColumnDoubleSizeBlock;
+			[id(35)] boolean	bUseShortKey;
+			[id(36)] boolean	bUseConditiontoTitle;
+			[id(37)] boolean	bUseDatatoTitle;
+			[id(38)] short		nHorzGap;
+			[id(39)] short		nVertGap;
+			[id(40)] short		nRButtonMenuType;
+			[id(41)] boolean	bShowWarningMessageBox;
+			[id(42)] boolean	bControlBlockSize;
+			[id(43)] boolean	bBlockMoveDelete;
+			[id(44)] boolean	bSelectTitle;
+			[id(45)] boolean	bSelectGraph;
+			[id(46)] boolean	bUseScaleRButtonMenu;
+			[id(47)] short		nGraphRButtonType;
+			[id(48)] short		nHoldingPacketSize;
+			[id(49)] BSTR		szBasePacketName;
+			[id(50)] boolean	bRedrawAfterUpdatedAllPackets;
+			[id(51)] short		nMinDataCountOnOnePage;
+			[id(52)] boolean	bFireRealEvent;
+			[id(53)] short		nInquiryType;
+			[id(54)] boolean	bOcxAreaNumericalInquiry;
+			[id(55)] long		nNumericalInquiryOption;
+			[id(56)] BSTR		strGlobalSharedList;
+			[id(57)] short		nUseInquiryWithCrossline;
+			[id(58)] boolean	bShowPriceRateInquiry;
+			[id(59)] boolean	bDoesUseSkinColor;
+			[id(60)] BSTR		strMapName;
+			[id(61)] short		nBongCountMargin;
+			[id(62)] boolean	bOnePageDataCountInTRCount;
+			[id(63)] boolean	bIsMapDefault;
+			[id(64)] short		nPacketCountDataSize;
+			[id(65)] short nLanguageID;
+			[id(66)] boolean bFreezedPageState;
+			[id(70)] boolean IsShowInneerToolBar;
+			[id(71)] BSTR		strChartList;
+			[id(72)] OLE_COLOR	clrBackground;
+			[id(73)] OLE_COLOR	clrBackBorder;
+			[id(74)] OLE_COLOR	clrBlock;
+			[id(75)] OLE_COLOR	clrBlockBorder;
+			[id(76)] OLE_COLOR	clrScaleLine;
+			[id(77)] OLE_COLOR	clrScaleText;
+			[id(78)] OLE_COLOR	clrGraphBase1;
+			[id(79)] OLE_COLOR	clrGraphBase2;
+			[id(80)] OLE_COLOR	clrGraphBase3;
+			[id(81)] OLE_COLOR	clrGraphBase4;
+			[id(82)] OLE_COLOR	clrGraphBase5;
+			[id(83)] OLE_COLOR	clrGraphBase6;
+			[id(84)] OLE_COLOR	clrAnalysisTool;
+			[id(85)] BSTR		strBlockRegion;
+			[id(86)] OLE_COLOR	clrScaleLine2;
+			[id(87)] OLE_COLOR	clrInquiryWindow;
+			[id(88)] BSTR		CustomFont;
+			[id(89)] OLE_COLOR	clrLattice;
+			[id(90)] BSTR		strStartDateOfData;
+			[id(91)] boolean	OnRunningOneChart;
+			[id(92)] boolean	EnableHorizontalLineInNIDLG;
+			[id(93)] boolean bShowPriceMinMaxText;
+			[id(94)] boolean bHideAllTitle;
+			[id(95)] BSTR strMapIndicatorInfo;
+			[id(96)] boolean bEnableIndicatorCalculation;
+			[id(67)] BSTR strPagePathWithPrefix;
+			[id(97)] long nCurrentDrawCount;
+			[id(68)] short nRealTimeTruncationType;
+			[id(69)] boolean bUseGapRevision;
+			[id(98)] long nFullDataCount;
+			//}}AFX_ODL_PROP
+
+		methods:
+			// NOTE - ClassWizard will maintain method information here.
+			//    Use extreme caution when editing this section.
+			//{{AFX_ODL_METHOD(CIBKChartCtrl)
+			[id(99)] boolean	SetAllProperties2(long dwData);
+			[id(100)] void		SetBaseDesk(long lKey);
+			[id(101)] long		GetBase(BSTR szKey);
+			[id(102)] short		SetChartData(long pChartData, short nCount, short nType);
+			[id(103)] short		SetChartDataStr(BSTR szChartData, short nCount, short nType);
+			[id(104)] short		testGetPacketdatasize(BSTR pIn);
+			[id(105)] void		testLoadAnalysisTools(short nToolOption, short nOption);
+			[id(106)] void		MakeSaveShortKey(BSTR szFileName, short nFlag);
+			[id(107)] short		ChangeChart(short nBlockRowPosition, short nBlockColumnPosition, BSTR strGraphTitle, BSTR strGraphName, BSTR strPacketName, BSTR strGraphType, BSTR strGraphStyle, short nLineWidth, OLE_COLOR clrLineColor);
+			[id(108)] short		ClearChartData(short nOption);
+			[id(109)] short		SetGraphHide(short nRow, short nColumn, BSTR strTitle, boolean bHide);
+			[id(110)] boolean	AddChartBlock(BSTR strChartName);
+			[id(111)] void		SetOnePageDataCount(long nOnePageDataCount);
+			[id(112)] long		GetOnePageDataCount();
+			[id(113)] boolean	SaveandOpenFromFile(BSTR strOpenFileName, BSTR strSaveFileName, boolean bOpenOption, boolean bSaveOption);
+			[id(114)] boolean	JoinandDevisionforCompareChart(long nRowCount, long nColumnCount, boolean bJoin);
+			[id(115)] boolean	ChangeGraphTitle(short nRowIndex, short nColumnIndex, short nGraphIndex, BSTR strNewTitle);
+			[id(116)] short		SetChartDataFromFile(BSTR szFileName, short nType);
+			[id(117)] boolean	RemoveChart(BSTR strChartName);
+			[id(118)] boolean	ChangeGraphType(BSTR strGraphName, BSTR strGraphType, BSTR strGraphStyle, BSTR strPacketNameList, boolean bRunatOnce);
+			[id(119)] void		SetChartAllInfo();
+			[id(120)] BSTR		GetData(BSTR strPacketName, short nDataIndex);
+			[id(121)] boolean	SetDrdsAdvise(boolean bOnAdvise);
+			[id(122)] short		GetDataCount();
+			[id(123)] boolean	ChangeChartItem(BSTR strGraphName, short nSubGraphIndex, BSTR strNewTitle, BSTR strNewPacketName, BSTR strNewGraphType, BSTR strNewGraphStyle, short nNewUpLineWidth, short nNewDownLineWidth, short nNewEqualLineWidth, boolean bRunatOnce);
+			[id(124)] boolean	SetStopLossPrice(boolean bIsStopLoss, double dStopLossPrice, boolean bIsProfit, double dProfitPrice);
+			[id(125)] boolean	RestoreMinMax(BSTR strPacketName);
+			[id(126)] boolean	RestoreMin(BSTR strPacketName);
+			[id(127)] boolean	RestorMax(BSTR strPacketName);
+			[id(128)] boolean	SetMin(BSTR strPacketName, double dMin);
+			[id(129)] boolean	SetMax(BSTR strPacketName, double dMax);
+			[id(130)] boolean	SetMinMax(BSTR strPacketName, double dMin, double dMax);
+			[id(131)] boolean	SetHorzScaleData(short nRowIndex, short nColumnIndex, BSTR strScaleData);
+			[id(132)] double	GetMin(BSTR strPacketName);
+			[id(133)] double	GetMax(BSTR strPacketName);
+			[id(134)] boolean	SetGraphHide2(short nRowIndex, short nColumnIndex, short nVerticalIndex, short nGraphIndex, short nSubGraphIndex, boolean bHide);
+			[id(135)] boolean	ChangeGraphDatas(short nRowIndex, short nColumnIndex, short nVerticalIndex, short nGraphIndex, BSTR strNewGraphName, BSTR strNewTitle, BSTR strNewPacketName, BSTR strNewGraphType, BSTR strNewGraphStyle, short nNewUpLineWidth, short nNewDownLineWidth, short nNewEqualLineWidth, boolean bRunatOnce);
+			[id(136)] void		SaveandApplyGraphStyle(short nSaveDataType, short nChangeDataType);
+			[id(137)] void		SetDataRegionInBlock(short nDataStartIndex);
+			[id(138)] void		SetItemInfo(BSTR lpstrCode, BSTR lpstrName);
+			[id(139)] void		AddandDeleteIndicator(BSTR strGraphName);
+			[id(140)] long		GetAllProperties2(long lpData);
+			[id(141)] long		GetBasePropIf();
+			[id(142)] boolean	SetVertScaleData(short nRowIndex, short nColumnIndex, short nVertScaleGroupIndex, BSTR strVertScaleData);
+			[id(143)] boolean	ChangeBlockType(short nBlockType, short nRowCount, short nColumnCount);
+			[id(144)] boolean	ChangeHorzScalePosition(short nScalePosition, short nRowIndex, short nColumnIndex);
+			[id(145)] boolean	ResetChart();
+			[id(146)] void		SetRealData(BSTR strPacketName, double dData, short nOption);
+			[id(147)] boolean	SetGraphTitle(BSTR strGraphName, short nSubGraphIndex, BSTR strNewGraphTitle, boolean bGraphShowing);
+			[id(148)] BSTR		GetIndicatorNameList(BSTR p_strGroup);
+			[id(149)] void		AddGraph(short nRow, short nColumn, short nVertScaleGroup, BSTR szGraphOption, boolean bCreateBlock, boolean bCreateVertScaleGroup, boolean bUseAutoScale);
+			[id(150)] void		AddPacket(BSTR szPacketOption);
+			[id(151)] BOOL		RemovePacket(BSTR szPacketName);
+			[id(152)] void		SetContainerDllInfo(long p_lDllWnd, short p_nID);
+			[id(153)] boolean	SetPacketData(BSTR szPacketName, long szData, long lLength, boolean bReset);
+			[id(154)] void		SetBackgroundColors(OLE_COLOR p_rgbBlockArea, OLE_COLOR p_rgbScaleArea);
+			[id(155)] boolean	AddRealItem(BSTR szRealInfo);
+			[id(156)] void		ShowIndicatorConfigDlg();
+			[id(157)] void		ResetChartCfgWith(short p_nIndex);
+			[id(158)] boolean	EmptyChart(boolean bIsDeleteAllPacket, boolean bIsDefault);
+			[id(159)] boolean	HasGraph(BSTR p_szGraphName);
+			[id(160)] void		RemoveRealItem(BSTR szRealInfo);
+			[id(161)] void		ShowInnerToolBar(boolean p_bShow);
+			[id(162)] boolean	ChangeVertScalePosition(short nScalePosition, short nRowIndex, short nColumnIndex, short nVSGroupIndex);
+			[id(163)] short		GetRowBlockCount();
+			[id(164)] short		GetColumnBlockCount();
+			[id(165)] boolean	SetStartPeriodOfPacket(BSTR p_szPacketName, long p_lStartPeriod, BOOL p_bAddSpace);
+			[id(166)] long		GetStartPeriodOfPacket(BSTR p_szPacketName);
+			[id(167)] boolean	GetStartEndDateOnView(double* p_pStartDate, double* p_pEndDate);
+			[id(168)] boolean	SetStartEndDateOfView(double p_dStartDate, double p_dEndDate);
+			[id(169)] boolean	ScrollToDataOfEnd(double p_dData);
+			[id(170)] short		ZoomToWithRightFix(short p_nZoomValue, boolean p_bWithRightFix);
+			[id(171)] void		ClearTimeMark();
+			[id(172)] void		ShowEnvironmentDlg();
+			[id(173)] void		SetTimeMark( BSTR p_szMarkTime, boolean p_bWithScroll);
+			[id(174)] short		GetVertScalePosition(short p_nRowIndex, short p_nColumnIndex, short p_nVSGroupIndex);
+			[id(175)] void		EnableBoundMark(boolean p_bEnable);
+			[id(176)] void		EnableReceivingTimeShare(boolean p_bEnable);
+			[id(177)] boolean	ChangePacketType(BSTR p_szPacketName, BSTR p_szPacketType);
+			[id(178)] boolean	ChangeGraphDrawingData(BSTR p_szGraphName, boolean p_bLowHigh, boolean p_bLowCur, boolean p_bHighCur, boolean p_bPrevCur, short p_nCurData);
+			[id(179)] boolean	ChangePriceGraphDrawingData(boolean p_bLowHigh, boolean p_bLowCur, boolean p_bHighCur, boolean p_bPrevCur, short p_nCurData, short p_nDefaultType);
+			[id(180)] void		ShowAnalysisToolText(boolean p_bTimeLine, boolean p_bPriceLineLeft, boolean p_bPriceLineRight, boolean p_bTrendLine, boolean p_bTrisectionLine, boolean p_bQuadrisectionLine, boolean p_bFibonacciRetraceLine);
+			[id(181)] boolean	HasGraphInSpecialBack(BSTR p_szGraphName);
+			[id(182)] boolean	LoadAddIn(BSTR p_szAddInDllName);
+			[id(183)] boolean	InvokeAddIn(BSTR p_szAddInDllName, short p_nCommandType, long p_lData);
+			[id(184)] void		SetDragModeType(short p_nDragModeType);
+			[id(185)] boolean	ResetRealListString(BSTR p_szRealList, boolean p_bAdviseNow);
+			[id(186)] boolean	AddOrRemoveChart(BSTR strGraphName);
+			[id(187)] void		SetHtsPath(BSTR pcszHtsPath);
+			[id(188)] BSTR		GetRealSettingInfo();
+			[id(189)] void		SetAllLogScale(boolean bLogScale);
+			[id(190)] void		GetListViewerData(BSTR* bstrTitle, BSTR* bstrHorzScale, BSTR* bstrPacketNamesPerBlock, BSTR* bstrPacketNames, BSTR* bstrSaveFilePath, boolean* bViewPacketSequence, long* lpPacketList);
+			[id(191)] void		SetDataIndexByDate(BSTR pcszStartDate, BSTR pcszEndDate);
+			[id(192)] void		SetRunTimeMode(boolean bRunTimeMode);
+			[id(193)] BSTR		GetPacketOption();
+			[id(194)] void		SetPacketOption(BSTR strPacketOption);
+			[id(195)] void		SetOutsideCommonInterface(long lpOutsideCommonInterface);
+			[id(196)] boolean	RemoveGraph_Title(short nRowIndex, short nColumnIndex, BSTR szGraphTitle, boolean bIsOnlyNoTRData, boolean bIsAutoHorzScalePosition);
+			[id(197)] BSTR		GetGraphPacketName(short nRowIndex, short nColumnIndex, BSTR szGraphTitle);
+			[id(198)] boolean	ChangeGraphTitle2(BSTR szTargetTitle, BSTR szSourceTitle);
+			[id(199)] boolean	PartitionAllGraph();
+			[id(200)] boolean	JoinAllGraph(boolean bIsOneVertScaleGroup);
+			[id(201)] boolean	ChangeAllFunctionName(BSTR szTargetGraphName, BSTR szSourceGraphName, boolean bKeepOldGraphColor);
+			[id(202)] boolean	ChangeIndicatorPacketName(BSTR strGraphName, short nSubGraphIndex, BSTR strNewPacketName);
+			[id(203)] void		RunEnvironmentDlg(short nOption);
+			[id(204)] boolean	SetIndicatorCondition(BSTR strGraphName, short nConditionType, short nConditionIndex, double dConditionValue, boolean bReCalculate);
+			[id(205)] boolean	SetPacketData2(BSTR strPacketName, BSTR strPacketType, BSTR strPacketData, short nDataCount, boolean bReCalculate);
+			[id(206)] boolean	SetLogScale(BSTR strGraphName, boolean bLogScale);
+			[id(207)] boolean	GetLogScale(BSTR strGraphName);
+			[id(208)] boolean	SetPacketHelpMessage(BSTR strHelpMsg, boolean bIsAllRemove);
+			[id(209)] boolean	InvokeAddInStr(BSTR p_szAddInDllName, BSTR p_szCommandName, BSTR p_szData);
+			[id(210)] boolean	SetHelpMessageRealDataRate(BSTR strHelpMessageData, boolean bIsRemove);
+			[id(211)] void		SetBongCountMargin(short nBongCountMargin);
+			[id(212)] boolean	SetAllPropertiesFromFile(BSTR strFilePath, BSTR strFileName);
+			[id(213)] boolean	SetGraphHide3(BSTR strTitle, boolean bIsHide);
+			[id(214)] boolean	GetBoundMarkFlag();
+			[id(215)] boolean	UnloadAddIn(BSTR p_szAddInDllName);
+			[id(216)] void		SetOnePageDataCount2(long nOnePageDataCount, boolean bIncludeBongCountMargin);
+			[id(217)] boolean	ClearPacketData(BSTR strPacketName, boolean bIsAbsoluteClear);
+			[id(218)] void		SetAllGraphHide(short nRowIndex, short nColumnIndex, short bHide);
+			[id(219)] void		InitStaticIndiCond(BSTR p_szBasePath);
+			[id(220)] void		SetAllGraphsHide(short nRowIndex, short nColumnIndex, boolean bHide);
+			[id(221)] BSTR		GetPacketData2(BSTR strPacketName, short nDataIndex, boolean bIsFullDataSize);
+			[id(222)] BSTR		GetSelectedSubGraphData(short nPoint_x, short nPoint_y);
+			[id(223)] short		GetPacketIndex(BSTR szPacketName, double dKeyValue);
+			[id(224)] short		GetCurrentPriceChartType();
+			[id(225)] boolean	RemoveBlock(short nPoint_x, short nPoint_y);
+			[id(226)] boolean	RemoveGraph(short nRowIndex, short nColumnIndex, BSTR strGraphTitle);
+			[id(227)] boolean	SetGraphColor(short nRowIndex, short nColumnIndex, short nVertScaleGroupIndex, short nGraphIndex, short nSubGraphIndex, BSTR strNewColor);
+			[id(228)] boolean	SetPacketDataInIndex(BSTR strPacketName, short nIndex, BSTR strData, boolean bIsRealData);
+			[id(229)] boolean	SetVertScaleLogType(short nRowIndex, short nColumnIndex, boolean bIsLogType);
+			[id(230)] boolean	OpenFileOfEnvAndIndi(BSTR strFileName_Env, BSTR strFileName_Indi, boolean bIsCurrentSave);
+			[id(231)] boolean	SetPacketDataInAdditionPacket(BSTR szPacketName, long szData, long lLength, boolean bReset);
+			[id(232)] void		SetOnePageDataCountInTRCount(boolean bIsTRCount, boolean bIsNowChange);
+			[id(233)] void		PrintChatImage();
+			[id(234)] void		ExportToExcel();
+			[id(235)] boolean	RunToolFunction(short nToolCommand, short nOption);
+			[id(236)] boolean	SetSubIndicatorCondition(BSTR strGraphName, short nConditionType, short nSubGraphIndex, short nConditionIndex, double dConditionValue, boolean bReCalculate);
+			[id(237)] boolean	SetGraphHide4(BSTR strGraphName, short nSubGraphIndex, boolean bHide);
+			[id(238)] boolean	SetMapDefaultInCurrent(boolean bIsNewMapDefault);
+			[id(239)] boolean	ChangeFunctionName(BSTR p_szTargetFName, BSTR p_szNewFName, BSTR p_szNewSGName);
+			[id(240)] boolean	GetHeadAndTailData(BSTR strPacketName, double* pHeadData, double* pTailData);
+			[id(241)] IUnknown*	GetAddInCustomInterface(BSTR p_szAddInName);
+			[id(242)] boolean	LoadAddInWithOverExclusive(BSTR p_szAddInName);
+			[id(243)] boolean	OpenFromFile(BSTR p_szFileName, boolean p_bAutoPrevSave);
+			[id(244)] boolean	SaveandOpenFromFileWithMSave(BSTR strOpenFileName, BSTR strSaveFileName, boolean bOpenOption, boolean bSaveOption);
+			[id(245)] boolean	AddRealItemWithSeparator(BSTR szRealInfo, BSTR szSeparatorChar);
+			[id(246)] void		RemoveRealItemWithSeparator(BSTR szRealInfo, BSTR szSeparatorChar);
+			[id(247)] long		GetAllProperties3(long p_lIPropertyMap);
+			[id(248)] long		SetAllProperties3(long p_lIPropertyMap);
+			[id(249)] boolean ShowIndicatorConfigDlgWithName(BSTR p_szGraphName);
+			[id(250)] boolean RemoveBlockWithIndex(short p_nRowIndex, short p_nColumnIndex);
+			[id(251)] boolean SetBinTrHelpMsg(BSTR p_szHelpMessage);
+			[id(252)] boolean SetBinTrDoubleData(BSTR p_szPacketName, long p_nCount, double* p_pdData);
+			[id(253)] boolean SetBinTrStringData(BSTR p_szPacketName, long p_nCount, long p_lData);
+			[id(254)] boolean SetBinTrEnd();
+			[id(255)] boolean EmptyChart2(BSTR p_szChartList, boolean p_bIsDeleteAllPacket, boolean p_bIsDefault);
+			[id(256)] short GetHorzScalePosition(short p_nRowIndex, short p_nColumnIndex);
+			[id(257)] boolean HasIndicator(BSTR p_szIndicatorName);
+			[id(258)] boolean HasIndicatorInSpecialBack(BSTR p_szIndicatorName);
+			[id(259)] boolean LockWindowUpdate();
+			[id(260)] void UnlockWindowUpdate();
+			[id(261)] BSTR AddChartItem(BSTR lpszItemCode, BSTR lpszItemName, boolean bBuiltChart);
+			[id(262)] void SetRealDataCode(BSTR strCode, BSTR strPacketName, double dData, short nOption);
+			[id(263)] void ShowIndicator(BSTR p_szIndicatorName, boolean p_bShow, boolean p_bRecalculate);
+			[id(264)] void SetPacketAutoScaleType(BSTR p_szPacketName, boolean p_bAutoScaleType);
+			[id(265)] boolean SetPacketTypeWithAutoScale(BSTR p_szPacketName, BSTR p_szPacketType, boolean p_bAutoScale);
+			[id(266)] void ShowBaseText(boolean p_bShow);
+			[id(267)] boolean ChangeGraphColor(BSTR p_szGraphTitle, BSTR p_szColors);
+			[id(268)] void AddPacketRQ(BSTR lpszRQ, BSTR lpszPacketOption);
+			[id(269)] boolean SetPacketDataRQ(BSTR lpszRQ, BSTR lpszPacketName, long nData, long nLength, boolean bReset);
+			[id(270)] boolean AddChartItemRQ(BSTR lpszRQ, BSTR lpszItemCode, BSTR lpszItemName);
+			[id(271)] void SetCurrentRQ(BSTR lpszRQ);
+			[id(272)] void SetResetTotalCountWhileDraw(boolean bReset);
+			[id(273)] void SetFutureScaleVisible(long nScaleVisible);
+			[id(274)] void SetMultiItemMode(boolean bMultiItem);
+			[id(275)] void SetVertScaleType(short nBlockRow, short nBlockCol, short nScaleGroup, short nScaleType, double dTypeValue);
+			[id(276)] void OpenFromPage(BSTR p_szPagePath, boolean p_bIsVirtualPage, short p_nVirtualPageIndex, short p_nDuplicateIndex);
+			[id(277)] void SaveToPage(BSTR p_szPagePath, boolean p_bIsVirtualPage, short p_nVirtualPageIndex, short p_nDuplicateIndex);
+			[id(278)] boolean ZoomTo(long p_nZoomValue, boolean p_bRelative);
+			[id(279)] boolean ShiftPacket(BSTR p_szPacketNames, long p_szShiftCount);
+			[id(280)] boolean SaveandOpenFromAnalToolFile(BSTR lpszOpenFileName, BSTR lpszSaveFileName, boolean bOpenOption, boolean bSaveOption);
+			[id(281)] void SetHorizontalScaleHeight(long nHeight);
+			[id(282)] void ChangeGraphPropertyAtOnce(BSTR lpszRQ, BSTR lpszTargetTitle, BSTR lpszNewTitle, short nGraphType, short nGraphStyle, short nDrawStyle, BSTR lpszColors, short nThickness1, short nThickness2, short nThickness3);
+			[id(283)] boolean EmptyChart3(BSTR lpszChartList, boolean bIsDeleteAllPacket, boolean bIsDefault, short nBlockCount);
+			[id(284)] boolean AddChartAllBlock(BSTR strChartName);
+			[id(285)] boolean RemoveGraphRQ(BSTR lpszRQ, BSTR lpszTitle);
+			[id(286)] BSTR AddPairItem(BSTR lpszItemCode, BSTR lpszItemName, boolean bBuiltChart);
+			[id(287)] boolean HasIndicatorWithRQ(BSTR p_szIndicatorName2, BSTR p_szRQ);
+			[id(288)] void RemoveAllGraphOfRQ(BSTR p_szRQ);
+			[id(289)] short GetRowOfGraphWithRQ(BSTR p_szIndicatorName2, BSTR p_szRQ);
+			[id(290)] boolean SetGraphColorWithRQ(BSTR p_szRQ, BSTR p_szIndicatorName2, BSTR p_szColor);
+			[id(291)] void SetUseSTExtData(BSTR lpszExtDataName);
+			[id(292)] boolean ShowGraphDataDrawingData(BSTR lpszRQ, BSTR lpszIndicatorName, boolean bShow, short nShowType);
+			[id(293)] void ShowSelEnvironmentDlg(short nPage);
+			[id(294)] long GetVertScaleGroupCount(short nRow, short nColumn);
+			[id(295)] void SetSyncPacketData(BSTR strSyncPacketNames);
+			[id(296)] void SetEmptyChart();
+			[id(297)] void SetDrawVerticalBox(double dHorzValue, BSTR strColor, boolean bFill);
+			[id(298)] void UseDummyPacketData(boolean bUse);
+			[id(299)] void SetDoubleSizeBlock(short nRowIndex, short nColIndex);
+			[id(300)] long AddHorizontalLine(BSTR lpszTitle, OLE_COLOR clrLine, short nLine, double dPrice);
+			[id(301)] void DeleteHorizontalLine(long nIndex);
+			[id(302)] void DeleteAllHorizontalLine();
+			[id(303)] void UpdateHorizontalLine(long nIndex, BSTR lpszTitle, OLE_COLOR clrLine, short nLine, double dPrice);
+			[id(304)] BSTR GetPacketTypeFromKrxCmeCode(BSTR p_szKrxCmeCode);
+			[id(305)] void SetEncUserID(BSTR strUserID);
+			[id(306)] void ReCalculateAllGraphs();
+			[id(307)] BSTR GetGraphPropertyAtOnce(BSTR lpszRQ, BSTR lpszTargetTitle);
+			[id(308)] void ChangeVertScaleMinMaxType(short nRowIndex, short nColumnIndex, short nVertScaleGroupIndex, short nScaleType, double dMinValue, double dMaxValue);
+			[id(309)] void SetAvgUnitPrice(double dAvgPrice);
+			[id(310)] long GetPacketCount(BSTR strPacketName);
+			[id(311)] boolean FindRQ(BSTR lpszRQ);
+			[id(312)] short	GetPacketNearIndex(BSTR szPacketName, double dKeyValue);
+			[id(313)] boolean ChangePacketTypeRQ(BSTR lpszRQ, BSTR p_szPacketName, BSTR p_szPacketType);
+			[id(314)] void SetDrawBaseLine(boolean bDraw);
+			[id(315)] boolean GetGraphHide4(BSTR strGraphName, short nSubGraphIndex);
+			[id(316)] void SetItemCode(BSTR p_szItemCode, BSTR p_szItemName);
+			[id(317)] void MoveChart( short nRow, short nCol, short nGroupIdx, short nGraphIdx, short nTargetRow, short nTargetCol, short nTargetGroupIdx, boolean bIsAddTail );
+			//}}AFX_ODL_METHOD
+	};
+
+	//  Event dispatch interface for CIBKChartCtrl
+
+	[ uuid(_OCX_EVENT_DISP_ID),
+	  helpstring("Event interface for IBKChart Control") ]
+	dispinterface _DIBKChartEvents
+	{
+		properties:
+			//  Event interface has no properties
+
+		methods:
+			// NOTE - ClassWizard will maintain event information here.
+			//    Use extreme caution when editing this section.
+			//{{AFX_ODL_EVENT(CIBKChartCtrl)
+			[id(1)] void	DataUpandDown(short nOption, BSTR strStartDate, BSTR strEndDate);
+			[id(2)] void	RequestBongData(short nOption, short nTemp);
+			[id(3)] void	ChangeOnePageDataCount(long nOnePageDataCount);
+			[id(4)] void	Restore();
+			[id(5)] void	RequestMapLoad(short nOption, BSTR strCode, BSTR strDate);
+			[id(6)] void	RequestNewPacket(short nOption, BSTR strName, BSTR strCode, BSTR strDate);
+			[id(7)] void	SaveSettedChartInfoToServer();
+			[id(8)] void	GetSettedChartInfoFromServer();
+			[id(9)] void	RequestPacketData(BSTR strDateType, BSTR strStartDate, BSTR strPacketNames);
+			[id(10)] void	AddInEvent(BSTR p_szAddInName, short p_nEventID, BSTR p_szData, double p_dData, long p_lData);
+			[id(11)] void	ChangeDateIndex(short nDateIndex);
+			[id(12)] void	RequestCodeAndName();
+			[id(13)] void	SendDataIndexInLButtonUp(short nRowIndex, short nColumnIndex, short nDataIndex, double dValue);
+			[id(14)] void ReturnOrgChart(long nOnePageDataCount);
+			//}}AFX_ODL_EVENT
+	};
+
+	//  Class information for CIBKChartCtrl
+
+	[ uuid(_OCX_CLASS_INFO_ID),
+	  helpstring("IBKChart Control"), control ]
+	coclass IBKChart
+	{
+		[default] dispinterface _DIBKChart;
+		[default, source] dispinterface _DIBKChartEvents;
+	};
+	//{{AFX_APPEND_ODL}}
+	//}}AFX_APPEND_ODL}}
+};

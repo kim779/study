@@ -1,0 +1,125 @@
+// listCtrl.cpp : implementation file
+//
+
+#include "stdafx.h"
+#include "IB210200.h"
+#include "listCtrl.h"
+#include "item.hxx"
+
+#ifdef _DEBUG
+#define new DEBUG_NEW
+#undef THIS_FILE
+static char THIS_FILE[] = __FILE__;
+#endif
+
+#define	clrTEXT		RGB(  0,   0,   0)
+#define	clrBACK		RGB(245, 245, 245)
+#define	clrSEL		RGB(199, 203, 221)
+
+/////////////////////////////////////////////////////////////////////////////
+// ClistCtrl
+
+ClistCtrl::ClistCtrl()
+{
+}
+
+ClistCtrl::~ClistCtrl()
+{
+}
+
+
+BEGIN_MESSAGE_MAP(ClistCtrl, CListCtrl)
+	//{{AFX_MSG_MAP(ClistCtrl)
+	ON_WM_NCCALCSIZE()
+	//}}AFX_MSG_MAP
+	ON_NOTIFY_REFLECT(NM_CUSTOMDRAW, OnCustomDrawList)
+END_MESSAGE_MAP()
+
+/////////////////////////////////////////////////////////////////////////////
+// ClistCtrl message handlers
+
+void ClistCtrl::PreSubclassWindow() 
+{
+	SetExtendedStyle(GetExtendedStyle()|LVS_EX_FULLROWSELECT|LVS_EX_GRIDLINES);
+	CListCtrl::PreSubclassWindow();
+}
+
+void ClistCtrl::OnNcCalcSize(BOOL bCalcValidRects, NCCALCSIZE_PARAMS FAR* lpncsp) 
+{
+	UpdateWindow();
+	CListCtrl::OnNcCalcSize(bCalcValidRects, lpncsp);
+}
+
+void ClistCtrl::OnCustomDrawList(NMHDR* pNMHDR, LRESULT* pResult)
+{
+	NMLVCUSTOMDRAW* pLVCD = (NMLVCUSTOMDRAW *)pNMHDR;
+
+	*pResult = CDRF_DODEFAULT;
+	switch (pLVCD->nmcd.dwDrawStage)
+	{
+	case CDDS_PREPAINT:
+		*pResult = CDRF_NOTIFYITEMDRAW;
+		break;
+
+	case CDDS_ITEMPREPAINT:
+		*pResult = CDRF_NOTIFYSUBITEMDRAW;
+		break;
+
+	case (CDDS_ITEMPREPAINT | CDDS_SUBITEM):
+		{
+		CDC*	dc;
+		Citem*	item;
+		int	row, subi;
+		CString	text;
+		CRect	rect;
+
+		dc   = CDC::FromHandle(pLVCD->nmcd.hdc);
+		row  = (int)pLVCD->nmcd.dwItemSpec;
+		subi = (int)pLVCD->iSubItem;
+		text = GetItemText(row, subi);
+		item = (Citem *)GetItemData(row);
+		if (!item)
+		{
+			*pResult = CDRF_DODEFAULT|CDRF_NOTIFYPOSTPAINT;
+			break;
+		}
+		CListCtrl::GetSubItemRect(row, subi, LVIR_BOUNDS, rect);
+		switch (subi)
+		{
+		case 0: case 2:
+			if (CListCtrl::GetItemState(row, LVIS_SELECTED))
+				dc->FillSolidRect(rect, clrSEL);
+			else
+				dc->FillSolidRect(rect, clrBACK);
+			dc->SetBkMode(TRANSPARENT);
+			dc->SetTextColor(!subi ? item->m_clr : clrTEXT);
+			dc->DrawText(text, rect, !subi ? DT_SINGLELINE|DT_VCENTER|DT_LEFT : DT_SINGLELINE|DT_VCENTER|DT_CENTER);
+			break;			
+		case 1:
+			dc->FillSolidRect(rect, item->m_clr);
+			break;
+		}
+
+		*pResult = CDRF_SKIPDEFAULT;	
+		//*pResult = CDRF_DODEFAULT|CDRF_NOTIFYPOSTPAINT;
+		//*pResult = CDRF_NOTIFYPOSTPAINT;
+		
+		break;
+		}
+	}
+}
+
+void ClistCtrl::Selected(int nItem, BOOL scroll)
+{
+	CRect	rc;
+	CSize	size;
+
+	SetItemState(nItem, LVIS_SELECTED|LVIS_FOCUSED, LVIS_SELECTED|LVIS_FOCUSED);
+	if (scroll)
+	{
+		GetItemRect(0, rc, LVIR_LABEL);
+		size.cx = 0;
+		size.cy = rc.Height() * (nItem - GetTopIndex());
+		Scroll(size);
+	}
+}

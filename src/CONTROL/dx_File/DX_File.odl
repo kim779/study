@@ -1,0 +1,47 @@
+// DX_File.odl : type library source for DX_File.dll
+
+[ uuid(73EB261C-F502-4E85-9B75-C3D39E94A205), version(1.0) ]
+library DX_File
+{
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+
+
+
+
+	//  Primary dispatch interface for CFilex
+	
+	[ uuid(5B749E8C-DF77-448D-94DA-A412D47B279F) ]
+	dispinterface IFilex
+	{
+		properties:
+			// NOTE - ClassWizard will maintain property information here.
+			//    Use extreme caution when editing this section.
+			//{{AFX_ODL_PROP(CFilex)
+			[id(1)] BSTR Name;
+			//}}AFX_ODL_PROP
+			
+		methods:
+			// NOTE - ClassWizard will maintain method information here.
+			//    Use extreme caution when editing this section.
+			//{{AFX_ODL_METHOD(CFilex)
+			[id(2)] boolean Open(BSTR mode, BSTR FileN);
+			[id(3)] BSTR Read(long size);
+			[id(4)] long Seek(long to);
+			[id(5)] void Close();
+			[id(6)] void Write(BSTR text);
+			//}}AFX_ODL_METHOD
+
+	};
+
+	//  Class information for CFilex
+
+	[ uuid(6E25AAFD-9E86-42FE-A32C-263783EBCB7C) ]
+	coclass Filex
+	{
+		[default] dispinterface IFilex;
+	};
+
+	//{{AFX_APPEND_ODL}}
+	//}}AFX_APPEND_ODL}}
+};

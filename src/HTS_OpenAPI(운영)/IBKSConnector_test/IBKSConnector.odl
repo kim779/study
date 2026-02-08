@@ -1,0 +1,136 @@
+// IBKSConnector.odl : type library source for ActiveX Control project.
+
+
+
+[ uuid(90685967-8F5E-491A-8CCA-4220479AC189), version(1.0),
+  helpfile("IBKSConnector.hlp"),
+  helpstring("IBKSConnector ActiveX Control module"),
+  control ]
+
+library IBKSCONNECTORLib
+{
+#include <olectl.h>
+#include <idispids.h>
+
+	importlib(STDOLE_TLB);
+	importlib(STDTYPE_TLB);
+
+[ uuid(C66F0D7B-235C-409A-9018-0587D1094C20),
+  helpstring("Dispatch interface for IBKSConnector Control"), hidden ]
+
+	dispinterface _DIBKSConnector
+	{
+		properties:
+			//{{AFX_ODL_PROP(CIBKSConnectorCtrl)
+			//}}AFX_ODL_PROP
+
+		methods:
+			//{{AFX_ODL_METHOD(CIBKSConnectorCtrl)
+			[id(1)] boolean Initialize();
+			[id(2)] void Uninitialize();
+			[id(3)] boolean Login(BSTR user_id, BSTR user_pw, BSTR cert_pw, BSTR svr_ip, long svr_port);
+			[id(4)] BSTR GetLastErrMsg();
+			[id(5)] BSTR GetUserName();
+			[id(6)] BSTR GetHome();
+			[id(7)] BSTR GetUserID();
+			[id(8)] void Logout();
+			[id(9)] boolean TR1001(long key, BSTR code);
+			[id(10)] boolean TR1201(long key, long mmgb, BSTR acno, BSTR pswd, long ojno, BSTR code, long jqty, long jprc, long hogb, long mdgb);
+			[id(11)] boolean TR1211(long key, BSTR acno, BSTR pswd, BSTR code, long dsgb, long sygb, long dlgb, long sort, BSTR nkey);
+			[id(12)] boolean TR1221(long key, BSTR acno, BSTR pswd, long allf, BSTR nkey);
+			[id(13)] boolean TR1231(long key, BSTR acno, BSTR pswd, BSTR code, long mmgb, double jprc);
+			[id(14)] boolean TR3001(long key, BSTR code);
+			[id(15)] boolean TR3201(long key, long mmgb, BSTR acno, BSTR pswd, long ojno, BSTR code, long jqty, long jprc, long hogb, long mdgb);
+			[id(16)] boolean TR3211(long key, BSTR acno, BSTR pswd, long dlgb, long sort, BSTR code, long cpgb, long dsgb, BSTR nkey);
+			[id(17)] boolean TR3221(long key, BSTR acno, BSTR pswd, BSTR nkey);
+			[id(18)] boolean TR3231(long key, BSTR acno, BSTR pswd, BSTR code, long mmgb, double jprc, long hogb, long qtpy, double jamt, double jrat);
+			[id(19)] boolean TR1801(long key, BSTR code);
+			[id(20)] boolean TR1802(long key, BSTR code);
+			[id(21)] boolean TR1803(long key, BSTR code);
+			[id(22)] boolean TR1804(long key, BSTR jidx);
+			[id(23)] BSTR GetAccounts();
+			[id(24)] boolean TR1002(long key, BSTR code, BSTR symb);
+			[id(25)] boolean TR1003(long key, BSTR code, long type, BSTR symb, BSTR nkey);
+			[id(26)] boolean TR3002(long key, BSTR code, BSTR symb);
+			[id(27)] boolean TR3003(long key, BSTR code, long type, BSTR symb, BSTR nkey);
+			[id(28)] boolean GetCode(long key, BSTR reqtype);
+			[id(29)] boolean TR1202(long key, long mmgb, BSTR acno, BSTR pswd, long ojno, BSTR code, long jqty, long jprc, long hogb, long mdgb, long id);
+			[id(30)] boolean TR3202(long key, long mmgb, BSTR acno, BSTR pswd, long ojno, BSTR code, long jqty, long jprc, long hogb, long mdgb, long id);
+			[id(31)] boolean TR4224(long key, BSTR acno, BSTR pswd, double zKpi200Idx);
+			[id(32)] boolean TR4223(long key, BSTR acno, BSTR pswd, BSTR zSrtDt, BSTR zEndDt, BSTR nkey);
+			[id(33)] boolean TR4303(long key, BSTR acno, BSTR pswd, BSTR zQrySrtDt, BSTR zQryEndDt, long zQryTp, long zStnlnSeqTp, long zBalEvalTp, BSTR nkey);
+			[id(34)] boolean TR4201(long key, BSTR acno, BSTR pswd, long zFnoClssCode, BSTR nkey);
+			[id(35)] boolean TR4101(long key, BSTR acno, BSTR pswd);
+			[id(36)] boolean TR4221(long key, BSTR acno, BSTR pswd);
+			[id(37)] boolean TR4401(long key, BSTR acno, BSTR pswd, long zQryTp, BSTR zQrySrtDt, BSTR zQryEndDt, BSTR zIsuNo, BSTR nkey);
+			[id(38)] boolean TR4202(long key, BSTR acno, BSTR pswd, long zBalEvalTp, long zPrcEvalTp, BSTR nkey);
+			[id(39)] boolean TR4003(long key, BSTR acno, BSTR pswd, long zMprcOrdTp, BSTR zRoopData);
+			[id(40)] boolean TR4004(long key, BSTR acno, BSTR pswd, BSTR zRoopData);
+			[id(41)] void SetPTS();
+			[id(42)] boolean TR4501(long key, BSTR zMnyoutAcntno, BSTR zMnyoutPswd, long zlMnyoutAmt, BSTR zMnyinBnkCode, BSTR zMnyinBnkAcntNo, BSTR zAskpsnNm, BSTR zTelExno, BSTR zTelRgno, BSTR zTelSeqno);
+			[id(43)] boolean TR4502(long key, BSTR acno, BSTR pswd, long lBkeepAmt, BSTR zMnyinAcntNo);
+			[id(44)] boolean TR4503(long key, BSTR zMnyinAcntNo, BSTR zBnkCode, BSTR zBnkAcntNo, BSTR zBnkPwd, long zMnyinAmt);
+			[id(45)] boolean TR4511(long key, BSTR acno, BSTR pswd, BSTR zQrySrtDt, BSTR zQryEndDt, BSTR nkey);
+			[id(46)] boolean TR4512(long key, BSTR acno, BSTR pswd, BSTR zQrySrtDt, BSTR zQryEndDt, BSTR nkey);
+			[id(47)] boolean TR4521(long key);
+			[id(48)] boolean TR4522(long key, BSTR acno, BSTR pswd, BSTR zBankCode);
+			[id(49)] boolean TR4523(long key, BSTR nkey);
+			[id(50)] boolean TR4524(long key);
+			[id(51)] boolean TR4525(long key, BSTR zMnyoutAcntno);
+			[id(52)] boolean TR4526(long key, BSTR acno, BSTR pswd, BSTR nkey);
+			[id(53)] boolean TR4527(long key, BSTR acno);
+			[id(54)] void SaveConfig(BSTR sSendName, BSTR sKey, BSTR sValue);
+			[id(55)] boolean TR8001(long key, BSTR acno);
+			[id(56)] void GoURL(long nType);
+			[id(57)] boolean TR1222(long key, BSTR acno, BSTR pswd, long allf);
+			[id(58)] boolean TR3222(long key, BSTR acno, BSTR pswd);
+			[id(59)] boolean TR4403(long key, BSTR acno, BSTR pswd, long zFnoClssCode, BSTR zCmsnAmtAddupCode, BSTR zStrDt, BSTR zEndDt, BSTR nkey);
+			[id(60)] boolean TR3411(long key, BSTR mymd);
+			[id(61)] BSTR GetGreeksData(BSTR sData);
+			[id(62)] boolean TR3232(long key, BSTR acno, BSTR pswd, long fstp, long ertp);
+			[id(63)] boolean TR2001(long key, BSTR upcd, long dtgb);
+			[id(64)] void SetPrograms(long pggb);
+			//}}AFX_ODL_METHOD
+	};
+
+[ uuid(55F8C481-7091-4ACA-8E9C-A5BA13944306),
+  helpstring("Event interface for IBKSConnector Control") ]
+
+	dispinterface _DIBKSConnectorEvents
+	{
+		properties:
+			//  Event interface has no properties
+
+		methods:
+			//{{AFX_ODL_EVENT(CIBKSConnectorCtrl)
+			[id(1)] void OnLogin(VARIANT_BOOL bLogin, BSTR msg);
+			[id(2)] void OnContract(BSTR data);
+			[id(3)] void OnRealData(BSTR data);
+			[id(4)] void OnRecvData(long key, long dptr, long size, VARIANT_BOOL bNext, BSTR nkey);
+			[id(5)] void OnError(BSTR msg);
+			[id(6)] void OnClose();
+			[id(7)] void OnAlert(long code, BSTR msg);
+			[id(8)] void OnRecvDataID(long key, long dptr, long size, VARIANT_BOOL bNext, BSTR nkey, long id);
+			[id(9)] void OnVerUpdate();
+			[id(10)] void OnUpdateStart();
+			[id(11)] void OnUpdating(BSTR sData, long nProgress);
+			[id(12)] void OnUpdateEnd();
+			[id(13)] void OnGuideMsg(long key, BSTR sMsg);
+			[id(14)] void OnFBalance(BSTR data);
+			[id(15)] void OnSBalance(BSTR data);
+			//}}AFX_ODL_EVENT
+	};
+
+[ uuid(CDADD338-C7AB-4977-B65D-8E988B5958E3),
+  helpstring("IBKSConnector Control"), control ]
+
+	coclass IBKSConnector
+	{
+		[default] dispinterface _DIBKSConnector;
+		[default, source] dispinterface _DIBKSConnectorEvents;
+	};
+
+
+	//{{AFX_APPEND_ODL}}
+	//}}AFX_APPEND_ODL}}
+};
