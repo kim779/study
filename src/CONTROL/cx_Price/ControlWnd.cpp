@@ -411,7 +411,7 @@ void CControlWnd::OnLButtonUp(UINT nFlags, CPoint point)
 		m_capture = false;
 		ReleaseCapture();
 		GetClientRect(&rc);
-
+		AfxMessageBox("123");
 		if (rc.PtInRect(point))
 		{
 			m_pParent->SendMessage(WM_USER, MAKEWPARAM(eventDLL, MAKEWORD(m_Param.key, 11/*Click*/)),

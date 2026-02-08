@@ -239,4 +239,7 @@
 #define MMSG_MAIN_TEST  0x28	                             //스레드등 처리를 위한 자체메시지
 #define MMSG_GETMAIN_STATE  0x30	                   //cx_account 에서 메인초기 진행 단계 확인을 위해
 #define MMSG_SETMAIN_STATE  0x31
+#define MMSG_GETRTS_FROM_MAIN  0x32
+#define  MMSG_RT_REGISTER_CODES 0x33	      //관심에서 실시간 코드 통보
+#define  MMSG_RT_UNREGISTER_WND 0x34  //관심닫을때 메인에 통보
 #endif

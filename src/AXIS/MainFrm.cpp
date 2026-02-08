@@ -1260,74 +1260,137 @@ void CMainFrame::MakeExpectSymbolTable()
 	}
 }
 
-void CMainFrame::ShowHistoryMap(WPARAM wParam,LPARAM lParam)
+void CMainFrame::ShowHistoryMap(WPARAM wParam, LPARAM lParam)
 {
-	LPCSTR xCode = (LPCSTR)wParam;
-	CRect rc = (LPRECT)lParam;
-	CRect barRc;
-	CRect mainRc;
-
-	if(xCode == m_codeHist)
-		return;
-
-	m_codeHist = xCode;
-	m_bar3->GetWindowRect(barRc);
-	GetClientRect(mainRc);
-	ClientToScreen(barRc);
-	ScreenToClient(mainRc);
-	if( m_bar3->GetBarStyle() & CBRS_ALIGN_TOP )
-		rc.top = mainRc.top + barRc.top + barRc.Height();
-	else
-		rc.top = mainRc.top + barRc.top - 20;
-
-	RECT openRC;
-	
-	openRC.top = rc.top;
-	openRC.left = barRc.left/2 + rc.left;
-	openRC.right = openRC.left + rc.Width();
-	openRC.bottom = rc.top + 25;
-
-	if(m_miniWid == NULL || !m_miniWid->GetSafeHwnd())
+	if (1)
 	{
-		const char* trust = "IB0000X8";
-		m_mapHelper->ChangeChild(trust, 1, 0, CenterPOS);
-		return;
-	}
-	else
-	{
-		if(m_viewHist == NULL || !m_viewHist->GetSafeHwnd())
-		{
+		if (!wParam || !lParam)
+			return;
+
+		LPCSTR xCode = reinterpret_cast<LPCSTR>(wParam);
+		RECT* pRc = reinterpret_cast<RECT*>(lParam);
+
+		if (IsBadStringPtrA(xCode, 256) || IsBadReadPtr(pRc, sizeof(RECT)))
+			return;
+
+		if (!m_bar3 || !m_bar3->GetSafeHwnd())
+			return;
+
+		if (m_codeHist.CompareNoCase(xCode) == 0)
+			return;
+
+		m_codeHist = xCode;
+
+		CRect rc(*pRc);
+		CRect barRc, mainRc;
+
+		m_bar3->GetWindowRect(&barRc);
+		ScreenToClient(&barRc);
+		GetClientRect(&mainRc);
+
+		if (m_bar3->GetBarStyle() & CBRS_ALIGN_TOP)
+			rc.top = barRc.bottom;
+		else
+			rc.top = barRc.top - 20;
+
+		RECT openRC{};
+		openRC.left = rc.left + barRc.left / 2;
+		openRC.top = rc.top;
+		openRC.right = openRC.left + rc.Width();
+		openRC.bottom = openRC.top + 25;
+
+		int iheight = openRC.bottom - openRC.top;
+		iheight -= 2;
+
+		constexpr int Y_OFFSET = 25;
+
+		openRC.top += iheight;
+		openRC.bottom += iheight;
+
+		if (!m_miniWid || !m_miniWid->GetSafeHwnd())
+			return;
+
+		if (!m_viewHist || !m_viewHist->GetSafeHwnd())
 			m_viewHist = m_miniWid->GetActiveView();
-		}
-	}
 
-	if(m_viewHist == NULL)
-	{
-		OutputDebugString("VIEWHIST IS NULL\n");
-		return;
-	}
+		if (!m_viewHist || !m_viewHist->GetSafeHwnd())
+			return;
 
-	if(!m_bSDI)
+		CWnd* base = m_viewHist->GetWindow(GW_CHILD);
+		if (base && base->GetSafeHwnd())
+			base->SendMessage(WD_HISTORYVIEW, wParam, (LPARAM)&openRC);
+
+		m_codeHist.Empty();
+	}
+	else
 	{
-		if(m_viewHist != NULL || m_viewHist->GetSafeHwnd())
+		LPCSTR xCode = (LPCSTR)wParam;
+		CRect rc = (LPRECT)lParam;
+		CRect barRc;
+		CRect mainRc;
+
+		if (xCode == m_codeHist)
+			return;
+
+		m_codeHist = xCode;
+		m_bar3->GetWindowRect(barRc);
+		GetClientRect(mainRc);
+		ClientToScreen(barRc);
+		ScreenToClient(mainRc);
+		if (m_bar3->GetBarStyle() & CBRS_ALIGN_TOP)
+			rc.top = mainRc.top + barRc.top + barRc.Height();
+		else
+			rc.top = mainRc.top + barRc.top - 20;
+
+		RECT openRC;
+
+		openRC.top = rc.top;
+		openRC.left = barRc.left / 2 + rc.left;
+		openRC.right = openRC.left + rc.Width();
+		openRC.bottom = rc.top + 25;
+
+		if (m_miniWid == NULL || !m_miniWid->GetSafeHwnd())
 		{
-			const CWnd* base{};
-			try
+			const char* trust = "IB0000X8";
+			m_mapHelper->ChangeChild(trust, 1, 0, CenterPOS);
+			return;
+		}
+		else
+		{
+			if (m_viewHist == NULL || !m_viewHist->GetSafeHwnd())
 			{
-				base = m_viewHist->GetWindow(GW_CHILD);
+				m_viewHist = m_miniWid->GetActiveView();
 			}
-			catch (const std::exception&)
+		}
+
+		if (m_viewHist == NULL)
+		{
+			OutputDebugString("VIEWHIST IS NULL\n");
+			return;
+		}
+
+		if (!m_bSDI)
+		{
+			if (m_viewHist != NULL || m_viewHist->GetSafeHwnd())
 			{
-				WriteLog("---------------------CMainFrame::ShowHistoryMap  try catch--------");
-				return;
+				const CWnd* base{};
+				try
+				{
+					base = m_viewHist->GetWindow(GW_CHILD);
+				}
+				catch (const std::exception&)
+				{
+					WriteLog("---------------------CMainFrame::ShowHistoryMap  try catch--------");
+					return;
+				}
+
+				if (base != NULL && base->GetSafeHwnd())
+					base->SendMessage(WD_HISTORYVIEW, wParam, (LPARAM)&openRC);
+				else
+					OutputDebugString("BASE HIST NOT SAFE\n");
+
+				m_codeHist = "";
 			}
-			
-			if(base != NULL && base->GetSafeHwnd())
-				base->SendMessage(WD_HISTORYVIEW,wParam,(LPARAM)&openRC);
-			else
-				OutputDebugString("BASE HIST NOT SAFE\n");
-	
-			m_codeHist = "";
 		}
 	}
 }
@@ -4071,6 +4134,10 @@ void CMainFrame::InitMapHK()
 
 	for(int ii = 237 ; ii < 249; ii++)
 		m_mapHWndToKey.SetAt(ii, "");
+
+#ifdef DF_MAIN_RTS
+	InitPool();
+#endif
 }
 
 int CMainFrame::GetKeyByHWnd(HWND hwnd, int igubn)
@@ -4637,6 +4704,109 @@ OutputDebugString(m_slog);
 			OutputDebugString(m_slog);
 		}
 		break;
+#ifdef DF_MAIN_RTS
+		case MMSG_GETRTS_FROM_MAIN:
+		{
+			TickSnapshot* out = (TickSnapshot*)lParam;
+
+			int idx = GetSlotIndex_FindOnly(out->code);
+
+			if (idx < 0)
+				return false;
+
+			ReadTick(idx, *out);
+			return true;
+			//OnRegisterTickApi();
+			//m_slog.Format("[AXIS][MMSG_SENDTR][%s]", (char*)lParam);
+			//output_DebugString(m_slog);
+
+			/*ST_RT_SUBSCRIBE* pReq = (ST_RT_SUBSCRIBE*)lParam;
+
+			HWND hWnd = pReq->hWnd;
+
+			for (int i = 0; i < pReq->count; ++i)
+			{
+				const char* code = pReq->codes[i];
+				RegisterSubscriber(code, hWnd, pReq->screenKey);
+			}
+
+			delete pReq;
+			return 0;*/
+
+			//// poolKey 할당
+			//int poolKey = AllocPoolKey();
+			//if (poolKey == -1)
+			//{
+			//	OutputDebugString("TR poolKey 부족\n");
+			//	return 0;
+			//}
+
+			//// poolKey → (HWND + key) 매핑
+			//TR_ROUTE_INFO info;
+			//info.hWnd = pTr->hSender;
+			//info.key = pTr->key;
+			//info.tick = GetTickCount();
+
+			//g_mapRoute[poolKey] = info;
+			//m_slog.Format("[2022][%s]<%d> .... 메인[%x] 에서  key[%d] ", __FUNCTION__, __LINE__, info.hWnd, info.key);
+			//output_DebugString(m_slog);
+			//// 서버로 보낼 key = poolKey
+			//sendTR(pTr->trname, pTr->datB, pTr->datL, pTr->stat, poolKey);
+		}
+		break;
+		case MMSG_RT_REGISTER_CODES:
+		{
+			std::unique_ptr<RTS_REGISTER_REQ> req((RTS_REGISTER_REQ*)lParam);
+
+			std::lock_guard<std::mutex> lock(m_subLock);
+
+			HWND h = req->hWnd;
+
+			// 기존 등록 제거 (갱신 개념)
+			auto it = m_wndSubscriptions.find(h);
+			if (it != m_wndSubscriptions.end())
+			{
+				for (auto& code : it->second)
+					m_codeSubscribers[code].erase(h);
+
+				m_wndSubscriptions.erase(it);
+			}
+
+			// 새로 등록
+			for (int i = 0; i < req->codeCount; i++)
+			{
+				std::string code = req->codes[i];
+
+				m_codeSubscribers[code].insert(h);
+				m_wndSubscriptions[h].insert(code);
+			}
+
+			return 0;
+		}
+		break;
+		case MMSG_RT_UNREGISTER_WND:
+		{
+			std::unique_ptr<RTS_REGISTER_REQ> req((RTS_REGISTER_REQ*)lParam);
+
+			std::lock_guard<std::mutex> lock(m_subLock);
+
+			HWND h = req->hWnd;
+
+			auto it = m_wndSubscriptions.find(h);
+			if (it != m_wndSubscriptions.end())
+			{
+				for (auto& code : it->second)
+				{
+					m_codeSubscribers[code].erase(h);
+				}
+
+				m_wndSubscriptions.erase(it);
+			}
+
+			return 0;
+		}
+		break;
+#endif
 #endif
 	}
 	return 0;
@@ -8621,7 +8791,182 @@ void CMainFrame::write_err()
 	err.Format("[GDI_ERROR] [%u]\n", dw);
 	WriteFile((char *)(const char*)err, err.GetLength());
 }
+#ifdef DF_MAIN_RTS
+// MainFrame 멤버함수 → 일반 함수 bridge
+static BOOL __stdcall GetTickBridge(const char* code, TickSnapshot* out)
+{
+	CMainFrame* pMain = (CMainFrame*)AfxGetMainWnd();
+	if (!pMain || !code || !out)
+		return FALSE;
 
+
+	return pMain->ReadTick(code, out); // 너가 만든 함수
+}
+
+LRESULT CMainFrame::OnRegisterTickApi()
+{
+	// DLL 핸들 얻기 (이미 로드되어 있음)
+	//HMODULE hDll = ::GetModuleHandle("IB202200.dll");
+	//if (!hDll)
+	//	return 0;
+
+	//auto pRegister = (PFN_REGISTER_GET_TICK)::GetProcAddress(hDll, "RegisterGetTick");
+	//if (!pRegister)
+	//	return 0;
+
+	//// 함수포인터 등록
+	//pRegister(GetTickBridge);
+
+	return 1;
+}
+
+bool CMainFrame::ReadTick(const char* code, TickSnapshot* out)  //dll에서 호출
+{
+	int idx = GetSlotIndex_FindOnly(code);
+	ReadTick(idx, *out);
+	return false;
+}
+
+bool CMainFrame::ReadTick(int idx, TickSnapshot& out)
+{
+	TickSnapshot& s = g_tickSlots[idx];
+
+	for (;;)
+	{
+		int v1 = s.seq.load(std::memory_order_acquire);
+		if (v1 & 1) continue; // writing 중
+
+		CopySnapshot(out, s);   // ? 구조체 직접 복사 대신 사용
+
+		int v2 = s.seq.load(std::memory_order_acquire);
+		if (v1 == v2 && !(v2 & 1))
+			return true;
+	}
+}
+
+void CMainFrame::update_ticker(int kind, struct _alertR* alertR)
+{
+	CString symbol;
+	CString sData;
+	CString stmp;
+
+#ifdef DF_MAIN_RTS
+	std::string scode = CStringA(alertR->code);
+	auto it = m_lastRTSTimeCode.find(scode);
+	// 첫 수신은 무조건 통과
+	const CTime now = CTime::GetCurrentTime();
+	if (it == m_lastRTSTimeCode.end())
+	{
+
+		m_lastRTSTimeCode.emplace(scode, now);
+		m_slog.Format("[AXIS][%s]<%d> ------  첫수신   code=[%s][%d]", __FUNCTION__, __LINE__, symbol, m_lastRTSTimeCode.size());
+		output_DebugString(m_slog);
+	}
+	else
+	{
+		const CTime& prevServerTime = it->second;
+		int diffSec = (int)(now - prevServerTime).GetTotalSeconds();
+		it->second = now;
+		m_slog.Format("[AXIS][%s]<%d> ------  쌓이는 데이터   code=[%s][%d]  diffSec=[%d]", __FUNCTION__, __LINE__, symbol, m_lastRTSTimeCode.size(), diffSec);
+		output_DebugString(m_slog);
+	}
+
+	/////////////////////!!!!!
+	if (!alertR)
+		return;
+
+#ifdef UNICODE
+	CT2A codeA(alertR->code);
+	const char* code = (const char*)codeA;
+#else
+	const char* code = (const char*)(LPCTSTR)alertR->code;
+#endif
+
+	if (!code || !code[0])
+		return;
+
+	// 종목코드 → 슬롯 index
+	int idx = GetSlotIndex_CreateIfMissing(code);
+	if (idx < 0)
+		return;
+
+	// 최신 틱 데이터 갱신
+	UpdateSnapshotFromAlert(g_tickSlots[idx], alertR);
+
+	// ? 기존처럼 화면 루프 돌릴 필요 없음
+	// 화면들은 g_tickSlots[idx]를 직접 읽으면 됨
+
+	/////////////////////!!!!!
+#endif
+	symbol = alertR->code;
+
+	DWORD* data{};
+	int i = 0;
+	for (int i = 0; i < alertR->size; i++)
+	{
+		data = (DWORD*)alertR->ptr[i];
+
+		sData.Format("%s", (char*)data[0]);
+
+		if (sData == "d" || sData == "D")
+			return;
+
+		CString	str;
+		if (!symbol.IsEmpty() && (symbol.GetAt(0) == 'X' || symbol.GetAt(0) == 'x'))
+		{
+			m_slog.Format("[mnginfo]");
+			output_DebugString(m_slog);
+			m_slog.Format("[mnginfo][%s]<%d>  size=[%d] symbol=[%s]", __FUNCTION__, __LINE__, alertR->size, symbol);
+			output_DebugString(m_slog);
+
+
+			// 장운영정보를 위해 추가
+			if (symbol.CompareNoCase(SYM_MNG) == 0)
+			{
+
+				CTime time;
+				time = CTime::GetCurrentTime();
+				CString str;
+				str.Format("\r\n update_ticker[%02d:%02d:%02d] kind[%d] sym[%s] dat[%.200s]\n", time.GetHour(), time.GetMinute(), time.GetSecond(), kind, symbol, data);
+				OutputDebugString(str);
+
+				ShowMngInfo(data);		//진짜사용	
+
+				//return;
+			}
+			else
+			{
+				str = ReplaceExpectSymbol(symbol);
+				if (!str.IsEmpty())
+					symbol = str;
+			}
+		}
+
+		if (kind != 0)
+		{
+			if (kind == 6)
+			{
+				const char* szNewsRTS = "S0000";
+
+				if (m_tInfo1)
+					m_tInfo1->ProcessRTS(szNewsRTS, data);
+				if (m_tInfo2)
+					m_tInfo2->ProcessRTS(szNewsRTS, data);
+			}
+			return;
+		}
+
+		if (i == 0)
+		{
+			if (m_tInfo1 && m_tInfo1->IsVisible())
+				m_tInfo1->ProcessRTS(symbol, data);
+			if (m_tInfo2 && m_tInfo2->IsVisible())
+				m_tInfo2->ProcessRTS(symbol, data);
+		}
+	}
+
+}
+#else
 void CMainFrame::update_ticker(int kind, struct _alertR* alertR)
 {
 	CString symbol;
@@ -8696,7 +9041,7 @@ void CMainFrame::update_ticker(int kind, struct _alertR* alertR)
 	}
 	
 }
-
+#endif
 /*
 void CMainFrame::update_ticker(int kind, struct _alertR* alertR)
 {
@@ -13555,6 +13900,18 @@ void CMainFrame::OnTimer(UINT nIDEvent)
 		SendMessage(WM_USER, MMSG_SETMAIN_STATE, 0);
 	}
 	break;
+	case TM_MAIN_RTS_TEST:
+	{
+		static int step = 0;
+		step++;
+		for (int i = 0; i < 5; i++)
+		{
+			TickSnapshot snap;
+			MakeDummyTick(snap, step + i);
+
+		}
+	}
+	break;
 	}
 	//WriteLog("End OnTimer");
 	CMDIFrameWnd::OnTimer(nIDEvent);
@@ -16729,6 +17086,33 @@ NXT
 		*/
 	default:
 		{
+#ifdef DF_MAIN_RTS		
+		auto it = g_mapRoute.find(key);
+		if (it != g_mapRoute.end())
+		{
+			TR_ROUTE_INFO info = it->second;
+
+			// 화면으로 돌려줄 TR 구조체 생성
+			//ST_SEND_TR* pTr = new ST_SEND_TR;
+			//pTr->key = info.key;     // 화면이 원래 보낸 key
+			//pTr->datB = data;
+			//pTr->datL = len;
+			//pTr->stat = 2;
+
+			// 화면으로 응답 전달
+			if (::IsWindow(info.hWnd))
+			{
+				m_slog.Format("[2022][%s]<%d>  메인에서 tr 받고 다시 화면[%x]으로  key[%d] ", __FUNCTION__, __LINE__, info.hWnd, info.key);
+				output_DebugString(m_slog);   //
+				::PostMessage(info.hWnd, WM_USER, MAKEWPARAM(MAKEWORD(DLL_OUB, info.key), len), lParam);
+			}
+
+			// poolKey 반환
+			g_mapRoute.erase(it);
+			FreePoolKey(key);
+			return;
+		}
+#endif	
 			int igubn{};
 			HWND hwnd = GetHWndByKey(key, igubn);
 			if (hwnd)
@@ -30714,6 +31098,69 @@ void CMainFrame::ServerOrderMsgToMap(int igubn, bool bPop)
 			break;
 	}
 }
+
+#ifdef DF_MAIN_RTS	
+//void CMainFrame::RegisterSubscriber(const char* code, HWND hWnd, int screenKey)
+//{
+//	std::lock_guard<std::mutex> lock(g_subMtx);
+//
+//	auto& vec = g_subMap[code];  // code 없으면 자동 생성
+//
+//	// ?? 중복 등록 방지
+//	for (auto& s : vec)
+//	{
+//		if (s.hWnd == hWnd && s.screenKey == screenKey)
+//			return;
+//	}
+//
+//	vec.push_back({ hWnd, screenKey });
+//}
+//
+//void CMainFrame::UnregisterSubscriber(const char* code, HWND hWnd, int screenKey)
+//{
+//	std::lock_guard<std::mutex> lock(g_subMtx);
+//
+//	auto it = g_subMap.find(code);
+//	if (it == g_subMap.end())
+//		return;
+//
+//	auto& vec = it->second;
+//
+//	vec.erase(
+//		std::remove_if(vec.begin(), vec.end(),
+//			[hWnd, screenKey](const SUBSCRIBER& s)
+//			{
+//				return s.hWnd == hWnd && s.screenKey == screenKey;
+//			}),
+//		vec.end()
+//				);
+//
+//	// ?? 구독자가 없으면 code 제거
+//	if (vec.empty())
+//		g_subMap.erase(it);
+//}
+#endif
+//void CMainFrame::DispatchRT(const char* code, const RT_DATA& data)
+//{
+//	std::lock_guard<std::mutex> lock(g_subMtx);
+//
+//	auto it = g_subMap.find(code);
+//	if (it == g_subMap.end())
+//		return;
+//
+//	for (auto& s : it->second)
+//	{
+//		if (::IsWindow(s.hWnd))
+//		{
+//			ST_SEND_TR* pMsg = new ST_SEND_TR{};
+//			pMsg->key = s.screenKey;
+//			pMsg->datB = (char*)&data;
+//			pMsg->datL = sizeof(RT_DATA);
+//
+//		//	::PostMessage(s.hWnd, WM_USER_RT_DATA, 0, (LPARAM)pMsg);
+//		}
+//	}
+//}
 
 #pragma warning (default : 4477)
 /*

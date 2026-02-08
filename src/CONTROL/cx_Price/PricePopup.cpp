@@ -893,6 +893,8 @@ void CPricePopup::OnLButtonDown(UINT nFlags, CPoint point)
 	double tmp = 0;
 	const	CRect	tRc = getPosition(point, &tmp);
 
+	AfxMessageBox("1");
+
 	if (!tRc.IsRectEmpty() && m_selRc != tRc)
 	{
 		COLORREF clr = RGB(255,255,255);
@@ -925,6 +927,7 @@ void CPricePopup::OnLButtonDown(UINT nFlags, CPoint point)
 
 void CPricePopup::OnLButtonUp(UINT nFlags, CPoint point) 
 {
+	AfxMessageBox("2");
 	m_pDoubleTmp = 0;
 	if (getPosition(point, &m_pDoubleTmp) != CRect(0, 0, 0, 0))
 	{

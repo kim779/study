@@ -18,6 +18,7 @@
 #include "childFrm.h"
 #include "SChild.h"
 #include "inca/npenkAppInstall5WIN.h"
+#include "../H/TickStore.h"
 
 #include <vector>
 #include <algorithm>
@@ -149,6 +150,7 @@ int __stdcall STSDKEX_EventCallback(long lCode, void* pParam, long lParamSize);
 #define TM_MNGINFO_NOW 9029
 #define TM_CHANGESKIN 9061
 #define TM_STAFF_OPENNOPOACC 9062  //직원용계좌확인은 HTS 시작할때는 안함
+#define TM_MAIN_RTS_TEST 9063
 
 #define	COLOR_TB		RGB(238, 238, 238)
 
@@ -485,6 +487,132 @@ struct _stMap
 	std::vector<CString> extra;
 };
 
+#define DF_MAIN_RTS
+#ifdef DF_MAIN_RTS
+//////////////////////////////////////////////////////////////////////메인실시간처리//////////////////////////////////////////////
+
+#include <atomic>
+
+//struct TickSnapshot
+//{
+//	std::atomic<int> seq{ 0 };   // seqlock
+//	DWORD ts_ms{ 0 };
+//
+//	char code[CODE_LEN]{};
+//
+//	char RTStype[2]{};
+//	char price[PRICE_LEN]{};   // 23 현재가
+//	char diff[DIFF_LEN]{};     // 14 대비
+//	char volume[VOL_LEN]{};    // 15 거래량
+//	char rate[RATE_LEN]{};     // 16 등락률
+//};
+
+
+// 2) 전역 슬롯 + code → index map
+#include <unordered_map>
+#include <string>
+#include <mutex>
+
+constexpr int MAX_SLOT = 4096;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+//#define MAX_CODE_LEN   12
+//#define MAX_SUBSCRIBE  128   // 화면당 구독 종목 최대 개수
+//
+//enum RT_REQ_TYPE
+//{
+//	RT_REQ_SUBSCRIBE = 1,   // 등록
+//	RT_REQ_UNSUBSCRIBE = 2, // 해제
+//	RT_REQ_UPDATE = 3       // 갱신
+//};
+//
+//struct ST_RT_SUBSCRIBE
+//{
+//	HWND hWnd;                         // 요청 화면 핸들
+//	int reqType;                      // 요청 타입
+//	int screenKey;                    // 화면 내부 key (optional but 강력추천)
+//
+//	int count;                        // 종목 개수
+//	int mkType;
+//	char codes[MAX_SUBSCRIBE][MAX_CODE_LEN];  // 종목코드 배열
+//};
+//
+//constexpr int MAX_FIELD = 256;
+//constexpr int MAX_STR_LEN = 64;
+//
+//enum FIELD_TYPE : uint8_t
+//{
+//	FT_EMPTY = 0,
+//	FT_INT,
+//	FT_LONG,     // 필요하면
+//	FT_DOUBLE,
+//	FT_STRING,
+//};
+//
+//struct FIELD_VALUE
+//{
+//	FIELD_TYPE type{ FT_EMPTY };
+//	union
+//	{
+//		int    iVal;
+//		long   lVal;
+//		double dVal;
+//		char   sVal[MAX_STR_LEN];
+//	};
+//};
+//
+//struct DLL_TICK_REC
+//{
+//	std::atomic<int> version{ 0 };        // lock-free 버전
+//	FIELD_VALUE field[MAX_FIELD];
+//};
+//
+//static FIELD_TYPE g_fieldType[MAX_FIELD];
+
+struct ST_SEND_TR
+{
+	CString trname;
+	char* datB;
+	int datL;
+	BYTE stat;
+	int key;
+	HWND hSender;
+};
+
+struct TR_ROUTE_INFO
+{
+	HWND hWnd;   // 요청한 화면
+	int key;     // 화면이 정한 key
+	DWORD tick;  // 요청 시간 (timeout 관리)
+};
+
+struct SUBSCRIBER
+{
+	HWND hWnd;
+	int screenKey;
+};
+
+
+//----------------------------------------------메인실시간처리------------------------------------------------
+#endif
 
 void WriteLog(LPCSTR log, ...);
 bool axiscall(int, WPARAM, LPARAM);
@@ -1666,7 +1794,180 @@ public:
 	bool LoadScreenInfo(const CString& filePath);
 	bool GetScreenInfoByMapKey(int mapkey, _stMap& outMap) const;
 
+	//실시간메인처리
+#ifdef DF_MAIN_RTS
+	std::queue<int> g_poolKeys;
+	std::mutex g_poolMtx;
+	std::unordered_map<int, TR_ROUTE_INFO> g_mapRoute;
+	std::unordered_map<std::string, CTime> m_lastRTSTimeCode;
 
+	bool ReadTick(const char* code, TickSnapshot* out);
+	LRESULT OnRegisterTickApi();
+
+	TickSnapshot g_tickSlots[MAX_SLOT];
+	std::unordered_map<std::string, int> g_codeToIndex;
+	int g_nextIndex = 0;
+	std::recursive_mutex g_codeMapLock;
+
+	std::mutex m_subLock;
+	std::map<std::string, std::set<HWND>> m_codeSubscribers;
+	std::map<HWND, std::set<std::string>> m_wndSubscriptions;
+
+	//3) code → slot index 함수 (충돌 방지 핵심)
+	int GetSlotIndex_FindOnly(const char* code)
+	{
+		std::lock_guard<std::recursive_mutex> lock(g_codeMapLock);
+
+		auto it = g_codeToIndex.find(code);
+		if (it == g_codeToIndex.end())
+			return -1;
+		return it->second;
+	}
+
+	int GetSlotIndex_CreateIfMissing(const char* code)
+	{
+		std::lock_guard<std::recursive_mutex> lock(g_codeMapLock);
+
+		auto it = g_codeToIndex.find(code);
+		if (it != g_codeToIndex.end())
+			return it->second;
+
+		if (g_nextIndex >= MAX_SLOT)
+			return -1; // 슬롯 부족
+
+		int idx = g_nextIndex++;
+		g_codeToIndex[code] = idx;
+		return idx;
+	}
+
+	// 안전 문자열 복사 함수
+	inline void CopyZ(char* dst, size_t cap, const char* src)
+	{
+		if (!dst || cap == 0) return;
+		if (!src) { dst[0] = '\0'; return; }
+		strncpy_s(dst, cap, src, _TRUNCATE);
+	}
+
+	// _alertR → TickSnapshot 변환 함수 (핵심 ?)
+	using PTR_T = DWORD; // 32bit라 DWORD OK (64bit면 uintptr_t)
+
+	void UpdateSnapshotFromAlert(TickSnapshot& s, const _alertR* alertR)
+	{
+		if (!alertR || alertR->size <= 0 || alertR->ptr[0] == 0)
+			return;
+
+		// 레코드 시작 주소
+		const PTR_T* data = reinterpret_cast<const PTR_T*>(alertR->ptr[0]);
+
+#ifdef UNICODE
+		CT2A codeA(alertR->code);
+		const char* code = (const char*)codeA;
+#else
+		const char* code = (const char*)(LPCTSTR)alertR->code;
+#endif
+		if (!code || !code[0])
+			return;
+
+		// ===== seqlock begin =====
+		int v = s.seq.load(std::memory_order_relaxed);
+		s.seq.store(v + 1, std::memory_order_release); // odd = writing
+
+		s.ts_ms = ::GetTickCount();
+		CopyZ(s.code, sizeof(s.code), code);
+
+		// 필드 인덱스 (네가 준 의미)
+		CopyZ(s.RTStype, sizeof(s.RTStype), (const char*)data[0]); // RTS 타입
+		CopyZ(s.price, sizeof(s.price), (const char*)data[23]); // 현재가
+		CopyZ(s.diff, sizeof(s.diff), (const char*)data[24]); // 대비
+		CopyZ(s.volume, sizeof(s.volume), (const char*)data[27]); // 거래량
+		CopyZ(s.rate, sizeof(s.rate), (const char*)data[33]); // 등락률
+
+		s.seq.store(v + 2, std::memory_order_release); // even = done
+
+		CString slog;
+		slog.Format("[AXIS][RTS] [%s][%s]  <%s>[%s]   <%s>[%s]  <%s>[%s]   <%s>[%s]", s.RTStype, s.code,
+			(const char*)data[23], s.price,
+			(const char*)data[14], s.diff,
+			(const char*)data[15], s.volume,
+			(const char*)data[16], s.rate);
+		//OutputDebugString(slog);
+		// ===== seqlock end =====
+	}
+
+	inline void CopySnapshot(TickSnapshot& dst, const TickSnapshot& src)
+	{
+		// seq 제외하고 복사
+		dst.ts_ms = src.ts_ms;
+
+		strcpy_s(dst.RTStype, sizeof(dst.RTStype), src.RTStype);
+		strcpy_s(dst.code, sizeof(dst.code), src.code);
+		strcpy_s(dst.price, sizeof(dst.price), src.price);
+		strcpy_s(dst.diff, sizeof(dst.diff), src.diff);
+		strcpy_s(dst.volume, sizeof(dst.volume), src.volume);
+		strcpy_s(dst.rate, sizeof(dst.rate), src.rate);
+	}
+
+	static void MakeDummyTick(TickSnapshot& snap, int step)
+	{
+		memset(&snap, 0, sizeof(TickSnapshot));
+
+		// 임의 종목코드 (예: 삼성전자)
+		strcpy_s(snap.code, "005930");
+
+		// 타입
+		strcpy_s(snap.RTStype, "B");
+
+		// 현재가: 65000 + step 변동
+		int price = 65000 + (step % 20) * 50;
+		sprintf_s(snap.price, "%d", price);
+
+		// 대비
+		sprintf_s(snap.diff, "%d", price - 65000);
+
+		// 거래량
+		sprintf_s(snap.volume, "%d", 1000 + step * 10);
+
+		// 등락률
+		double rate = (price - 65000) / 65000.0 * 100.0;
+		sprintf_s(snap.rate, "%.2f", rate);
+
+		snap.ts_ms = GetTickCount();
+	}
+
+
+
+	bool GetTick(const char* code, TickSnapshot& out)
+	{
+		int idx = GetSlotIndex_FindOnly(code);
+		if (idx < 0) return false;
+		return ReadTick(idx, out);
+	}
+	bool ReadTick(int idx, TickSnapshot& out);
+
+	void InitPool()
+	{
+		for (int k = 150; k <= 170; ++k)
+			g_poolKeys.push(k);
+	}
+
+	int AllocPoolKey()
+	{
+		std::lock_guard<std::mutex> lock(g_poolMtx);
+
+		if (g_poolKeys.empty())
+			return -1; // 사용 가능 key 없음
+
+		int key = g_poolKeys.front();
+		g_poolKeys.pop();
+		return key;
+	}
+
+	void FreePoolKey(int key)
+	{
+		std::lock_guard<std::mutex> lock(g_poolMtx);
+		g_poolKeys.push(key);
+	}
+#endif
 protected:
 // #ifdef USE_AHNLAB_SECUREBROWSER
 // 	IAosSB *m_pAosSB;
