@@ -245,6 +245,9 @@ BOOL CAmountPopup::OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult)
 	CString sSection, sPrice, sUnit;
 	int	nParam = 0;
 
+	CString slog;
+
+
 	switch (wParam)
 	{
 	case GRID_JCNT:
@@ -283,9 +286,15 @@ BOOL CAmountPopup::OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult)
 		{
 			// 편집 시작하면 현재 값을 저장
 			oldVal = pGrid->GetItemText(pi->item.row, pi->item.col);
+
+			slog.Format("[cx_amount]GVN_BEGINLABELEDIT");
+			OutputDebugString(slog);
+
 		}
 		else if (pi->hdr.code == GVN_ENDLABELEDIT || pi->hdr.code == GVN_SELCHANGED)
 		{
+			slog.Format("[cx_amount] GVN_ENDLABELEDIT");
+			OutputDebugString(slog);
 			if (pOldGrid != NULL)
 			{
 				//이전에 선택된 그리드의 색깔 초기화.
@@ -307,8 +316,13 @@ BOOL CAmountPopup::OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult)
 			val.Trim();
 			val.Replace(",", "");
 
+			slog.Format("[cx_amount] 1.val=[%s]", val);
+			OutputDebugString(slog);
+
 			if (pi->hdr.code==GVN_ENDLABELEDIT)
 			{
+				slog.Format("[cx_amount] GVN_ENDLABELEDIT");
+				OutputDebugString(slog);
 				// 공백이면 원래값으로 되돌린다.
 				if (val.GetLength()>0)
 				{
@@ -337,10 +351,18 @@ BOOL CAmountPopup::OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult)
 				if (atoi(sPrice) > 0 && atoi(sUnit) > 0)
 					nValue = atoi(val) / atoi(sPrice) / atoi(sUnit) * atoi(sUnit);
 
-				val.Format("%d", nValue);
-			}
+				slog.Format("[cx_amount] [nValue = atoi(val) / atoi(sPrice) / atoi(sUnit) * atoi(sUnit)] 2.sPrice=[%s] sUnit=[%s]  val=[%s]", sPrice, sUnit, val);
+				OutputDebugString(slog);
 
+				val.Format("%d", nValue);
+			
+			}
+	
 			m_pParent->SendMessage(WM_USER + 1, nParam, atoi(val));
+
+			slog.Format("[cx_amount] 3.val=[%s]", val);
+			OutputDebugString(slog);
+
 // 			PostMessage(WM_USER, 0, 0);
 			
 			for (int row=0; row<pGrid->GetRowCount(); ++row)
@@ -500,7 +522,7 @@ void CAmountPopup::OnActivate(UINT nState, CWnd* pWndOther, BOOL bMinimized)
 
 void CAmountPopup::OnLButtonDown(UINT nFlags, CPoint point) 
 {
-	
+
 	CWnd::OnLButtonDown(nFlags, point);
 }
 
@@ -512,6 +534,7 @@ void CAmountPopup::OnMouseMove(UINT nFlags, CPoint point)
 
 void CAmountPopup::OnLButtonUp(UINT nFlags, CPoint point) 
 {
+
 // 	int tmp = 0;
 // 	if (getPosition(point, tmp) != CRect(0, 0, 0, 0))
 // 	{

@@ -521,10 +521,15 @@ int CControlWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 long CControlWnd::OnMessage1(WPARAM wParam, LPARAM lParam)
 {
+	CString slog;
 	switch (wParam)
 	{
 	case 1: // Popup 수량선택
 		m_rtnStr.Format("%s\t%d", m_sSymbol, lParam);
+
+		slog.Format("[cx_amount][CControlWnd::OnMessage1] 수량  m_rtnStr=[%s]", m_rtnStr);
+		OutputDebugString(slog);
+
 		m_pParent->PostMessage(WM_USER, MAKEWPARAM(formDLL, m_Param.key), (LPARAM)m_rtnStr.GetString());
 		break;
 	case 2: // Popup 수량선택 없이 Close
@@ -532,6 +537,10 @@ long CControlWnd::OnMessage1(WPARAM wParam, LPARAM lParam)
 		break;
 	case 3: // Popup 금액선택	2013.10.10 KSJ
 		m_rtnStr.Format("%s\t%d", m_sSymbol, lParam);
+
+		slog.Format("[cx_amount][CControlWnd::OnMessage1]  금액 m_rtnStr=[%s]", m_rtnStr);
+		OutputDebugString(slog);
+
 		m_pParent->PostMessage(WM_USER, MAKEWPARAM(formDLL, m_Param.key), (LPARAM)m_rtnStr.GetString());
 		break;
 	}
