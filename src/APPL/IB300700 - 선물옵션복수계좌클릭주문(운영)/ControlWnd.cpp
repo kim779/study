@@ -887,12 +887,12 @@ void CControlWnd::LoadMaster(bool bFlag)
 	if(bFlag)
 	{
 		strFuture = "fjcode.dat";
-		strOption = "opcode.dat";
+		strOption = "opcode2.dat";
 	}
 	else
 	{
 		strFuture = "mfcode.dat";
-		strOption = "mocode.dat";
+		strOption = "mocode2.dat";
 	}
 	
 	// 선물종목코드
@@ -929,7 +929,11 @@ void CControlWnd::LoadMaster(bool bFlag)
 					row.atmg = (st->atmg==1);
 					sprintf(row.call_code, "%.8s", st->call[10-i].cod2);
 					sprintf(row.put_code, "%.8s", st->put[i].cod2);
-					sprintf(row.hsga, "%.3s.%.2s", &st->price[0], &st->price[3]);
+					//sprintf(row.hsga, "%.3s.%.2s", &st->price[0], &st->price[3]);
+					if (strlen(st->price) > 5)
+						sprintf(row.hsga, "%.4s.%.2s", &st->price[0], &st->price[3]);
+					else
+						sprintf(row.hsga, "%.3s.%.2s", &st->price[0], &st->price[3]);
 					
 					m_dtOption[i].push_back(row);
 				}

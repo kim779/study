@@ -654,7 +654,7 @@ bool CJangoWnd::OCodeLoad(CString tabPath)
 	struct  ojcode  OJCode;
 	ULONGLONG codeN=0, len=0;
 	
-	CString	path = tabPath + "opcode.dat";
+	CString	path = tabPath + "opcode2.dat";
 	if (!file.Open(path, CFile::modeRead|CFile::typeBinary))
 	{	
 		MessageBox("파일이 존재하지 않습니다.");
@@ -683,7 +683,10 @@ bool CJangoWnd::OCodeLoad(CString tabPath)
 		file.Read(&OJCode, sizeof(struct ojcode));
 		
 		tmp = CString(OJCode.price, OPriceLen);
-		oCode.Price.Format("%3.1f", float(atoi(tmp)/ 100.0));
+		if(tmp.GetLength() > 5)
+			oCode.Price.Format("%4.1f", float(atoi(tmp) / 100.0));
+		else
+			oCode.Price.Format("%3.1f", float(atoi(tmp)/ 100.0));
 		oCode.Atm = OJCode.atmg;
 
 		for (int jj = 0; jj < STANDARDCNT; jj++)

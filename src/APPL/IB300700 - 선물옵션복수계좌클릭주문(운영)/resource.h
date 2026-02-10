@@ -1,6 +1,6 @@
 //{{NO_DEPENDENCIES}}
-// Microsoft Visual C++에서 생성한 포함 파일입니다.
-// IB300700.rc에서 사용되고 있습니다.
+// Microsoft Developer Studio generated include file.
+// Used by IB191000.rc
 //
 #define IDD_DIALOG1                     1000
 #define IDD_CONFIG_DLG                  1000

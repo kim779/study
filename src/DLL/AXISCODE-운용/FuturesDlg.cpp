@@ -1605,8 +1605,7 @@ BOOL CFuturesDlg::loadWCode()
 
 	CString path;
 	
-//	path = ((CAxisCodeApp*)AfxGetApp())->m_root + "\\tab\\opcode.dat";  //옵션코드
-	path = ((CAxisCodeApp*)AfxGetApp())->m_root + "\\tab\\wocode.dat";  //옵션코드
+	path = ((CAxisCodeApp*)AfxGetApp())->m_root + "\\tab\\wocode2.dat";  //옵션코드
 	
 	if (!file.Open(path, CFile::modeRead|CFile::typeBinary | CFile::shareDenyNone))
 	{	
@@ -1630,7 +1629,7 @@ BOOL CFuturesDlg::loadWCode()
 	{
 		file.Read(&OJCode, sizeof(struct ojcode));
 
-		stmp.Format("[%d] [%.5s] \n",ii, OJCode.price);
+		stmp.Format("[%d] [%.7s] \n",ii, OJCode.price);
 		for(int ii = 0 ; ii < 11 ; ii++)
 		{
 			stmp1.Format("%s [%s] [%c]", OJCode.call[ii].cod2, OJCode.call[ii].hnam, OJCode.call[ii].yorn);
@@ -1658,6 +1657,34 @@ BOOL CFuturesDlg::loadWCode()
 	return TRUE;
 }
 
+void SortOCodeByPriceDesc(CArray<ojcode, ojcode>& arr)
+{
+	std::vector<ojcode> temp;
+
+	for (int i = 0; i < arr.GetSize(); i++)
+	{
+		temp.push_back(arr[i]);
+	}
+
+	// price 기준 내림차순 정렬
+	std::sort(temp.begin(), temp.end(),
+		[](const ojcode& a, const ojcode& b) {
+
+			double pa = atof(a.price);
+			double pb = atof(b.price);
+
+			return pa < pb;   // 여기만 변경 (내림차순)
+		});
+
+	arr.RemoveAll();
+
+	for (auto& item : temp)
+	{
+		arr.Add(item);
+	}
+}
+
+
 BOOL CFuturesDlg::loadOjCode()
 {									// 옵션 코드 종목...	
 // 	if (m_arrayOcode.GetSize() > 0)
@@ -1675,7 +1702,7 @@ BOOL CFuturesDlg::loadOjCode()
 
 	CString path;
   	
-	path = ((CAxisCodeApp*)AfxGetApp())->m_root + "\\tab\\opcode.dat";  //옵션코드
+	path = ((CAxisCodeApp*)AfxGetApp())->m_root + "\\tab\\opcode2.dat";  //옵션코드
 
 	if (!file.Open(path, CFile::modeRead|CFile::typeBinary | CFile::shareDenyNone))
 	{	
@@ -1696,17 +1723,23 @@ BOOL CFuturesDlg::loadOjCode()
 	m_ArrayMonth.RemoveAll();
 
 	codeN = gsl::narrow_cast<int>((file.GetLength() - len) / sizeof(struct ojcode));
-
+	//CString slog;
 	for (int ii = 0; ii < codeN; ii++)
 	{
 		struct  ojcode OJCode;
 		file.Read(&OJCode, sizeof(struct ojcode));
+
+		//slog.Format("[opcode][%s]행사가=[%s] atm=[%c]", __FUNCTION__, OJCode.price, OJCode.atmg);
+		//OutputDebugString(slog);
+
 		m_arrayOcode.Add(OJCode);
 	}
-
+	//SortOCodeByPriceDesc(m_arrayOcode);
 	file.Close();
 	return TRUE;
 }
+
+
 
 BOOL CFuturesDlg::loadMfCode()
 {
@@ -1770,7 +1803,7 @@ BOOL CFuturesDlg::loadMoCode()
 	
 	CString path;
 	
-	path = ((CAxisCodeApp*)AfxGetApp())->m_root + "\\tab\\mocode.dat";
+	path = ((CAxisCodeApp*)AfxGetApp())->m_root + "\\tab\\mocode2.dat";
 	
 	if (!file.Open(path, CFile::modeRead|CFile::typeBinary | CFile::shareDenyNone))
 	{	
@@ -1805,7 +1838,7 @@ BOOL CFuturesDlg::loadMoCode()
 	for (int ii = 0; ii < codeN; ii++)
 	{
 		file.Read(&OJCode, sizeof(struct ojcode));
-		stmp.Format("[%d] [%.5s] \n",ii, OJCode.price);
+		stmp.Format("[%d] [%.7s] \n",ii, OJCode.price);
 		for(int ii = 0 ; ii < 11 ; ii++)
 		{
 			stmp1.Format("%s [%c]", OJCode.call[ii].cod2, OJCode.call[ii].yorn);
@@ -3906,11 +3939,20 @@ void CFuturesDlg::OnButtonKospi200()
 
 	m_pCheck->RemoveAll();
 	m_pCheck->SetCount(m_arrayOcode.GetSize());
+	CString slog;
+
+	
 
 	// CheckBox에 데이터 맞물리기...
 	for (int ii = m_arrayOcode.GetSize() - 1; ii >= 0 ; ii--)
 	{
+		//slog.Format("[opcode][%s] ---------------------------------------------------------", __FUNCTION__);
+		//OutputDebugString(slog);
+
 		const ojcode OJCode  = m_arrayOcode.GetAt(ii);
+		//slog.Format("[opcode][%s][%s]",__FUNCTION__, OJCode.price);
+		//OutputDebugString(slog);
+		
 		
 		if (OJCode.atmg == 1)	// ATM 구하기 ...
 			m_nAtm = abs(ii - (m_arrayOcode.GetSize() - 1));
@@ -3941,10 +3983,18 @@ void CFuturesDlg::OnButtonKospi200()
 					data.atm = FALSE;
 			}
 			m_pCheck->AddData(row, jj, data);	// 데이터 삽입..
+
+		/*	slog.Format("[opcode][%s] col=[%d]  콜 [%s] code=[%s] flag=[%d]", __FUNCTION__, jj, data.name, data.code, data.flag);
+			if(row < 10)
+				OutputDebugString(slog);*/
+
 		}
 		
 		szTemp = "";
 		data.name = CString(OJCode.price, OPriceLen);
+
+		//slog.Format("[opcode]  --------------------------------------               [%s] 행사가=[%s]", __FUNCTION__, data.name);
+		//OutputDebugString(slog);
 
 		float	val = (float)atol(data.name);
 			val /= 100;
@@ -3980,6 +4030,9 @@ void CFuturesDlg::OnButtonKospi200()
 			}
 			m_pCheck->AddData(row, jj, data);	// 데이터 삽입..
 
+			/*slog.Format("[opcode][%s]  col=[%d]    풋 [%s] code=[%s] flag=[%d]", __FUNCTION__, jj, data.name, data.code, data.flag);
+			if (row < 10)
+				OutputDebugString(slog);*/
 		}			
 		++row;
 	}

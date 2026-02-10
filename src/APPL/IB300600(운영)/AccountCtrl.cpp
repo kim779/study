@@ -40,6 +40,7 @@ END_MESSAGE_MAP()
 	
 void CAccountCtrl::CreateControl()
 {
+
 	if (m_hInst) return;
 
 	CString dllPath = CString(Variant(homeCC, "")) + CString("\\dev\\CX_ACCOUNT.DLL");

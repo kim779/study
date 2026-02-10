@@ -347,6 +347,10 @@ void CDialogConfirm::CreateTextWnd()
 	COLORREF clrDataBack{};
 	COLORREF clrHeadBack{};
 	COLORREF clrLine{};
+	COLORREF crTextBkWhite = 0x00FFFFFF, crTextBkYellow = 0x00B7F2FF;
+
+	int Toggle = 0;
+
 	int nX = GAP;
 	int nY = GAP;
 	CRect rcClient;
@@ -382,6 +386,7 @@ void CDialogConfirm::CreateTextWnd()
 		arrHead.Add(arrHeadTop[4]);
 		arrHead.Add(arrHeadTop[6]);
 		arrHead.Add(arrHeadTop[7]);
+		Toggle = 1;
 		break;
 
 	case 2:			// 취소
@@ -398,6 +403,7 @@ void CDialogConfirm::CreateTextWnd()
 		arrHead.Add(arrHeadTop[3]);
 		arrHead.Add(arrHeadTop[4]);
 		arrHead.Add(arrHeadTop[6]);
+		Toggle = 2;
 		break;
 
 	case 3:			// 정정
@@ -416,6 +422,7 @@ void CDialogConfirm::CreateTextWnd()
 		arrHead.Add(arrHeadTop[5]);
 		arrHead.Add(arrHeadTop[6]);
 		arrHead.Add(arrHeadTop[7]);
+		Toggle = 3;
 		break;
 
 	default:	// 매도
@@ -432,6 +439,7 @@ void CDialogConfirm::CreateTextWnd()
 		arrHead.Add(arrHeadTop[4]);
 		arrHead.Add(arrHeadTop[6]);
 		arrHead.Add(arrHeadTop[7]);
+		Toggle = 0;
 		break;
 	}
 
@@ -448,7 +456,7 @@ void CDialogConfirm::CreateTextWnd()
 	nY += ROW_HEIGHT;
 
 	CFont* pFont = RequestFont("굴림체", 9, FALSE, NULL);
-
+	CFont* pFontB = RequestFont(_T("굴림체"), 9, FALSE, FW_BOLD);
 //	nX += GAP;
 	nY = nY + GAP;
 	nX = 5;
@@ -462,10 +470,71 @@ void CDialogConfirm::CreateTextWnd()
 		m_pHead[i].Create(arrHead[i], NULL, CRect(ix, nY, ix + 84, nY + ROW_HEIGHT),
 							this, IDC_HEADBASE + i, NULL, clrHeadBack, CLR_FG, clrLine);
 		m_pHead[i].SetFontFromParent(pFont);
-
-		m_pData[i].Create(_T(""), NULL, CRect(ix + 83, nY, iright-3, nY + ROW_HEIGHT),
-							this, IDC_DATABASE + i, NULL, clrDataBack, CLR_FG, clrLine);
-		m_pData[i].SetFontFromParent(pFont);
+		if (Toggle == 0 || Toggle == 1)//매수 매도
+		{
+			if (i == 2 || i == 4)
+			{
+				m_pData[i].Create(_T(""), NULL, CRect(ix + 83, nY, iright - 3, nY + ROW_HEIGHT),
+					this, IDC_DATABASE + i, NULL, crTextBkWhite, CLR_FG, clrLine);
+				m_pData[i].SetFontFromParent(pFontB);
+			}
+			else if (i == 5)
+			{
+				m_pData[i].Create(_T(""), NULL, CRect(ix + 83, nY, iright - 3, nY + ROW_HEIGHT),
+					this, IDC_DATABASE + i, NULL, crTextBkYellow, CLR_FG, clrLine);
+				m_pData[i].SetFontFromParent(pFontB);
+			}
+			else
+			{
+				m_pData[i].Create(_T(""), NULL, CRect(ix + 83, nY, iright - 3, nY + ROW_HEIGHT),
+					this, IDC_DATABASE + i, NULL, clrDataBack, CLR_FG, clrLine);
+				m_pData[i].SetFontFromParent(pFont);
+			}
+			
+		}
+		else if (Toggle == 2)
+		{
+			if (i == 3 || i == 5)
+			{
+				m_pData[i].Create(_T(""), NULL, CRect(ix + 83, nY, iright - 3, nY + ROW_HEIGHT),
+					this, IDC_DATABASE + i, NULL, crTextBkWhite, CLR_FG, clrLine);
+				m_pData[i].SetFontFromParent(pFontB);
+			}
+			else
+			{
+				m_pData[i].Create(_T(""), NULL, CRect(ix + 83, nY, iright - 3, nY + ROW_HEIGHT),
+					this, IDC_DATABASE + i, NULL, clrDataBack, CLR_FG, clrLine);
+				m_pData[i].SetFontFromParent(pFont);
+			}
+		}
+		else if (Toggle == 3)
+		{
+			if (i == 3 || i == 6)
+			{
+				m_pData[i].Create(_T(""), NULL, CRect(ix + 83, nY, iright - 3, nY + ROW_HEIGHT),
+					this, IDC_DATABASE + i, NULL, crTextBkWhite, CLR_FG, clrLine);
+				m_pData[i].SetFontFromParent(pFontB);
+			}
+			else if (i == 7)
+			{
+				m_pData[i].Create(_T(""), NULL, CRect(ix + 83, nY, iright - 3, nY + ROW_HEIGHT),
+					this, IDC_DATABASE + i, NULL, crTextBkYellow, CLR_FG, clrLine);
+				m_pData[i].SetFontFromParent(pFontB);
+			}
+			else
+			{
+				m_pData[i].Create(_T(""), NULL, CRect(ix + 83, nY, iright - 3, nY + ROW_HEIGHT),
+					this, IDC_DATABASE + i, NULL, clrDataBack, CLR_FG, clrLine);
+				m_pData[i].SetFontFromParent(pFont);
+			}
+		}
+		else
+		{
+			m_pData[i].Create(_T(""), NULL, CRect(ix + 83, nY, iright - 3, nY + ROW_HEIGHT),
+				this, IDC_DATABASE + i, NULL, clrDataBack, CLR_FG, clrLine);
+			m_pData[i].SetFontFromParent(pFont);
+		}
+		
 
 		if (i < nTop)
 			m_pData[i].SetAlign(DT_LEFT);

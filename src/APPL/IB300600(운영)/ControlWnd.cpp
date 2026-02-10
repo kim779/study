@@ -1165,12 +1165,12 @@ void CControlWnd::LoadMaster(int igubn)
 	if(igubn == NORMALBTN)
 	{
 		strFuture = "fjcode.dat";
-		strOption = "opcode.dat";
+		strOption = "opcode2.dat";
 	}
 	else if(igubn == MINIBTN)
 	{
 		strFuture = "mfcode.dat";
-		strOption = "mocode.dat";
+		strOption = "mocode2.dat";
 	}
 	else if(igubn == WEEKBTN)
 	{
@@ -1209,7 +1209,7 @@ void CControlWnd::LoadMaster(int igubn)
 
 		m_sArrTWeek.RemoveAll();
 		m_sArrMWeek.RemoveAll();
-
+		//CString str;
 		for(int n=0;st!=ed; ++st)
 		{
 			for(int i=0; i<11; ++i)
@@ -1221,8 +1221,14 @@ void CControlWnd::LoadMaster(int igubn)
 					
 					sprintf(row.call_code, "%.8s", st->call[10-i].cod2);
 					sprintf(row.put_code, "%.8s", st->put[i].cod2);
-					sprintf(row.hsga, "%.3s.%.2s", &st->price[0], &st->price[3]);
+					if (strlen(st->price) > 5)
+						sprintf(row.hsga, "%.4s.%.2s", &st->price[0], &st->price[3]);
+					else
+						sprintf(row.hsga, "%.3s.%.2s", &st->price[0], &st->price[3]);
 					
+					//str.Format("[opcode] %s", st->price);
+					//OutputDebugString(str);
+
 					m_dtOption[i].push_back(row);
 					isize = m_dtOption[i].size();
 
@@ -1286,7 +1292,7 @@ void CControlWnd::LoadMaster(bool bFlag)
 	if(bFlag)
 	{
 		strFuture = "fjcode.dat";
-		strOption = "opcode.dat";
+		strOption = "opcode2.dat";
 	}
 	else
 	{

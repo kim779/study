@@ -583,6 +583,9 @@ void CCheckBox::ResetScrollBars()
 
 void CCheckBox::AddData(int row, int col, const DATA& data)
 {	
+	/*CString slog;
+	slog.Format("[opcode][AddData] row=[%d] col=[%d] key=[%d][%d][%s][%s]", row, col, row * ROWCOUNT + col, data.flag, data.code, data.name);
+	OutputDebugString(slog);*/
 	m_Map.SetAt(row*ROWCOUNT + col, data);
 }
 
@@ -836,7 +839,7 @@ void CCheckBox::DeleteTool()
 	if (m_pTool)
 		m_pTool->DeleteDC();
 }
-
+//드랍다운으로 선택하는 원원물에 (마지막 컬럼한개) 대한 처리코드
 void CCheckBox::SetMonth(int row)
 {
 	int nRow = row, nIndex = 0;
@@ -851,7 +854,7 @@ void CCheckBox::SetMonth(int row)
 	const int nCount = m_Array.GetSize();
 	
 	if(nCount == 0)	return;	//2015.07.14 KSJ 사이즈가 0이면 그리지 않음.
-
+	CString slog;
 
 	{
 		icol = 0;
@@ -861,7 +864,7 @@ void CCheckBox::SetMonth(int row)
 		m_pTool->FrameRect(CALLMONRECT, USER_BT_NORMALCOR1);
 		m_pTool->WriteText(strData, CALLMONRECT);
 		m_pTool->DrawCell(CALLMONRECT);
-
+		
 		for (int jj = 0; jj < m_nCount; jj++)
 		{	
 			// col index
@@ -870,8 +873,16 @@ void CCheckBox::SetMonth(int row)
 			
 			// BOOL값 처리... 
 			m_Map.Lookup((jj*ROWCOUNT + icol + nIndex), data); 
+
+		/*	slog.Format("[axiscode][draw][C] m_nCallSelect=[%d]  key=[%d]  jj=[%d] icol = [%d] nIndex=[%d] flag=[%d][%s][%s] ", m_nCallSelect,
+				jj * ROWCOUNT + icol + nIndex
+				, jj, icol, nIndex, data.flag, data.code, data.name);*/
+			
+
 			if (data.flag)
 			{
+				//if (row < 10)
+				//	OutputDebugString(slog);
 				m_BitmapNormal.Draw(m_pTool->GetDC(), rc);
 				
 				if (data.flag == 2 && ((CFuturesDlg*)m_pWnd)->GetKind() != futureCODE
@@ -889,7 +900,7 @@ void CCheckBox::SetMonth(int row)
 	{
 		nRow = row;
 		icol = 8;
-		nIndex = m_nPutSelect + STANDARDNUM -1;
+		nIndex = m_nPutSelect + STANDARDNUM;
 
 		strData = m_Array.GetAt(abs(m_nPutSelect == 0 ? 0:m_nPutSelect - STANDARDNUM));
 		m_pTool->FrameRect(PUTMONRECT, USER_BT_NORMALCOR1);
@@ -904,14 +915,22 @@ void CCheckBox::SetMonth(int row)
 			
 			// BOOL값 처리... 
 			m_Map.Lookup((jj*ROWCOUNT + nIndex), data); 
+	
+		/*	slog.Format("[axiscode][draw][P]m_nPutSelect=[%d] key=  [%d]  jj=[%d] icol = [%d] nIndex=[%d] flag=[%d][%s][%s] ", m_nPutSelect,
+				jj * ROWCOUNT + icol + nIndex
+				, jj, icol, nIndex, data.flag, data.code, data.name);*/
+			
+
 			if (data.flag)
 			{
+			//	if(row < 10)
+			//		OutputDebugString(slog);
 				m_BitmapNormal.Draw(m_pTool->GetDC(), rc);
 				
 				if (data.flag == 2 && ((CFuturesDlg*)m_pWnd)->GetKind() != futureCODE
 					&& ((CFuturesDlg*)m_pWnd)->GetKind() != spreadCODE)
 				{	
-					m_BitmapClick.Draw(m_pTool->GetDC(), rc);
+					m_BitmapClick.Draw(m_pTool->GetDC(), rc); 
 					m_Key = jj*ROWCOUNT + nIndex;
 				}
 			}
@@ -1079,6 +1098,11 @@ void CCheckBox::OnLButtonUp(UINT nFlags, CPoint point)
 							((CFuturesDlg*)m_pWnd)->SetButton();
 							((CFuturesDlg*)m_pWnd)->UpdateData(FALSE);
 						}
+
+					/*	CString slog;
+						slog.Format("[opcode][OnLButtonUp] jj=[%d] nIndex=[%d] key=[%d][%d][%s][%s]", jj, nIndex, jj * ROWCOUNT + nIndex, data.flag, data.code, data.name);
+						OutputDebugString(slog);*/
+
 						AddData(jj, nIndex, data);
 						Invalidate();		
 					}

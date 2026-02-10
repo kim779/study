@@ -197,7 +197,7 @@ void CConfirmDlg::DrawSellOrder( CDC *pDC, CRect *pRC)
 	int line_h = 20, head_w = 50, pos_x = 0, pos_y = 0;
 
 	CString qty_txt;
-	COLORREF crHeadBk = 0xE6CDBB, crTextBk = 0xF2D3A6, crLine = 0x9C8F87;
+	COLORREF crHeadBk = 0xE6CDBB, crTextBk = 0xF2D3A6, crLine = 0x9C8F87, crTextBkWhite = 0x00FFFFFF, crTextBkYellow = 0x00B7F2FF;
 
 	CRect rc = *pRC;
 	rc.DeflateRect(CSize(PADDING_VALUE));
@@ -206,13 +206,16 @@ void CConfirmDlg::DrawSellOrder( CDC *pDC, CRect *pRC)
 
 	rc.bottom = rc.top + line_h;
 	pDC->SelectObject(m_pFontB);
+
 	pDC->SetTextColor(m_crMinus);
 	pDC->DrawText(CString("※ 매도주문 확인창"), rc, DT_VCENTER|DT_SINGLELINE|DT_LEFT);
 	
-	pDC->SelectObject(m_pFont);
+	
+	pDC->SelectObject(m_pFontB);
 	rc.OffsetRect(CPoint(0, line_h)); 
-	DrawLine(pDC, &rc, "종  목", m_cdnm, 80, m_crNormal, crHeadBk, crTextBk, crLine);
+	DrawLine(pDC, &rc, "종  목", m_cdnm, 80, m_crNormal, crHeadBk, crTextBkWhite, crLine);
 
+	pDC->SelectObject(m_pFont);
 	rc.OffsetRect(CPoint(0, line_h-1)); 
 	DrawLine(pDC, &rc, "구  분", GetCdgbName(), 80, m_crNormal, crHeadBk, crTextBk, crLine);
 	
@@ -221,12 +224,14 @@ void CConfirmDlg::DrawSellOrder( CDC *pDC, CRect *pRC)
 	DrawLine(pDC, &rc, "계  좌", qty_txt, 80, m_crNormal, crHeadBk, crTextBk, crLine);
 	
 	qty_txt.Format("%s 계약", Int2CommaStr(m_oqty));
+
+	pDC->SelectObject(m_pFontB);
 	rc.OffsetRect(CPoint(0, line_h-1)); 
-	DrawLine(pDC, &rc, "수  량", qty_txt, 80, m_crNormal, crHeadBk, crTextBk, crLine);
+	DrawLine(pDC, &rc, "수  량", qty_txt, 80, m_crNormal, crHeadBk, crTextBkWhite, crLine);
 
 	rc.OffsetRect(CPoint(0, line_h-1)); 
 	if (m_oprc!=MARKET_JPRC)
-		DrawLine(pDC, &rc, "단  가", Int2Str(m_oprc, 2), 80, m_crNormal, crHeadBk, crTextBk, crLine);
+		DrawLine(pDC, &rc, "단  가", Int2Str(m_oprc, 2), 80, m_crNormal, crHeadBk, crTextBkYellow, crLine);
 
 	rc.OffsetRect(CPoint(0, line_h+PADDING_VALUE)); 
 	pDC->SelectObject(m_pFontB);
@@ -248,7 +253,7 @@ void CConfirmDlg::DrawBuyOrder( CDC *pDC, CRect *pRC )
 	int line_h = 20, head_w = 50, pos_x = 0, pos_y = 0;
 	
 	CString qty_txt;
-	COLORREF crHeadBk = 0xC3BAF4, crTextBk = 0xC9C5F8, crLine = 0x8580F1;
+	COLORREF crHeadBk = 0xC3BAF4, crTextBk = 0xC9C5F8, crLine = 0x8580F1, crTextBkWhite = 0x00FFFFFF, crTextBkYellow = 0x00B7F2FF;
 	
 	CRect rc = *pRC;
 	rc.DeflateRect(CSize(PADDING_VALUE));
@@ -260,10 +265,12 @@ void CConfirmDlg::DrawBuyOrder( CDC *pDC, CRect *pRC )
 	pDC->SetTextColor(m_crPlus);
 	pDC->DrawText(CString("※ 매수주문 확인창"), rc, DT_VCENTER|DT_SINGLELINE|DT_LEFT);
 	
-	pDC->SelectObject(m_pFont);
-	rc.OffsetRect(CPoint(0, line_h)); 
-	DrawLine(pDC, &rc, "종  목", m_cdnm, 80, m_crNormal, crHeadBk, crTextBk, crLine);
 	
+	pDC->SelectObject(m_pFontB);
+	rc.OffsetRect(CPoint(0, line_h)); 
+	DrawLine(pDC, &rc, "종  목", m_cdnm, 80, m_crNormal, crHeadBk, crTextBkWhite, crLine);
+	
+	pDC->SelectObject(m_pFont);
 	rc.OffsetRect(CPoint(0, line_h-1)); 
 	DrawLine(pDC, &rc, "구  분", GetCdgbName(), 80, m_crNormal, crHeadBk, crTextBk, crLine);
 	
@@ -272,12 +279,14 @@ void CConfirmDlg::DrawBuyOrder( CDC *pDC, CRect *pRC )
 	DrawLine(pDC, &rc, "계  좌", qty_txt, 80, m_crNormal, crHeadBk, crTextBk, crLine);
 	
 	qty_txt.Format("%s 계약", Int2CommaStr(m_oqty));
+	pDC->SelectObject(m_pFontB);
 	rc.OffsetRect(CPoint(0, line_h-1)); 
-	DrawLine(pDC, &rc, "수  량", qty_txt, 80, m_crNormal, crHeadBk, crTextBk, crLine);
+	DrawLine(pDC, &rc, "수  량", qty_txt, 80, m_crNormal, crHeadBk, crTextBkWhite, crLine);
 
+	pDC->SelectObject(m_pFontB);
 	rc.OffsetRect(CPoint(0, line_h-1)); 
 	if (m_oprc!=MARKET_JPRC)
-		DrawLine(pDC, &rc, "단  가", Int2Str(m_oprc, 2), 80, m_crNormal, crHeadBk, crTextBk, crLine);
+		DrawLine(pDC, &rc, "단  가", Int2Str(m_oprc, 2), 80, m_crNormal, crHeadBk, crTextBkYellow, crLine);
 	
 	rc.OffsetRect(CPoint(0, line_h+PADDING_VALUE)); 
 	pDC->SelectObject(m_pFontB);
@@ -290,7 +299,7 @@ void CConfirmDlg::DrawModifyOrder( CDC *pDC, CRect *pRC )
 	int line_h = 20, head_w = 50, pos_x = 0, pos_y = 0;
 	
 	CString qty_txt;
-	COLORREF crHeadBk = 0xA2DEC3, crTextBk = 0xA5EAC0, crLine = 0x73C392, crBox = 0xD4F5E6;
+	COLORREF crHeadBk = 0xA2DEC3, crTextBk = 0xA5EAC0, crLine = 0x73C392, crBox = 0xD4F5E6, crTextBkWhite = 0x00FFFFFF, crTextBkYellow = 0x00B7F2FF;
 	
 	CRect rc = *pRC;
 	rc.DeflateRect(CSize(PADDING_VALUE));
@@ -302,10 +311,12 @@ void CConfirmDlg::DrawModifyOrder( CDC *pDC, CRect *pRC )
 	pDC->SetTextColor(m_crNormal);
 	pDC->DrawText(CString("※ 정정주문 확인창"), rc, DT_VCENTER|DT_SINGLELINE|DT_LEFT);
 	
-	pDC->SelectObject(m_pFont);
-	rc.OffsetRect(CPoint(0, line_h)); 
-	DrawLine(pDC, &rc, "종  목", m_cdnm, 80, m_crNormal, crHeadBk, crTextBk, crLine);
 	
+	pDC->SelectObject(m_pFontB);
+	rc.OffsetRect(CPoint(0, line_h)); 
+	DrawLine(pDC, &rc, "종  목", m_cdnm, 80, m_crNormal, crHeadBk, crTextBkWhite, crLine);
+	
+	pDC->SelectObject(m_pFont);
 	if (m_jqty>1) qty_txt.Format("%d 외 %d", m_ojno, m_jqty-1);
 	else              qty_txt.Format("%d", m_ojno);
 	rc.OffsetRect(CPoint(0, line_h+PADDING_VALUE)); 
@@ -316,12 +327,13 @@ void CConfirmDlg::DrawModifyOrder( CDC *pDC, CRect *pRC )
 	DrawLine(pDC, &rc, "계  좌", qty_txt, 80, m_crNormal, crHeadBk, crTextBk, crLine);
 	
 	qty_txt.Format("%s 계약", Int2CommaStr(m_oqty));
+	pDC->SelectObject(m_pFontB);
 	rc.OffsetRect(CPoint(0, line_h-1)); 
-	DrawLine(pDC, &rc, "수  량", qty_txt, 80, m_crNormal, crHeadBk, crTextBk, crLine);
+	DrawLine(pDC, &rc, "수  량", qty_txt, 80, m_crNormal, crHeadBk, crTextBkWhite, crLine);
 	
 	qty_txt.Format("%s -> %s", Int2Str(m_old_oprc), Int2Str(m_oprc));
 	rc.OffsetRect(CPoint(0, line_h-1)); 
-	DrawLine(pDC, &rc, "단  가", qty_txt, 80, m_crNormal, crHeadBk, crTextBk, crLine);
+	DrawLine(pDC, &rc, "단  가", qty_txt, 80, m_crNormal, crHeadBk, crTextBkYellow, crLine);
 	
 	rc.OffsetRect(CPoint(0, line_h+PADDING_VALUE)); 
 	pDC->SelectObject(m_pFontB);
@@ -333,7 +345,7 @@ void CConfirmDlg::DrawCancelOrder( CDC *pDC, CRect *pRC )
 	int line_h = 20, head_w = 50, pos_x = 0, pos_y = 0;
 	
 	CString qty_txt;
-	COLORREF crHeadBk = 0xBCDAE7, crTextBk = 0xEBF9FF, crLine = 0x98BCCD, crBox = 0xD8EEF8;
+	COLORREF crHeadBk = 0xBCDAE7, crTextBk = 0xEBF9FF, crLine = 0x98BCCD, crBox = 0xD8EEF8, crTextBkWhite = 0x00FFFFFF, crTextBkYellow = 0x00B7F2FF;
 	
 	CRect rc = *pRC;
 	rc.DeflateRect(CSize(PADDING_VALUE));
@@ -345,10 +357,12 @@ void CConfirmDlg::DrawCancelOrder( CDC *pDC, CRect *pRC )
 	pDC->SetTextColor(m_crNormal);
 	pDC->DrawText(CString("※ 취소주문 확인창"), rc, DT_VCENTER|DT_SINGLELINE|DT_LEFT);
 	
-	pDC->SelectObject(m_pFont);
-	rc.OffsetRect(CPoint(0, line_h)); 
-	DrawLine(pDC, &rc, "종  목", m_cdnm, 80, m_crNormal, crHeadBk, crTextBk, crLine);
 	
+	pDC->SelectObject(m_pFontB);
+	rc.OffsetRect(CPoint(0, line_h)); 
+	DrawLine(pDC, &rc, "종  목", m_cdnm, 80, m_crNormal, crHeadBk, crTextBkWhite, crLine);
+	
+	pDC->SelectObject(m_pFont);
 	if (m_jqty>1) qty_txt.Format("%d 외 %d", m_ojno, m_jqty-1);
 	else              qty_txt.Format("%d", m_ojno);
 	rc.OffsetRect(CPoint(0, line_h+PADDING_VALUE)); 
@@ -359,8 +373,9 @@ void CConfirmDlg::DrawCancelOrder( CDC *pDC, CRect *pRC )
 	DrawLine(pDC, &rc, "계  좌", qty_txt, 80, m_crNormal, crHeadBk, crTextBk, crLine);
 	
 	qty_txt.Format("%s 계약", Int2CommaStr(m_oqty));
+	pDC->SelectObject(m_pFontB);
 	rc.OffsetRect(CPoint(0, line_h-1)); 
-	DrawLine(pDC, &rc, "수  량", qty_txt, 80, m_crNormal, crHeadBk, crTextBk, crLine);
+	DrawLine(pDC, &rc, "수  량", qty_txt, 80, m_crNormal, crHeadBk, crTextBkWhite, crLine);
 	
 	/*
 	qty_txt.Format("%s -> %s", Int2Str(m_old_oprc), Int2Str(m_oprc));

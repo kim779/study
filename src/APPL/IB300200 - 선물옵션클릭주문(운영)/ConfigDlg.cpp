@@ -14,7 +14,6 @@ static char THIS_FILE[] = __FILE__;
 /////////////////////////////////////////////////////////////////////////////
 // CConfigDlg dialog
 
-
 CConfigDlg::CConfigDlg(CString file, CWnd* pParent /*=NULL*/)
 	: CDialog(CConfigDlg::IDD, pParent)
 {

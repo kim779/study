@@ -68,7 +68,7 @@ void CAccountCtrl::CreateControl()
 	param.style = 0;
 	param.tRGB  = 63;
 	param.pRGB  = GetIndexColor(7);
-	param.options = "";
+	param.options = "/t투자성향정보팝업";
 	param.key   = m_key;
 
 	m_pCtrl = axCreate(this, (LPVOID)&param);

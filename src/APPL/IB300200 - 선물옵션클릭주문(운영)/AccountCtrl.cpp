@@ -52,7 +52,6 @@ END_MESSAGE_MAP()
 
 void CAccountCtrl::createAccountCtrl(CString ctrlName, int nkey, DWORD bColor)
 {
-
 	CString dir;
 	dir.Format("%s\\dev\\cx_Account.dll", m_home);
 
