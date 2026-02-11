@@ -181,7 +181,13 @@ public: // RTM
 	BOOL m_bRemove{}; // 2011.12.29 KDK
 	void setAlertx(BOOL bflag) { m_bAlertx = bflag; }
 
-
+	int m_icheckTime{};
+	int m_DiffSec{};
+	bool ShouldSkipRTSByTimeDiff(CString& pcTime, const char* pRTSTime, int allowDiffSec, bool  bEnableCheck);
+	bool IsEnableRTSTimeCheck(const CTime& currentTime, const CTime& baseTime, int checkTimeSec);
+	CTime ParseRTSTime(const CString& sTime, const COleDateTime& today);
+	std::unordered_map<std::string, CTime> m_lastRTSTimeMap;
+	bool ShouldSkipRTSByServerTime(const std::string& code, const char* pServerTime, int  minIntervalSec);
 private:			 
 
 private:

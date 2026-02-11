@@ -671,9 +671,8 @@ void CIHCodeEdit::OnKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags)
 		}
 
 		return true;
+
 	};
-
-
 	/*if (!m_bKeydown)
 		return;
 	m_bKeydown = false;*/
@@ -986,7 +985,7 @@ int CIHCodeCtrl::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	m_pCombo = std::make_unique <CIHCodeCombo>(this);
 	m_pCombo->Create(CBS_DROPDOWN|WS_CHILD|WS_VISIBLE|WS_VSCROLL, CRect(0, 0, 0, 140), this, 0);
 	m_pCombo->SetItemHeight(-1, 0);
-	m_pCombo->SetDroppedWidth(150);
+	m_pCombo->SetDroppedWidth(200);
 
 	SetUnit(GU_CODE);
 	

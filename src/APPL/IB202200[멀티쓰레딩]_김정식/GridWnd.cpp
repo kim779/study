@@ -3885,6 +3885,14 @@ void CGridWnd::RbuttonAction(int row)
 		//			m_grid->memoCheck(row+1);
 		m_grid->memoRefresh();
 
+#ifdef DF_SORT
+		auto& pInter = _vInters.at(row - 1);
+
+		if (pInter)
+			pInter.get()->gubn = ROW_COMMENT;
+
+#endif
+
 		if (m_bAddCnd)
 		{
 			saveInterest();

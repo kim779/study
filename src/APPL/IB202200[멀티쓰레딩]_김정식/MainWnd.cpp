@@ -115,7 +115,8 @@ void CMainWnd::CheckRTSTimer(bool bFirst)
 	userip = CheckIP();
 	CString filePath;
 	filePath.Format("%s/%s/InterOption.ini", Variant(homeCC), "tab");
-	
+	m_icheckTime = GetPrivateProfileInt("OVERTIME", "TIME", 5000, filePath);
+	m_DiffSec = GetPrivateProfileInt("OVERTIME", "DIFFSEC", 1, filePath);
 	int iTime = 800;  
 	if (!m_bcustomer) //직원용
 	{
@@ -149,7 +150,7 @@ void CMainWnd::CheckRTSTimer(bool bFirst)
 			if (iTime != m_iTime)  //실시간 데이터 수신 설정률이 변한 경우만 타이머 다시 세팅
 			{
 				m_slog.Format("[IB202200][CheckRTSTimer2] KillTimer 고객용 iTime=[%d] m_iTime=[%d]", iTime, m_iTime);
-				OutputDebugString(m_slog);
+				Output_DebugString(m_slog);
 				m_iTime = iTime;
 			}
 		}
@@ -977,28 +978,87 @@ LONG CMainWnd::OnUser(WPARAM wParam, LPARAM lParam)
 		if (!m_bAlertx)
 			return 0;
 
-		const auto* alertR = reinterpret_cast<const _alertR*>(lParam);
+		if (1)
+		{
+			const auto* alertR = reinterpret_cast<const _alertR*>(lParam);
 
-		if (alertR == nullptr && alertR->size <= 0)
-			return 0;
-		const CString code = alertR->code;
-		if (!m_pGroupWnd->isCodeSymbol(code))
-			return 0;
+			if (alertR == nullptr && alertR->size <= 0)
+				return 0;
+			const CString code = alertR->code;
+			if (!m_pGroupWnd->isCodeSymbol(code))
+				return 0;
 
-		static constexpr int arr[] = { 41, 61, 101, 104, 106, 107, 109, 146, 181 };
-		auto& rmap = m_pGroupWnd->getRSymbol();
-		const bool bHoga = std::any_of(std::begin(arr), std::end(arr), [&rmap](const int symbol) {
-			return rmap.find(symbol) != rmap.end();
-		});
-	
-		if (bHoga == false && !(alertR->stat & alert_SCR))		
-			return 0;	
+			const DWORD* data = reinterpret_cast<const DWORD*>(alertR->ptr[0]);
+			COleDateTime oTime;
+			oTime = COleDateTime::GetCurrentTime();
+			CString strCurTime;
+			strCurTime.Format(_T("%02d%02d%02d"), oTime.GetHour(), oTime.GetMinute(), oTime.GetSecond());
 
-		m_pGroupWnd->initAlert();
+			int h1 = _ttoi(strCurTime.Mid(0, 2));
+			int m1 = _ttoi(strCurTime.Mid(2, 2));
+			int s1 = _ttoi(strCurTime.Mid(4, 2));
+			CTime timecur(oTime.GetYear(), oTime.GetMonth(), oTime.GetDay(), h1, m1, s1);
+
+			//m_strBeginTimeEnd = "141100";
+			h1 = _ttoi(m_strBeginTimeEnd.Mid(0, 2));
+			m1 = _ttoi(m_strBeginTimeEnd.Mid(2, 2));
+			s1 = _ttoi(m_strBeginTimeEnd.Mid(4, 2));
+			CTime timeOri(oTime.GetYear(), oTime.GetMonth(), oTime.GetDay(), h1, m1, s1);
+			CTimeSpan span(0, 0, 0, 10); // 10초
+			CTime timeend = timeOri - span;
+
+			bool bOverChecking{};
+			bOverChecking = IsEnableRTSTimeCheck(timecur, timeend, m_icheckTime);
+
+			std::string scode = CStringA(code);
+
+			if (ShouldSkipRTSByServerTime(scode, (char*)data[34], m_DiffSec) == true && bOverChecking)
+			{
+				return 0;
+			}
+			else
+			{
+				static constexpr int arr[] = { 41, 61, 101, 104, 106, 107, 109, 146, 181 };
+				auto& rmap = m_pGroupWnd->getRSymbol();
+				const bool bHoga = std::any_of(std::begin(arr), std::end(arr), [&rmap](const int symbol) {
+					return rmap.find(symbol) != rmap.end();
+					});
+
+				if (bHoga == false && !(alertR->stat & alert_SCR))
+					return 0;
+
+				m_pGroupWnd->initAlert();
+				AxStd::async([this, lParam]() {
+					m_pGroupWnd->RecvRTSx(lParam);
+					});
+				m_pGroupWnd->UpdateDraw();
+			}
+		}
+		else
+		{
+			const auto* alertR = reinterpret_cast<const _alertR*>(lParam);
+
+			if (alertR == nullptr && alertR->size <= 0)
+				return 0;
+			const CString code = alertR->code;
+			if (!m_pGroupWnd->isCodeSymbol(code))
+				return 0;
+
+			static constexpr int arr[] = { 41, 61, 101, 104, 106, 107, 109, 146, 181 };
+			auto& rmap = m_pGroupWnd->getRSymbol();
+			const bool bHoga = std::any_of(std::begin(arr), std::end(arr), [&rmap](const int symbol) {
+				return rmap.find(symbol) != rmap.end();
+				});
+
+			if (bHoga == false && !(alertR->stat & alert_SCR))
+				return 0;
+
+			m_pGroupWnd->initAlert();
 			AxStd::async([this, lParam]() {
 				m_pGroupWnd->RecvRTSx(lParam);
-		});
-		m_pGroupWnd->UpdateDraw();
+				});
+			m_pGroupWnd->UpdateDraw();
+		}
 	}
 	break;
 	// KSJ 
@@ -1025,6 +1085,51 @@ LONG CMainWnd::OnUser(WPARAM wParam, LPARAM lParam)
 	}
 
 	return ret;
+}
+
+bool CMainWnd::ShouldSkipRTSByServerTime(
+	const std::string& code,
+	const char* pServerTime,   // data[40]
+	int                minIntervalSec // 예: 1 or 2
+)
+{
+	if (!pServerTime)
+		return true;
+
+	if (minIntervalSec <= 0)
+		return false;
+
+	const CTime now = CTime::GetCurrentTime();
+	const CTime curServerTime = ParseRTSTime(pServerTime, COleDateTime::GetCurrentTime());
+
+	auto it = m_lastRTSTimeMap.find(code);
+
+	// 첫 수신은 무조건 통과
+	if (it == m_lastRTSTimeMap.end())
+	{
+		m_lastRTSTimeMap.emplace(code, curServerTime);
+		m_slog.Format("[IB202200][skipped] 첫수신 통과  code=[%s]  m_lastRTSTimeMap size = [%d] ", (LPCTSTR)&code, m_lastRTSTimeMap.size());
+		Output_DebugString(m_slog);
+		return false;
+	}
+
+	const CTime& prevServerTime = it->second;
+	int diffSec = (int)(curServerTime - prevServerTime).GetTotalSeconds();
+
+	// 서버시간이 같거나 너무 짧으면 스킵
+
+	if (diffSec < minIntervalSec)
+	{
+		//m_slog.Format("[IB202200][skipped]!!!!!!! code=[%s] diffSec=[%d] minIntervalSec=[%d]", (LPCTSTR)&code, diffSec, minIntervalSec);
+		//Output_DebugString(m_slog);
+		return true;
+	}
+
+	// 통과 → 마지막 시간 갱신
+	//m_slog.Format("[IB202200][NOskipped]@@@@@ code=[%s] diffSec=[%d] minIntervalSec=[%d]", (LPCTSTR)&code, diffSec, minIntervalSec);
+	//Output_DebugString(m_slog);
+	it->second = curServerTime;
+	return false;
 }
 
 void CMainWnd::parsingDomino(CString datB)
@@ -2350,3 +2455,70 @@ void CMainWnd::sendMemo(CString code, char type)
  	sendTR("pidomemo", (char*)pmid.get(), sizeof(st_mid_memo), TRKEY_INTER_MEMO_SEARCH);
 }
 
+bool CMainWnd::ShouldSkipRTSByTimeDiff(
+	CString& pcTime,
+	const char* pRTSTime,
+	int          allowDiffSec,   // 예: 1
+	bool         bEnableCheck
+)
+{
+	if (!bEnableCheck || !pRTSTime)
+		return false;
+
+	CString sRTSTime(pRTSTime);
+	if (sRTSTime.GetLength() < 6)
+		return false;
+
+	CTime rtsTime = ParseRTSTime(sRTSTime, COleDateTime::GetCurrentTime());
+	CTime rtsPCTime = ParseRTSTime(pcTime, COleDateTime::GetCurrentTime());
+
+	CTimeSpan diff = rtsPCTime - rtsTime;
+	int sec = abs((int)diff.GetTotalSeconds());
+
+	CString slog;
+	slog.Format("[IB202200][checkRTS] rtsTime=[%s] rtsPCTime=[%s] sec =[%d]",
+		sRTSTime, sRTSTime, sec);
+	Output_DebugString(slog);
+
+
+	// 차이가 너무 작으면 중복으로 판단
+	return sec <= allowDiffSec;
+}
+
+bool CMainWnd::IsEnableRTSTimeCheck(
+	const CTime& currentTime,
+	const CTime& baseTime,
+	int checkTimeSec   // m_icheckTime
+)
+{
+	if (checkTimeSec <= 0)
+		return false;
+
+	const CTimeSpan diff = currentTime - baseTime;
+
+
+	//CString slog;
+	//slog.Format("[IB202200][IsEnableRTSTimeCheck] checkTimeSec=[%d] deff=[%llu] m_strBeginTimeEnd=[%s]",
+	//	checkTimeSec, diff.GetTotalMinutes(), m_strBeginTimeEnd);
+	//OutputDebugString(slog);
+
+
+	if (diff < 0)
+		return false;
+
+	return diff.GetTotalMinutes() <= checkTimeSec;
+}
+
+CTime CMainWnd::ParseRTSTime(const CString& sTime, const COleDateTime& today)
+{
+	int h = _ttoi(sTime.Mid(0, 2));
+	int m = _ttoi(sTime.Mid(2, 2));
+	int s = _ttoi(sTime.Mid(4, 2));
+
+	return CTime(
+		today.GetYear(),
+		today.GetMonth(),
+		today.GetDay(),
+		h, m, s
+	);
+}

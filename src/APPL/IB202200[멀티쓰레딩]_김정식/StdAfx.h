@@ -38,3 +38,10 @@
 
 #define DF_NEWTREE
 #define DF_SERVERMEMO
+
+inline void Output_DebugString(CString slog)
+{
+	//OutputDebugString(slog);
+}
+
+#define DF_SORT

@@ -5325,6 +5325,24 @@ BOOL CintGrid::SortTextItems(int nCol, BOOL bAscending)
 	return SortTextItems(nCol, bAscending, GetFixedRowCount(), eRow);
 }
 
+bool CintGrid::IsCommentRow(int row) const
+{
+	if (row <= 0)
+		return false;
+
+	auto pInter = m_pParent->GetData(row - 1);
+	if (!pInter)
+		return false;
+
+	CString slog;
+	slog.Format("[sort] pInter->gubn=[%c]", pInter.get()->gubn);
+	Output_DebugString(slog);
+
+	if (pInter->gubn == ROW_COMMENT)
+		return true;
+	return false;
+}
+
 BOOL CintGrid::SortTextItems(int sortcol, BOOL ascending, int srow, int erow)
 {
 	CString strTemp;
@@ -5347,8 +5365,16 @@ BOOL CintGrid::SortTextItems(int sortcol, BOOL ascending, int srow, int erow)
 	CString	string, stringx;
 	for (int xrow = srow; xrow < erow-1; xrow++)
 	{
+#ifdef DF_SORT
+		if (IsCommentRow(xrow))
+			continue;
+#endif
 		for (int yrow = xrow+1; yrow < erow; yrow++)
 		{
+#ifdef DF_SORT
+			if (IsCommentRow(yrow))
+				continue;
+#endif
 			string  = GetItemText(xrow, sortcol);
 			stringx = GetItemText(yrow, sortcol);
 

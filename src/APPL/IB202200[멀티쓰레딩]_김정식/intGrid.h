@@ -406,9 +406,11 @@ protected:
 	std::unique_ptr <CTipDlg>		m_pToolChart{};
 	std::unique_ptr <CTipDlg>		m_pToolNews{};
 
-
+#ifdef DF_SORT
+	std::deque<int> _Count;
+#else
 	std::vector<int> _Count;
-
+#endif
 
 	// printing information
 	CSize		m_szChar;
@@ -779,6 +781,9 @@ protected:
 	afx_msg	void OnHistorySelEndOk();
 	afx_msg LONG OnManage (WPARAM wParam, LPARAM lParam);
 	DECLARE_MESSAGE_MAP()
+
+public:
+	bool IsCommentRow(int row) const;
 };
 
 inline xCELL CintGrid::GetCell(int nRow, int nCol) const
