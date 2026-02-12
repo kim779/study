@@ -8,10 +8,11 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
-int iHeads[] = {52, 52, 55, 49, 49, 52, 49, 49, 55, 52, 52};
-int iSHeads[] = {51, 51, 51, 55, 49, 52, 49, 55, 51, 51, 51};
-LPCSTR strHeads[] = {"증감", "미결제", "거래량", "대비", "현재가", "행사가", "현재가", "대비", "거래량", "미결제", "증감", NULL};
-LPCSTR strSHeads[] = {"저가", "고가", "시가", "거래량", "현재가", "행사가", "현재가", "거래량", "시가", "고가", "저가", NULL};
+
+int iHeads[] = { 46, 52, 55, 47, 53, 60, 53, 47, 55, 52, 46 };
+int iSHeads[] = { 49, 49, 49, 53, 53, 60, 53, 53, 49, 49, 49 };
+LPCSTR strHeads[] = { "증감", "미결제", "거래량", "대비", "현재가", "행사가", "현재가", "대비", "거래량", "미결제", "증감", NULL };
+LPCSTR strSHeads[] = { "저가", "고가", "시가", "거래량", "현재가", "행사가", "현재가", "거래량", "시가", "고가", "저가", NULL };
 
 #define TRG	"110301"
 #define S2I(x)	Str2Int(x, sizeof(x))
@@ -351,7 +352,6 @@ void CControlWnd::OnSize(UINT nType, int cx, int cy)
 			}
 		}
 	}
-	
 }
 
 void CControlWnd::ClearData()

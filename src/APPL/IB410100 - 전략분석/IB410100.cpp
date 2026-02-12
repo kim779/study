@@ -7,6 +7,7 @@
 #include "../../h/axisfire.h"
 #include "../../h/axisvar.h"
 #include "message.h"
+#include "MapWnd.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -305,14 +306,39 @@ int CIB410100App::ExitInstance()
 	return CWinApp::ExitInstance();
 }
 
+
 double CIB410100App::getOptionStrike(CString opCode)
 {
+
 	double strike;
+	CString shsga = "";
+	char hsga[7];	//shsga를 그대로 넣으면 문자열 길이를 제대로 못읽는 오류가 일어나서 위와같이 cstring -> char -> cstring으로 재변환 시켜줌 이건 다시 확인해봐야할 것으로 보임.
+	
+	CString temp;
+	CIB410100App* pApp = (CIB410100App*)AfxGetApp();
+	if (pApp && pApp->m_pMapWnd)
+		shsga = pApp->m_pMapWnd->getCodeHsga(opCode);
 
-	strike = atof(opCode.Mid(5, 3));
-	if (opCode[7] == '2' || opCode[7] == '7')
-		strike = strike + 0.5;
+	
+	if (shsga == "")
+	{	//기존로직
+		strike = atof(opCode.Mid(5, 3));
+		if (opCode[7] == '2' || opCode[7] == '7')
+			strike = strike + 0.5;
+	}
+	else
+	{
+		strncpy(hsga, (LPCSTR)shsga, 7);
+		shsga = (LPCSTR)hsga;
 
+		int nLen = shsga.GetLength();
+		if (nLen >= 2)
+			shsga.Insert(nLen - 2, _T('.'));
+		
+		strike = atof(shsga);
+	}
+	
+	
 	return strike;
 }
 

@@ -16,11 +16,19 @@
 #define	GUIDCOLOR_INDEX		34
 #define	GUIDTXTCOLOR_INDEX	97
 
+
 struct _codelist	// option code list
 {
 	CString code;		// 코드
 	CString name;		// 종목명
 	int	mdMargin{};	// 매도증거금
+	CString	hsga;
+};
+
+struct _codelistHsga	// option code list
+{
+	CString code;		// 코드
+	CString	hsga;
 };
 
 struct _strikelist
@@ -175,6 +183,7 @@ public:
 	};
 	_opgubn		m_pOPMonthInfo[11];	// 옵션월물 11개	2014.08.13 KSJ 
 	CArray <_codelist *, _codelist *> m_OPCodeList;		// full option codelist
+	CArray <_codelistHsga*, _codelistHsga*> m_OPCodeListHsga;		// full option codelist
 	CArray <_strikelist, _strikelist> m_pOPStrikeList[4];	// 각 월물별 행사가리스트
 	CStringArray	m_HedgeCodeList;	// 헤지할때 쓰는 코드리스트(옵션 최근월)
 
@@ -276,6 +285,7 @@ public:
 	void		initFOMultiSel(CRect rect);
 
 	CString		GetCtrlProperty(LPCSTR property);
+	CString		getCodeHsga(CString code);
 
 // Overrides
 	// ClassWizard generated virtual function overrides

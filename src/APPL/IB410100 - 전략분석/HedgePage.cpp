@@ -899,3 +899,4 @@ CString CHedgePage::AddComma(CString strData)
 	acData[iNaturalLength + iCommaCount] = 0;
 	return strSign + CString(acData);
 }
+

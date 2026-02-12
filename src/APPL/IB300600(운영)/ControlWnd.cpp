@@ -1935,6 +1935,7 @@ void CControlWnd::DisplayJango( Jango *pj )
 	int wcnt = 0, jqty = 0;	// 미체결 건수, 잔고수량
 	
 	// 잔고수량 계산
+	CString stemp;
 	st = m_pAccount->begin();
 	ed = m_pAccount->end();
 	for(; st!=ed; ++st)
@@ -1943,6 +1944,7 @@ void CControlWnd::DisplayJango( Jango *pj )
 		if (pos != st->second.jango.end())
 		{
 			jqty += pos->second.jqty;
+			stemp = pos->second.gubn;
 		}
 	}
 	
@@ -1960,16 +1962,34 @@ void CControlWnd::DisplayJango( Jango *pj )
 				wcnt += st2->second.d_cnt + st2->second.s_cnt;
 		}
 	}
-	
+	//wcnt  jqty // 미체결 건수, 잔고수량
 	if (jqty<=0 && wcnt<=0) text = "";
-	else if (jqty>0 && wcnt<=0) text.Format("%d", jqty);
+	/*else if (jqty>0 && wcnt<=0) text.Format("%d", jqty);
 	else if (jqty>0 && wcnt>0)	text.Format("%d(%d)", jqty, wcnt);
-	else if (jqty<=0 && wcnt>0) text.Format("(%d)", wcnt);
+	else if (jqty<=0 && wcnt>0) text.Format("(%d)", wcnt);*/
+	else if (jqty > 0 && wcnt <= 0)
+	{
+		if(stemp.Find("매도") >= 0)
+			text.Format("-%d", jqty);
+		else
+			text.Format("%d", jqty);
+	}
+	else if (jqty > 0 && wcnt > 0)
+	{
+		if (stemp.Find("매도") >= 0)
+			text.Format("-%d(%d)", jqty, wcnt);
+		else
+			text.Format("%d(%d)", jqty, wcnt);
+	}
+	else if (jqty <= 0 && wcnt > 0)
+	{
+		text.Format("(%d)", wcnt);
+	}
 	else return;		// -_-;
 
-// 	CString slog;
-// 	slog.Format("JQTY [%d] WCNT [%d]\n",jqty,wcnt);
-// 	OutputDebugString(slog);
+ 	/*CString slog;
+ 	slog.Format("stemp=[%s] text=[%s] JQTY [%d] WCNT [%d]  [%s]\n", stemp, text,jqty,wcnt, pj->code);
+ 	OutputDebugString(slog);*/
 	
 	//TRACE("\nControl Jango -> %d %d\n", jqty, wcnt);
 
@@ -2013,8 +2033,24 @@ void CControlWnd::DisplayJango( Jango *pj )
 				
 				if (m_pOptGrid->GetItemText(id.row, id.col)!=text)
 				{
-					m_pOptGrid->SetItemText(id.row, id.col, text);
-					m_pOptGrid->RedrawCell(id);
+					if (stemp.Find("매수") >= 0 )
+					{
+						m_pOptGrid->SetItemFgColour(id.row, id.col, RGB(255, 0, 0));
+						m_pOptGrid->SetItemText(id.row, id.col, text);
+						m_pOptGrid->RedrawCell(id);
+					}
+					else if (stemp.Find("매도") >= 0 )
+					{
+						m_pOptGrid->SetItemFgColour(id.row, id.col, RGB(0, 0, 255));
+						m_pOptGrid->SetItemText(id.row, id.col, text);
+						m_pOptGrid->RedrawCell(id);
+					}
+					else
+					{
+						m_pOptGrid->SetItemText(id.row, id.col, text);
+						m_pOptGrid->RedrawCell(id);
+					}
+				
 				}
 			}
 		}

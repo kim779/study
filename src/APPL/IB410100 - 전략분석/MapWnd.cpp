@@ -320,6 +320,8 @@ void CMapWnd::CreateMap(CWnd* pParent)
 	Variant(titleCC, "[4101] 전략분석");
 
 	m_pApp = (CIB410100App *)AfxGetApp();
+	m_pApp->m_pMapWnd = this;
+
 	m_sRoot = Variant(homeCC, "");
 	m_Hts = Variant(systemCC, "");
 	m_sUser = Variant(userCC, "");
@@ -3873,6 +3875,7 @@ bool CMapWnd::LoadOJCode()
 
 	CString	sPrice;
 	gsl::owner <_codelist*> CodeList{};
+	gsl::owner <_codelistHsga*> codelistHsga{};
 	//_strikelist	StrikeList;		
 	for (int ii = 0; ii < codeN; ii++)
 	{
@@ -3890,6 +3893,23 @@ bool CMapWnd::LoadOJCode()
 					CodeList->mdMargin = 1;
 					m_OPCodeList.Add(CodeList);
 				}
+			}
+			//행사가 코드 추가.
+			if (OJCode.call[jj].yorn == '1')
+			{
+				codelistHsga = new _codelistHsga;
+				codelistHsga->code = CString(OJCode.call[jj].cod2, OCodeLen);
+				codelistHsga->hsga = CString(OJCode.price, OPriceLen); // 행사가 저장
+				m_OPCodeListHsga.Add(codelistHsga);
+				
+			}
+
+			if (OJCode.put[jj].yorn == '1')
+			{
+				codelistHsga = new _codelistHsga;
+				codelistHsga->code = CString(OJCode.put[jj].cod2, OCodeLen);
+				codelistHsga->hsga = CString(OJCode.price, OPriceLen); // 행사가 저장
+				m_OPCodeListHsga.Add(codelistHsga);
 			}
 		}
 	}
@@ -4449,4 +4469,16 @@ CString CMapWnd::GetCtrlProperty( LPCSTR prop_name )
 	driver.GetPropertyByName(_bstr_t(prop_name), &var);
 	
 	return (LPCSTR)(_bstr_t)var;
+}
+
+
+CString CMapWnd::getCodeHsga(CString code)
+{
+	for (int i = 0; i < m_OPCodeListHsga.GetSize(); i++) 
+	{
+		_codelistHsga* pItem = m_OPCodeListHsga.GetAt(i);
+		if (pItem && pItem->code == code) {return pItem->hsga;}
+	}
+	
+	return _T("");
 }

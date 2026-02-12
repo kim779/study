@@ -931,9 +931,9 @@ void CControlWnd::LoadMaster(bool bFlag)
 					sprintf(row.put_code, "%.8s", st->put[i].cod2);
 					//sprintf(row.hsga, "%.3s.%.2s", &st->price[0], &st->price[3]);
 					if (strlen(st->price) > 5)
-						sprintf(row.hsga, "%.4s.%.2s", &st->price[0], &st->price[3]);
+						sprintf(row.hsga, "%.4s.%.1s", &st->price[0], &st->price[4]);
 					else
-						sprintf(row.hsga, "%.3s.%.2s", &st->price[0], &st->price[3]);
+						sprintf(row.hsga, "%.3s.%.1s", &st->price[0], &st->price[3]);
 					
 					m_dtOption[i].push_back(row);
 				}
@@ -1427,10 +1427,20 @@ void CControlWnd::DisplayJango( Jango *pj )
 					{
 						tmp.Format("%s", pj->gubn);
 						tmp.TrimRight();
-						if(tmp.Find("매수") >= 0)
-							m_pOptGrid->SetItemFgColour(id.row, id.col, RGB(255,0,0));
-						else if(tmp.Find("매도") >= 0)
-							m_pOptGrid->SetItemFgColour(id.row, id.col, RGB(0,0,255));
+						if (tmp.Find("매수") >= 0)
+						{
+							m_pOptGrid->SetItemFgColour(id.row, id.col, RGB(255, 0, 0));
+						/*	CString slog;
+							slog.Format("[option] 매수 [%s] stemp=[%s] \n", pj->code,  text);
+							OutputDebugString(slog);*/
+						}
+						else if (tmp.Find("매도") >= 0)
+						{
+							m_pOptGrid->SetItemFgColour(id.row, id.col, RGB(0, 0, 255));
+						/*	CString slog;
+							slog.Format("[option] 매도 stemp=[%s] \n", text);
+							OutputDebugString(slog);*/
+						}
 					}
 
 					m_pOptGrid->SetItemText(id.row, id.col, text);
@@ -1496,6 +1506,12 @@ CString CControlWnd::GetTradeDataFromCode(CString scode)
 			strResult.Format("%s", stmp);
 		else
 			strResult.Format("%s(%s)", stmp, stemp);
+	}
+
+	if (strResult.Find("((") >= 0 || strResult.Find("))") >= 0)
+	{
+		strResult.Replace("((", "(");
+		strResult.Replace("))", ")");
 	}
 
 	return strResult;

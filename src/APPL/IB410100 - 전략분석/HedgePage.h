@@ -61,6 +61,7 @@ public:
 	void	DeleteGridArray(bool bData = true, bool bGrid = true);
 	int	Round(double dVal);
 	CString AddComma(CString strData);
+	CString getCodeHsga(CString code);
 
 // Dialog Data
 	//{{AFX_DATA(CHedgePage)

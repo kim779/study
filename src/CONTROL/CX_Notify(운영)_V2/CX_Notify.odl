@@ -1,0 +1,56 @@
+// CX_Notify.odl : type library source for CX_Notify.dll
+
+[ uuid(D121A460-40F9-4B3E-958C-16B66C693186), version(1.0) ]
+library CX_Notify
+{
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+
+	//  Primary dispatch interface for CControlWnd
+	
+	[ uuid(7E5363E5-D4A1-4866-B9FF-A97FC342672D) ]
+	dispinterface IControlWnd
+	{
+		properties:
+			// NOTE - ClassWizard will maintain property information here.
+			//    Use extreme caution when editing this section.
+			//{{AFX_ODL_PROP(CControlWnd)
+			[id(1)] BSTR SetAccount;
+			[id(2)] BSTR DataList;
+			[id(3)] BSTR Flag;
+			[id(4)] BSTR DataMsg;
+			[id(5)] BSTR SetMcgb;
+			[id(18)] BSTR Version;
+			//}}AFX_ODL_PROP
+			
+		methods:
+			// NOTE - ClassWizard will maintain method information here.
+			//    Use extreme caution when editing this section.
+			//{{AFX_ODL_METHOD(CControlWnd)
+			[id(6)] BSTR GetProperties();
+			[id(7)] void SetProperties(BSTR sProperties);
+			[id(8)] void Send(BSTR sAccn, BSTR sPswd, BSTR dFee, BSTR dMass);
+			[id(9)] void AllAccnSend(BSTR sUserID, BSTR sPswd, BSTR sCode);
+			[id(10)] void Clear();
+			[id(11)] void AddReminData(BSTR sAccn, BSTR sCode, BSTR sRowData);
+			[id(12)] void SendX(BSTR sAccn, BSTR sPswd);
+			[id(13)] void SendRaw(BSTR sName);
+			[id(14)] void SetFilterAcc(BSTR sAccList);
+			[id(15)] void SendEx(BSTR sAccn, BSTR sPswd, BSTR dFee, BSTR dMass, BSTR dCalcType);
+			[id(16)] void SendMarketEx(BSTR sAccn, BSTR sPswd, BSTR dFee, BSTR dMass, BSTR dCalcType, BSTR sFiller);
+			//}}AFX_ODL_METHOD
+
+			[id(17)] void RequestBalance(BSTR sVal);
+	};
+
+	//  Class information for CControlWnd
+
+	[ uuid(B7FC0B44-7E1F-4777-A742-FAE54E6A795E) ]
+	coclass ControlWnd
+	{
+		[default] dispinterface IControlWnd;
+	};
+
+	//{{AFX_APPEND_ODL}}
+	//}}AFX_APPEND_ODL}}
+};

@@ -608,6 +608,20 @@ long CMapWnd::OnMessage(WPARAM wParam, LPARAM lParam)
 
 	switch(LOBYTE(LOWORD(wParam)))
 	{
+	case DLL_OUBx:
+		{
+			struct _extTHx* extTHx = (struct _extTHx*)lParam;
+			switch (extTHx->key)
+			{
+				case KEY_DATA:
+				{
+
+					parseData(extTHx->data, extTHx->size);
+				}
+				break;
+			}
+		}
+		break;
 	case DLL_OUB:
 		switch(HIBYTE(LOWORD(wParam)))
 		{
@@ -736,7 +750,7 @@ long CMapWnd::OnMessage(WPARAM wParam, LPARAM lParam)
 	case DLL_SETFONTx:
 		ChangeFont(HIWORD(wParam), (char*)lParam );
 		break;
-
+	
 	default:
 		break;
 	}
@@ -1038,6 +1052,7 @@ void CMapWnd::parseData(char* pData, int datL)
 
 		sprintf(m_pStrike[ii].ccod, "%.8s", gmod->ccod);
 		sprintf(m_pStrike[ii].pcod, "%.8s", gmod->pcod);
+		m_pStrike[ii].price = _tstof(gmod->price);
 
 		str.Format("%.8s", gmod->price); str.TrimRight();	
 		m_pCallGrid->SetItemText(nRow, gfPrice, str);		
@@ -1512,7 +1527,8 @@ void CMapWnd::generateODatas()
 void CMapWnd::generateOData(int nRow, bool callput)
 {
 	int nDisplayRow = 0;
-	CString sCode, str, sPrv, opt, sIV;
+	CString sCode, str, sPrv, opt, sIV,sHsga;
+
 	CfxGrid	*grid = NULL;
 	if (callput)
 	{
@@ -1529,7 +1545,14 @@ void CMapWnd::generateOData(int nRow, bool callput)
 
 	// 지수환산가
 	double strike{}, jisuConv{}, k200{};
-	strike = getOptionStrike(sCode); if (strike == 0) strike = 1;
+	if (m_pStrike[nRow].price > 0)
+	{
+		sHsga.Format(_T("%.2f"), m_pStrike[nRow].price);
+		strike = getOptionStrike(sHsga); if (strike == 0) strike = 1;
+	}
+	else
+		strike = getOptionStrike(sCode); if (strike == 0) strike = 1;
+
 	k200 = fabs(atof(m_pdataX[datK200Cur].val));
 	jisuConv = fabs(atof(m_pdataX[datKpCur].val)) * strike / k200;
 
@@ -1851,12 +1874,21 @@ void CMapWnd::showSiKoJeField(int showSiKoJe)	//2013.10.16 KSJ 시고저 보여주기
 
 double CMapWnd::getOptionStrike(CString opCode)
 {
-	double strike;
+	double strike,Hsga;
+	Hsga = _tstof(opCode);
+	if (Hsga > 0)
+	{
+		strike = atof(opCode);
+	}
+	else
+	{	// 기존
+		strike = atof(opCode.Mid(5, 3));
+		if (opCode[7] == '2' || opCode[7] == '7')
+			strike = strike + 0.5;
 
-	strike = atof(opCode.Mid(5, 3));
-	if (opCode[7] == '2' || opCode[7] == '7')
-		strike = strike + 0.5;
-
+	}
+	
+	
 	return strike;
 }
 

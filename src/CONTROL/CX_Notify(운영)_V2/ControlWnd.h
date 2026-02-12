@@ -1,0 +1,135 @@
+#pragma once
+// ControlWnd.h : header file
+//
+
+#include <afxmt.h>
+
+class CParam
+{
+public:
+	int		key=0;			// screen key
+	CString		name;			// control symbol name
+	CRect		rect;			// control rect
+	CString		fonts;			// font name
+	int		point=0;		// font point
+	int		style=0;		// font style
+	DWORD		tRGB=0;			// text color index
+	DWORD		pRGB=0;			// paint color index
+	CString		options;		// properties
+};
+
+/////////////////////////////////////////////////////////////////////////////
+// CControlWnd window
+
+class CControlWnd : public CWnd
+{
+
+public:
+	CControlWnd();
+	virtual ~CControlWnd();
+
+public:
+	CWnd*		m_pParent;
+	CParam		m_Param;
+
+private:
+	CCriticalSection	m_cs;
+	bool			m_bFilter;
+
+	std::unique_ptr<class CShMemory>	m_ShMemory;
+	CMapStringToString	m_CodeMap;
+	CMapStringToString	m_AccnMap;
+	CMapStringToString	m_AccnFilter;		// 계좌별 키관리
+	CString			m_sCtrlData;
+	bool			m_bAllAccn;
+	bool			m_bFuture;
+	CUIntArray		m_arField;
+	int			m_iJanType;		//0 전체보여주기 1, 유통만  2, 유통제외만
+
+public:
+	void	SetParam(struct _param *pParam);
+
+private:
+	bool	m_bLaw;
+
+	CString OptionParser(CString sOption, CString sKey);
+	BOOL	SendTR(CString sTR, BYTE type, CString data, int key = -1);
+	CString	Variant(int comm, CString data);
+	int	OpenView(int type, CString data);
+	CString	getKey(CString codeS, CString dateS, CString sygbS, CString jggb);
+	void	getDate(const CStringArray& arData, CString& dateS, CString& sygbS, CString& jggb);
+
+public:
+	void	SendToMap(CString sData, bool bAll, CString sAccn = "");
+	CString Parser(CString &srcstr, CString substr);
+
+	// ClassWizard generated virtual function overrides
+	//{{AFX_VIRTUAL(CControlWnd)
+public:
+	virtual void OnFinalRelease();
+	//}}AFX_VIRTUAL
+
+protected:
+	//{{AFX_MSG(CControlWnd)
+	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
+	afx_msg void OnDestroy();
+	afx_msg void OnPaint();
+	//}}AFX_MSG
+	DECLARE_MESSAGE_MAP()
+	// Generated OLE dispatch map functions
+	//{{AFX_DISPATCH(CControlWnd)
+	CString m_setAccount;
+	afx_msg void OnSetAccountChanged();
+	CString m_dataList;
+	afx_msg void OnDataListChanged();
+	CString m_flag;
+	afx_msg void OnFlagChanged();
+	CString m_dataMsg;
+	afx_msg void OnSetMcgbChanged();
+	CString m_setMcgb;
+	afx_msg void OnDataMsgChanged();
+	afx_msg BSTR GetProperties();
+	afx_msg void SetProperties(LPCTSTR sProperties);
+	afx_msg void Send(LPCTSTR sAccn, LPCTSTR sPswd, LPCTSTR dfee, LPCTSTR dmass);
+	afx_msg void SendEx(LPCTSTR sAccn, LPCTSTR sPswd, LPCTSTR dfee, LPCTSTR dmass, LPCTSTR dCalcType=_T("0"));
+	afx_msg void SendMarketEx(LPCTSTR sAccn, LPCTSTR sPswd, LPCTSTR dfee, LPCTSTR dmass, LPCTSTR dCalcType = _T("0"), LPCTSTR sFiller = _T(""));
+	afx_msg void AllAccnSend(LPCTSTR sUserID, LPCTSTR sPswd, LPCTSTR sCode);
+	afx_msg void Clear();
+	afx_msg void AddReminData(LPCTSTR sAccn, LPCTSTR sCode, LPCTSTR sRowData);
+	afx_msg void SendX(LPCTSTR sAccn, LPCTSTR sPswd);
+	afx_msg void SendRaw(LPCTSTR sName);
+	afx_msg void SetFilterAcc(LPCTSTR sAccList);
+	//}}AFX_DISPATCH
+	afx_msg long OnMessage(WPARAM wParam, LPARAM lParam);
+	afx_msg long OnRemainMessage(WPARAM wParam, LPARAM lParam);
+
+	DECLARE_DISPATCH_MAP()
+	DECLARE_INTERFACE_MAP()
+
+public:
+
+	CString m_slog{};
+#ifdef DF_NEW_VER
+	BOOL m_bWaitingFromVBS = TRUE;
+	int m_interval{};
+	std::queue<CString> m_drawQueue;
+	CCriticalSection m_lock;
+	void SendNextToVBS();
+	std::unordered_map<std::string, CTime> m_lastRTSTimeMap;
+	bool ShouldSkipRTSByTimeDiff(CString sCode);
+	int m_diffSec{};
+#endif
+
+protected:
+	void RequestBalance(BSTR sVal);
+
+	enum
+	{
+		dispidVersion = 18,
+		dispidRequestBalance = 17L
+	};
+	void OnVersionChanged();
+	CString m_Version;
+public:
+	afx_msg void OnTimer(UINT_PTR nIDEvent);
+};

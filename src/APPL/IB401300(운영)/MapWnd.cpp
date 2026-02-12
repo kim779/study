@@ -651,6 +651,7 @@ LRESULT CMapWnd::OnUser( WPARAM wParam, LPARAM lParam )
 		switch(key)
 		{
 		case TK_PIBO4013: ParsePIBO4013(dat, len); break;
+
 		case TK_JISU    : ParseJISU(dat, len); break;
 		case TK_OPTION  : ParseOption(dat, len); break;
 		}
@@ -683,6 +684,18 @@ LRESULT CMapWnd::OnUser( WPARAM wParam, LPARAM lParam )
 
 	case DLL_DOMINO:
 		break;
+	case DLL_OUBx:
+	{
+		struct _extTHx* extTHx = (struct _extTHx*)lParam;
+
+		switch (extTHx->key)
+		{
+		case TK_PIBO4013:
+			ParsePIBO4013(extTHx->data, extTHx->size);
+			break;
+		}
+	}
+	break;
 	}
 	return 0;
 }
@@ -706,7 +719,7 @@ void CMapWnd::LoadOptionData()
 */
 	if(m_cbMarket->GetCurSel() == 0)
 	{
-		strFile = "\\tab\\opcode.dat";
+		strFile = "\\tab\\opcode2.dat";
 	}
 	else if(m_cbMarket->GetCurSel() == 1)
 	{
@@ -1222,7 +1235,6 @@ void CMapWnd::Send()
 		send.Format("%d %d", m_key[0], m_key[1]);
 		SendTR("pibo401b", 0, (LPCSTR)&mid, sizeof(mid), TK_PIBO4013);   //확인필요  안날려도 됨
 	}
-
 	// KOSPI
 	{
 		char data[1024];
@@ -1263,6 +1275,9 @@ void CMapWnd::Send()
 
 void CMapWnd::ParsePIBO4013( LPCSTR dat, int len )
 {
+	CString temp;
+	temp.Format("[4013]len[%d]", len);
+	OutputDebugString(temp);
 	struct pibo4013_mod *mod = (struct pibo4013_mod *)dat;
 	CString stmp;
 	int ii{}, row{};
@@ -1271,12 +1286,13 @@ void CMapWnd::ParsePIBO4013( LPCSTR dat, int len )
 
 	CGridCtrl *pg = m_gdOption;
 	pg->SetRowCount(nrec + 1);	// + header
-
+	CString tetst;
 	for(ii=0, row=1; ii<nrec; ++ii, ++row)
 	{
 		struct pibo4013_grid *dg = (struct pibo4013_grid *)&mod->grid[ii];
-
+		tetst = CString(dg->hang, 8);
 		const double atmg = Str2Double(mod->atmg, sizeof(mod->atmg));
+		
 
 		m_hsga.Add(Str2Double(dg->hang, sizeof(dg->hang)));
 		CString s;
@@ -2709,8 +2725,9 @@ void CMapWnd::LoadFutureData()
 			const size_t len = fread(&fhead, 1, sizeof(fhead), fp);
 			if (len!=sizeof(fhead)) break;
 			
+
 			CString code(fhead.codx, sizeof(fhead.codx));
-			if (code.GetAt(0)=='1')
+			if (code.GetAt(0)=='1'|| code.GetAt(0) == 'A')
 			{
 				m_fcodes.Add(code);
 			}
@@ -3001,7 +3018,9 @@ void CMapWnd::GenOptionData(OPTION_DATA *pod)
 	else
 	{
 		char buff[64]{};
-		const double strk = GetOptionStrike(pod->code);
+		CString strHsga;
+		strHsga.Format(_T("%.2f"), pod->hsga);
+		const double strk = GetOptionStrike(strHsga);
 		const double jcnv = fabs(pKOSPI->curr) * strk / fabs(pK200->curr);
 		pod->set_jisu(jcnv);
 
@@ -3031,6 +3050,7 @@ void CMapWnd::GenOptionData(OPTION_DATA *pod)
 		dRho = atof(m_opcal.m_IOpSensCal->GetRho());
 		dTheoryValue = atof(m_opcal.m_IOpSensCal->GetTheoryValue());
 
+
 		pod->set_iv  ( dIV );
 		pod->set_delt( dDelta );
 		pod->set_gmma( dGamma );
@@ -3044,9 +3064,8 @@ void CMapWnd::GenOptionData(OPTION_DATA *pod)
 
 double CMapWnd::GetOptionStrike( LPCSTR code )
 {
-	double dval = atof(code+6);
-	if (code[8]=='2' || code[8]=='7') dval += 0.5;
-	return dval==0 ? 1.0 : dval;
+	double dval = atof(code);
+	return dval == 0 ? 1.0 : dval;
 }
 
 void CMapWnd::OnScreenType1()
@@ -3240,6 +3259,7 @@ void CMapWnd::CalcRAtm()
 	const int hsiz = m_hsga.GetSize();
 	for(int n=0; n<hsiz; ++n)
 	{
+
 		if (pjd->curr > m_hsga.GetAt(n))
 		{
 			const double val1 = fabs( m_hsga.GetAt(n) - pjd->curr );

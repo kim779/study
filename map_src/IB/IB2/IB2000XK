@@ -58,7 +58,7 @@ OUT  12374(65, 246, 146, 266)  LEN(15)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT|FA_C
   HINTTYPE(IH_NONE)
 LABEL  LABEL6(2, 247, 65, 268)  '상장주식수'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
   HINTTYPE(IH_NONE)
-OUT  2027(180, 308, 248, 328)  LEN(9)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT    COLOR(68, 69)  CUR(0)            IFRGB(94, 95)  TABORDER(0)  IOORDER(11)  ENABLE  &
+OUT  2027(180, 308, 248, 328)  LEN(10)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT    COLOR(68, 69)  CUR(0)            IFRGB(94, 95)  TABORDER(0)  IOORDER(11)  ENABLE  &
   HINTTYPE(IH_STRING)  HELPTEXT("거래량")HELPTEXT("거래량")
 OUT  2024(69, 308, 139, 328)  LEN(7)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT|FA_CORGB|FA_CONTRAST|SA_CORAW|SA_TEXT    COLOR(68, 69)  CUR(0)            IFRGB(94, 95)  TABORDER(0)  IOORDER(12)  ENABLE  &
   HINTTYPE(IH_STRING)  HELPTEXT("전일대비")HELPTEXT("전일대비")
@@ -98,7 +98,7 @@ Function Str2Int(Data)
 	If Len(AData) = 0 Then
 		Exit Function
 	End If
-	Str2Int = CLng(AData)
+	Str2Int = CCur(AData)
 End Function
 '-----------------------------------------------------------------------
 Function SetSign(Data)
@@ -141,7 +141,7 @@ Sub SetAccVol(Data)
 		Data = 0
 	End If
 
-	g_BefAccVol = CLng(Data)
+	g_BefAccVol = CCur(Data)
 End Sub
 '-----------------------------------------------------------------------
 Sub OnAlert()
@@ -168,7 +168,7 @@ Sub OnAlert()
 		AccVol = Trim(S11310.GetGridCell(i, 4))
 		If Len(Trim(AccVol)) = 0 Then
 			Exit For
-		ElseIf CLng(AccVol) = g_BefAccVol Then
+		ElseIf CCur(AccVol) = g_BefAccVol Then
 			Flag = 1
 			Exit For
 		End If
@@ -202,7 +202,7 @@ Sub OnAlert()
 		Loop
 	End If
 
-	g_BefAccVol = CLng(S11310.GetGridCell(1,4))
+	g_BefAccVol = CCur(S11310.GetGridCell(1,4))
 
 End Sub
 

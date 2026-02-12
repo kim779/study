@@ -19,11 +19,15 @@
 // CIB410100App
 // See IB410100.cpp for the implementation of this class
 //
+class CMapWnd;
 
 class CIB410100App : public CWinApp
 {
 public:
+		
 	CIB410100App();
+
+	CMapWnd* m_pMapWnd = nullptr;
 
 public:
 	CFont*		GetFont(CWnd *pView, int point, int bold = 0, CString name = _T("±¼¸²"), bool italic = false);
@@ -40,6 +44,8 @@ public:
 	double		BuhoModify(CString sData);
 	double		getOptionStrike(CString opCode);
 	CString		JisuToStrike(double ajisu);
+
+	CString		getCodeHsga(CString code);
 
 // Overrides
 	// ClassWizard generated virtual function overrides
