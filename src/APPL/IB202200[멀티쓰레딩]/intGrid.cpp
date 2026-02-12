@@ -285,8 +285,10 @@ CintGrid::CintGrid(CWnd* pMainWnd, CWnd* pParent, LOGFONT* logfont /*nullptr*/)
 	// updateXX_20170201_1
 	m_drawHolding = false;
 	// updateXX_20170201_2
-	_avgCount = 0.0;
-	_Count.resize(200);
+
+	//m_iTime = 0;
+
+	_Count.resize(200, 0);
 	if (m_pParent)
 	{
 		_font = m_pParent->getAxFont("굴림체", 9);  
@@ -1111,7 +1113,7 @@ void CintGrid::OnPaint()
 		else
 		{
 			_bDraw = false;
-			SetTimer(TIMEERDRAW, 500, nullptr);
+		//	SetTimer(TIMEERDRAW, 500, nullptr);
 		}
 	}
 	else
@@ -3835,43 +3837,44 @@ BOOL CintGrid::RedrawCell(int nRow, int nCol, CDC* pDC)
 		return TRUE;
 	}
 
-	const int key = nRow * 1000 + nCol;
-	const auto& it = _mapFilterDraw.emplace(key, 1);
+	const auto& it = _mapFilterDraw.emplace(nRow, nCol);
 	if (it.second == false)
 	{
+//AxStd::_Msg("RedrawCell Skip FilterDraw [%d,%d]", nRow, nCol);
 		return FALSE;
 	}
-
-	//drawHolding 처리 최적화
+	// drawHolding 처리 최적화
 	if (m_drawHolding) 
 	{
+//AxStd::_Msg("RedrawCell Holding [%d,%d]", nRow, nCol);
+		//const ULONGLONG tick = GetTickCount64();			
+		// map 조회 최적화
 		const auto it = _timeFilterCode.find(nRow);
 		const bool inserted = (it == _timeFilterCode.end());
 			
 		if (inserted) {
 			_timeFilterCode[nRow] = currentTick;
 		}
-						
-		//시간 차이 계산 최적화
+			
+		// Blink 처리 최적화
+		if (!inserted && _blinkType != 0 && _bReal) {
+			CRect blinkRect;
+			Blink(nRow, nCol, currentTick, blinkRect);
+			if (!blinkRect.IsRectEmpty()) {
+				rect.UnionRect(rect, blinkRect);
+			}
+		}
+			
+		// 시간 차이 계산 최적화
 		const ULONGLONG diff = inserted ? m_iTime : (currentTick - it->second);
 		if (diff >= static_cast<ULONGLONG>(m_iTime)) {
 			if (!inserted) it->second = currentTick;
 				
-			// Blink 처리 최적화
-			if (!inserted && _blinkType != 0 && _bReal) {
-				CRect blinkRect;
-				Blink(nRow, nCol, currentTick, blinkRect);
-				if (!blinkRect.IsRectEmpty()) {
-					rect.UnionRect(rect, blinkRect);
-				}
-			}
-
 			// Union 연산 최적화
 			if (!_filterRect.IsRectEmpty()) {
 				rect.UnionRect(rect, _filterRect);
 				_filterRect.SetRectEmpty();
 			}
-			
 			m_drawRect.UnionRect(m_drawRect, rect);
 		} 
 		else 
@@ -5302,10 +5305,6 @@ BOOL CintGrid::DeleteAllItems()
 
 BOOL CintGrid::SortTextItems(int nCol, BOOL bAscending)
 {
-	m_slog.Format("[sort][%s]<%d> nCol=[%d]  ",
-		__FUNCTION__, __LINE__, nCol);
-
-	Output_DebugString(m_slog);
 	ClearAllRTM(); 
 	ResetSelectedRange();
 
@@ -5346,10 +5345,6 @@ bool CintGrid::IsCommentRow(int row) const
 
 BOOL CintGrid::SortTextItems(int sortcol, BOOL ascending, int srow, int erow)
 {
-	m_slog.Format("[sort][%s]<%d> ascending=[%d]   sortcol=[%d]   srow=[%d]  erow=[%d] ",
-		__FUNCTION__, __LINE__, ascending, sortcol, srow, erow);
-	Output_DebugString(m_slog);
-
 	CString strTemp;
 
 	if (sortcol >= GetColumnCount())
@@ -5382,11 +5377,6 @@ BOOL CintGrid::SortTextItems(int sortcol, BOOL ascending, int srow, int erow)
 #endif
 			string  = GetItemText(xrow, sortcol);
 			stringx = GetItemText(yrow, sortcol);
-
-			m_slog.Format("[sort][%s]<%d> string=[%s]   stringx=[%s]    ",
-				__FUNCTION__, __LINE__, string, stringx);
-			Output_DebugString(m_slog);
-
 
 			if (GetItemAttr(xrow, sortcol) & GVAT_CONTRAST)
 			{
@@ -9981,65 +9971,40 @@ int CintGrid::GetGridWidth()
 } 
 
 
-void CintGrid::DisplayTest()
-{
-	std::random_device rd;
-	std::mt19937 g(rd());
-	std::shuffle(m_aryGridRows.begin() + 1, m_aryGridRows.end(), g);
-	std::uniform_int_distribution<> row(1, m_aryGridRows.size());
-	
-	const int drawrow = row(g);
-	for (int col = 19; col < m_nCols; col++)
-		RedrawCell(drawrow, col);
-	
-}
-
 void CintGrid::endDrawHolding()
 { 	
-	const ULONGLONG tick = GetTickCount64();
-
-	auto lambdaDraw = [this](const ULONGLONG& tick){
-		if (!m_drawRect.IsRectEmpty())
-		{
-			InvalidateRect(m_drawRect, false);
-			m_drawRect.SetRectEmpty();
-			_mapFilterDraw.clear();
-			_DrawTick = tick;
-		}
-	};
-
-	auto getAverage = [this](std::deque<int>& data) -> double {
-		const int calls = _idrawCount;
-		if (data.size() >= 200) {
-			_countSum -= static_cast<ULONGLONG>(data.front());
-			data.pop_front();
-		}
-		data.emplace_back(calls);
-		_countSum += static_cast<ULONGLONG>(calls);
-		return (data.empty())
-		? 0.0
-		: (_countSum / static_cast<double>(data.size()));
-	};
-
-	
 	m_drawHolding = false; 			
 	if (_bDraw && (!m_drawRect.IsRectEmpty()))
 	{	
-		const ULONGLONG drawtick = m_iTime;			
-		if ((tick - _DrawTick) >= drawtick) 
+		const ULONGLONG tick = GetTickCount64();
+		const ULONGLONG drawtick = m_iTime;
+		if ( (tick - _DrawTick) >= drawtick) 
 		{	
-			_avgCount = getAverage(_Count);
-			if (const int avg = max(_avgCount, 30.0); _idrawCount <= avg) {
-				lambdaDraw(tick);
+			if (_Count.size() >= 200)
+				_Count.erase(_Count.begin());
+			_Count.emplace_back(_idrawCount);		
+
+			_avgCount = (_Count.empty())
+			? 0.0
+			: std::accumulate(_Count.begin(), _Count.end(), 0.0) / _Count.size();
+//AxStd::_Msg("[%s][%d][%f]  draw count[%ld]", __FUNCTION__, _idrawCount, max(_avgCount, 10.0), drawtick);
+			if (const int avg = max(_avgCount, 30.0); _idrawCount > avg)	
+			{
+				_idrawCount = 0;
+//AxStd::_Msg("[%s] 안그려짐.", __FUNCTION__);
+				return;
 			}
+
+			InvalidateRect(m_drawRect, false);
+			m_drawRect.SetRectEmpty();
+			_mapFilterDraw.clear();
+//AxStd::_Msg("[%s] 그려짐. Filter 개수는 항상 0 [%d]", __FUNCTION__, _mapFilterDraw.size());
+
+			_DrawTick = tick;
+			_bExpect = false;
 			_idrawCount = 0;
 		}
-		else
-		{
-			if (_avgCount <= 20.0)
-				lambdaDraw(tick);
-			_idrawCount++;  // 시간 내 호출 횟수 카운트
-		}
+		_idrawCount++;
 	}
 }
 

@@ -47,7 +47,7 @@
 #define SECMSG		"secmsg"
 #define	HJCODE		"hjcode.dat"
 #define	FJCODE		"fjcode.dat"
-#define	OJCODE		"opcode.dat"
+#define	OJCODE		"opcode2.dat"
 #define	CJCODE		"cjcode.dat"
 #define	UPCODE		"upcode.dat"
 #define	KFCODE		"qjcode.dat"
@@ -57,7 +57,7 @@
 #define	ELWCODE		"elwcod.dat"
 #define CFCODE		"cfcode.dat"
 #define SFCODEDAT	"sfcode.dat"
-#define WOJCODE		"wocode.dat"
+#define WOJCODE		"wocode2.dat"
 #define HJCODEx		"hjcode3.dat"
 
 //////////////////////////////////////////////////////////////////////////

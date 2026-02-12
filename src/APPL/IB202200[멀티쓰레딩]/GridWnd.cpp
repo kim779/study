@@ -504,19 +504,6 @@ void CGridWnd::OnLButtonDown(UINT nFlags, CPoint point)
 // ADD PSH 20070912
 void CGridWnd::OnRButtonUp(UINT nFlags, CPoint point)
 {
-#ifdef DF_SORT
-		CString slog;
-		int icnt{};
-		for_each(_vInters.begin(), _vInters.end(), [&](auto& pInter) {
-		slog.Format("[sort]  코드=[%s] 구분=[%c]  icnt=[%d]",pInter.get()->code, pInter.get()->gubn, icnt);
-		icnt++;
-
-		if (icnt <= 10)
-			Output_DebugString(slog);
-	
-		});
-
-#endif
 	if (m_rcTitle.PtInRect(point))
 	{
 		ShowPopupMenu();
@@ -3900,7 +3887,7 @@ void CGridWnd::RbuttonAction(int row)
 
 #ifdef DF_SORT
 		auto& pInter = _vInters.at(row - 1);
-		
+
 		if (pInter)
 			pInter.get()->gubn = ROW_COMMENT;
 
@@ -7317,15 +7304,6 @@ void CGridWnd::OnTimer(UINT nIDEvent)
 		m_nTurn++;
 		m_nTurn = m_nTurn % ncnt;
 	}
-	else if (nIDEvent == 12345)
-	{
-		//ReSetSearchMap()
-		//HoldDraw();
-		//m_grid->DisplayTest();
-		//m_grid->setReal(false);
-		//m_grid->endDrawHolding();
-		
-	}
 	CBaseWnd::OnTimer(nIDEvent);
 }
 
@@ -9694,6 +9672,7 @@ void CGridWnd::parsingAlertx(LPARAM lParam)
 
 		} // for 문 끝
 
+	
 		// 2012.06.20 KSJ 배분, 임의 추가
 		if (data[950])
 		{

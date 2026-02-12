@@ -309,8 +309,7 @@ struct  sfcode {            /* 주식선물 종목코드 정보       */
 //
 //	옵션코드 
 //
-
-#define OPriceLen	5
+#define OPriceLen	7   //5->7    20260209
 #define ONameLen	20
 #define OCodeLen	9
 

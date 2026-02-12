@@ -116,7 +116,7 @@ class CGridWnd;
 class CintGrid;
 void  AFXAPI DDX_GridControl(CDataExchange* pDX, int nIDC, CintGrid& rControl);
 
-////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
 // CintGrid window
 enum { clr_UpIndex = 0, clr_NormalIndex, clr_DnIndex};
 
@@ -154,8 +154,6 @@ public:
 	BOOL IsSelectedRow(int nRow);
 	void dragScrollGrid(CPoint pt);				//그리드 드래그시 스크롤
 	int  GetGridWidth();
-
-	void    DisplayTest();
 // Operations
 public:
 	void SetSortColumn(int sortColumn) { m_sortColumn = sortColumn; } 
@@ -408,9 +406,11 @@ protected:
 	std::unique_ptr <CTipDlg>		m_pToolChart{};
 	std::unique_ptr <CTipDlg>		m_pToolNews{};
 
-
+#ifdef DF_SORT
 	std::deque<int> _Count;
-
+#else
+	std::vector<int> _Count;
+#endif
 
 	// printing information
 	CSize		m_szChar;
@@ -507,6 +507,11 @@ public:
 	CRect	m_drawRect;
 	CRect   _filterRect;
 
+	void    setExpectdelay(bool bflag)
+	{ 
+		_bExpect = bflag; 
+		_DrawTick = GetTickCount64();
+	}
 	void    setMemoType(const int type) { _memoType = type; }
 	void	beginDrawHolding() { m_drawHolding = true; }
 	void	endDrawHolding();
@@ -542,8 +547,8 @@ public:
 	void setDelay(int time){ m_iTime = time; }
 
 	int     m_iTime{};
+	bool    _bExpect = false;
 	long    _idrawCount = 0;
-	ULONGLONG _countSum = 0;
 
 // updateXX_20170201_2
 

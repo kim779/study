@@ -437,7 +437,8 @@ bool CIHCodeCombo::OCodeLoad(CString tabPath)
 	struct  ojcode  OJCode;
 	int	codeN{}, len{};
 	
-	CString	path = tabPath + "\\" + OJCODE;
+	//CString	path = tabPath + "\\" + OJCODE;
+	CString	path = tabPath + "\\" + "opcode2.dat";
 	if (!file.Open(path, CFile::modeRead|CFile::typeBinary|CFile::shareDenyNone))
 	{	
 		MessageBox("파일이 존재하지 않습니다.");
@@ -649,6 +650,30 @@ void CIHCodeEdit::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 void CIHCodeEdit::OnKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags) 
 {
 	CEdit::OnKeyUp(nChar, nRepCnt, nFlags);
+
+	auto isStockCode = [](const CString& str) -> bool
+	{
+		if (str.IsEmpty())
+			return false;
+
+		if (str.GetAt(0) < '0' || str.GetAt(0) > '9')
+			return false;
+
+		for (int ii = 1; ii < str.GetLength(); ii++)
+		{
+			TCHAR ch = str.GetAt(ii);
+
+			if (!(
+				(ch >= '0' && ch <= '9') ||
+				(ch >= 'A' && ch <= 'Z') ||
+				(ch >= 'a' && ch <= 'z')
+				))
+				return false;
+		}
+
+		return true;
+
+	};
 	/*if (!m_bKeydown)
 		return;
 	m_bKeydown = false;*/
@@ -677,7 +702,8 @@ void CIHCodeEdit::OnKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags)
 		{
 		case GU_CODE:
 		case GU_ELWCODE:
-			if (!isHexNumeric(sTmp))
+			//if(!isHexNumeric(sTmp))
+			if (!isStockCode(sTmp))
 			{
 				m_pParent->CodeListMode();
 				if (!m_pParent->m_pCombo->GetDroppedState())
@@ -960,7 +986,7 @@ int CIHCodeCtrl::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	m_pCombo = std::make_unique <CIHCodeCombo>(this);
 	m_pCombo->Create(CBS_DROPDOWN|WS_CHILD|WS_VISIBLE|WS_VSCROLL, CRect(0, 0, 0, 140), this, 0);
 	m_pCombo->SetItemHeight(-1, 0);
-	m_pCombo->SetDroppedWidth(150);
+	m_pCombo->SetDroppedWidth(200);
 
 	SetUnit(GU_CODE);
 	
