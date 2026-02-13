@@ -23,4 +23,12 @@ typedef struct TickSnapshot
 typedef BOOL(__stdcall* PFN_GET_TICK)(const char* code, TickSnapshot* out);
 typedef void(* PFN_REGISTER_GET_TICK)(PFN_GET_TICK fn);
 
+constexpr int MAX_CODES_PER_REQ = 200;
+constexpr int CODE_STR_LEN = 16;
 
+struct RTS_REGISTER_REQ
+{
+    HWND  hWnd;                       // 요청 화면 핸들
+    int   codeCount;                  // 몇 개 요청
+    char  codes[MAX_CODES_PER_REQ][CODE_STR_LEN]; // 종목코드 목록
+};
