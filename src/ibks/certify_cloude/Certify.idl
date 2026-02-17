@@ -1,0 +1,60 @@
+﻿// Certify.idl: ActiveX 컨트롤 프로젝트의 형식 라이브러리 소스입니다.
+
+// 이 파일은 MIDL 컴파일러 도구에 의해 처리되어
+// Certify.ocx에서 리소스가 되는 형식 라이브러리(Certify.tlb)를
+// Certify.ocx.
+
+#include <olectl.h>
+#include <idispids.h>
+
+[ uuid(5254d530-2db7-4224-a2f7-e330d0dfee54), version(1.0),
+  control ]
+library CertifyLib
+{
+	importlib(STDOLE_TLB);
+
+	//  CCertifyCtrl의 기본 디스패치 인터페이스
+	[ 
+		uuid(45b73aba-cdd7-4cb0-a9f3-d5386e3cfacd)
+	]
+	dispinterface _DCertify
+	{
+		properties:
+		methods:
+
+			[id(1)] long OnCertify(long pBytes, long nBytes);
+			[id(2)] boolean Certify(long pBytes, long nBytes, long infos);
+			[id(3)] boolean CertifyErr(long pBytes, long nBytes);
+			[id(4)] void CertifyId(long pBytes);
+			[id(5)] boolean CertifyEx(long pBytes, long nBytes);
+			[id(6)] long CertifyFull(long pInB, long pInL, long pOutB);
+			[id(7)] long CertifyName(long pBytes);
+			[id(8)] LONG CertifyCloud(LONG func);
+	};
+
+	//  CCertifyCtrl의 이벤트 디스패치 인터페이스
+
+	[ 
+		uuid(605e9aa3-dfb7-4ab1-bd82-cda32da4f50a)
+	]
+	dispinterface _DCertifyEvents
+	{
+		properties:
+			//  이벤트 인터페이스에 속성이 없습니다.
+
+		methods:
+
+			[id(1)] void OnFire(long type, long wParam, long lParam);
+	};
+
+	//  CCertifyCtrl에 대한 클래스 정보
+	[
+		uuid(3277f0b4-b8be-42aa-9b58-2fa88886ac64)
+	]
+	coclass Certify
+	{
+		[default] dispinterface _DCertify;
+		[default, source] dispinterface _DCertifyEvents;
+	};
+
+};

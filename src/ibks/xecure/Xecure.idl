@@ -1,0 +1,52 @@
+﻿// Xecure.idl: ActiveX 컨트롤 프로젝트의 형식 라이브러리 소스입니다.
+
+// 이 파일은 MIDL 컴파일러 도구에 의해 처리되어
+// Xecure.ocx에서 리소스가 되는 형식 라이브러리(Xecure.tlb)를
+// Xecure.ocx.
+
+#include <olectl.h>
+#include <idispids.h>
+
+[ uuid(21873802-5d41-4b55-a295-aabb297397ce), version(1.0),
+  control ]
+library XecureLib
+{
+	importlib(STDOLE_TLB);
+
+	//  CXecureCtrl의 기본 디스패치 인터페이스
+	[ 
+		uuid(316efc7f-38e6-4ce6-968e-8db234d8c231)
+	]
+	dispinterface _DXecure
+	{
+		properties:
+		methods:
+			[id(1)] boolean Encrypt(long pBytes, long nBytes);
+			[id(2)] boolean Decrypt(long pBytes, long nBytes);
+			[id(3)] long Xecure(long pBytes, long nBytes);
+	};
+
+	//  CXecureCtrl의 이벤트 디스패치 인터페이스
+
+	[ 
+		uuid(eb73b3f7-1f77-40db-82f3-576c90616fb4)
+	]
+	dispinterface _DXecureEvents
+	{
+		properties:
+			//  이벤트 인터페이스에 속성이 없습니다.
+
+		methods:
+	};
+
+	//  CXecureCtrl에 대한 클래스 정보
+	[
+		uuid(5526eb80-fe01-4fc4-9194-8fb806d6ad29)
+	]
+	coclass Xecure
+	{
+		[default] dispinterface _DXecure;
+		[default, source] dispinterface _DXecureEvents;
+	};
+
+};

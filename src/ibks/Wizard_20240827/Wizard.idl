@@ -1,0 +1,189 @@
+﻿// Wizard.idl: ActiveX 컨트롤 프로젝트의 형식 라이브러리 소스입니다.
+
+// 이 파일은 MIDL 컴파일러 도구에 의해 처리되어
+// Wizard.ocx에서 리소스가 되는 형식 라이브러리(Wizard.tlb)를
+// Wizard.ocx.
+
+#include <olectl.h>
+#include <idispids.h>
+
+[ uuid(18c830e8-7bd4-4d87-b32e-6fdb4edd6107), version(1.0),
+  control ]
+library WizardLib
+{
+	importlib(STDOLE_TLB);
+
+	//  CWizardCtrl의 기본 디스패치 인터페이스
+	[ 
+		uuid(72d9dc6c-90be-4e43-9e19-48b968830ae7)
+	]
+	dispinterface _DWizard
+	{
+		properties:
+		methods:
+			[id(1)] boolean RunAxis(long mode, long pBytes, long nBytes);
+			[id(2)] boolean axTR(long pBytes, long nBytes);
+			[id(3)] long axAttach(long view, long type, long key);
+			[id(4)] void axDetach(long key);
+			[id(5)] boolean axWorkShop(long key, BSTR maps, long size, bool only);
+			[id(6)] long axWorkName(long key);
+			[id(7)] long axWorkView(BSTR maps, long size);
+			[id(8)] long axWizard(long kind, long variant);
+			[id(9)] long axInvoke(long wParam, long lParam);
+
+	};
+
+	//  CWizardCtrl의 이벤트 디스패치 인터페이스
+
+	[ 
+		uuid(bf500ab3-0b43-43e8-adc4-f944d226da5f)
+	]
+	dispinterface _DWizardEvents
+	{
+		properties:
+			//  이벤트 인터페이스에 속성이 없습니다.
+
+		methods:
+			[id(1)] void OnFire(long type, long wParam, long lParam);
+	};
+
+	//  CWizardCtrl에 대한 클래스 정보
+	[
+		uuid(fe2fc2d9-055b-4095-8806-c98367187868)
+	]
+	coclass Wizard
+	{
+		[default] dispinterface _DWizard;
+		[default, source] dispinterface _DWizardEvents;
+	};
+
+
+	//  Primary dispatch interface for CxScreen
+	[uuid(89CFEA19-83BB-4DB3-BA70-D509794C1091)]
+	dispinterface IxScreen
+	{
+		properties:
+			[id(1)] long Key;
+			[id(2)] boolean OnSend;
+			[id(3)] boolean Wait;
+			[id(4)] long Major;
+			[id(5)] long Minor;
+			[id(6)] boolean Certify;
+			[id(7)] boolean Trigger;
+			[id(8)] float hRatio;
+			[id(9)] float VRatio;
+
+		methods:
+			[id(10)] void ClearAll(long dest, long type);
+			[id(11)] void ChangeTR(BSTR trN);
+			[id(12)] void ChangePath(BSTR path);
+			[id(13)] void SetLedger(long pos, long length, BSTR data);
+			[id(14)] BSTR GetLedger(long pos, long length);
+			[id(15)] void ChangeMap(BSTR mapN);
+			[id(16)] void SetMessage(BSTR msg);
+			[id(17)] void SetMessage2(long level, BSTR msg);
+			[id(18)] void CreateWindow(long type, BSTR param, BSTR data);
+			[id(19)] void Send(long target);
+			[id(20)] void RSend(long target);
+			[id(21)] void CloseWindow();
+			[id(22)] BSTR GetMapName(long target);
+			[id(23)] void IgnoreChange(BOOL ignore);
+			[id(24)] IDispatch* Object(BSTR forms);
+			[id(25)] boolean GetCode(long kind, BSTR codeSymbol, BSTR nameSymbol, long type);
+			[id(26)] BSTR GetName(long kind, BSTR code, long type);
+			[id(27)] boolean Service(BSTR trN, BSTR data, long length, long mode);
+			[id(28)] void Proc(BSTR procs, BSTR data);
+			[id(29)] void SetCaption(BSTR caption);
+			[id(30)] boolean Approve(long key, BSTR ip, BSTR map, BSTR data, long length);
+			[id(31)] BSTR PopupMenu(BSTR menus, BSTR symbol);
+			[id(32)] void SetFont(long point, BSTR name);
+			[id(33)] boolean CreateObject(BSTR name);
+			[id(34)] void SetSize(long width, long height);
+			[id(35)] void Print(BSTR text);
+			[id(36)] void SetTimer(long interval, BOOL main);
+			[id(37)] long GetCodeType(BSTR code);
+			[id(38)] long UploadFile(BSTR trN, BSTR data, long length, long mode, BSTR fileN, long offset);
+			[id(39)] boolean DownloadFile(BSTR trN, BSTR data, long length, long mode, BSTR fileN);
+			[id(40)] boolean IsCodeType(BSTR code, long type);
+			[id(41)] long GetOrderType(BSTR code);
+			[id(42)] BSTR GetCaption();
+			[id(43)] BSTR ServiceEx(BSTR trN, BSTR data, long length, long mode, long timeout);
+			[id(44)] void Next(BOOL next);
+			[id(45)] void ProcEx(BSTR procs, BSTR data, long count);
+			[id(46)] boolean GetCodeEx(long kind, BSTR codeSymbol, BSTR nameSymbol, long type, BSTR code);
+			[id(47)] void SendTR(BSTR trN);
+			[id(48)] boolean GetBizInfo(BSTR code, BSTR bizCodeSymbol, BSTR bizNameSymbol, BSTR typeSymbol);
+			[id(49)] long GetTradingUnit(BSTR code);
+			[id(50)] BSTR GetCodeInfo(BSTR code);
+			[id(51)] boolean GetELWBasis(BSTR code);
+			[id(52)] double GetListedStocks(BSTR code);
+			[id(53)] void InternalTrigger(BSTR procs, BSTR param, BSTR maps, BOOL setfocus);
+			[id(54)] boolean CreateObjectEx(BSTR name);
+			[id(55)] void SetTimerX(short id, long interval, BOOL main);
+			[id(56)] int GetGroupID();
+	};
+
+	//  Class information for CxScreen
+	[uuid(8B184965-2CFD-4134-9D99-59DDEA5E0FA5)]
+	coclass xScreen
+	{
+		[default] dispinterface IxScreen;
+	};
+
+
+	//  Primary dispatch interface for CxSystem
+	[uuid(557CAD32-82F6-4BA8-A55E-DDF8D378DCBE)]
+	dispinterface IxSystem
+	{
+		properties:
+			[id(1)] boolean TriggerOn;
+			[id(2)] long ConnectBy;
+			[id(3)] BSTR UserID;
+			[id(4)] BSTR TermID;
+			[id(5)] boolean OrderConfirm;
+			[id(6)] boolean OrderPopup;
+			[id(7)] BSTR Home;
+			[id(8)] BSTR Host;
+			[id(9)] BSTR Sound;
+			[id(10)] boolean UserKey;
+			[id(11)] BSTR SystemID;
+			[id(12)] BSTR UserPass;
+			[id(13)] BSTR CertifyPass;
+
+		methods:
+			[id(14)] BSTR Convert(long type, BSTR src, BSTR file);
+			[id(15)] boolean IsPopup(BSTR mapN);
+			[id(16)] void Help(BSTR file);
+			[id(17)] void Navigate(BSTR url);
+			[id(18)] void Trigger(BSTR procs, BSTR params, BSTR maps);
+			[id(19)] BSTR GetAccountName(BSTR account);
+			[id(20)] BSTR GetAccountPass(BSTR account);
+			[id(21)] BSTR GetHistory(BOOL all, BSTR symbol);
+			[id(22)] void SetHistory(BSTR symbol, BSTR code);
+			[id(23)] void Trace(BSTR str);
+			[id(24)] void Push(BSTR name, BSTR data);
+			[id(25)] BSTR Pop(BSTR name);
+			[id(26)] boolean Open(BSTR file);
+			[id(27)] void SetAutoCode(BSTR data, long count);
+			[id(28)] boolean ExcelToText(BSTR files);
+			[id(29)] boolean TextToExcel(BSTR files);
+			[id(30)] void Exit(BOOL reboot);
+			[id(31)] boolean Menu(BSTR menus);
+			[id(32)] boolean Print(BSTR data, BSTR fName, long fPoint);
+			[id(33)] boolean PlaySound(BSTR soundFile);
+			[id(34)] boolean CheckPasswd(BSTR passwd);
+			[id(35)] BSTR Encrypt(BSTR data, BSTR keys);
+			[id(36)] BSTR Decrypt(BSTR data, BSTR keys);
+			[id(37)] BSTR EncryptSHA(BSTR data);
+			[id(38)] long CertifyFull(BSTR srcB, long srcL, VARIANT* desB);
+			[id(39)] BSTR GetUserEncID();
+
+	};
+
+	//  Class information for CxSystem
+	[uuid(774C1579-3E4A-485F-9EBC-AD47BCA54B60)]
+	coclass xSystem
+	{
+		[default] dispinterface IxSystem;
+	};
+};
