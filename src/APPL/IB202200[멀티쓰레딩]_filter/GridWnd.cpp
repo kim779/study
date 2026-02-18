@@ -2015,7 +2015,11 @@ void CGridWnd::sendTransactionTR(int update, int nStart, int nEnd)
 		sprintf(tempB, "%s%c", pinters.get()->code.IsEmpty() == TRUE ? " " : pinters.get()->code, P_DELI);
 		CopyMemory(&sendB[sendL], tempB, strlen(tempB));
 		sendL += strlen(tempB);
+		CString code = pinters.get()->code.IsEmpty() ? _T(" ") : pinters.get()->code;
+		tempStr += code;
+		tempStr += _T("\t");
 	});
+
 
 	sendB[sendL] = P_NEW;
 	sendL += 1;
@@ -2052,6 +2056,10 @@ void CGridWnd::sendTransactionTR(int update, int nStart, int nEnd)
 	sdata.SetData("pooppoop", key, sendB.data(), sendL, "");
 
 	m_bSending = true;
+	tempStr += "|";
+	tempStr += "0\t23\t24\t27\t33";
+
+	m_pMainWnd->SendMessage(WM_MANAGE, MK_SETRTSCODE, (LPARAM)(LPCSTR)(LPCTSTR)tempStr);
 	m_pMainWnd->SendMessage(WM_MANAGE, MK_SENDTR, (LPARAM)&sdata);
 	m_endsort = false;
 

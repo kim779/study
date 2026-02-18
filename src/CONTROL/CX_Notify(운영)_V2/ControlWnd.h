@@ -118,6 +118,7 @@ public:
 	std::unordered_map<std::string, CTime> m_lastRTSTimeMap;
 	bool ShouldSkipRTSByTimeDiff(CString sCode);
 	int m_diffSec{};
+	bool IsQuantityChanged(const CString& oldD, const CString& newD);
 #endif
 
 protected:
@@ -129,6 +130,7 @@ protected:
 		dispidRequestBalance = 17L
 	};
 	void OnVersionChanged();
+
 	CString m_Version;
 public:
 	afx_msg void OnTimer(UINT_PTR nIDEvent);

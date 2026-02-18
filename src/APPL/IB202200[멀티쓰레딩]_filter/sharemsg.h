@@ -137,6 +137,7 @@
 #define MK_MARKETEVENT		126
 #define MK_MARKETRELOAD		127
 #define MK_NEWSX		128
+#define MK_SETRTSCODE		129
 
 // HIWORD(wParam)	// Msg Option
 // common

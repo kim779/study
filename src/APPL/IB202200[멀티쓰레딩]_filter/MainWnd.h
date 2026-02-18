@@ -8,16 +8,7 @@
 #include "sharemsg.h"
 #include "GridWnd.h"
 #include <afxmt.h>
-
-struct ST_SEND_TR
-{
-	CString trname;
-	char* datB;
-	int datL;
-	BYTE stat;
-	int key;
-	HWND hSender;
-};
+#include "../../H/TickStore.h"
 
 class CMainWnd : public CWnd
 {
@@ -67,7 +58,8 @@ protected:
 	afx_msg void OnTimer(UINT nIDEvent);
 	//}}AFX_MSG
 	afx_msg LONG OnManage(WPARAM wParam, LPARAM lParam);
-	afx_msg LONG OnUser(WPARAM wParam, LPARAM lParam);
+	afx_msg LONG OnUser(WPARAM wParam, LPARAM lParam); 
+	afx_msg LONG OnMainMsg(WPARAM wParam, LPARAM lParam);
 	DECLARE_MESSAGE_MAP()
 
 public:
@@ -241,7 +233,13 @@ public:
 
 	CWnd* m_pMainFrame{};
 	void GetMainFrameWnd();
-	void SendTRtoMain(CString trCode, char* datB, int datL, BYTE stat,int key);
+	void SetSendTRtoMainFrame(CString trCode, char* datB, int datL, BYTE stat,int key);
 	void RegisterRealtimeCodes(const std::vector<CString>& codeList);
 	void UnregisterRealtime();
+
+
+	void GetRTSFromMainFrame(CString scode);
+
+	std::vector<std::string> m_codes;
+	std::vector<int> m_symbols;
 };

@@ -1,4 +1,4 @@
-// MainFrm.h : interface of the CMainFrame class
+ï»¿// MainFrm.h : interface of the CMainFrame class
 //
 /////////////////////////////////////////////////////////////////////////////
 
@@ -22,6 +22,7 @@
 
 #include <vector>
 #include <algorithm>
+#include <unordered_set>
 
 #define USE_AHNLAB_SECUREBROWSER
 
@@ -109,7 +110,7 @@ int __stdcall STSDKEX_EventCallback(long lCode, void* pParam, long lParamSize);
 #define	SEP				0x7f
 #define	USERSEP			'\t'
 
-#define	INSERTID	"@ID@"			// ¸Ş´º¿¡¼­ webÈ­¸é ¿©´Â°æ¿ì ÀÌ½Éº¼ÀÌ ÀÖÀ¸¸é userID·Î º¯°æÇØÁÜ
+#define	INSERTID	"@ID@"			// ë©”ë‰´ì—ì„œ webí™”ë©´ ì—¬ëŠ”ê²½ìš° ì´ì‹¬ë³¼ì´ ìˆìœ¼ë©´ userIDë¡œ ë³€ê²½í•´ì¤Œ
 
 #define	MENU_NOT		0x00
 #define	MENU_NONE		0x01
@@ -125,32 +126,33 @@ int __stdcall STSDKEX_EventCallback(long lCode, void* pParam, long lParamSize);
 #define TM_PRNIMG		9012
 #define TM_AUTODCOTOR	9013
 #define TM_RTSQUEUE		9015			// RTS queue check(1000 ms)
-#define	TM_SCRLOG		9016			// È­¸é ·Î±× 20070627 kwon
-#define	TM_TEST			9018			// Å×½ºÆ®¿ë timer
+#define	TM_SCRLOG		9016			// í™”ë©´ ë¡œê·¸ 20070627 kwon
+#define	TM_TEST			9018			// í…ŒìŠ¤íŠ¸ìš© timer
 #define TM_INITSIZE		9030
-#define TM_NOTICE		9040            //°øÁö
-#define TM_HISTORY		9060			//È÷½ºÅä¸®
+#define TM_NOTICE		9040            //ê³µì§€
+#define TM_HISTORY		9060			//íˆìŠ¤í† ë¦¬
 #define TM_ITGY			9910
 #define TM_WINES_KIUP	9911
-#define TM_NPROTECT_ALIVE 9912			//nProtect ±âµ¿ »óÅÂ È®ÀÎ
-#define TM_AOS_ALIVE	9913			//AOS Àç±âµ¿
-#define TM_KINGS_ALIVE	9914			//Å°º¸µå º¸¾È Àç±âµ¿
-#define TM_POPUP_JISU   9019		    //ÇØ¿ÜÁö¼ö	
+#define TM_NPROTECT_ALIVE 9912			//nProtect ê¸°ë™ ìƒíƒœ í™•ì¸
+#define TM_AOS_ALIVE	9913			//AOS ì¬ê¸°ë™
+#define TM_KINGS_ALIVE	9914			//í‚¤ë³´ë“œ ë³´ì•ˆ ì¬ê¸°ë™
+#define TM_POPUP_JISU   9019		    //í•´ì™¸ì§€ìˆ˜	
 #define TM_TOP10_2018	9021
 #define TM_2022_CLOSE	9022
-#define TM_CB_SEARCH	9023			//¼­Å¶ ºê·¹ÀÌÅ©
+#define TM_CB_SEARCH	9023			//ì„œí‚· ë¸Œë ˆì´í¬
 
 
 
-#define TM_HTS_LOADENFORMATION	9024			//HTS ½ÇÇà½Ã ÃÖ¼±ÁıÇàµî °ü·Ã µ¿ÀÇ ÀıÂ÷ÈÄ °èÁÂºñ¹øÀúÀå È­¸é ¿ÀÇÂ
-#define TM_HTS_LOADENFORMATION_POP 9025 //HTS ½ÇÇà½Ã ÃÖ¼±ÁıÇàµî °ü·Ã µ¿ÀÇ ÀıÂ÷ÈÄ °èÁÂºñ¹øÀúÀå È­¸é SDI ¿ÀÇÂ
+#define TM_HTS_LOADENFORMATION	9024			//HTS ì‹¤í–‰ì‹œ ìµœì„ ì§‘í–‰ë“± ê´€ë ¨ ë™ì˜ ì ˆì°¨í›„ ê³„ì¢Œë¹„ë²ˆì €ì¥ í™”ë©´ ì˜¤í”ˆ
+#define TM_HTS_LOADENFORMATION_POP 9025 //HTS ì‹¤í–‰ì‹œ ìµœì„ ì§‘í–‰ë“± ê´€ë ¨ ë™ì˜ ì ˆì°¨í›„ ê³„ì¢Œë¹„ë²ˆì €ì¥ í™”ë©´ SDI ì˜¤í”ˆ
 #define TM_MARKET 9026
 #define TM_NOSCREEN_URL 9027
-#define TM_MNGINFO 9028  //¿ì¼± ½º·¹µå¿ëÀÌ¶ó¼­ ¾È¾¸
+#define TM_MNGINFO 9028  //ìš°ì„  ìŠ¤ë ˆë“œìš©ì´ë¼ì„œ ì•ˆì”€
 #define TM_MNGINFO_NOW 9029
 #define TM_CHANGESKIN 9061
-#define TM_STAFF_OPENNOPOACC 9062  //Á÷¿ø¿ë°èÁÂÈ®ÀÎÀº HTS ½ÃÀÛÇÒ¶§´Â ¾ÈÇÔ
+#define TM_STAFF_OPENNOPOACC 9062  //ì§ì›ìš©ê³„ì¢Œí™•ì¸ì€ HTS ì‹œì‘í• ë•ŒëŠ” ì•ˆí•¨
 #define TM_MAIN_RTS_TEST 9063
+#define TM_MAIN_RTS_PUSH 9064
 
 #define	COLOR_TB		RGB(238, 238, 238)
 
@@ -184,29 +186,29 @@ int __stdcall STSDKEX_EventCallback(long lCode, void* pParam, long lParamSize);
 #define	GAP				2
 #define SRCMASK			0x00220326    // mask
 
-// 2007.10 ´Ü±â°³¼±¿¡¼­´Â Å×µÎ¸®¸¦ 2px °íÁ¤
+// 2007.10 ë‹¨ê¸°ê°œì„ ì—ì„œëŠ” í…Œë‘ë¦¬ë¥¼ 2px ê³ ì •
 #define	XGAP			2//GetSystemMetrics(SM_CXFRAME)
 #define	YGAP			2//GetSystemMetrics(SM_CYFRAME)
 
-#define MAPN_REALTIMEJANGO		"IBXXXX01"		// ½Ç½Ã°£ÀÜ°í
-#define MAPN_ACCTGROUP			"IBXXXX02"		// ±×·ì°èÁÂ°ü¸®
-#define MAPN_STOPLOSS			"IBXXXX03"		// ½ºÅ¾·Î½º
-#define MAPN_ACCTTOOLBAR		"IBXXXX04"		// °èÁÂÅø¹Ù
-#define MAPN_ACCTGROUP1			"IBXXXX05"		// ±×·ì°èÁÂ°ü¸®1
-#define MAPN_ACCTGROUP2			"IBXXXX06"		// ±×·ì°èÁÂ°ü¸®2
-#define MAPN_SISECATCH			"IBXXXX08"		// ½Ã¼¼Æ÷Âø
-#define MAPN_SISECATCH1			"IBXXXX09"		// ½Ã¼¼Æ÷Âø(background)
-#define MAPN_FOSTOPLOSS			"IB115400"		// ¼±¹°¿É¼Ç ½ºÅ¾·Î½º
-#define MAPN_GONGJI				"IB600000"		// °øÁö
-#define MAPN_ACCTCONFIG			"IB0000X1"		// °èÁÂ¼³Á¤
-#define MAPN_LINKEXCEL			"IB0000X2"		// ¿¢¼¿¸µÅ©
-#define MAPN_KOBAELW			"IB281500"		// Á¶±âÁ¾·áELW Á¶È¸ È­¸é
-#define MAPN_KOBAELW_SCREEN		"IB280200"		// ELWÇöÀç°¡ È­¸é
-#define MAPN_LOGINSET			"IB0000AA"		// LOGIN.XXX -> PushÇØÁÖ´Â ¸Ê
-#define MAPN_MINIWID			"IB0000X8"		// ¹Ì´Ï °ü½ÉÁ¾¸ñ À§Á¬
-#define MAPN_CDDEDD			"IB823310" //CDD, EDD µî·ÏÈ­¸é //test cdd
+#define MAPN_REALTIMEJANGO		"IBXXXX01"		// ì‹¤ì‹œê°„ì”ê³ 
+#define MAPN_ACCTGROUP			"IBXXXX02"		// ê·¸ë£¹ê³„ì¢Œê´€ë¦¬
+#define MAPN_STOPLOSS			"IBXXXX03"		// ìŠ¤íƒ‘ë¡œìŠ¤
+#define MAPN_ACCTTOOLBAR		"IBXXXX04"		// ê³„ì¢Œíˆ´ë°”
+#define MAPN_ACCTGROUP1			"IBXXXX05"		// ê·¸ë£¹ê³„ì¢Œê´€ë¦¬1
+#define MAPN_ACCTGROUP2			"IBXXXX06"		// ê·¸ë£¹ê³„ì¢Œê´€ë¦¬2
+#define MAPN_SISECATCH			"IBXXXX08"		// ì‹œì„¸í¬ì°©
+#define MAPN_SISECATCH1			"IBXXXX09"		// ì‹œì„¸í¬ì°©(background)
+#define MAPN_FOSTOPLOSS			"IB115400"		// ì„ ë¬¼ì˜µì…˜ ìŠ¤íƒ‘ë¡œìŠ¤
+#define MAPN_GONGJI				"IB600000"		// ê³µì§€
+#define MAPN_ACCTCONFIG			"IB0000X1"		// ê³„ì¢Œì„¤ì •
+#define MAPN_LINKEXCEL			"IB0000X2"		// ì—‘ì…€ë§í¬
+#define MAPN_KOBAELW			"IB281500"		// ì¡°ê¸°ì¢…ë£ŒELW ì¡°íšŒ í™”ë©´
+#define MAPN_KOBAELW_SCREEN		"IB280200"		// ELWí˜„ì¬ê°€ í™”ë©´
+#define MAPN_LOGINSET			"IB0000AA"		// LOGIN.XXX -> Pushí•´ì£¼ëŠ” ë§µ
+#define MAPN_MINIWID			"IB0000X8"		// ë¯¸ë‹ˆ ê´€ì‹¬ì¢…ëª© ìœ„ì ¯
+#define MAPN_CDDEDD			"IB823310" //CDD, EDD ë“±ë¡í™”ë©´ //test cdd
 
-#define MAPN_MULTICONNECT		"DH621600"		// µ¿½ÃÁ¢¼Ó °ü¸®
+#define MAPN_MULTICONNECT		"DH621600"		// ë™ì‹œì ‘ì† ê´€ë¦¬
 
 #define SYM_MNG			"XXXXX"
 #define MNG_KIND		"047"
@@ -230,7 +232,7 @@ int __stdcall STSDKEX_EventCallback(long lCode, void* pParam, long lParamSize);
 
 //#define DF_CDDUSE  1
 
-// ½Ç½Ã°£ ¸Ê¹İ¿µ 2011.01.26 by warship -----------------------------------------------------------------
+// ì‹¤ì‹œê°„ ë§µë°˜ì˜ 2011.01.26 by warship -----------------------------------------------------------------
 struct rexp_item
 {
     char type[3];       /* MAP, DEV, EXE, TAB, MTB */
@@ -258,48 +260,48 @@ struct pibotran_mod {
     char data[1024*32];
 };
 // -----------------------------------------------------------------------------------------------------
-// ¿¡·¯¸®Æ÷Æ® ±â´É
+// ì—ëŸ¬ë¦¬í¬íŠ¸ ê¸°ëŠ¥
 
 // -----------------------------------------------------------------------------------------------------
 
 struct _inters
 {
-	char	gubn[1];	// Á¾¸ñ±¸ºĞ	0:none, 1:Çö¹°, 2:¼±¹°, 3:¿É¼Ç, 4:°³º°ÁÖ½Ä¿É¼Ç, 5:Áö¼ö
-	char	code[12];	// Á¾¸ñÄÚµå
-	char	name[32];	// Á¾¸ñ¸í
-	char	xprc[10];	// º¸À¯´Ü°¡
-	char	xnum[10];	// º¸À¯¼ö·®
-	char	xupnum[16];	// »óÀå ÁÖ½Ä¼ö
+	char	gubn[1];	// ì¢…ëª©êµ¬ë¶„	0:none, 1:í˜„ë¬¼, 2:ì„ ë¬¼, 3:ì˜µì…˜, 4:ê°œë³„ì£¼ì‹ì˜µì…˜, 5:ì§€ìˆ˜
+	char	code[12];	// ì¢…ëª©ì½”ë“œ
+	char	name[32];	// ì¢…ëª©ëª…
+	char	xprc[10];	// ë³´ìœ ë‹¨ê°€
+	char	xnum[10];	// ë³´ìœ ìˆ˜ëŸ‰
+	char	xupnum[16];	// ìƒì¥ ì£¼ì‹ìˆ˜
 	char	filler[24];	// Reserved
 };
 #define	sz_inters	sizeof(struct _inters)
 
 struct	_bookmarkinfo {
-	char	gubn[1];		// Á¾¸ñ±¸ºĞ	0:none, 1:Çö¹°, 2:¼±¹°, 3:¿É¼Ç, 4:°³º°ÁÖ½Ä¿É¼Ç, 5:Áö¼ö
-	char	code[12];		// Á¾¸ñÄÚµå
-	char	name[32];		// Á¾¸ñ¸í
-	char	bookmark[1];	// ºÏ¸¶Å© ¿©ºÎ
+	char	gubn[1];		// ì¢…ëª©êµ¬ë¶„	0:none, 1:í˜„ë¬¼, 2:ì„ ë¬¼, 3:ì˜µì…˜, 4:ê°œë³„ì£¼ì‹ì˜µì…˜, 5:ì§€ìˆ˜
+	char	code[12];		// ì¢…ëª©ì½”ë“œ
+	char	name[32];		// ì¢…ëª©ëª…
+	char	bookmark[1];	// ë¶ë§ˆí¬ ì—¬ë¶€
 };
 
 #define	sz_bookmark	sizeof(struct _bookmarkinfo)
 
-// ÁÖ¹®¼³Á¤ ¾÷·Îµå
+// ì£¼ë¬¸ì„¤ì • ì—…ë¡œë“œ
 struct _pidouini_item {
-	char	usid[8  ];				// »ç¿ëÀÚ ID
-	char	innm[100];				// INI ÆÄÀÏ¸í
-	char	senm[100];				// ¼½¼Ç¸í
+	char	usid[8  ];				// ì‚¬ìš©ì ID
+	char	innm[100];				// INI íŒŒì¼ëª…
+	char	senm[100];				// ì„¹ì…˜ëª…
 	char	skey[100];				// KEY
 	char	valu[2000];				// VALUE
-	char	date[8  ];				// ¾÷µ¥ÀÌÆ® ÀÏÀÚ
+	char	date[8  ];				// ì—…ë°ì´íŠ¸ ì¼ì
 };
 
 struct _pidouini_mid {
-	char	gubn[1 ];				//±¸ºĞ 'Q': Á¶È¸, 'I': ÀÔ·Â
+	char	gubn[1 ];				//êµ¬ë¶„ 'Q': ì¡°íšŒ, 'I': ì…ë ¥
 	struct	_pidouini_item item; 
 };
 
 struct  _pidouini_aid{
-	char    gubn        [ 1];           /*  ±¸ºĞ('A')       */
+	char    gubn        [ 1];           /*  êµ¬ë¶„('A')       */
 	char    nrec        [ 2];           /*  COUNT           */
 	struct  _pidouini_mid     mid [16];  /*  MID             */
 };
@@ -307,18 +309,18 @@ struct  _pidouini_aid{
 #define	sz_pidouini	sizeof(struct _pidouini_mid)
 
 //
-//	°ü½ÉÁ¾¸ñ UPLOAD / DOWNLOAD
+//	ê´€ì‹¬ì¢…ëª© UPLOAD / DOWNLOAD
 //
 struct	_uinfo {
-	char	gubn[2];	// ¾÷¹«±¸ºĞ
-				// "MY" : °ü½ÉÁ¾¸ñ
-				// "UL" : »ç¿ëÀÚ µ¥ÀÌÅÍ ¸ñ·Ï 
-				// "UD" : »ç¿ëÀÚ µ¥ÀÌÅÍ
-	char	dirt[1];	// Àü¼Û¹æÇâ 'U' : pc==>host, 'D' : host==>pc, 'X' : host==>pc (conversion), 'R' : ÀçÁ¶È¸
-	char	cont[1];	// ¿¬¼Ó±¸ºĞ 'F':First, 'M':Middle, 'L':First&Last, 'C':Cancel
+	char	gubn[2];	// ì—…ë¬´êµ¬ë¶„
+				// "MY" : ê´€ì‹¬ì¢…ëª©
+				// "UL" : ì‚¬ìš©ì ë°ì´í„° ëª©ë¡ 
+				// "UD" : ì‚¬ìš©ì ë°ì´í„°
+	char	dirt[1];	// ì „ì†¡ë°©í–¥ 'U' : pc==>host, 'D' : host==>pc, 'X' : host==>pc (conversion), 'R' : ì¬ì¡°íšŒ
+	char	cont[1];	// ì—°ì†êµ¬ë¶„ 'F':First, 'M':Middle, 'L':First&Last, 'C':Cancel
 	char	name[80];	// file name
-	char	nblc[5];	// ºí·°°³¼ö, ÆÄÀÏÅ©±â(max:64k)
-	char	retc[1];	// return value 'O':Á¤»ó 'E':¿¡·¯
+	char	nblc[5];	// ë¸”ëŸ­ê°œìˆ˜, íŒŒì¼í¬ê¸°(max:64k)
+	char	retc[1];	// return value 'O':ì •ìƒ 'E':ì—ëŸ¬
 	char	emsg[40];	// error message
 };
 
@@ -330,10 +332,10 @@ struct	_ginfo {
 };
 
 struct	_jinfo {
-	char	gubn[1];	// Á¾¸ñ±¸ºĞ	0:none, 1:Çö¹°, 2:¼±¹°, 3:¿É¼Ç, 4:°³º°ÁÖ½Ä¿É¼Ç, 5:Áö¼ö
-	char	code[12];	// Á¾¸ñÄÚµå
-	char	xprc[10];	// º¸À¯´Ü°¡
-	char	xnum[10];	// º¸À¯¼ö·®
+	char	gubn[1];	// ì¢…ëª©êµ¬ë¶„	0:none, 1:í˜„ë¬¼, 2:ì„ ë¬¼, 3:ì˜µì…˜, 4:ê°œë³„ì£¼ì‹ì˜µì…˜, 5:ì§€ìˆ˜
+	char	code[12];	// ì¢…ëª©ì½”ë“œ
+	char	xprc[10];	// ë³´ìœ ë‹¨ê°€
+	char	xnum[10];	// ë³´ìœ ìˆ˜ëŸ‰
 };
 
 struct	_updn {
@@ -351,21 +353,21 @@ struct _shjcode			// semi hjcode
 	CString code;
 	CString name;
 	CString symb;		// symbol
-	char	ecng;		// ECN ±¸ºĞ
-	char	size;		// ÀÚº»±İ±Ô¸ğ	2:´ë, 3:Áß, 4:¼Ò
-	char	ucdm;		// ¾÷Á¾ÁßºĞ·ù
-	char	ucds;		// ¾÷Á¾¼ÒºĞ·ù
-	char	jjug;		// Á¦Á¶¾÷ ±¸ºĞ(27: Á¦Á¶¾÷)
-	char	kpgb;		// KOSPI200 ±¸ºĞ
-	char	kosd;		// Á¾¸ñ±¸ºĞ
-	char	ssgb;		// ¼Ò¼Ó±¸ºĞ
-	char	ucmd;		// 0:º¸ÅëÁÖ, 5:¿ì¼±ÁÖ
-	char	wsgb;		// 0:ÀÏ¹İ 1:Áö¹è±¸Á¶¿ì¼ö±â¾÷
-	char	jsiz;		// ¾÷Á¾ÀÚº»±İ ´ëÁß¼Ò
-	char	itgb;		// KOSPI-IT/KQ-IT50±¸ºĞ(1:Ã¤ÅÃ)
-	char	star;		// KOSDAQ ½ºÅ¸Áö¼ö
-	char	prmr;		// ÇÁ¸®¹Ì¾îÁö¼ö
-	char	unio;		// ÅëÇÕÁö¼ö (KRX100)
+	char	ecng;		// ECN êµ¬ë¶„
+	char	size;		// ìë³¸ê¸ˆê·œëª¨	2:ëŒ€, 3:ì¤‘, 4:ì†Œ
+	char	ucdm;		// ì—…ì¢…ì¤‘ë¶„ë¥˜
+	char	ucds;		// ì—…ì¢…ì†Œë¶„ë¥˜
+	char	jjug;		// ì œì¡°ì—… êµ¬ë¶„(27: ì œì¡°ì—…)
+	char	kpgb;		// KOSPI200 êµ¬ë¶„
+	char	kosd;		// ì¢…ëª©êµ¬ë¶„
+	char	ssgb;		// ì†Œì†êµ¬ë¶„
+	char	ucmd;		// 0:ë³´í†µì£¼, 5:ìš°ì„ ì£¼
+	char	wsgb;		// 0:ì¼ë°˜ 1:ì§€ë°°êµ¬ì¡°ìš°ìˆ˜ê¸°ì—…
+	char	jsiz;		// ì—…ì¢…ìë³¸ê¸ˆ ëŒ€ì¤‘ì†Œ
+	char	itgb;		// KOSPI-IT/KQ-IT50êµ¬ë¶„(1:ì±„íƒ)
+	char	star;		// KOSDAQ ìŠ¤íƒ€ì§€ìˆ˜
+	char	prmr;		// í”„ë¦¬ë¯¸ì–´ì§€ìˆ˜
+	char	unio;		// í†µí•©ì§€ìˆ˜ (KRX100)
 };
 
 struct _sjcode			// semi code
@@ -374,33 +376,33 @@ struct _sjcode			// semi code
 	CString name;
 };
 
-//2013.7.30 ±è´ö±â
-//¹«°á¼º °ËÁõ
+//2013.7.30 ê¹€ë•ê¸°
+//ë¬´ê²°ì„± ê²€ì¦
 struct  pihoitgy_grid
 {	
-    char    gubn[3];            /* ±¸ºĞ                 */	
+    char    gubn[3];            /* êµ¬ë¶„                 */	
 	/* ex) exe, dev, map    */	
-    char    mnam[47];           /* ¸ğµâ¸í               */	
+    char    mnam[47];           /* ëª¨ë“ˆëª…               */	
 };
 
 struct  pihoitgy_grid2
 {
-    char    gubn[3];            /* ±¸ºĞ                     */
+    char    gubn[3];            /* êµ¬ë¶„                     */
 	/* ex) exe, dev, map        */
-    char    mnam[47];           /* ¸ğµâ¸í                   */	
-    char    skey[44];           /* Å¬¶óÀÌ¾ğÆ® SHA256 °á°ú   */
+    char    mnam[47];           /* ëª¨ë“ˆëª…                   */	
+    char    skey[44];           /* í´ë¼ì´ì–¸íŠ¸ SHA256 ê²°ê³¼   */
 };  
 
 struct  pihoitgy_mid 
 {	
-    char    gubn[1];            /*  1: LIST ¿äÃ»    2: ¹«°á¼º °ËÁõ  */	
-    char    nrec[4];            /* ¹«°á¼º °ËÁõ½Ã ¿äÃ» °¹¼ö          */	
+    char    gubn[1];            /*  1: LIST ìš”ì²­    2: ë¬´ê²°ì„± ê²€ì¦  */	
+    char    nrec[4];            /* ë¬´ê²°ì„± ê²€ì¦ì‹œ ìš”ì²­ ê°¯ìˆ˜          */	
     struct  pihoitgy_grid2   grid2[1];	
 };
 
 struct  pihoitgy_mod 
 {	
-    char    nrec[4];            /*  °¹¼ö            */	
+    char    nrec[4];            /*  ê°¯ìˆ˜            */	
     struct  pihoitgy_grid    grid[1];    	
 };
 
@@ -421,17 +423,17 @@ struct pibfstup_mod
 };
 
 struct   enca_mid {
-	char    gubn[1];    // S:¼º°ø, E:¿À·ù   
-	char    dnxx[256];  // dn°ª 
+	char    gubn[1];    // S:ì„±ê³µ, E:ì˜¤ë¥˜   
+	char    dnxx[256];  // dnê°’ 
 };
 
 
  struct   enca_mod {
-	char    ret[1]; // Ã³¸®¼º°ø : 1 Ã³¸®½ÇÆĞ : 0
-	char    cnt[1]; // ½ÇÆĞÈ½¼ö
+	char    ret[1]; // ì²˜ë¦¬ì„±ê³µ : 1 ì²˜ë¦¬ì‹¤íŒ¨ : 0
+	char    cnt[1]; // ì‹¤íŒ¨íšŸìˆ˜
 };
 
-//¸Å¼ö TOP10
+//ë§¤ìˆ˜ TOP10
 struct pibo2018_mid
 {
 	char gubn[1]; 
@@ -465,7 +467,7 @@ struct pibo2018_mod2
 	struct pibo2018_grid2 grid[1];
 };
 
-struct SBPGT336_mid //°øÀÎ ÀÎÁõ ¿À·ù Àü¼Û
+struct SBPGT336_mid //ê³µì¸ ì¸ì¦ ì˜¤ë¥˜ ì „ì†¡
 {
 	char In[5];
 	char uID[16];
@@ -476,7 +478,7 @@ struct SBPGT336_mod
 {
 	char InOut[22];
 	char rcd[5];
-	char psRtyCnt[2]; //Àç½Ãµµ °¡´ÉÈ½¼ö
+	char psRtyCnt[2]; //ì¬ì‹œë„ ê°€ëŠ¥íšŸìˆ˜
 };
 
 struct _stMap
@@ -489,7 +491,7 @@ struct _stMap
 
 #define DF_MAIN_RTS
 #ifdef DF_MAIN_RTS
-//////////////////////////////////////////////////////////////////////¸ŞÀÎ½Ç½Ã°£Ã³¸®//////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////ë©”ì¸ì‹¤ì‹œê°„ì²˜ë¦¬//////////////////////////////////////////////
 
 #include <atomic>
 
@@ -501,14 +503,14 @@ struct _stMap
 //	char code[CODE_LEN]{};
 //
 //	char RTStype[2]{};
-//	char price[PRICE_LEN]{};   // 23 ÇöÀç°¡
-//	char diff[DIFF_LEN]{};     // 14 ´ëºñ
-//	char volume[VOL_LEN]{};    // 15 °Å·¡·®
-//	char rate[RATE_LEN]{};     // 16 µî¶ô·ü
+//	char price[PRICE_LEN]{};   // 23 í˜„ì¬ê°€
+//	char diff[DIFF_LEN]{};     // 14 ëŒ€ë¹„
+//	char volume[VOL_LEN]{};    // 15 ê±°ë˜ëŸ‰
+//	char rate[RATE_LEN]{};     // 16 ë“±ë½ë¥ 
 //};
 
 
-// 2) Àü¿ª ½½·Ô + code ¡æ index map
+// 2) ì „ì—­ ìŠ¬ë¡¯ + code â†’ index map
 #include <unordered_map>
 #include <string>
 #include <mutex>
@@ -535,24 +537,24 @@ constexpr int MAX_SLOT = 4096;
 //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 //#define MAX_CODE_LEN   12
-//#define MAX_SUBSCRIBE  128   // È­¸é´ç ±¸µ¶ Á¾¸ñ ÃÖ´ë °³¼ö
+//#define MAX_SUBSCRIBE  128   // í™”ë©´ë‹¹ êµ¬ë… ì¢…ëª© ìµœëŒ€ ê°œìˆ˜
 //
 //enum RT_REQ_TYPE
 //{
-//	RT_REQ_SUBSCRIBE = 1,   // µî·Ï
-//	RT_REQ_UNSUBSCRIBE = 2, // ÇØÁ¦
-//	RT_REQ_UPDATE = 3       // °»½Å
+//	RT_REQ_SUBSCRIBE = 1,   // ë“±ë¡
+//	RT_REQ_UNSUBSCRIBE = 2, // í•´ì œ
+//	RT_REQ_UPDATE = 3       // ê°±ì‹ 
 //};
 //
 //struct ST_RT_SUBSCRIBE
 //{
-//	HWND hWnd;                         // ¿äÃ» È­¸é ÇÚµé
-//	int reqType;                      // ¿äÃ» Å¸ÀÔ
-//	int screenKey;                    // È­¸é ³»ºÎ key (optional but °­·ÂÃßÃµ)
+//	HWND hWnd;                         // ìš”ì²­ í™”ë©´ í•¸ë“¤
+//	int reqType;                      // ìš”ì²­ íƒ€ì…
+//	int screenKey;                    // í™”ë©´ ë‚´ë¶€ key (optional but ê°•ë ¥ì¶”ì²œ)
 //
-//	int count;                        // Á¾¸ñ °³¼ö
+//	int count;                        // ì¢…ëª© ê°œìˆ˜
 //	int mkType;
-//	char codes[MAX_SUBSCRIBE][MAX_CODE_LEN];  // Á¾¸ñÄÚµå ¹è¿­
+//	char codes[MAX_SUBSCRIBE][MAX_CODE_LEN];  // ì¢…ëª©ì½”ë“œ ë°°ì—´
 //};
 //
 //constexpr int MAX_FIELD = 256;
@@ -562,7 +564,7 @@ constexpr int MAX_SLOT = 4096;
 //{
 //	FT_EMPTY = 0,
 //	FT_INT,
-//	FT_LONG,     // ÇÊ¿äÇÏ¸é
+//	FT_LONG,     // í•„ìš”í•˜ë©´
 //	FT_DOUBLE,
 //	FT_STRING,
 //};
@@ -581,27 +583,27 @@ constexpr int MAX_SLOT = 4096;
 //
 //struct DLL_TICK_REC
 //{
-//	std::atomic<int> version{ 0 };        // lock-free ¹öÀü
+//	std::atomic<int> version{ 0 };        // lock-free ë²„ì „
 //	FIELD_VALUE field[MAX_FIELD];
 //};
 //
 //static FIELD_TYPE g_fieldType[MAX_FIELD];
 
-struct ST_SEND_TR
-{
-	CString trname;
-	char* datB;
-	int datL;
-	BYTE stat;
-	int key;
-	HWND hSender;
-};
+//struct ST_SEND_TR
+//{
+//	CString trname;
+//	char* datB;
+//	int datL;
+//	BYTE stat;
+//	int key;
+//	HWND hSender;
+//};
 
 struct TR_ROUTE_INFO
 {
-	HWND hWnd;   // ¿äÃ»ÇÑ È­¸é
-	int key;     // È­¸éÀÌ Á¤ÇÑ key
-	DWORD tick;  // ¿äÃ» ½Ã°£ (timeout °ü¸®)
+	HWND hWnd;   // ìš”ì²­í•œ í™”ë©´
+	int key;     // í™”ë©´ì´ ì •í•œ key
+	DWORD tick;  // ìš”ì²­ ì‹œê°„ (timeout ê´€ë¦¬)
 };
 
 struct SUBSCRIBER
@@ -611,7 +613,7 @@ struct SUBSCRIBER
 };
 
 
-//----------------------------------------------¸ŞÀÎ½Ç½Ã°£Ã³¸®------------------------------------------------
+//----------------------------------------------ë©”ì¸ì‹¤ì‹œê°„ì²˜ë¦¬------------------------------------------------
 #endif
 
 void WriteLog(LPCSTR log, ...);
@@ -699,7 +701,7 @@ protected:
 	bool	m_bSDI;	
 	BOOL	m_bHome;
 	BOOL	m_bEnd;
-	bool	m_bReconnect;				// ´Ù¸¥ ID·Î ÀçÁ¢¼Ó, 20070117
+	bool	m_bReconnect;				// ë‹¤ë¥¸ IDë¡œ ì¬ì ‘ì†, 20070117
 	BOOL	m_activeCap;
 	BOOL	m_bOnlySise;
 	BOOL	m_bHistory;
@@ -719,7 +721,7 @@ protected:
 	int		m_activeKey;
 	int		m_BackGroundKey;
 	
-	//** Ã¼°áÅø¹Ù °ü·Ã»çÇ×
+	//** ì²´ê²°íˆ´ë°” ê´€ë ¨ì‚¬í•­
 	BOOL	m_matchToolBar;
 	int		m_matchToolCount;
 	
@@ -738,14 +740,14 @@ protected:
 	int	m_connectBy;
 	int	m_downI;
 	int	m_action;
-	int m_nInterest;//¿­¸° °ü½ÉÁ¾¸ñÈ­¸é ¼ö
+	int m_nInterest;//ì—´ë¦° ê´€ì‹¬ì¢…ëª©í™”ë©´ ìˆ˜
 
 	BOOL	m_bInit;
 
 	HWND m_winechartHwnd;
 	HWND m_wineSchartHwnd;
 
-	//ÀçÁ¢¼ÓÀ» ÇØ¾ßÇÏ´ÂÁö ¿©ºÎ
+	//ì¬ì ‘ì†ì„ í•´ì•¼í•˜ëŠ”ì§€ ì—¬ë¶€
 	BOOL	m_bMustRetry;
 
 	CString m_slideMsg;
@@ -756,7 +758,7 @@ protected:
 	bool	m_bCertLogin;
 	bool	m_bUseNewLogin;
 
-	CString	m_strDN;//ÀÎÁõ¼­ DN
+	CString	m_strDN;//ì¸ì¦ì„œ DN
 
 #ifdef DF_USE_CPLUS17
 	std::unique_ptr<class CAxGuide> m_axGuide{};
@@ -784,7 +786,7 @@ protected:
 	std::unique_ptr<class CInfofile> m_infofile{};
 	
 	//modi  auto
-	std::unique_ptr < class CDlgServerOrder> m_pServerOrd{}; //modi ¼­¹ö  
+	std::unique_ptr < class CDlgServerOrder> m_pServerOrd{}; //modi ì„œë²„  
 	int		m_serverOrdHISTORY = 100;
 
 	std::unique_ptr<class CSlideWnd > m_pSlideWnd{};
@@ -794,16 +796,16 @@ public:
 	void	ShowServerOrdDlg();
 	void ShowSlideWnd(BOOL bShow = TRUE);
 	enum {
-		SERVERORDER_MSG_RELOAD = 0,                 //¼­¹öÁÖ¹®È­¸é¿¡°Ô ÀçÁ¶È¸ ¸Ş½ÃÁö
-		SERVERORDER_MSG_SVCREGI,						//ÁÖ½ÄÀÚµ¿ÁÖ¹® ¼­ºñ½º ½ÅÃ»
-		SERVERORDER_MSG_SVCTERMINATE,			//ÁÖ½ÄÀÚµ¿ÁÖ¹® ¼­ºñ½º ÇØÁö
-		SERVERORDER_MSG_SELLCONOK,					//ÁÖ½ÄÀÚµ¿ÁÖ¹® Á¶°Ç¸¸Á·(¸Åµµ)
-		SERVERORDER_MSG_BUYCONOK,					//ÁÖ½ÄÀÚµ¿ÁÖ¹® Á¶°Ç¸¸Á·(¸Å¼ö)
-		SERVERORDER_MSG_SELLNEWCONOK,			//ÁÖ½ÄÀÚµ¿ÁÖ¹® Á¶°Ç¸¸Á·(½Å±ÔÆíÀÔ¸Åµµ)
-		SERVERORDER_MSG_CONEXPD,						//ÁÖ½ÄÀÚµ¿ÁÖ¹® Á¶°Ç¸¸·á
-		SERVERORDER_MSG_CONSTATUE,					////ÁÖ½ÄÀÚµ¿ÁÖ¹® °¨½Ã³»¿ª
-		SERVERORDER_MSG_MISORDER,					//Âø¿ÀÁÖ¹® °ü·Ã ¸Ş½ÃÁö
-		SERVERORDER_MSG_MAPPOP = 20						//ÁÖ½ÄÀÚµ¿ÁÖ¹® °ü·Ã ¸ÊÈ­¸é ÆË¾÷
+		SERVERORDER_MSG_RELOAD = 0,                 //ì„œë²„ì£¼ë¬¸í™”ë©´ì—ê²Œ ì¬ì¡°íšŒ ë©”ì‹œì§€
+		SERVERORDER_MSG_SVCREGI,						//ì£¼ì‹ìë™ì£¼ë¬¸ ì„œë¹„ìŠ¤ ì‹ ì²­
+		SERVERORDER_MSG_SVCTERMINATE,			//ì£¼ì‹ìë™ì£¼ë¬¸ ì„œë¹„ìŠ¤ í•´ì§€
+		SERVERORDER_MSG_SELLCONOK,					//ì£¼ì‹ìë™ì£¼ë¬¸ ì¡°ê±´ë§Œì¡±(ë§¤ë„)
+		SERVERORDER_MSG_BUYCONOK,					//ì£¼ì‹ìë™ì£¼ë¬¸ ì¡°ê±´ë§Œì¡±(ë§¤ìˆ˜)
+		SERVERORDER_MSG_SELLNEWCONOK,			//ì£¼ì‹ìë™ì£¼ë¬¸ ì¡°ê±´ë§Œì¡±(ì‹ ê·œí¸ì…ë§¤ë„)
+		SERVERORDER_MSG_CONEXPD,						//ì£¼ì‹ìë™ì£¼ë¬¸ ì¡°ê±´ë§Œë£Œ
+		SERVERORDER_MSG_CONSTATUE,					////ì£¼ì‹ìë™ì£¼ë¬¸ ê°ì‹œë‚´ì—­
+		SERVERORDER_MSG_MISORDER,					//ì°©ì˜¤ì£¼ë¬¸ ê´€ë ¨ ë©”ì‹œì§€
+		SERVERORDER_MSG_MAPPOP = 20						//ì£¼ì‹ìë™ì£¼ë¬¸ ê´€ë ¨ ë§µí™”ë©´ íŒì—…
 	};
 	void ServerOrderMsgToMap(int igubn, bool bPop = FALSE);
 	bool MapCheckAndSendMsg(CString sMsg);
@@ -853,14 +855,14 @@ public:
 //	custom toolbar
 
 	CMapStringToString	m_tabviewlist;
-	CMapStringToString	m_mapExpectSymbol;	// 2006.7.24 ÀÌÀÎÈ£ => ¿¹»óÁö¼ö ½Éº¼ Å×ÀÌºí
+	CMapStringToString	m_mapExpectSymbol;	// 2006.7.24 ì´ì¸í˜¸ => ì˜ˆìƒì§€ìˆ˜ ì‹¬ë³¼ í…Œì´ë¸”
 	CStringArray		m_savelist;	
 	CStringArray		m_sfilelist;
 	CStringArray		m_removelist;
-	//2012.08.17 ±è´ö±â - È­¸éÈ÷½ºÆ®¸® ¾÷µ¥ÀÌÆ®¸¦ À§ÇÑ ÀúÀå
+	//2012.08.17 ê¹€ë•ê¸° - í™”ë©´íˆìŠ¤íŠ¸ë¦¬ ì—…ë°ì´íŠ¸ë¥¼ ìœ„í•œ ì €ì¥
 	CStringArray		m_screenHistory;
 
-	//2013.07.30 ±è´ö±â - ¹«°á¼º ÆÄÀÏ¸®½ºÆ®
+	//2013.07.30 ê¹€ë•ê¸° - ë¬´ê²°ì„± íŒŒì¼ë¦¬ìŠ¤íŠ¸
 	CStringArray		m_arrayItgy;
 	CStringArray		m_arrayPlfItgy;
 
@@ -892,26 +894,26 @@ public:
 	CString m_strCustomerID;
 	
 
-	//ÃË¾ØÅäÅ©
+	//ì´‰ì•¤í† í¬
 	int m_ShowSlide;
 
-	//È­¸é µÎ°³ ÆË¾÷ ¹æÁö, laststateÀúÀå ¹æÁö
+	//í™”ë©´ ë‘ê°œ íŒì—… ë°©ì§€, laststateì €ì¥ ë°©ì§€
 	void LoadNoTwoPOP_NoSaveLast();
 	CStringArray m_arNoTwoPop;
 	CStringArray m_arNoSaveLastmap;
 	bool IsNoTwopop(CString strmap);
 	bool IsNoSaveLastmap(CString strmap);
 
-	//°øµ¿ÀÎÁõ¼­ °ËÁõ°á°ú 
-	int  m_iCErrCnt;  //¿À·ù È½¼ö
+	//ê³µë™ì¸ì¦ì„œ ê²€ì¦ê²°ê³¼ 
+	int  m_iCErrCnt;  //ì˜¤ë¥˜ íšŸìˆ˜
 	void SendSBPGT336(CString sData);
 	void ParseSBPGT336(char* pdata, int len);
 
-	//Æ®·¹ÀÌ
+	//íŠ¸ë ˆì´
 	void GoToTray();
 	void BackFromTray();
 
-	//ÄÄÆÄÀÏ·¯ ¾÷µ¥ÀÌÆ® ¹öÀüÈ®ÀÎ
+	//ì»´íŒŒì¼ëŸ¬ ì—…ë°ì´íŠ¸ ë²„ì „í™•ì¸
 	void Check_HTS_Verstion();
 // Operations
 
@@ -925,7 +927,7 @@ public:
 	void ParseSAMFQ014(char* dat, int len);
 	void ParseSACMQ101(char* dat, int len);
 
-	//È­¸é Àá±İ
+	//í™”ë©´ ì ê¸ˆ
 	void KillMySelf();
 	HANDLE ProcessFind(char* strProcessName);
 public:
@@ -1074,7 +1076,7 @@ public:
 	void	SendEnca(CString sDN,bool bSuccess);
 
 protected:
-	// ½Ç½Ã°£ ¹İ¿µ ±â´É Ãß°¡ 2011.01.26 by warship
+	// ì‹¤ì‹œê°„ ë°˜ì˜ ê¸°ëŠ¥ ì¶”ê°€ 2011.01.26 by warship
 	std::vector<struct rexp_item> m_rexp;
 	void ProcessRexp(struct rexp_mid *mid);
 	void StartRexp();
@@ -1141,7 +1143,7 @@ protected:
 public:
 	bool	sendTR(CString trN, char* datB, int datL, BYTE stat = 0, int key = 0);
 
-	//ÃË¾ØÅäÅ© °ü·Ã
+	//ì´‰ì•¤í† í¬ ê´€ë ¨
 	void	HidePBArrItem(CWnd* rect);
 	CRect	getPBArrRect(CWnd* pdlg, int iwidth, int iheight);
 	void	OpenPBNews(CString strdata = "");
@@ -1150,7 +1152,7 @@ public:
 	DWORD   m_DInstallASTx;
 	void    GetASTxInstall();
 
-	//202003 CB ¹ßµ¿½Ã ÆË¾÷ //HTS ½ÃÀÛÈÄ °ü·ÃTRÁ¶È¸ ÇÏ¸é ¼­¹ö¿¡¼­ ³»·ÁÁÜ
+	//202003 CB ë°œë™ì‹œ íŒì—… //HTS ì‹œì‘í›„ ê´€ë ¨TRì¡°íšŒ í•˜ë©´ ì„œë²„ì—ì„œ ë‚´ë ¤ì¤Œ
 	//void	SendCBSerachTR();
 	CSize	GetFrameGap(bool mdichild = true);
 protected:
@@ -1197,7 +1199,7 @@ protected:
 	void	load_start_notice(BOOL bReload = false);
 	void    load_dbar2();
 
-	//UPDATE AGENT Á¾·á
+	//UPDATE AGENT ì¢…ë£Œ
 	void	KillUpdateAgent();
 
 	void	checkFirewall();
@@ -1298,16 +1300,16 @@ protected:
 	void    RunTOP10();
 
 /////////////////////////////////////////////////////////////////////////////////
-	// 2006.7.24 ÀÌÀÎÈ£ => ¿¹»óÁö¼ö¸¦ À§ÇÑ ½Éº¼Å×ÀÌºí
+	// 2006.7.24 ì´ì¸í˜¸ => ì˜ˆìƒì§€ìˆ˜ë¥¼ ìœ„í•œ ì‹¬ë³¼í…Œì´ë¸”
 	void	MakeExpectSymbolTable();	
 	CString	ReplaceExpectSymbol(CString sym);
 /////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////
-	// 2006.9.14 ÀÌÀÎÈ£ => ÇÏ³ª/´ëÅõ ¾ÏÈ£È­ ¸ğµâ ±¸ºĞ
+	// 2006.9.14 ì´ì¸í˜¸ => í•˜ë‚˜/ëŒ€íˆ¬ ì•”í˜¸í™” ëª¨ë“ˆ êµ¬ë¶„
 	void	SetEncriptFile();
 /////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////
-	// 2006.11.01 ÀÌÀÎÈ£ timer¸¦ ÀÌ¿ëÇÏ¿© È­¸é ÇÁ¸°Æ®ÀÇ delay¸¦ ÁÖ±â À§ÇÏ¿©
+	// 2006.11.01 ì´ì¸í˜¸ timerë¥¼ ì´ìš©í•˜ì—¬ í™”ë©´ í”„ë¦°íŠ¸ì˜ delayë¥¼ ì£¼ê¸° ìœ„í•˜ì—¬
 	CWnd*	m_pPRNChild;
 	CSize	m_sizePRN;
 	CSize	m_sizePRNORG;
@@ -1316,31 +1318,31 @@ protected:
 	BOOL	printOper(CWnd* pChild, CSize size, CSize sizeOrg, CString dat, bool bResize);
 /////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////
-	// Àå¿î¿µ Á¤º¸ °ü·Ã
-	CMapStringToString	m_mapAlarmList;		// 2006.8.23 ÀÌÀÎÈ£ => Àå¿î¿µÁ¤º¸ 
+	// ì¥ìš´ì˜ ì •ë³´ ê´€ë ¨
+	CMapStringToString	m_mapAlarmList;		// 2006.8.23 ì´ì¸í˜¸ => ì¥ìš´ì˜ì •ë³´ 
 #ifdef DF_USE_CPLUS17
 	std::unique_ptr<class CManageInfo> m_mngInfo;  
 	std::unique_ptr<class CTOP10Dialog> m_top10;
 #else
-	class CManageInfo*	m_mngInfo;	// Àå¿î¿µÁ¤º¸ È­¸é 2006.8.3
-	class CTOP10Dialog* m_top10; //¸Å¼ö TOP10 È­¸é 2017.10.27
+	class CManageInfo*	m_mngInfo;	// ì¥ìš´ì˜ì •ë³´ í™”ë©´ 2006.8.3
+	class CTOP10Dialog* m_top10; //ë§¤ìˆ˜ TOP10 í™”ë©´ 2017.10.27
 #endif
-	bool	m_bSound;	// ¾Ë¸² ¹× Àå¿î¿µÁ¤º¸ ¼Ò¸®¾Ë¸² ¿É¼Ç
-	// 2006. 11. 07 Àå¿î¿µ ¸Ş½ÃÁö À§Ä¡ ¿É¼ÇÃß°¡ 
+	bool	m_bSound;	// ì•Œë¦¼ ë° ì¥ìš´ì˜ì •ë³´ ì†Œë¦¬ì•Œë¦¼ ì˜µì…˜
+	// 2006. 11. 07 ì¥ìš´ì˜ ë©”ì‹œì§€ ìœ„ì¹˜ ì˜µì…˜ì¶”ê°€ 
 	int		m_nInfoPos;
-	// 2010. 08. 24 KOBA ELW ¾Ë¸² ¿É¼Ç
+	// 2010. 08. 24 KOBA ELW ì•Œë¦¼ ì˜µì…˜
 	bool	m_bKobaElwNotify;
 
-	// 2007.09.20 ¹ÙÅÁÈ­¸é ¸ğµå
+	// 2007.09.20 ë°”íƒ•í™”ë©´ ëª¨ë“œ
 	int		m_nBkMode;
-	BOOL	m_bUseAlarm;	// ¾Ë¸² ¸Ş¼¼Áö »ç¿ë¿©ºÎ
+	BOOL	m_bUseAlarm;	// ì•Œë¦¼ ë©”ì„¸ì§€ ì‚¬ìš©ì—¬ë¶€
 	
 	void	MngInfoPos();
 	void	ShowMngInfo(CString dat);
 	void	ShowMngInfo(DWORD* dat);
 /////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////
-	// °³Àå½Ã°£¿¡ ¸ÂÃß¾î Àå¾Ö½Å°í¸¦ º¸³¾¼ö ÀÖµµ·Ï ¿µ¾÷À» ÀúÀå 2006.12.06
+	// ê°œì¥ì‹œê°„ì— ë§ì¶”ì–´ ì¥ì• ì‹ ê³ ë¥¼ ë³´ë‚¼ìˆ˜ ìˆë„ë¡ ì˜ì—…ì„ ì €ì¥ 2006.12.06
 	CString	m_szRTime;
 	void	sendRTime();
 	void	processRTime(char* ptr, int len);
@@ -1355,14 +1357,14 @@ protected:
 
 /////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////
-	// Ã´Ã´¹Ú»ç 2007.01.22
+	// ì²™ì²™ë°•ì‚¬ 2007.01.22
 // 	void	ShowDoctorInfo(CString dat);
 // 	void	ShowDoctorInfo(DWORD* data);
 //	void	doctorInfoPos(bool bDoctor);
 
 	class	CDtInfo	*m_pDoctor;
 /////////////////////////////////////////////////////////////////////////////////
-	// ¹Ì¼öºó¹ß°í°´ ¾Ë¶÷
+	// ë¯¸ìˆ˜ë¹ˆë°œê³ ê° ì•ŒëŒ
 	void	showMisuAlarm();
 	class CDlgMisuAlarm*	m_misuAlarm;
 /////////////////////////////////////////////////////////////////////////////////
@@ -1376,7 +1378,7 @@ protected:
 	int		m_winVer;			// 20070724 win version
 	CString	getProcessList();		// 20070724
 /////////////////////////////////////////////////////////////////////////////////
-	// 20070627 ±Ş»ç(ĞáŞİ) Åë°èÃ³¸®
+	// 20070627 ê¸‰ì‚¬(æ€¥æ­») í†µê³„ì²˜ë¦¬
 	bool	m_bFirstOpen;
 	bool	m_bLastClose;
 	class CSysInfo	*m_sysInfo;
@@ -1399,7 +1401,7 @@ protected:
 
 	bool	m_bStart;
 //////////////////////////////////////////////////////////////////////////////////////
-//20190131 E-PB, CROWD ¹è³ÊÅ¬¸¯ È½¼ö
+//20190131 E-PB, CROWD ë°°ë„ˆí´ë¦­ íšŸìˆ˜
 	int     m_iClickEPBBanner;
 	int     m_iClickCROWDBanner;
 //////////////////////////////////////////////////////////////////////////////////////
@@ -1425,7 +1427,7 @@ public:
 //CArray<void*, void*> m_arrPBDlg;
 //void PBMngShow(CString strMsg, int iGubn = 0);
 //	void  ParseRTSMessage(char* pdata, int len);
-	//2020 °ü½ÉÁ¾¸ñ
+	//2020 ê´€ì‹¬ì¢…ëª©
 //	CArray<struct _updn*, struct _updn*> m_arrInterDn;
 
 	//{{AFX_MSG(CMainFrame)
@@ -1574,11 +1576,11 @@ private:
 	void InitFirewall();
 	void FreeFirewall();
 public:
-	//CArray <_shjcode, _shjcode>	m_hjcode;		// Çö¹°Á¾¸ñ
-	//CArray <_sjcode, _sjcode>	m_fjcode;		// ¼±¹°Á¾¸ñ
-	//CArray <ojcode, ojcode>		m_ojcode;		// ¿É¼ÇÁ¾¸ñ
-	//CArray <pjcode, pjcode>		m_pjcode;		// Çö¹°¿É¼Ç
-	//CArray <upcode, upcode>		m_upcode;		// ¾÷Á¾ÄÚµå
+	//CArray <_shjcode, _shjcode>	m_hjcode;		// í˜„ë¬¼ì¢…ëª©
+	//CArray <_sjcode, _sjcode>	m_fjcode;		// ì„ ë¬¼ì¢…ëª©
+	//CArray <ojcode, ojcode>		m_ojcode;		// ì˜µì…˜ì¢…ëª©
+	//CArray <pjcode, pjcode>		m_pjcode;		// í˜„ë¬¼ì˜µì…˜
+	//CArray <upcode, upcode>		m_upcode;		// ì—…ì¢…ì½”ë“œ
 	//CArray <_sjcode, _sjcode>	m_elwbase;		// elwbase
 
 	void	loadingHJcode();
@@ -1630,25 +1632,25 @@ public:
 	void	IMAXGroupSet(int key, int triggerN);
 	void	IMAXSkinSet();
 
-	//°£ÆíÀÎÁõ
+	//ê°„í¸ì¸ì¦
 	CString m_slog; 
 	CString m_sSimpleAuth;
-	CString m_sCustNumber; //°í°´¹øÈ£
+	CString m_sCustNumber; //ê³ ê°ë²ˆí˜¸
 	bool	m_bSimpleAuth;
 
 	void   signOnSimpleAuth(char* pdata);
 
-	//°ü½ÉÁ¶È¸
+	//ê´€ì‹¬ì¡°íšŒ
 	void InitMapHK();
 	int   GetKeyByHWnd(HWND hwnd, int igubn);
 	HWND GetHWndByKey(int key, int& msg);
 	CMap <int, int, CString, CString> m_mapHWndToKey;
 
-	//Á¢¼Ó¼­¹ö Ç¥±â
+	//ì ‘ì†ì„œë²„ í‘œê¸°
 	void CheckServer(CString strip);
 	CString m_strServer{};
 
-	//ÆùÆĞµå
+	//í°íŒ¨ë“œ
 	CString m_strPhone;
 
 	//7805popup
@@ -1656,30 +1658,30 @@ public:
 public:
 	void OutputWaitList();
 
-	//°ü½ÉÁ¾¸ñÁ¶È¸ ÀúÀå
+	//ê´€ì‹¬ì¢…ëª©ì¡°íšŒ ì €ì¥
 	/*CWnd* m_pInter;
 	CWnd* m_pSearchWnd;*/
 
 	HWND m_hInter;
 	HWND m_hSearchWnd;
 
-	//Á¦Å¥¾î ÆÄÀÏ Æú´õ À§Ä¡ Á¶Á¤
+	//ì œíì–´ íŒŒì¼ í´ë” ìœ„ì¹˜ ì¡°ì •
 	void Check_XECUREPATH();
 	
 	void UnzipXecure();
 	void CreateFolder(CString strTargetPath);
-	//pcÁ¤º¸ÀúÀå
+	//pcì •ë³´ì €ì¥
 	void SetPCData();
 	//hashkey
 	UINT AFXAPI HashDataAXIS(LPCSTR key);
-	//À§ÀÚµå create ÇÔ¼ö 
+	//ìœ„ìë“œ create í•¨ìˆ˜ 
 	bool CreateWizard();
-	//as is ¹ÙÅÁÈ­¸é ¾ÆÀÌÄÜ Áö¿ì±â
+	//as is ë°”íƒ•í™”ë©´ ì•„ì´ì½˜ ì§€ìš°ê¸°
 	void Delete_AsisICon();
-	//Á¢¼ÓÇÇ¾¾ IPÈ®ÀÎ
+	//ì ‘ì†í”¼ì”¨ IPí™•ì¸
 	BOOL m_bLOCALIP_172{};
 
-	//Å¬¶ó¿ìµå
+	//í´ë¼ìš°ë“œ
 	BOOL m_bCloudeUse{};
 	void CloudeCertUp();
 	void CloudeCertDown();
@@ -1687,7 +1689,7 @@ public:
 	void CludeUSE(bool bUseCloude);
 	void CludeFuncCall(int igubn);
 
-	//Á¦µµº¯°æ 20230729
+	//ì œë„ë³€ê²½ 20230729
 	void   FileMove();
 
 	//memo uplaoad
@@ -1701,39 +1703,39 @@ public:
 	//dump upload
 	void DumpUpload();
 
-	//»ı¼ºÇü AI
+	//ìƒì„±í˜• AI
 	void SendPiboStaf();
 
-	//¾ÏÈ£È­·Î±×
+	//ì•”í˜¸í™”ë¡œê·¸
 	CString GetMapNumByKey(int nkey);
 
-	//·Î±× ¾÷·Îµå
+	//ë¡œê·¸ ì—…ë¡œë“œ
 	BOOL m_bUploadComplet{};
 	std::unique_ptr<class CUploadFile> m_pUpload{};
 
-	//shared ¸Ş¸ğ¸® 
+	//shared ë©”ëª¨ë¦¬ 
 	void initShared();
-	CString m_sHSharedkey{};  //ÇÚµé °øÀ¯
-	CString m_sMSharedkey{};  //¸Ş¸ğ¸® °øÀ¯
+	CString m_sHSharedkey{};  //í•¸ë“¤ ê³µìœ 
+	CString m_sMSharedkey{};  //ë©”ëª¨ë¦¬ ê³µìœ 
 	HINSTANCE m_hSharedLib{};
 	CWnd* m_pSharedMemory{};
 
 	//ASTx
 	BOOL m_bCLOSE_ASTx{};
 	BOOL IsASTxRunning(BOOL bLog=FALSE);
-	BOOL m_bINILocal{};  //¼öµ¿À¸·Î ip ±¸ÇØ¼­
+	BOOL m_bINILocal{};  //ìˆ˜ë™ìœ¼ë¡œ ip êµ¬í•´ì„œ
 
-	//Ãë¾àÁ¡
+	//ì·¨ì•½ì 
 	BOOL GetCertLogin() { return m_bCertLogin; }
 
-	//NXT Àå¿î¿µ
+	//NXT ì¥ìš´ì˜
 	int m_iNXType = 0;
 #ifdef DF_MK_CAPTION
 	int m_iKRXype = 0;
 #endif
 	void Sendpibojggb(CString sMarket = "N");
 
-	//ÃÖ¼±ÁıÇà
+	//ìµœì„ ì§‘í–‰
 	void SendSACMT279();
 	void SendPIBOpopu(CString sGubn, int ikey);
 	void CheckEdgeInstalled();
@@ -1746,21 +1748,21 @@ public:
 	//FDS
 	void WriteMainInfo();
 
-	//ÀÚÃ¼ ¹«°á¼º°ËÁõ
+	//ìì²´ ë¬´ê²°ì„±ê²€ì¦
 	CString m_sMainName{}, m_sExtraced{};
 	CString m_sExIntegrity{}, m_sIntegrityMSG{};
 	CStringArray		m_arraySelfItgy{};
 	int Self_VerifyIntegrity();
 	void AddUniqueFromBtoA(CStringArray& arrA, const CStringArray& arrB);
 
-	//SDI °¡»óÈ­¸é visible
-	//HTS ½ÇÇà½Ã ÇöÀç °¡»óÈ­¸éÀÌ ¾Æ´Ñ ´Ù¸¥ °¡»óÈ­¸éµéÀÇ SDI°¡ º¸ÀÌ´Â Çö»ó ¼öÁ¤
+	//SDI ê°€ìƒí™”ë©´ visible
+	//HTS ì‹¤í–‰ì‹œ í˜„ì¬ ê°€ìƒí™”ë©´ì´ ì•„ë‹Œ ë‹¤ë¥¸ ê°€ìƒí™”ë©´ë“¤ì˜ SDIê°€ ë³´ì´ëŠ” í˜„ìƒ ìˆ˜ì •
 	void SetVirtualSDIVisible(int vsN, bool bshow);
 #ifdef DF_MK_CAPTION
-	//ÇØ¿Ü°í°´±ÇÇÑ  ex)0000000000000000000000000000000011  (½Ç½Ã°£½Ã¼¼)
+	//í•´ì™¸ê³ ê°ê¶Œí•œ  ex)0000000000000000000000000000000011  (ì‹¤ì‹œê°„ì‹œì„¸)
 	CString m_sCustomerAuth{};
 
-	//°Å·¡¼Ò ¼±ÅÃ°¡´ÉÇÑÁö
+	//ê±°ë˜ì†Œ ì„ íƒê°€ëŠ¥í•œì§€
 	CMapStringToString m_mapPermissions{};
 	void ReadMarketFile();
 	int GetMarketType(const CString& screenNo);
@@ -1770,7 +1772,7 @@ public:
 	void CheckMarketByMNG(CString sval);
 	bool m_bCSAT{};
 #endif
-	//È­¸é »èÁ¦
+	//í™”ë©´ ì‚­ì œ
 	//std::unique_ptr<CDlg_MSGBOX> m_pMDLSdlg{};
 	int m_iKey{};
 	CString m_sTriggerUrl{};
@@ -1778,7 +1780,7 @@ public:
 	void ReadManageMapInfo();
 	int ScreenCheck(CString mapname, int igubn = 0);
 
-	//Àå¿î¿µÁ¤º¸ Ã³¸®
+	//ì¥ìš´ì˜ì •ë³´ ì²˜ë¦¬
 	std::map<CString, CString> _mapMngInfo;
 	std::vector<std::pair<std::string, CString>> _vMngInfo;
 	CStringArray _arrmng;
@@ -1786,15 +1788,15 @@ public:
 	CString m_sMngType{}, m_sMngMsg{};
 	std::mutex _vMutex;
 
-	//mainframe ÁøÇà ´Ü°è
+	//mainframe ì§„í–‰ ë‹¨ê³„
 	int m_iAxisState{};
 
-	//ÆùÆĞµå °ü·Ã
+	//í°íŒ¨ë“œ ê´€ë ¨
 	std::map<CString, _stMap> m_MapScreenInfo;
 	bool LoadScreenInfo(const CString& filePath);
 	bool GetScreenInfoByMapKey(int mapkey, _stMap& outMap) const;
 
-	//½Ç½Ã°£¸ŞÀÎÃ³¸®
+	//ì‹¤ì‹œê°„ë©”ì¸ì²˜ë¦¬
 #ifdef DF_MAIN_RTS
 	std::queue<int> g_poolKeys;
 	std::mutex g_poolMtx;
@@ -1810,10 +1812,19 @@ public:
 	std::recursive_mutex g_codeMapLock;
 
 	std::mutex m_subLock;
-	std::map<std::string, std::set<HWND>> m_codeSubscribers;
-	std::map<HWND, std::set<std::string>> m_wndSubscriptions;
+	// code â†’ symbol â†’ windows
+	std::unordered_map<
+		std::string,
+		std::unordered_map<int, std::unordered_set<HWND>>
+	> m_codeSymbolSubscribers;
 
-	//3) code ¡æ slot index ÇÔ¼ö (Ãæµ¹ ¹æÁö ÇÙ½É)
+	// window â†’ code â†’ symbols
+	std::unordered_map<
+		HWND,
+		std::unordered_map<std::string, std::unordered_set<int>>
+	> m_wndSubscriptions;
+
+	//3) code â†’ slot index í•¨ìˆ˜ (ì¶©ëŒ ë°©ì§€ í•µì‹¬)
 	int GetSlotIndex_FindOnly(const char* code)
 	{
 		std::lock_guard<std::recursive_mutex> lock(g_codeMapLock);
@@ -1833,14 +1844,14 @@ public:
 			return it->second;
 
 		if (g_nextIndex >= MAX_SLOT)
-			return -1; // ½½·Ô ºÎÁ·
+			return -1; // ìŠ¬ë¡¯ ë¶€ì¡±
 
 		int idx = g_nextIndex++;
 		g_codeToIndex[code] = idx;
 		return idx;
 	}
 
-	// ¾ÈÀü ¹®ÀÚ¿­ º¹»ç ÇÔ¼ö
+	// ì•ˆì „ ë¬¸ìì—´ ë³µì‚¬ í•¨ìˆ˜
 	inline void CopyZ(char* dst, size_t cap, const char* src)
 	{
 		if (!dst || cap == 0) return;
@@ -1848,15 +1859,15 @@ public:
 		strncpy_s(dst, cap, src, _TRUNCATE);
 	}
 
-	// _alertR ¡æ TickSnapshot º¯È¯ ÇÔ¼ö (ÇÙ½É ?)
-	using PTR_T = DWORD; // 32bit¶ó DWORD OK (64bit¸é uintptr_t)
+	// _alertR â†’ TickSnapshot ë³€í™˜ í•¨ìˆ˜ (í•µì‹¬)
+	using PTR_T = DWORD; // 32bitë¼ DWORD OK (64bitë©´ uintptr_t)
 
 	void UpdateSnapshotFromAlert(TickSnapshot& s, const _alertR* alertR)
 	{
 		if (!alertR || alertR->size <= 0 || alertR->ptr[0] == 0)
 			return;
 
-		// ·¹ÄÚµå ½ÃÀÛ ÁÖ¼Ò
+		// ë ˆì½”ë“œ ì‹œì‘ ì£¼ì†Œ
 		const PTR_T* data = reinterpret_cast<const PTR_T*>(alertR->ptr[0]);
 
 #ifdef UNICODE
@@ -1870,66 +1881,80 @@ public:
 
 		// ===== seqlock begin =====
 		int v = s.seq.load(std::memory_order_relaxed);
-		s.seq.store(v + 1, std::memory_order_release); // odd = writing
+		s.seq.store(v + 1, std::memory_order_release);
 
-		s.ts_ms = ::GetTickCount();
+		s.ts_ms = GetTickCount();
 		CopyZ(s.code, sizeof(s.code), code);
 
-		// ÇÊµå ÀÎµ¦½º (³×°¡ ÁØ ÀÇ¹Ì)
-		CopyZ(s.RTStype, sizeof(s.RTStype), (const char*)data[0]); // RTS Å¸ÀÔ
-		CopyZ(s.price, sizeof(s.price), (const char*)data[23]); // ÇöÀç°¡
-		CopyZ(s.diff, sizeof(s.diff), (const char*)data[24]); // ´ëºñ
-		CopyZ(s.volume, sizeof(s.volume), (const char*)data[27]); // °Å·¡·®
-		CopyZ(s.rate, sizeof(s.rate), (const char*)data[33]); // µî¶ô·ü
+		s.valid.reset();
 
-		s.seq.store(v + 2, std::memory_order_release); // even = done
+		int fieldCount = alertR->size;
 
-		CString slog;
-		slog.Format("[AXIS][RTS] [%s][%s]  <%s>[%s]   <%s>[%s]  <%s>[%s]   <%s>[%s]", s.RTStype, s.code,
-			(const char*)data[23], s.price,
-			(const char*)data[14], s.diff,
-			(const char*)data[15], s.volume,
-			(const char*)data[16], s.rate);
-		//OutputDebugString(slog);
+		for (int ii = 0; ii < fieldCount; ii++)
+		{
+			for (int jj = 0; jj < MAX_RTS_INDEX; jj++)
+			{
+				const char* val = (const char*)data[jj];
+
+				if (val && val[0])
+				{
+					CopyZ(s.values[jj], FIELD_STR_LEN, val);
+					s.valid.set(jj);
+				}
+			}
+		}
+
+		s.seq.store(v + 2, std::memory_order_release);
+
+		//s.seq.store(v + 2, std::memory_order_release);   // writing done (even)
+		//CopyZ(s.RTStype, sizeof(s.RTStype), (const char*)data[0]); // RTS íƒ€ì…
+		//CopyZ(s.price, sizeof(s.price), (const char*)data[23]); // í˜„ì¬ê°€
+		//CopyZ(s.diff, sizeof(s.diff), (const char*)data[24]); // ëŒ€ë¹„
+		//CopyZ(s.volume, sizeof(s.volume), (const char*)data[27]); // ê±°ë˜ëŸ‰
+		//CopyZ(s.rate, sizeof(s.rate), (const char*)data[33]); // ë“±ë½ë¥ 
+
+		//s.seq.store(v + 2, std::memory_order_release); // even = done
+
+	
 		// ===== seqlock end =====
 	}
 
 	inline void CopySnapshot(TickSnapshot& dst, const TickSnapshot& src)
-	{
-		// seq Á¦¿ÜÇÏ°í º¹»ç
+	{//testcode
+		// seq ì œì™¸í•˜ê³  ë³µì‚¬
 		dst.ts_ms = src.ts_ms;
 
-		strcpy_s(dst.RTStype, sizeof(dst.RTStype), src.RTStype);
-		strcpy_s(dst.code, sizeof(dst.code), src.code);
-		strcpy_s(dst.price, sizeof(dst.price), src.price);
-		strcpy_s(dst.diff, sizeof(dst.diff), src.diff);
-		strcpy_s(dst.volume, sizeof(dst.volume), src.volume);
-		strcpy_s(dst.rate, sizeof(dst.rate), src.rate);
+		//strcpy_s(dst.RTStype, sizeof(dst.RTStype), src.RTStype);
+		//strcpy_s(dst.code, sizeof(dst.code), src.code);
+		//strcpy_s(dst.price, sizeof(dst.price), src.price);
+		//strcpy_s(dst.diff, sizeof(dst.diff), src.diff);
+		//strcpy_s(dst.volume, sizeof(dst.volume), src.volume);
+		//strcpy_s(dst.rate, sizeof(dst.rate), src.rate);
 	}
 
 	static void MakeDummyTick(TickSnapshot& snap, int step)
-	{
+	{//testcode
 		memset(&snap, 0, sizeof(TickSnapshot));
 
-		// ÀÓÀÇ Á¾¸ñÄÚµå (¿¹: »ï¼ºÀüÀÚ)
+		// ì„ì˜ ì¢…ëª©ì½”ë“œ (ì˜ˆ: ì‚¼ì„±ì „ì)
 		strcpy_s(snap.code, "005930");
 
-		// Å¸ÀÔ
-		strcpy_s(snap.RTStype, "B");
+		// íƒ€ì…
+		//strcpy_s(snap.RTStype, "B");
 
-		// ÇöÀç°¡: 65000 + step º¯µ¿
-		int price = 65000 + (step % 20) * 50;
-		sprintf_s(snap.price, "%d", price);
+		//// í˜„ì¬ê°€: 65000 + step ë³€ë™
+		//int price = 65000 + (step % 20) * 50;
+		//sprintf_s(snap.price, "%d", price);
 
-		// ´ëºñ
-		sprintf_s(snap.diff, "%d", price - 65000);
+		//// ëŒ€ë¹„
+		//sprintf_s(snap.diff, "%d", price - 65000);
 
-		// °Å·¡·®
-		sprintf_s(snap.volume, "%d", 1000 + step * 10);
+		//// ê±°ë˜ëŸ‰
+		//sprintf_s(snap.volume, "%d", 1000 + step * 10);
 
-		// µî¶ô·ü
-		double rate = (price - 65000) / 65000.0 * 100.0;
-		sprintf_s(snap.rate, "%.2f", rate);
+		//// ë“±ë½ë¥ 
+		//double rate = (price - 65000) / 65000.0 * 100.0;
+		//sprintf_s(snap.rate, "%.2f", rate);
 
 		snap.ts_ms = GetTickCount();
 	}
@@ -1955,7 +1980,7 @@ public:
 		std::lock_guard<std::mutex> lock(g_poolMtx);
 
 		if (g_poolKeys.empty())
-			return -1; // »ç¿ë °¡´É key ¾øÀ½
+			return -1; // ì‚¬ìš© ê°€ëŠ¥ key ì—†ìŒ
 
 		int key = g_poolKeys.front();
 		g_poolKeys.pop();

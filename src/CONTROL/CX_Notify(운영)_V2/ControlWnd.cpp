@@ -35,6 +35,25 @@ static char THIS_FILE[] = __FILE__;
 #define	LEN_DATE		8	// 날짜
 
 #define TM_BALANCE 9898
+#define VS_NOMAL "1"
+#define VS_SKIP "2"
+#define VS_TIMER "3"
+
+CString GetField(const CString& src, int index)
+{
+	CString tmp = src;
+	CString token;
+	int pos = 0;
+	int i = 0;
+
+	while (!(token = tmp.Tokenize(_T("\t"), pos)).IsEmpty())
+	{
+		if (i == index)
+			return token;
+		i++;
+	}
+	return "";
+}
 
 CControlWnd::CControlWnd()
 {
@@ -125,7 +144,7 @@ int CControlWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	m_interval = GetPrivateProfileInt("Balance", "time", 500, userPath);
 	m_diffSec = GetPrivateProfileInt("Balance", "diff", 1, userPath);
 
-	if (m_Version == "3")
+	if (m_Version == VS_TIMER)
 		SetTimer(TM_BALANCE, m_interval, nullptr);
 
 	m_slog.Format("[체결][cx_notify][%s]<%d> ------  m_Version ------[%s] ", __FUNCTION__, __LINE__, m_Version);
@@ -453,7 +472,7 @@ void CControlWnd::SendToMap(CString sData, bool bAll, CString sAccn/* = ""*/)
 	CString keyS, dateS, sygbS, jggb;
 	CStringArray sDataArr;
 	int	ii = 0, idx = 0, bound = 0;
-
+	bool quantityChanged = true;
 	if (bAll)	
 	{
 		//==================================================
@@ -495,6 +514,8 @@ void CControlWnd::SendToMap(CString sData, bool bAll, CString sAccn/* = ""*/)
 				if (idx > bound)
 					continue;
 				sSendData += sDataArr.GetAt(idx) + "\t";
+				m_slog.Format("[cx_notify][%s]<%d> idx =[%d] val =[%s]", __FUNCTION__, __LINE__, idx, sDataArr.GetAt(idx));
+				OutputDebugString(m_slog);
 			}
 			m_CodeMap.SetAt(keyS, sSendData);
 			sSendData += "\n";
@@ -503,7 +524,7 @@ void CControlWnd::SendToMap(CString sData, bool bAll, CString sAccn/* = ""*/)
 		m_dataList.Format("%d\t", m_CodeMap.GetCount());
 		m_dataList += sSendData;
 
-		if (m_Version == "2"|| m_Version == "3")
+		if (m_Version == VS_SKIP || m_Version == VS_TIMER)
 		{
 			m_cs.Unlock();
 			m_pParent->SendMessage(WM_USER, MAKEWPARAM(eventDLL, MAKEWORD(m_Param.key, evOnDblClk/*DblClick*/)), (LPARAM)m_Param.name.GetString());  //SendToMap
@@ -521,7 +542,7 @@ void CControlWnd::SendToMap(CString sData, bool bAll, CString sAccn/* = ""*/)
 		// code + date(8)
 		//==================================================
 		const	int	FindIndex = sData.Find("|");
-
+		
 		if (FindIndex > -1)
 			sData.Delete(FindIndex,sData.GetLength()-FindIndex);
 
@@ -593,6 +614,13 @@ void CControlWnd::SendToMap(CString sData, bool bAll, CString sAccn/* = ""*/)
 				if (idx > bound)	continue;
 				sSendData += sDataArr.GetAt(idx) + "\t";
 			}
+
+			CString oldData;
+			if (m_CodeMap.Lookup(keyS, oldData))
+			{
+				quantityChanged = IsQuantityChanged(oldData, sSendData);
+			}
+
 			m_CodeMap.SetAt(keyS, sSendData);
 		}
 #ifdef	CREDIT
@@ -607,20 +635,19 @@ void CControlWnd::SendToMap(CString sData, bool bAll, CString sAccn/* = ""*/)
 			m_dataList = sAccn + m_dataList;
 	}
 
-	if (m_Version == "2")
+	if (m_Version == VS_SKIP)
 	{
 		CSingleLock lock(&m_lock, TRUE);
-		if(!ShouldSkipRTSByTimeDiff(sCode))
+		if(quantityChanged||!ShouldSkipRTSByTimeDiff(sCode)  )
 			m_drawQueue.push(m_dataList);
 
 		if (m_bWaitingFromVBS)
 			SendNextToVBS();
 	}
-	else if (m_Version == "3")
+	else if (m_Version == VS_TIMER)
 	{
 		CSingleLock lock(&m_lock, TRUE);
-
-	
+		m_drawQueue.push(m_dataList);
 	}
 	else if(m_Version == "1")
 	{
@@ -801,7 +828,7 @@ void CControlWnd::RequestBalance(BSTR sVal)
 	//m_slog.Format("[cx_notify][%s]<%d> ------  m_Version ------[%s] size=[%d]", __FUNCTION__, __LINE__, m_Version, m_drawQueue.size());
 	//Output_DebugString(m_slog);
 
-	if (m_Version == "2")
+	if (m_Version == VS_SKIP)
 	{
 		m_bWaitingFromVBS = TRUE;
 		SendNextToVBS();
@@ -813,7 +840,7 @@ void CControlWnd::RequestBalance(BSTR sVal)
 void CControlWnd::OnVersionChanged()
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
-	if (m_Version == "3")
+	if (m_Version == VS_TIMER)
 	{
 		KillTimer(TM_BALANCE);
 		SetTimer(TM_BALANCE, m_interval, nullptr);
@@ -876,4 +903,15 @@ m_slog.Format("[cx_notify][%s]<%d> ------  첫수신  return  sCode=[%s]", __FUNCTI
 	//Output_DebugString(m_slog);
 	it->second = now;
 	return false;
+}
+
+bool CControlWnd::IsQuantityChanged(const CString& oldD, const CString& newD)
+{
+	if (oldD.IsEmpty())
+		return true;   // 이전 없으면 변화로 간주
+
+	CString oldQty = GetField(oldD, 4); // 4번째
+	CString newQty = GetField(newD, 4);
+
+	return oldQty != newQty;
 }

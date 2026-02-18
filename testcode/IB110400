@@ -224,6 +224,8 @@ PANEL  pl_blank1(372, 103, 384, 120)        COLOR(74, 232)  CUR(0)    AL_CENTER 
   VISIBLE  HINTTYPE(IH_NONE)
 PANEL  pl_blank2(369, 121, 385, 139)        COLOR(74, 232)  CUR(0)    AL_CENTER    ENABLE  &
   VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  BUTTON1(735, 35, 775, 60)  TP_PUSH      AL_CENTER    FOCUS  COLOR(208, 232)  CUR(0)      TABORDER(33)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
 }
 
 
@@ -606,9 +608,12 @@ _AW_ONCLICK_AW_
 If GRID0.HitPos = 3 Then
 	If GRID0.Column = 13 Or GRID0.Column = 14 Then
 	 stmp = Trim(GRID0.GetGridCell(GRID0.Row, 13))
+
 	 If  InStr(stmp, "SOR") > 0 Then
-	 	dmsg =  "mapN" & vbTab & "IB661000" &  vbLf &_
-		"ordnum" & vbTab & Trim(GRID0.GetGridCell(GRID0.Row, 5))
+	 	dmsg =  "zOrdDt" & vbTab & zOrdDt.Data &  vbLf &_
+	 			"OrdAcc" & vbTab & AN1A.Data &  vbLf &_
+	 			"pass" & vbTab & zPwd.Data &  vbLf &_
+				"ordnum" & vbTab & Trim(GRID0.GetGridCell(GRID0.Row, 5))
 
 		SCREEN.CreateWindow 1, "IB110900 /p5 /d", dmsg
 	 End If
@@ -1022,6 +1027,33 @@ Else
 
 	Call send_f()
 End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON1)
+_AW_ONCLICK_AW_
+
+	If GRID0.Column = 13 Or GRID0.Column = 14 Then
+	 stmp = Trim(GRID0.GetGridCell(GRID0.Row, 13))
+
+	 If  InStr(stmp, "SOR") > 0 Then
+	 	dmsg =  "zOrdDt" & vbTab & zOrdDt.Data &  vbLf &_
+	 			"OrdAcc" & vbTab & AN1A.Data &  vbLf &_
+	 			"pass" & vbTab & zPwd.Data &  vbLf &_
+				"ordnum" & vbTab & Trim(GRID0.GetGridCell(GRID0.Row, 5))
+
+		SCREEN.CreateWindow 1, "IB110901 /p5 /d", dmsg
+	 End If
+	End If
+
+    S1301.Data = Trim(GRID0.GetGridCell(GRID0.Row, 8))
+
+	If Trim(S1301.DATA) = "" Then
+		Exit Sub
+	End If
+
+	S1301.Trigger "", True
 _AW_ONENDSUB_AW_
 _AW_ENDSCRIPT_AW_
 

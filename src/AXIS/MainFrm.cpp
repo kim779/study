@@ -4705,9 +4705,79 @@ OutputDebugString(m_slog);
 		}
 		break;
 #ifdef DF_MAIN_RTS
-		case MMSG_GETRTS_FROM_MAIN:
+		case MMSG_SETSENDTR_TO_MAIN:  //관심등 화면에서 메인이 대신 sendtr 하도록...
 		{
-			TickSnapshot* out = (TickSnapshot*)lParam;
+			//OnRegisterTickApi();  //안됨
+		//m_slog.Format("[AXIS][MMSG_SENDTR][%s]", (char*)lParam);
+		//output_DebugString(m_slog);
+
+		/*ST_RT_SUBSCRIBE* pReq = (ST_RT_SUBSCRIBE*)lParam;
+
+		HWND hWnd = pReq->hWnd;
+
+		for (int i = 0; i < pReq->count; ++i)
+		{
+			const char* code = pReq->codes[i];
+			RegisterSubscriber(code, hWnd, pReq->screenKey);
+		}
+
+		delete pReq;
+		return 0;*/
+
+		// poolKey 할당
+		int poolKey = AllocPoolKey();
+		if (poolKey == -1)
+		{
+			OutputDebugString("TR poolKey 부족\n");
+			return 0;
+		}
+
+		// poolKey → (HWND + key) 매핑
+		ST_SEND_TR* pTr = (ST_SEND_TR*)lParam;
+		TR_ROUTE_INFO info;
+		info.hWnd = pTr->hSender;
+		info.key = pTr->key;
+		info.tick = GetTickCount();
+
+		g_mapRoute[poolKey] = info;
+		m_slog.Format("[2022][%s]<%d> .... 메인[%x] 에서  key[%d] ", __FUNCTION__, __LINE__, info.hWnd, info.key);
+		output_DebugString(m_slog);
+		// 서버로 보낼 key = poolKey
+		sendTR(pTr->trname, pTr->datB, pTr->datL, pTr->stat, poolKey);
+		}
+		break;
+		case MMSG_GETRTS_FROM_MAIN:  //메인에게 RTS 데이터 얻어올때
+		{
+			RTS_READ_REQ* req = (RTS_READ_REQ*)lParam;
+			if (!req) return 0;
+
+			int idx = GetSlotIndex_FindOnly(req->code);
+			if (idx < 0) return 0;
+
+			TickSnapshot snap{};
+			if (!ReadTick(idx, snap))   // already have this
+				return 0;
+
+			req->ts_ms = snap.ts_ms;
+
+			for (int i = 0; i < req->symbolCount; i++)
+			{
+				int sym = req->symbols[i];
+
+				if (sym >= 0 && sym < MAX_SYMBOLS && snap.valid.test(sym))
+				{
+					CopyZ(req->values[i], SYMBOL_STR_LEN, snap.values[sym]);
+					req->valid[i] = true;
+				}
+				else
+				{
+					req->values[i][0] = 0;
+					req->valid[i] = false;
+				}
+			}
+
+			return 1;
+		/*	TickSnapshot* out = (TickSnapshot*)lParam;
 
 			int idx = GetSlotIndex_FindOnly(out->code);
 
@@ -4715,70 +4785,117 @@ OutputDebugString(m_slog);
 				return false;
 
 			ReadTick(idx, *out);
-			return true;
-			//OnRegisterTickApi();
-			//m_slog.Format("[AXIS][MMSG_SENDTR][%s]", (char*)lParam);
-			//output_DebugString(m_slog);
-
-			/*ST_RT_SUBSCRIBE* pReq = (ST_RT_SUBSCRIBE*)lParam;
-
-			HWND hWnd = pReq->hWnd;
-
-			for (int i = 0; i < pReq->count; ++i)
-			{
-				const char* code = pReq->codes[i];
-				RegisterSubscriber(code, hWnd, pReq->screenKey);
-			}
-
-			delete pReq;
-			return 0;*/
-
-			//// poolKey 할당
-			//int poolKey = AllocPoolKey();
-			//if (poolKey == -1)
-			//{
-			//	OutputDebugString("TR poolKey 부족\n");
-			//	return 0;
-			//}
-
-			//// poolKey → (HWND + key) 매핑
-			//TR_ROUTE_INFO info;
-			//info.hWnd = pTr->hSender;
-			//info.key = pTr->key;
-			//info.tick = GetTickCount();
-
-			//g_mapRoute[poolKey] = info;
-			//m_slog.Format("[2022][%s]<%d> .... 메인[%x] 에서  key[%d] ", __FUNCTION__, __LINE__, info.hWnd, info.key);
-			//output_DebugString(m_slog);
-			//// 서버로 보낼 key = poolKey
-			//sendTR(pTr->trname, pTr->datB, pTr->datL, pTr->stat, poolKey);
+			return true;*/
 		}
 		break;
 		case MMSG_RT_REGISTER_CODES:
 		{
 			std::unique_ptr<RTS_REGISTER_REQ> req((RTS_REGISTER_REQ*)lParam);
-
 			std::lock_guard<std::mutex> lock(m_subLock);
 
 			HWND h = req->hWnd;
 
-			// 기존 등록 제거 (갱신 개념)
-			auto it = m_wndSubscriptions.find(h);
+			// ------------------------------------------------
+			// ------------------------------------------------
+			auto it = m_wndSubscriptions.find(h);  //키 핸들 ,  맵( 키 코드, 심볼배열)
 			if (it != m_wndSubscriptions.end())
 			{
-				for (auto& code : it->second)
-					m_codeSubscribers[code].erase(h);
+				for (auto& [code, symbols] : it->second)
+				{
+					for (int sym : symbols)
+					{
+						auto codeIt = m_codeSymbolSubscribers.find(code);  //키 코드,  맵(키 심볼, 핸들)
+						if (codeIt != m_codeSymbolSubscribers.end())
+						{
+							auto symIt = codeIt->second.find(sym);
+							if (symIt != codeIt->second.end())
+							{
+								symIt->second.erase(h);
+
+								// subscriber 없으면 정리
+								if (symIt->second.empty())
+									codeIt->second.erase(symIt);
+							}
+
+							if (codeIt->second.empty())std::unique_ptr<RTS_REGISTER_REQ> req((RTS_REGISTER_REQ*)lParam);
+							std::lock_guard<std::mutex> lock(m_subLock);
+
+							HWND h = req->hWnd;
+
+							// ------------------------------------------------
+							// ------------------------------------------------
+							auto it = m_wndSubscriptions.find(h);
+							if (it != m_wndSubscriptions.end())
+							{
+								for (auto& [code, symbols] : it->second)
+								{
+									for (int sym : symbols)
+									{
+										auto codeIt = m_codeSymbolSubscribers.find(code);
+										if (codeIt != m_codeSymbolSubscribers.end())
+										{
+											auto symIt = codeIt->second.find(sym);
+											if (symIt != codeIt->second.end())
+											{
+												symIt->second.erase(h);
+
+												// subscriber 없으면 정리
+												if (symIt->second.empty())
+													codeIt->second.erase(symIt);
+											}
+
+											if (codeIt->second.empty())
+												m_codeSymbolSubscribers.erase(codeIt);
+										}
+									}
+								}
+
+								m_wndSubscriptions.erase(it);
+							}
+
+							// ------------------------------------------------
+							// ------------------------------------------------
+							for (int i = 0; i < req->codeCount; i++)
+							{
+								std::string code = req->codes[i];
+
+								for (int s = 0; s < req->symbolCount; s++)
+								{
+									int symbol = req->symbols[s];
+
+									// code → symbol → window
+									m_codeSymbolSubscribers[code][symbol].insert(h);
+
+									// window → code → symbol
+									m_wndSubscriptions[h][code].insert(symbol);
+								}
+							}
+
+							return 0;
+								m_codeSymbolSubscribers.erase(codeIt);
+						}
+					}
+				}
 
 				m_wndSubscriptions.erase(it);
 			}
 
-			// 새로 등록
+			// ------------------------------------------------
+			// ------------------------------------------------
 			for (int i = 0; i < req->codeCount; i++)
 			{
 				std::string code = req->codes[i];
 
-				m_codeSubscribers[code].insert(h);
-				m_wndSubscriptions[h].insert(code);
+				for (int s = 0; s < req->symbolCount; s++)
+				{
+					int symbol = req->symbols[s];
+
+					// code → symbol → window
+					m_codeSymbolSubscribers[code][symbol].insert(h);
+
+					// window → code → symbol
+					m_wndSubscriptions[h][code].insert(symbol);
+				}
 			}
 
 			return 0;
@@ -4786,7 +4903,7 @@ OutputDebugString(m_slog);
 		break;
 		case MMSG_RT_UNREGISTER_WND:
 		{
-			std::unique_ptr<RTS_REGISTER_REQ> req((RTS_REGISTER_REQ*)lParam);
+			/*std::unique_ptr<RTS_REGISTER_REQ> req((RTS_REGISTER_REQ*)lParam);
 
 			std::lock_guard<std::mutex> lock(m_subLock);
 
@@ -4801,7 +4918,7 @@ OutputDebugString(m_slog);
 				}
 
 				m_wndSubscriptions.erase(it);
-			}
+			}*/
 
 			return 0;
 		}
@@ -5943,7 +6060,7 @@ WriteLog("[AXIS] CMainFrame::OnFireRect  FEV_ERROR  m_step= [%d] msg=[%s] enum	{
 						}
 						else
 						{
-							m_step = axNONE; // ?
+							m_step = axNONE; //
 							m_axConnect->SetStatus(SM_EXIT);
 						}
 					}
@@ -6045,7 +6162,7 @@ WriteLog("[AXIS] CMainFrame::OnFireRect  FEV_ERROR  m_step= [%d] msg=[%s] enum	{
 						}
 						else
 						{
-							m_step = axNONE; // ?
+							m_step = axNONE; //
 							m_axConnectOld->SetStatus(SM_EXIT);
 						}
 					}
@@ -6055,7 +6172,7 @@ WriteLog("[AXIS] CMainFrame::OnFireRect  FEV_ERROR  m_step= [%d] msg=[%s] enum	{
 		case axOPENWSH:
 			if (lParam)
 			{
-				m_step = axNONE;	// ?
+				m_step = axNONE;	//
 
 				if(m_bUseNewLogin)
 				{
@@ -7420,6 +7537,7 @@ void CMainFrame::endWorkstation()
 #ifdef DF_CDDUSE
 	CheckCDDEDD();   //test CDD
 #endif
+	SetTimer(TM_MAIN_RTS_PUSH, 100, nullptr);
 	initShared();
 	SetPCData();
 	WriteLog("[AXIS] endWorkstation - Step 1");
@@ -7605,6 +7723,8 @@ WriteLog(s);
 		load_start_notice();
 
 		WriteLog("[AXIS] endWorkstation - Step 10-4");
+
+
 	}
 
 // 	const char* trust = "IB0000X8";
@@ -8836,7 +8956,7 @@ bool CMainFrame::ReadTick(int idx, TickSnapshot& out)
 		int v1 = s.seq.load(std::memory_order_acquire);
 		if (v1 & 1) continue; // writing 중
 
-		CopySnapshot(out, s);   // ? 구조체 직접 복사 대신 사용
+		CopySnapshot(out, s);   //  구조체 직접 복사 대신 사용
 
 		int v2 = s.seq.load(std::memory_order_acquire);
 		if (v1 == v2 && !(v2 & 1))
@@ -8893,7 +9013,7 @@ void CMainFrame::update_ticker(int kind, struct _alertR* alertR)
 	// 최신 틱 데이터 갱신
 	UpdateSnapshotFromAlert(g_tickSlots[idx], alertR);
 
-	// ? 기존처럼 화면 루프 돌릴 필요 없음
+	//기존처럼 화면 루프 돌릴 필요 없음
 	// 화면들은 g_tickSlots[idx]를 직접 읽으면 됨
 
 	/////////////////////!!!!!
@@ -13771,39 +13891,39 @@ void CMainFrame::OnTimer(UINT nIDEvent)
 			const int		pos = 0;
 			int		kind = 0;
 			CString		wavfile;
-			
+
 			auto at = _mapMngInfo.find("601");
 			if (at == _mapMngInfo.end())
 				return;
 
 			val = at->second;
-			
+
 			if (val == MNG_KOBAELW && m_bKobaElwNotify)
 			{
 				auto at = _mapMngInfo.find("23");
 				if (at != _mapMngInfo.end())
 				{
 					val = at->second;
-			
+
 					int x{}, y{};
 					CRect mRc, wRc;
-			
+
 					mRc = GetWndRect();
-				m_kobanotify->GetWindowRect(wRc);
-			
+					m_kobanotify->GetWindowRect(wRc);
+
 					x = mRc.left;
 					y = mRc.bottom - wRc.Height() - GetSystemMetrics(SM_CYFIXEDFRAME);
 					if (x < 0)	x = 0;
 					if (y < 0)	y = 0;
 					if (mRc.bottom > GetSystemMetrics(SM_CYSCREEN))
 						y = GetSystemMetrics(SM_CYSCREEN) - wRc.Height();
-			
+
 					m_kobanotify->AddNotify(val);
 					m_kobanotify->SetWindowPos(NULL, x, y, 0, 0, SWP_NOSIZE | SWP_SHOWWINDOW | SWP_NOACTIVATE);
 					m_kobanotify->MoveWindow(x, y, wRc.Width(), wRc.Height());
 				}
 			}
-		
+
 			CheckMarketByMNG(val);
 
 			if (!m_mapAlarmList.Lookup(val, str))
@@ -13814,51 +13934,51 @@ void CMainFrame::OnTimer(UINT nIDEvent)
 				return;
 
 			sym = at->second;
-			
+
 			if (!m_bUseAlarm)
 				return;
-			
-				kind = atoi(sym);
-				val = _T("");
 
-				at = _mapMngInfo.find("47");
-				if (at != _mapMngInfo.end())
-					msgS = at->second;
-				m_mngInfo->StopSlide();
-				str = _T("");
+			kind = atoi(sym);
+			val = _T("");
 
-				at = _mapMngInfo.find("600");
-				if (m_bSound && at != _mapMngInfo.end())
+			at = _mapMngInfo.find("47");
+			if (at != _mapMngInfo.end())
+				msgS = at->second;
+			m_mngInfo->StopSlide();
+			str = _T("");
+
+			at = _mapMngInfo.find("600");
+			if (m_bSound && at != _mapMngInfo.end())
+			{
+				str = at->second;
+				if (!str.IsEmpty())
 				{
-					str = at->second;
-					if (!str.IsEmpty())
-					{
-						wavfile.Format("%s\\%s\\%s.wav", Axis::home, IMAGEDIR, str);
-						if (!IsFileExist(wavfile))  wavfile.Format("%s\\%s\\%s.wav", Axis::home, IMAGEDIR, "000");
-						sndPlaySound(NULL, SND_NODEFAULT | SND_ASYNC);
-						sndPlaySound(wavfile, SND_NODEFAULT | SND_ASYNC);
-					}
+					wavfile.Format("%s\\%s\\%s.wav", Axis::home, IMAGEDIR, str);
+					if (!IsFileExist(wavfile))  wavfile.Format("%s\\%s\\%s.wav", Axis::home, IMAGEDIR, "000");
+					sndPlaySound(NULL, SND_NODEFAULT | SND_ASYNC);
+					sndPlaySound(wavfile, SND_NODEFAULT | SND_ASYNC);
 				}
-			
-				if (msgS.GetAt(0) == 'X')
-				{
-					msgS = msgS.Mid(1);
-					kind = 3;
-				}
-				else if (msgS.GetAt(0) == 'W')
-				{
-					msgS = msgS.Mid(1);
-					kind = 4;
-				}
-				else if (msgS.GetAt(0) == 'Y')
-				{
-					msgS = msgS.Mid(1);
-					msgS.Remove('\n');
-					msgS.Remove('\r');
-					kind = 5;
-				}
-			
-				ShowMngInfo(msgS, kind);  //OnTimer
+			}
+
+			if (msgS.GetAt(0) == 'X')
+			{
+				msgS = msgS.Mid(1);
+				kind = 3;
+			}
+			else if (msgS.GetAt(0) == 'W')
+			{
+				msgS = msgS.Mid(1);
+				kind = 4;
+			}
+			else if (msgS.GetAt(0) == 'Y')
+			{
+				msgS = msgS.Mid(1);
+				msgS.Remove('\n');
+				msgS.Remove('\r');
+				kind = 5;
+			}
+
+			ShowMngInfo(msgS, kind);  //OnTimer
 		}
 		break;
 	}
@@ -13894,7 +14014,7 @@ void CMainFrame::OnTimer(UINT nIDEvent)
 		IMAXSkinSet();
 	}
 	break;
-	case TM_STAFF_OPENNOPOACC: 
+	case TM_STAFF_OPENNOPOACC:
 	{
 		KillTimer(TM_STAFF_OPENNOPOACC);
 		SendMessage(WM_USER, MMSG_SETMAIN_STATE, 0);
@@ -13910,6 +14030,78 @@ void CMainFrame::OnTimer(UINT nIDEvent)
 			MakeDummyTick(snap, step + i);
 
 		}
+	}
+	break;
+	case TM_MAIN_RTS_PUSH:
+	{
+		std::vector<DispatchJob> jobs;
+		jobs.reserve(512);
+
+		// 1) 구독 테이블 스냅샷(락 짧게)
+		{
+			std::lock_guard<std::mutex> lock(m_subLock);
+
+			for (auto& kvCode : m_codeSymbolSubscribers)
+			{
+				const std::string& code = kvCode.first;
+				auto& symMap = kvCode.second;
+
+				for (auto& kvSym : symMap)
+				{
+					int symbol = kvSym.first;
+					auto& wndSet = kvSym.second;
+
+					if (wndSet.empty())
+						continue;
+
+					DispatchJob job;
+					job.code = code;
+					job.symbol = symbol;
+					job.targets.reserve(wndSet.size());
+
+					for (HWND h : wndSet)
+						job.targets.push_back(h);
+
+					jobs.push_back(std::move(job));
+				}
+			}
+		}
+
+		// 2) 락 없이 실제 데이터 읽고 전송
+		for (auto& job : jobs)
+		{
+			int idx = GetSlotIndex_FindOnly(job.code.c_str());
+			if (idx < 0) continue;
+
+			TickSnapshot snap{};
+			if (!ReadTick(idx, snap)) // 너가 이미 갖고 있는 함수 사용
+				continue;
+
+			if (job.symbol < 0 || job.symbol >= MAX_SYMBOLS)
+				continue;
+
+			if (!snap.valid.test(job.symbol))
+				continue;
+
+			// payload 생성(타겟마다 new해서 SendMessage로 넘김)
+			for (HWND h : job.targets)
+			{
+				if (!::IsWindow(h))
+					continue;
+
+				RTS_PUSH_ITEM* p = new RTS_PUSH_ITEM{};
+				CopyZ(p->code, sizeof(p->code), snap.code);
+				p->symbol = job.symbol;
+				CopyZ(p->value, sizeof(p->value), snap.values[job.symbol]);
+				p->ts_ms = snap.ts_ms;
+
+				::SendMessage(h, WM_RTS_MAIN_PUSH, 0, (LPARAM)p);
+				// 받는 쪽에서 delete p; 해야 함
+			}
+		}
+	
+
+
 	}
 	break;
 	}

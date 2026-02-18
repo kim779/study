@@ -90,6 +90,7 @@ ON_WM_TIMER()
 //}}AFX_MSG_MAP
 ON_MESSAGE(WM_MANAGE, OnManage)
 ON_MESSAGE(WM_USER, OnUser)
+ON_MESSAGE(WM_USER + 0x5201, OnMainMsg)
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
@@ -212,7 +213,7 @@ void CMainWnd::CheckRTSTimer(bool bFirst)
 	else  //최초 화면 오픈하였을 경우
 	{
 		m_iTime = iTime;
-		//SetTimer(TM_RTSTIME, m_iTime, nullptr);
+		SetTimer(TM_RTSTIME, m_iTime, nullptr);
 	}
 	_pApp->setDelaytime(m_iTime);
 }
@@ -817,6 +818,80 @@ LONG CMainWnd::OnManage(WPARAM wParam, LPARAM lParam)
 		m_pGroupWnd->SendMessage(WM_MANAGE, wParam, lParam);
 	}
 	break;
+	case MK_SETRTSCODE:
+	{
+		CString tempStr;
+		tempStr.Format("%s", (char*)lParam);
+
+		RTS_REGISTER_REQ* pReq = new RTS_REGISTER_REQ{};
+		pReq->hWnd = m_hWnd;
+
+		// ------------------------------------
+		// ------------------------------------
+		CString codePart, symbolPart;
+
+		int sep = tempStr.Find(_T('|'));
+		if (sep >= 0)
+		{
+			codePart = tempStr.Left(sep);
+			symbolPart = tempStr.Mid(sep + 1);
+		}
+		else
+		{
+			// 심볼 없으면 코드만
+			codePart = tempStr;
+		}
+
+		// ------------------------------------
+		// ------------------------------------
+		int pos = 0;
+		CString token;
+
+		while ((token = codePart.Tokenize(_T("\t"), pos)) != _T(""))
+		{
+			if (pReq->codeCount >= MAX_CODES_PER_REQ)
+				break;
+
+#ifdef UNICODE
+			strncpy_s(pReq->codes[pReq->codeCount],
+				CODE_STR_LEN,
+				CT2A(token),
+				_TRUNCATE);
+#else
+			strncpy_s(pReq->codes[pReq->codeCount],
+				CODE_STR_LEN,
+				token,
+				_TRUNCATE);
+#endif
+			std::string code = (LPCTSTR)token;
+			if (std::find(m_codes.begin(), m_codes.end(), code) == m_codes.end())
+				m_codes.push_back(code);
+			
+			pReq->codeCount++;
+		}
+
+		// ------------------------------------
+		// ------------------------------------
+		pos = 0;
+
+		while ((token = symbolPart.Tokenize(_T("\t"), pos)) != _T(""))
+		{
+			if (pReq->symbolCount >= MAX_SYMBOLS_PER_REQ)
+				break;
+
+			pReq->symbols[pReq->symbolCount] = _ttoi(token);
+			pReq->symbolCount++;
+
+			if (std::find(m_symbols.begin(), m_symbols.end(), atoi(token)) == m_symbols.end())
+				m_symbols.push_back(atoi(token));
+		}
+
+		// ------------------------------------
+		// ------------------------------------
+		m_pMainFrame->SendMessage(WM_USER, MMSG_RT_REGISTER_CODES, (LPARAM)pReq);
+
+	}
+	break;
 	default:
 		break;
 	}
@@ -1238,8 +1313,8 @@ void CMainWnd::sendTR(CString trCode, char *datB, int datL, int key)
 
 	if (trCode == "pooppoop")
 	{
-		SendTRtoMain( trCode, datB,  datL, US_PASS, key);
-		return;
+		//SetSendTRtoMainFrame( trCode, datB,  datL, US_PASS, key);
+		//return;
 		m_slog.Format("[2022][%s]<%d> [%s][%d][%d]", __FUNCTION__, __LINE__, trCode, datL, key);
 		OutputDebugString(m_slog);
 		
@@ -2058,6 +2133,41 @@ void CMainWnd::OnTimer(UINT nIDEvent)
 		if (m_bDominoToolWnd && m_pToolWnd != nullptr)
 			m_pToolWnd->SendMessage(WM_MANAGE, MAKEWPARAM(MK_SELECTGROUP, (LPARAM)m_nGroupIndex));
 	}
+	else if (nIDEvent == TM_RTSTIME)
+	{
+		for (const auto& code : m_codes)
+		{
+			RTS_READ_REQ req{};
+			strcpy_s(req.code, code.c_str());
+
+			req.symbolCount = (int)m_symbols.size();
+
+			for (int i = 0; i < req.symbolCount; i++)
+				req.symbols[i] = m_symbols[i];
+
+			m_pMainFrame->SendMessage(MMSG_GETRTS_FROM_MAIN, 0, (LPARAM)&req);
+
+			//log
+			// ===== DEBUG LOG =====
+			CString log;
+			log.Format("--------------------[2022][REQ][code] code=%s, symbolCount=%d\r\n",
+				req.code, req.symbolCount);
+			OutputDebugString(log);
+
+			for (int i = 0; i < req.symbolCount; i++)
+			{
+				CString line;
+				line.Format("[2022][REQ][value]  symbol=%d, valid=%d, value=%s\r\n",
+					req.symbols[i],
+					req.valid[i] ? 1 : 0,
+					req.valid[i] ? req.values[i] : "");
+
+				OutputDebugString(line);
+			}
+		}
+
+
+	}
 	CWnd::OnTimer(nIDEvent);
 }
 
@@ -2555,7 +2665,7 @@ void CMainWnd::GetMainFrameWnd()
 	OutputDebugString(m_slog);
 }
 
-void CMainWnd::SendTRtoMain(CString trCode, char* datB, int datL, BYTE stat, int key)
+void CMainWnd::SetSendTRtoMainFrame(CString trCode, char* datB, int datL, BYTE stat, int key)
 {
 	ST_SEND_TR* p = new ST_SEND_TR;
 
@@ -2572,7 +2682,7 @@ void CMainWnd::SendTRtoMain(CString trCode, char* datB, int datL, BYTE stat, int
 	p->key = key;
 	p->hSender = m_hWnd;
 	
-	m_pMainFrame->PostMessage(WM_USER, MMSG_GETRTS_FROM_MAIN, (LPARAM)p);
+	m_pMainFrame->PostMessage(WM_USER, MMSG_SETSENDTR_TO_MAIN, (LPARAM)p);
 	
 }
 
@@ -2607,4 +2717,44 @@ void CMainWnd::UnregisterRealtime()
 	CWnd* pMain = AfxGetMainWnd();
 	if (pMain)
 		pMain->PostMessage(WM_USER, MMSG_RT_UNREGISTER_WND, (LPARAM)req);
+}
+
+void CMainWnd::GetRTSFromMainFrame(CString scode)
+{  
+	/*
+	struct RTS_READ_REQ
+{
+    char code[CODE_LEN];      // target code
+
+    int symbolCount;          // number of symbols
+    int symbols[MAX_REQ_SYMBOLS];
+
+    // output
+    char values[MAX_REQ_SYMBOLS][SYMBOL_STR_LEN];
+    bool valid[MAX_REQ_SYMBOLS];
+
+    DWORD ts_ms;
+};
+	*/
+	for (const auto& code : m_codes)
+	{
+		RTS_READ_REQ req{};
+		strcpy_s(req.code, code.c_str());
+
+		req.symbolCount = (int)m_symbols.size();
+
+		for (int i = 0; i < req.symbolCount; i++)
+			req.symbols[i] = m_symbols[i];
+
+		m_pMainFrame->SendMessage(MMSG_GETRTS_FROM_MAIN, 0, (LPARAM)&req);
+
+		// now req.values[] filled
+		// use data here
+	}
+}
+
+LONG CMainWnd::OnMainMsg(WPARAM wParam, LPARAM lParam)
+{
+
+	return 0;
 }
