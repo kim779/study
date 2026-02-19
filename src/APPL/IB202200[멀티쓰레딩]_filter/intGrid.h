@@ -408,8 +408,11 @@ protected:
 	std::unique_ptr <CTipDlg>		m_pToolChart{};
 	std::unique_ptr <CTipDlg>		m_pToolNews{};
 
-
+#ifdef DF_SORT
 	std::deque<int> _Count;
+#else
+	std::vector<int> _Count
+#endif
 
 
 	// printing information

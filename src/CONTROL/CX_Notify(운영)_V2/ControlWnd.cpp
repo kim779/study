@@ -427,6 +427,38 @@ void CControlWnd::AddReminData(LPCTSTR sAccn, LPCTSTR sCode, LPCTSTR sRowData)
 }
 
 //=================================================================================================
+int FindTokenIndex(const CString& src, const CString& target, TCHAR delim)
+{
+	int index = 0;
+	int start = 0;
+
+	while (true)
+	{
+		int pos = src.Find(delim, start);
+
+		CString token;
+		if (pos == -1)
+		{
+			token = src.Mid(start);
+		}
+		else
+		{
+			token = src.Mid(start, pos - start);
+		}
+
+		if (token == target)
+			return index;
+
+		if (pos == -1)
+			break;
+
+		start = pos + 1;
+		index++;
+	}
+
+	return -1; // 못찾음
+}
+
 void CControlWnd::SetParam(_param *pParam)
 {
 	m_Param.key     = pParam->key;
@@ -441,7 +473,8 @@ void CControlWnd::SetParam(_param *pParam)
 
 	CString tmp = m_Param.options;
 	CString fieldS = OptionParser(tmp, "/edit");
-
+	m_iPsCmtIndex = FindTokenIndex(fieldS, "05",'|');
+	m_iPsCmtIndex -= 1;
 	fieldS.Replace("|", "\t");
 	m_bFuture = atoi(Parser(fieldS, "\t"))?true:false;
 	if (tmp.Find("accnAll") != -1)
@@ -468,6 +501,10 @@ void CControlWnd::SendToMap(CString sData, bool bAll, CString sAccn/* = ""*/)
 #ifdef	SC_TEST
 	m_cs.Lock();
 #endif
+	m_slog.Format("[cx_notify]-------------------------------------------------------------------------------");
+	Output_DebugString(m_slog);
+	m_slog.Format("[cx_notify] size=[%d]     bAll=[%d] sAccn=[%s] [%s]", m_drawQueue.size(), bAll, sAccn, sData);
+	Output_DebugString(m_slog);
 	CString sSendData, sCodeData, sCode;
 	CString keyS, dateS, sygbS, jggb;
 	CStringArray sDataArr;
@@ -515,7 +552,7 @@ void CControlWnd::SendToMap(CString sData, bool bAll, CString sAccn/* = ""*/)
 					continue;
 				sSendData += sDataArr.GetAt(idx) + "\t";
 				m_slog.Format("[cx_notify][%s]<%d> idx =[%d] val =[%s]", __FUNCTION__, __LINE__, idx, sDataArr.GetAt(idx));
-				OutputDebugString(m_slog);
+				Output_DebugString(m_slog);
 			}
 			m_CodeMap.SetAt(keyS, sSendData);
 			sSendData += "\n";
@@ -619,6 +656,11 @@ void CControlWnd::SendToMap(CString sData, bool bAll, CString sAccn/* = ""*/)
 			if (m_CodeMap.Lookup(keyS, oldData))
 			{
 				quantityChanged = IsQuantityChanged(oldData, sSendData);
+
+m_slog.Format("[cx_notify]");
+Output_DebugString(m_slog);
+m_slog.Format("[cx_notify][%s]<%d> ------ [%s]  keyS=[%s]  ] oldData=[%s] ", __FUNCTION__, __LINE__, quantityChanged == 1?"가능수량변동":"변화없다",keyS, oldData);
+Output_DebugString(m_slog);
 			}
 
 			m_CodeMap.SetAt(keyS, sSendData);
@@ -638,8 +680,17 @@ void CControlWnd::SendToMap(CString sData, bool bAll, CString sAccn/* = ""*/)
 	if (m_Version == VS_SKIP)
 	{
 		CSingleLock lock(&m_lock, TRUE);
-		if(quantityChanged||!ShouldSkipRTSByTimeDiff(sCode)  )
+		if (quantityChanged || !ShouldSkipRTSByTimeDiff(sCode))
+		{
 			m_drawQueue.push(m_dataList);
+			m_slog.Format("[cx_notify]]  [%s]<%d>   넣어주었다 !!!! ", sCode, m_drawQueue.size());
+			Output_DebugString(m_slog);
+		}
+		else
+		{
+		/*	m_slog.Format("[cx_notify]]  [%s]<%d>   안넣어주었다 !!!! ", sCode, m_drawQueue.size());
+			Output_DebugString(m_slog);*/
+		}
 
 		if (m_bWaitingFromVBS)
 			SendNextToVBS();
@@ -895,7 +946,7 @@ m_slog.Format("[cx_notify][%s]<%d> ------  첫수신  return  sCode=[%s]", __FUNCTI
 	if (diffSec <= m_diffSec)
 	{
 		m_slog.Format("[cx_notify][%s]<%d> ------  스킵  return  sCode=[%s]  diffSec=[%d] m_flag=[%s] ", __FUNCTION__, __LINE__, sCode, diffSec, m_flag);
-		//Output_DebugString(m_slog);
+		Output_DebugString(m_slog);
 		return true;
 	}
 
@@ -909,9 +960,25 @@ bool CControlWnd::IsQuantityChanged(const CString& oldD, const CString& newD)
 {
 	if (oldD.IsEmpty())
 		return true;   // 이전 없으면 변화로 간주
+	if (GetField(oldD, 0) != GetField(newD, 0))
+	{
+		m_slog.Format("************* [cx_notify][% s]< % d>  return  종목코드 = [% s] 종목코드 = [% s]  서로다르다", __FUNCTION__, __LINE__, GetField(oldD, 1), GetField(newD, 1));
+		Output_DebugString(m_slog);
+		return false;
+	}
 
-	CString oldQty = GetField(oldD, 4); // 4번째
-	CString newQty = GetField(newD, 4);
+
+	CString oldQty = GetField(oldD, m_iPsCmtIndex); // 4번째
+	CString newQty = GetField(newD, m_iPsCmtIndex);
+
+	m_slog.Format("			[cx_notify][%s]<%d>  return  oldQty=[%s] newQty=[%s] ", __FUNCTION__, __LINE__, oldQty, newQty);
+	Output_DebugString(m_slog);
+
+	m_slog.Format("			[cx_notify][%s]<%d oldD=[%s]  ", __FUNCTION__, __LINE__, oldD);
+	Output_DebugString(m_slog);
+	m_slog.Format("			[cx_notify][%s]<%d>newD=[%s] ", __FUNCTION__, __LINE__, newD);
+	Output_DebugString(m_slog);
+
 
 	return oldQty != newQty;
 }

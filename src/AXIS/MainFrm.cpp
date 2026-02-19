@@ -7537,7 +7537,9 @@ void CMainFrame::endWorkstation()
 #ifdef DF_CDDUSE
 	CheckCDDEDD();   //test CDD
 #endif
+#ifdef DF_MAIN_RTS
 	SetTimer(TM_MAIN_RTS_PUSH, 100, nullptr);
+#endif
 	initShared();
 	SetPCData();
 	WriteLog("[AXIS] endWorkstation - Step 1");

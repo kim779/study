@@ -2470,7 +2470,11 @@ void CGroupWnd::RecvRTSx(LPARAM lParam)
 
 	for_each(_cacheGrid.begin(), _cacheGrid.end(), [this, lParam](CGridWnd* pGridWnd) {
 		pGridWnd->HoldDraw();
+#ifdef DF_MAIN_RTS
+		pGridWnd->parsing_Alertx(lParam);
+#else
 		pGridWnd->parsingAlertx(lParam);
+#endif
 	});
 
 	for (auto& grid : _cacheGrid)

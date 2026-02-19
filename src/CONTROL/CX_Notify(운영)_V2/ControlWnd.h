@@ -132,6 +132,7 @@ protected:
 	void OnVersionChanged();
 
 	CString m_Version;
+	int m_iPsCmtIndex{};   //가능수량이 잔고그리드에 몇번째 컬럼인가
 public:
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 };

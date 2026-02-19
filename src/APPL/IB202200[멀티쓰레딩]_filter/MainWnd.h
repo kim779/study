@@ -239,6 +239,8 @@ public:
 
 
 	void GetRTSFromMainFrame(CString scode);
+	void ConvertTickToAlert(const RTS_READ_REQ& req, _alertR& alert);
+	void FreeAlertMemory(_alertR& alert);
 
 	std::vector<std::string> m_codes;
 	std::vector<int> m_symbols;

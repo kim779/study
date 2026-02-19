@@ -1059,6 +1059,7 @@ LONG CMainWnd::OnUser(WPARAM wParam, LPARAM lParam)
 
 	case DLL_ALERTx:
 	{
+#ifndef DF_MAIN_RTS
 		if (m_bDestroy || m_strBeginTime.IsEmpty() || m_pGroupWnd == nullptr)
 			break;
 
@@ -1130,7 +1131,7 @@ LONG CMainWnd::OnUser(WPARAM wParam, LPARAM lParam)
 				});
 			m_pGroupWnd->UpdateDraw();
 		}
-		
+#endif
 	}
 	break;
 	// KSJ 
@@ -2135,6 +2136,7 @@ void CMainWnd::OnTimer(UINT nIDEvent)
 	}
 	else if (nIDEvent == TM_RTSTIME)
 	{
+#ifdef DF_MAIN_RTS
 		for (const auto& code : m_codes)
 		{
 			RTS_READ_REQ req{};
@@ -2164,9 +2166,19 @@ void CMainWnd::OnTimer(UINT nIDEvent)
 
 				OutputDebugString(line);
 			}
+
+			_alertR alertR{};
+			ConvertTickToAlert(req, alertR);
+
+			m_pGroupWnd->initAlert();
+			//	AxStd::async([this, lParam]() {
+			m_pGroupWnd->RecvRTSx((LPARAM)&alertR);
+			//	});
+			m_pGroupWnd->UpdateDraw();
+
+			FreeAlertMemory(alertR);
 		}
-
-
+#endif
 	}
 	CWnd::OnTimer(nIDEvent);
 }
@@ -2757,4 +2769,69 @@ LONG CMainWnd::OnMainMsg(WPARAM wParam, LPARAM lParam)
 {
 
 	return 0;
+}
+
+void CMainWnd::ConvertTickToAlert(const RTS_READ_REQ& req, _alertR& alert)
+{
+	// 1. 기본 초기화
+	alert.code = req.code;
+	alert.stat = 1;
+	alert.size = 1;
+
+	// 2. ptr 전체 초기화
+	for (int i = 0; i < maxREC; ++i)
+	{
+		alert.ptr[i] = 0;
+	}
+
+	// 3. record 버퍼 생성
+	DWORD* record = new DWORD[1000]{};
+
+	// 문자열 복사용 함수
+	auto AllocAndCopy = [](const char* src) -> DWORD
+	{
+		if (!src || !src[0]) return 0;
+
+		size_t len = strlen(src) + 1;
+		char* p = new char[len];
+		strcpy_s(p, len, src);
+		return (DWORD)p;
+	};
+
+	// 4. symbol → record index 매핑
+	for (int i = 0; i < req.symbolCount; ++i)
+	{
+		if (!req.valid[i])
+			continue;
+
+		int recIndex = req.symbols[i];
+
+		if (recIndex < 0 || recIndex >= 1000)
+			continue;
+
+		record[recIndex] = AllocAndCopy(req.values[i]);
+	}
+
+	// 5. ptr 연결
+	alert.ptr[0] = (DWORD)record;
+}
+
+void CMainWnd::FreeAlertMemory(_alertR& alert)
+{
+	if (alert.ptr[0] == 0)
+		return;
+
+	DWORD* record = (DWORD*)alert.ptr[0];
+
+	for (int i = 0; i < 1000; i++)
+	{
+		if (record[i] != 0)
+		{
+			delete[](char*)record[i];
+			record[i] = 0;
+		}
+	}
+
+	delete[] record;
+	alert.ptr[0] = 0;
 }

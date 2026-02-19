@@ -45,5 +45,5 @@ inline void Output_DebugString(CString slog)
 }
 
 #define DF_SORT
-
+#define DF_MAIN_RTS
 #include "../H/TickStore.h"

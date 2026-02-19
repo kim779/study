@@ -1111,7 +1111,7 @@ void CintGrid::OnPaint()
 		else
 		{
 			_bDraw = false;
-		//	SetTimer(TIMEERDRAW, 500, nullptr);
+			SetTimer(TIMEERDRAW, 500, nullptr);
 		}
 	}
 	else
