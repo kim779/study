@@ -1,7 +1,7 @@
 GLOBAL DIVISION
 {
 
-MAPNAME(IB120190)
+MAPNAME(IB121210)
 MAPSIZE(180, 172)
 VERSION(000)
 MAPKIND(NORMAL)
@@ -35,7 +35,7 @@ COMBO  cbo_bep(54, 83, 160, 103)  TP_SUNKEN  LEN(1)  COUNT(2)  VCOUNT(2)  INDEX(
   VISIBLE  HINTTYPE(IH_NONE)
 LABEL  LABEL0(12, 108, 55, 128)  '신  용'  AL_LEFT  CUR(0)      COLOR(208, 130)  ENABLE  &
   VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
-COMBO  cbo_type(54, 108, 160, 128)  TP_SUNKEN  LEN(1)  COUNT(2)  VCOUNT(2)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_NUM|EDIT_INPUT|FA_SKIP    COLOR(192, 130)  CUR(0)  DISPLAY("융자금제외", "융자금포함")  DATA("0", "1")    TABORDER(3)  IOORDER(3)  ENABLE  &
+COMBO  cbo_type(54, 108, 160, 128)  TP_SUNKEN  LEN(1)  COUNT(2)  VCOUNT(2)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_NUM|EDIT_INPUT|FA_SKIP    COLOR(192, 130)  CUR(0)  DISPLAY("융자금제외", "융자금포함")  DATA("0", "1")    TABORDER(3)  IOORDER(3)  &
   VISIBLE  HINTTYPE(IH_STRING)  HELPTEXT("융자금제외시 실제 고객 투자금에 대한 수익률 제공")HELPTEXT("융자금제외시 실제 고객 투자금에 대한 수익률 제공")
 BUTTON  BUTTON0(12, 157, 84, 177)  '적  용'  TP_PUSH|IMAGETEXT|AL_CENTER        FOCUS  COLOR(208, 232)  CUR(0)    "5btn.bmp"    TABORDER(4)  ENABLE  &
   VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
@@ -74,11 +74,6 @@ Sub p_write_ini()
 End Sub
 
 Sub p_read_ini()
-'	If Trim(mapName.Data) = "IB101900" Then
-'		cbo_renewal.Enable = False
-'	End If
-
-
 	If SCREEN.CreateObject("INFO") Then
 		Dim tax, mcgb, bep, ctype, renewal
 		tax = Trim(INFO.PopData(LOGIN.Name, "userconf.ini", Trim(mapName.Data), "tax"))
@@ -117,10 +112,6 @@ Sub p_read_ini()
 			cbo_type.Data = ctype
 		Else
 			cbo_type.Data = "0"
-		End If
-
-		If renewal = "" Then
-			renewal = 1
 		End If
 
 		If renewal<>"" Then

@@ -3263,6 +3263,12 @@ OutputDebugString(s);
 				m_main->RunPhonePad();
 				return 0;
 			}
+			//testcode
+			else if (m_main->ScreenCheck(mapN) == 0)
+			{
+				return 0;
+			}
+			//testcode
 		}
 	}
 	else if (index < ID_MENU_USERTOOL)

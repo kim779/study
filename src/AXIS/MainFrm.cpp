@@ -700,6 +700,9 @@ bool axiscall(int msg, WPARAM wParam, LPARAM lParam)
 	{
 	case AXI_CHANGEVIEW:	
 		//OutputDebugString("AXI_CHANGEVIEW\n");
+		//testcode
+		if(m_pMain->ScreenCheck((char*)lParam) == 0)
+			return false;
 		return (m_pMain->m_mapHelper->ChangeChild((char *)lParam, TRIGGERN, wParam) 
 									? true : false);
 	case AXI_SETACCOUNT:		
@@ -21937,7 +21940,7 @@ int CMainFrame::ScreenCheck(CString mapname,int  igubn)
 				sPopType = "1";
 
 			if (sPopType == "1")  //일반화면
-				m_mapHelper->ChangeChild(sPopMap);
+				m_mapHelper->ChangeChild(sPopMap,1,0,5);
 			else if (sPopType == "2")
 				m_mapHelper->CreateModal(sPopMap);
 			else if (sPopType == "2")

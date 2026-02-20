@@ -113,6 +113,7 @@ BEGIN_DISPATCH_MAP(CControlWnd, CWnd)
 	DISP_FUNCTION(CControlWnd, "SendRaw", SendRaw, VT_EMPTY, VTS_BSTR)
 	DISP_FUNCTION(CControlWnd, "SetFilterAcc", SetFilterAcc, VT_EMPTY, VTS_BSTR)
 	DISP_FUNCTION(CControlWnd, "RequestBalance", RequestBalance, VT_EMPTY, VTS_BSTR)
+	DISP_FUNCTION(CControlWnd, "SetSkipTime", SetSkipTime, VT_EMPTY, VTS_I2)
 	//}}AFX_DISPATCH_MAP
 	//DISP_FUNCTION_ID(CControlWnd, "RequestBalance", dispidRequestBalance, RequestBalance, VT_EMPTY, VTS_BSTR)
 	
@@ -677,7 +678,7 @@ Output_DebugString(m_slog);
 			m_dataList = sAccn + m_dataList;
 	}
 
-	if (m_Version == VS_SKIP)
+	if (m_diffSec > 0)
 	{
 		CSingleLock lock(&m_lock, TRUE);
 		if (quantityChanged || !ShouldSkipRTSByTimeDiff(sCode))
@@ -695,12 +696,12 @@ Output_DebugString(m_slog);
 		if (m_bWaitingFromVBS)
 			SendNextToVBS();
 	}
-	else if (m_Version == VS_TIMER)
-	{
-		CSingleLock lock(&m_lock, TRUE);
-		m_drawQueue.push(m_dataList);
-	}
-	else if(m_Version == "1")
+	//else if (m_Version == VS_TIMER)
+	//{
+	//	CSingleLock lock(&m_lock, TRUE);
+	//	m_drawQueue.push(m_dataList);
+	//}
+	else if(m_diffSec == 0)
 	{
 		m_pParent->SendMessage(WM_USER, MAKEWPARAM(eventDLL, MAKEWORD(m_Param.key, evOnDblClk/*DblClick*/)), (LPARAM)m_Param.name.GetString());  //SendToMap
 	}
@@ -887,6 +888,13 @@ void CControlWnd::RequestBalance(BSTR sVal)
 	// TODO: 여기에 디스패치 처리기 코드를 추가합니다.
 }
 
+void CControlWnd::SetSkipTime(SHORT sec)
+{
+	m_diffSec = sec;
+
+	m_slog.Format("[cx_notify][%s]<%d> ------  스킵시간지정  m_diffSec=[%d] sec=[%d]", __FUNCTION__, __LINE__, m_diffSec, sec);
+	Output_DebugString(m_slog);
+}
 
 void CControlWnd::OnVersionChanged()
 {
@@ -945,13 +953,13 @@ m_slog.Format("[cx_notify][%s]<%d> ------  첫수신  return  sCode=[%s]", __FUNCTI
 
 	if (diffSec <= m_diffSec)
 	{
-		m_slog.Format("[cx_notify][%s]<%d> ------  스킵  return  sCode=[%s]  diffSec=[%d] m_flag=[%s] ", __FUNCTION__, __LINE__, sCode, diffSec, m_flag);
+		m_slog.Format("[cx_notify][%s]<%d> ------  스킵  return  sCode=[%s]  diffSec=[%d] m_flag=[%s] m_diffSec=[%d] ", __FUNCTION__, __LINE__, sCode, diffSec, m_flag, m_diffSec);
 		Output_DebugString(m_slog);
 		return true;
 	}
 
-	m_slog.Format("[cx_notify][%s]<%d> ------  스킵안함  return  sCode=[%s] diffSec=[%d] m_flag=[%s]", __FUNCTION__, __LINE__, sCode, diffSec, m_flag);
-	//Output_DebugString(m_slog);
+	m_slog.Format("[cx_notify][%s]<%d> ------  스킵안함  return  sCode=[%s] diffSec=[%d] m_flag=[%s] m_diffSec=[%d]", __FUNCTION__, __LINE__, sCode, diffSec, m_flag, m_diffSec);
+	Output_DebugString(m_slog);
 	it->second = now;
 	return false;
 }

@@ -758,13 +758,14 @@ End Sub
 
 Sub p_read_ini()
 	If SCREEN.CreateObject("INFO") Then
-		Dim tax, mcgb, bep, ctype, chkJango, sPos
+		Dim tax, mcgb, bep, ctype, chkJango, sPos,renewal
 		tax = Trim(INFO.PopData(LOGIN.Name, "userconf.ini", SCREEN.GetMapName(0), "tax"))
 		mcgb = Trim(INFO.PopData(LOGIN.Name, "userconf.ini", SCREEN.GetMapName(0), "mcgb"))
 		bep = Trim(INFO.PopData(LOGIN.Name, "userconf.ini", SCREEN.GetMapName(0), "bep"))
 		ctype = Trim(INFO.PopData(LOGIN.Name, "userconf.ini", SCREEN.GetMapName(0), "type"))
 		chkJango = Trim(INFO.PopData(LOGIN.Name, "userconf.ini", SCREEN.GetMapName(0), "chk_jango"))
 		sPos = Trim(INFO.PopData(LOGIN.Name, "userconf.ini", SCREEN.GetMapName(0), "sinPos"))
+		renewal = Trim(INFO.PopData(LOGIN.Name, "userconf.ini", SCREEN.GetMapName(0), "renewal"))
 
 		If tax <> "" Then
 			cbo_tax.Index = tax
@@ -824,6 +825,22 @@ Sub p_read_ini()
 			Setting_Sinyong()
 		Else
 			chk_sPos.Checked = False
+		End If
+		
+		If renewal = "" Then 
+			renewal = 1
+		End If
+		
+		If renewal = 0 Then '실시간
+			CONTROL0.SetSkipTime(0)
+		ElseIf renewal = 1 Then '1초
+			CONTROL0.SetSkipTime(1)
+		ElseIf renewal = 2 Then  '2초
+			CONTROL0.SetSkipTime(2)
+		ElseIf renewal = 3 Then  '3초
+			CONTROL0.SetSkipTime(3)
+		Else
+			CONTROL0.SetSkipTime(0)
 		End If
 
 	End If
@@ -1073,11 +1090,11 @@ For ii = 1 To VIEWGRID.Rows
 			Else
 			     code = VIEWGRID.GetGridCell(ii, 2)   '종목코드
 			End If
-			
+
 			' 코드 연동용 시장 접두 제거
 			code = Replace(code, "M.", "")
 			code = Replace(code, "N.", "")
-			
+
 			jmna = VIEWGRID.GetGridCell(ii, 3)			'종목명
 			miga = VIEWGRID.GetGridCell(ii, 7)			'매입단가(평균단가)
 			jmsu = VIEWGRID.GetGridCell(ii, 6)			'주문수량

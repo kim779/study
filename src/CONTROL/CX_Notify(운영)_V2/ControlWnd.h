@@ -123,9 +123,11 @@ public:
 
 protected:
 	void RequestBalance(BSTR sVal);
+	void SetSkipTime(SHORT sec);
 
 	enum
 	{
+		dispidSetSkipTime = 19,
 		dispidVersion = 18,
 		dispidRequestBalance = 17L
 	};
