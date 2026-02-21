@@ -299,6 +299,8 @@ void CControlWnd::OnLButtonUp(UINT nFlags, CPoint point)
 					rc.SetRect(rc.left, rc.bottom, rc.left + 400 + SPACE_LEFT, rc.bottom + 50 + 80);/*(m_kind == 5?3:(m_kind == 4?1:m_kind))  * 20);*/ 
 				}
 
+				m_pParent->SendMessage(WM_USER, MAKEWPARAM(eventDLL, MAKEWORD(m_Param.key, evOnDblClk)), (LPARAM)m_Param.name.GetString());
+
 				//rc = adjustRect(rc);
 				m_pPopup->CreateEx(WS_EX_TOOLWINDOW | WS_EX_TOPMOST, sClassName, NULL,
 					WS_POPUP|WS_BORDER, rc,	NULL, NULL, NULL);
@@ -533,6 +535,15 @@ long CControlWnd::OnMessage1(WPARAM wParam, LPARAM lParam)
 		m_pParent->PostMessage(WM_USER, MAKEWPARAM(formDLL, m_Param.key), (LPARAM)m_rtnStr.GetString());
 		break;
 	case 2: // Popup 수량선택 없이 Close
+
+		slog.Format("OSBJPrc\t%s", "");
+		Variant(pushCC, slog);
+		slog.Format("OSBJ1377\t%s", "");
+		Variant(pushCC, slog);
+
+		slog.Format("주버튼 closewindow");
+		OutputDebugString(slog);
+		
 		SetTimer(TID_ONCHANGE_EVENT, 150, NULL);
 		break;
 	case 3: // Popup 금액선택	2013.10.10 KSJ

@@ -263,6 +263,7 @@ BOOL CAmountPopup::OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult)
 		sSection = "JMON_GRID";
 		sPrice = Variant(popCC, "OSBJPrc");
 		sUnit = Variant(popCC, "OSBJ1377");
+		
 		sPrice.Trim();
 		sUnit.Trim();
 		nParam = 3;

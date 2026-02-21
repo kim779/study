@@ -1,0 +1,1881 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB999912)
+MAPSIZE(627, 1020)
+VERSION(000)
+MAPKIND(PROCEDURES)
+MAPGROUP(0)
+MAPDESC("주식주문 공통 proc")
+MAPPUBLIC(";")
+FONT("굴림", 9, NORMAL)
+TITLE("주식주문 공통 proc")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+' 공통함수(IB999912) 전역변수: 매매구분. 1-매도, 2-매수, 3-정정, 4-취소
+' 주문화면 선언(declaration)부분에 mmgb값 설정해서 사용
+Dim mmgb
+Dim an_symb, pw_symb
+Dim itype
+Dim flag
+
+
+
+If Left(SCREEN.GetMapName(1),6) = "IB1050" Then	'-- 계좌번호 심볼
+	an_symb = "parent.AN18"
+Else
+	an_symb = "parent.AN1A"
+End If
+
+pw_symb = "parent.ed_pswd"
+
+
+
+' 주문가능 버튼 Visible TRUE/FALSE
+Sub SetGaBthVisible(val)
+	If val = "0" Then
+		BUTTON0.visible True
+		BUTTON1.visible True
+		BUTTON4.visible False
+	Else
+		BUTTON0.visible False
+		BUTTON1.visible False
+		BUTTON4.visible True
+	End If
+End Sub
+
+
+
+' Data NULL Check
+Function Null_check(Data)
+    Null_check = Data
+    If Trim(data) = "" Then
+        Null_check = "NO"
+        Exit Function
+    End If
+End Function
+
+
+
+'***************************************************************************
+' DESC: 종목코드 변경시 Setting
+'***************************************************************************
+Sub ChangeCode()
+SYSTEM.Trace "      [999912]ChangeCode Start : " & S1301.Data
+
+	'=================
+	' 화면별 특성 적용
+	'=================
+	Select Case Trim(SCREEN.GetMapName(1))
+	Case "IB105000" : '-- ELW주문화면
+		c_pric.visible False
+		If Trim(S1301.data) = "" Then
+SYSTEM.Trace "      [999912]ChangeCode EXIT 1"
+	  		Exit Sub
+	  	End If
+
+		If SCREEN.GetCodeType(S1301.Data) <> 9 Then
+			'MsgBox "ELW종목코드를 입력하십시오.", ,"IBK투자증권"
+			SCREEN.Object("main.GUIDE").Text = "ELW종목코드를 입력하십시오."
+			S1301.Clear
+SYSTEM.Trace "      [999912]ChangeCode EXIT 2"
+			Exit Sub
+		End If
+
+	Case "IB680100" : 	'--신주인수권 주문화면인 경우만
+		c_pric.visible True
+		scode.data = S1301.Data
+
+	Case "IB610100" : 	'--수익증권 주문화면인 경우만
+		c_pric.visible True
+		Jcode.data = S1301.Data
+
+	Case "IB101900" :	'--유통대주매매 가능 종목 여부 확인
+		c_pric.visible True
+		SCREEN.Proc "Main.proc_avaible", S1301.Data
+
+	Case "IB500000" :	'-- 시간외단일가 종합화면d
+		c_pric.visible True
+		If SCREEN.Object("main.cxMarket").IsNXTAble(S1301.Data) = 0 Then
+			SCREEN.Object("main.obj_showNXT").Visible = False
+			SCREEN.Object("main.obj_showNXT2").Visible = False
+			SCREEN.Object("main.OBJ_sise").Visible = True
+			SCREEN.Object("main.OBJ_order").Visible = True
+		Else
+			SCREEN.Object("main.obj_showNXT").Visible = True
+			SCREEN.Object("main.obj_showNXT2").Visible = True
+			SCREEN.Object("main.OBJ_sise").Visible = False
+			SCREEN.Object("main.OBJ_order").Visible = False
+		End If
+
+	Case Else
+		c_pric.visible True
+
+		' elw종목 & 신주인수권일경우 "원" 버튼 히든처리
+		If SCREEN.GetCodeType(S1301.Data) = 9 Then
+			c_pric.visible False
+		End If
+	End Select
+
+	OrdCfg.ItemCd = S1301.Data
+
+	'2011/03/08 단가가 삭제되도록
+	ed_jprc.Data = 0
+
+
+
+
+	'=====================
+	' Main단 종목코드 변경
+	'=====================
+SCREEN.IgnoreChange True
+	SCREEN.Object("main.1301").Data = S1301.Data
+	ed_ogno.Clear
+	If mmgb <> "4" Then		'== 종목코드 변경시 초기화
+		If shogb.Visible = True Then
+			shogb.Index = 0
+			shogb.Refresh
+SYSTEM.Trace "      [999912]ChangeCode -> Set_comb_hogb b4 : " & S1301.Data
+			Call Set_comb_hogb()
+SYSTEM.Trace "      [999912]ChangeCode -> Set_comb_hogb af : " & S1301.Data
+		End If
+	End If
+
+SCREEN.IgnoreChange False
+
+
+	'====================================
+	' 종목에 따른 시장 구분자 보정
+	'====================================
+	If UCase(TypeName( SCREEN.Object("Main.cxMarket"))) <> "NOTHING" Then
+		Dim tmp_mkgb
+		tmp_mkgb = SCREEN.Object("Main.cxMarket").sMarket
+		Call Spread_mkgb(S1301.Data,tmp_mkgb)
+
+
+		'====================================
+		' 주문화면단 현재 선택 시장 문구 표기
+		'====================================
+		Call Change_market_text(tmp_mkgb)
+	End If
+
+	'=================================================
+	' 주문옵션적용 when: common(주문전), after(주문후)
+	'=================================================
+	Call QueryOption("common")
+
+
+	' 화면별 특성 적용2
+	Select Case Trim(SCREEN.GetMapName(1))
+	Case "IB680100"	' 신주인수권 관련 화면
+		SCREEN.Object("OBJ_hnam").Send
+
+	Case "IB610100"	' 신주인수권 관련 화면
+		SCREEN.Object("OBJ_hnam").Send
+
+	Case Else	' 통상화면 :: 시장구분자 및 Tick 단위 설정
+		Call Set_mkgb(S1301.Data)
+		SCREEN.Object("obj_hnam.1301").Data = S1301.Data
+		SCREEN.Object("OBJ_hnam").Send
+	End Select
+
+
+	'=================
+	' Main단 시세 조회
+	'=================
+	' jumun 으로 올린 send_sise_all은 다시 OBJ_Order(ChangeCode)로 돌아오지 않는다.
+	SCREEN.Proc "main.send_sise_all", "jumun"
+
+	' 포커스 이동
+	If "1" = Ordcfg.ReadCfg("NotMoveCode") Then
+	  S1301.Setfocus
+	Else
+	  ed_jqty.Setfocus
+	End If
+SYSTEM.Trace "      [999912]ChangeCode End : " & S1301.Data
+
+End Sub
+
+
+
+
+
+
+
+'***************************************************************************
+' DESC: 주문환결설정 Setting
+' input: "parent.clearpush + (_buy, _sell, _jj, _cancel)"
+'***************************************************************************
+Sub init_option(clearpush)
+	Dim yn
+
+SCREEN.IgnoreChange True
+	S1301.Data = SCREEN.Object("main.1301").Data
+	Call Set_mkgb(S1301.Data)
+SCREEN.IgnoreChange False
+
+	SCREEN.Object("OBJ_hnam").Send
+
+	OrdCfg.PushPrefix = CStr(SCREEN.Major)
+	OrdCfg.OrderGB = mmgb-1
+	OrdCfg.LoadInfo
+	If SCREEN.Object(clearpush).data = "1" Then
+		SCREEN.Object(clearpush).data = "0"
+		'첫번째 화면실행시에는 메모리정보 Clear
+		OrdCfg.ClearPush
+	Else
+		OrdCfg.Pop
+	End If
+
+	OrdCfg.ItemCd = S1301.Data
+
+	Call QueryOption("common")
+
+	If SCREEN.CreateObject("info") Then
+		yn = Null_check(Trim(INFO.popdata(LOGIN.name, "userconf.ini", "S-ORD", "ORD_CONF")))
+	End If
+
+	If yn = "NO" Then
+		chk_OrderConfirm.Checked = SCREEN.Object("parent.chk_OrderConfirm").Checked
+	Else
+		chk_OrderConfirm.Checked = False
+	End If
+
+' 2022.10.27 시장경제 축소에 따른 당사 유동성자본확보를 위하여
+	' Default 신용구분을 자기융자(index:0)에서 유통융자(index:1)로 세팅
+	' 자기융자 => 유통융자 기본으로 변경
+	' 임지훈
+	If mmgb < "3" Then 	'-- ELW는 시장가 없음
+		If UCase(TypeName( SCREEN.Object("L_SYGB") )) <> "NOTHING" Then
+			c_sygb.Index = 1
+		End If
+	End If
+
+	If SCREEN.GetMapName(1) = "IB105000" Then
+		If mmgb < "3" Then 	'-- ELW는 시장가 없음
+			c_hogb.Visible = False
+		End If
+	End If
+
+
+	'====================================
+	' 주문화면단 현재 선택 시장 문구 표기
+	'====================================
+	If UCase(TypeName( SCREEN.Object("Main.cxMarket"))) <> "NOTHING" Then
+		Dim tmp_mkgb
+		tmp_mkgb = SCREEN.Object("Main.cxMarket").sMarket
+		Call Change_market_text(tmp_mkgb)
+	End If
+
+End Sub
+
+
+
+
+'***************************************************************************
+' DESC: 주문시 반드시 초기화해야 할 값
+'***************************************************************************
+Sub init_data()
+SCREEN.IgnoreChange True
+	ed_acno.Data = SCREEN.Object(an_symb).data	'계좌번호
+	ed_pswd.Data = SCREEN.Object(pw_symb).data	'비밀번호
+
+	ed_odgb.Data = "1"			'주문유형
+	ed_mmgb.Data = mmgb			'매매구분
+
+'	If UCase(TypeName( SCREEN.Object("c_hogb") )) <> "NOTHING" Then
+'		c_hogb.Checked = False
+'	End If
+
+SYSTEM.Trace "[999912] init_data mmgb = " & mmgb
+
+	Select Case mmgb
+		Case "2"
+			SYSTEM.Push "J_click", ""
+
+		Case "3"	' 정정
+			'ed_hogb.data = shogb.Data
+			SYSTEM.Push "J_click", ""
+			Set_comb_hogb()
+
+			'ed_jmgb.Data = "00"		'주문조건
+										' jmgb 를 Clear해버리면 IOC/FOK 정정이 안된다
+										' 삭제 :: 2025.10.14 by LIM
+
+			o_jmno.Clear				'주문번호
+
+		Case "4"
+			ed_jprc.Data = ""			'주문단가
+			ed_hogb.Data = ""			'호가구분
+			ed_jmgb.Data = "00"			'주문조건
+			o_jmno.Clear				'주문번호
+
+		Case Else
+			ed_ogno.Data = ""			'원주문번호
+			ed_mdgb.Data = ""			'정정취소
+	End Select
+
+SCREEN.IgnoreChange False
+
+	Call Set_prgb()				'--처리구분값 설정(현금/신용/대용)
+
+	'elw종목일경우 원자 버튼 히든처리 1009는 무조건 안보이게
+	If SCREEN.GetCodeType(S1301.Data) = 9 Then
+		c_pric.visible False
+	Else
+		If SCREEN.GetMapName(1) <> "IB105000" Then
+			c_pric.visible True
+		End If
+	End If
+
+	SCREEN.Object("main.guide").Text = " "					'메세지
+End Sub
+
+
+
+
+
+'--처리구분값 설정(현금/신용)
+Sub Set_prgb()
+	ed_prgb.Data = "X"			'처리구분
+	ed_gmo.Data = ""			'처리구분값1
+	ed_gmm.Data = ""			'처리구분값2
+
+SYSTEM.Trace "      [999912] Set_prgb  mmgb = " & mmgb & "    map(0) = " & SCREEN.GetMapName(0)
+
+	Select Case mmgb
+	Case "3", "4"	' 정정/취소
+		Exit Sub
+
+	Case "1", "2"	' 매도/매수
+		If Not R_cash.Checked Then			'--신용주문
+			If Left(SCREEN.GetMapName(1),6) = "IB3030" Then		'--선물대용주문
+
+				ed_prgb.data = "C"	' 선물대용주문
+
+				' 선물대용 KRX/NXT 구분 01:KRX 04:NXT
+				If UCase(TypeName( SCREEN.Object("cxMarket") )) <> "NOTHING" Then
+					Select Case cxMarket.sMarket
+					Case "KRX"	' KRX
+						ed_gmo.data = "01"&AN20.data
+
+					Case "NXT"	' NXT
+						ed_gmo.data = "04"&AN20.data
+
+					Case Else
+						ed_gmo.data = "01"&AN20.data
+					End Select
+
+				Else	' Default : KRX 선물대용
+					ed_gmo.data = "01"&AN20.data
+				End If
+
+			Else												'--신용주문
+				ed_prgb.Data = "B"			'처리구분
+				ed_gmo.Data = c_sygb.Data & ed_date.Data		'처리구분값1
+			End If
+		End If
+
+	End Select
+End Sub
+
+
+
+
+
+'***************************************************************************
+'현금/신용 설정
+'***************************************************************************
+Sub Set_CashCredit(xval)
+	Dim flag_date
+	If mmgb <> 1 And mmgb <> 2 Then Exit Sub	'--매수,매도화면에서만 설정
+	Select Case Left(SCREEN.GetMapName(1),6)
+	Case "IB1050"			'-- [ELW주문] 현금주문만 가능
+		R_credit.Visible = False : R_cash.TRGB = 103
+		lb_date.Visible = False
+		ed_date.Visible = False
+		c_sygb.Visible = False
+		L_SYGB.Visible = False
+		Exit Sub
+	End Select
+
+	Dim mapName
+	mapName = SCREEN.GetMapName(1)
+
+	R_credit.Visible = True
+	flag_date = False
+
+	ed_jqty.Clear
+	ed_jqty.SetFocus
+
+
+	If xval = 1 Then				'신용 : xval=1
+
+		' 유통 융자로 인해 추가 2021.06.07
+		' 기존 화면 영향도를 위해 L_SYGB 컴포넌트 존재여부 확인 후 Visible Setting
+		If UCase(TypeName( SCREEN.Object("L_SYGB") )) <> "NOTHING" Then
+			c_sygb.Visible = True
+			L_SYGB.Visible = True
+		End If
+
+		If mmgb = 1 Then			' 신용매도
+			flag_date = True
+			JUMUN_B.Text = "신용매도(F3)"
+			'If (Left(SCREEN.GetMapName(1),6)="IB3030") Then
+			'	BUTTON0.Visible = False		'가능수량조회버튼
+			'End If
+		Else						' 신용매수
+			JUMUN_B.Text = "신용매수(F2)"
+		End If
+		R_cash.TRGB = 69 : R_credit.TRGB = 103
+		R_credit.Checked = True
+
+		'정산금액 표시 2010.02.19
+		If mapName <> "IB105000" And mapName <> "IB610100" And mapName <> "IB680100" Then
+			OBJ_JUNGSAN.VIsible = False
+		End If
+	Else							'현금 : xval=0
+		c_sygb.Visible = False			' 유통 융자로 인해 추가 2021.06.07
+		If UCase(TypeName( SCREEN.Object("L_SYGB") )) <> "NOTHING" Then	' L_SYGB 컴포넌트 존재여부 확인 후 Visible Setting
+			L_SYGB.Visible = False
+		End If
+		If mmgb = 1 Then
+			JUMUN_B.Text = "매도(F3)"
+			BUTTON0.Visible = True		'가능수량조회버튼
+		Else
+			JUMUN_B.Text = "매수(F2)"
+		End If
+		R_cash.TRGB = 103 : R_credit.TRGB = 69
+		R_cash.Checked = True
+
+		'정산금액 표시 2010.02.19
+		If mapName <> "IB105000" And mapName <> "IB610100" And mapName <> "IB680100" Then
+			OBJ_JUNGSAN.VIsible = True
+		End If
+	End If
+
+	' 일자 입력 Field Visible
+	Select Case Trim(mapName)
+	Case "IB101900"	' 유통대주 :: 일자 표기가 통상 매매화면과 반대
+		R_cash.Visible = False
+		R_credit.Visible = False
+		If mmgb = 1 Then
+			JUMUN_B.Text = "대주매도(F3)"
+			flag_date = False
+		Else
+			JUMUN_B.Text = "대주상환(F2)"
+			flag_date = True
+		End If
+
+	Case "IB103200"	' [1032] 스마트창구(신용)
+		' 스마트창구(신용)의 신용 구분자도 저장하지 않음
+
+	Case "IB102100"	' [1021] 대출매도상환
+		' 대출매도상환의 신용 구분자도 저장하지 않음
+
+	Case Else : ' 일반 공통화면
+		' DESC: 화면 재오픈시에도 현금/신용구분 유지
+		' [1019] 유통대주는 무조건 신용주문이라 현금/신용 구분 저장하지 않음
+
+		' 신용 구분자 저장
+		push_sinyong(xval)
+	End Select
+
+	lb_date.Visible = flag_date
+	ed_date.Visible = flag_date
+
+
+
+	' 화면별 하단 계정계 화면 조회 연동
+	Select Case Trim(mapName)
+	Case	"IB100100", "IB200000", "IB2000XX", "IB2000YY", "IB300000", "IB800000", "IB000100", "IB103100" :
+		If SCREEN.Object("main.tab_account").ID = "7" Then	' 주문가능
+			SCREEN.Proc "main.OBJ_account.send_f", ""
+		End If
+
+	Case 	"IB100200" :
+		If SCREEN.Object("main.TAB1").ID = "7" Then	' 주문가능
+			SCREEN.Proc "main.OBJ_account.send_f", ""
+		End If
+
+	Case	"IB500000"
+		If SCREEN.Object("main.tab_account").ID = "4" Then
+			SCREEN.Proc "main.OBJ_account.send_f", ""
+		End If
+	End Select
+
+End Sub
+
+
+
+
+
+' DESC: 화면 재오픈시에도 현금/신용구분 유지
+' 일반 공통화면은 저장하고, [1019] 유통대주 화면에서는 저장하지 않음
+Sub push_sinyong(xval)
+	If SCREEN.CreateObject("Info") Then
+		Dim mapName
+		mapName = SCREEN.GetMapName(1)
+
+		If mapName <> "IB103100" And mapName <> "IB103200" Then
+			INFO.PushData LOGIN.name, "userconf.ini", "STOCK", "sinyong", xval
+		End If
+	End If
+End Sub
+
+
+
+
+
+Function pop_sinyong()
+	If SCREEN.CreateObject("Info") Then
+		Dim mapName
+		mapName = SCREEN.GetMapName(1)
+
+		If mapName <> "IB103100" And mapName <> "IB103200" Then
+			pop_sinyong = INFO.PopData(LOGIN.name, "userconf.ini", "STOCK", "sinyong")
+		End If
+	End If
+
+	If 	pop_sinyong <> "1" Then
+		pop_sinyong = "0"	'-- 현금
+	End If
+End Function
+
+
+
+
+
+'***************************************************************************
+' DESEC: 시장구분 Setting
+'			1:거래소 2:코스닥 3:프리보드 4:장외
+'***************************************************************************
+Function Set_mkgb(code)
+	Dim retn
+	Set_mkgb = True
+	ed_jprc.SetType 0
+
+	If UCase(TypeName( SCREEN.Object("edStopPrc") )) <> "NOTHING" Then
+		edStopPrc.SetType 0
+	End If
+
+	retn = SCREEN.GetCodeType(code)
+	Select Case retn
+		Case 1, 31
+			ed_mkgb.Data = "1"	'거래소
+			ed_jprc.SetType 100
+			If UCase(TypeName( SCREEN.Object("edStopPrc") )) <> "NOTHING" Then
+				edStopPrc.SetType 100
+			End If
+		Case 2
+			ed_mkgb.Data = "2"	'코스닥
+			ed_jprc.SetType 200
+			If UCase(TypeName( SCREEN.Object("edStopPrc") )) <> "NOTHING" Then
+				edStopPrc.SetType 200
+			End If
+		Case 3
+			ed_mkgb.Data = "3"	'프리보드
+		Case 4, 5, 7
+			ed_mkgb.Data = "4"	'장외
+		Case 6, 27
+			ed_mkgb.Data = "1"	'ETF
+			ed_jprc.SetType 240
+			If UCase(TypeName( SCREEN.Object("edStopPrc") )) <> "NOTHING" Then
+				edStopPrc.SetType 240
+			End If
+		Case 9
+			ed_mkgb.Data = "1"	'ELW
+			ed_jprc.SetType 250
+			If UCase(TypeName( SCREEN.Object("edStopPrc") )) <> "NOTHING" Then
+				edStopPrc.SetType 250
+			End If
+		Case Else
+			ed_mkgb.Data = "0"
+			Set_mkgb = False
+	End Select
+End Function
+
+
+
+
+
+'***************************************************************************
+' DESC: 호가조건 ComboBox 전환시 Setting
+'			00:지정가 03:시장가 05:조건부지정가 06:최유리지정가
+'			07:최우선지정가 09:자사주 10:자사주스톡옵션 12:자사주신탁
+'			61:장개시전시간외 81:시간외종가 91:시간외단일가
+'        호가구분에따라 단가를 enable/disable
+'***************************************************************************
+Sub Set_comb_hogb()
+
+SYSTEM.Trace "      [999912]Set_comb_hogb shogb = " & shogb.Data
+
+	Dim sto
+SCREEN.IgnoreChange True
+
+	If mmgb < 3 Then	c_hogb.Checked = False
+
+	If SCREEN.GetMapName(1) = "IB105000" Then
+		Select Case Right(shogb.Data,1)
+		Case 1,2,3,6,7 	'-- ELW는 시간외,중간가, 시장가,최유리,최우선 없음
+			shogb.Data = "00"
+			'MsgBox "ELW는 해당 구분으로 주문이 불가능합니다.", ,"IBK투자증권"
+		End Select
+	End If
+
+	' 시장가 선택시 색상 붉은색으로 강조
+	If shogb.Data = "03" Or shogb.Data = "13" Or shogb.Data = "23" Then
+		shogb.trgb = "94"
+	Else
+		shogb.trgb = "130"
+	End If
+
+	' 스톱지정가 EditBox Disable (Default)
+	If UCase(TypeName( SCREEN.Object("edStopPrc") )) <> "NOTHING" Then
+		edStopPrc.Visible = False
+		'edStopPrc.Data = "0"
+
+		If UCase(TypeName( SCREEN.Object("labelStop") )) <> "NOTHING" Then
+			labelStop.Visible = False
+		End If
+
+		If UCase(TypeName( SCREEN.Object("btnStopQS") )) <> "NOTHING" Then
+			btnStopQS.Visible = False
+		End If
+	End If
+
+
+	' 호가유형 선택에 따른 가격창 Enable/Disable
+	Select Case shogb.Data
+		Case "01"	' 스톱지정가 2025.03.04
+			ed_hogb.Data = "01"
+			ed_jprc.Enable = True
+			If IsStopOrderMap() = True Then
+				If UCase(TypeName( SCREEN.Object("edStopPrc") )) <> "NOTHING" Then
+					edStopPrc.Visible = True
+					edStopPrc.Enable = True
+					If UCase(TypeName( SCREEN.Object("labelStop") )) <> "NOTHING" Then
+						labelStop.Visible = True
+					End If
+
+					If UCase(TypeName( SCREEN.Object("btnStopQS") )) <> "NOTHING" Then
+						btnStopQS.Visible = True
+					End If
+
+					Select Case mmgb
+					Case 1, 2	' 매수/매도
+						If SCREEN.Object("main.OBJ_order.OBJ_odr.edStopPrc").Enable = True And SCREEN.Object("main.OBJ_order.OBJ_odr.edStopPrc").Visible = True Then
+							Dim mapid, symb
+							mapid = SCREEN.Object("main.OBJ_sise").getobject()
+
+							Select Case Left(SCREEN.GetMapName(1),6)
+							Case "IB5000"
+								symb = "14723"
+							Case Else
+								symb = "2023"
+							End Select
+
+							If CDbl(edStopPrc.Data) =< 0 Then
+								edStopPrc.Data = SCREEN.Object("main.OBJ_sise."&symb).Data
+							End If
+						End If
+					Case 3	 ' 정정/취소
+						sto = SYSTEM.Pop ("S_stov")
+						If UCase(TypeName( SCREEN.Object("main.OBJ_order.OBJ_odr.edStopPrc"))) <> "NOTHING" Then
+							Select Case Trim(sto)
+								Case "효력즉시발생"	' 스톱지정가 호가
+									SCREEN.Object("main.OBJ_order.OBJ_odr.edStopPrc").Enable = False
+								Case "효력발생"	' 스톱지정가 호가
+									SCREEN.Object("main.OBJ_order.OBJ_odr.edStopPrc").Enable = False
+								Case "효력미발생","접수완료"	' 스톱지정가 호가
+									SCREEN.Object("main.OBJ_order.OBJ_odr.edStopPrc").Enable = True
+								Case Else	' 그 외 호가
+									SCREEN.Object("main.OBJ_order.OBJ_odr.edStopPrc").Enable = False
+							End Select
+						End If
+					End Select
+
+				End If
+
+			End If
+
+		Case "02", "12", "22"		' 중간가(' ', IOC, FOK) 2025.03.04
+			ed_hogb.Data = "02"
+			ed_jprc.Data = "0"
+			ed_jprc.Enable = False
+			If IsStopOrderMap() = True Then
+				If UCase(TypeName( SCREEN.Object("edStopPrc") )) <> "NOTHING" Then
+					edStopPrc.Data = "0"
+				End If
+
+				If UCase(TypeName( SCREEN.Object("btnStopQS") )) <> "NOTHING" Then
+						btnStopQS.Visible = True
+					End If
+			End If
+
+		Case "65"	                ' 경매매
+			ed_hogb.Data = "65"
+'			ed_jprc.Data = "0"
+			ed_jprc.Enable = True
+			If UCase(TypeName( SCREEN.Object("edStopPrc") )) <> "NOTHING" Then
+				edStopPrc.Data = "0"
+			End If
+
+		Case "00", "10", "20"		' 보통/지정가(' ', IOC, FOK)/경매매
+			ed_hogb.Data = "00"
+'			ed_jprc.Data = "0"
+			ed_jprc.Enable = True
+			If UCase(TypeName( SCREEN.Object("edStopPrc") )) <> "NOTHING" Then
+				edStopPrc.Data = "0"
+			End If
+
+		Case "03", "13", "23"		' 시장가(' ', IOC, FOK)
+			ed_hogb.Data = "03"
+			ed_jprc.Data = "0"
+			ed_jprc.Enable = False
+			If mmgb < 3 Then
+				c_hogb.Checked = True
+
+				Select Case shogb.Data
+				Case "03"	' 시장가(FAS)
+					c_hogb.Caption = "시장가"
+				Case "13"	' 시장가(IOC)
+					c_hogb.Caption = "시장가(IOC)"
+				Case "23"	' 시장가(FOK)
+					c_hogb.Caption = "시장가(FOK)"
+				End Select
+			End If
+			If UCase(TypeName( SCREEN.Object("edStopPrc") )) <> "NOTHING" Then
+				edStopPrc.Data = "0"
+			End If
+
+		Case "05"					' 조건부
+			ed_hogb.Data = shogb.Data
+			ed_jprc.Enable = True
+			If UCase(TypeName( SCREEN.Object("edStopPrc") )) <> "NOTHING" Then
+				edStopPrc.Data = "0"
+			End If
+
+		Case "06", "16", "26"		'최유리(' ', IOC, FOK)
+			ed_hogb.Data = "06"
+			ed_jprc.Data = "0"
+			ed_jprc.Enable = False
+			If UCase(TypeName( SCREEN.Object("edStopPrc") )) <> "NOTHING" Then
+				edStopPrc.Data = "0"
+			End If
+
+		Case "08","18","28"
+			ed_hogb.Data = "76"
+			ed_jprc.Data = "0"
+			ed_jprc.Enable = False
+			If UCase(TypeName( SCREEN.Object("edStopPrc") )) <> "NOTHING" Then
+				edStopPrc.Data = "0"
+			End If
+
+		Case "82"
+			ed_hogb.Data = "82"
+			ed_jprc.Enable = True
+			If UCase(TypeName( SCREEN.Object("edStopPrc") )) <> "NOTHING" Then
+				edStopPrc.Data = "0"
+			End If
+
+		Case Else '"61", "81", "07"		'장전시간외(61), 장마감시간외(81), 최우선
+			ed_hogb.Data = shogb.Data
+			ed_jprc.Data = "0"
+			ed_jprc.Enable = False
+			If UCase(TypeName( SCREEN.Object("edStopPrc") )) <> "NOTHING" Then
+				edStopPrc.Data = "0"
+			End If
+	End Select
+
+	c_pric.Enable = ed_jprc.Enable
+
+	'-- 주문조건 (0:없음, 1:IOC, 2:FOK)
+	Select Case Left(shogb.Data,1)
+	Case "1", "2"
+		ed_jmgb.Data = Left(shogb.Data,1)
+
+		'주문가능화면 호가유형코드 설정(신용시에만)
+		If mmgb < 3 Then
+			If R_credit.Checked = True Then
+				Call SetJumunGanun(shogb.Data)
+			End If
+		End If
+	Case Else
+		ed_jmgb.Data = "0"
+	End Select
+
+	ed_jqty.SetFocus
+
+	' "자동" 버튼의 종속 시세 선택 콤보박스 Visible True/False
+	Check_cboPrice()
+SCREEN.IgnoreChange False
+
+End Sub
+
+
+
+
+
+
+Sub SetJumunGanun(comboType)
+	Dim mapName
+	mapName = SCREEN.GetMapName(1)
+
+	If UCase(TypeName( SCREEN.Object("OBJ_trust_avol.EDIT0") )) = "NOTHING" Then
+		Exit Sub
+	End If
+
+	Select Case comboType
+		Case "81","82","61"
+			SCREEN.Object("OBJ_trust_avol.EDIT0").data = "81"
+			Select Case mapName
+			Case "IB100100", "IB200000", "IB2000XX", "IB2000YY", "IB300000", "IB800000", "IB000100", "IB103100"
+				If SCREEN.Object("main.tab_account").ID = "7" Then
+					SCREEN.Proc "main.OBJ_account.setRadio", "1"
+				End If
+
+			Case "IB100200"
+				If SCREEN.Object("main.TAB1").ID = "7" Then
+					SCREEN.Proc "main.OBJ_account.setRadio", "1"
+				End If
+
+			Case "IB500000"
+				If SCREEN.Object("main.tab_account").ID = "4" Then
+					SCREEN.Proc "main.OBJ_account.setRadio", "1"
+				End If
+
+			End Select
+
+		Case Else
+
+			SCREEN.Object("OBJ_trust_avol.EDIT0").data = comboType
+			Select Case mapName
+			Case "IB100100", "IB200000", "IB2000XX", "IB2000YY", "IB300000", "IB800000", "IB000100", "IB103100"
+				If SCREEN.Object("main.tab_account").ID = "7" Then
+					SCREEN.Proc "main.OBJ_account.setRadio", "2"
+				End If
+
+			Case "IB100200"
+				If SCREEN.Object("main.TAB1").ID = "7" Then
+					SCREEN.Proc "main.OBJ_account.setRadio", "2"
+				End If
+
+			Case "IB500000"
+				If SCREEN.Object("main.tab_account").ID = "4" Then
+					SCREEN.Proc "main.OBJ_account.setRadio", "2"
+				End If
+			End Select
+
+	End Select
+End Sub
+
+
+
+
+
+
+
+'***************************************************************************
+' DESC: 호가조건 radio button Click 시 Setting
+'***************************************************************************
+Sub Set_radio_hogb()
+SCREEN.IgnoreChange True
+	' 스톱지정가 EditBox Disable (Default)
+	If UCase(TypeName( SCREEN.Object("edStopPrc") )) <> "NOTHING" Then
+		edStopPrc.Visible = False
+		edStopPrc.Data = 0
+		If UCase(TypeName( SCREEN.Object("labelStop") )) <> "NOTHING" Then
+			labelStop.Visible = False
+		End If
+
+		If UCase(TypeName( SCREEN.Object("btnStopQS") )) <> "NOTHING" Then
+			btnStopQS.Visible = False
+		End If
+	End If
+
+	If c_hogb.Checked = True Then	'시장가
+		shogb.trgb = "94"
+
+		' 시장별 시장가 세팅
+		' KRX : 03시장가
+		' NXT : 13시장가(IOC)
+		' SOR : 13시장가(IOC)
+		If UCase(TypeName( SCREEN.Object("cxMarket"))) <> "NOTHING" Then
+			Select Case Trim(cxMarket.sMarket)
+			Case "KRX"	' KRX
+				shogb.Data = "03"
+
+			Case "NXT"	' NXT
+				shogb.Data = "13"
+
+			Case "통합"	' SOR
+				shogb.Data = "13"
+			End Select
+		Else
+			shogb.Data = "03"
+		End If
+
+		ed_jprc.Data = "0"
+		ed_jprc.Enable = False
+		If UCase(TypeName( SCREEN.Object("CHK_auto") )) <> "NOTHING" Then
+			CHK_auto.Enable = False
+		End If
+		If UCase(TypeName( SCREEN.Object("cboPrice"))) <> "NOTHING" Then
+			cboPrice.Enable = False
+		End If
+	Else	' 지정가
+		shogb.trgb = "130"
+		shogb.Data = "00"
+		ed_jprc.Enable = True
+		If UCase(TypeName( SCREEN.Object("CHK_auto") )) <> "NOTHING" Then
+			CHK_auto.Enable = True
+		End If
+		If UCase(TypeName( SCREEN.Object("cboPrice"))) <> "NOTHING" Then
+				cboPrice.Enable = True
+			End If
+		Call QueryHoga()
+	End If
+
+	' 현금 체크 시 금액버튼 활성화
+	If UCase(TypeName( SCREEN.Object("R_cash"))) <> "NOTHING" Then
+		If R_cash.Checked = True Then	' 현금 체크시
+			If UCase(TypeName( SCREEN.Object("BUTTON5"))) <> "NOTHING" Then
+	 			BUTTON5.Visible = True	' 금액 버튼 활성화
+ 			End If
+		End If
+	End If
+
+	c_pric.Enable = ed_jprc.Enable
+'	ed_hogb.Data = shogb.Data
+'	ed_jmgb.Data = "0" 'IOC FOK RESET
+	Set_comb_hogb()
+	ed_jqty.SetFocus
+
+
+
+SYSTEM.Trace "      [999912] Set_radio_hogb"
+SCREEN.IgnoreChange False
+End Sub
+
+
+
+
+'***************************************************************************
+' DESC: 정정/취소조건 Setting 1:일부 2:전부
+'***************************************************************************
+Sub Set_mdgb()
+	If r_mdgb0.Checked = True Then
+		ed_mdgb.Data = "2"						'전부
+		ed_jqty.Data = "00000000"
+		ed_jqty.Enable = False
+		ed_ogno.SetFocus
+	ElseIf r_mdgb1.Checked = True Then
+		ed_mdgb.Data = "1"						'일부
+		ed_jqty.Enable = True
+		ed_jqty.SetFocus
+	End If
+	c_jqty.Enable = ed_jqty.Enable
+End Sub
+
+
+
+
+
+
+
+
+'***************************************************************************
+'외부에서 옵션 바꿀때, 계좌쪽에서 호출시 가격만 Setting
+'***************************************************************************
+Sub change_option(gubn)
+	OrdCfg.ItemCd = S1301.Data
+	If (mmgb = "1" Or mmgb = "2") And gubn = "account" Then
+		'단가설정
+		If shogb.Data = "00" Or shogb.Data = "05" Then			'지정, 조건부지정
+			If OrdCfg.KeepPrc = False Then						'주문전 or 주문수량유지안함
+				OrdCfg.QueryHoga								'기본단가설정 사용
+			End If
+		Else
+			ed_jprc.Data = ""
+		End If
+	Else
+		Call QueryOption("common")
+	End If
+	Call Set_mkgb(S1301.Data)
+End Sub
+
+
+
+
+
+
+
+
+
+'***************************************************************************
+' 주식 정정/취소시 원주문번호,주문단가 셋팅
+'***************************************************************************
+Sub Get_jmno ()
+
+	Dim ret, prc, num, cod, cPos, mkg, sto, odt
+
+	o_jmno.data = ""
+	num = SYSTEM.Pop ("S_ogno")		' 원주문번호
+	prc = SYSTEM.Pop ("S_jprc")		' 주문가격
+	cod = SYSTEM.Pop ("S_code")		' 종목코드
+	odt = SYSTEM.Pop ("S_odty")		' 주문유형 (지정가, 시장가, ...)
+	sto = SYSTEM.Pop ("S_stov")		' 스탑지정가 유형
+	mkg = SYSTEM.Pop ("S_mkgb")		' 스탑지정가 유형
+
+SYSTEM.Trace "      [999912] Get_jmno : " & cod
+
+	' 미체결내역 클릭 시, 주문호가 유형 세팅
+	' 기존에 다른 주문유형을 세팅하지 않고 있었기 때문에,
+	' 스톱지정가만 세팅
+	If UCase(TypeName( SCREEN.Object("main.OBJ_order.OBJ_odr.shogb"))) <> "NOTHING" Then
+		If Trim(odt) <> "" Then
+			Select Case odt
+	'			Case "지정가" : 			SCREEN.Object("main.OBJ_order.OBJ_odr.shogb").Data = "00"
+	'			Case "시장가" :				SCREEN.Object("main.OBJ_order.OBJ_odr.shogb").Data = "03"
+	'			Case "조건부지정가" :		SCREEN.Object("main.OBJ_order.OBJ_odr.shogb").Data = "05"
+	'			Case "최유리지정가" :		SCREEN.Object("main.OBJ_order.OBJ_odr.shogb").Data = "06"
+	'			Case "최우선지정가" :		SCREEN.Object("main.OBJ_order.OBJ_odr.shogb").Data = "07"
+	'			Case "지정가(IOC)" : 		SCREEN.Object("main.OBJ_order.OBJ_odr.shogb").Data = "10"
+	'			Case "시장가(IOC)" : 		SCREEN.Object("main.OBJ_order.OBJ_odr.shogb").Data = "13"
+	'			Case "최유리지정가(IOC)" : 	SCREEN.Object("main.OBJ_order.OBJ_odr.shogb").Data = "16"
+	'			Case "지정가(FOK)" : 		SCREEN.Object("main.OBJ_order.OBJ_odr.shogb").Data = "20"
+	'			Case "시장가(FOK)" : 		SC REEN.Object("main.OBJ_order.OBJ_odr.shogb").Data = "23"
+	'			Case "최유리지정가(FOK)" : 	SCREEN.Object("main.OBJ_order.OBJ_odr.shogb").Data = "26"
+	'			Case "경매매" : 			SCREEN.Object("main.OBJ_order.OBJ_odr.shogb").Data = "65"
+				Case "스톱지정가" : 		SCREEN.Object("main.OBJ_order.OBJ_odr.shogb").Data = "01"
+											Set_comb_hogb()
+				Case "중간가"     : 		SCREEN.Object("main.OBJ_order.OBJ_odr.shogb").Data = "02"
+											Set_comb_hogb()
+	'			Case "중간가(IOC)": 		SCREEN.Object("main.OBJ_order.OBJ_odr.shogb").Data = "12"
+	'			Case "중간가(FOK)": 		SCREEN.Object("main.OBJ_order.OBJ_odr.shogb").Data = "22"
+	'			Case "장후시간외" : 		SCREEN.Object("main.OBJ_order.OBJ_odr.shogb").Data = "81"
+	'			Case "장전시간외" : 		SCREEN.Object("main.OBJ_order.OBJ_odr.shogb").Data = "61"
+				Case "시간외단일가" : 		SCREEN.Object("main.OBJ_order.OBJ_odr.shogb").Data = "82"
+											Set_comb_hogb()
+			End Select
+
+		End If
+	End If
+
+	' 스톱지정가 유형인 경우 해당 케이스에 맞는 화면 세팅
+	If Trim(sto) <> "" Then
+		'MsgBox SCREEN.Object("main.OBJ_order.tab_order").ID
+		If SCREEN.Object("main.OBJ_order.tab_order").ID <> 4 Then
+			'MsgBox UCase(TypeName( SCREEN.Object("main.OBJ_order.OBJ_odr.edStopPrc")))
+			If UCase(TypeName( SCREEN.Object("main.OBJ_order.OBJ_odr.edStopPrc"))) <> "NOTHING" Then
+				Select Case Trim(sto)
+				Case "효력즉시발생"	' 스톱지정가 호가
+					'MsgBox sto & "3"
+					SCREEN.Object("main.OBJ_order.OBJ_odr.edStopPrc").Enable = False
+					SCREEN.Object("main.OBJ_order.OBJ_odr.edStopPrc").Data = 0
+					SCREEN.Object("main.OBJ_order.OBJ_odr.edStopPrc").Visible = True
+					SCREEN.Object("main.OBJ_order.OBJ_odr.labelStop").Visible = True
+
+				Case "효력발생"	' 스톱지정가 호가
+					SCREEN.Object("main.OBJ_order.OBJ_odr.edStopPrc").Enable = False
+					SCREEN.Object("main.OBJ_order.OBJ_odr.edStopPrc").Data = 0
+					SCREEN.Object("main.OBJ_order.OBJ_odr.edStopPrc").Visible = True
+					SCREEN.Object("main.OBJ_order.OBJ_odr.labelStop").Visible = True
+
+				Case "효력미발생","접수완료"	' 스톱지정가 호가
+					SCREEN.Object("main.OBJ_order.OBJ_odr.edStopPrc").Enable = True
+					SCREEN.Object("main.OBJ_order.OBJ_odr.edStopPrc").Visible = True
+					SCREEN.Object("main.OBJ_order.OBJ_odr.labelStop").Visible = True
+
+				Case Else	' 그 외 호가
+					SCREEN.Object("main.OBJ_order.OBJ_odr.edStopPrc").Enable = False
+					SCREEN.Object("main.OBJ_order.OBJ_odr.edStopPrc").Data = 0
+					SCREEN.Object("main.OBJ_order.OBJ_odr.edStopPrc").Visible = False
+					SCREEN.Object("main.OBJ_order.OBJ_odr.labelStop").Visible = False
+				End Select
+			End If
+		End If
+	End If
+
+	' 원주문번호 클리어
+	If S1301.Data <> cod Then
+		SCREEN.IgnoreChange True
+		If SCREEN.GetMapName(1) <> "IB101100" Then
+			ed_ogno.Clear
+		End If
+		SCREEN.IgnoreChange False
+
+SYSTEM.Trace "      [999912] Get_jmno EXIT"
+		Exit Sub
+	End If
+
+	' 정정/취소 화면에 주문단가 세팅
+	If SCREEN.Object("parent.tab_order").index = 3 Then
+		If Trim(prc) <> "" Then
+			SCREEN.IgnoreChange True
+			Select Case OrdCfg.ReadCfg("JJPrcGb")			' 주문설정 : 주문단가
+			Case "2"				'정정주문의 주문단가 조회
+				ed_jprc.data = prc
+			Case "1"				'현재가 조회
+				ed_jprc.Data = SCREEN.Object("main.OBJ_sise.2023").Data
+'			Case "0"
+'				ed_jprc.Data = "0"
+			End Select
+
+			SCREEN.IgnoreChange False
+		End If
+	End If
+
+	' 원주문 번호 세팅
+	If Trim(num) <> "000000" And Trim(num) <> "" Then
+		ed_ogno.data = num
+	End If
+SYSTEM.Trace "      [999912]ChangeCode End"
+End Sub
+
+
+
+
+
+
+'***************************************************************************
+' 주식 정정/취소시 원주문번호,주문단가 셋팅_종합화면 미체결용
+'***************************************************************************
+Sub Get_jmno_Mche()
+SYSTEM.Trace "      [999912] Get_jmno_Mche "
+	Dim ret, prc, num, cod, cPos, mkg, odt
+
+	o_jmno.data = ""
+	num = SYSTEM.Pop ("S_ogno")
+	prc = SYSTEM.Pop ("S_jprc")
+	cod = SYSTEM.Pop ("S_code")
+	odt = SYSTEM.Pop ("S_odty")
+
+	If S1301.Data <> cod Then
+		Exit Sub
+	End If
+
+	' 미체결내역 클릭 시, 주문호가 유형 세팅
+	' 기존에 다른 주문유형을 세팅하지 않고 있었기 때문에,
+	' 스톱지정가만 세팅
+	If UCase(TypeName( SCREEN.Object("main.OBJ_order.OBJ_odr.shogb"))) <> "NOTHING" Then
+		If Trim(odt) <> "" Then
+			Select Case odt
+	'			Case "지정가" : 			SCREEN.Object("main.OBJ_order.OBJ_odr.shogb").Data = "00"
+	'			Case "시장가" :				SCREEN.Object("main.OBJ_order.OBJ_odr.shogb").Data = "03"
+	'			Case "조건부지정가" :		SCREEN.Object("main.OBJ_order.OBJ_odr.shogb").Data = "05"
+	'			Case "최유리지정가" :		SCREEN.Object("main.OBJ_order.OBJ_odr.shogb").Data = "06"
+	'			Case "최우선지정가" :		SCREEN.Object("main.OBJ_order.OBJ_odr.shogb").Data = "07"
+	'			Case "지정가(IOC)" : 		SCREEN.Object("main.OBJ_order.OBJ_odr.shogb").Data = "10"
+	'			Case "시장가(IOC)" : 		SCREEN.Object("main.OBJ_order.OBJ_odr.shogb").Data = "13"
+	'			Case "최유리지정가(IOC)" : 	SCREEN.Object("main.OBJ_order.OBJ_odr.shogb").Data = "16"
+	'			Case "지정가(FOK)" : 		SCREEN.Object("main.OBJ_order.OBJ_odr.shogb").Data = "20"
+	'			Case "시장가(FOK)" : 		SCREEN.Object("main.OBJ_order.OBJ_odr.shogb").Data = "23"
+	'			Case "최유리지정가(FOK)" : 	SCREEN.Object("main.OBJ_order.OBJ_odr.shogb").Data = "26"
+	'			Case "경매매" : 			SCREEN.Object("main.OBJ_order.OBJ_odr.shogb").Data = "65"
+				Case "스톱지정가" : 		SCREEN.Object("main.OBJ_order.OBJ_odr.shogb").Data = "01"
+	'			Case "중간가"     : 		SCREEN.Object("main.OBJ_order.OBJ_odr.shogb").Data = "02"
+	'			Case "중간가(IOC)": 		SCREEN.Object("main.OBJ_order.OBJ_odr.shogb").Data = "12"
+	'			Case "중간가(FOK)": 		SCREEN.Object("main.OBJ_order.OBJ_odr.shogb").Data = "22"
+	'			Case "장후시간외" : 		SCREEN.Object("main.OBJ_order.OBJ_odr.shogb").Data = "81"
+	'			Case "장전시간외" : 		SCREEN.Object("main.OBJ_order.OBJ_odr.shogb").Data = "61"
+	'			Case "시간외단일가" : 		SCREEN.Object("main.OBJ_order.OBJ_odr.shogb").Data = "82"
+			End Select
+			Set_comb_hogb()
+		End If
+	End If
+
+
+	If SCREEN.Object("parent.tab_order").index = 3 Then
+		If Trim(prc) <> "" Then
+			SCREEN.IgnoreChange True
+			Select Case OrdCfg.ReadCfg("JJPrcGb")			' 주문설정 : 주문단가
+			Case "2"				'정정주문의 주문단가 조회
+				ed_jprc.data = prc
+			Case "1"				'현재가 조회
+				ed_jprc.Data = SCREEN.Object("main.OBJ_sise.2023").Data
+			End Select
+
+			SCREEN.IgnoreChange False
+		End If
+	End If
+
+	If Trim(num) <> "000000" And Trim(num) <> "" Then
+		ed_ogno.data = num
+	End If
+End Sub
+
+
+
+
+
+
+'***************************************************************************
+' DESC: 주문전 Error Check
+'***************************************************************************
+Function Error_check()
+	Dim mstr
+	Error_check = False
+	If Trim(ed_acno.Data) = "" Then
+		SCREEN.Object(an_symb).SetFocus
+		MsgBox "계좌번호를 입력하십시오.", , "IBK투자증권"
+		Exit Function
+	End If
+
+	If Len(Trim(ed_pswd.Data)) < 4 Then
+		SCREEN.Object(pw_symb).SetFocus
+		MsgBox "비밀번호를 입력하십시오.", , "IBK투자증권"
+		Exit Function
+	End If
+
+	Select Case mmgb
+		Case "1" : mstr = "매도"
+		Case "2" : mstr = "매수"
+		Case "3" : mstr = "정정"
+		Case "4" : mstr = "취소"
+	End Select
+
+	' 시장구분 Set
+	' 신주인수권 화면 제외 나머지는 다음을 적용
+	If SCREEN.GetMapName(1) <> "IB680100" And SCREEN.GetMapName(1) <> "IB610100" Then
+		If	Set_mkgb(S1301.Data) = False Then
+			MsgBox "종목코드를 확인하십시오.", , "IBK투자증권"
+			S1301.SetFocus
+			Exit Function
+		End If
+	End If
+
+	'주문수량 check
+	If ed_jqty.Enable = True And Is_numeric(ed_jqty.Data) = False Then
+		MsgBox mstr & "수량을 입력하십시오.", , "IBK투자증권"
+		ed_jqty.SetFocus
+		Exit Function
+	End If
+
+	'주문단가 check
+'	If mstr <> "취소" Then
+	If 	ed_mmgb.Data <> "4" Then
+		If ed_jprc.Enable = True And Is_numeric(ed_jprc.Data) = False Then
+			MsgBox mstr & "가격을 입력하십시오.", , "IBK투자증권"
+			ed_jprc.SetFocus
+			Exit Function
+		End If
+	End If
+
+	If mstr = "정정" Or mstr = "취소" Then
+		If Is_numeric(ed_ogno.Data) = False Then
+			MsgBox "원주문번호를 확인하십시오.", , "IBK투자증권"
+			ed_ogno.SetFocus
+			Exit Function
+		End If
+
+		' NXT 시장은 스톱지정가에 대한 정정을 지원하지 않는다
+'		If UCase(TypeName( SCREEN.Object("cxMarket") )) <> "NOTHING" Then
+'			If cxMarket.sMarket = "NXT" Then
+'				If shogb.Data = "01" And ed_mmgb.Data = "3" Then	' 스톱지정가
+'					MsgBox "NXT 스톱지정가 정정주문은" & vbLf & "스톱가격을 정정할 수 없어요.", , "IBK투자증권"
+'					shogb.SetFocus()
+'					Exit Function
+'				End If
+'			End If
+'		End If
+	End If
+
+	' 신주인수권 화면은 다음을 적용
+	If SCREEN.GetMapName(1) = "IB680100" Or SCREEN.GetMapName(1) = "IB610100" Then
+		Error_check = True
+		Exit Function
+	End If
+
+	'주문착오방지를 위한 모범규준 check
+	If chk_mistake_order(S1301.Data) = False Then
+		Exit Function
+	End If
+
+	' ELW 종목 여부 확인
+	If SCREEN.GetCodeType(S1301.Data) = "9" Then
+		'ELW주문착오 방지 check
+		If chk_elw_price(S1301.Data) = False Then
+			Exit Function
+		End If
+	End If
+
+
+	Error_check = True
+End Function
+
+
+
+
+
+
+
+
+'****************************************************************************
+' input: 매매구분. 1-매도, 2-매수, 3-정정, 4-취소
+'****************************************************************************
+Sub SetConfig()
+	SCREEN.Object(an_symb).TabStop = OrdCfg.TabAccount
+	SCREEN.Object(pw_symb).TabStop = OrdCfg.TabPassword
+	S1301.TabStop = OrdCfg.TabCode
+	ed_jqty.TabStop = OrdCfg.TabQty
+	JUMUN_B.TabStop = OrdCfg.TabButton
+	If mmgb <> "4" Then
+		ed_jprc.TabStop = OrdCfg.TabPrc
+	End If
+	If mmgb = "1" Or mmgb = "2" Then		'매도/매수 주문시
+		shogb.TabStop = OrdCfg.TabMMGB
+		SCREEN.Proc "parent.Set_Auto", mmgb
+	End If
+	Select Case mmgb
+	Case "1" : cboPrice.Data = OrdCfg.ReadCfg("SellPrcGB")
+	Case "2" : cboPrice.Data = OrdCfg.ReadCfg("BuyPrcGB")
+'	Case "3" : cboPrice.Data = OrdCfg.ReadCfg("JJPrcGB")
+	End Select
+End Sub
+
+
+
+
+
+
+
+'****************************************************************************
+' DESC: 주문옵션적용 when: common(주문전), after(주문후)
+'****************************************************************************
+Sub QueryOption(when)
+	Dim qtyOpt
+
+	If when = "after" Then
+		If OrdCfg.KeepQty = False Then		'-- 수량유지안함
+			ed_jqty.Data = "0"
+		End If
+		' 금감원 원칙으로 주문후 원주문번호 clear
+		Select Case mmgb
+		Case "3", "4"
+			ed_ogno.Data = ""
+		End Select
+
+		If mmgb <> "4" And OrdCfg.KeepPrc = False Then		'-- 단가유지안함
+			ed_jprc.Data = "0"
+			If UCase(TypeName( SCREEN.Object("edStopPrc") )) <> "NOTHING" Then
+				edStopPrc.Data = "0"
+			End If
+		End If
+		Exit Sub
+	End If
+
+	Select Case mmgb
+		Case "3"
+			If Mid(SCREEN.GetMapName(1),1,5)="IB101" Then
+				If Trim(SCREEN.Object("main.ed_jprc").Data) <> "" Then
+					Exit Sub
+				End If
+			End If
+
+			Call QueryHoga()
+			Exit Sub
+
+		Case "4"
+			Call QueryHoga()
+			Exit Sub
+	End Select
+
+	'단가설정
+	If Right(shogb.Data,1) = 3 Or Right(shogb.Data,1) = 2  Then	'시장가 (03, 13) 중간가(02)
+		ed_jprc.Data = "0"
+	Else
+		If when = "common" Then	'주문전
+
+'			Call QueryHoga()	'OrdCfg.QueryHoga			'기본단가설정 사용
+		End If
+	End If
+
+	'수량설정
+	If when = "common" Then		'주문전
+		QueryOption_qty()
+	End If
+
+	SCREEN.Object("main.guide").Text = " "					'메세지
+	SCREEN.Proc "OBJ_JUNGSAN.CalcJungsan", ""
+
+End Sub
+
+
+
+
+
+
+
+
+Sub QueryOption_qty()
+	'	100616 잔고에서 클릭하였는지 여부 확인
+	Dim tQty, tClick
+	tQty = Trim(SYSTEM.Pop("J_qty"))
+	tClick = Trim(SYSTEM.Pop("J_click"))
+
+	If tClick <> "" And mmgb = "1" Then
+		ed_jqty.Data = tQty
+'		SYSTEM.Push "J_qty", ""
+		Exit Sub
+	End If
+
+	' 신주인수권 관련 화면은 SKIP 처리
+	If SCREEN.GetMapName(1) = "IB680100" Or SCREEN.GetMapName(1) = "IB610100" Then
+		Exit Sub
+	End If
+
+	OrdCfg.Price = ed_jprc.data
+	OrdCfg.Push
+	Dim qtyOpt, cfgGB, strPop, strPop2
+	Select Case mmgb
+		Case "1" : cfgGB = "SellQtyGB"
+		Case "2" : cfgGB = "BuyQtyGB"
+		Case Else : Exit Sub
+	End Select
+	qtyOpt = OrdCfg.ReadCfg(cfgGB)							'수량설정 index
+
+	Select Case qtyOpt
+		Case "0"					'수량
+			OrdCfg.SetDoQty(True)
+			OrdCfg.QueryQty
+
+			If SCREEN.GetMapName(1) = "IB101100" Then
+				l_avol.Text = "4"		'가능수량을 최소가능수량으로 return함
+			Else
+				l_avol.Text = "1"
+			End If
+		Case "2"                    ' 금액매수 Set
+			If SCREEN.GetMapName(0) <> "IB1021T2" Then
+				l_avol.Text = "금액"
+				SCREEN.SetTimer 3, False
+			End If
+
+		Case "1", "3"				'매도가능수량 Set
+			strPop = SYSTEM.Pop("ROTATEVIEW")
+			strPop2 = SYSTEM.Pop("ROTATEVIEW_C")
+
+			If (strPop <> "1") And (strPop2 <> "1") Then
+				l_avol.Text = qtyOpt
+				If Trim(SCREEN.Object(an_symb).data) <> "" And _
+					Trim(SCREEN.Object(pw_symb).Data) <> "" Then
+					SCREEN.SetTimer 3, False
+				End If
+			Else
+				l_avol.Text = "0"
+			End If
+
+		Case Else
+			l_avol.Text = "0"
+	End Select
+End Sub
+
+
+
+
+
+
+
+Sub QueryHoga()
+	Dim siseObj, prcOpt, cfgGB, mapid, mainmap, sdata
+
+	siseObj = "parent.parent.obj_sise."
+
+SYSTEM.Trace "      [999912] ---------------------------------------------------------"
+SYSTEM.Trace "      [999912] QueryHoga  1301 = " & S1301.data
+
+	If IsStopOrderMap = True Then
+
+		itype = SCREEN.GetName(199, S1301.Data,0)	' KONEX 종목 여부 판단 (28이면 KONEX)
+
+		If IsNumeric(itype) = True Then
+			If (itype <> 28) Then
+				itype = SCREEN.GetCodeType(S1301.Data)	' KONEX 종목이 아닌 경우 정상적으로 GetCodeType
+			End If
+		Else
+			SCREEN.GetCodeType(S1301.Data)	' KONEX 종목이 아닌 경우 정상적으로 GetCodeType
+		End If
+
+	Else
+		If UCase(TypeName( SCREEN.Object("edStopPrc") )) <> "NOTHING" Then
+			edStopPrc.Visible = False
+		End If
+
+		If UCase(TypeName( SCREEN.Object("labelStop") )) <> "NOTHING" Then
+			labelStop.Visible = False
+		End If
+	End If
+
+	prcOpt = siseObj & "1377"		'주문수량단위
+
+	If UCase(TypeName( SCREEN.Object(prcOpt) )) <> "NOTHING" Then
+		If Is_numeric(SCREEN.Object(prcOpt).Data) Then
+			ed_jqty.SetDelta SCREEN.Object(prcOpt).Data
+		End If
+	End If
+
+	' 정정/취소 화면 진입 시, 자동으로 마지막 주문번호 세팅하는 최종 로직 1
+	If IsQueryHoga.Data = "0" Then	'-- 주문가격 설정안함 (ex.잔고클릭시)
+		Call Get_Jmno()
+		IsQueryHoga.Data = " "
+		SCREEN.Proc "OBJ_JUNGSAN.CalcJungsan", ""
+		Exit Sub
+	End If
+
+	Select Case mmgb
+		Case "1" : cfgGB = "SellPrcGB"
+		Case "2" : cfgGB = "BuyPrcGB"
+		Case "3"
+			If Right(shogb.Data,1) = "3" Or  Right(shogb.Data,1) = "2" Then
+				ed_jprc.Data = "0" 'SSLDQ380
+			Else
+'				OrdCfg.QueryHoga
+			End If
+			SCREEN.Proc "OBJ_JUNGSAN.CalcJungsan", ""
+
+			' 정정/취소 화면 진입 시, 자동으로 마지막 주문번호 세팅하는 최종 로직 2
+			Call Get_Jmno()
+			Exit Sub
+
+		Case Else
+			SCREEN.Proc "OBJ_JUNGSAN.CalcJungsan", ""
+			Exit Sub
+	End Select
+
+	'시장가 (03, 13) 혹은 중간가(02)거나 시세자동 단가세팅이 해제되어 있는 경우
+	If Right(shogb.Data,1) = "3" Or Right(shogb.Data,1) = "2" Or chk_auto.Checked = False Then
+		If Mid(SCREEN.GetMapName(1),1,5)="IB101" Then				'미니주문??
+			If Trim(SCREEN.Object("main.ed_jprc").Data) <> "" Then
+				Exit Sub
+			End If
+		End If
+
+		'10/06/16 잔고에서 클릭했는지 확인
+		Dim tQty, tPrc, tClick
+
+		tClick = Trim(SYSTEM.Pop("J_click"))
+		tQty = Trim(SYSTEM.Pop("J_qty"))
+		tPrc = Trim(SYSTEM.Pop("J_jprc"))
+
+		If tClick = "YES" And mmgb = "1" Then
+			ed_jprc.Data = tPrc
+'			SYSTEM.Push "J_jprc", ""
+		Else
+			'2011/03/08 각 주문종합화면에서 obj_sise에서 탭이동시
+			'단가가 삭제되는 현상이 있어 주석처리. 단가삭제는 ChangeCode로 이동
+			'6801, 6901의 경우 종목변경시 이전 현재가가 입력되는 현상이 있어 단가를 0으로 초기화
+
+			If SCREEN.GetMapName(1) = "IB680100" Or SCREEN.GetMapName(1) = "IB690100" Then
+				ed_jprc.Data = 0
+			End If
+		End If
+
+		SCREEN.Proc "OBJ_JUNGSAN.CalcJungsan", ""
+		Exit Sub
+	End If
+
+	prcOpt = OrdCfg.ReadCfg(cfgGB)
+
+	If SCREEN.GetMapName(1) = "IB105000" And Left(prcOpt, 2) ="23" Then
+		ed_jprc.Data = 0
+		Exit Sub
+	End If
+
+	mapid = SCREEN.Object("main.obj_sise").getObject
+
+	Select Case mapid
+	Case "IB500040","IB882011" '시간외단일가
+		If Right(prcOpt, 2) = "03" Then
+			prcOpt = "14303"
+		ElseIf Right(prcOpt, 2) = "02" Then
+			prcOpt = "14920"
+		Else
+			prcOpt = "147" & Right(prcOpt, 2)
+		End If
+	Case Else
+	End Select
+
+	If mapid = "IB303021" Then
+		prcOpt = "14723"
+	ElseIf mapid = "IB303020" Then
+		prcOpt = "2023"
+	ElseIf SCREEN.GetMapName(1) = "IB101900" Then
+		prcOpt = "2023"
+	End If
+
+	prcOpt = siseObj & prcOpt
+	If Trim(shogb.data) = "05" Or Trim(Right(shogb.data,1)) = "0" Or Trim(shogb.data) = "82" Then
+		If Right(Trim(prcOpt),4) <> "2303" Or mapid = "IB882010" Or mapid = "IB1032ZZ" Then
+			If UCase(TypeName(SCREEN.Object(prcOpt))) <> "NOTHING" Then
+		 		ed_jprc.Data = SCREEN.Object(prcOpt).Data
+		 	End If
+		Else
+			ed_jprc.Data = SCREEN.Object("main.obj_obj_sise.2303").Data
+		End If
+	Else
+		ed_jprc.Data = 0
+		If UCase(TypeName( SCREEN.Object("edStopPrc") )) <> "NOTHING" Then
+			edStopPrc.Data = 0
+		End If
+	End If
+
+	SCREEN.Proc "OBJ_JUNGSAN.CalcJungsan", ""
+End Sub
+
+
+
+
+
+
+'****************************************************************************
+' DESC: 주문가능수량 설정
+'****************************************************************************
+Sub set_avol(data)
+	If Trim(data) = "" Then data = "0"
+SCREEN.IgnoreChange True
+	ed_jqty.Data = data
+	ed_jqty.SetFocus
+SCREEN.IgnoreChange False
+End Sub
+
+
+
+
+
+
+
+
+'****************************************************************************
+' DESC: 주문 후 커서 설정
+'****************************************************************************
+Sub SetCursor()
+	Select Case OrdCfg.ReadCfg("CursorPos")
+		Case "0" : SCREEN.Object(an_symb).SetFocus()
+		Case "1" : SCREEN.Object(pw_symb).SetFocus()
+		Case "2" : S1301.SetFocus()
+		Case "3" : ed_jqty.SetFocus()
+		Case "4" : ed_jprc.SetFocus()
+	End Select
+End Sub
+
+
+
+
+
+
+'****************************************************************************
+' DESC: 주문화면 당일손익 탭 트리거때문에 ㅠㅠ
+'****************************************************************************
+Sub send_sise_all_ds(xval)
+	S1301.data = Mid(Trim(Grid0.GetGridCell(GRID0.Row, 1)), 2)
+
+	S1301.Trigger "1301", True
+
+	If xval <> "jumun" Then
+		If SCREEN.GetMapName(1) = "IB200000" Or SCREEN.GetMapName(1) = "IB2000XX"Or SCREEN.GetMapName(1) = "IB2000YY" Then
+			SCREEN.IgnoreChange True
+			SCREEN.Object("main.OBJ_order.obj_odr.1301").Data = S1301.Data
+			SCREEN.IgnoreChange False
+			SCREEN.Proc "main.OBJ_order.obj_odr.ChCode", ""
+		Else
+		SCREEN.IgnoreChange True
+			SCREEN.Object("main.OBJ_order.obj_odr.1301").Data = S1301.Data
+			SCREEN.Object("main.OBJ_order1.obj_odr.1301").Data = S1301.Data
+			SCREEN.IgnoreChange False
+			SCREEN.Proc "main.OBJ_order.obj_odr.ChCode", ""
+			SCREEN.Proc "main.OBJ_order1.obj_odr.ChCode", ""
+		End If
+	End If
+
+	SCREEN.Object("main.OBJ_sise").Send
+	SCREEN.Object("main.OBJ_tuja").Send
+	SCREEN.Object("main.OBJ_etc").Send
+End Sub
+
+
+
+
+
+Sub set_chk_auto()
+SYSTEM.Trace "      [999912]set_chk_auto  shogb.Data = " & shogb.Data
+	If CHK_auto.Checked = True Then
+		Select Case cboPrice.Data
+			Case "2025"
+				ed_jprc.Data = SCREEN.Object("main.OBJ_sise.2025").Data
+			Case "2023"
+				ed_jprc.Data = SCREEN.Object("main.OBJ_sise.2023").Data
+			Case "2026"
+				ed_jprc.Data = SCREEN.Object("main.OBJ_sise.2026").Data
+			Case "2302"
+				ed_jprc.Data = SCREEN.Object("main.OBJ_sise.2302").Data
+			Case "2303"
+				ed_jprc.Data = SCREEN.Object("main.obj_obj_sise.2303").Data
+		End Select
+	End If
+End Sub
+
+
+
+
+
+Sub msg_chk_auto()
+	If CHK_auto.Checked = True Then
+		Dim msgx
+	 	msgx = "자동 체크시 시세에 따라 단가가 자동으로 변경되오니 이용시 주의바랍니다."
+		SCREEN.Object("main.guide").Text = msgx
+	 	MsgBox msgx, , "IBK투자증권"
+	End If
+
+	' "자동" 버튼의 종속 시세 선택 콤보박스 Visible True/False
+	Check_cboPrice()
+End Sub
+
+
+
+
+Function IsStopOrderMap()
+	IsStopOrderMap = False
+	Dim mapNum
+	mapNum = SCREEN.GetMapName(1)
+
+	' 스탑지정가 호가 유형이 있는 주문 화면 리스트
+	Select Case mapNum
+	Case "IB000100", "IB1011T0", "IB100100", "IB103300", "IB100200"
+		IsStopOrderMap = True
+	Case "IB2000YY", "IB2000XX", "IB300000", "IB800000", "IB102100"
+		IsStopOrderMap = True
+	Case "IB103100", "IB103200", "IB101900", "IB101100", "IB1021T0"
+		IsStopOrderMap = True
+	Case "IB101200", "IB101300", "IB282100", "IB100800", "IB303000"
+    	IsStopOrderMap = True
+	Case "IB500000", "IB882000"
+    	IsStopOrderMap = True
+	End Select
+
+SYSTEM.Trace "[999912]  IsStopOrderMap mapNum = [" & mapNum &  "]  = " & IsStopOrderMap
+End Function
+
+
+
+
+Sub SetPriceEdit(strEdit)
+	If IsStopOrderMap = True Then
+		Select Case SCREEN.GetMapName(1)
+			Case "IB2000XX"
+				If UCase(TypeName(SCREEN.Object("main.obj_reduce2.17412"))) <> "NOTHING" Then
+					SCREEN.Object("main.obj_reduce2.17412").SetPrcEdit(strEdit)
+				End If
+
+				If UCase(TypeName(SCREEN.Object("main.OBJ_sise.17412"))) <> "NOTHING" Then
+					SCREEN.Object("main.OBJ_sise.17412").SetPrcEdit(strEdit)
+				End If
+
+			Case "IB2000YY"
+				If UCase(TypeName(SCREEN.Object("main.OBJ_sise.17412"))) <> "NOTHING" Then
+					SCREEN.Object("main.OBJ_sise.17412").SetPrcEdit(strEdit)
+				End If
+
+			Case "IB103200"
+				If UCase(TypeName(SCREEN.Object("main.obj_reduce.17412"))) <> "NOTHING" Then
+					SCREEN.Object("main.obj_reduce.17412").SetPrcEdit(strEdit)
+				End If
+
+			Case "IB300000"
+				If UCase(TypeName(SCREEN.Object("main.OBJ_sise.OBJ_hoga.17412"))) <> "NOTHING" Then
+					SCREEN.Object("main.OBJ_sise.OBJ_hoga.17412").SetPrcEdit(strEdit)
+				End If	'obj_obj_sise
+
+			Case "IB100200"
+				If UCase(TypeName(SCREEN.Object("main.OBJ_sise.OBJ_hoga.17412"))) <> "NOTHING" Then
+					SCREEN.Object("main.OBJ_sise.OBJ_hoga.17412").SetPrcEdit(strEdit)
+				End If
+
+			Case "IB103300"
+				If UCase(TypeName(SCREEN.Object("main.obj_reduce.17412"))) <> "NOTHING" Then
+					SCREEN.Object("main.obj_reduce.17412").SetPrcEdit(strEdit)
+				End If
+
+			Case "IB282100"
+				If UCase(TypeName(SCREEN.Object("main.OBJ_sise.17415"))) <> "NOTHING" Then
+					SCREEN.Object("main.OBJ_sise.17415").SetPrcEdit(strEdit)
+				End If
+
+			Case Else
+				If UCase(TypeName(SCREEN.Object("main.OBJ_sise.17412"))) <> "NOTHING" Then
+					SCREEN.Object("main.OBJ_sise.17412").SetPrcEdit(strEdit)
+				End If
+		End Select
+	Else
+SYSTEM.Trace SCREEN.GetMapName(1) & "은 스톱주문 화면이 아님!!!!!!"
+	End If
+End Sub
+
+
+' "자동" 버튼의 종속 시세 선택 콤보박스 Visible True/False
+Sub Check_cboPrice()
+	If UCase(TypeName( SCREEN.Object("shogb"))) <> "NOTHING" Then
+		If UCase(TypeName( SCREEN.Object("cboPrice"))) <> "NOTHING" Then
+			If UCase(TypeName( SCREEN.Object("CHK_auto"))) <> "NOTHING" Then
+
+				flag = SYSTEM.Pop("auto_flag_s")
+
+				Select Case shogb.Data
+						Case "00", "01", "05", "10", "20"  '지정가, 스톱지정가, 지정가IOC, 지정가FOK
+							cboPrice.Enable = True
+							CHK_auto.Enable = True
+							CHK_auto.Checked = (Mid(flag,mmgb,1) = "1")
+
+						Case "03", "02", "06", "07", "13", "12", "16", "23", "22", "26", "81", "61"
+							cboPrice.Enable = False
+							CHK_auto.Enable = False
+
+						Case Else
+							cboPrice.Enable = True
+							CHK_auto.Enable = True
+				End Select
+			End If
+		End If
+	End If
+End Sub
+
+'****************************************************************************
+' DESC: 주버튼 클릭시 (cx_amount에 현재가등 pushcc)
+'****************************************************************************
+Sub Set_cx_amount()
+	If IsNumeric(Trim(SCREEN.Object("main.obj_sise.1377").Data)) Then
+		SYSTEM.Push "OSBJ1377", Trim(SCREEN.Object("main.obj_sise.1377").Data)
+SYSTEM.Trace "[주버튼] 1377 존재 = " & Trim(SCREEN.Object("main.obj_sise.1377").Data)		
+	Else
+SYSTEM.Trace "[주버튼] 1377 없어서 1"	
+		SYSTEM.Push "OSBJ1377", 1
+	End If
+	
+SYSTEM.Trace "[주버튼] jprc = " & Trim(ed_jprc.Data)
+	SYSTEM.Push "OSBJPrc", Trim(ed_jprc.Data)
+End Sub
+
+
+
+}
+
+
+
