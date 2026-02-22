@@ -1644,6 +1644,24 @@ WriteLog(m_slog);
 				{
 					m_mapDebugKey.RemoveAll();
 					m_mapDebugRemoveKey.RemoveAll();
+
+
+					int nCount = m_mapAlarmList.GetCount();
+					m_slog.Format("[mng][main]] Map Count = %d\n", nCount);
+					OutputDebugString(m_slog);
+
+					POSITION pos = m_mapAlarmList.GetStartPosition();
+					while (pos != NULL)
+					{
+						CString key, value;
+						m_mapAlarmList.GetNextAssoc(pos, key, value);
+
+						if (value == "1")
+						{
+							m_slog.Format("[mng][main]Key = %s Value = %s\n", key, value);
+							OutputDebugString(m_slog);
+						}
+					}
 				}
 				break;
 				case 'z':
@@ -4710,7 +4728,7 @@ OutputDebugString(m_slog);
 #ifdef DF_MAIN_RTS
 		case MMSG_SETSENDTR_TO_MAIN:  //관심등 화면에서 메인이 대신 sendtr 하도록...
 		{
-			//OnRegisterTickApi();  //안됨
+		
 		//m_slog.Format("[AXIS][MMSG_SENDTR][%s]", (char*)lParam);
 		//output_DebugString(m_slog);
 
@@ -8917,33 +8935,6 @@ void CMainFrame::write_err()
 	WriteFile((char *)(const char*)err, err.GetLength());
 }
 #ifdef DF_MAIN_RTS
-// MainFrame 멤버함수 → 일반 함수 bridge
-static BOOL __stdcall GetTickBridge(const char* code, TickSnapshot* out)
-{
-	CMainFrame* pMain = (CMainFrame*)AfxGetMainWnd();
-	if (!pMain || !code || !out)
-		return FALSE;
-
-
-	return pMain->ReadTick(code, out); // 너가 만든 함수
-}
-
-LRESULT CMainFrame::OnRegisterTickApi()
-{
-	// DLL 핸들 얻기 (이미 로드되어 있음)
-	//HMODULE hDll = ::GetModuleHandle("IB202200.dll");
-	//if (!hDll)
-	//	return 0;
-
-	//auto pRegister = (PFN_REGISTER_GET_TICK)::GetProcAddress(hDll, "RegisterGetTick");
-	//if (!pRegister)
-	//	return 0;
-
-	//// 함수포인터 등록
-	//pRegister(GetTickBridge);
-
-	return 1;
-}
 
 bool CMainFrame::ReadTick(const char* code, TickSnapshot* out)  //dll에서 호출
 {
@@ -13043,45 +13034,56 @@ void CMainFrame::SetDefaultMng()
 {
 	m_mapAlarmList.RemoveAll();
 
-	m_mapAlarmList.SetAt("851", "");  //장전 동시호가 개시
-	m_mapAlarmList.SetAt("801", "");  //장개시
-	m_mapAlarmList.SetAt("21", "");   //장개시 10분전
-	m_mapAlarmList.SetAt("26", "");   //장개시 5분전
-	m_mapAlarmList.SetAt("30", "");   //장개시 1분전
-	m_mapAlarmList.SetAt("35", "");    //장개시 10초전
-	m_mapAlarmList.SetAt("852", "");  //장후 동시호개 개시
-	m_mapAlarmList.SetAt("809", "");  //장마감
-	m_mapAlarmList.SetAt("126", "");  //장마감 5분전
-	m_mapAlarmList.SetAt("130", ""); //장마감 1분전
-	m_mapAlarmList.SetAt("135", ""); //장마감 10초전
-	m_mapAlarmList.SetAt("804", ""); //시간외종가 매매개시
-	m_mapAlarmList.SetAt("853", ""); //시간외종가 매매종료, 시간외단일가 매매개시
-	m_mapAlarmList.SetAt("806", ""); //시간외단일가 매매종료
-	m_mapAlarmList.SetAt("846", "");  //KOBA ELW 조기종료
-	m_mapAlarmList.SetAt("871", "1"); //사이드카발동
-	m_mapAlarmList.SetAt("872", "1"); //사이드카해제
+	CString mtblFile;
+	mtblFile.Format("%s\\%s\\mngsetup.ini",
+		Axis::home, MTBLDIR);
 
-
-	m_mapAlarmList.SetAt("56", "");   //선물/옵션 장개시 5분전
-	m_mapAlarmList.SetAt("60", "");   //선물/옵션 장개시 1분전
-	m_mapAlarmList.SetAt("65", "");   //선물/옵션 장개시 10초전
-	m_mapAlarmList.SetAt("862", "");   //선물/옵션 장후 동시호가 개시
-	m_mapAlarmList.SetAt("863", "");   //선물/옵션 장마감
-	m_mapAlarmList.SetAt("837", "1");   //선물/옵션 서킷브레이커발동
-	m_mapAlarmList.SetAt("838", "1");   //선물/옵션 서킷브레이커해제
-
-
-	m_mapAlarmList.SetAt("817", "1");  //서킷브레이커발동
-	m_mapAlarmList.SetAt("818", "1"); //서킷브레이커해제
+	// KRX
+	LoadMngFromIni(mtblFile, "Manage");
 
 	// NXT
-	m_mapAlarmList.SetAt("881", ""); //프리마켓 개시
-	m_mapAlarmList.SetAt("882", "");  //프리마켓 마감
-	m_mapAlarmList.SetAt("884", "");  //메인마켓 개시
-	m_mapAlarmList.SetAt("885", ""); //메인마켓 마감
-	m_mapAlarmList.SetAt("887", ""); //애프터마켓 시가단일가 개시
-	m_mapAlarmList.SetAt("888", ""); //애프터마켓 개시
-	m_mapAlarmList.SetAt("889", ""); //애프터마켓 마감
+	LoadMngFromIni(mtblFile, "NXT");
+	//m_mapAlarmList.RemoveAll();
+
+	//m_mapAlarmList.SetAt("851", "");  //장전 동시호가 개시
+	//m_mapAlarmList.SetAt("801", "");  //장개시
+	//m_mapAlarmList.SetAt("21", "");   //장개시 10분전
+	//m_mapAlarmList.SetAt("26", "");   //장개시 5분전
+	//m_mapAlarmList.SetAt("30", "");   //장개시 1분전
+	//m_mapAlarmList.SetAt("35", "");    //장개시 10초전
+	//m_mapAlarmList.SetAt("852", "");  //장후 동시호개 개시
+	//m_mapAlarmList.SetAt("809", "");  //장마감
+	//m_mapAlarmList.SetAt("126", "");  //장마감 5분전
+	//m_mapAlarmList.SetAt("130", ""); //장마감 1분전
+	//m_mapAlarmList.SetAt("135", ""); //장마감 10초전
+	//m_mapAlarmList.SetAt("804", ""); //시간외종가 매매개시
+	//m_mapAlarmList.SetAt("853", ""); //시간외종가 매매종료, 시간외단일가 매매개시
+	//m_mapAlarmList.SetAt("806", ""); //시간외단일가 매매종료
+	//m_mapAlarmList.SetAt("846", "");  //KOBA ELW 조기종료
+	//m_mapAlarmList.SetAt("871", "1"); //사이드카발동
+	//m_mapAlarmList.SetAt("872", "1"); //사이드카해제
+
+
+	//m_mapAlarmList.SetAt("56", "");   //선물/옵션 장개시 5분전
+	//m_mapAlarmList.SetAt("60", "");   //선물/옵션 장개시 1분전
+	//m_mapAlarmList.SetAt("65", "");   //선물/옵션 장개시 10초전
+	//m_mapAlarmList.SetAt("862", "");   //선물/옵션 장후 동시호가 개시
+	//m_mapAlarmList.SetAt("863", "");   //선물/옵션 장마감
+	//m_mapAlarmList.SetAt("837", "1");   //선물/옵션 서킷브레이커발동
+	//m_mapAlarmList.SetAt("838", "1");   //선물/옵션 서킷브레이커해제
+
+
+	//m_mapAlarmList.SetAt("817", "1");  //서킷브레이커발동
+	//m_mapAlarmList.SetAt("818", "1"); //서킷브레이커해제
+
+	//// NXT
+	//m_mapAlarmList.SetAt("881", ""); //프리마켓 개시
+	//m_mapAlarmList.SetAt("882", "");  //프리마켓 마감
+	//m_mapAlarmList.SetAt("884", "");  //메인마켓 개시
+	//m_mapAlarmList.SetAt("885", ""); //메인마켓 마감
+	//m_mapAlarmList.SetAt("887", ""); //애프터마켓 시가단일가 개시
+	//m_mapAlarmList.SetAt("888", ""); //애프터마켓 개시
+	//m_mapAlarmList.SetAt("889", ""); //애프터마켓 마감
 
 }
 
@@ -13104,39 +13106,39 @@ void CMainFrame::ExpandDerivedSignals()
 	}
 }
 
-void CMainFrame::LoadMngFromIni(LPCTSTR file)
+void CMainFrame::LoadMngFromIni(const CString& file, const CString& section)
 {
-	char buf[4096]{};
-	DWORD len = GetPrivateProfileSection("Manage", buf, sizeof(buf), file);
+	TCHAR buf[4096]{};
+	DWORD len = GetPrivateProfileSection(section, buf, 4096, file);
 
-	if (len == 0) return;
+	if (len <= 0) return;
 
-	CString s(buf, len);
+	TCHAR* p = buf;
 
-	while (!s.IsEmpty())
+	while (*p)
 	{
-		int pos = s.Find('\0');
-		if (pos < 0) break;
-
-		CString line = s.Left(pos);
-		s = s.Mid(pos + 1);
+		CString line = p;
 
 		int eq = line.Find('=');
-		if (eq < 0) continue;
-
-		CString key = line.Left(eq);
-		key.TrimRight();
-		CString val = line.Mid(eq + 1);
-		val.TrimRight();
-
-		if (atoi(val) == 1)
+		if (eq > 0)
 		{
-			m_slog.Format("[mng][메인] key=[%s]   val =[%s]\n", key, val);
-			OutputDebugString(m_slog);
-			m_mapAlarmList.SetAt(key, "1");
+			CString key = line.Left(eq);
+			CString val = line.Mid(eq + 1);
+
+			int semi = val.Find(';');
+			if (semi >= 0)
+				val = val.Left(semi);
+
+			key.TrimRight();
+			val.TrimRight();
+
+			if (atoi(val) == 1)
+				m_mapAlarmList.SetAt(key, val);
+			else
+				m_mapAlarmList.RemoveKey(key);
 		}
-		else
-			m_mapAlarmList.RemoveKey(key);
+
+		p += _tcslen(p) + 1;
 	}
 }
 
@@ -13176,21 +13178,15 @@ void CMainFrame::load_mngSetup()
 	if (userExist)
 		userVer = GetPrivateProfileInt("MESSAGE", "INIT", 0, userFile);
 
-	// =========================
-	// version 동기화
-	// =========================
+	// version sync
 	if (!userExist || mtblVer > userVer)
-	{
-		// mtbl 기준으로 user 갱신
 		CopyFile(mtblFile, userFile, FALSE);
-	}
 
-	// 이제 항상 userFile 사용
 	CString file = userFile;
 
-	// =========================
-	// UI 설정값
-	// =========================
+	// -------------------------
+	// UI 설정
+	// -------------------------
 	CProfile profile(pkManageSetup);
 
 	m_bSound = profile.GetInt("Setup", "SOUND", 0);
@@ -13201,19 +13197,20 @@ void CMainFrame::load_mngSetup()
 	int val = profile.GetInt("Manage", MNG_INFO_KOBAELW, -1);
 	m_bKobaElwNotify = (val == -1) ? true : (val == 1);
 
-	// =========================
-	// 기본값 세팅
-	// =========================
+	// -------------------------
+	// default = mtbl
+	// -------------------------
 	SetDefaultMng();
 
-	// =========================
-	// 사용자 설정 overlay
-	// =========================
-	LoadMngFromIni(file);
+	// -------------------------
+	// user overlay
+	// -------------------------
+	LoadMngFromIni(file, "Manage");
+	LoadMngFromIni(file, "NXT");
 
-	// =========================
-	// 파생 이벤트 확장
-	// =========================
+	// -------------------------
+	// derived
+	// -------------------------
 	ExpandDerivedSignals();
 }
 #else

@@ -1799,7 +1799,7 @@ public:
 	//장운영정보
 	void SetDefaultMng();
 	void ExpandDerivedSignals();
-	void LoadMngFromIni(LPCTSTR file);
+	void LoadMngFromIni(const CString& file, const CString& section);
 	void MigrateMng(LPCTSTR file, int oldVersion);
 
 	//실시간메인처리
@@ -1810,7 +1810,6 @@ public:
 	std::unordered_map<std::string, CTime> m_lastRTSTimeCode;
 
 	bool ReadTick(const char* code, TickSnapshot* out);
-	LRESULT OnRegisterTickApi();
 
 	TickSnapshot g_tickSlots[MAX_SLOT];
 	std::unordered_map<std::string, int> g_codeToIndex;
