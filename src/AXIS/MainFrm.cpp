@@ -1644,31 +1644,11 @@ WriteLog(m_slog);
 				{
 					m_mapDebugKey.RemoveAll();
 					m_mapDebugRemoveKey.RemoveAll();
-					this->load_mngSetup();
 				}
 				break;
 				case 'z':
 				case 'Z':
 					{
-					
-						int nCount = m_mapAlarmList.GetCount();
-						m_slog.Format("[mng][메인] Map Count = %d\n", nCount);
-						OutputDebugString(m_slog);
-
-						// 루프
-						POSITION pos = m_mapAlarmList.GetStartPosition();
-						while (pos != NULL)
-						{
-							CString key, value;
-							m_mapAlarmList.GetNextAssoc(pos, key, value);
-
-							if (value == "1")
-							{
-								m_slog.Format("[mng][메인]Key = %s Value = %s\n", key, value);
-								OutputDebugString(m_slog);
-							}
-						}
-					
 						m_mapDebugKey.RemoveAll();
 						m_mapDebugRemoveKey.RemoveAll();
 						CString file, repo, key, dat;
