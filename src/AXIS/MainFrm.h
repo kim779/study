@@ -1796,6 +1796,12 @@ public:
 	bool LoadScreenInfo(const CString& filePath);
 	bool GetScreenInfoByMapKey(int mapkey, _stMap& outMap) const;
 
+	//장운영정보
+	void SetDefaultMng();
+	void ExpandDerivedSignals();
+	void LoadMngFromIni(LPCTSTR file);
+	void MigrateMng(LPCTSTR file, int oldVersion);
+
 	//실시간메인처리
 #ifdef DF_MAIN_RTS
 	std::queue<int> g_poolKeys;

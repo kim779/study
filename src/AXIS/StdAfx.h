@@ -71,6 +71,7 @@ typedef BOOL(WINAPI* RtlGetVersion_FUNC) (OSVERSIONINFOEXW*);
 #define DF_WEAKPOINT
 #define DF_AUTOLOGV1
 #define DF_EDGE_MAP   "IB980002"
+#define DF_NEW_MNG
 
 inline void output_DebugString(CString sdata)
 {

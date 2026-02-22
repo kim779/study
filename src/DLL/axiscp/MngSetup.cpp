@@ -59,91 +59,111 @@ BOOL CMngSetup::OnInitDialog()
 
 void CMngSetup::loadInfo()
 {
-	CString stmp;
-	CString file;
-	file.Format("%s\\%s\\%s\\mngsetup.ini", Axis::home, USRDIR, Axis::user);
+	m_mapMng.RemoveAll();
 
-	//DefaultSetup();
+	CString userFile, mtblFile;
 
-	char	ssb[1024 * 4];
-	const DWORD ssL = GetPrivateProfileSection("Manage", ssb, sizeof(ssb), file);
+	userFile.Format("%s\\%s\\%s\\mngsetup.ini",
+		Axis::home, USRDIR, Axis::user);
 
-	CString slog;
-	slog.Format("[MNGSETUP][KRX] user ssL = %d ", ssL);
-	OutputDebugString(slog);
+	mtblFile.Format("%s\\%s\\mngsetup.ini",
+		Axis::home, MTBLDIR);
 
-	if (ssL <= 0)
+	bool userExist =
+		(GetFileAttributes(userFile) != INVALID_FILE_ATTRIBUTES);
+
+	int userVer = 0;
+	int mtblVer = GetPrivateProfileInt("MESSAGE", "INIT", 0, mtblFile);
+
+	if (userExist)
+		userVer = GetPrivateProfileInt("MESSAGE", "INIT", 0, userFile);
+
+	CString useFile;
+
+	if (!userExist)
 	{
-		DefaultSetup();
-		return;
+		CopyFile(mtblFile, userFile, FALSE);
+		useFile = userFile;
+	}
+	else if (mtblVer > userVer)
+	{
+		CopyFile(mtblFile, userFile, FALSE);
+		useFile = userFile;
+	}
+	else
+	{
+		useFile = userFile;
 	}
 
-	CString subitem, keys, value, string = CString(ssb, ssL);
-	for (; !string.IsEmpty(); )
+	// =========================
+	// Manage 로딩
+	// =========================
+	TCHAR buf[4096]{};
+	DWORD len = GetPrivateProfileSection("Manage", buf, 4096, useFile);
+
+	if (len > 0)
 	{
-		int idx = string.Find('\0');
-		if (idx == -1)	break;
+		TCHAR* p = buf;
 
-		subitem  = string.Left(idx++);
-		string = string.Mid(idx);
-
-		idx = subitem.Find('=');
-		if (idx == -1)	continue;
-
-		keys = subitem.Left(idx++);
-		value = subitem.Mid(idx);
-
-		if(m_mapSymkey.Lookup(keys, stmp))
+		while (*p)
 		{
-			m_mapMng.SetAt(stmp, value);  //ref 장운영 여기서  파일에서 읽은 key값을 변화해줘야 한다.
-			setControlValue(stmp, value);   //ref 장운영 loadInfo
+			CString line = p;
+
+			int eq = line.Find('=');
+			if (eq > 0)
+			{
+				CString key = line.Left(eq);
+				CString val = line.Mid(eq + 1);
+
+				int semi = val.Find(';');
+				if (semi >= 0)
+					val = val.Left(semi);
+
+				key.TrimRight();
+				val.TrimRight();
+
+				m_mapMng.SetAt(key, val);
+				setControlValue(key, val);
+			}
+
+			p += _tcslen(p) + 1;
 		}
 	}
 
-	int	nRes = -1;
-	m_pos = GetPrivateProfileInt("Setup", "Pos", 2, file);
-	
+	// Setup 로딩
+	m_pos = GetPrivateProfileInt("Setup", "Pos", 2, useFile);
+	m_popup = GetPrivateProfileInt("Setup", "Popup", 0, useFile);
+	m_sound = GetPrivateProfileInt("Setup", "Sound", 0, useFile);
+
+	int nRes = -1;
 	switch (m_pos)
 	{
-	case 0: 
-		nRes = RADIO_UPPERLEFT;
-		break;
-	case 2: 
-		nRes = RADIO_UPPERRIGHT;
-		break;
-	case 3: 
-		nRes = RADIO_BOTTOMLEFT;
-		break;
-	case 4: 
-		nRes = RADIO_BOTTOMRIGHT;
-		break;
+		case 0:
+			nRes = RADIO_UPPERLEFT;
+			break;
+		case 2:
+			nRes = RADIO_UPPERRIGHT;
+			break;
+		case 3:
+			nRes = RADIO_BOTTOMLEFT;
+			break;
+		case 4:
+			nRes = RADIO_BOTTOMRIGHT;
+			break;
 	}
-	if (nRes!=-1)
+	if (nRes != -1)
 	{
-		((CButton *)GetDlgItem(RADIO_UPPERLEFT))->SetCheck(FALSE);
-		((CButton *)GetDlgItem(RADIO_UPPERRIGHT))->SetCheck(FALSE);
-		((CButton *)GetDlgItem(RADIO_BOTTOMLEFT))->SetCheck(FALSE);
-		((CButton *)GetDlgItem(RADIO_BOTTOMRIGHT))->SetCheck(FALSE);
-		((CButton *)GetDlgItem(nRes))->SetCheck(TRUE);
+		((CButton*)GetDlgItem(RADIO_UPPERLEFT))->SetCheck(FALSE);
+		((CButton*)GetDlgItem(RADIO_UPPERRIGHT))->SetCheck(FALSE);
+		((CButton*)GetDlgItem(RADIO_BOTTOMLEFT))->SetCheck(FALSE);
+		((CButton*)GetDlgItem(RADIO_BOTTOMRIGHT))->SetCheck(FALSE);
+		((CButton*)GetDlgItem(nRes))->SetCheck(TRUE);
 	}
 
-	((CButton *)GetDlgItem(IDC_POPUP))->SetCheck(m_popup = 
-						GetPrivateProfileInt("Setup", "Popup", 0, file));
-	((CButton *)GetDlgItem(IDC_SOUND))->SetCheck(m_sound = 
-						GetPrivateProfileInt("Setup", "Sound", 0, file));
+	((CButton*)GetDlgItem(IDC_POPUP))->SetCheck(m_popup);
+	((CButton*)GetDlgItem(IDC_SOUND))->SetCheck(m_sound);
 
-	//modi
-	file.Format("%s\\%s\\%s\\mngsetup.ini", Axis::home, USRDIR, Axis::user);
-	int iret = GetPrivateProfileInt("MESSAGE", "INIT", 0, file);
-
-	if (iret < 3)  //최종버전보다 낮다면
-	{
-		m_mapMng.SetAt("871", "1");   //사이드카 발동
-		setControlValue("871", "1");
-
-		m_mapMng.SetAt("872", "1");   //사이드카 해제
-		setControlValue("872", "1");
-	}
+	showlog();
 }
 
 void CMngSetup::setControlValue(CString keys, CString value)
@@ -159,21 +179,40 @@ void CMngSetup::setControlValue(CString keys, CString value)
 
 void CMngSetup::saveInfo()
 {
-	CString file, keys, value;
-	file.Format("%s\\%s\\%s\\mngsetup.ini", Axis::home, USRDIR, Axis::user);
+	CString userFile, mtblFile;
 
-	for (POSITION pos = m_mapMng.GetStartPosition(); pos; )
+	userFile.Format("%s\\%s\\%s\\mngsetup.ini",
+		Axis::home, USRDIR, Axis::user);
+
+	mtblFile.Format("%s\\%s\\mngsetup.ini",
+		Axis::home, MTBLDIR);
+
+	// =========================
+	// Manage 저장
+	// =========================
+	for (POSITION pos = m_mapMng.GetStartPosition(); pos;)
 	{
-		m_mapMng.GetNextAssoc(pos, keys, value);
-		
-		WritePrivateProfileString("Manage", keys, value, file);
+		CString key, val;
+		m_mapMng.GetNextAssoc(pos, key, val);
+		WritePrivateProfileString("Manage", key, val, userFile);
 	}
-	
-	WritePrivateProfileString("Setup", "Pos", Format("%d", m_pos), file);
-	WritePrivateProfileString("Setup", "Popup", Format("%d", m_popup), file);
-	WritePrivateProfileString("Setup", "Sound", Format("%d", m_sound), file);
 
-	WritePrivateProfileString("MESSAGE", "INIT", "4", file);
+	// =========================
+	// Setup 저장
+	// =========================
+	WritePrivateProfileString("Setup", "Pos", Format("%d", m_pos), userFile);
+	WritePrivateProfileString("Setup", "Popup", Format("%d", m_popup), userFile);
+	WritePrivateProfileString("Setup", "Sound", Format("%d", m_sound), userFile);
+
+	// =========================
+	// INIT version 동기화 (핵심)
+	// =========================
+	int mtblVer = GetPrivateProfileInt("MESSAGE", "INIT", 0, mtblFile);
+
+	CString ver;
+	ver.Format("%d", mtblVer);
+
+	WritePrivateProfileString("MESSAGE", "INIT", ver, userFile);
 }
 /*
 { 'S', {{ 47,  "GUBN"}, { 600, "BELLCODE"    }, { 601, "KEYVALUE"    },
@@ -260,61 +299,83 @@ void CMngSetup::ApplySetup()
 
 void CMngSetup::DefaultSetup()
 {
-	CString file, stmp;
-	char	ssb[1024 * 4]{};
-	//file.Format("%s\\%s\\%s\\mngsetup.ini", Axis::home, USRDIR, Axis::user);
-	//const DWORD ret = GetPrivateProfileSection("Manage", ssb, sizeof(ssb), file);  //새로운 설정적용이 있다면
-	//if (ret > 0)
-	//	return;
+	CString userFile, mtblFile;
 
-	file.Format("%s\\%s\\mngsetup.ini", Axis::home, MTBLDIR);
-	memset(ssb, 0x00, 1024 * 4);
-	const DWORD ssL = GetPrivateProfileSection("Manage", ssb, sizeof(ssb), file);
-	if (ssL <= 0)		return;
+	userFile.Format("%s\\%s\\%s\\mngsetup.ini",
+		Axis::home, USRDIR, Axis::user);
 
+	mtblFile.Format("%s\\%s\\mngsetup.ini",
+		Axis::home, MTBLDIR);
+
+	// =========================
+	// mtbl Manage 로딩
+	// =========================
 	m_mapMng.RemoveAll();
 
-	CString subitem, keys, value, string = CString(ssb, ssL);
-	for (; !string.IsEmpty(); )
+	TCHAR buf[4096]{};
+	DWORD len = GetPrivateProfileSection("Manage", buf, 4096, mtblFile);
+
+	if (len > 0)
 	{
-		int idx = string.Find('\0');
-		if (idx == -1)	break;
+		TCHAR* p = buf;
 
-		subitem  = string.Left(idx++);
-		string = string.Mid(idx);
-
-		idx = subitem.Find('=');
-		if (idx == -1)	continue;
-
-		keys = subitem.Left(idx++);
-		value = subitem.Mid(idx);
-
-		if (m_mapSymkey.Lookup(keys, stmp))
+		while (*p)
 		{
-			m_mapMng.SetAt(stmp, value);  //ref 장운영 DefaultSetup 여기서  파일에서 읽은 key값을 변화해줘야 한다.
-			setControlValue(stmp, value);
+			CString line = p;
+
+			int eq = line.Find('=');
+			if (eq > 0)
+			{
+				CString key = line.Left(eq);
+				CString val = line.Mid(eq + 1);
+
+				// 주석 제거
+				int semi = val.Find(';');
+				if (semi >= 0)
+					val = val.Left(semi);
+
+				key.TrimRight();
+				val.TrimRight();
+
+				m_mapMng.SetAt(key, val);
+				setControlValue(key, val);
+			}
+
+			p += _tcslen(p) + 1;
 		}
 	}
 
-	m_pos = GetPrivateProfileInt("Setup", "Pos", 2, file);
-	((CButton *)GetDlgItem(RADIO_UPPERLEFT))->SetCheck(0);
-	((CButton *)GetDlgItem(RADIO_UPPERRIGHT))->SetCheck(0);
-	((CButton *)GetDlgItem(RADIO_BOTTOMLEFT))->SetCheck(0);
-	((CButton *)GetDlgItem(RADIO_BOTTOMRIGHT))->SetCheck(0);
+	// =========================
+	// Setup 로딩 (mtbl 기준)
+	// =========================
+	m_pos = GetPrivateProfileInt("Setup", "Pos", 2, mtblFile);
+	m_popup = GetPrivateProfileInt("Setup", "Popup", 0, mtblFile);
+	m_sound = GetPrivateProfileInt("Setup", "Sound", 0, mtblFile);
 
-	int	nRes{};
-	if (m_pos == 0)	    	{ nRes = RADIO_UPPERLEFT;   m_pos = 0; }
-	else if (m_pos == 1)	{ nRes = RADIO_UPPERRIGHT;  m_pos = 2; }
-	else if (m_pos == 2)	{ nRes = RADIO_BOTTOMLEFT;  m_pos = 3; }
-	else if (m_pos == 3)	{ nRes = RADIO_BOTTOMRIGHT; m_pos = 4; }
-	((CButton *)GetDlgItem(nRes))->SetCheck(1);
+	((CButton*)GetDlgItem(IDC_POPUP))->SetCheck(m_popup);
+	((CButton*)GetDlgItem(IDC_SOUND))->SetCheck(m_sound);
 
-	m_popup = GetPrivateProfileInt("Setup", "Popup", 0, file);
-	((CButton *)GetDlgItem(IDC_POPUP))->SetCheck(m_popup);
+	int nRes = -1;
+	switch (m_pos)
+	{
+	case 0: nRes = RADIO_UPPERLEFT; break;
+	case 2: nRes = RADIO_UPPERRIGHT; break;
+	case 3: nRes = RADIO_BOTTOMLEFT; break;
+	case 4: nRes = RADIO_BOTTOMRIGHT; break;
+	}
 
-	m_sound = GetPrivateProfileInt("Setup", "Sound", 0, file);
-	((CButton *)GetDlgItem(IDC_SOUND))->SetCheck(m_sound);
+	if (nRes != -1)
+	{
+		((CButton*)GetDlgItem(RADIO_UPPERLEFT))->SetCheck(FALSE);
+		((CButton*)GetDlgItem(RADIO_UPPERRIGHT))->SetCheck(FALSE);
+		((CButton*)GetDlgItem(RADIO_BOTTOMLEFT))->SetCheck(FALSE);
+		((CButton*)GetDlgItem(RADIO_BOTTOMRIGHT))->SetCheck(FALSE);
+		((CButton*)GetDlgItem(nRes))->SetCheck(TRUE);
+	}
 
+	// =========================
+	// user 파일로 저장
+	// =========================
 	saveInfo();
 }
 
@@ -333,96 +394,136 @@ BOOL CMngSetup::PreTranslateMessage(MSG* pMsg)
 
 void CMngSetup::InitSignalControlMap()
 {
-	int oldsignals[] = { 610000,  110000 , 110600 , 110300,  110060, 110010, 710000, 210000,  210300 , 210060 ,
-								  210010, 100000, 200000, 310000, 410000,  510000 , 2610000,  2110000 , 2110600 ,2110300, 2110060,
-								  2110010 , 2710000 , 2210000 , 2100000 , 2200000 ,601196, 0 };
+	m_signalMap.RemoveAll();
 
-	int signals[] = {
-	851, //610000,		//장전 동시호가 개시
-	801, //110000,		//장개시
-	21, //110600,		//장개시 10분전
-	26, //110300,		//장개시 5분전
-	30, //110060,		//장개시 1분전
-	35, //110010,		//장개시 10초전
-	852, //710000,       //장후 동시호개 개시
-	809, //210000,		//장마감
-	126, //210300,		//장마감 5분전
-	130, //210060,		//장마감 1분전
-	135, //210010,		//장마감 10초전
-	817, //100000,		//서킷브레이커발동
-	818, //200000,		//서킷브레이커해제
-	804, //310000,		//시간외종가 매매개시
-	853, //410000,		//시간외종가 매매종료, 시간외단일가 매매개시 
-	806, //510000,		//시간외단일가 매매종료
-	832, //2610000,		//선물/옵션 장전 동시호가 개시
-	861, //2110000,		//선물/옵션 장개시
-	2110600,		//선물/옵션 장개시 10분전
-	56, //2110300,		//선물/옵션 장개시 5분전
-	60, //2110060,		//선물/옵션 장개시 1분전
-	65, //2110010,		//선물/옵션 장개시 10초전
-	862, //2710000,		//선물/옵션 장후 동시호가 개시
-	863, //2210000,		//선물/옵션 장마감
-	837, //2100000,		//선물/옵션 서킷브레이커발동
-	838, //2200000,		//선물/옵션 서킷브레이커해제
-	846, //601196,		//KOBA ELW 조기종료
-	871,//					//사이드카발동
-	872,//					//사이드카해제
-	0
-	};
-	const UINT const controls[] = {
-		KOSPI_BEFORE_HOGA, 	//장전 동시호개 개시
-		KOSPI_OPEN,
-		KOSPI_OPEN_10M,
-		KOSPI_OPEN_5M,
-		KOSPI_OPEN_1M,
-		KOSPI_OPEN_10S,
-		KOSPI_AFTER_HOGA,
-		KOSPI_CLOSE,
-		KOSPI_CLOSE_5M,
-		KOSPI_CLOSE_1M,
-		KOSPI_CLOSE_10S,
-		KOSPI_OPEN_CIRCUIT,
-		KOSPI_CLOSE_CIRCUIT,
-		KOSPI_OPEN_TIME,
-		KOSPI_CLOSE_TIME,
-		KOSPI_CLOSE_TIME_ONE,
-		FUTURE_BEFORE_HOGA,
-		FUTURE_OPEN,
-		FUTURE_OPEN_10M,
-		FUTURE_OPEN_5M,
-		FUTURE_OPEN_1M,
-		FUTURE_OPEN_10S,
-		FUTURE_AFTER_HOGA,
-		FUTURE_CLOSE,
-		FUTURE_OPEN_CIRCUIT,
-		FUTURE_CLOSE_CIRCUIT,
-		KOBA_ELW_CLOSE,
-		KOSPI_OPEN_SIDECAR,
-		KOSPI_CLOSE_SIDECAR,
-		0
+	struct Item { int sig; UINT cid; };
+
+	static const Item items[] =
+	{
+		{851, KOSPI_BEFORE_HOGA},
+		{801, KOSPI_OPEN},
+		{21,  KOSPI_OPEN_10M},
+		{26,  KOSPI_OPEN_5M},
+		{30,  KOSPI_OPEN_1M},
+		{35,  KOSPI_OPEN_10S},
+		{852, KOSPI_AFTER_HOGA},
+		{809, KOSPI_CLOSE},
+		{126, KOSPI_CLOSE_5M},
+		{130, KOSPI_CLOSE_1M},
+		{135, KOSPI_CLOSE_10S},
+		{804, KOSPI_OPEN_TIME},
+		{853, KOSPI_CLOSE_TIME},
+		{806, KOSPI_CLOSE_TIME_ONE},
+		{846, KOBA_ELW_CLOSE},
+		{871, KOSPI_OPEN_SIDECAR},
+		{872, KOSPI_CLOSE_SIDECAR},
+		{817, KOSPI_OPEN_CIRCUIT},
+		{818, KOSPI_CLOSE_CIRCUIT},
+
+		{56,  FUTURE_OPEN_5M},
+		{60,  FUTURE_OPEN_1M},
+		{65,  FUTURE_OPEN_10S},
+		{862, FUTURE_AFTER_HOGA},
+		{863, FUTURE_CLOSE},
+		{837, FUTURE_OPEN_CIRCUIT},
+		{838, FUTURE_CLOSE_CIRCUIT},
 	};
 
-	for (int i = 0; signals[i]; i++)
-	{
-		m_signalMap.SetAt(signals[i], controls[i]);
-	}
-
-	int isize = sizeof(oldsignals) / sizeof(int);
-	CString sOri, sNew;                 //ref 기존심벌 신규변환을 위한
-	for (int ii = 0; ii < isize; ii++)
-	{
-		sOri.Format("%07d", oldsignals[ii]);
-		sNew.Format("%d", signals[ii]);
-		m_mapSymkey.SetAt(sOri, sNew);
-	}
-
-	isize = sizeof(controls) / sizeof(int);
-	for (int ii = 0; ii < isize; ii++)
-	{
-		sNew.Format("%d", signals[ii]);
-		m_mapSymkey.SetAt(sNew, sNew);
-	}
+	for (int i = 0; i < (int)(sizeof(items) / sizeof(items[0])); ++i)
+		m_signalMap.SetAt(items[i].sig, items[i].cid);
 }
+//void CMngSetup::InitSignalControlMap()
+//{
+//	int oldsignals[] = { 610000,  110000 , 110600 , 110300,  110060, 110010, 710000, 210000,  210300 , 210060 ,
+//								  210010, 100000, 200000, 310000, 410000,  510000 , 2610000,  2110000 , 2110600 ,2110300, 2110060,
+//								  2110010 , 2710000 , 2210000 , 2100000 , 2200000 ,601196, 0 };
+//
+//	int signals[] = {
+//	851, //610000,		//장전 동시호가 개시
+//	801, //110000,		//장개시
+//	21, //110600,		//장개시 10분전
+//	26, //110300,		//장개시 5분전
+//	30, //110060,		//장개시 1분전
+//	35, //110010,		//장개시 10초전
+//	852, //710000,       //장후 동시호개 개시
+//	809, //210000,		//장마감
+//	126, //210300,		//장마감 5분전
+//	130, //210060,		//장마감 1분전
+//	135, //210010,		//장마감 10초전
+//	817, //100000,		//서킷브레이커발동
+//	818, //200000,		//서킷브레이커해제
+//	804, //310000,		//시간외종가 매매개시
+//	853, //410000,		//시간외종가 매매종료, 시간외단일가 매매개시 
+//	806, //510000,		//시간외단일가 매매종료
+//	832, //2610000,		//선물/옵션 장전 동시호가 개시
+//	861, //2110000,		//선물/옵션 장개시
+//	2110600,		//선물/옵션 장개시 10분전
+//	56, //2110300,		//선물/옵션 장개시 5분전
+//	60, //2110060,		//선물/옵션 장개시 1분전
+//	65, //2110010,		//선물/옵션 장개시 10초전
+//	862, //2710000,		//선물/옵션 장후 동시호가 개시
+//	863, //2210000,		//선물/옵션 장마감
+//	837, //2100000,		//선물/옵션 서킷브레이커발동
+//	838, //2200000,		//선물/옵션 서킷브레이커해제
+//	846, //601196,		//KOBA ELW 조기종료
+//	871,//					//사이드카발동
+//	872,//					//사이드카해제    //29개
+//	0
+//	};
+//	const UINT const controls[] = {
+//		KOSPI_BEFORE_HOGA, 	//장전 동시호개 개시
+//		KOSPI_OPEN,
+//		KOSPI_OPEN_10M,
+//		KOSPI_OPEN_5M,
+//		KOSPI_OPEN_1M,
+//		KOSPI_OPEN_10S,
+//		KOSPI_AFTER_HOGA,
+//		KOSPI_CLOSE,
+//		KOSPI_CLOSE_5M,
+//		KOSPI_CLOSE_1M,
+//		KOSPI_CLOSE_10S,
+//		KOSPI_OPEN_CIRCUIT,
+//		KOSPI_CLOSE_CIRCUIT,
+//		KOSPI_OPEN_TIME,
+//		KOSPI_CLOSE_TIME,
+//		KOSPI_CLOSE_TIME_ONE,
+//		FUTURE_BEFORE_HOGA,
+//		FUTURE_OPEN,
+//		FUTURE_OPEN_10M,
+//		FUTURE_OPEN_5M,
+//		FUTURE_OPEN_1M,
+//		FUTURE_OPEN_10S,
+//		FUTURE_AFTER_HOGA,
+//		FUTURE_CLOSE,
+//		FUTURE_OPEN_CIRCUIT,
+//		FUTURE_CLOSE_CIRCUIT,
+//		KOBA_ELW_CLOSE,
+//		KOSPI_OPEN_SIDECAR,
+//		KOSPI_CLOSE_SIDECAR,   //29
+//		0
+//	};
+//
+//	for (int i = 0; signals[i]; i++)
+//	{
+//		m_signalMap.SetAt(signals[i], controls[i]);
+//	}
+//
+//	int isize = sizeof(oldsignals) / sizeof(int);
+//	CString sOri, sNew;                 //ref 기존심벌 신규변환을 위한
+//	for (int ii = 0; ii < isize; ii++)
+//	{
+//		sOri.Format("%07d", oldsignals[ii]);
+//		sNew.Format("%d", signals[ii]);
+//		m_mapSymkey.SetAt(sOri, sNew);
+//	}
+//
+//	isize = sizeof(controls) / sizeof(int);
+//	for (int ii = 0; ii < isize; ii++)
+//	{
+//		sNew.Format("%d", signals[ii]);
+//		m_mapSymkey.SetAt(sNew, sNew);
+//	}
+//}
 
 void CMngSetup::draw_groupBox(CPaintDC *pdc, int ids)
 {
@@ -493,3 +594,4 @@ void CMngSetup::Loadsetup()
 {
 	loadInfo();
 }
+

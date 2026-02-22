@@ -132,42 +132,60 @@ BOOL CMNG_NXT::OnInitDialog()
 
 void CMNG_NXT::loadInfo()
 {
-	CString stmp;
+	m_mapMng.RemoveAll();
+
+	CString userFile, mtblFile;
+
+	userFile.Format("%s\\%s\\%s\\mngsetup.ini",
+		Axis::home, USRDIR, Axis::user);
+
+	mtblFile.Format("%s\\%s\\mngsetup.ini",
+		Axis::home, MTBLDIR);
+
+	bool userExist =
+		(GetFileAttributes(userFile) != INVALID_FILE_ATTRIBUTES);
+
+	int mtblVer = GetPrivateProfileInt("MESSAGE", "INIT", 0, mtblFile);
+	int userVer = GetPrivateProfileInt("MESSAGE", "INIT", 0, userFile);
+
 	CString file;
-	file.Format("%s\\%s\\%s\\mngsetup.ini", Axis::home, USRDIR, Axis::user);
-
-	//유저폴더의  mngsetup.ini 에 nxt 장운영 정보가 있다면 mtbl 의 default를 사용안하고
-	//mtbl 의 default를 사용했다면 아래에서 데이터 없어서 mtbl이 유지된다.
-	char	ssb[1024 * 4];
-	const DWORD ssL = GetPrivateProfileSection("NXT", ssb, sizeof(ssb), file);
-	
-	CString slog;
-	slog.Format("[MNGSETUP][NXT] user ssL = %d ", ssL);
-	OutputDebugString(slog);
-
-	if (ssL <= 0)
+	file = userFile;
+	if (!userExist || mtblVer > userVer)
 	{
-		DefaultSetup();
-		return;
+		if (!CopyFile(mtblFile, userFile, FALSE))
+			file = mtblFile;   // 복사 실패시 mtbl 직접 사용
 	}
 
-	CString subitem, keys, value, string = CString(ssb, ssL);
-	for (; !string.IsEmpty(); )
+	char	ssb[1024 * 4];
+	const DWORD ssL = GetPrivateProfileSection("NXT", ssb, sizeof(ssb), file);
+
+	if (ssL > 0)
 	{
-		int idx = string.Find('\0');
-		if (idx == -1)	break;
+		CString subitem, keys, value, string = CString(ssb, ssL);
+		for (; !string.IsEmpty(); )
+		{
+			int idx = string.Find('\0');
+			if (idx == -1)	break;
 
-		subitem = string.Left(idx++);
-		string = string.Mid(idx);
+			subitem = string.Left(idx++);
+			string = string.Mid(idx);
 
-		idx = subitem.Find('=');
-		if (idx == -1)	continue;
+			idx = subitem.Find('=');
+			if (idx == -1)	continue;
 
-		keys = subitem.Left(idx++);
-		value = subitem.Mid(idx);
+			keys = subitem.Left(idx++);
+			value = subitem.Mid(idx);
 
-		setControlValue(keys, value);
-		m_mapMng.SetAt(keys, value);
+			// 주석 제거
+			int semi = value.Find(';');
+			if (semi >= 0)
+				value = value.Left(semi);
+
+			value.TrimRight();
+
+			setControlValue(keys, value);
+			m_mapMng.SetAt(keys, value);
+		}
 	}
 
 	m_pos = GetPrivateProfileInt("Setup", "Pos", 2, file);
@@ -199,7 +217,31 @@ void CMNG_NXT::loadInfo()
 
 void CMNG_NXT::DefaultSetup()
 {
-	CString file, stmp;
+	CString userFile, mtblFile;
+
+	userFile.Format("%s\\%s\\%s\\mngsetup.ini",
+		Axis::home, USRDIR, Axis::user);
+
+	mtblFile.Format("%s\\%s\\mngsetup.ini",
+		Axis::home, MTBLDIR);
+
+	// ⭐ 선택사항 (백업)
+	if (GetFileAttributes(userFile) != INVALID_FILE_ATTRIBUTES)
+	{
+		CString backup = userFile + ".bak";
+		CopyFile(userFile, backup, FALSE);
+	}
+
+	// ⭐ mtbl → user 완전 덮어쓰기
+	if (!CopyFile(mtblFile, userFile, FALSE))
+	{
+		AfxMessageBox("초기화 실패 (파일 복사 오류)");
+		return;
+	}
+
+	// ⭐ 다시 로딩 (UI 포함)
+	loadInfo();
+	/*CString file, stmp;
 	char	ssb[1024 * 4]{};
 	file.Format("%s\\%s\\mngsetup.ini", Axis::home, MTBLDIR);
 	memset(ssb, 0x00, 1024 * 4);
@@ -233,7 +275,7 @@ void CMNG_NXT::DefaultSetup()
 	((CButton*)GetDlgItem(RADIO_NXT_LEFTBOTTOM))->SetCheck(0);
 	((CButton*)GetDlgItem(RADIO_NXT_RIGHTBOTTOM))->SetCheck(0);
 
-	((CButton*)GetDlgItem(IDC_CHK_SOUNDAVA))->SetCheck(FALSE);
+	((CButton*)GetDlgItem(IDC_CHK_SOUNDAVA))->SetCheck(FALSE);*/
 }
 
 void CMNG_NXT::setControlValue(CString keys, CString value)
@@ -256,17 +298,32 @@ void CMNG_NXT::setControlValue(CString keys, CString value)
 
 void CMNG_NXT::saveInfo()
 {
-	CString file, keys, value;
-	file.Format("%s\\%s\\%s\\mngsetup.ini", Axis::home, USRDIR, Axis::user);
+	CString userFile, mtblFile, keys, value;
 
+	userFile.Format("%s\\%s\\%s\\mngsetup.ini",
+		Axis::home, USRDIR, Axis::user);
+
+	mtblFile.Format("%s\\%s\\mngsetup.ini",
+		Axis::home, MTBLDIR);
+
+	// =========================
+	// NXT 저장
+	// =========================
 	for (POSITION pos = m_mapMng.GetStartPosition(); pos; )
 	{
 		m_mapMng.GetNextAssoc(pos, keys, value);
-
-		WritePrivateProfileString("NXT", keys, value, file);
+		WritePrivateProfileString("NXT", keys, value, userFile);
 	}
 
-	WritePrivateProfileString("MESSAGE", "INIT", "4", file);
+	// =========================
+	// version 동기화 (핵심)
+	// =========================
+	int mtblVer = GetPrivateProfileInt("MESSAGE", "INIT", 0, mtblFile);
+
+	CString ver;
+	ver.Format("%d", mtblVer);
+
+	WritePrivateProfileString("MESSAGE", "INIT", ver, userFile);
 
 	if(((CButton*)GetDlgItem(RADIO_NXT_LEFTTOP))->GetCheck())
 		m_pos = 0;
@@ -277,10 +334,10 @@ void CMNG_NXT::saveInfo()
 	else if(((CButton*)GetDlgItem(RADIO_NXT_RIGHTBOTTOM))->GetCheck())
 		m_pos = 4;
 
-	WritePrivateProfileString("Setup", "Pos", Format("%d", m_pos), file);
+	WritePrivateProfileString("Setup", "Pos", Format("%d", m_pos), userFile);
 
 	m_sound = ((CButton*)GetDlgItem(IDC_CHK_SOUNDAVA))->GetCheck();
-	WritePrivateProfileString("Setup", "Sound", Format("%d", m_sound), file);
+	WritePrivateProfileString("Setup", "Sound", Format("%d", m_sound), userFile);
 }
 
 void CMNG_NXT::ApplySetup()

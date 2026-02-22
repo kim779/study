@@ -13,6 +13,12 @@
 /////////////////////////////////////////////////////////////////////////////
 // CMngSetup dialog
 
+struct MngSignalItem
+{
+	int  signal;
+	UINT controlID;
+};
+
 class AFX_EXT_CLASS CMngSetup : public CSetupDialog
 {
 // Construction
@@ -63,12 +69,36 @@ protected:
 	DECLARE_MESSAGE_MAP()
 private:
 	void InitSignalControlMap();
-	CMap<int, int&, UINT, UINT> m_signalMap;
+	CMap<int, int, UINT, UINT> m_signalMap;
 
 	//modi 장운영 기존키값을 심볼키로 변환위한 20240705
 	CMapStringToString m_mapSymkey{};
 public:
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
+
+	CString m_slog{};
+	
+	void showlog()
+	{
+		CString file;
+		file.Format("%s\\%s\\%s\\mngsetup.ini", Axis::home, USRDIR, Axis::user);
+		int iret = GetPrivateProfileInt("MESSAGE", "INIT", 0, file);
+
+		int nCount = m_mapSymkey.GetCount();
+		m_slog.Format("[mng] Map Count = %d  iret=[%d]\n", nCount, iret);
+		OutputDebugString(m_slog);
+
+		// 루프
+		POSITION pos = m_mapSymkey.GetStartPosition();
+		while (pos != NULL)
+		{
+			CString key, value;
+			m_mapSymkey.GetNextAssoc(pos, key, value);
+
+			m_slog.Format("[mng] Key = %s, Value = %s\n", key, value);
+			OutputDebugString(m_slog);
+		}
+	}
 };
 
 //{{AFX_INSERT_LOCATION}}

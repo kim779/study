@@ -1644,11 +1644,31 @@ WriteLog(m_slog);
 				{
 					m_mapDebugKey.RemoveAll();
 					m_mapDebugRemoveKey.RemoveAll();
+					this->load_mngSetup();
 				}
 				break;
 				case 'z':
 				case 'Z':
 					{
+					
+						int nCount = m_mapAlarmList.GetCount();
+						m_slog.Format("[mng][메인] Map Count = %d\n", nCount);
+						OutputDebugString(m_slog);
+
+						// 루프
+						POSITION pos = m_mapAlarmList.GetStartPosition();
+						while (pos != NULL)
+						{
+							CString key, value;
+							m_mapAlarmList.GetNextAssoc(pos, key, value);
+
+							if (value == "1")
+							{
+								m_slog.Format("[mng][메인]Key = %s Value = %s\n", key, value);
+								OutputDebugString(m_slog);
+							}
+						}
+					
 						m_mapDebugKey.RemoveAll();
 						m_mapDebugRemoveKey.RemoveAll();
 						CString file, repo, key, dat;
@@ -13039,7 +13059,184 @@ BOOL CMainFrame::CheckMasterFile()
 	return FALSE;
 }
 
-#ifdef DF_MK_CAPTION
+void CMainFrame::SetDefaultMng()
+{
+	m_mapAlarmList.RemoveAll();
+
+	m_mapAlarmList.SetAt("851", "");  //장전 동시호가 개시
+	m_mapAlarmList.SetAt("801", "");  //장개시
+	m_mapAlarmList.SetAt("21", "");   //장개시 10분전
+	m_mapAlarmList.SetAt("26", "");   //장개시 5분전
+	m_mapAlarmList.SetAt("30", "");   //장개시 1분전
+	m_mapAlarmList.SetAt("35", "");    //장개시 10초전
+	m_mapAlarmList.SetAt("852", "");  //장후 동시호개 개시
+	m_mapAlarmList.SetAt("809", "");  //장마감
+	m_mapAlarmList.SetAt("126", "");  //장마감 5분전
+	m_mapAlarmList.SetAt("130", ""); //장마감 1분전
+	m_mapAlarmList.SetAt("135", ""); //장마감 10초전
+	m_mapAlarmList.SetAt("804", ""); //시간외종가 매매개시
+	m_mapAlarmList.SetAt("853", ""); //시간외종가 매매종료, 시간외단일가 매매개시
+	m_mapAlarmList.SetAt("806", ""); //시간외단일가 매매종료
+	m_mapAlarmList.SetAt("846", "");  //KOBA ELW 조기종료
+	m_mapAlarmList.SetAt("871", "1"); //사이드카발동
+	m_mapAlarmList.SetAt("872", "1"); //사이드카해제
+
+
+	m_mapAlarmList.SetAt("56", "");   //선물/옵션 장개시 5분전
+	m_mapAlarmList.SetAt("60", "");   //선물/옵션 장개시 1분전
+	m_mapAlarmList.SetAt("65", "");   //선물/옵션 장개시 10초전
+	m_mapAlarmList.SetAt("862", "");   //선물/옵션 장후 동시호가 개시
+	m_mapAlarmList.SetAt("863", "");   //선물/옵션 장마감
+	m_mapAlarmList.SetAt("837", "1");   //선물/옵션 서킷브레이커발동
+	m_mapAlarmList.SetAt("838", "1");   //선물/옵션 서킷브레이커해제
+
+
+	m_mapAlarmList.SetAt("817", "1");  //서킷브레이커발동
+	m_mapAlarmList.SetAt("818", "1"); //서킷브레이커해제
+
+	// NXT
+	m_mapAlarmList.SetAt("881", ""); //프리마켓 개시
+	m_mapAlarmList.SetAt("882", "");  //프리마켓 마감
+	m_mapAlarmList.SetAt("884", "");  //메인마켓 개시
+	m_mapAlarmList.SetAt("885", ""); //메인마켓 마감
+	m_mapAlarmList.SetAt("887", ""); //애프터마켓 시가단일가 개시
+	m_mapAlarmList.SetAt("888", ""); //애프터마켓 개시
+	m_mapAlarmList.SetAt("889", ""); //애프터마켓 마감
+
+}
+
+void CMainFrame::ExpandDerivedSignals()
+{
+	CString v;
+
+	if (m_mapAlarmList.Lookup("871", v))  //사이드카발동
+	{
+		m_mapAlarmList.SetAt("873", "");  //?
+		m_mapAlarmList.SetAt("875", ""); //?
+		m_mapAlarmList.SetAt("877", ""); //?
+	}
+
+	if (m_mapAlarmList.Lookup("872", v))
+	{
+		m_mapAlarmList.SetAt("874", "");  //?
+		m_mapAlarmList.SetAt("876", "");  //?
+		m_mapAlarmList.SetAt("878", "");  //?
+	}
+}
+
+void CMainFrame::LoadMngFromIni(LPCTSTR file)
+{
+	char buf[4096]{};
+	DWORD len = GetPrivateProfileSection("Manage", buf, sizeof(buf), file);
+
+	if (len == 0) return;
+
+	CString s(buf, len);
+
+	while (!s.IsEmpty())
+	{
+		int pos = s.Find('\0');
+		if (pos < 0) break;
+
+		CString line = s.Left(pos);
+		s = s.Mid(pos + 1);
+
+		int eq = line.Find('=');
+		if (eq < 0) continue;
+
+		CString key = line.Left(eq);
+		key.TrimRight();
+		CString val = line.Mid(eq + 1);
+		val.TrimRight();
+
+		if (atoi(val) == 1)
+		{
+			m_slog.Format("[mng][메인] key=[%s]   val =[%s]\n", key, val);
+			OutputDebugString(m_slog);
+			m_mapAlarmList.SetAt(key, "1");
+		}
+		else
+			m_mapAlarmList.RemoveKey(key);
+	}
+}
+
+void CMainFrame::MigrateMng(LPCTSTR file, int oldVersion)
+{
+
+	if (oldVersion < 5)
+	{
+		m_mapAlarmList.SetAt("871", "");  //사이드카 발동
+		m_mapAlarmList.SetAt("872", "");  //사이드카 해제
+		m_mapAlarmList.SetAt("837", "1");   //선물/옵션 서킷브레이커발동
+		m_mapAlarmList.SetAt("838", "1");   //선물/옵션 서킷브레이커해제
+	}
+
+	CString v;
+	v.Format("%d", 5);
+	WritePrivateProfileString("MESSAGE", "INIT", v, file);
+}
+
+#ifdef DF_NEW_MNG
+void CMainFrame::load_mngSetup()
+{
+	CString userFile, mtblFile;
+
+	userFile.Format("%s\\%s\\%s\\mngsetup.ini",
+		Axis::home, USRDIR, Axis::user);
+
+	mtblFile.Format("%s\\%s\\mngsetup.ini",
+		Axis::home, MTBLDIR);
+
+	bool userExist =
+		(GetFileAttributes(userFile) != INVALID_FILE_ATTRIBUTES);
+
+	int mtblVer = GetPrivateProfileInt("MESSAGE", "INIT", 0, mtblFile);
+	int userVer = 0;
+
+	if (userExist)
+		userVer = GetPrivateProfileInt("MESSAGE", "INIT", 0, userFile);
+
+	// =========================
+	// version 동기화
+	// =========================
+	if (!userExist || mtblVer > userVer)
+	{
+		// mtbl 기준으로 user 갱신
+		CopyFile(mtblFile, userFile, FALSE);
+	}
+
+	// 이제 항상 userFile 사용
+	CString file = userFile;
+
+	// =========================
+	// UI 설정값
+	// =========================
+	CProfile profile(pkManageSetup);
+
+	m_bSound = profile.GetInt("Setup", "SOUND", 0);
+	m_nInfoPos = profile.GetInt("Setup", "POS", 2);
+	m_bUseAlarm = profile.GetInt("Setup", "USE", 1);
+	m_nBkMode = profile.GetInt(szBkNotice, "MODE");
+
+	int val = profile.GetInt("Manage", MNG_INFO_KOBAELW, -1);
+	m_bKobaElwNotify = (val == -1) ? true : (val == 1);
+
+	// =========================
+	// 기본값 세팅
+	// =========================
+	SetDefaultMng();
+
+	// =========================
+	// 사용자 설정 overlay
+	// =========================
+	LoadMngFromIni(file);
+
+	// =========================
+	// 파생 이벤트 확장
+	// =========================
+	ExpandDerivedSignals();
+}
+#else
 void CMainFrame::load_mngSetup()
 {
 	CProfile profile(pkManageSetup);
@@ -13064,7 +13261,7 @@ void CMainFrame::load_mngSetup()
 	}
 
 	m_mapAlarmList.RemoveAll();
-	if (iret == 0)  //유저폴더에  없는 상태
+	if (0 == 0)  //유저폴더에  없는 상태
 	{	//디폴트 장운영을 넣어준다.
 		m_mapAlarmList.SetAt("851", "");	//장전 동시호가 개시
 		m_mapAlarmList.SetAt("801", "");	//장개시
@@ -13077,14 +13274,14 @@ void CMainFrame::load_mngSetup()
 		m_mapAlarmList.SetAt("126", "");	//장마감 5분전
 		m_mapAlarmList.SetAt("130", "");	//장마감 1분전
 		m_mapAlarmList.SetAt("135", "");	//장마감 10초전
-		m_mapAlarmList.SetAt("817", "");	//서킷브레이커발동
-		m_mapAlarmList.SetAt("818", "");	//서킷브레이커해제
+		m_mapAlarmList.SetAt("817", "1");	//서킷브레이커발동
+		m_mapAlarmList.SetAt("818", "1");	//서킷브레이커해제
 		m_mapAlarmList.SetAt("804", "");	//시간외종가 매매개시
 		m_mapAlarmList.SetAt("853", "");	//시간외종가 매매종료, 시간외단일가 매매개시 
 		m_mapAlarmList.SetAt("806", "");	//시간외단일가 매매종료
 		m_mapAlarmList.SetAt("846", "");	//KOBA ELW 조기종료
-		m_mapAlarmList.SetAt("871", "");	//사이드카 발동
-		m_mapAlarmList.SetAt("872", "");	 //사이드카 해제
+		m_mapAlarmList.SetAt("871", "1");	//사이드카 발동
+		m_mapAlarmList.SetAt("872", "1");	 //사이드카 해제
 
 		 //version 4  NXT 
 		m_mapAlarmList.SetAt("881", "NXT 프리마켓 개시");  /* 08:00            */
@@ -13197,202 +13394,6 @@ void CMainFrame::load_mngSetup()
 		m_mapAlarmList.SetAt("876", "");
 		m_mapAlarmList.SetAt("878", "");
 	}
-
-	//NXT
-	//m_mapAlarmList.SetAt("883", "NXT 오전 휴장");  /* 08:50~09:00:30   */
-	//m_mapAlarmList.SetAt("886", "NXT 오후 휴장"); /* 15:20~15:30      */
-	//m_mapAlarmList.SetAt("890", "NXT 장마감"); /* 20:00            */
-	//m_mapAlarmList.SetAt("896", "NXT 종가매매 호가개시");  /* 15:00~15:30      */      
-	//m_mapAlarmList.SetAt("897", "NXT 종가매매 마감");  /* 16:00            */
-	//m_mapAlarmList.SetAt("900", "NXT SHUTDOWN발동");
-	//m_mapAlarmList.SetAt("901", "NXT 주식(코스피) CB발동");
-	//m_mapAlarmList.SetAt("902", "NXT 주식(코스피) CB해제");
-	//m_mapAlarmList.SetAt("903", "NXT 주식(코스피) 사이드카 매도발동");
-	//m_mapAlarmList.SetAt("904", "NXT 주식(코스피) 사이드카 매도발동해제");
-	//m_mapAlarmList.SetAt("905", "NXT 주식(코스피) 사이드카 매수발동");
-	//m_mapAlarmList.SetAt("906", "NXT 주식(코스피) 사이드카 매수발동해제");
-	//m_mapAlarmList.SetAt("907", "NXT 주식(코스피) 시장임시정지");
-	//m_mapAlarmList.SetAt("908", "NXT 주식(코스피) 시장임시정지해제");
-	//m_mapAlarmList.SetAt("909", "NXT 주식(코스피) 시장호가접수정지");
-	//m_mapAlarmList.SetAt("910", "NXT 주식(코스피) 시장호가접수정지해제");
-	//m_mapAlarmList.SetAt("911", "NXT 주식(코스닥) CB발동");
-	//m_mapAlarmList.SetAt("912", "NXT 주식(코스닥) CB해제");
-	//m_mapAlarmList.SetAt("913", "NXT 주식(코스닥) 사이드카 매도발동");
-	//m_mapAlarmList.SetAt("914", "NXT 주식(코스닥) 사이드카 매도발동해제");
-	//m_mapAlarmList.SetAt("915", "NXT 주식(코스닥) 사이드카 매수발동");
-	//m_mapAlarmList.SetAt("916", "NXT 주식(코스닥) 사이드카 매수발동해제");
-	//m_mapAlarmList.SetAt("917", "NXT 주식(코스닥) 시장임시정지");
-	//m_mapAlarmList.SetAt("918", "NXT 주식(코스닥) 시장매매재개");
-	//m_mapAlarmList.SetAt("919", "NXT 주식(코스닥) 시장호가접수정지");
-	//m_mapAlarmList.SetAt("920", "NXT 주식(코스닥) 시장호가접수재개");
-
-	//if (Axis::devMode)
-	//{
-	//	m_mapAlarmList.SetAt("300", "");
-	//}
-}
-#else
-void CMainFrame::load_mngSetup()
-{
-	CProfile profile(pkManageSetup);
-	CString szTotal, szUnit;
-
-	const int iret = profile.GetInt(szMessage, "Init");
-
-	m_bSound = profile.GetInt("Setup", "SOUND") == 1;
-	m_nInfoPos = profile.GetInt("Setup", "POS", 2);
-	m_bUseAlarm = profile.GetInt("Setup", "USE", 1);
-	m_nBkMode = profile.GetInt(szBkNotice, "MODE");
-
-	// KOBA ELW 장운영 알림 설정
-	const int val = profile.GetInt("Manage", MNG_INFO_KOBAELW, -1);
-	if (val == -1)
-	{
-		m_bKobaElwNotify = true;
-	}
-	else
-	{
-		m_bKobaElwNotify = (val == 1) ? true : false;
-	}
-
-	m_mapAlarmList.RemoveAll();
-	if (iret == 0)  //유저폴더 없는 상태
-	{	//디폴트 장운영을 넣어준다.
-		m_mapAlarmList.SetAt("851", "");	//장전 동시호가 개시
-		m_mapAlarmList.SetAt("801", "");	//장개시
-		m_mapAlarmList.SetAt("21", "");		//장개시 10분전
-		m_mapAlarmList.SetAt("26", "");		//장개시 5분전
-		m_mapAlarmList.SetAt("30", "");		//장개시 1분전
-		m_mapAlarmList.SetAt("35", "");		//장개시 10초전
-		m_mapAlarmList.SetAt("852", "");	//장후 동시호개 개시
-		m_mapAlarmList.SetAt("809", "");	//장마감
-		m_mapAlarmList.SetAt("126", "");	//장마감 5분전
-		m_mapAlarmList.SetAt("130", "");	//장마감 1분전
-		m_mapAlarmList.SetAt("135", "");	//장마감 10초전
-		m_mapAlarmList.SetAt("817", "");	//서킷브레이커발동
-		m_mapAlarmList.SetAt("818", "");	//서킷브레이커해제
-		m_mapAlarmList.SetAt("804", "");	//시간외종가 매매개시
-		m_mapAlarmList.SetAt("853", "");	//시간외종가 매매종료, 시간외단일가 매매개시 
-		m_mapAlarmList.SetAt("806", "");	//시간외단일가 매매종료
-		m_mapAlarmList.SetAt("846", "");	//KOBA ELW 조기종료
-		m_mapAlarmList.SetAt("871", "");	//사이드카 발동
-		m_mapAlarmList.SetAt("872", "");	 //사이드카 해제
-	}
-	else if (iret == 1)
-	{	//기존 설정  //디폴트 장운영을 넣어준다.
-		profile.Write(szMessage, "OPEN", "");
-		profile.Write(szMessage, "CLOSE", "");
-		m_mapAlarmList.SetAt("851", "");	//장전 동시호가 개시
-		m_mapAlarmList.SetAt("801", "");	//장개시
-		m_mapAlarmList.SetAt("21", "");		//장개시 10분전
-		m_mapAlarmList.SetAt("26", "");		//장개시 5분전
-		m_mapAlarmList.SetAt("30", "");		//장개시 1분전
-		m_mapAlarmList.SetAt("35", "");		//장개시 10초전
-		m_mapAlarmList.SetAt("852", "");	//장후 동시호개 개시
-		m_mapAlarmList.SetAt("809", "");	//장마감
-		m_mapAlarmList.SetAt("126", "");	//장마감 5분전
-		m_mapAlarmList.SetAt("130", "");	//장마감 1분전
-		m_mapAlarmList.SetAt("135", "");	//장마감 10초전
-		m_mapAlarmList.SetAt("817", "");	//서킷브레이커발동
-		m_mapAlarmList.SetAt("818", "");	//서킷브레이커해제
-		m_mapAlarmList.SetAt("804", "");	//시간외종가 매매개시
-		m_mapAlarmList.SetAt("853", "");	//시간외종가 매매종료, 시간외단일가 매매개시 
-		m_mapAlarmList.SetAt("806", "");	//시간외단일가 매매종료
-		m_mapAlarmList.SetAt("846", "");	//KOBA ELW 조기종료
-		m_mapAlarmList.SetAt("871", "");	//사이드카 발동
-		m_mapAlarmList.SetAt("872", "");	 //사이드카 해제
-	}
-	else if (iret == 3 || iret == 2)
-	{//설정화면을 이미 다녀왔다. 
-		//ref 장운영 추가 
-		CString file;
-		file.Format("%s\\%s\\%s\\mngsetup.ini", Axis::home, USRDIR, Axis::user);
-		char	ssb[1024 * 4];
-		const DWORD ssL = GetPrivateProfileSection("Manage", ssb, sizeof(ssb), file);
-		if (ssL <= 0)
-			return;
-
-		CString subitem, keys, value, string = CString(ssb, ssL);
-		for (; !string.IsEmpty(); )
-		{
-			int idx = string.Find('\0');
-			if (idx == -1)	break;
-
-			subitem = string.Left(idx++);
-			string = string.Mid(idx);
-
-			idx = subitem.Find('=');
-			if (idx == -1)	continue;
-
-			keys = subitem.Left(idx++);
-			value = subitem.Mid(idx);
-
-			if (atoi(value) == 1)
-				m_mapAlarmList.SetAt(keys, "");
-		}
-
-		if (iret < 3)  //최종버전보다 낮으면 
-		{
-			m_mapAlarmList.SetAt("871", "1");	//사이드카 발동
-			m_mapAlarmList.SetAt("872", "1");	 //사이드카 해제
-		}
-	}
-
-	CString sym, vals{};
-	if (m_mapAlarmList.Lookup("871", vals)) //사이드카 발동
-	{
-		m_mapAlarmList.SetAt("873", "");
-		m_mapAlarmList.SetAt("875", "");
-		m_mapAlarmList.SetAt("877", "");
-	}
-
-	vals.Empty();
-	if (m_mapAlarmList.Lookup("872", vals)) //사이드카 해제
-	{
-		m_mapAlarmList.SetAt("874", "");
-		m_mapAlarmList.SetAt("876", "");
-		m_mapAlarmList.SetAt("878", "");
-	}
-
-	//NXT
-	m_mapAlarmList.SetAt("881", "NXT 프리마켓 개시");  /* 08:00            */
-	m_mapAlarmList.SetAt("882", "NXT 프리마켓 마감");  /* 08:50            */
-	m_mapAlarmList.SetAt("883", "NXT 오전 휴장");  /* 08:50~09:00:30   */
-	m_mapAlarmList.SetAt("884", "NXT 메인마켓 개시"); /* 09:00:30         */
-	m_mapAlarmList.SetAt("885", "NXT 메인마켓 마감");  /* 15:20            */
-	m_mapAlarmList.SetAt("886", "NXT 오후 휴장"); /* 15:20~15:30      */
-	m_mapAlarmList.SetAt("887", "NXT 단일가 호가개시"); /* 15:30~15:40      */
-	m_mapAlarmList.SetAt("888", "NXT 애프터마켓 개시");  /* 15:40            */
-	m_mapAlarmList.SetAt("889", "NXT 애프터마켓 마감"); /* 20:00            */
-	m_mapAlarmList.SetAt("890", "NXT 장마감"); /* 20:00            */
-	m_mapAlarmList.SetAt("896", "NXT 종가매매 호가개시");  /* 15:00~15:30      */
-	m_mapAlarmList.SetAt("897", "NXT 종가매매 마감");  /* 16:00            */
-	m_mapAlarmList.SetAt("900", "NXT SHUTDOWN발동");
-	m_mapAlarmList.SetAt("901", "NXT 주식(코스피) CB발동");
-	m_mapAlarmList.SetAt("902", "NXT 주식(코스피) CB해제");
-	m_mapAlarmList.SetAt("903", "NXT 주식(코스피) 사이드카 매도발동");
-	m_mapAlarmList.SetAt("904", "NXT 주식(코스피) 사이드카 매도발동해제");
-	m_mapAlarmList.SetAt("905", "NXT 주식(코스피) 사이드카 매수발동");
-	m_mapAlarmList.SetAt("906", "NXT 주식(코스피) 사이드카 매수발동해제");
-	m_mapAlarmList.SetAt("907", "NXT 주식(코스피) 시장임시정지");
-	m_mapAlarmList.SetAt("908", "NXT 주식(코스피) 시장임시정지해제");
-	m_mapAlarmList.SetAt("909", "NXT 주식(코스피) 시장호가접수정지");
-	m_mapAlarmList.SetAt("910", "NXT 주식(코스피) 시장호가접수정지해제");
-	m_mapAlarmList.SetAt("911", "NXT 주식(코스닥) CB발동");
-	m_mapAlarmList.SetAt("912", "NXT 주식(코스닥) CB해제");
-	m_mapAlarmList.SetAt("913", "NXT 주식(코스닥) 사이드카 매도발동");
-	m_mapAlarmList.SetAt("914", "NXT 주식(코스닥) 사이드카 매도발동해제");
-	m_mapAlarmList.SetAt("915", "NXT 주식(코스닥) 사이드카 매수발동");
-	m_mapAlarmList.SetAt("916", "NXT 주식(코스닥) 사이드카 매수발동해제");
-	m_mapAlarmList.SetAt("917", "NXT 주식(코스닥) 시장임시정지");
-	m_mapAlarmList.SetAt("918", "NXT 주식(코스닥) 시장매매재개");
-	m_mapAlarmList.SetAt("919", "NXT 주식(코스닥) 시장호가접수정지");
-	m_mapAlarmList.SetAt("920", "NXT 주식(코스닥) 시장호가접수재개");
-
-	//if (Axis::devMode)
-	//{
-	//	m_mapAlarmList.SetAt("300", "");
-	//}
 }
 #endif
 
