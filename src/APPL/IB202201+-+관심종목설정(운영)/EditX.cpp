@@ -574,51 +574,148 @@ LRESULT CXEditPrompt::OnImeComposition(WPARAM wParam, LPARAM lParam)
 	return 0;
 }
 
+static bool IsHangul(wchar_t ch)
+{
+	// ÇÑ±Û À½Àý(°¡-ÆR) + ÀÚ¸ð(¤¡-¤¾, ¤¿-¤Ó)±îÁö Æ÷ÇÔ
+	return (ch >= 0xAC00 && ch <= 0xD7A3) ||  // °¡-ÆR
+		(ch >= 0x3131 && ch <= 0x318E) ||  // ¤¡-¤¾, ¤¿-¤Ó (È£È¯ ÀÚ¸ð)
+		(ch >= 0x1100 && ch <= 0x11FF);    // ÇÑ±Û ÀÚ¸ð
+}
+
+static bool IsStockCodeString(CString& s) // s¸¦ ´ë¹®ÀÚ·Î Á¤¸®ÇØÁÖ·Á°í non-const
+{
+	s.Trim(); // ¾ÕµÚ °ø¹é Á¦°Å
+	const int len = s.GetLength();
+	if (len <= 0) return false;
+
+	// ±æÀÌ Á¦ÇÑ(³Ê È¯°æ¿¡ ¸Â°Ô Á¶Àý °¡´É)
+	if (len > 12) return false;
+
+	bool hasDigit = false;
+
+	for (int i = 0; i < len; ++i)
+	{
+		const wchar_t ch = (wchar_t)s.GetAt(i);
+
+		// ÇÑ±Û Æ÷ÇÔÀÌ¸é ¹«Á¶°Ç Á¾¸ñ¸í
+		if (IsHangul(ch))
+			return false;
+
+		// ¼ýÀÚ/¿µ¹®¸¸ Çã¿ë (±× ¿Ü: -, _, °ø¹é, Æ¯¼ö¹®ÀÚ => Á¾¸ñ¸í)
+		if (!_istalnum(ch))
+			return false;
+
+		if (_istdigit(ch))
+		{
+			hasDigit = true;
+			continue;
+		}
+
+		// ¿µ¹®Àº ´ë¹®ÀÚ·Î ÅëÀÏ
+		if (_istalpha(ch))
+		{
+			s.SetAt(i, (TCHAR)_totupper(ch));
+			continue;
+		}
+	}
+
+	// ¼ýÀÚ 1°³µµ ¾øÀ¸¸é ÄÚµå·Î º¸Áö ¾ÊÀ½(ÀüºÎ ¿µ¹®ÀÌ¸é Á¾¸ñ¸í Ã³¸®)
+	if (!hasDigit)
+		return false;
+
+	return true;
+}
 
 void CXEditPrompt::OnKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags)
 {
-	CEdit::OnKeyUp(nChar, nRepCnt, nFlags);
-	if (!m_bKeyDown)
-		return;
-
-	m_bKeyDown = false;
-	CString	string; GetWindowText(string);
-
-
-
-	if (string.GetLength() <= 0)
+	if (1)
 	{
-		GetParent()->SendMessage(WM_EDITX, wpBLANK, 0);
+		CEdit::OnKeyUp(nChar, nRepCnt, nFlags);
 
-		if(nChar == 40)
-			GetParent()->SendMessage(WM_EDITX, wpDown, 0);
-		return;
-	}
+		if (!m_bKeyDown)
+			return;
+		m_bKeyDown = false;
 
-	int	xChar{}; bool digit = false;
-	for (int ii = 0; ii < string.GetLength(); ii++)
-	{
-		xChar = (int)string.GetAt(ii);
-		if (xChar >= (int)'0' && xChar <= (int)'9')
+		CString text;
+		GetWindowText(text);
+		text.Trim();
+
+		// ºó ¹®ÀÚ¿­ Ã³¸®
+		if (text.IsEmpty())
 		{
-			digit = true;
-			continue;
-		}
-		digit = false;
-		break;
-	}
+			GetParent()->SendMessage(WM_EDITX, wpBLANK, 0);
 
-	if (digit)
-	{
-		GetParent()->SendMessage(WM_EDITX, wpSEARCH1, 0);
-		if(nChar == 40)
-			GetParent()->SendMessage(WM_EDITX, wpDown, 0);
+			// Down Å°(40) Ã³¸® À¯Áö
+			if (nChar == 40)
+				GetParent()->SendMessage(WM_EDITX, wpDown, 0);
+			return;
+		}
+
+		// ÄÚµå/ÀÌ¸§ ÆÇº°
+		CString key = text; // IsStockCodeString¿¡¼­ ´ë¹®ÀÚ º¯È¯ÇÒ ¼ö ÀÖÀ¸´Ï º¹»çº» »ç¿ë
+		const bool isCode = IsStockCodeString(key);
+
+		if (isCode)
+		{
+			// ´ë¹®ÀÚ ¹Ý¿µÀÌ ÇÊ¿äÇÏ¸é ¿¡µðÆ®¿¡ ´Ù½Ã ¼¼ÆÃ(¿øÇÏ¸é ÁÖ¼® ÇØÁ¦)
+			// if (key != text) SetWindowText(key);
+
+			GetParent()->SendMessage(WM_EDITX, wpSEARCH1, 0); // Á¾¸ñÄÚµå
+			if (nChar == 40)
+				GetParent()->SendMessage(WM_EDITX, wpDown, 0);
+		}
+		else
+		{
+			GetParent()->SendMessage(WM_EDITX, wpSEARCH2, 0); // Á¾¸ñ¸í
+			if (nChar == 40)
+				GetParent()->SendMessage(WM_EDITX, wpDown, 0);
+		}
 	}
 	else
 	{
-		GetParent()->SendMessage(WM_EDITX, wpSEARCH2, 0);
-		if(nChar == 40)
-			GetParent()->SendMessage(WM_EDITX, wpDown, 0);
+		CEdit::OnKeyUp(nChar, nRepCnt, nFlags);
+		if (!m_bKeyDown)
+			return;
+
+		m_bKeyDown = false;
+		CString	string; GetWindowText(string);
+
+
+
+		if (string.GetLength() <= 0)
+		{
+			GetParent()->SendMessage(WM_EDITX, wpBLANK, 0);
+
+			if (nChar == 40)
+				GetParent()->SendMessage(WM_EDITX, wpDown, 0);
+			return;
+		}
+
+		int	xChar{}; bool digit = false;
+		for (int ii = 0; ii < string.GetLength(); ii++)
+		{
+			xChar = (int)string.GetAt(ii);
+			if (xChar >= (int)'0' && xChar <= (int)'9')
+			{
+				digit = true;
+				continue;
+			}
+			digit = false;
+			break;
+		}
+
+		if (digit)
+		{
+			GetParent()->SendMessage(WM_EDITX, wpSEARCH1, 0);
+			if (nChar == 40)
+				GetParent()->SendMessage(WM_EDITX, wpDown, 0);
+		}
+		else
+		{
+			GetParent()->SendMessage(WM_EDITX, wpSEARCH2, 0);
+			if (nChar == 40)
+				GetParent()->SendMessage(WM_EDITX, wpDown, 0);
+		}
 	}
 }
 

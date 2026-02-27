@@ -119,6 +119,10 @@ static char THIS_FILE[] = __FILE__;
 static CRect	g_monRc(0, 0, 0, 0);
 static CMainFrame* m_pMain = NULL;
 
+#ifdef DF_MAIN_RTS
+std::unordered_map<std::string, int> g_codeToIndex;
+TickSnapshot g_tickSlots[MAX_SLOT];
+#endif
 
 #pragma	comment(lib, "Winmm.lib")
 #pragma	comment(lib, "SUiPre.lib")
@@ -617,58 +621,62 @@ LRESULT CALLBACK KeyboardProc(int nCode, WPARAM wParam, LPARAM lParam)
 				}
 			}
 			break;
+		default:
+			break;
 		}
 
 		const int	index = 0;
 		switch (msg->message)
 		{
-		case WM_KEYDOWN:
-			if (msg->wParam == VK_RETURN)
-			{
-				if (!(msg->lParam & 0x1000000))	// center enter key
+			case WM_KEYDOWN:
+				if (msg->wParam == VK_RETURN)
 				{
-					if (m_pMain->TransKey(msg->wParam))
-						return TRUE;
-				}
-			}
-			if (msg->wParam == VK_TAB && (GetKeyState(VK_CONTROL) & 0x8000))
-			{
-				//m_pMain->MDINextChild();
-				return TRUE;
-			}
-			if (msg->wParam == VK_F8/*byte('P')*/ && (GetKeyState(VK_CONTROL) & 0x8000))
-			{
-				//m_pMain->update_ticker(0,"S0000	047	1	014	506727	048	20100527	301	 	015	윤흡 한백 대표 `이달의 기능한국인` 선정                                                                                 	016	20100527110009    273724	041	13	042	9	044	173339	022	 	045	인물/동정	046	헤럴	");
-				//폰패드장비에 비밀번호 읽어옴
-				if(!Axis::isCustomer)
-				{	
-					//m_pMain->ReadPhonePad(0);
-					m_pMain->RunPhonePad();
-					/*
-					if (!m_pMain->m_phone_dlgs)
+					if (!(msg->lParam & 0x1000000))	// center enter key
 					{
-						m_pMain->m_phone_dlgs = new CPhonePad(NULL);
-						m_pMain->m_phone_dlgs->DoModal();
-						m_pMain->m_phone_dlgs = NULL;
+						if (m_pMain->TransKey(msg->wParam))
+							return TRUE;
 					}
-					*/
-					
+				}
+				if (msg->wParam == VK_TAB && (GetKeyState(VK_CONTROL) & 0x8000))
+				{
+					//m_pMain->MDINextChild();
 					return TRUE;
 				}
-			}
-			break;
-		case WM_SYSKEYDOWN:
-			switch (msg->wParam)
-			{
-			case 49:case 50:case 51:case 52:case 53:case 54:
-				if (!(GetKeyState(VK_MENU) & 0x8000))	
-					break;
-				m_pMain->Change_VsKey(msg->wParam - 49);
-				return TRUE;
-			}
-			break;
-		default:
-			break;
+				if (msg->wParam == VK_F8/*byte('P')*/ && (GetKeyState(VK_CONTROL) & 0x8000))
+				{
+					//m_pMain->update_ticker(0,"S0000	047	1	014	506727	048	20100527	301	 	015	윤흡 한백 대표 `이달의 기능한국인` 선정                                                                                 	016	20100527110009    273724	041	13	042	9	044	173339	022	 	045	인물/동정	046	헤럴	");
+					//폰패드장비에 비밀번호 읽어옴
+					if(!Axis::isCustomer)
+					{	
+						//m_pMain->ReadPhonePad(0);
+						m_pMain->RunPhonePad();
+						/*
+						if (!m_pMain->m_phone_dlgs)
+						{
+							m_pMain->m_phone_dlgs = new CPhonePad(NULL);
+							m_pMain->m_phone_dlgs->DoModal();
+							m_pMain->m_phone_dlgs = NULL;
+						}
+						*/
+					
+						return TRUE;
+					}
+				}
+				break;
+			case WM_SYSKEYDOWN:
+				switch (msg->wParam)
+				{
+					case 49:case 50:case 51:case 52:case 53:case 54:
+						if (!(GetKeyState(VK_MENU) & 0x8000))	
+							break;
+						m_pMain->Change_VsKey(msg->wParam - 49);
+						return TRUE;
+					default:
+						break;
+				}
+				break;
+			default:
+				break;
 		}
 	}
 	return CallNextHookEx(m_pMain->m_hHook, nCode, wParam, lParam);
@@ -686,6 +694,8 @@ LRESULT CALLBACK viewProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		if (m_pMain->m_view)	
 			return TRUE;
 		break;
+	default:
+		break;
 	}
 
 	return ::CallWindowProc((long (__stdcall *)(HWND, UINT, WPARAM, LPARAM))m_pMain->m_callproc, hwnd, msg, wParam, lParam);
@@ -700,7 +710,6 @@ bool axiscall(int msg, WPARAM wParam, LPARAM lParam)
 	{
 	case AXI_CHANGEVIEW:	
 		//OutputDebugString("AXI_CHANGEVIEW\n");
-		//testcode
 		if(m_pMain->ScreenCheck((char*)lParam) == 0)
 			return false;
 		return (m_pMain->m_mapHelper->ChangeChild((char *)lParam, TRIGGERN, wParam) 
@@ -846,8 +855,8 @@ CMainFrame::CMainFrame()
 	
 	m_TotalAcc = NULL;
 
-	srand( (unsigned)time( NULL ) );
-	m_rndkey = rand();
+	//srand( (unsigned)time( NULL ) );
+	m_rndkey = GetTickCount();
 
 	m_preFontSize = 0;
 	bBackFont     = false;
@@ -1265,67 +1274,109 @@ void CMainFrame::MakeExpectSymbolTable()
 
 void CMainFrame::ShowHistoryMap(WPARAM wParam, LPARAM lParam)
 {
-	if (1)
+	//if (1)
 	{
-		if (!wParam || !lParam)
-			return;
+			if (!wParam || !lParam)
+				return;
 
-		LPCSTR xCode = reinterpret_cast<LPCSTR>(wParam);
-		RECT* pRc = reinterpret_cast<RECT*>(lParam);
+			LPCSTR xCode = reinterpret_cast<LPCSTR>(wParam);
+			RECT* pRc = reinterpret_cast<RECT*>(lParam);
 
-		if (IsBadStringPtrA(xCode, 256) || IsBadReadPtr(pRc, sizeof(RECT)))
-			return;
+			if (!xCode || !pRc)
+				return;
 
-		if (!m_bar3 || !m_bar3->GetSafeHwnd())
-			return;
+			if (!m_bar3 || !m_bar3->GetSafeHwnd())
+				return;
 
-		if (m_codeHist.CompareNoCase(xCode) == 0)
-			return;
+			if (m_codeHist.CompareNoCase(xCode) == 0)
+				return;
 
-		m_codeHist = xCode;
+			m_codeHist = xCode;
 
-		CRect rc(*pRc);
-		CRect barRc, mainRc;
+			// ---------------------------------
+			// lParam 포인터 방어 (SEH)
+			// ---------------------------------
+			CRect rc;
+			__try
+			{
+				rc = *pRc;   // 여기서 AV 나면 except로 빠짐
+			}
+			__except (EXCEPTION_EXECUTE_HANDLER)
+			{
+				m_codeHist.Empty();
+				return;
+			}
 
-		m_bar3->GetWindowRect(&barRc);
-		ScreenToClient(&barRc);
-		GetClientRect(&mainRc);
+			// lParam은 client 좌표라고 가정 → screen 좌표로 변환
+			ClientToScreen(&rc);
 
-		if (m_bar3->GetBarStyle() & CBRS_ALIGN_TOP)
-			rc.top = barRc.bottom;
-		else
-			rc.top = barRc.top - 20;
+			// ---------------------------------
+			// bar 위치 (screen 좌표)
+			// ---------------------------------
+			CRect barRc;
+			m_bar3->GetWindowRect(&barRc); // 이미 screen 좌표
 
-		RECT openRC{};
-		openRC.left = rc.left + barRc.left / 2;
-		openRC.top = rc.top;
-		openRC.right = openRC.left + rc.Width();
-		openRC.bottom = openRC.top + 25;
+			if (m_bar3->GetBarStyle() & CBRS_ALIGN_TOP)
+				rc.top = barRc.bottom;
+			else
+				rc.top = barRc.top - 20;
 
-		int iheight = openRC.bottom - openRC.top;
-		iheight -= 2;
+			RECT openRC{};
+			openRC.left = rc.left;
+			openRC.top = rc.top;
+			openRC.right = openRC.left + rc.Width();
+			openRC.bottom = openRC.top + 25;
 
-		constexpr int Y_OFFSET = 25;
+			// ---------------------------------
+			// 현재 프레임이 속한 모니터 기준 보정
+			// ---------------------------------
+			HMONITOR hMonitor = MonitorFromWindow(this->GetSafeHwnd(), MONITOR_DEFAULTTONEAREST);
+			MONITORINFO mi{};
+			mi.cbSize = sizeof(MONITORINFO);
+			GetMonitorInfo(hMonitor, &mi);
 
-		openRC.top += iheight;
-		openRC.bottom += iheight;
+			if (openRC.right > mi.rcWork.right)
+			{
+				int w = openRC.right - openRC.left;
+				openRC.left = mi.rcWork.right - w;
+				openRC.right = mi.rcWork.right;
+			}
 
-		if (!m_miniWid || !m_miniWid->GetSafeHwnd())
-			return;
+			if (openRC.bottom > mi.rcWork.bottom)
+			{
+				int h = openRC.bottom - openRC.top;
+				openRC.top = mi.rcWork.bottom - h;
+				openRC.bottom = mi.rcWork.bottom;
+			}
 
-		if (!m_viewHist || !m_viewHist->GetSafeHwnd())
-			m_viewHist = m_miniWid->GetActiveView();
+			// ---------------------------------
+			// view / window 체크
+			// ---------------------------------
+			if (!m_miniWid || !m_miniWid->GetSafeHwnd())
+			{
+				m_codeHist.Empty();
+				return;
+			}
 
-		if (!m_viewHist || !m_viewHist->GetSafeHwnd())
-			return;
+			if (!m_viewHist || !m_viewHist->GetSafeHwnd())
+				m_viewHist = m_miniWid->GetActiveView();
 
-		CWnd* base = m_viewHist->GetWindow(GW_CHILD);
-		if (base && base->GetSafeHwnd())
-			base->SendMessage(WD_HISTORYVIEW, wParam, (LPARAM)&openRC);
+			if (!m_viewHist || !m_viewHist->GetSafeHwnd())
+			{
+				m_codeHist.Empty();
+				return;
+			}
 
-		m_codeHist.Empty();
+			CWnd* base = m_viewHist->GetWindow(GW_CHILD);
+			if (base && base->GetSafeHwnd())
+			{
+				// 여기서 죽는 경우는 base 내부 로직 문제
+				base->SendMessage(WD_HISTORYVIEW, wParam, (LPARAM)&openRC);
+			}
+
+			m_codeHist.Empty();
 	}
-	else
+	/*else
 	{
 		LPCSTR xCode = (LPCSTR)wParam;
 		CRect rc = (LPRECT)lParam;
@@ -1395,7 +1446,7 @@ void CMainFrame::ShowHistoryMap(WPARAM wParam, LPARAM lParam)
 				m_codeHist = "";
 			}
 		}
-	}
+	}*/
 }
 
 void CMainFrame::CloseHistoryMap(WPARAM wParam,LPARAM lParam)
@@ -1646,7 +1697,7 @@ WriteLog(m_slog);
 					m_mapDebugRemoveKey.RemoveAll();
 
 
-					int nCount = m_mapAlarmList.GetCount();
+				/*	int nCount = m_mapAlarmList.GetCount();
 					m_slog.Format("[mng][main]] Map Count = %d\n", nCount);
 					OutputDebugString(m_slog);
 
@@ -1661,7 +1712,7 @@ WriteLog(m_slog);
 							m_slog.Format("[mng][main]Key = %s Value = %s\n", key, value);
 							OutputDebugString(m_slog);
 						}
-					}
+					}*/
 				}
 				break;
 				case 'z':
@@ -1748,8 +1799,10 @@ WriteLog(m_slog);
 						AfxMessageBox("CryptProtectData error");
 						break;
 					}*/
-
-
+					DumpAllSlots(g_tickSlots, MAX_SLOT, 100, 50);
+					
+					m_slog.Format("[AXIS][RTSLOG] g_codeToIndex = %d", g_codeToIndex.size());
+					OutputDebugString(m_slog);
 
 
 				}
@@ -1789,6 +1842,8 @@ WriteLog(m_slog);
 					//}).detach();
 				}
 				break;
+				default:
+					break;
 			}	
 	}
 
@@ -1883,6 +1938,8 @@ LRESULT CMainFrame::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 				return TRUE;
 			}
 			return TRUE;
+		default:
+			break;
 		}
 		break;
 	case WM_NCMOUSEMOVE:
@@ -1892,6 +1949,8 @@ LRESULT CMainFrame::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 		case HTMAXBUTTON:
 		case HTMINBUTTON:
 			return TRUE;
+		default:
+			break;
 		}
 		break;
 	case WM_NCLBUTTONDBLCLK:
@@ -1910,7 +1969,8 @@ LRESULT CMainFrame::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 			}
 		}
 		break;
-	
+	default:
+		break;
 // 	case WM_QUERYENDSESSION
 // 		{
 // 			//save_laststat();
@@ -4811,115 +4871,78 @@ OutputDebugString(m_slog);
 		break;
 		case MMSG_RT_REGISTER_CODES:
 		{
-			std::unique_ptr<RTS_REGISTER_REQ> req((RTS_REGISTER_REQ*)lParam);
-			std::lock_guard<std::mutex> lock(m_subLock);
+			const RTS_REGISTER_REQ* req = (const RTS_REGISTER_REQ*)lParam;
+			HWND hWnd = req->hWnd;
+			if (!::IsWindow(req->hWnd) || !req)
+				return 0;
 
-			HWND h = req->hWnd;
-
-			// ------------------------------------------------
-			// ------------------------------------------------
-			auto it = m_wndSubscriptions.find(h);  //키 핸들 ,  맵( 키 코드, 심볼배열)
-			if (it != m_wndSubscriptions.end())
+			// -----------------------------
+			// Debug Log 시작
+			// -----------------------------
 			{
-				for (auto& [code, symbols] : it->second)
+				CString log;
+				log.Format(_T("[MAIN][RTS등록] HWND=0x%p, codeCount=%d, symbolCount=%d\r\n"),
+					hWnd, req->codeCount, req->symbolCount);
+				OutputDebugString(log);
+
+				// 코드 목록 출력
+				for (int i = 0; i < req->codeCount; ++i)
 				{
-					for (int sym : symbols)
-					{
-						auto codeIt = m_codeSymbolSubscribers.find(code);  //키 코드,  맵(키 심볼, 핸들)
-						if (codeIt != m_codeSymbolSubscribers.end())
-						{
-							auto symIt = codeIt->second.find(sym);
-							if (symIt != codeIt->second.end())
-							{
-								symIt->second.erase(h);
+					if (req->codes[i][0] == '\0') continue;
 
-								// subscriber 없으면 정리
-								if (symIt->second.empty())
-									codeIt->second.erase(symIt);
-							}
-
-							if (codeIt->second.empty())std::unique_ptr<RTS_REGISTER_REQ> req((RTS_REGISTER_REQ*)lParam);
-							std::lock_guard<std::mutex> lock(m_subLock);
-
-							HWND h = req->hWnd;
-
-							// ------------------------------------------------
-							// ------------------------------------------------
-							auto it = m_wndSubscriptions.find(h);
-							if (it != m_wndSubscriptions.end())
-							{
-								for (auto& [code, symbols] : it->second)
-								{
-									for (int sym : symbols)
-									{
-										auto codeIt = m_codeSymbolSubscribers.find(code);
-										if (codeIt != m_codeSymbolSubscribers.end())
-										{
-											auto symIt = codeIt->second.find(sym);
-											if (symIt != codeIt->second.end())
-											{
-												symIt->second.erase(h);
-
-												// subscriber 없으면 정리
-												if (symIt->second.empty())
-													codeIt->second.erase(symIt);
-											}
-
-											if (codeIt->second.empty())
-												m_codeSymbolSubscribers.erase(codeIt);
-										}
-									}
-								}
-
-								m_wndSubscriptions.erase(it);
-							}
-
-							// ------------------------------------------------
-							// ------------------------------------------------
-							for (int i = 0; i < req->codeCount; i++)
-							{
-								std::string code = req->codes[i];
-
-								for (int s = 0; s < req->symbolCount; s++)
-								{
-									int symbol = req->symbols[s];
-
-									// code → symbol → window
-									m_codeSymbolSubscribers[code][symbol].insert(h);
-
-									// window → code → symbol
-									m_wndSubscriptions[h][code].insert(symbol);
-								}
-							}
-
-							return 0;
-								m_codeSymbolSubscribers.erase(codeIt);
-						}
-					}
+#ifdef UNICODE
+					CString code(req->codes[i]);
+#else
+					CString code(req->codes[i]);
+#endif
+					CString line;
+					line.Format(_T("[MAIN][RTS등록]  CODE[%d] = %s\r\n"), i, code.GetString());
+					OutputDebugString(line);
 				}
 
-				m_wndSubscriptions.erase(it);
+				// 심볼 목록 출력
+				for (int i = 0; i < req->symbolCount; ++i)
+				{
+					CString line;
+					line.Format(_T("[MAIN][RTS등록]  SYMBOL[%d] = %d\r\n"), i, req->symbols[i]);
+					OutputDebugString(line);
+				}
+
+				OutputDebugString(_T("--------------------------------------------------\r\n"));
+			}
+			// -----------------------------
+			// Debug Log 끝
+			// -----------------------------
+
+			// 실제 등록 로직
+			RtsSubscription sub;
+
+			sub.codes.reserve(req->codeCount);
+			for (int i = 0; i < req->codeCount; ++i)
+			{
+				if (req->codes[i][0] == '\0') continue;
+				sub.codes.emplace_back(req->codes[i]);
+				EnsureSlotIndexForCode(req->codes[i]);
 			}
 
-			// ------------------------------------------------
-			// ------------------------------------------------
-			for (int i = 0; i < req->codeCount; i++)
+			sub.symbols.reserve(req->symbolCount);
+			for (int i = 0; i < req->symbolCount; ++i)
 			{
-				std::string code = req->codes[i];
-
-				for (int s = 0; s < req->symbolCount; s++)
+				int s = req->symbols[i];
+				if (s < 0 || s >= 1000) continue;
+				if (!sub.symbolMask.test(s))
 				{
-					int symbol = req->symbols[s];
-
-					// code → symbol → window
-					m_codeSymbolSubscribers[code][symbol].insert(h);
-
-					// window → code → symbol
-					m_wndSubscriptions[h][code].insert(symbol);
+					sub.symbolMask.set(s);
+					sub.symbols.push_back(s);
 				}
 			}
 
-			return 0;
+			{
+				std::unique_lock lk(g_subMtx);
+				g_subByHwnd[hWnd] = std::move(sub);
+			}
+
+			return 1;
 		}
 		break;
 		case MMSG_RT_UNREGISTER_WND:
@@ -4944,8 +4967,8 @@ OutputDebugString(m_slog);
 			return 0;
 		}
 		break;
-#endif
-#endif
+#endif //DF_MAIN_RTS
+#endif //DF_MK_CAPTION
 	}
 	return 0;
 }
@@ -7559,7 +7582,7 @@ void CMainFrame::endWorkstation()
 	CheckCDDEDD();   //test CDD
 #endif
 #ifdef DF_MAIN_RTS
-	SetTimer(TM_MAIN_RTS_PUSH, 100, nullptr);
+	//SetTimer(TM_MAIN_RTS_PUSH, 100, nullptr);
 #endif
 	initShared();
 	SetPCData();
@@ -7746,8 +7769,6 @@ WriteLog(s);
 		load_start_notice();
 
 		WriteLog("[AXIS] endWorkstation - Step 10-4");
-
-
 	}
 
 // 	const char* trust = "IB0000X8";
@@ -8077,7 +8098,7 @@ OutputDebugString("GLB signOnCert");
 	//CopyMemory(signPC.cpas,m_axConnect->GetCPass(),m_axConnect->GetCPass().GetLength());
 
 	char ca[6776];
-	int ret;
+	int ret{};
 
 	memset(ca,' ',6776);
 	//CopyMemory(ca,m_axConnect->GetCPass(),m_axConnect->GetCPass().GetLength());
@@ -8934,8 +8955,8 @@ void CMainFrame::write_err()
 	err.Format("[GDI_ERROR] [%u]\n", dw);
 	WriteFile((char *)(const char*)err, err.GetLength());
 }
-#ifdef DF_MAIN_RTS
 
+#ifdef DF_MAIN_RTS
 bool CMainFrame::ReadTick(const char* code, TickSnapshot* out)  //dll에서 호출
 {
 	int idx = GetSlotIndex_FindOnly(code);
@@ -8959,33 +8980,34 @@ bool CMainFrame::ReadTick(int idx, TickSnapshot& out)
 			return true;
 	}
 }
+#endif
 
+#ifdef DF_MAIN_RTS
 void CMainFrame::update_ticker(int kind, struct _alertR* alertR)
 {
 	CString symbol;
 	CString sData;
 	CString stmp;
 
-#ifdef DF_MAIN_RTS
 	std::string scode = CStringA(alertR->code);
-	auto it = m_lastRTSTimeCode.find(scode);
-	// 첫 수신은 무조건 통과
-	const CTime now = CTime::GetCurrentTime();
-	if (it == m_lastRTSTimeCode.end())
-	{
+	//auto it = m_lastRTSTimeCode.find(scode);
+	//// 첫 수신은 무조건 통과
+	//const CTime now = CTime::GetCurrentTime();
+	//if (it == m_lastRTSTimeCode.end())
+	//{
 
-		m_lastRTSTimeCode.emplace(scode, now);
-		m_slog.Format("[AXIS][%s]<%d> ------  첫수신   code=[%s][%d]", __FUNCTION__, __LINE__, symbol, m_lastRTSTimeCode.size());
-		output_DebugString(m_slog);
-	}
-	else
-	{
-		const CTime& prevServerTime = it->second;
-		int diffSec = (int)(now - prevServerTime).GetTotalSeconds();
-		it->second = now;
-		m_slog.Format("[AXIS][%s]<%d> ------  쌓이는 데이터   code=[%s][%d]  diffSec=[%d]", __FUNCTION__, __LINE__, symbol, m_lastRTSTimeCode.size(), diffSec);
-		output_DebugString(m_slog);
-	}
+	//	m_lastRTSTimeCode.emplace(scode, now);
+	//	m_slog.Format("[AXIS][%s]<%d> ------  첫수신   code=[%s][%d]", __FUNCTION__, __LINE__, symbol, m_lastRTSTimeCode.size());
+	//	output_DebugString(m_slog);
+	//}
+	//else
+	//{
+	//	const CTime& prevServerTime = it->second;
+	//	int diffSec = (int)(now - prevServerTime).GetTotalSeconds();
+	//	it->second = now;
+	//	m_slog.Format("[AXIS][%s]<%d> ------  쌓이는 데이터   code=[%s][%d]  diffSec=[%d]", __FUNCTION__, __LINE__, symbol, m_lastRTSTimeCode.size(), diffSec);
+	//	output_DebugString(m_slog);
+	//}
 
 	/////////////////////!!!!!
 	if (!alertR)
@@ -9002,18 +9024,18 @@ void CMainFrame::update_ticker(int kind, struct _alertR* alertR)
 		return;
 
 	// 종목코드 → 슬롯 index
-	int idx = GetSlotIndex_CreateIfMissing(code);
-	if (idx < 0)
-		return;
-
-	// 최신 틱 데이터 갱신
-	UpdateSnapshotFromAlert(g_tickSlots[idx], alertR);
+	auto it = g_codeToIndex.find(code);
+	if (it != g_codeToIndex.end())
+	{
+		int idx = it->second;
+		// 최신 틱 데이터 갱신
+		UpdateSnapshotFromAlert(g_tickSlots[idx], alertR);
+	}
 
 	//기존처럼 화면 루프 돌릴 필요 없음
 	// 화면들은 g_tickSlots[idx]를 직접 읽으면 됨
 
 	/////////////////////!!!!!
-#endif
 	symbol = alertR->code;
 
 	DWORD* data{};
@@ -10024,7 +10046,6 @@ void CMainFrame::changeSize(int key, CSize size)
 			else	
 				gapY = GetFrameGap().cy;
 
-			//testcode
 			gapX -= 4;
 			gapY -= 10;
 
@@ -10076,7 +10097,7 @@ void CMainFrame::changeSize(int key, CSize size)
 		else
 		{
 			nCx = size.cx + gapX;
-			//nCy = size.cy + gapY+4;  //testcode
+			//nCy = size.cy + gapY+4; 
 			nCy = size.cy + gapY + 8;
 			schild->SetSize(nCx, nCy);
 		}
@@ -13043,47 +13064,6 @@ void CMainFrame::SetDefaultMng()
 
 	// NXT
 	LoadMngFromIni(mtblFile, "NXT");
-	//m_mapAlarmList.RemoveAll();
-
-	//m_mapAlarmList.SetAt("851", "");  //장전 동시호가 개시
-	//m_mapAlarmList.SetAt("801", "");  //장개시
-	//m_mapAlarmList.SetAt("21", "");   //장개시 10분전
-	//m_mapAlarmList.SetAt("26", "");   //장개시 5분전
-	//m_mapAlarmList.SetAt("30", "");   //장개시 1분전
-	//m_mapAlarmList.SetAt("35", "");    //장개시 10초전
-	//m_mapAlarmList.SetAt("852", "");  //장후 동시호개 개시
-	//m_mapAlarmList.SetAt("809", "");  //장마감
-	//m_mapAlarmList.SetAt("126", "");  //장마감 5분전
-	//m_mapAlarmList.SetAt("130", ""); //장마감 1분전
-	//m_mapAlarmList.SetAt("135", ""); //장마감 10초전
-	//m_mapAlarmList.SetAt("804", ""); //시간외종가 매매개시
-	//m_mapAlarmList.SetAt("853", ""); //시간외종가 매매종료, 시간외단일가 매매개시
-	//m_mapAlarmList.SetAt("806", ""); //시간외단일가 매매종료
-	//m_mapAlarmList.SetAt("846", "");  //KOBA ELW 조기종료
-	//m_mapAlarmList.SetAt("871", "1"); //사이드카발동
-	//m_mapAlarmList.SetAt("872", "1"); //사이드카해제
-
-
-	//m_mapAlarmList.SetAt("56", "");   //선물/옵션 장개시 5분전
-	//m_mapAlarmList.SetAt("60", "");   //선물/옵션 장개시 1분전
-	//m_mapAlarmList.SetAt("65", "");   //선물/옵션 장개시 10초전
-	//m_mapAlarmList.SetAt("862", "");   //선물/옵션 장후 동시호가 개시
-	//m_mapAlarmList.SetAt("863", "");   //선물/옵션 장마감
-	//m_mapAlarmList.SetAt("837", "1");   //선물/옵션 서킷브레이커발동
-	//m_mapAlarmList.SetAt("838", "1");   //선물/옵션 서킷브레이커해제
-
-
-	//m_mapAlarmList.SetAt("817", "1");  //서킷브레이커발동
-	//m_mapAlarmList.SetAt("818", "1"); //서킷브레이커해제
-
-	//// NXT
-	//m_mapAlarmList.SetAt("881", ""); //프리마켓 개시
-	//m_mapAlarmList.SetAt("882", "");  //프리마켓 마감
-	//m_mapAlarmList.SetAt("884", "");  //메인마켓 개시
-	//m_mapAlarmList.SetAt("885", ""); //메인마켓 마감
-	//m_mapAlarmList.SetAt("887", ""); //애프터마켓 시가단일가 개시
-	//m_mapAlarmList.SetAt("888", ""); //애프터마켓 개시
-	//m_mapAlarmList.SetAt("889", ""); //애프터마켓 마감
 
 }
 
@@ -13238,7 +13218,7 @@ void CMainFrame::load_mngSetup()
 	}
 
 	m_mapAlarmList.RemoveAll();
-	if (0 == 0)  //유저폴더에  없는 상태
+	if (iret == 0)  //유저폴더에  없는 상태
 	{	//디폴트 장운영을 넣어준다.
 		m_mapAlarmList.SetAt("851", "");	//장전 동시호가 개시
 		m_mapAlarmList.SetAt("801", "");	//장개시
@@ -14003,6 +13983,8 @@ void CMainFrame::OnTimer(UINT nIDEvent)
 		SendMessage(WM_USER, MMSG_SETMAIN_STATE, 0);
 	}
 	break;
+
+#ifdef DF_MAIN_RTS
 	case TM_MAIN_RTS_TEST:
 	{
 		static int step = 0;
@@ -14015,78 +13997,17 @@ void CMainFrame::OnTimer(UINT nIDEvent)
 		}
 	}
 	break;
+#endif
+#ifdef DF_MAIN_RTS
 	case TM_MAIN_RTS_PUSH:
 	{
 		std::vector<DispatchJob> jobs;
 		jobs.reserve(512);
 
-		// 1) 구독 테이블 스냅샷(락 짧게)
-		{
-			std::lock_guard<std::mutex> lock(m_subLock);
-
-			for (auto& kvCode : m_codeSymbolSubscribers)
-			{
-				const std::string& code = kvCode.first;
-				auto& symMap = kvCode.second;
-
-				for (auto& kvSym : symMap)
-				{
-					int symbol = kvSym.first;
-					auto& wndSet = kvSym.second;
-
-					if (wndSet.empty())
-						continue;
-
-					DispatchJob job;
-					job.code = code;
-					job.symbol = symbol;
-					job.targets.reserve(wndSet.size());
-
-					for (HWND h : wndSet)
-						job.targets.push_back(h);
-
-					jobs.push_back(std::move(job));
-				}
-			}
-		}
-
-		// 2) 락 없이 실제 데이터 읽고 전송
-		for (auto& job : jobs)
-		{
-			int idx = GetSlotIndex_FindOnly(job.code.c_str());
-			if (idx < 0) continue;
-
-			TickSnapshot snap{};
-			if (!ReadTick(idx, snap)) // 너가 이미 갖고 있는 함수 사용
-				continue;
-
-			if (job.symbol < 0 || job.symbol >= MAX_SYMBOLS)
-				continue;
-
-			if (!snap.valid.test(job.symbol))
-				continue;
-
-			// payload 생성(타겟마다 new해서 SendMessage로 넘김)
-			for (HWND h : job.targets)
-			{
-				if (!::IsWindow(h))
-					continue;
-
-				RTS_PUSH_ITEM* p = new RTS_PUSH_ITEM{};
-				CopyZ(p->code, sizeof(p->code), snap.code);
-				p->symbol = job.symbol;
-				CopyZ(p->value, sizeof(p->value), snap.values[job.symbol]);
-				p->ts_ms = snap.ts_ms;
-
-				::SendMessage(h, WM_RTS_MAIN_PUSH, 0, (LPARAM)p);
-				// 받는 쪽에서 delete p; 해야 함
-			}
-		}
-	
-
 
 	}
 	break;
+#endif
 	}
 	//WriteLog("End OnTimer");
 	CMDIFrameWnd::OnTimer(nIDEvent);
@@ -17262,31 +17183,31 @@ NXT
 	default:
 		{
 #ifdef DF_MAIN_RTS		
-		auto it = g_mapRoute.find(key);
-		if (it != g_mapRoute.end())
-		{
-			TR_ROUTE_INFO info = it->second;
+		//auto it = g_mapRoute.find(key);
+		//if (it != g_mapRoute.end())
+		//{
+		//	TR_ROUTE_INFO info = it->second;
 
-			// 화면으로 돌려줄 TR 구조체 생성
-			//ST_SEND_TR* pTr = new ST_SEND_TR;
-			//pTr->key = info.key;     // 화면이 원래 보낸 key
-			//pTr->datB = data;
-			//pTr->datL = len;
-			//pTr->stat = 2;
+		//	// 화면으로 돌려줄 TR 구조체 생성
+		//	//ST_SEND_TR* pTr = new ST_SEND_TR;
+		//	//pTr->key = info.key;     // 화면이 원래 보낸 key
+		//	//pTr->datB = data;
+		//	//pTr->datL = len;
+		//	//pTr->stat = 2;
 
-			// 화면으로 응답 전달
-			if (::IsWindow(info.hWnd))
-			{
-				m_slog.Format("[2022][%s]<%d>  메인에서 tr 받고 다시 화면[%x]으로  key[%d] ", __FUNCTION__, __LINE__, info.hWnd, info.key);
-				output_DebugString(m_slog);   //
-				::PostMessage(info.hWnd, WM_USER, MAKEWPARAM(MAKEWORD(DLL_OUB, info.key), len), lParam);
-			}
+		//	// 화면으로 응답 전달
+		//	if (::IsWindow(info.hWnd))
+		//	{
+		//		m_slog.Format("[2022][%s]<%d>  메인에서 tr 받고 다시 화면[%x]으로  key[%d] ", __FUNCTION__, __LINE__, info.hWnd, info.key);
+		//		output_DebugString(m_slog);   //
+		//		::PostMessage(info.hWnd, WM_USER, MAKEWPARAM(MAKEWORD(DLL_OUB, info.key), len), lParam);
+		//	}
 
-			// poolKey 반환
-			g_mapRoute.erase(it);
-			FreePoolKey(key);
-			return;
-		}
+		//	// poolKey 반환
+		//	g_mapRoute.erase(it);
+		//	FreePoolKey(key);
+		//	return;
+		//}
 #endif	
 			int igubn{};
 			HWND hwnd = GetHWndByKey(key, igubn);
@@ -21740,8 +21661,8 @@ void CMainFrame::OpenAnnouncement()
 		}
 		else
 		{
-			cx = atoi(urls.Left(4));
-			cy = atoi(urls.Mid(4, 4));
+			cx = _ttoi(urls.Left(4));
+			cy = _ttoi(urls.Mid(4, 4));
 			urls = urls.Mid(pos+1);
 		}
 
@@ -22150,7 +22071,7 @@ BOOL CMainFrame::IsRunTime()
 		return FALSE;
 
 	szTime.Format("%02d%02d%02d", time.GetHour(), time.GetMinute(), time.GetSecond());
-	if (90000 > atoi(szTime) || atoi(szTime) > 170000)
+	if (90000 > _ttoi(szTime) || _ttoi(szTime) > 170000)
 		return FALSE;
 
 	return TRUE;
@@ -22607,7 +22528,7 @@ void CMainFrame::checkOpenedList()
 
 	((CAxisApp*)m_axis)->m_logPath = profile.GetFileName();
 
-	if (atoi(value) != 1)
+	if (_ttoi(value) != 1)
 	{
 		TRY
 		{
@@ -22951,6 +22872,8 @@ void CMainFrame::show_Ticker(int nID)
 		saveToolStatus();
 		SetSDIChangeHeight();
 		break;
+	default:
+		break;
 	}
 }
 
@@ -22958,13 +22881,18 @@ void CMainFrame::hide_Ticker(int nID)
 {
 	switch (nID)
 	{
-	case 5:
-#ifdef DF_USE_CPLUS17
-		ShowControlBar(m_tInfo3.get(), FALSE, FALSE);
-#else
-		ShowControlBar(m_tInfo3, FALSE, FALSE);
-#endif
-		saveToolStatus();
+		case 5:
+		{
+	#ifdef DF_USE_CPLUS17
+			ShowControlBar(m_tInfo3.get(), FALSE, FALSE);
+	#else
+			ShowControlBar(m_tInfo3, FALSE, FALSE);
+	#endif
+			saveToolStatus();
+		}
+		break;
+		default:
+			break;
 	}
 }
 
@@ -22974,7 +22902,7 @@ CGPop*	CMainFrame::getGPOP( CString strMapName )
 	while( pos )
 	{
 		int key;
-		CGPop* p;
+		CGPop* p{};
 		m_arGPOP.GetNextAssoc( pos, key, p );		
 
 		if( p->m_mapN == strMapName.Left(8) )
@@ -30500,7 +30428,7 @@ LRESULT CMainFrame::OnLockPass( WPARAM wParam, LPARAM lParam )
 		return 0;
 	}
 	char ca[20];
-	int ret;
+	int ret{};
 
 	memset(ca, ' ', 20);
 	int ilen = Axis::userID.GetLength();
@@ -30628,106 +30556,209 @@ void CMainFrame::PBMngShow(CString strMsg)
 	pMngPB->ShowPBSlide(mRc);
 }
 
+//void CMainFrame::HidePBArrItem(CWnd* pwnd)
+//{
+//	if(m_arrOrdRect.GetSize() == 0)
+//		return;
+//
+//	CPBRect* pArrRect = NULL;
+//	for(int ii = 0 ; ii < m_arrOrdRect.GetSize() ; ii++)
+//	{
+//		pArrRect = m_arrOrdRect.GetAt(ii);
+//		if(pArrRect->pWnd == pwnd)
+//			pArrRect->bShow = false;
+//	}
+//
+//	if(!CheckArrRectShow())
+//		m_arrOrdRect.RemoveAll();
+//}
 void CMainFrame::HidePBArrItem(CWnd* pwnd)
 {
-	if(m_arrOrdRect.GetSize() == 0)
+	if (m_arrOrdRect.empty())
 		return;
 
-	CPBRect* pArrRect = NULL;
-	for(int ii = 0 ; ii < m_arrOrdRect.GetSize() ; ii++)
+	for (auto& item : m_arrOrdRect)
 	{
-		pArrRect = m_arrOrdRect.GetAt(ii);
-		if(pArrRect->pWnd == pwnd)
-			pArrRect->bShow = false;
+		if (item->pWnd == pwnd)
+			item->bShow = false;
 	}
 
-	if(!CheckArrRectShow())
-		m_arrOrdRect.RemoveAll();
+	if (!CheckArrRectShow())
+		m_arrOrdRect.clear();   // 자동 delete
 }
 
+//bool CMainFrame::CheckArrRectShow()
+//{
+//	bool bShow = false;
+//	CPBRect* pArrRect = NULL;
+//	for(int ii = 0 ; ii < m_arrOrdRect.GetSize() ; ii++)
+//	{
+//		pArrRect = m_arrOrdRect.GetAt(ii);
+//		if(pArrRect->bShow == true)
+//			bShow = true;	
+//	}
+//
+//	return bShow;
+//}
 bool CMainFrame::CheckArrRectShow()
 {
-	bool bShow = false;
-	CPBRect* pArrRect = NULL;
-	for(int ii = 0 ; ii < m_arrOrdRect.GetSize() ; ii++)
+	for (const auto& item : m_arrOrdRect)
 	{
-		pArrRect = m_arrOrdRect.GetAt(ii);
-		if(pArrRect->bShow == true)
-			bShow = true;	
+		if (item->bShow)
+			return true;
 	}
 
-	return bShow;
+	return false;
 }
 
+//CRect CMainFrame::getPBArrRect(CWnd* pdlg, int iwidth, int iheight)
+//{
+////	int index;
+//	CPBRect* pArrRect = NULL;
+//
+//	if(m_arrOrdRect.GetSize() == 0 ) //단독(최초)으로 뜨게 된경우
+//	{
+//		
+//		CRect mRc;
+//		mRc = GetWndRect();
+//		const int x = mRc.right - iwidth - GetSystemMetrics(SM_CXFIXEDFRAME);
+//		const int y = mRc.bottom - iheight - GetSystemMetrics(SM_CYFIXEDFRAME);
+//			
+//		CRect rect;
+//		rect = mRc;
+//		rect.left = x;
+//		rect.top = y;
+//		rect.right = rect.left + iwidth;
+//		rect.bottom = rect.top + iheight;
+//		
+//		pArrRect = new CPBRect;
+//		pArrRect->bShow = true;
+//		pArrRect->rect = rect;
+//		pArrRect->pWnd = pdlg;
+//		pArrRect->MainRect = GetWndRect();
+//		m_arrOrdRect.Add(pArrRect);
+//		return rect;
+//	}
+//
+//	//이미 PB 다이알로그가 떠있는 상태인대 또 내려온경우
+//	CRect beforeRect;
+//	for(int ii = 0 ; ii < m_arrOrdRect.GetSize() ; ii++)
+//	{
+//		pArrRect = m_arrOrdRect.GetAt(ii);
+//		if(pArrRect->bShow == false) 
+//		{
+//			pArrRect->bShow = true;
+//			pArrRect->pWnd = pdlg;
+//
+//			if(!CompareRect(pArrRect->MainRect, GetWndRect()))
+//			{
+//				
+//				pArrRect->MainRect = GetWndRect();
+//				pArrRect->rect = getBasePBRect(iwidth, iheight);
+//				m_arrOrdRect.RemoveAll();
+//				m_arrOrdRect.Add(pArrRect);
+//				return getBasePBRect(iwidth, iheight);
+//			}
+//			else
+//			{
+//				m_arrOrdRect.SetAt(ii, pArrRect);
+//				return m_arrOrdRect.GetAt(ii)->rect;
+//			}
+//		}
+//		else 
+//			beforeRect = m_arrOrdRect.GetAt(ii)->rect;  //가장 마지막 존재하는 PBDlg의 postion
+//	}
+//	
+//	if((pArrRect != NULL) && !CompareRect(pArrRect->MainRect, GetWndRect()))
+//	{//팝업창이 떠있는 상태에서 HTS 메인전체를 옮겼을때
+//		beforeRect = getBasePBRect(iwidth, iheight);
+//		m_arrOrdRect.RemoveAll();
+//	}
+//	else	
+//		beforeRect.OffsetRect(0, iheight * -1); 
+//
+//	if(beforeRect.top < 0)  
+//	{
+//		beforeRect.left -= iwidth;
+//		beforeRect.bottom = getBasePBRect(iwidth, iheight).bottom;
+//		beforeRect.right = beforeRect.left + iwidth;
+//		beforeRect.top = beforeRect.bottom - iheight;
+//	}
+//
+//	pArrRect = new CPBRect;
+//	pArrRect->bShow = true;	
+//	pArrRect->rect = beforeRect;
+//	pArrRect->MainRect = GetWndRect();
+//	pArrRect->pWnd = pdlg;
+//	m_arrOrdRect.Add(pArrRect);
+//	return  beforeRect;  
+//}
 CRect CMainFrame::getPBArrRect(CWnd* pdlg, int iwidth, int iheight)
 {
-//	int index;
-	CPBRect* pArrRect = NULL;
-
-	if(m_arrOrdRect.GetSize() == 0 ) //단독(최초)으로 뜨게 된경우
+	if (m_arrOrdRect.empty())
 	{
-		
-		CRect mRc;
-		mRc = GetWndRect();
+		CRect mRc = GetWndRect();
+
 		const int x = mRc.right - iwidth - GetSystemMetrics(SM_CXFIXEDFRAME);
 		const int y = mRc.bottom - iheight - GetSystemMetrics(SM_CYFIXEDFRAME);
-			
-		CRect rect;
-		rect = mRc;
+
+		CRect rect = mRc;
 		rect.left = x;
 		rect.top = y;
 		rect.right = rect.left + iwidth;
 		rect.bottom = rect.top + iheight;
-		
-		pArrRect = new CPBRect;
-		pArrRect->bShow = true;
-		pArrRect->rect = rect;
 
-		pArrRect->pWnd = pdlg;
-		pArrRect->MainRect = GetWndRect();
-		m_arrOrdRect.Add(pArrRect);
+		auto newItem = std::make_unique<CPBRect>();
+		newItem->bShow = true;
+		newItem->rect = rect;
+		newItem->pWnd = pdlg;
+		newItem->MainRect = GetWndRect();
+
+		m_arrOrdRect.push_back(std::move(newItem));
 
 		return rect;
 	}
 
-	//이미 PB 다이알로그가 떠있는 상태인대 또 내려온경우
 	CRect beforeRect;
-	for(int ii = 0 ; ii < m_arrOrdRect.GetSize() ; ii++)
-	{
-		pArrRect = m_arrOrdRect.GetAt(ii);
-		if(pArrRect->bShow == false) 
-		{
-			pArrRect->bShow = true;
-			pArrRect->pWnd = pdlg;
 
-			if(!CompareRect(pArrRect->MainRect, GetWndRect()))
+	for (auto& item : m_arrOrdRect)
+	{
+		if (!item->bShow)
+		{
+			item->bShow = true;
+			item->pWnd = pdlg;
+
+			if (!CompareRect(item->MainRect, GetWndRect()))
 			{
-				
-				pArrRect->MainRect = GetWndRect();
-				pArrRect->rect = getBasePBRect(iwidth, iheight);
-				m_arrOrdRect.RemoveAll();
-				m_arrOrdRect.Add(pArrRect);
+				item->MainRect = GetWndRect();
+				item->rect = getBasePBRect(iwidth, iheight);
+
+				m_arrOrdRect.clear();
+				m_arrOrdRect.push_back(std::move(item));
+
 				return getBasePBRect(iwidth, iheight);
 			}
-			else
-			{
-				m_arrOrdRect.SetAt(ii, pArrRect);
-				return m_arrOrdRect.GetAt(ii)->rect;
-			}
-		}
-		else 
-			beforeRect = m_arrOrdRect.GetAt(ii)->rect;  //가장 마지막 존재하는 PBDlg의 postion
-	}
-	
-	if(!CompareRect(pArrRect->MainRect, GetWndRect()))
-	{//팝업창이 떠있는 상태에서 HTS 메인전체를 옮겼을때
-		beforeRect = getBasePBRect(iwidth, iheight);
-		m_arrOrdRect.RemoveAll();
-	}
-	else	
-		beforeRect.OffsetRect(0, iheight * -1); 
 
-	if(beforeRect.top < 0)  
+			return item->rect;
+		}
+		else
+		{
+			beforeRect = item->rect;
+		}
+	}
+
+	if (!m_arrOrdRect.empty() &&
+		!CompareRect(m_arrOrdRect.back()->MainRect, GetWndRect()))
+	{
+		beforeRect = getBasePBRect(iwidth, iheight);
+		m_arrOrdRect.clear();
+	}
+	else
+	{
+		beforeRect.OffsetRect(0, iheight * -1);
+	}
+
+	if (beforeRect.top < 0)
 	{
 		beforeRect.left -= iwidth;
 		beforeRect.bottom = getBasePBRect(iwidth, iheight).bottom;
@@ -30735,14 +30766,15 @@ CRect CMainFrame::getPBArrRect(CWnd* pdlg, int iwidth, int iheight)
 		beforeRect.top = beforeRect.bottom - iheight;
 	}
 
-	pArrRect = new CPBRect;
-	pArrRect->bShow = true;	
-	pArrRect->rect = beforeRect;
-	pArrRect->MainRect = GetWndRect();
-	pArrRect->pWnd = pdlg;
-	m_arrOrdRect.Add(pArrRect);
+	auto newItem = std::make_unique<CPBRect>();
+	newItem->bShow = true;
+	newItem->rect = beforeRect;
+	newItem->MainRect = GetWndRect();
+	newItem->pWnd = pdlg;
 
-	return  beforeRect;  
+	m_arrOrdRect.push_back(std::move(newItem));
+
+	return beforeRect;
 }
 
 void CMainFrame::OpenPBNews(CString strdata)  //HOB
@@ -31060,7 +31092,7 @@ void   CMainFrame::Check_XECUREPATH()
 	CString iniConf = Axis::home + "\\tab\\axis.ini";
 	GetPrivateProfileString("XECURE", "size", "10", buff, sizeof(buff) - 1, iniConf);
 	stmp.Format("%s", buff);
-	int maxSizeInKB = atoi(stmp);
+	int maxSizeInKB = _ttoi(stmp);
 	filePath = Axis::home + _T("\\exe\\xc.log");
 	CFileStatus fileStatus;
 	if (CFile::GetStatus(filePath, fileStatus))
@@ -31078,7 +31110,7 @@ void   CMainFrame::Check_XECUREPATH()
 
 	GetPrivateProfileString("XECURE", "level", "0", buff, sizeof(buff) - 1, iniConf);
 	stmp.Format("%s", buff);
-	int ilevel = atoi(stmp);
+	int ilevel = _ttoi(stmp);
 
 	CString rootPath, logPath, logLevel;
 	filePath = Axis::home + _T("\\exe\\xc_conf.ini");
@@ -32002,7 +32034,7 @@ void  CMainFrame::MemoUpload()
 			nBytesRead = rFile.Read(&lBytes, sizeof(lBytes));
 			if (nBytesRead == sizeof(lBytes))
 			{
-				int lSize = atoi(CString(lBytes, 4));
+				int lSize = _ttoi(CString(lBytes, 4));
 				nBytesRead = rFile.Read(dat.GetBuffer(lSize), lSize);
 
 				if ((int)nBytesRead != lSize)
@@ -32644,6 +32676,80 @@ bool CMainFrame::LoadScreenInfo(const CString& filePath)
 	}
 	return true;
 }
+
+
+#ifdef DF_MAIN_RTS
+
+int CMainFrame::GetSlotIndex_FindOnly(const char* code)
+{
+	std::lock_guard<std::mutex> lock(g_codeMapLock);
+
+	auto it = g_codeToIndex.find(code);
+	if (it == g_codeToIndex.end())
+	{
+		char pcode[7]{};   // 반드시 7
+
+		if (code)
+		{
+			size_t len = strlen(code);
+
+			if (len >= 6)
+				memcpy(pcode, code + (len - 6), 6);
+			else
+				strncpy(pcode, code, 6);
+
+			pcode[6] = '\0';
+		}
+
+		it = g_codeToIndex.find(pcode);  // 재할당 (새 선언 X)
+
+		if (it == g_codeToIndex.end())
+			return -1;
+	}
+	return it->second;
+}
+
+int CMainFrame::EnsureSlotIndexForCode(const char* code)
+{
+	if (!code || !code[0])
+		return -1;
+
+	std::lock_guard<std::mutex> lock(g_codeMapLock);
+
+	auto it = g_codeToIndex.find(code);
+	if (it != g_codeToIndex.end())
+		return it->second;
+
+	if (g_nextIndex >= MAX_SLOT)
+		return -1;
+
+	int idx = g_nextIndex++;
+
+	g_codeToIndex.emplace(code, idx);
+
+	CopyZ(g_tickSlots[idx].code,
+		sizeof(g_tickSlots[idx].code),
+		code);
+
+	return idx;
+}
+
+AXIS_API int Axis_EnsureSlotIndex(const char* code)
+{
+	CMainFrame* pFrame = (CMainFrame*)AfxGetMainWnd();
+	if (!pFrame)
+		return -1;
+
+	return pFrame->EnsureSlotIndexForCode(code);
+}
+
+AXIS_API const TickSnapshot* Axis_GetTickSlots()
+{
+	return g_tickSlots;
+}
+#endif
+
+
 #endif
 //CString ip;
 //	ip.Format("%s", ipaddr);

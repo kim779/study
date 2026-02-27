@@ -18,6 +18,8 @@ public:
 	bool isIPInRange(CString ip, CString network_s, CString network_e);
 	unsigned int IPToUInt(CString ip);
 	CString CheckIP();
+	int  PosToTimeMs(int pos) const;
+	void UpdateTimeText(int timeMs);
 // 대화 상자 데이터입니다.
 #ifdef AFX_DESIGN_TIME
 	enum { IDD = IDD_DLG_SLIDER };
@@ -32,5 +34,6 @@ public:
 	CSliderCtrl m_slider;
 	afx_msg void OnCustomdrawSlider1(NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg void OnPaint();
+	afx_msg void OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);
 	virtual BOOL OnInitDialog();
 };

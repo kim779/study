@@ -34,6 +34,27 @@ static char THIS_FILE[] = __FILE__;
 #define	LEN_SYGB		2	// 신용구분 길이
 #define	LEN_DATE		8	// 날짜
 
+#define TM_BALANCE 9898
+#define VS_NOMAL "1"
+#define VS_SKIP "2"
+#define VS_TIMER "3"
+
+CString GetField(const CString& src, int index)
+{
+	CString tmp = src;
+	CString token;
+	int pos = 0;
+	int i = 0;
+
+	while (!(token = tmp.Tokenize(_T("\t"), pos)).IsEmpty())
+	{
+		if (i == index)
+			return token;
+		i++;
+	}
+	return "";
+}
+
 CControlWnd::CControlWnd()
 {
 	EnableAutomation();
@@ -46,6 +67,7 @@ CControlWnd::CControlWnd()
 	m_bLaw = false;
 	m_bFilter = false;
 	m_iJanType = 0;
+
 }
 
 CControlWnd::~CControlWnd()
@@ -66,6 +88,7 @@ BEGIN_MESSAGE_MAP(CControlWnd, CWnd)
 	//}}AFX_MSG_MAP
 	ON_MESSAGE(WM_USER, OnMessage)
 	ON_MESSAGE(WM_REMAIN, OnRemainMessage)
+	ON_WM_TIMER()
 END_MESSAGE_MAP()
 
 
@@ -76,6 +99,8 @@ BEGIN_DISPATCH_MAP(CControlWnd, CWnd)
 	DISP_PROPERTY_NOTIFY(CControlWnd, "Flag", m_flag, OnFlagChanged, VT_BSTR)
 	DISP_PROPERTY_NOTIFY(CControlWnd, "DataMsg", m_dataMsg, OnDataMsgChanged, VT_BSTR)
 	DISP_PROPERTY_NOTIFY(CControlWnd, "SetMcgb", m_setMcgb, OnSetMcgbChanged, VT_BSTR)
+	DISP_PROPERTY_NOTIFY(CControlWnd, "Version", m_Version, OnVersionChanged, VT_BSTR)
+	//DISP_PROPERTY_NOTIFY_ID(CControlWnd, "Version", dispidVersion, m_Version, OnVersionChanged, VTS_BSTR)
 	DISP_FUNCTION(CControlWnd, "GetProperties", GetProperties, VT_BSTR, VTS_NONE)
 	DISP_FUNCTION(CControlWnd, "SetProperties", SetProperties, VT_EMPTY, VTS_BSTR)
 	DISP_FUNCTION(CControlWnd, "Send", Send, VT_EMPTY, VTS_BSTR VTS_BSTR VTS_BSTR VTS_BSTR)
@@ -87,7 +112,11 @@ BEGIN_DISPATCH_MAP(CControlWnd, CWnd)
 	DISP_FUNCTION(CControlWnd, "SendX", SendX, VT_EMPTY, VTS_BSTR VTS_BSTR)
 	DISP_FUNCTION(CControlWnd, "SendRaw", SendRaw, VT_EMPTY, VTS_BSTR)
 	DISP_FUNCTION(CControlWnd, "SetFilterAcc", SetFilterAcc, VT_EMPTY, VTS_BSTR)
+	DISP_FUNCTION(CControlWnd, "RequestBalance", RequestBalance, VT_EMPTY, VTS_BSTR)
+	DISP_FUNCTION(CControlWnd, "SetSkipTime", SetSkipTime, VT_EMPTY, VTS_I2)
 	//}}AFX_DISPATCH_MAP
+	//DISP_FUNCTION_ID(CControlWnd, "RequestBalance", dispidRequestBalance, RequestBalance, VT_EMPTY, VTS_BSTR)
+	
 END_DISPATCH_MAP()
 
 // {7E5363E5-D4A1-4866-B9FF-A97FC342672D}
@@ -108,6 +137,20 @@ int CControlWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	m_cs.Lock();
 #endif
 	CString path = Variant(homeCC, "");
+	CString userPath;
+	userPath.Format("%s\\tab\\%s", path, "AXISAI.INI");
+	m_Version.Format("%d", GetPrivateProfileInt("Balance", "ver", 2, userPath));
+	m_Version.TrimRight();
+
+	m_interval = GetPrivateProfileInt("Balance", "time", 500, userPath);
+	m_diffSec = GetPrivateProfileInt("Balance", "diff", 1, userPath);
+
+	if (m_Version == VS_TIMER)
+		SetTimer(TM_BALANCE, m_interval, nullptr);
+
+	m_slog.Format("[체결][cx_notify][%s]<%d> ------  m_Version ------[%s] ", __FUNCTION__, __LINE__, m_Version);
+	Output_DebugString(m_slog);
+
 	path.Replace("\\", "_");
 
 	m_ShMemory = std::make_unique<CShMemory>();
@@ -201,8 +244,7 @@ long CControlWnd::OnMessage(WPARAM wParam, LPARAM lParam)
 			m_dataList = sData.Mid(0, pos);
 			m_dataMsg = sData.Mid(pos+1, sData.GetLength()-pos);
 
-			m_pParent->SendMessage(WM_USER, MAKEWPARAM(eventDLL, MAKEWORD(m_Param.key, evOnDblClk/*DblClick*/)),
-						(LPARAM)m_Param.name.GetString());
+			m_pParent->SendMessage(WM_USER, MAKEWPARAM(eventDLL, MAKEWORD(m_Param.key, evOnDblClk/*DblClick*/)), (LPARAM)m_Param.name.GetString());  //법인용 안씀
 			m_pParent->SendMessage(WM_USER, MAKEWPARAM(eventDLL, MAKEWORD(m_Param.key, evOnClick/*DblClick*/)),
 						(LPARAM)m_Param.name.GetString());
 		}
@@ -237,7 +279,7 @@ long CControlWnd::OnRemainMessage(WPARAM wParam, LPARAM lParam)
 		if (sData.GetAt(0) != _T('0'))	// 오류
 		{
 			m_flag = _T("E");
-			m_pParent->SendMessage(WM_USER, MAKEWPARAM(eventDLL, MAKEWORD(m_Param.key, evOnDblClk/*DblClick*/)),
+			m_pParent->SendMessage(WM_USER, MAKEWPARAM(eventDLL, MAKEWORD(m_Param.key, evOnDblClk/*DblClick*/)),  //err
 						(LPARAM)m_Param.name.GetString());
 		}
 	}
@@ -386,6 +428,38 @@ void CControlWnd::AddReminData(LPCTSTR sAccn, LPCTSTR sCode, LPCTSTR sRowData)
 }
 
 //=================================================================================================
+int FindTokenIndex(const CString& src, const CString& target, TCHAR delim)
+{
+	int index = 0;
+	int start = 0;
+
+	while (true)
+	{
+		int pos = src.Find(delim, start);
+
+		CString token;
+		if (pos == -1)
+		{
+			token = src.Mid(start);
+		}
+		else
+		{
+			token = src.Mid(start, pos - start);
+		}
+
+		if (token == target)
+			return index;
+
+		if (pos == -1)
+			break;
+
+		start = pos + 1;
+		index++;
+	}
+
+	return -1; // 못찾음
+}
+
 void CControlWnd::SetParam(_param *pParam)
 {
 	m_Param.key     = pParam->key;
@@ -400,7 +474,8 @@ void CControlWnd::SetParam(_param *pParam)
 
 	CString tmp = m_Param.options;
 	CString fieldS = OptionParser(tmp, "/edit");
-
+	m_iPsCmtIndex = FindTokenIndex(fieldS, "05",'|');
+	m_iPsCmtIndex -= 1;
 	fieldS.Replace("|", "\t");
 	m_bFuture = atoi(Parser(fieldS, "\t"))?true:false;
 	if (tmp.Find("accnAll") != -1)
@@ -416,6 +491,7 @@ void CControlWnd::SetParam(_param *pParam)
 	CString sJtype = OptionParser(tmp, "/q");  //0전체 1유통대주만 2유통대주제외
 	if (!sJtype.IsEmpty())
 		m_iJanType = atoi(sJtype);
+
 }
 
 // bAll -> true : 잔고조회, false : 실시간 잔고
@@ -426,11 +502,16 @@ void CControlWnd::SendToMap(CString sData, bool bAll, CString sAccn/* = ""*/)
 #ifdef	SC_TEST
 	m_cs.Lock();
 #endif
+	int sLen = sData.GetLength();
+	m_slog.Format("[cx_notify]-------------------------------------------------------------------------------");
+	Output_DebugString(m_slog);
+	m_slog.Format("[cx_notify] size=[%d]     bAll=[%d] sAccn=[%s] [%s]", m_drawQueue.size(), bAll, sAccn, sData);
+	//Output_DebugString(m_slog);
 	CString sSendData, sCodeData, sCode;
 	CString keyS, dateS, sygbS, jggb;
 	CStringArray sDataArr;
 	int	ii = 0, idx = 0, bound = 0;
-
+	bool quantityChanged = true;
 	if (bAll)	
 	{
 		//==================================================
@@ -472,6 +553,8 @@ void CControlWnd::SendToMap(CString sData, bool bAll, CString sAccn/* = ""*/)
 				if (idx > bound)
 					continue;
 				sSendData += sDataArr.GetAt(idx) + "\t";
+				m_slog.Format("[cx_notify][%s]<%d> idx =[%d] val =[%s]", __FUNCTION__, __LINE__, idx, sDataArr.GetAt(idx));
+				Output_DebugString(m_slog);
 			}
 			m_CodeMap.SetAt(keyS, sSendData);
 			sSendData += "\n";
@@ -479,6 +562,16 @@ void CControlWnd::SendToMap(CString sData, bool bAll, CString sAccn/* = ""*/)
 		m_flag = "A";
 		m_dataList.Format("%d\t", m_CodeMap.GetCount());
 		m_dataList += sSendData;
+
+		m_slog.Format("[cx_notify] size=[%d]     bAll=[%d] sAccn=[%s] [%s]   sLen=[%d]", m_drawQueue.size(), bAll, sAccn, sData, sLen);
+		Output_DebugString(m_slog);
+
+		//if (m_Version != VS_SKIP && m_Version != VS_TIMER)
+		{
+			m_pParent->SendMessage(WM_USER, MAKEWPARAM(eventDLL, MAKEWORD(m_Param.key, evOnDblClk/*DblClick*/)), (LPARAM)m_Param.name.GetString());  //SendToMap
+			m_cs.Unlock();
+			return;
+		}
 	}
 	else
 	{
@@ -491,7 +584,7 @@ void CControlWnd::SendToMap(CString sData, bool bAll, CString sAccn/* = ""*/)
 		// code + date(8)
 		//==================================================
 		const	int	FindIndex = sData.Find("|");
-
+		
 		if (FindIndex > -1)
 			sData.Delete(FindIndex,sData.GetLength()-FindIndex);
 
@@ -563,6 +656,18 @@ void CControlWnd::SendToMap(CString sData, bool bAll, CString sAccn/* = ""*/)
 				if (idx > bound)	continue;
 				sSendData += sDataArr.GetAt(idx) + "\t";
 			}
+
+			CString oldData;
+			if (m_CodeMap.Lookup(keyS, oldData))
+			{
+				quantityChanged = IsQuantityChanged(oldData, sSendData);
+
+m_slog.Format("[cx_notify]");
+Output_DebugString(m_slog);
+m_slog.Format("[cx_notify][%s]<%d> ------ [%s]  keyS=[%s]  ] oldData=[%s] ", __FUNCTION__, __LINE__, quantityChanged == 1?"가능수량변동":"변화없다",keyS, oldData);
+Output_DebugString(m_slog);
+			}
+
 			m_CodeMap.SetAt(keyS, sSendData);
 		}
 #ifdef	CREDIT
@@ -577,11 +682,59 @@ void CControlWnd::SendToMap(CString sData, bool bAll, CString sAccn/* = ""*/)
 			m_dataList = sAccn + m_dataList;
 	}
 
-	m_pParent->SendMessage(WM_USER, MAKEWPARAM(eventDLL, MAKEWORD(m_Param.key, evOnDblClk/*DblClick*/)),
-					(LPARAM)m_Param.name.GetString());
+	if (m_diffSec > 0)
+	{
+		CSingleLock lock(&m_lock, TRUE);
+		if (quantityChanged || !ShouldSkipRTSByTimeDiff(sCode))
+		{
+			//m_drawQueue.push(m_dataList);
+			m_slog.Format("[cx_notify]]  [%s]<%d>  m_diffSec = [%d]   넣어주었다 !!!! ", sCode, m_drawQueue.size(), m_diffSec);
+			Output_DebugString(m_slog);
+			m_pParent->SendMessage(WM_USER, MAKEWPARAM(eventDLL, MAKEWORD(m_Param.key, evOnDblClk/*DblClick*/)), (LPARAM)m_Param.name.GetString());  //SendToMap
+		}
+		else
+		{
+			m_slog.Format("[cx_notify]]  [%s]<%d>   m_diffSec = [%d] 안넣어주었다 !!!! ", sCode, m_drawQueue.size(), m_diffSec);
+			Output_DebugString(m_slog);
+		}
+
+		//if (m_bWaitingFromVBS)
+		//	SendNextToVBS();
+	}
+	//else if (m_Version == VS_TIMER)
+	//{
+	//	CSingleLock lock(&m_lock, TRUE);
+	//	m_drawQueue.push(m_dataList);
+	//}
+	else if(m_diffSec == 0)
+	{
+		m_pParent->SendMessage(WM_USER, MAKEWPARAM(eventDLL, MAKEWORD(m_Param.key, evOnDblClk/*DblClick*/)), (LPARAM)m_Param.name.GetString());  //SendToMap
+	}
+
 #ifdef	SC_TEST
 	m_cs.Unlock();
 #endif
+}
+
+void CControlWnd::SendNextToVBS()
+{
+	CString data;
+
+	
+	CSingleLock lock(&m_lock, TRUE);
+
+	if (m_drawQueue.empty())
+	{
+		m_bWaitingFromVBS = TRUE;  // 다음 요청 대기
+		return;
+	}
+
+	m_dataList = m_drawQueue.front();
+	m_drawQueue.pop();
+	m_bWaitingFromVBS = FALSE;
+	
+	// VBScript에 전달 (예: IDispatch 호출 / WebBrowser 호출)
+	m_pParent->SendMessage(WM_USER, MAKEWPARAM(eventDLL, MAKEWORD(m_Param.key, evOnDblClk)), (LPARAM)m_Param.name.GetString());  //SendNextToVBS()
 }
 
 BOOL CControlWnd::SendTR(CString sTR, BYTE type, CString data, int key /*= -1*/)
@@ -722,4 +875,126 @@ void CControlWnd::OnSetMcgbChanged()
 {
 	// TODO: Add notification handler code
 
+}
+
+
+void CControlWnd::RequestBalance(BSTR sVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	//m_slog.Format("[cx_notify][%s]<%d> ------  m_Version ------[%s] size=[%d]", __FUNCTION__, __LINE__, m_Version, m_drawQueue.size());
+	//Output_DebugString(m_slog);
+
+	if (m_Version == VS_SKIP)
+	{
+		m_bWaitingFromVBS = TRUE;
+		SendNextToVBS();
+	}
+	// TODO: 여기에 디스패치 처리기 코드를 추가합니다.
+}
+
+void CControlWnd::SetSkipTime(SHORT sec)
+{
+	m_diffSec = sec;
+
+	if (m_Version == VS_NOMAL)
+		m_diffSec = 0;
+
+	m_slog.Format("[cx_notify][%s]<%d> ------  스킵시간지정  m_diffSec=[%d] sec=[%d]", __FUNCTION__, __LINE__, m_diffSec, sec);
+	Output_DebugString(m_slog);
+}
+
+void CControlWnd::OnVersionChanged()
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+	if (m_Version == VS_TIMER)
+	{
+		KillTimer(TM_BALANCE);
+		SetTimer(TM_BALANCE, m_interval, nullptr);
+	}
+	// TODO: 여기에 속성 처리기 코드를 추가합니다.
+}
+
+
+void CControlWnd::OnTimer(UINT_PTR nIDEvent)
+{
+	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
+	switch (nIDEvent)
+	{
+		case TM_BALANCE:
+		{
+			if (m_drawQueue.empty())
+				return;
+
+			m_slog.Format("[체결][cx_notify][%s]<%d> ------  m_Version ------[%s] size = [%d]", __FUNCTION__, __LINE__, m_Version, m_drawQueue.size());
+			Output_DebugString(m_slog);
+
+			m_bWaitingFromVBS = TRUE;
+			SendNextToVBS();
+		}
+		break;
+
+	}
+	CWnd::OnTimer(nIDEvent);
+}
+
+bool CControlWnd::ShouldSkipRTSByTimeDiff(CString sCode)
+{ //false 실시간 처리   ,    true 스킵
+	if (m_flag != "U")
+		return false;
+
+	std::string code = CStringA(sCode);
+	auto it = m_lastRTSTimeMap.find(code);
+	const CTime now = CTime::GetCurrentTime();
+	// 첫 수신은 무조건 통과
+	if (it == m_lastRTSTimeMap.end())
+	{
+
+		m_lastRTSTimeMap.emplace(sCode, now);
+m_slog.Format("[cx_notify][%s]<%d> ------  첫수신  return  sCode=[%s]", __FUNCTION__, __LINE__, sCode);
+//Output_DebugString(m_slog);
+		return false;
+	}
+	
+	const CTime& prevServerTime = it->second;
+	int diffSec = (int)(now - prevServerTime).GetTotalSeconds();
+
+	if (diffSec <= m_diffSec)
+	{
+		m_slog.Format("[cx_notify][%s]<%d> ------  스킵  return  sCode=[%s]  diffSec=[%d] m_flag=[%s] m_diffSec=[%d] ", __FUNCTION__, __LINE__, sCode, diffSec, m_flag, m_diffSec);
+		Output_DebugString(m_slog);
+		return true;
+	}
+
+	m_slog.Format("[cx_notify][%s]<%d> ------  스킵안함  return  sCode=[%s] diffSec=[%d] m_flag=[%s] m_diffSec=[%d]", __FUNCTION__, __LINE__, sCode, diffSec, m_flag, m_diffSec);
+	Output_DebugString(m_slog);
+	it->second = now;
+	return false;
+}
+
+bool CControlWnd::IsQuantityChanged(const CString& oldD, const CString& newD)
+{
+	if (oldD.IsEmpty())
+		return true;   // 이전 없으면 변화로 간주
+	if (GetField(oldD, 0) != GetField(newD, 0))
+	{
+		m_slog.Format("************* [cx_notify][% s]< % d>  return  종목코드 = [% s] 종목코드 = [% s]  서로다르다", __FUNCTION__, __LINE__, GetField(oldD, 1), GetField(newD, 1));
+		Output_DebugString(m_slog);
+		return false;
+	}
+
+
+	CString oldQty = GetField(oldD, m_iPsCmtIndex); // 4번째
+	CString newQty = GetField(newD, m_iPsCmtIndex);
+
+	m_slog.Format("			[cx_notify][%s]<%d>  return  oldQty=[%s] newQty=[%s] ", __FUNCTION__, __LINE__, oldQty, newQty);
+	Output_DebugString(m_slog);
+
+	m_slog.Format("			[cx_notify][%s]<%d oldD=[%s]  ", __FUNCTION__, __LINE__, oldD);
+	Output_DebugString(m_slog);
+	m_slog.Format("			[cx_notify][%s]<%d>newD=[%s] ", __FUNCTION__, __LINE__, newD);
+	Output_DebugString(m_slog);
+
+
+	return oldQty != newQty;
 }

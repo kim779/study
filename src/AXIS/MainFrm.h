@@ -23,6 +23,7 @@
 #include <vector>
 #include <algorithm>
 #include <unordered_set>
+#include <shared_mutex>
 
 #define USE_AHNLAB_SECUREBROWSER
 
@@ -515,7 +516,7 @@ struct _stMap
 #include <string>
 #include <mutex>
 
-constexpr int MAX_SLOT = 4096;
+
 
 
 
@@ -1415,7 +1416,9 @@ protected:
 			CRect MainRect;
 	};
 
-	CArray<CPBRect*,CPBRect*> m_arrOrdRect;
+	//CArray<CPBRect*,CPBRect*> m_arrOrdRect;
+	std::vector<std::unique_ptr<CPBRect>> m_arrOrdRect;
+
 	void PBMngShow(CString strMsg);
 	CRect getBasePBRect(int iwidth, int iheight);
 	bool  CompareRect(CRect aRect, CRect bRect);
@@ -1802,6 +1805,12 @@ public:
 	void LoadMngFromIni(const CString& file, const CString& section);
 	void MigrateMng(LPCTSTR file, int oldVersion);
 
+
+
+
+
+
+
 	//실시간메인처리
 #ifdef DF_MAIN_RTS
 	std::queue<int> g_poolKeys;
@@ -1811,50 +1820,16 @@ public:
 
 	bool ReadTick(const char* code, TickSnapshot* out);
 
-	TickSnapshot g_tickSlots[MAX_SLOT];
-	std::unordered_map<std::string, int> g_codeToIndex;
+	//TickSnapshot g_tickSlots[MAX_SLOT];
+	//std::unordered_map<std::string, int> g_codeToIndex;
 	int g_nextIndex = 0;
-	std::recursive_mutex g_codeMapLock;
+	std::mutex g_codeMapLock;
 
-	std::mutex m_subLock;
-	// code → symbol → windows
-	std::unordered_map<
-		std::string,
-		std::unordered_map<int, std::unordered_set<HWND>>
-	> m_codeSymbolSubscribers;
+	std::unordered_map<HWND, RtsSubscription> g_subByHwnd;
+	mutable std::shared_mutex g_subMtx; // read/write lock
 
-	// window → code → symbols
-	std::unordered_map<
-		HWND,
-		std::unordered_map<std::string, std::unordered_set<int>>
-	> m_wndSubscriptions;
-
-	//3) code → slot index 함수 (충돌 방지 핵심)
-	int GetSlotIndex_FindOnly(const char* code)
-	{
-		std::lock_guard<std::recursive_mutex> lock(g_codeMapLock);
-
-		auto it = g_codeToIndex.find(code);
-		if (it == g_codeToIndex.end())
-			return -1;
-		return it->second;
-	}
-
-	int GetSlotIndex_CreateIfMissing(const char* code)
-	{
-		std::lock_guard<std::recursive_mutex> lock(g_codeMapLock);
-
-		auto it = g_codeToIndex.find(code);
-		if (it != g_codeToIndex.end())
-			return it->second;
-
-		if (g_nextIndex >= MAX_SLOT)
-			return -1; // 슬롯 부족
-
-		int idx = g_nextIndex++;
-		g_codeToIndex[code] = idx;
-		return idx;
-	}
+	int GetSlotIndex_FindOnly(const char* code);
+	int EnsureSlotIndexForCode(const char* code);
 
 	// 안전 문자열 복사 함수
 	inline void CopyZ(char* dst, size_t cap, const char* src)
@@ -1925,20 +1900,26 @@ public:
 	}
 
 	inline void CopySnapshot(TickSnapshot& dst, const TickSnapshot& src)
-	{//testcode
+	{
 		// seq 제외하고 복사
 		dst.ts_ms = src.ts_ms;
+		if (1)  //우선테스트
+		{
+			static_assert(std::is_trivially_copyable_v<decltype(dst.ts_ms)>);
+			static_assert(std::is_trivially_copyable_v<decltype(dst.code)>);
+			static_assert(std::is_trivially_copyable_v<decltype(dst.values)>);
+			static_assert(std::is_trivially_copyable_v<decltype(dst.valid)>);
 
-		//strcpy_s(dst.RTStype, sizeof(dst.RTStype), src.RTStype);
-		//strcpy_s(dst.code, sizeof(dst.code), src.code);
-		//strcpy_s(dst.price, sizeof(dst.price), src.price);
-		//strcpy_s(dst.diff, sizeof(dst.diff), src.diff);
-		//strcpy_s(dst.volume, sizeof(dst.volume), src.volume);
-		//strcpy_s(dst.rate, sizeof(dst.rate), src.rate);
+			dst.ts_ms = src.ts_ms;
+			std::memcpy(dst.code, src.code, sizeof(dst.code));
+			std::memcpy(dst.values, src.values, sizeof(dst.values));
+			dst.valid = src.valid; // bitset은 대입이 안전/빠름
+		}
+	
 	}
 
 	static void MakeDummyTick(TickSnapshot& snap, int step)
-	{//testcode
+	{
 		memset(&snap, 0, sizeof(TickSnapshot));
 
 		// 임의 종목코드 (예: 삼성전자)
@@ -1997,6 +1978,73 @@ public:
 		std::lock_guard<std::mutex> lock(g_poolMtx);
 		g_poolKeys.push(key);
 	}
+
+
+	//---------------------------- log -----------------------------------------------------------------------------------------------
+	static bool ReadSnapshotStable(const TickSnapshot& src, TickSnapshot& out)
+	{
+		for (;;)
+		{
+			int v1 = src.seq.load(std::memory_order_acquire);
+			if (v1 & 1) continue; // writing 중 (odd)
+
+			// ===== 실제 데이터 복사 =====
+			out.ts_ms = src.ts_ms;
+			memcpy(out.code, src.code, sizeof(src.code));
+			memcpy(out.values, src.values, sizeof(src.values));
+			out.valid = src.valid;
+
+			int v2 = src.seq.load(std::memory_order_acquire);
+			if (v1 == v2)
+				return true;
+		}
+	}
+
+	static void DumpOneSlot(int slotIdx, const TickSnapshot& snap, int maxFieldsToPrint = 9999)
+	{
+		CStringA log;
+		log.Format("\n----- [AXISLOG1]SLOT[%d] code=%s ts=%lu valid=%d -----\n",
+			slotIdx, snap.code, snap.ts_ms, (int)snap.valid.count());
+
+		int printed = 0;
+		for (int i = 0; i < MAX_RTS_INDEX; ++i)
+		{
+			if (!snap.valid.test(i)) continue;
+
+			CStringA line;
+			line.Format(" [AXISLOG2][%03d] %s\n", i, snap.values[i]);
+			log += line;
+
+			if (++printed >= maxFieldsToPrint) break;
+		}
+
+		log += "-----------------------------------------\n";
+		OutputDebugStringA(log);
+	}
+
+	void DumpAllSlots(const TickSnapshot* slots, int slotCount,
+		int maxSlotsToPrint = 50,
+		int maxFieldsPerSlot = 50)
+	{
+		int printedSlots = 0;
+
+		for (int i = 0; i < slotCount; ++i)
+		{
+			TickSnapshot local;
+			ReadSnapshotStable(slots[i], local);
+
+			if (local.code[0] == '\0')
+				continue; // 비어있으면 스킵
+
+			DumpOneSlot(i, local, maxFieldsPerSlot);
+
+			if (++printedSlots >= maxSlotsToPrint)
+				break;
+		}
+	}
+
+	//---------------------------- log -----------------------------------------------------------------------------------------------
+
 #endif
 protected:
 // #ifdef USE_AHNLAB_SECUREBROWSER

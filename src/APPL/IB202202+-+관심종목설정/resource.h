@@ -335,6 +335,9 @@
 #define IDC_RADIO_MEMOOVER              14046
 #define IDC_RADIO_MEMOCLICK             14047
 #define IDC_STATIC_MEMO                 14048
+#define IDC_STATIC_TIME                 14049
+#define IDC_STATIC_TIME2                14050
+#define IDC_STATIC_UNIT                 14050
 
 // Next default values for new objects
 // 
@@ -342,7 +345,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        14016
 #define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         14049
+#define _APS_NEXT_CONTROL_VALUE         14050
 #define _APS_NEXT_SYMED_VALUE           14001
 #endif
 #endif

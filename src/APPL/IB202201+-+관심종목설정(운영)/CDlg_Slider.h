@@ -17,7 +17,8 @@ public:
 	bool isIPInRange(CString ip, CString network_s, CString network_e);
 	unsigned int IPToUInt(CString ip);
 	CString CheckIP();
-
+	int  PosToTimeMs(int pos) const;
+	void UpdateTimeText(int timeMs);
 	int m_iTime{};
 // 대화 상자 데이터입니다.
 #ifdef AFX_DESIGN_TIME

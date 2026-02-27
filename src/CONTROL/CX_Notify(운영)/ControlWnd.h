@@ -105,4 +105,36 @@ protected:
 
 	DECLARE_DISPATCH_MAP()
 	DECLARE_INTERFACE_MAP()
+
+public:
+
+	CString m_slog{};
+#ifdef DF_NEW_VER
+	BOOL m_bWaitingFromVBS = TRUE;
+	int m_interval{};
+	std::queue<CString> m_drawQueue;
+	CCriticalSection m_lock;
+	void SendNextToVBS();
+	std::unordered_map<std::string, CTime> m_lastRTSTimeMap;
+	bool ShouldSkipRTSByTimeDiff(CString sCode);
+	int m_diffSec{};
+	bool IsQuantityChanged(const CString& oldD, const CString& newD);
+#endif
+
+protected:
+	void RequestBalance(BSTR sVal);
+	void SetSkipTime(SHORT sec);
+
+	enum
+	{
+		dispidSetSkipTime = 19,
+		dispidVersion = 18,
+		dispidRequestBalance = 17L
+	};
+	void OnVersionChanged();
+
+	CString m_Version;
+	int m_iPsCmtIndex{};   //가능수량이 잔고그리드에 몇번째 컬럼인가
+public:
+	afx_msg void OnTimer(UINT_PTR nIDEvent);
 };

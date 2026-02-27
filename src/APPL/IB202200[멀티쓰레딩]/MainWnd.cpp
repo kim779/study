@@ -1012,8 +1012,10 @@ LONG CMainWnd::OnUser(WPARAM wParam, LPARAM lParam)
 
 			std::string scode = CStringA(code);
 
-			if (ShouldSkipRTSByServerTime(scode, (char*)data[34], m_DiffSec) == true && bOverChecking)
+			if (bOverChecking && ShouldSkipRTSByServerTime(scode, (char*)data[34], m_DiffSec) == true  )
 			{
+				m_slog.Format("[IB202200][skipped]!!!!!!!ShouldSkipRTSByServerTime true");
+				Output_DebugString(m_slog);
 				return 0;
 			}
 			else
@@ -1094,10 +1096,19 @@ bool CMainWnd::ShouldSkipRTSByServerTime(
 )
 {
 	if (!pServerTime)
-		return true;
+	{
+		m_slog.Format("[IB202200][skipped]!!!!!!!pServerTime null");
+		Output_DebugString(m_slog);
+		return false;
+	}
 
 	if (minIntervalSec <= 0)
+	{
+		m_slog.Format("[IB202200][skipped]!!!!!!! minIntervalSec null");
+		Output_DebugString(m_slog);
 		return false;
+	}
+	
 
 	const CTime now = CTime::GetCurrentTime();
 	const CTime curServerTime = ParseRTSTime(pServerTime, COleDateTime::GetCurrentTime());
@@ -1108,7 +1119,7 @@ bool CMainWnd::ShouldSkipRTSByServerTime(
 	if (it == m_lastRTSTimeMap.end())
 	{
 		m_lastRTSTimeMap.emplace(code, curServerTime);
-		m_slog.Format("[IB202200][skipped] 첫수신 통과  code=[%s]  m_lastRTSTimeMap size = [%d] ", (LPCTSTR)&code, m_lastRTSTimeMap.size());
+		m_slog.Format("[IB202200][NOskipped] 첫수신 통과  code=[%s]  m_lastRTSTimeMap size = [%d] ", (LPCTSTR)&code, m_lastRTSTimeMap.size());
 		Output_DebugString(m_slog);
 		return false;
 	}
@@ -1120,15 +1131,15 @@ bool CMainWnd::ShouldSkipRTSByServerTime(
 
 	if (diffSec < minIntervalSec)
 	{
-		//m_slog.Format("[IB202200][skipped]!!!!!!! code=[%s] diffSec=[%d] minIntervalSec=[%d]", (LPCTSTR)&code, diffSec, minIntervalSec);
-		//Output_DebugString(m_slog);
+		m_slog.Format("[IB202200][skipped]!!!!!!! code=[%s] diffSec=[%d] minIntervalSec=[%d]", (LPCTSTR)&code, diffSec, minIntervalSec);
+	   Output_DebugString(m_slog);
 		return true;
 	}
 
 	// 통과 → 마지막 시간 갱신
 	//m_slog.Format("[IB202200][NOskipped]@@@@@ code=[%s] diffSec=[%d] minIntervalSec=[%d]", (LPCTSTR)&code, diffSec, minIntervalSec);
 	//Output_DebugString(m_slog);
-	it->second = curServerTime;
+	it->second = curServerTime;  //이코드가 시간이 걸린다
 	return false;
 }
 
@@ -2453,36 +2464,6 @@ void CMainWnd::sendMemo(CString code, char type)
 {
 	std::unique_ptr<st_mid_memo> pmid = std::make_unique<st_mid_memo>(type, m_id, code);
  	sendTR("pidomemo", (char*)pmid.get(), sizeof(st_mid_memo), TRKEY_INTER_MEMO_SEARCH);
-}
-
-bool CMainWnd::ShouldSkipRTSByTimeDiff(
-	CString& pcTime,
-	const char* pRTSTime,
-	int          allowDiffSec,   // 예: 1
-	bool         bEnableCheck
-)
-{
-	if (!bEnableCheck || !pRTSTime)
-		return false;
-
-	CString sRTSTime(pRTSTime);
-	if (sRTSTime.GetLength() < 6)
-		return false;
-
-	CTime rtsTime = ParseRTSTime(sRTSTime, COleDateTime::GetCurrentTime());
-	CTime rtsPCTime = ParseRTSTime(pcTime, COleDateTime::GetCurrentTime());
-
-	CTimeSpan diff = rtsPCTime - rtsTime;
-	int sec = abs((int)diff.GetTotalSeconds());
-
-	CString slog;
-	slog.Format("[IB202200][checkRTS] rtsTime=[%s] rtsPCTime=[%s] sec =[%d]",
-		sRTSTime, sRTSTime, sec);
-	Output_DebugString(slog);
-
-
-	// 차이가 너무 작으면 중복으로 판단
-	return sec <= allowDiffSec;
 }
 
 bool CMainWnd::IsEnableRTSTimeCheck(

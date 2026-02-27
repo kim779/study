@@ -183,7 +183,7 @@ public: // RTM
 
 	int m_icheckTime{};
 	int m_DiffSec{};
-	bool ShouldSkipRTSByTimeDiff(CString& pcTime, const char* pRTSTime, int allowDiffSec, bool  bEnableCheck);
+
 	bool IsEnableRTSTimeCheck(const CTime& currentTime, const CTime& baseTime, int checkTimeSec);
 	CTime ParseRTSTime(const CString& sTime, const COleDateTime& today);
 	std::unordered_map<std::string, CTime> m_lastRTSTimeMap;

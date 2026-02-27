@@ -40,14 +40,23 @@ public:
 
 	const CString& getMemo(CString sCode);
 
-	void    setDelaytime(const int delay){ _delaytime = delay; }
+	void    setDelaytime(const int delay){ 
+		if (delay == 300)
+		{
+			_delaytime = 0;
+			return;
+		}
+		_delaytime = delay;
+	}
 	void	setBlinkColor(COLORREF color) { _blinkColor = color; }
 	void    setBlinkType(const int type) { _blinkType = type;  }
 	void    setMemoType(const int type)  { _memoType = type;   }
 	const int      getBlinkType() const  { return _blinkType;  }
 	const int      getMemoType() const   { return _memoType;   }
 	const COLORREF getBlinkColor() const { return _blinkColor; }
-	const int      getDelay() const { return _delaytime; }
+	const int      getDelay() const { 
+		return _delaytime; 
+	}
 
 private:
 	std::unordered_map<std::string, CString> _memoMap;

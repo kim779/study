@@ -29,3 +29,9 @@
 #endif // _AFX_NO_AFXCMN_SUPPORT
 
 #include <axStd.hpp>
+
+#define  DF_NEW_VER
+inline void Output_DebugString(CString slog)
+{
+	OutputDebugString(slog);
+}

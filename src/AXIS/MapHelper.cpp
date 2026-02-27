@@ -424,7 +424,7 @@ WINDOWPLACEMENT	pl{};
 						strValue = _T("1");
 					}
 
-					value = atoi(strValue);
+					value = _ttoi(strValue);
 					
 					if(value == 10)
 					{
@@ -484,7 +484,7 @@ WINDOWPLACEMENT	pl{};
 // 						s.Format("SRUN MAP NAME : %s	GROUP : %d\n",child->m_mapN,strValue);
 // 						OutputDebugString(s);
 						
-						value = atoi(strValue);
+						value = _ttoi(strValue);
 						
 						if(value == 10)
 						{
@@ -748,7 +748,7 @@ OutputDebugString(s);
 						// 						s.Format("RUN MAP NAME : %s	GROUP : %d\n",child->m_mapN,strValue);
 						// 						OutputDebugString(s);
 						
-						value = atoi(strValue);
+						value = _ttoi(strValue);
 						
 						if(value == 10)
 						{
@@ -2867,7 +2867,7 @@ OutputDebugString(s);
 // 						s.Format("RUN MAP NAME : %s	GROUP : %d\n",child->m_mapN,strValue);
 // 						OutputDebugString(s);
 
-						value = atoi(strValue);
+						value = _ttoi(strValue);
 
 						if(value == 10)
 						{
@@ -2935,7 +2935,7 @@ OutputDebugString(s);
 						// 						s.Format("RUN MAP NAME : %s	GROUP : %d\n",child->m_mapN,strValue);
 						// 						OutputDebugString(s);
 						
-						value = atoi(strValue);
+						value = _ttoi(strValue);
 						
 						if(value == 10)
 						{
@@ -3263,12 +3263,10 @@ OutputDebugString(s);
 				m_main->RunPhonePad();
 				return 0;
 			}
-			//testcode
 			else if (m_main->ScreenCheck(mapN) == 0)
 			{
 				return 0;
 			}
-			//testcode
 		}
 	}
 	else if (index < ID_MENU_USERTOOL)
@@ -4258,8 +4256,8 @@ BOOL CMapHelper::GetMapInfo(const char* mapName, int& type, int& size)
 		Trim(line);
 		ts = line;
 
-		short cx = atoi(width);
-		short cy = atoi(height);
+		short cx = _ttoi(width);
+		short cy = _ttoi(height);
 		size = MAKELONG(cx, cy);
 
 		ts.MakeLower();
@@ -4674,7 +4672,7 @@ void CMapHelper::CountMap( LPCSTR mapN )
 	else
 		ft->second += 1;
 #else
-	void* pCnt{};
+	/*void* pCnt{};
 	if (m_counter.Lookup((LPCSTR)scrNo, pCnt))
 	{
 		++*((int*)pCnt);
@@ -4684,7 +4682,7 @@ void CMapHelper::CountMap( LPCSTR mapN )
 		pCnt = new int;
 		*((int*)pCnt) = 1;
 		m_counter.SetAt((LPCSTR)scrNo, pCnt);
-	}
+	}*/
 #endif
 }
 
@@ -4757,7 +4755,7 @@ void CMapHelper::SetCountData( LPCSTR data, int dlen )
 			else
 				ft->second += atoi(scrCnt);
 #else
-			void* pCnt;
+		/*	void* pCnt;
 			if (m_counter.Lookup((LPCSTR)scrNo, pCnt))
 			{
 				*((int*)pCnt) += atoi(scrCnt);
@@ -4767,7 +4765,7 @@ void CMapHelper::SetCountData( LPCSTR data, int dlen )
 				pCnt = new int;
 				*((int*)pCnt) = atoi(scrCnt);
 				m_counter.SetAt((LPCSTR)scrNo, pCnt);
-			}
+			}*/
 #endif
 		}
 		st = pos = pos + 1;

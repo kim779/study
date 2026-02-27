@@ -315,7 +315,7 @@ void CTreeWnd::loadingOJcode()
 	struct  ojcodh  ojcodH;
 	struct  ojcode  ojcode;
 
-	filePath.Format("%s/%s/%s", m_root, TABDIR, "opcode2.dat");
+	filePath.Format("%s/%s/%s", m_root, TABDIR, OJCODE);
 	if (!fileH.Open(filePath, CFile::modeRead|CFile::typeBinary|CFile::shareDenyNone))
 	{
 		AfxMessageBox("옵션 파일을 읽을 수 없습니다.");

@@ -1,7 +1,8 @@
 // MapWnd.cpp : implementation file
 //
-
 #include "stdafx.h"
+#include "../../H/TickStore.h"
+
 #include "IB202200.h"
 #include "MainWnd.h"
 #include "toolwnd.h"
@@ -16,6 +17,7 @@
 #include <EzIni.hpp>
 #include "Memo.h"
 
+
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #undef THIS_FILE
@@ -24,7 +26,17 @@ static char THIS_FILE[] = __FILE__;
 
 /////////////////////////////////////////////////////////////////////////////
 // CMainWnd
+
+
 #define TM_RTSTIME 9898
+
+#ifdef _DEBUG
+#pragma comment(lib, "../../AXIS/Debug/axis.lib")
+#else
+#pragma comment(lib, "../../AXIS/Release/axis.lib")
+#endif
+
+
 
 CMainWnd::CMainWnd(CWnd *pWnd) : _pApp(static_cast<CIB202200App*>(AfxGetApp()))
 {
@@ -134,9 +146,10 @@ void CMainWnd::CheckRTSTimer(bool bFirst)
 		else  //최초 화면 오픈하였을 경우
 		{
 			m_iTime = iTime;
-			SetTimer(TM_RTSTIME, m_iTime, nullptr);
+			//SetTimer(TM_RTSTIME, m_iTime, nullptr);
 		}
 		_pApp->setDelaytime(m_iTime);
+		SetTimer(TM_RTSTIME, m_iTime, nullptr);
 		return;
 	}
 
@@ -161,6 +174,7 @@ void CMainWnd::CheckRTSTimer(bool bFirst)
 			m_iTime = iTime;
 		}
 		_pApp->setDelaytime(m_iTime);
+		SetTimer(TM_RTSTIME, m_iTime, nullptr);
 		return;
 	}
 	else
@@ -197,6 +211,7 @@ void CMainWnd::CheckRTSTimer(bool bFirst)
 					m_iTime = iTime;
 				}
 				_pApp->setDelaytime(m_iTime);
+				SetTimer(TM_RTSTIME, m_iTime, nullptr);
 				return;
 			}
 		}
@@ -823,6 +838,9 @@ LONG CMainWnd::OnManage(WPARAM wParam, LPARAM lParam)
 		CString tempStr;
 		tempStr.Format("%s", (char*)lParam);
 
+m_slog.Format("[2022][REQ]tempStr =[%s] ", tempStr);
+OutputDebugString(m_slog);
+
 		RTS_REGISTER_REQ* pReq = new RTS_REGISTER_REQ{};
 		pReq->hWnd = m_hWnd;
 
@@ -846,7 +864,7 @@ LONG CMainWnd::OnManage(WPARAM wParam, LPARAM lParam)
 		// ------------------------------------
 		int pos = 0;
 		CString token;
-
+		const int type = m_pToolWnd->SendMessage(WM_MANAGE, MK_MARKET);
 		while ((token = codePart.Tokenize(_T("\t"), pos)) != _T(""))
 		{
 			if (pReq->codeCount >= MAX_CODES_PER_REQ)
@@ -863,7 +881,24 @@ LONG CMainWnd::OnManage(WPARAM wParam, LPARAM lParam)
 				token,
 				_TRUNCATE);
 #endif
+			token.TrimRight();
 			std::string code = (LPCTSTR)token;
+			if (code.empty())
+				continue;
+
+			switch (type)
+			{
+			case 2:
+				code = "N.A" + code;
+				break;
+			case 3:
+				code = "M.A" + code;
+				break;
+			case 1:
+			default:
+				code = "A" + code;
+				break;
+			}
 			if (std::find(m_codes.begin(), m_codes.end(), code) == m_codes.end())
 				m_codes.push_back(code);
 			
@@ -879,6 +914,10 @@ LONG CMainWnd::OnManage(WPARAM wParam, LPARAM lParam)
 			if (pReq->symbolCount >= MAX_SYMBOLS_PER_REQ)
 				break;
 
+			token.TrimRight();
+			if (token.IsEmpty())
+				continue;
+			 
 			pReq->symbols[pReq->symbolCount] = _ttoi(token);
 			pReq->symbolCount++;
 
@@ -888,8 +927,8 @@ LONG CMainWnd::OnManage(WPARAM wParam, LPARAM lParam)
 
 		// ------------------------------------
 		// ------------------------------------
-		m_pMainFrame->SendMessage(WM_USER, MMSG_RT_REGISTER_CODES, (LPARAM)pReq);
-
+		m_pMainFrame->SendMessage(WM_USER, MMSG_RT_REGISTER_CODES, (LPARAM)pReq);  //test
+		InitSlotIndices();
 	}
 	break;
 	default:
@@ -1316,7 +1355,7 @@ void CMainWnd::sendTR(CString trCode, char *datB, int datL, int key)
 	{
 		//SetSendTRtoMainFrame( trCode, datB,  datL, US_PASS, key);
 		//return;
-		m_slog.Format("[2022][%s]<%d> [%s][%d][%d]", __FUNCTION__, __LINE__, trCode, datL, key);
+		m_slog.Format("[2022][pooppoop][%s]<%d> [%s][%d][%d]", __FUNCTION__, __LINE__, trCode, datL, key);
 		OutputDebugString(m_slog);
 		
 	}
@@ -2136,50 +2175,56 @@ void CMainWnd::OnTimer(UINT nIDEvent)
 	}
 	else if (nIDEvent == TM_RTSTIME)
 	{
-#ifdef DF_MAIN_RTS
-		for (const auto& code : m_codes)
+		char valueBuf[SYMBOL_STR_LEN];
+
+		for (int slotIndex : m_slotIndices)
 		{
-			RTS_READ_REQ req{};
-			strcpy_s(req.code, code.c_str());
+			//TickSnapshot& slot = g_tickSlots[slotIndex];
 
-			req.symbolCount = (int)m_symbols.size();
+			//if (slot.code[0] == '\0')
+			//	continue;
 
-			for (int i = 0; i < req.symbolCount; i++)
-				req.symbols[i] = m_symbols[i];
-
-			m_pMainFrame->SendMessage(MMSG_GETRTS_FROM_MAIN, 0, (LPARAM)&req);
-
-			//log
-			// ===== DEBUG LOG =====
-			CString log;
-			log.Format("--------------------[2022][REQ][code] code=%s, symbolCount=%d\r\n",
-				req.code, req.symbolCount);
-			OutputDebugString(log);
-
-			for (int i = 0; i < req.symbolCount; i++)
-			{
-				CString line;
-				line.Format("[2022][REQ][value]  symbol=%d, valid=%d, value=%s\r\n",
-					req.symbols[i],
-					req.valid[i] ? 1 : 0,
-					req.valid[i] ? req.values[i] : "");
-
-				OutputDebugString(line);
-			}
-
-			_alertR alertR{};
-			ConvertTickToAlert(req, alertR);
-
-			m_pGroupWnd->initAlert();
-			//	AxStd::async([this, lParam]() {
-			m_pGroupWnd->RecvRTSx((LPARAM)&alertR);
-			//	});
-			m_pGroupWnd->UpdateDraw();
-
-			FreeAlertMemory(alertR);
+			//for (int sym : m_symbols)
+			//{
+			//	if (ReadSymbolValue(slot, sym, valueBuf))
+			//	{
+			//		m_slog.Format("--------------------[2022][REQ][code] code=%s, sym=[%d] val=%s \r\n", slot.code, sym, valueBuf);
+			//		OutputDebugString(valueBuf);
+			//		// 값이 있을 때만 갱신
+			//		//m_pGroupWnd->UpdateSymbol(slot.code, sym, valueBuf);
+			//	}
+			//}
 		}
-#endif
+
+		m_pGroupWnd->UpdateDraw();   // 루프 끝에서 1번만
 	}
+	/*
+	for (const auto& code : m_codes)
+	{ 
+	RTS_READ_REQ req{};
+	strcpy_s(req.code, code.c_str());
+	req.symbolCount = (int)m_symbols.size();
+	for (int i = 0; i < req.symbolCount; i++)
+		req.symbols[i] = m_symbols[i];
+		int ret = m_pMainFrame->SendMessage(WM_USER, MMSG_GETRTS_FROM_MAIN, (LPARAM)&req); 
+		if (!ret) continue; //log // ===== DEBUG LOG ===== CString log; 
+		log.Format("--------------------[2022][REQ][code] code=%s, symbolCount=%d\r\n", req.code, req.symbolCount); OutputDebugString(log); 
+		for (int i = 0; i < req.symbolCount; i++) 
+		{ 
+		CString line; line.Format("[2022][REQ][value] symbol=%d, valid=%d, value=%s\r\n", req.symbols[i], req.valid[i] ? 1 : 0, req.valid[i] ? req.values[i] : "");
+		OutputDebugString(line);
+		} 
+		_alertR alertR{}; 
+		ConvertTickToAlert(req, alertR); 
+		m_pGroupWnd->initAlert();
+		// AxStd::async([this, lParam]() 
+		{ 
+		m_pGroupWnd->RecvRTSx((LPARAM)&alertR); 
+		//});
+		m_pGroupWnd->UpdateDraw();
+		FreeAlertMemory(alertR);
+	}
+	*/
 	CWnd::OnTimer(nIDEvent);
 }
 
@@ -2698,29 +2743,6 @@ void CMainWnd::SetSendTRtoMainFrame(CString trCode, char* datB, int datL, BYTE s
 	
 }
 
-void CMainWnd::RegisterRealtimeCodes(const std::vector<CString>& codeList)
-{
-	/*
-	std::vector<CString> codes;
-
-    for (auto& item : m_myInterestCodes)
-        codes.push_back(item);
-
-    RegisterRealtimeCodes(codes);
-	*/
-	RTS_REGISTER_REQ* req = new RTS_REGISTER_REQ{};
-
-	req->hWnd = this->GetSafeHwnd();
-	req->codeCount = min((int)codeList.size(), MAX_CODES_PER_REQ);
-
-	for (int i = 0; i < req->codeCount; i++)
-	{
-		strcpy_s(req->codes[i], codeList[i]);
-	}
-
-	m_pMainFrame->PostMessage(WM_USER, MMSG_RT_REGISTER_CODES, (LPARAM)req);
-}
-
 void CMainWnd::UnregisterRealtime()
 {
 	RTS_REGISTER_REQ* req = new RTS_REGISTER_REQ{};
@@ -2834,4 +2856,37 @@ void CMainWnd::FreeAlertMemory(_alertR& alert)
 
 	delete[] record;
 	alert.ptr[0] = 0;
+}
+
+void CMainWnd::InitSlotIndices()
+{
+	m_slotIndices.clear();
+
+	m_slog.Format("[2022][REQ][code] code count = %d\n",
+		(int)m_codes.size());
+	OutputDebugString(m_slog);
+
+	for (const auto& code : m_codes)
+	{
+		int idx = Axis_EnsureSlotIndex(code.c_str());
+	
+		if (idx >= 0)
+		{
+			m_slog.Format("[2022][REQ][code]    [OK] code=%s → slot=%d\n",
+				code.c_str(), idx);
+			OutputDebugString(m_slog);
+
+			m_slotIndices.push_back(idx);
+		}
+		else
+		{
+			m_slog.Format(" [2022][REQ][code]   [FAIL] code=%s (slot allocation failed)\n",
+				code.c_str());
+			OutputDebugString(m_slog);
+		}
+	}
+
+	m_slog.Format("[2022][REQ][code] [InitSlotIndices] final slot count = %d\n",
+		(int)m_slotIndices.size());
+	OutputDebugString(m_slog);
 }

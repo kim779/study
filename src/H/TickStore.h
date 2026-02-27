@@ -1,30 +1,27 @@
 #pragma once
+
+#ifdef AXIS_MAIN
+#define AXIS_API extern "C" __declspec(dllexport)
+#else
+#define AXIS_API extern "C" __declspec(dllimport)
+#endif
+
 #include <bitset>
 #define CODE_LEN   13
-//#define PRICE_LEN  16
-//#define DIFF_LEN   16
-//#define VOL_LEN    24
-//#define RATE_LEN   16
-//
-//typedef struct TickSnapshot
-//{
-//	std::atomic<int> seq{ 0 };   // seqlock
-//	DWORD ts_ms{ 0 };
-//
-//
-//    char  RTStype[2];
-//    char  code[CODE_LEN];
-//    char  price[PRICE_LEN];
-//    char  diff[DIFF_LEN];
-//    char  volume[VOL_LEN];
-//    char  rate[RATE_LEN];
-//}TickSnapshot;;
 
 #define MAX_SYMBOLS 1000
 #define MAX_RTS_INDEX 1000
 #define FIELD_STR_LEN 32
 #define SYMBOL_STR_LEN 32
 
+
+#pragma message("--------------------------------------------------TickStore.h included")
+
+
+
+
+//----------------------------------------------------------
+//mainFrame  update_ticker  실시간 데이터 수신시 저장 구조체
 typedef struct TickSnapshot
 {
     std::atomic<int> seq{ 0 };   // seqlock
@@ -37,12 +34,18 @@ typedef struct TickSnapshot
     std::bitset<MAX_SYMBOLS> valid;   // 값 존재 여부
 } TickSnapshot;
 
+constexpr int MAX_SLOT = 4096;
+extern std::unordered_map<std::string, int> g_codeToIndex;
+extern TickSnapshot g_tickSlots[MAX_SLOT];
 
+AXIS_API int  Axis_EnsureSlotIndex(const char* code);
+AXIS_API const TickSnapshot* Axis_GetTickSlots();
 
+//typedef BOOL(__stdcall* PFN_GET_TICK)(const char* code, TickSnapshot* out);
+//typedef void(* PFN_REGISTER_GET_TICK)(PFN_GET_TICK fn);
 
-
-typedef BOOL(__stdcall* PFN_GET_TICK)(const char* code, TickSnapshot* out);
-typedef void(* PFN_REGISTER_GET_TICK)(PFN_GET_TICK fn);
+//----------------------------------------------------------
+//관심종목에서 poop 조회시 mainframe 에 핸들과 코드, 심볼리스트를 저장할때
 
 constexpr int MAX_CODES_PER_REQ = 200;
 constexpr int CODE_STR_LEN = 16;
@@ -60,9 +63,20 @@ struct RTS_REGISTER_REQ
 };
 
 
+//----------------------------------------------------------
+
+struct RtsSubscription
+{
+    // 코드 목록 (정렬해두면 비교/갱신이 쉬움)
+    std::vector<std::string> codes;
+
+    // 심볼 목록: 조회가 빠르게 bitset + 원본 인덱스 list 둘 다 들고가면 좋음
+    std::bitset<1000> symbolMask;
+    std::vector<int> symbols; // (0~999)
+};
 
 
-
+//----------------------------------------------------------
 
 struct ST_SEND_TR
 {
@@ -74,7 +88,7 @@ struct ST_SEND_TR
     HWND hSender;
 };
 
-
+//----------------------------------------------------------
 
 
 #define MAX_REQ_SYMBOLS 128
@@ -93,7 +107,7 @@ struct RTS_READ_REQ
     DWORD ts_ms;
 };
 
-
+//----------------------------------------------------------
 #define WM_RTS_MAIN_PUSH  (WM_USER + 0x5201)
 
 struct RTS_PUSH_ITEM

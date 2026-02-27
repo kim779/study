@@ -15,7 +15,7 @@ IMPLEMENT_DYNAMIC(CDlg_Slider, CDialog)
 #define DF_IMIN_RATE  300
 #define DF_IMAX_POS 100
 #define DF_IMIN_POS 30
-
+//IDC_STATIC_TIME
 CDlg_Slider::CDlg_Slider(CWnd* pParent /*=nullptr*/)
 	: CDialog(IDD_DLG_SLIDER, pParent)
 {
@@ -171,6 +171,9 @@ void CDlg_Slider::SaveRate()
 	filePath.Format("%s/%s/InterOption.ini", m_root, "tab");
 	strRate.Format("%d", isliderPos);
 
+	if (isliderPos == DF_IMIN_RATE)
+		strRate = _T("0");
+
 	if (isliderPos < m_iTime  )
 	{
 		AfxMessageBox("실시간 갱신주기 변경 시 시세처리량이 증가하여 HTS 반응속도가 느려질 수 있습니다.");
@@ -290,6 +293,23 @@ BOOL CDlg_Slider::OnInitDialog()
 	CDialog::OnInitDialog();
 	m_slider.SetRange(30, 100, TRUE);
 	LoadRate();
+
+	if (CWnd* pUnit = GetDlgItem(IDC_STATIC_UNIT))
+	{
+		CRect rc;
+		pUnit->GetWindowRect(&rc);
+		ScreenToClient(&rc);
+
+		// 1~2px 아래로 이동 (원하면 2로 바꿔라)
+		const int offsetY = 0;
+		rc.OffsetRect(0, offsetY);
+
+		pUnit->MoveWindow(rc);
+	}
+
+	const int timeMs = PosToTimeMs(m_slider.GetPos());
+	m_iTime = timeMs;
+	UpdateTimeText(timeMs);
 	return TRUE;  // return TRUE unless you set the focus to a control
 				  // 예외: OCX 속성 페이지는 FALSE를 반환해야 합니다.
 }
@@ -307,10 +327,58 @@ void CDlg_Slider::OnPaint()
 void CDlg_Slider::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 {
 	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
+	if (pScrollBar && pScrollBar->GetSafeHwnd() == m_slider.GetSafeHwnd())
+	{
+		const int pos = m_slider.GetPos();
+		const int timeMs = PosToTimeMs(pos);
 
+		// 현재 선택값을 멤버에 반영 (OK 누르면 SaveRate에서 다시 계산하지만,
+		// 화면/로직에서 바로 쓰려면 여기서 갱신해두는 게 맞음)
+		m_iTime = timeMs;
+
+		UpdateTimeText(timeMs);
+	}
 	CDialog::OnHScroll(nSBCode, nPos, pScrollBar);
 }
 
+int CDlg_Slider::PosToTimeMs(int pos) const
+{
+	// pos 범위 보정
+	if (pos < DF_IMIN_POS) pos = DF_IMIN_POS;
+	if (pos > DF_IMAX_POS) pos = DF_IMAX_POS;
+
+	const int posRange = (DF_IMAX_POS - DF_IMIN_POS);   // 70
+	const int timeRange = (DF_IMAX_RATE - DF_IMIN_RATE);  // 5700
+
+	// 정수 연산 반올림(중간값 더하기)
+	const int timeMs = DF_IMIN_RATE + ((timeRange * (pos - DF_IMIN_POS) + posRange / 2) / posRange);
+	return timeMs;
+}
+
+void CDlg_Slider::UpdateTimeText(int timeMs)
+{
+	CString s;
+	if (timeMs <= DF_IMIN_RATE) // 300ms면 "실시간"
+	{
+		s = " 실시간";
+		if (CWnd* p = GetDlgItem(IDC_STATIC_UNIT))
+			p->SetWindowText("");
+	}
+	else
+	{
+		// 1) 소수 1자리 초 표기 (예: 800ms -> 0.8초, 1500ms -> 1.5초)
+		const double sec = static_cast<double>(timeMs) / 1000.0;
+		s.Format("%.1f", sec);
+		if (CWnd* p = GetDlgItem(IDC_STATIC_UNIT))
+			p->SetWindowText("초");
+	}
+
+	if (CWnd* p = GetDlgItem(IDC_STATIC_TIME))
+		p->SetWindowText(s);
+
+	// 디버그 로그 (필요하면 주석 해제/유지)
+	// AxStd::_Msg("[%s] Slider pos=%d => time=%dms (%s)", __FUNCTION__, m_slider.GetPos(), timeMs, (LPCTSTR)s);
+}
 
 void CDlg_Slider::OnBnClickedOk()
 {

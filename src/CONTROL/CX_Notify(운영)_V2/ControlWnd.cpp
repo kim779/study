@@ -562,12 +562,12 @@ void CControlWnd::SendToMap(CString sData, bool bAll, CString sAccn/* = ""*/)
 		m_dataList.Format("%d\t", m_CodeMap.GetCount());
 		m_dataList += sSendData;
 
-		if (m_Version == VS_SKIP || m_Version == VS_TIMER)
-		{
+		//if (m_Version == VS_SKIP || m_Version == VS_TIMER)
+		//{
 			m_cs.Unlock();
 			m_pParent->SendMessage(WM_USER, MAKEWPARAM(eventDLL, MAKEWORD(m_Param.key, evOnDblClk/*DblClick*/)), (LPARAM)m_Param.name.GetString());  //SendToMap
 			return;
-		}
+		//}
 	}
 	else
 	{

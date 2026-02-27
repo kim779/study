@@ -437,8 +437,7 @@ bool CIHCodeCombo::OCodeLoad(CString tabPath)
 	struct  ojcode  OJCode;
 	int	codeN{}, len{};
 	
-	//CString	path = tabPath + "\\" + OJCODE;
-	CString	path = tabPath + "\\" + "opcode2.dat";
+	CString	path = tabPath + "\\" + OJCODE;
 	if (!file.Open(path, CFile::modeRead|CFile::typeBinary|CFile::shareDenyNone))
 	{	
 		MessageBox("파일이 존재하지 않습니다.");
