@@ -122,6 +122,8 @@ static CMainFrame* m_pMain = NULL;
 #ifdef DF_MAIN_RTS
 std::unordered_map<std::string, int> g_codeToIndex;
 TickSnapshot g_tickSlots[MAX_SLOT];
+int g_nextIndex = 0;
+std::shared_mutex  g_codeMapLock;
 #endif
 
 #pragma	comment(lib, "Winmm.lib")
@@ -144,6 +146,8 @@ TickSnapshot g_tickSlots[MAX_SLOT];
 #define	UPMAXSIZE	1024*15
 #define TM_DNINTEREST 9050
 #define TM_SLIDE	9051
+
+#define TM_MAIN_TEST_RTS 9052
 
 #define CNT_MAXPB 10
 
@@ -1799,8 +1803,8 @@ WriteLog(m_slog);
 						AfxMessageBox("CryptProtectData error");
 						break;
 					}*/
-					DumpAllSlots(g_tickSlots, MAX_SLOT, 100, 50);
-					
+					//DumpAllSlots(g_tickSlots, MAX_SLOT, 100, 50);
+					SetTimer(TM_MAIN_TEST_RTS, 500, nullptr);
 					m_slog.Format("[AXIS][RTSLOG] g_codeToIndex = %d", g_codeToIndex.size());
 					OutputDebugString(m_slog);
 
@@ -3794,7 +3798,9 @@ WriteLog("[AXIS] OnAxis-axAXIS - Step 13");
 
 			m_bInit = FALSE;
 
-			
+#ifdef DF_MAIN_RTS
+
+#endif 
 		}
 		break;
 	case axSIGNON:	
@@ -4218,6 +4224,7 @@ void CMainFrame::InitMapHK()
 
 #ifdef DF_MAIN_RTS
 	InitPool();
+	
 #endif
 }
 
@@ -4788,23 +4795,6 @@ OutputDebugString(m_slog);
 #ifdef DF_MAIN_RTS
 		case MMSG_SETSENDTR_TO_MAIN:  //관심등 화면에서 메인이 대신 sendtr 하도록...
 		{
-		
-		//m_slog.Format("[AXIS][MMSG_SENDTR][%s]", (char*)lParam);
-		//output_DebugString(m_slog);
-
-		/*ST_RT_SUBSCRIBE* pReq = (ST_RT_SUBSCRIBE*)lParam;
-
-		HWND hWnd = pReq->hWnd;
-
-		for (int i = 0; i < pReq->count; ++i)
-		{
-			const char* code = pReq->codes[i];
-			RegisterSubscriber(code, hWnd, pReq->screenKey);
-		}
-
-		delete pReq;
-		return 0;*/
-
 		// poolKey 할당
 		int poolKey = AllocPoolKey();
 		if (poolKey == -1)
@@ -4821,7 +4811,7 @@ OutputDebugString(m_slog);
 		info.tick = GetTickCount();
 
 		g_mapRoute[poolKey] = info;
-		m_slog.Format("[2022][%s]<%d> .... 메인[%x] 에서  key[%d] ", __FUNCTION__, __LINE__, info.hWnd, info.key);
+		m_slog.Format("[2022][AXIS][%s]<%d> .... 메인[%x] 에서  key[%d] ", __FUNCTION__, __LINE__, info.hWnd, info.key);
 		output_DebugString(m_slog);
 		// 서버로 보낼 key = poolKey
 		sendTR(pTr->trname, pTr->datB, pTr->datL, pTr->stat, poolKey);
@@ -4829,44 +4819,35 @@ OutputDebugString(m_slog);
 		break;
 		case MMSG_GETRTS_FROM_MAIN:  //메인에게 RTS 데이터 얻어올때
 		{
-			RTS_READ_REQ* req = (RTS_READ_REQ*)lParam;
-			if (!req) return 0;
+			//RTS_READ_REQ* req = (RTS_READ_REQ*)lParam;
+			//if (!req) return 0;
 
-			int idx = GetSlotIndex_FindOnly(req->code);
-			if (idx < 0) return 0;
+			//int idx = GetSlotIndex_FindOnly(req->code);
+			//if (idx < 0) return 0;
 
-			TickSnapshot snap{};
-			if (!ReadTick(idx, snap))   // already have this
-				return 0;
+			//TickSnapshot snap{};
+			//if (!ReadTick(idx, snap))   // already have this
+			//	return 0;
 
-			req->ts_ms = snap.ts_ms;
+			//req->ts_ms = snap.ts_ms;
 
-			for (int i = 0; i < req->symbolCount; i++)
-			{
-				int sym = req->symbols[i];
+			//for (int i = 0; i < req->symbolCount; i++)
+			//{
+			//	int sym = req->symbols[i];
 
-				if (sym >= 0 && sym < MAX_SYMBOLS && snap.valid.test(sym))
-				{
-					CopyZ(req->values[i], SYMBOL_STR_LEN, snap.values[sym]);
-					req->valid[i] = true;
-				}
-				else
-				{
-					req->values[i][0] = 0;
-					req->valid[i] = false;
-				}
-			}
+			//	if (sym >= 0 && sym < MAX_SYMBOLS && snap.valid.test(sym))
+			//	{
+			//		CopyZ(req->values[i], SYMBOL_STR_LEN, snap.values[sym]);
+			//		req->valid[i] = true;
+			//	}
+			//	else
+			//	{
+			//		req->values[i][0] = 0;
+			//		req->valid[i] = false;
+			//	}
+			//}
 
 			return 1;
-		/*	TickSnapshot* out = (TickSnapshot*)lParam;
-
-			int idx = GetSlotIndex_FindOnly(out->code);
-
-			if (idx < 0)
-				return false;
-
-			ReadTick(idx, *out);
-			return true;*/
 		}
 		break;
 		case MMSG_RT_REGISTER_CODES:
@@ -4896,7 +4877,7 @@ OutputDebugString(m_slog);
 					CString code(req->codes[i]);
 #endif
 					CString line;
-					line.Format(_T("[MAIN][RTS등록]  CODE[%d] = %s\r\n"), i, code.GetString());
+					line.Format(_T("[AXIS][RTS등록]  CODE[%d] = %s\r\n"), i, code.GetString());
 					OutputDebugString(line);
 				}
 
@@ -4904,7 +4885,7 @@ OutputDebugString(m_slog);
 				for (int i = 0; i < req->symbolCount; ++i)
 				{
 					CString line;
-					line.Format(_T("[MAIN][RTS등록]  SYMBOL[%d] = %d\r\n"), i, req->symbols[i]);
+					line.Format(_T("[AXIS][RTS등록]  SYMBOL[%d] = %d\r\n"), i, req->symbols[i]);
 					OutputDebugString(line);
 				}
 
@@ -8957,29 +8938,29 @@ void CMainFrame::write_err()
 }
 
 #ifdef DF_MAIN_RTS
-bool CMainFrame::ReadTick(const char* code, TickSnapshot* out)  //dll에서 호출
-{
-	int idx = GetSlotIndex_FindOnly(code);
-	ReadTick(idx, *out);
-	return false;
-}
-
-bool CMainFrame::ReadTick(int idx, TickSnapshot& out)
-{
-	TickSnapshot& s = g_tickSlots[idx];
-
-	for (;;)
-	{
-		int v1 = s.seq.load(std::memory_order_acquire);
-		if (v1 & 1) continue; // writing 중
-
-		CopySnapshot(out, s);   //  구조체 직접 복사 대신 사용
-
-		int v2 = s.seq.load(std::memory_order_acquire);
-		if (v1 == v2 && !(v2 & 1))
-			return true;
-	}
-}
+//bool CMainFrame::ReadTick(const char* code, TickSnapshot* out)  //dll에서 호출
+//{
+//	int idx = GetSlotIndex_FindOnly(code);
+//	ReadTick(idx, *out);
+//	return false;
+//}
+//
+//bool CMainFrame::ReadTick(int idx, TickSnapshot& out)
+//{
+//	TickSnapshot& s = g_tickSlots[idx];
+//
+//	for (;;)
+//	{
+//		int v1 = s.seq.load(std::memory_order_acquire);
+//		if (v1 & 1) continue; // writing 중
+//
+//		CopySnapshot(out, s);   //  구조체 직접 복사 대신 사용
+//
+//		int v2 = s.seq.load(std::memory_order_acquire);
+//		if (v1 == v2 && !(v2 & 1))
+//			return true;
+//	}
+//}
 #endif
 
 #ifdef DF_MAIN_RTS
@@ -8990,26 +8971,7 @@ void CMainFrame::update_ticker(int kind, struct _alertR* alertR)
 	CString stmp;
 
 	std::string scode = CStringA(alertR->code);
-	//auto it = m_lastRTSTimeCode.find(scode);
-	//// 첫 수신은 무조건 통과
-	//const CTime now = CTime::GetCurrentTime();
-	//if (it == m_lastRTSTimeCode.end())
-	//{
 
-	//	m_lastRTSTimeCode.emplace(scode, now);
-	//	m_slog.Format("[AXIS][%s]<%d> ------  첫수신   code=[%s][%d]", __FUNCTION__, __LINE__, symbol, m_lastRTSTimeCode.size());
-	//	output_DebugString(m_slog);
-	//}
-	//else
-	//{
-	//	const CTime& prevServerTime = it->second;
-	//	int diffSec = (int)(now - prevServerTime).GetTotalSeconds();
-	//	it->second = now;
-	//	m_slog.Format("[AXIS][%s]<%d> ------  쌓이는 데이터   code=[%s][%d]  diffSec=[%d]", __FUNCTION__, __LINE__, symbol, m_lastRTSTimeCode.size(), diffSec);
-	//	output_DebugString(m_slog);
-	//}
-
-	/////////////////////!!!!!
 	if (!alertR)
 		return;
 
@@ -9025,11 +8987,27 @@ void CMainFrame::update_ticker(int kind, struct _alertR* alertR)
 
 	// 종목코드 → 슬롯 index
 	auto it = g_codeToIndex.find(code);
+
+;
 	if (it != g_codeToIndex.end())
 	{
 		int idx = it->second;
-		// 최신 틱 데이터 갱신
+		stmp.Format("[AXIS][%s]<%d> 저장된 실시간 갱신  idx=[%d] code=[%s]",
+			__FUNCTION__, __LINE__, idx, code);
+		//OutputDebugString(stmp);
 		UpdateSnapshotFromAlert(g_tickSlots[idx], alertR);
+	}
+	else
+	{
+		// 없으면 새로 슬롯 할당 후 저장
+		int idx = EnsureSlotIndexForCode(code);
+		if (idx >= 0)
+		{
+			stmp.Format("[AXIS][%s]<%d> 신규 슬롯 할당 idx=[%d] code=[%s]",
+				__FUNCTION__, __LINE__, idx, code);
+			OutputDebugString(stmp);
+			UpdateSnapshotFromAlert(g_tickSlots[idx], alertR);
+		}
 	}
 
 	//기존처럼 화면 루프 돌릴 필요 없음
@@ -13985,26 +13963,17 @@ void CMainFrame::OnTimer(UINT nIDEvent)
 	break;
 
 #ifdef DF_MAIN_RTS
-	case TM_MAIN_RTS_TEST:
-	{
-		static int step = 0;
-		step++;
-		for (int i = 0; i < 5; i++)
-		{
-			TickSnapshot snap;
-			MakeDummyTick(snap, step + i);
-
-		}
-	}
-	break;
-#endif
-#ifdef DF_MAIN_RTS
 	case TM_MAIN_RTS_PUSH:
 	{
 		std::vector<DispatchJob> jobs;
 		jobs.reserve(512);
 
 
+	}
+	break;
+	case TM_MAIN_TEST_RTS:
+	{
+		TestRTSData();
 	}
 	break;
 #endif
@@ -32679,10 +32648,10 @@ bool CMainFrame::LoadScreenInfo(const CString& filePath)
 
 
 #ifdef DF_MAIN_RTS
-
+//MMSG_GETRTS_FROM_MAIN   화면에서 실시간 데이터 요청해서 읽을때!!
 int CMainFrame::GetSlotIndex_FindOnly(const char* code)
 {
-	std::lock_guard<std::mutex> lock(g_codeMapLock);
+	std::shared_lock<std::shared_mutex > lock(g_codeMapLock);  //GetSlotIndex_FindOnly
 
 	auto it = g_codeToIndex.find(code);
 	if (it == g_codeToIndex.end())
@@ -32709,13 +32678,50 @@ int CMainFrame::GetSlotIndex_FindOnly(const char* code)
 	return it->second;
 }
 
+//MMSG_RT_REGISTER_CODES   화면에서 실시간 코드를 등록할때!!
+//update_ticker 에서 실시가 받아서 쓸때!!!
+//int CMainFrame::EnsureSlotIndexForCode(const char* code)
+//{
+//	if (!code || !code[0])
+//		return -1;
+//
+//	std::shared_lock<std::shared_mutex > lock(g_codeMapLock);  //EnsureSlotIndexForCode
+//
+//	//m_slog.Format("[AXISMAIN][REQ] FIND EnsureSlotIndexForCode start code=[%s]  [%d]", code, g_codeToIndex.size());
+//	//OutputDebugString(m_slog);
+//
+//	auto it = g_codeToIndex.find(code);
+//	if (it != g_codeToIndex.end())
+//		return it->second;   // 이미 있으면 기존 index 반환
+//
+//	// 슬롯 꽉 찼으면
+//	if (g_nextIndex >= MAX_SLOT)
+//		return -1;
+//
+//	// 새로 할당
+//	int idx = g_nextIndex++;
+//	g_codeToIndex.emplace(code, idx);
+//	CopyZ(g_tickSlots[idx].code, sizeof(g_tickSlots[idx].code), code);
+//
+//	return idx;
+//}
 int CMainFrame::EnsureSlotIndexForCode(const char* code)
 {
 	if (!code || !code[0])
 		return -1;
 
-	std::lock_guard<std::mutex> lock(g_codeMapLock);
+	// 읽기로 먼저 확인
+	{
+		std::shared_lock<std::shared_mutex> readLock(g_codeMapLock);
+		auto it = g_codeToIndex.find(code);
+		if (it != g_codeToIndex.end())
+			return it->second;
+	}
 
+	// 없으면 쓰기락으로 새로 할당
+	std::unique_lock<std::shared_mutex> writeLock(g_codeMapLock);
+
+	// double-check (락 잡는 사이 다른 스레드가 먼저 넣었을 수 있음)
 	auto it = g_codeToIndex.find(code);
 	if (it != g_codeToIndex.end())
 		return it->second;
@@ -32724,12 +32730,8 @@ int CMainFrame::EnsureSlotIndexForCode(const char* code)
 		return -1;
 
 	int idx = g_nextIndex++;
-
 	g_codeToIndex.emplace(code, idx);
-
-	CopyZ(g_tickSlots[idx].code,
-		sizeof(g_tickSlots[idx].code),
-		code);
+	CopyZ(g_tickSlots[idx].code, sizeof(g_tickSlots[idx].code), code);
 
 	return idx;
 }
@@ -32751,6 +32753,58 @@ AXIS_API const TickSnapshot* Axis_GetTickSlots()
 
 
 #endif
+
+void CMainFrame::TestRTSData()
+{
+	static int s_seq = 0;
+	s_seq++;
+
+	// 1. lock 잡고 코드목록만 복사
+	std::vector<std::string> codes;
+	{
+		//std::lock_guard<std::mutex> lock(g_codeMapLock); 
+		std::shared_lock<std::shared_mutex> lock(g_codeMapLock);   //TestRTSData
+		for (const auto& pair : g_codeToIndex)
+			codes.push_back(pair.first);
+	}
+	// 2. lock 해제 후 테스트 데이터 생성 및 update_ticker 호출
+	for (const auto& scode : codes)
+	{
+		const char* code = scode.c_str();
+
+		char s_gubn[4] = "1";
+		char s_curr[16] = {};
+		char s_diff[16] = {};
+		char s_rate[16] = {};
+		char s_volume[16] = {};
+
+		int price = 10000 + (rand() % 90000);
+		int diff = (rand() % 2000) - 1000;
+		float rate = (float)diff / price * 100.0f;
+		int volume = rand() % 9000000 + 100000;
+
+		sprintf_s(s_curr, "%d", price);
+		sprintf_s(s_diff, "%d", diff);
+		sprintf_s(s_rate, "%.2f", rate);
+		sprintf_s(s_volume, "%d", volume);
+
+		DWORD data[MAX_RTS_INDEX]{};
+		data[0] = (DWORD)s_gubn;
+		data[23] = (DWORD)s_curr;
+		data[24] = (DWORD)s_diff;
+		data[33] = (DWORD)s_rate;
+		data[27] = (DWORD)s_volume;
+
+		_alertR alertR{};
+		alertR.code = code;
+		alertR.stat = 1;
+		alertR.size = 1;
+		alertR.ptr[0] = (DWORD)data;
+
+		update_ticker(0, &alertR);
+	}
+}
+
 //CString ip;
 //	ip.Format("%s", ipaddr);
 //	ip.TrimLeft(), ip.TrimRight();

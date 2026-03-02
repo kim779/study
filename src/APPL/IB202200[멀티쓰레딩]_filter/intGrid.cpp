@@ -3841,7 +3841,7 @@ BOOL CintGrid::RedrawCell(int nRow, int nCol, CDC* pDC)
 		if (it.second == false)
 		{
 			//AxStd::_Msg("RedrawCell Skip FilterDraw [%d,%d]", nRow, nCol);
-			return FALSE;
+			//return FALSE;
 		}
 		// drawHolding 처리 최적화
 		if (m_drawHolding)
@@ -10072,104 +10072,5 @@ void CintGrid::endDrawHolding()
 	InvalidateRect(m_drawRect, false);
 	_mapFilterDraw.clear();
 }
-//void CintGrid::endDrawHolding()
-//{ 	
-//	const ULONGLONG tick = GetTickCount64();
-//
-//	auto lambdaDraw = [this](const ULONGLONG& tick){
-//		if (!m_drawRect.IsRectEmpty())
-//		{
-//			InvalidateRect(m_drawRect, false);
-//			m_drawRect.SetRectEmpty();
-//			_mapFilterDraw.clear();
-//			_DrawTick = tick;
-//		}
-//	};
-//
-//	auto getAverage = [this](std::deque<int>& data) -> double {
-//		const int calls = _idrawCount;
-//		if (data.size() >= 200) {
-//			_countSum -= static_cast<ULONGLONG>(data.front());
-//			data.pop_front();
-//		}
-//		data.emplace_back(calls);
-//		_countSum += static_cast<ULONGLONG>(calls);
-//		return (data.empty())
-//		? 0.0
-//		: (_countSum / static_cast<double>(data.size()));
-//	};
-//
-//
-//	if (0)
-//	{
-//		if (0)
-//		{
-//			lambdaDraw(GetTickCount64());
-//			m_drawHolding = false;
-//			return;
-//		}
-//	
-//		if (!_bDraw || m_drawRect.IsRectEmpty())
-//			return;
-//
-//		static int drawCounter = 0;
-//		drawCounter++;
-//
-//		const int threshold = CalcDrawThreshold(m_iTime);
-//
-//		if (drawCounter >= threshold)  //test
-//		{
-////m_slog.Format("[IB202200][DRAWING][@@@@NOskipped] drawCounter = [%d] threshold=[%d] m_iTime=[%d] ", drawCounter, threshold, m_iTime);
-////OutputDebugString(m_slog);
-//		    lambdaDraw(GetTickCount64());
-//			drawCounter = 0;
-//		}
-//		else
-//		{
-//			//m_slog.Format("[IB202200][DRAWING][!!!!!skipped] drawCounter = [%d] threshold=[%d] m_iTime=[%d] ", drawCounter, threshold, m_iTime);
-//			//OutputDebugString(m_slog);
-//		}
-//	}
-//	else
-//	{
-//		if (_bDraw && (!m_drawRect.IsRectEmpty()))
-//		{
-//			const ULONGLONG drawtick = m_iTime;
-//			m_slog.Format("[IB202200][DRAWING] tick = [%llu] _DrawTick=[%llu], tick - _DrawTick %llu],  drawtick=[%llu] ", tick, _DrawTick, tick - _DrawTick, drawtick);
-//			OutputDebugString(m_slog);
-//
-//			if ((tick - _DrawTick) >= drawtick)
-//			{
-//				_avgCount = getAverage(_Count);
-//
-//				m_slog.Format("[IB202200][DRAWING] [%s]<%d> _avgCount =[%f]  _idrawCount = [%ld] que size =[%d]",
-//					__FUNCTION__, __LINE__, _avgCount, _idrawCount, _Count.size());
-//				OutputDebugString(m_slog);
-//
-//				if (const int avg = max(_avgCount, 30.0); _idrawCount <= avg) {
-//					m_slog.Format("[IB202200][DRAWING] drawing 1");
-//					OutputDebugString(m_slog);
-//					lambdaDraw(tick);
-//				}
-//				_idrawCount = 0;
-//			}
-//			else
-//			{
-//				m_slog.Format("[IB202200][DRAWING] drawing 2 _avgCount=[%f] _idrawCount=[%ld] getAverage=[%f] tick - _DrawTick =[%llu]",
-//					_avgCount, _idrawCount, getAverage(_Count), tick - _DrawTick);
-//				OutputDebugString(m_slog);
-//				if (_avgCount <= 20.0)
-//				{
-//					lambdaDraw(tick);
-//				}
-//				_idrawCount++;  // 시간 내 호출 횟수 카운트
-//			}
-//		}
-//	}
-//
-//	m_drawHolding = false;
-//
-//	m_slog.Format("[IB202200][DRAWING]");
-//	OutputDebugString(m_slog);
-//}
+
 

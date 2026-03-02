@@ -113,7 +113,7 @@ public:
 	void checktheRecommand(); //지수 실시간 변동시 그리드윈도우에 업데이트 실시
 
 	bool isModified(int kind);
-
+	void UpdateFromTick(const std::vector<int>& slotIndices);
 protected:
 	//{{AFX_MSG(CGroupWnd)
 	afx_msg void OnMouseMove(UINT nFlags, CPoint point);

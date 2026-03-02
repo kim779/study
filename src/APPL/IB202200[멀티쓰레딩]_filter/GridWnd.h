@@ -594,4 +594,6 @@ public:
 
 	void HandleSpecialInfo(int xrow,
 		const DataAccessor& acc);
+
+	void UpdateFromTickSlot(int slotIndex);
 };

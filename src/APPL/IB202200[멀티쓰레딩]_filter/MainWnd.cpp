@@ -115,7 +115,7 @@ int CMainWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	SetTimer(8787, 500, nullptr);
 	RequestMarketTime();
 	CheckRTSTimer(true);
-	
+
 	return 1;
 }
 
@@ -838,7 +838,7 @@ LONG CMainWnd::OnManage(WPARAM wParam, LPARAM lParam)
 		CString tempStr;
 		tempStr.Format("%s", (char*)lParam);
 
-m_slog.Format("[2022][REQ]tempStr =[%s] ", tempStr);
+m_slog.Format("[2022][RTS등록]tempStr =[%s] ", tempStr);
 OutputDebugString(m_slog);
 
 		RTS_REGISTER_REQ* pReq = new RTS_REGISTER_REQ{};
@@ -2175,28 +2175,47 @@ void CMainWnd::OnTimer(UINT nIDEvent)
 	}
 	else if (nIDEvent == TM_RTSTIME)
 	{
-		char valueBuf[SYMBOL_STR_LEN];
-
-		for (int slotIndex : m_slotIndices)
+		if (nIDEvent == TM_RTSTIME)
 		{
-			//TickSnapshot& slot = g_tickSlots[slotIndex];
-
-			//if (slot.code[0] == '\0')
-			//	continue;
-
-			//for (int sym : m_symbols)
-			//{
-			//	if (ReadSymbolValue(slot, sym, valueBuf))
-			//	{
-			//		m_slog.Format("--------------------[2022][REQ][code] code=%s, sym=[%d] val=%s \r\n", slot.code, sym, valueBuf);
-			//		OutputDebugString(valueBuf);
-			//		// 값이 있을 때만 갱신
-			//		//m_pGroupWnd->UpdateSymbol(slot.code, sym, valueBuf);
-			//	}
-			//}
+			if (m_pGroupWnd && !m_slotIndices.empty())
+			{
+			//	CGroupWnd* pGroup = (CGroupWnd*)m_pGroupWnd;
+				m_pGroupWnd->UpdateFromTick(m_slotIndices);
+			}
+			return;
 		}
+		//const TickSnapshot* slots = Axis_GetTickSlots();  // 전체 배열 포인터 - 루프 밖에서 한번만
+		//if (!slots)
+		//	return;
 
-		m_pGroupWnd->UpdateDraw();   // 루프 끝에서 1번만
+		//char valueBuf[SYMBOL_STR_LEN]{};
+
+		//for (int slotIndex : m_slotIndices)
+		//{
+		//	const TickSnapshot& slot = slots[slotIndex];  // 인덱스로 해당 슬롯 접근
+
+		//	if (slot.code[0] == '\0')
+		//		continue;
+
+		//	for (int sym : m_symbols)
+		//	{
+		//		if (!slot.valid[sym])  // 값 없으면 스킵
+		//			continue;
+
+		//		memcpy(valueBuf, slot.values[sym], SYMBOL_STR_LEN);
+		//		valueBuf[SYMBOL_STR_LEN - 1] = '\0';
+
+		//		CString slog;
+		//		slog.Format("[2022][TIMER] code=%s sym=%d val=%s\n",
+		//			slot.code, sym, valueBuf);
+		//		OutputDebugString(slog);
+
+		//		// 화면 갱신
+		//		// m_pGroupWnd->UpdateSymbol(slot.code, sym, valueBuf);
+		//	}
+		//}
+
+		//m_pGroupWnd->UpdateDraw();   // 루프 끝에서 1번만
 	}
 	/*
 	for (const auto& code : m_codes)
@@ -2866,10 +2885,11 @@ void CMainWnd::InitSlotIndices()
 		(int)m_codes.size());
 	OutputDebugString(m_slog);
 
+	int cnt{};
 	for (const auto& code : m_codes)
 	{
 		int idx = Axis_EnsureSlotIndex(code.c_str());
-	
+
 		if (idx >= 0)
 		{
 			m_slog.Format("[2022][REQ][code]    [OK] code=%s → slot=%d\n",

@@ -1820,13 +1820,9 @@ public:
 
 	bool ReadTick(const char* code, TickSnapshot* out);
 
-	//TickSnapshot g_tickSlots[MAX_SLOT];
-	//std::unordered_map<std::string, int> g_codeToIndex;
-	int g_nextIndex = 0;
-	std::mutex g_codeMapLock;
-
 	std::unordered_map<HWND, RtsSubscription> g_subByHwnd;
 	mutable std::shared_mutex g_subMtx; // read/write lock
+	//mutable std::mutex g_subMtx; // read/write lock
 
 	int GetSlotIndex_FindOnly(const char* code);
 	int EnsureSlotIndexForCode(const char* code);
@@ -1842,14 +1838,15 @@ public:
 	// _alertR → TickSnapshot 변환 함수 (핵심)
 	using PTR_T = DWORD; // 32bit라 DWORD OK (64bit면 uintptr_t)
 
+
+	//update_ticker(int kind, struct _alertR* alertR)  에서 호출
+	//
 	void UpdateSnapshotFromAlert(TickSnapshot& s, const _alertR* alertR)
 	{
 		if (!alertR || alertR->size <= 0 || alertR->ptr[0] == 0)
 			return;
 
-		// 레코드 시작 주소
-		const PTR_T* data = reinterpret_cast<const PTR_T*>(alertR->ptr[0]);
-
+		CString slog;
 #ifdef UNICODE
 		CT2A codeA(alertR->code);
 		const char* code = (const char*)codeA;
@@ -1859,44 +1856,38 @@ public:
 		if (!code || !code[0])
 			return;
 
-		// ===== seqlock begin =====
+		// ===== seqlock begin (홀수 = 쓰기중) =====
 		int v = s.seq.load(std::memory_order_relaxed);
 		s.seq.store(v + 1, std::memory_order_release);
 
 		s.ts_ms = GetTickCount();
 		CopyZ(s.code, sizeof(s.code), code);
-
 		s.valid.reset();
 
-		int fieldCount = alertR->size;
-
-		for (int ii = 0; ii < fieldCount; ii++)
+		// size-1 → 0 역순 (마지막 레코드가 최신)
+		for (int ii = alertR->size - 1; ii >= 0; ii--)
 		{
+			if (alertR->ptr[ii] == 0) continue;
+
+			const PTR_T* data = reinterpret_cast<const PTR_T*>(alertR->ptr[ii]);
+
 			for (int jj = 0; jj < MAX_RTS_INDEX; jj++)
 			{
-				const char* val = (const char*)data[jj];
+				if (data[jj] == 0) continue;
 
+				const char* val = reinterpret_cast<const char*>(data[jj]);
 				if (val && val[0])
 				{
-					CopyZ(s.values[jj], FIELD_STR_LEN, val);
+					CopyZ(s.values[jj], SYMBOL_STR_LEN, val);
 					s.valid.set(jj);
+					//slog.Format("[AXIS][%s]<%d> jj=[%d] val=[%s] ", __FUNCTION__, __LINE__, jj, val);
+					//OutputDebugString(slog);
 				}
 			}
 		}
 
+		// ===== seqlock end (짝수 = 완료) =====
 		s.seq.store(v + 2, std::memory_order_release);
-
-		//s.seq.store(v + 2, std::memory_order_release);   // writing done (even)
-		//CopyZ(s.RTStype, sizeof(s.RTStype), (const char*)data[0]); // RTS 타입
-		//CopyZ(s.price, sizeof(s.price), (const char*)data[23]); // 현재가
-		//CopyZ(s.diff, sizeof(s.diff), (const char*)data[24]); // 대비
-		//CopyZ(s.volume, sizeof(s.volume), (const char*)data[27]); // 거래량
-		//CopyZ(s.rate, sizeof(s.rate), (const char*)data[33]); // 등락률
-
-		//s.seq.store(v + 2, std::memory_order_release); // even = done
-
-	
-		// ===== seqlock end =====
 	}
 
 	inline void CopySnapshot(TickSnapshot& dst, const TickSnapshot& src)
@@ -1917,35 +1908,6 @@ public:
 		}
 	
 	}
-
-	static void MakeDummyTick(TickSnapshot& snap, int step)
-	{
-		memset(&snap, 0, sizeof(TickSnapshot));
-
-		// 임의 종목코드 (예: 삼성전자)
-		strcpy_s(snap.code, "005930");
-
-		// 타입
-		//strcpy_s(snap.RTStype, "B");
-
-		//// 현재가: 65000 + step 변동
-		//int price = 65000 + (step % 20) * 50;
-		//sprintf_s(snap.price, "%d", price);
-
-		//// 대비
-		//sprintf_s(snap.diff, "%d", price - 65000);
-
-		//// 거래량
-		//sprintf_s(snap.volume, "%d", 1000 + step * 10);
-
-		//// 등락률
-		//double rate = (price - 65000) / 65000.0 * 100.0;
-		//sprintf_s(snap.rate, "%.2f", rate);
-
-		snap.ts_ms = GetTickCount();
-	}
-
-
 
 	bool GetTick(const char* code, TickSnapshot& out)
 	{
@@ -2043,6 +2005,9 @@ public:
 		}
 	}
 
+
+	void TestRTSData();
+	
 	//---------------------------- log -----------------------------------------------------------------------------------------------
 
 #endif

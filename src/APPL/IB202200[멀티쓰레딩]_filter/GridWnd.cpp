@@ -10518,6 +10518,95 @@ void CGridWnd::HandleSpecialInfo(int xrow, const DataAccessor& acc)
 	}
 }
 
+void CGridWnd::UpdateFromTickSlot(int slotIndex)
+{
+	if (m_bSending) return;
+
+	const TickSnapshot* slots = Axis_GetTickSlots();
+	if (!slots) return;
+
+	const TickSnapshot& slot = slots[slotIndex];
+	if (slot.code[0] == '\0') return;
+
+	// seqlock - 쓰기 중이면 스킵
+	int seq = slot.seq.load(std::memory_order_acquire);
+	if (seq & 1) return;
+
+	// _alertR 임시 생성 (스택 - 힙할당 없음)
+	_alertR alertR{};
+	alertR.code = slot.code;
+	alertR.stat = 1;
+	alertR.size = 1;
+
+	// record 배열 - 스택 불가(너무 큼) → 힙 1회만
+	DWORD record[MAX_FIELD_INDEX]{};
+	// values는 slot에 있으므로 포인터만 연결 (복사 없음!)
+	for (int sym = 0; sym < MAX_SYMBOLS && sym < MAX_FIELD_INDEX; sym++)
+	{
+		if (!slot.valid[sym]) continue;
+		record[sym] = (DWORD)slot.values[sym];  // 복사 없이 포인터만
+	}
+	alertR.ptr[0] = (DWORD)record;
+
+	// 기존 로직 그대로 재활용
+	CString code = alertR.code;
+	CString strCode;
+	bool bKrx = true;
+	NormalizeCodeAndMarket(code, strCode, bKrx);
+
+	CString strGubn;
+	if (slot.valid[0])
+		strGubn = slot.values[0];
+
+	HandleIndexExpectedCase(code, strCode, strGubn);
+
+	int count = CheckRealTimeCode(code);
+	if (count == 0) return;
+
+	const int beginTime = _ttoi(m_strBeginTime);
+	const int beginTimeEnd = _ttoi(m_strBeginTimeEnd);
+	const int endTimeEnd = _ttoi(m_strEndTimeEnd);
+	const int endTime = _ttoi(m_strEndTime);
+
+	DataAccessor acc(&alertR);
+
+	for (int rowPosition = 0; rowPosition < count; rowPosition++)
+	{
+		int xrow = m_irowCode[rowPosition];
+		ProcessOneRow_Alertx(
+			xrow, code, strCode, strGubn, bKrx,
+			beginTime, beginTimeEnd, endTimeEnd, endTime,
+			acc
+		);
+	}
+	// record는 스택 - 해제 불필요, slot.values 포인터만 참조했으므로 안전
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 void CGridWnd::parsingAlertx(LPARAM lParam)
 {
 	if (m_bSending)

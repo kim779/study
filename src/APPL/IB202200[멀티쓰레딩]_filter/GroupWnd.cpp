@@ -3086,3 +3086,46 @@ BOOL CGroupWnd::CheckGetRTSHoga()
 	}
 	return FALSE;
 }
+
+
+void CGroupWnd::UpdateFromTick(const std::vector<int>& slotIndices)
+{
+	if (m_nGroup == 0) return;
+
+	const TickSnapshot* slots = Axis_GetTickSlots();
+	if (!slots) return;
+
+	for (int slotIndex : slotIndices)
+	{
+		const TickSnapshot& slot = slots[slotIndex];
+		if (slot.code[0] == '\0') continue;
+
+		// 쓰기 중이면 이번 tick 스킵 (절대 죽지 않음)
+		int seq = slot.seq.load(std::memory_order_acquire);
+		if (seq & 1) continue;
+
+		CString code = slot.code;
+
+		// 이 슬롯을 표시하는 GridWnd 찾기
+		_cacheGrid.clear();
+		for_each_n(m_GridWnd.begin(), m_nGroup, [this, &code](const auto& gridWnd) {
+			if (gridWnd && gridWnd->IsCode(code))
+				_cacheGrid.push_back(gridWnd.get());
+			});
+
+		if (_cacheGrid.empty()) continue;
+
+		// GridWnd 갱신
+		for (CGridWnd* pGrid : _cacheGrid)
+		{
+			if (!pGrid || !pGrid->GetSafeHwnd()) continue;
+			pGrid->HoldDraw();
+			pGrid->UpdateFromTickSlot(slotIndex);  // 아래 구현
+		}
+
+		for (CGridWnd* pGrid : _cacheGrid)
+		{
+			if (pGrid) pGrid->ReleaseDraw();
+		}
+	}
+}

@@ -6,6 +6,7 @@
 #define AXIS_API extern "C" __declspec(dllimport)
 #endif
 
+#include <shared_mutex>
 #include <bitset>
 #define CODE_LEN   13
 
@@ -35,8 +36,12 @@ typedef struct TickSnapshot
 } TickSnapshot;
 
 constexpr int MAX_SLOT = 4096;
+#ifdef AXIS_MAIN
 extern std::unordered_map<std::string, int> g_codeToIndex;
 extern TickSnapshot g_tickSlots[MAX_SLOT];
+extern int g_nextIndex;
+extern std::shared_mutex  g_codeMapLock;
+#endif
 
 AXIS_API int  Axis_EnsureSlotIndex(const char* code);
 AXIS_API const TickSnapshot* Axis_GetTickSlots();
