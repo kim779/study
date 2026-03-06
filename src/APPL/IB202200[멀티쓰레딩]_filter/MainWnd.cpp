@@ -838,8 +838,7 @@ LONG CMainWnd::OnManage(WPARAM wParam, LPARAM lParam)
 		CString tempStr;
 		tempStr.Format("%s", (char*)lParam);
 
-m_slog.Format("[2022][RTS등록]tempStr =[%s] ", tempStr);
-OutputDebugString(m_slog);
+
 
 		RTS_REGISTER_REQ* pReq = new RTS_REGISTER_REQ{};
 		pReq->hWnd = m_hWnd;
@@ -870,6 +869,19 @@ OutputDebugString(m_slog);
 			if (pReq->codeCount >= MAX_CODES_PER_REQ)
 				break;
 
+			token.TrimRight();
+			std::string code = (LPCTSTR)token;
+			if (code.empty() || token.Left(1) =="m")
+				continue;
+
+			if (AxStd::IsGetNxt(code.c_str()))
+				code = "M.A" + code;
+			else
+				code = "A" + code;
+
+			if(type == 2)
+				code = "N.A" + code;
+
 #ifdef UNICODE
 			strncpy_s(pReq->codes[pReq->codeCount],
 				CODE_STR_LEN,
@@ -878,15 +890,11 @@ OutputDebugString(m_slog);
 #else
 			strncpy_s(pReq->codes[pReq->codeCount],
 				CODE_STR_LEN,
-				token,
+				code.c_str(),
 				_TRUNCATE);
 #endif
-			token.TrimRight();
-			std::string code = (LPCTSTR)token;
-			if (code.empty())
-				continue;
 
-			switch (type)
+		/*	switch (type)
 			{
 			case 2:
 				code = "N.A" + code;
@@ -898,7 +906,7 @@ OutputDebugString(m_slog);
 			default:
 				code = "A" + code;
 				break;
-			}
+			}*/
 			if (std::find(m_codes.begin(), m_codes.end(), code) == m_codes.end())
 				m_codes.push_back(code);
 			
@@ -926,6 +934,10 @@ OutputDebugString(m_slog);
 		}
 
 		// ------------------------------------
+		CString slog;
+		slog.Format("[2022][RTS등록] code cnt =[%d] symbol cnt =[%d]", pReq->codeCount, pReq->symbolCount);
+		OutputDebugString(slog);
+
 		// ------------------------------------
 		m_pMainFrame->SendMessage(WM_USER, MMSG_RT_REGISTER_CODES, (LPARAM)pReq);  //test
 		InitSlotIndices();
@@ -2175,15 +2187,52 @@ void CMainWnd::OnTimer(UINT nIDEvent)
 	}
 	else if (nIDEvent == TM_RTSTIME)
 	{
-		if (nIDEvent == TM_RTSTIME)
+		// CPU 체크해서 타이머 동적 조절
+		int cpu = GetProcessCpuUsage();
+
+		int newInterval;
+		if (cpu > 80)       newInterval = m_iTime * 3;   // 매우 바쁨 - 3배 느리게
+		else if (cpu > 60)  newInterval = m_iTime * 2;   // 바쁨 - 2배 느리게
+		else if (cpu > 40)  newInterval = m_iTime;        // 보통 - 설정값 그대로
+		else if (cpu > 20)  newInterval = m_iTime * 2 / 3; // 여유 - 1.5배 빠르게
+		else                newInterval = m_iTime / 2;    // 매우 여유 - 2배 빠르게
+
+
+		CString slog;
+		slog.Format("[Timer] CPU=[%d%%] interval=[%d→%d ms]\n",
+			cpu, m_iCurInterval, newInterval);
+		OutputDebugString(slog);
+
+		// 최소값 보장 (너무 빠르면 역효과)
+		if (newInterval < 50) newInterval = 50;  // 최소 50ms
+
+		if (newInterval != m_iCurInterval)
 		{
-			if (m_pGroupWnd && !m_slotIndices.empty())
-			{
-			//	CGroupWnd* pGroup = (CGroupWnd*)m_pGroupWnd;
-				m_pGroupWnd->UpdateFromTick(m_slotIndices);
-			}
-			return;
+			KillTimer(TM_RTSTIME);
+			SetTimer(TM_RTSTIME, newInterval, nullptr);
+			m_iCurInterval = newInterval;
+
+			CString slog;
+			slog.Format("[Timer] CPU=[%d%%] interval=[%d→%d ms]\n",
+				cpu, m_iCurInterval, newInterval);
+			OutputDebugString(slog);
 		}
+
+		// dirty 큐 처리 - API로
+		static int dirtyBuf[MAX_SLOT];
+#ifdef DF_DLL_RTS
+		int count = DLL_SwapDirtySlots(dirtyBuf, MAX_SLOT);
+#else
+		int count = Axis_SwapDirtySlots(dirtyBuf, MAX_SLOT);
+#endif
+
+		if (count > 0 && m_pGroupWnd)
+		{
+			std::vector<int> dirty(dirtyBuf, dirtyBuf + count);
+			m_pGroupWnd->UpdateFromTick(dirty);
+		}
+
+		return;
 		//const TickSnapshot* slots = Axis_GetTickSlots();  // 전체 배열 포인터 - 루프 밖에서 한번만
 		//if (!slots)
 		//	return;
@@ -2909,4 +2958,42 @@ void CMainWnd::InitSlotIndices()
 	m_slog.Format("[2022][REQ][code] [InitSlotIndices] final slot count = %d\n",
 		(int)m_slotIndices.size());
 	OutputDebugString(m_slog);
+}
+
+int CMainWnd::GetProcessCpuUsage()
+{
+	FILETIME createTime, exitTime, kernelTime, userTime;
+	FILETIME sysIdle, sysKernel, sysUser;
+
+	// 프로세스 CPU 시간
+	GetProcessTimes(GetCurrentProcess(),
+		&createTime, &exitTime, &kernelTime, &userTime);
+
+	// 시스템 전체 시간 (경과시간 기준으로 나누기 위해)
+	GetSystemTimes(&sysIdle, &sysKernel, &sysUser);
+
+	auto toULL = [](FILETIME ft) {
+		return ((ULONGLONG)ft.dwHighDateTime << 32) | ft.dwLowDateTime;
+	};
+
+	ULONGLONG procDiff =
+		(toULL(kernelTime) - toULL(m_prevProcKernel)) +
+		(toULL(userTime) - toULL(m_prevProcUser));
+
+	ULONGLONG sysDiff =
+		(toULL(sysKernel) - toULL(m_prevSysKernel)) +
+		(toULL(sysUser) - toULL(m_prevSysUser));
+
+	m_prevProcKernel = kernelTime;
+	m_prevProcUser = userTime;
+	m_prevSysKernel = sysKernel;
+	m_prevSysUser = sysUser;
+
+	if (sysDiff == 0) return 0;
+
+	// 코어 수로 나누면 단일 프로세스 기준 %
+	SYSTEM_INFO si{};
+	GetSystemInfo(&si);
+
+	return (int)(procDiff * 100 / sysDiff);
 }

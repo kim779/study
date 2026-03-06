@@ -47,7 +47,7 @@ public:
 	void SetData(SiseData *psd);
 	void SetRealData(RealData *rp);
 	void SetRealData( DWORD* data );
-	void SetCurrToCenter();
+	void SetCurrToCenter(BOOL bForce =FALSE);
 	void SetMdgaToCenter();
 	void Clear();
 	void SetMicheg(PriceMichegMap *pmm);
@@ -77,7 +77,7 @@ protected:
 	int m_HeadWidth[COLUMN_SIZE];
 	LPCSTR m_HeadText[COLUMN_SIZE];
 
-	
+	PriceMichegMap* m_pMichegMap;  //test
 protected:
 	SiseData *m_pSiseData;
 	

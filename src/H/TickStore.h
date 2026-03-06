@@ -6,6 +6,13 @@
 #define AXIS_API extern "C" __declspec(dllimport)
 #endif
 
+#ifdef DLL_MAIN
+#define DLL_API extern "C" __declspec(dllexport)
+#else
+#define DLL_API extern "C" __declspec(dllimport)
+#endif
+
+
 #include <shared_mutex>
 #include <bitset>
 #define CODE_LEN   13
@@ -36,15 +43,34 @@ typedef struct TickSnapshot
 } TickSnapshot;
 
 constexpr int MAX_SLOT = 4096;
+
 #ifdef AXIS_MAIN
 extern std::unordered_map<std::string, int> g_codeToIndex;
 extern TickSnapshot g_tickSlots[MAX_SLOT];
 extern int g_nextIndex;
 extern std::shared_mutex  g_codeMapLock;
+extern std::vector<int> g_dirtySlots;
+extern std::mutex       g_dirtyMtx;
 #endif
-
+AXIS_API void  Axis_PushDirtySlot(int idx);
+AXIS_API int   Axis_SwapDirtySlots(int* outBuf, int bufSize);  // swapÇØ¼­ °¡Á®¿È
 AXIS_API int  Axis_EnsureSlotIndex(const char* code);
 AXIS_API const TickSnapshot* Axis_GetTickSlots();
+
+
+
+#ifdef DLL_MAIN
+extern std::unordered_map<std::string, int> g_dllcodeToIndex;
+extern TickSnapshot g_dlltickSlots[MAX_SLOT];
+extern int g_dllnextIndex;
+extern std::shared_mutex  g_dllcodeMapLock;
+extern std::vector<int> g_dlldirtySlots;
+extern std::mutex       g_dlldirtyMtx;
+#endif
+DLL_API void  DLL_PushDirtySlot(int idx);
+DLL_API int   DLL_SwapDirtySlots(int* outBuf, int bufSize);  // swapÇØ¼­ °¡Á®¿È
+DLL_API int  DLL_EnsureSlotIndex(const char* code);
+DLL_API const TickSnapshot* DLL_GetTickSlots();
 
 //typedef BOOL(__stdcall* PFN_GET_TICK)(const char* code, TickSnapshot* out);
 //typedef void(* PFN_REGISTER_GET_TICK)(PFN_GET_TICK fn);

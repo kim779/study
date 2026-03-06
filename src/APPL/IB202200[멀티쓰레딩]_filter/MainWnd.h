@@ -265,4 +265,12 @@ public:
 
 	private:
 		std::vector<int> m_slotIndices;   // 이 화면이 참조할 슬롯들
+
+		FILETIME m_prevProcKernel{};
+		FILETIME m_prevProcUser{};
+		FILETIME m_prevSysKernel{};
+		FILETIME m_prevSysUser{};
+		int m_iCurInterval{ 0 };
+
+		int GetProcessCpuUsage();
 };

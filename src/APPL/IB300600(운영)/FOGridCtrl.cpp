@@ -67,6 +67,7 @@ CFOGridCtrl::CFOGridCtrl(CWnd *pParent)
 	m_nSigaRow = -1;
 	m_nJegaRow = -1;
 	m_nKogaRow = -1;
+	m_pMichegMap = NULL; //test
 }
 
 CFOGridCtrl::~CFOGridCtrl()
@@ -502,11 +503,12 @@ CString slog;
 		}
 	}
 
-	SetCurrToCenter();
+	SetCurrToCenter(TRUE);
 
 //slog.Format("[3006]_RTS  -------[SetData] m_nSigaRow = [%d]   m_nKogaRow = [%d]   m_nJegaRow = [%d]  -------\n",m_nSigaRow, m_nKogaRow, m_nJegaRow);
 //OutputDebugString(slog);
 }
+
 
 
 void CFOGridCtrl::OnMouseMove(UINT nFlags, CPoint point) 
@@ -584,23 +586,40 @@ void CFOGridCtrl::OnMouseMove(UINT nFlags, CPoint point)
 	}
 }
 
-void CFOGridCtrl::SetCurrToCenter()
+void CFOGridCtrl::SetCurrToCenter(BOOL bForce )
 {
-	if (m_CurCell.row)
+	if (1)
 	{
-		CRect rc;
-		GetClientRect(&rc);
-//		int pos = (m_CurCell.row*GetDefCellHeight()) - rc.Height()/2;  //test
-		int pos = (m_CurCell.row*m_iRowHeight) - rc.Height()/2; 
+		if (!m_CurCell.row) return;
+		if (!m_bHogaFix && !bForce) return;
 
-//			CString msg;
-//  		SCROLLINFO info;
-//  		GetScrollInfo(SB_VERT, &info, SIF_ALL);
-//  		msg.Format("SetCurrToCenter min(%d) max(%d) pos(%d)\n", info.nMin, info.nMax, info.nPos);
-//  		OutputDebugString(msg);
+		int targetPos = ((m_CurCell.row + 1) * m_iRowHeight) - m_rcClient.Height() / 2;
+		int curPos = GetScrollPos(SB_VERT);
 
-		SetScrollPos32(SB_VERT, pos, TRUE);
+		// 5칸 미만 차이면 스킵
+	//	if (abs(curPos - targetPos) < m_iRowHeight * 5) return;
+
+		SetScrollPos32(SB_VERT, targetPos, TRUE);
 		SendMessage(WM_VSCROLL, 0, 0);
+	}
+	else
+	{
+		if (m_CurCell.row)
+		{
+			CRect rc;
+			GetClientRect(&rc);
+			//		int pos = (m_CurCell.row*GetDefCellHeight()) - rc.Height()/2;  
+			int pos = (m_CurCell.row * m_iRowHeight) - rc.Height() / 2;
+
+			//			CString msg;
+			//  		SCROLLINFO info;
+			//  		GetScrollInfo(SB_VERT, &info, SIF_ALL);
+			//  		msg.Format("SetCurrToCenter min(%d) max(%d) pos(%d)\n", info.nMin, info.nMax, info.nPos);
+			//  		OutputDebugString(msg);
+
+			SetScrollPos32(SB_VERT, pos, TRUE);
+			SendMessage(WM_VSCROLL, 0, 0);
+		}
 	}
 }
 
@@ -707,6 +726,7 @@ void CFOGridCtrl::SetRealData( RealData *rp )
 			{
 				SetCurrToCenter();
 			}
+			
 		}
 
 		map<int,int>::iterator pos;
@@ -795,20 +815,21 @@ void CFOGridCtrl::SetRealData( RealData *rp )
 	}
 }
 
-void CFOGridCtrl::SetRealData( DWORD* data )
-{	
+void CFOGridCtrl::SetRealData(DWORD* data)
+{
 	if (!m_pSiseData) return;
 	if (m_pSiseData->code.IsEmpty()) return;
 
 	BOOL bCurrChange = FALSE;
+	BOOL bCurrRowChanged = FALSE;  // row가 실제로 바뀐 경우만 TRUE
 
 	CString strVal;
 	CString s;
+
 	// 현재가 변경
-	if ( data[23] )
+	if (data[23])
 	{
 		bCurrChange = TRUE;
-
 		strVal = (char*)data[23];
 		strVal.Replace("++", "+");
 		strVal.Replace("-+", "+");
@@ -818,128 +839,89 @@ void CFOGridCtrl::SetRealData( DWORD* data )
 		strVal.Replace("0-", "-");
 
 		int curr;
-
-		if(m_pSiseData->code.GetAt(0) != '4' && m_pSiseData->code.GetAt(0) != 'D') //파생상품 코드개편
+		if (m_pSiseData->code.GetAt(0) != '4' && m_pSiseData->code.GetAt(0) != 'D')
 		{
-			curr = (int)(fabs(atof(strVal)*100.0) + DOUBLE_PREFIX);
+			curr = (int)(fabs(atof(strVal) * 100.0) + DOUBLE_PREFIX);
 		}
 		else
 		{
-			if(atof(strVal)*100.0 >= 0)
-				curr = (int)(fabs(atof(strVal)*100.0) + DOUBLE_PREFIX);
+			if (atof(strVal) * 100.0 >= 0)
+				curr = (int)(fabs(atof(strVal) * 100.0) + DOUBLE_PREFIX);
 			else
-				curr = (int)((atof(strVal)*100.0) - DOUBLE_PREFIX);
+				curr = (int)((atof(strVal) * 100.0) - DOUBLE_PREFIX);
 		}
 
 		int row = m_mapHogaRow[curr];
-
-
-		if (row>0 && row!=m_CurCell.row)
+		if (row > 0 && row != m_CurCell.row)
 		{
-			/* 시고저 바탕 처리
-			if (abs(row-m_CurCell.row)>1)
-			{
-				CDC *pdc = GetDC();
-				if (row>m_CurCell.row)
-				{
-					for(int jj=m_CurCell.row; jj<row; ++jj)
-					{
-						SetItemBkColour( jj, IDX_HOGA, m_crYellowBk);
-						RedrawCell(jj, IDX_HOGA, pdc);
-					}
-				}
-				else
-				{
-					for(int jj=m_CurCell.row; jj>row; --jj)
-					{
-						SetItemBkColour( jj, IDX_HOGA, m_crYellowBk);
-						RedrawCell(jj, IDX_HOGA, pdc);
-					}
-				}
-				ReleaseDC(pdc);
-			}
-			*/
+			bCurrRowChanged = TRUE;  // ← 실제로 row 이동한 경우만 세팅
 
-////////////////////////////////////////////////////////////
-			
 			CString sRjega, sRgoga;
 			sRjega = (char*)data[31];
 			sRjega.Replace("+", "");
 			sRjega.Replace("-", "");
-			
+
 			sRgoga = (char*)data[30];
 			sRgoga.Replace("+", "");
 			sRgoga.Replace("-", "");
-		
-			map<int,int>::iterator pos = m_mapHogaRow.find((int)(fabs(Str2Double(sRjega)*100.0) + DOUBLE_PREFIX));
-			if (pos == m_mapHogaRow.end()) return;
 
- 			int valL = pos->second;
-			
-			pos = m_mapHogaRow.find((int)(fabs(Str2Double(sRgoga)*100.0) + DOUBLE_PREFIX));
+			map<int, int>::iterator pos = m_mapHogaRow.find((int)(fabs(Str2Double(sRjega) * 100.0) + DOUBLE_PREFIX));
 			if (pos == m_mapHogaRow.end()) return;
+			int valL = pos->second;
 
+			pos = m_mapHogaRow.find((int)(fabs(Str2Double(sRgoga) * 100.0) + DOUBLE_PREFIX));
+			if (pos == m_mapHogaRow.end()) return;
 			int valH = pos->second;
-			
-			if(valL > 0 && valH > 0)
+
+			if (valL > 0 && valH > 0)
 			{
-				if(valH != m_nKogaRow || valL != m_nJegaRow)
+				if (valH != m_nKogaRow || valL != m_nJegaRow)
 				{
-					if(m_nKogaRow > 0 && m_nJegaRow > 0)
+					if (m_nKogaRow > 0 && m_nJegaRow > 0)
 					{
-						for(int jj = m_nKogaRow ; jj <= m_nJegaRow; jj++ )
+						for (int jj = m_nKogaRow; jj <= m_nJegaRow; jj++)
 						{
-							SetItemBkColour( jj, IDX_HOGA, CLR_DEFAULT);
+							SetItemBkColour(jj, IDX_HOGA, CLR_DEFAULT);
 							RedrawCell(jj, IDX_HOGA);
 						}
 					}
-				
 
-					for(int jj = valH; jj <= valL; jj++)
+					for (int jj = valH; jj <= valL; jj++)
 					{
-						SetItemBkColour( jj, IDX_HOGA, m_crYellowBk);
+						SetItemBkColour(jj, IDX_HOGA, m_crYellowBk);
 						RedrawCell(jj, IDX_HOGA);
 					}
 				}
 			}
-	
-////////////////////////////////////////////////////////////
-		
-			SetItemState( m_CurCell.row, IDX_HOGA, GetItemState(m_CurCell.row, IDX_HOGA) & ~GVIS_SELECTED );
-			SetItemState( row, IDX_HOGA, GetItemState(row, IDX_HOGA) | GVIS_SELECTED );
-			SetItemBkColour( row, IDX_HOGA, m_crYellowBk);
 
-			CString strPprc;  //평균가 저장
+			SetItemState(m_CurCell.row, IDX_HOGA, GetItemState(m_CurCell.row, IDX_HOGA) & ~GVIS_SELECTED);
+			SetItemState(row, IDX_HOGA, GetItemState(row, IDX_HOGA) | GVIS_SELECTED);
+			SetItemBkColour(row, IDX_HOGA, m_crYellowBk);
+
+			CString strPprc;
 			strPprc.Empty();
-		
-			if(m_iPprcRow > 0)
-				strPprc = GetItemText(m_iPprcRow, IDX_HOGA); 
+			if (m_iPprcRow > 0)
+				strPprc = GetItemText(m_iPprcRow, IDX_HOGA);
 
 			CString strCurr, strdata;
-			CString s;
 
-			if(data[31])   //저가
+			if (data[31])   //저가
 			{
 				CString sRjega;
 				sRjega = (char*)data[31];
 				sRjega.Replace("+", "");
 				sRjega.Replace("-", "");
-
-				int val = (int)(fabs(Str2Double(sRjega)*100.0) + DOUBLE_PREFIX);
-				map<int,int>::iterator pos = m_mapHogaRow.find(val);
-				if (pos!=m_mapHogaRow.end())
+				int val = (int)(fabs(Str2Double(sRjega) * 100.0) + DOUBLE_PREFIX);
+				map<int, int>::iterator pos = m_mapHogaRow.find(val);
+				if (pos != m_mapHogaRow.end())
 				{
 					int irow = pos->second;
-					if(irow != m_nJegaRow)
+					if (irow != m_nJegaRow)
 					{
-						
-//CString slog;
-//slog.Format("[3006]_RTS 저가변동 sRsiga = [%s], val = [%d], irow = [%d] , m_nJegaRow= [%d]\n", sRjega, val, irow, m_nJegaRow);
-//OutputDebugString(slog);
-						if(m_nJegaRow < 0)
+						if (m_nJegaRow < 0)
 						{
 							m_nJegaRow = irow;
-							strdata = GetItemText(m_nJegaRow,IDX_HOGA);
+							strdata = GetItemText(m_nJegaRow, IDX_HOGA);
 							strdata.Replace(LOGA, "");
 							strdata.Replace(STGA, "");
 							strdata.Replace(GOGA, "");
@@ -949,20 +931,18 @@ void CFOGridCtrl::SetRealData( DWORD* data )
 							RedrawCell(m_nJegaRow, IDX_HOGA);
 						}
 						else
-						{	
-							strdata = GetItemText(m_nJegaRow,IDX_HOGA);
+						{
+							strdata = GetItemText(m_nJegaRow, IDX_HOGA);
 							strdata.Replace(LOGA, "");
 							strdata.Replace(STGA, "");
 							strdata.Replace(GOGA, "");
 							strdata.Replace(PPGA, "");
-							
 							strdata.TrimLeft();
 							strdata.TrimRight();
-							
 							SetItemText(m_nJegaRow, IDX_HOGA, strdata);
 							RedrawCell(m_nJegaRow, IDX_HOGA);
-							
-							strdata = GetItemText(irow,IDX_HOGA);
+
+							strdata = GetItemText(irow, IDX_HOGA);
 							strdata.Replace(LOGA, "");
 							strdata.Replace(STGA, "");
 							strdata.Replace(GOGA, "");
@@ -972,31 +952,27 @@ void CFOGridCtrl::SetRealData( DWORD* data )
 							m_nJegaRow = irow;
 							RedrawCell(m_nJegaRow, IDX_HOGA);
 						}
-					}	
+					}
 				}
 			}
 
-			if(data[30])   //고가
+			if (data[30])   //고가
 			{
 				CString sRkoga;
 				sRkoga = (char*)data[30];
 				sRkoga.Replace("+", "");
 				sRkoga.Replace("-", "");
-				
-				int val = (int)(fabs(Str2Double(sRkoga)*100.0) + DOUBLE_PREFIX);
-				map<int,int>::iterator pos = m_mapHogaRow.find(val);
-				if (pos!=m_mapHogaRow.end())
+				int val = (int)(fabs(Str2Double(sRkoga) * 100.0) + DOUBLE_PREFIX);
+				map<int, int>::iterator pos = m_mapHogaRow.find(val);
+				if (pos != m_mapHogaRow.end())
 				{
 					int irow = pos->second;
-					if(irow != m_nKogaRow)
+					if (irow != m_nKogaRow)
 					{
-//CString slog;
-//slog.Format("[3006]_RTS 고가변동 sRsiga = [%s], val = [%d], irow = [%d] , m_nJegaRow= [%d]\n", sRkoga, val, irow, m_nKogaRow);
-//OutputDebugString(slog);
-						if(m_nKogaRow < 0)
+						if (m_nKogaRow < 0)
 						{
 							m_nKogaRow = irow;
-							strdata = GetItemText(m_nKogaRow,IDX_HOGA);
+							strdata = GetItemText(m_nKogaRow, IDX_HOGA);
 							strdata.Replace(LOGA, "");
 							strdata.Replace(STGA, "");
 							strdata.Replace(GOGA, "");
@@ -1007,19 +983,17 @@ void CFOGridCtrl::SetRealData( DWORD* data )
 						}
 						else
 						{
-							strdata = GetItemText(m_nKogaRow,IDX_HOGA);
+							strdata = GetItemText(m_nKogaRow, IDX_HOGA);
 							strdata.Replace(LOGA, "");
 							strdata.Replace(STGA, "");
 							strdata.Replace(GOGA, "");
 							strdata.Replace(PPGA, "");
-							
 							strdata.TrimLeft();
 							strdata.TrimRight();
-							
 							SetItemText(m_nKogaRow, IDX_HOGA, strdata);
 							RedrawCell(m_nKogaRow, IDX_HOGA);
-							
-							strdata = GetItemText(irow,IDX_HOGA);
+
+							strdata = GetItemText(irow, IDX_HOGA);
 							strdata.Replace(LOGA, "");
 							strdata.Replace(STGA, "");
 							strdata.Replace(GOGA, "");
@@ -1029,32 +1003,25 @@ void CFOGridCtrl::SetRealData( DWORD* data )
 							m_nKogaRow = irow;
 							RedrawCell(m_nKogaRow, IDX_HOGA);
 						}
-					}	
-				}	
+					}
+				}
 			}
 
-			
-			if(data[29])   //시가
+			if (data[29])   //시가
 			{
 				CString sRsiga;
 				sRsiga = (char*)data[29];
 				sRsiga.Replace("+", "");
 				sRsiga.Replace("-", "");
-				
-				int val = (int)(fabs(Str2Double(sRsiga)*100.0) + DOUBLE_PREFIX);
-				map<int,int>::iterator pos = m_mapHogaRow.find(val);
-				if (pos!=m_mapHogaRow.end())
+				int val = (int)(fabs(Str2Double(sRsiga) * 100.0) + DOUBLE_PREFIX);
+				map<int, int>::iterator pos = m_mapHogaRow.find(val);
+				if (pos != m_mapHogaRow.end())
 				{
 					int irow = pos->second;
-//CString slog;
-//slog.Format("[3006]_RTS 시가변동1 sRsiga = [%s], val = [%d], irow = [%d] , m_nSigaRow= [%d]\n", sRsiga, val, irow, m_nSigaRow);
-//OutputDebugString(slog);
-					
-
-					if(m_nSigaRow < 0)
+					if (m_nSigaRow < 0)
 					{
 						m_nSigaRow = irow;
-						strdata = GetItemText(m_nSigaRow,IDX_HOGA);
+						strdata = GetItemText(m_nSigaRow, IDX_HOGA);
 						strdata.Replace(LOGA, "");
 						strdata.Replace(STGA, "");
 						strdata.Replace(GOGA, "");
@@ -1065,19 +1032,17 @@ void CFOGridCtrl::SetRealData( DWORD* data )
 					}
 					else
 					{
-						strdata = GetItemText(m_nSigaRow,IDX_HOGA);
+						strdata = GetItemText(m_nSigaRow, IDX_HOGA);
 						strdata.Replace(LOGA, "");
 						strdata.Replace(STGA, "");
 						strdata.Replace(GOGA, "");
 						strdata.Replace(PPGA, "");
-						
 						strdata.TrimLeft();
 						strdata.TrimRight();
-						
 						SetItemText(m_nSigaRow, IDX_HOGA, strdata);
 						RedrawCell(m_nSigaRow, IDX_HOGA);
-						
-						strdata = GetItemText(irow,IDX_HOGA);
+
+						strdata = GetItemText(irow, IDX_HOGA);
 						strdata.Replace(LOGA, "");
 						strdata.Replace(STGA, "");
 						strdata.Replace(GOGA, "");
@@ -1087,75 +1052,27 @@ void CFOGridCtrl::SetRealData( DWORD* data )
 						m_nSigaRow = irow;
 						RedrawCell(m_nSigaRow, IDX_HOGA);
 					}
-						
-				}	
+				}
 			}
-			
-
-		/*	if(m_nJegaRow < row)
-			{
-				strCurr = GetItemText(m_nJegaRow,IDX_HOGA);
-
-				//strCurr.Remove('L');
-				strCurr.Replace(LOGA, "");
-				
-				strCurr.TrimLeft();
-				strCurr.TrimRight();
-				
-				SetItemText(m_nJegaRow, IDX_HOGA, strCurr);
-				
-				strCurr = GetItemText(row,IDX_HOGA);
-				
-				strCurr = LOGA + strCurr;
-				
-				SetItemText(row, IDX_HOGA, strCurr);
-				
-				m_nJegaRow = row;
-			}
-			else  if(m_nKogaRow > row)
-			{
-				strCurr = GetItemText(m_nKogaRow,IDX_HOGA);
-
-				//strCurr.Remove('H');
-				strCurr.Replace(GOGA, "");
-	
-				strCurr.TrimLeft();
-				strCurr.TrimRight();
-				
-				SetItemText(m_nKogaRow, IDX_HOGA, strCurr);
-			
-				strCurr = GetItemText(row,IDX_HOGA);
-				
-				strCurr = GOGA + strCurr;
-				
-				SetItemText(row, IDX_HOGA, strCurr);
-					
-				m_nKogaRow = row;
-			}
-			*/
 
 			RedrawCell(m_CurCell);
 			m_CurCell.row = row;
 			RedrawCell(m_CurCell);
 
-			if(m_iPprcRow > 0 && !strPprc.IsEmpty())
-			{	
+			if (m_iPprcRow > 0 && !strPprc.IsEmpty())
+			{
 				SetItemText(m_iPprcRow, IDX_HOGA, strPprc);
 				RedrawCell(m_iPprcRow, IDX_HOGA);
 			}
-		
 		}
-
-// 		s.Format("3007 REAL DATA CURR [%d]\n",curr);
-// 		OutputDebugString(s);
 	}
 
 	// 호가 변경
-	if ( data[40] )
+	if (data[40])
 	{
 		int n, row, hoga;
 		set<int> setMado, setMasu;
-		for(n=0; n<MAX_FHOGA; ++n)
+		for (n = 0; n < MAX_FHOGA; ++n)
 		{
 			setMado.insert(m_MdgaCell[n]);
 			setMasu.insert(m_MsgaCell[n]);
@@ -1165,25 +1082,22 @@ void CFOGridCtrl::SetRealData( DWORD* data )
 		if (m_bHogaFix)
 		{
 			strVal = (char*)data[51];
-
 			int val;
-
-			if (m_pSiseData->code.GetAt(0) != '4' && m_pSiseData->code.GetAt(0) != 'D')  //파생상품 코드개편
+			if (m_pSiseData->code.GetAt(0) != '4' && m_pSiseData->code.GetAt(0) != 'D')
 			{
-				val = (int)(fabs(atof(strVal)*100.0) + DOUBLE_PREFIX);
+				val = (int)(fabs(atof(strVal) * 100.0) + DOUBLE_PREFIX);
 			}
 			else
 			{
-				if(atof(strVal)*100.0 >= 0)
-					val = (int)((atof(strVal)*100.0) + DOUBLE_PREFIX);
+				if (atof(strVal) * 100.0 >= 0)
+					val = (int)((atof(strVal) * 100.0) + DOUBLE_PREFIX);
 				else
-					val = (int)((atof(strVal)*100.0) - DOUBLE_PREFIX);
+					val = (int)((atof(strVal) * 100.0) - DOUBLE_PREFIX);
 			}
-
-			map<int,int>::iterator pos = m_mapHogaRow.find(val);
-			if (pos!=m_mapHogaRow.end())
+			map<int, int>::iterator pos = m_mapHogaRow.find(val);
+			if (pos != m_mapHogaRow.end())
 			{
-				if (atoi((char*)data[41])>0)	// 0이라면 아무래도 장전~
+				if (atoi((char*)data[41]) > 0)
 				{
 					if (m_MdgaCell[0] != pos->second)
 					{
@@ -1191,126 +1105,103 @@ void CFOGridCtrl::SetRealData( DWORD* data )
 						SetMdgaToCenter();
 					}
 				}
-				else if (bCurrChange)
+				else if (bCurrRowChanged)  // ← bCurrChange → bCurrRowChanged
 				{
 					SetCurrToCenter();
 				}
 			}
-			else if (bCurrChange)
+			else if (bCurrRowChanged)      // ← bCurrChange → bCurrRowChanged
 			{
 				SetCurrToCenter();
 			}
 		}
 
-		map<int,int>::iterator pos;
-		for(n=0; n<MAX_FHOGA; ++n)
+		map<int, int>::iterator pos;
+		for (n = 0; n < MAX_FHOGA; ++n)
 		{
 			CString strHoga;
-
-			if (m_pSiseData->code.GetAt(0) != '4' && m_pSiseData->code.GetAt(0) != 'D')  //파생상품 코드개편
+			if (m_pSiseData->code.GetAt(0) != '4' && m_pSiseData->code.GetAt(0) != 'D')
 			{
-				strHoga = (char*)data[51+n];
-				hoga = (int)(fabs(atof(strHoga)*100.0) + DOUBLE_PREFIX);
+				strHoga = (char*)data[51 + n];
+				hoga = (int)(fabs(atof(strHoga) * 100.0) + DOUBLE_PREFIX);
 			}
 			else
 			{
-				strHoga = (char*)data[51+n];
+				strHoga = (char*)data[51 + n];
 				strHoga.Replace("++", "+");
 				strHoga.Replace("-+", "+");
 				strHoga.Replace("0+", "+");
 				strHoga.Replace("--", "-");
 				strHoga.Replace("+-", "-");
 				strHoga.Replace("0-", "-");
-
-				if(atof(strHoga)*100.0 >= 0)
-					hoga = (int)((atof(strHoga)*100.0) + DOUBLE_PREFIX);
+				if (atof(strHoga) * 100.0 >= 0)
+					hoga = (int)((atof(strHoga) * 100.0) + DOUBLE_PREFIX);
 				else
-					hoga = (int)((atof(strHoga)*100.0) - DOUBLE_PREFIX);
-				
-// 				CString strTemp;
-// 				strTemp.Format("[KSJ] strHoga[%s] hoga[%d]", strHoga, hoga);
-// 				OutputDebugString(strTemp);
+					hoga = (int)((atof(strHoga) * 100.0) - DOUBLE_PREFIX);
 			}
 
-// 			s.Format("3007 REAL DATA HOGA [%d]\n",hoga);
-// 			OutputDebugString(s);
-			
 			pos = m_mapHogaRow.find(hoga);
-			if (pos!=m_mapHogaRow.end())
+			if (pos != m_mapHogaRow.end())
 			{
-				if (pos->second>0)
+				if (pos->second > 0)
 				{
 					row = pos->second;
-					int dvol = atoi((char*)data[41+n]);
-					int dcnt = atoi((char*)data[211+n]);
-
-// 					CString strTemp;
-// 					strTemp.Format("[KSJ] row[%d] n[%d] hoga[%d] 41[%d] 211[%d]", row, n, hoga, dvol, dcnt);
-// 					OutputDebugString(strTemp);
-
-					SetItemText(row, IDX_ASK_SIZE  , (dvol) ? Int2CommaStr(dvol) : "");	// 매도잔량
-					SetItemText(row, IDX_ASK_BEFORE, (dcnt) ? Int2CommaStr(dcnt) : "");	// 매도건수
+					int dvol = atoi((char*)data[41 + n]);
+					int dcnt = atoi((char*)data[211 + n]);
+					SetItemText(row, IDX_ASK_SIZE, (dvol) ? Int2CommaStr(dvol) : "");
+					SetItemText(row, IDX_ASK_BEFORE, (dcnt) ? Int2CommaStr(dcnt) : "");
 					RedrawCell(row, IDX_ASK_SIZE); RedrawCell(row, IDX_ASK_BEFORE);
 					m_MdgaCell[n] = row;
 					setMado.erase(row);
 				}
 			}
 
-			if (m_pSiseData->code.GetAt(0) != '4' && m_pSiseData->code.GetAt(0) != 'D')  //파생상품 코드개편
+			if (m_pSiseData->code.GetAt(0) != '4' && m_pSiseData->code.GetAt(0) != 'D')
 			{
-				strHoga = (char*)data[71+n];
-				hoga = (int)(fabs(atof(strHoga)*100.0) + DOUBLE_PREFIX);
+				strHoga = (char*)data[71 + n];
+				hoga = (int)(fabs(atof(strHoga) * 100.0) + DOUBLE_PREFIX);
 			}
 			else
 			{
-				strHoga = (char*)data[71+n];
+				strHoga = (char*)data[71 + n];
 				strHoga.Replace("++", "+");
 				strHoga.Replace("-+", "+");
 				strHoga.Replace("0+", "+");
 				strHoga.Replace("--", "-");
 				strHoga.Replace("+-", "-");
 				strHoga.Replace("0-", "-");
-				
-				if(atof(strHoga)*100.0 >= 0)
-					hoga = (int)((atof(strHoga)*100.0) + DOUBLE_PREFIX);
+				if (atof(strHoga) * 100.0 >= 0)
+					hoga = (int)((atof(strHoga) * 100.0) + DOUBLE_PREFIX);
 				else
-					hoga = (int)((atof(strHoga)*100.0) - DOUBLE_PREFIX);
+					hoga = (int)((atof(strHoga) * 100.0) - DOUBLE_PREFIX);
 			}
 
-// 			s.Format("3007 REAL DATA HOGA [%d]\n",hoga);
-// 			OutputDebugString(s);
-			
 			pos = m_mapHogaRow.find(hoga);
-			if (pos!=m_mapHogaRow.end())
+			if (pos != m_mapHogaRow.end())
 			{
-				if (pos->second>0)
+				if (pos->second > 0)
 				{
 					row = pos->second;
-					int svol = atoi((char*)data[61+n]);
-					int scnt = atoi((char*)data[221+n]);
-
-// 					CString strTemp;
-// 					strTemp.Format("[KSJ] row[%d] n[%d] hoga[%d] 61[%d] 221[%d]", row, n, hoga, svol, scnt);
-// 					OutputDebugString(strTemp);
-
-					SetItemText(row, IDX_BID_SIZE  , (svol) ? Int2CommaStr(svol) : "");	// 매수잔량
-					SetItemText(row, IDX_BID_BEFORE, (scnt) ? Int2CommaStr(scnt) : "");	// 매수건수
+					int svol = atoi((char*)data[61 + n]);
+					int scnt = atoi((char*)data[221 + n]);
+					SetItemText(row, IDX_BID_SIZE, (svol) ? Int2CommaStr(svol) : "");
+					SetItemText(row, IDX_BID_BEFORE, (scnt) ? Int2CommaStr(scnt) : "");
 					RedrawCell(row, IDX_BID_SIZE); RedrawCell(row, IDX_BID_BEFORE);
 					m_MsgaCell[n] = row;
 					setMasu.erase(row);
 				}
 			}
 		}
-	
+
 		set<int>::iterator st, ed;
-		for(st=setMado.begin(), ed=setMado.end(); st!=ed; ++st)
+		for (st = setMado.begin(), ed = setMado.end(); st != ed; ++st)
 		{
 			SetItemText(*st, IDX_ASK_SIZE, "");
 			SetItemText(*st, IDX_ASK_BEFORE, "");
 			RedrawCell(*st, IDX_ASK_SIZE);
 			RedrawCell(*st, IDX_ASK_BEFORE);
 		}
-		for(st=setMasu.begin(), ed=setMasu.end(); st!=ed; ++st)
+		for (st = setMasu.begin(), ed = setMasu.end(); st != ed; ++st)
 		{
 			SetItemText(*st, IDX_BID_SIZE, "");
 			SetItemText(*st, IDX_BID_BEFORE, "");
@@ -1318,7 +1209,15 @@ void CFOGridCtrl::SetRealData( DWORD* data )
 			RedrawCell(*st, IDX_BID_BEFORE);
 		}
 	}
+
+	// 함수 끝 - row가 실제 바뀐 경우에만 스크롤 이동
+	//if (bCurrRowChanged)
+	{
+		SetCurrToCenter();  //test
+	}
 }
+
+
 
 void CFOGridCtrl::Clear()
 {

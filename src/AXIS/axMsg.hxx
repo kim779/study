@@ -244,4 +244,5 @@
 #define  MMSG_RT_UNREGISTER_WND 0x34  //관심닫을때 메인에 통보
 #define MMSG_GETRTS_FROM_MAIN  0x35
 #define MMSG_SETSENDTR_TO_MAIN  0x36
+#define MMSG_SHARED_DUMP 0x37
 #endif

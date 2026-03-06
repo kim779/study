@@ -1782,6 +1782,7 @@ public:
 	CMapStringToString m_mapManage{};
 	void ReadManageMapInfo();
 	int ScreenCheck(CString mapname, int igubn = 0);
+	CString FindKeyByTargetAndType(const CString& strTargetKey, int nType);
 
 	//장운영정보 처리
 	std::map<CString, CString> _mapMngInfo;
@@ -1813,16 +1814,36 @@ public:
 
 	//실시간메인처리
 #ifdef DF_MAIN_RTS
+	struct SafeAlertItem {
+		char  code[CODE_LEN];
+		DWORD ts_ms;
+		char  values[MAX_RTS_INDEX][SYMBOL_STR_LEN];  // 값 자체를 복사
+		bool  hasValue[MAX_RTS_INDEX];
+	};
+
+	BOOL m_bMainRTS{};
+
+	// 워커스레드 관련
+	std::queue<SafeAlertItem*> m_alertQueue;
+	std::mutex            m_alertMutex;
+	std::thread           m_workerThread;
+	std::atomic<bool>     m_workerRunning{ false };
+
+	void WorkerThreadFunc();
+	void StartWorkerThread();
+	void StopWorkerThread();
+	std::unordered_map<std::string, int>   m_tickCount;
+	std::unordered_map<std::string, DWORD> m_tickFirst; // 첫 수신 시각
+	DWORD m_tickCountStart{ 0 };                        // 카운팅 시작 시각
 	std::queue<int> g_poolKeys;
 	std::mutex g_poolMtx;
 	std::unordered_map<int, TR_ROUTE_INFO> g_mapRoute;
-	std::unordered_map<std::string, CTime> m_lastRTSTimeCode;
 
-	bool ReadTick(const char* code, TickSnapshot* out);
+
+	//bool ReadTick(const char* code, TickSnapshot* out);
 
 	std::unordered_map<HWND, RtsSubscription> g_subByHwnd;
 	mutable std::shared_mutex g_subMtx; // read/write lock
-	//mutable std::mutex g_subMtx; // read/write lock
 
 	int GetSlotIndex_FindOnly(const char* code);
 	int EnsureSlotIndexForCode(const char* code);
@@ -1841,81 +1862,62 @@ public:
 
 	//update_ticker(int kind, struct _alertR* alertR)  에서 호출
 	//
-	void UpdateSnapshotFromAlert(TickSnapshot& s, const _alertR* alertR)
+	void UpdateSnapshotFromAlert(TickSnapshot& s, const SafeAlertItem* item)
 	{
-		if (!alertR || alertR->size <= 0 || alertR->ptr[0] == 0)
-			return;
-
-		CString slog;
-#ifdef UNICODE
-		CT2A codeA(alertR->code);
-		const char* code = (const char*)codeA;
-#else
-		const char* code = (const char*)(LPCTSTR)alertR->code;
-#endif
-		if (!code || !code[0])
-			return;
-
-		// ===== seqlock begin (홀수 = 쓰기중) =====
+		// seqlock begin
 		int v = s.seq.load(std::memory_order_relaxed);
 		s.seq.store(v + 1, std::memory_order_release);
 
-		s.ts_ms = GetTickCount();
-		CopyZ(s.code, sizeof(s.code), code);
-		s.valid.reset();
+		s.ts_ms = item->ts_ms;
+		CopyZ(s.code, sizeof(s.code), item->code);
 
-		// size-1 → 0 역순 (마지막 레코드가 최신)
-		for (int ii = alertR->size - 1; ii >= 0; ii--)
+		// valid.reset() 없이 누적 저장
+		for (int jj = 0; jj < MAX_RTS_INDEX; jj++)
 		{
-			if (alertR->ptr[ii] == 0) continue;
-
-			const PTR_T* data = reinterpret_cast<const PTR_T*>(alertR->ptr[ii]);
-
-			for (int jj = 0; jj < MAX_RTS_INDEX; jj++)
+			if (item->hasValue[jj])
 			{
-				if (data[jj] == 0) continue;
-
-				const char* val = reinterpret_cast<const char*>(data[jj]);
-				if (val && val[0])
-				{
-					CopyZ(s.values[jj], SYMBOL_STR_LEN, val);
-					s.valid.set(jj);
-					//slog.Format("[AXIS][%s]<%d> jj=[%d] val=[%s] ", __FUNCTION__, __LINE__, jj, val);
-					//OutputDebugString(slog);
-				}
+				CopyZ(s.values[jj], SYMBOL_STR_LEN, item->values[jj]);
+				s.valid.set(jj);
 			}
 		}
 
-		// ===== seqlock end (짝수 = 완료) =====
+		// seqlock end
 		s.seq.store(v + 2, std::memory_order_release);
 	}
 
-	inline void CopySnapshot(TickSnapshot& dst, const TickSnapshot& src)
-	{
-		// seq 제외하고 복사
-		dst.ts_ms = src.ts_ms;
-		if (1)  //우선테스트
-		{
-			static_assert(std::is_trivially_copyable_v<decltype(dst.ts_ms)>);
-			static_assert(std::is_trivially_copyable_v<decltype(dst.code)>);
-			static_assert(std::is_trivially_copyable_v<decltype(dst.values)>);
-			static_assert(std::is_trivially_copyable_v<decltype(dst.valid)>);
 
-			dst.ts_ms = src.ts_ms;
-			std::memcpy(dst.code, src.code, sizeof(dst.code));
-			std::memcpy(dst.values, src.values, sizeof(dst.values));
-			dst.valid = src.valid; // bitset은 대입이 안전/빠름
-		}
-	
-	}
 
-	bool GetTick(const char* code, TickSnapshot& out)
-	{
-		int idx = GetSlotIndex_FindOnly(code);
-		if (idx < 0) return false;
-		return ReadTick(idx, out);
-	}
-	bool ReadTick(int idx, TickSnapshot& out);
+
+
+
+
+
+
+#define SYM_PRICE    23   // 현재가
+#define SYM_DIFF     24   // 전일대비
+#define SYM_RATE     33   // 등락률
+#define SYM_VOLUME   27   // 거래량
+
+	void DumpAllSlots();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 	void InitPool()
 	{
@@ -1939,70 +1941,6 @@ public:
 	{
 		std::lock_guard<std::mutex> lock(g_poolMtx);
 		g_poolKeys.push(key);
-	}
-
-
-	//---------------------------- log -----------------------------------------------------------------------------------------------
-	static bool ReadSnapshotStable(const TickSnapshot& src, TickSnapshot& out)
-	{
-		for (;;)
-		{
-			int v1 = src.seq.load(std::memory_order_acquire);
-			if (v1 & 1) continue; // writing 중 (odd)
-
-			// ===== 실제 데이터 복사 =====
-			out.ts_ms = src.ts_ms;
-			memcpy(out.code, src.code, sizeof(src.code));
-			memcpy(out.values, src.values, sizeof(src.values));
-			out.valid = src.valid;
-
-			int v2 = src.seq.load(std::memory_order_acquire);
-			if (v1 == v2)
-				return true;
-		}
-	}
-
-	static void DumpOneSlot(int slotIdx, const TickSnapshot& snap, int maxFieldsToPrint = 9999)
-	{
-		CStringA log;
-		log.Format("\n----- [AXISLOG1]SLOT[%d] code=%s ts=%lu valid=%d -----\n",
-			slotIdx, snap.code, snap.ts_ms, (int)snap.valid.count());
-
-		int printed = 0;
-		for (int i = 0; i < MAX_RTS_INDEX; ++i)
-		{
-			if (!snap.valid.test(i)) continue;
-
-			CStringA line;
-			line.Format(" [AXISLOG2][%03d] %s\n", i, snap.values[i]);
-			log += line;
-
-			if (++printed >= maxFieldsToPrint) break;
-		}
-
-		log += "-----------------------------------------\n";
-		OutputDebugStringA(log);
-	}
-
-	void DumpAllSlots(const TickSnapshot* slots, int slotCount,
-		int maxSlotsToPrint = 50,
-		int maxFieldsPerSlot = 50)
-	{
-		int printedSlots = 0;
-
-		for (int i = 0; i < slotCount; ++i)
-		{
-			TickSnapshot local;
-			ReadSnapshotStable(slots[i], local);
-
-			if (local.code[0] == '\0')
-				continue; // 비어있으면 스킵
-
-			DumpOneSlot(i, local, maxFieldsPerSlot);
-
-			if (++printedSlots >= maxSlotsToPrint)
-				break;
-		}
 	}
 
 

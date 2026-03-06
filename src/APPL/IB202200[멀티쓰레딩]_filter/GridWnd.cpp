@@ -693,7 +693,7 @@ LONG CGridWnd::OnManage(WPARAM wParam, LPARAM lParam)
 		break;
 		// 2012.01.19 KSJ Alertx 추가
 	case MK_RTSDATAx:
-		//RecvRTSx(lParam);
+		
 		break;
 		// 2012.01.19 KSJ Alertx 추가 끝
 	case MK_ENDDRAG:
@@ -2057,7 +2057,7 @@ void CGridWnd::sendTransactionTR(int update, int nStart, int nEnd)
 
 	m_bSending = true;
 	tempStr += "|";
-	tempStr += "0\t23\t24\t27\t33";
+	tempStr += "0\t23\t24\t27\t33\t111\t112\t115\t116";
 
 	m_pMainWnd->SendMessage(WM_MANAGE, MK_SETRTSCODE, (LPARAM)(LPCSTR)(LPCTSTR)tempStr);
 	m_pMainWnd->SendMessage(WM_MANAGE, MK_SENDTR, (LPARAM)&sdata);
@@ -7077,6 +7077,7 @@ int CGridWnd::CheckRealTimeCode(CString code)
 // 2011.12.29 KSJ
 void CGridWnd::ReSetSearchMap()
 {
+	CString slog;
 	class CIndexMap *idx = nullptr;
 	const int realtimeCol = 0;
 	CString string, strTemp;
@@ -7093,6 +7094,9 @@ void CGridWnd::ReSetSearchMap()
 		if (string.IsEmpty())
 			continue;
 		_mapSymbol.emplace(std::make_pair(string, 1));
+
+slog.Format("[2022][_mapSymbol][%p]  string=[%s]", this, string);
+OutputDebugString(slog);
 
 		// map에 중복 데이터 체크
 		if (!m_pSearchMap.Lookup(string, (CObject *&)idx))
@@ -9893,13 +9897,13 @@ void CGridWnd::ProcessOneRow_Alertx(
 	}
 
 	// --------- (A) 예상가/현재가 처리: “원본 블록”을 함수로 옮기기 ----------
-	/*ApplyExpectLogic(
+	ApplyExpectLogic(
 		xrow, code, strCode, strGubn, bKrx,
 		beginTime, beginTimeEnd, endTimeEnd, endTime,
 		expectPtr, currPtr, serverTime, dealTime, serverTimePtr, dealTimePtr,
 		bLast,
 		bTransSymbol, bZisu, entry
-	);*/
+	);
 
 	newEXP = m_grid->GetItemText(xrow, colEXPECT);
 	const BOOL bForceDraw = (newEXP == oldEXP) ? FALSE : TRUE;
@@ -9917,12 +9921,12 @@ void CGridWnd::ProcessOneRow_Alertx(
 	);
 
 	// --------- (C) 후처리: 전일대비율/봉/calcInClient/posField 등 ----------
-	/*PostProcessAfterGrid(
+	PostProcessAfterGrid(
 		xrow, code, strCode,
 		bExpect,
 		saveData,
 		acc
-	);*/
+	);
 }
 
 void CGridWnd::HandleIndexExpectedCase(CString& code, CString& strCode, const CString& strGubn)
@@ -10519,18 +10523,43 @@ void CGridWnd::HandleSpecialInfo(int xrow, const DataAccessor& acc)
 }
 
 void CGridWnd::UpdateFromTickSlot(int slotIndex)
-{
-	if (m_bSending) return;
+{	
+	CString slog;
+	if (m_bSending)
+	{
+		slog.Format("[UpdateFromTickSlot] m_bSending=[%d]\n", m_bSending);
+		Output_DebugString(slog);
+		return;
+	}
 
+#ifdef DF_DLL_RTS
+	const TickSnapshot* slots = DLL_GetTickSlots();
+#else
 	const TickSnapshot* slots = Axis_GetTickSlots();
-	if (!slots) return;
+#endif
+	if (!slots)
+	{
+		slog.Format("[UpdateFromTickSlot] slots=[%d]\n", slots);
+		Output_DebugString(slog);
+		return;
+	}
 
 	const TickSnapshot& slot = slots[slotIndex];
-	if (slot.code[0] == '\0') return;
+	if (slot.code[0] == '\0')
+	{
+		slog.Format("[UpdateFromTickSlot] slotIndex=[%d]\n", slotIndex);
+		Output_DebugString(slog);
+		return;
+	}
 
 	// seqlock - 쓰기 중이면 스킵
 	int seq = slot.seq.load(std::memory_order_acquire);
-	if (seq & 1) return;
+	if (seq & 1)
+	{
+		slog.Format("[UpdateFromTickSlot] seq=[%d]\n", seq);
+		Output_DebugString(slog);
+		return;
+	}
 
 	// _alertR 임시 생성 (스택 - 힙할당 없음)
 	_alertR alertR{};
@@ -10538,18 +10567,42 @@ void CGridWnd::UpdateFromTickSlot(int slotIndex)
 	alertR.stat = 1;
 	alertR.size = 1;
 
-	// record 배열 - 스택 불가(너무 큼) → 힙 1회만
+	slog.Format("[UpdateFromTickSlot] code=[%s] slotIndex=[%d]\n", alertR.code, slotIndex);
+	Output_DebugString(slog);
+
+	// 현재 시각
+	SYSTEMTIME st;
+	GetLocalTime(&st);
+	int now = st.wHour * 10000 + st.wMinute * 100 + st.wSecond;
+
+	// 이미 있는 멤버변수 활용
+	const int beginTime = _ttoi(m_strBeginTime);     // 장전 시작
+	const int beginTimeEnd = _ttoi(m_strBeginTimeEnd);  // 장전 종료
+	const int endTime = _ttoi(m_strEndTime);       // 장후 시작
+	const int endTimeEnd = _ttoi(m_strEndTimeEnd);    // 장후 종료
+
+	bool bExpected = (now >= beginTime && now < beginTimeEnd) ||
+		(now >= endTime && now < endTimeEnd);
+
+	// record 구성 시 예상가 시간 아니면 111 스킵
 	DWORD record[MAX_FIELD_INDEX]{};
-	// values는 slot에 있으므로 포인터만 연결 (복사 없음!)
 	for (int sym = 0; sym < MAX_SYMBOLS && sym < MAX_FIELD_INDEX; sym++)
 	{
 		if (!slot.valid[sym]) continue;
-		record[sym] = (DWORD)slot.values[sym];  // 복사 없이 포인터만
+
+		// 예상가 시간 아닌데 111 심볼이면 스킵
+		if (sym == 111 && !bExpected) continue;
+
+		record[sym] = (DWORD)slot.values[sym];
 	}
 	alertR.ptr[0] = (DWORD)record;
 
 	// 기존 로직 그대로 재활용
 	CString code = alertR.code;
+
+	int count = CheckRealTimeCode(code);
+	if (count == 0) return;
+
 	CString strCode;
 	bool bKrx = true;
 	NormalizeCodeAndMarket(code, strCode, bKrx);
@@ -10559,15 +10612,6 @@ void CGridWnd::UpdateFromTickSlot(int slotIndex)
 		strGubn = slot.values[0];
 
 	HandleIndexExpectedCase(code, strCode, strGubn);
-
-	int count = CheckRealTimeCode(code);
-	if (count == 0) return;
-
-	const int beginTime = _ttoi(m_strBeginTime);
-	const int beginTimeEnd = _ttoi(m_strBeginTimeEnd);
-	const int endTimeEnd = _ttoi(m_strEndTimeEnd);
-	const int endTime = _ttoi(m_strEndTime);
-
 	DataAccessor acc(&alertR);
 
 	for (int rowPosition = 0; rowPosition < count; rowPosition++)

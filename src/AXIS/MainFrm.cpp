@@ -126,6 +126,9 @@ int g_nextIndex = 0;
 std::shared_mutex  g_codeMapLock;
 #endif
 
+std::vector<int>  g_dirtySlots;  // ← 추가
+std::mutex        g_dirtyMtx;    // ← 추가
+
 #pragma	comment(lib, "Winmm.lib")
 #pragma	comment(lib, "SUiPre.lib")
 
@@ -1804,9 +1807,7 @@ WriteLog(m_slog);
 						break;
 					}*/
 					//DumpAllSlots(g_tickSlots, MAX_SLOT, 100, 50);
-					SetTimer(TM_MAIN_TEST_RTS, 500, nullptr);
-					m_slog.Format("[AXIS][RTSLOG] g_codeToIndex = %d", g_codeToIndex.size());
-					OutputDebugString(m_slog);
+					DumpAllSlots();
 
 
 				}
@@ -1814,6 +1815,8 @@ WriteLog(m_slog);
 				case 'a':
 				case 'A':
 				{
+					if (m_pSharedMemory)
+						return (int)(m_pSharedMemory->SendMessage(WM_USER, MAKEWPARAM(MAKEWORD(MMSG_SHARED_DUMP, 1), 1), 0));
 					//_vMngInfo.clear();
 					//_vMngInfo.emplace_back(std::move("881"), std::move("881"));  //장마감 프리
 					//_vMngInfo.emplace_back(std::move("851"), std::move("851"));  //시간외 프리
@@ -3799,7 +3802,7 @@ WriteLog("[AXIS] OnAxis-axAXIS - Step 13");
 			m_bInit = FALSE;
 
 #ifdef DF_MAIN_RTS
-
+			//StartWorkerThread();
 #endif 
 		}
 		break;
@@ -4884,9 +4887,9 @@ OutputDebugString(m_slog);
 				// 심볼 목록 출력
 				for (int i = 0; i < req->symbolCount; ++i)
 				{
-					CString line;
+				/*	CString line;
 					line.Format(_T("[AXIS][RTS등록]  SYMBOL[%d] = %d\r\n"), i, req->symbols[i]);
-					OutputDebugString(line);
+					OutputDebugString(line);*/
 				}
 
 				OutputDebugString(_T("--------------------------------------------------\r\n"));
@@ -4922,6 +4925,11 @@ OutputDebugString(m_slog);
 				std::unique_lock lk(g_subMtx);
 				g_subByHwnd[hWnd] = std::move(sub);
 			}
+
+			CString slog;
+			slog.Format("[EnsureSlot] 신규등록  총갯수=[%d]\n",
+				(int)g_codeToIndex.size());
+			OutputDebugString(slog);
 
 			return 1;
 		}
@@ -5489,6 +5497,7 @@ WriteLog("[AXIS] CMainFrame::OnFireRec (lparam null )     FEV_RUN\n");
 	case FEV_ANM:	
 		{
 			update_ticker((int)wParam, (struct _alertR*)lParam);
+		//	m_pSharedMemory->SendMessage(WM_USER, MAKEWPARAM(MAKEWORD(DLL_ALERT, 1), 1), (LPARAM)lParam);
 		}
 		break;
 	case FEV_AXIS:
@@ -6364,6 +6373,7 @@ int CMainFrame::Initialize()
 		m_axis->WriteProfileString(INFORMATION, "Server", "172.16.205.20");
 	}
 	CloseChaserAPP();
+
 //	m_hHook = SetWindowsHookEx(WH_GETMESSAGE, KeyboardProc, 
 //			AfxGetInstanceHandle(), GetCurrentThreadId());
 	m_pMain = (CMainFrame *) this;
@@ -7050,6 +7060,13 @@ bool CMainFrame::Start(CString user)
 		m_cpass.TrimRight();
 
 		AfxGetApp()->WriteProfileString(WORKSTATION, "UPDATE", "");
+
+		memset(buf, 512, 0x00);
+		spath.Format("%s\\%s\\AXISAI.ini", Axis::home, "tab");
+		dw = GetPrivateProfileString("MAINRTS", "use", "0", buf, sizeof(buf), spath);
+		s.Format("%s", buf);
+		s.TrimRight();
+		m_bMainRTS = (_ttoi(s) == 1) ? TRUE : FALSE;
 
 		if(m_bUseNewLogin)
 		{
@@ -8966,121 +8983,164 @@ void CMainFrame::write_err()
 #ifdef DF_MAIN_RTS
 void CMainFrame::update_ticker(int kind, struct _alertR* alertR)
 {
-	CString symbol;
-	CString sData;
-	CString stmp;
+		if (!alertR || alertR->size <= 0 || alertR->ptr[0] == 0)
+			return;
 
-	std::string scode = CStringA(alertR->code);
+		
+		DWORD uiThreadId = AfxGetApp()->m_nThreadID;  // UI 스레드 ID
+		DWORD curThreadId = GetCurrentThreadId();      // 현재 스레드 ID
+		CString slog;
+		slog.Format("[update_ticker] UI스레드=[%d] 현재스레드=[%d] %s\n",
+			uiThreadId, curThreadId,
+			(uiThreadId == curThreadId) ? "★UI스레드" : "★별도스레드");
+		OutputDebugString(slog);
 
-	if (!alertR)
-		return;
+		CString symbol, sData;
+		symbol = alertR->code;
+		DWORD* data{};
+
+		for (int i = 0; i < alertR->size; i++)
+		{
+			data = (DWORD*)alertR->ptr[i];
+			sData.Format("%s", (char*)data[0]);
+			if (sData == "d" || sData == "D")
+				return;
+
+			CString str;
+			if (!symbol.IsEmpty() && (symbol.GetAt(0) == 'X' || symbol.GetAt(0) == 'x'))
+			{
+				m_slog.Format("[mnginfo]");
+				output_DebugString(m_slog);
+				m_slog.Format("[mnginfo][%s]<%d>  size=[%d] symbol=[%s]", __FUNCTION__, __LINE__, alertR->size, symbol);
+				output_DebugString(m_slog);
+
+				if (symbol.CompareNoCase(SYM_MNG) == 0)
+				{
+					CTime time;
+					time = CTime::GetCurrentTime();
+					CString str;
+					str.Format("\r\n update_ticker[%02d:%02d:%02d] kind[%d] sym[%s] dat[%.200s]\n",
+						time.GetHour(), time.GetMinute(), time.GetSecond(), kind, symbol, data);
+					OutputDebugString(str);
+					ShowMngInfo(data);
+				}
+				else
+				{
+					str = ReplaceExpectSymbol(symbol);
+					if (!str.IsEmpty())
+						symbol = str;
+				}
+			}
+
+			if (kind != 0)
+			{
+				if (kind == 6)
+				{
+					const char* szNewsRTS = "S0000";
+					if (m_tInfo1)
+						m_tInfo1->ProcessRTS(szNewsRTS, data);
+					if (m_tInfo2)
+						m_tInfo2->ProcessRTS(szNewsRTS, data);
+				}
+				return;
+			}
+
+			if (i == 0)
+			{
+				if (m_tInfo1 && m_tInfo1->IsVisible())
+					m_tInfo1->ProcessRTS(symbol, data);
+				if (m_tInfo2 && m_tInfo2->IsVisible())
+					m_tInfo2->ProcessRTS(symbol, data);
+			}
+		}
+
+		if (!m_bMainRTS)
+			return;
+	
+		// 덤프용 카운터
+		if (m_tickCountStart == 0)
+			m_tickCountStart = GetTickCount();
 
 #ifdef UNICODE
-	CT2A codeA(alertR->code);
-	const char* code = (const char*)codeA;
+		CT2A codeA(alertR->code);
+		const char* code = (const char*)codeA;
 #else
-	const char* code = (const char*)(LPCTSTR)alertR->code;
+		const char* code = (const char*)(LPCTSTR)alertR->code;
 #endif
+		if (!code || !code[0]) return;
 
-	if (!code || !code[0])
-		return;
+		m_tickCount[std::string(code)]++;
 
-	// 종목코드 → 슬롯 index
-	auto it = g_codeToIndex.find(code);
-
-;
-	if (it != g_codeToIndex.end())
-	{
-		int idx = it->second;
-		stmp.Format("[AXIS][%s]<%d> 저장된 실시간 갱신  idx=[%d] code=[%s]",
-			__FUNCTION__, __LINE__, idx, code);
-		//OutputDebugString(stmp);
-		UpdateSnapshotFromAlert(g_tickSlots[idx], alertR);
-	}
-	else
-	{
-		// 없으면 새로 슬롯 할당 후 저장
-		int idx = EnsureSlotIndexForCode(code);
-		if (idx >= 0)
+		// 큐 사이즈 체크 - new 하기 전에
 		{
-			stmp.Format("[AXIS][%s]<%d> 신규 슬롯 할당 idx=[%d] code=[%s]",
-				__FUNCTION__, __LINE__, idx, code);
-			OutputDebugString(stmp);
-			UpdateSnapshotFromAlert(g_tickSlots[idx], alertR);
-		}
+			std::lock_guard<std::mutex> lock(m_alertMutex);
+			if (m_alertQueue.size() > 500)
+				return;
 	}
 
-	//기존처럼 화면 루프 돌릴 필요 없음
-	// 화면들은 g_tickSlots[idx]를 직접 읽으면 됨
-
-	/////////////////////!!!!!
-	symbol = alertR->code;
-
-	DWORD* data{};
-	int i = 0;
-	for (int i = 0; i < alertR->size; i++)
-	{
-		data = (DWORD*)alertR->ptr[i];
-
-		sData.Format("%s", (char*)data[0]);
-
-		if (sData == "d" || sData == "D")
-			return;
-
-		CString	str;
-		if (!symbol.IsEmpty() && (symbol.GetAt(0) == 'X' || symbol.GetAt(0) == 'x'))
+		// UI 스레드에서 포인터 역참조 + 값 복사
+		if (1)
 		{
-			m_slog.Format("[mnginfo]");
-			output_DebugString(m_slog);
-			m_slog.Format("[mnginfo][%s]<%d>  size=[%d] symbol=[%s]", __FUNCTION__, __LINE__, alertR->size, symbol);
-			output_DebugString(m_slog);
+			if (!code || !code[0]) return;
 
+			m_tickCount[std::string(code)]++;
+			if (m_tickCountStart == 0)
+				m_tickCountStart = GetTickCount();
 
-			// 장운영정보를 위해 추가
-			if (symbol.CompareNoCase(SYM_MNG) == 0)
+			// 직접 저장
+			int idx = EnsureSlotIndexForCode(code);
+			if (idx < 0) return;
+
+			TickSnapshot& s = g_tickSlots[idx];
+			s.ts_ms = GetTickCount();
+			CopyZ(s.code, sizeof(s.code), code);
+
+			for (int ii = alertR->size - 1; ii >= 0; ii--)
 			{
-
-				CTime time;
-				time = CTime::GetCurrentTime();
-				CString str;
-				str.Format("\r\n update_ticker[%02d:%02d:%02d] kind[%d] sym[%s] dat[%.200s]\n", time.GetHour(), time.GetMinute(), time.GetSecond(), kind, symbol, data);
-				OutputDebugString(str);
-
-				ShowMngInfo(data);		//진짜사용	
-
-				//return;
+				if (alertR->ptr[ii] == 0) continue;
+				const PTR_T* data = reinterpret_cast<const PTR_T*>(alertR->ptr[ii]);
+				for (int jj = 0; jj < MAX_RTS_INDEX; jj++)
+				{
+					if (data[jj] == 0) continue;
+					const char* val = reinterpret_cast<const char*>(data[jj]);
+					if (val && val[0])
+					{
+						CopyZ(s.values[jj], SYMBOL_STR_LEN, val);
+						s.valid.set(jj);
+					}
+				}
 			}
-			else
-			{
-				str = ReplaceExpectSymbol(symbol);
-				if (!str.IsEmpty())
-					symbol = str;
-			}
+
+			Axis_PushDirtySlot(idx);
 		}
-
-		if (kind != 0)
+		else
 		{
-			if (kind == 6)
+			SafeAlertItem* item = new SafeAlertItem{};
+			CopyZ(item->code, CODE_LEN, code);
+			item->ts_ms = GetTickCount();
+			memset(item->hasValue, 0, sizeof(item->hasValue));
+
+			for (int ii = alertR->size - 1; ii >= 0; ii--)
 			{
-				const char* szNewsRTS = "S0000";
+				if (alertR->ptr[ii] == 0) continue;
+				const PTR_T* data = reinterpret_cast<const PTR_T*>(alertR->ptr[ii]);
 
-				if (m_tInfo1)
-					m_tInfo1->ProcessRTS(szNewsRTS, data);
-				if (m_tInfo2)
-					m_tInfo2->ProcessRTS(szNewsRTS, data);
+				for (int jj = 0; jj < MAX_RTS_INDEX; jj++)
+				{
+					if (data[jj] == 0) continue;
+					const char* val = reinterpret_cast<const char*>(data[jj]);
+					if (val && val[0])
+					{
+						CopyZ(item->values[jj], SYMBOL_STR_LEN, val);
+						item->hasValue[jj] = true;
+					}
+				}
 			}
-			return;
-		}
 
-		if (i == 0)
-		{
-			if (m_tInfo1 && m_tInfo1->IsVisible())
-				m_tInfo1->ProcessRTS(symbol, data);
-			if (m_tInfo2 && m_tInfo2->IsVisible())
-				m_tInfo2->ProcessRTS(symbol, data);
+			std::lock_guard<std::mutex> lock(m_alertMutex);
+			m_alertQueue.push(item);
 		}
-	}
-
+		
 }
 #else
 void CMainFrame::update_ticker(int kind, struct _alertR* alertR)
@@ -10892,10 +10952,11 @@ void CMainFrame::ClearUserIni()
 
 void CMainFrame::save_laststat()
 {	
+	m_iAxisState = 10;
 	int	key{}, index{};
 	CString	mpN, tmps, data, info, keys = "LASTSTAT";
 	CString date;
-
+	CString sMapname;
 	CTime time;
 	time = CTime::GetCurrentTime();
 	
@@ -10974,9 +11035,16 @@ void CMainFrame::save_laststat()
 			{
 				if (!m_mapHelper->IsValidMap(mpN) ||!ExistMenu(mpN))
 				{
-					mpN = mpN.Left(L_MAPN-2)  + "00";
-					if (!m_mapHelper->IsValidMap(mpN) || !ExistMenu(mpN))
-						continue;
+					if (this->ScreenCheck(mpN, 2) == DF_YUSE)
+					{
+
+					}
+					else
+					{
+						mpN = mpN.Left(L_MAPN - 2) + "00";
+						if (!m_mapHelper->IsValidMap(mpN) || !ExistMenu(mpN))
+							continue;
+					}
 				}
 			}
 
@@ -11056,11 +11124,21 @@ void CMainFrame::save_laststat()
 				wndpl.rcNormalPosition.right = rctmp.right;
 				wndpl.rcNormalPosition.top = rctmp.top;
 				wndpl.rcNormalPosition.bottom = rctmp.bottom;
-			}	
-			
+			}
+
+			sMapname = child->m_mapN;
+			if (ScreenCheck(sMapname, 2) == DF_YUSE)
+			{
+				CString stmp;
+				stmp = FindKeyByTargetAndType(child->m_mapN, 5);
+				if (!stmp.IsEmpty())
+					sMapname = stmp;
+			}
+
+
 			tmps.Format("%d%02d", m_saveALLVS ? vsN : 0, index++);
 			info.Format("%s|%d|%d|%d|%d|%d|%d|%d|%d|%d|%d|%d|%d|%d|%s|",
-					child->m_mapN,
+					sMapname,
 					0,
 					wndpl.length,
 					wndpl.flags,
@@ -11099,7 +11177,17 @@ void CMainFrame::save_laststat()
 			if (!m_arSDI[vsN].Lookup(key, schild))	continue;
 			if (ExceptMap(schild->m_mapN))		continue;
 			
-			mpN.Format("%s", schild->m_mapN.Left(L_MAPN));
+			mpN = schild->m_mapN.Left(L_MAPN);
+			if (ScreenCheck(mpN, 2) == DF_YUSE)
+			{
+				CString stmp;
+				stmp = FindKeyByTargetAndType(schild->m_mapN, 5);
+				if (!stmp.IsEmpty())
+					mpN = stmp;
+			}
+			else
+				mpN.Format("%s", schild->m_mapN.Left(L_MAPN));
+
 			if (!ExistMenu(mpN))	continue;
 
 			data.Empty();
@@ -20238,6 +20326,8 @@ void CMainFrame::preload_screen()
 
 	child = load_hidescreen("IBXXXX00");
 	m_arHide.Add(child);
+
+
 	// 20070604
 //	child = load_hidescreen(MAPN_SISECATCH1);
 //	m_arHide.Add(child);
@@ -21723,8 +21813,50 @@ bool CMainFrame::ExceptMap(CString mapN)
 	return false;
 }
 
+CString CMainFrame::FindKeyByTargetAndType(const CString& strTargetKey, int nType)
+{
+	POSITION pos = m_mapManage.GetStartPosition();
+	while (pos != NULL)
+	{
+		CString strKey, strValue;
+		m_mapManage.GetNextAssoc(pos, strKey, strValue);
+
+		// value를 '|' 기준으로 파싱
+		// 형식: 필드0|필드1|필드2|필드3|
+		CString strTemp = strValue;
+		CStringArray arrFields;
+
+		int nFind = 0;
+		while ((nFind = strTemp.Find('|')) != -1)
+		{
+			arrFields.Add(strTemp.Left(nFind));
+			strTemp = strTemp.Mid(nFind + 1);
+		}
+		// 마지막 잔여값도 추가
+		arrFields.Add(strTemp);
+
+		// 필드 수 최소 4개 필요 (인덱스 0~3)
+		if (arrFields.GetSize() < 4)
+			continue;
+
+		CString strField1 = arrFields[1]; // 타입 (예: "5")
+		CString strField3 = arrFields[3]; // 매핑키 (예: "IB202700")
+
+		// 두 조건 모두 일치하면 key 반환
+		if (strField3 == strTargetKey && _ttoi(strField1) == nType)
+		{
+			return strKey; // "IB202200" 반환
+		}
+	}
+
+	return _T(""); // 못 찾으면 빈 문자열
+}
+
 int CMainFrame::ScreenCheck(CString mapname,int  igubn)
 {
+//igubn  1 ExceptMap에서 호출  ,   2 save_laststat  에서 호출
+// 
+//
 //#define DF_NUSE 0					    //#0x00 사용불가      0  
 //#define DF_YUSE 1					     //#0x01 사용가능      1
 //#define DF_NUSE_AFTERDAY 2    //#0x02 특정날짜이후 사용가능    2
@@ -21737,7 +21869,7 @@ int CMainFrame::ScreenCheck(CString mapname,int  igubn)
 	OutputDebugString(m_slog);
 
 	CString sData{};
-	if(!m_mapManage.Lookup(mapname, sData))
+	if(!m_mapManage.Lookup(mapname, sData) && igubn != 2)
 	{
 		if (mapname.Left(2) == "00")
 		{
@@ -21771,6 +21903,11 @@ int CMainFrame::ScreenCheck(CString mapname,int  igubn)
 		return DF_NUSE;
 	}
 
+	if (igubn == 2 && sval == "5")
+	{
+		return DF_YUSE;
+	}
+
 	if (sval == "64" && igubn != 1)  //HTS 시작하거나 끌때는 안한다
 	{
 		char buff[256]{};
@@ -21800,7 +21937,7 @@ int CMainFrame::ScreenCheck(CString mapname,int  igubn)
 			return DF_YUSE;
 		}
 	}
-	else if (sval == "0")     //사용안하는 화면에 대한 처리
+	else if (sval == "0" && m_iAxisState < 10)     //사용안하는 화면에 대한 처리
 	{
 		if (!sPopMap.IsEmpty())   //맵으로 띄우는 안내팝업에 대한 내용이 있을경우
 		{
@@ -21811,8 +21948,15 @@ int CMainFrame::ScreenCheck(CString mapname,int  igubn)
 				m_mapHelper->ChangeChild(sPopMap,1,0,5);
 			else if (sPopType == "2")
 				m_mapHelper->CreateModal(sPopMap);
-			else if (sPopType == "2")
+			else if (sPopType == "3")
 				m_mapHelper->CreatePopup(sPopMap);
+			else if (sPopType == "5")
+			{
+				if(m_bMainRTS)
+					m_mapHelper->ChangeChild(sPopMap);
+				else
+					m_mapHelper->ChangeChild(mapname);
+			}
 		}
 		else	if (sPopType == "0")  //그냥 안띄우고 넘어감
 			return DF_NUSE;
@@ -21889,7 +22033,9 @@ void CMainFrame::OnDestroy()
 // 			ldes();
 // 		FreeLibrary(m_hMRadar);		
 // 	}
-
+#ifdef DF_MAIN_RTS
+	StopWorkerThread();
+#endif
 	OutputDebugString("COMPLETE MAIN DESTROY\n");
 
  	if (m_hMNews) FreeLibrary(m_hMNews);
@@ -31276,67 +31422,9 @@ void CMainFrame::ServerOrderMsgToMap(int igubn, bool bPop)
 }
 
 #ifdef DF_MAIN_RTS	
-//void CMainFrame::RegisterSubscriber(const char* code, HWND hWnd, int screenKey)
-//{
-//	std::lock_guard<std::mutex> lock(g_subMtx);
-//
-//	auto& vec = g_subMap[code];  // code 없으면 자동 생성
-//
-//	// ?? 중복 등록 방지
-//	for (auto& s : vec)
-//	{
-//		if (s.hWnd == hWnd && s.screenKey == screenKey)
-//			return;
-//	}
-//
-//	vec.push_back({ hWnd, screenKey });
-//}
-//
-//void CMainFrame::UnregisterSubscriber(const char* code, HWND hWnd, int screenKey)
-//{
-//	std::lock_guard<std::mutex> lock(g_subMtx);
-//
-//	auto it = g_subMap.find(code);
-//	if (it == g_subMap.end())
-//		return;
-//
-//	auto& vec = it->second;
-//
-//	vec.erase(
-//		std::remove_if(vec.begin(), vec.end(),
-//			[hWnd, screenKey](const SUBSCRIBER& s)
-//			{
-//				return s.hWnd == hWnd && s.screenKey == screenKey;
-//			}),
-//		vec.end()
-//				);
-//
-//	// ?? 구독자가 없으면 code 제거
-//	if (vec.empty())
-//		g_subMap.erase(it);
-//}
+
 #endif
-//void CMainFrame::DispatchRT(const char* code, const RT_DATA& data)
-//{
-//	std::lock_guard<std::mutex> lock(g_subMtx);
-//
-//	auto it = g_subMap.find(code);
-//	if (it == g_subMap.end())
-//		return;
-//
-//	for (auto& s : it->second)
-//	{
-//		if (::IsWindow(s.hWnd))
-//		{
-//			ST_SEND_TR* pMsg = new ST_SEND_TR{};
-//			pMsg->key = s.screenKey;
-//			pMsg->datB = (char*)&data;
-//			pMsg->datL = sizeof(RT_DATA);
-//
-//		//	::PostMessage(s.hWnd, WM_USER_RT_DATA, 0, (LPARAM)pMsg);
-//		}
-//	}
-//}
+
 
 #pragma warning (default : 4477)
 /*
@@ -32678,33 +32766,6 @@ int CMainFrame::GetSlotIndex_FindOnly(const char* code)
 	return it->second;
 }
 
-//MMSG_RT_REGISTER_CODES   화면에서 실시간 코드를 등록할때!!
-//update_ticker 에서 실시가 받아서 쓸때!!!
-//int CMainFrame::EnsureSlotIndexForCode(const char* code)
-//{
-//	if (!code || !code[0])
-//		return -1;
-//
-//	std::shared_lock<std::shared_mutex > lock(g_codeMapLock);  //EnsureSlotIndexForCode
-//
-//	//m_slog.Format("[AXISMAIN][REQ] FIND EnsureSlotIndexForCode start code=[%s]  [%d]", code, g_codeToIndex.size());
-//	//OutputDebugString(m_slog);
-//
-//	auto it = g_codeToIndex.find(code);
-//	if (it != g_codeToIndex.end())
-//		return it->second;   // 이미 있으면 기존 index 반환
-//
-//	// 슬롯 꽉 찼으면
-//	if (g_nextIndex >= MAX_SLOT)
-//		return -1;
-//
-//	// 새로 할당
-//	int idx = g_nextIndex++;
-//	g_codeToIndex.emplace(code, idx);
-//	CopyZ(g_tickSlots[idx].code, sizeof(g_tickSlots[idx].code), code);
-//
-//	return idx;
-//}
 int CMainFrame::EnsureSlotIndexForCode(const char* code)
 {
 	if (!code || !code[0])
@@ -32733,6 +32794,11 @@ int CMainFrame::EnsureSlotIndexForCode(const char* code)
 	g_codeToIndex.emplace(code, idx);
 	CopyZ(g_tickSlots[idx].code, sizeof(g_tickSlots[idx].code), code);
 
+	CString slog;
+	slog.Format("[EnsureSlot] 신규등록 code=[%s] idx=[%d] 총갯수=[%d]\n",
+		code, idx, (int)g_codeToIndex.size());
+	OutputDebugString(slog);
+
 	return idx;
 }
 
@@ -32748,6 +32814,24 @@ AXIS_API int Axis_EnsureSlotIndex(const char* code)
 AXIS_API const TickSnapshot* Axis_GetTickSlots()
 {
 	return g_tickSlots;
+}
+
+AXIS_API void Axis_PushDirtySlot(int idx)
+{
+	std::lock_guard<std::mutex> lk(g_dirtyMtx);
+	g_dirtySlots.push_back(idx);
+}
+
+AXIS_API int Axis_SwapDirtySlots(int* outBuf, int bufSize)
+{
+	std::vector<int> dirty;
+	{
+		std::lock_guard<std::mutex> lk(g_dirtyMtx);
+		dirty.swap(g_dirtySlots);
+	}
+	int count = min((int)dirty.size(), bufSize);
+	memcpy(outBuf, dirty.data(), count * sizeof(int));
+	return count;
 }
 #endif
 
@@ -32805,6 +32889,121 @@ void CMainFrame::TestRTSData()
 	}
 }
 
+void CMainFrame::DumpAllSlots()
+{
+	DWORD now = GetTickCount();
+	DWORD elapsed = (m_tickCountStart > 0) ? (now - m_tickCountStart) : 1;
+	float elapsedSec = elapsed / 1000.0f;
+	if (elapsedSec < 0.001f) elapsedSec = 0.001f;
+
+	std::vector<std::pair<std::string, int>> sorted(m_tickCount.begin(), m_tickCount.end());
+	std::sort(sorted.begin(), sorted.end(), [](const auto& a, const auto& b) {
+		return a.second > b.second;
+		});
+
+	// 전체 합계 먼저 계산 (리셋 전에)
+	int totalCnt = 0;
+	for (const auto& p : m_tickCount) totalCnt += p.second;
+	float totalPerSec = totalCnt / elapsedSec;
+
+	CString slog;
+	slog.Format("[TopTickers] 경과=[%.1f초] 총종목=[%d] 전체수신=[%d회] 전체초당=[%.1f회/초] =====\n",
+		elapsedSec, (int)sorted.size(), totalCnt, totalPerSec);
+	OutputDebugString(slog);
+
+	int rank = 1;
+	for (const auto& item : sorted)
+	{
+		float perSec = item.second / elapsedSec;
+
+		const char* curr = "-";
+		const char* volume = "-";
+		const char* rate = "-";
+		{
+			std::shared_lock<std::shared_mutex> readLock(g_codeMapLock);
+			auto it = g_codeToIndex.find(item.first);
+			if (it != g_codeToIndex.end())
+			{
+				const TickSnapshot& slot = g_tickSlots[it->second];
+				int seq = slot.seq.load(std::memory_order_acquire);
+				if (!(seq & 1))
+				{
+					if (slot.valid[23]) curr = slot.values[23];
+					if (slot.valid[27]) volume = slot.values[27];
+					if (slot.valid[33]) rate = slot.values[33];
+				}
+			}
+		}
+
+		slog.Format("[TopTickers][%3d위] code=[%-12s] 수신=[%3d회/%.1f회/초] 현재가=[%8s] 거래량=[%10s] 등락률=[%s]\n",
+			rank++, item.first.c_str(), item.second, perSec,  // perSec = item.second / elapsedSec
+			curr, volume, rate);
+		OutputDebugString(slog);
+
+		//if (rank > 30) break;
+	}
+
+	slog.Format("[TopTickers] ====END====\n");
+	OutputDebugString(slog);
+
+	// 마지막에 리셋
+	m_tickCount.clear();
+	m_tickCountStart = GetTickCount();
+}
+
+void CMainFrame::StartWorkerThread()
+{
+	if (m_bMainRTS)
+	{
+		m_workerRunning = true;
+		m_workerThread = std::thread(&CMainFrame::WorkerThreadFunc, this);
+	}
+}
+
+// 워커 스레드 종료 - OnDestroy 시점에 호출
+void CMainFrame::StopWorkerThread()
+{
+	if (m_bMainRTS)
+	{
+		m_workerRunning = false;
+		if (m_workerThread.joinable())
+			m_workerThread.join();
+	}
+}
+
+// 워커 스레드 함수
+void CMainFrame::WorkerThreadFunc()
+{
+	while (m_workerRunning)
+	{
+		SafeAlertItem* item = nullptr;
+		{
+			std::lock_guard<std::mutex> lock(m_alertMutex);
+			if (!m_alertQueue.empty())
+			{
+				item = m_alertQueue.front();
+				m_alertQueue.pop();
+
+				// 같은 종목이 큐에 또 있으면 최신값으로 교체하고 이전꺼 버림
+				while (!m_alertQueue.empty() &&
+					strcmp(m_alertQueue.front()->code, item->code) == 0)
+				{
+					delete item;
+					item = m_alertQueue.front();
+					m_alertQueue.pop();
+				}
+			}
+		}
+
+		int idx = EnsureSlotIndexForCode(item->code);
+		if (idx >= 0)
+		{
+			UpdateSnapshotFromAlert(g_tickSlots[idx], item);
+			Axis_PushDirtySlot(idx);  // ← API로
+		}
+		delete item;
+	}
+}
 //CString ip;
 //	ip.Format("%s", ipaddr);
 //	ip.TrimLeft(), ip.TrimRight();

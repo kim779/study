@@ -138,10 +138,17 @@ public:
 	{		
 		if (code.CompareNoCase("S0000") == 0 || code[0] == 'X')
 			return true;	
-
+		CString slog;
 		const auto ft = _mapSymbol.find(code);
 		if (ft != _mapSymbol.end())
+		{
+			slog.Format("[IsCode][%p] 있다 code =[%s] _mapSymbol size= [%d] ", this, code, _mapSymbol.size());
+			Output_DebugString(slog);
 			return true;
+		}
+		
+		slog.Format("[IsCode][%p]없다 code =[%s] _mapSymbol size= [%d] ", this, code, _mapSymbol.size());
+		Output_DebugString(slog);
 		return false;
 	}
 

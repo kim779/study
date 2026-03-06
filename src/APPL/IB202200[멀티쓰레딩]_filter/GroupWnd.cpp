@@ -203,7 +203,7 @@ LONG CGroupWnd::OnManage(WPARAM wParam, LPARAM lParam)
 	{
 	case MK_RTS_DATA:
 	{
-		RecvRTSx(lParam);
+	
 	}
 	break;
 	case MK_INTSAVE: // BUFFET
@@ -450,7 +450,7 @@ LONG CGroupWnd::OnManage(WPARAM wParam, LPARAM lParam)
 		//RecvRTS((CRecvData *)lParam);
 		break;
 	case MK_RTSDATAx:
-		RecvRTSx(lParam);
+	
 		break;
 	case MK_SELINT:
 		SendGrid(m_nCurSel, (int)lParam);
@@ -2453,33 +2453,6 @@ int CGroupWnd::OverOper(int nIndex, CGridData *sdata)
 
 
 // 2012.02.10 KSJ
-void CGroupWnd::RecvRTSx(LPARAM lParam)
-{
-	if (m_nGroup == 0)
-		return;
-
-	_cacheGrid.clear();
-	
-	const auto* alertR  = reinterpret_cast<const _alertR*>(lParam);
-	const CString code  = alertR->code;
-		
-	for_each_n(m_GridWnd.begin(), m_nGroup, [this, code](const auto& gridWnd) {	
-		if (gridWnd->IsCode(code))
-			_cacheGrid.push_back(gridWnd.get());
-	});
-
-	for_each(_cacheGrid.begin(), _cacheGrid.end(), [this, lParam](CGridWnd* pGridWnd) {
-		pGridWnd->HoldDraw();
-#ifdef DF_MAIN_RTS
-		pGridWnd->parsing_Alertx(lParam);
-#else
-		pGridWnd->parsingAlertx(lParam);
-#endif
-	});
-
-	for (auto& grid : _cacheGrid)
-		grid->ReleaseDraw();
-}
 
 void CGroupWnd::UpdateDraw()
 {
@@ -3095,32 +3068,63 @@ void CGroupWnd::UpdateFromTick(const std::vector<int>& slotIndices)
 	const TickSnapshot* slots = Axis_GetTickSlots();
 	if (!slots) return;
 
+	CString slog;
+	slog.Format("[UpdateFromTick] ------------------------------start-------------------------");
+	Output_DebugString(slog);
 	for (int slotIndex : slotIndices)
 	{
 		const TickSnapshot& slot = slots[slotIndex];
-		if (slot.code[0] == '\0') continue;
+		if (slot.code[0] == '\0')
+		{
+			CString slog;
+			slog.Format("[UpdateFromTick] slot EMPTY - slotIndex=[%d]\n", slotIndex);
+			Output_DebugString(slog);
+			continue;
+		}
 
 		// 쓰기 중이면 이번 tick 스킵 (절대 죽지 않음)
 		int seq = slot.seq.load(std::memory_order_acquire);
-		if (seq & 1) continue;
+		if (seq & 1)
+		{
+			CString slog;
+			slog.Format("[UpdateFromTick] seq & 1   seq=[%d]\n", seq);
+			Output_DebugString(slog);
+			continue;
+		}
 
 		CString code = slot.code;
 
-		// 이 슬롯을 표시하는 GridWnd 찾기
-		_cacheGrid.clear();
-		for_each_n(m_GridWnd.begin(), m_nGroup, [this, &code](const auto& gridWnd) {
-			if (gridWnd && gridWnd->IsCode(code))
-				_cacheGrid.push_back(gridWnd.get());
-			});
-
-		if (_cacheGrid.empty()) continue;
-
-		// GridWnd 갱신
-		for (CGridWnd* pGrid : _cacheGrid)
+		if (1)
 		{
-			if (!pGrid || !pGrid->GetSafeHwnd()) continue;
-			pGrid->HoldDraw();
-			pGrid->UpdateFromTickSlot(slotIndex);  // 아래 구현
+			for_each_n(m_GridWnd.begin(), m_nGroup, [this, slotIndex, code](const auto& gridWnd) {
+				gridWnd.get()->HoldDraw();
+				gridWnd.get()->IsCode(code);
+#ifdef DF_MAIN_RTS
+				gridWnd.get()->UpdateFromTickSlot(slotIndex);
+				gridWnd.get()->ReleaseDraw();
+#else
+				gridWnd.get()->parsingAlertx(lParam);
+#endif
+				});
+		}
+		else
+		{
+			// 이 슬롯을 표시하는 GridWnd 찾기
+			_cacheGrid.clear();
+			for_each_n(m_GridWnd.begin(), m_nGroup, [this, &code](const auto& gridWnd) {
+				if (gridWnd && gridWnd->IsCode(code))
+					_cacheGrid.push_back(gridWnd.get());
+				});
+
+			if (_cacheGrid.empty()) continue;
+
+			// GridWnd 갱신
+			for (CGridWnd* pGrid : _cacheGrid)
+			{
+				if (!pGrid || !pGrid->GetSafeHwnd()) continue;
+				pGrid->HoldDraw();
+				pGrid->UpdateFromTickSlot(slotIndex);  // 아래 구현
+			}
 		}
 
 		for (CGridWnd* pGrid : _cacheGrid)
