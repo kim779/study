@@ -37,7 +37,7 @@ static char THIS_FILE[] = __FILE__;
 #define TM_BALANCE 9898
 #define VS_NOMAL "1"
 #define VS_SKIP "2"
-#define VS_TIMER "3"
+
 
 CString GetField(const CString& src, int index)
 {
@@ -144,9 +144,6 @@ int CControlWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 	m_interval = GetPrivateProfileInt("Balance", "time", 500, userPath);
 	m_diffSec = GetPrivateProfileInt("Balance", "diff", 1, userPath);
-
-	if (m_Version == VS_TIMER)
-		SetTimer(TM_BALANCE, m_interval, nullptr);
 
 	m_slog.Format("[체결][cx_notify][%s]<%d> ------  m_Version ------[%s] ", __FUNCTION__, __LINE__, m_Version);
 	Output_DebugString(m_slog);
@@ -566,7 +563,7 @@ void CControlWnd::SendToMap(CString sData, bool bAll, CString sAccn/* = ""*/)
 		m_slog.Format("[cx_notify] size=[%d]     bAll=[%d] sAccn=[%s] [%s]   sLen=[%d]", m_drawQueue.size(), bAll, sAccn, sData, sLen);
 		Output_DebugString(m_slog);
 
-		//if (m_Version != VS_SKIP && m_Version != VS_TIMER)
+	
 		{
 			m_pParent->SendMessage(WM_USER, MAKEWPARAM(eventDLL, MAKEWORD(m_Param.key, evOnDblClk/*DblClick*/)), (LPARAM)m_Param.name.GetString());  //SendToMap
 			m_cs.Unlock();
@@ -682,34 +679,47 @@ Output_DebugString(m_slog);
 			m_dataList = sAccn + m_dataList;
 	}
 
-	if (m_diffSec > 0)
+	 if(m_diffSec == 0 || m_Version == VS_NOMAL)
 	{
+		m_pParent->SendMessage(WM_USER, MAKEWPARAM(eventDLL, MAKEWORD(m_Param.key, evOnDblClk/*DblClick*/)), (LPARAM)m_Param.name.GetString());
+	}
+	else if (m_flag == "A" || m_flag == "I" || m_flag == "D")
+	{
+		m_slog.Format("[cx_notify] [%s]<%d> [일시전송] flag=[%s] sCode=[%s]", __FUNCTION__, __LINE__, m_flag, sCode);
+		Output_DebugString(m_slog);
+		m_pParent->SendMessage(WM_USER, MAKEWPARAM(eventDLL, MAKEWORD(m_Param.key, evOnDblClk/*DblClick*/)), (LPARAM)m_Param.name.GetString());
+	}
+	else if (m_diffSec > 0)
+	{
+		// U(현재가 업데이트) : diffSec 기정 스킵 필터 적용
 		CSingleLock lock(&m_lock, TRUE);
+
 		if (quantityChanged || !ShouldSkipRTSByTimeDiff(sCode))
 		{
-			//m_drawQueue.push(m_dataList);
-			m_slog.Format("[cx_notify]]  [%s]<%d>  m_diffSec = [%d]   넣어주었다 !!!! ", sCode, m_drawQueue.size(), m_diffSec);
+			// 통과 : 일시 전송, 利 접몽 pending 젊게
+			m_pendingMap.RemoveKey(sCode);
+
+			m_slog.Format("[cx_notify] [%s]<%d> [일시전송-U] sCode=[%s] m_diffSec=[%d]", __FUNCTION__, __LINE__, sCode, m_diffSec);
 			Output_DebugString(m_slog);
-			m_pParent->SendMessage(WM_USER, MAKEWPARAM(eventDLL, MAKEWORD(m_Param.key, evOnDblClk/*DblClick*/)), (LPARAM)m_Param.name.GetString());  //SendToMap
+			m_pParent->SendMessage(WM_USER, MAKEWPARAM(eventDLL, MAKEWORD(m_Param.key, evOnDblClk/*DblClick*/)), (LPARAM)m_Param.name.GetString());
 		}
 		else
 		{
-			m_slog.Format("[cx_notify]]  [%s]<%d>   m_diffSec = [%d] 안넣어주었다 !!!! ", sCode, m_drawQueue.size(), m_diffSec);
+			// 스킵 : 접몽별 천신 데이타 덕어쉼기 보관
+			m_pendingMap.SetAt(sCode, m_dataList);
+
+			// 연속시간 동안 새 데이타가 안 온면 pending 발송하도록 타이링 리셋
+			if (!m_bPendingTimer)
+			{
+				SetTimer(TM_BALANCE, m_diffSec * 100, nullptr);
+				m_bPendingTimer = TRUE;
+			}
+
+			m_slog.Format("[cx_notify] [%s]<%d> [스킵-pending보관] sCode=[%s] m_diffSec=[%d] pendingCount=[%d]", __FUNCTION__, __LINE__, sCode, m_diffSec, m_pendingMap.GetCount());
 			Output_DebugString(m_slog);
 		}
+	}
 
-		//if (m_bWaitingFromVBS)
-		//	SendNextToVBS();
-	}
-	//else if (m_Version == VS_TIMER)
-	//{
-	//	CSingleLock lock(&m_lock, TRUE);
-	//	m_drawQueue.push(m_dataList);
-	//}
-	else if(m_diffSec == 0)
-	{
-		m_pParent->SendMessage(WM_USER, MAKEWPARAM(eventDLL, MAKEWORD(m_Param.key, evOnDblClk/*DblClick*/)), (LPARAM)m_Param.name.GetString());  //SendToMap
-	}
 
 #ifdef	SC_TEST
 	m_cs.Unlock();
@@ -907,11 +917,7 @@ void CControlWnd::SetSkipTime(SHORT sec)
 void CControlWnd::OnVersionChanged()
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
-	if (m_Version == VS_TIMER)
-	{
-		KillTimer(TM_BALANCE);
-		SetTimer(TM_BALANCE, m_interval, nullptr);
-	}
+
 	// TODO: 여기에 속성 처리기 코드를 추가합니다.
 }
 
@@ -923,14 +929,28 @@ void CControlWnd::OnTimer(UINT_PTR nIDEvent)
 	{
 		case TM_BALANCE:
 		{
-			if (m_drawQueue.empty())
+			if (m_pendingMap.IsEmpty())
 				return;
 
-			m_slog.Format("[체결][cx_notify][%s]<%d> ------  m_Version ------[%s] size = [%d]", __FUNCTION__, __LINE__, m_Version, m_drawQueue.size());
+			m_slog.Format("[cx_notify][%s]<%d> [pending발송시작] pendingCount=[%d]", __FUNCTION__, __LINE__, m_pendingMap.GetCount());
 			Output_DebugString(m_slog);
 
-			m_bWaitingFromVBS = TRUE;
-			SendNextToVBS();
+			POSITION pos = m_pendingMap.GetStartPosition();
+			while (pos != nullptr)
+			{
+				CString sCode, sData;
+				m_pendingMap.GetNextAssoc(pos, sCode, sData);
+
+				m_dataList = sData;
+			
+				m_slog.Format("[cx_notify][%s]<%d> [pending일시전송] sCode=[%s]", __FUNCTION__, __LINE__, sCode);
+				Output_DebugString(m_slog);
+
+				m_pParent->SendMessage(WM_USER, MAKEWPARAM(eventDLL, MAKEWORD(m_Param.key, evOnDblClk/*DblClick*/)), (LPARAM)m_Param.name.GetString());
+			}
+			m_pendingMap.RemoveAll();
+			KillTimer(TM_BALANCE);
+			m_bPendingTimer = FALSE;
 		}
 		break;
 

@@ -119,6 +119,8 @@ public:
 	bool ShouldSkipRTSByTimeDiff(CString sCode);
 	int m_diffSec{};
 	bool IsQuantityChanged(const CString& oldD, const CString& newD);
+	CMapStringToString m_pendingMap;
+	BOOL m_bPendingTimer{};
 #endif
 
 protected:

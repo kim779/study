@@ -1,0 +1,228 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB425301)
+MAPSIZE(19, 128)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("±¼¸²Ã¼", 9, NORMAL)
+TITLE("Untitled")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("bo425301")
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+COMBO  JNAM(0, 0, 110, 19)  TP_SUNKEN  LEN(3)  COUNT(0)  VCOUNT(24)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_NUM|EDIT_INPUT    COLOR(68, 69)  CUR(0)    TABORDER(1)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  SYMBOL7(110, 0, 128, 19)  TP_PUSH|IMAGE|AL_STRETCH      COLOR(24, 0)  CUR(10)    "°Ë»ö.BMP"    TABORDER(2)  ENABLE  &
+  VISIBLE  IMAGE  HOVER  HINTTYPE(IH_NONE)
+OUT  HNAM(295, 56, 433, 76)  LEN(40)  IO_MIXED|AL_LEFT||SUM    FONT("±¼¸²Ã¼", 9, BOLD)    COLOR(90, 130)  CUR(0)  LINECOLOR(65)          TABORDER(0)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_REF)  HELPTEXT("HNAM")HELPTEXT("HNAM")
+GRID  gridcom(210, 111, 520, 246)  VISIBLEROW(0)  CELLH(20)  MATRIX(500, 2)  FIX(0)  MAINCOLOR(208, 232)  LINECOLOR(0)  FOCUSCOLOR(0)  FOCUSKIND(0)  |FLEXIBLE|VSCROLL|HEADER    &
+	COLINFO("Col0")  LEN(3)  WIDTH(80)  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_NUM|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
+	COLINFO("Col1")  LEN(32)  WIDTH(80)  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_MIXED|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    TABORDER(3)  IOORDER(3)  ENABLE
+EDIT  edjnam(210, 55, 295, 75)  LEN(20)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(4)  IOORDER(4)  ENABLE  &
+  HINTTYPE(IH_NONE)
+CONTROL  cx_log(210, 255, 285, 290)  |FA_PROTECT  "CX_log"  ""  LEN(0)  EDIT_NOP    COLOR(192, 232)  TABORDER(0)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Sub send()
+	'SCREEN.Send 0
+End Sub
+
+Dim myFILE, myMAP
+myFILE = "userconf.ini"
+myMAP = SCREEN.GetMapName(0)
+
+
+Sub delete_samecode(scode)
+
+SYSTEM.Trace "delete_samecode scode = " & scode
+
+	For ii = 2 To gridcom.Rows
+SYSTEM.Trace gridcom.GetGridCell(ii, 1)
+	 	If Trim(scode) = Trim(gridcom.GetGridCell(ii, 1)) Then
+SYSTEM.Trace "delete row = " & ii
+	 		gridcom.RemoveRow(ii)
+	 		gridcom.Refresh()
+	 	End If
+	Next
+
+SYSTEM.Trace "grid row = " & gridcom.Rows
+End Sub
+
+
+Sub addRowToGrid(scode, sval)
+	gridcom.InsertRow(0)
+	gridcom.SetGridCell 1,1, scode
+	gridcom.SetGridCell 1,2, sval
+End Sub
+
+Sub Setcombo()
+	Dim item, sVal
+	JNAM.Clear
+
+	items = "03" & vbTab
+
+	For ii = 1 To gridcom.Rows
+	 	sVal = gridcom.GetGridCell(ii, 1) & " " & gridcom.GetGridCell(ii, 2)
+	 	items = items & sVal & vbTab
+SYSTEM.Trace "[4253] Setcombo sVal = " & sVal
+	Next
+
+	JNAM.SetItems(items)
+	write_combo_history()
+End Sub
+
+
+Sub write_combo_history()
+	Dim item, sVal, nRows
+	JNAM.Clear
+
+	items = "03" & vbTab
+
+	nRows = gridcom.Rows
+	For ii = 1 To gridcom.Rows
+	 	sVal = gridcom.GetGridCell(nRows, 1) & " " & gridcom.GetGridCell(nRows, 2)
+	 	items = items & sVal & vbTab
+	 	nRows = nRows - 1
+SYSTEM.Trace "[4253] write_combo_history sVal = " & sVal
+	Next
+
+	If SCREEN.CreateObject("Info") Then
+		INFO.pushData LOGIN.Name, myFILE, myMAP, "combohistory", items
+	End If
+End Sub
+
+
+Sub read_combo_history()
+	SYSTEM.Trace "read_combo_history"
+	gridcom.Clear
+	JNAM.Clear
+	Dim sComhis, arr, code, nam
+	If SCREEN.CreateObject("Info") Then
+		sComhis = Trim(INFO.popData (LOGIN.Name, myFILE, myMAP, "combohistory"))
+
+		If Len(Trim(sComhis)) > 0 Then
+			arr = Split(sComhis, vbTab)
+
+			For ii = 1 To UBound(arr)
+				code = Left(arr(ii),3)
+				nam = Mid(arr(ii),4)
+				addRowToGrid code, nam
+SYSTEM.Trace "[4253] read_combo_history code = " & code & " nam =" & nam
+			Next
+
+			JNAM.SetItems(sComhis)
+		Else
+SYSTEM.Trace "on data -> dosomething"
+		'	cx_log.DoSomething "Get_SFCODE_VAL", "sfcode"
+		End If
+
+	End If
+End Sub
+
+_AW_ONSTART_AW_
+SYSTEM.Trace "IB425301 onStart"
+read_combo_history()
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+SCREEN.Send = False
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+SCREEN.Proc "parent.Get_Ini" , ""
+SCREEN.Proc "parent.SelectRD" , ""
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(JNAM)
+_AW_ONCHANGE_AW_
+'If SCREEN.Object("main.rd2").Checked = True Then
+    SCREEN.Proc "main.Set_Ini", "1, 0, 1"
+	SCREEN.Proc "main.send_id", ""
+'End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(SYMBOL7)
+_AW_ONCLICK_AW_
+
+
+SCREEN.GetCode 137, "edjnam", "HNAM", 1
+
+SYSTEM.Trace "-----------------------------------------"
+SYSTEM.Trace "edjnam = " & edjnam.Data
+SYSTEM.Trace "HNAM = " & HNAM.Data
+
+addRowToGrid edjnam.Data , HNAM.text
+delete_samecode(edjnam.Data)
+Setcombo()
+
+SCREEN.Proc "main.Set_Ini", "1, 0, 1"
+SCREEN.Proc "main.send_id", ""
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(gridcom)
+_AW_ONCLICK_AW_
+gridcom.Clear
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(cx_log)
+_AW_ONDBLCLK_AW_
+Dim arr
+Dim sret
+
+sret = cx_log.sVal
+
+arr = Split(sret, "|")
+
+SYSTEM.Trace "--- arr(0) = " & arr(0)
+SYSTEM.Trace "--- arr(1) = " & arr(1)
+SYSTEM.Trace "--- arr(2) = " & arr(2)
+
+
+If arr(0) <> "sfcode" Then
+SYSTEM.Trace "------- [425301] cx_log wrong sgubn"
+	Exit Sub
+End If
+
+If Len(Trim(arr(1))) = 0 Then
+SYSTEM.Trace "------- [425301] no value from cx_log"
+	Exit Sub
+End If
+
+addRowToGrid arr(1) , arr(2)
+delete_samecode(arr(1))
+Setcombo()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

@@ -1240,6 +1240,64 @@ void CMapWnd::DoSomething(BSTR sDo, BSTR sgubn)
 		code.Empty();
 		m_pWizard->SendMessage(WM_USER, MAKEWPARAM(0x45, 0), (long)(LPCTSTR)code);
 	}
+	else if (strDo == "getATMCode")
+	{
+		CString path;
+		CFile	file;
+		path.Format("%s\\tab\\opcode2.dat", m_strHome);
+		struct  ojcodh  OJCodh {};
+
+		if (!file.Open(path, CFile::modeRead | CFile::typeBinary | CFile::shareDenyNone))
+		{
+			MessageBox("파일[opcode.dat]이 존재하지 않습니다.");
+			return ;
+		}
+
+		CArray<ojcode, ojcode>		m_arrayOcode;
+		int len = file.Read(&OJCodh, sizeof(struct ojcodh));
+		int codeN = gsl::narrow_cast<int>((file.GetLength() - len) / sizeof(struct ojcode));
+		//CString slog;
+		for (int ii = 0; ii < codeN; ii++)
+		{
+			struct  ojcode OJCode;
+			file.Read(&OJCode, sizeof(struct ojcode));
+			m_arrayOcode.Add(OJCode);
+		} 
+		file.Close();
+
+		CString sATMCallCode, sATMPutCode;
+
+		for (int ii = 0; ii < m_arrayOcode.GetSize(); ii++)
+		{
+			const struct ojcode& oj = m_arrayOcode.GetAt(ii);
+
+			if (oj.atmg != 0x01)   // ATM 행사가만
+				continue;
+
+			// call : 인덱스가 높을수록 근월물 → 뒤에서부터 탐색
+			for (int m = 10; m >= 0; m--)
+			{
+				if (oj.call[m].yorn == '1')
+				{
+					sATMCallCode = CString(oj.call[m].cod2, OCodeLen);
+					break;
+				}
+			}
+
+			// put : 인덱스가 낮을수록 근월물 → 앞에서부터 탐색
+			for (int m = 0; m < 11; m++)
+			{
+				if (oj.put[m].yorn == '1')
+				{
+					sATMPutCode = CString(oj.put[m].cod2, OCodeLen);
+					break;
+				}
+			}
+			break;  // ATM은 1개뿐이므로 찾으면 종료
+		}
+		
+		m_sVal.Format("%s\t%s", sATMCallCode, sATMPutCode);
+	}
 	// TODO: 여기에 디스패치 처리기 코드를 추가합니다.
 }
 
