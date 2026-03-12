@@ -123,6 +123,13 @@ int CMainWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	RequestMarketTime();
 	CheckRTSTimer(true);
 
+	if (Axis_IsMainRTS())
+		m_slog.Format("[2022][MAINRTS] true");
+	else
+		m_slog.Format("[2022][MAINRTS] false");
+
+	OutputDebugString(m_slog);
+
 	return 1;
 }
 
@@ -153,10 +160,9 @@ void CMainWnd::CheckRTSTimer(bool bFirst)
 		else  //최초 화면 오픈하였을 경우
 		{
 			m_iTime = iTime;
-			//SetTimer(TM_RTSTIME, m_iTime, nullptr);
 		}
 		_pApp->setDelaytime(m_iTime);
-		SetTimer(TM_RTSTIME, m_iTime, nullptr);
+		if (Axis_IsMainRTS()) SetTimer(TM_RTSTIME, m_iTime, nullptr);
 		return;
 	}
 
@@ -179,7 +185,7 @@ void CMainWnd::CheckRTSTimer(bool bFirst)
 			m_iTime = iTime;
 		}
 		_pApp->setDelaytime(m_iTime);
-		SetTimer(TM_RTSTIME, m_iTime, nullptr);
+		if (Axis_IsMainRTS()) SetTimer(TM_RTSTIME, m_iTime, nullptr);
 		return;
 	}
 	else
@@ -216,7 +222,8 @@ void CMainWnd::CheckRTSTimer(bool bFirst)
 					m_iTime = iTime;
 				}
 				_pApp->setDelaytime(m_iTime);
-				SetTimer(TM_RTSTIME, m_iTime, nullptr);
+				
+				if (Axis_IsMainRTS()) SetTimer(TM_RTSTIME, m_iTime, nullptr);
 				return;
 			}
 		}
@@ -233,7 +240,7 @@ void CMainWnd::CheckRTSTimer(bool bFirst)
 	else  //최초 화면 오픈하였을 경우
 	{
 		m_iTime = iTime;
-		SetTimer(TM_RTSTIME, m_iTime, nullptr);
+		if (Axis_IsMainRTS()) SetTimer(TM_RTSTIME, m_iTime, nullptr);
 	}
 	_pApp->setDelaytime(m_iTime);
 }
@@ -1114,79 +1121,80 @@ LONG CMainWnd::OnUser(WPARAM wParam, LPARAM lParam)
 
 	case DLL_ALERTx:
 	{
-#ifndef DF_MAIN_RTS
-		if (m_bDestroy || m_strBeginTime.IsEmpty() || m_pGroupWnd == nullptr)
-			break;
-
-		if (!m_bAlertx)
-			return 0;
-
-		const auto* alertR = reinterpret_cast<const _alertR*>(lParam);
-
-		if (alertR == nullptr && alertR->size <= 0)
-			return 0;
-		const CString code = alertR->code;
-		if (!m_pGroupWnd->isCodeSymbol(code))
-			return 0;
-
-
-		const DWORD* data = reinterpret_cast<const DWORD*>(alertR->ptr[0]);
-		COleDateTime oTime;
-		oTime = COleDateTime::GetCurrentTime();
-		CString strCurTime;
-		strCurTime.Format(_T("%02d%02d%02d"), oTime.GetHour(), oTime.GetMinute(), oTime.GetSecond());
-
-		int h1 = _ttoi(strCurTime.Mid(0, 2));
-		int m1 = _ttoi(strCurTime.Mid(2, 2));
-		int s1 = _ttoi(strCurTime.Mid(4, 2));
-		CTime timecur(oTime.GetYear(), oTime.GetMonth(), oTime.GetDay(), h1, m1, s1);
-
-		//m_strBeginTimeEnd = "141100";
-		h1 = _ttoi(m_strBeginTimeEnd.Mid(0, 2));
-		m1 = _ttoi(m_strBeginTimeEnd.Mid(2, 2));
-		s1 = _ttoi(m_strBeginTimeEnd.Mid(4, 2));
-		CTime timeOri(oTime.GetYear(), oTime.GetMonth(), oTime.GetDay(), h1, m1, s1);
-		CTimeSpan span(0, 0, 0, 10); // 10초
-		CTime timeend = timeOri - span;
-
-		bool bOverChecking{};
-		bOverChecking = IsEnableRTSTimeCheck(timecur, timeend, m_icheckTime);
-
-		std::string scode = CStringA(code);
-
-		//if (bOverChecking)
-		//{
-		//m_slog.Format("[.]");
-		//OutputDebugString(m_slog);
-
-		if (ShouldSkipRTSByServerTime(scode, (char*)data[34], m_DiffSec) == true && bOverChecking)
+		if (!Axis_IsMainRTS())
 		{
-		//	m_slog.Format("-------------------[IB202200][skipped]!!!!!!! thread id = [%d]", GetCurrentThreadId());
-		//	OutputDebugString(m_slog);
-			return 0;
-		}
-		//}
-		else
-		{
-		//	m_slog.Format("==============[IB202200][NOskipped]@@@@ bOverChecking = [%d]  code=[%s] 거래량=[%s] bOverChecking=[%d] ", bOverChecking, (LPCTSTR)&scode, (char*)data[27], bOverChecking);
-		//	OutputDebugString(m_slog);
-		
-			static constexpr int arr[] = { 41, 61, 101, 104, 106, 107, 109, 146, 181 };
-			auto& rmap = m_pGroupWnd->getRSymbol();
-			const bool bHoga = std::any_of(std::begin(arr), std::end(arr), [&rmap](const int symbol) {
-				return rmap.find(symbol) != rmap.end();
-				});
+			if (m_bDestroy || m_strBeginTime.IsEmpty() || m_pGroupWnd == nullptr)
+				break;
 
-			if (bHoga == false && !(alertR->stat & alert_SCR))
+			if (!m_bAlertx)
 				return 0;
 
-			m_pGroupWnd->initAlert();
-			AxStd::async([this, lParam]() {
-				m_pGroupWnd->RecvRTSx(lParam);
-				});
-			m_pGroupWnd->UpdateDraw();
+			const auto* alertR = reinterpret_cast<const _alertR*>(lParam);
+
+			if (alertR == nullptr && alertR->size <= 0)
+				return 0;
+			const CString code = alertR->code;
+			if (!m_pGroupWnd->isCodeSymbol(code))
+				return 0;
+
+
+			const DWORD* data = reinterpret_cast<const DWORD*>(alertR->ptr[0]);
+			COleDateTime oTime;
+			oTime = COleDateTime::GetCurrentTime();
+			CString strCurTime;
+			strCurTime.Format(_T("%02d%02d%02d"), oTime.GetHour(), oTime.GetMinute(), oTime.GetSecond());
+
+			int h1 = _ttoi(strCurTime.Mid(0, 2));
+			int m1 = _ttoi(strCurTime.Mid(2, 2));
+			int s1 = _ttoi(strCurTime.Mid(4, 2));
+			CTime timecur(oTime.GetYear(), oTime.GetMonth(), oTime.GetDay(), h1, m1, s1);
+
+			//m_strBeginTimeEnd = "141100";
+			h1 = _ttoi(m_strBeginTimeEnd.Mid(0, 2));
+			m1 = _ttoi(m_strBeginTimeEnd.Mid(2, 2));
+			s1 = _ttoi(m_strBeginTimeEnd.Mid(4, 2));
+			CTime timeOri(oTime.GetYear(), oTime.GetMonth(), oTime.GetDay(), h1, m1, s1);
+			CTimeSpan span(0, 0, 0, 10); // 10초
+			CTime timeend = timeOri - span;
+
+			bool bOverChecking{};
+			bOverChecking = IsEnableRTSTimeCheck(timecur, timeend, m_icheckTime);
+
+			std::string scode = CStringA(code);
+
+			//if (bOverChecking)
+			//{
+			//m_slog.Format("[.]");
+			//OutputDebugString(m_slog);
+
+			if (ShouldSkipRTSByServerTime(scode, (char*)data[34], m_DiffSec) == true && bOverChecking)
+			{
+				//	m_slog.Format("-------------------[IB202200][skipped]!!!!!!! thread id = [%d]", GetCurrentThreadId());
+				//	OutputDebugString(m_slog);
+				return 0;
+			}
+			//}
+			else
+			{
+				//	m_slog.Format("==============[IB202200][NOskipped]@@@@ bOverChecking = [%d]  code=[%s] 거래량=[%s] bOverChecking=[%d] ", bOverChecking, (LPCTSTR)&scode, (char*)data[27], bOverChecking);
+				//	OutputDebugString(m_slog);
+
+				static constexpr int arr[] = { 41, 61, 101, 104, 106, 107, 109, 146, 181 };
+				auto& rmap = m_pGroupWnd->getRSymbol();
+				const bool bHoga = std::any_of(std::begin(arr), std::end(arr), [&rmap](const int symbol) {
+					return rmap.find(symbol) != rmap.end();
+					});
+
+				if (bHoga == false && !(alertR->stat & alert_SCR))
+					return 0;
+
+				m_pGroupWnd->initAlert();
+				AxStd::async([this, lParam]() {
+					m_pGroupWnd->RecvRTSx(lParam);
+					});
+				m_pGroupWnd->UpdateDraw();
+			}
 		}
-#endif
 	}
 	break;
 	// KSJ 
@@ -2192,29 +2200,29 @@ void CMainWnd::OnTimer(UINT nIDEvent)
 	else if (nIDEvent == TM_RTSTIME)
 	{
 		// CPU 체크해서 타이머 동적 조절
-		int cpu = GetProcessCpuUsage();
+		//int cpu = GetProcessCpuUsage();
 
-		int newInterval;
-		if (cpu > 80)       newInterval = m_iTime * 3;   // 매우 바쁨 - 3배 느리게
-		else if (cpu > 60)  newInterval = m_iTime * 2;   // 바쁨 - 2배 느리게
-		else if (cpu > 40)  newInterval = m_iTime;        // 보통 - 설정값 그대로
-		else if (cpu > 20)  newInterval = m_iTime * 2 / 3; // 여유 - 1.5배 빠르게
-		else                newInterval = m_iTime / 2;    // 매우 여유 - 2배 빠르게
+		//int newInterval;
+		//if (cpu > 80)       newInterval = m_iTime * 3;   // 매우 바쁨 - 3배 느리게
+		//else if (cpu > 60)  newInterval = m_iTime * 2;   // 바쁨 - 2배 느리게
+		//else if (cpu > 40)  newInterval = m_iTime;        // 보통 - 설정값 그대로
+		//else if (cpu > 20)  newInterval = m_iTime * 2 / 3; // 여유 - 1.5배 빠르게
+		//else                newInterval = m_iTime / 2;    // 매우 여유 - 2배 빠르게
 
-		// 최소값 보장 (너무 빠르면 역효과)
-		if (newInterval < 50) newInterval = 50;  // 최소 50ms
+		//// 최소값 보장 (너무 빠르면 역효과)
+		//if (newInterval < 50) newInterval = 50;  // 최소 50ms
 
-		if (newInterval != m_iCurInterval)
-		{
-			KillTimer(TM_RTSTIME);
-			SetTimer(TM_RTSTIME, newInterval, nullptr);
-			m_iCurInterval = newInterval;
+		//if (newInterval != m_iCurInterval)
+		//{
+		//	KillTimer(TM_RTSTIME);
+		//	if (Axis_IsMainRTS()) SetTimer(TM_RTSTIME, newInterval, nullptr);
+		//	m_iCurInterval = newInterval;
 
-			CString slog;
-			slog.Format("[Timer] CPU=[%d%%] interval=[%d→%d ms]\n",
-				cpu, m_iCurInterval, newInterval);
-			OutputDebugString(slog);
-		}
+		//	CString slog;
+		//	slog.Format("[Timer] CPU=[%d%%] interval=[%d→%d ms]\n",
+		//		cpu, m_iCurInterval, newInterval);
+		//	OutputDebugString(slog);
+		//}
 
 		// dirty 큐 처리 - API로
 		static int dirtyBuf[MAX_SLOT];

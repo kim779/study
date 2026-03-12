@@ -2655,7 +2655,7 @@ void CGridWnd::sendTransactionTR(int update,int nStart,int nEnd)
 	//struct _inters* pinters{};
 	int	ncnt = 0;
 	const int nInterCnt = m_inters.size();
-	CString tempStr;
+	CString tempStr, stmp;
 	int pos = -1;
 
 	for (int ii = 0; ii < nInterCnt; ii++)
@@ -2671,6 +2671,10 @@ void CGridWnd::sendTransactionTR(int update,int nStart,int nEnd)
 			{
 				pinters.get()->code = tempStr.Mid(0, pos);
 			}
+
+			CString code = pinters.get()->code.IsEmpty() ? _T(" ") : pinters.get()->code;
+			stmp += code;
+			stmp += _T("\t");
 
 			ncnt++;
 		}
@@ -2710,6 +2714,10 @@ void CGridWnd::sendTransactionTR(int update,int nStart,int nEnd)
 	{
 		trkey->kind = TRKEY_GRIDUPJONG;
 	}
+
+	stmp += "|";
+	stmp += "0\t23\t24\t27\t33\t111\t112\t115\t116";
+	m_pMainWnd->SendMessage(WM_MANAGE, MK_SETRTSCODE, (LPARAM)(LPCSTR)(LPCTSTR)stmp);
 
 	m_updateROW = m_staticUpdate;
 
@@ -5183,6 +5191,7 @@ void CGridWnd::initialGrid(bool size)
 	m_grid->SetMarkerColor(m_clrMarkerTXT);
 	m_grid->SetMarkerShadow(m_bShadow);
 	m_grid->SetInfo(m_bInfo);
+	m_grid->m_iTime = ((CMainWnd*)m_pMainWnd)->m_iTime;
 //	m_grid->SetGridLine(GVLN_VERT);//BUFFET LINE
 //	m_grid->SetStepColor(1, GetAxColor(68), GetAxColor(77));//BUFF
 ////////////////////////////////////////////////////
@@ -8744,7 +8753,12 @@ void CGridWnd::parsingAlertx(LPARAM lParam)
 			//KSJ
 		}
 
+#ifdef DF_RTS_CHECK
+		m_grid->ReDrawTimer();
+#else
 		m_grid->ReDrawAll();
+#endif
+		
 
 	}
 }
@@ -11626,4 +11640,606 @@ void CGridWnd::setSeverMemoCheck(int xrow, bool bflag)
 
 	auto& pinters = m_inters.at(xrow);
 	pinters.get()->bMemo = bflag ? "Y" : "N";
+}
+
+void CGridWnd::UpdateFromTickSlot(int slotIndex)
+{
+	CString slog;
+	CString stmp;
+
+#ifdef DF_DLL_RTS
+	const TickSnapshot* slots = DLL_GetTickSlots();
+#else
+	const TickSnapshot* slots = Axis_GetTickSlots();
+#endif
+	if (!slots)
+	{
+		slog.Format("[UpdateFromTickSlot] slots=[%d]\n", slots);
+		Output_DebugString(slog);
+		return;
+	}
+
+	const TickSnapshot& slot = slots[slotIndex];
+	if (slot.code[0] == '\0')
+	{
+		slog.Format("[UpdateFromTickSlot] slotIndex=[%d]\n", slotIndex);
+		Output_DebugString(slog);
+		return;
+	}
+
+	// seqlock - 쓰기 중이면 스킵
+	int seq = slot.seq.load(std::memory_order_acquire);
+	if (seq & 1)
+	{
+		slog.Format("[UpdateFromTickSlot] seq=[%d]\n", seq);
+		Output_DebugString(slog);
+		return;
+	}
+
+	// _alertR 임시 생성 (스택 - 힙할당 없음)
+	_alertR alertR{};
+	alertR.code = slot.code;
+	alertR.stat = 1;
+	alertR.size = 1;
+
+	slog.Format("[UpdateFromTickSlot] code=[%s] slotIndex=[%d]\n", alertR.code, slotIndex);
+	Output_DebugString(slog);
+
+	// 현재 시각
+	SYSTEMTIME st;
+	GetLocalTime(&st);
+	int now = st.wHour * 10000 + st.wMinute * 100 + st.wSecond;
+
+	// CMainWnd에서 장시간 4개 변수 참조 (parsingAlertx의 m_strBeginTime/m_strEndTime 대체)
+	const int beginTime = _ttoi(((CMainWnd*)m_pMainWnd)->m_strBeginTime);    // 장전 동시호가 시작
+	const int beginTimeEnd = _ttoi(((CMainWnd*)m_pMainWnd)->m_strBeginTimeEnd); // 장전 동시호가 종료
+	const int endTime = _ttoi(((CMainWnd*)m_pMainWnd)->m_strEndTime);      // 장후 동시호가 시작
+	const int endTimeEnd = _ttoi(((CMainWnd*)m_pMainWnd)->m_strEndTimeEnd);   // 장후 동시호가 종료
+
+	// 예상가 시간 여부: 장전 또는 장후 동시호가 구간일 때만 111 심볼 허용
+	// parsingAlertx의 조건: m_strBeginTime <= strTime && m_strEndTime >= strTime
+	bool bExpected = (now >= beginTime && now <= beginTimeEnd) ||
+		(now >= endTime && now <= endTimeEnd);
+
+	// record 구성: 예상가 시간이 아니면 111(예상가) 심볼 스킵
+	DWORD record[MAX_FIELD_INDEX]{};
+	for (int sym = 0; sym < MAX_SYMBOLS && sym < MAX_FIELD_INDEX; sym++)
+	{
+		if (!slot.valid[sym]) continue;
+
+		if (sym == 111 && !bExpected) continue;
+
+		record[sym] = (DWORD)slot.values[sym];
+	}
+	alertR.ptr[0] = (DWORD)record;
+
+	// ---------------------------------------------------------------
+	// 이하: parsingAlertx 로직 그대로 수행
+	// ---------------------------------------------------------------
+	m_grid->setReal(true);
+
+	DWORD* data = (DWORD*)alertR.ptr[0];
+
+	CString code = alertR.code;
+	CString strCode;
+	CString strGubn;
+	bool    bKrx = true;
+
+	// 코드 정규화 (parsingAlertx 원본 동일)
+	if (code.GetLength() == 7)
+		strCode = code.Mid(1);
+	else if (code.GetAt(0) == 'X')
+		strCode = code.Mid(1);
+	else
+		strCode = code;
+
+	// NXT/통합 시장은 예상가 없음
+	if (code[0] == 'M' || code[0] == 'N')
+		bKrx = false;
+
+	// 구분값
+	if (data[0])
+		strGubn = (char*)data[0];
+
+	// S0000: 뉴스 처리 후 리턴
+	if (code.CompareNoCase("S0000") == 0)
+	{
+		parsingNewsx(data);
+		return;
+	}
+
+	int count = CheckRealTimeCode(code);
+	if (count == 0) return;
+
+	// 지수일 때 예상가 표시: 'X'로 시작하는 5자리 코드 → 'K'로 교체
+	if (!strGubn.Compare("X") && code.GetLength() == 5)
+	{
+		code.Delete(0);
+		code.Insert(0, 'K');
+		strCode = code;
+	}
+
+	CString str950, str951;
+	BOOL    bTicker = TRUE;
+
+	for (int rowPosition = 0; rowPosition < count; rowPosition++)
+	{
+		int xrow = m_irowCode[rowPosition];
+
+		// bTicker 판단 (parsingAlertx 원본 동일)
+		if (!data[34] && data[40])
+		{
+			if (!data[111])
+				bTicker = FALSE;
+		}
+		if (data[734] || data[740])
+			bTicker = FALSE;
+
+		CString entry;
+		CString oldEXP = m_grid->GetItemText(xrow, colEXPECT);
+		CString newEXP;
+		BOOL    bTransSymbol = FALSE;
+		BOOL    bDaebi = FALSE;
+		BOOL    bZisu = FALSE;
+		bool    updatePoss = false;
+
+		// saveData: 예상가/현재가 중 있는 것
+		CString saveData;
+		if (data[111])      saveData = (char*)data[111];
+		else if (data[23])  saveData = (char*)data[23];
+
+		// bLast 필터: 선물 필터링 마지막 데이터 무시
+		CString str90 = data[90] ? (char*)data[90] : "";
+		str90.TrimLeft(); str90.TrimRight();
+		BOOL bLast = FALSE;
+		if ((!strGubn.Compare("L") || !strGubn.Compare("4") ||
+			!strGubn.Compare("P") || !strGubn.Compare("g")) &&
+			(!str90.Compare("99") || !str90.Compare("40")))
+		{
+			m_grid->SetItemText(xrow, colEXPECT, "0");
+			m_grid->SetItemData(xrow, colEXPECT, 0);
+			bLast = TRUE;
+		}
+
+		const int nEndOPMarket = m_grid->GetItemData(xrow, colEXPECT);
+
+		// -------------------------------------------------------
+		// 예상가 / 현재가 판단 (parsingAlertx 원본 동일)
+		// -------------------------------------------------------
+		if ((strGubn == "n" || !strGubn.Compare("X") || data[111] || nEndOPMarket == 1) && !bLast)
+		{
+			if (data[111])
+				entry = (char*)data[111];
+			else if (nEndOPMarket == 1)
+				entry = " ";
+			else
+			{
+				bZisu = TRUE;
+				entry = (char*)data[23];
+			}
+
+			if (entry != "0" && entry != "-0" && entry != "0.00" &&
+				entry != "+0" && entry != " 0" && entry != " ")
+			{
+				m_grid->SetItemText(xrow, colEXPECT, "1");
+			}
+			else
+			{
+				entry = m_grid->GetItemText(xrow, colCURR);
+				// 원본과 동일하게 continue (row 루프의 다음 row로)
+				goto REDRAW;
+			}
+
+			if (!_bManual)          // 예상 버튼 안 눌린 상태
+			{
+				if (_bAutoCheck)    // 자동 체크된 상태
+					bTransSymbol = TRUE;
+				else
+				{
+					if (!entry.IsEmpty())
+						m_grid->SetItemText(xrow, colEXPECT, "0");
+				}
+			}
+			else
+				bTransSymbol = TRUE;
+		}
+		else if (data[23])
+		{
+			entry = (char*)data[23];
+
+			if (!_bManual)          // 예상 버튼 안 눌린 상태
+			{
+				if (_bAutoCheck)    // 자동 체크된 상태
+				{
+					CString strTime = data[34] ? (char*)data[34] : "";
+
+					if (m_strBeginTime <= strTime && m_strEndTime >= strTime && bKrx)
+					{
+						if (entry != "0" && entry != "-0" && entry != "0.00" &&
+							entry != "+0" && entry != " 0" && entry != " ")
+						{
+							m_grid->SetItemText(xrow, colEXPECT, "1");
+						}
+						else
+						{
+							m_grid->SetItemText(xrow, colEXPECT, "0");
+							entry = m_grid->GetItemText(xrow, colCURR);
+							goto REDRAW;
+						}
+					}
+					else
+					{
+						m_grid->SetItemText(xrow, colEXPECT, "0");
+					}
+				}
+			}
+			else                    // 예상 버튼 눌린 상태 (_bManual)
+			{
+				if (!entry.IsEmpty())
+				{
+					bTransSymbol = TRUE;
+					if (entry != "0" && entry != "-0" && entry != "0.00" &&
+						entry != "+0" && entry != " 0" && entry != " ")
+					{
+						m_grid->SetItemText(xrow, colEXPECT, "1");
+					}
+					else
+					{
+						m_grid->SetItemText(xrow, colEXPECT, "0");
+						entry = m_grid->GetItemText(xrow, colCURR);
+						goto REDRAW;
+					}
+				}
+			}
+		}
+
+		{
+			newEXP = m_grid->GetItemText(xrow, colEXPECT);
+			const BOOL bForceDraw = (newEXP == oldEXP) ? FALSE : TRUE;
+			BOOL       bExpect = (BOOL)atoi(m_grid->GetItemText(xrow, colEXPECT));
+
+			const int  countX = m_gridHdrX.GetSize();
+			bool       bKospi = (strCode.GetLength() == 6);
+			CString    symbol;
+			_gridHdr   xgridHdr;
+
+			// -------------------------------------------------------
+			// 심볼 루프 (parsingAlertx 원본 동일)
+			// -------------------------------------------------------
+			for (int ii = 2; ii < countX; ii++)
+			{
+				xgridHdr = m_gridHdrX.GetAt(ii);
+				symbol = CString(xgridHdr.symbol, strlen(xgridHdr.symbol));
+
+				if (symbol.GetLength() >= 3)
+					symbol = symbol.Right(3);
+
+				entry.Empty();
+
+				if (!bTransSymbol)
+				{
+					if (!symbol.Compare("111"))  entry = (char*)data[23];
+					else if (!symbol.Compare("112"))  entry = (char*)data[27];
+					else if (!symbol.Compare("115"))  entry = (char*)data[24];
+					else if (!symbol.Compare("116"))  entry = (char*)data[33];
+					else if (!bKospi && !symbol.Compare("204")) entry = " ";
+					else if (atof(symbol) == 0)       entry = " ";
+					else                              entry = (char*)data[atoi(symbol)];
+				}
+				else if (data[atoi(symbol)] && bZisu)
+				{
+					entry = (char*)data[atoi(symbol)];
+				}
+				else if (bTransSymbol)
+				{
+					if (!symbol.Compare("023"))  entry = (char*)data[111];
+					else if (!symbol.Compare("027"))  entry = (char*)data[112];
+					else if (!symbol.Compare("024"))  entry = (char*)data[115];
+					else if (!symbol.Compare("033"))  entry = (char*)data[116];
+					else if (!bKospi && !symbol.Compare("204")) entry = " ";
+					else if (atof(symbol) == 0)       entry = " ";
+					else                              entry = (char*)data[atoi(symbol)];
+				}
+				else
+					continue;
+
+				if (!bForceDraw && IH::TOf(entry) == IH::TOf(m_grid->GetItemText(xrow, ii)))
+					continue;
+
+				if (!(xgridHdr.attr & GVAT_HIDDEN) && !entry.IsEmpty())
+				{
+					// 시가대비 계산 필드 (symbol 2029/2030/2031)
+					if ((strcmp("2029", xgridHdr.symbol) == 0) ||
+						(strcmp("2030", xgridHdr.symbol) == 0) ||
+						(strcmp("2031", xgridHdr.symbol) == 0))
+					{
+						if ((1 == xgridHdr.needs) || (3 == xgridHdr.needs))
+						{
+							CString strVal = entry;
+							CString strDiff = strVal;
+							if (strVal[0] == '+' || strVal[0] == '-')
+								strDiff = strVal.Mid(1);
+
+							double dDiffOpen = 0.0;
+							double dPClose = atof((m_grid->GetItemText(xrow, colPCURR)).GetBuffer(0));
+							double dVal = atof(strDiff.GetBuffer(0));
+
+							if (dVal != 0 && dPClose != 0)
+							{
+								dDiffOpen = (dVal - dPClose) / dPClose * 100;
+								if (1 == xgridHdr.needs)
+									entry.Format("%s(%0.2f%c)", strVal, dDiffOpen, P_PER);
+								else if (3 == xgridHdr.needs)
+								{
+									if (0 > dDiffOpen) entry.Format("%0.2f%c", dDiffOpen, P_PER);
+									else if (0 == dDiffOpen) entry.Format(" %0.2f%c", dDiffOpen, P_PER);
+									else                     entry.Format(" +%0.2f%c", dDiffOpen, P_PER);
+								}
+							}
+						}
+					}
+				}
+
+				// 예상버튼 안 눌린 상태 + 동시호가일 때 colCURR 0값 처리
+				if ((ii == colCURR) && bExpect && !m_bExpect)
+				{
+					entry.TrimLeft(); entry.TrimRight();
+					if (entry == "0" || entry == "-0" || entry == "+0" || entry == "")
+					{
+						entry = m_grid->GetItemText(xrow, colCURR);
+						goto REDRAW;
+					}
+				}
+
+				// KOSPI/KOSDAQ 지수값 저장
+				if (ii == colCURR)
+				{
+					CString tempStr;
+					if (code.Find("K0001") > -1)
+					{
+						m_dKospi = atof(entry);
+						tempStr.Format("%.2f", m_dKospi);
+						m_dKospi = atof(tempStr);
+					}
+					else if (code.Find("KQ001") > -1)
+					{
+						m_dKosdaq = atof(entry);
+						tempStr.Format("%.2f", m_dKosdaq);
+						m_dKosdaq = atof(tempStr);
+					}
+				}
+
+				// 보합(대비/등락률) 0값 처리
+				if ((strcmp("2115", xgridHdr.symbol) == 0) || (strcmp("2024", xgridHdr.symbol) == 0) ||
+					(strcmp("2116", xgridHdr.symbol) == 0) || (strcmp("2033", xgridHdr.symbol) == 0))
+				{
+					entry.TrimLeft(); entry.TrimRight();
+					if (entry == "0" || entry == "-0" || entry == "0.00" || entry == "+0" ||
+						entry == " 0" || entry == "30" || entry == ".00" ||
+						entry == "+0.00" || entry == "-0.00")
+					{
+						bDaebi = TRUE;
+					}
+				}
+				else
+				{
+					entry.TrimLeft(); entry.TrimRight();
+					if (entry == "0" || entry == "-0" || entry == "0.00" || entry == "+0" ||
+						entry == " 0" || entry == ".00" || entry == "+0.00" || entry == "-0.00" ||
+						atof(entry) == 0 || atof(symbol) == 0)
+					{
+						if (entry.GetLength() > 0 && atof(entry.Mid(1)) == 0) entry = " ";
+					}
+				}
+
+				// colCURR: 빈값이면 기존값 유지
+				if (ii == colCURR && entry == "")
+					entry = m_grid->GetItemText(xrow, colCURR);
+
+				CString strPreValue = m_grid->GetItemText(xrow, ii);
+				strPreValue.TrimLeft(); strPreValue.TrimRight();
+
+				if (ii != colCURR && (strPreValue != entry || strPreValue.IsEmpty()))
+				{
+					entry.TrimLeft(); entry.TrimRight();
+
+					if (symbol.CompareNoCase("146") == 0 || symbol.CompareNoCase("181") == 0)
+					{
+						if (data[146])
+							m_grid->SetItemText(xrow, ii, entry);
+					}
+					else if (symbol.CompareNoCase("051") == 0)
+					{
+						entry = (char*)data[25];
+						if (!entry.IsEmpty()) m_grid->SetItemText(xrow, ii, entry);
+					}
+					else if (symbol.CompareNoCase("071") == 0)
+					{
+						entry = (char*)data[26];
+						if (!entry.IsEmpty()) m_grid->SetItemText(xrow, ii, entry);
+					}
+					else if (!entry.IsEmpty())
+					{
+						if (bDaebi) entry = "";
+						bDaebi = FALSE;
+						m_grid->SetItemText(xrow, ii, entry);
+					}
+				}
+				else if (ii == colCURR)
+				{
+					// 스프레드 종목: 보합에 -, + 표시
+					if (strCode.GetLength() == 8 &&
+						(strCode.GetAt(0) == '4' || strCode.GetAt(0) == 'D'))
+					{
+						if (entry.GetAt(0) == ' ')
+							entry.Replace(" ", "0");
+					}
+					m_grid->SetItemText(xrow, ii, entry);
+				}
+
+				// colCURR 처리 후 봉/포지션
+				if (ii == colCURR)
+				{
+					if (!bExpect && m_bongField >= 0)
+					{
+						CString bongdata, open, high, low;
+						if (data[29])
+						{
+							open = (char*)data[29];
+							m_grid->SetItemText(xrow, colOPEN, open);
+						}
+						if (data[30])
+						{
+							high = (char*)data[30];
+							high.Remove('+'); high.Remove('-');
+							if (data[31])
+							{
+								low = (char*)data[31];
+								low.Remove('+'); low.Remove('-');
+								bongdata.Format("%s%c%s", high, P_TAB, low);
+								m_grid->SetItemText(xrow, m_bongField, bongdata);
+							}
+						}
+					}
+					if (m_posField && !bExpect)
+						updatePoss = true;
+				}
+
+				entry.Empty();
+			} // for 심볼 루프 끝
+
+			// calcInClient
+			if (m_ccField)
+				calcInClient(xrow);
+
+			// 포지션/평가손익
+			if (m_posField)
+			{
+				for (int jj = 0; jj < m_gridHdrX.GetSize(); jj++)
+				{
+					const _gridHdr xxgridHdr = m_gridHdrX.GetAt(jj);
+					if (xxgridHdr.needs != 9) continue;
+
+					auto& pinters = m_inters.at(xrow - 1);
+					CString mCode = pinters.get()->code;
+					mCode.Trim();
+					int sizeCode = mCode.GetLength();
+
+					double dval1{}, dval2{}, dval3{};
+					CString futurnGubn, strCurr;
+
+					if (bExpect == FALSE)   // 장중
+					{
+						switch (xxgridHdr.symbol[3])
+						{
+						case '3':
+							dval1 = atof(pinters.get()->xnum);
+							dval2 = atof(pinters.get()->xprc);
+							dval3 = IH::TOfabs(m_grid->GetItemText(xrow, colCURR));
+							if (dval1 <= 0 || dval2 <= 0) continue;
+							if (sizeCode == 6 || sizeCode == 9)
+								entry = CalcuPyungaSonik(pinters.get(), m_grid->GetItemText(xrow, colCURR));
+							else
+							{
+								futurnGubn = CString(pinters.get()->futureGubn, sizeof(pinters.get()->futureGubn));
+								entry = CalFutureEvalPrice(pinters.get(), code, futurnGubn, dval3, dval2, dval1);
+							}
+							break;
+						case '4':
+							dval1 = atof(pinters.get()->xnum);
+							dval2 = atof(pinters.get()->xprc);
+							dval3 = IH::TOfabs(m_grid->GetItemText(xrow, colCURR));
+							if (dval1 <= 0 || dval2 <= 0) continue;
+							if (sizeCode == 6 || sizeCode == 9)
+								entry = CalcuSuik(pinters.get(), m_grid->GetItemText(xrow, colCURR));
+							else
+							{
+								futurnGubn = CString(pinters.get()->futureGubn, sizeof(pinters.get()->futureGubn));
+								entry = CalFutureEvalRate(pinters.get(), code, futurnGubn, dval3, dval2, dval1);
+							}
+							break;
+						default: continue;
+						}
+						m_grid->SetItemText(xrow, jj, entry);
+					}
+					else                    // 동시호가 시간
+					{
+						if (_bAutoCheck)
+						{
+							switch (xgridHdr.symbol[3])
+							{
+							case '3':
+								dval1 = atof(pinters.get()->xnum);
+								dval2 = atof(pinters.get()->xprc);
+								if (dval1 <= 0 || dval2 <= 0) continue;
+								if (sizeCode == 6 || sizeCode == 9)
+									entry = CalcuPyungaSonik(pinters.get(), strCurr);
+								else
+								{
+									futurnGubn = CString(pinters->futureGubn, sizeof(pinters->futureGubn));
+									entry = CalFutureEvalPrice(pinters.get(), code, futurnGubn, dval3, dval2, dval1);
+								}
+								break;
+							case '4':
+								dval1 = atof(pinters.get()->xnum);
+								dval2 = atof(pinters.get()->xprc);
+								if (dval1 <= 0 || dval2 <= 0) continue;
+								if (sizeCode == 6 || sizeCode == 9)
+									entry = CalcuSuik(pinters.get(), strCurr);
+								else
+								{
+									futurnGubn = CString(pinters->futureGubn, sizeof(pinters->futureGubn));
+									entry = CalFutureEvalRate(pinters.get(), code, futurnGubn, dval3, dval2, dval1);
+								}
+								break;
+							default: continue;
+							}
+							m_grid->SetItemText(xrow, jj, entry);
+							entry.Empty();
+						}
+					}
+				}
+			}
+
+			// 950/951 종목 특이사항
+			if (data[950])
+			{
+				str950 = (char*)data[950];
+				if (!str950.IsEmpty())
+				{
+					if (str950.GetAt(0) == '1')
+						m_grid->SetItemData(xrow, colINFO, 12);
+					else
+					{
+						entry = m_grid->GetItemText(xrow, colINFO);
+						CString strName = m_grid->GetItemText(xrow, colNAME);
+						SetColInfo(strName, xrow, entry);
+					}
+				}
+			}
+			if (data[951])
+			{
+				str951 = (char*)data[951];
+				if (!str951.IsEmpty())
+				{
+					if (str951 == "12" || str951 == "14" || str951 == "16")
+						m_grid->SetItemData(xrow, colINFO, 13);
+					else
+					{
+						entry = m_grid->GetItemText(xrow, colINFO);
+						CString strName = m_grid->GetItemText(xrow, colNAME);
+						SetColInfo(strName, xrow, entry);
+					}
+				}
+			}
+		}
+
+	REDRAW:;
+	} // for rowPosition 루프 끝
+
+#ifdef DF_RTS_CHECK
+	m_grid->ReDrawTimer();
+#else
+	m_grid->ReDrawAll();
+#endif
 }

@@ -36,7 +36,7 @@ public:
 	CString		m_strCode;
 
 	int		m_iDragIn{};		// 드래그인으로 들어오는 카운트 횟수 집계
-
+	int		m_iTime{};
 	_trkey* 	m_pTrkey{};
 	CString		m_commInfo[2][3];	// Send/Receive시 TR키값 및 화면 인덱스 번호 저장
 	int		m_commIndex{};
@@ -239,6 +239,8 @@ public:	//2012.02.13 KSJ 이벤트로 보내면 데이터가 깨져서 직접 메소드 호출함.
 	bool isCodeSymbol(CString code);
 
 	CString m_slog;
+
+	void UpdateFromTick(const std::vector<int>& slotIndices);
 };
 
 

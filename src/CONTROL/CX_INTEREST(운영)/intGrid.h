@@ -492,7 +492,7 @@ protected:
 
 
 public:
-
+	int m_iTime{};
 	long    _idrawCount = 0;
 	bool	m_excelF{};
 	CString	m_excelS;
@@ -526,6 +526,7 @@ public:
 	int	GetScrollPos32(int nBar, BOOL bGetTrackPos = FALSE);
 	BOOL	SetScrollPos32(int nBar, int nPos, BOOL bRedraw = TRUE);
 	void    ReDrawAll();
+	void ReDrawTimer();
 
 protected:
 	HBITMAP getBitmap(CString path);

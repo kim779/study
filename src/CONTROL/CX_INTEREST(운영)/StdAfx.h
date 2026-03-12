@@ -38,3 +38,10 @@
 //#define DF_USEBOOKFILE
 
 #define DF_SERVERMEMO
+#define DF_RTS_CHECK
+
+#include "../H/TickStore.h"
+inline void Output_DebugString(CString slog)
+{
+	OutputDebugString(slog);
+}

@@ -124,6 +124,7 @@ std::unordered_map<std::string, int> g_codeToIndex;
 TickSnapshot g_tickSlots[MAX_SLOT];
 int g_nextIndex = 0;
 std::shared_mutex  g_codeMapLock;
+int g_nextSlot{};
 #endif
 
 std::vector<int>  g_dirtySlots;  // ← 추가
@@ -846,7 +847,7 @@ bool axiscall(int msg, WPARAM wParam, LPARAM lParam)
 }
 /////////////////////////////////////////////////////////////////////////////
 // CMainFrame construction/destruction
-
+static CMainFrame* g_pMainFrame = nullptr;
 CMainFrame::CMainFrame()
 {
 	m_pMain				= (CMainFrame *) 0;
@@ -1087,7 +1088,7 @@ CMainFrame::~CMainFrame()
 #ifdef _DEBUG
 	return;
 #endif
-	if(uninitASTx())
+	if(uninitASTx())  //test
 	{
 		stopPB();
 		stopFW();
@@ -1143,7 +1144,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 {
 	if (CMDIFrameWnd::OnCreate(lpCreateStruct) == -1)
 		return -1;
-
+	g_pMainFrame = this;
 	//if (!SetPriorityClass(GetCurrentProcess(), HIGH_PRIORITY_CLASS))
 	//{
 	//	OutputDebugString("[SetPriorityClass] Fail");
@@ -1597,133 +1598,122 @@ BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)
 {//if (msg->wParam == VK_F8/*byte('P')*/ && (GetKeyState(VK_CONTROL) & 0x8000))
 	if(pMsg->message == WM_KEYDOWN)
 	{
-//m_slog.Format("\r\n --------------------------------- [%d] ----------------------------\r\n", pMsg->wParam);
-//OutputDebugString(m_slog);
+		const bool bCtrl = (::GetKeyState(VK_CONTROL) & 0x8000) != 0;
+		const bool bShift = (::GetKeyState(VK_SHIFT) & 0x8000) != 0;
+
 		switch(pMsg->wParam)
 		{
 				case VK_F5:
 				{
-				//	if(GetKeyState(VK_CONTROL) & 0x8000)
-				//	{
-				//		if (Axis::devMode || !Axis::isCustomer)
-				//			RunPhonePad();
-				//	}
+				
 				}
 				break;
-				case 'f':
 				case 'F':
+				{
+					if (bCtrl && bShift)
 					{
-					
-					if (GetKeyState(VK_CONTROL) & 0x8000)
-					{
-						if (GetKeyState(VK_SHIFT) & 0x8000)
+						CString	Path;
+						Path.Format("%s\\%s\\ACCNTDEPT.INI", Axis::home, "tab");
+
+						char readB[1024];
+						int readL;
+						readL = GetPrivateProfileString("ACCNTDEPT", "DEPT", "811", readB, sizeof(readB), Path);
+						CString tDept(readB, readL);
+						tDept.TrimLeft(); tDept.TrimRight();
+
+						readL = GetPrivateProfileString("ACCNTDEPT", "KEYINPUT", "0", readB, sizeof(readB), Path);
+						CString stmp(readB, readL);
+						m_slog.Format("[AXIS] tDept =[%s] m_Dept=[%s] keyin=[%s]", tDept, m_dept, stmp);
+						WriteLog(m_slog);
+
+						if (stmp == "1")
 						{
-							CString	Path;
-							Path.Format("%s\\%s\\ACCNTDEPT.INI", Axis::home, "tab");
-
-							char readB[1024];
-							int readL;
-							readL = GetPrivateProfileString("ACCNTDEPT", "DEPT", "811", readB, sizeof(readB), Path);
-							CString tDept(readB, readL);
-							tDept.TrimLeft(); tDept.TrimRight();
-
-							readL = GetPrivateProfileString("ACCNTDEPT", "KEYINPUT", "0", readB, sizeof(readB), Path);
-							CString stmp(readB, readL);
-m_slog.Format("[AXIS] tDept =[%s] m_Dept=[%s] keyin=[%s]", tDept, m_dept, stmp);
-WriteLog(m_slog);
-
-							if (stmp == "1")
-							{
-								ShowControlBar(m_TotalAcc, TRUE, FALSE);
-								m_TotalAcc->Refresh813(1);
-							}
+							ShowControlBar(m_TotalAcc, TRUE, FALSE);
+							m_TotalAcc->Refresh813(1);
 						}
 					}
-					
-				/*	CString str, title;
-					str= "901	00110012107	902	devilswo \
-						904	29 \
-						996	11	988	체결	923	14420233	906	테스트계좌	922	3	905	0	997	HTS	912	매도	907	A005930	908	삼성전자                                	992	453	931	1	916	72100	909	1	910	0	921	0	975	   0	924 - 현금매도	925	시장가	926	KSE	993	00	911	00	994		995	0	933	0	999	1	974	0	984	10	023 - 55500";
-					ConclusionNotice(str, title);*/
-					//RunHelpCom();
-					//	m_axMisc->RunVers(verRETRY, Axis::userID, m_pass, m_cpass);
-					//m_axMisc->RunVers(verUPDATE, "", "", "");
-					}	
-					break;
-				case 'x':
+
+					/*	CString str, title;
+						str= "901	00110012107	902	devilswo \
+							904	29 \
+							996	11	988	체결	923	14420233	906	테스트계좌	922	3	905	0	997	HTS	912	매도	907	A005930	908	삼성전자                                	992	453	931	1	916	72100	909	1	910	0	921	0	975	   0	924 - 현금매도	925	시장가	926	KSE	993	00	911	00	994		995	0	933	0	999	1	974	0	984	10	023 - 55500";
+						ConclusionNotice(str, title);*/
+						//RunHelpCom();
+						//	m_axMisc->RunVers(verRETRY, Axis::userID, m_pass, m_cpass);
+						//m_axMisc->RunVers(verUPDATE, "", "", "");
+				}
+				break;
 				case 'X':
+				{
+					if (bCtrl && bShift)
 					{
-						if (GetKeyState(VK_CONTROL) & 0x8000)
+						char	buf[512];
+						CString	file, stmp;
+						file.Format("%s\\tab\\axis.ini", Axis::home);
+						DWORD dw = GetPrivateProfileString("PHONEPAD", "HOTKEY", "", buf, sizeof(buf), file);
+
+						if (dw > 0)
 						{
-							if (GetKeyState(VK_SHIFT) & 0x8000)
+							stmp.Format("%s", buf);
+							stmp.TrimRight();
+							if (stmp != "1") return 0;
+
+							CString sdat, dat;
+							dat = m_strPhone;
+							sdat = "zPwd\t" + dat;
+
+							CChildFrame* actChild{};
+							CSChild* actSchild{};
+
+							if (m_arMDI[m_vsN].Lookup(m_activeKey, actChild))
 							{
-								char	buf[512];
-								CString	file, stmp;
-								file.Format("%s\\tab\\axis.ini", Axis::home);
-								DWORD dw = GetPrivateProfileString("PHONEPAD", "HOTKEY", "", buf, sizeof(buf), file);
-								
-								if (dw > 0)
-								{
-									stmp.Format("%s", buf);
-									stmp.TrimRight();
-									if (stmp != "1") return 0;
+								m_slog.Format("[phonepad] actChild->m_mapN = [%s]", actChild->m_mapN);
 
-									CString sdat, dat;
-									dat = m_strPhone;
-									sdat = "zPwd\t" + dat;
-
-									CChildFrame* actChild{};
-									CSChild* actSchild{};
-
-									if (m_arMDI[m_vsN].Lookup(m_activeKey, actChild))
-									{
-										m_slog.Format("[phonepad] actChild->m_mapN = [%s]", actChild->m_mapN);
-
-									}
-
-									m_slog.Format("[phonepad] OnPhonePadNating dat=[%s] m_activeKey=[%d] ", dat, m_activeKey);
-									OutputDebugString(m_slog);
-
-									m_wizard->InvokeHelper(DI_WIZARD, DISPATCH_METHOD, VT_EMPTY, (void*)NULL,
-										(BYTE*)(VTS_I4 VTS_I4), MAKELONG(setFDC, m_activeKey), (LPARAM)(const char*)sdat);
-									sdat = "pswd\t" + dat;
-									m_wizard->InvokeHelper(DI_WIZARD, DISPATCH_METHOD, VT_EMPTY, (void*)NULL,
-										(BYTE*)(VTS_I4 VTS_I4), MAKELONG(setFDC, m_activeKey), (LPARAM)(const char*)sdat);
-									sdat = "ed_pswd\t" + dat;
-									m_wizard->InvokeHelper(DI_WIZARD, DISPATCH_METHOD, VT_EMPTY, (void*)NULL,
-										(BYTE*)(VTS_I4 VTS_I4), MAKELONG(setFDC, m_activeKey), (LPARAM)(const char*)sdat);		
-								}
 							}
-						} 
+
+							m_slog.Format("[phonepad] OnPhonePadNating dat=[%s] m_activeKey=[%d] ", dat, m_activeKey);
+							OutputDebugString(m_slog);
+
+							m_wizard->InvokeHelper(DI_WIZARD, DISPATCH_METHOD, VT_EMPTY, (void*)NULL,
+								(BYTE*)(VTS_I4 VTS_I4), MAKELONG(setFDC, m_activeKey), (LPARAM)(const char*)sdat);
+							sdat = "pswd\t" + dat;
+							m_wizard->InvokeHelper(DI_WIZARD, DISPATCH_METHOD, VT_EMPTY, (void*)NULL,
+								(BYTE*)(VTS_I4 VTS_I4), MAKELONG(setFDC, m_activeKey), (LPARAM)(const char*)sdat);
+							sdat = "ed_pswd\t" + dat;
+							m_wizard->InvokeHelper(DI_WIZARD, DISPATCH_METHOD, VT_EMPTY, (void*)NULL,
+								(BYTE*)(VTS_I4 VTS_I4), MAKELONG(setFDC, m_activeKey), (LPARAM)(const char*)sdat);
+						}
 					}
-					break;
-				case 'd':
+				}
+				break;
 				case 'D':
 				{
-					m_mapDebugKey.RemoveAll();
-					m_mapDebugRemoveKey.RemoveAll();
-
-
-				/*	int nCount = m_mapAlarmList.GetCount();
-					m_slog.Format("[mng][main]] Map Count = %d\n", nCount);
-					OutputDebugString(m_slog);
-
-					POSITION pos = m_mapAlarmList.GetStartPosition();
-					while (pos != NULL)
+					if (bCtrl && bShift)
 					{
-						CString key, value;
-						m_mapAlarmList.GetNextAssoc(pos, key, value);
+						m_mapDebugKey.RemoveAll();
+						m_mapDebugRemoveKey.RemoveAll();
+					}
+					/*	int nCount = m_mapAlarmList.GetCount();
+						m_slog.Format("[mng][main]] Map Count = %d\n", nCount);
+						OutputDebugString(m_slog);
 
-						if (value == "1")
+						POSITION pos = m_mapAlarmList.GetStartPosition();
+						while (pos != NULL)
 						{
-							m_slog.Format("[mng][main]Key = %s Value = %s\n", key, value);
-							OutputDebugString(m_slog);
-						}
-					}*/
+							CString key, value;
+							m_mapAlarmList.GetNextAssoc(pos, key, value);
+
+							if (value == "1")
+							{
+								m_slog.Format("[mng][main]Key = %s Value = %s\n", key, value);
+								OutputDebugString(m_slog);
+							}
+						}*/
 				}
 				break;
-				case 'z':
 				case 'Z':
+				{
+					if (bCtrl && bShift)
 					{
 						m_mapDebugKey.RemoveAll();
 						m_mapDebugRemoveKey.RemoveAll();
@@ -1737,20 +1727,20 @@ WriteLog(m_slog);
 							if (dw)
 							{
 								CString stmp;
-								
+
 								m_slog.Format("%s", buf);
 								while (m_slog.GetLength() > 0)
 								{
 									stmp = Parser(m_slog, ";");
 									m_mapDebugKey.SetAt(stmp, stmp);
 								}
-							}	
+							}
 
 							dw = GetPrivateProfileString("DEBUG", "remove", "", buf, sizeof(buf), file);
 							if (dw)
 							{
 								CString stmp;
-								
+
 								m_slog.Format("%s", buf);
 								while (m_slog.GetLength() > 0)
 								{
@@ -1758,12 +1748,13 @@ WriteLog(m_slog);
 									m_mapDebugRemoveKey.SetAt(stmp, stmp);
 								}
 							}
-						}
-				/*	CString stmp, stitle;
-					stmp.Format("950\t3\t951\t20240708173000\t952\t조건 만족 주문내역 확인");
-					ConclusionNotice(stmp, stitle);
-					stmp.Format("950\t6\t951\t20240708173000\t952\t조건만료 감시내역 확인");
-					ConclusionNotice(stmp, stitle);*/
+						}	
+					}
+					/*	CString stmp, stitle;
+						stmp.Format("950\t3\t951\t20240708173000\t952\t조건 만족 주문내역 확인");
+						ConclusionNotice(stmp, stitle);
+						stmp.Format("950\t6\t951\t20240708173000\t952\t조건만료 감시내역 확인");
+						ConclusionNotice(stmp, stitle);*/
 						//ref 테스트코드
 						//enum en_gnbn { ACC = 0, AI, AUTOORDERLIST, SERVERORDADD };  //계좌입력기  ,  AI버튼,   자동주문리스트
 						//int ival = AUTOORDERLIST;
@@ -1790,69 +1781,80 @@ WriteLog(m_slog);
 
 						//		CString strmenu;
 						//		strmenu.Format("도우미\t#%s\t%s\t%s", strname, strmap, strname);
-					}
-					break;
-				case 's':
-				case 'S':
-				{
-					/*std::wstring plain = L"!O7#8aksjdf67h53";
-					DATA_BLOB in;
-					in.pbData = (BYTE*)plain.data();
-					in.cbData = static_cast<DWORD>(plain.size() * sizeof(wchar_t));
-
-					DATA_BLOB out;
-					if (!CryptProtectData(&in, nullptr, nullptr, nullptr, nullptr, 0, &out))
-					{
-						AfxMessageBox("CryptProtectData error");
-						break;
-					}*/
-					//DumpAllSlots(g_tickSlots, MAX_SLOT, 100, 50);
-					DumpAllSlots();
-
-
 				}
 				break;
-				case 'a':
+				case 'S':
+				{
+					if (bCtrl && bShift)
+					{
+						/*std::wstring plain = L"!O7#8aksjdf67h53";
+						DATA_BLOB in;
+						in.pbData = (BYTE*)plain.data();
+						in.cbData = static_cast<DWORD>(plain.size() * sizeof(wchar_t));
+
+						DATA_BLOB out;
+						if (!CryptProtectData(&in, nullptr, nullptr, nullptr, nullptr, 0, &out))
+						{
+							AfxMessageBox("CryptProtectData error");
+							break;
+						}*/
+						//DumpAllSlots(g_tickSlots, MAX_SLOT, 100, 50);
+						DumpAllSlots();
+					}
+				}
+				break;
 				case 'A':
 				{
-					if (m_pSharedMemory)
-						return (int)(m_pSharedMemory->SendMessage(WM_USER, MAKEWPARAM(MAKEWORD(MMSG_SHARED_DUMP, 1), 1), 0));
-					//_vMngInfo.clear();
-					//_vMngInfo.emplace_back(std::move("881"), std::move("881"));  //장마감 프리
-					//_vMngInfo.emplace_back(std::move("851"), std::move("851"));  //시간외 프리
-					//_vMngInfo.emplace_back(std::move("803"), std::move("803")); //장마감 프리
-					//_vMngInfo.emplace_back(std::move("883"), std::move("883"));  //장마감 장마감
-					//_vMngInfo.emplace_back(std::move("801"), std::move("801"));  //정규장 정규장
-					//_vMngInfo.emplace_back(std::move("886"), std::move("886"));  //정규장 장마감
-					//_vMngInfo.emplace_back(std::move("887"), std::move("887"));  //장마감 단일가
-					//_vMngInfo.emplace_back(std::move("888"), std::move("888"));   //시간외 애프터 
-					//_vMngInfo.emplace_back(std::move("805"), std::move("805"));  //단일가 애프터
-					//_vMngInfo.emplace_back(std::move("806"), std::move("806"));  //장마감 애프터
-					//_vMngInfo.emplace_back(std::move("889"), std::move("889"));  //장마감 장마감
+					if (bCtrl && bShift)
+					{
+						//	/*		m_slog.Format("msg=%u wParam=%u (0x%X)\n", pMsg->message, pMsg->wParam, pMsg->wParam);
+						//			AfxMessageBox(m_slog);*/
 
-					//
-					//std::thread([this]()
-					//{
-					//	CString slog;
-					//	for (const auto& [key, value] : _vMngInfo)
-					//	{
-					//		CString stmp;
-					//		stmp.Format("%s", value);
+						//	if (GetKeyState(VK_CONTROL) & 0x8000)
+						//	{
+						//		if (GetKeyState(VK_SHIFT) & 0x8000)
+						//		{
+						//			if (m_pSharedMemory)
+						//				(int)(m_pSharedMemory->SendMessage(WM_USER, MAKEWPARAM(MAKEWORD(MMSG_SHARED_DUMP, 1), 1), 0));
+						//			//_vMngInfo.clear();
+						//			//_vMngInfo.emplace_back(std::move("881"), std::move("881"));  //장마감 프리
+						//			//_vMngInfo.emplace_back(std::move("851"), std::move("851"));  //시간외 프리
+						//			//_vMngInfo.emplace_back(std::move("803"), std::move("803")); //장마감 프리
+						//			//_vMngInfo.emplace_back(std::move("883"), std::move("883"));  //장마감 장마감
+						//			//_vMngInfo.emplace_back(std::move("801"), std::move("801"));  //정규장 정규장
+						//			//_vMngInfo.emplace_back(std::move("886"), std::move("886"));  //정규장 장마감
+						//			//_vMngInfo.emplace_back(std::move("887"), std::move("887"));  //장마감 단일가
+						//			//_vMngInfo.emplace_back(std::move("888"), std::move("888"));   //시간외 애프터 
+						//			//_vMngInfo.emplace_back(std::move("805"), std::move("805"));  //단일가 애프터
+						//			//_vMngInfo.emplace_back(std::move("806"), std::move("806"));  //장마감 애프터
+						//			//_vMngInfo.emplace_back(std::move("889"), std::move("889"));  //장마감 장마감
+						//			//
+						//			//std::thread([this]()
+						//			//{
+						//			//	CString slog;
+						//			//	for (const auto& [key, value] : _vMngInfo)
+						//			//	{
+						//			//		CString stmp;
+						//			//		stmp.Format("%s", value);
 
-					//		slog.Format("[mnginfo][%s][%d] before postmessage stmp = [%s]", __FUNCTION__, __LINE__, stmp);
-					//		OutputDebugString(slog);
+						//			//		slog.Format("[mnginfo][%s][%d] before postmessage stmp = [%s]", __FUNCTION__, __LINE__, stmp);
+						//			//		OutputDebugString(slog);
 
-					//		CString* pstr = new CString(stmp);
-					//		PostMessage(WM_USER, MMSG_MAIN_TEST, reinterpret_cast<LPARAM>(pstr));
-					//		Sleep(1000);
-					//	}
-					//}).detach();
+						//			//		CString* pstr = new CString(stmp);
+						//			//		PostMessage(WM_USER, MMSG_MAIN_TEST, reinterpret_cast<LPARAM>(pstr));
+						//			//		Sleep(1000);
+						//			//	}
+						//			//}).detach();
+						//		}
+						//	}
+					}
 				}
 				break;
 				default:
 					break;
 			}	
 	}
+	
 
 	if (m_tMenu && m_tMenu->PreTranslateMsg(pMsg))
 		return TRUE;
@@ -2840,10 +2842,11 @@ void CMainFrame::OnClose()
 		MemoUpload();  //memo
 		//DumpUpload();
 	}
-	
-	CString file;
 
-	OutputDebugString("MAIN ONCLOSE\n");
+	CString file;
+	m_iAxisState = AXIS_STATE_ONCLOSE;
+	m_slog.Format("--------------------[Axis_State][onClose start]  m_iAxisState =[%d]-------------", m_iAxisState);
+	OutputDebugString(m_slog);
 	const char* noticeMapName = "IB780100";
 	CProfile pout(pkUserConfig);
 	const CWnd* wnd = FindWindow(NULL,"실시간해외지수");
@@ -3161,7 +3164,9 @@ void CMainFrame::OnClose()
 		FreeLibrary(m_hSharedLib);
 		m_hSharedLib = nullptr;
 	}
-	OutputDebugString("Complete Main Close\n");
+	
+	m_slog.Format("--------------------[Axis_State][onClose end]  m_iAxisState =[%d]-------------", m_iAxisState);
+	OutputDebugString(m_slog);
 	CMDIFrameWnd::OnClose();
 }
 
@@ -4791,7 +4796,7 @@ OutputDebugString(m_slog);
 		{
 			m_iAxisState++;
 
-			m_slog.Format("--------------------[createUserScreen][cx_account]  m_iAxisState =[%d]-------------", m_iAxisState);
+			m_slog.Format("--------------------[Axis_State][MMSG_SETMAIN_STATE]  m_iAxisState =[%d]-------------", m_iAxisState);
 			OutputDebugString(m_slog);
 		}
 		break;
@@ -7068,6 +7073,7 @@ bool CMainFrame::Start(CString user)
 		s.TrimRight();
 		m_bMainRTS = (_ttoi(s) == 1) ? TRUE : FALSE;
 
+
 		if(m_bUseNewLogin)
 		{
 #ifdef DF_ENCUSER
@@ -8989,11 +8995,11 @@ void CMainFrame::update_ticker(int kind, struct _alertR* alertR)
 		
 		DWORD uiThreadId = AfxGetApp()->m_nThreadID;  // UI 스레드 ID
 		DWORD curThreadId = GetCurrentThreadId();      // 현재 스레드 ID
-		CString slog;
+	/*	CString slog;
 		slog.Format("[update_ticker] UI스레드=[%d] 현재스레드=[%d] %s\n",
 			uiThreadId, curThreadId,
 			(uiThreadId == curThreadId) ? "★UI스레드" : "★별도스레드");
-		OutputDebugString(slog);
+		OutputDebugString(slog);*/
 
 		CString symbol, sData;
 		symbol = alertR->code;
@@ -9092,26 +9098,45 @@ void CMainFrame::update_ticker(int kind, struct _alertR* alertR)
 			if (idx < 0) return;
 
 			TickSnapshot& s = g_tickSlots[idx];
+
+			// seqlock begin
+			s.seq.fetch_add(1, std::memory_order_acq_rel);
+			bool bchange = false;
+
 			s.ts_ms = GetTickCount();
-			CopyZ(s.code, sizeof(s.code), code);
+
+			static const int targetSymbols[] = { 0, 23, 24, 27, 33, 111, 112, 115, 116 };
 
 			for (int ii = alertR->size - 1; ii >= 0; ii--)
 			{
 				if (alertR->ptr[ii] == 0) continue;
+
 				const PTR_T* data = reinterpret_cast<const PTR_T*>(alertR->ptr[ii]);
-				for (int jj = 0; jj < MAX_RTS_INDEX; jj++)
+
+				for (int kk = 0; kk < sizeof(targetSymbols) / sizeof(targetSymbols[0]); kk++)
 				{
+					int jj = targetSymbols[kk];
+
 					if (data[jj] == 0) continue;
+
 					const char* val = reinterpret_cast<const char*>(data[jj]);
+
 					if (val && val[0])
 					{
-						CopyZ(s.values[jj], SYMBOL_STR_LEN, val);
-						s.valid.set(jj);
+						if (strcmp(s.values[jj], val) != 0)
+						{
+							CopyZ(s.values[jj], SYMBOL_STR_LEN, val);
+							s.valid.set(jj);
+							bchange = true;
+						}
 					}
 				}
 			}
 
-			Axis_PushDirtySlot(idx);
+			s.seq.fetch_add(1, std::memory_order_release);
+
+			if (bchange)
+				Axis_PushDirtySlot(idx);
 		}
 		else
 		{
@@ -10447,8 +10472,8 @@ void CMainFrame::createUserScreen(int key)
 
 void CMainFrame::createUserScreen(CString mapN, bool allVS)
 {
-	m_iAxisState = 5;
-	m_slog.Format("--------------------[createUserScreen][cx_account]  start-------------");
+	m_iAxisState = AXIS_STATE_CREATEUSERSCREEN;
+	m_slog.Format("--------------------[Axis_State][createUserScreen][cx_account]  start-------------");
 	OutputDebugString(m_slog);
 
 	int	pos{}, key{}, trigger{}, sdi{};
@@ -10588,7 +10613,7 @@ void CMainFrame::createUserScreen(CString mapN, bool allVS)
 #endif
 	m_bLoadScreen = true;
 
-	m_slog.Format("--------------------[createUserScreen][cx_account] 1111 end m_iAxisState =[%d]-------------", m_iAxisState);
+	m_slog.Format("--------------------[Axis_State]=[%d]-------------", m_iAxisState);
 	OutputDebugString(m_slog);
 
 	/*auto f = std::async(std::launch::async | std::launch::deferred, [this]() {
@@ -10610,7 +10635,7 @@ void CMainFrame::createUserScreen(CString mapN, bool allVS)
 
 	SetTimer(TM_STAFF_OPENNOPOACC, atoi(tmps), nullptr);
 
-	m_slog.Format("--------------------[createUserScreen][cx_account] 2222  end m_iAxisState =[%d] tmps=[%s]-------------", m_iAxisState, tmps);
+	m_slog.Format("--------------------[Axis_State]m_iAxisState =[%d] tmps=[%s]-------------", m_iAxisState, tmps);
 	OutputDebugString(m_slog);
 }
 
@@ -10952,7 +10977,7 @@ void CMainFrame::ClearUserIni()
 
 void CMainFrame::save_laststat()
 {	
-	m_iAxisState = 10;
+	m_iAxisState = AXIS_STATE_SAVELASTSTAT;
 	int	key{}, index{};
 	CString	mpN, tmps, data, info, keys = "LASTSTAT";
 	CString date;
@@ -22022,7 +22047,9 @@ typedef void (CALLBACK* LPFNDestory)();
 
 void CMainFrame::OnDestroy() 
 {
-	OutputDebugString("BEGIN MAIN DESTROY\n");
+	m_iAxisState = AXIS_STATE_ONDESTORY;
+	m_slog.Format("--------------------[Axis_State][OnDestroy start]  m_iAxisState =[%d]-------------", m_iAxisState);
+	OutputDebugString(m_slog);
 	Axis::sFiller = "destroying";
 	CFrameWnd::OnDestroy();
 	Axis::sFiller = "";
@@ -22039,6 +22066,9 @@ void CMainFrame::OnDestroy()
 	OutputDebugString("COMPLETE MAIN DESTROY\n");
 
  	if (m_hMNews) FreeLibrary(m_hMNews);
+
+	m_slog.Format("--------------------[Axis_State][OnDestroy end]  m_iAxisState =[%d]-------------", m_iAxisState);
+	OutputDebugString(m_slog);
 	//FreeFirewall();
 }
 
@@ -32768,38 +32798,55 @@ int CMainFrame::GetSlotIndex_FindOnly(const char* code)
 
 int CMainFrame::EnsureSlotIndexForCode(const char* code)
 {
-	if (!code || !code[0])
-		return -1;
-
-	// 읽기로 먼저 확인
-	{
-		std::shared_lock<std::shared_mutex> readLock(g_codeMapLock);
-		auto it = g_codeToIndex.find(code);
-		if (it != g_codeToIndex.end())
-			return it->second;
-	}
-
-	// 없으면 쓰기락으로 새로 할당
-	std::unique_lock<std::shared_mutex> writeLock(g_codeMapLock);
-
-	// double-check (락 잡는 사이 다른 스레드가 먼저 넣었을 수 있음)
 	auto it = g_codeToIndex.find(code);
+
 	if (it != g_codeToIndex.end())
 		return it->second;
 
-	if (g_nextIndex >= MAX_SLOT)
-		return -1;
+	int idx = g_nextSlot++;
+	g_codeToIndex[code] = idx;
 
-	int idx = g_nextIndex++;
-	g_codeToIndex.emplace(code, idx);
-	CopyZ(g_tickSlots[idx].code, sizeof(g_tickSlots[idx].code), code);
-
-	CString slog;
-	slog.Format("[EnsureSlot] 신규등록 code=[%s] idx=[%d] 총갯수=[%d]\n",
-		code, idx, (int)g_codeToIndex.size());
-	OutputDebugString(slog);
+	CopyZ(g_tickSlots[idx].code, CODE_LEN, code);
 
 	return idx;
+	//if (!code || !code[0])
+	//	return -1;
+
+	//// 읽기로 먼저 확인
+	//{
+	//	std::shared_lock<std::shared_mutex> readLock(g_codeMapLock);
+	//	auto it = g_codeToIndex.find(code);
+	//	if (it != g_codeToIndex.end())
+	//		return it->second;
+	//}
+
+	//// 없으면 쓰기락으로 새로 할당
+	//std::unique_lock<std::shared_mutex> writeLock(g_codeMapLock);
+
+	//// double-check (락 잡는 사이 다른 스레드가 먼저 넣었을 수 있음)
+	//auto it = g_codeToIndex.find(code);
+	//if (it != g_codeToIndex.end())
+	//	return it->second;
+
+	//if (g_nextIndex >= MAX_SLOT)
+	//	return -1;
+
+	//int idx = g_nextIndex++;
+	//g_codeToIndex.emplace(code, idx);
+	//CopyZ(g_tickSlots[idx].code, sizeof(g_tickSlots[idx].code), code);
+
+	//CString slog;
+	//slog.Format("[EnsureSlot] 신규등록 code=[%s] idx=[%d] 총갯수=[%d]\n",
+	//	code, idx, (int)g_codeToIndex.size());
+	//OutputDebugString(slog);
+
+	//return idx;
+}
+
+AXIS_API int Axis_State()
+{
+	if (!g_pMainFrame) return FALSE;
+	return g_pMainFrame->m_iAxisState;
 }
 
 AXIS_API int Axis_EnsureSlotIndex(const char* code)
@@ -32832,6 +32879,18 @@ AXIS_API int Axis_SwapDirtySlots(int* outBuf, int bufSize)
 	int count = min((int)dirty.size(), bufSize);
 	memcpy(outBuf, dirty.data(), count * sizeof(int));
 	return count;
+}
+
+AXIS_API  BOOL Axis_IsMainRTS()
+{
+	if (!g_pMainFrame) return FALSE;
+	return g_pMainFrame->m_bMainRTS;
+}
+
+AXIS_API  CWnd* Axis_GetMainWnd()
+{
+	if (!g_pMainFrame) return FALSE;
+	return g_pMainFrame;
 }
 #endif
 
@@ -32974,35 +33033,35 @@ void CMainFrame::StopWorkerThread()
 // 워커 스레드 함수
 void CMainFrame::WorkerThreadFunc()
 {
-	while (m_workerRunning)
-	{
-		SafeAlertItem* item = nullptr;
-		{
-			std::lock_guard<std::mutex> lock(m_alertMutex);
-			if (!m_alertQueue.empty())
-			{
-				item = m_alertQueue.front();
-				m_alertQueue.pop();
+	//while (m_workerRunning)
+	//{
+	//	SafeAlertItem* item = nullptr;
+	//	{
+	//		std::lock_guard<std::mutex> lock(m_alertMutex);
+	//		if (!m_alertQueue.empty())
+	//		{
+	//			item = m_alertQueue.front();
+	//			m_alertQueue.pop();
 
-				// 같은 종목이 큐에 또 있으면 최신값으로 교체하고 이전꺼 버림
-				while (!m_alertQueue.empty() &&
-					strcmp(m_alertQueue.front()->code, item->code) == 0)
-				{
-					delete item;
-					item = m_alertQueue.front();
-					m_alertQueue.pop();
-				}
-			}
-		}
+	//			// 같은 종목이 큐에 또 있으면 최신값으로 교체하고 이전꺼 버림
+	//			while (!m_alertQueue.empty() &&
+	//				strcmp(m_alertQueue.front()->code, item->code) == 0)
+	//			{
+	//				delete item;
+	//				item = m_alertQueue.front();
+	//				m_alertQueue.pop();
+	//			}
+	//		}
+	//	}
 
-		int idx = EnsureSlotIndexForCode(item->code);
-		if (idx >= 0)
-		{
-			UpdateSnapshotFromAlert(g_tickSlots[idx], item);
-			Axis_PushDirtySlot(idx);  // ← API로
-		}
-		delete item;
-	}
+	//	int idx = EnsureSlotIndexForCode(item->code);
+	//	if (idx >= 0)
+	//	{
+	//		UpdateSnapshotFromAlert(g_tickSlots[idx], item);
+	//		Axis_PushDirtySlot(idx);  // ← API로
+	//	}
+	//	delete item;
+	//}
 }
 //CString ip;
 //	ip.Format("%s", ipaddr);

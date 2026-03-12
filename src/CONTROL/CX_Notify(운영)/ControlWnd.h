@@ -109,19 +109,24 @@ protected:
 public:
 
 	CString m_slog{};
-#ifdef DF_NEW_VER
 	BOOL m_bWaitingFromVBS = TRUE;
-	int m_interval{};
+
 	std::queue<CString> m_drawQueue;
 	CCriticalSection m_lock;
 	void SendNextToVBS();
 	std::unordered_map<std::string, CTime> m_lastRTSTimeMap;
 	bool ShouldSkipRTSByTimeDiff(CString sCode);
-	int m_diffSec{};
+	int m_diffSec = 0;
 	bool IsQuantityChanged(const CString& oldD, const CString& newD);
 	CMapStringToString m_pendingMap;
 	BOOL m_bPendingTimer{};
-#endif
+	BOOL m_bSubTimerActive{};
+	int m_nSubSendCount{};
+	std::vector<CString> m_sendQueue;
+	int  m_nSendIndex{};
+	int m_subInterval{};
+	int m_nThreshold{};
+	BOOL m_bForceDefault = FALSE;
 
 protected:
 	void RequestBalance(BSTR sVal);
@@ -135,7 +140,8 @@ protected:
 	};
 	void OnVersionChanged();
 
-	CString m_Version;
+	BOOL m_bCustomer{};
+	CString m_Version = "1";
 	int m_iPsCmtIndex{};   //가능수량이 잔고그리드에 몇번째 컬럼인가
 public:
 	afx_msg void OnTimer(UINT_PTR nIDEvent);

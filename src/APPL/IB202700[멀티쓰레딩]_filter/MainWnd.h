@@ -245,24 +245,6 @@ public:
 	std::vector<int> m_symbols;
 	void InitSlotIndices();
 
-	inline bool ReadSymbolValue(const TickSnapshot& src, int symbol, char* outValue)
-	{
-		for (;;)
-		{
-			int v1 = src.seq.load(std::memory_order_acquire);
-			if (v1 & 1)
-				continue;
-
-			if (src.valid.test(symbol))
-				memcpy(outValue, src.values[symbol], SYMBOL_STR_LEN);
-
-			int v2 = src.seq.load(std::memory_order_acquire);
-
-			if (v1 == v2)
-				return src.valid.test(symbol);
-		}
-	}
-
 	private:
 		std::vector<int> m_slotIndices;   // 이 화면이 참조할 슬롯들
 

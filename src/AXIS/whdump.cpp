@@ -17,13 +17,20 @@ LONG MiniDumper::TopLevelFilter(struct _EXCEPTION_POINTERS* pExceptionInfo)
     LONG retval = EXCEPTION_CONTINUE_SEARCH;
     const HWND hParent = NULL;      // find a better value for your app
     CString slog;
-    slog.Format("[axis][MiniDumper][TopLevelFilter] [%s]\n", Axis::sFiller);
+    slog.Format("[Axis_State][MiniDumper][TopLevelFilter] [%s]   Axis_state=[%d] \n", Axis::sFiller, Axis_State());
     OutputDebugString(slog);
     if (Axis::sFiller.Find("destroying") >= 0)
     {
         OutputDebugString("[axis][MiniDumper][TopLevelFilter] --------- bDestroying is true  return ");
         return 0;
     }
+
+    if(Axis_State() >= AXIS_STATE_ONCLOSE)
+    {
+        OutputDebugString("[axis][MiniDumper][TopLevelFilter] --------- AXIS_STATE_ONCLOSE is true  return ");
+        return 0;
+    }
+
     // firstly see if dbghelp.dll is around and has the function we need
     // look next to the EXE first, as the one in System32 might be old
     // (e.g. Windows 2000)

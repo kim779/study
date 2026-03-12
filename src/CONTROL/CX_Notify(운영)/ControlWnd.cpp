@@ -35,8 +35,12 @@ static char THIS_FILE[] = __FILE__;
 #define	LEN_DATE		8	// 날짜
 
 #define TM_BALANCE 9898
+#define TM_VSTIEMR 9899
+#define TM_VSSUBTIEMR 9897
+
 #define VS_NOMAL "1"
 #define VS_SKIP "2"
+#define VS_TIMER "3"
 
 
 CString GetField(const CString& src, int index)
@@ -129,7 +133,7 @@ END_INTERFACE_MAP()
 
 #define DF_SHARED
 //=================================================================================================
-int CControlWnd::OnCreate(LPCREATESTRUCT lpCreateStruct) 
+int CControlWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 {
 	if (CWnd::OnCreate(lpCreateStruct) == -1)
 		return -1;
@@ -137,16 +141,25 @@ int CControlWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	m_cs.Lock();
 #endif
 	CString path = Variant(homeCC, "");
+	if (m_pParent->SendMessage(WM_USER, MAKEWPARAM(variantDLL, orderCC), 0))
+		m_bCustomer = TRUE;
+
 	CString userPath;
 	userPath.Format("%s\\tab\\%s", path, "AXISAI.INI");
-	m_Version.Format("%d", GetPrivateProfileInt("Balance", "ver", 2, userPath));
-	m_Version.TrimRight();
 
-	m_interval = GetPrivateProfileInt("Balance", "time", 500, userPath);
 	m_diffSec = GetPrivateProfileInt("Balance", "diff", 1, userPath);
-
-	m_slog.Format("[체결][cx_notify][%s]<%d> ------  m_Version ------[%s] ", __FUNCTION__, __LINE__, m_Version);
-	Output_DebugString(m_slog);
+	m_subInterval = GetPrivateProfileInt("Balance", "sub", 500, userPath);  
+	m_nThreshold = GetPrivateProfileInt("Balance", "threshold", 20, userPath);  //단일전송 최대 잔고수량
+	const int nForceDefault = GetPrivateProfileInt("Balance", "forceDefault", 0, userPath);
+	m_bForceDefault = (nForceDefault == 1);
+	if (m_bForceDefault)
+	{
+		m_Version = VS_NOMAL;
+		m_diffSec = 0;
+		m_slog.Format("[cx_notify][%s]<%d> [forceDefault] 강제 실시간몽드 온치로돤",
+			__FUNCTION__, __LINE__);
+		Output_DebugString(m_slog);
+	}
 
 	path.Replace("\\", "_");
 
@@ -657,12 +670,12 @@ void CControlWnd::SendToMap(CString sData, bool bAll, CString sAccn/* = ""*/)
 			CString oldData;
 			if (m_CodeMap.Lookup(keyS, oldData))
 			{
-				quantityChanged = IsQuantityChanged(oldData, sSendData);
+				//quantityChanged = IsQuantityChanged(oldData, sSendData);
 
-m_slog.Format("[cx_notify]");
-Output_DebugString(m_slog);
-m_slog.Format("[cx_notify][%s]<%d> ------ [%s]  keyS=[%s]  ] oldData=[%s] ", __FUNCTION__, __LINE__, quantityChanged == 1?"가능수량변동":"변화없다",keyS, oldData);
-Output_DebugString(m_slog);
+//m_slog.Format("[cx_notify]");
+//Output_DebugString(m_slog);
+//m_slog.Format("[cx_notify][%s]<%d> ------ [%s]  keyS=[%s]  ] oldData=[%s] ", __FUNCTION__, __LINE__, quantityChanged == 1?"가능수량변동":"변화없다",keyS, oldData);
+//Output_DebugString(m_slog);
 			}
 
 			m_CodeMap.SetAt(keyS, sSendData);
@@ -679,46 +692,51 @@ Output_DebugString(m_slog);
 			m_dataList = sAccn + m_dataList;
 	}
 
-	 if(m_diffSec == 0 || m_Version == VS_NOMAL)
-	{
-		m_pParent->SendMessage(WM_USER, MAKEWPARAM(eventDLL, MAKEWORD(m_Param.key, evOnDblClk/*DblClick*/)), (LPARAM)m_Param.name.GetString());
-	}
-	else if (m_flag == "A" || m_flag == "I" || m_flag == "D")
+	
+	if (m_flag == "A" || m_flag == "I" || m_flag == "D")
 	{
 		m_slog.Format("[cx_notify] [%s]<%d> [일시전송] flag=[%s] sCode=[%s]", __FUNCTION__, __LINE__, m_flag, sCode);
 		Output_DebugString(m_slog);
 		m_pParent->SendMessage(WM_USER, MAKEWPARAM(eventDLL, MAKEWORD(m_Param.key, evOnDblClk/*DblClick*/)), (LPARAM)m_Param.name.GetString());
 	}
-	else if (m_diffSec > 0)
+	else if (m_diffSec == 0 || m_Version == VS_NOMAL)
 	{
-		// U(현재가 업데이트) : diffSec 기정 스킵 필터 적용
-		CSingleLock lock(&m_lock, TRUE);
-
-		if (quantityChanged || !ShouldSkipRTSByTimeDiff(sCode))
-		{
-			// 통과 : 일시 전송, 利 접몽 pending 젊게
-			m_pendingMap.RemoveKey(sCode);
-
-			m_slog.Format("[cx_notify] [%s]<%d> [일시전송-U] sCode=[%s] m_diffSec=[%d]", __FUNCTION__, __LINE__, sCode, m_diffSec);
-			Output_DebugString(m_slog);
-			m_pParent->SendMessage(WM_USER, MAKEWPARAM(eventDLL, MAKEWORD(m_Param.key, evOnDblClk/*DblClick*/)), (LPARAM)m_Param.name.GetString());
-		}
-		else
-		{
-			// 스킵 : 접몽별 천신 데이타 덕어쉼기 보관
-			m_pendingMap.SetAt(sCode, m_dataList);
-
-			// 연속시간 동안 새 데이타가 안 온면 pending 발송하도록 타이링 리셋
-			if (!m_bPendingTimer)
-			{
-				SetTimer(TM_BALANCE, m_diffSec * 100, nullptr);
-				m_bPendingTimer = TRUE;
-			}
-
-			m_slog.Format("[cx_notify] [%s]<%d> [스킵-pending보관] sCode=[%s] m_diffSec=[%d] pendingCount=[%d]", __FUNCTION__, __LINE__, sCode, m_diffSec, m_pendingMap.GetCount());
-			Output_DebugString(m_slog);
-		}
+		m_pParent->SendMessage(WM_USER, MAKEWPARAM(eventDLL, MAKEWORD(m_Param.key, evOnDblClk/*DblClick*/)), (LPARAM)m_Param.name.GetString());
 	}
+	else if (m_Version == VS_TIMER)
+	 {
+		 m_pendingMap.SetAt(sCode, m_dataList);
+	 }
+	//else if (m_diffSec > 0 && m_Version == VS_SKIP)
+	//{
+	//	// U(현재가 업데이트) : diffSec 기정 스킵 필터 적용
+	//	CSingleLock lock(&m_lock, TRUE);
+
+	//	if (quantityChanged || !ShouldSkipRTSByTimeDiff(sCode))
+	//	{
+	//		// 통과 : 일시 전송, 利 접몽 pending 젊게
+	//		m_pendingMap.RemoveKey(sCode);
+
+	//		m_slog.Format("[cx_notify] [%s]<%d> [일시전송-U] sCode=[%s] m_diffSec=[%d]", __FUNCTION__, __LINE__, sCode, m_diffSec);
+	//		Output_DebugString(m_slog);
+	//		m_pParent->SendMessage(WM_USER, MAKEWPARAM(eventDLL, MAKEWORD(m_Param.key, evOnDblClk/*DblClick*/)), (LPARAM)m_Param.name.GetString());
+	//	}
+	//	else
+	//	{
+	//		// 스킵 : 접몽별 천신 데이타 덕어쉼기 보관
+	//		m_pendingMap.SetAt(sCode, m_dataList);
+
+	//		// 연속시간 동안 새 데이타가 안 온면 pending 발송하도록 타이링 리셋
+	//		if (!m_bPendingTimer)
+	//		{
+	//			SetTimer(TM_BALANCE, m_diffSec * 800, nullptr);
+	//			m_bPendingTimer = TRUE;
+	//		}
+
+	//		m_slog.Format("[cx_notify] [%s]<%d> [스킵-pending보관] sCode=[%s] m_diffSec=[%d] pendingCount=[%d]", __FUNCTION__, __LINE__, sCode, m_diffSec, m_pendingMap.GetCount());
+	//		Output_DebugString(m_slog);
+	//	}
+	//}
 
 
 #ifdef	SC_TEST
@@ -905,10 +923,28 @@ void CControlWnd::RequestBalance(BSTR sVal)
 
 void CControlWnd::SetSkipTime(SHORT sec)
 {
+	if (m_bForceDefault)
+	{
+		m_slog.Format("[cx_notify][%s]<%d> [forceDefault] SetSkipTime 臾댁떆 sec=[%d]",
+			__FUNCTION__, __LINE__, sec);
+		Output_DebugString(m_slog);
+		return;
+	}
+
 	m_diffSec = sec;
 
-	if (m_Version == VS_NOMAL)
+	if (m_diffSec == 0)
+	{
+		KillTimer(TM_VSTIEMR);
 		m_diffSec = 0;
+		m_Version = VS_NOMAL;
+	}
+	else if(m_diffSec > 0)
+	{
+		m_Version = VS_TIMER;
+		KillTimer(TM_VSTIEMR);
+		SetTimer(TM_VSTIEMR, m_diffSec * 1000, nullptr);
+	}
 
 	m_slog.Format("[cx_notify][%s]<%d> ------  스킵시간지정  m_diffSec=[%d] sec=[%d]", __FUNCTION__, __LINE__, m_diffSec, sec);
 	Output_DebugString(m_slog);
@@ -953,7 +989,114 @@ void CControlWnd::OnTimer(UINT_PTR nIDEvent)
 			m_bPendingTimer = FALSE;
 		}
 		break;
+		case TM_VSTIEMR:
+		{
+			if (m_pendingMap.IsEmpty())
+				return;
 
+			const int total = m_CodeMap.GetCount();  // 전챵 잔고 개수
+
+			if (m_bSubTimerActive)
+				return;
+
+			if (total <= m_nThreshold)
+			{
+				// 20개 이하
+				m_slog.Format("[cx_notify][%s]<%d> [TM_VSTIEMR] total=[%d]",
+					__FUNCTION__, __LINE__, total);
+				Output_DebugString(m_slog);
+
+				POSITION pos = m_pendingMap.GetStartPosition();
+				while (pos != nullptr)
+				{
+					CString sCode, sData;
+					m_pendingMap.GetNextAssoc(pos, sCode, sData);
+					m_pendingMap.RemoveKey(sCode);
+
+					m_flag = "U";
+					m_dataList = sData;
+
+					m_pParent->SendMessage(WM_USER,
+						MAKEWPARAM(eventDLL, MAKEWORD(m_Param.key, evOnDblClk/*DblClick*/)),
+						(LPARAM)m_Param.name.GetString());
+				}
+			}
+			else
+			{
+				const int totalTicks = (m_diffSec > 0) ? (m_diffSec * 1000 / m_subInterval) : 5;
+				m_nSubSendCount = (m_pendingMap.GetCount() + totalTicks - 1) / totalTicks;  // ceil
+
+				m_sendQueue.clear();
+				m_nSendIndex = 0;
+				POSITION pos = m_pendingMap.GetStartPosition();
+				while (pos != nullptr)
+				{
+					CString sCode, sData;
+					m_pendingMap.GetNextAssoc(pos, sCode, sData);
+					m_sendQueue.push_back(sCode);
+				}
+
+				m_slog.Format("[cx_notify][%s]<%d> [TM_VSTIEMR] total=[%d] subSendCount=[%d] diffSec=[%d]",
+					__FUNCTION__, __LINE__, total, m_nSubSendCount, m_diffSec);
+				Output_DebugString(m_slog);
+
+				m_bSubTimerActive = TRUE;
+				SetTimer(TM_VSSUBTIEMR, m_subInterval, nullptr);
+			}
+		}
+		break;
+		case TM_VSSUBTIEMR:
+		{
+			if (m_nSendIndex >= (int)m_sendQueue.size())
+			{
+				KillTimer(TM_VSSUBTIEMR);
+				m_bSubTimerActive = FALSE;
+				m_sendQueue.clear();
+				m_slog.Format("[cx_notify][%s]<%d> [TM_VSSUBTIEMR] KillTimer  diffSec=[%d]",
+					__FUNCTION__, __LINE__, m_diffSec);
+				Output_DebugString(m_slog);
+				return;
+			}
+
+			
+			const int endIndex = min(m_nSendIndex + m_nSubSendCount, (int)m_sendQueue.size());
+
+			m_slog.Format("[cx_notify][%s]<%d> [TM_VSSUBTIEMR] --------------------------m_nSendIndex =[%d] m_nSubSendCount=[%d]  endIndex=[%d] diffSec=[%d]",
+				__FUNCTION__, __LINE__, m_nSendIndex, m_nSubSendCount, endIndex, m_diffSec);
+			Output_DebugString(m_slog);
+
+			for (int i = m_nSendIndex; i < endIndex; i++)
+			{
+				const CString& sCode = m_sendQueue[i];
+				CString sData;
+
+				if (!m_pendingMap.Lookup(sCode, sData))
+					continue;  
+
+				m_flag = "U";
+				m_dataList = sData;
+
+				m_slog.Format("[cx_notify][%s]<%d> [TM_VSSUBTIEMR 분할] sCode=[%s] idx=[%d/%d ]m_nSendIndex=[%d] endIndex=[%d]",
+					__FUNCTION__, __LINE__, sCode, i + 1, (int)m_sendQueue.size(), m_nSendIndex, endIndex);
+				Output_DebugString(m_slog);
+
+				m_pParent->SendMessage(WM_USER,
+					MAKEWPARAM(eventDLL, MAKEWORD(m_Param.key, evOnDblClk/*DblClick*/)),
+					(LPARAM)m_Param.name.GetString());
+			}
+			m_nSendIndex = endIndex;
+
+			if (m_nSendIndex >= (int)m_sendQueue.size())
+			{
+				KillTimer(TM_VSSUBTIEMR);
+				m_bSubTimerActive = FALSE;
+				m_sendQueue.clear();
+				m_slog.Format("[cx_notify][%s]<%d> [TM_VSSUBTIEMR] !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!  KillTimer",
+					__FUNCTION__, __LINE__);
+				Output_DebugString(m_slog);
+			}
+		}
+		break;
 	}
 	CWnd::OnTimer(nIDEvent);
 }

@@ -346,7 +346,8 @@ int CMainWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	m_SmMemory->remainSHMEMNAME = sSHMENAME;
 	m_SmMemory->InitSharedMemory(this->m_hWnd);
 	//m_SmMemory->AddHandle(this->m_hWnd);
-	StartWorkerThread();
+	if(Axis_IsMainRTS())
+		StartWorkerThread();
 	FileMove();
 	return 0;
 }

@@ -649,6 +649,31 @@ void CIHCodeEdit::OnKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags)
 	/*if (!m_bKeydown)
 		return;
 	m_bKeydown = false;*/
+
+	auto isStockCode = [](const CString& str) -> bool
+	{
+		if (str.IsEmpty())
+			return false;
+
+		if (str.GetAt(0) < '0' || str.GetAt(0) > '9')
+			return false;
+
+		for (int ii = 1; ii < str.GetLength(); ii++)
+		{
+			TCHAR ch = str.GetAt(ii);
+
+			if (!(
+				(ch >= '0' && ch <= '9') ||
+				(ch >= 'A' && ch <= 'Z') ||
+				(ch >= 'a' && ch <= 'z')
+				))
+				return false;
+		}
+
+		return true;
+
+	};
+
 	if (nFlags == 0x8000)
 		return;
 	int len{};
@@ -674,7 +699,8 @@ void CIHCodeEdit::OnKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags)
 		{
 		case GU_CODE:
 		case GU_ELWCODE:
-			if (!isHexNumeric(sTmp))
+			//if (!isHexNumeric(sTmp))
+			if (!isStockCode(sTmp))
 			{
 				m_pParent->CodeListMode();
 				if (!m_pParent->m_pCombo->GetDroppedState())

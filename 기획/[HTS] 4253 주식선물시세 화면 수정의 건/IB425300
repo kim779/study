@@ -42,8 +42,8 @@ LABEL  SYMBOL11(775, 6, 856, 26)  '단위 : 계약수'  AL_LEFT  CUR(0)      COLOR(76
   VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
 BUTTON  BUTTON0(907, 6, 944, 26)  '조회'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, BOLD)  FOCUS  COLOR(208, 186)  CUR(0)    "조회btn.bmp"    TABORDER(2)  ENABLE  &
   VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
-COMBO  62302(630, 20, 720, 40)  TP_SUNKEN  LEN(2)  COUNT(1)  VCOUNT(1)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_NUM|EDIT_INPUT|FA_SEND|FA_SKIP|SA_ALL    COLOR(68, 130)  CUR(0)  DISPLAY("선물")  DATA("01")    TABORDER(1)  IOORDER(1)  ENABLE  &
-  VISIBLE  HINTTYPE(IH_NONE)
+COMBO  62302(634, 20, 724, 40)  TP_SUNKEN  LEN(2)  COUNT(1)  VCOUNT(1)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_NUM|EDIT_INPUT|FA_SEND|FA_SKIP|SA_ALL    COLOR(68, 130)  CUR(0)  DISPLAY("선물")  DATA("01")    TABORDER(1)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
 OBJECT  obj1(5, 39, 948, 127)    "IB425311"  TABORDER(3)  IOORDER(2)  ENABLE  &
   VISIBLE  HINTTYPE(IH_NONE)
 OBJECT  obj2(5, 135, 948, 527)    "IB425310"  TABORDER(4)  IOORDER(3)  ENABLE  &
@@ -84,10 +84,8 @@ BUTTON  CHECK0(360, 5, 415, 25)  '종목별'  TP_CHECK|EDIT_NOP          COLOR(66, 
   VISIBLE  HINTTYPE(IH_NONE)
 LABEL  LABEL3(575, 5, 770, 25)  '*종목은 근월물만 선택 가능합니다 .'  AL_LEFT  CUR(0)      COLOR(131, 130)  ENABLE  &
   VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
-EDIT  62303(725, 20, 785, 40)  LEN(3)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("49")          TABORDER(16)  IOORDER(9)  ENABLE  &
-  VISIBLE  HINTTYPE(IH_NONE)
-BUTTON  BUTTON2(545, 5, 573, 25)  '설정'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, BOLD)  FOCUS  COLOR(208, 186)  CUR(0)    "조회btn.bmp"    TABORDER(17)  ENABLE  &
-  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+EDIT  62303(729, 20, 789, 40)  LEN(3)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("49")          TABORDER(16)  IOORDER(9)  ENABLE  &
+  HINTTYPE(IH_NONE)
 }
 
 
@@ -208,7 +206,7 @@ End Sub
 
 Sub send_id()
 	Dim codex,idx
-	codex = Trim(SCREEN.Object("jnam.jnam").data)
+	codex = Trim(SCREEN.Object("jnam.scode").data)
 
 	If Len(Trim(codex)) = 0 Then
 		Exit Sub
@@ -222,6 +220,10 @@ SYSTEM.Trace "------------------------ 	idx = " & idx
 		S62303.data = 49
 	End If
 	SCREEN.Send 0
+End Sub
+
+Sub SetCode_IB425300(sCode)
+	SCREEN.Proc "jnam.SetCode_IB425301", sCode
 End Sub
 
 _AW_ONINDECLARE_AW_
@@ -240,6 +242,10 @@ SCREEN.Send 0
 
 SCREEN.Proc "jnam.send", ""
 SCREEN.Object("jnam.jnam").Enable = False
+
+
+
+
 
 _AW_ONENDSUB_AW_
 _AW_ONSEND_AW_
@@ -393,15 +399,20 @@ _AW_ENDSCRIPT_AW_
 _AW_SCRIPT_AW_(CHECK0)
 _AW_ONCLICK_AW_
 Dim idx, codex
-codex = Trim(SCREEN.Object("jnam.jnam").data)
 
 If CHECK0.Checked = True Then
 	SCREEN.Object("jnam.jnam").Enable = True
+	SCREEN.Object("jnam.BUTTON2").Enable = True   '
+	SCREEN.Object("jnam.SYMBOL7").Enable = True
 	SCREEN.Proc ("jnam.read_combo_history"), ""
 ElseIf CHECK0.Checked = False Then
 	SCREEN.Object("jnam.jnam").Enable = False
+	SCREEN.Object("jnam.BUTTON2").Enable = False
+	SCREEN.Object("jnam.SYMBOL7").Enable = False
 End If
 
+codex = Trim(SCREEN.Object("jnam.scode").data)
+MsgBox 
 If Len(Trim(codex)) = 0 Then
 	Exit Sub
 End If
@@ -416,13 +427,6 @@ ElseIf CHECK0.Checked = False Then
 	S62303.data = 49
 End If
 SCREEN.Send 0
-_AW_ONENDSUB_AW_
-_AW_ENDSCRIPT_AW_
-
-
-_AW_SCRIPT_AW_(BUTTON2)
-_AW_ONCLICK_AW_
-SCREEN.CreateWindow 2, "IB425399 /p? /d", msg
 _AW_ONENDSUB_AW_
 _AW_ENDSCRIPT_AW_
 

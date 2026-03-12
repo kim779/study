@@ -2,6 +2,7 @@
 //
 
 #include "stdafx.h"
+#include "../../H/TickStore.h"
 #include "CX_INTERGRID.h"
 #include "MainWnd.h"
 #include "toolwnd.h"
@@ -25,6 +26,7 @@ static char THIS_FILE[] = __FILE__;
 #define TRKEY_INTER	100
 #define TM_DRAG		9898
 #define TM_RTSTIME  9897
+#define TM_INIT_SLOTS 9896
 
 #define DF_NEW_RTSPROCESS
 
@@ -40,6 +42,18 @@ struct MarketTime
 
 /////////////////////////////////////////////////////////////////////////////
 // CMainWnd
+
+#ifdef _DEBUG
+#pragma comment(lib, "../../AXIS/Debug/axis.lib")
+#else
+#pragma comment(lib, "../../AXIS/Release/axis.lib")
+#endif
+
+#ifdef _DEBUG
+#pragma comment(lib, "../../control/cx_shared/cx_shared/Debug/cx_shared.tlb")
+#else
+#pragma comment(lib, "../../control/cx_shared/cx_shared/Release/cx_shared.lib")
+#endif
 
 CMainWnd::CMainWnd(CWnd* pWnd, _param* pInfo)
 	: _pApp(_pApp = dynamic_cast<CCX_INTERGRIDApp*>(AfxGetApp()))
@@ -159,6 +173,9 @@ int CMainWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	AfxGetApp()->m_pMainWnd = this;
 	Variant(titleCC, "관심종목");
 	init();
+
+	CheckRTSTimer(true);
+
 	loadinfo();
 	CreateChild();
 	SetPallette();
@@ -763,7 +780,106 @@ LONG CMainWnd::OnManage(WPARAM wParam, LPARAM lParam)
 	case MK_MARKET:
 		ret = _market;
 		break;
+	case MK_SETRTSCODE:
+	{
+		CString tempStr;
+		tempStr.Format("%s", (char*)lParam);
+
+
+
+		RTS_REGISTER_REQ* pReq = new RTS_REGISTER_REQ{};
+		pReq->hWnd = GetSafeHwnd();
+
+		// ------------------------------------
+		// ------------------------------------
+		CString codePart, symbolPart;
+
+		int sep = tempStr.Find(_T('|'));
+		if (sep >= 0)
+		{
+			codePart = tempStr.Left(sep);
+			symbolPart = tempStr.Mid(sep + 1);
+		}
+		else
+		{
+			// 심볼 없으면 코드만
+			codePart = tempStr;
+		}
+
+		// ------------------------------------
+		// ------------------------------------
+		int pos = 0;
+		CString token;
+		const int type = m_pToolWnd->SendMessage(WM_MANAGE, MK_MARKET);
+		while ((token = codePart.Tokenize(_T("\t"), pos)) != _T(""))
+		{
+			if (pReq->codeCount >= MAX_CODES_PER_REQ)
+				break;
+
+			token.TrimRight();
+			std::string code = (LPCTSTR)token;
+			if (code.empty() || token.Left(1) == "m")
+				continue;
+
+			if (AxStd::IsGetNxt(code.c_str()))
+				code = "M.A" + code;
+			else
+				code = "A" + code;
+
+			if (type == 2)
+				code = "N.A" + code;
+
+#ifdef UNICODE
+			strncpy_s(pReq->codes[pReq->codeCount],
+				CODE_STR_LEN,
+				CT2A(token),
+				_TRUNCATE);
+#else
+			strncpy_s(pReq->codes[pReq->codeCount],
+				CODE_STR_LEN,
+				code.c_str(),
+				_TRUNCATE);
+#endif
+
+			if (std::find(m_codes.begin(), m_codes.end(), code) == m_codes.end())
+				m_codes.push_back(code);
+
+			pReq->codeCount++;
+		}
+
+		// ------------------------------------
+		// ------------------------------------
+		pos = 0;
+
+		while ((token = symbolPart.Tokenize(_T("\t"), pos)) != _T(""))
+		{
+			if (pReq->symbolCount >= MAX_SYMBOLS_PER_REQ)
+				break;
+
+			token.TrimRight();
+			if (token.IsEmpty())
+				continue;
+
+			pReq->symbols[pReq->symbolCount] = _ttoi(token);
+			pReq->symbolCount++;
+
+			if (std::find(m_symbols.begin(), m_symbols.end(), atoi(token)) == m_symbols.end())
+				m_symbols.push_back(atoi(token));
+		}
+
+		// ------------------------------------
+		CString slog;
+		slog.Format("[2022][RTS등록] code cnt =[%d] symbol cnt =[%d]", pReq->codeCount, pReq->symbolCount);
+		OutputDebugString(slog);
+
+		// ------------------------------------
+		Axis_GetMainWnd()->PostMessage(WM_USER, MMSG_RT_REGISTER_CODES, (LPARAM)pReq);  //test
+
+		SetTimer(TM_INIT_SLOTS, 300, nullptr);
 	}
+	break;
+	}
+	
 
 	return ret;
 }
@@ -913,8 +1029,72 @@ LONG CMainWnd::OnUser(WPARAM wParam, LPARAM lParam)
 		//2012.01.19 KSJ RTM 처리향상을 위한 포맷변경
 	case DLL_ALERTx:
 	{
+#ifdef DF_RTS_CHECK
+		if (Axis_IsMainRTS())
+		{
+
+		}
+		else
+		{
+			if (_bStop)
+				return 0;
+
+			if (m_bDestroy || m_strBeginTime.IsEmpty() || m_pGroupWnd == nullptr)
+				break;
+
+			const auto* alertR = reinterpret_cast<const _alertR*>(lParam);
+			const CString code = alertR->code;
+
+			const DWORD* data = reinterpret_cast<const DWORD*>(alertR->ptr[0]);
+			if (data == nullptr)
+				return 0;
+
+			COleDateTime oTime;
+			oTime = COleDateTime::GetCurrentTime();
+			CString strCurTime;
+			strCurTime.Format(_T("%02d%02d%02d"), oTime.GetHour(), oTime.GetMinute(), oTime.GetSecond());
+
+			int h1 = _ttoi(strCurTime.Mid(0, 2));
+			int m1 = _ttoi(strCurTime.Mid(2, 2));
+			int s1 = _ttoi(strCurTime.Mid(4, 2));
+			CTime timecur(oTime.GetYear(), oTime.GetMonth(), oTime.GetDay(), h1, m1, s1);
+
+			//m_strBeginTimeEnd = "141100";
+			h1 = _ttoi(m_strBeginTimeEnd.Mid(0, 2));
+			m1 = _ttoi(m_strBeginTimeEnd.Mid(2, 2));
+			s1 = _ttoi(m_strBeginTimeEnd.Mid(4, 2));
+			CTime timeOri(oTime.GetYear(), oTime.GetMonth(), oTime.GetDay(), h1, m1, s1);
+			CTimeSpan span(0, 0, 0, 10); // 10초
+			CTime timeend = timeOri - span;
+
+			bool bOverChecking{};
+			bOverChecking = IsEnableRTSTimeCheck(timecur, timeend, m_icheckTime);
+
+			std::string scode = CStringA(code);
+
+			if (ShouldSkipRTSByServerTime(scode, (char*)data[34], m_DiffSec) == true && bOverChecking)
+			{
+				return 0;
+			}
+
+			static constexpr int arr[] = { 41, 61, 101, 104, 106, 107, 109, 146, 181 };
+			auto& rmap = m_pGroupWnd->getRSymbol();
+			bool bHoga = std::any_of(std::begin(arr), std::end(arr), [&rmap](const int symbol) {
+				return rmap.find(symbol) != rmap.end();
+				});
+
+			if (bHoga == false && !(alertR->stat & alert_SCR))
+				return 0;
+
+			m_pGroupWnd->initAlert();
+			AxStd::async([this, lParam]() {
+				m_pGroupWnd->RecvRTSx(lParam);
+				});
+			m_pGroupWnd->UpdateDraw();
+		}
+#else
 		if (_bStop)
-			return 0; 
+			return 0;
 
 		if (m_bDestroy || m_strBeginTime.IsEmpty() || m_pGroupWnd == nullptr)
 			break;
@@ -932,16 +1112,17 @@ LONG CMainWnd::OnUser(WPARAM wParam, LPARAM lParam)
 		auto& rmap = m_pGroupWnd->getRSymbol();
 		bool bHoga = std::any_of(std::begin(arr), std::end(arr), [&rmap](const int symbol) {
 			return rmap.find(symbol) != rmap.end();
-		});
+			});
 
-		if (bHoga == false && !(alertR->stat & alert_SCR))		
-			return 0;	
+		if (bHoga == false && !(alertR->stat & alert_SCR))
+			return 0;
 
-		m_pGroupWnd->initAlert();	
-			AxStd::async([this, lParam]() {
-				m_pGroupWnd->RecvRTSx(lParam);
-		});
+		m_pGroupWnd->initAlert();
+		AxStd::async([this, lParam]() {
+			m_pGroupWnd->RecvRTSx(lParam);
+			});
 		m_pGroupWnd->UpdateDraw();
+#endif
 	}
 	break;
 		//KSJ
@@ -1001,7 +1182,7 @@ void CMainWnd::parsingTrigger(CString datB)
 	{
 		if (!m_bProc)
 		{
-
+			
 			const int	ret = (int)m_pToolWnd->SendMessage(WM_MANAGE, MK_SETUPOK);
 			m_pTreeWnd->SendMessage(WM_MANAGE, MK_SETUPOK);
 
@@ -1615,7 +1796,55 @@ void CMainWnd::OnTimer(UINT nIDEvent)
 		KillTimer(nIDEvent);
 		ChangeGroup(m_iGroup);
 	}
+	else if (nIDEvent == TM_RTSTIME)
+	{
+		// CPU 체크해서 타이머 동적 조절
+		//int cpu = GetProcessCpuUsage();
 
+		int newInterval;
+		//if (cpu > 80)       newInterval = m_iTime * 3;   // 매우 바쁨 - 3배 느리게
+		//else if (cpu > 60)  newInterval = m_iTime * 2;   // 바쁨 - 2배 느리게
+		//else if (cpu > 40)  newInterval = m_iTime;        // 보통 - 설정값 그대로
+		//else if (cpu > 20)  newInterval = m_iTime * 2 / 3; // 여유 - 1.5배 빠르게
+		//else                newInterval = m_iTime / 2;    // 매우 여유 - 2배 빠르게
+
+		//// 최소값 보장 (너무 빠르면 역효과)
+		//if (newInterval < 50) newInterval = 50;  // 최소 50ms
+		//newInterval = m_iTime;
+
+		//if (newInterval != m_iCurInterval)
+		//{
+			//KillTimer(TM_RTSTIME);
+			//if (Axis_IsMainRTS()) SetTimer(TM_RTSTIME, newInterval, nullptr);
+			//m_iCurInterval = newInterval;
+
+			/*CString slog;
+			slog.Format("[Timer] CPU=[%d%%] interval=[%d→%d ms]\n",
+				cpu, m_iCurInterval, newInterval);
+			OutputDebugString(slog);*/
+		//}
+
+		// dirty 큐 처리 - API로
+		static int dirtyBuf[MAX_SLOT];
+#ifdef DF_DLL_RTS
+		int count = DLL_SwapDirtySlots(dirtyBuf, MAX_SLOT);
+#else
+		int count = Axis_SwapDirtySlots(dirtyBuf, MAX_SLOT);
+#endif
+
+		if (count > 0 && m_pGroupWnd)
+		{
+			std::vector<int> dirty(dirtyBuf, dirtyBuf + count);
+			m_pGroupWnd->UpdateFromTick(dirty);
+		}
+
+		return;
+	}
+	else if (nIDEvent == TM_INIT_SLOTS)
+	{
+		KillTimer(nIDEvent);
+		InitSlotIndices();
+	}
 
 	CWnd::OnTimer(nIDEvent);
 }
@@ -2001,7 +2230,7 @@ BSTR CMainWnd::GetCode()
 void CMainWnd::OnPortfolio(LPCTSTR result) 
 {
 	CString str(result);
-
+	CheckRTSTimer(false);
 	if (m_bChangeGroup == TRUE)
 		return;
 
@@ -2009,7 +2238,7 @@ void CMainWnd::OnPortfolio(LPCTSTR result)
 		return;
 
 	//m_pGroupWnd->SendMessage(WM_MANAGE, MAKEWPARAM(MK_SETUPOK, 0));
-
+	
 	const int	ret = (int)m_pToolWnd->SendMessage(WM_MANAGE, MK_SETUPOK);
 	m_pTreeWnd->SendMessage(WM_MANAGE, MK_SETUPOK);
 	
@@ -2392,4 +2621,231 @@ void CMainWnd::sendMemo(CString code, char type)
 void CMainWnd::Stop(boolean bflag)
 {
 	_bStop = bflag;
+}
+
+void CMainWnd::CheckRTSTimer(bool bFirst)
+{
+#ifdef DF_RTS_CHECK
+	CString slog;
+	CString userip;
+	m_bcustomer = m_pWnd->SendMessage(WM_USER, MAKEWPARAM(variantDLL, orderCC), 0L);
+	userip = CheckIP();
+	CString filePath;
+	filePath.Format("%s/%s/InterOption.ini", Variant(homeCC), "tab");
+	m_icheckTime = GetPrivateProfileInt("OVERTIME", "TIME", 5000, filePath);
+	m_DiffSec = GetPrivateProfileInt("OVERTIME", "DIFFSEC", 1, filePath);
+	int iTime = 800;
+	if (!m_bcustomer) //직원용
+	{
+		iTime = GetPrivateProfileInt("STAFF", "cTIME", 800, filePath);
+
+		if (!bFirst)  //관심설정창 닫은후 호출 
+		{
+			if (iTime != m_iTime)  //실시간 데이터 수신 설정률이 변한 경우만 타이머 다시 세팅
+			{
+				m_iTime = iTime;
+			}
+		}
+		else  //최초 화면 오픈하였을 경우
+		{
+			m_iTime = iTime;
+		}
+		if(Axis_IsMainRTS()) SetTimer(TM_RTSTIME, m_iTime, nullptr);
+		return;
+	}
+
+	//고객용 HTS
+	int icount = 0;
+	iTime = GetPrivateProfileInt("CUSTOMER", "cTIME", 200, filePath);
+	icount = GetPrivateProfileInt("IPLIST", "COUNT", 0, filePath);
+	if (icount == 0)
+	{
+
+		if (!bFirst)  //관심설정창 닫은후 호출 
+		{
+			if (iTime != m_iTime)  //실시간 데이터 수신 설정률이 변한 경우만 타이머 다시 세팅
+			{
+				m_slog.Format("[IB202200][CheckRTSTimer2] KillTimer 고객용 iTime=[%d] m_iTime=[%d]", iTime, m_iTime);
+				Output_DebugString(m_slog);
+				m_iTime = iTime;
+			}
+		}
+		else  //최초 화면 오픈하였을 경우
+		{
+			m_iTime = iTime;
+		}
+		if (Axis_IsMainRTS())  SetTimer(TM_RTSTIME, m_iTime, nullptr);
+		return;
+	}
+	else
+	{
+		BOOL binip = false;
+		char buf[1024]{};
+		CString siplist, eiplist, sip, eip;
+		for (int ii = 0; ii < icount; ii++)
+		{
+			siplist.Format("IP00%d_STT", ii + 1);
+			eiplist.Format("IP00%d_END", ii + 1);
+
+			memset(buf, 0x00, sizeof(buf));
+			GetPrivateProfileString("IPLIST", siplist, "", buf, sizeof(buf), filePath);
+			sip.Format("%s", buf);
+
+			memset(buf, 0x00, sizeof(buf));
+			GetPrivateProfileString("IPLIST", eiplist, "", buf, sizeof(buf), filePath);
+			eip.Format("%s", buf);
+
+			binip = isIPInRange(userip, sip, eip); //고객용 HTS 이지만 ip대역이 직원용피씨
+			if (binip)
+			{
+				iTime = GetPrivateProfileInt("SCUSTOMER", "cTIME", 700, filePath);
+				if (!bFirst)  //관심설정창 닫은후 호출 
+				{
+					if (iTime != m_iTime)  //실시간 데이터 수신 설정률이 변한 경우만 타이머 다시 세팅
+					{
+						m_iTime = iTime;
+					}
+				}
+				else  //최초 화면 오픈하였을 경우
+				{
+					m_iTime = iTime;
+				}
+				if (Axis_IsMainRTS())  SetTimer(TM_RTSTIME, m_iTime, nullptr);
+				return;
+			}
+		}
+	}
+
+	//고객용이지만 IP가 직원용 대역이 아닌경우 (대부분 고객)
+	if (!bFirst)  //관심설정창 닫은후 호출 
+	{
+		if (iTime != m_iTime)  //실시간 데이터 수신 설정률이 변한 경우만 타이머 다시 세팅
+		{
+			m_iTime = iTime;
+		}
+	}
+	else  //최초 화면 오픈하였을 경우
+	{
+		m_iTime = iTime;
+		if (Axis_IsMainRTS())  SetTimer(TM_RTSTIME, m_iTime, nullptr);
+	}
+	
+#endif
+}
+
+bool CMainWnd::IsEnableRTSTimeCheck(
+	const CTime& currentTime,
+	const CTime& baseTime,
+	int checkTimeSec   // m_icheckTime
+)
+{
+	if (checkTimeSec <= 0)
+		return false;
+
+	const CTimeSpan diff = currentTime - baseTime;
+
+
+	//CString slog;
+	//slog.Format("[IB202200][IsEnableRTSTimeCheck] checkTimeSec=[%d] deff=[%llu] m_strBeginTimeEnd=[%s]",
+	//	checkTimeSec, diff.GetTotalMinutes(), m_strBeginTimeEnd);
+	//OutputDebugString(slog);
+
+
+	if (diff < 0)
+		return false;
+
+	return diff.GetTotalMinutes() <= checkTimeSec;
+}
+
+CTime CMainWnd::ParseRTSTime(const CString& sTime, const COleDateTime& today)
+{
+	int h = _ttoi(sTime.Mid(0, 2));
+	int m = _ttoi(sTime.Mid(2, 2));
+	int s = _ttoi(sTime.Mid(4, 2));
+
+	return CTime(
+		today.GetYear(),
+		today.GetMonth(),
+		today.GetDay(),
+		h, m, s
+	);
+
+}
+bool CMainWnd::ShouldSkipRTSByServerTime(
+	const std::string& code,
+	const char* pServerTime,   // data[40]
+	int                minIntervalSec // 예: 1 or 2
+)
+{
+	if (!pServerTime)
+		return true;
+
+	if (minIntervalSec <= 0)
+		return false;
+
+	const CTime now = CTime::GetCurrentTime();
+	const CTime curServerTime = ParseRTSTime(pServerTime, COleDateTime::GetCurrentTime());
+
+	auto it = m_lastRTSTimeMap.find(code);
+
+	// 첫 수신은 무조건 통과
+	if (it == m_lastRTSTimeMap.end())
+	{
+		m_lastRTSTimeMap.emplace(code, curServerTime);
+		m_slog.Format("[IB202200][skipped] 첫수신 통과  code=[%s]  m_lastRTSTimeMap size = [%d] ", (LPCTSTR)&code, m_lastRTSTimeMap.size());
+		Output_DebugString(m_slog);
+		return false;
+	}
+
+	const CTime& prevServerTime = it->second;
+	int diffSec = (int)(curServerTime - prevServerTime).GetTotalSeconds();
+
+	// 서버시간이 같거나 너무 짧으면 스킵
+
+	if (diffSec < minIntervalSec)
+	{
+		//m_slog.Format("[IB202200][skipped]!!!!!!! code=[%s] diffSec=[%d] minIntervalSec=[%d]", (LPCTSTR)&code, diffSec, minIntervalSec);
+		//Output_DebugString(m_slog);
+		return true;
+	}
+
+	// 통과 → 마지막 시간 갱신
+	//m_slog.Format("[IB202200][NOskipped]@@@@@ code=[%s] diffSec=[%d] minIntervalSec=[%d]", (LPCTSTR)&code, diffSec, minIntervalSec);
+	//Output_DebugString(m_slog);
+	it->second = curServerTime;
+	return false;
+}
+
+void CMainWnd::InitSlotIndices()
+{
+	m_slotIndices.clear();
+
+	m_slog.Format("[cx_interest][REQ][code] code count = %d\n",
+		(int)m_codes.size());
+	OutputDebugString(m_slog);
+
+	int cnt{};
+	for (const auto& code : m_codes)
+	{
+		int idx = Axis_EnsureSlotIndex(code.c_str());
+
+		if (idx >= 0)
+		{
+			m_slog.Format("[cx_interest][REQ][code]    [OK] code=%s → slot=%d\n",
+				code.c_str(), idx);
+			OutputDebugString(m_slog);
+
+			m_slotIndices.push_back(idx);
+		}
+		else
+		{
+			m_slog.Format(" [cx_interest][REQ][code]   [FAIL] code=%s (slot allocation failed)\n",
+				code.c_str());
+			OutputDebugString(m_slog);
+		}
+	}
+
+	m_slog.Format("[cx_interest][REQ][code] [InitSlotIndices] final slot count = %d\n",
+		(int)m_slotIndices.size());
+	OutputDebugString(m_slog);
 }

@@ -30,7 +30,6 @@
 
 #include <axStd.hpp>
 
-#define  DF_NEW_VER
 inline void Output_DebugString(CString slog)
 {
 	OutputDebugString(slog);

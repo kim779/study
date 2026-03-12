@@ -64,6 +64,7 @@ extern CComModule _Module;
 #pragma comment(linker,"/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 #endif
 
+#include "../H/TickStore.h"
 typedef BOOL(WINAPI* RtlGetVersion_FUNC) (OSVERSIONINFOEXW*);
 
 #define DF_MK_CAPTION   //childframe 타이틀에 거래소 추가
@@ -73,6 +74,14 @@ typedef BOOL(WINAPI* RtlGetVersion_FUNC) (OSVERSIONINFOEXW*);
 #define DF_EDGE_MAP   "IB980002"
 #define DF_NEW_MNG
 
+enum AXIS_STATE
+{
+	AXIS_STATE_START = 0,
+	AXIS_STATE_CREATEUSERSCREEN = 5,
+	AXIS_STATE_SAVELASTSTAT = 10,
+	AXIS_STATE_ONCLOSE = 15,
+	AXIS_STATE_ONDESTORY = 20,
+};
 
 inline void output_DebugString(CString sdata)
 {

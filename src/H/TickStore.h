@@ -51,11 +51,16 @@ extern int g_nextIndex;
 extern std::shared_mutex  g_codeMapLock;
 extern std::vector<int> g_dirtySlots;
 extern std::mutex       g_dirtyMtx;
+extern int g_nextSlot;
 #endif
 AXIS_API void  Axis_PushDirtySlot(int idx);
 AXIS_API int   Axis_SwapDirtySlots(int* outBuf, int bufSize);  // swapÇØ¼­ °¡Á®¿È
 AXIS_API int  Axis_EnsureSlotIndex(const char* code);
 AXIS_API const TickSnapshot* Axis_GetTickSlots();
+AXIS_API BOOL Axis_IsMainRTS();
+AXIS_API CWnd* Axis_GetMainWnd();
+AXIS_API BOOL Axis_State();
+
 
 
 

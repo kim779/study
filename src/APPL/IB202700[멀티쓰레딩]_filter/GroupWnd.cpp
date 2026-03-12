@@ -3137,3 +3137,27 @@ void CGroupWnd::UpdateFromTick(const std::vector<int>& slotIndices)
 		}
 	}
 }
+
+void CGroupWnd::RecvRTSx(LPARAM lParam)
+{
+	if (m_nGroup == 0)
+		return;
+
+	_cacheGrid.clear();
+
+	const auto* alertR = reinterpret_cast<const _alertR*>(lParam);
+	const CString code = alertR->code;
+
+	for_each_n(m_GridWnd.begin(), m_nGroup, [this, code](const auto& gridWnd) {
+		if (gridWnd->IsCode(code))
+			_cacheGrid.push_back(gridWnd.get());
+		});
+
+	for_each(_cacheGrid.begin(), _cacheGrid.end(), [this, lParam](CGridWnd* pGridWnd) {
+		pGridWnd->HoldDraw();
+		pGridWnd->parsingAlertx(lParam);
+		});
+
+	for (auto& grid : _cacheGrid)
+		grid->ReleaseDraw();
+}

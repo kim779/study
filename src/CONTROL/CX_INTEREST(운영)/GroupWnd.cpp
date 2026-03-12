@@ -2307,6 +2307,48 @@ void CGroupWnd::RecvRTSx(LPARAM lParam, int igubn)
 }
 
 
+void CGroupWnd::UpdateFromTick(const std::vector<int>& slotIndices)
+{
+	if (m_nGroup == 0) return;
+
+#ifdef DF_DLL_RTS
+	const TickSnapshot* slots = DLL_GetTickSlots();
+#else
+	const TickSnapshot* slots = Axis_GetTickSlots();
+#endif
+	if (!slots) return;
+
+	CString slog;
+	slog.Format("[UpdateFromTick] ------------------------------start-------------------------");
+	Output_DebugString(slog);
+	for (int slotIndex : slotIndices)
+	{
+		const TickSnapshot& slot = slots[slotIndex];
+		if (slot.code[0] == '\0')
+		{
+			CString slog;
+			slog.Format("[UpdateFromTick] slot EMPTY - slotIndex=[%d]\n", slotIndex);
+			Output_DebugString(slog);
+			continue;
+		}
+
+		// 쓰기 중이면 이번 tick 스킵 (절대 죽지 않음)
+		int seq = slot.seq.load(std::memory_order_acquire);
+		if (seq & 1)
+		{
+			CString slog;
+			slog.Format("[UpdateFromTick] seq & 1   seq=[%d]\n", seq);
+			Output_DebugString(slog);
+			continue;
+		}
+
+		CString code = slot.code;
+		for_each_n(m_GridWnd.begin(), m_nGroup, [this, slotIndex, code](const auto& gridWnd) {
+			gridWnd.get()->UpdateFromTickSlot(slotIndex);
+			});
+	}
+}
+
 void CGroupWnd::UpdateDraw()
 {
 	for_each(_cacheGrid.begin(), _cacheGrid.end(), [](CGridWnd* pGridWnd) {
@@ -2895,3 +2937,4 @@ bool CGroupWnd::isCodeSymbol(CString code)
 	}
 	return false;
 }
+

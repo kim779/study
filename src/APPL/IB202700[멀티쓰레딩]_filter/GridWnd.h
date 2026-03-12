@@ -480,7 +480,6 @@ public:
 	std::map<CString, int>		_mapSymbol;
 
 	void parsingAlertx(LPARAM lParam);
-	void parsing_Alertx(LPARAM lParam);
 	void initRSymbol();
 	void saveServer(const std::vector<std::shared_ptr<struct _intersx>>& vInters, int gno = -1);
 

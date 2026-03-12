@@ -135,6 +135,7 @@ protected:
 	//void RecvRTS(CRecvData *rdata);
 
 public:						     	// 2012.02.13 KSJ 이벤트로 보내면 데이터가 깨져서 직접 메소드 호출함.
+	void RecvRTSx(LPARAM lParam);
 	void SelectOper();
 	void UpdateDraw();
 

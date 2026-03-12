@@ -10283,3 +10283,34 @@ void CintGrid::ReDrawAll()
 	}
 
 }
+
+
+void CintGrid::ReDrawTimer()
+{
+	if (_DrawAllRect.IsRectEmpty())
+		return;
+
+	const ULONGLONG tick = GetTickCount64();
+	auto lambdaDraw = [this](const ULONGLONG& tick) {
+		if (!_DrawAllRect.IsRectEmpty())
+		{
+			InvalidateRect(_DrawAllRect, FALSE);
+			_DrawAllRect.SetRectEmpty();
+			_mapFilterDraw.clear();
+			_lastDrawTick = tick;
+		}
+	};
+
+	if (GetSafeHwnd() && (tick - _lastDrawTick >= m_iTime))
+	{
+		lambdaDraw(tick);
+	}
+	//else
+	//{
+	//	//AxStd::_Msg("[%s] 무조건 그림.", __FUNCTION__);
+	//	if (_avgCount <= 20.0)
+	//		lambdaDraw(tick);
+	//	_idrawCount++;  // 시간 내 호출 횟수 카운트
+	//}
+
+}

@@ -18,7 +18,7 @@
 #include "childFrm.h"
 #include "SChild.h"
 #include "inca/npenkAppInstall5WIN.h"
-#include "../H/TickStore.h"
+
 
 #include <vector>
 #include <algorithm>
@@ -1792,7 +1792,7 @@ public:
 	CString m_sMngType{}, m_sMngMsg{};
 	std::mutex _vMutex;
 
-	//mainframe 진행 단계
+
 	int m_iAxisState{};
 
 	//폰패드 관련
@@ -1885,39 +1885,12 @@ public:
 		s.seq.store(v + 2, std::memory_order_release);
 	}
 
-
-
-
-
-
-
-
-
 #define SYM_PRICE    23   // 현재가
 #define SYM_DIFF     24   // 전일대비
 #define SYM_RATE     33   // 등락률
 #define SYM_VOLUME   27   // 거래량
-
+//
 	void DumpAllSlots();
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 	void InitPool()
 	{
