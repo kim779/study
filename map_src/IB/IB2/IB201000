@@ -31,7 +31,7 @@ PANEL  PANEL12(0, 0, 551, 29)        COLOR(64, 232)  CUR(0)    AL_CENTER    ENAB
   VISIBLE  HINTTYPE(IH_NONE)
 PANEL  PANEL11(1, 0, 547, 26)        COLOR(66, 130)  CUR(0)    AL_CENTER    ENABLE  &
   VISIBLE  HINTTYPE(IH_NONE)
-BUTTON  GP_BTN(494, 3, 542, 23)  '데이터'  TP_PUSH|IMAGETEXT|AL_STRETCH        FOCUS  COLOR(14, 186)  CUR(0)    "3btn.BMP"    TABORDER(4)  ENABLE  &
+BUTTON  GP_BTN(460, 3, 508, 23)  '데이터'  TP_PUSH|IMAGETEXT|AL_STRETCH        FOCUS  COLOR(14, 186)  CUR(0)    "3btn.BMP"    TABORDER(4)  ENABLE  &
   VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
 OUT  2021(632, 53, 737, 73)  LEN(12)  IO_ALPHA|AL_CENTER||FA_FLASH    COLOR(203, 1)  CUR(0)            TABORDER(0)  IOORDER(1)  &
   HINTTYPE(IH_NONE)
@@ -95,6 +95,8 @@ CONTROL  cxMarket(4, 3, 24, 23)  |FA_SKIP  "CX_MarketPicker"  "/k2/tIB201000/u1/
   VISIBLE  HINTTYPE(IH_NONE)
 EDIT  edMarketTrigger(645, 160, 677, 180)  LEN(6)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(8)  IOORDER(15)  ENABLE  &
   VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  sent_btn(511, 3, 543, 23)  '조회'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, BOLD)  COLOR(208, 186)  CUR(0)    "조회BTN.BMP"    TABORDER(9)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
 }
 
 
@@ -126,8 +128,28 @@ Sub OnAlert()
 		Exit Sub
 	End If
 
+	If Trim(S2027.Data) = "" Or Trim(S2027.Data) = "0"Then
+		Exit Sub
+	End If
+
+	If Trim(S2314.Data) = "" Or Trim(S2314.Data) = "0"Then
+		Exit Sub
+	End If
+
+	If Not IsNumeric(Trim(S2314.Data)) Then
+		Exit Sub
+	End If
+
+	If Not IsNumeric(Trim(S2027.Data)) Then
+		Exit Sub
+	End If
+
 	srat = (S2314.Data / S2027.Data)*100
 	S2352.Data = FormatNumber(srat, 2, -1)
+
+	If Not IsNumeric(Trim(S2352.Data)) Then
+		Exit Sub
+	End If
 
 	If Trim(S2352.data) < 50 Then
 		S2352.TRgb = 95
@@ -280,6 +302,16 @@ _AW_ENDSCRIPT_AW_
 _AW_SCRIPT_AW_(edMarketTrigger)
 _AW_ONCHANGE_AW_
 Change_MKGubn_Main(Trim(edMarketTrigger.Data))
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(sent_btn)
+_AW_ONCLICK_AW_
+cxMarket.sCode = Trim(S1301.Data)
+SCREEN.Send 0
+
+S1301.SetFocus
 _AW_ONENDSUB_AW_
 _AW_ENDSCRIPT_AW_
 

@@ -13,7 +13,7 @@ OPTIONS(FLASH)
 TITLE("[201010] 종목가격대별매매비중")
 TOPATH(AXIS)
 METHOD(FORM)
-TRXCODE("bo201010")
+TRXCODE("no201010")
 MAPTYPE(NORM)
 HEADER(NOP)
 }
@@ -36,7 +36,7 @@ GRID  GRID(0, 0, 536, 359)  VISIBLEROW(14)  CELLH(18)  MATRIX(2000, 8)  FIX(0)  
 
 LABEL  UPNM(109, 431, 192, 449)  AL_LEFT  CUR(0)      COLOR(131, 1)  ENABLE  &
   VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
-EDIT  1301(592, 40, 663, 60)  LEN(6)  IO_MIXED|EDIT_INOUT|FA_WRAP|FA_HAN    COLOR(28, 232)  CUR(0)  TP_NONE          TABORDER(2)  IOORDER(1)  &
+EDIT  1301(592, 40, 663, 60)  LEN(12)  IO_MIXED|EDIT_INOUT|FA_WRAP|FA_HAN    COLOR(28, 232)  CUR(0)  TP_NONE          TABORDER(2)  IOORDER(1)  &
   HINTTYPE(IH_NONE)
 EDIT  sort(593, 71, 625, 93)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(28, 232)  CUR(0)  TP_NONE  INIT("2")          TABORDER(3)  IOORDER(2)  ENABLE  &
   VISIBLE  HINTTYPE(IH_NONE)
@@ -54,6 +54,17 @@ If Trim(S1301.Data) = "" Then
 	SCREEN.OnSend = False
 	Exit Sub
 End If
+
+If UCase(TypeName( SCREEN.Object("main.cxMarket"))) <> "NOTHING" Then
+	If SCREEN.Object("main.cxMarket").sMarket = "KRX" Then
+		S1301.Data = S1301.Data
+	ElseIf SCREEN.Object("main.cxMarket").sMarket = "NXT" Then
+		S1301.Data = "N." & S1301.Data
+	ElseIf SCREEN.Object("main.cxMarket").sMarket = "통합" Then
+		S1301.Data = "M." & S1301.Data
+	End If
+End If
+SYSTEM.Trace "|"&S1301.Data&"|"
 
 _AW_ONENDSUB_AW_
 _AW_SCRIPT_AW_(GRID)

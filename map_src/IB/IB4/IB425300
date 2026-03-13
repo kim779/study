@@ -42,7 +42,7 @@ LABEL  SYMBOL11(775, 6, 856, 26)  '단위 : 계약수'  AL_LEFT  CUR(0)      COLOR(76
   VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
 BUTTON  BUTTON0(907, 6, 944, 26)  '조회'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, BOLD)  FOCUS  COLOR(208, 186)  CUR(0)    "조회btn.bmp"    TABORDER(2)  ENABLE  &
   VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
-COMBO  62302(155, 599, 245, 619)  TP_SUNKEN  LEN(2)  COUNT(1)  VCOUNT(1)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_NUM|EDIT_INPUT|FA_SEND|FA_SKIP|SA_ALL    COLOR(68, 130)  CUR(0)  DISPLAY("선물")  DATA("01")    TABORDER(1)  IOORDER(1)  ENABLE  &
+COMBO  62302(634, 20, 724, 40)  TP_SUNKEN  LEN(2)  COUNT(1)  VCOUNT(1)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_NUM|EDIT_INPUT|FA_SEND|FA_SKIP|SA_ALL    COLOR(68, 130)  CUR(0)  DISPLAY("선물")  DATA("01")    TABORDER(1)  IOORDER(1)  ENABLE  &
   HINTTYPE(IH_NONE)
 OBJECT  obj1(5, 39, 948, 127)    "IB425311"  TABORDER(3)  IOORDER(2)  ENABLE  &
   VISIBLE  HINTTYPE(IH_NONE)
@@ -78,14 +78,14 @@ BUTTON  RADIO0(195, 6, 245, 25)  '증감'  TP_RADIO|RD_NORMAL|EDIT_NOP      GROUP(
   VISIBLE  CHECKED  HINTTYPE(IH_NONE)
 COMBO  COMBO0(185, 5, 275, 25)  TP_SUNKEN  LEN(1)  COUNT(3)  VCOUNT(3)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_NUM|EDIT_INPUT|FA_SKIP    COLOR(68, 69)  CUR(0)  DISPLAY("매도", "매수", "순매수")  DATA("1", "2", "3")    TABORDER(13)  IOORDER(7)  ENABLE  &
   VISIBLE  HINTTYPE(IH_NONE)
-OBJECT  jnam(425, 5, 553, 25)    "IB425301"  TABORDER(14)  IOORDER(8)  ENABLE  &
+OBJECT  jnam(415, 5, 543, 25)    "IB425301"  TABORDER(14)  IOORDER(8)  ENABLE  &
   VISIBLE  HINTTYPE(IH_NONE)
-BUTTON  CHECK0(370, 5, 425, 25)  '종목별'  TP_CHECK|EDIT_NOP          COLOR(66, 232)  CUR(0)      TABORDER(15)  ENABLE  &
+BUTTON  CHECK0(360, 5, 415, 25)  '종목별'  TP_CHECK|EDIT_NOP          COLOR(66, 232)  CUR(0)      TABORDER(15)  ENABLE  &
   VISIBLE  HINTTYPE(IH_NONE)
-LABEL  LABEL3(555, 5, 755, 25)  '*종목은 근월물만 선택 가능합니다 .'  AL_LEFT  CUR(0)      COLOR(131, 130)  ENABLE  &
+LABEL  LABEL3(575, 5, 770, 25)  '*종목은 근월물만 선택 가능합니다 .'  AL_LEFT  CUR(0)      COLOR(131, 130)  ENABLE  &
   VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
-EDIT  62303(150, 560, 210, 580)  LEN(3)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("49")          TABORDER(16)  IOORDER(9)  ENABLE  &
-  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  62303(729, 20, 789, 40)  LEN(3)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("49")          TABORDER(16)  IOORDER(9)  ENABLE  &
+  HINTTYPE(IH_NONE)
 }
 
 
@@ -206,7 +206,7 @@ End Sub
 
 Sub send_id()
 	Dim codex,idx
-	codex = Trim(SCREEN.Object("jnam.jnam").data)
+	codex = Trim(SCREEN.Object("jnam.scode").data)
 
 	If Len(Trim(codex)) = 0 Then
 		Exit Sub
@@ -220,6 +220,10 @@ SYSTEM.Trace "------------------------ 	idx = " & idx
 		S62303.data = 49
 	End If
 	SCREEN.Send 0
+End Sub
+
+Sub SetCode_IB425300(sCode)
+	SCREEN.Proc "jnam.SetCode_IB425301", sCode
 End Sub
 
 _AW_ONINDECLARE_AW_
@@ -391,14 +395,19 @@ _AW_ENDSCRIPT_AW_
 _AW_SCRIPT_AW_(CHECK0)
 _AW_ONCLICK_AW_
 Dim idx, codex
-codex = Trim(SCREEN.Object("jnam.jnam").data)
 
 If CHECK0.Checked = True Then
 	SCREEN.Object("jnam.jnam").Enable = True
+	SCREEN.Object("jnam.BUTTON2").Enable = True   '
+	SCREEN.Object("jnam.SYMBOL7").Enable = True
 	SCREEN.Proc ("jnam.read_combo_history"), ""
 ElseIf CHECK0.Checked = False Then
 	SCREEN.Object("jnam.jnam").Enable = False
+	SCREEN.Object("jnam.BUTTON2").Enable = False
+	SCREEN.Object("jnam.SYMBOL7").Enable = False
 End If
+
+codex = Trim(SCREEN.Object("jnam.scode").data)
 
 If Len(Trim(codex)) = 0 Then
 	Exit Sub

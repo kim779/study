@@ -456,6 +456,12 @@ Sub send_OK()
 	If GUBN.Data <> "1" Then
 		Tog.Data = "1"
 	End If
+
+	If SYSTEM.Pop ("4987_skip_6") = "1" Then
+		Tog.Data = "1"
+		SYSTEM.Push "4987_skip_6", ""
+	End If
+
 	StringData.Data = dmsg
 	SCREEN.SetTimer 3, False
 '	If SCREEN.CreateObject("Info") Then
@@ -555,6 +561,10 @@ Sub send_OK_Before()
 		Exit Sub
 	End If
 
+	If SYSTEM.Pop ("4987_skip_6") = "1" Then
+		send_OK()
+	End If
+
 	Dim char, check_char, donimo_char, dmsg, dmsg2
 	char = Trim(OUTPUT20.Data)
 
@@ -628,15 +638,22 @@ Sub send_OK_Before()
 		Q3 = Trim(INFO.PopData(LOGIN.Name, "userconf.ini", "InvestTuja", "Quest3"))
 		Q4 = Trim(INFO.PopData(LOGIN.Name, "userconf.ini", "InvestTuja", "Quest4"))
 	End If
+	Dim strData
+	strData = SYSTEM.Pop ("4987_P_Q3")
+	SYSTEM.Push "4987_BuFund_1", CmplxPdtYn.Data '고난도 여부
+	SYSTEM.Push "4987_BuFund_2", RpAbleYn.Data '중도환매여부 1 0 ,yn
+	SYSTEM.Push "4987_BuFund_3", strData
+	SYSTEM.Push "4987_BuFund_4", RfundDt.Data
+	SYSTEM.Push "4987_BuFund_5", Q2
+	SYSTEM.Push "4987_BuFund_6", Q3
+	SYSTEM.Push "4987_BuFund_7", Q4
 
 	SYSTEM.Push "4987f_num", Trim(f_num.Data)
 	'부적합 1 , 가입 2 , 적정성 3
 	GUBN.Data = "0"
 
 	If Q2 = "1" Then
-		If donimo_char = 1 Then
-			GUBN.Data = "2"
-		End If
+		GUBN.Data = "1"
 	Else
 		If CmplxPdtYn.Data <> "1" Then	'고난도 상품이 아니고
 			If RpAbleYn.Data <> "1" Then	'중도환매 제한상품 여부가 아니고
@@ -649,52 +666,53 @@ Sub send_OK_Before()
 				GUBN.Data = "4"	'아래에서 투자예정기간 > 상품만기일 체크
 			End If
 		End If
-	End If
 
-	If GUBN.Data = "5" Then
-		If check_char < donimo_char Then	'고객,상품 투자성향 비교
-			GUBN.Data = "1"
-		Else
-			GUBN.Data = "3"
-		End If
-	End If
 
-	If GUBN.Data = "4" Then
-		If Trim(RfundDt.Data) <> "" Then
-			Dim FDay, EDay, diff , FDate, EDate, nQ4
-			FDay = GetToday()
-			EDay = RfundDt.Data
-			FDate = DateSerial(Left(FDay,4),Mid(FDay,5,2),Right(FDay,2))
-			EDate = DateSerial(Left(EDay,4),Mid(EDay,5,2),Right(EDay,2))
-			diff = DateDiff("d",FDate,EDate)
-
-			If Q4 = "5" Then
-				nQ4 = 999999
-			ElseIf Q4 = "4" Then
-				nQ4 = 1095
-			ElseIf Q4 = "3" Then
-				nQ4 = 730
-			ElseIf Q4 = "2" Then
-				nQ4 = 365
-			ElseIf Q4 = "1" Then
-				nQ4 = 180
-			End If
-			If nQ4 > diff Then
-				If check_char < donimo_char Then	'고객,상품 투자성향 비교
-					GUBN.Data = "1"
-				Else
-					GUBN.Data = "3"
-				End If
-			Else
-				GUBN.Data = "1"
-			End If
-		Else
+		If GUBN.Data = "5" Then
 			If check_char < donimo_char Then	'고객,상품 투자성향 비교
 				GUBN.Data = "1"
 			Else
 				GUBN.Data = "3"
 			End If
-			'SCREEN.CreateWindow 3, "IB498706 /p5 /d", dmsg2
+		End If
+
+		If GUBN.Data = "4" Then
+			If Trim(RfundDt.Data) <> "" Then
+				Dim FDay, EDay, diff , FDate, EDate, nQ4
+				FDay = GetToday()
+				EDay = RfundDt.Data
+				FDate = DateSerial(Left(FDay,4),Mid(FDay,5,2),Right(FDay,2))
+				EDate = DateSerial(Left(EDay,4),Mid(EDay,5,2),Right(EDay,2))
+				diff = DateDiff("d",FDate,EDate)
+
+				If Q4 = "5" Then
+					nQ4 = 999999
+				ElseIf Q4 = "4" Then
+					nQ4 = 1095
+				ElseIf Q4 = "3" Then
+					nQ4 = 730
+				ElseIf Q4 = "2" Then
+					nQ4 = 365
+				ElseIf Q4 = "1" Then
+					nQ4 = 180
+				End If
+				If nQ4 > diff Then
+					If check_char < donimo_char Then	'고객,상품 투자성향 비교
+						GUBN.Data = "1"
+					Else
+						GUBN.Data = "3"
+					End If
+				Else
+					GUBN.Data = "1"
+				End If
+			Else
+				If check_char < donimo_char Then	'고객,상품 투자성향 비교
+					GUBN.Data = "1"
+				Else
+					GUBN.Data = "3"
+				End If
+				'SCREEN.CreateWindow 3, "IB498706 /p5 /d", dmsg2
+			End If
 		End If
 	End If
 

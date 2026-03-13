@@ -107,13 +107,17 @@ BUTTON  BUTTON0(1154, 5, 1190, 25)  '설정'  TP_PUSH|IMAGETEXT|AL_STRETCH      FO
   VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
 BUTTON  infobt(1063, 5, 1153, 25)  '관심종목등록'  TP_USER|IMAGETEXT|AL_STRETCH    KEYMAP(PAGEUP)    FONT("굴림체", 9, NORMAL)  FOCUS  COLOR(208, 186)  CUR(0)    "6BTN.BMP"    TABORDER(24)  ENABLE  &
   VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
-COMBO  infocb(1066, 25, 1152, 65)  TP_SUNKEN  LEN(2)  COUNT(0)  VCOUNT(0)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_MIXED|EDIT_INPUT|FA_SKIP    COLOR(68, 69)  CUR(0)    TABORDER(25)  IOORDER(7)  ENABLE  &
+COMBO  infocb(1066, 27, 1152, 47)  TP_SUNKEN  LEN(2)  COUNT(0)  VCOUNT(0)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_MIXED|EDIT_INPUT|FA_SKIP    COLOR(68, 69)  CUR(0)    TABORDER(25)  IOORDER(7)  ENABLE  &
   HINTTYPE(IH_NONE)
 CONTROL  cxMarket(300, 5, 320, 25)  |FA_SKIP  "CX_MarketPicker"  "/k2/tIB201500/u1/d1"  LEN(12)  EDIT_NOP    COLOR(192, 232)  TABORDER(0)  ENABLE  &
   VISIBLE  HINTTYPE(IH_NONE)
 EDIT  edMarketTrigger(1305, 16, 1337, 36)  LEN(6)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(26)  IOORDER(8)  ENABLE  &
   HINTTYPE(IH_NONE)
 LABEL  LABEL6(1240, 16, 1300, 36)  '거래소'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  R_realChk(1475, 29, 1515, 48)  LEN(1)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(28, 232)  CUR(0)  TP_NONE  INIT("0")          TABORDER(27)  IOORDER(9)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  R_realTime(1470, 49, 1510, 68)  LEN(3)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(28, 232)  CUR(0)  TP_NONE  INIT("3")          TABORDER(28)  IOORDER(10)  ENABLE  &
   HINTTYPE(IH_NONE)
 }
 
@@ -214,7 +218,7 @@ Sub Onstart()
 		SCREEN.Object("SUBMAP.ed_DataTp").Data = "0"
 	End If
 
-
+	SetTime()
 
 	JMOBJ.Send
 	SUBMAP.Send
@@ -250,8 +254,17 @@ End Sub
 
 Sub Change_MKGubn_Main(sMKGubn)
 	cxMarket.sMarket = sMKGubn
+
+	SetTime()
+
 	SUBMAP.Send
 End Sub
+
+Sub SetTime()
+	SCREEN.Object("SUBMAP.sReal").Data = R_realChk.Data
+	SCREEN.Object("SUBMAP.sTime").Data = R_realTime.Data
+	SCREEN.Object("SUBMAP.ChangeTime").Data = "300"
+End Sub 
 
 _AW_ONINDECLARE_AW_
 #load IB888888
@@ -261,6 +274,8 @@ _AW_ONSTART_AW_
 ' 현재 화면의 시장식별자(cxMarket)에 고유 화면번호 부여
 cxMarket.MNum = SCREEN.GetMapName(1)
 cxMarket.Major = SCREEN.Major
+R_realChk.Data = GetIniData("RB1", "0")
+R_realTime.Data = GetIniData("RB2", "3")
 
 Call Onstart()
 
@@ -302,6 +317,9 @@ Else
 		   SetIniData "ISKOSPI", "1"
 	End Select
 
+
+	SetTime()
+
 	SCREEN.Object("SUBMAP.ed_TrTp").Data = "0"
 	SUBMAP.Send
 	SCREEN.Object("UPJM.20301").DATA = S20301.Data
@@ -333,6 +351,9 @@ Select Case upcd
 End Select
 SCREEN.IgnoreChange False
 
+
+SetTime()
+
 S20301.SetFocus
 SCREEN.Object("SUBMAP.ed_TrTp").Data = "0"
 SUBMAP.Send
@@ -348,6 +369,9 @@ _AW_ENDSCRIPT_AW_
 _AW_SCRIPT_AW_(cb_Sort)
 _AW_ONCHANGE_AW_
 SCREEN.Object("SUBMAP.ed_TrTp").Data = "0"
+
+SetTime()
+
 SUBMAP.Send
 SetIniData"SORT", cb_Sort.Data
 _AW_ONENDSUB_AW_
@@ -356,6 +380,8 @@ _AW_ENDSCRIPT_AW_
 
 _AW_SCRIPT_AW_(ck_DataTp)
 _AW_ONCLICK_AW_
+SetTime()
+
 If ck_DataTp.Checked Then
 	SUBMAP.SetObject("IB201520")
 	SCREEN.Object("SUBMAP.ed_DataTp").Data = "1"
@@ -383,6 +409,9 @@ Else
 	SCREEN.Object("SUBMAP.ed_NextCk").Data = SCREEN.Object("SUBMAP.ot_NextCk").Data
 End If
 
+
+SetTime()
+
 SUBMAP.Send
 _AW_ONENDSUB_AW_
 _AW_ENDSCRIPT_AW_
@@ -399,6 +428,8 @@ If Int(CURPAGE.Data) = 1 Then
 Else
 	SCREEN.Object("SUBMAP.ed_PrevCk").Data = SCREEN.Object("SUBMAP.ot_PrevCk").Data
 End If
+
+SetTime()
 
 SUBMAP.Send
 _AW_ONENDSUB_AW_
@@ -424,6 +455,9 @@ SCREEN.IgnoreChange True
 S20301.Data = "001"
 SCREEN.IgnoreChange False
 SCREEN.Object("SUBMAP.ed_TrTp").Data = "0"
+
+SetTime()
+
 SUBMAP.Send
 SCREEN.Object("JMOBJ.20301").data = S20301.Data
 JMOBJ.Send
@@ -442,6 +476,8 @@ SCREEN.IgnoreChange True
 S20301.Data = "201"
 SCREEN.IgnoreChange False
 SCREEN.Object("SUBMAP.ed_TrTp").Data = "0"
+SetTime()
+
 SUBMAP.Send
 SCREEN.Object("JMOBJ.20301").data = S20301.Data
 JMOBJ.Send
@@ -484,9 +520,13 @@ _AW_SCRIPT_AW_(autopage)
 _AW_ONCLICK_AW_
 If autopage.Checked Then
 	SetIniData "AOTOCHECK", "1"
+	SetTime()
+	SUBMAP.Send
 	'INFO.PushData LOGIN.Name, "userconf.ini", "IB201500", "AOTOCHECK", "1"
 Else
 	SetIniData "AOTOCHECK", "0"
+	SetTime()
+	SUBMAP.Send
 	'INFO.PushData LOGIN.Name, "userconf.ini", "IB201500", "AOTOCHECK", "0"
 End If
 _AW_ONENDSUB_AW_
@@ -600,11 +640,18 @@ _AW_ENDSCRIPT_AW_
 _AW_SCRIPT_AW_(BUTTON0)
 _AW_ONCLICK_AW_
 
+SYSTEM.Push "mapcs", ""
 SCREEN.CreateWindow 2, "IB201503 /p5 " , ""
-'
-'If SYSTEM.Pop("mapcs") = "OK" Then
+Dim strTmp
+strTmp = SYSTEM.Pop("mapcs")
+
+If strTmp = "OK" Then
+	R_realChk.Data = GetIniData("RB1", "0")
+	R_realTime.Data = GetIniData("RB2", "3")
+	
+	SetTime()
 	SUBMAP.Send
-'End If
+End If
 _AW_ONENDSUB_AW_
 _AW_ENDSCRIPT_AW_
 
@@ -667,6 +714,8 @@ _AW_ENDSCRIPT_AW_
 
 _AW_SCRIPT_AW_(cxMarket)
 _AW_ONCLICK_AW_
+SetTime()
+
 JMOBJ.Send
 SUBMAP.Send
 _AW_ONENDSUB_AW_

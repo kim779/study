@@ -672,13 +672,13 @@ Sub complete_cusstatus()
 		zAdqucyJdrptYn = SYSTEM.Pop ("498970_zAdqucyJdrptYn")
 		zCmplxpdtYn = SYSTEM.Pop ("498970_zCmplxpdtYn")
 		SCREEN.Object("main.tujaNM").Data = "없음(정보미제공)"
-		
+
 		Exception.Data = "1"
 		SCREEN.Object("obj_cusstatus.TpText3").Data = SYSTEM.Pop ("498970_TpText3")
 		SCREEN.Object("obj_cusstatus.CmplxPdtYn").Data = SYSTEM.Pop ("498970_zCmplxpdtYn")
 		SCREEN.Object("obj_cusstatus.RpAbleYn").Data = SYSTEM.Pop ("498970_zRpAbleYn")
 		SCREEN.Object("obj_cusstatus.RfundDt").Data = SYSTEM.Pop ("498970_RfundDt")
-		
+
 		If zAdqucyJdrptYn = "1" Or zCmplxpdtYn = "1" Then
 			SCREEN.CreateWindow 1, "IB498794 /t/p5", ""
 			Exit Sub
@@ -686,7 +686,7 @@ Sub complete_cusstatus()
 			SCREEN.Object("obj_cusstatus").Proc "send_OK_Before",""
 			Exit Sub
 		End If
-		
+
 	Else '일반금융소비자
 		'tujaYN.Data = tmptujaYN
 		'infoYN.Data = tmpinfoYN
@@ -819,6 +819,13 @@ End Function
 
 Sub New_cusstatus()
 	SYSTEM.Trace "=====================send_OK_Before====================="
+
+
+	If Trim(SCREEN.Object("OBJ1.zInvstMthdCode").Data) = "01" Then
+		SYSTEM.Push "4987_skip_6", "1"
+		SCREEN.Object("obj_cusstatus").Proc "send_OK_Before",""
+	End If
+
 
 	If Trim(SCREEN.Object("obj_cusstatus.OUTPUT6").Data) = "0" Then' 전문금융소비자 일경우 스킵
 		SCREEN.Object("obj_cusstatus").Proc "send_pass",""

@@ -2,7 +2,7 @@ GLOBAL DIVISION
 {
 
 MAPNAME(IB104099)
-MAPSIZE(746, 773)
+MAPSIZE(749, 773)
 VERSION(000)
 MAPKIND(PROCEDURES)
 MAPGROUP(0)
@@ -533,6 +533,23 @@ End Sub
 '****************************************************************************
 Sub set_avol(data)
 	ed_jqty.Data = data
+End Sub
+
+
+'****************************************************************************
+' DESC: 주버튼 클릭시 (cx_amount에 현재가등 pushcc)
+'****************************************************************************
+Sub Set_cx_amount()
+	If IsNumeric(Trim(SCREEN.Object("main.obj_sise.1377").Data)) Then
+		SYSTEM.Push "OSBJ1377", Trim(SCREEN.Object("main.obj_sise.1377").Data)
+SYSTEM.Trace "[주버튼] 1377 존재 = " & Trim(SCREEN.Object("main.obj_sise.1377").Data)		
+	Else
+SYSTEM.Trace "[주버튼] 1377 없어서 1"	
+		SYSTEM.Push "OSBJ1377", 1
+	End If
+	
+SYSTEM.Trace "[주버튼] jprc = " & Trim(ed_jprc.Data)
+	SYSTEM.Push "OSBJPrc", Trim(ed_jprc.Data)
 End Sub
 
 }
