@@ -49,7 +49,7 @@ extern std::unordered_map<std::string, int> g_codeToIndex;
 extern TickSnapshot g_tickSlots[MAX_SLOT];
 extern int g_nextIndex;
 extern std::shared_mutex  g_codeMapLock;
-extern std::vector<int> g_dirtySlots;
+extern std::unordered_set<int> g_dirtySlots;
 extern std::mutex       g_dirtyMtx;
 extern int g_nextSlot;
 #endif

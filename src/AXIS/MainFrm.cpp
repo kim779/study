@@ -127,7 +127,7 @@ std::shared_mutex  g_codeMapLock;
 int g_nextSlot{};
 #endif
 
-std::vector<int>  g_dirtySlots;  // ← 추가
+std::unordered_set<int>  g_dirtySlots;  // ← 추가
 std::mutex        g_dirtyMtx;    // ← 추가
 
 #pragma	comment(lib, "Winmm.lib")
@@ -32866,18 +32866,20 @@ AXIS_API const TickSnapshot* Axis_GetTickSlots()
 AXIS_API void Axis_PushDirtySlot(int idx)
 {
 	std::lock_guard<std::mutex> lk(g_dirtyMtx);
-	g_dirtySlots.push_back(idx);
+	g_dirtySlots.insert(idx);  // 중복 자동 제거
 }
 
 AXIS_API int Axis_SwapDirtySlots(int* outBuf, int bufSize)
 {
-	std::vector<int> dirty;
+	std::unordered_set<int> dirty;
 	{
 		std::lock_guard<std::mutex> lk(g_dirtyMtx);
 		dirty.swap(g_dirtySlots);
 	}
 	int count = min((int)dirty.size(), bufSize);
-	memcpy(outBuf, dirty.data(), count * sizeof(int));
+	int i = 0;
+	for (int idx : dirty)
+		outBuf[i++] = idx;
 	return count;
 }
 

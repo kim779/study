@@ -2225,18 +2225,9 @@ void CMainWnd::OnTimer(UINT nIDEvent)
 		//}
 
 		// dirty 큐 처리 - API로
-		static int dirtyBuf[MAX_SLOT];
-#ifdef DF_DLL_RTS
-		int count = DLL_SwapDirtySlots(dirtyBuf, MAX_SLOT);
-#else
-		int count = Axis_SwapDirtySlots(dirtyBuf, MAX_SLOT);
-#endif
-
-		if (count > 0 && m_pGroupWnd)
-		{
-			std::vector<int> dirty(dirtyBuf, dirtyBuf + count);
-			m_pGroupWnd->UpdateFromTick(dirty);
-		}
+		if (!m_slotIndices.empty() && m_pGroupWnd)
+			m_pGroupWnd->UpdateFromTick(m_slotIndices);
+		return;
 
 		return;
 	}
