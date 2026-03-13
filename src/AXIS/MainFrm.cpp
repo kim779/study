@@ -9088,55 +9088,51 @@ void CMainFrame::update_ticker(int kind, struct _alertR* alertR)
 		if (1)
 		{
 			if (!code || !code[0]) return;
-
 			m_tickCount[std::string(code)]++;
 			if (m_tickCountStart == 0)
 				m_tickCountStart = GetTickCount();
 
-			// 직접 저장
 			int idx = EnsureSlotIndexForCode(code);
 			if (idx < 0) return;
 
 			TickSnapshot& s = g_tickSlots[idx];
-
-			// seqlock begin
-			s.seq.fetch_add(1, std::memory_order_acq_rel);
-			bool bchange = false;
-
 			s.ts_ms = GetTickCount();
 
-			static const int targetSymbols[] = { 0, 23, 24, 27, 33, 111, 112, 115, 116 };
+			static const int targetSymbols[] = {
+				0,    // 구분
+				23,   // 현재가
+				24,   // 전일대비
+				27,   // 거래량
+				33,   // 등락률
+				29,   // 시가
+				30,   // 고가
+				31,   // 저가
+				34,   // 체결시간
+				40,   // 서버시간
+				111,  // 예상가
+				112,  // 예상거래량
+				115,  // 예상대비
+				116,  // 예상등락률
+			};
+			constexpr int targetCount = sizeof(targetSymbols) / sizeof(targetSymbols[0]);
 
 			for (int ii = alertR->size - 1; ii >= 0; ii--)
 			{
 				if (alertR->ptr[ii] == 0) continue;
-
 				const PTR_T* data = reinterpret_cast<const PTR_T*>(alertR->ptr[ii]);
 
-				for (int kk = 0; kk < sizeof(targetSymbols) / sizeof(targetSymbols[0]); kk++)
+				for (int kk = 0; kk < targetCount; kk++)
 				{
 					int jj = targetSymbols[kk];
-
 					if (data[jj] == 0) continue;
-
 					const char* val = reinterpret_cast<const char*>(data[jj]);
-
 					if (val && val[0])
 					{
-						if (strcmp(s.values[jj], val) != 0)
-						{
-							CopyZ(s.values[jj], SYMBOL_STR_LEN, val);
-							s.valid.set(jj);
-							bchange = true;
-						}
+						CopyZ(s.values[jj], SYMBOL_STR_LEN, val);
+						s.valid.set(jj);
 					}
 				}
 			}
-
-			s.seq.fetch_add(1, std::memory_order_release);
-
-			if (bchange)
-				Axis_PushDirtySlot(idx);
 		}
 		else
 		{

@@ -115,8 +115,8 @@ void CMainWnd::CheckRTSTimer(bool bFirst)
 	userip = CheckIP();
 	CString filePath;
 	filePath.Format("%s/%s/InterOption.ini", Variant(homeCC), "tab");
-	m_icheckTime = GetPrivateProfileInt("OVERTIME", "TIME", 5000, filePath);
-	m_DiffSec = GetPrivateProfileInt("OVERTIME", "DIFFSEC", 1, filePath);
+	m_icheckTime = GetPrivateProfileInt("OVERTIME", "TIME", 300, filePath);
+	m_DiffSec = GetPrivateProfileInt("OVERTIME", "DIFFSEC", 0, filePath);
 	int iTime = 800;  
 	if (!m_bcustomer) //직원용
 	{
@@ -982,13 +982,15 @@ LONG CMainWnd::OnUser(WPARAM wParam, LPARAM lParam)
 		{
 			const auto* alertR = reinterpret_cast<const _alertR*>(lParam);
 
-			if (alertR == nullptr && alertR->size <= 0)
+			if (alertR == nullptr || alertR->size <= 0)
 				return 0;
 			const CString code = alertR->code;
 			if (!m_pGroupWnd->isCodeSymbol(code))
 				return 0;
 
 			const DWORD* data = reinterpret_cast<const DWORD*>(alertR->ptr[0]);
+			if (data == nullptr)
+				return 0;
 			COleDateTime oTime;
 			oTime = COleDateTime::GetCurrentTime();
 			CString strCurTime;
@@ -1091,8 +1093,8 @@ LONG CMainWnd::OnUser(WPARAM wParam, LPARAM lParam)
 
 bool CMainWnd::ShouldSkipRTSByServerTime(
 	const std::string& code,
-	const char* pServerTime,   // data[40]
-	int                minIntervalSec // 예: 1 or 2
+	const char* pServerTime,   //data[34] 
+	int                minIntervalSec 
 )
 {
 	if (!pServerTime)
@@ -1109,9 +1111,10 @@ bool CMainWnd::ShouldSkipRTSByServerTime(
 		return false;
 	}
 	
-
-	const CTime now = CTime::GetCurrentTime();
 	const CTime curServerTime = ParseRTSTime(pServerTime, COleDateTime::GetCurrentTime());
+
+	if (curServerTime == CTime(0)) 
+		return false;
 
 	auto it = m_lastRTSTimeMap.find(code);
 
@@ -2477,29 +2480,30 @@ bool CMainWnd::IsEnableRTSTimeCheck(
 
 	const CTimeSpan diff = currentTime - baseTime;
 
-
 	//CString slog;
 	//slog.Format("[IB202200][IsEnableRTSTimeCheck] checkTimeSec=[%d] deff=[%llu] m_strBeginTimeEnd=[%s]",
 	//	checkTimeSec, diff.GetTotalMinutes(), m_strBeginTimeEnd);
 	//OutputDebugString(slog);
 
-
-	if (diff < 0)
+	if (diff.GetTotalSeconds() < 0) 
 		return false;
 
-	return diff.GetTotalMinutes() <= checkTimeSec;
+	return diff.GetTotalSeconds() <= checkTimeSec;
 }
 
 CTime CMainWnd::ParseRTSTime(const CString& sTime, const COleDateTime& today)
 {
+	// 길이 검증
+	if (sTime.GetLength() < 6)
+		return CTime(0);  // 유효하지 않은 시간 반환
+
 	int h = _ttoi(sTime.Mid(0, 2));
 	int m = _ttoi(sTime.Mid(2, 2));
 	int s = _ttoi(sTime.Mid(4, 2));
 
-	return CTime(
-		today.GetYear(),
-		today.GetMonth(),
-		today.GetDay(),
-		h, m, s
-	);
+	// 범위 검증
+	if (h < 0 || h > 23 || m < 0 || m > 59 || s < 0 || s > 59)
+		return CTime(0);  // 유효하지 않은 시간 반환
+
+	return CTime(today.GetYear(), today.GetMonth(), today.GetDay(), h, m, s);
 }

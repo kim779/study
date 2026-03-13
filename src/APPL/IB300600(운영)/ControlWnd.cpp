@@ -1175,7 +1175,7 @@ void CControlWnd::LoadMaster(int igubn)
 	else if(igubn == WEEKBTN)
 	{
 		strFuture = "fjcode.dat";
-		strOption = "wocode.dat";
+		strOption = "wocode2.dat";
 	}
 	
 	// 선물종목코드
@@ -1222,9 +1222,9 @@ void CControlWnd::LoadMaster(int igubn)
 					sprintf(row.call_code, "%.8s", st->call[10-i].cod2);
 					sprintf(row.put_code, "%.8s", st->put[i].cod2);
 					if (strlen(st->price) > 5)
-						sprintf(row.hsga, "%.4s.%.2s", &st->price[0], &st->price[3]);
+						sprintf(row.hsga, "%.4s.%.1s", &st->price[0], &st->price[4]);
 					else
-						sprintf(row.hsga, "%.3s.%.2s", &st->price[0], &st->price[3]);
+						sprintf(row.hsga, "%.3s.%.1s", &st->price[0], &st->price[3]);
 					
 					//str.Format("[opcode] %s", st->price);
 					//OutputDebugString(str);
