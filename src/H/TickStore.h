@@ -49,12 +49,12 @@ extern std::unordered_map<std::string, int> g_codeToIndex;
 extern TickSnapshot g_tickSlots[MAX_SLOT];
 extern int g_nextIndex;
 extern std::shared_mutex  g_codeMapLock;
-extern std::unordered_set<int> g_dirtySlots;
-extern std::mutex       g_dirtyMtx;
+//extern std::unordered_set<int> g_dirtySlots;
+//extern std::mutex       g_dirtyMtx;
 extern int g_nextSlot;
 #endif
-AXIS_API void  Axis_PushDirtySlot(int idx);
-AXIS_API int   Axis_SwapDirtySlots(int* outBuf, int bufSize);  // swapÇØ¼­ °¡Á®¿È
+//AXIS_API void  Axis_PushDirtySlot(int idx);
+//AXIS_API int   Axis_SwapDirtySlots(int* outBuf, int bufSize);  // swapÇØ¼­ °¡Á®¿È
 AXIS_API int  Axis_EnsureSlotIndex(const char* code);
 AXIS_API const TickSnapshot* Axis_GetTickSlots();
 AXIS_API BOOL Axis_IsMainRTS();
@@ -69,11 +69,11 @@ extern std::unordered_map<std::string, int> g_dllcodeToIndex;
 extern TickSnapshot g_dlltickSlots[MAX_SLOT];
 extern int g_dllnextIndex;
 extern std::shared_mutex  g_dllcodeMapLock;
-extern std::vector<int> g_dlldirtySlots;
-extern std::mutex       g_dlldirtyMtx;
+//extern std::vector<int> g_dlldirtySlots;
+//extern std::mutex       g_dlldirtyMtx;
 #endif
-DLL_API void  DLL_PushDirtySlot(int idx);
-DLL_API int   DLL_SwapDirtySlots(int* outBuf, int bufSize);  // swapÇØ¼­ °¡Á®¿È
+//DLL_API void  DLL_PushDirtySlot(int idx);
+//DLL_API int   DLL_SwapDirtySlots(int* outBuf, int bufSize);  // swapÇØ¼­ °¡Á®¿È
 DLL_API int  DLL_EnsureSlotIndex(const char* code);
 DLL_API const TickSnapshot* DLL_GetTickSlots();
 

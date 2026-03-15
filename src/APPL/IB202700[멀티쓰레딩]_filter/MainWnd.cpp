@@ -2199,32 +2199,6 @@ void CMainWnd::OnTimer(UINT nIDEvent)
 	}
 	else if (nIDEvent == TM_RTSTIME)
 	{
-		// CPU 체크해서 타이머 동적 조절
-		//int cpu = GetProcessCpuUsage();
-
-		//int newInterval;
-		//if (cpu > 80)       newInterval = m_iTime * 3;   // 매우 바쁨 - 3배 느리게
-		//else if (cpu > 60)  newInterval = m_iTime * 2;   // 바쁨 - 2배 느리게
-		//else if (cpu > 40)  newInterval = m_iTime;        // 보통 - 설정값 그대로
-		//else if (cpu > 20)  newInterval = m_iTime * 2 / 3; // 여유 - 1.5배 빠르게
-		//else                newInterval = m_iTime / 2;    // 매우 여유 - 2배 빠르게
-
-		//// 최소값 보장 (너무 빠르면 역효과)
-		//if (newInterval < 50) newInterval = 50;  // 최소 50ms
-
-		//if (newInterval != m_iCurInterval)
-		//{
-		//	KillTimer(TM_RTSTIME);
-		//	if (Axis_IsMainRTS()) SetTimer(TM_RTSTIME, newInterval, nullptr);
-		//	m_iCurInterval = newInterval;
-
-		//	CString slog;
-		//	slog.Format("[Timer] CPU=[%d%%] interval=[%d→%d ms]\n",
-		//		cpu, m_iCurInterval, newInterval);
-		//	OutputDebugString(slog);
-		//}
-
-		// dirty 큐 처리 - API로
 		if (!m_slotIndices.empty() && m_pGroupWnd)
 			m_pGroupWnd->UpdateFromTick(m_slotIndices);
 		return;

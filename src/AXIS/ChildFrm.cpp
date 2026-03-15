@@ -415,9 +415,13 @@ void CChildFrame::OnSize(UINT nType, int cx, int cy)
 	const int yy = GetSystemMetrics(SM_CYFRAME) + GetSystemMetrics(SM_CYSIZEFRAME);
 
 	form.DeflateRect(xx , yy );
-	form.right += 4;
+	//form.right += 4;
+	//form.left -= 4;
+	//form.bottom += 1;
+	form.left -= 7;
+	form.right += 6;
 	form.left -= 4;
-	form.bottom += 1;
+	form.bottom += 6;
 	
 	CRgn rgn;
 	rgn.CreateRectRgn(form.left, form.top, form.right, form.bottom);
@@ -478,7 +482,6 @@ void CChildFrame::DrawFrame()
 	right.left = right.right - GetSystemMetrics(SM_CXFRAME) - GetSystemMetrics(SM_CXSIZEFRAME) -2;
 	left.right = left.left + GetSystemMetrics(SM_CXFRAME) + GetSystemMetrics(SM_CXSIZEFRAME);
 	bottom.top = bottom.bottom - GetSystemMetrics(SM_CYFRAME) - GetSystemMetrics(SM_CYSIZEFRAME) - 1;
-
 	dc.FillSolidRect(left, border);
 	dc.FillSolidRect(right, border);
 	dc.FillSolidRect(bottom, border);
@@ -709,12 +712,14 @@ void CChildFrame::OnNcCalcSize(BOOL bCalcValidRects, NCCALCSIZE_PARAMS FAR* lpnc
 	//
 	//CMDIChildWnd::OnNcCalcSize(bCalcValidRects, lpncsp);
 
+
+
 	if (!IsZoomed() && !IsIconic())
 	{
 		if (GetStyle() & WS_CAPTION) {
 			lpncsp->rgrc[0].top -= GetSystemMetrics(SM_CYCAPTION) + 1;
 			lpncsp->rgrc[0].left -= 1;
-			lpncsp->rgrc[0].right += 1;
+		    lpncsp->rgrc[0].right += 1;
 			lpncsp->rgrc[0].bottom += 1;
 		}
 	}

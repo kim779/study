@@ -127,11 +127,12 @@ std::shared_mutex  g_codeMapLock;
 int g_nextSlot{};
 #endif
 
-std::unordered_set<int>  g_dirtySlots;  // ← 추가
-std::mutex        g_dirtyMtx;    // ← 추가
+//std::unordered_set<int>  g_dirtySlots;  // ← 추가
+//std::mutex        g_dirtyMtx;    // ← 추가
 
 #pragma	comment(lib, "Winmm.lib")
 #pragma	comment(lib, "SUiPre.lib")
+#pragma comment(lib, "iphlpapi.lib")
 
 //** macho begin 2008-03-20
 #define CALLCENTER1		"고객센터 : 1588-0030 , 1544-0050"
@@ -1799,6 +1800,7 @@ BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)
 							break;
 						}*/
 						//DumpAllSlots(g_tickSlots, MAX_SLOT, 100, 50);
+						GetCurrentNetType();
 						DumpAllSlots();
 					}
 				}
@@ -2842,6 +2844,9 @@ void CMainFrame::OnClose()
 		MemoUpload();  //memo
 		//DumpUpload();
 	}
+
+	SetEvent(g_hStopEvent);
+	CloseHandle(g_hStopEvent);
 
 	CString file;
 	m_iAxisState = AXIS_STATE_ONCLOSE;
@@ -27464,9 +27469,10 @@ void CMainFrame::os_report()
 // 	sprintf(mid.item.valu, "VER[%d.%d] BUILD[%d] PLATFORM[%d] OS[%s] OS BIT[%s] CPU[%d] CPU NUMBER[%d] MEMORY PHYS[%dM] SKIN [%s]", 
 // 		info.dwMajorVersion, info.dwMinorVersion, info.dwBuildNumber,
 // 		info.dwPlatformId, m_sysInfo->GetWindowInfo(),IsWow64(),m_sysInfo->GetCPUInfo(),sysinfo.dwNumberOfProcessors,m_sysInfo->GetMemoryInfo(),skinName);
-	sprintf(mid.item.valu, "VER[%s] BUILD[%d] PLATFORM[%d] OS[%s] OS BIT[%s] CPU[%s] CPU NUMBER[%d] MEMORY PHYS[%sM] SKIN [%s]",
+	sprintf(mid.item.valu, "VER[%s] BUILD[%d] PLATFORM[%d] OS[%s] OS BIT[%s] CPU[%s] CPU NUMBER[%d] MEMORY PHYS[%sM] SKIN [%s] network=[%s]",
 		m_sysInfo->GetWindowVersion(), info.dwBuildNumber,
-		info.dwPlatformId, m_sysInfo->GetWindowInfo(), IsWow64(), m_sysInfo->GetCPUInfo(), sysinfo.dwNumberOfProcessors, m_sysInfo->GetMemoryInfo(), skinName);
+		info.dwPlatformId, m_sysInfo->GetWindowInfo(), IsWow64(), m_sysInfo->GetCPUInfo(), sysinfo.dwNumberOfProcessors, m_sysInfo->GetMemoryInfo(), skinName,
+		GetCurrentNetType(TRUE) == 0 ? "none" : GetCurrentNetType(TRUE) == 1 ? "wifi" : "WIRED");
 	memcpy(mid.item.date, sdat, 8);
 
 // 	CString s;
@@ -32859,25 +32865,25 @@ AXIS_API const TickSnapshot* Axis_GetTickSlots()
 	return g_tickSlots;
 }
 
-AXIS_API void Axis_PushDirtySlot(int idx)
-{
-	std::lock_guard<std::mutex> lk(g_dirtyMtx);
-	g_dirtySlots.insert(idx);  // 중복 자동 제거
-}
-
-AXIS_API int Axis_SwapDirtySlots(int* outBuf, int bufSize)
-{
-	std::unordered_set<int> dirty;
-	{
-		std::lock_guard<std::mutex> lk(g_dirtyMtx);
-		dirty.swap(g_dirtySlots);
-	}
-	int count = min((int)dirty.size(), bufSize);
-	int i = 0;
-	for (int idx : dirty)
-		outBuf[i++] = idx;
-	return count;
-}
+//AXIS_API void Axis_PushDirtySlot(int idx)
+//{
+//	std::lock_guard<std::mutex> lk(g_dirtyMtx);
+//	g_dirtySlots.insert(idx);  // 중복 자동 제거
+//}
+//
+//AXIS_API int Axis_SwapDirtySlots(int* outBuf, int bufSize)
+//{
+//	std::unordered_set<int> dirty;
+//	{
+//		std::lock_guard<std::mutex> lk(g_dirtyMtx);
+//		dirty.swap(g_dirtySlots);
+//	}
+//	int count = min((int)dirty.size(), bufSize);
+//	int i = 0;
+//	for (int idx : dirty)
+//		outBuf[i++] = idx;
+//	return count;
+//}
 
 AXIS_API  BOOL Axis_IsMainRTS()
 {
@@ -33061,166 +33067,136 @@ void CMainFrame::WorkerThreadFunc()
 	//	delete item;
 	//}
 }
-//CString ip;
-//	ip.Format("%s", ipaddr);
-//	ip.TrimLeft(), ip.TrimRight();
 
-   //int returnL = 12;
-   //FillMemory(data, returnL, ' '); data[returnL] = 0x00;
-   //CString strRetrun;
+NetType CMainFrame::GetCurrentNetType(BOOL bUpload)
+{
+	ULONG size = 0;
+	GetAdaptersAddresses(AF_UNSPEC,
+		GAA_FLAG_INCLUDE_GATEWAYS, // ← 게이트웨이 정보 포함
+		NULL, NULL, &size);
 
-   //IP_ADAPTER_INFO AdapterInfo[16];
-   //DWORD dwBufLen = sizeof(AdapterInfo);
+	if (size == 0) return NET_NONE;
 
-   //DWORD dwStatus = GetAdaptersInfo(AdapterInfo, &dwBufLen);
+	IP_ADAPTER_ADDRESSES* addresses = (IP_ADAPTER_ADDRESSES*)malloc(size);
+	if (!addresses) return NET_NONE;
 
-   //CString stmp;
-   //PIP_ADAPTER_INFO pAdapterInfo = AdapterInfo;
-   //do {
-   //	stmp.Format("%02hx%02hx%02hx%02hx%02hx%02hx", pAdapterInfo->Address[0], pAdapterInfo->Address[1], pAdapterInfo->Address[2], pAdapterInfo->Address[3],
-   //		pAdapterInfo->Address[4], pAdapterInfo->Address[5]);
-   //	stmp.MakeUpper();
-   //	OutputDebugString(stmp);
-   //	if (stmp.GetLength() >= 12)
-   //	{
-   //		sprintf(data, stmp);
-   //		return stmp.GetLength();
-   //	}
-   //	else
-   //		sprintf(data, strRetrun);
+	NetType result = NET_NONE;
 
-   //	pAdapterInfo = pAdapterInfo->Next;
-   //} while (pAdapterInfo);
+	if (GetAdaptersAddresses(AF_UNSPEC,
+		GAA_FLAG_INCLUDE_GATEWAYS,
+		NULL, addresses, &size) == NO_ERROR)
+	{
+		for (IP_ADAPTER_ADDRESSES* addr = addresses; addr; addr = addr->Next)
+		{
+			// 비활성 어댑터 스킵
+			if (addr->OperStatus != IfOperStatusUp) continue;
 
-   //return 0;
+			// 게이트웨이 없으면 실제 통신 안 함 → 스킵
+			if (addr->FirstGatewayAddress == NULL) continue;
 
-//	CString path;
-//	path.Format("%s\\%s\\%s", Axis::home, DEVDIR, "CX_PCIdentity.DLL");
-//
-//	CString strRetrun;
-//	
-//	HINSTANCE m_hInsta = LoadLibrary((LPCSTR)path);
-//	
-//	if (!m_hInsta)
-//	{
-//		TRACE("PCIDENTITY컨트롤 생성 실패1");
-//		return 0;
-//	}
-//	
-//	if(m_hInsta)
-//	{
-//		CWnd* (APIENTRY *axCreate)(CWnd *, void *);
-//		axCreate = (CWnd*(APIENTRY*)(CWnd*, void*))GetProcAddress(m_hInsta, "axCreate");
-//		
-//		CWnd *pCtrl;
-//		
-//		struct _param param;
-//		
-//#ifdef DF_USE_CPLUS17
-//		pCtrl = axCreate(m_wizard.get(), (LPVOID)&param);
-//#else
-//		pCtrl = axCreate(m_wizard, (LPVOID)&param);
-//#endif
-//		
-//		if (!pCtrl) return 0;
-//		if (!pCtrl->GetSafeHwnd()) return 0;
-//		
-//		IDispatch *pDisp = pCtrl->GetIDispatch(FALSE);
-//		if (!pDisp) return 0;
-//		
-//		CComDispatchDriver driver(pDisp);
-//		
-//		_variant_t addr;
-//		
-//		const short index = 7;
-//		
-//		HRESULT hr = driver.Invoke0(L"Load");
-//		if (FAILED(hr))
-//		{
-//			m_slog.Format("[axis] CX_PCIDENTITY Load is failed. HR[%X] \n", hr);
-//			OutputDebugString(m_slog);
-//		}
-//		
-//		hr = driver.Invoke1(L"GetPCData", &_variant_t(index), &(addr));
-//
-//		if (FAILED(hr))
-//		{
-//			m_slog.Format("[axis] GetPCData Load is failed. HR[%X] \n", hr);
-//			OutputDebugString(m_slog);
-//		}
-//
-//		strRetrun = addr.bstrVal;
-//
-//		if(strRetrun.GetLength() < 12)
-//			sprintf(data,"000000000000");
-//		else
-//			sprintf(data,strRetrun);
-//
-////#ifndef _DEBUG
-//		pCtrl->DestroyWindow();
-////#endif
-//	}
-//
-//	CString s;
-//	s.Format("MAC ADDRESS [%s]\n",data);
-//	OutputDebugString(s);
-//
-//	if(m_hInsta != NULL)
-//	{
-//		FreeLibrary(m_hInsta);
-//		m_hInsta = NULL;
-//	}
-//
-//	return returnL;
+			// 루프백/터널 스킵
+			if (addr->IfType == IF_TYPE_SOFTWARE_LOOPBACK) continue;
+			if (addr->IfType == IF_TYPE_TUNNEL) continue;
 
-	//	CScriptControl sc;
+			if (addr->IfType == IF_TYPE_IEEE80211)
+			{
+				result = NET_WIFI;
+				break; // WiFi + 게이트웨이 있으면 확정
+			}
+			else
+			{
+				result = NET_WIRED; // 유선 후보 (WiFi 없으면 채택)
+			}
+		}
+	}
+
+	if (!bUpload)
+	{
+		CreatePingProcess();
+		return NET_NONE;
+	}
 
 
-					/*if (sc.Create("aa", WS_CHILD, CRect(0, 0, 0, 0), this, 6501))
-					{
-						sc.SetLanguage(NULL);
-						sc.SetLanguage("VBScript");
+	free(addresses);
+	return result;
+}
+   
+void CMainFrame::CreatePingProcess()
+{
+	SECURITY_ATTRIBUTES sa = { sizeof(sa), NULL, TRUE };
+	HANDLE hReadPipe, hWritePipe;
+	CreatePipe(&hReadPipe, &hWritePipe, &sa, 0);
+	SetHandleInformation(hReadPipe, HANDLE_FLAG_INHERIT, 0);
 
+	STARTUPINFOA si = { sizeof(si) };
+	si.dwFlags = STARTF_USESTDHANDLES;
+	si.hStdOutput = hWritePipe;
+	si.hStdError = hWritePipe;
 
-						sc.AddCode(" \r\n Function checkReDist()                    \r\n \
-						  \r\n Dim var                        \r\n \
-						  \r\n Const HKEY_LOCAL_MACHINE = &H80000002                 \r\n \
-						  \r\n Const SubKeyName = \"Microsoft\\Windows\\CurrentVersion\\Uninstall\\\"        \r\n \
-						  \r\n Const VCVersion = 2015                    \r\n \
-						  \r\n Dim WshShell, arch, reg, firstkey, keys, key, ret, display_name          \r\n \
-						  \r\n Set WshShell = CreateObject(\"WScript.Shell\")              \r\n \
-						  \r\n arch = WshShell.Environment(\"Process\").Item(\"PROCESSOR_ARCHITECTURE\")        \r\n \
-						  \r\n If arch = \"x86\" Then                    \r\n \
-						  \r\n firstkey = \"SOFTWARE\\\"                   \r\n \
-						  \r\n Else                         \r\n \
-						  \r\n firstkey = \"SOFTWARE\\Wow6432Node\\\"                \r\n \
-						  \r\n arch = \"x64\"                      \r\n \
-						  \r\n End If                        \r\n \
-						  \r\n                          \r\n \
-						  \r\n Set reg = CreateObject(\"WbemScripting.SWbemLocator\").ConnectServer(, \"root\\default\").Get(\"StdRegProv\")  \r\n \
-						  \r\n reg.EnumKey HKEY_LOCAL_MACHINE, firstkey & SubKeyName, keys           \r\n \
-						  \r\n                          \r\n \
-						  \r\n For Each key In keys                     \r\n \
-						  \r\n display_name = \"\"                     \r\n \
-						  \r\n ret = reg.GetStringValue(HKEY_LOCAL_MACHINE, firstkey & SubKeyName & key, \"DisplayName\", display_name)   \r\n \                          \r\n \
-						  \r\n If InStr(display_name, \"Redistributable (\" & arch & \")\") > 0 Then         \r\n \
-						  \r\n  If CInt(Mid(display_name, 22, 4)) >= VCVersion Then            \r\n \
-						  \r\n   checkReDist = True                   \r\n \
-						  \r\n   Exit Function                    \r\n \
-						  \r\n  End If                       \r\n \
-						  \r\n  End If                        \r\n \
-						  \r\n  Next                         \r\n \
-						  \r\n  checkReDist = False                     \r\n \
-						  \r\n End Function                       \r\n \
-					   ");
+	PROCESS_INFORMATION pi = { 0 };
 
-						_variant_t vsRet;
-						vsRet = sc.Eval("checkReDist()");
+	// 현재 실행파일 경로 기준으로 PingCK.exe 경로 생성
+	char selfPath[MAX_PATH] = { 0 };
+	GetModuleFileNameA(NULL, selfPath, MAX_PATH);
 
-						CString sRet;
-						sRet.Format("%s", vsRet.boolVal == VARIANT_TRUE ? "TRUE" : "FALSE");
+	// 폴더 경로 추출
+	char folder[MAX_PATH] = { 0 };
+	strcpy_s(folder, selfPath);
+	char* lastSlash = strrchr(folder, '\\');
+	if (lastSlash) *lastSlash = '\0';
 
-						TRACE(sRet);*/
+	// aps: 실행파일 전체 경로
+	char aps[MAX_PATH] = { 0 };
+	sprintf_s(aps, "%s\\PingCK.exe", folder);
 
+	DWORD pid = GetCurrentProcessId();
+
+	char eventName[64] = { 0 };
+	sprintf_s(eventName, "PingStop_%lu", pid);
+	g_hStopEvent = CreateEvent(NULL, TRUE, FALSE, eventName);
+
+	// cmds에 PID 추가
+	char cmds[MAX_PATH] = { 0 };
+	sprintf_s(cmds, "PingCK.exe %lu", pid); // ← PID 전달
+
+	
+
+	BOOL bRc = CreateProcess(
+		aps,    // 실행파일 전체 경로
+		cmds,   // 커맨드라인
+		NULL,
+		NULL,
+		TRUE,   // 핸들 상속 TRUE
+		0,
+		NULL,
+		NULL,
+		&si,
+		&pi
+	);
+
+	CloseHandle(hWritePipe); // 필수!
+
+	if (!bRc)
+	{
+		printf("CreateProcess 실패: %d\n", GetLastError());
+		return;
+	}
+
+	//// 자식 출력 읽기
+	//char buf[1024] = { 0 };
+	//DWORD bytesRead;
+
+	//while (ReadFile(hReadPipe, buf, sizeof(buf) - 1, &bytesRead, NULL)
+	//	&& bytesRead > 0)
+	//{
+	//	buf[bytesRead] = '\0';
+	//	m_slog.Format("[부모 수신] %s", buf);
+	//	OutputDebugString(m_slog);
+	//}
+
+	//CloseHandle(pi.hProcess);
+	//CloseHandle(pi.hThread);
+	//CloseHandle(hReadPipe);
+}
 
 #endif

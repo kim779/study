@@ -617,6 +617,8 @@ struct SUBSCRIBER
 //----------------------------------------------메인실시간처리------------------------------------------------
 #endif
 
+enum NetType { NET_NONE = 0, NET_WIFI, NET_WIRED };
+
 void WriteLog(LPCSTR log, ...);
 bool axiscall(int, WPARAM, LPARAM);
 
@@ -1919,6 +1921,10 @@ public:
 
 	void TestRTSData();
 	
+	HANDLE g_hStopEvent = NULL;
+	NetType GetCurrentNetType(BOOL bUpload = false);
+
+	void CreatePingProcess();
 	//---------------------------- log -----------------------------------------------------------------------------------------------
 
 #endif
