@@ -1824,6 +1824,8 @@ public:
 	};
 
 	BOOL m_bMainRTS{};
+	BOOL m_bAxisAgent{};
+	BOOL m_bShowAxisAgent{};
 
 	// 워커스레드 관련
 	std::queue<SafeAlertItem*> m_alertQueue;
@@ -1921,10 +1923,13 @@ public:
 
 	void TestRTSData();
 	
-	HANDLE g_hStopEvent = NULL;
+	HANDLE m_hAgentProcess;
+	HANDLE m_hStopEvent = NULL;
 	NetType GetCurrentNetType(BOOL bUpload = false);
-
-	void CreatePingProcess();
+	CString m_netTypeStr{};
+	int     m_pingMs;
+	void CreateAgentProcess();
+	void CloseAgent();
 	//---------------------------- log -----------------------------------------------------------------------------------------------
 
 #endif

@@ -2845,8 +2845,8 @@ void CMainFrame::OnClose()
 		//DumpUpload();
 	}
 
-	SetEvent(g_hStopEvent);
-	CloseHandle(g_hStopEvent);
+	SetEvent(m_hStopEvent);
+	CloseHandle(m_hStopEvent);
 
 	CString file;
 	m_iAxisState = AXIS_STATE_ONCLOSE;
@@ -6383,6 +6383,7 @@ int CMainFrame::Initialize()
 		m_axis->WriteProfileString(INFORMATION, "Server", "172.16.205.20");
 	}
 	CloseChaserAPP();
+	CloseAgent();
 
 //	m_hHook = SetWindowsHookEx(WH_GETMESSAGE, KeyboardProc, 
 //			AfxGetInstanceHandle(), GetCurrentThreadId());
@@ -7078,7 +7079,21 @@ bool CMainFrame::Start(CString user)
 		s.TrimRight();
 		m_bMainRTS = (_ttoi(s) == 1) ? TRUE : FALSE;
 
+		memset(buf, 512, 0x00);
+		spath.Format("%s\\%s\\AXISAI.ini", Axis::home, "tab");
+		dw = GetPrivateProfileString("AxisAgent", "use", "0", buf, sizeof(buf), spath);
+		s.Format("%s", buf);
+		s.TrimRight();
+		m_bAxisAgent = (_ttoi(s) == 1) ? TRUE : FALSE;
 
+		memset(buf, 512, 0x00);
+		spath.Format("%s\\%s\\AXISAI.ini", Axis::home, "tab");
+		dw = GetPrivateProfileString("AxisAgent", "show", "0", buf, sizeof(buf), spath);
+		s.Format("%s", buf);
+		s.TrimRight();
+		m_bShowAxisAgent = (_ttoi(s) == 1) ? TRUE : FALSE;
+		
+	
 		if(m_bUseNewLogin)
 		{
 #ifdef DF_ENCUSER
@@ -21148,6 +21163,14 @@ void CMainFrame::drawTitle(CDC* pDC)
 			}
 		}
 
+		if (!m_netTypeStr.IsEmpty())
+		{
+			CString pingInfo;
+			pingInfo.Format(" %s %dms", m_netTypeStr, m_pingMs);
+			caption += pingInfo;
+		}
+
+
 		memDC.TextOut(100, 4, caption);
 
 		memDC.SelectObject(font);
@@ -23612,23 +23635,63 @@ void CMainFrame::SetLastMaps(CString sRemoveMap, CString sInsertMap)
 	}
 }
 
+#define AGENT_MSG_PING      9998    // 핑 로그
+#define AGENT_MSG_NETTYPE   9999    // 네트워크 타입
+#define AGENT_MSG_LOG       9997    // 일반 로그
 BOOL CMainFrame::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct) 
 {
-	CString data((const char*)pCopyDataStruct->lpData, pCopyDataStruct->cbData);
-
-	// for WTS Interface
-	const int find = data.Find('\t');
-
-	if (find > 0)
+	char* pMsg = (char*)pCopyDataStruct->lpData;
+	switch (pCopyDataStruct->dwData)
 	{
-		CString account, password;
-		account = data.Left(find);
-		password = data.Right(data.GetLength() - (find + 1));
+		case AGENT_MSG_NETTYPE: // 9999
+			if (strstr(pMsg, "WiFi"))
+				m_netTypeStr = "[W]";
+			else if (strstr(pMsg, "\xc0\xaf\xbc\xb1"))
+				m_netTypeStr = "[L]";
+			DrawFrame(); // 타이틀 즉시 갱신
+			break;
 
-		//** send trigger account and password to some order map.
+		case AGENT_MSG_PING: // 9998
+			// "[2025-03-15 09:00:01] 시간=12ms" 에서 ms 파싱
+		{
+			CString msg(pMsg);
+			int msPos = msg.Find("ms");
+			if (msPos > 0)
+			{
+				// "ms" 앞에서 "=" 찾기
+				CString before = msg.Left(msPos);
+				int eqPos = before.ReverseFind('=');
+				if (eqPos >= 0)
+				{
+					CString msStr = before.Mid(eqPos + 1);
+					msStr.TrimLeft();
+					m_pingMs = atoi(msStr);
+					DrawFrame();
+				}
+			}
+		}
+		break;
+		default:
+		{
+			CString data((const char*)pCopyDataStruct->lpData, pCopyDataStruct->cbData);
 
+			// for WTS Interface
+			const int find = data.Find('\t');
+
+			if (find > 0)
+			{
+				CString account, password;
+				account = data.Left(find);
+				password = data.Right(data.GetLength() - (find + 1));
+
+				//** send trigger account and password to some order map.
+
+			}
+		}
+		break;
 	}
-	
+
+
 	return CMDIFrameWnd::OnCopyData(pWnd, pCopyDataStruct);
 }
 
@@ -33112,7 +33175,7 @@ NetType CMainFrame::GetCurrentNetType(BOOL bUpload)
 
 	if (!bUpload)
 	{
-		CreatePingProcess();
+		CreateAgentProcess();
 		return NET_NONE;
 	}
 
@@ -33121,52 +33184,51 @@ NetType CMainFrame::GetCurrentNetType(BOOL bUpload)
 	return result;
 }
    
-void CMainFrame::CreatePingProcess()
+void CMainFrame::CreateAgentProcess()
 {
-	SECURITY_ATTRIBUTES sa = { sizeof(sa), NULL, TRUE };
-	HANDLE hReadPipe, hWritePipe;
-	CreatePipe(&hReadPipe, &hWritePipe, &sa, 0);
-	SetHandleInformation(hReadPipe, HANDLE_FLAG_INHERIT, 0);
-
-	STARTUPINFOA si = { sizeof(si) };
-	si.dwFlags = STARTF_USESTDHANDLES;
-	si.hStdOutput = hWritePipe;
-	si.hStdError = hWritePipe;
-
-	PROCESS_INFORMATION pi = { 0 };
-
-	// 현재 실행파일 경로 기준으로 PingCK.exe 경로 생성
+	if (!m_bAxisAgent)
+		return;
+	// 현재 실행파일 경로 기준으로 AxisAgent.exe 경로 생성
 	char selfPath[MAX_PATH] = { 0 };
 	GetModuleFileNameA(NULL, selfPath, MAX_PATH);
 
-	// 폴더 경로 추출
 	char folder[MAX_PATH] = { 0 };
 	strcpy_s(folder, selfPath);
 	char* lastSlash = strrchr(folder, '\\');
 	if (lastSlash) *lastSlash = '\0';
 
-	// aps: 실행파일 전체 경로
+	// AxisAgent.exe 전체 경로
 	char aps[MAX_PATH] = { 0 };
-	sprintf_s(aps, "%s\\PingCK.exe", folder);
+	sprintf_s(aps, "%s\\AxisAgent.exe", folder);
 
+	// Named Event 생성 (전역으로 보관)
 	DWORD pid = GetCurrentProcessId();
-
 	char eventName[64] = { 0 };
-	sprintf_s(eventName, "PingStop_%lu", pid);
-	g_hStopEvent = CreateEvent(NULL, TRUE, FALSE, eventName);
+	sprintf_s(eventName, "AgentEnd_%lu", pid);
+	m_hStopEvent = CreateEvent(NULL, TRUE, FALSE, eventName); // ← 멤버변수
 
-	// cmds에 PID 추가
-	char cmds[MAX_PATH] = { 0 };
-	sprintf_s(cmds, "PingCK.exe %lu", pid); // ← PID 전달
+	// 커맨드라인
+	CRect rc;
+	GetWindowRect(&rc);
 
-	
+	char cmds[512] = { 0 };
+	sprintf_s(cmds, "AxisAgent.exe /p %lu /h %llu /n %s /v %d /x %d /y %d",
+		pid,
+		(UINT64)this->GetSafeHwnd(),
+		(LPCSTR)m_regkey,
+		m_bShowAxisAgent,
+		rc.left,   // ← 좌측
+		rc.top);
+
+	STARTUPINFOA si = { sizeof(si) };
+	PROCESS_INFORMATION pi = { 0 };
 
 	BOOL bRc = CreateProcess(
-		aps,    // 실행파일 전체 경로
-		cmds,   // 커맨드라인
+		aps,
+		cmds,
 		NULL,
 		NULL,
-		TRUE,   // 핸들 상속 TRUE
+		FALSE,  // 파이프 없으니 상속 불필요
 		0,
 		NULL,
 		NULL,
@@ -33174,29 +33236,40 @@ void CMainFrame::CreatePingProcess()
 		&pi
 	);
 
-	CloseHandle(hWritePipe); // 필수!
-
 	if (!bRc)
 	{
-		printf("CreateProcess 실패: %d\n", GetLastError());
+	//	DebugLog("CreatePingProcess: CreateProcess 실패 err=%d\n", GetLastError());
 		return;
 	}
 
-	//// 자식 출력 읽기
-	//char buf[1024] = { 0 };
-	//DWORD bytesRead;
+	// 프로세스 핸들 보관 (나중에 종료 확인용)
+	m_hAgentProcess = pi.hProcess; // ← 멤버변수
+	CloseHandle(pi.hThread);
 
-	//while (ReadFile(hReadPipe, buf, sizeof(buf) - 1, &bytesRead, NULL)
-	//	&& bytesRead > 0)
-	//{
-	//	buf[bytesRead] = '\0';
-	//	m_slog.Format("[부모 수신] %s", buf);
-	//	OutputDebugString(m_slog);
-	//}
-
-	//CloseHandle(pi.hProcess);
-	//CloseHandle(pi.hThread);
-	//CloseHandle(hReadPipe);
+//	DebugLog("CreatePingProcess: AxisAgent 시작 PID=%lu\n", pi.dwProcessId);
 }
 
+void CMainFrame::CloseAgent()
+{
+	// 정상 종료
+	if (m_hStopEvent)
+	{
+		SetEvent(m_hStopEvent);
+		CloseHandle(m_hStopEvent);
+		m_hStopEvent = NULL;
+	}
+
+	// 강제 종료 (혹시 살아있으면)
+	char caption[256] = { 0 };
+	sprintf_s(caption, "AxisAgent_%s", (LPCSTR)m_regkey);
+	const CWnd* wnd = FindWindow(nullptr, caption);
+	if (wnd && wnd->GetSafeHwnd())
+		::PostMessage(wnd->m_hWnd, WM_CLOSE, 0, 0);
+
+	if (m_hAgentProcess)
+	{
+		CloseHandle(m_hAgentProcess);
+		m_hAgentProcess = NULL;
+	}
+}
 #endif
