@@ -381,21 +381,6 @@ BOOL CPopListWnd::CreateListBox(CString items)
 {
     OutputDebugString("[CPopListWnd] CreateListBox\n");
 
-
-    if (items.IsEmpty())
-    {
-        items = "005930 삼성전자\t";
-        items += "000020 동화약품\t";
-        items += "003280 흥아해운\t";
-        items += "005880 대한해운\t";
-        items += "005935 삼성전자우\t";
-        items += "000660 SK하이닉스\t";
-        items += "035720 카카오\t";
-        items += "035420 NAVER\t";
-        OutputDebugString("[CPopListWnd] CreateListBox 테스트 데이터 사용\n");
-    }
-
-
     CRect rec;
     GetClientRect(rec);
 

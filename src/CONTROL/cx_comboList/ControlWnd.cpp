@@ -762,7 +762,8 @@ BSTR CControlWnd::GetData()
 
 void CControlWnd::SetData(LPCTSTR code) 
 {
-	
+	CString sval;
+	sval.Format("%s", code);
 }
 
 void CControlWnd::SetCode(LPCTSTR code) 
