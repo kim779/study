@@ -8,9 +8,9 @@
  /* File created by MIDL compiler version 8.01.0622 */
 /* at Tue Jan 19 12:14:07 2038
  */
-/* Compiler settings for AxisAgent.idl:
-    Oicf, W1, Zp8, env=Win64 (32b run), target_arch=AMD64 8.01.0622 
-    protocol : all , ms_ext, c_ext, robust
+/* Compiler settings for cx_comboList.odl:
+    Oicf, W1, Zp8, env=Win32 (32b run), target_arch=X86 8.01.0622 
+    protocol : dce , ms_ext, c_ext, robust
     error checks: allocation ref bounds_check enum stub_data 
     VC __declspec() decoration level: 
          __declspec(uuid()), __declspec(selectany), __declspec(novtable)
@@ -66,13 +66,13 @@ typedef IID CLSID;
 
 #endif // !_MIDL_USE_GUIDDEF_
 
-MIDL_DEFINE_GUID(IID, LIBID_AxisAgent,0xb0af1f1d,0xaf01,0x4788,0x94,0xfc,0xed,0x24,0xf9,0x13,0x7d,0xe3);
+MIDL_DEFINE_GUID(IID, LIBID_cx_comboList,0x6D401289,0x737F,0x4155,0x9D,0xA9,0x32,0xF2,0xB5,0x50,0x91,0x61);
 
 
-MIDL_DEFINE_GUID(IID, DIID_IAxisAgent,0xdfd75f25,0xbcd8,0x4c1f,0xb6,0x86,0xb3,0x05,0xd7,0x3f,0xba,0x67);
+MIDL_DEFINE_GUID(IID, DIID_IControlWnd,0x794B73A4,0x2083,0x426A,0x8F,0x47,0xA8,0x97,0xE6,0xF9,0x83,0x09);
 
 
-MIDL_DEFINE_GUID(CLSID, CLSID_AxisAgent,0xf67dc37b,0x5139,0x450a,0x9a,0x14,0xd0,0xba,0xd2,0xe4,0x06,0xbf);
+MIDL_DEFINE_GUID(CLSID, CLSID_ControlWnd,0x0ABFCF1D,0x152E,0x426B,0xB9,0x20,0xED,0x48,0x76,0xB0,0x89,0x28);
 
 #undef MIDL_DEFINE_GUID
 

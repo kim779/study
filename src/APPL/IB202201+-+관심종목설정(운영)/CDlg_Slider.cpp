@@ -102,17 +102,22 @@ void CDlg_Slider::LoadRate()
 {
 	CString filePath, strRate, userip;
 	filePath.Format("%s/%s/InterOption.ini", m_root, "tab");
-
+	
 	userip = CheckIP();
 
 	int iTime = 800;
 	int ipos;
+	int ichk;
 	if (!m_bCustomer) //직원용
 	{
 		iTime = GetPrivateProfileInt("STAFF", "TIME", 800, filePath);
 		m_iTime = iTime;
 		ipos = ((iTime - DF_IMIN_RATE) / ((DF_IMAX_RATE - DF_IMIN_RATE) / (DF_IMAX_POS - DF_IMIN_POS))) + DF_IMIN_POS;
 		m_slider.SetPos(ipos);
+		ichk = GetPrivateProfileInt("STAFF", "Real", 0, filePath);
+		if(ichk)
+			((CButton*)GetDlgItem(IDC_CK_REAL))->SetCheck(BST_CHECKED);
+	
 		return;
 	}
 
@@ -151,6 +156,10 @@ void CDlg_Slider::LoadRate()
 				m_iTime = iTime;
 				ipos = ((iTime - DF_IMIN_RATE) / ((DF_IMAX_RATE - DF_IMIN_RATE) / (DF_IMAX_POS - DF_IMIN_POS))) + DF_IMIN_POS;
 				m_slider.SetPos(ipos);
+
+				ichk = GetPrivateProfileInt("SCUSTOMER", "Real", 0, filePath);
+				if (ichk)
+					((CButton*)GetDlgItem(IDC_CK_REAL))->SetCheck(BST_CHECKED);
 				return;
 			}
 		}
@@ -160,6 +169,9 @@ void CDlg_Slider::LoadRate()
 	// slog.Format("[2022]TIMER 고객용일반 ip=[%s] iTime=[%d]", userip, iTime);
 	ipos = ((iTime - DF_IMIN_RATE) / ((DF_IMAX_RATE - DF_IMIN_RATE) / (DF_IMAX_POS - DF_IMIN_POS))) + DF_IMIN_POS;
 	m_slider.SetPos(ipos);
+	ichk = GetPrivateProfileInt("CUSTOMER", "Real", 0, filePath);
+	if (ichk)
+		((CButton*)GetDlgItem(IDC_CK_REAL))->SetCheck(BST_CHECKED);
 }
 
 void CDlg_Slider::SaveRate()
@@ -171,17 +183,17 @@ void CDlg_Slider::SaveRate()
 	filePath.Format("%s/%s/InterOption.ini", m_root, "tab");
 	strRate.Format("%d", isliderPos);
 
-	if (isliderPos == DF_IMIN_RATE)
-		strRate = _T("0");
-
-	if (isliderPos < m_iTime  )
-	{
-		AfxMessageBox("실시간 갱신주기 변경 시 시세처리량이 증가하여 HTS 반응속도가 느려질 수 있습니다.");
-	}
-
 	if (!m_bCustomer)
 	{
 		WritePrivateProfileString("STAFF", "TIME", strRate, filePath);
+		if(((CButton*)GetDlgItem(IDC_CK_REAL))->GetCheck())
+			WritePrivateProfileString("STAFF", "Real", "1", filePath);
+		else
+			WritePrivateProfileString("STAFF", "Real", "0", filePath);
+
+		if (isliderPos < m_iTime || ((CButton*)GetDlgItem(IDC_CK_REAL))->GetCheck())
+			AfxMessageBox("실시간 갱신주기 변경 시 시세처리량이 증가하여 HTS 반응속도가 느려질 수 있습니다.");
+
 		return;
 	}
 
@@ -209,12 +221,27 @@ void CDlg_Slider::SaveRate()
 		if (binip)
 		{
 			WritePrivateProfileString("SCUSTOMER", "TIME", strRate, filePath);
+			if (((CButton*)GetDlgItem(IDC_CK_REAL))->GetCheck())
+				WritePrivateProfileString("SCUSTOMER", "Real", "1", filePath);
+			else
+				WritePrivateProfileString("SCUSTOMER", "Real", "0", filePath);
 			// slog.Format("[2022]TIMER 고객용직원IP대역 ip=[%s]  iTime=[%d]", userip, iTime);
+
+			if (isliderPos < m_iTime || ((CButton*)GetDlgItem(IDC_CK_REAL))->GetCheck())
+				AfxMessageBox("실시간 갱신주기 변경 시 시세처리량이 증가하여 HTS 반응속도가 느려질 수 있습니다.");
+	
 			return;
 		}
 	}
 
 	WritePrivateProfileString("CUSTOMER", "TIME", strRate, filePath);
+	if (((CButton*)GetDlgItem(IDC_CK_REAL))->GetCheck())
+		WritePrivateProfileString("CUSTOMER", "Real", "1", filePath);
+	else
+		WritePrivateProfileString("CUSTOMER", "Real", "0", filePath);
+
+	if (isliderPos < m_iTime || ((CButton*)GetDlgItem(IDC_CK_REAL))->GetCheck())
+		AfxMessageBox("실시간 갱신주기 변경 시 시세처리량이 증가하여 HTS 반응속도가 느려질 수 있습니다.");
 }
 
 void CDlg_Slider::OnCustomdrawSliderRate(NMHDR* pNMHDR, LRESULT* pResult)
@@ -292,6 +319,7 @@ BOOL CDlg_Slider::OnInitDialog()
 {
 	CDialog::OnInitDialog();
 	m_slider.SetRange(30, 100, TRUE);
+	((CButton*)GetDlgItem(IDC_CK_REAL))->SetCheck(BST_UNCHECKED);
 	LoadRate();
 
 	if (CWnd* pUnit = GetDlgItem(IDC_STATIC_UNIT))
@@ -334,7 +362,6 @@ void CDlg_Slider::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 
 		// 현재 선택값을 멤버에 반영 (OK 누르면 SaveRate에서 다시 계산하지만,
 		// 화면/로직에서 바로 쓰려면 여기서 갱신해두는 게 맞음)
-		m_iTime = timeMs;
 
 		UpdateTimeText(timeMs);
 	}
@@ -358,21 +385,13 @@ int CDlg_Slider::PosToTimeMs(int pos) const
 void CDlg_Slider::UpdateTimeText(int timeMs)
 {
 	CString s;
-	if (timeMs <= DF_IMIN_RATE) // 300ms면 "실시간"
-	{
-		s = " 실시간";
-		if (CWnd* p = GetDlgItem(IDC_STATIC_UNIT))
-			p->SetWindowText("");
-	}
-	else
-	{
-		// 1) 소수 1자리 초 표기 (예: 800ms -> 0.8초, 1500ms -> 1.5초)
-		const double sec = static_cast<double>(timeMs) / 1000.0;
-		s.Format("%.1f", sec);
-		if (CWnd* p = GetDlgItem(IDC_STATIC_UNIT))
-			p->SetWindowText("초");
-	}
 
+	// 1) 소수 1자리 초 표기 (예: 800ms -> 0.8초, 1500ms -> 1.5초)
+	const double sec = static_cast<double>(timeMs) / 1000.0;
+	s.Format("%.1f", sec);
+	if (CWnd* p = GetDlgItem(IDC_STATIC_UNIT))
+		p->SetWindowText("초");
+	
 	if (CWnd* p = GetDlgItem(IDC_STATIC_TIME))
 		p->SetWindowText(s);
 

@@ -1563,48 +1563,48 @@ CString CMapWnd::parsingNotice(CString str)
 				mapNotice.Lookup(RT_JGTYPE, sJGType);	// 잔고구분
 				type = 0;
 				bNewCode = false;
-				keyS = getKey(false, sJCode, sDate, sSygb, sJggb, atoi(sTRKey));		// key  NXT
+				CString findJCode = sJCode;
+				keyS = getKey(false, findJCode, sDate, sSygb, sJggb, atoi(sTRKey));		// key  NXT
 				if (!pAccn->m_CodeMap.Lookup(keyS, (void*&)pRemain))
 				{
-					m_slog.Format("[jango][%s]<%d> sJCode=[%s]  처음 없음 ", __FUNCTION__, __LINE__, sJCode);
+					m_slog.Format("[jango][%s]<%d> findJCode=[%s]  처음 없음 ", __FUNCTION__, __LINE__, findJCode);
 					Output_DebugString(m_slog);
-					sJCode = "N." + sJCode;
-					keyS = getKey(false, sJCode, sDate, sSygb, sJggb, atoi(sTRKey));		// key NXT
+					findJCode = "N." + sJCode;
+					keyS = getKey(false, findJCode, sDate, sSygb, sJggb, atoi(sTRKey));		// key NXT
 					if (!pAccn->m_CodeMap.Lookup(keyS, (void*&)pRemain))
 					{
-						m_slog.Format("[jango][%s]<%d> sJCode=[%s]  두번째 없음 ", __FUNCTION__, __LINE__, sJCode);
+						m_slog.Format("[jango][%s]<%d> findJCode=[%s]  두번째 없음 ", __FUNCTION__, __LINE__, findJCode);
 						Output_DebugString(m_slog);
-						sJCode.Replace("N.", "");
-						sJCode = "M." + sJCode;
-						keyS = getKey(false, sJCode, sDate, sSygb, sJggb, atoi(sTRKey));		// key NXT
+				
+						findJCode = "M." + sJCode;
+						keyS = getKey(false, findJCode, sDate, sSygb, sJggb, atoi(sTRKey));		// key NXT
 						if (!pAccn->m_CodeMap.Lookup(keyS, (void*&)pRemain))
 						{
-							m_slog.Format("[jango][%s]<%d> sJCode=[%s]  세번째도 없음 ", __FUNCTION__, __LINE__, sJCode);
+							m_slog.Format("[jango][%s]<%d> findJCode=[%s]  세번째도 없음 ", __FUNCTION__, __LINE__, findJCode);
 							Output_DebugString(m_slog);
 
-							sJCode.Replace("M.", "");
-							
+							findJCode = sJCode;
 
 							if (smkgb == "2")  //nxt
 							{
-								sJCode = "N." + sJCode;
+								findJCode = "N." + sJCode;
 							}
 							else if (smkgb == "3") //통합
 							{
-								sJCode = "M." + sJCode;
+								findJCode = "M." + sJCode;
 							}
 
-							keyS = getKey(false, sJCode, sDate, sSygb, sJggb, atoi(sTRKey));    // key NXT
+							keyS = getKey(false, findJCode, sDate, sSygb, sJggb, atoi(sTRKey));    // key NXT
 							m_slog.Format("[jango][%s]<%d> 새로운잔고 keyS=[%s]  ", __FUNCTION__, __LINE__, keyS);
 							Output_DebugString(m_slog);
 
 							bool b_etf = false;
 							struct	hjcodex* hjc;
 
-							lookupS = sJCode;
+							lookupS = findJCode;
 							int ifind = lookupS.Find('.');
 							if (ifind != -1)
-								lookupS = sJCode.Mid(ifind + 1);
+								lookupS = findJCode.Mid(ifind + 1);
 
 							if (m_hname.Lookup(lookupS.Mid(1, 7), (void*&)hjc))   //nxt ?  체결이   NXT종목이면 N.A005930 이라서 . 이 있으면 그다음부터 한다. 종목마스터는 N. 로 안주니까..
 							{
@@ -1632,9 +1632,9 @@ CString CMapWnd::parsingNotice(CString str)
 							pRemain->m_dSave = pAccn->m_dSave;
 							pRemain->m_dCalcType = pAccn->m_dCalcType;
 							pRemain->m_iMcgb = pAccn->m_iMcgb;	//2015.04.22 KSJ 매체구분 추가
-							pRemain->m_b3RDCode = Is3RDCode(sJCode);	//2015.04.22 KSJ K-OTC인지 체크
-							pRemain->m_bKONEXCode = IsKONEXCode(sJCode);
-							int itype = m_pParent->SendMessage(WM_USER, MAKEWPARAM(codeTYPE, 0), (LPARAM)sJCode.Right(6).operator LPCTSTR());
+							pRemain->m_b3RDCode = Is3RDCode(findJCode);	//2015.04.22 KSJ K-OTC인지 체크
+							pRemain->m_bKONEXCode = IsKONEXCode(findJCode);
+							int itype = m_pParent->SendMessage(WM_USER, MAKEWPARAM(codeTYPE, 0), (LPARAM)findJCode.Right(6).operator LPCTSTR());
 							if (itype == singjongGoodType)
 								pRemain->m_bSJSuikCode = true;
 

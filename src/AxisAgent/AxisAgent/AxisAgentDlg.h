@@ -33,6 +33,7 @@ public:
 public:
 	// 전역 데이터
 	int m_startX{}, m_startY{};
+	BOOL m_bShow{};
 	char   m_logFile[MAX_PATH];
 	HANDLE m_hParent;
 	HANDLE m_hStopEvent;

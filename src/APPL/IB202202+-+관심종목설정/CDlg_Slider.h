@@ -10,7 +10,7 @@ class CDlg_Slider : public CDialog
 public:
 	CDlg_Slider(CWnd* pParent = nullptr);   // 표준 생성자입니다.
 	virtual ~CDlg_Slider();
-
+	int m_iTime{};
 	CString m_root{};
 	BOOL m_bCustomer{};
 	void LoadRate();

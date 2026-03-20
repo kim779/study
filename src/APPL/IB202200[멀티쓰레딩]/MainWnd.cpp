@@ -118,6 +118,7 @@ void CMainWnd::CheckRTSTimer(bool bFirst)
 	m_icheckTime = GetPrivateProfileInt("OVERTIME", "TIME", 300, filePath);
 	m_DiffSec = GetPrivateProfileInt("OVERTIME", "DIFFSEC", 0, filePath);
 	int iTime = 800;  
+	int ichk{};
 	if (!m_bcustomer) //Á÷¿ø¿ë
 	{
 		iTime = GetPrivateProfileInt("STAFF", "TIME", 800, filePath);
@@ -134,6 +135,10 @@ void CMainWnd::CheckRTSTimer(bool bFirst)
 			m_iTime = iTime;
 			SetTimer(TM_RTSTIME, m_iTime, nullptr);
 		}
+
+		ichk = GetPrivateProfileInt("STAFF", "Real", 0, filePath);
+		if (ichk)
+			m_iTime = 0;
 		_pApp->setDelaytime(m_iTime);
 		return;
 	}
@@ -158,6 +163,10 @@ void CMainWnd::CheckRTSTimer(bool bFirst)
 		{
 			m_iTime = iTime;
 		}
+
+		ichk = GetPrivateProfileInt("CUSTOMER", "Real", 0, filePath);
+		if (ichk)
+			m_iTime = 0;
 		_pApp->setDelaytime(m_iTime);
 		return;
 	}
@@ -194,6 +203,10 @@ void CMainWnd::CheckRTSTimer(bool bFirst)
 				{
 					m_iTime = iTime;
 				}
+
+				ichk = GetPrivateProfileInt("SCUSTOMER", "Real", 0, filePath);
+				if (ichk)
+					m_iTime = 0;
 				_pApp->setDelaytime(m_iTime);
 				return;
 			}
@@ -213,6 +226,9 @@ void CMainWnd::CheckRTSTimer(bool bFirst)
 		m_iTime = iTime;
 		//SetTimer(TM_RTSTIME, m_iTime, nullptr);
 	}
+	ichk = GetPrivateProfileInt("CUSTOMER", "Real", 0, filePath);
+	if (ichk)
+		m_iTime = 0;
 	_pApp->setDelaytime(m_iTime);
 }
 

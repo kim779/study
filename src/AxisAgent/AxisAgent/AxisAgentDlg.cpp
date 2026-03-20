@@ -305,9 +305,9 @@ void CAxisAgentDlg::ParseCommandLine()
 		{
 			int bShow = _wtoi(argvW[++i]); // ← ++i 추가
 			if (bShow)
-				ShowWindow(SW_SHOW);
+				m_bShow = TRUE;
 			else
-				ShowWindow(SW_HIDE);
+				m_bShow = FALSE;
 		}
 
 		else if (wcscmp(argvW[i], L"/x") == 0 && i + 1 < argc)
@@ -324,7 +324,7 @@ void CAxisAgentDlg::ParseCommandLine()
 		m_startX,   // 메인 left
 		m_startY,   // 메인 top
 		400, 200,   // 크기 (원하는 크기로)
-		SWP_NOZORDER | SWP_NOACTIVATE | SWP_SHOWWINDOW
+		SWP_NOZORDER | SWP_NOACTIVATE | (m_bShow ? SWP_SHOWWINDOW : SWP_HIDEWINDOW)
 	);
 
 	LocalFree(argvW);
