@@ -204,7 +204,6 @@ public:
 		if (m_Unit == GU_FCODE)
 		{
 			m_pHCode.RemoveAll();
-			m_pCodeList->RemoveAllHistory();
 		}
 	}
 public:
@@ -215,9 +214,7 @@ public:
 	int		m_Unit;
 
 protected:
-	std::unique_ptr<CCodeList> m_pCodeList;
 	CString		m_sCode;
-
 	CArray <_JCode, _JCode> m_pHCode;	// history list
 	CQArray <_JCode, _JCode> m_pJCode;	// code list
 };
@@ -304,9 +301,6 @@ public:
 public:
 	std::unique_ptr<CCodeEdit>  m_pEdit;
 
-	CRect	m_btnListRect;
-	CRect	m_btnCodeRect;
-
 	CString	m_sHistory;
 	CString	m_sPath;
 	CString	m_Name;
@@ -323,11 +317,6 @@ private:
 	int	m_btnDown;
 	int	m_btnList;
 	int	m_updnIndex;
-
-	std::unique_ptr<class CfxImgButton>	m_pCtlUpBtn;
-	std::unique_ptr<class CfxImgButton>	m_pCtlDownBtn;
-	std::unique_ptr<class CfxImgButton>	m_pBtnCode;
-	std::unique_ptr<class CfxImgButton>	m_pBtnList;
 
 	CString	m_sbmpCode;
 	CString	m_sbmpCodepush;
@@ -358,7 +347,6 @@ public:
 	void	GetRect(CRect &rc);
 
 	void	SetEditFocus();
-	void	SetComboBtnBmp(CString sCode,CString sCodedown,CString sList,CString sListdown);
 	void	SetListCode(CString str);
 	HCURSOR GetCursor(int kind);
 	HWND	GetEditSafeHwnd(){ _ASSERT(m_pEdit); return m_pEdit->GetSafeHwnd(); }

@@ -42,7 +42,6 @@ CCodeCombo::CCodeCombo()
 
 	m_pWizard = nullptr;
 	m_pParent = nullptr;
-	m_pCodeList = nullptr;
 	m_bTracking = false;
 
 	m_Unit = 0;
@@ -66,42 +65,42 @@ END_MESSAGE_MAP()
 
 int CCodeCombo::GetCurSel()
 {
-	return m_pCodeList->GetCurSel();
+	return 0;
 }
 
 void CCodeCombo::SetTopIndex(int index)
 {
-	m_pCodeList->SetTopIndex(index);
+
 }
 
 void CCodeCombo::SetCurSel(int cur)
 {
-	m_pCodeList->SetCurSel(cur);
+
 }
 
 int CCodeCombo::GetTopIndex()
 {
-	return m_pCodeList->GetTopIndex();
+	return 0;
 }
 
 int CCodeCombo::GetCount()
 {
-	return m_pCodeList->GetCount();
+	return 0;
 }
 
 void CCodeCombo::AddString(CString str)
 {
-	m_pCodeList->AddItem(str);
+
 }
 
 void CCodeCombo::AddSFString(CString str)
 {
-	m_pCodeList->AddSFItem(str); 
+	
 }
 
 void CCodeCombo::ResetContent()
 {
-	m_pCodeList->Update();
+
 }
 
 void CCodeCombo::OnSelchange() 
@@ -143,7 +142,7 @@ BOOL CCodeCombo::IsExistThisCode(CString code)
 
 	for (int ii = 0, nidx = 0; ii < size; ii++)
 	{
-		strItem = m_pCodeList->GetRawItem(ii);
+	
 		nidx = strItem.Find('\t');
 
 		if (nidx < 0)
@@ -179,9 +178,6 @@ void CCodeCombo::SearchCode(CString code)
 
 		for (int ii = 0, nidx = 0; ii < size; ii++)
 		{
-			//jCode = m_pJCode.GetAt(ii);
-
-			strItem = m_pCodeList->GetRawItem(ii);
 			nidx = strItem.Find('\t');
 
 			if (nidx < 0)
@@ -293,7 +289,7 @@ CString CCodeCombo::GetSelectCode()
 	{
 // 		_JCode	jCode = m_pJCode.GetAt(index);
 // 		m_sCode = jCode.Code.Mid(1);
-		CString strItem = m_pCodeList->GetRawItem(index);
+		CString strItem;
 		const	int	nidx = strItem.Find('\t');
 		if (nidx < 0)
 			return "";
@@ -360,7 +356,7 @@ void CCodeCombo::Key(int key)
 
 void CCodeCombo::InitCodeList(int unit,CString sFind)
 {
-	m_pCodeList->RemoveAll();
+	
 	_JCode	jCode;
 	CString	Str;
 	CStringArray arJCode;
@@ -403,7 +399,7 @@ void CCodeCombo::InitCodeList(int unit,CString sFind)
 	
 	m_Unit = unit;
 	m_DataMode = DM_CODELIST;
-	m_pCodeList->Update();
+
 	
 }
 
@@ -411,7 +407,6 @@ void CCodeCombo::InitHistory(CString history, int unit)
 {
 	ResetContent();
 
-	m_pCodeList->RemoveAll();
 	m_pHCode.RemoveAll();
 	_JCode	jCode;
 	CString	Str;
@@ -448,7 +443,7 @@ void CCodeCombo::InitHistory(CString history, int unit)
 	}
 	m_Unit = unit;
 	m_DataMode = DM_HISTORY;
-	m_pCodeList->Update();
+
 }
 
 bool CCodeCombo::IsHistoryMode() 
@@ -626,36 +621,7 @@ BOOL CCodeCombo::loadSfCode(CString tabpath)
 
 void CCodeCombo::WriteHistory(CString rootPath)
 {
-	CString usr;
-	CString strPath;
-	CString line;
-	CFile	file;
-
-	usr = ((CControlWnd*)GetParent())->Variant(nameCC, "");
-	if (m_Unit == GU_FCODE )
-		strPath.Format("%s/%s/%s/%s", rootPath, USRDIR, usr, SFCODE_HISTORY);
-	else if (m_Unit == GU_SCODE)
-		strPath.Format("%s/%s/%s/%s", rootPath, USRDIR, usr, SCODE_HISTORY);
-	else if (m_Unit == GU_JCODE)
-		strPath.Format("%s/%s/%s/%s", rootPath, USRDIR, usr, NJCODE_HISTORY);
 	
-	if (file.Open(strPath, CFile::modeWrite | CFile::modeCreate | CFile::shareDenyNone))
-	{
-		CString slog;
-		slog.Format("[codectrl] m_pCodeList->GetCount() = [%d]", m_pCodeList->GetCount());
-		OutputDebugString(slog);
-
-		for (int ii = 0; ii < m_pCodeList->GetCount(); ii++)
-		{
-			line = m_pCodeList->GetRawItem(ii);
-
-			line.Replace("\t", " ");
-			line += "\t";
-
-			file.Write(line, line.GetLength());
-		}
-		file.Close();
-	}
 }
 
 bool CCodeCombo::FCodeLoad(CString tabPath)
@@ -797,36 +763,7 @@ void CCodeCombo::SetDroppedState(bool bflag)
 
 void CCodeCombo::ShowDropDown(bool bflag, bool bshow)
 {
-	CRect	rc;
-	const	int	defaultWidth = (m_pCodeList->m_RowHeight - 2) * 17;
-	int nCnt = m_pHCode.GetCount();
-	if (nCnt >= 1)	//종목이 하나 이상일 경우 전체삭제 row를 위하여 +1 개로 봐야함.
-		nCnt += 1;
-
-	if (nCnt > 21)	// 기존 최대 크기가 21로 잡혀있었기 때문에 최대크기 이상일 경우 21로 고정되도록 처리.
-		nCnt = 21;
-
-	GetWindowRect(rc);
-
-	m_pCodeList->SetWindowPos(NULL, rc.left, rc.bottom, defaultWidth, m_pCodeList->m_RowHeight* nCnt +4, SWP_HIDEWINDOW|SWP_NOACTIVATE);
-	m_pCodeList->m_pCtlBtnDeleteAll->SetWindowPos(NULL, 
-					 GAP, 
-					 m_pCodeList->m_RowHeight* nCnt - m_pCodeList->m_RowHeight,
-					 defaultWidth- 2*GAP - 16, 
-					 m_pCodeList->m_RowHeight + 4 - GAP, SWP_SHOWWINDOW);
 	
-	if (bflag)
-	{
-		m_pCodeList->SetWindowPos(NULL, rc.left, rc.bottom, m_Width, m_Height, SWP_NOSIZE|SWP_SHOWWINDOW);
-		m_pCodeList->ShowWindow(bshow == true? SW_SHOW:SW_HIDE);	
-	}
-	else 
-	{
-		m_pCodeList->SetWindowPos(NULL, rc.left, rc.bottom, m_Width, m_Height, SWP_NOSIZE|SWP_SHOWWINDOW|SWP_NOACTIVATE);
-		m_pCodeList->ShowWindow(bshow == true? SW_SHOWNA:SW_HIDE);
-	}
-	m_pCodeList->SetTopIndex(0);
-	m_bVisible = bshow;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -1432,10 +1369,8 @@ CfxCodeCtrl::CfxCodeCtrl(CWnd* parent, CString rootPath)
 	m_bTracking = false;
 
 	m_pEdit     = nullptr;
-	m_pCodeList = std::make_unique<CCodeList>(this, parent, m_sPath);
 
 	m_btnDown = 0;
-	m_btnList = 0;
 	m_updnIndex = 1;
 
 	m_sHistory = "";
@@ -1447,12 +1382,9 @@ CfxCodeCtrl::CfxCodeCtrl(CWnd* parent, CString rootPath)
 	m_arrList.RemoveAll();
 
 	m_bHistory = true;
-	m_pCtlUpBtn = NULL;
-	m_pCtlDownBtn = NULL;
+
 	m_nIndex = 0;
 
-	m_pBtnCode = NULL;
-	m_pBtnList = NULL;
 	m_Name.Empty();
 
 	m_bKONEX = FALSE;	//KDK 2013.05.14 KONEX
@@ -1506,57 +1438,26 @@ int CfxCodeCtrl::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	m_pEdit->Create(ES_AUTOHSCROLL|WS_VISIBLE|WS_CHILD|ES_UPPERCASE, CRect(0,0,10,10), this, IDC_EDIT);
 	m_pEdit->m_bValidCheck = m_bValidCheck;
 	
-	m_pCtlUpBtn   = std::make_unique<CfxImgButton>();
-	m_pCtlDownBtn = std::make_unique<CfxImgButton>();
-	m_pCtlUpBtn->Create("up", CRect(0, 0, 0, 0), this, IDC_CTRL_UP);
-	m_pCtlDownBtn->Create("down", CRect(0, 0, 0, 0), this, IDC_CTRL_DOWN);
+
 
 	CString path;
 	path.Format("%s\\%s\\", m_sPath, IMAGEDIR);
-	m_pCtlUpBtn->SetImgBitmap(((CControlWnd*)m_pParent)->GetBitmap(path + "axspin1.bmp"),
-				  ((CControlWnd*)m_pParent)->GetBitmap(path + "axspin1_en.bmp"),
-				  ((CControlWnd*)m_pParent)->GetBitmap(path + "axspin1_dn.bmp"));
 
-	m_pCtlDownBtn->SetImgBitmap(((CControlWnd*)m_pParent)->GetBitmap(path + "axspin2.bmp"),
-				    ((CControlWnd*)m_pParent)->GetBitmap(path + "axspin2_en.bmp"),
-				    ((CControlWnd*)m_pParent)->GetBitmap(path + "axspin2_dn.bmp"));
-
-	m_pCtlUpBtn->ShowWindow(SW_HIDE);
-	m_pCtlDownBtn->ShowWindow(SW_HIDE);
 
 	int	width = 200;
 	if (((CControlWnd*)m_pParent)->m_nGubn ==  GU_FCODE || ((CControlWnd*)m_pParent)->m_nGubn == GU_FOSTOCK)
 		width = 300;
 
-	m_pCodeList->Create(CRect(0, 0, width, 200), this);
-	SetUnit(m_Unit);
-
-	m_pCodeList->ShowWindow(SW_HIDE);
-	m_pCodeList->Update();
-
-	m_pBtnCode = std::make_unique<CfxImgButton>();
-	m_pBtnList = std::make_unique<CfxImgButton>();
-	m_pBtnCode->Create("", CRect(0, 0, 0, 0), this, IDC_CODE, FALSE, TRUE);
-	m_pBtnList->Create("", CRect(0, 0, 0, 0), this, IDC_LIST, FALSE, TRUE);
-
-	m_pBtnCode->SetCursor(GetCursor(10));
-	m_pBtnList->SetCursor(GetCursor(10));
-	if (((CControlWnd*)m_pParent)->m_bSearch)
-		m_pBtnCode->ShowWindow(SW_SHOW);
-	else
-		m_pBtnCode->ShowWindow(SW_HIDE);
 
 	return 0;
 }
 
 void CfxCodeCtrl::OnDestroy() 
 {
-	m_pCodeList.reset();
+
 	m_pEdit.reset();
-	m_pBtnCode.reset();
-	m_pBtnList.reset();
-	m_pCtlUpBtn.reset();
-	m_pCtlDownBtn.reset();
+
+
 	m_backColor.DeleteObject();
 	m_NObackColor.DeleteObject();
 
@@ -1572,8 +1473,7 @@ void CfxCodeCtrl::OnLButtonDown(UINT nFlags, CPoint point)
 
 void CfxCodeCtrl::LButtonUp()
 {
-	m_btnList = false;
-	InvalidateRect(&m_btnListRect);
+
 }
 
 void CfxCodeCtrl::OnPaint() 
@@ -1582,9 +1482,8 @@ void CfxCodeCtrl::OnPaint()
 
 	CRect	WinRC;
 	GetClientRect(&WinRC);
-	//dc.FillSolidRect(WinRC, RGB(140,140,140));
+
 	CRect	btnRect;
-	m_pBtnCode->GetClientRect(&btnRect);
 	if (((CControlWnd*)m_pParent)->m_bSearch)
 		WinRC.right -= (19+btnRect.Width());  
 	else
@@ -1640,11 +1539,10 @@ void CfxCodeCtrl::OnSize(UINT nType, int cx, int cy)
 	else
 		btnRC.left = rect.Width()-rect.Width()*18/65-1;
 	
-	m_btnCodeRect.CopyRect(btnRC);
-	
+
 	btnRC.OffsetRect(-17/*-16*/, 0);
 	btnRC.right -= 2;
-	m_btnListRect.CopyRect(btnRC);
+
 	
 
 	editRC.right = btnRC.left;
@@ -1661,26 +1559,10 @@ void CfxCodeCtrl::OnSize(UINT nType, int cx, int cy)
 			m_pEdit->MoveWindow(editRC.left, editRC.top , editRC.Width()-1+19, editRC.Height() - 2);
 		*/
 		//ResizeEdit(editRC.Width()+editRC.Height(), editRC.Height());
-		ResizeEdit(m_btnCodeRect.right, editRC.Height());
+	
 
 	}
 	
-
-	if (m_pBtnList && m_pBtnCode) 
-	{
-		if (((CControlWnd*)m_pParent)->m_bSearch)
-		{
-			m_pBtnList->MoveWindow(m_btnListRect);
-			m_pBtnCode->MoveWindow(m_btnCodeRect);
-			
-		}
-		else
-		{
-			m_btnCodeRect.left += 2;
-			m_pBtnList->MoveWindow(m_btnCodeRect);
-			m_pBtnCode->MoveWindow(m_btnCodeRect);
-		}
-	}
 }
 
 void CfxCodeCtrl::SetFont(CFont* pFont, bool redraw)
@@ -2216,47 +2098,17 @@ void CfxCodeCtrl::SetValidCheck(bool bValid)
 	//	m_bValidCheck =bValid;
 }
 
-void CfxCodeCtrl::SetComboBtnBmp(CString sCode,CString sCodedown,CString sList,CString sListdown)
-{
-	m_sbmpCode = sCode;	m_sbmpCodepush = sCodedown;
-	m_sbmpList = sList;	m_sbmpListpush = sListdown;
-
-	m_sbmpCodeEn = m_sbmpCodepush;
-	m_sbmpListEn = m_sbmpListpush;
-	m_sbmpCodeEn.Replace("dn", "en");
-	m_sbmpListEn.Replace("dn", "en");
-
-	CString root;
-
-	root.Format("%s\\%s\\", m_sPath, IMAGEDIR);
-	if (m_pBtnCode && m_pBtnList)
-	{
-		m_pBtnCode->SetImgBitmap(((CControlWnd*)m_pParent)->GetBitmap(root + m_sbmpCode),
-					((CControlWnd*)m_pParent)->GetBitmap(root + m_sbmpCodepush),
-					((CControlWnd*)m_pParent)->GetBitmap(root + m_sbmpCodeEn));
-
-		m_pBtnList->SetImgBitmap(((CControlWnd*)m_pParent)->GetBitmap(root + m_sbmpList),
-					((CControlWnd*)m_pParent)->GetBitmap(root + m_sbmpListpush),
-					((CControlWnd*)m_pParent)->GetBitmap(root + m_sbmpListEn));
-	}
-}
-
 void CfxCodeCtrl::OnLButtonUp(UINT nFlags, CPoint point) 
 {
 	// TODO: Add your message handler code here and/or call default
-	m_btnDown = false;
-	InvalidateRect(&m_btnCodeRect);
 
-	m_btnList = false;
-	InvalidateRect(&m_btnListRect);
 
 	CWnd::OnLButtonUp(nFlags, point);
 }
 
 void CfxCodeCtrl::GetRect(CRect &rc) 
 {
-	if (m_pCodeList)
-		m_pCodeList->GetWindowRect(rc);
+
 }
 
 void CfxCodeCtrl::OnMove(int x, int y) 
@@ -2306,18 +2158,11 @@ void CfxCodeCtrl::SetListCode(CString sData)
 	m_arrList.RemoveAll();
 	m_nIndex = 0;
 
-	m_pBtnCode->ShowWindow(SW_HIDE);
-	m_pBtnList->ShowWindow(SW_HIDE);
-	
-
 	while (!sData.IsEmpty())
 		m_arrList.Add(((CControlWnd*)m_pParent)->Parser(sData, "\n"));
 	
-	const	int	cx = m_btnCodeRect.Width();
-	const	int	cy = m_btnCodeRect.Height()/2;
 
-	m_pCtlUpBtn->SetWindowPos(NULL, m_btnCodeRect.left + 1, 1, cx, cy, SWP_SHOWWINDOW);
-	m_pCtlDownBtn->SetWindowPos(NULL, m_btnCodeRect.left + 1, cy, cx, cy , SWP_SHOWWINDOW);
+	const	int	cy{};
 
 	if (m_arrList.GetSize())
 	{
@@ -2332,16 +2177,6 @@ void CfxCodeCtrl::SetListCode(CString sData)
 
 void CfxCodeCtrl::SetNormal()
 {
-	if (((CControlWnd*)m_pParent)->m_bSearch)
-		m_pBtnCode->ShowWindow(SW_SHOW);
-	else
-		m_pBtnCode->ShowWindow(SW_HIDE);
-	//m_pBtnCode->ShowWindow(SW_SHOW);
-	m_pBtnList->ShowWindow(SW_SHOW);
-
-	m_pCtlUpBtn->ShowWindow(SW_HIDE);
-	m_pCtlDownBtn->ShowWindow(SW_HIDE);
-
 	m_bHistory = true;
 	m_arrList.RemoveAll();
 }
@@ -2372,7 +2207,7 @@ void CfxCodeCtrl::OnCodeDown()
 	CString	code, str;
 	UINT	flags = allCODE;
 	int	type = 0;
-	CPoint pt(m_btnCodeRect.left, m_btnCodeRect.bottom);
+	CPoint pt(0,0);  //test
 
 	ClientToScreen(&pt);
 	m_updnIndex = 1;
@@ -2436,24 +2271,12 @@ HCURSOR CfxCodeCtrl::GetCursor(int kind)
 
 void CfxCodeCtrl::GoDown()
 {
-	if (m_pCodeList->IsWindowVisible())
-	{
-		m_pCodeList->SetCurSel(m_pCodeList->GetCurSel() + 1);
 
-		if (m_pCodeList->GetCurSel() - m_pCodeList->GetTopIndex() + 1 > 12)
-			m_pCodeList->SetTopIndex(m_pCodeList->GetCurSel() - 11);
-	}
 }
 
 void CfxCodeCtrl::GoUp()
 {
-	if (m_pCodeList->IsWindowVisible())
-	{
-		m_pCodeList->SetCurSel(m_pCodeList->GetCurSel() - 1);
-
-		if (m_pCodeList->GetCurSel() - m_pCodeList->GetTopIndex() < 0)
-			m_pCodeList->SetTopIndex(m_pCodeList->GetCurSel());
-	}
+	
 }
 
 void CCodeEdit::OnTimer(UINT nIDEvent) 
@@ -2498,7 +2321,6 @@ void CfxCodeCtrl::ResizeEdit(int cx, int cy)
 	//((CControlWnd*)m_pParent)->m_Param.point = sz;
 	CFont* pFont = ((CControlWnd*)m_pParent)->GetAxFont(((CControlWnd*)m_pParent)->m_Param.fonts, ((CControlWnd*)m_pParent)->m_Param.point, ((CControlWnd*)m_pParent)->m_Param.style);
 	m_pEdit->SetFont(pFont);
-	m_pCodeList->SetItemFont(pFont);
 
 	if (pFont)
 	{
@@ -2520,7 +2342,7 @@ void CfxCodeCtrl::ResizeEdit(int cx, int cy)
 	//CRect rc; GetClientRect(&rc);
 	if (yMargin<2) yMargin = 2;
 	CRect bRc;
-	m_pBtnCode->GetClientRect(&bRc);
+
 	
 	rcEdit.SetRect(MARGIN, yMargin, rc.Width() - bRc.Width() - MARGIN*2, cy-yMargin);
 	
@@ -2545,37 +2367,19 @@ void CfxCodeCtrl::ResizeCtrl()
 	else
 		btnRC.left = rect.Width()-rect.Width()*18/65-1;
 	
-	m_btnCodeRect.CopyRect(btnRC);
+
 	
 	
 	
 	btnRC.OffsetRect(-17/*-16*/, 0);
 	btnRC.right -= 2;
-	m_btnListRect.CopyRect(btnRC);
+
 	
 
 	editRC.right = btnRC.left;
 	//editRC.left += 2;
 	//editRC.top += 6;
 
-
-	
-
-	if (m_pBtnList && m_pBtnCode) 
-	{
-		if (((CControlWnd*)m_pParent)->m_bSearch)
-		{
-			m_pBtnList->MoveWindow(m_btnListRect);
-			m_pBtnCode->MoveWindow(m_btnCodeRect);
-			
-		}
-		else
-		{
-			m_btnCodeRect.left += 2;
-			m_pBtnList->MoveWindow(m_btnCodeRect);
-			m_pBtnCode->MoveWindow(m_btnCodeRect);
-		}
-	}
 	if (m_pEdit) 
 	{
 		/*

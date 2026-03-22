@@ -6,7 +6,26 @@
 #include <iphlpapi.h>
 #pragma comment(lib, "iphlpapi.lib")
 
+#include <DbgHelp.h>
+#include <TlHelp32.h>
+#pragma comment(lib, "DbgHelp.lib")
+
 #define WM_PING_LOG (WM_USER + 100)
+
+#define AGENT_MSG_MONITOR   9995
+
+// 감지 임계값
+#define THRESHOLD_CPU       80.0f   // CPU 80% 이상
+#define THRESHOLD_HANG_MS   3000    // 3초 응답없음
+#define MONITOR_INTERVAL    1000    // 1초 주기
+
+struct ThreadCpuInfo
+{
+	DWORD       dwThreadId;
+	FILETIME    ftPrevKernel;
+	FILETIME    ftPrevUser;
+	float       fCpuUsage;
+};
 
 class CAxisAgentDlgAutoProxy;
 
@@ -41,6 +60,35 @@ public:
 	char   m_regkey[256];
 	DWORD  m_parentPid;
 	HANDLE m_hPingThread;
+
+	// 멤버변수
+	DWORD   m_dwMainThreadId = 0;       // 메인 스레드 ID
+	HANDLE  m_hMonitorThread = NULL;
+	bool    m_bDumpCreated = false;   // 중복 덤프 방지
+	static DWORD WINAPI MonitorThreadProc(LPVOID pParam);
+	void MonitorLoop();
+
+	// CPU 계산
+	float CalcCpuUsage(FILETIME& prevKernel, FILETIME& prevUser,
+		FILETIME  curKernel, FILETIME  curUser);
+
+	// 덤프 생성
+	void CreateDump(const char* reason);
+
+	// 덤프 분석
+	void AnalyzeDump(const char* dumpPath);
+
+	// 모니터링 로그
+	void WriteMonitorLog(const char* msg);
+
+	// FILETIME 빼기 헬퍼
+	static ULONGLONG FileTimeToULL(const FILETIME& ft)
+	{
+		return ((ULONGLONG)ft.dwHighDateTime << 32) | ft.dwLowDateTime;
+	}
+
+
+
 
 	// 메서드
 	void WriteLog(const char* msg);

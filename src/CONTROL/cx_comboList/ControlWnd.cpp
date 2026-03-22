@@ -35,6 +35,9 @@ const int gap		= 0;
 /////////////////////////////////////////////////////////////////////////////
 // CControlWnd
 
+#include <imm.h>
+#pragma comment(lib, "imm32.lib")
+
 CControlWnd::CControlWnd(CWnd* pWnd) : CAxWnd(pWnd)
 {
 	EnableAutomation();
@@ -96,6 +99,8 @@ BEGIN_MESSAGE_MAP(CControlWnd, CAxWnd)
 	ON_WM_TIMER()
 	//}}AFX_MSG_MAP
 	ON_MESSAGE(WM_USER, OnMessage)
+	ON_MESSAGE(WM_EDIT_MSG, OnEditMsg)
+	ON_BN_CLICKED(ID_BTN_LANG, OnBtnLangClicked)
 	ON_MESSAGE(WM_POPLISTWINDOW, OnInitPos)
 	ON_BN_CLICKED(IDC_BUTTON_CATEGORY, OnBtnCode)
 	ON_BN_CLICKED(IDC_BUTTON_INTER, OnBtnInter)
@@ -467,30 +472,41 @@ int CControlWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	const int cx = rc.Width();
 	const int cy = rc.Height();
 
-	// 최초 크기 저장
-	m_szOriginal.cx = cx;
-	m_szOriginal.cy = cy;
+	// m_szOriginal 이 0 이면 기본값 설정
+	if (cx > 0 && cy > 0)
+	{
+		m_szOriginal.cx = cx;
+		m_szOriginal.cy = cy;
+	}
+	else
+	{
+		// lpCreateStruct 에서 크기 가져오기
+		m_szOriginal.cx = lpCreateStruct->cx;
+		m_szOriginal.cy = lpCreateStruct->cy;
+	}
 	m_nBtnWidthOrig = m_nBtnWidth; // 최초 버튼 너비 저장
+
+	CString slog;
+	slog.Format("[OnCreate] cx=%d cy=%d orig(%d,%d)\n",
+		cx, cy, m_szOriginal.cx, m_szOriginal.cy);
+	OutputDebugString(slog);
 
 	CString file;
 	int nType = 0;
 	CString usr;
 
-	usr = Variant(nameCC, "");
+	m_sUser = Variant(nameCC, "");
 	m_sRoot = Variant(homeCC, "");
 
-	m_sHistoryFile.Format("%s\\%s\\%s\\%s", m_sRoot, USRDIR, usr, "userconf.ini");
-	m_sSection = "IB425301";
-	LoadHistory();
 	//nType = GetPrivateProfileInt("SCREEN", "CODECTRL", 0, file);
 
 	//m_pCodeCtrl = std::make_unique<CfxCodeCtrl>(m_pWizard, Variant(homeCC, ""));
-	//m_pCodeCtrl->Create(this, CRect(0, 0, cx - m_nBtnWidthOrig, cy), 1001);
+	//m_pCodeCtrl->Create(this, CRect(0, 0, cx - m_nBtnWidthOrig, m_szOriginal.cy), 1001);
 
 	// CfxImgButton
 	m_pBtnDrop = std::make_unique<CfxImgButton>();
 	m_pBtnDrop->Create("",
-		CRect(cx - m_nBtnWidth, 0, cx, cy),
+		CRect(cx - m_nBtnWidth, 0, m_szOriginal.cx, m_szOriginal.cy),
 		this, ID_BTN_DROP);
 
 	m_pBtnDrop->LoadPng(
@@ -498,11 +514,15 @@ int CControlWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		m_sRoot + "\\image\\" + "axspin1_dn.png",  // 클릭 (없으면 "" 전달)
 		m_sRoot + "\\image\\" + "axspin1_en.png"); // 호버 (없으면 "" 전달)
 
-// m_pBmpNormal = GetBitmap(m_sRoot + "\\image\\" + "axspin1.bmp");
-// m_pBmpHover = GetBitmap(m_sRoot + "\\image\\" + "axspin1_en.bmp");
-// m_pBmpDown = GetBitmap(m_sRoot + "\\image\\" + "axspin1_dn.bmp");
-//	if (m_pBmpNormal && m_pBtnDrop)
-//		m_pBtnDrop->SetImgBitmap(m_pBmpNormal, m_pBmpDown, m_pBmpHover);
+	m_pBtnLang = std::make_unique<CfxImgButton>();
+	m_pBtnLang->Create("",
+		CRect(m_szOriginal.cx - m_nBtnWidthOrig - m_nBtnLangWidth, 0,
+			m_szOriginal.cx - m_nBtnWidthOrig, m_szOriginal.cy),
+		this, ID_BTN_LANG);
+
+	m_pBtnLang->LoadPng(
+		m_sRoot + "\\image\\axEng.png", "", "");
+
 
 	 // 클라이언트 좌표 → 스크린 좌표 변환
 	PostMessage(WM_POPLISTWINDOW, POPLIST_CREATE, 0);  //postmessage 로 비동기 최초 생성
@@ -525,6 +545,28 @@ int CControlWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	SetTimer(stockFUTURE, 350, NULL);
 	return 0;
 }
+
+LRESULT CControlWnd::OnEditMsg(WPARAM wp, LPARAM lp)
+{
+	switch (wp)
+	{
+	case EDIT_MSG_FOCUS:      // 포커스 받음
+		OutputDebugString("[OnEditMsg] EDIT_MSG_FOCUS\n");
+		UpdateLangBtn();
+		break;
+
+	case EDIT_MSG_KILLFOCUS:  // 포커스 잃음
+		OutputDebugString("[OnEditMsg] EDIT_MSG_KILLFOCUS\n");
+		break;
+
+	case EDIT_MSG_HANGUL:     // 한영 상태 변경
+		OutputDebugString("[OnEditMsg] EDIT_MSG_HANGUL\n");
+		UpdateLangBtn();
+		break;
+	}
+	return 0;
+}
+
 LRESULT CControlWnd::OnInitPos(WPARAM wp, LPARAM lp) //OnInitPos WM_POPLISTWINDOW
 {
 	CRect rc;
@@ -539,6 +581,16 @@ LRESULT CControlWnd::OnInitPos(WPARAM wp, LPARAM lp) //OnInitPos WM_POPLISTWINDO
 	{
 		case POPLIST_SHOW:
 		{
+			LoadHistory();
+
+			// 리스트 갱신
+			if (m_pListPop && m_pListPop->m_pCodelist
+				&& m_pListPop->m_pCodelist->GetSafeHwnd())
+			{
+				m_pListPop->RefreshList(m_sItems);
+				OutputDebugString("[CControlWnd] POPLIST_SHOW RefreshList\n");
+			}
+
 			m_bDropVisible = TRUE;
 			ShowDropList(TRUE);
 		}
@@ -578,7 +630,7 @@ LRESULT CControlWnd::OnInitPos(WPARAM wp, LPARAM lp) //OnInitPos WM_POPLISTWINDO
 		case POPLIST_CLEARALL:
 		{
 			ClearItems();
-			SaveHistory(); // 파일에도 저장
+		
 		}
 		break;
 	}
@@ -588,6 +640,43 @@ LRESULT CControlWnd::OnInitPos(WPARAM wp, LPARAM lp) //OnInitPos WM_POPLISTWINDO
 void CControlWnd::OnBtnDropClicked()
 {
 	PostMessage(WM_POPLISTWINDOW, POPLIST_SHOW, 0); //OnBtnDropClicked 보여준다
+}
+
+void CControlWnd::OnBtnLangClicked()
+{
+	OutputDebugString("[CControlWnd] OnBtnLangClicked\n");
+
+	if (!m_pCodeCtrl) return;
+
+	HWND hEdit = m_pCodeCtrl->GetEditSafeHwnd();
+	HIMC hImc = ImmGetContext(hEdit);
+
+	BOOL bHangul = ImmGetOpenStatus(hImc);
+	ImmSetOpenStatus(hImc, !bHangul);
+
+	ImmReleaseContext(hEdit, hImc);
+
+	UpdateLangBtn();
+}
+
+void CControlWnd::UpdateLangBtn()
+{
+	if (!m_pCodeCtrl || !m_pBtnLang) return;
+
+	HWND hEdit = m_pCodeCtrl->GetEditSafeHwnd();
+	HIMC hImc = ImmGetContext(hEdit);
+	BOOL bHangul = ImmGetOpenStatus(hImc);
+	ImmReleaseContext(hEdit, hImc);
+
+	CString sPng = bHangul
+		? m_sRoot + "\\image\\axHan.png"
+		: m_sRoot + "\\image\\axEng.png";
+
+	m_pBtnLang->LoadPng(sPng, "", "");
+
+	CString slog;
+	slog.Format("[UpdateLangBtn] %s\n", sPng);
+	OutputDebugString(slog);
 }
 
 bool CControlWnd::Resize()
@@ -647,6 +736,7 @@ void CControlWnd::OnSize(UINT nType, int cx, int cy)
 
 	// 버튼 너비도 비율 적용
 	const int nBtnW = (int)(m_nBtnWidthOrig * ratioX);
+	const int nLangW = (int)(m_nBtnLangWidth * ratioX);
 
 	// CfxCodeCtrl - 에디트 영역
 	if (m_pCodeCtrl && m_pCodeCtrl->GetSafeHwnd())
@@ -662,6 +752,11 @@ void CControlWnd::OnSize(UINT nType, int cx, int cy)
 			cx - nBtnW, nBtnW, cy);
 		OutputDebugString(slog);
 	}
+
+	// 한영 버튼
+	if (m_pBtnLang && m_pBtnLang->GetSafeHwnd())
+		m_pBtnLang->MoveWindow(cx - nBtnW - nLangW, 0, nLangW, cy);
+
 
 	//Resize();
 }
@@ -916,7 +1011,7 @@ void CControlWnd::ShowDropList(bool bShow)
 			&CWnd::wndTopMost,
 			rcScreen.left,
 			rcScreen.bottom,    // 에디트 바로 아래
-			rcClient.Width() + 100,   // 너비 동일
+			rcClient.Width() * 3,   // 너비 동일
 			200,                // 드롭 높이
 			SWP_SHOWWINDOW);
 		m_pListPop->ShowWindow(SW_SHOW);
@@ -951,6 +1046,8 @@ void CControlWnd::SetImgBitmap(CBitmap* pNormal, CBitmap* pDown, CBitmap* pHover
 void CControlWnd::LoadHistory()
 {
 	OutputDebugString("[CControlWnd] LoadHistory\n");
+	m_sHistoryFile.Format("%s\\%s\\%s\\%s", m_sRoot, USRDIR, m_sUser, "userconf.ini");
+	m_sSection = "IB425301";
 
 	m_vecItems.clear();
 	m_mapItems.clear();
@@ -1011,7 +1108,7 @@ void CControlWnd::LoadHistory()
 			sCode, sName);
 		OutputDebugString(slog);
 	}
-
+	m_sItems = GetItemsString();
 	OutputDebugString("[CControlWnd] LoadHistory 완료\n");
 }
 
@@ -1060,6 +1157,8 @@ void CControlWnd::AddItem(CString sCode, CString sName)
 	CString slog;
 	slog.Format("[CControlWnd] AddItem code=%s name=%s\n", sCode, sName);
 	OutputDebugString(slog);
+
+	SaveHistory();
 }
 
 void CControlWnd::RemoveItem(CString sCode)
@@ -1079,6 +1178,7 @@ void CControlWnd::RemoveItem(CString sCode)
 	}
 
 	OutputDebugString("[CControlWnd] RemoveItem code=" + sCode + "\n");
+	SaveHistory();
 }
 
 void CControlWnd::ClearItems()
@@ -1086,6 +1186,7 @@ void CControlWnd::ClearItems()
 	m_vecItems.clear();
 	m_mapItems.clear();
 	OutputDebugString("[CControlWnd] ClearItems\n");
+	SaveHistory(); // 파일에도 저장
 }
 
 // CPopListWnd 에 넘길 문자열 생성

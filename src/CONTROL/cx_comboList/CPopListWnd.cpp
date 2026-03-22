@@ -643,3 +643,48 @@ void CPopListWnd::OnBtnClear()
     if (m_pParent && m_pParent->GetSafeHwnd())
         m_pParent->PostMessage(WM_POPLISTWINDOW, POPLIST_CLEARALL, 0);
 }
+
+void CPopListWnd::RefreshList(CString items)
+{
+    OutputDebugString("[CPopListWnd] RefreshList\n");
+
+    if (!m_pCodelist || !m_pCodelist->GetSafeHwnd()) return;
+
+    // 기존 데이터 전체 삭제
+    m_pCodelist->DeleteAllItems();
+
+    if (items.IsEmpty())
+    {
+        OutputDebugString("[CPopListWnd] RefreshList items 없음\n");
+        return;
+    }
+
+    // 데이터 추가
+    CStringArray arr;
+    m_pCodelist->StringSplit(items, arr, _T('\t'));
+
+    for (int idx = 0; idx < arr.GetCount(); idx++)
+    {
+        CString sItem = arr.GetAt(idx);
+        if (sItem.IsEmpty()) continue;
+
+        CString sname = sItem;
+        CString scode = parser(sname, " ");
+
+        m_pCodelist->InsertItem(idx, scode);
+        m_pCodelist->SetItemText(idx, 1, sname);
+        m_pCodelist->SetItemText(idx, 2, "");
+
+        CString slog;
+        slog.Format("[CPopListWnd] RefreshList idx=%d code=%s name=%s\n",
+            idx, scode, sname);
+        OutputDebugString(slog);
+    }
+
+    // 첫번째 행 선택
+    if (m_pCodelist->GetItemCount() > 0)
+        m_pCodelist->SetItemStates(0,
+            RC_ITEM_SELECTED | RC_ITEM_FOCUSED);
+
+    OutputDebugString("[CPopListWnd] RefreshList 완료\n");
+}

@@ -35,8 +35,14 @@
 
 #define ID_BTN_DROP     1001
 #define ID_BTN_CLEAR    9900
+#define ID_BTN_LANG     1002
+
+#define EDIT_MSG_FOCUS      1   // 포커스 받음
+#define EDIT_MSG_KILLFOCUS  2   // 포커스 잃음
+#define EDIT_MSG_HANGUL     3   // 한영 상태 변경
 
 #define WM_POPLISTWINDOW  (WM_USER + 300)
+#define WM_EDIT_MSG     (WM_USER + 500)
 
 #define POPLIST_DBCLICKCODE 5
 #define POPLIST_CLEARALL 4
