@@ -100,11 +100,11 @@ BEGIN_MESSAGE_MAP(CControlWnd, CAxWnd)
 	//}}AFX_MSG_MAP
 	ON_MESSAGE(WM_USER, OnMessage)
 	ON_MESSAGE(WM_EDIT_MSG, OnEditMsg)
-	ON_BN_CLICKED(ID_BTN_LANG, OnBtnLangClicked)
 	ON_MESSAGE(WM_POPLISTWINDOW, OnInitPos)
 	ON_BN_CLICKED(IDC_BUTTON_CATEGORY, OnBtnCode)
 	ON_BN_CLICKED(IDC_BUTTON_INTER, OnBtnInter)
 	ON_BN_CLICKED(ID_BTN_DROP, OnBtnDropClicked)
+	ON_BN_CLICKED(ID_BTN_LANG, OnBtnLangClicked)
 END_MESSAGE_MAP()
 
 BEGIN_DISPATCH_MAP(CControlWnd, CAxWnd)
@@ -168,7 +168,11 @@ long CControlWnd::OnMessage(WPARAM wParam, LPARAM lParam)
 		struct	_extTHx* exth;
 		exth = (struct _extTHx*)lParam;
 		length = exth->size;
-		if (m_bDomino && length < 13 && length > 2)
+		if (length == 3)
+		{
+			m_pCodeCtrl->SetEditData(str);
+		}
+		else if (m_bDomino && length < 13 && length > 2)
 		{
 			// 선물, 옵션, 주식 구분해서 처리...
 			CString str = CString(exth->data);
@@ -500,8 +504,9 @@ int CControlWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 	//nType = GetPrivateProfileInt("SCREEN", "CODECTRL", 0, file);
 
-	//m_pCodeCtrl = std::make_unique<CfxCodeCtrl>(m_pWizard, Variant(homeCC, ""));
-	//m_pCodeCtrl->Create(this, CRect(0, 0, cx - m_nBtnWidthOrig, m_szOriginal.cy), 1001);
+	m_pCodeCtrl = std::make_unique<CfxCodeCtrl>(m_pWizard, Variant(homeCC, ""));
+	m_pCodeCtrl->Create(this, CRect(0, 0, cx - m_nBtnWidthOrig, m_szOriginal.cy), ID_EDIT_CODE);
+	//m_pCodeCtrl->ShowWindow(SW_HIDE);
 
 	// CfxImgButton
 	m_pBtnDrop = std::make_unique<CfxImgButton>();
@@ -521,7 +526,7 @@ int CControlWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		this, ID_BTN_LANG);
 
 	m_pBtnLang->LoadPng(
-		m_sRoot + "\\image\\axEng.png", "", "");
+		m_sRoot + "\\image\\axEng.png", m_sRoot + "\\image\\axEng.png", m_sRoot + "\\image\\axEng.png");
 
 
 	 // 클라이언트 좌표 → 스크린 좌표 변환
@@ -650,10 +655,25 @@ void CControlWnd::OnBtnLangClicked()
 
 	HWND hEdit = m_pCodeCtrl->GetEditSafeHwnd();
 	HIMC hImc = ImmGetContext(hEdit);
+	if (!hImc) return;
 
-	BOOL bHangul = ImmGetOpenStatus(hImc);
-	ImmSetOpenStatus(hImc, !bHangul);
+	DWORD dwConversion = 0, dwSentence = 0;
+	ImmGetConversionStatus(hImc, &dwConversion, &dwSentence);
 
+	// 한글 모드 체크
+	BOOL bHangul = (dwConversion & IME_CMODE_HANGUL);
+
+	CString slog;
+	slog.Format("[OnBtnLangClicked] dwConversion=0x%x bHangul=%d\n",
+		dwConversion, bHangul);
+	OutputDebugString(slog);
+
+	if (bHangul)
+		dwConversion &= ~IME_CMODE_HANGUL; // 한글 → 영문
+	else
+		dwConversion |= IME_CMODE_HANGUL;  // 영문 → 한글
+
+	ImmSetConversionStatus(hImc, dwConversion, dwSentence);
 	ImmReleaseContext(hEdit, hImc);
 
 	UpdateLangBtn();
@@ -665,17 +685,22 @@ void CControlWnd::UpdateLangBtn()
 
 	HWND hEdit = m_pCodeCtrl->GetEditSafeHwnd();
 	HIMC hImc = ImmGetContext(hEdit);
-	BOOL bHangul = ImmGetOpenStatus(hImc);
+	if (!hImc) return;
+
+	DWORD dwConversion = 0, dwSentence = 0;
+	ImmGetConversionStatus(hImc, &dwConversion, &dwSentence);
 	ImmReleaseContext(hEdit, hImc);
+
+	BOOL bHangul = (dwConversion & IME_CMODE_HANGUL);
 
 	CString sPng = bHangul
 		? m_sRoot + "\\image\\axHan.png"
 		: m_sRoot + "\\image\\axEng.png";
 
-	m_pBtnLang->LoadPng(sPng, "", "");
+	m_pBtnLang->LoadPng(sPng, sPng, sPng);
 
 	CString slog;
-	slog.Format("[UpdateLangBtn] %s\n", sPng);
+	slog.Format("[UpdateLangBtn] bHangul=%d png=%s\n", bHangul, sPng);
 	OutputDebugString(slog);
 }
 
@@ -725,40 +750,30 @@ void CControlWnd::Send(CString szCode)
 void CControlWnd::OnSize(UINT nType, int cx, int cy) 
 {
 	CAxWnd::OnSize(nType, cx, cy);
-	
-	// TODO: Add your message handler code here
+
 	if (cx <= 0 || cy <= 0) return;
 	if (m_szOriginal.cx <= 0 || m_szOriginal.cy <= 0) return;
 
-	// 비율 계산
 	const float ratioX = (float)cx / m_szOriginal.cx;
-	const float ratioY = (float)cy / m_szOriginal.cy;
+	const int   nBtnW = (int)(m_nBtnWidthOrig * ratioX);
+	const int   nLangW = (int)(m_nBtnLangWidth * ratioX);
 
-	// 버튼 너비도 비율 적용
-	const int nBtnW = (int)(m_nBtnWidthOrig * ratioX);
-	const int nLangW = (int)(m_nBtnLangWidth * ratioX);
+	CString slog;
+	slog.Format("[OnSize] cx=%d cy=%d nBtnW=%d nLangW=%d editW=%d\n",
+		cx, cy, nBtnW, nLangW, cx - nBtnW - nLangW);
+	OutputDebugString(slog);
 
-	// CfxCodeCtrl - 에디트 영역
+	// 에디트 영역 - 버튼 두개 제외
 	if (m_pCodeCtrl && m_pCodeCtrl->GetSafeHwnd())
-		m_pCodeCtrl->MoveWindow(0, 0, cx - nBtnW, cy);
+		m_pCodeCtrl->MoveWindow(0, 0, cx - nBtnW - nLangW, cy);
 
-	// CfxImgButton - 버튼 비율 적용
-	if (m_pBtnDrop && m_pBtnDrop->GetSafeHwnd())
-	{
-		m_pBtnDrop->MoveWindow(cx - nBtnW, 0, nBtnW, cy);
-
-		CString slog;
-		slog.Format("[CControlWnd] OnSize BtnDrop x=%d w=%d h=%d\n",
-			cx - nBtnW, nBtnW, cy);
-		OutputDebugString(slog);
-	}
-
-	// 한영 버튼
+	// 한영 버튼 - 드롭버튼 왼쪽
 	if (m_pBtnLang && m_pBtnLang->GetSafeHwnd())
 		m_pBtnLang->MoveWindow(cx - nBtnW - nLangW, 0, nLangW, cy);
 
-
-	//Resize();
+	// 드롭 버튼 - 맨 오른쪽
+	if (m_pBtnDrop && m_pBtnDrop->GetSafeHwnd())
+		m_pBtnDrop->MoveWindow(cx - nBtnW, 0, nBtnW, cy);
 }
 
 void CControlWnd::OnBtnCode()

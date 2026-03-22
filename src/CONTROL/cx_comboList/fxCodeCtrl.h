@@ -299,7 +299,7 @@ public:
 
 // Attributes
 public:
-	std::unique_ptr<CCodeEdit>  m_pEdit;
+	std::unique_ptr<CCodeEdit>  m_pEdit{};
 
 	CString	m_sHistory;
 	CString	m_sPath;

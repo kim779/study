@@ -33,9 +33,10 @@
 #define VS1_TYPE   0
 #define VS2_TYPE   1
 
-#define ID_BTN_DROP     1001
+#define ID_BTN_DROP     9899
 #define ID_BTN_CLEAR    9900
-#define ID_BTN_LANG     1002
+#define ID_BTN_LANG     9898
+#define ID_EDIT_CODE     9989
 
 #define EDIT_MSG_FOCUS      1   // 포커스 받음
 #define EDIT_MSG_KILLFOCUS  2   // 포커스 잃음

@@ -1193,8 +1193,8 @@ BOOL CCodeEdit::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
 void CCodeEdit::OnSetFocus(CWnd* pOldWnd) 
 {
 
-	KillTimer(TID_CHANGEHANGLE);
-	SetTimer(TID_CHANGEHANGLE, 10, NULL);	
+	//KillTimer(TID_CHANGEHANGLE);
+	//SetTimer(TID_CHANGEHANGLE, 10, NULL);	
 	SetSel(0, -1);	
 	CDDEdit::OnSetFocus(pOldWnd);
 }
@@ -1247,23 +1247,16 @@ void CCodeEdit::ListCode(CString code)
 
 void CCodeEdit::ChangeHangulMode(HWND hWnd, bool bHangle)
 {
+
 	DWORD	dwConversion = 0, dwSentence = 0;
 	
 	HIMC hImc = ImmGetContext(this->m_hWnd);
 	if (ImmGetConversionStatus(hImc, &dwConversion, &dwSentence))
 	{
-		
-#if 1 // for korean
 		if (dwConversion & IME_CMODE_HANGEUL)
 			return;
-//		keybd_event(VK_HANGEUL,0,0,0);		
-//		keybd_event(VK_HANGEUL,0,KEYEVENTF_KEYUP,0);
-		
+
 		dwConversion |= IME_CMODE_HANGEUL;
-#else // for english
-		if (dwConversion & IME_CMODE_HANGEUL)
-			dwConversion -= IME_CMODE_HANGEUL;
-#endif
 		ImmSetConversionStatus(hImc, dwConversion, dwSentence);
 	}
 }
@@ -1454,7 +1447,8 @@ int CfxCodeCtrl::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 void CfxCodeCtrl::OnDestroy() 
 {
-
+	if (m_pEdit && m_pEdit->GetSafeHwnd())
+		m_pEdit->DestroyWindow();
 	m_pEdit.reset();
 
 
@@ -1479,6 +1473,8 @@ void CfxCodeCtrl::LButtonUp()
 void CfxCodeCtrl::OnPaint() 
 {
 	CPaintDC dc(this); // device context for painting
+
+	if (!m_pParent) return;
 
 	CRect	WinRC;
 	GetClientRect(&WinRC);
@@ -1531,33 +1527,33 @@ void CfxCodeCtrl::OnSize(UINT nType, int cx, int cy)
 	editRC = btnRC = rect;
 	
 	
-	btnRC.left = btnRC.right - editRC.Height()-3+1;/*19*/;
-	//btnRC.bottom = 21;
-	//if ((btnRC.Width()/rect.Width()) > 18/65) 
-	if (m_Unit == GU_FCODE || m_Unit == GU_FUTURE || m_Unit == GU_OPTION || m_Unit == GU_FOCODE)
-		btnRC.left = rect.Width()-rect.Width()*18/80-1;
-	else
-		btnRC.left = rect.Width()-rect.Width()*18/65-1;
-	
+	//btnRC.left = btnRC.right - editRC.Height()-3+1;/*19*/;
+	////btnRC.bottom = 21;
+	////if ((btnRC.Width()/rect.Width()) > 18/65) 
+	//if (m_Unit == GU_FCODE || m_Unit == GU_FUTURE || m_Unit == GU_OPTION || m_Unit == GU_FOCODE)
+	//	btnRC.left = rect.Width()-rect.Width()*18/80-1;
+	//else
+	//	btnRC.left = rect.Width()-rect.Width()*18/65-1;
+	//
 
-	btnRC.OffsetRect(-17/*-16*/, 0);
-	btnRC.right -= 2;
+	//btnRC.OffsetRect(-17/*-16*/, 0);
+	//btnRC.right -= 2;
 
-	
+	//
 
-	editRC.right = btnRC.left;
+	//editRC.right = btnRC.left;
 	//editRC.left += 2;
 	//editRC.top += 6;
 
 	if (m_pEdit) 
 	{
-		/*
 		
-		if (((CControlWnd*)m_pParent)->m_bSearch)
+		
+	//	if (((CControlWnd*)m_pParent)->m_bSearch)
 			m_pEdit->MoveWindow(editRC.left, editRC.top , editRC.Width()-1, editRC.Height() - 2);
-		else
-			m_pEdit->MoveWindow(editRC.left, editRC.top , editRC.Width()-1+19, editRC.Height() - 2);
-		*/
+	//	else
+	//		m_pEdit->MoveWindow(editRC.left, editRC.top , editRC.Width()-1+19, editRC.Height() - 2);
+		
 		//ResizeEdit(editRC.Width()+editRC.Height(), editRC.Height());
 	
 

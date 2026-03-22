@@ -468,8 +468,9 @@ BOOL CfxImgButton::OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message)
 		::SetCursor(m_hCursor);
 		return TRUE;
 	}
-
-	return CWnd::OnSetCursor(pWnd, nHitTest, message);
+	static HCURSOR hHand = ::LoadCursor(NULL, IDC_HAND); // 한번만 로드
+	::SetCursor(hHand);
+	return TRUE;
 }
 
 BOOL CfxImgButton::LoadPng(CString sNormal, CString sDown, CString sHover)
