@@ -39,8 +39,7 @@ public:
 
 
 	CString m_ClickCode{};
-
-
+	void RefreshList(CString items);
 
 protected:
 	afx_msg LRESULT OnMessage(WPARAM wParam, LPARAM lParam);

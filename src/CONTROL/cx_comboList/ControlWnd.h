@@ -44,7 +44,7 @@ public:
 
 // Attributes
 public:
-	CString		m_sData, m_sUserID, m_sRoot;
+	CString		m_sData, m_sUserID, m_sRoot, m_sUser;
 	COLORREF	m_boxColor, m_boxColorHover, m_bgCol, m_bgColHover;
 	int		m_bgColor;
 	CString		m_sCode;
@@ -68,6 +68,8 @@ public:
 	std::unique_ptr<CPopListWnd> m_pListPop;
 
 	std::unique_ptr<CfxImgButton>   m_pBtnDrop;
+	std::unique_ptr<CfxImgButton> m_pBtnLang{};
+
 
 	CBitmap* m_pBmpNormal = nullptr;
 	CBitmap* m_pBmpDown = nullptr;
@@ -76,6 +78,7 @@ public:
 	int         m_nBtnWidth = 20;  
 	int         m_nHeight ; 
 	int		 m_nBtnWidthOrig; // 최초 버튼 너비
+	int		 m_nBtnLangWidth = 10; // m_pBtnDrop 절반
 
 	CSize m_szOriginal;  // 최초 생성 시 크기 저장
 protected:
@@ -161,8 +164,9 @@ protected:
 	afx_msg void SetUnit(short unit);
 	afx_msg BOOL IsKonex();
 	afx_msg void OnBtnDropClicked();
+	afx_msg void OnBtnLangClicked();
 	LRESULT OnInitPos(WPARAM wp, LPARAM lp);
-
+	afx_msg LRESULT OnEditMsg(WPARAM wp, LPARAM lp);
 	//}}AFX_DISPATCH
 	DECLARE_DISPATCH_MAP()
 	DECLARE_INTERFACE_MAP()
@@ -176,7 +180,7 @@ private:
 	DWORD m_dwHideTime = 0;  // 팝업 닫힌 시간 저장
 	CString m_sItems;
 	void ShowDropList(bool bShow);
-
+	void UpdateLangBtn();
 	struct CodeItem
 	{
 		CString sCode;  // "000660"
