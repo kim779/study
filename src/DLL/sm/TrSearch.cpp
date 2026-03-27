@@ -301,6 +301,7 @@ void CTrSearch::setCount(int cnt, int tot)
 
 void CTrSearch::treeSelect(int idx)
 {
+	return; //
 	if (idx >= m_arItem.GetSize())
 		return;
 	m_Tree.SelectItem(m_arItem.GetAt(idx));

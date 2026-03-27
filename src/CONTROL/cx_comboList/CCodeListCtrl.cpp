@@ -15,8 +15,8 @@
 #define MUST_NOT_STYLE		(LVS_EDITLABELS | LVS_ICON | LVS_SMALLICON | LVS_LIST | LVS_NOSCROLL)
 #define MUST_NOT_EX_STYLE	(0)
 
-#define COL_CODE		1    //종목코드
-#define COL_NAME		2   //종목명
+#define COL_CODE		0    //종목코드
+#define COL_NAME		1   //종목명
 
 struct ROWINFO
 {
@@ -125,6 +125,8 @@ int _ITEM_COMPARE_FUNCS::_DateCompare(const COleDateTime& date1, const COleDateT
 
 IMPLEMENT_DYNAMIC(CCodeListCtrl, CListCtrl)
 
+#define TID_SINGLE_CLICK 9898
+
 CCodeListCtrl::CCodeListCtrl(CWnd* pWizard, CString sItems) : m_pWndEdit(nullptr)
 {
 	m_pWndEdit = std::make_unique<CEdit>();
@@ -165,6 +167,8 @@ BEGIN_MESSAGE_MAP(CCodeListCtrl, CListCtrl)
 	ON_WM_MOUSEMOVE()
 	ON_MESSAGE(WM_MOUSELEAVE, OnMouseLeave)
 //	ON_WM_MOUSELEAVE()
+ON_WM_KEYDOWN()
+ON_WM_TIMER()
 END_MESSAGE_MAP()
 
 // CCodeListCtrl 메시지 처리기
@@ -196,6 +200,18 @@ void CCodeListCtrl::OnCustomDraw(NMHDR* pNMHDR, LRESULT* pResult)
 		ASSERT(nSubItem >= 0 && nSubItem < p->aTextColors.GetSize());
 		lplvcd->clrText = p->aTextColors[nSubItem];
 		lplvcd->clrTextBk = p->aBkColors[nSubItem];
+
+		// 호버 행 색상 직접 지정 (포커스 없어도 선택된 것처럼 보임)
+		if (nItem == m_nHoverItem)
+		{
+			lplvcd->clrTextBk = RGB(0, 120, 215);  // 파란 배경
+			lplvcd->clrText = RGB(255, 255, 255); // 흰 글자
+		}
+		else
+		{
+			lplvcd->clrText = p->aTextColors[nSubItem];
+			lplvcd->clrTextBk = p->aBkColors[nSubItem];
+		}
 
 		// 컬럼2 + 호버 행 → PNG 그리기
 		if (nSubItem == 2 && nItem == m_nHoverItem
@@ -242,11 +258,7 @@ void CCodeListCtrl::OnColumnclick(NMHDR* pNMHDR, LRESULT* pResult)
 void CCodeListCtrl::OnLButtonDown(UINT nFlags, CPoint point)
 {
 	_MouseClkMonitor(WM_LBUTTONDOWN, nFlags, point, TRUE);
-}
-
-void CCodeListCtrl::OnLButtonDblClk(UINT nFlags, CPoint point)
-{
-	_MouseClkMonitor(WM_LBUTTONDBLCLK, nFlags, point, TRUE);
+	m_bDblClkFired = FALSE;
 
 	LVHITTESTINFO hitInfo;
 	hitInfo.pt = point;
@@ -255,7 +267,6 @@ void CCodeListCtrl::OnLButtonDblClk(UINT nFlags, CPoint point)
 	int nItem = hitInfo.iItem;
 	int nSubItem = hitInfo.iSubItem;
 
-	// 종목코드(0) or 종목명(1) 컬럼만
 	if (nItem >= 0 && (nSubItem == 0 || nSubItem == 1))
 	{
 		CString scode = GetItemText(nItem, COL_CODE);
@@ -264,9 +275,83 @@ void CCodeListCtrl::OnLButtonDblClk(UINT nFlags, CPoint point)
 		CString stmp;
 		stmp.Format("%s\t%s", scode, sname);
 
-		// 기존 방식과 동일하게 WM_USER + WPARAM 으로
 		GetParent()->SendMessage(WM_USER,
-			MAKEWPARAM(MSG_DBL_CLICK, 0),
+			MAKEWPARAM(LIST_MSG_ONE_CLICK, 0),
+			(LPARAM)(LPSTR)(LPCTSTR)stmp);
+	}
+	/*LVHITTESTINFO hitInfo;
+	hitInfo.pt = point;
+	SubItemHitTest(&hitInfo);
+	int nItem = hitInfo.iItem;
+	int nSubItem = hitInfo.iSubItem;
+
+	if (nItem >= 0 && (nSubItem == 0 || nSubItem == 1))
+	{
+		m_nPendingClickItem = nItem;
+		m_nPendingClickSubItem = nSubItem;
+		m_bDblClkFired = FALSE;
+		KillTimer(TID_SINGLE_CLICK);
+		SetTimer(TID_SINGLE_CLICK, GetDoubleClickTime() + 10, NULL);
+	}*/
+}
+
+void CCodeListCtrl::OnTimer(UINT_PTR nIDEvent)
+{
+	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
+	if (nIDEvent == TID_SINGLE_CLICK)
+	{
+		KillTimer(TID_SINGLE_CLICK);
+
+		if (m_bDblClkFired)
+		{
+			m_bDblClkFired = FALSE;
+			return;
+		}
+
+		if (m_nPendingClickItem >= 0)
+		{
+			CString scode = GetItemText(m_nPendingClickItem, COL_CODE);
+			CString sname = GetItemText(m_nPendingClickItem, COL_NAME);
+			CString stmp;
+			stmp.Format("%s\t%s", scode, sname);
+
+			OutputDebugString("[CCodeListCtrl] SingleClick code=" + scode + "\n");
+			GetParent()->SendMessage(WM_USER,
+				MAKEWPARAM(LIST_MSG_ONE_CLICK, 0),
+				(LPARAM)(LPSTR)(LPCTSTR)stmp);
+
+			m_nPendingClickItem = -1;
+			m_nPendingClickSubItem = -1;
+		}
+		return;
+	}
+	CListCtrl::OnTimer(nIDEvent);
+}
+
+
+void CCodeListCtrl::OnLButtonDblClk(UINT nFlags, CPoint point)
+{
+	_MouseClkMonitor(WM_LBUTTONDBLCLK, nFlags, point, TRUE);
+	//KillTimer(TID_SINGLE_CLICK);
+	m_bDblClkFired = TRUE;
+
+	LVHITTESTINFO hitInfo;
+	hitInfo.pt = point;
+	SubItemHitTest(&hitInfo);
+
+	int nItem = hitInfo.iItem;
+	int nSubItem = hitInfo.iSubItem;
+
+	if (nItem >= 0 && (nSubItem == 0 || nSubItem == 1))
+	{
+		CString scode = GetItemText(nItem, COL_CODE);
+		CString sname = GetItemText(nItem, COL_NAME);
+
+		CString stmp;
+		stmp.Format("%s\t%s", scode, sname);
+
+		GetParent()->SendMessage(WM_USER,
+			MAKEWPARAM(LIST_MSG_DBL_CLICK, 0),
 			(LPARAM)(LPSTR)(LPCTSTR)stmp);
 	}
 }
@@ -1805,7 +1890,29 @@ void CCodeListCtrl::OnNMClick(NMHDR* pNMHDR, LRESULT* pResult)
 		CString strMessage;
 		strMessage.Format(_T("\r\n\r\nClicked on Row: %d, Column: %d"), nItem, nSubItem);
 		OutputDebugString(strMessage);
-		if (nSubItem == 4)
+		if (nSubItem == 2) // X 버튼 클릭
+		{
+			CString scode = GetItemText(nItem, COL_CODE);
+			CString sname = GetItemText(nItem, COL_NAME);
+
+			if (m_bAllowDelete)
+			{
+				DeleteItem(nItem);
+
+				CString stmp;
+				stmp.Format("%s\t%s", scode, sname);
+				GetParent()->PostMessage(WM_USER,
+					MAKEWPARAM(LIST_MSG_REMOVE_ITEM, 0),
+					(LPARAM)(LPSTR)(LPCTSTR)stmp);
+
+				OutputDebugString("[CCodeListCtrl] X버튼 삭제 code=" + scode + "\n");
+			}
+			else
+			{
+				OutputDebugString("[CCodeListCtrl] X버튼 삭제 불가 (서치팝업)\n");
+			}
+		}
+		else if (nSubItem == 4)
 		{
 			CRect rect;
 			GetItemRect(nItem, &rect, LVIR_BOUNDS);
@@ -1821,7 +1928,7 @@ void CCodeListCtrl::OnNMClick(NMHDR* pNMHDR, LRESULT* pResult)
 			stmp.Format("%s\t%s\n%d\t%d", GetItemText(nItem, COL_CODE), GetItemText(nItem, COL_NAME), rect.right - pt.x, pt.y - rect.top);
 			//OutputDebugString("\r\n" + stmp);
 
-			GetParent()->SendMessage(WM_USER, MAKEWPARAM(MSG_POP_MENU, 0), (LPARAM)(LPSTR)(LPCTSTR)stmp);
+			GetParent()->SendMessage(WM_USER, MAKEWPARAM(LIST_MSG_POP_MENU, 0), (LPARAM)(LPSTR)(LPCTSTR)stmp);
 		}
 		else if (nSubItem == 3)
 		{
@@ -1877,6 +1984,7 @@ void CCodeListCtrl::OnMouseMove(UINT nFlags, CPoint point)
 		CString slog;
 		slog.Format("[CCodeListCtrl] OnMouseMove hover=%d\n", m_nHoverItem);
 		OutputDebugString(slog);
+
 	}
 
 	CListCtrl::OnMouseMove(nFlags, point);
@@ -1897,3 +2005,67 @@ LRESULT  CCodeListCtrl::OnMouseLeave(WPARAM wp, LPARAM lp)
 	//CListCtrl::OnMouseLeave();
 	return 0;
 }
+
+
+void CCodeListCtrl::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
+{
+	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
+	CString slog;
+	slog.Format("[CCodeListCtrl] OnKeyDown nChar=%d\n", nChar);
+	OutputDebugString(slog);
+
+	if (nChar == VK_UP || nChar == VK_DOWN ||
+		nChar == VK_PRIOR || nChar == VK_NEXT ||
+		nChar == VK_HOME || nChar == VK_END)
+	{
+		if (m_nHoverItem >= 0)
+		{
+			int nPrev = m_nHoverItem;
+			m_nHoverItem = -1;
+			// 이전 호버 행 다시 그리기
+			CRect rc;
+			GetItemRect(nPrev, &rc, LVIR_BOUNDS);
+			InvalidateRect(&rc);
+		}
+
+		if (nChar == VK_UP)
+		{
+			// 현재 선택된 행 확인
+			int nItem = GetNextItem(-1, LVNI_SELECTED);
+			if (nItem == 0 || nItem == -1)
+			{
+				// 첫번째 행에서 위 → 팝업 닫고 에디트 포커스
+				OutputDebugString("[CCodeListCtrl] VK_UP 첫행 에디트 복귀\n");
+
+				// 부모(CPopListWnd) 에 통보
+				GetParent()->PostMessage(WM_USER,
+					MAKEWPARAM(LIST_MSG_EDIT_FOCUS, 0), 0);
+				return;
+			}
+		}
+	}
+
+	if (nChar == VK_RETURN)
+	{
+		int nItem = GetNextItem(-1, LVNI_SELECTED);
+		if (nItem >= 0)
+		{
+			CString scode = GetItemText(nItem, 0);
+			CString sname = GetItemText(nItem, 1);
+
+			OutputDebugString("[CCodeListCtrl] VK_RETURN code=" + scode + "\n");
+
+			CString stmp;
+			stmp.Format("%s\t%s", scode, sname);
+			GetParent()->SendMessage(WM_USER,
+				MAKEWPARAM(LIST_MSG_RETURN_CLICK, 0),
+				(LPARAM)(LPSTR)(LPCTSTR)stmp);
+		}
+		return;
+	}
+
+
+	CListCtrl::OnKeyDown(nChar, nRepCnt, nFlags);
+}
+
+

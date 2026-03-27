@@ -260,6 +260,7 @@ protected:
 	afx_msg void OnDestroy();
 	afx_msg void OnEnable(BOOL bEnable);
 	afx_msg HBRUSH OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor);
+	afx_msg LRESULT OnInputLangChange(WPARAM wp, LPARAM lp);
 	//}}AFX_MSG
 
 	DECLARE_MESSAGE_MAP()
@@ -300,7 +301,7 @@ public:
 // Attributes
 public:
 	std::unique_ptr<CCodeEdit>  m_pEdit{};
-
+	CString m_sPendingData{};
 	CString	m_sHistory;
 	CString	m_sPath;
 	CString	m_Name;
@@ -311,7 +312,7 @@ public:
 	int	m_Unit;
 
 	BOOL	m_bKONEX;	//KDK 2013.05.14 KONEX
-
+	CString m_sPrevText{};
 private:
 	CFont*	m_pFont;
 	int	m_btnDown;
@@ -328,10 +329,10 @@ private:
 	CStringArray	m_arrList;
 
 	BOOL	m_bFocusInit;
-		
+
 // Operations
 public:
-
+	BOOL m_bHangulMode{};
 
 	BOOL	Create(CWnd* parent, CRect rect, UINT id);
 	void	SetHistory(CString sHistory);
@@ -383,10 +384,13 @@ public:
 	afx_msg void OnMove(int x, int y);
 	afx_msg HBRUSH OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor);
 	afx_msg void OnKillFocus(CWnd* pNewWnd);
+	afx_msg void OnChangeEdit();
 	//}}AFX_MSG
 	afx_msg void OnBtnUp();
 	afx_msg void OnBtnDown();
 	afx_msg void OnCodeDown();
 	afx_msg void OnListDown();
+
 	DECLARE_MESSAGE_MAP()
+	afx_msg void OnTimer(UINT_PTR nIDEvent);
 };

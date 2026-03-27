@@ -415,13 +415,10 @@ void CChildFrame::OnSize(UINT nType, int cx, int cy)
 	const int yy = GetSystemMetrics(SM_CYFRAME) + GetSystemMetrics(SM_CYSIZEFRAME);
 
 	form.DeflateRect(xx , yy );
-	//form.right += 4;
-	//form.left -= 4;
-	//form.bottom += 1;
+
+	form.right += 5;
 	form.left -= 7;
-	form.right += 6;
-	form.left -= 4;
-	form.bottom += 6;
+	form.bottom += 3;
 	
 	CRgn rgn;
 	rgn.CreateRectRgn(form.left, form.top, form.right, form.bottom);

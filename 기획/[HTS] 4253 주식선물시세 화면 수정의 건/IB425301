@@ -2,7 +2,7 @@ GLOBAL DIVISION
 {
 
 MAPNAME(IB425301)
-MAPSIZE(19, 128)
+MAPSIZE(20, 128)
 VERSION(000)
 MAPKIND(NORMAL)
 MAPGROUP(1)
@@ -24,19 +24,19 @@ FORM DIVISION
 
 COMBO  JNAM1(205, 295, 312, 312)  TP_SUNKEN  LEN(3)  COUNT(0)  VCOUNT(24)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_NUM|EDIT_INPUT    COLOR(68, 69)  CUR(0)    TABORDER(1)  IOORDER(1)  ENABLE  &
   HINTTYPE(IH_NONE)
-BUTTON  SYMBOL7(107, 0, 125, 19)  TP_PUSH|IMAGE|AL_CENTER      COLOR(24, 0)  CUR(10)    "검색.BMP"    TABORDER(2)  &
+BUTTON  SYMBOL7(110, 0, 128, 19)  TP_PUSH|IMAGE|AL_CENTER      COLOR(24, 0)  CUR(10)    "검색.BMP"    TABORDER(2)  &
   VISIBLE  IMAGE  HOVER  HINTTYPE(IH_NONE)
 GRID  gridcom(210, 111, 520, 246)  VISIBLEROW(0)  CELLH(20)  MATRIX(500, 2)  FIX(0)  MAINCOLOR(208, 232)  LINECOLOR(0)  FOCUSCOLOR(0)  FOCUSKIND(0)  |FLEXIBLE|VSCROLL|HEADER    &
 	COLINFO("Col0")  LEN(3)  WIDTH(80)  COLALIGN(AL_CENTER, AL_RIGHT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_NUM|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    &
 	COLINFO("Col1")  LEN(32)  WIDTH(80)  COLALIGN(AL_CENTER, AL_LEFT)  COLHINTTYPE(IH_NONE)  HEADCOLOR(208, 232)  IO_MIXED|EDIT_OUTPUT      COLOR(192, 232)  COLCUR(0, 0)    COLUMN_VISIBLE  INORMAL    HNORMAL  SORTSTARTPOS(0)    TABORDER(3)  IOORDER(2)  ENABLE
 CONTROL  cx_log(210, 255, 285, 290)  |FA_PROTECT  "CX_log"  ""  LEN(0)  EDIT_NOP    COLOR(192, 232)  TABORDER(0)  ENABLE  &
   HINTTYPE(IH_NONE)
-BUTTON  BUTTON2(90, 0, 107, 19)  TP_PUSH|IMAGE|AL_CENTER      FOCUS  COLOR(208, 186)  CUR(0)    "axScrDown_EN.bmp"    TABORDER(4)  &
-  VISIBLE  IMAGE  HINTTYPE(IH_NONE)
-EDIT  JNAM(1, 2, 91, 18)  LEN(32)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_SUNKEN          TABORDER(5)  IOORDER(3)  ENABLE  &
+EDIT  JNAM(315, 60, 405, 76)  LEN(32)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_SUNKEN          TABORDER(4)  IOORDER(3)  ENABLE  &
   VISIBLE  HINTTYPE(IH_NONE)
-EDIT  scode(0, 20, 60, 35)  LEN(3)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(6)  IOORDER(4)  ENABLE  &
+EDIT  scode1(0, 20, 60, 35)  LEN(3)  IO_NUM|EDIT_INPUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(5)  IOORDER(4)  ENABLE  &
   HINTTYPE(IH_NONE)
+CONTROL  scode(0, 0, 109, 20)    "CX_COMBOLIST"  "/u10/t기초자산"  LEN(6)  EDIT_INOUT    COLOR(192, 232)  TABORDER(6)  IOORDER(5)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
 }
 
 
@@ -46,113 +46,10 @@ RESOURCE DIVISION
 
 
 _AW_ONDECLARE_AW_
-Sub send()
-	'SCREEN.Send 0
-End Sub
-
-Dim myFILE, myMAP
-myFILE = "userconf.ini"
-myMAP = SCREEN.GetMapName(0)
-
-Sub write_combo_history()
-	Dim item, sVal, nRows, arr, stmp
-
-	version =  Trim(INFO.popData (LOGIN.Name, myFILE, myMAP, "version"))
-
-	If version <> "1" Then
-		INFO.pushData LOGIN.Name, myFILE, myMAP, "version", "1"
-		INFO.pushData LOGIN.Name, myFILE, myMAP, "combohistory", ""
-	End If
-		
-	If SCREEN.CreateObject("Info") Then
-		sComhis = Trim(INFO.popData (LOGIN.Name, myFILE, myMAP, "combohistory"))
-		stmp = ""
-		newItem = Trim(scode.Data) & Trim(JNAM.Data)   ' 예: 200한화
-
-		If Len(sComhis) > 0 Then
-		    arr = Split(sComhis, vbTab)
-		
-		    For ii = 0 To UBound(arr)
-		        If Len(Trim(arr(ii))) >= 3 Then
-		            code = Left(Trim(arr(ii)), 3)
-		            nam = Mid(Trim(arr(ii)), 4)
-		
-		            ' 같은 코드가 아니면 기존값 유지
-		            If code <> Trim(scode.Data) Then
-		                If Len(stmp) > 0 Then
-		                    stmp = stmp & vbTab
-		                End If
-		                stmp = stmp & code & nam
-		            End If
-		        End If
-		    Next
-		End If
-		
-		' 마지막에 새 항목 추가
-		If Len(stmp) > 0 Then
-		    stmp = stmp & vbTab
-		End If
-	
-		stmp = stmp & newItem
-		INFO.pushData LOGIN.Name, myFILE, myMAP, "combohistory", stmp
-	End If
-End Sub
 
 
-Sub read_combo_history()
-	SYSTEM.Trace "read_combo_history"
-	gridcom.Clear
-	JNAM.Clear
-	Dim sComhis, arr, code, nam, version
-	If SCREEN.CreateObject("Info") Then
-		version =  Trim(INFO.popData (LOGIN.Name, myFILE, myMAP, "version"))
 
-		If version <> "1" Then
-			INFO.pushData LOGIN.Name, myFILE, myMAP, "version", "1"
-			INFO.pushData LOGIN.Name, myFILE, myMAP, "combohistory", ""
-		End If
 
-		sComhis = Trim(INFO.popData (LOGIN.Name, myFILE, myMAP, "combohistory"))
-
-		If Len(Trim(sComhis)) > 0 Then
-			arr = Split(sComhis, vbTab)
-
-			For ii = 0 To UBound(arr)
-				code = Left(arr(ii),3)
-				nam = Mid(arr(ii),4)
-				nam = Trim(nam)
-SYSTEM.Trace "[4253] read_combo_history code = " & code & " nam =" & nam
-				JNAM.Data = nam
-				scode.Data = code
-			Next
-		Else
-SYSTEM.Trace "on data -> dosomething"
-		'	cx_log.DoSomething "Get_SFCODE_VAL", "sfcode"
-		End If
-
-	End If
-End Sub
-
-Sub SetCode_IB425301(sval)
-	Dim arr
-	If Trim(sval) = "49" Then	
-		scode.data = "49"
-		JNAM.Data = ""
-	Else
-	arr = Split(sval, vbTab)
-		JNAM.Data = Trim(arr(1))
-		scode.Data = Trim(arr(0))
-	End If
-	
-	SCREEN.Proc "main.Set_Ini", "1, 0, 1"
-	SCREEN.Proc "main.send_id", ""
-End Sub
-
-_AW_ONSTART_AW_
-SYSTEM.Trace "IB425301 onStart"
-read_combo_history()
-
-_AW_ONENDSUB_AW_
 _AW_ONSEND_AW_
 SCREEN.Send = False
 
@@ -174,16 +71,10 @@ _AW_ENDSCRIPT_AW_
 
 _AW_SCRIPT_AW_(SYMBOL7)
 _AW_ONCLICK_AW_
-
-
 If SCREEN.GetCode(137, "scode", "JNAM", 1) = True Then
 	If Trim(JNAM.Data) = "" Then
 		Exit Sub
 	End If
-	Dim stmp
-	stmp = Trim(JNAM.Data)
-	JNAM.Data = stmp
-	write_combo_history()
 	SCREEN.Proc "main.Set_Ini", "1, 0, 1"
 	SCREEN.Proc "main.send_id", ""
 End If
@@ -229,11 +120,9 @@ _AW_ONENDSUB_AW_
 _AW_ENDSCRIPT_AW_
 
 
-_AW_SCRIPT_AW_(BUTTON2)
-_AW_ONCLICK_AW_
-If SCREEN.Object("main.CHECK0").Checked = True Then
-	SCREEN.CreateWindow 2, "IB425399 /p? /d", msg
-End If
+_AW_SCRIPT_AW_(scode)
+_AW_ONCHANGE_AW_
+SYSTEM.Trigger "SetCode_IB425300", scode.Data, "IB425300"
 _AW_ONENDSUB_AW_
 _AW_ENDSCRIPT_AW_
 

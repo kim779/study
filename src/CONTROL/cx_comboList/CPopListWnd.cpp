@@ -49,6 +49,7 @@ BEGIN_MESSAGE_MAP(CPopListWnd, CWnd)
     ON_WM_ACTIVATE()
     ON_WM_SIZE()
     ON_BN_CLICKED(ID_BTN_CLEAR, OnBtnClear)
+    ON_WM_MOUSEMOVE()
 END_MESSAGE_MAP()
 
 
@@ -307,7 +308,7 @@ LRESULT CPopListWnd::OnMessage(WPARAM wParam, LPARAM lParam)
 {
     switch (LOWORD(wParam))
     {
-        case MSG_POP_MENU:
+        case LIST_MSG_POP_MENU:
         {
             CString stmp, scode, sval;
             stmp.Format("%s", (char*)lParam);
@@ -319,21 +320,66 @@ LRESULT CPopListWnd::OnMessage(WPARAM wParam, LPARAM lParam)
             MakePopMenu(scode, point);
         }
         break;
-        case MSG_DBL_CLICK:
+        case LIST_MSG_ONE_CLICK:
+        case LIST_MSG_DBL_CLICK:
+        case LIST_MSG_RETURN_CLICK:
         {
             CString stmp, scode, sname;
             stmp.Format("%s", (char*)lParam);
             scode = parser(stmp, "\t");
             sname = stmp;
 
-            OutputDebugString("[CPopListWnd] MSG_DBL_CLICK code=" + scode + "\n");
+            if (LOWORD(wParam) == LIST_MSG_ONE_CLICK)
+            {
+                m_pParent->m_bSettingCode = true;
+                m_pParent->m_pCodeCtrl->SetEditData(sname,true);
+                m_pParent->m_bSettingCode = false;
+                return 0;
+            }
 
-            ShowWindow(SW_HIDE);
+            OutputDebugString("[cx_combolist][CPopListWnd][OnMessage] MSG_DBL_CLICK code=" + scode + "\n");  //m_bSettingCode
+          //  m_pParent->m_bSettingCode = true;
+            m_pParent->m_pCodeCtrl->SetEditData(sname);
+          // m_pParent->m_bSettingCode = false;
+            m_pParent->AddItem(scode, sname);
+
+            m_pParent->PostMessage(WM_POPLISTWINDOW, POPLIST_HIDE, 0);
             if (m_pParent && m_pParent->GetSafeHwnd())
             {
-                m_pParent->PostMessage(WM_POPLISTWINDOW, POPLIST_DBCLICKCODE, (LPARAM)(LPSTR)(LPCTSTR)scode);  //리스트 더블클릭 종목 알려주기
-                m_pParent->PostMessage(WM_POPLISTWINDOW, POPLIST_HIDE, 0);  //리스트 더블클릭 닫는다
+                if(LOWORD(wParam) == LIST_MSG_DBL_CLICK)
+                    m_pParent->PostMessage(WM_POPLISTWINDOW, POPLIST_ENTER, (LPARAM)(LPSTR)(LPCTSTR)scode);  //리스트 엔터 종목 알려주기
+                else
+                    m_pParent->PostMessage(WM_POPLISTWINDOW, POPLIST_DBCLICKCODE, (LPARAM)(LPSTR)(LPCTSTR)scode);  //리스트 더블클릭 종목 알려주기
             }
+        }
+        break;
+        case LIST_MSG_REMOVE_ITEM:
+        {
+            CString stmp, scode, sname;
+            stmp.Format("%s", (char*)lParam);
+            scode = parser(stmp, "\t");
+            sname = stmp;
+
+            if (m_nPopupType == POPUP_TYPE_HISTORY)
+            {
+           /*     if (m_pParent && m_pParent->GetSafeHwnd())
+                    m_pParent->PostMessage(WM_POPLISTWINDOW, POPLIST_REMOVE,
+                        (LPARAM)(LPSTR)(LPCTSTR)scode);*/
+            }
+            else
+            {
+                // 서치팝업은 삭제 통보 안함
+                OutputDebugString("[CPopListWnd] 서치팝업 삭제 무시\n");
+            }
+        }
+        break;
+        case LIST_MSG_EDIT_FOCUS:
+        {
+            ShowWindow(SW_HIDE);
+
+            // CControlWnd 에 통보
+            if (m_pParent && m_pParent->GetSafeHwnd())
+                m_pParent->PostMessage(WM_POPLISTWINDOW, POPLIST_EDIT_FOCUS, 0);
         }
         break;
     }
@@ -354,21 +400,12 @@ BOOL CPopListWnd::CreatePopUpWindow(CWnd* pParent, CRect rec)
         WS_EX_TOPMOST | WS_EX_TOOLWINDOW,              // WS_EX_TOOLWINDOW 제거
         className,
         NULL,
-        WS_POPUP | WS_BORDER,
+        WS_POPUP ,
         rec,
         pParent,                    // ← 부모 제대로 전달
         0,
         NULL);
-    //int ret = CreateEx(
-    //    //WS_EX_TOPMOST | WS_EX_TOOLWINDOW  ,          // ← WS_EX_TOOLWINDOW 제거
-    //    0,
-    //    className,
-    //    _T(""),
-    //    // WS_POPUP | WS_BORDER,       // ← WS_VISIBLE 제거
-    //    WS_CHILD | WS_VISIBLE | WS_BORDER,
-    //    rec,
-    //    pParent,
-    //    0);
+
     
     return ret;
 }
@@ -377,7 +414,7 @@ BOOL CPopListWnd::CreatePopUpWindow(CWnd* pParent, CRect rec)
 //	WS_POPUP | WS_BORDER, CRect(rc.left, rc.bottom, rc.left + cx, rc.bottom + cy),
 //	NULL, NULL, NULL))
 
-BOOL CPopListWnd::CreateListBox(CString items)
+BOOL CPopListWnd::CreateListBox(CString items, int nPopWidth)
 {
     OutputDebugString("[CPopListWnd] CreateListBox\n");
 
@@ -385,22 +422,83 @@ BOOL CPopListWnd::CreateListBox(CString items)
     GetClientRect(rec);
 
     const int nBtnHeight = 20;
-    CRect rcList(rec.left, rec.top, rec.right, rec.bottom - nBtnHeight);
-    CRect rcBtn(rec.left, rec.bottom - nBtnHeight, rec.right, rec.bottom);
+    const int nBorder = 1; // 테두리 두께
+
+    //CRect rcList(rec.left, rec.top, rec.right, rec.bottom - nBtnHeight);
+    //CRect rcBtn(rec.left, rec.bottom - nBtnHeight, rec.right, rec.bottom);
+
+    CRect rcList(
+        rec.left + nBorder,
+        rec.top + nBorder,
+        rec.right - nBorder,
+        rec.bottom - nBtnHeight - nBorder);
+
+    CRect rcBtn(
+        rec.left + nBorder,
+        rec.bottom - nBtnHeight,
+        rec.right - nBorder,
+        rec.bottom - nBorder);
 
     m_pCodelist = std::make_unique<CCodeListCtrl>(nullptr, items);
     m_pCodelist->Create(
         WS_CHILD | WS_VISIBLE | LVS_REPORT | LVS_NOCOLUMNHEADER | LVS_SINGLESEL,
         rcList, this, 9898);
 
+    if (m_nPopupType == POPUP_TYPE_SEARCH)
+        m_pCodelist->m_bAllowDelete = FALSE;  // 서치팝업 삭제 불가
+    else
+        m_pCodelist->m_bAllowDelete = TRUE;   // 히스토리팝업 삭제 가능
+
     if (m_nType == VS1_TYPE)
     {
-        // 종목코드 | 종목명 | X버튼
-        const int nTotal = rcList.Width();
-        const int nCodeW = 50;
-        const int nBtnW = 24;
-        const int nNameW = nTotal - nCodeW - nBtnW;
+        int nTotal = nPopWidth;
+        if (nTotal <= 0)
+        {
+            CRect rcPop;
+            GetClientRect(&rcPop);
+            nTotal = rcPop.Width();
+        }
+        // 1. 최대 코드 길이 계산
+        CStringArray arrTmp;
+        m_pCodelist->StringSplit(items, arrTmp, _T('\t'));
+        int nMaxCodeLen = 0;
+        for (int i = 0; i < arrTmp.GetCount(); i++)
+        {
+            CString sItem = arrTmp.GetAt(i);
+            if (sItem.IsEmpty()) continue;
+            CString sname = sItem;
+            CString scode = parser(sname, " ");
+            nMaxCodeLen = max(nMaxCodeLen, scode.GetLength());
+        }
 
+        BOOL bVScroll = IsVScrollVisible(arrTmp.GetCount());
+        int nScrollW = bVScroll ? GetSystemMetrics(SM_CXVSCROLL) : 0;
+
+        // 2. 실제 픽셀 크기 측정
+        CClientDC dc((CWnd*)m_pCodelist.get());
+        CFont* pFont = m_pCodelist->GetFont();
+        CFont* pOldFont = nullptr;
+        if (pFont) pOldFont = dc.SelectObject(pFont);
+        CString sMaxCode;
+        sMaxCode.Format("%.*s", nMaxCodeLen, "WWWWWWWWWW");
+        CSize sz = dc.GetTextExtent(sMaxCode);
+        if (pOldFont) dc.SelectObject(pOldFont);
+
+        // 3. 너비 계산
+        const int nCodeW = max(sz.cx + 10, 50);
+        const int nBtnW = 24;
+        CRect rcPop;
+        GetClientRect(&rcPop);
+        const int nTotalW = nTotal - nScrollW;
+        int nNameW = max(nTotalW - nCodeW - nBtnW, 60);
+       // nNameW -= 10;
+
+        CString slog;
+        slog.Format("[CPopListWnd][listsize] CreateListBox nCodeW=%d nNameW=%d nScrollW=%d\n",
+            nCodeW, nNameW, nScrollW);
+        OutputDebugString(slog);
+
+        // 4. InsertColumn 에서 너비 설정 (SetColumnWidth 제거)
         m_pCodelist->InsertColumn(0, "종목코드", LVCFMT_LEFT, nCodeW);
         m_pCodelist->InsertColumn(1, "종목명", LVCFMT_LEFT, nNameW);
         m_pCodelist->InsertColumn(2, "", LVCFMT_CENTER, nBtnW);
@@ -410,12 +508,9 @@ BOOL CPopListWnd::CreateListBox(CString items)
     }
     else if (m_nType == VS2_TYPE)
     {
-        // VS2 타입 컬럼 구성 (추후 정의)
         const int nTotal = rcList.Width();
         m_pCodelist->InsertColumn(0, "", LVCFMT_LEFT, nTotal);
     }
-
-
 
     // 이미지 리스트
     if (m_nType == VS2_TYPE)
@@ -431,63 +526,56 @@ BOOL CPopListWnd::CreateListBox(CString items)
         m_pCodelist->SetExtendedStyle(LVS_EX_FULLROWSELECT | LVS_EX_TRACKSELECT);
     }
 
-
-    // 데이터 추가
-   CStringArray arr;
+    // 데이터 추가 - 역순 삽입
+    CStringArray arr;
     m_pCodelist->StringSplit(items, arr, _T('\t'));
-    if (m_nType == VS1_TYPE)
+
+    for (int idx = arr.GetCount() - 1; idx >= 0; idx--)
     {
-        for (int idx = 0; idx < arr.GetCount(); idx++)
-        {
-            CString sItem = arr.GetAt(idx);
-            if (sItem.IsEmpty()) continue;
+        CString sItem = arr.GetAt(idx);
+        if (sItem.IsEmpty()) continue;
 
-            CString sname = sItem;
-            CString scode = parser(sname, " ");
+        CString sname = sItem;
+        CString scode = parser(sname, " ");
 
-            CString slog;
-            slog.Format("[CPopListWnd] InsertItem idx=%d code=%s name=%s\n",
-                idx, scode, sname);
-            OutputDebugString(slog);
+        m_pCodelist->InsertItem(0, scode);
+        m_pCodelist->SetItemText(0, 1, sname);
+        m_pCodelist->SetItemText(0, 2, "");
 
-            m_pCodelist->InsertItem(idx, scode);
-            m_pCodelist->SetItemText(idx, 1, sname);
-            m_pCodelist->SetItemText(idx, 2, "");
-        }
-
-     
+        CString slog;
+        slog.Format("[CPopListWnd] CreateListBox idx=%d code=%s name=%s\n",
+            idx, scode, sname);
+        OutputDebugString(slog);
     }
 
     // 전체삭제 버튼
     m_pBtnClear = std::make_unique<CfxImgButton>();
-    m_pBtnClear->Create("전체 삭제",
-        rcBtn, this, ID_BTN_CLEAR);
-
-
-    // PNG 로드
+    m_pBtnClear->Create("전체 삭제", rcBtn, this, ID_BTN_CLEAR);
     m_pBtnClear->LoadPng(
         m_pParent->m_sRoot + "\\image\\btn_clear.png",
         m_pParent->m_sRoot + "\\image\\btn_clear_dn.png",
         m_pParent->m_sRoot + "\\image\\btn_clear_hv.png");
-
-    //m_pCodelist->SetFocus();
 
     CString slog;
     slog.Format("[CPopListWnd] CreateListBox 완료 type=%d\n", m_nType);
     OutputDebugString(slog);
     slog.Format("[CPopListWnd] %s\n", m_pParent->m_sRoot + "\\image\\btn_clear.png");
 
-    
     return TRUE;
 }
 
 void CPopListWnd::OnKillFocus(CWnd* pNewWnd)
 {
     CString slog;
-    slog.Format("\t\n[CPopListWnd] -------------------------------kill focus pNewWnd=[%x] [%x]", pNewWnd, m_pCodelist.get());
+    slog.Format("\t\n[CPopListWnd] -------------------------------kill focus pNewWnd=[%x] [%x] m_nPopupType=[%d]", pNewWnd, m_pCodelist.get(), m_nPopupType);
     OutputDebugString(slog);
+    if (m_nPopupType == POPUP_TYPE_SEARCH)
+        return;
     // TODO: 여기에 메시지 처리기 코드를 추가합니다.
     if (pNewWnd && (pNewWnd == m_pCodelist.get() || IsChild(pNewWnd)))
+        return;
+
+    if (m_pParent->m_bSettingCode)
         return;
 
     ShowWindow(SW_HIDE);
@@ -542,8 +630,36 @@ int CPopListWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 void CPopListWnd::OnPaint()
 {
     CPaintDC dc(this); // device context for painting
-                       // TODO: 여기에 메시지 처리기 코드를 추가합니다.
-                       // 그리기 메시지에 대해서는 CWnd::OnPaint()을(를) 호출하지 마십시오.
+
+    CRect rc;
+    GetClientRect(&rc);
+
+    // 타입별 테두리 색상
+    COLORREF clrBorder;
+    if (m_nPopupType == POPUP_TYPE_SEARCH)
+        clrBorder = RGB(100, 100, 100); // 회색 
+    else
+        clrBorder = RGB(0, 120, 215);   // 파란색 
+
+    // 테두리 그리기
+    dc.Draw3dRect(&rc, clrBorder, clrBorder);
+
+    // 상단에 타입 표시 텍스트 (선택사항)
+    CRect rcTitle(rc.left + 1, rc.top + 1, rc.right - 1, rc.top + 15);
+    COLORREF clrBg = (m_nPopupType == POPUP_TYPE_SEARCH)
+        ? RGB(0, 120, 215)
+        : RGB(100, 100, 100);
+
+    dc.FillSolidRect(&rcTitle, clrBg);
+    dc.SetTextColor(RGB(255, 255, 255));
+    dc.SetBkMode(TRANSPARENT);
+
+    CString sTitle = (m_nPopupType == POPUP_TYPE_SEARCH)
+        ? "검색"
+        : "히스토리";
+
+    dc.DrawText(sTitle, &rcTitle,
+        DT_SINGLELINE | DT_CENTER | DT_VCENTER);
 }
 
 
@@ -584,6 +700,9 @@ void CPopListWnd::OnActivate(UINT nState, CWnd* pWndOther, BOOL bMinimized)
             return;
         }
 
+        if (m_pParent->m_bSettingCode)
+            return;
+
         OutputDebugString("[CPopListWnd] OnActivate 외부 비활성화 닫기\n");
         ShowWindow(SW_HIDE);
 
@@ -592,6 +711,12 @@ void CPopListWnd::OnActivate(UINT nState, CWnd* pWndOther, BOOL bMinimized)
     }
     else if (nState == WA_ACTIVE)
     {
+        if (m_nPopupType == POPUP_TYPE_SEARCH)
+        {
+            OutputDebugString("[CPopListWnd] SearchPop - 포커스 유지\n");
+            return;
+        }
+
         if (m_pCodelist && m_pCodelist->GetSafeHwnd())
             m_pCodelist->SetFocus();
     }
@@ -605,28 +730,47 @@ void CPopListWnd::OnSize(UINT nType, int cx, int cy)
     if (cx <= 0 || cy <= 0) return;
 
     const int nBtnHeight = 20;
+    const int nBorder = 1;
+    const int nScrollW = GetSystemMetrics(SM_CXVSCROLL);
 
-    // CCodeListCtrl 크기 조정
+    // CCodeListCtrl
     if (m_pCodelist && m_pCodelist->GetSafeHwnd())
     {
-        m_pCodelist->MoveWindow(0, 0, cx, cy - nBtnHeight);
+        int nListW = cx - nBorder * 2;
+        int nListH = cy - nBtnHeight - nBorder * 2;
 
-        // 컬럼 너비 재조정
+        m_pCodelist->MoveWindow(nBorder, nBorder, nListW, nListH);
+
+        // 컬럼 너비 재조정 (스크롤바 고려)
+        BOOL bVScroll = IsVScrollVisible(m_pCodelist->GetItemCount());
+        int  nScrW = bVScroll ? nScrollW : 0;
+
         const int nCodeW = 70;
         const int nBtnW = 24;
-        const int nNameW = cx - nCodeW - nBtnW;
+        const int nNameW = max(nListW - nCodeW - nBtnW - nScrW, 60);
+
         m_pCodelist->SetColumnWidth(0, nCodeW);
         m_pCodelist->SetColumnWidth(1, nNameW);
         m_pCodelist->SetColumnWidth(2, nBtnW);
-    }
-
-    // m_pBtnClear - 전체 폭으로
-    if (m_pBtnClear && m_pBtnClear->GetSafeHwnd())
-    {
-        m_pBtnClear->MoveWindow(0, cy - nBtnHeight, cx, nBtnHeight);
 
         CString slog;
-        slog.Format("[CPopListWnd] OnSize BtnClear w=%d h=%d\n", cx, nBtnHeight);
+        slog.Format("[CPopListWnd][listsize] OnSize list w=%d h=%d nNameW=%d\n",
+            nListW, nListH, nNameW);
+        OutputDebugString(slog);
+    }
+
+    // m_pBtnClear
+    if (m_pBtnClear && m_pBtnClear->GetSafeHwnd())
+    {
+        m_pBtnClear->MoveWindow(
+            nBorder,
+            cy - nBtnHeight,
+            cx - nBorder * 2,
+            nBtnHeight - nBorder);
+
+        CString slog;
+        slog.Format("[CPopListWnd] OnSize BtnClear w=%d h=%d\n",
+            cx - nBorder * 2, nBtnHeight - nBorder);
         OutputDebugString(slog);
     }
 }
@@ -650,19 +794,18 @@ void CPopListWnd::RefreshList(CString items)
 
     if (!m_pCodelist || !m_pCodelist->GetSafeHwnd()) return;
 
-    // 기존 데이터 전체 삭제
     m_pCodelist->DeleteAllItems();
 
     if (items.IsEmpty())
     {
-        OutputDebugString("[CPopListWnd] RefreshList items 없음\n");
+        OutputDebugString("[CPopListWnd] RefreshList items\n");
         return;
     }
 
-    // 데이터 추가
     CStringArray arr;
     m_pCodelist->StringSplit(items, arr, _T('\t'));
 
+    int nMaxCodeLen = 0;
     for (int idx = 0; idx < arr.GetCount(); idx++)
     {
         CString sItem = arr.GetAt(idx);
@@ -670,21 +813,102 @@ void CPopListWnd::RefreshList(CString items)
 
         CString sname = sItem;
         CString scode = parser(sname, " ");
-
-        m_pCodelist->InsertItem(idx, scode);
-        m_pCodelist->SetItemText(idx, 1, sname);
-        m_pCodelist->SetItemText(idx, 2, "");
-
-        CString slog;
-        slog.Format("[CPopListWnd] RefreshList idx=%d code=%s name=%s\n",
-            idx, scode, sname);
-        OutputDebugString(slog);
+        nMaxCodeLen = max(nMaxCodeLen, scode.GetLength());
     }
 
-    // 첫번째 행 선택
-    if (m_pCodelist->GetItemCount() > 0)
-        m_pCodelist->SetItemStates(0,
-            RC_ITEM_SELECTED | RC_ITEM_FOCUSED);
 
-    OutputDebugString("[CPopListWnd] RefreshList 완료\n");
+    CClientDC dc((CWnd*)m_pCodelist.get());
+    CFont* pFont = m_pCodelist->GetFont();
+    CFont* pOldFont = nullptr;
+    if (pFont) pOldFont = dc.SelectObject(pFont);
+
+
+    CString sMaxCode;
+    sMaxCode.Format("%.*s", nMaxCodeLen, "WWWWWWWWWW");
+    CSize sz = dc.GetTextExtent(sMaxCode);
+    if (pOldFont) dc.SelectObject(pOldFont);
+
+    const int nCodeW = sz.cx + 10;
+    const int nBtnW = 24;
+
+    BOOL bVScroll = IsVScrollVisible(arr.GetCount());
+    int nScrollW = bVScroll ? GetSystemMetrics(SM_CXVSCROLL) : 0;
+
+    CRect rcList;
+    m_pCodelist->GetClientRect(&rcList);
+    const int nTotalW = rcList.Width() - nScrollW;
+    const int nNameW = max(nTotalW - nCodeW - nBtnW, 60);
+
+    m_pCodelist->SetColumnWidth(0, nCodeW);
+    m_pCodelist->SetColumnWidth(1, nNameW);
+    m_pCodelist->SetColumnWidth(2, nBtnW);
+
+    CString slog;
+    slog.Format("[CPopListWnd] RefreshList nMaxCodeLen=%d nCodeW=%d nNameW=%d nScrollW=%d listW=%d\n",
+        nMaxCodeLen, nCodeW, nNameW, nScrollW, rcList.Width());
+    OutputDebugString(slog);
+
+    for (int idx = arr.GetCount() - 1; idx >= 0; idx--)
+    {
+        CString sItem = arr.GetAt(idx);
+        if (sItem.IsEmpty()) continue;
+
+        CString sname = sItem;
+        CString scode = parser(sname, " ");
+
+        m_pCodelist->InsertItem(0, scode);
+        m_pCodelist->SetItemText(0, 1, sname);
+        m_pCodelist->SetItemText(0, 2, "");
+
+        slog.Format("[CPopListWnd] RefreshList idx=%d code=%s name=%s\n",
+            idx, scode, sname);
+        //   OutputDebugString(slog);
+    }
+
+    if (m_pCodelist->GetItemCount() > 0)
+        m_pCodelist->SetItemStates(0, RC_ITEM_SELECTED | RC_ITEM_FOCUSED);
+
+    OutputDebugString("[CPopListWnd] RefreshList \n");
+}
+
+
+
+
+void CPopListWnd::OnMouseMove(UINT nFlags, CPoint point)
+{
+    // TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
+    OutputDebugString("[CPopListWnd] OnMouseMove 완료\n");
+
+    CWnd::OnMouseMove(nFlags, point);
+}
+
+
+BOOL CPopListWnd::IsVScrollVisible(int nItemCount)
+{
+    if (m_nPopupType == POPUP_TYPE_SEARCH) return TRUE;
+    if (!m_pCodelist || !m_pCodelist->GetSafeHwnd()) return FALSE;
+    if (nItemCount <= 0) return FALSE;
+
+    CRect rcList;
+    m_pCodelist->GetClientRect(&rcList);
+
+    // 행 높이 측정
+    int nRowHeight = 20; // 기본값
+    if (m_pCodelist->GetItemCount() > 0)
+    {
+        CRect rcItem;
+        m_pCodelist->GetItemRect(0, &rcItem, LVIR_BOUNDS);
+        nRowHeight = rcItem.Height();
+        if (nRowHeight <= 0) nRowHeight = 20;
+    }
+
+    // 전체 아이템 높이 vs 리스트 높이
+    int nTotalHeight = nItemCount * nRowHeight;
+
+    CString slog;
+    slog.Format("[IsVScrollVisible] nItemCount=%d nRowH=%d totalH=%d listH=%d\n",
+        nItemCount, nRowHeight, nTotalHeight, rcList.Height());
+    OutputDebugString(slog);
+
+    return (nTotalHeight > rcList.Height());
 }

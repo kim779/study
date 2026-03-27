@@ -75,6 +75,8 @@ typedef BOOL(WINAPI* RtlGetVersion_FUNC) (OSVERSIONINFOEXW*);
 #define DF_AUTOLOGV1
 #define DF_EDGE_MAP   "IB980002"
 #define DF_NEW_MNG
+#define DF_NEW_SCREENCHECK1
+
 
 enum AXIS_STATE
 {

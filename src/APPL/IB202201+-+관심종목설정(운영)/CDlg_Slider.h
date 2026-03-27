@@ -19,7 +19,9 @@ public:
 	CString CheckIP();
 	int  PosToTimeMs(int pos) const;
 	void UpdateTimeText(int timeMs);
+	void UpdateSliderByCheckState();
 	int m_iTime{};
+	BOOL m_bOldReal = FALSE;
 // 대화 상자 데이터입니다.
 #ifdef AFX_DESIGN_TIME
 	enum { IDD = IDD_DLG_SLIDER };
@@ -36,4 +38,5 @@ public:
 	afx_msg void OnPaint();
 	afx_msg void OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);
 	afx_msg void OnBnClickedOk();
+	afx_msg void OnBnClickedCkReal();
 };

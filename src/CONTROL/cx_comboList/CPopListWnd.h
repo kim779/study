@@ -26,7 +26,7 @@ public:
 	CWnd* m_child{};
 	class CControlWnd* m_pParent{};
 
-	BOOL CreateListBox(CString items);
+	BOOL CreateListBox(CString items, int nPopWidth = 0);
 
 	void InitMenu();
 	CArray	< CHMenu*, CHMenu* > m_arMenuT{};
@@ -41,6 +41,9 @@ public:
 	CString m_ClickCode{};
 	void RefreshList(CString items);
 
+	int m_nPopupType = POPUP_TYPE_HISTORY;
+
+	BOOL IsVScrollVisible(int nItemCount);
 protected:
 	afx_msg LRESULT OnMessage(WPARAM wParam, LPARAM lParam);
 	afx_msg void OnBtnClear();
@@ -59,6 +62,7 @@ public:
 	afx_msg void OnActivate(UINT nState, CWnd* pWndOther, BOOL bMinimized);
 	afx_msg void OnSize(UINT nType, int cx, int cy);
 
+	afx_msg void OnMouseMove(UINT nFlags, CPoint point);
 };
 
 

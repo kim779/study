@@ -1089,7 +1089,7 @@ CMainFrame::~CMainFrame()
 #ifdef _DEBUG
 	return;
 #endif
-	if(uninitASTx())  //test
+	if(uninitASTx())
 	{
 		stopPB();
 		stopFW();
@@ -1689,11 +1689,6 @@ BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)
 				break;
 				case 'D':
 				{
-					if (bCtrl && bShift)
-					{
-						m_mapDebugKey.RemoveAll();
-						m_mapDebugRemoveKey.RemoveAll();
-					}
 					/*	int nCount = m_mapAlarmList.GetCount();
 						m_slog.Format("[mng][main]] Map Count = %d\n", nCount);
 						OutputDebugString(m_slog);
@@ -1714,43 +1709,6 @@ BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)
 				break;
 				case 'Z':
 				{
-					if (bCtrl && bShift)
-					{
-						m_mapDebugKey.RemoveAll();
-						m_mapDebugRemoveKey.RemoveAll();
-						CString file, repo, key, dat;
-						file.Format("%s\\exe\\Debug.TXT", Axis::home);
-						if (IsFileExist(file))
-						{
-							char	buf[256]{};
-							DWORD dw = GetPrivateProfileString("DEBUG", "key", "", buf, sizeof(buf), file);
-
-							if (dw)
-							{
-								CString stmp;
-
-								m_slog.Format("%s", buf);
-								while (m_slog.GetLength() > 0)
-								{
-									stmp = Parser(m_slog, ";");
-									m_mapDebugKey.SetAt(stmp, stmp);
-								}
-							}
-
-							dw = GetPrivateProfileString("DEBUG", "remove", "", buf, sizeof(buf), file);
-							if (dw)
-							{
-								CString stmp;
-
-								m_slog.Format("%s", buf);
-								while (m_slog.GetLength() > 0)
-								{
-									stmp = Parser(m_slog, ";");
-									m_mapDebugRemoveKey.SetAt(stmp, stmp);
-								}
-							}
-						}	
-					}
 					/*	CString stmp, stitle;
 						stmp.Format("950\t3\t951\t20240708173000\t952\t조건 만족 주문내역 확인");
 						ConclusionNotice(stmp, stitle);
@@ -1800,7 +1758,7 @@ BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)
 							break;
 						}*/
 						//DumpAllSlots(g_tickSlots, MAX_SLOT, 100, 50);
-						GetCurrentNetType();
+						//CreateAgentProcess();
 						DumpAllSlots();
 					}
 				}
@@ -3810,10 +3768,7 @@ WriteLog("[AXIS] OnAxis-axAXIS - Step 13");
 // 			}
 
 			m_bInit = FALSE;
-
-#ifdef DF_MAIN_RTS
-			//StartWorkerThread();
-#endif 
+			CreateAgentProcess(); 
 		}
 		break;
 	case axSIGNON:	
@@ -4237,7 +4192,6 @@ void CMainFrame::InitMapHK()
 
 #ifdef DF_MAIN_RTS
 	InitPool();
-	
 #endif
 }
 
@@ -4832,35 +4786,7 @@ OutputDebugString(m_slog);
 		break;
 		case MMSG_GETRTS_FROM_MAIN:  //메인에게 RTS 데이터 얻어올때
 		{
-			//RTS_READ_REQ* req = (RTS_READ_REQ*)lParam;
-			//if (!req) return 0;
 
-			//int idx = GetSlotIndex_FindOnly(req->code);
-			//if (idx < 0) return 0;
-
-			//TickSnapshot snap{};
-			//if (!ReadTick(idx, snap))   // already have this
-			//	return 0;
-
-			//req->ts_ms = snap.ts_ms;
-
-			//for (int i = 0; i < req->symbolCount; i++)
-			//{
-			//	int sym = req->symbols[i];
-
-			//	if (sym >= 0 && sym < MAX_SYMBOLS && snap.valid.test(sym))
-			//	{
-			//		CopyZ(req->values[i], SYMBOL_STR_LEN, snap.values[sym]);
-			//		req->valid[i] = true;
-			//	}
-			//	else
-			//	{
-			//		req->values[i][0] = 0;
-			//		req->valid[i] = false;
-			//	}
-			//}
-
-			return 1;
 		}
 		break;
 		case MMSG_RT_REGISTER_CODES:
@@ -4946,24 +4872,7 @@ OutputDebugString(m_slog);
 		break;
 		case MMSG_RT_UNREGISTER_WND:
 		{
-			/*std::unique_ptr<RTS_REGISTER_REQ> req((RTS_REGISTER_REQ*)lParam);
-
-			std::lock_guard<std::mutex> lock(m_subLock);
-
-			HWND h = req->hWnd;
-
-			auto it = m_wndSubscriptions.find(h);
-			if (it != m_wndSubscriptions.end())
-			{
-				for (auto& code : it->second)
-				{
-					m_codeSubscribers[code].erase(h);
-				}
-
-				m_wndSubscriptions.erase(it);
-			}*/
-
-			return 0;
+			
 		}
 		break;
 #endif //DF_MAIN_RTS
@@ -5364,7 +5273,7 @@ int CMainFrame::OnFireRec(int type, WPARAM wParam, LPARAM lParam)
 	CString s;
 	if (m_forceClose)	return 0;
 
-	onFireLog(type, wParam, lParam);
+	//onFireLog(type, wParam, lParam);
 
 	switch (type)
 	{
@@ -5507,7 +5416,6 @@ WriteLog("[AXIS] CMainFrame::OnFireRec (lparam null )     FEV_RUN\n");
 	case FEV_ANM:	
 		{
 			update_ticker((int)wParam, (struct _alertR*)lParam);
-		//	m_pSharedMemory->SendMessage(WM_USER, MAKEWPARAM(MAKEWORD(DLL_ALERT, 1), 1), (LPARAM)lParam);
 		}
 		break;
 	case FEV_AXIS:
@@ -9012,10 +8920,10 @@ void CMainFrame::update_ticker(int kind, struct _alertR* alertR)
 		if (!alertR || alertR->size <= 0 || alertR->ptr[0] == 0)
 			return;
 
-		
+		/*
 		DWORD uiThreadId = AfxGetApp()->m_nThreadID;  // UI 스레드 ID
 		DWORD curThreadId = GetCurrentThreadId();      // 현재 스레드 ID
-	/*	CString slog;
+		CString slog;
 		slog.Format("[update_ticker] UI스레드=[%d] 현재스레드=[%d] %s\n",
 			uiThreadId, curThreadId,
 			(uiThreadId == curThreadId) ? "★UI스레드" : "★별도스레드");
@@ -10991,6 +10899,390 @@ void CMainFrame::ClearUserIni()
 	}
 }
 
+#ifndef DF_NEW_SCREENCHECK
+void CMainFrame::save_laststat()
+{
+	int	key{}, index{};
+	CString	mpN, tmps, data, info, keys = "LASTSTAT";
+	CString date;
+
+	CTime time;
+	time = CTime::GetCurrentTime();
+
+	date.Format("%04d%02d%02d", time.GetYear(), time.GetMonth(), time.GetDay());
+
+	CString orginF = Format("%s\\user\\%s\\%s.ini", Axis::home, Axis::user, Axis::user);
+	CString copyF = Format("%s\\user\\%s\\%s.ini.%s", Axis::home, Axis::user, Axis::user, date);
+	CopyFile(orginF, copyF, FALSE);
+
+	CProfile profile(pkUserSetup);
+	profile.Write("ROOT", "00", keys);
+
+	WINDOWPLACEMENT	wndpl;
+	CArray	<int, int>	aryK;
+
+	wndpl.length = sizeof(WINDOWPLACEMENT);
+	profile.WriteSection(keys, "");
+	profile.WriteSection("LASTSTATCOUNT", "");
+	profile.WriteSection("LASTSTATSTATUS", "");
+
+	CString strSendvsN, strTotalLast, strResult;
+
+	m_saveALLVS = true;
+
+	strResult = "";
+
+	CChildFrame* child = NULL;
+	CSChild* schild = NULL;
+	for (int vsN = V_SCREEN1; vsN <= V_SCREEN6; vsN++)
+	{
+		strSendvsN = "";
+
+		CString vsnS, lsc;
+		vsnS.Format("%d", vsN);
+
+		CString strLog;
+
+		strLog.Format("SAVEALL [%d] CVSN [%d] vsN [%d]", m_saveALLVS, m_vsN, vsN);
+		profile.Write("LASTSTATSTATUS", vsnS, strLog);
+
+		if (!m_saveALLVS && vsN != m_vsN)	continue;
+
+		for (int ii = 0; ii < m_bar2->m_arButton[vsN].GetSize(); ii++)
+		{
+			//const _button* btn = m_bar2->m_arButton[vsN].GetAt(ii); //vc2019? test 
+			auto  btn = m_bar2->m_arButton[vsN].GetAt(ii);
+
+			key = btn->key;
+			aryK.Add(key);
+		}
+
+		lsc.Format("%d", m_bar2->m_arButton[vsN].GetSize());
+		profile.Write("LASTSTATCOUNT", vsnS, lsc);
+
+		CMapStringToString mapDRFN;
+		mapDRFN.RemoveAll();
+		int ii{};
+		for (index = 1, ii = 0; ii < aryK.GetSize(); ii++)
+		{
+			key = aryK.GetAt(ii);
+			if (!m_arMDI[vsN].Lookup(key, child))	continue;
+			strLog.Format("[%d] KEY [%d]", ii, key);
+			profile.Write("LASTSTATSTATUS", vsnS, strLog);
+			if (!child->GetSafeHwnd())		continue;
+			strLog.Format("SAFE HANDLE [%s] [%d]", child->m_mapN, (int)child->GetSafeHwnd());
+			profile.Write("LASTSTATSTATUS", vsnS, strLog);
+			if (ExceptMap(child->m_mapN))		continue;
+			strLog.Format("EXCEPT MAP [%s]", child->m_mapN);
+			profile.Write("LASTSTATSTATUS", vsnS, strLog);
+
+			if (IsNoSaveLastmap(child->m_mapN)) continue;
+
+			mpN = child->m_mapN.Left(L_MAPN);
+
+			if (mpN != "IB715100" && mpN != "IB715200")
+			{
+				if (!m_mapHelper->IsValidMap(mpN) || !ExistMenu(mpN))
+				{
+					mpN = mpN.Left(L_MAPN - 2) + "00";
+					if (!m_mapHelper->IsValidMap(mpN) || !ExistMenu(mpN))
+						continue;
+				}
+			}
+
+			strLog.Format("VALID MAP [%s]", mpN);
+			profile.Write("LASTSTATSTATUS", vsnS, strLog);
+
+			data.Empty();
+			child->GetWindowPlacement(&wndpl);
+			getScreenData(child->m_key, data);
+
+			// dll data append.........
+			if (m_mapHelper->IsDLL(child->m_mapN))
+			{
+				//DLL 화면들은 특별히 OnSize를 처리해 주지 않으면 최소화 처리가 제대로 안됨
+				//그래서 DLL 화면들은 종료시 원복 후 저장 처리.특별히 차트가 문제
+				//2016.02.11 - dkkim
+				if (child->m_bIconic)
+				{
+					child->actionCaption(IDX_RESTORE, CPoint(0, 0));
+				}
+				/////////////////////////////////////////////////////////////////////////////
+
+				const CWnd* base = child->GetActiveView()->GetWindow(GW_CHILD);
+				if (base)
+				{
+					if (m_mapHelper->IsDRFN(child->m_mapN))
+					{
+						CString tmp;
+						CString strValue;
+
+						if (mapDRFN.Lookup(child->m_mapN, tmp))
+						{
+							const int n = atoi(tmp);
+
+							tmp.Format("%d", n + 1);
+							mapDRFN.SetAt(child->m_mapN, tmp);
+
+							tmp.Format(",%d%02d", vsN, n + 1);
+
+							tmp.Insert(2, ",");
+							tmp.Insert(4, ",");
+
+							strValue = "LASTSTAT" + tmp;
+						}
+						else
+						{
+							tmp.Format("%d", 1);
+							mapDRFN.SetAt(child->m_mapN, tmp);
+
+							strValue = "LASTSTAT,0,0,1";
+						}
+
+						char	wb[256];
+						sprintf(wb, strValue);
+						base->SendMessage(WM_DLLDATA, 0, (long)&wb);
+						if (!data.IsEmpty())	data += ";";
+						tmps.Format("%s\t%s", USERDEFSYM, wb);
+						data = tmps;
+					}
+					else
+					{
+						char	wb[256];
+						sprintf(wb, keys);
+						base->SendMessage(WM_DLLDATA, 1, (long)&wb);
+						if (!data.IsEmpty())	data += ";";
+						tmps.Format("%s\t%s", USERDEFSYM, wb);
+						data += tmps;
+					}
+				}
+			}
+
+			if (child->IsIconic())
+			{
+				CRect	rctmp;
+				rctmp = child->GetRestoreRC();
+				wndpl.rcNormalPosition.left = rctmp.left;
+				wndpl.rcNormalPosition.right = rctmp.right;
+				wndpl.rcNormalPosition.top = rctmp.top;
+				wndpl.rcNormalPosition.bottom = rctmp.bottom;
+			}
+
+			tmps.Format("%d%02d", m_saveALLVS ? vsN : 0, index++);
+			info.Format("%s|%d|%d|%d|%d|%d|%d|%d|%d|%d|%d|%d|%d|%d|%s|",
+				child->m_mapN,
+				0,
+				wndpl.length,
+				wndpl.flags,
+				wndpl.showCmd,
+				wndpl.ptMinPosition.x,
+				wndpl.ptMinPosition.y,
+				wndpl.ptMaxPosition.x,
+				wndpl.ptMaxPosition.y,
+				wndpl.rcNormalPosition.left,
+				wndpl.rcNormalPosition.top,
+				wndpl.rcNormalPosition.right,
+				wndpl.rcNormalPosition.bottom,
+				child->m_xcaption.GetGroup(),
+				data);
+
+			profile.Write(keys, tmps, info);
+
+			strSendvsN += child->m_mapN + " ";
+
+			// 			if(key == m_activeKey)
+			// 			{
+			// 				profile.Write(keys,"LASTSTATFOCUS",tmps);
+			// 			}
+		}
+		aryK.RemoveAll();
+
+		for (POSITION spos = m_arSDI[vsN].GetStartPosition(); spos; )
+		{
+			m_arSDI[vsN].GetNextAssoc(spos, key, schild);
+			aryK.Add(key);
+		}
+
+		for (ii = 0; ii < aryK.GetSize(); ii++)
+		{
+			key = aryK.GetAt(ii);
+			if (!m_arSDI[vsN].Lookup(key, schild))	continue;
+			if (ExceptMap(schild->m_mapN))		continue;
+
+			mpN.Format("%s", schild->m_mapN.Left(L_MAPN));
+			if (!ExistMenu(mpN))	continue;
+
+			data.Empty();
+			schild->GetWindowPlacement(&wndpl);
+			getScreenData(schild->m_key, data);
+
+			// dll data append.........
+			if (m_mapHelper->IsDLL(schild->m_mapN))
+			{
+				const CWnd* base = schild->GetActiveView()->GetWindow(GW_CHILD);
+				if (base)
+				{
+					char	wb[256];
+					sprintf(wb, keys);
+					base->SendMessage(WM_DLLDATA, 1, (long)&wb);
+					if (!data.IsEmpty())	data += ";";
+					tmps.Format("%s\t%s", USERDEFSYM, wb);
+					data += tmps;
+				}
+			}
+
+			tmps.Format("%d%02d", vsN, index++);
+			info.Format("%s|%d|%d|%d|%d|%d|%d|%d|%d|%d|%d|%d|%d|%d|%s|",
+				mpN,
+				1,
+				wndpl.length,
+				wndpl.flags,
+				wndpl.showCmd,
+				wndpl.ptMinPosition.x,
+				wndpl.ptMinPosition.y,
+				wndpl.ptMaxPosition.x,
+				wndpl.ptMaxPosition.y,
+				wndpl.rcNormalPosition.left,
+				wndpl.rcNormalPosition.top,
+				wndpl.rcNormalPosition.right,
+				wndpl.rcNormalPosition.bottom,
+				schild->m_xcaption.GetGroup(),
+				data);
+			profile.Write(keys, tmps, info);
+
+			strSendvsN += mpN + " ";
+
+			// 			if(key == m_activeKey)
+			// 			{
+			// 				profile.Write(keys,"LASTSTATFOCUS",tmps);
+			// 			}
+		}
+		aryK.RemoveAll();
+
+		if (vsN < 6)
+		{
+			CString tmpVsN;
+			tmpVsN.Format("%03d", vsN);
+
+			//struct	_pidouini_mid	uini;
+
+			//FillMemory((char*) &uini, sizeof(_pidouini_mid), ' ');
+			CString sdat;
+
+			//sval.Format("%s INSTALL PATH [%s]\n",str,Axis::home);
+			//==================================================
+			CString s;
+			// 	s.Format("SEND CONFIG : [%s]\n",sval);
+			// 	OutputDebugString(s);
+
+			if (strSendvsN == "")
+			{
+				strSendvsN = "Nothing";
+			}
+
+			CTime	time;
+			time = time.GetCurrentTime();
+			sdat.Format("%04d%02d%02d", time.GetYear(), time.GetMonth(), time.GetDay());
+			CString fname = Axis::user + ".ini";
+
+			CString strTmp;
+			//strTmp = CString((char*)&uini,sizeof(struct _pidouini_mid));
+
+			strTmp.Format("%c%-8s%-100s%-100s%-100s%-2000s%-8s", 'I', Axis::userID, fname, "LASTSTAT", tmpVsN, strSendvsN, sdat);
+
+			// 			s.Format("LAST SEND [%s]\n",strTmp);
+			// 			OutputDebugString(s);
+
+			strResult += strTmp;
+		}
+	}
+
+	strTotalLast.Format("A06%s", strResult);
+
+	// 	CString s;
+	// 	s.Format("LAST STAT : [%s]\n",strTotalLast);
+	// 	OutputDebugString(s);
+
+	if (strlen(strTotalLast) < (1024 * 15))
+	{
+		SendLastStat((char*)(const char*)strTotalLast);
+	}
+
+	// 바탕화면 공지사항 mode
+	CProfile p(pkEnvironment);
+	p.Write("BKNOTICE", "MODE", Format("%d", m_nBkMode));
+
+	// scr_report() 함수로 대체함.
+	// SendConfig();
+
+	 //SendInstallPath();
+
+	os_report();
+
+	CString ips;
+
+	if (m_forceIP.IsEmpty() == FALSE)
+	{
+		SendForceIP();
+	}
+
+	CString		filename;
+	//에러로그 안올리게 차단
+// 	 CFile cfile;
+// 
+// 	 filename.Format("%s\\log", Axis::home);
+// 
+// 	 if(_taccess(filename,04)) return;
+// 
+// 	 if (cfile.Open(filename, CFile::modeRead|CFile::typeBinary))
+// 	 {
+// 		 int	fileL = cfile.GetLength();
+// 		 char*	sndB = new char [fileL + 1];
+// 		 
+// 		 ZeroMemory(sndB, fileL + 1);
+// 		 cfile.Read(sndB, fileL);
+// 		 cfile.Close();
+// 		
+// 		 CString errMsg(sndB,fileL);
+// 
+// 		 trouble_shooting(errMsg,"ERRORLOG");
+// 	 }
+// 
+// 	 ::DeleteFile(filename);
+
+// 	 filename.Format("%s\\menulog", Axis::home);
+// 	 
+// 	 if(_taccess(filename,04)) return;
+// 	 
+// 	 if (cfile.Open(filename, CFile::modeRead|CFile::typeBinary))
+// 	 {
+// 		 int	fileL = cfile.GetLength();
+// 		 char*	sndB = new char [fileL + 1];
+// 		 
+// 		 ZeroMemory(sndB, fileL + 1);
+// 		 cfile.Read(sndB, fileL);
+// 		 cfile.Close();
+// 		 
+// 		 CString errMsg(sndB,fileL);
+// 		 
+// 		 trouble_shooting(errMsg,"MENULOG");
+// 	 }
+// 	 
+// 	 ::DeleteFile(filename);
+	 //2012.09.18 김덕기 - 2000번에서 실시간잔고 조회건수 전송
+// 	 if(Axis::userID == "dundas" || Axis::userID == "yale8700")
+// 	 {
+// 		Send2000();
+// 	 }
+
+	CString strFile;
+	strFile.Format("%s\\tab\\TOP10.ini", Axis::home);
+	if (m_top10 != nullptr && m_top10->IsWindowVisible())
+		WritePrivateProfileString("TOP10", "AUTOPOPUP", "1", strFile);
+	else
+		WritePrivateProfileString("TOP10", "AUTOPOPUP", "0", strFile);
+}
+#else
 void CMainFrame::save_laststat()
 {	
 	m_iAxisState = AXIS_STATE_SAVELASTSTAT;
@@ -11402,7 +11694,7 @@ void CMainFrame::save_laststat()
 		WritePrivateProfileString("TOP10","AUTOPOPUP","0",strFile);	
 
 }
-
+#endif
 #pragma warning (disable : 26400)
 #pragma warning (disable : 26409)
 #pragma warning (disable : 6001)
@@ -14102,7 +14394,7 @@ void CMainFrame::OnTimer(UINT nIDEvent)
 	break;
 	case TM_MAIN_TEST_RTS:
 	{
-		TestRTSData();
+		//TestRTSData();
 	}
 	break;
 #endif
@@ -18585,49 +18877,11 @@ LONG CMainFrame::OnCHASER(WPARAM wParam, LPARAM lParam)
 	slog.Format("%s", bufx + L_cds);
 	OutputDebugString(slog);
 
-	if (m_mapDebugKey.GetCount() == 0)
-	{
-		CString str;
-		winCaption.Format("AxisChaser for %s", m_regkey);
-		CWnd* wnd = CWnd::FindWindow(NULL, winCaption);
-		if (wnd->GetSafeHwnd())
-			::SendMessage(wnd->m_hWnd, WM_COPYDATA, 0, (LPARAM)&cs);
-
-		m_sync.Unlock();
-		return 0;
-	}
-
-
-	bool bfind = false;
-	CString skey, stemp;
-	for (POSITION pos = m_mapDebugKey.GetStartPosition(); pos; )
-	{
-		m_mapDebugKey.GetNextAssoc(pos, skey, stemp);
-		skey.TrimRight();
-		if (slog.Find(skey) >= 0 && skey.GetLength() > 0)
-		{
-			bfind = true;
-			break;
-		}
-	}
-	if (bfind)
-	{
-		for (POSITION pos = m_mapDebugRemoveKey.GetStartPosition(); pos; )
-		{
-			m_mapDebugRemoveKey.GetNextAssoc(pos, skey, stemp);
-			skey.TrimRight();
-			if (slog.Find(skey) >= 0 && skey.GetLength() > 0)
-			{
-				return 0;
-			}
-		}
-
-		CString str;
-		winCaption.Format("AxisChaser for %s", m_regkey);
-		CWnd* wnd = CWnd::FindWindow(NULL, winCaption);
-		if (wnd->GetSafeHwnd())
-			::SendMessage(wnd->m_hWnd, WM_COPYDATA, 0, (LPARAM)&cs);
-	}
+	CString str;
+	winCaption.Format("AxisChaser for %s", m_regkey);
+	CWnd* wnd = CWnd::FindWindow(NULL, winCaption);
+	if (wnd->GetSafeHwnd())
+		::SendMessage(wnd->m_hWnd, WM_COPYDATA, 0, (LPARAM)&cs);
 
 	m_sync.Unlock();
 	return 0;
@@ -21900,7 +22154,7 @@ CString CMainFrame::FindKeyByTargetAndType(const CString& strTargetKey, int nTyp
 
 	return _T(""); // 못 찾으면 빈 문자열
 }
-
+#ifdef DF_NEW_SCREENCHECK
 int CMainFrame::ScreenCheck(CString mapname,int  igubn)
 {
 //igubn  1 ExceptMap에서 호출  ,   2 save_laststat  에서 호출
@@ -22026,7 +22280,118 @@ int CMainFrame::ScreenCheck(CString mapname,int  igubn)
 
 	return DF_YUSE;
 }
+#else
+int CMainFrame::ScreenCheck(CString mapname, int  igubn)
+{
+	//#define DF_NUSE 0					    //#0x00 사용불가      0  
+	//#define DF_YUSE 1					     //#0x01 사용가능      1
+	//#define DF_NUSE_AFTERDAY 2    //#0x02 특정날짜이후 사용가능    2
+	//#define DF_YUSE_AFTERDAY 4  //#0x02 특정날짜이후 사용중지    4
+	//#define DF_YUSE_MANAGER 8  //#0x08 관리자전용  8
+	//#define DF_YUSE_DEBUG   16   //#0x10 디버그기능 포함   16
+	//#define DF_NUSE_HTSOPEN   32   //#HTS 시작할때는 안띄움
+	//#define DF_YUSE_GUIDEPOP   64   //특정시간에는 대체팝업
+	m_slog.Format("[ScreenCheck] mapname=%s igubn=[%d]", mapname, igubn);
+	OutputDebugString(m_slog);
 
+	CString sData{};
+	if (!m_mapManage.Lookup(mapname, sData))
+	{
+		if (mapname.Left(2) == "00")
+		{
+			mapname = "IB" + mapname.Mid(2);
+			if (!m_mapManage.Lookup(mapname, sData))
+			{
+				m_slog.Format("[ScreenCheck]1 YESUSE mapname=%s igubn=[%d]", mapname, igubn);
+				OutputDebugString(m_slog);
+				return DF_YUSE;
+			}
+		}
+		else
+		{
+			m_slog.Format("[ScreenCheck]2 YESUSE mapname=%s igubn=[%d]", mapname, igubn);
+			OutputDebugString(m_slog);
+			return DF_YUSE;
+		}
+	}
+
+	CString sval, sDate, sPopType, sPopMap, sUrl;
+	sval = Parse(sData, "|");
+	sPopType = Parse(sData, "|");
+	sDate = Parse(sData, "|");
+	sPopMap = Parse(sData, "|");
+	sUrl = Parse(sData, "|");
+
+	if (igubn == 1 && sval == "32")
+	{  //HTS 시작할때는 #IB586000=32|0|||    이런식이면 안띄운다 
+		m_slog.Format("[ScreenCheck] HTS 시작시 DF_NUSE mapname=%s", mapname);
+		OutputDebugString(m_slog);
+		return DF_NUSE;
+	}
+
+	if (sval == "64" && igubn != 1)  //HTS 시작하거나 끌때는 안한다
+	{
+		char buff[256]{};
+		CString file, tmps;
+		file.Format("%s\\%s\\SWITCHING.INI", Axis::home, TABDIR);
+		GetPrivateProfileString("해외", "STIM", "720", buff, sizeof(buff), file);
+		tmps.Format("%s", buff);
+		tmps.TrimRight();
+
+		int from = _ttoi(tmps);
+
+		GetPrivateProfileString("해외", "ETIM", "750", buff, sizeof(buff), file);
+		tmps.Format("%s", buff);
+		tmps.TrimRight();
+
+		int end = _ttoi(tmps);
+
+		CTime now = CTime::GetCurrentTime();
+
+		int nowTime = now.GetHour() * 100 + now.GetMinute();
+
+		bool bIn = (nowTime >= from && nowTime <= end);
+
+		if (bIn)
+		{
+			m_mapHelper->CreatePopup(sPopMap, 1, WK_POPUP, 5);
+			return DF_YUSE;
+		}
+	}
+	else if (sval == "0")     //사용안하는 화면에 대한 처리
+	{
+		if (!sPopMap.IsEmpty())   //맵으로 띄우는 안내팝업에 대한 내용이 있을경우
+		{
+			if (sPopType.IsEmpty())
+				sPopType = "1";
+
+			if (sPopType == "1")  //일반화면
+				m_mapHelper->ChangeChild(sPopMap, 1, 0, 5);
+			else if (sPopType == "2")
+				m_mapHelper->CreateModal(sPopMap);
+			else if (sPopType == "2")
+				m_mapHelper->CreatePopup(sPopMap);
+		}
+		else	if (sPopType == "0")  //그냥 안띄우고 넘어감
+			return DF_NUSE;
+		else //url 팝업을 띄운다
+		{
+			CDlg_MSGBOX dlg;
+			if (dlg.DoModal() == IDOK)
+			{
+				m_iKey = m_mapHelper->ChangeChild("IB980001");
+
+				m_sTriggerUrl.Format("edUrlTrigger\t%s", sUrl);
+
+				SetTimer(TM_NOSCREEN_URL, 1000, nullptr);
+			}
+		}
+		return DF_NUSE;
+	}
+
+	return DF_YUSE;
+}
+#endif
 int CMainFrame::GetMacAddr(char* ipaddr, char* data)
 {
 	int ilen = 0;
@@ -22084,9 +22449,7 @@ void CMainFrame::OnDestroy()
 // 			ldes();
 // 		FreeLibrary(m_hMRadar);		
 // 	}
-#ifdef DF_MAIN_RTS
-	StopWorkerThread();
-#endif
+
 	OutputDebugString("COMPLETE MAIN DESTROY\n");
 
  	if (m_hMNews) FreeLibrary(m_hMNews);
@@ -33173,13 +33536,6 @@ NetType CMainFrame::GetCurrentNetType(BOOL bUpload)
 		}
 	}
 
-	if (!bUpload)
-	{
-		CreateAgentProcess();
-		return NET_NONE;
-	}
-
-
 	free(addresses);
 	return result;
 }
@@ -33211,24 +33567,28 @@ void CMainFrame::CreateAgentProcess()
 	CRect rc;
 	GetWindowRect(&rc);
 
+	DWORD mainTid = GetCurrentThreadId();
+
 	char cmds[512] = { 0 };
-	sprintf_s(cmds, "AxisAgent.exe /p %lu /h %llu /n %s /v %d /x %d /y %d",
+	sprintf_s(cmds,
+		"AxisAgent.exe /p %lu /h %llu /t %lu /n %s /v %d /x %d /y %d",
 		pid,
 		(UINT64)this->GetSafeHwnd(),
+		mainTid,
 		(LPCSTR)m_regkey,
 		m_bShowAxisAgent,
-		rc.left,   // ← 좌측
+		rc.left,
 		rc.top);
 
 	STARTUPINFOA si = { sizeof(si) };
 	PROCESS_INFORMATION pi = { 0 };
 
-	BOOL bRc = CreateProcess(
+	BOOL bRc = CreateProcessA(
 		aps,
 		cmds,
 		NULL,
 		NULL,
-		FALSE,  // 파이프 없으니 상속 불필요
+		FALSE,
 		0,
 		NULL,
 		NULL,

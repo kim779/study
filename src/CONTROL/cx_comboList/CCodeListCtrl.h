@@ -52,8 +52,12 @@
 #define COLOR_INVALID					0xffffffff
 
 
-#define MSG_POP_MENU				0x9898
-#define MSG_DBL_CLICK                0x989
+#define LIST_MSG_POP_MENU			0x9898
+#define LIST_MSG_DBL_CLICK				0x9899
+#define LIST_MSG_RETURN_CLICK         0x9897
+#define LIST_MSG_REMOVE_ITEM         0x9896
+#define LIST_MSG_EDIT_FOCUS    0x9895
+#define LIST_MSG_ONE_CLICK				0x9894
 
 class CCodeListCtrl : public CListCtrl
 {
@@ -280,7 +284,14 @@ public:
 	// PNG 로드 함수
 	BOOL    LoadClosePng(CString sPath);
 	
+	BOOL m_bAllowDelete = TRUE;  // 삭제 허용 여부
 
+	int   m_nPendingClickItem = -1;
+	int   m_nPendingClickSubItem = -1;
+	BOOL  m_bDblClkFired = FALSE;
+
+	afx_msg void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
+	afx_msg void OnTimer(UINT_PTR nIDEvent);
 };
 
 

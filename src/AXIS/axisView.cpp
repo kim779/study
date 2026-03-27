@@ -310,6 +310,7 @@ void CAxisView::OnNcCalcSize(BOOL bCalcValidRects, NCCALCSIZE_PARAMS FAR* lpncsp
 	lpncsp->rgrc[0].left -= VF;
 	lpncsp->rgrc[0].right += VF;
 	lpncsp->rgrc[0].bottom += VF;
+
 }
 
 LRESULT CAxisView::OnMouseLeave(WPARAM wparam, LPARAM lparam)

@@ -13,8 +13,280 @@
 #define new DEBUG_NEW
 #endif
 
+static const int MAX_DUMP_COUNT = 3;
+static const DWORD DUMP_INTERVAL_MS = 1000;
 
 // 응용 프로그램 정보에 사용되는 CAboutDlg 대화 상자입니다.
+#include <string>
+
+namespace
+{
+	static bool IsWaitLikeFunction(const char* name)
+	{
+		if (!name || !name[0]) return false;
+
+		return
+			strstr(name, "Wait") != NULL ||
+			strstr(name, "SleepConditionVariable") != NULL ||
+			strstr(name, "SRW") != NULL ||
+			strstr(name, "CriticalSection") != NULL ||
+			strstr(name, "NtWait") != NULL ||
+			strstr(name, "ZwWait") != NULL ||
+			strstr(name, "MsgWait") != NULL;
+	}
+
+	static bool IsUiLikeFunction(const char* name)
+	{
+		if (!name || !name[0]) return false;
+
+		return
+			strstr(name, "CUGCell") != NULL ||
+			strstr(name, "axCreate") != NULL ||
+			strstr(name, "GetSign") != NULL ||
+			strstr(name, "OnPaint") != NULL ||
+			strstr(name, "Draw") != NULL ||
+			strstr(name, "user32") != NULL;
+	}
+
+	static void WriteMainSummary(
+		CAxisAgentDlg* pThis,
+		DWORD threadId,
+		const char* f0,
+		const char* f1,
+		const char* f2)
+	{
+		if (!pThis) return;
+
+		const char* s0 = (f0 && f0[0]) ? f0 : "?";
+		const char* s1 = (f1 && f1[0]) ? f1 : "?";
+		const char* s2 = (f2 && f2[0]) ? f2 : "?";
+
+		char buf[1024] = { 0 };
+		sprintf_s(buf,
+			"[MAIN_SUMMARY] TID=%lu TOP=%s | CALLER1=%s | CALLER2=%s",
+			threadId, s0, s1, s2);
+		pThis->WriteMonitorLog(buf);
+
+		if (IsWaitLikeFunction(s0) || IsWaitLikeFunction(s1) || IsWaitLikeFunction(s2))
+		{
+			sprintf_s(buf,
+				"[MAIN_WAIT] TID=%lu wait-pattern detected: %s / %s / %s",
+				threadId, s0, s1, s2);
+			pThis->WriteMonitorLog(buf);
+		}
+
+		if (IsUiLikeFunction(s0) || IsUiLikeFunction(s1) || IsUiLikeFunction(s2))
+		{
+			sprintf_s(buf,
+				"[MAIN_UI] TID=%lu ui-pattern detected: %s / %s / %s",
+				threadId, s0, s1, s2);
+			pThis->WriteMonitorLog(buf);
+		}
+	}
+
+	struct StackHotState
+	{
+		std::string lastTopFunc;
+		DWORD64 lastTopAddr;
+		int repeatCount;
+
+		StackHotState()
+			: lastTopAddr(0), repeatCount(0)
+		{
+		}
+	};
+
+	static StackHotState g_hotState;
+
+	static void WriteTaggedLog(CAxisAgentDlg* pThis, const char* tag, const char* msg)
+	{
+		if (!pThis || !tag || !msg)
+			return;
+
+		char buf[1024] = { 0 };
+		sprintf_s(buf, "[%s] %s", tag, msg);
+		pThis->WriteMonitorLog(buf);
+	}
+
+	static void UpdateHotStateAndLog(
+		CAxisAgentDlg* pThis,
+		BOOL bMain,
+		int frameNo,
+		DWORD64 addr,
+		const char* funcName,
+		DWORD64 disp64)
+	{
+		if (!pThis || !funcName || !funcName[0])
+			return;
+
+		char msg[1024] = { 0 };
+
+		// 1. TOP 프레임은 무조건 강조
+		if (frameNo == 0)
+		{
+			sprintf_s(msg,
+				"%s %s + 0x%I64X",
+				bMain ? "[MAIN][TOP]" : "[TOP]",
+				funcName,
+				disp64);
+			WriteTaggedLog(pThis, "HOT", msg);
+
+			// 2. 같은 TOP 함수/주소 반복되면 STUCK 강조
+			if (g_hotState.lastTopFunc == funcName && g_hotState.lastTopAddr == addr)
+			{
+				g_hotState.repeatCount++;
+			}
+			else
+			{
+				g_hotState.lastTopFunc = funcName;
+				g_hotState.lastTopAddr = addr;
+				g_hotState.repeatCount = 0;
+			}
+
+			if (g_hotState.repeatCount >= 2)
+			{
+				sprintf_s(msg,
+					"%s 같은 TOP 반복 func=%s addr=0x%I64X repeat=%d",
+					bMain ? "[MAIN][STUCK]" : "[STUCK]",
+					funcName,
+					addr,
+					g_hotState.repeatCount);
+				WriteTaggedLog(pThis, "HOT", msg);
+			}
+		}
+	}
+
+	struct DumpWalkContext
+	{
+		BYTE* pView;
+		MINIDUMP_MEMORY_LIST* pMemList;
+		MINIDUMP_MEMORY64_LIST* pMem64List;
+
+		DumpWalkContext()
+			: pView(NULL), pMemList(NULL), pMem64List(NULL)
+		{
+		}
+	};
+
+	static DumpWalkContext* g_pDumpWalkCtx = NULL;
+
+	static const MINIDUMP_MEMORY_DESCRIPTOR* FindMemoryDesc32(
+		MINIDUMP_MEMORY_LIST* pList, ULONG64 addr)
+	{
+		if (!pList)
+			return NULL;
+
+		for (ULONG i = 0; i < pList->NumberOfMemoryRanges; ++i)
+		{
+			const MINIDUMP_MEMORY_DESCRIPTOR& md = pList->MemoryRanges[i];
+			const ULONG64 start = md.StartOfMemoryRange;
+			const ULONG64 end = start + md.Memory.DataSize;
+			if (addr >= start && addr < end)
+				return &md;
+		}
+		return NULL;
+	}
+
+	static BOOL CALLBACK DumpReadMemoryRoutine(
+		HANDLE /*hProcess*/,
+		DWORD64 qwBaseAddress,
+		PVOID lpBuffer,
+		DWORD nSize,
+		LPDWORD lpNumberOfBytesRead)
+	{
+		if (lpNumberOfBytesRead)
+			*lpNumberOfBytesRead = 0;
+
+		if (!lpBuffer || !g_pDumpWalkCtx)
+			return FALSE;
+
+		DumpWalkContext* ctx = g_pDumpWalkCtx;
+
+		// MemoryListStream 우선
+		if (ctx->pMemList)
+		{
+			const MINIDUMP_MEMORY_DESCRIPTOR* md =
+				FindMemoryDesc32(ctx->pMemList, qwBaseAddress);
+			if (!md)
+				return FALSE;
+
+			ULONG64 offset = qwBaseAddress - md->StartOfMemoryRange;
+			ULONG64 remain = md->Memory.DataSize - offset;
+			DWORD toCopy = (DWORD)((remain < (ULONG64)nSize) ? remain : (ULONG64)nSize);
+
+			BYTE* src = ctx->pView + md->Memory.Rva + (SIZE_T)offset;
+			memcpy(lpBuffer, src, toCopy);
+
+			if (lpNumberOfBytesRead)
+				*lpNumberOfBytesRead = toCopy;
+
+			return TRUE;
+		}
+
+		// Memory64ListStream
+		if (ctx->pMem64List)
+		{
+			ULONG64 curRva = ctx->pMem64List->BaseRva;
+
+			for (ULONG64 i = 0; i < ctx->pMem64List->NumberOfMemoryRanges; ++i)
+			{
+				const MINIDUMP_MEMORY_DESCRIPTOR64& md =
+					ctx->pMem64List->MemoryRanges[i];
+
+				const ULONG64 start = md.StartOfMemoryRange;
+				const ULONG64 end = start + md.DataSize;
+
+				if (qwBaseAddress >= start && qwBaseAddress < end)
+				{
+					ULONG64 offset = qwBaseAddress - start;
+					ULONG64 remain = md.DataSize - offset;
+					DWORD toCopy = (DWORD)((remain < (ULONG64)nSize) ? remain : (ULONG64)nSize);
+
+					BYTE* src = ctx->pView + (SIZE_T)(curRva + offset);
+					memcpy(lpBuffer, src, toCopy);
+
+					if (lpNumberOfBytesRead)
+						*lpNumberOfBytesRead = toCopy;
+
+					return TRUE;
+				}
+
+				curRva += md.DataSize;
+			}
+		}
+
+		return FALSE;
+	}
+
+	static std::string DumpWideStringToAnsi(BYTE* pView, ULONG32 rva)
+	{
+		if (!pView || rva == 0)
+			return std::string();
+
+		MINIDUMP_STRING* pStr =
+			reinterpret_cast<MINIDUMP_STRING*>(pView + rva);
+
+		if (!pStr || pStr->Length == 0)
+			return std::string();
+
+		int wcharCount = (int)(pStr->Length / sizeof(WCHAR));
+		int need = WideCharToMultiByte(
+			CP_ACP, 0, pStr->Buffer, wcharCount,
+			NULL, 0, NULL, NULL);
+
+		if (need <= 0)
+			return std::string();
+
+		std::string out;
+		out.resize(need);
+
+		WideCharToMultiByte(
+			CP_ACP, 0, pStr->Buffer, wcharCount,
+			&out[0], need, NULL, NULL);
+
+		return out;
+	}
+}
 
 void DebugLog(const char* fmt, ...)
 {
@@ -72,6 +344,9 @@ CAxisAgentDlg::CAxisAgentDlg(CWnd* pParent)
 	, m_hParentWnd(NULL)
 	, m_parentPid(0)
 	, m_hPingThread(NULL)
+	, m_dumpSeq(0)
+	, m_dumpCount(0)
+	, m_lastDumpTick(0)
 {
 	memset(m_logFile, 0, sizeof(m_logFile));
 	memset(m_regkey, 0, sizeof(m_regkey));
@@ -105,6 +380,8 @@ BEGIN_MESSAGE_MAP(CAxisAgentDlg, CDialogEx)
 	ON_WM_QUERYDRAGICON()
 	ON_WM_COPYDATA()
 	ON_WM_DESTROY()
+	ON_BN_CLICKED(IDC_BTN_TEST, &CAxisAgentDlg::OnBnClickedBtnTest)
+	ON_WM_TIMER()
 END_MESSAGE_MAP()
 
 
@@ -117,8 +394,7 @@ BOOL CAxisAgentDlg::OnInitDialog()
 	((CWnd*)GetDlgItem(IDOK))->ShowWindow(SW_HIDE);
 	((CWnd*)GetDlgItem(IDCANCEL))->ShowWindow(SW_HIDE);
 
-	// 창 숨기기
-	ShowWindow(SW_HIDE);
+	ModifyStyleEx(WS_EX_APPWINDOW, WS_EX_TOOLWINDOW);
 
 	// 커맨드라인 파싱
 	ParseCommandLine();
@@ -143,7 +419,7 @@ BOOL CAxisAgentDlg::OnInitDialog()
 	// Named Event 열기
 	char eventName[64] = { 0 };
 	sprintf_s(eventName, "PingStop_%lu", m_parentPid);
-	m_hStopEvent = OpenEvent(SYNCHRONIZE, FALSE, eventName);
+	m_hStopEvent = OpenEvent(EVENT_MODIFY_STATE | SYNCHRONIZE, FALSE, eventName);
 	if (m_hStopEvent)
 		DebugLog("OnInitDialog: StopEvent 열기 성공 [%s]\n", eventName);
 	else
@@ -191,6 +467,15 @@ BOOL CAxisAgentDlg::OnInitDialog()
 
 	// ping 스레드 시작
 	StartPingThread();
+
+	// 실제 모니터 스레드 시작
+	m_hMonitorThread = CreateThread(
+		NULL, 0, MonitorThreadProc, (LPVOID)this, 0, NULL);
+
+	if (m_hMonitorThread)
+		DebugLog("OnInitDialog: MonitorThread 시작\n");
+	else
+		DebugLog("OnInitDialog: MonitorThread CreateThread 실패 err=%lu\n", GetLastError());
 
 	return TRUE;
 }
@@ -331,14 +616,15 @@ void CAxisAgentDlg::ParseCommandLine()
 	);
 
 	LocalFree(argvW);
-	DebugLog("ParseCommandLine: PID=%lu HWND=%llu KEY=%s\n",
-		m_parentPid, (UINT64)m_hParentWnd, m_regkey);
+	slog.Format("ParseCommandLine: PID=%lu HWND=%llu TID=%lu KEY=%s show=%d\n",
+		m_parentPid, (UINT64)m_hParentWnd, m_dwMainThreadId, m_regkey, m_bShow);
+	WriteMonitorLog(slog);
 
+	//m_hMonitorThread = CreateThread(
+	//	NULL, 0, MonitorThreadProc, (LPVOID)this, 0, NULL);
+	//DebugLog("OnInitDialog: MonitorThread 시작\n");
 
-	// MonitorThread 시작
-	m_hMonitorThread = CreateThread(
-		NULL, 0, MonitorThreadProc, (LPVOID)this, 0, NULL);
-	DebugLog("OnInitDialog: MonitorThread 시작\n");
+	SetTimer(9898, 100, nullptr);
 }
 
 void CAxisAgentDlg::WriteLog(const char* msg)
@@ -354,25 +640,46 @@ void CAxisAgentDlg::WriteLog(const char* msg)
 
 void CAxisAgentDlg::SendToParent(const char* msg, int nKind)
 {
-	if (!m_hParentWnd) return;
+	return;
+	if (!m_hParentWnd)
+	{
+		WriteMonitorLog("[S2] m_hParentWnd NULL");
+		return;
+	}
 
-	COPYDATASTRUCT cds = { 0 };
+	if (!::IsWindow(m_hParentWnd))
+	{
+		WriteMonitorLog("[S3] 부모 윈도우 invalid");
+		return;
+	}
+
+	COPYDATASTRUCT cds = {};
 	cds.dwData = (ULONG_PTR)nKind;
 	cds.cbData = (DWORD)strlen(msg) + 1;
-	cds.lpData = (void*)msg;
+	cds.lpData = (PVOID)msg;
+
+
 
 	DWORD_PTR result = 0;
 	LRESULT lr = SendMessageTimeout(
 		m_hParentWnd,
 		WM_COPYDATA,
-		(WPARAM)m_hWnd,   // 보내는 쪽 HWND
+		(WPARAM)m_hWnd,
 		(LPARAM)&cds,
-		SMTO_ABORTIFHUNG,
+		SMTO_ABORTIFHUNG | SMTO_BLOCK,
 		3000,
 		&result);
 
 	if (lr == 0)
-		DebugLog("SendToParent: 전송 실패 or 타임아웃 err=%d\n", GetLastError());
+	{
+		char buf[128] = { 0 };
+		sprintf_s(buf, "[S5] SendToParent 실패 err=%lu", GetLastError());
+		WriteMonitorLog(buf);
+	}
+	else
+	{
+
+	}
 }
 
 BOOL CAxisAgentDlg::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCds)
@@ -396,7 +703,6 @@ void CAxisAgentDlg::OnDestroy()
 {
 	DebugLog("OnDestroy: 종료 처리\n");
 
-	// StopEvent 시그널
 	if (m_hStopEvent)
 	{
 		SetEvent(m_hStopEvent);
@@ -404,7 +710,13 @@ void CAxisAgentDlg::OnDestroy()
 		m_hStopEvent = NULL;
 	}
 
-	// ping 스레드 종료 대기
+	if (m_hMonitorThread)
+	{
+		WaitForSingleObject(m_hMonitorThread, 3000);
+		CloseHandle(m_hMonitorThread);
+		m_hMonitorThread = NULL;
+	}
+
 	if (m_hPingThread)
 	{
 		WaitForSingleObject(m_hPingThread, 3000);
@@ -610,20 +922,88 @@ void CAxisAgentDlg::StartPingThread()
 }
 
 // CPU 사용률 계산
-float CAxisAgentDlg::CalcCpuUsage(
+float CAxisAgentDlg::CalcProcessCpuUsage(
 	FILETIME& prevKernel, FILETIME& prevUser,
-	FILETIME  curKernel, FILETIME  curUser)
+	FILETIME  curKernel, FILETIME  curUser,
+	ULONGLONG& prevTickMs,
+	ULONGLONG  curTickMs)
 {
-	ULONGLONG prevTotal = FileTimeToULL(prevKernel) + FileTimeToULL(prevUser);
-	ULONGLONG curTotal = FileTimeToULL(curKernel) + FileTimeToULL(curUser);
-	ULONGLONG diff = curTotal - prevTotal;
+	const ULONGLONG prevTotal =
+		FileTimeToULL(prevKernel) + FileTimeToULL(prevUser);
 
-	// 1초 = 10000000 (100나노초 단위)
-	float fCpu = (float)diff / 10000000.0f * 100.0f;
+	const ULONGLONG curTotal =
+		FileTimeToULL(curKernel) + FileTimeToULL(curUser);
+
+	if (curTotal < prevTotal || curTickMs <= prevTickMs)
+	{
+		prevKernel = curKernel;
+		prevUser = curUser;
+		prevTickMs = curTickMs;
+		return 0.0f;
+	}
+
+	const ULONGLONG cpuTime100ns = curTotal - prevTotal;
+	const ULONGLONG elapsedMs = curTickMs - prevTickMs;
+	const double elapsed100ns = static_cast<double>(elapsedMs) * 10000.0;
+
+	SYSTEM_INFO si = {};
+	GetSystemInfo(&si);
+	const DWORD cpuCount = (si.dwNumberOfProcessors > 0) ? si.dwNumberOfProcessors : 1;
+
+	float fCpu = 0.0f;
+	if (elapsed100ns > 0.0)
+	{
+		fCpu = static_cast<float>(
+			(static_cast<double>(cpuTime100ns) / elapsed100ns)
+			* 100.0
+			/ static_cast<double>(cpuCount));
+	}
 
 	prevKernel = curKernel;
 	prevUser = curUser;
+	prevTickMs = curTickMs;
 
+	if (fCpu < 0.0f) fCpu = 0.0f;
+	return fCpu;
+}
+
+float CAxisAgentDlg::CalcThreadCpuUsage(
+	FILETIME& prevKernel, FILETIME& prevUser,
+	FILETIME  curKernel, FILETIME  curUser,
+	ULONGLONG& prevTickMs,
+	ULONGLONG  curTickMs)
+{
+	const ULONGLONG prevTotal =
+		FileTimeToULL(prevKernel) + FileTimeToULL(prevUser);
+
+	const ULONGLONG curTotal =
+		FileTimeToULL(curKernel) + FileTimeToULL(curUser);
+
+	if (curTotal < prevTotal || curTickMs <= prevTickMs)
+	{
+		prevKernel = curKernel;
+		prevUser = curUser;
+		prevTickMs = curTickMs;
+		return 0.0f;
+	}
+
+	const ULONGLONG cpuTime100ns = curTotal - prevTotal;
+	const ULONGLONG elapsedMs = curTickMs - prevTickMs;
+	const double elapsed100ns = static_cast<double>(elapsedMs) * 10000.0;
+
+	float fCpu = 0.0f;
+	if (elapsed100ns > 0.0)
+	{
+		fCpu = static_cast<float>(
+			(static_cast<double>(cpuTime100ns) / elapsed100ns) * 100.0);
+	}
+
+	prevKernel = curKernel;
+	prevUser = curUser;
+	prevTickMs = curTickMs;
+
+	if (fCpu < 0.0f) fCpu = 0.0f;
+	if (fCpu > 100.0f) fCpu = 100.0f;
 	return fCpu;
 }
 
@@ -643,11 +1023,11 @@ void CAxisAgentDlg::WriteMonitorLog(const char* msg)
 		selfPath, st.wYear, st.wMonth, st.wDay);
 
 	char output[2048] = { 0 };
-	sprintf_s(output, "[%04d-%02d-%02d %02d:%02d:%02d] %s\n",
+	sprintf_s(output, "[AxisAgent][%04d-%02d-%02d %02d:%02d:%02d][AxisAgent] %s\n",
 		st.wYear, st.wMonth, st.wDay,
 		st.wHour, st.wMinute, st.wSecond,
 		msg);
-
+	OutputDebugStringA(output);
 	FILE* fp = nullptr;
 	fopen_s(&fp, logPath, "a");
 	if (fp)
@@ -656,14 +1036,30 @@ void CAxisAgentDlg::WriteMonitorLog(const char* msg)
 		fclose(fp);
 	}
 
-	OutputDebugStringA(output);
+	//OutputDebugStringA(output);
 }
 
 // 덤프 생성
 void CAxisAgentDlg::CreateDump(const char* reason)
 {
-	if (m_bDumpCreated) return; // 중복 방지
-	m_bDumpCreated = true;
+	if (m_dumpCount >= MAX_DUMP_COUNT)
+	{
+		WriteMonitorLog("[D0] dump skipped: max dump count reached");
+		return;
+	}
+
+	const ULONGLONG nowTick = GetTickCount64();
+	if (m_lastDumpTick != 0 && (nowTick - m_lastDumpTick) < DUMP_INTERVAL_MS)
+	{
+		char skipMsg[256] = { 0 };
+		sprintf_s(skipMsg,
+			"[D0] dump skipped: interval not reached diff=%llu",
+			(nowTick - m_lastDumpTick));
+		WriteMonitorLog(skipMsg);
+		return;
+	}
+
+	const int seq = ++m_dumpSeq;
 
 	SYSTEMTIME st;
 	GetLocalTime(&st);
@@ -673,194 +1069,112 @@ void CAxisAgentDlg::CreateDump(const char* reason)
 	char* lastSlash = strrchr(selfPath, '\\');
 	if (lastSlash) *lastSlash = '\0';
 
-	char dumpPath[MAX_PATH] = { 0 };
-	sprintf_s(dumpPath, "%s\\ping\\dump_%04d%02d%02d_%02d%02d%02d.dmp",
-		selfPath,
-		st.wYear, st.wMonth, st.wDay,
-		st.wHour, st.wMinute, st.wSecond);
+	char dumpDir[MAX_PATH] = { 0 };
+	sprintf_s(dumpDir, "%s\\ping", selfPath);
+	CreateDirectoryA(dumpDir, NULL);
 
-	char logMsg[512] = { 0 };
-	sprintf_s(logMsg, "덤프 생성 시작 reason=%s path=%s", reason, dumpPath);
+	char dumpPath[MAX_PATH] = { 0 };
+	sprintf_s(dumpPath,
+		"%s\\dump_%04d%02d%02d_%02d%02d%02d_%03d_pid%lu_seq%02d.dmp",
+		dumpDir,
+		st.wYear, st.wMonth, st.wDay,
+		st.wHour, st.wMinute, st.wSecond, st.wMilliseconds,
+		m_parentPid,
+		seq);
+
+	char logMsg[1024] = { 0 };
+	sprintf_s(logMsg,
+		"[D1] dump start seq=%d reason=%s path=%s pid=%lu",
+		seq,
+		reason ? reason : "(null)",
+		dumpPath,
+		m_parentPid);
 	WriteMonitorLog(logMsg);
 
-	HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, m_parentPid);
+	DWORD access =
+		PROCESS_QUERY_INFORMATION |
+		PROCESS_VM_READ |
+		PROCESS_DUP_HANDLE |
+		SYNCHRONIZE;
+
+	HANDLE hProcess = OpenProcess(access, FALSE, m_parentPid);
 	if (!hProcess)
 	{
-		WriteMonitorLog("덤프 생성 실패 OpenProcess 에러");
+		sprintf_s(logMsg, "[D2] seq=%d OpenProcess fail err=%lu", seq, GetLastError());
+		WriteMonitorLog(logMsg);
 		return;
 	}
 
-	HANDLE hFile = CreateFileA(dumpPath,
-		GENERIC_WRITE, 0, NULL,
-		CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-
-	if (hFile == INVALID_HANDLE_VALUE)
+	if (WaitForSingleObject(hProcess, 0) == WAIT_OBJECT_0)
 	{
-		WriteMonitorLog("덤프 생성 실패 파일 생성 에러");
+		sprintf_s(logMsg, "[D3] seq=%d target already exited", seq);
+		WriteMonitorLog(logMsg);
 		CloseHandle(hProcess);
 		return;
 	}
+
+	HANDLE hFile = CreateFileA(
+		dumpPath,
+		GENERIC_WRITE,
+		0,
+		NULL,
+		CREATE_ALWAYS,
+		FILE_ATTRIBUTE_NORMAL,
+		NULL);
+
+	if (hFile == INVALID_HANDLE_VALUE)
+	{
+		sprintf_s(logMsg, "[D4] seq=%d CreateFile fail err=%lu", seq, GetLastError());
+		WriteMonitorLog(logMsg);
+		CloseHandle(hProcess);
+		return;
+	}
+
+	MINIDUMP_EXCEPTION_INFORMATION* pExInfo = NULL;
+
+	SetLastError(0);
 
 	BOOL bOk = MiniDumpWriteDump(
 		hProcess,
 		m_parentPid,
 		hFile,
-		(MINIDUMP_TYPE)(MiniDumpWithFullMemory |
-			MiniDumpWithThreadInfo |
-			MiniDumpWithProcessThreadData),
-		NULL, NULL, NULL);
+		MiniDumpNormal,
+		pExInfo,
+		NULL,
+		NULL);
+
+	DWORD dwErr = GetLastError();
+
+	FlushFileBuffers(hFile);
+
+	LARGE_INTEGER fileSize = {};
+	GetFileSizeEx(hFile, &fileSize);
 
 	CloseHandle(hFile);
 	CloseHandle(hProcess);
 
-	if (bOk)
+	sprintf_s(logMsg,
+		"[D5] seq=%d MiniDumpWriteDump ok=%d err=%lu size=%lld",
+		seq, (int)bOk, dwErr, fileSize.QuadPart);
+	WriteMonitorLog(logMsg);
+
+	if (bOk && fileSize.QuadPart > 0)
 	{
-		WriteMonitorLog("덤프 생성 완료");
-		AnalyzeDump(dumpPath); // 바로 분석
+		m_dumpCount++;
+		m_lastDumpTick = nowTick;
+
+		sprintf_s(logMsg,
+			"[D6] dump success seq=%d count=%d",
+			seq, m_dumpCount);
+		WriteMonitorLog(logMsg);
+
+		AnalyzeDump(dumpPath);
 	}
 	else
 	{
-		WriteMonitorLog("덤프 생성 실패 MiniDumpWriteDump 에러");
-	}
-}
-
-// 덤프 분석
-void CAxisAgentDlg::AnalyzeDump(const char* dumpPath)
-{
-	WriteMonitorLog("덤프 분석 시작");
-
-	HANDLE hFile = CreateFileA(dumpPath,
-		GENERIC_READ, FILE_SHARE_READ, NULL,
-		OPEN_EXISTING, 0, NULL);
-	if (hFile == INVALID_HANDLE_VALUE) return;
-
-	HANDLE hMapping = CreateFileMapping(hFile, NULL, PAGE_READONLY, 0, 0, NULL);
-	if (!hMapping) { CloseHandle(hFile); return; }
-
-	void* pView = MapViewOfFile(hMapping, FILE_MAP_READ, 0, 0, 0);
-	if (!pView) { CloseHandle(hMapping); CloseHandle(hFile); return; }
-
-	// 스레드 목록 가져오기
-	PVOID pStream = nullptr;
-	ULONG streamSize = 0;
-	MiniDumpReadDumpStream(pView, ThreadListStream,
-		nullptr, &pStream, &streamSize);
-
-	if (!pStream)
-	{
-		WriteMonitorLog("덤프 분석 실패 스레드 목록 없음");
-		UnmapViewOfFile(pView);
-		CloseHandle(hMapping);
-		CloseHandle(hFile);
-		return;
-	}
-
-	// PDB 경로 (exe 와 같은 폴더)
-	char selfPath[MAX_PATH] = { 0 };
-	GetModuleFileNameA(NULL, selfPath, MAX_PATH);
-	char* lastSlash = strrchr(selfPath, '\\');
-	if (lastSlash) *lastSlash = '\0';
-
-	// 심볼 초기화
-	HANDLE hProcess = GetCurrentProcess();
-	SymInitialize(hProcess, selfPath, FALSE);
-	SymSetOptions(SYMOPT_LOAD_LINES | SYMOPT_UNDNAME | SYMOPT_DEFERRED_LOADS);
-
-	// 모듈 로드
-	PVOID pModStream = nullptr;
-	ULONG modStreamSize = 0;
-	MiniDumpReadDumpStream(pView, ModuleListStream,
-		nullptr, &pModStream, &modStreamSize);
-
-	if (pModStream)
-	{
-		MINIDUMP_MODULE_LIST* pModList = (MINIDUMP_MODULE_LIST*)pModStream;
-		for (ULONG i = 0; i < pModList->NumberOfModules; i++)
-		{
-			MINIDUMP_MODULE& mod = pModList->Modules[i];
-			SymLoadModuleEx(hProcess, NULL,
-				(char*)((BYTE*)pView + mod.ModuleNameRva + 4),
-				NULL,
-				mod.BaseOfImage, mod.SizeOfImage,
-				NULL, 0);
-		}
-	}
-
-	// 스레드 콜스택 분석
-	MINIDUMP_THREAD_LIST* pThreadList = (MINIDUMP_THREAD_LIST*)pStream;
-
-	char logMsg[1024] = { 0 };
-	sprintf_s(logMsg, "덤프 분석 스레드수=%lu", pThreadList->NumberOfThreads);
-	WriteMonitorLog(logMsg);
-
-	for (ULONG i = 0; i < pThreadList->NumberOfThreads; i++)
-	{
-		MINIDUMP_THREAD& thread = pThreadList->Threads[i];
-
-		sprintf_s(logMsg, "=== ThreadID=%lu %s ===",
-			thread.ThreadId,
-			thread.ThreadId == m_dwMainThreadId ? "(메인스레드)" : "");
+		sprintf_s(logMsg, "[D7] dump failed seq=%d", seq);
 		WriteMonitorLog(logMsg);
-
-		// 컨텍스트
-		CONTEXT* pCtx = (CONTEXT*)((BYTE*)pView +
-			thread.ThreadContext.Rva);
-
-		STACKFRAME64 sf = { 0 };
-
-		// x86 (32비트)
-		sf.AddrPC.Offset = pCtx->Eip;  // Rip → Eip
-		sf.AddrPC.Mode = AddrModeFlat;
-		sf.AddrFrame.Offset = pCtx->Ebp;  // Rbp → Ebp
-		sf.AddrFrame.Mode = AddrModeFlat;
-		sf.AddrStack.Offset = pCtx->Esp;  // Rsp → Esp
-		sf.AddrStack.Mode = AddrModeFlat;
-
-		int nFrame = 0;
-		while (StackWalk64(
-			IMAGE_FILE_MACHINE_I386,  // AMD64 → I386
-			hProcess, NULL,
-			&sf, pCtx,
-			NULL,
-			SymFunctionTableAccess64,
-			SymGetModuleBase64,
-			NULL) && nFrame < 20)
-		{
-			char symBuf[sizeof(SYMBOL_INFO) + 256] = { 0 };
-			SYMBOL_INFO* pSym = (SYMBOL_INFO*)symBuf;
-			pSym->SizeOfStruct = sizeof(SYMBOL_INFO);
-			pSym->MaxNameLen = 255;
-
-			DWORD64 displacement = 0;
-			if (SymFromAddr(hProcess,
-				sf.AddrPC.Offset, &displacement, pSym))
-			{
-				IMAGEHLP_LINE64 line = { sizeof(line) };
-				DWORD lineDisp = 0;
-				SymGetLineFromAddr64(hProcess,
-					sf.AddrPC.Offset, &lineDisp, &line);
-
-				sprintf_s(logMsg, "  [%02d] %s() line=%lu",
-					nFrame, pSym->Name, line.LineNumber);
-			}
-			else
-			{
-				// PDB 없으면 주소값
-				sprintf_s(logMsg, "  [%02d] 0x%016llX (PDB없음)",
-					nFrame, sf.AddrPC.Offset);
-			}
-
-			WriteMonitorLog(logMsg);
-			nFrame++;
-		}
 	}
-
-	SymCleanup(hProcess);
-	UnmapViewOfFile(pView);
-	CloseHandle(hMapping);
-	CloseHandle(hFile);
-
-	WriteMonitorLog("덤프 분석 완료");
 }
 
 // 스레드 진입점
@@ -875,133 +1189,566 @@ void CAxisAgentDlg::MonitorLoop()
 {
 	WriteMonitorLog("MonitorLoop 시작");
 
-	// 프로세스 핸들
 	HANDLE hProcess = OpenProcess(
-		PROCESS_QUERY_INFORMATION | PROCESS_ALL_ACCESS,
+		PROCESS_QUERY_INFORMATION | SYNCHRONIZE,
 		FALSE, m_parentPid);
 
 	if (!hProcess)
 	{
-		WriteMonitorLog("MonitorLoop OpenProcess 실패");
+		char buf[256] = { 0 };
+		sprintf_s(buf, "OpenProcess 실패 err=%lu pid=%lu", GetLastError(), m_parentPid);
+		WriteMonitorLog(buf);
 		return;
 	}
 
-	// 메인 스레드 핸들
 	HANDLE hMainThread = OpenThread(
 		THREAD_QUERY_INFORMATION,
 		FALSE, m_dwMainThreadId);
 
-	// 이전 CPU 시간 초기화
-	FILETIME ftPrevProcKernel = { 0 }, ftPrevProcUser = { 0 };
-	FILETIME ftPrevMainKernel = { 0 }, ftPrevMainUser = { 0 };
-	FILETIME ftDummy = { 0 };
+	if (!hMainThread)
+	{
+		char buf[256] = { 0 };
+		sprintf_s(buf, "OpenThread 실패 err=%lu tid=%lu", GetLastError(), m_dwMainThreadId);
+		WriteMonitorLog(buf);
+	}
 
-	// 첫 측정값 가져오기
-	GetProcessTimes(hProcess,
-		&ftDummy, &ftDummy,
-		&ftPrevProcKernel, &ftPrevProcUser);
+	FILETIME ftPrevProcKernel = {}, ftPrevProcUser = {};
+	FILETIME ftPrevMainKernel = {}, ftPrevMainUser = {};
+	FILETIME ftDummy = {};
+
+	ULONGLONG prevProcTickMs = GetTickCount64();
+	ULONGLONG prevMainTickMs = prevProcTickMs;
+
+	if (!GetProcessTimes(hProcess, &ftDummy, &ftDummy, &ftPrevProcKernel, &ftPrevProcUser))
+	{
+		char buf[256] = { 0 };
+		sprintf_s(buf, "초기 GetProcessTimes 실패 err=%lu", GetLastError());
+		WriteMonitorLog(buf);
+
+		if (hMainThread)
+			CloseHandle(hMainThread);
+		CloseHandle(hProcess);
+		return;
+	}
 
 	if (hMainThread)
-		GetThreadTimes(hMainThread,
-			&ftDummy, &ftDummy,
-			&ftPrevMainKernel, &ftPrevMainUser);
+	{
+		if (!GetThreadTimes(hMainThread, &ftDummy, &ftDummy, &ftPrevMainKernel, &ftPrevMainUser))
+		{
+			char buf[256] = { 0 };
+			sprintf_s(buf, "초기 GetThreadTimes 실패 err=%lu", GetLastError());
+			WriteMonitorLog(buf);
+		}
+	}
 
-	while (true)
+	int noResponseCount = 0;
+	int cpuSpikeCount = 0;
+
+	//bool bNoResponseDumpTried = false;
+	//bool bCpuDumpTried = false;
+
+	while (!ShouldStop())
 	{
 		Sleep(MONITOR_INTERVAL);
 
-		if (ShouldStop()) break;
 
-		// 1. 행 감지 - IsHungAppWindow
-		if (m_hParentWnd && IsHungAppWindow(m_hParentWnd))
+		if (WaitForSingleObject(hProcess, 0) == WAIT_OBJECT_0)
 		{
-			WriteMonitorLog("행 감지 IsHungAppWindow");
-			CreateDump("HungApp");
+			WriteMonitorLog("부모 프로세스 종료");
 			break;
 		}
 
-		// 2. 응답없음 감지 - SendMessageTimeout
+		if (!::IsWindow(m_hParentWnd))
+		{
+			WriteMonitorLog("부모 윈도우 핸들 무효");
+			break;
+		}
+
+		bool bHung = IsHungAppWindow(m_hParentWnd) ? true : false;
+
 		DWORD_PTR result = 0;
 		LRESULT lr = SendMessageTimeout(
-			m_hParentWnd, WM_NULL, 0, 0,
-			SMTO_ABORTIFHUNG,
-			THRESHOLD_HANG_MS, &result);
+			m_hParentWnd,
+			WM_NULL,
+			0,
+			0,
+			SMTO_ABORTIFHUNG | SMTO_BLOCK,
+			THRESHOLD_HANG_MS,
+			&result);
 
 		if (lr == 0)
+			++noResponseCount;
+		else
+			noResponseCount = 0;
+
+		float fProcCpu = 0.0f;
+		FILETIME ftCurProcKernel = {}, ftCurProcUser = {};
+		if (GetProcessTimes(hProcess, &ftDummy, &ftDummy, &ftCurProcKernel, &ftCurProcUser))
 		{
-			WriteMonitorLog("행 감지 SendMessageTimeout 응답없음");
-			CreateDump("NoResponse");
-			break;
+			ULONGLONG curProcTickMs = GetTickCount64();
+			fProcCpu = CalcProcessCpuUsage(
+				ftPrevProcKernel, ftPrevProcUser,
+				ftCurProcKernel, ftCurProcUser,
+				prevProcTickMs, curProcTickMs);
+		}
+		else
+		{
+			char buf[256] = { 0 };
+			sprintf_s(buf, "GetProcessTimes 실패 err=%lu", GetLastError());
+			WriteMonitorLog(buf);
 		}
 
-		// 3. 프로세스 CPU 측정
-		FILETIME ftCurProcKernel = { 0 }, ftCurProcUser = { 0 };
-		GetProcessTimes(hProcess,
-			&ftDummy, &ftDummy,
-			&ftCurProcKernel, &ftCurProcUser);
-
-		float fProcCpu = CalcCpuUsage(
-			ftPrevProcKernel, ftPrevProcUser,
-			ftCurProcKernel, ftCurProcUser);
-
-		// 4. 메인 스레드 CPU 측정
 		float fMainCpu = 0.0f;
 		if (hMainThread)
 		{
-			FILETIME ftCurMainKernel = { 0 }, ftCurMainUser = { 0 };
-			GetThreadTimes(hMainThread,
-				&ftDummy, &ftDummy,
-				&ftCurMainKernel, &ftCurMainUser);
-
-			fMainCpu = CalcCpuUsage(
-				ftPrevMainKernel, ftPrevMainUser,
-				ftCurMainKernel, ftCurMainUser);
+			FILETIME ftCurMainKernel = {}, ftCurMainUser = {};
+			if (GetThreadTimes(hMainThread, &ftDummy, &ftDummy, &ftCurMainKernel, &ftCurMainUser))
+			{
+				ULONGLONG curMainTickMs = GetTickCount64();
+				fMainCpu = CalcThreadCpuUsage(
+					ftPrevMainKernel, ftPrevMainUser,
+					ftCurMainKernel, ftCurMainUser,
+					prevMainTickMs, curMainTickMs);
+			}
+			else
+			{
+				char buf[256] = { 0 };
+				sprintf_s(buf, "GetThreadTimes 실패 err=%lu", GetLastError());
+				WriteMonitorLog(buf);
+			}
 		}
 
-		// 5. 스레드 개수
-		HANDLE hSnap = CreateToolhelp32Snapshot(
-			TH32CS_SNAPTHREAD, m_parentPid);
+		HANDLE hSnap = CreateToolhelp32Snapshot(TH32CS_SNAPTHREAD, 0);
 		int nThreadCount = 0;
 		if (hSnap != INVALID_HANDLE_VALUE)
 		{
-			THREADENTRY32 te = { sizeof(te) };
+			THREADENTRY32 te = {};
+			te.dwSize = sizeof(te);
+
 			if (Thread32First(hSnap, &te))
 			{
-				do {
+				do
+				{
 					if (te.th32OwnerProcessID == m_parentPid)
-						nThreadCount++;
+						++nThreadCount;
 				} while (Thread32Next(hSnap, &te));
 			}
 			CloseHandle(hSnap);
 		}
+		else
+		{
+			char buf[256] = { 0 };
+			sprintf_s(buf, "CreateToolhelp32Snapshot 실패 err=%lu", GetLastError());
+			WriteMonitorLog(buf);
+		}
 
-		// 6. 로그
+
 		char logMsg[512] = { 0 };
 		sprintf_s(logMsg,
-			"프로세스CPU=%.1f%% 메인스레드CPU=%.1f%% 스레드수=%d",
-			fProcCpu, fMainCpu, nThreadCount);
+			"[monitor]프로세스CPU=%.1f%% 메인스레드CPU=%.1f%% 스레드수=%d 응답실패=%d Hung=%d",
+			fProcCpu, fMainCpu, nThreadCount, noResponseCount, bHung ? 1 : 0);
 		WriteMonitorLog(logMsg);
 
-		// 7. WM_COPYDATA 로 HTS 에 전송
 		char sendMsg[256] = { 0 };
 		sprintf_s(sendMsg, "CPU=%.1f MAIN=%.1f THR=%d",
 			fProcCpu, fMainCpu, nThreadCount);
 		SendToParent(sendMsg, AGENT_MSG_MONITOR);
 
-		// 8. CPU 급등 감지
+		if ((bHung && noResponseCount >= 2) || noResponseCount >= 3)
+		{
+			WriteMonitorLog("[M4] 응답없음 판정 진입");
+		}
+
 		if (fMainCpu > THRESHOLD_CPU)
 		{
-			sprintf_s(logMsg,
-				"메인스레드 CPU 급등 %.1f%% 덤프 생성",
-				fMainCpu);
-			WriteMonitorLog(logMsg);
+			WriteMonitorLog("[M5] CPU 임계치 초과");
+			++cpuSpikeCount;
+		}
+		else
+		{
+			cpuSpikeCount = 0;
+		}
+
+		if (noResponseCount >= 2)
+		{
+			char buf[256] = { 0 };
+			sprintf_s(buf,
+				"[M8] noresponse trigger noResp=%d hung=%d mainCpu=%.1f procCpu=%.1f",
+				noResponseCount, bHung ? 1 : 0, fMainCpu, fProcCpu);
+			WriteMonitorLog(buf);
+
+			CreateDump("NoResponse");
+		}
+
+		if (cpuSpikeCount >= 3)
+		{
+			char buf[256] = { 0 };
+			sprintf_s(buf,
+				"[M9] cpuspike trigger cpuSpikeCount=%d hung=%d mainCpu=%.1f procCpu=%.1f",
+				cpuSpikeCount, bHung ? 1 : 0, fMainCpu, fProcCpu);
+			WriteMonitorLog(buf);
+
 			CreateDump("CpuSpike");
-			break;
+		}
+
+	}
+
+	if (hMainThread)
+		CloseHandle(hMainThread);
+
+	CloseHandle(hProcess);
+}
+
+void CAxisAgentDlg::OnBnClickedBtnTest()
+{
+
+}
+
+
+void CAxisAgentDlg::OnTimer(UINT_PTR nIDEvent)
+{
+	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
+	switch (nIDEvent)
+	{
+		case 9898:
+		{
+			KillTimer(nIDEvent);
+			ShowWindow(m_bShow);
+		}
+		break;
+	}
+	CDialogEx::OnTimer(nIDEvent);
+}
+
+void CAxisAgentDlg::AnalyzeDump(const char* dumpPath)
+{
+	if (!dumpPath || !dumpPath[0])
+		return;
+
+	WriteMonitorLog("덤프 분석 시작");
+
+	HANDLE hFile = CreateFileA(
+		dumpPath,
+		GENERIC_READ,
+		FILE_SHARE_READ,
+		NULL,
+		OPEN_EXISTING,
+		FILE_ATTRIBUTE_NORMAL,
+		NULL);
+
+	if (hFile == INVALID_HANDLE_VALUE)
+	{
+		char buf[256] = { 0 };
+		sprintf_s(buf, "덤프 분석 실패 CreateFile err=%lu", GetLastError());
+		WriteMonitorLog(buf);
+		return;
+	}
+
+	HANDLE hMapping = CreateFileMapping(hFile, NULL, PAGE_READONLY, 0, 0, NULL);
+	if (!hMapping)
+	{
+		char buf[256] = { 0 };
+		sprintf_s(buf, "덤프 분석 실패 CreateFileMapping err=%lu", GetLastError());
+		WriteMonitorLog(buf);
+		CloseHandle(hFile);
+		return;
+	}
+
+	BYTE* pView = (BYTE*)MapViewOfFile(hMapping, FILE_MAP_READ, 0, 0, 0);
+	if (!pView)
+	{
+		char buf[256] = { 0 };
+		sprintf_s(buf, "덤프 분석 실패 MapViewOfFile err=%lu", GetLastError());
+		WriteMonitorLog(buf);
+		CloseHandle(hMapping);
+		CloseHandle(hFile);
+		return;
+	}
+
+	HANDLE hSymProcess = GetCurrentProcess();
+
+	SymSetOptions(SYMOPT_LOAD_LINES | SYMOPT_UNDNAME | SYMOPT_DEFERRED_LOADS);
+
+	if (!SymInitialize(hSymProcess, NULL, FALSE))
+	{
+		char buf[256] = { 0 };
+		sprintf_s(buf, "SymInitialize 실패 err=%lu", GetLastError());
+		WriteMonitorLog(buf);
+
+		UnmapViewOfFile(pView);
+		CloseHandle(hMapping);
+		CloseHandle(hFile);
+		return;
+	}
+
+	char logMsg[1024] = { 0 };
+
+	PMINIDUMP_DIRECTORY pDir = NULL;
+	PVOID pExcStream = NULL;
+	ULONG excSize = 0;
+
+	DWORD exceptionThreadId = 0;
+
+	if (MiniDumpReadDumpStream(
+		pView, ExceptionStream, &pDir, &pExcStream, &excSize) && pExcStream)
+	{
+		MINIDUMP_EXCEPTION_STREAM* pExc =
+			(MINIDUMP_EXCEPTION_STREAM*)pExcStream;
+
+		exceptionThreadId = pExc->ThreadId;
+
+		sprintf_s(logMsg,
+			"[AN1] ExceptionThread=%lu Code=0x%08lX Addr=0x%08lX",
+			pExc->ThreadId,
+			pExc->ExceptionRecord.ExceptionCode,
+			(DWORD)pExc->ExceptionRecord.ExceptionAddress);
+		WriteMonitorLog(logMsg);
+	}
+	else
+	{
+		WriteMonitorLog("[AN1] ExceptionStream 없음");
+	}
+
+	DumpWalkContext walkCtx;
+	walkCtx.pView = pView;
+
+	PVOID pMemStream = NULL;
+	ULONG memSize = 0;
+	if (MiniDumpReadDumpStream(
+		pView, MemoryListStream, &pDir, &pMemStream, &memSize) && pMemStream)
+	{
+		walkCtx.pMemList = (MINIDUMP_MEMORY_LIST*)pMemStream;
+		WriteMonitorLog("[AN2] MemoryListStream 사용");
+	}
+	else
+	{
+		PVOID pMem64Stream = NULL;
+		ULONG mem64Size = 0;
+		if (MiniDumpReadDumpStream(
+			pView, Memory64ListStream, &pDir, &pMem64Stream, &mem64Size) && pMem64Stream)
+		{
+			walkCtx.pMem64List = (MINIDUMP_MEMORY64_LIST*)pMem64Stream;
+			WriteMonitorLog("[AN2] Memory64ListStream 사용");
+		}
+		else
+		{
+			WriteMonitorLog("[AN2] Memory stream 없음");
 		}
 	}
 
-	if (hMainThread) CloseHandle(hMainThread);
-	CloseHandle(hProcess);
+	PVOID pModStream = NULL;
+	ULONG modSize = 0;
+	if (MiniDumpReadDumpStream(
+		pView, ModuleListStream, &pDir, &pModStream, &modSize) && pModStream)
+	{
+		MINIDUMP_MODULE_LIST* pModList =
+			(MINIDUMP_MODULE_LIST*)pModStream;
 
-	WriteMonitorLog("MonitorLoop 종료");
+		sprintf_s(logMsg, "[AN3] 모듈수=%lu", pModList->NumberOfModules);
+		WriteMonitorLog(logMsg);
+
+		for (ULONG i = 0; i < pModList->NumberOfModules; ++i)
+		{
+			MINIDUMP_MODULE& mod = pModList->Modules[i];
+			std::string modName = DumpWideStringToAnsi(pView, mod.ModuleNameRva);
+
+			SymLoadModuleEx(
+				hSymProcess,
+				NULL,
+				modName.empty() ? NULL : modName.c_str(),
+				NULL,
+				mod.BaseOfImage,
+				mod.SizeOfImage,
+				NULL,
+				0);
+		}
+	}
+	else
+	{
+		WriteMonitorLog("[AN3] ModuleListStream 없음");
+	}
+
+	PVOID pThreadStream = NULL;
+	ULONG threadSize = 0;
+	if (!MiniDumpReadDumpStream(
+		pView, ThreadListStream, &pDir, &pThreadStream, &threadSize) || !pThreadStream)
+	{
+		WriteMonitorLog("덤프 분석 실패 ThreadListStream 없음");
+		SymCleanup(hSymProcess);
+		UnmapViewOfFile(pView);
+		CloseHandle(hMapping);
+		CloseHandle(hFile);
+		return;
+	}
+
+	MINIDUMP_THREAD_LIST* pThreadList =
+		(MINIDUMP_THREAD_LIST*)pThreadStream;
+
+	sprintf_s(logMsg, "[AN4] 스레드수=%lu", pThreadList->NumberOfThreads);
+	WriteMonitorLog(logMsg);
+
+	g_pDumpWalkCtx = &walkCtx;
+
+	bool bFoundMain = false;
+
+	for (ULONG i = 0; i < pThreadList->NumberOfThreads; ++i)
+	{
+		MINIDUMP_THREAD& th = pThreadList->Threads[i];
+
+		bool bMain = (th.ThreadId == m_dwMainThreadId);
+		bool bException = (exceptionThreadId != 0 && th.ThreadId == exceptionThreadId);
+
+		if (!bMain)
+			continue;
+
+		bFoundMain = true;
+
+		sprintf_s(logMsg,
+			"=== ThreadID=%lu %s%s ===",
+			th.ThreadId,
+			bMain ? "(메인스레드)" : "",
+			bException ? "(예외스레드)" : "");
+		WriteMonitorLog(logMsg);
+
+		CONTEXT* pCtx = (CONTEXT*)(pView + th.ThreadContext.Rva);
+		if (!pCtx)
+		{
+			WriteMonitorLog("  컨텍스트 없음");
+			break;
+		}
+
+#ifdef _M_IX86
+		sprintf_s(logMsg,
+			"  EIP=0x%08lX EBP=0x%08lX ESP=0x%08lX",
+			pCtx->Eip, pCtx->Ebp, pCtx->Esp);
+		WriteMonitorLog(logMsg);
+
+		STACKFRAME64 sf;
+		ZeroMemory(&sf, sizeof(sf));
+
+		sf.AddrPC.Offset = pCtx->Eip;
+		sf.AddrPC.Mode = AddrModeFlat;
+		sf.AddrFrame.Offset = pCtx->Ebp;
+		sf.AddrFrame.Mode = AddrModeFlat;
+		sf.AddrStack.Offset = pCtx->Esp;
+		sf.AddrStack.Mode = AddrModeFlat;
+
+		CONTEXT ctxCopy = *pCtx;
+
+		char mainF0[256] = { 0 };
+		char mainF1[256] = { 0 };
+		char mainF2[256] = { 0 };
+
+		for (int frameNo = 0; frameNo < 10; ++frameNo)
+		{
+			BOOL sw = StackWalk64(
+				IMAGE_FILE_MACHINE_I386,
+				hSymProcess,
+				NULL,
+				&sf,
+				&ctxCopy,
+				DumpReadMemoryRoutine,
+				SymFunctionTableAccess64,
+				SymGetModuleBase64,
+				NULL);
+
+			if (!sw || sf.AddrPC.Offset == 0)
+				break;
+
+			char symBuf[sizeof(SYMBOL_INFO) + 256] = { 0 };
+			SYMBOL_INFO* pSym = (SYMBOL_INFO*)symBuf;
+			pSym->SizeOfStruct = sizeof(SYMBOL_INFO);
+			pSym->MaxNameLen = 255;
+
+			DWORD64 disp64 = 0;
+			IMAGEHLP_LINE64 line;
+			ZeroMemory(&line, sizeof(line));
+			line.SizeOfStruct = sizeof(line);
+			DWORD lineDisp = 0;
+
+			char funcName[256] = { 0 };
+
+			if (SymFromAddr(hSymProcess, sf.AddrPC.Offset, &disp64, pSym))
+			{
+				strcpy_s(funcName, pSym->Name);
+
+				if (frameNo == 0) strcpy_s(mainF0, funcName);
+				else if (frameNo == 1) strcpy_s(mainF1, funcName);
+				else if (frameNo == 2) strcpy_s(mainF2, funcName);
+
+				if (frameNo == 0)
+				{
+					sprintf_s(logMsg,
+						"[MAIN][TOP] %s + 0x%I64X",
+						pSym->Name,
+						disp64);
+					WriteMonitorLog(logMsg);
+				}
+
+				if (SymGetLineFromAddr64(hSymProcess, sf.AddrPC.Offset, &lineDisp, &line))
+				{
+					sprintf_s(logMsg,
+						"  [%02d] %s + 0x%I64X (%s:%lu)",
+						frameNo,
+						pSym->Name,
+						disp64,
+						line.FileName ? line.FileName : "?",
+						line.LineNumber);
+				}
+				else
+				{
+					sprintf_s(logMsg,
+						"  [%02d] %s + 0x%I64X",
+						frameNo,
+						pSym->Name,
+						disp64);
+				}
+			}
+			else
+			{
+				if (frameNo == 0)
+				{
+					sprintf_s(logMsg,
+						"[MAIN][TOP] 0x%08I64X",
+						sf.AddrPC.Offset);
+					WriteMonitorLog(logMsg);
+				}
+
+				if (frameNo == 0) sprintf_s(mainF0, "0x%08I64X", sf.AddrPC.Offset);
+				else if (frameNo == 1) sprintf_s(mainF1, "0x%08I64X", sf.AddrPC.Offset);
+				else if (frameNo == 2) sprintf_s(mainF2, "0x%08I64X", sf.AddrPC.Offset);
+
+				sprintf_s(logMsg,
+					"  [%02d] 0x%08I64X",
+					frameNo,
+					sf.AddrPC.Offset);
+			}
+
+			WriteMonitorLog(logMsg);
+		}
+
+		WriteMainSummary(this, th.ThreadId, mainF0, mainF1, mainF2);
+#else
+		WriteMonitorLog("  현재 AnalyzeDump는 x86 기준으로 작성됨");
+#endif
+		break;
+	}
+
+	if (!bFoundMain)
+	{
+		char buf[256] = { 0 };
+		sprintf_s(buf,
+			"[AN_MAIN] 메인스레드 미발견 m_dwMainThreadId=%lu",
+			m_dwMainThreadId);
+		WriteMonitorLog(buf);
+	}
+
+	g_pDumpWalkCtx = NULL;
+
+	SymCleanup(hSymProcess);
+	UnmapViewOfFile(pView);
+	CloseHandle(hMapping);
+	CloseHandle(hFile);
+
+	WriteMonitorLog("덤프 분석 완료");
 }

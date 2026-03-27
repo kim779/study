@@ -770,6 +770,7 @@ void CCodeCombo::ShowDropDown(bool bflag, bool bshow)
 // CCodeEdit
 #define TID_CHANGEHANGLE 1000
 #define TID_RETURNTIDLE 1001
+#define TM_SET_CURSOR  300
 CCodeEdit::CCodeEdit(CfxCodeCtrl *pCombo, CWnd* pTarget)
 {
 	m_pParent = pCombo;
@@ -804,195 +805,240 @@ BEGIN_MESSAGE_MAP(CCodeEdit, CDDEdit)
 	ON_WM_DESTROY()
 	ON_WM_ENABLE()
 	ON_WM_CTLCOLOR()
+	ON_MESSAGE(WM_INPUTLANGCHANGE, OnInputLangChange)
+	
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
 // CCodeEdit message handlers
 
+
 void CCodeEdit::OnChar(UINT nChar, UINT nRepCnt, UINT nFlags) 
 {
-	CString tmpS;
-	int	len = 0;
+	//CString tmpS;
+	//int	len = 0;
 
-	GetWindowText(tmpS);
-	if (tmpS.IsEmpty() && nChar >= '0' && nChar <= '9')
-		ChangeHangulMode(this->m_hWnd, false);
+	//GetWindowText(tmpS);
+	//if (tmpS.IsEmpty() && nChar >= '0' && nChar <= '9')
+	//	ChangeHangulMode(this->m_hWnd, false);
 
-	switch (nChar)
-	{
-	case VK_RETURN:
-		//TRACE("OnChar: VK_RETURN\n");
-		len = tmpS.GetLength();
-		if (len <= 0)
-		{
-			if (len == 0)
-			{
-				//SetTimer(TID_RETURNTIDLE, 3000, NULL);
-				
-				m_pParent->m_pParent->PostMessage(WM_KEYDOWN, VK_RETURN, 0);
-				m_pParent->FireChangeEvent();
-				return;
-			}
-		}
-		
-		if (m_Unit == GU_INDEX)
-		{
-			if (isNumeric(tmpS) && len == sz_INDEX)
-			{
-				CString	string;
-				
-				string.Format("%03d", atoi(tmpS)); 
-				m_pParent->SetEditData(string);
-				SetSel(0, -1);
-				m_pParent->m_pParent->SendMessage(WM_COMMAND, MAKEWPARAM(m_pParent->GetDlgCtrlID(), BN_CLICKED), (LPARAM)GetSafeHwnd());
-			}
-		}
-		else if (m_Unit == GU_CODE || m_Unit == GU_ELWCODE)
-		{
-			//TRACE("OnChar: GU_CODE\n");
-			if (!isHexNumeric2(tmpS))
-			{	// false
-				OnKeyUp(0, 0, 0); //엔터키와 마지막 한글입력이 함께 들어오면 keyup이벤트가 잘 안타는 버그때문에 다시한번 돌도록 예외처리
-				
-				const	int	curIndex = m_pParent->GetCurSel();
-				//TRACE("OnChar: GU_CODE-IN: %s[%d]\n", tmpS, curIndex);
-				
-				if (curIndex == 0)
-					m_pParent->SearchCode(tmpS);
-				tmpS = m_pParent->GetSelectCode();
+	//switch (nChar)
+	//{
+	//case VK_RETURN:
+	//	len = tmpS.GetLength();
+	//	if (len <= 0)
+	//	{
+	//		if (len == 0)
+	//		{
+	//			//SetTimer(TID_RETURNTIDLE, 3000, NULL);
+	//			
+	//			m_pParent->m_pParent->PostMessage(WM_KEYDOWN, VK_RETURN, 0);
+	//			m_pParent->FireChangeEvent();
+	//			return;
+	//		}
+	//	}
+	//	
+	//	if (m_Unit == GU_INDEX)
+	//	{
+	//		if (isNumeric(tmpS) && len == sz_INDEX)
+	//		{
+	//			CString	string;
+	//			
+	//			string.Format("%03d", atoi(tmpS)); 
+	//			m_pParent->SetEditData(string);
+	//			SetSel(0, -1);
+	//			m_pParent->m_pParent->SendMessage(WM_COMMAND, MAKEWPARAM(m_pParent->GetDlgCtrlID(), BN_CLICKED), (LPARAM)GetSafeHwnd());
+	//		}
+	//	}
+	//	else if (m_Unit == GU_CODE || m_Unit == GU_ELWCODE)
+	//	{
+	//		if (!isHexNumeric2(tmpS))
+	//		{	// false
+	//			OnKeyUp(0, 0, 0); //엔터키와 마지막 한글입력이 함께 들어오면 keyup이벤트가 잘 안타는 버그때문에 다시한번 돌도록 예외처리
+	//			
+	//			const	int	curIndex = m_pParent->GetCurSel();
 
-				if (m_pParent->GetDroppedState())
-					m_pParent->ShowDropDown(false, false);
-				m_pParent->SetEditData(tmpS);
-			}
-			else
-			{
-				m_pParent->m_DataMode = 0;
+	//			if (curIndex == 0)
+	//				m_pParent->SearchCode(tmpS);
+	//			tmpS = m_pParent->GetSelectCode();
 
-				//pyt
-				CString str, name;
-				switch (len)
-				{
-				case 2:
-//					str.Format("0000%02d", atoi(tmpS));
-					str.Format("0000%s", tmpS);
-					break;
-				case 3:
-//					str.Format("000%03d", atoi(tmpS));
-					str.Format("000%s", tmpS);
-					break;
-				case 4:
-//					str.Format("00%04d", atoi(tmpS)); 
-					str.Format("00%s", tmpS);
-					break;
-				case 5:
-//					str.Format("0%05d", atoi(tmpS)); 
-					str.Format("0%s", tmpS);
-					break;
-				case 6:
-//					str.Format("%06d", atoi(tmpS)); 
-					str.Format("%s", tmpS);
-					break;
-				}
-				
-				name = ((CControlWnd*)m_pParent->m_pParent)->GetHNam(str);
-				if (!name.IsEmpty())
-				{
-					CString sRtnStr = ((CControlWnd*)m_pParent->m_pParent)->GetRtnStr();
-					if (sRtnStr != str)
-					{
-						m_pParent->SetNormal();
-						m_pParent->SetEditData(str);
-					}
-					else
-					{
-						m_pParent->OnBtnDown();
-					}
-					
-					SetSel(0, -1);
-				}
-				else 
-				{
-					str = ((CControlWnd*)m_pParent->m_pParent)->GetRtnStr();
-					m_pParent->SetEditData(str);
-					SetWindowText(str);
-					SetSel(0, -1);
-				}
-			}
-			m_pParent->m_pParent->PostMessage(WM_KEYDOWN, VK_RETURN, 0);
-			return;
-		}
-		else if (m_Unit == GU_FUTURE || m_Unit == GU_OPTION || m_Unit == GU_FOCODE || m_Unit == GU_POPTION || m_Unit == GU_FCODE || m_Unit == GU_FOSTOCK)
-		{
-			if (m_Unit == GU_FUTURE && len == 5 && (tmpS.GetAt(0) == '1' || tmpS.GetAt(0) == 'A'))	// 20230125 파생상품 코드 개편  '1', 'A' : 선물
-			{
-				tmpS += "000";
-				m_pParent->SetEditData(tmpS);
-				SetSel(0, -1);
-				break;
-			}
+	//			if (m_pParent->GetDroppedState())
+	//				m_pParent->ShowDropDown(false, false);
+	//			m_pParent->SetEditData(tmpS);
+	//		}
+	//		else
+	//		{
+	//			m_pParent->m_DataMode = 0;
 
-			GetWindowText(tmpS);
-			if (!tmpS.IsEmpty())
-			{
-				if (!isHexNumeric(tmpS))
-				{
-					CString	tmpS = m_pParent->GetSelectCode();
-					if (m_pParent->GetDroppedState())
-						m_pParent->ShowDropDown(false, false);
-					m_pParent->SetEditData(tmpS);
-				}
-				SetSel(0, -1);
-			}
-		}
-		else
-			m_pParent->SetEditData(tmpS);	
+	//			//pyt
+	//			CString str, name;
+	//			switch (len)
+	//			{
+	//			case 2:
+	//				str.Format("0000%s", tmpS);
+	//				break;
+	//			case 3:
+	//				str.Format("000%s", tmpS);
+	//				break;
+	//			case 4:
+	//				str.Format("00%s", tmpS);
+	//				break;
+	//			case 5:
+	//				str.Format("0%s", tmpS);
+	//				break;
+	//			case 6:
+	//				str.Format("%s", tmpS);
+	//				break;
+	//			}
+	//			
+	//			name = ((CControlWnd*)m_pParent->m_pParent)->GetHNam(str);
+	//			if (!name.IsEmpty())
+	//			{
+	//				CString sRtnStr = ((CControlWnd*)m_pParent->m_pParent)->GetRtnStr();
+	//				if (sRtnStr != str)
+	//				{
+	//					m_pParent->SetNormal();
+	//					m_pParent->SetEditData(str);
+	//				}
+	//				else
+	//				{
+	//					m_pParent->OnBtnDown();
+	//				}
+	//				
+	//				SetSel(0, -1);
+	//			}
+	//			else 
+	//			{
+	//				str = ((CControlWnd*)m_pParent->m_pParent)->GetRtnStr();
+	//				m_pParent->SetEditData(str);
+	//				SetWindowText(str);
+	//				SetSel(0, -1);
+	//			}
+	//		}
+	//		m_pParent->m_pParent->PostMessage(WM_KEYDOWN, VK_RETURN, 0);
+	//		return;
+	//	}
+	//	else if (m_Unit == GU_FUTURE || m_Unit == GU_OPTION || m_Unit == GU_FOCODE || m_Unit == GU_POPTION || m_Unit == GU_FCODE || m_Unit == GU_FOSTOCK)
+	//	{
+	//		if (m_Unit == GU_FUTURE && len == 5 && (tmpS.GetAt(0) == '1' || tmpS.GetAt(0) == 'A'))	// 20230125 파생상품 코드 개편  '1', 'A' : 선물
+	//		{
+	//			tmpS += "000";
+	//			m_pParent->SetEditData(tmpS);
+	//			SetSel(0, -1);
+	//			break;
+	//		}
 
-		m_pParent->m_pParent->PostMessage(WM_KEYDOWN, VK_RETURN, 0);
-		break;
-	case VK_TAB:
-		{
-			m_pParent->m_pParent->PostMessage(WM_KEYDOWN, VK_TAB, 0);			
-			return;	
-		}
-	}
+	//		GetWindowText(tmpS);
+	//		if (!tmpS.IsEmpty())
+	//		{
+	//			if (!isHexNumeric(tmpS))
+	//			{
+	//				CString	tmpS = m_pParent->GetSelectCode();
+	//				if (m_pParent->GetDroppedState())
+	//					m_pParent->ShowDropDown(false, false);
+	//				m_pParent->SetEditData(tmpS);
+	//			}
+	//			SetSel(0, -1);
+	//		}
+	//	}
+	//	else
+	//		m_pParent->SetEditData(tmpS);	
+
+	//	m_pParent->m_pParent->PostMessage(WM_KEYDOWN, VK_RETURN, 0);
+	//	break;
+	//case VK_TAB:
+	//	{
+	//		m_pParent->m_pParent->PostMessage(WM_KEYDOWN, VK_TAB, 0);			
+	//		return;	
+	//	}
+	//}
 	CDDEdit::OnChar(nChar, nRepCnt, nFlags);
-	
+
 }
 
 void CCodeEdit::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags) 
 {
 	m_bKeydown = true;
 	CString DownHis_Code;
-	switch (nChar)
+
+	CString sText;
+	GetWindowText(sText);
+
+	if (sText.IsEmpty())
 	{
-	case VK_UP :
-		if (!m_pParent->GetDroppedState())
+		if (nChar == VK_DOWN)
 		{
-			DownHis_Code = m_pParent->GetHistCode(-1);
-			if (DownHis_Code.IsEmpty()) return;
-			m_pParent->SetEditData(DownHis_Code);
-		
-			SetSel(0, -1);
-			
+			OutputDebugString("[CCodeEdit] OnKeyDown VK_DOWN 빈상태 히스토리\n");
+			GetParent()->GetParent()->PostMessage(
+				WM_EDIT_MSG, EDIT_MSG_SHOW_HISTORYPOP, 0);
 			return;
 		}
-		break;
-	case VK_DOWN :
-		if (!m_pParent->GetDroppedState())
+		if (nChar == VK_UP)
 		{
-			DownHis_Code = m_pParent->GetHistCode(1);
-			if (DownHis_Code.IsEmpty()) return;
-			m_pParent->SetEditData(DownHis_Code);
-			//SetWindowText(DownHis_Code);
-			
-			SetSel(0, -1);
+			OutputDebugString("[CCodeEdit] OnKeyDown VK_UP 빈상태 전종목\n");
+			GetParent()->GetParent()->PostMessage(
+				WM_EDIT_MSG, EDIT_MSG_SHOW_ALLCODEPOP, 0);
 			return;
+		}
+	}
+
+	switch (nChar)
+	{
+		case VK_UP :
+			//if (!m_pParent->GetDroppedState())
+			//{
+			//	DownHis_Code = m_pParent->GetHistCode(-1);
+			//	if (DownHis_Code.IsEmpty()) return;
+			//	m_pParent->SetEditData(DownHis_Code);
+		//
+			//	SetSel(0, -1);
+			//
+			//	return;
+			//}
+			break;
+		case VK_DOWN :
+			{
+				LRESULT lr = GetParent()->GetParent()->SendMessage(
+					WM_EDIT_MSG, EDIT_MSG_ARROW_DOWN, 0);
+
+				if (lr == 1)
+					return; // SearchPop 처리했으면 기본동작 막음
+
+				 // SearchPop 안보이면 → 히스토리 팝업
+				OutputDebugString("[CCodeEdit] OnKeyDown VK_DOWN 히스토리\n");
+				GetParent()->GetParent()->PostMessage(
+					WM_EDIT_MSG, EDIT_MSG_KEY_DOWN, 0);
+			}
+			//if (!m_pParent->GetDroppedState())
+			//{
+			//	DownHis_Code = m_pParent->GetHistCode(1);
+			//	if (DownHis_Code.IsEmpty()) return;
+			//	m_pParent->SetEditData(DownHis_Code);
+			//	//SetWindowText(DownHis_Code);
+			//
+			//	SetSel(0, -1);
+			//	return;
+			//}
+			break;
+		case VK_HANGUL:
+		case 0xE5:
+		{
+			GetParent()->GetParent()->PostMessage(
+				WM_EDIT_MSG, EDIT_MSG_HANGUL, 0);
 		}
 		break;
 	}
 	CDDEdit::OnKeyDown(nChar, nRepCnt, nFlags);
+}
+
+LRESULT CCodeEdit::OnInputLangChange(WPARAM wp, LPARAM lp)
+{
+	OutputDebugString("[CCodeEdit] OnInputLangChange\n");
+	// CControlWnd 에 통보
+	GetParent()->GetParent()->PostMessage(
+		WM_EDIT_MSG, EDIT_MSG_HANGUL, 0);
+	return Default();
 }
 
 void CCodeEdit::OnKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags) 
@@ -1001,173 +1047,138 @@ void CCodeEdit::OnKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags)
 	
 	if (nFlags == 0x8000) 		
 		return;
-	/*
-	if ((nChar == VK_UP)||(nChar == VK_DOWN))
-		return;
-	*/
-	
-	if ((nChar != VK_RETURN)||(nChar == VK_DOWN))
-	{
-		CString	sTmp;
-		int	len = 0;
 
-		GetWindowText(sTmp);
-		if (sTmp.IsEmpty())
-		{
-			((CControlWnd*)m_pParent->GetParent())->clean();
-			return;
-		}
+	//if ((nChar != VK_RETURN)||(nChar == VK_DOWN))
+	//{
+	//	CString	sTmp;
+	//	int	len = 0;
 
-		len = sTmp.GetLength();
-		if (len <= 0)
-		{
-			m_preCode = sTmp;
-			return;
-		}
-		
-		if (sTmp == m_preCode)
-			return;
-		
-		m_preCode = sTmp;
-		switch (m_Unit)
-		{
-		case GU_INDEX:
-			if (len == sz_INDEX && isHexNumeric(sTmp)) 
-			{	
-				m_pParent->SetEditData(sTmp);
-				m_pParent->m_pParent->SendMessage(WM_COMMAND, MAKEWPARAM(m_pParent->GetDlgCtrlID(), BN_CLICKED), (LPARAM)GetSafeHwnd());
-			}
-			break;
-		case GU_CODE:
-		case GU_ELWCODE:
-			if (isNumeric(sTmp) && sTmp.GetLength() > 6)
-			{
-				((CControlWnd*)m_pParent->GetParent())->clean();
-				return;
-			}
-			//TRACE("KeyUp: %s\n", sTmp);
-			//if (!isHexNumeric(sTmp) && m_Unit == GU_CODE)
-			if (!isHexNumeric2(sTmp) && m_Unit == GU_CODE && !m_pParent->IsExistThisCode(sTmp))
-			{
-				m_pParent->CodeListMode(sTmp);
-				if (!m_pParent->GetDroppedState())
-					m_pParent->ShowDropDown(false);
-				::SetCursor(AfxGetApp()->LoadStandardCursor(IDC_ARROW));
-				
-				m_pParent->SearchCode(sTmp);
-				return;
-			}
-			if ((len == sz_JCODE && m_bValidCheck 
-				&& (m_pParent->IsValidCode(sTmp)) || (m_bValidCheck && len >= sz_JCODE)))
-			{	
-				m_pParent->SetNormal();
-				GetParent()->SetWindowText(sTmp);
-				m_pParent->SetEditData(sTmp);
-				SetSel(0, -1);
-				if (m_pParent->GetDroppedState())
-					m_pParent->ShowDropDown(false, false);
-			}
-			else if (len >= sz_OPTION)
-			{
-				GetParent()->SetWindowText(sTmp);
-				m_pParent->SetEditData(sTmp);
-				SetSel(0, -1);
-				if (m_pParent->GetDroppedState())
-					m_pParent->ShowDropDown(false, false);
-			}
-			break;
-		case GU_FUTURE: 
-			if (!isHexNumeric(sTmp))
-			{
-//				m_pParent->CodeListMode();
-//				if (!m_pParent->GetDroppedState())
-//					m_pParent->ShowDropDown(TRUE);
-//				::SetCursor(AfxGetApp()->LoadStandardCursor(IDC_ARROW));
-//				m_pParent->SearchCode(sTmp);
-//				
-//				return;
-			}
-			if (len == 5 && (sTmp.GetAt(0) == '1' || sTmp.GetAt(0) == 'A'))	// 20230125 파생상품 코드 개편  '1', 'A' : 선물
-			{
-				sTmp += "000";
-				SetWindowText(sTmp);
-				SetSel(0, -1);
-				len = 8;
-			}
-			if (len == sz_FCODE)
-			{
-				GetParent()->SetWindowText(sTmp);
-				m_pParent->SetEditData(sTmp);
-//				m_pTarget->SendMessage(WM_COMMAND, MAKEWPARAM(GetParent()->GetDlgCtrlID(), CBN_SELENDOK), (LPARAM)GetParent()->GetSafeHwnd());
-				SetSel(0, -1);
-//				if (m_pParent->GetDroppedState())
-//					m_pParent->ShowDropDown(FALSE);
-			}
-			break;
-		case GU_FCODE:
-			if (len == sz_FOCODE)
-			{
-// 				GetParent()->SetWindowText(sTmp);
-// 				m_pParent->SetEditData(sTmp);
-// 				SetSel(0, -1);
+	//	GetWindowText(sTmp);
+	//	if (sTmp.IsEmpty())
+	//	{
+	//		((CControlWnd*)m_pParent->GetParent())->clean();
+	//		return;
+	//	}
 
-				GetParent()->SetWindowText(sTmp);
-				m_pParent->SetEditData(sTmp);
-				SetSel(0, -1);
-				if (m_pParent->GetDroppedState())
-					m_pParent->ShowDropDown(false, false);
-			}
-			break;
-		case GU_FOSTOCK:
-			if (len == sz_FOCODE)
-			{
+	//	len = sTmp.GetLength();
+	//	if (len <= 0)
+	//	{
+	//		m_preCode = sTmp;
+	//		return;
+	//	}
+	//	
+	//	if (sTmp == m_preCode)
+	//		return;
+	//	
+	//	m_preCode = sTmp;
+	//	switch (m_Unit)
+	//	{
+	//	case GU_INDEX:
+	//		if (len == sz_INDEX && isHexNumeric(sTmp)) 
+	//		{	
+	//			m_pParent->SetEditData(sTmp);
+	//			m_pParent->m_pParent->SendMessage(WM_COMMAND, MAKEWPARAM(m_pParent->GetDlgCtrlID(), BN_CLICKED), (LPARAM)GetSafeHwnd());
+	//		}
+	//		break;
+	//	case GU_CODE:
+	//	case GU_ELWCODE:
+	//		if (isNumeric(sTmp) && sTmp.GetLength() > 6)
+	//		{
+	//			((CControlWnd*)m_pParent->GetParent())->clean();
+	//			return;
+	//		}
+	//		if (!isHexNumeric2(sTmp) && m_Unit == GU_CODE && !m_pParent->IsExistThisCode(sTmp))
+	//		{
+	//			m_pParent->CodeListMode(sTmp);
+	//			if (!m_pParent->GetDroppedState())
+	//				m_pParent->ShowDropDown(false);
+	//			::SetCursor(AfxGetApp()->LoadStandardCursor(IDC_ARROW));
+	//			
+	//			m_pParent->SearchCode(sTmp);
+	//			return;
+	//		}
+	//		if ((len == sz_JCODE && m_bValidCheck 
+	//			&& (m_pParent->IsValidCode(sTmp)) || (m_bValidCheck && len >= sz_JCODE)))
+	//		{	
+	//			m_pParent->SetNormal();
+	//			GetParent()->SetWindowText(sTmp);
+	//			m_pParent->SetEditData(sTmp);
+	//			SetSel(0, -1);
+	//			if (m_pParent->GetDroppedState())
+	//				m_pParent->ShowDropDown(false, false);
+	//		}
+	//		else if (len >= sz_OPTION)
+	//		{
+	//			GetParent()->SetWindowText(sTmp);
+	//			m_pParent->SetEditData(sTmp);
+	//			SetSel(0, -1);
+	//			if (m_pParent->GetDroppedState())
+	//				m_pParent->ShowDropDown(false, false);
+	//		}
+	//		break;
+	//	case GU_FUTURE: 
+	//		if (!isHexNumeric(sTmp))
+	//		{
 
-			}
-		case GU_OPTION:
-			if (!isHexNumeric(sTmp))
-			{
-//				m_pParent->CodeListMode();
-//				if (!m_pParent->GetDroppedState())
-//					m_pParent->ShowDropDown(TRUE);
-//				::SetCursor(AfxGetApp()->LoadStandardCursor(IDC_ARROW));
-//				m_pParent->SearchCode(sTmp);
-//				
-//				return;
-			}
-		case GU_POPTION:
-			if (len == sz_OPTION)
-			{
-				GetParent()->SetWindowText(sTmp);
-				m_pParent->SetEditData(sTmp);
-//				m_pTarget->SendMessage(WM_COMMAND, MAKEWPARAM(GetParent()->GetDlgCtrlID(), CBN_SELENDOK), (LPARAM)GetParent()->GetSafeHwnd());
-				SetSel(0, -1);
-//				if (m_pParent->GetDroppedState() || !sTmp.IsEmpty())
-//					m_pParent->ShowDropDown(FALSE);
-			}
-			break;
-		case GU_FOCODE:
-			if (!isHexNumeric(sTmp))
-			{
-//				m_pParent->CodeListMode();
-//				if (!m_pParent->GetDroppedState())
-//					m_pParent->ShowDropDown(TRUE);
-//				::SetCursor(AfxGetApp()->LoadStandardCursor(IDC_ARROW));
-//				m_pParent->SearchCode(sTmp);
-//				
-//				return;
-			}
-			if (len == sz_FOCODE)
-			{
-				GetParent()->SetWindowText(sTmp);
-				m_pParent->SetEditData(sTmp);
-//				m_pTarget->SendMessage(WM_COMMAND, MAKEWPARAM(GetParent()->GetDlgCtrlID(), CBN_SELENDOK), (LPARAM)GetParent()->GetSafeHwnd());
-				SetSel(0, -1);
-				if (m_pParent->GetDroppedState() || !sTmp.IsEmpty())
-					m_pParent->ShowDropDown(false, false);
-			}
-			break;
-		}
-	}
+	//		}
+	//		if (len == 5 && (sTmp.GetAt(0) == '1' || sTmp.GetAt(0) == 'A'))	// 20230125 파생상품 코드 개편  '1', 'A' : 선물
+	//		{
+	//			sTmp += "000";
+	//			SetWindowText(sTmp);
+	//			SetSel(0, -1);
+	//			len = 8;
+	//		}
+	//		if (len == sz_FCODE)
+	//		{
+	//			GetParent()->SetWindowText(sTmp);
+	//			m_pParent->SetEditData(sTmp);
+	//			SetSel(0, -1);
+	//		}
+	//		break;
+	//	case GU_FCODE:
+	//		if (len == sz_FOCODE)
+	//		{
+	//			GetParent()->SetWindowText(sTmp);
+	//			m_pParent->SetEditData(sTmp);
+	//			SetSel(0, -1);
+	//			if (m_pParent->GetDroppedState())
+	//				m_pParent->ShowDropDown(false, false);
+	//		}
+	//		break;
+	//	case GU_FOSTOCK:
+	//		if (len == sz_FOCODE)
+	//		{
+
+	//		}
+	//	case GU_OPTION:
+	//		if (!isHexNumeric(sTmp))
+	//		{
+
+	//		}
+	//	case GU_POPTION:
+	//		if (len == sz_OPTION)
+	//		{
+	//			GetParent()->SetWindowText(sTmp);
+	//			m_pParent->SetEditData(sTmp);
+	//			SetSel(0, -1);
+	//		}
+	//		break;
+	//	case GU_FOCODE:
+	//		if (!isHexNumeric(sTmp))
+	//		{
+
+	//		}
+	//		if (len == sz_FOCODE)
+	//		{
+	//			GetParent()->SetWindowText(sTmp);
+	//			m_pParent->SetEditData(sTmp);
+	//			SetSel(0, -1);
+	//			if (m_pParent->GetDroppedState() || !sTmp.IsEmpty())
+	//				m_pParent->ShowDropDown(false, false);
+	//		}
+	//		break;
+	//	}
+	//}
 
 	m_bValidCheck = true;
 }
@@ -1177,7 +1188,7 @@ void CCodeEdit::OnLButtonDown(UINT nFlags, CPoint point)
 	CDDEdit::OnLButtonDown(nFlags, point);
 	//m_bFocusInit = TRUE;
 	m_pParent->SetAxFocus(true);
-	SetSel(0, -1);
+	//SetSel(0, -1);
 }
 
 BOOL CCodeEdit::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt) 
@@ -1192,10 +1203,30 @@ BOOL CCodeEdit::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
 
 void CCodeEdit::OnSetFocus(CWnd* pOldWnd) 
 {
+	HIMC hImc = ImmGetContext(m_hWnd);
+	if (hImc)
+	{
+		DWORD dwConversion = 0, dwSentence = 0;
+		ImmGetConversionStatus(hImc, &dwConversion, &dwSentence);
 
-	//KillTimer(TID_CHANGEHANGLE);
-	//SetTimer(TID_CHANGEHANGLE, 10, NULL);	
-	SetSel(0, -1);	
+		if (m_pParent->m_bHangulMode)
+			dwConversion |= IME_CMODE_HANGEUL;
+		else
+			dwConversion &= ~IME_CMODE_HANGEUL;
+
+		ImmSetConversionStatus(hImc, dwConversion, dwSentence);
+		ImmReleaseContext(m_hWnd, hImc);
+
+
+		m_pParent->Invalidate();
+
+		CString slog;
+		slog.Format("[CCodeEdit] OnSetFocus  m_bHangulMode=%d\n",
+			(int)m_pParent->m_bHangulMode);
+		OutputDebugString(slog);
+	}
+
+	SetSel(0, -1);
 	CDDEdit::OnSetFocus(pOldWnd);
 }
 
@@ -1334,20 +1365,32 @@ void CCodeEdit::OnMouseMove(UINT nFlags, CPoint point)
 
 void CCodeEdit::OnKillFocus(CWnd* pNewWnd) 
 {
-	CDDEdit::OnKillFocus(pNewWnd);	
-	
-	//if (m_bFocusInit == TRUE)	
-	//{
-	//	if (pNewWnd->GetSafeHwnd() != this->GetSafeHwnd())
-	//	{
-	//		SetFocus();
-	//		SetSel(0,-1);
-	//
-	//		m_pParent->SetFocus();
-	//	}
-	//	
-	//	m_bFocusInit = FALSE;
-	//}
+
+	HIMC hImc = ImmGetContext(m_hWnd);
+	if (hImc)
+	{
+		DWORD dwConversion = 0, dwSentence = 0;
+		ImmGetConversionStatus(hImc, &dwConversion, &dwSentence);
+		m_pParent->m_bHangulMode = (dwConversion & IME_CMODE_HANGEUL) ? TRUE : FALSE;
+
+		CString slog;
+		slog.Format("[CCodeEdit] OnKillFocus  m_bHangulMode=%d\n",
+			(int)m_pParent->m_bHangulMode);
+		OutputDebugString(slog);
+
+		ImmReleaseContext(m_hWnd, hImc);
+	}
+
+	CDDEdit::OnKillFocus(pNewWnd);
+
+	CString slog;
+	slog.Format("[CCodeEdit] OnKillFocus pNewWnd=0x%p\n",
+		pNewWnd ? pNewWnd->GetSafeHwnd() : NULL);
+	OutputDebugString(slog);
+
+	GetParent()->GetParent()->PostMessage(
+		WM_EDIT_MSG, EDIT_MSG_KILLFOCUS,
+		(LPARAM)(pNewWnd ? pNewWnd->GetSafeHwnd() : NULL));
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -1407,10 +1450,34 @@ BEGIN_MESSAGE_MAP(CfxCodeCtrl, 	CCodeCombo)
 	ON_BN_CLICKED(IDC_CTRL_DOWN, OnBtnDown)
 	ON_BN_CLICKED(IDC_CODE, OnCodeDown)
 	ON_BN_CLICKED(IDC_LIST, OnListDown)
+	ON_EN_CHANGE(IDC_EDIT, OnChangeEdit)
+	ON_WM_TIMER()
 END_MESSAGE_MAP()
 
 
 /////////////////////////////////////////////////////////////////////////////
+ void CfxCodeCtrl::OnChangeEdit()
+{
+	 if (!m_pEdit) return;
+
+	 CString sText;
+	 m_pEdit->GetWindowText(sText);
+	 sText.TrimRight();
+	 // 이전과 같으면 무시
+	 if (sText == m_sPrevText) return;
+	 m_sPrevText = sText;
+
+	 OutputDebugString("[CfxCodeCtrl] OnChangeEdit text=" + sText + "\n");
+
+	 if (((CControlWnd*)m_pParent)->m_bSettingCode)
+		 return;
+
+
+	 if (m_pParent)
+		 ((CControlWnd*)m_pParent)->SendMessage(
+			 WM_EDIT_MSG, EDIT_MSG_CHAR,
+			 (LPARAM)(LPCTSTR)sText);
+}
 // CfxCodeCtrl message handlers
 BOOL CfxCodeCtrl::Create(CWnd* parent, CRect rect, UINT id)
 {
@@ -1428,7 +1495,7 @@ int CfxCodeCtrl::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		return -1;
 
 	m_pEdit = std::make_unique<CCodeEdit>(this, m_pWizard);
-	m_pEdit->Create(ES_AUTOHSCROLL|WS_VISIBLE|WS_CHILD|ES_UPPERCASE, CRect(0,0,10,10), this, IDC_EDIT);
+	m_pEdit->Create(ES_AUTOHSCROLL|WS_VISIBLE|WS_CHILD, CRect(0,0,10,10), this, IDC_EDIT);
 	m_pEdit->m_bValidCheck = m_bValidCheck;
 	
 
@@ -1472,39 +1539,29 @@ void CfxCodeCtrl::LButtonUp()
 
 void CfxCodeCtrl::OnPaint() 
 {
-	CPaintDC dc(this); // device context for painting
-
+	CPaintDC dc(this);
 	if (!m_pParent) return;
 
-	CRect	WinRC;
+	CRect WinRC;
 	GetClientRect(&WinRC);
 
-	CRect	btnRect;
-	if (((CControlWnd*)m_pParent)->m_bSearch)
-		WinRC.right -= (19+btnRect.Width());  
-	else
-		WinRC.right -= btnRect.Width(); 
-
-	CPen pn; pn.CreatePen(PS_SOLID, 1, RGB(149,159,172));
-	dc.SelectObject(&pn);
-	
+	// 배경
 	if (IsWindowEnabled())
-	{
-		dc.SelectObject(&m_backColor);
-		//dc.FillSolidRect(WinRC, CLR_BACKCOLOR);
-	}
+		dc.FillSolidRect(&WinRC, CLR_BACKCOLOR);
 	else
-	{
-		dc.SelectObject(&m_NObackColor);
-		//dc.FillSolidRect(WinRC, CLR_NOBACKCOLOR);
-	}
-	
-	dc.Rectangle(WinRC);
-//	dc.DrawEdge(&WinRC, EDGE_SUNKEN, BF_RECT);   
-	/*
-	dc.Draw3dRect(WinRC, ((CControlWnd*)GetParent())->GetIndexColor(110),
-			     ((CControlWnd*)GetParent())->GetIndexColor(111));
-	*/
+		dc.FillSolidRect(&WinRC, CLR_NOBACKCOLOR);
+
+	// 테두리 - 멤버변수로 판단
+	COLORREF clrBorder = m_bHangulMode
+		? RGB(255, 0, 0)
+		: RGB(149, 159, 172);
+
+	CString slog;
+	slog.Format("[OnPaint] m_bHangulMode=%d clrBorder=0x%06x\n",
+		m_bHangulMode, clrBorder);
+	OutputDebugString(slog);
+
+	dc.Draw3dRect(&WinRC, clrBorder, clrBorder);
 }
 
 void CfxCodeCtrl::OnSetFocus(CWnd* pOldWnd) 
@@ -1520,43 +1577,16 @@ void CfxCodeCtrl::OnSetFocus(CWnd* pOldWnd)
 void CfxCodeCtrl::OnSize(UINT nType, int cx, int cy) 
 {
 	CWnd::OnSize(nType, cx, cy);
-	CRect	rect, editRC, btnRC;
+	CRect	rect, editRC;
 	GetClientRect(&rect);
 
-	//rect.DeflateRect(1,1);
-	editRC = btnRC = rect;
-	
-	
-	//btnRC.left = btnRC.right - editRC.Height()-3+1;/*19*/;
-	////btnRC.bottom = 21;
-	////if ((btnRC.Width()/rect.Width()) > 18/65) 
-	//if (m_Unit == GU_FCODE || m_Unit == GU_FUTURE || m_Unit == GU_OPTION || m_Unit == GU_FOCODE)
-	//	btnRC.left = rect.Width()-rect.Width()*18/80-1;
-	//else
-	//	btnRC.left = rect.Width()-rect.Width()*18/65-1;
-	//
-
-	//btnRC.OffsetRect(-17/*-16*/, 0);
-	//btnRC.right -= 2;
-
-	//
-
-	//editRC.right = btnRC.left;
-	//editRC.left += 2;
-	//editRC.top += 6;
+	editRC = rect;
 
 	if (m_pEdit) 
 	{
-		
-		
-	//	if (((CControlWnd*)m_pParent)->m_bSearch)
-			m_pEdit->MoveWindow(editRC.left, editRC.top , editRC.Width()-1, editRC.Height() - 2);
-	//	else
-	//		m_pEdit->MoveWindow(editRC.left, editRC.top , editRC.Width()-1+19, editRC.Height() - 2);
-		
-		//ResizeEdit(editRC.Width()+editRC.Height(), editRC.Height());
-	
-
+		editRC.SetRect(rect.left, rect.top, rect.Width() - 5, rect.Height() - 6);
+		editRC.OffsetRect(3, 4);
+		m_pEdit->MoveWindow(editRC);
 	}
 	
 }
@@ -1623,6 +1653,22 @@ void CfxCodeCtrl::SetEditData(CString sData, bool bflag, bool bfocus)
 	{
 		return;
 	}
+	sData.TrimLeft();
+	sData.TrimRight();
+	m_pEdit->SetWindowText(sData);
+
+	FireChangeEvent();
+
+	if (bflag)
+		return;
+
+	// 커서 맨 끝으로
+	int nLen = sData.GetLength();
+	//m_pEdit->PostMessage(EM_SETSEL, nLen, nLen);
+	m_sPendingData = sData;
+	SetTimer(TM_SET_CURSOR, 50, NULL);
+	return;
+
 
 	if (sData.Find("FOCUS") > -1)
 	{
@@ -2151,24 +2197,24 @@ CString CfxCodeCtrl::GetSymbol()
 
 void CfxCodeCtrl::SetListCode(CString sData)
 {
-	m_arrList.RemoveAll();
-	m_nIndex = 0;
+	//m_arrList.RemoveAll();
+	//m_nIndex = 0;
 
-	while (!sData.IsEmpty())
-		m_arrList.Add(((CControlWnd*)m_pParent)->Parser(sData, "\n"));
-	
+	//while (!sData.IsEmpty())
+	//	m_arrList.Add(((CControlWnd*)m_pParent)->Parser(sData, "\n"));
+	//
 
-	const	int	cy{};
+	//const	int	cy{};
 
-	if (m_arrList.GetSize())
-	{
-		SetEditData(m_arrList.GetAt(0));
-		m_pEdit->SetSel(0, -1);
-		m_pEdit->SetFocus();
-	}
+	//if (m_arrList.GetSize())
+	//{
+	//	SetEditData(m_arrList.GetAt(0));
+	//	m_pEdit->SetSel(0, -1);
+	//	m_pEdit->SetFocus();
+	//}
 
-	m_bHistory = false;
-	Invalidate();
+	//m_bHistory = false;
+	//Invalidate();
 }
 
 void CfxCodeCtrl::SetNormal()
@@ -2179,70 +2225,62 @@ void CfxCodeCtrl::SetNormal()
 
 void CfxCodeCtrl::OnBtnDown()
 {
-	if (m_arrList.GetSize() <= 0)
-		return;
-	SetValidCheck(false);
-	if (m_nIndex < m_arrList.GetSize() - 1)	m_nIndex++;
-	SetEditData(m_arrList.GetAt(m_nIndex));
-	m_pEdit->SetSel(0, -1);
+	//if (m_arrList.GetSize() <= 0)
+	//	return;
+	//SetValidCheck(false);
+	//if (m_nIndex < m_arrList.GetSize() - 1)	m_nIndex++;
+	//SetEditData(m_arrList.GetAt(m_nIndex));
+	//m_pEdit->SetSel(0, -1);
 }
 
 void CfxCodeCtrl::OnBtnUp()
 {
-	if (m_arrList.GetSize() <= 0)
-		return;
+	//if (m_arrList.GetSize() <= 0)
+	//	return;
 
-	SetValidCheck(false);
-	if (m_nIndex > 0)	m_nIndex--;
-	SetEditData(m_arrList.GetAt(m_nIndex));
-	m_pEdit->SetSel(0, -1);
+	//SetValidCheck(false);
+	//if (m_nIndex > 0)	m_nIndex--;
+	//SetEditData(m_arrList.GetAt(m_nIndex));
+	//m_pEdit->SetSel(0, -1);
 }
 
 void CfxCodeCtrl::OnCodeDown()
 {
-	CString	code, str;
-	UINT	flags = allCODE;
-	int	type = 0;
-	CPoint pt(0,0);  //test
+	//CString	code, str;
+	//UINT	flags = allCODE;
+	//int	type = 0;
+	//CPoint pt(0,0);  //test
 
-	ClientToScreen(&pt);
-	m_updnIndex = 1;
+	//ClientToScreen(&pt);
+	//m_updnIndex = 1;
 
-	/*
-	if (m_Unit == GU_ELWCODE)
-	{
-		str.Format("hdselwdg/S/s/t?/P%d", MAKELONG(pt.x,pt.y));
-		((CControlWnd*)m_pParent)->OpenView(str, typePOPUP);
-	}
-	else
-	*/
-	{
-		switch (m_Unit)
-		{
-		case GU_CODE:		flags = allCODE;		   break;	// 주식
-		case GU_FUTURE:		flags = futureCODE;		   break;	// 선물 
-		case GU_OPTION:		flags = optionCODE;		   break;	// 옵션 
-		case GU_POPTION:	flags = koptionCODE;		   break;	// 주식 옵션 
-		case GU_FOCODE:		flags = foptionCODE;	type = 2;  break;	// 선물 + 옵션 
-		case GU_INDEX:		flags = indexCODE;		   break;	// 업종 
-		case GU_SCODE:		flags = sinjuCODE;	type = 4;  break;	// 신주인수권 
-		case GU_BOND:		flags = goodFOCODE;		   break;	// 채권 
-		case GU_SBOND:		flags = smbondCODE;		   break;	// 소매채권
-		case GU_ELWCODE:	flags = elwCODE;		   break;	// elwcode
-		case GU_FCODE:		flags = sfCODE;		type = 20; break;	// 주식선물
-		case GU_FOSTOCK:	flags = sfCODE;		type = 52; break;	// 주식선물 + 옵션 
-		case GU_FOREIGN:	flags = usCODE;		break;
-		case GU_JCODE:		flags = thirdCODE;  break;	// 수익증권 
-		default:		break;
-		}
-		
-		code = (char*)m_pWizard->SendMessage(WM_USER, MAKEWPARAM(codeDLL, MAKEWORD(flags, type)), 
-							      MAKELPARAM(pt.x, pt.y));
-		SetValidCheck(false);
-		if (!code.IsEmpty())
-			SetEditData(((CControlWnd*)m_pParent)->Parser(code, "\t"));
-		m_Name = code;
-	}
+	//{
+	//	switch (m_Unit)
+	//	{
+	//	case GU_CODE:		flags = allCODE;		   break;	// 주식
+	//	case GU_FUTURE:		flags = futureCODE;		   break;	// 선물 
+	//	case GU_OPTION:		flags = optionCODE;		   break;	// 옵션 
+	//	case GU_POPTION:	flags = koptionCODE;		   break;	// 주식 옵션 
+	//	case GU_FOCODE:		flags = foptionCODE;	type = 2;  break;	// 선물 + 옵션 
+	//	case GU_INDEX:		flags = indexCODE;		   break;	// 업종 
+	//	case GU_SCODE:		flags = sinjuCODE;	type = 4;  break;	// 신주인수권 
+	//	case GU_BOND:		flags = goodFOCODE;		   break;	// 채권 
+	//	case GU_SBOND:		flags = smbondCODE;		   break;	// 소매채권
+	//	case GU_ELWCODE:	flags = elwCODE;		   break;	// elwcode
+	//	case GU_FCODE:		flags = sfCODE;		type = 20; break;	// 주식선물
+	//	case GU_FOSTOCK:	flags = sfCODE;		type = 52; break;	// 주식선물 + 옵션 
+	//	case GU_FOREIGN:	flags = usCODE;		break;
+	//	case GU_JCODE:		flags = thirdCODE;  break;	// 수익증권 
+	//	default:		break;
+	//	}
+	//	
+	//	code = (char*)m_pWizard->SendMessage(WM_USER, MAKEWPARAM(codeDLL, MAKEWORD(flags, type)), 
+	//						      MAKELPARAM(pt.x, pt.y));
+	//	SetValidCheck(false);
+	//	if (!code.IsEmpty())
+	//		SetEditData(((CControlWnd*)m_pParent)->Parser(code, "\t"));
+	//	m_Name = code;
+	//}
 }
 
 void CfxCodeCtrl::OnListDown()
@@ -2288,7 +2326,7 @@ void CCodeEdit::OnTimer(UINT nIDEvent)
 		m_pParent->m_pParent->PostMessage(WM_KEYDOWN, VK_RETURN, 0);
 		m_pParent->FireChangeEvent();
 		*/
-	}
+	} 
 
 	CDDEdit::OnTimer(nIDEvent);
 }
@@ -2690,4 +2728,22 @@ bool CCodeCombo::NJCodeLoad(CString tabPath)
 	pWb.reset();
 
 	return true;
+}
+
+void CfxCodeCtrl::OnTimer(UINT_PTR nIDEvent)
+{
+	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
+	if (nIDEvent == TM_SET_CURSOR)
+	{
+	KillTimer(TM_SET_CURSOR);
+	if (m_pEdit && m_pEdit->GetSafeHwnd())
+	{
+		int nLen = m_sPendingData.GetLength();
+		m_pEdit->SetFocus();
+		m_pEdit->SetSel(nLen, nLen);
+		OutputDebugString("[CfxCodeCtrl] TM_SET_CURSOR SetSel\n");
+	}
+	return;
+	}
+	CCodeCombo::OnTimer(nIDEvent);
 }

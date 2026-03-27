@@ -41,14 +41,27 @@
 #define EDIT_MSG_FOCUS      1   // 포커스 받음
 #define EDIT_MSG_KILLFOCUS  2   // 포커스 잃음
 #define EDIT_MSG_HANGUL     3   // 한영 상태 변경
+#define EDIT_MSG_CHAR		 4
+#define EDIT_MSG_ARROW_DOWN 5
+#define EDIT_MSG_SHOW_HISTORYPOP 6
+#define EDIT_MSG_SHOW_ALLCODEPOP 7
+#define EDIT_MSG_KEY_DOWN 8
 
 #define WM_POPLISTWINDOW  (WM_USER + 300)
 #define WM_EDIT_MSG     (WM_USER + 500)
 
+#define POPLIST_EDIT_FOCUS 8
+#define POPLIST_REMOVE 7
+#define POPLIST_ENTER 6
 #define POPLIST_DBCLICKCODE 5
 #define POPLIST_CLEARALL 4
 #define POPLIST_CREATE 1
 #define POPLIST_SHOW  2
 #define POPLIST_HIDE 3
+
+#define POPUP_TYPE_HISTORY  0  // 히스토리 팝업
+#define POPUP_TYPE_SEARCH   1  // 검색 팝업
+
+#include "../../H/jmcode.h"
 
 void Msg(char* fmt, ...);

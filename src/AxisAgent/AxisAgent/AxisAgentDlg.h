@@ -61,6 +61,10 @@ public:
 	DWORD  m_parentPid;
 	HANDLE m_hPingThread;
 
+	int        m_dumpSeq = 0;
+	int        m_dumpCount = 0;
+	ULONGLONG  m_lastDumpTick = 0;
+
 	// 멤버변수
 	DWORD   m_dwMainThreadId = 0;       // 메인 스레드 ID
 	HANDLE  m_hMonitorThread = NULL;
@@ -68,23 +72,25 @@ public:
 	static DWORD WINAPI MonitorThreadProc(LPVOID pParam);
 	void MonitorLoop();
 
-	// CPU 계산
-	float CalcCpuUsage(FILETIME& prevKernel, FILETIME& prevUser,
-		FILETIME  curKernel, FILETIME  curUser);
+	float CalcProcessCpuUsage(
+		FILETIME& prevKernel, FILETIME& prevUser,
+		FILETIME  curKernel, FILETIME  curUser,
+		ULONGLONG& prevTickMs,
+		ULONGLONG  curTickMs);
 
-	// 덤프 생성
+	float CalcThreadCpuUsage(
+		FILETIME& prevKernel, FILETIME& prevUser,
+		FILETIME  curKernel, FILETIME  curUser,
+		ULONGLONG& prevTickMs,
+		ULONGLONG  curTickMs);
+
 	void CreateDump(const char* reason);
-
-	// 덤프 분석
 	void AnalyzeDump(const char* dumpPath);
-
-	// 모니터링 로그
 	void WriteMonitorLog(const char* msg);
 
-	// FILETIME 빼기 헬퍼
 	static ULONGLONG FileTimeToULL(const FILETIME& ft)
 	{
-		return ((ULONGLONG)ft.dwHighDateTime << 32) | ft.dwLowDateTime;
+		return (static_cast<ULONGLONG>(ft.dwHighDateTime) << 32) | ft.dwLowDateTime;
 	}
 
 
@@ -122,4 +128,7 @@ protected:
 
 	afx_msg BOOL OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCds); // HTS → Agent
 	afx_msg void OnDestroy();
+public:
+	afx_msg void OnBnClickedBtnTest();
+	afx_msg void OnTimer(UINT_PTR nIDEvent);
 };

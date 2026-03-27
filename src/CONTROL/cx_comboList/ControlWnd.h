@@ -66,6 +66,7 @@ public:
 
 	std::unique_ptr<CfxCodeCtrl>	m_pCodeCtrl;
 	std::unique_ptr<CPopListWnd> m_pListPop;
+	std::unique_ptr<CPopListWnd> m_pSearchPop{};  // 검색 팝업
 
 	std::unique_ptr<CfxImgButton>   m_pBtnDrop;
 	std::unique_ptr<CfxImgButton> m_pBtnLang{};
@@ -78,7 +79,7 @@ public:
 	int         m_nBtnWidth = 20;  
 	int         m_nHeight ; 
 	int		 m_nBtnWidthOrig; // 최초 버튼 너비
-	int		 m_nBtnLangWidth = 10; // m_pBtnDrop 절반
+	int		 m_nBtnLangWidth = 20; // m_pBtnDrop 절반
 
 	CSize m_szOriginal;  // 최초 생성 시 크기 저장
 protected:
@@ -170,32 +171,46 @@ protected:
 	//}}AFX_DISPATCH
 	DECLARE_DISPATCH_MAP()
 	DECLARE_INTERFACE_MAP()
-private:
-	bool Resize();
 
-
-
-	CRect m_rcTarget{};
-	BOOL m_bDropVisible{};
-	DWORD m_dwHideTime = 0;  // 팝업 닫힌 시간 저장
-	CString m_sItems;
-	void ShowDropList(bool bShow);
-	void UpdateLangBtn();
+public:
 	struct CodeItem
 	{
 		CString sCode;  // "000660"
 		CString sName;  // "SK하이닉스"
 	};
 
-	// CControlWnd.h
 	std::vector<CodeItem>           m_vecItems;  // 순서 유지
 	std::map<CString, int>          m_mapItems;  // 코드 → 인덱스 (빠른 검색)
 	CString m_sHistoryFile;  // 히스토리 파일 경로
 	CString m_sSection;   //파일내부 섹션
+	CString m_sOption{};
+private:
+	bool Resize();
+
+	CRect m_rcTarget{};
+	CString m_sItems;
+	void	   ShowDropList(bool bShow);
+	void	   UpdateLangBtn();
 	void    LoadHistory();
 	void    SaveHistory();
-	void    AddItem(CString sCode, CString sName);
+	
 	void    RemoveItem(CString sCode);
 	void    ClearItems();
 	CString GetItemsString(); // CPopListWnd 에 넘길 문자열 생성
+
+	vector<struct sfcode> m_fjcode{};
+	CMapStringToString	m_mapCodeToGichoName{};
+	CMapStringToString	m_mapGichoNameToCode{};
+	void LoadMaster();
+
+
+	void    SearchCode(CString sText);
+	CString BuildSearchItems(CString sText);
+	BOOL	 IsHangul(const CString& sText); // ← TCHAR 대신 CString
+	BOOL    IsNumber(TCHAR ch);
+	BOOL    MatchChosung(CString sFindChosung, CString sName);
+
+public:
+	BOOL m_bSettingCode{};
+	void    AddItem(CString sCode, CString sName, bool bSave = true);
 };
