@@ -1,0 +1,159 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB590000)
+MAPSIZE(650, 862)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(0)
+MAPDESC("해외주식 환전")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(FLASH|CR2TAB)
+TITLE("해외주식 환전")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(FIXED)
+HEADER(NOP)
+BGROUND(BRUSH, 66)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL0(0, 0, 870, 420)        COLOR(66, 130)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL7(0, 624, 865, 650)  LIMAGE(1)  LINEW(3)  STRESS(0)  STRESSW(0)  LINETYPE(4)  LINECOLOR(64)      COLOR(34, 69)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  pswd(325, 5, 385, 25)  LEN(8)  IO_MIXED|EDIT_INPUT|FA_PASSWD|FA_WRAP|FA_SKIP|FA_ENUM    COLOR(192, 130)  CUR(0)  TP_SUNKEN    ENCRYPT("en_accn")        TABORDER(2)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL3(274, 5, 322, 25)  '비밀번호'  AL_LEFT  CUR(0)      COLOR(208, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+CONTROL  AN3A(57, 5, 197, 25)  |FA_SKIP  "CX_Account"  "/w0/q1"  LEN(11)  EDIT_INPUT    COLOR(68, 130)  TABORDER(1)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  ACNM(199, 5, 263, 25)  LEN(20)  IO_MIXED|AL_LEFT||FA_SKIP    COLOR(49, 130)  CUR(0)  LINECOLOR(48)          TABORDER(0)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL6(8, 5, 56, 25)  '계좌번호'  AL_LEFT  CUR(0)      COLOR(208, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+BUTTON  b_send(825, 5, 861, 25)  '조회'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, BOLD)  COLOR(208, 186)  CUR(0)    "조회BTN.BMP"    TABORDER(3)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+EDIT  en_accn(922, 147, 1022, 167)  LEN(11)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 69)  CUR(0)  TP_SUNKEN          TABORDER(4)  IOORDER(4)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL20(919, 125, 992, 145)  '암호화'  AL_CENTER  CUR(0)      COLOR(141, 192)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  obj_exchange(0, 25, 454, 395)    "IB590010"  TABORDER(5)  IOORDER(5)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  SND(788, 5, 824, 25)  '환전'  TP_PUSH|IMAGETEXT|AL_STRETCH        FOCUS  COLOR(208, 186)  CUR(0)    "2btn.bmp"    TABORDER(6)  &
+  IMAGETEXT  HINTTYPE(IH_NONE)
+OBJECT  obj_exrate(454, 225, 864, 395)    "IB590020"  TABORDER(7)  IOORDER(6)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  obj_acccur(454, 55, 864, 225)    "IB590030"  TABORDER(8)  IOORDER(7)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  GUIDE(30, 627, 860, 647)        COLOR(34, 130)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+PANEL  PANEL8(15, 630, 29, 644)    |IMAGE|AL_STRETCH    COLOR(208, 232)  CUR(0)    "알림_ic.bmp"  ENABLE  &
+  VISIBLE  TRANSPARENT  IMAGE  HINTTYPE(IH_NONE)
+PANEL  PANEL1(445, 30, 865, 55)        COLOR(181, 232)  CUR(0)    RESIZABLE  AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  obj_list(0, 395, 864, 625)    "IB590060"  TABORDER(9)  IOORDER(8)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Sub Set_account()
+	SCREEN.ClearAll 0, 2
+	pswd.Clear
+	obj_exrate.ClearAll 0
+	obj_acccur.ClearAll 0
+	obj_exchange.ClearAll 0
+
+	GUIDE.Text = ""
+
+	ACNM.Data = AN3A.name
+	pswd.Data = AN3A.Password
+	If Trim(AN3A.Data) = "" Then
+		AN3A.SetFocus
+		Exit Sub
+	End If
+
+	If Trim(pswd.Data) = "" Then
+		pswd.SetFocus
+		Exit Sub
+	End If
+
+	send_f()
+End Sub
+
+Sub send_f()
+	If Len(Trim(AN3A.Data)) <> 11 Then
+		GUIDE.Text = "계좌번호를 확인하여 주십시오."
+		AN3A.SetFocus()
+		Exit Sub
+	End If
+
+	If Len(Trim(pswd.Data)) < 4 Then
+		GUIDE.Text = "비밀번호를 확인하여 주십시오."
+		pswd.SetFocus
+		Exit Sub
+	End If
+
+	SCREEN.Proc "obj_acccur.send_f", ""
+	SCREEN.Proc "obj_exrate.send_f", ""
+	SCREEN.Proc "obj_list.send_f", ""
+
+
+	' 계좌 클리어 시 재조회
+	' 은행으로부터 해당 화폐의 매도/매수에 대한 고시 환율을 조회(SDPKT169)한 다음
+	' 해당 고시환율에 대한 적용환율을 코스콤으로부터 조회(SDPDQ099)
+	SCREEN.Proc "obj_exchange.Clear_Input", ""
+	SCREEN.Object("obj_exchange.obj_srhreate").Send
+
+End Sub
+
+_AW_ONINDECLARE_AW_
+#load IB888888
+#load IB888833
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(pswd)
+_AW_ONKEYCHANGE_AW_
+If SCREEN.Key = 13 Then
+	Call send_f()
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(AN3A)
+_AW_ONCHANGE_AW_
+Call Set_account()	'-- 계좌명, 비밀번호 설정
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(b_send)
+_AW_ONCLICK_AW_
+Call send_f()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(SND)
+_AW_ONCLICK_AW_
+SCREEN.Proc "obj_exchange.send_f", "1"
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+
