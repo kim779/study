@@ -154,6 +154,7 @@ int __stdcall STSDKEX_EventCallback(long lCode, void* pParam, long lParamSize);
 #define TM_STAFF_OPENNOPOACC 9062  //직원용계좌확인은 HTS 시작할때는 안함
 #define TM_MAIN_RTS_TEST 9063
 #define TM_MAIN_RTS_PUSH 9064
+#define TM_NOTICE_POP 9065
 
 #define	COLOR_TB		RGB(238, 238, 238)
 
@@ -1785,6 +1786,15 @@ public:
 	void ReadManageMapInfo();
 	int ScreenCheck(CString mapname, int igubn = 0);
 	CString FindKeyByTargetAndType(const CString& strTargetKey, int nType);
+	void HandleScreenPopup(const CString& sPopType, const CString& sPopMap, const CString& sUrl, int itimer = 0);
+	bool IsGuidePopupTime() const;
+	CString GetTodayYmd() const;
+	bool IsManagerUser() const;
+	bool IsDebugUser() const;
+
+	CString m_sNoticePopMap{};
+	CString m_sNoticePopType{};
+
 
 	//장운영정보 처리
 	std::map<CString, CString> _mapMngInfo;

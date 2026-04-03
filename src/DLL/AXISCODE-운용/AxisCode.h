@@ -10,9 +10,17 @@
 #include "resource.h"		// main symbols
 #include "../../h/jmcode.h"
 #include <afxtempl.h>
+#include "user.h"
 
 //using HCODE  = struct hjcode;
 using HCODEX = struct hjcodex;
+
+//typedef struct FCode
+//{
+//	CString code;
+//	CString name;
+//	char	mchk{};
+//} FCODE;
 
 typedef struct listitem
 {
@@ -127,6 +135,7 @@ public:
 	BOOL	LoadETFCode();
 	BOOL    loadCJCode();
 	int	GetVirtualScreenX();
+	BOOL	LoadFCode();
 
 public:
 	CString m_root;
@@ -142,6 +151,11 @@ public:
 	std::map<CString, std::pair<CString, int>>	      _mapACODE;
 	std::map<CString, CString>			      _mapNAME;
 	std::vector<std::tuple<CString, CString, char, char>> _vBond;
+
+
+	CArray<FCODE, FCODE>		_m_arrayFcode;
+	CArray<ojcode, ojcode>		_m_arrayOcode;
+	CArray<PCODE, PCODE>		_m_arrayPcode;
 
 private:
 	std::unique_ptr<char[]> m_hcB;

@@ -486,7 +486,7 @@ BOOL CPopListWnd::CreateListBox(CString items, int nPopWidth)
 
         // 3. 너비 계산
         const int nCodeW = max(sz.cx + 10, 50);
-        const int nBtnW = 24;
+        const int nBtnW = 17;
         CRect rcPop;
         GetClientRect(&rcPop);
         const int nTotalW = nTotal - nScrollW;
@@ -552,14 +552,9 @@ BOOL CPopListWnd::CreateListBox(CString items, int nPopWidth)
     m_pBtnClear = std::make_unique<CfxImgButton>();
     m_pBtnClear->Create("전체 삭제", rcBtn, this, ID_BTN_CLEAR);
     m_pBtnClear->LoadPng(
-        m_pParent->m_sRoot + "\\image\\btn_clear.png",
-        m_pParent->m_sRoot + "\\image\\btn_clear_dn.png",
-        m_pParent->m_sRoot + "\\image\\btn_clear_hv.png");
-
-    CString slog;
-    slog.Format("[CPopListWnd] CreateListBox 완료 type=%d\n", m_nType);
-    OutputDebugString(slog);
-    slog.Format("[CPopListWnd] %s\n", m_pParent->m_sRoot + "\\image\\btn_clear.png");
+        m_pParent->m_sRoot + "\\image\\AxAllDelete.png",
+        m_pParent->m_sRoot + "\\image\\AxAllDelete_DN.png",
+        m_pParent->m_sRoot + "\\image\\AxAllDelete_EN.png");
 
     return TRUE;
 }
@@ -746,7 +741,7 @@ void CPopListWnd::OnSize(UINT nType, int cx, int cy)
         int  nScrW = bVScroll ? nScrollW : 0;
 
         const int nCodeW = 70;
-        const int nBtnW = 24;
+        const int nBtnW = 17;
         const int nNameW = max(nListW - nCodeW - nBtnW - nScrW, 60);
 
         m_pCodelist->SetColumnWidth(0, nCodeW);
@@ -781,11 +776,15 @@ void CPopListWnd::OnBtnClear()
 
     if (!m_pCodelist || !m_pCodelist->GetSafeHwnd()) return;
 
+    if (m_pParent && m_pParent->GetSafeHwnd())
+        if (m_nPopupType == POPUP_TYPE_SEARCH)
+            return;
+
     m_pCodelist->DeleteAllItems();
 
     // 부모에 전체삭제 통보
     if (m_pParent && m_pParent->GetSafeHwnd())
-        m_pParent->PostMessage(WM_POPLISTWINDOW, POPLIST_CLEARALL, 0);
+            m_pParent->PostMessage(WM_POPLISTWINDOW, POPLIST_CLEARALL, 0);
 }
 
 void CPopListWnd::RefreshList(CString items)
@@ -829,7 +828,7 @@ void CPopListWnd::RefreshList(CString items)
     if (pOldFont) dc.SelectObject(pOldFont);
 
     const int nCodeW = sz.cx + 10;
-    const int nBtnW = 24;
+    const int nBtnW = 17;
 
     BOOL bVScroll = IsVScrollVisible(arr.GetCount());
     int nScrollW = bVScroll ? GetSystemMetrics(SM_CXVSCROLL) : 0;

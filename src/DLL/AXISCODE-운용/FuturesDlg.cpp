@@ -128,6 +128,18 @@ CFuturesDlg::CFuturesDlg(int kind, CPoint pt, int type /*= 0*/, CWnd* pParent /*
 	m_file = m_root + "\\user\\" + m_user + "\\" + m_user + ".ini";
 	m_bMini = false;
 	m_iGubn = NORMAKKOSPI200;
+
+	CAxisCodeApp* m_pApp;
+	m_pApp = (CAxisCodeApp*)AfxGetApp();
+
+	//auto future = std::async([&]() {
+	//	for (auto mt : m_pApp->_mapCODEx)
+	//		_mapCODE.emplace(mt);
+	//	});
+	//m_arrayFcode.Copy(m_pApp->_m_arrayFcode);
+	//m_arrayOcode.Copy(m_pApp->_m_arrayOcode);
+	//m_arrayPcode.Copy(m_pApp->_m_arrayPcode);
+
 }	
 
 
@@ -1201,9 +1213,9 @@ void CFuturesDlg::OnButtonClose()
 BOOL CFuturesDlg::loadPjCode()			//현물 코드 종목...
 {
 	//return TRUE;
-	if (m_arrayPcode.GetSize() > 0)
-		return FALSE;
-	
+	//if (m_arrayPcode.GetSize() > 0)
+	//	return FALSE;
+
 	int		codeN{};
 	CFile		file;
 	struct  pjcode  PJCode {};
@@ -1557,8 +1569,12 @@ BOOL CFuturesDlg::loadSfCode()
 
 BOOL CFuturesDlg::loadFjCode()
 {
-	//if (m_arrayFcode.GetSize() > 0)
-	//	return FALSE;
+//	if (m_arrayFcode.GetCount() > 0)
+//		return FALSE;
+
+	CString slog;
+	slog.Format("[AXISCODE][%s]<%d> [%d][%d] ", __FUNCTION__, __LINE__, m_arrayFcode.GetSize(), m_arrayFcode.GetCount());
+	OutputDebugString(slog);
 
 	m_arrayFcode.RemoveAll();
 	
@@ -1743,7 +1759,9 @@ BOOL CFuturesDlg::loadOjCode()
 
 BOOL CFuturesDlg::loadMfCode()
 {
-	m_arrayFcode.RemoveAll();
+	//m_arrayFcode.RemoveAll();
+	//if (m_arrayFcode.GetCount() > 0)
+	//	return false;
 
 	int	codeN{};
 	
@@ -2316,6 +2334,10 @@ BOOL CFuturesDlg::FindCode(int kind, CString szCode)		// GetName()에서 사용.
 
 	szCode.TrimRight();
 
+	CString slog;
+	slog.Format("[AXISCODE][%s]<%d> kind=[%d] code=[%s] ", __FUNCTION__, __LINE__, kind, szCode);
+	OutputDebugString(slog);
+
 	switch(kind)
 	{
 	case whichTYPE:
@@ -2349,7 +2371,7 @@ BOOL CFuturesDlg::FindCode(int kind, CString szCode)		// GetName()에서 사용.
 					{
 						fcode.name.TrimRight();
 						SetName(fcode.name);
-						m_arrayFcode.RemoveAll();
+						//m_arrayFcode.RemoveAll();  //test??
 
 						m_jongmuk = futureType;
 						return TRUE;

@@ -135,7 +135,7 @@ _AW_ONENDSUB_AW_
 _AW_ONSEND_AW_
 LEDGER.Rcnt = "0008"
 
-SYSTEM.Trace "[IB590000][IB590050][SDPKT169] OnSend"
+SYSTEM.Trace "[IB590000][IB590050][SDPKT169]거래환율조회 OnSend"
 
 SCREEN.OnSend = False
 
@@ -224,7 +224,7 @@ End Select
 SYSTEM.Trace "obj_srhreate_onrecv"
 
 Select Case Trim(chk.Data)
-Case "1"	' 환신 시, 조회 적용환율 변동사항 체크용
+Case "1"	' 환전시, 조회 적용환율 변동사항 체크용
 	chk.Clear()
 
 	' 환전예상액 계산 시 적용환율과
@@ -237,7 +237,28 @@ Case "1"	' 환신 시, 조회 적용환율 변동사항 체크용
 		tmpb = Trim(o_xchrat.Data)
 	End Select
 
-	If Trim(tmpb) = SCREEN.Object("Main.obj_exchange.chk").Data Then
+	Dim oldRate
+	Dim canProceed
+
+	oldRate = Trim(SCREEN.Object("Main.obj_exchange.chk").Data)
+	canProceed = False
+
+	If Trim(tmpb) <> "" And Trim(oldRate) <> "" Then
+	    Select Case SCREEN.Object("parent.tab_ex").ID
+	    Case 2    ' 외화매수
+	        If CCur(tmpb) >= CCur(oldRate) Then
+	            canProceed = True
+	        End If
+
+	    Case 1    ' 외화매도
+	        If CCur(tmpb) <= CCur(oldRate) Then
+	            canProceed = True
+	        End If
+	    End Select
+	End If
+
+	'If Trim(tmpb) = SCREEN.Object("Main.obj_exchange.chk").Data Then
+	If canProceed = True Then
 	    SYSTEM.Trace "111"
 	    SYSTEM.Trace ":"&SCREEN.Object("parent.ed_acno").Data
 	      'If Left(SCREEN.Object("parent.ed_acno").Data, 3) >= 550 Then
@@ -346,19 +367,6 @@ Case "1"	' 환신 시, 조회 적용환율 변동사항 체크용
 			       zFcurrDps = 0
 			    End If
 
-'			    'If CCur(zDpsBalAmt) - CCur(zBnkDps) < CCur(ed_won) Then
-'			    If CCur(zFcurrMxchgAbleAmt) < CCur(ed_won) Then
-'			         SYSTEM.Trace "obj_getMoney.contributionBnk logic start:"&ed_won
-'			        '은행에서 증권으로 돈 입금
-'			         ed_won_add = CCur(zFcurrDps) + CCur(ed_won)*1.03 - CCur(zFcurrMxchgAbleAmt)
-'			         SYSTEM.Trace "ed_won_add:"&ed_won_add
-'			         SCREEN.Proc "obj_getMoney.contributionBnk", Left(ed_won_add, Len(ed_won_add)-3)
-'			    Else
-'			    	'환전 실행
-'			    	SCREEN.Proc "Main.obj_exchange.send_f", "1"
-'			    End If
-
-
                 ed_won_add = CCur(ed_won)*1.03
                 If CCur(zFcurrMxchgAbleAmt) < CCur(ed_won_add) Then
                    If CCur(zFcurrMxchgAbleAmt) > 0 Then
@@ -373,8 +381,6 @@ Case "1"	' 환신 시, 조회 적용환율 변동사항 체크용
                     SYSTEM.Trace "123ed_won_add:"& Fix(ed_won_add)
  			        SCREEN.Proc "obj_getMoney.contributionBnk", Fix(ed_won_add)
                 End If
-                '환전 실행
-                 'SCREEN.Proc "Main.obj_exchange.send_f", "1"
 
 		    End If
 		     '매도

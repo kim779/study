@@ -67,6 +67,137 @@ int CAxisCodeApp::GetVirtualScreenX()
 	return virScrX;
 }
 
+CString GetString(char* pChar, int nMinLen)
+{
+	return CString(pChar, min(nMinLen, (int)strlen(pChar)));
+}
+
+BOOL CAxisCodeApp::LoadFCode()
+{
+	if ( _m_arrayFcode.GetCount() > 0)
+		return TRUE;
+	if (_m_arrayOcode.GetCount() > 0)
+		return TRUE;
+	if (_m_arrayPcode.GetCount() > 0)
+		return TRUE;
+
+	int	codeN{};
+	CFile	file;
+	struct  fjcode  FJCode {};
+	FCODE fcode{};
+	CString path;
+	path = ((CAxisCodeApp*)AfxGetApp())->m_root + "\\tab\\fjcode.dat";   //선물스프레드
+
+	if (!file.Open(path, CFile::modeRead | CFile::typeBinary | CFile::shareDenyNone))
+	{
+		return FALSE;
+	}
+	// 데이터의 갯수...
+	codeN = gsl::narrow_cast<int>(file.GetLength() / sizeof(struct fjcode));
+
+	for (int ii = 0; ii < codeN; ii++)
+	{
+		file.Read(&FJCode, sizeof(struct fjcode));
+
+		fcode.code = CString(FJCode.cod2, FCodeLen);
+		fcode.name = CString(FJCode.hnam, FNameLen);
+		fcode.mchk = FJCode.mchk;
+
+		_m_arrayFcode.Add(fcode);
+	}
+	file.Close();
+
+
+
+	int	 len{};
+	struct  ojcodh  OJCodh {};
+
+	path = ((CAxisCodeApp*)AfxGetApp())->m_root + "\\tab\\opcode2.dat";  //옵션코드
+
+	if (!file.Open(path, CFile::modeRead | CFile::typeBinary | CFile::shareDenyNone))
+	{
+		return FALSE;
+	}
+	len = file.Read(&OJCodh, sizeof(struct ojcodh));
+
+	codeN = gsl::narrow_cast<int>((file.GetLength() - len) / sizeof(struct ojcode));
+	for (int ii = 0; ii < codeN; ii++)
+	{
+		struct  ojcode OJCode;
+		file.Read(&OJCode, sizeof(struct ojcode));
+
+		_m_arrayOcode.Add(OJCode);
+	}
+	file.Close();
+
+
+
+	struct  pjcode  PJCode {};
+	PCODE		pcode{};
+	CMapStringToPtr pcodemap;
+	//CQArray	<CString, CString>	qKindArr;
+
+	path = ((CAxisCodeApp*)AfxGetApp())->m_root + "\\tab\\pjcode.dat";  //주식옵션
+
+	if (!file.Open(path, CFile::modeRead | CFile::typeBinary | CFile::shareDenyNone))
+	{
+		//MessageBox("파일[pjcode.dat]이 존재하지 않습니다.");
+		return FALSE;
+	}
+	// 데이터의 갯수...
+	codeN = gsl::narrow_cast<int>(file.GetLength() / sizeof(struct pjcode));
+
+	for (int ii = 0; ii < codeN; ii++)
+	{
+		file.Read(&PJCode, sizeof(struct pjcode));
+
+		pcode.kind = GetString(PJCode.tjgb, 2);
+		pcode.name = GetString(PJCode.snam, 20);
+		pcode.code = GetString(PJCode.codx, PCodeLen);
+		pcode.hnam = GetString(PJCode.hnam, sizeof(PJCode.hnam)); pcode.hnam.TrimRight();
+		pcode.month = GetString(PJCode.mont, 4);
+		pcode.price = GetString(PJCode.hsga, 8);
+		pcode.gcod = GetString(PJCode.gcod, 12);
+		pcode.mchk = PJCode.mchk;
+
+		if (PJCode.atmx == 1)
+			pcode.atm = TRUE;
+		else
+			pcode.atm = FALSE;
+
+		pcodemap.SetAt(pcode.kind, (void*)_m_arrayPcode.Add(pcode));
+	}
+
+	POSITION pos = pcodemap.GetStartPosition();
+	CString sKind;
+	int value{};
+
+	//if (m_plistbox.m_hWnd && IsWindow(m_plistbox.m_hWnd))
+	//{
+	//	m_plistbox.ResetContent();
+	//	while (pos)
+	//	{
+	//		pcodemap.GetNextAssoc(pos, sKind, (void*&)value);
+	//		qKindArr.Add(sKind);
+	//	}
+
+	//	qKindArr.QuickSort();
+
+	//	for (int ii = 0; ii < qKindArr.GetSize(); ii++)
+	//	{
+	//		sKind = qKindArr.GetAt(ii);
+	//		if (pcodemap.Lookup(sKind, (void*&)value))
+	//		{
+	//			CString str = m_arrayPcode.GetAt(value).name;
+	//			m_plistbox.SetItemData(m_plistbox.AddString(m_arrayPcode.GetAt(value).name), value);
+	//		}
+	//	}
+	//}
+
+	file.Close();
+
+}
+
 BOOL CAxisCodeApp::LoadCode()
 {
 	if (/*_mapCODE.size() > 0 ||*/ _mapCODEx.size() > 0)

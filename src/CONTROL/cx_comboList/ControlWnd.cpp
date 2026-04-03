@@ -604,9 +604,9 @@ int CControlWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		this, ID_BTN_DROP);
 
 	m_pBtnDrop->LoadPng(
-		m_sRoot + "\\image\\" + "axspin1.png",     // 일반
-		m_sRoot + "\\image\\" + "axspin1_dn.png",  // 클릭 (없으면 "" 전달)
-		m_sRoot + "\\image\\" + "axspin1_en.png"); // 호버 (없으면 "" 전달)
+		m_sRoot + "\\image\\" + "AXCOMBO.PNG",     // 일반
+		m_sRoot + "\\image\\" + "AXCOMBO_DN.png",  // 클릭 (없으면 "" 전달)
+		m_sRoot + "\\image\\" + "AXCOMBO_EN.png"); // 호버 (없으면 "" 전달)
 
 	m_pBtnLang = std::make_unique<CfxImgButton>();
 	m_pBtnLang->Create("",

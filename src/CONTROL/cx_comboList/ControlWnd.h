@@ -76,10 +76,10 @@ public:
 	CBitmap* m_pBmpDown = nullptr;
 	CBitmap* m_pBmpHover = nullptr;
 
-	int         m_nBtnWidth = 20;  
+	int         m_nBtnWidth = 17;  
 	int         m_nHeight ; 
 	int		 m_nBtnWidthOrig; // 최초 버튼 너비
-	int		 m_nBtnLangWidth = 20; // m_pBtnDrop 절반
+	int		 m_nBtnLangWidth = 17; // m_pBtnDrop 절반
 
 	CSize m_szOriginal;  // 최초 생성 시 크기 저장
 protected:

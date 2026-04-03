@@ -31,6 +31,7 @@ __declspec(dllexport) void WINAPI axCreateEx(void* root)
 	pApp->LoadCode();
 	pApp->LoadETFCode();
 	pApp->loadCJCode();
+	pApp->LoadFCode();
 }
 
 __declspec(dllexport) bool WINAPI axGetCode(int kind, char *user, char* code, int type, CPoint pt)
@@ -845,6 +846,9 @@ __declspec(dllexport) bool WINAPI axGetName(int kind, char* code, char* name, in
 
 	case whichTYPE: // 선택..
 		{
+		CString slog;
+		slog.Format("[AXISCODE] whichTYPE szCode=[%s]", szCode);
+		OutputDebugString(slog);
 			auto& map = pApp->_mapCODEx;
 			if (const auto ft = map.find(szCode); ft != map.end())
 			{
@@ -890,10 +894,67 @@ __declspec(dllexport) bool WINAPI axGetName(int kind, char* code, char* name, in
 				if (hjc->ssgb == jmKONEX && kind == typeforTAX)
 					*type = KONEXType;
 				strcpy(name, szName);
+
+				slog.Format("[AXISCODE] whichTYPE szName=[%s]", szName);
+				OutputDebugString(slog);
+
 				return TRUE;			
 			}
 			else
 			{
+				szCode = szCode.Mid(1);
+				if (const auto ft = map.find(szCode); ft != map.end())
+				{
+					const struct hjcodex* hjc = ft->second;
+					szName = CString(hjc->hnam, HNameLen).Trim();
+
+					switch (hjc->kosd)
+					{
+					case jmKOSPI:
+						*type = kospiType;		break;
+					case jmKOSDAQ:
+						*type = kosdaqType;		break;
+					case jm3RD:
+						*type = thirdType;		break;
+					case jmMUFND:
+						//	case jmMUFND2:
+						*type = mufundType;		break;
+					case jmREITS:
+						*type = reitsType;		break;
+					}
+
+					if (hjc->ssgb == jmETF)
+						*type = etfType;
+					if (hjc->ssgb == jmSINJU || hjc->ssgb == jmSINJS)
+						*type = sinjuType;
+					if (hjc->ssgb == jmHYFND)
+						*type = hyfundType;
+					if (hjc->ssgb == jmELW)
+						*type = elwType;
+					if (hjc->ssgb == jmFOREIGN)
+						*type = foreignType;
+					if (hjc->ssgb == jmETN)//KSJ 2014.10.28 ETN 추가
+						*type = etnType;
+					if (hjc->ssgb == jmTJCONJS)//2024/04/22 신종코드타입
+						*type = singjongType;
+					if (hjc->ssgb == jmSINSUJS)//2024/04/22 신종코드타입
+						*type = singjongType;
+					if (hjc->ssgb == jmGOODSTOCK)
+						*type = singjongGoodType;
+
+					//20191114 맵화면에서 getcodetype를 사용하는 곳이 너무 많아서 kind를 typeforTAX로 주는 경우에만 타입을 세분화 해줌
+					//SCREEN.GetName(199, 종목코드, 0)
+					if (hjc->ssgb == jmKONEX && kind == typeforTAX)
+						*type = KONEXType;
+					strcpy(name, szName);
+
+					slog.Format("[AXISCODE] whichTYPE szName=[%s]", szName);
+					OutputDebugString(slog);
+
+					return TRUE;
+				}
+
+
 				if (szCode.GetLength() > 5)
 				{
 					const TCHAR	ch1 = szCode.GetAt(0);
