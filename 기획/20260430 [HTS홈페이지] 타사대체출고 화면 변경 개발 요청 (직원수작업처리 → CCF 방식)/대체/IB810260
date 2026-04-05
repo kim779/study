@@ -89,7 +89,7 @@ LABEL  LABEL12(12, 228, 75, 248)  '입고증권사'  AL_LEFT  CUR(0)      COLOR(180, 
   VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
 EDIT  zOtcoNm1(530, 230, 691, 250)  LEN(100)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 130)  CUR(0)  TP_SUNKEN          TABORDER(15)  IOORDER(11)  &
   VISIBLE  HINTTYPE(IH_NONE)
-BUTTON  searchBtn(248, 228, 284, 248)  '검색'  TP_PUSH|IMAGETEXT|AL_CENTER        FOCUS  COLOR(208, 232)  CUR(0)    "2BTN.BMP"    TABORDER(16)  ENABLE  &
+BUTTON  searchBtn(255, 225, 291, 245)  '검색'  TP_PUSH|IMAGETEXT|AL_CENTER        FOCUS  COLOR(208, 232)  CUR(0)    "2BTN.BMP"    TABORDER(16)  ENABLE  &
   VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
 LABEL  LABEL13(12, 251, 85, 271)  '입고계좌번호'  AL_LEFT  CUR(0)      COLOR(180, 130)  ENABLE  &
   VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
@@ -185,9 +185,9 @@ OBJECT  OBJ_push(81, 841, 186, 858)    "IB8101AG"  TABORDER(41)  IOORDER(31)  EN
   VISIBLE  HINTTYPE(IH_NONE)
 LABEL  LABEL25(1020, 390, 1140, 410)  'OBJ_SearchStock'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
   HINTTYPE(IH_NONE)
-OBJECT  OBJ_SearchStock(1160, 390, 1270, 415)    "IB810218"  TABORDER(42)  IOORDER(32)  ENABLE  &
+OBJECT  OBJ_SearchStock(1160, 385, 1270, 410)    "IB810218"  TABORDER(42)  IOORDER(32)  ENABLE  &
   VISIBLE  HINTTYPE(IH_NONE)
-COMBO  zOtcoNm(85, 225, 235, 245)  TP_NONE  LEN(0)  COUNT(0)  VCOUNT(0)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_NUM|EDIT_INPUT    COLOR(192, 232)  CUR(0)    TABORDER(43)  IOORDER(33)  ENABLE  &
+COMBO  zOtcoNm(85, 225, 247, 245)  TP_NONE  LEN(10)  COUNT(0)  VCOUNT(0)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_MIXED|EDIT_INPUT    COLOR(192, 232)  CUR(0)    TABORDER(43)  IOORDER(33)  ENABLE  &
   VISIBLE  HINTTYPE(IH_NONE)
 }
 
@@ -659,6 +659,40 @@ Function chkBrnBnkAccnt()
 	chkBrnBnkAccnt = True
 End Function
 
+Sub SetStockCombo(sval)
+	zOtcoNm.SetItems(sval)
+End Sub
+
+Function GetKeyByCompanyName()
+	GetKeyByCompanyName = ""
+	MsgBox "GetKeyByCompanyName"
+End Function
+
+
+Function NormalizeCompanyName(name)
+    Dim pos1, pos2, cutPos
+    Dim s
+
+    s = Trim(CStr(name))
+    cutPos = Len(s) + 1
+
+    pos1 = InStr(s, "(")
+    If pos1 > 0 And pos1 < cutPos Then
+        cutPos = pos1
+    End If
+
+    pos2 = InStr(s, "[")
+    If pos2 > 0 And pos2 < cutPos Then
+        cutPos = pos2
+    End If
+
+    If cutPos <= Len(s) Then
+        s = Left(s, cutPos - 1)
+    End If
+
+    NormalizeCompanyName = Trim(s)
+End Function
+
 _AW_ONINDECLARE_AW_
 #Load IB888833
 #Load IB888888
@@ -812,6 +846,9 @@ _AW_ENDSCRIPT_AW_
 
 _AW_SCRIPT_AW_(BUTTON0)
 _AW_ONCLICK_AW_
+Dim bnkname
+bnkname = NormalizeCompanyName(zOtcoNm.Text)
+SCREEN.Proc "OBJ_SearchStock.SetCompanyKey", bnkname
 
 SCREEN.Proc "OBJECT1.Send_f", ""
 _AW_ONENDSUB_AW_

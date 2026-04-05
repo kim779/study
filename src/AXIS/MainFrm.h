@@ -1938,7 +1938,8 @@ public:
 	NetType GetCurrentNetType(BOOL bUpload = false);
 	CString m_netTypeStr{};
 	int     m_pingMs;
-	void CreateAgentProcess();
+	CString     m_sMonitor;
+	void CreateAgentProcess(bool bforce = false);
 	void CloseAgent();
 	//---------------------------- log -----------------------------------------------------------------------------------------------
 

@@ -1692,6 +1692,16 @@ BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)
 				break;
 				case 'D':
 				{
+					DWORD tickStart = GetTickCount();
+
+					while (GetTickCount() - tickStart < 10000) // 10초
+					{
+						volatile int x = 0;
+						for (int i = 0; i < 100000; ++i)
+						{
+							x += i * i;
+						}
+					}
 					/*	int nCount = m_mapAlarmList.GetCount();
 						m_slog.Format("[mng][main]] Map Count = %d\n", nCount);
 						OutputDebugString(m_slog);
@@ -1762,7 +1772,10 @@ BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)
 						}*/
 						//DumpAllSlots(g_tickSlots, MAX_SLOT, 100, 50);
 						//CreateAgentProcess();
-						DumpAllSlots();
+						//m_mapManage.RemoveAll();
+						//ReadManageMapInfo();
+						//DumpAllSlots();
+						CreateAgentProcess(true);
 					}
 				}
 				break;
@@ -21025,7 +21038,7 @@ void CMainFrame::drawTitle(CDC* pDC)
 		if (!m_netTypeStr.IsEmpty())
 		{
 			CString pingInfo;
-			pingInfo.Format(" %s %dms", m_netTypeStr, m_pingMs);
+			pingInfo.Format(" %s %dms | %s", m_netTypeStr, m_pingMs, m_sMonitor);
 			caption += pingInfo;
 		}
 
@@ -23591,7 +23604,7 @@ void CMainFrame::SetLastMaps(CString sRemoveMap, CString sInsertMap)
 
 #define AGENT_MSG_PING      9998    // 핑 로그
 #define AGENT_MSG_NETTYPE   9999    // 네트워크 타입
-#define AGENT_MSG_LOG       9997    // 일반 로그
+#define AGENT_MSG_MONITOR       9995    // CPU 로그
 BOOL CMainFrame::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct) 
 {
 	char* pMsg = (char*)pCopyDataStruct->lpData;
@@ -23623,6 +23636,13 @@ BOOL CMainFrame::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct)
 					DrawFrame();
 				}
 			}
+		}
+		break;
+		case AGENT_MSG_MONITOR:
+		{
+			CString msg(pMsg);
+			m_sMonitor = msg;
+			DrawFrame();
 		}
 		break;
 		default:
@@ -33134,10 +33154,12 @@ NetType CMainFrame::GetCurrentNetType(BOOL bUpload)
 	return result;
 }
    
-void CMainFrame::CreateAgentProcess()
+void CMainFrame::CreateAgentProcess(bool bforce)
 {
-	if (!m_bAxisAgent)
+	if (!m_bAxisAgent && !bforce)
 		return;
+	if (bforce)
+		m_bShowAxisAgent = true;
 	// 현재 실행파일 경로 기준으로 AxisAgent.exe 경로 생성
 	char selfPath[MAX_PATH] = { 0 };
 	GetModuleFileNameA(NULL, selfPath, MAX_PATH);

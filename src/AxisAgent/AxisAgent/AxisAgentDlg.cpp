@@ -19,6 +19,8 @@ static const DWORD DUMP_INTERVAL_MS = 1000;
 // 응용 프로그램 정보에 사용되는 CAboutDlg 대화 상자입니다.
 #include <string>
 
+
+
 namespace
 {
 	static bool IsWaitLikeFunction(const char* name)
@@ -288,7 +290,7 @@ namespace
 	}
 }
 
-void DebugLog(const char* fmt, ...)
+void CAxisAgentDlg::DebugLog(const char* fmt, ...)
 {
 	char msg[1024] = { 0 };
 	va_list args;
@@ -299,6 +301,8 @@ void DebugLog(const char* fmt, ...)
 	char buf[1024] = { 0 };
 	sprintf_s(buf, sizeof(buf), "[AxisAgent] %s", msg);
 	OutputDebugStringA(buf);
+
+	AddLog("DEBUG", msg);
 }
 
 class CAboutDlg : public CDialogEx
@@ -326,6 +330,7 @@ CAboutDlg::CAboutDlg() : CDialogEx(IDD_ABOUTBOX)
 void CAboutDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
+	
 }
 
 BEGIN_MESSAGE_MAP(CAboutDlg, CDialogEx)
@@ -371,6 +376,10 @@ CAxisAgentDlg::~CAxisAgentDlg()
 void CAxisAgentDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
+	DDX_Control(pDX, IDC_LIST_LOG, m_listLog);
+	DDX_Control(pDX, IDC_CHK_PING, m_chkPing);
+	DDX_Control(pDX, IDC_CHK_MONITOR, m_chkMonitor);
+	DDX_Control(pDX, IDC_CHK_STOP, m_chkStop);
 }
 
 BEGIN_MESSAGE_MAP(CAxisAgentDlg, CDialogEx)
@@ -381,11 +390,31 @@ BEGIN_MESSAGE_MAP(CAxisAgentDlg, CDialogEx)
 	ON_WM_COPYDATA()
 	ON_WM_DESTROY()
 	ON_BN_CLICKED(IDC_BTN_TEST, &CAxisAgentDlg::OnBnClickedBtnTest)
+	ON_BN_CLICKED(IDC_CHK_PING, &CAxisAgentDlg::OnBnClickedChkPing)
+	ON_BN_CLICKED(IDC_CHK_MONITOR, &CAxisAgentDlg::OnBnClickedChkMonitor)
 	ON_WM_TIMER()
+	ON_BN_CLICKED(IDC_CHK_STOP, &CAxisAgentDlg::OnBnClickedChkStop)
+	ON_BN_CLICKED(IDC_LIST_CLEAR, &CAxisAgentDlg::OnBnClickedListClear)
 END_MESSAGE_MAP()
 
 
 // CAxisAgentDlg 메시지 처리기
+
+
+bool CAxisAgentDlg::ShouldShowLogType(const char* type)
+{
+	CString sType = type ? type : "";
+
+	if (sType.CompareNoCase("PING") == 0)
+		return m_chkPing.GetCheck() == BST_CHECKED;
+
+	if (sType.CompareNoCase("MONITOR") == 0)
+		return m_chkMonitor.GetCheck() == BST_CHECKED;
+
+	// INIT, DEBUG 같은 건 일단 항상 보이게 할지,
+	// 아니면 MONITOR 쪽으로 묶을지 선택
+	return true;
+}
 
 BOOL CAxisAgentDlg::OnInitDialog()
 {
@@ -394,10 +423,26 @@ BOOL CAxisAgentDlg::OnInitDialog()
 	((CWnd*)GetDlgItem(IDOK))->ShowWindow(SW_HIDE);
 	((CWnd*)GetDlgItem(IDCANCEL))->ShowWindow(SW_HIDE);
 
-	ModifyStyleEx(WS_EX_APPWINDOW, WS_EX_TOOLWINDOW);
+	m_chkPing.SetCheck(BST_CHECKED);
+	m_chkMonitor.SetCheck(BST_CHECKED);
+
+	m_listLog.SetExtendedStyle(
+		LVS_EX_FULLROWSELECT |
+		LVS_EX_GRIDLINES |
+		LVS_EX_DOUBLEBUFFER);
+
+	m_listLog.InsertColumn(0, "Time", LVCFMT_LEFT, 90);
+	m_listLog.InsertColumn(1, "Type", LVCFMT_LEFT, 80);
+	m_listLog.InsertColumn(2, "Message", LVCFMT_LEFT, 500);
+	AddLog("INIT", "리스트 테스트");
 
 	// 커맨드라인 파싱
 	ParseCommandLine();
+
+	if (m_bShow)
+		ModifyStyleEx(WS_EX_TOOLWINDOW, WS_EX_APPWINDOW);
+	else
+		ModifyStyleEx(WS_EX_APPWINDOW, WS_EX_TOOLWINDOW);
 
 	// 유효성 체크
 	if (m_parentPid == 0 || m_hParentWnd == NULL || strlen(m_regkey) == 0)
@@ -611,8 +656,8 @@ void CAxisAgentDlg::ParseCommandLine()
 		NULL,
 		m_startX,   // 메인 left
 		m_startY,   // 메인 top
-		400, 200,   // 크기 (원하는 크기로)
-		SWP_NOZORDER | SWP_NOACTIVATE | (m_bShow ? SWP_SHOWWINDOW : SWP_HIDEWINDOW)
+		0, 0,   // 크기 (원하는 크기로)
+		SWP_NOSIZE |SWP_NOZORDER | SWP_NOACTIVATE | (m_bShow ? SWP_SHOWWINDOW : SWP_HIDEWINDOW)
 	);
 
 	LocalFree(argvW);
@@ -622,7 +667,7 @@ void CAxisAgentDlg::ParseCommandLine()
 
 	//m_hMonitorThread = CreateThread(
 	//	NULL, 0, MonitorThreadProc, (LPVOID)this, 0, NULL);
-	//DebugLog("OnInitDialog: MonitorThread 시작\n");
+	DebugLog("OnInitDialog: MonitorThread 시작\n");
 
 	SetTimer(9898, 100, nullptr);
 }
@@ -640,7 +685,6 @@ void CAxisAgentDlg::WriteLog(const char* msg)
 
 void CAxisAgentDlg::SendToParent(const char* msg, int nKind)
 {
-	return;
 	if (!m_hParentWnd)
 	{
 		WriteMonitorLog("[S2] m_hParentWnd NULL");
@@ -780,6 +824,8 @@ CAxisAgentDlg::NetType CAxisAgentDlg::GetCurrentNetType()
 
 bool CAxisAgentDlg::ShouldStop()
 {
+	if (m_bShow)
+		return false;
 	// 부모 프로세스 죽었는지
 	if (m_hParent)
 	{
@@ -876,7 +922,7 @@ void CAxisAgentDlg::PingLoop()
 					line);
 
 				WriteLog(output);
-				DebugLog("%s", output);
+				AddLog("PING", output);
 				SendToParent(output, AGENT_MSG_PING);
 
 				// 종료 체크
@@ -1037,6 +1083,7 @@ void CAxisAgentDlg::WriteMonitorLog(const char* msg)
 	}
 
 	//OutputDebugStringA(output);
+	AddLog("MONITOR", msg);
 }
 
 // 덤프 생성
@@ -1350,8 +1397,9 @@ void CAxisAgentDlg::MonitorLoop()
 		WriteMonitorLog(logMsg);
 
 		char sendMsg[256] = { 0 };
-		sprintf_s(sendMsg, "CPU=%.1f MAIN=%.1f THR=%d",
-			fProcCpu, fMainCpu, nThreadCount);
+		sprintf_s(sendMsg,
+			"CPU=%.1f MAIN=%.1f THR=%d HUNG=%d NORESP=%d",
+			fProcCpu, fMainCpu, nThreadCount, bHung ? 1 : 0, noResponseCount);
 		SendToParent(sendMsg, AGENT_MSG_MONITOR);
 
 		if ((bHung && noResponseCount >= 2) || noResponseCount >= 3)
@@ -1639,7 +1687,9 @@ void CAxisAgentDlg::AnalyzeDump(const char* dumpPath)
 		char mainF1[256] = { 0 };
 		char mainF2[256] = { 0 };
 
-		for (int frameNo = 0; frameNo < 10; ++frameNo)
+		const int MAX_MAIN_FRAMES = 5;
+
+		for (int frameNo = 0; frameNo < MAX_MAIN_FRAMES; ++frameNo)
 		{
 			BOOL sw = StackWalk64(
 				IMAGE_FILE_MACHINE_I386,
@@ -1678,54 +1728,68 @@ void CAxisAgentDlg::AnalyzeDump(const char* dumpPath)
 
 				if (frameNo == 0)
 				{
-					sprintf_s(logMsg,
-						"[MAIN][TOP] %s + 0x%I64X",
-						pSym->Name,
-						disp64);
-					WriteMonitorLog(logMsg);
-				}
-
-				if (SymGetLineFromAddr64(hSymProcess, sf.AddrPC.Offset, &lineDisp, &line))
-				{
-					sprintf_s(logMsg,
-						"  [%02d] %s + 0x%I64X (%s:%lu)",
-						frameNo,
-						pSym->Name,
-						disp64,
-						line.FileName ? line.FileName : "?",
-						line.LineNumber);
+					if (SymGetLineFromAddr64(hSymProcess, sf.AddrPC.Offset, &lineDisp, &line))
+					{
+						sprintf_s(logMsg,
+							"[MAIN][TOP] %s + 0x%I64X (%s:%lu)",
+							pSym->Name,
+							disp64,
+							line.FileName ? line.FileName : "?",
+							line.LineNumber);
+					}
+					else
+					{
+						sprintf_s(logMsg,
+							"[MAIN][TOP] %s + 0x%I64X",
+							pSym->Name,
+							disp64);
+					}
 				}
 				else
 				{
-					sprintf_s(logMsg,
-						"  [%02d] %s + 0x%I64X",
-						frameNo,
-						pSym->Name,
-						disp64);
+					if (SymGetLineFromAddr64(hSymProcess, sf.AddrPC.Offset, &lineDisp, &line))
+					{
+						sprintf_s(logMsg,
+							"[MAIN][%02d] %s + 0x%I64X (%s:%lu)",
+							frameNo,
+							pSym->Name,
+							disp64,
+							line.FileName ? line.FileName : "?",
+							line.LineNumber);
+					}
+					else
+					{
+						sprintf_s(logMsg,
+							"[MAIN][%02d] %s + 0x%I64X",
+							frameNo,
+							pSym->Name,
+							disp64);
+					}
 				}
 			}
 			else
 			{
 				if (frameNo == 0)
 				{
+					sprintf_s(mainF0, "0x%08I64X", sf.AddrPC.Offset);
 					sprintf_s(logMsg,
 						"[MAIN][TOP] 0x%08I64X",
 						sf.AddrPC.Offset);
-					WriteMonitorLog(logMsg);
 				}
+				else
+				{
+					if (frameNo == 1) sprintf_s(mainF1, "0x%08I64X", sf.AddrPC.Offset);
+					else if (frameNo == 2) sprintf_s(mainF2, "0x%08I64X", sf.AddrPC.Offset);
 
-				if (frameNo == 0) sprintf_s(mainF0, "0x%08I64X", sf.AddrPC.Offset);
-				else if (frameNo == 1) sprintf_s(mainF1, "0x%08I64X", sf.AddrPC.Offset);
-				else if (frameNo == 2) sprintf_s(mainF2, "0x%08I64X", sf.AddrPC.Offset);
-
-				sprintf_s(logMsg,
-					"  [%02d] 0x%08I64X",
-					frameNo,
-					sf.AddrPC.Offset);
+					sprintf_s(logMsg,
+						"[MAIN][%02d] 0x%08I64X",
+						frameNo,
+						sf.AddrPC.Offset);
 			}
+		}
 
 			WriteMonitorLog(logMsg);
-		}
+	}
 
 		WriteMainSummary(this, th.ThreadId, mainF0, mainF1, mainF2);
 #else
@@ -1751,4 +1815,80 @@ void CAxisAgentDlg::AnalyzeDump(const char* dumpPath)
 	CloseHandle(hFile);
 
 	WriteMonitorLog("덤프 분석 완료");
+}
+
+void CAxisAgentDlg::AppendLogToList(const CString& sTime, const CString& sType, const CString& sMsg)
+{
+	if (!::IsWindow(m_listLog.GetSafeHwnd()))
+		return;
+
+	int nIndex = m_listLog.GetItemCount();
+	m_listLog.InsertItem(nIndex, sTime);
+	m_listLog.SetItemText(nIndex, 1, sType);
+	m_listLog.SetItemText(nIndex, 2, sMsg);
+	m_listLog.EnsureVisible(nIndex, FALSE);
+}
+
+void CAxisAgentDlg::AddLog(const char* type, const char* msg)
+{
+	SYSTEMTIME st;
+	GetLocalTime(&st);
+
+	CString sTime;
+	sTime.Format("%02d:%02d:%02d", st.wHour, st.wMinute, st.wSecond);
+
+	CString sType = type ? type : "";
+	CString sMsg = msg ? msg : "";
+
+	AGENT_LOG_ROW row;
+	row.time = sTime;
+	row.type = sType;
+	row.msg = sMsg;
+
+	m_allLogs.push_back(row);
+
+
+	if (m_chkStop.GetCheck())
+		return;
+
+	if (ShouldShowLogType(type))
+		AppendLogToList(sTime, sType, sMsg);
+}
+
+void CAxisAgentDlg::RefreshLogList()
+{
+	if (!::IsWindow(m_listLog.GetSafeHwnd()))
+		return;
+
+	m_listLog.DeleteAllItems();
+
+	for (size_t i = 0; i < m_allLogs.size(); ++i)
+	{
+		const AGENT_LOG_ROW& row = m_allLogs[i];
+
+		if (ShouldShowLogType(CT2A(row.type)))
+			AppendLogToList(row.time, row.type, row.msg);
+	}
+}
+
+void CAxisAgentDlg::OnBnClickedChkPing()
+{
+	RefreshLogList();
+}
+
+void CAxisAgentDlg::OnBnClickedChkMonitor()
+{
+	RefreshLogList();
+}
+
+void CAxisAgentDlg::OnBnClickedChkStop()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+}
+
+
+void CAxisAgentDlg::OnBnClickedListClear()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	m_listLog.DeleteAllItems();
 }

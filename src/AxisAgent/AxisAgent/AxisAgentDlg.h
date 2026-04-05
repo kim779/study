@@ -12,12 +12,19 @@
 
 #define WM_PING_LOG (WM_USER + 100)
 
-#define AGENT_MSG_MONITOR   9995
+
 
 // 감지 임계값
 #define THRESHOLD_CPU       80.0f   // CPU 80% 이상
 #define THRESHOLD_HANG_MS   3000    // 3초 응답없음
 #define MONITOR_INTERVAL    1000    // 1초 주기
+
+struct AGENT_LOG_ROW
+{
+	CString time;
+	CString type;
+	CString msg;
+};
 
 struct ThreadCpuInfo
 {
@@ -60,6 +67,15 @@ public:
 	char   m_regkey[256];
 	DWORD  m_parentPid;
 	HANDLE m_hPingThread;
+
+	std::vector<AGENT_LOG_ROW> m_allLogs;
+
+	CButton m_chkStop;
+	CButton m_chkPing;
+	CButton m_chkMonitor;
+	CListCtrl m_listLog;
+
+	bool ShouldShowLogType(const char* type);
 
 	int        m_dumpSeq = 0;
 	int        m_dumpCount = 0;
@@ -106,6 +122,11 @@ public:
 	void PingLoop();
 	bool ShouldStop();
 
+	void DebugLog(const char* fmt, ...);
+	void AddLog(const char* type, const char* msg);
+	void AppendLogToList(const CString& sTime, const CString& sType, const CString& sMsg);
+	void RefreshLogList();
+
 	// 네트워크
 	enum NetType { NET_NONE, NET_WIFI, NET_WIRED };
 	NetType GetCurrentNetType();
@@ -130,5 +151,9 @@ protected:
 	afx_msg void OnDestroy();
 public:
 	afx_msg void OnBnClickedBtnTest();
+	afx_msg void OnBnClickedChkPing();
+	afx_msg void OnBnClickedChkStop();
+	afx_msg void OnBnClickedChkMonitor();
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
+	afx_msg void OnBnClickedListClear();
 };

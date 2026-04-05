@@ -65,6 +65,8 @@ protected:
 	afx_msg LONG OnCHILDMSG(WPARAM wParam, LPARAM lParam);
 	afx_msg	LONG OnAXIS(WPARAM wParam, LPARAM lParam);
 	DECLARE_MESSAGE_MAP()
+public:
+	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
 };
 
 /////////////////////////////////////////////////////////////////////////////

@@ -45,6 +45,7 @@ BEGIN_MESSAGE_MAP(CGPop, CFrameWnd)
 	//}}AFX_MSG_MAP
 	ON_MESSAGE(WM_CHILDMSG, OnCHILDMSG)
 	ON_MESSAGE(WM_AXIS, OnAXIS)
+	ON_WM_CREATE()
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
@@ -242,3 +243,14 @@ void CGPop::SetSize(int width, int height, BOOL revise)
 	}
 }
 
+
+
+int CGPop::OnCreate(LPCREATESTRUCT lpCreateStruct)
+{
+	if (CFrameWnd::OnCreate(lpCreateStruct) == -1)
+		return -1;
+
+	// TODO:  여기에 특수화된 작성 코드를 추가합니다.
+	SetWindowText("IBK 투자증권");
+	return 0;
+}
