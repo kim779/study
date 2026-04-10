@@ -10,6 +10,7 @@
 // 여기에 미리 컴파일하려는 헤더 추가
 #include "framework.h"
 #include <vector>
+#include <algorithm>
 #define AGENT_MSG_PING      9998    // 핑 로그
 #define AGENT_MSG_NETTYPE   9999    // 네트워크 타입
 #define AGENT_MSG_LOG       9997    // 일반 로그

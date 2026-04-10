@@ -396,6 +396,11 @@ private:
 	BOOL m_bCheckAgetn{};
 
 	BOOL m_bSearching{};
+
+	CString m_sHome{};
+	CString HashAccount(const CString& sAccNo);
+	CString EncryptAccount(const CString& sAccNo);
+	CString DecryptAccount(const CString& sEncrypted);
 protected:
 	BSTR GetShowHideAcc(BSTR strShow, BSTR strHide);
 
@@ -411,7 +416,7 @@ protected:
 	CWnd* m_pAxisMainFrame{};
 	DllInvoker shareddll{};
 	BOOL m_bPOPTrdTed{};   //직원용  고객투자성향팝업
-	void CreateOubWnd(CString sMsg = "");
+	void CreateOubWnd(CString sMsg = "" , BOOL bIsAgent = false);
 	std::vector<COubWnd*> m_arrOubWnd;
 	void FileLog(CString strhome, LPCSTR log, ...);
 	void Check2AgentAcc();

@@ -72,235 +72,528 @@ END_MESSAGE_MAP()
 #define DF_MENU_SUBX_CHART   2     //차트 관련 화면 리스트
 #define DF_MENU_SUBX_BALANCE   3     //잔고 관련 화면 리스트
 
+//BOOL CPopListWnd::MakePopMenu(CString sData, CPoint point)
+//{
+//
+//
+//    CString skey{}, stmp{}, sCode{}, sName{}, sFilepath{};
+//    CString sSMenu{}, sSHMenu{};
+//    CString sFMenu{}, sFHMenu{};
+//
+//    //
+//    sFilepath = "F:\\util\\HTS\\IBK투자증권 HTS\\tab\\axPOPMenu.INI";  //여기선 탭이지만 개인 히스토리가 필요하므로   
+//    //
+//
+//    CHMenu	 frameMenu, * menu{}, * subMenu{}, * popup{};
+//    sName = sData;
+//    sCode = parser(sName, "\t");
+//
+//    DWORD rc;
+//    char* ptr{}, wb[1024]{};
+//    int iGubn = 0;
+//        
+//    //종목 시장 분류
+//    switch (iGubn) 
+//    {
+//        case 0:  //주식
+//        {
+//            //frame 메뉴 로드
+//            rc = GetPrivateProfileString(DF_MENU_STOCK, "menu", "", wb, 1024, sFilepath);
+//            sFMenu.Format("%s", wb);
+//            sFMenu.Trim();
+//       
+//            if (!rc)
+//            {
+//                sFMenu.Empty();
+//                return FALSE;
+//            }
+//        }
+//        break;
+//        case 1:  //파생
+//        {
+//            //frame 메뉴 로드
+//            rc = GetPrivateProfileString(DF_MENU_FUTURE, "menu", "", wb, 1024, sFilepath);
+//            sFMenu.Format("%s", wb);
+//            sFMenu.Trim();
+//
+//            if (!rc)
+//            {
+//                sFMenu.Empty();
+//                return FALSE;
+//            }
+//        }
+//        break;
+//        default:
+//            break;
+//    }
+//    
+//    popup = new CHMenu();
+//
+//    //auto cleanupPopup = [&]()
+//    //{
+//    //    if (!popup) return;
+//    //    for (int ii = 0; ii < popup->GetMenuItemCount(); ii++)
+//    //    {
+//    //        CHMenu* pSub = (CHMenu*)popup->GetSubMenu(ii);
+//    //        if (pSub) delete pSub;
+//    //    }
+//    //    delete popup;
+//    //    popup = nullptr;
+//    //};
+//
+//    popup->CreatePopupMenu();
+//
+//
+//    CStringArray arrFMenu, arrSMenu, arrHMenu;
+//    m_pCodelist->StringSplit(sFMenu, arrFMenu, _T(';'));
+//   
+//    int	menuN{};
+//    int    nID{};
+//    CMapStringToString _map{};
+// 
+//    for (int ii = 0; ii < arrFMenu.GetSize(); ii++)
+//    {
+//        //서브 메뉴 로드  ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
+//        switch (ii)
+//        {
+//        case DF_MENU_SUBX_TRD:  //매매 관련 화면 리스트
+//        {
+//
+//            rc = GetPrivateProfileString(iGubn == 0 ? DF_MENU_STRADE : DF_MENU_FTRADE, "menu", "", wb, 1024, sFilepath);
+//            sSMenu.Format("%s", wb);
+//            sSMenu.Trim();
+//
+//            if (!rc)
+//            {
+//                sFMenu.Empty();
+//                //cleanupPopup();
+//                for (int ii = 0; ii < popup->GetMenuItemCount(); ii++)
+//                {
+//                    CHMenu* pSub = (CHMenu*)popup->GetSubMenu(ii);
+//                    if (pSub) delete pSub;
+//                }
+//                delete popup;
+//                popup = nullptr;
+//                return FALSE;
+//            }
+//
+//            //히스토리 - 매매 메뉴 내역
+//            rc = GetPrivateProfileString(iGubn == 0 ? DF_MENU_STRADE : DF_MENU_FTRADE, "Trade_S_Hmenu", "", wb, 1024, sFilepath);
+//            sSHMenu.Format("%s", wb);
+//            sSHMenu.Trim();
+//
+//        }
+//        break;
+//        case DF_MENU_SUBX_SISE: //시세 관련 화면 리스트
+//        {
+//            rc = GetPrivateProfileString(iGubn == 0 ? DF_MENU_SSISE : DF_MENU_FSISE, "menu", "", wb, 1024, sFilepath);
+//            sSMenu.Format("%s", wb);
+//            sSMenu.Trim();
+//
+//            if (!rc)
+//            {
+//                sFMenu.Empty();
+//               // cleanupPopup();
+//                for (int ii = 0; ii < popup->GetMenuItemCount(); ii++)
+//                {
+//                    CHMenu* pSub = (CHMenu*)popup->GetSubMenu(ii);
+//                    if (pSub) delete pSub;
+//                }
+//                delete popup;
+//                popup = nullptr;
+//                return FALSE;
+//            }
+//
+//            //히스토리 - 시세 메뉴 내역
+//            rc = GetPrivateProfileString(iGubn == 0 ? DF_MENU_STRADE : DF_MENU_FTRADE, "SISE_H_menu", "", wb, 1024, sFilepath);
+//            sSHMenu.Format("%s", wb);
+//            sSHMenu.Trim();
+//
+//        }
+//        break;
+//        case DF_MENU_SUBX_CHART: //차트 관련 화면 리스트
+//        {
+//            rc = GetPrivateProfileString(iGubn == 0 ? DF_MENU_SCHART : DF_MENU_FCHART, "menu", "", wb, 1024, sFilepath);
+//            sSMenu.Format("%s", wb);
+//            sSMenu.Trim();
+//
+//            if (!rc)
+//            {
+//                sFMenu.Empty();
+//                //cleanupPopup();
+//                for (int ii = 0; ii < popup->GetMenuItemCount(); ii++)
+//                {
+//                    CHMenu* pSub = (CHMenu*)popup->GetSubMenu(ii);
+//                    if (pSub) delete pSub;
+//                }
+//                delete popup;
+//                popup = nullptr;
+//                return FALSE;
+//            }
+//
+//            //히스토리 - 차트  메뉴 내역
+//            rc = GetPrivateProfileString(iGubn == 0 ? DF_MENU_STRADE : DF_MENU_FTRADE, "CHART_S_menu", "", wb, 1024, sFilepath);
+//            sSHMenu.Format("%s", wb);
+//            sSHMenu.Trim();
+//        }
+//        break;
+//        case DF_MENU_SUBX_BALANCE: //잔고 관련 화면 리스트
+//        {
+//            rc = GetPrivateProfileString(iGubn == 0 ? DF_MENU_SBALANCE : DF_MENU_FBALANCE, "menu", "", wb, 1024, sFilepath);
+//            sSMenu.Format("%s", wb);
+//            sSMenu.Trim();
+//
+//            if (!rc)
+//            {
+//                sFMenu.Empty();
+//               // cleanupPopup();
+//                for (int ii = 0; ii < popup->GetMenuItemCount(); ii++)
+//                {
+//                    CHMenu* pSub = (CHMenu*)popup->GetSubMenu(ii);
+//                    if (pSub) delete pSub;
+//                }
+//                delete popup;
+//                popup = nullptr;
+//                return FALSE;
+//            }
+//
+//            //히스토리 - 잔고  메뉴 내역
+//            rc = GetPrivateProfileString(iGubn == 0 ? DF_MENU_STRADE : DF_MENU_FTRADE, "BALANCE_S_menu", "", wb, 1024, sFilepath);
+//            sSHMenu.Format("%s", wb);
+//            sSHMenu.Trim();
+//        }
+//        break;
+//        default:
+//        {
+//        }
+//        break;
+//        }
+//        //서브 메뉴 로드  ↑↑↑↑↑↑↑↑↑↑↑↑↑↑ 
+//
+//        menu = new CHMenu();
+//        menu->CreatePopupMenu();
+//
+//        stmp.Format("%s", arrFMenu.GetAt(ii));
+//        stmp.Replace("|", " ");
+//        popup->InsertMenuX(ii , MF_POPUP | MF_BYPOSITION | MF_STRING, (UINT)menu->m_hMenu, stmp);
+//
+//        CHMenu* psub = (CHMenu*)popup->GetSubMenu(ii);
+//        int id = popup->GetMenuItemCount();
+//        
+//        m_pCodelist->StringSplit(sSHMenu, arrSMenu, _T(';'));
+//        for (int jj = 0; jj < arrSMenu.GetSize(); jj++)
+//        {
+//            stmp.Format("%s", arrSMenu.GetAt(jj));
+//            stmp.Replace("|", " ");
+//            int ret = psub->AppendMenuX(MF_BYPOSITION | MF_STRING, ++menuN, stmp, nullptr);   
+//
+//            skey.Format("%d", menuN);
+//          //_map.SetAt(skey, stmp.Mid(stmp.Find(" ")));
+//            _map.SetAt(skey, stmp);
+//
+//        }
+//        sSMenu.Empty();
+//
+//        psub->AppendMenuX(MF_SEPARATOR);
+//        //히스토리 내역  추가
+//        m_pCodelist->StringSplit(sSMenu, arrHMenu, _T(';'));
+//        for (int jj = 0; jj < arrHMenu.GetSize(); jj++)
+//        {
+//            stmp.Format("%s", arrHMenu.GetAt(jj));
+//            stmp.Replace("|", " ");
+//            int ret = psub->AppendMenuX(MF_BYPOSITION | MF_STRING, ++menuN, stmp, nullptr);
+//
+//            skey.Format("%d", menuN);
+//            _map.SetAt(skey, stmp.Mid(stmp.Find(" ")));
+//            _map.SetAt(skey, stmp);
+//
+//        }
+//    }
+//
+//   
+//
+//
+//    CPoint pt;
+//    GetCursorPos(&pt);
+//
+//
+//    stmp.Format("CLBparen cursor -- > [pt]  top=[%d]\t right=[%d]", pt.x, pt.y);
+//    OutputDebugString("\r\n" + stmp);
+//
+//    stmp.Format("CPopListWnd[point]   point.x=[%d]\t point.y=[%d]", point.x, point.y);
+//    OutputDebugString("\r\n" + stmp);
+//
+//    if (_bRightPop) //우측으로 띄울때
+//    {
+//        pt.x += point.x;
+//        pt.y -= point.y;
+//
+//        pt.y -= 3;
+//        pt.x += 18;
+//    }
+//
+//    int index{};
+//    index = popup->TrackPopupMenu(TPM_LEFTALIGN | TPM_RIGHTBUTTON | TPM_RETURNCMD, pt.x, pt.y, this);
+//
+//    switch(index)
+//    {
+//        default:
+//        {
+//
+//        }
+//        break;
+//    }
+//
+//    
+//    skey.Format("%d", index);
+//    if (_map.Lookup(skey, stmp))
+//    {
+//      //  stmp = skey + "   " + stmp;
+//        AfxMessageBox(m_sVal);
+//    }
+//
+//   // cleanupPopup();
+//    for (int ii = 0; ii < popup->GetMenuItemCount(); ii++)
+//    {
+//        CHMenu* pSub = (CHMenu*)popup->GetSubMenu(ii);
+//        if (pSub) delete pSub;
+//    }
+//    delete popup;
+//    popup = nullptr;
+//}
 BOOL CPopListWnd::MakePopMenu(CString sData, CPoint point)
 {
     CString skey{}, stmp{}, sCode{}, sName{}, sFilepath{};
     CString sSMenu{}, sSHMenu{};
     CString sFMenu{}, sFHMenu{};
 
-    //
-    sFilepath = "F:\\util\\HTS\\IBK투자증권 HTS\\tab\\axPOPMenu.INI";  //여기선 탭이지만 개인 히스토리가 필요하므로   
-    //
+    sFilepath = "F:\\util\\HTS\\IBK투자증권 HTS\\tab\\axPOPMenu.INI";
 
-    CHMenu	 frameMenu, * menu{}, * subMenu{}, * popup{};
+    CHMenu* menu{}, * subMenu{}, * popup{};
     sName = sData;
     sCode = parser(sName, "\t");
 
     DWORD rc;
     char* ptr{}, wb[1024]{};
     int iGubn = 0;
-        
-    //종목 시장 분류
-    switch (iGubn) 
-    {
-        case 0:  //주식
-        {
-            //frame 메뉴 로드
-            rc = GetPrivateProfileString(DF_MENU_STOCK, "menu", "", wb, 1024, sFilepath);
-            sFMenu.Format("%s", wb);
-            sFMenu.Trim();
-       
-            if (!rc)
-            {
-                sFMenu.Empty();
-                return FALSE;
-            }
-        }
-        break;
-        case 1:  //파생
-        {
-            //frame 메뉴 로드
-            rc = GetPrivateProfileString(DF_MENU_FUTURE, "menu", "", wb, 1024, sFilepath);
-            sFMenu.Format("%s", wb);
-            sFMenu.Trim();
 
-            if (!rc)
-            {
-                sFMenu.Empty();
-                return FALSE;
-            }
+    switch (iGubn)
+    {
+    case 0:
+    {
+        rc = GetPrivateProfileString(DF_MENU_STOCK, "menu", "", wb, 1024, sFilepath);
+        sFMenu.Format("%s", wb);
+        sFMenu.Trim();
+        if (!rc)
+        {
+            sFMenu.Empty();
+            return FALSE;
         }
+    }
+    break;
+    case 1:
+    {
+        rc = GetPrivateProfileString(DF_MENU_FUTURE, "menu", "", wb, 1024, sFilepath);
+        sFMenu.Format("%s", wb);
+        sFMenu.Trim();
+        if (!rc)
+        {
+            sFMenu.Empty();
+            return FALSE;
+        }
+    }
+    break;
+    default:
         break;
     }
-    
+
     popup = new CHMenu();
     popup->CreatePopupMenu();
 
+    // ↓↓↓ menu 객체 추적용 벡터 추가
+    std::vector<CHMenu*> menuList;
+
     CStringArray arrFMenu, arrSMenu, arrHMenu;
     m_pCodelist->StringSplit(sFMenu, arrFMenu, _T(';'));
-   
-    int	menuN{};
-    int    nID{};
+
+    int menuN{};
+    int nID{};
     CMapStringToString _map{};
- 
+
     for (int ii = 0; ii < arrFMenu.GetSize(); ii++)
     {
-        //서브 메뉴 로드  ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
         switch (ii)
         {
-        case DF_MENU_SUBX_TRD:  //매매 관련 화면 리스트
+        case DF_MENU_SUBX_TRD:
         {
-
             rc = GetPrivateProfileString(iGubn == 0 ? DF_MENU_STRADE : DF_MENU_FTRADE, "menu", "", wb, 1024, sFilepath);
             sSMenu.Format("%s", wb);
             sSMenu.Trim();
-
             if (!rc)
             {
                 sFMenu.Empty();
+                for (auto* m : menuList) delete m;
+                for (int i = 0; i < popup->GetMenuItemCount(); i++)
+                {
+                    CHMenu* pSub = (CHMenu*)popup->GetSubMenu(i);
+                    if (pSub) delete pSub;
+                }
+                delete popup; popup = nullptr;
                 return FALSE;
             }
-
-            //히스토리 - 매매 메뉴 내역
             rc = GetPrivateProfileString(iGubn == 0 ? DF_MENU_STRADE : DF_MENU_FTRADE, "Trade_S_Hmenu", "", wb, 1024, sFilepath);
             sSHMenu.Format("%s", wb);
             sSHMenu.Trim();
-
         }
         break;
-        case DF_MENU_SUBX_SISE: //시세 관련 화면 리스트
+        case DF_MENU_SUBX_SISE:
         {
             rc = GetPrivateProfileString(iGubn == 0 ? DF_MENU_SSISE : DF_MENU_FSISE, "menu", "", wb, 1024, sFilepath);
             sSMenu.Format("%s", wb);
             sSMenu.Trim();
-
             if (!rc)
             {
                 sFMenu.Empty();
+                for (auto* m : menuList) delete m;
+                for (int i = 0; i < popup->GetMenuItemCount(); i++)
+                {
+                    CHMenu* pSub = (CHMenu*)popup->GetSubMenu(i);
+                    if (pSub) delete pSub;
+                }
+                delete popup; popup = nullptr;
                 return FALSE;
             }
-
-            //히스토리 - 시세 메뉴 내역
             rc = GetPrivateProfileString(iGubn == 0 ? DF_MENU_STRADE : DF_MENU_FTRADE, "SISE_H_menu", "", wb, 1024, sFilepath);
             sSHMenu.Format("%s", wb);
             sSHMenu.Trim();
-
         }
         break;
-        case DF_MENU_SUBX_CHART: //차트 관련 화면 리스트
+        case DF_MENU_SUBX_CHART:
         {
             rc = GetPrivateProfileString(iGubn == 0 ? DF_MENU_SCHART : DF_MENU_FCHART, "menu", "", wb, 1024, sFilepath);
             sSMenu.Format("%s", wb);
             sSMenu.Trim();
-
             if (!rc)
             {
                 sFMenu.Empty();
+                for (auto* m : menuList) delete m;
+                for (int i = 0; i < popup->GetMenuItemCount(); i++)
+                {
+                    CHMenu* pSub = (CHMenu*)popup->GetSubMenu(i);
+                    if (pSub) delete pSub;
+                }
+                delete popup; popup = nullptr;
                 return FALSE;
             }
-
-            //히스토리 - 차트  메뉴 내역
             rc = GetPrivateProfileString(iGubn == 0 ? DF_MENU_STRADE : DF_MENU_FTRADE, "CHART_S_menu", "", wb, 1024, sFilepath);
             sSHMenu.Format("%s", wb);
             sSHMenu.Trim();
         }
         break;
-        case DF_MENU_SUBX_BALANCE: //잔고 관련 화면 리스트
+        case DF_MENU_SUBX_BALANCE:
         {
             rc = GetPrivateProfileString(iGubn == 0 ? DF_MENU_SBALANCE : DF_MENU_FBALANCE, "menu", "", wb, 1024, sFilepath);
             sSMenu.Format("%s", wb);
             sSMenu.Trim();
-
             if (!rc)
             {
                 sFMenu.Empty();
+                for (auto* m : menuList) delete m;
+                for (int i = 0; i < popup->GetMenuItemCount(); i++)
+                {
+                    CHMenu* pSub = (CHMenu*)popup->GetSubMenu(i);
+                    if (pSub) delete pSub;
+                }
+                delete popup; popup = nullptr;
                 return FALSE;
             }
-
-            //히스토리 - 잔고  메뉴 내역
             rc = GetPrivateProfileString(iGubn == 0 ? DF_MENU_STRADE : DF_MENU_FTRADE, "BALANCE_S_menu", "", wb, 1024, sFilepath);
             sSHMenu.Format("%s", wb);
             sSHMenu.Trim();
         }
         break;
+        default:
+            break;
         }
-        //서브 메뉴 로드  ↑↑↑↑↑↑↑↑↑↑↑↑↑↑ 
 
         menu = new CHMenu();
         menu->CreatePopupMenu();
+        menuList.push_back(menu);  // ← 추적 등록
 
         stmp.Format("%s", arrFMenu.GetAt(ii));
         stmp.Replace("|", " ");
-        popup->InsertMenuX(ii , MF_POPUP | MF_BYPOSITION | MF_STRING, (UINT)menu->m_hMenu, stmp);
+        popup->InsertMenuX(ii, MF_POPUP | MF_BYPOSITION | MF_STRING, (UINT)menu->m_hMenu, stmp);
 
         CHMenu* psub = (CHMenu*)popup->GetSubMenu(ii);
         int id = popup->GetMenuItemCount();
-        
+
         m_pCodelist->StringSplit(sSHMenu, arrSMenu, _T(';'));
         for (int jj = 0; jj < arrSMenu.GetSize(); jj++)
         {
             stmp.Format("%s", arrSMenu.GetAt(jj));
             stmp.Replace("|", " ");
-            int ret = psub->AppendMenuX(MF_BYPOSITION | MF_STRING, ++menuN, stmp, nullptr);   
-
+            int ret = psub->AppendMenuX(MF_BYPOSITION | MF_STRING, ++menuN, stmp, nullptr);
             skey.Format("%d", menuN);
-          //_map.SetAt(skey, stmp.Mid(stmp.Find(" ")));
             _map.SetAt(skey, stmp);
-
         }
         sSMenu.Empty();
 
         psub->AppendMenuX(MF_SEPARATOR);
-        //히스토리 내역  추가
         m_pCodelist->StringSplit(sSMenu, arrHMenu, _T(';'));
         for (int jj = 0; jj < arrHMenu.GetSize(); jj++)
         {
             stmp.Format("%s", arrHMenu.GetAt(jj));
             stmp.Replace("|", " ");
             int ret = psub->AppendMenuX(MF_BYPOSITION | MF_STRING, ++menuN, stmp, nullptr);
-
             skey.Format("%d", menuN);
             _map.SetAt(skey, stmp.Mid(stmp.Find(" ")));
             _map.SetAt(skey, stmp);
-
         }
     }
-
-   
-
 
     CPoint pt;
     GetCursorPos(&pt);
 
-
     stmp.Format("CLBparen cursor -- > [pt]  top=[%d]\t right=[%d]", pt.x, pt.y);
     OutputDebugString("\r\n" + stmp);
-
     stmp.Format("CPopListWnd[point]   point.x=[%d]\t point.y=[%d]", point.x, point.y);
     OutputDebugString("\r\n" + stmp);
 
-    if (_bRightPop) //우측으로 띄울때
+    if (_bRightPop)
     {
         pt.x += point.x;
         pt.y -= point.y;
-
         pt.y -= 3;
         pt.x += 18;
-    }
-    else
-    {
-
     }
 
     int index{};
     index = popup->TrackPopupMenu(TPM_LEFTALIGN | TPM_RIGHTBUTTON | TPM_RETURNCMD, pt.x, pt.y, this);
 
-    switch(index)
+    switch (index)
     {
-        default:
-        {
-
-        }
+    default:
         break;
     }
 
-    
     skey.Format("%d", index);
     if (_map.Lookup(skey, stmp))
     {
-      //  stmp = skey + "   " + stmp;
         AfxMessageBox(m_sVal);
     }
+
+    // ↓↓↓ 정리: menu 객체들 먼저, 그다음 popup
+    for (auto* m : menuList)
+        delete m;
+    menuList.clear();
+
+    for (int ii = 0; ii < popup->GetMenuItemCount(); ii++)
+    {
+        CHMenu* pSub = (CHMenu*)popup->GetSubMenu(ii);
+        if (pSub) delete pSub;
+    }
+    delete popup;
+    popup = nullptr;
 }
 
 
@@ -360,11 +653,20 @@ LRESULT CPopListWnd::OnMessage(WPARAM wParam, LPARAM lParam)
             scode = parser(stmp, "\t");
             sname = stmp;
 
+            scode.TrimRight();
+            sname.TrimRight();
+
+          //  if (scode.IsEmpty())
+           // {
+               // stmp.Format("[cx_combolist][CPopListWnd] LIST_MSG_REMOVE_ITEM scode = [%s] sname=[%s]", scode, sname);
+               //OutputDebugString(stmp);
+               // AfxMessageBox(stmp);
+          //  }
+
             if (m_nPopupType == POPUP_TYPE_HISTORY)
             {
-           /*     if (m_pParent && m_pParent->GetSafeHwnd())
-                    m_pParent->PostMessage(WM_POPLISTWINDOW, POPLIST_REMOVE,
-                        (LPARAM)(LPSTR)(LPCTSTR)scode);*/
+                if (m_pParent && m_pParent->GetSafeHwnd())
+                    m_pParent->SendMessage(WM_POPLISTWINDOW, POPLIST_REMOVE, (LPARAM)(LPSTR)(LPCTSTR)scode);
             }
             else
             {
@@ -380,6 +682,11 @@ LRESULT CPopListWnd::OnMessage(WPARAM wParam, LPARAM lParam)
             // CControlWnd 에 통보
             if (m_pParent && m_pParent->GetSafeHwnd())
                 m_pParent->PostMessage(WM_POPLISTWINDOW, POPLIST_EDIT_FOCUS, 0);
+        }
+        break;
+        default:
+        {
+
         }
         break;
     }
@@ -486,7 +793,7 @@ BOOL CPopListWnd::CreateListBox(CString items, int nPopWidth)
 
         // 3. 너비 계산
         const int nCodeW = max(sz.cx + 10, 50);
-        const int nBtnW = 17;
+        const int nBtnW = 15;
         CRect rcPop;
         GetClientRect(&rcPop);
         const int nTotalW = nTotal - nScrollW;
@@ -504,7 +811,8 @@ BOOL CPopListWnd::CreateListBox(CString items, int nPopWidth)
         m_pCodelist->InsertColumn(2, "", LVCFMT_CENTER, nBtnW);
 
         m_pCodelist->LoadClosePng(
-            m_pParent->m_sRoot + "\\image\\btn_square_close.png");
+            m_pParent->m_sRoot + "\\image\\btn_combo_delete.BMP");
+            //m_pParent->m_sRoot + "\\image\\btn_square_close.png");
     }
     else if (m_nType == VS2_TYPE)
     {
@@ -551,10 +859,13 @@ BOOL CPopListWnd::CreateListBox(CString items, int nPopWidth)
     // 전체삭제 버튼
     m_pBtnClear = std::make_unique<CfxImgButton>();
     m_pBtnClear->Create("전체 삭제", rcBtn, this, ID_BTN_CLEAR);
-    m_pBtnClear->LoadPng(
+    m_pBtnClear->SetImgBitmap(m_pParent->GetBitmap( m_pParent->m_sRoot + "\\image\\AxAllDelete.bmp"), 
+                                                    m_pParent->GetBitmap(m_pParent->m_sRoot + "\\image\\AxAllDelete_DN.bmp"),
+                                                   m_pParent->GetBitmap( m_pParent->m_sRoot + "\\image\\AxAllDelete_EN.bmp"));
+    /*m_pBtnClear->LoadPng(
         m_pParent->m_sRoot + "\\image\\AxAllDelete.png",
         m_pParent->m_sRoot + "\\image\\AxAllDelete_DN.png",
-        m_pParent->m_sRoot + "\\image\\AxAllDelete_EN.png");
+        m_pParent->m_sRoot + "\\image\\AxAllDelete_EN.png");*/
 
     return TRUE;
 }
@@ -741,7 +1052,7 @@ void CPopListWnd::OnSize(UINT nType, int cx, int cy)
         int  nScrW = bVScroll ? nScrollW : 0;
 
         const int nCodeW = 70;
-        const int nBtnW = 17;
+        const int nBtnW = 15;
         const int nNameW = max(nListW - nCodeW - nBtnW - nScrW, 60);
 
         m_pCodelist->SetColumnWidth(0, nCodeW);
@@ -828,7 +1139,7 @@ void CPopListWnd::RefreshList(CString items)
     if (pOldFont) dc.SelectObject(pOldFont);
 
     const int nCodeW = sz.cx + 10;
-    const int nBtnW = 17;
+    const int nBtnW = 15;
 
     BOOL bVScroll = IsVScrollVisible(arr.GetCount());
     int nScrollW = bVScroll ? GetSystemMetrics(SM_CXVSCROLL) : 0;

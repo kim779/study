@@ -1901,7 +1901,7 @@ void CCodeListCtrl::OnNMClick(NMHDR* pNMHDR, LRESULT* pResult)
 
 				CString stmp;
 				stmp.Format("%s\t%s", scode, sname);
-				GetParent()->PostMessage(WM_USER,
+				GetParent()->SendMessage(WM_USER,
 					MAKEWPARAM(LIST_MSG_REMOVE_ITEM, 0),
 					(LPARAM)(LPSTR)(LPCTSTR)stmp);
 

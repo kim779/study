@@ -11,16 +11,24 @@
 
 #include "AccountCtrl.h"
 
+#include "AccCrypto.h"
 
-// COubWnd
-const int headerH = 20, dataH = 20;
-const int titleH = 18, tabW = 140, gap1 = 1;
 
 IMPLEMENT_DYNAMIC(COubWnd, CWnd)
 
 #define TM_MOVECHECK 9999
 #define TM_SLIDESTART 9998
 #define TM_SLIDING		 9997
+
+// -----------------------------------------------
+// 레이아웃 상수
+// -----------------------------------------------
+const int headerH = 20;
+const int dataH = 20;
+const int titleH = 18;
+const int tabW = 140;
+const int gap1 = 1;
+const int chkH = 18;	// 체크박스 영역 높이 (대리인 전용)
 
 COubWnd::COubWnd()
 {
@@ -46,35 +54,127 @@ END_MESSAGE_MAP()
 
 
 // COubWnd 메시지 처리기
+// ==============================================
+// 해시 (단방향 - FNV-1a 32bit)
+// ==============================================
+CString COubWnd::HashAccount(const CString& sAccNo)
+{
+	DWORD hash = 2166136261u;
+	for (int i = 0; i < sAccNo.GetLength(); i++)
+	{
+		hash ^= (BYTE)sAccNo[i];
+		hash *= 16777619u;
+	}
+	CString sHash;
+	sHash.Format(_T("%08X"), hash);		// 예: "A3F2C1D0"
+	return sHash;
+}
 
+CString COubWnd::EncryptAccount(const CString& sAccNo)
+{
+	CByteArray arr;
+	for (int i = 0; i < sAccNo.GetLength(); i++)
+	{
+		BYTE b = (BYTE)sAccNo[i];
+		b ^= s_xorKey[i % s_keyLen];		// XOR
+		b += (BYTE)(i * 7);				// 위치별 오프셋 추가
+		arr.Add(b);
+	}
+	return BytesToHex(arr);
+}
+
+CString COubWnd::DecryptAccount(const CString& sEncrypted)
+{
+	CByteArray arr;
+	HexToBytes(sEncrypted, arr);
+
+	CString sResult;
+	for (int i = 0; i < arr.GetSize(); i++)
+	{
+		BYTE b = arr[i];
+		b -= (BYTE)(i * 7);				// 위치별 오프셋 제거
+		b ^= s_xorKey[i % s_keyLen];		// XOR 복원
+		sResult += (TCHAR)b;
+	}
+	return sResult;
+}
+
+// ==============================================
+// ini 유틸
+// ==============================================
+
+// 체크 시 오늘 날짜를 해시 키로 ini에 저장
+void COubWnd::SaveHideDate()
+{
+	if (m_sAccNo.IsEmpty() || m_sIniPath.IsEmpty())
+		return;
+#ifdef DF_ACC_HASH
+	CString sKey = HashAccount(m_sAccNo);
+#else
+	CString sKey = EncryptAccount(m_sAccNo);
+
+#endif
+	COleDateTime today = COleDateTime::GetCurrentTime();
+	CString sDate = today.Format(_T("%Y%m%d"));
+
+	WritePrivateProfileString(_T("AgentPopup"), sKey, sDate, m_sIniPath);
+
+}
+
+// 7일 억제 중인지 확인 (TRUE = 억제 중 → 팝업 스킵)
+bool COubWnd::IsHiddenToday()
+{
+	if (m_sAccNo.IsEmpty() || m_sIniPath.IsEmpty())
+		return false;
+
+#ifdef DF_ACC_HASH
+	CString sKey = HashAccount(m_sAccNo);
+#else
+	CString sKey = EncryptAccount(m_sAccNo);
+#endif
+
+	TCHAR szDate[16] = {};
+	GetPrivateProfileString(_T("AgentPopup"), sKey, _T(""),
+		szDate, 16, m_sIniPath);
+
+	if (_tcslen(szDate) != 8)
+		return false;
+
+	CString s(szDate);
+	int year = _ttoi(s.Mid(0, 4));
+	int month = _ttoi(s.Mid(4, 2));
+	int day = _ttoi(s.Mid(6, 2));
+
+	COleDateTime saved(year, month, day, 0, 0, 0);
+	COleDateTime now = COleDateTime::GetCurrentTime();
+
+	COleDateTimeSpan span = now - saved;
+	return (span.GetTotalDays() < 7.0);	// 7일 이내면 억제
+}
 
 
 
 void COubWnd::OnPaint()
 {
-	CPaintDC dc(this); // device context for painting
-					   // TODO: 여기에 메시지 처리기 코드를 추가합니다.
-					   // 그리기 메시지에 대해서는 CWnd::OnPaint()을(를) 호출하지 마십시오.
-	//xxx::CMemDC	memdc(&dc);
-
+	CPaintDC dc(this);
 	CRect rc;
 	GetClientRect(&rc);
 
 	CPen* pOldPen;
-	GetClientRect(&rc);
-
 	dc.FillSolidRect(rc, GetSysColor(COLOR_INACTIVEBORDER));
 	drawCaption(&dc);
 	drawData(&dc);
 
-	pOldPen = (CPen*)dc.SelectObject(getAxPen(GetSysColor(COLOR_HIGHLIGHTTEXT), 1, PS_SOLID));
-
-	// exit button
+	// 닫기(X) 버튼
 	GetClientRect(&rc);
 	rc.left = rc.right - 14;
 	rc.top = rc.top + 5;
 	rc.bottom = rc.top + 10;
 	rc.right = rc.left + 10;
+
+	pOldPen = (CPen*)dc.SelectObject(
+		getAxPen(GetSysColor(COLOR_HIGHLIGHTTEXT), 1, PS_SOLID));
+
 	dc.Rectangle(rc);
 	rc.DeflateRect(1, 1);
 	dc.FillSolidRect(rc, GetSysColor(COLOR_HIGHLIGHT));
@@ -127,36 +227,32 @@ CFont* COubWnd::getAxFont(CString fName, int point, int style)
 void COubWnd::drawCaption(CDC* pDC)
 {
 	CFont* pOldFont = nullptr;
-	CRect	clientRc, rect;
+	CRect clientRc, rect;
 
-	GetClientRect(&clientRc); 
+	GetClientRect(&clientRc);
 	rect = clientRc;
-	
-	rect.top += gap1; 
+
+	rect.top += gap1;
 	rect.bottom = rect.top + titleH;
 	pDC->FillSolidRect(rect, GetSysColor(COLOR_INFOBK));
-
 	pDC->SetTextColor(RGB(38, 55, 100));
 	pOldFont = (CFont*)pDC->SelectObject(getAxFont(_T("굴림체"), 9, 3));
 
-
 	rect.right = rect.left + tabW;
-	//pDC->DrawText("조회결과", -1, rect, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
 	pDC->SelectObject(pOldFont);
 
-	rect.left = rect.right; rect.right = clientRc.right; rect.DeflateRect(0, 2, 2, 2);
+	rect.left = rect.right;
+	rect.right = clientRc.right;
+	rect.DeflateRect(0, 2, 2, 2);
 	pDC->FillSolidRect(rect, GetSysColor(COLOR_HIGHLIGHT));
 }
 
 void COubWnd::drawData(CDC* pDC)
 {
-	CRect		rect, irc, drc;
-	CFont		font;
-	CString		tmpx, temp, string;
-	CStringArray	stringAry;
-
+	CRect rect, drc;
 	GetClientRect(&rect);
-	rect.top = rect.top + headerH; rect.DeflateRect(1, 1);
+	rect.top = rect.top + headerH;
+	rect.DeflateRect(1, 1);
 	pDC->FillSolidRect(rect, GetSysColor(COLOR_INFOBK));
 
 	pDC->SetBkMode(TRANSPARENT);
@@ -165,9 +261,45 @@ void COubWnd::drawData(CDC* pDC)
 
 	drc = rect;
 	drc.top += 5;
-	//drc.bottom = drc.top + dataH;
-	//string = " 주문대리인이 약정된 계좌입니다.  \n\n 자세한 사항은 화면번호(8782)에서\n\n 확인하여 주시기 바랍니다.";
-	pDC->DrawText(m_sMsg, drc, DT_LEFT|DT_VCENTER|DT_WORDBREAK);
+
+	// 대리인이면 하단 chkH 만큼 체크박스 영역 확보
+	if (m_bIsAgent)
+		drc.bottom -= chkH;
+
+	pDC->DrawText(m_sMsg, drc, DT_LEFT | DT_VCENTER | DT_WORDBREAK);
+
+	// ── 체크박스 그리기 (대리인 전용) ──────────────────
+	if (m_bIsAgent)
+	{
+		CRect rcChk;
+		rcChk.left = rect.left + 5;
+		rcChk.bottom = rect.bottom - 3;
+		rcChk.top = rcChk.bottom - 13;
+		rcChk.right = rcChk.left + 13;
+		m_rcCheckBox = rcChk;	// 클릭 판정용 저장
+
+		// 체크박스 테두리
+		pDC->Rectangle(rcChk);
+
+		// 체크 표시
+		if (m_bDontShow)
+		{
+			CPen* pOldPen = (CPen*)pDC->SelectObject(
+				getAxPen(RGB(0, 0, 200), 2, PS_SOLID));
+			pDC->MoveTo(rcChk.left + 2, rcChk.top + 6);
+			pDC->LineTo(rcChk.left + 5, rcChk.bottom - 2);
+			pDC->LineTo(rcChk.right - 2, rcChk.top + 2);
+			pDC->SelectObject(pOldPen);
+		}
+
+		// 체크박스 옆 문구
+		CRect rcTxt = rcChk;
+		rcTxt.left = rcChk.right + 4;
+		rcTxt.right = rect.right;
+		pDC->DrawText(_T("7일동안 안띄웁니다."), rcTxt,
+			DT_LEFT | DT_VCENTER | DT_SINGLELINE);
+	}
+	// ────────────────────────────────────────────────────
 
 	pDC->SelectObject(pOldFont);
 }
@@ -189,10 +321,19 @@ void COubWnd::OnKillFocus(CWnd* pNewWnd)
 
 void COubWnd::OnLButtonDown(UINT nFlags, CPoint point)
 {
-	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
+	// ── 체크박스 클릭 (대리인 전용) ──────────────────
+	if (m_bIsAgent && m_rcCheckBox.PtInRect(point))
+	{
+		m_bDontShow = !m_bDontShow;
+		Invalidate();
+		CWnd::OnLButtonDown(nFlags, point);
+		return;
+	}
+	// ─────────────────────────────────────────────────
+
+	// 닫기(X) 버튼
 	CRect rc;
 	GetClientRect(&rc);
-
 	rc.left = rc.right - 14;
 	rc.top = rc.top + 5;
 	rc.bottom = rc.top + 10;
@@ -200,9 +341,7 @@ void COubWnd::OnLButtonDown(UINT nFlags, CPoint point)
 
 	if (rc.PtInRect(point))
 	{
-		//m_firstPnt = point;
 		SetCapture();
-		//GetClientRect(&m_rc);
 		m_bDrag = true;
 	}
 	CWnd::OnLButtonDown(nFlags, point);
@@ -301,6 +440,11 @@ void COubWnd::OnDestroy()
 {
 	CWnd::OnDestroy();
 	m_bShow = false;
+
+	// 체크됐으면 ini에 날짜 저장
+	if (m_bIsAgent && m_bDontShow)
+		SaveHideDate();
+
 	((CAccountCtrl*)m_pParent)->RemoveOubWnd(this);
 	// TODO: 여기에 메시지 처리기 코드를 추가합니다.
 }

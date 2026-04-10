@@ -828,6 +828,11 @@ CString CControlWnd::BuildSearchItems(CString sText)
 	POSITION pos = m_mapCodeToGichoName.GetStartPosition();
 	CString sCode, sName;
 
+	slog.Format("[cx_combolist][CControlWnd][BuildSearchItems] sText=%s \n",
+		sText);
+	OutputDebugString(slog);
+
+
 	while (pos)
 	{
 		m_mapCodeToGichoName.GetNextAssoc(pos, sCode, sName);
@@ -930,7 +935,7 @@ void CControlWnd::SearchCode(CString sText)
 		GetClientRect(&rcClient);
 
 		CPoint ptLT(rcClient.left, rcClient.bottom);
-		CPoint ptRB(rcClient.right + 100, rcClient.bottom + 200);
+		CPoint ptRB(rcClient.right + 100, rcClient.bottom + 150);
 
 		ClientToScreen(&ptLT);
 		ClientToScreen(&ptRB);
@@ -1016,7 +1021,7 @@ LRESULT CControlWnd::OnInitPos(WPARAM wp, LPARAM lp) //OnInitPos WM_POPLISTWINDO
 			GetClientRect(&rcClient);
 
 			CPoint ptLT(rcClient.left, rcClient.bottom);
-			CPoint ptRB(rcClient.right + 100, rcClient.bottom + 200);
+			CPoint ptRB(rcClient.right + 100, rcClient.bottom + 150);
 
 			ClientToScreen(&ptLT);
 			ClientToScreen(&ptRB);
@@ -1105,7 +1110,8 @@ LRESULT CControlWnd::OnInitPos(WPARAM wp, LPARAM lp) //OnInitPos WM_POPLISTWINDO
 }
 void CControlWnd::OnBtnDropClicked()
 {
-	PostMessage(WM_POPLISTWINDOW, POPLIST_SHOW, 0); //OnBtnDropClicked 보여준다
+	if(m_pCodeCtrl->m_pEdit && m_pCodeCtrl->m_pEdit->IsWindowEnabled() == true)
+		PostMessage(WM_POPLISTWINDOW, POPLIST_SHOW, 0); //OnBtnDropClicked 보여준다
 }
 
 void CControlWnd::OnBtnLangClicked()

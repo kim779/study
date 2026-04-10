@@ -66,18 +66,15 @@ SCREEN.Send 0
 _AW_ONENDSUB_AW_
 _AW_ONSEND_AW_
 'SCREEN.OnSend = False
+bnkcode.Data = ""
 
 _AW_ONENDSUB_AW_
 _AW_ONRECEIVE_AW_
-Dim desc, ltim
+If Left(Trim(LEDGER.Ecod), 1) = "0" Then
+	SCREEN.Object("main.edbnkcode").Data = bnkcode.Data
+End If
 
-Select Case LEDGER.Ecod
-	Case "0136"	' 조회가 완료되었습니다.
-		' Proceed
-
-	Case Else
-		Exit Sub
-End Select
+'SCREEN.Object("main.GUIDE").Text = LEDGER.Emsg
 
 _AW_ONENDSUB_AW_
 _AW_SCRIPT_AW_(ed_acno)

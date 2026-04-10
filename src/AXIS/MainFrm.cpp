@@ -1694,14 +1694,14 @@ BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)
 				{
 					DWORD tickStart = GetTickCount();
 
-					while (GetTickCount() - tickStart < 10000) // 10초
-					{
-						volatile int x = 0;
-						for (int i = 0; i < 100000; ++i)
-						{
-							x += i * i;
-						}
-					}
+					//while (GetTickCount() - tickStart < 10000) // 10초
+					//{
+					//	volatile int x = 0;
+					//	for (int i = 0; i < 100000; ++i)
+					//	{
+					//		x += i * i;
+					//	}
+					//}
 					/*	int nCount = m_mapAlarmList.GetCount();
 						m_slog.Format("[mng][main]] Map Count = %d\n", nCount);
 						OutputDebugString(m_slog);
@@ -4240,6 +4240,7 @@ HWND CMainFrame::GetHWndByKey(int key, int& msg)
 		msg = atoi(temp);
 		return hwnd;
 	}
+	return nullptr;
 	return nullptr;
 }
 
@@ -33183,14 +33184,19 @@ void CMainFrame::CreateAgentProcess(bool bforce)
 	CRect rc;
 	GetWindowRect(&rc);
 
-	char cmds[512] = { 0 };
-	sprintf_s(cmds, "AxisAgent.exe /p %lu /h %llu /n %s /v %d /x %d /y %d",
+	CString userpath;
+	userpath.Format("%s\\%s\\%s\\Crashlog", Axis::home, USRDIR, Axis::user);
+
+	char cmds[1024] = { 0 };
+	sprintf_s(cmds, "AxisAgent.exe /p %lu /h %llu /n %s /v %d /x %d /y %d /t %lu /d \"%s\"",
 		pid,
 		(UINT64)this->GetSafeHwnd(),
 		(LPCSTR)m_regkey,
 		m_bShowAxisAgent,
 		rc.left,   // ← 좌측
-		rc.top);
+		rc.top,
+		GetCurrentThreadId(),
+		(LPCSTR)userpath);      // 현재 스레드 ID);
 
 	STARTUPINFOA si = { sizeof(si) };
 	PROCESS_INFORMATION pi = { 0 };

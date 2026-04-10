@@ -1540,6 +1540,8 @@ void CfxCodeCtrl::LButtonUp()
 void CfxCodeCtrl::OnPaint() 
 {
 	CPaintDC dc(this);
+
+
 	if (!m_pParent) return;
 
 	CRect WinRC;
@@ -1552,16 +1554,16 @@ void CfxCodeCtrl::OnPaint()
 		dc.FillSolidRect(&WinRC, CLR_NOBACKCOLOR);
 
 	// 테두리 - 멤버변수로 판단
-	COLORREF clrBorder = m_bHangulMode
+	/*COLORREF clrBorder = m_bHangulMode
 		? RGB(255, 0, 0)
 		: RGB(149, 159, 172);
 
 	CString slog;
 	slog.Format("[OnPaint] m_bHangulMode=%d clrBorder=0x%06x\n",
 		m_bHangulMode, clrBorder);
-	OutputDebugString(slog);
+	OutputDebugString(slog);*/
 
-	dc.Draw3dRect(&WinRC, clrBorder, clrBorder);
+	dc.Draw3dRect(&WinRC, RGB(149, 159, 172), RGB(149, 159, 172));
 }
 
 void CfxCodeCtrl::OnSetFocus(CWnd* pOldWnd) 

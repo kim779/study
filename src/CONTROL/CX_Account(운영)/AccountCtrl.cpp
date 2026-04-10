@@ -5,6 +5,9 @@
 #include "CX_Account.h"
 #include "AccountCtrl.h"
 #include "../../axis/axMsg.hxx"
+
+#include "AccCrypto.h"
+
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #undef THIS_FILE
@@ -202,6 +205,7 @@ typedef struct _Osacaq029 {
 }OSACAQ029, * POSACAQ029;
 
 #define L_ISACAQ029	sizeof(_Isacaq029)
+
 //KJS
 void CAccountCtrl::FileLog(CString strhome, LPCSTR log, ...)
 {
@@ -786,14 +790,14 @@ BOOL CAccountCtrl::Initialize(BOOL bDLL)
 	m_strUser = Variant(userCC);
 	m_strName = Variant(nameCC);
 	m_strDept = Variant(deptCC);
-
+	m_sHome.Format("%s\\user\\%s\\%s.ini", m_strRoot, m_strName, m_strName);
 //m_slog.Format("[cx_account][%s]<%d>  Variant(deptCC)  =[%s]", __FUNCTION__, __LINE__, m_strDept);
 //Output_DebugString(m_slog);
 
 	m_strDept.Trim();
 	m_staff = IsNumber(m_strUser);
 	//Check2AgentAcc();
-	InitAllowDept();  //전 계좌 가능 지점부서 초기화
+	InitAllowDept();  //전 계좌 가능 지점부서 초기화 
 
 	m_pCombo = std::make_unique<CAccCombo>(this);
 	m_pEdit  = std::make_shared<CAccEdit>();
@@ -6038,18 +6042,47 @@ bool CAccountCtrl::SACAQ0239Ret_Check()
 #ifdef DF_TEST_MODE
 	m_sbAgn = "Y";
 #endif
-	if(m_sbAgn == "Y")  //주문대리인
-		CreateOubWnd(" 주문대리인이 약정된 계좌입니다.  \n\n 자세한 사항은 화면번호(8782)에서\n\n 확인하여 주시기 바랍니다.");
+	if (m_sbAgn == "Y")
+	{
+		CString strData;
+		m_pEdit->GetWindowText(strData);
+		strData.Replace("-", "");
+		CString sIniPath = m_sHome ;
+#ifdef DF_ACC_HASH
+		CString sKey = HashAccount(strData);	// strData = 계좌번호
+#else
+		CString sKey = EncryptAccount(strData);
+#endif
+
+		// 7일 억제 중인지 확인
+		TCHAR szDate[16] = {};
+		GetPrivateProfileString(_T("AgentPopup"), sKey,
+			_T(""), szDate, 16, sIniPath);
+
+		bool bSkip = false;
+		if (_tcslen(szDate) == 8)
+		{
+			CString s(szDate);
+			COleDateTime saved(
+				_ttoi(s.Mid(0, 4)), _ttoi(s.Mid(4, 2)), _ttoi(s.Mid(6, 2)), 0, 0, 0);
+			COleDateTime now = COleDateTime::GetCurrentTime();
+			bSkip = ((now - saved).GetTotalDays() < 7.0);
+		}
+
+		if (!bSkip)
+			CreateOubWnd(" 주문대리인이 약정된 계좌입니다.  \n\n 자세한 사항은 화면번호(8782)에서\n\n 확인하여 주시기 바랍니다.", TRUE);
+	}
 
 	return true;
 }
 
 
-void CAccountCtrl::CreateOubWnd(CString sMsg)
+void CAccountCtrl::CreateOubWnd(CString sMsg, BOOL bIsAgent)
 {
 	CString strData;
 	strData = m_pEdit->GetInputData();
 	strData.Trim();
+	strData.Replace("-", "");
 	if (strData.IsEmpty())
 		return;
 
@@ -6058,10 +6091,20 @@ void CAccountCtrl::CreateOubWnd(CString sMsg)
 	ClientToScreen(&rcParent);
 
 	int cx = 310, cy = 100;
+
+	// 대리인이면 체크박스 영역만큼 높이 추가
+	if (bIsAgent)
+		cy = 118;
+
 	COubWnd* pWnd = new COubWnd;
 	pWnd->m_pWizard = m_pParent;
 	pWnd->m_pParent = this;
 	pWnd->m_sMsg = sMsg;
+	pWnd->m_bIsAgent = bIsAgent;
+	pWnd->m_bDontShow = FALSE;
+	pWnd->m_sAccNo = strData;								// 계좌번호 세팅
+	pWnd->m_sIniPath = m_sHome ;	// ini 경로 세팅
+
 	CString sClassName = AfxRegisterWndClass(0);
 
 	//-----------------------------
@@ -6085,8 +6128,7 @@ void CAccountCtrl::CreateOubWnd(CString sMsg)
 		COubWnd* pLast = m_arrOubWnd.back();
 		CRect rcLast;
 		pLast->GetWindowRect(&rcLast);
-
-		top = rcLast.bottom + 2;   // 기본 아래 배치
+		top = rcLast.bottom + 2;
 	}
 	else
 	{
@@ -6097,7 +6139,7 @@ void CAccountCtrl::CreateOubWnd(CString sMsg)
 	int bottom = top + cy;
 
 	//-----------------------------
-	// ◆ 모니터 아래로 넘어가면 → 첫 번째 팝업 위로 보낸다
+	// 모니터 아래로 넘어가면 → 첫 번째 팝업 위로 보낸다
 	//-----------------------------
 	if (!m_arrOubWnd.empty() && bottom > rcWork.bottom)
 	{
@@ -6105,11 +6147,9 @@ void CAccountCtrl::CreateOubWnd(CString sMsg)
 		CRect rcFirst;
 		pFirst->GetWindowRect(&rcFirst);
 
-		// 첫 번째 팝업 바로 위
 		top = rcFirst.top - cy - 2;
 		bottom = top + cy;
 
-		// 화면 위로 넘어가면 clamp
 		if (top < rcWork.top)
 			top = rcWork.top;
 	}
@@ -6133,6 +6173,20 @@ void CAccountCtrl::CreateOubWnd(CString sMsg)
 	m_arrOubWnd.push_back(pWnd);
 }
 
+// AccountCtrl.cpp 에 추가 (COubWnd 것과 동일 로직)
+CString CAccountCtrl::HashAccount(const CString& sAccNo)
+{
+	DWORD hash = 2166136261u;
+	for (int i = 0; i < sAccNo.GetLength(); i++)
+	{
+		hash ^= (BYTE)sAccNo[i];
+		hash *= 16777619u;
+	}
+	CString sHash;
+	sHash.Format(_T("%08X"), hash);
+	return sHash;
+}
+
 void CAccountCtrl::RemoveOubWnd(COubWnd* pwnd)
 {
 	auto it = std::find(m_arrOubWnd.begin(), m_arrOubWnd.end(), pwnd);
@@ -6146,4 +6200,35 @@ CString CAccountCtrl::OptionParser(CString sOption, CString sKey)
 	Parser(tmp, sKey);
 	tmp = Parser(tmp, "/");
 	return tmp;
+}
+
+
+
+CString CAccountCtrl::EncryptAccount(const CString& sAccNo)
+{
+	CByteArray arr;
+	for (int i = 0; i < sAccNo.GetLength(); i++)
+	{
+		BYTE b = (BYTE)sAccNo[i];
+		b ^= s_xorKey[i % s_keyLen];		// XOR
+		b += (BYTE)(i * 7);				// 위치별 오프셋 추가
+		arr.Add(b);
+	}
+	return BytesToHex(arr);
+}
+
+CString CAccountCtrl::DecryptAccount(const CString& sEncrypted)
+{
+	CByteArray arr;
+	HexToBytes(sEncrypted, arr);
+
+	CString sResult;
+	for (int i = 0; i < arr.GetSize(); i++)
+	{
+		BYTE b = arr[i];
+		b -= (BYTE)(i * 7);				// 위치별 오프셋 제거
+		b ^= s_xorKey[i % s_keyLen];		// XOR 복원
+		sResult += (TCHAR)b;
+	}
+	return sResult;
 }

@@ -56,6 +56,22 @@ CHMenu::~CHMenu()
 {
 	m_fontMenu.DeleteObject();
 	m_penBorder.DeleteObject();
+
+	const int nCount = GetMenuItemCount();
+	for (int i = 0; i < nCount; i++)
+	{
+		MENUITEMINFO mii = {};
+		mii.cbSize = sizeof(mii);
+		mii.fMask = MIIM_DATA | MIIM_FTYPE;
+		if (::GetMenuItemInfo(m_hMenu, i, TRUE, &mii))
+		{
+			CHMenuItem* pItem = reinterpret_cast<CHMenuItem*>(mii.dwItemData);
+			if (pItem && pItem->IsMyData())  // IsMyData()로 내 데이터인지 확인
+			{
+				delete pItem;
+			}
+		}
+	}
 	//ref 우선주석
 	//Clear();  
 }
@@ -664,40 +680,63 @@ BOOL CHMenu::AppendODMenu(UINT nFlags, CHMenuItem* pItem, ACCEL* pAccel)
 
 BOOL CHMenu::InsertMenuX(UINT nPosition, UINT nFlags, UINT nIDNewItem, LPCTSTR lpszNewItem, HICON hIcon)
 {
-	if (nFlags & MF_SEPARATOR)	return AppendSeparator();
-	const CHMenuItem* item = new CHMenuText(nIDNewItem, lpszNewItem, hIcon);
-	ASSERT(item);
+	if (nFlags & MF_SEPARATOR) return AppendSeparator();
 
+	auto pItem = std::make_unique<CHMenuText>(nIDNewItem, lpszNewItem, hIcon);
+	ASSERT(pItem.get());
 	nFlags |= MF_OWNERDRAW;
-	/* ===>> ???????????????????? */
-	if (m_bBreak) 	nFlags |= MF_MENUBREAK;
-	if (m_bBreakBar)nFlags |= MF_MENUBARBREAK;
+	if (m_bBreak)    nFlags |= MF_MENUBREAK;
+	if (m_bBreakBar) nFlags |= MF_MENUBARBREAK;
 	m_bBreak = m_bBreakBar = FALSE;
-	/* ???????????????????? <<=== */
-	return InsertMenu(nPosition, nFlags, item->m_dwID, (LPCTSTR)item);
+
+	bool bresult = InsertMenu(nPosition, nFlags, pItem->m_dwID, (LPCTSTR)pItem.get());
+	if (bresult)
+		pItem.release();  // 성공 → 소유권을 메뉴에 넘김
+	return bresult;
 }
 
 BOOL CHMenu::AppendMenuX(UINT nFlags, UINT nIDNewItem, LPCTSTR lpszNewItem, HICON hIcon)
 {
 	if (nFlags & MF_SEPARATOR)	return AppendSeparator();
-	const CHMenuItem* item = new CHMenuText(nIDNewItem, lpszNewItem, hIcon);
-	ASSERT(item);
+	//CHMenuItem* item = new CHMenuText(nIDNewItem, lpszNewItem, hIcon);
+	//ASSERT(item);
+
+	//nFlags |= MF_OWNERDRAW;
+	///* ===>> ???????????????????? */
+	//if (m_bBreak) 	nFlags |= MF_MENUBREAK;
+	//if (m_bBreakBar)nFlags |= MF_MENUBARBREAK;
+	//m_bBreak = m_bBreakBar = FALSE;
+	///* ???????????????????? <<=== */
+	//bool bresult = AppendMenu(nFlags, item->m_dwID, (LPCTSTR)item);
+	//if (!bresult)
+	//	delete item;
+	//return bresult;
+
+	auto pItem = std::make_unique<CHMenuText>(nIDNewItem, lpszNewItem, hIcon);
+	ASSERT(pItem.get());
 
 	nFlags |= MF_OWNERDRAW;
 	/* ===>> ???????????????????? */
 	if (m_bBreak) 	nFlags |= MF_MENUBREAK;
 	if (m_bBreakBar)nFlags |= MF_MENUBARBREAK;
 	m_bBreak = m_bBreakBar = FALSE;
-	/* ???????????????????? <<=== */
-	return AppendMenu(nFlags, item->m_dwID, (LPCTSTR)item);
+
+	bool bresult = AppendMenu(nFlags, pItem->m_dwID, (LPCTSTR)pItem.get());
+	if (bresult)
+		pItem.release();  // 성공 → 소유권을 메뉴에 넘김	
+	return bresult;
 }
 
 BOOL CHMenu::AppendSeparator(void)
 {
 	m_bBreak = m_bBreakBar = FALSE;
 
-	const  CHMenuSeparator* pItem = new  CHMenuSeparator;
-	return AppendMenu(MF_OWNERDRAW | MF_SEPARATOR, 0, (LPCTSTR)pItem);
+	auto pItem = std::make_unique<CHMenuSeparator>();
+	BOOL bResult = AppendMenu(MF_OWNERDRAW | MF_SEPARATOR, 0, (LPCTSTR)pItem.get());
+	if (bResult)
+		pItem.release();  // 성공 → 소유권을 메뉴에 넘김
+	// 실패 → unique_ptr 소멸자가 자동 delete
+	return bResult;
 }
 
 BOOL CHMenu::AppendODPopup(UINT nFlags, CHMenu* pPopup, CHMenuItem* pItem)

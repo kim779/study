@@ -3,6 +3,52 @@
 
 LPCTSTR MiniDumper::m_szAppName;
 #pragma warning (disable : 26495)
+
+static void WriteCrashSummaryIni(
+    LPCTSTR dumpFilePath,
+    struct _EXCEPTION_POINTERS* pExceptionInfo)
+{
+    if (dumpFilePath == NULL || pExceptionInfo == NULL)
+        return;
+
+    CString iniPath;
+    iniPath.Format(_T("%s\\ping\\dump_analysis.ini"), Axis::home);
+
+    // ping 폴더 없으면 생성
+    CString pingDir;
+    pingDir.Format(_T("%s\\ping"), Axis::home);
+    ::CreateDirectory(pingDir, NULL);
+
+    // 섹션명은 dump 파일명만 사용
+    CString section = dumpFilePath;
+    int pos = section.ReverseFind(_T('\\'));
+    if (pos >= 0)
+        section = section.Mid(pos + 1);
+
+    SYSTEMTIME st;
+    ::GetLocalTime(&st);
+
+    CString value;
+    value.Format(_T("%04d-%02d-%02d %02d:%02d:%02d"),
+        st.wYear, st.wMonth, st.wDay,
+        st.wHour, st.wMinute, st.wSecond);
+    ::WritePrivateProfileString(section, _T("TIME"), value, iniPath);
+
+    ::WritePrivateProfileString(section, _T("DUMPFILE"), dumpFilePath, iniPath);
+
+    value.Format(_T("0x%08X"), pExceptionInfo->ExceptionRecord->ExceptionCode);
+    ::WritePrivateProfileString(section, _T("EXCEPTION_CODE"), value, iniPath);
+
+    value.Format(_T("0x%p"), pExceptionInfo->ExceptionRecord->ExceptionAddress);
+    ::WritePrivateProfileString(section, _T("EXCEPTION_ADDR"), value, iniPath);
+
+    value.Format(_T("%lu"), ::GetCurrentThreadId());
+    ::WritePrivateProfileString(section, _T("THREAD_ID"), value, iniPath);
+
+    value.Format(_T("%lu"), ::GetCurrentProcessId());
+    ::WritePrivateProfileString(section, _T("PROCESS_ID"), value, iniPath);
+}
+
 MiniDumper::MiniDumper(LPCTSTR szAppName)
 {
     m_szAppName = _T("Application");

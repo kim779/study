@@ -67,6 +67,18 @@ public:
 	char   m_regkey[256];
 	DWORD  m_parentPid;
 	HANDLE m_hPingThread;
+	char m_sUserpath[256]{};
+
+	//ping 관련
+	HANDLE m_hPingProcess{};
+	HANDLE m_hPingPipeRead{};
+	HANDLE m_hPingPipeWrite{};
+	bool  m_bLastPingSuccess{};
+	bool  m_bPingStateInit{};
+	DWORD m_lastPingSummaryTick{};
+	int   m_pingOkCount{};
+	int   m_pingFailCount{};
+	bool IsPingSuccessLine(const char* line);
 
 	std::vector<AGENT_LOG_ROW> m_allLogs;
 
@@ -88,6 +100,10 @@ public:
 	static DWORD WINAPI MonitorThreadProc(LPVOID pParam);
 	void MonitorLoop();
 
+	DWORD m_lastMonitorSummaryTick;
+	bool  m_bLastHung;
+	int   m_lastNoResponseCount;
+
 	float CalcProcessCpuUsage(
 		FILETIME& prevKernel, FILETIME& prevUser,
 		FILETIME  curKernel, FILETIME  curUser,
@@ -103,6 +119,22 @@ public:
 	void CreateDump(const char* reason);
 	void AnalyzeDump(const char* dumpPath);
 	void WriteMonitorLog(const char* msg);
+	CString GetFileNameOnly(const char* fullPath) const;
+	CString GetDumpAnalysisIniPath() const;
+	CString GetMainCrashDumpDir() const;
+	//BOOL IsDumpAlreadyAnalyzed(const char* dumpPath) const;
+	BOOL IsDumpAlreadyAnalyzed(const CString& dumpPath) const;
+
+	void ScanAndAnalyzeMainCrashDumps();
+
+	void AppendBlankLineToIni();
+	void WriteDumpAnalysisIniByDumpName(
+		const char* dumpPath,
+		const CString& top,
+		const CString& c1,
+		const CString& c2,
+		const CString& c3,
+		const CString& c4);
 
 	static ULONGLONG FileTimeToULL(const FILETIME& ft)
 	{
@@ -156,4 +188,5 @@ public:
 	afx_msg void OnBnClickedChkMonitor();
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	afx_msg void OnBnClickedListClear();
+	afx_msg void OnBnClickedBtnDumpans();
 };

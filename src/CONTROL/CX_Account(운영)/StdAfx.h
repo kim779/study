@@ -40,6 +40,7 @@
 //#define DF_ACC_EMPHASIS  //사용안하기로 함
 
 #define  DF_TEST_MODE1
+#define DF_ACC_HASH
 
 inline void Output_DebugString(CString slog)
 {

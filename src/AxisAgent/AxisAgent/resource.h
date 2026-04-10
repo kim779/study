@@ -16,6 +16,8 @@
 #define IDC_CHK_STOP                    1004
 #define IDC_BUTTON1                     1005
 #define IDC_LIST_CLEAR                  1005
+#define IDC_LIST_CLEAR2                 1006
+#define IDC_BTN_DUMPANS                 1006
 
 // Next default values for new objects
 // 

@@ -232,10 +232,9 @@ namespace
 
 			for (ULONG64 i = 0; i < ctx->pMem64List->NumberOfMemoryRanges; ++i)
 			{
-				const MINIDUMP_MEMORY_DESCRIPTOR64& md =
-					ctx->pMem64List->MemoryRanges[i];
+				const MINIDUMP_MEMORY_DESCRIPTOR64& md = ctx->pMem64List->MemoryRanges[i];
 
-				const ULONG64 start = md.StartOfMemoryRange;
+					const ULONG64 start = md.StartOfMemoryRange;
 				const ULONG64 end = start + md.DataSize;
 
 				if (qwBaseAddress >= start && qwBaseAddress < end)
@@ -349,6 +348,10 @@ CAxisAgentDlg::CAxisAgentDlg(CWnd* pParent)
 	, m_hParentWnd(NULL)
 	, m_parentPid(0)
 	, m_hPingThread(NULL)
+	, m_hMonitorThread(NULL)
+	, m_hPingProcess(NULL)
+	, m_hPingPipeRead(NULL)
+	, m_hPingPipeWrite(NULL)
 	, m_dumpSeq(0)
 	, m_dumpCount(0)
 	, m_lastDumpTick(0)
@@ -395,6 +398,7 @@ BEGIN_MESSAGE_MAP(CAxisAgentDlg, CDialogEx)
 	ON_WM_TIMER()
 	ON_BN_CLICKED(IDC_CHK_STOP, &CAxisAgentDlg::OnBnClickedChkStop)
 	ON_BN_CLICKED(IDC_LIST_CLEAR, &CAxisAgentDlg::OnBnClickedListClear)
+	ON_BN_CLICKED(IDC_BTN_DUMPANS, &CAxisAgentDlg::OnBnClickedBtnDumpans)
 END_MESSAGE_MAP()
 
 
@@ -440,7 +444,15 @@ BOOL CAxisAgentDlg::OnInitDialog()
 	ParseCommandLine();
 
 	if (m_bShow)
+	{
 		ModifyStyleEx(WS_EX_TOOLWINDOW, WS_EX_APPWINDOW);
+		SetWindowPos(nullptr, 0, 0, 0, 0,
+			SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
+
+		// 2단계: TopMost 설정
+		SetWindowPos(&wndTopMost, 0, 0, 0, 0,
+			SWP_NOMOVE | SWP_NOSIZE);
+	}
 	else
 		ModifyStyleEx(WS_EX_APPWINDOW, WS_EX_TOOLWINDOW);
 
@@ -499,6 +511,15 @@ BOOL CAxisAgentDlg::OnInitDialog()
 		pingFolder, st.wYear, st.wMonth, st.wDay);
 	DebugLog("OnInitDialog: 로그 파일 [%s]\n", m_logFile);
 
+	char exePath[MAX_PATH] = { 0 };
+	GetModuleFileNameA(NULL, exePath, MAX_PATH);
+
+	char* p = strrchr(exePath, '\\');
+	if (p) *p = '\0';
+
+	SymSetOptions(SYMOPT_LOAD_LINES | SYMOPT_UNDNAME | SYMOPT_DEFERRED_LOADS);
+	BOOL bOk = SymInitialize(GetCurrentProcess(), NULL, TRUE);
+
 	// 네트워크 타입 로그
 	char netLog[256] = { 0 };
 	switch (GetCurrentNetType())
@@ -510,10 +531,19 @@ BOOL CAxisAgentDlg::OnInitDialog()
 	WriteLog(netLog);
 	SendToParent(netLog, AGENT_MSG_NETTYPE);
 
+	m_bLastPingSuccess = true;
+	m_bPingStateInit = false;
+	m_lastPingSummaryTick = GetTickCount();
+	m_pingOkCount = 0;
+	m_pingFailCount = 0;
 	// ping 스레드 시작
 	StartPingThread();
 
 	// 실제 모니터 스레드 시작
+
+	m_lastMonitorSummaryTick = GetTickCount();
+	m_bLastHung = false;
+	m_lastNoResponseCount = 0;
 	m_hMonitorThread = CreateThread(
 		NULL, 0, MonitorThreadProc, (LPVOID)this, 0, NULL);
 
@@ -618,18 +648,34 @@ void CAxisAgentDlg::ParseCommandLine()
 	LPWSTR* argvW = CommandLineToArgvW(GetCommandLineW(), &argc);
 	if (!argvW) return;
 
+	char output[2048] = { 0 };
+
 	CString slog;
 	for (int i = 1; i < argc; i++)
 	{
 		if (wcscmp(argvW[i], L"/p") == 0 && i + 1 < argc)
+		{
 			m_parentPid = (DWORD)_wtoi(argvW[++i]);
+			memset(output, sizeof(output), 0x00);
+			sprintf_s(output, sizeof(output),
+				"[m_parentPid = %d]\n",
+				m_parentPid);
+			AddLog("MONITOR", output);
+		}
 
 		else if (wcscmp(argvW[i], L"/h") == 0 && i + 1 < argc)
 			m_hParentWnd = (HWND)(UINT64)_wtoi64(argvW[++i]);
 
 		else if (wcscmp(argvW[i], L"/n") == 0 && i + 1 < argc)
+		{
 			WideCharToMultiByte(CP_ACP, 0, argvW[++i], -1,
 				m_regkey, sizeof(m_regkey), NULL, NULL);
+			memset(output, sizeof(output), 0x00);
+			sprintf_s(output, sizeof(output),
+				"[m_regkey = %s]\n",
+				m_regkey);
+			AddLog("MONITOR", output);
+		}
 
 		else if (wcscmp(argvW[i], L"/v") == 0 && i + 1 < argc) // ← 수정
 		{
@@ -647,7 +693,25 @@ void CAxisAgentDlg::ParseCommandLine()
 			m_startY = _wtoi(argvW[++i]);
 
 		else if (wcscmp(argvW[i], L"/t") == 0 && i + 1 < argc)
+		{
 			m_dwMainThreadId = (DWORD)_wtoi(argvW[++i]);
+			memset(output, sizeof(output), 0x00);
+			sprintf_s(output, sizeof(output),
+				"[m_dwMainThreadId = %d]\n",
+				m_dwMainThreadId);
+			AddLog("MONITOR", output);
+		}
+
+		else if (wcscmp(argvW[i], L"/d") == 0 && i + 1 < argc)
+		{
+			WideCharToMultiByte(CP_ACP, 0, argvW[++i], -1,
+				m_sUserpath, sizeof(m_sUserpath), NULL, NULL);
+			memset(output, sizeof(output), 0x00);
+			sprintf_s(output, sizeof(output),
+				"[m_sUserpath = %s]\n",
+				m_sUserpath);
+			AddLog("MONITOR", output);
+		}
 	}
 
 
@@ -747,13 +811,32 @@ void CAxisAgentDlg::OnDestroy()
 {
 	DebugLog("OnDestroy: 종료 처리\n");
 
+	// StopEvent 먼저 세팅해서 각 루프가 종료 조건을 보게 함
 	if (m_hStopEvent)
 	{
 		SetEvent(m_hStopEvent);
-		CloseHandle(m_hStopEvent);
-		m_hStopEvent = NULL;
 	}
 
+	// ping 프로세스 먼저 종료
+	if (m_hPingProcess)
+	{
+		TerminateProcess(m_hPingProcess, 0);
+	}
+
+	// pipe 닫아서 ReadFile 블로킹을 깨움
+	if (m_hPingPipeRead)
+	{
+		CloseHandle(m_hPingPipeRead);
+		m_hPingPipeRead = NULL;
+	}
+
+	if (m_hPingPipeWrite)
+	{
+		CloseHandle(m_hPingPipeWrite);
+		m_hPingPipeWrite = NULL;
+	}
+
+	// 모니터 스레드 종료 대기
 	if (m_hMonitorThread)
 	{
 		WaitForSingleObject(m_hMonitorThread, 3000);
@@ -761,6 +844,7 @@ void CAxisAgentDlg::OnDestroy()
 		m_hMonitorThread = NULL;
 	}
 
+	// ping 스레드 종료 대기
 	if (m_hPingThread)
 	{
 		WaitForSingleObject(m_hPingThread, 3000);
@@ -768,6 +852,21 @@ void CAxisAgentDlg::OnDestroy()
 		m_hPingThread = NULL;
 	}
 
+	// ping 프로세스 핸들 정리
+	if (m_hPingProcess)
+	{
+		CloseHandle(m_hPingProcess);
+		m_hPingProcess = NULL;
+	}
+
+	// StopEvent 핸들 정리
+	if (m_hStopEvent)
+	{
+		CloseHandle(m_hStopEvent);
+		m_hStopEvent = NULL;
+	}
+
+	// 부모 프로세스 핸들 정리
 	if (m_hParent)
 	{
 		CloseHandle(m_hParent);
@@ -776,7 +875,6 @@ void CAxisAgentDlg::OnDestroy()
 
 	CDialogEx::OnDestroy();
 }
-
 CAxisAgentDlg::NetType CAxisAgentDlg::GetCurrentNetType()
 {
 	ULONG size = 0;
@@ -857,80 +955,210 @@ DWORD WINAPI CAxisAgentDlg::PingThreadProc(LPVOID pParam)
 	return 0;
 }
 
+bool CAxisAgentDlg::IsPingSuccessLine(const char* line)
+{
+	if (!line || !line[0])
+		return false;
+
+	// 한글/영문 ping 출력 둘 다 대충 커버
+	if (strstr(line, "TTL=") != NULL) return true;
+	if (strstr(line, "ttl=") != NULL) return true;
+	if (strstr(line, "시간=") != NULL) return true;
+	if (strstr(line, "bytes=") != NULL) return true;
+
+	return false;
+}
+
 void CAxisAgentDlg::PingLoop()
 {
 	DebugLog("PingLoop 시작\n");
 
 	SECURITY_ATTRIBUTES sa = { sizeof(sa), NULL, TRUE };
-	HANDLE hReadPipe, hWritePipe;
-	if (!CreatePipe(&hReadPipe, &hWritePipe, &sa, 0))
+
+	// 혹시 이전 값이 남아있으면 초기화
+	m_hPingPipeRead = NULL;
+	m_hPingPipeWrite = NULL;
+	m_hPingProcess = NULL;
+
+	if (!CreatePipe(&m_hPingPipeRead, &m_hPingPipeWrite, &sa, 0))
 	{
-		DebugLog("PingLoop: CreatePipe 실패 err=%d\n", GetLastError());
+		DebugLog("PingLoop: CreatePipe 실패 err=%lu\n", GetLastError());
 		return;
 	}
-	SetHandleInformation(hReadPipe, HANDLE_FLAG_INHERIT, 0);
+
+	SetHandleInformation(m_hPingPipeRead, HANDLE_FLAG_INHERIT, 0);
 
 	STARTUPINFOA si = { sizeof(si) };
 	si.dwFlags = STARTF_USESTDHANDLES;
-	si.hStdOutput = hWritePipe;
-	si.hStdError = hWritePipe;
+	si.hStdOutput = m_hPingPipeWrite;
+	si.hStdError = m_hPingPipeWrite;
 
 	PROCESS_INFORMATION pi = { 0 };
 	char cmd[] = "ping 8.8.8.8 -t";
 
-	if (!CreateProcessA(NULL, cmd, NULL, NULL, TRUE,
-		CREATE_NO_WINDOW, NULL, NULL, &si, &pi))
+	if (!CreateProcessA(
+		NULL,
+		cmd,
+		NULL,
+		NULL,
+		TRUE,
+		CREATE_NO_WINDOW,
+		NULL,
+		NULL,
+		&si,
+		&pi))
 	{
-		DebugLog("PingLoop: ping CreateProcess 실패 err=%d\n", GetLastError());
-		CloseHandle(hReadPipe);
-		CloseHandle(hWritePipe);
+		DebugLog("PingLoop: ping CreateProcess 실패 err=%lu\n", GetLastError());
+
+		if (m_hPingPipeRead)
+		{
+			CloseHandle(m_hPingPipeRead);
+			m_hPingPipeRead = NULL;
+		}
+
+		if (m_hPingPipeWrite)
+		{
+			CloseHandle(m_hPingPipeWrite);
+			m_hPingPipeWrite = NULL;
+		}
+
 		return;
 	}
 
+	m_hPingProcess = pi.hProcess;
+
 	DebugLog("PingLoop: ping 프로세스 시작 PID=%lu\n", pi.dwProcessId);
-	CloseHandle(hWritePipe);
+
+	// 부모(Agent) 쪽에서는 write pipe 더 이상 안 씀
+	if (m_hPingPipeWrite)
+	{
+		CloseHandle(m_hPingPipeWrite);
+		m_hPingPipeWrite = NULL;
+	}
 
 	char buf[1024] = { 0 };
 	char line[1024] = { 0 };
-	int  linePos = 0;
-	DWORD bytesRead;
+	int linePos = 0;
+	DWORD bytesRead = 0;
 
-	while (ReadFile(hReadPipe, buf, sizeof(buf) - 1, &bytesRead, NULL)
-		&& bytesRead > 0)
+	while (true)
 	{
+		// 종료 요청이 먼저 들어왔는지 확인
+		if (ShouldStop())
+		{
+			WriteLog("[종료] 종료 신호 감지 - 자체 종료\n");
+			DebugLog("PingLoop: while 시작 전 종료 감지\n");
+
+			if (m_hPingProcess)
+				TerminateProcess(m_hPingProcess, 0);
+
+			goto CLEANUP;
+		}
+
+		BOOL bRead = ReadFile(m_hPingPipeRead, buf, sizeof(buf) - 1, &bytesRead, NULL);
+		if (!bRead || bytesRead == 0)
+			break;
+
 		buf[bytesRead] = '\0';
 
 		for (DWORD i = 0; i < bytesRead; i++)
 		{
 			char c = buf[i];
-			if (c == '\r') continue;
+			if (c == '\r')
+				continue;
 
 			if (c == '\n')
 			{
 				line[linePos] = '\0';
 				linePos = 0;
-				if (strlen(line) == 0) continue;
 
-				SYSTEMTIME st;
-				GetLocalTime(&st);
+				if (strlen(line) == 0)
+					continue;
 
-				char output[2048] = { 0 };
-				sprintf_s(output, sizeof(output),
-					"[%04d-%02d-%02d %02d:%02d:%02d] %s\n",
-					st.wYear, st.wMonth, st.wDay,
-					st.wHour, st.wMinute, st.wSecond,
-					line);
+				bool bPingOk = IsPingSuccessLine(line);
 
-				WriteLog(output);
-				AddLog("PING", output);
-				SendToParent(output, AGENT_MSG_PING);
+				if (bPingOk)
+					m_pingOkCount++;
+				else
+					m_pingFailCount++;
 
-				// 종료 체크
+				DWORD nowTick = GetTickCount();
+
+				if (!m_bPingStateInit)
+				{
+					m_bLastPingSuccess = bPingOk;
+					m_bPingStateInit = true;
+
+					SYSTEMTIME st;
+					GetLocalTime(&st);
+
+					char output[2048] = { 0 };
+					sprintf_s(output, sizeof(output),
+						"[%04d-%02d-%02d %02d:%02d:%02d] ping 초기상태: %s | %s\n",
+						st.wYear, st.wMonth, st.wDay,
+						st.wHour, st.wMinute, st.wSecond,
+						bPingOk ? "정상" : "실패",
+						line);
+
+					WriteLog(output);
+					AddLog("PING", output);
+					SendToParent(output, AGENT_MSG_PING);
+				}
+				else
+				{
+					if (bPingOk != m_bLastPingSuccess)
+					{
+						SYSTEMTIME st;
+						GetLocalTime(&st);
+
+						char output[2048] = { 0 };
+						sprintf_s(output, sizeof(output),
+							"[%04d-%02d-%02d %02d:%02d:%02d] ping 상태 변경: %s -> %s | %s\n",
+							st.wYear, st.wMonth, st.wDay,
+							st.wHour, st.wMinute, st.wSecond,
+							m_bLastPingSuccess ? "정상" : "실패",
+							bPingOk ? "정상" : "실패",
+							line);
+
+						WriteLog(output);
+						AddLog("PING", output);
+						SendToParent(output, AGENT_MSG_PING);
+
+						m_bLastPingSuccess = bPingOk;
+					}
+
+					if (nowTick - m_lastPingSummaryTick >= 60000)
+					{
+						SYSTEMTIME st;
+						GetLocalTime(&st);
+
+						char output[2048] = { 0 };
+						sprintf_s(output, sizeof(output),
+							"[%04d-%02d-%02d %02d:%02d:%02d] ping 요약(1분): OK=%d FAIL=%d 현재=%s\n",
+							st.wYear, st.wMonth, st.wDay,
+							st.wHour, st.wMinute, st.wSecond,
+							m_pingOkCount,
+							m_pingFailCount,
+							bPingOk ? "정상" : "실패");
+
+						WriteLog(output);
+						AddLog("PING", output);
+						SendToParent(output, AGENT_MSG_PING);
+
+						m_pingOkCount = 0;
+						m_pingFailCount = 0;
+						m_lastPingSummaryTick = nowTick;
+					}
+				}
+
 				if (ShouldStop())
 				{
 					WriteLog("[종료] 종료 신호 감지 - 자체 종료\n");
 					DebugLog("PingLoop: 종료 신호 - ping 종료\n");
-					TerminateProcess(pi.hProcess, 0);
+
+					if (m_hPingProcess)
+						TerminateProcess(m_hPingProcess, 0);
+
 					goto CLEANUP;
 				}
 			}
@@ -945,9 +1173,30 @@ void CAxisAgentDlg::PingLoop()
 	DebugLog("PingLoop: ReadFile 종료\n");
 
 CLEANUP:
-	CloseHandle(pi.hProcess);
-	CloseHandle(pi.hThread);
-	CloseHandle(hReadPipe);
+	if (pi.hThread)
+	{
+		CloseHandle(pi.hThread);
+		pi.hThread = NULL;
+	}
+
+	if (m_hPingPipeRead)
+	{
+		CloseHandle(m_hPingPipeRead);
+		m_hPingPipeRead = NULL;
+	}
+
+	if (m_hPingPipeWrite)
+	{
+		CloseHandle(m_hPingPipeWrite);
+		m_hPingPipeWrite = NULL;
+	}
+
+	if (m_hPingProcess)
+	{
+		CloseHandle(m_hPingProcess);
+		m_hPingProcess = NULL;
+	}
+
 	DebugLog("PingLoop 종료\n");
 
 	// 스레드 종료 후 다이얼로그 종료
@@ -1082,8 +1331,7 @@ void CAxisAgentDlg::WriteMonitorLog(const char* msg)
 		fclose(fp);
 	}
 
-	//OutputDebugStringA(output);
-	AddLog("MONITOR", msg);
+	AddLog("MONITOR", msg);   //testcmt
 }
 
 // 덤프 생성
@@ -1390,11 +1638,39 @@ void CAxisAgentDlg::MonitorLoop()
 		}
 
 
-		char logMsg[512] = { 0 };
-		sprintf_s(logMsg,
-			"[monitor]프로세스CPU=%.1f%% 메인스레드CPU=%.1f%% 스레드수=%d 응답실패=%d Hung=%d",
-			fProcCpu, fMainCpu, nThreadCount, noResponseCount, bHung ? 1 : 0);
-		WriteMonitorLog(logMsg);
+		DWORD nowTick = GetTickCount();
+
+		// 상태 변화 시 즉시 로그
+		if (bHung != m_bLastHung ||
+			noResponseCount != m_lastNoResponseCount)
+		{
+			char logMsg[512] = { 0 };
+			sprintf_s(logMsg,
+				"[monitor][상태변화] CPU=%.1f MAIN=%.1f THR=%d HUNG=%d NORESP=%d",
+				fProcCpu, fMainCpu, nThreadCount,
+				bHung ? 1 : 0,
+				noResponseCount);
+
+			WriteMonitorLog(logMsg);
+
+			m_bLastHung = bHung;
+			m_lastNoResponseCount = noResponseCount;
+		}
+
+		// 1분 heartbeat 요약 로그
+		if (nowTick - m_lastMonitorSummaryTick >= 60000)
+		{
+			char logMsg[512] = { 0 };
+			sprintf_s(logMsg,
+				"[monitor][1분요약] CPU=%.1f MAIN=%.1f THR=%d HUNG=%d NORESP=%d",
+				fProcCpu, fMainCpu, nThreadCount,
+				bHung ? 1 : 0,
+				noResponseCount);
+
+			WriteMonitorLog(logMsg);
+
+			m_lastMonitorSummaryTick = nowTick;
+		}
 
 		char sendMsg[256] = { 0 };
 		sprintf_s(sendMsg,
@@ -1473,6 +1749,7 @@ void CAxisAgentDlg::AnalyzeDump(const char* dumpPath)
 	if (!dumpPath || !dumpPath[0])
 		return;
 
+	WriteMonitorLog("--------------------------------");
 	WriteMonitorLog("덤프 분석 시작");
 
 	HANDLE hFile = CreateFileA(
@@ -1558,6 +1835,7 @@ void CAxisAgentDlg::AnalyzeDump(const char* dumpPath)
 	}
 
 	DumpWalkContext walkCtx;
+	ZeroMemory(&walkCtx, sizeof(walkCtx));
 	walkCtx.pView = pView;
 
 	PVOID pMemStream = NULL;
@@ -1635,25 +1913,49 @@ void CAxisAgentDlg::AnalyzeDump(const char* dumpPath)
 	sprintf_s(logMsg, "[AN4] 스레드수=%lu", pThreadList->NumberOfThreads);
 	WriteMonitorLog(logMsg);
 
+	// 분석 대상 스레드 결정
+	DWORD targetThreadId = 0;
+
+	if (exceptionThreadId != 0)
+	{
+		targetThreadId = exceptionThreadId;
+		sprintf_s(logMsg, "[AN5] 대상스레드=예외스레드 %lu", targetThreadId);
+		WriteMonitorLog(logMsg);
+	}
+	else if (m_dwMainThreadId != 0)
+	{
+		targetThreadId = m_dwMainThreadId;
+		sprintf_s(logMsg, "[AN5] 대상스레드=메인스레드 %lu", targetThreadId);
+		WriteMonitorLog(logMsg);
+	}
+	else if (pThreadList->NumberOfThreads > 0)
+	{
+		targetThreadId = pThreadList->Threads[0].ThreadId;
+		sprintf_s(logMsg, "[AN5] 대상스레드=첫번째스레드 %lu", targetThreadId);
+		WriteMonitorLog(logMsg);
+	}
+
 	g_pDumpWalkCtx = &walkCtx;
 
-	bool bFoundMain = false;
+	bool bFoundTarget = false;
 
 	for (ULONG i = 0; i < pThreadList->NumberOfThreads; ++i)
 	{
 		MINIDUMP_THREAD& th = pThreadList->Threads[i];
 
-		bool bMain = (th.ThreadId == m_dwMainThreadId);
+		bool bTarget = (targetThreadId != 0 && th.ThreadId == targetThreadId);
 		bool bException = (exceptionThreadId != 0 && th.ThreadId == exceptionThreadId);
+		bool bMain = (m_dwMainThreadId != 0 && th.ThreadId == m_dwMainThreadId);
 
-		if (!bMain)
+		if (!bTarget)
 			continue;
 
-		bFoundMain = true;
+		bFoundTarget = true;
 
 		sprintf_s(logMsg,
-			"=== ThreadID=%lu %s%s ===",
+			"=== ThreadID=%lu %s%s%s ===",
 			th.ThreadId,
+			bTarget ? "(분석대상)" : "",
 			bMain ? "(메인스레드)" : "",
 			bException ? "(예외스레드)" : "");
 		WriteMonitorLog(logMsg);
@@ -1686,6 +1988,8 @@ void CAxisAgentDlg::AnalyzeDump(const char* dumpPath)
 		char mainF0[256] = { 0 };
 		char mainF1[256] = { 0 };
 		char mainF2[256] = { 0 };
+		char mainF3[256] = { 0 };
+		char mainF4[256] = { 0 };
 
 		const int MAX_MAIN_FRAMES = 5;
 
@@ -1725,6 +2029,8 @@ void CAxisAgentDlg::AnalyzeDump(const char* dumpPath)
 				if (frameNo == 0) strcpy_s(mainF0, funcName);
 				else if (frameNo == 1) strcpy_s(mainF1, funcName);
 				else if (frameNo == 2) strcpy_s(mainF2, funcName);
+				else if (frameNo == 3) strcpy_s(mainF3, funcName);
+				else if (frameNo == 4) strcpy_s(mainF4, funcName);
 
 				if (frameNo == 0)
 				{
@@ -1780,6 +2086,8 @@ void CAxisAgentDlg::AnalyzeDump(const char* dumpPath)
 				{
 					if (frameNo == 1) sprintf_s(mainF1, "0x%08I64X", sf.AddrPC.Offset);
 					else if (frameNo == 2) sprintf_s(mainF2, "0x%08I64X", sf.AddrPC.Offset);
+					else if (frameNo == 3) sprintf_s(mainF3, "0x%08I64X", sf.AddrPC.Offset);
+					else if (frameNo == 4) sprintf_s(mainF4, "0x%08I64X", sf.AddrPC.Offset);
 
 					sprintf_s(logMsg,
 						"[MAIN][%02d] 0x%08I64X",
@@ -1792,19 +2100,38 @@ void CAxisAgentDlg::AnalyzeDump(const char* dumpPath)
 	}
 
 		WriteMainSummary(this, th.ThreadId, mainF0, mainF1, mainF2);
+		WriteMonitorLog("INI 저장 직전");
+
+		AppendBlankLineToIni();
+		WriteDumpAnalysisIniByDumpName(
+			dumpPath,
+			CString(mainF0),
+			CString(mainF1),
+			CString(mainF2),
+			CString(mainF3),
+			CString(mainF4));
 #else
 		WriteMonitorLog("  현재 AnalyzeDump는 x86 기준으로 작성됨");
 #endif
 		break;
-	}
+}
 
-	if (!bFoundMain)
+	if (!bFoundTarget)
 	{
 		char buf[256] = { 0 };
 		sprintf_s(buf,
-			"[AN_MAIN] 메인스레드 미발견 m_dwMainThreadId=%lu",
-			m_dwMainThreadId);
+			"[AN_MAIN] 대상스레드 미발견 target=%lu exception=%lu main=%lu",
+			targetThreadId, exceptionThreadId, m_dwMainThreadId);
 		WriteMonitorLog(buf);
+
+		// fallback: 그래도 첫 번째 스레드 로그는 남기기
+		if (pThreadList->NumberOfThreads > 0)
+		{
+			sprintf_s(buf,
+				"[AN_MAIN] fallback first thread=%lu",
+				pThreadList->Threads[0].ThreadId);
+			WriteMonitorLog(buf);
+		}
 	}
 
 	g_pDumpWalkCtx = NULL;
@@ -1891,4 +2218,217 @@ void CAxisAgentDlg::OnBnClickedListClear()
 {
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
 	m_listLog.DeleteAllItems();
+}
+
+void CAxisAgentDlg::WriteDumpAnalysisIniByDumpName(
+	const char* dumpPath,
+	const CString& top,
+	const CString& c1,
+	const CString& c2,
+	const CString& c3,
+	const CString& c4)
+{
+	if (dumpPath == NULL || dumpPath[0] == 0)
+		return;
+
+	CString iniPath = GetDumpAnalysisIniPath();
+	CString section = GetFileNameOnly(dumpPath);
+
+	SYSTEMTIME st;
+	::GetLocalTime(&st);
+
+	CString timeStr;
+	timeStr.Format("%04d-%02d-%02d %02d:%02d:%02d",
+		st.wYear, st.wMonth, st.wDay,
+		st.wHour, st.wMinute, st.wSecond);
+
+	::WritePrivateProfileStringA((LPCSTR)section, "TIME", (LPCSTR)timeStr, (LPCSTR)iniPath);
+	::WritePrivateProfileStringA((LPCSTR)section, "TOP", (LPCSTR)top, (LPCSTR)iniPath);
+	::WritePrivateProfileStringA((LPCSTR)section, "CALLER1", (LPCSTR)c1, (LPCSTR)iniPath);
+	::WritePrivateProfileStringA((LPCSTR)section, "CALLER2", (LPCSTR)c2, (LPCSTR)iniPath);
+	::WritePrivateProfileStringA((LPCSTR)section, "CALLER3", (LPCSTR)c3, (LPCSTR)iniPath);
+	::WritePrivateProfileStringA((LPCSTR)section, "CALLER4", (LPCSTR)c4, (LPCSTR)iniPath);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+CString CAxisAgentDlg::GetDumpAnalysisIniPath() const
+{
+	char selfPath[MAX_PATH] = { 0 };
+	::GetModuleFileNameA(NULL, selfPath, MAX_PATH);
+
+	char* lastSlash = strrchr(selfPath, '\\');
+	if (lastSlash)
+		*lastSlash = '\0';
+
+	CString iniPath;
+	iniPath.Format("%s\\ping\\dump_analysis.ini", selfPath);
+
+	return iniPath;
+}
+
+CString CAxisAgentDlg::GetFileNameOnly(const char* fullPath) const
+{
+	CString sPath = fullPath ? fullPath : "";
+
+	int pos = sPath.ReverseFind('\\');
+	if (pos >= 0)
+		return sPath.Mid(pos + 1);
+
+	return sPath;
+}
+
+CString CAxisAgentDlg::GetMainCrashDumpDir() const
+{
+	// 메인 whdump.cpp 에서 dump 남기는 위치와 동일하게 맞춰야 함
+	CString dumpDir;
+	dumpDir.Format("%s",m_sUserpath);
+	return dumpDir;
+}
+
+BOOL CAxisAgentDlg::IsDumpAlreadyAnalyzed(const CString& dumpPath) const
+{
+	CString iniPath = GetDumpAnalysisIniPath();
+	CString section = GetFileNameOnly(dumpPath);
+
+	char buf[64] = { 0 };
+	::GetPrivateProfileStringA(
+		(LPCSTR)section,
+		"TIME",
+		"",
+		buf,
+		sizeof(buf),
+		(LPCSTR)iniPath);
+
+	return (buf[0] != 0);
+}
+
+void CAxisAgentDlg::ScanAndAnalyzeMainCrashDumps()
+{
+	CString slog;
+	CString dumpDir = GetMainCrashDumpDir();
+
+	if (dumpDir.IsEmpty())
+	{
+		AddLog("MONITOR", "ScanAndAnalyzeMainCrashDumps: dumpDir is empty");
+		return;
+	}
+
+	dumpDir.TrimRight("\\/");
+
+	CString spec;
+	spec.Format("%s\\*.dmp", (LPCSTR)dumpDir);
+
+	slog.Format("dumpDir=[%s]", (LPCSTR)dumpDir);
+	AddLog("MONITOR", slog);
+
+	slog.Format("spec=[%s]", (LPCSTR)spec);
+	AddLog("MONITOR", slog);
+
+	DWORD attr = GetFileAttributes((LPCSTR)dumpDir);
+	slog.Format("dir attr=0x%08X", attr);
+	AddLog("MONITOR", slog);
+
+	if (attr == INVALID_FILE_ATTRIBUTES || !(attr & FILE_ATTRIBUTE_DIRECTORY))
+	{
+		AddLog("MONITOR", "ScanAndAnalyzeMainCrashDumps: dumpDir not found");
+		return;
+	}
+
+	WIN32_FIND_DATA fd = { 0 };
+	HANDLE hFind = FindFirstFile((LPCSTR)spec, &fd);
+	if (hFind == INVALID_HANDLE_VALUE)
+	{
+		slog.Format("FindFirstFile fail err=%lu", GetLastError());
+		AddLog("MONITOR", slog);
+		return;
+	}
+
+	int foundCount = 0;
+	int analyzedCount = 0;
+	std::vector<CString> dumpFiles;
+
+	do
+	{
+		if (fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+			continue;
+
+		CString fileName = fd.cFileName;
+		CString fullPath;
+		fullPath.Format("%s\\%s", (LPCSTR)dumpDir, (LPCSTR)fileName);
+
+		dumpFiles.push_back(fullPath);
+		foundCount++;
+
+		slog.Format("found dump: [%s]", (LPCSTR)fullPath);
+		AddLog("MONITOR", slog);
+
+	} while (FindNextFile(hFind, &fd));
+
+	FindClose(hFind);
+
+	std::sort(dumpFiles.begin(), dumpFiles.end(),
+		[](const CString& a, const CString& b)
+		{
+			return a.CompareNoCase(b) < 0;
+		});
+
+	for (size_t i = 0; i < dumpFiles.size(); ++i)
+	{
+		const CString& dumpPath = dumpFiles[i];
+
+		if (IsDumpAlreadyAnalyzed((LPCSTR)dumpPath))
+			continue;
+
+		CString msg;
+		msg.Format("미분석 dump 발견: %s",
+			(LPCSTR)GetFileNameOnly((LPCSTR)dumpPath));
+		AddLog("DUMP", msg);
+
+		AnalyzeDump((LPCSTR)dumpPath);
+
+		CString okMsg;
+		okMsg.Format("dump 분석 완료: %s",
+			(LPCSTR)GetFileNameOnly((LPCSTR)dumpPath));
+		AddLog("DUMP", okMsg);
+
+		analyzedCount++;
+	}
+
+	CString sumMsg;
+	sumMsg.Format("Crashlog scan 완료: found=%d analyzed=%d",
+		foundCount, analyzedCount);
+	AddLog("DUMP", sumMsg);
+}
+
+
+void CAxisAgentDlg::OnBnClickedBtnDumpans()
+{
+	ScanAndAnalyzeMainCrashDumps();
+}
+
+
+void CAxisAgentDlg::AppendBlankLineToIni()
+{
+	CString iniPath = GetDumpAnalysisIniPath();
+
+	CFile file;
+	if (file.Open(iniPath,
+		CFile::modeWrite |
+		CFile::modeNoTruncate |
+		CFile::modeCreate))
+	{
+		file.SeekToEnd();
+		file.Write("\r\n", 2);
+		file.Close();
+	}
 }
