@@ -156,6 +156,9 @@ public:
 	CArray<FCODE, FCODE>		_m_arrayFcode;
 	CArray<ojcode, ojcode>		_m_arrayOcode;
 	CArray<PCODE, PCODE>		_m_arrayPcode;
+	CArray<ojcode, ojcode>  _m_arrayWcode;   // wocode2.dat
+	CArray<FCODE, FCODE>    _m_arrayMfcode;  // mfcode.dat
+	CArray<ojcode, ojcode>  _m_arrayMocode;  // mocode2.dat
 
 private:
 	std::unique_ptr<char[]> m_hcB;

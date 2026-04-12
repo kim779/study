@@ -977,14 +977,16 @@ __declspec(dllexport) bool WINAPI axGetName(int kind, char* code, char* name, in
 					else
 					{
 						CFuturesDlg fdlg(kind);
-						fdlg.loadFjCode();
-						fdlg.loadOjCode();
-						fdlg.loadPjCode();
 						if (fdlg.FindCode(kind, code))
 						{
 							// ¼±¹°
 							szName = fdlg.GetName();
 							strcpy(name, szName);
+
+							CString slog;
+							slog.Format("[AXISCODE][whichTYPE][%s]<%d> type=[%d] code=[%s] ", __FUNCTION__, __LINE__, fdlg.m_jongmuk, szCode);
+							OutputDebugString(slog);
+
 
 							*type = fdlg.GetJongmuk();
 							return TRUE;

@@ -1210,6 +1210,23 @@ void CFuturesDlg::OnButtonClose()
 	OnOK();
 }
 
+BOOL CFuturesDlg::FindPjCode(const CString& szCode)
+{
+	CAxisCodeApp* pApp = (CAxisCodeApp*)AfxGetApp();
+
+	for (int ii = 0; ii < pApp->_m_arrayPcode.GetSize(); ii++)
+	{
+		const PCODE& pcode = pApp->_m_arrayPcode[ii];
+		if (szCode.CompareNoCase(pcode.code) == 0)
+		{
+			SetName(pcode.hnam);
+			m_jongmuk = koptionType;
+			return TRUE;
+		}
+	}
+	return FALSE;
+}
+
 BOOL CFuturesDlg::loadPjCode()			//현물 코드 종목...
 {
 	//return TRUE;
@@ -1223,30 +1240,30 @@ BOOL CFuturesDlg::loadPjCode()			//현물 코드 종목...
 	CString		path;
 	CMapStringToPtr pcodemap;
 	CQArray	<CString, CString>	qKindArr;
-  	
+
 	path = ((CAxisCodeApp*)AfxGetApp())->m_root + "\\tab\\pjcode.dat";  //주식옵션
 
-	if (!file.Open(path, CFile::modeRead|CFile::typeBinary | CFile::shareDenyNone))
+	if (!file.Open(path, CFile::modeRead | CFile::typeBinary | CFile::shareDenyNone))
 	{
 		//MessageBox("파일[pjcode.dat]이 존재하지 않습니다.");
 		return FALSE;
 	}
-								// 데이터의 갯수...
+	// 데이터의 갯수...
 	codeN = gsl::narrow_cast<int>(file.GetLength() / sizeof(struct pjcode));
 
 	for (int ii = 0; ii < codeN; ii++)
 	{
 		file.Read(&PJCode, sizeof(struct pjcode));
-		
+
 		pcode.kind = GetString(PJCode.tjgb, 2);
 		pcode.name = GetString(PJCode.snam, 20);
 		pcode.code = GetString(PJCode.codx, PCodeLen);
 		pcode.hnam = GetString(PJCode.hnam, sizeof(PJCode.hnam)); pcode.hnam.TrimRight();
 		pcode.month = GetString(PJCode.mont, 4);
 		pcode.price = GetString(PJCode.hsga, 8);
-		pcode.gcod  = GetString(PJCode.gcod, 12);
+		pcode.gcod = GetString(PJCode.gcod, 12);
 		pcode.mchk = PJCode.mchk;
-		
+
 		if (PJCode.atmx == 1)
 			pcode.atm = TRUE;
 		else
@@ -1269,7 +1286,7 @@ BOOL CFuturesDlg::loadPjCode()			//현물 코드 종목...
 		}
 
 		qKindArr.QuickSort();
-		
+
 		for (int ii = 0; ii < qKindArr.GetSize(); ii++)
 		{
 			sKind = qKindArr.GetAt(ii);
@@ -1567,45 +1584,90 @@ BOOL CFuturesDlg::loadSfCode()
 
 }
 
+BOOL CFuturesDlg::FindFjCode(const CString& szCode)
+{
+	CAxisCodeApp* pApp = (CAxisCodeApp*)AfxGetApp();
+
+	for (int ii = 0; ii < pApp->_m_arrayFcode.GetSize(); ii++)
+	{
+		const FCODE& fcode = pApp->_m_arrayFcode[ii];
+		if (szCode.CompareNoCase(fcode.code) == 0)
+		{
+			SetName(fcode.name);
+			m_jongmuk = futureType;
+			return TRUE;
+		}
+	}
+	return FALSE;
+}
+
 BOOL CFuturesDlg::loadFjCode()
 {
-//	if (m_arrayFcode.GetCount() > 0)
-//		return FALSE;
+	//	if (m_arrayFcode.GetCount() > 0)
+	//		return FALSE;
 
 	CString slog;
 	slog.Format("[AXISCODE][%s]<%d> [%d][%d] ", __FUNCTION__, __LINE__, m_arrayFcode.GetSize(), m_arrayFcode.GetCount());
 	OutputDebugString(slog);
 
 	m_arrayFcode.RemoveAll();
-	
+
 	int	codeN{};
 	CFile	file;
-	struct  fjcode  FJCode{};
+	struct  fjcode  FJCode {};
 	FCODE fcode{};
 	CString path;
-  	path = ((CAxisCodeApp*)AfxGetApp())->m_root + "\\tab\\fjcode.dat";   //선물스프레드
-	
-	if (!file.Open(path, CFile::modeRead|CFile::typeBinary | CFile::shareDenyNone))
+	path = ((CAxisCodeApp*)AfxGetApp())->m_root + "\\tab\\fjcode.dat";   //선물스프레드
+
+	if (!file.Open(path, CFile::modeRead | CFile::typeBinary | CFile::shareDenyNone))
 	{
 		MessageBox("파일[fjcode.dat]이 존재하지 않습니다.");
 		return FALSE;
 	}
-								// 데이터의 갯수...
+	// 데이터의 갯수...
 	codeN = gsl::narrow_cast<int>(file.GetLength() / sizeof(struct fjcode));
 
 	for (int ii = 0; ii < codeN; ii++)
 	{
 		file.Read(&FJCode, sizeof(struct fjcode));
-		
+
 		fcode.code = CString(FJCode.cod2, FCodeLen);
 		fcode.name = CString(FJCode.hnam, FNameLen);
 		fcode.mchk = FJCode.mchk;
-		
+
 		m_arrayFcode.Add(fcode);
 	}
 
 	file.Close();
 	return TRUE;
+}
+
+BOOL CFuturesDlg::FindWCode(const CString& szCode)
+{
+	CAxisCodeApp* pApp = (CAxisCodeApp*)AfxGetApp();
+
+	for (int ii = 0; ii < pApp->_m_arrayWcode.GetSize(); ii++)
+	{
+		const ojcode& OJcode = pApp->_m_arrayWcode[ii];
+
+		for (int jj = 0; jj < STANDARDNUM; jj++)
+		{
+			if (szCode.CompareNoCase(OJcode.call[jj].cod2) == 0)
+			{
+				SetName(OJcode.call[jj].hnam);
+				m_jongmuk = callType;
+				return TRUE;
+			}
+
+			if (szCode.CollateNoCase(OJcode.put[jj].cod2) == 0)
+			{
+				SetName(OJcode.put[jj].hnam);
+				m_jongmuk = putType;
+				return TRUE;
+			}
+		}
+	}
+	return FALSE;
 }
 
 BOOL CFuturesDlg::loadWCode()
@@ -1700,12 +1762,39 @@ void SortOCodeByPriceDesc(CArray<ojcode, ojcode>& arr)
 	}
 }
 
+BOOL CFuturesDlg::FindOjCode(const CString& szCode)
+{
+	CAxisCodeApp* pApp = (CAxisCodeApp*)AfxGetApp();
+
+	for (int ii = 0; ii < pApp->_m_arrayOcode.GetSize(); ii++)
+	{
+		const ojcode& OJcode = pApp->_m_arrayOcode[ii];
+
+		for (int jj = 0; jj < STANDARDNUM; jj++)
+		{
+			if (szCode.CompareNoCase(OJcode.call[jj].cod2) == 0)
+			{
+				SetName(OJcode.call[jj].hnam);
+				m_jongmuk = callType;
+				return TRUE;
+			}
+
+			if (szCode.CollateNoCase(OJcode.put[jj].cod2) == 0)
+			{
+				SetName(OJcode.put[jj].hnam);
+				m_jongmuk = putType;
+				return TRUE;
+			}
+		}
+	}
+	return FALSE;
+}
 
 BOOL CFuturesDlg::loadOjCode()
 {									// 옵션 코드 종목...	
 // 	if (m_arrayOcode.GetSize() > 0)
 // 		return FALSE;
-	
+
 	//2015.07.02 KSJ 버튼으로 옮기기 때문에 한번씩 지워준다.
 	m_arrayOcode.RemoveAll();
 	m_ArrayMonth.RemoveAll();
@@ -1713,15 +1802,15 @@ BOOL CFuturesDlg::loadOjCode()
 	int	codeN{}, len{};
 
 	CFile	file;
-	struct  ojcodh  OJCodh{};
-	
+	struct  ojcodh  OJCodh {};
+
 
 	CString path;
-  	
+
 	path = ((CAxisCodeApp*)AfxGetApp())->m_root + "\\tab\\opcode2.dat";  //옵션코드
 
-	if (!file.Open(path, CFile::modeRead|CFile::typeBinary | CFile::shareDenyNone))
-	{	
+	if (!file.Open(path, CFile::modeRead | CFile::typeBinary | CFile::shareDenyNone))
+	{
 		MessageBox("파일[opcode.dat]이 존재하지 않습니다.");
 		return FALSE;
 	}
@@ -1732,7 +1821,7 @@ BOOL CFuturesDlg::loadOjCode()
 		CString str = CString(OJCodh.cjym[jj], 6).Right(4);
 		m_ArrayMonth.Add(str);
 	}
-	
+
 	if (m_pCheck->GetSafeHwnd())
 		m_pCheck->SetArray();
 
@@ -1755,7 +1844,22 @@ BOOL CFuturesDlg::loadOjCode()
 	return TRUE;
 }
 
+BOOL CFuturesDlg::FindMfCode(const CString& szCode)
+{
+	CAxisCodeApp* pApp = (CAxisCodeApp*)AfxGetApp();
 
+	for (int ii = 0; ii < pApp->_m_arrayMfcode.GetSize(); ii++)
+	{
+		const FCODE& fcode = pApp->_m_arrayMfcode[ii];
+		if (szCode.CompareNoCase(fcode.code) == 0)
+		{
+			SetName(fcode.name);
+			m_jongmuk = futureType;
+			return TRUE;
+		}
+	}
+	return FALSE;
+}
 
 BOOL CFuturesDlg::loadMfCode()
 {
@@ -1801,6 +1905,34 @@ BOOL CFuturesDlg::loadMfCode()
 	
 	file.Close();
 	return TRUE;
+}
+
+BOOL CFuturesDlg::FindMoCode(const CString& szCode)
+{
+	CAxisCodeApp* pApp = (CAxisCodeApp*)AfxGetApp();
+
+	for (int ii = 0; ii < pApp->_m_arrayMocode.GetSize(); ii++)
+	{
+		const ojcode& OJcode = pApp->_m_arrayMocode[ii];
+
+		for (int jj = 0; jj < STANDARDNUM; jj++)
+		{
+			if (szCode.CompareNoCase(OJcode.call[jj].cod2) == 0)
+			{
+				SetName(OJcode.call[jj].hnam);
+				m_jongmuk = callType;
+				return TRUE;
+			}
+
+			if (szCode.CollateNoCase(OJcode.put[jj].cod2) == 0)
+			{
+				SetName(OJcode.put[jj].hnam);
+				m_jongmuk = putType;
+				return TRUE;
+			}
+		}
+	}
+	return FALSE;
 }
 
 BOOL CFuturesDlg::loadMoCode()
@@ -2341,91 +2473,28 @@ BOOL CFuturesDlg::FindCode(int kind, CString szCode)		// GetName()에서 사용.
 	switch(kind)
 	{
 	case whichTYPE:
+	{
+		m_jongmuk = 0;
+
+		if (szCode.Mid(1, 2) == "09" || szCode.Mid(1, 2) == "AF")
 		{
-			m_jongmuk = 0;
-
-			if(szCode.Mid(1, 2) == "09" || szCode.Mid(1, 2) == "AF")
-			{
-				loadFjCode();
-				loadWCode();
-			}
-			else if(szCode.Mid(1, 2) != "05")
-			{
-				//kospi200 콜풋 2015.07.02 KSJ
-				loadFjCode();
-				loadOjCode();
-			}
-			else
-			{
-				//mini kospi200 콜풋 2015.07.02 KSj
-				loadMfCode();
-				loadMoCode();
-			}
-
-			if (m_arrayFcode.GetSize() > 0)
-			{
-				for(int ii = 0; ii < m_arrayFcode.GetSize(); ii++)
-				{
-					fcode = m_arrayFcode[ii];
-					if (szCode.CompareNoCase(fcode.code) == 0) // fcode.code == szCode)
-					{
-						fcode.name.TrimRight();
-						SetName(fcode.name);
-						//m_arrayFcode.RemoveAll();  //test??
-
-						m_jongmuk = futureType;
-						return TRUE;
-					}
-				}
-			}
-
-			if (m_arrayOcode.GetSize() > 0)
-			{
-				for (int ii = 0; ii < m_arrayOcode.GetSize(); ii++)
-				{
-					OJcode = m_arrayOcode.GetAt(ii);
-					
-					for (int jj = 0; jj < STANDARDNUM ; jj++)
-					{
-						if (szCode.CompareNoCase(OJcode.call[jj].cod2) == 0)  // == szCode)
-						{
-							SetName(OJcode.call[jj].hnam);
-							m_arrayOcode.RemoveAll();
-							m_jongmuk = callType;
-							return TRUE;
-						}
-
-						if (szCode.CollateNoCase(OJcode.put[jj].cod2) == 0) // == szCode)
-						{
-							SetName(OJcode.put[jj].hnam);
-							m_arrayOcode.RemoveAll();
-							m_jongmuk = putType;
-							return TRUE;
-						}
-					}
-				}
-			}
-
-			if (m_arrayPcode.GetSize() > 0)
-			{
-
-				for (int ii = 0; ii < m_arrayPcode.GetSize(); ii++)
-				{
-					pcode = m_arrayPcode.GetAt(ii);
-
-					if (szCode.CompareNoCase(pcode.code) == 0) // == szCode)
-					{
-						pcode.name.TrimRight();
-						CString temp =  pcode.hnam;
-						SetName(temp);
-						m_arrayPcode.RemoveAll();
-						m_jongmuk = koptionType;
-						return TRUE;
-					}
-				}
-			}
+			if (FindFjCode(szCode)) return TRUE;
+			if (FindWCode(szCode))  return TRUE;
 		}
-		break;
+		else if (szCode.Mid(1, 2) != "05")
+		{
+			if (FindFjCode(szCode)) return TRUE;
+			if (FindOjCode(szCode)) return TRUE;
+		}
+		else
+		{
+			if (FindMfCode(szCode)) return TRUE;
+			if (FindMoCode(szCode)) return TRUE;
+		}
+
+		if (FindPjCode(szCode)) return TRUE;
+	}
+	break;
 	case futureNAME:
 		{
 			if(szCode.Mid(1, 2) != "05")
@@ -2472,36 +2541,6 @@ BOOL CFuturesDlg::FindCode(int kind, CString szCode)		// GetName()에서 사용.
 			return TRUE;
 		}
 		break;
-/*
-	case WoptionNAME:
-		{
-			if (m_arrayOcode.GetSize() < 0)
-				return FALSE;
-			
-			for (int ii = 0; ii < m_arrayOcode.GetSize(); ii++)
-			{
-				OJcode = m_arrayOcode.GetAt(ii);
-				
-				for (int jj = 0; jj < STANDARDNUM; jj++)
-				{
-					if (szCode.CompareNoCase(OJcode.call[jj].cod2) == 0)  // == szCode)
-					{
-						SetName(OJcode.call[jj].hnam);
-						m_arrayOcode.RemoveAll();
-						return TRUE;
-					}
-					
-					if (szCode.CollateNoCase(OJcode.put[jj].cod2) == 0) // == szCode)
-					{
-						SetName(OJcode.put[jj].hnam);
-						m_arrayOcode.RemoveAll();
-						return TRUE;
-					}
-				}
-			}
-		}
-		break;
-		*/
 	case optionNAME:
 		{
 			if(szCode.Mid(1, 2) == "09" || szCode.Mid(1, 2) == "AF")

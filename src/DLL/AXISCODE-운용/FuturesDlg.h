@@ -141,13 +141,27 @@ public:
 	CStringArray m_arrA, m_arrB;	//2016.06.21 KSJ 달러 메뉴에 삽입할 텍스트
 
 	BOOL	loadFjCode(); // 선물파일...
+	BOOL  FindFjCode(const CString& szCode);
+
 	BOOL	loadOjCode(); // 옵션파일...
+	BOOL   FindOjCode(const CString& szCode);
+
 	BOOL	loadPjCode(); // 현물파일...
+	BOOL   FindPjCode(const CString& szCode);
+
+	BOOL	loadMoCode(); // 미니 코스피200 옵션파일...
+	BOOL FindMoCode(const CString& szCode);
+
+	BOOL	loadMfCode(); // 미니 코스피200 선물파일...
+	BOOL FindMfCode(const CString& szCode);
+
+	BOOL	loadWCode();  // 위클리옵션
+	BOOL FindWCode(const CString& szCode);
+
 	BOOL	loadCFjCode(); // 상품선물 파일 
 	BOOL	loadSfCode(); // 주식선물 파일
-	BOOL	loadMoCode(); // 미니 코스피200 옵션파일...
-	BOOL	loadMfCode(); // 미니 코스피200 선물파일...
-	BOOL	loadWCode();  // 위클리옵션
+
+
 
 // Dialog Data
 	//{{AFX_DATA(CFuturesDlg)
