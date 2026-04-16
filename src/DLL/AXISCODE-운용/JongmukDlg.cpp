@@ -80,7 +80,8 @@ enum tree_class{
 	tree_etfetn,		//2014.10.28 KSJ etf/ETN 전종목추가
 	tree_spac,		//2015.11.04 KSJ spac 추가
 	tree_goodstock,		//25.06.12 수익형증권
-	tree_nxt	
+	tree_nxt,
+	tree_bdc
 };
 
 
@@ -232,7 +233,7 @@ BOOL CJongmukDlg::OnInitDialog()
 	CDialog::OnInitDialog();
 	
 	//const CRect rect(100, 40, 274, 292);
-	m_EditSearch.SetPromptText(_T("종목명, 종목코드, 초성 입력"));
+	m_EditSearch.SetPromptText(_T("종목명, 종목코드, 초성  입력"));
 	//m_EditSearch.SetPromptText(_T("종목검색"));
 
 	if (_mapCODE.size() <= 0)
@@ -3697,6 +3698,7 @@ void CJongmukDlg::SetTree()
 
 	noderoot[_T("ETN")].get().setData(MAKELONG(0, tree_etn));
 	noderoot[_T("상장형수익증권")].get().setData(MAKELONG(0, tree_goodstock));
+	noderoot[_T("BDC")].get().setData(MAKELONG(0, tree_bdc));
 	noderoot[_T("리츠")].get().setData(MAKELONG(0, tree_reits));
 	noderoot[_T("스팩")].get().setData(MAKELONG(0, tree_spac));	
 
@@ -4281,6 +4283,22 @@ void CJongmukDlg::ProcPart(int ntype,int nSubType)
 		});
 		CodeListSome(vData);
 	}
+	else if (ntype == tree_bdc)
+	{
+		initNxt();
+		m_gListsort = FALSE;
+		clearEditSearch();
+
+		m_select = OTHERTYPE;
+		m_ComboGroup.ShowWindow(SW_HIDE);
+
+		for_each(_mapCODE.begin(), _mapCODE.end(), [&vData](auto item) {
+			if (item.second->ssgb == jmBDCPST || item.second->ssgb == jmBDCICY)
+				vData.emplace_back(item.second);
+			});
+		CodeListSome(vData);
+	}
+
 	m_ListCtrl.Selected(0);
 	m_szCode = m_ListCtrl.GetItemText(0, 0);
 	m_szName = m_ListCtrl.GetItemText(0, 1);

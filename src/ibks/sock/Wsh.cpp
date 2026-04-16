@@ -185,6 +185,7 @@ void CWsh::DoParse(CMQue* pMQ)
 		return;
 
 	bytes = atoi(CString(rsmH->datL, sizeof(rsmH->datL)));
+
 	switch (rsmH->resK)
 	{
 	case resK_REQ:

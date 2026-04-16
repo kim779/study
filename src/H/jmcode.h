@@ -250,6 +250,8 @@ TO-BE 업종분류 첫 바이트가 '0' 이하는 미분류(현재 '000   ' 혹은 '      '으로 셋�
 #define jmTJCONJS 19  //투자계약증권   //20240422
 #define jmSINSUJS 20  //신탁수익증권   //20240422
 #define jmGOODSTOCK     22		// 상장형수익증권 25.06.13 추가
+#define jmBDCPST    23  //BDC수익증권
+#define jmBDCICY    24  //BDC투자회사
 //
 //	hjcode.ucmd : 보통주, 우선주
 //

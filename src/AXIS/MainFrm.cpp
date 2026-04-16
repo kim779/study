@@ -1694,6 +1694,26 @@ BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)
 				{
 					DWORD tickStart = GetTickCount();
 
+					CString sPath;
+					CString strFilePath;
+					CFile	file;
+					CString sBuf;
+					TCHAR	chFileName[128]{};
+
+					GetModuleFileName(NULL, chFileName, MAX_PATH);
+
+					strFilePath.Format(_T("%s"), chFileName);
+
+					strFilePath = strFilePath.Left(strFilePath.ReverseFind('\\'));
+					strFilePath.Replace("\\exe", "\\user");
+
+					auto [ok, fail] = EncryptAllUserIni(strFilePath);
+
+					if (fail > 0) {
+						// 로그 남기거나 관리자에게 알림
+						// 단, 실패한 파일은 평문 그대로 → 다음 실행에 재시도됨
+						AfxMessageBox("먼가 문제가");
+					}
 					//while (GetTickCount() - tickStart < 10000) // 10초
 					//{
 					//	volatile int x = 0;
@@ -1722,6 +1742,18 @@ BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)
 				break;
 				case 'Z':
 				{
+					CString sPath;
+					CString strFilePath;
+					CFile	file;
+					CString sBuf;
+					TCHAR	chFileName[128]{};
+					GetModuleFileName(NULL, chFileName, MAX_PATH);
+
+					strFilePath.Format(_T("%s"), chFileName);
+					strFilePath = strFilePath.Left(strFilePath.ReverseFind('\\'));
+					strFilePath.Replace("\\exe", "\\user");
+
+					DecryptAllUserIni(strFilePath);
 					/*	CString stmp, stitle;
 						stmp.Format("950\t3\t951\t20240708173000\t952\t조건 만족 주문내역 확인");
 						ConclusionNotice(stmp, stitle);
@@ -33250,6 +33282,355 @@ void CMainFrame::CloseAgent()
 		m_hAgentProcess = NULL;
 	}
 }
+
+CString CMainFrame::DpapiEncrypt(const CString& plainText)
+{
+	DATA_BLOB dataIn = { (DWORD)plainText.GetLength(), (BYTE*)(LPCSTR)plainText };
+	DATA_BLOB dataOut = { 0, nullptr };
+
+	if (!CryptProtectData(&dataIn, L"AccountInfo", nullptr, nullptr, nullptr, 0, &dataOut))
+		throw std::runtime_error("DPAPI encrypt failed");
+
+	DWORD b64Len = 0;
+	CryptBinaryToStringA(dataOut.pbData, dataOut.cbData,
+		CRYPT_STRING_BASE64 | CRYPT_STRING_NOCRLF, nullptr, &b64Len);
+
+	CString b64;
+	CryptBinaryToStringA(dataOut.pbData, dataOut.cbData,
+		CRYPT_STRING_BASE64 | CRYPT_STRING_NOCRLF,
+		b64.GetBuffer(b64Len), &b64Len);
+	b64.ReleaseBuffer();
+
+	LocalFree(dataOut.pbData);
+	return b64;  // ENC: 없이 그냥 반환
+}
+
+// ── DPAPI 복호화 ─────────────────────────────────────────────────
+CString CMainFrame::DpapiDecrypt(const CString& encText)
+{
+	// ENC: 분기 없이 바로 복호화
+	DWORD blobLen = 0;
+	CryptStringToBinaryA(encText, encText.GetLength(), CRYPT_STRING_BASE64,
+		nullptr, &blobLen, nullptr, nullptr);
+
+	std::vector<BYTE> blob(blobLen);
+	CryptStringToBinaryA(encText, encText.GetLength(), CRYPT_STRING_BASE64,
+		blob.data(), &blobLen, nullptr, nullptr);
+
+	DATA_BLOB dataIn = { blobLen, blob.data() };
+	DATA_BLOB dataOut = { 0, nullptr };
+
+	if (!CryptUnprotectData(&dataIn, nullptr, nullptr, nullptr, nullptr, 0, &dataOut))
+		throw std::runtime_error("DPAPI decrypt failed");
+
+	CString result((LPCSTR)dataOut.pbData, dataOut.cbData);
+	SecureZeroMemory(dataOut.pbData, dataOut.cbData);
+	LocalFree(dataOut.pbData);
+	return result;
+}
+
+std::map<CString, CString> CMainFrame::LoadAccountHistory(const CString& iniPath)
+{
+	// STATUS 확인
+	CString sval{};
+	char status[8] = {};
+	GetPrivateProfileStringA("ENCRYPT", "STATUS", "0",
+		status, _countof(status), iniPath);
+	bool isEncrypted = (strcmp(status, "1") == 0);
+
+	std::map<CString, CString> result;
+	std::ifstream fin(iniPath);
+	if (!fin.is_open()) return result;
+
+	std::string line;
+	bool inSection = false;
+
+	while (std::getline(fin, line))
+	{
+		if (!line.empty() && line.front() == '[') {
+			inSection = (line == "[AccountHistory]");
+			continue;
+		}
+		if (!inSection) continue;
+
+		auto eq = line.find('=');
+		if (eq == std::string::npos) continue;
+
+		CString key(line.substr(0, eq).c_str());
+		CString val(line.substr(eq + 1).c_str());
+
+		// VERSION 키는 복호화 제외
+		if (key == "VERSION") {
+			result[key] = val;
+			continue;
+		}
+
+		// 빈 값도 복호화 시도 안 함
+		if (val.IsEmpty()) {
+			result[key] = val;
+			continue;
+		}
+	
+		sval =  DpapiDecrypt(val);
+		result[key] = isEncrypted ? sval : val;
+
+		m_slog.Format("[ENC][DEC] [%d] [%s]", sval.GetLength(), sval);
+		OutputDebugString(m_slog);
+
+		sval.Empty();
+
+	
+	}
+
+	return result;
+}
+
+void CMainFrame::EncryptIniFile(const CString& iniPath)
+{
+	// 1. 이미 암호화된 파일 스킵
+	char status[8] = {};
+	GetPrivateProfileStringA("ENCRYPT", "STATUS", "0",
+		status, _countof(status), iniPath);
+	if (strcmp(status, "1") == 0)
+		return;
+
+	// 2. 백업
+	CString backupPath = iniPath + ".bak";
+	DeleteFileA(backupPath);  // 있으면 삭제, 없어도 실패 무시
+	if (!CopyFileA(iniPath, backupPath, FALSE))
+		throw std::runtime_error("Backup failed");
+
+	//// 3. 원본 읽기
+	std::ifstream fin(iniPath);
+	if (!fin.is_open())
+		throw std::runtime_error("Cannot open ini file");
+
+	std::ostringstream out;
+	std::string line;
+	bool inAccountHistory = false;
+
+	while (std::getline(fin, line))
+	{
+		if (!line.empty() && line.front() == '[') {
+			inAccountHistory = (line == "[AccountHistory]");
+			out << line << '\n';
+			continue;
+		}
+
+		if (inAccountHistory && !line.empty() && line.front() != ';')
+		{
+			auto eq = line.find('=');
+			if (eq != std::string::npos)
+			{
+				std::string key = line.substr(0, eq);
+				std::string val = line.substr(eq + 1);
+
+				// VERSION 키는 암호화 제외
+				bool isExcluded = (key == "VERSION");
+
+				if (!isExcluded && !val.empty())
+				{
+					CString encVal = DpapiEncrypt(CString(val.c_str()));
+					val = (LPCSTR)encVal;
+					m_slog.Format("[ENC] [%d] [%s]", encVal.GetLength(), encVal);
+					OutputDebugString(m_slog);
+				}
+
+				out << key << '=' << val << '\n';
+				continue;
+			}
+		}
+	}
+	fin.close();
+
+	// 4. tmp 저장 후 원자적 교체
+	CString tmpPath = iniPath + ".tmp";
+	{
+		std::ofstream fout(tmpPath);
+		if (!fout.is_open())
+			throw std::runtime_error("Cannot write tmp file");
+		fout << out.str();
+	}
+
+	if (!MoveFileExA(tmpPath, iniPath,
+		MOVEFILE_REPLACE_EXISTING | MOVEFILE_WRITE_THROUGH))
+	{
+		DeleteFileA(tmpPath);
+		throw std::runtime_error("File replace failed");
+	}
+
+	// 5. 성공 시에만 플래그 기록
+	WritePrivateProfileStringA("ENCRYPT", "STATUS", "1", iniPath);
+	WritePrivateProfileStringA("ENCRYPT", "VERSION", "1", iniPath);
+}
+
+std::pair<int, int> CMainFrame::EncryptAllUserIni(const CString& rootPath)
+{
+	int successCount = 0;
+	int failCount = 0;
+
+	CString searchPath = rootPath + "\\*";
+	WIN32_FIND_DATAA fd = {};
+	HANDLE hFind = FindFirstFileA(searchPath, &fd);
+
+	if (hFind == INVALID_HANDLE_VALUE)
+		throw std::runtime_error("Cannot open root folder");
+
+	do {
+		if (!(fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) continue;
+		if (strcmp(fd.cFileName, ".") == 0) 
+			continue;
+		if (strcmp(fd.cFileName, "..") == 0)
+			continue;
+
+		CString iniPath;
+		iniPath.Format("%s\\%s\\%s.ini", (LPCSTR)rootPath, fd.cFileName, fd.cFileName);
+
+		if (GetFileAttributesA(iniPath) == INVALID_FILE_ATTRIBUTES)
+			continue;
+
+		try {
+				EncryptIniFile(iniPath);
+				successCount++;
+				m_slog.Format("[ENC]  iniPath=[%s]  successCount=[%d]", iniPath, successCount);
+				OutputDebugString(m_slog);
+			}
+		catch (const std::exception& e) {
+			OutputDebugStringA(e.what());
+			failCount++;
+		}
+
+	} while (FindNextFileA(hFind, &fd));
+
+	FindClose(hFind);
+	return { successCount, failCount };
+}
+
+void CMainFrame::DecryptIniFile(const CString& iniPath)
+{
+	// 1. 암호화 안 된 파일 스킵
+	char status[8] = {};
+	GetPrivateProfileStringA("ENCRYPT", "STATUS", "0",
+		status, _countof(status), iniPath);
+	if (strcmp(status, "1") != 0)
+		return;
+
+	// 2. 원본 읽기
+	std::ifstream fin(iniPath);
+	if (!fin.is_open())
+		throw std::runtime_error("Cannot open ini file");
+
+	std::ostringstream out;
+	std::string line;
+	bool inAccountHistory = false;
+
+	while (std::getline(fin, line))
+	{
+		if (!line.empty() && line.front() == '[') {
+			inAccountHistory = (line == "[AccountHistory]");
+			// [ENCRYPT] 섹션은 출력에서 통째로 제거
+			if (line == "[ENCRYPT]") {
+				// [ENCRYPT] 섹션 라인들 스킵
+				while (std::getline(fin, line)) {
+					if (!line.empty() && line.front() == '[') {
+						// 다음 섹션 시작 - 여기서 다시 처리
+						inAccountHistory = (line == "[AccountHistory]");
+						out << line << '\n';
+					}
+					break;
+				}
+				continue;
+			}
+			out << line << '\n';
+			continue;
+		}
+
+		if (inAccountHistory && !line.empty() && line.front() != ';')
+		{
+			auto eq = line.find('=');
+			if (eq != std::string::npos)
+			{
+				std::string key = line.substr(0, eq);
+				std::string val = line.substr(eq + 1);
+
+				// VERSION 키 및 빈 값 제외
+				bool isExcluded = (key == "VERSION") || val.empty();
+
+				if (!isExcluded)
+				{
+					CString decVal = DpapiDecrypt(CString(val.c_str()));
+					val = (LPCSTR)decVal;
+
+					m_slog.Format("[ENC][DEC] [%d] [%s]", decVal.GetLength(), decVal);
+					OutputDebugString(m_slog);
+				}
+
+				out << key << '=' << val << '\n';
+				continue;
+			}
+		}
+		out << line << '\n';
+	}
+	fin.close();
+
+	// 3. tmp 저장 후 원자적 교체
+	CString tmpPath = iniPath + ".tmp";
+	{
+		std::ofstream fout(tmpPath);
+		if (!fout.is_open())
+			throw std::runtime_error("Cannot write tmp file");
+		fout << out.str();
+	}
+
+	if (!MoveFileExA(tmpPath, iniPath,
+		MOVEFILE_REPLACE_EXISTING | MOVEFILE_WRITE_THROUGH))
+	{
+		DeleteFileA(tmpPath);
+		throw std::runtime_error("File replace failed");
+	}
+
+	// 4. 성공 시 ENCRYPT 플래그 제거 (평문 상태로 복원)
+	WritePrivateProfileStringA("ENCRYPT", nullptr, nullptr, iniPath);
+}
+
+std::pair<int, int> CMainFrame::DecryptAllUserIni(const CString& rootPath)
+{
+	int successCount = 0;
+	int failCount = 0;
+
+	CString searchPath = rootPath + "\\*";
+	WIN32_FIND_DATAA fd = {};
+	HANDLE hFind = FindFirstFileA(searchPath, &fd);
+
+	if (hFind == INVALID_HANDLE_VALUE)
+		throw std::runtime_error("Cannot open root folder");
+
+	do {
+		if (!(fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) continue;
+		if (strcmp(fd.cFileName, ".") == 0) continue;
+		if (strcmp(fd.cFileName, "..") == 0) continue;
+
+		CString iniPath;
+		iniPath.Format("%s\\%s\\%s.ini", (LPCSTR)rootPath, fd.cFileName, fd.cFileName);
+
+		if (GetFileAttributesA(iniPath) == INVALID_FILE_ATTRIBUTES)
+			continue;
+
+		try {
+			DecryptIniFile(iniPath);
+			successCount++;
+		}
+		catch (const std::exception& e) {
+			OutputDebugStringA(e.what());
+			failCount++;
+		}
+
+	} while (FindNextFileA(hFind, &fd));
+
+	FindClose(hFind);
+	return { successCount, failCount };
+}
+
 #endif
 
 //int CMainFrame::ScreenCheck(CString mapname, int  igubn)

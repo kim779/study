@@ -454,6 +454,8 @@ void CInfoPopup::drawData(CDC *pDC)
 	case 'J': jgub = "시 장 구 분   : 신탁수익증서";		break;
 	case 'K': jgub = "시 장 구 분   : 투자계약증권";		break;
 	case 'R': jgub = "시 장 구 분   : 상장형수익증권";		break;
+	case 'C': jgub = "시 장 구 분   : BDC수익증권";		break;
+	case 'D': jgub = "시 장 구 분   : BDC투자회사";		break;
 	default: jgub = m_jinfo.jgub;	break;
 	}
 	//KSJ

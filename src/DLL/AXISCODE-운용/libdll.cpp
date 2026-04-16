@@ -991,6 +991,12 @@ __declspec(dllexport) bool WINAPI axGetName(int kind, char* code, char* name, in
 							*type = fdlg.GetJongmuk();
 							return TRUE;
 						}
+						else
+						{
+							CString slog;
+							slog.Format("[AXISCODE][whichTYPE][%s]<%d>  code=[%s] 타입을 모른다 ", __FUNCTION__, __LINE__,szCode);
+							OutputDebugString(slog);
+						}
 					}
 				} 
 				else if (szCode.GetLength() <= 3)
