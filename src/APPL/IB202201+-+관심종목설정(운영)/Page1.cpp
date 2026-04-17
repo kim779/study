@@ -51,6 +51,7 @@ constexpr	int xKOSPIUP = 50, xKOSDAQUP = 51, xKOSPIex = 52, xKOSDAQex = 53;
 
 constexpr       int xGOODSTOCK = 122;
 constexpr       int xNXT = 123;
+constexpr       int xBDC = 124;
 
 constexpr struct _exKospi {
 	char* code{};
@@ -1893,6 +1894,8 @@ void CPage1::initTree()
 	m_tree.SetItemData(m_tree.InsertItem(_T("ETN"), hRoot, TVI_LAST), xETNCODE);	//2013.06.25 KSJ 코넥스 추가
 
 	m_tree.SetItemData(m_tree.InsertItem(_T("상장형수익증권"), hRoot, TVI_LAST), xGOODSTOCK);	//25.06.12 상장형수익증권 추가
+
+	m_tree.SetItemData(m_tree.InsertItem(_T("BDC"), hRoot, TVI_LAST), xBDC);	//25.06.12 상장형수익증권 추가
 
 	m_tree.SetItemData(m_tree.InsertItem(_T("리츠"), hRoot, TVI_LAST), xRITS);	//20240422 리츠
 	
