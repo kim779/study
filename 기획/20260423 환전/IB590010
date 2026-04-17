@@ -220,7 +220,7 @@ EDIT  ed_prvrate_skip(140, 5, 238, 25)  LEN(14)  IO_NUM|EDIT_INPUT|FA_RIGHT|FA_W
   HINTTYPE(IH_NONE)
 OBJECT  obj_srhreate(105, 416, 335, 547)    "IB590050"  TABORDER(33)  IOORDER(53)  ENABLE  &
   HINTTYPE(IH_NONE)
-OBJECT  obj_apprate(88, 654, 286, 802)    "IB590040"  TABORDER(32)  IOORDER(52)  ENABLE  &
+OBJECT  obj_apprate(85, 650, 283, 798)    "IB590040"  TABORDER(32)  IOORDER(52)  ENABLE  &
   HINTTYPE(IH_NONE)
 TABLE  TABLE8(232, 170, 342, 190)  MATRIX(1, 1)  LINECOLOR(75)  CELLH(19)  AUTOSIZE  |NOHEAD  EDIT_OUTPUT    &
 	COLINFO("TBL01")  LEN(16)  WIDTH(115)  HEAD("원화전잔")  COLALIGN(AL_CENTER, AL_RIGHT)  HEADCOLOR(74, 192)  IO_NUM|FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSUP    COLOR(192, 69)  COLCUR(0, 0)  COLHINTTYPE(IH_NONE)    COLUMN_VISIBLE  IFRGB(69, 69)  IOORDER(43)  ENABLE  &
@@ -324,6 +324,10 @@ EDIT  bnkcode(250, 5, 315, 25)  LEN(3)  IO_MIXED|EDIT_INOUT|FA_WRAP|FA_SKIP    C
   HINTTYPE(IH_NONE)
 EDIT  IFval(595, 55, 670, 75)  LEN(10)  IO_MIXED|EDIT_INOUT|FA_WRAP    COLOR(192, 130)  CUR(0)  TP_NONE          TABORDER(55)  IOORDER(2)  ENABLE  &
   HINTTYPE(IH_NONE)
+GROUP  GROUP2(1009, 33, 1344, 248)  'obj_srhreate_k835 거래환율조회(은행)'        COLOR(-1, 232)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  obj_IBKrate(1052, 69, 1282, 200)    "IB590070"  TABORDER(56)  IOORDER(62)  ENABLE  &
+  HINTTYPE(IH_NONE)
 }
 
 
@@ -338,6 +342,9 @@ Dim g_rateQueryTick
 Dim g_rateQueryValid
 
 Sub send_f(sdata)
+
+SYSTEM.Trace "[IB590000][IB590010]   send_f"
+
 	Select Case Trim(sdata)
 	Case "0":	' 환전예상금액
 		' 처리구분
@@ -378,6 +385,8 @@ Sub send_f(sdata)
 			ed_chgcrcycode.Data = "HKD"
 		Case 2:	' CNY
 			ed_chgcrcycode.Data = "CNY"
+		Case 3:	' USD
+			ed_chgcrcycode.Data = "AUD"	
 		End Select
 		ed_tgtcrcycode.Data = "KRW"     '대상통화코드
 
@@ -389,6 +398,8 @@ Sub send_f(sdata)
 			ed_tgtcrcycode.Data = "HKD"
 		Case 2:	' CNY
 			ed_tgtcrcycode.Data = "CNY"
+		Case 3:	' USD
+			ed_tgtcrcycode.Data = "AUD"	
 		End Select
 		ed_chgcrcycode.Data = "KRW"     '환전통화코드
 
@@ -519,11 +530,11 @@ Function CheckRateQueryRequeryLimit(limitSec)
     End If
 
     diffSec = Timer - g_rateQueryTick
-    If diffSec < 0 Then 
+    If diffSec < 0 Then
     	diffSec = diffSec + 86400
     End If
-    
-   SYSTEM.Trace "[IB590000][IB590010][TIME] CheckRateQueryRequeryLimit -------------  diffSec =" & diffSec 
+
+   SYSTEM.Trace "[IB590000][IB590010][TIME] CheckRateQueryRequeryLimit -------------  diffSec =" & diffSec
 
     If diffSec < limitSec Then
         MsgBox "적용환율은 10초간 유지 됩니다.", vbExclamation
@@ -544,7 +555,7 @@ Function CheckRateQueryExchangeLimit(limitSec)
     End If
 
     diffSec = Timer - g_rateQueryTick
-    If diffSec < 0 Then 
+    If diffSec < 0 Then
     	diffSec = diffSec + 86400
     End If
 
@@ -669,6 +680,8 @@ ed_trddt.Data = "        "
  SYSTEM.Trace "getmoney logic end"
  '20230830 550 이상인 경우 로직 추가 끝
 
+SYSTEM.Trace "[IB590000][IB590010]OnSend ed_chgcrcycode = " & ed_chgcrcycode.Data
+
 'SDPDT080 환전시작
 SCREEN.OnSend = True
 
@@ -700,6 +713,8 @@ Select Case LEDGER.Ecod
 		'MsgBox SCREEN.Object("Main.GUIDE").Text
 		SCREEN.Proc "Main.obj_acccur.send_f", ""
 		SCREEN.Proc "Main.obj_list.send_f", ""
+		
+SYSTEM.Trace "[IB590000][IB590010]OnReceive ed_chgcrcycode = " & ed_chgcrcycode.Data		
 
         'If tab_ex.ID = 1 And Left(ed_acno.Data, 3) >= 550 Then '매도한 환전액 은행을 송금
         If tab_ex.ID = 1 And IsBnkAccnType(SCREEN.Object("ed_acno")) = True Then
@@ -854,7 +869,12 @@ Clear_Input()
 ' 은행으로부터 해당 화폐의 매도/매수에 대한 고시 환율을 조회(SDPKT169)한 다음
 ' 해당 고시환율에 대한 적용환율을 코스콤으로부터 조회(SDPDQ099)
 SaveRateQueryTime()
-SCREEN.Object("obj_srhreate").Send
+
+If Trim(SCREEN.Object("Main.edbnkcode").Data)  = "003" Then
+	SCREEN.Object("obj_IBKrate").Send
+Else
+	SCREEN.Object("obj_srhreate").Send
+End If
 _AW_ONENDSUB_AW_
 _AW_ENDSCRIPT_AW_
 

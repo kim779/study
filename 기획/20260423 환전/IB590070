@@ -1,7 +1,7 @@
 GLOBAL DIVISION
 {
 
-MAPNAME(IB590050)
+MAPNAME(IB590070)
 MAPSIZE(236, 555)
 VERSION(000)
 MAPKIND(NORMAL)
@@ -9,13 +9,13 @@ MAPGROUP(1)
 MAPDESC("5905 거래환율조회")
 MAPPUBLIC(";")
 FONT("굴림", 9, NORMAL)
-TITLE("5905 거래환율조회 (국민은행)")
+TITLE("5905 거래환율조회 (기업은행)")
 TOPATH(AXIS)
 METHOD(FORM)
 TRXCODE("piboPBxQ")
 MAPTYPE(FIXED)
 HEADER(LEDGER)
-TRXH("14CSDPKT169")
+TRXH("14CSDPKT183")
 }
 
 
@@ -137,7 +137,7 @@ _AW_ONENDSUB_AW_
 _AW_ONSEND_AW_
 LEDGER.Rcnt = "0008"
 
-SYSTEM.Trace "[IB590000][IB590050][SDPKT169]거래환율조회 OnSend"
+SYSTEM.Trace "[IB590000][IB590070][SDPKT169]거래환율조회 OnSend"
 
 SCREEN.OnSend = False
 
@@ -184,11 +184,13 @@ _AW_ONENDSUB_AW_
 _AW_ONRECEIVE_AW_
 Dim ecod, hh, mm, ss
 Dim i, j
+Dim bankcode
+
 
 ecod = Left(Trim(LEDGER.Emsg), 4)
 
-SYSTEM.Trace "[IB590000][IB590050][SDPKT169]ecod = " & ecod
-SYSTEM.Trace "[IB590000][IB590050][SDPKT169]emsg = " & Trim(LEDGER.Emsg)
+SYSTEM.Trace "[IB590000][IB590070][SDPKT183]ecod = " & ecod
+SYSTEM.Trace "[IB590000][IB590070][SDPKT183]emsg = " & Trim(LEDGER.Emsg)
 
 If ecod <> "0136" Then	' 조회 성공이 아님
 	If Trim(o_bnkmsg.Data) <> "" Then	' 은행 메시지 존재시 은행 메시지 출력
@@ -216,8 +218,9 @@ SCREEN.Object("Parent.LTIM").Text = Trim(ltim)
 
 
 '2021 07 21 13322
-SYSTEM.Trace "[IB590000][IB590050][SDPKT169] ltim = " & ltim
-
+SYSTEM.Trace "[IB590000][IB590070][SDPKT183] ltim = " & ltim
+bankcode = Trim(SCREEN.Object("Main.edbnkcode").Data)
+SYSTEM.Trace "[IB590000][IB590070][SDPKT183] 은행코드 = " & bankcode
 
 ' 적용환율 조회
 Select Case SCREEN.Object("parent.tab_ex").ID
@@ -227,7 +230,7 @@ Case 1:		' 외화매도
 	tmpb = Trim(o_xchrat.Data)
 End Select
 
-SYSTEM.Trace "obj_srhreate_onrecv"
+SYSTEM.Trace "obj_IBKrate_onrecv"
 
 Select Case Trim(chk.Data)
 Case "1"	' 환전시, 조회 적용환율 변동사항 체크용
@@ -264,10 +267,11 @@ Case "1"	' 환전시, 조회 적용환율 변동사항 체크용
 	End If
 
 	'If Trim(tmpb) = SCREEN.Object("Main.obj_exchange.chk").Data Then
-	If canProceed = True Then
+	If canProceed = True And bankcode = "004" Then  '국민은행 인경우 환율변동 체크
 	    SYSTEM.Trace "111"
 	    SYSTEM.Trace ":"&SCREEN.Object("parent.ed_acno").Data
 	      'If Left(SCREEN.Object("parent.ed_acno").Data, 3) >= 550 Then
+SYSTEM.Trace "[IB590000][IB590070][SDPKT183] IsBnkAccnType = " & IsBnkAccnType(SCREEN.Object("parent.ed_acno"))	      
 	      If IsBnkAccnType(SCREEN.Object("parent.ed_acno")) = True Then
 
                Dim hhmm
@@ -297,14 +301,14 @@ Case "1"	' 환전시, 조회 적용환율 변동사항 체크용
 			    zPrsmptMnyoutAbleAmtD2    = SCREEN.Object("main.obj_exchange.obj_SDPAQ066.PrsmptMnyoutAbleAmtD2").Data
 			    zBnkDps                   = SCREEN.Object("main.obj_exchange.obj_SDPAQ066.BnkDps").Data
 
-			    SYSTEM.Trace "[IB590000][IB590050][SDPKT169] zDpsBalAmt:"&zDpsBalAmt
-			    SYSTEM.Trace "[IB590000][IB590050][SDPKT169] zPsnOutAbleAmt:"&zPsnOutAbleAmt
-			    SYSTEM.Trace "[IB590000][IB590050][SDPKT169] zMnyrclAmt:"&zMnyrclAmt
-			    SYSTEM.Trace "[IB590000][IB590050][SDPKT169] zIntrstDlinqAmt:"&zIntrstDlinqAmt
-			    SYSTEM.Trace "[IB590000][IB590050][SDPKT169] zEtclnd:"&zEtclnd
-			    SYSTEM.Trace "[IB590000][IB590050][SDPKT169] zOldUnRfundAmt:"&zOldUnRfundAmt
-			    SYSTEM.Trace "[IB590000][IB590050][SDPKT169] zPrsmptMnyoutAbleAmtD2:"&zPrsmptMnyoutAbleAmtD2
-			    SYSTEM.Trace "[IB590000][IB590050][SDPKT169] zBnkDps:"&zBnkDps
+			    SYSTEM.Trace "[IB590000][IB590070][SDPKT183] zDpsBalAmt:"&zDpsBalAmt
+			    SYSTEM.Trace "[IB590000][IB590070][SDPKT183] zPsnOutAbleAmt:"&zPsnOutAbleAmt
+			    SYSTEM.Trace "[IB590000][IB590070][SDPKT183] zMnyrclAmt:"&zMnyrclAmt
+			    SYSTEM.Trace "[IB590000][IB590070][SDPKT183] zIntrstDlinqAmt:"&zIntrstDlinqAmt
+			    SYSTEM.Trace "[IB590000][IB590070][SDPKT183] zEtclnd:"&zEtclnd
+			    SYSTEM.Trace "[IB590000][IB590070][SDPKT183] zOldUnRfundAmt:"&zOldUnRfundAmt
+			    SYSTEM.Trace "[IB590000][IB590070][SDPKT183] zPrsmptMnyoutAbleAmtD2:"&zPrsmptMnyoutAbleAmtD2
+			    SYSTEM.Trace "[IB590000][IB590070][SDPKT183] zBnkDps:"&zBnkDps
 
                Dim ed_won
                ed_won = SCREEN.Object("parent.ed_won").Data
@@ -411,6 +415,7 @@ Case "1"	' 환전시, 조회 적용환율 변동사항 체크용
 	SCREEN.Object("Main.obj_exchange.chk").Clear()
 
 Case Else	' 적용 환율 조회
+SYSTEM.Trace "[IB590000][IB590070][SDPKT183] 적용 환율 조회 시작!!!"
 	SCREEN.Object("Main.obj_exchange.chk").Data = tmpb
 	SCREEN.Proc "Main.obj_exchange.obj_apprate.send_f", ""
 

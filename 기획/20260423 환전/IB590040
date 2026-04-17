@@ -112,7 +112,8 @@ End If
 LEDGER.Hsiz = 44
 LEDGER.EPwd = SYSTEM.EncryptSHA(Trim(ed_pswd.Data))
 '------------------------------------------------------------------------
-
+Dim bankcode
+bankcode = Trim(SCREEN.Object("Main.edbnkcode").Data)
 'k835 에서 서비스를 조회해서 환율조회해야 한다.
 '외화매수인 경우 외화예금입금환율
 '외화매도인 경우 외화예금출금환율
@@ -120,9 +121,17 @@ LEDGER.EPwd = SYSTEM.EncryptSHA(Trim(ed_pswd.Data))
 ' * 적용환율 입력 환율에 기입
 Select Case SCREEN.Object("parent.tab_ex").ID
 Case 2:		' 외화매수
-	tmpb = Trim(SCREEN.Object("Main.obj_exchange.obj_srhreate.o_bfxchrat").Data) & "0"
+	If bankcode = "003" Then
+		tmpb = Trim(SCREEN.Object("Main.obj_exchange.obj_IBKrate.o_bfxchrat").Data) & "0"
+	Else
+		tmpb = Trim(SCREEN.Object("Main.obj_exchange.obj_srhreate.o_bfxchrat").Data) & "0"
+	End If
 Case 1:		' 외화매도
-	tmpb = Trim(SCREEN.Object("Main.obj_exchange.obj_srhreate.o_xchrat").Data) & "0"
+	If bankcode = "003" Then
+		tmpb = Trim(SCREEN.Object("Main.obj_exchange.obj_IBKrate.o_xchrat").Data) & "0"
+	Else
+		tmpb = Trim(SCREEN.Object("Main.obj_exchange.obj_srhreate.o_xchrat").Data) & "0"
+	End If
 End Select
 
 ' Zero Padding
@@ -141,6 +150,9 @@ SCREEN.OnSend = True
 _AW_ONENDSUB_AW_
 _AW_ONRECEIVE_AW_
 Dim desc, ltim
+
+SYSTEM.Trace "[IB590000][IB590040][SDPDQ099]ecod = " & ecod
+SYSTEM.Trace "[IB590000][IB590040][SDPDQ099]emsg = " & Trim(LEDGER.Emsg)
 
 Select Case LEDGER.Ecod
 	Case "0136"	' 조회가 완료되었습니다.
