@@ -1071,7 +1071,8 @@ void CPopListWnd::OnSize(UINT nType, int cx, int cy)
         m_pBtnClear->MoveWindow(
             nBorder,
             cy - nBtnHeight,
-            cx - nBorder * 2,
+            //cx - nBorder * 2,
+            180,
             nBtnHeight - nBorder);
 
         CString slog;

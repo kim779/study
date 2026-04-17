@@ -268,139 +268,142 @@ Case "1"	' 환전시, 조회 적용환율 변동사항 체크용
 	    SYSTEM.Trace "111"
 	    SYSTEM.Trace ":"&SCREEN.Object("parent.ed_acno").Data
 	      'If Left(SCREEN.Object("parent.ed_acno").Data, 3) >= 550 Then
-	      If IsBnkAccnType(SCREEN.Object("parent.ed_acno")) = True Then
+		If IsBnkAccnType(SCREEN.Object("parent.ed_acno")) = True Then
 
-               Dim hhmm
-               hhmm = Hour(Now)*100 + Minute(Now)
-               SYSTEM.Trace "hhmm:"&hhmm
-               If hhmm < 900 Or hhmm > 2300 Then
- 			        MsgBox "환전가능시간이 아닙니다(가능시간 09:00~23:00)"
- 			         Exit Sub
- 			   End If
-
-                SYSTEM.Trace "222"
-			    Dim zDpsBalAmt               '예수금잔고금액
-			    Dim zPsnOutAbleAmt           '인출가능금액
-			    Dim zMnyrclAmt               '현금미수금액
-			    Dim zIntrstDlinqAmt         '이자미납금액
-			    Dim zEtclnd                  '기타대여금
-			    Dim zOldUnRfundAmt           '(구) 미상환금액
-			    Dim zPrsmptMnyoutAbleAmtD2   '추정인출가능금 D+2
-			    Dim zBnkDps                  '은행예수금
-
-			    zDpsBalAmt                = SCREEN.Object("main.obj_exchange.obj_SDPAQ066.DpsBalAmt").Data
-			    zPsnOutAbleAmt            = SCREEN.Object("main.obj_exchange.obj_SDPAQ066.PsnOutAbleAmt").Data
-			    zMnyrclAmt                = SCREEN.Object("main.obj_exchange.obj_SDPAQ066.MnyrclAmt").Data
-			    zIntrstDlinqAmt           = SCREEN.Object("main.obj_exchange.obj_SDPAQ066.IntrstDlinqAmt").Data
-			    zEtclnd                   = SCREEN.Object("main.obj_exchange.obj_SDPAQ066.Etclnd").Data
-			    zOldUnRfundAmt            = SCREEN.Object("main.obj_exchange.obj_SDPAQ066.OldUnRfundAmt").Data
-			    zPrsmptMnyoutAbleAmtD2    = SCREEN.Object("main.obj_exchange.obj_SDPAQ066.PrsmptMnyoutAbleAmtD2").Data
-			    zBnkDps                   = SCREEN.Object("main.obj_exchange.obj_SDPAQ066.BnkDps").Data
-
-			    SYSTEM.Trace "[IB590000][IB590050][SDPKT169] zDpsBalAmt:"&zDpsBalAmt
-			    SYSTEM.Trace "[IB590000][IB590050][SDPKT169] zPsnOutAbleAmt:"&zPsnOutAbleAmt
-			    SYSTEM.Trace "[IB590000][IB590050][SDPKT169] zMnyrclAmt:"&zMnyrclAmt
-			    SYSTEM.Trace "[IB590000][IB590050][SDPKT169] zIntrstDlinqAmt:"&zIntrstDlinqAmt
-			    SYSTEM.Trace "[IB590000][IB590050][SDPKT169] zEtclnd:"&zEtclnd
-			    SYSTEM.Trace "[IB590000][IB590050][SDPKT169] zOldUnRfundAmt:"&zOldUnRfundAmt
-			    SYSTEM.Trace "[IB590000][IB590050][SDPKT169] zPrsmptMnyoutAbleAmtD2:"&zPrsmptMnyoutAbleAmtD2
-			    SYSTEM.Trace "[IB590000][IB590050][SDPKT169] zBnkDps:"&zBnkDps
-
-               Dim ed_won
-               ed_won = SCREEN.Object("parent.ed_won").Data
-               '매수
-			   If SCREEN.Object("parent.tab_ex").ID = 2 Then
-			     SYSTEM.Trace "maesu_logic start "
-			     SYSTEM.Trace "ed_won:"&ed_won 'SCREEN.Object("parent.ed_acno").Data
-
-			    Dim zmisu
-			    zmisu = 0
-			    If Trim(zMnyrclAmt) = "" Then
-			       zMnyrclAmt = 0
-			    End If
-			    If Trim(zIntrstDlinqAmt) = "" Then
-			       zIntrstDlinqAmt = 0
-			    End If
-			    If Trim(zEtclnd) = "" Then
-			       zEtclnd = 0
-			    End If
-			    If Trim(zOldUnRfundAmt) = "" Then
-			       zOldUnRfundAmt = 0
-			    End If
-
-			    zmisu = CCur(zMnyrclAmt) + CCur(zIntrstDlinqAmt) + CCur(zEtclnd) + CCur(zOldUnRfundAmt)
-			    SYSTEM.Trace "step1_zmisu:"& zmisu
-			    If CCur(zmisu) > 0 Then
-			       MsgBox "미수발생 계좌는 외화 매수가 불가합니다."
-			       SYSTEM.Trace "zmisu:"& CCur(zmisu)
-			       Exit Sub
-			    End If
-
-			    Dim minable
-			    minable = 0
-			    SYSTEM.Trace "zPsnOutAbleAmt:"& CCur(zPsnOutAbleAmt)
-			    If CCur(zPsnOutAbleAmt) > CCur(zPrsmptMnyoutAbleAmtD2) Then
-			       minable = CCur(zPrsmptMnyoutAbleAmtD2)
-			    Else
-			       minable = CCur(zPsnOutAbleAmt)
-			    End If
-			    SYSTEM.Trace "minable:"& CCur(minable)
-
+			Dim hhmm
+			hhmm = Hour(Now)*100 + Minute(Now)
+			SYSTEM.Trace "hhmm:"&hhmm
+			If hhmm < 900 Or hhmm > 2300 Then
+			    MsgBox "환전가능시간이 아닙니다(가능시간 09:00~23:00)"
+			     Exit Sub
+			End If
+	
+			SYSTEM.Trace "222"
+			Dim zDpsBalAmt               '예수금잔고금액
+			Dim zPsnOutAbleAmt           '인출가능금액
+			Dim zMnyrclAmt               '현금미수금액
+			Dim zIntrstDlinqAmt         '이자미납금액
+			Dim zEtclnd                  '기타대여금
+			Dim zOldUnRfundAmt           '(구) 미상환금액
+			Dim zPrsmptMnyoutAbleAmtD2   '추정인출가능금 D+2
+			Dim zBnkDps                  '은행예수금
+			
+			zDpsBalAmt                = SCREEN.Object("main.obj_exchange.obj_SDPAQ066.DpsBalAmt").Data
+			zPsnOutAbleAmt            = SCREEN.Object("main.obj_exchange.obj_SDPAQ066.PsnOutAbleAmt").Data
+			zMnyrclAmt                = SCREEN.Object("main.obj_exchange.obj_SDPAQ066.MnyrclAmt").Data
+			zIntrstDlinqAmt           = SCREEN.Object("main.obj_exchange.obj_SDPAQ066.IntrstDlinqAmt").Data
+			zEtclnd                   = SCREEN.Object("main.obj_exchange.obj_SDPAQ066.Etclnd").Data
+			zOldUnRfundAmt            = SCREEN.Object("main.obj_exchange.obj_SDPAQ066.OldUnRfundAmt").Data
+			zPrsmptMnyoutAbleAmtD2    = SCREEN.Object("main.obj_exchange.obj_SDPAQ066.PrsmptMnyoutAbleAmtD2").Data
+			zBnkDps                   = SCREEN.Object("main.obj_exchange.obj_SDPAQ066.BnkDps").Data
+			
+			SYSTEM.Trace "[IB590000][IB590050][SDPKT169] zDpsBalAmt:"&zDpsBalAmt
+			SYSTEM.Trace "[IB590000][IB590050][SDPKT169] zPsnOutAbleAmt:"&zPsnOutAbleAmt
+			SYSTEM.Trace "[IB590000][IB590050][SDPKT169] zMnyrclAmt:"&zMnyrclAmt
+			SYSTEM.Trace "[IB590000][IB590050][SDPKT169] zIntrstDlinqAmt:"&zIntrstDlinqAmt
+			SYSTEM.Trace "[IB590000][IB590050][SDPKT169] zEtclnd:"&zEtclnd
+			SYSTEM.Trace "[IB590000][IB590050][SDPKT169] zOldUnRfundAmt:"&zOldUnRfundAmt
+			SYSTEM.Trace "[IB590000][IB590050][SDPKT169] zPrsmptMnyoutAbleAmtD2:"&zPrsmptMnyoutAbleAmtD2
+			SYSTEM.Trace "[IB590000][IB590050][SDPKT169] zBnkDps:"&zBnkDps
+			
+			Dim ed_won
+			ed_won = SCREEN.Object("parent.ed_won").Data
+			
+	      '매수
+		  	If SCREEN.Object("parent.tab_ex").ID = 2 Then
+		  
+				SYSTEM.Trace "maesu_logic start "
+				SYSTEM.Trace "ed_won:"&ed_won 'SCREEN.Object("parent.ed_acno").Data
+	
+				Dim zmisu
+				zmisu = 0
+				If Trim(zMnyrclAmt) = "" Then
+				   zMnyrclAmt = 0
+				End If
+				If Trim(zIntrstDlinqAmt) = "" Then
+				   zIntrstDlinqAmt = 0
+				End If
+				If Trim(zEtclnd) = "" Then
+				   zEtclnd = 0
+				End If
+				If Trim(zOldUnRfundAmt) = "" Then
+				   zOldUnRfundAmt = 0
+				End If
+			
+				zmisu = CCur(zMnyrclAmt) + CCur(zIntrstDlinqAmt) + CCur(zEtclnd) + CCur(zOldUnRfundAmt)
+				SYSTEM.Trace "step1_zmisu:"& zmisu
+				If CCur(zmisu) > 0 Then
+				   MsgBox "미수발생 계좌는 외화 매수가 불가합니다."
+				   SYSTEM.Trace "zmisu:"& CCur(zmisu)
+				   Exit Sub
+				End If
+			
+				Dim minable
+				minable = 0
+				SYSTEM.Trace "zPsnOutAbleAmt:"& CCur(zPsnOutAbleAmt)
+				If CCur(zPsnOutAbleAmt) > CCur(zPrsmptMnyoutAbleAmtD2) Then
+				   minable = CCur(zPrsmptMnyoutAbleAmtD2)
+				Else
+				   minable = CCur(zPsnOutAbleAmt)
+				End If
+				SYSTEM.Trace "minable:"& CCur(minable)
+			
 				Dim wonchk
 				wonchk = 0
 				wonchk = CCur(minable) * 0.97
-			    If CCur(wonchk) < CCur(ed_won) Then
-			       MsgBox "환전에 필요한 원화가 부족합니다."
-			       Exit Sub
-			    End If
-
-                Dim ed_won_add
-                ed_won_add =0
-
-                Dim zFcurrMxchgAbleAmt
-                zFcurrMxchgAbleAmt = SCREEN.Object("Main.obj_acccur.zFcurrMxchgAbleAmt").Data
-                SYSTEM.Trace "11zFcurrMxchgAbleAmt:"&zFcurrMxchgAbleAmt
-
-                Dim zFcurrDps
-                zFcurrDps = SCREEN.Object("Main.obj_acccur.zFcurrDps").Data
-                SYSTEM.Trace "11zFcurrDps:"&zFcurrDps
-
-                If Trim(zFcurrMxchgAbleAmt) = "" Then
-			       zFcurrMxchgAbleAmt = 0
-			    End If
-
-	            If Trim(zFcurrDps) = "" Then
-			       zFcurrDps = 0
-			    End If
-
-                ed_won_add = CCur(ed_won)*1.03
-                If CCur(zFcurrMxchgAbleAmt) < CCur(ed_won_add) Then
-                   If CCur(zFcurrMxchgAbleAmt) > 0 Then
-                      ed_won_add = 0
-                      ed_won_add = CCur(zFcurrDps) + CCur(ed_won)*1.03 - CCur(zFcurrMxchgAbleAmt)
-                      SYSTEM.Trace "aaa"
-                   Else
-                      ed_won_add = 0
-                      ed_won_add = CCur(zDpsBalAmt) - CCur(zPsnOutAbleAmt) + CCur(ed_won)*1.03
-                      SYSTEM.Trace "bbb"
-                   End If
-                    SYSTEM.Trace "123ed_won_add:"& Fix(ed_won_add)
- 			        SCREEN.Proc "obj_getMoney.contributionBnk", Fix(ed_won_add)
-                End If
-
-		    End If
+				If CCur(wonchk) < CCur(ed_won) Then
+				   MsgBox "환전에 필요한 원화가 부족합니다."
+				   Exit Sub
+				End If
+			
+				Dim ed_won_add
+				ed_won_add =0
+				
+				Dim zFcurrMxchgAbleAmt
+				zFcurrMxchgAbleAmt = SCREEN.Object("Main.obj_acccur.zFcurrMxchgAbleAmt").Data
+				SYSTEM.Trace "11zFcurrMxchgAbleAmt:"&zFcurrMxchgAbleAmt
+				
+				Dim zFcurrDps
+				zFcurrDps = SCREEN.Object("Main.obj_acccur.zFcurrDps").Data
+				SYSTEM.Trace "11zFcurrDps:"&zFcurrDps
+			
+				If Trim(zFcurrMxchgAbleAmt) = "" Then
+				   zFcurrMxchgAbleAmt = 0
+				End If
+				
+				If Trim(zFcurrDps) = "" Then
+				   zFcurrDps = 0
+				End If
+			
+				ed_won_add = CCur(ed_won)*1.03
+				If CCur(zFcurrMxchgAbleAmt) < CCur(ed_won_add) Then
+				   If CCur(zFcurrMxchgAbleAmt) > 0 Then
+				      ed_won_add = 0
+				      ed_won_add = CCur(zFcurrDps) + CCur(ed_won)*1.03 - CCur(zFcurrMxchgAbleAmt)
+				      SYSTEM.Trace "aaa"
+				   Else
+				      ed_won_add = 0
+				      ed_won_add = CCur(zDpsBalAmt) - CCur(zPsnOutAbleAmt) + CCur(ed_won)*1.03
+				      SYSTEM.Trace "bbb"
+				   End If
+				    SYSTEM.Trace "123ed_won_add:"& Fix(ed_won_add)
+				    SCREEN.Proc "obj_getMoney.contributionBnk", Fix(ed_won_add)
+				End If
+			
+		  	End If
+		  
 		     '매도
-		    If SCREEN.Object("parent.tab_ex").ID = 1 Then
-			    SYSTEM.Trace "maesu_logic start "
-			    SCREEN.Proc "Main.obj_exchange.send_f", "1"
-			End If '매도
-		Else
+			 If SCREEN.Object("parent.tab_ex").ID = 1 Then
+				SYSTEM.Trace "maesu_logic start "
+				SCREEN.Proc "Main.obj_exchange.send_f", "1"
+			 End If '매도
+		 
+		Else 'If IsBnkAccnType(SCREEN.Object("parent.ed_acno")) = True Then
            '환전 실행
            SYSTEM.Trace "go exchage start"
 		   SCREEN.Proc "Main.obj_exchange.send_f", "1"
-    End If
-
-
+    	End If
+    	
 	Else
 		MsgBox "환율이 변동이 발생 하였습니다. 적용환율 조회 후 다시 환전 처리하여 주시기 바랍니다."
 		SCREEN.Object("Main.GUIDE").Text = "환율이 변동이 발생 하였습니다. 적용환율 조회 후 다시 환전 처리하여 주시기 바랍니다."
@@ -408,6 +411,7 @@ Case "1"	' 환전시, 조회 적용환율 변동사항 체크용
 		SCREEN.Proc "Main.obj_exchange.Clear_Input", ""
 		SCREEN.Object("Main.obj_exchange.BUTTON0").SetFocus()
 	End If
+	
 	SCREEN.Object("Main.obj_exchange.chk").Clear()
 
 Case Else	' 적용 환율 조회

@@ -967,7 +967,7 @@ void CControlWnd::SearchCode(CString sText)
 		&CWnd::wndTopMost,
 		rcScreen.left,
 		rcScreen.bottom,
-		rcClient.Width() * 2,
+		rcClient.Width() * 1.67 - 1,
 		200,
 		SWP_SHOWWINDOW| SWP_NOACTIVATE);
 
@@ -1523,7 +1523,7 @@ void CControlWnd::ShowDropList(bool bShow)
 		CRect rcClient;
 		GetClientRect(&rcClient);
 
-		int nPopWidth = rcClient.Width() * 2;
+		int nPopWidth = rcClient.Width() * 1.67 - 1;
 
 		m_pListPop->SetWindowPos(
 			&CWnd::wndTopMost,
