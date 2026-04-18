@@ -37,7 +37,7 @@
 
 #include <AxStd.hpp>
 
-#define DF_SHOW_LOG1
+#define DF_SHOW_LOG
 inline void Output_DebugString(CString slog)
 {
 #ifdef DF_SHOW_LOG

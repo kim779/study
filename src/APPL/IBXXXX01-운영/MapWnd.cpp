@@ -437,6 +437,9 @@ LRESULT CMapWnd::OnReceiveRemainData(WPARAM wParam, LPARAM lParam)
 			pRemain->m_b3RDCode = Is3RDCode(codeS);	//2015.04.22 KSJ K-OTC인지 체크 
 			pRemain->m_bKONEXCode = IsKONEXCode(codeS);	
 			int itype = m_pParent->SendMessage(WM_USER, MAKEWPARAM(codeTYPE, 0), (LPARAM)codeS.Right(6).operator LPCTSTR());
+			pRemain->m_iCodetype = itype;
+			m_slog.Format("[JANGO][%s]<%d> codeS=[%s] iCodetype=[%d] ", __FUNCTION__, __LINE__, codeS, itype);
+			Output_DebugString(m_slog);
 			if (itype == singjongGoodType)
 				pRemain->m_bSJSuikCode = true;
 		}
@@ -842,6 +845,9 @@ CString CMapWnd::parsingRemainData(char* pData, int len, CString sErrmsg, int tr
 			pRemain->m_bKONEXCode = IsKONEXCode(sCode);
 			//if (!pRemain->m_b3RDCode && !pRemain->m_bKONEXCode && (sCode.Left(1) == "A" || sCode.Left(3) == "M.A" || sCode.Left(3) == "N.A"))
 			int itype = m_pParent->SendMessage(WM_USER, MAKEWPARAM(codeTYPE, 0), (LPARAM)sCode.Right(6).operator LPCTSTR());
+			pRemain->m_iCodetype = itype;
+			m_slog.Format("[JANGO][%s]<%d> sCode=[%s] iCodetype=[%d] ", __FUNCTION__, __LINE__, sCode, itype); 
+			Output_DebugString(m_slog);
 			if (itype == singjongGoodType)
 				pRemain->m_bSJSuikCode = true;
 			
@@ -1635,6 +1641,9 @@ CString CMapWnd::parsingNotice(CString str)
 							pRemain->m_b3RDCode = Is3RDCode(findJCode);	//2015.04.22 KSJ K-OTC인지 체크
 							pRemain->m_bKONEXCode = IsKONEXCode(findJCode);
 							int itype = m_pParent->SendMessage(WM_USER, MAKEWPARAM(codeTYPE, 0), (LPARAM)findJCode.Right(6).operator LPCTSTR());
+							pRemain->m_iCodetype = itype;
+							m_slog.Format("[JANGO][%s]<%d> sJCode=[%s] iCodetype=[%d] ", __FUNCTION__, __LINE__, sJCode, itype);
+							Output_DebugString(m_slog);
 							if (itype == singjongGoodType)
 								pRemain->m_bSJSuikCode = true;
 

@@ -4,6 +4,7 @@
 #include "DefineAll.h"
 #include <math.h>
 #include "MapWnd.h"
+#include "../../H/axisfire.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -182,6 +183,13 @@ m_slog.Format("[jango][%s]<%d>[%s][%s]  m_curr[현재가] =[%s]  m_rprice[평가금액]
 	__FUNCTION__, __LINE__, m_code.Trim(), m_name.Trim(), m_curr.Trim(),  m_rprice.Trim(), m_pgsonik.Trim(), m_psuik.Trim(), m_maip.Trim());
 Output_DebugString(m_slog);
 
+m_slog.Format("[jango][%s]<%d> m_dFee=[%d] m_dMass=[%.5f] m_dTax=[%.4f]",
+	__FUNCTION__, __LINE__,
+	m_dFee,
+	m_dMass,
+	m_dTax);
+Output_DebugString(m_slog);
+
 #else
 	FillString(m_date, LEN_DATE);
 	FillString(m_creditS, LEN_SYGB);
@@ -269,6 +277,10 @@ Output_DebugString(m_slog);
 		{
 			m_dTax = TAX_RATE_SJSUIK;
 		}
+		else if (m_iCodetype == BDCpstType || m_iCodetype == BDCicyType)
+		{
+			m_dTax = 0;
+		}
 		else
 		{
 			m_dTax = TAX_RATE;
@@ -299,7 +311,7 @@ Output_DebugString(m_slog);
 		//if ( m_code.GetAt(0) == 'J' ) dprice = atof(m_rprice)*(1 - m_dMass ) - m_dSave;
 		//else dprice = atof(m_rprice)*(1 - m_dMass - TAX_RATE ) - m_dSave;
 	
-		if (( m_code.GetAt(0) == 'J' && strlen(m_code) == 7 ) || m_betf || m_code.GetAt(0) == 'Q') //2015.04.22 ETN추가
+		if (( m_code.GetAt(0) == 'J' && strlen(m_code) == 7 ) || m_betf || m_code.GetAt(0) == 'Q' || m_iCodetype == BDCpstType || m_iCodetype == BDCicyType) //2015.04.22 ETN추가
 		{
 			if(m_creditS == "05")  //유통대주
 				dprice = atof(m_rprice) + ( dmass + m_dSave);
@@ -380,6 +392,10 @@ Output_DebugString(m_slog);
 	{
 		m_dTax = TAX_RATE_SJSUIK;
 	}
+	else if (m_iCodetype == BDCpstType || m_iCodetype == BDCicyType)
+	{
+		m_dTax = 0;
+	}
 	else
 	{
 		m_dTax = TAX_RATE;
@@ -395,7 +411,7 @@ Output_DebugString(m_slog);
 	//	if ( m_code.GetAt(0) == 'J' ) dbep = fabs(atof(m_pmaip))*(1+m_dMass) + fabs(atof(m_curr))*m_dMass;
 	//	else dbep = fabs(atof(m_pmaip))*(1+m_dMass) + fabs(atof(m_curr))*(m_dMass+TAX_RATE);
 
-		if (( m_code.GetAt(0) == 'J' && strlen(m_code) == 7 )|| m_betf || m_code.GetAt(0) == 'Q') //2015.04.22 ETN추가
+		if (( m_code.GetAt(0) == 'J' && strlen(m_code) == 7 )|| m_betf || m_code.GetAt(0) == 'Q' || m_iCodetype == BDCpstType || m_iCodetype == BDCicyType) //2015.04.22 ETN추가
 		{	
 			if(m_creditS == "05")  //유통대주 // (매도금액 - 수수료)/(수량 * (1 + 수수료율))
 				dbep = ((atof(m_pmaip)*atoi(m_remain)) - RoundDown(fabs(atof(m_pmaip))*atoi(m_remain) * m_dMass))/(atoi(m_remain) * (1 + m_dMass));
@@ -438,6 +454,17 @@ Output_DebugString(m_slog);
 /**************************************************/
 	TRACE("PR[%x][%x] 종목(%s) 수량(%d) 단가(%f) 매입금액(%.f) 원매입금액(%.f) 평가금액(%f) 수익률(%f)\n",
 		this, GetCurrentThreadId(),	m_code, atoi(m_remain), atof(m_pmaip), atof(m_maip), atof(m_omaip), atof(m_rprice), atof(m_psuik));
+
+	m_slog.Format("[jango][%s]<%d> m_dFee=[%d] m_dMass=[%.5f] m_dTax=[%.4f] codetype=[%d]",
+		__FUNCTION__, __LINE__,
+		m_dFee,
+		m_dMass,
+		m_dTax, m_iCodetype);
+	Output_DebugString(m_slog);
+
+	m_slog.Format("[jango][%s]<%d> m_dFee -------------------------------",
+		__FUNCTION__, __LINE__);
+	Output_DebugString(m_slog);
 }
 
 void CRemain::ParsingAllaccnData(CString sData)
@@ -788,6 +815,10 @@ bool CRemain::CalPgsonik(CString currS, CString rateS, int noticeMode)
 		{
 			m_dTax = TAX_RATE_SJSUIK;
 		}
+		else if (m_iCodetype == BDCpstType || m_iCodetype == BDCicyType)
+		{
+			m_dTax = 0;
+		}
 		else
 		{
 			m_dTax = TAX_RATE;
@@ -797,7 +828,7 @@ bool CRemain::CalPgsonik(CString currS, CString rateS, int noticeMode)
 		const double dtax = Round(rprice * m_dTax);
 
 		//수수료및 제세금 적용
-		if (( m_code.GetAt(0) == 'J' && strlen(m_code) == 7 )|| m_betf || m_code.GetAt(0) == 'Q') //2015.04.22 ETN추가
+		if (( m_code.GetAt(0) == 'J' && strlen(m_code) == 7 )|| m_betf || m_code.GetAt(0) == 'Q' || m_iCodetype == BDCpstType || m_iCodetype == BDCicyType) //2015.04.22 ETN추가
 		{
 			if(m_creditS == "05")  //유통대주
 				rprice = rprice + (dmass + m_dSave);
@@ -869,6 +900,10 @@ bool CRemain::CalPgsonik(CString currS, CString rateS, int noticeMode)
 		{
 			m_dTax = TAX_RATE_SJSUIK;
 		}
+		else if (m_iCodetype == BDCpstType || m_iCodetype == BDCicyType)
+		{
+			m_dTax = 0;
+		}
 		else
 		{
 			m_dTax = TAX_RATE;
@@ -879,7 +914,7 @@ bool CRemain::CalPgsonik(CString currS, CString rateS, int noticeMode)
 
 		const double cur_tax = RoundDown2(fabs(atof(m_creditS == "05"?m_pmaip:m_curr)) * m_dTax);
 
-		if (( m_code.GetAt(0) == 'J' && strlen(m_code) == 7 )|| m_betf || m_code.GetAt(0) == 'Q') //2015.04.22 ETN추가
+		if (( m_code.GetAt(0) == 'J' && strlen(m_code) == 7 )|| m_betf || m_code.GetAt(0) == 'Q' || m_iCodetype == BDCpstType || m_iCodetype == BDCicyType) //2015.04.22 ETN추가
 		{
 			if(m_creditS == "05")  //유통대주 // (매도금액 - 수수료)/(수량 * (1 + 수수료율))
 				dbep = ((atof(m_pmaip)*atoi(m_remain)) - RoundDown(fabs(atof(m_pmaip))*atoi(m_remain) * m_dMass))/(atoi(m_remain) * (1 + m_dMass ));

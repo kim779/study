@@ -45,6 +45,8 @@ constexpr	int xKBp = 201, xSECp = 202, xSKp = 203, xPOSCOp = 204, xKTp = 205, xK
 constexpr	int xKOSPIUP = 50, xKOSDAQUP = 51, xKOSPIex = 52, xKOSDAQex = 53;
 constexpr	int xGOODSTOCK = 122;
 constexpr       int xNXT = 123;
+constexpr       int xBDC = 124;
+
 constexpr struct _exKospi {
 	char* code{};
 	char* name{};
@@ -1389,6 +1391,15 @@ void CPage1::SelectTree(int selItem)
 		m_Radio_ELWPut.ShowWindow(SW_HIDE);
 		xNxtList();
 		break;
+	case xBDC:
+	{
+		m_search.SetWindowText("");
+		m_Radio_ELWAll.ShowWindow(SW_HIDE);
+		m_Radio_ELWCall.ShowWindow(SW_HIDE);
+		m_Radio_ELWPut.ShowWindow(SW_HIDE);
+		xBDCkToList();
+	}
+	break;
 	default:
 		m_Radio_ELWAll.ShowWindow(SW_HIDE);
 		m_Radio_ELWCall.ShowWindow(SW_HIDE);
@@ -2515,6 +2526,8 @@ void CPage1::initTree()
 	m_tree.SetItemData(m_tree.InsertItem(_T("ETN"), hRoot, TVI_LAST), xETNCODE);	//2013.06.25 KSJ 코넥스 추가
 
 	m_tree.SetItemData(m_tree.InsertItem(_T("상장형수익증권"), hRoot, TVI_LAST), xGOODSTOCK);	//25.06.12 상장형수익증권 추가
+
+	m_tree.SetItemData(m_tree.InsertItem(_T("BDC"), hRoot, TVI_LAST), xBDC);	//25.06.12 상장형수익증권 추가
 
 	m_tree.SetItemData(m_tree.InsertItem(_T("리츠"), hRoot, TVI_LAST), xRITS);	//20240422 리츠
 
@@ -5009,6 +5022,40 @@ int CPage1::xSinjuCodeToList()
 				continue;
 			}
 			break;
+		default:
+			continue;
+		}
+
+		code = CString(hjcode.code, HCodeLen);
+		name = CString(hjcode.name, HNameLen);
+
+		AppendItemToList1(position, code, name.Trim());
+		position += 1;
+	}
+	m_list1.SetItemCountEx(m_arList.GetSize());
+	m_list1.Invalidate();
+	return position;
+}
+
+int CPage1::xBDCkToList()
+{
+	ClearListitem();
+	m_list1.DeleteAllItems();
+
+	_shjcode   hjcode;
+	CString code, name;
+	int position = 0;
+
+	for (int ii = 0; ii < m_hjcode.GetSize(); ii++)
+	{
+		hjcode = m_hjcode.GetAt(ii);
+
+		switch (hjcode.ssgb)
+		{
+		case jmBDCPST:
+		case jmBDCICY:
+			break;
+
 		default:
 			continue;
 		}

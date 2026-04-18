@@ -499,6 +499,8 @@ struct	_userWH	{
 #define productFutureType	29			//상품선물
 #define singjongType		30			//신종증권
 #define singjongGoodType	31			//신종수익증권
+#define BDCpstType 32 //BDC수익증권
+#define BDCicyType 33 //BDC투자회사
 
 //
 //	AxisCode.dll

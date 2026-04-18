@@ -423,6 +423,7 @@ public:
 	void	OKactionOne(int gnum);
 	void	CCaction();
 	int     xNxtList();
+	int xBDCkToList();  //BDC
 
 	int		GetUploadData(int gno, CString& name, char* datB);
 	CString	GetTempData(int gno, CString& name, int& count);

@@ -888,6 +888,10 @@ __declspec(dllexport) bool WINAPI axGetName(int kind, char* code, char* name, in
 					*type = singjongType;
 				if (hjc->ssgb == jmGOODSTOCK)
 					*type = singjongGoodType;
+				if (hjc->ssgb == jmBDCPST)
+					*type = BDCpstType;
+				if (hjc->ssgb == jmBDCICY)
+					*type = BDCicyType;
 
 				//20191114 맵화면에서 getcodetype를 사용하는 곳이 너무 많아서 kind를 typeforTAX로 주는 경우에만 타입을 세분화 해줌
 				//SCREEN.GetName(199, 종목코드, 0)
@@ -941,6 +945,10 @@ __declspec(dllexport) bool WINAPI axGetName(int kind, char* code, char* name, in
 						*type = singjongType;
 					if (hjc->ssgb == jmGOODSTOCK)
 						*type = singjongGoodType;
+					if (hjc->ssgb == jmBDCPST)
+						*type = BDCpstType;
+					if (hjc->ssgb == jmBDCICY)
+						*type = BDCicyType;
 
 					//20191114 맵화면에서 getcodetype를 사용하는 곳이 너무 많아서 kind를 typeforTAX로 주는 경우에만 타입을 세분화 해줌
 					//SCREEN.GetName(199, 종목코드, 0)
@@ -1061,6 +1069,10 @@ __declspec(dllexport) bool WINAPI axGetName(int kind, char* code, char* name, in
 					*type = singjongType;				
 				if (hjc->ssgb == jmGOODSTOCK)
 					*type = singjongGoodType;
+				if (hjc->ssgb == jmBDCPST)
+					*type = BDCpstType;
+				if (hjc->ssgb == jmBDCICY)
+					*type = BDCicyType;
 
 				//20191114 맵화면에서 getcodetype를 사용하는 곳이 너무 많아서 kind를 typeforTAX로 주는 경우에만 타입을 세분화 해줌
 				//SCREEN.GetName(199, 종목코드, 0)

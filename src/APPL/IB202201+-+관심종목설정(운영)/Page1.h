@@ -399,6 +399,7 @@ public:
 	int xSPACCodeToList(); // 2015.11.03 spac 추가
 	int xRITSCodeToList();
 	int xNewCodeToList(int igubn = 0);  //0422 신종증권
+	int xBDCkToList();  //BDC
 
 	int xCFutureToList(bool bCurrency); // 2012.10.04 KSJ 금리/통화 통화일때는 true
 	int xSFutureToList();		    // 2012.10.04 KSJ 주식선물

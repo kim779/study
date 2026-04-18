@@ -46,15 +46,16 @@ public:
 	char	m_system;
 	bool m_betf, m_bchg;
 
-	int m_dFee;//적용미적용
-	double m_dMass;		//매체 수수료
+	int m_dFee{};//적용미적용
+	double m_dMass{};		//매체 수수료
 	double m_dSave;		//SAVE 수수료
 	int m_dCalcType;	//융자금 차감(0), 포함(1)
 	int	m_iMcgb;		// 2015.04.22 KSJ 매체구분 0:HTS/MTS/홈페이지, 1:영업점/콜센터, 2:ARS
 	bool m_b3RDCode;	// 2015.04.22 KSJ K-OTC인지 세팅
 	bool m_bKONEXCode;	//KONEX 여부
 	bool m_bSJSuikCode{};	//상장수익여부
-	double m_dTax;		// 2015.04.22 KSJ 세율
+	double m_dTax{};		// 2015.04.22 KSJ 세율
+	int m_iCodetype{};  //코드타입
 		
 	CString m_slog{};
 private:

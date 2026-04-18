@@ -1073,6 +1073,15 @@ void CPage1::SelectTree(int selItem)
 		m_Radio_ELWPut.ShowWindow(SW_HIDE);
 		xNxtList();
 		break;
+	case xBDC:
+	{
+		m_search.SetWindowText("");
+		m_Radio_ELWAll.ShowWindow(SW_HIDE);
+		m_Radio_ELWCall.ShowWindow(SW_HIDE);
+		m_Radio_ELWPut.ShowWindow(SW_HIDE);
+		xBDCkToList();
+	}
+	break;
 	default:
 		m_Radio_ELWAll.ShowWindow(SW_HIDE);
 		m_Radio_ELWCall.ShowWindow(SW_HIDE);
@@ -3965,6 +3974,40 @@ int CPage1::xSinjuCodeToList()
 		auto& item = _vList.emplace_back(std::move(CITEMS()));
 		item.code = CString(hjcode.code, HCodeLen);
 		item.name = CString(hjcode.name, HNameLen);
+	}
+	//speed
+	m_list1.SetItemCountEx(_vList.size());
+	m_list1.Invalidate();
+	//@speed
+	return 0;
+}
+
+int CPage1::xBDCkToList()
+{
+	CString slog;
+	ClearListitem();
+	m_list1.DeleteAllItems();
+
+	_shjcode   hjcode;
+	for (int ii = 0; ii < m_hjcode.GetSize(); ii++)
+	{
+		hjcode = m_hjcode.GetAt(ii);
+
+		switch (hjcode.ssgb)
+		{
+		case jmBDCPST:
+		case jmBDCICY:
+			slog.Format("%s", CString(hjcode.name, HNameLen));
+			break;
+
+		default:
+			continue;
+		}
+
+		auto& item = _vList.emplace_back(std::move(CITEMS()));
+		item.code = CString(hjcode.code, HCodeLen);
+		item.name = CString(hjcode.name, HNameLen);
+
 	}
 	//speed
 	m_list1.SetItemCountEx(_vList.size());
