@@ -1819,13 +1819,18 @@ public:
 	void MigrateMng(LPCTSTR file, int oldVersion);
 
 	//계좌번호 암호화
-	void EncryptIniFile(const CString& iniPath);
+	void EncryptIniFile(const CString& iniPath, const std::vector<BYTE>& enkey);
 	std::pair<int, int> EncryptAllUserIni(const CString& rootPath);
 	std::pair<int, int> DecryptAllUserIni(const CString& rootPath);
 	CString DpapiEncrypt(const CString& plainText);
 	CString DpapiDecrypt(const CString& encText);
-	void      DecryptIniFile(const CString& iniPath);
+	void      DecryptIniFile(const CString& iniPath, const std::vector<BYTE>& enkey);
 	std::map<CString, CString> LoadAccountHistory(const CString& iniPath);
+
+	std::vector<BYTE> DeriveKeyFromRegkey(const CString& regkey);
+	CString AesEncrypt(const CString& plainText, const std::vector<BYTE>& key);
+	CString AesDecrypt(const CString& encText, const std::vector<BYTE>& key);
+
 	//실시간메인처리
 #ifdef DF_MAIN_RTS
 	struct SafeAlertItem {

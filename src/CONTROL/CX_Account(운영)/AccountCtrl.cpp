@@ -808,10 +808,15 @@ BOOL CAccountCtrl::Initialize(BOOL bDLL)
 	
 	Path.Format("%s\\tab\\ACCNTDEPT.INI", Variant(homeCC, ""));
 	readl = GetPrivateProfileString("ACCNTDEPT", "DEPT", "811", readb, sizeof(readb), Path);
-	
+
 	strTemp = CString(readb, readl);
 	strTemp.Trim();
 	m_sAccnDept = strTemp;
+
+	memset(readb, 0x00, 10 * 1024);
+	Path.Format("%s\\tab\\AXIS.INI", Variant(homeCC, ""));
+	readl = GetPrivateProfileString("AXIS", "reg", "", readb, sizeof(readb), Path);
+	m_regkey = CString(readb, readl);
 
 //m_slog.Format("[cx_account][%s]<%d>m_sAccnDept=[%s]", __FUNCTION__, __LINE__, m_sAccnDept);
 //Output_DebugString(m_slog);
@@ -896,6 +901,14 @@ BOOL CAccountCtrl::Initialize(BOOL bDLL)
 	std::shared_ptr<CAccount> pAcc = nullptr;
 
 	readl = GetPrivateProfileString(_T("AccountHistory"), strTemp, _T(""), readb, sizeof(readb), Path);
+
+	//enc
+	CString val = ReadAccountHistory(Path, strTemp);
+	strncpy_s(readb, sizeof(readb), val, _TRUNCATE);
+	readl = (int)strlen(readb);
+	//enc
+
+
 	strTemp = CString(readb, readl);
 	strTemp.Trim();
 	if (!strTemp.IsEmpty())
@@ -3665,6 +3678,14 @@ void CAccountCtrl::OnTimer(UINT nIDEvent)
 		//if (strKey.Find("AN2") == -1) strKey = "AN1A";
 
 		GetPrivateProfileString(_T("AccountHistory"), strKey, _T(""), readb, sizeof(readb), Path);
+
+		//enc
+		CString val = ReadAccountHistory(Path, strKey);
+		strncpy_s(readb, sizeof(readb), val, _TRUNCATE);
+		int readl = (int)strlen(readb);
+		//enc
+
+
 		strHistory = readb;
 		strHistory.Trim();
 		if (!strHistory.IsEmpty())
@@ -4296,6 +4317,9 @@ void CAccountCtrl::OnDestroy()
 
 	//if (strKey.Find("AN2") == -1) strKey = "AN1A";
 	WritePrivateProfileString(_T("AccountHistory"), (LPCTSTR)strKey, (LPCTSTR)strSaveData, (LPCTSTR)strUserPath);
+	//enc
+	WriteAccountHistory(strUserPath, strKey, strSaveData);
+	//enc
 	PushDeleteAccHistory();
 
 	m_bDestroy = TRUE;	//2012.02.08 KSJ
@@ -4397,6 +4421,9 @@ void CAccountCtrl::SaveHistory()
 	}
 	
 	WritePrivateProfileString(_T("AccountHistory"), (LPCTSTR)strKey, (LPCTSTR)strSaveData, (LPCTSTR)strUserPath);
+	//enc
+	WriteAccountHistory(strUserPath, strKey, strSaveData);
+	//enc
 	SortHistory();
 }
 
@@ -5327,6 +5354,12 @@ void CAccountCtrl::Convert_V2()
 	{
 		// AN1A 에 모든 히스토리저장되어 있다. 이걸 각자 타입별로 찢어야 한다.
 		GetPrivateProfileString("AccountHistory", "AN1A", "", buff, sizeof(buff)-1, iniPath);
+
+		//enc
+		CString val = ReadAccountHistory(iniPath, "AN1A");
+		strncpy_s(buff, sizeof(buff), val, _TRUNCATE);
+		int readl = (int)strlen(buff);
+		//enc
 		
 		StrVector vAcnt;
 		IStrVector p;
@@ -5363,6 +5396,9 @@ void CAccountCtrl::Convert_V2()
 			CString data;
 			Join(&p2->second, '\t', &data);
 			WritePrivateProfileString("AccountHistory", p2->first, data, iniPath);
+			//enc
+			WriteAccountHistory(iniPath, p2->first, data);
+			//enc
 			WritePrivateProfileString("AccountHistory", "VERSION", "2", iniPath);
 		}
 	}
@@ -5404,6 +5440,14 @@ void CAccountCtrl::SortHistory()
 
 	iniPath.Format("%s\\user\\%s\\%s.ini", Variant(homeCC), Variant(nameCC), Variant(nameCC));
 	size = GetPrivateProfileString("AccountHistory", m_Param.name, "", buff, sizeof(buff)-1, iniPath);
+
+	//enc
+	CString val = ReadAccountHistory(iniPath, m_Param.name);
+	strncpy_s(buff, sizeof(buff), val, _TRUNCATE);
+	int readl = (int)strlen(buff);
+	size = readl;
+	//enc
+
 	if (size == 0)
 		return;
 
@@ -5424,6 +5468,14 @@ void CAccountCtrl::SortHistory()
 		if (std::find(pos->second.begin(), pos->second.end(), type) == pos->second.end()) continue; // 해야할놈만 하자!
 		
 		size = GetPrivateProfileString("AccountHistory", pos->first, "", buff, sizeof(buff)-1, iniPath);
+
+		//enc
+		CString val = ReadAccountHistory(iniPath, pos->first);
+		strncpy_s(buff, sizeof(buff), val, _TRUNCATE);
+		int readl = (int)strlen(buff);
+		size = readl;
+		//enc
+
 		
 		StrVector src;
 		Split(buff, '\t', &src);
@@ -5443,6 +5495,9 @@ void CAccountCtrl::SortHistory()
 		Join(&src, '\t', &data);
 
 		WritePrivateProfileString("AccountHistory", pos->first, data, iniPath);
+		//enc
+		WriteAccountHistory(iniPath, pos->first, data);
+		//enc
 	}
 }
 
@@ -5480,6 +5535,14 @@ void CAccountCtrl::DeleteHistory(LPCSTR acno)
 			continue;		// 같은 타입은 당연히 할필요 없지!
 		
 		size = GetPrivateProfileString("AccountHistory", pos->first, "", buff, sizeof(buff)-1, iniPath);
+
+		//enc
+		CString val = ReadAccountHistory(iniPath, pos->first);
+		strncpy_s(buff, sizeof(buff), val, _TRUNCATE);
+		int readl = (int)strlen(buff);
+		size = readl;
+		//enc
+
 		if (size == 0)
 			continue;
 
@@ -5496,6 +5559,9 @@ void CAccountCtrl::DeleteHistory(LPCSTR acno)
 		Join(&src, '\t', &data);
 		
 		WritePrivateProfileString("AccountHistory", pos->first, data, iniPath);
+		//enc
+		WriteAccountHistory(iniPath, pos->first, data);
+		//enc
 	}
 }
 
@@ -6231,4 +6297,43 @@ CString CAccountCtrl::DecryptAccount(const CString& sEncrypted)
 		sResult += (TCHAR)b;
 	}
 	return sResult;
+}
+
+CString CAccountCtrl::ReadAccountHistory(const CString& strUserPath, const CString& strKey)
+{
+	char readb[1024 * 64]{};
+	GetPrivateProfileStringA("AccountHistory", strKey, "", readb, sizeof(readb), strUserPath);
+
+	CString val(readb);
+	if (val.IsEmpty())
+		return val;
+
+	// 암호화 여부 확인
+	char status[8] = {};
+	GetPrivateProfileStringA("ENCRYPT", "STATUS", "0", status, _countof(status), strUserPath);
+	if (strcmp(status, "1") == 0)
+	{
+		auto key = DeriveKeyFromRegkey(m_regkey);
+		val = AesDecrypt(val, key);
+		SecureZeroMemory(key.data(), key.size());
+	}
+	return val;
+}
+
+// ── 쓰기 공통 헬퍼 (새로 추가) ──────────────────────────────────
+void CAccountCtrl::WriteAccountHistory(const CString& strUserPath, const CString& strKey, const CString& strData)
+{
+	CString valToWrite = strData;
+
+	// 암호화 여부 확인
+	char status[8] = {};
+	GetPrivateProfileStringA("ENCRYPT", "STATUS", "0", status, _countof(status), strUserPath);
+	if (strcmp(status, "1") == 0 && !strData.IsEmpty())
+	{
+		auto key = DeriveKeyFromRegkey(m_regkey);
+		valToWrite = AesEncrypt(strData, key);
+		SecureZeroMemory(key.data(), key.size());
+	}
+
+	WritePrivateProfileString(_T("AccountHistory"), (LPCTSTR)strKey, (LPCTSTR)valToWrite, (LPCTSTR)strUserPath);
 }

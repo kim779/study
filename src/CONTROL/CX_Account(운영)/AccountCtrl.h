@@ -426,6 +426,9 @@ protected:
 	bool SACAQ0239Ret_Check();
 	void EnableCtrl(SHORT bEnable);
 
+	CString m_regkey{};
+	void WriteAccountHistory(const CString& strUserPath, const CString& strKey, const CString& strData);
+	CString ReadAccountHistory(const CString& strUserPath, const CString& strKey);
 public:
 	void RemoveOubWnd(COubWnd* pwnd);
 };

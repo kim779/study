@@ -6345,6 +6345,10 @@ int CMainFrame::Initialize()
 	CloseChaserAPP();
 	CloseAgent();
 
+	CString filename;
+	filename.Format("%s\\%s\\%s", Axis::home, "tab", "axis.ini");
+	WritePrivateProfileString("AXIS", "reg", m_regkey, filename);
+
 //	m_hHook = SetWindowsHookEx(WH_GETMESSAGE, KeyboardProc, 
 //			AfxGetInstanceHandle(), GetCurrentThreadId());
 	m_pMain = (CMainFrame *) this;
@@ -33385,7 +33389,7 @@ std::map<CString, CString> CMainFrame::LoadAccountHistory(const CString& iniPath
 	return result;
 }
 
-void CMainFrame::EncryptIniFile(const CString& iniPath)
+void CMainFrame::EncryptIniFile(const CString& iniPath, const std::vector<BYTE>& key)
 {
 	// 1. 이미 암호화된 파일 스킵
 	char status[8] = {};
@@ -33396,22 +33400,39 @@ void CMainFrame::EncryptIniFile(const CString& iniPath)
 
 	// 2. 백업
 	CString backupPath = iniPath + ".bak";
-	DeleteFileA(backupPath);  // 있으면 삭제, 없어도 실패 무시
+	DeleteFileA(backupPath);
 	if (!CopyFileA(iniPath, backupPath, FALSE))
 		throw std::runtime_error("Backup failed");
 
-	//// 3. 원본 읽기
-	std::ifstream fin(iniPath);
+	// 3. 원본 읽기
+	std::ifstream fin(iniPath, std::ios::binary);
 	if (!fin.is_open())
 		throw std::runtime_error("Cannot open ini file");
 
 	std::ostringstream out;
 	std::string line;
 	bool inAccountHistory = false;
+	bool encryptSectionExists = false;
 
 	while (std::getline(fin, line))
 	{
-		if (!line.empty() && line.front() == '[') {
+		// \r 제거 (CRLF 대응)
+		if (!line.empty() && line.back() == '\r')
+			line.pop_back();
+
+		if (!line.empty() && line.front() == '[')
+		{
+			// [ENCRYPT] 섹션은 나중에 우리가 직접 쓸거라 스킵
+			if (line == "[ENCRYPT]") {
+				encryptSectionExists = true;
+				// [ENCRYPT] 섹션 내용 라인들 스킵
+				while (std::getline(fin, line)) {
+					if (!line.empty() && line.back() == '\r')
+						line.pop_back();
+					if (!line.empty() && line.front() == '[')
+						break;  // 다음 섹션 시작 → 루프 밖에서 처리
+				}
+			}
 			inAccountHistory = (line == "[AccountHistory]");
 			out << line << '\n';
 			continue;
@@ -33422,31 +33443,34 @@ void CMainFrame::EncryptIniFile(const CString& iniPath)
 			auto eq = line.find('=');
 			if (eq != std::string::npos)
 			{
-				std::string key = line.substr(0, eq);
+				std::string key_str = line.substr(0, eq);
 				std::string val = line.substr(eq + 1);
 
-				// VERSION 키는 암호화 제외
-				bool isExcluded = (key == "VERSION");
-
-				if (!isExcluded && !val.empty())
+				// VERSION 키 및 빈 값 제외
+				if (!val.empty() && key_str != "VERSION")
 				{
-					CString encVal = DpapiEncrypt(CString(val.c_str()));
+					CString encVal = AesEncrypt(CString(val.c_str()), key);
 					val = (LPCSTR)encVal;
-					m_slog.Format("[ENC] [%d] [%s]", encVal.GetLength(), encVal);
-					OutputDebugString(m_slog);
 				}
 
-				out << key << '=' << val << '\n';
+				out << key_str << '=' << val << '\n';
 				continue;
 			}
 		}
-	}
+
+		out << line << '\n';
+		}
 	fin.close();
+
+	// ★ [ENCRYPT] 섹션을 파일 끝에 직접 추가
+	out << "[ENCRYPT]\n";
+	out << "STATUS=1\n";
+	out << "VERSION=1\n";
 
 	// 4. tmp 저장 후 원자적 교체
 	CString tmpPath = iniPath + ".tmp";
 	{
-		std::ofstream fout(tmpPath);
+		std::ofstream fout(tmpPath, std::ios::binary);
 		if (!fout.is_open())
 			throw std::runtime_error("Cannot write tmp file");
 		fout << out.str();
@@ -33458,11 +33482,8 @@ void CMainFrame::EncryptIniFile(const CString& iniPath)
 		DeleteFileA(tmpPath);
 		throw std::runtime_error("File replace failed");
 	}
-
-	// 5. 성공 시에만 플래그 기록
-	WritePrivateProfileStringA("ENCRYPT", "STATUS", "1", iniPath);
-	WritePrivateProfileStringA("ENCRYPT", "VERSION", "1", iniPath);
-}
+	// ★ WritePrivateProfileStringA 호출 제거 - 위에서 직접 썼으므로
+	}
 
 std::pair<int, int> CMainFrame::EncryptAllUserIni(const CString& rootPath)
 {
@@ -33475,6 +33496,8 @@ std::pair<int, int> CMainFrame::EncryptAllUserIni(const CString& rootPath)
 
 	if (hFind == INVALID_HANDLE_VALUE)
 		throw std::runtime_error("Cannot open root folder");
+
+	std::vector<BYTE> key = DeriveKeyFromRegkey(m_regkey);
 
 	do {
 		if (!(fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) continue;
@@ -33490,7 +33513,7 @@ std::pair<int, int> CMainFrame::EncryptAllUserIni(const CString& rootPath)
 			continue;
 
 		try {
-				EncryptIniFile(iniPath);
+				EncryptIniFile(iniPath, key);
 				successCount++;
 				m_slog.Format("[ENC]  iniPath=[%s]  successCount=[%d]", iniPath, successCount);
 				OutputDebugString(m_slog);
@@ -33506,7 +33529,7 @@ std::pair<int, int> CMainFrame::EncryptAllUserIni(const CString& rootPath)
 	return { successCount, failCount };
 }
 
-void CMainFrame::DecryptIniFile(const CString& iniPath)
+void CMainFrame::DecryptIniFile(const CString& iniPath, const std::vector<BYTE>& enkey)
 {
 	// 1. 암호화 안 된 파일 스킵
 	char status[8] = {};
@@ -33558,7 +33581,11 @@ void CMainFrame::DecryptIniFile(const CString& iniPath)
 
 				if (!isExcluded)
 				{
+#ifdef DF_ENC_AES
+					CString decVal = AesDecrypt(CString(val.c_str()), enkey);
+#else
 					CString decVal = DpapiDecrypt(CString(val.c_str()));
+#endif
 					val = (LPCSTR)decVal;
 
 					m_slog.Format("[ENC][DEC] [%d] [%s]", decVal.GetLength(), decVal);
@@ -33605,6 +33632,7 @@ std::pair<int, int> CMainFrame::DecryptAllUserIni(const CString& rootPath)
 	if (hFind == INVALID_HANDLE_VALUE)
 		throw std::runtime_error("Cannot open root folder");
 
+	std::vector<BYTE> key = DeriveKeyFromRegkey(m_regkey);
 	do {
 		if (!(fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) continue;
 		if (strcmp(fd.cFileName, ".") == 0) continue;
@@ -33617,7 +33645,7 @@ std::pair<int, int> CMainFrame::DecryptAllUserIni(const CString& rootPath)
 			continue;
 
 		try {
-			DecryptIniFile(iniPath);
+			DecryptIniFile(iniPath, key);
 			successCount++;
 		}
 		catch (const std::exception& e) {
@@ -33629,6 +33657,184 @@ std::pair<int, int> CMainFrame::DecryptAllUserIni(const CString& rootPath)
 
 	FindClose(hFind);
 	return { successCount, failCount };
+}
+
+
+CString CMainFrame::AesEncrypt(const CString& plainText, const std::vector<BYTE>& key)
+{
+	HCRYPTPROV hProv = 0;
+	HCRYPTKEY  hKey = 0;
+
+	if (!CryptAcquireContextA(&hProv, NULL, NULL, PROV_RSA_AES, CRYPT_VERIFYCONTEXT))
+		throw std::runtime_error("CryptAcquireContext failed");
+
+	// 키 임포트용 구조체
+	struct {
+		BLOBHEADER hdr;
+		DWORD      keyLen;
+		BYTE       keyData[32];
+	} keyBlob = {};
+
+	keyBlob.hdr.bType = PLAINTEXTKEYBLOB;
+	keyBlob.hdr.bVersion = CUR_BLOB_VERSION;
+	keyBlob.hdr.reserved = 0;
+	keyBlob.hdr.aiKeyAlg = CALG_AES_256;
+	keyBlob.keyLen = 32;
+	memcpy(keyBlob.keyData, key.data(), 32);
+
+	if (!CryptImportKey(hProv, (BYTE*)&keyBlob, sizeof(keyBlob), 0, 0, &hKey)) {
+		CryptReleaseContext(hProv, 0);
+		throw std::runtime_error("CryptImportKey failed");
+	}
+
+	// CBC 모드 설정
+	DWORD mode = CRYPT_MODE_CBC;
+	CryptSetKeyParam(hKey, KP_MODE, (BYTE*)&mode, 0);
+
+	// IV 랜덤 생성 (16바이트)
+	BYTE iv[16] = {};
+	CryptGenRandom(hProv, 16, iv);
+	CryptSetKeyParam(hKey, KP_IV, iv, 0);
+
+	// CP949 바이트 기준으로 복사 (한글 2바이트 정확히 처리)
+	LPCSTR pszPlain = (LPCSTR)plainText;
+	DWORD  plainLen = (DWORD)strlen(pszPlain);  // 실제 바이트 수
+
+	// 암호화 버퍼: AES 블록(16바이트) 단위 올림 + 여유
+	DWORD bufLen = ((plainLen / 16) + 1) * 16;
+	std::vector<BYTE> data(bufLen, 0);
+	memcpy(data.data(), pszPlain, plainLen);
+
+	DWORD dataLen = plainLen;
+	if (!CryptEncrypt(hKey, 0, TRUE, 0, data.data(), &dataLen, bufLen)) {
+		CryptDestroyKey(hKey);
+		CryptReleaseContext(hProv, 0);
+		throw std::runtime_error("CryptEncrypt failed");
+	}
+
+	CryptDestroyKey(hKey);
+	CryptReleaseContext(hProv, 0);
+
+	// IV(16바이트) + 암호문 합쳐서 Base64 인코딩
+	std::vector<BYTE> ivAndData;
+	ivAndData.reserve(16 + dataLen);
+	ivAndData.insert(ivAndData.end(), iv, iv + 16);
+	ivAndData.insert(ivAndData.end(), data.begin(), data.begin() + dataLen);
+
+	// 민감 데이터 정리
+	SecureZeroMemory(data.data(), data.size());
+	SecureZeroMemory(keyBlob.keyData, 32);
+
+	DWORD b64Len = 0;
+	CryptBinaryToStringA(ivAndData.data(), (DWORD)ivAndData.size(),
+		CRYPT_STRING_BASE64 | CRYPT_STRING_NOCRLF, nullptr, &b64Len);
+	CString b64;
+	CryptBinaryToStringA(ivAndData.data(), (DWORD)ivAndData.size(),
+		CRYPT_STRING_BASE64 | CRYPT_STRING_NOCRLF,
+		b64.GetBuffer(b64Len), &b64Len);
+	b64.ReleaseBuffer();
+
+	return b64;
+}
+
+CString CMainFrame::AesDecrypt(const CString& encText, const std::vector<BYTE>& key)
+{
+	// Base64 디코딩
+	DWORD blobLen = 0;
+	CryptStringToBinaryA(encText, encText.GetLength(), CRYPT_STRING_BASE64,
+		nullptr, &blobLen, nullptr, nullptr);
+	if (blobLen < 16)
+		throw std::runtime_error("Invalid encrypted data");
+
+	std::vector<BYTE> ivAndData(blobLen);
+	CryptStringToBinaryA(encText, encText.GetLength(), CRYPT_STRING_BASE64,
+		ivAndData.data(), &blobLen, nullptr, nullptr);
+
+	// IV(앞 16바이트) / 암호문 분리
+	BYTE iv[16] = {};
+	memcpy(iv, ivAndData.data(), 16);
+	std::vector<BYTE> data(ivAndData.begin() + 16, ivAndData.end());
+
+	HCRYPTPROV hProv = 0;
+	HCRYPTKEY  hKey = 0;
+
+	if (!CryptAcquireContextA(&hProv, NULL, NULL, PROV_RSA_AES, CRYPT_VERIFYCONTEXT))
+		throw std::runtime_error("CryptAcquireContext failed");
+
+	struct {
+		BLOBHEADER hdr;
+		DWORD      keyLen;
+		BYTE       keyData[32];
+	} keyBlob = {};
+
+	keyBlob.hdr.bType = PLAINTEXTKEYBLOB;
+	keyBlob.hdr.bVersion = CUR_BLOB_VERSION;
+	keyBlob.hdr.reserved = 0;
+	keyBlob.hdr.aiKeyAlg = CALG_AES_256;
+	keyBlob.keyLen = 32;
+	memcpy(keyBlob.keyData, key.data(), 32);
+
+	if (!CryptImportKey(hProv, (BYTE*)&keyBlob, sizeof(keyBlob), 0, 0, &hKey)) {
+		CryptReleaseContext(hProv, 0);
+		throw std::runtime_error("CryptImportKey failed");
+	}
+
+	DWORD mode = CRYPT_MODE_CBC;
+	CryptSetKeyParam(hKey, KP_MODE, (BYTE*)&mode, 0);
+	CryptSetKeyParam(hKey, KP_IV, iv, 0);
+
+	DWORD dataLen = (DWORD)data.size();
+	if (!CryptDecrypt(hKey, 0, TRUE, 0, data.data(), &dataLen)) {
+		CryptDestroyKey(hKey);
+		CryptReleaseContext(hProv, 0);
+		throw std::runtime_error("CryptDecrypt failed");
+	}
+
+	CryptDestroyKey(hKey);
+	CryptReleaseContext(hProv, 0);
+	SecureZeroMemory(keyBlob.keyData, 32);
+
+	// ★ null terminator 공간 확보
+	data.resize(dataLen + 1, 0);
+	data[dataLen] = 0;
+	CString result((LPCSTR)data.data());
+
+	SecureZeroMemory(data.data(), data.size());
+	return result;
+}
+
+// ── m_regkey → 32바이트 AES 키 파생 (SHA-256) ───────────────────
+std::vector<BYTE> CMainFrame::DeriveKeyFromRegkey(const CString& regkey)
+{
+	HCRYPTPROV hProv = 0;
+	HCRYPTHASH hHash = 0;
+
+	if (!CryptAcquireContextA(&hProv, NULL, NULL, PROV_RSA_AES, CRYPT_VERIFYCONTEXT))
+		throw std::runtime_error("CryptAcquireContext failed");
+
+	if (!CryptCreateHash(hProv, CALG_SHA_256, 0, 0, &hHash)) {
+		CryptReleaseContext(hProv, 0);
+		throw std::runtime_error("CryptCreateHash failed");
+	}
+
+	// m_regkey 문자열을 해시 입력으로
+	if (!CryptHashData(hHash, (BYTE*)(LPCSTR)regkey, regkey.GetLength(), 0)) {
+		CryptDestroyHash(hHash);
+		CryptReleaseContext(hProv, 0);
+		throw std::runtime_error("CryptHashData failed");
+	}
+
+	DWORD keyLen = 32;
+	std::vector<BYTE> key(keyLen);
+	if (!CryptGetHashParam(hHash, HP_HASHVAL, key.data(), &keyLen, 0)) {
+		CryptDestroyHash(hHash);
+		CryptReleaseContext(hProv, 0);
+		throw std::runtime_error("CryptGetHashParam failed");
+	}
+
+	CryptDestroyHash(hHash);
+	CryptReleaseContext(hProv, 0);
+	return key;  // SHA-256 = 32바이트 = AES-256 키로 딱 맞음
 }
 
 #endif
