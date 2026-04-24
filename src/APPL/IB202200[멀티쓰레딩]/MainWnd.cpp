@@ -994,98 +994,70 @@ LONG CMainWnd::OnUser(WPARAM wParam, LPARAM lParam)
 		if (!m_bAlertx)
 			return 0;
 
-		if (1)
+		const auto* alertR = reinterpret_cast<const _alertR*>(lParam);
+
+		if (alertR == nullptr || alertR->size <= 0)
+			return 0;
+		const CString code = alertR->code;
+		if (!m_pGroupWnd->isCodeSymbol(code))
+			return 0;
+
+		const DWORD* data = reinterpret_cast<const DWORD*>(alertR->ptr[0]);
+		if (data == nullptr)
+			return 0;
+		//test
+		CString stmp;
+		stmp.Format("%s", (char*)data[0]);
+		stmp.TrimRight();
+		if (stmp != "w")
+			return 0;
+
+		stmp.Format("[RTS] 23=[%s] 24=[%s] 27=[%s] 28=[%s] 29=[%s] 30=[%s] 31=[%s] 32=[%s] 33=[%s] 36=[%s] 41=[%s] 61=[%s] 101=[%s] 104=[%s] 106=[%s] 109=[%s] 146=[%s] 181=[%s]",
+		(char*)data[623], (char*)data[624], (char*)data[627], (char*)data[628], (char*)data[629], (char*)data[630], (char*)data[631], (char*)data[632], (char*)data[633], (char*)data[636], (char*)data[641], (char*)data[661],
+			(char*)data[601], (char*)data[604], (char*)data[606], (char*)data[609], (char*)data[646], (char*)data[681]);
+		Output_DebugString(stmp);
+
+
+		//test
+		COleDateTime oTime;
+		oTime = COleDateTime::GetCurrentTime();
+		CString strCurTime;
+		strCurTime.Format(_T("%02d%02d%02d"), oTime.GetHour(), oTime.GetMinute(), oTime.GetSecond());
+
+		int h1 = _ttoi(strCurTime.Mid(0, 2));
+		int m1 = _ttoi(strCurTime.Mid(2, 2));
+		int s1 = _ttoi(strCurTime.Mid(4, 2));
+		CTime timecur(oTime.GetYear(), oTime.GetMonth(), oTime.GetDay(), h1, m1, s1);
+
+		//m_strBeginTimeEnd = "141100";
+		h1 = _ttoi(m_strBeginTimeEnd.Mid(0, 2));
+		m1 = _ttoi(m_strBeginTimeEnd.Mid(2, 2));
+		s1 = _ttoi(m_strBeginTimeEnd.Mid(4, 2));
+		CTime timeOri(oTime.GetYear(), oTime.GetMonth(), oTime.GetDay(), h1, m1, s1);
+		CTimeSpan span(0, 0, 0, 10); // 10√ 
+		CTime timeend = timeOri - span;
+
+		bool bOverChecking{};
+		bOverChecking = IsEnableRTSTimeCheck(timecur, timeend, m_icheckTime);
+
+		std::string scode = CStringA(code);
+
+		if (bOverChecking && ShouldSkipRTSByServerTime(scode, (char*)data[34], m_DiffSec) == true  )
 		{
-			const auto* alertR = reinterpret_cast<const _alertR*>(lParam);
-
-			if (alertR == nullptr || alertR->size <= 0)
-				return 0;
-			const CString code = alertR->code;
-			if (!m_pGroupWnd->isCodeSymbol(code))
-				return 0;
-
-			const DWORD* data = reinterpret_cast<const DWORD*>(alertR->ptr[0]);
-			if (data == nullptr)
-				return 0;
-			//test
-			CString stmp;
-			stmp.Format("%s", (char*)data[0]);
-			stmp.TrimRight();
-			if (stmp != "w")
-				return 0;
-
-			stmp.Format("[RTS] 23=[%s] 24=[%s] 27=[%s] 28=[%s] 29=[%s] 30=[%s] 31=[%s] 32=[%s] 33=[%s] 36=[%s] 41=[%s] 61=[%s] 101=[%s] 104=[%s] 106=[%s] 109=[%s] 146=[%s] 181=[%s]",
-			(char*)data[623], (char*)data[624], (char*)data[627], (char*)data[628], (char*)data[629], (char*)data[630], (char*)data[631], (char*)data[632], (char*)data[633], (char*)data[636], (char*)data[641], (char*)data[661],
-				(char*)data[601], (char*)data[604], (char*)data[606], (char*)data[609], (char*)data[646], (char*)data[681]);
-			Output_DebugString(stmp);
-
-
-			//test
-			COleDateTime oTime;
-			oTime = COleDateTime::GetCurrentTime();
-			CString strCurTime;
-			strCurTime.Format(_T("%02d%02d%02d"), oTime.GetHour(), oTime.GetMinute(), oTime.GetSecond());
-
-			int h1 = _ttoi(strCurTime.Mid(0, 2));
-			int m1 = _ttoi(strCurTime.Mid(2, 2));
-			int s1 = _ttoi(strCurTime.Mid(4, 2));
-			CTime timecur(oTime.GetYear(), oTime.GetMonth(), oTime.GetDay(), h1, m1, s1);
-
-			//m_strBeginTimeEnd = "141100";
-			h1 = _ttoi(m_strBeginTimeEnd.Mid(0, 2));
-			m1 = _ttoi(m_strBeginTimeEnd.Mid(2, 2));
-			s1 = _ttoi(m_strBeginTimeEnd.Mid(4, 2));
-			CTime timeOri(oTime.GetYear(), oTime.GetMonth(), oTime.GetDay(), h1, m1, s1);
-			CTimeSpan span(0, 0, 0, 10); // 10√ 
-			CTime timeend = timeOri - span;
-
-			bool bOverChecking{};
-			bOverChecking = IsEnableRTSTimeCheck(timecur, timeend, m_icheckTime);
-
-			std::string scode = CStringA(code);
-
-			if (bOverChecking && ShouldSkipRTSByServerTime(scode, (char*)data[34], m_DiffSec) == true  )
-			{
-				m_slog.Format("[IB202200][skipped]!!!!!!!ShouldSkipRTSByServerTime true");
-				Output_DebugString(m_slog);
-				return 0;
-			}
-			else
-			{
-	/*			static constexpr int arr[] = { 41, 61, 101, 104, 106, 107, 109, 146, 181 };
-				auto& rmap = m_pGroupWnd->getRSymbol();
-				const bool bHoga = std::any_of(std::begin(arr), std::end(arr), [&rmap](const int symbol) {
-					return rmap.find(symbol) != rmap.end();
-					});
-
-				if (bHoga == false && !(alertR->stat & alert_SCR))
-					return 0;*/
-
-				m_pGroupWnd->initAlert();
-				AxStd::async([this, lParam]() {
-					m_pGroupWnd->RecvRTSx(lParam);
-					});
-				m_pGroupWnd->UpdateDraw();
-			}
+			m_slog.Format("[IB202200][skipped]!!!!!!!ShouldSkipRTSByServerTime true");
+			Output_DebugString(m_slog);
+			return 0;
 		}
 		else
 		{
-			const auto* alertR = reinterpret_cast<const _alertR*>(lParam);
-
-			if (alertR == nullptr && alertR->size <= 0)
-				return 0;
-			const CString code = alertR->code;
-			if (!m_pGroupWnd->isCodeSymbol(code))
-				return 0;
-
-			static constexpr int arr[] = { 41, 61, 101, 104, 106, 107, 109, 146, 181 };
+/*			static constexpr int arr[] = { 41, 61, 101, 104, 106, 107, 109, 146, 181 };
 			auto& rmap = m_pGroupWnd->getRSymbol();
 			const bool bHoga = std::any_of(std::begin(arr), std::end(arr), [&rmap](const int symbol) {
 				return rmap.find(symbol) != rmap.end();
 				});
 
 			if (bHoga == false && !(alertR->stat & alert_SCR))
-				return 0;
+				return 0;*/
 
 			m_pGroupWnd->initAlert();
 			AxStd::async([this, lParam]() {
@@ -1093,6 +1065,8 @@ LONG CMainWnd::OnUser(WPARAM wParam, LPARAM lParam)
 				});
 			m_pGroupWnd->UpdateDraw();
 		}
+	
+		
 	}
 	break;
 	// KSJ 

@@ -91,14 +91,14 @@ static int ToMapped(int idx)
 
 	if (it != m.end())
 	{
-		slog.Format("[RTS index] idx=%d  second=%d ", idx , it->second);
-		Output_DebugString(slog);
+	//	slog.Format("[RTS index] idx=%d  second=%d ", idx , it->second);
+	//	Output_DebugString(slog);
 		return  it->second;
 	}
 	else
 	{
-		slog.Format("[RTS index] idx=%d", idx);
-		Output_DebugString(slog);
+	//	slog.Format("[RTS index] idx=%d", idx);
+	//	Output_DebugString(slog);
 		return idx;
 	}
 		//return (it != m.end()) ? it->second : idx;
@@ -9036,13 +9036,9 @@ void CGridWnd::parsingAlertx(LPARAM lParam)
 		return data[real] ? reinterpret_cast<LPCSTR>(data[real]) : nullptr;
 	};
 	const auto getDataString = [&](int idx) -> CString {
-		const int real = ToMapped(idx);
-		if (const LPCSTR ptr = getDataPtr(real))
+		if (const LPCSTR ptr = getDataPtr(idx))   
 			return CString(ptr);
 		return CString();
-	/*	if (const LPCSTR ptr = getDataPtr(idx))
-			return CString(ptr);
-		return CString();	*/
 	};
 	const auto isZeroLike = [](const CString& value, bool includeThirty = false) -> bool {
 		CString trimmed(value);
@@ -9112,12 +9108,19 @@ void CGridWnd::parsingAlertx(LPARAM lParam)
 
 		//변경이 있을때마다 배열에 저장해 둔 현재가 데이타 업데이트
 		CString saveData;
-		const LPCSTR expectPtr = getDataPtr(111);
+		 LPCSTR expectPtr = getDataPtr(111);
 		const LPCSTR currPtr = getDataPtr(23);
 		const LPCSTR dealTimePtr = getDataPtr(34);
 		const LPCSTR serverTimePtr = getDataPtr(40);
 		const int dealTime = dealTimePtr ? _ttoi(dealTimePtr) : 0;
 		const int serverTime = serverTimePtr ? _ttoi(serverTimePtr) : 0;
+
+		if (_ttoi(expectPtr) > 0)
+		{
+
+		}
+		else
+			expectPtr = nullptr;
 
 		if (expectPtr) //예상체결가...
 		{
@@ -9274,6 +9277,9 @@ void CGridWnd::parsingAlertx(LPARAM lParam)
 				symbol = symbol.Right(3);
 
 			nSymbol = atoi(symbol);
+
+			//if (nSymbol == 23)
+			//	CString str;
 
 			if (!bTransSymbol) // 2013.07.08 예상체크되어 있을때 밑에 타도록
 			{
@@ -9549,6 +9555,7 @@ void CGridWnd::parsingAlertx(LPARAM lParam)
 						entry.Replace(" ", "0"); //그때는 '　' ㄱ 한자 1번 을 넣어준다. 스페이스 아님..
 				}
 				// 2013.08.23 KSJ END
+				//entry.Format("%d", _ttoi(entry) + GetTickCount() % 1000); //test
 				m_grid->SetItemText(xrow, ii, entry);
 			}
 
