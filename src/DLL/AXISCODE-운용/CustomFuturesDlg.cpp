@@ -1413,9 +1413,9 @@ bool CCustomFuturesDlg::GetCodeOrderable(CString code, int* type)
 				|| "3A" <= kind && kind <= "3Z" || "4A" <= kind && kind <= "4Z" || "5A" <= kind && kind <= "5Z" || "6A" <= kind && kind <= "6Z" || "7A" <= kind && kind <= "7Z"
 				|| "8A" <= kind && kind <= "8Z" || "9A" <= kind && kind <= "9Z")
 			{
-				CString m_slog;
+		/*		CString m_slog;
 				m_slog.Format("[axiscode][SF][%s]<%d> code=[%s]", __FUNCTION__, __LINE__, code);
-				OutputDebugString(m_slog);
+				OutputDebugString(m_slog);*/
 
 				SFCODE	sfcode;
 				for (int ii = 0 ; ii < m_arraySfCode.GetSize() ; ii++)

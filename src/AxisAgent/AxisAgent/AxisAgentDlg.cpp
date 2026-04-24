@@ -424,6 +424,10 @@ BOOL CAxisAgentDlg::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 
+	HICON hIcon = AfxGetApp()->LoadIcon(IDI_ICON1);
+	SetIcon(hIcon, TRUE);   // 큰 아이콘 (Alt+Tab, 작업표시줄)
+	SetIcon(hIcon, FALSE);  // 작은 아이콘 (타이틀바)
+
 	((CWnd*)GetDlgItem(IDOK))->ShowWindow(SW_HIDE);
 	((CWnd*)GetDlgItem(IDCANCEL))->ShowWindow(SW_HIDE);
 
@@ -445,7 +449,11 @@ BOOL CAxisAgentDlg::OnInitDialog()
 
 	if (m_bShow)
 	{
-		ModifyStyleEx(WS_EX_TOOLWINDOW, WS_EX_APPWINDOW);
+		//ModifyStyleEx(WS_EX_TOOLWINDOW, WS_EX_APPWINDOW);
+		LONG style = GetWindowLong(m_hWnd, GWL_STYLE);
+		style |= WS_MINIMIZEBOX | WS_SYSMENU | WS_CAPTION;
+
+		SetWindowLong(m_hWnd, GWL_STYLE, style);
 		SetWindowPos(nullptr, 0, 0, 0, 0,
 			SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
 
@@ -715,12 +723,11 @@ void CAxisAgentDlg::ParseCommandLine()
 	}
 
 
-
 	SetWindowPos(
 		NULL,
 		m_startX,   // 메인 left
 		m_startY,   // 메인 top
-		0, 0,   // 크기 (원하는 크기로)
+		500, 200,   // 크기 (원하는 크기로)
 		SWP_NOSIZE |SWP_NOZORDER | SWP_NOACTIVATE | (m_bShow ? SWP_SHOWWINDOW : SWP_HIDEWINDOW)
 	);
 

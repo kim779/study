@@ -148,21 +148,28 @@ EDIT0.Data = "00001"
 TrxTp.Data = "0"
 EDIT2.Data = "+000000000"
 
-ActNo.Data = Trim(SCREEN.Object("parent.parent.CMB_ACCT").Data)
+Dim slogh , slog
+slogh = "[대체][" & SCREEN.GetMapName(0) & "] "
+
+ActNo.Data = Trim(SCREEN.Object("parent.CMB_ACCT").Data)
+
+slog = slogh & "OnSend ActNo = " & ActNo.Data
+SYSTEM.Trace slog
+
 If Len(Trim(ActNo.Data)) <> 11 Then
 	Call guide_msg("출고계좌를 확인하여 주십시오.")
-	SCREEN.Object("parent.parent.obj1.CMB_ACCT").SetFocus
+	SCREEN.Object("parent.obj1.CMB_ACCT").SetFocus
 	SCREEN.OnSend = False
 	Exit Sub
 End If
 
 
 'ActNo.Data = "00110011541"
-zpwd.Data = Trim(SCREEN.Object("parent.parent.zPwd").Data)
+zpwd.Data = Trim(SCREEN.Object("parent.zPwd").Data)
 SYSTEM.Trace "zpwd : " & Len(Trim(zpwd.Data))
 If Len(Trim(zpwd.Data)) < 4 Then
 	Call guide_msg("비밀번호를 확인하여 주십시오.")
-	SCREEN.Object("parent.parent.obj1.zPwd").SetFocus
+	SCREEN.Object("parent.obj1.zPwd").SetFocus
 	SCREEN.OnSend = False
 	Exit Sub
 End If
@@ -172,27 +179,41 @@ LEDGER.EPwd = SYSTEM.EncryptSHA(Trim(zpwd.Data))
 zpwd.Data = "HEAD"
 
 
+
 'cod2.Data = "A000660"
-cod2.Data = SCREEN.Object("parent.parent.zIsuNo").Data
+cod2.Data = SCREEN.Object("parent.zIsuNo").Data
+
+slog = slogh & "OnSend cod2 = " & cod2.Data
+SYSTEM.Trace slog
+
 If Len(Trim(cod2.Data)) < 7 Then
 	Call guide_msg("종목을 선택하여 주십시오.")
-	SCREEN.Object("parent.parent.zPwd").SetFocus
+	SCREEN.Object("parent.zPwd").SetFocus
 	SCREEN.OnSend = False
 	Exit Sub
 End If
 
 'zOtcoNm
 
-companyno.Data = SCREEN.Object("parent.parent.zOtcoNo").Data
+companyno.Data = SCREEN.Object("parent.zOtcoNo").Data
 SYSTEM.Trace "[IB810243] onSend  scomname = " & scomname
 SYSTEM.Trace "[IB810243] onSend  companyno = " & companyno.Data
 
+slog = slogh & "OnSend scomname = " & scomname
+SYSTEM.Trace slog
+
+slog = slogh & "OnSend companyno = " & companyno.Data
+SYSTEM.Trace slog
+
 'cpcd.Data = "00001"
-cpcd.data =  SCREEN.Object("parent.parent.zOtcoBrnNo").Data
+cpcd.data =  SCREEN.Object("parent.zOtcoBrnNo").Data
 
 
 'BAcntNo.Data = "10011004593"
-BAcntNo.Data = SCREEN.Object("parent.parent.zBkeepAcntNo").Data
+BAcntNo.Data = SCREEN.Object("parent.zBkeepAcntNo").Data
+
+slog = slogh & "OnSend BAcntNo = " & BAcntNo.Data
+SYSTEM.Trace slog
 
 
 BKeepTp.Data = "4"
@@ -201,24 +222,42 @@ seqn.Data = "+000000000"
 
 _AW_ONENDSUB_AW_
 _AW_ONRECEIVE_AW_
-SYSTEM.Trace "[IB810243] onReceive emsg = " & LEDGER.Emsg
+Dim slogh , slog
+slogh = "[대체][" & SCREEN.GetMapName(0) & "]"
+slog = slogh & "OnReceive ecode = " & LEDGER.Ecod
+SYSTEM.Trace slog
+
+slog = slogh & "OnReceive Emsg = " & LEDGER.Emsg
+SYSTEM.Trace slog
+
 If Left(LEDGER.Ecod, 1) = "0" Then
 
 	If SCREEN.Object("parent.pccode").data = "11" Then			'개인
+	
+slog = slogh & "OnReceive 개인 pccode = " & SCREEN.Object("parent.pccode").data
+SYSTEM.Trace slog
+
+slog = slogh & "OnReceive 동일인여부 samep = " & samep.Data
+SYSTEM.Trace slog		
+	
 		If samep.Data = "1" Then		'동일인
-			SCREEN.Object("parent.parent.OAcnm").data = Trim(acntnm.Data)
+			SCREEN.Object("parent.OAcnm").data = Trim(acntnm.Data)
 			SCREEN.Object("parent.parent.sendBtn").enable = True
-			SCREEN.Object("parent.parent.zBkeepAcntNo").enable = False
+			SCREEN.Object("parent.zBkeepAcntNo").enable = False
 			Call guide_msg("계좌명 조회가 완료 되었습니다.")
 		Else
 			MsgBox "타사의 동일명의로만 출고 신청이 가능합니다.",  ,"IBK투자증권"
 			Call guide_msg("타사의 동일명의로만 출고 신청이 가능합니다.")
-			SCREEN.Object("parent.parent.sendBtn").enable = False
+			SCREEN.Object("parent.sendBtn").enable = False
 		End If
 	Else 					'법인
-		SCREEN.Object("parent.parent.OAcnm").data = Trim(acntnm.Data)
-		SCREEN.Object("parent.parent.sendBtn").enable = True
-		SCREEN.Object("parent.parent.zBkeepAcntNo").enable = False
+	
+slog = slogh & "OnReceive 법인 pccode = " & SCREEN.Object("parent.pccode").data
+SYSTEM.Trace slog		
+	
+		SCREEN.Object("parent.OAcnm").data = Trim(acntnm.Data)
+		SCREEN.Object("parent.sendBtn").enable = True
+		SCREEN.Object("parent.zBkeepAcntNo").enable = False
 		Call guide_msg("계좌명 조회가 완료 되었습니다.")
 	End If
 

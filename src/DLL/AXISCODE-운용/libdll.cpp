@@ -848,7 +848,7 @@ __declspec(dllexport) bool WINAPI axGetName(int kind, char* code, char* name, in
 		{
 		CString slog;
 		slog.Format("[AXISCODE] whichTYPE szCode=[%s]", szCode);
-		OutputDebugString(slog);
+		Output_DebugString(slog);
 			auto& map = pApp->_mapCODEx;
 			if (const auto ft = map.find(szCode); ft != map.end())
 			{
@@ -888,10 +888,10 @@ __declspec(dllexport) bool WINAPI axGetName(int kind, char* code, char* name, in
 					*type = singjongType;
 				if (hjc->ssgb == jmGOODSTOCK)
 					*type = singjongGoodType;
-				if (hjc->ssgb == jmBDCPST)
+			/*	if (hjc->ssgb == jmBDCPST)
 					*type = BDCpstType;
 				if (hjc->ssgb == jmBDCICY)
-					*type = BDCicyType;
+					*type = BDCicyType;*/
 
 				//20191114 맵화면에서 getcodetype를 사용하는 곳이 너무 많아서 kind를 typeforTAX로 주는 경우에만 타입을 세분화 해줌
 				//SCREEN.GetName(199, 종목코드, 0)
@@ -899,15 +899,16 @@ __declspec(dllexport) bool WINAPI axGetName(int kind, char* code, char* name, in
 					*type = KONEXType;
 				strcpy(name, szName);
 
-				slog.Format("[AXISCODE] whichTYPE szName=[%s]", szName);
-				OutputDebugString(slog);
+				slog.Format("[AXISCODE] whichTYPE szName=[%s] type=[%d]", szName, *type);
+				Output_DebugString(slog);
 
 				return TRUE;			
 			}
 			else
 			{
-				szCode = szCode.Mid(1);
-				if (const auto ft = map.find(szCode); ft != map.end())
+				CString tmpCode;
+				tmpCode = szCode.Mid(1);
+				if (const auto ft = map.find(tmpCode); ft != map.end())
 				{
 					const struct hjcodex* hjc = ft->second;
 					szName = CString(hjc->hnam, HNameLen).Trim();
@@ -945,10 +946,10 @@ __declspec(dllexport) bool WINAPI axGetName(int kind, char* code, char* name, in
 						*type = singjongType;
 					if (hjc->ssgb == jmGOODSTOCK)
 						*type = singjongGoodType;
-					if (hjc->ssgb == jmBDCPST)
+			/*		if (hjc->ssgb == jmBDCPST)
 						*type = BDCpstType;
 					if (hjc->ssgb == jmBDCICY)
-						*type = BDCicyType;
+						*type = BDCicyType;*/
 
 					//20191114 맵화면에서 getcodetype를 사용하는 곳이 너무 많아서 kind를 typeforTAX로 주는 경우에만 타입을 세분화 해줌
 					//SCREEN.GetName(199, 종목코드, 0)
@@ -956,8 +957,8 @@ __declspec(dllexport) bool WINAPI axGetName(int kind, char* code, char* name, in
 						*type = KONEXType;
 					strcpy(name, szName);
 
-					slog.Format("[AXISCODE] whichTYPE szName=[%s]", szName);
-					OutputDebugString(slog);
+					slog.Format("[AXISCODE] whichTYPE szName=[%s] type=[%d]", szName, *type);
+					Output_DebugString(slog);
 
 					return TRUE;
 				}
@@ -991,19 +992,19 @@ __declspec(dllexport) bool WINAPI axGetName(int kind, char* code, char* name, in
 							szName = fdlg.GetName();
 							strcpy(name, szName);
 
-							CString slog;
-							slog.Format("[AXISCODE][whichTYPE][%s]<%d> type=[%d] code=[%s] ", __FUNCTION__, __LINE__, fdlg.m_jongmuk, szCode);
-							OutputDebugString(slog);
-
-
 							*type = fdlg.GetJongmuk();
+
+							CString slog;
+							slog.Format("[AXISCODE][whichTYPE][%s]<%d> type=[%d] code=[%s] ", __FUNCTION__, __LINE__, fdlg.m_jongmuk, szCode );
+							Output_DebugString(slog);
+
 							return TRUE;
 						}
 						else
 						{
 							CString slog;
 							slog.Format("[AXISCODE][whichTYPE][%s]<%d>  code=[%s] 타입을 모른다 ", __FUNCTION__, __LINE__,szCode);
-							OutputDebugString(slog);
+							Output_DebugString(slog);
 						}
 					}
 				} 
@@ -1069,10 +1070,10 @@ __declspec(dllexport) bool WINAPI axGetName(int kind, char* code, char* name, in
 					*type = singjongType;				
 				if (hjc->ssgb == jmGOODSTOCK)
 					*type = singjongGoodType;
-				if (hjc->ssgb == jmBDCPST)
+	/*			if (hjc->ssgb == jmBDCPST)
 					*type = BDCpstType;
 				if (hjc->ssgb == jmBDCICY)
-					*type = BDCicyType;
+					*type = BDCicyType;*/
 
 				//20191114 맵화면에서 getcodetype를 사용하는 곳이 너무 많아서 kind를 typeforTAX로 주는 경우에만 타입을 세분화 해줌
 				//SCREEN.GetName(199, 종목코드, 0)

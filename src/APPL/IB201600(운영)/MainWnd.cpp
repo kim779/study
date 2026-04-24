@@ -345,13 +345,21 @@ LONG CMainWnd::OnUser(WPARAM wParam, LPARAM lParam)
 
 			if(data[701])
 			{
-
 				for(int ii=0 ; ii<m_iCols ; ii++)
 				{
 					for(int jj=0 ; jj<m_iRows ; jj++)
 					{
-				
-						if(!strCode.Compare(m_pViewWnd->m_pSiseWnd[ii][jj]->GetCode()))
+						CString sMktype, scode;
+						sMktype = m_pViewWnd->m_pSiseWnd[ii][jj]->GetMarket();
+
+						if (sMktype == _T("ХыЧе"))
+							scode = "M.A" + m_pViewWnd->m_pSiseWnd[ii][jj]->GetCode();
+						else if(sMktype == _T("NXT"))
+							scode = "N.A" + m_pViewWnd->m_pSiseWnd[ii][jj]->GetCode();
+						else if (sMktype == _T("KRX"))
+							scode =  m_pViewWnd->m_pSiseWnd[ii][jj]->GetCode();
+
+						if(!strCode.Compare(scode))
 						{
 							m_pViewWnd->m_pSiseWnd[ii][jj]->m_pwndSymbol->SendMessage(WM_USER, wParam, lParam);
 						}

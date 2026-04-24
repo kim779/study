@@ -96,6 +96,7 @@ BEGIN_DISPATCH_MAP(CControlWnd, CWnd)
 	DISP_FUNCTION(CControlWnd, "SetProperties", SetProperties, VT_EMPTY, VTS_BSTR)
 	DISP_FUNCTION(CControlWnd, "GetProperties", GetProperties, VT_BSTR, VTS_NONE)
 	DISP_FUNCTION(CControlWnd, "SetSideTime", SetSideTime, VT_EMPTY, VTS_BOOL)
+	DISP_FUNCTION(CControlWnd, "GetCodeSymbolType", GetCodeSymbolType, VT_BSTR, VTS_NONE)
 	//}}AFX_DISPATCH_MAP
 END_DISPATCH_MAP()
 
@@ -480,7 +481,7 @@ long CControlWnd::OnMessage(WPARAM wParam, LPARAM lParam)
 		{
 		m_slog.Format("[cx_symbol][%s]<%d>  데이터 크기  크기 = [%d]  L_jinfo3=[%d] ", __FUNCTION__, __LINE__,
 			exth->size, L_jinfo3);
-		GetTopLevelParent()->SendMessage(WM_USER, MMSG_SHARED_GUIDEMESSAGE, (LPARAM)(LPSTR)(LPCTSTR)m_slog);
+		//GetTopLevelParent()->SendMessage(WM_USER, MMSG_SHARED_GUIDEMESSAGE, (LPARAM)(LPSTR)(LPCTSTR)m_slog);
 			
 		CString strINI;
 		strINI.Format("%s\\User\\%s\\Error.ini", m_sRoot, m_sUserID);
@@ -1861,6 +1862,8 @@ void CControlWnd::loadBitmap(CString jrab, CString nrat, CString jgub, CString k
 				break;
 			case 'F':  //스팩
 			case '2':	// 코스닥
+			case 'C':	// BDC 수익증권
+			case 'D':	// BDC 투자회사
 				strImgPath.Format("%s/image/코스닥.bmp", m_sRoot);
 				m_pRBmp = getBitmap(strImgPath);
 				break;
@@ -1895,8 +1898,6 @@ void CControlWnd::loadBitmap(CString jrab, CString nrat, CString jgub, CString k
 				m_pRBmp = getBitmap(strImgPath);
 				break;
 			case 'A' :	//2013.06.11 KSJ 코넥스 추가
-			case 'C' :	//2013.06.11 KSJ 코넥스 추가
-			case 'D' :	//2013.06.11 KSJ 코넥스 추가
 				strImgPath.Format("%s/image/코넥스.bmp", m_sRoot);
 				m_pRBmp = getBitmap(strImgPath);
 				break;
@@ -2366,4 +2367,14 @@ int CControlWnd::GetMKgubn(CString sCode)
 		return 3;
 		
 	return 1;
+}
+
+BSTR CControlWnd::GetCodeSymbolType()
+{
+	CString Gbun, strResult,slog;
+	Gbun = m_jinfo.jgub;
+	strResult = Gbun.GetAt(0);
+	slog.Format("getcodetype = %s", strResult);
+	OutputDebugString(slog);
+	return strResult.AllocSysString();
 }

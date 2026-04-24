@@ -28,7 +28,7 @@ const int dataH = 20;
 const int titleH = 18;
 const int tabW = 140;
 const int gap1 = 1;
-const int chkH = 18;	// 체크박스 영역 높이 (대리인 전용)
+const int chkH = 90;	// 체크박스 영역 높이 (대리인 전용)
 
 COubWnd::COubWnd()
 {
@@ -148,8 +148,10 @@ bool COubWnd::IsHiddenToday()
 	COleDateTime saved(year, month, day, 0, 0, 0);
 	COleDateTime now = COleDateTime::GetCurrentTime();
 
-	COleDateTimeSpan span = now - saved;
-	return (span.GetTotalDays() < 7.0);	// 7일 이내면 억제
+	// 날짜만 비교 (시간 무관)
+	return (saved.GetYear() == now.GetYear() &&
+		saved.GetMonth() == now.GetMonth() &&
+		saved.GetDay() == now.GetDay());
 }
 
 
@@ -262,46 +264,131 @@ void COubWnd::drawData(CDC* pDC)
 	drc = rect;
 	drc.top += 5;
 
-	// 대리인이면 하단 chkH 만큼 체크박스 영역 확보
+	// 대리인이면 하단 chkH 만큼 메시지 영역 줄임
 	if (m_bIsAgent)
 		drc.bottom -= chkH;
 
-	pDC->DrawText(m_sMsg, drc, DT_LEFT | DT_VCENTER | DT_WORDBREAK);
+	pDC->DrawText(m_sMsg, drc, DT_LEFT | DT_WORDBREAK);
 
-	// ── 체크박스 그리기 (대리인 전용) ──────────────────
 	if (m_bIsAgent)
 	{
+		// ── 구분선 ──────────────────────────────────
+		CRect rcLine = rect;
+		rcLine.top = drc.bottom + 2;
+		rcLine.bottom = rcLine.top + 1;
+		pDC->FillSolidRect(rcLine, GetSysColor(COLOR_BTNSHADOW));
+
+		// ── 체크박스 ─────────────────────────────────
 		CRect rcChk;
 		rcChk.left = rect.left + 5;
-		rcChk.bottom = rect.bottom - 3;
-		rcChk.top = rcChk.bottom - 13;
-		rcChk.right = rcChk.left + 13;
-		m_rcCheckBox = rcChk;	// 클릭 판정용 저장
+		rcChk.top = rcLine.bottom + 5;
+		rcChk.right = rcChk.left + 11;
+		rcChk.bottom = rcChk.top + 11;
+		m_rcCheckBox = rcChk;
 
-		// 체크박스 테두리
 		pDC->Rectangle(rcChk);
 
-		// 체크 표시
 		if (m_bDontShow)
 		{
 			CPen* pOldPen = (CPen*)pDC->SelectObject(
 				getAxPen(RGB(0, 0, 200), 2, PS_SOLID));
-			pDC->MoveTo(rcChk.left + 2, rcChk.top + 6);
-			pDC->LineTo(rcChk.left + 5, rcChk.bottom - 2);
+			pDC->MoveTo(rcChk.left + 2, rcChk.top + 5);
+			pDC->LineTo(rcChk.left + 4, rcChk.bottom - 2);
 			pDC->LineTo(rcChk.right - 2, rcChk.top + 2);
 			pDC->SelectObject(pOldPen);
 		}
 
-		// 체크박스 옆 문구
-		CRect rcTxt = rcChk;
-		rcTxt.left = rcChk.right + 4;
-		rcTxt.right = rect.right;
-		pDC->DrawText(_T("7일동안 안띄웁니다."), rcTxt,
-			DT_LEFT | DT_VCENTER | DT_SINGLELINE);
+		// ── 텍스트: 1줄은 체크박스 오른쪽, 2~4줄은 들여쓰기 ──
+		int indentX = rcChk.right + 4;   // 체크박스 오른쪽 기준
+		int lineTop = rcLine.bottom + 4;
+		int lineH = 20;                 // 줄 높이
+
+		const TCHAR* lines[] = {
+			_T("해당계좌의 주문대리인 약정여부를"),
+			_T("확인하였으며, 금일에 한하여"),
+			_T("본 팝업창을 표시하지 않는것에"),
+			_T("동의합니다."),
+		};
+
+		for (int i = 0; i < 4; i++)
+		{
+			CRect rcTxt;
+			rcTxt.left = indentX;         // 모든 줄 동일하게 체크박스 오른쪽 정렬
+			rcTxt.top = lineTop + i * lineH;
+			rcTxt.right = rect.right - 3;
+			rcTxt.bottom = rcTxt.top + lineH;
+			pDC->DrawText(lines[i], rcTxt, DT_LEFT | DT_SINGLELINE);
+		}
 	}
-	// ────────────────────────────────────────────────────
 
 	pDC->SelectObject(pOldFont);
+	//CRect rect, drc;
+	//GetClientRect(&rect);
+	//rect.top = rect.top + headerH;
+	//rect.DeflateRect(1, 1);
+	//pDC->FillSolidRect(rect, GetSysColor(COLOR_INFOBK));
+
+	//pDC->SetBkMode(TRANSPARENT);
+	//pDC->SetTextColor(GetSysColor(COLOR_WINDOWTEXT));
+	//CFont* pOldFont = (CFont*)pDC->SelectObject(getAxFont(_T("굴림체"), 8, 0));
+
+	//drc = rect;
+	//drc.top += 5;
+
+	//// 대리인이면 하단 chkH 만큼 체크박스 영역 확보
+	//if (m_bIsAgent)
+	//	drc.bottom -= chkH;
+
+	//pDC->DrawText(m_sMsg, drc, DT_LEFT | DT_VCENTER | DT_WORDBREAK);
+
+	//// ── 체크박스 그리기 (대리인 전용) ──────────────────
+	//if (m_bIsAgent)
+	//{
+	//	// ── 구분선 ──────────────────────────────────────
+	//	CRect rcLine = rect;
+	//	rcLine.top = drc.bottom + 2;
+	//	rcLine.bottom = rcLine.top + 1;
+	//	pDC->FillSolidRect(rcLine, GetSysColor(COLOR_BTNSHADOW));
+
+	//	// ── 체크박스 ─────────────────────────────────────
+	//	CRect rcChk;
+	//	rcChk.left = rect.left + 5;
+	//	rcChk.top = rcLine.bottom + 5;
+	//	rcChk.bottom = rcChk.top + 13;
+	//	rcChk.right = rcChk.left + 13;
+	//	m_rcCheckBox = rcChk;
+
+	//	// 체크박스 테두리
+	//	pDC->Rectangle(rcChk);
+
+	//	// 체크 표시
+	//	if (m_bDontShow)
+	//	{
+	//		CPen* pOldPen = (CPen*)pDC->SelectObject(
+	//			getAxPen(RGB(0, 0, 200), 2, PS_SOLID));
+	//		pDC->MoveTo(rcChk.left + 2, rcChk.top + 6);
+	//		pDC->LineTo(rcChk.left + 5, rcChk.bottom - 2);
+	//		pDC->LineTo(rcChk.right - 2, rcChk.top + 2);
+	//		pDC->SelectObject(pOldPen);
+	//	}
+
+	//	// ── 체크박스 옆 4줄 텍스트 ───────────────────────
+	//	CRect rcTxt;
+	//	rcTxt.left = rcChk.right + 4;
+	//	rcTxt.top = rcLine.bottom + 3;
+	//	rcTxt.right = rect.right - 3;
+	//	rcTxt.bottom = rect.bottom - 3;
+
+	//	pDC->DrawText(
+	//		_T("해당계좌의 주문대리인 약정여부를\n")
+	//		_T("확인하였으며, 금일에 한하여\n")
+	//		_T("본 팝업창을 표시하지 않는것에\n")
+	//		_T("동의합니다."),
+	//		rcTxt, DT_LEFT | DT_WORDBREAK);
+	//}
+	//// ────────────────────────────────────────────────────
+
+	//pDC->SelectObject(pOldFont);
 }
 
 void COubWnd::OnSetFocus(CWnd* pOldWnd)

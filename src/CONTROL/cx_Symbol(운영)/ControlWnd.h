@@ -180,6 +180,7 @@ protected:
 	afx_msg void SetProperties(LPCTSTR sParam);
 	afx_msg BSTR GetProperties();
 	afx_msg void SetSideTime(BOOL flag);
+	afx_msg BSTR GetCodeSymbolType();
 	//}}AFX_DISPATCH
 	DECLARE_DISPATCH_MAP()
 	DECLARE_INTERFACE_MAP()

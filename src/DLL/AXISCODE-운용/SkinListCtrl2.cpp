@@ -199,9 +199,9 @@ int CSkinListCtrl2::OnToolHitTest( CPoint point, TOOLINFO* pTI ) const
 	pTI->lpszText   = LPSTR_TEXTCALLBACK;
 	pTI->rect               = cellrect;
 
-	CString slog;
-	slog.Format("[axiscode] hwnd=[%x]  row=[%d] col=[%d] uId=[%d]", pTI->hwnd, row, col, pTI->uId);
-	OutputDebugString(slog);
+	//CString slog;
+	//slog.Format("[axiscode] hwnd=[%x]  row=[%d] col=[%d] uId=[%d]", pTI->hwnd, row, col, pTI->uId);
+	//OutputDebugString(slog);
 
 	return  pTI->uId;
 }
@@ -270,9 +270,9 @@ BOOL CSkinListCtrl2::OnToolTipText( UINT, NMHDR* pNMHDR, LRESULT* pResult )
 	
 	if (row < 0 || row > 3 || col <= 0 || (col != 1 && col != 2))
 	{
-		CString slog;
+	/*	CString slog;
 		slog.Format("[axiscode]row=[%d] col=[%d] nID=[%d]",  row, col, nID);
-		OutputDebugString(slog);
+		OutputDebugString(slog);*/
 		return FALSE;
 	}
 	

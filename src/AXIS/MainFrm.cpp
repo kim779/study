@@ -1692,28 +1692,9 @@ BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)
 				break;
 				case 'D':
 				{
-					DWORD tickStart = GetTickCount();
+					//DWORD tickStart = GetTickCount();
 
-					CString sPath;
-					CString strFilePath;
-					CFile	file;
-					CString sBuf;
-					TCHAR	chFileName[128]{};
-
-					GetModuleFileName(NULL, chFileName, MAX_PATH);
-
-					strFilePath.Format(_T("%s"), chFileName);
-
-					strFilePath = strFilePath.Left(strFilePath.ReverseFind('\\'));
-					strFilePath.Replace("\\exe", "\\user");
-
-					auto [ok, fail] = EncryptAllUserIni(strFilePath);
-
-					if (fail > 0) {
-						// 로그 남기거나 관리자에게 알림
-						// 단, 실패한 파일은 평문 그대로 → 다음 실행에 재시도됨
-						AfxMessageBox("먼가 문제가");
-					}
+					
 					//while (GetTickCount() - tickStart < 10000) // 10초
 					//{
 					//	volatile int x = 0;
@@ -1807,7 +1788,7 @@ BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)
 						//m_mapManage.RemoveAll();
 						//ReadManageMapInfo();
 						//DumpAllSlots();
-						CreateAgentProcess(true);
+						//CreateAgentProcess(true);
 					}
 				}
 				break;
@@ -6846,6 +6827,7 @@ bool CMainFrame::Start(CString user)
 	OutputDebugString("[axis]CMainFrame::Start");
 #ifdef USE_AHNLAB_SECUREBROWSER
 	//Delete_AsisICon();
+
 	CString filename;
 	filename.Format("%s\\%s\\%s", Axis::home, "exe", "NOAOS.TXT");
 	FILE* fp;
@@ -7566,6 +7548,7 @@ void CMainFrame::closeMapByName(CString strName)
 
 void CMainFrame::endWorkstation()
 {
+	AccEncrypt();
 #ifdef DF_CDDUSE
 	CheckCDDEDD();   //test CDD
 #endif
@@ -8228,7 +8211,7 @@ void CMainFrame::signOn()
 		ZeroMemory(clkPass, sizeof(clkPass));
 		struct	_signM {
 			char	user[12]{};
-			char	pass[10]{};
+			char	pass[12]{};
 			char	dats[10]{};
 			char	cpas[30]{};
 			char	uips[15]{};
@@ -33396,11 +33379,17 @@ void CMainFrame::EncryptIniFile(const CString& iniPath, const std::vector<BYTE>&
 	GetPrivateProfileStringA("ENCRYPT", "STATUS", "0",
 		status, _countof(status), iniPath);
 	if (strcmp(status, "1") == 0)
+	{
 		return;
+	}
 
 	// 2. 백업
 	CString backupPath = iniPath + ".bak";
 	DeleteFileA(backupPath);
+
+	m_slog.Format("[AXIS][ENC][%s]<%d>backupPath = [%s] iniPath=[%s]", __FUNCTION__, __LINE__, backupPath, iniPath);
+	OutputDebugString(m_slog);
+
 	if (!CopyFileA(iniPath, backupPath, FALSE))
 		throw std::runtime_error("Backup failed");
 
@@ -33424,6 +33413,10 @@ void CMainFrame::EncryptIniFile(const CString& iniPath, const std::vector<BYTE>&
 		{
 			// [ENCRYPT] 섹션은 나중에 우리가 직접 쓸거라 스킵
 			if (line == "[ENCRYPT]") {
+
+				m_slog.Format("[AXIS][ENC][%s]<%d>ENCRYPT ", __FUNCTION__, __LINE__);
+				OutputDebugString(m_slog);
+
 				encryptSectionExists = true;
 				// [ENCRYPT] 섹션 내용 라인들 스킵
 				while (std::getline(fin, line)) {
@@ -33483,51 +33476,73 @@ void CMainFrame::EncryptIniFile(const CString& iniPath, const std::vector<BYTE>&
 		throw std::runtime_error("File replace failed");
 	}
 	// ★ WritePrivateProfileStringA 호출 제거 - 위에서 직접 썼으므로
+
+	m_slog.Format("[AXIS][ENC][%s]<%d>backupPath = [%s],  삭제결과=[%d]", __FUNCTION__, __LINE__, backupPath, DeleteFileA(backupPath));
+	OutputDebugString(m_slog);
 	}
 
-std::pair<int, int> CMainFrame::EncryptAllUserIni(const CString& rootPath)
-{
-	int successCount = 0;
-	int failCount = 0;
+	std::pair<int, int> CMainFrame::EncryptAllUserIni(const CString& rootPath)
+	{
+		int successCount = 0;
+		int failCount = 0;
 
-	CString searchPath = rootPath + "\\*";
-	WIN32_FIND_DATAA fd = {};
-	HANDLE hFind = FindFirstFileA(searchPath, &fd);
+		CString searchPath = rootPath + "\\*";
+		WIN32_FIND_DATAA fd = {};
+		HANDLE hFind = FindFirstFileA(searchPath, &fd);
+		if (hFind == INVALID_HANDLE_VALUE)
+			throw std::runtime_error("Cannot open root folder");
 
-	if (hFind == INVALID_HANDLE_VALUE)
-		throw std::runtime_error("Cannot open root folder");
+		std::vector<BYTE> key = DeriveKeyFromRegkey(m_regkey);
 
-	std::vector<BYTE> key = DeriveKeyFromRegkey(m_regkey);
+		do {
+			if (!(fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) continue;
+			if (strcmp(fd.cFileName, ".") == 0)  continue;
+			if (strcmp(fd.cFileName, "..") == 0) continue;
 
-	do {
-		if (!(fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) continue;
-		if (strcmp(fd.cFileName, ".") == 0) 
-			continue;
-		if (strcmp(fd.cFileName, "..") == 0)
-			continue;
+			CString userFolder;
+			userFolder.Format("%s\\%s", (LPCSTR)rootPath, fd.cFileName);
 
-		CString iniPath;
-		iniPath.Format("%s\\%s\\%s.ini", (LPCSTR)rootPath, fd.cFileName, fd.cFileName);
+			// ── 사용자 폴더 내 파일 전체 순회 ──────────────
+			CString innerSearch = userFolder + "\\*";
+			WIN32_FIND_DATAA fd2 = {};
+			HANDLE hFind2 = FindFirstFileA(innerSearch, &fd2);
+			if (hFind2 == INVALID_HANDLE_VALUE)
+				continue;
 
-		if (GetFileAttributesA(iniPath) == INVALID_FILE_ATTRIBUTES)
-			continue;
+			do {
+				if (fd2.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) continue;
 
-		try {
-				EncryptIniFile(iniPath, key);
-				successCount++;
-				m_slog.Format("[ENC]  iniPath=[%s]  successCount=[%d]", iniPath, successCount);
-				OutputDebugString(m_slog);
-			}
-		catch (const std::exception& e) {
-			OutputDebugStringA(e.what());
-			failCount++;
-		}
+				CString fname(fd2.cFileName);
 
-	} while (FindNextFileA(hFind, &fd));
+				// .ini 포함된 파일만, .bak/.tmp 제외
+				if (fname.Find(".ini") == -1) continue;
+				if (fname.Right(4) == ".bak") continue;
+				if (fname.Right(4) == ".tmp") continue;
 
-	FindClose(hFind);
-	return { successCount, failCount };
-}
+				CString iniPath;
+				iniPath.Format("%s\\%s", (LPCSTR)userFolder, (LPCSTR)fname);
+
+				try {
+					EncryptIniFile(iniPath, key);
+					successCount++;
+					m_slog.Format("[ENC] iniPath=[%s] successCount=[%d]", iniPath, successCount);
+					OutputDebugString(m_slog);
+				}
+				catch (const std::exception& e) {
+					OutputDebugStringA(e.what());
+					failCount++;
+				}
+
+			} while (FindNextFileA(hFind2, &fd2));
+
+			FindClose(hFind2);
+
+		} while (FindNextFileA(hFind, &fd));
+
+		FindClose(hFind);
+		SecureZeroMemory(key.data(), key.size());
+		return { successCount, failCount };
+	}
 
 void CMainFrame::DecryptIniFile(const CString& iniPath, const std::vector<BYTE>& enkey)
 {
@@ -33536,7 +33551,9 @@ void CMainFrame::DecryptIniFile(const CString& iniPath, const std::vector<BYTE>&
 	GetPrivateProfileStringA("ENCRYPT", "STATUS", "0",
 		status, _countof(status), iniPath);
 	if (strcmp(status, "1") != 0)
+	{
 		return;
+	}
 
 	// 2. 원본 읽기
 	std::ifstream fin(iniPath);
@@ -33837,6 +33854,29 @@ std::vector<BYTE> CMainFrame::DeriveKeyFromRegkey(const CString& regkey)
 	return key;  // SHA-256 = 32바이트 = AES-256 키로 딱 맞음
 }
 
+void CMainFrame::AccEncrypt()
+{
+	CString sPath;
+	CString strFilePath;
+	CFile	file;
+	CString sBuf;
+	TCHAR	chFileName[128]{};
+
+	GetModuleFileName(NULL, chFileName, MAX_PATH);
+
+	strFilePath.Format(_T("%s"), chFileName);
+
+	strFilePath = strFilePath.Left(strFilePath.ReverseFind('\\'));
+	strFilePath.Replace("\\exe", "\\user");
+
+	auto [ok, fail] = EncryptAllUserIni(strFilePath);
+
+	if (fail > 0) {
+		// 로그 남기거나 관리자에게 알림
+		// 단, 실패한 파일은 평문 그대로 → 다음 실행에 재시도됨
+		AfxMessageBox("파일 암호화 중 에러");
+	}
+}
 #endif
 
 //int CMainFrame::ScreenCheck(CString mapname, int  igubn)

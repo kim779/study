@@ -353,7 +353,7 @@ protected:
 	void BaseSorting();
 	bool GetCodeMap(CMap<CString, LPCTSTR, int, int> &arCodeMap);
 
-	void SettingGridHeaderName(int index);
+	//void SettingGridHeaderName(int index);
 
 	void ClearSearchMap();
 	void ReSetSearchMap();					      // 2011.12.29 KSJ

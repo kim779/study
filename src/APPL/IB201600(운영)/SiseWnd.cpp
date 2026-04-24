@@ -901,7 +901,22 @@ void CSiseWnd::sendSymbol(CString code)
 	indexInfo.Format("%d%d", m_iColSiseWnd, m_iRowSiseWnd);
 	iInfo = atoi(indexInfo);
 
-	sDat.Format("1301%c%s\t1021\t17413\t", 0x7f, m_szCode);
+	if (1)
+	{
+		CString smarket;
+		int itype{};
+		if (GetMarket() == "KRX")
+			itype = 1;
+		else if (GetMarket() == "NXT")
+			itype = 2;
+		else if (GetMarket() == "통합")
+			itype = 3;
+
+		sDat.Format("1301%c%s\t1777%c%d\t1021\t17413\t", 0x7f, m_szCode, 0x7f, itype);
+	}
+	else
+		sDat.Format("1301%c%s\t1021\t17413\t", 0x7f, m_szCode);
+
 	sendOOP(iInfo, (char *)sDat.operator LPCTSTR(), sDat.GetLength());
 }
 
@@ -988,7 +1003,8 @@ void CSiseWnd::parsingSymbol(char* datb)
 	}
 	else
 	{
-		if (text.GetAt(0) == 'A' || text.GetAt(0) == 'Q')  //20200430 ETN 추가
+		//if (text.GetAt(0) == 'A' || text.GetAt(0) == 'Q')  //20200430 ETN 추가
+		if (text.GetAt(0) == 'A' || text.GetAt(0) == 'Q' || text.GetAt(0) == 'M' || text.GetAt(0) == 'N')  //20200430 ETN 추가
 		{
 			value = text.Find('\t');
 			if (value != -1)
@@ -997,7 +1013,8 @@ void CSiseWnd::parsingSymbol(char* datb)
 				CString tempCode;
 				tempCode = text.Left(value++);
 
-				if (tempCode.GetLength() == 7)
+				//if (tempCode.GetLength() == 7)
+				if (tempCode.GetLength() == 7 || tempCode.GetLength() == 9)
 				{
 					text = text.Mid(value);
 					WPARAM	wParam{};
@@ -1341,7 +1358,7 @@ LONG CSiseWnd::OnMsgMKDLL(WPARAM wParam, LPARAM lParam)
 			m_szMarket = stmp.Right(stmp.GetLength() - ifnd - 1);
 			m_pParent->GetParent()->Procedure(sMarket, m_mapKey);
 			m_pParent->CallMarketSnapShot();
-			
+			sendSymbol(m_szCode);
 		}
 		break;
 	}

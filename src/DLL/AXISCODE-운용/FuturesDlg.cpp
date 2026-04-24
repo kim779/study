@@ -128,18 +128,6 @@ CFuturesDlg::CFuturesDlg(int kind, CPoint pt, int type /*= 0*/, CWnd* pParent /*
 	m_file = m_root + "\\user\\" + m_user + "\\" + m_user + ".ini";
 	m_bMini = false;
 	m_iGubn = NORMAKKOSPI200;
-
-	CAxisCodeApp* m_pApp;
-	m_pApp = (CAxisCodeApp*)AfxGetApp();
-
-	//auto future = std::async([&]() {
-	//	for (auto mt : m_pApp->_mapCODEx)
-	//		_mapCODE.emplace(mt);
-	//	});
-	//m_arrayFcode.Copy(m_pApp->_m_arrayFcode);
-	//m_arrayOcode.Copy(m_pApp->_m_arrayOcode);
-	//m_arrayPcode.Copy(m_pApp->_m_arrayPcode);
-
 }	
 
 
@@ -1221,6 +1209,9 @@ BOOL CFuturesDlg::FindPjCode(const CString& szCode)
 		{
 			SetName(pcode.hnam);
 			m_jongmuk = koptionType;
+			CString slog;
+			slog.Format("[AXISCODE][%s]<%d>szCode=[%s] type=[%d][koptionType] ", __FUNCTION__, __LINE__, szCode, m_jongmuk);
+			Output_DebugString(slog);
 			return TRUE;
 		}
 	}
@@ -1229,9 +1220,12 @@ BOOL CFuturesDlg::FindPjCode(const CString& szCode)
 
 BOOL CFuturesDlg::loadPjCode()			//泅拱 内靛 辆格...
 {
+	CString slog;
+	slog.Format("[AXISCODE][%s]<%d>", __FUNCTION__, __LINE__);
+	Output_DebugString(slog);
 	//return TRUE;
-	//if (m_arrayPcode.GetSize() > 0)
-	//	return FALSE;
+	if (m_arrayPcode.GetSize() > 0)
+		return FALSE;
 
 	int		codeN{};
 	CFile		file;
@@ -1304,6 +1298,10 @@ BOOL CFuturesDlg::loadPjCode()			//泅拱 内靛 辆格...
 
 BOOL CFuturesDlg::loadCFjCode()
 {
+	CString slog;
+	slog.Format("[AXISCODE][%s]<%d>", __FUNCTION__, __LINE__);
+	Output_DebugString(slog);
+
 	m_arrayFcode.RemoveAll();
 
 	CString path;
@@ -1339,6 +1337,10 @@ BOOL CFuturesDlg::loadCFjCode()
 
 BOOL CFuturesDlg::loadSfCode()
 {	
+	CString slog;
+	slog.Format("[AXISCODE][%s]<%d>", __FUNCTION__, __LINE__);
+	Output_DebugString(slog);
+
 	CFile	file;
 	struct  sfcode  SFCode{};
 	SFCODE scode{};
@@ -1595,6 +1597,11 @@ BOOL CFuturesDlg::FindFjCode(const CString& szCode)
 		{
 			SetName(fcode.name);
 			m_jongmuk = futureType;
+
+			CString slog;
+			slog.Format("[AXISCODE][%s]<%d>szCode=[%s] type=[%d][futureType] ", __FUNCTION__, __LINE__, szCode, m_jongmuk);
+			Output_DebugString(slog);
+
 			return TRUE;
 		}
 	}
@@ -1603,12 +1610,12 @@ BOOL CFuturesDlg::FindFjCode(const CString& szCode)
 
 BOOL CFuturesDlg::loadFjCode()
 {
+	CString slog;
+	slog.Format("[AXISCODE][%s]<%d>", __FUNCTION__, __LINE__);
+	Output_DebugString(slog);
+
 	//	if (m_arrayFcode.GetCount() > 0)
 	//		return FALSE;
-
-	CString slog;
-	slog.Format("[AXISCODE][%s]<%d> [%d][%d] ", __FUNCTION__, __LINE__, m_arrayFcode.GetSize(), m_arrayFcode.GetCount());
-	OutputDebugString(slog);
 
 	m_arrayFcode.RemoveAll();
 
@@ -1656,6 +1663,11 @@ BOOL CFuturesDlg::FindWCode(const CString& szCode)
 			{
 				SetName(OJcode.call[jj].hnam);
 				m_jongmuk = callType;
+
+				CString slog;
+				slog.Format("[AXISCODE][%s]<%d>szCode=[%s] type=[%d][callType] ", __FUNCTION__, __LINE__, szCode, m_jongmuk);
+				Output_DebugString(slog);
+
 				return TRUE;
 			}
 
@@ -1663,6 +1675,11 @@ BOOL CFuturesDlg::FindWCode(const CString& szCode)
 			{
 				SetName(OJcode.put[jj].hnam);
 				m_jongmuk = putType;
+
+				CString slog;
+				slog.Format("[AXISCODE][%s]<%d>szCode=[%s] type=[%d][putType] ", __FUNCTION__, __LINE__, szCode, m_jongmuk);
+				Output_DebugString(slog);
+
 				return TRUE;
 			}
 		}
@@ -1672,6 +1689,10 @@ BOOL CFuturesDlg::FindWCode(const CString& szCode)
 
 BOOL CFuturesDlg::loadWCode()
 {
+	CString slog;
+	slog.Format("[AXISCODE][%s]<%d>", __FUNCTION__, __LINE__);
+	Output_DebugString(slog);
+
 //writelogs("AXISCODE loadWCode start");
 	CString stmp, stmp1, stmp2, sWfname, sWlname;
 	m_arrayOcode.RemoveAll();
@@ -1776,6 +1797,11 @@ BOOL CFuturesDlg::FindOjCode(const CString& szCode)
 			{
 				SetName(OJcode.call[jj].hnam);
 				m_jongmuk = callType;
+
+				CString slog;
+				slog.Format("[AXISCODE][%s]<%d>szCode=[%s] type=[%d][callType]", __FUNCTION__, __LINE__, szCode, m_jongmuk);
+				Output_DebugString(slog);
+
 				return TRUE;
 			}
 
@@ -1783,6 +1809,11 @@ BOOL CFuturesDlg::FindOjCode(const CString& szCode)
 			{
 				SetName(OJcode.put[jj].hnam);
 				m_jongmuk = putType;
+
+				CString slog;
+				slog.Format("[AXISCODE][%s]<%d>szCode=[%s] type=[%d][putType] ", __FUNCTION__, __LINE__, szCode, m_jongmuk);
+				Output_DebugString(slog);
+
 				return TRUE;
 			}
 		}
@@ -1791,7 +1822,11 @@ BOOL CFuturesDlg::FindOjCode(const CString& szCode)
 }
 
 BOOL CFuturesDlg::loadOjCode()
-{									// 可记 内靛 辆格...	
+{			
+	CString slog;
+	slog.Format("[AXISCODE][%s]<%d>", __FUNCTION__, __LINE__);
+	Output_DebugString(slog);
+// 可记 内靛 辆格...	
 // 	if (m_arrayOcode.GetSize() > 0)
 // 		return FALSE;
 
@@ -1855,6 +1890,11 @@ BOOL CFuturesDlg::FindMfCode(const CString& szCode)
 		{
 			SetName(fcode.name);
 			m_jongmuk = futureType;
+
+			CString slog;
+			slog.Format("[AXISCODE][%s]<%d>szCode=[%s] type=[%d][futureType] ", __FUNCTION__, __LINE__, szCode, m_jongmuk);
+			Output_DebugString(slog);
+
 			return TRUE;
 		}
 	}
@@ -1863,9 +1903,11 @@ BOOL CFuturesDlg::FindMfCode(const CString& szCode)
 
 BOOL CFuturesDlg::loadMfCode()
 {
-	//m_arrayFcode.RemoveAll();
-	//if (m_arrayFcode.GetCount() > 0)
-	//	return false;
+	CString slog;
+	slog.Format("[AXISCODE][%s]<%d>", __FUNCTION__, __LINE__);
+	Output_DebugString(slog);
+
+	m_arrayFcode.RemoveAll();
 
 	int	codeN{};
 	
@@ -1921,6 +1963,11 @@ BOOL CFuturesDlg::FindMoCode(const CString& szCode)
 			{
 				SetName(OJcode.call[jj].hnam);
 				m_jongmuk = callType;
+
+				CString slog;
+				slog.Format("[AXISCODE][%s]<%d>szCode=[%s] type=[%d][callType] ", __FUNCTION__, __LINE__, szCode, m_jongmuk);
+				Output_DebugString(slog);
+
 				return TRUE;
 			}
 
@@ -1928,6 +1975,11 @@ BOOL CFuturesDlg::FindMoCode(const CString& szCode)
 			{
 				SetName(OJcode.put[jj].hnam);
 				m_jongmuk = putType;
+
+				CString slog;
+				slog.Format("[AXISCODE][%s]<%d>szCode=[%s] type=[%d][putType] ", __FUNCTION__, __LINE__, szCode, m_jongmuk);
+				Output_DebugString(slog);
+
 				return TRUE;
 			}
 		}
@@ -1936,7 +1988,11 @@ BOOL CFuturesDlg::FindMoCode(const CString& szCode)
 }
 
 BOOL CFuturesDlg::loadMoCode()
-{									// 可记 内靛 辆格...	
+{				
+	CString slog;
+	slog.Format("[AXISCODE][%s]<%d>", __FUNCTION__, __LINE__);
+	Output_DebugString(slog);
+// 可记 内靛 辆格...	
 // 	if (m_arrayOcode.GetSize() > 0 && m)
 // 		return FALSE;
 

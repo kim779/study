@@ -89,7 +89,7 @@ LABEL  LABEL12(12, 228, 75, 248)  '입고증권사'  AL_LEFT  CUR(0)      COLOR(180, 
   VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
 EDIT  zOtcoNm1(530, 230, 691, 250)  LEN(100)  IO_MIXED|EDIT_INPUT|FA_WRAP    COLOR(192, 130)  CUR(0)  TP_SUNKEN          TABORDER(15)  IOORDER(11)  &
   VISIBLE  HINTTYPE(IH_NONE)
-BUTTON  searchBtn(255, 225, 291, 245)  '검색'  TP_PUSH|IMAGETEXT|AL_CENTER        FOCUS  COLOR(208, 232)  CUR(0)    "2BTN.BMP"    TABORDER(16)  ENABLE  &
+BUTTON  searchBtn(295, 225, 331, 245)  '검색'  TP_PUSH|IMAGETEXT|AL_CENTER        FOCUS  COLOR(208, 232)  CUR(0)    "2BTN.BMP"    TABORDER(16)  ENABLE  &
   VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
 LABEL  LABEL13(12, 251, 85, 271)  '입고계좌번호'  AL_LEFT  CUR(0)      COLOR(180, 130)  ENABLE  &
   VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
@@ -119,9 +119,9 @@ LABEL  LABEL10(9, 734, 73, 754)  '타사지점번호'  AL_LEFT  CUR(0)      COLOR(168,
   HINTTYPE(IH_NONE)
 BUTTON  cautionRead(6, 624, 106, 636)  '유의사항 읽음'  TP_CHECK|EDIT_NOP          COLOR(208, 232)  CUR(0)      TABORDER(30)  ENABLE  &
   HINTTYPE(IH_NONE)
-LABEL  LABEL15(207, 694, 271, 719)  'obj_snd'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+LABEL  LABEL15(1077, 419, 1141, 444)  'obj_snd'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
   HINTTYPE(IH_NONE)
-OBJECT  obj_snd(284, 693, 376, 719)    "IB810210"  TABORDER(31)  IOORDER(18)  ENABLE  &
+OBJECT  obj_snd(1154, 418, 1246, 444)    "IB810218"  TABORDER(31)  IOORDER(18)  ENABLE  &
   HINTTYPE(IH_NONE)
 OBJECT  obj_showCerti(336, 153, 526, 270)    ""  TABORDER(24)  IOORDER(19)  ENABLE  &
   HINTTYPE(IH_NONE)
@@ -157,7 +157,7 @@ BUTTON  BUTTON0(450, 251, 534, 271)  '계좌명조회'  TP_PUSH|IMAGETEXT|AL_STRETCH 
   VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
 EDIT  OAcnm(353, 251, 447, 271)  LEN(40)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 130)  CUR(0)  TP_SUNKEN          TABORDER(35)  IOORDER(26)  &
   VISIBLE  HINTTYPE(IH_NONE)
-OBJECT  OBJECT1(735, 525, 1070, 630)    "IB810244"  TABORDER(36)  IOORDER(29)  ENABLE  &
+OBJECT  OBJECT1(1160, 460, 1270, 490)    "IB810243"  TABORDER(36)  IOORDER(29)  ENABLE  &
   HINTTYPE(IH_NONE)
 BUTTON  send_fee(730, 181, 820, 201)  '예상출고수수료'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, NORMAL)  COLOR(208, 186)  CUR(0)    "6btn.bmp"    TABORDER(37)  ENABLE  &
   VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
@@ -185,9 +185,11 @@ OBJECT  OBJ_push(81, 841, 186, 858)    "IB8101AG"  TABORDER(41)  IOORDER(31)  EN
   VISIBLE  HINTTYPE(IH_NONE)
 LABEL  LABEL25(1020, 390, 1140, 410)  'OBJ_SearchStock'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
   HINTTYPE(IH_NONE)
-OBJECT  OBJ_SearchStock(1160, 385, 1270, 410)    "IB810218"  TABORDER(42)  IOORDER(32)  ENABLE  &
+COMBO  zOtcoNm(85, 225, 247, 245)  TP_NONE  LEN(10)  COUNT(0)  VCOUNT(0)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_MIXED|EDIT_INPUT    COLOR(192, 232)  CUR(0)    TABORDER(42)  IOORDER(32)  ENABLE  &
   VISIBLE  HINTTYPE(IH_NONE)
-COMBO  zOtcoNm(85, 225, 247, 245)  TP_NONE  LEN(10)  COUNT(0)  VCOUNT(0)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_MIXED|EDIT_INPUT    COLOR(192, 232)  CUR(0)    TABORDER(43)  IOORDER(33)  ENABLE  &
+LABEL  LABEL26(945, 460, 1150, 485)  'OBJECT1 SDPET053 입고계좌명조회'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  BUTTON3(250, 225, 285, 245)  TP_PUSH      AL_CENTER    FOCUS  COLOR(208, 232)  CUR(0)      TABORDER(43)  ENABLE  &
   VISIBLE  HINTTYPE(IH_NONE)
 }
 
@@ -398,23 +400,23 @@ Function InputCheck()
 		Exit Function
 	End If
 
-	If (Trim(zTelRgno.Data)) = "" Then
-		Call alert_msg("고객전화번호를 확인하여 주십시오.")
-		zTelRgno.SetFocus
-		Exit Function
-	End If
+'	If (Trim(zTelRgno.Data)) = "" Then
+'		Call alert_msg("고객전화번호를 확인하여 주십시오.")
+'		zTelRgno.SetFocus
+'		Exit Function
+'	End If
 
-	If (Trim(zTelExno.Data)) = "" Then
-		Call alert_msg("고객전화번호를 확인하여 주십시오.")
-		zTelExno.SetFocus
-		Exit Function
-	End If
+'	If (Trim(zTelExno.Data)) = "" Then
+'		Call alert_msg("고객전화번호를 확인하여 주십시오.")
+'		zTelExno.SetFocus
+'		Exit Function
+'	End If
 
-	If (Trim(zTelSeqno.Data)) = "" Then
-		Call alert_msg("고객전화번호를 확인하여 주십시오.")
-		zTelSeqno.SetFocus
-		Exit Function
-	End If
+'	If (Trim(zTelSeqno.Data)) = "" Then
+'		Call alert_msg("고객전화번호를 확인하여 주십시오.")
+'		zTelSeqno.SetFocus
+'		Exit Function
+'	End If
 
 	If Trim(tmp_zIsuNo.Data) = "" Or Trim(jmNm.Data) = "" Then
 		Call alert_msg("유가잔고내역에서 종목을 선택하여 주십시오.")
@@ -457,23 +459,23 @@ Function InputCheck()
 		Exit Function
 	End If
 
-	If Trim(zSecinSecompTelRgno.Data) = "" Then
-		Call alert_msg("입고증권사 전화번호를 확인하여 주십시오.")
-		zSecinSecompTelRgno.SetFocus
-		Exit Function
-	End If
+'	If Trim(zSecinSecompTelRgno.Data) = "" Then
+'		Call alert_msg("입고증권사 전화번호를 확인하여 주십시오.")
+'		zSecinSecompTelRgno.SetFocus
+'		Exit Function
+'	End If
 
-	If Trim(zSecinSecompTelExno.Data) = "" Then
-		Call alert_msg("입고증권사 전화번호를 확인하여 주십시오.")
-		zSecinSecompTelExno.SetFocus
-		Exit Function
-	End If
+'	If Trim(zSecinSecompTelExno.Data) = "" Then
+'		Call alert_msg("입고증권사 전화번호를 확인하여 주십시오.")
+'		zSecinSecompTelExno.SetFocus
+'		Exit Function
+'	End If
 
-	If Trim(zSecinSecompTelSeqno.Data) = "" Then
-		Call alert_msg("입고증권사 전화번호를 확인하여 주십시오.")
-		zSecinSecompTelSeqno.SetFocus
-		Exit Function
-	End If
+'	If Trim(zSecinSecompTelSeqno.Data) = "" Then
+'		Call alert_msg("입고증권사 전화번호를 확인하여 주십시오.")
+'		zSecinSecompTelSeqno.SetFocus
+'		Exit Function
+'	End If
 
 	If Trim(OAcnm.Data) = "" Then
 		Call alert_msg("입고계좌명을 확인하여 주십시오.")
@@ -659,9 +661,9 @@ Function chkBrnBnkAccnt()
 	chkBrnBnkAccnt = True
 End Function
 
-Sub SetStockCombo(sval)
-	zOtcoNm.SetItems(sval)
-End Sub
+'Sub SetStockCombo(sval)
+'	zOtcoNm.SetItems(sval)
+'End Sub
 
 Function GetKeyByCompanyName()
 	GetKeyByCompanyName = ""
@@ -693,12 +695,58 @@ Function NormalizeCompanyName(name)
     NormalizeCompanyName = Trim(s)
 End Function
 
+Sub initstock_combo()
+	Dim sval
+	sval = "0000010000" & vbTab & "0000010000교보증권"
+	sval = sval & vbTab & "0000020000신한투자증권"
+	sval = sval & vbTab & "0000030000한국투자증권"
+	sval = sval & vbTab & "0000040000대신증권"
+	sval = sval & vbTab & "0000050000미래에셋증권"
+	sval = sval & vbTab & "0000050020대우증권(신탁)"
+	sval = sval & vbTab & "0000060000신영증권"
+	sval = sval & vbTab & "0000080000유진투자증권"
+	sval = sval & vbTab & "0000090000한양증권"
+	sval = sval & vbTab & "0000100000메리츠증권"
+	sval = sval & vbTab & "0000120000NH투자증권"
+	sval = sval & vbTab & "0000130000부국증권"
+	sval = sval & vbTab & "0000170000KB증권"
+	sval = sval & vbTab & "0000210000한화투자증권"
+	sval = sval & vbTab & "0000220000현대차증권"
+	sval = sval & vbTab & "0000230000유화증권"
+	sval = sval & vbTab & "0000240000유안타증권"
+	sval = sval & vbTab & "0000250000SK증권"
+	sval = sval & vbTab & "0000290000상상인증권"
+	sval = sval & vbTab & "0000300000삼성증권"
+	sval = sval & vbTab & "0000310000DB금융투자"
+	sval = sval & vbTab & "0000460000아이엠증권"
+	sval = sval & vbTab & "0000500000키움증권"
+	sval = sval & vbTab & "0000520000리딩투자증권"
+	sval = sval & vbTab & "0000560000하나증권"
+	sval = sval & vbTab & "0000560020하나증권(신탁)"
+	sval = sval & vbTab & "0000690000카카오페이증권"
+	sval = sval & vbTab & "0000700000디에스투자증권"
+	sval = sval & vbTab & "0000710000디올투자증권"
+	sval = sval & vbTab & "0000720000케이프투자증권"
+	sval = sval & vbTab & "0000770000토스증권"
+	sval = sval & vbTab & "0000860000비엔케이투자증권"
+	sval = sval & vbTab & "0007520000엘에스증권"
+	sval = sval & vbTab & "0007530000코리아에셋투자증권주식회사"
+	sval = sval & vbTab & "0007580000흥국증권"
+	sval = sval & vbTab & "0043250000(주)우리투자증권"
+	
+	
+	zOtcoNm.SetItems(sval)
+End Sub
+
+'    items = items & vbTab & code10 & textValue
+
 _AW_ONINDECLARE_AW_
 #Load IB888833
 #Load IB888888
 
 _AW_ONENDSUB_AW_
 _AW_ONSTART_AW_
+initstock_combo()
 l_zBkeepQty.Text = "(주)"
 l_zSecoutBuyDate.Visible = False
 zBuyDate.Visible = False
@@ -846,10 +894,9 @@ _AW_ENDSCRIPT_AW_
 
 _AW_SCRIPT_AW_(BUTTON0)
 _AW_ONCLICK_AW_
-Dim bnkname
-bnkname = NormalizeCompanyName(zOtcoNm.Text)
-SCREEN.Proc "OBJ_SearchStock.SetCompanyKey", bnkname
 
+
+zOtcoNo.Data = zOtcoNm.Data
 SCREEN.Proc "OBJECT1.Send_f", ""
 _AW_ONENDSUB_AW_
 _AW_ENDSCRIPT_AW_
@@ -892,6 +939,13 @@ _AW_ONCLICK_AW_
 cautionRead.Checked = True
 
 SCREEN.CreateWindow 1, "IB810224 /t /s /p5", ""
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON3)
+_AW_ONCLICK_AW_
+MsgBox zOtcoNm.Data
 _AW_ONENDSUB_AW_
 _AW_ENDSCRIPT_AW_
 

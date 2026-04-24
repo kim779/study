@@ -74,7 +74,7 @@ static char THIS_FILE[] = __FILE__;
 #define ONLY_SISE 		'9'		//객장 시세조회전용단말 아이디 앞자 "9" 로 시작
 
 #define	LEN_USID		12 
-#define	LEN_GRPD		4 
+#define	LEN_GRPD		4  
 #define	LEN_ECOD		4
 #define	LEN_EMSG		80
 #define	LEN_NREC		4		//반복
@@ -320,6 +320,12 @@ CAccountCtrl::CAccountCtrl(CWnd* pParent, _param* pParam)
 	m_bGroup = FALSE;
 
 	m_mapName = (LPCTSTR)m_pParent->SendMessage(WM_USER, MAKEWPARAM(mapDLL, 0));
+
+	char	readb[32]{};
+	CString Path{};
+	Path.Format("%s\\tab\\AXIS.INI", Variant(homeCC, ""));
+	int readl = GetPrivateProfileString("AXIS", "reg", "", readb, sizeof(readb), Path);
+	m_regkey = CString(readb, readl);
 
 	LoadAccountType();
 	Convert_V2();
@@ -812,11 +818,6 @@ BOOL CAccountCtrl::Initialize(BOOL bDLL)
 	strTemp = CString(readb, readl);
 	strTemp.Trim();
 	m_sAccnDept = strTemp;
-
-	memset(readb, 0x00, 10 * 1024);
-	Path.Format("%s\\tab\\AXIS.INI", Variant(homeCC, ""));
-	readl = GetPrivateProfileString("AXIS", "reg", "", readb, sizeof(readb), Path);
-	m_regkey = CString(readb, readl);
 
 //m_slog.Format("[cx_account][%s]<%d>m_sAccnDept=[%s]", __FUNCTION__, __LINE__, m_sAccnDept);
 //Output_DebugString(m_slog);
@@ -6049,12 +6050,14 @@ bool CAccountCtrl::SACAQ0239Ret_Check()
 
 	//투자자구분(m_sInvst   0 전문금융소비자  1 일반금융소비자  9 등록안됨
 	//투정미등록 혹은 만기일(m_sDueDt)이 당일 이전 
+	//m_sInvst = "9"; //test
 	if(m_sInvst == "9" || (inputDate < today)) 
 		CreateOubWnd("투자자정보확인서만료(미등록)계좌\n\n입니다");
 
 	//투자자구분(m_sInvst)   0 전문금융소비자  1 일반금융소비자  9 등록안됨
 	//정보제공구분(m_sInfogubn)     0 미제공 1 제공 
 	// 투자자구분이 일반금융소비자 이고 정보제공구분이 0미제공
+	//m_sInvst = "1"; //test
 	if (m_sInvst == "1" && m_sInfogubn == "0") 
 		CreateOubWnd("투자자정보미제공 고객입니다");
 	
@@ -6076,6 +6079,7 @@ bool CAccountCtrl::SACAQ0239Ret_Check()
 	// 투자자구분(m_sInvst   0 전문금융소비자  1 일반금융소비자  9 등록안됨
 	// 투자권유구분(m_sInvsCnvs)      //투자권유구분  0 미제공 1 제공
 	//정보제공구분(m_sInfogubn)     0 미제공 1 제공 
+	//m_sInvsCnvs = "0"; //test
 	if ((m_sInvst == "1" && m_sInvsCnvs == "0") || (m_sInvst == "1" && m_sInfogubn == "1" && igrade < 3))
 	{
 			CString smsg;
@@ -6156,11 +6160,11 @@ void CAccountCtrl::CreateOubWnd(CString sMsg, BOOL bIsAgent)
 	GetClientRect(&rcParent);
 	ClientToScreen(&rcParent);
 
-	int cx = 310, cy = 100;
+	int cx = 260, cy = 100;
 
 	// 대리인이면 체크박스 영역만큼 높이 추가
 	if (bIsAgent)
-		cy = 118;
+		cy = 185;
 
 	COubWnd* pWnd = new COubWnd;
 	pWnd->m_pWizard = m_pParent;

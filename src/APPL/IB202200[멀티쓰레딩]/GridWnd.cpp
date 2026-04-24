@@ -35,7 +35,82 @@ _DLL_SetLibOpen SignalLib_Open;
 _DLL_SetLibClose SignalLib_Close;
 _DLL_SetSignal SignalLib_SetSignal;
 
+static const std::unordered_map<int, int>& FwdMap()
+{
+	static const std::unordered_map<int, int> m = {
+		{ 23, 623 },
+		{ 24, 624 },
+		{ 27, 627 },
+		{ 28, 628 },
+		{ 29, 629 },
+		{ 30, 630 },
+		{ 31, 631 },
+		{ 32, 632 },
+		{ 33, 633 },
+		{ 36, 634 },
+		{ 41, 641 },
+		{ 51, 651 },
+		{ 61, 661 },
+		{ 71, 671 },
+		{ 101, 601 },
+		{ 104, 604 },
+		{ 106, 606 },
+		{ 109, 609 },
+		{ 146, 646 },
+		{ 181, 681 },
+		{ 111, 611 },
+		{ 112, 612 },
+		{ 115, 615 },
+		{ 116, 616 },
 
+		// ...
+	};
+	return m;
+}
+
+static const std::unordered_map<int, int>& RevMap()
+{
+	static const std::unordered_map<int, int> m = [] {
+		std::unordered_map<int, int> r;
+		r.reserve(FwdMap().size());
+		for (const auto& kv : FwdMap())
+			r.emplace(kv.second, kv.first);
+		return r;
+	}();
+	return m;
+}
+
+// 23 -> 623 (없으면 원본 그대로)
+static int ToMapped(int idx)
+{
+	const auto& m = FwdMap();
+	auto it = m.find(idx);
+
+	CString slog;
+	
+
+	if (it != m.end())
+	{
+		slog.Format("[RTS index] idx=%d  second=%d ", idx , it->second);
+		Output_DebugString(slog);
+		return  it->second;
+	}
+	else
+	{
+		slog.Format("[RTS index] idx=%d", idx);
+		Output_DebugString(slog);
+		return idx;
+	}
+		//return (it != m.end()) ? it->second : idx;
+}
+
+// 623 -> 23 (없으면 원본 그대로)
+static int ToOriginal(int idx)
+{
+	const auto& m = RevMap();
+	auto it = m.find(idx);
+	return (it != m.end()) ? it->second : idx;
+}
 
 /////////////////////////////////////////////////////////////////////////////
 // CGridWnd
@@ -6720,61 +6795,61 @@ CString SplitString(CString &strData, CString strToken)
 	return sResult;
 }
 
-void CGridWnd::SettingGridHeaderName(int index)
-{
-	const struct _symbol
-	{
-		UINT stid1;
-		char *symb1;
-		UINT stid2;
-		char *symb2;
-	} chksym[] = {
-	    {IDS_GH_CURR, "2023", IDS_GH_ANTIPRC, "2111"},
-	    {IDS_GH_DIFF, "2024", IDS_GH_DIFF, "2115"},
-	    {IDS_GH_RATE, "2033", IDS_GH_RATE, "2116"},
-	    {IDS_GH_VOL, "2027", IDS_GH_ANTIVOL, "2112"},
-	};
-
-	const int chksymC = sizeof(chksym) / sizeof(_symbol);
-
-	if (index == 1)
-	{
-		_gridHdr xgridHdr{};
-		for (int ii = 0; ii < chksymC; ii++)
-		{
-			for (int jj = colCURR; jj < m_gridHdrX.GetSize(); jj++)
-			{
-				xgridHdr = m_gridHdrX.GetAt(jj);
-				if (atoi(xgridHdr.symbol) != atoi(chksym[ii].symb1))
-					continue;
-
-				xgridHdr.stid = chksym[ii].stid2;
-				m_gridHdrX.SetAt(jj, xgridHdr);
-			}
-		}
-		for (int jj = 0; jj < m_gridHdrX.GetSize(); jj++)
-		{
-			xgridHdr = m_gridHdrX.GetAt(jj);
-		}
-	}
-	else
-	{
-		_gridHdr xgridHdr{};
-		for (int ii = 0; ii < chksymC; ii++)
-		{
-			for (int jj = colCURR; jj < m_gridHdrX.GetSize(); jj++)
-			{
-				xgridHdr = m_gridHdrX.GetAt(jj);
-				if (atoi(xgridHdr.symbol) != atoi(chksym[ii].symb2))
-					continue;
-
-				xgridHdr.stid = chksym[ii].stid1;
-				m_gridHdrX.SetAt(jj, xgridHdr);
-				break;
-			}
-		}
-	}
-}
+//void CGridWnd::SettingGridHeaderName(int index)
+//{
+//	const struct _symbol
+//	{
+//		UINT stid1;
+//		char *symb1;
+//		UINT stid2;
+//		char *symb2;
+//	} chksym[] = {
+//	    {IDS_GH_CURR, "2023", IDS_GH_ANTIPRC, "2111"},
+//	    {IDS_GH_DIFF, "2024", IDS_GH_DIFF, "2115"},
+//	    {IDS_GH_RATE, "2033", IDS_GH_RATE, "2116"},
+//	    {IDS_GH_VOL, "2027", IDS_GH_ANTIVOL, "2112"},
+//	};
+//
+//	const int chksymC = sizeof(chksym) / sizeof(_symbol);
+//
+//	if (index == 1)
+//	{
+//		_gridHdr xgridHdr{};
+//		for (int ii = 0; ii < chksymC; ii++)
+//		{
+//			for (int jj = colCURR; jj < m_gridHdrX.GetSize(); jj++)
+//			{
+//				xgridHdr = m_gridHdrX.GetAt(jj);
+//				if (atoi(xgridHdr.symbol) != atoi(chksym[ii].symb1))
+//					continue;
+//
+//				xgridHdr.stid = chksym[ii].stid2;
+//				m_gridHdrX.SetAt(jj, xgridHdr);
+//			}
+//		}
+//		for (int jj = 0; jj < m_gridHdrX.GetSize(); jj++)
+//		{
+//			xgridHdr = m_gridHdrX.GetAt(jj);
+//		}
+//	}
+//	else
+//	{
+//		_gridHdr xgridHdr{};
+//		for (int ii = 0; ii < chksymC; ii++)
+//		{
+//			for (int jj = colCURR; jj < m_gridHdrX.GetSize(); jj++)
+//			{
+//				xgridHdr = m_gridHdrX.GetAt(jj);
+//				if (atoi(xgridHdr.symbol) != atoi(chksym[ii].symb2))
+//					continue;
+//
+//				xgridHdr.stid = chksym[ii].stid1;
+//				m_gridHdrX.SetAt(jj, xgridHdr);
+//				break;
+//			}
+//		}
+//	}
+//}
 
 
 CString CGridWnd::getABRdata(const char *pcurr, CString strCode, CString strsym)
@@ -8956,12 +9031,18 @@ void CGridWnd::parsingAlertx(LPARAM lParam)
 
 	const DWORD *data = (const DWORD *)alertR->ptr[0];
 	const auto getDataPtr = [&](int idx) -> LPCSTR {
-		return data[idx] ? reinterpret_cast<LPCSTR>(data[idx]) : nullptr;
+		//return data[idx] ? reinterpret_cast<LPCSTR>(data[idx]) : nullptr;
+		const int real = ToMapped(idx);   // 23 -> 623 (매핑 없는 값은 그대로)
+		return data[real] ? reinterpret_cast<LPCSTR>(data[real]) : nullptr;
 	};
 	const auto getDataString = [&](int idx) -> CString {
-		if (const LPCSTR ptr = getDataPtr(idx))
+		const int real = ToMapped(idx);
+		if (const LPCSTR ptr = getDataPtr(real))
 			return CString(ptr);
-		return CString();	
+		return CString();
+	/*	if (const LPCSTR ptr = getDataPtr(idx))
+			return CString(ptr);
+		return CString();	*/
 	};
 	const auto isZeroLike = [](const CString& value, bool includeThirty = false) -> bool {
 		CString trimmed(value);

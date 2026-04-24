@@ -15,6 +15,8 @@ static char THIS_FILE[] = __FILE__;
 /////////////////////////////////////////////////////////////////////////////
 // CManageInfo dialog
 #define	TM_SLIDE	100
+#define TM_JUSTHIDE 101
+#define TMI_AUTOHIDE    3000 
 #define	TMI_SLIDE	100
 #define	SLIDEGAP	10
 #define	GAPX		4
@@ -97,6 +99,8 @@ long CManageInfo::OnMessage(WPARAM wParam, LPARAM lParam)
 
 void CManageInfo::OnDestroy() 
 {
+	KillTimer(TM_SLIDE);
+	KillTimer(TM_JUSTHIDE);
 	CDialog::OnDestroy();	
 	m_font.DeleteObject();
 }
@@ -106,6 +110,12 @@ void CManageInfo::OnTimer(UINT nIDEvent)
 	switch (nIDEvent)
 	{
 	case TM_SLIDE:	Slide();break;
+	case TM_JUSTHIDE:
+	{
+		KillTimer(TM_JUSTHIDE);
+		ShowWindow(SW_HIDE);
+	}
+	break;
 	default:		break;
 	}
 	CDialog::OnTimer(nIDEvent);
@@ -164,7 +174,16 @@ void CManageInfo::HideSlide()
 			}
 	}).detach();
 #else
-	SetTimer(TM_SLIDE, TMI_SLIDE, NULL);
+	if (1)
+	{
+		KillTimer(TM_SLIDE);
+		KillTimer(TM_JUSTHIDE);
+		// 일정 시간 뒤에 한 번만 울리는 타이머
+		SetTimer(TM_JUSTHIDE, TMI_AUTOHIDE, NULL);
+	}
+	else
+		SetTimer(TM_SLIDE, TMI_SLIDE, NULL);
+
 #endif
 }
 

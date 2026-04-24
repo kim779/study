@@ -1819,6 +1819,7 @@ public:
 	void MigrateMng(LPCTSTR file, int oldVersion);
 
 	//계좌번호 암호화
+	void AccEncrypt();
 	void EncryptIniFile(const CString& iniPath, const std::vector<BYTE>& enkey);
 	std::pair<int, int> EncryptAllUserIni(const CString& rootPath);
 	std::pair<int, int> DecryptAllUserIni(const CString& rootPath);

@@ -1007,6 +1007,20 @@ LONG CMainWnd::OnUser(WPARAM wParam, LPARAM lParam)
 			const DWORD* data = reinterpret_cast<const DWORD*>(alertR->ptr[0]);
 			if (data == nullptr)
 				return 0;
+			//test
+			CString stmp;
+			stmp.Format("%s", (char*)data[0]);
+			stmp.TrimRight();
+			if (stmp != "w")
+				return 0;
+
+			stmp.Format("[RTS] 23=[%s] 24=[%s] 27=[%s] 28=[%s] 29=[%s] 30=[%s] 31=[%s] 32=[%s] 33=[%s] 36=[%s] 41=[%s] 61=[%s] 101=[%s] 104=[%s] 106=[%s] 109=[%s] 146=[%s] 181=[%s]",
+			(char*)data[623], (char*)data[624], (char*)data[627], (char*)data[628], (char*)data[629], (char*)data[630], (char*)data[631], (char*)data[632], (char*)data[633], (char*)data[636], (char*)data[641], (char*)data[661],
+				(char*)data[601], (char*)data[604], (char*)data[606], (char*)data[609], (char*)data[646], (char*)data[681]);
+			Output_DebugString(stmp);
+
+
+			//test
 			COleDateTime oTime;
 			oTime = COleDateTime::GetCurrentTime();
 			CString strCurTime;
@@ -1038,14 +1052,14 @@ LONG CMainWnd::OnUser(WPARAM wParam, LPARAM lParam)
 			}
 			else
 			{
-				static constexpr int arr[] = { 41, 61, 101, 104, 106, 107, 109, 146, 181 };
+	/*			static constexpr int arr[] = { 41, 61, 101, 104, 106, 107, 109, 146, 181 };
 				auto& rmap = m_pGroupWnd->getRSymbol();
 				const bool bHoga = std::any_of(std::begin(arr), std::end(arr), [&rmap](const int symbol) {
 					return rmap.find(symbol) != rmap.end();
 					});
 
 				if (bHoga == false && !(alertR->stat & alert_SCR))
-					return 0;
+					return 0;*/
 
 				m_pGroupWnd->initAlert();
 				AxStd::async([this, lParam]() {
