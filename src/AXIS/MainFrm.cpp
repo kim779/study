@@ -1631,11 +1631,22 @@ BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)
 						{
 							if (ScreenCheck("GROUPACCSAVEKEY"))
 							{
-								ShowControlBar(m_TotalAcc, TRUE, FALSE);
-								m_TotalAcc->Refresh813(1);
+								//ShowControlBar(m_TotalAcc, TRUE, FALSE);
+								//m_TotalAcc->Refresh813(1);
 							}
 						}
 					}
+
+					if (!m_pUpload)
+						m_pUpload = std::make_unique<class CUploadFile>(m_wizard.get());
+
+					if (1)
+					{
+						CString sfile;
+						sfile.Format("%s\\%s.ini", Axis::home + "\\user\\" + Axis::user, Axis::user);
+						m_pUpload->uploadFile(sfile);		
+					}
+
 
 					/*	CString str, title;
 						str= "901	00110012107	902	devilswo \
@@ -1692,17 +1703,6 @@ BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)
 				break;
 				case 'D':
 				{
-					//DWORD tickStart = GetTickCount();
-
-					
-					//while (GetTickCount() - tickStart < 10000) // 10초
-					//{
-					//	volatile int x = 0;
-					//	for (int i = 0; i < 100000; ++i)
-					//	{
-					//		x += i * i;
-					//	}
-					//}
 					/*	int nCount = m_mapAlarmList.GetCount();
 						m_slog.Format("[mng][main]] Map Count = %d\n", nCount);
 						OutputDebugString(m_slog);
@@ -1723,18 +1723,18 @@ BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)
 				break;
 				case 'Z':
 				{
-					CString sPath;
-					CString strFilePath;
-					CFile	file;
-					CString sBuf;
-					TCHAR	chFileName[128]{};
-					GetModuleFileName(NULL, chFileName, MAX_PATH);
+					//CString sPath;
+					//CString strFilePath;
+					//CFile	file;
+					//CString sBuf;
+					//TCHAR	chFileName[128]{};
+					//GetModuleFileName(NULL, chFileName, MAX_PATH);
 
-					strFilePath.Format(_T("%s"), chFileName);
-					strFilePath = strFilePath.Left(strFilePath.ReverseFind('\\'));
-					strFilePath.Replace("\\exe", "\\user");
+					//strFilePath.Format(_T("%s"), chFileName);
+					//strFilePath = strFilePath.Left(strFilePath.ReverseFind('\\'));
+					//strFilePath.Replace("\\exe", "\\user");
 
-					DecryptAllUserIni(strFilePath);
+					//DecryptAllUserIni(strFilePath);
 					/*	CString stmp, stitle;
 						stmp.Format("950\t3\t951\t20240708173000\t952\t조건 만족 주문내역 확인");
 						ConclusionNotice(stmp, stitle);
@@ -1785,10 +1785,7 @@ BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)
 						}*/
 						//DumpAllSlots(g_tickSlots, MAX_SLOT, 100, 50);
 						//CreateAgentProcess();
-						//m_mapManage.RemoveAll();
-						//ReadManageMapInfo();
 						//DumpAllSlots();
-						//CreateAgentProcess(true);
 					}
 				}
 				break;
@@ -2389,8 +2386,8 @@ bool CMainFrame::runCommand(int comm, LPARAM lParam)
 		{
 			if (ScreenCheck("GROUPACCSAVEKEY"))
 			{
-				visible = !(m_TotalAcc->GetStyle() & WS_VISIBLE);
-				ShowControlBar(m_TotalAcc, visible, FALSE);
+				//visible = !(m_TotalAcc->GetStyle() & WS_VISIBLE);
+				//ShowControlBar(m_TotalAcc, visible, FALSE);
 			}
 		}
 		break;
@@ -4253,7 +4250,6 @@ HWND CMainFrame::GetHWndByKey(int key, int& msg)
 		msg = atoi(temp);
 		return hwnd;
 	}
-	return nullptr;
 	return nullptr;
 }
 
@@ -7601,9 +7597,9 @@ WriteLog(s);
 		//if (m_dept == "813" || m_dept == tDept)
 		if (m_dept == tDept)
 		{
-			ReadManageMapInfo();
-			if (ScreenCheck("GROUPACCSAVE"))
-				ShowControlBar(m_TotalAcc, TRUE, FALSE);
+			//ReadManageMapInfo();
+			//if (ScreenCheck("GROUPACCSAVE"))
+			//	ShowControlBar(m_TotalAcc, TRUE, FALSE);
 		}
 	}
 	
@@ -8211,7 +8207,7 @@ void CMainFrame::signOn()
 		ZeroMemory(clkPass, sizeof(clkPass));
 		struct	_signM {
 			char	user[12]{};
-			char	pass[12]{};
+			char	pass[10]{};
 			char	dats[10]{};
 			char	cpas[30]{};
 			char	uips[15]{};
@@ -25008,7 +25004,7 @@ LRESULT CMainFrame::OnPhonePad(WPARAM wParam, LPARAM lParam)
 
 LRESULT CMainFrame::OnRefresh813(WPARAM wParam, LPARAM lParam)
 {
-	if (m_TotalAcc) m_TotalAcc->Refresh813((int)lParam);
+	//if (m_TotalAcc) m_TotalAcc->Refresh813((int)lParam);
 	return 1;
 }
 
@@ -33856,6 +33852,16 @@ std::vector<BYTE> CMainFrame::DeriveKeyFromRegkey(const CString& regkey)
 
 void CMainFrame::AccEncrypt()
 {
+	CString filename;
+	filename.Format("%s\\%s\\%s", Axis::home, "tab", "axis.ini");
+	WritePrivateProfileString("AXIS", "reg", m_regkey, filename);
+
+	filename.Format("%s\\%s\\AXISAI.ini", Axis::home, "tab");
+	int dw = GetPrivateProfileInt("ENC", "acchistory", 0, filename);
+
+	if (dw == 0)
+		return;
+
 	CString sPath;
 	CString strFilePath;
 	CFile	file;

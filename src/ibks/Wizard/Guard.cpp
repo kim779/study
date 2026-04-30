@@ -2911,7 +2911,7 @@ OutputDebugString(m_slog);
 		axisH->auxs |= mask_NXT_MARKET;
 
 CString stmp{}, sval{};
-hex_OUT((char*)axisH, stmp, sval, sizeof(struct	_axisH));
+//hex_OUT((char*)axisH, stmp, sval, sizeof(struct	_axisH));
 m_slog.Format("\r\n[WIZARD][TCP][DLL][%s]<%d> len =[%d] axisH=[%s]", __FUNCTION__, __LINE__,  nBytes, stmp);
 OutputDebugString(m_slog);
 
@@ -3016,16 +3016,16 @@ BOOL CGuard::Login(int mode, char* datB, int datL, bool xecure)
 	CopyMemory(axisH->datL, (char *)text.operator LPCTSTR(), sizeof(axisH->datL));
 
 CString shex{}, sval{};
-hex_OUT((char*)axisH, shex, sval, sizeof(struct	_axisH));
+//hex_OUT((char*)axisH, shex, sval, sizeof(struct	_axisH));
 m_slog.Format("\r\n [axwizard][Login][%s]<%d> <<<<<trN=[%s] axisH=[%s] >>>>>", __FUNCTION__, __LINE__, trN, shex);
 OutputDebugString(m_slog);
 
-hex_OUT((char*)axisH, shex, sval, sizeof(struct	_axisH),  11);
+//hex_OUT((char*)axisH, shex, sval, sizeof(struct	_axisH),  11);
 m_slog.Format("\r\n [axwizard][Login][%s]<%d> <<<<<sval=[%s] >>>>>", __FUNCTION__, __LINE__, sval);
 OutputDebugString(m_slog);
 
 
-hex_OUT(&sendB[L_axisH], shex, sval, datL);
+//hex_OUT(&sendB[L_axisH], shex, sval, datL);
 m_slog.Format("\r\n [axwizard][Login][%s]<%d> <<<<<sendB = [%s]>>>>>", __FUNCTION__, __LINE__, sval);
 OutputDebugString(m_slog);
 

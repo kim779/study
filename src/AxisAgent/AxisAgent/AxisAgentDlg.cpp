@@ -1342,6 +1342,142 @@ void CAxisAgentDlg::WriteMonitorLog(const char* msg)
 }
 
 // 덤프 생성
+//void CAxisAgentDlg::CreateDump(const char* reason)
+//{
+//	if (m_dumpCount >= MAX_DUMP_COUNT)
+//	{
+//		WriteMonitorLog("[D0] dump skipped: max dump count reached");
+//		return;
+//	}
+//
+//	const ULONGLONG nowTick = GetTickCount64();
+//	if (m_lastDumpTick != 0 && (nowTick - m_lastDumpTick) < DUMP_INTERVAL_MS)
+//	{
+//		char skipMsg[256] = { 0 };
+//		sprintf_s(skipMsg,
+//			"[D0] dump skipped: interval not reached diff=%llu",
+//			(nowTick - m_lastDumpTick));
+//		WriteMonitorLog(skipMsg);
+//		return;
+//	}
+//
+//	const int seq = ++m_dumpSeq;
+//
+//	SYSTEMTIME st;
+//	GetLocalTime(&st);
+//
+//	char selfPath[MAX_PATH] = { 0 };
+//	GetModuleFileNameA(NULL, selfPath, MAX_PATH);
+//	char* lastSlash = strrchr(selfPath, '\\');
+//	if (lastSlash) *lastSlash = '\0';
+//
+//	char dumpDir[MAX_PATH] = { 0 };
+//	sprintf_s(dumpDir, "%s\\ping", selfPath);
+//	CreateDirectoryA(dumpDir, NULL);
+//
+//	char dumpPath[MAX_PATH] = { 0 };
+//	sprintf_s(dumpPath,
+//		"%s\\dump_%04d%02d%02d_%02d%02d%02d_%03d_pid%lu_seq%02d.dmp",
+//		dumpDir,
+//		st.wYear, st.wMonth, st.wDay,
+//		st.wHour, st.wMinute, st.wSecond, st.wMilliseconds,
+//		m_parentPid,
+//		seq);
+//
+//	char logMsg[1024] = { 0 };
+//	sprintf_s(logMsg,
+//		"[D1] dump start seq=%d reason=%s path=%s pid=%lu",
+//		seq,
+//		reason ? reason : "(null)",
+//		dumpPath,
+//		m_parentPid);
+//	WriteMonitorLog(logMsg);
+//
+//	DWORD access =
+//		PROCESS_QUERY_INFORMATION |
+//		PROCESS_VM_READ |
+//		PROCESS_DUP_HANDLE |
+//		SYNCHRONIZE;
+//
+//	HANDLE hProcess = OpenProcess(access, FALSE, m_parentPid);
+//	if (!hProcess)
+//	{
+//		sprintf_s(logMsg, "[D2] seq=%d OpenProcess fail err=%lu", seq, GetLastError());
+//		WriteMonitorLog(logMsg);
+//		return;
+//	}
+//
+//	if (WaitForSingleObject(hProcess, 0) == WAIT_OBJECT_0)
+//	{
+//		sprintf_s(logMsg, "[D3] seq=%d target already exited", seq);
+//		WriteMonitorLog(logMsg);
+//		CloseHandle(hProcess);
+//		return;
+//	}
+//
+//	HANDLE hFile = CreateFileA(
+//		dumpPath,
+//		GENERIC_WRITE,
+//		0,
+//		NULL,
+//		CREATE_ALWAYS,
+//		FILE_ATTRIBUTE_NORMAL,
+//		NULL);
+//
+//	if (hFile == INVALID_HANDLE_VALUE)
+//	{
+//		sprintf_s(logMsg, "[D4] seq=%d CreateFile fail err=%lu", seq, GetLastError());
+//		WriteMonitorLog(logMsg);
+//		CloseHandle(hProcess);
+//		return;
+//	}
+//
+//	MINIDUMP_EXCEPTION_INFORMATION* pExInfo = NULL;
+//
+//	SetLastError(0);
+//
+//	BOOL bOk = MiniDumpWriteDump(
+//		hProcess,
+//		m_parentPid,
+//		hFile,
+//		MiniDumpNormal,
+//		pExInfo,
+//		NULL,
+//		NULL);
+//
+//	DWORD dwErr = GetLastError();
+//
+//	FlushFileBuffers(hFile);
+//
+//	LARGE_INTEGER fileSize = {};
+//	GetFileSizeEx(hFile, &fileSize);
+//
+//	CloseHandle(hFile);
+//	CloseHandle(hProcess);
+//
+//	sprintf_s(logMsg,
+//		"[D5] seq=%d MiniDumpWriteDump ok=%d err=%lu size=%lld",
+//		seq, (int)bOk, dwErr, fileSize.QuadPart);
+//	WriteMonitorLog(logMsg);
+//
+//	if (bOk && fileSize.QuadPart > 0)
+//	{
+//		m_dumpCount++;
+//		m_lastDumpTick = nowTick;
+//
+//		sprintf_s(logMsg,
+//			"[D6] dump success seq=%d count=%d",
+//			seq, m_dumpCount);
+//		WriteMonitorLog(logMsg);
+//
+//		AnalyzeDump(dumpPath);
+//	}
+//	else
+//	{
+//		sprintf_s(logMsg, "[D7] dump failed seq=%d", seq);
+//		WriteMonitorLog(logMsg);
+//	}
+//}
 void CAxisAgentDlg::CreateDump(const char* reason)
 {
 	if (m_dumpCount >= MAX_DUMP_COUNT)
@@ -1349,7 +1485,6 @@ void CAxisAgentDlg::CreateDump(const char* reason)
 		WriteMonitorLog("[D0] dump skipped: max dump count reached");
 		return;
 	}
-
 	const ULONGLONG nowTick = GetTickCount64();
 	if (m_lastDumpTick != 0 && (nowTick - m_lastDumpTick) < DUMP_INTERVAL_MS)
 	{
@@ -1360,21 +1495,16 @@ void CAxisAgentDlg::CreateDump(const char* reason)
 		WriteMonitorLog(skipMsg);
 		return;
 	}
-
 	const int seq = ++m_dumpSeq;
-
 	SYSTEMTIME st;
 	GetLocalTime(&st);
-
 	char selfPath[MAX_PATH] = { 0 };
 	GetModuleFileNameA(NULL, selfPath, MAX_PATH);
 	char* lastSlash = strrchr(selfPath, '\\');
 	if (lastSlash) *lastSlash = '\0';
-
 	char dumpDir[MAX_PATH] = { 0 };
 	sprintf_s(dumpDir, "%s\\ping", selfPath);
 	CreateDirectoryA(dumpDir, NULL);
-
 	char dumpPath[MAX_PATH] = { 0 };
 	sprintf_s(dumpPath,
 		"%s\\dump_%04d%02d%02d_%02d%02d%02d_%03d_pid%lu_seq%02d.dmp",
@@ -1384,7 +1514,11 @@ void CAxisAgentDlg::CreateDump(const char* reason)
 		m_parentPid,
 		seq);
 
+	// =============================================
+	//  추가: logMsg 를 여기서 미리 선언 (이후 전체에서 재사용)
+	// =============================================
 	char logMsg[1024] = { 0 };
+
 	sprintf_s(logMsg,
 		"[D1] dump start seq=%d reason=%s path=%s pid=%lu",
 		seq,
@@ -1392,6 +1526,35 @@ void CAxisAgentDlg::CreateDump(const char* reason)
 		dumpPath,
 		m_parentPid);
 	WriteMonitorLog(logMsg);
+
+	// =============================================
+	//  추가: SeDebugPrivilege 활성화
+	//    다른 PC에서 권한이 없어 덤프 크기 0 되는 주요 원인
+	// =============================================
+	HANDLE hToken = NULL;
+	if (OpenProcessToken(GetCurrentProcess(), TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY, &hToken))
+	{
+		TOKEN_PRIVILEGES tp = {};
+		if (LookupPrivilegeValueA(NULL, "SeDebugPrivilege", &tp.Privileges[0].Luid))
+		{
+			tp.PrivilegeCount = 1;
+			tp.Privileges[0].Attributes = SE_PRIVILEGE_ENABLED;
+			AdjustTokenPrivileges(hToken, FALSE, &tp, sizeof(tp), NULL, NULL);
+			sprintf_s(logMsg, "[D1-P] SeDebugPrivilege adjust err=%lu", GetLastError());
+			WriteMonitorLog(logMsg);
+		}
+		else
+		{
+			sprintf_s(logMsg, "[D1-P] LookupPrivilegeValue fail err=%lu", GetLastError());
+			WriteMonitorLog(logMsg);
+		}
+		CloseHandle(hToken);
+	}
+	else
+	{
+		sprintf_s(logMsg, "[D1-P] OpenProcessToken fail err=%lu", GetLastError());
+		WriteMonitorLog(logMsg);
+	}
 
 	DWORD access =
 		PROCESS_QUERY_INFORMATION |
@@ -1402,9 +1565,21 @@ void CAxisAgentDlg::CreateDump(const char* reason)
 	HANDLE hProcess = OpenProcess(access, FALSE, m_parentPid);
 	if (!hProcess)
 	{
-		sprintf_s(logMsg, "[D2] seq=%d OpenProcess fail err=%lu", seq, GetLastError());
+		// =============================================
+		// 추가: 실패 시 PROCESS_ALL_ACCESS 로 재시도
+		// =============================================
+		sprintf_s(logMsg, "[D2] seq=%d OpenProcess(limited) fail err=%lu, retrying ALL_ACCESS", seq, GetLastError());
 		WriteMonitorLog(logMsg);
-		return;
+
+		hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, m_parentPid);
+		if (!hProcess)
+		{
+			sprintf_s(logMsg, "[D2] seq=%d OpenProcess(ALL_ACCESS) fail err=%lu", seq, GetLastError());
+			WriteMonitorLog(logMsg);
+			return;
+		}
+		sprintf_s(logMsg, "[D2] seq=%d OpenProcess(ALL_ACCESS) success", seq);
+		WriteMonitorLog(logMsg);
 	}
 
 	if (WaitForSingleObject(hProcess, 0) == WAIT_OBJECT_0)
@@ -1423,7 +1598,6 @@ void CAxisAgentDlg::CreateDump(const char* reason)
 		CREATE_ALWAYS,
 		FILE_ATTRIBUTE_NORMAL,
 		NULL);
-
 	if (hFile == INVALID_HANDLE_VALUE)
 	{
 		sprintf_s(logMsg, "[D4] seq=%d CreateFile fail err=%lu", seq, GetLastError());
@@ -1432,44 +1606,60 @@ void CAxisAgentDlg::CreateDump(const char* reason)
 		return;
 	}
 
-	MINIDUMP_EXCEPTION_INFORMATION* pExInfo = NULL;
+	// =============================================
+	//  변경: MiniDumpNormal → 추가 플래그 포함
+	//    WithHandleData, WithThreadInfo 추가
+	// =============================================
+	MINIDUMP_TYPE dumpType = (MINIDUMP_TYPE)(
+		MiniDumpNormal |
+		MiniDumpWithHandleData |
+		MiniDumpWithThreadInfo
+		);
 
 	SetLastError(0);
-
 	BOOL bOk = MiniDumpWriteDump(
 		hProcess,
 		m_parentPid,
 		hFile,
-		MiniDumpNormal,
-		pExInfo,
+		dumpType,		// ← 기존: MiniDumpNormal
+		NULL,
 		NULL,
 		NULL);
 
 	DWORD dwErr = GetLastError();
 
+	// =============================================
+	//  추가: 실패 시 에러코드 hex 로 즉시 로그
+	// =============================================
+	if (!bOk)
+	{
+		sprintf_s(logMsg, "[D5-FAIL] seq=%d MiniDumpWriteDump failed err=%lu(0x%08lX)", seq, dwErr, dwErr);
+		WriteMonitorLog(logMsg);
+	}
+
 	FlushFileBuffers(hFile);
 
 	LARGE_INTEGER fileSize = {};
 	GetFileSizeEx(hFile, &fileSize);
-
 	CloseHandle(hFile);
 	CloseHandle(hProcess);
 
+	// =============================================
+	//  변경: err 를 hex 병기로 출력 (에러 원인 파악 용이)
+	// =============================================
 	sprintf_s(logMsg,
-		"[D5] seq=%d MiniDumpWriteDump ok=%d err=%lu size=%lld",
-		seq, (int)bOk, dwErr, fileSize.QuadPart);
+		"[D5] seq=%d MiniDumpWriteDump ok=%d err=%lu(0x%08lX) size=%lld",
+		seq, (int)bOk, dwErr, dwErr, fileSize.QuadPart);
 	WriteMonitorLog(logMsg);
 
 	if (bOk && fileSize.QuadPart > 0)
 	{
 		m_dumpCount++;
 		m_lastDumpTick = nowTick;
-
 		sprintf_s(logMsg,
 			"[D6] dump success seq=%d count=%d",
 			seq, m_dumpCount);
 		WriteMonitorLog(logMsg);
-
 		AnalyzeDump(dumpPath);
 	}
 	else

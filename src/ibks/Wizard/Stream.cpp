@@ -1475,7 +1475,7 @@ void CStream::MakeStream(CScreen* screen, CString trx, int market)   //modi nxt
 		axisH->auxs |= mask_NXT_MARKET;
 
 	CString stmp{}, sval{};
-	hex_OUT((char*)axisH, stmp, sval, sizeof(struct	_axisH));
+	//hex_OUT((char*)axisH, stmp, sval, sizeof(struct	_axisH));
 	m_slog.Format("[WIZARD][TCP][map][%s] mapn[%s] trx=[%s] axisH=[%s]", __FUNCTION__,
 		CString(screen->m_mapH->mapN, L_MAPN), trx, stmp);
 	OutputDebugString(m_slog);

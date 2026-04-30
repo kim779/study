@@ -6312,6 +6312,9 @@ CString CAccountCtrl::ReadAccountHistory(const CString& strUserPath, const CStri
 	if (val.IsEmpty())
 		return val;
 
+	if (val.Find('|') >= 0)
+		return val;
+
 	// 암호화 여부 확인
 	char status[8] = {};
 	GetPrivateProfileStringA("ENCRYPT", "STATUS", "0", status, _countof(status), strUserPath);
