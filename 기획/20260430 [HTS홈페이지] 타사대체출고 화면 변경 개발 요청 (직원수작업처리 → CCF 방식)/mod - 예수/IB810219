@@ -1,0 +1,294 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB810219)
+MAPSIZE(262, 278)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("[8102] 타사대체출고")
+MAPPUBLIC(";")
+FONT("MS Sans Serif", 9, NORMAL)
+TITLE("[8102] 타사대체 예상출고 수수료")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("piboPBxQ")
+MAPTYPE(FIXED)
+HEADER(LEDGER)
+TRXH("11CSDPEQ074")
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL0(-3, 0, 287, 270)  LIMAGE(0)  LINEW(5)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL0(592, 40, 677, 60)  'In'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  irec(677, 40, 797, 60)  LEN(5)  IO_NUM|EDIT_INOUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("00001")          TABORDER(1)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL3(592, 59, 677, 79)  '계좌번호'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  AcntNo(677, 59, 797, 79)  LEN(20)  IO_NUM|EDIT_INOUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(2)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL5(592, 78, 677, 98)  '종목번호'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  IsuNo(677, 78, 797, 98)  LEN(12)  IO_MIXED|EDIT_INOUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(3)  IOORDER(3)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL10(592, 97, 677, 117)  '부호'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  sign(677, 97, 797, 117)  LEN(1)  IO_MIXED|EDIT_INOUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("+")          TABORDER(4)  IOORDER(4)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL11(592, 116, 677, 136)  '출고수량'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  orec(679, 183, 759, 203)  LEN(5)  IO_MIXED|AL_CENTER|    COLOR(192, 232)  CUR(0)  LINECOLOR(0)          TABORDER(0)  IOORDER(8)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL12(592, 183, 677, 203)  'OUT'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  SecoutCmsnAmt(679, 203, 806, 223)  LEN(16)  IO_NUM|AL_LEFT||FA_COMMA|FA_RIGHT|FA_CORGB|FA_CONTRAST|SA_COSUP|SA_TEXT    COLOR(192, 232)  CUR(0)  LINECOLOR(0)          TABORDER(0)  IOORDER(9)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL13(592, 203, 677, 223)  '출고수수료'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  SecoutQty(677, 116, 797, 136)  LEN(15)  IO_NUM|EDIT_INOUT|FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_WRAP|FA_XFLOAT|SA_ZERO    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(5)  IOORDER(5)  ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  GUIDE(593, 229, 1100, 253)  LINECOLOR(64)      COLOR(228, 130)  CUR(0)    AL_LEFT    ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_NONE)
+PANEL  PANEL1(10, 10, 280, 30)  '   선택하신 종목의 예상출고 수수료는'  LINECOLOR(181)      COLOR(16, 232)  CUR(0)    AL_LEFT  FONT("굴림체", 9, NORMAL)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+PANEL  FEE(10, 29, 280, 49)  LINECOLOR(181)      COLOR(16, 94)  CUR(0)    AL_LEFT  FONT("굴림체", 9, BOLD)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+PANEL  PANEL3(10, 48, 280, 68)  LINECOLOR(181)      COLOR(16, 232)  CUR(0)    AL_LEFT  FONT("굴림체", 9, NORMAL)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+PANEL  PANEL4(10, 67, 280, 87)  '※ 본 수수료는 예상 수수료로, 실제 출고 시'  LINECOLOR(181)      COLOR(16, 232)  CUR(0)    AL_LEFT  FONT("굴림체", 9, NORMAL)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+PANEL  PANEL5(10, 86, 280, 106)  '   차이가 있을 수 있습니다.'  LINECOLOR(181)      COLOR(16, 232)  CUR(0)    AL_LEFT  FONT("굴림체", 9, NORMAL)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+PANEL  PANEL6(10, 105, 280, 125)  '   출고 수수료가 부족 시 타사 대체처리가'  LINECOLOR(181)      COLOR(16, 232)  CUR(0)    AL_LEFT  FONT("굴림체", 9, NORMAL)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+PANEL  PANEL7(10, 124, 280, 144)  '   되지 않으니, 인출 가능금액을 확인하시기'  LINECOLOR(181)      COLOR(16, 232)  CUR(0)    AL_LEFT  FONT("굴림체", 9, NORMAL)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+PANEL  PANEL8(10, 143, 280, 163)  '   바랍니다.'  LINECOLOR(181)      COLOR(16, 232)  CUR(0)    AL_LEFT  FONT("굴림체", 9, NORMAL)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+PANEL  PANEL9(10, 162, 280, 182)  LINECOLOR(181)      COLOR(16, 232)  CUR(0)    AL_LEFT  FONT("굴림체", 9, NORMAL)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+PANEL  PANEL10(10, 181, 280, 201)  '※ 타사 대체출고 수수료 건당 2,000원'  LINECOLOR(181)      COLOR(16, 232)  CUR(0)    AL_LEFT  FONT("굴림체", 9, NORMAL)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+PANEL  PANEL11(10, 200, 280, 220)  '   공모주 입고주식 6개월 이내 건당 5,000원'  LINECOLOR(181)      COLOR(16, 232)  CUR(0)    AL_LEFT  FONT("굴림체", 9, NORMAL)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+PANEL  PANEL12(10, 219, 280, 239)  LINECOLOR(181)      COLOR(16, 232)  CUR(0)    AL_LEFT  FONT("굴림체", 9, NORMAL)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+PANEL  PANEL13(10, 238, 280, 258)  LINECOLOR(181)      COLOR(16, 232)  CUR(0)    AL_LEFT  FONT("굴림체", 9, NORMAL)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+PANEL  PANEL99(10, 10, 30, 30)    |IMAGE|AL_CENTER    COLOR(208, 232)  CUR(0)    "텍스트화살표_하단.BMP"  ENABLE  &
+  VISIBLE  TRANSPARENT  IMAGE  HINTTYPE(IH_NONE)
+BUTTON  confirm(103, 238, 187, 258)  '확 인'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, NORMAL)  COLOR(208, 186)  CUR(0)    "6btn.bmp"    TABORDER(6)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+BOX  LINE(32, 48, 176, 50)    COLOR(94, 94)  LINEW(1)  BX_LINE    ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL2(592, 135, 677, 155)  '채권매수일자'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  BuyDate(677, 135, 797, 155)  LEN(8)  IO_NUM|EDIT_INOUT|FA_XFLOAT    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(7)  IOORDER(6)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL4(592, 154, 677, 174)  '채권과세유형'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  TxontTp(677, 154, 797, 174)  LEN(1)  IO_NUM|EDIT_INOUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(8)  IOORDER(7)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL6(798, 154, 925, 174)  '1:종합과세, 2:분리과세'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+'********************************************************
+' 입력값이 숫자인지를 확인
+'********************************************************
+Function checkInptVal(inpt)
+	checkInptVal = False
+
+	Dim num
+	num = Trim(inpt)
+
+	If num = "" Then
+		Exit Function
+	End If
+
+	If IsNumeric(num) = False Then
+		Exit Function
+	End If
+
+	If CDbl(num) <= 0 Then
+		Exit Function
+	End If
+
+	Dim ii, char
+
+	For ii = 1 To Len(num)
+		char = Mid(num, ii, 1)
+
+		If AscW(char) < 48 Or AscW(char) > 57 Then
+			Exit Function
+		End If
+	Next
+
+	checkInptVal = True
+End Function
+
+Function IsValidAcc(accData)
+	Dim Prefix
+	IsValidAcc = False
+
+	If Len(AccData) < 3 Then
+		Exit Function
+	End If
+
+	Prefix = Left(accData, 3)
+
+	Select Case Prefix
+		Case "551","552","553","554","555","556","557","558","561","571"
+			IsValidAcc = True
+		Case Else
+			IsValidAcc = False
+	End Select
+
+	Dim slogh , slog
+	slogh = "[대체][" & SCREEN.GetMapName(0) & "] IsValidacc accData =" & accData
+	slog = slogh & "IsValid Acc = " & IsValidAcc
+	SYSTEM.Trace slog
+
+End Function
+
+Sub send_f()
+	'SCREEN.ClearAll 0, 0
+
+Dim slogh , slog
+slogh = "[대체][" & SCREEN.GetMapName(0) & "] send_f "
+slog = slogh & Trim(SCREEN.Object("parent.parent.CMB_ACCT").Data)
+SYSTEM.Trace  slog
+	If Len(Trim(SCREEN.Object("parent.parent.CMB_ACCT").Data)) <> 11 Then
+		Call alert_msg("출고계좌번호를 확인하여 주십시오.")
+		SCREEN.Object("parent.parent.CMB_ACCT").SetFocus
+		Exit Sub
+	End If
+
+slog = slogh & Trim(SCREEN.Object("parent.parent.zIsuNo").Data)
+SYSTEM.Trace  slog
+
+	If Trim(SCREEN.Object("parent.parent.zIsuNo").Data) = "" Then
+		Call alert_msg("유가잔고내역에서 종목을 선택하여 주십시오.")
+		Exit Sub
+	End If
+
+slog = slogh & Trim(SCREEN.Object("parent.parent.jmNm").Data)
+SYSTEM.Trace slog
+
+	If  Trim(SCREEN.Object("parent.parent.jmNm").Data) = "" Then
+		Call alert_msg("유가잔고내역에서 종목을 선택하여 주십시오.")
+		Exit Sub
+	End If
+
+slog = slogh & Trim(SCREEN.Object("parent.parent.zTrxQty").Data)
+SYSTEM.Trace slog
+
+	If checkInptVal(Trim(SCREEN.Object("parent.parent.zTrxQty").Data)) = False Then
+		Call alert_msg("대체수량을 확인하여 주십시오.")
+		SCREEN.Object("parent.parent.zTrxQty").SetFocus
+		Exit Sub
+	End If
+
+	AcntNo.Data = Trim(SCREEN.Object("parent.parent.CMB_ACCT").Data)
+	IsuNo.Data = Trim(SCREEN.Object("parent.parent.zIsuNo").Data)
+	SecoutQty.Data = Trim(SCREEN.Object("parent.parent.zTrxQty").Data)
+	BuyDate.Data = Trim(SCREEN.Object("parent.parent.zBuyDate").Data)
+	TxontTp.Data = Trim(SCREEN.Object("parent.parent.zTxontTp").Data)
+
+slog = slogh & BuyDate.Data
+SYSTEM.Trace  slog
+
+slog = slogh & TxontTp.Data
+SYSTEM.Trace  slog
+
+
+	LEDGER.Fkey = "C"
+	SCREEN.Send 0
+End Sub
+
+_AW_ONINDECLARE_AW_
+#Load IB888833
+#Load IB888888
+
+_AW_ONENDSUB_AW_
+_AW_ONSTART_AW_
+'If Len(Trim(AcntNo.Data)) <> 11 Then
+'	Call alert_msg("출고계좌번호를 확인하여 주십시오.")
+'	SCREEN.CloseWindow()
+'	Exit Sub
+'End If
+
+'If Trim(IsuNo.Data) = "" Then
+'	Call alert_msg("유가잔고내역에서 종목을 선택하여 주십시오.")
+'	SCREEN.CloseWindow()
+'	Exit Sub
+'End If
+
+'If Len(Trim(SecoutQty.Data)) = 0 Then
+'	Call alert_msg("대체수량을 확인하여 주십시오.")
+'	SCREEN.CloseWindow()
+'	Exit Sub
+'End If
+
+'Call send_f()
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+' 입력숫자
+irec.Data = "00001"
+
+' 부호
+sign.Data = "+"
+
+LINE.Visible = False
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+If Left(LEDGER.Ecod, 1) = "0" Then
+
+Dim slogh , slog
+slogh = "[대체][" & SCREEN.GetMapName(0) & "] "
+slog = slogh & "OnReceive SecoutCmsnAmt = " & SecoutCmsnAmt.Data
+SYSTEM.Trace slog
+
+	If CInt(Trim(SecoutCmsnAmt.Text)) < 0 Or CInt(Trim(SecoutCmsnAmt.Text)) = 0 Then
+		SCREEN.Proc "parent.send_f", ""
+	Else
+		If IsValidAcc(Trim(SCREEN.Object("parent.parent.CMB_ACCT").Data)) = False Then
+		'If IsValidAcc(Trim(SCREEN.Object("parent.parent.CMB_ACCT").Data)) = True Then
+			SCREEN.Proc "parent.send_f", ""
+		Else
+			SCREEN.Proc "parent.obj_SDPAQ066_Send",""
+		End If
+	End If
+Else
+	Call guide_msg(Trim(LEDGER.Emsg))
+	MsgBox Trim(LEDGER.Emsg)
+	SCREEN.CloseWindow()
+End If
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(confirm)
+_AW_ONCLICK_AW_
+SCREEN.CloseWindow()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

@@ -1,0 +1,322 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB810200)
+MAPSIZE(623, 835)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("거래내역")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+OPTIONS(ENCODE|CR2TAB)
+TITLE("[8102] 유가증권대체")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(NORM)
+HEADER(LEDGER)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL0(-2, 375, 837, 600)  LIMAGE(0)  LINEW(4)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  GUIDE1(-2, 599, 837, 623)  LIMAGE(1)  LINEW(3)  STRESS(0)  STRESSW(0)  LINETYPE(4)  LINECOLOR(64)      COLOR(34, 69)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL11(0, 623, 839, 626)        COLOR(64, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  HINTTYPE(IH_NONE)
+PANEL  PANEL63(-2, 0, 837, 376)  LIMAGE(0)  LINEW(4)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 232)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+BUTTON  send_btn(721, 229, 758, 249)  '조회'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, BOLD)  FOCUS  COLOR(208, 186)  CUR(0)    "조회btn.bmp"    TABORDER(1)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+BUTTON  print(684, 229, 720, 249)  '출력'  TP_PUSH|IMAGETEXT|AL_STRETCH        FOCUS  COLOR(208, 186)  CUR(0)    "2btn.bmp"    TABORDER(2)  &
+  IMAGETEXT  HINTTYPE(IH_NONE)
+OBJECT  obj0(175, 870, 295, 890)    "IB999910"  TABORDER(3)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+USRTAB  UTAB0(5, 5, 829, 31)  FOCUS  INDEX(0)  COUNT(3)  AL_TOP  TAB_IMAGE        COLOR(3, 70)  CUR(0)  TABIMAGE("tab.bmp")  FCOLOR(3, 71)  CAPTION("주식대체", "타사대체출고", "타사대체취소")  TABINFO("1:1", "1:2", "0:3")  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  OBJ1(6, 33, 830, 368)    "IB810250"  TABORDER(4)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  OBJ_cert(123, 749, 297, 784)    "IB810202"  TABORDER(5)  IOORDER(3)  ENABLE  &
+  HINTTYPE(IH_NONE)
+USRTAB  UTAB1(6, 383, 831, 409)  FOCUS  INDEX(0)  COUNT(4)  AL_TOP  TAB_IMAGE        COLOR(3, 70)  CUR(0)  TABIMAGE("tab.bmp")  FCOLOR(3, 71)  CAPTION("출고내역", "유가증권잔고", "주식출고가능수량", "타사대체신청내역")  TABINFO("1:1", "0:2", "0:3", "1:4")  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OBJECT  obj2(6, 409, 831, 592)    "IB810232"  TABORDER(6)  IOORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+PANEL  PANEL3(5, 604, 19, 618)    |IMAGE|AL_STRETCH    COLOR(208, 232)  CUR(0)    "알림_ic.bmp"  ENABLE  &
+  VISIBLE  TRANSPARENT  IMAGE  HINTTYPE(IH_NONE)
+PANEL  GUIDE(21, 599, 829, 623)        COLOR(228, 130)  CUR(0)    AL_LEFT    ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL0(19, 750, 108, 770)  'obj_cert'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  OBJ_acct(114, 717, 269, 743)    "IB810201"  TABORDER(7)  IOORDER(5)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  obj_acctLab(19, 720, 108, 740)  'obj_acct'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OBJECT  OBJ_cont(123, 791, 223, 811)    "IB810216"  TABORDER(8)  IOORDER(6)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL9(29, 793, 118, 813)  'obj_cont'  AL_LEFT  CUR(0)      COLOR(168, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  BUTTON0(794, 385, 830, 405)  '조회'  TP_PUSH|IMAGETEXT|AL_STRETCH      FONT("굴림체", 9, BOLD)  FOCUS  COLOR(208, 186)  CUR(0)    "조회BTN.BMP"    TABORDER(9)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Option Explicit
+
+Sub UTAB0_Change()
+	GUIDE.Text = ""
+
+	Select Case UTAB0.ID
+		Case 1
+		        OBJ1.SetObject ("IB810250")
+		        UTAB1.ID = 1
+
+		Case 2
+		        OBJ1.SetObject ("IB810260")
+		        UTAB1.ID = 4
+
+		Case 3
+				OBJ1.SetObject ("IB810270")
+
+		Case Else
+				UTAB0.ID = 1
+		        OBJ1.SetObject ("IB810250")
+	End Select
+
+	Call setTransferList()
+
+	SCREEN.Proc "obj_acct.mkAcnt", "out"
+End Sub
+
+'== 첫 조회
+Sub send_f()
+	LEDGER.Fkey = "C"
+	next_btn.Enable = False
+	SCREEN.Object("obj2.GRID0").clear
+	SCREEN.Object("obj2.zAcntNo").data = Trim(SCREEN.Object("OBJ1.zAcntNo").data)
+	SCREEN.Object("obj2.zPwd").data = Trim(SCREEN.Object("OBJ1.zPwd").Data)
+	SCREEN.Object("obj2.flag").text = "1"
+	obj2.send
+End Sub
+
+'== 연속 조회
+Sub send_c()
+	LEDGER.Fkey = "7"
+	SCREEN.Object("obj2.grid0").SetDataPosition(2)
+	obj2.send
+End Sub
+
+
+Sub contract()		'입고계좌 셋팅, 본인계좌 + 약정계좌
+	Dim ii, accnData, accnText, accnGubn, accnNm, items, tmpAcntGb, cnt, acnt
+	items = ""
+	cnt = 0
+	acnt = Trim(SCREEN.Object("OBJ1.CMB_ACCT").Data)
+
+	For ii = 1 To SCREEN.Object("OBJ_acct.GRID0").Rows
+		accnData = Trim(SCREEN.Object("OBJ_acct.GRID0").GetGridCell(ii, 9))
+
+		If Trim(accnData) = "" Then
+			Exit Sub
+		End If
+
+		tmpAcntGb = Mid(Trim(accnData), 4, 2)
+
+		If tmpAcntGb = "10" Then
+			accnGubn = "위탁    "
+		ElseIf tmpAcntGb = "11" Then
+			accnGubn = "ELW전용 "
+		ElseIf tmpAcntGb = "12" Then
+			accnGubn = "코넥스전용 "
+		ElseIf tmpAcntGb = "30" Then
+			accnGubn = "일반저축"
+		End If
+
+
+		If tmpAcntGb = "10" Or tmpAcntGb = "11"  Or tmpAcntGb = "12" Or tmpAcntGb = "30" Then
+			If Trim(accnData) <> Trim(acnt) And Trim(Left(accnData, 3)) = Trim(Left(acnt, 3)) And Trim(Right(accnData, 6)) = Trim(Right(acnt, 6))Then
+				If items = "" Then
+					items = accnData
+				End If
+
+				accnText = Trim(SCREEN.Object("OBJ_acct.GRID0").GetGridText(ii, 9))
+				accnNm = Trim(SCREEN.Object("OBJ_acct.GRID0").GetGridCell(ii, 10))
+
+				items = items & vbTab & accnData & accnText & "  " & accnGubn & "  " & accnNm
+			End If
+		End If
+	Next
+
+	For ii = 1 To SCREEN.Object("OBJ_cont.GRID0").Rows
+		If Trim(SCREEN.Object("OBJ_cont.GRID0").GetGridCell(ii, 1)) = "1101" Then
+			accnData = Trim(SCREEN.Object("OBJ_cont.GRID0").GetGridCell(ii, 5))
+			tmpAcntGb = Mid(Trim(accnData), 4, 2)
+			If InStr(items, accnData) < 1 Then
+				If Trim(tmpAcntGb) = "10" Or Trim(tmpAcntGb) = "11" Or Trim(tmpAcntGb) = "12" Or Trim(tmpAcntGb) = "30" Then
+					accnText = Trim(SCREEN.Object("OBJ_cont.GRID0").GetGridText(ii, 5))
+					accnNm = Trim(SCREEN.Object("OBJ_cont.GRID0").GetGridCell(ii, 6))
+
+					If tmpAcntGb = "10" Then
+						accnGubn = "위탁   "
+					ElseIf tmpAcntGb = "11" Then
+						accnGubn = "ELW전용"
+					ElseIf tmpAcntGb = "12" Then
+						accnGubn = "코넥스전용"
+					ElseIf tmpAcntGb = "30" Then
+						accnGubn = "일반저축"
+					End If
+
+					If items = "" Then
+						items = accnData
+					End If
+
+					items = items & vbTab & accnData & accnText & "  " & accnGubn & "  " & accnNm
+				End If
+			End If
+		End If
+	Next
+
+	SCREEN.Object("OBJ1.CMB_ACCT2").SetItems(items)
+	SCREEN.Proc "OBJ1.acct2_set", ""
+End Sub
+
+Sub chk_echCont(accnt)
+	Dim str
+
+	For ii = 1 To SCREEN.Object("OBJ_cont.GRID0").rows
+		str = Trim(SCREEN.Object("OBJ_cont.grid0").getGridText(ii, 3))
+		If str = accnt Then
+			SCREEN.Object("OBJ1.cont").text = "true"
+			Exit Sub
+		End If
+	Next
+End Sub
+
+Sub setTransferList()
+	If UTAB1.ID = 1 Then
+		obj2.SetObject "IB810232"
+	Else
+		obj2.SetObject "IB810262"
+	End If
+
+	If Trim(SCREEN.Object("obj1.isPwdConfirm").Text) = "Y" Then
+	'	If UTAB1.ID = 1 Then
+		SCREEN.Proc "obj2.send_f", ""
+	'	End If
+	End If
+End Sub
+
+
+
+'--------------------------------------------------------- 팝업 창 띄우기
+'Sub popup()
+'	Dim Today, nToday, ch , gubn
+'		nToday = Date
+'
+'	If SCREEN.CreateObject("Info") Then
+'
+'    	Today = INFO.PopData("", "NOTICECOOKIE.ini", "8101", "TODAY")
+'    	ch = INFO.PopData("", "NOTICECOOKIE.ini", "8101", "END")
+'
+'		If Today = "" Then
+'		   Today = "0"
+'		   ch = "0"
+'		End If
+'
+'	    gubn = SCREEN.Object("OBJPOP.M_card").data
+'
+'		If gubn <> "Y" Then
+'			INFO.PushData "", "NOTICECOOKIE.INI", "8101", "END", "0"
+'			Exit Sub
+'		End If
+'
+'		If ch = "0" Then
+'			If CStr(Today) = CStr(nToday) Then
+' 		    INFO.PushData "", "NOTICECOOKIE.INI", "8101", "END", "0"
+' 			Exit Sub
+'
+' 			Else
+' 			INFO.PushData "", "NOTICECOOKIE.INI", "8101", "END", "1"
+'
+' 			End If
+'
+' 		End If
+'
+'	End If
+'
+'End Sub
+'--------------------------------------------------------- 팝업 창 띄우기
+
+_AW_ONINDECLARE_AW_
+#Load IB888833
+
+_AW_ONENDSUB_AW_
+_AW_ONSTART_AW_
+SCREEN.Proc "obj_acct.send_f", ""
+SCREEN.Proc "obj_cert.send_f", ""
+
+'OBJPOP.Send
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+SCREEN.OnSend = False
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(send_btn)
+_AW_ONCLICK_AW_
+
+'If Trim(SCREEN.Object("OBJ1.zAcntNo").data) <> "" And Trim(SCREEN.Object("OBJ1.zPwd").Data) <> "" Then
+'	obj2.Send
+'End If
+
+' 기본값[9999] - 09/07/15  (고객인 경우 비밀번호 없이 조회가능하도록)
+If Trim(SCREEN.Object("OBJ1.zAcntNo").data) <> "" Then
+	If SYSTEM.ConnectBy = "0" Then
+		obj2.Send
+	ElseIf Trim(SCREEN.Object("OBJ1.zPwd").Data) <> "" Then
+		obj2.Send
+	End If
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(UTAB0)
+_AW_ONCLICK_AW_
+Call UTAB0_change()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(UTAB1)
+_AW_ONCLICK_AW_
+Call setTransferList()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON0)
+_AW_ONCLICK_AW_
+If Trim(SCREEN.Object("parent.obj1.isPwdConfirm").Text) <> "Y" Then
+	SCREEN.Proc "parent.obj1.obj_chkPwd.send_f", "bottom"
+Else
+	SCREEN.Proc "obj2.send_f", ""
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+
