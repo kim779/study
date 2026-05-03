@@ -360,13 +360,6 @@ CAxisAgentDlg::CAxisAgentDlg(CWnd* pParent)
 	memset(m_regkey, 0, sizeof(m_regkey));
 }
 
-//CAxisAgentDlg::CAxisAgentDlg(CWnd* pParent /*=nullptr*/)
-//	: CDialogEx(IDD_AXISAGENT_DIALOG, pParent)
-//{
-//	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
-//	m_pAutoProxy = nullptr;
-//}
-
 CAxisAgentDlg::~CAxisAgentDlg()
 {
 	// 이 대화 상자에 대한 자동화 프록시가 있을 경우 이 대화 상자에 대한
@@ -399,6 +392,11 @@ BEGIN_MESSAGE_MAP(CAxisAgentDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_CHK_STOP, &CAxisAgentDlg::OnBnClickedChkStop)
 	ON_BN_CLICKED(IDC_LIST_CLEAR, &CAxisAgentDlg::OnBnClickedListClear)
 	ON_BN_CLICKED(IDC_BTN_DUMPANS, &CAxisAgentDlg::OnBnClickedBtnDumpans)
+	ON_COMMAND(ID_TRAY_SHOW, OnTrayShow)
+	ON_COMMAND(ID_TRAY_HIDE, OnTrayHide)
+	ON_COMMAND(ID_TRAY_EXIT, OnTrayExit)
+	ON_MESSAGE(WM_TRAYICON, OnTrayIcon)
+	ON_BN_CLICKED(IDC_BTN_HIDE, &CAxisAgentDlg::OnBnClickedBtnHide)
 END_MESSAGE_MAP()
 
 
@@ -445,24 +443,26 @@ BOOL CAxisAgentDlg::OnInitDialog()
 	AddLog("INIT", "리스트 테스트");
 
 	// 커맨드라인 파싱
+#ifdef _DEBUG   //디버그는 다보이기
+	if (m_parentPid == 0)
+	{
+		m_parentPid = GetCurrentProcessId();  // 자기 자신
+		m_hParentWnd = this->GetSafeHwnd();
+		strcpy_s(m_regkey, "TEST");
+		m_bShow = TRUE;
+		m_startX = 100;
+		m_startY = 100;
+		DebugLog("OnInitDialog: DEBUG 모드 - 더미값으로 진행\n");
+	}
+#endif
 	ParseCommandLine();
 
-	if (m_bShow)
-	{
-		//ModifyStyleEx(WS_EX_TOOLWINDOW, WS_EX_APPWINDOW);
-		LONG style = GetWindowLong(m_hWnd, GWL_STYLE);
-		style |= WS_MINIMIZEBOX | WS_SYSMENU | WS_CAPTION;
+	LONG style = GetWindowLong(m_hWnd, GWL_STYLE);
+	style |= WS_MINIMIZEBOX | WS_SYSMENU | WS_CAPTION;
+	SetWindowLong(m_hWnd, GWL_STYLE, style);
 
-		SetWindowLong(m_hWnd, GWL_STYLE, style);
-		SetWindowPos(nullptr, 0, 0, 0, 0,
-			SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
-
-		// 2단계: TopMost 설정
-		SetWindowPos(&wndTopMost, 0, 0, 0, 0,
-			SWP_NOMOVE | SWP_NOSIZE);
-	}
-	else
-		ModifyStyleEx(WS_EX_APPWINDOW, WS_EX_TOOLWINDOW);
+	SetWindowPos(NULL, 0, 0, 0, 0,
+		SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
 
 	// 유효성 체크
 	if (m_parentPid == 0 || m_hParentWnd == NULL || strlen(m_regkey) == 0)
@@ -480,6 +480,10 @@ BOOL CAxisAgentDlg::OnInitDialog()
 		PostMessage(WM_CLOSE);
 		return FALSE;
 	}
+
+
+
+
 
 	// Named Event 열기
 	char eventName[64] = { 0 };
@@ -560,6 +564,7 @@ BOOL CAxisAgentDlg::OnInitDialog()
 	else
 		DebugLog("OnInitDialog: MonitorThread CreateThread 실패 err=%lu\n", GetLastError());
 
+	RegisterTrayIcon();
 	return TRUE;
 }
 
@@ -572,6 +577,11 @@ void CAxisAgentDlg::OnSysCommand(UINT nID, LPARAM lParam)
 	}
 	else
 	{
+		if (nID == SC_MINIMIZE)
+		{
+			ShowWindow(SW_HIDE);
+			return;
+		}
 		CDialogEx::OnSysCommand(nID, lParam);
 	}
 }
@@ -641,12 +651,12 @@ BOOL CAxisAgentDlg::CanExit()
 	// 프록시 개체가 계속 남아 있으면 자동화 컨트롤러에서는
 	//  이 애플리케이션을 계속 사용합니다.  대화 상자는 남겨 두지만
 	//  해당 UI는 숨깁니다.
-	if (m_pAutoProxy != nullptr)
-	{
-		ShowWindow(SW_HIDE);
-		return FALSE;
-	}
-
+	//if (m_pAutoProxy != nullptr)
+	//{
+	//	ShowWindow(SW_HIDE);
+	//	return FALSE;
+	//}
+	this->RemoveTrayIcon();
 	return TRUE;
 }
 
@@ -722,25 +732,16 @@ void CAxisAgentDlg::ParseCommandLine()
 		}
 	}
 
-
-	SetWindowPos(
-		NULL,
-		m_startX,   // 메인 left
-		m_startY,   // 메인 top
-		500, 200,   // 크기 (원하는 크기로)
-		SWP_NOSIZE |SWP_NOZORDER | SWP_NOACTIVATE | (m_bShow ? SWP_SHOWWINDOW : SWP_HIDEWINDOW)
-	);
-
 	LocalFree(argvW);
 	slog.Format("ParseCommandLine: PID=%lu HWND=%llu TID=%lu KEY=%s show=%d\n",
 		m_parentPid, (UINT64)m_hParentWnd, m_dwMainThreadId, m_regkey, m_bShow);
 	WriteMonitorLog(slog);
 
-	//m_hMonitorThread = CreateThread(
-	//	NULL, 0, MonitorThreadProc, (LPVOID)this, 0, NULL);
 	DebugLog("OnInitDialog: MonitorThread 시작\n");
 
+#ifndef _DEBUG
 	SetTimer(9898, 100, nullptr);
+#endif
 }
 
 void CAxisAgentDlg::WriteLog(const char* msg)
@@ -1934,7 +1935,15 @@ void CAxisAgentDlg::OnTimer(UINT_PTR nIDEvent)
 		case 9898:
 		{
 			KillTimer(nIDEvent);
-			ShowWindow(m_bShow);
+			if (m_bShow)
+			{
+				SetWindowPos(&wndTopMost,
+					m_startX, m_startY,
+					500, 300,
+					SWP_FRAMECHANGED | SWP_SHOWWINDOW);
+			}
+			else
+				ShowWindow(SW_HIDE);
 		}
 		break;
 	}
@@ -2628,4 +2637,132 @@ void CAxisAgentDlg::AppendBlankLineToIni()
 		file.Write("\r\n", 2);
 		file.Close();
 	}
+}
+
+void CAxisAgentDlg::RegisterTrayIcon()
+{
+	memset(&m_nid, 0, sizeof(m_nid));
+	m_nid.cbSize = sizeof(NOTIFYICONDATA);
+	m_nid.hWnd = this->GetSafeHwnd();
+	m_nid.uID = 1;
+	m_nid.uFlags = NIF_ICON | NIF_MESSAGE | NIF_TIP;
+	m_nid.uCallbackMessage = WM_TRAYICON;
+
+	// 아이콘: exe 내장 아이콘 사용 (IDR_MAINFRAME)
+	m_nid.hIcon = AfxGetApp()->LoadIcon(IDI_ICON1);
+
+	// 툴팁 문자열
+	strcpy_s(m_nid.szTip, "AxisAgent");
+
+	BOOL bRet = Shell_NotifyIcon(NIM_ADD, &m_nid);
+
+	// 결과 확인
+	DebugLog("RegisterTrayIcon: result=%d hWnd=%p hIcon=%p err=%lu\n",
+		bRet,
+		m_nid.hWnd,
+		m_nid.hIcon,
+		GetLastError());
+
+	if (!bRet)
+	{
+		// 원인별 체크
+		if (!m_nid.hWnd)
+			DebugLog("RegisterTrayIcon: hWnd 가 NULL\n");
+
+		if (!m_nid.hIcon)
+			DebugLog("RegisterTrayIcon: hIcon 로드 실패 - IDR_MAINFRAME 없을 수 있음\n");
+	}
+	else
+	{
+		m_bTrayRegistered = TRUE;
+		DebugLog("RegisterTrayIcon: 트레이 등록 성공\n");
+	}
+
+}
+
+void CAxisAgentDlg::RemoveTrayIcon()
+{
+	if (m_bTrayRegistered)
+	{
+		Shell_NotifyIcon(NIM_DELETE, &m_nid);
+		m_bTrayRegistered = FALSE;
+	}
+}
+
+void CAxisAgentDlg::OnTrayShow()
+{
+	// 스타일 확인 후 최소화 버튼 보장
+	LONG style = GetWindowLong(m_hWnd, GWL_STYLE);
+	if (!(style & WS_MINIMIZEBOX))
+	{
+		style |= WS_MINIMIZEBOX | WS_SYSMENU | WS_CAPTION;
+		SetWindowLong(m_hWnd, GWL_STYLE, style);
+	}
+
+	SetWindowPos(&wndTopMost,
+		m_startX, m_startY,
+		500, 400,
+		SWP_FRAMECHANGED | SWP_SHOWWINDOW);
+
+	SetForegroundWindow();
+}
+
+void CAxisAgentDlg::OnTrayHide()
+{
+	ShowWindow(SW_HIDE);
+}
+
+void CAxisAgentDlg::OnTrayExit()
+{
+	PostMessage(WM_CLOSE);
+}
+
+LRESULT CAxisAgentDlg::OnTrayIcon(WPARAM wParam, LPARAM lParam)
+{
+	switch (lParam)
+	{
+	case WM_LBUTTONDBLCLK:   // 더블클릭 → 보이기/숨기기 토글
+		if (IsWindowVisible())
+			ShowWindow(SW_HIDE);
+		else
+		{
+			ShowWindow(SW_SHOW);
+			SetForegroundWindow();
+		}
+		break;
+
+	case WM_RBUTTONUP:        // 우클릭 → 컨텍스트 메뉴
+	{
+		CPoint pt;
+		GetCursorPos(&pt);
+
+		CMenu menu;
+		menu.CreatePopupMenu();
+		menu.AppendMenu(MF_STRING, ID_TRAY_SHOW, "보이기");
+		menu.AppendMenu(MF_STRING, ID_TRAY_HIDE, "숨기기");
+		menu.AppendMenu(MF_SEPARATOR);
+		menu.AppendMenu(MF_STRING, ID_TRAY_EXIT, "종료");
+
+		// 트레이 메뉴 제대로 닫히게 하는 필수 코드
+		SetForegroundWindow();
+		menu.TrackPopupMenu(TPM_RIGHTALIGN | TPM_BOTTOMALIGN,
+			pt.x, pt.y, this);
+		PostMessage(WM_NULL);
+	}
+	break;
+	}
+	return 0;
+}
+
+BOOL CAxisAgentDlg::OnCommand(WPARAM wParam, LPARAM lParam)
+{
+	// TODO: 여기에 특수화된 코드를 추가 및/또는 기본 클래스를 호출합니다.
+
+	return CDialogEx::OnCommand(wParam, lParam);
+}
+
+
+void CAxisAgentDlg::OnBnClickedBtnHide()
+{
+	OnTrayHide();
 }

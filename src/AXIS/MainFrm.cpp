@@ -2944,7 +2944,7 @@ void CMainFrame::OnClose()
 	KillTimer(TM_SCRLOG);	// 20070710 cej
 	//OutputDebugString("FREEFIREWALL\n");
 	//FreeFirewall();
-	
+	CloseAgent();
 	DeleteChaser();
 	//saveExitMap();
 	saveToolStatus();

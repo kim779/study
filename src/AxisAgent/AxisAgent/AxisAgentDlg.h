@@ -12,7 +12,12 @@
 
 #define WM_PING_LOG (WM_USER + 100)
 
-
+// 트레이 관련
+#define WM_TRAYICON  (WM_USER + 100)
+// 트레이 메뉴 ID
+#define ID_TRAY_SHOW    2001
+#define ID_TRAY_HIDE    2002
+#define ID_TRAY_EXIT    2003
 
 // 감지 임계값
 #define THRESHOLD_CPU       80.0f   // CPU 80% 이상
@@ -162,8 +167,16 @@ public:
 	// 네트워크
 	enum NetType { NET_NONE, NET_WIFI, NET_WIRED };
 	NetType GetCurrentNetType();
-// 구현입니다.
-protected:
+
+	//트레이
+	NOTIFYICONDATA  m_nid;
+	BOOL            m_bTrayRegistered = FALSE;
+	void RegisterTrayIcon();
+	void RemoveTrayIcon();
+	void OnTrayShow();
+	void OnTrayHide();
+	void OnTrayExit();
+
 	CAxisAgentDlgAutoProxy* m_pAutoProxy;
 	HICON m_hIcon;
 
@@ -177,6 +190,7 @@ protected:
 	afx_msg void OnClose();
 	virtual void OnOK();
 	virtual void OnCancel();
+	afx_msg LRESULT OnTrayIcon(WPARAM wParam, LPARAM lParam);
 	DECLARE_MESSAGE_MAP()
 
 	afx_msg BOOL OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCds); // HTS → Agent
@@ -189,4 +203,6 @@ public:
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	afx_msg void OnBnClickedListClear();
 	afx_msg void OnBnClickedBtnDumpans();
+	virtual BOOL OnCommand(WPARAM wParam, LPARAM lParam);
+	afx_msg void OnBnClickedBtnHide();
 };

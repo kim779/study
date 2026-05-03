@@ -1009,7 +1009,7 @@ LONG CMainWnd::OnUser(WPARAM wParam, LPARAM lParam)
 		CString stmp;
 		stmp.Format("%s", (char*)data[0]);
 		stmp.TrimRight();
-		if (stmp != "w")
+		if (stmp != "w")  
 			return 0;
 
 		stmp.Format("[RTS] 23=[%s] 24=[%s] 27=[%s] 28=[%s] 29=[%s] 30=[%s] 31=[%s] 32=[%s] 33=[%s] 36=[%s] 41=[%s] 61=[%s] 101=[%s] 104=[%s] 106=[%s] 109=[%s] 146=[%s] 181=[%s]",
