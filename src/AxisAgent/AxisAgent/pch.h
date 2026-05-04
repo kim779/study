@@ -16,4 +16,6 @@
 #define AGENT_MSG_LOG       9997    // 일반 로그
 #define AGENT_MSG_MONITOR   9995
 
+#define AGENT_LOG_MONITOR1
+
 #endif //PCH_H

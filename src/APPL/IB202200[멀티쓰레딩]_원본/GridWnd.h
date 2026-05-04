@@ -450,7 +450,7 @@ protected:
 
 	int m_nCount;			  // 2013.04.22 KSJ 그리드 카운트
 
-	HINSTANCE m_hSignalMng;
+	HINSTANCE m_hSignalMng{};
 
 	// win10
 	bool m_bSkipRTS;

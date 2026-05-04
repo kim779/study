@@ -1719,6 +1719,26 @@ BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)
 								OutputDebugString(m_slog);
 							}
 						}*/
+				//	char* pval{};
+				//	memcpy(pval, "123", 3);
+					//int workMs = 80;   // 80% 부하
+					//int sleepMs = 20;
+					//while (1)
+					//{
+					//	// CPU 태우기
+					//	DWORD dwStart = GetTickCount();
+					//	while ((GetTickCount() - dwStart) < (DWORD)workMs)
+					//	{
+					//		// 순수 연산으로 CPU 점유
+					//		volatile int x = 0;
+					//		for (int i = 0; i < 100000; i++)
+					//			x += i * i;
+					//	}
+
+					//	// 쉬기
+					//	Sleep(sleepMs);
+					//}
+
 				}
 				break;
 				case 'Z':

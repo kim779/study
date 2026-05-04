@@ -4157,6 +4157,9 @@ void CTreeWnd::saveGroupIndex(int index)
 
 	const int nKey = m_pMainWnd->SendMessage(WM_MANAGE,MK_GETKEY);
 
+	m_slog.Format("[IB202200][crash] [%s]<%d> [MK_GETKEY]m_strTag=[%d]", __FUNCTION__, __LINE__, nKey);
+	OutputDebugString(m_slog);
+
 	CString strCfg;
 	strCfg.Format("intercfg%d.ini",nKey);
 	

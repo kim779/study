@@ -291,6 +291,7 @@ namespace
 
 void CAxisAgentDlg::DebugLog(const char* fmt, ...)
 {
+
 	char msg[1024] = { 0 };
 	va_list args;
 	va_start(args, fmt);
@@ -541,7 +542,7 @@ BOOL CAxisAgentDlg::OnInitDialog()
 	case NET_NONE:  sprintf_s(netLog, "[시작] 네트워크: 없음\n");  break;
 	}
 	WriteLog(netLog);
-	SendToParent(netLog, AGENT_MSG_NETTYPE);
+	//SendToParent(netLog, AGENT_MSG_NETTYPE);
 
 	m_bLastPingSuccess = true;
 	m_bPingStateInit = false;
@@ -1110,7 +1111,7 @@ void CAxisAgentDlg::PingLoop()
 
 					WriteLog(output);
 					AddLog("PING", output);
-					SendToParent(output, AGENT_MSG_PING);
+					//SendToParent(output, AGENT_MSG_PING);
 				}
 				else
 				{
@@ -1130,7 +1131,7 @@ void CAxisAgentDlg::PingLoop()
 
 						WriteLog(output);
 						AddLog("PING", output);
-						SendToParent(output, AGENT_MSG_PING);
+						//SendToParent(output, AGENT_MSG_PING);
 
 						m_bLastPingSuccess = bPingOk;
 					}
@@ -1151,7 +1152,7 @@ void CAxisAgentDlg::PingLoop()
 
 						WriteLog(output);
 						AddLog("PING", output);
-						SendToParent(output, AGENT_MSG_PING);
+						//SendToParent(output, AGENT_MSG_PING);
 
 						m_pingOkCount = 0;
 						m_pingFailCount = 0;
@@ -1313,172 +1314,37 @@ float CAxisAgentDlg::CalcThreadCpuUsage(
 // 모니터링 로그 저장
 void CAxisAgentDlg::WriteMonitorLog(const char* msg)
 {
-	SYSTEMTIME st;
-	GetLocalTime(&st);
+#ifdef AGENT_LOG_MONITOR
+		SYSTEMTIME st;
+		GetLocalTime(&st);
 
-	char logPath[MAX_PATH] = { 0 };
-	char selfPath[MAX_PATH] = { 0 };
-	GetModuleFileNameA(NULL, selfPath, MAX_PATH);
-	char* lastSlash = strrchr(selfPath, '\\');
-	if (lastSlash) *lastSlash = '\0';
+		char logPath[MAX_PATH] = { 0 };
+		char selfPath[MAX_PATH] = { 0 };
+		GetModuleFileNameA(NULL, selfPath, MAX_PATH);
+		char* lastSlash = strrchr(selfPath, '\\');
+		if (lastSlash) *lastSlash = '\0';
 
-	sprintf_s(logPath, "%s\\ping\\monitorlog_%04d%02d%02d.txt",
-		selfPath, st.wYear, st.wMonth, st.wDay);
+		sprintf_s(logPath, "%s\\ping\\monitorlog_%04d%02d%02d.txt",
+			selfPath, st.wYear, st.wMonth, st.wDay);
 
-	char output[2048] = { 0 };
-	sprintf_s(output, "[AxisAgent][%04d-%02d-%02d %02d:%02d:%02d][AxisAgent] %s\n",
-		st.wYear, st.wMonth, st.wDay,
-		st.wHour, st.wMinute, st.wSecond,
-		msg);
-	OutputDebugStringA(output);
-	FILE* fp = nullptr;
-	fopen_s(&fp, logPath, "a");
-	if (fp)
-	{
-		fputs(output, fp);
-		fclose(fp);
-	}
+		char output[2048] = { 0 };
+		sprintf_s(output, "[AxisAgent][%04d-%02d-%02d %02d:%02d:%02d][AxisAgent] %s\n",
+			st.wYear, st.wMonth, st.wDay,
+			st.wHour, st.wMinute, st.wSecond,
+			msg);
+		OutputDebugStringA(output);
+		FILE* fp = nullptr;
+		fopen_s(&fp, logPath, "a");
+		if (fp)
+		{
+			fputs(output, fp);
+			fclose(fp);
+		}
+#endif
 
 	AddLog("MONITOR", msg);   //testcmt
 }
 
-// 덤프 생성
-//void CAxisAgentDlg::CreateDump(const char* reason)
-//{
-//	if (m_dumpCount >= MAX_DUMP_COUNT)
-//	{
-//		WriteMonitorLog("[D0] dump skipped: max dump count reached");
-//		return;
-//	}
-//
-//	const ULONGLONG nowTick = GetTickCount64();
-//	if (m_lastDumpTick != 0 && (nowTick - m_lastDumpTick) < DUMP_INTERVAL_MS)
-//	{
-//		char skipMsg[256] = { 0 };
-//		sprintf_s(skipMsg,
-//			"[D0] dump skipped: interval not reached diff=%llu",
-//			(nowTick - m_lastDumpTick));
-//		WriteMonitorLog(skipMsg);
-//		return;
-//	}
-//
-//	const int seq = ++m_dumpSeq;
-//
-//	SYSTEMTIME st;
-//	GetLocalTime(&st);
-//
-//	char selfPath[MAX_PATH] = { 0 };
-//	GetModuleFileNameA(NULL, selfPath, MAX_PATH);
-//	char* lastSlash = strrchr(selfPath, '\\');
-//	if (lastSlash) *lastSlash = '\0';
-//
-//	char dumpDir[MAX_PATH] = { 0 };
-//	sprintf_s(dumpDir, "%s\\ping", selfPath);
-//	CreateDirectoryA(dumpDir, NULL);
-//
-//	char dumpPath[MAX_PATH] = { 0 };
-//	sprintf_s(dumpPath,
-//		"%s\\dump_%04d%02d%02d_%02d%02d%02d_%03d_pid%lu_seq%02d.dmp",
-//		dumpDir,
-//		st.wYear, st.wMonth, st.wDay,
-//		st.wHour, st.wMinute, st.wSecond, st.wMilliseconds,
-//		m_parentPid,
-//		seq);
-//
-//	char logMsg[1024] = { 0 };
-//	sprintf_s(logMsg,
-//		"[D1] dump start seq=%d reason=%s path=%s pid=%lu",
-//		seq,
-//		reason ? reason : "(null)",
-//		dumpPath,
-//		m_parentPid);
-//	WriteMonitorLog(logMsg);
-//
-//	DWORD access =
-//		PROCESS_QUERY_INFORMATION |
-//		PROCESS_VM_READ |
-//		PROCESS_DUP_HANDLE |
-//		SYNCHRONIZE;
-//
-//	HANDLE hProcess = OpenProcess(access, FALSE, m_parentPid);
-//	if (!hProcess)
-//	{
-//		sprintf_s(logMsg, "[D2] seq=%d OpenProcess fail err=%lu", seq, GetLastError());
-//		WriteMonitorLog(logMsg);
-//		return;
-//	}
-//
-//	if (WaitForSingleObject(hProcess, 0) == WAIT_OBJECT_0)
-//	{
-//		sprintf_s(logMsg, "[D3] seq=%d target already exited", seq);
-//		WriteMonitorLog(logMsg);
-//		CloseHandle(hProcess);
-//		return;
-//	}
-//
-//	HANDLE hFile = CreateFileA(
-//		dumpPath,
-//		GENERIC_WRITE,
-//		0,
-//		NULL,
-//		CREATE_ALWAYS,
-//		FILE_ATTRIBUTE_NORMAL,
-//		NULL);
-//
-//	if (hFile == INVALID_HANDLE_VALUE)
-//	{
-//		sprintf_s(logMsg, "[D4] seq=%d CreateFile fail err=%lu", seq, GetLastError());
-//		WriteMonitorLog(logMsg);
-//		CloseHandle(hProcess);
-//		return;
-//	}
-//
-//	MINIDUMP_EXCEPTION_INFORMATION* pExInfo = NULL;
-//
-//	SetLastError(0);
-//
-//	BOOL bOk = MiniDumpWriteDump(
-//		hProcess,
-//		m_parentPid,
-//		hFile,
-//		MiniDumpNormal,
-//		pExInfo,
-//		NULL,
-//		NULL);
-//
-//	DWORD dwErr = GetLastError();
-//
-//	FlushFileBuffers(hFile);
-//
-//	LARGE_INTEGER fileSize = {};
-//	GetFileSizeEx(hFile, &fileSize);
-//
-//	CloseHandle(hFile);
-//	CloseHandle(hProcess);
-//
-//	sprintf_s(logMsg,
-//		"[D5] seq=%d MiniDumpWriteDump ok=%d err=%lu size=%lld",
-//		seq, (int)bOk, dwErr, fileSize.QuadPart);
-//	WriteMonitorLog(logMsg);
-//
-//	if (bOk && fileSize.QuadPart > 0)
-//	{
-//		m_dumpCount++;
-//		m_lastDumpTick = nowTick;
-//
-//		sprintf_s(logMsg,
-//			"[D6] dump success seq=%d count=%d",
-//			seq, m_dumpCount);
-//		WriteMonitorLog(logMsg);
-//
-//		AnalyzeDump(dumpPath);
-//	}
-//	else
-//	{
-//		sprintf_s(logMsg, "[D7] dump failed seq=%d", seq);
-//		WriteMonitorLog(logMsg);
-//	}
-//}
 void CAxisAgentDlg::CreateDump(const char* reason)
 {
 	if (m_dumpCount >= MAX_DUMP_COUNT)
@@ -1874,7 +1740,7 @@ void CAxisAgentDlg::MonitorLoop()
 		sprintf_s(sendMsg,
 			"CPU=%.1f MAIN=%.1f THR=%d HUNG=%d NORESP=%d",
 			fProcCpu, fMainCpu, nThreadCount, bHung ? 1 : 0, noResponseCount);
-		SendToParent(sendMsg, AGENT_MSG_MONITOR);
+		//SendToParent(sendMsg, AGENT_MSG_MONITOR);
 
 		if ((bHung && noResponseCount >= 2) || noResponseCount >= 3)
 		{
@@ -1923,7 +1789,114 @@ void CAxisAgentDlg::MonitorLoop()
 
 void CAxisAgentDlg::OnBnClickedBtnTest()
 {
+	SYSTEMTIME st;
+	GetLocalTime(&st);
 
+	char selfPath[MAX_PATH] = { 0 };
+	GetModuleFileNameA(NULL, selfPath, MAX_PATH);
+	char* p = strrchr(selfPath, '\\');
+	if (p) *p = '\0';
+
+	// DbgHelp.dll - exe 옆에 있는거 우선 로드 (없으면 시스템꺼)
+	char dbgHelpPath[MAX_PATH] = { 0 };
+	sprintf_s(dbgHelpPath, "%s\\DbgHelp.dll", selfPath);
+
+	HMODULE hDbgHelp = LoadLibraryA(dbgHelpPath);
+	if (!hDbgHelp)
+	{
+		DebugLog("TestDump: exe 옆 DbgHelp.dll 없음 - 시스템꺼 로드\n");
+		hDbgHelp = LoadLibraryA("DbgHelp.dll");
+	}
+
+	if (!hDbgHelp)
+	{
+		AddLog("DUMP", "DbgHelp.dll 로드 실패");
+		return;
+	}
+
+	// 버전 로그
+	char loadedPath[MAX_PATH] = { 0 };
+	GetModuleFileNameA(hDbgHelp, loadedPath, MAX_PATH);
+	DebugLog("TestDump: DbgHelp.dll 로드 [%s]\n", loadedPath);
+
+	typedef BOOL(WINAPI* PFN_MiniDumpWriteDump)(
+		HANDLE, DWORD, HANDLE, MINIDUMP_TYPE,
+		PMINIDUMP_EXCEPTION_INFORMATION,
+		PMINIDUMP_USER_STREAM_INFORMATION,
+		PMINIDUMP_CALLBACK_INFORMATION);
+
+	PFN_MiniDumpWriteDump pfnDump =
+		(PFN_MiniDumpWriteDump)GetProcAddress(hDbgHelp, "MiniDumpWriteDump");
+
+	if (!pfnDump)
+	{
+		AddLog("DUMP", "MiniDumpWriteDump GetProcAddress 실패");
+		FreeLibrary(hDbgHelp);
+		return;
+	}
+
+	// 덤프 파일 생성
+	char dumpPath[MAX_PATH] = { 0 };
+	sprintf_s(dumpPath, "%s\\ping\\test_dump_%04d%02d%02d_%02d%02d%02d.dmp",
+		selfPath,
+		st.wYear, st.wMonth, st.wDay,
+		st.wHour, st.wMinute, st.wSecond);
+
+	HANDLE hFile = CreateFileA(
+		dumpPath,
+		GENERIC_WRITE, 0, NULL,
+		CREATE_ALWAYS,
+		FILE_ATTRIBUTE_NORMAL, NULL);
+
+	if (hFile == INVALID_HANDLE_VALUE)
+	{
+		char buf[256] = { 0 };
+		sprintf_s(buf, "TestDump: CreateFile 실패 err=%lu", GetLastError());
+		AddLog("DUMP", buf);
+		FreeLibrary(hDbgHelp);
+		return;
+	}
+
+	MINIDUMP_TYPE dumpType = (MINIDUMP_TYPE)(
+		MiniDumpWithDataSegs |
+		MiniDumpWithHandleData |
+		MiniDumpWithThreadInfo |
+		MiniDumpWithUnloadedModules);
+
+	BOOL bOk = pfnDump(
+		GetCurrentProcess(),
+		GetCurrentProcessId(),
+		hFile,
+		dumpType,
+		NULL, NULL, NULL);
+
+	DWORD err = GetLastError();
+	CloseHandle(hFile);
+	FreeLibrary(hDbgHelp);
+
+	if (bOk)
+	{
+		HANDLE hCheck = CreateFileA(dumpPath, GENERIC_READ, FILE_SHARE_READ,
+			NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+		DWORD size = 0;
+		if (hCheck != INVALID_HANDLE_VALUE)
+		{
+			size = GetFileSize(hCheck, NULL);
+			CloseHandle(hCheck);
+		}
+
+		char buf[256] = { 0 };
+		sprintf_s(buf, "TestDump: 성공 size=%lu bytes", size);
+		AddLog("DUMP", buf);
+		DebugLog("TestDump: [%s] %s\n", dumpPath, buf);
+	}
+	else
+	{
+		char buf[256] = { 0 };
+		sprintf_s(buf, "TestDump: 실패 err=%lu (0x%08X)", err, err);
+		AddLog("DUMP", buf);
+		DebugLog("%s\n", buf);
+	}
 }
 
 

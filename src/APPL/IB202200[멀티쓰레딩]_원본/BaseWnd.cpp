@@ -89,6 +89,7 @@ void CBaseWnd::OperInit()
 
 int CBaseWnd::OnCreate(LPCREATESTRUCT lpCreateStruct) 
 {
+	CString slog;
 	if (CWnd::OnCreate(lpCreateStruct) == -1)
 		return -1;
 	_Wizard = (CWnd*)m_pMainWnd->SendMessage(WM_MANAGE, MAKEWPARAM(MK_GETWND, MO_VIEW));
@@ -96,7 +97,8 @@ int CBaseWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	m_user.Format("%s", (char*)m_pMainWnd->SendMessage(WM_MANAGE, MK_GETUSER));
 
 	const int nKey = m_pMainWnd->SendMessage(WM_MANAGE, MK_GETKEY);
-
+	slog.Format("[IB202200][crash] [%s]<%d> [MK_GETKEY]m_strTag=[%d]", __FUNCTION__, __LINE__, nKey);
+	OutputDebugString(slog);
 	CString strCfg;
 	strCfg.Format("intercfg%d.ini",nKey);
 	m_fileCFG.Format("%s\\%s\\%s\\%s", m_root, USRDIR, m_user, strCfg); 

@@ -167,7 +167,10 @@ CGridWnd::CGridWnd(CWnd *pMainWnd, int nIndex) : CBaseWnd(pMainWnd)
 
 	CString path;
 	path.Format("%s/%s/%s", m_root, DEVDIR, "lib_signalmng.dll");
-	m_hSignalMng = ::LoadLibrary(path);
+	//m_hSignalMng = ::LoadLibrary(path);
+
+	m_slog.Format("[IB202200][crash] [%s]<%d>  m_hSignalMng=[%x] ", __FUNCTION__, __LINE__, m_hSignalMng);
+	OutputDebugString(m_slog);
 
 	if (m_hSignalMng)
 	{
@@ -254,6 +257,9 @@ void CGridWnd::UpdateAll()
 
 void CGridWnd::OperInit()
 {
+	m_slog.Format("[IB202200][crash] [%s]<%d> ", __FUNCTION__, __LINE__);
+	OutputDebugString(m_slog);
+
 	m_pView = (CWnd *)m_pMainWnd->SendMessage(WM_MANAGE, MAKEWPARAM(MK_GETWND, MO_VIEW));
 	m_pGroupWnd = (CWnd *)m_pMainWnd->SendMessage(WM_MANAGE, MAKEWPARAM(MK_GETWND, MO_GROUP));
 	m_pToolWnd = (CWnd *)m_pMainWnd->SendMessage(WM_MANAGE, MAKEWPARAM(MK_GETWND, MO_TOOL));
@@ -283,6 +289,9 @@ void CGridWnd::OperInit()
 	m_clrTEXT[1] = RGB(100, 100, 100);
 	m_size.cy = ((CGroupWnd *)m_pGroupWnd)->GetRowHeight();
 	loadcfg();
+
+	m_slog.Format("[IB202200][crash] [%s]<%d> 1 ", __FUNCTION__, __LINE__);
+	OutputDebugString(m_slog);
 
 	m_grid = std::make_unique<CintGrid>(m_pMainWnd, this, &lf);
 	m_grid->Create(CRect(0, 0, 0, 0), this, IDC_GRID, GVSC_BOTH, GVDD_FULL);
@@ -319,7 +328,13 @@ void CGridWnd::OperInit()
 	m_bMoveCfg = m_pToolWnd->SendMessage(WM_MANAGE, MK_GETMOVECFG);
 	m_nMoveSave = m_pToolWnd->SendMessage(WM_MANAGE, MK_GETMOVESAVE);
 
+	m_slog.Format("[IB202200][crash] [%s]<%d> 2 ", __FUNCTION__, __LINE__);
+
+	OutputDebugString(m_slog);
 	InitPopupMenu();
+
+	m_slog.Format("[IB202200][crash] [%s]<%d> 3 ", __FUNCTION__, __LINE__);
+	OutputDebugString(m_slog);
 
 	m_btReload.Create("\n그룹 다시 불러오기", CRect(0, 0, SIZE_BUTTONS, SIZE_BUTTONS), this, IDC_BT_RELOAD);
 	m_btDomino.Create("\n복수현재가2 종목연동", CRect(0, 0, SIZE_BUTTONS, SIZE_BUTTONS), this, IDC_BT_DOMINO);
@@ -358,7 +373,13 @@ void CGridWnd::OperInit()
 	m_btCLOSE.SetFont(m_pFont, false);
 	m_btCLOSE.SetImgBitmap(hBITMAP, hBITMAP_DN, hBITMAP_HV);
 
+	m_slog.Format("[IB202200][crash] [%s]<%d> 4 ", __FUNCTION__, __LINE__);
+	OutputDebugString(m_slog);
+
 	RemoveAll();
+
+	m_slog.Format("[IB202200][crash] [%s]<%d> 5 ", __FUNCTION__, __LINE__);
+	OutputDebugString(m_slog);
 
 	// 2016.04.11 KSJ 처음열었을때 트리메뉴보고 필드셋업
 	if (CAST_TREEID(m_kind)->kind == xEPBCODE)
@@ -366,14 +387,24 @@ void CGridWnd::OperInit()
 	else
 		FieldSetup(false);
 
+	m_slog.Format("[IB202200][crash] [%s]<%d> 6 ", __FUNCTION__, __LINE__);
+	OutputDebugString(m_slog);
+
 	if (m_hSignalMng)
 	{
+		m_slog.Format("[IB202200][crash] [%s]<%d> 6.5  ", __FUNCTION__, __LINE__);
+		OutputDebugString(m_slog);
 		CString strRealType;
 		strRealType.Format("%d", (int)TYPE_SIGNAL_ALERT);
 		SignalLib_SetSignal(true, this, strRealType, "", "8");
 	}
+	else
+	{
+		m_slog.Format("[IB202200][crash] [%s]<%d> 6.6 ", __FUNCTION__, __LINE__);
+		OutputDebugString(m_slog);
+	}
 
-	m_slog.Format("[2022][SMART][%s] %s  [%x]", __FUNCTION__, m_hSignalMng);
+	m_slog.Format("[IB202200][crash] [%s]<%d> 7 ", __FUNCTION__, __LINE__);
 	OutputDebugString(m_slog);
 
 	
@@ -381,6 +412,9 @@ void CGridWnd::OperInit()
 	m_btDomino.Invalidate(TRUE);
 	m_btSAVE.Invalidate(TRUE);
 	m_btCLOSE.Invalidate(TRUE);
+
+	m_slog.Format("[IB202200][crash] [%s]<%d> end ", __FUNCTION__, __LINE__);
+	OutputDebugString(m_slog);
 }
 
 CString CGridWnd::CalMaketTime(CString strTime, bool bEnd)
@@ -1397,6 +1431,9 @@ void CGridWnd::savecfg_data(CString keydata)
 
 void CGridWnd::loadcfg()
 {
+	m_slog.Format("[IB202200][crash] [%s]<%d> ", __FUNCTION__, __LINE__);
+	OutputDebugString(m_slog);
+
 	const int confirm_start = GetPrivateProfileInt(m_section, KEY_DATA, 9999, m_fileCFG);
 	if (confirm_start == 9999)
 	{
@@ -1406,6 +1443,9 @@ void CGridWnd::loadcfg()
 	{
 		m_bfirstStart = FALSE;
 	}
+
+	m_slog.Format("[IB202200][crash] [%s]<%d> 1", __FUNCTION__, __LINE__);
+	OutputDebugString(m_slog);
 
 	// data kind
 	m_kind = GetPrivateProfileInt(m_section, KEY_DATA, 0, m_fileCFG);
@@ -1422,6 +1462,9 @@ void CGridWnd::loadcfg()
 	GetPrivateProfileString(m_section, KEY_WIDTH, "", buf, sizeof(buf), m_fileCFG);
 	m_szWIDTH.Format("%s", buf);
 
+	m_slog.Format("[IB202200][crash] [%s]<%d> 2", __FUNCTION__, __LINE__);
+	OutputDebugString(m_slog);
+
 	// 2013.07.12 KSJ ,0,0,0,0이 들어가있으면 지우고 저장한다.
 	// 7852~7855까지 추가한걸 잘못 반영했다가 생긴 어쩔수 없는 코딩
 	if (m_szWIDTH.Find(",0,0,0,0"))
@@ -1434,6 +1477,9 @@ void CGridWnd::loadcfg()
 	// ADD PSH 20070912
 	memset(buf, 0x00, sizeof(buf));
 	GetPrivateProfileString(SEC_MAIN, KEY_MARGIN, "", buf, sizeof(buf), m_fileCFG);
+
+	m_slog.Format("[IB202200][crash] [%s]<%d> 3", __FUNCTION__, __LINE__);
+	OutputDebugString(m_slog);
 
 	if (m_bfirstStart == TRUE)
 	{
@@ -1449,6 +1495,9 @@ void CGridWnd::loadcfg()
 	memset(buf, 0x00, sizeof(buf));
 	dwRes = GetPrivateProfileString(m_section, "BKGCLR", "", buf, sizeof(buf), m_fileCFG);
 
+	m_slog.Format("[IB202200][crash] [%s]<%d> 4", __FUNCTION__, __LINE__);
+	OutputDebugString(m_slog);
+
 	if (0 == dwRes)
 	{
 		m_clrMarkerBKG = RGB(240, 240, 240);
@@ -1461,6 +1510,9 @@ void CGridWnd::loadcfg()
 
 	memset(buf, 0x00, sizeof(buf));
 	dwRes = GetPrivateProfileString(m_section, "TXTCLR", "", buf, sizeof(buf), m_fileCFG);
+
+	m_slog.Format("[IB202200][crash] [%s]<%d> 5", __FUNCTION__, __LINE__);
+	OutputDebugString(m_slog);
 
 	if (0 == dwRes)
 	{
@@ -1475,6 +1527,9 @@ void CGridWnd::loadcfg()
 	memset(buf, 0x00, sizeof(buf));
 	dwRes = GetPrivateProfileString(m_section, "TXTSHD", "", buf, sizeof(buf), m_fileCFG);
 
+	m_slog.Format("[IB202200][crash] [%s]<%d> 6", __FUNCTION__, __LINE__);
+	OutputDebugString(m_slog);
+
 	if (0 == dwRes)
 	{
 		m_bShadow = TRUE;
@@ -1488,6 +1543,9 @@ void CGridWnd::loadcfg()
 	memset(buf, 0x00, sizeof(buf));
 	dwRes = GetPrivateProfileString(m_section, "ALLAPPL", "", buf, sizeof(buf), m_fileCFG);
 
+	m_slog.Format("[IB202200][crash] [%s]<%d> 7", __FUNCTION__, __LINE__);
+	OutputDebugString(m_slog);
+
 	if (0 == dwRes)
 	{
 		m_bAllApply = TRUE;
@@ -1500,6 +1558,9 @@ void CGridWnd::loadcfg()
 
 	memset(buf, 0x00, sizeof(buf));
 	dwRes = GetPrivateProfileString(SEC_MAIN, KEY_SYMINFO, "", buf, sizeof(buf), m_fileCFG);
+
+	m_slog.Format("[IB202200][crash] [%s]<%d> 8", __FUNCTION__, __LINE__);
+	OutputDebugString(m_slog);
 
 	if (m_bfirstStart == TRUE)
 	{
@@ -1521,6 +1582,9 @@ void CGridWnd::loadcfg()
 	memset(buf, 0x00, sizeof(buf));
 	dwRes = GetPrivateProfileString(m_section, "TKAPPL", "", buf, sizeof(buf), m_fileCFG);
 
+	m_slog.Format("[IB202200][crash] [%s]<%d> 9", __FUNCTION__, __LINE__);
+	OutputDebugString(m_slog);
+
 	if (0 == dwRes)
 	{
 		m_tkConfig.m_bApply = FALSE;
@@ -1533,6 +1597,9 @@ void CGridWnd::loadcfg()
 
 	memset(buf, 0x00, sizeof(buf));
 	dwRes = GetPrivateProfileString(m_section, "TKVOL", "", buf, sizeof(buf), m_fileCFG);
+
+	m_slog.Format("[IB202200][crash] [%s]<%d> 10", __FUNCTION__, __LINE__);
+	OutputDebugString(m_slog);
 
 	if (0 == dwRes)
 	{
@@ -1547,6 +1614,11 @@ void CGridWnd::loadcfg()
 	memset(buf, 0x00, sizeof(buf));
 	dwRes = GetPrivateProfileString(m_section, "TKAMT", "", buf, sizeof(buf), m_fileCFG);
 
+
+	m_slog.Format("[IB202200][crash] [%s]<%d> 11", __FUNCTION__, __LINE__);
+	OutputDebugString(m_slog);
+
+
 	if (0 == dwRes)
 	{
 		m_tkConfig.m_amt = 0;
@@ -1559,6 +1631,9 @@ void CGridWnd::loadcfg()
 
 	memset(buf, 0x00, sizeof(buf));
 	dwRes = GetPrivateProfileString(m_section, "TKAND", "", buf, sizeof(buf), m_fileCFG);
+
+	m_slog.Format("[IB202200][crash] [%s]<%d>12", __FUNCTION__, __LINE__);
+	OutputDebugString(m_slog);
 
 	if (0 == dwRes)
 	{
@@ -1573,6 +1648,9 @@ void CGridWnd::loadcfg()
 	memset(buf, 0x00, sizeof(buf));
 	dwRes = GetPrivateProfileString(m_section, "TKPRC", "", buf, sizeof(buf), m_fileCFG);
 
+	m_slog.Format("[IB202200][crash] [%s]<%d> 13", __FUNCTION__, __LINE__);
+	OutputDebugString(m_slog);
+
 	if (0 == dwRes)
 	{
 		m_tkConfig.m_price = FALSE;
@@ -1585,6 +1663,9 @@ void CGridWnd::loadcfg()
 
 	memset(buf, 0x00, sizeof(buf));
 	dwRes = GetPrivateProfileString(m_section, "TKSPRC", "", buf, sizeof(buf), m_fileCFG);
+
+	m_slog.Format("[IB202200][crash] [%s]<%d> 14", __FUNCTION__, __LINE__);
+	OutputDebugString(m_slog);
 
 	if (0 == dwRes)
 	{
@@ -1599,6 +1680,9 @@ void CGridWnd::loadcfg()
 	memset(buf, 0x00, sizeof(buf));
 	dwRes = GetPrivateProfileString(m_section, "TKEPRC", "", buf, sizeof(buf), m_fileCFG);
 
+	m_slog.Format("[IB202200][crash] [%s]<%d> 15", __FUNCTION__, __LINE__);
+	OutputDebugString(m_slog);
+
 	if (0 == dwRes)
 	{
 		m_tkConfig.m_eprc = 0;
@@ -1611,6 +1695,9 @@ void CGridWnd::loadcfg()
 
 	memset(buf, 0x00, sizeof(buf));
 	dwRes = GetPrivateProfileString(m_section, "TKULIM", "", buf, sizeof(buf), m_fileCFG);
+
+	m_slog.Format("[IB202200][crash] [%s]<%d> 16", __FUNCTION__, __LINE__);
+	OutputDebugString(m_slog);
 
 	if (0 == dwRes)
 	{
@@ -1625,6 +1712,9 @@ void CGridWnd::loadcfg()
 	memset(buf, 0x00, sizeof(buf));
 	dwRes = GetPrivateProfileString(m_section, "TKUP", "", buf, sizeof(buf), m_fileCFG);
 
+	m_slog.Format("[IB202200][crash] [%s]<%d> 17", __FUNCTION__, __LINE__);
+	OutputDebugString(m_slog);
+
 	if (0 == dwRes)
 	{
 		m_tkConfig.m_up = TRUE;
@@ -1637,6 +1727,9 @@ void CGridWnd::loadcfg()
 
 	memset(buf, 0x00, sizeof(buf));
 	dwRes = GetPrivateProfileString(m_section, "TKFLAT", "", buf, sizeof(buf), m_fileCFG);
+
+	m_slog.Format("[IB202200][crash] [%s]<%d> 18", __FUNCTION__, __LINE__);
+	OutputDebugString(m_slog);
 
 	if (0 == dwRes)
 	{
@@ -1651,6 +1744,9 @@ void CGridWnd::loadcfg()
 	memset(buf, 0x00, sizeof(buf));
 	dwRes = GetPrivateProfileString(m_section, "TKDLIM", "", buf, sizeof(buf), m_fileCFG);
 
+	m_slog.Format("[IB202200][crash] [%s]<%d> 19", __FUNCTION__, __LINE__);
+	OutputDebugString(m_slog);
+
 	if (0 == dwRes)
 	{
 		m_tkConfig.m_dlimit = TRUE;
@@ -1663,6 +1759,9 @@ void CGridWnd::loadcfg()
 
 	memset(buf, 0x00, sizeof(buf));
 	dwRes = GetPrivateProfileString(m_section, "TKDOWN", "", buf, sizeof(buf), m_fileCFG);
+
+	m_slog.Format("[IB202200][crash] [%s]<%d> 20", __FUNCTION__, __LINE__);
+	OutputDebugString(m_slog);
 
 	if (0 == dwRes)
 	{
@@ -1677,6 +1776,9 @@ void CGridWnd::loadcfg()
 	memset(buf, 0x00, sizeof(buf));
 	dwRes = GetPrivateProfileString(m_section, "ALLAUTO", "", buf, sizeof(buf), m_fileCFG);
 
+	m_slog.Format("[IB202200][crash] [%s]<%d> 21", __FUNCTION__, __LINE__);
+	OutputDebugString(m_slog);
+
 	if (0 == dwRes)
 	{
 		m_bAutoSaveAllApply = FALSE;
@@ -1690,6 +1792,9 @@ void CGridWnd::loadcfg()
 	memset(buf, 0x00, sizeof(buf));
 	dwRes = GetPrivateProfileString(m_section, "ADDCND", "", buf, sizeof(buf), m_fileCFG);
 
+	m_slog.Format("[IB202200][crash] [%s]<%d> 22", __FUNCTION__, __LINE__);
+	OutputDebugString(m_slog);
+
 	if (0 == dwRes)
 	{
 		m_bAddCnd = FALSE;
@@ -1702,6 +1807,9 @@ void CGridWnd::loadcfg()
 
 	memset(buf, 0x00, sizeof(buf));
 	dwRes = GetPrivateProfileString(m_section, "CHGCND", "", buf, sizeof(buf), m_fileCFG);
+
+	m_slog.Format("[IB202200][crash] [%s]<%d> 23", __FUNCTION__, __LINE__);
+	OutputDebugString(m_slog);
 
 	if (0 == dwRes)
 	{
@@ -1717,6 +1825,10 @@ void CGridWnd::loadcfg()
 	memset(buf, 0x00, sizeof(buf));
 	dwRes = GetPrivateProfileString(m_section, "NEWSNCHARTWIDTH", "", buf, sizeof(buf), m_fileCFG);
 
+
+	m_slog.Format("[IB202200][crash] [%s]<%d> 24", __FUNCTION__, __LINE__);
+	OutputDebugString(m_slog);
+
 	if (0 == dwRes)
 	{
 		m_nNewsNChartWidth = 20;
@@ -1731,6 +1843,9 @@ void CGridWnd::loadcfg()
 	memset(buf, 0x00, sizeof(buf));
 	dwRes = GetPrivateProfileString(m_section, "CODEWIDTH", "", buf, sizeof(buf), m_fileCFG);
 
+	m_slog.Format("[IB202200][crash] [%s]<%d> 25", __FUNCTION__, __LINE__);
+	OutputDebugString(m_slog);
+
 	if (0 == dwRes)
 	{
 		m_nCodeWidth = 80;
@@ -1743,6 +1858,9 @@ void CGridWnd::loadcfg()
 
 	memset(buf, 0x00, sizeof(buf));
 	dwRes = GetPrivateProfileString(m_section, "GRIDWIDTH", "", buf, sizeof(buf), m_fileCFG);
+
+	m_slog.Format("[IB202200][crash] [%s]<%d> 26", __FUNCTION__, __LINE__);
+	OutputDebugString(m_slog);
 
 	if (0 == dwRes)
 	{
@@ -1757,11 +1875,17 @@ void CGridWnd::loadcfg()
 	//처음 한번만 세팅해주자
 	dwRes = GetPrivateProfileString(m_section, "ISFIRSTGRIDSETINFO", "", buf, sizeof(buf), m_fileCFG);
 
+	m_slog.Format("[IB202200][crash] [%s]<%d> 27", __FUNCTION__, __LINE__);
+	OutputDebugString(m_slog);
+
 	if (0 == dwRes)
 	{
 		SetGridinfo();
 	}
 
+
+	m_slog.Format("[IB202200][crash] [%s]<%d>   end", __FUNCTION__, __LINE__);
+	OutputDebugString(m_slog);
 	// END ADD
 }
 

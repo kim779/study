@@ -309,6 +309,9 @@ void CMainWnd::OnDestroy()
 
 void CMainWnd::loadinfo()
 {
+	m_slog.Format("[IB202200][crash] [%s]<%d> ", __FUNCTION__, __LINE__);
+	OutputDebugString(m_slog);
+
 	CString filepath;
 
 	CString strCfg;
@@ -563,7 +566,11 @@ LONG CMainWnd::OnManage(WPARAM wParam, LPARAM lParam)
 	switch (LOWORD(wParam))
 	{
 	case MK_GETKEY:
+	{
+		m_slog.Format("[IB202200][crash] [%s]<%d> m_strTag=[%s]", __FUNCTION__, __LINE__, m_strTag);
+		OutputDebugString(m_slog);
 		ret = atoi(m_strTag);
+	}
 		break;
 	case MK_ISTREE:
 		ret = m_bTree;
@@ -1640,6 +1647,9 @@ LRESULT CMainWnd::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 			strTmp.TrimLeft();
 			strTmp.TrimRight();
 
+			m_slog.Format("[IB202200][crash] [%s]<%d> ", __FUNCTION__, __LINE__);
+			OutputDebugString(m_slog);
+
 			CString strCfg, filepath;
 			strCfg.Format("intercfg%s.ini", strTmp);
 			filepath.Format("%s\\%s\\%s\\%s", m_home, USRDIR, m_user, strCfg);
@@ -1692,6 +1702,10 @@ LRESULT CMainWnd::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 		str.TrimRight();
 
 		m_strTag = str;
+
+		m_slog.Format("[IB202200][crash] [%s]<%d> m_strTag=[%s]", __FUNCTION__, __LINE__, m_strTag);
+		OutputDebugString(m_slog);
+
 		Variant(titleCC, "包缴辆格");
 		init();
 
@@ -1707,6 +1721,9 @@ LRESULT CMainWnd::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 			}
 
 			m_strTag.Format("%d", nKey);
+
+			m_slog.Format("[IB202200][crash] [%s]<%d> m_strTag=[%s]", __FUNCTION__, __LINE__, m_strTag);
+			OutputDebugString(m_slog);
 
 			CString strCfg, filepath;
 			strCfg.Format("intercfg%s.ini", m_strTag);
@@ -1724,6 +1741,9 @@ LRESULT CMainWnd::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 		}
 		else
 		{
+			m_slog.Format("[IB202200][crash] [%s]<%d> ", __FUNCTION__, __LINE__);
+			OutputDebugString(m_slog);
+
 			CString strCfg, filepath, filepathNew;
 			strCfg.Format("intercfg%s.ini", m_strTag);
 			filepath.Format("%s\\%s\\%s\\%s", m_home, USRDIR, m_user, strCfg);
@@ -1736,6 +1756,12 @@ LRESULT CMainWnd::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 
 				m_strTag = "";
 				m_strTag.Format("%d", nKey);
+
+				m_slog.Format("[IB202200][crash] [%s]<%d> m_strTag=[%s]", __FUNCTION__, __LINE__, m_strTag);
+				OutputDebugString(m_slog);
+
+				m_slog.Format("[IB202200][crash] [%s]<%d> ", __FUNCTION__, __LINE__);
+				OutputDebugString(m_slog);
 
 				strCfg.Format("intercfg%s.ini", m_strTag);
 				filepathNew.Format("%s\\%s\\%s\\%s", m_home, USRDIR, m_user, strCfg);
@@ -1766,10 +1792,17 @@ LRESULT CMainWnd::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 			if (nKey < 10)
 				nKey = nKey + 1000;
 			m_strTag.Format("%d", nKey);
+
+			m_slog.Format("[IB202200][crash] [%s]<%d> m_strTag=[%s]", __FUNCTION__, __LINE__, m_strTag);
+			OutputDebugString(m_slog);
+			//m_strTag.Empty();
 		}
 
 		Variant(titleCC, "包缴辆格");
 		init();
+
+		m_slog.Format("[IB202200][crash] [%s]<%d> ", __FUNCTION__, __LINE__);
+		OutputDebugString(m_slog);
 
 		CString strCfg, filepath;
 		strCfg.Format("intercfg%s.ini", m_strTag);
@@ -2064,6 +2097,9 @@ void CMainWnd::OnTimer(UINT nIDEvent)
 			{
 				const int nKey = m_pWnd->SendMessage(WM_USER, MAKEWPARAM(variantDLL, majorCC), NULL);
 				m_strTag.Format("%d", nKey);
+
+				m_slog.Format("[IB202200][crash] [%s]<%d> m_strTag=[%s]", __FUNCTION__, __LINE__, m_strTag);
+				OutputDebugString(m_slog);
 			}
 
 			Variant(titleCC, "包缴辆格");
