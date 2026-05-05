@@ -1,6 +1,6 @@
 //{{NO_DEPENDENCIES}}
 // Microsoft Developer Studio generated include file.
-// Used by IB202200.rc
+// Used by IB202700.rc
 //
 #define IDS_GUIDE1                      1
 #define IDS_GUIDE2                      2

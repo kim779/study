@@ -16,6 +16,8 @@ static char THIS_FILE[] = __FILE__;
 /////////////////////////////////////////////////////////////////////////////
 // CGPop
 
+#define TM_TITLE 9898
+
 //IMPLEMENT_DYNCREATE(CGPop, CFrameWnd)
 
 CGPop::CGPop(CWnd* pMain, bool stealth, bool depend)
@@ -46,6 +48,7 @@ BEGIN_MESSAGE_MAP(CGPop, CFrameWnd)
 	ON_MESSAGE(WM_CHILDMSG, OnCHILDMSG)
 	ON_MESSAGE(WM_AXIS, OnAXIS)
 	ON_WM_CREATE()
+	ON_WM_TIMER()
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
@@ -251,6 +254,25 @@ int CGPop::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		return -1;
 
 	// TODO:  여기에 특수화된 작성 코드를 추가합니다.
-	SetWindowText("IBK 투자증권");
+	SetTimer(TM_TITLE, 100, nullptr);
 	return 0;
+}
+
+
+void CGPop::OnTimer(UINT_PTR nIDEvent)
+{
+	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
+	switch (nIDEvent)
+	{
+		case TM_TITLE:
+		{
+			KillTimer(nIDEvent);
+			CString sTitle;
+			GetWindowText(sTitle);
+			if (sTitle == "Untitled")
+				SetWindowText("IBK 투자증권");
+		}
+		break;
+	}
+	CFrameWnd::OnTimer(nIDEvent);
 }

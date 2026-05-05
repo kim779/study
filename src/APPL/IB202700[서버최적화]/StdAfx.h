@@ -41,10 +41,7 @@
 
 inline void Output_DebugString(CString slog)
 {
-	OutputDebugString(slog);
+	//OutputDebugString(slog);
 }
 
 #define DF_SORT
-#define DF_MAIN_RTS
-#include "../H/TickStore.h"
-#define DF_DLL_RTS1

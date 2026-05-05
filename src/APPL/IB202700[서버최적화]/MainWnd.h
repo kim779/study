@@ -58,8 +58,7 @@ protected:
 	afx_msg void OnTimer(UINT nIDEvent);
 	//}}AFX_MSG
 	afx_msg LONG OnManage(WPARAM wParam, LPARAM lParam);
-	afx_msg LONG OnUser(WPARAM wParam, LPARAM lParam); 
-	afx_msg LONG OnMainMsg(WPARAM wParam, LPARAM lParam);
+	afx_msg LONG OnUser(WPARAM wParam, LPARAM lParam);
 	DECLARE_MESSAGE_MAP()
 
 public:
@@ -184,8 +183,8 @@ public: // RTM
 
 	int m_icheckTime{};
 	int m_DiffSec{};
-	bool ShouldSkipRTSByTimeDiff(CString& pcTime,	const char* pRTSTime, int allowDiffSec,	bool  bEnableCheck	);
-	bool IsEnableRTSTimeCheck(const CTime& currentTime,	const CTime& baseTime,	 int checkTimeSec);
+
+	bool IsEnableRTSTimeCheck(const CTime& currentTime, const CTime& baseTime, int checkTimeSec);
 	CTime ParseRTSTime(const CString& sTime, const COleDateTime& today);
 	std::unordered_map<std::string, CTime> m_lastRTSTimeMap;
 	bool ShouldSkipRTSByServerTime(const std::string& code, const char* pServerTime, int  minIntervalSec);
@@ -230,29 +229,4 @@ public:
 	bool IsFileExist(CString filename);  //test mod
 	void setOptimizeCPUAffinity();
 	void sendMemo(CString sCode, char type = 'S');
-
-	CWnd* m_pMainFrame{};
-	void GetMainFrameWnd();
-	void SetSendTRtoMainFrame(CString trCode, char* datB, int datL, BYTE stat,int key);
-	void UnregisterRealtime();
-
-
-	void GetRTSFromMainFrame(CString scode);
-	void ConvertTickToAlert(const RTS_READ_REQ& req, _alertR& alert);
-	void FreeAlertMemory(_alertR& alert);
-
-	std::vector<std::string> m_codes;
-	std::vector<int> m_symbols;
-	void InitSlotIndices();
-
-	private:
-		std::vector<int> m_slotIndices;   // 이 화면이 참조할 슬롯들
-
-		FILETIME m_prevProcKernel{};
-		FILETIME m_prevProcUser{};
-		FILETIME m_prevSysKernel{};
-		FILETIME m_prevSysUser{};
-		int m_iCurInterval{ 0 };
-
-		int GetProcessCpuUsage();
 };

@@ -40,6 +40,8 @@
 #define DF_SERVERMEMO
 #define DF_RTS_CHECK
 
+#define DF_SYMBOL_REPLACE
+
 #include "../H/TickStore.h"
 inline void Output_DebugString(CString slog)
 {

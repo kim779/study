@@ -26,8 +26,6 @@
 
 // 값 넘어가는지 확인하는 함수짜기
 const int maxIDX = 100;
-//#define MAX_FIELD_INDEX 1000
-static constexpr int MAX_FIELD_INDEX = 1024;
 
 class CIndexMap
 {
@@ -138,17 +136,10 @@ public:
 	{		
 		if (code.CompareNoCase("S0000") == 0 || code[0] == 'X')
 			return true;	
-		CString slog;
+
 		const auto ft = _mapSymbol.find(code);
 		if (ft != _mapSymbol.end())
-		{
-			slog.Format("[IsCode][%p] 있다 code =[%s] _mapSymbol size= [%d] ", this, code, _mapSymbol.size());
-			Output_DebugString(slog);
 			return true;
-		}
-		
-		slog.Format("[IsCode][%p]없다 code =[%s] _mapSymbol size= [%d] ", this, code, _mapSymbol.size());
-		Output_DebugString(slog);
 		return false;
 	}
 
@@ -362,7 +353,7 @@ protected:
 	void BaseSorting();
 	bool GetCodeMap(CMap<CString, LPCTSTR, int, int> &arCodeMap);
 
-	void SettingGridHeaderName(int index);
+	//void SettingGridHeaderName(int index);
 
 	void ClearSearchMap();
 	void ReSetSearchMap();					      // 2011.12.29 KSJ
@@ -490,116 +481,4 @@ public:
 	int _typeAuto = 0;
 	void initgridalert();
 	void setMemo();
-
-
-	class DataAccessor
-	{
-	public:
-		explicit DataAccessor(const _alertR* alert)
-		{
-			m_data = alert && alert->ptr[0]
-				? (const DWORD*)alert->ptr[0]
-				: nullptr;
-		}
-
-		LPCSTR ptr(int idx) const
-		{
-			if (!m_data || idx < 0 || idx >= MAX_FIELD_INDEX)
-				return nullptr;
-
-			DWORD p = m_data[idx];
-			return p ? reinterpret_cast<LPCSTR>(p) : nullptr;
-		}
-
-		CString str(int idx) const
-		{
-			if (auto p = ptr(idx))
-				return CString(p);
-			return CString();
-		}
-		
-		const DWORD* row() const { return m_data; }
-
-	private:
-		const DWORD* m_data{};
-	};
-
-	void CGridWnd::ProcessOneRow_Alertx(
-		int xrow,
-		const CString& code,
-		const CString& strCode,
-		const CString& strGubn,
-		bool bKrx,
-		int beginTime, int beginTimeEnd, int endTimeEnd, int endTime,
-		const DataAccessor& acc);
-
-	void ApplyExpectLogic(
-		int xrow,
-		const CString& code,
-		const CString& strCode,
-		const CString& strGubn,
-		bool bKrx,
-		int beginTime,
-		int beginTimeEnd,
-		int endTimeEnd,
-		int endTime,
-		LPCSTR expectPtr,
-		LPCSTR currPtr,
-		int serverTime,
-		int dealTime,
-		LPCSTR serverTimePtr,
-		LPCSTR dealTimePtr,
-		BOOL bLast,
-		BOOL& bTransSymbol,
-		BOOL& bZisu,
-		CString& entry);
-
-	void UpdateGridByHeaders(
-		int xrow,
-		const CString& code,
-		const CString& strCode,
-		const CString& strGubn,
-		BOOL bExpect,
-		BOOL bForceDraw,
-		BOOL bTransSymbol,
-		BOOL bZisu,
-		BOOL& bDaebi,
-		CString& entry,
-		LPCSTR expectPtr,
-		LPCSTR currPtr,
-		const DataAccessor& acc);
-
-	void PostProcessAfterGrid(
-		int xrow,
-		const CString& code,
-		const CString& strCode,
-		BOOL bExpect,
-		const CString& saveData,
-		const DataAccessor& acc);
-
-	bool HandleNewsIfAny(const CString& code, const DataAccessor& acc);
-
-	void HandleIndexExpectedCase(CString& code, CString& strCode, const CString& strGubn);
-
-	bool NormalizeCodeAndMarket(const CString& in, CString& out, bool& bKrx);
-
-	void ProcessOneRow(int xrow, const CString& code, const DataAccessor& acc);
-
-	bool DecideExpectState(int xrow, const DataAccessor& acc, CString& entry);
-
-	void UpdateGridFields(int xrow, const DataAccessor& acc,
-		bool bExpect, const CString& entry);
-
-	CString GetEntryForSymbol(int nSymbol,
-		const DataAccessor& acc,
-		bool bExpect);
-
-	void UpdateCalculatedFields(int xrow,
-		const DataAccessor& acc,
-		bool bExpect);
-
-	void HandleSpecialInfo(int xrow,
-		const DataAccessor& acc);
-
-	void UpdateFromTickSlot(int slotIndex);
 };

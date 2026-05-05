@@ -1057,7 +1057,8 @@ void CTreeWnd::initTree()
 	SetItemData(InsertItem(_T("K-OTC"), 0, 1, hRoot, TVI_LAST), MAKE_TREEID(xFREECODE));
 	SetItemData(InsertItem(_T("ETF"), 0, 1, hRoot, TVI_LAST), MAKE_TREEID(xETFCODE, 0, 0, 0, TD_MID));
 	SetItemData(InsertItem(_T("ETN"), 0, 1, hRoot, TVI_LAST), MAKE_TREEID(xETNCODE));
-	SetItemData(InsertItem(_T("상장형수익증권"),0, 1, hRoot, TVI_LAST), MAKE_TREEID(xGOODSTOCK));		//25.06.12 상장형수익증권 추가
+	SetItemData(InsertItem(_T("상장형수익증권"),0, 1, hRoot, TVI_LAST), MAKE_TREEID(xGOODSTOCK));		//25.06.12 상장형수익증권 추가  
+	SetItemData(InsertItem(_T("BDC"), 0, 1, hRoot, TVI_LAST), MAKE_TREEID(xBDC));
 	SetItemData(InsertItem(_T("리츠"), 0, 1, hRoot, TVI_LAST), MAKE_TREEID(xRITS));
 	SetItemData(InsertItem(_T("스팩"), 0, 1, hRoot, TVI_LAST), MAKE_TREEID(xSPACCODE));	//2015.11.03 KSJ spac 추가
 	SetItemData(InsertItem(_T("섹터종목"), 0, 1, hRoot, TVI_LAST), MAKE_TREEID(xTHEMACODE));
@@ -2107,6 +2108,18 @@ BOOL CTreeWnd::CheckStock(UINT kind, _shjcode* hjcode)
 			break;
 		}
 		break;
+	case xBDC:
+	{
+		switch (hjcode->ssgb)
+		{
+		case jmBDCPST:
+		case jmBDCICY:
+			ret = TRUE;
+			break;
+		}
+		break;
+	}
+	break;
 	case xNXT:
 	{
 		if (hjcode->nxtf == 'Y')
@@ -3084,6 +3097,7 @@ bool CTreeWnd::GetData(class CGridData& sdata, int max, int opt)
 	case xALLNEWST: //20240422 신종증권
 	case xGOODSTOCK:
 	case xNXT:
+	case xBDC:
 		{
 			if(treeID.kind == xSPACCODE)	opt = 0;	//2015.11.20 KSJ 스팩일때는 옵션을 0으로 
 				GetStock(sdata, max, opt);

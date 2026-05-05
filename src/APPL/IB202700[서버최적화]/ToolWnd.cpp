@@ -128,9 +128,7 @@ void CToolWnd::OperInit()
 	_cxMarket = std::make_unique<CContainerWnd>();
 	_cxMarket->SetParent(_pWizard);
 	_cxMarket->Create(NULL, NULL, WS_CHILDWINDOW | WS_VISIBLE, CRect(255, 27, SIZE_BUTTONS + 255, SIZE_BUTTONS + 27), this, -1);
-	_cxMarket->CreateControl(m_root, "CX_MarketPicker", "xxInter", CRect(0,0,0,0), "/tIB202200/k2");
-	//_cxMarket->ShowWindow(SW_HIDE);
-
+	_cxMarket->CreateControl(m_root, "CX_MarketPicker", "xxInter", CRect(0,0,0,0), "/tIB202700/k2");
 
 	CString market = _cxMarket->GetCtrlProperty("sMarket");
 	if (market == "KRX")
@@ -1505,11 +1503,6 @@ int CToolWnd::loadActiveField()
 
 int CToolWnd::Reload()
 {
-//	m_slog.Format("\r\n[interest][IB202200] -------------------------------------");
-//	OutputDebugString(m_slog);
-//	m_slog.Format("\r\n[interest][IB202200][%s]", __FUNCTION__);
-//	OutputDebugString(m_slog);
-
 	const int ncntBeforeload = m_cbGROUP->GetCount();		//변경전 그룹 개수
 	int	ncursel = m_cbFIELD->GetCurSel();
 	int	ndata = 0;

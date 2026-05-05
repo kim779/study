@@ -111,72 +111,7 @@ void CGroupWnd::AddDragInCount()
 
 void CGroupWnd::SendUini()
 {
-	//struct userdata
-	//{
-	//	char usid[8];	//사용자Id
-	//	char innm[100]; // INI파일명
-	//	char senm[100]; //시간데이터
-	//	char skey[100]; //일자데이터
-	//	char valu[500]; //카운트
-	//	char date[8];	//업데이트일자
-	//};
-
-	//struct mid
-	//{
-	//	char gubn[1];
-	//	struct userdata userdata;
-	//};
-
-	//struct mid mid;
-	//// ZeroMemory(&mid, sizeof(mid));
-	////memset(&mid, ' ', sizeof(mid));
-
-	//mid.gubn[0] = 'I';
-	//CString m_user = Variant(userCC);
-	//CString m_filename = "IB202200";
-
-	//CTime time;
-	//CString m_time, m_day, m_update, strCount;
-	//const int count = GetDragInCount();
-
-	//if (count > 0)
-	//{
-	//	strCount.Format("%04d", count);
-
-	//	time = CTime::GetCurrentTime();
-
-	//	m_day.Format("%04d%02d%02d", time.GetYear(), time.GetMonth(), time.GetDay());
-	//	m_time.Format("%02d%02d%02d", time.GetHour(), time.GetMinute(), time.GetSecond());
-	//	m_update.Format("%04d%02d%02d", time.GetYear(), time.GetMonth(), time.GetDay());
-
-	//	CopyMemory(mid.userdata.usid, m_user.operator LPCTSTR(), min(sizeof(mid.userdata.usid), strlen(m_user)));
-
-	//	CopyMemory(mid.userdata.innm, m_filename.operator LPCTSTR(), min(sizeof(mid.userdata.innm), strlen(m_filename)));
-	//	CopyMemory(mid.userdata.senm, m_time.operator LPCTSTR(), min(sizeof(mid.userdata.senm), strlen(m_time)));
-	//	CopyMemory(mid.userdata.skey, m_day.operator LPCTSTR(), min(sizeof(mid.userdata.skey), strlen(m_day)));
-	//	CopyMemory(mid.userdata.valu, strCount.operator LPCTSTR(), min(sizeof(mid.userdata.valu), strlen(strCount)));
-	//	CopyMemory(mid.userdata.date, m_update.operator LPCTSTR(), min(sizeof(mid.userdata.date), strlen(m_update)));
-
-	//	int sMid = sizeof(mid);
-	//	std::string buffer;
-	//	buffer.resize(sMid + 1);
-
-	//	// updateX_20111229
-	//	CopyMemory(buffer.data(), &mid, sizeof(mid));
-	//	buffer[sMid] = 0x00;
-
-	//	//	SendTR
-	//	CSendData sdata;
-	//	char key{};
-	//	_trkey *trkey = (struct _trkey *)&key;
-
-	//	trkey->group = m_nIndex;
-	//	trkey->kind = TRKEY_TRCOUNT;
-
-	//	sdata.SetData("pidouini", key, buffer.data(), buffer.size(), "");
-	//	m_pMainWnd->SendMessage(WM_MANAGE, MK_SENDTR, (LPARAM)&sdata);
-
-	//}
+	
 }
 
 void CGroupWnd::OperDraw(CDC *pDC)
@@ -2453,6 +2388,29 @@ int CGroupWnd::OverOper(int nIndex, CGridData *sdata)
 
 
 // 2012.02.10 KSJ
+void CGroupWnd::RecvRTSx(LPARAM lParam)
+{
+	if (m_nGroup == 0)
+		return;
+
+	_cacheGrid.clear();
+	
+	const auto* alertR  = reinterpret_cast<const _alertR*>(lParam);
+	const CString code  = alertR->code;
+		
+	for_each_n(m_GridWnd.begin(), m_nGroup, [this, code](const auto& gridWnd) {	
+		if (gridWnd->IsCode(code))
+			_cacheGrid.push_back(gridWnd.get());
+	});
+
+	for_each(_cacheGrid.begin(), _cacheGrid.end(), [this, lParam](CGridWnd* pGridWnd) {
+		pGridWnd->HoldDraw();
+		pGridWnd->parsingAlertx(lParam);
+	});
+
+	for (auto& grid : _cacheGrid)
+		grid->ReleaseDraw();
+}
 
 void CGroupWnd::UpdateDraw()
 {
@@ -3058,106 +3016,4 @@ BOOL CGroupWnd::CheckGetRTSHoga()
 		}
 	}
 	return FALSE;
-}
-
-
-void CGroupWnd::UpdateFromTick(const std::vector<int>& slotIndices)
-{
-	if (m_nGroup == 0) return;
-
-#ifdef DF_DLL_RTS
-	const TickSnapshot* slots = DLL_GetTickSlots();
-#else
-	const TickSnapshot* slots = Axis_GetTickSlots();
-#endif
-	if (!slots) return;
-
-	CString slog;
-	slog.Format("[UpdateFromTick] ------------------------------start-------------------------");
-	Output_DebugString(slog);
-	for (int slotIndex : slotIndices)
-	{
-		const TickSnapshot& slot = slots[slotIndex];
-		if (slot.code[0] == '\0')
-		{
-			CString slog;
-			slog.Format("[UpdateFromTick] slot EMPTY - slotIndex=[%d]\n", slotIndex);
-			Output_DebugString(slog);
-			continue;
-		}
-
-		// 쓰기 중이면 이번 tick 스킵 (절대 죽지 않음)
-		int seq = slot.seq.load(std::memory_order_acquire);
-		if (seq & 1)
-		{
-			CString slog;
-			slog.Format("[UpdateFromTick] seq & 1   seq=[%d]\n", seq);
-			Output_DebugString(slog);
-			continue;
-		}
-
-		CString code = slot.code;
-
-		if (1)
-		{
-			for_each_n(m_GridWnd.begin(), m_nGroup, [this, slotIndex, code](const auto& gridWnd) {
-				gridWnd.get()->HoldDraw();
-				gridWnd.get()->IsCode(code);
-#ifdef DF_MAIN_RTS
-				gridWnd.get()->UpdateFromTickSlot(slotIndex);
-				gridWnd.get()->ReleaseDraw();
-#else
-				gridWnd.get()->parsingAlertx(lParam);
-#endif
-				});
-		}
-		else
-		{
-			// 이 슬롯을 표시하는 GridWnd 찾기
-			_cacheGrid.clear();
-			for_each_n(m_GridWnd.begin(), m_nGroup, [this, &code](const auto& gridWnd) {
-				if (gridWnd && gridWnd->IsCode(code))
-					_cacheGrid.push_back(gridWnd.get());
-				});
-
-			if (_cacheGrid.empty()) continue;
-
-			// GridWnd 갱신
-			for (CGridWnd* pGrid : _cacheGrid)
-			{
-				if (!pGrid || !pGrid->GetSafeHwnd()) continue;
-				pGrid->HoldDraw();
-				pGrid->UpdateFromTickSlot(slotIndex);  // 아래 구현
-			}
-		}
-
-		for (CGridWnd* pGrid : _cacheGrid)
-		{
-			if (pGrid) pGrid->ReleaseDraw();
-		}
-	}
-}
-
-void CGroupWnd::RecvRTSx(LPARAM lParam)
-{
-	if (m_nGroup == 0)
-		return;
-
-	_cacheGrid.clear();
-
-	const auto* alertR = reinterpret_cast<const _alertR*>(lParam);
-	const CString code = alertR->code;
-
-	for_each_n(m_GridWnd.begin(), m_nGroup, [this, code](const auto& gridWnd) {
-		if (gridWnd->IsCode(code))
-			_cacheGrid.push_back(gridWnd.get());
-		});
-
-	for_each(_cacheGrid.begin(), _cacheGrid.end(), [this, lParam](CGridWnd* pGridWnd) {
-		pGridWnd->HoldDraw();
-		pGridWnd->parsingAlertx(lParam);
-		});
-
-	for (auto& grid : _cacheGrid)
-		grid->ReleaseDraw();
 }

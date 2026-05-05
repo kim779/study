@@ -1,4 +1,4 @@
-// IB202200.cpp : Defines the initialization routines for the DLL.
+// IB202700.cpp : Defines the initialization routines for the DLL.
 //
 
 #include "stdafx.h"
@@ -59,7 +59,7 @@ CIB202700App::CIB202700App()
 }
 
 /////////////////////////////////////////////////////////////////////////////
-// The one and only CIB202200App object
+// The one and only CIB202700App object
 CIB202700App theApp;
 
 #include "MainWnd.h"

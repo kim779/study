@@ -49,11 +49,11 @@ struct MarketTime
 #pragma comment(lib, "../../AXIS/Release/axis.lib")
 #endif
 
-#ifdef _DEBUG
-#pragma comment(lib, "../../control/cx_shared/cx_shared/Debug/cx_shared.tlb")
-#else
-#pragma comment(lib, "../../control/cx_shared/cx_shared/Release/cx_shared.lib")
-#endif
+//#ifdef _DEBUG
+//#pragma comment(lib, "../../control/cx_shared/cx_shared/Debug/cx_shared.tlb")
+//#else
+//#pragma comment(lib, "../../control/cx_shared/cx_shared/Release/cx_shared.lib")
+//#endif
 
 CMainWnd::CMainWnd(CWnd* pWnd, _param* pInfo)
 	: _pApp(_pApp = dynamic_cast<CCX_INTERGRIDApp*>(AfxGetApp()))

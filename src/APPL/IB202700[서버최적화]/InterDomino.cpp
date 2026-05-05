@@ -271,7 +271,7 @@ void CInterDomino::OnOK()
 	int nScnt = 0;
 	constexpr char chTab = P_TAB;
 	
-	string_Head = "IB202200"; 
+	string_Head = "IB202700"; 
 	
 	for(int ii=0 ; ii<m_irowCount ; ii++)
 	{
