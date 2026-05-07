@@ -469,6 +469,7 @@ public:
 
 	std::unordered_map<int, int>	_mRsymbol;
 	std::map<CString, int>		_mapSymbol;
+	std::map<CString, CString> m_mapCodeName{};
 
 	void parsingAlertx(LPARAM lParam);
 	void initRSymbol();

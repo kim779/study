@@ -890,6 +890,7 @@ BOOL CAccountCtrl::Initialize(BOOL bDLL)
 		}
 	}
 
+	m_bEditMode = TRUE;  //testcode
 
 	m_pEdit->SetEditMode(m_bEditMode);
 
@@ -923,6 +924,12 @@ BOOL CAccountCtrl::Initialize(BOOL bDLL)
 			strLast = Parser(strTemp, _T("\t"));
 			strLastAcc = Parser(strLast, _T("|"));
 			strLastName = Parser(strLast, _T("|"));
+
+			//if (strTemp.Find("3471") >= 0)
+			{
+				m_slog.Format("[ACCN] 1 [%s]", strTemp);
+				OutputDebugString(m_slog);
+			}
 		
 			if (!m_mapName.Compare("IB140100") || !m_mapName.Compare("IB340100") || !m_mapName.Compare("IB611100"))
 			{
@@ -3669,7 +3676,7 @@ void CAccountCtrl::OnTimer(UINT nIDEvent)
 		}
 
 		CString Path, strHistory;
-		char	readb[10 * 1024]{};
+		char	readb[60 * 2048]{};
 		CString strKey = m_Param.name;
 		std::shared_ptr<CAccount> pAcc = nullptr;
 
@@ -3689,6 +3696,7 @@ void CAccountCtrl::OnTimer(UINT nIDEvent)
 
 		strHistory = readb;
 		strHistory.Trim();
+
 		if (!strHistory.IsEmpty())
 		{
 			CString strLast;
@@ -3697,6 +3705,11 @@ void CAccountCtrl::OnTimer(UINT nIDEvent)
 
 			while (!strHistory.IsEmpty())
 			{
+				//if (strHistory.Find("3471") >= 0)
+				{
+					m_slog.Format("[ACCN] [%s]", strHistory);
+					OutputDebugString(m_slog);
+				}
 				strLast = Parser(strHistory, _T("\t"));
 				strLastAcc = Parser(strLast, _T("|"));
 				strLastName = Parser(strLast, _T("|"));
@@ -4663,6 +4676,9 @@ void CAccountCtrl::AppendAccHistory(CString strAcc, CString strPassword, CString
 	CString strPushKey(_T(""));
 
 	strPushKey.Format("%s%d", PP_SYM, 0);
+
+	//m_slog.Format("[ACCN] [%s][%s][%s]", strAcc, strPassword, strAccName);
+	//OutputDebugString(m_slog);
 
 	strData.Format("%s\t%s\t%s|", strAcc, strPassword, strAccName);
 	
@@ -6305,7 +6321,7 @@ CString CAccountCtrl::DecryptAccount(const CString& sEncrypted)
 
 CString CAccountCtrl::ReadAccountHistory(const CString& strUserPath, const CString& strKey)
 {
-	char readb[1024 * 64]{};
+	char readb[2048 * 64]{};
 	GetPrivateProfileStringA("AccountHistory", strKey, "", readb, sizeof(readb), strUserPath);
 
 	CString val(readb);

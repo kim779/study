@@ -8008,14 +8008,39 @@ void CGridWnd::parsingNewsx()
 // 2012.01.19 KSJ Alertx 추가 끝
 CString CGridWnd::GetCodeName(CString code)
 {
-	CString ret = _T("");
+	code.TrimLeft();
+	code.TrimRight();
+
+	if (code.IsEmpty())
+		return _T("");
+
+	// 1. 캐시에 있으면 바로 반환
+	std::map<CString, CString>::iterator it = m_mapCodeName.find(code);
+	if (it != m_mapCodeName.end())
+		return it->second;
+
+	// 2. 없으면 기존 방식으로 조회
+	CString ret;
 	CString sztmp;
-	sztmp.Format("%s", code);
-	ret.Format("%s", (char *)m_pView->SendMessage(WM_USER, MAKEWPARAM(nameDLL, 0), (LPARAM)sztmp.operator LPCTSTR()));
-	ret.TrimLeft(), ret.TrimRight();
+	sztmp.Format(_T("%s"), code);
+
+	ret.Format(_T("%s"),
+		(char*)m_pView->SendMessage(
+			WM_USER,
+			MAKEWPARAM(nameDLL, 0),
+			(LPARAM)sztmp.operator LPCTSTR()
+		)
+	);
+
+	ret.TrimLeft();
+	ret.TrimRight();
 
 	if (ret.GetLength() > 32)
 		ret = ret.Mid(0, 32);
+
+	// 3. 캐시에 저장
+	m_mapCodeName[code] = ret;
+
 	return ret;
 }
 
@@ -9086,6 +9111,11 @@ void CGridWnd::parsingAlertx(LPARAM lParam)
 		{
 			saveData = currPtr;
 		}
+
+		//slog.Format("[IB202200][symbol] [%s][%s] 예상가=[%s] 현재가=[%s]  saveData=[%s]", strCode,GetCodeName(strCode), expectPtr, currPtr, saveData);
+		slog.Format("[IB202200][symbol] [%s] 예상가=[%s] 현재가=[%s]  saveData=[%s] _typeAuto=[%d]", strCode, expectPtr, currPtr, saveData, _typeAuto);
+		Output_DebugString(slog);
+
 		//내려오는 걸 기준으로 끊기
 		// 111이 내려오는지 023이 내려오는지 판단해서 사전 차단
 
@@ -9104,7 +9134,8 @@ void CGridWnd::parsingAlertx(LPARAM lParam)
 		//m_grid->setExpectdelay(true);
 
 		const int nEndOPMarket = m_grid->GetItemData(xrow, colEXPECT);    // 2013.09.17 KSJ 해당종목이 장종료 되었으면
-		if ((strGubn == "n" || strGubn.Compare("X") == 0 || expectPtr || nEndOPMarket == 1) && !bLast) // 예상가 적용	2013.08.22 지수예상가는111심볼이 없고 구분값이X로 온다.
+		//if ((strGubn == "n" || strGubn.Compare("X") == 0 || expectPtr || nEndOPMarket == 1) && !bLast) // 예상가 적용	2013.08.22 지수예상가는111심볼이 없고 구분값이X로 온다.
+		if ((expectPtr || nEndOPMarket == 1) && !bLast)
 		{
 			if (expectPtr)
 			{
@@ -9122,24 +9153,25 @@ void CGridWnd::parsingAlertx(LPARAM lParam)
 			{  //장마감 동시호가 이후 체결(B) 데이터가 들어와서 현재가(예상가로 세팅되있는)를 초기화 해주는데 
 				//간혹 한두종목이 체결 데이터 수신 후 또 다시 예상가호가(D)데이터가 들어와서 다시 예상가로 바꿔주는 역전현상이 있다
 				//예상가가 아닌걸로 세팅 되고 난뒤 다시 예상가가 들어왔을때 시간이 장마감동시호가 이후면 처리 하지 않는다
-				strTime = serverTimePtr ? CString(serverTimePtr) : CString();
+
+			/*	strTime = serverTimePtr ? CString(serverTimePtr) : CString();
 				if (bKrx && m_grid->GetItemText(xrow, colEXPECT) == "0" && serverTime >= endTimeEnd)
 				{
-//					m_slog.Format("\r\n [inter][역전데이터 스킵] [%s] gubn=[%s] cur=[%s] exCur=[%s] serverTime=[%s]", 
-//						code,  (char*)data[0], (char*)data[23], (char*)data[111], strTime);
-//					OutputDebugString(m_slog);
+
 				}
 				else
-					m_grid->SetItemText(xrow, colEXPECT, "1");
+					m_grid->SetItemText(xrow, colEXPECT, "1");*/
+
 			}
 			else
 			{
 				// 2012.05.09 KSJ 예상가가 0이 올때는 현재가를 뿌려준다.
 				//m_mapCurValue.Lookup(strCode, strData);
 				//m_grid->SetItemText(xrow, colEXPECT, "0"); //예상가 취소
-				CString ss = entry;
+
+		/*		CString ss = entry;
 				entry = m_grid->GetItemText(xrow, colCURR);
-				AxStd::_Msg("[%s][%s]예상가가 0이 올때는 현재가를 뿌려준다.", ss, entry);
+				AxStd::_Msg("[%s][%s]예상가가 0이 올때는 현재가를 뿌려준다.", ss, entry);*/
 			}
 
 			//현재 예상버튼이 안눌러져 있을때, 강제로 심볼을 바꾸어서 그리드에 데이터를 보여주고 있다
@@ -9147,11 +9179,11 @@ void CGridWnd::parsingAlertx(LPARAM lParam)
 			//그럼 자동 체크 눌러있을때만, 보여주면 되고
 			//자동 체크 해지시엔, 예상가 안보여주면 된다
 					
-			if (_typeAuto == 0)
+			if (_typeAuto == 0) //자동
 			{
 				bTransSymbol = TRUE; // 2012.02.09 KSJ 현재가 심볼이 예상가 심볼로 바껴야함.
 			}
-			else if(_typeAuto == 1)
+			else if(_typeAuto == 1)  //예상
 			{
 				bTransSymbol = TRUE; // 2012.02.09 KSJ 현재가 심볼이 예상가 심볼로 바껴야함.
 			}
@@ -9166,7 +9198,7 @@ void CGridWnd::parsingAlertx(LPARAM lParam)
 		else if (currPtr)
 		{
 			entry = currPtr;
-			if (_typeAuto == 0)
+			if (_typeAuto == 0)  //자동
 			{
 				strTime = dealTimePtr ? CString(dealTimePtr) : CString();
 				if (beginTime <= dealTime && beginTimeEnd >= dealTime && bKrx)
@@ -9187,7 +9219,7 @@ void CGridWnd::parsingAlertx(LPARAM lParam)
 					m_grid->SetItemText(xrow, colEXPECT, "0"); //여기
 				}
 			}
-			else if (_typeAuto == 1)
+			else if (_typeAuto == 1)  //예상
 			{
 				if (!entry.IsEmpty())
 				{
@@ -9212,7 +9244,9 @@ void CGridWnd::parsingAlertx(LPARAM lParam)
 		const BOOL bExpect = static_cast<BOOL>(_ttoi(newEXP)); // 위에서 설정한 0 이나 1 값 return
 		const int countX = m_gridHdrX.GetSize();
 		_gridHdr xgridHdr{};
-		// LONG ret = 0;
+
+		slog.Format("[IB202200][symbol] [%s] newEXP=[%s] bForceDraw=[%d]  bExpect=[%d]", strCode, newEXP, bForceDraw, bExpect);
+		Output_DebugString(slog);
 
 		// 2012.11.08 KSJ 주식과 선물옵션의 심볼값이 똑같은 것이 있다. 외인소진률 같은것.
 		const bool bKospi = (codeLength == 6);
@@ -9239,7 +9273,8 @@ void CGridWnd::parsingAlertx(LPARAM lParam)
 
 			if (!bTransSymbol) // 2013.07.08 예상체크되어 있을때 밑에 타도록
 			{
-				// 2012.03.16 KSJ 예상가, 거래량 빠져있어서 추가함..
+				// bTransSymbol 심볼변환(예상가변환)을 안하는 경우 -> 현재가 보여줘야 할때
+				// 그리드 컬럼이 예상이라도 현재가로
 				switch (nSymbol)
 				{
 				//예상가
@@ -9277,6 +9312,7 @@ void CGridWnd::parsingAlertx(LPARAM lParam)
 			}
 			else if (bZisu)
 			{
+				//지수인경우 심볼을 알아봐야 한다
 				if (const LPCSTR ptr = getDataPtr(nSymbol))
 				{
 					entry = ptr;
@@ -9288,7 +9324,8 @@ void CGridWnd::parsingAlertx(LPARAM lParam)
 			}
 			else if (bTransSymbol)
 			{
-				// 2012.03.16 KSJ 예상가, 거래량 빠져있어서 추가함..
+				// bTransSymbol 심볼변환(예상가변환)을 하는 경우 -> 예상가 보여줘야 할때
+			 // 그리드 컬럼이 현재라도 예상가로
 				switch (nSymbol)
 				{
 				//예상가
