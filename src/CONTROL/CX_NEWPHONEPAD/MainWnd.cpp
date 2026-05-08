@@ -1,18 +1,18 @@
-Ôªø// CMainWnd.cpp: Íµ¨ÌòÑ ÌååÏùº
+// MainWnd.cpp : implementation file
 //
 
-#include "pch.h"
+#include "stdafx.h"
 #include "CX_NEWPHONEPAD.h"
-#include "CMainWnd.h"
+#include "MainWnd.h"
+
+#ifdef _DEBUG
+#define new DEBUG_NEW
+#undef THIS_FILE
+static char THIS_FILE[] = __FILE__;
+#endif
 
 #pragma comment(lib, "lib/EAPIClientLib.lib")
-// CMainWnd
 
-IMPLEMENT_DYNAMIC(CMainWnd, CWnd)
-
-//-------------------------------------------------------
-// Message Name
-//-------------------------------------------------------
 static const char* GetMsgName(int nMsgID)
 {
 	switch (nMsgID) {
@@ -60,21 +60,61 @@ static const char* GetMsgName(int nMsgID)
 static const char* SZ(const char* p) { return p ? p : ""; }
 
 CMainWnd* CMainWnd::s_pDlg = NULL;
+/////////////////////////////////////////////////////////////////////////////
+// CMainWnd
 
 CMainWnd::CMainWnd(CWnd* pParent, _param* pParam)
 {
-
+	EnableAutomation();
 }
 
 CMainWnd::~CMainWnd()
 {
 }
 
+void CMainWnd::OnFinalRelease()
+{
+	// When the last reference for an automation object is released
+	// OnFinalRelease is called.  The base class will automatically
+	// deletes the object.  Add additional cleanup required for your
+	// object before calling the base class.
+
+	CWnd::OnFinalRelease();
+}
+
 
 BEGIN_MESSAGE_MAP(CMainWnd, CWnd)
+	//{{AFX_MSG_MAP(CMainWnd)
+		// NOTE - the ClassWizard will add and remove mapping macros here.
+	//}}AFX_MSG_MAP
 	ON_WM_CREATE()
 	ON_MESSAGE(WM_APP_LOG, &CMainWnd::OnAppLog)
+	ON_WM_DESTROY()
 END_MESSAGE_MAP()
+
+
+BEGIN_DISPATCH_MAP(CMainWnd, CWnd)
+	//{{AFX_DISPATCH_MAP(CMainWnd)
+	DISP_FUNCTION(CMainWnd, "DoSomething", DoSomething, VT_BOOL, VTS_I2 VTS_BSTR)
+	//}}AFX_DISPATCH_MAP
+	DISP_FUNCTION_ID(CMainWnd, "EAPIConnect", dispidEAPIConnect, _EAPIConnect, VT_BOOL, VTS_BSTR VTS_I2)
+	DISP_FUNCTION_ID(CMainWnd, "EAPIDisconnect", dispidEAPIDisconnect, _EAPIDisconnect, VT_EMPTY, VTS_NONE)
+	DISP_FUNCTION_ID(CMainWnd, "EAPILogin", dispidEAPILogin, _EAPILogin, VT_EMPTY, VTS_BSTR VTS_BSTR VTS_BSTR VTS_BSTR)
+	DISP_FUNCTION_ID(CMainWnd, "EAPILogout", dispidEAPILogout, _EAPILogout, VT_EMPTY, VTS_NONE)
+	DISP_FUNCTION_ID(CMainWnd, "EAPIPhonePad", dispidEAPIPhonePad, _EAPIPhonePad, VT_EMPTY, VTS_BSTR VTS_BSTR VTS_BSTR VTS_BSTR)
+END_DISPATCH_MAP()
+
+// Note: we add support for IID_IMainWnd to support typesafe binding
+//  from VBA.  This IID must match the GUID that is attached to the 
+//  dispinterface in the .ODL file.
+
+// {F2D3913A-1BCD-4EAB-980C-78555FDB3AAF}
+static const IID IID_IMainWnd =
+{ 0xf2d3913a, 0x1bcd, 0x4eab, { 0x98, 0xc, 0x78, 0x55, 0x5f, 0xdb, 0x3a, 0xaf } };
+
+BEGIN_INTERFACE_MAP(CMainWnd, CWnd)
+	INTERFACE_PART(CMainWnd, IID_IMainWnd, Dispatch)
+END_INTERFACE_MAP()
 
 
 DWORD CMainWnd::CB_Resp(int nMessageID, char* pszUniqueNO, char* pszDeviceType,
@@ -109,27 +149,27 @@ DWORD CMainWnd::CB_Resp(int nMessageID, char* pszUniqueNO, char* pszDeviceType,
 			case 1017:
 				_snprintf_s(detail, sizeof(detail), _TRUNCATE,
 					"[cx_newphonepad][%s]<%d>[LOGIN FAIL] Cause=%d DEVICE_NOT_FOUND - Device ID not found on server", __FUNCTION__, __LINE__, nCause);
-				s_pDlg->SetStatus("Login Failed: DEVICE_NOT_FOUND");
+				s_pDlg->SetStatus(detail);
 				break;
 			case 1018:
 				_snprintf_s(detail, sizeof(detail), _TRUNCATE,
 					"[cx_newphonepad][%s]<%d>[LOGIN FAIL] Cause=%d DEVICE_MULTIPLE_FOUND - Multiple devices found", __FUNCTION__, __LINE__, nCause);
-				s_pDlg->SetStatus("Login Failed: DEVICE_MULTIPLE");
+				s_pDlg->SetStatus(detail);
 				break;
 			case 1019:
 				_snprintf_s(detail, sizeof(detail), _TRUNCATE,
 					"[cx_newphonepad][%s]<%d>[LOGIN FAIL] Cause=%d HR_EXT_NOT_FOUND - No extension in HR (ID-only login)", __FUNCTION__, __LINE__, nCause);
-				s_pDlg->SetStatus("Login Failed: HR_EXT_NOT_FOUND");
+				s_pDlg->SetStatus(detail);
 				break;
 			case 1020:
 				_snprintf_s(detail, sizeof(detail), _TRUNCATE,
 					"[cx_newphonepad][%s]<%d>[LOGIN FAIL] Cause=%d HR_EXT_NB_FOUND - Extension exists in another HR", __FUNCTION__, __LINE__, nCause);
-				s_pDlg->SetStatus("Login Failed: HR_EXT_NB_FOUND");
+				s_pDlg->SetStatus(detail);
 				break;
 			default:
 				_snprintf_s(detail, sizeof(detail), _TRUNCATE,
 					"[cx_newphonepad][%s]<%d>[LOGIN FAIL] Cause=%d %s", __FUNCTION__, __LINE__, nCause, SZ(pszCauseStr));
-				s_pDlg->SetStatus("Login Failed");
+				s_pDlg->SetStatus(detail);
 				break;
 			}
 			detail[sizeof(detail) - 1] = '\0';
@@ -138,12 +178,12 @@ DWORD CMainWnd::CB_Resp(int nMessageID, char* pszUniqueNO, char* pszDeviceType,
 	}
 	// Logout response
 	else if (nMessageID == 1102) {
-		s_pDlg->SetStatus("Logged Out");
+		s_pDlg->SetStatus("[cx_newphonepad]Logged Out");
 	}
 	// PhonePad response
 	else if (nMessageID == 1120) {
 		char pp[256];
-		_snprintf_s(pp, sizeof(pp), _TRUNCATE, "[PHONEPAD-RESP] Result=%s (%s)",
+		_snprintf_s(pp, sizeof(pp), _TRUNCATE, "[cx_newphonepad][PHONEPAD-RESP] Result=%s (%s)",
 			SZ(pszResult), (pszResult && pszResult[0] == '1') ? "SUCCESS" : "FAIL");
 		pp[sizeof(pp) - 1] = '\0';
 		s_pDlg->PostLogFromCallback(pp);
@@ -162,7 +202,7 @@ DWORD CMainWnd::CB_Event(int nMessageID, char* pszCallID1, char* pszCallID2,
 
 	char buf[1024];
 	_snprintf_s(buf, sizeof(buf), _TRUNCATE,
-		"[EVENT] %s(%d) CallID=%s, ANI=%s, DNIS=%s, Dir=%s, %s->%s",
+		"[cx_newphonepad][EVENT] %s(%d) CallID=%s, ANI=%s, DNIS=%s, Dir=%s, %s->%s",
 		GetMsgName(nMessageID), nMessageID,
 		SZ(pszCallID1), SZ(pszANI), SZ(pszDNIS),
 		SZ(pszCallDirection), SZ(pszPrevStatus), SZ(pszCallStatus));
@@ -182,7 +222,7 @@ DWORD CMainWnd::CB_UUI(int nMessageID, char* pszCallID, char* pszUUIData,
 	if (nMessageID == 1314) {
 		// EVT_UC_DATA - PhonePad result
 		_snprintf_s(buf, sizeof(buf), _TRUNCATE,
-			"[UC-DATA] %s(%d) CallID=%s\r\n"
+			"[cx_newphonepad][UC-DATA] %s(%d) CallID=%s\r\n"
 			"          DATA=[%s]\r\n"
 			"          Result=%s, Cause=%s",
 			GetMsgName(nMessageID), nMessageID,
@@ -192,7 +232,7 @@ DWORD CMainWnd::CB_UUI(int nMessageID, char* pszCallID, char* pszUUIData,
 	else {
 		// EVT_UUI_DATA
 		_snprintf_s(buf, sizeof(buf), _TRUNCATE,
-			"[UUI] %s(%d) CallID=%s, Data=[%s], Result=%s",
+			"[cx_newphonepad][UUI] %s(%d) CallID=%s, Data=[%s], Result=%s",
 			GetMsgName(nMessageID), nMessageID,
 			SZ(pszCallID), SZ(pszUUIData), SZ(pszResult));
 	}
@@ -201,79 +241,36 @@ DWORD CMainWnd::CB_UUI(int nMessageID, char* pszCallID, char* pszUUIData,
 
 	return 0;
 }
-// CMainWnd Î©îÏãúÏßÄ Ï≤òÎ¶¨Í∏∞
-void CMainWnd::SetParam(_param* pParam)
+// CMainWnd ∏ﬁΩ√¡ˆ √≥∏Æ±‚
+/////////////////////////////////////////////////////////////////////////////
+// CMainWnd message handlers
+
+BOOL CMainWnd::DoSomething(short type, BSTR sval)
 {
-	m_Param.key = pParam->key;
-	m_Param.name = CString(pParam->name, pParam->name.GetLength());
-	m_Param.rect = CRect(pParam->rect.left, pParam->rect.top, pParam->rect.right, pParam->rect.bottom);
-	m_Param.fonts = CString(pParam->fonts, pParam->fonts.GetLength());
-	m_Param.point = pParam->point;
-	m_Param.style = pParam->style;
-	//m_clrForeColor = m_Param.tRGB = pParam->tRGB;
-	//m_clrBackColor = m_Param.pRGB = pParam->pRGB;
-	m_Param.options = CString(pParam->options, pParam->options.GetLength());
-/*
-	m_sHideTradeAgent.Empty();
-
-	m_sOption.Empty();
-
-	int	idx = 0, pos = 0;
-	CString	keys, text, tmps, strtemp;
-	CString sOption{};
-	sOption = m_Param.options;
-
-	tmps = _T("/ ");
-	keys = _T("wt");
-
-	for (int ii = 0; ii < keys.GetLength(); ii++)
-	{
-		tmps.SetAt(1, keys[ii]);
-		idx = sOption.Find(tmps);
-		if (idx < 0)
-			continue;
-
-		idx += 2;
-		pos = sOption.Find('/', idx);
-
-		text = (pos < 0) ? sOption.Mid(idx) : sOption.Mid(idx, pos - idx);
-		text.TrimLeft();
-
-		switch (keys[ii])
-		{
-		case 'w':
-		{
-			if (OptionParser(sOption, "/w") == 3)
-				m_sHideTradeAgent = "1";
-		}
-		break;
-		case 't':
-		{
-#ifndef DF_TEST_MODE
-			if (!(long)m_pParent->SendMessage(WM_USER, MAKEWPARAM(variantDLL, orderCC), 0L))
-#endif
-			{
-				m_sOption = OptionParser(sOption, "/t");
-			}
-		}
-		break;
-		}
-	}*/
+	// TODO: Add your dispatch handler code here
+	CString slog;
+	slog.Format("%d %s", type, sval);
+	
+	return TRUE;
 }
 
-int CMainWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
-{
-	if (CWnd::OnCreate(lpCreateStruct) == -1)
-		return -1;
 
-	// TODO:  Ïó¨Í∏∞Ïóê ÌäπÏàòÌôîÎêú ÏûëÏÑ± ÏΩîÎìúÎ•º Ï∂îÍ∞ÄÌï©ÎãàÎã§.
-	BOOL bRtn = EAPIInitialize(CB_Resp, CB_Event, CB_UUI, GetSafeHwnd(), NULL);
+VARIANT_BOOL CMainWnd::_EAPIConnect(BSTR ip, SHORT port)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	// TODO: ø©±‚ø° µΩ∫∆–ƒ° √≥∏Æ±‚ ƒ⁄µÂ∏¶ √ﬂ∞°«’¥œ¥Ÿ.
+	m_nPort = port;
+	m_strIP.Format("%s", ip);
+
+	CStringA ipA(m_strIP);
+	BOOL bRtn = EAPIConnect(ipA.GetString(), m_nPort);
 
 	CString slog;
-	slog.Format("[cx_newphonepad][%s]<%d>  bRtn = [%d]  CB_Resp=[%x]  CB_Event=[%x] CB_UUI=[%x]", __FUNCTION__, __LINE__,   bRtn, CB_Resp, CB_Event, CB_UUI);
-	OutputDebugString(slog); 
+	slog.Format("[cx_newphonepad][%s]<%d> bRtn=[%d]", __FUNCTION__, __LINE__, bRtn);
+	OutputDebugString(slog);
 
-	return 0;
+	return VARIANT_TRUE;
 }
 
 LRESULT CMainWnd::OnAppLog(WPARAM wParam, LPARAM lParam)
@@ -298,4 +295,101 @@ void CMainWnd::SetStatus(const char* pszStatus)
 	CString slog;
 	slog.Format("[cx_newphonepad][%s]<%d> pszStatus=[%s]", __FUNCTION__, __LINE__, pszStatus);
 	OutputDebugString(slog);
+}
+
+int CMainWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
+{
+	if (CWnd::OnCreate(lpCreateStruct) == -1)
+		return -1;
+
+	// TODO:  ø©±‚ø° ∆Øºˆ»≠µ» ¿€º∫ ƒ⁄µÂ∏¶ √ﬂ∞°«’¥œ¥Ÿ.
+	BOOL bRtn = EAPIInitialize(CB_Resp, CB_Event, CB_UUI, GetSafeHwnd(), NULL);
+
+	CString slog;
+	slog.Format("[cx_newphonepad][%s]<%d>  bRtn = [%d]  CB_Resp=[%x]  CB_Event=[%x] CB_UUI=[%x]", __FUNCTION__, __LINE__, bRtn, CB_Resp, CB_Event, CB_UUI);
+	OutputDebugString(slog);
+	return 0;
+}
+
+
+void CMainWnd::_EAPIDisconnect()
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+	EAPIDisconnect();
+	SetStatus("Disconnected");
+	// TODO: ø©±‚ø° µΩ∫∆–ƒ° √≥∏Æ±‚ ƒ⁄µÂ∏¶ √ﬂ∞°«’¥œ¥Ÿ.
+}
+
+
+void CMainWnd::_EAPILogin(BSTR sID, BSTR sDvcID, BSTR sUnqID, BSTR sOtpion)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+	m_strID.Format("%s", sID);
+	m_strID.Format("%s", sDvcID);
+	m_strID.Format("%s", sUnqID);
+
+	CStringA idA(m_strID);
+	CStringA devA(m_strDevice);
+	CStringA uniA(m_strUnique);
+
+	BOOL bRtn = EAPILogin(idA.GetString(), devA.GetString(), uniA.GetString(), "");
+
+	CString slog;
+	slog.Format("[cx_newphonepad][%s]<%d>  bRtn = [%d] ", __FUNCTION__, __LINE__, bRtn);
+	OutputDebugString(slog);
+	// TODO: ø©±‚ø° µΩ∫∆–ƒ° √≥∏Æ±‚ ƒ⁄µÂ∏¶ √ﬂ∞°«’¥œ¥Ÿ.
+}
+
+
+void CMainWnd::_EAPILogout()
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+	CStringA idA(m_strID);
+	CStringA devA(m_strDevice);
+	CStringA uniA(m_strUnique);
+
+	BOOL bRtn = EAPILogout(idA.GetString(), devA.GetString(), uniA.GetString());
+
+	CString slog;
+	slog.Format("[cx_newphonepad][%s]<%d>  bRtn = [%d] ", __FUNCTION__, __LINE__, bRtn);
+	OutputDebugString(slog);
+	// TODO: ø©±‚ø° µΩ∫∆–ƒ° √≥∏Æ±‚ ƒ⁄µÂ∏¶ √ﬂ∞°«’¥œ¥Ÿ.
+
+	if (bRtn)
+		_EAPIDisconnect();
+}
+
+
+void CMainWnd::OnDestroy()
+{
+	EAPIDisconnect();
+	EAPIFinalize();
+	CWnd::OnDestroy();
+}
+
+
+void CMainWnd::_EAPIPhonePad(BSTR sCallID, BSTR sSvcCode, BSTR sCustData, BSTR sDialNumber)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+	CString strCallID;
+	strCallID.Format("%s", sCallID);
+	strCallID.TrimRight();
+	if (strCallID.IsEmpty())
+		strCallID = "check";
+
+	m_strPPCustData.Format("%s", sCustData);
+	m_strPPCustData.TrimRight();
+	m_strPPCustData.Format("%s", sDialNumber);
+	m_strPPCustData.TrimRight();
+
+	CStringA dialA(m_strPPDialNum);
+	CStringA custA(m_strPPCustData);
+
+	// CallID="check" => No Call object, direct send
+	BOOL bRtn = EAPIPhonePad(strCallID, "", custA.GetString(), dialA.GetString());
+
+	CString slog;
+	slog.Format("[cx_newphonepad][%s]<%d>  bRtn = [%d] ", __FUNCTION__, __LINE__, bRtn);
+	OutputDebugString(slog);
+	// TODO: ø©±‚ø° µΩ∫∆–ƒ° √≥∏Æ±‚ ƒ⁄µÂ∏¶ √ﬂ∞°«’¥œ¥Ÿ.
 }

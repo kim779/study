@@ -9089,31 +9089,63 @@ void CGridWnd::parsingAlertx(LPARAM lParam)
 
 		//변경이 있을때마다 배열에 저장해 둔 현재가 데이타 업데이트
 		CString saveData;
-		 LPCSTR expectPtr = getDataPtr(111);
-		const LPCSTR currPtr = getDataPtr(23);
+
+		// 현재가/예상가 심볼 보정
+		// 현재가: 23 -> ToMapped(23) = 623
+		// 예상가: 111 -> ToMapped(111) = 611
+		CString rawExpectValue = getDataString(111); // 예상가 원본
+		CString rawCurrValue = getDataString(23);  // 현재가 원본
+
+		rawExpectValue.Trim();
+		rawCurrValue.Trim();
+
+		// 원본 기준으로 실제 예상가/현재가 수신 여부 판단
+		const BOOL bHasExpect = !isZeroLike(rawExpectValue);
+		const BOOL bHasCurr = !isZeroLike(rawCurrValue);
+
+		// 실제 표시/계산에 사용할 값
+		CString expectValue = rawExpectValue;
+		CString currValue = rawCurrValue;
+
+		// 현재가가 0이면 예상가로 표시
+		if (isZeroLike(currValue) && bHasExpect)
+		{
+			currValue = rawExpectValue;
+		}
+
+		// 예상가가 0이면 현재가로 표시
+		if (isZeroLike(expectValue) && bHasCurr)
+		{
+			expectValue = rawCurrValue;
+		}
+
+		// 중요:
+		// expectPtr 는 "예상가 원본이 실제로 들어왔는지" 기준
+		// currPtr 는 "현재가 원본이 실제로 들어왔는지" 기준
+		LPCSTR expectPtr = bHasExpect ? expectValue.GetString() : nullptr;
+		LPCSTR currPtr = bHasCurr ? currValue.GetString() : nullptr;
+
 		const LPCSTR dealTimePtr = getDataPtr(34);
 		const LPCSTR serverTimePtr = getDataPtr(40);
 		const int dealTime = dealTimePtr ? _ttoi(dealTimePtr) : 0;
 		const int serverTime = serverTimePtr ? _ttoi(serverTimePtr) : 0;
 
-		if (_ttoi(expectPtr) > 0)
+		// 평가손익/수익률 계산용 저장값
+		if (!isZeroLike(expectValue))
 		{
-
+			saveData = expectValue;
 		}
-		else
-			expectPtr = nullptr;
-
-		if (expectPtr) //예상체결가...
+		else if (!isZeroLike(currValue))
 		{
-			saveData = expectPtr;
-		}
-		else if (currPtr) // 체결가...
-		{
-			saveData = currPtr;
+			saveData = currValue;
 		}
 
-		//slog.Format("[IB202200][symbol] [%s][%s] 예상가=[%s] 현재가=[%s]  saveData=[%s]", strCode,GetCodeName(strCode), expectPtr, currPtr, saveData);
-		slog.Format("[IB202200][symbol] [%s] 예상가=[%s] 현재가=[%s]  saveData=[%s] _typeAuto=[%d]", strCode, expectPtr, currPtr, saveData, _typeAuto);
+		slog.Format("[IB202200][symbol] [%s] 예상가=[%s] 현재가=[%s] saveData=[%s] _typeAuto=[%d]",
+			strCode,
+			expectPtr ? expectPtr : "",
+			currPtr ? currPtr : "",
+			saveData,
+			_typeAuto);
 		Output_DebugString(slog);
 
 		//내려오는 걸 기준으로 끊기
@@ -9154,13 +9186,6 @@ void CGridWnd::parsingAlertx(LPARAM lParam)
 				//간혹 한두종목이 체결 데이터 수신 후 또 다시 예상가호가(D)데이터가 들어와서 다시 예상가로 바꿔주는 역전현상이 있다
 				//예상가가 아닌걸로 세팅 되고 난뒤 다시 예상가가 들어왔을때 시간이 장마감동시호가 이후면 처리 하지 않는다
 
-			/*	strTime = serverTimePtr ? CString(serverTimePtr) : CString();
-				if (bKrx && m_grid->GetItemText(xrow, colEXPECT) == "0" && serverTime >= endTimeEnd)
-				{
-
-				}
-				else
-					m_grid->SetItemText(xrow, colEXPECT, "1");*/
 
 			}
 			else
@@ -9279,7 +9304,7 @@ void CGridWnd::parsingAlertx(LPARAM lParam)
 				{
 				//예상가
 				case 111:
-					entry = getDataString(23);
+					entry = currValue;
 					break; //현재가
 				//예상거래량
 				case 112:
@@ -9330,7 +9355,7 @@ void CGridWnd::parsingAlertx(LPARAM lParam)
 				{
 				//예상가
 				case 23:
-					entry = getDataString(111);
+					entry = expectValue;
 					break; //예상현재가
 				//거래량
 				case 27:
