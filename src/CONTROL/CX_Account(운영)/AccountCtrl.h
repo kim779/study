@@ -2,7 +2,6 @@
 // AccountCtrl.h : header file
 
 #pragma warning(disable : 4786)
-
 #include <vector>
 #include <map>
 #include <algorithm>
@@ -426,6 +425,8 @@ protected:
 	bool SACAQ0239Ret_Check();
 	void EnableCtrl(SHORT bEnable);
 
+	CMapStringToString m_accHistoryCache;
+	CString m_strLastSavedAcc{};
 	CString m_regkey{};
 	void WriteAccountHistory(const CString& strUserPath, const CString& strKey, const CString& strData);
 	CString ReadAccountHistory(const CString& strUserPath, const CString& strKey);

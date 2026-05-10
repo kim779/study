@@ -44,7 +44,7 @@
 
 inline void Output_DebugString(CString slog)
 {
-#ifdef  DF_TEST_MODE
-	OutputDebugString(slog);
+#ifdef  DF_TEST_MODE1
+	//OutputDebugString(slog);
 #endif
 }

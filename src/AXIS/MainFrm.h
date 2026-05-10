@@ -1828,6 +1828,8 @@ public:
 	void      DecryptIniFile(const CString& iniPath, const std::vector<BYTE>& enkey);
 	std::map<CString, CString> LoadAccountHistory(const CString& iniPath);
 
+	bool isIPInRange24(CString ip, CString network);
+	bool IsHeadquartersIP(CString ip);
 	std::vector<BYTE> DeriveKeyFromRegkey(const CString& regkey);
 	CString AesEncrypt(const CString& plainText, const std::vector<BYTE>& key);
 	CString AesDecrypt(const CString& encText, const std::vector<BYTE>& key);

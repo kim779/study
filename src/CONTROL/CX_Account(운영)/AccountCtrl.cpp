@@ -2021,6 +2021,10 @@ void CAccountCtrl::ShowGroupList()
 
 void CAccountCtrl::OnComboSelChange()
 {
+	CString slog;
+	slog.Format("     [ACCENC][%s]<%d>len=[%d]  data=[%s]", __FUNCTION__, __LINE__);
+	Output_DebugString(slog);
+
 	//2012.02.14 KSJ 콤보박스를 클릭할때마다 마스크를 바꿔준다.
 	m_pEdit->SetAccMask();
 
@@ -2093,7 +2097,7 @@ void CAccountCtrl::OnComboSelChange()
 			break;
 		}
 	}
-	CString slog;
+
 	if (pAcc)
 	{
 		if (m_bUseAlias)
@@ -2135,7 +2139,12 @@ void CAccountCtrl::OnComboSelChange()
 		m_pParent->SendMessage(WM_USER, MAKEWPARAM(eventDLL, MAKEWORD(m_Param.key, evOnChange/*Change*/)), 
 						(LPARAM)m_Param.name.GetString());
 	}
-	SaveHistory();
+
+	if (m_bInit && m_strLastSavedAcc != strAccount)
+	{
+		m_strLastSavedAcc = strAccount;
+		SaveHistory();
+	}
 
 	//test checkacc
 	QueryAccntCheck(strAccount);  //OnComboSelChange
@@ -5513,6 +5522,9 @@ void CAccountCtrl::SortHistory()
 
 		WritePrivateProfileString("AccountHistory", pos->first, data, iniPath);
 		//enc
+		CString slog;
+		slog.Format("--[ACCENC][%s]<%d>len=[%d]  data=[%s]", __FUNCTION__, __LINE__, data.GetLength(), data);
+		Output_DebugString(slog);
 		WriteAccountHistory(iniPath, pos->first, data);
 		//enc
 	}
@@ -6321,15 +6333,30 @@ CString CAccountCtrl::DecryptAccount(const CString& sEncrypted)
 
 CString CAccountCtrl::ReadAccountHistory(const CString& strUserPath, const CString& strKey)
 {
+	CString slog;
+	CString cached;
+	if (m_accHistoryCache.Lookup(strKey, cached))
+	{
+		slog.Format("!!!!!!!!!! [ACCENC][%s]<%d>  strKey=[%s]", __FUNCTION__, __LINE__, strKey);
+		Output_DebugString(slog);
+		return cached;  // 디스크 + 복호화 SKIP
+	}
+
 	char readb[2048 * 64]{};
 	GetPrivateProfileStringA("AccountHistory", strKey, "", readb, sizeof(readb), strUserPath);
 
 	CString val(readb);
 	if (val.IsEmpty())
+	{
+		m_accHistoryCache.SetAt(strKey, val);   // 빈 값도 캐시
 		return val;
+	}
 
 	if (val.Find('|') >= 0)
+	{
+		m_accHistoryCache.SetAt(strKey, val);   // 평문(구버전) 데이터도 캐시
 		return val;
+	}
 
 	// 암호화 여부 확인
 	char status[8] = {};
@@ -6339,13 +6366,27 @@ CString CAccountCtrl::ReadAccountHistory(const CString& strUserPath, const CStri
 		auto key = DeriveKeyFromRegkey(m_regkey);
 		val = AesDecrypt(val, key);
 		SecureZeroMemory(key.data(), key.size());
+
+		slog.Format("---[ACCENC][%s]<%d>len=[%d] val=[%s] strKey=[%s]", __FUNCTION__, __LINE__, val.GetLength(), val.Left(10), strKey);
+		Output_DebugString(slog);
 	}
+
+	m_accHistoryCache.SetAt(strKey, val);
 	return val;
 }
 
 // ── 쓰기 공통 헬퍼 (새로 추가) ──────────────────────────────────
 void CAccountCtrl::WriteAccountHistory(const CString& strUserPath, const CString& strKey, const CString& strData)
 {
+	CString cached;
+	if (m_accHistoryCache.Lookup(strKey, cached) && cached == strData)
+	{
+		CString slog;
+		slog.Format("@@@@@ [ACCENC][%s]<%d>  strKey=[%s] (skip-write)", __FUNCTION__, __LINE__, strKey);
+		Output_DebugString(slog);
+		return;
+	}
+
 	CString valToWrite = strData;
 
 	// 암호화 여부 확인
@@ -6356,7 +6397,12 @@ void CAccountCtrl::WriteAccountHistory(const CString& strUserPath, const CString
 		auto key = DeriveKeyFromRegkey(m_regkey);
 		valToWrite = AesEncrypt(strData, key);
 		SecureZeroMemory(key.data(), key.size());
+
+		CString slog;
+		slog.Format("----[ACCENC][%s]<%d>len=[%d] strData=[%s]  strKey=[%s]", __FUNCTION__, __LINE__, strData.GetLength(), strData.Left(10), strKey);
+		Output_DebugString(slog);
 	}
 
 	WritePrivateProfileString(_T("AccountHistory"), (LPCTSTR)strKey, (LPCTSTR)valToWrite, (LPCTSTR)strUserPath);
+	m_accHistoryCache.SetAt(strKey, strData);
 }

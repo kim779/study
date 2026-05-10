@@ -33870,6 +33870,44 @@ std::vector<BYTE> CMainFrame::DeriveKeyFromRegkey(const CString& regkey)
 	return key;  // SHA-256 = 32바이트 = AES-256 키로 딱 맞음
 }
 
+bool CMainFrame::isIPInRange24(CString ip, CString network)
+{
+	const unsigned int ip_addr = IPToUInt(ip);
+	const unsigned int network_addr = IPToUInt(network);
+	const unsigned int mask_addr = IPToUInt("255.255.255.0");   // /24
+
+	const unsigned int net_lower = (network_addr & mask_addr);
+	const unsigned int net_upper = (net_lower | (~mask_addr));
+
+	if (ip_addr >= net_lower && ip_addr <= net_upper)
+		return true;
+	return false;
+}
+
+bool CMainFrame::IsHeadquartersIP(CString ip)
+{
+	static const char* HQ_RANGES[] = {
+		"172.17.0.0",    // 1F
+		"172.17.1.0",    // 4F(IT)
+		"172.17.4.0",    // 2F
+		"172.17.5.0",    // 7F
+		"172.17.6.0",    // 3F
+		"172.17.7.0",    // 6F
+		"172.17.8.0",    // 5F
+		"172.17.12.0",   // 9F
+		"172.17.13.0",   // 10F
+		"172.17.14.0",   // 11F
+		"172.17.16.0",   // 8F
+	};
+
+	for (size_t i = 0; i < _countof(HQ_RANGES); ++i)
+	{
+		if (isIPInRange24(ip, HQ_RANGES[i]))
+			return true;
+	}
+	return false;
+}
+
 void CMainFrame::AccEncrypt()
 {
 	CString filename;
@@ -33881,6 +33919,13 @@ void CMainFrame::AccEncrypt()
 
 	if (dw == 0)
 		return;
+
+	if (!IsHeadquartersIP(m_ipAddr))
+	{
+		m_slog.Format("[AXIS][AccEncrypt] Skipped - not HQ IP=[%s]", m_ipAddr);
+		output_DebugString(m_slog);
+		return;
+	}
 
 	CString sPath;
 	CString strFilePath;
