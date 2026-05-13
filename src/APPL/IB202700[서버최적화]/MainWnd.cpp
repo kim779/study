@@ -1008,13 +1008,18 @@ LONG CMainWnd::OnUser(WPARAM wParam, LPARAM lParam)
 		CString stmp;
 		stmp.Format("%s", (char*)data[0]);
 		stmp.TrimRight();
-		if (stmp != "w")  
+
+		m_slog.Format("[RTS] = [%s] 0 =[%s] 23=[%s] 111=[%s] 24=[%s] 27=[%s] 28=[%s] 29=[%s] 30=[%s] 31=[%s] 32=[%s] 33=[%s] 36=[%s] 41=[%s] 61=[%s] 101=[%s] 104=[%s] 106=[%s] 109=[%s] 146=[%s] 181=[%s]", code, stmp,
+			(char*)data[623], (char*)data[611], (char*)data[624], (char*)data[627], (char*)data[628], (char*)data[629], (char*)data[630], (char*)data[631], (char*)data[632], (char*)data[633], (char*)data[636], (char*)data[641], (char*)data[661],
+			(char*)data[601], (char*)data[604], (char*)data[606], (char*)data[609], (char*)data[646], (char*)data[681]);
+
+		Output_DebugString(m_slog);
+		//선물체결 K, 선물예상체결 4, 옵션 예상체결 O, 옵션예상호가 P, 옵션시세  O, 옵션호가 P, 상품선물체결 f, 상품선물호가 g, 업종지수 J, 업종예상지수 Y, 상품선물체결 f, 상품선물호가 g
+		if (stmp != "w" && stmp != "T" && stmp != "K" && stmp != "4" && stmp != "O" && stmp != "P" && stmp != "f" && stmp != "g" && stmp != "J" && stmp != "Y" && stmp != "f" && stmp != "g" && stmp != "X")
 			return 0;
 
-		stmp.Format("[RTS] 23=[%s] 24=[%s] 27=[%s] 28=[%s] 29=[%s] 30=[%s] 31=[%s] 32=[%s] 33=[%s] 36=[%s] 41=[%s] 61=[%s] 101=[%s] 104=[%s] 106=[%s] 109=[%s] 146=[%s] 181=[%s]",
-		(char*)data[623], (char*)data[624], (char*)data[627], (char*)data[628], (char*)data[629], (char*)data[630], (char*)data[631], (char*)data[632], (char*)data[633], (char*)data[636], (char*)data[641], (char*)data[661],
-			(char*)data[601], (char*)data[604], (char*)data[606], (char*)data[609], (char*)data[646], (char*)data[681]);
-		Output_DebugString(stmp);
+	
+
 
 
 		//test

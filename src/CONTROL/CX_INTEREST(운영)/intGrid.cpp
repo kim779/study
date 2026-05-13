@@ -4065,45 +4065,7 @@ BOOL CintGrid::RedrawCell(int nRow, int nCol, CDC* pDC)
 		return TRUE;
 	}
 
-	const int key = 1000* nRow + nCol;
-	const auto& it = _mapFilterDraw.emplace(key, 1);
-	if (it.second == false)
-	{
-		return FALSE;
-	}
-
-	auto& filter = _timeFilterCode.find(nRow);
-	const bool inserted = (filter == _timeFilterCode.end());
-		
-	if (inserted) {
-		_timeFilterCode[nRow] = currentTick;
-	}
-		
-	// Blink 처리 최적화
-	if (!inserted && _blinkType != 0 && _bReal) {
-		CRect blinkRect;
-		Blink(nRow, nCol, currentTick, blinkRect);
-		if (!blinkRect.IsRectEmpty()) {
-			rect.UnionRect(rect, blinkRect);
-		}
-	}
-		
-	// 시간 차이 계산 최적화
-	const ULONGLONG diff = inserted ? 99999 : (currentTick - filter->second);
-	if (diff >= static_cast<ULONGLONG>(500)) {
-		if (!inserted) filter->second = currentTick;
-			
-		// Union 연산 최적화
-		if (!_filterRect.IsRectEmpty()) {
-			rect.UnionRect(rect, _filterRect);
-			_filterRect.SetRectEmpty();
-		}
-		_DrawAllRect.UnionRect(_DrawAllRect, rect);
-	} 
-	else 
-	{
-		_filterRect.UnionRect(_filterRect, rect);
-	}
+	InvalidateRect(rect, FALSE);
 	return TRUE;
 }
 

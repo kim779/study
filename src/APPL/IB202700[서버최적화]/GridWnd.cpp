@@ -90,18 +90,10 @@ static int ToMapped(int idx)
 	
 
 	if (it != m.end())
-	{
-	//	slog.Format("[RTS index] idx=%d  second=%d ", idx , it->second);
-	//	Output_DebugString(slog);
 		return  it->second;
-	}
 	else
-	{
-	//	slog.Format("[RTS index] idx=%d", idx);
-	//	Output_DebugString(slog);
 		return idx;
-	}
-		//return (it != m.end()) ? it->second : idx;
+
 }
 
 // 623 -> 23 (없으면 원본 그대로)
@@ -305,7 +297,7 @@ void CGridWnd::HoldDraw() {
 		m_grid->setVirtualDraw(bVisible);
 		m_grid->setDelay(_pApp->getDelay());
 		m_grid->setReal(true);
-		m_grid->beginDrawHolding();
+		//m_grid->beginDrawHolding();
 		m_grid->setBlinkType(_pApp->getBlinkType());
 		m_grid->setBlinkColor(_pApp->getBlinkColor());
 		m_grid->setMemoType(_pApp->getMemoType());
@@ -316,7 +308,7 @@ void CGridWnd::ReleaseDraw() {
 	if (m_grid)
 	{
 		m_grid->setReal(false);
-		m_grid->endDrawHolding();
+		//m_grid->endDrawHolding();
 	}
 }
 
@@ -2029,6 +2021,9 @@ void CGridWnd::sendTransactionTR(int update, int nStart, int nEnd)
         CopyMemory(&sendB[sendL], tempB, strlen(tempB));
 	sendL += strlen(tempB);
 
+	sprintf(tempB, "%s%c%d%c", "90999", P_DELI, 1, P_TAB);
+	CopyMemory(&sendB[sendL], tempB, strlen(tempB));
+	sendL += strlen(tempB);
 
 	sprintf(tempB, "%s%c", gSYMBOL, P_DELI);
 	CopyMemory(&sendB[sendL], tempB, strlen(tempB));
@@ -9011,9 +9006,10 @@ void CGridWnd::parsingAlertx(LPARAM lParam)
 		bKrx = false;
 
 	const DWORD *data = (const DWORD *)alertR->ptr[0];
+	const bool bNeedMap = (data[0] && strcmp(reinterpret_cast<LPCSTR>(data[0]), "w") == 0);
 	const auto getDataPtr = [&](int idx) -> LPCSTR {
 		//return data[idx] ? reinterpret_cast<LPCSTR>(data[idx]) : nullptr;
-		const int real = ToMapped(idx);   // 23 -> 623 (매핑 없는 값은 그대로)
+		const int real = bNeedMap ? ToMapped(idx) : idx;// 23 -> 623 (매핑 없는 값은 그대로)
 		return data[real] ? reinterpret_cast<LPCSTR>(data[real]) : nullptr;
 	};
 	const auto getDataString = [&](int idx) -> CString {
@@ -9093,37 +9089,30 @@ void CGridWnd::parsingAlertx(LPARAM lParam)
 		// 현재가/예상가 심볼 보정
 		// 현재가: 23 -> ToMapped(23) = 623
 		// 예상가: 111 -> ToMapped(111) = 611
-		CString rawExpectValue = getDataString(111); // 예상가 원본
-		CString rawCurrValue = getDataString(23);  // 현재가 원본
+		CString rawExpectValue = getDataString(111); // 611 예상가 원본
+		CString rawCurrValue = getDataString(23);  // 623 현재가 원본
 
 		rawExpectValue.Trim();
 		rawCurrValue.Trim();
 
-		// 원본 기준으로 실제 예상가/현재가 수신 여부 판단
 		const BOOL bHasExpect = !isZeroLike(rawExpectValue);
 		const BOOL bHasCurr = !isZeroLike(rawCurrValue);
 
-		// 실제 표시/계산에 사용할 값
 		CString expectValue = rawExpectValue;
 		CString currValue = rawCurrValue;
 
-		// 현재가가 0이면 예상가로 표시
-		if (isZeroLike(currValue) && bHasExpect)
-		{
-			currValue = rawExpectValue;
-		}
+		// 예 이미지 표시/삭제는 오직 611 기준
+		m_grid->SetItemText(xrow, colEXPECT, bHasExpect ? "1" : "0");
 
-		// 예상가가 0이면 현재가로 표시
-		if (isZeroLike(expectValue) && bHasCurr)
-		{
-			expectValue = rawCurrValue;
-		}
+		// 현재가 표시값
+		// 611 예상가가 있으면 현재가 칸에는 예상가를 보여준다.
+		// 611 예상가가 없으면 623 현재가를 보여준다.
+		CString displayCurrValue = bHasExpect ? rawExpectValue : rawCurrValue;
 
-		// 중요:
-		// expectPtr 는 "예상가 원본이 실제로 들어왔는지" 기준
-		// currPtr 는 "현재가 원본이 실제로 들어왔는지" 기준
-		LPCSTR expectPtr = bHasExpect ? expectValue.GetString() : nullptr;
-		LPCSTR currPtr = bHasCurr ? currValue.GetString() : nullptr;
+		LPCSTR expectPtr = bHasExpect ? rawExpectValue.GetString() : nullptr;
+		LPCSTR currPtr = bHasCurr ? rawCurrValue.GetString() : nullptr;
+
+		saveData = displayCurrValue;
 
 		const LPCSTR dealTimePtr = getDataPtr(34);
 		const LPCSTR serverTimePtr = getDataPtr(40);
@@ -9140,16 +9129,21 @@ void CGridWnd::parsingAlertx(LPARAM lParam)
 			saveData = currValue;
 		}
 
-		slog.Format("[IB202200][symbol] [%s] 예상가=[%s] 현재가=[%s] saveData=[%s] _typeAuto=[%d]",
-			strCode,
-			expectPtr ? expectPtr : "",
-			currPtr ? currPtr : "",
-			saveData,
-			_typeAuto);
-		Output_DebugString(slog);
-
-		//내려오는 걸 기준으로 끊기
-		// 111이 내려오는지 023이 내려오는지 판단해서 사전 차단
+		if(isZeroLike(getDataPtr(24)))
+		{
+			slog.Format("[IB202200][symbol] [%s] 예상가=[%s] 현재가=[%s] saveData=[%s] _typeAuto=[%d] 대비=[%s] 등락률=[%s] 거래량=[%s]",
+				strCode,
+				expectPtr ? expectPtr : "",
+				currPtr ? currPtr : "",
+				saveData,
+				_typeAuto,
+				getDataPtr(24),
+				getDataPtr(33),
+				getDataPtr(27)
+			);
+			Output_DebugString(slog);
+		}
+		
 
 		entry.Empty();
 
@@ -9167,7 +9161,7 @@ void CGridWnd::parsingAlertx(LPARAM lParam)
 
 		const int nEndOPMarket = m_grid->GetItemData(xrow, colEXPECT);    // 2013.09.17 KSJ 해당종목이 장종료 되었으면
 		//if ((strGubn == "n" || strGubn.Compare("X") == 0 || expectPtr || nEndOPMarket == 1) && !bLast) // 예상가 적용	2013.08.22 지수예상가는111심볼이 없고 구분값이X로 온다.
-		if ((expectPtr || nEndOPMarket == 1) && !bLast)
+		if(expectPtr)
 		{
 			if (expectPtr)
 			{
@@ -9193,10 +9187,6 @@ void CGridWnd::parsingAlertx(LPARAM lParam)
 				// 2012.05.09 KSJ 예상가가 0이 올때는 현재가를 뿌려준다.
 				//m_mapCurValue.Lookup(strCode, strData);
 				//m_grid->SetItemText(xrow, colEXPECT, "0"); //예상가 취소
-
-		/*		CString ss = entry;
-				entry = m_grid->GetItemText(xrow, colCURR);
-				AxStd::_Msg("[%s][%s]예상가가 0이 올때는 현재가를 뿌려준다.", ss, entry);*/
 			}
 
 			//현재 예상버튼이 안눌러져 있을때, 강제로 심볼을 바꾸어서 그리드에 데이터를 보여주고 있다
@@ -9225,21 +9215,21 @@ void CGridWnd::parsingAlertx(LPARAM lParam)
 			entry = currPtr;
 			if (_typeAuto == 0)  //자동
 			{
-				strTime = dealTimePtr ? CString(dealTimePtr) : CString();
-				if (beginTime <= dealTime && beginTimeEnd >= dealTime && bKrx)
-				{
-					if (!isZeroLike(entry))
-					{
-						m_grid->SetItemText(xrow, colEXPECT, "1");
-					}
-					else
-					{
-						m_grid->SetItemText(xrow, colEXPECT, "0"); 	// 2012.08.29 KSJ 예상가 취소함. 8:10 ~ 8:30분 사이에 체결이 떨어지면
-						entry = m_grid->GetItemText(xrow, colCURR);
-						return;
-					}
-				}
-				else
+				//strTime = dealTimePtr ? CString(dealTimePtr) : CString();
+				//if (beginTime <= dealTime && beginTimeEnd >= dealTime && bKrx)
+				//{
+				//	if (!isZeroLike(entry))
+				//	{
+				//		m_grid->SetItemText(xrow, colEXPECT, "1");
+				//	}
+				//	else
+				//	{
+				//		m_grid->SetItemText(xrow, colEXPECT, "0"); 	// 2012.08.29 KSJ 예상가 취소함. 8:10 ~ 8:30분 사이에 체결이 떨어지면
+				//		entry = m_grid->GetItemText(xrow, colCURR);
+				//		return;
+				//	}
+				//}
+				//else
 				{
 					m_grid->SetItemText(xrow, colEXPECT, "0"); //여기
 				}
@@ -9271,7 +9261,7 @@ void CGridWnd::parsingAlertx(LPARAM lParam)
 		_gridHdr xgridHdr{};
 
 		slog.Format("[IB202200][symbol] [%s] newEXP=[%s] bForceDraw=[%d]  bExpect=[%d]", strCode, newEXP, bForceDraw, bExpect);
-		Output_DebugString(slog);
+		//Output_DebugString(slog);
 
 		// 2012.11.08 KSJ 주식과 선물옵션의 심볼값이 똑같은 것이 있다. 외인소진률 같은것.
 		const bool bKospi = (codeLength == 6);
@@ -9638,6 +9628,10 @@ void CGridWnd::parsingAlertx(LPARAM lParam)
 							m_grid->SetItemText(xrow, m_bongField, bongdata);
 						}
 					}
+				}
+				else
+				{
+					m_grid->SetItemText(xrow, m_bongField, _T(""));
 				}
 			}
 

@@ -111,7 +111,7 @@ void CToolWnd::OperInit()
 	m_cbGROUP.Create(CBS_DROPDOWNLIST | WS_VSCROLL, CRect(0, 0, 0, 0), this, IDC_CB_GROUP);
 	m_cbGROUP.SetFont(m_pFont);
 
-	m_menuField.CreatePopupMenu();
+	m_menuField.CreatePopupMenu(); 
 	// END ADD
 
  	m_chkAUTO->ShowWindow(SW_HIDE);

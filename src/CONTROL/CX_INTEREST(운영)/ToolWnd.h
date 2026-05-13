@@ -133,7 +133,7 @@ public:
 	// ADD PSH 20070911
 	CfxImgButton	m_btField;		// ÇÊµå 
 	CfxImgButton	m_btFieldDrop;
-	CNewMenu		m_menuField;
+	CNewMenu		m_menuField;   
 	// END ADD
 
 // data memebers

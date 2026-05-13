@@ -233,12 +233,10 @@ private:
 	CString		m_strMarketTime;	//시장구분 (동시호가) KSJ 2012.11.26 
 	//CString    CalMaketTime(CString strTime, bool bEnd); //test시작시간
 	CString    CalMaketTime(CString strTime, bool bEnd, bool bmorning = false);
-public:
 	CString		m_strBeginTime{};  //동시호가 시작시간 xx:10:00
 	CString		m_strBeginTimeEnd{};  //동시호가 종료시간 xx:59:59
 	CString		m_strEndTime{};  //동시호가 시작시간 xx:10:00
 	CString		m_strEndTimeEnd{};  //동시호가 종료시간 xx:59:59
-private:
 	//CString		m_strBeginTime = "084000";  //동시호가 시작시간 xx:10:00
 	//CString		m_strBeginTimeEnd = "085959";  //동시호가 종료시간 xx:59:59
 	//CString		m_strEndTime = "152000";  //동시호가 시작시간 xx:10:00
@@ -341,18 +339,6 @@ public:
 	CTime ParseRTSTime(const CString& sTime, const COleDateTime& today);
 	std::unordered_map<std::string, CTime> m_lastRTSTimeMap;
 	bool ShouldSkipRTSByServerTime(const std::string& code, const char* pServerTime, int  minIntervalSec);
-
-
-	std::vector<std::string> m_codes;
-	std::vector<int> m_symbols;
-	void InitSlotIndices();
-	std::vector<int> m_slotIndices;   // 이 화면이 참조할 슬롯들
-	FILETIME m_prevProcKernel{};
-	FILETIME m_prevProcUser{};
-	FILETIME m_prevSysKernel{};
-	FILETIME m_prevSysUser{};
-	int m_iCurInterval{ 0 };
-	int GetProcessCpuUsage();
 
 protected:
 	

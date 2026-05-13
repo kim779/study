@@ -3785,217 +3785,50 @@ BOOL CintGrid::RedrawCell(const CIdCell& cell, CDC* pDC)
 
 BOOL CintGrid::RedrawCell(int nRow, int nCol, CDC* pDC)
 {
-	if (0)
+	//if (!_bVirtualDraw)
+	//	return FALSE;
+
+	if (nRow < 0 || nRow >= m_nRows || nCol < 0 || nCol >= m_nCols)
+		return FALSE;
+
+	if (!GetSafeHwnd())
+		return FALSE;
+
+	//// 캐시된 가시 영역 (500ms마다 업데이트)
+	//static CIdCell s_lastTlCell(-1, -1);
+	//static CRangeCell s_lastVisCellRange;
+	//static ULONGLONG s_lastUpdateTick = 0;
+
+	//const ULONGLONG currentTick = GetTickCount64();
+	//if (currentTick - s_lastUpdateTick > 500)
+	//{
+	//	s_lastTlCell = GetTopleftNonFixedCell();
+	//	CRect visRect;
+	//	s_lastVisCellRange = GetVisibleNonFixedCellRange(visRect);
+	//	s_lastUpdateTick = currentTick;
+	//}
+
+	//if (nRow < s_lastTlCell.row || nRow > s_lastVisCellRange.GetMaxRow() ||
+	//	nCol < s_lastTlCell.col || nCol > s_lastVisCellRange.GetMaxCol())
+	//	return FALSE;
+
+	CRect rect;
+	if (!GetCellRect(nRow, nCol, rect))
+		return FALSE;
+
+	if (rect.IsRectEmpty())
+		return FALSE;
+
+	// colSIG(뉴스)는 즉시 그리기
+	if (nCol == colSIG)
 	{
-		if (!_bVirtualDraw)
-			return FALSE;
-		// 빠른 유효성 검사	
-		if (nRow < 0 || nRow >= m_nRows || nCol < 0 || nCol >= m_nCols) {
-			return FALSE;
-		}
-
-		// 윈도우 핸들 체크 (가장 빠른 체크)
-		if (!GetSafeHwnd()) {
-			return FALSE;
-		}
-
-		// 캐시된 가시 영역 정보 사용 (함수 호출 최소화)
-		static CIdCell s_lastTlCell(-1, -1);
-		static CRangeCell s_lastVisCellRange;
-		static ULONGLONG s_lastUpdateTick = 0;
-
-		const ULONGLONG currentTick = GetTickCount64();
-		if (currentTick - s_lastUpdateTick > 500) { // 500ms마다 업데이트
-			s_lastTlCell = GetTopleftNonFixedCell();
-			CRect visRect;
-			s_lastVisCellRange = GetVisibleNonFixedCellRange(visRect);
-			s_lastUpdateTick = currentTick;
-		}
-
-		const int minVisibleRow = s_lastTlCell.row;
-		const int minVisibleCol = s_lastTlCell.col;
-		const int maxVisibleRow = s_lastVisCellRange.GetMaxRow();
-		const int maxVisibleCol = s_lastVisCellRange.GetMaxCol();
-
-		if (nRow < minVisibleRow || nRow > maxVisibleRow ||
-			nCol < minVisibleCol || nCol > maxVisibleCol) {
-			return FALSE;
-		}
-
-		// IsCellVisible 호출 최소화 - 범위 내에 있으면 대부분 보임
-		CRect rect;
-		if (!GetCellRect(nRow, nCol, rect)) {
-			return FALSE;
-		}
-
-		// 빈 rect 체크 (빠른 반환)
-		if (rect.IsRectEmpty()) {
-			return FALSE;
-		}
-
-		// colSIG 뉴스 컬럼만 InvalidateRect 호출 (필요시에만)
-		if (nCol == colSIG) {
-			InvalidateRect(rect, FALSE);
-			return TRUE;
-		}
-
-		const int key = nRow * 1000 + nCol;
-
-	
-		const auto& it = _mapFilterDraw.emplace(key, 1);
-
-		if (it.second == false)
-		{
-			return FALSE;
-		}
-
-		//drawHolding 처리 최적화
-		if (m_drawHolding)
-		{
-			const auto it = _timeFilterCode.find(nRow);
-			const bool inserted = (it == _timeFilterCode.end());
-
-			if (inserted) {
-				_timeFilterCode[nRow] = currentTick;
-			}
-
-			//시간 차이 계산 최적화
-			const ULONGLONG diff = inserted ? m_iTime : (currentTick - it->second);
-			if (diff >= static_cast<ULONGLONG>(m_iTime)) {
-				if (!inserted) it->second = currentTick;
-
-				// Blink 처리 최적화
-				if (!inserted && _blinkType != 0 && _bReal) {
-					CRect blinkRect;
-					Blink(nRow, nCol, currentTick, blinkRect);
-					if (!blinkRect.IsRectEmpty()) {
-						rect.UnionRect(rect, blinkRect);
-					}
-				}
-
-				// Union 연산 최적화
-				if (!_filterRect.IsRectEmpty()) {
-					rect.UnionRect(rect, _filterRect);
-					_filterRect.SetRectEmpty();
-				}
-
-				m_drawRect.UnionRect(m_drawRect, rect);
-			}
-			else
-			{
-				_filterRect.UnionRect(_filterRect, rect);
-			}
-
-			return FALSE;
-		}
+		InvalidateRect(rect, FALSE);
 		return TRUE;
 	}
-	else
-	{
-		if (!_bVirtualDraw)
-			return FALSE;
-		// 빠른 유효성 검사	
-		if (nRow < 0 || nRow >= m_nRows || nCol < 0 || nCol >= m_nCols) {
-			return FALSE;
-		}
 
-		// 윈도우 핸들 체크 (가장 빠른 체크)
-		if (!GetSafeHwnd()) {
-			return FALSE;
-		}
-
-		// 캐시된 가시 영역 정보 사용 (함수 호출 최소화)
-		static CIdCell s_lastTlCell(-1, -1);
-		static CRangeCell s_lastVisCellRange;
-		static ULONGLONG s_lastUpdateTick = 0;
-
-		const ULONGLONG currentTick = GetTickCount64();
-		if (currentTick - s_lastUpdateTick > 500) { // 500ms마다 업데이트
-			s_lastTlCell = GetTopleftNonFixedCell();
-			CRect visRect;
-			s_lastVisCellRange = GetVisibleNonFixedCellRange(visRect);
-			s_lastUpdateTick = currentTick;
-		}
-
-		const int minVisibleRow = s_lastTlCell.row;
-		const int minVisibleCol = s_lastTlCell.col;
-		const int maxVisibleRow = s_lastVisCellRange.GetMaxRow();
-		const int maxVisibleCol = s_lastVisCellRange.GetMaxCol();
-
-		if (nRow < minVisibleRow || nRow > maxVisibleRow ||
-			nCol < minVisibleCol || nCol > maxVisibleCol) {
-			return FALSE;
-		}
-
-		// IsCellVisible 호출 최소화 - 범위 내에 있으면 대부분 보임
-		CRect rect;
-		if (!GetCellRect(nRow, nCol, rect)) {
-			return FALSE;
-		}
-
-		// 빈 rect 체크 (빠른 반환)
-		if (rect.IsRectEmpty()) {
-			return FALSE;
-		}
-
-		// colSIG 뉴스 컬럼만 InvalidateRect 호출 (필요시에만)
-		if (nCol == colSIG) {
-			InvalidateRect(rect, FALSE);
-			return TRUE;
-		}
-
-		const auto& it = _mapFilterDraw.emplace(nRow, nCol);
-
-		if (it.second == false)
-		{
-			//AxStd::_Msg("RedrawCell Skip FilterDraw [%d,%d]", nRow, nCol);
-			//return FALSE;
-		}
-		// drawHolding 처리 최적화
-		if (m_drawHolding)
-		{
-			//AxStd::_Msg("RedrawCell Holding [%d,%d]", nRow, nCol);
-					//const ULONGLONG tick = GetTickCount64();			
-					// map 조회 최적화
-			const auto it = _timeFilterCode.find(nRow);
-			const bool inserted = (it == _timeFilterCode.end());
-
-			if (inserted) {
-				_timeFilterCode[nRow] = currentTick;
-			}
-
-			// Blink 처리 최적화
-			if (!inserted && _blinkType != 0 && _bReal) {
-				CRect blinkRect;
-				Blink(nRow, nCol, currentTick, blinkRect);
-				if (!blinkRect.IsRectEmpty()) {
-					rect.UnionRect(rect, blinkRect);
-				}
-			}
-
-			// 시간 차이 계산 최적화
-			const ULONGLONG diff = inserted ? m_iTime : (currentTick - it->second);
-			if (diff >= static_cast<ULONGLONG>(m_iTime)) {
-				if (!inserted) it->second = currentTick;
-
-				// Union 연산 최적화
-				if (!_filterRect.IsRectEmpty()) {
-					rect.UnionRect(rect, _filterRect);
-					_filterRect.SetRectEmpty();
-				}
-				m_drawRect.UnionRect(m_drawRect, rect);
-			}
-			else
-			{
-				_filterRect.UnionRect(_filterRect, rect);
-			}
-
-			return FALSE;
-		}
-		return TRUE;
-
-	}
-	
+	// 서버에서 속도 제어 → 클라이언트는 바로 그리기
+	InvalidateRect(rect, FALSE);
+	return TRUE;
 }
 
 CIdCell CintGrid::SetFocusCell(int nRow, int nCol)
@@ -5789,6 +5622,7 @@ BOOL CintGrid::SetItemText(int nRow, int nCol, LPCTSTR str)
 			{
 				pCell->dtext = dstr;
 				RedrawCell(nRow,colCURR);
+				RedrawCell(nRow, colEXPECT);
 				return TRUE;
 			}
 		}
@@ -10084,119 +9918,6 @@ int CintGrid::GetGridWidth()
 
 void CintGrid::endDrawHolding()
 { 	
-	if (1)
-	{
-		const ULONGLONG tick = ::GetTickCount64();
 
-		// 1) m_iTime(int) -> 안전한 ms tick으로 변환
-		//    - 음수/0이면 최소값으로 보정(예: 1ms 또는 16ms 등 정책 선택)
-		ULONGLONG drawtick = 0;
-		if (m_iTime <= 0) {
-			// 정책: 0 이하면 즉시 그리기(혹은 최소 1ms)
-			drawtick = 0;
-			//AxStd::_Msg("[%s] WARNING: m_iTime=%d (<=0). drawtick set to %llu", __FUNCTION__, m_iTime, drawtick);
-		}
-		else {
-			drawtick = static_cast<ULONGLONG>(m_iTime);
-		}
-
-		// 2) elapsed 계산은 안전하게
-		//    _DrawTick이 초기값이거나(0), 어떤 이유로 tick보다 큰 경우 보호
-		ULONGLONG elapsed = 0;
-		if (_DrawTick == 0 || tick < _DrawTick) {
-			// 초기/비정상: 지금 시점을 기준으로 리셋
-			elapsed = drawtick; // 조건을 바로 만족시키거나, 0으로 두고 다음 주기로 넘겨도 됨
-			//AxStd::_Msg("[%s] INFO: Reset _DrawTick (prev=%llu, now=%llu). elapsed forced=%llu",
-			//	__FUNCTION__, _DrawTick, tick, elapsed);
-			_DrawTick = tick;
-		}
-		else {
-			elapsed = tick - _DrawTick;
-		}
-
-		// 3) 시간 조건
-		if (elapsed >= drawtick)
-		{
-			// ---- 통계/스킵 판단 ----
-			if (_Count.size() >= 200)
-				_Count.erase(_Count.begin());
-			_Count.emplace_back(_idrawCount);
-
-			_avgCount = (_Count.empty())
-				? 0.0
-				: std::accumulate(_Count.begin(), _Count.end(), 0.0) / _Count.size();
-
-			const int avgLimit = (int)max(_avgCount, 30.0);
-
-			// 로그(조건 만족 시점)
-			//AxStd::_Msg("[%s] DRAW-CHK tick=%llu prev=%llu elapsed=%llu drawtick=%llu idraw=%d avg=%.2f limit=%d rectEmpty=%d filter=%zu",
-			//	__FUNCTION__, tick, _DrawTick, elapsed, drawtick, _idrawCount, _avgCount, avgLimit,
-			//	m_drawRect.IsRectEmpty() ? 1 : 0, _mapFilterDraw.size());
-
-			if (_idrawCount > avgLimit)
-			{
-				//AxStd::_Msg("[%s] SKIP draw: idrawCount=%d > limit=%d (avg=%.2f), elapsed=%llu drawtick=%llu",
-				//	__FUNCTION__, _idrawCount, avgLimit, _avgCount, elapsed, drawtick);
-
-				_idrawCount = 0;
-				return;
-			}
-
-			// ---- 실제 그리기 트리거 ----
-			InvalidateRect(m_drawRect, false);
-
-			// 상태 초기화
-			m_drawRect.SetRectEmpty();
-			_mapFilterDraw.clear();
-
-			// draw tick 갱신 (지금 tick 기준)
-			_DrawTick = tick;
-			_bExpect = false;
-			_idrawCount = 0;
-
-		//	AxStd::_Msg("[%s] DRAW fired. Next window starts at _DrawTick=%llu, filter=%zu",
-		//		__FUNCTION__, _DrawTick, _mapFilterDraw.size());
-		}
-
-		// 호출 횟수 카운트는 항상 증가
-		_idrawCount++;
-	}
-	else
-	{
-		m_drawHolding = false;
-		if (_bDraw && (!m_drawRect.IsRectEmpty()))
-		{
-			const ULONGLONG tick = GetTickCount64();
-			const ULONGLONG drawtick = m_iTime;
-			if ((tick - _DrawTick) >= drawtick)
-			{
-				if (_Count.size() >= 200)
-					_Count.erase(_Count.begin());
-				_Count.emplace_back(_idrawCount);
-
-				_avgCount = (_Count.empty())
-					? 0.0
-					: std::accumulate(_Count.begin(), _Count.end(), 0.0) / _Count.size();
-				//AxStd::_Msg("[%s][%d][%f]  draw count[%ld]", __FUNCTION__, _idrawCount, max(_avgCount, 10.0), drawtick);
-				if (const int avg = max(_avgCount, 30.0); _idrawCount > avg)
-				{
-					_idrawCount = 0;
-					//AxStd::_Msg("[%s] 안그려짐.", __FUNCTION__);
-					return;
-				}
-
-				InvalidateRect(m_drawRect, false);
-				m_drawRect.SetRectEmpty();
-				_mapFilterDraw.clear();
-				//AxStd::_Msg("[%s] 그려짐. Filter 개수는 항상 0 [%d]", __FUNCTION__, _mapFilterDraw.size());
-
-				_DrawTick = tick;
-				_bExpect = false;
-				_idrawCount = 0;
-			}
-			_idrawCount++;
-		}
-	}
-	
 }
 
