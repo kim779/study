@@ -9045,12 +9045,12 @@ void CGridWnd::parsingAlertx(LPARAM lParam)
 		15:00~15:01 'J' 현재가표시
 	*/
 
-	if (strGubn == "X" && code.GetLength() == 5) //지수일때
-	{
-		code.Delete(0);	     //첫 글자 'X'를 삭제한다.
-		code.Insert(0, 'K'); //첫 글자를 'K'로 바꿔준다.
-		strCode = code;
-	}
+	//if (strGubn == "X" && code.GetLength() == 5) //지수일때
+	//{
+	//	code.Delete(0);	     //첫 글자 'X'를 삭제한다.
+	//	code.Insert(0, 'K'); //첫 글자를 'K'로 바꿔준다.
+	//	strCode = code;
+	//}
 
 	// 2013.08.26 KSJ END
 	if (code.CompareNoCase("S0000") == 0)
@@ -9063,7 +9063,18 @@ void CGridWnd::parsingAlertx(LPARAM lParam)
 	}
 
 	int count = 0;
-	count = CheckRealTimeCode(code); // 중복개수처리...
+	
+
+	if (strGubn == "X" && code.GetLength() == 5) //지수일때
+	{
+		count = CheckRealTimeCode(code); // 중복개수처리...
+		code.Delete(0);	     //첫 글자 'X'를 삭제한다.
+		code.Insert(0, 'K'); //첫 글자를 'K'로 바꿔준다.
+		strCode = code;
+	}
+	else
+		count = CheckRealTimeCode(code); // 중복개수처리...
+
 	if (count == 0)
 		return;
 
@@ -9086,11 +9097,22 @@ void CGridWnd::parsingAlertx(LPARAM lParam)
 		//변경이 있을때마다 배열에 저장해 둔 현재가 데이타 업데이트
 		CString saveData;
 
-		// 현재가/예상가 심볼 보정
-		// 현재가: 23 -> ToMapped(23) = 623
-		// 예상가: 111 -> ToMapped(111) = 611
-		CString rawExpectValue = getDataString(111); // 611 예상가 원본
-		CString rawCurrValue = getDataString(23);  // 623 현재가 원본
+		// ── 예상가/현재가 원본값 추출 ────────────────────────
+		// bNeedMap(w 시장): getDataString 통해 치환된 인덱스(611, 623) 접근
+		// 기존 시장:        data[] 직접 접근으로 원본 111, 23 사용
+		CString rawExpectValue;
+		CString rawCurrValue;
+
+		if (bNeedMap)
+		{
+			rawExpectValue = getDataString(111);  // ToMapped(111) = 611
+			rawCurrValue = getDataString(23);   // ToMapped(23)  = 623
+		}
+		else
+		{
+			rawExpectValue = data[111] ? CString(reinterpret_cast<LPCSTR>(data[111])) : CString();
+			rawCurrValue = data[23] ? CString(reinterpret_cast<LPCSTR>(data[23])) : CString();
+		}
 
 		rawExpectValue.Trim();
 		rawCurrValue.Trim();
@@ -9629,7 +9651,7 @@ void CGridWnd::parsingAlertx(LPARAM lParam)
 						}
 					}
 				}
-				else
+				else if (bExpect && m_bongField >= 0)
 				{
 					m_grid->SetItemText(xrow, m_bongField, _T(""));
 				}

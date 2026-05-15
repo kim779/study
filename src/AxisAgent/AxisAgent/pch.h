@@ -11,6 +11,7 @@
 #include "framework.h"
 #include <vector>
 #include <algorithm>
+#include <wincrypt.h>
 #define AGENT_MSG_PING      9998    // 핑 로그
 #define AGENT_MSG_NETTYPE   9999    // 네트워크 타입
 #define AGENT_MSG_LOG       9997    // 일반 로그

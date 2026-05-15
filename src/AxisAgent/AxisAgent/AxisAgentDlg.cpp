@@ -8,6 +8,7 @@
 #include "AxisAgentDlg.h"
 #include "DlgProxy.h"
 #include "afxdialogex.h"
+#include "CL_ENC.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -287,6 +288,119 @@ namespace
 
 		return out;
 	}
+}
+
+void dumptest()
+{
+	SYSTEMTIME st;
+	GetLocalTime(&st);
+
+	char selfPath[MAX_PATH] = { 0 };
+	GetModuleFileNameA(NULL, selfPath, MAX_PATH);
+	char* p = strrchr(selfPath, '\\');
+	if (p) *p = '\0';
+
+	// DbgHelp.dll - exe 옆에 있는거 우선 로드 (없으면 시스템꺼)
+	char dbgHelpPath[MAX_PATH] = { 0 };
+	sprintf_s(dbgHelpPath, "%s\\DbgHelp.dll", selfPath);
+
+	HMODULE hDbgHelp = LoadLibraryA(dbgHelpPath);
+	if (!hDbgHelp)
+	{
+		//DebugLog("TestDump: exe 옆 DbgHelp.dll 없음 - 시스템꺼 로드\n");
+		hDbgHelp = LoadLibraryA("DbgHelp.dll");
+	}
+
+	if (!hDbgHelp)
+	{
+		//AddLog("DUMP", "DbgHelp.dll 로드 실패");
+		return;
+	}
+
+	// 버전 로그
+	char loadedPath[MAX_PATH] = { 0 };
+	GetModuleFileNameA(hDbgHelp, loadedPath, MAX_PATH);
+	//DebugLog("TestDump: DbgHelp.dll 로드 [%s]\n", loadedPath);
+
+	typedef BOOL(WINAPI* PFN_MiniDumpWriteDump)(
+		HANDLE, DWORD, HANDLE, MINIDUMP_TYPE,
+		PMINIDUMP_EXCEPTION_INFORMATION,
+		PMINIDUMP_USER_STREAM_INFORMATION,
+		PMINIDUMP_CALLBACK_INFORMATION);
+
+	PFN_MiniDumpWriteDump pfnDump =
+		(PFN_MiniDumpWriteDump)GetProcAddress(hDbgHelp, "MiniDumpWriteDump");
+
+	if (!pfnDump)
+	{
+	//	AddLog("DUMP", "MiniDumpWriteDump GetProcAddress 실패");
+		FreeLibrary(hDbgHelp);
+		return;
+	}
+
+	// 덤프 파일 생성
+	char dumpPath[MAX_PATH] = { 0 };
+	sprintf_s(dumpPath, "%s\\ping\\test_dump_%04d%02d%02d_%02d%02d%02d.dmp",
+		selfPath,
+		st.wYear, st.wMonth, st.wDay,
+		st.wHour, st.wMinute, st.wSecond);
+
+	HANDLE hFile = CreateFileA(
+		dumpPath,
+		GENERIC_WRITE, 0, NULL,
+		CREATE_ALWAYS,
+		FILE_ATTRIBUTE_NORMAL, NULL);
+
+	if (hFile == INVALID_HANDLE_VALUE)
+	{
+		char buf[256] = { 0 };
+		sprintf_s(buf, "TestDump: CreateFile 실패 err=%lu", GetLastError());
+	//	AddLog("DUMP", buf);
+		FreeLibrary(hDbgHelp);
+		return;
+	}
+
+	MINIDUMP_TYPE dumpType = (MINIDUMP_TYPE)(
+		MiniDumpWithDataSegs |
+		MiniDumpWithHandleData |
+		MiniDumpWithThreadInfo |
+		MiniDumpWithUnloadedModules);
+
+	BOOL bOk = pfnDump(
+		GetCurrentProcess(),
+		GetCurrentProcessId(),
+		hFile,
+		dumpType,
+		NULL, NULL, NULL);
+
+	DWORD err = GetLastError();
+	CloseHandle(hFile);
+	FreeLibrary(hDbgHelp);
+
+	if (bOk)
+	{
+		HANDLE hCheck = CreateFileA(dumpPath, GENERIC_READ, FILE_SHARE_READ,
+			NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+		DWORD size = 0;
+		if (hCheck != INVALID_HANDLE_VALUE)
+		{
+			size = GetFileSize(hCheck, NULL);
+			CloseHandle(hCheck);
+		}
+
+		char buf[256] = { 0 };
+		sprintf_s(buf, "TestDump: 성공 size=%lu bytes", size);
+	
+	//	DebugLog("TestDump: [%s] %s\n", dumpPath, buf);
+	}
+	else
+	{
+		char buf[256] = { 0 };
+		sprintf_s(buf, "TestDump: 실패 err=%lu (0x%08X)", err, err);
+	
+	//	DebugLog("%s\n", buf);
+	}
+
 }
 
 void CAxisAgentDlg::DebugLog(const char* fmt, ...)
@@ -1787,118 +1901,62 @@ void CAxisAgentDlg::MonitorLoop()
 	CloseHandle(hProcess);
 }
 
-void CAxisAgentDlg::OnBnClickedBtnTest()
+#include <random>
+BOOL WriteRandomEncryptedFile(const CString& filePath)
 {
-	SYSTEMTIME st;
-	GetLocalTime(&st);
+	CStdioFile file;
 
-	char selfPath[MAX_PATH] = { 0 };
-	GetModuleFileNameA(NULL, selfPath, MAX_PATH);
-	char* p = strrchr(selfPath, '\\');
-	if (p) *p = '\0';
-
-	// DbgHelp.dll - exe 옆에 있는거 우선 로드 (없으면 시스템꺼)
-	char dbgHelpPath[MAX_PATH] = { 0 };
-	sprintf_s(dbgHelpPath, "%s\\DbgHelp.dll", selfPath);
-
-	HMODULE hDbgHelp = LoadLibraryA(dbgHelpPath);
-	if (!hDbgHelp)
+	if (!file.Open(filePath,
+		CFile::modeCreate |
+		CFile::modeWrite |
+		CFile::typeText))
 	{
-		DebugLog("TestDump: exe 옆 DbgHelp.dll 없음 - 시스템꺼 로드\n");
-		hDbgHelp = LoadLibraryA("DbgHelp.dll");
+		return FALSE;
 	}
 
-	if (!hDbgHelp)
+	std::random_device rd;
+	std::mt19937 gen(rd());
+
+	std::uniform_int_distribution<> digitDist(4, 6);
+
+	const int count = 20;
+
+	for (int i = 0; i < count; ++i)
 	{
-		AddLog("DUMP", "DbgHelp.dll 로드 실패");
-		return;
-	}
+		int digits = digitDist(gen);
 
-	// 버전 로그
-	char loadedPath[MAX_PATH] = { 0 };
-	GetModuleFileNameA(hDbgHelp, loadedPath, MAX_PATH);
-	DebugLog("TestDump: DbgHelp.dll 로드 [%s]\n", loadedPath);
+		int minValue = 1;
+		int maxValue = 9;
 
-	typedef BOOL(WINAPI* PFN_MiniDumpWriteDump)(
-		HANDLE, DWORD, HANDLE, MINIDUMP_TYPE,
-		PMINIDUMP_EXCEPTION_INFORMATION,
-		PMINIDUMP_USER_STREAM_INFORMATION,
-		PMINIDUMP_CALLBACK_INFORMATION);
-
-	PFN_MiniDumpWriteDump pfnDump =
-		(PFN_MiniDumpWriteDump)GetProcAddress(hDbgHelp, "MiniDumpWriteDump");
-
-	if (!pfnDump)
-	{
-		AddLog("DUMP", "MiniDumpWriteDump GetProcAddress 실패");
-		FreeLibrary(hDbgHelp);
-		return;
-	}
-
-	// 덤프 파일 생성
-	char dumpPath[MAX_PATH] = { 0 };
-	sprintf_s(dumpPath, "%s\\ping\\test_dump_%04d%02d%02d_%02d%02d%02d.dmp",
-		selfPath,
-		st.wYear, st.wMonth, st.wDay,
-		st.wHour, st.wMinute, st.wSecond);
-
-	HANDLE hFile = CreateFileA(
-		dumpPath,
-		GENERIC_WRITE, 0, NULL,
-		CREATE_ALWAYS,
-		FILE_ATTRIBUTE_NORMAL, NULL);
-
-	if (hFile == INVALID_HANDLE_VALUE)
-	{
-		char buf[256] = { 0 };
-		sprintf_s(buf, "TestDump: CreateFile 실패 err=%lu", GetLastError());
-		AddLog("DUMP", buf);
-		FreeLibrary(hDbgHelp);
-		return;
-	}
-
-	MINIDUMP_TYPE dumpType = (MINIDUMP_TYPE)(
-		MiniDumpWithDataSegs |
-		MiniDumpWithHandleData |
-		MiniDumpWithThreadInfo |
-		MiniDumpWithUnloadedModules);
-
-	BOOL bOk = pfnDump(
-		GetCurrentProcess(),
-		GetCurrentProcessId(),
-		hFile,
-		dumpType,
-		NULL, NULL, NULL);
-
-	DWORD err = GetLastError();
-	CloseHandle(hFile);
-	FreeLibrary(hDbgHelp);
-
-	if (bOk)
-	{
-		HANDLE hCheck = CreateFileA(dumpPath, GENERIC_READ, FILE_SHARE_READ,
-			NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-		DWORD size = 0;
-		if (hCheck != INVALID_HANDLE_VALUE)
+		for (int j = 1; j < digits; ++j)
 		{
-			size = GetFileSize(hCheck, NULL);
-			CloseHandle(hCheck);
+			minValue *= 10;
+			maxValue = maxValue * 10 + 9;
 		}
 
-		char buf[256] = { 0 };
-		sprintf_s(buf, "TestDump: 성공 size=%lu bytes", size);
-		AddLog("DUMP", buf);
-		DebugLog("TestDump: [%s] %s\n", dumpPath, buf);
+		std::uniform_int_distribution<> numDist(minValue, maxValue);
+		int value = numDist(gen);
+
+		CStringA plainA;
+		plainA.Format("%d", value);
+
+		CString enc = Aes256EncryptBase64(plainA);
+
+		CString line;
+		line.Format(_T("%S = %s\r\n"), plainA.GetString(), enc.GetString());
+
+		file.WriteString(line);
 	}
-	else
-	{
-		char buf[256] = { 0 };
-		sprintf_s(buf, "TestDump: 실패 err=%lu (0x%08X)", err, err);
-		AddLog("DUMP", buf);
-		DebugLog("%s\n", buf);
-	}
+
+	file.Close();
+
+	return TRUE;
 }
 
+void CAxisAgentDlg::OnBnClickedBtnTest()
+{
+	WriteRandomEncryptedFile(_T("C:\\Temp\\aes_random.txt"));
+}
 
 void CAxisAgentDlg::OnTimer(UINT_PTR nIDEvent)
 {

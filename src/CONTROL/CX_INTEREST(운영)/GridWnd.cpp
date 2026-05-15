@@ -8114,15 +8114,6 @@ void CGridWnd::parsingAlertx(LPARAM lParam)
 		{
 			xrow = m_irowCode[rowPosition];
 
-			// bTicker 판단 (기존 유지)
-			if (!hasData(34) && hasData(40))
-			{
-				if (!hasData(111))
-					bTicker = FALSE;
-			}
-			if (hasData(734) || hasData(740))
-				bTicker = FALSE;
-
 			entry = _T("");
 			CString	oldEXP = m_grid->GetItemText(xrow, colEXPECT);
 			CString	newEXP = _T("");
@@ -8135,8 +8126,19 @@ void CGridWnd::parsingAlertx(LPARAM lParam)
 			CString en2, saveData;
 
 			// ── 예상가/현재가 판단 (두 번째 소스 방식으로 통일) ──
-			CString rawExpectValue = getData(111) ? CString(getData(111)) : CString();
-			CString rawCurrValue = getData(23) ? CString(getData(23)) : CString();
+			CString rawExpectValue;
+			CString rawCurrValue;
+
+			if (bNeedMap)
+			{
+				rawExpectValue = getData(111) ? CString(getData(111)) : CString(); // ToMapped(111) = 611
+				rawCurrValue = getData(23) ? CString(getData(23)) : CString(); // ToMapped(23)  = 623
+			}
+			else
+			{
+				rawExpectValue = data[111] ? CString(reinterpret_cast<LPCSTR>(data[111])) : CString();
+				rawCurrValue = data[23] ? CString(reinterpret_cast<LPCSTR>(data[23])) : CString();
+			}
 			rawExpectValue.Trim();
 			rawCurrValue.Trim();
 
@@ -8482,7 +8484,7 @@ void CGridWnd::parsingAlertx(LPARAM lParam)
 							}
 						}
 					}
-					else
+					else if (bExpect && m_bongField >= 0)
 					{
 						m_grid->SetItemText(xrow, m_bongField, _T(""));
 					}

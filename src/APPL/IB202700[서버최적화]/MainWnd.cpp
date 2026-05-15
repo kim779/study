@@ -1009,8 +1009,8 @@ LONG CMainWnd::OnUser(WPARAM wParam, LPARAM lParam)
 		stmp.Format("%s", (char*)data[0]);
 		stmp.TrimRight();
 
-		m_slog.Format("[RTS] = [%s] 0 =[%s] 23=[%s] 111=[%s] 24=[%s] 27=[%s] 28=[%s] 29=[%s] 30=[%s] 31=[%s] 32=[%s] 33=[%s] 36=[%s] 41=[%s] 61=[%s] 101=[%s] 104=[%s] 106=[%s] 109=[%s] 146=[%s] 181=[%s]", code, stmp,
-			(char*)data[623], (char*)data[611], (char*)data[624], (char*)data[627], (char*)data[628], (char*)data[629], (char*)data[630], (char*)data[631], (char*)data[632], (char*)data[633], (char*)data[636], (char*)data[641], (char*)data[661],
+		m_slog.Format("[RTS] = [%s] 0 =[%s] 23=[%s] 623=[%s] 611=[%s] 624=[%s] 627=[%s] 628=[%s] 629=[%s] 630=[%s] 631=[%s] 632=[%s] 633=[%s] 636=[%s] 641=[%s] 661=[%s]601=[%s] 604=[%s] 606=[%s] 609=[%s] 646=[%s] 681=[%s]", code, stmp,
+			(char*)data[23], (char*)data[623], (char*)data[611], (char*)data[624], (char*)data[627], (char*)data[628], (char*)data[629], (char*)data[630], (char*)data[631], (char*)data[632], (char*)data[633], (char*)data[636], (char*)data[641], (char*)data[661],
 			(char*)data[601], (char*)data[604], (char*)data[606], (char*)data[609], (char*)data[646], (char*)data[681]);
 
 		Output_DebugString(m_slog);
