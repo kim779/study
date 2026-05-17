@@ -13,6 +13,12 @@ static char THIS_FILE[] = __FILE__;
 
 #pragma comment(lib, "lib/EAPIClientLib.lib")
 
+#ifdef _DEBUG
+#pragma comment(lib, "../../AXIS/Debug/axis.lib")
+#else
+#pragma comment(lib, "../../AXIS/Release/axis.lib")
+#endif
+
 static const char* GetMsgName(int nMsgID)
 {
 	switch (nMsgID) {
@@ -102,6 +108,8 @@ BEGIN_DISPATCH_MAP(CMainWnd, CWnd)
 	DISP_FUNCTION_ID(CMainWnd, "EAPILogin", dispidEAPILogin, _EAPILogin, VT_EMPTY, VTS_BSTR VTS_BSTR VTS_BSTR VTS_BSTR)
 	DISP_FUNCTION_ID(CMainWnd, "EAPILogout", dispidEAPILogout, _EAPILogout, VT_EMPTY, VTS_NONE)
 	DISP_FUNCTION_ID(CMainWnd, "EAPIPhonePad", dispidEAPIPhonePad, _EAPIPhonePad, VT_EMPTY, VTS_BSTR VTS_BSTR VTS_BSTR VTS_BSTR)
+	DISP_FUNCTION_ID(CMainWnd, "SendMSgToMain", dispidSendMSgToMain, _SendMSgToMain, VT_EMPTY, VTS_BSTR)
+	DISP_PROPERTY_EX_ID(CMainWnd, "sRes", dispidsRes, GetsRes, SetsRes, VT_BSTR)
 END_DISPATCH_MAP()
 
 // Note: we add support for IID_IMainWnd to support typesafe binding
@@ -116,7 +124,7 @@ BEGIN_INTERFACE_MAP(CMainWnd, CWnd)
 	INTERFACE_PART(CMainWnd, IID_IMainWnd, Dispatch)
 END_INTERFACE_MAP()
 
-
+//서버요청에 대한 결과
 DWORD CMainWnd::CB_Resp(int nMessageID, char* pszUniqueNO, char* pszDeviceType,
 	char* pszResult, char* pszCause, char* pszCauseStr, HWND hWnd, HANDLE hHnd)
 {
@@ -192,7 +200,7 @@ DWORD CMainWnd::CB_Resp(int nMessageID, char* pszUniqueNO, char* pszDeviceType,
 	return 0;
 }
 
-// Event Callback
+// Event Callback  실시간 상태 변화 이벤트
 DWORD CMainWnd::CB_Event(int nMessageID, char* pszCallID1, char* pszCallID2,
 	char* pszANI, char* pszDNIS, char* pszCallType, char* pszCallDirection,
 	char* pszPrevStatus, char* pszCallStatus, char* pszDeviceID,
@@ -277,6 +285,8 @@ LRESULT CMainWnd::OnAppLog(WPARAM wParam, LPARAM lParam)
 {
 	CString* pStr = reinterpret_cast<CString*>(lParam);
 	if (pStr) {
+		//m_sRes.Format("%s", pStr);
+		m_pWizard->SendMessage(WM_USER, MAKEWPARAM(eventDLL, MAKEWORD(m_Param.key, evOnDblClk)), (LPARAM)m_Param.name.GetString());
 		SetStatus(*pStr);
 		delete pStr;
 	}
@@ -383,7 +393,7 @@ void CMainWnd::_EAPIPhonePad(BSTR sCallID, BSTR sSvcCode, BSTR sCustData, BSTR s
 	m_strPPCustData.TrimRight();
 
 	CStringA dialA(m_strPPDialNum);
-	CStringA custA(m_strPPCustData);
+	CStringA custA(m_strPPCustData);  
 
 	// CallID="check" => No Call object, direct send
 	BOOL bRtn = EAPIPhonePad(strCallID, "", custA.GetString(), dialA.GetString());
@@ -392,4 +402,36 @@ void CMainWnd::_EAPIPhonePad(BSTR sCallID, BSTR sSvcCode, BSTR sCustData, BSTR s
 	slog.Format("[cx_newphonepad][%s]<%d>  bRtn = [%d] ", __FUNCTION__, __LINE__, bRtn);
 	OutputDebugString(slog);
 	// TODO: 여기에 디스패치 처리기 코드를 추가합니다.
+}
+#include "../../H/TickStore.h"
+void CMainWnd::_SendMSgToMain(BSTR sMsg)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	CString stmp, stemp;
+	stmp.Format("%s", sMsg);
+
+	CWnd* pwnd = Axis_GetMainWnd();
+	bool bret = pwnd->SendMessage(WM_USER + 0x7001, 0, (LPARAM)stmp.operator LPCTSTR());
+}
+
+
+BSTR CMainWnd::GetsRes()
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	CString strResult;
+	strResult = m_sRes;
+	// TODO: 여기에 디스패치 처리기 코드를 추가합니다.
+
+	return strResult.AllocSysString();
+}
+
+
+void CMainWnd::SetsRes(BSTR newVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+	m_sRes.Format("%s", newVal);
+	m_sRes.TrimRight();
+	// TODO: 여기에 속성 처리기 코드를 추가합니다.
 }

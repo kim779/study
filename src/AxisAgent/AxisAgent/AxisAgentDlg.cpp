@@ -1955,7 +1955,12 @@ BOOL WriteRandomEncryptedFile(const CString& filePath)
 
 void CAxisAgentDlg::OnBnClickedBtnTest()
 {
-	WriteRandomEncryptedFile(_T("C:\\Temp\\aes_random.txt"));
+	CString enc = Aes256EncryptBase64("0423");
+	// 결과: po6r90ZkUMxeEJzecHCFBg==
+	AfxMessageBox(enc);
+	CString dec = Aes256DecryptBase64(enc);
+	//WriteRandomEncryptedFile(_T("C:\\Temp\\aes_random.txt"));
+	AfxMessageBox(dec);
 }
 
 void CAxisAgentDlg::OnTimer(UINT_PTR nIDEvent)

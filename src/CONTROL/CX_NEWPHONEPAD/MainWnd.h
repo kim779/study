@@ -78,6 +78,8 @@ protected:
 
 	enum
 	{
+		dispidSendMSgToMain = 8L,
+		dispidsRes = 7,
 		dispidEAPIPhonePad = 6L,
 		dispidEAPILogout = 5L,
 		dispidEAPILogin = 4L,
@@ -111,6 +113,10 @@ public:
 	afx_msg void OnDestroy();
 protected:
 	void _EAPIPhonePad(BSTR sCallID, BSTR sSvcCode, BSTR sCustData, BSTR sDialNumber);
+	CString m_sRes{};
+	void _SendMSgToMain(BSTR sMsg);
+	BSTR GetsRes();
+	void SetsRes(BSTR newVal);
 };
 
 /////////////////////////////////////////////////////////////////////////////
