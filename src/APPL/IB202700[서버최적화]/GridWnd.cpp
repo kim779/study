@@ -7076,6 +7076,7 @@ void CGridWnd::calcInClient(int row)
 
 int CGridWnd::CheckRealTimeCode(CString code)
 {
+	CString slog;
 	class CIndexMap *idx = nullptr;
 	constexpr int count = 0;
 	ZeroMemory(m_irowCode, sizeof(int) * 110);
@@ -7087,6 +7088,10 @@ int CGridWnd::CheckRealTimeCode(CString code)
 
 		for (int ii = 0; ii < idx->idxCnt; ii++)
 			m_irowCode[ii] = idx->index[ii];
+
+		slog.Format("[IB202200][symbol] [%s] code=[%s] ii=[%d]", __FUNCTION__, code, idx->idxCnt);
+		Output_DebugString(slog);
+
 		return idx->idxCnt;
 	}
 	return count;
@@ -7095,6 +7100,7 @@ int CGridWnd::CheckRealTimeCode(CString code)
 // 2011.12.29 KSJ
 void CGridWnd::ReSetSearchMap()
 {
+	CString slog;
 	class CIndexMap *idx = nullptr;
 	const int realtimeCol = 0;
 	CString string, strTemp;
@@ -7121,6 +7127,9 @@ void CGridWnd::ReSetSearchMap()
 
 		idx->index[idx->idxCnt++] = ii;
 		m_pSearchMap.SetAt(string, (CObject *)idx);
+
+		slog.Format("[IB202200][symbol] [%s] string=[%s] ii=[%d]",__FUNCTION__, string, ii);
+		Output_DebugString(slog);
 	}
 }
 
@@ -9064,13 +9073,14 @@ void CGridWnd::parsingAlertx(LPARAM lParam)
 
 	int count = 0;
 	
-
+	BOOL bZisu = FALSE;	   // 2013.08.27 KSJ 지수일때는 구분이 'X'이고 예상가가 23에 온다.
 	if (strGubn == "X" && code.GetLength() == 5) //지수일때
 	{
-		count = CheckRealTimeCode(code); // 중복개수처리...
 		code.Delete(0);	     //첫 글자 'X'를 삭제한다.
 		code.Insert(0, 'K'); //첫 글자를 'K'로 바꿔준다.
 		strCode = code;
+		count = CheckRealTimeCode(code); // 중복개수처리...
+		bZisu = TRUE;
 	}
 	else
 		count = CheckRealTimeCode(code); // 중복개수처리...
@@ -9088,7 +9098,7 @@ void CGridWnd::parsingAlertx(LPARAM lParam)
 
 		BOOL bTransSymbol = FALSE; // 2012.02.09 KSJ 심볼변경되는 상황 일때 TRUE
 		BOOL bDaebi = FALSE;	   // 2012.03.20 KSJ 예상대비가 0일때 체크함.
-		BOOL bZisu = FALSE;	   // 2013.08.27 KSJ 지수일때는 구분이 'X'이고 예상가가 23에 온다.
+		
 
 		CString strTime, expect, real, excep;
 		const CString codeExceptA(strCode);
@@ -9107,6 +9117,11 @@ void CGridWnd::parsingAlertx(LPARAM lParam)
 		{
 			rawExpectValue = getDataString(111);  // ToMapped(111) = 611
 			rawCurrValue = getDataString(23);   // ToMapped(23)  = 623
+		}
+		else if (bZisu)
+		{
+			rawExpectValue = CString(reinterpret_cast<LPCSTR>(data[23]));
+			rawCurrValue = CString(reinterpret_cast<LPCSTR>(data[23]));
 		}
 		else
 		{
@@ -9151,10 +9166,13 @@ void CGridWnd::parsingAlertx(LPARAM lParam)
 			saveData = currValue;
 		}
 
-		if(isZeroLike(getDataPtr(24)))
+	//	if(isZeroLike(getDataPtr(24))) //전일대비
 		{
-			slog.Format("[IB202200][symbol] [%s] 예상가=[%s] 현재가=[%s] saveData=[%s] _typeAuto=[%d] 대비=[%s] 등락률=[%s] 거래량=[%s]",
+			slog.Format("[IB202200][symbol] [%s] bZisu=[%d] rawExpectValue=[%s] expectValue=[%s] 예상가=[%s] 현재가=[%s] saveData=[%s] _typeAuto=[%d] 대비=[%s] 등락률=[%s] 거래량=[%s]",
 				strCode,
+				bZisu,
+				rawExpectValue,
+				expectValue,
 				expectPtr ? expectPtr : "",
 				currPtr ? currPtr : "",
 				saveData,
@@ -9193,22 +9211,7 @@ void CGridWnd::parsingAlertx(LPARAM lParam)
 				entry = " ";	    //예상가가 0이 올때랑 같은 상황임.
 			else
 			{
-				bZisu = TRUE;
 				entry = currPtr ? CString(currPtr) : CString(); // 2013.08.22 지수예상가는111심볼이 없고 구분값이X로 온다.
-			}
-
-			if (!isZeroLike(entry))
-			{  //장마감 동시호가 이후 체결(B) 데이터가 들어와서 현재가(예상가로 세팅되있는)를 초기화 해주는데 
-				//간혹 한두종목이 체결 데이터 수신 후 또 다시 예상가호가(D)데이터가 들어와서 다시 예상가로 바꿔주는 역전현상이 있다
-				//예상가가 아닌걸로 세팅 되고 난뒤 다시 예상가가 들어왔을때 시간이 장마감동시호가 이후면 처리 하지 않는다
-
-
-			}
-			else
-			{
-				// 2012.05.09 KSJ 예상가가 0이 올때는 현재가를 뿌려준다.
-				//m_mapCurValue.Lookup(strCode, strData);
-				//m_grid->SetItemText(xrow, colEXPECT, "0"); //예상가 취소
 			}
 
 			//현재 예상버튼이 안눌러져 있을때, 강제로 심볼을 바꾸어서 그리드에 데이터를 보여주고 있다
@@ -9237,24 +9240,7 @@ void CGridWnd::parsingAlertx(LPARAM lParam)
 			entry = currPtr;
 			if (_typeAuto == 0)  //자동
 			{
-				//strTime = dealTimePtr ? CString(dealTimePtr) : CString();
-				//if (beginTime <= dealTime && beginTimeEnd >= dealTime && bKrx)
-				//{
-				//	if (!isZeroLike(entry))
-				//	{
-				//		m_grid->SetItemText(xrow, colEXPECT, "1");
-				//	}
-				//	else
-				//	{
-				//		m_grid->SetItemText(xrow, colEXPECT, "0"); 	// 2012.08.29 KSJ 예상가 취소함. 8:10 ~ 8:30분 사이에 체결이 떨어지면
-				//		entry = m_grid->GetItemText(xrow, colCURR);
-				//		return;
-				//	}
-				//}
-				//else
-				{
 					m_grid->SetItemText(xrow, colEXPECT, "0"); //여기
-				}
 			}
 			else if (_typeAuto == 1)  //예상
 			{
