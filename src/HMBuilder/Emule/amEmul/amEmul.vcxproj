@@ -1,0 +1,188 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{C851F747-87E3-4C38-A43F-01B6E92E01BB}</ProjectGuid>
+    <RootNamespace>amEmul</RootNamespace>
+    <Keyword>MFCDLLProj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>MultiByte</CharacterSet>
+    <UseOfMfc>Dynamic</UseOfMfc>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>false</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+    <UseOfMfc>Dynamic</UseOfMfc>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+    <OutDir>../../bin/</OutDir>
+    <IntDir>.\Debug\</IntDir>
+    <IncludePath>E:\si\HMBuilder\Emule\dll\lua\Libary\lua\include;E:\si\HMBuilder\Emule\dll\lua\Libary\luabind\include;E:\si\boost_1_53_0;$(IncludePath)</IncludePath>
+    <LibraryPath>E:\si\HMBuilder\Emule\dll\lua\Libary\lua\Lib;E:\si\HMBuilder\Emule\dll\lua\Libary\luabind\Lib;E:\si\boost_1_53_0\lib\NT_VC10_32;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+    <OutDir>../../Release/</OutDir>
+    <IncludePath>..\dll\lua\Libary\lua\include;..\dll\lua\Libary\luabind\include;..\..\..\boost_1_53_0;$(IncludePath)</IncludePath>
+    <LibraryPath>..\dll\lua\Libary\lua\Lib;..\dll\lua\Libary\luabind\Lib;..\..\..\boost_1_53_0\lib\NT_VC10_32;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;_AFXEXT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ModuleDefinitionFile>.\amEmul.def</ModuleDefinitionFile>
+      <AdditionalDependencies>ws2_32.lib;imm32.lib;version.lib;winmm.lib;../../Lib/amform.lib;../../Lib/amlua.lib;gdiplus.lib;../../lib/amgLib.lib;../../lib/amSock.lib;../../lib/lua51.lib;../../lib/luabind_D.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ImportLibrary>../../Lib/amEmul.lib</ImportLibrary>
+    </Link>
+    <Midl>
+      <MkTypLibCompatible>false</MkTypLibCompatible>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </Midl>
+    <ResourceCompile>
+      <Culture>0x0412</Culture>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;_AFXEXT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <ModuleDefinitionFile>.\amEmul.def</ModuleDefinitionFile>
+      <AdditionalDependencies>ws2_32.lib;imm32.lib;version.lib;winmm.lib;../Lib/amform.lib;../Lib/amlua.lib;gdiplus.lib;../lib/amgLib.lib;../lib/amSock.lib;../../lib/lua51.lib;../../lib/luabind.lib</AdditionalDependencies>
+      <ImportLibrary>../Lib/amEmul.lib</ImportLibrary>
+    </Link>
+    <Midl>
+      <MkTypLibCompatible>false</MkTypLibCompatible>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </Midl>
+    <ResourceCompile>
+      <Culture>0x0412</Culture>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <None Include="amEmul.def" />
+    <None Include="ReadMe.txt" />
+    <None Include="res\amEmul.rc2" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="amEmul.cpp" />
+    <ClCompile Include="Cast.cpp" />
+    <ClCompile Include="Client.cpp" />
+    <ClCompile Include="Dde.cpp" />
+    <ClCompile Include="Dll.cpp" />
+    <ClCompile Include="dllmain.cpp">
+      <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsManaged>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </PrecompiledHeader>
+      <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsManaged>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="EmulCtrl.cpp" />
+    <ClCompile Include="Event.cpp" />
+    <ClCompile Include="excel9.cpp" />
+    <ClCompile Include="Guard.cpp" />
+    <ClCompile Include="Key.cpp" />
+    <ClCompile Include="mapping.cpp" />
+    <ClCompile Include="Misc.cpp" />
+    <ClCompile Include="Mouse.cpp" />
+    <ClCompile Include="Objects.cpp" />
+    <ClCompile Include="OleDrop.cpp" />
+    <ClCompile Include="OleDropEx.cpp" />
+    <ClCompile Include="Printer.cpp" />
+    <ClCompile Include="Screen.cpp" />
+    <ClCompile Include="Script.cpp" />
+    <ClCompile Include="stdafx.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Stream.cpp" />
+    <ClCompile Include="Tips.cpp" />
+    <ClCompile Include="Works.cpp" />
+    <ClCompile Include="xscreen.cpp" />
+    <ClCompile Include="xsystem.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Cast.h" />
+    <ClInclude Include="Client.h" />
+    <ClInclude Include="Dde.h" />
+    <ClInclude Include="Dll.h" />
+    <ClInclude Include="EmulCtrl.h" />
+    <ClInclude Include="excel9.h" />
+    <ClInclude Include="Guard.h" />
+    <ClInclude Include="Key.h" />
+    <ClInclude Include="mapping.h" />
+    <ClInclude Include="Misc.h" />
+    <ClInclude Include="Mouse.h" />
+    <ClInclude Include="Objects.h" />
+    <ClInclude Include="OleDrop.h" />
+    <ClInclude Include="OleDropEx.h" />
+    <ClInclude Include="Printer.h" />
+    <ClInclude Include="Resource.h" />
+    <ClInclude Include="Screen.h" />
+    <ClInclude Include="Script.h" />
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="Stream.h" />
+    <ClInclude Include="targetver.h" />
+    <ClInclude Include="Tips.h" />
+    <ClInclude Include="Works.h" />
+    <ClInclude Include="xscreen.h" />
+    <ClInclude Include="xsystem.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="amEmul.rc" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+  <ProjectExtensions>
+    <VisualStudio>
+      <UserProperties RESOURCE_FILE="amEmul.rc" />
+    </VisualStudio>
+  </ProjectExtensions>
+</Project>

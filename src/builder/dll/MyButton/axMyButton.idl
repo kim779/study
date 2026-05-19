@@ -1,0 +1,41 @@
+// axMyButton.idl : axMyButton.dll의 형식 라이브러리 소스입니다.
+// 이 파일은 MIDL 컴파일러에 의해 처리되어
+// 형식 라이브러리(axMyButton.tlb)를 생성합니다.
+
+#include "olectl.h"
+[ uuid(3F61A7DE-E418-4EE0-A6CF-4205F6701A3B), version(1.0) ]
+library axMyButton
+{
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+	//  fmMyButton의 기본 디스패치 인터페이스입니다.
+		
+	[ uuid(E990B576-C6EA-431E-8F32-6AC17882C10E) ]
+	dispinterface IfmMyButton
+	{
+		properties:
+			[id(1)] LONG Text;
+			[id(2)] LONG PRgb;
+			[id(3)] BOOL TRgb;
+			[id(4)] BOOL Visible;
+			[id(5)] BOOL Enable;
+			[id(6)] BOOL TabStop;
+			[id(7)] LONG Left;
+			[id(8)] LONG Top;
+			[id(9)] LONG Right;
+			[id(10)] LONG Bottom;
+		methods:
+			[id(11)] void Refresh(void);
+			[id(12)] void SetFocus(void);
+			[id(13)] void SetRect(LONG left, LONG top, LONG right, LONG bottom);
+
+	};
+
+	//  fmMyButton의 클래스 정보입니다.
+
+	[ uuid(94654E5E-5EEF-4FF9-AFCC-7EB79AC5CDAD) ]
+	coclass fmMyButton
+	{
+		[default] dispinterface IfmMyButton;
+	};
+};

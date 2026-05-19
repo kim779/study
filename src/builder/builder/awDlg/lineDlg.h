@@ -1,0 +1,23 @@
+#pragma once
+
+#include "resource.h"
+
+// CLineDlg 대화 상자입니다.
+
+class AFX_EXT_CLASS CLineDlg : public CDialogEx
+{
+	DECLARE_DYNAMIC(CLineDlg)
+
+public:
+	CLineDlg(CWnd* pParent = NULL);   // 표준 생성자입니다.
+	virtual ~CLineDlg();
+
+// 대화 상자 데이터입니다.
+	enum { IDD = IDD_LINEDLG };
+	int		m_lineNum;
+
+protected:
+	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 지원입니다.
+
+	DECLARE_MESSAGE_MAP()
+};
