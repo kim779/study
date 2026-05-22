@@ -76,7 +76,7 @@ BOOL C32BitImageProcessor::ProcessPixels(RGBX* pSrcPixels, CSize , RGBX* pDestPi
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
-static countS = 0;
+static int countS = 0;
 CEnBitmap::CEnBitmap(COLORREF crBkgnd) : m_crBkgnd(crBkgnd)
 {
 }

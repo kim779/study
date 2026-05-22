@@ -16,6 +16,7 @@
 #define AGENT_MSG_NETTYPE   9999    // 네트워크 타입
 #define AGENT_MSG_LOG       9997    // 일반 로그
 #define AGENT_MSG_MONITOR   9995
+#define AGENT_MSG_AGENT_REGISTER    9994
 
 #define AGENT_LOG_MONITOR1
 

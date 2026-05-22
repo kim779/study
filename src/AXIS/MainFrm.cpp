@@ -5465,6 +5465,7 @@ WriteLog("[AXIS] CMainFrame::OnFireRec (lparam null )     FEV_RUN\n");
 	case FEV_ANM:	
 		{
 			update_ticker((int)wParam, (struct _alertR*)lParam);
+			ForwardTickerToAgent(wParam, lParam);
 		}
 		break;
 	case FEV_AXIS:
@@ -18510,23 +18511,6 @@ LONG CMainFrame::OnCHASER(WPARAM wParam, LPARAM lParam)
 	cs.dwData = 0;
 	cs.lpData = bufx;
 
-// 	CString data(bufx,len+L_cds);
-// 	if(data.Find("pijs")>-1)
-// 	{
-// 		CString s;
-// 		s.Format("DRFN : %s\n",data);
-// 		OutputDebugString(s);
-// 	}
-// 	CString s;
-// 	s.Format("SEND MESSAGE [%s]\n",(char*)lParam);
-// 	OutputDebugString(s);
-// 	if(data.Find("Send") > -1)
-// 	{
-// 		CString s;
-// 		s.Format("SEND MESSAGE [%s]\n",data);
-// 		OutputDebugString(s);
-// 	}
-
 	CString	winCaption, slog;
 	slog.Format("%s", bufx + L_cds);
 	OutputDebugString(slog);
@@ -23638,14 +23622,48 @@ void CMainFrame::SetLastMaps(CString sRemoveMap, CString sInsertMap)
 	}
 }
 
+struct AGENT_REG_INFO
+{
+	HWND   hAgentWnd;       // 에이전트 메인 다이얼로그 HWND
+	DWORD  dwAgentPid;      // 에이전트 PID (검증용)
+	DWORD  dwVersion;       // 프로토콜 버전 (확장 대비)
+};
+
 #define AGENT_MSG_PING      9998    // 핑 로그
 #define AGENT_MSG_NETTYPE   9999    // 네트워크 타입
 #define AGENT_MSG_MONITOR       9995    // CPU 로그
+#define AGENT_MSG_AGENT_REGISTER 9994
 BOOL CMainFrame::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct) 
 {
 	char* pMsg = (char*)pCopyDataStruct->lpData;
 	switch (pCopyDataStruct->dwData)
 	{
+		case AGENT_MSG_AGENT_REGISTER:
+		{
+			if (pCopyDataStruct->cbData != sizeof(AGENT_REG_INFO))
+				return FALSE;
+
+			AGENT_REG_INFO* pInfo = (AGENT_REG_INFO*)pCopyDataStruct->lpData;
+
+			// 검증: HWND 유효성 + PID 일치 (CreateProcess 때 받은 pi.dwProcessId와 비교)
+			if (!::IsWindow(pInfo->hAgentWnd))
+				return FALSE;
+
+			DWORD dwPidOfHwnd = 0;
+			::GetWindowThreadProcessId(pInfo->hAgentWnd, &dwPidOfHwnd);
+			if (dwPidOfHwnd != pInfo->dwAgentPid)
+				return FALSE;  // HWND와 PID 불일치 → 이상함
+
+			// (선택) CreateProcess 때 저장해둔 PID와도 대조
+			// if (pInfo->dwAgentPid != m_dwExpectedAgentPid) return FALSE;
+
+			m_hAgentWnd = pInfo->hAgentWnd;
+			m_dwAgentPid = pInfo->dwAgentPid;
+
+			TRACE(_T("[Agent] Registered: HWND=0x%p PID=%u\n"),
+				m_hAgentWnd, m_dwAgentPid);
+		}
+		break;
 		case AGENT_MSG_NETTYPE: // 9999
 			if (strstr(pMsg, "WiFi"))
 				m_netTypeStr = "[W]";
@@ -33190,6 +33208,48 @@ NetType CMainFrame::GetCurrentNetType(BOOL bUpload)
 	return result;
 }
    
+void CMainFrame::ForwardTickerToAgent(WPARAM wParam, LPARAM lParam)
+{
+	if (lParam == 0) return;
+
+	m_sync.Lock();  // 기존 코드와 동일 패턴
+
+	const WORD wFlag = HIWORD(wParam);
+	const WORD wBodyLen = LOWORD(wParam);
+	const int  nTotal = L_cds + wBodyLen;
+
+	// 안전 체크
+	static char bufx[1024 * 128];  // 128KB - 기존과 동일
+	if (nTotal > (int)sizeof(bufx)) {
+		m_sync.Unlock();
+		return;
+	}
+
+	ZeroMemory(bufx, nTotal);  // 필요한 만큼만 (성능)
+
+	struct _exeCDSS* cds = (struct _exeCDSS*)bufx;
+	cds->flag = wFlag;
+	cds->len = wBodyLen;
+	CopyMemory(&bufx[L_cds], (char*)lParam, wBodyLen);  // 본문 길이만 복사
+
+	COPYDATASTRUCT cs;
+	cs.cbData = nTotal;
+	cs.dwData = 0;            // 기존 컨벤션 유지 (또는 IPC_REALTIME_TICK)
+	cs.lpData = bufx;
+
+	// 에이전트로 송신
+	if (m_hAgentWnd && ::IsWindow(m_hAgentWnd))
+	{
+		::SendMessageTimeout(
+			m_hAgentWnd, WM_COPYDATA,
+			(WPARAM)GetSafeHwnd(),
+			(LPARAM)&cs,
+			SMTO_ABORTIFHUNG, 200, NULL);
+	}
+
+	m_sync.Unlock();
+}
+
 void CMainFrame::CreateAgentProcess(bool bforce)
 {
 	if (!m_bAxisAgent && !bforce)

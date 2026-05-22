@@ -39,6 +39,11 @@
 #include "EAPI_define.h"
 #include <vector>
 
+static void Output_DebugString(CString str)
+{
+	OutputDebugString(str);
+}
+
 //{{AFX_INSERT_LOCATION}}
 // Microsoft Visual C++ will insert additional declarations immediately before the previous line.
 

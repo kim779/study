@@ -122,7 +122,7 @@ void CMainFrame::Dump(CDumpContext& dc) const
 
 /////////////////////////////////////////////////////////////////////////////
 // CMainFrame message handlers
-void CMainFrame::OnChaserDisplay(WPARAM wParam, LPARAM lParam)
+LRESULT CMainFrame::OnChaserDisplay(WPARAM wParam, LPARAM lParam)
 {
 #if 0
 	ShowWindow(SW_SHOW);
@@ -141,6 +141,8 @@ void CMainFrame::OnChaserDisplay(WPARAM wParam, LPARAM lParam)
 	ShowWindow(SW_SHOW);
 #endif
 	m_bStart = true;
+
+	return 0;
 }
 
 void CMainFrame::OnSetFocus(CWnd* pOldWnd)

@@ -9165,11 +9165,11 @@ void CGridWnd::parsingAlertx(LPARAM lParam)
 		{
 			saveData = currValue;
 		}
-
+		//선물체결 K, 선물예상체결 4, 옵션 예상체결 O, 옵션예상호가 P, 옵션시세  O, 옵션호가 P, 상품선물체결 f, 상품선물호가 g, 업종지수 J, 업종예상지수 Y, 상품선물체결 f, 상품선물호가 g
 	//	if(isZeroLike(getDataPtr(24))) //전일대비
 		{
-			slog.Format("[IB202200][symbol] [%s] bZisu=[%d] rawExpectValue=[%s] expectValue=[%s] 예상가=[%s] 현재가=[%s] saveData=[%s] _typeAuto=[%d] 대비=[%s] 등락률=[%s] 거래량=[%s]",
-				strCode,
+			slog.Format("[IB202200][symbol] [%s][%s][%d] bZisu=[%d] rawExpectValue=[%s] expectValue=[%s] 예상가=[%s] 현재가=[%s] saveData=[%s] _typeAuto=[%d] 대비=[%s] 등락률=[%s] 거래량=[%s]",
+				strCode, strGubn, count,
 				bZisu,
 				rawExpectValue,
 				expectValue,
@@ -9190,7 +9190,7 @@ void CGridWnd::parsingAlertx(LPARAM lParam)
 		CString str90 = getDataString(90); // 10차우선호가 매도
 		str90.Trim();
 		BOOL bLast = FALSE; // 2015.01.15 필터링때문에 오는 마지막 데이터 무시해야함.ㄷ
-
+		//선물체결 K, 선물예상체결 4, 옵션 예상체결 O, 옵션예상호가 P, 옵션시세  O, 옵션호가 P, 상품선물체결 f, 상품선물호가 g, 업종지수 J, 업종예상지수 Y, 상품선물체결 f, 상품선물호가 g
 		// 2015.01.15 선물호가 4 추가됨 2015.02.03 KSJ 9시 장시작할 때도 필터링된 데이터가 나온다.
 		if ((strGubn == "L" || strGubn == "4" || strGubn == "P" || strGubn == "g") && ((str90 == "99") || (str90 == "40")))
 		{    //L 선물호가 잔량(90심볼존재), 4 선물예상가(90심볼존재), P 옵션 호가 잔량(90심볼존재), g상품선물 호가잔량 (90심볼존재)

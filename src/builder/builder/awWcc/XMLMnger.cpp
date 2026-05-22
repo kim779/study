@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "XMLMnger.h"
 
 CXMLMnger::CXMLMnger()

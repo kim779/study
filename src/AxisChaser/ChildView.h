@@ -91,6 +91,12 @@ protected:
 	struct _options		m_options;
 
 	CString			m_filename;
+
+	// 키워드 필터
+	CEdit		m_editKeyword;
+	CButton		m_chkFilter;
+	CString		m_strKeyword;
+	BOOL		m_bFilterOn;
 // Operations
 public:
 
@@ -153,10 +159,14 @@ protected:
 	afx_msg void OnOptions();
 	afx_msg void OnSave();
 	afx_msg void OnSaveas();
+	afx_msg void OnChangeEditKeyword();
+	afx_msg void OnClickedChkFilter();
 	//}}AFX_MSG
 	afx_msg LRESULT OnFindDialogMessage(WPARAM wParam, LPARAM lParam);
-	afx_msg void	OnReceive(WPARAM wParam, LPARAM lParam);
+	afx_msg LRESULT	OnReceive(WPARAM wParam, LPARAM lParam);
 	DECLARE_MESSAGE_MAP()
+public:
+	afx_msg void OnTimer(UINT_PTR nIDEvent);
 };
 
 /////////////////////////////////////////////////////////////////////////////

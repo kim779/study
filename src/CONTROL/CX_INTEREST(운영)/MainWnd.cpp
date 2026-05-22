@@ -1002,7 +1002,7 @@ LONG CMainWnd::OnUser(WPARAM wParam, LPARAM lParam)
 		stmp.Format("%s", (char*)data[0]);
 		stmp.TrimRight();
 		//선물체결 K, 선물예상체결 4, 옵션 예상체결 O, 옵션예상호가 P, 옵션시세  O, 옵션호가 P, 상품선물체결 f, 상품선물호가 g, 업종지수 J, 업종예상지수 Y, 상품선물체결 f, 상품선물호가 g
-		if (stmp != "w" && stmp != "T" && stmp != "K" && stmp != "4" && stmp != "O" && stmp != "P" && stmp != "f" && stmp != "g" && stmp != "J" && stmp != "Y" && stmp != "f" && stmp != "g")
+		if (stmp != "w" && stmp != "T" && stmp != "K" && stmp != "4" && stmp != "O" && stmp != "P" && stmp != "f" && stmp != "g" && stmp != "J" && stmp != "Y" && stmp != "f" && stmp != "g" && stmp != "X")
 			return 0;
 
 		//static constexpr int arr[] = { 41, 61, 101, 104, 106, 107, 109, 146, 181 };

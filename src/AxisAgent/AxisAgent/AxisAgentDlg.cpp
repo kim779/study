@@ -516,6 +516,31 @@ END_MESSAGE_MAP()
 
 
 // CAxisAgentDlg 메시지 처리기
+struct AGENT_REG_INFO
+{
+	HWND   hAgentWnd;       // 에이전트 메인 다이얼로그 HWND
+	DWORD  dwAgentPid;      // 에이전트 PID (검증용)
+	DWORD  dwVersion;       // 프로토콜 버전 (확장 대비)
+};
+
+void CAxisAgentDlg::RegisterToMain()
+{
+	AGENT_REG_INFO info = { 0 };
+	info.hAgentWnd = GetSafeHwnd();
+	info.dwAgentPid = ::GetCurrentProcessId();
+	info.dwVersion = 1;
+
+	COPYDATASTRUCT cds = { 0 };
+	cds.dwData = AGENT_MSG_AGENT_REGISTER;
+	cds.cbData = sizeof(info);
+	cds.lpData = &info;
+
+	::SendMessageTimeout(
+		m_hParentWnd, WM_COPYDATA,
+		(WPARAM)GetSafeHwnd(),
+		(LPARAM)&cds,
+		SMTO_ABORTIFHUNG, 2000, NULL);
+}
 
 
 bool CAxisAgentDlg::ShouldShowLogType(const char* type)
@@ -680,6 +705,7 @@ BOOL CAxisAgentDlg::OnInitDialog()
 		DebugLog("OnInitDialog: MonitorThread CreateThread 실패 err=%lu\n", GetLastError());
 
 	RegisterTrayIcon();
+	RegisterToMain();
 	return TRUE;
 }
 
@@ -1594,7 +1620,10 @@ void CAxisAgentDlg::CreateDump(const char* reason)
 	MINIDUMP_TYPE dumpType = (MINIDUMP_TYPE)(
 		MiniDumpNormal |
 		MiniDumpWithHandleData |
-		MiniDumpWithThreadInfo
+		MiniDumpWithThreadInfo |
+		MiniDumpWithIndirectlyReferencedMemory |
+		MiniDumpWithDataSegs |
+		MiniDumpWithProcessThreadData
 		);
 
 	SetLastError(0);

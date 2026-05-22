@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "BinaryMngr.h"
 #include "../h/seq.H"
 

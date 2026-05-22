@@ -1,6 +1,8 @@
+#include "stdafx.h"
 #include "LoadTrlayout.h"
 #include "h/mainvar.h"
 #include "h/seq.H"
+
 
 CLoadTrlayout::CLoadTrlayout()
 {

@@ -3827,6 +3827,7 @@ BOOL CintGrid::RedrawCell(int nRow, int nCol, CDC* pDC)
 	}
 
 	// 서버에서 속도 제어 → 클라이언트는 바로 그리기
+	
 	InvalidateRect(rect, FALSE);
 	return TRUE;
 }

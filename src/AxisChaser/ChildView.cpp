@@ -13,6 +13,8 @@
 #define SNEWLINE	"\n"
 #define CHARLIMIT	15
 
+#define TM_STAYONTOP 9899
+ 
 struct _exeCDSS
 {
 	DWORD	flag;
@@ -109,13 +111,25 @@ BEGIN_MESSAGE_MAP(CChildView,CWnd )
 	ON_REGISTERED_MESSAGE(m_findMSG, OnFindDialogMessage)
 	ON_COMMAND(ID_SAVE, OnSave)
 	ON_COMMAND(ID_SAVEAS, OnSaveas)
+	ON_EN_CHANGE(IDC_EDIT_KEYWORD, OnChangeEditKeyword)
+	ON_BN_CLICKED(IDC_CHK_FILTER, OnClickedChkFilter)
 	//}}AFX_MSG_MAP
 	ON_MESSAGE(WM_RECEIVE, OnReceive)
+	ON_WM_TIMER()
 END_MESSAGE_MAP()
 
 
 /////////////////////////////////////////////////////////////////////////////
 // CChildView message handlers
+void CChildView::OnChangeEditKeyword()
+{
+	m_editKeyword.GetWindowText(m_strKeyword);
+}
+
+void CChildView::OnClickedChkFilter()
+{
+	m_bFilterOn = (m_chkFilter.GetCheck() == BST_CHECKED);
+}
 
 BOOL CChildView::PreCreateWindow(CREATESTRUCT& cs) 
 {
@@ -147,6 +161,30 @@ int CChildView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		return -1;
 
 	Init();
+
+	CRect rcEdit(10, 10, 250, 32);
+	m_editKeyword.Create(WS_CHILD | WS_VISIBLE | WS_BORDER | ES_AUTOHSCROLL,
+		rcEdit, this, IDC_EDIT_KEYWORD);
+
+	CRect rcChk(260, 10, 380, 32);
+	m_chkFilter.Create(_T("키워드 필터"),
+		WS_CHILD | WS_VISIBLE | BS_AUTOCHECKBOX,
+		rcChk, this, IDC_CHK_FILTER);
+
+	//m_editKeyword.SetWindowPos(&CWnd::wndTop, 0, 0, 0, 0,
+	//	SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
+	//m_chkFilter.SetWindowPos(&CWnd::wndTop, 0, 0, 0, 0,
+	//	SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
+
+	m_editKeyword.SetFont(GetFont());
+	m_chkFilter.SetFont(GetFont());
+
+	m_bFilterOn = FALSE;
+	m_strKeyword.Empty();
+
+
+	SetTimer(TM_STAYONTOP, 1000, nullptr);
+
 	return 0;
 }
 
@@ -172,11 +210,28 @@ void CChildView::OnDestroy()
 void CChildView::OnSize(UINT nType, int cx, int cy) 
 {
 	CWnd ::OnSize(nType, cx, cy);
-	
+
+	const int filterHeight = 28;  // 필터 영역 높이 (여백 포함)
+	const int margin = 4;
+	const int editWidth = 240;
+	const int chkWidth = 120;
+	const int ctrlHeight = 22;
+
+	if (m_editKeyword.GetSafeHwnd())
+	{
+		m_editKeyword.MoveWindow(margin, margin, editWidth, ctrlHeight);
+	}
+	if (m_chkFilter.GetSafeHwnd())
+	{
+		m_chkFilter.MoveWindow(margin + editWidth + margin, margin,
+			chkWidth, ctrlHeight);
+	}
+
 	if (m_trace.GetSafeHwnd())
 	{
 		CRect	cRc;
 		GetClientRect(cRc);
+		cRc.top += 30;
 		m_trace.MoveWindow(cRc);
 	}
 }
@@ -236,6 +291,53 @@ void CChildView::OnRCVData(WPARAM wParam, LPARAM lParam)
 			
 			for (int ii = row * maxCnt; ii < (row + 1) * maxCnt; ii++)
 			{
+#ifdef DF_MBCS
+				if (ii < len)
+				{
+					tmpS.Format("%02X", (unsigned char)dat[ii]);
+					sRow += tmpS;
+					if (ii == row * maxCnt + 9)
+						sRow += "-";
+					else	sRow += " ";
+				}
+				else
+					sRow += "   ";
+
+				if (ii < len)
+				{
+					unsigned char ch = (unsigned char)dat[ii];
+
+					// CP949 lead byte이고, 다음 바이트가 같은 줄 안에 있고, trail byte이면 한글로 처리
+					if (_ismbblead(ch)
+						&& (ii + 1) < len
+						&& (ii + 1) < (row + 1) * maxCnt
+						&& _ismbbtrail((unsigned char)dat[ii + 1]))
+					{
+						unsigned char ch2 = (unsigned char)dat[ii + 1];
+
+						// ASCII 칸에 한글 2바이트 그대로
+						sDat += (char)ch;
+						sDat += (char)ch2;
+
+						// 다음 바이트(trail)의 hex도 미리 출력하고 ii 증가
+						ii++;
+						tmpS.Format("%02X", ch2);
+						sRow += tmpS;
+						if (ii == row * maxCnt + 9)
+							sRow += "-";
+						else	sRow += " ";
+			}
+					else if (0x20 <= ch && ch <= 0x7f)
+					{
+						sDat += (char)ch;
+					}
+					else
+					{
+						sDat += '.';
+					}
+		}
+				else	sDat += " ";
+#else
 				if (ii < len)
 				{
 					tmpS.Format("%02X", (unsigned char) dat[ii]);
@@ -255,6 +357,7 @@ void CChildView::OnRCVData(WPARAM wParam, LPARAM lParam)
 					else	sDat += '.';
 				}
 				else	sDat += " ";
+#endif
 			}
 
 			sDat  += '\n';
@@ -372,7 +475,21 @@ void CChildView::OnRCVData(WPARAM wParam, LPARAM lParam)
 
 void CChildView::addTrace(CString dat, int kind)
 {
+	CString slog;
+	CString stmp;
+	stmp = dat;
+	stmp.TrimRight();
+	stmp.Replace("\n", "");
+	slog.Format("[addTrace] [%d][%s]", stmp.GetLength(), stmp);
+	OutputDebugString(slog);
+
 	if (dat.IsEmpty())	return;
+	if (m_bFilterOn && !m_strKeyword.IsEmpty() && dat.Find(">>>>") < 0 && dat.Find("<<<<") < 0)
+	{
+		if (dat.Find(m_strKeyword) < 0)
+			return;  // 키워드 없으면 스킵
+	}
+
 	if (m_findDlg)
 		m_findDlg->SetFocus();
 //	else	SetFocus();
@@ -598,7 +715,7 @@ void CChildView::CopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct)
 #endif
 }
 
-void CChildView::OnReceive(WPARAM wParam, LPARAM lParam)
+LRESULT CChildView::OnReceive(WPARAM wParam, LPARAM lParam)
 {
 	CQue*	que;
 	while (m_que.GetSize())
@@ -610,6 +727,7 @@ void CChildView::OnReceive(WPARAM wParam, LPARAM lParam)
 		OnRCVData(MAKEWPARAM(que->m_nBytes, que->m_flag), (LPARAM) que->m_pBytes);
 		delete que;
 	}
+	return 0;
 }
 
 void CChildView::OnModeBinary() 
@@ -1156,3 +1274,21 @@ void CChildView::OnSaveas()
 	file.Write((LPCSTR)strText, strText.GetLength());
 	file.Close();
 }
+
+
+void CChildView::OnTimer(UINT_PTR nIDEvent)
+{
+	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
+	switch (nIDEvent)
+	{
+	case TM_STAYONTOP:
+		{
+			KillTimer(TM_STAYONTOP);
+			m_bSTAYONTOP = false;
+			OnStayontop();
+		}
+		break;
+	}
+	CWnd::OnTimer(nIDEvent);
+}
+

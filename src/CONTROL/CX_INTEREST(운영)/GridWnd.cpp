@@ -8035,7 +8035,7 @@ void  CGridWnd::initgridalert(bool bSend)
 void CGridWnd::parsingAlertx(LPARAM lParam)
 {
 	m_grid->setReal(true);
-
+	CString slog;
 	int xrow{};
 	CString	code, name, symbol, entry, datB, strValue, dataExceptCode, strCode, strData;
 	BOOL bTicker{};
@@ -8097,18 +8097,23 @@ void CGridWnd::parsingAlertx(LPARAM lParam)
 	}
 
 	int count = 0;
-	count = CheckRealTimeCode(code);
-	if (count == 0)
-		return;
 
 	{
 		// 2013.08.26 KSJ 지수일때 예상가 표시
+		BOOL	bZisu = FALSE;
 		if (!strGubn.Compare("X") && code.GetLength() == 5)
 		{
 			code.Delete(0);
 			code.Insert(0, 'K');
 			strCode = code;
+			count = CheckRealTimeCode(code);
+			bZisu = TRUE;
 		}
+		else
+			count = CheckRealTimeCode(code);
+
+		if (count == 0)
+			return;
 
 		for (int rowPosition = 0; rowPosition < count; rowPosition++)
 		{
@@ -8119,7 +8124,7 @@ void CGridWnd::parsingAlertx(LPARAM lParam)
 			CString	newEXP = _T("");
 			BOOL	bTransSymbol = FALSE;
 			BOOL	bDaebi = FALSE;
-			BOOL	bZisu = FALSE;
+			
 
 			CString strTime, expect, real, excep;
 			CString codeExceptA;
@@ -8133,6 +8138,11 @@ void CGridWnd::parsingAlertx(LPARAM lParam)
 			{
 				rawExpectValue = getData(111) ? CString(getData(111)) : CString(); // ToMapped(111) = 611
 				rawCurrValue = getData(23) ? CString(getData(23)) : CString(); // ToMapped(23)  = 623
+			}
+			else if (bZisu)
+			{
+				rawExpectValue = data[23] ? CString(reinterpret_cast<LPCSTR>(data[23])) : CString();
+				rawCurrValue = data[23] ? CString(reinterpret_cast<LPCSTR>(data[23])) : CString();
 			}
 			else
 			{
@@ -8153,6 +8163,22 @@ void CGridWnd::parsingAlertx(LPARAM lParam)
 
 			saveData = bHasExpect ? rawExpectValue : rawCurrValue;
 			en2 = getData(34) ? CString(getData(34)) : CString();
+
+			{
+
+				slog.Format("[IB202200][symbol] [%s][%s][%d] bZisu=[%d] rawExpectValue=[%s] 예상가=[%s] 현재가=[%s] saveData=[%s]  대비=[%s] 등락률=[%s] 거래량=[%s]",
+					strCode, strGubn, count,
+					bZisu,
+					rawExpectValue,
+					expectPtr ? expectPtr : "",
+					currPtr ? currPtr : "",
+					saveData,
+					getData(24),
+					getData(33),
+					getData(27)
+				);
+				Output_DebugString(slog);
+			}
 			// ─────────────────────────────────────────────────────
 
 			entry.Empty();
@@ -8161,17 +8187,20 @@ void CGridWnd::parsingAlertx(LPARAM lParam)
 			CString str90 = p90 ? p90 : "";
 			BOOL bLast = FALSE;
 
+
+			//L 선물호가잔량 , 4 선물예상가 , P 옵션호가잔량, g 상품선물호가잔량
 			str90.TrimLeft(); str90.TrimRight();
 			if ((!strGubn.Compare("L") || !strGubn.Compare("4") || !strGubn.Compare("P") || !strGubn.Compare("g"))
 				&& ((!str90.Compare("99")) || (!str90.Compare("40"))))
 			{
 				m_grid->SetItemText(xrow, colEXPECT, "0");
 				m_grid->SetItemData(xrow, colEXPECT, 0);
+				bTransSymbol = FALSE;
 				bLast = TRUE;
 			}
 
 			// ── 예상가/현재가 분기 ────────────────────────────────
-			if (expectPtr && !bLast)
+			if (expectPtr)
 			{
 				entry = expectPtr;
 
@@ -8813,6 +8842,7 @@ void CGridWnd::calcInClient(int row)
 
 int CGridWnd::CheckRealTimeCode(CString code)
 {
+	CString slog;
 	class CIndexMap* idx = nullptr;
 
 	const int realtimeCol = 0;
@@ -8834,11 +8864,12 @@ int CGridWnd::CheckRealTimeCode(CString code)
 		if (!m_pSearchMap.Lookup(code, (CObject*&)idx))
 			return count;
 
-// tick = timeGetTime();
-
 		for (ii = 0; ii < idx->idxCnt; ii++)
 			m_irowCode[ii] = idx->index[ii];
-//TRACE("map  serarch... gap = [%d][%d]\n", m_grid->GetRowCount(), int(timeGetTime() - tick));
+
+		slog.Format("[cx_interest][symbol] [%s] code=[%s] ii=[%d]", __FUNCTION__, code, ii);
+		Output_DebugString(slog);
+
 		return idx->idxCnt;
 	}
 
@@ -8869,6 +8900,7 @@ int CGridWnd::CheckRealTimeCode(CString code)
 //2011.12.29 KSJ
 void CGridWnd::ReSetSearchMap()
 {
+	CString slog;
 	class CIndexMap* idx = nullptr;
 
 	const int realtimeCol = 0;
@@ -8900,6 +8932,9 @@ void CGridWnd::ReSetSearchMap()
 
 		idx->index[idx->idxCnt++] = ii;
 		m_pSearchMap.SetAt(string, (CObject*)idx);
+
+		slog.Format("[cx_interest][symbol] [%s] string=[%s] ii=[%d]", __FUNCTION__, string, ii);
+		Output_DebugString(slog);
 
 	}
 }

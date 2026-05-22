@@ -2,7 +2,7 @@
 //
 
 #include "RichEditCtrlEx.h"
-
+#include <mbstring.h>
 /////////////////////////////////////////////////////////////////////////////
 // CRichEditCtrlEx
 
@@ -85,7 +85,7 @@ CRTFBuilder& doUnderline(	CRTFBuilder& r,
 CRTFBuilder& doFont(	CRTFBuilder&	r,
 											int						n)
 {
-	r.font( n ) ;
+	r.font( _T("굴림"));
 	return r ;
 }
 
@@ -457,23 +457,78 @@ void CRTFBuilder::write( CRichEditCtrl& c )
 	m_string.Empty( ) ;
 }
 
+#ifdef DF_MBCS
+CRTFBuilder& CRTFBuilder::operator+=(LPCTSTR p)
+{
+	CString s(p), s2;
+
+	int len = s.GetLength();
+	for (int i = 0; i < len; i++)
+	{
+		unsigned char ch = (unsigned char)s[i];
+
+		if (ch == '\n')
+		{
+			s2 += "\r\n\\par ";
+		}
+		else if (ch == '\\' || ch == '{' || ch == '}')
+		{
+			// RTF 메타문자 escape
+			CString esc;
+			esc.Format("\\%c", ch);
+			s2 += esc;
+		}
+		else if (_ismbblead(ch) && (i + 1) < len)
+		{
+			// CP949 2바이트 문자(한글 등) → \'XX\'XX
+			unsigned char hi = ch;
+			unsigned char lo = (unsigned char)s[i + 1];
+			CString esc;
+			esc.Format("\\'%02x\\'%02x", hi, lo);
+			s2 += esc;
+			i++; // trail byte 건너뜀
+		}
+		else if (ch > 0x7F)
+		{
+			// ASCII 범위 밖의 단일 바이트도 안전하게 escape
+			CString esc;
+			esc.Format("\\'%02x", ch);
+			s2 += esc;
+		}
+		else
+		{
+			s2 += (char)ch;
+		}
+	}
+
+	WORD langID = PRIMARYLANGID(GetSystemDefaultLangID());
+	switch (langID)
+	{
+	case LANG_KOREAN:
+		m_string += (CString)
+			"{\\rtf1\\ansi\\ansicpg949\\deff0\\deftab720";
+		break;
+	case LANG_CHINESE:
+		m_string += (CString)
+			"{\\rtf1\\ansi\\ansicpg950\\deff0\\deftab720";
+		break;
+	case LANG_ENGLISH:
+	default:
+		m_string += (CString)
+			"{\\rtf1\\ansi\\ansicpg1252\\deff0\\deftab720";
+		break;
+	}
+
+	m_string += (CString)m_fontList;
+	m_string += (CString)m_colorList;
+	m_string += (CString)m_attr;
+	m_string += s2;
+
+	return *this;
+}
+#else
 CRTFBuilder& CRTFBuilder::operator+=( LPCTSTR p )
 {
-//	CString s( p ) , s2 ;
-//	for ( int i = 0 ; i < s.GetLength( ) ; i ++ )
-//		if ( s[i]=='\n' )
-//			s2+= (CString)"\r\n" += "\\par ";//\\par " ;
-//		else
-//			s2+= s[i] ;
-//
-//	m_string += (CString)
-//	"{\\rtf1\\ansi\\ansicpg950\\deff0\\deftab720" += 
-//	(CString)m_fontList +=
-//	(CString)m_colorList += 
-//	(CString)m_attr += 
-//	s2  ;
-//	return *this ;
-
 	CString s( p ) , s2 , tmps;
 	for ( int i = 0 ; i < s.GetLength( ) ; i ++ )
 		if ( s[i]=='\n' )
@@ -504,6 +559,7 @@ CRTFBuilder& CRTFBuilder::operator+=( LPCTSTR p )
 	return *this ;
 
 }
+#endif
 
 CRTFBuilder&
 CRTFBuilder::operator << ( LPCTSTR p )

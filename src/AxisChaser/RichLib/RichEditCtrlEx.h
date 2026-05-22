@@ -7,6 +7,8 @@
 #include <list>
 #include <stack>
 
+#define DF_MBCS 
+
 using namespace std;
 #pragma  warning( disable : 4786 )
 
@@ -95,6 +97,23 @@ class CFontList
 : public list<CString>
 {
 public:
+#ifdef DF_MBCS
+	operator CString() const
+	{
+		CString s;
+		s = "{\\fonttbl";
+		int nCount = 0;
+		for (const_iterator i = begin(); i != end(); i++)
+		{
+			CString s2;
+			// \fcharset129 = Hangul charset
+			s2.Format("{\\f%d\\fcharset129\\fprq2 %s;}", nCount++, (*i));
+			s += s2;
+		}
+		s += '}';
+		return s;
+	}
+#else
 	operator CString( ) const
 		{ 
 			CString s ;
@@ -109,7 +128,7 @@ public:
 			s+='}' ;
 			return s ;
 		}
-
+#endif
 	void add( const CString& s )
 		{ push_back( s ) ; }
 };
@@ -286,7 +305,7 @@ public:
 	void push( ) ;
 	void pull( ) ;
 	
-	operator+=( CString& s ) ;
+	CRTFBuilder operator+=( CString& s ) ;
 	CRTFBuilder();
 	virtual ~CRTFBuilder();
 

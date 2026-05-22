@@ -65,7 +65,8 @@
 #define ID_SAVE                         32791
 #define ID_SAVEAS                       32792
 #define ID_END                          33000
-
+#define IDC_EDIT_KEYWORD	10001
+#define IDC_CHK_FILTER		10002
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED

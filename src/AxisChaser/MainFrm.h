@@ -58,7 +58,7 @@ protected:
 	afx_msg BOOL OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct);
 	afx_msg void OnClose();
 	//}}AFX_MSG
-	afx_msg void OnChaserDisplay(WPARAM wParam, LPARAM lParam);
+	afx_msg LRESULT OnChaserDisplay(WPARAM wParam, LPARAM lParam);
 	DECLARE_MESSAGE_MAP()
 };
 

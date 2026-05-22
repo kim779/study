@@ -37,7 +37,7 @@ std::vector<BYTE> DeriveKeyFromRegkey(const CString& regkey)
 		DWORD dwErr = GetLastError();
 		CString slog;
 		slog.Format(_T("CryptAcquireContext failed: 0x%08X"), dwErr);
-		OutputDebugString(slog);
+		Output_DebugString(slog);
 		return std::vector<BYTE>{};
 	}
 
@@ -47,7 +47,7 @@ std::vector<BYTE> DeriveKeyFromRegkey(const CString& regkey)
 		DWORD dwErr = GetLastError();
 		CString slog;
 		slog.Format(_T("CryptCreateHash failed: 0x%08X"), dwErr);
-		OutputDebugString(slog);
+		Output_DebugString(slog);
 		return std::vector<BYTE>{};
 	}
 
@@ -59,7 +59,7 @@ std::vector<BYTE> DeriveKeyFromRegkey(const CString& regkey)
 		DWORD dwErr = GetLastError();
 		CString slog;
 		slog.Format(_T("CryptHashData failed: 0x%08X"), dwErr);
-		OutputDebugString(slog);
+		Output_DebugString(slog);
 	}
 
 	DWORD keyLen = 32;
@@ -71,7 +71,7 @@ std::vector<BYTE> DeriveKeyFromRegkey(const CString& regkey)
 		DWORD dwErr = GetLastError();
 		CString slog;
 		slog.Format(_T("CryptGetHashParam failed: 0x%08X"), dwErr);
-		OutputDebugString(slog);
+		Output_DebugString(slog);
 	}
 
 	CryptDestroyHash(hHash);
@@ -89,7 +89,7 @@ CString AesEncrypt(const CString& plainText, const std::vector<BYTE>& key)
 		DWORD dwErr = GetLastError();
 		CString slog;
 		slog.Format(_T("CryptAcquireContext failed: 0x%08X"), dwErr);
-		OutputDebugString(slog);
+		Output_DebugString(slog);
 	}
 
 	// 키 임포트용 구조체
@@ -112,7 +112,7 @@ CString AesEncrypt(const CString& plainText, const std::vector<BYTE>& key)
 		DWORD dwErr = GetLastError();
 		CString slog;
 		slog.Format(_T("CryptImportKey failed: 0x%08X"), dwErr);
-		OutputDebugString(slog);
+		Output_DebugString(slog);
 	}
 
 	// CBC 모드 설정
@@ -141,7 +141,7 @@ CString AesEncrypt(const CString& plainText, const std::vector<BYTE>& key)
 		DWORD dwErr = GetLastError();
 		CString slog;
 		slog.Format(_T("CryptEncrypt failed: 0x%08X"), dwErr);
-		OutputDebugString(slog);
+		Output_DebugString(slog);
 	}
 
 	CryptDestroyKey(hKey);
@@ -180,7 +180,7 @@ CString AesDecrypt(const CString& encText, const std::vector<BYTE>& key)
 		DWORD dwErr = GetLastError();
 		CString slog;
 		slog.Format(_T("Invalid encrypted data: 0x%08X"), dwErr);
-		OutputDebugString(slog);
+		Output_DebugString(slog);
 	}
 
 	std::vector<BYTE> ivAndData(blobLen);
@@ -200,7 +200,7 @@ CString AesDecrypt(const CString& encText, const std::vector<BYTE>& key)
 		DWORD dwErr = GetLastError();
 		CString slog;
 		slog.Format(_T("CryptAcquireContext failed: 0x%08X"), dwErr);
-		OutputDebugString(slog);
+		Output_DebugString(slog);
 	}
 		
 	struct {
@@ -222,7 +222,7 @@ CString AesDecrypt(const CString& encText, const std::vector<BYTE>& key)
 		DWORD dwErr = GetLastError();
 		CString slog;
 		slog.Format(_T("CryptImportKey failed: 0x%08X"), dwErr);
-		OutputDebugString(slog);
+		Output_DebugString(slog);
 	}
 
 	DWORD mode = CRYPT_MODE_CBC;
@@ -237,7 +237,7 @@ CString AesDecrypt(const CString& encText, const std::vector<BYTE>& key)
 		DWORD dwErr = GetLastError();
 		CString slog;
 		slog.Format(_T("CryptDecrypt failed: 0x%08X"), dwErr);
-		OutputDebugString(slog);
+		Output_DebugString(slog);
 	}
 
 	CryptDestroyKey(hKey);

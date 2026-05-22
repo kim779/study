@@ -92,6 +92,7 @@ public:
 	CButton m_chkMonitor;
 	CListCtrl m_listLog;
 
+	void RegisterToMain();
 	bool ShouldShowLogType(const char* type);
 
 	int        m_dumpSeq = 0;

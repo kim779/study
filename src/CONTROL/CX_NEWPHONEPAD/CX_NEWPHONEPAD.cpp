@@ -103,6 +103,7 @@ __declspec(dllexport) CWnd* APIENTRY axCreate(CWnd* parent, void* pParam)
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
 	CMainWnd* m_pMainWnd = new CMainWnd(parent, (_param*)pParam);
+	m_pMainWnd->m_pWizard = parent;
 	int ret = m_pMainWnd->Create(NULL, NULL, WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN, CRect(0, 0, 0, 0), parent, 100);
 
 	return m_pMainWnd;

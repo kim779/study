@@ -36,11 +36,18 @@ public:
 
 // Attributes
 public:
+	enum {
+		LOGOUT = 0, LOGINED = 1, LOGING = 2};
+
+	int m_iLoginState{};   
 	int m_nPort{};
 	CString m_strIP{};
 	CString	 m_strID{};
 	CString	 m_strDevice{};
 	CString m_strUnique{};
+	CString m_sAccPass{};
+	CString m_sState{};
+	CString m_sMsgID{};
 	// PhonePad
 	CString	m_strPPDialNum{};
 	CString	m_strPPCustData{};
@@ -48,6 +55,7 @@ public:
 	CParam m_Param{};
 	CWnd* m_pWizard{};
 	void	SetParam(_param* pParam);
+	void parseOptions();
 // Operations
 public:
 
@@ -74,10 +82,12 @@ protected:
 	//}}AFX_DISPATCH
 	DECLARE_DISPATCH_MAP()
 	DECLARE_INTERFACE_MAP()
-	VARIANT_BOOL _EAPIConnect(BSTR ip, SHORT port);
 
 	enum
 	{
+		dispidsMSGID = 12,
+		dispidblogin = 11,
+		dispidsState = 10,
 		dispidSendMSgToMain = 8L,
 		dispidsRes = 7,
 		dispidEAPIPhonePad = 6L,
@@ -94,6 +104,7 @@ public:
 public:
 	void SetStatus(const char* pszStatus);
 	void PostLogFromCallback(const char* pszMsg);
+	void SendPassToMap();
 
 	static DWORD CB_Resp(int nMessageID, char* pszUniqueNO, char* pszDeviceType,
 		char* pszResult, char* pszCause, char* pszCauseStr, HWND hWnd, HANDLE hHnd);
@@ -106,17 +117,27 @@ public:
 
 	static CMainWnd* s_pDlg;
 protected:
-	void _EAPIDisconnect();
-	void _EAPILogin(BSTR sID, BSTR sDvcID, BSTR sUnqID, BSTR sOtpion);
-	void _EAPILogout();
+	VARIANT_BOOL _EAPIConnect(BSTR ip, SHORT port);
+	VARIANT_BOOL _EAPIDisconnect();
+	VARIANT_BOOL _EAPILogin(BSTR sID, BSTR sDvcID, BSTR sUnqID, BSTR sOtpion);
+	VARIANT_BOOL _EAPILogout();
+	VARIANT_BOOL _EAPIPhonePad(BSTR sCallID, BSTR sSvcCode, BSTR sCustData, BSTR sDialNumber);
 public:
 	afx_msg void OnDestroy();
 protected:
-	void _EAPIPhonePad(BSTR sCallID, BSTR sSvcCode, BSTR sCustData, BSTR sDialNumber);
 	CString m_sRes{};
 	void _SendMSgToMain(BSTR sMsg);
 	BSTR GetsRes();
 	void SetsRes(BSTR newVal);
+	BSTR GetsMSGID();
+	void SetsMSGID(BSTR newVal);
+public:
+	afx_msg void OnTimer(UINT_PTR nIDEvent);
+protected:
+	BSTR GetsState();
+	void SetsState(BSTR newVal);
+	SHORT Getblogin();
+	void Setblogin(SHORT newVal);
 };
 
 /////////////////////////////////////////////////////////////////////////////

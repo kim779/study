@@ -1846,6 +1846,8 @@ public:
 	BOOL m_bMainRTS{};
 	BOOL m_bAxisAgent{};
 	BOOL m_bShowAxisAgent{};
+	HWND m_hAgentWnd{};
+	DWORD  m_dwAgentPid;
 
 	// 워커스레드 관련
 	std::queue<SafeAlertItem*> m_alertQueue;
@@ -1950,6 +1952,7 @@ public:
 	int     m_pingMs;
 	CString     m_sMonitor;
 	void CreateAgentProcess(bool bforce = false);
+	void ForwardTickerToAgent(WPARAM wParam, LPARAM lParam);
 	void CloseAgent();
 	//---------------------------- log -----------------------------------------------------------------------------------------------
 
