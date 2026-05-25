@@ -26213,36 +26213,8 @@ CString CMainFrame::GetMyThemeName()
 	return "";
 }
 
-void CMainFrame::RunPhonePad()
+void CMainFrame::RunPhonePad(CString sPhonpad)
 {
-// 	CString	aps, cmds, exes;
-// 	STARTUPINFO		si;
-// 	PROCESS_INFORMATION	pi;
-// 
-// 	ZeroMemory(&si, sizeof(STARTUPINFO));
-// 	ZeroMemory(&pi, sizeof(PROCESS_INFORMATION));
-// 
-// 	si.cb          = sizeof(STARTUPINFO);
-// 	si.dwFlags     = STARTF_USESHOWWINDOW;
-// 	si.wShowWindow = SW_SHOW;
-// 
-// 	CAxisApp* app = (class CAxisApp *) AfxGetApp();
-// 	char	buffer[1024];
-// 	GetClassName(m_hWnd, buffer, sizeof(buffer));
-// 	cmds.Format(" %d", m_hWnd);
-// 	aps.Format("%s\\%s\\PhonePadDlg.exe", Axis::home, RUNDIR);
-// 
-// 	BOOL bRc = CreateProcess(
-// 			aps,				// application name
-// 			(char *)(const char*)cmds,// command line
-// 			NULL,				// process attribute
-// 			NULL,				// thread attribute
-// 			FALSE,				// is inherit handle
-// 			0,					// creation flags
-// 			NULL,				// environment
-// 			NULL,				// current directory
-// 			&si,				// STARTUPINFO
-// 			&pi);				// PROCESS_INFORMATION
 	CString strPhonepad;
 	strPhonepad = "C:\\PhonePAD\\PhonePad.EXE";
 
@@ -26251,51 +26223,42 @@ void CMainFrame::RunPhonePad()
 		Axis::MessageBox(this,"폰패드 프로그램이 설치되지 않았습니다.\n폰패드 프로그램을 설치하셔요.",MB_ICONINFORMATION);
 		return;
 	}
-	 //폰패드 프로그램은 최초피씨 배급시 설치 하는 사항
-	//HTS에서 폰패드 드라이버 설치하면 파워베이스 폰패드 드라이버와 문제가 생기는 현상이 있음
-	//현재  정보시스템부에서 전직원 피씨의 EXEUPDATE.INI 를 교체해서 드라이버 재설치 하지 않지만 우선 주석
 
-	/*if(!IsFileExist(strPhonepad))
+	CString mapN;
+
+	// 임시 선택창
+	// 예: 예 = 기존 폰패드, 아니오 = 신규 폰패드
+	int ret = Axis::MessageBox(this,
+		_T("실행할 폰패드 화면을 선택하십시오.\n\n")
+		_T("[예] 기존 폰패드 IB877700\n")
+		_T("[아니오] 신규 폰패드 IB878000\n")
+		_T("[취소] 실행 안 함"),
+		MB_YESNOCANCEL | MB_ICONQUESTION);
+
+	if (ret == IDYES)
 	{
-		Axis::MessageBox(this,"폰패드 프로그램이 설치되지 않았습니다.\n폰패드 프로그램을 설치합니다.",MB_ICONINFORMATION);
-
-		CString filePath;
-		filePath.Format("%s/exe/Call_Man_Setup.exe", Axis::home);
-
-		ShellExecute(NULL, _T("open"), filePath, NULL,NULL, SW_SHOWNORMAL);
-		return;
+		mapN = _T("IB877700");
+	}
+	else if (ret == IDNO)
+	{
+		mapN = _T("IB878800");
 	}
 	else
 	{
-		CString file;
-		file.Format("%s\\%s\\%s", Axis::home, TABDIR, "EXEUPDATE.INI");
-		
-		const int nUpdate =  GetPrivateProfileInt("CALLMAN", "UPDATE", 0, file );
+		return;
+	}
 
-		if(nUpdate == 1)
-		{
-			Axis::MessageBox(this,"폰패드 프로그램이 업데이트가 필요합니다.\n폰패드 프로그램을 설치합니다.",MB_ICONINFORMATION);
-
-			CString filePath;
-			filePath.Format("%s/exe/Call_Man_Setup.exe", Axis::home);
-			
-			ShellExecute(NULL, _T("open"), filePath, NULL,NULL, SW_SHOWNORMAL);
-
-			WritePrivateProfileString("CALLMAN","UPDATE","0",file);
-
-			return;
-		}
-	}*/
-
-	m_pMain->m_mapHelper->CreatePopup("IB877700", TRIGGERN, winK_POPUP,
+	m_pMain->m_mapHelper->CreatePopup(mapN, TRIGGERN, winK_POPUP,
 		1, 1, CPoint(-1, -1), false);
 }
 
 BOOL CMainFrame::IsPhonePad(const char *map)
 {
-	const char* foreignMapName = "IB877700";
+	if (map == nullptr)
+		return FALSE;
 
-	return !strcmp(foreignMapName, map);
+	return strcmp(map, "IB877700") == 0 ||
+		strcmp(map, "IB878800") == 0;
 }
 
 void CMainFrame::dnloadAction()

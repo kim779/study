@@ -3462,7 +3462,8 @@ int CMapHelper::CreatePopup(CString mapN, int trigger, int key, int position, in
 	else	
 		m_main->positionWindow(actkey, pop, position, false);
 
-	if (mapN.Find("IB877700") > -1)
+	if (mapN == _T("IB877700") ||
+		mapN == _T("IB878000"))
 	{
 		CMenu* menu = pop->GetSystemMenu(0);
 		menu->EnableMenuItem( SC_CLOSE, MF_DISABLED );
@@ -4005,7 +4006,8 @@ BOOL CMapHelper::closePopup()
 			continue;
 		//8777 ESC 키 종료 막음 - 2016.01.19
 		//닫기 버튼으로만 닫을수 있어야 한다.
-		if(pop->m_mapN == "IB877700")
+		if (pop->m_mapN == _T("IB877700") ||
+			pop->m_mapN == _T("IB878000"))
 			return TRUE;
 
 		pop->SendMessage(WM_CLOSE, 0, 0);

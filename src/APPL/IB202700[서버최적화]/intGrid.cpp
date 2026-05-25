@@ -1302,67 +1302,74 @@ void CintGrid::OnTimer(UINT nIDEvent)
 
 	if (nIDEvent == TIMEFLASH)
 	{
-		if (_blinkType == 0)
-		 	return;
-
-		CRect rowRect = CRect(0,0,0,0);
-		concurrent_vector<long> vdel;
-		AxStd::async([&](){
-			for_each(_mapBlink.begin(), _mapBlink.end(), [this, &vdel, &rowRect](auto& pair)
-			{
-				// Do something with pair.first (key) and pair.second (value)
-				const ULONGLONG time = pair.second;
-				const long key       = pair.first;
-				
-				if ((GetTickCount64() - time) > 500)
-				{
-					GVITEM gvitem{};
-					gvitem.row = key / 100;
-					gvitem.col = key % 100;
-				
-					if (gvitem.col == 0)
-					{
-						for (int ii = colNAME; ii < GetColumnCount(); ii++)
-						{
-							CRect rc;
-
-							gvitem.col = ii;
-							gvitem.mask = GVMK_ATTR;
-							GetItem(&gvitem);
-							if (gvitem.attr & GVAT_HIDDEN)
-								continue;
-
-							GetItemRect(gvitem.row, ii, &rc);
-							rowRect.UnionRect(rowRect, rc);
-
-							gvitem.mask = GVMK_FLASH;
-							gvitem.flash = 0;
-							SetItem(&gvitem);	
-						}
-					}
-					else
-					{
-						gvitem.mask = GVMK_FLASH;
-						gvitem.flash = 0;
-						SetItem(&gvitem);			
-					}
-					vdel.push_back(key);
-				}
-			});
-		});
-
-		for (const auto& key : vdel)
-		{	
-			_mapBlink.erase(key);
-			if (key % 100 == 0)
-			{	
-				if(!rowRect.IsRectEmpty())
-					InvalidateRect(rowRect);	
-			}
-			else 
-				InvalidateCellRect(CIdCell{ key / 100, key % 100 });
+		if (1)
+		{
+			ProcessBlink();
 		}
-		return;
+		else
+		{
+			if (_blinkType == 0)
+				return;
+
+			CRect rowRect = CRect(0, 0, 0, 0);
+			concurrent_vector<long> vdel;
+			AxStd::async([&]() {
+				for_each(_mapBlink.begin(), _mapBlink.end(), [this, &vdel, &rowRect](auto& pair)
+					{
+						// Do something with pair.first (key) and pair.second (value)
+						const ULONGLONG time = pair.second;
+						const long key = pair.first;
+
+						if ((GetTickCount64() - time) > 500)
+						{
+							GVITEM gvitem{};
+							gvitem.row = key / 100;
+							gvitem.col = key % 100;
+
+							if (gvitem.col == 0)
+							{
+								for (int ii = colNAME; ii < GetColumnCount(); ii++)
+								{
+									CRect rc;
+
+									gvitem.col = ii;
+									gvitem.mask = GVMK_ATTR;
+									GetItem(&gvitem);
+									if (gvitem.attr & GVAT_HIDDEN)
+										continue;
+
+									GetItemRect(gvitem.row, ii, &rc);
+									rowRect.UnionRect(rowRect, rc);
+
+									gvitem.mask = GVMK_FLASH;
+									gvitem.flash = 0;
+									SetItem(&gvitem);
+								}
+							}
+							else
+							{
+								gvitem.mask = GVMK_FLASH;
+								gvitem.flash = 0;
+								SetItem(&gvitem);
+							}
+							vdel.push_back(key);
+						}
+					});
+				});
+
+			for (const auto& key : vdel)
+			{
+				_mapBlink.erase(key);
+				if (key % 100 == 0)
+				{
+					if (!rowRect.IsRectEmpty())
+						InvalidateRect(rowRect);
+				}
+				else
+					InvalidateCellRect(CIdCell{ key / 100, key % 100 });
+			}
+			return;
+		}
 	}
 
 	if (nIDEvent != WM_LBUTTONDOWN )
@@ -3794,24 +3801,6 @@ BOOL CintGrid::RedrawCell(int nRow, int nCol, CDC* pDC)
 	if (!GetSafeHwnd())
 		return FALSE;
 
-	//// 캐시된 가시 영역 (500ms마다 업데이트)
-	//static CIdCell s_lastTlCell(-1, -1);
-	//static CRangeCell s_lastVisCellRange;
-	//static ULONGLONG s_lastUpdateTick = 0;
-
-	//const ULONGLONG currentTick = GetTickCount64();
-	//if (currentTick - s_lastUpdateTick > 500)
-	//{
-	//	s_lastTlCell = GetTopleftNonFixedCell();
-	//	CRect visRect;
-	//	s_lastVisCellRange = GetVisibleNonFixedCellRange(visRect);
-	//	s_lastUpdateTick = currentTick;
-	//}
-
-	//if (nRow < s_lastTlCell.row || nRow > s_lastVisCellRange.GetMaxRow() ||
-	//	nCol < s_lastTlCell.col || nCol > s_lastVisCellRange.GetMaxCol())
-	//	return FALSE;
-
 	CRect rect;
 	if (!GetCellRect(nRow, nCol, rect))
 		return FALSE;
@@ -5624,6 +5613,7 @@ BOOL CintGrid::SetItemText(int nRow, int nCol, LPCTSTR str)
 				pCell->dtext = dstr;
 				RedrawCell(nRow,colCURR);
 				RedrawCell(nRow, colEXPECT);
+				Blink(nRow, nCol);
 				return TRUE;
 			}
 		}
@@ -9922,3 +9912,118 @@ void CintGrid::endDrawHolding()
 
 }
 
+
+
+
+
+
+long CintGrid::MakeBlinkKey(int row, int col) const
+{
+	return (row << 16) | (col & 0xFFFF);
+}
+
+void CintGrid::BlinkCell(int row, int col)
+{
+	if (_blinkType == 0)
+		return;
+
+	if (row < 0 || row >= GetRowCount())
+		return;
+
+	if (col < 0 || col >= GetColumnCount())
+		return;
+
+	if (IsCellAttribute(CIdCell(row, col), GVAT_HIDDEN))
+		return;
+
+	const long key = MakeBlinkKey(row, col);
+
+	GVITEM item{};
+	item.row = row;
+	item.col = col;
+	item.mask = GVMK_BKCOLOR;
+
+	GetItem(&item);
+
+	auto it = _mapBlinkColor.find(key);
+
+	if (it == _mapBlinkColor.end())
+	{
+		BlinkItem blink{};
+		blink.oldBk = item.bkcol;;
+		blink.tick = GetTickCount64();
+
+		_mapBlinkColor.emplace(key, blink);
+	}
+	else
+	{
+		it->second.tick = GetTickCount64();
+	}
+
+	item.mask = GVMK_BKCOLOR;
+	item.bkcol = RGB(255, 255, 180);   // 깜빡임 색
+
+	SetItem(&item);
+
+	InvalidateCellRect(CIdCell(row, col));
+}
+
+void CintGrid::BlinkRow(int row)
+{
+	if (_blinkType == 0)
+		return;
+
+	if (row < 0 || row >= GetRowCount())
+		return;
+
+	for (int col = colNAME; col < GetColumnCount(); col++)
+	{
+		if (IsCellAttribute(CIdCell(row, col), GVAT_HIDDEN))
+			continue;
+
+		BlinkCell(row, col);
+	}
+}
+
+void CintGrid::Blink(int row, int col)
+{
+	if (_blinkType == 0)
+		return;
+
+	if (_blinkType == 1)
+	{
+		BlinkCell(row, col);
+		return;
+	}
+
+	if (_blinkType == 2)
+	{
+		BlinkRow(row);
+		return;
+	}
+}
+
+void CintGrid::ProcessBlink()
+{
+	const ULONGLONG now = GetTickCount64();
+	std::vector<long> vErase;
+
+	for (auto& it : _mapBlinkColor)
+	{
+		const long key = it.first;
+		const BlinkItem& blink = it.second;
+
+		if ((now - blink.tick) <= 500)
+			continue;
+
+		const int row = key >> 16;
+		const int col = key & 0xFFFF;
+
+		SetItemBkColor(row, col, blink.oldBk, true);
+
+		vErase.push_back(key);
+	}
+
+	for (long key : vErase)
+		_mapBlinkColor.erase(key);
+}
