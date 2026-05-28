@@ -91,6 +91,8 @@ protected:
 	struct _options		m_options;
 
 	CString			m_filename;
+	CWnd* m_xecure;
+	CString		m_root;
 
 	// 키워드 필터
 	CEdit		m_editKeyword;

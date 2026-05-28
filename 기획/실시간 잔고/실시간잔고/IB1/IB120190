@@ -1,0 +1,186 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB120190)
+MAPSIZE(180, 172)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("굴림체", 9, NORMAL)
+TITLE("실시간잔고 설정")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+PANEL  PANEL12(0, 0, 172, 180)  LIMAGE(0)  LINEW(5)  STRESS(93)  STRESSW(1)  LINETYPE(4)  LINECOLOR(64)      COLOR(181, 69)  CUR(0)    AL_CENTER    ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL4(12, 33, 50, 53)  '수수료'  AL_LEFT  CUR(0)      COLOR(208, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+COMBO  cbo_mmd(54, 58, 160, 78)  TP_SUNKEN  LEN(1)  COUNT(3)  VCOUNT(3)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_NUM|EDIT_INPUT|FA_SKIP    COLOR(192, 130)  CUR(0)  DISPLAY("HTS/홈페이지", "영업점/콜센타", "ARS")  DATA("0", "1", "2")    TABORDER(1)  IOORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL5(12, 58, 55, 78)  '매  체'  AL_LEFT  CUR(0)      COLOR(208, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL8(12, 83, 50, 103)  '단  가'  AL_LEFT  CUR(0)      COLOR(208, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+COMBO  cbo_bep(54, 83, 160, 103)  TP_SUNKEN  LEN(1)  COUNT(2)  VCOUNT(2)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_NUM|EDIT_INPUT|FA_SKIP    COLOR(192, 130)  CUR(0)  DISPLAY("평균단가", "BEP 단가")  DATA("0", "1")    TABORDER(2)  IOORDER(2)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL0(12, 108, 55, 128)  '신  용'  AL_LEFT  CUR(0)      COLOR(208, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+COMBO  cbo_type(54, 108, 160, 128)  TP_SUNKEN  LEN(1)  COUNT(2)  VCOUNT(2)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_NUM|EDIT_INPUT|FA_SKIP    COLOR(192, 130)  CUR(0)  DISPLAY("융자금제외", "융자금포함")  DATA("0", "1")    TABORDER(3)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_STRING)  HELPTEXT("융자금제외시 실제 고객 투자금에 대한 수익률 제공")HELPTEXT("융자금제외시 실제 고객 투자금에 대한 수익률 제공")
+BUTTON  BUTTON0(12, 157, 84, 177)  '적  용'  TP_PUSH|IMAGETEXT|AL_CENTER        FOCUS  COLOR(208, 232)  CUR(0)    "5btn.bmp"    TABORDER(4)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+BUTTON  BUTTON1(87, 157, 159, 177)  '취  소'  TP_PUSH|IMAGETEXT|AL_CENTER        FOCUS  COLOR(208, 232)  CUR(0)    "5btn.bmp"    TABORDER(5)  ENABLE  &
+  VISIBLE  IMAGETEXT  HINTTYPE(IH_NONE)
+LABEL  LABEL1(12, 11, 136, 27)  '실시간잔고 설정'  AL_LEFT  FONT("굴림체", 9, BOLD)  CUR(0)      COLOR(168, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+OUT  mapName(270, 40, 363, 56)  LEN(20)  IO_MIXED|AL_LEFT|    COLOR(181, 69)  CUR(0)            TABORDER(0)  IOORDER(4)  ENABLE  &
+  HINTTYPE(IH_NONE)
+COMBO  cbo_tax(54, 34, 160, 54)  TP_SUNKEN  LEN(1)  COUNT(2)  VCOUNT(2)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_NUM|EDIT_INPUT|FA_SKIP    COLOR(192, 130)  CUR(0)  DISPLAY("적용", "미적용")  DATA("1", "0")    TABORDER(6)  IOORDER(5)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL2(6, 130, 55, 150)  '갱신주기'  AL_LEFT  CUR(0)      COLOR(208, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+COMBO  cbo_renewal(54, 131, 160, 151)  TP_SUNKEN  LEN(1)  COUNT(4)  VCOUNT(4)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_NUM|EDIT_INPUT|FA_SKIP    COLOR(192, 130)  CUR(0)  DISPLAY("실시간", "1초", "2초", "3초")  DATA("0", "1", "2", "3")    TABORDER(7)  IOORDER(6)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_STRING)  HELPTEXT("융자금제외시 실제 고객 투자금에 대한 수익률 제공")HELPTEXT("융자금제외시 실제 고객 투자금에 대한 수익률 제공")
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Sub p_write_ini()
+	If SCREEN.CreateObject("Info") Then
+		INFO.pushData LOGIN.Name, "userconf.ini", Trim(mapName.Data), "tax", cbo_tax.Index
+		INFO.pushData LOGIN.Name, "userconf.ini", Trim(mapName.Data), "mcgb", cbo_mmd.Index
+		INFO.pushData LOGIN.Name, "userconf.ini", Trim(mapName.Data), "bep", cbo_bep.Index
+		INFO.PushData LOGIN.Name, "userconf.ini", Trim(mapName.Data), "type", cbo_type.Data
+		INFO.PushData LOGIN.Name, "userconf.ini", Trim(mapName.Data), "renewal", cbo_renewal.Data
+
+'		SYSTEM.Trace "[" & Trim(mapName.Data) & "]" & cbo_tax.Index & " , " & cbo_mmd.Index & " , " & cbo_bep.Index & " , " & cbo_type.Data
+'		MsgBox cbo_tax.Index & " , " & cbo_mmd.Index & " , " & cbo_bep.Index & " , " & cbo_type.Data
+	End If
+End Sub
+
+Sub p_read_ini()
+'	If Trim(mapName.Data) = "IB101900" Then
+'		cbo_renewal.Enable = False
+'	End If
+
+
+	If SCREEN.CreateObject("INFO") Then
+		Dim tax, mcgb, bep, ctype, renewal
+		tax = Trim(INFO.PopData(LOGIN.Name, "userconf.ini", Trim(mapName.Data), "tax"))
+		mcgb = Trim(INFO.PopData(LOGIN.Name, "userconf.ini", Trim(mapName.Data), "mcgb"))
+		bep = Trim(INFO.PopData(LOGIN.Name, "userconf.ini", Trim(mapName.Data), "bep"))
+		ctype = Trim(INFO.PopData(LOGIN.Name, "userconf.ini", Trim(mapName.Data), "type"))
+		renewal = Trim(INFO.PopData(LOGIN.Name, "userconf.ini", Trim(mapName.Data), "renewal"))
+
+'		MsgBox tax & " , " & mcgb & " , " & bep & " , " & ctype
+'		SYSTEM.Trace "[" & Trim(mapName.Data) & "]" & tax & " , " & mcgb & " , " & bep & " , " & ctype
+		If tax <> "" Then
+			cbo_tax.Index = tax
+		Else
+			cbo_tax.Index = 0
+		End If
+
+		If cbo_tax.Data = 0 Then
+			cbo_mmd.Enable = False
+		Else
+			cbo_mmd.Enable = True
+		End If
+
+		If mcgb <> "" Then
+			cbo_mmd.Data = mcgb
+		Else
+			cbo_mmd.Data = 0
+		End If
+
+		If bep <> "" Then
+			cbo_bep.Data = bep
+		Else
+			cbo_mmd.Data = 0
+		End If
+
+		If ctype<>"" Then
+			cbo_type.Data = ctype
+		Else
+			cbo_type.Data = "0"
+		End If
+
+		If renewal = "" Then '실시간
+			If SYSTEM.ConnectBy <> "1" Then '고객
+				renewal = 0
+			Else
+				renewal = 1
+			End If
+		End If
+
+		If renewal<>"" Then
+			cbo_renewal.Data = renewal
+		Else
+			cbo_renewal.Data = "0"
+		End If
+
+
+	End If
+End Sub
+
+_AW_ONSTART_AW_
+Call p_read_ini()
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+SCREEN.OnSend False
+
+_AW_ONENDSUB_AW_
+_AW_ONKEY_AW_
+If SCREEN.Key = "13" Then
+	SCREEN.CloseWindow
+End If
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(BUTTON0)
+_AW_ONCLICK_AW_
+Call p_write_ini()
+
+SYSTEM.Push "SettingOk", "OK"
+SCREEN.CloseWindow
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(BUTTON1)
+_AW_ONCLICK_AW_
+SYSTEM.Push "SettingOk", "Cancel"
+SCREEN.CloseWindow
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(cbo_tax)
+_AW_ONCHANGE_AW_
+If cbo_tax.Data = 0 Then
+	cbo_mmd.Enable = False
+Else
+	cbo_mmd.Enable = True
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

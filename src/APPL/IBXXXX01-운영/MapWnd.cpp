@@ -1601,7 +1601,7 @@ CString CMapWnd::parsingNotice(CString str)
 							}
 
 							keyS = getKey(false, findJCode, sDate, sSygb, sJggb, atoi(sTRKey));    // key NXT
-							m_slog.Format("[jango][%s]<%d> 货肺款儡绊 keyS=[%s]  ", __FUNCTION__, __LINE__, keyS);
+							m_slog.Format("[jango][%s]<%d> 货肺款儡绊 findJCode=[%s] keyS=[%s]  ", __FUNCTION__, __LINE__, findJCode, keyS);
 							Output_DebugString(m_slog);
 
 							bool b_etf = false;

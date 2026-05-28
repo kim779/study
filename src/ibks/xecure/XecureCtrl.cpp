@@ -240,7 +240,8 @@ BOOL CXecureCtrl::Decrypt(long pBytes, long nBytes)
 	m_sync.Unlock();
 	return TRUE;
 }
-#include "../../IBK/H/axislog.h"
+//#include "../../IBK/H/axislog.h"
+#include "../../H/axislog.h"
 long CXecureCtrl::Xecure(long pBytes, long nBytes)
 {
 	int	rc, encL = *(int*)nBytes;

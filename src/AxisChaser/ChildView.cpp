@@ -69,6 +69,31 @@ CChildView::CChildView()
 	m_matchN = -1;
 
 	m_findDlg = NULL;
+
+	char buf[500]{};
+	GetModuleFileName(nullptr, buf, 260);
+
+	CString spath, slog;
+	spath.Format("%s", buf);
+	spath.TrimRight();
+
+
+	spath.Replace("AxisChaser.exe", "");
+	spath.Replace("\\exe\\", "");
+	m_root = spath;
+
+	m_xecure = new CWnd();
+	if (!m_xecure->CreateControl(_T("AxisXecure.XecureCtrl.IBK2019"), NULL, 0, CRect(0, 0, 0, 0), GetParent(), 0))
+	{
+		delete m_xecure;
+		m_xecure = NULL;
+		spath.Format("%d [%x]", GetLastError(), m_xecure);
+		AfxMessageBox(spath);
+	}
+	else
+	{
+		AfxMessageBox("Create success");
+	}
 }
 
 CChildView::~CChildView()
@@ -249,6 +274,7 @@ void CChildView::OnRCVData(WPARAM wParam, LPARAM lParam)
 	{
 	case x_RCVs:
 	case x_SNDs:
+	{
 		if (!m_bSNDRCV)	break;
 		if (HIWORD(wParam) == x_SNDs && !m_options.send)	break;
 		if (HIWORD(wParam) == x_RCVs && !m_options.receive)	break;
@@ -262,15 +288,19 @@ void CChildView::OnRCVData(WPARAM wParam, LPARAM lParam)
 			addTrace("\n", K_SNDRCV);
 			return;
 		}
-		
+
 		if (!m_options.header && !m_options.data)
 		{
 			break;
 		}
 		else if (m_options.header && !m_options.data)
 		{
-			if (len > L_axishdr)
-				len = L_axishdr;
+			//if (len > L_axishdr)
+			//	len = L_axishdr;
+
+			//len = L_axishdr;
+			//len += 100;
+			len = 60;
 		}
 		else if (!m_options.header && m_options.data)
 		{
@@ -282,13 +312,16 @@ void CChildView::OnRCVData(WPARAM wParam, LPARAM lParam)
 		}
 
 		string.Empty();
-		if (!m_bBINARY)	maxCnt = 80;
+		if (!m_bBINARY)
+			maxCnt = 80;
 
-		for (row = 0; row < len / maxCnt + 1; row++)
+		int rowCnt = (len + maxCnt - 1) / maxCnt;
+
+		for (row = 0; row < rowCnt; row++)
 		{
-			CString sRow, sDat = "  ";
+			CString sRow, sDat;
 			sRow.Format("%05d  ", row * maxCnt);
-			
+
 			for (int ii = row * maxCnt; ii < (row + 1) * maxCnt; ii++)
 			{
 #ifdef DF_MBCS
@@ -296,18 +329,21 @@ void CChildView::OnRCVData(WPARAM wParam, LPARAM lParam)
 				{
 					tmpS.Format("%02X", (unsigned char)dat[ii]);
 					sRow += tmpS;
+
 					if (ii == row * maxCnt + 9)
 						sRow += "-";
-					else	sRow += " ";
+					else
+						sRow += " ";
 				}
 				else
+				{
 					sRow += "   ";
+				}
 
 				if (ii < len)
 				{
 					unsigned char ch = (unsigned char)dat[ii];
 
-					// CP949 lead byte이고, 다음 바이트가 같은 줄 안에 있고, trail byte이면 한글로 처리
 					if (_ismbblead(ch)
 						&& (ii + 1) < len
 						&& (ii + 1) < (row + 1) * maxCnt
@@ -315,18 +351,19 @@ void CChildView::OnRCVData(WPARAM wParam, LPARAM lParam)
 					{
 						unsigned char ch2 = (unsigned char)dat[ii + 1];
 
-						// ASCII 칸에 한글 2바이트 그대로
 						sDat += (char)ch;
 						sDat += (char)ch2;
 
-						// 다음 바이트(trail)의 hex도 미리 출력하고 ii 증가
 						ii++;
+
 						tmpS.Format("%02X", ch2);
 						sRow += tmpS;
+
 						if (ii == row * maxCnt + 9)
 							sRow += "-";
-						else	sRow += " ";
-			}
+						else
+							sRow += " ";
+					}
 					else if (0x20 <= ch && ch <= 0x7f)
 					{
 						sDat += (char)ch;
@@ -335,37 +372,58 @@ void CChildView::OnRCVData(WPARAM wParam, LPARAM lParam)
 					{
 						sDat += '.';
 					}
-		}
-				else	sDat += " ";
+				}
+				else
+				{
+					sDat += " ";
+				}
 #else
 				if (ii < len)
 				{
-					tmpS.Format("%02X", (unsigned char) dat[ii]);
+					tmpS.Format("%02X", (unsigned char)dat[ii]);
 					sRow += tmpS;
+
 					if (ii == row * maxCnt + 9)
 						sRow += "-";
-					else	sRow += " ";
+					else
+						sRow += " ";
 				}
 				else
+				{
 					sRow += "   ";
-				
+				}
+
 				if (ii < len)
 				{
 					char ch = dat[ii];
+
 					if (0x20 <= ch && ch <= 0x7f)
 						sDat += ch;
-					else	sDat += '.';
+					else
+						sDat += '.';
 				}
-				else	sDat += " ";
+				else
+				{
+					sDat += " ";
+				}
 #endif
 			}
 
-			sDat  += '\n';
-			if (!m_bBINARY)	sRow.Format("%05d  ", row * maxCnt);
-			sRow  += sDat;
-			string += sRow;
+			sDat += '\n';
+
+			if (!m_bBINARY)
+				sRow.Format("%05d  ", row * maxCnt);
+
+			// 현재는 데이터 문자열만 출력
+			string += sDat;
+
+			// HEX + ASCII 같이 보고 싶으면 위 줄 대신 아래 사용
+			// sRow += sDat;
+			// string += sRow;
 		}
+
 		addTrace(string, K_SNDRCV);
+	}
 		break;
 	case x_RTMs:
 		if (m_bRTM)

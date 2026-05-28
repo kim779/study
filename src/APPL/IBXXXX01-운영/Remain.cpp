@@ -509,7 +509,13 @@ int CRemain::CalRemainData(CMapStringToString &symbolMap, CString keyS, bool bNe
 	int nMod = 1;
 
 	CString jggbS = keyS.Left(LEN_JGGB);
-	CString codeS = keyS.Mid(LEN_JGGB, LEN_HCODE);
+	//CString codeS = keyS.Mid(LEN_JGGB, LEN_HCODE);
+	CString codeS;
+	if(keyS.Find("N.") >= 0 || keyS.Find("M.") >= 0)
+		codeS = keyS.Mid(LEN_JGGB, LEN_HCODE + 2);
+	else
+		codeS = keyS.Mid(LEN_JGGB, LEN_HCODE);
+
 	CString dateS = keyS.Mid(LEN_JGGB + LEN_HCODE, LEN_DATE);
 
 	m_slog.Format("[jango][%s]<%d> 체결 시작  keyS=[%s] , jggbS=[%s] codeS=[%s]  dateS=[%s] ",
