@@ -82,17 +82,65 @@ CChildView::CChildView()
 	spath.Replace("\\exe\\", "");
 	m_root = spath;
 
-	m_xecure = new CWnd();
-	if (!m_xecure->CreateControl(_T("AxisXecure.XecureCtrl.IBK2019"), NULL, 0, CRect(0, 0, 0, 0), GetParent(), 0))
+	m_root.Format("%s\\exe\\AXXECURE.OCX", spath);
+
+	HINSTANCE hLib = LoadLibrary(m_root);
+
+	if (hLib < (HINSTANCE)HINSTANCE_ERROR)
 	{
-		delete m_xecure;
-		m_xecure = NULL;
-		spath.Format("%d [%x]", GetLastError(), m_xecure);
-		AfxMessageBox(spath);
+		m_slog.Format("[AXISCHASER] [registerControl] LoadLibrary error....[%s] error=[%d]\n", m_root, GetLastError());
+		OutputDebugString(m_slog);
 	}
 	else
 	{
-		AfxMessageBox("Create success");
+		m_slog.Format("[AXISCHASER] [registerControl] path....[%s] hLib=[%x]\n", m_root, hLib);
+		OutputDebugString(m_slog);
+	}
+
+	FARPROC	lpDllEntryPoint;
+	(FARPROC&)lpDllEntryPoint = GetProcAddress(hLib, _T("DllRegisterServer"));
+
+	if (lpDllEntryPoint == nullptr)
+	{
+		FreeLibrary(hLib);
+		m_slog.Format("[AXISCHASER] [registerControl] DllRegisterServer fail....[%d]\n", GetLastError());
+		OutputDebugString(m_slog);
+	}
+	else
+	{
+		m_slog.Format("[AXISCHASER] [registerControl] DllRegisterServer success....[%x]\n", lpDllEntryPoint);
+		OutputDebugString(m_slog);
+
+		HRESULT hr = lpDllEntryPoint();  
+		if (FAILED(hr))
+		{
+			m_slog.Format("[AXISCHASER] DllRegisterServer call failed hr=[%x]\n", hr);
+			OutputDebugString(m_slog);
+		}
+		else
+		{
+			m_slog.Format("[AXISCHASER] DllRegisterServer call success hr=[%x]\n", hr);
+			OutputDebugString(m_slog);
+		}
+	}
+
+	CLSID clsid;
+	HRESULT hr2 = CLSIDFromProgID(L"AxisXecure.XecureCtrl.IBK2019", &clsid);
+	m_slog.Format("[AXISCHASER] CLSIDFromProgID hr=[%x]\n", hr2);
+	OutputDebugString(m_slog);
+
+	m_xecure = new CWnd();
+	if (!m_xecure->CreateControl(_T("AxisXecure.XecureCtrl.IBK2019"), NULL, 0, CRect(0, 0, 0, 0), this, 0))
+	{
+		delete m_xecure;
+		m_xecure = NULL;
+		m_slog.Format("[AXISCHASER] error=[%d]  m_xecure=[%x]", GetLastError(), m_xecure);
+		OutputDebugString(m_slog);
+	}
+	else
+	{
+		m_slog.Format("[AXISCHASER] CreateControl success m_xecure=[%x]\n", m_xecure);
+		OutputDebugString(m_slog);
 	}
 }
 

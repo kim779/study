@@ -1774,12 +1774,12 @@ bool CMapWnd::RunExcel_()
 	//미등록계좌 끝
 
 	//2014.12.01 KSJ 처음에 3개의 시트를 전부 삭제하면 에러난다. 그래서 마지막에 삭제해줌.
-	Ws1 = Wss.GetItem(COleVariant((short)1));
-	Ws1.Delete();
-	Ws1 = Wss.GetItem(COleVariant((short)1));
-	Ws1.Delete();
-	Ws1 = Wss.GetItem(COleVariant((short)1));
-	Ws1.Delete();
+	//Ws1 = Wss.GetItem(COleVariant((short)1));
+	//Ws1.Delete();
+	//Ws1 = Wss.GetItem(COleVariant((short)1));
+	//Ws1.Delete();
+	//Ws1 = Wss.GetItem(COleVariant((short)1));
+	//Ws1.Delete();
 
 	Wss.Select(COleVariant((short)1));
 

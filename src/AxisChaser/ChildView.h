@@ -93,7 +93,7 @@ protected:
 	CString			m_filename;
 	CWnd* m_xecure;
 	CString		m_root;
-
+	CString m_slog;
 	// 키워드 필터
 	CEdit		m_editKeyword;
 	CButton		m_chkFilter;
