@@ -1834,6 +1834,12 @@ public:
 	CString AesEncrypt(const CString& plainText, const std::vector<BYTE>& key);
 	CString AesDecrypt(const CString& encText, const std::vector<BYTE>& key);
 
+	//파일 처리 프로세스
+	static CString FM_MapFolderKey(const CString& key);
+	static int FM_SetPlainConfValue(const CString& filePath,
+		const CString& key,
+		const CString& newValue);
+	void ProcessFileManager(const CString& setupFile);
 	//실시간메인처리
 #ifdef DF_MAIN_RTS
 	struct SafeAlertItem {

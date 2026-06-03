@@ -1,0 +1,174 @@
+bool CMainFrame::EncryptIniFile(const CString& iniPath, const std::vector<BYTE>& key)
+{
+	// 1. 이미 암호화된 파일 스킵
+	char status[8] = {};
+	GetPrivateProfileString("ENCRYPT", "STATUS", "0",
+		status, _countof(status), iniPath);
+
+	if (strcmp(status, "1") == 0)
+	{
+		m_slog.Format("[AXIS][ENC][%s]<%d>이미 암호화된 파일 skip iniPath=[%s]",
+			__FUNCTION__, __LINE__, iniPath);
+		OutputDebugString(m_slog);
+		return false;
+	}
+
+	// 2. AccountHistory 섹션의 key 목록 읽기
+	char keys[64 * 1024] = {};
+	DWORD keyLen = GetPrivateProfileString(
+		"AccountHistory",
+		NULL,
+		"",
+		keys,
+		sizeof(keys),
+		iniPath);
+
+	if (keyLen == 0)
+	{
+		m_slog.Format("[AXIS][ENC][%s]<%d>AccountHistory 없음 skip iniPath=[%s]",
+			__FUNCTION__, __LINE__, iniPath);
+		OutputDebugString(m_slog);
+		return false;
+	}
+
+	bool needEncrypt = false;
+
+	struct ENC_ITEM
+	{
+		CString key;
+		CString encValue;
+	};
+
+	std::vector<ENC_ITEM> encItems;
+
+	// 3. key 목록 순회
+	char* p = keys;
+
+	while (*p)
+	{
+		CString keyName(p);
+
+		// VERSION 제외
+		if (keyName.CompareNoCase("VERSION") == 0)
+		{
+			p += strlen(p) + 1;
+			continue;
+		}
+
+		char value[64 * 1024] = {};
+		GetPrivateProfileString(
+			"AccountHistory",
+			keyName,
+			"",
+			value,
+			sizeof(value),
+			iniPath);
+
+		// 빈 값은 절대 암호화 안 함
+		if (value[0] == '\0')
+		{
+			m_slog.Format("[AXIS][ENC][!][%s]<%d>empty skip key=[%s] iniPath=[%s]",
+				__FUNCTION__, __LINE__, keyName, iniPath);
+			OutputDebugString(m_slog);
+
+			p += strlen(p) + 1;
+			continue;
+		}
+
+		CString plain(value);
+		CString encVal = AesEncrypt(plain, key);
+
+		ENC_ITEM item;
+		item.key = keyName;
+		item.encValue = encVal;
+		encItems.push_back(item);
+
+		needEncrypt = true;
+
+		m_slog.Format("[AXIS][ENC][!][%s]<%d>encrypt key=[%s] iniPath=[%s]",
+			__FUNCTION__, __LINE__, keyName, iniPath);
+		//OutputDebugString(m_slog);
+
+		p += strlen(p) + 1;
+	}
+
+	if (!needEncrypt)
+	{
+		m_slog.Format("[AXIS][ENC][%s]<%d>암호화 대상 없음 - backup 생성 안함 iniPath=[%s]",
+			__FUNCTION__, __LINE__, iniPath);
+		OutputDebugString(m_slog);
+		return false;
+	}
+
+	// 4. 실제 암호화 대상일 때만 백업 생성
+	CString backupPath = iniPath + ".bak";
+
+	DeleteFileA(backupPath);
+
+	if (!CopyFileA(iniPath, backupPath, FALSE))
+		throw std::runtime_error("Backup failed");
+
+	m_slog.Format("[AXIS][ENC][%s]<%d>backup 생성 backupPath=[%s] iniPath=[%s]",
+		__FUNCTION__, __LINE__, backupPath, iniPath);
+	OutputDebugString(m_slog);
+
+	// 5. AccountHistory 값 갱신
+	for (size_t i = 0; i < encItems.size(); ++i)
+	{
+		m_slog.Format("[AXIS][ENC][!][%s]<%d> key=[%s] encValue=[%s]",
+			__FUNCTION__, __LINE__, encItems[i].key, encItems[i].encValue);
+		OutputDebugString(m_slog);
+		if (!WritePrivateProfileString(
+			"AccountHistory",
+			encItems[i].key,
+			encItems[i].encValue,
+			iniPath))
+		{
+			m_slog.Format("[AXIS][ENC][!][%s]<%d>파일쓰기가 실패한거야...",
+				__FUNCTION__, __LINE__);
+			OutputDebugString(m_slog);
+			throw std::runtime_error("WritePrivateProfileStringA AccountHistory failed");
+		}
+	}
+
+	// 6. ENCRYPT 섹션 갱신
+	WritePrivateProfileString("ENCRYPT", NULL, NULL, iniPath);
+
+	if (!WritePrivateProfileString("ENCRYPT", "STATUS", "1", iniPath))
+		throw std::runtime_error("WritePrivateProfileStringA ENCRYPT STATUS failed");
+
+	if (!WritePrivateProfileString("ENCRYPT", "VERSION", "1", iniPath))
+		throw std::runtime_error("WritePrivateProfileStringA ENCRYPT VERSION failed");
+
+	// ini cache flush
+	//WritePrivateProfileStringA(NULL, NULL, NULL, iniPath);
+
+	// 7. 백업 삭제/유지 정책
+	if (Axis::isCustomer)
+	{
+		BOOL bDel = DeleteFile(backupPath);
+
+		m_slog.Format("[AXIS][ENC][%s]<%d>고객용 - backupPath=[%s], 삭제결과=[%d]",
+			__FUNCTION__, __LINE__, backupPath, bDel);
+		OutputDebugString(m_slog);
+	}
+	else
+	{
+		if (!IsHeadquartersIP(m_ipAddr))
+		{
+			m_slog.Format("[AXIS][ENC][%s]<%d>영업점 직원 - backup 유지 backupPath=[%s]",
+				__FUNCTION__, __LINE__, backupPath);
+			OutputDebugString(m_slog);
+		}
+		else
+		{
+			BOOL bDel = DeleteFileA(backupPath);
+
+			m_slog.Format("[AXIS][ENC][%s]<%d>본사 직원 - backupPath=[%s], 삭제결과=[%d]",
+				__FUNCTION__, __LINE__, backupPath, bDel);
+			OutputDebugString(m_slog);
+		}
+	}
+
+	return true;
+}

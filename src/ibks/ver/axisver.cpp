@@ -14,8 +14,119 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
+#include "../../H/axislog.h"
 /////////////////////////////////////////////////////////////////////////////
 // CAxisverApp
+
+#include <RestartManager.h>
+#pragma comment(lib, "Rstrtmgr.lib")
+
+// 지정 파일을 사용 중인 프로세스들을 로그로 남긴다.
+void LogProcessesUsingFile(LPCSTR filePath)
+{
+	CString slog;
+	DWORD dwSession = 0;
+	WCHAR szSessionKey[CCH_RM_SESSION_KEY + 1] = { 0 };
+
+	DWORD rc = RmStartSession(&dwSession, 0, szSessionKey);
+	if (rc != ERROR_SUCCESS)
+	{
+		slog.Format("[VER] RmStartSession fail(%d)\n", rc);
+		OutputDebugString(slog);
+		return;
+	}
+
+	// RM API는 유니코드 경로를 받는다. CP949 → UTF-16 변환.
+	WCHAR wPath[MAX_PATH] = { 0 };
+	MultiByteToWideChar(CP_ACP, 0, filePath, -1, wPath, MAX_PATH);
+	LPCWSTR pFiles[1] = { wPath };
+
+	rc = RmRegisterResources(dwSession, 1, pFiles, 0, NULL, 0, NULL);
+	if (rc != ERROR_SUCCESS)
+	{
+		slog.Format("[VER] RmRegisterResources fail(%d)\n", rc);
+		OutputDebugString(slog);
+		RmEndSession(dwSession);
+		return;
+	}
+
+	UINT nProcInfoNeeded = 0, nProcInfo = 0;
+	DWORD dwReason = 0;
+
+	// 먼저 필요한 개수를 조회 (nProcInfo=0 으로 호출)
+	rc = RmGetList(dwSession, &nProcInfoNeeded, &nProcInfo, NULL, &dwReason);
+
+	if (rc == ERROR_MORE_DATA && nProcInfoNeeded > 0)
+	{
+		RM_PROCESS_INFO* pInfo = new RM_PROCESS_INFO[nProcInfoNeeded];
+		nProcInfo = nProcInfoNeeded;
+
+		rc = RmGetList(dwSession, &nProcInfoNeeded, &nProcInfo, pInfo, &dwReason);
+		if (rc == ERROR_SUCCESS)
+		{
+			for (UINT i = 0; i < nProcInfo; i++)
+			{
+				// 프로세스 이름은 UTF-16 → CP949 로 변환해서 로그
+				char szName[256] = { 0 };
+				WideCharToMultiByte(CP_ACP, 0,
+					pInfo[i].strAppName, -1, szName, sizeof(szName), NULL, NULL);
+
+				DWORD pid = pInfo[i].Process.dwProcessId;
+				slog.Format("[VER] locked by: %s (pid=%d)\n", szName, pid);
+				OutputDebugString(slog);
+				FileLog(slog);
+			}
+		}
+		delete[] pInfo;
+	}
+
+	RmEndSession(dwSession);
+}
+
+static BOOL WaitAxisExit(HWND hAxis, DWORD timeoutMs)
+{
+	CString slog;
+	if (!::IsWindow(hAxis))
+		return TRUE;   // 이미 창이 없으면 종료된 것으로 간주
+
+	DWORD pid = 0;
+	::GetWindowThreadProcessId(hAxis, &pid);
+	if (pid == 0)
+	{
+		slog.Format("[VER] axis pid is 0....\n");;
+		OutputDebugString(slog);
+		return TRUE;
+	}
+
+	HANDLE hProc = ::OpenProcess(SYNCHRONIZE | PROCESS_TERMINATE, FALSE, pid);
+	if (hProc == NULL)
+	{
+		// 핸들을 못 열면 이미 죽었을 가능성. 창 존재만 폴링으로 확인.
+		DWORD waited = 0;
+		while (::IsWindow(hAxis) && waited < timeoutMs)
+		{
+			::Sleep(100);
+			waited += 100;
+
+			slog.Format("[VER] axis waited =[%d] timeoutMs=[%d]", waited, timeoutMs);
+			OutputDebugString(slog);
+
+		}
+		return !::IsWindow(hAxis);
+	}
+
+	DWORD wr = ::WaitForSingleObject(hProc, timeoutMs);
+	if (wr == WAIT_TIMEOUT)
+	{
+		// 정상 종료가 시간 내 안 끝남 → 마지막 수단으로 강제 종료
+		slog.Format("[VER] axis exit timeout. terminating pid=%d\n", pid);
+		OutputDebugString(slog);
+		::TerminateProcess(hProc, 0);
+		::WaitForSingleObject(hProc, 3000);   // 강제 종료 반영 대기
+	}
+	::CloseHandle(hProc);
+	return TRUE;
+}
 
 BEGIN_MESSAGE_MAP(CAxisverApp, CWinApp)
 	//{{AFX_MSG_MAP(CAxisverApp)
@@ -85,6 +196,10 @@ void CAxisverApp::parsingCommandStatus()
 
 	CCommLine cmdInfo;
 	ParseCommandLine(cmdInfo);
+
+	CString slog;
+	slog.Format("[VER] axis =  [%x]\n", m_axis);
+	OutputDebugString(slog);
 }
 
 void CAxisverApp::updateObjectAXIS()
@@ -93,7 +208,8 @@ void CAxisverApp::updateObjectAXIS()
 	{
 		Sleep(500);
 		::SendMessage(m_axis, WM_CLOSE, 0, 0);
-		Sleep(500);
+		WaitAxisExit(m_axis, 10000);
+		//Sleep(500);
 	}
 
 	if (!getDownDirFileName())
@@ -103,7 +219,7 @@ void CAxisverApp::updateObjectAXIS()
 	}
 
 	int	fileN, step, index;
-	CString	dests, news, tmps, text;
+	CString	dests, news, tmps, text, slog;
 	CMapStringToString refs;
 	CZip	zip;
 
@@ -148,6 +264,13 @@ void CAxisverApp::updateObjectAXIS()
 		{
 			if (CopyFile(text, dests, FALSE))
 				break;
+
+			DWORD err = GetLastError();
+			slog.Format("[VER] CopyFile fail(%d): %s -> %s\n", err, (LPCSTR)text, (LPCSTR)dests);
+			OutputDebugString(slog);
+
+			if (err == ERROR_SHARING_VIOLATION)   // 32
+				LogProcessesUsingFile(dests);     // 누가 잡고 있는지 로그
 
 			AfxMessageBox(tmps + "을 사용중입니다. 프로그램을 종료하십시오.", MB_OK|MB_ICONINFORMATION|MB_SYSTEMMODAL);
 		}
@@ -203,7 +326,8 @@ void CAxisverApp::retryAXIS()
 	{
 		Sleep(500);
 		::PostMessage(m_axis, WM_CLOSE, 0, 0);
-		WaitForSingleObject(m_axis, 3000);
+		//WaitForSingleObject(m_axis, 3000);
+		WaitAxisExit(m_axis, 10000);
 	}
 
 	CString	tmps, dests, text;

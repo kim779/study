@@ -331,19 +331,8 @@ void CMapForm::Init()
 
 	file.Format("%s\\%s\\%s\\%s", Axis::home, USRDIR, Axis::user, "axisensetup.ini");
 
-	int nChk = GetPrivateProfileInt("SCREEN", "POPUPACC", 1, file);
-	/*
-	CFont* font = GetDlgItem(IDC_CHECK_LOGIN)->GetFont();
-
-	LOGFONT logFont;
-	font->GetLogFont(&logFont);
-	logFont.lfWeight = FW_BOLD;
-
-	m_font.CreateFontIndirect(&logFont);
-	GetDlgItem(IDC_CHECK_LOGIN)->SetFont(&m_font);
-	*/
-
-	((CButton*)GetDlgItem(IDC_CHECK_LOGIN))->SetCheck(nChk);
+	int nPopup = GetPrivateProfileInt("SCREEN", "POPUPACC", 0, file);
+	((CButton*)GetDlgItem(IDC_CHECK_LOGIN))->SetCheck(nPopup ? BST_UNCHECKED : BST_CHECKED);
 	
 	if (m_pToolTip == NULL)
 	{
@@ -991,12 +980,13 @@ void CMapForm::OnOK()
 	
 	file.Format("%s\\%s\\%s\\%s", Axis::home, USRDIR, Axis::user, "axisensetup.ini");
 	
-	int nChk = 0;
+	int nPopup = 0;
+	if (((CButton*)GetDlgItem(IDC_CHECK_LOGIN))->GetCheck() == BST_CHECKED)
+		nPopup = 0;   // 다시 보지 않기 체크 → 안 띄움
+	else
+		nPopup = 1;   // 해제 → 계속 띄움
 
-	if (((CButton *) GetDlgItem(IDC_CHECK_LOGIN))->GetCheck() == BST_CHECKED)	nChk = 1;
-		else	nChk = 0;
-	
-	value.Format("%d", nChk);
+	value.Format("%d", nPopup);
 	WritePrivateProfileString("SCREEN", "POPUPACC", value, file);
 
 	CloseDll();
@@ -1986,11 +1976,12 @@ void CMapForm::OnCheckLogin()
 	
 	file.Format("%s\\%s\\%s\\%s", Axis::home, USRDIR, Axis::user, "axisensetup.ini");
 
-	int nChk = 0;
-	
-	if (((CButton *) GetDlgItem(IDC_CHECK_LOGIN))->GetCheck() == BST_CHECKED)	nChk = 1;
-	else	nChk = 0;
-	
-	value.Format("%d", nChk);
+	int nPopup = 0;
+	if (((CButton*)GetDlgItem(IDC_CHECK_LOGIN))->GetCheck() == BST_CHECKED)
+		nPopup = 0;   // 다시 보지 않기 체크 → 안 띄움
+	else
+		nPopup = 1;   // 해제 → 계속 띄움
+
+	value.Format("%d", nPopup);
 	WritePrivateProfileString("SCREEN", "POPUPACC", value, file);
 }

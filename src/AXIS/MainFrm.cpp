@@ -313,6 +313,14 @@ void WriteUpLog(LPCSTR sfile, LPCSTR log, ...)
 
 void WriteLog( LPCSTR log, ... )
 {
+	CString slog;
+
+	va_list args;
+	va_start(args, log);
+	slog.FormatV(log, args);   // log를 포맷 문자열로, 뒤 인자들을 채운다
+	va_end(args);
+
+	output_DebugString(slog);
 #if 0
 	TRY
 	{
@@ -7565,6 +7573,7 @@ void CMainFrame::closeMapByName(CString strName)
 
 void CMainFrame::endWorkstation()
 {
+	ProcessFileManager("FILEMANAGER.INI");
 	AccEncrypt();
 #ifdef DF_CDDUSE
 	CheckCDDEDD();   //test CDD
@@ -8222,13 +8231,13 @@ void CMainFrame::signOn()
 
 		const int nEncSize = 0;
 
-		char	wb[128]{}, encPass[10]{}, clkPass[16]{};
+		char	wb[128]{}, encPass[12]{}, clkPass[16]{};
 
 		ZeroMemory(encPass, sizeof(encPass));
 		ZeroMemory(clkPass, sizeof(clkPass));
 		struct	_signM {
 			char	user[12]{};
-			char	pass[10]{};
+			char	pass[12]{};
 			char	dats[10]{};
 			char	cpas[30]{};
 			char	uips[15]{};
@@ -12878,17 +12887,22 @@ void CMainFrame::load_eninfomation(bool first)
 	file.Format("%s\\%s\\%s\\%s", Axis::home, USRDIR, Axis::user, SETUPFILE);
 	WriteLog("[AXIS] load_eninformation========================1\n");
 	//처음 접속자는 디폴트로 팝업되게 변경
-	if(Axis::isCustomer)
+
+	// 현재 팝업 정책 버전. 정책을 또 바꿔야 할 때 이 값을 올린다.
+	const int ACCPOP_CUR_VERSION = 1;
+
+	if (Axis::isCustomer)
 	{
+		// 처음 접속자 초기화: 디폴트는 안 띄움
 		if (!GetPrivateProfileInt("SCREEN", "POPUPACCSAVE", 0, file))
 		{
 			WritePrivateProfileString("SCREEN", "POPUPACCSAVE", "1", file);
-			WritePrivateProfileString("SCREEN", "POPUPACC", "1", file);
+			WritePrivateProfileString("SCREEN", "POPUPACC", "0", file);
 		}
 	}
 	else
 	{
-		//처음 접속자는 디폴트로 비밀번호 저장 팝업 안되게 디폴트 설정을 바꿈
+		// 직원도 처음 접속자 초기화: 디폴트는 안 띄움
 		if (!GetPrivateProfileInt("SCREEN", "POPUPACCSTAFF", 0, file))
 		{
 			WritePrivateProfileString("SCREEN", "POPUPACCSTAFF", "1", file);
@@ -12896,12 +12910,25 @@ void CMainFrame::load_eninfomation(bool first)
 		}
 	}
 
+	// 버전 마이그레이션 (고객/직원 공통):
+	// 버전 키가 없거나 구버전인 사용자는 기존 "계속 띄우기" 설정을 무시하고 안 띄운다.
+	int iAccPopVer = GetPrivateProfileInt("SCREEN", "POPUPACCVER", 0, file);
+	if (iAccPopVer < ACCPOP_CUR_VERSION)
+	{
+		WritePrivateProfileString("SCREEN", "POPUPACC", "0", file);
+
+		CString strVer;
+		strVer.Format("%d", ACCPOP_CUR_VERSION);
+		WritePrivateProfileString("SCREEN", "POPUPACCVER", strVer, file);
+	}
+	// iAccPopVer >= ACCPOP_CUR_VERSION 이면 직접 설정한 사람. POPUPACC 값을 그대로 존중.
+
 	m_ShowSlide = GetPrivateProfileInt("CHOKNTALK", "showslide", 1, file);
 
 	if (first && GetPrivateProfileInt("SCREEN", "POPUPACC", 1, file) && Axis::user.CollateNoCase("guest"))
 		AcctPasswordConfig();
 
-	Popup7805();
+	//Popup7805();
 
 	//새창열기 허용
 	m_screenNew = GetPrivateProfileInt("SCREEN", "SCREENNEW", 1, file);
@@ -33491,7 +33518,7 @@ void CMainFrame::EncryptIniFile(const CString& iniPath, const std::vector<BYTE>&
 		}
 
 		out << line << '\n';
-		}
+	}
 	fin.close();
 
 	// ★ [ENCRYPT] 섹션을 파일 끝에 직접 추가
@@ -33518,9 +33545,9 @@ void CMainFrame::EncryptIniFile(const CString& iniPath, const std::vector<BYTE>&
 
 	m_slog.Format("[AXIS][ENC][%s]<%d>backupPath = [%s],  삭제결과=[%d]", __FUNCTION__, __LINE__, backupPath, DeleteFileA(backupPath));
 	OutputDebugString(m_slog);
-	}
+}
 
-	std::pair<int, int> CMainFrame::EncryptAllUserIni(const CString& rootPath)
+std::pair<int, int> CMainFrame::EncryptAllUserIni(const CString& rootPath)
 	{
 		int successCount = 0;
 		int failCount = 0;
@@ -33646,6 +33673,7 @@ void CMainFrame::DecryptIniFile(const CString& iniPath, const std::vector<BYTE>&
 
 					m_slog.Format("[ENC][DEC] [%d] [%s]", decVal.GetLength(), decVal);
 					OutputDebugString(m_slog);
+
 				}
 
 				out << key << '=' << val << '\n';
@@ -33943,12 +33971,12 @@ void CMainFrame::AccEncrypt()
 	if (dw == 0)
 		return;
 
-	if (!IsHeadquartersIP(m_ipAddr))
-	{
-		m_slog.Format("[AXIS][AccEncrypt] Skipped - not HQ IP=[%s]", m_ipAddr);
-		output_DebugString(m_slog);
-		return;
-	}
+	//if (!IsHeadquartersIP(m_ipAddr))
+	//{
+	//	m_slog.Format("[AXIS][AccEncrypt] Skipped - not HQ IP=[%s]", m_ipAddr);
+	//	output_DebugString(m_slog);
+	//	return;
+	//}
 
 	CString sPath;
 	CString strFilePath;
@@ -33970,6 +33998,230 @@ void CMainFrame::AccEncrypt()
 		// 단, 실패한 파일은 평문 그대로 → 다음 실행에 재시도됨
 		AfxMessageBox("파일 암호화 중 에러");
 	}
+}
+
+//============================================================
+// FileManager: 메인 시작 시 1회 실행.
+//   Axis::home\exe\filemanager.ini 를 읽어 파일 제어 작업 수행.
+//   - DELETE : 파일 삭제
+//   - SETKEY : 비표준 "키 = 값" 설정파일의 특정 키 값만 교체(빈값 포함)
+//   VERSION 으로 중복 실행을 막고, AFTER=DELETE 면 ini 자체를 삭제.
+//============================================================
+
+// 폴더키 → 실제 경로 매핑 (화이트리스트). 목록 밖이면 빈 문자열 반환 → skip.
+ CString CMainFrame::FM_MapFolderKey(const CString& key)
+{
+	CString k = key;  k.MakeUpper();  k.TrimRight();
+	if (k == "EXE")   return Axis::home + "\\exe";
+	if (k == "DEV")   return Axis::home + "\\dev";
+	if (k == "GEX")   return Axis::home + "\\gex";
+	if (k == "TAB")   return Axis::home + "\\tab";
+	if (k == "XC32")  return Axis::home + "\\xc32_win64\\conf";
+	return "";
+}
+
+// 비표준 "키 = 값" 설정파일에서 지정 키의 값만 newValue로 교체. 반환: 바꾼 줄 수.
+// (xc_conf.ini 처럼 섹션이 없고 '=' 양옆 공백/탭이 섞인 파일용. WritePrivateProfile* 못 씀)
+ int CMainFrame::FM_SetPlainConfValue(const CString& filePath,
+	const CString& key,
+	const CString& newValue)
+{
+	CFile f;
+	if (!f.Open(filePath, CFile::modeRead | CFile::shareDenyWrite))
+	{
+		WriteLog("[FM] SETKEY open fail: %s\n", (LPCSTR)filePath);
+		return 0;
+	}
+	ULONGLONG len = f.GetLength();
+	CStringA buf;
+	if (len > 0)
+	{
+		f.Read(buf.GetBuffer((int)len), (UINT)len);
+		buf.ReleaseBuffer((int)len);
+	}
+	f.Close();
+
+	CStringA keyA(key);        keyA.TrimRight();
+	CStringA valA(newValue);   // 빈 문자열이면 값 제거
+
+	CStringA out;
+	int changed = 0;
+	int pos = 0;
+	while (pos < buf.GetLength())
+	{
+		int nl = buf.Find('\n', pos);
+		CStringA line, eol;
+		if (nl < 0) { line = buf.Mid(pos);            pos = buf.GetLength(); }
+		else { line = buf.Mid(pos, nl - pos);  pos = nl + 1;  eol = "\n"; }
+
+		if (!line.IsEmpty() && line[line.GetLength() - 1] == '\r')
+		{
+			line = line.Left(line.GetLength() - 1);
+			eol = "\r\n";
+		}
+
+		CStringA trimmed = line;  trimmed.TrimLeft();
+		int eq = line.Find('=');
+		if (eq < 0 || (!trimmed.IsEmpty() && trimmed[0] == '#'))
+		{
+			out += line;  out += eol;   // 주석/'=' 없는 줄은 그대로
+			continue;
+		}
+
+		CStringA lhs = line.Left(eq);
+		CStringA lhsTrim = lhs;  lhsTrim.TrimRight();
+
+		if (lhsTrim.CompareNoCase(keyA) == 0)
+		{
+			CStringA rebuilt = lhs;   // 키 + 정렬용 공백/탭 원형 보존
+			rebuilt += "= ";
+			rebuilt += valA;          // 빈값이면 여기서 끝
+			out += rebuilt;  out += eol;
+			changed++;
+			WriteLog("[FM] SETKEY: %s -> [%s]\n", (LPCSTR)keyA, (LPCSTR)valA);
+		}
+		else
+		{
+			out += line;  out += eol;
+		}
+	}
+
+	if (changed == 0)
+	{
+		WriteLog("[FM] SETKEY key not found: %s in %s\n", (LPCSTR)keyA, (LPCSTR)filePath);
+		return 0;
+	}
+
+	// 임시 파일에 쓰고 원자적 교체
+	CString tmp = filePath + ".tmp";
+	CFile wf;
+	if (!wf.Open(tmp, CFile::modeCreate | CFile::modeWrite | CFile::shareExclusive))
+	{
+		WriteLog("[FM] SETKEY tmp open fail: %s\n", (LPCSTR)tmp);
+		return 0;
+	}
+	if (out.GetLength() > 0)
+		wf.Write((LPCSTR)out, out.GetLength());
+	wf.Close();
+
+	::DeleteFile(filePath);
+	if (!::MoveFile(tmp, filePath))
+	{
+		WriteLog("[FM] SETKEY replace fail(%d): %s\n", GetLastError(), (LPCSTR)filePath);
+		::DeleteFile(tmp);   // 교체 실패 시 임시파일 정리
+		return 0;
+	}
+	return changed;
+}
+
+// 메인 시작 시 호출. setupFile: 처리버전(FMDONEVER)을 기록할 셋업 ini 경로.
+void CMainFrame::ProcessFileManager(const CString& setupFile)
+{
+	// filemanager.ini 위치 (일단 exe 폴더 기준)
+	CString fmFile;
+	fmFile.Format("%s\\tab\\filemanager.ini", (LPCSTR)Axis::home);
+
+	if (::GetFileAttributes(fmFile) == INVALID_FILE_ATTRIBUTES)
+		return;   // 파일 없으면 조용히 종료
+
+	// 버전 기반 중복 실행 방지
+	int fmVer = GetPrivateProfileInt("GENERAL", "FMVERSION", 0, fmFile);
+	int doneVer = GetPrivateProfileInt("SCREEN", "FMDONEVER", 0, fmFile);
+	bool bForce = (fmVer < 0);
+	m_slog.Format("[FM]  (fmVer=%d <= doneVer=%d)\n", fmVer, doneVer);
+	output_DebugString(m_slog);
+	if (!bForce && fmVer <= doneVer)
+	{
+		m_slog.Format("[FM] skip (fmVer=%d <= doneVer=%d)\n", fmVer, doneVer);
+		output_DebugString(m_slog);
+		return;
+	}
+
+	int nCount = GetPrivateProfileInt("GENERAL", "COUNT", 0, fmFile);
+	m_slog.Format("[FM] start: ver=%d, count=%d\n", fmVer, nCount);
+	output_DebugString(m_slog);
+
+	for (int i = 1; i <= nCount; i++)
+	{
+		CString sec;  sec.Format("ITEM%d", i);
+
+		char szAct[64] = { 0 }, szFolder[64] = { 0 }, szFile[260] = { 0 };
+		GetPrivateProfileString(sec, "ACTION", "", szAct, sizeof(szAct), fmFile);
+		GetPrivateProfileString(sec, "FOLDER", "", szFolder, sizeof(szFolder), fmFile);
+		GetPrivateProfileString(sec, "FILE", "", szFile, sizeof(szFile), fmFile);
+
+		CString act = szAct;       act.MakeUpper();  act.TrimLeft();
+		CString dir = FM_MapFolderKey(szFolder);
+		CString fileName = szFile; fileName.TrimLeft();
+
+		// 안전 가드: 폴더 매핑 실패 / 빈 파일명 / 경로 탈출 문자 차단
+		if (dir.IsEmpty() || fileName.IsEmpty())
+		{
+			m_slog.Format("[FM] ITEM%d skip (folder/file invalid)\n", i);
+			output_DebugString(m_slog);
+			continue;
+		}
+		if (fileName.Find("..") >= 0 || fileName.Find("\\") >= 0
+			|| fileName.Find("/") >= 0 || fileName.Find(":") >= 0)
+		{
+			m_slog.Format("[FM] ITEM%d skip (path escape blocked): %s\n", i, (LPCSTR)fileName);
+			output_DebugString(m_slog);
+			continue;
+		}
+
+		CString full = dir + "\\" + fileName;
+
+		if (act == "DELETE")
+		{
+			if (::GetFileAttributes(full) == INVALID_FILE_ATTRIBUTES)
+				WriteLog("[FM] DELETE skip (not exist): %s\n", full);
+			else if (::DeleteFile(full))
+				WriteLog("[FM] DELETE ok: %s\n", (full));
+			else
+				WriteLog("[FM] DELETE fail(%d): %s\n", full);
+		}
+		else if (act == "SETKEY")
+		{
+			char szKey[128] = { 0 }, szVal[256] = { 0 };
+			GetPrivateProfileString(sec, "KEY", "", szKey, sizeof(szKey), fmFile);
+			GetPrivateProfileString(sec, "VALUE", "", szVal, sizeof(szVal), fmFile);
+
+			CString k = szKey;  k.TrimLeft();
+			if (k.IsEmpty())
+			{
+				WriteLog("[FM] ITEM%d SETKEY skip (empty key)\n", i);
+				continue;
+			}
+			if (::GetFileAttributes(full) == INVALID_FILE_ATTRIBUTES)
+			{
+				WriteLog("[FM] SETKEY skip (not exist): %s\n", (LPCSTR)full);
+				continue;
+			}
+			FM_SetPlainConfValue(full, k, CString(szVal));
+		}
+		else
+		{
+			WriteLog("[FM] ITEM%d unknown action: %s\n", i, (LPCSTR)act);
+		}
+	}
+
+	// 처리 버전 기록
+	if (fmVer >= 0)
+	{
+		CString v;  v.Format("%d", fmVer);
+		WritePrivateProfileString("SCREEN", "FMDONEVER", v, fmFile);
+	}
+
+	// AFTER 처리
+	char szAfter[16] = { 0 };
+	GetPrivateProfileString("GENERAL", "AFTER", "KEEP", szAfter, sizeof(szAfter), fmFile);
+	if (_stricmp(szAfter, "DELETE") == 0)
+	{
+		if (::DeleteFile(fmFile))
+			WriteLog("[FM] ini deleted (AFTER=DELETE)\n");
+	}
+
+	WriteLog("[FM] done.\n");
 }
 #endif
 

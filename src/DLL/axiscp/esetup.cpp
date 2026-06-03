@@ -253,7 +253,7 @@ void CESetup::load_info()
 	}
 	((CButton *) GetDlgItem(nRes))->SetCheck(1);
 
-	m_popupAcc = GetPrivateProfileInt("SCREEN", "POPUPACC", 1, file);
+	m_popupAcc = GetPrivateProfileInt("SCREEN", "POPUPACC", 0, file);
 	((CButton *) GetDlgItem(IDC_POPUPPASSDLG))->SetCheck(m_popupAcc);
 
 	m_screenNew = GetPrivateProfileInt("SCREEN", "SCREENNEW", 1, file);
@@ -599,7 +599,7 @@ void CESetup::DefaultSetup()
 	}
 	((CButton *) GetDlgItem(nRes))->SetCheck(1);
 
-	m_popupAcc = GetPrivateProfileInt("SCREEN", "POPUPACC", 1, file);
+	m_popupAcc = GetPrivateProfileInt("SCREEN", "POPUPACC", 0, file);
 	((CButton *) GetDlgItem(IDC_POPUPPASSDLG))->SetCheck(m_popupAcc);
 
 	m_screenNew = GetPrivateProfileInt("SCREEN", "SCREENNEW", 1, file);
