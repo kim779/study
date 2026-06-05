@@ -192,17 +192,63 @@ void CXecureCtrl::OnResetState()
 // CXecureCtrl 메시지 처리기
 BOOL CXecureCtrl::Encrypt(long pBytes, long nBytes)
 {
+	CString slog;
+	int inputLen = *(int*)nBytes;
+
+	slog.Format("[xecure][%s]<%d> before nBytes=[%d]\r\n", __FUNCTION__, __LINE__,
+		inputLen);
+	OutputDebugString(slog);
+
 	if (m_enc != stepENC::encRUN)
+	{
+		slog.Format("[xecure][%s]<%d> Encrypt fail - not encRUN\r\n", __FUNCTION__,
+			__LINE__);
+		OutputDebugString(slog);
 		return FALSE;
+	}
+
+	// 평문을 AxisChaser로 전송 (XC_ENCODE 전 시점)
+	CWnd* pChaser = CWnd::FindWindow(NULL, _T("AxisChaser for IBK_UAT"));
+	if (pChaser)
+	{
+		// _exeCDSS { DWORD flag; DWORD len; } + data
+		int   bufLen = sizeof(DWORD) * 2 + inputLen;
+		char* buf = new char[bufLen];
+
+		*(DWORD*)(buf) = 0x02;      // x_SNDs
+		*(DWORD*)(buf + sizeof(DWORD)) = inputLen;
+		CopyMemory(buf + sizeof(DWORD) * 2, (void*)pBytes, inputLen);
+
+		COPYDATASTRUCT cds{};
+		cds.dwData = 0;
+		cds.cbData = bufLen;
+		cds.lpData = buf;
+
+		pChaser->SendMessage(WM_COPYDATA, 0, (LPARAM)&cds);
+		delete[] buf;
+
+		slog.Format("[xecure][%s]<%d> pChaser find=[%x]\r\n", __FUNCTION__, __LINE__,	pChaser);
+		OutputDebugString(slog);
+	}
+	else
+	{
+		slog.Format("[xecure][%s]<%d> pChaser not find\r\n", __FUNCTION__, __LINE__);
+		OutputDebugString(slog);
+	}
 
 	m_sync.Lock();
 	m_nBytes = *(int*)nBytes;
 
 	if (m_nBytes > maxlen)
+	{
+		slog.Format("[xecure][%s]<%d> Encrypt fail maxlen\r\n", __FUNCTION__, __LINE__);
+		OutputDebugString(slog);
+		m_sync.Unlock();
 		return FALSE;
+	}
 
-
-	if (XC_ENCODE(&m_ctx, (unsigned char*)m_pBytes, &m_nBytes, (unsigned char*)pBytes, (int) m_nBytes, NULL, 0, XC_TMODE_MSG) < 0)
+	if (XC_ENCODE(&m_ctx, (unsigned char*)m_pBytes, &m_nBytes,
+		(unsigned char*)pBytes, (int)m_nBytes, NULL, 0, XC_TMODE_MSG) < 0)
 	{
 		m_sync.Unlock();
 		return FALSE;
@@ -211,20 +257,35 @@ BOOL CXecureCtrl::Encrypt(long pBytes, long nBytes)
 	*(int*)nBytes = m_nBytes;
 	CopyMemory((void*)pBytes, m_pBytes, m_nBytes);
 
+	slog.Format("[xecure][%s]<%d> after nBytes=[%d]\r\n", __FUNCTION__, __LINE__, m_nBytes);
+	OutputDebugString(slog);
+
 	m_sync.Unlock();
 	return TRUE;
 }
 
 BOOL CXecureCtrl::Decrypt(long pBytes, long nBytes)
 {
+	CString slog;
+	//slog.Format("[xecure][%s]<%d> Xecure nBytes=[%d]  pBytes=[%.50s] \r\n  ", __FUNCTION__, __LINE__, nBytes, pBytes);
+	//OutputDebugString(slog);
+
 	if (m_enc != stepENC::encRUN)
+	{
+		slog.Format("[xecure][%s]<%d> Decrypt fail \r\n  ", __FUNCTION__, __LINE__);
+		OutputDebugString(slog);
 		return FALSE;
+	}
 
 	m_sync.Lock();
 	m_nBytes = *(int*)nBytes;
 
 	if (m_nBytes > maxlen)
+	{
+		slog.Format("[xecure][%s]<%d> Decrypt fail m_nBytes=[%d] maxlen=[%d] \r\n  ", __FUNCTION__, __LINE__, m_nBytes, maxlen);
+		OutputDebugString(slog);
 		return FALSE;
+	}
 
 
 	if (XC_DECODE(&m_ctx, (unsigned char*)m_pBytes, &m_nBytes, (unsigned char*)pBytes, m_nBytes, NULL, 0) < 0)
@@ -259,7 +320,7 @@ long CXecureCtrl::Xecure(long pBytes, long nBytes)
 	CString slog;
 	slog.Format("[xecure] Xecure dirSTR=[%s]  path=[%s] \r\n  ", dirSTR, chfile);
 	OutputDebugString(slog);
-	FileLog(slog);
+	//FileLog(slog);
 
 
 	
@@ -279,7 +340,7 @@ long CXecureCtrl::Xecure(long pBytes, long nBytes)
 	//spath.Replace("axis.exe", "xc_conf.ini");
 	//spath.Replace("ibks_setup.exe", "xc_conf.ini");
 	OutputDebugString("[XECURE]" + spath);
-	FileLog(spath);
+	//FileLog(spath);
 
 
 	//C:\IBKS\IBK투자증권 HTS\exe
@@ -301,6 +362,9 @@ long CXecureCtrl::Xecure(long pBytes, long nBytes)
 		}
 		m_log->Trace("xecure_3", 0, dirSTR);
 
+		slog.Format("[xecure] Xecure encHELLO dirSTR=[%s] \r\n  ", dirSTR);
+		OutputDebugString(slog);
+
 		ZeroMemory(&m_ctx, sizeof(XC_CTX));
 		if (XC_ENCODE(&m_ctx, (unsigned char*)m_pBytes, &m_nBytes, NULL, 0, NULL, 0, XC_TMODE_KEY) < 0)
 		{
@@ -309,6 +373,10 @@ long CXecureCtrl::Xecure(long pBytes, long nBytes)
 		}
 		m_log->Trace("xecure_4", 0, dirSTR);
 		m_enc = stepENC::encOK;
+
+		slog.Format("[xecure] Xecure encOK dirSTR=[%s] \r\n  ", dirSTR);
+		OutputDebugString(slog);
+
 		break;
 	case stepENC::encOK:
 		rc = XC_DECODE(&m_ctx, (unsigned char*)m_pBytes, &m_nBytes, (unsigned char*)pBytes, encL, NULL, 0);
