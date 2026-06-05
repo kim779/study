@@ -9,6 +9,9 @@
 #include "FontSetDlg.h"
 #include "Options.h"
 
+#include "../H/axisfire.h"
+#include "../H/axis.h"
+
 #define STAB		"\t"
 #define SNEWLINE	"\n"
 #define CHARLIMIT	15
@@ -84,64 +87,7 @@ CChildView::CChildView()
 
 	m_root.Format("%s\\exe\\AXXECURE.OCX", spath);
 
-	HINSTANCE hLib = LoadLibrary(m_root);
-
-	if (hLib < (HINSTANCE)HINSTANCE_ERROR)
-	{
-		m_slog.Format("[AXISCHASER] [registerControl] LoadLibrary error....[%s] error=[%d]\n", m_root, GetLastError());
-		OutputDebugString(m_slog);
-	}
-	else
-	{
-		m_slog.Format("[AXISCHASER] [registerControl] path....[%s] hLib=[%x]\n", m_root, hLib);
-		OutputDebugString(m_slog);
-	}
-
-	FARPROC	lpDllEntryPoint;
-	(FARPROC&)lpDllEntryPoint = GetProcAddress(hLib, _T("DllRegisterServer"));
-
-	if (lpDllEntryPoint == nullptr)
-	{
-		FreeLibrary(hLib);
-		m_slog.Format("[AXISCHASER] [registerControl] DllRegisterServer fail....[%d]\n", GetLastError());
-		OutputDebugString(m_slog);
-	}
-	else
-	{
-		m_slog.Format("[AXISCHASER] [registerControl] DllRegisterServer success....[%x]\n", lpDllEntryPoint);
-		OutputDebugString(m_slog);
-
-		HRESULT hr = lpDllEntryPoint();  
-		if (FAILED(hr))
-		{
-			m_slog.Format("[AXISCHASER] DllRegisterServer call failed hr=[%x]\n", hr);
-			OutputDebugString(m_slog);
-		}
-		else
-		{
-			m_slog.Format("[AXISCHASER] DllRegisterServer call success hr=[%x]\n", hr);
-			OutputDebugString(m_slog);
-		}
-	}
-
-	CLSID clsid;
-	HRESULT hr2 = CLSIDFromProgID(L"AxisXecure.XecureCtrl.IBK2019", &clsid);
-	m_slog.Format("[AXISCHASER] CLSIDFromProgID hr=[%x]\n", hr2);
-	OutputDebugString(m_slog);
-
-	m_xecure = new CWnd();
-	if (!m_xecure->CreateControl(_T("AxisXecure.XecureCtrl.IBK2019"), NULL, 0, CRect(0, 0, 0, 0), this, 0))
-	{
-		delete m_xecure;
-		m_xecure = NULL;
-		m_slog.Format("[AXISCHASER] error=[%d]  m_xecure=[%x]", GetLastError(), m_xecure);
-		OutputDebugString(m_slog);
-	}
-	else
-	{
-		m_slog.Format("[AXISCHASER] CreateControl success m_xecure=[%x]\n", m_xecure);
-		OutputDebugString(m_slog);
-	}
+	
 }
 
 CChildView::~CChildView()
@@ -228,6 +174,65 @@ int CChildView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	AfxOleInit();
 	if (CWnd ::OnCreate(lpCreateStruct) == -1)
 		return -1;
+
+	HINSTANCE hLib = LoadLibrary(m_root);
+
+	if (hLib < (HINSTANCE)HINSTANCE_ERROR)
+	{
+		m_slog.Format("[AXISCHASER] [registerControl] LoadLibrary error....[%s] error=[%d]\n", m_root, GetLastError());
+		OutputDebugString(m_slog);
+	}
+	else
+	{
+		m_slog.Format("[AXISCHASER] [registerControl] path....[%s] hLib=[%x]\n", m_root, hLib);
+		OutputDebugString(m_slog);
+	}
+
+	FARPROC	lpDllEntryPoint;
+	(FARPROC&)lpDllEntryPoint = GetProcAddress(hLib, _T("DllRegisterServer"));
+
+	if (lpDllEntryPoint == nullptr)
+	{
+		FreeLibrary(hLib);
+		m_slog.Format("[AXISCHASER] [registerControl] DllRegisterServer fail....[%d]\n", GetLastError());
+		OutputDebugString(m_slog);
+	}
+	else
+	{
+		m_slog.Format("[AXISCHASER] [registerControl] DllRegisterServer success....[%x]\n", lpDllEntryPoint);
+		OutputDebugString(m_slog);
+
+		HRESULT hr = lpDllEntryPoint();
+		if (FAILED(hr))
+		{
+			m_slog.Format("[AXISCHASER] DllRegisterServer call failed hr=[%x]\n", hr);
+			OutputDebugString(m_slog);
+		}
+		else
+		{
+			m_slog.Format("[AXISCHASER] DllRegisterServer call success hr=[%x]\n", hr);
+			OutputDebugString(m_slog);
+		}
+	}
+
+	CLSID clsid;
+	HRESULT hr2 = CLSIDFromProgID(L"AxisXecure.XecureCtrl.IBK2019", &clsid);
+	m_slog.Format("[AXISCHASER] CLSIDFromProgID hr=[%x]\n", hr2);
+	OutputDebugString(m_slog);
+
+	m_xecure = new CWnd();
+	if (!m_xecure->CreateControl(_T("AxisXecure.XecureCtrl.IBK2019"), NULL, 0, CRect(0, 0, 0, 0), this, 0))
+	{
+		delete m_xecure;
+		m_xecure = NULL;
+		m_slog.Format("[AXISCHASER] error=[%d]  m_xecure=[%x]", GetLastError(), m_xecure);
+		OutputDebugString(m_slog);
+	}
+	else
+	{
+		m_slog.Format("[AXISCHASER] CreateControl success m_xecure=[%x]\n", m_xecure);
+		OutputDebugString(m_slog);
+	}
 	
 	DWORD dwStyle = WS_CHILD|WS_VISIBLE|WS_VSCROLL|WS_HSCROLL|ES_AUTOHSCROLL|ES_AUTOVSCROLL|ES_MULTILINE|ES_READONLY;
 	if (!m_trace.Create(dwStyle, CRect(0, 0, 0, 0), this, (UINT) &m_trace))
@@ -324,6 +329,22 @@ void CChildView::OnRCVData(WPARAM wParam, LPARAM lParam)
 	case x_SNDs:
 	{
 		if (!m_bSNDRCV)	break;
+
+		if (len > L_axisH)
+		{
+			struct _axisH* axisH = (struct _axisH*)dat;
+			char* chain = dat + L_axisH;
+			int   chainL = len - L_axisH;
+
+			if (axisH->stat & statENC)
+			{
+				if (Xecure(DI_DEC, chain, chainL))
+				{
+					len = L_axisH + chainL;
+				}
+			}
+		}
+
 		if (HIWORD(wParam) == x_SNDs && !m_options.send)	break;
 		if (HIWORD(wParam) == x_RCVs && !m_options.receive)	break;
 		if (HIWORD(wParam) == x_SNDs)
@@ -1398,3 +1419,19 @@ void CChildView::OnTimer(UINT_PTR nIDEvent)
 	CWnd::OnTimer(nIDEvent);
 }
 
+BOOL CChildView::Xecure(int helper, char* pBytes, int& nBytes)
+{
+	m_slog.Format("[AXISCHASER] [%s]<%d> helper=[%d] pBytes=[%.20s]\n", __FUNCTION__,  __LINE__,helper, pBytes);
+	OutputDebugString(m_slog);
+
+	if (m_xecure == NULL)
+		return FALSE;
+	BOOL retv;
+	m_xecure->InvokeHelper(helper, DISPATCH_METHOD, VT_BOOL, (void*)&retv,
+		(BYTE*)VTS_I4 VTS_I4, pBytes, &nBytes);
+
+	m_slog.Format("[AXISCHASER] [%s]<%d> retv=[%d] nBytes =[%d] pBytes=[%.20s]\n", __FUNCTION__, __LINE__, retv, nBytes, pBytes);
+	OutputDebugString(m_slog);
+
+	return retv;
+}

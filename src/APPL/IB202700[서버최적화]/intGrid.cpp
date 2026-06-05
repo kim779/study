@@ -1305,6 +1305,7 @@ void CintGrid::OnTimer(UINT nIDEvent)
 		if (1)
 		{
 			ProcessBlink();
+			return;
 		}
 		else
 		{
@@ -5581,7 +5582,7 @@ BOOL CintGrid::SetColumnItems(int nCol, GVITEM* gvitem)
 BOOL CintGrid::SetItemText(int nRow, int nCol, LPCTSTR str)
 {
 	const auto pCell = GetCell(nRow, nCol);
-	
+
 	bool bBong = false;
 	if (!pCell) return FALSE;
 
@@ -5589,44 +5590,45 @@ BOOL CintGrid::SetItemText(int nRow, int nCol, LPCTSTR str)
 
 	pCell->text = str;
 
-	CString	dstr = _T("");
+	CString dstr = _T("");
 	dstr = str;
 
 	if (pCell->symbol == "7777")
 	{
-		dstr = _T("AAAAAAAA"); 
+		dstr = _T("AAAAAAAA");
 		bBong = true;
 	}
 	else
 	{
-		if(nCol != colEXPECT)
+		if (nCol != colEXPECT)
 		{
-			if(strPreText == str)
+			if (strPreText == str)
 			{
 				return FALSE;
 			}
 		}
 		else
 		{
-			if(strPreText != str)
+			if (strPreText != str)
 			{
 				pCell->dtext = dstr;
-				RedrawCell(nRow,colCURR);
+				RedrawCell(nRow, colCURR);
 				RedrawCell(nRow, colEXPECT);
-				Blink(nRow, nCol);
+				Blink(nRow, colCURR);   // colEXPECT는 hidden, colCURR에 표시
 				return TRUE;
 			}
 		}
 		CString strCode = GetItemText(nRow, colCODE);
-		DisplayAttribute(pCell->attr, dstr, nRow, nCol, strCode);  //test spread
+		DisplayAttribute(pCell->attr, dstr, nRow, nCol, strCode);
 	}
 
 	pCell->dtext = dstr;
 
-	//2016.03.30 KSJ 이전데이터와 같으면 다시 그리지 않는다.
-	//2016.04.20 KSJ 봉데이터가 이전데이터와 계속 같이 들어와서 우선 주석처리함 고가 저가를 저장하기때문에 같을수 밖에 없음....
-	//if(nCol == colNAME || nCol == colCURR || bBong)	RedrawCell(nRow,nCol);
-	RedrawCell(nRow,nCol);
+	if (_bReal && nRow >= m_nFixedRows)
+		Blink(nRow, nCol);   // 변한 컬럼으로 blink (hidden이면 BlinkCell에서 알아서 skip)
+
+	//if(nCol == colNAME || nCol == colCURR || bBong) RedrawCell(nRow,nCol);
+	RedrawCell(nRow, nCol);
 
 	return TRUE;
 }
@@ -9938,35 +9940,60 @@ void CintGrid::BlinkCell(int row, int col)
 
 	const long key = MakeBlinkKey(row, col);
 
+	auto it = _mapBlinkColor.find(key);
+	if (it != _mapBlinkColor.end())
+		return;  // 이미 깜박이는 중이면 무시 (tick 갱신 안 함)
+
 	GVITEM item{};
 	item.row = row;
 	item.col = col;
-	item.mask = GVMK_BKCOLOR;
-
-	GetItem(&item);
-
-	auto it = _mapBlinkColor.find(key);
-
-	if (it == _mapBlinkColor.end())
-	{
-		BlinkItem blink{};
-		blink.oldBk = item.bkcol;;
-		blink.tick = GetTickCount64();
-
-		_mapBlinkColor.emplace(key, blink);
-	}
-	else
-	{
-		it->second.tick = GetTickCount64();
-	}
-
-	item.mask = GVMK_BKCOLOR;
-	item.bkcol = RGB(255, 255, 180);   // 깜빡임 색
-
+	item.mask = GVMK_FLASH;
+	item.flash = GVFL_FLASHED;
 	SetItem(&item);
+
+	BlinkItem blink{};
+	blink.tick = GetTickCount64();
+	_mapBlinkColor.emplace(key, blink);
 
 	InvalidateCellRect(CIdCell(row, col));
 }
+//void CintGrid::BlinkCell(int row, int col)
+//{
+//	if (_blinkType == 0)
+//		return;
+//
+//	if (row < 0 || row >= GetRowCount())
+//		return;
+//
+//	if (col < 0 || col >= GetColumnCount())
+//		return;
+//
+//	if (IsCellAttribute(CIdCell(row, col), GVAT_HIDDEN))
+//		return;
+//
+//	const long key = MakeBlinkKey(row, col);
+//
+//	GVITEM item{};
+//	item.row = row;
+//	item.col = col;
+//	item.mask = GVMK_FLASH;
+//	item.flash = GVFL_FLASHED;
+//	SetItem(&item);
+//
+//	auto it = _mapBlinkColor.find(key);
+//	if (it == _mapBlinkColor.end())
+//	{
+//		BlinkItem blink{};
+//		blink.tick = GetTickCount64();
+//		_mapBlinkColor.emplace(key, blink);
+//	}
+//	else
+//	{
+//		it->second.tick = GetTickCount64();
+//	}
+//
+//	InvalidateCellRect(CIdCell(row, col));
+//}
 
 void CintGrid::BlinkRow(int row)
 {
@@ -10019,8 +10046,14 @@ void CintGrid::ProcessBlink()
 		const int row = key >> 16;
 		const int col = key & 0xFFFF;
 
-		SetItemBkColor(row, col, blink.oldBk, true);
+		GVITEM item{};
+		item.row = row;
+		item.col = col;
+		item.mask = GVMK_FLASH;
+		item.flash = 0;
+		SetItem(&item);
 
+		InvalidateCellRect(CIdCell(row, col));
 		vErase.push_back(key);
 	}
 

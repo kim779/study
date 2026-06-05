@@ -234,7 +234,6 @@ namespace
 			for (ULONG64 i = 0; i < ctx->pMem64List->NumberOfMemoryRanges; ++i)
 			{
 				const MINIDUMP_MEMORY_DESCRIPTOR64& md = ctx->pMem64List->MemoryRanges[i];
-
 					const ULONG64 start = md.StartOfMemoryRange;
 				const ULONG64 end = start + md.DataSize;
 
@@ -512,6 +511,7 @@ BEGIN_MESSAGE_MAP(CAxisAgentDlg, CDialogEx)
 	ON_COMMAND(ID_TRAY_EXIT, OnTrayExit)
 	ON_MESSAGE(WM_TRAYICON, OnTrayIcon)
 	ON_BN_CLICKED(IDC_BTN_HIDE, &CAxisAgentDlg::OnBnClickedBtnHide)
+	ON_BN_CLICKED(IDC_BTN_DECACC, &CAxisAgentDlg::OnBnClickedBtnDecacc)
 END_MESSAGE_MAP()
 
 
@@ -2830,4 +2830,10 @@ BOOL CAxisAgentDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 void CAxisAgentDlg::OnBnClickedBtnHide()
 {
 	OnTrayHide();
+}
+
+
+void CAxisAgentDlg::OnBnClickedBtnDecacc()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
 }

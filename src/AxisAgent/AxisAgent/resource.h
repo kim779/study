@@ -22,6 +22,7 @@
 #define IDC_BUTTON2                     1007
 #define IDC_BTN_HIDE                    1007
 #define IDC_BUTTON3                     1008
+#define IDC_BTN_DECACC                  1008
 
 // Next default values for new objects
 // 

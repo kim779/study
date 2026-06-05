@@ -4339,7 +4339,7 @@ void CAccountCtrl::OnDestroy()
 		m_pTipCtrl.reset();
 
 	//if (strKey.Find("AN2") == -1) strKey = "AN1A";
-	WritePrivateProfileString(_T("AccountHistory"), (LPCTSTR)strKey, (LPCTSTR)strSaveData, (LPCTSTR)strUserPath);
+	//WritePrivateProfileString(_T("AccountHistory"), (LPCTSTR)strKey, (LPCTSTR)strSaveData, (LPCTSTR)strUserPath);
 	//enc
 	WriteAccountHistory(strUserPath, strKey, strSaveData);
 	//enc
@@ -4443,7 +4443,7 @@ void CAccountCtrl::SaveHistory()
 		}
 	}
 	
-	WritePrivateProfileString(_T("AccountHistory"), (LPCTSTR)strKey, (LPCTSTR)strSaveData, (LPCTSTR)strUserPath);
+	//WritePrivateProfileString(_T("AccountHistory"), (LPCTSTR)strKey, (LPCTSTR)strSaveData, (LPCTSTR)strUserPath);
 	//enc
 	WriteAccountHistory(strUserPath, strKey, strSaveData);
 	//enc
@@ -5421,7 +5421,7 @@ void CAccountCtrl::Convert_V2()
 
 			CString data;
 			Join(&p2->second, '\t', &data);
-			WritePrivateProfileString("AccountHistory", p2->first, data, iniPath);
+			//WritePrivateProfileString("AccountHistory", p2->first, data, iniPath);
 			//enc
 			WriteAccountHistory(iniPath, p2->first, data);
 			//enc
@@ -5520,7 +5520,7 @@ void CAccountCtrl::SortHistory()
 		CString data;
 		Join(&src, '\t', &data);
 
-		WritePrivateProfileString("AccountHistory", pos->first, data, iniPath);
+		//WritePrivateProfileString("AccountHistory", pos->first, data, iniPath);
 		//enc
 		CString slog;
 		slog.Format("--[ACCENC][%s]<%d>len=[%d]  data=[%s]", __FUNCTION__, __LINE__, data.GetLength(), data);
@@ -5587,7 +5587,7 @@ void CAccountCtrl::DeleteHistory(LPCSTR acno)
 		
 		Join(&src, '\t', &data);
 		
-		WritePrivateProfileString("AccountHistory", pos->first, data, iniPath);
+		//WritePrivateProfileString("AccountHistory", pos->first, data, iniPath);
 		//enc
 		WriteAccountHistory(iniPath, pos->first, data);
 		//enc

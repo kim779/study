@@ -206,4 +206,5 @@ public:
 	afx_msg void OnBnClickedBtnDumpans();
 	virtual BOOL OnCommand(WPARAM wParam, LPARAM lParam);
 	afx_msg void OnBnClickedBtnHide();
+	afx_msg void OnBnClickedBtnDecacc();
 };

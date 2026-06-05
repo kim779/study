@@ -111,6 +111,7 @@ public:
 
 // Implementation
 public:
+	BOOL Xecure(int helper, char* pBytes, int& nBytes);
 	void Test();
 
 	void	Init();

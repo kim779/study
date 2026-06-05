@@ -1276,66 +1276,74 @@ void CintGrid::OnTimer(UINT nIDEvent)
 	
 	if (nIDEvent == TIMEFLASH)
 	{
-		if (_blinkType == 0)
-		 	return;
-		concurrent_vector<long> vdel;
-		CRect rowRect = CRect(0, 0, 0, 0);
-		AxStd::async([&](){
-			for_each(_mapBlink.begin(), _mapBlink.end(), [this, &vdel, &rowRect](auto& pair)
-			{
-				// Do something with pair.first (key) and pair.second (value)
-				const ULONGLONG time = pair.second;
-				const long key       = pair.first;
-				
-				if ((GetTickCount64() - time) > 500)
-				{
-					GVITEM gvitem{};
-					gvitem.row = key / 100;
-					gvitem.col = key % 100;
-				
-					if (gvitem.col == 0)
+		if (1)
+		{
+			ProcessBlink();
+			return;
+		}
+		else
+		{
+			if (_blinkType == 0)
+				return;
+			concurrent_vector<long> vdel;
+			CRect rowRect = CRect(0, 0, 0, 0);
+			AxStd::async([&]() {
+				for_each(_mapBlink.begin(), _mapBlink.end(), [this, &vdel, &rowRect](auto& pair)
 					{
-						for (int ii = colNAME; ii < GetColumnCount(); ii++)
+						// Do something with pair.first (key) and pair.second (value)
+						const ULONGLONG time = pair.second;
+						const long key = pair.first;
+
+						if ((GetTickCount64() - time) > 500)
 						{
-							CRect rc;
+							GVITEM gvitem{};
+							gvitem.row = key / 100;
+							gvitem.col = key % 100;
 
-							gvitem.col = ii;
-							gvitem.mask = GVMK_ATTR;
-							GetItem(&gvitem);
-							if (gvitem.attr & GVAT_HIDDEN)
-								continue;
+							if (gvitem.col == 0)
+							{
+								for (int ii = colNAME; ii < GetColumnCount(); ii++)
+								{
+									CRect rc;
 
-							GetItemRect(gvitem.row, ii, &rc);
-							rowRect.UnionRect(rowRect, rc);
+									gvitem.col = ii;
+									gvitem.mask = GVMK_ATTR;
+									GetItem(&gvitem);
+									if (gvitem.attr & GVAT_HIDDEN)
+										continue;
 
-							gvitem.mask = GVMK_FLASH;
-							gvitem.flash = 0;
-							SetItem(&gvitem);	
+									GetItemRect(gvitem.row, ii, &rc);
+									rowRect.UnionRect(rowRect, rc);
+
+									gvitem.mask = GVMK_FLASH;
+									gvitem.flash = 0;
+									SetItem(&gvitem);
+								}
+							}
+							else
+							{
+								gvitem.mask = GVMK_FLASH;
+								gvitem.flash = 0;
+								SetItem(&gvitem);
+							}
+							vdel.push_back(key);
 						}
+					});
+				}).get();
+
+				for (const auto& key : vdel)
+				{
+					_mapBlink.erase(key);
+					if (key % 100 == 0)
+					{
+						if (!rowRect.IsRectEmpty())
+							InvalidateRect(rowRect);
 					}
 					else
-					{
-						gvitem.mask = GVMK_FLASH;
-						gvitem.flash = 0;
-						SetItem(&gvitem);			
-					}
-					vdel.push_back(key);
+						InvalidateCellRect(CIdCell{ key / 100, key % 100 });
 				}
-			});
-		}).get();
-
-		for (const auto& key : vdel)
-		{	
-			_mapBlink.erase(key);
-			if (key % 100 == 0)
-			{	
-				if(!rowRect.IsRectEmpty())
-					InvalidateRect(rowRect);	
-			}
-			else 
-				InvalidateCellRect(CIdCell{ key / 100, key % 100 });
+				return;
 		}
-		return;
 	}
 
 	if (nIDEvent != WM_LBUTTONDOWN)
@@ -5857,7 +5865,11 @@ BOOL CintGrid::SetItemText(int nRow, int nCol, LPCTSTR str)
 
 	//2016.03.30 KSJ 이전데이터와 같으면 다시 그리지 않는다.
 	if(strPreText.Compare(str) || nCol == colNAME || nCol == colCURR)	
-		RedrawCell(nRow,nCol);
+	{
+		if (_bReal && nRow >= m_nFixedRows && strPreText.Compare(str) != 0)
+			Blink(nRow, nCol == colEXPECT ? colCURR : nCol);
+		RedrawCell(nRow, nCol);
+	}
 
 	return TRUE;
 }
@@ -10275,4 +10287,109 @@ void CintGrid::ReDrawTimer()
 	//	_idrawCount++;  // 시간 내 호출 횟수 카운트
 	//}
 
+}
+
+long CintGrid::MakeBlinkKey(int row, int col) const
+{
+	return (row << 16) | (col & 0xFFFF);
+}
+
+void CintGrid::BlinkCell(int row, int col)
+{
+	if (_blinkType == 0)
+		return;
+
+	if (row < 0 || row >= GetRowCount())
+		return;
+
+	if (col < 0 || col >= GetColumnCount())
+		return;
+
+	if (IsCellAttribute(CIdCell(row, col), GVAT_HIDDEN))
+		return;
+
+	const long key = MakeBlinkKey(row, col);
+
+	auto it = _mapBlinkColor.find(key);
+	if (it != _mapBlinkColor.end())
+		return;
+
+	GVITEM item{};
+	item.row = row;
+	item.col = col;
+	item.mask = GVMK_FLASH;
+	item.flash = GVFL_FLASHED;
+	SetItem(&item);
+
+	BlinkItem blink{};
+	blink.tick = GetTickCount64();
+	_mapBlinkColor.emplace(key, blink);
+
+	InvalidateCellRect(CIdCell(row, col));
+}
+
+void CintGrid::BlinkRow(int row)
+{
+	if (_blinkType == 0)
+		return;
+
+	if (row < 0 || row >= GetRowCount())
+		return;
+
+	for (int col = colNAME; col < GetColumnCount(); col++)
+	{
+		if (IsCellAttribute(CIdCell(row, col), GVAT_HIDDEN))
+			continue;
+
+		BlinkCell(row, col);
+	}
+}
+
+void CintGrid::Blink(int row, int col)
+{
+	if (_blinkType == 0)
+		return;
+
+	if (_blinkType == 1)
+	{
+		BlinkCell(row, col);
+		return;
+	}
+
+	if (_blinkType == 2)
+	{
+		BlinkRow(row);
+		return;
+	}
+}
+
+void CintGrid::ProcessBlink()
+{
+	const ULONGLONG now = GetTickCount64();
+	std::vector<long> vErase;
+
+	for (auto& it : _mapBlinkColor)
+	{
+		const long key = it.first;
+		const BlinkItem& blink = it.second;
+
+		if ((now - blink.tick) <= 500)
+			continue;
+
+		const int row = key >> 16;
+		const int col = key & 0xFFFF;
+
+		GVITEM item{};
+		item.row = row;
+		item.col = col;
+		item.mask = GVMK_FLASH;
+		item.flash = 0;
+		SetItem(&item);
+
+		InvalidateCellRect(CIdCell(row, col));
+		vErase.push_back(key);
+	}
+
+	for (long key : vErase)
+		_mapBlinkColor.erase(key);
 }
