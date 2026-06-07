@@ -33,7 +33,7 @@
 #ifndef _AFX_NO_DAO_SUPPORT
 #include <afxdao.h>                     // MFC DAO 데이터베이스 클래스입니다.
 #endif // _AFX_NO_DAO_SUPPORT
-#include "D:\src\IBKS\src\H\axislog.h"
+#include "../../h/axislog.h"
 #endif // _WIN64
 
 //#define DF_ASTx_CHECK 

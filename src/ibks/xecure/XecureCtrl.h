@@ -31,7 +31,8 @@ private:
 	CCriticalSection m_sync;
 
 	class	CLog* m_log;
-
+	CString m_reg;
+	CWnd* m_pChaser{};
 protected:
 	~CXecureCtrl();
 

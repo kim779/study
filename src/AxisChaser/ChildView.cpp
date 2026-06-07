@@ -175,7 +175,7 @@ int CChildView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	if (CWnd ::OnCreate(lpCreateStruct) == -1)
 		return -1;
 
-	HINSTANCE hLib = LoadLibrary(m_root);
+	/*HINSTANCE hLib = LoadLibrary(m_root);
 
 	if (hLib < (HINSTANCE)HINSTANCE_ERROR)
 	{
@@ -232,7 +232,7 @@ int CChildView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	{
 		m_slog.Format("[AXISCHASER] CreateControl success m_xecure=[%x]\n", m_xecure);
 		OutputDebugString(m_slog);
-	}
+	}*/
 	
 	DWORD dwStyle = WS_CHILD|WS_VISIBLE|WS_VSCROLL|WS_HSCROLL|ES_AUTOHSCROLL|ES_AUTOVSCROLL|ES_MULTILINE|ES_READONLY;
 	if (!m_trace.Create(dwStyle, CRect(0, 0, 0, 0), this, (UINT) &m_trace))
@@ -325,6 +325,34 @@ void CChildView::OnRCVData(WPARAM wParam, LPARAM lParam)
 	char*	dat = (char *) lParam;
 	switch (HIWORD(wParam))
 	{
+	case 0x05: // xecure 평문
+	{
+		if (!m_bSNDRCV) break;
+		if (!m_options.send) break;
+
+		string.Format("\n#################### [XECURE 평문 %d Bytes][%s] #################### \n", len, timeS);
+		addTrace(string, K_SNDRCV);
+
+		if (len > 0)
+		{
+			string.Empty();
+			int rowCnt = (len + 79) / 80;
+			for (row = 0; row < rowCnt; row++)
+			{
+				CString sRow, sDat;
+				for (int ii = row * 80; ii < (row + 1) * 80 && ii < len; ii++)
+				{
+					unsigned char c = (unsigned char)dat[ii];
+					sDat.Format("%c", (c >= 0x20 && c < 0x80) ? c : '.');
+					sRow += sDat;
+				}
+				sRow += "\r\n";
+				string += sRow;
+			}
+			addTrace(string, K_SNDRCV);
+		}
+		break;
+	}
 	case x_RCVs:
 	case x_SNDs:
 	{
@@ -1421,7 +1449,7 @@ void CChildView::OnTimer(UINT_PTR nIDEvent)
 
 BOOL CChildView::Xecure(int helper, char* pBytes, int& nBytes)
 {
-	m_slog.Format("[AXISCHASER] [%s]<%d> helper=[%d] pBytes=[%.20s]\n", __FUNCTION__,  __LINE__,helper, pBytes);
+	/*m_slog.Format("[AXISCHASER] [%s]<%d> helper=[%d] pBytes=[%.20s]\n", __FUNCTION__,  __LINE__,helper, pBytes);
 	OutputDebugString(m_slog);
 
 	if (m_xecure == NULL)
@@ -1433,5 +1461,6 @@ BOOL CChildView::Xecure(int helper, char* pBytes, int& nBytes)
 	m_slog.Format("[AXISCHASER] [%s]<%d> retv=[%d] nBytes =[%d] pBytes=[%.20s]\n", __FUNCTION__, __LINE__, retv, nBytes, pBytes);
 	OutputDebugString(m_slog);
 
-	return retv;
+	return retv;*/
+	return false;
 }

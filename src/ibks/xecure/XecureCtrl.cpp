@@ -208,14 +208,24 @@ BOOL CXecureCtrl::Encrypt(long pBytes, long nBytes)
 	}
 
 	// 평문을 AxisChaser로 전송 (XC_ENCODE 전 시점)
-	CWnd* pChaser = CWnd::FindWindow(NULL, _T("AxisChaser for IBK_UAT"));
-	if (pChaser)
+	//m_reg
+	if (!m_pChaser)
+	{
+		CString stitle;
+		stitle.Format("AxisChaser for %s", m_reg);
+		m_pChaser = CWnd::FindWindow(NULL, stitle);
+
+		slog.Format("[xecure][%s]<%d> pChaser find=[%x]\r\n", __FUNCTION__, __LINE__, m_pChaser);
+		OutputDebugString(slog);
+	}
+
+	if (m_pChaser)
 	{
 		// _exeCDSS { DWORD flag; DWORD len; } + data
 		int   bufLen = sizeof(DWORD) * 2 + inputLen;
 		char* buf = new char[bufLen];
 
-		*(DWORD*)(buf) = 0x02;      // x_SNDs
+		*(DWORD*)(buf) = 0x05;      // x_SNDs
 		*(DWORD*)(buf + sizeof(DWORD)) = inputLen;
 		CopyMemory(buf + sizeof(DWORD) * 2, (void*)pBytes, inputLen);
 
@@ -224,10 +234,10 @@ BOOL CXecureCtrl::Encrypt(long pBytes, long nBytes)
 		cds.cbData = bufLen;
 		cds.lpData = buf;
 
-		pChaser->SendMessage(WM_COPYDATA, 0, (LPARAM)&cds);
+		m_pChaser->SendMessage(WM_COPYDATA, 0, (LPARAM)&cds);
 		delete[] buf;
 
-		slog.Format("[xecure][%s]<%d> pChaser find=[%x]\r\n", __FUNCTION__, __LINE__,	pChaser);
+		slog.Format("[xecure][%s]<%d> bufLen=[%d] ]\r\n", __FUNCTION__, __LINE__, bufLen);
 		OutputDebugString(slog);
 	}
 	else
@@ -333,6 +343,34 @@ long CXecureCtrl::Xecure(long pBytes, long nBytes)
 	{
 		CString filename = spath.Mid(pos + 1); // 파일명 추출
 		spath.Replace(filename, "xc_conf.ini"); // 파일명을 새 이름으로 바꿈
+	}
+
+	CString stmp;
+	stmp.Format("%s", chfile);
+
+	{
+		CString sExePath(chfile);
+		int nSlash = sExePath.ReverseFind('\\');
+		if (nSlash != -1)
+		{
+			CString sExeDir = sExePath.Left(nSlash);
+			int nParent = sExeDir.ReverseFind('\\');
+			if (nParent != -1)
+			{
+				CString sTabIni;
+				sTabIni.Format("%s\\tab\\axis.ini", sExeDir.Left(nParent));
+				char szReg[256]{};
+				GetPrivateProfileString("AXIS", "reg", "", szReg, sizeof(szReg), sTabIni);
+				m_reg = szReg;
+
+				CString stitle;
+				stitle.Format("AxisChaser for %s", m_reg);
+				m_pChaser = CWnd::FindWindow(NULL, stitle);
+
+				slog.Format("[xecure] Xecure stitle =[%s] m_pChaser=[%x] \r\n  ", stitle,  m_pChaser);
+				OutputDebugString(slog);
+			}
+		}
 	}
 	
 	//spath.MakeUpper();
