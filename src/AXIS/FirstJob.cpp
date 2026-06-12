@@ -6,190 +6,91 @@
 
 CFirstJob::CFirstJob()
 {
-	//** delete usertool.ini in user area
-	
-	CProfile profile(pkAxis);
-	const BOOL bFirst = profile.GetInt("Stamp", "InitUserTool", 1);
-
-	if (bFirst)
-	{
-		DeleteUserFile(Format("%s\\%s", Axis::home, "user"), "usertool.ini");
-		profile.Write("Stamp", "InitUserTool", 0);
-	}
-
-	DeleteGarbageFiles();
+	PatchModules();
 }
 
-
-void CFirstJob::DeleteUserFile(const char* root, const char* fileName)
+bool CFirstJob::FileExists(const CString& path)
 {
-	CString folder(root);
+	return GetFileAttributes(path) != INVALID_FILE_ATTRIBUTES;
+}
 
-	if (folder.IsEmpty())
+bool CFirstJob::CopyFileSafe(const CString& src, const CString& dst)
+{
+	return ::CopyFile(src, dst, FALSE) != FALSE;
+}
+
+// Controlled by {home}\tab\devpatch.ini
+//   [PATCH]
+//   activate=original  ; trans=apply patch, original=restore original
+//   state=original     ; managed by this code, do not edit manually
+//
+//   [MODULES]
+//   IB202700.dll=IB202200.dll
+//   cx_interest.dll=cx_interest.dll
+void CFirstJob::PatchModules()
+{
+	CString iniPath;
+	iniPath.Format("%s\\%s\\devpatch.ini", Axis::home, TABDIR);
+
+	if (!FileExists(iniPath))
 		return;
-	
-	if (folder[folder.GetLength() - 1] != '\\')
-		folder += '\\';
 
-	CFileFind ff;
-	BOOL exist = FALSE;
+	char buf[16] = { 0 };
+	GetPrivateProfileString("PATCH", "activate", "original", buf, sizeof(buf), iniPath);
+	const CString activate(buf);
 
-	if (ff.FindFile(folder + "*.*"))
+	GetPrivateProfileString("PATCH", "state", "original", buf, sizeof(buf), iniPath);
+	const CString state(buf);
+
+	if (activate == state)
+		return;
+
+	char sectionBuf[4096] = { 0 };
+	GetPrivateProfileSection("MODULES", sectionBuf, sizeof(sectionBuf), iniPath);
+
+	bool allOk = true;
+	for (const char* p = sectionBuf; *p; p += strlen(p) + 1)
 	{
-		while (ff.FindNextFile())
+		CString entry(p);
+		const int sep = entry.Find('=');
+		if (sep <= 0)
+			continue;
+
+		CString gexName = entry.Left(sep);
+		CString devName = entry.Mid(sep + 1);
+		gexName.TrimRight(); devName.TrimRight();
+		if (gexName.IsEmpty() || devName.IsEmpty())
+			continue;
+
+		CString devFile, gexFile, bakFile;
+		devFile.Format("%s\\%s\\%s", Axis::home, DEVDIR, devName);
+		gexFile.Format("%s\\%s\\%s", Axis::home, GEXDIR, gexName);
+		bakFile.Format("%s\\%s\\%s.org", Axis::home, GEXDIR, devName);
+
+		if (activate == "trans")  //변환
 		{
-			if (ff.IsDirectory() && !ff.IsDots())
+			if (!FileExists(gexFile))
 			{
-				DeleteUserFile(ff.GetFilePath(), fileName);
+				allOk = false;
+				continue;
 			}
-			else if (!ff.IsDirectory()) 
+			if (FileExists(devFile) && !CopyFileSafe(devFile, bakFile))
 			{
-				if (ff.GetFileName().CompareNoCase(fileName) == 0)
-					exist = TRUE;
+				allOk = false;
+				continue;
 			}
+			if (!CopyFileSafe(gexFile, devFile))
+				allOk = false;
 		}
-		if (ff.IsDirectory() && !ff.IsDots())
+		else   //원복
 		{
-			DeleteUserFile(ff.GetFilePath(), fileName);
-		}
-		else if (!ff.IsDirectory()) 
-		{
-			if (ff.GetFileName().CompareNoCase(fileName) == 0)
-				exist = TRUE;
-		}
-
-		ff.Close();
-	}
-
-	if (exist)
-	{
-		TRY
-		{
-			CFile::Remove(folder + fileName);
-		}
-		CATCH(CFileException, e)
-		{
-		}
-		END_CATCH;
-	}
-}
-
-void CFirstJob::IncreaseDate(CString& date, CString today)
-{
-	int year{}, month{}, day{};
-	
-	if (date.GetLength() != 10)
-	{
-		date = today;
-		return;
-	}
-	year = atoi(date.Mid(0, 4));
-	month = atoi(date.Mid(5, 2));
-	day = atoi(date.Mid(8, 2));
-
-	if (year * month * day == 0)
-	{
-		date = today;
-		return;
-	}
-
-	CTime tm(year, month, day, 0, 0, 0);
-
-	const CTimeSpan ts(1, 0, 0, 0);
-	tm += ts;
-
-	date = tm.Format("%Y.%m.%d");
-}
-
-void CFirstJob::DeleteFile(const char* fileName)
-{
-	CString file(fileName), path;
-	CString pathSign;
-
-	const int find = file.Find('/');
-	if (find > 0)
-	{
-		pathSign = file.Left(find);
-		file.Delete(0, find + 1);
-	}
-	else
-		return;
-
-	pathSign.MakeUpper();
-
-	if (pathSign == "MAP")
-		path = MakeMapFileName(file);
-	else
-		path.Format("%s\\%s\\%s", Axis::home, pathSign, file);
-
-	if (path.IsEmpty())
-		return;
-
-	TRY 
-	{
-		TRACE("Deleting file = %s\n", path);
-		CFile::Remove(path);
-	}
-	CATCH (CFileException, e)
-	{
-		
-	}
-	END_CATCH;		
-}
-
-CString CFirstJob::MakeMapFileName(const char* fileName)
-{
-	CString file(fileName);
-	file.MakeUpper();
-
-	if (file.Left(2) != "IB")
-		return "";
-
-	return Format("%s\\MAP\\%s\\%s\\%s", Axis::home, "IB", file.Left(3), file);
-}
-
-void CFirstJob::DeleteGarbageFiles()
-{
-	CProfile profile(pkUserConfig);
-	CString lastDate = profile.GetString("FIRSTJOB", "FileDeleteDate", "2008.06.12");
-	CProfile delfile(Format("%s\\%s\\deletefile.ini", Axis::home, TABDIR));
-	CString today(CTime::GetCurrentTime().Format("%Y.%m.%d"));
-	CString lastUpdate = delfile.GetString("SET", "LastDate", today);
-	CString buffer, line;
-	int find{};
-
-	while (lastDate < lastUpdate)
-	{
-		IncreaseDate(lastDate, today);
-
-		buffer = delfile.GetSectionLF(lastDate);
-
-		while (!buffer.IsEmpty())
-		{
-			find = buffer.Find('\n');
-			if (find < 0)
-			{
-				line = buffer;
-				buffer.Empty();
-			}
-			else
-			{
-				line = buffer.Left(find);
-				buffer.Delete(0, find + 1);
-			}
-
-			line = buffer.Left(find);
-
-			line.Replace("\r", "");
-			line.Replace("\n", "");
-
-			Trim(line);
-
-			if (!line.IsEmpty())
-				DeleteFile(line);
+			if (!FileExists(bakFile))
+				continue;
+			if (!CopyFileSafe(bakFile, devFile))
+				allOk = false;
 		}
 	}
 
-	profile.Write("FIRSTJOB", "FileDeleteDate", today);
+	if (allOk)
+		WritePrivateProfileString("PATCH", "state", activate, iniPath);
 }
-

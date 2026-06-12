@@ -3,6 +3,7 @@
 
 #define VBSCRIPT	0
 #define LUA		1
+#define PYTHON		2
 
 #define BUF_SIZE	1024 * 50
 #define SEQ_FORMAT	0x08

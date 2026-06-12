@@ -692,7 +692,9 @@ void CControlWnd::SendToMap(CString sData, bool bAll, CString sAccn/* = ""*/)
 			m_dataList = sAccn + m_dataList;
 	}
 
-	
+	CString tmpdateS;
+	tmpdateS = dateS;
+	tmpdateS.TrimRight();
 	if (m_flag == "A" || m_flag == "I" || m_flag == "D")
 	{
 		m_slog.Format("[cx_notify] [%s]<%d> [일시전송] flag=[%s] sCode=[%s]", __FUNCTION__, __LINE__, m_flag, sCode);
@@ -703,9 +705,43 @@ void CControlWnd::SendToMap(CString sData, bool bAll, CString sAccn/* = ""*/)
 	{
 		m_pParent->SendMessage(WM_USER, MAKEWPARAM(eventDLL, MAKEWORD(m_Param.key, evOnDblClk/*DblClick*/)), (LPARAM)m_Param.name.GetString());
 	}
+	else if (tmpdateS.GetLength() > 0)
+	{
+		// 신용 즉시 전달
+		m_pParent->SendMessage(WM_USER, MAKEWPARAM(eventDLL, MAKEWORD(m_Param.key, evOnDblClk)),
+			(LPARAM)m_Param.name.GetString());
+
+		// pendingMap에서 같은 sCode의 일반 항목 검색
+		// keyS 포맷: jggb(2) + code(12) + date(8) + sygb(2)
+		CString foundKey;
+		POSITION sp = m_pendingMap.GetStartPosition();
+		while (sp != nullptr)
+		{
+			CString k, v;
+			m_pendingMap.GetNextAssoc(sp, k, v);
+			CString codeInKey = k.Mid(LEN_JGGB, LEN_ACODE);  codeInKey.TrimRight();
+			CString dateInKey = k.Mid(LEN_JGGB + LEN_ACODE, LEN_DATE);  dateInKey.TrimRight();
+			if (codeInKey == sCode && dateInKey.IsEmpty())
+			{
+				foundKey = k;
+				break;
+			}
+		}
+		if (!foundKey.IsEmpty())
+		{
+			CString pendingData;
+			m_pendingMap.Lookup(foundKey, pendingData);
+			m_pendingMap.RemoveKey(foundKey);
+			m_flag = "U";
+			m_dataList = pendingData;
+			m_pParent->SendMessage(WM_USER, MAKEWPARAM(eventDLL, MAKEWORD(m_Param.key,
+				evOnDblClk)),
+				(LPARAM)m_Param.name.GetString());
+		}
+	}
 	else if (m_Version == VS_TIMER)
 	 {
-		 m_pendingMap.SetAt(sCode, m_dataList);
+		 m_pendingMap.SetAt(keyS, m_dataList);
 	 }
 	//else if (m_diffSec > 0 && m_Version == VS_SKIP)
 	//{

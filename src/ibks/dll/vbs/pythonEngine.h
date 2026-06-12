@@ -1,11 +1,13 @@
 #pragma once
 
-#include <Python.h>
 #include <afxtempl.h>
 
+// Forward declaration - Python.h is only needed in pythonEngine.cpp
+struct _object;
+typedef struct _object PyObject;
+
 /////////////////////////////////////////////////////////////////////////////
-// CPythonEngine
-// CScriptEngine 과 동일한 public 인터페이스 - 내부만 CPython C API 사용
+// CPythonEngine - same public interface as CScriptEngine, Python C API inside
 
 class AFX_EXT_CLASS CPythonEngine
 {
@@ -19,9 +21,9 @@ public:
 
 protected:
 	CWnd*		m_parent;
-	PyObject*	m_module;		// 스크립트 실행 결과 모듈 (globals dict)
-	PyObject*	m_globals;		// 전역 네임스페이스 dict
-	CStringArray	m_errors;	// 에러 메시지 목록
+	PyObject*	m_module;		// script globals dict
+	PyObject*	m_globals;		// global namespace dict
+	CStringArray	m_errors;	// error message list
 
 // Operations
 public:
@@ -42,5 +44,5 @@ public:
 private:
 	PyObject*	getFunction(CString procs);
 	void		fetchError();
-	CString		m_maps;		// 현재 맵 이름 (에러 표시용)
+	CString		m_maps;		// map name for error messages
 };

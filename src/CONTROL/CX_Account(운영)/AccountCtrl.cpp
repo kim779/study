@@ -6333,46 +6333,77 @@ CString CAccountCtrl::DecryptAccount(const CString& sEncrypted)
 
 CString CAccountCtrl::ReadAccountHistory(const CString& strUserPath, const CString& strKey)
 {
-	CString slog;
-	CString cached;
-	if (m_accHistoryCache.Lookup(strKey, cached))
-	{
-		slog.Format("!!!!!!!!!! [ACCENC][%s]<%d>  strKey=[%s]", __FUNCTION__, __LINE__, strKey);
-		Output_DebugString(slog);
-		return cached;  // 디스크 + 복호화 SKIP
-	}
+	 CString slog;
+        CString cached;
+        if (m_accHistoryCache.Lookup(strKey, cached))
+        {
+			slog.Format("[READ_CACHE] [ACCENC][%s]<%d>  strKey=[%s]", __FUNCTION__, __LINE__, strKey);
+                Output_DebugString(slog);
+                return cached;
+        }
 
-	char readb[2048 * 64]{};
-	GetPrivateProfileStringA("AccountHistory", strKey, "", readb, sizeof(readb), strUserPath);
+		char readb[2048 * 64]{};
+		GetPrivateProfileStringA("AccountHistory", strKey, "", readb, sizeof(readb), strUserPath);
 
-	CString val(readb);
-	if (val.IsEmpty())
-	{
-		m_accHistoryCache.SetAt(strKey, val);   // 빈 값도 캐시
-		return val;
-	}
+        CString val(readb);
+        if (val.IsEmpty())
+        {
+                m_accHistoryCache.SetAt(strKey, val);
+                return val;
+        }
 
-	if (val.Find('|') >= 0)
-	{
-		m_accHistoryCache.SetAt(strKey, val);   // 평문(구버전) 데이터도 캐시
-		return val;
-	}
+        // Check encryption enabled from axisai.ini
+        CString axisaiPath;
+        axisaiPath.Format("%s\\tab\\axisai.ini", Variant(homeCC, ""));
+        int encEnabled = GetPrivateProfileIntA("ENC", "acchistory", 0, axisaiPath);
 
-	// 암호화 여부 확인
-	char status[8] = {};
-	GetPrivateProfileStringA("ENCRYPT", "STATUS", "0", status, _countof(status), strUserPath);
-	if (strcmp(status, "1") == 0)
-	{
-		auto key = DeriveKeyFromRegkey(m_regkey);
-		val = AesDecrypt(val, key);
-		SecureZeroMemory(key.data(), key.size());
+        // '|' present = plain text, return as-is
+        // '|' absent + enc enabled = encrypted -> decrypt
+		if (val.Find('|') < 0 && encEnabled == 1)
+		{
+			try
+			{
+				auto key = DeriveKeyFromRegkey(m_regkey);
 
-		slog.Format("---[ACCENC][%s]<%d>len=[%d] val=[%s] strKey=[%s]", __FUNCTION__, __LINE__, val.GetLength(), val.Left(10), strKey);
-		Output_DebugString(slog);
-	}
+				CString decrypted;
+				CString remaining = val;
+				int pos = 0;
+				bool first = true;
+				while ((pos = remaining.Find('\t')) != -1)
+				{
+					CString part = remaining.Left(pos);
+					if (!part.IsEmpty())
+					{
+						CString dec = AesDecrypt(part, key);
+						slog.Format("[READ_ENC] [ACCENC][%s]<%d>  dec=[%s]", __FUNCTION__, __LINE__, dec);
+						Output_DebugString(slog);
+						if (!first) decrypted += '\t';
+						decrypted += dec;
+						first = false;
+					}
+					remaining = remaining.Mid(pos + 1);
+				}
+				if (!remaining.IsEmpty())
+				{
+					CString lastDec = AesDecrypt(remaining, key);
+					slog.Format("[READ_ENC] [ACCENC][%s]<%d>  lastDec=[%s]", __FUNCTION__, __LINE__, lastDec);
+					Output_DebugString(slog);
+					if (!first) decrypted += '\t';
+					decrypted += lastDec;
+				}
+				val = decrypted;
 
-	m_accHistoryCache.SetAt(strKey, val);
-	return val;
+				SecureZeroMemory(key.data(), key.size());
+			}
+			catch (const std::exception& e)
+			{
+				slog.Format("[DEC_FAIL] [ACCENC][%s]<%d>  key=[%s] err=[%s]", __FUNCTION__, __LINE__, strKey, e.what());
+				Output_DebugString(slog);
+			}
+		}
+
+        m_accHistoryCache.SetAt(strKey, val);
+        return val;
 }
 
 // ── 쓰기 공통 헬퍼 (새로 추가) ──────────────────────────────────
@@ -6382,24 +6413,27 @@ void CAccountCtrl::WriteAccountHistory(const CString& strUserPath, const CString
 	if (m_accHistoryCache.Lookup(strKey, cached) && cached == strData)
 	{
 		CString slog;
-		slog.Format("@@@@@ [ACCENC][%s]<%d>  strKey=[%s] (skip-write)", __FUNCTION__, __LINE__, strKey);
+		slog.Format("[WRITE_CACHE] [ACCENC][%s]<%d>  strKey=[%s] (skip-write)", __FUNCTION__, __LINE__, strKey);
 		Output_DebugString(slog);
 		return;
 	}
 
+	// Check encryption enabled from axisai.ini
+	CString axisaiPath;
+	axisaiPath.Format("%s\\tab\\axisai.ini", Variant(homeCC, ""));
+	int encEnabled = GetPrivateProfileIntA("ENC", "acchistory", 0, axisaiPath);
+
 	CString valToWrite = strData;
 
-	// 암호화 여부 확인
-	char status[8] = {};
-	GetPrivateProfileStringA("ENCRYPT", "STATUS", "0", status, _countof(status), strUserPath);
-	if (strcmp(status, "1") == 0 && !strData.IsEmpty())
+	// '|' present + enc enabled = plain text -> encrypt before write
+	if (!strData.IsEmpty() && strData.Find('|') >= 0 && encEnabled == 1)
 	{
 		auto key = DeriveKeyFromRegkey(m_regkey);
 		valToWrite = AesEncrypt(strData, key);
 		SecureZeroMemory(key.data(), key.size());
 
 		CString slog;
-		slog.Format("----[ACCENC][%s]<%d>len=[%d] strData=[%s]  strKey=[%s]", __FUNCTION__, __LINE__, strData.GetLength(), strData.Left(10), strKey);
+		slog.Format("[WRITE_ENC][ACCENC][%s]<%d>len=[%d] strData=[%s]  strKey=[%s]  [%d] [%s]", __FUNCTION__, __LINE__, strData.GetLength(), strData.Left(10), strKey, valToWrite.GetLength(), valToWrite);
 		Output_DebugString(slog);
 	}
 

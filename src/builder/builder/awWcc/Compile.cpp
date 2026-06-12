@@ -1,4 +1,4 @@
-// Compile.cpp : ±¸Çö ÆÄÀÏÀÔ´Ï´Ù.
+// Compile.cpp : ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ô´Ï´ï¿½.
 //
 
 #include "stdafx.h"
@@ -99,7 +99,7 @@ bool CCompile::makeHTSBinaryFile(CString strTmp, mapForm* mapH)
 		setMessage(-1, 7);
 		return false;
 	}
-	BYTE ScpKind = VBSCRIPT;
+	BYTE ScpKind = mapH->pythonMode ? PYTHON : VBSCRIPT;
 
 	CBinaryMngr BinaryMngr;
 	BinaryMngr.AddBinaryData(&mapH->vers	,	sizeof(mapH->vers	));

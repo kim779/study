@@ -166,6 +166,8 @@ BOOL CAxisApp::InitInstance()
 	const char* defaultRegKey = "IBK투자증권MAC";	// REAL		IBKMAC_STAFF REAL/직원
 #endif // _DEBUG
 	
+	SetOtherCore();
+
 	m_regkey = defaultRegKey;
 
 #ifndef _DEBUG
@@ -376,14 +378,32 @@ BOOL CAxisApp::InitInstance()
 	if (!pMainFrame->Start(Axis::userID))
 		return FALSE;
 
-	const CFirstJob fj;
-	
 	pMainFrame->ShowWindow(SW_HIDE);
 	pMainFrame->UpdateWindow();
 	pMainFrame->PostMessage(WM_USER+500, MAKEWPARAM(3/*axAXIS*/, 0), 0);
 
 	
 	return TRUE;
+}
+
+void CAxisApp::SetOtherCore()
+{
+	SYSTEM_INFO si; GetSystemInfo(&si);
+	DWORD_PTR allCoresMask = ((DWORD_PTR)1 << si.dwNumberOfProcessors) - 1;
+	DWORD_PTR mainThreadCore = ::SetThreadAffinityMask(::GetCurrentThread(), allCoresMask);
+
+	BOOL fBool = ::SetThreadPriority(::GetCurrentThread(), THREAD_PRIORITY_HIGHEST); //THREAD_PRIORITY_HIGHEST THREAD_PRIORITY_ABOVE_NORMAL
+
+	if (!fBool)
+	{
+		CString msg; msg.Format("[wizard] main SetThreadPriority error = [%x][%d]\n", mainThreadCore, GetLastError());
+		OutputDebugString(msg);
+	}
+	else {
+		CString msg; msg.Format("[wizard] main SetThreadPriority success = [%x][\n", mainThreadCore);
+		OutputDebugString(msg);
+	}
+
 }
 
 #pragma warning(default : 26409)

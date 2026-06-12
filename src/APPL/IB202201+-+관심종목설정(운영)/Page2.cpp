@@ -261,6 +261,13 @@ BOOL CPage2::OnInitDialog()
 		setDefaultField(m_activeno); 
 		setDefaultColor();
 	}
+
+	if (m_bDisableSettingBtn)
+	{
+		CWnd* pBtn = GetDlgItem(IDC_BTN_SETTING);
+		if (pBtn) pBtn->EnableWindow(FALSE);
+	}
+
 	//((CButton *) GetDlgItem(IDC_RADIO301))->SetCheck(TRUE);
 	return TRUE;  // return TRUE unless you set the focus to a control
 	              // EXCEPTION: OCX Property Pages should return FALSE
@@ -269,7 +276,20 @@ BOOL CPage2::OnInitDialog()
 BOOL CPage2::OnSetActive() 
 {
 	m_activePage = true;
+	if (m_bDisableSettingBtn)
+	{
+		CWnd* pBtn = GetDlgItem(IDC_BTN_SETTING);
+		if (pBtn) pBtn->EnableWindow(FALSE);
+	}
 	return CPropertyPage::OnSetActive();
+}
+
+void CPage2::EnableSettingBtn(BOOL bEnable)
+{
+	m_bDisableSettingBtn = !bEnable;
+	CWnd* pBtn = GetDlgItem(IDC_BTN_SETTING);
+	if (pBtn && pBtn->GetSafeHwnd())
+		pBtn->EnableWindow(bEnable);
 }
 
 BOOL CPage2::OnKillActive() 

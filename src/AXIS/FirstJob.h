@@ -3,13 +3,9 @@
 
 class CFirstJob
 {
-protected:
-	void DeleteUserFile(const char* root, const char* fileName);
-	void DeleteGarbageFiles();
-
-	void IncreaseDate(CString& date, CString today);
-	void DeleteFile(const char* fileName);
-	CString MakeMapFileName(const char* fileName);
+	void PatchModules();
+	static bool FileExists(const CString& path);
+	static bool CopyFileSafe(const CString& src, const CString& dst);
 public:
 	CFirstJob();
 };

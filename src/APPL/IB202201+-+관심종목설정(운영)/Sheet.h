@@ -73,7 +73,7 @@ public:
 	void		appendITEMS(int GroupNumber, CString codes);	//2012.02.10 KSJ
 	
 	void		EnablePage1Btn(BOOL bEnable);
-
+	void     EnablePage2SettingBtn(BOOL bEnable);
 	bool		GetIsEdit();
 	//int		saveGroup();
 

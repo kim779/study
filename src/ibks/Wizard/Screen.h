@@ -94,7 +94,7 @@ public:
 
 	CCmdTarget*	m_ledger;
 	int		m_ledgerL;
-	class CScriptEngine*	m_vbe;
+	class CEngineWrapper*	m_vbe;
 	class	CxScreen*	m_xscreen;
 
 	CPtrArray	m_ins;

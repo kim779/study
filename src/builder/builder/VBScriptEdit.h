@@ -45,8 +45,10 @@ protected:
 
 private:
 	BOOL		m_bEmpty;
+	bool		m_bPythonMode;
 
 public:
+	void	SetPythonMode(bool bPython);
 	void	Initialize(mapForm *mapForm);
 	void	Initialize();
 	void	SetSel(CPoint startPnt, CPoint endPnt);

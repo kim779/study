@@ -50,7 +50,8 @@ CVBScriptEdit::CVBScriptEdit()
 	m_pAutoDlg  = NULL;
 	m_pAutoTip  = NULL;
 
-	m_bEmpty    = TRUE;
+	m_bEmpty      = TRUE;
+	m_bPythonMode = false;
 
 	m_sControlName.Empty();
 }
@@ -95,11 +96,11 @@ int CVBScriptEdit::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	m_lf.lfClipPrecision  = CLIP_DEFAULT_PRECIS;
 	m_lf.lfQuality        = DEFAULT_QUALITY;
 	m_lf.lfPitchAndFamily = DEFAULT_PITCH | FF_DONTCARE;
-	strcpy_s(m_lf.lfFaceName, LF_FACESIZE, _T("±¼¸²Ã¼"));
+	strcpy_s(m_lf.lfFaceName, LF_FACESIZE, _T("ï¿½ï¿½ï¿½ï¿½Ã¼"));
 
 	CDC *pDC = GetDC();
 	FONTENUMPROC pFunc = (FONTENUMPROC) EnumFontFamProc;
-	if (EnumFontFamilies(pDC->m_hDC, _T("±¼¸²Ã¼"), pFunc, 2) != 2)
+	if (EnumFontFamilies(pDC->m_hDC, _T("ï¿½ï¿½ï¿½ï¿½Ã¼"), pFunc, 2) != 2)
 	{
 		m_lf.lfHeight         = 10;
 		m_lf.lfCharSet        = ANSI_CHARSET;
@@ -119,22 +120,34 @@ CCrystalTextBuffer* CVBScriptEdit::LocateTextBuffer()
 	return &m_buf;
 }
 
-void CVBScriptEdit::OnLButtonDown(UINT nFlags, CPoint point) 
+void CVBScriptEdit::SetPythonMode(bool bPython)
 {
-	SetFocus();
-	void* pVal = (void *)AfxGetMainWnd()->SendMessage(WM_USER, ID_USR_MEDIA);
-	BYTE byteMedia;
-	memcpy(&byteMedia, pVal, sizeof(BYTE));
-	if (byteMedia == MEDIA_HTS)
-	{
-		m_strKeywords = m_strKeywordsLower = szKeywords;
-		
-	}
-	else
-	{
-		m_strKeywords = m_strKeywordsLower = szLuaKeywords;
+	m_bPythonMode = bPython;
+	if (bPython) {
+		m_strKeywords   = m_strKeywordsLower   = szPythonKeywords;
+		m_strConstants  = m_strConstantsLower  = szPythonConstants;
+	} else {
+		void* pVal = (void *)AfxGetMainWnd()->SendMessage(WM_USER, ID_USR_MEDIA);
+		BYTE byteMedia = MEDIA_HTS;
+		if (pVal) memcpy(&byteMedia, pVal, sizeof(BYTE));
+		m_strKeywords = m_strKeywordsLower = (byteMedia == MEDIA_HTS) ? szKeywords : szLuaKeywords;
+		m_strConstants = m_strConstantsLower = szConstants;
 	}
 	m_strKeywordsLower.MakeLower();
+	m_strConstantsLower.MakeLower();
+	InvalidateRect(NULL);
+}
+
+void CVBScriptEdit::OnLButtonDown(UINT nFlags, CPoint point)
+{
+	SetFocus();
+	if (!m_bPythonMode) {
+		void* pVal = (void *)AfxGetMainWnd()->SendMessage(WM_USER, ID_USR_MEDIA);
+		BYTE byteMedia;
+		memcpy(&byteMedia, pVal, sizeof(BYTE));
+		m_strKeywords = m_strKeywordsLower = (byteMedia == MEDIA_HTS) ? szKeywords : szLuaKeywords;
+		m_strKeywordsLower.MakeLower();
+	}
 	CCrystalEditView::OnLButtonDown(nFlags, point);
 }
 
@@ -230,8 +243,9 @@ DWORD CVBScriptEdit::ParseLine(DWORD dwCookie, int nLineIndex, TEXTBLOCK *pBuf, 
 			}
 			continue;
 		}
-		// Comment '
-		if (pszChars[ii] == _T('\''))
+		// Comment: ' for VBScript, # for Python
+		if ((!m_bPythonMode && pszChars[ii] == _T('\'')) ||
+		    ( m_bPythonMode && pszChars[ii] == _T('#')))
 		{
 			DEFINE_BLOCK(ii, COLORINDEX_COMMENT);
 			dwCookie |= COOKIE_COMMENT;

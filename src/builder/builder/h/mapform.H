@@ -132,6 +132,7 @@ public:
 
 		ZeroMemory(controller, 128);
 		alpha = 0;
+		pythonMode = false;
 	}
 public:
 	BYTE	vers;			// version
@@ -239,6 +240,8 @@ public:
 
 	char	controller[128];	// mobile form controller
 	int	alpha;			// mobile alpha
+
+	bool	pythonMode;		// if true, script is Python (otherwise VBScript)
 
 };
 #pragma	pack()

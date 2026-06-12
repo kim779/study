@@ -48,6 +48,7 @@ public:
 	CString		m_root;
 	CString		m_name;
 	bool		m_activePage;
+	bool     m_bDisableSettingBtn{};
 
 	BOOL m_bSet;				//메뉴 탐색기가 꺼졌는지 
 
@@ -100,6 +101,7 @@ public:
 
 	void	CheckField(CString text);
 	BOOL	endSendAction();
+	void    EnableSettingBtn(BOOL bEnable);
 protected:
 	BOOL	AddColumn(CListCtrl *ctrl, LPCTSTR string, int item, int width);
 	int	AddItem(CListCtrl *ctrl, LPCSTR string, int nitem, int nSubItem = -1);

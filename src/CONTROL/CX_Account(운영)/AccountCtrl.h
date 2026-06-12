@@ -428,6 +428,7 @@ protected:
 	CMapStringToString m_accHistoryCache;
 	CString m_strLastSavedAcc{};
 	CString m_regkey{};
+	CString m_bAccEnc{};
 	void WriteAccountHistory(const CString& strUserPath, const CString& strKey, const CString& strData);
 	CString ReadAccountHistory(const CString& strUserPath, const CString& strKey);
 public:

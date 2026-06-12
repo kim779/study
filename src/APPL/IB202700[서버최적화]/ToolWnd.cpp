@@ -606,6 +606,9 @@ BOOL CToolWnd::OnCommand(WPARAM wParam, LPARAM lParam)
 			
 			sztmp.Format("%s /p5 /S /d %s%c%d%c%s%c", MAP_CONFIG, "selectGROUP", P_TAB ,GroupNumber , P_NEW , "NO", P_TAB);
 			m_pMainWnd->SendMessage(WM_MANAGE, MAKEWPARAM(MK_OPENSCR, typePOPUP), (LPARAM)sztmp.operator LPCTSTR());
+			sztmp.Format("%s /p5 /S/d%s", MAP_CONFIG, "disableFieldSetupBtn");
+			m_pMainWnd->SendMessage(WM_MANAGE, MAKEWPARAM(MK_OPENSCR, typePOPUP),
+				(LPARAM)sztmp.operator LPCTSTR());
 
 		}
 		break;

@@ -19,7 +19,7 @@
 #include "../dll/form/fmctrl.h"
 #include "../dll/form/fmgrid.h"
 #include "../dll/form/fmtable.h"
-#include "../dll/vbs/scriptEngine.h"
+#include "../dll/vbs/engineWrapper.h"
 
 #ifdef _DEBUG
 #undef THIS_FILE
@@ -37,7 +37,7 @@ CScreen::CScreen(CClient* client, CRect rect)
 	m_client = client;
 	m_rect   = rect;
 	m_guard  = client->m_guard;
-	m_vbe    = new CScriptEngine(m_guard->GetParent());
+	m_vbe    = new CEngineWrapper(m_guard->GetParent());
 
 	m_mapH    = NULL;
 	m_view    = m_client->m_view;
@@ -396,6 +396,23 @@ bool CScreen::Parse(bool resize, bool fix)
 		CString	pubs;
 
 		text = CString(m_scriptR, m_mapH->strR - m_mapH->scriptR);
+
+		// [TEST] if sidecar .py file exists, use it instead of embedded script
+		{
+			CString pyPath = m_guard->PathMAP(CString(m_mapH->mapN, L_MAPN)) + _T(".py");
+			CFile pyFile;
+	
+			if (pyFile.Open(pyPath, CFile::modeRead | CFile::shareDenyNone)) {
+				UINT flen = (UINT)pyFile.GetLength();
+				char* buf = new char[flen + 1];
+				pyFile.Read(buf, flen);
+				buf[flen] = '\0';
+				pyFile.Close();
+				text = CString(buf, flen);
+				delete[] buf;
+			}
+		}
+
 		getExternalScript(text, pubs);
 
 		if (!pubs.IsEmpty())
@@ -1670,7 +1687,7 @@ bool CScreen::OnTRAN(bool byKey)
 			continue;
 		}
 
-		//if (!(form->m_form->attr & FA_SKIP))  //½ºÅµÀÌ µÇÀÖ´Â 
+		//if (!(form->m_form->attr & FA_SKIP))  //ï¿½ï¿½Åµï¿½ï¿½ ï¿½ï¿½ï¿½Ö´ï¿½ 
 		{
 			if (!form->IsValid(guide))
 			{
@@ -2239,7 +2256,7 @@ void CScreen::OnProfit(CfmBase* form)
 			if (dir != -1)
 			{
 				form->ReadData(text, false, -1, dir, ii);
-				if (text.Find(_T("¸Åµµ")) != -1 || text.Find('S') != -1)
+				if (text.Find(_T("ï¿½Åµï¿½")) != -1 || text.Find('S') != -1)
 					sum = tmpv + (tmpv - (sum + m_profit->m_charge ? v_charge * 2 : 0));
 			}
 
@@ -2285,7 +2302,7 @@ void CScreen::OnProfit(CfmBase* form)
 					if (dir != -1)
 					{
 						form->ReadData(text, false, -1, dir, kk);
-						if (text.Find(_T("¸Åµµ")) != -1 || text.Find('S') != -1)
+						if (text.Find(_T("ï¿½Åµï¿½")) != -1 || text.Find('S') != -1)
 							tmpv = -tmpv;
 					}
 					if (tmpv)

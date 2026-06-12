@@ -1751,18 +1751,18 @@ BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)
 				break;
 				case 'Z':
 				{
-					//CString sPath;
-					//CString strFilePath;
-					//CFile	file;
-					//CString sBuf;
-					//TCHAR	chFileName[128]{};
-					//GetModuleFileName(NULL, chFileName, MAX_PATH);
+					CString sPath;
+					CString strFilePath;
+					CFile	file;
+					CString sBuf;
+					TCHAR	chFileName[128]{};
+					GetModuleFileName(NULL, chFileName, MAX_PATH);
 
-					//strFilePath.Format(_T("%s"), chFileName);
-					//strFilePath = strFilePath.Left(strFilePath.ReverseFind('\\'));
-					//strFilePath.Replace("\\exe", "\\user");
+					strFilePath.Format(_T("%s"), chFileName);
+					strFilePath = strFilePath.Left(strFilePath.ReverseFind('\\'));
+					strFilePath.Replace("\\exe", "\\user");
 
-					//DecryptAllUserIni(strFilePath);
+					DecryptAllUserIni(strFilePath);
 					/*	CString stmp, stitle;
 						stmp.Format("950\t3\t951\t20240708173000\t952\t조건 만족 주문내역 확인");
 						ConclusionNotice(stmp, stitle);
@@ -33440,26 +33440,16 @@ std::map<CString, CString> CMainFrame::LoadAccountHistory(const CString& iniPath
 
 void CMainFrame::EncryptIniFile(const CString& iniPath, const std::vector<BYTE>& key)
 {
-	// 1. 이미 암호화된 파일 스킵
-	char status[8] = {};
-	GetPrivateProfileStringA("ENCRYPT", "STATUS", "0",
-		status, _countof(status), iniPath);
-	if (strcmp(status, "1") == 0)
-	{
-		return;
-	}
-
-	// 2. 백업
+	// Backup
 	CString backupPath = iniPath + ".bak";
 	DeleteFileA(backupPath);
 
-	m_slog.Format("[AXIS][ENC][%s]<%d>backupPath = [%s] iniPath=[%s]", __FUNCTION__, __LINE__, backupPath, iniPath);
+	m_slog.Format("[AXIS][ENC][%s]<%d> iniPath=[%s]", __FUNCTION__, __LINE__, iniPath);
 	OutputDebugString(m_slog);
 
 	if (!CopyFileA(iniPath, backupPath, FALSE))
 		throw std::runtime_error("Backup failed");
 
-	// 3. 원본 읽기
 	std::ifstream fin(iniPath, std::ios::binary);
 	if (!fin.is_open())
 		throw std::runtime_error("Cannot open ini file");
@@ -33467,31 +33457,14 @@ void CMainFrame::EncryptIniFile(const CString& iniPath, const std::vector<BYTE>&
 	std::ostringstream out;
 	std::string line;
 	bool inAccountHistory = false;
-	bool encryptSectionExists = false;
 
 	while (std::getline(fin, line))
 	{
-		// \r 제거 (CRLF 대응)
 		if (!line.empty() && line.back() == '\r')
 			line.pop_back();
 
 		if (!line.empty() && line.front() == '[')
 		{
-			// [ENCRYPT] 섹션은 나중에 우리가 직접 쓸거라 스킵
-			if (line == "[ENCRYPT]") {
-
-				m_slog.Format("[AXIS][ENC][%s]<%d>ENCRYPT ", __FUNCTION__, __LINE__);
-				OutputDebugString(m_slog);
-
-				encryptSectionExists = true;
-				// [ENCRYPT] 섹션 내용 라인들 스킵
-				while (std::getline(fin, line)) {
-					if (!line.empty() && line.back() == '\r')
-						line.pop_back();
-					if (!line.empty() && line.front() == '[')
-						break;  // 다음 섹션 시작 → 루프 밖에서 처리
-				}
-			}
 			inAccountHistory = (line == "[AccountHistory]");
 			out << line << '\n';
 			continue;
@@ -33505,11 +33478,32 @@ void CMainFrame::EncryptIniFile(const CString& iniPath, const std::vector<BYTE>&
 				std::string key_str = line.substr(0, eq);
 				std::string val = line.substr(eq + 1);
 
-				// VERSION 키 및 빈 값 제외
-				if (!val.empty() && key_str != "VERSION")
+				// '|' present = plain text -> encrypt
+				// '|' absent  = already encrypted
+				if (!val.empty())
 				{
-					CString encVal = AesEncrypt(CString(val.c_str()), key);
-					val = (LPCSTR)encVal;
+					// split by \t, encrypt each entry that contains '|'
+					std::vector<std::string> parts;
+					std::istringstream ss(val);
+					std::string token;
+					while (std::getline(ss, token, '\t'))
+						parts.push_back(token);
+
+					for (auto& part : parts)
+					{
+						if (!part.empty() && part.find('|') != std::string::npos)
+						{
+							CString encVal = AesEncrypt(CString(part.c_str()), key);
+							part = (LPCSTR)encVal;
+						}
+					}
+
+					val.clear();
+					for (size_t i = 0; i < parts.size(); i++)
+					{
+						if (i > 0) val += '\t';
+						val += parts[i];
+					}
 				}
 
 				out << key_str << '=' << val << '\n';
@@ -33521,12 +33515,6 @@ void CMainFrame::EncryptIniFile(const CString& iniPath, const std::vector<BYTE>&
 	}
 	fin.close();
 
-	// ★ [ENCRYPT] 섹션을 파일 끝에 직접 추가
-	out << "[ENCRYPT]\n";
-	out << "STATUS=1\n";
-	out << "VERSION=1\n";
-
-	// 4. tmp 저장 후 원자적 교체
 	CString tmpPath = iniPath + ".tmp";
 	{
 		std::ofstream fout(tmpPath, std::ios::binary);
@@ -33541,10 +33529,8 @@ void CMainFrame::EncryptIniFile(const CString& iniPath, const std::vector<BYTE>&
 		DeleteFileA(tmpPath);
 		throw std::runtime_error("File replace failed");
 	}
-	// ★ WritePrivateProfileStringA 호출 제거 - 위에서 직접 썼으므로
 
-	m_slog.Format("[AXIS][ENC][%s]<%d>backupPath = [%s],  삭제결과=[%d]", __FUNCTION__, __LINE__, backupPath, DeleteFileA(backupPath));
-	OutputDebugString(m_slog);
+
 }
 
 std::pair<int, int> CMainFrame::EncryptAllUserIni(const CString& rootPath)
@@ -33591,16 +33577,12 @@ std::pair<int, int> CMainFrame::EncryptAllUserIni(const CString& rootPath)
 				try {
 					if (fname == CString(fd.cFileName) + ".ini")
 					{
-						char bkStatus[8] = {};
-						GetPrivateProfileStringA("ENCRYPT", "STATUS", "0",
-							bkStatus, _countof(bkStatus), iniPath);
-						if (strcmp(bkStatus, "0") == 0)
+						CString endataPath;
+						endataPath.Format("%s\\endata.dll", (LPCSTR)userFolder);
+						if (GetFileAttributesA(endataPath) == INVALID_FILE_ATTRIBUTES)
 						{
-							CString backupPath;
-							backupPath.Format("%s\\endata.dll", (LPCSTR)userFolder);
-							CopyFileA(iniPath, backupPath, FALSE);
-
-							m_slog.Format("[ENC][BACKUP] [%s] -> [%s]", iniPath, backupPath);
+							CopyFileA(iniPath, endataPath, FALSE);
+							m_slog.Format("[ENC][BACKUP] [%s] -> [%s]", iniPath, endataPath);
 							OutputDebugString(m_slog);
 						}
 					}
@@ -33627,16 +33609,6 @@ std::pair<int, int> CMainFrame::EncryptAllUserIni(const CString& rootPath)
 
 void CMainFrame::DecryptIniFile(const CString& iniPath, const std::vector<BYTE>& enkey)
 {
-	// 1. 암호화 안 된 파일 스킵
-	char status[8] = {};
-	GetPrivateProfileStringA("ENCRYPT", "STATUS", "0",
-		status, _countof(status), iniPath);
-	if (strcmp(status, "1") != 0)
-	{
-		return;
-	}
-
-	// 2. 원본 읽기
 	std::ifstream fin(iniPath);
 	if (!fin.is_open())
 		throw std::runtime_error("Cannot open ini file");
@@ -33647,21 +33619,12 @@ void CMainFrame::DecryptIniFile(const CString& iniPath, const std::vector<BYTE>&
 
 	while (std::getline(fin, line))
 	{
-		if (!line.empty() && line.front() == '[') {
+		if (!line.empty() && line.back() == '\r')
+			line.pop_back();
+
+		if (!line.empty() && line.front() == '[')
+		{
 			inAccountHistory = (line == "[AccountHistory]");
-			// [ENCRYPT] 섹션은 출력에서 통째로 제거
-			if (line == "[ENCRYPT]") {
-				// [ENCRYPT] 섹션 라인들 스킵
-				while (std::getline(fin, line)) {
-					if (!line.empty() && line.front() == '[') {
-						// 다음 섹션 시작 - 여기서 다시 처리
-						inAccountHistory = (line == "[AccountHistory]");
-						out << line << '\n';
-					}
-					break;
-				}
-				continue;
-			}
 			out << line << '\n';
 			continue;
 		}
@@ -33674,10 +33637,9 @@ void CMainFrame::DecryptIniFile(const CString& iniPath, const std::vector<BYTE>&
 				std::string key = line.substr(0, eq);
 				std::string val = line.substr(eq + 1);
 
-				// VERSION 키 및 빈 값 제외
-				bool isExcluded = (key == "VERSION") || val.empty();
-
-				if (!isExcluded)
+				// '|' absent and not VERSION = encrypted -> decrypt
+				// '|' present = plain text, leave as-is
+				if (!val.empty() && key != "VERSION" && val.find('|') == std::string::npos)
 				{
 #ifdef DF_ENC_AES
 					CString decVal = AesDecrypt(CString(val.c_str()), enkey);
@@ -33688,7 +33650,6 @@ void CMainFrame::DecryptIniFile(const CString& iniPath, const std::vector<BYTE>&
 
 					m_slog.Format("[ENC][DEC] [%d] [%s]", decVal.GetLength(), decVal);
 					OutputDebugString(m_slog);
-
 				}
 
 				out << key << '=' << val << '\n';
@@ -33699,7 +33660,6 @@ void CMainFrame::DecryptIniFile(const CString& iniPath, const std::vector<BYTE>&
 	}
 	fin.close();
 
-	// 3. tmp 저장 후 원자적 교체
 	CString tmpPath = iniPath + ".tmp";
 	{
 		std::ofstream fout(tmpPath);
@@ -33714,9 +33674,6 @@ void CMainFrame::DecryptIniFile(const CString& iniPath, const std::vector<BYTE>&
 		DeleteFileA(tmpPath);
 		throw std::runtime_error("File replace failed");
 	}
-
-	// 4. 성공 시 ENCRYPT 플래그 제거 (평문 상태로 복원)
-	WritePrivateProfileStringA("ENCRYPT", nullptr, nullptr, iniPath);
 }
 
 std::pair<int, int> CMainFrame::DecryptAllUserIni(const CString& rootPath)

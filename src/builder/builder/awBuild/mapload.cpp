@@ -1,4 +1,4 @@
-// mapload.cpp : ±¸Çö ÆÄÀÏÀÔ´Ï´Ù.
+// mapload.cpp : ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ô´Ï´ï¿½.
 //
 
 #include "stdafx.h"
@@ -227,7 +227,7 @@ void CMapLoad::BuildXmlForm(CNode* pElementNode, CNode* pCellPropNode)
 	if (Prop->kind == fmIMVIEW || Prop->kind == fmBUTTON)
 		Prop->alignment = atCENTER;
 
-	Prop->styles &= ~(stENABLE | stVISIBLE | stCHECKED); // ±âº» ¼¼ÆÃ°ª Á¦°Å
+	Prop->styles &= ~(stENABLE | stVISIBLE | stCHECKED); // ï¿½âº» ï¿½ï¿½ï¿½Ã°ï¿½ ï¿½ï¿½ï¿½ï¿½
 	// NAME
 	CString strData;
 	if (mapData.Lookup("NAME", strData))
@@ -3199,6 +3199,29 @@ void CMapLoad::BuildXmlResource(CNode* pElementNode)
 		m_mapH->onInDeclarationN[0] = '\0';
 		wccGetTempName(m_mapH->onInDeclarationN, prefix);
 		saveScriptFile(CString(m_mapH->onInDeclarationN), strData);
+	}
+
+	if (!m_mapH->pythonMode) {
+		POSITION p = mapData.GetStartPosition();
+		while (p) {
+			CString key, val;
+			mapData.GetNextAssoc(p, key, val);
+			if (val.Find("def ") >= 0 || val.Find("import ") >= 0) {
+				m_mapH->pythonMode = true;
+				break;
+			}
+		}
+	}
+	if (!m_mapH->pythonMode) {
+		POSITION p = mapObject.GetStartPosition();
+		while (p) {
+			CString key, val;
+			mapObject.GetNextAssoc(p, key, val);
+			if (val.Find("def ") >= 0 || val.Find("import ") >= 0) {
+				m_mapH->pythonMode = true;
+				break;
+			}
+		}
 	}
 
 	POSITION pos;

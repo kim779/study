@@ -12,7 +12,7 @@
 
 #include "../dll/form/fmgrid.h"
 #include "../dll/form/fmctrl.h"
-#include "../dll/vbs/scriptEngine.h"
+#include "../dll/vbs/engineWrapper.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -990,7 +990,7 @@ BSTR CxScreen::_ServiceEx(LPCTSTR trN, LPCTSTR data, long length, long mode, lon
 
 	DWORD result = MsgWaitForMultipleObjects(0, NULL, FALSE, INFINITE, QS_ALLINPUT);
 
-	//if (result == WAIT_OBJECT_0)  //¿ì¼± ÁÖ¼® ¸ÕÁö ¸ð¸§
+	//if (result == WAIT_OBJECT_0)  //ï¿½ì¼± ï¿½Ö¼ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½
 	{
 		while (m_service != svFlag::svDONE)
 		{
@@ -1004,7 +1004,7 @@ BSTR CxScreen::_ServiceEx(LPCTSTR trN, LPCTSTR data, long length, long mode, lon
 			Sleep(1);
 			if (PeekMessage(&msg, 0, 0, 0, PM_REMOVE))
 			{
-				//ref ¸Þ½ÃÁö ºÐ¼®
+				//ref ï¿½Þ½ï¿½ï¿½ï¿½ ï¿½Ð¼ï¿½
 				
 			
 

@@ -74,7 +74,7 @@ public:
 	virtual BOOL InitInstance();
 	virtual int ExitInstance();
 	//}}AFX_VIRTUAL
-
+	void SetOtherCore();
 // Implementation
 	//{{AFX_MSG(CAxisApp)
 	afx_msg void OnAppAbout();

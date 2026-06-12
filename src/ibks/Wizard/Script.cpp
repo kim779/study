@@ -10,7 +10,7 @@
 #include "Key.h"
 
 #include "../h/axiserr.h"
-#include "../dll/vbs/scriptEngine.h"
+#include "../dll/vbs/engineWrapper.h"
 
 #ifdef _DEBUG
 #undef THIS_FILE

@@ -15,6 +15,15 @@ static LPCTSTR szLuaKeywords = " and break do else elseif "
 " in local nil not or "
 " repeat return then true until ";
 
+static LPCTSTR szPythonKeywords = " False None True and as assert async await "
+" break class continue def del elif else except "
+" finally for from global if import in is lambda "
+" nonlocal not or pass raise return try while with yield ";
+
+static LPCTSTR szPythonConstants = " print len range str int float list dict tuple set "
+" type isinstance hasattr getattr setattr enumerate zip map filter "
+" True False None ";
+
 static LPCTSTR szConstants = " Empty False True Nothing Null "
 "vbBlack vbRed vbGreen vbYellow vbBlue vbMagenta vbCyan vbWhite "
 "vbBinaryCompare vbTextCompare vbDatabaseCompare "

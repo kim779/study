@@ -1643,6 +1643,10 @@ void CMapWnd::OnTimer(UINT nIDEvent)
 					m_sheet->updateParentGroup(entry);
 					m_sheet->m_only = false;
 				}
+				else if (symbol == _T("disableFieldSetupBtn"))
+				{
+					m_sheet->EnablePage2SettingBtn(FALSE);
+				}
 				else if (symbol == _T("selectGROUP") && !entry.IsEmpty())
 				{
 					m_sheet->selectGroup(atoi(entry));

@@ -1,4 +1,4 @@
-// scriptWnd.cpp : ±¸Çö ÆÄÀÏÀÔ´Ï´Ù.
+// scriptWnd.cpp : ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ô´Ï´ï¿½.
 //
 
 #include "stdafx.h"
@@ -22,6 +22,7 @@
 #define ID_PIN		103
 #define ID_WHOLE	104
 #define ID_LIST_MEMBER	105
+#define ID_PYTHON	106
 
 #define LISTVWIDTH	150
 // CScriptWnd
@@ -63,12 +64,13 @@ BEGIN_MESSAGE_MAP(CScriptWnd, CDockablePane)
 	ON_CBN_SELENDOK(ID_EVENTLIST, OnELSelEndOk)
 	ON_BN_CLICKED(ID_PIN, OnPinClick)
 	ON_BN_CLICKED(ID_WHOLE, OnWholeClick)
+	ON_BN_CLICKED(ID_PYTHON, OnPythonClick)
 	ON_MESSAGE(WM_USER+100, OnMessage)
 	ON_LBN_DBLCLK(ID_LIST_MEMBER, OnMemberDClick)
 END_MESSAGE_MAP()
 
 
-// CScriptWnd ¸Þ½ÃÁö Ã³¸®±âÀÔ´Ï´Ù.
+// CScriptWnd ï¿½Þ½ï¿½ï¿½ï¿½ Ã³ï¿½ï¿½ï¿½ï¿½ï¿½Ô´Ï´ï¿½.
 
 
 
@@ -143,8 +145,11 @@ int CScriptWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	if (!m_pinBtn.Create(NULL, _T("P"), WS_CHILD | WS_VISIBLE | WS_TABSTOP, CRect(0), this, ID_PIN))
 		return -1;
 
-	// Script Wnd UIº¯°æ	
+	// Script Wnd UIï¿½ï¿½ï¿½ï¿½	
 	if (!m_pwholeBtn.Create(NULL, _T("WHOLE"), WS_CHILD | WS_VISIBLE | WS_TABSTOP, CRect(0, 0, 0, 0), this, ID_WHOLE))
+		return -1;
+
+	if (!m_pythonBtn.Create(NULL, _T("PY"), WS_CHILD | WS_VISIBLE | WS_TABSTOP, CRect(0, 0, 0, 0), this, ID_PYTHON))
 		return -1;
 
 	if (!m_listMember.Create(WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL | CBS_AUTOHSCROLL | CBS_HASSTRINGS | CBS_SORT | CBS_OWNERDRAWFIXED, CRect(0, 0, 0, 0), this, ID_LIST_MEMBER))
@@ -162,6 +167,7 @@ int CScriptWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	m_eventCB.SetFont(&m_font);
 	m_pinBtn.SetFont(&m_font);
 	m_pwholeBtn.SetFont(&m_font);
+	m_pythonBtn.SetFont(&m_font);
 	m_listMember.SetFont(&m_font);
 	
 	m_hPinBitmap = ::LoadBitmap(AfxGetResourceHandle(), MAKEINTRESOURCE(IDB_PINNOPUSH));
@@ -213,6 +219,10 @@ void CScriptWnd::OnSize(UINT nType, int cx, int cy)
 	rc.left = rc.right + 1;
 	rc.right += 22;
 	m_pwholeBtn.MoveWindow(rc);
+
+	rc.left = rc.right + 1;
+	rc.right += 24;
+	m_pythonBtn.MoveWindow(rc);
 
 	rc.top = 0;
 	rc.left = rc.right;
@@ -654,15 +664,17 @@ void CScriptWnd::Initialize(class mapForm* mapForm)
 	m_editScript.Initialize(m_mapH);
 	if (m_mapH && m_mapH->mapK == MK_PROCEDURES)
 		m_editScript.EnableWindow(FALSE);
+	m_editScript.SetPythonMode(m_mapH->pythonMode);
+	m_pythonBtn.SetCheck(m_mapH->pythonMode);
 	m_index = -1;
 	m_prev = -1;
 	if (m_mapH->onDeclaration || m_mapH->onInDeclaration)
-		m_ctrlCB.SetItemBold(0, true);	// 0¹øÂ°¿¡ declaration
+		m_ctrlCB.SetItemBold(0, true);	// 0ï¿½ï¿½Â°ï¿½ï¿½ declaration
 	if (m_mapH->onStart || m_mapH->onSend || m_mapH->onReceive || m_mapH->onAlert
 		|| m_mapH->onService || m_mapH->onFile || m_mapH->onSelect || m_mapH->onTimer
 		|| m_mapH->onFocus || m_mapH->onClose || m_mapH->onDevice || m_mapH->onApprove 
 		|| m_mapH->onKey || m_mapH->onChangeLayout || m_mapH->onFlicking)
-		m_ctrlCB.SetItemBold(1, true);	// 1¹øÂ°¿¡ form
+		m_ctrlCB.SetItemBold(1, true);	// 1ï¿½ï¿½Â°ï¿½ï¿½ form
 	m_eventCB.ResetContent();
 	m_eventCB.ResetItemInfo();
 }
@@ -2618,7 +2630,7 @@ void CScriptWnd::OnWholeClick()
 	m_editScript.EnableWindow(TRUE);
 }
 
-// ÀüÃ¼ scriptº¸±â
+// ï¿½ï¿½Ã¼ scriptï¿½ï¿½ï¿½ï¿½
 void CScriptWnd::setWholeScript()
 {
 	CString str;
@@ -3027,4 +3039,22 @@ void CScriptWnd::showList(int kind, CString sName)
 		} while (!info.IsEmpty());
 	}
 
+}
+
+void CScriptWnd::OnPythonClick()
+{
+	if (!m_mapH) return;
+
+	m_mapH->pythonMode = !m_mapH->pythonMode;
+	m_pythonBtn.SetCheck(m_mapH->pythonMode);
+	m_editScript.SetPythonMode(m_mapH->pythonMode);
+	m_mapH->modified = true;
+}
+
+void CScriptWnd::SetPythonMode(bool bPython)
+{
+	if (!m_mapH) return;
+	m_mapH->pythonMode = bPython;
+	m_pythonBtn.SetCheck(bPython);
+	m_editScript.SetPythonMode(bPython);
 }

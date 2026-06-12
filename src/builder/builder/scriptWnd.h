@@ -24,6 +24,7 @@ protected:
 	CBoldComboBox	m_eventCB;
 	CNFButton	m_pinBtn;
 	CNFButton	m_pwholeBtn;
+	CNFButton	m_pythonBtn;
 	CBoldComboBox	m_listMember;
 	CFont		m_font;
 	HBITMAP		m_hPinBitmap, m_hPinBitmap2;
@@ -79,6 +80,8 @@ public:
 	afx_msg void OnCLSelEndOk();
 	afx_msg	void OnPinClick();
 	afx_msg	void OnWholeClick();
+	afx_msg	void OnPythonClick();
+	void	SetPythonMode(bool bPython);
 	afx_msg void OnMemberDClick();
 	afx_msg LRESULT	OnMessage(WPARAM wp, LPARAM lp);
 };

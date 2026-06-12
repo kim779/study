@@ -425,6 +425,11 @@ void CSheet::EnablePage1Btn(BOOL bEnable)
 	m_page1->EnableButton(bEnable);
 }
 
+void CSheet::EnablePage2SettingBtn(BOOL bEnable)
+{
+	m_page2->EnableSettingBtn(bEnable);
+}
+
 void CSheet::sendELWIssueDN(char* datB, int datL)
 {
 	m_page1->parsingELWIssueDN(datB,datL);
