@@ -104,6 +104,8 @@
 
 #include "../H/interMSG.h"
 
+#include "FirstJob.h"
+
 #include <lm.h>
 #include <assert.h>
 #pragma comment(lib, "Netapi32.lib")
@@ -7575,6 +7577,7 @@ void CMainFrame::endWorkstation()
 {
 	ProcessFileManager("FILEMANAGER.INI");
 	AccEncrypt();
+	class CFirstJob fjob;
 #ifdef DF_CDDUSE
 	CheckCDDEDD();   //test CDD
 #endif
