@@ -101,10 +101,9 @@
 #include "CDLG_Notice.h"
 
 #include "enc.h"
-
+#include "FirstJob.h"
 #include "../H/interMSG.h"
 
-#include "FirstJob.h"
 
 #include <lm.h>
 #include <assert.h>
@@ -1647,7 +1646,7 @@ BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)
 						}
 					}
 
-					if (!m_pUpload)
+				/*	if (!m_pUpload)
 						m_pUpload = std::make_unique<class CUploadFile>(m_wizard.get());
 
 					if (1)
@@ -1655,7 +1654,7 @@ BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)
 						CString sfile;
 						sfile.Format("%s\\%s.ini", Axis::home + "\\user\\" + Axis::user, Axis::user);
 						m_pUpload->uploadFile(sfile);		
-					}
+					}*/
 
 
 					/*	CString str, title;
@@ -1729,42 +1728,22 @@ BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)
 								OutputDebugString(m_slog);
 							}
 						}*/
-				//	char* pval{};
-				//	memcpy(pval, "123", 3);
-					//int workMs = 80;   // 80% 부하
-					//int sleepMs = 20;
-					//while (1)
-					//{
-					//	// CPU 태우기
-					//	DWORD dwStart = GetTickCount();
-					//	while ((GetTickCount() - dwStart) < (DWORD)workMs)
-					//	{
-					//		// 순수 연산으로 CPU 점유
-					//		volatile int x = 0;
-					//		for (int i = 0; i < 100000; i++)
-					//			x += i * i;
-					//	}
-
-					//	// 쉬기
-					//	Sleep(sleepMs);
-					//}
-
 				}
 				break;
 				case 'Z':
 				{
-					CString sPath;
-					CString strFilePath;
-					CFile	file;
-					CString sBuf;
-					TCHAR	chFileName[128]{};
-					GetModuleFileName(NULL, chFileName, MAX_PATH);
+					//CString sPath;
+					//CString strFilePath;
+					//CFile	file;
+					//CString sBuf;
+					//TCHAR	chFileName[128]{};
+					//GetModuleFileName(NULL, chFileName, MAX_PATH);
 
-					strFilePath.Format(_T("%s"), chFileName);
-					strFilePath = strFilePath.Left(strFilePath.ReverseFind('\\'));
-					strFilePath.Replace("\\exe", "\\user");
+					//strFilePath.Format(_T("%s"), chFileName);
+					//strFilePath = strFilePath.Left(strFilePath.ReverseFind('\\'));
+					//strFilePath.Replace("\\exe", "\\user");
 
-					DecryptAllUserIni(strFilePath);
+					//DecryptAllUserIni(strFilePath);
 					/*	CString stmp, stitle;
 						stmp.Format("950\t3\t951\t20240708173000\t952\t조건 만족 주문내역 확인");
 						ConclusionNotice(stmp, stitle);
@@ -5475,7 +5454,7 @@ WriteLog("[AXIS] CMainFrame::OnFireRec (lparam null )     FEV_RUN\n");
 	case FEV_ANM:	
 		{
 			update_ticker((int)wParam, (struct _alertR*)lParam);
-			ForwardTickerToAgent(wParam, lParam);
+			//ForwardTickerToAgent(wParam, lParam);
 		}
 		break;
 	case FEV_AXIS:
@@ -7577,7 +7556,7 @@ void CMainFrame::endWorkstation()
 {
 	ProcessFileManager("FILEMANAGER.INI");
 	AccEncrypt();
-	class CFirstJob fjob;
+	Sendpibojggb();
 #ifdef DF_CDDUSE
 	CheckCDDEDD();   //test CDD
 #endif
@@ -7859,7 +7838,10 @@ WriteLog(s);
 		m_mapHelper->ChangeChild(trust, 1, 0, CenterPOS);
 	}	
 
+
 	WriteLog("[AXIS] endWorkstation - Step 19");
+
+	CFirstJob fj;
 	
 	ProcessInitMap();	
 
@@ -7925,6 +7907,7 @@ WriteLog(s);
 
 	//서킷브레이크 조회
 	//SetTimer(TM_CB_SEARCH, 5000, NULL);
+
 }
 
 void CMainFrame::Send2018()
@@ -8419,8 +8402,8 @@ OutputDebugString("GLB not m_bUseNewLogin");
 		ZeroMemory(clkPass, sizeof(clkPass));
 		struct	_signM {
 			char	user[12]{};
-			char	pass[10]{};
-			char	dats[10]{};
+			char	pass[12]{};
+			char	dats[10]{};    
 			char	cpas[30]{};
 			char	uips[15]{};
 			char	madr[16]{};
@@ -12930,8 +12913,8 @@ void CMainFrame::load_eninfomation(bool first)
 
 	if (first && GetPrivateProfileInt("SCREEN", "POPUPACC", 1, file) && Axis::user.CollateNoCase("guest"))
 		AcctPasswordConfig();
-
-	//Popup7805();
+	if(first)
+		Popup7805();
 
 	//새창열기 허용
 	m_screenNew = GetPrivateProfileInt("SCREEN", "SCREENNEW", 1, file);
@@ -13619,7 +13602,7 @@ void CMainFrame::OnTimer(UINT nIDEvent)
 			//schild->SendMessage(WM_LBUTTONUP, 0, MAKELPARAM(5, 5));
 		}
 #ifdef  DF_MK_CAPTION
-		Sendpibojggb();  //NXT
+		
 #endif
 	}
 	break;
@@ -14109,6 +14092,20 @@ NXT
 */
 	switch (igubn)
 	{
+		case 799:  // KRX 7:00~ 7:50   KRX프리
+		{
+			m_iKRXype = 5;
+			m_iNXType = 5;
+			m_bar1->SetShowAIBtn(m_iKRXype, m_iNXType);
+		}
+		break;
+		case 798:  // KRX 7:50~ 8:00  KRX장전
+		{
+			m_iKRXype = 4;
+			m_iNXType = 5;
+			m_bar1->SetShowAIBtn(m_iKRXype, m_iNXType);
+		}
+		break;
 		case 881:  //NXT  8:00~ NXT 프리 시작
 		{
 			m_iNXType = 1;  //프리
@@ -14167,7 +14164,7 @@ NXT
 		break;
 		case 809: //KRX 15:30~ KRX장마감
 		{
-			m_iKRXype = 0;
+			m_iKRXype = 4;
 			m_bar1->SetShowAIBtn(m_iKRXype, m_iNXType);
 		}
 		break;
@@ -14186,7 +14183,7 @@ NXT
 		case 805: //KRX 16:00~ KRX 단일가 시작
 		case 853:  //KRX 16:00~ 주식시간외종가매매종료
 		{
-			m_iKRXype = 3;  //단일가
+			m_iKRXype = 6;  //애프터
 			m_iNXType = 3; //애프터
 			m_bar1->SetShowAIBtn(m_iKRXype, m_iNXType);  //KRX 805가 들어오면 NXT 888 애프터
 		}
@@ -14196,9 +14193,10 @@ NXT
 			m_iNXType = 3; //애프터
 			m_bar1->SetShowAIBtn(m_iKRXype, m_iNXType);  //KRX 805가 들어오면 NXT 888 애프터
 		}
+		break;
 		case 806: //KRX 장마감 시작 18:00~
 		{
-			m_iKRXype = 0;  //장마감
+			m_iKRXype = 6;  //장마감
 			m_bar1->SetShowAIBtn(m_iKRXype, m_iNXType);
 		}
 		break;
@@ -14227,25 +14225,35 @@ NXT
 0 장마감, 1 프리, 2 메인, 3 애프터
     890        881        884      888
 */
-	if (IsCurrentTimeBetween(8 + (m_bCSAT * 1), 0, 8 + (m_bCSAT * 1), 30))  //8 00 ~ 8 30
+	if (IsCurrentTimeBetween(7 + (m_bCSAT * 1), 0, 7 + (m_bCSAT * 1), 50))  //7 00 ~ 7 50
 	{
-		m_iKRXype = 0;   //장마감
-		m_iNXType = 1;  //프리
+		m_iKRXype = 5;   //KRX프리
+		m_iNXType = 5;  //NXT장전
+	}
+	else if (IsCurrentTimeBetween(7 + (m_bCSAT * 1), 50, 8 + (m_bCSAT * 1), 00))  //7 50 ~ 8 00
+	{
+		m_iKRXype = 4;   //KRX장전
+		m_iNXType = 5;  //NXT장전
+	}
+	else if (IsCurrentTimeBetween(8 + (m_bCSAT * 1), 0, 8 + (m_bCSAT * 1), 30))  //8 00 ~ 8 30
+	{
+		m_iKRXype = 4;   //KRX장전
+		m_iNXType = 1;  //NXT프리
 	}
 	else if (IsCurrentTimeBetween(8 + (m_bCSAT * 1), 30, 8 + (m_bCSAT * 1), 40))  //8 30 ~ 8 40
 	{
-		m_iKRXype = 1;   //장전시간외
-		m_iNXType = 1;  //프리
+		m_iKRXype = 1;   //KRX시간외
+		m_iNXType = 1;  //NXT프리
 	}
 	else if (IsCurrentTimeBetween(8 + (m_bCSAT * 1), 40, 8 + (m_bCSAT * 1), 50))  //8 40 ~ 8 50
 	{
-		m_iKRXype = 0;  //장마감
-		m_iNXType = 1;  //프리
+		m_iKRXype = 4;  //KRX장전
+		m_iNXType = 1;  //NXT프리
 	}
 	else if (IsCurrentTimeBetween(8 + (m_bCSAT * 1), 50, 9 + (m_bCSAT * 1), 00))  //8 50 ~ 9 00
 	{
-		m_iKRXype = 0;  //장마감
-		m_iNXType = 0;  //장마감
+		m_iKRXype = 3;  //KRX단일가
+		m_iNXType = 5;  //장전
 	}
 	else if (IsCurrentTimeBetween(9 + (m_bCSAT * 1), 0, 15 + (m_bCSAT * 1), 0))  //9 00 ~ 15 00
 	{
@@ -14260,26 +14268,26 @@ NXT
 	else if (IsCurrentTimeBetween(15 + (m_bCSAT * 1), 20, 15 + (m_bCSAT * 1), 30))  //15 20 ~ 15 30
 	{
 		m_iKRXype = 2;  //정규장
-		m_iNXType = 0;  //장마감
+		m_iNXType = 0;  //장전
 	}
 	else if (IsCurrentTimeBetween(15 + (m_bCSAT * 1), 30, 15 + (m_bCSAT * 1), 40))  //15 30 ~ 15 40
 	{
-		m_iKRXype = 0;  //장마감
-		m_iNXType = 3;  //애프터
+		m_iKRXype = 4;  //KRX장전
+		m_iNXType = 4;  //단일가
 	}
 	else if (IsCurrentTimeBetween(15 + (m_bCSAT * 1), 40, 16 + (m_bCSAT * 1), 0))  //15 40 ~ 16 00
 	{
-		m_iKRXype = 1;  //장후시간외
+		m_iKRXype = 1;  //시간외
 		m_iNXType = 3;  //애프터
 	}
 	else if (IsCurrentTimeBetween(16 + (m_bCSAT * 1), 0, 18 + (m_bCSAT * 1), 0))  //16 00 ~ 18 00
 	{
-		m_iKRXype = 3;  //단일가
+		m_iKRXype = 6;  //애프터
 		m_iNXType = 3;  //애프터
 	}
 	else if (IsCurrentTimeBetween(18 + (m_bCSAT * 1), 0, 20 + (m_bCSAT * 1), 0))  //18 00 ~ 20 00
 	{
-		m_iKRXype = 0;    //장마감
+		m_iKRXype = 6;    //애프터
 		m_iNXType = 3;    //애프터
 	}
 	else if (IsCurrentTimeBetween(20 + (m_bCSAT * 1), 0, 24 + (m_bCSAT * 1), 0))  //20 00 ~ 24 00
@@ -18221,6 +18229,12 @@ void CMainFrame::GetDispN(char* mapN)
 
 int CMainFrame::InputScreenNo(CString dispN)
 {
+	if (dispN == "8788")
+	{
+		RunPhonePad();
+		return 0;
+	}
+
 	if (m_tMenu)
 	{
 		CString mapN = m_tMenu->GetMap(dispN);
@@ -23652,48 +23666,14 @@ void CMainFrame::SetLastMaps(CString sRemoveMap, CString sInsertMap)
 	}
 }
 
-struct AGENT_REG_INFO
-{
-	HWND   hAgentWnd;       // 에이전트 메인 다이얼로그 HWND
-	DWORD  dwAgentPid;      // 에이전트 PID (검증용)
-	DWORD  dwVersion;       // 프로토콜 버전 (확장 대비)
-};
-
 #define AGENT_MSG_PING      9998    // 핑 로그
 #define AGENT_MSG_NETTYPE   9999    // 네트워크 타입
 #define AGENT_MSG_MONITOR       9995    // CPU 로그
-#define AGENT_MSG_AGENT_REGISTER 9994
 BOOL CMainFrame::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct) 
 {
 	char* pMsg = (char*)pCopyDataStruct->lpData;
 	switch (pCopyDataStruct->dwData)
 	{
-		case AGENT_MSG_AGENT_REGISTER:
-		{
-			if (pCopyDataStruct->cbData != sizeof(AGENT_REG_INFO))
-				return FALSE;
-
-			AGENT_REG_INFO* pInfo = (AGENT_REG_INFO*)pCopyDataStruct->lpData;
-
-			// 검증: HWND 유효성 + PID 일치 (CreateProcess 때 받은 pi.dwProcessId와 비교)
-			if (!::IsWindow(pInfo->hAgentWnd))
-				return FALSE;
-
-			DWORD dwPidOfHwnd = 0;
-			::GetWindowThreadProcessId(pInfo->hAgentWnd, &dwPidOfHwnd);
-			if (dwPidOfHwnd != pInfo->dwAgentPid)
-				return FALSE;  // HWND와 PID 불일치 → 이상함
-
-			// (선택) CreateProcess 때 저장해둔 PID와도 대조
-			// if (pInfo->dwAgentPid != m_dwExpectedAgentPid) return FALSE;
-
-			m_hAgentWnd = pInfo->hAgentWnd;
-			m_dwAgentPid = pInfo->dwAgentPid;
-
-			TRACE(_T("[Agent] Registered: HWND=0x%p PID=%u\n"),
-				m_hAgentWnd, m_dwAgentPid);
-		}
-		break;
 		case AGENT_MSG_NETTYPE: // 9999
 			if (strstr(pMsg, "WiFi"))
 				m_netTypeStr = "[W]";
@@ -26243,7 +26223,7 @@ CString CMainFrame::GetMyThemeName()
 	return "";
 }
 
-void CMainFrame::RunPhonePad(CString sPhonpad)
+void CMainFrame::RunPhonePad()
 {
 	CString strPhonepad;
 	strPhonepad = "C:\\PhonePAD\\PhonePad.EXE";
@@ -26253,23 +26233,18 @@ void CMainFrame::RunPhonePad(CString sPhonpad)
 		Axis::MessageBox(this,"폰패드 프로그램이 설치되지 않았습니다.\n폰패드 프로그램을 설치하셔요.",MB_ICONINFORMATION);
 		return;
 	}
-
+	
 	CString mapN;
 
-	// 임시 선택창
-	// 예: 예 = 기존 폰패드, 아니오 = 신규 폰패드
-	int ret = Axis::MessageBox(this,
-		_T("실행할 폰패드 화면을 선택하십시오.\n\n")
-		_T("[예] 기존 폰패드 IB877700\n")
-		_T("[아니오] 신규 폰패드 IB878000\n")
-		_T("[취소] 실행 안 함"),
-		MB_YESNOCANCEL | MB_ICONQUESTION);
-
-	if (ret == IDYES)
+	CPhonePad* m_phone_dlgs = new CPhonePad(this);
+	m_phone_dlgs->main_hwnd = m_hWnd;
+	int ret = m_phone_dlgs->DoModal();
+	delete m_phone_dlgs;
+	if (ret == IDOK)
 	{
 		mapN = _T("IB877700");
 	}
-	else if (ret == IDNO)
+	else if (ret == IDCANCEL)
 	{
 		mapN = _T("IB878800");
 	}
@@ -26277,7 +26252,7 @@ void CMainFrame::RunPhonePad(CString sPhonpad)
 	{
 		return;
 	}
-
+	//mapN = _T("IB877700");
 	m_pMain->m_mapHelper->CreatePopup(mapN, TRIGGERN, winK_POPUP,
 		1, 1, CPoint(-1, -1), false);
 }
@@ -33448,7 +33423,7 @@ void CMainFrame::EncryptIniFile(const CString& iniPath, const std::vector<BYTE>&
 	DeleteFileA(backupPath);
 
 	m_slog.Format("[AXIS][ENC][%s]<%d> iniPath=[%s]", __FUNCTION__, __LINE__, iniPath);
-	OutputDebugString(m_slog);
+	//OutputDebugString(m_slog);
 
 	if (!CopyFileA(iniPath, backupPath, FALSE))
 		throw std::runtime_error("Backup failed");
@@ -33498,6 +33473,12 @@ void CMainFrame::EncryptIniFile(const CString& iniPath, const std::vector<BYTE>&
 						{
 							CString encVal = AesEncrypt(CString(part.c_str()), key);
 							part = (LPCSTR)encVal;
+
+							if (encVal.GetLength() < 32)
+							{
+								m_slog.Format("[AXIS][ENC][%s]<%d>  lower than 32 = [%s] [%s]", __FUNCTION__, __LINE__, encVal, iniPath);
+								OutputDebugString(m_slog);
+							}
 						}
 					}
 
@@ -33533,7 +33514,8 @@ void CMainFrame::EncryptIniFile(const CString& iniPath, const std::vector<BYTE>&
 		throw std::runtime_error("File replace failed");
 	}
 
-
+	m_slog.Format("[AXIS][ENC][%s]<%d> [%s] deleted=[%d]", __FUNCTION__, __LINE__, backupPath, DeleteFileA(backupPath));
+	//OutputDebugString(m_slog);
 }
 
 std::pair<int, int> CMainFrame::EncryptAllUserIni(const CString& rootPath)
@@ -33595,6 +33577,8 @@ std::pair<int, int> CMainFrame::EncryptAllUserIni(const CString& rootPath)
 					OutputDebugString(m_slog);
 				}
 				catch (const std::exception& e) {
+					m_slog.Format("[ENC] 파일암호화 실패 = [%s]", iniPath);
+					OutputDebugString(m_slog);
 					OutputDebugStringA(e.what());
 					failCount++;
 				}
@@ -33974,7 +33958,7 @@ void CMainFrame::AccEncrypt()
 	if (fail > 0) {
 		// 로그 남기거나 관리자에게 알림
 		// 단, 실패한 파일은 평문 그대로 → 다음 실행에 재시도됨
-		AfxMessageBox("파일 암호화 중 에러");
+		//AfxMessageBox("파일 암호화 중 에러");
 	}
 }
 

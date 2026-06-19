@@ -250,10 +250,26 @@ Sub SaveAllColumnWidth()
 	Dim ival
 	Dim allval
 	Dim mapname
+	Dim section
 
 	For ii = 0 To SecDtlGrid.Columns
-
+		ival = SecDtlGrid.GetColumnWidth(ii)
+		If SecDtlGrid.IsColumnVisible(ii) And ival > 0 Then
+			'SYSTEM.Trace "[IB170900] column ii = " & ii & "ival = " & ival
+			allval = allval & "|" & ival
+		End If
 	Next
+	
+	If Len(allval) > 0 Then
+		allval = Mid(allval, 2)
+	End If
+	
+	If SCREEN.CreateObject("info") Then
+		mapname = SCREEN.GetMapName(0)
+		section = "colwidth" & SCREEN.Object("main.tab_subSubHangmok").ID
+		INFO.PushData LOGIN.Name, "userconf.ini", mapname, section, allval
+		SYSTEM.Trace "[IB170900] allval = " & allval
+	End If
 End Sub
 
 Sub SetAllColumnWidth()
@@ -262,11 +278,15 @@ Sub SetAllColumnWidth()
 	Dim val
 	Dim ii
 	Dim mapname
+	Dim section
 
 	If SCREEN.CreateObject("info") Then
 		mapname = SCREEN.GetMapName(0)
-		val = INFO.popdata (LOGIN.Name, "userconf.ini", mapname, "colwidth")
+		section = "colwidth" & SCREEN.Object("main.tab_subSubHangmok").ID
+		val = INFO.popdata (LOGIN.Name, "userconf.ini", mapname, section)
 	End If
+
+SYSTEM.Trace "[IB170900] SetAllColumnWidth section = " & section & "  val = " & val
 
 	If Len(Trim(val)) > 0 Then
 
@@ -275,24 +295,29 @@ Sub SetAllColumnWidth()
 		cnt = 0
 
 		For ii = 0 To SecDtlGrid.Columns
-
+			If SecDtlGrid.IsColumnVisible(ii) Then
+				SecDtlGrid.SetColumnWidth ii, ArrData(cnt)
+				cnt = cnt + 1
+			End If
 		Next
-
-
+	Else
+		defAllcolwidth()
 	End If
 
 End Sub
 
 Sub defAllcolwidth()
-
-	Dim ArrData
-	Dim val
-	Dim ii
-
-	vla = ""
-
-
-
+	If SCREEN.Object("main.tab_subSubHangmok").ID = 0 Then
+	SYSTEM.Trace "[IB170900] defAllcolwidth "
+		SecDtlGrid.SetColumnWidth 5,  112 '종목명
+		SecDtlGrid.SetColumnWidth 7,  32  '구분
+		SecDtlGrid.SetColumnWidth 8,  72 '보유수량
+		SecDtlGrid.SetColumnWidth 11, 72 '평균단가
+		SecDtlGrid.SetColumnWidth 13, 72 '현재가
+		SecDtlGrid.SetColumnWidth 15, 112 '평가금액
+		SecDtlGrid.SetColumnWidth 16, 72 '평가율
+		SecDtlGrid.SetColumnWidth 17, 112 '평가손익
+	End If
 End Sub
 
 _AW_ONINDECLARE_AW_
@@ -422,6 +447,8 @@ ElseIf Left(Trim(LEDGER.Ecod), 1) = "0" Then
 			End If
 		Else
 
+SYSTEM.Trace "[IB170900] -----OnReceive-----"
+
 			SecDtlGrid.SetHead 5, "종목명"
 			SecDtlGrid.SetHead 11, "평균단가"
 			SecDtlGrid.SetHead 13, "현재가"
@@ -440,10 +467,10 @@ ElseIf Left(Trim(LEDGER.Ecod), 1) = "0" Then
 			SecDtlGrid.SetColumnWidth 14, 102  '현재가 소수점 (visible = false)
 			SecDtlGrid.SetColumnWidth 15, 63 '평가금액
 			SecDtlGrid.SetColumnWidth 16, 100
-			
+
 			'해외주식 탭 외 종목번호 Visible False
 			SecDtlGrid.SetColumnVisible 4, False
-
+		
 			If SCREEN.Object("main.tab_subSubHangmok").ID = 2 Then
 				Dim ii, avgPrc, curPrc, jj, rat
 
@@ -571,6 +598,9 @@ ElseIf Left(Trim(LEDGER.Ecod), 1) = "0" Then
 				Next
 
 			End If
+			
+			SetAllColumnWidth()
+			
 		End If
 	End If
 Else
@@ -643,6 +673,12 @@ If SecDtlGrid.Rows > 1 Then
 End If
 
 _AW_ONENDSUB_AW_
+_AW_ONTIMERX_AW_
+If id = 1 Then
+	SaveAllColumnWidth()
+End If
+
+_AW_ONENDSUB_AW_
 _AW_SCRIPT_AW_(OUTPUT1)
 _AW_ENDSCRIPT_AW_
 
@@ -700,6 +736,9 @@ _AW_ENDSCRIPT_AW_
 _AW_SCRIPT_AW_(SecDtlGrid)
 _AW_ONCLICK_AW_
 If SecDtlGrid.HitPos <> 3 Then
+	If SecDtlGrid.HitPos = 0 Then
+		SCREEN.SetTimerx 1, 500, False
+	End If
 	Exit Sub
 End If
 

@@ -229,4 +229,6 @@ public:
 	bool IsFileExist(CString filename);  //test mod
 	void setOptimizeCPUAffinity();
 	void sendMemo(CString sCode, char type = 'S');
+	afx_msg void OnShowWindow(BOOL bShow, UINT nStatus);
+	afx_msg void OnWindowPosChanged(WINDOWPOS* lpwndpos);
 };

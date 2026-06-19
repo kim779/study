@@ -2105,6 +2105,16 @@ void CDbar1::SetShowAIBtn(int Kgubn, int Ngubn)
 				m_btKRX->set_Image(CAxButtonName(Format("TOOL_%s", "KRX_MBEFORE")));
 			}
 			break;
+			case 5: //KRX 프리
+			{
+				m_btKRX->set_Image(CAxButtonName(Format("TOOL_%s", "KRX_FREE")));
+			}
+			break;
+			case 6: //KRX 애프터
+			{
+				m_btKRX->set_Image(CAxButtonName(Format("TOOL_%s", "KRX_AFTER")));
+			}
+			break;
 			}
 		}
 		m_btKRX->Invalidate();

@@ -13,6 +13,10 @@ static char THIS_FILE[] = __FILE__;
 #endif
 #define COLOR_INLINE	RGB(103,170,197)
 #define COLOR_OUTLINE	RGB(255,255,255)
+
+#define SIG_KRX_FREE_OPEN    799
+#define SIG_KRX_AFTER_OPEN   798
+#define SIG_KRX_AFTER_CLOSE  797
 /////////////////////////////////////////////////////////////////////////////
 // CMngSetup dialog
 CMngSetup::CMngSetup(CWnd* pParent /*=NULL*/)
@@ -53,6 +57,11 @@ BOOL CMngSetup::OnInitDialog()
 	m_font.CreatePointFont(90, "±¼¸²Ã¼");
 	loadInfo();
 
+	((CButton*)GetDlgItem(KOSPI_CLOSE_TIME_ONE))->ShowWindow(SW_HIDE);
+	((CButton*)GetDlgItem(KOBA_ELW_CLOSE))->ShowWindow(SW_HIDE);
+	((CButton*)GetDlgItem(KOSPI_CLOSE_TIME))->ShowWindow(SW_HIDE);
+	((CButton*)GetDlgItem(KOSPI_OPEN_10S))->ShowWindow(SW_HIDE);
+	((CButton*)GetDlgItem(KOSPI_CLOSE_10S))->ShowWindow(SW_HIDE);
 	
 	return TRUE;  
 }
@@ -87,7 +96,14 @@ void CMngSetup::loadInfo()
 	}
 	else if (mtblVer > userVer)
 	{
-		CopyFile(mtblFile, userFile, FALSE);
+		WritePrivateProfileString("Manage", Format("%d", SIG_KRX_FREE_OPEN), "1", userFile);
+		WritePrivateProfileString("Manage", Format("%d", SIG_KRX_AFTER_OPEN), "1", userFile);
+		WritePrivateProfileString("Manage", Format("%d", SIG_KRX_AFTER_CLOSE), "1", userFile);
+
+		CString ver;
+		ver.Format("%d", mtblVer);
+		WritePrivateProfileString("MESSAGE", "INIT", ver, userFile);
+
 		useFile = userFile;
 	}
 	else
@@ -419,6 +435,10 @@ void CMngSetup::InitSignalControlMap()
 		{872, KOSPI_CLOSE_SIDECAR},
 		{817, KOSPI_OPEN_CIRCUIT},
 		{818, KOSPI_CLOSE_CIRCUIT},
+		{SIG_KRX_FREE_OPEN, KOSPI_FREE},
+		{SIG_KRX_AFTER_OPEN, KOSPI_AFTER_START},
+		{SIG_KRX_AFTER_CLOSE, KOSPI_AFTER_END},
+
 
 		{56,  FUTURE_OPEN_5M},
 		{60,  FUTURE_OPEN_1M},

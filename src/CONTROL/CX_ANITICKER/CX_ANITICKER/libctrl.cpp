@@ -9,6 +9,7 @@ __declspec(dllexport) CWnd* WINAPI axCreate(CWnd* parent, void* pParam)
 
 	_param* p = static_cast<_param*>(pParam);
 	ControlWnd* ctrl = new ControlWnd();
+	ctrl->SetParam(p);
 	if (!ctrl->Create(NULL, NULL, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS,
 		p->rect, parent, (UINT)(UINT_PTR)ctrl))
 	{

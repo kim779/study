@@ -6,6 +6,7 @@
 #define IDC_CONFIG                      2
 #define IDC_CLEAR                       3
 #define IDC_ACTION                      3
+#define IDCANCEL2                       3
 #define IDC_OSETUP                      4
 #define IDD_ABOUTBOX                    100
 #define IDP_SOCKETS_INIT_FAILED         104
@@ -636,7 +637,7 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_3D_CONTROLS                     1
-#define _APS_NEXT_RESOURCE_VALUE        486
+#define _APS_NEXT_RESOURCE_VALUE        487
 #define _APS_NEXT_COMMAND_VALUE         32879
 #define _APS_NEXT_CONTROL_VALUE         1306
 #define _APS_NEXT_SYMED_VALUE           113

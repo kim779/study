@@ -1603,7 +1603,7 @@ public:
 	void parsingOubsDN(char* datB, int datL);
 	void dnloadAction();
 	BOOL IsPhonePad(const char* map);
-	void RunPhonePad(CString sPhonpad = "");
+	void RunPhonePad();
 	BOOL m_bfitdual;
 	WINDOWPLACEMENT m_predual;
 	CString m_theme;

@@ -41,7 +41,7 @@
 
 inline void Output_DebugString(CString slog)
 {
-	OutputDebugString(slog);
+	//OutputDebugString(slog);
 }
 
 #define DF_SORT

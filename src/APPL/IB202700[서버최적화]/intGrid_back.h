@@ -319,6 +319,23 @@ public:
 	double  getAvgCount() const { return _avgCount; }
 	// END ADD
 	void    initRowFilter() { _mapFilterDraw.clear(); }
+
+
+
+
+	struct BlinkItem
+	{
+		COLORREF oldBk{};
+		ULONGLONG tick{};
+	};
+
+	std::map<long, BlinkItem> _mapBlinkColor;
+
+	long MakeBlinkKey(int row, int col) const;
+	void BlinkCell(int row, int col);
+	void BlinkRow(int row);
+	void Blink(int row, int col);
+	void ProcessBlink();
 // Attributes
 protected:
 
@@ -549,6 +566,7 @@ public:
 	int     m_iTime{};
 	bool    _bExpect = false;
 	long    _idrawCount = 0;
+	ULONGLONG _countSum = 0;
 
 // updateXX_20170201_2
 

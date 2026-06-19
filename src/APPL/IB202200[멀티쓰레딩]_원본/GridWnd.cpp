@@ -9148,6 +9148,36 @@ void CGridWnd::parsingAlertx(LPARAM lParam)
 	if (count == 0)
 		return;
 
+	/////////////////////////////
+
+	SYSTEMTIME st;
+	GetLocalTime(&st);
+	const int curMin = st.wHour * 60 + st.wMinute;
+	if (m_nRtLogMinute != -1 && curMin != m_nRtLogMinute && !m_mapRtCallCount.empty())
+	{
+		CString sRtLog;
+		sRtLog.Format("[IB202700][RT][%d][%02d:%02d]",
+			m_kind, m_nRtLogMinute / 60, m_nRtLogMinute % 60);
+		OutputDebugString(sRtLog);
+		for (auto& kv : m_mapRtCallCount)
+		{
+			CString tmp;
+			tmp.Format("[RT] [%10s]=%3d", (LPCTSTR)kv.first, kv.second);
+			sRtLog.Format("%40s", tmp);
+			OutputDebugString(sRtLog);
+		}
+
+	}
+	if (curMin != m_nRtLogMinute)
+	{
+		m_mapRtCallCount.clear();
+		m_nRtLogMinute = curMin;
+	}
+	m_mapRtCallCount[code]++;
+
+
+	///////////////////////////
+
 	for (int rowPosition = 0; rowPosition < count; rowPosition++)
 	{
 		xrow = m_irowCode[rowPosition]; // 중복종목처리...

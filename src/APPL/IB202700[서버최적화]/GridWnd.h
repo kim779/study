@@ -471,6 +471,9 @@ public:
 	std::map<CString, int>		_mapSymbol;
 	std::map<CString, CString> m_mapCodeName{};
 
+	std::map<CString, int> m_mapRtCallCount;  // code별 1분 누적 호출 횟수
+	int m_nRtLogMinute = -1;                  // 마지막 로그 기록한 분 (hour*60+min)
+
 	void parsingAlertx(LPARAM lParam);
 	void initRSymbol();
 	void saveServer(const std::vector<std::shared_ptr<struct _intersx>>& vInters, int gno = -1);

@@ -93,6 +93,8 @@ ON_WM_TIMER()
 //}}AFX_MSG_MAP
 ON_MESSAGE(WM_MANAGE, OnManage)
 ON_MESSAGE(WM_USER, OnUser)
+ON_WM_SHOWWINDOW()
+ON_WM_WINDOWPOSCHANGED()
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
@@ -2451,4 +2453,27 @@ CTime CMainWnd::ParseRTSTime(const CString& sTime, const COleDateTime& today)
 		return CTime(0);  // 유효하지 않은 시간 반환
 
 	return CTime(today.GetYear(), today.GetMonth(), today.GetDay(), h, m, s);
+}
+
+void CMainWnd::OnShowWindow(BOOL bShow, UINT nStatus)
+{
+	CWnd::OnShowWindow(bShow, nStatus);
+
+	//if (bShow)
+	//	Invalidate(FALSE);  // 최신값 일괄 반영
+}
+
+
+void CMainWnd::OnWindowPosChanged(WINDOWPOS* lpwndpos)
+{
+	CWnd::OnWindowPosChanged(lpwndpos);
+	//bool m_bScreenVisible;
+	//if (lpwndpos->flags & SWP_HIDEWINDOW)
+	//	m_bScreenVisible = false;
+	//else if (lpwndpos->flags & SWP_SHOWWINDOW)
+	//	m_bScreenVisible = true;
+
+	//m_slog.Format("[IB202700][OnShowWindow] m_bScreenVisible=%d ", m_bScreenVisible);
+	//OutputDebugString(m_slog);
+	// TODO: 여기에 메시지 처리기 코드를 추가합니다.
 }

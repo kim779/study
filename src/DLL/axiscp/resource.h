@@ -537,6 +537,7 @@
 #define IDC_CHK_FCLOSE                  7280
 #define KOSPI_BEFORE_HOGA               7280
 #define IDC_CHK_O_SIMHOGA               7281
+#define KOSPI_FREE                      7281
 #define IDC_CHK_OCLOSE                  7282
 #define IDC_POPUP                       7282
 #define IDC_TREEMENU                    7283
@@ -580,7 +581,10 @@
 #define IDC_MAINTAB                     7313
 #define KOSPI_CLOSE_SIDECAR             7313
 #define IDC_INVEST_KOSPI                7314
+#define KOSPI_AFTER_START               7314
 #define IDC_INVEST_KOSDAQ               7315
+#define KOSPI_OPEN_TIME3                7315
+#define KOSPI_AFTER_END                 7315
 #define IDC_INVEST_FUTURE               7316
 #define IDC_INVEST_CALL                 7317
 #define IDC_INVEST_PUT                  7318

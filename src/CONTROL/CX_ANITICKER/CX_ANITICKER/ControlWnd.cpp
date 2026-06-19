@@ -5,38 +5,44 @@
 #pragma comment(lib, "d2d1.lib")
 #pragma comment(lib, "dwrite.lib")
 
+#include <cmath>
+
+static CStringW FormatDisplay(const CStringW& text);
+
 IMPLEMENT_DYNCREATE(ControlWnd, CWnd)
 
 ControlWnd::ControlWnd()
-	: m_dir(0), m_prevDir(0)
+	: m_dir(0), m_colorDir(0), m_prevColorDir(0)
 	, m_animProg(0.0f), m_bAnimating(false)
+	, m_currVal(0.0), m_targetVal(0.0), m_bCounting(false), m_decimalPlaces(0)
 	, m_pD2DFactory(nullptr), m_pDWFactory(nullptr)
-	, m_pFmtLabel(nullptr), m_pFmtValue(nullptr)
+	, m_pFmt(nullptr)
 	, m_pRT(nullptr)
-	, m_pBrushLabel(nullptr), m_pBrushUp(nullptr)
-	, m_pBrushDown(nullptr), m_pBrushFlat(nullptr)
+	, m_pBrushUp(nullptr), m_pBrushDown(nullptr), m_pBrushFlat(nullptr)
 {
 	EnableAutomation();
+
 }
 
 ControlWnd::ControlWnd(_param* pParam, CWnd* pWizard)
-	: m_dir(0), m_prevDir(0)
+	: m_dir(0), m_colorDir(0), m_prevColorDir(0)
 	, m_animProg(0.0f), m_bAnimating(false)
+	, m_currVal(0.0), m_targetVal(0.0), m_bCounting(false), m_decimalPlaces(0)
 	, m_pD2DFactory(nullptr), m_pDWFactory(nullptr)
-	, m_pFmtLabel(nullptr), m_pFmtValue(nullptr)
+	, m_pFmt(nullptr)
 	, m_pRT(nullptr)
-	, m_pBrushLabel(nullptr), m_pBrushUp(nullptr)
-	, m_pBrushDown(nullptr), m_pBrushFlat(nullptr)
+	, m_pBrushUp(nullptr), m_pBrushDown(nullptr), m_pBrushFlat(nullptr)
 {
 	EnableAutomation();
 	m_pWizard = pWizard;
+
 }
 
 ControlWnd::~ControlWnd()
 {
 	DiscardDeviceResources();
 	ReleaseTextFormats();
-	if (m_pDWFactory) { m_pDWFactory->Release(); m_pDWFactory = nullptr; }
+	if (m_pDWFactory)  { m_pDWFactory->Release();  m_pDWFactory  = nullptr; }
 	if (m_pD2DFactory) { m_pD2DFactory->Release(); m_pD2DFactory = nullptr; }
 }
 
@@ -98,10 +104,9 @@ HRESULT ControlWnd::CreateDeviceResources()
 		&m_pRT);
 	if (FAILED(hr)) return hr;
 
-	m_pRT->CreateSolidColorBrush(D2D1::ColorF(1.0f, 1.0f, 1.0f), &m_pBrushLabel);
 	m_pRT->CreateSolidColorBrush(D2D1::ColorF(1.0f, 0.22f, 0.22f), &m_pBrushUp);
 	m_pRT->CreateSolidColorBrush(D2D1::ColorF(0.28f, 0.50f, 1.0f), &m_pBrushDown);
-	m_pRT->CreateSolidColorBrush(D2D1::ColorF(0.88f, 0.88f, 0.88f), &m_pBrushFlat);
+	m_pRT->CreateSolidColorBrush(D2D1::ColorF(1.0f, 1.0f, 1.0f),   &m_pBrushFlat);
 
 	RecreateTextFormats((float)rc.bottom);
 	return S_OK;
@@ -109,11 +114,10 @@ HRESULT ControlWnd::CreateDeviceResources()
 
 void ControlWnd::DiscardDeviceResources()
 {
-	if (m_pBrushLabel) { m_pBrushLabel->Release(); m_pBrushLabel = nullptr; }
-	if (m_pBrushUp)    { m_pBrushUp->Release();    m_pBrushUp    = nullptr; }
-	if (m_pBrushDown)  { m_pBrushDown->Release();  m_pBrushDown  = nullptr; }
-	if (m_pBrushFlat)  { m_pBrushFlat->Release();  m_pBrushFlat  = nullptr; }
-	if (m_pRT)         { m_pRT->Release();          m_pRT         = nullptr; }
+	if (m_pBrushUp)   { m_pBrushUp->Release();   m_pBrushUp   = nullptr; }
+	if (m_pBrushDown) { m_pBrushDown->Release();  m_pBrushDown = nullptr; }
+	if (m_pBrushFlat) { m_pBrushFlat->Release();  m_pBrushFlat = nullptr; }
+	if (m_pRT)        { m_pRT->Release();          m_pRT        = nullptr; }
 }
 
 void ControlWnd::RecreateTextFormats(float height)
@@ -121,35 +125,25 @@ void ControlWnd::RecreateTextFormats(float height)
 	ReleaseTextFormats();
 	if (!m_pDWFactory) return;
 
-	float fontSize = height * 0.60f;
+	float fontSize = height * 0.92f;
 	if (fontSize < 8.0f) fontSize = 8.0f;
 
 	m_pDWFactory->CreateTextFormat(
 		L"Malgun Gothic", nullptr,
 		DWRITE_FONT_WEIGHT_BOLD, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL,
-		fontSize, L"ko-KR", &m_pFmtLabel);
+		fontSize, L"ko-KR", &m_pFmt);
 
-	m_pDWFactory->CreateTextFormat(
-		L"Malgun Gothic", nullptr,
-		DWRITE_FONT_WEIGHT_BOLD, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL,
-		fontSize, L"ko-KR", &m_pFmtValue);
-
-	if (m_pFmtLabel)
+	if (m_pFmt)
 	{
-		m_pFmtLabel->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER);
-		m_pFmtLabel->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
-	}
-	if (m_pFmtValue)
-	{
-		m_pFmtValue->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER);
-		m_pFmtValue->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+		m_pFmt->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER);
+		m_pFmt->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+		m_pFmt->SetWordWrapping(DWRITE_WORD_WRAPPING_NO_WRAP);
 	}
 }
 
 void ControlWnd::ReleaseTextFormats()
 {
-	if (m_pFmtLabel) { m_pFmtLabel->Release(); m_pFmtLabel = nullptr; }
-	if (m_pFmtValue) { m_pFmtValue->Release(); m_pFmtValue = nullptr; }
+	if (m_pFmt) { m_pFmt->Release(); m_pFmt = nullptr; }
 }
 
 // ---------------------------------------------------------------------------
@@ -168,8 +162,8 @@ void ControlWnd::OnDestroy()
 	KillTimer(TIMER_ANIM);
 	DiscardDeviceResources();
 	ReleaseTextFormats();
-	if (m_pDWFactory)   { m_pDWFactory->Release();   m_pDWFactory   = nullptr; }
-	if (m_pD2DFactory)  { m_pD2DFactory->Release();  m_pD2DFactory  = nullptr; }
+	if (m_pDWFactory)  { m_pDWFactory->Release();  m_pDWFactory  = nullptr; }
+	if (m_pD2DFactory) { m_pD2DFactory->Release(); m_pD2DFactory = nullptr; }
 	CWnd::OnDestroy();
 }
 
@@ -204,12 +198,29 @@ void ControlWnd::OnTimer(UINT_PTR nIDEvent)
 {
 	if (nIDEvent == TIMER_ANIM)
 	{
-		m_animProg += 0.07f;
-		if (m_animProg >= 1.0f)
+		if (m_bCounting)
 		{
-			m_animProg   = 1.0f;
-			m_bAnimating = false;
-			KillTimer(TIMER_ANIM);
+			double diff = m_targetVal - m_currVal;
+			if (fabs(diff) < 0.5)
+			{
+				m_currVal   = m_targetVal;
+				m_bCounting = false;
+				KillTimer(TIMER_ANIM);
+			}
+			else
+			{
+				m_currVal += diff * 0.15;
+			}
+		}
+		else
+		{
+			m_animProg += 0.04f;
+			if (m_animProg >= 1.0f)
+			{
+				m_animProg   = 1.0f;
+				m_bAnimating = false;
+				KillTimer(TIMER_ANIM);
+			}
 		}
 		Invalidate(FALSE);
 	}
@@ -219,6 +230,86 @@ void ControlWnd::OnTimer(UINT_PTR nIDEvent)
 // ---------------------------------------------------------------------------
 // D2D rendering
 // ---------------------------------------------------------------------------
+
+void ControlWnd::RenderOdometer(float W, float H)
+{
+	float t = m_animProg * m_animProg * (3.0f - 2.0f * m_animProg); // smoothstep
+
+	CStringW oldDisplay = FormatDisplay(m_prevText);
+	CStringW newDisplay = FormatDisplay(m_text);
+
+	while (oldDisplay.GetLength() < newDisplay.GetLength()) oldDisplay = L" " + oldDisplay;
+	while (newDisplay.GetLength() < oldDisplay.GetLength()) newDisplay = L" " + newDisplay;
+
+	int len = newDisplay.GetLength();
+
+	IDWriteTextLayout* pLayout = nullptr;
+	if (FAILED(m_pDWFactory->CreateTextLayout(newDisplay, len, m_pFmt, W, H, &pLayout)) || !pLayout)
+	{
+		float yOld = -t * H;
+		float yNew = (1.0f - t) * H;
+		DrawSlice(yOld, m_prevText, m_prevColorDir);
+		DrawSlice(yNew, m_text,     m_colorDir);
+		return;
+	}
+
+	int oldDigit{};
+	for (int i = 0; i < len; i++)
+	{
+		wchar_t oldCh = oldDisplay[i];
+		wchar_t newCh = newDisplay[i];
+
+		float x0 = 0.0f, x1 = W, dummy = 0.0f;
+		DWRITE_HIT_TEST_METRICS metrics{};
+		if (i > 0)
+			pLayout->HitTestTextPosition(i,     FALSE, &x0, &dummy, &metrics);
+		if (i < len - 1)
+			pLayout->HitTestTextPosition(i + 1, FALSE, &x1, &dummy, &metrics);
+
+		m_pRT->PushAxisAlignedClip(D2D1::RectF(x0, 0.0f, x1, H), D2D1_ANTIALIAS_MODE_PER_PRIMITIVE);
+
+		bool oldIsDigit = (oldCh >= L'0' && oldCh <= L'9');
+		bool newIsDigit = (newCh >= L'0' && newCh <= L'9');
+
+		if (oldCh == newCh || !oldIsDigit || !newIsDigit)
+		{
+			// 변화 없거나 숫자가 아닌 자릿수(콤마 등): 정지
+			DrawSlice(0.0f, m_text, m_colorDir);
+		}
+		else
+		{
+			// 숫자 자릿수 변화: 중간 숫자들 스크롤
+			oldDigit = oldCh - L'0';
+			int newDigit = newCh - L'0';
+			int steps    = newDigit - oldDigit;
+			int digitDir = (steps > 0) ? 1 : -1;
+			int absSteps = abs(steps);
+
+			float pos  = t * absSteps;
+			int   step = (int)pos;
+			if (step >= absSteps) step = absSteps - 1;
+			float frac = pos - step;
+
+			int d0 = oldDigit + digitDir * step;
+			int d1 = oldDigit + digitDir * (step + 1);
+
+			float yOut = -frac * H;
+			float yIn  = (1.0f - frac) * H;
+
+			CStringW strOut = newDisplay;
+			CStringW strIn  = newDisplay;
+			strOut.SetAt(i, L'0' + (wchar_t)((d0 % 10 + 10) % 10));
+			strIn .SetAt(i, L'0' + (wchar_t)((d1 % 10 + 10) % 10));
+
+			DrawSlice(yOut, strOut, m_colorDir);
+			DrawSlice(yIn,  strIn,  m_colorDir);
+		}
+
+		m_pRT->PopAxisAlignedClip();
+	}
+
+	pLayout->Release();
+}
 
 void ControlWnd::RenderD2D()
 {
@@ -235,29 +326,54 @@ void ControlWnd::RenderD2D()
 
 	if (m_bAnimating && m_dir != 0)
 	{
-		// Smoothstep easing: t = p*p*(3-2*p)
-		float p = m_animProg;
-		float t = p * p * (3.0f - 2.0f * p);
-
-		float oldY, newY;
-		if (m_dir > 0)
+		if (m_type == ANIM_ODOMETER)
 		{
-			// Up: old exits top, new enters from bottom
-			oldY = -t * H;
-			newY = (1.0f - t) * H;
+			RenderOdometer(W, H);
 		}
 		else
 		{
-			// Down: old exits bottom, new enters from top
-			oldY =  t * H;
-			newY = -(1.0f - t) * H;
+			float p = m_animProg;
+			float t = p * p * (3.0f - 2.0f * p); // smoothstep
+
+			float oldY, newY;
+			if (m_dir > 0) { oldY = -t * H; newY = (1.0f - t) * H; }
+			else           { oldY =  t * H; newY = -(1.0f - t) * H; }
+
+			CStringW oldDisplay = FormatDisplay(m_prevText);
+			CStringW newDisplay = FormatDisplay(m_text);
+
+			int commonLen = 0;
+			int minLen = min(oldDisplay.GetLength(), newDisplay.GetLength());
+			for (int i = 0; i < minLen; i++)
+			{
+				if (oldDisplay[i] == newDisplay[i]) commonLen++;
+				else break;
+			}
+
+			if (commonLen > 0 && oldDisplay.GetLength() == newDisplay.GetLength())
+			{
+				float splitX = MeasurePrefixX(newDisplay, commonLen);
+
+				m_pRT->PushAxisAlignedClip(D2D1::RectF(0.0f, 0.0f, splitX, H), D2D1_ANTIALIAS_MODE_PER_PRIMITIVE);
+				DrawSlice(0.0f, m_text, m_colorDir);
+				m_pRT->PopAxisAlignedClip();
+
+				m_pRT->PushAxisAlignedClip(D2D1::RectF(splitX, 0.0f, W, H), D2D1_ANTIALIAS_MODE_PER_PRIMITIVE);
+				DrawSlice(oldY, m_prevText, m_prevColorDir);
+				DrawSlice(newY, m_text, m_colorDir);
+				m_pRT->PopAxisAlignedClip();
+			}
+			else
+			{
+				DrawSlice(oldY, m_prevText, m_prevColorDir);
+				DrawSlice(newY, m_text, m_colorDir);
+			}
 		}
-		DrawRow(oldY, m_prevPrice, m_prevChange, m_prevDir);
-		DrawRow(newY, m_price, m_change, m_dir);
 	}
 	else
 	{
-		DrawRow(0.0f, m_price, m_change, m_dir);
+		CStringW drawText = m_bCounting ? CountDisplayText() : m_text;
+		DrawSlice(0.0f, drawText, m_colorDir);
 	}
 
 	m_pRT->PopAxisAlignedClip();
@@ -269,96 +385,284 @@ void ControlWnd::RenderD2D()
 	}
 }
 
-void ControlWnd::DrawRow(float yOff, const CStringW& price, const CStringW& change, int dir)
+float ControlWnd::MeasurePrefixX(const CStringW& display, int prefixLen)
 {
-	if (!m_pFmtLabel || !m_pFmtValue) return;
+	if (prefixLen <= 0 || !m_pDWFactory || !m_pFmt || display.IsEmpty())
+		return 0.0f;
 
 	RECT rc;
 	GetClientRect(&rc);
 	float W = (float)rc.right;
 	float H = (float)rc.bottom;
 
-	ID2D1SolidColorBrush* pValBrush = (dir > 0) ? m_pBrushUp :
-	                                  (dir < 0) ? m_pBrushDown : m_pBrushFlat;
+	IDWriteTextLayout* pLayout = nullptr;
+	if (FAILED(m_pDWFactory->CreateTextLayout(
+		display, display.GetLength(), m_pFmt, W, H, &pLayout)) || !pLayout)
+		return 0.0f;
 
-	// Layout: [30% label][40% price][30% change%]
-	float x1 = W * 0.30f;
-	float x2 = W * 0.70f;
+	float x = 0.0f, y = 0.0f;
+	DWRITE_HIT_TEST_METRICS metrics = {};
+	pLayout->HitTestTextPosition(prefixLen, FALSE, &x, &y, &metrics);
+	pLayout->Release();
+	return x;
+}
 
-	if (!m_label.IsEmpty())
+static CStringW FormatDisplay(const CStringW& text)
+{
+	if (text.IsEmpty()) return text;
+
+	CStringW s = text;
+	if (s[0] == L'+' || s[0] == L'-')
+		s = s.Mid(1);
+
+	// Check if numeric (digits and at most one '.')
+	bool isNum = !s.IsEmpty();
+	for (int i = 0; i < s.GetLength() && isNum; i++)
 	{
-		m_pRT->DrawText(m_label, m_label.GetLength(), m_pFmtLabel,
-			D2D1::RectF(0.0f, yOff, x1, yOff + H), m_pBrushLabel);
+		if (s[i] != L'.' && (s[i] < L'0' || s[i] > L'9'))
+			isNum = false;
 	}
-	if (!price.IsEmpty())
+
+	if (!isNum) return s;
+
+	int dotPos = s.Find(L'.');
+	CStringW intPart = (dotPos >= 0) ? s.Left(dotPos) : s;
+	CStringW decPart = (dotPos >= 0) ? s.Mid(dotPos) : L"";
+
+	CStringW result;
+	int len = intPart.GetLength();
+	for (int i = 0; i < len; i++)
 	{
-		m_pRT->DrawText(price, price.GetLength(), m_pFmtValue,
-			D2D1::RectF(x1, yOff, x2, yOff + H), pValBrush);
+		if (i > 0 && (len - i) % 3 == 0)
+			result += L',';
+		result += intPart[i];
 	}
-	if (!change.IsEmpty())
-	{
-		m_pRT->DrawText(change, change.GetLength(), m_pFmtValue,
-			D2D1::RectF(x2, yOff, W, yOff + H), pValBrush);
-	}
+
+	return result + decPart;
+}
+
+void ControlWnd::DrawSlice(float yOff, const CStringW& text, int dir)
+{
+	if (!m_pFmt || text.IsEmpty()) return;
+
+	RECT rc;
+	GetClientRect(&rc);
+	float W = (float)rc.right;
+	float H = (float)rc.bottom;
+
+	ID2D1SolidColorBrush* pBrush = (dir > 0) ? m_pBrushUp :
+	                               (dir < 0) ? m_pBrushDown : m_pBrushFlat;
+
+	CStringW display = FormatDisplay(text);
+	D2D1_RECT_F layoutRect = D2D1::RectF(0.0f, yOff, W, yOff + H);
+	m_pRT->DrawText(display, display.GetLength(), m_pFmt, layoutRect, pBrush);
+}
+
+CStringW ControlWnd::CountDisplayText() const
+{
+	CStringW prefix = (m_colorDir > 0) ? L"+" : (m_colorDir < 0) ? L"-" : L"";
+	CStringW num;
+	if (m_decimalPlaces > 0)
+		num.Format(L"%.*f", m_decimalPlaces, m_currVal);
+	else
+		num.Format(L"%d", (int)round(m_currVal));
+	return prefix + num;
 }
 
 // ---------------------------------------------------------------------------
 // OLE dispatch
 // ---------------------------------------------------------------------------
 
-SHORT ControlWnd::SetData(int gubn, BSTR sVal)
+SHORT ControlWnd::SetData(int gubn, LPCTSTR sVal)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
-	if (!sVal) return 0;
+	if (!sVal || sVal[0] == _T('\0')) return 0;
 
-	// Parse pipe-delimited string: "label|price|change|dir"
-	// dir: "1"=up, "-1"=down, "0"=flat
-	CStringW data(sVal);
-	CStringW parts[5];
-	int count = 0;
-	int start = 0;
-	for (int i = 0; i <= data.GetLength() && count < 5; i++)
+	CStringW newText(sVal);
+	newText.Trim();
+
+	int newColorDir = 0;
+	if (!newText.IsEmpty())
 	{
-		if (i == data.GetLength() || data[i] == L'|')
+		if      (newText[0] == L'+') newColorDir =  1;
+		else if (newText[0] == L'-') newColorDir = -1;
+	}
+
+	// Strip prefix and check if numeric (allow comma-formatted input)
+	CStringW stripped = newText;
+	if (!stripped.IsEmpty() && (stripped[0] == L'+' || stripped[0] == L'-'))
+		stripped = stripped.Mid(1);
+	stripped.Remove(L',');
+
+	bool isNum = !stripped.IsEmpty();
+	for (int i = 0; i < stripped.GetLength() && isNum; i++)
+		if (stripped[i] != L'.' && (stripped[i] < L'0' || stripped[i] > L'9'))
+			isNum = false;
+
+	double newVal = isNum ? _wtof(stripped) : 0.0;
+
+	if (isNum)
+	{
+		int dotPos = stripped.Find(L'.');
+		m_decimalPlaces = (dotPos >= 0) ? (stripped.GetLength() - dotPos - 1) : 0;
+	}
+
+	// Init (gubn==0 or first value)
+	if (m_text.IsEmpty() || gubn == 0)
+	{
+		m_text       = newText;
+		m_colorDir   = newColorDir;
+		m_dir        = 0;
+		m_bAnimating = false;
+		m_bCounting  = false;
+		if (isNum) m_currVal = m_targetVal = newVal;
+		KillTimer(TIMER_ANIM);
+		Invalidate(FALSE);
+		return 0;
+	}
+
+	if (isNum && m_type == ANIM_COUNTUP)
+	{
+		if (!m_bCounting)
+			m_currVal = m_targetVal;
+
+		m_targetVal  = newVal;
+		m_text       = newText;
+		m_colorDir   = newColorDir;
+		m_bAnimating = false;
+
+		if (fabs(m_targetVal - m_currVal) < 0.5)
 		{
-			parts[count++] = data.Mid(start, i - start);
-			start = i + 1;
+			m_currVal   = m_targetVal;
+			m_bCounting = false;
+			KillTimer(TIMER_ANIM);
+			Invalidate(FALSE);
+			return 0;
+		}
+
+		if (!m_bCounting)
+		{
+			m_bCounting = true;
+			SetTimer(TIMER_ANIM, 100, nullptr);
+		}
+		return 0;
+	}
+
+	// Slide / Odometer (numeric direction 비교, 비숫자는 direction=0 -> instant)
+	{
+		CStringW prevStripped = m_text;
+		if (!prevStripped.IsEmpty() && (prevStripped[0] == L'+' || prevStripped[0] == L'-'))
+			prevStripped = prevStripped.Mid(1);
+		prevStripped.Remove(L',');
+		double prevVal = _wtof(prevStripped);
+
+		// signed comparison: +/- prefix is rise/fall indicator, not arithmetic sign
+		double prevSigned = (m_colorDir  < 0) ? -prevVal : prevVal;
+		double newSigned  = (newColorDir < 0) ? -newVal  : newVal;
+
+		int newAnimDir = 0;
+		if (newSigned > prevSigned)      newAnimDir =  1;
+		else if (newSigned < prevSigned) newAnimDir = -1;
+
+		if (newAnimDir == 0)
+			return 0;
+
+		m_prevText     = m_text;
+		m_prevColorDir = m_colorDir;
+		m_text         = newText;
+		m_colorDir     = newColorDir;
+		m_dir          = newAnimDir;
+		m_animProg     = 0.0f;
+		m_bAnimating   = true;
+		m_bCounting    = false;
+		SetTimer(TIMER_ANIM, 16, nullptr);
+		return 0;
+	}
+}
+
+void ControlWnd::SetParam(_param* pParam)
+{
+	m_Param.key = pParam->key;
+	m_Param.name = CString(pParam->name, pParam->name.GetLength());
+	m_Param.rect = CRect(pParam->rect.left, pParam->rect.top, pParam->rect.right, pParam->rect.bottom);
+	m_Param.fonts = CString(pParam->fonts, pParam->fonts.GetLength());
+	m_Param.point = pParam->point;
+	m_Param.style = pParam->style;
+	//m_clrForeColor = m_Param.tRGB = pParam->tRGB;
+	//m_clrBackColor = m_Param.pRGB = pParam->pRGB;
+	m_Param.options = CString(pParam->options, pParam->options.GetLength());
+	parseOptions();
+}
+
+void ControlWnd::parseOptions()
+{
+	int	idx = 0, pos = 0;
+	CString	keys, text, tmps, strtemp;
+	CString sOption{};
+	sOption = m_Param.options;
+
+	tmps = _T("/ ");
+	keys = _T("dpbschlutoargmxwfyvk");
+
+	for (int ii = 0; ii < keys.GetLength(); ii++)
+	{
+		tmps.SetAt(1, keys[ii]);
+		idx = sOption.Find(tmps);
+		if (idx < 0)
+			continue;
+
+		idx += 2;
+		pos = sOption.Find('/', idx);
+
+		text = (pos < 0) ? sOption.Mid(idx) : sOption.Mid(idx, pos - idx);
+		text.TrimLeft();
+
+		switch (keys[ii])
+		{
+			case 's':
+			{
+				if (text == "0")
+					m_type = ANIM_COUNTUP;
+				else if(text == "1")
+					m_type = ANIM_ODOMETER;
+			}
+			break;
+			case 'u':
+			{
+		
+			}
+			break;
+			case 't':
+			{
+			
+			}
+			break;
+			case 'k':
+			{
+		
+			}
+			break;
+			case 'd':
+			{
+		
+			}
+			break;
+			case 'v':
+			{
+		
+			}
+			break;
+			case 'y':
+			{
+		
+			}
+			break;
+			case 'f':
+			{
+
+			}
+			break;
 		}
 	}
-
-	if (count < 1) return 0;
-
-	if (!parts[0].IsEmpty())
-		m_label = parts[0];
-
-	CStringW newPrice  = (count >= 2) ? parts[1] : L"";
-	CStringW newChange = (count >= 3) ? parts[2] : L"";
-	int      newDir    = (count >= 4) ? _wtoi(parts[3]) : 0;
-
-	bool withAnim = (gubn == 1) && !m_price.IsEmpty() && (newPrice != m_price);
-
-	if (withAnim)
-	{
-		m_prevPrice  = m_price;
-		m_prevChange = m_change;
-		m_prevDir    = m_dir;
-
-		m_price  = newPrice;
-		m_change = newChange;
-		m_dir    = newDir;
-
-		m_animProg   = 0.0f;
-		m_bAnimating = true;
-		SetTimer(TIMER_ANIM, 16, nullptr);
-	}
-	else
-	{
-		m_price  = newPrice;
-		m_change = newChange;
-		m_dir    = newDir;
-		Invalidate(FALSE);
-	}
-
-	return 0;
 }
