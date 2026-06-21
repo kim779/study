@@ -45,6 +45,7 @@ private:
 	int      m_dir;           // animation direction: 1=up, -1=down
 	int      m_colorDir;      // text color: 1=red(+), -1=blue(-), 0=black
 	int      m_prevColorDir;  // previous text color (for animation frame)
+	float  m_iInterval = 0.04f;
 
 	float  m_animProg;
 	bool   m_bAnimating;

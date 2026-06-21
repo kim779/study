@@ -214,7 +214,7 @@ void ControlWnd::OnTimer(UINT_PTR nIDEvent)
 		}
 		else
 		{
-			m_animProg += 0.04f;
+			m_animProg += m_iInterval;// 0.04f;
 			if (m_animProg >= 1.0f)
 			{
 				m_animProg   = 1.0f;
@@ -246,8 +246,8 @@ void ControlWnd::RenderOdometer(float W, float H)
 	IDWriteTextLayout* pLayout = nullptr;
 	if (FAILED(m_pDWFactory->CreateTextLayout(newDisplay, len, m_pFmt, W, H, &pLayout)) || !pLayout)
 	{
-		float yOld = -t * H;
-		float yNew = (1.0f - t) * H;
+		float yOld = (m_dir > 0) ? -t * H :  t * H;
+		float yNew = (m_dir > 0) ? (1.0f - t) * H : -(1.0f - t) * H;
 		DrawSlice(yOld, m_prevText, m_prevColorDir);
 		DrawSlice(yNew, m_text,     m_colorDir);
 		return;
@@ -282,7 +282,10 @@ void ControlWnd::RenderOdometer(float W, float H)
 			oldDigit = oldCh - L'0';
 			int newDigit = newCh - L'0';
 			int steps    = newDigit - oldDigit;
-			int digitDir = (steps > 0) ? 1 : -1;
+			// 전체 방향(m_dir)에 맞게 wrap 경로 선택 (예: 감소 시 0→9는 +9가 아닌 -1)
+			if (m_dir > 0 && steps < 0) steps += 10;
+			if (m_dir < 0 && steps > 0) steps -= 10;
+			int digitDir = (steps >= 0) ? 1 : -1;
 			int absSteps = abs(steps);
 
 			float pos  = t * absSteps;
@@ -293,8 +296,9 @@ void ControlWnd::RenderOdometer(float W, float H)
 			int d0 = oldDigit + digitDir * step;
 			int d1 = oldDigit + digitDir * (step + 1);
 
-			float yOut = -frac * H;
-			float yIn  = (1.0f - frac) * H;
+			// 증가: 위로 나가고 아래서 들어옴 / 감소: 아래로 나가고 위에서 들어옴
+			float yOut = (m_dir > 0) ? -frac * H :  frac * H;
+			float yIn  = (m_dir > 0) ? (1.0f - frac) * H : -(1.0f - frac) * H;
 
 			CStringW strOut = newDisplay;
 			CStringW strIn  = newDisplay;
@@ -557,13 +561,10 @@ SHORT ControlWnd::SetData(int gubn, LPCTSTR sVal)
 		prevStripped.Remove(L',');
 		double prevVal = _wtof(prevStripped);
 
-		// signed comparison: +/- prefix is rise/fall indicator, not arithmetic sign
-		double prevSigned = (m_colorDir  < 0) ? -prevVal : prevVal;
-		double newSigned  = (newColorDir < 0) ? -newVal  : newVal;
-
+		// +/- 접두사는 색상 표시용(전일대비 방향), 슬라이드 방향은 절대값으로 비교
 		int newAnimDir = 0;
-		if (newSigned > prevSigned)      newAnimDir =  1;
-		else if (newSigned < prevSigned) newAnimDir = -1;
+		if (newVal > prevVal)      newAnimDir =  1;
+		else if (newVal < prevVal) newAnimDir = -1;
 
 		if (newAnimDir == 0)
 			return 0;
@@ -635,7 +636,7 @@ void ControlWnd::parseOptions()
 			break;
 			case 't':
 			{
-			
+				m_iInterval = (float)atof(text);
 			}
 			break;
 			case 'k':
