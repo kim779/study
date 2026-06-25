@@ -583,7 +583,6 @@
 #define IDC_INVEST_KOSPI                7314
 #define KOSPI_AFTER_START               7314
 #define IDC_INVEST_KOSDAQ               7315
-#define KOSPI_OPEN_TIME3                7315
 #define KOSPI_AFTER_END                 7315
 #define IDC_INVEST_FUTURE               7316
 #define IDC_INVEST_CALL                 7317

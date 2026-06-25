@@ -235,7 +235,11 @@ DWORD CMainWnd::CB_Resp(int nMessageID, char* pszUniqueNO, char* pszDeviceType,
 	if (nMessageID == 1101) {
 		s_pDlg->m_sMsgID.Format("%d", nMessageID);
 		if (pszResult && pszResult[0] == '1') {
-			s_pDlg->SetStatus("Logged In");
+			CStringA sDvcID(EAPIGetDeviceID());
+			char detail[512];
+			_snprintf_s(detail, sizeof(detail), _TRUNCATE,
+				"Logged In | %s", sDvcID.GetString());
+			s_pDlg->SetStatus(detail);
 		}
 		else
 		{
@@ -301,16 +305,23 @@ DWORD CMainWnd::CB_Event(int nMessageID, char* pszCallID1, char* pszCallID2,
 
 	char buf[1024];
 	_snprintf_s(buf, sizeof(buf), _TRUNCATE,
-		"[cx_newphonepad][EVENT] %s(%d) CallID=%s, ANI=%s, DNIS=%s, Dir=%s, %s->%s",
-		GetMsgName(nMessageID), nMessageID,
-		SZ(pszCallID1), SZ(pszANI), SZ(pszDNIS),
-		SZ(pszCallDirection), SZ(pszPrevStatus), SZ(pszCallStatus));
+    "[cx_newphonepad][EVENT] %s(%d) CallID=%s/%s, ANI=%s, DNIS=%s, Dir=%s, %s->%s, DeviceID=%s",
+    GetMsgName(nMessageID), nMessageID,
+    SZ(pszCallID1), SZ(pszCallID2), SZ(pszANI), SZ(pszDNIS),
+    SZ(pszCallDirection), SZ(pszPrevStatus), SZ(pszCallStatus),
+    SZ(pszDeviceID));
 	buf[sizeof(buf) - 1] = '\0';
 	s_pDlg->PostLogFromCallback(buf);
 	s_pDlg->m_sMsgID.Format("%d", nMessageID);
 	if (nMessageID == 1305)
 	{
 		s_pDlg->m_iLoginState = LOGINED;
+		s_pDlg->SetStatus("EVT_IN_SERVICE - ready");
+	}
+	else if (nMessageID == 1304)
+	{
+		s_pDlg->m_iLoginState = LOGOUT;
+		s_pDlg->SetStatus("EVT_OUT_OF_SERVICE - unavailable");
 	}
 	return 0;
 }
@@ -333,7 +344,7 @@ DWORD CMainWnd::CB_UUI(int nMessageID, char* pszCallID, char* pszUUIData,
 			SZ(pszResult), SZ(pszCause));
 
 			CString stmp;
-			stmp.Format("%s", pszUUIData);
+			stmp.Format("%s", SZ(pszUUIData));
 
 			CString stoken{};
 			int pos = stmp.Find(_T("HTS^"));
@@ -346,9 +357,17 @@ DWORD CMainWnd::CB_UUI(int nMessageID, char* pszCallID, char* pszUUIData,
 					stoken = stmp.Mid(pos, end - pos);
 					s_pDlg->m_sAccPass = Aes256DecryptBase64(stoken);
 					s_pDlg->m_sAccPass.TrimRight();
-					s_pDlg->SendPassToMap();
-					s_pDlg->m_sState = "고객입력완료";
-					s_pDlg->SetStatus(s_pDlg->m_sState);
+					if (s_pDlg->m_sAccPass.TrimRight().GetLength() > 0)
+					{
+						s_pDlg->SendPassToMap();
+						s_pDlg->m_sState = "고객입력완료";
+						s_pDlg->SetStatus(s_pDlg->m_sState);
+					}
+					 else
+					{
+						// decrypt failed or empty result
+						s_pDlg->PostLogFromCallback("[cx_newphonepad][CB_UUI] decrypt failed - empty result");
+					}
 				}
 			}
 			
@@ -442,8 +461,9 @@ LRESULT CMainWnd::OnAppLog(WPARAM wParam, LPARAM lParam)
 		m_pWizard->SendMessage(WM_USER, MAKEWPARAM(eventDLL, MAKEWORD(m_Param.key, evOnDblClk)), (LPARAM)m_Param.name.GetString());  //메시지
 		
 		CString slog;
-		slog.Format("[cx_newphonepad] pszStatus=[%s]",  (LPCTSTR)(*pStr));
-		OutputDebugString(slog);
+		slog.Format("[cx_newphonepad][%s]<%d> SendMessage evOnDblClk sRes=[%s]",
+    __FUNCTION__, __LINE__, (LPCTSTR)m_sRes);
+OutputDebugString(slog);
 
 		//m_sRes.Empty();
 
@@ -462,7 +482,7 @@ void CMainWnd::PostLogFromCallback(const char* pszMsg)
 void CMainWnd::SetStatus(const char* pszStatus)
 {
 	m_sState.Format("%s", pszStatus);
-	m_pWizard->SendMessage(WM_USER, MAKEWPARAM(eventDLL, MAKEWORD(m_Param.key, evOnChange)), (LPARAM)m_Param.name.GetString()); //프로세스 상태
+	m_pWizard->PostMessage(WM_USER, MAKEWPARAM(eventDLL, MAKEWORD(m_Param.key, evOnChange)), (LPARAM)m_Param.name.GetString()); //프로세스 상태
 }
 
 int CMainWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
@@ -499,7 +519,7 @@ VARIANT_BOOL CMainWnd::_EAPILogin(BSTR sID, BSTR sDvcID, BSTR sUnqID, BSTR sOtpi
 	BOOL bRtn = EAPILogin(idA.GetString(), devA.GetString(), uniA.GetString(), "");
 
 	CString slog;
-	slog.Format("[cx_newphonepad][%s]<%d>  bRtn = [%d] ", __FUNCTION__, __LINE__, bRtn);
+	slog.Format("[cx_newphonepad][%s]<%d> bRtn=[%d] ID=[%s] Device=[%s] Unique=[%s]",  __FUNCTION__, __LINE__, bRtn,  idA.GetString(), devA.GetString(), uniA.GetString());
 	OutputDebugString(slog);
 
 	m_sState.Format("%s", bRtn ? "로그인" : "로그인 실패");
@@ -537,8 +557,14 @@ VARIANT_BOOL CMainWnd::_EAPILogout()
 
 void CMainWnd::OnDestroy()
 {
-	EAPIDisconnect();
-	EAPIFinalize();
+	BOOL bDisc = EAPIDisconnect();
+	BOOL bFin = EAPIFinalize();
+
+	CString slog;
+    slog.Format("[cx_newphonepad][%s]<%d> EAPIDisconnect=[%d] EAPIFinalize=[%d]",
+        __FUNCTION__, __LINE__, bDisc, bFin);
+    OutputDebugString(slog);
+
 	CWnd::OnDestroy();
 }
 
@@ -570,7 +596,7 @@ VARIANT_BOOL CMainWnd::_EAPIPhonePad(BSTR sCallID, BSTR sSvcCode, BSTR sCustData
 	CTime time;
 	time = CTime::GetCurrentTime();
 	m_sRes.Format("[%02d:%02d:%02d]계좌비번요청 결과 = [%d] 고유번호=[%s] 다이알넘버=[%s] ", time.GetHour(), time.GetMinute(), time.GetSecond() ,bRtn, m_strPPCustData, m_strPPDialNum );
-	OutputDebugString(slog);
+	OutputDebugString(m_sRes);
 	m_pWizard->SendMessage(WM_USER, MAKEWPARAM(eventDLL, MAKEWORD(m_Param.key, evOnDblClk)), (LPARAM)m_Param.name.GetString());  //메시지
 
 	m_sState.Format("%s", bRtn ? "고객입력대기중" : "고개입력요청 실패");
@@ -591,7 +617,8 @@ void CMainWnd::_SendMSgToMain(BSTR sMsg)
 	stmp.Format("%s", sMsg);
 	stmp.TrimRight();
 	CWnd* pwnd = Axis_GetMainWnd();
-	bool bret = pwnd->SendMessage(WM_USER + 0x7001, 0, (LPARAM)stmp.operator LPCTSTR());
+	if(pwnd)
+		pwnd->SendMessage(WM_USER + 0x7001, 0, (LPARAM)stmp.operator LPCTSTR());
 }
 
 

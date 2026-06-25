@@ -62,6 +62,8 @@ BOOL CMngSetup::OnInitDialog()
 	((CButton*)GetDlgItem(KOSPI_CLOSE_TIME))->ShowWindow(SW_HIDE);
 	((CButton*)GetDlgItem(KOSPI_OPEN_10S))->ShowWindow(SW_HIDE);
 	((CButton*)GetDlgItem(KOSPI_CLOSE_10S))->ShowWindow(SW_HIDE);
+	((CButton*)GetDlgItem(KOSPI_FREE))->ShowWindow(SW_HIDE);
+	
 	
 	return TRUE;  
 }

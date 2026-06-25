@@ -42,6 +42,8 @@ static char THIS_FILE[] = __FILE__;
 #define VS_SKIP "2"
 #define VS_TIMER "3"
 
+#define DF_BALANCE_TOTALSEND1
+
 
 CString GetField(const CString& src, int index)
 {
@@ -707,36 +709,23 @@ void CControlWnd::SendToMap(CString sData, bool bAll, CString sAccn/* = ""*/)
 	}
 	else if (tmpdateS.GetLength() > 0)
 	{
-		// 신용 즉시 전달
-		m_pParent->SendMessage(WM_USER, MAKEWPARAM(eventDLL, MAKEWORD(m_Param.key, evOnDblClk)),
-			(LPARAM)m_Param.name.GetString());
+		// 신용종목 타이머 처리: 현재 항목을 pendingMap에 등록
+		m_pendingMap.SetAt(keyS, m_dataList);
 
-		// pendingMap에서 같은 sCode의 일반 항목 검색
-		// keyS 포맷: jggb(2) + code(12) + date(8) + sygb(2)
-		CString foundKey;
-		POSITION sp = m_pendingMap.GetStartPosition();
+		// 같은 종목코드의 다른 신용날짜 항목을 CodeMap에서 찾아 pendingMap에 함께 등록
+		// → 타이머 발화 시 동일 종목의 모든 신용날짜 행이 동시에 업데이트됨
+		POSITION sp = m_CodeMap.GetStartPosition();
 		while (sp != nullptr)
 		{
 			CString k, v;
-			m_pendingMap.GetNextAssoc(sp, k, v);
+			m_CodeMap.GetNextAssoc(sp, k, v);
 			CString codeInKey = k.Mid(LEN_JGGB, LEN_ACODE);  codeInKey.TrimRight();
-			CString dateInKey = k.Mid(LEN_JGGB + LEN_ACODE, LEN_DATE);  dateInKey.TrimRight();
-			if (codeInKey == sCode && dateInKey.IsEmpty())
+			if (codeInKey == sCode && k != keyS)
 			{
-				foundKey = k;
-				break;
+				CString dummy;
+				if (!m_pendingMap.Lookup(k, dummy))
+					m_pendingMap.SetAt(k, v);
 			}
-		}
-		if (!foundKey.IsEmpty())
-		{
-			CString pendingData;
-			m_pendingMap.Lookup(foundKey, pendingData);
-			m_pendingMap.RemoveKey(foundKey);
-			m_flag = "U";
-			m_dataList = pendingData;
-			m_pParent->SendMessage(WM_USER, MAKEWPARAM(eventDLL, MAKEWORD(m_Param.key,
-				evOnDblClk)),
-				(LPARAM)m_Param.name.GetString());
 		}
 	}
 	else if (m_Version == VS_TIMER)
@@ -1025,6 +1014,7 @@ void CControlWnd::OnTimer(UINT_PTR nIDEvent)
 			m_bPendingTimer = FALSE;
 		}
 		break;
+#ifdef DF_BALANCE_TOTALSEND
 		case TM_VSTIEMR:
 		{
 			if (m_pendingMap.IsEmpty())
@@ -1072,8 +1062,8 @@ void CControlWnd::OnTimer(UINT_PTR nIDEvent)
 					m_sendQueue.push_back(sCode);
 				}
 
-				m_slog.Format("[cx_notify][%s]<%d> [TM_VSTIEMR] total=[%d] subSendCount=[%d] diffSec=[%d]",
-					__FUNCTION__, __LINE__, total, m_nSubSendCount, m_diffSec);
+				m_slog.Format("[cx_notify][%s]<%d> [TM_VSTIEMR] total=[%d] subSendCount=[%d] diffSec=[%d] m_nThreshold=[%d]",
+					__FUNCTION__, __LINE__, total, m_nSubSendCount, m_diffSec, m_nThreshold);
 				Output_DebugString(m_slog);
 
 				m_bSubTimerActive = TRUE;
@@ -1095,7 +1085,7 @@ void CControlWnd::OnTimer(UINT_PTR nIDEvent)
 			}
 
 			
-			const int endIndex = min(m_nSendIndex + m_nSubSendCount, (int)m_sendQueue.size());
+			int endIndex = min(m_nSendIndex + m_nSubSendCount, (int)m_sendQueue.size());
 
 			m_slog.Format("[cx_notify][%s]<%d> [TM_VSSUBTIEMR] --------------------------m_nSendIndex =[%d] m_nSubSendCount=[%d]  endIndex=[%d] diffSec=[%d]",
 				__FUNCTION__, __LINE__, m_nSendIndex, m_nSubSendCount, endIndex, m_diffSec);
@@ -1133,6 +1123,133 @@ void CControlWnd::OnTimer(UINT_PTR nIDEvent)
 			}
 		}
 		break;
+#else
+				case TM_VSTIEMR:
+				{
+					if (m_pendingMap.IsEmpty())
+						return;
+
+					if (m_bSubTimerActive)
+						return;
+
+					const int total = m_pendingMap.GetCount();
+
+					if (total <= m_nThreshold)
+					{
+						m_slog.Format("[cx_notify][%s]<%d> [TM_VSTIEMR] total=[%d]",
+							__FUNCTION__, __LINE__, total);
+						Output_DebugString(m_slog);
+
+						POSITION pos = m_pendingMap.GetStartPosition();
+						while (pos != nullptr)
+						{
+							CString sCode, sData;
+							m_pendingMap.GetNextAssoc(pos, sCode, sData);
+							m_pendingMap.RemoveKey(sCode);
+
+							m_flag = "U";
+							m_dataList = sData;
+
+							m_pParent->SendMessage(WM_USER,
+								MAKEWPARAM(eventDLL, MAKEWORD(m_Param.key, evOnDblClk)),
+								(LPARAM)m_Param.name.GetString());
+						}
+					}
+					else
+					{
+						//const int totalTicks = (m_diffSec > 0) ? (m_diffSec * 1000 / m_subInterval) : 5;
+						//m_nSubSendCount = (total + totalTicks - 1) / totalTicks;
+						m_nSubSendCount = 3;
+
+						// group by stock code so same-stock items are consecutive in sendQueue
+						std::map<CString, std::vector<CString>> codeGroups;
+						POSITION pos = m_pendingMap.GetStartPosition();
+						while (pos != nullptr)
+						{
+							CString sCode, sData;
+							m_pendingMap.GetNextAssoc(pos, sCode, sData);
+							CString code = sCode.Mid(LEN_JGGB, LEN_ACODE);
+							code.TrimRight();
+							codeGroups[code].push_back(sCode);
+						}
+
+						m_sendQueue.clear();
+						m_nSendIndex = 0;
+						for (auto& grp : codeGroups)
+							for (auto& key : grp.second)
+								m_sendQueue.push_back(key);
+
+						m_slog.Format("[cx_notify][%s]<%d> [TM_VSTIEMR] total=[%d] subSendCount=[%d] diffSec=[%d] m_nThreshold=[%d]",
+							__FUNCTION__, __LINE__, total, m_nSubSendCount, m_diffSec, m_nThreshold);
+						Output_DebugString(m_slog);
+
+						m_bSubTimerActive = TRUE;
+						SetTimer(TM_VSSUBTIEMR, m_subInterval, nullptr);
+					}
+				}
+				break;
+				case TM_VSSUBTIEMR:
+				{
+					if (m_nSendIndex >= (int)m_sendQueue.size())
+					{
+						KillTimer(TM_VSSUBTIEMR);
+						m_bSubTimerActive = FALSE;
+						m_sendQueue.clear();
+						return;
+					}
+
+					int itemsSent = 0;
+					while (m_nSendIndex < (int)m_sendQueue.size())
+					{
+						// m_nSubSendCount 채웠어도 현재 그룹 시작이면 진행
+						CString curCode = m_sendQueue[m_nSendIndex].Mid(LEN_JGGB, LEN_ACODE);
+						curCode.TrimRight();
+
+						// 현재 그룹(같은 종목코드) 전체 전송
+						while (m_nSendIndex < (int)m_sendQueue.size())
+						{
+							CString code = m_sendQueue[m_nSendIndex].Mid(LEN_JGGB, LEN_ACODE);
+							code.TrimRight();
+							if (code != curCode)
+							{
+								m_slog.Format("[cx_notify][%s]<%d> ---- [TM_VSSUBTIEMR] m_nSendIndex=[%d] size=%d] code=[%s] curCode=[%s]",
+									__FUNCTION__, __LINE__, m_nSendIndex, m_sendQueue.size(), code, curCode);
+								Output_DebugString(m_slog);
+								break;
+							}
+
+							CString sData;
+							if (m_pendingMap.Lookup(m_sendQueue[m_nSendIndex], sData))
+							{
+								m_pendingMap.RemoveKey(m_sendQueue[m_nSendIndex]);
+								m_flag = "U";
+								m_dataList = sData;
+								m_pParent->SendMessage(WM_USER,
+									MAKEWPARAM(eventDLL, MAKEWORD(m_Param.key, evOnDblClk)),
+									(LPARAM)m_Param.name.GetString());
+
+								m_slog.Format("[cx_notify][%s]<%d> [TM_VSSUBTIEMR] m_nSendIndex=[%d] size=%d] code=[%s] curCode=[%s] sData=[%s] ",
+									__FUNCTION__, __LINE__, m_nSendIndex, m_sendQueue.size(), code, curCode, sData);
+								Output_DebugString(m_slog);
+							}
+							m_nSendIndex++;
+							itemsSent++;
+						}
+
+						// 그룹 하나 완료 후 m_nSubSendCount 이상이면 다음 틱으로
+						if (itemsSent >= m_nSubSendCount)
+							break;
+					}
+
+					if (m_nSendIndex >= (int)m_sendQueue.size())
+					{
+						KillTimer(TM_VSSUBTIEMR);
+						m_bSubTimerActive = FALSE;
+						m_sendQueue.clear();
+					}
+				}
+				break;
+#endif
 	}
 	CWnd::OnTimer(nIDEvent);
 }

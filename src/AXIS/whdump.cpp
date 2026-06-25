@@ -239,10 +239,12 @@ LONG MiniDumper::TopLevelFilter(struct _EXCEPTION_POINTERS* pExceptionInfo)
 
                 // 덤프 타입 - 상세 정보 포함
                 MINIDUMP_TYPE dumpType = (MINIDUMP_TYPE)(
+                    MiniDumpNormal |
                     MiniDumpWithDataSegs |
                     MiniDumpWithHandleData |
                     MiniDumpWithThreadInfo |
-                    MiniDumpWithUnloadedModules);
+                    MiniDumpWithUnloadedModules |
+                    MiniDumpWithCodeSegs);    // x64 CALL
 
                 const BOOL bOK = pDump(
                     GetCurrentProcess(), GetCurrentProcessId(),

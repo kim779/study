@@ -526,30 +526,15 @@ SHORT ControlWnd::SetData(int gubn, LPCTSTR sVal)
 		return 0;
 	}
 
-	if (isNum && m_type == ANIM_COUNTUP)
+	if (m_type == ANIM_NORMAL)
 	{
-		if (!m_bCounting)
-			m_currVal = m_targetVal;
-
-		m_targetVal  = newVal;
 		m_text       = newText;
 		m_colorDir   = newColorDir;
+		if (isNum) m_currVal = m_targetVal = newVal;
 		m_bAnimating = false;
-
-		if (fabs(m_targetVal - m_currVal) < 0.5)
-		{
-			m_currVal   = m_targetVal;
-			m_bCounting = false;
-			KillTimer(TIMER_ANIM);
-			Invalidate(FALSE);
-			return 0;
-		}
-
-		if (!m_bCounting)
-		{
-			m_bCounting = true;
-			SetTimer(TIMER_ANIM, 100, nullptr);
-		}
+		m_bCounting  = false;
+		KillTimer(TIMER_ANIM);
+		Invalidate(FALSE);
 		return 0;
 	}
 
@@ -624,8 +609,10 @@ void ControlWnd::parseOptions()
 			case 's':
 			{
 				if (text == "0")
-					m_type = ANIM_COUNTUP;
-				else if(text == "1")
+					m_type = ANIM_NORMAL;
+				else if (text == "1")
+					m_type = ANIM_SLIDE;
+				else if (text == "2")
 					m_type = ANIM_ODOMETER;
 			}
 			break;

@@ -13,9 +13,9 @@ CIBKS_SampleDlg::CIBKS_SampleDlg(CWnd* pParent /*=NULL*/)
 	: CDialog(CIBKS_SampleDlg::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CIBKS_SampleDlg)
-	m_CertPW = _T("ahffkdy123 ");
-	m_UserID = _T("rhkd62");
-	m_UserPW = _T("ahffkdy3");
+	m_CertPW = _T("");
+	m_UserID = _T("khs779");
+	m_UserPW = _T("1q2w3e4r");
 	m_odrAccn = _T("");
 	m_odrPswd = _T("");
 	m_odrCode = _T("");
@@ -27,7 +27,7 @@ CIBKS_SampleDlg::CIBKS_SampleDlg(CWnd* pParent /*=NULL*/)
 	m_siseCode = _T("");
 	m_jngoAccn = _T("");
 	m_jngoPswd = _T("");
-	m_ServerIP = _T("211.255.204.137");
+	m_ServerIP = _T("211.255.204.75");
 //	m_ServerIP = _T("172.16.202.130");
 	//}}AFX_DATA_INIT
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);

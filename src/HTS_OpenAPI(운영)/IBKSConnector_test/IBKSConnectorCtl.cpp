@@ -26,9 +26,9 @@ void WriteLog(LPCSTR log, ...)
 	TRY
 	{
 		CString slog;
-	slog.Format("[AXIS][WriteLog] [%s]\n", log);
-	//OutputDebugString(slog);
-
+	slog.Format("[OPENAPI][WriteLog] [%s]\n", log);
+	OutputDebugString(slog);
+	return;
 		FILE* fp;
 		fopen_s(&fp, "d:\\openapi.log", "a+");
 		if (!fp)
@@ -274,10 +274,20 @@ BOOL CIBKSConnectorCtrl::Initialize()
 		{
 			if (!RegisterOCX( sRoot + "\\" + OCX[n] ))
 			{
-				m_sLastMsg.Format("ActiveX 등록 실패 - %s[%s]", OCX[n], sRoot);
+				m_sLastMsg.Format("[openapi] ActiveX 등록 실패 - %s[%s] err=[%d]", OCX[n], sRoot , GetLastError());
 				WriteLog(m_sLastMsg);
 				return FALSE;
 			}
+			else
+			{
+				m_sLastMsg.Format("[openapi] ActiveX 등록 성공2 - %s[%s]", OCX[n], sRoot);
+				WriteLog(m_sLastMsg);
+			}
+		}
+		else
+		{
+			m_sLastMsg.Format("[openapi] ActiveX 등록 성공1 - %s[%s]", OCX[n], sRoot);
+			WriteLog(m_sLastMsg);
 		}
 	}
 
@@ -291,7 +301,7 @@ BOOL CIBKSConnectorCtrl::Initialize()
 	if (!m_Wizard.Create(NULL, NULL, WS_CHILD|WF_OLECTLCONTAINER, CRect(0,0,0,0), this, 0))
 	{
 		int ierr = GetLastError();
-		m_sLastMsg = "IBKSWizard 생성 실패";
+		m_sLastMsg.Format("IBKSWizard 생성 실패 [%d]", ierr);
 		return FALSE;
 	}
 
@@ -628,6 +638,9 @@ void CIBKSConnectorCtrl::GetLedger(void *param)
 
 int CIBKSConnectorCtrl::SendTR( LPCSTR trnm, int tkey, int stat, LPCSTR data, int size, TR_CALLBACK cb)
 {
+	m_slog.Format("[openapi][%s]<%d> trnm =[%s] tkey=[%d]", __FUNCTION__, __LINE__,   trnm, tkey);
+	WriteLog(m_slog);
+
 	if (!RegCallBack(tkey, cb)) return FALSE;
 
 	vector<char> buff(L_user_th + size);
@@ -909,6 +922,9 @@ BOOL CIBKSConnectorCtrl::S_PIDOVERS()
 		CopyMemory(mid.grid2[0].gubn,"EXE",3);
 		CopyMemory(mid.grid2[0].mnam,"IBKSCONNECTOR.OCX",17);
 		CopyMemory(mid.grid2[0].skey,str,strlen(str));
+
+		m_slog.Format("[openapi] IBKSCONNECTOR sha256 =[%s]", str);
+		WriteLog(m_slog);
 		
 		//CopyMemory(mid.grid2,(char*)&grid,sizeof(mid.grid2));
 	}
@@ -1107,6 +1123,11 @@ void CIBKSConnectorCtrl::DEF_CALLBACK(WPARAM wParam, LPARAM lParam)
 	int key = LOWORD(wParam);
 	int size = HIWORD(wParam);
 
+	CString slog;
+	slog.Format("[OPENAPI][%s]<%d> key=[%d] size=[%d]\n", __FUNCTION__, __LINE__, key, size);
+	OutputDebugString(slog);
+
+
 	if(m_bSaveLog)
 		testSaveFile(key, (char*)lParam, size);
 
@@ -1116,6 +1137,10 @@ void CIBKSConnectorCtrl::DEF_CALLBACK(WPARAM wParam, LPARAM lParam)
 void CIBKSConnectorCtrl::DEF_KOSCOM_CALLBACK(WPARAM wParam, LPARAM lParam)
 {
 // 	OutputDebugString("[KSJ] DEF_KOSCOM_CALLBACK");
+
+	CString slog;
+	slog.Format("[OPENAPI][%s]<%d> \n", __FUNCTION__, __LINE__);
+	OutputDebugString(slog);
 
 	char nID[8]={0,};
 	char nkey[19]={0,};
@@ -1146,6 +1171,9 @@ void CIBKSConnectorCtrl::DEF_KOSCOM_CALLBACK(WPARAM wParam, LPARAM lParam)
 	//2012.06.13 KSJ ID를 포함해서 이벤트를 새로 만듬
 	memcpy(nID, ledg->csym, sizeof(ledg->csym));
 	int id = atoi(nID);
+
+	slog.Format("[OPENAPI][%s]<%d> key=[%d] size=[%d]\n", __FUNCTION__, __LINE__, key, size);
+	OutputDebugString(slog);
 
 // 	CString strTemp;
 // 	strTemp.Format("[KSJ]nID[%s]id[%d]ledg->csym[%s]", nID, id, ledg->csym);
@@ -1408,7 +1436,7 @@ BOOL CIBKSConnectorCtrl::S_PIBOSODR(int key, int mmgb, LPCSTR acno, LPCSTR pswd,
 		m_sLastMsg = "매매구분 입력값이 올바르지 않습니다.";
 		return FALSE;
 	}
-	
+
 	if (m_shoga.find(hogb)==m_shoga.end()) 
 	{
 		m_sLastMsg = "호가구분 입력값이 올바르지 않습니다.";
@@ -1435,7 +1463,7 @@ BOOL CIBKSConnectorCtrl::S_PIBOSODR(int key, int mmgb, LPCSTR acno, LPCSTR pswd,
 		m_sLastMsg = "원주문번호가 올바르지 않습니다.";
 		return FALSE;
 	}
-	
+
 	vector<char> buff( L_ledger + L_tr1201_mid );
 	memset(&buff[0], ' ', buff.size());
 	
@@ -2275,10 +2303,18 @@ BSTR CIBKSConnectorCtrl::GetAccounts()
 	CString sRet = "";
 	for(size_t n=0; n<m_acno.size(); ++n)
 	{
+		m_slog.Format("[openapi][%s]<%d> acc =[%s]", __FUNCTION__, __LINE__, m_acno[n]);
+		WriteLog(m_slog);
+
 		if (m_acno[n].GetLength()!=11) continue;
 		if (m_acno[n].Mid(3,2)=="00") continue;
 		sRet += m_acno[n] + "\t" + m_acnm[n] + "\n";
+
+		m_slog.Format("[openapi][%s]<%d> added acc =[%s]", __FUNCTION__, __LINE__, m_acno[n]);
+		WriteLog(m_slog);
 	}
+
+	
 
 	sRet.TrimRight();
 
@@ -2708,7 +2744,7 @@ void CIBKSConnectorCtrl::InitJanGo()
 			m_sLastMsg = "IBXXXX11 생성 실패";
 		}
 
-		S_PIDOVERS();
+		//S_PIDOVERS();   //test comment
 	}
 }
 

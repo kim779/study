@@ -28875,16 +28875,19 @@ void CMainFrame::QueryPihoitgy()
 	for(int i=0;i<m_arrayItgy.GetSize();i++)
 	{
 		strGrid += m_arrayItgy.GetAt(i);
+
+		s.Format("[PIHOITGY] [UPLOAD] DATA [%d][%s]\n",i, m_arrayItgy.GetAt(i));
+		OutputDebugString(s);
 	}
 
 	strMsg.Format("2%04d%s", m_arrayItgy.GetSize(), strGrid);
 
 	//CopyMemory(mid.grid2, strGrid,strGrid.GetLength());
 
-	s.Format("PIHOITGY UPLOAD DATA [%s][%d]\n",strMsg,strMsg.GetLength());
-	OutputDebugString(s);
+	//s.Format("[PIHOITGY] [UPLOAD] DATA [%s][%d]\n",strMsg,strMsg.GetLength());
+	//OutputDebugString(s);
 	
-	sendTR("pihoitgy", (LPSTR)(LPCTSTR)strMsg, strMsg.GetLength(), 0, 252);
+	//sendTR("pihoitgy", (LPSTR)(LPCTSTR)strMsg, strMsg.GetLength(), 0, 252);  //test comment
 
 	OutputDebugString("Success Send ITGY\n");
 
@@ -29073,6 +29076,10 @@ void CMainFrame::ParsePihoitgyList(char* dat, int len)
 	const pihoitgy_mod* mod = (struct pihoitgy_mod*) dat;
 	int	cnt = atoi(CString(mod->nrec, sizeof(mod->nrec)));
 
+	s.Format("[PIHOITGY] cnt = [%d]\n", cnt);
+	OutputDebugString(s);
+
+
 	m_arrayItgy.RemoveAll();
 	m_arrayPlfItgy.RemoveAll();
 
@@ -29083,8 +29090,8 @@ void CMainFrame::ParsePihoitgyList(char* dat, int len)
 
 		CString filename,gridItem;
 
-// 		s.Format("PIHOITGY [%s] [%s] [%d]\n",gubn,mnam,mnam.Find("@"));
-// 		OutputDebugString(s);
+ 		//s.Format("[PIHOITGY][%s][%s] [%s] [%d]\n", __FUNCTION__,gubn,mnam,mnam.Find("@"));
+ 		//OutputDebugString(s);
 
 // 		if(!gubn.CompareNoCase("PLF"))
 // 		{
@@ -29111,7 +29118,7 @@ void CMainFrame::ParsePihoitgyList(char* dat, int len)
 				tmpG = "EXE";
 
 #ifdef DF_SHOWITGYLOG
-				m_slog.Format("[core] 조회해온 itgylist mnam=[%s] ", mnam);
+				m_slog.Format("[PIHOITGY] 조회해온 itgylist mnam=[%s] ", mnam);
 				OutputDebugString(m_slog);
 #endif
 
@@ -29128,8 +29135,8 @@ void CMainFrame::ParsePihoitgyList(char* dat, int len)
 			filename.Format("%s\\%s\\IB\\%s\\%s", Axis::home, gubn, mnam.Mid(0,3), mnam);
 		}
 
-		s.Format("PIHOITGY [%s] [%s] [%d]\n",gubn,mnam,mnam.Find("@"));
-		OutputDebugString(s);
+		//s.Format("[PIHOITGY] [%s] [%s] [%d]\n",gubn,mnam,mnam.Find("@"));
+		//OutputDebugString(s);
 
 		if(hModule)
 		{
@@ -29138,7 +29145,7 @@ void CMainFrame::ParsePihoitgyList(char* dat, int len)
 			gridItem.Format("%-3s%-47s%-44s",gubn,mnam,str);
 
 #ifdef DF_SHOWITGYLOG	
-			m_slog.Format("[core] 조회해온 모듈의 sha256  mnam=[%s] sha=[%s]  ", mnam, str);
+			m_slog.Format("[PIHOITGY][%s]sha256  mnam=[%s] sha=[%s]  ", __FUNCTION__, mnam, str);
 			OutputDebugString(m_slog);
 #endif
 			m_arrayItgy.Add(gridItem);

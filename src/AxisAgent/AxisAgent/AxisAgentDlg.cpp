@@ -235,7 +235,7 @@ namespace
 			{
 				const MINIDUMP_MEMORY_DESCRIPTOR64& md = ctx->pMem64List->MemoryRanges[i];
 					const ULONG64 start = md.StartOfMemoryRange;
-				const ULONG64 end = start + md.DataSize;
+						const ULONG64 end = start + md.DataSize;
 
 				if (qwBaseAddress >= start && qwBaseAddress < end)
 				{
@@ -486,10 +486,11 @@ CAxisAgentDlg::~CAxisAgentDlg()
 void CAxisAgentDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
-	DDX_Control(pDX, IDC_LIST_LOG, m_listLog);
-	DDX_Control(pDX, IDC_CHK_PING, m_chkPing);
-	DDX_Control(pDX, IDC_CHK_MONITOR, m_chkMonitor);
-	DDX_Control(pDX, IDC_CHK_STOP, m_chkStop);
+	DDX_Control(pDX, IDC_LIST_LOG,      m_listLog);
+	DDX_Control(pDX, IDC_CHK_PING,     m_chkPing);
+	DDX_Control(pDX, IDC_CHK_MONITOR,  m_chkMonitor);
+	DDX_Control(pDX, IDC_CHK_STOP,     m_chkStop);
+	DDX_Control(pDX, IDC_EDIT_SYMPATH, m_editSymPath);
 }
 
 BEGIN_MESSAGE_MAP(CAxisAgentDlg, CDialogEx)
@@ -512,6 +513,8 @@ BEGIN_MESSAGE_MAP(CAxisAgentDlg, CDialogEx)
 	ON_MESSAGE(WM_TRAYICON, OnTrayIcon)
 	ON_BN_CLICKED(IDC_BTN_HIDE, &CAxisAgentDlg::OnBnClickedBtnHide)
 	ON_BN_CLICKED(IDC_BTN_DECACC, &CAxisAgentDlg::OnBnClickedBtnDecacc)
+	ON_BN_CLICKED(IDC_BTN_DUMPOPEN, &CAxisAgentDlg::OnBnClickedBtnDumpOpen)
+	ON_BN_CLICKED(IDC_BTN_SYMPATH,  &CAxisAgentDlg::OnBnClickedBtnSympath)
 END_MESSAGE_MAP()
 
 
@@ -596,6 +599,19 @@ BOOL CAxisAgentDlg::OnInitDialog()
 	}
 #endif
 	ParseCommandLine();
+
+	// 저장된 심볼경로 로드
+	{
+		char exeDir[MAX_PATH] = {};
+		GetModuleFileNameA(NULL, exeDir, MAX_PATH);
+		char* sl = strrchr(exeDir, '\\'); if (sl) *sl = '\0';
+		char iniPath[MAX_PATH] = {};
+		sprintf_s(iniPath, "%s\\AxisAgent.ini", exeDir);
+		char buf[MAX_PATH] = {};
+		GetPrivateProfileStringA("Symbol", "Path", "", buf, MAX_PATH, iniPath);
+		m_sSymPath = buf;
+		m_editSymPath.SetWindowText(m_sSymPath);
+	}
 
 	LONG style = GetWindowLong(m_hWnd, GWL_STYLE);
 	style |= WS_MINIMIZEBOX | WS_SYSMENU | WS_CAPTION;
@@ -1623,7 +1639,8 @@ void CAxisAgentDlg::CreateDump(const char* reason)
 		MiniDumpWithThreadInfo |
 		MiniDumpWithIndirectlyReferencedMemory |
 		MiniDumpWithDataSegs |
-		MiniDumpWithProcessThreadData
+		MiniDumpWithProcessThreadData |
+		MiniDumpWithCodeSegs          // x64 스택 언와인드 테이블 포함 (CALLER 복원에 필수)
 		);
 
 	SetLastError(0);
@@ -2065,7 +2082,25 @@ void CAxisAgentDlg::AnalyzeDump(const char* dumpPath)
 
 	SymSetOptions(SYMOPT_LOAD_LINES | SYMOPT_UNDNAME | SYMOPT_DEFERRED_LOADS);
 
-	if (!SymInitialize(hSymProcess, NULL, FALSE))
+	// 심볼 경로: 사용자 지정 + AxisAgent.exe 위치 + 덤프 파일 위치
+	char symPath[MAX_PATH * 4] = {};
+	{
+		char exeDir[MAX_PATH] = {};
+		GetModuleFileNameA(NULL, exeDir, MAX_PATH);
+		char* sl = strrchr(exeDir, '\\'); if (sl) *sl = '\0';
+
+		char dumpDir[MAX_PATH] = {};
+		strcpy_s(dumpDir, dumpPath);
+		char* sl2 = strrchr(dumpDir, '\\'); if (sl2) *sl2 = '\0';
+
+		CStringA userSym(m_sSymPath);
+		if (!userSym.IsEmpty())
+			sprintf_s(symPath, "%s;%s;%s", (LPCSTR)userSym, exeDir, dumpDir);
+		else
+			sprintf_s(symPath, "%s;%s", exeDir, dumpDir);
+	}
+
+	if (!SymInitialize(hSymProcess, symPath, FALSE))
 	{
 		char buf[256] = { 0 };
 		sprintf_s(buf, "SymInitialize 실패 err=%lu", GetLastError());
@@ -2093,12 +2128,37 @@ void CAxisAgentDlg::AnalyzeDump(const char* dumpPath)
 
 		exceptionThreadId = pExc->ThreadId;
 
+		DWORD excCode = pExc->ExceptionRecord.ExceptionCode;
+		const char* excName = "UNKNOWN";
+		switch (excCode)
+		{
+		case 0xC0000005: excName = "ACCESS_VIOLATION";        break;
+		case 0xC0000094: excName = "INTEGER_DIVIDE_BY_ZERO";  break;
+		case 0xC0000095: excName = "INTEGER_OVERFLOW";        break;
+		case 0xC00000FD: excName = "STACK_OVERFLOW";          break;
+		case 0xC000001D: excName = "ILLEGAL_INSTRUCTION";     break;
+		case 0xC0000025: excName = "NONCONTINUABLE_EXCEPTION";break;
+		case 0xC0000374: excName = "HEAP_CORRUPTION";         break;
+		case 0xE06D7363: excName = "C++_EXCEPTION (throw)";  break;
+		case 0x80000003: excName = "BREAKPOINT";              break;
+		}
+
 		sprintf_s(logMsg,
-			"[AN1] ExceptionThread=%lu Code=0x%08lX Addr=0x%08lX",
+			"[AN1] ExceptionThread=%lu Code=0x%08lX (%s) Addr=0x%016I64X",
 			pExc->ThreadId,
-			pExc->ExceptionRecord.ExceptionCode,
-			(DWORD)pExc->ExceptionRecord.ExceptionAddress);
+			excCode,
+			excName,
+			(DWORD64)pExc->ExceptionRecord.ExceptionAddress);
 		WriteMonitorLog(logMsg);
+
+		// ACCESS_VIOLATION: 읽기/쓰기 주소 추가 표시
+		if (excCode == 0xC0000005 && pExc->ExceptionRecord.NumberParameters >= 2)
+		{
+			const char* rwStr = (pExc->ExceptionRecord.ExceptionInformation[0] == 1) ? "WRITE" : "READ";
+			sprintf_s(logMsg, "[AN1] AV %s at 0x%016I64X",
+				rwStr, (DWORD64)pExc->ExceptionRecord.ExceptionInformation[1]);
+			WriteMonitorLog(logMsg);
+		}
 	}
 	else
 	{
@@ -2238,36 +2298,43 @@ void CAxisAgentDlg::AnalyzeDump(const char* dumpPath)
 			break;
 		}
 
-#ifdef _M_IX86
-		sprintf_s(logMsg,
-			"  EIP=0x%08lX EBP=0x%08lX ESP=0x%08lX",
-			pCtx->Eip, pCtx->Ebp, pCtx->Esp);
+		STACKFRAME64 sf = {};
+		CONTEXT ctxCopy = *pCtx;
+		DWORD machineType = 0;
+
+#if defined(_M_X64)
+		machineType          = IMAGE_FILE_MACHINE_AMD64;
+		sf.AddrPC.Offset     = pCtx->Rip;
+		sf.AddrFrame.Offset  = pCtx->Rbp;
+		sf.AddrStack.Offset  = pCtx->Rsp;
+		sprintf_s(logMsg, "  RIP=0x%016I64X RSP=0x%016I64X", pCtx->Rip, pCtx->Rsp);
+#elif defined(_M_IX86)
+		machineType          = IMAGE_FILE_MACHINE_I386;
+		sf.AddrPC.Offset     = pCtx->Eip;
+		sf.AddrFrame.Offset  = pCtx->Ebp;
+		sf.AddrStack.Offset  = pCtx->Esp;
+		sprintf_s(logMsg, "  EIP=0x%08lX EBP=0x%08lX ESP=0x%08lX", pCtx->Eip, pCtx->Ebp, pCtx->Esp);
+#else
+		WriteMonitorLog("  지원하지 않는 아키텍처");
+		break;
+#endif
+		sf.AddrPC.Mode    = AddrModeFlat;
+		sf.AddrFrame.Mode = AddrModeFlat;
+		sf.AddrStack.Mode = AddrModeFlat;
 		WriteMonitorLog(logMsg);
 
-		STACKFRAME64 sf;
-		ZeroMemory(&sf, sizeof(sf));
+		char mainF0[256] = {};
+		char mainF1[256] = {};
+		char mainF2[256] = {};
+		char mainF3[256] = {};
+		char mainF4[256] = {};
 
-		sf.AddrPC.Offset = pCtx->Eip;
-		sf.AddrPC.Mode = AddrModeFlat;
-		sf.AddrFrame.Offset = pCtx->Ebp;
-		sf.AddrFrame.Mode = AddrModeFlat;
-		sf.AddrStack.Offset = pCtx->Esp;
-		sf.AddrStack.Mode = AddrModeFlat;
-
-		CONTEXT ctxCopy = *pCtx;
-
-		char mainF0[256] = { 0 };
-		char mainF1[256] = { 0 };
-		char mainF2[256] = { 0 };
-		char mainF3[256] = { 0 };
-		char mainF4[256] = { 0 };
-
-		const int MAX_MAIN_FRAMES = 5;
+		const int MAX_MAIN_FRAMES = 30;
 
 		for (int frameNo = 0; frameNo < MAX_MAIN_FRAMES; ++frameNo)
 		{
 			BOOL sw = StackWalk64(
-				IMAGE_FILE_MACHINE_I386,
+				machineType,
 				hSymProcess,
 				NULL,
 				&sf,
@@ -2280,95 +2347,61 @@ void CAxisAgentDlg::AnalyzeDump(const char* dumpPath)
 			if (!sw || sf.AddrPC.Offset == 0)
 				break;
 
-			char symBuf[sizeof(SYMBOL_INFO) + 256] = { 0 };
+			char symBuf[sizeof(SYMBOL_INFO) + 256] = {};
 			SYMBOL_INFO* pSym = (SYMBOL_INFO*)symBuf;
 			pSym->SizeOfStruct = sizeof(SYMBOL_INFO);
-			pSym->MaxNameLen = 255;
+			pSym->MaxNameLen   = 255;
 
 			DWORD64 disp64 = 0;
-			IMAGEHLP_LINE64 line;
-			ZeroMemory(&line, sizeof(line));
-			line.SizeOfStruct = sizeof(line);
-			DWORD lineDisp = 0;
+			IMAGEHLP_LINE64 line = {};
+			line.SizeOfStruct    = sizeof(line);
+			DWORD lineDisp       = 0;
 
-			char funcName[256] = { 0 };
+			const char* tag = (frameNo == 0) ? "TOP" : "   ";
 
 			if (SymFromAddr(hSymProcess, sf.AddrPC.Offset, &disp64, pSym))
 			{
-				strcpy_s(funcName, pSym->Name);
+				if (frameNo == 0) strcpy_s(mainF0, pSym->Name);
+				else if (frameNo == 1) strcpy_s(mainF1, pSym->Name);
+				else if (frameNo == 2) strcpy_s(mainF2, pSym->Name);
+				else if (frameNo == 3) strcpy_s(mainF3, pSym->Name);
+				else if (frameNo == 4) strcpy_s(mainF4, pSym->Name);
 
-				if (frameNo == 0) strcpy_s(mainF0, funcName);
-				else if (frameNo == 1) strcpy_s(mainF1, funcName);
-				else if (frameNo == 2) strcpy_s(mainF2, funcName);
-				else if (frameNo == 3) strcpy_s(mainF3, funcName);
-				else if (frameNo == 4) strcpy_s(mainF4, funcName);
-
-				if (frameNo == 0)
-				{
-					if (SymGetLineFromAddr64(hSymProcess, sf.AddrPC.Offset, &lineDisp, &line))
-					{
-						sprintf_s(logMsg,
-							"[MAIN][TOP] %s + 0x%I64X (%s:%lu)",
-							pSym->Name,
-							disp64,
-							line.FileName ? line.FileName : "?",
-							line.LineNumber);
-					}
-					else
-					{
-						sprintf_s(logMsg,
-							"[MAIN][TOP] %s + 0x%I64X",
-							pSym->Name,
-							disp64);
-					}
-				}
+				if (SymGetLineFromAddr64(hSymProcess, sf.AddrPC.Offset, &lineDisp, &line))
+					sprintf_s(logMsg, "[%s][%02d] %s + 0x%I64X (%s:%lu)",
+						tag, frameNo, pSym->Name, disp64,
+						line.FileName ? line.FileName : "?", line.LineNumber);
 				else
-				{
-					if (SymGetLineFromAddr64(hSymProcess, sf.AddrPC.Offset, &lineDisp, &line))
-					{
-						sprintf_s(logMsg,
-							"[MAIN][%02d] %s + 0x%I64X (%s:%lu)",
-							frameNo,
-							pSym->Name,
-							disp64,
-							line.FileName ? line.FileName : "?",
-							line.LineNumber);
-					}
-					else
-					{
-						sprintf_s(logMsg,
-							"[MAIN][%02d] %s + 0x%I64X",
-							frameNo,
-							pSym->Name,
-							disp64);
-					}
-				}
+					sprintf_s(logMsg, "[%s][%02d] %s + 0x%I64X",
+						tag, frameNo, pSym->Name, disp64);
 			}
 			else
 			{
-				if (frameNo == 0)
+				// PDB 없어도 모듈명 + 오프셋 표시
+				char frameStr[256] = {};
+				IMAGEHLP_MODULE64 modInfo = {};
+				modInfo.SizeOfStruct = sizeof(IMAGEHLP_MODULE64);
+				if (SymGetModuleInfo64(hSymProcess, sf.AddrPC.Offset, &modInfo))
 				{
-					sprintf_s(mainF0, "0x%08I64X", sf.AddrPC.Offset);
-					sprintf_s(logMsg,
-						"[MAIN][TOP] 0x%08I64X",
-						sf.AddrPC.Offset);
+					DWORD64 offset = sf.AddrPC.Offset - modInfo.BaseOfImage;
+					sprintf_s(frameStr, "%s + 0x%I64X", modInfo.ModuleName, offset);
 				}
 				else
 				{
-					if (frameNo == 1) sprintf_s(mainF1, "0x%08I64X", sf.AddrPC.Offset);
-					else if (frameNo == 2) sprintf_s(mainF2, "0x%08I64X", sf.AddrPC.Offset);
-					else if (frameNo == 3) sprintf_s(mainF3, "0x%08I64X", sf.AddrPC.Offset);
-					else if (frameNo == 4) sprintf_s(mainF4, "0x%08I64X", sf.AddrPC.Offset);
+					sprintf_s(frameStr, "0x%016I64X", sf.AddrPC.Offset);
+				}
 
-					sprintf_s(logMsg,
-						"[MAIN][%02d] 0x%08I64X",
-						frameNo,
-						sf.AddrPC.Offset);
+				if (frameNo == 0) strcpy_s(mainF0, frameStr);
+				else if (frameNo == 1) strcpy_s(mainF1, frameStr);
+				else if (frameNo == 2) strcpy_s(mainF2, frameStr);
+				else if (frameNo == 3) strcpy_s(mainF3, frameStr);
+				else if (frameNo == 4) strcpy_s(mainF4, frameStr);
+
+				sprintf_s(logMsg, "[%s][%02d] %s", tag, frameNo, frameStr);
 			}
-		}
 
 			WriteMonitorLog(logMsg);
-	}
+		}
 
 		WriteMainSummary(this, th.ThreadId, mainF0, mainF1, mainF2);
 		WriteMonitorLog("INI 저장 직전");
@@ -2381,9 +2414,6 @@ void CAxisAgentDlg::AnalyzeDump(const char* dumpPath)
 			CString(mainF2),
 			CString(mainF3),
 			CString(mainF4));
-#else
-		WriteMonitorLog("  현재 AnalyzeDump는 x86 기준으로 작성됨");
-#endif
 		break;
 }
 
@@ -2834,6 +2864,57 @@ void CAxisAgentDlg::OnBnClickedBtnHide()
 
 
 void CAxisAgentDlg::OnBnClickedBtnDecacc()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+}
+
+void CAxisAgentDlg::OnBnClickedBtnDumpOpen()
+{
+	CFileDialog dlg(TRUE, _T("dmp"), NULL,
+		OFN_FILEMUSTEXIST | OFN_HIDEREADONLY,
+		_T("Dump Files (*.dmp)|*.dmp|All Files (*.*)|*.*||"),
+		this);
+
+	if (dlg.DoModal() != IDOK)
+		return;
+
+	m_editSymPath.GetWindowText(m_sSymPath);
+
+	CStringA szPath(dlg.GetPathName());
+	AddLog("DUMP", "--------------------------------");
+	AddLog("DUMP", (LPCSTR)CStringA("[DUMP] 파일 분석 시작: ") + szPath);
+	AnalyzeDump(szPath);
+}
+
+void CAxisAgentDlg::OnBnClickedBtnSympath()
+{
+	BROWSEINFOA bi = {};
+	bi.hwndOwner = m_hWnd;
+	bi.ulFlags   = BIF_RETURNONLYFSDIRS | BIF_NEWDIALOGSTYLE;
+	bi.lpszTitle = "PDB 심볼 파일 폴더 선택";
+
+	LPITEMIDLIST pidl = SHBrowseForFolderA(&bi);
+	if (!pidl) return;
+
+	char folderPath[MAX_PATH] = {};
+	if (SHGetPathFromIDListA(pidl, folderPath))
+	{
+		m_sSymPath = folderPath;
+		m_editSymPath.SetWindowText(m_sSymPath);
+
+		// INI 저장
+		char exeDir[MAX_PATH] = {};
+		GetModuleFileNameA(NULL, exeDir, MAX_PATH);
+		char* sl = strrchr(exeDir, '\\'); if (sl) *sl = '\0';
+		char iniPath[MAX_PATH] = {};
+		sprintf_s(iniPath, "%s\\AxisAgent.ini", exeDir);
+		WritePrivateProfileStringA("Symbol", "Path", folderPath, iniPath);
+	}
+	CoTaskMemFree(pidl);
+}
+
+
+void CAxisAgentDlg::OnBnClickedBtnDumpopen()
 {
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
 }

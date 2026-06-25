@@ -33,8 +33,9 @@ public:
 	void parseOptions();
 	void SetParam(_param* pParam);
 	enum AnimType {
-		ANIM_COUNTUP = 1,   // ���� ī���� (���� ����)
-		ANIM_ODOMETER = 2   // �巳 �� ��������
+		ANIM_NORMAL   = 0,
+		ANIM_SLIDE    = 1,
+		ANIM_ODOMETER = 2
 	};
 
 	CParam m_Param;

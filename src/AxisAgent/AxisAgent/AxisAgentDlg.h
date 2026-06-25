@@ -91,6 +91,8 @@ public:
 	CButton m_chkPing;
 	CButton m_chkMonitor;
 	CListCtrl m_listLog;
+	CEdit   m_editSymPath;
+	CString m_sSymPath;
 
 	void RegisterToMain();
 	bool ShouldShowLogType(const char* type);
@@ -207,4 +209,7 @@ public:
 	virtual BOOL OnCommand(WPARAM wParam, LPARAM lParam);
 	afx_msg void OnBnClickedBtnHide();
 	afx_msg void OnBnClickedBtnDecacc();
+	afx_msg void OnBnClickedBtnDumpOpen();
+	afx_msg void OnBnClickedBtnDumpopen();
+	afx_msg void OnBnClickedBtnSympath();
 };
