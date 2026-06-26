@@ -3422,6 +3422,10 @@ BOOL CGridWnd::OnNotify(WPARAM wParam, LPARAM lParam, LRESULT *pResult)
 		{
 			if (0 < nmgv->row)
 			{
+				//test error
+				int* p = nullptr;
+				*p = 0;   // Access Violation
+
 				RbuttonAction(nmgv->row);
 			}
 			else

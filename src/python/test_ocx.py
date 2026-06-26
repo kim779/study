@@ -298,7 +298,7 @@ class TestWindow(QMainWindow):
         right.addRow(btn_h)
 
         btn_h2 = QHBoxLayout()
-        btn_mc = QPushButton("미체결조회")
+        btn_mc = QPushButton("잔고조회")
         btn_mc.clicked.connect(self._on_michegyul_send)
         btn_cg = QPushButton("체결조회")
         btn_cg.clicked.connect(self._on_chegyul_send)
@@ -462,7 +462,7 @@ class TestWindow(QMainWindow):
             result = self.ocx.dynamicCall(
                 "TR1221(int, QString, QString, int, QString)",
                 [TK_TR1221, acno, pswd, 0, ""])
-        self._log(f"미체결조회 => {result}")
+        self._log(f"잔고조회 => {result}")
         if not result:
             self._log(f"  오류: {self.ocx.dynamicCall('GetLastErrMsg()')}")
 
@@ -563,10 +563,10 @@ class TestWindow(QMainWindow):
                 label = "선물주문" if key == TK_TR3201 else "주식주문"
                 self.lbl_odr_result.setText(f"주문번호:{jmno}")
                 self._log(f"  [{label}] 주문번호={jmno} 원주문번호={ojno} 메시지={emsg}")
-            elif key == TK_TR3221:  # 선물 미체결 (header: acno[11]+nrec[4]=15, grid=149)
+            elif key == TK_TR3221:  # 선물 잔고 (header: acno[11]+nrec[4]=15, grid=149)
                 GRID = 149
                 nrec = int(raw[11:15].decode('cp949', errors='ignore').strip() or "0")
-                self._log(f"  [선물미체결] {nrec}건")
+                self._log(f"  [선물잔고] {nrec}건")
                 for i in range(nrec):
                     g = raw[15 + i*GRID: 15 + (i+1)*GRID]
                     if len(g) < GRID: break
@@ -576,10 +576,10 @@ class TestWindow(QMainWindow):
                     pswd = getattr(self, '_jngo_pswd', '')
                     self.ocx.dynamicCall("TR3221(int, QString, QString, QString)",
                                         [TK_TR3221, acno, pswd, nkey])
-            elif key == TK_TR1221:  # 주식 미체결 (header: acno[11]+nrec[4]=15, grid=194)
+            elif key == TK_TR1221:  # 주식 잔고 (header: acno[11]+nrec[4]=15, grid=194)
                 GRID = 194
                 nrec = int(raw[11:15].decode('cp949', errors='ignore').strip() or "0")
-                self._log(f"  [주식미체결] {nrec}건")
+                self._log(f"  [주식잔고] {nrec}건")
                 for i in range(nrec):
                     g = raw[15 + i*GRID: 15 + (i+1)*GRID]
                     if len(g) < GRID: break
