@@ -94,11 +94,12 @@ protected:
 	CWnd* m_xecure;
 	CString		m_root;
 	CString m_slog;
-	// Å°¿öµå ÇÊÅÍ
+	// Å°ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 	CEdit		m_editKeyword;
 	CButton		m_chkFilter;
 	CString		m_strKeyword;
 	BOOL		m_bFilterOn;
+	BOOL		m_bBypassFilter;
 // Operations
 public:
 

@@ -168,7 +168,7 @@ UINT Production_td(LPVOID pParam)
 		else
 		{
 			str.Format("[test][%s] ******** [%x]  CDlg_Thread  에서 getsafehwnd 이 false 라서  return  !!!!!!!---", __FUNCTION__, pwnd);
-			OutputDebugString(str);
+			//OutputDebugString(str);
 
 			return 0;
 		}
@@ -326,14 +326,14 @@ void CDlg_Thread::OnBnClickedBtnTest()
 		case WAIT_OBJECT_0:
 		{
 			str.Format("\r\n[test][%s] **********************   WAIT_OBJECT_0  *********************", __FUNCTION__);
-			OutputDebugString(str);
+			//OutputDebugString(str);
 			for (int ii = 0; ii < m_nGroup; ii++)
 			{
 				m_pWnd[ii]->DestroyWindow();
 				delete m_pWnd[ii];
 
 				str.Format("\r\n[test] [%d] [%s] *************윈도우 삭제 끝***********", ii, __FUNCTION__);
-				OutputDebugString(str);
+				//OutputDebugString(str);
 			}
 
 		}

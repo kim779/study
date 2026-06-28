@@ -245,7 +245,7 @@ int CChildView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		rcEdit, this, IDC_EDIT_KEYWORD);
 
 	CRect rcChk(260, 10, 380, 32);
-	m_chkFilter.Create(_T("Å°¿öµå ÇÊÅÍ"),
+	m_chkFilter.Create(_T("Key WORD FILETER"),
 		WS_CHILD | WS_VISIBLE | BS_AUTOCHECKBOX,
 		rcChk, this, IDC_CHK_FILTER);
 
@@ -258,6 +258,7 @@ int CChildView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	m_chkFilter.SetFont(GetFont());
 
 	m_bFilterOn = FALSE;
+	m_bBypassFilter = FALSE;
 	m_strKeyword.Empty();
 
 
@@ -289,7 +290,7 @@ void CChildView::OnSize(UINT nType, int cx, int cy)
 {
 	CWnd ::OnSize(nType, cx, cy);
 
-	const int filterHeight = 28;  // ÇÊÅÍ ¿µ¿ª ³ôÀÌ (¿©¹é Æ÷ÇÔ)
+	const int filterHeight = 28;  // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ (ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½)
 	const int margin = 4;
 	const int editWidth = 240;
 	const int chkWidth = 120;
@@ -325,12 +326,12 @@ void CChildView::OnRCVData(WPARAM wParam, LPARAM lParam)
 	char*	dat = (char *) lParam;
 	switch (HIWORD(wParam))
 	{
-	case 0x05: // xecure Æò¹®
+	case 0x05: // xecure ï¿½ï¿½
 	{
 		if (!m_bSNDRCV) break;
 		if (!m_options.send) break;
 
-		string.Format("\n#################### [XECURE Æò¹® %d Bytes][%s] #################### \n", len, timeS);
+		string.Format("\n#################### [XECURE ï¿½ï¿½ %d Bytes][%s] #################### \n", len, timeS);
 		addTrace(string, K_SNDRCV);
 
 		if (len > 0)
@@ -511,10 +512,10 @@ void CChildView::OnRCVData(WPARAM wParam, LPARAM lParam)
 			if (!m_bBINARY)
 				sRow.Format("%05d  ", row * maxCnt);
 
-			// ÇöÀç´Â µ¥ÀÌÅÍ ¹®ÀÚ¿­¸¸ Ãâ·Â
+			// ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ú¿ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
 			string += sDat;
 
-			// HEX + ASCII °°ÀÌ º¸°í ½ÍÀ¸¸é À§ ÁÙ ´ë½Å ¾Æ·¡ »ç¿ë
+			// HEX + ASCII ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½Æ·ï¿½ ï¿½ï¿½ï¿½
 			// sRow += sDat;
 			// string += sRow;
 		}
@@ -525,10 +526,18 @@ void CChildView::OnRCVData(WPARAM wParam, LPARAM lParam)
 	case x_RTMs:
 		if (m_bRTM)
 		{
-			string = dat;		
+			string = dat;
 			CString code = parse(string, STAB);
 			if (m_options.rts && !m_mapCode.Lookup(code, string))	break;
 
+			if (m_bFilterOn && !m_strKeyword.IsEmpty())
+			{
+				CString fullDat = dat;
+				if (fullDat.Find(m_strKeyword) < 0)
+					break;
+			}
+
+			m_bBypassFilter = TRUE;
 			string.Format("\n----- [RTM DATAs %d Bytes] %s -----\n", len, timeS);
 			addTrace(string, K_RTMS);	string = dat;
 
@@ -574,6 +583,7 @@ void CChildView::OnRCVData(WPARAM wParam, LPARAM lParam)
 				ary.RemoveAll();
 			}
 
+			m_bBypassFilter = FALSE;
 		}
 		break;
 	case x_STRs:
@@ -590,7 +600,7 @@ void CChildView::OnRCVData(WPARAM wParam, LPARAM lParam)
 			string = "*******************************************************\n";	addTrace(string, K_REPORT);
 			string = "*                   REPORT DATAs                      *\n";	addTrace(string, K_REPORT);
 			string = "*******************************************************\n";	addTrace(string, K_REPORT);
-			string.Format("¢Â %s ¢Â", timeS);	addTrace(string, K_REPORT);
+			string.Format("ï¿½ï¿½ %s ï¿½ï¿½", timeS);	addTrace(string, K_REPORT);
 			string = dat;
 
 			CMapStringToString fms;
@@ -639,10 +649,10 @@ void CChildView::addTrace(CString dat, int kind)
 	OutputDebugString(slog);
 
 	if (dat.IsEmpty())	return;
-	if (m_bFilterOn && !m_strKeyword.IsEmpty() && dat.Find(">>>>") < 0 && dat.Find("<<<<") < 0)
+	if (!m_bBypassFilter && m_bFilterOn && !m_strKeyword.IsEmpty() && dat.Find(">>>>") < 0 && dat.Find("<<<<") < 0)
 	{
 		if (dat.Find(m_strKeyword) < 0)
-			return;  // Å°¿öµå ¾øÀ¸¸é ½ºÅµ
+			return;
 	}
 
 	if (m_findDlg)
@@ -1104,9 +1114,9 @@ void CChildView::Test()
 {
 	LockWindowUpdate();
 	CRTFBuilder c ;
-	c << font("±Ã¼­Ã¼" );
+	c << font("ï¿½Ã¼ï¿½Ã¼" );
 	c << size(12) ;
-	c << color( RGB(255,255,255)) << "¾È³çÇÏ¼¼¿ä" ;
+	c << color( RGB(255,255,255)) << "ï¿½È³ï¿½ï¿½Ï¼ï¿½ï¿½ï¿½" ;
 	c << red	<< "Red\n"
 	  << blue	<< "Blue"
 	  << green	<< "Green\n"
@@ -1121,7 +1131,7 @@ void CChildView::Test()
 	c << font("Comic Sans MS" );
 	c << size(7) ;
 	c << red ;
-	c << "About to PUSH with these new settings¾È³çÇÏ¼¼¿ä\n";
+	c << "About to PUSH with these new settingsï¿½È³ï¿½ï¿½Ï¼ï¿½ï¿½ï¿½\n";
 	c		<< push << blue << bold << size(20) << "Some more new settings\n" 
 			<< pull << "Settings PULLED\n";
 	c	<< pull << "Settings PULLED again\n" ;
@@ -1433,7 +1443,7 @@ void CChildView::OnSaveas()
 
 void CChildView::OnTimer(UINT_PTR nIDEvent)
 {
-	// TODO: ¿©±â¿¡ ¸Þ½ÃÁö Ã³¸®±â ÄÚµå¸¦ Ãß°¡ ¹×/¶Ç´Â ±âº»°ªÀ» È£ÃâÇÕ´Ï´Ù.
+	// TODO: ï¿½ï¿½ï¿½â¿¡ ï¿½Þ½ï¿½ï¿½ï¿½ Ã³ï¿½ï¿½ï¿½ï¿½ ï¿½Úµå¸¦ ï¿½ß°ï¿½ ï¿½ï¿½/ï¿½Ç´ï¿½ ï¿½âº»ï¿½ï¿½ï¿½ï¿½ È£ï¿½ï¿½ï¿½Õ´Ï´ï¿½.
 	switch (nIDEvent)
 	{
 	case TM_STAYONTOP:
