@@ -172,3 +172,21 @@ bool CMainFrame::EncryptIniFile(const CString& iniPath, const std::vector<BYTE>&
 
 	return true;
 }
+
+void CWsh::BeginRTM()
+{
+	if (m_running) return;
+
+	m_running = true;
+//	m_thread = AfxBeginThread((AFX_THREADPROC)dispatchRTM, (LPVOID)this, THREAD_PRIORITY_HIGHEST);
+	m_thread = AfxBeginThread((AFX_THREADPROC)dispatchRTM, (LPVOID)this, THREAD_PRIORITY_HIGHEST, 0, CREATE_SUSPENDED);
+	if (m_thread)
+	{
+		m_thread->m_bAutoDelete = FALSE;
+
+		DWORD_PTR WshThreadCore = GetOtherCore();
+		DWORD_PTR pWshThreadCore = SetThreadAffinityMask(m_thread->m_hThread, WshThreadCore);
+
+		m_thread->ResumeThread();
+	}
+}
