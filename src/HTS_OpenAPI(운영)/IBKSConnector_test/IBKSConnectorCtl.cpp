@@ -945,7 +945,7 @@ void CIBKSConnectorCtrl::C_PIDOVERS(WPARAM wParam, LPARAM lParam)
 	if(cnt > 0)
 	{
 		m_bLogin = false;
-		FireOnLogin(false,"정상적인 OCX 버젼이 아닙니다.배포된 OCX를 사용해 주세요.");
+		FireOnLogin(false,"정상적인 OCX 버젼이 아닙니다.배포된 OCX를 사용해 주세요..");
 
 		m_Wizard.RunAxis(loginAXIS, 0, -1);
 	}

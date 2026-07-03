@@ -283,7 +283,6 @@
 #define IDC_STD                         1175
 #define IDC_MSG                         1175
 #define IDC_TEST                        1176
-#define IDC_SFCODE3                     1176
 #define IDC_DUMP                        1176
 #define IDC_FUNC_TEMP                   1177
 #define IDC_BTN_FILEMOVE                1177

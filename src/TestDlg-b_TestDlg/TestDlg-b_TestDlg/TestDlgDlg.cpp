@@ -6510,46 +6510,90 @@ void CTestDlgDlg::OnBnClickedBtnRound()
 }
 
 
+BOOL ConnectWithTimeout(const char* ip, int port, int timeoutMS)
+{
+	WSADATA wsa;
+	if (WSAStartup(MAKEWORD(2, 2), &wsa) != 0)
+		return FALSE;
+
+	SOCKET sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+	if (sock == INVALID_SOCKET)
+	{
+		WSACleanup();
+		return FALSE;
+	}
+
+	// Non-blocking 모드
+	u_long mode = 1;
+	ioctlsocket(sock, FIONBIO, &mode);
+
+	sockaddr_in addr;
+	ZeroMemory(&addr, sizeof(addr));
+
+	addr.sin_family = AF_INET;
+	addr.sin_port = htons(port);
+	addr.sin_addr.s_addr = inet_addr(ip);
+
+	int ret = connect(sock, (sockaddr*)&addr, sizeof(addr));
+
+	if (ret == SOCKET_ERROR)
+	{
+		int err = WSAGetLastError();
+
+		// 연결 진행중이면 정상
+		if (err != WSAEWOULDBLOCK &&
+			err != WSAEINPROGRESS &&
+			err != WSAEINVAL)
+		{
+			closesocket(sock);
+			WSACleanup();
+			return FALSE;
+		}
+	}
+
+	fd_set writeSet;
+	FD_ZERO(&writeSet);
+	FD_SET(sock, &writeSet);
+
+	timeval tv;
+	tv.tv_sec = timeoutMS / 1000;
+	tv.tv_usec = (timeoutMS % 1000) * 1000;
+
+	ret = select(0, NULL, &writeSet, NULL, &tv);
+
+	BOOL bConnected = FALSE;
+
+	if (ret > 0)
+	{
+		int so_error = 0;
+		int len = sizeof(so_error);
+
+		getsockopt(sock,
+			SOL_SOCKET,
+			SO_ERROR,
+			(char*)&so_error,
+			&len);
+
+		if (so_error == 0)
+			bConnected = TRUE;
+	}
+
+	closesocket(sock);
+	WSACleanup();
+
+	return bConnected;
+}
+
 void CTestDlgDlg::OnBnClickedBtnRe()
-{
-	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
-	double ione = 21364112;
-	float dtemp = (float)28 / (float)365;
-	double ival = ione * 0.12 * dtemp;
-	int total = ione + ival;
-	total -= 2647000;
-	ione = total;  //20230208 부터
-
-	dtemp = (float)477 / (float)365;
-	ival = ione * 0.12 * dtemp;
-	total = ival + ione;
-	
-	
- struct _GrpInfo	// 전체 설정정보
-{
-	char	tick{};		// 전체 틱정보,				저장시 + CT_CHAR
-	char	ctrl{};		// 컨트롤 사용여부,			저장시 + CT_CHAR
-	char	option1{};	// 수평선/수직선/최대최소 그리기	저장시 + CT_CHAR
-	char	option2{};	// 미리보기/역순/수직하단틱		저장시 + CT_CHAR
-	char	req[5]{};		// 그래프 요청개수
-	char	show[5]{};	// 그래프 출력개수
-	char	gcnt[2]{};	// 그래프 개수(최대 18)
-	char	rcnt[2]{};	// 영역 개수(최대 9)
-	char	rinfo[18]{};	// 영역 분할정보(2byte * 최대 9개)
-	char	index[1]{};	// 색인-일주월분틱
-	char	option3{};	// 개별 실시간				저장시 + CT_CHAR
-	char	res[8]{};		// reserve
-};
-#define	sz_GRPINFO	sizeof(struct _GrpInfo)
-	
-	int ilen = sz_GRPINFO;
-
-
-	char* pppp = "123123";
-	CString str;
-	str.Format("%.6s", "123123");
-
-	str += '\0';
+{//회사망체크
+	if (ConnectWithTimeout("172.16.202.106", 15201, 500))
+	{
+		AfxMessageBox(_T("회사망입니다."));
+	}
+	else
+	{
+		AfxMessageBox(_T("외부망입니다."));
+	}
 }
 
 #include <Windows.h>
