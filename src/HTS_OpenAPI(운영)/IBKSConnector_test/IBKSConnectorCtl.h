@@ -426,7 +426,7 @@ protected:
 	double	CNormal(double value);
 	double	GetND(double value);
 	int	CallPut(LPSTR code);
-
+	bool IsDevOrUAT();
 protected:
 	void DebugFile(LPCSTR path, LPCSTR mode, LPCSTR data, int dlen);
 	inline bool IsInit();										// 초기화 여부 확인

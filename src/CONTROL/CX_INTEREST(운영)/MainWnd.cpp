@@ -916,66 +916,6 @@ LONG CMainWnd::OnUser(WPARAM wParam, LPARAM lParam)
 		//2012.01.19 KSJ RTM 처리향상을 위한 포맷변경
 	case DLL_ALERTx:
 	{
-#ifdef DF_RTS_CHECK
-		if (_bStop)
-			return 0;
-
-		if (m_bDestroy || m_strBeginTime.IsEmpty() || m_pGroupWnd == nullptr)
-			break;
-
-		const auto* alertR = reinterpret_cast<const _alertR*>(lParam);
-		const CString code = alertR->code;
-
-		const DWORD* data = reinterpret_cast<const DWORD*>(alertR->ptr[0]);
-		if (data == nullptr)
-			return 0;
-
-		if (!m_pGroupWnd->isCodeSymbol(code))
-			return 0;
-
-		COleDateTime oTime;
-		oTime = COleDateTime::GetCurrentTime();
-		CString strCurTime;
-		strCurTime.Format(_T("%02d%02d%02d"), oTime.GetHour(), oTime.GetMinute(), oTime.GetSecond());
-
-		int h1 = _ttoi(strCurTime.Mid(0, 2));
-		int m1 = _ttoi(strCurTime.Mid(2, 2));
-		int s1 = _ttoi(strCurTime.Mid(4, 2));
-		CTime timecur(oTime.GetYear(), oTime.GetMonth(), oTime.GetDay(), h1, m1, s1);
-
-		//m_strBeginTimeEnd = "141100";
-		h1 = _ttoi(m_strBeginTimeEnd.Mid(0, 2));
-		m1 = _ttoi(m_strBeginTimeEnd.Mid(2, 2));
-		s1 = _ttoi(m_strBeginTimeEnd.Mid(4, 2));
-		CTime timeOri(oTime.GetYear(), oTime.GetMonth(), oTime.GetDay(), h1, m1, s1);
-		CTimeSpan span(0, 0, 0, 10); // 10초
-		CTime timeend = timeOri - span;
-
-		bool bOverChecking{};
-		bOverChecking = IsEnableRTSTimeCheck(timecur, timeend, m_icheckTime);
-
-		std::string scode = CStringA(code);
-
-		if (ShouldSkipRTSByServerTime(scode, (char*)data[34], m_DiffSec) == true && bOverChecking)
-		{
-			return 0;
-		}
-
-		static constexpr int arr[] = { 41, 61, 101, 104, 106, 107, 109, 146, 181 };
-		auto& rmap = m_pGroupWnd->getRSymbol();
-		bool bHoga = std::any_of(std::begin(arr), std::end(arr), [&rmap](const int symbol) {
-			return rmap.find(symbol) != rmap.end();
-			});
-
-		if (bHoga == false && !(alertR->stat & alert_SCR))
-			return 0;
-
-		m_pGroupWnd->initAlert();
-		AxStd::async([this, lParam]() {
-			m_pGroupWnd->RecvRTSx(lParam);
-			});
-		m_pGroupWnd->UpdateDraw();
-#else
 		if (_bStop)
 			return 0;
 
@@ -1019,7 +959,6 @@ LONG CMainWnd::OnUser(WPARAM wParam, LPARAM lParam)
 			m_pGroupWnd->RecvRTSx(lParam);
 			});
 		m_pGroupWnd->UpdateDraw();
-#endif
 	}
 	break;
 		//KSJ

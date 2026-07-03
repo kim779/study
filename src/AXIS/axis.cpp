@@ -388,22 +388,22 @@ BOOL CAxisApp::InitInstance()
 
 void CAxisApp::SetOtherCore()
 {
-	SYSTEM_INFO si; GetSystemInfo(&si);
-	DWORD_PTR allCoresMask = ((DWORD_PTR)1 << si.dwNumberOfProcessors) - 1;
-	DWORD_PTR mainThreadCore = ::SetThreadAffinityMask(::GetCurrentThread(), allCoresMask);
+	DWORD_PTR procMask, sysMask;
+	GetProcessAffinityMask(GetCurrentProcess(), &procMask, &sysMask);
 
-	BOOL fBool = ::SetThreadPriority(::GetCurrentThread(), THREAD_PRIORITY_HIGHEST); //THREAD_PRIORITY_HIGHEST THREAD_PRIORITY_ABOVE_NORMAL
+	// sysMask에서 마지막(최상위) 코어 비트 찾기
+	DWORD_PTR lastCoreMask = 0;
+	for (DWORD_PTR bit = (DWORD_PTR)1; bit; bit <<= 1)
+		if (sysMask & bit) lastCoreMask = bit;
 
-	if (!fBool)
-	{
-		CString msg; msg.Format("[wizard] main SetThreadPriority error = [%x][%d]\n", mainThreadCore, GetLastError());
-		OutputDebugString(msg);
-	}
-	else {
-		CString msg; msg.Format("[wizard] main SetThreadPriority success = [%x][\n", mainThreadCore);
-		OutputDebugString(msg);
-	}
+	DWORD_PTR mainMask = sysMask & ~lastCoreMask;   // last core exclude
+	if (mainMask == 0) mainMask = sysMask;          // single core fallback
 
+	DWORD_PTR prev = SetThreadAffinityMask(GetCurrentThread(), mainMask);
+	if (prev == 0)
+		OutputDebugString("[wizard] SetThreadAffinityMask failed\n");
+
+	::SetThreadPriority(::GetCurrentThread(), THREAD_PRIORITY_ABOVE_NORMAL);
 }
 
 #pragma warning(default : 26409)

@@ -118,27 +118,6 @@ CSockCtrl::CSockCtrl()
 	m_rsm = (CWsh*)AfxBeginThread(RUNTIME_CLASS(CWsh), THREAD_PRIORITY_NORMAL, 0, 0);
 	m_wsh = (CWsh*)AfxBeginThread(RUNTIME_CLASS(CWsh), THREAD_PRIORITY_NORMAL, 0, 0);
 
-	//modi test
-	DWORD_PTR dwProcessAffinityMask = 0x03;
-	CString slog;
-	if (SetThreadAffinityMask(m_wsh->m_hThread, dwProcessAffinityMask) == 0) {
-		int ierror = GetLastError();
-
-		slog.Format("[MULTICORE]m_wsh 스레드 친화도 실패[%d]", ierror);
-		OutputDebugString(slog);
-	}
-	else
-	{
-		slog.Format("[MULTICORE]  m_wsh 프로세스 친화도 성공");
-		OutputDebugString(slog);
-	}
-	//test
-
-
-	CString m_slog;
-	m_slog.Format("[axSock][생성]--------@@@ m_rsm=[%x] m_wsh=[%x]  ", m_rsm, m_wsh);
-	OutputDebugString(m_slog);
-
 	//m_wsh = (CWsh*)AfxBeginThread(RUNTIME_CLASS(CWsh), THREAD_PRIORITY_HIGHEST, 0, 0);
 	m_wsh->BeginRTM();
 	

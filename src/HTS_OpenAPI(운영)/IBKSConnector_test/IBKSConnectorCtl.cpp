@@ -989,6 +989,10 @@ void CIBKSConnectorCtrl::C_PIDOUINI(WPARAM wParam, LPARAM lParam)
 			do {
 				ed = acno.Find("\n", pos);
 				CString acc = acno.Mid(pos, ed-pos);
+
+m_slog.Format("[openapi][%s]<%d> 전체계좌 acc =[%s %s %s]", __FUNCTION__, __LINE__, acc.Left(3), acc.Mid(3,2), acc.Mid(5,6));
+WriteLog(m_slog);
+
 				m_acno.push_back( acc.Mid(0, 11) );
 				m_acnm.push_back( acc.Mid(12, acc.Find("|", 12)-12) );
 				pos = ed+1;
@@ -1889,6 +1893,9 @@ BOOL CIBKSConnectorCtrl::S_SONBQ504(int key, LPCSTR acno, LPCSTR pswd, int zBalE
 
 BOOL CIBKSConnectorCtrl::S_PIBOSCHG(int key, LPCSTR acno, LPCSTR pswd, LPCSTR code, int dsgb, int sygb, int dlgb, int sort, LPCSTR nkey)
 {
+	m_slog.Format("[openapi][%s]<%d> key =[%d] acno =[%s] code =[%s]", __FUNCTION__, __LINE__, key, acno, code);
+	WriteLog(m_slog);
+
 	if (!IsValidState())		return FALSE;
 	if (!IsValidAccount(acno))	return FALSE;
 	if (!IsValidAcnoPswd(pswd)) return FALSE;
@@ -1941,7 +1948,7 @@ BOOL CIBKSConnectorCtrl::S_PIBOSCHG(int key, LPCSTR acno, LPCSTR pswd, LPCSTR co
 	mid->dllf[0] = '1';
 	
 	//return SendTR("piboschg", key, US_ENC, (LPCSTR)&buff[0], buff.size(), DEF_KOSCOM_CALLBACK); //vc2019
-	return SendTR("piboschg", key, US_ENC, (LPCSTR)&buff[0], buff.size(), &CIBKSConnectorCtrl::DEF_KOSCOM_CALLBACK);
+	return SendTR("pihoschg", key, US_ENC, (LPCSTR)&buff[0], buff.size(), &CIBKSConnectorCtrl::DEF_KOSCOM_CALLBACK);
 }
 
 BOOL CIBKSConnectorCtrl::S_PIBOSJGO(int key, LPCSTR acno, LPCSTR pswd, int allf, LPCSTR nkey)
@@ -2652,8 +2659,13 @@ void CIBKSConnectorCtrl::C_SACAQ504( WPARAM wParam, LPARAM lParam )
 				if(m_bSaveLog)
 					testSaveFile("Not Found", m_acno[n], 11);
 
-				m_acno.erase(m_acno.begin()+n);
-				m_acnm.erase(m_acnm.begin()+n);
+				m_slog.Format("[openapi][%s]<%d> sacaq504 (약정)결과에 따라 삭제 계좌 =[%s]", __FUNCTION__, __LINE__, (LPCSTR)m_acno[n]);
+				WriteLog(m_slog);
+				
+				if (!IsDevOrUAT()) {
+					m_acno.erase(m_acno.begin() + n);
+					m_acnm.erase(m_acnm.begin() + n);
+				}
 				break;
 			}
 		}
@@ -4653,4 +4665,8 @@ void CIBKSConnectorCtrl::C_SACEQ320( WPARAM wParam, LPARAM lParam )
 	InitJanGo();
 }
 
+bool CIBKSConnectorCtrl::IsDevOrUAT()
+{
+	return (m_svrip == "172.16.202.106" || m_svrip == "211.255.204.104");
+}
 #pragma warning (default : 4996)

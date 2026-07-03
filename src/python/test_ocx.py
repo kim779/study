@@ -32,6 +32,7 @@ TK_TR3222 = 46
 TK_TR1222 = 45
 TK_TR3232 = 47
 TK_TR3411 = 48
+TK_TR8001  = 50
 TK_GETCODE = 32
 TK_GREEKS1 = 150
 TK_GREEKS2 = 151
@@ -131,6 +132,11 @@ class TestWindow(QMainWindow):
         self.ocx.OnGuideMsg.connect(self._evt_guide_msg)
         self.ocx.OnRecvData.connect(self._evt_recv_data)
         self.ocx.OnRealData.connect(self._evt_real_data)
+        self.ocx.OnContract.connect(self._evt_contract)
+        self.ocx.OnVerUpdate.connect(self._evt_ver_update)
+        self.ocx.OnUpdateStart.connect(self._evt_update_start)
+        self.ocx.OnUpdating.connect(self._evt_updating)
+        self.ocx.OnUpdateEnd.connect(self._evt_update_end)
 
         central = QWidget()
         self.setCentralWidget(central)
@@ -174,10 +180,10 @@ class TestWindow(QMainWindow):
         layout = QVBoxLayout(group)
 
         form = QFormLayout()
-        self.edit_user_id  = QLineEdit("khs779")
-        self.edit_user_pw  = QLineEdit(); self.edit_user_pw.setEchoMode(QLineEdit.Password)
-        self.edit_cert_pw  = QLineEdit(); self.edit_cert_pw.setEchoMode(QLineEdit.Password)
-        self.edit_svr_ip   = QLineEdit("211.255.204.75")
+        self.edit_user_id  = QLineEdit("ng12589")
+        self.edit_user_pw  = QLineEdit("wnsgur12@"); self.edit_user_pw.setEchoMode(QLineEdit.Password)
+        self.edit_cert_pw  = QLineEdit("ahffkdy123 "); self.edit_cert_pw.setEchoMode(QLineEdit.Password)
+        self.edit_svr_ip   = QLineEdit("211.255.204.104")
         self.edit_svr_port = QLineEdit("15201")
         form.addRow("user_id",   self.edit_user_id)
         form.addRow("user_pw",   self.edit_user_pw)
@@ -189,20 +195,25 @@ class TestWindow(QMainWindow):
         h = QHBoxLayout()
         btn_login  = QPushButton("Login()")
         btn_logout = QPushButton("Logout()")
+        btn_cust   = QPushButton("고객정보(TR8001)")
         btn_login.clicked.connect(self._on_login)
         btn_logout.clicked.connect(self._on_logout)
+        btn_cust.clicked.connect(self._on_tr8001)
         self.lbl_login = QLabel("-")
         h.addWidget(btn_login)
         h.addWidget(btn_logout)
+        h.addWidget(btn_cust)
         h.addWidget(self.lbl_login)
         h.addStretch()
         layout.addLayout(h)
+
 
         # account combo - populated after login
         h2 = QHBoxLayout()
         h2.addWidget(QLabel("계좌"))
         self.combo_accn = QComboBox()
-        self.combo_accn.setMinimumWidth(200)
+        self.combo_accn.setMinimumWidth(260)
+        self.combo_accn.setSizeAdjustPolicy(QComboBox.AdjustToContents)
         h2.addWidget(self.combo_accn)
         h2.addStretch()
         layout.addLayout(h2)
@@ -256,7 +267,8 @@ class TestWindow(QMainWindow):
         # 왼쪽 컬럼: 계좌 / 비밀번호 / 종목코드 / 매매구분 / 호가유형
         left = QFormLayout()
         self.combo_odr_accn = QComboBox()
-        self.combo_odr_accn.setMinimumWidth(160)
+        self.combo_odr_accn.setMinimumWidth(260)
+        self.combo_odr_accn.setSizeAdjustPolicy(QComboBox.AdjustToContents)
         left.addRow("계좌", self.combo_odr_accn)
 
         self.edit_odr_pswd = QLineEdit()
@@ -288,6 +300,14 @@ class TestWindow(QMainWindow):
         self.edit_odr_ojno = QLineEdit("0")
         right.addRow("원주문번호", self.edit_odr_ojno)
 
+        self.combo_pggb = QComboBox()
+        for text, val in [("0 일반", 0), ("1 공매도", 1), ("2 프로그램", 2), ("3 ETN", 3), ("4 ETN공매도", 4), ("5 ETN프로그램", 5)]:
+            self.combo_pggb.addItem(text, val)
+        self.combo_pggb.currentIndexChanged.connect(
+            lambda i: self.ocx.dynamicCall("SetPrograms(int)", self.combo_pggb.itemData(i))
+        )
+        right.addRow("프로그램구분", self.combo_pggb)
+
         btn_h = QHBoxLayout()
         btn = QPushButton("주문실행")
         btn.clicked.connect(self._on_odr_send)
@@ -302,8 +322,11 @@ class TestWindow(QMainWindow):
         btn_mc.clicked.connect(self._on_michegyul_send)
         btn_cg = QPushButton("체결조회")
         btn_cg.clicked.connect(self._on_chegyul_send)
+        btn_uc = QPushButton("미체결조회")
+        btn_uc.clicked.connect(self._on_michegyul_odr_send)
         btn_h2.addWidget(btn_mc)
         btn_h2.addWidget(btn_cg)
+        btn_h2.addWidget(btn_uc)
         btn_h2.addStretch()
         right.addRow(btn_h2)
 
@@ -316,6 +339,12 @@ class TestWindow(QMainWindow):
     def _build_log_group(self):
         group = QGroupBox("Log")
         v = QVBoxLayout(group)
+        h = QHBoxLayout()
+        btn_clear = QPushButton("로그 지우기")
+        btn_clear.clicked.connect(lambda: self.log_edit.clear())
+        h.addWidget(btn_clear)
+        h.addStretch()
+        v.addLayout(h)
         self.log_edit = QTextEdit()
         self.log_edit.setReadOnly(True)
         self.log_edit.setMinimumHeight(150)
@@ -389,6 +418,8 @@ class TestWindow(QMainWindow):
         self._log(f"[EVT] OnLogin({status}) {msg}")
 
         if b_login:
+            home = self.ocx.dynamicCall("GetHome()")
+            self._log(f"  OCX 홈 경로: {home}")
             self._load_accounts()
 
     def _load_accounts(self):
@@ -405,9 +436,10 @@ class TestWindow(QMainWindow):
             parts = line.split('\t')
             acno = parts[0] if parts else line
             acnm = parts[1] if len(parts) > 1 else ""
-            self._log(f"  계좌={acno}({len(acno)}자리) 명={acnm} 4~5번째={acno[3:5] if len(acno)>=5 else '?'}")
-            self.combo_accn.addItem(line)
-            self.combo_odr_accn.addItem(line)
+            display = f"{acno[:3]} {acno[3:5]} {acno[5:]}  {acnm}".strip() if len(acno) >= 5 else line
+            self._log(f"  계좌={acno}({len(acno)}자리) 명={acnm}")
+            self.combo_accn.addItem(display, acno)
+            self.combo_odr_accn.addItem(display, acno)
 
     def _evt_error(self, msg):
         self._log(f"[EVT] OnError: {msg}")
@@ -422,8 +454,33 @@ class TestWindow(QMainWindow):
     def _evt_guide_msg(self, key, msg):
         self._log(f"[EVT] OnGuideMsg [{key}] {msg}")
 
+    def _evt_contract(self, msg):
+        self._log(f"[체결통보] {repr(msg)}")
+
+    def _evt_ver_update(self):
+        self._log("[업데이트] OCX 버전 업그레이드 필요 - OCX 재설치 후 재실행하세요")
+
+    def _evt_update_start(self):
+        self._log("[업데이트] 파일 업데이트 시작...")
+
+    def _evt_updating(self, filename, percent):
+        self._log(f"[업데이트] {filename} {percent}%")
+
+    def _evt_update_end(self):
+        self._log("[업데이트] 파일 업데이트 완료")
+
+    def _on_tr8001(self):
+        acno = self.combo_accn.currentData() or ""
+        if not acno.strip():
+            self._log("계좌를 선택하세요")
+            return
+        result = self.ocx.dynamicCall("TR8001(int, QString)", TK_TR8001, acno)
+        self._log(f"고객정보조회 => {result}")
+        if not result:
+            self._log(f"  오류: {self.ocx.dynamicCall('GetLastErrMsg()')}")
+
     def _on_odr_send(self):
-        acno  = self.combo_odr_accn.currentText().split('\t')[0][:11]
+        acno  = self.combo_odr_accn.currentData() or ""
         pswd  = self.edit_odr_pswd.text()
         code  = self.edit_odr_code.text().strip()
         mmgb  = self.combo_mmgb.currentData()
@@ -447,7 +504,7 @@ class TestWindow(QMainWindow):
             self._log(f"  오류: {err}")
 
     def _on_michegyul_send(self):
-        acno = self.combo_odr_accn.currentText().split('\t')[0][:11]
+        acno = self.combo_odr_accn.currentData() or ""
         pswd = self.edit_odr_pswd.text()
         if not acno.strip():
             self._log("계좌를 선택하세요")
@@ -467,7 +524,7 @@ class TestWindow(QMainWindow):
             self._log(f"  오류: {self.ocx.dynamicCall('GetLastErrMsg()')}")
 
     def _on_chegyul_send(self):
-        acno = self.combo_odr_accn.currentText().split('\t')[0][:11]
+        acno = self.combo_odr_accn.currentData() or ""
         pswd = self.edit_odr_pswd.text()
         if not acno.strip():
             self._log("계좌를 선택하세요")
@@ -482,7 +539,29 @@ class TestWindow(QMainWindow):
             result = self.ocx.dynamicCall(
                 "TR1211(int, QString, QString, QString, int, int, int, int, QString)",
                 [TK_TR1211, acno, pswd, "", 0, 0, 0, 1, ""])
+        self._chegyul_mode = "체결"
         self._log(f"체결조회 => {result}")
+        if not result:
+            self._log(f"  오류: {self.ocx.dynamicCall('GetLastErrMsg()')}")
+
+    def _on_michegyul_odr_send(self):
+        acno = self.combo_odr_accn.currentData() or ""
+        pswd = self.edit_odr_pswd.text()
+        if not acno.strip():
+            self._log("계좌를 선택하세요")
+            return
+        self._jngo_acno = acno
+        self._jngo_pswd = pswd
+        if self.combo_jtype.currentIndex() == 0:  # 선물옵션 dlgb=2
+            result = self.ocx.dynamicCall(
+                "TR3211(int, QString, QString, int, int, QString, int, int, QString)",
+                [TK_TR3211, acno, pswd, 2, 1, "", 0, 0, ""])
+        else:  # 주식 dlgb=2
+            result = self.ocx.dynamicCall(
+                "TR1211(int, QString, QString, QString, int, int, int, int, QString)",
+                [TK_TR1211, acno, pswd, "", 0, 0, 2, 1, ""])
+        self._chegyul_mode = "미체결"
+        self._log(f"미체결조회 => {result}")
         if not result:
             self._log(f"  오류: {self.ocx.dynamicCall('GetLastErrMsg()')}")
 
@@ -589,10 +668,11 @@ class TestWindow(QMainWindow):
                     pswd = getattr(self, '_jngo_pswd', '')
                     self.ocx.dynamicCall("TR1221(int, QString, QString, int, QString)",
                                         [TK_TR1221, acno, pswd, 0, nkey])
-            elif key == TK_TR3211:  # 선물 체결 (header: acno[11]+nrec[4]=15, grid=179)
+            elif key == TK_TR3211:  # 선물 체결/미체결 (header: acno[11]+nrec[4]=15, grid=179)
                 GRID = 179
+                mode = getattr(self, '_chegyul_mode', '체결')
                 nrec = int(raw[11:15].decode('cp949', errors='ignore').strip() or "0")
-                self._log(f"  [선물체결] {nrec}건")
+                self._log(f"  [선물{mode}] {nrec}건")
                 for i in range(nrec):
                     g = raw[15 + i*GRID: 15 + (i+1)*GRID]
                     if len(g) < GRID: break
@@ -600,23 +680,29 @@ class TestWindow(QMainWindow):
                 if b_next:
                     acno = getattr(self, '_jngo_acno', '')
                     pswd = getattr(self, '_jngo_pswd', '')
+                    dlgb = 2 if mode == "미체결" else 0
                     self.ocx.dynamicCall(
                         "TR3211(int, QString, QString, int, int, QString, int, int, QString)",
-                        [TK_TR3211, acno, pswd, 0, 1, "", 0, 0, nkey])
-            elif key == TK_TR1211:  # 주식 체결 (header: acno[11]+nrec[4]=15, grid=222)
+                        [TK_TR3211, acno, pswd, dlgb, 1, "", 0, 0, nkey])
+            elif key == TK_TR1211:  # 주식 체결/미체결 (header: acno[11]+nrec[4]=15, grid=222)
                 GRID = 222
+                mode = getattr(self, '_chegyul_mode', '체결')
                 nrec = int(raw[11:15].decode('cp949', errors='ignore').strip() or "0")
-                self._log(f"  [주식체결] {nrec}건")
+                self._log(f"  [주식{mode}] {nrec}건")
                 for i in range(nrec):
                     g = raw[15 + i*GRID: 15 + (i+1)*GRID]
                     if len(g) < GRID: break
-                    self._log(f"    주문={s(g[0:5])} {s(g[10:22])} {s(g[62:82])} 주문가={s(g[122:134])} 주문량={s(g[134:146])} 체결가={s(g[146:158])} 체결량={s(g[158:170])} 미체결={s(g[182:194])} [{s(g[194:214])}] {s(g[214:222])}")
+                    self._log(f"    주문={s(g[0:5])} 종목={s(g[21:27])} {s(g[27:62])} {s(g[62:82])} 주문가={s(g[122:134])} 주문량={s(g[134:146])} 체결가={s(g[146:158])} 체결량={s(g[158:170])} 미체결={s(g[182:194])} [{s(g[194:214])}] {s(g[214:222])}")
                 if b_next:
                     acno = getattr(self, '_jngo_acno', '')
                     pswd = getattr(self, '_jngo_pswd', '')
+                    dlgb = 2 if mode == "미체결" else 0
                     self.ocx.dynamicCall(
                         "TR1211(int, QString, QString, QString, int, int, int, int, QString)",
-                        [TK_TR1211, acno, pswd, "", 0, 0, 0, 1, nkey])
+                        [TK_TR1211, acno, pswd, "", 0, 0, dlgb, 1, nkey])
+            elif key == TK_TR8001:  # 고객정보 (pihocust, mod: gubn[1])
+                gubn = raw[0:1].decode('cp949', errors='ignore').strip()
+                self._log(f"  [고객정보] gubn={gubn!r} raw={raw[:32].hex(' ')}")
             else:
                 self._log(f"  [RecvData] key={key} (미처리)")
         except Exception as e:

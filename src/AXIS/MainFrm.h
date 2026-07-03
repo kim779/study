@@ -1827,6 +1827,7 @@ public:
 	CString DpapiDecrypt(const CString& encText);
 	void      DecryptIniFile(const CString& iniPath, const std::vector<BYTE>& enkey);
 	std::map<CString, CString> LoadAccountHistory(const CString& iniPath);
+	bool HasPlainAccountHistory(const CString& iniPath);
 
 	bool isIPInRange24(CString ip, CString network);
 	bool IsHeadquartersIP(CString ip);

@@ -33,3 +33,5 @@
 #include "../../h/axisfire.h"
 #include "../../h/axisvar.h"
 #include "../../h/ledger.h"
+
+#include <afxinet.h>

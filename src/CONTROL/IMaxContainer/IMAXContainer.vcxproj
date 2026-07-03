@@ -19,7 +19,7 @@
     <SccLocalPath />
     <Keyword>MFCProj</Keyword>
     <ProjectGuid>{8F50A7E4-98C8-470E-A4D3-D41755EBD7B8}</ProjectGuid>
-    <WindowsTargetPlatformVersion>10.0.18362.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Template|Win32'" Label="Configuration">
@@ -66,7 +66,7 @@
     <IntDir>.\Release\</IntDir>
     <LinkIncremental>false</LinkIncremental>
     <CodeAnalysisRuleSet>D:\IBKS_TEST\ibks_2019\AxRules.ruleset</CodeAnalysisRuleSet>
-    <RunCodeAnalysis>true</RunCodeAnalysis>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -162,13 +162,18 @@
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <LinkDLL>true</LinkDLL>
       <SubSystem>Windows</SubSystem>
-      <OutputFile>D:\IBK_HOT_TRADING\dev\IMAXContainer.dll</OutputFile>
+      <OutputFile>D:\util\HTS\IBK_SMART\dev\IMAXContainer.dll</OutputFile>
       <ImportLibrary>.\Release\IMAXContainer.lib</ImportLibrary>
       <ModuleDefinitionFile>.\IMAXContainer.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ProgramDatabaseFile>D:\symbol\$(ProjectName).pdb</ProgramDatabaseFile>
     </Link>
+    <PostBuildEvent>
+      <Command>"C:\Program Files (x86)\Windows Kits\8.1\Debuggers\x86\symstore.exe" add /f "D:\symbol\$(ProjectName).pdb" /s "D:\symstore" /t "IBKS"</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="CMarketTimeManager.cpp" />
     <ClCompile Include="CMDLSbox.cpp" />
     <ClCompile Include="ControlWnd.cpp" />
     <ClCompile Include="IMAXApi.cpp" />
@@ -197,6 +202,7 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="CMarketTimeManager.h" />
     <ClInclude Include="CMDLSbox.h" />
     <ClInclude Include="ControlWnd.h" />
     <ClInclude Include="IMAXApi.h" />

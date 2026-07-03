@@ -8667,7 +8667,7 @@ void CGridWnd::parsingAlertx(LPARAM lParam)
 #ifdef DF_RTS_CHECK
 		m_grid->ReDrawTimer();
 #else
-		//m_grid->ReDrawAll();
+		m_grid->ReDrawAll();
 #endif
 	}
 }

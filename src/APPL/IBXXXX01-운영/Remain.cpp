@@ -129,6 +129,7 @@ CString CRemain::TotalData()
 
 void CRemain::ParsingRemainData(char *pData)
 {
+	m_bchg = false;
 	CString stmp;
 	struct s_rec srec;
 	CopyMemory(&srec, pData, L_srec);

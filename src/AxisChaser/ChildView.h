@@ -94,12 +94,19 @@ protected:
 	CWnd* m_xecure;
 	CString		m_root;
 	CString m_slog;
-	// Ű���� ����
 	CEdit		m_editKeyword;
 	CButton		m_chkFilter;
 	CString		m_strKeyword;
 	BOOL		m_bFilterOn;
 	BOOL		m_bBypassFilter;
+
+	CEdit		m_editRangeFrom;
+	CStatic		m_lblTilde;
+	CEdit		m_editRangeTo;
+	CButton		m_chkRange;
+	int		m_nRangeFrom;
+	int		m_nRangeTo;
+	BOOL		m_bRangeOn;
 // Operations
 public:
 
@@ -165,6 +172,9 @@ protected:
 	afx_msg void OnSaveas();
 	afx_msg void OnChangeEditKeyword();
 	afx_msg void OnClickedChkFilter();
+	afx_msg void OnChangeEditRangeFrom();
+	afx_msg void OnChangeEditRangeTo();
+	afx_msg void OnClickedChkRange();
 	//}}AFX_MSG
 	afx_msg LRESULT OnFindDialogMessage(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT	OnReceive(WPARAM wParam, LPARAM lParam);

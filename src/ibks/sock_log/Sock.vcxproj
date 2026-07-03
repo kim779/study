@@ -171,9 +171,10 @@
       <OptimizeReferences>
       </OptimizeReferences>
       <ModuleDefinitionFile>.\Sock.def</ModuleDefinitionFile>
-      <OutputFile>F:\util\HTS\IBK투자증권 HTS\exe/axSock.ocx</OutputFile>
+      <OutputFile>D:\util\HTS\IBK_SMART\exe/axSock.ocx</OutputFile>
       <RegisterOutput>false</RegisterOutput>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ProgramDatabaseFile>D:\symbol\$(ProjectName).pdb</ProgramDatabaseFile>
     </Link>
     <Midl>
       <MkTypLibCompatible>false</MkTypLibCompatible>
@@ -187,6 +188,9 @@
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
+    <PostBuildEvent>
+      <Command>"C:\Program Files (x86)\Windows Kits\8.1\Debuggers\x86\symstore.exe" add /f "D:\symbol\$(ProjectName).pdb" /s "D:\symstore" /t "IBKS"</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>

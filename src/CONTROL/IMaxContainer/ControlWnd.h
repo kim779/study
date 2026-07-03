@@ -182,6 +182,8 @@ public:
 	BOOL		m_bLoinSuccess{};
 	void			AbroadAuth(bool bSet, bool bfile = true);
 	enum {
+		dispidGetMarketType = 11L,
+		dispidSetMapNum = 10L,
 		dispidsJango = 9,
 		TYPE_WAIT = 0};
 	void			DoWork(int itype, int iSec);
@@ -256,4 +258,6 @@ public:
 protected:
 	BSTR GetsJango();
 	void SetsJango(BSTR newVal);
+	void SetMapNum(BSTR sMapNum);
+	BSTR GetMarketType();
 };

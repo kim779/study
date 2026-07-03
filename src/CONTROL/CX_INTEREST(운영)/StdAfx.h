@@ -38,7 +38,7 @@
 //#define DF_USEBOOKFILE
 
 #define DF_SERVERMEMO
-#define DF_RTS_CHECK1
+#define DF_RTS_CHECK
 inline void Output_DebugString(CString slog)
 {
 	OutputDebugString(slog);

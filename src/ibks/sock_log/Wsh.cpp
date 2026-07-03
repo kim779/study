@@ -105,7 +105,7 @@ int CWsh::Run()
 		
 		if (m_que.GetUpperBound() < 0)
 		{
-			m_section.Unlock();  // µ¿±âÈ­ ÇØÁ¦
+			m_section.Unlock();  // ï¿½ï¿½ï¿½ï¿½È­ ï¿½ï¿½ï¿½ï¿½
 
 m_iUpperbound = m_que.GetSize();
 m_slog.Format("[axSock][Receive]--------conitnue!!! [%x][%s]  m_que.GetUpperBound()=[%d] m_iUpperbound=[%x][%d]",
@@ -117,21 +117,10 @@ m_slog.Format("[axSock][Receive]--------conitnue!!! [%x][%s]  m_que.GetUpperBoun
 			continue;
 		}
 
-		//m_section.Lock();   //ÀÌ°ÅÀÇ À§Ä¡°¡ ÀÌ»óÇÏ´Ù°í ÇÑ´Ù.
+		//m_section.Lock();   //ï¿½Ì°ï¿½ï¿½ï¿½ ï¿½ï¿½Ä¡ï¿½ï¿½ ï¿½Ì»ï¿½ï¿½Ï´Ù°ï¿½ ï¿½Ñ´ï¿½.
 		pMQ = (CMQue *)m_que.GetAt(0);
 		m_que.RemoveAt(0);
 		m_section.Unlock();
-
-#ifdef DF_SHOW_SENDRECEIVE
-		if (pMQ->m_ssm == 1)  
-		{
-			m_iUpperbound = m_que.GetSize();
-			m_slog.Format("[axSock][Receive]--------Ã³¸® [%x][%s]  m_que.GetUpperBound()=[%d] m_iUpperbound=[%x][%d]",
-				this, __FUNCTION__, m_que.GetUpperBound(), &m_iUpperbound, m_iUpperbound);
-			if (m_type == WSH)
-				OutputDebugString(m_slog);
-		}
-#endif
 
 		if (pMQ->m_ssm != ssM_SM)
 		{
@@ -205,12 +194,12 @@ void CWsh::Dispatch(int ssm, char* pBytes, int nBytes)
 
 	if (nBytes > 0)
 	{
-		char extractedString[8 + 1]{};  // ³Î ¹®ÀÚ Æ÷ÇÔ
+		char extractedString[8 + 1]{};  // ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 		strncpy_s(extractedString, pBytes + 12 - 1, 8);
 		const char* searchString = "pibopswd";
 		if (strstr(extractedString, searchString) != NULL)
 		{
-			m_slog.Format("[axSock][Receive] Æ¯Á¤TR Ã£¾Æ¼­ µû·Î Ã³¸® [%x][%s]  extractedString =[%s]",
+			m_slog.Format("[axSock][Receive][%x][%s]  extractedString =[%s]",
 				this, __FUNCTION__, extractedString);
 			OutputDebugString(m_slog);
 			//
@@ -269,16 +258,6 @@ void CWsh::DoParse(CMQue* pMQ)
 	case ssM_AP:		// OnApprove()
 	default:
 	{
-#ifdef DF_SHOW_SENDRECEIVE
-	/*	struct _rtmH* rtmH = (struct _rtmH*)pMQ->m_pBytes;
-		int datL = atoi(CString(rtmH->datL, sizeof(rtmH->datL)));*/
-//	text = CString(pBytes, datL);
-		CString sdata;
-		sdata.Format("%.8s", (char*)&pMQ->m_pBytes[11]);
-		m_slog.Format("[axSock][Receive]Á¤»óÃ³¸®ÇØ¼­ À§ÀÚµå¿¡ ¸Þ½ÃÁö  [%s]  >>>>>[%s]<<<<<", __FUNCTION__, sdata);
-		if (m_type == WSH)
-			OutputDebugString(m_slog);
-#endif
 		m_pWnd->SendMessage(WFM_AXIS, (WPARAM)pMQ->m_nBytes, (LPARAM)pMQ->m_pBytes);
 		return;
 	}
@@ -385,7 +364,7 @@ void CWsh::DoParse(CMQue* pMQ)
 			m_slog.Format("[axSock][patch][%s][%x] stFlag::stRSC", __FUNCTION__, rsmH->resK);
 			OutputDebugString(m_slog);
 #endif  
-			//¹®Á¦
+			//ï¿½ï¿½ï¿½ï¿½
 			Update(pMQ->m_pBytes, 0);  //icss test 
 			break;
 		}
@@ -435,7 +414,7 @@ void CWsh::DoParse(CMQue* pMQ)
 	if (rsmH->resF == resF_LAS || rsmH->resF == resF_ONLY)
 	{
 #ifdef _DEBUG
-		m_slog.Format("[axSock][patch][%s][%x][%s]³»·Á¹ÞÀº ÆÄÀÏÀ» ½ÇÁ¦ Æú´õ¿¡ º¹»çÇÏ´Â ´Ü°è", __FUNCTION__, rsmH->resK, rsmH->resN);
+		m_slog.Format("[axSock][patch][%s][%x][%s]ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï´ï¿½ ï¿½Ü°ï¿½", __FUNCTION__, rsmH->resK, rsmH->resN);
 		OutputDebugString(m_slog);
 #endif
 		
@@ -614,7 +593,7 @@ void CWsh::Update(char* pBytes, int nBytes, BOOL update)
 		m_current++;
 
 	if (rsmH->resK == resK_RSP && m_current <= m_list.GetSize() && m_list.GetAt(m_current-1)->m_size > 0)
-	{  //¹®Á¦   <-- À§ Á¶°ÇÀÇ »óÈ²(==resK_RSP) ÀÌ µÇ¸é m_list¿¡ °ªÀ» °¡Á® ¿Í¼­ ³Ö¾î¹ö¸®°Ô µÈ´Ù.,
+	{  //ï¿½ï¿½ï¿½ï¿½   <-- ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½È²(==resK_RSP) ï¿½ï¿½ ï¿½Ç¸ï¿½ m_listï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Í¼ï¿½ ï¿½Ö¾ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½È´ï¿½.,
 		rate   = 100;
 		nBytes = m_list.GetAt(m_current-1)->m_size;
 	}
@@ -641,7 +620,7 @@ void CWsh::Update(char* pBytes, int nBytes, BOOL update)
 		}
 	}
 
-	if (rsmH->resK == resK_RSP)  //¹®Á¦
+	if (rsmH->resK == resK_RSP)  //ï¿½ï¿½ï¿½ï¿½
 		path =  m_list.GetAt(m_current-1)->m_name;
 	else
 		path = rsmH->resN;
@@ -650,10 +629,6 @@ void CWsh::Update(char* pBytes, int nBytes, BOOL update)
 		OutputDebugString(path);
 	//if (path.Find("IB0000A1") >= 0)   //test
 	//	OutputDebugString(path);
-#ifndef _DEBUG
-	m_slog.Format("[axSock][patch][%s] [%s] nBytes=[%d] m_current=[%d] m_list=[%d]", __FUNCTION__, path, nBytes, m_current, m_list.GetSize());
-	OutputDebugString(m_slog);
-#endif
 	pos  = path.ReverseFind('/');
 	if (pos != -1)
 		path = path.Mid(pos+1);
@@ -687,10 +662,6 @@ void CWsh::Update(char* pBytes, int nBytes, BOOL update)
 		if (GetFileAttributes(str) != 0xffffffff)
 		{
 			DeleteFile(path);
-#ifndef _DEBUG
-m_slog.Format("[axSock][patch]  [%s]  DeleteFile= [%s]  MoveFile(=[%s]", __FUNCTION__, path, str);
-OutputDebugString(m_slog);
-#endif
 			MoveFile(str, path);
 		}
 		path.Format(_T("%s/%s/%s"), m_home.GetString(), TABDIR, (m_state == stFlag::stAXIS) ? snAXIS : snRSC);
@@ -745,7 +716,7 @@ bool CWsh::GetUpdateList()
 	int	value, total;
 	time_t	utime, ctime;
 
-	if (CFile::GetStatus(path, fs))  //ÀÌ°Ô ¸Õ°¡ ÀüÃ¼ ¹Þ´Â ·ÎÁ÷?
+	if (CFile::GetStatus(path, fs))  //ï¿½Ì°ï¿½ ï¿½Õ°ï¿½ ï¿½ï¿½Ã¼ ï¿½Þ´ï¿½ ï¿½ï¿½ï¿½ï¿½?
 	{
 		utime = fs.m_mtime.GetTime();
 		time(&ctime);
@@ -756,10 +727,7 @@ bool CWsh::GetUpdateList()
 	CStdioFile file;
 	char	twb[64];
 	int	size, vers, key;
-#ifndef _DEBUG
-	m_slog.Format("[axSock][patch][%s] infos=[%s] count=[%d]", __FUNCTION__, infos, count);
-	OutputDebugString(m_slog);
-#endif
+
 	if (!file.Open(infos, CFile::modeRead))
 		return false;
 
@@ -785,11 +753,6 @@ bool CWsh::GetUpdateList()
 			value += update->m_size;
 			total++;
 		}
-
-//#ifdef _DEBUG
-		m_slog.Format("[axSock][patch][%s]     [%s]", __FUNCTION__ , text);
-		OutputDebugString(m_slog);
-//#endif
 
 		m_list.Add(update);
 	}
@@ -865,17 +828,11 @@ bool CWsh::MakeUpdateList()
 		infos.Format(_T("%s/%s/%s"), m_home.GetString(), TABDIR, snAXIS);
 		if (!file.Open(infos, CFile::modeCreate|CFile::modeWrite)) //updateAxis
 			return false;
-#ifndef _DEBUG
-		m_slog.Format("[axSock][patch]  MakeUpdateList 11111111 arr=[%d]", arr.GetSize());
-		OutputDebugString(m_slog);
-#endif
-		for (int ii = 0; ii < arr.GetSize(); ii++) //infoAXIS.new¿¡ ÀÖ´Â µ¥ÀÌÅÍ arr
+
+		for (int ii = 0; ii < arr.GetSize(); ii++) //infoAXIS.newï¿½ï¿½ ï¿½Ö´ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ arr
 		{
 			str  = arr.GetAt(ii);
 			str.TrimLeft(); str.TrimRight();
-
-m_slog.Format("[axSock][patch]  MakeUpdateList str=[%s]", str);
-OutputDebugString(m_slog);
 
 			if (str.IsEmpty())
 				continue;
@@ -934,10 +891,6 @@ OutputDebugString(m_slog);
 		if (GetFileAttributes(str) != 0xffffffff)
 		{
 			DeleteFile(path);
-#ifndef _DEBUG
-m_slog.Format("[axSock][patch]  [%s]  DeleteFile= [%s]  MoveFile(=[%s]", __FUNCTION__, path, str);
-OutputDebugString(m_slog);
-#endif
 			MoveFile(str, path);
 		}
 		DeleteFile(infos);
@@ -1064,21 +1017,11 @@ OutputDebugString(m_slog);
 		default:
 			break;
 		}
-#ifndef _DEBUG
-		if (version == verMAP || version == verDEV)
-		{
-			m_slog.Format("[axSock][patch]  [%s]  text=[%s]", __FUNCTION__, text);
-			OutputDebugString(m_slog);
-		}
-#endif
 		update = new Cupdate;
 		update->m_name = text;
 		update->m_size = size;
 		update->m_info = str;
 		value += size;
-
-		if (text.Find("icss") >= 0)    //icss test 
-			OutputDebugString(text);
 
 		m_list.Add(update);
 		str += '\n';
@@ -1121,10 +1064,6 @@ OutputDebugString(m_slog);
 	if (GetFileAttributes(str) != 0xffffffff)
 	{
 		DeleteFile(path);
-#ifndef _DEBUG
-m_slog.Format("[axSock][patch]  [%s]  DeleteFile= [%s]  MoveFile(=[%s]", __FUNCTION__, path, str);
-OutputDebugString(m_slog);
-#endif
 		MoveFile(str, path);
 	}
 	DeleteFile(infos);
@@ -1226,10 +1165,6 @@ void CWsh::DoClose()
 	if (GetFileAttributes(text) != 0xffffffff)
 	{
 		DeleteFile(path);
-#ifndef _DEBUG
-m_slog.Format("[axSock][patch]  [%s]  DeleteFile= [%s]  MoveFile(=[%s]", __FUNCTION__, path, text);
-OutputDebugString(m_slog);
-#endif
 		MoveFile(text, path);
 	}
 }
@@ -1238,6 +1173,11 @@ UINT dispatchRTM(LPVOID lpvoid)
 {
 	CWsh* pWsh = (CWsh *) lpvoid;
 	if (pWsh == NULL) return 0;
+
+	DWORD_PTR procMask, sysMask;
+	GetProcessAffinityMask(GetCurrentProcess(), &procMask, &sysMask);
+	if (sysMask & 1)
+		SetThreadAffinityMask(GetCurrentThread(), 1);
 
 	CMQue *pMQ;
 	CSingleLock	syncLock(&pWsh->m_eventRTM);
@@ -1292,19 +1232,19 @@ void CWsh::BeginRTM()
 		//0x08 -> 1000
 
 	//	DWORD_PTR dwProcessAffinityMask = 0x01 | 0x02 | 0x03 | 0x04 | 0x05 | 0x06 | 0x07 | 0x08 | 0x09 | 0x0a;
-		DWORD_PTR dwProcessAffinityMask = 0x03;
-		CString slog;
-		if (SetThreadAffinityMask(m_thread->m_hThread, dwProcessAffinityMask) == 0) {
-		    int ierror = GetLastError();
-		  
-		    slog.Format("[MULTICORE]axissock ½º·¹µå Ä£È­µµ ½ÇÆÐ[%d]", ierror);
-			OutputDebugString(slog);
-		}
-		else
-		{
-			slog.Format("[MULTICORE]  axissock ÇÁ·Î¼¼½º Ä£È­µµ ¼º°ø");
-			OutputDebugString(slog);
-		}
+		//DWORD_PTR dwProcessAffinityMask = 0x03;
+		//CString slog;
+		//if (SetThreadAffinityMask(m_thread->m_hThread, dwProcessAffinityMask) == 0) {
+		//    int ierror = GetLastError();
+		//  
+		//    slog.Format("[MULTICORE]axissock ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Ä£È­ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½[%d]", ierror);
+		//	OutputDebugString(slog);
+		//}
+		//else
+		//{
+		//	slog.Format("[MULTICORE]  axissock ï¿½ï¿½ï¿½Î¼ï¿½ï¿½ï¿½ Ä£È­ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½");
+		//	OutputDebugString(slog);
+		//}
 	
 
 

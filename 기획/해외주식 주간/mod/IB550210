@@ -1,0 +1,119 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB550210)
+MAPSIZE(300, 470)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("5500 우측상단호가")
+MAPPUBLIC(";")
+FONT("굴림", 9, NORMAL)
+TITLE("Untitled")
+TOPATH(AXIS)
+METHOD(MENU)
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+CONTROL  ctrl_hoga(0, 0, 470, 300)  |FA_PROTECT  "IMAXContainer"  "/t1529"  LEN(0)  EDIT_NOP    COLOR(192, 232)  TABORDER(0)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  IMAXGROUP(58, 337, 83, 357)  LEN(2)  IO_MIXED|EDIT_INOUT|FA_WRAP|FA_PASS    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(1)  IOORDER(1)  &
+  HINTTYPE(IH_NONE)
+EDIT  IMAXSKIN(88, 337, 113, 357)  LEN(1)  IO_MIXED|EDIT_INOUT|FA_WRAP|FA_PASS    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(2)  IOORDER(2)  &
+  HINTTYPE(IH_NONE)
+EDIT  ed_initimax(130, 335, 155, 360)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_PASS    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("0")          TABORDER(3)  IOORDER(3)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Sub InitIMAX
+SYSTEM.Trace "----- ed_initimax.Data = " & ed_initimax.Data
+	ed_initimax.Data = l_initimax("ctrl_hoga")
+
+' 	If ed_initimax.Data = "1" Then
+'  		SCREEN.Proc "main.Acc_SearchComplete", "3"
+'	End If
+End Sub
+
+Sub SetGroup(groupID)
+	ctrl_hoga.SetIMAXGroup(groupID)
+End Sub
+
+Sub ChangeCode_H(sCode)
+	Dim itype
+	ctrl_hoga.SetIMAXData 7, sCode
+End Sub
+
+Sub SetIMAXFocus
+
+End Sub
+
+Sub GetIMAXValue(sdata)
+
+End Sub
+
+Sub SetIMAXVisible(bVisible)
+	ctrl_hoga.SetVisible(bVisible)
+End Sub
+
+Sub SetIMAXEnable(bEnable)
+	ctrl_hoga.SetEnable(bEnable)
+End Sub
+
+Sub IMAXReflesh()
+
+End Sub
+
+Sub GetIMAXCodetype(sdata)
+
+End Sub
+
+'코스콤으로 부터 조회한 시장구분자
+'71홍콩 72상해 73심천 81뉴욕 82나스닥 87아맥스
+Sub ChangeIMaxCode(smkgubn , scode)
+SYSTEM.Trace "ChangeIMaxCode =" & GetIMaxMkcode(smkgubn) & vbTab & scode
+	ctrl_hoga.SetIMAXData GetIMAXMk(smkgubn), GetIMaxMkcode(smkgubn) & vbTab & scode
+End Sub
+
+_AW_ONINDECLARE_AW_
+#load IB999938
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(ctrl_hoga)
+_AW_ONDBLCLK_AW_
+SCREEN.Proc "main.Acc_SearchComplete", "3"
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(IMAXGROUP)
+_AW_ONCHANGE_AW_
+SYSTEM.Trace "IB550200 groupid =" & IMAXGROUP.Data
+ctrl_hoga.SetIMAXGroup IMAXGROUP.Data
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(IMAXSKIN)
+_AW_ONCHANGE_AW_
+ctrl_hoga.SetIMAXSkin IMAXSKIN.Data
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

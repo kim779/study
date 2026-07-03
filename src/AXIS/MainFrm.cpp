@@ -2834,7 +2834,7 @@ void CMainFrame::OnUpdateRunCommand(CCmdUI* pCmdUI)
 }
 
 void CMainFrame::OnClose() 
-{
+ {
 	if (!m_bCLOSE_ASTx)
 	{
 		MemoUpload();  //memo
@@ -33139,11 +33139,11 @@ void CMainFrame::WorkerThreadFunc()
 
 NetType CMainFrame::GetCurrentNetType(BOOL bUpload)
 {
-	ULONG size = 0;
-	GetAdaptersAddresses(AF_UNSPEC,
-		GAA_FLAG_INCLUDE_GATEWAYS, // ← 게이트웨이 정보 포함
-		NULL, NULL, &size);
+	DWORD bestIfIndex = 0;
+	GetBestInterface(inet_addr("8.8.8.8"), &bestIfIndex);   // 실제 기본 경로 인터페이스
 
+	ULONG size = 0;
+	GetAdaptersAddresses(AF_UNSPEC, GAA_FLAG_INCLUDE_GATEWAYS, NULL, NULL, &size);
 	if (size == 0) return NET_NONE;
 
 	IP_ADAPTER_ADDRESSES* addresses = (IP_ADAPTER_ADDRESSES*)malloc(size);
@@ -33151,31 +33151,20 @@ NetType CMainFrame::GetCurrentNetType(BOOL bUpload)
 
 	NetType result = NET_NONE;
 
-	if (GetAdaptersAddresses(AF_UNSPEC,
-		GAA_FLAG_INCLUDE_GATEWAYS,
-		NULL, addresses, &size) == NO_ERROR)
+	if (GetAdaptersAddresses(AF_UNSPEC, GAA_FLAG_INCLUDE_GATEWAYS, NULL, addresses, &size) == NO_ERROR)
 	{
 		for (IP_ADAPTER_ADDRESSES* addr = addresses; addr; addr = addr->Next)
 		{
-			// 비활성 어댑터 스킵
 			if (addr->OperStatus != IfOperStatusUp) continue;
-
-			// 게이트웨이 없으면 실제 통신 안 함 → 스킵
 			if (addr->FirstGatewayAddress == NULL) continue;
-
-			// 루프백/터널 스킵
 			if (addr->IfType == IF_TYPE_SOFTWARE_LOOPBACK) continue;
 			if (addr->IfType == IF_TYPE_TUNNEL) continue;
 
-			if (addr->IfType == IF_TYPE_IEEE80211)
-			{
-				result = NET_WIFI;
-				break; // WiFi + 게이트웨이 있으면 확정
-			}
-			else
-			{
-				result = NET_WIRED; // 유선 후보 (WiFi 없으면 채택)
-			}
+			// 실제 기본 경로로 쓰이는 어댑터만 인정 (메트릭/우선순위 반영됨)
+			if (bestIfIndex != 0 && addr->IfIndex != bestIfIndex) continue;
+
+			result = (addr->IfType == IF_TYPE_IEEE80211) ? NET_WIFI : NET_WIRED;
+			break;
 		}
 	}
 
@@ -33571,11 +33560,30 @@ std::pair<int, int> CMainFrame::EncryptAllUserIni(const CString& rootPath)
 					{
 						CString endataPath;
 						endataPath.Format("%s\\endata.dll", (LPCSTR)userFolder);
-						if (GetFileAttributesA(endataPath) == INVALID_FILE_ATTRIBUTES)
+
+						if (Axis::isCustomer)
 						{
-							CopyFileA(iniPath, endataPath, FALSE);
-							m_slog.Format("[ENC][BACKUP] [%s] -> [%s]", iniPath, endataPath);
-							OutputDebugString(m_slog);
+							// 고객 PC: 평문 백업을 만들지 않고, 과거 버전이 남긴 잔존 파일도 정리
+							if (GetFileAttributesA(endataPath) != INVALID_FILE_ATTRIBUTES)
+							{
+								DeleteFileA(endataPath);
+								m_slog.Format("[ENC][BACKUP] customer - removed stale [%s]", endataPath);
+								OutputDebugString(m_slog);
+							}
+						}
+						else if (HasPlainAccountHistory(iniPath))
+						{
+							// 직원/지원용: 아직 평문일 때만 1회 복구본 생성
+							if (CopyFileA(iniPath, endataPath, FALSE))
+							{
+								m_slog.Format("[ENC][BACKUP] [%s] -> [%s]", iniPath, endataPath);
+								OutputDebugString(m_slog);
+							}
+							else
+							{
+								m_slog.Format("[ENC][BACKUP] copy failed [%s] -> [%s]", iniPath, endataPath);
+								OutputDebugString(m_slog);
+							}
 						}
 					}
 					EncryptIniFile(iniPath, key);
@@ -34216,6 +34224,32 @@ void CMainFrame::ProcessFileManager(const CString& setupFile)
 	}
 
 	WriteLog("[FM] done.\n");
+}
+
+bool CMainFrame::HasPlainAccountHistory(const CString& iniPath)
+{
+	std::vector<char> buf(4096);
+	DWORD len = GetPrivateProfileSection("AccountHistory", buf.data(), (DWORD)buf.size(), iniPath);
+
+	// 섹션이 버퍼보다 크면(반환값 == 버퍼크기-2) 버퍼를 키워서 재시도
+	while (len == buf.size() - 2)
+	{
+		buf.resize(buf.size() * 4);
+		len = GetPrivateProfileSection("AccountHistory", buf.data(), (DWORD)buf.size(), iniPath);
+	}
+
+	for (const char* p = buf.data(); *p; p += strlen(p) + 1)
+	{
+		const char* eq = strchr(p, '=');
+		if (!eq) continue;
+
+		std::string key(p, eq - p);
+		std::string val(eq + 1);
+
+		if (key != "VERSION" && !val.empty() && val.find('|') != std::string::npos)
+			return true;
+	}
+	return false;
 }
 #endif
 

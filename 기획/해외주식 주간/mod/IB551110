@@ -1,0 +1,681 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB551110)
+MAPSIZE(245, 305)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("5500매도주문")
+MAPPUBLIC(";")
+FONT("굴림", 9, NORMAL)
+TITLE("매도주문")
+TOPATH(AXIS)
+METHOD(MENU)
+MAPTYPE(FIXED)
+HEADER(NOP)
+BGROUND(BRUSH, 171)
+}
+
+
+
+FORM DIVISION
+{
+
+CONTROL  ctrl_code(35, 14, 290, 34)  |FA_PROTECT  "IMAXContainer"  "/t1525"  LEN(0)  EDIT_NOP    COLOR(192, 232)  TABORDER(0)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  SYMBOL28(7, 13, 31, 33)  '종목'  AL_LEFT  CUR(0)      COLOR(228, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  SYMBOL83(7, 62, 31, 82)  '수량'  AL_LEFT  CUR(0)      COLOR(228, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+EDIT  ed_jqty(35, 62, 115, 82)  LEN(8)  IO_NUM|EDIT_INPUT|FA_COMMA|FA_RIGHT|FA_SKIP|FA_XFLOAT  SPIN(1)      COLOR(68, 130)  CUR(0)  TP_SUNKEN  INIT("0")          TABORDER(2)  IOORDER(1)  ENABLE  &
+  VISIBLE  HOVER  HINTTYPE(IH_NONE)
+BUTTON  BUTTON3(55, 676, 113, 696)  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(132, 186)  CUR(0)    "매도_주문설정.BMP"    TABORDER(5)  ENABLE  &
+  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+BUTTON  JUMUN_B(225, 200, 300, 237)  '매도(F3)'  TP_USER|IMAGETEXT|AL_STRETCH    KEYMAP(F3)    FONT("새굴림", 11, BOLD)  FOCUS  COLOR(193, 240)  CUR(10)    "매도.BMP"    TABORDER(4)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+LABEL  LABEL23(7, 38, 31, 58)  '유형'  AL_LEFT  CUR(0)      COLOR(228, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+COMBO  shogb(35, 38, 115, 58)  TP_SUNKEN  LEN(2)  COUNT(3)  VCOUNT(3)  INDEX(0)  MATCHKEY(NOTMAPPING)  IO_NUM|EDIT_INPUT|FA_SKIP    COLOR(68, 130)  CUR(0)  DISPLAY("00 지정가", "01 TWAP", "02 VWAP")  DATA("00", "01", "02")    TABORDER(1)  IOORDER(3)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL24(7, 110, 31, 130)  '단가'  AL_LEFT  CUR(0)      COLOR(228, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+CONTROL  c_jqty(119, 62, 139, 82)    "CX_Amount"  "/k1/i매도_1BTN_BG.BMP/t주/red_jqty"  LEN(0)  EDIT_NOP    COLOR(132, 186)  TABORDER(0)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+COMBO  cboPrice(50, 651, 122, 671)  TP_SUNKEN  LEN(4)  COUNT(5)  VCOUNT(5)  INDEX(1)  MATCHKEY(NOTMAPPING)  IO_NUM|EDIT_INPUT|FA_PASS    COLOR(192, 130)  CUR(0)  DISPLAY("매도호가", "현재가", "매수호가", "상한가", "하한가")  DATA("2025", "2023", "2026", "2302", "2303")    TABORDER(6)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  chk_OrderConfirm(55, 631, 124, 651)  '주문확인'  TP_CHECK|EDIT_NOP          COLOR(208, 130)  CUR(0)      TABORDER(7)  ENABLE  &
+  CHECKED  TRANSPARENT  HINTTYPE(IH_NONE)
+CONTROL  ctrl_prc(35, 110, 160, 130)  |FA_PROTECT  "IMAXContainer"  "/t1527"  LEN(0)  EDIT_NOP    COLOR(192, 232)  TABORDER(0)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL26(7, 139, 31, 159)  '금액'  AL_LEFT  CUR(0)      COLOR(228, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+OUT  out_USD(35, 140, 127, 158)  LEN(30)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT    COLOR(171, 232)  CUR(0)  LINECOLOR(216)          TABORDER(0)  IOORDER(4)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  lb_cur(140, 139, 175, 159)  'USD'  AL_LEFT  CUR(0)      COLOR(228, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+OUT  out_WON(35, 162, 127, 180)  LEN(30)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT    COLOR(171, 232)  CUR(0)  LINECOLOR(216)          TABORDER(0)  IOORDER(5)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL30(140, 161, 164, 181)  '원'  AL_LEFT  CUR(0)      COLOR(228, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL8(190, 62, 240, 82)  '주문단위'  AL_LEFT  CUR(0)      COLOR(228, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  LABEL9(190, 139, 240, 159)  '환율'  AL_LEFT  CUR(0)      COLOR(228, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+OUT  out_OdUnit(240, 63, 300, 81)  LEN(30)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT    COLOR(171, 232)  CUR(0)  LINECOLOR(216)          TABORDER(0)  IOORDER(6)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+OUT  out_ERate(240, 140, 300, 158)  LEN(30)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT|FA_FLOAT    COLOR(171, 232)  CUR(0)  LINECOLOR(216)        FLOAT(2)    TABORDER(0)  IOORDER(7)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  IMAXGROUP(161, 579, 186, 599)  LEN(2)  IO_MIXED|EDIT_INOUT|FA_WRAP|FA_SKIP|FA_PASS    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(8)  IOORDER(8)  &
+  HINTTYPE(IH_NONE)
+EDIT  IMAXSKIN(193, 579, 218, 599)  LEN(1)  IO_MIXED|EDIT_INOUT|FA_WRAP|FA_SKIP|FA_PASS    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(9)  IOORDER(9)  &
+  HINTTYPE(IH_NONE)
+EDIT  IMAXEXID(894, 560, 944, 575)  LEN(12)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_PASS    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(10)  IOORDER(10)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  IMAXPRICE(180, 85, 300, 120)  LEN(12)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_PASS    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(11)  IOORDER(11)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  BUTTON0(170, 655, 190, 675)  '가'  TP_PUSH|IMAGETEXT|AL_STRETCH        COLOR(132, 186)  CUR(0)    "매도_1BTN_BG.BMP"    TABORDER(12)  ENABLE  &
+  IMAGETEXT  HOVER  HINTTYPE(IH_STRING)  HELPTEXT("가능수량")HELPTEXT("가능수량")
+EDIT  IMAXCODE(895, 580, 948, 595)  LEN(12)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_PASS    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(13)  IOORDER(12)  ENABLE  &
+  HINTTYPE(IH_NONE)
+GROUP  GP1(411, 631, 467, 651)  'GP1'        COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  o_mono(470, 593, 526, 613)  LEN(6)  IO_NUM|AL_CENTER||FA_RIGHT|FA_ZEROSUP|FA_SKIP|SA_SPACE  FONT("굴림", 10, BOLD)    COLOR(122, 209)  CUR(0)  TP_SUNKEN          TABORDER(0)  IOORDER(13)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL18(406, 593, 462, 613)  '원주문번호'  AL_CENTER  CUR(0)      COLOR(146, 0)  ENABLE  &
+  TRANSPARENT  HINTTYPE(IH_NONE)
+CONTROL  OrdCfg(483, 626, 556, 673)  |FA_PROTECT  "CX_OrderCfg"  "/k1/xPOOPPOOP/m/ped_jprc/qed_jqty/sIB1001C0/rIB100100"  LEN(0)  EDIT_NOP    COLOR(192, 232)  TABORDER(0)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  l_avol(492, 684, 512, 705)  '0'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL27(307, 685, 478, 704)  '0:안함 1:최대가능 3:최소가능'  AL_CENTER  CUR(0)      COLOR(195, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+GROUP  GP2(410, 650, 466, 670)  'GP2'        COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL29(306, 714, 395, 735)  'call QueryHoga'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  isQueryHoga(401, 714, 464, 735)  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  flash_fg(240, 551, 272, 578)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_PASS    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("0")          TABORDER(14)  IOORDER(14)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  jmbtclick(532, 770, 582, 790)  LEN(1)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_SKIP|FA_PASS    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("0")          TABORDER(15)  IOORDER(15)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL31(411, 770, 526, 789)  '주문버튼클릭구분값'  AL_CENTER  CUR(0)      COLOR(195, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+BUTTON  dtlBtn(35, 86, 71, 106)  '잔고'  TP_PUSH|IMAGETEXT|AL_CENTER        COLOR(132, 186)  CUR(10)    "2btn.BMP"    TABORDER(3)  ENABLE  &
+  VISIBLE  IMAGETEXT  HOVER  HINTTYPE(IH_NONE)
+LABEL  LABEL32(7, 208, 62, 228)  '주문번호'  AL_LEFT  CUR(0)      COLOR(228, 130)  ENABLE  &
+  VISIBLE  TRANSPARENT  HINTTYPE(IH_NONE)
+LABEL  lb_medopsi(125, 38, 225, 58)  '매도만 가능'  AL_LEFT  CUR(0)      COLOR(171, 130)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  IMAXORQTY(894, 636, 979, 651)  LEN(12)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_PASS    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(16)  IOORDER(16)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  IMAXCODENAME(894, 617, 979, 632)  LEN(40)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_PASS    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(17)  IOORDER(17)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  o_jmno(60, 208, 184, 228)  LEN(6)  IO_NUM|AL_CENTER||FA_RIGHT|FA_ZEROSUP|FA_SKIP|SA_SPACE  FONT("굴림", 10, BOLD)    COLOR(175, 130)  CUR(0)  LINECOLOR(61)          TABORDER(0)  IOORDER(18)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL2(460, 145, 533, 163)  '시장구분'  AL_CENTER  CUR(0)      COLOR(195, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  ed_mkgb(537, 145, 566, 163)  LEN(2)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP|FA_PASS    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(18)  IOORDER(19)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL11(460, 45, 533, 63)  '매매구분'  AL_CENTER  CUR(0)      COLOR(195, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  ed_mmgb(535, 45, 564, 63)  LEN(2)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP|FA_PASS    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(19)  IOORDER(20)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL3(650, 145, 1470, 163)  'ed_mkgb IMAXEXID 홍콩104, 상해215, 심천214, 뉴욕321, 나스닥537, 아멕스66  코스콤코드 홍콩 71 상해72 심천73 뉴욕81 나스닥82 아멕스87'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL0(460, 70, 533, 89)  '원주문번호'  AL_CENTER  CUR(0)      COLOR(195, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  ed_ogno(537, 70, 610, 89)  LEN(10)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP|FA_PASS    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(20)  IOORDER(21)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL5(460, 245, 533, 264)  '호가구분'  AL_CENTER  CUR(0)      COLOR(195, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  ed_hogb(537, 245, 566, 264)  LEN(2)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP|FA_PASS    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("00")          TABORDER(21)  IOORDER(22)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL6(650, 245, 1285, 263)  'ed_hogb 00-지정가, 03-시장가, A2-TWAP, A3-VWAP, A4-LIMIT_TWAP,A5-LIMIT_VWAP, B1-MOC, B2-LOC    '  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL12(460, 295, 532, 314)  '중개인구분코드'  AL_CENTER  CUR(0)      COLOR(195, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  ed_mdgb(537, 295, 566, 314)  LEN(2)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP|FA_PASS    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("20")          TABORDER(22)  IOORDER(23)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL13(650, 70, 855, 88)  'ed_ogno '  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL14(650, 295, 900, 313)  'ed_mdgb 20초상증권(중국) 10 LEK(미국)'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL21(650, 45, 943, 63)  'ed_mmgb 01매도 02매수 08취소 21단주'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL22(460, 120, 533, 139)  '비밀번호'  AL_CENTER  CUR(0)      COLOR(195, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL25(460, 95, 533, 114)  '계좌번호'  AL_CENTER  CUR(0)      COLOR(195, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  ed_acno(535, 95, 642, 114)  LEN(20)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP|FA_PASS    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(23)  IOORDER(24)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  ed_pswd(537, 119, 593, 139)  LEN(8)  IO_MIXED|EDIT_INPUT|FA_PASSWD|FA_WRAP|FA_PASS    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(24)  IOORDER(25)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL4(460, 170, 533, 188)  '종목번호'  AL_CENTER  CUR(0)      COLOR(195, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL15(460, 195, 533, 213)  '주문수량'  AL_CENTER  CUR(0)      COLOR(195, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL16(460, 220, 533, 238)  '주문가'  AL_CENTER  CUR(0)      COLOR(195, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL17(650, 170, 1055, 188)  'ISIN 코드'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL19(650, 195, 1055, 213)  'ed_jqty'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL20(650, 220, 1055, 238)  'IMAXPRICE  ex) 10 -> 100000 입력   52.12 -> 521200'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL7(460, 320, 533, 339)  '예약처리구분'  AL_CENTER  CUR(0)      COLOR(195, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  ed_rsvgubn(537, 320, 566, 339)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP|FA_PASS    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(25)  IOORDER(26)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL10(460, 21, 533, 39)  '주문타입'  AL_CENTER  CUR(0)      COLOR(195, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  ed_ordTp(537, 21, 566, 39)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP|FA_PASS    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(26)  IOORDER(27)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL28(648, 20, 941, 38)  'ed_ordTp 1-중국 2-미국 3-예약'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  ed_code(537, 170, 617, 188)  LEN(12)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP|FA_PASS    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(27)  IOORDER(28)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL33(460, 345, 533, 364)  '국가코드'  AL_CENTER  CUR(0)      COLOR(195, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  ed_curCode(537, 345, 566, 364)  LEN(3)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP|FA_PASS    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(28)  IOORDER(29)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  ed_prc(537, 220, 617, 238)  LEN(15)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP|FA_PASS    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(29)  IOORDER(30)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL34(460, 370, 533, 389)  '예약주문입력일'  AL_CENTER  CUR(0)      COLOR(195, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  ed_rsvIpDt(535, 370, 620, 389)  LEN(8)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP|FA_PASS    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(30)  IOORDER(31)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL35(460, 396, 533, 415)  '예약주문시작일'  AL_CENTER  CUR(0)      COLOR(195, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  ed_rsvStDt(537, 396, 615, 415)  LEN(8)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP|FA_PASS    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(31)  IOORDER(32)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL36(460, 423, 533, 442)  '예약주문종료일'  AL_CENTER  CUR(0)      COLOR(195, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  ed_rsvEdDt(537, 423, 615, 442)  LEN(8)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP|FA_PASS    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(32)  IOORDER(33)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL37(460, 448, 533, 467)  '예약주문조건코드'  AL_CENTER  CUR(0)      COLOR(195, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  ed_rsvOrdCode(537, 448, 566, 467)  LEN(2)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP|FA_PASS    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(33)  IOORDER(34)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL38(460, 474, 533, 493)  '필러'  AL_CENTER  CUR(0)      COLOR(195, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  ed_filler(537, 474, 610, 493)  LEN(8)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP|FA_PASS    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(34)  IOORDER(35)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  IMAXISIN(894, 598, 989, 613)  LEN(12)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_PASS    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(35)  IOORDER(36)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL39(641, 556, 891, 574)  'IMAXEXID 시장코드'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL40(641, 576, 891, 594)  'IMAXCODE'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL41(640, 595, 890, 613)  'IMAXISIN'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL42(641, 615, 891, 633)  'IMAXCODENAME'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL43(641, 635, 891, 653)  'IMAXORQTY'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL44(641, 655, 891, 673)  'IMAXPRICE'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL45(641, 675, 891, 693)  'IMAXABLEMEDO'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  IMAXABLEMEDO(895, 675, 980, 690)  LEN(1)  IO_MIXED|EDIT_INPUT|FA_WRAP|FA_SKIP|FA_PASS    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(36)  IOORDER(37)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  ed_imaxcode(234, 463, 266, 490)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP|FA_PASS    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("0")          TABORDER(37)  IOORDER(38)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  ed_imaxprc(234, 493, 266, 520)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP|FA_PASS    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("0")          TABORDER(38)  IOORDER(39)  ENABLE  &
+  HINTTYPE(IH_NONE)
+CONTROL  CX_DTS(640, 715, 740, 800)  |FA_PROTECT  "CX_DATATRANS"  ""  LEN(0)  EDIT_NOP    COLOR(192, 232)  TABORDER(0)  ENABLE  &
+  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+mmgb = "1"
+Dim stype
+
+Sub InitIMAX
+SYSTEM.Trace "[IMAX] InitIMAX 111"
+'	ed_imaxcode.Data = l_initimax("ctrl_code")
+'	ed_imaxprc.Data = l_initimax("ctrl_prc")
+	l_initimax("ctrl_code")
+	l_initimax("ctrl_prc")
+	Call init_data()
+	Call ChangeCode()
+	GetParentGroupAdnSkin()
+
+SYSTEM.Trace "[IMAX] InitIMAX 222"
+	SCREEN.SetTimerx 10,100, False
+
+
+'	If ed_imaxcode.Data = "1" And ed_imaxprc.Data = "1" Then
+'		SCREEN.Proc "main.Acc_SearchComplete", "4"
+'	End If
+End Sub
+
+Sub DoOrder()
+	Dim hogb, cPos, dmsg
+	Dim sHnam
+
+	init_data()										'주문 기본세팅
+
+	If Error_check() = False Then			'주문전 Error Check
+		flash_fg.Data = 0
+		Exit Sub
+	End If
+
+'개인 3억이상 주문시 경고창 5억이상 주문시 주문 거부창
+'법인 5억이상 주문시 경고차 10억이상 주문시 주문 거부창
+'매도 매수화면의 거래시 필요한 원화 계산  환율 * 원화 * 수량
+	If Len(Trim(out_ERate.Data)) = 0 Or Len(Trim(IMAXPRICE.Data)) = 0 Or ed_jqty.Data = 0 Then
+		Exit Sub
+	End If
+
+	If IsCorporation(ed_acno.Data) = True Then  '법인
+		If Round(CDbl(out_ERate.Text) * CDbl(IMAXPRICE.Text) * ed_jqty.Data, 0) >= 1000000000 Then
+			MsgBox "주문금액 10억이상 불가합니다..",,"IBK투자증권"
+			Exit Sub
+		ElseIf Round(CDbl(out_ERate.Text) * CDbl(IMAXPRICE.Text) * ed_jqty.Data, 0) >= 500000000 Then
+			MsgBox "주문금액 5억이상입니다..",,"IBK투자증권"
+		End If
+	Else   '개인
+		If Round(CDbl(out_ERate.Text) * CDbl(IMAXPRICE.Text) * ed_jqty.Data, 0) >= 500000000 Then
+			MsgBox "주문금액 5억이상 불가합니다.",,"IBK투자증권"
+			Exit Sub
+		ElseIf Round(CDbl(out_ERate.Text) * CDbl(IMAXPRICE.Text) * ed_jqty.Data, 0) >= 300000000 Then
+			MsgBox "주문금액 3억이상입니다.",,"IBK투자증권"
+		End If
+	End If
+'
+'	'주문전송 확인 If OrdCfg.OrderConfirm() = True Then
+'	If chk_OrderConfirm.Checked Then
+'		hogb = Mid(shogb.Text, 4)		'매매구분
+		hogb = shogb.Text				'매매구분
+		dmsg = "o_acno" & vbTab & ed_acno.Data & vbLf &_
+			"o_acnm" & vbTab & SCREEN.Object("parent.ACNM").Data & vbLf &_
+			"o_hnam" & vbTab & IMAXCODENAME.Data & vbLf &_
+			"o_hogb" & vbTab & hogb & vbLf &_
+			"o_jqty" & vbTab & ed_jqty.Data & vbLf &_
+			"o_jprc" & vbTab & Round(IMAXPRICE.Data, 2) & vbLf	'소수점 2자리 반올림
+
+		SCREEN.CreateWindow 2, "IB55000A /p5 /d", dmsg
+
+		If SYSTEM.Pop("FOstock_mado_order") <> "OK" Then
+			flash_fg.Data = 0
+			Exit Sub
+		End If
+'	End If
+	jmbtclick.Data = 1  '주문버튼클릭 구분값
+
+'------------------------------------------------------------------------------------------------
+	stmp = GetMkCode(IMAXEXID.Data)
+	If stmp = "71" Or stmp = "72" Or stmp = "73" Then
+		ed_ordTp.Data = "1"
+		ed_mdgb.Data = "20"
+	ElseIf stmp = "81" Or stmp = "82" Or stmp = "87" Then
+		ed_ordTp.Data = "2"
+		ed_mdgb.Data = "10"
+	Else
+		MsgBox "시장구분번호를 확인하세요.",,"IBK투자증권"
+		Exit Sub
+	End If
+
+	ed_mmgb.Data = "01"    					'매매구분 01매도 02매수 08취소 21단주
+	ed_ogno.Data = "" 	   					'원주문번호
+	ed_mkgb.Data = GetMkCode(IMAXEXID.Data) '시장구분
+	ed_code.Data = Trim(IMAXISIN.Data)		'종목코드
+	ed_prc.Data = Round(CDbl(Trim(IMAXPRICE.Data)), 2)  * 10000 						'주문가 ( 소수점 2자리 반올림 )
+	ed_hogb.Data = shogb.Data  				'00-지정가, 03-시장가, A2-TWAP, A3-VWAP, A4-LIMIT_TWAP,A5-LIMIT_VWAP, B1-MOC, B2-LOC
+
+	If stmp = "71"  Then
+		ed_curCode.Data = "009"
+	ElseIf stmp = "72" Or stmp = "73" Then
+		ed_curCode.Data = "006"
+	ElseIf stmp = "81" Or stmp = "82" Or stmp = "87" Then
+		ed_curCode.Data = "001"
+	Else
+		MsgBox "시장구분번호를 확인하세요..",,"IBK투자증권"
+		Exit Sub
+	End If
+
+'------------------------------------------------------------------------------------------------
+
+	'미국 주식인경우 COSAT003 그외는 COSAT002
+	SCREEN.Object("parent.obj_snd").send		'주문전송
+
+'
+'	Call QueryOption("after")
+'	Call SetCursor()			'주문 후 커서 설정
+	flash_fg.Data = 0
+
+End Sub
+
+Sub ChangeIMaxCode(smkgubn , scode)
+	ctrl_code.SetIMAXData GetIMAXMk(smkgubn), GetIMaxMkcode(smkgubn) & vbTab & scode
+	ctrl_prc.SetIMAXData GetIMAXMk(smkgubn), GetIMaxMkcode(smkgubn) & vbTab & scode
+End Sub
+
+Sub CalWon()
+SYSTEM.Trace "!!!!!!!!!!!!!!!!!!!!!!!!!CalWon map="& SCREEN.GetMapName(0)
+	If Trim(IMAXPRICE.Text) = "" Or Trim(IMAXPRICE.Text) = "0" Then
+		out_USD.Data = 0
+		out_WON.Data = 0
+		Exit Sub
+	End If
+
+	'수량 * 외화(가격)  소수점2자리
+	out_USD.Data = Round( CDbl(IMAXPRICE.Text) * ed_jqty.Data, 2)
+
+	If Trim(out_ERate.Text) = "" Or Trim(out_ERate.Text) = "0" Then
+		out_WON.Data = 0
+		Exit Sub
+	End If
+
+	If Trim(out_USD.Data) = "" Or Trim(out_USD.Data) = "0" Then
+		out_USD.Data = 0
+		out_WON.Data = 0
+		Exit Sub
+	End If
+
+	'수량 * 외화(가격) * 환율
+	out_WON.Data = Round( CDbl(out_ERate.Text) * CDbl(IMAXPRICE.Text) * ed_jqty.Data, 0)
+End Sub
+
+
+'***************************************************************
+'NAME: chkNumericData(num)
+'num이 숫자이면 True, Null이거나 숫자가 아니면 False를 반환
+'***************************************************************
+Function chkNumericData(num)
+	chkNumericData = False
+
+	Dim data
+	data = Trim(num)
+
+	If data = "" Then
+		Exit Function
+	End If
+
+	If IsNumeric(data) = False Then
+		Exit Function
+	End If
+
+	chkNumericData = True
+End Function
+
+'개인 3억이상 주문시 경고창 5억이상 주문시 주문 거부창
+'법인 5억이상 주문시 경고차 10억이상 주문시 주문 거부창
+Function IsCorporation(stracc)
+IsCorporation = False
+stracc = Replace(stracc, "-", "")
+Dim accList
+Dim idx
+Dim ii
+accList = Split(CX_DTS.GetTypeData ("4","1" ), vbLf, -1, vbTextCompare)  ''accoutcc 로 전계좌 불러오기 0->1
+	idx = 1
+
+	For ii=0 To UBound(accList)
+		acc = Trim(accList(ii))
+		If Len(acc)>11 Then
+			acc = Split(acc, "|", -1, vbTextCompare)
+			acno = Trim(Mid(acc(0), 1, 11))
+			acnm = Mid(acc(0), 12)
+			acnm = Replace(acnm, vbTab, "")
+			acnm = Trim(acnm)
+			acid = Trim(acc(1))
+			actp = Mid(acno, 4, 2)
+			myAcntFlag = acc(2)
+
+
+			'계좌플래그 2 또는 3 이면 랩계좌      법인계좌 타입 = 4
+			'랩계좌 제외
+			If stracc = acno Then
+SYSTEM.Trace  acno & "|  " & acnm & "|  " & acid & " | " & actp & " | " & myAcntFlag
+				If chkNumericData(myAcntFlag) = True Then
+					value = myAcntFlag And 4    '랩계좌 2 와 And 연산
+				    If value = 1 Then
+						IsCorporation = True
+					End If
+				End If
+			End If
+		End If
+	Next
+End Function
+
+_AW_ONINDECLARE_AW_
+#load IB888888
+'해외주식 공통
+#load IB999938
+
+_AW_ONENDSUB_AW_
+_AW_ONSEND_AW_
+SCREEN.OnSend = False
+
+_AW_ONENDSUB_AW_
+_AW_ONTIMER_AW_
+Dim smkgubn, scode, lndt, sqty
+
+lndt = Trim(SYSTEM.Pop ("IB551010_zlndt"))		' 대출일자
+sqty = Trim(SYSTEM.Pop ("IB551010AMT"))	   		' 주문수량
+ed_jqty.Data = sqty
+CalWon()
+
+SYSTEM.Push "IB551010AMT", ""
+SYSTEM.Push "IB551010_smkgubn",""
+SYSTEM.Push "IB551010_scode", ""
+SYSTEM.Push "IB551010_zlndt",""
+
+If Len(Trim(lndt)) > 0 Then
+	SCREEN.Object("parent.edLoadDay").Data = lndt
+	SCREEN.Object("parent.edPassCnt").Data = sqty
+	SCREEN.Proc("parent.Parent_tab_change"), "4"
+End If
+
+_AW_ONENDSUB_AW_
+_AW_ONTIMERX_AW_
+If id  =  10 Then
+	If ed_imaxcode.Data = "1" And ed_imaxprc.Data = "1" Then
+		SCREEN.Proc "main.Acc_SearchComplete", "4"
+	Else
+		SCREEN.SetTimerx 10,1, False
+	End If
+ElseIf id = 2 Then
+   If Len(Trim(IMAXORQTY.Data)) > 0 Then
+	ed_jqty.Data = IMAXORQTY.Data
+   End If
+End If
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(ctrl_code)
+_AW_ONDBLCLK_AW_
+SYSTEM.Trace "[IMAX] InitIMAX codectrl ondoubleclick"
+ed_imaxcode.Data = "1"
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(ed_jqty)
+_AW_ONCHANGE_AW_
+CalWon()
+_AW_ONENDSUB_AW_
+_AW_ONCHARCHANGE_AW_
+CalWon()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(JUMUN_B)
+_AW_ONCLICK_AW_
+flash_fg.Data = 1
+Call DoOrder()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(shogb)
+_AW_ONCHANGE_AW_
+ctrl_prc.SetEnable("True")
+If shogb.Text ="시장가" Or shogb.Text ="TWAP" Or shogb.Text ="VWAP" Or shogb.Text ="MOC" Then
+	ctrl_prc.SetEnable("False")
+	ctrl_prc.SetIMAXData 25,"0"
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(c_jqty)
+_AW_ONCHANGE_AW_
+ed_jqty.SetFocus
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(chk_OrderConfirm)
+_AW_ONCLICK_AW_
+If chk_OrderConfirm.Checked = False Then
+	SCREEN.CreateWindow 2, "IB999920 /p?", ""
+	If SYSTEM.Pop("rtn_OrderConfirm") <> "OK" Then
+		chk_OrderConfirm.Checked = True
+		Exit Sub
+	End If
+End If
+
+SCREEN.Object("parent.chk_OrderConfirm").Checked = chk_OrderConfirm.Checked
+
+If chk_OrderConfirm.Checked = True Then
+	If SCREEN.CreateObject("info") Then
+	   	INFO.pushdata LOGIN.name, "userconf.ini", "S-ORD", "ORD_CONF", "NO"
+	End If
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(ctrl_prc)
+_AW_ONCLICK_AW_
+ ed_imaxprc.Data = "1"
+_AW_ONENDSUB_AW_
+_AW_ONDBLCLK_AW_
+SYSTEM.Trace "[IMAX] InitIMAX ed_imaxprc ondoubleclick"
+ed_imaxprc.Data = "1"
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(LABEL8)
+_AW_ONCLICK_AW_
+InitIMAX
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(IMAXGROUP)
+_AW_ONCHANGE_AW_
+SYSTEM.Trace "groupid =" & IMAXGROUP.Data
+
+ctrl_code.SetIMAXGroup IMAXGROUP.Data
+ctrl_prc.SetIMAXGroup IMAXGROUP.Data
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(IMAXSKIN)
+_AW_ONCHANGE_AW_
+ctrl_code.SetIMAXSkin IMAXSKIN.Data
+ctrl_prc.SetIMAXSkin IMAXSKIN.Data
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(IMAXEXID)
+_AW_ONCHANGE_AW_
+SetcurrType lb_cur, IMAXEXID.Data
+SetMkExchange ed_mkgb, IMAXEXID.Data
+
+'환율조회 COSAQ058
+'ExRateSearch()
+SCREEN.Proc "parent.ExRateSearch2",ed_acno.Data & ", " & lb_cur.Data
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(IMAXPRICE)
+_AW_ONCHANGE_AW_
+CalWon()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(IMAXCODE)
+_AW_ONCHANGE_AW_
+axTrace "[IMAXVAL]", "IMAXCODE OnChange"
+ChangeCode()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(dtlBtn)
+_AW_ONCLICK_AW_
+If Len(Trim(SCREEN.Object("parent.AN3A").Data)) <> 11 Then
+	Exit Sub
+End If
+
+SYSTEM.Push "IB551010AMT", ""
+SYSTEM.Push "IB551010_smkgubn",""
+SYSTEM.Push "IB551010_scode", ""
+SYSTEM.Push "IB551010_zlndt",""
+
+SCREEN.Object("parent.edLoadDay").Data = ""
+SCREEN.Object("parent.edPassCnt").Data = ""
+
+SCREEN.CreateWindow 2, "IB551040 /t /s /p5 /d",  "ed_acno"  & vbTab & SCREEN.Object("parent.AN3A").Data & vbLf & "ed_pswd" & vbTab & SCREEN.Object("parent.ed_pswd").Data
+
+' 종목코드 세팅
+smkgubn = Trim(SYSTEM.Pop ("IB551010_smkgubn"))	' 시장구분
+scode = Trim(SYSTEM.Pop ("IB551010_scode"))		' 종목코드
+If Len(smkgubn) > 0 And Len(scode) > 0 Then
+	ctrl_code.SetIMAXData GetIMAXMk(smkgubn), GetIMaxMkcode(smkgubn) & vbTab & scode
+	SCREEN.SetTimer 3, False
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(IMAXORQTY)
+_AW_ONCHANGE_AW_
+SYSTEM.Trace "orqty = " & IMAXORQTY.Data
+SCREEN.SetTimerx 2, 1, False
+
+'
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(IMAXCODENAME)
+_AW_ONCHANGE_AW_
+axTrace "[IMAXVAL]", "IMAXCODENAME OnChange"
+SetcurrComboType shogb, IMAXEXID.Data
+ctrl_prc.SetEnable("True")
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+_AW_SCRIPT_AW_(IMAXABLEMEDO)
+_AW_ONCHANGE_AW_
+If IMAXABLEMEDO.Data = "1" Then
+	lb_medopsi.Visible = True
+Else
+	lb_medopsi.Visible = False
+End If
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

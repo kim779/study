@@ -67,6 +67,9 @@
 #define ID_END                          33000
 #define IDC_EDIT_KEYWORD	10001
 #define IDC_CHK_FILTER		10002
+#define IDC_EDIT_RANGE_FROM	10003
+#define IDC_EDIT_RANGE_TO	10004
+#define IDC_CHK_RANGE		10005
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED

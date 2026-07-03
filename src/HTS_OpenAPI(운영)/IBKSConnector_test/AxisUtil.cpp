@@ -237,6 +237,7 @@ CString GetLocalIP( CString ip, int port)
 
 CString GetRootPath()
 {
+	CString slog;
 	static CString modPath;
 	if (modPath.IsEmpty())
 	{
@@ -245,6 +246,10 @@ CString GetRootPath()
 #if 1
 		GetLongPathName(path, fpath, MAX_PATH);
 		modPath = fpath;
+
+		slog.Format("[openapi] GetRootPath modPath =[%s]", modPath);
+		OutputDebugString(slog);
+
 #else
 		modPath = path;
 #endif

@@ -132,6 +132,9 @@ BEGIN_MESSAGE_MAP(CChildView,CWnd )
 	ON_COMMAND(ID_SAVEAS, OnSaveas)
 	ON_EN_CHANGE(IDC_EDIT_KEYWORD, OnChangeEditKeyword)
 	ON_BN_CLICKED(IDC_CHK_FILTER, OnClickedChkFilter)
+	ON_EN_CHANGE(IDC_EDIT_RANGE_FROM, OnChangeEditRangeFrom)
+	ON_EN_CHANGE(IDC_EDIT_RANGE_TO, OnChangeEditRangeTo)
+	ON_BN_CLICKED(IDC_CHK_RANGE, OnClickedChkRange)
 	//}}AFX_MSG_MAP
 	ON_MESSAGE(WM_RECEIVE, OnReceive)
 	ON_WM_TIMER()
@@ -148,6 +151,29 @@ void CChildView::OnChangeEditKeyword()
 void CChildView::OnClickedChkFilter()
 {
 	m_bFilterOn = (m_chkFilter.GetCheck() == BST_CHECKED);
+}
+
+void CChildView::OnChangeEditRangeFrom()
+{
+	CString s;
+	m_editRangeFrom.GetWindowText(s);
+	m_nRangeFrom = max(0, _ttoi(s));
+}
+
+void CChildView::OnChangeEditRangeTo()
+{
+	CString s;
+	m_editRangeTo.GetWindowText(s);
+	s.TrimLeft(); s.TrimRight();
+	if (s.IsEmpty() || s == "*")
+		m_nRangeTo = INT_MAX;
+	else
+		m_nRangeTo = max(0, _ttoi(s));
+}
+
+void CChildView::OnClickedChkRange()
+{
+	m_bRangeOn = (m_chkRange.GetCheck() == BST_CHECKED);
 }
 
 BOOL CChildView::PreCreateWindow(CREATESTRUCT& cs) 
@@ -245,7 +271,7 @@ int CChildView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		rcEdit, this, IDC_EDIT_KEYWORD);
 
 	CRect rcChk(260, 10, 380, 32);
-	m_chkFilter.Create(_T("Key WORD FILETER"),
+	m_chkFilter.Create(_T("FILETER"),
 		WS_CHILD | WS_VISIBLE | BS_AUTOCHECKBOX,
 		rcChk, this, IDC_CHK_FILTER);
 
@@ -257,9 +283,38 @@ int CChildView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	m_editKeyword.SetFont(GetFont());
 	m_chkFilter.SetFont(GetFont());
 
+	CRect rcFrom(10, 36, 80, 58);
+	m_editRangeFrom.Create(WS_CHILD | WS_VISIBLE | WS_BORDER | ES_AUTOHSCROLL | ES_NUMBER,
+		rcFrom, this, IDC_EDIT_RANGE_FROM);
+
+	CRect rcTilde(84, 36, 100, 58);
+	m_lblTilde.Create(_T("~"), WS_CHILD | WS_VISIBLE | SS_CENTER,
+		rcTilde, this);
+
+	CRect rcTo(104, 36, 174, 58);
+	m_editRangeTo.Create(WS_CHILD | WS_VISIBLE | WS_BORDER | ES_AUTOHSCROLL,
+		rcTo, this, IDC_EDIT_RANGE_TO);
+
+	CRect rcChkRange(178, 36, 310, 58);
+	m_chkRange.Create(_T("Byte Range"),
+		WS_CHILD | WS_VISIBLE | BS_AUTOCHECKBOX,
+		rcChkRange, this, IDC_CHK_RANGE);
+
+	m_editRangeFrom.SetFont(GetFont());
+	m_editRangeTo.SetFont(GetFont());
+	m_chkRange.SetFont(GetFont());
+	m_lblTilde.SetFont(GetFont());
+
+	m_editRangeFrom.SetWindowText("0");
+	m_editRangeTo.SetWindowText("*");
+
 	m_bFilterOn = FALSE;
 	m_bBypassFilter = FALSE;
 	m_strKeyword.Empty();
+
+	m_nRangeFrom = 0;
+	m_nRangeTo   = INT_MAX;
+	m_bRangeOn   = FALSE;
 
 
 	SetTimer(TM_STAYONTOP, 1000, nullptr);
@@ -290,27 +345,33 @@ void CChildView::OnSize(UINT nType, int cx, int cy)
 {
 	CWnd ::OnSize(nType, cx, cy);
 
-	const int filterHeight = 28;  // ���� ���� ���� (���� ����)
 	const int margin = 4;
 	const int editWidth = 240;
 	const int chkWidth = 120;
 	const int ctrlHeight = 22;
+	const int row1Y = margin;
+	const int row2Y = margin + ctrlHeight + margin;
+	const int traceTop = row2Y + ctrlHeight + margin;
 
 	if (m_editKeyword.GetSafeHwnd())
-	{
-		m_editKeyword.MoveWindow(margin, margin, editWidth, ctrlHeight);
-	}
+		m_editKeyword.MoveWindow(margin, row1Y, editWidth, ctrlHeight);
 	if (m_chkFilter.GetSafeHwnd())
-	{
-		m_chkFilter.MoveWindow(margin + editWidth + margin, margin,
-			chkWidth, ctrlHeight);
-	}
+		m_chkFilter.MoveWindow(margin + editWidth + margin, row1Y, chkWidth, ctrlHeight);
+
+	if (m_editRangeFrom.GetSafeHwnd())
+		m_editRangeFrom.MoveWindow(margin, row2Y, 70, ctrlHeight);
+	if (m_lblTilde.GetSafeHwnd())
+		m_lblTilde.MoveWindow(margin + 70 + 2, row2Y, 14, ctrlHeight);
+	if (m_editRangeTo.GetSafeHwnd())
+		m_editRangeTo.MoveWindow(margin + 70 + 2 + 14 + 2, row2Y, 70, ctrlHeight);
+	if (m_chkRange.GetSafeHwnd())
+		m_chkRange.MoveWindow(margin + 70 + 2 + 14 + 2 + 70 + margin, row2Y, 110, ctrlHeight);
 
 	if (m_trace.GetSafeHwnd())
 	{
 		CRect	cRc;
 		GetClientRect(cRc);
-		cRc.top += 30;
+		cRc.top += traceTop;
 		m_trace.MoveWindow(cRc);
 	}
 }
@@ -331,7 +392,7 @@ void CChildView::OnRCVData(WPARAM wParam, LPARAM lParam)
 		if (!m_bSNDRCV) break;
 		if (!m_options.send) break;
 
-		string.Format("\n#################### [XECURE �� %d Bytes][%s] #################### \n", len, timeS);
+		string.Format("\n#################### [XECURE %d Bytes][%s] #################### \n", len, timeS);
 		addTrace(string, K_SNDRCV);
 
 		if (len > 0)
@@ -406,6 +467,19 @@ void CChildView::OnRCVData(WPARAM wParam, LPARAM lParam)
 			{
 				len -= L_axishdr;
 				dat += L_axishdr;
+			}
+		}
+
+		if (m_bRangeOn && len > 0)
+		{
+			int from = max(0, m_nRangeFrom);
+			int to   = min(m_nRangeTo, len - 1);
+			if (from >= len)
+				len = 0;
+			else
+			{
+				dat += from;
+				len = max(0, to - from + 1);
 			}
 		}
 
@@ -509,15 +583,14 @@ void CChildView::OnRCVData(WPARAM wParam, LPARAM lParam)
 
 			sDat += '\n';
 
-			if (!m_bBINARY)
-				sRow.Format("%05d  ", row * maxCnt);
-
-			// ����� ������ ���ڿ��� ���
-			string += sDat;
-
-			// HEX + ASCII ���� ���� ������ �� �� ��� �Ʒ� ���
-			// sRow += sDat;
-			// string += sRow;
+			if (m_bBINARY)
+			{
+				sRow += "      ";
+				sRow += sDat;
+				string += sRow;
+			}
+			else
+				string += sDat;
 		}
 
 		addTrace(string, K_SNDRCV);
@@ -856,7 +929,7 @@ void CChildView::WriteFile(char* pBytes, int nBytes)
 	Dfile.Close();
 }
 
-void CChildView::CopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct) 
+void CChildView::CopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct)
 {
 	char*	rcvB = (char *) pCopyDataStruct->lpData;
 	struct _exeCDSS* cdss = (struct _exeCDSS*) rcvB;
@@ -864,6 +937,9 @@ void CChildView::CopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct)
 	DWORD	len  = cdss->len;
 	DWORD	flag = cdss->flag;
 #if 1
+	if (flag == x_RTMs && m_que.GetSize() > 200)
+		return;
+
 	CQue*	que = new CQue;
 	que->m_flag = flag;
 	que->m_nBytes = len;
@@ -882,8 +958,11 @@ void CChildView::CopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct)
 
 LRESULT CChildView::OnReceive(WPARAM wParam, LPARAM lParam)
 {
+	const int MAX_PER_CALL = 20;
+	int processed = 0;
+
 	CQue*	que;
-	while (m_que.GetSize())
+	while (m_que.GetSize() && processed < MAX_PER_CALL)
 	{
 		m_sync.Lock();
 		que = (CQue *) m_que.GetAt(0);
@@ -891,7 +970,12 @@ LRESULT CChildView::OnReceive(WPARAM wParam, LPARAM lParam)
 		m_sync.Unlock();
 		OnRCVData(MAKEWPARAM(que->m_nBytes, que->m_flag), (LPARAM) que->m_pBytes);
 		delete que;
+		processed++;
 	}
+
+	if (m_que.GetSize())
+		PostMessage(WM_RECEIVE);
+
 	return 0;
 }
 
