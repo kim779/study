@@ -1,0 +1,34 @@
+// cx_fileupdown.idl : cx_fileupdown.dll의 형식 라이브러리 소스입니다.
+// 이 파일은 MIDL 컴파일러에 의해 처리되어
+// 형식 라이브러리(cx_fileupdown.tlb)를 생성합니다.
+
+#include "olectl.h"
+[ uuid(404D0CF5-C936-433C-8A11-5ED24D2C7272), version(1.0) ]
+library cx_fileupdown
+{
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+	
+	
+	//  Controlwnd의 기본 디스패치 인터페이스입니다.
+		
+	[ uuid(5C7A69CB-ACA9-4B83-8787-851D94C43603) ]
+	dispinterface IControlwnd
+	{
+		properties:
+		methods:
+			[id(1)] void SetType(BSTR type);
+			[id(2)] void SetCmPass(BSTR path);
+			[id(3)] void UploadFile(BSTR path, BSTR file, BSTR struuid);
+			[id(4)] void DownFile(BSTR path, BSTR filename, BSTR struuid, BSTR open);
+			[id(5)] BSTR GetPercent(void);
+	};
+
+	//  Controlwnd의 클래스 정보입니다.
+
+	[ uuid(4765A563-F17D-43BD-AA88-1002793CA485) ]
+	coclass Controlwnd
+	{
+		[default] dispinterface IControlwnd;
+	};
+};

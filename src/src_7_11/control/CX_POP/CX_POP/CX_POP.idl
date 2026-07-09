@@ -1,0 +1,29 @@
+// CX_POP.idl : CX_POP.dll의 형식 라이브러리 소스입니다.
+// 이 파일은 MIDL 컴파일러에 의해 처리되어
+// 형식 라이브러리(CX_POP.tlb)를 생성합니다.
+
+#include "olectl.h"
+[ uuid(EBA32145-7DD5-4BBA-84CD-9292204C2EC9), version(1.0) ]
+library CX_POP
+{
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+	//  Controlwnd의 기본 디스패치 인터페이스입니다.
+		
+	[ uuid(51297536-E912-4C77-96AB-5C2C18A4A295) ]
+	dispinterface IControlwnd
+	{
+		properties:
+		methods:
+			[id(1)] void Setdata(BSTR data);
+			[id(2)] void SetVisible(LONG bVisible);
+	};
+
+	//  Controlwnd의 클래스 정보입니다.
+
+	[ uuid(0E618D57-49E9-4783-8F19-A51E786871A7) ]
+	coclass Controlwnd
+	{
+		[default] dispinterface IControlwnd;
+	};
+};

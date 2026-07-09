@@ -58,7 +58,7 @@ private:
 	CMap	<BYTE, BYTE, BYTE, BYTE&>	m_keys;
 
 	CString		m_string;
-	CString		m_slog{};
+
 private:
 	void	Free();
 };

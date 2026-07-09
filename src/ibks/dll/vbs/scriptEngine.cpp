@@ -351,12 +351,22 @@ CStringArray* CScriptEngine::GetErrorMessages()
 
 bool CScriptEngine::getIDOfProcedure(CString procs, DISPID* pID)
 {
+	CString	dbg;
+
 	if (!m_dispatch)
+	{
+		dbg.Format("[WIZARD][SCRIPT][DEBUG] getIDOfProcedure(%s): m_dispatch is NULL\n", procs.GetString());
+		OutputDebugString(dbg);
 		return false;
+	}
 
 	BSTR	strProc = procs.AllocSysString();
 	HRESULT hr= m_dispatch->GetIDsOfNames(IID_NULL, &strProc, 1, LOCALE_SYSTEM_DEFAULT, pID);
 	::SysFreeString(strProc);
+
+	dbg.Format("[WIZARD][SCRIPT][DEBUG] getIDOfProcedure(%s): hr=0x%08lx\n", procs.GetString(), hr);
+	OutputDebugString(dbg);
+
 	return (hr == S_OK) ? true : false;
 }
 

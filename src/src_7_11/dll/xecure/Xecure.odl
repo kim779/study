@@ -1,0 +1,69 @@
+// Xecure.odl : type library source for ActiveX Control project.
+
+// This file will be processed by the Make Type Library (mktyplib) tool to
+// produce the type library (Xecure.tlb) that will become a resource in
+// Xecure.ocx.
+
+#include <olectl.h>
+#include <idispids.h>
+
+[ uuid(83E9D393-FA66-4DAD-83D0-6C8053861A70), version(1.0),
+  helpfile("Xecure.hlp"),
+  helpstring("Xecure ActiveX Control module"),
+  control ]
+library XECURELib
+{
+	importlib(STDOLE_TLB);
+	importlib(STDTYPE_TLB);
+
+	//  Primary dispatch interface for CXecureCtrl
+
+	[ uuid(66AC43F4-2CED-46F1-B647-8D05E7B66B2F),
+	  helpstring("Dispatch interface for Xecure Control"), hidden ]
+	dispinterface _DXecure
+	{
+		properties:
+			// NOTE - ClassWizard will maintain property information here.
+			//    Use extreme caution when editing this section.
+			//{{AFX_ODL_PROP(CXecureCtrl)
+			//}}AFX_ODL_PROP
+
+		methods:
+			// NOTE - ClassWizard will maintain method information here.
+			//    Use extreme caution when editing this section.
+			//{{AFX_ODL_METHOD(CXecureCtrl)
+			[id(1)] boolean Encrypt(long pBytes, long nBytes);
+			[id(2)] boolean Decrypt(long pBytes, long nBytes);
+			[id(3)] long Xecure(long pBytes, long nBytes);
+			//}}AFX_ODL_METHOD
+	};
+
+	//  Event dispatch interface for CXecureCtrl
+
+	[ uuid(66AC43F5-2CED-46F1-B647-8D05E7B66B2F),
+	  helpstring("Event interface for Xecure Control") ]
+	dispinterface _DXecureEvents
+	{
+		properties:
+			//  Event interface has no properties
+
+		methods:
+			// NOTE - ClassWizard will maintain event information here.
+			//    Use extreme caution when editing this section.
+			//{{AFX_ODL_EVENT(CXecureCtrl)
+			//}}AFX_ODL_EVENT
+	};
+
+	//  Class information for CXecureCtrl
+	[ uuid(66AC43F3-2CED-46F1-B647-8D05E7B66B2F),
+	  helpstring("Xecure Control"), control ]
+	coclass Xecure
+	{
+		[default] dispinterface _DXecure;
+		[default, source] dispinterface _DXecureEvents;
+	};
+
+
+	//{{AFX_APPEND_ODL}}
+	//}}AFX_APPEND_ODL}}
+};

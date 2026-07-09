@@ -485,6 +485,7 @@ HCURSOR CTestDlgDlg::OnQueryDragIcon()
 //-연산
 void CTestDlgDlg::OnBnClickedBrnBit()
 {
+	OnBnClickedBtnHen();
 	//int xval = 0x2a;
 	//int xdata = 0x08;
 
@@ -1619,7 +1620,7 @@ void CTestDlgDlg::OnBnClickedBtnHashkey()
 {
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
 	CString sname;
-	sname = "131122";
+	sname = "##opuser";
 	CString sdata;
 	sdata.Format("%08u", Hashdata((LPCSTR)sname));
 	
@@ -7494,7 +7495,7 @@ void CTestDlgDlg::OnBnClickedBtnHen()
 
 	CString strResult;
 	CString sId;
-	sId = "##ibk";
+	sId = "##opuser";
 
 	bool bret = IsNumber(sId);
 

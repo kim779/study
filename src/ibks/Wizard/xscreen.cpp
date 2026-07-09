@@ -118,7 +118,6 @@ BEGIN_DISPATCH_MAP(CxScreen, CCmdTarget)
 	DISP_FUNCTION(CxScreen, "CreateObjectEx", _CreateObjectEx, VT_BOOL, VTS_BSTR)
 	DISP_FUNCTION(CxScreen, "SetTimerX", _SetTimerX, VT_EMPTY, VTS_I2 VTS_I4 VTS_BOOL)
 	DISP_FUNCTION(CxScreen, "GetGroupID", _GetGroupID, VT_I4, VTS_NONE)
-	DISP_FUNCTION(CxScreen, "SendMarketTR", _SendMarKetTR, VT_EMPTY, VTS_I4 VTS_I4)
 	//}}AFX_DISPATCH_MAP
 END_DISPATCH_MAP()
 
@@ -967,10 +966,9 @@ BSTR CxScreen::_ServiceEx(LPCTSTR trN, LPCTSTR data, long length, long mode, lon
 {
 	CString strResult = _T("");
 
-
 	switch (m_service)
 	{
-	case svFlag::svREADY: 
+	case svFlag::svREADY:
 	case svFlag::svTIMEOUT:
 		if (_Service(trN, data, length, mode | US_PASS) && timeout)
 		{
@@ -988,53 +986,39 @@ BSTR CxScreen::_ServiceEx(LPCTSTR trN, LPCTSTR data, long length, long mode, lon
 	HWND	hWnd = m_screen->m_view->GetSafeHwnd();
 	ULONGLONG elapse = GetTickCount64();
 
-	DWORD result = MsgWaitForMultipleObjects(0, NULL, FALSE, INFINITE, QS_ALLINPUT);
-
-	//if (result == WAIT_OBJECT_0)  //�켱 �ּ� ���� ��
+	while (m_service != svFlag::svDONE)
 	{
-		while (m_service != svFlag::svDONE)
+		if (!::IsWindow(hWnd) || (timeout > 0 && GetTickCount64() - elapse > (ULONGLONG)timeout))
 		{
-			if (!::IsWindow(hWnd) || (timeout > 0 && GetTickCount64() - elapse > (ULONGLONG)timeout))
-			{
-				m_service = svFlag::svTIMEOUT;
-				// updateXXX_202202	
-				m_screen->m_client->WaitDone(m_screen, false, true);
-				return strResult.AllocSysString();
-			}
-			Sleep(1);
-			if (PeekMessage(&msg, 0, 0, 0, PM_REMOVE))
-			{
-				//ref �޽��� �м�
-				
-			
+			m_service = svFlag::svTIMEOUT;
+// updateXXX_202202	
+			m_screen->m_client->WaitDone(m_screen, false, true);
+			return strResult.AllocSysString();
+		}
 
-					//
-				switch (msg.message)
-				{
-				case WM_CHAR:
-				case WM_KEYDOWN:
-				case WM_KEYUP:
-				case WM_LBUTTONDOWN:
-				case WM_RBUTTONDOWN:
-				case WM_MOUSEMOVE:
-				case WM_MOUSEWHEEL:
-					if (hWnd == msg.hwnd)
-						break;
-					[[fallthrough]];
-				case WM_LBUTTONUP:
-				case WM_RBUTTONUP:
-				default:
-					m_slog.Format("\r\n [axwizrd][Receive] ---PeekMessage--- <%d>[%s] MSG=[%d] m_service=[%d]",
-						__LINE__, __FUNCTION__, msg.message, m_service);
-					//OutputDebugString(m_slog);
-					TranslateMessage(&msg);
-					DispatchMessage(&msg);
+		if (PeekMessage(&msg, 0, 0, 0, PM_REMOVE))
+		{
+			switch (msg.message)
+			{
+			case WM_CHAR:
+			case WM_KEYDOWN:
+			case WM_KEYUP:
+			case WM_LBUTTONDOWN:
+			case WM_RBUTTONDOWN:
+			case WM_MOUSEMOVE:
+			case WM_MOUSEWHEEL:
+				if (hWnd == msg.hwnd)
 					break;
-				}
+				[[fallthrough]];
+			case WM_LBUTTONUP:
+			case WM_RBUTTONUP:
+			default:
+				TranslateMessage(&msg);
+				DispatchMessage(&msg);
+				break;
 			}
 		}
 	}
-
 
 	if (m_pBytes)
 	{
@@ -1048,9 +1032,6 @@ BSTR CxScreen::_ServiceEx(LPCTSTR trN, LPCTSTR data, long length, long mode, lon
 
 bool CxScreen::OnService(char* pBytes, int nBytes)
 {
-	m_slog.Format("\r\n [axwizrd][Receive]<%d>[%s] m_service=[%d] nBytes=[%d] pBytes=[%.20s]", __LINE__, __FUNCTION__, m_service, nBytes, pBytes);
-	OutputDebugString(m_slog);
-
 	if (pBytes == NULL)
 		return (m_service == svFlag::svWAIT) ? true : false;
 
@@ -1251,18 +1232,4 @@ void CxScreen::_SetTimerX(short id, long interval, BOOL main)
 int CxScreen::_GetGroupID()
 {
 	return m_screen->m_client->m_group;
-}
-
-void CxScreen::_SendMarKetTR(long target, long market)
-{
-	if (m_screen->m_client->m_vm->m_script)
-		return;		// ignore dup
-
-	CScreen* screen;
-	screen = m_screen;
-
-	m_slog.Format("\r\n [WIZARD][TCP][%s]<%d>target =[%d]  market=[%d]", __FUNCTION__, __LINE__, target, market);
-	OutputDebugString(m_slog);
-
-	m_screen->m_client->m_stream->InStream(screen, false, "", market);
 }

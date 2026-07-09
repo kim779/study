@@ -1,0 +1,345 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Template|Win32">
+      <Configuration>Template</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <SccProjectName />
+    <SccLocalPath />
+    <Keyword>MFCProj</Keyword>
+    <ProjectGuid>{E712DE10-0DA0-486F-A354-4092EADC6A8D}</ProjectGuid>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Template|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v100</PlatformToolset>
+    <UseOfMfc>Dynamic</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v142</PlatformToolset>
+    <UseOfMfc>Dynamic</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Template|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.Cpp.UpgradeFromVC60.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.Cpp.UpgradeFromVC60.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>.\Release\</OutDir>
+    <IntDir>.\Release\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>.\Debug\</OutDir>
+    <IntDir>.\Debug\</IntDir>
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <InlineFunctionExpansion>Default</InlineFunctionExpansion>
+      <StringPooling>true</StringPooling>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <Optimization>MaxSpeed</Optimization>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_AFXEXT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AssemblerListingLocation>.\Release\</AssemblerListingLocation>
+      <PrecompiledHeaderOutputFile>.\Release\awDlg.pch</PrecompiledHeaderOutputFile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
+      <ObjectFileName>.\Release\</ObjectFileName>
+      <ProgramDataBaseFileName>.\Release\</ProgramDataBaseFileName>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+    </ClCompile>
+    <Midl>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <TypeLibraryName>.\Release\awDlg.tlb</TypeLibraryName>
+      <MkTypLibCompatible>true</MkTypLibCompatible>
+      <TargetEnvironment>Win32</TargetEnvironment>
+    </Midl>
+    <ResourceCompile>
+      <Culture>0x0412</Culture>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ResourceCompile>
+    <Bscmake>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <OutputFile>.\Release\awDlg.bsc</OutputFile>
+    </Bscmake>
+    <Link>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <LinkDLL>true</LinkDLL>
+      <SubSystem>Windows</SubSystem>
+      <OutputFile>../../../../release/awdlg.dll</OutputFile>
+      <ImportLibrary>.\Release\awdlg.lib</ImportLibrary>
+      <AdditionalDependencies>../awSock/release/awsock.lib;../awBuild/release/awbuild.lib;../awWcc/release/awwcc.lib;../awCommon/release/awcommon.lib;../../dll/lib/release/axislib.lib;../awObject/release/awObject.lib;../awUser/release/awUser.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ModuleDefinitionFile>.\awDlg.def</ModuleDefinitionFile>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <InlineFunctionExpansion>Default</InlineFunctionExpansion>
+      <FunctionLevelLinking>false</FunctionLevelLinking>
+      <Optimization>Disabled</Optimization>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <WarningLevel>Level3</WarningLevel>
+      <MinimalRebuild>true</MinimalRebuild>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_AFXEXT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AssemblerListingLocation>.\Debug\</AssemblerListingLocation>
+      <BrowseInformation>true</BrowseInformation>
+      <PrecompiledHeaderOutputFile>.\Debug\awDlg.pch</PrecompiledHeaderOutputFile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
+      <ObjectFileName>.\Debug\</ObjectFileName>
+      <ProgramDataBaseFileName>.\Debug\</ProgramDataBaseFileName>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+    </ClCompile>
+    <Midl>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <TypeLibraryName>.\Debug\awDlg.tlb</TypeLibraryName>
+      <MkTypLibCompatible>true</MkTypLibCompatible>
+      <TargetEnvironment>Win32</TargetEnvironment>
+    </Midl>
+    <ResourceCompile>
+      <Culture>0x0412</Culture>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ResourceCompile>
+    <Bscmake>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <OutputFile>.\Debug\awDlg.bsc</OutputFile>
+    </Bscmake>
+    <Link>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <LinkDLL>true</LinkDLL>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <OutputFile>../../../../exe/awdlg.dll</OutputFile>
+      <ImportLibrary>.\Debug\awdlg.lib</ImportLibrary>
+      <AdditionalDependencies>../awSock/debug/awsock.lib;../awBuild/debug/awbuild.lib;../awWcc/debug/awwcc.lib;../awCommon/debug/awcommon.lib;../../dll/lib/debug/axislib.lib;../awObject/debug/awObject.lib;../awUser/debug/awUser.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ModuleDefinitionFile>.\awDlg.def</ModuleDefinitionFile>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\BtnCombo.cpp" />
+    <ClCompile Include="..\Components\EditItem.cpp" />
+    <ClCompile Include="..\Components\EditList.cpp" />
+    <ClCompile Include="..\Components\fxColorCombo.cpp" />
+    <ClCompile Include="..\Components\ItemCombo.cpp" />
+    <ClCompile Include="..\Components\PopListCtrl.cpp" />
+    <ClCompile Include="..\ListGrid.cpp" />
+    <ClCompile Include="..\NFBtn.cpp" />
+    <ClCompile Include="addrDlg.cpp" />
+    <ClCompile Include="attrDlg.cpp" />
+    <ClCompile Include="awDlg.cpp" />
+    <ClCompile Include="BaseInfoPage.cpp" />
+    <ClCompile Include="BATCH.CPP" />
+    <ClCompile Include="cbItem.cpp" />
+    <ClCompile Include="cellEdit.cpp" />
+    <ClCompile Include="colorDlg.cpp" />
+    <ClCompile Include="ControlDlg.cpp" />
+    <ClCompile Include="coRGB.cpp" />
+    <ClCompile Include="DefaultPage.cpp" />
+    <ClCompile Include="EditOrder.cpp" />
+    <ClCompile Include="folderBrowser.cpp" />
+    <ClCompile Include="format.cpp" />
+    <ClCompile Include="GridColumnDlg.cpp" />
+    <ClCompile Include="HBBtn.cpp" />
+    <ClCompile Include="InputKeyDlg.cpp" />
+    <ClCompile Include="LineDlg.cpp" />
+    <ClCompile Include="Login.cpp" />
+    <ClCompile Include="LoginSetDlg.cpp" />
+    <ClCompile Include="mapOption.cpp" />
+    <ClCompile Include="MGColumnDlg.cpp" />
+    <ClCompile Include="OptionsSheet.cpp" />
+    <ClCompile Include="Pane.cpp" />
+    <ClCompile Include="Preview.cpp" />
+    <ClCompile Include="PreviewRun.cpp" />
+    <ClCompile Include="PublicSetDlg.cpp" />
+    <ClCompile Include="saveDlg.cpp" />
+    <ClCompile Include="ScriptPage.cpp" />
+    <ClCompile Include="SepWnd.cpp" />
+    <ClCompile Include="SettingDlg.cpp" />
+    <ClCompile Include="SingleProperty.cpp" />
+    <ClCompile Include="StdAfx.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h</PrecompiledHeaderFile>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="upDlg.cpp" />
+    <ClCompile Include="upTmplDlg.cpp" />
+    <ClCompile Include="uTabPage.cpp" />
+    <ClCompile Include="XFontDialog.cpp" />
+    <ClCompile Include="xTreeCtrl.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="awDlg.def" />
+    <CustomBuild Include="res\awDlg.rc2" />
+    <CustomBuild Include="RES\tfdropcopy.cur" />
+    <CustomBuild Include="RES\tfnodropcopy.cur" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="awDlg.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\BtnCombo.h" />
+    <ClInclude Include="..\Components\ComboItem.h" />
+    <ClInclude Include="..\Components\EditItem.h" />
+    <ClInclude Include="..\Components\EditList.h" />
+    <ClInclude Include="..\Components\fxColorCombo.h" />
+    <ClInclude Include="..\Components\ItemCombo.h" />
+    <ClInclude Include="..\Components\PopListCtrl.h" />
+    <ClInclude Include="..\ListGrid.h" />
+    <ClInclude Include="..\NFBtn.h" />
+    <ClInclude Include="addrDlg.h" />
+    <ClInclude Include="attrDlg.h" />
+    <ClInclude Include="BaseInfoPage.h" />
+    <ClInclude Include="BATCH.H" />
+    <ClInclude Include="brushProp.h" />
+    <ClInclude Include="cbItem.h" />
+    <ClInclude Include="cellEdit.h" />
+    <ClInclude Include="colorDlg.h" />
+    <ClInclude Include="ControlDlg.h" />
+    <ClInclude Include="coRGB.h" />
+    <ClInclude Include="DefaultPage.h" />
+    <ClInclude Include="EditOrder.h" />
+    <ClInclude Include="folderBrowser.h" />
+    <ClInclude Include="format.h" />
+    <ClInclude Include="GridColumnDlg.h" />
+    <ClInclude Include="HBBtn.h" />
+    <ClInclude Include="InputKeyDlg.h" />
+    <ClInclude Include="LineDlg.h" />
+    <ClInclude Include="lineProp.h" />
+    <ClInclude Include="Login.h" />
+    <ClInclude Include="LoginSetDlg.h" />
+    <ClInclude Include="mapOption.h" />
+    <ClInclude Include="MGColumnDlg.h" />
+    <ClInclude Include="OptionsSheet.h" />
+    <ClInclude Include="Pane.h" />
+    <ClInclude Include="Preview.h" />
+    <ClInclude Include="PreviewRun.h" />
+    <ClInclude Include="PublicSetDlg.h" />
+    <ClInclude Include="Resource.h" />
+    <ClInclude Include="saveDlg.h" />
+    <ClInclude Include="ScriptPage.h" />
+    <ClInclude Include="SepWnd.h" />
+    <ClInclude Include="SettingDlg.h" />
+    <ClInclude Include="SingleProperty.h" />
+    <ClInclude Include="StdAfx.h" />
+    <ClInclude Include="upDlg.h" />
+    <ClInclude Include="upTmplDlg.h" />
+    <ClInclude Include="uTabPage.h" />
+    <ClInclude Include="XFontDialog.h" />
+    <ClInclude Include="XFontDialogRes.h" />
+    <ClInclude Include="xTreeCtrl.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="RES\axis_builder.bmp" />
+    <Image Include="RES\axis_workstudio.bmp" />
+    <Image Include="RES\cancelBtn_off.bmp" />
+    <Image Include="RES\cancelBtn_on.bmp" />
+    <Image Include="RES\close.bmp" />
+    <Image Include="RES\close_dn.bmp" />
+    <Image Include="RES\close_en.bmp" />
+    <Image Include="RES\connect.bmp" />
+    <Image Include="RES\connectBtn_off.bmp" />
+    <Image Include="RES\connectBtn_on.bmp" />
+    <Image Include="RES\connect_dn.bmp" />
+    <Image Include="RES\connect_en.bmp" />
+    <Image Include="RES\gold_cancel.bmp" />
+    <Image Include="RES\gold_cancel_on.bmp" />
+    <Image Include="RES\gold_connect.bmp" />
+    <Image Include="RES\gold_connect_on.bmp" />
+    <Image Include="RES\gold_setup.bmp" />
+    <Image Include="RES\gold_setup_on.bmp" />
+    <Image Include="res\graph.ico" />
+    <Image Include="res\listb.ico" />
+    <Image Include="res\normal.ico" />
+    <Image Include="RES\setup.bmp" />
+    <Image Include="RES\setupBtn_off.bmp" />
+    <Image Include="RES\setupBtn_on.bmp" />
+    <Image Include="RES\setup_dn.bmp" />
+    <Image Include="RES\setup_en.bmp" />
+    <Image Include="res\split01.ico" />
+    <Image Include="res\split02.ico" />
+    <Image Include="res\split03.ico" />
+    <Image Include="res\split04.ico" />
+    <Image Include="res\split05.ico" />
+    <Image Include="res\split06.ico" />
+    <Image Include="res\split07.ico" />
+    <Image Include="res\split08.ico" />
+    <Image Include="res\split09.ico" />
+    <Image Include="res\split10.ico" />
+    <Image Include="res\split11.ico" />
+    <Image Include="res\split12.ico" />
+    <Image Include="res\tab.ico" />
+    <Image Include="RES\treeview.bmp" />
+    <Image Include="res\userob.ico" />
+    <Image Include="split01.ico" />
+    <Image Include="split03.ico" />
+    <Image Include="split04.ico" />
+    <Image Include="split06.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\dll\lib\axislib.vcxproj">
+      <Project>{16194290-b5bc-4734-bcb9-e322d5cc9fed}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\awBuild\awBuild.vcxproj">
+      <Project>{58e0dd64-86ac-4457-9c20-9be49ed1e403}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\awCommon\awCommon.vcxproj">
+      <Project>{6745e141-74de-4c99-9a0c-56888477b9bb}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\awObject\awObject.vcxproj">
+      <Project>{5effdb5f-8751-4069-8fa4-9b992d8fb2c4}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\awSock\awSock.vcxproj">
+      <Project>{b61cbe16-83d6-4635-be2c-fe0525072668}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\awUser\awUser.vcxproj">
+      <Project>{b894c756-5bdf-48f3-94e4-8829312a82a8}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\awWcc\awWcc.vcxproj">
+      <Project>{034e1e12-a04e-4350-b7b6-70c354f056cf}</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

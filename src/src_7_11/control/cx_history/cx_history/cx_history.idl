@@ -1,0 +1,29 @@
+// cx_history.idl : cx_history.dll의 형식 라이브러리 소스입니다.
+// 이 파일은 MIDL 컴파일러에 의해 처리되어
+// 형식 라이브러리(cx_history.tlb)를 생성합니다.
+
+#include "olectl.h"
+[ uuid(BA28FEBF-219C-43A0-80DA-114F7176A5C9), version(1.0) ]
+library cx_history
+{
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+	//  Controlwnd의 기본 디스패치 인터페이스입니다.
+		
+	[ uuid(284956DB-5AE0-4542-8683-F622CC39BC9E) ]
+	dispinterface IControlwnd
+	{
+		properties:
+		methods:
+			[id(1)] BSTR Gethistory(void);
+			[id(2)] BSTR GethistoryCode(void);
+	};
+
+	//  Controlwnd의 클래스 정보입니다.
+
+	[ uuid(EC504E40-4A32-491A-9821-5A91EBFEEA27) ]
+	coclass Controlwnd
+	{
+		[default] dispinterface IControlwnd;
+	};
+};

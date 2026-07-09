@@ -411,8 +411,6 @@ bool CKey::OnKeyCell(CScreen* screen, CfmBase* form, WPARAM wParam)
 
 void CKey::OnIME(WPARAM wParam, LPARAM lParam)
 {
-m_slog.Format("[WIZARD][COMBO][%s]<%d>", __FUNCTION__, __LINE__);
-OutputDebugString(m_slog);
 	if (wParam && lParam & GCS_DELTASTART)
 	{
 		OnKey(VK_DELETE, 0);
@@ -448,8 +446,6 @@ OutputDebugString(m_slog);
 
 void CKey::OnChar(WPARAM wParam, LPARAM lParam)
 {
-	m_slog.Format("[WIZARD][COMBO][%s]<%d>", __FUNCTION__, __LINE__);
-	OutputDebugString(m_slog);
 	if (!(lParam & 0xff0000))
 		return;				// Specifies the scan code, ignore IME code
 

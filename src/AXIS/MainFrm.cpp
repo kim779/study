@@ -322,7 +322,7 @@ void WriteLog( LPCSTR log, ... )
 	va_end(args);
 
 	output_DebugString(slog);
-#if 0
+#if 1
 	TRY
 	{
 		CString slog;

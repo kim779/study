@@ -40,7 +40,7 @@ protected:
 
 private:
 	int		m_type;
-	CString		m_slog{};
+
 // Operations
 public:
 	void	SaveMouse(CPoint &point, bool click = false);

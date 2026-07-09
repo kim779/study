@@ -150,9 +150,6 @@ CScreen::~CScreen()
 
 bool CScreen::Attach(CString mapN)
 {
-	//m_slog.Format("[WIZARD][OPEN]    [%s]<%d> mapN=[%s]", __FUNCTION__, __LINE__, mapN);
-	//OutputDebugString(m_slog);
-
 	if (mapN.GetLength() != L_MAPN)
 		return false;
 
@@ -397,22 +394,6 @@ bool CScreen::Parse(bool resize, bool fix)
 
 		text = CString(m_scriptR, m_mapH->strR - m_mapH->scriptR);
 
-		// [TEST] if sidecar .py file exists, use it instead of embedded script
-		{
-			CString pyPath = m_guard->PathMAP(CString(m_mapH->mapN, L_MAPN)) + _T(".py");
-			CFile pyFile;
-	
-			if (pyFile.Open(pyPath, CFile::modeRead | CFile::shareDenyNone)) {
-				UINT flen = (UINT)pyFile.GetLength();
-				char* buf = new char[flen + 1];
-				pyFile.Read(buf, flen);
-				buf[flen] = '\0';
-				pyFile.Close();
-				text = CString(buf, flen);
-				delete[] buf;
-			}
-		}
-
 		getExternalScript(text, pubs);
 
 		if (!pubs.IsEmpty())
@@ -444,7 +425,32 @@ bool CScreen::Parse(bool resize, bool fix)
 					m_vbe->AddObject(name, control);
 			}
 		}
-		m_vbe->LoadScript(text); 
+		{
+			CString dbg;
+			dbg.Format("[WIZARD][SCRIPT][DEBUG] text.GetLength()=%d\n", text.GetLength());
+			OutputDebugString(dbg);
+			dbg.Format("[WIZARD][SCRIPT][DEBUG] text=[%s]\n", text.GetString());
+			OutputDebugString(dbg);
+		}
+		if (!m_vbe->LoadScript(text, m_mapH->pythonMode))
+		{
+			CStringArray* errs = m_vbe->GetErrorMessages();
+			CString dbg;
+			dbg.Format("[WIZARD][SCRIPT][DEBUG] LoadScript FAILED, errCount=%d\n", errs ? (int)errs->GetSize() : -1);
+			OutputDebugString(dbg);
+			if (errs)
+			{
+				for (int di = 0; di < errs->GetSize(); di++)
+				{
+					dbg.Format("[WIZARD][SCRIPT][DEBUG] err[%d]=%s\n", di, errs->GetAt(di).GetString());
+					OutputDebugString(dbg);
+				}
+			}
+		}
+		else
+		{
+			OutputDebugString("[WIZARD][SCRIPT][DEBUG] LoadScript OK\n");
+		}
 	}
 	for (int ii = 0; ii < fmTabs.GetSize(); ii++)
 	{
@@ -1687,7 +1693,7 @@ bool CScreen::OnTRAN(bool byKey)
 			continue;
 		}
 
-		//if (!(form->m_form->attr & FA_SKIP))  //ï¿½ï¿½Åµï¿½ï¿½ ï¿½ï¿½ï¿½Ö´ï¿½ 
+		//if (!(form->m_form->attr & FA_SKIP))  //½ºÅµÀÌ µÇÀÖ´Â 
 		{
 			if (!form->IsValid(guide))
 			{
@@ -2256,7 +2262,7 @@ void CScreen::OnProfit(CfmBase* form)
 			if (dir != -1)
 			{
 				form->ReadData(text, false, -1, dir, ii);
-				if (text.Find(_T("ï¿½Åµï¿½")) != -1 || text.Find('S') != -1)
+				if (text.Find(_T("¸Åµµ")) != -1 || text.Find('S') != -1)
 					sum = tmpv + (tmpv - (sum + m_profit->m_charge ? v_charge * 2 : 0));
 			}
 
@@ -2302,7 +2308,7 @@ void CScreen::OnProfit(CfmBase* form)
 					if (dir != -1)
 					{
 						form->ReadData(text, false, -1, dir, kk);
-						if (text.Find(_T("ï¿½Åµï¿½")) != -1 || text.Find('S') != -1)
+						if (text.Find(_T("¸Åµµ")) != -1 || text.Find('S') != -1)
 							tmpv = -tmpv;
 					}
 					if (tmpv)
@@ -2841,34 +2847,10 @@ long CScreen::DoSomething(int type, CfmBase* form, WPARAM wParam, LPARAM lParam,
 			if (m_client->m_vm->m_script)
 				return 0;	// ignore dup
 
-//sendlog1
-
-			screen = this;
-
-m_slog.Format("[WIZARD][TCP][doSEND][%s] m_client->m_mapN=[%s ]  mapN=[%s]   trxH=[%s]", __FUNCTION__, m_client->m_mapN,
-	CString(screen->m_mapH->mapN, 8) , CString(screen->m_mapH->trxH,32));
-OutputDebugString(m_slog);
-
 			m_client->m_stream->InStream(screen, false, wParam ? (char *)wParam : "");
 		}
 		break;
-	case doMARKETSEND:  //modi NTX
-	{
-		screen = this;
-		string = form->GetSymbolName();
-		if (m_client->FindScreen(dpCURRENT, string, screen, true))
-		{
-			if (m_client->m_vm->m_script)
-				return 0;	// ignore dup
 
-//sendlog1
-			m_slog.Format("[WIZARD][TCP][doMARKETSEND][%s] m_client->m_mapN=[%s]", __FUNCTION__, m_client->m_mapN);
-			OutputDebugString(m_slog);
-
-			m_client->m_stream->InStream(screen, false, "", (int)wParam);
-		}
-	}
-	break;
 	case doRSEND:
 		screen = this;
 		string = form->GetSymbolName();
@@ -2976,8 +2958,6 @@ OutputDebugString(m_slog);
 		break;
 
 	case doSETFOCUS:
-		m_slog.Format("[WIZARD][FOCUS]    [%s]<%d>", __FUNCTION__, __LINE__);
-		OutputDebugString(m_slog);
 		if (m_client->m_vm->IsAvailable(this, evSetFocus, form))
 		{
 			m_client->m_vm->OnSetFocus(this, form);

@@ -1,11 +1,14 @@
 import sys
+import os
+import shutil
+import subprocess
 import ctypes
 import winreg
 from PyQt5.QAxContainer import QAxWidget
 from PyQt5.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
     QGroupBox, QPushButton, QLabel, QLineEdit, QTextEdit, QFormLayout,
-    QComboBox, QGridLayout
+    QComboBox, QGridLayout, QMessageBox
 )
 from datetime import datetime
 
@@ -455,10 +458,61 @@ class TestWindow(QMainWindow):
         self._log(f"[EVT] OnGuideMsg [{key}] {msg}")
 
     def _evt_contract(self, msg):
+        # format: key<delim>value<delim>key<delim>value... (delim = \r \t \n)
         self._log(f"[체결통보] {repr(msg)}")
+        parts = [p for p in msg.replace('\r', '\t').replace('\n', '\t').split('\t') if p != '']
+        m = {}
+        it = iter(parts)
+        for k in it:
+            v = next(it, "")
+            m[k] = v
+        self._log(
+            f"  구분={m.get('988','-')} 계좌={m.get('901','-')} 종목={m.get('907','-')} "
+            f"매매={m.get('912','-')} 가격={m.get('916','-')} 구분={m.get('925','-')} "
+            f"주문번호={m.get('904','-')} 원주문={m.get('905','-')} "
+            f"주문수량={m.get('974','-')} 체결수량={m.get('909','-')} 미체결수량={m.get('931','-')}"
+        )
 
     def _evt_ver_update(self):
-        self._log("[업데이트] OCX 버전 업그레이드 필요 - OCX 재설치 후 재실행하세요")
+        self._log("[업데이트] OnVerUpdate: exe\\axis\\ -> exe\\ 복사 및 OCX 재등록 시작")
+        home = self.ocx.dynamicCall("GetHome()")
+        exe_dir  = os.path.join(home, "exe")
+        axis_dir = os.path.join(exe_dir, "axis")
+
+        if os.path.isdir(axis_dir):
+            # IBKSCONNECTOR.OCX 는 직접 빌드한 버전 사용 - 서버 버전으로 덮어쓰지 않음
+            SKIP = {"IBKSCONNECTOR.OCX"}
+            OCX_FILES = {"AXWIZARD.OCX", "AXXECURE.OCX", "AXSOCK.OCX", "AXCERTIFY.OCX"}
+            for fname in os.listdir(axis_dir):
+                if fname.upper() in SKIP:
+                    self._log(f"  skip: {fname}")
+                    continue
+                src = os.path.join(axis_dir, fname)
+                dst = os.path.join(exe_dir, fname)
+                try:
+                    shutil.copy2(src, dst)
+                    self._log(f"  copy: {fname}")
+                except Exception as e:
+                    self._log(f"  copy FAIL: {fname} - {e}")
+
+            for ocx in OCX_FILES:
+                ocx_path = os.path.join(exe_dir, ocx)
+                if os.path.exists(ocx_path):
+                    r = subprocess.call(["regsvr32", "/s", ocx_path])
+                    self._log(f"  regsvr32 {ocx} => {'OK' if r == 0 else f'FAIL({r})'}")
+
+            try:
+                shutil.rmtree(axis_dir)
+                self._log(f"  axis\\ 폴더 삭제 완료")
+            except Exception as e:
+                self._log(f"  axis\\ 삭제 실패: {e}")
+        else:
+            self._log(f"  axis\\ 폴더 없음 ({axis_dir})")
+
+        self._log("[업데이트] 완료 - 프로그램을 재시작합니다")
+        QMessageBox.information(self, "업데이트 완료", "파일 업데이트가 완료되었습니다.\n확인을 누르면 프로그램이 재시작됩니다.")
+        subprocess.Popen([sys.executable] + sys.argv)
+        QApplication.quit()
 
     def _evt_update_start(self):
         self._log("[업데이트] 파일 업데이트 시작...")

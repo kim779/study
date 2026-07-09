@@ -108,8 +108,6 @@ void CMouse::OnDown(CPoint point, WPARAM wParam)
 	case MS_LB:
 		if (L_Down(point, shift) == mouse_t::mouseERR)
 		{
-			m_slog.Format("[WIZARD][spin][%s]<%d>", __FUNCTION__, __LINE__);
-			OutputDebugString(m_slog);
 			m_capture = false;
 			return;
 		}
@@ -148,8 +146,6 @@ void CMouse::OnUp(CPoint point, WPARAM wParam)
 	{
 	case MS_LB:
 //		if (L_Up(point) == mouseIN && !(m_client->m_status & S_WAIT))
-m_slog.Format("[WIZARD][spin][%s]<%d>", __FUNCTION__, __LINE__);
-OutputDebugString(m_slog);
 		if (L_Up(point) == mouse_t::mouseIN && !m_guard->IsWait(m_client))
 			OnClick();
 		break;	
@@ -181,8 +177,6 @@ bool CMouse::OnRepeat(CPoint point)
 	}
 	if (m_mouse.m_idx < 0)
 	{
-		m_slog.Format("[WIZARD][spin[%s]<%d>!!!!!!!!!!!!!!!!!!!!!!!! FAIL  m_mouse.m_idx = [%d]", __FUNCTION__, __LINE__, m_mouse.m_idx);
-		OutputDebugString(m_slog);
 		m_repeat = -1;
 		return false;
 	}
@@ -458,8 +452,6 @@ mouse_t CMouse::L_Down(CPoint& point, int shift)
 	int idx = WhichForm(point);
 	if (idx < 0)
 	{
-		m_slog.Format("[WIZARD][spin[%s]<%d>!!!!!!!!!!!!!!!!!!!!!!!! FAIL  m_mouse.m_idx = [%d]", __FUNCTION__, __LINE__, m_mouse.m_idx);
-		OutputDebugString(m_slog);
 		if (m_client->m_status & (S_SHIFT|S_CONTROL))
 			m_client->ClearShift();
 		return mouse_t::mouseNO;
@@ -471,11 +463,7 @@ mouse_t CMouse::L_Down(CPoint& point, int shift)
 
 	CfmBase* form = m_screen->GetAtForm(idx);
 	if (!form || !form->IsVisible() || !IsEnable(form))
-	{
-		m_slog.Format("[WIZARD][spin[%s]<%d>!!!!!!!!!!!!!!!!!!!!!!!! FAIL  m_mouse.m_idx = [%d]", __FUNCTION__, __LINE__, m_mouse.m_idx);
-		OutputDebugString(m_slog);
 		return mouse_t::mouseERR;
-	}
 
 	bool	focus = true;
 	switch (form->m_form->kind)
@@ -510,11 +498,7 @@ mouse_t CMouse::L_Down(CPoint& point, int shift)
 			m_client->OnFocus(m_screen, idx, true);
 //			if (m_client->m_status & S_WAIT)
 			if (m_guard->IsWait(m_client))
-			{
-				m_slog.Format("[WIZARD][spin[%s]<%d>!!!!!!!!!!!!!!!!!!!!!!!! FAIL  m_mouse.m_idx = [%d]", __FUNCTION__, __LINE__, m_mouse.m_idx);
-				OutputDebugString(m_slog);
 				return mouse_t::mouseERR;
-			}
 		}
 
 		if (form->m_form->kind == FM_COMBO)
@@ -536,8 +520,6 @@ mouse_t CMouse::L_Down(CPoint& point, int shift)
 		break;
 
 	case FM_EDIT:
-		m_slog.Format("[WIZARD][spin][%s]<%d>", __FUNCTION__, __LINE__);
-		OutputDebugString(m_slog);
 		m_mouse.m_idx = idx;
 		form->OnLButton(true, point, shift);
 		if (focus && m_mouse != m_client->m_current)
@@ -799,8 +781,6 @@ mouse_t CMouse::X_Down(CPoint& point)
 
 	if (m_mouse.m_idx < 0)
 	{
-		m_slog.Format("[WIZARD][spin[%s]<%d>!!!!!!!!!!!!!!!!!!!!!!!! FAIL  m_mouse.m_idx = [%d]", __FUNCTION__, __LINE__, m_mouse.m_idx);
-		OutputDebugString(m_slog);
 		return mouse_t::mouseNO;
 	}
 
@@ -845,15 +825,10 @@ mouse_t CMouse::X_Down(CPoint& point)
 
 mouse_t CMouse::L_Up(CPoint& point)
 {
-	m_slog.Format("[WIZARD][spin][%s]<%d>", __FUNCTION__, __LINE__);
-	OutputDebugString(m_slog);
-
 	int	result = 0;
 
 	if (m_mouse.m_idx < 0)
 	{
-m_slog.Format("[WIZARD][spin[%s]<%d>!!!!!!!!!!!!!!!!!!!!!!!! FAIL  m_mouse.m_idx = [%d]", __FUNCTION__, __LINE__, m_mouse.m_idx);
-OutputDebugString(m_slog);
 		return mouse_t::mouseERR;
 	}
 
@@ -988,8 +963,6 @@ bool CMouse::OnClick()
 {
 	if (m_mouse.m_idx < 0)
 	{
-		m_slog.Format("[WIZARD][spin[%s]<%d>!!!!!!!!!!!!!!!!!!!!!!!! FAIL  m_mouse.m_idx = [%d]", __FUNCTION__, __LINE__, m_mouse.m_idx);
-		OutputDebugString(m_slog);
 		return false;
 	}
 

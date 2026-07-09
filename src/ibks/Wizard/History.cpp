@@ -29,7 +29,6 @@ CHistory::CHistory(CClient* client, CString items)
 
 CHistory::~CHistory()
 {
-	
 }
 
 
@@ -41,8 +40,6 @@ BEGIN_MESSAGE_MAP(CHistory, CListBox)
 	ON_WM_KEYDOWN()
 	ON_WM_KILLFOCUS()
 	//}}AFX_MSG_MAP
-//	ON_WM_DRAWITEM()
-//	ON_WM_MEASUREITEM()
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
@@ -160,9 +157,7 @@ void CHistory::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 void CHistory::OnKillFocus(CWnd* pNewWnd) 
 {
 	CListBox::OnKillFocus(pNewWnd);
-m_slog.Format("[WIZARD][KillFocus][COMBO][%s]<%d>", __FUNCTION__, __LINE__);
-OutputDebugString(m_slog);
-	m_client->History(false);  
+	m_client->History(false);  //test
 }
 
 bool CHistory::GetItem(CString& item)
@@ -181,8 +176,6 @@ bool CHistory::GetItem(CString& item)
 
 void CHistory::FindItem(CString item, bool self)
 {
-	m_slog.Format("[WIZARD][COMBO][%s]<%d> item=[%s]", __FUNCTION__, __LINE__, item);
-	OutputDebugString(m_slog);
 	int	find;
 
 	item.TrimLeft();
@@ -314,4 +307,3 @@ void CHistory::MeasureItemX(LPMEASUREITEMSTRUCT lpMeasureItemStruct)
 	if (lpMeasureItemStruct->CtlType == ODT_LISTBOX)
 		lpMeasureItemStruct->itemHeight = m_height;
 }
-

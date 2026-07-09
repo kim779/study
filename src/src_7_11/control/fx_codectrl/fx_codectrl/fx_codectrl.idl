@@ -1,0 +1,52 @@
+// fx_codectrl.idl : fx_codectrl.dll의 형식 라이브러리 소스입니다.
+// 이 파일은 MIDL 컴파일러에 의해 처리되어
+// 형식 라이브러리(fx_codectrl.tlb)를 생성합니다.
+
+#include "olectl.h"
+[ uuid(9717A53F-325A-456E-99EF-57D5280329D5), version(1.0) ]
+library fx_codectrl
+{
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+	//  fxCodeCtrl의 기본 디스패치 인터페이스입니다.
+		
+	[ uuid(656726DE-5FD2-4929-8F97-F57464D0AD50) ]
+	dispinterface IfxCodeCtrl
+	{
+		properties:
+		methods:
+	};
+
+	//  fxCodeCtrl의 클래스 정보입니다.
+
+	[ uuid(779AEC8F-2D8A-4FD9-B5CA-E9B01B4DA1BE) ]
+	coclass fxCodeCtrl
+	{
+		[default] dispinterface IfxCodeCtrl;
+	};
+	//  Controlwnd의 기본 디스패치 인터페이스입니다.
+		
+	[ uuid(3EBBD33B-2F57-4ACA-8C33-D82219DCE4F4) ]
+	dispinterface IControlwnd
+	{
+		properties:
+			[id(2)] BSTR name;
+	methods:
+			[id(1)] void SetName(BSTR data);
+			[id(3)] BSTR GetCode(void);
+			[id(4)] void SetType(BSTR type, BSTR btype);
+			[id(5)] void SetHsymbol(BSTR symbol);
+			[id(6)] void SetVisible(LONG benable);
+			[id(7)] void SetEnable(LONG benable);
+			[id(8)] void SetBalListType(BSTR list, BSTR type);
+			[id(9)] void ResetCondition(void);
+	};
+
+	//  Controlwnd의 클래스 정보입니다.
+
+	[ uuid(765AC45F-31E4-43E4-A1C7-33CF26C740F2) ]
+	coclass Controlwnd
+	{
+		[default] dispinterface IControlwnd;
+	};
+};

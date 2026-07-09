@@ -1,0 +1,30 @@
+// CX_FileRead.idl : CX_FileRead.dll의 형식 라이브러리 소스입니다.
+// 이 파일은 MIDL 컴파일러에 의해 처리되어
+// 형식 라이브러리(CX_FileRead.tlb)를 생성합니다.
+
+#include "olectl.h"
+[ uuid(8A961DB0-FC11-4B50-B432-138CCD47633F), version(1.0) ]
+library CX_FileRead
+{
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+	//  Controlwnd의 기본 디스패치 인터페이스입니다.
+		
+	[ uuid(6A81C649-6153-4B35-87C7-4DD3D5889EB9) ]
+	dispinterface IControlwnd
+	{
+		properties:
+		methods:
+			[id(1)] BSTR GetGroupName(void);
+			[id(2)] BSTR GetGroupCode(BSTR strgroup);
+			[id(3)] void NotToday(BSTR title);
+	};
+
+	//  Controlwnd의 클래스 정보입니다.
+
+	[ uuid(A08F2701-48FE-4828-96A2-8657789612E3) ]
+	coclass Controlwnd
+	{
+		[default] dispinterface IControlwnd;
+	};
+};

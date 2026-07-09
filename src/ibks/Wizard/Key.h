@@ -18,7 +18,7 @@ public:
 
 // Attributes
 public:
-	CString m_slog{};
+
 protected:
 	class CGuard*	m_guard;
 	class CClient*	m_client;

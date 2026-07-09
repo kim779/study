@@ -23,8 +23,7 @@ class CStream
 public:
 	CStream(class CClient* client);
 	virtual ~CStream();
-	
-	CString m_slog{};
+
 // Attributes
 public:
 	int		m_sndL;
@@ -37,10 +36,8 @@ protected:
 
 // Operations
 public:
-	//bool	InStream(bool byKey = false); //modi NXT
-	//bool	InStream(class CScreen* screen, bool byKey = false, CString trx = _T("")); //modi NXT
-	bool	InStream(bool byKey = false, int iMarket = 1);
-	bool	InStream(class CScreen* screen, bool byKey = false, CString trx = _T(""), int iMarket = 1);
+	bool	InStream(bool byKey = false);
+	bool	InStream(class CScreen* screen, bool byKey = false, CString trx = _T(""));
 	void	OutStream(struct _axisH* axisH, char* datB, int datL);
 
 	bool	SetGuide(CScreen* screen, CString guide, COLORREF rgb = -1);
@@ -53,10 +50,8 @@ protected:
 	int	GetDataNRM2(CScreen* screen, char* iosB, bool tab, bool skip = false);
 	int	GetDataOOP(CScreen* screen, char* iosB, bool skip = false);
 	int	GetDataOOP2(CScreen* screen, char* iosB, bool skip = false);
-	//void	MakeStream(bool byKey = false);  //modi nxt
-	//void	MakeStream(CScreen* screen, CString trx = _T(""));   //modi nxt
-	void	MakeStream(bool byKey = false, int market = 1);
-	void	MakeStream(CScreen * screen, CString trx = _T(""), int market = 1);
+	void	MakeStream(bool byKey = false);
+	void	MakeStream(CScreen* screen, CString trx = _T(""));
 
 	bool	GetScreen(class CScreen*& screen, struct _axisH* axisH);
 	BOOL	GetScreen(class CScreen*& screen, struct _axisH* axisH, int& index, int& ukey);

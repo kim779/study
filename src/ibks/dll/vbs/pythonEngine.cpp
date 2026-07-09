@@ -55,6 +55,21 @@ static PyObject* ansiToPy(const char* s, int len = -1)
     return PyUnicode_FromWideChar(wbuf.data(), wlen);
 }
 
+static void ansiToUtf8(const char* s, int len, std::vector<char>& out)
+{
+    int wlen = MultiByteToWideChar(CP_ACP, 0, s, len, NULL, 0);
+    std::vector<wchar_t> wbuf((size_t)((std::max)(wlen, 0)) + 1);
+    if (wlen > 0)
+        MultiByteToWideChar(CP_ACP, 0, s, len, wbuf.data(), wlen);
+    wbuf[((std::max)(wlen, 0))] = 0;
+
+    int u8len = WideCharToMultiByte(CP_UTF8, 0, wbuf.data(), wlen, NULL, 0, NULL, NULL);
+    out.resize((size_t)((std::max)(u8len, 0)) + 1);
+    if (u8len > 0)
+        WideCharToMultiByte(CP_UTF8, 0, wbuf.data(), wlen, out.data(), u8len, NULL, NULL);
+    out[((std::max)(u8len, 0))] = 0;
+}
+
 static PyObject* cstrToPy(const CString& s)
 {
     return ansiToPy(s.GetString(), s.GetLength());
@@ -388,10 +403,14 @@ bool CPythonEngine::LoadScript(CString scripts)
         }
     }
     buf.push_back('\0');
-    const char* src = buf.data();
+
+    // Source is stored ANSI(CP949); PyRun_String assumes UTF-8, so transcode first
+    // (Korean literals/comments would otherwise fail to parse as invalid UTF-8).
+    std::vector<char> u8buf;
+    ansiToUtf8(buf.data(), (int)buf.size() - 1, u8buf);
 
     PyObject* result = PyRun_String(
-        src, Py_file_input, m_globals, m_globals);
+        u8buf.data(), Py_file_input, m_globals, m_globals);
 
     if (!result) {
         fetchError();
@@ -490,14 +509,14 @@ bool CPythonEngine::DoProcedure(CString procs, CString data, int count)
 
     CStringArray arrs;
     CString tmp = data;
-    for (;;) {
+    for ( ; !tmp.IsEmpty(); ) {
         int idx = tmp.Find(',');
         if (idx != -1) {
             arrs.Add(tmp.Left(idx));
             tmp = tmp.Mid(idx + 1);
         } else {
             arrs.Add(tmp);
-            break;
+            tmp.Empty();
         }
     }
 
@@ -571,6 +590,23 @@ void CPythonEngine::fetchError()
                 PyMem_Free(ws);
             }
             Py_DECREF(str);
+        }
+
+        // SyntaxError/IndentationError carry the offending source line in .text
+        if (PyObject_HasAttrString(pvalue, "text")) {
+            PyObject* textObj = PyObject_GetAttrString(pvalue, "text");
+            if (textObj && textObj != Py_None && PyUnicode_Check(textObj)) {
+                Py_ssize_t tlen;
+                wchar_t* tws = PyUnicode_AsWideCharString(textObj, &tlen);
+                if (tws) {
+                    CString line;
+                    line.Format("%S", tws);
+                    line.TrimRight("\r\n");
+                    msg += "\r\n\r\n>> " + line;
+                    PyMem_Free(tws);
+                }
+            }
+            Py_XDECREF(textObj);
         }
     }
     if (msg.IsEmpty())

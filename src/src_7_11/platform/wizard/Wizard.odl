@@ -1,0 +1,209 @@
+// Wizard.odl : type library source for ActiveX Control project.
+
+// This file will be processed by the Make Type Library (mktyplib) tool to
+// produce the type library (Wizard.tlb) that will become a resource in
+// Wizard.ocx.
+
+#include <olectl.h>
+#include <idispids.h>
+
+[ //uuid(DB13014C-73D9-4D8E-84DB-E59EEEF0B55D), version(1.0),
+  uuid(95840AF6-B82B-42DE-94C9-2039367689CB), version(1.0),
+  helpfile("Wizard.hlp"),
+  helpstring("Wizard ActiveX Control module"),
+  control ]
+library WIZARDLib
+{
+	importlib(STDOLE_TLB);
+	importlib(STDTYPE_TLB);
+
+	//  Primary dispatch interface for CWizardCtrl
+
+	[ uuid(540246C5-8AA5-46DE-B4CB-E3F291D695C3),
+	  helpstring("Dispatch interface for AXIS Wizard Control"), hidden ]
+	dispinterface _DWizard
+	{
+		properties:
+			// NOTE - ClassWizard will maintain property information here.
+			//    Use extreme caution when editing this section.
+			//{{AFX_ODL_PROP(CWizardCtrl)
+			//}}AFX_ODL_PROP
+
+		methods:
+			// NOTE - ClassWizard will maintain method information here.
+			//    Use extreme caution when editing this section.
+			//{{AFX_ODL_METHOD(CWizardCtrl)
+			[id(1)] boolean RunAxis(long mode, LONG_PTR pBytes, long nBytes);
+			[id(2)] boolean axTR(LONG_PTR pBytes, long nBytes);
+			[id(3)] long axAttach(LONG_PTR view, long type, long key);
+			[id(4)] void axDetach(long key);
+			[id(5)] boolean axWorkShop(long key, BSTR maps, int size, bool only);
+			[id(6)] LONG_PTR axWorkName(long key);
+			[id(7)] long axWorkView(BSTR maps, long size);
+			[id(8)] LONG_PTR axWizard(long kind, LONG_PTR variant);
+			[id(9)] long axInvoke(long wParam, long lParam);
+			//}}AFX_ODL_METHOD
+	};
+
+	//  Event dispatch interface for CWizardCtrl
+
+	[ uuid(A2DD4943-F0C3-4AB0-85C6-C5D4E5330A01),
+	  helpstring("Event interface for AXIS Wizard Control") ]
+	dispinterface _DWizardEvents
+	{
+		properties:
+			//  Event interface has no properties
+
+		methods:
+			// NOTE - ClassWizard will maintain event information here.
+			//    Use extreme caution when editing this section.
+			//{{AFX_ODL_EVENT(CWizardCtrl)
+			[id(1)] void OnFire(long type, WPARAM nBytes, LPARAM pBytes);
+			//}}AFX_ODL_EVENT
+	};
+
+	//  Class information for CWizardCtrl
+
+	[ uuid(B2816A99-87C0-4EC2-B97F-3875B86AF2C7),
+	  helpstring("AXIS Wizard Control"), control ]
+	coclass Wizard
+	{
+		[default] dispinterface _DWizard;
+		[default, source] dispinterface _DWizardEvents;
+	};
+
+
+	//  Primary dispatch interface for CxScreen
+	
+	[ uuid(892925C0-9BED-4662-9932-DB3E6ECB329B) ]
+	dispinterface IxScreen
+	{
+		properties:
+			// NOTE - ClassWizard will maintain property information here.
+			//    Use extreme caution when editing this section.
+			//{{AFX_ODL_PROP(CxScreen)
+			[id(1)] long Key;
+			[id(2)] boolean OnSend;
+			[id(3)] boolean Wait;
+			[id(4)] long Major;
+			[id(5)] long Minor;
+			[id(6)] boolean Certify;
+			[id(7)] boolean Trigger;
+			//}}AFX_ODL_PROP
+			
+		methods:
+			// NOTE - ClassWizard will maintain method information here.
+			//    Use extreme caution when editing this section.
+			//{{AFX_ODL_METHOD(CxScreen)
+			[id(8)] void ClearAll(long dest, long type);
+			[id(9)] void ChangeTR(BSTR trN);
+			[id(10)] void ChangePath(BSTR path);
+			[id(11)] void SetLedger(long pos, long length, BSTR data);
+			[id(12)] BSTR GetLedger(long pos, long length);
+			[id(13)] void ChangeMap(BSTR mapN);
+			[id(14)] void SetMessage(BSTR msg);
+			[id(15)] void SetMessage2(long level, BSTR msg);
+			[id(16)] void CreateWindow(long type, BSTR param, BSTR data);
+			[id(17)] void Send(long target);
+			[id(18)] void RSend(long target);
+			[id(19)] void CloseWindow();
+			[id(20)] BSTR GetMapName(long target);
+			[id(21)] void IgnoreChange(BOOL ignore);
+			[id(22)] IDispatch* Object(BSTR forms);
+			[id(23)] boolean GetCode(long kind, BSTR codeSymbol, BSTR nameSymbol, long type);
+			[id(24)] BSTR GetName(long kind, BSTR code, long type);
+			[id(25)] boolean Service(BSTR trN, BSTR data, long length, long mode);
+			[id(26)] void Proc(BSTR procs, BSTR data);
+			[id(27)] void SetCaption(BSTR caption);
+			[id(28)] boolean Approve(long key, BSTR ip, BSTR map, BSTR data, long length);
+			[id(29)] BSTR PopupMenu(BSTR menus, BSTR symbol);
+			[id(30)] void SetFont(long point, BSTR name);
+			[id(31)] boolean CreateObject(BSTR name);
+			[id(32)] void SetSize(long width, long height);
+			[id(33)] void Print(BSTR text);
+			[id(34)] void SetTimer(long interval, BOOL main);
+			[id(35)] long GetCodeType(BSTR code);
+			[id(36)] long UploadFile(BSTR trN, BSTR data, long length, long mode, BSTR fileN, long offset);
+			[id(37)] boolean DownloadFile(BSTR trN, BSTR data, long length, long mode, BSTR fileN);
+			[id(38)] boolean IsCodeType(BSTR code, long type);
+			[id(39)] long GetOrderType(BSTR code);
+			[id(40)] BSTR GetCaption();
+			[id(41)] BSTR ServiceEx(BSTR trN, BSTR data, long length, long mode, long timeout);
+			[id(43)] void ReloadAccn(BSTR name);
+			[id(44)] void RegisterRTM(BSTR codes);
+			//}}AFX_ODL_METHOD
+
+	};
+
+	//  Class information for CxScreen
+
+	[ uuid(63ED2000-869B-44C9-B43E-2D376758C58F) ]
+	coclass xScreen
+	{
+		[default] dispinterface IxScreen;
+	};
+
+
+	//  Primary dispatch interface for CxSystem
+	
+	[ uuid(55F722FF-9F53-411D-B7BA-8633BD300885) ]
+	dispinterface IxSystem
+	{
+		properties:
+			// NOTE - ClassWizard will maintain property information here.
+			//    Use extreme caution when editing this section.
+			//{{AFX_ODL_PROP(CxSystem)
+			[id(1)] boolean TriggerOn;
+			[id(2)] long ConnectBy;
+			[id(3)] BSTR UserID;
+			[id(4)] BSTR TermID;
+			[id(5)] boolean OrderConfirm;
+			[id(6)] boolean OrderPopup;
+			[id(7)] BSTR Home;
+			[id(8)] BSTR Host;
+			[id(9)] BSTR SystemID;
+			[id(10)] BSTR Otp;
+			//}}AFX_ODL_PROP
+			
+		methods:
+			// NOTE - ClassWizard will maintain method information here.
+			//    Use extreme caution when editing this section.
+			//{{AFX_ODL_METHOD(CxSystem)
+			[id(11)] BSTR Convert(long type, BSTR src, BSTR file);
+			[id(12)] boolean IsPopup(BSTR mapN);
+			[id(13)] void Help(BSTR file);
+			[id(14)] void Navigate(BSTR url);
+			[id(15)] void Trigger(BSTR procs, BSTR params, BSTR maps);
+			[id(16)] BSTR GetAccountName(BSTR account);
+			[id(17)] BSTR GetAccountPass(BSTR account);
+			[id(18)] BSTR GetHistory(BOOL all, BSTR symbol);
+			[id(19)] void SetHistory(BSTR symbol, BSTR code);
+			[id(20)] void Trace(BSTR str);
+			[id(21)] void Push(BSTR name, BSTR data);
+			[id(22)] BSTR Pop(BSTR name);
+			[id(23)] boolean Open(BSTR file);
+			[id(24)] void SetAutoCode(BSTR data, long count);
+			[id(25)] boolean ExcelToText(BSTR files);
+			[id(26)] boolean TextToExcel(BSTR files);
+			[id(27)] void Exit(BOOL reboot);
+			[id(28)] boolean Menu(BSTR menus);
+			[id(29)] boolean Print(BSTR data, BSTR fName, long fPoint);
+			[id(30)] boolean PlaySound(BSTR fileN);
+			[id(31)] boolean CheckPasswd(BSTR passwd);
+			[id(32)] void SetPasswd(BSTR passwd);
+			//}}AFX_ODL_METHOD
+
+	};
+
+	//  Class information for CxSystem
+
+	[ uuid(9B4CF2DB-3D25-4DFF-B8FA-F634092684A3) ]
+	coclass xSystem
+	{
+		[default] dispinterface IxSystem;
+	};
+
+
+	//{{AFX_APPEND_ODL}}
+	//}}AFX_APPEND_ODL}}
+};

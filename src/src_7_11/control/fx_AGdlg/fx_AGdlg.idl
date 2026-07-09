@@ -1,0 +1,29 @@
+// fx_AGdlg.idl : fx_AGdlg.dll의 형식 라이브러리 소스입니다.
+// 이 파일은 MIDL 컴파일러에 의해 처리되어
+// 형식 라이브러리(fx_AGdlg.tlb)를 생성합니다.
+
+#include "olectl.h"
+[ uuid(53FD3CD8-365D-430E-A6BC-6CD4094E31C4), version(1.0) ]
+library fx_AGdlg
+{
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+	//  ControlWnd의 기본 디스패치 인터페이스입니다.
+		
+	[ uuid(717FD819-85BE-496F-A003-BFBCF50CF86D) ]
+	dispinterface IControlWnd
+	{
+		properties:
+		methods:
+			[id(1)] void SetType(BSTR gubn, BSTR type);
+			[id(2)] void SetBalListType(BSTR balcode, BSTR type);
+	};
+
+	//  ControlWnd의 클래스 정보입니다.
+
+	[ uuid(52FAC2E8-05A5-4523-B5DC-8F3AE6D5CB75) ]
+	coclass ControlWnd
+	{
+		[default] dispinterface IControlWnd;
+	};
+};

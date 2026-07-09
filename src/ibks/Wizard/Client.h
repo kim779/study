@@ -12,7 +12,6 @@
 #include <vector>
 #include <utility>
 #include <string>
-#include "CLBparent.h"
 
 #define	TM_RTM			1		// real-time
 #define	TM_WAIT			2		// wait timeout
@@ -100,7 +99,6 @@ public:
 //	class	COnTimer*	m_OnTimer;
 	CMap	<int, int, int, int&>		m_timers;
 
-	CLBparent* m_pPrtWnd{};
 protected:
 	CMap	<int, int, CScreen*, CScreen*>	m_screen;
 
@@ -275,8 +273,6 @@ protected:
 	void	StopAVI();
 
 	CString m_slog{};
-	
-	CfmBase* m_pfmBase{};
 };
 
 LRESULT CALLBACK CallProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);

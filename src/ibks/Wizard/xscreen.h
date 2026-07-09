@@ -31,7 +31,6 @@ protected:
 	int		m_nBytes = 0;
 	enum class svFlag {svREADY, svWAIT, svTIMEOUT, svDONE}	m_service;
 
-	CString m_slog;
 // Operations
 public:
 	bool	OnService(char* pBytes, int nBytes);
@@ -84,8 +83,7 @@ protected:
 	afx_msg void _SetMessage(LPCTSTR msg);
 	afx_msg void _SetMessage2(long level, LPCTSTR msg);
 	afx_msg void _CreateWindow(long type, LPCTSTR param, LPCTSTR data);
-	afx_msg void _Send(long target); 
-	afx_msg void _SendMarKetTR(long target, long market); //modi nxt
+	afx_msg void _Send(long target);
 	afx_msg void _RSend(long target);
 	afx_msg void _CloseWindow();
 	afx_msg BSTR _GetMapName(long target);
@@ -126,7 +124,6 @@ protected:
 	//}}AFX_DISPATCH
 	DECLARE_DISPATCH_MAP()
 	DECLARE_INTERFACE_MAP()
-public:
 };
 
 /////////////////////////////////////////////////////////////////////////////

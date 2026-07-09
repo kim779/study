@@ -34,14 +34,14 @@ CStream::~CStream()
 {
 }
 
-bool CStream::InStream(bool byKey, int iMarket) //modi nxt
+bool CStream::InStream(bool byKey)
 {
 	if (m_lock || !m_client->OnTRAN(byKey))
 		return false;
 
 	m_lock = true;
 	m_sndL = 0;
-	MakeStream(byKey, iMarket);  //modi nxt
+	MakeStream(byKey);
 
 	if (m_sndL > 0 && m_guard->RouteTR(m_client))
 	{
@@ -53,7 +53,7 @@ bool CStream::InStream(bool byKey, int iMarket) //modi nxt
 	return false;
 }
 
-bool CStream::InStream(CScreen* screen, bool byKey, CString trx, int iMarket)  //modi nxt
+bool CStream::InStream(CScreen* screen, bool byKey, CString trx)
 {
 	if (screen->isUob())
 	{
@@ -73,10 +73,7 @@ bool CStream::InStream(CScreen* screen, bool byKey, CString trx, int iMarket)  /
 
 	m_lock = true;
 	m_sndL = 0;
-	MakeStream(screen, trx, iMarket);  //modi nxt
-
-m_slog.Format("[WIZARD][SEND][MAP][%s]", __FUNCTION__);
-OutputDebugString(m_slog);
+	MakeStream(screen, trx);
 
 	if (m_sndL > 0 && m_guard->RouteTR(m_client))
 	{
@@ -93,12 +90,6 @@ void CStream::OutStream(struct _axisH* axisH, char* datB, int datL)
 	struct _auxH*	auxH = nullptr;
 	CString	guide = _T("");
 	bool	set_guide = false;
-
-	if (datL > 0)
-	{
-		//m_slog.Format("\r\n [axwizrd][Receive]<%d>[%s] trxC=[%s]", __LINE__, __FUNCTION__, axisH->trxC);
-		//OutputDebugString(m_slog);
-	}
 
 	if (axisH->stat & statAUX)
 	{
@@ -306,12 +297,10 @@ void CStream::GetDataH(CScreen* screen, char* sysB, int& sysL)
 	case TH_KOSCOM:
 		break;
 	case TH_LEDGER:
-	{
 		datH = screen->m_ledgerL;
 		FillMemory(sysB, datH, ' ');
 		screen->GetLedger(sysB);
-	}
-	break;
+		break;
 	default:
 		break;
 	}
@@ -1340,7 +1329,7 @@ int CStream::GetDataOOP2(CScreen* screen, char* iosB, bool skip)
 	return iosL;
 }
 
-void CStream::MakeStream(bool byKey, int market)  //modi nxt
+void CStream::MakeStream(bool byKey)
 {
 	CScreen* screen;
 
@@ -1355,11 +1344,11 @@ void CStream::MakeStream(bool byKey, int market)  //modi nxt
 		if (screen->isUob())
 			continue;
 
-		MakeStream(screen, "", market);  //modi nxt
+		MakeStream(screen);
 	}
 }
 
-void CStream::MakeStream(CScreen* screen, CString trx, int market)   //modi nxt
+void CStream::MakeStream(CScreen* screen, CString trx)
 {
 	if (screen->m_state & waitSN)
 		return;			// maybe does not happen except for script bug
@@ -1392,26 +1381,6 @@ void CStream::MakeStream(CScreen* screen, CString trx, int market)   //modi nxt
 	CopyMemory(axisH->trxC, trx, L_TRXC);
 	CopyMemory(axisH->svcN, CString(screen->m_mapH->mapN, L_MAPN).Mid(L_SGID, L_SELC), sizeof(axisH->svcN));
 	m_sndL += L_axisH;
-
-#ifdef DF_ASTx_CHECK
-	if (screen->m_mapH->typeH == TH_LEDGER)
-	{
-		char* pval = new char[2];
-		memset(pval, 0x00, 2);
-		memcpy((char*)pval, "1", 1);
-		m_guard->GetParent()->SendMessage(WM_PROCESS_DATA, MAKEWORD(0, 0), (LPARAM)pval);
-		//WM_PROCESS_DATA -> WN_USER + 4
-
-		if (strcmp(pval, "1") != 0)
-		{  //보안 모듈이 실행하지 되지 않을때
-			m_guard->SetGuide("보안프로그램(ASTx) 실행 요함");
-			m_sndL -= L_axisH;
-			SetGuide(screen, "");
-			m_guard->SetGuide(AE_CSECURE, m_client->m_key);
-			return;
-		}
-	}
-#endif
 
 	bool info_trx = screen->GetTranInfo(trx);
 	if (screen->m_mapH->options & OP_OOP)
@@ -1457,7 +1426,6 @@ void CStream::MakeStream(CScreen* screen, CString trx, int market)   //modi nxt
 		axisH->stat |= statENC;
 	}
 
-
 	m_guard->xTRACE(x_SNDs, &m_sndB[m_sndL-L_axisH], L_axisH+axisL);
 //	m_guard->xTRACE(x_SNDs, &m_sndB[m_sndL], axisL);
 
@@ -1465,20 +1433,6 @@ void CStream::MakeStream(CScreen* screen, CString trx, int market)   //modi nxt
 	text.Format("%05d", axisL);
 	CopyMemory(axisH->datL, (char *)text.operator LPCTSTR(), sizeof(axisH->datL));
 	m_sndL += axisL;
-
-	//modi nxt
-	if(market == 0)  //  통합
-		axisH->auxs |= mask_ALL_MARKET;
-	else if (market == 1) //KRX 기존
-		axisH->auxs |= mask_KRX_MARKET;
-	else if (market == 2) //NXT
-		axisH->auxs |= mask_NXT_MARKET;
-
-	CString stmp{}, sval{};
-	//hex_OUT((char*)axisH, stmp, sval, sizeof(struct	_axisH));
-	m_slog.Format("[WIZARD][TCP][map][%s] mapn[%s] trx=[%s] axisH=[%s]", __FUNCTION__,
-		CString(screen->m_mapH->mapN, L_MAPN), trx, stmp);
-	OutputDebugString(m_slog);
 }
 
 bool CStream::GetScreen(CScreen*& screen, struct _axisH* axisH)

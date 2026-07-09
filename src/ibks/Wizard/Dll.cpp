@@ -27,7 +27,6 @@ LRESULT CALLBACK DllProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	static	CString	text{};
 	CPoint	pt;
 	int	value = 0;
-	CString m_slog{};
 
 	switch (msg)
 	{
@@ -60,36 +59,11 @@ LRESULT CALLBACK DllProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		case getPALETTE:
 			return dll->m_guard->m_palette->GetPaletteRGB(lParam);
 		case invokeTRx:
-		case invokeALLMarketTRx:
-		case invokeNTXMarketTRx:
-			m_slog.Format("[WIZARD][SEND][DLL][Dll.cpp %s]<%d>mapn=[%s]  key=[%d]", __FUNCTION__, __LINE__, dll->m_mapN, dll->m_key);
-OutputDebugString(m_slog);
-
-			if(LOWORD(wParam) == invokeTRx)
+			if (dll->m_guard->Write((char *)lParam, HIWORD(wParam), dll->m_key))
 			{
-				if (dll->m_guard->Write((char*)lParam, HIWORD(wParam), dll->m_key))
-				{
-					dll->OnUnit(((struct _userTH*)lParam)->key);
-					return TRUE;
-				}
+				dll->OnUnit(((struct _userTH *)lParam)->key);
+				return TRUE;
 			}
-			else if (LOWORD(wParam) == invokeALLMarketTRx)
-			{
-				if (dll->m_guard->Write((char*)lParam, HIWORD(wParam), dll->m_key, 0))
-				{
-					dll->OnUnit(((struct _userTH*)lParam)->key);
-					return TRUE;
-				}
-			}
-			else if (LOWORD(wParam) == invokeNTXMarketTRx)
-			{
-				if (dll->m_guard->Write((char*)lParam, HIWORD(wParam), dll->m_key, 2))
-				{
-					dll->OnUnit(((struct _userTH*)lParam)->key);
-					return TRUE;
-				}
-			}
-			
 			return FALSE;
 		case viewDLL:
 			return dll->m_guard->OpenView(dll, (char *)lParam, HIWORD(wParam));
@@ -612,12 +586,6 @@ void CDll::OnTrigger(CString name, CString text, int key)
 
 	name += '\t';
 	name += text;
-
-	m_slog.Format("[%s]<%d> [TRIGGER]  OnTrigger  key=[%d]  name=[%s] text=[%s]", __FUNCTION__, __LINE__, key, name, text);
-
-	//if (name.Find("cxMarket") >= 0)
-		OutputDebugString(m_slog);
-
 	m_dll->SendMessage(WM_USER, MAKEWPARAM(MAKEWORD(DLL_TRIGGER, key), false), (LPARAM)name.operator LPCTSTR());
 }
 
@@ -738,26 +706,13 @@ int CDll::GetSize(CString maps)
 
 int CDll::Attach(CWnd* pWnd, int type)
 {
-m_slog.Format("     [ATTACH]    ");
-OutputDebugString(m_slog);
-m_slog.Format("[%s]<%d>[ATTACH] type=[%d]", __FUNCTION__, __LINE__, type);
-OutputDebugString(m_slog);
-
 	int	key;
 
 	if (type == 0)
 		type = vtypeWND|vtypeNRM;
 	key = m_guard->Attach(pWnd, type, WK_NORM);
-
-	m_slog.Format("[%s]<%d>[ATTACH] key=[%d]", __FUNCTION__, __LINE__, key);
-	OutputDebugString(m_slog);
-
 	if (key != WK_NONE)
-	{
 		m_screens.SetAt(key, pWnd);
-m_slog.Format("[%s]<%d>[ATTACH]  m_screens.setat size=[%d]   key=[%d]", __FUNCTION__, __LINE__, m_screens.GetSize(), key);
-OutputDebugString(m_slog);
-	}
 	return key;
 }
 
@@ -889,13 +844,6 @@ bool CDll::isTrigger(int key, CString name, CString text)
 	CWorks*	works;
 	WORD	keys;
 
-	//modi test
-m_slog.Format("[%s]<%d> [TRIGGER]  È­¸éÅ°key=[%d]  name=[%s] text=[%s]", __FUNCTION__, __LINE__, key, name, text);
-
-if(name.Find("cxMarket") >= 0)
-	OutputDebugString(m_slog);
-	//test
-
 	if (!m_screens.Lookup(key, (void *&)pWnd))
 		return false;
 
@@ -906,17 +854,8 @@ if(name.Find("cxMarket") >= 0)
 	for (POSITION pos = m_screens.GetStartPosition(); pos; )
 	{
 		m_screens.GetNextAssoc(pos, (WORD&)keys, (void *&)pWnd);
-
-m_slog.Format("[%s]<%d> [TRIGGER] keys=[%d]  key=[%d] ", __FUNCTION__, __LINE__, keys, key);
-if (name.Find("cxMarket") >= 0)
-	OutputDebugString(m_slog);
-
 		if (keys != key && m_guard->GetClient(keys, works))
-		{
-//m_slog.Format("[%s]<%d> [TRIGGER] keys=[%d]  key=[%d] ", __FUNCTION__, __LINE__, keys,  key);
-//OutputDebugString(m_slog);
 			works->OnTrigger(name, text, -1);
-		}
 	}
 	OnTrigger(name, text, 0);
 

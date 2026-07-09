@@ -39,7 +39,6 @@ static char THIS_FILE[]=__FILE__;
 //////////////////////////////////////////////////////////////////////
 
 #define DF_NOENC
-#define DF_NOFDS1
 
 CGuard::CGuard()
 {
@@ -551,22 +550,6 @@ int CGuard::Attach(CWnd *view, int type, int key)
 {
 	CWorks* works;
 	bool	istrue = false;
-	
-	m_slog.Empty();
-	switch (type & ~vtypeMSK)
-	{
-		case vtypeNRM:
-			m_slog.Format("[WIZARD][OPEN][%s]<%d> MAP key=[%d]", __FUNCTION__,__LINE__ , key);
-			break;
-		case vtypeDLL:
-		case vtypeGRX:
-			m_slog.Format("[WIZARD][OPEN][%s]<%d> DLL key=[%d]", __FUNCTION__, __LINE__, key);
-			break;
-	}
-	OutputDebugString(m_slog);
-
-	
-
 
 	switch (key)
 	{
@@ -1762,7 +1745,7 @@ void CGuard::AddRegistry(char* datB, int datL, CString& dns)
 				lz4enc(entry);
 				m_account.SetAt(name, entry);
 
-LOG_OUTP(3, "[wizard][loadacc]", entry, __FUNCTION__);
+LOG_OUTP(3, "[axwizard][loadacc]", entry, __FUNCTION__);
 
 				m_accno.Add(name);
 			}
@@ -1917,7 +1900,7 @@ void CGuard::SetAccounts(CString entry)
 			m_accno.Add(keys);
 		tmps = entry.Mid(++idx);
 
-LOG_OUTP(3, "[wizard][loadacc]", tmps, __FUNCTION__);
+LOG_OUTP(3, "[axwizard][loadacc]", tmps, __FUNCTION__);
 
 		lz4enc(tmps);
 		m_account.SetAt(keys, tmps);
@@ -1955,7 +1938,7 @@ void CGuard::GetAcName(CString& account, BOOL full)
 //	if (m_term & flagACN)
 //		return;
 	m_slog.Format("account=[%s] full=[%d]", account, full);
-	LOG_OUTP(3, "[wizard][loadacc]", m_slog, __FUNCTION__);
+	LOG_OUTP(3, "[axwizard][loadacc]", m_slog, __FUNCTION__);
 
 	for (int ii = 0; ii < m_accno.GetSize(); ii++)
 	{
@@ -1980,7 +1963,7 @@ void CGuard::GetAcName(CString& account, BOOL full)
 		account += '\n';
 	}
 
-	LOG_OUTP(3, "[wizard][loadacc] account = ", account, __FUNCTION__);
+	LOG_OUTP(3, "[axwizard][loadacc] account = ", account, __FUNCTION__);
 }
 
 bool CGuard::GetAcPass(CString key, CString& pass)
@@ -2035,8 +2018,8 @@ void CGuard::xAlert(CClient* client, CScreen* screen)
 	sndL = client->xAlert(screen, &sndB[L_axisH]);
 	if (sndL == 0)
 	{
-m_slog.Format("[%s]<%d>[화면닫을때_msgK_MAPX] sndL=0  client->m_key=[%d] ", __FUNCTION__ ,__LINE__ ,client->m_key);
-LOG_OUTP(3, "[axwizard]", __FUNCTION__, m_slog);
+m_slog.Format("[mapkey] sndL=0  client->m_key=[%d] ", client->m_key);
+LOG_OUTP(3, "axwizard", __FUNCTION__, m_slog);
 		return;
 	}
 
@@ -2050,8 +2033,8 @@ LOG_OUTP(3, "[axwizard]", __FUNCTION__, m_slog);
 		tmps.Format("%d,", (unsigned char)*&sndB[L_axisH + ii]);
 		strdata += tmps;
 	}
-	m_slog.Format("[WIZARD][CLOSE][mapkey] client->m_key=[%d] sndB=[%s] sndL=[%d] m_key=[%d] key= [%s]", client->m_key, sndB, sndL,  axisH->winK , strdata);
-	LOG_OUTP(3, "[axwizard]", __FUNCTION__, m_slog);
+	m_slog.Format("[mapkey] client->m_key=[%d] sndB=[%s] sndL=[%d] m_key=[%d] key= [%s]", client->m_key, sndB, sndL,  axisH->winK , strdata);
+	LOG_OUTP(3, "axwizard", __FUNCTION__, m_slog);
 
 	Write(sndB, L_axisH+sndL, false);
 }
@@ -2821,7 +2804,6 @@ bool CGuard::RouteTR(CClient* client)
 		}
 		strresult += stmp;
 	}
-
 	if (!Write(client->m_stream->m_sndB, client->m_stream->m_sndL, false))
 	{
 		SetGuide(AE_SERVERX, client->m_key);
@@ -2832,11 +2814,10 @@ bool CGuard::RouteTR(CClient* client)
 	return true;
 }
 
-BOOL CGuard::Write(char* pBytes, int nBytes, int key, int market)  //modi ntx
+BOOL CGuard::Write(char* pBytes, int nBytes, int key)
 {
-m_slog.Format("\r\n[axwizard][SEND][DLL][%s]<%d> len -=[%d] pBytes=[%.50s]", __FUNCTION__,  __LINE__,  nBytes, pBytes);
-OutputDebugString(m_slog);
-
+	m_slog.Format("\r\n[wizard][guard]<%d>[%s] len =[%d] pBytes=[%.50s]",__LINE__, __FUNCTION__, nBytes, pBytes);
+	OutputDebugString(m_slog);
 // updateXXX_2022XX
 	if (nBytes > maxIOs)
 	{
@@ -2881,12 +2862,8 @@ OutputDebugString(m_slog);
 
 	if (!(m_term & flagENX) && userth->stat & US_ENC)
 	{
-		if (GetFdsValue(CString(axisH->trxC, L_TRXC), &sendB[L_axisH], nBytes))  // CGuard::Write   DLL write?
-		{
+		if (GetFdsValue(CString(axisH->trxC, L_TRXC), &sendB[L_axisH], nBytes))
 			axisH->auxs |= auxsFDS;
-			m_slog.Format("\r\n[WIZARD][FDS][%s]<%d> len =[%d]  TR=[%s]", __FUNCTION__, __LINE__, nBytes, CString(axisH->trxC, L_TRXC));
-			OutputDebugString(m_slog);
-		}
 
 #ifndef DF_NOENC
 		if (!Xecure(DI_ENC, &sendB[L_axisH], nBytes))
@@ -2903,18 +2880,6 @@ OutputDebugString(m_slog);
 	text.Format(_T("%05d"), nBytes);
 	CopyMemory(axisH->datL, text.GetString(), sizeof(axisH->datL));
 
-	if (market == 0)
-		axisH->auxs |= mask_ALL_MARKET;
-	else if (market == 1)
-		axisH->auxs |= mask_KRX_MARKET;
-	else if (market == 2)
-		axisH->auxs |= mask_NXT_MARKET;
-
-CString stmp{}, sval{};
-//hex_OUT((char*)axisH, stmp, sval, sizeof(struct	_axisH));
-m_slog.Format("\r\n[WIZARD][TCP][DLL][%s]<%d> len =[%d] axisH=[%s]", __FUNCTION__, __LINE__,  nBytes, stmp);
-OutputDebugString(m_slog);
-
 	if (Write(sendB, L_axisH+nBytes, true))
 	{
 		if (key && !(userth->stat & US_PASS))
@@ -2929,9 +2894,6 @@ OutputDebugString(m_slog);
 
 BOOL CGuard::Write(int msgK, CString trxC, char* datB, int datL, int key, bool trace)
 {
-	m_slog.Format("\r\n[WIZARD][SEND][%s]<%d> len =[%d] pBytes=[%.50s]", __FUNCTION__, __LINE__, datL, datB);
-	OutputDebugString(m_slog);
-
 	char*	sendB;
 	struct	_axisH*	axisH;
 	CWorks*	works;
@@ -2952,12 +2914,8 @@ BOOL CGuard::Write(int msgK, CString trxC, char* datB, int datL, int key, bool t
 
 	if (msgK == msgK_XCA)	// for FDS
 	{
-		if (GetFdsValue(CString(axisH->trxC, L_TRXC), &sendB[L_axisH], datL))     //CGuard::Write(....)
-		{
-m_slog.Format("\r\n[WIZARD][FDS][%s]<%d> len =[%d]  TR=[%s]", __FUNCTION__, __LINE__, datL, CString(axisH->trxC, L_TRXC));
-OutputDebugString(m_slog);
+		if (GetFdsValue(CString(axisH->trxC, L_TRXC), &sendB[L_axisH], datL))
 			axisH->auxs |= auxsFDS;
-		}
 	}
 
 	if (Write(sendB, L_axisH+datL, trace))
@@ -2969,6 +2927,46 @@ OutputDebugString(m_slog);
 	delete [] sendB;
 	return FALSE;
 }
+
+/* 20171101 for signUSERc
+BOOL CGuard::Login(char* datB, int datL, bool xecure)
+{
+	CString	text;
+	char*	sendB;
+	struct	_axisH*	axisH;
+
+	sendB = new char[L_axisH+datL+2048];	// 256 -> 2048 : for FDS
+	axisH = (struct _axisH *) sendB;
+	ZeroMemory(axisH, L_axisH);
+
+	text = _T("AXLOGON");
+	axisH->msgK = msgK_SIGN;
+	CopyMemory(axisH->trxC, text, text.GetLength());
+	CopyMemory(&sendB[L_axisH], datB, datL);
+	if (GetFdsValue(_T("AXLOGON"), &sendB[L_axisH], datL))
+		axisH->auxs |= auxsFDS;
+	if (xecure)
+	{
+		if (!Xecure(DI_ENC, (char *)&sendB[L_axisH], datL))
+		{
+			delete [] sendB;
+			return FALSE;
+		}
+		axisH->stat |= statENC;
+	}
+
+	text.Format("%05d", datL);
+	CopyMemory(axisH->datL, (char *)text.operator LPCTSTR(), sizeof(axisH->datL));
+	if (Write(sendB, L_axisH+datL, false))
+	{
+		delete [] sendB;
+		return TRUE;
+	}
+
+	delete [] sendB;
+	return FALSE;
+}
+*/
 
 BOOL CGuard::Login(int mode, char* datB, int datL, bool xecure)
 {
@@ -2990,17 +2988,11 @@ BOOL CGuard::Login(int mode, char* datB, int datL, bool xecure)
 		trN = _T("AXLOGONC");
 		axisH->msgK = msgK_SIGNx;
 	}
-
 	CopyMemory(axisH->trxC, trN, trN.GetLength());
-
 	CopyMemory(&sendB[L_axisH], datB, datL);
-	if (GetFdsValue(trN, &sendB[L_axisH], datL))  //CGuard::Login
-	{
-		m_slog.Format("\r\n[WIZARD][FDS][%s]<%d> len =[%d]  TR=[%s]", __FUNCTION__, __LINE__, datL, CString(axisH->trxC, L_TRXC));
-		OutputDebugString(m_slog);
+	if (GetFdsValue(trN, &sendB[L_axisH], datL))
 		axisH->auxs |= auxsFDS;
-	}
-#ifndef DF_NOENC
+
 	if (xecure)
 	{
 		if (!Xecure(DI_ENC, (char *)&sendB[L_axisH], datL))
@@ -3010,25 +3002,9 @@ BOOL CGuard::Login(int mode, char* datB, int datL, bool xecure)
 		}
 		axisH->stat |= statENC;
 	}
-#endif
 
 	text.Format("%05d", datL);
 	CopyMemory(axisH->datL, (char *)text.operator LPCTSTR(), sizeof(axisH->datL));
-
-CString shex{}, sval{};
-//hex_OUT((char*)axisH, shex, sval, sizeof(struct	_axisH));
-m_slog.Format("\r\n [axwizard][Login][%s]<%d> <<<<<trN=[%s] axisH=[%s] >>>>>", __FUNCTION__, __LINE__, trN, shex);
-OutputDebugString(m_slog);
-
-//hex_OUT((char*)axisH, shex, sval, sizeof(struct	_axisH),  11);
-m_slog.Format("\r\n [axwizard][Login][%s]<%d> <<<<<sval=[%s] >>>>>", __FUNCTION__, __LINE__, sval);
-OutputDebugString(m_slog);
-
-
-//hex_OUT(&sendB[L_axisH], shex, sval, datL);
-m_slog.Format("\r\n [axwizard][Login][%s]<%d> <<<<<sendB = [%s]>>>>>", __FUNCTION__, __LINE__, sval);
-OutputDebugString(m_slog);
-
 	if (Write(sendB, L_axisH+datL, false))
 	{
 		delete [] sendB;
@@ -3071,12 +3047,8 @@ BOOL CGuard::Service(CScreen* screen, CString trxC, char* datB, int datL, int mo
 
 	if (!(m_term & flagENX) && mode & US_ENC)
 	{
-		if (GetFdsValue(CString(axisH->trxC, L_TRXC), &sendB[L_axisH], datL)) //CGuard::Service
-		{
-			m_slog.Format("\r\n[WIZARD][FDS][%s]<%d> len =[%d]  TR=[%s]", __FUNCTION__, __LINE__, datL, CString(axisH->trxC, L_TRXC));
-			OutputDebugString(m_slog);
+		if (GetFdsValue(CString(axisH->trxC, L_TRXC), &sendB[L_axisH], datL))
 			axisH->auxs |= auxsFDS;
-		}
 
 		if (!Xecure(DI_ENC, &sendB[L_axisH], datL))
 		{
@@ -3090,11 +3062,6 @@ BOOL CGuard::Service(CScreen* screen, CString trxC, char* datB, int datL, int mo
 	CString	text;
 	text.Format("%05d", datL);
 	CopyMemory(axisH->datL, (char *)text.operator LPCTSTR(), sizeof(axisH->datL));
-
-	CString stmp{};
-	//hex_OUT((char*)axisH, stmp, sizeof(struct	_axisH));
-	m_slog.Format("\r\n [axwizard][Service][%s]<%d> <<<<<trxC=[%s]>>>>>", __FUNCTION__, __LINE__, trxC);
-	OutputDebugString(m_slog);
 
 	if (Write(sendB, L_axisH+datL, true))
 	{
@@ -3144,9 +3111,6 @@ BOOL CGuard::Approve(CScreen* screen, int key, CString ip, CString map, char* da
 	CopyMemory(&sendB[L_axisH], datB, datL);
 
 	xTRACE(x_SNDs, sendB, L_axisH+datL);
-
-	m_slog.Format("\r\n[WIZARD][%s]<%d> len =[%d]  TR=[%s]", __FUNCTION__, __LINE__, datL, CString(axisH->trxC, L_TRXC));
-	OutputDebugString(m_slog);
 
 	ip.Trim();
 	BOOL	retv;
@@ -3233,12 +3197,8 @@ long CGuard::UploadFile(CScreen* screen, CString trxC, char* datB, int datL, int
 
 	if (!(m_term & flagENX) && mode & US_ENC)
 	{
-		if (GetFdsValue(CString(axisH->trxC, L_TRXC), &sendB[L_axisH], datL))  //CGuard::UploadFile(
-		{
-			m_slog.Format("\r\n[WIZARD][FDS][%s]<%d> len =[%d]  TR=[%s]", __FUNCTION__, __LINE__, datL, CString(axisH->trxC, L_TRXC));
-			OutputDebugString(m_slog);
+		if (GetFdsValue(CString(axisH->trxC, L_TRXC), &sendB[L_axisH], datL))
 			axisH->auxs |= auxsFDS;
-		}
 
 		if (!Xecure(DI_ENC, &sendB[L_axisH], datL))
 		{
@@ -3251,9 +3211,6 @@ long CGuard::UploadFile(CScreen* screen, CString trxC, char* datB, int datL, int
 
 	text.Format(_T("%05d"), datL);
 	CopyMemory(axisH->datL, (char *)text.operator LPCTSTR(), sizeof(axisH->datL));
-
-	m_slog.Format("\r\n[axwizard][%s]<%d> len =[%d]  TR=[%s]", __FUNCTION__, __LINE__, datL, CString(axisH->trxC, L_TRXC));
-	OutputDebugString(m_slog);
 
 	if (Write(sendB, L_axisH+datL, true))
 	{
@@ -3312,12 +3269,8 @@ BOOL CGuard::DownloadFile(CScreen* screen, CString trxC, char* datB, int datL, i
 
 	if (!(m_term & flagENX) && mode & US_ENC)
 	{
-		if (GetFdsValue(CString(axisH->trxC, L_TRXC), &sendB[L_axisH], datL))  //CGuard::DownloadFile
-		{
-			m_slog.Format("\r\n[WIZARD][FDS][%s]<%d> len =[%d]  TR=[%s]", __FUNCTION__, __LINE__, datL, CString(axisH->trxC, L_TRXC));
-			OutputDebugString(m_slog);
+		if (GetFdsValue(CString(axisH->trxC, L_TRXC), &sendB[L_axisH], datL))
 			axisH->auxs |= auxsFDS;
-		}
 
 		if (!Xecure(DI_ENC, &sendB[L_axisH], datL))
 		{
@@ -3330,11 +3283,6 @@ BOOL CGuard::DownloadFile(CScreen* screen, CString trxC, char* datB, int datL, i
 
 	text.Format(_T("%05d"), datL);
 	CopyMemory(axisH->datL, (char *)text.operator LPCTSTR(), sizeof(axisH->datL));
-
-CString stmp{};
-//hex_OUT((char*)axisH, stmp, sizeof(struct	_axisH));
-m_slog.Format("\r\n [WIZARD][TCP][%s]<%d> <<<<<trxC=[%s]  [%s]>>>>>", __FUNCTION__, __LINE__, trxC, axisH->svcN);
-OutputDebugString(m_slog);
 
 	if (Write(sendB, L_axisH+datL, true))
 	{
@@ -3352,9 +3300,8 @@ OutputDebugString(m_slog);
 	return FALSE;
 }
 
-BOOL CGuard::Invoke(char* pBytes, int nBytes, int key, int market)
+BOOL CGuard::Invoke(char* pBytes, int nBytes, int key)
 {
-
 	if (nBytes > maxIOs)
 	{
 		SetGuide(AE_MAXIO, key);
@@ -3396,12 +3343,6 @@ BOOL CGuard::Invoke(char* pBytes, int nBytes, int key, int market)
 	if (!((CClient *)works)->GetAtScreen(screen, userth->key))
 		return FALSE;
 	
-
-CString slog;
-slog.Format("[WIZARD]CGuard::Invoke     map = [%s]    type = [%d] tr=[%s] ",
-	screen->m_mapH->mapN ,screen->m_mapH->typeH, screen->m_mapH->trxC);
-LOG_OUTP(2, "[ASTx]", slog);
-
 	if (userth->stat & US_KEY)
 	{
 		pos = string.GetAt(0);
@@ -3445,12 +3386,8 @@ LOG_OUTP(2, "[ASTx]", slog);
 
 	if (!(m_term & flagENX) && userth->stat & US_ENC)
 	{
-		if (GetFdsValue(CString(axisH->trxC, L_TRXC), &sendB[L_axisH], nBytes))  //CGuard::Invoke
-		{
-			m_slog.Format("\r\n[WIZARD][FDS][%s]<%d> len =[%d]  TR=[%s]", __FUNCTION__, __LINE__, nBytes, CString(axisH->trxC, L_TRXC));
-			OutputDebugString(m_slog);
+		if (GetFdsValue(CString(axisH->trxC, L_TRXC), &sendB[L_axisH], nBytes))
 			axisH->auxs |= auxsFDS;
-		}
 #ifndef DF_NOENC
 		if (!Xecure(DI_ENC, &sendB[L_axisH], nBytes))
 		{
@@ -3465,18 +3402,6 @@ LOG_OUTP(2, "[ASTx]", slog);
 	CString	text;
 	text.Format(_T("%05d"), nBytes);
 	CopyMemory(axisH->datL, (char *)text.operator LPCTSTR(), sizeof(axisH->datL));
-
-	if (market == 0)
-		axisH->auxs |= mask_ALL_MARKET;
-	else if (market == 1)
-		axisH->auxs |= mask_KRX_MARKET;
-	else if (market == 2)
-		axisH->auxs |= mask_NXT_MARKET;
-
-//CString stmp{};
-//hex_OUT((char*)axisH, stmp, sizeof(struct	_axisH));
-m_slog.Format("\r\n [WIZARD][TCP][%s]<%d> <<<<<trxC=[%s]>>>>>", __FUNCTION__, __LINE__, axisH->trxC);
-OutputDebugString(m_slog);
 
 	if (Write(sendB, L_axisH+nBytes, true))
 	{
@@ -3493,47 +3418,11 @@ OutputDebugString(m_slog);
 
 BOOL CGuard::Write(char* pBytes, int nBytes, bool trace)
 {
-	char extractedString[8 + 1];  // 널 문자 포함
-   // pBytes + 36 위치부터 extractLength 만큼 문자열 복사
- 	strncpy_s(extractedString, pBytes + 12 - 1, 8);
-
-	m_slog.Format("\r\n [WIZRD][TCP][SEND][%s]<%d> <<<<<trx=[%s]>>>>>", __FUNCTION__,__LINE__ ,extractedString);
-	OutputDebugString(m_slog);
-	m_slog.Format("\r\n [WIZRD][TCP]");
-	OutputDebugString(m_slog);
-
-#ifdef DF_ASTx_CHECK
 // updateXXX_2022XX	
 OutputDebugString("\r\n--------------");
-char extractedString[8 + 1];  // 널 문자 포함
-   // pBytes + 36 위치부터 extractLength 만큼 문자열 복사
-strncpy_s(extractedString, pBytes + 12 - 1, 8);
-// 널 종단 문자 추가
-extractedString[8] = '\0';  // 마지막에 널 문자 추가
-const char* searchString = "pibopbxq";
-if (strstr(extractedString, searchString) != NULL)
-{
-	char* pval = new char[2];
-	memset(pval, 0x00, 2);
-	memcpy((char*)pval, "1", 1);
-	GetParent()->SendMessage(WM_PROCESS_DATA, MAKEWORD(0, 0), (LPARAM)pval);
-	//WM_PROCESS_DATA -> WN_USER + 4
-
-	if (strcmp(pval, "1") != 0)
-	{  //보안 모듈이 실행하지 되지 않을때
-		SetGuide("보안프로그램(ASTx) 실행 요함");
-		m_slog.Format("\r\n[ASTx][wizard][guard]<%d>[%s]보안 모듈이 실행하지 되지 않을때", __LINE__, __FUNCTION__,  extractedString);
-		OutputDebugString(m_slog);
-		return FALSE;
-	}
-}
-
-m_slog.Format("\r\n[ASTx][wizard][guard]<%d>[%s] len =[%d] extractedString=[%s] pBytes=[%.100s]", __LINE__, __FUNCTION__, nBytes, extractedString,  pBytes);
+m_slog.Format("\r\n[wizard][guard]<%d>[%s] len =[%d] pBytes=[%x][%x]", __LINE__, __FUNCTION__, nBytes, *pBytes, *(pBytes  + 3));
 OutputDebugString(m_slog);
 OutputDebugString("\r\n============");
-#endif
-
-
 	if (nBytes > L_axisH + maxIOs)
 	{
 		SetGuide(AE_MAXIO, ((struct _axisH *)pBytes)->winK);
@@ -5080,9 +4969,6 @@ void CGuard::OnDDE()
 
 char* CGuard::Modal(int kind, CString text)
 {
-	m_slog.Format("[axisdialog][%s]<%d> kind=[%d]  text=[%s]", __FUNCTION__, __LINE__, kind, text);
-	OutputDebugString(m_slog);
-
 	int	idx;
 	CString	keys, currents, defs;
 
@@ -5111,12 +4997,6 @@ char* CGuard::Modal(int kind, CString text)
 		defs = text.Left(idx);
 	else
 		defs = text;
-
-	m_slog.Format("[axisdialog][%s]<%d> currents=[%s]", __FUNCTION__, __LINE__, currents);
-	OutputDebugString(m_slog);
-	m_slog.Format("[axisdialog][%s]<%d> defs=[%s]", __FUNCTION__, __LINE__, defs);
-	OutputDebugString(m_slog);
-
 
 	Modal(kind, keys, currents, defs);
 	return (char*)currents.GetString();
@@ -6154,31 +6034,19 @@ bool CGuard::GetFdsValue(CString trN, char* datB, int& datL)
 		char	fdsB[1024*2];
 
 		ZeroMemory(fdsB, sizeof(fdsB));
-        int	rc = (*axFDSValue)((char *)trN.operator LPCTSTR(), datB, datL, fdsB);
-		//int fdslen = rc;
-		//rc = 1059;
-m_slog.Format("\r\n[WIZARD][FDS][%s]<%d> FDS 길이 rc =[%d]  원래 보내려는 데이터 길이 datL=[%d]", __FUNCTION__, __LINE__, rc, datL);
-OutputDebugString(m_slog);
-//원래 보내려는 데이터의 앞에 FDS 관련(길이등) 4바이트를 붙이고 그다음 보내려는 데이터 붙이고 마지막에 FDS 붙인다
+		int	rc = (*axFDSValue)((char *)trN.operator LPCTSTR(), datB, datL, fdsB);
 		if (rc > 0)
 		{
 			struct	_fdsR*	fdsR;
 			char*	ptr = new char[datL];
 
-			CopyMemory(ptr, datB, datL);				       //기존값 복사
-			fdsR = (struct _fdsR *)datB; 
+			CopyMemory(ptr, datB, datL);
+			fdsR = (struct _fdsR *)datB;
 			ZeroMemory(fdsR, L_FDSR);
-			fdsR->fdsL = rc;										  //기존값 맨앞에 FDS 정보
-			CopyMemory(&datB[L_FDSR], ptr, datL);  //FDS 정보 다음에 다시 기존값 복사
-			datL += L_FDSR;							 				//기존값에 FDS 정보구조체 크기  datL
-#ifdef DF_NOFDS
-			memset(fdsB, ' ', rc);
+			fdsR->fdsL = rc;
+			CopyMemory(&datB[L_FDSR], ptr, datL);
+			datL += L_FDSR;
 			CopyMemory(&datB[datL], fdsB, rc);
-
-#else
-			CopyMemory(&datB[datL], fdsB, rc);            //datL에  FDS 복사
-#endif
-			//CopyMemory(&datB[datL], fdsB, fdslen);   //datL에  FDS 복사
 			datL += rc;
 			delete[] ptr;
 			return true;

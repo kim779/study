@@ -41,7 +41,7 @@ static char THIS_FILE[] = __FILE__;
 /////////////////////////////////////////////////////////////////////////////
 // CAxisForm
 
-char*	LCcontrast[] = {"  ", "¡é", "¡å", "¡ã", "¡è"};
+char* LCcontrast[] = { "  ", "¡é", "¡å", "¡ã", "¡è" };
 
 IMPLEMENT_DYNCREATE(CAxisForm, CCmdTarget)
 
@@ -1159,6 +1159,14 @@ void CAxisForm::getExternalScript(CString& scripts, CString& pubs)
 		tmpx = tmps;
 		tmpx.MakeUpper();
 		pos = tmpx.Find(str);
+		if (pos == -1)
+		{
+			// Python mode uses '#' for comments, so "@LOAD " is the equivalent
+			// include directive there (this block never reaches the script engine
+			// either way - it's stripped out here before Python/VBScript ever runs).
+			str = _T("@LOAD ");
+			pos = tmpx.Find(str);
+		}
 		if (pos != -1 && !isComment(tmps.Left(pos)))
 		{
 			tmps = tmps.Mid(pos+str.GetLength());

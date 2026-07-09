@@ -19,7 +19,6 @@
 #define	WM_GUIDE	WM_USER+1
 #define	WM_VERS		WM_USER+2
 #define	WM_ANM		WM_USER+3
-#define	WM_PROCESS_DATA		WM_USER+4
 
 #define WS_SIGN		0x00000001
 #define	WS_TRIX		0x00000002
@@ -288,8 +287,7 @@ public:
 	bool	IsPopup(CString mapN);
 
 	bool	RouteTR(CClient* client);
-	//BOOL	Write(char* pBytes, int nBytes, int key);  //modi ntx
-	BOOL	Write(char* pBytes, int nBytes, int key, int market = 1);
+	BOOL	Write(char* pBytes, int nBytes, int key);
 	BOOL	Write(int msgK, CString trxC, char* datB, int datL, int key = 0, bool trace = false);
 //	BOOL	Login(char* datB, int datL, bool xecure);
 	BOOL	Login(int mode, char* datB, int datL, bool xecure);
@@ -297,7 +295,7 @@ public:
 	BOOL	Approve(CScreen* screen, int key, CString ip, CString map, char* datB, int datL);
 	long	UploadFile(CScreen* screen, CString trxC, char* datB, int datL, int mode, CString fileN, int offset);
 	BOOL	DownloadFile(CScreen* screen, CString trxC, char* datB, int datL, int mode, CString fileN);
-	BOOL	Invoke(char* pBytes, int nBytes, int key, int market = 1); //modi nxt
+	BOOL	Invoke(char* pBytes, int nBytes, int key);
 	BOOL	Write(char* pBytes, int nBytes, bool trace);
 
 	void	PostAxis(WPARAM wParam, LPARAM lParam = 0)

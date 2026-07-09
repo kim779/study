@@ -18,7 +18,7 @@ public:
 
 // Attributes
 public:
-	CString m_slog{};
+
 // Operations
 public:
 
@@ -38,7 +38,7 @@ private:
 	class CClient*	m_client;
 
 	CString		m_items;
-	 
+
 	COLORREF	m_tRGB;
 	COLORREF	m_pRGB;
 	int		m_height;	// cell height
@@ -67,7 +67,6 @@ protected:
 	//}}AFX_MSG
 
 	DECLARE_MESSAGE_MAP()
-public:
 };
 
 /////////////////////////////////////////////////////////////////////////////

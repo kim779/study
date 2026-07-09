@@ -520,6 +520,8 @@ mouse_t CMouse::L_Down(CPoint& point, int shift)
 		break;
 
 	case FM_EDIT:
+		m_slog.Format("[WIZARD][spin][%s]<%d>", __FUNCTION__, __LINE__);
+		OutputDebugString(m_slog);
 		m_mouse.m_idx = idx;
 		form->OnLButton(true, point, shift);
 		if (focus && m_mouse != m_client->m_current)
@@ -780,7 +782,11 @@ mouse_t CMouse::X_Down(CPoint& point)
 	m_mouse.m_idx = WhichForm(point);
 
 	if (m_mouse.m_idx < 0)
+	{
+		m_slog.Format("[WIZARD][spin[%s]<%d>!!!!!!!!!!!!!!!!!!!!!!!! FAIL  m_mouse.m_idx = [%d]", __FUNCTION__, __LINE__, m_mouse.m_idx);
+		OutputDebugString(m_slog);
 		return mouse_t::mouseNO;
+	}
 
 	CfmBase *form = m_screen->GetAtForm(m_mouse.m_idx);
 	if (!form || !form->IsVisible() || !IsEnable(form))
@@ -823,10 +829,17 @@ mouse_t CMouse::X_Down(CPoint& point)
 
 mouse_t CMouse::L_Up(CPoint& point)
 {
+	m_slog.Format("[WIZARD][spin][%s]<%d>", __FUNCTION__, __LINE__);
+	OutputDebugString(m_slog);
+
 	int	result = 0;
 
 	if (m_mouse.m_idx < 0)
+	{
+m_slog.Format("[WIZARD][spin[%s]<%d>!!!!!!!!!!!!!!!!!!!!!!!! FAIL  m_mouse.m_idx = [%d]", __FUNCTION__, __LINE__, m_mouse.m_idx);
+OutputDebugString(m_slog);
 		return mouse_t::mouseERR;
+	}
 
 	CfmBase	*form;
 	if (m_mouse.m_key != m_screen->m_key)
@@ -958,7 +971,11 @@ mouse_t CMouse::X_Up(CPoint& point)
 bool CMouse::OnClick()
 {
 	if (m_mouse.m_idx < 0)
+	{
+		m_slog.Format("[WIZARD][spin[%s]<%d>!!!!!!!!!!!!!!!!!!!!!!!! FAIL  m_mouse.m_idx = [%d]", __FUNCTION__, __LINE__, m_mouse.m_idx);
+		OutputDebugString(m_slog);
 		return false;
+	}
 
 	if (!m_client->m_vm->IsAvailable(m_screen, evClick, m_screen->GetAtForm(m_mouse.m_idx)))
 		return false;

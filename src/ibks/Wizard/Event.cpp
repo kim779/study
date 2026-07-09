@@ -148,15 +148,6 @@ LRESULT CALLBACK CallProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	case WM_SETFOCUS:
 		if (GetParent((HWND)wParam) != client->m_view->GetSafeHwnd())
 		{
-			
-			
-			if (client->m_pPrtWnd)
-			{
-				//slog.Format("[WIZARD][setfocus][Event.cpp %s]<%d> map=[%s] wparam = [%d]  windowID=[%d]", __FUNCTION__, __LINE__, client->m_mapN, (int)wParam, client->m_pPrtWnd->GetDlgCtrlID());
-				//OutputDebugString(slog); //m_pPrtWnd
-				//if ((int)wParam == client->m_pPrtWnd->GetDlgCtrlID())
-					break;;
-			}
 			client->OnFocus(TRUE, (HWND)wParam);
 		}
 		break;
@@ -170,18 +161,7 @@ LRESULT CALLBACK CallProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			else if (GetParent(GetParent(GetParent((HWND)wParam))) == client->m_view->GetSafeHwnd())
 				client->OnControl((HWND)GetParent(GetParent((HWND)wParam)));
 			else
-			{
-
-				if (client->m_pPrtWnd)
-				{
-				/*	slog.Format("[WIZARD][killfocus][Event.cpp %s]<%d> map=[%s]   wparam = [%d]  windowID=[%d]", __FUNCTION__, __LINE__, client->m_mapN, (int)wParam, client->m_pPrtWnd->GetDlgCtrlID());
-					OutputDebugString(slog);
-					if ((int)wParam == client->m_pPrtWnd->GetDlgCtrlID())*/
-						break;;
-				}
-			
 				client->OnFocus(FALSE, (HWND)wParam);
-			}
 	
 			if (!client->m_focus)
 			{
@@ -204,13 +184,8 @@ LRESULT CALLBACK CallProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			if (client->m_status & S_CHILD || client->OnControl())
 			{
 				client->m_view->SetFocus();
-				slog.Format("[WIZARD][spin][%s]<%d> 스핀버튼 클릭햇는데 break", __FUNCTION__, __LINE__);
-				OutputDebugString(slog);
 				break;
 			}
-
-slog.Format("[WIZARD][spin][%s]<%d>", __FUNCTION__, __LINE__);
-OutputDebugString(slog);
 
 			client->m_mouse->SaveMouse(point, true);
 			client->m_mouse->OnDown(point, wParam);
@@ -309,8 +284,8 @@ OutputDebugString(slog);
 		case TM_WAIT:
 			client->WaitDone(NULL, true);
 			client->m_guard->SetGuide(AE_TIMEOUT, client->m_key);
-			slog.Format("[wizard] TM_WAIT[%s]", client->m_mapN);
-			LOG_OUTP(3, "wizard", __FUNCTION__, slog);
+			slog.Format("[axwizard] TM_WAIT[%s]", client->m_mapN);
+			LOG_OUTP(3, "axwizard", __FUNCTION__, slog);
 			FileLog(slog, "timeout.ini");
 			break;
 		case TM_RTM:
@@ -361,17 +336,7 @@ OutputDebugString(slog);
 		case getPALETTE:
 			return client->m_guard->m_palette->GetPaletteRGB(lParam);
 		case invokeTRx:
-		case invokeALLMarketTRx:  //modi nxt
-		case invokeNTXMarketTRx:
-slog.Format("[WIZARD][SEND][controll dll][Event.cpp %s]<%d> map=[%s] ",__FUNCTION__, __LINE__,  client->m_mapN);
-OutputDebugString(slog);
-			if (LOWORD(wParam) == invokeTRx)
-				return client->m_guard->Invoke((char*)lParam, HIWORD(wParam), client->m_key);
-			else if (LOWORD(wParam) == invokeALLMarketTRx)
-				return client->m_guard->Invoke((char*)lParam, HIWORD(wParam), client->m_key, 0);
-			else if (LOWORD(wParam) == invokeNTXMarketTRx)
-				return client->m_guard->Invoke((char*)lParam, HIWORD(wParam), client->m_key, 2);
-
+			return client->m_guard->Invoke((char *)lParam, HIWORD(wParam), client->m_key);
 		case viewDLL:
 			return client->m_guard->OpenView(client, (char *)lParam, HIWORD(wParam));
 		case procDLL:

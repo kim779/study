@@ -30,8 +30,6 @@ static char THIS_FILE[]=__FILE__;
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-#define DF_POPUP
-
 CClient::CClient(CGuard* guard, CWnd* view, int key, int type) : CWorks(guard, view, key, type)
 {
 	m_focus  = TRUE;
@@ -106,8 +104,6 @@ CClient::~CClient()
 
 void CClient::SetInitial(bool reset)
 {
-	m_slog.Format("[WIZARD][combo][%s]<%d>beforehistory", __FUNCTION__, __LINE__);
-	OutputDebugString(m_slog);
 	History(false);
 	StopAVI();
 
@@ -177,9 +173,6 @@ void CClient::SetInitial(bool reset)
 
 bool CClient::Attach(CString maps, bool only, bool fix)
 {
-m_slog.Format("[WIZARD][ATTACH][%s]<%d> maps=[%s]", __FUNCTION__, __LINE__, maps);
-OutputDebugString(m_slog);
-
 	if ((m_status & S_WAIT) && !only)
 		return false;
 
@@ -1005,8 +998,7 @@ void CClient::OnResize(int Width, int Height)
 {
 	CScreen* screen;
 	CScreen* main;
-	m_slog.Format("[WIZARD][combo][%s]<%d> beforehistory", __FUNCTION__, __LINE__);
-	OutputDebugString(m_slog);
+
 	History(false);
 
 	switch (m_type & vtypeMSK)
@@ -1119,11 +1111,6 @@ void CClient::OnFocus(BOOL focus, HWND hWnd)
 				return;
 			}
 
-//			CString stmp;
-//			if(m_pfmBase)
-//				m_pfmBase->ReadData(stmp);
-//m_slog.Format("[WIZARD][combo][%s]<%d>  ReadData = [%s]", __FUNCTION__, __LINE__, stmp);
-//OutputDebugString(m_slog);
 			for (int key = 0; key < m_magic; key++)
 			{
 				if (GetAtScreen(screen, key))
@@ -1253,18 +1240,7 @@ void CClient::OnDraw(CDC* pDC)
 		return;
 	}
 
-	if (0)
-	{
-		CMemDC mdc(*pDC, m_view);
-		CDC& dc = mdc.GetDC();
-		//OnPaint(pDC, false);
-		OnPaint(&dc, false);
-	}
-	else
-	{
-		OnPaint(pDC, false);
-	}
-
+	OnPaint(pDC, false);
 	return;
 }
 
@@ -2038,12 +2014,6 @@ void CClient::OnRepeat(int key)
 
 void CClient::ChangeIME(CScreen* screen, int idx)
 {
-	m_slog.Format("[WIZARD][IME][%s] m_key=[%d] [%s],  [%s]",
-		__FUNCTION__, m_key, screen->m_mapH->mapN, screen->m_formR[idx].name);
-	OutputDebugString(m_slog);
-m_slog.Format("[WIZARD][IME][%s] [%d] [%d] [%x]", 
-	__FUNCTION__,screen->m_formR[idx].kind, screen->m_formR[idx].type, screen->m_formR[idx].attr );
-OutputDebugString(m_slog);
 	switch (screen->m_formR[idx].kind)
 	{
 	case FM_EDIT:
@@ -2058,9 +2028,6 @@ OutputDebugString(m_slog);
 		case IO_ANY:
 			if (screen->m_formR[idx].attr & FA_HAN)
 			{
-				m_slog.Format("[WIZARD][IME]한글모드");
-				OutputDebugString(m_slog);
-
 				m_status |= S_HAN;
 				break;
 			}
@@ -2437,11 +2404,8 @@ void CClient::ClearShift()
 	}
 }
 
-
 void CClient::History(CfmBase* form, int mode)
 {
-m_slog.Format("[WIZARD][COMBO][%s]<%d>   ----]", __FUNCTION__, __LINE__);
-OutputDebugString(m_slog);
 	if (m_status & (S_CHILD|S_FIND))
 		return;
 
@@ -2499,42 +2463,16 @@ OutputDebugString(m_slog);
 	wRc.right  = wRc.left + size.cx;
 	wRc.bottom = min(wRc.top + size.cy, cRc.bottom);
 
-	
-#ifndef DF_POPUP
-
-		m_child = new CHistory(this, items);
-		if (!((CHistory *)m_child)->Create(WS_CHILD|WS_VISIBLE|WS_CLIPSIBLINGS, wRc, m_view, 223)) //test codelist
-		{
-			m_status &= ~(S_CHILD | S_FIND);
-			delete m_child;
-		}
-#else
-	
-		CRect rec;
-		rec = form->GetRect(true);
-		rec.top = wRc.top;
-		rec.right = rec.left + wRc.Width(), 
-		rec.bottom = min(rec.top + size.cy, cRc.bottom);
-		m_view->ClientToScreen(rec);
-
-		m_pPrtWnd = new CLBparent();
-		BOOL bret = m_pPrtWnd->CreatePopUpWindow(m_view, rec);
-		if (bret)
-		{
-			m_child = m_pPrtWnd->CreateListBox(this, items);
-			m_pPrtWnd->ShowWindow(SW_SHOW);
-			//test
-			//form->SetFocus(true);
-			m_view->SetFocus();
-		}
-#endif
+	m_child   = new CHistory(this, items); 
+	if (!((CHistory *)m_child)->Create(WS_CHILD|WS_VISIBLE|WS_CLIPSIBLINGS, wRc, m_view, 223)) //test codelist
+	{
+		m_status &= ~(S_CHILD | S_FIND);
+		delete m_child;
+	}	
 }
 
 void CClient::History(bool apply)
 {
-m_slog.Format("[WIZARD][COMBO][%s]<%d> apply=[%d]", __FUNCTION__, __LINE__, apply);
-OutputDebugString(m_slog);
-
 	if (m_status & (S_CHILD|S_FIND))
 	{
 		CString	text{};
@@ -2559,35 +2497,18 @@ OutputDebugString(m_slog);
 				}
 			}
 		}
-	
 		delete m_child;
-		if (m_pPrtWnd)
-		{
-		//	m_pPrtWnd->DestroyWindow();
-			m_status &= ~(S_CHILD | S_FIND);
-			delete m_pPrtWnd;
-			m_pPrtWnd = nullptr;
-		}
 	}
 }
 
 void CClient::SelfHistory(CfmBase* form)
 {
 	CString	text{};
-	//test
-	m_pfmBase = form;
 
 	form->ReadData(text);		// self-history mode reset
 	text.TrimRight();
-
-	m_slog.Format("[WIZARD][COMBO][%s]<%d> text=[%s]", __FUNCTION__, __LINE__, text);
-	OutputDebugString(m_slog);
-
-
 	if (text.IsEmpty())
 	{
-		m_slog.Format("[WIZARD][combo][%s]<%d> beforehistory", __FUNCTION__, __LINE__);
-		OutputDebugString(m_slog);
 		History(false);
 		return;
 	}
@@ -2610,11 +2531,7 @@ void CClient::SelfHistory(CfmBase* form)
 
 	m_cbox = m_current;
 	History(form, RC_SEARCH);
-#ifdef DF_POPUP
-	((CPopHistory*)m_child)->FindItem(text, true);
-#else
-	((CHistory*)m_child)->FindItem(text, true);
-#endif
+	((CHistory *)m_child)->FindItem(text, true);
 }
 
 void CClient::AutoHistory(CfmBase* form)
@@ -2638,8 +2555,6 @@ void CClient::AutoHistory(CfmBase* form)
 			return;
 		}
 	}
-	m_slog.Format("[WIZARD][combo][%s]<%d> beforehistory", __FUNCTION__, __LINE__);
-	OutputDebugString(m_slog);
 	History(false);
 }
 
@@ -3689,55 +3604,24 @@ void CClient::EditColumns(CScreen* screen, CfmBase* form)
 	if (form->m_form->vals[0] != NOVALUE)
 	{
 		int	index, idx;
-		CString	text, defs, tmps, tmpfile;
+		CString	text, defs, tmps;
 		char	twb[256]{};
 
 		text.Format(_T("%s\\%s\\grid.ini"), m_guard->m_root.GetString(), TABDIR);
 		defs.Format(_T("%s$%s"), LPCTSTR(CString(screen->m_mapH->mapN, L_MAPN)), (char *)form->m_form->name);
-		
-		m_slog.Format("[axisdialog] [맵번호$폼이름]   defs=[%s]", defs);
-		OutputDebugString(m_slog);
-		
 		GetPrivateProfileString("GRID", defs, "", twb, sizeof(twb), text);
 		defs = twb;
-		tmpfile = text;
-
-		m_slog.Format("[axisdialog]");
-		OutputDebugString(m_slog);
-		m_slog.Format("[axisdialog][%s]<%d>   [%s]읽어서 defs=[%s]", __FUNCTION__,  __LINE__, tmpfile, defs);
-		OutputDebugString(m_slog);
 
 		text.Format(_T("%s$%s"), LPCTSTR(CString(screen->m_mapH->mapN, L_MAPN)), (char *)form->m_form->name);
-
-		m_slog.Format("[axisdialog] [맵번호$폼이름]   text=[%s]", text);
-		OutputDebugString(m_slog);
-
 		GetPrivateProfileString("GRID", text, "", twb, sizeof(twb), m_guard->m_modals);
-
-		m_slog.Format("[axisdialog] [%s] [파일=%s]   읽어서 twb=[%s]", text, m_guard->m_modals, twb);
-		OutputDebugString(m_slog);
-
-
 		tmps = twb;
 		tmps.Trim();
 		index = tmps.GetLength();
-
-		m_slog.Format("[axisdialog] 위에 파일[%s]  읽은값의 길이 index=%d  ", m_guard->m_modals, index);
-		OutputDebugString(m_slog);
-
-
 		if (index == 0)
 		{
 			tmps  = defs;
 			index = tmps.GetLength();
-
-			m_slog.Format("[axisdialog] 길이가 0이 다른파일 읽어서[%s]  읽은값의 길이 index=%d  ", 
-				tmpfile, index);
-			OutputDebugString(m_slog);
 		}
-
-		m_slog.Format("[axisdialog] [맵번호$폼이름]   text=[%s]", text);
-		OutputDebugString(m_slog);
 
 		text.Empty();
 		struct _cellR*	cell = (struct _cellR *) &screen->m_cellR[form->m_form->vals[0]];
@@ -3750,14 +3634,14 @@ void CClient::EditColumns(CScreen* screen, CfmBase* form)
 			text += (cell[idx].head  == NOVALUE) ? "HEAD ?" : (char *)cell[idx].head;
 			text += '|';
 
-			if (cell[idx].properties & PR_VISIBLE && index == 0)  
-			{   //grid.ini ,  modal.ini  두파일 해당그리드 관련 내용없다
+			if (cell[idx].properties & PR_VISIBLE && index == 0)
+			{
 				tmps += (char *)cell[idx].name;
 				tmps += '|';
 			}
 		}
 
-		if (defs.IsEmpty())  //def는 grid.ini 읽어서 나온값
+		if (defs.IsEmpty())
 		{
 			for (idx = form->m_form->type; idx < nCols; idx++)
 			{
@@ -3768,11 +3652,6 @@ void CClient::EditColumns(CScreen* screen, CfmBase* form)
 				defs += '|';
 			}
 		}
-
-		//대략 grid.ini,  modal.ini 파일을 참조하는데...각각 tmps, defs 변수로 저장된다.
-		//파일 둘다 내용이 없으면 빌더에서 visible true 한 헤더들만 찾아서 두 변수에 같게 저장되는거 같다
-		m_slog.Format("[axisdialog] ");
-		OutputDebugString(m_slog);
 
 		if (m_guard->Modal(columnED, text, tmps, defs))
 		{
@@ -3844,7 +3723,7 @@ int CClient::GetKey(int skey, int ukey, int index)
 	key = MAKELONG(MAKEWORD(skey, ukey), index);
 
 m_slog.Format("[mapkey] skey=[%d] ukey=[%d] index=[%d] key=[%d] ", skey, ukey, index, key);
-LOG_OUTP(3, "[axwizard]", __FUNCTION__, m_slog);
+LOG_OUTP(3, "axwizard", __FUNCTION__, m_slog);
 
 	for (int ii = 0xfe; ii >= 0; ii--)
 	{
@@ -3853,7 +3732,7 @@ LOG_OUTP(3, "[axwizard]", __FUNCTION__, m_slog);
 			if (key == keyx)
 			{
 m_slog.Format("[mapkey] key == keyx  cnt=[%d]  key=[%d]   ii=[%d]", m_keys.GetCount(), key, ii);
-LOG_OUTP(3, "[axwizard]", __FUNCTION__, m_slog);
+LOG_OUTP(3, "axwizard", __FUNCTION__, m_slog);
 				return ii;
 			}
 			continue;
@@ -3862,7 +3741,7 @@ LOG_OUTP(3, "[axwizard]", __FUNCTION__, m_slog);
 		{
 			m_keys.SetAt(ii, key);
 m_slog.Format("[mapkey]   cnt=[%d]  key=[%d]  ii=[%d]", m_keys.GetCount(), key, ii);
-LOG_OUTP(3, "[axwizard]", __FUNCTION__, m_slog);
+LOG_OUTP(3, "axwizard", __FUNCTION__, m_slog);
 			return ii;
 		}
 	}

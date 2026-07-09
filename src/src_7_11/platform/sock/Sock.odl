@@ -1,0 +1,78 @@
+// Sock.odl : type library source for ActiveX Control project.
+
+// This file will be processed by the Make Type Library (mktyplib) tool to
+// produce the type library (Sock.tlb) that will become a resource in
+// Sock.ocx.
+
+#include <olectl.h>
+#include <idispids.h>
+
+
+[ //uuid(1FE24EF3-2A3D-4BC7-B22A-BC7791F60E86), version(1.0),
+  uuid(4240D683-6BA4-4626-B0D9-27E13ACBE944), version(1.0),
+  helpfile("Sock.hlp"),
+  helpstring("Sock ActiveX Control module"),
+  control ]
+library SOCKLib
+{
+	importlib(STDOLE_TLB);
+	importlib(STDTYPE_TLB);
+
+	//  Primary dispatch interface for CSockCtrl
+
+	[ uuid(425B9540-5811-4FF2-B054-417D8408BAA5),
+	  helpstring("Dispatch interface for AXIS Sock Control"), hidden ]
+	dispinterface _DSock
+	{
+		properties:
+			// NOTE - ClassWizard will maintain property information here.
+			//    Use extreme caution when editing this section.
+			//{{AFX_ODL_PROP(CSockCtrl)
+			//}}AFX_ODL_PROP
+
+		methods:
+			// NOTE - ClassWizard will maintain method information here.
+			//    Use extreme caution when editing this section.
+			//{{AFX_ODL_METHOD(CSockCtrl)
+			[id(1)] boolean OpenSock(BSTR home, BSTR ip, long port);
+			[id(2)] void CloseSock();
+			[id(3)] boolean WriteStream(LONG_PTR pBytes, long nBytes);
+			[id(4)] boolean OpenDgram(long port);
+			[id(5)] void CloseDgram();
+			[id(6)] boolean WriteDgram(BSTR ip, LONG_PTR pBytes, long nBytes, bool route);
+			[id(7)] boolean StartAxis(LONG_PTR key, long mode);
+			[id(8)] long GetEnum(LONG_PTR pBytes, long nBytes, long mode);
+			//}}AFX_ODL_METHOD
+	};
+
+	//  Event dispatch interface for CSockCtrl
+
+	[ uuid(DF8B333E-3E0B-4CCD-940D-328E22D419F4),
+	  helpstring("Event interface for AXIS Sock Control") ]
+	dispinterface _DSockEvents
+	{
+		properties:
+			//  Event interface has no properties
+
+		methods:
+			// NOTE - ClassWizard will maintain event information here.
+			//    Use extreme caution when editing this section.
+			//{{AFX_ODL_EVENT(CSockCtrl)
+			[id(1)] void OnStream(long type, LONG_PTR pBytes, long nBytes);
+			//}}AFX_ODL_EVENT
+	};
+
+	//  Class information for CSockCtrl
+
+	[ uuid(C8D8A27C-B3E4-4998-97B6-2EFF9567B3F9),
+	  helpstring("AXIS Sock Control"), control ]
+	coclass Sock
+	{
+		[default] dispinterface _DSock;
+		[default, source] dispinterface _DSockEvents;
+	};
+
+
+	//{{AFX_APPEND_ODL}}
+	//}}AFX_APPEND_ODL}}
+};
