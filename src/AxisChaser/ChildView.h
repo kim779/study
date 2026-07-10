@@ -107,6 +107,12 @@ protected:
 	int		m_nRangeFrom;
 	int		m_nRangeTo;
 	BOOL		m_bRangeOn;
+
+	CEdit		m_editLogFile;
+	CButton		m_btnLogOpen;
+	CButton		m_chkLogEnable;
+	CString		m_logFilePath;
+	BOOL		m_bLogEnable;
 // Operations
 public:
 
@@ -125,7 +131,7 @@ public:
 	void	Init();
 	void	CopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct) ;
 
-	void	addTrace(CString dat, int kind = K_NORMAL);
+	void	addTrace(CString dat, int kind = K_NORMAL, CString boldSub = _T(""));
 	CString	parse(CString &dat, CString separate);
 	void	parseData(CString dat, CMapStringToString& ary, CStringArray& aryS);
 	void	ReportParse(CString dat, CMapStringToString& ary, CStringArray& aryS);
@@ -136,6 +142,7 @@ public:
 	BOOL	SearchUP(CString FindName, bool bMatchCase, bool bMatchWholeWord);
 	void	MovePos(CHARRANGE cr);
 	void	loadOptions();
+	void	WriteLogFile(const CString& text);
 	// Generated message map functions
 protected:
 	//{{AFX_MSG(CChildView)
@@ -175,6 +182,9 @@ protected:
 	afx_msg void OnChangeEditRangeFrom();
 	afx_msg void OnChangeEditRangeTo();
 	afx_msg void OnClickedChkRange();
+	afx_msg void OnChangeEditLogFile();
+	afx_msg void OnClickedBtnLogOpen();
+	afx_msg void OnClickedChkLogEnable();
 	//}}AFX_MSG
 	afx_msg LRESULT OnFindDialogMessage(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT	OnReceive(WPARAM wParam, LPARAM lParam);

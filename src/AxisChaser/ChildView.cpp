@@ -9,6 +9,8 @@
 #include "FontSetDlg.h"
 #include "Options.h"
 
+#include <shellapi.h>
+
 #include "../H/axisfire.h"
 #include "../H/axis.h"
 
@@ -135,6 +137,9 @@ BEGIN_MESSAGE_MAP(CChildView,CWnd )
 	ON_EN_CHANGE(IDC_EDIT_RANGE_FROM, OnChangeEditRangeFrom)
 	ON_EN_CHANGE(IDC_EDIT_RANGE_TO, OnChangeEditRangeTo)
 	ON_BN_CLICKED(IDC_CHK_RANGE, OnClickedChkRange)
+	ON_EN_CHANGE(IDC_EDIT_LOGFILE, OnChangeEditLogFile)
+	ON_BN_CLICKED(IDC_BTN_LOGOPEN, OnClickedBtnLogOpen)
+	ON_BN_CLICKED(IDC_CHK_LOGENABLE, OnClickedChkLogEnable)
 	//}}AFX_MSG_MAP
 	ON_MESSAGE(WM_RECEIVE, OnReceive)
 	ON_WM_TIMER()
@@ -174,6 +179,25 @@ void CChildView::OnChangeEditRangeTo()
 void CChildView::OnClickedChkRange()
 {
 	m_bRangeOn = (m_chkRange.GetCheck() == BST_CHECKED);
+}
+
+void CChildView::OnChangeEditLogFile()
+{
+	m_editLogFile.GetWindowText(m_logFilePath);
+}
+
+void CChildView::OnClickedChkLogEnable()
+{
+	m_bLogEnable = (m_chkLogEnable.GetCheck() == BST_CHECKED);
+}
+
+void CChildView::OnClickedBtnLogOpen()
+{
+	if (m_logFilePath.IsEmpty())	return;
+
+	HINSTANCE h = ShellExecute(m_hWnd, "open", m_logFilePath, NULL, NULL, SW_SHOWNORMAL);
+	if ((INT_PTR)h <= 32)
+		::MessageBox(m_hWnd, "Cannot open file: " + m_logFilePath, "Axis Chaser", MB_ICONWARNING);
 }
 
 BOOL CChildView::PreCreateWindow(CREATESTRUCT& cs) 
@@ -316,6 +340,28 @@ int CChildView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	m_nRangeTo   = INT_MAX;
 	m_bRangeOn   = FALSE;
 
+	CRect rcLogFile(10, 62, 380, 84);
+	m_editLogFile.Create(WS_CHILD | WS_VISIBLE | WS_BORDER | ES_AUTOHSCROLL,
+		rcLogFile, this, IDC_EDIT_LOGFILE);
+
+	CRect rcLogOpen(384, 62, 444, 84);
+	m_btnLogOpen.Create(_T("OPEN"), WS_CHILD | WS_VISIBLE, rcLogOpen, this, IDC_BTN_LOGOPEN);
+
+	CRect rcLogEnable(448, 62, 580, 84);
+	m_chkLogEnable.Create(_T("Log SND/RCV"),
+		WS_CHILD | WS_VISIBLE | BS_AUTOCHECKBOX,
+		rcLogEnable, this, IDC_CHK_LOGENABLE);
+
+	m_editLogFile.SetFont(GetFont());
+	m_btnLogOpen.SetFont(GetFont());
+	m_chkLogEnable.SetFont(GetFont());
+
+	char logBuf[512];
+	GetCurrentDirectory(sizeof(logBuf), logBuf);
+	m_logFilePath.Format("%s\\Send_Rev.ini", logBuf);
+	m_editLogFile.SetWindowText(m_logFilePath);
+
+	m_bLogEnable = FALSE;
 
 	SetTimer(TM_STAYONTOP, 1000, nullptr);
 
@@ -351,7 +397,8 @@ void CChildView::OnSize(UINT nType, int cx, int cy)
 	const int ctrlHeight = 22;
 	const int row1Y = margin;
 	const int row2Y = margin + ctrlHeight + margin;
-	const int traceTop = row2Y + ctrlHeight + margin;
+	const int row3Y = row2Y + ctrlHeight + margin;
+	const int traceTop = row3Y + ctrlHeight + margin;
 
 	if (m_editKeyword.GetSafeHwnd())
 		m_editKeyword.MoveWindow(margin, row1Y, editWidth, ctrlHeight);
@@ -366,6 +413,15 @@ void CChildView::OnSize(UINT nType, int cx, int cy)
 		m_editRangeTo.MoveWindow(margin + 70 + 2 + 14 + 2, row2Y, 70, ctrlHeight);
 	if (m_chkRange.GetSafeHwnd())
 		m_chkRange.MoveWindow(margin + 70 + 2 + 14 + 2 + 70 + margin, row2Y, 110, ctrlHeight);
+
+	const int logEditWidth = 370;
+	const int logBtnWidth = 60;
+	if (m_editLogFile.GetSafeHwnd())
+		m_editLogFile.MoveWindow(margin, row3Y, logEditWidth, ctrlHeight);
+	if (m_btnLogOpen.GetSafeHwnd())
+		m_btnLogOpen.MoveWindow(margin + logEditWidth + margin, row3Y, logBtnWidth, ctrlHeight);
+	if (m_chkLogEnable.GetSafeHwnd())
+		m_chkLogEnable.MoveWindow(margin + logEditWidth + margin + logBtnWidth + margin, row3Y, 130, ctrlHeight);
 
 	if (m_trace.GetSafeHwnd())
 	{
@@ -420,6 +476,7 @@ void CChildView::OnRCVData(WPARAM wParam, LPARAM lParam)
 	{
 		if (!m_bSNDRCV)	break;
 
+		CString trxCode;
 		if (len > L_axisH)
 		{
 			struct _axisH* axisH = (struct _axisH*)dat;
@@ -433,6 +490,11 @@ void CChildView::OnRCVData(WPARAM wParam, LPARAM lParam)
 					len = L_axisH + chainL;
 				}
 			}
+
+			trxCode = CString(axisH->trxC, sizeof(axisH->trxC));
+			int nul = trxCode.Find('\0');
+			if (nul >= 0)	trxCode = trxCode.Left(nul);
+			trxCode.TrimRight(' ');
 		}
 
 		if (HIWORD(wParam) == x_SNDs && !m_options.send)	break;
@@ -593,7 +655,7 @@ void CChildView::OnRCVData(WPARAM wParam, LPARAM lParam)
 				string += sDat;
 		}
 
-		addTrace(string, K_SNDRCV);
+		addTrace(string, K_SNDRCV, trxCode);
 	}
 		break;
 	case x_RTMs:
@@ -711,7 +773,7 @@ void CChildView::OnRCVData(WPARAM wParam, LPARAM lParam)
 	}
 }
 
-void CChildView::addTrace(CString dat, int kind)
+void CChildView::addTrace(CString dat, int kind, CString boldSub)
 {
 	CString slog;
 	CString stmp;
@@ -728,6 +790,9 @@ void CChildView::addTrace(CString dat, int kind)
 			return;
 	}
 
+	if (m_bLogEnable && (kind == K_SNDRCV || kind == K_REPORT))
+		WriteLogFile(dat);
+
 	if (m_findDlg)
 		m_findDlg->SetFocus();
 //	else	SetFocus();
@@ -736,12 +801,14 @@ void CChildView::addTrace(CString dat, int kind)
 	m_trace.ReplaceSel(dat);
 #else
 	CRTFBuilder	c;
+	bool	baseBold;
 
 	if (m_bSameFont)
 	{
 		c << font(m_fName[IDX_ALL]) << size(m_fSize[IDX_ALL]);
 
-		if (m_bBold[IDX_ALL])	c << bold;
+		baseBold = (m_bBold[IDX_ALL] != FALSE);
+		if (baseBold)	c << bold;
 		if (m_bItalic[IDX_ALL])	c << italic;
 		if (m_bStrike[IDX_ALL])	c << strike;
 		if (m_bUline[IDX_ALL])	c << underline;
@@ -757,7 +824,8 @@ void CChildView::addTrace(CString dat, int kind)
 		case K_REPORT:	c << font(m_fName[IDX_RPT]) << size(m_fSize[IDX_RPT]);	break;
 		}
 
-		if (m_bBold[kind])	c << bold;
+		baseBold = (m_bBold[kind] != FALSE);
+		if (baseBold)	c << bold;
 		if (m_bItalic[kind])	c << italic;
 		if (m_bStrike[kind])	c << strike;
 		if (m_bUline[kind])	c << underline;
@@ -777,7 +845,18 @@ void CChildView::addTrace(CString dat, int kind)
 		}
 	}
 
-	c << dat >> m_trace;
+	int boldPos = (baseBold || boldSub.IsEmpty()) ? -1 : dat.Find(boldSub);
+	if (boldPos >= 0)
+	{
+		CString pre  = dat.Left(boldPos);
+		CString post = dat.Mid(boldPos + boldSub.GetLength());
+
+		c << pre << bold << boldSub << bold(false) << post >> m_trace;
+	}
+	else
+	{
+		c << dat >> m_trace;
+	}
 #endif
 	if (m_bNOSCROLL)	return;
 	m_trace.SendMessage(WM_VSCROLL, SB_BOTTOM);
@@ -927,6 +1006,17 @@ void CChildView::WriteFile(char* pBytes, int nBytes)
 		Dfile.Write(pBytes, nBytes);
 	}
 	Dfile.Close();
+}
+
+void CChildView::WriteLogFile(const CString& text)
+{
+	CFile file;
+	if (!file.Open(m_logFilePath, CFile::modeCreate | CFile::modeWrite | CFile::modeNoTruncate))
+		return;
+
+	file.SeekToEnd();
+	file.Write((LPCSTR)text, text.GetLength());
+	file.Close();
 }
 
 void CChildView::CopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct)

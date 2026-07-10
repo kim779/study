@@ -92,6 +92,7 @@ protected:
 	afx_msg BOOL OnMouseWheel(UINT nFlags, short zDelta, CPoint pt);
 	afx_msg void OnKillFocus(CWnd* pNewWnd);
 	afx_msg void OnRButtonDown(UINT nFlags, CPoint point);
+	afx_msg void OnEditTab();
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 

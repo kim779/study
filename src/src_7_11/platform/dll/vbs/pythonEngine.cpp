@@ -356,8 +356,16 @@ void CPythonEngine::Initialize(CString maps)
 
     initAxisTypes();
 
-    if (m_globals)
+    if (m_globals) {
         Py_DECREF(m_globals);
+        // Module globals form a reference cycle with the def'd functions
+        // (each function keeps __globals__ alive), so a plain DECREF never
+        // drops the refcount to zero - it just becomes GC-only garbage.
+        // Collect now, while the COM objects AddObject() wrapped (Screen,
+        // System, ...) are still valid, instead of leaving it to a later,
+        // unrelated GC pass that may run after those objects are destroyed.
+        PyGC_Collect();
+    }
 
     m_globals = PyDict_New();
     PyDict_SetItemString(m_globals, "__builtins__", PyEval_GetBuiltins());
@@ -433,6 +441,10 @@ bool CPythonEngine::UnloadScript()
     if (m_globals) {
         Py_DECREF(m_globals);
         m_globals = NULL;
+        // See comment in Initialize(): break the globals/functions
+        // reference cycle immediately, before the caller (CScreen dtor)
+        // deletes the COM objects these globals wrap (Screen, System, ...).
+        PyGC_Collect();
     }
     m_module = NULL;
     return true;
@@ -614,6 +626,37 @@ void CPythonEngine::fetchError()
                 }
             }
             Py_XDECREF(textObj);
+        }
+
+        // Runtime errors (AttributeError, TypeError, ...) don't have .text, but
+        // do have a traceback with line numbers - format it via the traceback module.
+        if (ptb) {
+            PyObject* tbModule = PyImport_ImportModule("traceback");
+            if (tbModule) {
+                PyObject* formatFunc = PyObject_GetAttrString(tbModule, "format_exception");
+                if (formatFunc) {
+                    PyObject* list = PyObject_CallFunctionObjArgs(formatFunc, ptype, pvalue, ptb, NULL);
+                    if (list) {
+                        PyObject* sep = PyUnicode_FromString("");
+                        PyObject* joined = PyUnicode_Join(sep, list);
+                        if (joined) {
+                            Py_ssize_t jlen;
+                            wchar_t* jws = PyUnicode_AsWideCharString(joined, &jlen);
+                            if (jws) {
+                                CString tbText;
+                                tbText.Format("%S", jws);
+                                msg += "\r\n\r\n" + tbText;
+                                PyMem_Free(jws);
+                            }
+                            Py_DECREF(joined);
+                        }
+                        Py_DECREF(sep);
+                        Py_DECREF(list);
+                    }
+                    Py_DECREF(formatFunc);
+                }
+                Py_DECREF(tbModule);
+            }
         }
     }
     if (msg.IsEmpty())

@@ -2,7 +2,7 @@ GLOBAL DIVISION
 {
 
 MAPNAME(IB12010B)
-MAPSIZE(36, 355)
+MAPSIZE(32, 355)
 PYTHON(1)
 VERSION(000)
 MAPKIND(NORMAL)
@@ -10,7 +10,7 @@ MAPGROUP(0)
 MAPDESC("[주식]총예탁자산")
 MAPPUBLIC(";")
 FONT("굴림체", 9, NORMAL)
-OPTIONS(ENCODE|CR2TAB)
+OPTIONS(CR2TAB)
 TITLE("총예탁자산")
 TOPATH(AXIS)
 METHOD(FORM)
@@ -734,8 +734,8 @@ def InitOption():
     feeGubn = Screen.Object("parent.cbo_tax").Data()
 
     if feeGubn == 1:
-        medoFee = 1
-        medoTax = 1
+        medoFee = "1"
+        medoTax = "1"
 
     mmd = Screen.Object("parent.cbo_mmd").Data()
     if mmd == "0":
@@ -768,7 +768,7 @@ def InitOption():
     else:
         feePro = strTemp
 
-    if checha.strip() == "" or len(checha.Replace("0", "").strip()) == 0:
+    if checha.strip() == "" or len(checha.replace("0", "").strip()) == "0":
         checha = "+000000000000000"
     elif len(checha.strip()) == 15:
         checha = "+" + checha
@@ -791,9 +791,9 @@ def InitOption():
     if credit.strip() == "":
         credit = "0"
 
-    # 수수료 미적용시 매수, 매도, 매도제세금을 0으로 보낸다.
+# 수수료 미적용시 매수, 매도, 매도제세금을 0으로 보낸다.
     if feeGubn.strip() == "0":
-        mesuFee = medoFee = medoTax = 0
+        mesuFee = medoFee = medoTax = "0"
 
     zD2balBaseQryTp.Data = jango
     zBalCreTp.Data = bond
@@ -811,8 +811,7 @@ def InitOption():
     zOtptTp6.Data = credit
     zOtptTp7.Data = credit
 
-
-def send_f():
+def Send_f():
     global gridPos
     Screen.ClearAll(0, 2)
     gridPos = 1
@@ -1039,7 +1038,7 @@ _AW_ENDSCRIPT_AW_
 
 _AW_SCRIPT_AW_(PANEL160)
 _AW_ONCLICK_AW_
-Screen.Send(0)
+Send_f()
 _AW_ONENDSUB_AW_
 _AW_ENDSCRIPT_AW_
 

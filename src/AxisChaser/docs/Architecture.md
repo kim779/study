@@ -1,0 +1,103 @@
+# Architecture
+
+- 생성일: 2026-07-10
+- 목적: 프로젝트의 클래스/모듈 구조, 계층, 의존 관계를 기록한다.
+
+## 개요
+
+AxisChaser는 MFC 기반 Windows 실행 파일(단일 SDI 스타일, Doc/View 미사용 - CFrameWnd
++ CWnd 조합)로, AXIS 트레이딩 워크스테이션 프로세스가 주고받는 송수신 데이터·RTM(실시간)
+데이터·시스템 트레이스·리포트 데이터를 다른 프로세스로부터 `WM_COPYDATA`로 전달받아
+헥사덤프/텍스트 형태로 색상·폰트를 입혀 RichEdit 컨트롤에 표시하는 **트레이스 뷰어(디버깅
+도구)**다. 이름의 "Chaser"는 전광판 이펙트가 아니라 AXIS 통신 데이터를 "쫓아가며(추적)"
+보여주는 트레이스 도구를 의미하는 것으로 확인됨.
+
+## 클래스 구조
+
+| 클래스 | 베이스 | 역할 |
+|---|---|---|
+| `CAxisChaserApp` | `CWinApp` | 앱 진입점. 단일 인스턴스 뮤텍스(`IsFirstInstance`), 명령행 파싱, 레지스트리 설정 관리 |
+| `CCommParam` | `CCommandLineInfo` | 명령행 인자 파싱(`-c`: 클래스명, `-r`: 대상 레지스트리 키) |
+| `CMainFrame` | `CFrameWnd` | 메인 프레임. 툴바(`CToolBar24`) + `CChildView` 호스팅, 창 위치/크기 저장 |
+| `CChildView` | `CWnd` | 핵심 뷰. 트레이스 표시, 필터/검색 UI, 데이터 파싱·큐잉 |
+| `CQue` | `CObject` | 수신 데이터 1건을 담는 큐 항목(`m_flag`, `m_nBytes`, `m_pBytes`) |
+| `COptions` | `CDialog` | 옵션 다이얼로그(표시 대상 코드 목록 관리, `chaser.ini` 연동) |
+| `CFontSetDlg` | `CDialog` | 카테고리별(전체/SND·RCV/RTM/SYS/REPORT) 폰트 설정 |
+| `CTextColorDlg` | `CDialog` | 카테고리별 텍스트 색상 설정 |
+| `CColor` | (없음) | RGB ↔ HLS 색상 변환 유틸리티 (독일어 주석, 외부 유틸 코드로 추정) |
+| `CEnBitmap` | `CBitmap` | 32비트 비트맵 로드/그레이스케일/비활성화 이미지 가공 |
+| `C32BitImageProcessor` 및 파생(`CImageNormal`,`CImageGrayer`,`CImageHigh`) | - | 픽셀 단위 이미지 프로세싱 전략 (Strategy 패턴 후보) |
+| `CToolBar24` | `CToolBar` | 24비트 컬러 툴바 이미지 처리(`CEnBitmap` 활용) |
+| `CRichEditCtrlEx`, `CRTFBuilder` 등 | `CRichEditCtrl` 등 | (RichLib 서브프로젝트) RTF 스트림 빌더 — `<<`, `>>` 연산자로 색상/폰트 서식 문자열 구성 |
+
+## 프로세스 간 통신(IPC) 및 동시성 구조
+
+- 실제 소켓/네트워크 코드는 AxisChaser 내부에 없음. 데이터 원본은 별도 프로세스(AXIS
+  워크스테이션 본체)이며, `WM_COPYDATA` 메시지로 전달받는다(`CMainFrame::OnCopyData` →
+  `CChildView::CopyData`).
+- 별도 워커 스레드(`CreateThread`/`AfxBeginThread`)는 사용하지 않는다. 대신 UI 스레드
+  내에서 **큐 + 커스텀 메시지 펌핑**으로 비동기 처리를 흉내낸다:
+  1. `CopyData()`가 수신 바이트를 `CQue`로 감싸 `m_que`(`CObArray`)에 추가 (RTM 데이터는
+     큐 200건 초과 시 드롭)
+  2. `CCriticalSection m_sync`로 큐 추가/제거 구간만 보호 (진짜 멀티스레드 경쟁이 아니라
+     안전을 위한 방어적 락으로 보임 — 전부 UI 스레드에서 실행되는 듯하나, `PostMessage`
+     비동기 처리와 결합되어 재진입 가능성 대비용으로 추정)
+  3. `PostMessage(WM_RECEIVE)` → `CChildView::OnReceive`가 한 번에 최대 20건(`MAX_PER_CALL`)
+     을 꺼내 `OnRCVData()` 호출, 큐에 남은 항목이 있으면 다시 `PostMessage`로 재귀 예약
+     (UI 응답성 유지를 위한 배치 처리)
+- `SetTimer(TM_STAYONTOP, 1000, ...)` — 시작 시 1초 뒤 "항상 위" 상태를 자동 해제하는
+  1회성 타이머.
+
+## 메시지/데이터 흐름
+
+```
+[AXIS 프로세스] --WM_COPYDATA--> CMainFrame::OnCopyData
+                                      │
+                                      ▼
+                          CChildView::CopyData (큐 적재, m_sync로 보호)
+                                      │ PostMessage(WM_RECEIVE)
+                                      ▼
+                          CChildView::OnReceive (최대 20건 배치 처리)
+                                      │
+                                      ▼
+                          CChildView::OnRCVData (데이터 종류별 분기)
+              x_SNDs/x_RCVs(송수신) ─┬─ x_RTMs(실시간) ─┬─ x_STRs(시스템) ─┬─ x_CONs(리포트)
+                                      │                  │                 │
+                                      ▼                  ▼                 ▼
+                                  hex dump          parseData()      ReportParse()
+                                      └──────────────────┴─────────────────┘
+                                                    ▼
+                                          CChildView::addTrace()
+                                     (필터/키워드/바이트범위 적용 후
+                                      CRTFBuilder로 색상·폰트 서식 구성)
+                                                    ▼
+                                        CRichEditCtrlEx (m_trace) 출력
+```
+
+- `x_SNDs`/`x_RCVs`: `../H/axis.h`의 `_axisH` 헤더 구조체를 해석, `statENC` 플래그가
+  설정된 경우 `Xecure()`로 복호화를 시도하나, **현재 `Xecure()` 구현은 주석 처리되어
+  `false`만 반환**(ActiveX 컨트롤 `AxisXecure.XecureCtrl.IBK2019` 연동 코드 전체가
+  `CChildView::OnCreate` 내부에 주석 처리된 상태 — 죽은 코드, 삭제하지 않고 확인 필요로
+  남겨둠).
+- `x_RTMs`/`x_CONs`: 탭/개행 구분 텍스트를 `parseData()`/`ReportParse()`로 키-값 파싱 후
+  포맷팅.
+
+## Include 관계 (핵심)
+
+- `ChildView.cpp`가 `../H/axisfire.h`, `../H/axis.h` — 워크스페이스 루트의 AXIS 공용
+  프로토콜 헤더(`d:\src\IBKS\src\H\`)에 의존. 이 헤더들은 AxisChaser 트리 밖에 있음.
+- `ChildView.h`가 `RichLib/RichEditCtrlEx.h`를 include — RichLib은 별도 `.vcxproj`를
+  가진 서브 프로젝트이며, 빌드 산출물(`RichLib.lib`)을 링크하는 구조(자세한 내용은
+  [Dependency.md](Dependency.md) 참고).
+
+## 리팩터링 후보 (추정 — 근거 명시)
+
+- `CChildView::OnRCVData` (`ChildView.cpp:379`) — 약 330줄, 데이터 종류 4가지(SND/RCV,
+  RTM, SYSTRACE, REPORT)를 하나의 switch 안에서 모두 처리. SRP 위반 후보, 종류별 함수로
+  분리 여지 있음.
+- `OnCreate`(`ChildView.cpp:198`) 내 Xecure ActiveX 등록/생성 코드 전체(약 60줄)가
+  주석 처리된 채 남아있음 — 삭제하지 않고 사용자 확인 필요로 표시.
+- `#ifdef DF_MBCS` 분기(`ChildView.cpp:499-581`)가 `RichEditCtrlEx.h`에서 항상
+  `#define DF_MBCS`로 고정되어 있어, `#else` 분기는 사실상 죽은 코드로 추정.
+- `CColor` 클래스(독일어 주석, 1999년 작성)는 AxisChaser 내에서 실제 사용처가 코드상
+  확인되지 않음 — 별도 유틸리티를 가져다 쓴 것으로 보이며 사용 여부 확인 필요.

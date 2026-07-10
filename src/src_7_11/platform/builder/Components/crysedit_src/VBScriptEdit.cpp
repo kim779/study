@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "VBScriptEdit.h"
+#include "editcmd.h"
 
 #include "../../mainvar.h"
 #include "../../keywords.h"
@@ -24,6 +25,7 @@ BEGIN_MESSAGE_MAP(CVBScriptEdit, CCrystalEditView)
 	ON_WM_MOUSEWHEEL()
 	ON_WM_KILLFOCUS()
 	ON_WM_RBUTTONDOWN()
+	ON_COMMAND(ID_EDIT_TAB, OnEditTab)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
@@ -91,11 +93,11 @@ int CVBScriptEdit::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	m_lf.lfClipPrecision  = CLIP_DEFAULT_PRECIS;
 	m_lf.lfQuality        = DEFAULT_QUALITY;
 	m_lf.lfPitchAndFamily = DEFAULT_PITCH | FF_DONTCARE;
-	strcpy_s(m_lf.lfFaceName, _T("±¼¸²Ã¼"));
+	strcpy_s(m_lf.lfFaceName, _T("ï¿½ï¿½ï¿½ï¿½Ã¼"));
 
 	CDC *pDC = GetDC();
 	FONTENUMPROC pFunc = (FONTENUMPROC) EnumFontFamProc;
-	if (EnumFontFamilies(pDC->m_hDC, "±¼¸²Ã¼", pFunc, 2) != 2)
+	if (EnumFontFamilies(pDC->m_hDC, "ï¿½ï¿½ï¿½ï¿½Ã¼", pFunc, 2) != 2)
 	{
 		m_lf.lfHeight         = 10;
 		m_lf.lfCharSet        = ANSI_CHARSET;
@@ -115,6 +117,99 @@ int CVBScriptEdit::OnCreate(LPCREATESTRUCT lpCreateStruct)
 CCrystalTextBuffer * CVBScriptEdit::LocateTextBuffer()
 {
 	return &m_buf;
+}
+
+// Python indentation is syntactic, so the Tab key must insert spaces here
+// instead of a literal tab char (mixing tabs/spaces breaks Python parsing).
+// VBScript mode is untouched - it still falls through to the base tab-char behavior.
+void CVBScriptEdit::OnEditTab()
+{
+	if (!m_bPythonMode)
+	{
+		CCrystalEditView::OnEditTab();
+		return;
+	}
+
+	if (! QueryEditable() || m_pTextBuffer == NULL)
+		return;
+
+	BOOL bTabify = FALSE;
+	CPoint ptSelStart, ptSelEnd;
+	if (IsSelection())
+	{
+		GetSelection(ptSelStart, ptSelEnd);
+		bTabify = ptSelStart.y != ptSelEnd.y;
+	}
+
+	static const TCHAR pszText[] = _T("    ");
+
+	if (bTabify)
+	{
+		m_pTextBuffer->BeginUndoGroup();
+
+		int nStartLine = ptSelStart.y;
+		int nEndLine = ptSelEnd.y;
+		ptSelStart.x = 0;
+		if (ptSelEnd.x > 0)
+		{
+			if (ptSelEnd.y == GetLineCount() - 1)
+			{
+				ptSelEnd.x = GetLineLength(ptSelEnd.y);
+			}
+			else
+			{
+				ptSelEnd.x = 0;
+				ptSelEnd.y ++;
+			}
+		}
+		else
+			nEndLine --;
+		SetSelection(ptSelStart, ptSelEnd);
+		SetCursorPos(ptSelEnd);
+		EnsureVisible(ptSelEnd);
+
+		m_bHorzScrollBarLocked = TRUE;
+		for (int L = nStartLine; L <= nEndLine; L ++)
+		{
+			int x, y;
+			m_pTextBuffer->InsertText(this, L, 0, pszText, y, x, CE_ACTION_INDENT);
+		}
+		m_bHorzScrollBarLocked = FALSE;
+		RecalcHorzScrollBar();
+
+		m_pTextBuffer->FlushUndoGroup(this);
+		return;
+	}
+
+	if (GetOverwriteMode())
+	{
+		CCrystalEditView::OnEditTab();
+		return;
+	}
+
+	m_pTextBuffer->BeginUndoGroup();
+
+	if (IsSelection())
+	{
+		ReplaceSelection(pszText);
+	}
+	else
+	{
+		CPoint ptCursorPos = GetCursorPos();
+		ASSERT_VALIDTEXTPOS(ptCursorPos);
+
+		int x, y;
+		m_pTextBuffer->InsertText(this, ptCursorPos.y, ptCursorPos.x, pszText, y, x, CE_ACTION_TYPING);
+		ptCursorPos.x = x;
+		ptCursorPos.y = y;
+		ASSERT_VALIDTEXTPOS(ptCursorPos);
+		SetSelection(ptCursorPos, ptCursorPos);
+		SetAnchor(ptCursorPos);
+		SetCursorPos(ptCursorPos);
+		EnsureVisible(ptCursorPos);
+	}
+
+	m_pTextBuffer->FlushUndoGroup(this);
 }
 
 void CVBScriptEdit::SetPythonMode(bool bPython)

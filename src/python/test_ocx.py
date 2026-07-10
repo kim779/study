@@ -14,6 +14,31 @@ from datetime import datetime
 
 OCX_GUID = "{CDADD338-C7AB-4977-B65D-8E988B5958E3}"
 
+# 접속서버 목록 (IP, 이름) - 포트는 UI의 svr_port 값 공용 사용
+SERVER_LIST = [
+    ("211.255.204.104", "UAT"),
+    ("211.255.204.70", "BP10"),
+    ("211.255.204.71", "BP11"),
+    ("211.255.204.72", "BP12"),
+    ("211.255.204.73", "BP13"),
+    ("211.255.204.74", "BP14"),
+    ("211.255.204.75", "BP15"),
+    ("211.255.204.76", "BP16"),
+    ("211.255.204.77", "BP17"),
+    ("211.255.204.78", "BP18"),
+    ("211.255.204.79", "BP19"),
+    ("211.255.204.33", "BP20"),
+    ("211.255.204.34", "BP21"),
+    ("211.255.204.35", "BP22"),
+    ("211.255.204.36", "BP23"),
+    ("211.255.204.37", "BP24"),
+    ("211.255.204.38", "BP25"),
+    ("211.255.204.39", "BP26"),
+    ("211.255.204.57", "BP27"),
+    ("211.255.204.58", "BP28"),
+    ("211.255.204.59", "BP29"),
+]
+
 # TR key constants - must match Common.h exactly
 TK_TR1001 = 1
 TK_TR1002 = 2
@@ -186,11 +211,16 @@ class TestWindow(QMainWindow):
         self.edit_user_id  = QLineEdit("ng12589")
         self.edit_user_pw  = QLineEdit("wnsgur12@"); self.edit_user_pw.setEchoMode(QLineEdit.Password)
         self.edit_cert_pw  = QLineEdit("ahffkdy123 "); self.edit_cert_pw.setEchoMode(QLineEdit.Password)
-        self.edit_svr_ip   = QLineEdit("211.255.204.104")
+        self.combo_server  = QComboBox()
+        for ip, name in SERVER_LIST:
+            self.combo_server.addItem(f"{name} ({ip})", ip)
+        self.combo_server.currentIndexChanged.connect(self._on_server_selected)
+        self.edit_svr_ip   = QLineEdit(SERVER_LIST[0][0])
         self.edit_svr_port = QLineEdit("15201")
         form.addRow("user_id",   self.edit_user_id)
         form.addRow("user_pw",   self.edit_user_pw)
         form.addRow("cert_pw",   self.edit_cert_pw)
+        form.addRow("서버선택",  self.combo_server)
         form.addRow("svr_ip",    self.edit_svr_ip)
         form.addRow("svr_port",  self.edit_svr_port)
         layout.addLayout(form)
@@ -209,7 +239,6 @@ class TestWindow(QMainWindow):
         h.addWidget(self.lbl_login)
         h.addStretch()
         layout.addLayout(h)
-
 
         # account combo - populated after login
         h2 = QHBoxLayout()
@@ -395,6 +424,11 @@ class TestWindow(QMainWindow):
         self.ocx.dynamicCall("Logout()")
         self.lbl_login.setText("-")
         self._log("Logout() called")
+
+    def _on_server_selected(self, idx):
+        ip = self.combo_server.itemData(idx)
+        if ip:
+            self.edit_svr_ip.setText(ip)
 
     def _on_sise_send(self):
         code = self.edit_sise_code.text().strip()

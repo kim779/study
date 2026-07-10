@@ -70,6 +70,9 @@
 #define IDC_EDIT_RANGE_FROM	10003
 #define IDC_EDIT_RANGE_TO	10004
 #define IDC_CHK_RANGE		10005
+#define IDC_EDIT_LOGFILE	10006
+#define IDC_BTN_LOGOPEN		10007
+#define IDC_CHK_LOGENABLE	10008
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
