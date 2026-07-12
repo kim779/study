@@ -263,7 +263,18 @@ LRESULT CALLBACK CallProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			}
 			break;
 		default:
-			if (wParam >= TM_VB)
+			if (wParam >= TM_VBx)
+			{
+				int	key, id;
+
+				key = (wParam / TM_VBx)-1;
+				id  = (wParam % TM_VBx);
+				client->m_view->KillTimer(wParam);
+				client->m_timers.RemoveKey(wParam);
+				if (!(client->m_status & S_ING) && client->GetAtScreen(screen, key))
+					client->m_vm->OnTimerX(screen, id);
+			}
+			else if (wParam >= TM_VB)
 			{
 				client->m_view->KillTimer(wParam);
 				if (client->GetAtScreen(screen, (int)wParam - TM_VB))

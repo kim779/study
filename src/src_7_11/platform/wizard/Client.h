@@ -18,6 +18,7 @@
 #define	TM_REPBN		3		// repeat-mouse
 #define	TM_REPTR		100		// repeat-TR
 #define	TM_VB			200		// script timer
+#define	TM_VBx			1000		// script timer II
 #define	TMI_RTM			250
 #define	TMI_REPTR		3000
 
@@ -91,6 +92,8 @@ public:
 	COLORREF	m_bkground;
 	CCriticalSection	m_sync;
 	float		m_hR, m_vR;
+
+	CMap	<int, int, int, int&>		m_timers;
 
 protected:
 	CMap	<int, int, CScreen*, CScreen*>	m_screen;

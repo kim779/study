@@ -403,6 +403,7 @@ bool CBatch::open(CString fileN)
 	m_mapH.onFile    = false;
 	m_mapH.onSelect  = false;
 	m_mapH.onTimer   = false;
+	m_mapH.onTimerX  = false;
 	m_mapH.onFocus   = false;
 	m_mapH.onClose   = false;
 	m_mapH.onDevice  = false;

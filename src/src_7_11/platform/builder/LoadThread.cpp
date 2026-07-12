@@ -143,6 +143,7 @@ bool CLoadThread::open(CString fileN)
 	mapH.onFile    = false;
 	mapH.onSelect  = false;
 	mapH.onTimer   = false;
+	mapH.onTimerX  = false;
 	mapH.onFocus   = false;
 	mapH.onClose   = false;
 	mapH.onDevice  = false;

@@ -278,6 +278,8 @@ void CScriptBar::OnELSelEndOk()
 			setScript(m_mapH->onApproveN);	break;
 		case 13:
 			setScript(m_mapH->onKeyN);	break;
+		case 35:
+			setScript(m_mapH->onTimerXN);	break;
 		default:
 			insertToEdit("");
 			m_editScript.EnableWindow(FALSE);
@@ -611,10 +613,11 @@ void CScriptBar::AddEventList()
 		kind = m_index;
 		if (m_index == -2 && (m_mapH->onDeclaration || m_mapH->onInDeclaration))
 			m_ctrllistCBO.SetItemBold(m_ctrllistCBO.GetCurSel(), true);
-		if (m_index == -1 && 
+		if (m_index == -1 &&
 			(m_mapH->onStart || m_mapH->onSend || m_mapH->onReceive || m_mapH->onAlert
 			|| m_mapH->onService || m_mapH->onFile || m_mapH->onSelect || m_mapH->onTimer
-			|| m_mapH->onFocus || m_mapH->onClose || m_mapH->onDevice || m_mapH->onApprove 
+			|| m_mapH->onTimerX
+			|| m_mapH->onFocus || m_mapH->onClose || m_mapH->onDevice || m_mapH->onApprove
 			|| m_mapH->onKey))
 			m_ctrllistCBO.SetItemBold(m_ctrllistCBO.GetCurSel(), true);		
 	}
@@ -662,6 +665,8 @@ void CScriptBar::AddEventList()
 			if (m_mapH->onApprove) m_eventlistCBO.SetItemBold(12, true);
 			m_eventlistCBO.SetItemData(m_eventlistCBO.AddString("OnKey"), 13);
 			if (m_mapH->onKey) m_eventlistCBO.SetItemBold(13, true);
+			m_eventlistCBO.SetItemData(m_eventlistCBO.AddString("OnTimerX(id)"), 35);
+			if (m_mapH->onTimerX) m_eventlistCBO.SetItemBold(14, true);
 		}
 		else
 			m_editScript.EnableWindow(FALSE);
@@ -1297,13 +1302,33 @@ void CScriptBar::WriteScript()
 			{
 				char	prefix[L_SGID+1];
 				CopyMemory(prefix, m_mapH->mapN, L_SGID);
-				prefix[L_SGID] = '\0'; 
+				prefix[L_SGID] = '\0';
 				wccGetTempName(m_mapH->onKeyN, prefix);
 			}
 			dir = m_mapH->onKeyN;
 			m_mapH->onKey = true;
 			break;
-			
+
+		case 35:		// onTimerX
+			if (sData.GetLength() <= 0)
+			{
+				if (m_mapH->onTimerX)
+					DeleteFile(m_mapH->onTimerXN);
+				m_mapH->onTimerXN[0] = '\0';
+				m_mapH->onTimerX = false;
+				break;
+			}
+			if (m_mapH->onTimerXN[0] == '\0')
+			{
+				char	prefix[L_SGID+1];
+				CopyMemory(prefix, m_mapH->mapN, L_SGID);
+				prefix[L_SGID] = '\0';
+				wccGetTempName(m_mapH->onTimerXN, prefix);
+			}
+			dir = m_mapH->onTimerXN;
+			m_mapH->onTimerX = true;
+			break;
+
 		default:
 			break;
 		}
@@ -1882,6 +1907,19 @@ CString CScriptBar::getAllScript(_mapH *mapH, int *pLineNum, int *pIdx)
 		}
 	}
 
+	if (mapH->onTimerX)
+	{
+		lineCount = getLineCount(sAllScript);
+		sAllScript += "Sub OnTimerX(id)\n";
+		sAllScript += getScript(mapH->onTimerXN);
+		sAllScript += "\nEnd Sub\n";
+		if (pLineNum && *pLineNum > lineCount && *pLineNum <= getLineCount(sAllScript))
+		{
+			lineNum = *pLineNum - lineCount - (lineCount?0:1);
+			idx = -26;
+		}
+	}
+
 	if (mapH->onFocus)
 	{
 		lineCount = getLineCount(sAllScript);
@@ -2163,7 +2201,7 @@ void CScriptBar::LoadAutoList()
 
 	CString path, info = "", sLevel = "CONTROLS";
 	path.Format("%s\\%s\\public.ini", (char*)AfxGetMainWnd()->SendMessage(WM_USER, ID_USR_GETROOTDIR, 0), TABDIR);
-
+	
 	{
 		CString dbg;
 		dbg.Format("[AXISWORK][AUTOLIST][DEBUG] public.ini path=[%s] exists=%d\n",

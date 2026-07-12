@@ -80,6 +80,9 @@ struct	_mapH	{
 	bool	onTimer;		// if true, onTIMER script defined (otherwise, not defined)
 	char	onTimerN[128];		// temporary onTIMER script file name
 
+	bool	onTimerX;		// if true, onTIMERX script defined (otherwise, not defined)
+	char	onTimerXN[128];		// temporary onTIMERX script file name
+
 	bool	onFocus;		// if true, onFOCUS script defined (otherwise, not defined)
 	char	onFocusN[128];		// temporary onFOCUS script file name
 

@@ -99,6 +99,7 @@ BEGIN_DISPATCH_MAP(CxScreen, CCmdTarget)
 	DISP_FUNCTION(CxScreen, "SetSize", _SetSize, VT_EMPTY, VTS_I4 VTS_I4)
 	DISP_FUNCTION(CxScreen, "Print", _Print, VT_EMPTY, VTS_BSTR)
 	DISP_FUNCTION(CxScreen, "SetTimer", _SetTimer, VT_EMPTY, VTS_I4 VTS_BOOL)
+	DISP_FUNCTION(CxScreen, "SetTimerX", _SetTimerX, VT_EMPTY, VTS_I2 VTS_I4 VTS_BOOL)
 	DISP_FUNCTION(CxScreen, "GetCodeType", _GetCodeType, VT_I4, VTS_BSTR)
 	DISP_FUNCTION(CxScreen, "UploadFile", _UploadFile, VT_I4, VTS_BSTR VTS_BSTR VTS_I4 VTS_I4 VTS_BSTR VTS_I4)
 	DISP_FUNCTION(CxScreen, "DownloadFile", _DownloadFile, VT_BOOL, VTS_BSTR VTS_BSTR VTS_I4 VTS_I4 VTS_BSTR)
@@ -742,7 +743,7 @@ void CxScreen::_Print(LPCTSTR text)
 	m_screen->m_client->m_guard->SendAxis(printVIEW, m_screen->m_client->m_key, (LPARAM)text);
 }
 
-void CxScreen::_SetTimer(long interval, BOOL main) 
+void CxScreen::_SetTimer(long interval, BOOL main)
 {
 	if (main)
 	{
@@ -754,6 +755,21 @@ void CxScreen::_SetTimer(long interval, BOOL main)
 		m_screen->m_view->KillTimer(TM_VB+m_screen->m_key);
 		m_screen->m_view->SetTimer(TM_VB+m_screen->m_key, interval*100, NULL);
 	}
+}
+
+void CxScreen::_SetTimerX(short id, long interval, BOOL main)
+{
+	int	tid;
+
+	if (main)
+		id += TM_VBx;
+	else
+		id += (TM_VBx * (m_screen->m_key+1));
+
+	tid = id;
+	m_screen->m_view->KillTimer(id);
+	m_screen->m_view->SetTimer(id, interval, NULL);
+	m_screen->m_client->m_timers.SetAt(id, tid);
 }
 
 long CxScreen::_UploadFile(LPCTSTR trN, LPCTSTR data, long length, long mode, LPCTSTR fileN, long offset) 

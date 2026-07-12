@@ -153,6 +153,18 @@ bool CScript::OnTimer(class CScreen* screen)
 	return true;
 }
 
+bool CScript::OnTimerX(class CScreen* screen, int id)
+{
+	CString	procs = getProcName(evTimerX);
+	if (screen->m_vbe->IsAvailable(procs))
+	{
+		m_script = false;
+		initialize(screen);
+		return screen->m_vbe->DoProcedure(procs, (WPARAM)id);
+	}
+	return true;
+}
+
 bool CScript::OnSelect(class CScreen* screen, CString maps)
 {
 	CString	procs = getProcName(evSelect);
@@ -322,6 +334,8 @@ CString CScript::getProcName(int event, CString symbol)
 		procs = _T("AX_SUB_OnDevice_AX_");	break;
 	case evTimer:
 		procs = _T("AX_SUB_OnTimer_AX_");	break;
+	case evTimerX:
+		procs = _T("AX_SUB_OnTimerX_AX_");	break;
 	case evSelect:
 		procs = _T("AX_SUB_OnSelect_AX_");	break;
 	case evFile:

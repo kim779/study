@@ -544,6 +544,16 @@ void CBuild::generateResource()
 		newline(false);
 	}
 
+	if (m_mapH->onTimerX && m_mapH->onTimerXN[0] != NULL)
+	{
+		m_buf = "_AW_ONTIMERX_AW_";
+		newline(false);
+		writeScriptData(m_mapH->onTimerXN);
+		newline(false);
+		m_buf = "_AW_ONENDSUB_AW_";
+		newline(false);
+	}
+
 	if (m_mapH->onFocus && m_mapH->onFocusN[0] != NULL)
 	{
 		m_buf = "_AW_ONFOCUS_AW_";

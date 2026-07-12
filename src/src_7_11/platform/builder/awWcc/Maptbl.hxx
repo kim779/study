@@ -584,6 +584,7 @@ struct _scriptTbl {
 		{"_AW_ONKEY_AW_",	15},	{"_AW_ONTRIGGER_AW_",	16},
 		{"_AW_ONENDSUB_AW_",	17},	{"_AW_ONDECLARE_AW_",	18},
 		{"_AW_ONINDECLARE_AW_",	19},	{"_AW_ONENDFUNC_AW_",	20},
+		{"_AW_ONTIMERX_AW_",	21},
 		{"PROCEDURE",	100},	{"ENDPROC",	101}
 };
 #define	SCRIPTTBL	sizeof(scriptTbl) / sizeof(struct _scriptTbl)

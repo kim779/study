@@ -23,6 +23,7 @@
 #define	evSelect	11
 #define	evFile		12
 #define	evAlert		13
+#define	evTimerX	14
 
 #define	evClick		100
 #define	evChange	101
@@ -59,6 +60,7 @@ public:
 	bool	OnApprove(class CScreen* screen, int key, char* data, int datL);
 	bool	OnDevice(class CScreen* screen);
 	bool	OnTimer(class CScreen* screen);
+	bool	OnTimerX(class CScreen* screen, int id);
 	bool	OnSelect(class CScreen* screen, CString maps);
 	bool	OnFile(class CScreen* screen, BOOL upload, char* data, int datL);
 	bool	OnAlert(class CScreen* screen, CString code, CString data, int stat);

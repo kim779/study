@@ -3742,6 +3742,13 @@ void CChildView::LoadAutoList()
 	char	twb[128];
 	path.Format("%s\\%s\\public.ini", (char*)AfxGetMainWnd()->SendMessage(WM_USER, ID_USR_GETROOTDIR, 0), TABDIR);
 
+	{
+		CString dbg;
+		dbg.Format("[AXISWORK][AUTOLIST][CHILDVIEW][DEBUG] public.ini path=[%s] exists=%d\n",
+			path.GetString(), (int)(GetFileAttributes(path) != INVALID_FILE_ATTRIBUTES));
+		OutputDebugString(dbg);
+	}
+
 	for (int ii = 1; ii < 100; ii++)
 	{
 		void *rtValue;
@@ -3805,6 +3812,14 @@ void CChildView::LoadAutoList()
 	}
 
 	mapFormID.RemoveAll();
+
+	{
+		void* rtValue;
+		CString dbg;
+		dbg.Format("[AXISWORK][AUTOLIST][CHILDVIEW][DEBUG] loaded: ScriptStrMap has SCREEN=%d, AutoListMap count=%d\n",
+			(int)m_pSCEdit->m_ScriptStrMap.Lookup("SCREEN", rtValue), (int)m_pSCEdit->m_AutoListMap.GetCount());
+		OutputDebugString(dbg);
+	}
 }
 
 void CChildView::changeKind()

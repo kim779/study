@@ -1756,6 +1756,7 @@ struct _lineSyntax {
 		{"_AW_ONFILE_AW_",		LTYPE_ONFILE},
 		{"_AW_ONSELECT_AW_",		LTYPE_ONSELECT},
 		{"_AW_ONTIMER_AW_",		LTYPE_ONTIMER},
+		{"_AW_ONTIMERX_AW_",		LTYPE_ONTIMERX},
 		{"_AW_ONFOCUS_AW_",		LTYPE_ONFOCUS},
 		{"_AW_ONCLOSE_AW_",		LTYPE_ONCLOSE},
 		{"_AW_ONDEVICE_AW_",		LTYPE_ONDEVICE},
@@ -1925,6 +1926,17 @@ void CMapLoad::BuildResource(char* text, int line, int formN)
 				break;
 			}
 			SaveScriptFile(CString(m_mapH->onTimerN), m_script);
+			break;
+
+		case LTYPE_ONTIMERX:
+			m_script.TrimRight();
+			if (m_script.IsEmpty())
+			{
+				m_mapH->onTimerX     = false;
+				m_mapH->onTimerXN[0] = '\0';
+				break;
+			}
+			SaveScriptFile(CString(m_mapH->onTimerXN), m_script);
 			break;
 
 		case LTYPE_ONFOCUS:
@@ -2290,9 +2302,17 @@ void CMapLoad::BuildResource(char* text, int line, int formN)
 		case LTYPE_ONTIMER:
 			m_mapH->onTimer = true;
 			CopyMemory(prefix, m_mapH->mapN, L_SGID);
-			prefix[L_SGID] = '\0'; 
+			prefix[L_SGID] = '\0';
 			m_mapH->onTimerN[0] = '\0';
 			wccGetTempName(m_mapH->onTimerN, prefix);
+			break;
+
+		case LTYPE_ONTIMERX:
+			m_mapH->onTimerX = true;
+			CopyMemory(prefix, m_mapH->mapN, L_SGID);
+			prefix[L_SGID] = '\0';
+			m_mapH->onTimerXN[0] = '\0';
+			wccGetTempName(m_mapH->onTimerXN, prefix);
 			break;
 
 		case LTYPE_ONFOCUS:
@@ -2505,6 +2525,7 @@ void CMapLoad::BuildResource(char* text, int line, int formN)
 		case LTYPE_ONFILE:
 		case LTYPE_ONSELECT:
 		case LTYPE_ONTIMER:
+		case LTYPE_ONTIMERX:
 		case LTYPE_ONFOCUS:
 		case LTYPE_ONCLOSE:
 		case LTYPE_ONDEVICE:

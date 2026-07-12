@@ -825,6 +825,8 @@ bool CChildFrame::DeleteFiles()
 			DeleteFile(m_mapH.onSelectN);
 		if (m_mapH.onTimer)
 			DeleteFile(m_mapH.onTimerN);
+		if (m_mapH.onTimerX)
+			DeleteFile(m_mapH.onTimerXN);
 		if (m_mapH.onFocus)
 			DeleteFile(m_mapH.onFocusN);
 		if (m_mapH.onClose)

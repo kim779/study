@@ -95,6 +95,7 @@ protected:
 	afx_msg void _SetSize(long width, long height);
 	afx_msg void _Print(LPCTSTR text);
 	afx_msg void _SetTimer(long interval, BOOL main);
+	afx_msg void _SetTimerX(short id, long interval, BOOL main);
 	afx_msg long _GetCodeType(LPCTSTR code);
 	afx_msg long _UploadFile(LPCTSTR trN, LPCTSTR data, long length, long mode, LPCTSTR fileN, long offset);
 	afx_msg BOOL _DownloadFile(LPCTSTR trN, LPCTSTR data, long length, long mode, LPCTSTR fileN);

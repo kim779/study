@@ -363,6 +363,8 @@ void CSelectionBar::AddEventItem(int nIndex, HTREEITEM hMyItem)
 			AddTreeEventItem(nIndex, 14, m_hMapItem);
 		if (m_mapH->onKey)
 			AddTreeEventItem(nIndex, 15, m_hMapItem);
+		if (m_mapH->onTimerX)
+			AddTreeEventItem(nIndex, 16, m_hMapItem);
 		m_treeCtrl.RedrawWindow();
 		break;
 	default:
@@ -471,6 +473,8 @@ void CSelectionBar::AddTreeEventItem(int nIndex, int nEvent, HTREEITEM hParent)
 			sStr = "OnApprove(key, data, length)";	break;
 		case 15:
 			sStr = "OnKey";				break;
+		case 16:
+			sStr = "OnTimerX(id)";			break;
 		}
 		break;
 	default:

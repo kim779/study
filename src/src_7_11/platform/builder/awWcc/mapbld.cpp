@@ -1810,6 +1810,10 @@ void CCompile::mapResStrBuilding(CMapToken *token, int tokCnt, int sLine)
 			m_pyAwait = true; m_pyBlock = false; m_pyWrap = "Sub AX_SUB_OnKey_AX_()";
 			break;
 
+		case 21:		// ONTIMERX
+			m_pyAwait = true; m_pyBlock = false; m_pyWrap = "Sub AX_SUB_OnTimerX_AX_(id)";
+			break;
+
 		case 16:	// ONTRIGGER
 			m_pyAwait = true; m_pyBlock = false; m_pyWrap = "Sub AX_SUB_OnTrigger_AX_()";
 			break;

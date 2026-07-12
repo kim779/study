@@ -1228,6 +1228,7 @@ CChildFrame* CMainFrame::openMAP(CString fileN)
 	child->m_mapH.onFile    = false;
 	child->m_mapH.onSelect	= false;
 	child->m_mapH.onTimer   = false;
+	child->m_mapH.onTimerX  = false;
 	child->m_mapH.onFocus   = false;
 	child->m_mapH.onClose   = false;
 	child->m_mapH.onDevice  = false;
@@ -1611,6 +1612,8 @@ void CMainFrame::reloadMAP()
 		DeleteFile(child->m_mapH.onSelectN);
 	if (child->m_mapH.onTimer)
 		DeleteFile(child->m_mapH.onTimerN);
+	if (child->m_mapH.onTimerX)
+		DeleteFile(child->m_mapH.onTimerXN);
 	if (child->m_mapH.onFocus)
 		DeleteFile(child->m_mapH.onFocusN);
 	if (child->m_mapH.onClose)
@@ -2591,6 +2594,8 @@ void CMainFrame::changeMap(CString src)
 		DeleteFile(child->m_mapH.onSelectN);
 	if (child->m_mapH.onTimer)
 		DeleteFile(child->m_mapH.onTimerN);
+	if (child->m_mapH.onTimerX)
+		DeleteFile(child->m_mapH.onTimerXN);
 	if (child->m_mapH.onFocus)
 		DeleteFile(child->m_mapH.onFocusN);
 	if (child->m_mapH.onClose)
@@ -2614,6 +2619,7 @@ void CMainFrame::changeMap(CString src)
 	child->m_mapH.onFile    = false;
 	child->m_mapH.onSelect	= false;
 	child->m_mapH.onTimer   = false;
+	child->m_mapH.onTimerX  = false;
 	child->m_mapH.onFocus   = false;
 	child->m_mapH.onClose   = false;
 	child->m_mapH.onDevice  = false;
@@ -3365,6 +3371,9 @@ long CMainFrame::OnMessage(WPARAM wParam, LPARAM lParam)
 				CString dbg;
 				dbg.Format("[AXISWORK][ROOTDIR][DEBUG][%s] ini branch: iniPath=[%s] iniExists=%d n=%d err=%d value=[%s]\n",
 					__FUNCTION__, iniPath.GetString(), (int)(GetFileAttributes(iniPath) != INVALID_FILE_ATTRIBUTES), n, err, twb);
+				OutputDebugString(dbg);
+				dbg.Format("[AXISWORK][ROOTDIR][DEBUG] m_root=[%s]\n",
+					__FUNCTION__, m_root);
 				OutputDebugString(dbg);
 			}
 			return (long)m_root.operator LPCTSTR();

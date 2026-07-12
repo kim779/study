@@ -102,6 +102,7 @@ public:
 #define	LTYPE_DIVEND		32
 #define LTYPE_ONENDSUB		33
 #define LTYPE_ONENDFUNC		34
+#define LTYPE_ONTIMERX		35
 
 struct	_mapText {
 	WORD	type;
