@@ -198,7 +198,7 @@ protected:
 // Message maps
 	//{{AFX_MSG(CIBKSConnectorCtrl)
 	//}}AFX_MSG
-	afx_msg long OnUser(WPARAM wParam, LPARAM lParam);
+	afx_msg LRESULT OnUser(WPARAM wParam, LPARAM lParam);
 	DECLARE_MESSAGE_MAP()
 
 // Dispatch maps

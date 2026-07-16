@@ -14902,6 +14902,18 @@ void CMainFrame::ShowMngInfo(DWORD* dat)
 		CheckMarketByMNG(val);
 		if (val == "884")  //우선 NXT 장시작은 skip
 			return;
+		if (val == "65")  //선물옵션 장개시10초전 skip
+			return;
+		if (val == "35")  //주식 장개시10초전 skip
+			return;
+		if (val == "135")  //주식 장마감10초전 skip
+			return;
+		if (val == "853") // 시간외종가 매매종료, 시간외단일가 매매개시
+			return;
+		if (val == "806") //시간외단일가 매매종료
+			return;
+		if (val == "846") //KOBA ELW 조기종료
+			return;
 #endif
 
 		if (!m_mapAlarmList.Lookup(val, str))

@@ -832,6 +832,8 @@ void CScreen::UpdateRTM(int key, CString code, CString update, CdataSet* fms, CO
 			continue;
 		case FM_EDIT:
 		case FM_OUT:
+			if (form->m_form->iok == EIO_INPUT)   // 입력전용은 실시간 갱신 제외
+				continue;
 			break;
 		case FM_GRID:
 			if (isUob() && !isFlash())

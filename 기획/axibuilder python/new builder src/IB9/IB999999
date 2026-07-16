@@ -1,0 +1,124 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB999999)
+MAPSIZE(508, 1077)
+PYTHON(1)
+VERSION(000)
+MAPKIND(PROCEDURES)
+MAPGROUP(1)
+MAPDESC("Procedures")
+MAPPUBLIC(";")
+FONT("굴림", 9, NORMAL)
+TITLE("Procedures")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+g_s88Accn = ""
+g_s88Pswd = "" 
+
+#== 영업일 표시 실명제
+#   : D+1 일, D+2일  => D+1(5/18), D+2(5/19)
+def P_GetDDay(day1, day2):
+
+    if Login.Day1().strip() != "":
+        day1 = Login.Day1().strip()
+        day2 = Login.Day2().strip()
+        System.Trace("[python] P_GetDDay day1 =" + day1)      
+        System.Trace("[python] P_GetDDay day2 =" + day2)      
+
+
+#***************************************************************
+#잔고클릭시, 매도주문창 연동기능
+#***************************************************************
+def HowMaedoJumun():
+    if chk_jango.Checked() == True:
+        Screen.Proc("main.change_tab_order", 1)  # 잔고 클릭시 매도로...
+    
+#***************************************************************
+#관심종목 그리드 클릭시 뉴스알람 처리 관련 이벤트
+#***************************************************************    
+def newsClick():
+    key_text = ""
+    key_value = ""
+    sig = ""
+    
+    key_text = S90303.GetGridCell(S90303.Row(), 4).strip()
+    key_value = S90303.GetGridCell(S90303.Row(), 3).strip()
+
+    if (S90303.Row() % 2) == 0:
+        S90303.SetPRgb(S90303.Row(), 5, 77)
+    else:
+        S90303.SetPRgb(S90303.Row(), 5, 76)
+        
+    sig = S90303.GetGridCell(S90303.Row(), 5).strip()
+
+    if sig == "추":
+        if Screen.CreateObject("INFO") == True:
+    	    INFO.PushData(Login.Name, "userconf.ini", "IB202600", "POPUP_CODE", S90303.GetGridCell(S90303.Row(), 2).strip())
+    
+        if Screen.CreateObject("INFO") == True:
+    	    INFO.PushData(Login.Name, "userconf.ini", "IB202600", "POPUP_FLAG", 1)
+    
+        Screen.CreateWindow(1, "IB202600 /t/s/p5/d", "CODE" & vbTab & S90303.GetGridCell(S90303.Row(), 2).strip())
+    else:
+        if key_value != "" and key_text != "":
+            Screen.CreateWindow(4, "IBNEWSXX /S/d/p1", "015"& vbTab & key_text & vbLf & "016" & vbTab & key_value & vbLf & "1301" & vbTab & S90303.GetGridCell(S90303.Row(), 2))
+    
+    S90303.SetGridCell(S90303.Row(), 5, "")
+    S90303.SetGridCell(S90303.Row(), 4, "")
+    S90303.SetGridCell(S90303.Row(), 3, "")
+	
+
+#***************************************************************
+#업종 대분류 return
+#***************************************************************
+def P_GetBigCd(fu_upgb):
+    c = fu_upgb[:1]     # VBScript Left(fu_upgb, 1)
+
+    if c == "0":
+        return "001"    # KOSPI
+    elif c == "1":
+        return "101"    # KOSPI200
+    elif c == "2":
+        return "201"    # KOSDAQ
+    elif c == "3":
+        return "301"    # KOSDAQ50
+    elif c == "4":
+        return "401"    # KOSPI100
+    elif c == "5":
+        return "501"    # KONEX
+    elif c == "6":
+        return "601"    # SECTOR
+    elif c == "7":
+        return "701"    # 프리보드
+    else:
+        if fu_upgb == "999" or fu_upgb == "998" or fu_upgb == "997":
+            return fu_upgb
+        elif c == "8":
+            return "801"  # 기타지수
+        else:
+            return ""
+
+
+}
+
+
+

@@ -139,6 +139,7 @@ BEGIN_MESSAGE_MAP(CChildView, CWnd)
 	//}}AFX_MSG_MAP
 	ON_COMMAND_RANGE(ID_RSENDTOFIRST, ID_EXTMENUID, OnViewCommand)
 	ON_MESSAGE(WM_USER, OnMessage)
+	ON_BN_CLICKED(ID_CV_PYBTN, OnPyBtnClick)
 END_MESSAGE_MAP()
 
 
@@ -412,8 +413,11 @@ void CChildView::OnSize(UINT nType, int cx, int cy)
 
 	if (m_mapH->mapK == MK_PROCEDURES)
 	{
+		const int btnH = 20;
+		if (::IsWindow(m_pyBtn.GetSafeHwnd()))
+			m_pyBtn.SetWindowPos(NULL, 0, 0, 40, btnH, SWP_NOZORDER);
 		if (m_pSCEdit)
-			m_pSCEdit->SetWindowPos(NULL, 0, 0, cx, cy, SWP_NOMOVE|SWP_NOZORDER);
+			m_pSCEdit->SetWindowPos(NULL, 0, btnH, cx, cy - btnH, SWP_NOZORDER);
 		CWnd::OnSize(nType, cx, cy);
 		return;
 	}
@@ -2923,9 +2927,18 @@ bool CChildView::drawImage(CDC *pDC)
 	return true;
 }
 
-BOOL CChildView::OnEraseBkgnd(CDC* pDC) 
+BOOL CChildView::OnEraseBkgnd(CDC* pDC)
 {
-	return TRUE;	
+	if (m_mapH && m_mapH->mapK == MK_PROCEDURES)
+	{
+		// Fill the strip beside m_pyBtn that no child window covers
+		// (previously left unpainted, showing the default hatch pattern).
+		CRect rc;
+		GetClientRect(&rc);
+		pDC->FillSolidRect(&rc, ::GetSysColor(COLOR_BTNFACE));
+		return TRUE;
+	}
+	return TRUE;
 	return CWnd::OnEraseBkgnd(pDC);
 }
 
@@ -3834,6 +3847,11 @@ void CChildView::changeKind()
 		m_pSCEdit->Initialize(m_mapH);
 		m_pSCEdit->SetPythonMode(m_mapH->pythonMode);
 
+		if (!::IsWindow(m_pyBtn.GetSafeHwnd()))
+			m_pyBtn.Create(NULL, m_mapH->pythonMode ? "PY" : "VB", WS_CHILD | WS_VISIBLE | WS_TABSTOP, CRect(0), this, ID_CV_PYBTN);
+		m_pyBtn.SetCheck(m_mapH->pythonMode);
+		m_pyBtn.SetWindowText(m_mapH->pythonMode ? "PY" : "VB");
+
 		/*CMapPtrToPtr *pUndoMap = new CMapPtrToPtr;
 		m_mapH->pUndoMap = pUndoMap;
 
@@ -3842,6 +3860,18 @@ void CChildView::changeKind()
 
 		//((CMDIChildWnd*)GetParent())->MDIActivate();	? ���� ���� �ּ�ó��(SDI�϶� ����)
 	}
+}
+
+void CChildView::OnPyBtnClick()
+{
+	if (!m_mapH || m_mapH->mapK != MK_PROCEDURES || !m_pSCEdit)
+		return;
+
+	m_mapH->pythonMode = !m_mapH->pythonMode;
+	m_pyBtn.SetCheck(m_mapH->pythonMode);
+	m_pyBtn.SetWindowText(m_mapH->pythonMode ? "PY" : "VB");
+	m_pSCEdit->SetPythonMode(m_mapH->pythonMode);
+	m_mapH->modified = true;
 }
 
 BOOL CChildView::PreTranslateMessage(MSG* pMsg) 

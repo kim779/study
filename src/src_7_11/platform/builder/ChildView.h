@@ -15,6 +15,7 @@
 #include <afxtempl.h>
 #include "awCommon/FormItem.h"
 #include "Components/crysedit_src/VBScriptEdit.h"
+#include "NFBtn.h"
 
 class CShow;
 class CChildView : public CWnd
@@ -39,6 +40,7 @@ public:
 	bool	m_move, m_bSelect, m_bLBtnDown, m_bRedraw, m_bFirstDrawing;
 	CString m_root, m_rtnStr;
 	CVBScriptEdit	*m_pSCEdit;
+	CNFBtn		m_pyBtn;	// Python/VBScript toggle for MK_PROCEDURES maps (m_pSCEdit has no ScriptBar/m_pythonBtn equivalent)
 
 	CWnd		*m_pPreView;
 	CWnd		*m_pChildFrame;
@@ -59,10 +61,10 @@ protected:
 
 	// new added
 
-	CString	m_sImgPath;	// ¹è°æÀÌ¹ÌÁö °æ·Î
-	HBITMAP	m_hImgBack;	// ¹è°æÀÌ¹ÌÁö HBITMAP
-	int	m_szWidth;	// ¹è°æÀÌ¹ÌÁö Æø
-	int	m_szHeight;	// ¹è°æÀÌ¹ÌÁö ³ôÀÌ
+	CString	m_sImgPath;	// ï¿½ï¿½ï¿½ï¿½Ì¹ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
+	HBITMAP	m_hImgBack;	// ï¿½ï¿½ï¿½ï¿½Ì¹ï¿½ï¿½ï¿½ HBITMAP
+	int	m_szWidth;	// ï¿½ï¿½ï¿½ï¿½Ì¹ï¿½ï¿½ï¿½ ï¿½ï¿½
+	int	m_szHeight;	// ï¿½ï¿½ï¿½ï¿½Ì¹ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 	bool	drawImage(CDC *pDC);
 // Operations
 public:
@@ -165,6 +167,7 @@ protected:
 	afx_msg void OnSetFocus(CWnd* pOldWnd);
 	//}}AFX_MSG
 	afx_msg void OnViewCommand(UINT cmdID);
+	afx_msg void OnPyBtnClick();
 	DECLARE_MESSAGE_MAP()
 };
 

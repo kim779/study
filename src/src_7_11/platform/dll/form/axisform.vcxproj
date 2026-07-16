@@ -159,7 +159,11 @@
       <ImportLibrary>.\Release\axisform.lib</ImportLibrary>
       <AdditionalDependencies>msimg32.lib;winmm.lib;imm32.lib;../lib/release/axislib.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>.\axisform.def</ModuleDefinitionFile>
+      <ProgramDatabaseFile>D:\symbol\$(ProjectName).pdb</ProgramDatabaseFile>
     </Link>
+    <PostBuildEvent>
+      <Command>"C:\Program Files (x86)\Windows Kits\8.1\Debuggers\x86\symstore.exe" add /f "D:\symbol\$(ProjectName).pdb" /s "D:\symstore" /t "IBKS"</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="axArray.cpp" />

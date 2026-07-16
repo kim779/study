@@ -51,6 +51,7 @@
 #define ID_SELECTIONBAR                 139
 #define IDD_QUICK                       141
 #define ID_SCR_PYBTN                     142
+#define ID_CV_PYBTN                      143
 #define IDI_MAP                         156
 #define IDI_TEMPLATE                    157
 #define IDI_PROCEDURES                  158

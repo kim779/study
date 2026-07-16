@@ -572,6 +572,7 @@ void CScriptBar::Initialize(_mapH *mapH)
 	m_mapH = mapH;
 	m_editScript.Initialize(m_mapH);
 	m_pythonBtn.SetCheck(m_mapH->pythonMode);
+	m_pythonBtn.SetWindowText(m_mapH->pythonMode ? "PY" : "VB");
 	m_editScript.SetPythonMode(m_mapH->pythonMode);
 	if (m_mapH && m_mapH->mapK == MK_PROCEDURES)
 		m_editScript.EnableWindow(FALSE);
@@ -1761,6 +1762,7 @@ void CScriptBar::OnPyBtnClick()
 
 	m_mapH->pythonMode = !m_mapH->pythonMode;
 	m_pythonBtn.SetCheck(m_mapH->pythonMode);
+	m_pythonBtn.SetWindowText(m_mapH->pythonMode ? "PY" : "VB");
 	m_editScript.SetPythonMode(m_mapH->pythonMode);
 	m_mapH->modified = true;
 }
@@ -1787,7 +1789,7 @@ CString CScriptBar::getAllScript(_mapH *mapH, int *pLineNum, int *pIdx)
 		if (pLineNum && *pLineNum > lineCount && *pLineNum <= getLineCount(sAllScript))
 		{
 			lineNum = *pLineNum - lineCount;
-			idx = -26;
+			idx = -80;
 		}
 	}
 
@@ -1799,7 +1801,7 @@ CString CScriptBar::getAllScript(_mapH *mapH, int *pLineNum, int *pIdx)
 		if (pLineNum && *pLineNum > lineCount && *pLineNum <= getLineCount(sAllScript))
 		{
 			lineNum = *pLineNum - lineCount;
-			idx = -27;
+			idx = -81;
 		}
 	}
 
@@ -1812,7 +1814,7 @@ CString CScriptBar::getAllScript(_mapH *mapH, int *pLineNum, int *pIdx)
 		if (pLineNum && *pLineNum > lineCount && *pLineNum <= getLineCount(sAllScript))
 		{
 			lineNum = *pLineNum - lineCount - (lineCount?0:1);
-			idx = -13;
+			idx = -40;
 		}
 	}
 
@@ -1825,7 +1827,7 @@ CString CScriptBar::getAllScript(_mapH *mapH, int *pLineNum, int *pIdx)
 		if (pLineNum && *pLineNum > lineCount && *pLineNum <= getLineCount(sAllScript))
 		{
 			lineNum = *pLineNum - lineCount - (lineCount?0:1);
-			idx = -14;
+			idx = -41;
 		}
 	}
 
@@ -1838,7 +1840,7 @@ CString CScriptBar::getAllScript(_mapH *mapH, int *pLineNum, int *pIdx)
 		if (pLineNum && *pLineNum > lineCount && *pLineNum <= getLineCount(sAllScript))
 		{
 			lineNum = *pLineNum - lineCount - (lineCount?0:1);
-			idx = -15;
+			idx = -42;
 		}
 	}
 
@@ -1851,7 +1853,7 @@ CString CScriptBar::getAllScript(_mapH *mapH, int *pLineNum, int *pIdx)
 		if (pLineNum && *pLineNum > lineCount && *pLineNum <= getLineCount(sAllScript))
 		{
 			lineNum = *pLineNum - lineCount - (lineCount?0:1);
-			idx = -16;
+			idx = -43;
 		}
 	}
 
@@ -1864,7 +1866,7 @@ CString CScriptBar::getAllScript(_mapH *mapH, int *pLineNum, int *pIdx)
 		if (pLineNum && *pLineNum > lineCount && *pLineNum <= getLineCount(sAllScript))
 		{
 			lineNum = *pLineNum - lineCount - (lineCount?0:1);
-			idx = -17;
+			idx = -44;
 		}
 	}
 
@@ -1877,7 +1879,7 @@ CString CScriptBar::getAllScript(_mapH *mapH, int *pLineNum, int *pIdx)
 		if (pLineNum && *pLineNum > lineCount && *pLineNum <= getLineCount(sAllScript))
 		{
 			lineNum = *pLineNum - lineCount - (lineCount?0:1);
-			idx = -18;
+			idx = -45;
 		}
 	}
 
@@ -1890,7 +1892,7 @@ CString CScriptBar::getAllScript(_mapH *mapH, int *pLineNum, int *pIdx)
 		if (pLineNum && *pLineNum > lineCount && *pLineNum <= getLineCount(sAllScript))
 		{
 			lineNum = *pLineNum - lineCount - (lineCount?0:1);
-			idx = -19;
+			idx = -46;
 		}
 	}
 
@@ -1903,7 +1905,7 @@ CString CScriptBar::getAllScript(_mapH *mapH, int *pLineNum, int *pIdx)
 		if (pLineNum && *pLineNum > lineCount && *pLineNum <= getLineCount(sAllScript))
 		{
 			lineNum = *pLineNum - lineCount - (lineCount?0:1);
-			idx = -20;
+			idx = -47;
 		}
 	}
 
@@ -1916,7 +1918,7 @@ CString CScriptBar::getAllScript(_mapH *mapH, int *pLineNum, int *pIdx)
 		if (pLineNum && *pLineNum > lineCount && *pLineNum <= getLineCount(sAllScript))
 		{
 			lineNum = *pLineNum - lineCount - (lineCount?0:1);
-			idx = -26;
+			idx = -74;
 		}
 	}
 
@@ -1929,7 +1931,7 @@ CString CScriptBar::getAllScript(_mapH *mapH, int *pLineNum, int *pIdx)
 		if (pLineNum && *pLineNum > lineCount && *pLineNum <= getLineCount(sAllScript))
 		{
 			lineNum = *pLineNum - lineCount - (lineCount?0:1);
-			idx = -21;
+			idx = -48;
 		}
 	}
 
@@ -1942,7 +1944,7 @@ CString CScriptBar::getAllScript(_mapH *mapH, int *pLineNum, int *pIdx)
 		if (pLineNum && *pLineNum > lineCount && *pLineNum <= getLineCount(sAllScript))
 		{
 			lineNum = *pLineNum - lineCount - (lineCount?0:1);
-			idx = -22;
+			idx = -49;
 		}
 	}
 
@@ -1955,7 +1957,7 @@ CString CScriptBar::getAllScript(_mapH *mapH, int *pLineNum, int *pIdx)
 		if (pLineNum && *pLineNum > lineCount && *pLineNum <= getLineCount(sAllScript))
 		{
 			lineNum = *pLineNum - lineCount - (lineCount?0:1);
-			idx = -23;
+			idx = -50;
 		}
 	}
 
@@ -1968,7 +1970,7 @@ CString CScriptBar::getAllScript(_mapH *mapH, int *pLineNum, int *pIdx)
 		if (pLineNum && *pLineNum > lineCount && *pLineNum <= getLineCount(sAllScript))
 		{
 			lineNum = *pLineNum - lineCount - (lineCount?0:1);
-			idx = -24;
+			idx = -51;
 		}
 	}
 
@@ -1981,7 +1983,7 @@ CString CScriptBar::getAllScript(_mapH *mapH, int *pLineNum, int *pIdx)
 		if (pLineNum && *pLineNum > lineCount && *pLineNum <= getLineCount(sAllScript))
 		{
 			lineNum = *pLineNum - lineCount - (lineCount?0:1);
-			idx = -25;
+			idx = -52;
 		}
 	}
 
@@ -2000,7 +2002,7 @@ CString CScriptBar::getAllScript(_mapH *mapH, int *pLineNum, int *pIdx)
 				if (pLineNum && *pLineNum > lineCount && *pLineNum <= getLineCount(sAllScript))
 				{
 					lineNum = *pLineNum - lineCount - (lineCount?0:1);
-					idx = ii * 13;
+					idx = ii * 40;
 				}
 			}
 
@@ -2014,7 +2016,7 @@ CString CScriptBar::getAllScript(_mapH *mapH, int *pLineNum, int *pIdx)
 				if (pLineNum && *pLineNum > lineCount && *pLineNum <= getLineCount(sAllScript))
 				{
 					lineNum = *pLineNum - lineCount - (lineCount?0:1);
-					idx = ii * 13 + 1;
+					idx = ii * 40 + 1;
 				}
 			}
 
@@ -2028,7 +2030,7 @@ CString CScriptBar::getAllScript(_mapH *mapH, int *pLineNum, int *pIdx)
 				if (pLineNum && *pLineNum > lineCount && *pLineNum <= getLineCount(sAllScript))
 				{
 					lineNum = *pLineNum - lineCount - (lineCount?0:1);
-					idx = ii * 13 + 2;
+					idx = ii * 40 + 2;
 				}
 			}
 
@@ -2042,7 +2044,7 @@ CString CScriptBar::getAllScript(_mapH *mapH, int *pLineNum, int *pIdx)
 				if (pLineNum && *pLineNum > lineCount && *pLineNum <= getLineCount(sAllScript))
 				{
 					lineNum = *pLineNum - lineCount - (lineCount?0:1);
-					idx = ii * 13 + 3;
+					idx = ii * 40 + 3;
 				}
 			}
 
@@ -2056,7 +2058,7 @@ CString CScriptBar::getAllScript(_mapH *mapH, int *pLineNum, int *pIdx)
 				if (pLineNum && *pLineNum > lineCount && *pLineNum <= getLineCount(sAllScript))
 				{
 					lineNum = *pLineNum - lineCount - (lineCount?0:1);
-					idx = ii * 13 + 4;
+					idx = ii * 40 + 4;
 				}
 			}
 		}
@@ -2112,23 +2114,18 @@ long CScriptBar::getLineCount(CString str)
 	if (str.IsEmpty())
 		return 0;
 
-	int nBPos = 0, nPos = 0, lineCount = 1;
-	CString txt = _T("");
+	// Must count every physical line (including blank ones), because callers
+	// compare this against real editor line numbers (CCrystalTextView line
+	// indices / Ctrl+G line numbers), which also count blank lines. The
+	// previous version skipped blank lines, so any script containing a blank
+	// line desynced the block-boundary math in getAllScript() from the
+	// actual editor line positions used by setLinePos().
+	int nPos = 0, lineCount = 1;
 
-	while(nPos >= 0)
+	while ((nPos = str.Find('\n', nPos)) >= 0)
 	{
-		nPos = str.Find("\n", nPos + 1);
-		if (nPos < 0)
-			break;
-		txt = str.Mid(nBPos, nPos - nBPos);
-		txt.Remove('\r');
-		txt.Remove('\t');
-		txt.Remove(' ');
-		txt.Remove('\n');
-		nBPos = nPos;
-		if (nPos > 0 && txt.IsEmpty())
-			continue;
 		lineCount++;
+		nPos++;
 	}
 	return lineCount;
 }

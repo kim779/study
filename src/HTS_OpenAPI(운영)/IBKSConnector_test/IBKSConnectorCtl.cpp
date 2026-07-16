@@ -2743,7 +2743,7 @@ void CIBKSConnectorCtrl::InitJanGo()
 			CString strTemp;
 			long nView = m_Wizard.axWorkView("IBXXXX11", 0);
 			
-			long nReturn = m_Wizard.axAttach((long)&m_Notify, nView, 128);
+			long nReturn = m_Wizard.axAttach((long)&m_Notify, nView, 129);
 			
 			long size = MAKELONG(100,100);
 			if(!m_Wizard.axWorkShop(nReturn,"IBXXXX11",size,false))
@@ -2791,7 +2791,7 @@ void CIBKSConnectorCtrl::OnSetClientSite()
 	COleControl::OnSetClientSite();
 }
 
-long CIBKSConnectorCtrl::OnUser(WPARAM wParam, LPARAM lParam)
+LRESULT CIBKSConnectorCtrl::OnUser(WPARAM wParam, LPARAM lParam)
 {	
 	switch(wParam)
 	{

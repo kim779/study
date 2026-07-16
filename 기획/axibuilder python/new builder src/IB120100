@@ -3,7 +3,7 @@ GLOBAL DIVISION
 
 MAPNAME(IB120100)
 MAPSIZE(399, 729)
-PYTHON(0)
+PYTHON(1)
 VERSION(000)
 MAPKIND(NORMAL)
 MAPGROUP(0)
@@ -190,44 +190,44 @@ RESOURCE DIVISION
 
 
 _AW_ONDECLARE_AW_
-Option Explicit
+#Option Explicit
 
 
-Dim ii,i
+ii,i
 Dim list
-Set list = CreateObject("Scripting.Dictionary")
-''*************************************************
-''send ui data
-''*************************************************
-Sub f_vSendUiData()
+set list = CreateObject("Scripting.Dictionary")
+#*************************************************
+#send ui data
+#*************************************************
+def f_vSendUiData():
 	Dim ACCN, pass,tax,mmd, ctype
 
-	SCREEN.OnSend False
+	Screen.OnSend False
 	VIEWGRID.Clear
 
-	If cbo_mmd.Index = 0 Then
+	if cbo_mmd.Index = 0 Then
 		mmd = out_hts.data
 	ElseIf cbo_mmd.Index = 1 Then
 		mmd = out_call.data
 	ElseIf cbo_mmd.Index = 2 Then
 		mmd = out_ars.data
-	End If
+	End if
 
 	' 기본값[9999] - 09/07/15
-	If SYSTEM.ConnectBy = "0" And Trim(pswd.Data) = "" Then
+	if System.ConnectBy = "0" and Trim(pswd.Data) = "" Then
 	   pswd.Data = "9999"
-	End If
+	End if
 
 	ACCN = Trim(AN1A.Data)						'계좌번호
 	pass = Trim(pswd.Data)						'비밀번호
 	tax = cbo_tax.data
 	ctype = cbo_type.Data
 
-	If Len(Trim(ACCN)) <> 11 Then
-		SCREEN.Object("main.obj_GUIDE.GUIDE").Text = "계좌번호를 확인하여 주십시오."
+	if len(Trim(ACCN)) <> 11 Then
+		Screen.Object("main.obj_GUIDE.GUIDE").Text = "계좌번호를 확인하여 주십시오."
 		AN1A.SetFocus
 		Exit Sub
-	End If
+	End if
 
 	If Len(Trim(pass)) < 4 Then
 		SCREEN.Object("main.obj_GUIDE.GUIDE").Text = "비밀번호를 확인하여 주십시오."
@@ -851,69 +851,65 @@ _AW_ONINDECLARE_AW_
 
 _AW_ONENDSUB_AW_
 _AW_ONSTART_AW_
-' 현재 화면의 시장식별자(cxMarket)에 고유 화면번호 부여
-cxMarket.Major = SCREEN.Major
-cxMarket.MNum = SCREEN.GetMapName(1)
+# 현재 화면의 시장식별자(cxMarket)에 고유 화면번호 부여
+cxMarket.Major = Screen.Major
+cxMarket.MNum = Screen.GetMapName(1)
 
-If SYSTEM.ConnectBy = "1" Then			'직원용 HTS
-	print.Visible = False
-	print.Enable = False
+if System.ConnectBy = "1":			#직원용 HTS
+    print.Visible = False
+    print.Enable = False
 
-End If
 
-Call Check_LoginType(pswd)		'직원/고객에 따른 비밀번호 컨트롤 설정
-Call p_read_ini()
+
+Check_LoginType(pswd)		#직원/고객에 따른 비밀번호 컨트롤 설정
+p_read_ini()
 editSearch.Data = "1"
-'VIEWGRID의 위치를 수정하는 이유는 viewtype을 resizableEx로 변경후
-'가이드부분이 사라져 보이지 않기 때문.
-VIEWGRID.SetRect 6, 102, 723, 370
-SCREEN.SetSize 729, 400
-SCREEN.SetTimer 0.1, False
+#VIEWGRID의 위치를 수정하는 이유는 viewtype을 resizableEx로 변경후
+#가이드부분이 사라져 보이지 않기 때문.
+VIEWGRID.SetRect(6, 102, 723, 370)
+Screen.SetSize(729, 400)
+Screen.SetTimer(0.1, False)
 VIEWGRID.Refresh()
 
-If SYSTEM.ConnectBy = "1" Then
-	cautionBtn.Visible = False
-	cautionBtn.Enable = False
-
-	print.Enable = False
-	print.Visible = False
-
-	staff_cautionBtn.Visible = True
-	staff_cautionBtn.Enable = True
-
-
-End If
+if System.ConnectBy = "1":
+    cautionBtn.Visible = False
+    cautionBtn.Enable = False
+    
+    print.Enable = False
+    print.Visible = False
+    
+    staff_cautionBtn.Visible = True
+    staff_cautionBtn.Enable = True
 
 _AW_ONENDSUB_AW_
 _AW_ONSEND_AW_
-' 기본값[9999] - 09/07/15
-If UCase(TypeName( SCREEN.Object("main.cxMarket"))) <> "NOTHING" Then
-	cxMarket.sCode = SCREEN.Object("main.cxMarket").sCode
+# 기본값[9999] - 09/07/15
+if UCase(TypeName( Screen.Object("main.cxMarket"))) <> "NOTHING":
+    cxMarket.sCode = Screen.Object("main.cxMarket").sCode
+    
+    if Screen.Object("main.cxMarket").sMarket = "KRX":
+    	cxMarket.sMarket = "KRX"
+    elif Screen.Object("main.cxMarket").sMarket = "NXT":
+    	cxMarket.sMarket = "NXT"
+    elif Screen.Object("main.cxMarket").sMarket = "통합":
+    	cxMarket.sMarket = "통합"
 
-	If SCREEN.Object("main.cxMarket").sMarket = "KRX" Then
-		cxMarket.sMarket = "KRX"
-	ElseIf SCREEN.Object("main.cxMarket").sMarket = "NXT" Then
-		cxMarket.sMarket = "NXT"
-	ElseIf SCREEN.Object("main.cxMarket").sMarket = "통합" Then
-		cxMarket.sMarket = "통합"
-	End If
-End If
 
-If SYSTEM.ConnectBy = "0" And Trim(pswd.Data) = "" Then
-   pswd.Data = "9999"
-End If
 
-If CheckInput(AN1A, pswd) = True Then
-	SCREEN.OnSend True
-End If
+if System.ConnectBy = "0" and Trim(pswd.Data) = "" :
+    pswd.Data = "9999"
+
+
+if CheckInput(AN1A, pswd) = True :
+    Screen.OnSend True
 
 _AW_ONENDSUB_AW_
 _AW_ONTIMER_AW_
-SCREEN.SetSize 729, 401
+Screen.SetSize(729, 401)
 
 _AW_ONENDSUB_AW_
 _AW_ONCLOSE_AW_
-Call p_write_ini()
+p_write_ini()
 
 _AW_ONENDSUB_AW_
 _AW_SCRIPT_AW_(VIEWGRID)

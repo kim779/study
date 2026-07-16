@@ -6103,7 +6103,7 @@ void CTestDlgDlg::OnBnClickedBtnExcute()
 
 void CTestDlgDlg::OnBnClickedBtnOsver()
 {
-	OSVERSIONINFOEX os;
+	/*OSVERSIONINFOEX os;
 	os.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
 
 	HMODULE hMod{};
@@ -6133,7 +6133,7 @@ void CTestDlgDlg::OnBnClickedBtnOsver()
 	}
 	else
 		return ;
-	FreeLibrary(hMod);
+	FreeLibrary(hMod);*/
 	//if (!GetVersion(&osvi))
 	//	return
 

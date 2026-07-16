@@ -23,7 +23,7 @@ public:
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 지원입니다.
-	afx_msg LONG OnSockManage(WPARAM wParam, LPARAM lParam);
+	//afx_msg LONG OnSockManage(WPARAM wParam, LPARAM lParam);
 	DECLARE_MESSAGE_MAP()
 public:
 	virtual BOOL OnInitDialog();

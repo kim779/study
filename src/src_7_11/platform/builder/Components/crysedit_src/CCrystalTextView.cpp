@@ -766,12 +766,35 @@ void CCrystalTextView::DrawMargin(CDC *pdc, const CRect &rect, int nLineIndex)
 	if (nImageIndex >= 0)
 	{
 		if (m_pIcons == NULL)
-		{ 
+		{
 			m_pIcons = new CImageList;
 			VERIFY(m_pIcons->Create(IDR_MARGIN_ICONS, 14, 14, RGB(255, 255, 255)));
 		}
 		CPoint pt(rect.left + 2, rect.top + (rect.Height() - 14) / 2);
 		VERIFY(m_pIcons->Draw(pdc, nImageIndex, pt, ILD_TRANSPARENT));
+	}
+
+	if (nLineIndex >= 0)
+	{
+		CString sLineNum;
+		sLineNum.Format(_T("%d"), nLineIndex + 1);
+
+		CRect rcNum(rect.left + 20, rect.top, rect.right - 2, rect.bottom);
+		// Explicitly erase this cell before drawing the number. OnDraw() reuses
+		// one shared per-line cache bitmap across all visible lines, and with
+		// TRANSPARENT background mode a stale/wider previous number's pixels
+		// could otherwise still show through under the new one.
+		pdc->FillSolidRect(&rcNum, GetColor(COLORINDEX_BKGND));
+
+		CFont *pOldFont = pdc->SelectObject(GetFont());
+		int nOldBkMode = pdc->SetBkMode(TRANSPARENT);
+		COLORREF crOldText = pdc->SetTextColor(GetColor(COLORINDEX_NORMALTEXT));
+
+		pdc->DrawText(sLineNum, rcNum, DT_RIGHT | DT_VCENTER | DT_SINGLELINE | DT_NOPREFIX);
+
+		pdc->SetTextColor(crOldText);
+		pdc->SetBkMode(nOldBkMode);
+		pdc->SelectObject(pOldFont);
 	}
 }
 
@@ -2770,7 +2793,9 @@ BOOL CCrystalTextView::GetSelectionMargin()
 
 int CCrystalTextView::GetMarginWidth()
 {
-	return m_bSelMargin ? 20 : 1;
+	if (! m_bSelMargin)
+		return 1;
+	return 20 + GetCharWidth() * 6;		// icon strip + up to 6-digit line number
 }
 
 BOOL CCrystalTextView::GetSmoothScroll() const

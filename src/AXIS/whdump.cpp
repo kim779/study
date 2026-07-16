@@ -244,6 +244,7 @@ LONG MiniDumper::TopLevelFilter(struct _EXCEPTION_POINTERS* pExceptionInfo)
                     MiniDumpWithHandleData |
                     MiniDumpWithThreadInfo |
                     MiniDumpWithUnloadedModules |
+                    MiniDumpWithIndirectlyReferencedMemory | 
                     MiniDumpWithCodeSegs);    // x64 CALL
 
                 const BOOL bOK = pDump(

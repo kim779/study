@@ -313,6 +313,183 @@ Module(OCX 독립모듈), Facade(CGuard/CSockCtrl), Observer(EventMap), Thread P
 4. **CAxisDraw (platform/dll/lib)** — 그래픽 객체 풀에 동시성 보호 없음
 5. **xTreeCtrl 중복 정의 (platform/builder/awCommon ↔ awSock)** — 동일 코드 중복
 
+---
+
+## 7.1 AxisBuilder Core Classes (빌더 핵심 클래스 기능분석)
+
+### 개요
+
+platform/builder의 Python 엔진 통합(2026-07-08~14)으로, 다음 9개 핵심 클래스의 역할과 최근 변경사항을 명시 기록한다.
+상세는 KnowledgeBase.md 섹션 8(Explicit pythonMode Architecture) 및 Todo.md(2026-07-08~14 항목) 참고.
+
+### 클래스 기능 매트릭스
+
+| 클래스명 | 파일 경로 | 역할 | 주요 함수 | 최근 변경(2026-07-08~14) |
+|---------|---------|------|---------|----------------------|
+| **CMainFrame** | MainFrm.h/cpp | MDI 메인 프레임, 도킹 패널 관리, ID_USR_REFRESHCTRL 핸들러 | `OnCreate()`, `changeMap()`, `ID_USR_REFRESHCTRL` | `MainFrm.cpp:878` 13진법→40진법 인덱스 변환. Procedures 맵 pythonMode 동기화 추가. `[AXISWORK][ROOTDIR][DEBUG]` 로그 추가. |
+| **CChildView/ CChildFrame** | ChildView.h/cpp, ChildFrm.h/cpp | Procedures 라이브러리 맵 에디터, 별도 CVBScriptEdit 관리 | `changeKind()`, `OnSize()`, `OnPyBtnClick()` | **m_pyBtn(토글 버튼) 신규 추가**(2026-07-14). 클릭 시 `m_mapH->pythonMode` 즉시 토글 + `m_pSCEdit->SetPythonMode()` 즉시 반영. `SaveProcedures()` 자체는 수정하지 않음(원문 스크립트만 씀, pythonMode와 무관) — 직렬화는 기존 `CBuild::generateHeader()`의 `PYTHON(%d)` 경로를 그대로 탐. |
+| **CScriptBar** | ScriptBar.h/cpp | 일반 Map용 스크립트 도킹 패널 (사용자 실제 에디터) | `Initialize()`, `SelectEvent()`, `getAllScript()`, `OnPyBtnClick()`, `LoadAutoList()` | `m_pythonBtn` 자체는 2026-07-08 Phase 2에서 이미 추가됨. **캡션이 체크 상태에 따라 "PY"/"VB"로 바뀌도록 수정**(2026-07-13~14). `getAllScript()` idx: 13진법→40진법 재계산(2026-07-13). **빈 줄 포함 라인 카운팅 수정**(`getLineCount()`, 2026-07-13). `[AXISWORK][AUTOLIST][DEBUG]` 로그(2026-07-08). |
+| **CVBScriptEdit/ CCrystalTextView** | VBScriptEdit.h/cpp, crysedit_src/ | 구문강조/자동완성 에디터 | `SetPythonMode()`, `IsSymbol()`, `OnEditTab()`, `DrawMargin()` | **Python 키워드·주석('#') 토글**(2026-07-10). **Tab→Space 4칸**(2026-07-10). **Screen/System/Login/Ledger 정확한 대소문자 교정**(2026-07-08~09). **줄 번호 표시 추가**(2026-07-13). `Alt+F1` "Edit Source" 단축키. |
+| **CNFBtn** | NFBtn.h/cpp | 커스텀 토글 버튼 | (기존 기능, 변경 없음) | m_pyBtn/m_pythonBtn 인스턴스 용도로 재사용만 함. |
+| **CMapLoad** | awBuild/mapLoad.cpp | 텍스트 Map 파일 → 바이너리 _mapH 구조체 파싱 | `Load()`, `SaveScriptFile()` | **변경 없음.** `SaveScriptFile()`의 `def `/`import ` 자동감지는 여전히 **Procedures 맵에서는 호출되지 않는** 구조적 한계로 남아있음(`SaveProcedures()`가 이 경로를 안 거치고 직접 파일을 씀) — Procedures 맵은 위 `CChildView::m_pyBtn` 수동 토글로 이 한계를 우회한 것이지, `CMapLoad` 쪽을 고친 게 아님. |
+| **CBuild** | awBuild/build.cpp | 메모리 _mapH → 컴파일 소스 텍스트 생성 | `generateHeader()`, `GetScript()` | **PYTHON(%d) 지시어 추가**(2026-07-08): `generateHeader()`가 `m_mapH->pythonMode`를 컴파일 소스에 직렬화. 이전까지 에디터의 pythonMode 값이 컴파일러로 전달되지 않던 누락된 고리였음. |
+| **CCompile** | awWcc/mapbld.cpp | 소스 텍스트 → 바이너리 맵 컴파일 | `mapGlobalStrBuilding()`, `mapResStrBuilding()`, `mapMemoryAllocation()` | **PYTHON 지시어 감지**(case 21, 2026-07-08): 소스의 `PYTHON(1)`을 읽어 `m_mapH.pythonMode` 반영. **def 래핑 자동화**(2026-07-08): VBScript처럼 Python 이벤트 블록도 `def AX_..._AX_():` 헤더 자동생성 + 본문 자동 들여쓰기. **pass 삽입**(2026-07-08): 빈/주석뿐인 블록도 `    pass`로 유효한 Python 문법 유지. **들여쓰기 보존**(2026-07-07 misc.cpp rawText): 기존 strip 버그 수정(VBScript는 무해, Python은 오류). |
+| **CAxisForm:: getExternalScript()** | dll/form/axform.cpp (양쪽 트리 공유) | #load/@load 라이브러리 병합 | `getExternalScript()`, `getScripts()` | **@load 지시어 추가**(2026-07-08): `#load` 외 `@load` 문법도 인식. Python 모드에서 `#`를 주석으로 오인하지 않기 위한 대체문법. 컴파일 결과물에는 양쪽 전부 동작(스크립트 엔진에 전달 전에 통째로 제거됨). |
+
+### 각 클래스의 상세 설명
+
+#### 1. CMainFrame (MainFrm.h/cpp)
+
+**역할**: MDI 메인 윈도우, 전체 UI 조종
+
+- `OnCreate()`: 초기화 시 `CScriptBar` 도킹 패널 생성
+- `changeMap()`: 맵 선택/로드 시 호출
+- `ID_USR_REFRESHCTRL`: 맵 재로드 시 `pythonMode` 동기화 포인트 (CScriptBar + Procedures 맵의 m_pSCEdit 양쪽 SetPythonMode 호출)
+
+**최근 변경**:
+- **MainFrm.cpp:878 인덱스 변환**: 13진법→40진법 (2026-07-13 "Go to Line" 기능 확장용)
+- **m_pyBtn.SetCheck() 동기화** (Procedures 맵 로드 시): `ID_USR_REFRESHCTRL` 핸들러
+
+#### 2. CChildView/CChildFrame (ChildView.h/cpp, ChildFrm.h/cpp)
+
+**역할**: Procedures(라이브러리) 맵 전용 에디터
+
+- `changeKind()`: 맵 종류(`MAPKIND_PROCEDURES`)별 UI 생성
+- `OnSize()`: 버튼 배치
+- `OnPyBtnClick()`: Python/VBScript 토글 → `m_mapH->pythonMode` 즉시 변경 + `m_pSCEdit->SetPythonMode()` 즉시 반영
+
+**최근 변경**:
+- **m_pyBtn 신규 추가** (2026-07-14): Procedures 맵에도 일반 Map과 동일한 PY/VB 토글 버튼 제공
+- `SaveProcedures()` 자체는 수정하지 않음 — 여전히 `CreateFile`/`WriteFile`로 원문 스크립트만 직접 씀. pythonMode 값은 `m_mapH` 구조체 필드라 버튼 클릭 시 이미 메모리에 반영되고, 맵 저장/컴파일 시 `CBuild::generateHeader()`의 기존 `PYTHON(%d)` 직렬화 경로를 그대로 탄다(Procedures 전용 코드 추가 없음).
+
+#### 3. CScriptBar (ScriptBar.h/cpp)
+
+**역할**: 일반 Map 스크립트 편집 도킹 패널 (사용자 실제 쓰는 에디터)
+
+- `Initialize()`: 초기화
+- `SelectEvent()`: 이벤트 선택
+- `getAllScript(idx_out)`: 모든 이벤트 텍스트 병합 + 각 줄이 속한 이벤트 idx 반환
+- `OnPyBtnClick()`: Python/VBScript 토글
+- `LoadAutoList()`: public.ini에서 키워드 자동완성 데이터 로드
+
+**최근 변경**:
+- `m_pythonBtn` 자체는 2026-07-08 Phase 2에서 이미 추가됨. **캡션이 체크 상태에 따라 "PY"/"VB"로 바뀌도록 수정** (2026-07-13~14, `Initialize()`/`OnPyBtnClick()` 두 곳에 `SetWindowText()` 추가)
+- **getAllScript() idx: 13진법→40진법** (2026-07-13): 16개 이벤트 상수(-13~-27 등)를 40진법으로 재계산하면서 OnTimerX 중복 제거 및 모든 이벤트 구분 가능화
+- **getLineCount() 수정** (2026-07-13): 빈 줄도 포함해서 카운팅 (물리적 라인 번호 기준)
+- **[AXISWORK][AUTOLIST][DEBUG]** 로그: RootDir 찾기 진단용 (2026-07-08)
+
+#### 4. CVBScriptEdit/CCrystalTextView
+
+**역할**: MFC 에디터 컴포넌트 (VBScript 레거시, Python 확장)
+
+- `SetPythonMode(bool)`: 모드 전환
+- `IsSymbol()`: 자동완성/키워드색상 처리
+- `OnEditTab()`: Tab 키 입력
+- `DrawMargin()`: 줄번호 렌더링
+
+**최근 변경**:
+- **Python 키워드셋 추가** (2026-07-10): `def`, `import`, `if`, `for` 등
+- **주석문자 동적 전환** (2026-07-10): `'` (VBScript) ↔ `#` (Python)
+- **Tab→Space 4칸** (2026-07-10 `OnEditTab()`): VBScript는 Tab, Python은 스페이스 필수
+- **Screen/System/Login/Ledger 대소문자 교정** (2026-07-08~09 `IsSymbol()`): Python 모드에서 이 전역객체들만 정확한 철자로 강제교정 (PUBLIC.INI의 대문자 등록 무시)
+- **줄 번호 표시** (2026-07-13 `DrawMargin()`): 좌측 여백에 우측정렬 숫자 표시
+- **Alt+F1 "Edit Source" 단축키**: axisWork.rc 액셀러레이터 테이블
+
+#### 5. CNFBtn (NFBtn.h/cpp)
+
+**역할**: 커스텀 토글 버튼 컴포넌트
+
+- 기존 기능 유지, 변경 없음
+- `m_pyBtn`, `m_pythonBtn` 인스턴스로만 재사용
+
+#### 6. CMapLoad (awBuild/mapLoad.cpp)
+
+**역할**: Map 문서 로드/파싱
+
+- `Load()`: 파일 읽기 → `_mapH` 바이너리 구조체 채우기
+- `SaveScriptFile()`: 스크립트 저장 시 `pythonMode` 자동감지 (def/import 텍스트 스캔)
+
+**최근 변경**: 없음 (기존 로직 유지, Procedures 맵 처리 일부 추가)
+
+#### 7. CBuild (awBuild/build.cpp)
+
+**역할**: 메모리 _mapH → 컴파일 소스 텍스트 생성 (빌더가 awWcc에 넘기기 전)
+
+- `generateHeader()`: Map 헤더 정보(MAPNAME, MAPSIZE 등) + **PYTHON(%d) 지시어** 직렬화
+
+**최근 변경**:
+- **PYTHON(%d) 지시어** (2026-07-08): `generateHeader()`가 `m_mapH->pythonMode`를 소스에 직렬화
+  - 이전: 에디터의 pythonMode 값이 컴파일러로 전달되지 않음 (누락)
+  - 현재: CBuild→CCompile로 명시적 전달, 컴파일러가 명시 플래그 기준 동작
+
+#### 8. CCompile (awWcc/mapbld.cpp)
+
+**역할**: 소스 텍스트 → 바이너리 .map 파일 컴파일
+
+- `mapGlobalStrBuilding(case 21)`: PYTHON 지시어 처리
+- `mapResStrBuilding()`: 이벤트 블록 처리 (def 래핑, pass 삽입, 들여쓰기 보존)
+- `mapMemoryAllocation()`: 컴파일 결과 메모리 할당
+
+**최근 변경**:
+- **PYTHON 지시어 감지** (2026-07-08, case 21 추가): 소스의 `PYTHON(1)` 읽기 → `m_mapH.pythonMode = 1` 설정
+- **def 래핑 자동화** (2026-07-08): `m_pyWrap` = `"def AX_<컨트롤>_On<이벤트>_AX_():"` 자동 생성 + 본문 4-space 들여쓰기 자동 삽입
+- **pass 삽입** (2026-07-08): 빈 블록도 마지막에 `    pass` 자동 추가 (유효한 Python 문법 보장)
+- **들여쓰기 보존** (2026-07-07, misc.cpp rawText): 기존 strip 버그 수정
+
+#### 9. CAxisForm::getExternalScript()/getScripts() (dll/form/axform.cpp)
+
+**역할**: #load/@load 지시어 처리 (라이브러리 맵 병합)
+
+- `getExternalScript()`: `#LOAD`/`@LOAD` 마커 탐색 → 참조 맵의 스크립트 추출
+- `getScripts()`: 최종 병합 스크립트 생성
+
+**최근 변경**:
+- **@load 문법 추가** (2026-07-08): `#load` 외 `@load` 지시어 인식
+  - 배경: Python 모드에서 `#`를 주석으로 오인하는 사용자 혼동 방지
+  - 효과: `@load IB999901` → 일반 텍스트 색상 (주석 아님이 명확)
+  - 호환성: `#load` 기존 문법 그대로 유지
+
+### 아키텍처 통합 관점
+
+**데이터 흐름**:
+```
+에디터(CScriptBar) → 메모리 _mapH (pythonMode 플래그)
+  ↓
+CBuild::generateHeader() → PYTHON(1/0) 지시어 직렬화 + 스크립트 텍스트
+  ↓
+CCompile::mapGlobalStrBuilding() → PYTHON 지시어 파싱, m_mapH.pythonMode 설정
+CCompile::mapResStrBuilding() → pythonMode 기준 def 래핑/들여쓰기/pass
+  ↓
+바이너리 .map 파일 저장 (pythonMode 직렬화됨)
+  ↓
+런타임(Wizard/Screen.cpp) → m_mapH.pythonMode 읽음 → CEngineWrapper에 전달
+  ↓
+CPythonEngine 또는 CScriptEngine 선택 (명시적 플래그, 텍스트 스캔 아님)
+```
+
+**주요 설계 변경**:
+
+1. **추측 방식 → 명시 플래그** (2026-07-08)
+   - 이전: 런타임에 `def `/`import ` 텍스트 스캔 (휴리스틱)
+   - 현재: 컴파일 시점에 pythonMode 명시 설정 + 바이너리 저장 → 런타임 명시 플래그 사용
+   - 효과: 혼합 언어 오판 제거, 화면별 명확한 언어 선택
+
+2. **자동 래핑 & 안전장치**
+   - VBScript: 기존대로 컴파일러가 Sub/End Sub 자동 생성
+   - Python: 동일하게 def/pass 자동 생성 → 사용자 부담 제거
+
+3. **Procedures 맵 개선** (2026-07-14)
+   - 전역 함수 정의 맵에도 PY/VB 토글 버튼(`CChildView::m_pyBtn`) 추가 — `CMapLoad::SaveScriptFile()`의 자동감지가 이 맵 종류에서는 호출되지 않는 구조적 한계를 우회하는 수동 버튼
+   - `SaveProcedures()`/`CMapLoad` 자체는 변경하지 않음(직렬화는 기존 `CBuild::generateHeader()` 경로 그대로 사용)
+
+### 참고 문서
+
+- **KnowledgeBase.md**: 섹션 8 "Explicit pythonMode Architecture" (설계 배경)
+- **Todo.md**: 2026-07-08~14 완료 항목 (상세 변경사항/버그 수정)
+- **Memory**: `project_python_engine_progress.md` (Python 엔진 진행 상황)
+
+---
+
 ## 다음 분석 단계 (권장)
 - Call Graph: 진입점(WinMain/DllMain)→ThreadProc/Socket Callback/Message Handler 추적 (call-graph 스킬)
 - Architecture Review: 위 God Class/강결합/동시성 리스크에 대한 세부 리뷰 (architecture-review 스킬)

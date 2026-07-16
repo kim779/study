@@ -199,11 +199,18 @@ int CGuard::Initial(CWnd* control)
 	((CWizardApp*)AfxGetApp())->SetRegistry(m_keys);
 
 	m_root = m_app->GetProfileString(ENVIRONMENT, ROOTDIR, "");
+
+	{
+		CString slogTrace;
+		slogTrace.Format(_T("[logintrace][%s]<%d> m_root read from registry =[%s]"), _T(__FUNCTION__), __LINE__, m_root.GetString());
+		OutputDebugString(slogTrace);
+	}
+
 	if (m_root.IsEmpty())
 		return -1;
 
 	//xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-	// [KJS] ¾²·¹µå Ã³¸®...  µð¹ö±×½Ã ¾²·¹µå Ã³¸®ÇÏ¸é Ã³¸® ¾ÈµÊ...
+	// [KJS] ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Ã³ï¿½ï¿½...  ï¿½ï¿½ï¿½ï¿½×½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Ã³ï¿½ï¿½ï¿½Ï¸ï¿½ Ã³ï¿½ï¿½ ï¿½Èµï¿½...
 	//xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 #ifndef _DEBUG
 	auto future = std::async([&]() {	
@@ -212,10 +219,15 @@ int CGuard::Initial(CWnd* control)
 		m_xecure = new CWnd();
 		if (!m_xecure->CreateControl(_T("AxisXecure.XecureCtrl.IBK2019"), NULL, 0, CRect(0, 0, 0, 0), control, 0))
 		{
-
-
+			m_slog.Format("[logintrace][%s]<%d> m_xecure CreateControl fail err=[%d]", __FUNCTION__, __LINE__, GetLastError());
+			OutputDebugString(m_slog);
 			delete m_xecure;
 			m_xecure = NULL;
+		}
+		else
+		{
+			m_slog.Format("[logintrace][%s]<%d> m_xecure CreateControl success", __FUNCTION__, __LINE__);
+			OutputDebugString(m_slog);
 		}
 #ifndef _DEBUG
 	});
@@ -223,13 +235,25 @@ int CGuard::Initial(CWnd* control)
 //	//xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
 	if (!m_sock->CreateControl(_T("AxisSock.SockCtrl.IBK2019"), NULL, WS_VISIBLE, CRect(0, 0, 0, 0), control, -1))
+	{
+		CString slogTrace;
+		slogTrace.Format(_T("[logintrace][%s]<%d> m_sock CreateControl fail err=[%d]"), _T(__FUNCTION__), __LINE__, GetLastError());
+		OutputDebugString(slogTrace);
 		return -1;
+	}
 
 	m_certify = new CWnd();
 	if (!m_certify->CreateControl(_T("AxisCertify.CertifyCtrl.IBK2019"), NULL, 0, CRect(0, 0, 0, 0), control, 0))
 	{
+		m_slog.Format("[logintrace][%s]<%d> m_certify CreateControl fail err=[%d]", __FUNCTION__, __LINE__, GetLastError());
+		OutputDebugString(m_slog);
 		delete m_certify;
 		m_certify = NULL;
+	}
+	else
+	{
+		m_slog.Format("[logintrace][%s]<%d> m_certify CreateControl success", __FUNCTION__, __LINE__);
+		OutputDebugString(m_slog);
 	}
 
 
@@ -240,6 +264,12 @@ int CGuard::Initial(CWnd* control)
 	m_repository.Format(_T("%s\\%s\\Repository"), m_root.GetString(), TABDIR);
 	m_userini.Format(_T("%s\\%s\\%s"), m_root.GetString(), TABDIR, AXISUSER);
 	m_modals.Format(_T("%s\\%s\\%s\\modal.ini"), m_root.GetString(), USRDIR, m_uname.GetString());
+
+	{
+		CString slogTrace;
+		slogTrace.Format(_T("[logintrace][%s]<%d> m_vtcode=[%s] m_repository=[%s] m_userini=[%s]"), _T(__FUNCTION__), __LINE__, m_vtcode.GetString(), m_repository.GetString(), m_userini.GetString());
+		OutputDebugString(slogTrace);
+	}
 
 	CString	tmps;
 // updateXXX_202202
@@ -282,7 +312,7 @@ int CGuard::Initial(CWnd* control)
 	isMenu(true);
 #ifndef _DEBUG
 //	//xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-//	// [KJS] ¾²·¹µå ³¡³¯¶§±îÁö ±â´Ù¸²
+//	// [KJS] ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ù¸ï¿½
 //	//xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 	const std::chrono::milliseconds wtime(50);
 	while (future.wait_for(wtime) != std::future_status::ready)
@@ -1060,7 +1090,7 @@ void CGuard::OnNotice(char* pBytes, int nBytes)
 
 	text = CString(pBytes, nBytes);
  	tmps = text;
-	if (text.Find("w  ") != -1 && text.Find("quote") != -1)	// ½Ã¼¼º¯µ¿ÆÇ¿ë µ¥ÀÌÅÍ
+	if (text.Find("w  ") != -1 && text.Find("quote") != -1)	// ï¿½Ã¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç¿ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	{
 		CWorks* works;
 
@@ -1513,10 +1543,10 @@ void CGuard::Sign(int signK, char* signB, int signL, CString& dns, bool shop)
 
 	int	idx;
 	switch (signR->mask & maskSEC)  
-	{//¸Õ°¡ ¼­¹ö¶û ±ÔÄ¢À» ¸ÂÃß´Â°Å °°´Ù.
-	 //or  ,  and,  xor ¼ÂÁß¿¡ ÇÏ³ª ÇÏ±â·Î ¼­¹ö°¡ Á¤ÇØÁØ°É ±¸ºÐÀÚ·Î ¹Þ°í
-	//½ÇÁ¦ incS °ªÀ» Á¤ÇØÁø ±¸ºÐÀÚ·Î ºñÆ® ¿¬»êÇÑ´Ù.
-	//¹è¿­ÀÇ ÀÎÀÚ 1, 0 °ªÀ» ºñÆ®¿¬»êÇØ¼­ ³Ö¾îµÐ´Ù.
+	{//ï¿½Õ°ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ä¢ï¿½ï¿½ ï¿½ï¿½ï¿½ß´Â°ï¿½ ï¿½ï¿½ï¿½ï¿½.
+	 //or  ,  and,  xor ï¿½ï¿½ï¿½ß¿ï¿½ ï¿½Ï³ï¿½ ï¿½Ï±ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ø°ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ú·ï¿½ ï¿½Þ°ï¿½
+	//ï¿½ï¿½ï¿½ï¿½ incS ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ú·ï¿½ ï¿½ï¿½Æ® ï¿½ï¿½ï¿½ï¿½ï¿½Ñ´ï¿½.
+	//ï¿½è¿­ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ 1, 0 ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Æ®ï¿½ï¿½ï¿½ï¿½ï¿½Ø¼ï¿½ ï¿½Ö¾ï¿½Ð´ï¿½.
 	case maskOR:
 		for (idx = 0; idx < sizeof(signR->incS); idx++)
 		{
@@ -1605,7 +1635,7 @@ void CGuard::Sign(int signK, char* signB, int signL, CString& dns, bool shop)
 				SYSTEMTIME st;
 				time_t	tmx = (time_t)atoi(string.Mid(idx + 1));
 				errno_t	eno = localtime_s(&ltime, &tmx);
-// KJS  2022/11/04  ¿À·ù ¼öÁ¤....
+// KJS  2022/11/04  ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½....
 				if (eno == 0)
 				{
 					GetLocalTime(&st);
@@ -2980,7 +3010,7 @@ BOOL CGuard::Login(int mode, char* datB, int datL, bool xecure)
 
 	if (mode == signUSER)
 	{
-		trN = _T("AXLOGON");
+		trN = _T("AXLOGONE");
 		axisH->msgK = msgK_SIGN;
 	}
 	else
@@ -4298,7 +4328,7 @@ BOOL CGuard::Certify(BOOL force, BOOL certify, BOOL xcertify, BOOL xserver)
 				m_certify = NULL;
 				if (!force)
 				{
-					AfxMessageBox("°øÀÎÀÎÁõ ÄÁÆ®·Ñ »ý¼º ¿À·ù");
+					AfxMessageBox("Xecure create fail");
 					SetGuide(AE_ECERTCTRL);
 				}
 				return TRUE;
@@ -5660,7 +5690,7 @@ CString CGuard::GetFileName(CString fileN, CString filter, CString& ext, bool fo
 			if (GetString(AS_FILE, tmps))
 				string.Format(tmps, fileN);
 			else
-				string.Format(_T("ÀÌ À§Ä¡¿¡  \'%s\' ÆÄÀÏÀÌ ÀÖ½À´Ï´Ù. ±âÁ¸ÀÇ ÆÄÀÏÀ»(¸¦) ¹Ù²Ù½Ã°Ú½À´Ï±î?"), fileN.GetString());
+				string.Format(_T("ï¿½ï¿½ ï¿½ï¿½Ä¡ï¿½ï¿½  \'%s\' ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ö½ï¿½ï¿½Ï´ï¿½. ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½(ï¿½ï¿½) ï¿½Ù²Ù½Ã°Ú½ï¿½ï¿½Ï±ï¿½?"), fileN.GetString());
 
 			int	rc = ::MessageBox(NULL, string, "Excel", MB_YESNOCANCEL | MB_ICONINFORMATION);
 			switch (rc)
@@ -5671,7 +5701,7 @@ CString CGuard::GetFileName(CString fileN, CString filter, CString& ext, bool fo
 					if (GetString(AS_USING, tmps))
 						string.Format(tmps, fileN);
 					else
-						string.Format(_T("\'%s\' ÆÄÀÏÀÌ »ç¿ëÁßÀÔ´Ï´Ù. »ç¿ëÁßÀÎ ÆÄÀÏÀ» ´Ý°í ´Ù½Ã ½ÃµµÇØ ÁÖ½Ê½Ã¿À."), fileN.GetString());
+						string.Format(_T("\'%s\' ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô´Ï´ï¿½. ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ý°ï¿½ ï¿½Ù½ï¿½ ï¿½Ãµï¿½ï¿½ï¿½ ï¿½Ö½Ê½Ã¿ï¿½."), fileN.GetString());
 					::MessageBox(NULL, string, "Excel", MB_OK | MB_ICONINFORMATION);
 					return _T("");
 				}
@@ -5933,7 +5963,7 @@ void CGuard::DoRTM(CString code, int stat, CdataSet* fms, CObArray* obs, CString
 		m_alertR.ptr[0] = (DWORD)fms->GetData();
 	}
 
-	m_parent->SendMessage(WM_ANM, 0, (LPARAM)&m_alertR);		// Array Àü¼ÛÀ¸·Î º¯°æ
+	m_parent->SendMessage(WM_ANM, 0, (LPARAM)&m_alertR);		// Array ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 	for (pos = m_clients.GetStartPosition(); pos; )
 	{
 		m_clients.GetNextAssoc(pos, key, works);

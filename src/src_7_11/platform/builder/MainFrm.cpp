@@ -874,8 +874,17 @@ void CMainFrame::OnMainCommand(UINT cmdID)
 					}
 					int lineNum = dlg.m_lineNum + 1, idx;
 					m_wndScriptBar.WriteScript();
+					// Clamp to the actual script range first - a line number that
+					// doesn't fall inside any event block leaves idx at its -3
+					// sentinel, which setLinePos() misreads as a real (bogus)
+					// control index and can fail with ERROR_INVALID_PARAMETER.
+					int totalLines = m_wndScriptBar.getLineCount(m_wndScriptBar.getAllScript(NULL));
+					if (lineNum < 1)
+						lineNum = 1;
+					if (lineNum > totalLines)
+						lineNum = totalLines;
 					m_wndScriptBar.getAllScript(NULL, &lineNum, &idx);
-					m_wndScriptBar.setLinePos(idx / 13, abs(idx % 13) + 1, lineNum - 1);
+					m_wndScriptBar.setLinePos(idx / 40, abs(idx % 40) + 1, lineNum - 1);
 				}
 			}
 		}
@@ -3623,7 +3632,11 @@ long CMainFrame::OnMessage(WPARAM wParam, LPARAM lParam)
 				m_wndScriptBar.ResetCombo(1);
 				m_wndScriptBar.Initialize(&pActiveChild->m_mapH);	// resetcombo -> initialize
 				if (pActiveChild->m_view.m_pSCEdit)
+				{
 					pActiveChild->m_view.m_pSCEdit->SetPythonMode(pActiveChild->m_mapH.pythonMode);
+					pActiveChild->m_view.m_pyBtn.SetCheck(pActiveChild->m_mapH.pythonMode);
+					pActiveChild->m_view.m_pyBtn.SetWindowText(pActiveChild->m_mapH.pythonMode ? "PY" : "VB");
+				}
 
 				for (int ii = 0; ii < pActiveChild->m_pFormItem->getFormCount(); ii++)
 				{

@@ -36,7 +36,7 @@ void CSockDlg::DoDataExchange(CDataExchange* pDX)
 
 BEGIN_MESSAGE_MAP(CSockDlg, CDialogEx)
 	ON_WM_TIMER()
-	ON_MESSAGE(WM_USER + 12, OnSockManage)
+	//ON_MESSAGE(WM_USER + 12, OnSockManage)
 	ON_BN_CLICKED(IDC_BTN_TESTSEND, &CSockDlg::OnBnClickedBtnTestsend)
 END_MESSAGE_MAP()
 
@@ -169,29 +169,29 @@ void CSockDlg::OnTimer(UINT_PTR nIDEvent)
 	CDialogEx::OnTimer(nIDEvent);
 }
 
-LONG CSockDlg::OnSockManage(WPARAM wParam, LPARAM lParam)
-{
-	switch (LOWORD(wParam))
-	{
-	case sm_CLOSE:
-		if (m_sock)
-			m_sock.reset();
-		break;
-
-	case sm_CONNECT:
-		KillTimer(TM_CONNECT);
-		
-		break;
-
-	case sm_RECEIVE:
-		KillTimer(TM_CONNECT);
-		char* pdata = (char*)lParam;
-	//	KillTimer(TM_RECEIVE);
-	//	dispatch((char*)lParam, (int)HIWORD(wParam));
-		break;
-	}
-	return 0;
-}
+//LONG CSockDlg::OnSockManage(WPARAM wParam, LPARAM lParam)
+//{
+//	switch (LOWORD(wParam))
+//	{
+//	case sm_CLOSE:
+//		if (m_sock)
+//			m_sock.reset();
+//		break;
+//
+//	case sm_CONNECT:
+//		KillTimer(TM_CONNECT);
+//		
+//		break;
+//
+//	case sm_RECEIVE:
+//		KillTimer(TM_CONNECT);
+//		char* pdata = (char*)lParam;
+//	//	KillTimer(TM_RECEIVE);
+//	//	dispatch((char*)lParam, (int)HIWORD(wParam));
+//		break;
+//	}
+//	return 0;
+//}
 
 void CSockDlg::OnBnClickedBtnTestsend()
 {
