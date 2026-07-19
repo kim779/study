@@ -7,6 +7,9 @@
 #include "../../axis/axMsg.hxx"
 
 #include "AccCrypto.h"
+#ifdef DF_SINGLETONE_FILE
+#include "AccHistoryStore.h"
+#endif
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -889,8 +892,9 @@ BOOL CAccountCtrl::Initialize(BOOL bDLL)
 			m_bOrderEnable = FALSE;
 		}
 	}
-
+#ifdef  DF_TEST_MODE
 	m_bEditMode = TRUE;  //testcode
+#endif
 
 	m_pEdit->SetEditMode(m_bEditMode);
 
@@ -2580,6 +2584,10 @@ void CAccountCtrl::AccountInputComplete(CString strAccount)
 			QueryAccntName(strAccount);
 			SetTimer(TT_QUERYACCNM, 10000, NULL);
 
+			slog.Format("[FOCUSDBG][%s]<%d> TT_QUERYACCNM SetTimer armed. ctrl=[%s] acc=[%s] m_staff=[%d]",
+				__FUNCTION__, __LINE__, m_Param.name, strAccount, m_staff);
+			FileLog(m_strRoot, slog);
+
 			return;
 		}
 #endif
@@ -3793,6 +3801,21 @@ void CAccountCtrl::OnTimer(UINT nIDEvent)
 	{
 		KillTimer(TT_QUERYACCNM);
 
+		{
+			CWnd* pFocusWndBefore = GetFocus();
+			char szFocusClass[64] = { 0 };
+			if (pFocusWndBefore && pFocusWndBefore->GetSafeHwnd())
+				::GetClassNameA(pFocusWndBefore->GetSafeHwnd(), szFocusClass, sizeof(szFocusClass));
+
+			CString slogFocusDbg;
+			slogFocusDbg.Format("[FOCUSDBG][%s]<%d> TT_QUERYACCNM FIRED (delayed). ctrl=[%s] m_strAccName=[%s] focusHwndBefore=[0x%p] focusClassBefore=[%s] editHwnd=[0x%p]",
+				__FUNCTION__, __LINE__, m_Param.name, m_strAccName,
+				pFocusWndBefore ? pFocusWndBefore->GetSafeHwnd() : NULL,
+				szFocusClass,
+				m_pEdit ? m_pEdit->GetSafeHwnd() : NULL);
+			FileLog(m_strRoot, slogFocusDbg);
+		}
+
 		if (m_strAccName.IsEmpty())
 		{
 			Variant(guideCC, "계좌명 조회 실패.  관리자에게 문의바랍니다.");
@@ -3800,6 +3823,13 @@ void CAccountCtrl::OnTimer(UINT nIDEvent)
 			//QueryAccntInfo(_T(""));
 			m_pEdit->SetSel(0, -1);
 			m_pEdit->SetFocus();
+
+			{
+				CString slogFocusDbg2;
+				slogFocusDbg2.Format("[FOCUSDBG][%s]<%d> STOLE FOCUS to account edit (m_strAccName empty). ctrl=[%s]",
+					__FUNCTION__, __LINE__, m_Param.name);
+				FileLog(m_strRoot, slogFocusDbg2);
+			}
 		}
 		else if (m_strAccName.Compare("NONAME!"))
 		{
@@ -4172,6 +4202,13 @@ void CAccountCtrl::ParseAccntName(char *pBuf)
 	
 	if (m_strAccName == "")
 	{
+		KillTimer(TT_QUERYACCNM);	// FIX 2026-07-18: prevents the pending 10s timer from firing later and stealing focus while the user is on another control
+
+		CString slogFocusDbg;
+		slogFocusDbg.Format("[FOCUSDBG][%s]<%d> server returned EMPTY account name, TT_QUERYACCNM killed here (fixed). ctrl=[%s]",
+			__FUNCTION__, __LINE__, m_Param.name);
+		FileLog(m_strRoot, slogFocusDbg);
+
 		if (m_Param.name.Find(_T("AN3A")) >= 0)
 		{
 			m_pParent->SendMessage(WM_USER, MAKEWPARAM(eventDLL, MAKEWORD(m_Param.key, evOnChange/*Change*/)),     //해외
@@ -6333,6 +6370,11 @@ CString CAccountCtrl::DecryptAccount(const CString& sEncrypted)
 
 CString CAccountCtrl::ReadAccountHistory(const CString& strUserPath, const CString& strKey)
 {
+#ifdef DF_SINGLETONE_FILE
+	// 여러 화면(CAccountCtrl 인스턴스)이 같은 ini 파일을 동시에 건드리는 문제를
+	// 프로세스 전역 싱글톤(CAccHistoryStore)으로 위임해서 해결 (캐시/락 전부 공유)
+	return CAccHistoryStore::Instance().Read(strUserPath, strKey, Variant(homeCC, ""), m_regkey);
+#else
 	 CString slog;
         CString cached;
         if (m_accHistoryCache.Lookup(strKey, cached))
@@ -6404,11 +6446,14 @@ CString CAccountCtrl::ReadAccountHistory(const CString& strUserPath, const CStri
 
         m_accHistoryCache.SetAt(strKey, val);
         return val;
+#endif
 }
 
-// ── 쓰기 공통 헬퍼 (새로 추가) ──────────────────────────────────
 void CAccountCtrl::WriteAccountHistory(const CString& strUserPath, const CString& strKey, const CString& strData)
 {
+#ifdef DF_SINGLETONE_FILE
+	CAccHistoryStore::Instance().Write(strUserPath, strKey, strData, Variant(homeCC, ""), m_regkey);
+#else
 	CString cached;
 	if (m_accHistoryCache.Lookup(strKey, cached) && cached == strData)
 	{
@@ -6439,4 +6484,5 @@ void CAccountCtrl::WriteAccountHistory(const CString& strUserPath, const CString
 
 	WritePrivateProfileString(_T("AccountHistory"), (LPCTSTR)strKey, (LPCTSTR)valToWrite, (LPCTSTR)strUserPath);
 	m_accHistoryCache.SetAt(strKey, strData);
+#endif
 }

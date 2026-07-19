@@ -17,3 +17,5 @@
 | 2026-07-15 | @docs/Build.md | 빌드 환경, 프로세스, vcxproj 설정, 트러블슈팅 | ✓ 완료 |
 | 2026-07-15 | @docs/ProjectReport.md | 프로젝트 전체 요약, 기술 분석, 위험 평가 | ✓ 완료 |
 | 2026-07-15 | @docs/Todo.md | 진행 과제, 테스트 계획, 마일스톤, 리스크 관리 | ✓ 완료 |
+| 2026-07-13 | @docs/WizardArchitecture.md | axwizard 클래스 계층, 이벤트→프로시저 매핑, 스크립트엔진 초기화 순서 | ✓ 1차 완료 (심화 분석 진행중) |
+| 2026-07-19 | @docs/RealtimeCodeIndex_Investigation.md | RTM DoRTM 전체순회 개선(종목코드 역인덱스) 조사, PR_CODE 필드 쓰기경로 추적 | 🔍 조사 중 (목표 07-22) |

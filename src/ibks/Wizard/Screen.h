@@ -122,6 +122,10 @@ private:
 	bool		m_color;
 	CMapStringToPtr	m_objects;
 
+#ifdef DF_RTM_INDEX
+	CString		m_lastCode;		// RTM 역인덱스 자가갱신용: 마지막으로 관측된 PR_CODE 필드 값
+#endif
+
 // Operations
 public:
 	BOOL	isMain()	{ return !m_key; }

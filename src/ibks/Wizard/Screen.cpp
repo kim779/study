@@ -790,6 +790,21 @@ bool CScreen::OnAlert(CString code, CString update, CdataSet* fms, CObArray* obs
 			form->ReadData(text);
 			text.TrimRight();
 
+			CString dbg;
+			dbg.Format("[WIZARD][RTM][DEBUG] compare mapN=%s field=%s vs code=%s match=%d\n",
+				CString(m_mapH->mapN, L_MAPN).GetString(), text.GetString(), code.GetString(), !text.Compare(code));
+			OutputDebugString(dbg);
+
+#ifdef DF_RTM_INDEX  //CScreen::OnAlert
+			// 자가갱신: 매 틱마다 어차피 읽는 이 값을 이용해 인덱스를 최신 상태로 유지.
+			// 별도 쓰기지점 후킹 없이, 값이 바뀐 걸 발견하면 그때 인덱스를 갱신함.
+			if (text != m_lastCode)
+			{
+				m_guard->UpdateCodeIndex(this, m_lastCode, text);
+				m_lastCode = text;
+			}
+#endif
+
 			if (!text.Compare(code))
 			{
 				flash = true;
@@ -832,7 +847,7 @@ void CScreen::UpdateRTM(int key, CString code, CString update, CdataSet* fms, CO
 			continue;
 		case FM_EDIT:
 		case FM_OUT:
-			if (form->m_form->iok == EIO_INPUT)   // �Է������� �ǽð� ���� ����
+			if (form->m_form->iok == EIO_INPUT)   // �Է������� �ǽð� ���� ����
 				continue;
 			break;
 		case FM_GRID:
@@ -1695,7 +1710,7 @@ bool CScreen::OnTRAN(bool byKey)
 			continue;
 		}
 
-		//if (!(form->m_form->attr & FA_SKIP))  //��ŵ�� ���ִ� 
+		//if (!(form->m_form->attr & FA_SKIP))  //��ŵ�� ���ִ� 
 		{
 			if (!form->IsValid(guide))
 			{
@@ -2264,7 +2279,7 @@ void CScreen::OnProfit(CfmBase* form)
 			if (dir != -1)
 			{
 				form->ReadData(text, false, -1, dir, ii);
-				if (text.Find(_T("�ŵ�")) != -1 || text.Find('S') != -1)
+				if (text.Find(_T("매수")) != -1 || text.Find('S') != -1)
 					sum = tmpv + (tmpv - (sum + m_profit->m_charge ? v_charge * 2 : 0));
 			}
 
@@ -2310,7 +2325,7 @@ void CScreen::OnProfit(CfmBase* form)
 					if (dir != -1)
 					{
 						form->ReadData(text, false, -1, dir, kk);
-						if (text.Find(_T("�ŵ�")) != -1 || text.Find('S') != -1)
+						if (text.Find(_T("매수")) != -1 || text.Find('S') != -1)
 							tmpv = -tmpv;
 					}
 					if (tmpv)

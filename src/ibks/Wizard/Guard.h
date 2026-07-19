@@ -125,6 +125,10 @@ protected:
 	CMapStringToOb	m_codex;		// codes history
 	CString		m_master;		// code master
 
+#ifdef DF_RTM_INDEX
+	CMapStringToPtr	m_codeIndex;		// RTM shadow index: code -> CPtrArray* of CScreen*
+#endif
+
 	CByteArray	m_major;
 	UINT		m_trace;
 	HWND		m_hTrace;
@@ -397,6 +401,13 @@ private:
 
 	void	DoRTM(CString code, int stat, class CdataSet* fms, CObArray* obs, CString updates);
 	CString	MakeString(class CdataSet* fms, bool newline = true);
+
+#ifdef DF_RTM_INDEX
+	// RTM code reverse-index (shadow/validation only, does not affect DoRTM behavior yet).
+	// Self-updates from CScreen::OnAlert's existing per-tick field read, so no separate
+	// write-path hooks are required. oldCode may be empty (first observation for a screen).
+	void	UpdateCodeIndex(class CScreen* screen, CString oldCode, CString newCode);
+#endif
 
 	size_t	strcspnx(const char* s, const char reject);
 	char*	strtokx(char* str, const char delim, char** start);

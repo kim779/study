@@ -348,8 +348,15 @@ void CPythonEngine::Initialize(CString maps)
     if (!Py_IsInitialized()) {
         PyConfig config;
         PyConfig_InitPythonConfig(&config);
-        PyConfig_SetString(&config, &config.home,
-            L"C:\\Users\\IBKS\\AppData\\Local\\Programs\\Python\\Python311-32");
+
+        wchar_t pyHome[MAX_PATH];
+        wchar_t* localAppData = NULL;
+        size_t   localAppDataLen = 0;
+        _wdupenv_s(&localAppData, &localAppDataLen, L"LOCALAPPDATA");
+        swprintf_s(pyHome, MAX_PATH, L"%s\\Programs\\Python\\Python311-32", localAppData ? localAppData : L"");
+        if (localAppData) free(localAppData);
+        PyConfig_SetString(&config, &config.home, pyHome);
+
         Py_InitializeFromConfig(&config);
         PyConfig_Clear(&config);
     }

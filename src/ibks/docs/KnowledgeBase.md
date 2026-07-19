@@ -705,13 +705,56 @@ case FM_OUT:
 
 ---
 
-## 12. 추가 자료
+## 12. axwizard 소스 분석 중 발견한 문서-코드 드리프트 (2026-07-13)
+
+`ibks/Wizard/` 전체 아키텍처 분석 프로젝트(`@docs/WizardArchitecture.md`) 진행 중, 초기 설계 문서(`@docs/python_engine_260608.md`, 2026-06-08~11 작성)와 **현재 `dll/vbs/engineWrapper.cpp` / `pythonEngine.h` 실제 코드가 달라진 부분**을 발견함. 아래는 그 상세 내용 (기존 기록은 삭제하지 않고 이 절로 보강).
+
+### 12.1 엔진 선택 방식이 "순수 자동감지"에서 "빌드 시 확정 + 자동감지 폴백"으로 진화
+
+기존 문서(1절 "엔진 선택 방식", 3절 버그#3): `isPythonScript()`가 스크립트 텍스트 어디든 `"def "`/`"import "`가 있으면(Find() >= 0) Python으로 판단한다고 기록됨.
+
+**현재 코드 (`Wizard/Screen.cpp` `CScreen::Parse()`):**
+```cpp
+m_vbe->LoadScript(text, m_mapH->pythonMode);   // 빌드 시 확정된 pythonMode를 명시적으로 전달
+```
+`m_mapH->pythonMode`는 `builder/awBuild/mapload.cpp`가 **빌드 시점**에 자동감지해 맵 바이너리에 기록한 값(python_engine_260608.md 9단계 작업, 완료됨). 즉 런타임 자동감지는 이제 "1차 판단"이 아니라 이 값이 없을 때(-1)의 **폴백**이다.
+
+`dll/vbs/engineWrapper.cpp::LoadScript(scripts, scpKind)`:
+```cpp
+bool usePython = (scpKind == -1) ? isPythonScript(scripts) : (scpKind != 0);
+```
+
+### 12.2 텍스트 스캔 폴백(`isPythonScript()`) 자체도 더 엄격해짐
+
+기존: `scripts.Find("def ") >= 0` — 텍스트 어디에 있든 매치 (문자열/주석 안의 "def "도 오탐 가능).
+
+현재: 줄 단위로 순회하며 `line.TrimLeft()` 후 **줄의 맨 앞이 `"def "` 또는 `"import "`로 시작**하는지만 검사. 오탐 가능성을 줄이는 방향의 개선.
+
+### 12.3 재진입(reentrancy) 방어 코드(`m_inException`)가 현재 코드에 없음
+
+기존 문서(2절, 3절 버그#5): `MessageBox` 재진입으로 인한 `PyDict_GetItem` 크래시를 `m_inException` 플래그로 방어했다고 기록됨.
+
+**현재 `dll/vbs/pythonEngine.h`에는 `m_inException` 필드 자체가 없음.** `engineWrapper.cpp::IsAvailable()`의 주석:
+> "Nested calls (e.g. Screen.Send(0) inside OnClick synchronously reaching OnSend) are safe in CPython on the same thread, so no re-entrancy guard is needed here - matches VBScript's behavior below."
+
+의도적으로 제거된 것으로 보이나, **실제 재진입 크래시 시나리오(MessageBox 모달 → 메시지 루프 재진입 → DoProcedure 재호출)로 재검증되지는 않은 상태**. 과거 크래시 심각도(버그#5)를 고려하면 실운영 테스트(`python_engine_260608.md` 10단계) 시 최우선 회귀 확인 대상.
+
+### 12.4 PendingObject 버퍼링 메커니즘은 그대로 유지됨 (기존 설계 확인됨)
+
+`CScreen::Parse()`는 `m_vbe->Initialize()` 직후, 아직 VBS/Python이 결정되기 전에 `AddObject("Screen", ...)`, `AddObject("System", ...)` 등을 여러 차례 호출한다. `CEngineWrapper`는 이를 `std::vector<PendingObject>`에 버퍼링해뒀다가 `LoadScript()`에서 엔진이 확정되는 순간(`ensureEngine()`) 일괄 등록한다 — 기존 문서 2절 "AddObject 버퍼링" 설계와 동일한 메커니즘이 현재도 유지되고 있음을 코드로 확인.
+
+**교훈:** 설계 문서는 작성 시점의 스냅샷이며, 이후 리팩토링으로 세부 구현이 계속 진화할 수 있다. 특히 크래시 방어 코드처럼 "왜 있는지" 불분명해 보이는 코드가 문서에는 있는데 실제 코드에는 없을 경우, 삭제된 것이 의도적 개선인지 실수인지 코드만으로는 단정할 수 없으므로 실동작 테스트로 확인 필요.
+
+---
+
+## 13. 추가 자료
 
 ### 참고 문서
 - `@docs/Architecture.md` - 모듈 구조
 - `@docs/Dependency.md` - 라이브러리 의존성
 - `@docs/python_engine_260608.md` - 프로젝트 상세 기록
 - `@docs/CallGraph.md` - 함수 호출 흐름
+- `@docs/WizardArchitecture.md` - axwizard 클래스 계층/이벤트 흐름 상세 분석 (2026-07-13)
 
 ### 외부 참고
 - [Python C API 문서](https://docs.python.org/3.11/c-api/)
@@ -720,5 +763,5 @@ case FM_OUT:
 
 ---
 
-**최종 수정:** 2026-07-16
+**최종 수정:** 2026-07-13
 **기여자:** Documentation Agent

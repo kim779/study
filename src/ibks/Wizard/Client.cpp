@@ -1506,6 +1506,8 @@ void CClient::OnAlert(CString code, CString update, CdataSet* fms, CObArray* obs
 	{
 		if (GetAtScreen(screen, idx) && screen->isFlash())
 		{
+
+			OutputDebugString(CString("[WIZARD][RTM][DEBUG] visit mapN=") + CString(screen->m_mapH->mapN, L_MAPN) + " code=" + code + "\n");
 			if (screen->OnAlert(code, update, fms, obs, stat, alertR))
 				m_vm->OnProcedure(screen, "OnAlert");
 			m_vm->OnAlert(screen, code, update, stat);

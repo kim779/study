@@ -38,7 +38,7 @@ static char THIS_FILE[]=__FILE__;
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-#define DF_NOENC
+#define DF_NOENC1
 
 CGuard::CGuard()
 {
@@ -5897,6 +5897,22 @@ BOOL CGuard::IsWait(CClient* client)
 
 void CGuard::DoRTM(CString code, int stat, CdataSet* fms, CObArray* obs, CString updates)
 {
+	CString dbg;
+	dbg.Format("[WIZARD][RTM][DEBUG] tick code=%s clients=%d\n", code.GetString(), (int)m_clients.GetCount());
+	OutputDebugString(dbg);
+
+#ifdef DF_RTM_INDEX   //CGuard::DoRTM
+	{
+		void*	ptr;
+		int	idxCount = 0;
+		if (m_codeIndex.Lookup(code, ptr))
+			idxCount = (int)((CPtrArray*)ptr)->GetSize();
+		CString dbgIdx;
+		dbgIdx.Format("[WIZARD][RTM][DEBUG][INDEX] code=%s indexCount=%d\n", code.GetString(), idxCount);
+		OutputDebugString(dbgIdx);
+	}
+#endif
+
 	int	key;
 	POSITION pos;
 	CWorks* works;
@@ -5980,6 +5996,39 @@ void CGuard::DoRTM(CString code, int stat, CdataSet* fms, CObArray* obs, CString
 	}
 	m_sync.Unlock();
 }
+
+#ifdef DF_RTM_INDEX  //CGuard::UpdateCodeIndex
+void CGuard::UpdateCodeIndex(CScreen* screen, CString oldCode, CString newCode)
+{
+	void*		ptr;
+	CPtrArray*	arr;
+
+	if (!oldCode.IsEmpty() && m_codeIndex.Lookup(oldCode, ptr))
+	{
+		arr = (CPtrArray*)ptr;
+		for (int ii = 0; ii < arr->GetSize(); ii++)
+		{
+			if (arr->GetAt(ii) == screen)
+			{
+				arr->RemoveAt(ii);
+				break;
+			}
+		}
+	}
+
+	if (!newCode.IsEmpty())
+	{
+		if (!m_codeIndex.Lookup(newCode, ptr))
+		{
+			arr = new CPtrArray();
+			m_codeIndex.SetAt(newCode, arr);
+		}
+		else
+			arr = (CPtrArray*)ptr;
+		arr->Add(screen);
+	}
+}
+#endif
 
 BOOL CGuard::IsPortfolioSymbol(CString name)
 {

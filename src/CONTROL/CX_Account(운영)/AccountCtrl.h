@@ -425,7 +425,9 @@ protected:
 	bool SACAQ0239Ret_Check();
 	void EnableCtrl(SHORT bEnable);
 
+#ifndef DF_SINGLETONE_FILE
 	CMapStringToString m_accHistoryCache;
+#endif
 	CString m_strLastSavedAcc{};
 	CString m_regkey{};
 	CString m_bAccEnc{};

@@ -10,4 +10,9 @@
 // 여기에 미리 컴파일하려는 헤더 추가
 #include "framework.h"
 
+// RTM 종목코드 역인덱스 그림자검증(2026-07-19~). 기본은 꺼짐(주석 상태).
+// 켜려면 아래 줄 주석 해제 후 재빌드 - DoRTM의 실제 동작(전체순회)은 그대로이고
+// 인덱스 조회 결과를 로그로만 비교합니다. (docs/RealtimeCodeIndex_Investigation.md)
+ #define DF_RTM_INDEX
+
 #endif //PCH_H
