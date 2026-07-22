@@ -5,6 +5,7 @@ import subprocess
 import ctypes
 import winreg
 import time
+import socket
 import sqlite3
 from PyQt5.QAxContainer import QAxWidget
 from PyQt5.QtWidgets import (
@@ -47,6 +48,7 @@ TK_TR1001 = 1   # 주식 시세조회
 TK_TR1002 = 2   # 주식 조회(OOP)
 TK_TR1003 = 3   # 주식 조회(OOP)
 TK_TR1201 = 4   # 주식 주문
+TK_TR1203 = 5   # 주식 주문 시장구분
 TK_TR1211 = 7   # 주식 체결/미체결조회
 TK_TR1221 = 8   # 주식 잔고조회
 TK_TR1231 = 9   # 주식 주문옵션조회
@@ -64,6 +66,7 @@ TK_TR1222 = 45  # 주식 잔고조회(실시간)
 TK_TR3232 = 47  # 선물옵션 미결제조회
 TK_TR3411 = 48  # 옵션 만기일 관련 시세
 TK_TR8001  = 50 # 고객정보조회
+TK_TR1223  = 51 # 주식 잔고조회(시장구분)
 TK_GETCODE = 32 # 종목코드 목록조회 (GetCode)
 TK_GREEKS1 = 150 # 옵션 그릭스(민감도) 조회용 키1
 TK_GREEKS2 = 151 # 옵션 그릭스(민감도) 조회용 키2
@@ -72,6 +75,8 @@ TK_GREEKS2 = 151 # 옵션 그릭스(민감도) 조회용 키2
 # 순서 = 응답에서 값이 오는 순서와 동일하다고 가정 (실측 후 확정 필요)
 TR1002_SISE_FIELDS = ["2023", "2033", "2029", "2030", "2031", "2024", "2027", "2041", "2061"]
 TR1002_SISE_LABELS = ["현재가", "등락율", "시가", "고가", "저가", "전일대비", "거래량", "매도잔량", "매수잔량"]
+
+MKGB_NAMES = {"1": "KRX", "2": "NXT", "3": "통합"}
 
 # C structs mirroring Open_API_OUT.h (#pragma pack(1))
 class _Hoga3001(ctypes.Structure):
@@ -174,6 +179,20 @@ def _init_db():
     return conn
 
 
+MY_DEV_PC_IP = "172.19.1.106"
+
+def _is_my_dev_pc():
+    # 로컬 IP가 개발자 PC와 일치할 때만 True. 실제 접속 없이 로컬 IP만 확인.
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    try:
+        s.connect(("8.8.8.8", 80))
+        return s.getsockname()[0] == MY_DEV_PC_IP
+    except OSError:
+        return False
+    finally:
+        s.close()
+
+
 def _check_ocx_registry():
     # OCX가 레지스트리에 등록되어 있고, 등록된 경로에 실제 파일이 있는지 확인한다.
     reg_key = f"CLSID\\{OCX_GUID}\\InprocServer32"
@@ -224,6 +243,7 @@ class TestWindow(QMainWindow):
         self.ocx.setVisible(False)
         self._jango_row_by_code = {}
         self._jango_calc = {}
+        self._sise_realtime_key = ""  # TR1002 응답의 1021 필드값 (OnRealData 코드와 동일 형식)
         self.watch_codes = set()
         self.db_conn = _init_db()
 
@@ -286,15 +306,18 @@ class TestWindow(QMainWindow):
         group = QGroupBox("Login")
         layout = QVBoxLayout(group)
 
+        is_dev = _is_my_dev_pc()
         form = QFormLayout()
-        self.edit_user_id  = QLineEdit("ng12589")
-        self.edit_user_pw  = QLineEdit("wnsgur12@"); self.edit_user_pw.setEchoMode(QLineEdit.Password)
-        self.edit_cert_pw  = QLineEdit("ahffkdy123 "); self.edit_cert_pw.setEchoMode(QLineEdit.Password)
+        self.edit_user_id  = QLineEdit("ng12589" if is_dev else "")
+        self.edit_user_pw  = QLineEdit("wnsgur12@" if is_dev else ""); self.edit_user_pw.setEchoMode(QLineEdit.Password)
+        self.edit_cert_pw  = QLineEdit("ahffkdy123 " if is_dev else ""); self.edit_cert_pw.setEchoMode(QLineEdit.Password)
         self.combo_server  = QComboBox()
+        self.combo_server.addItem("", "")
         for ip, name in SERVER_LIST:
             self.combo_server.addItem(f"{name} ({ip})", ip)
+        self.combo_server.setCurrentIndex(0)
         self.combo_server.currentIndexChanged.connect(self._on_server_selected)
-        self.edit_svr_ip   = QLineEdit(SERVER_LIST[0][0])
+        self.edit_svr_ip   = QLineEdit("")
         self.edit_svr_port = QLineEdit("15201")
         form.addRow("user_id",   self.edit_user_id)
         form.addRow("user_pw",   self.edit_user_pw)
@@ -424,27 +447,31 @@ class TestWindow(QMainWindow):
         )
         right.addRow("프로그램구분", self.combo_pggb)
 
+        mk_h = QHBoxLayout()
+        self.combo_jango_mkgubn = QComboBox()
+        for text, val in [("KRX", 1), ("NXT", 2), ("통합", 3)]:
+            self.combo_jango_mkgubn.addItem(text, val)
+        self.lbl_odr_result = QLabel("-")
+        mk_h.addWidget(self.combo_jango_mkgubn)
+        mk_h.addWidget(self.lbl_odr_result)
+        mk_h.addStretch()
+        right.addRow(mk_h)
+
         btn_h = QHBoxLayout()
         btn = QPushButton("주문실행")
         btn.clicked.connect(self._on_odr_send)
-        self.lbl_odr_result = QLabel("-")
-        btn_h.addWidget(btn)
-        btn_h.addWidget(self.lbl_odr_result)
-        btn_h.addStretch()
-        right.addRow(btn_h)
-
-        btn_h2 = QHBoxLayout()
         btn_mc = QPushButton("잔고조회")
         btn_mc.clicked.connect(self._on_michegyul_send)
         btn_cg = QPushButton("체결조회")
         btn_cg.clicked.connect(self._on_chegyul_send)
         btn_uc = QPushButton("미체결조회")
         btn_uc.clicked.connect(self._on_michegyul_odr_send)
-        btn_h2.addWidget(btn_mc)
-        btn_h2.addWidget(btn_cg)
-        btn_h2.addWidget(btn_uc)
-        btn_h2.addStretch()
-        right.addRow(btn_h2)
+        btn_h.addWidget(btn)
+        btn_h.addWidget(btn_mc)
+        btn_h.addWidget(btn_cg)
+        btn_h.addWidget(btn_uc)
+        btn_h.addStretch()
+        right.addRow(btn_h)
 
         h_main.addLayout(left)
         h_main.addSpacing(20)
@@ -458,7 +485,7 @@ class TestWindow(QMainWindow):
         v.setContentsMargins(4, 4, 4, 4)
         v.setSpacing(2)
 
-        cols = ["종목코드", "잔고수량", "현재가", "평가금액", "수익률(%)"]
+        cols = ["종목코드", "잔고수량", "가능수량", "현재가", "평가금액", "수익률(%)"]
         self.table_jango = QTableWidget(0, len(cols))
         self.table_jango.setHorizontalHeaderLabels(cols)
         self.table_jango.verticalHeader().setVisible(False)
@@ -468,14 +495,15 @@ class TestWindow(QMainWindow):
         self.table_jango.horizontalHeader().setStretchLastSection(True)
         self.table_jango.horizontalHeader().setSectionResizeMode(0, QHeaderView.Stretch)
         self.table_jango.setFixedHeight(140)  # 헤더 + 6줄 고정
+        self.table_jango.cellDoubleClicked.connect(self._on_jango_double_clicked)
         v.addWidget(self.table_jango)
 
         return group
 
-    def _add_jango_row(self, code, remain, maip, curr, eval_amt, rate):
+    def _add_jango_row(self, code, remain, avail, maip, curr, eval_amt, rate):
         row = self.table_jango.rowCount()
         self.table_jango.insertRow(row)
-        for col, val in enumerate([code, remain, curr, eval_amt, rate]):
+        for col, val in enumerate([code, remain, avail, curr, eval_amt, rate]):
             self.table_jango.setItem(row, col, QTableWidgetItem(val))
         code_key = code.lstrip('A')
         self._jango_row_by_code[code_key] = row
@@ -493,7 +521,7 @@ class TestWindow(QMainWindow):
         row = self._jango_row_by_code.get(code.lstrip('A'))
         if row is None:
             return
-        for col, val in [(2, curr), (3, eval_amt), (4, rate)]:
+        for col, val in [(3, curr), (4, eval_amt), (5, rate)]:
             if val is not None:
                 self.table_jango.setItem(row, col, QTableWidgetItem(val))
 
@@ -512,6 +540,16 @@ class TestWindow(QMainWindow):
         new_eval = calc['base_eval'] + (new_curr - calc['base_curr']) * remain
         rate = (new_eval - maip) * 100 / maip if maip else 0.0
         self._update_jango_row(code_key, curr=f"{new_curr:.0f}", eval_amt=f"{new_eval:.0f}", rate=f"{rate:.2f}")
+
+    def _on_jango_double_clicked(self, row, col):
+        item = self.table_jango.item(row, col)
+        if item is None:
+            return
+        text = item.text().strip()
+        if col == 0:  # 종목코드 -> 주문 종목코드 ('A' 접두문자 포함 그대로)
+            self.edit_odr_code.setText(text)
+        elif col == 3:  # 현재가 -> 주문가격 (부호는 등락 표시이므로 제거)
+            self.edit_odr_jprc.setText(text.lstrip('+-'))
 
     def _build_collect_group(self):
         group = QGroupBox("데이터수집 (틱 저장)")
@@ -549,6 +587,11 @@ class TestWindow(QMainWindow):
         self.log_edit.append(f"[{ts}] {msg}")
         ctypes.windll.kernel32.OutputDebugStringW(f"[IBKS][{ts}] {msg}")
 
+    def _log_err(self, err):
+        self._log(f"  오류: {err}")
+        if err and "제한" in err:
+            QMessageBox.warning(self, "요청 제한", err)
+
     def _on_initialize(self):
         result = self.ocx.dynamicCall("Initialize()")
         self.lbl_init.setText(str(result))
@@ -571,6 +614,10 @@ class TestWindow(QMainWindow):
         cert_pw  = self.edit_cert_pw.text()
         svr_ip   = self.edit_svr_ip.text()
         svr_port = int(self.edit_svr_port.text() or "0")
+
+        if not svr_ip.strip():
+            QMessageBox.warning(self, "서버 미선택", "서버를 선택하거나 svr_ip를 입력하세요.")
+            return
 
         result = self.ocx.dynamicCall(
             "Login(QString, QString, QString, QString, int)",
@@ -610,7 +657,7 @@ class TestWindow(QMainWindow):
         self._log(f"시세조회 요청({code}, 시장={mkgubn}) => {result}")
         if not result:
             err = self.ocx.dynamicCall("GetLastErrMsg()")
-            self._log(f"  오류: {err}")
+            self._log_err(err)
 
     def _on_watch_start(self):
         codes = [c.strip() for c in self.edit_watch_codes.text().split(',') if c.strip()]
@@ -689,25 +736,27 @@ class TestWindow(QMainWindow):
             f"주문수량={m.get('974','-')} 체결수량={m.get('909','-')} 미체결수량={m.get('931','-')}"
         )
 
-    def _evt_sbalance(self, data):
-        # 주식 실시간 잔고 (TR1222 등록 후 수신). 필드 순서 추정치이며 실측 후 조정 필요:
-        # 0.종목코드 1.종목명 2.결제잔고 3.주문잔량 4.매입평균가 5.매도가능잔고 6.현재가 7.평가금액 8.평가손익 9.평가수익률 10.매입금액 ...
-        self._log(f"[EVT] OnSBalance raw={data!r}")
-        f = data.split('\t')
-        if len(f) < 10:
+        # 다른 사용자 계좌의 체결통보도 같이 내려올 수 있어서, 현재 선택된 계좌와
+        # 일치할 때만 이후 계산(잔고 갱신 등) 로직으로 진입시킨다.
+        selected_acno = (self.combo_odr_accn.currentData() or "").strip()
+        contract_acno = m.get('901', '').strip()
+        if contract_acno != selected_acno:
             return
-        code = f[0].lstrip('A')
-        self._update_jango_row(code, remain=f[2], avg_price=f[4], curr_price=f[6], rate=f[9])
+
+        # 접수/체결/취소 어느 쪽이든 가능수량(xqty, 매도가능/청산가능)에 영향을 주므로
+        # 상태 구분 없이 재조회한다. 실시간 시세와 무관하게 주문/체결 시점에만 오는
+        # 저빈도 이벤트라 OnSBalance 대신 여기서 잔고를 다시 조회해도 안전하다.
+        self._on_michegyul_send()
+
+    def _evt_sbalance(self, data):
+        # 실제 필드 포맷이 화면 설정(m_arField)에 따라 달라지는 레거시 프로토콜이라
+        # 신뢰할 수 있는 매핑을 알 수 없어 무시한다 (2026-07-21 논의).
+        # 잔고 갱신은 OnContract(체결통보) 수신 시 TR1221/TR3221 재조회로 처리한다.
+        pass
 
     def _evt_fbalance(self, data):
-        # 선물옵션 실시간 잔고 (TR3222 등록 후 수신). 필드 순서 추정치이며 실측 후 조정 필요:
-        # 0.종목코드 1.종목명 2.구분 3.잔고수량 4.가능수량 5.평균가 6.현재가 7.평균가대비 8.평가금액 9.평가손익 10.수익률 11.매입금액 12.전일대비
-        self._log(f"[EVT] OnFBalance raw={data!r}")
-        f = data.split('\t')
-        if len(f) < 11:
-            return
-        code = f[0].lstrip('A')
-        self._update_jango_row(code, remain=f[3], avg_price=f[5], curr_price=f[6], rate=f[10])
+        # 위 OnSBalance와 동일한 이유로 무시한다.
+        pass
 
     def _evt_ver_update(self):
         self._log("[업데이트] OnVerUpdate: exe\\axis\\ -> exe\\ 복사 및 OCX 재등록 시작")
@@ -770,7 +819,7 @@ class TestWindow(QMainWindow):
         result = self.ocx.dynamicCall("TR8001(int, QString)", TK_TR8001, acno)
         self._log(f"고객정보조회 => {result}")
         if not result:
-            self._log(f"  오류: {self.ocx.dynamicCall('GetLastErrMsg()')}")
+            self._log_err(self.ocx.dynamicCall('GetLastErrMsg()'))
 
     def _on_odr_send(self):
         acno  = self.combo_odr_accn.currentData() or ""
@@ -787,14 +836,15 @@ class TestWindow(QMainWindow):
                 "TR3201(int, int, QString, QString, int, QString, int, int, int, int)",
                 [TK_TR3201, mmgb, acno, pswd, ojno, code, jqty, jprc, hogb, 0])
         else:  # 주식
+            mkgb = self.combo_jango_mkgubn.currentData()  # 1=KRX 2=NXT 3=통합
             result = self.ocx.dynamicCall(
-                "TR1201(int, int, QString, QString, int, QString, int, int, int, int)",
-                [TK_TR1201, mmgb, acno, pswd, ojno, code, jqty, jprc, hogb, 0])
+                "TR1203(int, int, QString, QString, int, QString, int, int, int, int, int)",
+                [TK_TR1203, mmgb, acno, pswd, ojno, code, jqty, jprc, hogb, 0, mkgb])
 
         self._log(f"주문({code} {self.combo_mmgb.currentText()} {jqty}@{jprc}) => {result}")
         if not result:
             err = self.ocx.dynamicCall("GetLastErrMsg()")
-            self._log(f"  오류: {err}")
+            self._log_err(err)
 
     def _on_michegyul_send(self):
         acno = self.combo_odr_accn.currentData() or ""
@@ -814,18 +864,20 @@ class TestWindow(QMainWindow):
             r2 = self.ocx.dynamicCall("TR3222(int, QString, QString)", [TK_TR3222, acno, pswd])
             self._log(f"TR3222(실시간잔고등록) => {r2}")
             if not r2:
-                self._log(f"  오류: {self.ocx.dynamicCall('GetLastErrMsg()')}")
+                self._log_err(self.ocx.dynamicCall('GetLastErrMsg()'))
         else:  # 주식
+            mkgb = self.combo_jango_mkgubn.currentData()  # 1=KRX 2=NXT 3=통합
+            self._jngo_mkgb = mkgb
             result = self.ocx.dynamicCall(
-                "TR1221(int, QString, QString, int, QString)",
-                [TK_TR1221, acno, pswd, 0, ""])
+                "TR1223(int, QString, QString, int, int, QString)",
+                [TK_TR1223, acno, pswd, 0, mkgb, ""])
             r2 = self.ocx.dynamicCall("TR1222(int, QString, QString, int)", [TK_TR1222, acno, pswd, 0])
             self._log(f"TR1222(실시간잔고등록) => {r2}")
             if not r2:
-                self._log(f"  오류: {self.ocx.dynamicCall('GetLastErrMsg()')}")
+                self._log_err(self.ocx.dynamicCall('GetLastErrMsg()'))
         self._log(f"잔고조회 => {result}")
         if not result:
-            self._log(f"  오류: {self.ocx.dynamicCall('GetLastErrMsg()')}")
+            self._log_err(self.ocx.dynamicCall('GetLastErrMsg()'))
 
     def _on_chegyul_send(self):
         acno = self.combo_odr_accn.currentData() or ""
@@ -846,7 +898,7 @@ class TestWindow(QMainWindow):
         self._chegyul_mode = "체결"
         self._log(f"체결조회 => {result}")
         if not result:
-            self._log(f"  오류: {self.ocx.dynamicCall('GetLastErrMsg()')}")
+            self._log_err(self.ocx.dynamicCall('GetLastErrMsg()'))
 
     def _on_michegyul_odr_send(self):
         acno = self.combo_odr_accn.currentData() or ""
@@ -867,7 +919,7 @@ class TestWindow(QMainWindow):
         self._chegyul_mode = "미체결"
         self._log(f"미체결조회 => {result}")
         if not result:
-            self._log(f"  오류: {self.ocx.dynamicCall('GetLastErrMsg()')}")
+            self._log_err(self.ocx.dynamicCall('GetLastErrMsg()'))
 
     @staticmethod
     def _parse_signed_int(s):
@@ -921,9 +973,9 @@ class TestWindow(QMainWindow):
         if len(parts) < 3:
             return
 
-        # 주식은 실시간 코드에 'A' prefix 붙어 옴, 선물은 에디트/실시간 둘 다 'A' prefix
-        # 양쪽 모두 lstrip('A') 후 비교
-        code = parts[0].lstrip('A')
+        # 실시간 코드 형식: KRX="A005930", NXT="N.A005930", 통합="M.A005930"
+        # '.' 기준 마지막 조각만 취한 뒤 앞의 'A'를 떼면 세 경우 모두 순수 종목코드만 남음
+        code = parts[0].split('.')[-1].lstrip('A')
 
         # key=value 딕셔너리로 변환
         m = {}
@@ -991,7 +1043,7 @@ class TestWindow(QMainWindow):
                 self._log(f"  [주식시세] 현재가={s(mod.curr)} 전일대비={s(mod.diff)}"
                           f" 등락률={s(mod.rate)} 거래량={s(mod.gvol)}"
                           f" 시가={s(mod.siga)} 고가={s(mod.koga)} 저가={s(mod.jega)}")
-            elif key in (TK_TR3201, TK_TR1201):
+            elif key in (TK_TR3201, TK_TR1203):
                 # 주문번호[6] 원주문번호[6] 에러메시지[80] (nrec[4] 이후)
                 jmno = raw[4:10].decode('cp949', errors='ignore').strip()
                 ojno = raw[10:16].decode('cp949', errors='ignore').strip()
@@ -1006,27 +1058,32 @@ class TestWindow(QMainWindow):
                 for i in range(nrec):
                     g = raw[15 + i*GRID: 15 + (i+1)*GRID]
                     if len(g) < GRID: break
-                    self._log(f"    {s(g[0:8])} {s(g[38:44])} 잔고={s(g[44:54])} 평단={s(g[64:74])} 현재={s(g[74:84])} 평가금액={s(g[94:109])} 수익률={s(g[124:134])}% 매입금액={s(g[134:149])}")
-                    self._add_jango_row(s(g[0:8]), s(g[44:54]), s(g[134:149]), s(g[74:84]), s(g[94:109]), s(g[124:134]))
+                    if not s(g[0:8]):  # 종목코드 빈 레코드는 건너뛴다
+                        continue
+                    self._log(f"    {s(g[0:8])} {s(g[38:44])} 잔고={s(g[44:54])} 가능={s(g[54:64])} 평단={s(g[64:74])} 현재={s(g[74:84])} 평가금액={s(g[94:109])} 수익률={s(g[124:134])}% 매입금액={s(g[134:149])}")
+                    self._add_jango_row(s(g[0:8]), s(g[44:54]), s(g[54:64]), s(g[134:149]), s(g[74:84]), s(g[94:109]), s(g[124:134]))
                 if b_next:
                     acno = getattr(self, '_jngo_acno', '')
                     pswd = getattr(self, '_jngo_pswd', '')
                     self.ocx.dynamicCall("TR3221(int, QString, QString, QString)",
                                         [TK_TR3221, acno, pswd, nkey])
-            elif key == TK_TR1221:  # 주식 잔고 (header: acno[11]+nrec[4]=15, grid=194)
+            elif key == TK_TR1223:  # 주식 잔고(시장구분) (header: acno[11]+nrec[4]=15, grid=194)
                 GRID = 194
                 nrec = int(raw[11:15].decode('cp949', errors='ignore').strip() or "0")
                 self._log(f"  [주식잔고] {nrec}건")
                 for i in range(nrec):
                     g = raw[15 + i*GRID: 15 + (i+1)*GRID]
                     if len(g) < GRID: break
-                    self._log(f"    {s(g[0:12])} 잔고={s(g[54:64])} 평단={s(g[74:84])} 현재={s(g[99:109])} 평가금액={s(g[129:144])} 수익률={s(g[159:169])}% 매입금액={s(g[84:99])}")
-                    self._add_jango_row(s(g[0:12]), s(g[54:64]), s(g[84:99]), s(g[99:109]), s(g[129:144]), s(g[159:169]))
+                    if not s(g[0:12]):  # 종목코드 빈 레코드는 건너뛴다
+                        continue
+                    self._log(f"    {s(g[0:12])} 잔고={s(g[54:64])} 가능={s(g[64:74])} 평단={s(g[74:84])} 현재={s(g[99:109])} 평가금액={s(g[129:144])} 수익률={s(g[159:169])}% 매입금액={s(g[84:99])}")
+                    self._add_jango_row(s(g[0:12]), s(g[54:64]), s(g[64:74]), s(g[84:99]), s(g[99:109]), s(g[129:144]), s(g[159:169]))
                 if b_next:
                     acno = getattr(self, '_jngo_acno', '')
                     pswd = getattr(self, '_jngo_pswd', '')
-                    self.ocx.dynamicCall("TR1221(int, QString, QString, int, QString)",
-                                        [TK_TR1221, acno, pswd, 0, nkey])
+                    mkgb = getattr(self, '_jngo_mkgb', 1)
+                    self.ocx.dynamicCall("TR1223(int, QString, QString, int, int, QString)",
+                                        [TK_TR1223, acno, pswd, 0, mkgb, nkey])
             elif key == TK_TR3211:  # 선물 체결/미체결 (header: acno[11]+nrec[4]=15, grid=179)
                 GRID = 179
                 mode = getattr(self, '_chegyul_mode', '체결')
@@ -1043,15 +1100,16 @@ class TestWindow(QMainWindow):
                     self.ocx.dynamicCall(
                         "TR3211(int, QString, QString, int, int, QString, int, int, QString)",
                         [TK_TR3211, acno, pswd, dlgb, 1, "", 0, 0, nkey])
-            elif key == TK_TR1211:  # 주식 체결/미체결 (header: acno[11]+nrec[4]=15, grid=222)
-                GRID = 222
+            elif key == TK_TR1211:  # 주식 체결/미체결 (header: acno[11]+nrec[4]=15, grid=265)
+                GRID = 265
                 mode = getattr(self, '_chegyul_mode', '체결')
                 nrec = int(raw[11:15].decode('cp949', errors='ignore').strip() or "0")
                 self._log(f"  [주식{mode}] {nrec}건")
                 for i in range(nrec):
                     g = raw[15 + i*GRID: 15 + (i+1)*GRID]
                     if len(g) < GRID: break
-                    self._log(f"    주문={s(g[0:5])} 종목={s(g[21:27])} {s(g[27:62])} {s(g[62:82])} 주문가={s(g[122:134])} 주문량={s(g[134:146])} 체결가={s(g[146:158])} 체결량={s(g[158:170])} 미체결={s(g[182:194])} [{s(g[194:214])}] {s(g[214:222])}")
+                    mkgb = s(g[20:21])
+                    self._log(f"    주문={s(g[0:10])} 원주문={s(g[10:20])} 시장={MKGB_NAMES.get(mkgb, mkgb)} 종목={s(g[21:33])} {s(g[33:73])} {s(g[73:93])} 주문가={s(g[133:145])} 주문량={s(g[145:157])} 체결가={s(g[157:169])} 체결량={s(g[169:181])} 미체결={s(g[193:205])} [{s(g[237:257])}] 시간={s(g[257:265])}")
                 if b_next:
                     acno = getattr(self, '_jngo_acno', '')
                     pswd = getattr(self, '_jngo_pswd', '')
@@ -1065,10 +1123,13 @@ class TestWindow(QMainWindow):
             elif key == TK_TR1002:  # 주식 시세(NXT/통합) - 응답이 고정바이너리 아닌 평문 텍스트
                 text = raw.decode('cp949', errors='ignore')
                 self._log(f"  [TR1002 시세] raw={text!r}")
-                # 요청 필드 순서(TR1002_SISE_FIELDS)와 응답 값이 같은 순서로 온다고 가정
-                vals = [v for v in text.replace('\n', '\t').split('\t') if v != '']
+                # 맨 앞 토큰 = 1021(종목코드) 필드값. 실시간 코드와 동일 형식(M.A005930 등)이라
+                # OnRealData 매칭용 키로 저장해두고, 나머지 토큰만 요청 필드 순서대로 매핑
+                tokens = [v for v in text.replace('\n', '\t').split('\t') if v != '']
+                realtime_key, vals = (tokens[0], tokens[1:]) if tokens else ("", [])
+                self._sise_realtime_key = realtime_key
                 pairs = ", ".join(f"{lbl}={v}" for lbl, v in zip(TR1002_SISE_LABELS, vals))
-                self._log(f"  [TR1002 파싱시도] {pairs}")
+                self._log(f"  [TR1002 파싱시도] code={realtime_key} {pairs}")
                 # 현재가,등락율,시가,고가,저가,전일대비,거래량,매도잔량,매수잔량 순
                 widgets = [self.lbl_curr, self.lbl_rate, self.lbl_siga, self.lbl_koga,
                            self.lbl_jega, self.lbl_diff, self.lbl_gvol, self.lbl_dvol, self.lbl_svol]

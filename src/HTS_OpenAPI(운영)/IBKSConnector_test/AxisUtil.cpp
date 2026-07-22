@@ -10,10 +10,10 @@ void WriteLog_1(LPCSTR log, ...)
 	TRY
 	{
 		CString slog;
-	slog.Format("[AXIS][WriteLog] [%s]\n", log);
-	//OutputDebugString(slog);
+		slog.Format("[AXIS][WriteLog] [%s]\n", log);
+		OutputDebugString(slog);
 
-		FILE* fp;
+		/*FILE* fp;
 		fopen_s(&fp, "d:\\openapi.log", "a+");
 		if (!fp) return;
 
@@ -26,7 +26,7 @@ void WriteLog_1(LPCSTR log, ...)
 		va_end(argptr);
 		fprintf(fp, "\n");
 
-		fclose(fp);
+		fclose(fp);*/
 	}
 		CATCH(CMemoryException, e)
 	{

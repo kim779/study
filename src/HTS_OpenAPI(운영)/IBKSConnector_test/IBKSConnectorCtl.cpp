@@ -137,6 +137,8 @@ BEGIN_DISPATCH_MAP(CIBKSConnectorCtrl, COleControl)
 	DISP_FUNCTION(CIBKSConnectorCtrl, "TR3232", TR3232, VT_BOOL, VTS_I4 VTS_BSTR VTS_BSTR VTS_I4 VTS_I4)
 	DISP_FUNCTION(CIBKSConnectorCtrl, "TR2001", TR2001, VT_BOOL, VTS_I4 VTS_BSTR VTS_I4)
 	DISP_FUNCTION(CIBKSConnectorCtrl, "SetPrograms", SetPrograms, VT_EMPTY, VTS_I4)
+	DISP_FUNCTION(CIBKSConnectorCtrl, "TR1223", TR1223, VT_BOOL, VTS_I4 VTS_BSTR VTS_BSTR VTS_I4 VTS_I4 VTS_BSTR) //test1223
+	DISP_FUNCTION(CIBKSConnectorCtrl, "TR1203", TR1203, VT_BOOL, VTS_I4 VTS_I4 VTS_BSTR VTS_BSTR VTS_I4 VTS_BSTR VTS_I4 VTS_I4 VTS_I4 VTS_I4 VTS_I4) //test1203
 	//}}AFX_DISPATCH_MAP
 END_DISPATCH_MAP()
 
@@ -1518,6 +1520,101 @@ BOOL CIBKSConnectorCtrl::S_PIBOSODR(int key, int mmgb, LPCSTR acno, LPCSTR pswd,
 	return SendTR("pibosodr", key, US_CA | US_KEY, (LPCSTR)&buff[0], buff.size(), &CIBKSConnectorCtrl::DEF_KOSCOM_CALLBACK);
 }
 
+BOOL CIBKSConnectorCtrl::S_PIBOSODR_MK(int key, int mmgb, LPCSTR acno, LPCSTR pswd, int ojno, LPCSTR fcod, int jqty, int jprc, int hogb, int mdgb, int mkgn)
+{
+	if (!IsValidState())		return FALSE;
+	if (!IsValidAccount(acno))	return FALSE;
+	if (!IsValidAcnoPswd(pswd))	return FALSE;
+
+	if (mmgb < 1 || mmgb>4)
+	{
+		m_sLastMsg = "매매구분 입력값이 올바르지 않습니다.";
+		return FALSE;
+	}
+
+	if (m_shoga.find(hogb) == m_shoga.end())
+	{
+		m_sLastMsg = "호가구분 입력값이 올바르지 않습니다.";
+		return FALSE;
+	}
+	if (mdgb < 0 || mdgb>2) return FALSE;
+	if (strlen(fcod) < 7)
+	{
+		m_sLastMsg = "종목코드가 올바르지 않습니다.";
+		return FALSE;
+	}
+	if (jqty < 0)
+	{
+		m_sLastMsg = "주문수량이 올바르지 않습니다.";
+		return FALSE;
+	}
+	if (jqty == 0 && (mmgb == 1 || mmgb == 2))
+	{
+		m_sLastMsg = "주문수량이 올바르지 않습니다.";
+		return FALSE;
+	}
+	if ((mmgb == 3 || mmgb == 4) && ojno == 0)
+	{
+		m_sLastMsg = "원주문번호가 올바르지 않습니다.";
+		return FALSE;
+	}
+
+	vector<char> buff(L_ledger + L_tr1201_mid);
+	memset(&buff[0], ' ', buff.size());
+
+	struct ledger* ledger = (struct ledger*)&buff[0];
+	struct tr3201_mid* mid = (struct tr3201_mid*)&buff[L_ledger];
+
+	//  Ledger 편집
+	GetLedger(ledger);
+	FillMemory(ledger->usid, sizeof(ledger->usid), ' ');
+	memcpy(ledger->usid, (LPCSTR)m_usid, m_usid.GetLength());
+	memcpy(ledger->brno, "000", 3);
+	memcpy(ledger->rcnt, "0000", 4);
+	memcpy(ledger->fkey, "5   ", 4);
+
+	//2014.04.21 KSJ 일방향암호화 추가
+	CString sPswd;
+	sPswd = GetEncPassword(pswd);
+	CopyMemory(ledger->hsiz, "44", sizeof(ledger->hsiz));
+	CopyMemory(ledger->epwd, sPswd, sPswd.GetLength());
+
+	// 주문 편집
+	memcpy(mid->gubn, "^C", 2);				//^C 2014.04.21 KSJ 차익/비차익 때문에 추가
+	sprintf(mid->nrec, "%04d", 1);			// 반복횟수
+
+	if (mkgn == 1)
+		mid->odgb[0] = '1';          //KRX
+	else if(mkgn ==2)
+		mid->odgb[0] = 'N';			  // 선물
+	else if(mkgn == 3)
+		mid->odgb[0] = 'S';			  // 선물
+
+	mid->mmgb[0] = '0' + mmgb;				// 매매구분
+	memcpy(mid->accn, acno, 11);				// 계좌번호
+	//memcpy(mid->pswd, pswd, strlen(pswd));	// 계좌비번
+	memcpy(mid->pswd, "HEAD", 4);			// 계좌비번	2015.05.23 KSJ
+	sprintf(mid->ojno, "%012d", ojno);		// 원주문번호
+	sprintf(mid->fcod, "%.8s", fcod);		// 종목코드
+	sprintf(mid->jqty, "%08d", jqty);		// 주문수량
+	sprintf(mid->jprc, "%010d", jprc);		// 주문가격
+	if (hogb == 61 || hogb == 81)
+	{
+		sprintf(mid->hogb, "%02d", hogb);		// 호가구분
+		sprintf(mid->cdgb, "%d", 0);		// IOC/FOK
+	}
+	else
+	{
+		sprintf(mid->hogb, "%02d", hogb % 10);		// 호가구분
+		sprintf(mid->cdgb, "%d", hogb / 10);		// IOC/FOK
+	}
+	sprintf(mid->mdgb, "%d", mdgb);			// 정정취소
+	mid->prgb[0] = 'X';
+	sprintf(mid->pggb, "%02d", m_nPggb);	// 프로그램(00:일반 01:차익 03:비차익) 2014.04.21 추가
+
+	//return SendTR("pibosodr", key, US_CA|US_KEY, (LPCSTR)&buff[0], buff.size(), DEF_KOSCOM_CALLBACK);  //vc2019
+	return SendTR("pibosodr", key, US_CA | US_KEY, (LPCSTR)&buff[0], buff.size(), &CIBKSConnectorCtrl::DEF_KOSCOM_CALLBACK);
+}
 //2012.06.04 KSJ 주문에 사용자정의ID 추가
 BOOL CIBKSConnectorCtrl::S_PIBOSODR_ID(int key, int mmgb, LPCSTR acno, LPCSTR pswd, int ojno, LPCSTR fcod, int jqty, int jprc, int hogb, int mdgb, int id )
 {
@@ -1961,7 +2058,7 @@ BOOL CIBKSConnectorCtrl::S_PIBOSJGO(int key, LPCSTR acno, LPCSTR pswd, int allf,
 	vector<char> buff(L_ledger+L_tr1221_mid, ' ');
 	struct ledger *ledger = (struct ledger*)&buff[0];
 	struct tr1221_mid *mid = (struct tr1221_mid*)&buff[L_ledger];
-	
+
 	GetLedger(ledger);
 	memcpy(ledger->svcd, "SONAQ052", 8);
 	FillMemory(ledger->usid, sizeof(ledger->usid), ' ');
@@ -1989,10 +2086,65 @@ BOOL CIBKSConnectorCtrl::S_PIBOSJGO(int key, LPCSTR acno, LPCSTR pswd, int allf,
 	memcpy(mid->acno, acno, 11);
 	//memcpy(mid->pswd, pswd, strlen(pswd));	// 계좌비번
 	memcpy(mid->pswd, "HEAD", 4);			// 계좌비번	2015.05.23 KSJ
+	//mid->allf[0] = allf + '0';
 	mid->allf[0] = allf + '0';
-	
+
 	//return SendTR("pibosjgo", key, US_ENC, (LPCSTR)&buff[0], buff.size(), DEF_KOSCOM_CALLBACK);  //vc2019
 	return SendTR("pibosjgo", key, US_ENC, (LPCSTR)&buff[0], buff.size(), &CIBKSConnectorCtrl::DEF_KOSCOM_CALLBACK);
+}
+
+BOOL CIBKSConnectorCtrl::S_PIBOSJG2(int key, LPCSTR acno, LPCSTR pswd, int allf, LPCSTR nkey, int mkgubn)
+{
+	if (!IsValidState())		return FALSE;
+	if (!IsValidAccount(acno))	return FALSE;
+	if (!IsValidAcnoPswd(pswd))	return FALSE;
+	if (allf < 0 || allf>2) { m_sLastMsg = "조회구분값을 확인하세요.[allf]"; return FALSE; }
+
+	vector<char> buff(L_ledger + L_tr1221_mid, ' ');
+	struct ledger* ledger = (struct ledger*)&buff[0];
+	struct tr1221_mid* mid = (struct tr1221_mid*)&buff[L_ledger];
+
+	GetLedger(ledger);
+	memcpy(ledger->svcd, "SONAQ052", 8);
+	FillMemory(ledger->usid, sizeof(ledger->usid), ' ');
+	memcpy(ledger->usid, (LPCSTR)m_usid, m_usid.GetLength());
+	memcpy(ledger->brno, "000", 3);
+	memcpy(ledger->rcnt, "0030", 4);
+	if (strlen(nkey) == 0)
+		memcpy(ledger->fkey, "C   ", 4);
+	else
+	{
+		ledger->next[0] = 'Y';
+		memcpy(ledger->fkey, "7   ", 4);
+		CString strTemp;
+		strTemp.Format("%s", nkey);
+		CopyMemory(ledger->nkey, strTemp, strTemp.GetLength());
+	}
+
+	//2014.04.21 KSJ 일방향암호화 추가
+	CString sPswd;
+	sPswd = GetEncPassword(pswd);
+	CopyMemory(ledger->hsiz, "44", sizeof(ledger->hsiz));
+	CopyMemory(ledger->epwd, sPswd, sPswd.GetLength());
+
+	// Data 편집
+	memcpy(mid->acno, acno, 11);
+	//memcpy(mid->pswd, pswd, strlen(pswd));	// 계좌비번
+	memcpy(mid->pswd, "HEAD", 4);			// 계좌비번	2015.05.23 KSJ
+	//mid->allf[0] = allf + '0';
+	mid->allf[0] = allf;
+	mid->fill[0] = mkgubn;
+
+	if (mkgubn == 1)
+		mid->fill[0] = '1';
+	else if (mkgubn == 2)
+		mid->fill[0] = '2';
+	else if (mkgubn == 3)
+		mid->fill[0] = '3';
+	
+
+	//return SendTR("pibosjgo", key, US_ENC, (LPCSTR)&buff[0], buff.size(), DEF_KOSCOM_CALLBACK);  //vc2019
+	return SendTR("pibosjg2", key, US_ENC, (LPCSTR)&buff[0], buff.size(), &CIBKSConnectorCtrl::DEF_KOSCOM_CALLBACK);
 }
 
 BOOL CIBKSConnectorCtrl::S_SONBQ101(int key, LPCSTR acno, LPCSTR pswd, LPCSTR code, int zBnsTp, double dOrdPrc, int hogb, int zQryTp, double lOrdAmt, double dRatVal)
@@ -2167,6 +2319,16 @@ BOOL CIBKSConnectorCtrl::TR1202(long key, long mmgb, LPCTSTR acno, LPCTSTR pswd,
 }
 //KSJ
 
+BOOL CIBKSConnectorCtrl::TR1203(long key, long mmgb, LPCTSTR acno, LPCTSTR pswd, long ojno, LPCTSTR code, long jqty, long jprc, long hogb, long mdgb, long mkgb)  //test1203
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	if (hogb == 61 || hogb == 81)	// 장전시간외종가, 시간외종가 주문일 경우 제한을 달리한다.
+		return AccessTr(eTR1203) ? S_PIBOSODR_MK(key, mmgb, acno, pswd, ojno, code, jqty, jprc, hogb, mdgb, mkgb) : FALSE;
+	else
+		return AccessTr(eTR1203) ? S_PIBOSODR_MK(key, mmgb, acno, pswd, ojno, code, jqty, jprc, hogb, mdgb, mkgb) : FALSE;
+}
+
 BOOL CIBKSConnectorCtrl::TR1211(long key, LPCTSTR acno, LPCTSTR pswd, LPCTSTR code, long dsgb, long sygb, long dlgb, long sort, LPCTSTR nkey) 
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
@@ -2197,6 +2359,12 @@ BOOL CIBKSConnectorCtrl::TR1222(long key, LPCTSTR acno, LPCTSTR pswd, long allf)
 	m_Notify.GetWindow(GW_CHILD)->SendMessage(WM_ACCOUNT, MAKEWPARAM(this->m_hWnd, S_NOTIFY), (LPARAM)(LPCTSTR)sData);
 	return TRUE;	
 //	return AccessTr(eTR1222) ? S_PIBOSJGO(key, acno, pswd, allf, nkey) : FALSE;
+}
+
+BOOL CIBKSConnectorCtrl::TR1223(long key, LPCTSTR acno, LPCTSTR pswd, long allf, long mkgb, LPCTSTR nkey)  //test1223
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+	return AccessTr(eTR1223) ? S_PIBOSJG2(key, acno, pswd, allf, nkey, mkgb) : FALSE;
 }
 
 BOOL CIBKSConnectorCtrl::TR1231(long key, LPCTSTR acno, LPCTSTR pswd, LPCTSTR code, long mmgb, double jprc) 
@@ -2339,7 +2507,9 @@ BOOL CIBKSConnectorCtrl::S_TR1002(int key, LPCSTR code, LPCSTR data)
 		return FALSE;
 	}
 	CString sdat;
-	sdat.Format("1301\x7f%s\t%s\t", code, data);
+	sdat.Format("1301%c%s\t1021\t%s\t", 0x7f, code, data);
+	//sdat.Format("1301\x7f%s\t%s\t", code, data);
+	//tmps.Format("1301%c%s\t1021\t17413\t", 0x7f, code);
 	//return SendTR("pooppoop", key, US_OOP, (LPCSTR)sdat, sdat.GetLength(), C_TR1002);  //vc2019
 	return SendTR("pooppoop", key, US_OOP, (LPCSTR)sdat, sdat.GetLength(), &CIBKSConnectorCtrl::C_TR1002);
 }
@@ -2662,7 +2832,7 @@ void CIBKSConnectorCtrl::C_SACAQ504( WPARAM wParam, LPARAM lParam )
 				m_slog.Format("[openapi][%s]<%d> sacaq504 (약정)결과에 따라 삭제 계좌 =[%s]", __FUNCTION__, __LINE__, (LPCSTR)m_acno[n]);
 				WriteLog(m_slog);
 				
-				if (!IsDevOrUAT()) {
+				if (!IsMyDevPC()) {
 					m_acno.erase(m_acno.begin() + n);
 					m_acnm.erase(m_acnm.begin() + n);
 				}
@@ -4669,4 +4839,17 @@ bool CIBKSConnectorCtrl::IsDevOrUAT()
 {
 	return (m_svrip == "172.16.202.106" || m_svrip == "211.255.204.104");
 }
+
+// 개발자 PC 테스트 전용 - 접속에 사용된 로컬 IP(m_cltip)가 개발자 사설 IP와
+// 일치할 때만 true. 고객 PC의 사설 IP는 이 값과 다르므로 실수로 배포되어도
+// 항상 false로 평가되어 기존 정식 동작(계좌 제거)이 그대로 유지된다.
+bool CIBKSConnectorCtrl::IsMyDevPC()
+{
+	return (m_cltip == "172.19.1.106");
+}
+
+//bool CIBKSConnectorCtrl::IsDevOrUAT()
+//{
+//	return (m_svrip == "172.16.202.106" || m_svrip == "211.255.204.104");
+//}
 #pragma warning (default : 4996)

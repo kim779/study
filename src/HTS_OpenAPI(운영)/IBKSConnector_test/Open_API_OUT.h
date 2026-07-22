@@ -111,6 +111,7 @@ struct tr1211_grid
 {
     char    juno[10];    /* 주문   번호      */	//2015.05.28 5 -> 10로 변경
     char    ojno[10];    /* 원주문 번호      */	//2015.05.28 5 -> 10로 변경
+	char    mkgb[1];   /* 시장구분         */
     char    cod2[12];   /* 종목코드         */
     char    hnam[40];   /* 종목명           */
     char    odgb[20];   /* 주문구분         */
@@ -122,6 +123,8 @@ struct tr1211_grid
     char    dqty[12];   /* 체결수량         */
     char    tqty[12];   /* 체결수량합       */
     char    wqty[12];   /* 미체결수량       */
+	char    stopPrc[12];   /* 스톱가격       */
+	char    stopStat[20];   /* 스톱유형       */
     char    stat[20];   /* 접수상태         */
     char    time[8];    /* 주문시간         */
 };

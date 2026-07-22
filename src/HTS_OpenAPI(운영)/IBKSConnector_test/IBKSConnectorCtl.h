@@ -58,9 +58,11 @@ typedef enum {
 	eTR1003,	// 주식 분봉조회(OOP)
 	eTR1201,	// 주식 주문
 	eTR1201_01, // 주식 주문(시간외,장전시간외 종가 주문제한)
+	eTR1203,	// 주식 주문 //test1203
 	eTR1211,	// 주식 체결조회
 	eTR1221,	// 주식 잔고조회
 	eTR1222,	// 주식 잔고조회(실시간)
+	eTR1223,	// 주식 잔고조회(시장구분)  //test1223
 	eTR1231,	// 주식 주문가능수량조회
 	eTR3001,	// 선물옵션 시세조회
 	eTR3002,	// 선물옵션 심볼조회(OOP)
@@ -117,10 +119,12 @@ struct LIMIT_ITEM
 	{ eTR1002, 1000, 0,  1, 0},
 	{ eTR1002, 1000, 0,  1, 0},
 	{ eTR1201, 1000, 0, 10, 0},
+	{ eTR1203, 1000, 0, 10, 0}, //test1203
 	{ eTR1201_01, 1000, 0, 10, 0},
 	{ eTR1211, 1000, 0,  1, 0},
 	{ eTR1221, 1000, 0,  1, 0},	//2015.12.09 KSJ 잔고조회 xscale때문에 조정 6 -> 1
 	{ eTR1222, 1000, 0,  1, 0},
+	{ eTR1223, 1000, 0,  1, 0},  //test1223
 	{ eTR1231, 1000, 0,  1, 0},
 	{ eTR3001, 1000, 0,  1, 0},
 	{ eTR3002, 1000, 0,  1, 0},
@@ -267,6 +271,8 @@ protected:
 	afx_msg BOOL TR3232(long key, LPCTSTR acno, LPCTSTR pswd, long fstp, long ertp);
 	afx_msg BOOL TR2001(long key, LPCTSTR upcd, long dtgb);
 	afx_msg void SetPrograms(long pggb);
+	afx_msg BOOL TR1223(long key, LPCTSTR acno, LPCTSTR pswd, long allf, long mkgubn, LPCTSTR nkey);  //test1223
+	afx_msg BOOL TR1203(long key, long mmgb, LPCTSTR acno, LPCTSTR pswd, long ojno, LPCTSTR code, long jqty, long jprc, long hogb, long mdgb, long mkgb);
 	//}}AFX_DISPATCH
 	DECLARE_DISPATCH_MAP()
 
@@ -388,6 +394,8 @@ public:
 	eventidOnGuideMsg = 13L,
 	eventidOnFBalance = 14L,
 	eventidOnSBalance = 15L,
+	dispidTR1223 = 65L,  //test1223
+	dispidTR1203 = 66L,
 	//}}AFX_DISP_ID
 	};
 
@@ -427,6 +435,7 @@ protected:
 	double	GetND(double value);
 	int	CallPut(LPSTR code);
 	bool IsDevOrUAT();
+	bool IsMyDevPC();
 protected:
 	void DebugFile(LPCSTR path, LPCSTR mode, LPCSTR data, int dlen);
 	inline bool IsInit();										// 초기화 여부 확인
@@ -489,9 +498,11 @@ public:
 	// 주식
 	BOOL S_PIBO1003(int key, LPCSTR jcod);	// 시세조회
 	BOOL S_PIBOSODR(int key, int mmgb, LPCSTR acno, LPCSTR pswd, int ojno, LPCSTR fcod, int jqty, int jprc, int hogb, int mdgb ); // 주문
+	BOOL S_PIBOSODR_MK(int key, int mmgb, LPCSTR acno, LPCSTR pswd, int ojno, LPCSTR fcod, int jqty, int jprc, int hogb, int mdgb, int mkgn); // 주문  //test1203
 	BOOL S_PIBOSODR_ID(int key, int mmgb, LPCSTR acno, LPCSTR pswd, int ojno, LPCSTR fcod, int jqty, int jprc, int hogb, int mdgb, int id ); // 2012.06.04 KSJ 주문 사용자정의ID 추가
 	BOOL S_PIBOSCHG(int key, LPCSTR acno, LPCSTR pswd, LPCSTR code, int dsgb, int sygb, int dlgb, int sort, LPCSTR nkey); // 주식체결조회
 	BOOL S_PIBOSJGO(int key, LPCSTR acno, LPCSTR pswd, int allf, LPCSTR nkey); // 주식잔고조회
+	BOOL S_PIBOSJG2(int key, LPCSTR acno, LPCSTR pswd, int allf, LPCSTR nkey, int mkgubn);
 	BOOL S_SONAQ200(int key, LPCSTR acno, LPCSTR pswd, LPCSTR code, int zBnsTp, double dOrdPrc); // 주문가능수량조회
 
 	// 선물옵션

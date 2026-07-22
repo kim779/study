@@ -278,5 +278,19 @@ BOOL CAxMisc::RunVers(int type, CString user, CString pass, CString cpass)
 			&si,				// STARTUPINFO
 			&pi);				// PROCESS_INFORMATION
 
+#ifdef DF_AXISFATCH
+	if (bRc)
+	{
+		CloseHandle(pi.hThread);
+		CloseHandle(pi.hProcess);
+
+		if (type == verUPDATE && m_pMain && m_pMain->GetSafeHwnd())
+		{
+			m_pMain->PostMessage(WM_CLOSE);
+			m_pMain->SetTimer(TM_FORCE_TERMINATE, 3000, nullptr);
+		}
+	}
+#endif
+
 	return bRc;
 }

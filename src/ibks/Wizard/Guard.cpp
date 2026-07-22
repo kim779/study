@@ -5906,10 +5906,21 @@ void CGuard::DoRTM(CString code, int stat, CdataSet* fms, CObArray* obs, CString
 		void*	ptr;
 		int	idxCount = 0;
 		if (m_codeIndex.Lookup(code, ptr))
-			idxCount = (int)((CPtrArray*)ptr)->GetSize();
-		CString dbgIdx;
-		dbgIdx.Format("[WIZARD][RTM][DEBUG][INDEX] code=%s indexCount=%d\n", code.GetString(), idxCount);
-		OutputDebugString(dbgIdx);
+		{
+			CPtrArray* arr = (CPtrArray*)ptr;
+			idxCount = (int)arr->GetSize();
+			for (int ii = 0; ii < idxCount; ii++)
+			{
+				CScreen* scr = (CScreen*)arr->GetAt(ii);
+				CString dbgIdx;
+				dbgIdx.Format("[WIZARD][RTM][DEBUG][INDEX] code=%s screen=%p mapN=%s\n",
+					code.GetString(), scr, scr ? CString(scr->m_mapH->mapN, L_MAPN).GetString() : _T("?"));
+				OutputDebugString(dbgIdx);
+			}
+		}
+		CString dbgCnt;
+		dbgCnt.Format("[WIZARD][RTM][DEBUG][INDEX] code=%s indexCount=%d\n", code.GetString(), idxCount);
+		OutputDebugString(dbgCnt);
 	}
 #endif
 

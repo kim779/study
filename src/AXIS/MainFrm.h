@@ -155,6 +155,8 @@ int __stdcall STSDKEX_EventCallback(long lCode, void* pParam, long lParamSize);
 #define TM_MAIN_RTS_TEST 9063
 #define TM_MAIN_RTS_PUSH 9064
 #define TM_NOTICE_POP 9065
+#define TM_FORCE_TERMINATE 9066
+#define TM_CLOSE_WATCHDOG 9067
 
 #define	COLOR_TB		RGB(238, 238, 238)
 
@@ -1841,6 +1843,13 @@ public:
 		const CString& key,
 		const CString& newValue);
 	void ProcessFileManager(const CString& setupFile);
+
+	//폰패드
+	BOOL m_bNewPhonepad{};
+	BOOL ConnectWithTimeOut(const char* ip, int port, int timeoutMS);
+
+	BOOL m_bSise{};   //1시세전용  0일반
+
 	//실시간메인처리
 #ifdef DF_MAIN_RTS
 	struct SafeAlertItem {

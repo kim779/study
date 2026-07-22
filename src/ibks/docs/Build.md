@@ -343,6 +343,34 @@ error MSB3191: Unable to create directory "...\..\bin\Release\"
 3. General → Output Directory
 4. `$(ProjectDir)\bin\$(Configuration)\` 로 수정
 
+### 오류 5: LNK2019 - 노트북/PC 간 드라이브 문자(D:\ vs F:\) 불일치 (2026-07-20)
+
+```
+error LNK2019: unresolved external symbol "public: bool __thiscall CEngineWrapper::LoadScript(...)"
+error LNK1120: 1개의 확인할 수 없는 외부 참조입니다.
+```
+
+**원인:**
+- `Wizard.vcxproj`의 `AdditionalDependencies`에 axisvbs.lib 경로가 절대경로(`D:\...` 등)로 박혀있으면, 다른 PC(노트북 등, 리포지토리 드라이브 문자가 `F:\` 등으로 다름)에서 열었을 때 해당 경로를 못 찾음
+- 이 상태에서 링크가 오래된/엉뚱한 axisvbs.lib을 잡거나 아예 못 찾으면서 `LoadScript` 심볼 unresolved 발생
+
+**해결:**
+- `AdditionalDependencies`를 절대경로 대신 상대경로로 수정 (드라이브 문자와 무관하게 어느 PC에서든 동작)
+  ```xml
+  <!-- Before -->
+  D:\src\IBKS\src\src_7_11\platform\dll\vbs\Release\axisvbs.lib
+
+  <!-- After -->
+  ..\..\src_7_11\platform\dll\vbs\Release\axisvbs.lib
+  ```
+
+**중요 — 트리 구조 확인 (2026-07-20 확인):**
+- `Wizard`(axwizard, 화면 런타임)는 **`ibks` 트리** 기준으로 작업 중
+- 반면 **`axisvbs`(Python/VBS 스크립트 엔진, dll/vbs)는 `src_7_11/platform/dll/vbs` 트리 기준으로 작업 중** — `ibks/dll/vbs`가 아님
+- 즉 `Wizard.vcxproj`가 링크하는 `axisvbs.lib`은 의도적으로 **다른 트리(`src_7_11/platform`)의 빌드 결과물**을 가리킴 (실수 아님, 확인됨)
+- `ibks/dll/vbs/pythonEngine.cpp`와 `src_7_11/platform/dll/vbs/pythonEngine.cpp`는 내용이 서로 다름(약 290줄 차이, 2026-07-20 diff 확인) — **axisvbs 관련 실제 코드 수정은 반드시 `src_7_11/platform/dll/vbs`에서 할 것.** `ibks/dll/vbs`를 고치면 Wizard.ocx에는 반영되지 않음.
+- `engineWrapper.cpp/h`는 두 트리가 현재 동일함 (2026-07-20 기준, 앞으로 divergence 가능성 있으니 수정 시 트리 재확인 권장)
+
 ---
 
 ## 6. 배포 단계

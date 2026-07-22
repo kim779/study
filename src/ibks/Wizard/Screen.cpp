@@ -76,6 +76,18 @@ CScreen::CScreen(CClient* client, CRect rect)
 
 CScreen::~CScreen()
 {
+#ifdef DF_RTM_INDEX  //CScreen::~CScreen - RTM index detach
+	{
+		WORD	flashKey;
+		CString	flashCode;
+		for (POSITION pos = m_lastCodes.GetStartPosition(); pos; )
+		{
+			m_lastCodes.GetNextAssoc(pos, flashKey, flashCode);
+			m_guard->UpdateCodeIndex(this, flashCode, _T(""));
+		}
+	}
+#endif
+
 	m_flashObs.RemoveAll();
 	m_revObs.RemoveAll();
 	m_blink.RemoveAll();
@@ -382,6 +394,31 @@ bool CScreen::Parse(bool resize, bool fix)
 			else if (form->m_form->kind == FM_CONTROL)
 				m_flashObs.SetAt(m_mapH->formN+ii, form);
 			flash = true;
+
+#ifdef DF_RTM_INDEX  //CScreen::Parse - RTM index attach (mirrors CScreen::OnAlert's default-branch classification)
+			switch (form->m_form->kind)
+			{
+			case FM_GRID:
+			case FM_TABLE:
+			case FM_CONTROL:
+				break;
+			default:
+				if (form->m_form->iorder != (WORD)-1)
+				{
+					form->ReadData(text);
+					text.TrimRight();
+					m_guard->UpdateCodeIndex(this, _T(""), text);
+					m_lastCodes.SetAt(form->m_form->iorder, text);
+
+					CString dbg;
+					dbg.Format("[WIZARD][RTM][DEBUG][ATTACH] mapN=%s name=%s kind=%d code=%s\n",
+						CString(m_mapH->mapN, L_MAPN).GetString(), (char*)form->m_form->name, form->m_form->kind, text.GetString());
+					OutputDebugString(dbg);
+				}
+				break;
+			}
+#endif
+
 		}
 
 		m_vbe->AddObject(form->GetSymbolName(),
@@ -798,10 +835,16 @@ bool CScreen::OnAlert(CString code, CString update, CdataSet* fms, CObArray* obs
 #ifdef DF_RTM_INDEX  //CScreen::OnAlert
 			// 자가갱신: 매 틱마다 어차피 읽는 이 값을 이용해 인덱스를 최신 상태로 유지.
 			// 별도 쓰기지점 후킹 없이, 값이 바뀐 걸 발견하면 그때 인덱스를 갱신함.
-			if (text != m_lastCode)
+			// key(iorder)별로 추적 - 화면 하나에 flash key 필드가 여러 개(다중 코드) 있어도 서로 안 섞이게.
 			{
-				m_guard->UpdateCodeIndex(this, m_lastCode, text);
-				m_lastCode = text;
+				CString prevCode;
+				if (!m_lastCodes.Lookup(key, prevCode))
+					prevCode = _T("");
+				if (text != prevCode)
+				{
+					m_guard->UpdateCodeIndex(this, prevCode, text);
+					m_lastCodes.SetAt(key, text);
+				}
 			}
 #endif
 
@@ -847,8 +890,8 @@ void CScreen::UpdateRTM(int key, CString code, CString update, CdataSet* fms, CO
 			continue;
 		case FM_EDIT:
 		case FM_OUT:
-			if (form->m_form->iok == EIO_INPUT)   // �Է������� �ǽð� ���� ����
-				continue;
+			//if (form->m_form->iok == EIO_INPUT)   //Edit  input no RTS writing //testcode
+			//	continue;
 			break;
 		case FM_GRID:
 			if (isUob() && !isFlash())

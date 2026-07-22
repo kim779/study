@@ -386,7 +386,12 @@ public:
 	bool	GetFdsValue(CString trN, char* datB, int& datL);
 	long	CertifyFull(CString srcB, int srcL, char* desB, int& desL);
 	long	CertifyName(char* datB);
-
+#ifdef DF_RTM_INDEX
+	// RTM code reverse-index (shadow/validation only, does not affect DoRTM behavior yet).
+	// Self-updates from CScreen::OnAlert's existing per-tick field read, so no separate
+	// write-path hooks are required. oldCode may be empty (first observation for a screen).
+	void	UpdateCodeIndex(class CScreen* screen, CString oldCode, CString newCode);
+#endif
 private:
 	int	AtView(CWorks* works, CString maps, CString domino, bool force);
 	void	RequestMAPs(CString mapN, Cvers* vers);
@@ -402,12 +407,7 @@ private:
 	void	DoRTM(CString code, int stat, class CdataSet* fms, CObArray* obs, CString updates);
 	CString	MakeString(class CdataSet* fms, bool newline = true);
 
-#ifdef DF_RTM_INDEX
-	// RTM code reverse-index (shadow/validation only, does not affect DoRTM behavior yet).
-	// Self-updates from CScreen::OnAlert's existing per-tick field read, so no separate
-	// write-path hooks are required. oldCode may be empty (first observation for a screen).
-	void	UpdateCodeIndex(class CScreen* screen, CString oldCode, CString newCode);
-#endif
+
 
 	size_t	strcspnx(const char* s, const char reject);
 	char*	strtokx(char* str, const char delim, char** start);

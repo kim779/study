@@ -123,7 +123,7 @@ private:
 	CMapStringToPtr	m_objects;
 
 #ifdef DF_RTM_INDEX
-	CString		m_lastCode;		// RTM 역인덱스 자가갱신용: 마지막으로 관측된 PR_CODE 필드 값
+	CMap<WORD, WORD, CString, CString&>	m_lastCodes;	// RTM 역인덱스 자가갱신용: flash key 필드(iorder)별 마지막 관측값 (화면당 코드필드 다건 대응)
 #endif
 
 // Operations

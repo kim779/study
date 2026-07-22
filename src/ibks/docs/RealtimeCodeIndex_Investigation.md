@@ -14,25 +14,23 @@
 
 ## 확인된 사실
 
-### 1. "종목코드 필드"의 식별 방법 — `PR_CODE` 속성 플래그
+### 1. "종목코드 필드"의 식별 방법 — `FA_FLASH` 속성 플래그 (2026-07-20 정정, 실측 확인 완료)
 
-화면(.map)의 필드 중 `FM_EDIT` 타입이고 `form->m_form->properties & PR_CODE`가 설정된 필드가 "이 화면의 종목코드 필드"다. 이건 **맵소스 설계 시점(빌더)에 지정되는 플래그**이지, 필드 이름 관례가 아니다.
+**정정:** 최초 조사 때는 `PR_CODE`(`FM_EDIT : has code list`, form.h:361)가 식별 플래그라고 봤으나, 이는 **코드조회 팝업(콤보리스트) UI 기능** 표시일 뿐 실시간 매칭과 무관한 것으로 확인됨(`CGuard::SetCode`가 쓰는 목적은 이 팝업 연동, 다른 용도).
 
-근거: `CGuard::SetCode(CScreen* screen, ...)` (Guard.cpp:2305)
-```cpp
-for (int ii = 0; ii < screen->m_mapH->formN; ii++)
-{
-    form = screen->GetAtForm(ii);
-    if (!form || form->m_form->kind != FM_EDIT)
-        continue;
-    if (form->m_form->properties & PR_CODE && self)
-    {
-        form->ReadData(text);
-        SetCode((char*)form->m_form->name, text, self, ...);
-        ...
-    }
-}
+**실제 정답:** `form->m_form->attr & FA_FLASH`(`flash key field`, form.h:282)가 설정된 필드가 "이 화면의 실시간 매칭 키 필드"다. 그리고 이 필드는 **`FM_EDIT`이 아니라 `FM_OUT`(kind=9, output)일 수 있다** — 사용자가 눈으로 보는/조회에 쓰는 Edit 필드(예: `IB999987`의 `1301`, `FM_EDIT`, 조회용)와 실시간 키로 쓰이는 필드(같은 맵의 `1021`, `FM_OUT`, `FA_FLASH`)가 **서로 다른 별개의 필드**인 경우가 있다. `1021`은 서버 조회 응답으로 시장구분+종목코드 조합값(예: `A005930`)을 받는다.
+
+**실측 로그 (2026-07-20, `IB999987`, 화면 오픈 시점):**
 ```
+[WIZARD][RTM][DEBUG][ATTACH] mapN=IB999987 name=1021 kind=9 code=
+```
+(`code=`가 비어있는 건 화면이 막 열린 시점이라 아직 TR 조회 응답이 안 와서임 — 정상. 응답 도착 후 다음 틱에서 자가치유(`OnAlert`의 `m_lastCode` 비교)가 실제값으로 채워줌.)
+
+axisBuilder에서 `1021`의 Attributes 다이얼로그로 직접 확인 — `FLASH` 체크박스가 켜져 있고, 이 체크를 켜야 실시간 갱신이 동작하는 것을 실제 토글 테스트로 확인함(사용자 직접 검증).
+
+**따라서 `CScreen::Parse()`의 attach 로직은 `FA_FLASH` 여부 + `kind`가 `FM_GRID`/`FM_TABLE`/`FM_CONTROL`이 아닌 것(=`CScreen::OnAlert`의 default 분기와 동일 기준)으로 판별해야 하며, `FM_EDIT`으로 kind를 좁혀서 판별하면 `FM_OUT` 키 필드를 놓친다.** (최초 구현 시도 때 `case FM_EDIT:`으로 좁혀서 테스트했다가 실제 키 필드(`FM_OUT`)를 못 잡아서 한 차례 혼선 있었음 — 위 실측으로 해결.)
+
+~~근거(정정 전, 참고용 — `PR_CODE`는 실시간 매칭과 무관하므로 이 예시는 폐기): `CGuard::SetCode(CScreen* screen, ...)` (Guard.cpp:2305)는 `PR_CODE` 필드를 찾아 코드조회 팝업과 연동하는 별개 기능이다.~~
 
 ### 2. 읽기측(매칭) — `CScreen::OnAlert`
 
@@ -89,13 +87,29 @@ void CfmEdit::WriteData(CString data, bool redraw, int col, int row)
 
 ---
 
-## 미해결 질문 (다음 조사 대상)
+## 미해결 질문 → 답변 완료 (2026-07-20)
 
-1. **`fmEdit::WriteData`의 일반 경로(1298줄 이후) 끝에서 `IsChanged()`나 다른 공통 콜백이 불리는지** — 있다면 그게 더 나은 후킹 후보. `fmBase.h:222`의 `virtual bool IsChanged(bool reset=true) { return true; }`가 서브클래스에서 어떻게 오버라이드되는지 아직 안 봄.
-2. **`CClient::OnDomino`가 실제로 언제 호출되는지** — 포커스 전환마다? 코드 입력 엔터 시? 빈도가 얼마나 되는지가 인덱스 갱신 비용 산정에 중요.
-3. **사용자가 키보드로 직접 코드를 입력하는 경로**(`fmEdit.cpp`의 `OnChar`/`OnKeyDown` 계열)가 최종적으로 `WriteData`를 거치는지, 아니면 별도 경로로 필드 버퍼를 직접 건드리는지.
-4. **TR 응답으로 필드가 채워지는 경로**(`Stream.cpp`)가 `PR_CODE` 필드를 건드릴 수 있는지 — 있다면 이것도 4번째 쓰기 경로.
-5. **대안**: 매 write 지점을 다 찾아 후킹하는 대신, `CScreen::OnAlert`가 어차피 매 틱마다 `PR_CODE` 필드를 `ReadData`로 읽는다는 점을 이용해 — **"인덱스를 실시간으로 100% 정확하게 유지"하는 대신 "일정 주기로(예: 코드 변경 감지 시 지연 없이, 혹은 도미노/도착 이벤트 시점마다) 인덱스를 갱신"하는 절충안**도 고려 가치 있음. 완벽한 이벤트 기반 갱신이 너무 위험하면, 첫 구현은 "화면 Attach/Detach 시점 + Domino 발생 시점"만 잡고 시작하는 것도 방법.
+1. **`IsChanged()`가 공통 훅이 될 수 있나?** → **아니오.** `fmEdit.cpp:1894`의 `IsChanged()`는 `m_changed` 플래그를 읽고 리셋하는 getter일 뿐, 이벤트/콜백이 아님. 후킹 지점으로 못 씀.
+2. **`CClient::OnDomino`는 언제 호출되나?** → `Guard.cpp:4029-4032` `CGuard::AtView(force=true)` → 새 화면을 도미노 코드와 함께 열 때만 호출(예: 관심종목 더블클릭 → 상세화면 열기). 화면 전환 시점 전용, 빈도 낮음.
+3. **사용자 직접 타이핑이 `WriteData`를 거치나?** → **아니오.** `fmEdit.cpp`엔 `OnChar`/`OnKeyDown`이 없고, 키 입력은 `CfmEdit::UpdateData(int key, ...)`(fmEdit.cpp:1384)가 `m_strR` 버퍼를 직접 조작. `WriteData`와 별개 경로.
+4. **TR 응답이 코드 필드를 건드릴 수 있나?** → **네.** `Stream.cpp`(`SetDataOOP` 등)엔 코드필드 관련 특수 분기가 없어서 일반 필드와 동일하게 `form->WriteData()` 호출.
+
+**종합:** 코드 변경 경로가 최소 4갈래(직접 타이핑=`UpdateData` / 도미노=`WriteData` / TR응답=`WriteData` / 스크립트 SetData=`WriteData`)이고 방식도 제각각이라 개별 후킹은 비현실적 — 자가갱신(self-heal on read) 채택이 맞는 방향이었음이 재확인됨.
+
+**단, 자가갱신 방식 자체의 구조적 한계 발견 (2026-07-20):** 자가갱신은 `CScreen::OnAlert`가 매 틱마다 호출되는 것에 편승하는 방식인데, 이는 **현재 shadow 모드(전체순회 유지)에서만 안전**하다. 실제 컷오버(전체순회 → 인덱스 기반 라우팅) 이후에는, 화면이 코드를 변경했는데 그 즉시 인덱스에 반영 안 된 상태에서 예전 코드의 틱이 더 이상 안 오면 그 화면은 영영 재인덱싱 안 될 수 있음 (커버리지 gap, 무한 지연 가능).
+
+**대안으로 채택/적용한 것: Attach/Detach 훅 (2026-07-20 구현 완료)**
+- 자가갱신을 대체하는 게 아니라 **보강** — "화면 열기/닫기" 케이스는 attach/detach로 지연 없이 확정 처리하고, "화면은 열려있는데 코드값만 바뀌는" 케이스는 여전히 자가갱신에 의존.
+- **Attach** — `CScreen::Parse()`, `FA_FLASH` 등록 블록 안(Screen.cpp:390-404)에 추가. `OnAlert`와 동일한 kind 분류(`FM_GRID`/`FM_TABLE`/`FM_CONTROL`이 아닌 나머지)로 판별해서 화면 로드 시점에 바로 `UpdateCodeIndex(this, "", 코드)` 호출.
+- **Detach** — `~CScreen()` 소멸자 맨 앞(Screen.cpp:77-81)에 `UpdateCodeIndex(this, m_lastCode, "")` 추가. 이걸로 화면이 닫혀도 `m_codeIndex`에 댕글링 `CScreen*` 포인터가 안 남게 됨 (수정 전엔 detach 호출이 전무해서, 나중에 인덱스를 실제 라우팅에 쓰기 시작하면 use-after-free 크래시로 이어질 수 있는 잠재 위험이었음 — `m_codeIndex` 자체가 이번 조사 중 새로 추가된 구조라 이 위험도 이번에 같이 생겼다가 같이 없어진 것).
+- 둘 다 `#ifdef DF_RTM_INDEX` 안에서만 컴파일되어 실제 배포 동작(전체순회)엔 영향 없음.
+- 실측 검증 완료: 화면 오픈 시 `[ATTACH] mapN=IB999987 name=1021 kind=9 code=` 로그로 attach 정상 동작 확인.
+
+**남은 잔여 리스크(경미, 당장 조치 불필요):** Attach는 `Parse()` 시점(TR 조회 응답 도착 전)에 실행되므로 최초 등록 시 코드값이 비어있을 수 있음(위 로그의 `code=` 공란). TR 응답 도착 후 다음 실시간 틱이 오면 기존 자가갱신이 채워줌 — shadow 모드(전체순회 유지)에서는 이 다음 틱이 반드시 오므로 문제 없음.
+
+**추가 수정 (2026-07-20) — `m_lastCode` 단일변수 → 필드별 추적으로 변경:** 화면 하나에 `FA_FLASH` 기본분기 필드가 여러 개(예: 관심종목처럼 여러 종목을 동시에 추적하는 화면) 있을 수 있다는 점을 고려해, `CString m_lastCode`(화면당 1개) 대신 `CMap<WORD, WORD, CString, CString&> m_lastCodes`(필드의 `iorder`를 키로, 필드별로 마지막 관측값 추적)로 변경함. 이걸 안 하면: 자가갱신이 서로 다른 필드의 값을 뒤섞어 비교하게 되고, Detach 시 마지막으로 처리된 필드의 코드만 인덱스에서 빠지고 나머지는 댕글링으로 남게 됨. Attach/Detach/자가갱신 3곳 모두 `m_lastCodes`(필드별 키) 기준으로 통일함. (`Wizard/Screen.h:126`, `Screen.cpp:77-89`(Detach), `398-413`(Attach), `835-847`(자가갱신))
+
+**부수 수정 — Attach의 kind 분류에서 `FM_EDIT` 제외 로직 제거:** 테스트 중 한때 `case FM_EDIT:`을 제외 목록에 추가했었는데, `OnAlert`의 실제 매칭 로직은 `FM_EDIT`을 배제하지 않으므로(GRID/TABLE/CONTROL만 명시적으로 분리) 이 예외가 있으면 다른 맵에서 진짜 키 필드가 `FM_EDIT` 타입일 경우 Attach가 누락될 위험이 있었음. `OnAlert`와 완전히 동일한 분류 기준으로 되돌림.
 
 ---
 
@@ -106,11 +120,50 @@ void CfmEdit::WriteData(CString data, bool redraw, int col, int row)
 | `Wizard/Screen.cpp:755-804` | `OnAlert` — 읽기측 매칭 로직 |
 | `Wizard/Screen.cpp:198-454` | `Parse()` — `m_flashObs` 등록 (화면 로드 시점) |
 | `Wizard/Guard.cpp:5898-5982` | `DoRTM` — 개선 대상, 전체순회 지점 |
-| `Wizard/Guard.cpp:2305-2334` | `SetCode(CScreen*, ...)` — `PR_CODE` 필드 식별 예시 |
+| `Wizard/Guard.cpp:2305-2334` | `SetCode(CScreen*, ...)` — `PR_CODE` 필드 식별 예시 (실시간 매칭과는 무관한 것으로 판명, 참고용) |
 | `Wizard/Client.cpp:477` | `OnDomino` — 도미노 트리거 진입점 |
 | `Wizard/Client.cpp:1741-1878` | `RestoreDomino`/`CodeDomino` — 도미노 실제 쓰기 |
 | `dll/form/fmEdit.cpp:1261-1296` | `CfmEdit::WriteData`의 `PR_CODE` 분기 (일반 케이스는 미해당) |
 | `dll/form/fmBase.h:215,222` | `WriteData`/`IsChanged` 가상함수 선언 |
+| `builder/h/form.h:282,361` | `FA_FLASH`("flash key field") vs `PR_CODE`("has code list") 정의 — 실시간 키 식별은 전자 |
+| `Wizard/Screen.cpp:77-81` | `~CScreen()` — RTM 인덱스 Detach 훅 (2026-07-20 추가) |
+| `Wizard/Screen.cpp:390-404` | `Parse()` FA_FLASH 등록 블록 — RTM 인덱스 Attach 훅 (2026-07-20 추가) |
+| `Wizard/Guard.h:129`, `Guard.cpp:6001-6030` | `m_codeIndex`, `UpdateCodeIndex()` — 인덱스 자료구조/유지 함수 |
+
+## 3단계 설계: 실제 컷오버 (2026-07-20 설계, 미구현)
+
+**전제:** 1~2단계(shadow 검증 + attach/detach 보강)가 끝났으니, 다음은 `DoRTM`이 전체순회 대신 `m_codeIndex`를 실제로 써서 화면 방문 범위를 줄이는 것. 이건 운영 트레이딩 화면에 직접 영향을 주는 변경이라, 실시간 데이터로 검증 가능한 시점(장중)에 신중하게 넣어야 함.
+
+### 설계 원칙 — 매칭 로직은 그대로, "몇 개 화면을 부르느냐"만 바꾼다
+
+`CScreen::OnAlert` 내부의 필드별 매칭 로직(`m_flashObs` 순회, `text.Compare(code)`, `UpdateRTM(key+1, ...)` 호출)은 **손대지 않는다.** 바뀌는 건 오직 "`OnAlert`를 몇 개의 화면에 대해 호출하느냐" 뿐:
+
+- **지금:** `CClient::OnAlert`(Client.cpp:1496)가 그 클라이언트에 열린 **모든** `isFlash()` 화면에 대해 `OnAlert` 호출
+- **컷오버 후:** `m_codeIndex[code]`에 등록된 화면들에 대해서만 `OnAlert` 호출
+
+### 변경 지점 후보
+
+`CClient::OnAlert`가 클라이언트별로 화면을 순회하면서 스크립트 훅(`m_vm->OnProcedure`, `m_vm->OnAlert`)도 같이 호출하고 있어서, 단순히 `DoRTM`에서 인덱스 조회 결과로 직접 화면을 호출하면 이 스크립트 훅 호출 경로가 빠질 위험이 있음. 두 가지 방식 검토 필요:
+
+1. `CClient::OnAlert`는 그대로 두되, 그 안의 화면순회 루프만 "그 클라이언트 소속이면서 `m_codeIndex[code]`에도 있는 화면"으로 제한
+2. `DoRTM`이 `m_codeIndex[code]`로 화면 목록을 직접 얻고, 각 화면의 `m_client`를 통해 스크립트 훅까지 동일하게 호출하도록 재구성
+
+**중복 호출 주의:** 화면 하나가 같은 코드에 대해 `m_flashObs` 안에 필드를 2개 이상 갖고 있어도(이론상 드물지만 배제 못 함) `m_codeIndex[code]` 배열엔 그 화면이 여러 번 들어갈 수 있음(현재 `UpdateCodeIndex`는 중복 방지 안 함). 같은 화면에 `OnAlert`를 두 번 부르면 틀린 결과가 나오진 않지만(멱등) 낭비이므로, 컷오버 시점에 화면 포인터 기준 중복 제거를 추가하는 게 좋음.
+
+### 안전한 롤아웃 순서 (제안)
+
+1. **화면 단위 shadow 검증 추가** — 지금 shadow 로그는 "코드당 인덱스 개수"만 비교 중. 컷오버 전에, 실제 전체순회 결과(어떤 화면들이 `flash=true`를 반환했는지)와 인덱스 조회 결과(어떤 화면이 나왔는지)를 **화면 단위로 직접 diff**해서 완전히 일치하는지 실거래일 동안 로그로 확인. (지금 카운트 비교보다 한 단계 더 엄격한 검증)
+2. **런타임 킬스위치 확보** — 지금은 `#ifdef DF_RTM_INDEX`라 컴파일 타임 스위치뿐. 실제 컷오버 코드는 `.ini`/레지스트리 값으로 즉시 끌 수 있게 만들어서, 장중 문제 발생 시 재배포 없이 바로 기존 전체순회로 되돌릴 수 있어야 함.
+3. **컷오버 적용 + 병행 기간** — 위 킬스위치를 켠 상태로 실제 배포하되, 초기엔 "인덱스로 걸러진 화면 목록"과 "전체순회로 찾은 화면 목록"을 여전히 둘 다 계산해서 다르면 경고 로그를 남기는 이중 모드로 일정 기간(예: 1~2주 장중) 운영.
+4. **전체순회 제거** — 병행 기간 동안 불일치가 없었으면 전체순회 코드/이중계산 제거, 인덱스 단독 운영으로 전환.
+
+### 미결 사항 (구현 전 확정 필요)
+
+- 스크립트 훅(`m_vm->OnProcedure`/`OnAlert`) 호출을 컷오버 후에도 정확히 같은 타이밍/횟수로 보장하는 방법
+- 킬스위치를 `.ini`로 할지, 별도 관리 명령(레지스트리 등)으로 할지
+- `m_codeIndex` 배열의 중복 등록 방지 여부(어차피 멱등이라 필수는 아니지만 성능상 정리하는 게 나음)
+
+---
 
 ## 관련 문서
 
