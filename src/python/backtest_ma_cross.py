@@ -39,17 +39,9 @@ def sma_series(prices, window):
     return result
 
 
-def backtest(code):
-    rows = load_prices(code)
-    if len(rows) < LONG_WINDOW + 1:
-        print(f"데이터 부족: {code} 틱 {len(rows)}개 (최소 {LONG_WINDOW + 1}개 필요)")
-        return
-
-    times = [r[0] for r in rows]
-    prices = [r[1] for r in rows]
-    short = sma_series(prices, SHORT_WINDOW)
-    long_ = sma_series(prices, LONG_WINDOW)
-
+def find_trades(times, prices, short, long_):
+    # 골든크로스(단기가 장기를 상향 돌파) 매수, 데드크로스(하향 돌파) 매도로 짝지어
+    # 완결된 거래 목록과, 아직 청산 안 된 포지션(있다면)을 반환한다.
     position = None  # None=미보유, else 매수가격
     trades = []  # (buy_time, buy_price, sell_time, sell_price)
     entry = None
@@ -69,6 +61,21 @@ def backtest(code):
             position = None
             entry = None
 
+    return trades, entry
+
+
+def backtest(code):
+    rows = load_prices(code)
+    if len(rows) < LONG_WINDOW + 1:
+        print(f"데이터 부족: {code} 틱 {len(rows)}개 (최소 {LONG_WINDOW + 1}개 필요)")
+        return
+
+    times = [r[0] for r in rows]
+    prices = [r[1] for r in rows]
+    short = sma_series(prices, SHORT_WINDOW)
+    long_ = sma_series(prices, LONG_WINDOW)
+    trades, entry = find_trades(times, prices, short, long_)
+
     print(f"종목={code}  틱={len(rows)}개  단기={SHORT_WINDOW} 장기={LONG_WINDOW}")
     print(f"거래횟수={len(trades)}")
     total_pnl = 0
@@ -81,12 +88,15 @@ def backtest(code):
         print(f"  매수 {buy_t} @ {buy_p}  ->  매도 {sell_t} @ {sell_p}  손익={pnl:+.0f}")
     if trades:
         print(f"총손익={total_pnl:+.0f}  승률={wins * 100 / len(trades):.1f}%")
-    if position is not None:
+    if entry is not None:
         print(f"(미청산 보유중: {entry[0]} @ {entry[1]})")
 
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
-        print("사용법: python backtest_ma_cross.py <종목코드>")
+        print("사용법: python backtest_ma_cross.py <종목코드> [단기윈도우] [장기윈도우]")
         sys.exit(1)
+    if len(sys.argv) >= 4:
+        SHORT_WINDOW = int(sys.argv[2])
+        LONG_WINDOW = int(sys.argv[3])
     backtest(sys.argv[1])

@@ -7,14 +7,23 @@ import winreg
 import time
 import socket
 import sqlite3
+import re
 from PyQt5.QAxContainer import QAxWidget
 from PyQt5.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
     QGroupBox, QPushButton, QLabel, QLineEdit, QTextEdit, QFormLayout,
     QComboBox, QGridLayout, QMessageBox, QTableWidget, QTableWidgetItem,
-    QHeaderView, QAbstractItemView
+    QHeaderView, QAbstractItemView, QDateTimeEdit
 )
+from PyQt5.QtCore import QDateTime, QDate, QTime
 from datetime import datetime
+import matplotlib
+matplotlib.rcParams['font.family'] = 'Malgun Gothic'
+matplotlib.rcParams['axes.unicode_minus'] = False  # 한글 폰트 사용 시 마이너스 기호 깨짐 방지
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg
+from matplotlib.figure import Figure
+import matplotlib.dates
+from backtest_ma_cross import sma_series, find_trades
 
 OCX_GUID = "{CDADD338-C7AB-4977-B65D-8E988B5958E3}"
 
@@ -47,6 +56,7 @@ SERVER_LIST = [
 TK_TR1001 = 1   # 주식 시세조회
 TK_TR1002 = 2   # 주식 조회(OOP)
 TK_TR1003 = 3   # 주식 조회(OOP)
+TK_TR1004 = 6   # 주식 실시간 다중종목 등록
 TK_TR1201 = 4   # 주식 주문
 TK_TR1203 = 5   # 주식 주문 시장구분
 TK_TR1211 = 7   # 주식 체결/미체결조회
@@ -73,7 +83,7 @@ TK_GREEKS2 = 151 # 옵션 그릭스(민감도) 조회용 키2
 
 # TR1002(NXT/통합 시세조회) 요청 시 1777(장운영구분) 뒤에 붙이는 요청 필드번호 목록
 # 순서 = 응답에서 값이 오는 순서와 동일하다고 가정 (실측 후 확정 필요)
-TR1002_SISE_FIELDS = ["2023", "2033", "2029", "2030", "2031", "2024", "2027", "2041", "2061"]
+TR1002_SISE_FIELDS = ["1021","2023", "2033", "2029", "2030", "2031", "2024", "2027", "2041", "2061"]
 TR1002_SISE_LABELS = ["현재가", "등락율", "시가", "고가", "저가", "전일대비", "거래량", "매도잔량", "매수잔량"]
 
 MKGB_NAMES = {"1": "KRX", "2": "NXT", "3": "통합"}
@@ -160,6 +170,8 @@ DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "ticks.db")
 
 def _init_db():
     conn = sqlite3.connect(DB_PATH)
+    conn.execute("PRAGMA journal_mode=WAL")
+    conn.execute("PRAGMA busy_timeout=5000")
     conn.execute("""
         CREATE TABLE IF NOT EXISTS ticks (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -216,7 +228,7 @@ class TestWindow(QMainWindow):
         super().__init__()
         self.setWindowTitle("Auto Trader")
         self.setMinimumWidth(500)
-        self.resize(650, 750)
+        self.resize(1500, 750)
 
         ocx_ok, ocx_info = _check_ocx_registry()
         if not ocx_ok:
@@ -270,15 +282,13 @@ class TestWindow(QMainWindow):
 
         layout.addWidget(self._build_init_group())
 
-        # Login | 시세조회 좌우 분할
-        mid = QWidget()
-        mid_h = QHBoxLayout(mid)
-        mid_h.setContentsMargins(0, 0, 0, 0)
-        mid_h.addWidget(self._build_login_group())
-        mid_h.addWidget(self._build_sise_group())
-        layout.addWidget(mid)
-
-        layout.addWidget(self._build_order_group())
+        # Login | 시세조회 를 위에, 주문을 그 아래에 두고, 차트는 오른쪽에서 두 행을 모두 세로로 차지
+        mid = QGridLayout()
+        mid.addWidget(self._build_login_group(), 0, 0)
+        mid.addWidget(self._build_sise_group(), 0, 1)
+        mid.addWidget(self._build_chart_group(), 0, 2, 2, 1)
+        mid.addWidget(self._build_order_group(), 1, 0, 1, 2)
+        layout.addLayout(mid)
         layout.addWidget(self._build_jango_group())
         layout.addWidget(self._build_collect_group())
         layout.addWidget(self._build_log_group())
@@ -308,9 +318,9 @@ class TestWindow(QMainWindow):
 
         is_dev = _is_my_dev_pc()
         form = QFormLayout()
-        self.edit_user_id  = QLineEdit("ng12589" if is_dev else "")
-        self.edit_user_pw  = QLineEdit("wnsgur12@" if is_dev else ""); self.edit_user_pw.setEchoMode(QLineEdit.Password)
-        self.edit_cert_pw  = QLineEdit("ahffkdy123 " if is_dev else ""); self.edit_cert_pw.setEchoMode(QLineEdit.Password)
+        self.edit_user_id  = QLineEdit("khs779" if is_dev else "")
+        self.edit_user_pw  = QLineEdit("1q2w3e4r" if is_dev else ""); self.edit_user_pw.setEchoMode(QLineEdit.Password)
+        self.edit_cert_pw  = QLineEdit("ra33080404!" if is_dev else ""); self.edit_cert_pw.setEchoMode(QLineEdit.Password)
         self.combo_server  = QComboBox()
         self.combo_server.addItem("", "")
         for ip, name in SERVER_LIST:
@@ -368,6 +378,7 @@ class TestWindow(QMainWindow):
         self.combo_mkgubn = QComboBox()
         for text, val in [("KRX", 1), ("NXT", 2), ("통합", 3)]:
             self.combo_mkgubn.addItem(text, val)
+        self.combo_mkgubn.setCurrentIndex(2)
         h.addWidget(self.combo_mkgubn)
         btn = QPushButton("조회")
         btn.clicked.connect(self._on_sise_send)
@@ -398,6 +409,178 @@ class TestWindow(QMainWindow):
         v.addLayout(grid)
 
         return group
+
+    def _build_chart_group(self):
+        group = QGroupBox("차트")
+        v = QVBoxLayout(group)
+
+        h1 = QHBoxLayout()
+        h1.addWidget(QLabel("종목코드"))
+        self.edit_chart_code = QLineEdit()
+        self.edit_chart_code.setMaximumWidth(90)
+        h1.addWidget(self.edit_chart_code)
+        h1.addWidget(QLabel("단기"))
+        self.edit_chart_short = QLineEdit("5")
+        self.edit_chart_short.setMaximumWidth(40)
+        h1.addWidget(self.edit_chart_short)
+        h1.addWidget(QLabel("장기"))
+        self.edit_chart_long = QLineEdit("20")
+        self.edit_chart_long.setMaximumWidth(40)
+        h1.addWidget(self.edit_chart_long)
+        h1.addStretch()
+        v.addLayout(h1)
+
+        h2 = QHBoxLayout()
+        h2.addWidget(QLabel("기간"))
+        today = QDate.currentDate()
+        self.edit_chart_time_from = QDateTimeEdit(QDateTime(today, QTime(9, 0, 0)))
+        self.edit_chart_time_from.setDisplayFormat("MM-dd HH:mm:ss")
+        h2.addWidget(self.edit_chart_time_from)
+        h2.addWidget(QLabel("~"))
+        self.edit_chart_time_to = QDateTimeEdit(QDateTime(today, QTime(15, 30, 0)))
+        self.edit_chart_time_to.setDisplayFormat("MM-dd HH:mm:ss")
+        h2.addWidget(self.edit_chart_time_to)
+        btn = QPushButton("조회")
+        btn.clicked.connect(self._on_chart_send)
+        h2.addWidget(btn)
+        h2.addStretch()
+        v.addLayout(h2)
+
+        h3 = QHBoxLayout()
+        self.chart_fig = Figure(figsize=(5, 3))
+        self.chart_canvas = FigureCanvasQTAgg(self.chart_fig)
+        h3.addWidget(self.chart_canvas, 3)
+
+        trade_box = QVBoxLayout()
+        self.lbl_chart_summary = QLabel("거래 없음")
+        trade_box.addWidget(self.lbl_chart_summary)
+        self.table_chart_trades = QTableWidget(0, 5)
+        self.table_chart_trades.setHorizontalHeaderLabels(["매수시간", "매수가", "매도시간", "매도가", "손익"])
+        self.table_chart_trades.verticalHeader().setVisible(False)
+        self.table_chart_trades.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        trade_box.addWidget(self.table_chart_trades)
+        trade_widget = QWidget()
+        trade_widget.setLayout(trade_box)
+        h3.addWidget(trade_widget, 2)
+
+        v.addLayout(h3)
+
+        return group
+
+    def _on_chart_send(self):
+        code = self.edit_chart_code.text().strip()
+        if not code:
+            self._log("차트: 종목코드를 입력하세요")
+            return
+        try:
+            short_win = int(self.edit_chart_short.text().strip() or 5)
+            long_win = int(self.edit_chart_long.text().strip() or 20)
+        except ValueError:
+            self._log("차트: 단기/장기 윈도우는 숫자로 입력하세요")
+            return
+
+        cur = self.db_conn.execute(
+            "SELECT trade_time, price FROM ticks WHERE code=? AND price IS NOT NULL ORDER BY id", (code,))
+        all_rows = cur.fetchall()
+
+        # 기간 필터: 날짜+시간을 함께 비교 (여러 날짜 데이터가 섞여 있어도 지정한 구간만 선택됨)
+        qdt_from = self.edit_chart_time_from.dateTime()
+        qdt_to = self.edit_chart_time_to.dateTime()
+        rows = []
+        for r in all_rows:
+            t = self._parse_trade_time(r[0])
+            if t is None:
+                continue
+            qdt = QDateTime(QDate(t.year, t.month, t.day), QTime(t.hour, t.minute, t.second))
+            if qdt < qdt_from or qdt > qdt_to:
+                continue
+            rows.append(r)
+
+        prices = [r[1] for r in rows]
+        if len(prices) < long_win:
+            self._log(f"차트: {code} 데이터 부족 (틱 {len(prices)}개, 최소 {long_win}개 필요)")
+            return
+
+        short = sma_series(prices, short_win)
+        long_ = sma_series(prices, long_win)
+
+        # 틱이 많으면(수만 개) 화면 폭에 다 그릴 때 선이 겹쳐 면처럼 보이므로,
+        # 이평 계산은 전체 데이터로 하되 표시용으로만 일정 간격으로 솎아낸다.
+        n = len(prices)
+        step = max(1, n // 2000)
+        idx = range(0, n, step)
+        points = [
+            (t, prices[i], short[i], long_[i])
+            for i, t in ((i, self._parse_trade_time(rows[i][0])) for i in idx)
+            if t is not None
+        ]
+        if not points:
+            self._log(f"차트: {code} trade_time 파싱 실패")
+            return
+        times, plot_prices, plot_short, plot_long = zip(*points)
+
+        # 골든/데드크로스 지점(전체 데이터 기준으로 찾아야 안 놓침)
+        golden_x, golden_y, dead_x, dead_y = [], [], [], []
+        for i in range(1, n):
+            if None in (short[i], long_[i], short[i - 1], long_[i - 1]):
+                continue
+            t = self._parse_trade_time(rows[i][0])
+            if t is None:
+                continue
+            if short[i - 1] <= long_[i - 1] and short[i] > long_[i]:
+                golden_x.append(t); golden_y.append(prices[i])
+            elif short[i - 1] >= long_[i - 1] and short[i] < long_[i]:
+                dead_x.append(t); dead_y.append(prices[i])
+
+        # 실제 매수->매도로 짝지어지는 거래만 별도로 뽑아서 목록/승률 표시
+        raw_times = [r[0] for r in rows]
+        trades, entry = find_trades(raw_times, prices, short, long_)
+        self.table_chart_trades.setRowCount(0)
+        total_pnl = 0
+        wins = 0
+        for buy_t, buy_p, sell_t, sell_p in trades:
+            pnl = sell_p - buy_p
+            total_pnl += pnl
+            if pnl > 0:
+                wins += 1
+            row = self.table_chart_trades.rowCount()
+            self.table_chart_trades.insertRow(row)
+            for col, val in enumerate([buy_t, f"{buy_p:.0f}", sell_t, f"{sell_p:.0f}", f"{pnl:+.0f}"]):
+                self.table_chart_trades.setItem(row, col, QTableWidgetItem(val))
+        if trades:
+            win_rate = wins * 100 / len(trades)
+            summary = f"거래 {len(trades)}건  총손익 {total_pnl:+.0f}  승률 {win_rate:.1f}%"
+        else:
+            summary = "거래 없음"
+        if entry is not None:
+            summary += f"  (미청산: {entry[0]} @ {entry[1]:.0f})"
+        self.lbl_chart_summary.setText(summary)
+
+        self.chart_fig.clear()
+        ax = self.chart_fig.add_subplot(111)
+        ax.plot(times, plot_prices, label="가격", color="black", linewidth=0.8)
+        ax.plot(times, plot_short, label=f"{short_win}틱 이평", color="green", linewidth=1)
+        ax.plot(times, plot_long, label=f"{long_win}틱 이평", color="red", linewidth=1)
+        ax.scatter(golden_x, golden_y, marker='^', color='blue', s=25, zorder=5, label="골든크로스")
+        ax.scatter(dead_x, dead_y, marker='v', color='magenta', s=25, zorder=5, label="데드크로스")
+        ax.set_title(code)
+        ax.legend(loc="upper left", fontsize=8)
+        ax.xaxis.set_major_formatter(matplotlib.dates.DateFormatter('%H:%M:%S'))
+        self.chart_fig.autofmt_xdate()
+        self.chart_fig.tight_layout()
+        self.chart_canvas.draw()
+
+    @staticmethod
+    def _parse_trade_time(s):
+        # trade_time: 신형(YYYYMMDDHHMMSS, 14자리) 또는 구형(HHMMSS, 6자리 - 날짜 없음)
+        try:
+            if len(s) >= 14:
+                return datetime.strptime(s[:14], "%Y%m%d%H%M%S")
+            if len(s) >= 6:
+                return datetime.strptime(datetime.now().strftime("%Y%m%d") + s[:6], "%Y%m%d%H%M%S")
+        except ValueError:
+            pass
+        return None
 
     def _build_order_group(self):
         group = QGroupBox("주문")
@@ -451,6 +634,7 @@ class TestWindow(QMainWindow):
         self.combo_jango_mkgubn = QComboBox()
         for text, val in [("KRX", 1), ("NXT", 2), ("통합", 3)]:
             self.combo_jango_mkgubn.addItem(text, val)
+        self.combo_jango_mkgubn.setCurrentIndex(2)
         self.lbl_odr_result = QLabel("-")
         mk_h.addWidget(self.combo_jango_mkgubn)
         mk_h.addWidget(self.lbl_odr_result)
@@ -510,9 +694,10 @@ class TestWindow(QMainWindow):
         # 실시간 재계산용 기준값 저장 (서버가 계산한 초기 평가금액을 기준점으로 삼아
         # 현재가 변동분만큼만 보정 -> 수수료/세금을 몰라도 근사치가 아닌 정확한 값 유지)
         try:
+            # curr(현재가)의 +/-는 등락 방향 표시일 뿐 실제 부호가 아니므로 양수로 취급
             self._jango_calc[code_key] = {
                 'remain': float(remain), 'maip': float(maip),
-                'base_curr': float(curr), 'base_eval': float(eval_amt),
+                'base_curr': float(curr.lstrip('+-')), 'base_eval': float(eval_amt),
             }
         except ValueError:
             pass
@@ -532,7 +717,8 @@ class TestWindow(QMainWindow):
         if calc is None:
             return
         try:
-            new_curr = float(new_curr_s)
+            # 023(현재가)의 +/-는 실제 부호가 아니라 등락 방향 표시라서 가격은 항상 양수로 취급
+            new_curr = float(new_curr_s.lstrip('+-'))
         except ValueError:
             return
         remain = calc['remain']
@@ -557,9 +743,18 @@ class TestWindow(QMainWindow):
         h.addWidget(QLabel("구독종목(콤마구분)"))
         self.edit_watch_codes = QLineEdit()
         h.addWidget(self.edit_watch_codes)
+        h.addWidget(QLabel("시장"))
+        self.combo_watch_mkgubn = QComboBox()
+        for text, val in [("KRX", 1), ("NXT", 2), ("통합", 3)]:
+            self.combo_watch_mkgubn.addItem(text, val)
+        self.combo_watch_mkgubn.setCurrentIndex(2)
+        h.addWidget(self.combo_watch_mkgubn)
         btn = QPushButton("구독시작")
         btn.clicked.connect(self._on_watch_start)
         h.addWidget(btn)
+        btn_stop = QPushButton("구독중지")
+        btn_stop.clicked.connect(self._on_watch_stop)
+        h.addWidget(btn_stop)
         self.lbl_watch_status = QLabel("구독중: 0개")
         h.addWidget(self.lbl_watch_status)
         h.addStretch()
@@ -639,6 +834,10 @@ class TestWindow(QMainWindow):
     def _on_sise_send(self):
         code = self.edit_sise_code.text().strip()
         mkgubn = self.combo_mkgubn.currentData()  # 1=KRX 2=NXT 3=통합
+        for lbl in (self.lbl_curr, self.lbl_diff, self.lbl_rate, self.lbl_gvol,
+                    self.lbl_siga, self.lbl_koga, self.lbl_jega, self.lbl_mgjv,
+                    self.lbl_dvol, self.lbl_svol):
+            lbl.setText("-")
         if self.combo_jtype.currentIndex() == 0:  # 선물옵션
             if len(code) != 8:
                 self._log("선물옵션 종목코드는 8자리입니다.")
@@ -660,20 +859,50 @@ class TestWindow(QMainWindow):
             self._log_err(err)
 
     def _on_watch_start(self):
+        mkgubn = self.combo_watch_mkgubn.currentData()  # 1=KRX 2=NXT 3=통합
+        # TR1001은 시장구분 파라미터가 없어 KRX 실시간만 등록된다.
+        # TR1002를 종목별로 반복 호출하면 서버가 매 호출마다 이전 등록을 새 등록으로
+        # 덮어써서 마지막 종목만 실시간이 살아있는 문제가 있었다 -> 다중종목 등록
+        # TR1004(콤마구분 종목코드 전체를 한 번에 전송)로 전환.
+        fields = "\t".join(TR1002_SISE_FIELDS)
         codes = [c.strip() for c in self.edit_watch_codes.text().split(',') if c.strip()]
+        new_codes = []
         for code in codes:
             if len(code) != 6:
                 self._log(f"구독 실패(종목코드 6자리 아님): {code}")
                 continue
             if code in self.watch_codes:
                 continue
-            result = self.ocx.dynamicCall("TR1001(int, QString)", TK_TR1001, code)
-            if result:
-                self.watch_codes.add(code)
-                self._log(f"구독 등록: {code}")
-            else:
-                err = self.ocx.dynamicCall("GetLastErrMsg()")
-                self._log(f"구독 실패({code}): {err}")
+            new_codes.append(code)
+
+        if not new_codes:
+            self.lbl_watch_status.setText(f"구독중: {len(self.watch_codes)}개")
+            return
+
+        symb = f"1777\x7f{mkgubn}\t{fields}\t"
+        codes_str = ",".join(new_codes)
+        result = self.ocx.dynamicCall(
+            "TR1004(int, QString, QString)", [TK_TR1004, codes_str, symb])
+        if result:
+            self.watch_codes.update(new_codes)
+            self._log(f"구독 등록: {codes_str} (시장={mkgubn})")
+        else:
+            err = self.ocx.dynamicCall("GetLastErrMsg()")
+            self._log(f"구독 실패({codes_str}): {err}")
+        self.lbl_watch_status.setText(f"구독중: {len(self.watch_codes)}개")
+
+    def _on_watch_stop(self):
+        # 서버에 등록 해제를 요청하는 TR은 아직 없어서, 로컬에서만 watch_codes에서
+        # 빼서 이후 OnRealData가 와도 틱을 저장하지 않게 하고, 다시 구독시작을 누르면
+        # 새 종목으로 취급되어 TR1004가 재전송되게 한다.
+        codes = [c.strip() for c in self.edit_watch_codes.text().split(',') if c.strip()]
+        removed = [c for c in codes if c in self.watch_codes]
+        for c in removed:
+            self.watch_codes.discard(c)
+        if removed:
+            self._log(f"구독 중지: {','.join(removed)}")
+        else:
+            self._log("구독 중지: 대상 없음 (구독중인 종목이 아님)")
         self.lbl_watch_status.setText(f"구독중: {len(self.watch_codes)}개")
 
     # ── OCX event handlers ───────────────────────────────────────
@@ -932,6 +1161,18 @@ class TestWindow(QMainWindow):
             return None
 
     @staticmethod
+    def _parse_price_int(s):
+        # 023(현재가)의 +/-는 실제 부호가 아니라 전일대비 등락 방향 표시라서
+        # 가격 자체는 항상 양수로 취급해야 한다 (diff는 _parse_signed_int로 별도 처리).
+        s = s.strip()
+        if s[:1] in ('+', '-'):
+            s = s[1:]
+        try:
+            return int(s)
+        except ValueError:
+            return None
+
+    @staticmethod
     def _parse_tick_volume(raw):
         # 032(체결량): 부호(+/-)가 있으면 매수/매도 체결 구분, 없으면 맨 앞자리는 체결강도 표시라서 버림
         if not raw:
@@ -947,20 +1188,21 @@ class TestWindow(QMainWindow):
 
     def _save_tick(self, code, m):
         side, tick_volume = self._parse_tick_volume(m.get("032", ""))
+        now = datetime.now()
         try:
             self.db_conn.execute(
                 "INSERT INTO ticks (code, trade_time, price, diff, rate, cum_volume, tick_volume, side, received_at) "
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
                 (
                     code,
-                    m.get("034", ""),
-                    self._parse_signed_int(m.get("023", "")),
+                    now.strftime("%Y%m%d") + m.get("034", ""),
+                    self._parse_price_int(m.get("023", "")),
                     self._parse_signed_int(m.get("024", "")),
                     float(m["033"]) if m.get("033", "").strip() else None,
                     self._parse_signed_int(m.get("027", "")),
                     tick_volume,
                     side,
-                    datetime.now().strftime("%H:%M:%S.%f"),
+                    now.strftime("%Y-%m-%d %H:%M:%S.%f"),
                 )
             )
             self.db_conn.commit()
@@ -994,7 +1236,7 @@ class TestWindow(QMainWindow):
             return  # 현재 조회 중인 종목만 처리(시세조회 화면 갱신은 여기까지)
 
         if "034" in m:  # 체결시간 있으면 체결 데이터
-            self.lbl_curr.setText(m.get("023", "-"))
+            self.lbl_curr.setText(m.get("023", "-").lstrip('+-') or "-")
             self.lbl_diff.setText(m.get("024", "-"))
             self.lbl_rate.setText(m.get("033", "-"))
             self.lbl_gvol.setText(m.get("027", "-"))
@@ -1002,6 +1244,8 @@ class TestWindow(QMainWindow):
             self.lbl_koga.setText(m.get("030", "-"))
             self.lbl_jega.setText(m.get("031", "-"))
             self.lbl_mgjv.setText(m.get("201", "-"))
+        elif "111" in m:  # 동시호가 구간엔 034(체결) 대신 111(예상체결가)만 옴
+            self.lbl_curr.setText(m.get("111", "-").lstrip('+-') or "-")
 
         if "040" in m:  # 호가시간 있으면 호가 데이터
             self.lbl_dvol.setText(m.get("101", "-"))
@@ -1051,6 +1295,10 @@ class TestWindow(QMainWindow):
                 label = "선물주문" if key == TK_TR3201 else "주식주문"
                 self.lbl_odr_result.setText(f"주문번호:{jmno}")
                 self._log(f"  [{label}] 주문번호={jmno} 원주문번호={ojno} 메시지={emsg}")
+                if jmno and jmno != "000000":
+                    QMessageBox.information(self, f"{label} 접수", f"주문번호: {jmno}\n{emsg}")
+                else:
+                    QMessageBox.warning(self, f"{label} 실패", emsg or "주문이 거부되었습니다.")
             elif key == TK_TR3221:  # 선물 잔고 (header: acno[11]+nrec[4]=15, grid=149)
                 GRID = 149
                 nrec = int(raw[11:15].decode('cp949', errors='ignore').strip() or "0")
@@ -1135,6 +1383,19 @@ class TestWindow(QMainWindow):
                            self.lbl_jega, self.lbl_diff, self.lbl_gvol, self.lbl_dvol, self.lbl_svol]
                 for w, v in zip(widgets, vals):
                     w.setText(v)
+            elif key == TK_TR1004:  # 다중종목 실시간 등록 응답 - 코드별로 레코드가 이어붙어 옴
+                text = raw.decode('cp949', errors='ignore')
+                self._log(f"  [TR1004 응답] size={size}")
+                # 레코드 시작점 = 종목코드 토큰(M.A005930, N.A005930, A441800 등) + 탭.
+                # 그 앞에는 화면 헤더용 고정 필드가 붙어있어서 코드 패턴으로 잘라낸다.
+                matches = list(re.finditer(r'((?:[A-Z]\.)?A\d{6})\t', text))
+                for i, m in enumerate(matches):
+                    code = m.group(1).split('.')[-1].lstrip('A')
+                    start = m.end()
+                    end = matches[i + 1].start() if i + 1 < len(matches) else len(text)
+                    vals = [v for v in text[start:end].split('\t') if v != '']
+                    pairs = ", ".join(f"{lbl}={v}" for lbl, v in zip(TR1002_SISE_LABELS, vals))
+                    self._log(f"  [TR1004 파싱] code={code} {pairs}")
             else:
                 self._log(f"  [RecvData] key={key} (미처리)")
         except Exception as e:

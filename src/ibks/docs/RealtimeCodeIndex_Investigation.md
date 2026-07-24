@@ -152,15 +152,87 @@ void CfmEdit::WriteData(CString data, bool redraw, int col, int row)
 
 ### 안전한 롤아웃 순서 (제안)
 
-1. **화면 단위 shadow 검증 추가** — 지금 shadow 로그는 "코드당 인덱스 개수"만 비교 중. 컷오버 전에, 실제 전체순회 결과(어떤 화면들이 `flash=true`를 반환했는지)와 인덱스 조회 결과(어떤 화면이 나왔는지)를 **화면 단위로 직접 diff**해서 완전히 일치하는지 실거래일 동안 로그로 확인. (지금 카운트 비교보다 한 단계 더 엄격한 검증)
-2. **런타임 킬스위치 확보** — 지금은 `#ifdef DF_RTM_INDEX`라 컴파일 타임 스위치뿐. 실제 컷오버 코드는 `.ini`/레지스트리 값으로 즉시 끌 수 있게 만들어서, 장중 문제 발생 시 재배포 없이 바로 기존 전체순회로 되돌릴 수 있어야 함.
+1. **화면 단위 shadow 검증 추가** — **완료 (2026-07-23)**, 아래 상세 참고.
+2. **런타임 킬스위치 확보** — **완료 (2026-07-23)**, 아래 상세 참고. 레지스트리 방식 채택.
 3. **컷오버 적용 + 병행 기간** — 위 킬스위치를 켠 상태로 실제 배포하되, 초기엔 "인덱스로 걸러진 화면 목록"과 "전체순회로 찾은 화면 목록"을 여전히 둘 다 계산해서 다르면 경고 로그를 남기는 이중 모드로 일정 기간(예: 1~2주 장중) 운영.
 4. **전체순회 제거** — 병행 기간 동안 불일치가 없었으면 전체순회 코드/이중계산 제거, 인덱스 단독 운영으로 전환.
 
-### 미결 사항 (구현 전 확정 필요)
+### ①단계 실행 결과 (2026-07-23)
 
+**포인터 로그 추가로 "IB999919가 매 틱 두 번 방문되는" 의문 해소:** `visit`(Client.cpp:1510)과 `compare`(Screen.cpp:831) 로그에 `screen=%p`를 추가해서 확인한 결과, 두 번의 방문이 서로 **다른 `CScreen*` 포인터**였음을 확인 — 한 화면이 flash 필드 2개를 가진 게 아니라, **대표화면(마스터 화면) 안에 같은 맵(`IB999919`)이 임베디드 형태로 2개 들어있는 구조**였다(사용자 확인). `m_codeIndex`/`m_lastCodes` 둘 다 `CScreen*` 인스턴스 단위로 동작하므로 이 케이스에 별도 설계 변경 불필요 — 기존 설계가 이미 정확히 처리하고 있음이 실측으로 확인됨.
+
+**`[MISMATCH]` 자동 검증 로그 추가:** `CGuard::IsCodeIndexed(code, screen)`(Guard.h 선언, Guard.cpp `UpdateCodeIndex` 바로 아래 구현)를 추가하고, `CScreen::OnAlert`의 default 분기에서 `text.Compare(code)`가 일치(`flash=true`)하는 바로 그 순간 이 화면이 `m_codeIndex[code]`에도 들어있는지 확인해서, **없으면**(=매칭됐는데 인덱스가 놓친 경우, 컷오버 시 데이터 누락으로 이어질 유일한 위험 케이스) `[WIZARD][RTM][DEBUG][MISMATCH]`를 찍도록 함. 인덱스에 화면이 여분으로 더 들어있는 반대 방향(매칭 안 되는데 인덱스엔 있는 경우)은 성능 손해만 있고 데이터 누락은 없어 의도적으로 검사 대상에서 제외.
+
+```cpp
+// Guard.h (UpdateCodeIndex 선언 옆)
+bool	IsCodeIndexed(CString code, class CScreen* screen);
+
+// Guard.cpp (UpdateCodeIndex 정의 바로 아래)
+bool CGuard::IsCodeIndexed(CString code, CScreen* screen)
+{
+	void*	ptr;
+	if (!m_codeIndex.Lookup(code, ptr))
+		return false;
+	CPtrArray* arr = (CPtrArray*)ptr;
+	for (int ii = 0; ii < arr->GetSize(); ii++)
+		if (arr->GetAt(ii) == screen)
+			return true;
+	return false;
+}
+
+// Screen.cpp, CScreen::OnAlert default 분기, flash = true; 직후
+#ifdef DF_RTM_INDEX
+if (!m_guard->IsCodeIndexed(code, this))
+{
+	CString dbgMiss;
+	dbgMiss.Format("[WIZARD][RTM][DEBUG][MISMATCH] mapN=%s screen=%p code=%s matched but NOT in index!\n",
+		CString(m_mapH->mapN, L_MAPN).GetString(), this, code.GetString());
+	OutputDebugString(dbgMiss);
+}
+#endif
+```
+
+**실측 결과 (2026-07-23, 장중):** 주문(매도/매수), 통합현재가, 실시간잔고, 코스피지수/삼성전자 현재가, 관심종목(전종목/코스피/코스닥/코스피200/KRX100 탭 다수) 등 화면을 다수 동시에 띄운 상태로 장시간 관찰 — **`[MISMATCH]` 0건.**
+
+**참고:** 관심종목/차트처럼 `FM_GRID`/`FM_TABLE` 기반으로 종목을 다수 표시하는 화면은 애초에 `m_codeIndex`의 검증 대상이 아님 — `OnAlert`의 `FM_GRID`/`FM_TABLE` 분기는 `FlashGrid`/`FlashSemi`로 별도 처리되고, attach 시점 코드도 이 kind들은 명시적으로 skip한다(단일 "코드 필드"가 아니라 여러 종목을 동시에 표시하는 구조라 이번 역인덱스 설계 범위 밖). 사용자가 "관심종목/차트는 구조가 다르지만 육안상 as-is/to-be 동일해 보인다"고 확인한 것은 이 경로가 이번 shadow 작업으로 전혀 건드려지지 않았다는 뜻으로, 정상.
+
+**결론:** ①단계(화면 단위 shadow 검증) 완료로 판단.
+
+### ②단계 실행 결과 (2026-07-23) — 런타임 킬스위치(레지스트리)
+
+기존 `WORKSTATION` 섹션 레지스트리 관례(`m_app->GetProfileInt(WORKSTATION, KEY, default)`, 실제 경로는 `HKCU\Software\IBK투자증권MAC\AXIS Workstation V04.00\Workstation`)를 그대로 따라서 새 키 하나 추가:
+
+```cpp
+// h/axisvar.h, WORKSTATION SECTION 블록
+#define	RTMIDXCUT	"RTMIndexCutover"	// dword
+						// 0 = full traversal (default, safe) / 1 = use m_codeIndex for RTM dispatch
+
+// Guard.h, DF_RTM_INDEX 블록 (m_codeIndex 옆)
+bool	m_rtmIndexCutover = false;	// runtime kill switch (registry: Workstation\RTMIndexCutover), read once at Startup()
+
+// Guard.cpp, CGuard::Startup() (m_wait 읽는 곳 옆)
+#ifdef DF_RTM_INDEX
+	m_rtmIndexCutover = m_app->GetProfileInt(WORKSTATION, RTMIDXCUT, 0) ? true : false;
+	CString dbgCut;
+	dbgCut.Format("[WIZARD][RTM][DEBUG] RTMIndexCutover=%d (registry-read)\n", m_rtmIndexCutover);
+	OutputDebugString(dbgCut);
+#endif
+```
+
+프로그램 재시작 시점에만 반영(라이브 리로드 아님) — 지금 단계에서 충분하다고 판단, 나중에 HTS 설정 화면으로 옮길 때 다시 검토.
+
+**실측:** 값을 DWORD가 아니라 QWORD(64비트)로 잘못 만들어서 처음엔 0으로 읽힘 → DWORD(32비트)로 재생성 후 정상적으로 `RTMIndexCutover=1` 읽히는 것 확인.
+
+**주의 — 이 변수는 아직 아무 실제 동작도 바꾸지 않음.** ③단계(실제 컷오버 로직)를 구현할 때 `if (m_guard->m_rtmIndexCutover) { 인덱스경로 } else { 기존 전체순회 }`로 감싸는 스위치로 쓸 예정. 지금은 레지스트리 읽기 인프라만 준비되고 검증된 상태.
+
+### 미결 사항 (③단계 구현 전 반드시 확정 필요)
+
+- **[신규, 최우선] 자가갱신의 구조적 한계가 아직 안 닫혀 있음** — `CScreen::OnAlert`의 자가갱신은 "그 화면에 틱이 실제로 와야만" 인덱스를 갱신한다. 화면이 이미 열려있는 상태에서 코드값이 바뀌는 경로(직접입력=`CfmEdit::UpdateData`, 도미노=`WriteData`, TR응답=`WriteData`, 스크립트 SetData=`WriteData`, 3절 참고)는 전부 자가갱신과 무관하게 동작하므로, 코드가 바뀐 "새 코드"의 틱이 온다는 보장이 없다(그 새 코드를 아무도 안 보내면 자가갱신 자체가 트리거 안 됨). Attach/Detach는 "화면 열기/닫기"만 커버하지 "열린 채로 코드만 바뀌는" 케이스는 못 막는다. 지금은(전체순회 유지 중) 이게 안전한데, ③단계에서 실제로 인덱스 밖 화면의 `OnAlert` 호출을 skip하기 시작하면 이 화면은 새 코드에 대해 영영 인덱싱이 안 될 수 있다.
+  - 완화 옵션 (택1 또는 조합, ③단계 착수 전 결정 필요):
+    a. **주기적 재동기화(safety net)** — 예: N초마다 한 번씩은 skip 없이 전체순회를 강제로 한 번 돌려서 인덱스를 바로잡음. 컷오버의 성능이득은 유지하면서 "영영 안 고쳐짐"의 최대 지연시간을 N초로 제한.
+    b. **코드 변경 시점 훅 추가** — `CfmEdit::UpdateData`/도미노/TR응답 경로에 직접 `UpdateCodeIndex` 호출 추가 (2026-07-20 조사 당시엔 경로가 여러 갈래라 개별 후킹이 비현실적이라 판단해 자가갱신으로 대체했음 — 재검토 여지 있음)
+    c. **잔여 리스크 수용** — 실거래에서 "화면 열어둔 채로 다른 종목으로 바꾸는" 빈도/영향을 실측해서 허용 가능하면 그대로 진행
 - 스크립트 훅(`m_vm->OnProcedure`/`OnAlert`) 호출을 컷오버 후에도 정확히 같은 타이밍/횟수로 보장하는 방법
-- 킬스위치를 `.ini`로 할지, 별도 관리 명령(레지스트리 등)으로 할지
 - `m_codeIndex` 배열의 중복 등록 방지 여부(어차피 멱등이라 필수는 아니지만 성능상 정리하는 게 나음)
 
 ---

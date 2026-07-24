@@ -139,6 +139,8 @@ CWizardCtrl::CWizardCtrl()
 
 	m_axisL = 0;
 	m_axisB = nullptr;
+
+	OutputDebugString("[WIZARD][constructor]");
 }
 
 // CWizardCtrl::~CWizardCtrl - 소멸자

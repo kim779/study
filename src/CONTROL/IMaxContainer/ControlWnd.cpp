@@ -235,8 +235,9 @@ long CControlWnd::IMAXOnMessageFETCH(WPARAM wParam, LPARAM lParam)
 
 long CControlWnd::IMAXOnMessageOPEN(WPARAM wParam, LPARAM lParam)
 {
-m_tmpX.Format("IMAXOnMessageOPEN()[OPEN] viewNo[%s]msg[%s]map[%s]", m_sViewNo, (LPCTSTR)lParam, (LPCTSTR)wParam); dprint();
+m_tmpX.Format("IMAXOnMessageOPEN()[OPEN] viewNo[%s]msg[%s]map[%s]", m_sViewNo, (LPCTSTR)lParam, (LPCTSTR)wParam);
 OutputDebugString(m_tmpX);
+dprint();
 
 	CString sIMAXMessageInfo = (LPCTSTR)lParam;
 	CString	sImaxMapNum = (LPCTSTR)wParam;

@@ -829,28 +829,27 @@ bool CScreen::OnAlert(CString code, CString update, CdataSet* fms, CObArray* obs
 
 			CString dbg;
 			dbg.Format("[WIZARD][RTM][DEBUG] compare mapN=%s field=%s vs code=%s match=%d\n",
-				CString(m_mapH->mapN, L_MAPN).GetString(), text.GetString(), code.GetString(), !text.Compare(code));
+				CString(m_mapH->mapN, L_MAPN).GetString(), text.GetString(),
+				 code.GetString(), !text.Compare(code));
 			OutputDebugString(dbg);
 
 #ifdef DF_RTM_INDEX  //CScreen::OnAlert
-			// 자가갱신: 매 틱마다 어차피 읽는 이 값을 이용해 인덱스를 최신 상태로 유지.
-			// 별도 쓰기지점 후킹 없이, 값이 바뀐 걸 발견하면 그때 인덱스를 갱신함.
-			// key(iorder)별로 추적 - 화면 하나에 flash key 필드가 여러 개(다중 코드) 있어도 서로 안 섞이게.
-			{
-				CString prevCode;
-				if (!m_lastCodes.Lookup(key, prevCode))
-					prevCode = _T("");
-				if (text != prevCode)
-				{
-					m_guard->UpdateCodeIndex(this, prevCode, text);
-					m_lastCodes.SetAt(key, text);
-				}
-			}
+			UpdateFlashCode(key, text);
 #endif
+
 
 			if (!text.Compare(code))
 			{
 				flash = true;
+#ifdef DF_RTM_INDEX  //CScreen::OnAlert - 컷오버 전 정합성 검증: 매칭된 화면이 인덱스에도 있는가
+				if (!m_guard->IsCodeIndexed(code, this))
+				{
+					CString dbgMiss;
+					dbgMiss.Format("[WIZARD][RTM][DEBUG][MISMATCH] mapN=%s screen=%p code=%s matched but NOT in index!\n",
+						CString(m_mapH->mapN, L_MAPN).GetString(), this, code.GetString());
+					OutputDebugString(dbgMiss);
+				}
+#endif
 				UpdateRTM(key+1, code, update, fms, obs, stat, alertR);
 			}
 			break;
@@ -860,6 +859,21 @@ bool CScreen::OnAlert(CString code, CString update, CdataSet* fms, CObArray* obs
 		DominoForm();
 	return flash;
 }
+
+#ifdef DF_RTM_INDEX
+void CScreen::UpdateFlashCode(WORD key, CString text)
+{
+	text.TrimRight();
+	CString prevCode;
+	if (!m_lastCodes.Lookup(key, prevCode))
+		prevCode = _T("");
+	if (text != prevCode)
+	{
+		m_guard->UpdateCodeIndex(this, prevCode, text);
+		m_lastCodes.SetAt(key, text);
+	}
+}
+#endif
 
 void CScreen::UpdateRTM(int key, CString code, CString update, CdataSet* fms, CObArray* obs, int stat, struct _alertR* alertR)
 {

@@ -56,6 +56,7 @@ typedef enum {
 	eTR1001,	// 주식 시세조회
 	eTR1002,	// 주식 심볼조회(OOP)
 	eTR1003,	// 주식 분봉조회(OOP)
+	eTR1004,	// 주식 복수종목 조회(OOP) //test1004
 	eTR1201,	// 주식 주문
 	eTR1201_01, // 주식 주문(시간외,장전시간외 종가 주문제한)
 	eTR1203,	// 주식 주문 //test1203
@@ -117,7 +118,8 @@ struct LIMIT_ITEM
 } limit[] = {
 	{ eTR1001, 1000, 0,  1, 0},
 	{ eTR1002, 1000, 0,  1, 0},
-	{ eTR1002, 1000, 0,  1, 0},
+	{ eTR1003, 1000, 0,  1, 0},  //이거 eTR1002 라서 eTR1003 으로 변경
+	{ eTR1004, 1000, 0,  1, 0},  //test1004
 	{ eTR1201, 1000, 0, 10, 0},
 	{ eTR1203, 1000, 0, 10, 0}, //test1203
 	{ eTR1201_01, 1000, 0, 10, 0},
@@ -232,6 +234,7 @@ protected:
 	afx_msg BSTR GetAccounts();
 	afx_msg BOOL TR1002(long key, LPCTSTR code, LPCTSTR symb);
 	afx_msg BOOL TR1003(long key, LPCTSTR code, long type, LPCTSTR symb, LPCTSTR nkey);
+	afx_msg BOOL TR1004(long key, LPCTSTR code, LPCTSTR symb);   //test1004 복수종목조회
 	afx_msg BOOL TR3002(long key, LPCTSTR code, LPCTSTR symb);
 	afx_msg BOOL TR3003(long key, LPCTSTR code, long type, LPCTSTR symb, LPCTSTR nkey);
 	afx_msg BOOL GetCode(long key, LPCTSTR reqtype);
@@ -396,6 +399,7 @@ public:
 	eventidOnSBalance = 15L,
 	dispidTR1223 = 65L,  //test1223
 	dispidTR1203 = 66L,
+	dispidTR1004 = 67L,
 	//}}AFX_DISP_ID
 	};
 
@@ -560,6 +564,8 @@ public:
 	// 주식 정보조회
 	BOOL S_TR1002(int key, LPCSTR code, LPCSTR data);
 	void C_TR1002(WPARAM wParam, LPARAM lParam);
+	BOOL S_TR1004_multi(int key, LPCSTR code, LPCSTR data);	//test1004 시세조회
+	void C_TR1004(WPARAM wParam, LPARAM lParam); //test1004 시세조회
 	// 주식 분봉조회
 	BOOL S_TR1003(int key, LPCSTR code, int type, LPCSTR columns, LPCSTR nkey);
 	void C_TR1003(WPARAM wParam, LPARAM lParam);

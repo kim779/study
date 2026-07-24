@@ -5,7 +5,6 @@ import subprocess
 import ctypes
 import winreg
 import time
-import socket
 from PyQt5.QAxContainer import QAxWidget
 from PyQt5.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
@@ -156,20 +155,6 @@ class tr1001_mod(ctypes.Structure):
         ("jqty", ctypes.c_char * 9),
     ]
 
-MY_DEV_PC_IP = "172.19.1.106"
-
-def _is_my_dev_pc():
-    # 로컬 IP가 개발자 PC와 일치할 때만 True. 실제 접속 없이 로컬 IP만 확인.
-    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    try:
-        s.connect(("8.8.8.8", 80))
-        return s.getsockname()[0] == MY_DEV_PC_IP
-    except OSError:
-        return False
-    finally:
-        s.close()
-
-
 def _check_ocx_registry():
     # OCX가 레지스트리에 등록되어 있고, 등록된 경로에 실제 파일이 있는지 확인한다.
     reg_key = f"CLSID\\{OCX_GUID}\\InprocServer32"
@@ -280,11 +265,10 @@ class TestWindow(QMainWindow):
         group = QGroupBox("Login")
         layout = QVBoxLayout(group)
 
-        is_dev = _is_my_dev_pc()
         form = QFormLayout()
-        self.edit_user_id  = QLineEdit("ng12589" if is_dev else "")
-        self.edit_user_pw  = QLineEdit("wnsgur12@" if is_dev else ""); self.edit_user_pw.setEchoMode(QLineEdit.Password)
-        self.edit_cert_pw  = QLineEdit("ahffkdy123 " if is_dev else ""); self.edit_cert_pw.setEchoMode(QLineEdit.Password)
+        self.edit_user_id  = QLineEdit("")
+        self.edit_user_pw  = QLineEdit(""); self.edit_user_pw.setEchoMode(QLineEdit.Password)
+        self.edit_cert_pw  = QLineEdit(""); self.edit_cert_pw.setEchoMode(QLineEdit.Password)
         self.combo_server  = QComboBox()
         self.combo_server.addItem("", "")
         for ip, name in SERVER_LIST:
@@ -484,9 +468,10 @@ class TestWindow(QMainWindow):
         # 실시간 재계산용 기준값 저장 (서버가 계산한 초기 평가금액을 기준점으로 삼아
         # 현재가 변동분만큼만 보정 -> 수수료/세금을 몰라도 근사치가 아닌 정확한 값 유지)
         try:
+            # curr(현재가)의 +/-는 등락 방향 표시일 뿐 실제 부호가 아니므로 양수로 취급
             self._jango_calc[code_key] = {
                 'remain': float(remain), 'maip': float(maip),
-                'base_curr': float(curr), 'base_eval': float(eval_amt),
+                'base_curr': float(curr.lstrip('+-')), 'base_eval': float(eval_amt),
             }
         except ValueError:
             pass
@@ -506,7 +491,8 @@ class TestWindow(QMainWindow):
         if calc is None:
             return
         try:
-            new_curr = float(new_curr_s)
+            # 023(현재가)의 +/-는 실제 부호가 아니라 등락 방향 표시라서 가격은 항상 양수로 취급
+            new_curr = float(new_curr_s.lstrip('+-'))
         except ValueError:
             return
         remain = calc['remain']
@@ -599,6 +585,10 @@ class TestWindow(QMainWindow):
     def _on_sise_send(self):
         code = self.edit_sise_code.text().strip()
         mkgubn = self.combo_mkgubn.currentData()  # 1=KRX 2=NXT 3=통합
+        for lbl in (self.lbl_curr, self.lbl_diff, self.lbl_rate, self.lbl_gvol,
+                    self.lbl_siga, self.lbl_koga, self.lbl_jega, self.lbl_mgjv,
+                    self.lbl_dvol, self.lbl_svol):
+            lbl.setText("-")
         if self.combo_jtype.currentIndex() == 0:  # 선물옵션
             if len(code) != 8:
                 self._log("선물옵션 종목코드는 8자리입니다.")
@@ -888,7 +878,7 @@ class TestWindow(QMainWindow):
             return  # 현재 조회 중인 종목만 처리(시세조회 화면 갱신은 여기까지)
 
         if "034" in m:  # 체결시간 있으면 체결 데이터
-            self.lbl_curr.setText(m.get("023", "-"))
+            self.lbl_curr.setText(m.get("023", "-").lstrip('+-') or "-")
             self.lbl_diff.setText(m.get("024", "-"))
             self.lbl_rate.setText(m.get("033", "-"))
             self.lbl_gvol.setText(m.get("027", "-"))
@@ -896,6 +886,8 @@ class TestWindow(QMainWindow):
             self.lbl_koga.setText(m.get("030", "-"))
             self.lbl_jega.setText(m.get("031", "-"))
             self.lbl_mgjv.setText(m.get("201", "-"))
+        elif "111" in m:  # 동시호가 구간엔 034(체결) 대신 111(예상체결가)만 옴
+            self.lbl_curr.setText(m.get("111", "-").lstrip('+-') or "-")
 
         if "040" in m:  # 호가시간 있으면 호가 데이터
             self.lbl_dvol.setText(m.get("101", "-"))
@@ -945,6 +937,10 @@ class TestWindow(QMainWindow):
                 label = "선물주문" if key == TK_TR3201 else "주식주문"
                 self.lbl_odr_result.setText(f"주문번호:{jmno}")
                 self._log(f"  [{label}] 주문번호={jmno} 원주문번호={ojno} 메시지={emsg}")
+                if jmno and jmno != "000000":
+                    QMessageBox.information(self, f"{label} 접수", f"주문번호: {jmno}\n{emsg}")
+                else:
+                    QMessageBox.warning(self, f"{label} 실패", emsg or "주문이 거부되었습니다.")
             elif key == TK_TR3221:  # 선물 잔고 (header: acno[11]+nrec[4]=15, grid=149)
                 GRID = 149
                 nrec = int(raw[11:15].decode('cp949', errors='ignore').strip() or "0")

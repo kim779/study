@@ -19,3 +19,4 @@
 | 2026-07-15 | @docs/Todo.md | 진행 과제, 테스트 계획, 마일스톤, 리스크 관리 | ✓ 완료 |
 | 2026-07-13 | @docs/WizardArchitecture.md | axwizard 클래스 계층, 이벤트→프로시저 매핑, 스크립트엔진 초기화 순서 | ✓ 1차 완료 (심화 분석 진행중) |
 | 2026-07-19 | @docs/RealtimeCodeIndex_Investigation.md | RTM DoRTM 전체순회 개선(종목코드 역인덱스) 조사, PR_CODE 필드 쓰기경로 추적 | 🔍 조사 중 (목표 07-22) |
+| 2026-07-24 | @docs/AxisformArchitecture.md | axisform.dll(dll/form) 클래스 계층, 컨트롤 생명주기, DLL 경계 vtable 위험성 | ✓ 1차 완료 |

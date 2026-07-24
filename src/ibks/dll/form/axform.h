@@ -163,8 +163,11 @@ public:
 	virtual	bool GetHistory(CString name, CString& codes, bool up = true) { return false; }
 	virtual	BOOL IsResizable() { return FALSE; }
 	virtual	int  GetHeight() { return 0; }
-	virtual	int  GetWidth() { return 0; } 
-	
+	virtual	int  GetWidth() { return 0; }
+#ifdef DF_RTM_INDEX
+	virtual	void UpdateFlashCode(WORD key, CString text) {}	// RTM 코드 필드 변경 훅, CScreen이 override - 반드시 마지막에 추가 (기존 가상함수 vtable 슬롯을 밀면 안 됨)
+#endif
+
 // Overrides
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CAxisForm)

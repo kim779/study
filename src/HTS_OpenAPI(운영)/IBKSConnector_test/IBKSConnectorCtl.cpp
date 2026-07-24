@@ -7,6 +7,7 @@
 #include "AxisUtil.h"
 #include "grid_i.h"
 #include <math.h>
+#include "../../h/grid.h"
 
 #define MB_CAPTION		("IBK투자증권")
 #define MB_ERROPTION	(MB_OK|MB_ICONERROR)
@@ -137,8 +138,9 @@ BEGIN_DISPATCH_MAP(CIBKSConnectorCtrl, COleControl)
 	DISP_FUNCTION(CIBKSConnectorCtrl, "TR3232", TR3232, VT_BOOL, VTS_I4 VTS_BSTR VTS_BSTR VTS_I4 VTS_I4)
 	DISP_FUNCTION(CIBKSConnectorCtrl, "TR2001", TR2001, VT_BOOL, VTS_I4 VTS_BSTR VTS_I4)
 	DISP_FUNCTION(CIBKSConnectorCtrl, "SetPrograms", SetPrograms, VT_EMPTY, VTS_I4)
-	DISP_FUNCTION(CIBKSConnectorCtrl, "TR1223", TR1223, VT_BOOL, VTS_I4 VTS_BSTR VTS_BSTR VTS_I4 VTS_I4 VTS_BSTR) //test1223
-	DISP_FUNCTION(CIBKSConnectorCtrl, "TR1203", TR1203, VT_BOOL, VTS_I4 VTS_I4 VTS_BSTR VTS_BSTR VTS_I4 VTS_BSTR VTS_I4 VTS_I4 VTS_I4 VTS_I4 VTS_I4) //test1203
+	DISP_FUNCTION(CIBKSConnectorCtrl, "TR1223", TR1223, VT_BOOL, VTS_I4 VTS_BSTR VTS_BSTR VTS_I4 VTS_I4 VTS_BSTR) //test1223  주식주문시장구분
+	DISP_FUNCTION(CIBKSConnectorCtrl, "TR1203", TR1203, VT_BOOL, VTS_I4 VTS_I4 VTS_BSTR VTS_BSTR VTS_I4 VTS_BSTR VTS_I4 VTS_I4 VTS_I4 VTS_I4 VTS_I4) //test1203 잔고시장구분
+	DISP_FUNCTION(CIBKSConnectorCtrl, "TR1004", TR1004, VT_BOOL, VTS_I4 VTS_BSTR VTS_BSTR)
 	//}}AFX_DISPATCH_MAP
 END_DISPATCH_MAP()
 
@@ -2508,13 +2510,106 @@ BOOL CIBKSConnectorCtrl::S_TR1002(int key, LPCSTR code, LPCSTR data)
 	}
 	CString sdat;
 	sdat.Format("1301%c%s\t1021\t%s\t", 0x7f, code, data);
-	//sdat.Format("1301\x7f%s\t%s\t", code, data);
-	//tmps.Format("1301%c%s\t1021\t17413\t", 0x7f, code);
-	//return SendTR("pooppoop", key, US_OOP, (LPCSTR)sdat, sdat.GetLength(), C_TR1002);  //vc2019
 	return SendTR("pooppoop", key, US_OOP, (LPCSTR)sdat, sdat.GetLength(), &CIBKSConnectorCtrl::C_TR1002);
 }
 
+BOOL CIBKSConnectorCtrl::S_TR1004_multi(int key, LPCSTR code, LPCSTR data)
+{
+	CStringArray codeArr;
+	CString strCodes(code);
+	int pos = 0;
+	CString token;
+	do {
+		token = strCodes.Tokenize(_T(","), pos);
+		if (!token.IsEmpty())
+			codeArr.Add(token);
+	} while (pos != -1);
+
+	// data 형식: "1777\x7f{mkgubn}\t{field1}\t{field2}\t...\t"
+	int mkgubn = 3;
+	CString fieldsPart;
+	{
+		CString d(data);
+		int p7f = d.Find((TCHAR)0x7f);
+		if (p7f >= 0)
+		{
+			int ptab = d.Find(_T('\t'), p7f + 1);
+			if (ptab >= 0)
+			{
+				CString mk = d.Mid(p7f + 1, ptab - p7f - 1);
+				if (!mk.IsEmpty())
+					mkgubn = _ttoi(mk);
+				fieldsPart = d.Mid(ptab + 1);   // 필드 목록(탭 구분) 나머지 전체
+			}
+		}
+	}
+
+	// 탭 구분 필드 목록을 줄바꿈(0x0A) 구분으로 변환
+	CStringA fieldListLF;
+	{
+		int fp = 0;
+		CString ftok;
+		do {
+			ftok = fieldsPart.Tokenize(_T("\t"), fp);
+			if (!ftok.IsEmpty())
+			{
+				fieldListLF += CStringA(ftok);
+				fieldListLF += "\n";
+			}
+		} while (fp != -1);
+	}
+
+	const int nCodes = (int)codeArr.GetSize();
+
+	std::string head;
+	head += "90991";
+	head += (char)0x7f;
+	head += "1\t";              // 예상가 여부: 0=일반, 1=예상가
+	head += "90777";
+	head += (char)0x7f;
+	CStringA mkStr;
+	mkStr.Format("%d", mkgubn);
+	head += (LPCSTR)mkStr;
+	head += "\t";
+	head += "$90303";
+	head += (char)0x7f;
+
+	// _gridHi: visible[2]+rows[4]+type+dir+sort (9) + symbol[16]+key+page[4]+save[80] (101) = 110바이트
+	head += "99";
+	CStringA rowsStr;
+	rowsStr.Format("%04d", nCodes);
+	head += (LPCSTR)rowsStr;
+	head += "010";
+	head += std::string(16 + 1 + 4 + 80, ' ');
+
+	head += (LPCSTR)fieldListLF;   // 우리가 요청한 필드 목록
+	head += "1301";
+	head += (char)0x7f;
+
+	std::string sendS = head;
+	for (int i = 0; i < nCodes; i++)
+	{
+		sendS += CStringA(codeArr[i]);
+		sendS += (char)0x7f;
+	}
+	sendS += '\n';
+	sendS += '\t';
+
+	return SendTR("pooppoop", key, US_OOP, sendS.data(), (int)sendS.size(), &CIBKSConnectorCtrl::C_TR1004);
+}
+
 void CIBKSConnectorCtrl::C_TR1002(WPARAM wParam, LPARAM lParam)
+{
+	int key = LOWORD(wParam);
+	int size = HIWORD(wParam);
+	LPCSTR data = (LPCSTR)lParam;
+	CString odat = CString(data, size);
+	odat.TrimRight();
+
+	FireOnRecvData(key, (long)(LPCSTR)odat, odat.GetLength(), false, "");
+}
+
+void CIBKSConnectorCtrl::C_TR1004(WPARAM wParam, LPARAM lParam)
 {
 	int key = LOWORD(wParam);
 	int size = HIWORD(wParam);
@@ -2555,7 +2650,6 @@ BOOL CIBKSConnectorCtrl::S_TR1003(int key, LPCSTR code, int type, LPCSTR columns
 	memcpy(&buff[0],		 (LPCSTR)sin,  ilen);
 	memcpy(&buff[ilen],		 &gin,	       glen);
 	memcpy(&buff[ilen+glen], (LPCSTR)sout, olen);
-	//return SendTR("pooppoop", key, US_OOP, (LPCSTR)&buff[0], buff.size(), C_TR1003);  //vc2019
 	return SendTR("pooppoop", key, US_OOP, (LPCSTR)&buff[0], buff.size(), &CIBKSConnectorCtrl::C_TR1003);
 }
 
@@ -2595,7 +2689,6 @@ BOOL CIBKSConnectorCtrl::S_TR3002(int key, LPCSTR code, LPCSTR data)
 	else
 		sdat.Format("40301\x7f%s\t%s\t", code, data);
 
-	//return SendTR("pooppoop", key, US_OOP, (LPCSTR)sdat, sdat.GetLength(), C_TR3002);  //vc2019
 	return SendTR("pooppoop", key, US_OOP, (LPCSTR)sdat, sdat.GetLength(), &CIBKSConnectorCtrl::C_TR3002);
 }
 void CIBKSConnectorCtrl::C_TR3002(WPARAM wParam, LPARAM lParam)
@@ -2646,7 +2739,6 @@ BOOL CIBKSConnectorCtrl::S_TR3003(int key, LPCSTR code, int type, LPCSTR columns
 	memcpy(&buff[0],		 (LPCSTR)sin,  ilen);
 	memcpy(&buff[ilen],		 &gin,	       glen);
 	memcpy(&buff[ilen+glen], (LPCSTR)sout, olen);
-	//return SendTR("pooppoop", key, US_OOP, (LPCSTR)&buff[0], buff.size(), C_TR3003);  //vc2019
 	return SendTR("pooppoop", key, US_OOP, (LPCSTR)&buff[0], buff.size(), &CIBKSConnectorCtrl::C_TR3003);
 }
 
@@ -2725,6 +2817,12 @@ BOOL CIBKSConnectorCtrl::TR1003(long key, LPCTSTR code, long type, LPCTSTR symb,
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 	return AccessTr(eTR1003) ? S_TR1003(key, code, type, symb, nkey) : FALSE;
+}
+
+BOOL CIBKSConnectorCtrl::TR1004(long key, LPCTSTR code, LPCTSTR symb)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+	return AccessTr(eTR1004) ? S_TR1004_multi(key, code, symb) : FALSE;
 }
 
 BOOL CIBKSConnectorCtrl::TR3002(long key, LPCTSTR code, LPCTSTR symb) 

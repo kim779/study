@@ -127,6 +127,7 @@ protected:
 
 #ifdef DF_RTM_INDEX
 	CMapStringToPtr	m_codeIndex;		// RTM shadow index: code -> CPtrArray* of CScreen*
+	bool		m_rtmIndexCutover = false;	// runtime kill switch (registry: Workstation\RTMIndexCutover), read once at Startup()
 #endif
 
 	CByteArray	m_major;
@@ -391,6 +392,7 @@ public:
 	// Self-updates from CScreen::OnAlert's existing per-tick field read, so no separate
 	// write-path hooks are required. oldCode may be empty (first observation for a screen).
 	void	UpdateCodeIndex(class CScreen* screen, CString oldCode, CString newCode);
+	bool IsCodeIndexed(CString code, CScreen* screen);
 #endif
 private:
 	int	AtView(CWorks* works, CString maps, CString domino, bool force);

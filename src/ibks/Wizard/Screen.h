@@ -146,6 +146,9 @@ public:
 	void	OnPush(CString pushs);
 
 	bool	OnAlert(CString code, CString update, class CdataSet* fms, CObArray* obs, int stat, struct _alertR* alertR = NULL);
+#ifdef DF_RTM_INDEX
+	virtual void UpdateFlashCode(WORD key, CString text);
+#endif
 	bool	OnNotice(CdataSet& major, CdataSet& minor, CdataSet& fms, CString notices);
 	void	OnProfit(CfmBase* form);
 	void	Blink();

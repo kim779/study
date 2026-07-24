@@ -1237,6 +1237,16 @@ void CfmEdit::SetFocus(bool focus)
 		m_state   = esNone;
 		iRc.right += 2;
 		m_axform->m_view->HideCaret();
+
+#ifdef DF_RTM_INDEX
+		if (m_form->attr & FA_FLASH)
+		{
+			CString text;
+			ReadData(text);
+			text.TrimRight();
+			m_axform->UpdateFlashCode(m_form->iorder, text);
+		}
+#endif		
 	}
 	else
 	{
@@ -1367,6 +1377,16 @@ void CfmEdit::WriteData(CString data, bool redraw, int col, int row)
 		return;
 
 	m_strR = data;
+#ifdef DF_RTM_INDEX
+	if (m_form->attr & FA_FLASH)
+	{
+		CString text = data;
+		text.TrimRight();
+		m_axform->UpdateFlashCode(m_form->iorder, text);
+	}
+#endif
+	if (!m_caret)
+
 	if (!m_caret)
 		m_focusing = true;
 

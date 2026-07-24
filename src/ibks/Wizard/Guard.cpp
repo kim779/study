@@ -369,6 +369,13 @@ void CGuard::Startup()
 	m_wait = m_app->GetProfileInt(WORKSTATION, TRANTMO, 0);
 	m_wait *= 1000;
 
+#ifdef DF_RTM_INDEX  //CGuard::Startup - runtime kill switch for RTM index cutover
+	m_rtmIndexCutover = m_app->GetProfileInt(WORKSTATION, RTMIDXCUT, 0) ? true : false;
+	CString dbgCut;
+	dbgCut.Format("[WIZARD][RTM][DEBUG] [%s] RTMIndexCutover=%d (registry-read)\n", m_app->m_pszRegistryKey , m_rtmIndexCutover);
+	OutputDebugString(dbgCut);
+#endif
+
 	char	tmpb[1024]{};
 	GetPrivateProfileString(SYSTEMSN, "Pass", "", tmpb, sizeof(tmpb), m_vtcode);
 	m_verpass = tmpb;
@@ -6039,6 +6046,22 @@ void CGuard::UpdateCodeIndex(CScreen* screen, CString oldCode, CString newCode)
 		arr->Add(screen);
 	}
 }
+
+bool CGuard::IsCodeIndexed(CString code, CScreen* screen)
+{
+	void*	ptr;
+	if (!m_codeIndex.Lookup(code, ptr))
+		return false;
+
+	CPtrArray* arr = (CPtrArray*)ptr;
+	for (int ii = 0; ii < arr->GetSize(); ii++)
+	{
+		if (arr->GetAt(ii) == screen)
+			return true;
+	}
+	return false;
+}
+
 #endif
 
 BOOL CGuard::IsPortfolioSymbol(CString name)

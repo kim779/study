@@ -157,6 +157,7 @@
 
 #define	AXISONLY	"AxisOnly"		// dword
 #define	DOWNLOAD	"DownloadOption"	// dword
+#define	RTMIDXCUT	"RTMIndexCutover"
 						// 0 = download all / 1 = download except map
 		
 

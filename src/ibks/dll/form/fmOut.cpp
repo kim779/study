@@ -433,6 +433,10 @@ void CfmOut::WriteData(CString data, bool redraw, int col, int row)
 
 	m_strR = data;
 	m_strR.TrimRight();
+#ifdef DF_RTM_INDEX
+	if (m_form->attr & FA_FLASH)
+		m_axform->UpdateFlashCode(m_form->iorder, m_strR);
+#endif	
 	editData();
 
 	if (redraw && (m_form->properties & PR_VISIBLE))
