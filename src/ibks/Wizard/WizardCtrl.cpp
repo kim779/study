@@ -14,6 +14,7 @@
 #include "../h/axisvar.h"
 #include "../h/axisanm.h"
 #include "../h/axiserr.h"
+#include "../h/axlog.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -353,7 +354,13 @@ BOOL CWizardCtrl::axTR(long pBytes, long nBytes)
 
 long CWizardCtrl::axAttach(long view, long type, long key)
 {
-	return m_guard->Attach((CWnd*)view, type, key);
+	axlog(LOG_INIT, "axAttach view=%p type=%d key=%d", (void*)view, type, key);
+
+	long result = m_guard->Attach((CWnd*)view, type, key);
+
+	axlog(LOG_INIT, "axAttach result(assigned key)=%d", result);
+
+	return result;
 }
 
 void CWizardCtrl::axDetach(long key)
@@ -1061,6 +1068,9 @@ void CWizardCtrl::OnXecure(int encK, char* pBytes, int nBytes)
 
 void CWizardCtrl::OnAxis(struct _axisH* axisH, char* pBytes, int nBytes)
 {
+	axlog(LOG_DATA, "[1-OnAxis-raw] msgK=%d stat=%d auxs=%d winK=%d unit=%d trxC=%.8s nBytes=%d",
+		axisH->msgK, axisH->stat, axisH->auxs, axisH->winK, axisH->unit, axisH->trxC, nBytes);
+
 	char	mapN[L_MAPN + 1];
 	CopyMemory(mapN, axisH->trxC, L_MAPN);
 	mapN[L_MAPN] = '\0';

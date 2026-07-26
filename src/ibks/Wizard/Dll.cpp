@@ -8,6 +8,7 @@
 #include "../h/axisvar.h"
 #include "../h/axiserr.h"
 #include "../h/axstring.h"
+#include "../h/axlog.h"
 
 #ifdef _DEBUG
 #undef THIS_FILE
@@ -48,12 +49,15 @@ LRESULT CALLBACK DllProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			default:
 				dll->m_view->GetClientRect(rect);
 				dll->m_dll->MoveWindow(rect);
+				axlog(LOG_EVENT, "CDll DllProc WM_SIZE propagate rect=(%d,%d,%d,%d)",
+					rect.left, rect.top, rect.right, rect.bottom);
 				break;
 			}
 		}
 		break;
 
 	case WM_USER:
+		axlog(LOG_EVENT, "CDll DllProc WM_USER cmd=%d wParam=%d lParam=%d", LOWORD(wParam), (int)wParam, (int)lParam);
 		switch (LOWORD(wParam))
 		{
 		case getPALETTE:
@@ -421,6 +425,8 @@ bool CDll::Attach(CString maps, bool only, bool fix)
 	maps   = maps.Left(L_MAPN);
 	CopyMemory(tmapN, (char *)maps.GetString(), L_MAPN); tmapN[L_MAPN] = '\0';
 
+	axlog(LOG_INIT, "CDll::Attach maps=%.7s domino=%s", tmapN, domino.GetString());
+
 	bool	equal = false;
 	bool	isvirtual = m_guard->GetVirtualTR(tmapN);
 	if (isvirtual && !m_mapN.IsEmpty())
@@ -459,6 +465,7 @@ bool CDll::Attach(CString maps, bool only, bool fix)
 				}
 				dll = new CWnd();
 				dll->Attach(hWnd);
+				axlog(LOG_INIT, "CDll::Attach loaded via axCreateEx maps=%.7s", tmapN);
 			}
 			else
 			{
@@ -475,6 +482,7 @@ bool CDll::Attach(CString maps, bool only, bool fix)
 					return false;
 				}
 				is_domino = true;
+				axlog(LOG_INIT, "CDll::Attach loaded via axCreateX maps=%.7s domino=%s", tmapN, domino.GetString());
 			}
 		}
 		else
@@ -485,6 +493,7 @@ bool CDll::Attach(CString maps, bool only, bool fix)
 				AfxFreeLibrary(instance);
 				return false;
 			}
+			axlog(LOG_INIT, "CDll::Attach loaded via axCreate maps=%.7s", tmapN);
 		}
 
 		Free();

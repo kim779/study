@@ -10,6 +10,7 @@
 #include "stream.h"
 
 #include "../h/axisvar.h"
+#include "../h/axlog.h"
 #include <winsock2.h>
 #include <WS2tcpip.h>
 #include <mmsystem.h>
@@ -325,6 +326,7 @@ void CxSystem::_Navigate(LPCTSTR url)
 
 void CxSystem::_Trigger(LPCTSTR procs, LPCTSTR params, LPCTSTR maps)
 {
+	axlog(LOG_SCRIPT, "CxSystem::_Trigger procs=%s params=%s maps=%s", procs, params, maps);
 	m_guard->OnProcedure(procs, params, maps);
 }
 

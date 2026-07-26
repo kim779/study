@@ -6,6 +6,7 @@
 #include "Wizard.h"
 #include "Works.h"
 #include "OleDrop.h"
+#include "../h/axlog.h"
 
 #ifdef _DEBUG
 #undef THIS_FILE
@@ -58,6 +59,9 @@ bool CWorks::Attach(CString maps, bool only, bool fix)
 
 void CWorks::OnStream(_axisH *axisH, char *pBytes, int nBytes)
 {
+	axlog(LOG_DATA, "[2-OnStream-reassemble] winK=%d unit=%d stat=%d statCON=%d nBytes=%d accumulated=%d",
+		axisH->winK, axisH->unit, axisH->stat, (axisH->stat & statCON) ? 1 : 0, nBytes, m_axisL);
+
 	if (m_axisL > 0)
 	{
 		char*	axisB = m_axisB;

@@ -16,6 +16,7 @@
 #include "xScreen.h"
 #include "../h/axiserr.h"
 #include "../h/axisvar.h"
+#include "../h/axlog.h"
 #include "../dll/form/fmctrl.h"
 #include "../dll/form/fmgrid.h"
 #include "../h/axstring.h"
@@ -176,6 +177,9 @@ bool CClient::Attach(CString maps, bool only, bool fix)
 	if ((m_status & S_WAIT) && !only)
 		return false;
 
+	ULONGLONG t0 = GetTickCount64();
+	axlog(LOG_INIT, "[CClient::Attach-enter] maps=%.7s", maps.GetString());
+
 	m_guard->SetCursor(0, m_view);
 	m_sync.Lock();
 
@@ -213,6 +217,7 @@ bool CClient::Attach(CString maps, bool only, bool fix)
 			return false;
 		}
 	}
+	axlog(LOG_INIT, "[CClient::Attach-timing] GetMapH +%dms", (int)(GetTickCount64()-t0));
 
 	if (isvirtual && !m_mapN.IsEmpty())
 	{
@@ -257,6 +262,7 @@ bool CClient::Attach(CString maps, bool only, bool fix)
 			m_sync.Unlock();
 			return false;
 		}
+		axlog(LOG_INIT, "[CClient::Attach-timing] SetAtScreen +%dms", (int)(GetTickCount64()-t0));
 
 		m_mouse->m_hover.m_key = -1;
 		m_mouse->m_hover.m_idx = -1;
@@ -266,6 +272,7 @@ bool CClient::Attach(CString maps, bool only, bool fix)
 
 		m_mapN = maps;
 		screen->Parse();
+		axlog(LOG_INIT, "[CClient::Attach-timing] screen->Parse +%dms", (int)(GetTickCount64()-t0));
 		OnResize(m_rect.Width(), m_rect.Height());
 		m_guard->SendAxis(MAKEWPARAM(titleVIEW, m_key), screen->m_mapH->caption);
 
@@ -291,8 +298,10 @@ bool CClient::Attach(CString maps, bool only, bool fix)
 			SetFont(m_font, m_guard->m_resize, true);
 		else
 			SetFont(m_guard->m_font, m_guard->m_resize, true);
+		axlog(LOG_INIT, "[CClient::Attach-timing] SetFont +%dms", (int)(GetTickCount64()-t0));
 
 		OnStart(screen);
+		axlog(LOG_INIT, "[CClient::Attach-timing] OnStart(script) +%dms", (int)(GetTickCount64()-t0));
 
 		if (m_current.m_idx == -1)
 		{
@@ -350,11 +359,15 @@ bool CClient::Attach(CString maps, bool only, bool fix)
 		m_view->SetTimer(TM_RTM, TMI_RTM, NULL);
 	m_sync.Unlock();
 
+	axlog(LOG_INIT, "[CClient::Attach-total] +%dms", (int)(GetTickCount64()-t0));
 	return true;
 }
 
 void CClient::OnAxis(struct _axisH* axisH, char* pBytes, int nBytes)
 {
+	axlog(LOG_DATA, "[3-CClient-OnAxis-reassembled] winK=%d unit=%d msgK=%d trxC=%.8s nBytes=%d",
+		axisH->winK, axisH->unit, axisH->msgK, axisH->trxC, nBytes);
+
 	m_stream->OutStream(axisH, pBytes, nBytes);
 }
 

@@ -2,6 +2,7 @@
 
 #include "stdafx.h"
 #include "engineWrapper.h"
+#include "../../h/axlog.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -92,6 +93,9 @@ bool CEngineWrapper::IsAvailable(CString procs)
 
 bool CEngineWrapper::DoProcedure(CString procs, WPARAM wParam, LPARAM lParam, int key)
 {
+    axlog(LOG_EVENT, "DoProcedure(1) procs=%s engine=%s",
+        procs.GetString(), (m_usePython && m_py) ? "Python" : (m_vbs ? "VBS" : "none"));
+
     bool result;
     if (m_usePython && m_py) {
         result   = m_py->DoProcedure(procs, wParam, lParam, key);
@@ -107,6 +111,9 @@ bool CEngineWrapper::DoProcedure(CString procs, WPARAM wParam, LPARAM lParam, in
 
 bool CEngineWrapper::DoProcedure(CString procs, CString data, int count)
 {
+    axlog(LOG_EVENT, "DoProcedure(2) procs=%s engine=%s",
+        procs.GetString(), (m_usePython && m_py) ? "Python" : (m_vbs ? "VBS" : "none"));
+
     bool result;
     if (m_usePython && m_py) {
         result   = m_py->DoProcedure(procs, data, count);

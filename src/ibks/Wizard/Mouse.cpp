@@ -11,6 +11,7 @@
 #include "Key.h"
 #include "History.h"
 #include "../dll/form/fmgrid.h"
+#include "../h/axlog.h"
 
 #ifdef _DEBUG
 #undef THIS_FILE
@@ -53,6 +54,8 @@ CMouse::~CMouse()
 
 void CMouse::OnDown(CPoint point, WPARAM wParam)
 {
+	axlog(LOG_EVENT, "CMouse::OnDown x=%d y=%d wParam=%d", point.x, point.y, (int)wParam);
+
 	if (m_capture)	return;
 
 	// Win10 IME

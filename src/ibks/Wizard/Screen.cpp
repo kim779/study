@@ -16,6 +16,7 @@
 #include "../h/axisvar.h"
 #include "../h/axiserr.h"
 #include "../h/axstring.h"
+#include "../h/axlog.h"
 #include "../dll/form/fmctrl.h"
 #include "../dll/form/fmgrid.h"
 #include "../dll/form/fmtable.h"
@@ -34,6 +35,8 @@ static char THIS_FILE[]=__FILE__;
 CScreen::CScreen(CClient* client, CRect rect)
 	: CAxisForm()
 {
+	axlog(LOG_INIT, "CScreen::ctor client_key=%d addr=%p", client->m_key, this);
+
 	m_client = client;
 	m_rect   = rect;
 	m_guard  = client->m_guard;
@@ -76,6 +79,9 @@ CScreen::CScreen(CClient* client, CRect rect)
 
 CScreen::~CScreen()
 {
+	axlog(LOG_INIT, "CScreen::dtor client_key=%d addr=%p mapN=%s",
+		m_client->m_key, this, m_mapH ? CString(m_mapH->mapN, L_MAPN).GetString() : _T("(null)"));
+
 #ifdef DF_RTM_INDEX  //CScreen::~CScreen - RTM index detach
 	{
 		WORD	flashKey;
@@ -209,6 +215,10 @@ int compare(const void *arg1, const void *arg2)
 
 bool CScreen::Parse(bool resize, bool fix)
 {
+	axlog(LOG_INIT, "CScreen::Parse mapN=%s resize=%d fix=%d",
+		CString(m_mapH->mapN, L_MAPN).GetString(), resize, fix);
+	ULONGLONG tp0 = GetTickCount64();
+
 	if (m_push != NULL)
 	{
 		m_push = NULL;
@@ -222,6 +232,8 @@ bool CScreen::Parse(bool resize, bool fix)
 
 	mainRc = isMain() ? CRect(0, 0, m_mapH->width, m_mapH->height) : m_rect;
 	LoadForm(mainRc);
+	axlog(LOG_INIT, "[CScreen::Parse-timing] mapN=%s LoadForm +%dms",
+		CString(m_mapH->mapN, L_MAPN).GetString(), (int)(GetTickCount64()-tp0));
 
 	CScreen* screen;
 	CfmBase* form;
@@ -424,6 +436,8 @@ bool CScreen::Parse(bool resize, bool fix)
 		m_vbe->AddObject(form->GetSymbolName(),
 			(form->m_form->kind == FM_CONTROL) ? (CCmdTarget *)((CfmCtrl*)form)->m_ctrl : form);
 	}
+	axlog(LOG_INIT, "[CScreen::Parse-timing] mapN=%s form-loop(incl. sub-Parse) +%dms",
+		CString(m_mapH->mapN, L_MAPN).GetString(), (int)(GetTickCount64()-tp0));
 
 	if (m_mapH->scriptR != NOVALUE)
 	{
@@ -462,33 +476,26 @@ bool CScreen::Parse(bool resize, bool fix)
 					m_vbe->AddObject(name, control);
 			}
 		}
-		{
-			CString dbg;
-			dbg.Format("[WIZARD][SCRIPT][DEBUG] text.GetLength()=%d\n", text.GetLength());
-			OutputDebugString(dbg);
-			dbg.Format("[WIZARD][SCRIPT][DEBUG] text=[%s]\n", text.GetString());
-			OutputDebugString(dbg);
-		}
+		axlog(LOG_SCRIPT, "text.GetLength()=%d", text.GetLength());
+		axlog(LOG_SCRIPT, "text=[%s]", text.GetString());
+
 		if (!m_vbe->LoadScript(text, m_mapH->pythonMode))
 		{
 			CStringArray* errs = m_vbe->GetErrorMessages();
-			CString dbg;
-			dbg.Format("[WIZARD][SCRIPT][DEBUG] LoadScript FAILED, errCount=%d\n", errs ? (int)errs->GetSize() : -1);
-			OutputDebugString(dbg);
+			axlog(LOG_SCRIPT, "LoadScript FAILED, errCount=%d", errs ? (int)errs->GetSize() : -1);
 			if (errs)
 			{
 				for (int di = 0; di < errs->GetSize(); di++)
-				{
-					dbg.Format("[WIZARD][SCRIPT][DEBUG] err[%d]=%s\n", di, errs->GetAt(di).GetString());
-					OutputDebugString(dbg);
-				}
+					axlog(LOG_SCRIPT, "err[%d]=%s", di, errs->GetAt(di).GetString());
 			}
 		}
 		else
 		{
-			OutputDebugString("[WIZARD][SCRIPT][DEBUG] LoadScript OK\n");
+			axlog(LOG_SCRIPT, "LoadScript OK");
 		}
 	}
+	axlog(LOG_INIT, "[CScreen::Parse-timing] mapN=%s LoadScript-block +%dms",
+		CString(m_mapH->mapN, L_MAPN).GetString(), (int)(GetTickCount64()-tp0));
 	for (int ii = 0; ii < fmTabs.GetSize(); ii++)
 	{
 		form = (CfmBase *)fmTabs.GetAt(ii);
@@ -583,6 +590,8 @@ bool CScreen::Parse(bool resize, bool fix)
 	if (m_mapH->options & OP_DROP)
 		m_client->Register(NULL);
 
+	axlog(LOG_INIT, "[CScreen::Parse-timing] mapN=%s TOTAL +%dms",
+		CString(m_mapH->mapN, L_MAPN).GetString(), (int)(GetTickCount64()-tp0));
 	return true;
 }
 
@@ -904,6 +913,8 @@ void CScreen::UpdateRTM(int key, CString code, CString update, CdataSet* fms, CO
 			continue;
 		case FM_EDIT:
 		case FM_OUT:
+			axlog(LOG_RTM, "[UpdateRTM-write] name=%.16s kind=%d iok=%d isInput=%d",
+				(char*)form->m_form->name, form->m_form->kind, form->m_form->iok, (form->m_form->iok == EIO_INPUT) ? 1 : 0);
 			//if (form->m_form->iok == EIO_INPUT)   //Edit  input no RTS writing //testcode
 			//	continue;
 			break;
@@ -2800,8 +2811,7 @@ long CScreen::DoSomething(int type, CfmBase* form, WPARAM wParam, LPARAM lParam,
 	static CString text;
 	int	value = 0, row = 0, column = 0;
 
-	m_slog.Format("[WIZARD][SCRIPT][%s]<%d> type =[%s]", __FUNCTION__, __LINE__,getSomethins(type));
-	OutputDebugString(m_slog);
+	axlog(LOG_SCRIPT, "[%s]<%d> type =[%s]", __FUNCTION__, __LINE__, getSomethins(type));
 
 	switch (type)
 	{

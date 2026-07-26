@@ -12,6 +12,7 @@
 
 #include "../dll/form/fmgrid.h"
 #include "../dll/form/fmctrl.h"
+#include "../h/axlog.h"
 #include "../dll/vbs/engineWrapper.h"
 
 #ifdef _DEBUG
@@ -360,6 +361,9 @@ void CxScreen::_CreateWindow(long type, LPCTSTR param, LPCTSTR data)
 
 void CxScreen::_Send(long target)
 {
+	axlog(LOG_SCRIPT, "CxScreen::_Send target=%d mapN=%.7s",
+		target, CString(m_screen->m_mapH->mapN, L_MAPN).GetString());
+
 	if (m_screen->m_client->m_vm->m_script)
 		return;		// ignore dup
 
@@ -380,7 +384,9 @@ void CxScreen::_Send(long target)
 		return;		// invalid script
 	}
 
+	ULONGLONG t0 = GetTickCount64();
 	m_screen->m_client->m_stream->InStream(screen);
+	axlog(LOG_SCRIPT, "CxScreen::_Send InStream +%dms", (int)(GetTickCount64()-t0));
 }
 
 void CxScreen::_RSend(long target)

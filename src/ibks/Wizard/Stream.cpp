@@ -9,6 +9,8 @@
 #include "Script.h"
 #include "xscreen.h"
 #include "../h/axiserr.h"
+#include "../h/axlog.h"
+#include "../h/ledger.h"
 #include "../dll/form/fmgrid.h"
 #include "../dll/form/fmradio.h"
 
@@ -87,6 +89,12 @@ bool CStream::InStream(CScreen* screen, bool byKey, CString trx)
 
 void CStream::OutStream(struct _axisH* axisH, char* datB, int datL)
 {
+	{
+		int	previewL = (datL < 60) ? datL : 60;
+		axlog(LOG_DATA, "[4-OutStream-parse] winK=%d unit=%d msgK=%d trxC=%.8s datL=%d preview=[%.*s]",
+			axisH->winK, axisH->unit, axisH->msgK, axisH->trxC, datL, previewL, datB);
+	}
+
 	struct _auxH*	auxH = nullptr;
 	CString	guide = _T("");
 	bool	set_guide = false;
@@ -1365,6 +1373,9 @@ void CStream::MakeStream(CScreen* screen, CString trx)
 	axisH->trxK = screen->m_trxK;
 	screen->m_trxK = 0;
 
+	axlog(LOG_DATA, "[0-MakeStream-send] winK=%d unit=%d mapN=%.7s",
+		axisH->winK, axisH->unit, screen->m_mapH->mapN);
+
 	bool	tab = false;
 	if (screen->m_mapH->options & OP_TABS)
 	{
@@ -1564,6 +1575,9 @@ int CStream::SetDataNRM(CScreen* screen, char* axisB, int axisL, bool skip)
 			formL = form->m_form->size;
 			if (formL > axisL - idx)
 				return axisL;
+
+			axlog(LOG_DATA, "[5-SetDataNRM-write] key=%d name=%.16s kind=%d value=[%.*s]",
+				key, (char*)form->m_form->name, form->m_form->kind, formL, &axisB[idx]);
 
 			form->WriteData(CString(&axisB[idx], formL));
 			if (!isSup)	form->IsChanged();
@@ -2398,6 +2412,9 @@ bool CStream::SetDataH(CScreen* screen, char* datB, int& datH)
 	int	skip;
 
 	datH = 0;
+
+	axlog(LOG_DATA, "[SetDataH] typeH=%d ledgerL=%d", screen->m_mapH->typeH, screen->m_ledgerL);
+
 	switch (screen->m_mapH->typeH)
 	{
 	case TH_KOSCOM:
@@ -2406,8 +2423,14 @@ bool CStream::SetDataH(CScreen* screen, char* datB, int& datH)
 		break;
 	case TH_LEDGER:
 		datH += screen->m_ledgerL;
+		{
+			struct _ledgerH* lg = (struct _ledgerH*)datB;
+			axlog(LOG_DATA, "[SetDataH-ledger] size=%.6s type=%.1s svcd=%.8s usid=%.16s ecod=%.4s next=%.1s nkey=%.18s emsg=%.30s",
+				lg->size, lg->type, lg->svcd, lg->usid, lg->ecod, lg->next, lg->nkey, lg->emsg);
+		}
 		screen->SetLedger(datB);
 		skip = atoi(m_guard->GetLedger(screen->m_ledger, getOK));
+		axlog(LOG_DATA, "[SetDataH-ledger] getOK-skip=%d datH=%d", skip, datH);
 		if (skip == 0)
 			return false;
 		if (skip < 0)
@@ -2424,6 +2447,9 @@ void CStream::SetCells(CScreen* screen, CfmBase* form, int nRows, int nCols, cha
 	int	col, row, formL;
 	CString	text;
 	struct _cellR*	cell;
+
+	axlog(LOG_DATA, "[6-SetCells-enter] name=%.16s nRows=%d nCols=%d",
+		(char*)form->m_form->name, nRows, nCols);
 
 	cell = (struct _cellR *)&screen->m_cellR[form->m_form->vals[0]];
 	text.Empty();
@@ -2447,6 +2473,8 @@ void CStream::SetCells(CScreen* screen, CfmBase* form, int nRows, int nCols, cha
 				break;
 			case EIO_NOP:
 			default:
+				axlog(LOG_DATA, "[6-SetCells-cell] row=%d col=%d iok=%d SKIP(no-bytes-on-wire)",
+					row, col, cell[col].iok);
 				continue;
 			}
 
@@ -2456,12 +2484,18 @@ void CStream::SetCells(CScreen* screen, CfmBase* form, int nRows, int nCols, cha
 				break;			// return false;
 			}
 
+			axlog(LOG_DATA, "[6-SetCells-cell] row=%d col=%d iok=%d value=[%.*s]",
+				row, col, cell[col].iok, formL, &axisB[idx]);
+
 			text += CString(&axisB[idx], formL);
 			text += '\t';
 			idx += formL;
 		}
 		text += '\n';
 	}
+
+	axlog(LOG_DATA, "[6-SetCells-done] name=%.16s assembled=[%s]",
+		(char*)form->m_form->name, text.GetString());
 
 	form->WriteAll(text);
 }

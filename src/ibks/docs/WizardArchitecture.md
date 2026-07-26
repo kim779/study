@@ -159,17 +159,89 @@ m_vbe->LoadScript(text, m_mapH->pythonMode);               // 여기서 비로�
 
 ---
 
-## 7. 다음 분석 대상 (미착수)
+## 7. 전체 클래스 레퍼런스 (2026-07-25, `Wizard/` 폴더 57개 파일 전수 확인)
 
-- CGuard 초기화/로그인 시퀀스 상세 (RunAxis mode별 분기, Xecure/Certify 흐름)
-- CClient 이벤트 라우팅 상세 (OnMouse/OnKey/OnTRAN → CScript 호출 지점)
-- xscreen.cpp (CxScreen) — 스크립트에서 보이는 Screen 객체의 실제 메서드/프로퍼티 목록
-- RTM(실시간) 갱신 흐름은 이미 `@docs/KnowledgeBase.md` 11절에 기록됨 (참고)
+`Wizard/` 폴더의 모든 클래스를 역할별로 정리. 1~5절에서 이미 상세히 다룬 6개 핵심 클래스(CWizardApp, CWizardCtrl, CGuard, CClient, CScreen, CScript)는 표에서 파일 위치만 표시하고 설명은 생략 — 위 절 참고.
+
+### 7.1 진입점 / ActiveX 컨트롤 계층
+
+| 클래스 | 파일 | 역할 |
+|---|---|---|
+| `CWizardApp` | Wizard.h/cpp | DLL 진입점 (1절 참고) |
+| `CWizardCtrl` | WizardCtrl.h/cpp | ActiveX 컨트롤 본체 (1절 참고) |
+| `CWizardPropPage : COlePropertyPage` | WizardPropPage.h/cpp | 디자인타임 속성 페이지 — MFC ActiveX 마법사가 생성한 보일러플레이트, 커스텀 로직 없음 |
+
+### 7.2 세션 / 작업영역 관리 계층
+
+| 클래스 | 파일 | 역할 |
+|---|---|---|
+| `CGuard` | Guard.h/cpp | 세션 허브 (1절 참고) |
+| `CWorks` | Works.h/cpp | 작업영역의 **추상 기반 클래스**. `CClient`/`CDll`이 상속. `S_*` 상태 플래그(S_LOAD, S_FLASH, S_LOCK 등) 정의, `Attach`/`OnAxis`/`OnAlert`/`OnDomino` 등 가상함수로 공통 인터페이스 제공. `m_drop`(COleDrop)로 OLE 드래그앤드롭도 여기서 관리 |
+| `CClient : CWorks` | Client.h/cpp | 실제 화면 작업영역 (1절 참고) |
+| `CDll : CWorks` | Dll.h/cpp | **DLL 기반 작업영역** — CClient(화면 기반)의 대안 경로로 보임. `m_dll`(별도 로드된 DLL 핸들), `m_screens`(CMapWordToPtr)로 자체 화면 목록 관리. `LoadLibrary`로 외부 DLL을 동적 로드해서 작업영역처럼 다룸(`Attach`가 `HINSTANCE m_instance` 사용) — 용도는 미조사 (예: 특정 화면군을 별도 DLL로 배포하는 확장 메커니즘 추정) |
+
+### 7.3 화면 / 스크립트 노출 객체 계층
+
+| 클래스 | 파일 | 역할 |
+|---|---|---|
+| `CScreen : CAxisForm` | Screen.h/cpp | 화면 인스턴스 (1, 3절 참고) |
+| `CxScreen : CCmdTarget` | xscreen.h/cpp | 스크립트에서 `Screen` 이름으로 보이는 **COM 디스패치 래퍼**. `_SetData`류가 아니라 `_ChangeTR`/`_Send`/`_Service`/`_CreateObject`/`_SetTimer`/`_SetTimerX`/`_GetCode`/`_Print`/`_UploadFile`/`_DownloadFile` 등 **60개 이상의 dispatch 메서드**로 화면 제어 전체 노출. `CScreen` 1개당 1개 생성(`Screen.cpp:223`, `m_xscreen = new CxScreen(this)`) |
+| `CxSystem : CCmdTarget` | xsystem.h/cpp | 스크립트에서 `System` 이름으로 보이는 COM 디스패치 래퍼. `_GetUserID`/`_Trigger`/`_Encrypt`/`_Decrypt`/`_Menu`/`_PlaySound`/`_CheckPasswd` 등 시스템/보안 레벨 기능 노출. `CGuard` 1개당 1개(세션 전체에서 공유) |
+
+### 7.4 이벤트 / 입력 처리 계층
+
+| 클래스 | 파일 | 역할 |
+|---|---|---|
+| `CScript` | Script.h/cpp | 이벤트→프로시저 매핑 (1, 4절 참고) |
+| `CKey` | Key.h/cpp | 키보드 입력 처리. `OnKey`/`OnChar`/`OnIME`, 필드 간 이동(`GoNextForm`/`GoPrevForm`/`NextForm`), 셀 단위 편집(`OnKeyCell`). RTM 조사(`RealtimeCodeIndex_Investigation.md`)에서 언급된 `CfmEdit::UpdateData` 호출의 상위 진입점이 여기 있을 가능성 높음(교차검증 필요) |
+| `CMouse` | Mouse.h/cpp | 마우스 입력 처리. `OnDown`/`OnUp`/`OnDblClick`/`OnWheel`/`ComboBox`, 클릭한 위치의 폼 판별(`WhichForm`) |
+| `COnTimer : CWinThread` | OnTimer.h/cpp | **타이머 전용 워커 스레드**(`AfxBeginThread`로 생성, `Client.cpp:4180`). `Dispatch(key)`로 타이머 이벤트를 큐(`CDWordArray m_que`)에 넣고 메인 스레드와 `CEvent`로 동기화. Wizard에서 확인된 몇 안 되는 실제 멀티스레드 지점 — KnowledgeBase.md의 "멀티스레드 고려사항" 절과 연결지어 재검토 가치 있음 |
+
+### 7.5 통신 / 외부 연동 계층
+
+| 클래스 | 파일 | 역할 |
+|---|---|---|
+| `CStream` | Stream.h/cpp | TR 스트림 처리 (상세 미조사, `Client.h`에 `m_stream`으로 참조됨) |
+| `CDde : CWnd` | Dde.h/cpp | DDE(Dynamic Data Exchange) 통신 — 엑셀 등 외부 프로그램과 실시간 데이터 연동. `CGuard::m_dde`로 세션당 1개 |
+| `COleDrop : COleDropTarget` | OleDrop.h/cpp | OLE 드래그앤드롭 수신 (MFC 표준 클래스 상속). `CWorks::m_drop`으로 작업영역마다 1개 |
+| `COleDropEx : IDropTarget` | OleDropEx.h/cpp | OLE 드래그앤드롭 수신의 **COM 저수준 직접 구현판**. `CMap<HWND, ..., CWorks*, ...>`로 여러 창의 드롭 대상을 한 인스턴스가 관리 — `COleDrop`과 두 가지 구현이 공존하는 이유는 미조사 |
+| `_Application`/`_Workbook`/`Workbooks`/`Range` | excel9.h/cpp | Excel COM 자동화용 **자동생성 래퍼**(ClassWizard 산출물). 커스텀 로직 없음, 엑셀 내보내기 기능(`CGuard::MakeXlsFile` 등)에서 사용 |
+
+### 7.6 부가 UI / 유틸리티 계층
+
+| 클래스 | 파일 | 역할 |
+|---|---|---|
+| `CObjects` | Objects.h/cpp | 이름→COM 객체 팩토리. `CreateObject(name, target)`로 외부 DLL을 동적 로드해서 `CCmdTarget` 생성 — 맵소스에서 커스텀 COM 컨트롤을 이름으로 참조할 때 쓰는 것으로 추정 |
+| `CHistory : CListBox` | History.h/cpp | 입력 필드의 코드 히스토리 드롭다운 UI(리스트박스). `CGuard::m_codex`(코드 히스토리 데이터)를 화면에 보여주는 뷰 역할 |
+| `CTips : CWnd` | Tips.h/cpp | 툴팁 표시. `CGuard::m_tips`로 세션당 1개, `RelayEvent`로 여러 `CClient`의 마우스 이벤트를 릴레이받아 툴팁 표시 여부 결정 |
+| `CPrinter` | Printer.h/cpp | 프린터 설정 저장/복원 (MFC 표준 유틸리티에 가까움, Wizard 고유 로직 적음) |
+| `CLog` | Log.h/cpp | 파일 기반 통신 로그 기록(`Trace(msg, len, dir)`) — 3절/4절에서 다룬 `OutputDebugString` 기반 디버그 로그와는 별개로, **송수신 패킷을 파일로 남기는** 운영 로그 메커니즘 |
+
+### 7.7 작은 헬퍼/데이터 구조체 (Misc.h)
+
+| 클래스 | 역할 |
+|---|---|
+| `CCaret` | 화면 내 커서 위치(폼 key + 인덱스) 표현. `CClient::m_current`/`m_default`/`m_cbox` 등에서 광범위하게 사용 |
+| `CComboN` | 콤보박스 항목 하나 (`m_entry`) |
+| `CCode` | 종목코드 입력 히스토리 목록 (`m_codes`, `CGuard::m_codex`의 값 타입) |
+| `CdataSet` | 실시간 시세 데이터셋 — 고정배열 `DWORD m_data[maxSYM]`에 필드별 값 저장, RTM 흐름(`DoRTM`)에서 핵심적으로 사용됨 |
+| `CpubControl` | DLL 핸들 + CCmdTarget 포인터 쌍 |
 
 ---
 
-## 8. 관련 문서
+## 8. 다음 분석 대상 (미착수)
+
+- CGuard 초기화/로그인 시퀀스 상세 (RunAxis mode별 분기, Xecure/Certify 흐름)
+- CClient 이벤트 라우팅 상세 (OnMouse/OnKey/OnTRAN → CScript 호출 지점) — `CKey`/`CMouse`가 1차 수신하는 것으로 보이나 `CClient`로 넘어가는 정확한 지점 미확인
+- `CDll`(작업영역의 DLL 기반 대안 경로)의 실제 사용처 — 어떤 화면/기능이 CClient 대신 CDll을 쓰는지
+- `COleDrop`과 `COleDropEx` 두 드래그앤드롭 구현이 공존하는 이유
+- RTM(실시간) 갱신 흐름은 이미 `@docs/KnowledgeBase.md` 11절, `@docs/RealtimeCodeIndex_Investigation.md`에 기록됨 (참고)
+
+---
+
+## 9. 관련 문서
 
 - `@docs/Architecture.md` - Python 엔진 전환 프로젝트 관점 3계층 개요
 - `@docs/python_engine_260608.md` - VBS→Python 전환 상세 기록 (초기 설계, 일부 드리프트 있음 → 5절 참고)
 - `@docs/KnowledgeBase.md` - 버그/설계 지식 베이스 (12절에 이 문서의 드리프트 발견 내용 반영)
+- `@docs/RealtimeCodeIndex_Investigation.md` - RTM 종목코드 역인덱스 조사, `CKey`/`fmEdit` 입력 경로 상세

@@ -13,6 +13,7 @@
 #include "History.h"
 
 #include "../h/axiserr.h"
+#include "../h/axlog.h"
 
 #ifdef _DEBUG
 #undef THIS_FILE
@@ -40,6 +41,9 @@ CKey::~CKey()
 
 void CKey::OnKey(WPARAM wParam, LPARAM lParam)
 {
+	axlog(LOG_EVENT, "CKey::OnKey wParam=%d(0x%x) client_key=%d isWait=%d",
+		(int)wParam, (int)wParam, m_client->m_key, m_guard->IsWait(m_client) ? 1 : 0);
+
 	switch (wParam)
 	{
 	case VK_SHIFT:
@@ -149,10 +153,12 @@ void CKey::OnKey(WPARAM wParam, LPARAM lParam)
 			{
 				if (form->m_form->attr & FA_SEND)
 				{
+					ULONGLONG t0 = GetTickCount64();
 					if ((form->m_form->attr2 & SA_SEND) == SA_THIS)
 						m_client->m_stream->InStream(screen);
 					else
 						m_client->m_stream->InStream();
+					axlog(LOG_EVENT, "CKey::OnKey VK_RETURN->InStream (FA_SEND) +%dms", (int)(GetTickCount64()-t0));
 					return;
 				}
 
