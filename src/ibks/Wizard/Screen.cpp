@@ -327,6 +327,10 @@ bool CScreen::Parse(bool resize, bool fix)
 				form->m_form->keys = screen->m_key;
 				screen->m_object   = ii;
 				screen->m_parent   = m_key;
+				axlog(LOG_INIT, "[SCREEN-TREE] parent=%.8s child=%.8s control=%s",
+					CString(m_mapH->mapN, L_MAPN).GetString(),
+					screen->m_mapH ? CString(screen->m_mapH->mapN, L_MAPN).GetString() : _T("(null)"),
+					form->GetSymbolName().GetString());
 				screen->Parse(resize, (form->m_form->attr2 & GO_FIX) ? true : false);
 			}
 			break;
@@ -1796,7 +1800,10 @@ bool CScreen::OnTRAN(bool byKey)
 	}
 
 	m_xscreen->m_return = TRUE;
-	if (m_client->m_vm->OnSend(this) && m_xscreen->m_return)
+	BOOL onSendResult = m_client->m_vm->OnSend(this);
+	axlog(LOG_DATA, "[OnTRAN-gate] maps=%s onSendResult=%d m_return=%d",
+		m_mapH ? CString(m_mapH->mapN, L_MAPN).GetString() : _T("(null)"), onSendResult, m_xscreen->m_return);
+	if (onSendResult && m_xscreen->m_return)
 	{
 		m_skip = false;
 		return true;

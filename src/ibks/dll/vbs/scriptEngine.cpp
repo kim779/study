@@ -358,11 +358,11 @@ bool CScriptEngine::getIDOfProcedure(CString procs, DISPID* pID)
 		return false;
 	}
 
-	BSTR	strProc = procs.AllocSysString();
+	BSTR		strProc = procs.AllocSysString();
 	HRESULT hr= m_dispatch->GetIDsOfNames(IID_NULL, &strProc, 1, LOCALE_SYSTEM_DEFAULT, pID);
 	::SysFreeString(strProc);
 
-	axlog(LOG_SCRIPT, "getIDOfProcedure(%s): hr=0x%08lx", procs.GetString(), hr);
+	axlog(LOG_SCRIPT, "!!getIDOfProcedure(%s): hr=0x%08lx", procs.GetString(), hr);
 
 	return (hr == S_OK) ? true : false;
 }

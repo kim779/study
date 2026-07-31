@@ -254,6 +254,7 @@ public:
 	void	xAlert(class CClient* client, class CScreen* screen);
 
 	BOOL	Xecure(int helper, char* pBytes, int& nBytes);
+	BOOL	IsNoEncMode();	// dev-only: true if NOENC.TXT exists under m_root - skips outgoing encryption so plaintext is visible in logs
 	CString	Secure(CString src, CString keys = _T(""), int mode = 0, bool enc = true);
 	CString	Secure2(CString src);
 	bool	GetCode(int kind, CString& code, int type, CPoint pt = CPoint(-1,-1), bool valid = false);

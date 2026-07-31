@@ -21,6 +21,7 @@
 #include "../h/axisanm.h"
 #include "../h/axiserr.h"
 #include "../h/axstring.h"
+#include "../h/axlog.h"
 #include "../dll/form/fmgrid.h"
 #include <future>
 #include <thread>
@@ -219,15 +220,13 @@ int CGuard::Initial(CWnd* control)
 		m_xecure = new CWnd();
 		if (!m_xecure->CreateControl(_T("AxisXecure.XecureCtrl.IBK2019"), NULL, 0, CRect(0, 0, 0, 0), control, 0))
 		{
-			m_slog.Format("[logintrace][%s]<%d> m_xecure CreateControl fail err=[%d]", __FUNCTION__, __LINE__, GetLastError());
-			OutputDebugString(m_slog);
+			axlog(LOG_INIT, "CGuard::Initial m_xecure CreateControl(AxisXecure.XecureCtrl.IBK2019) FAILED err=%d", GetLastError());
 			delete m_xecure;
 			m_xecure = NULL;
 		}
 		else
 		{
-			m_slog.Format("[logintrace][%s]<%d> m_xecure CreateControl success", __FUNCTION__, __LINE__);
-			OutputDebugString(m_slog);
+			axlog(LOG_INIT, "CGuard::Initial m_xecure CreateControl(AxisXecure.XecureCtrl.IBK2019) OK");
 		}
 #ifndef _DEBUG
 	});
@@ -2079,11 +2078,41 @@ LOG_OUTP(3, "axwizard", __FUNCTION__, m_slog);
 BOOL CGuard::Xecure(int helper, char* pBytes, int& nBytes)
 {
 	if (m_xecure == NULL)
+	{
+		axlog(LOG_DATA, "[Xecure] helper=%s SKIPPED (m_xecure is NULL)", helper == DI_ENC ? "ENC" : "DEC");
 		return FALSE;
+	}
 	BOOL	retv;
+	int		nBytesIn = nBytes;
 	m_xecure->InvokeHelper(helper, DISPATCH_METHOD, VT_BOOL, (void*)&retv,
 						(BYTE *) VTS_I4 VTS_I4, pBytes, &nBytes);
+	axlog(LOG_DATA, "[Xecure] helper=%s nBytesIn=%d nBytesOut=%d retv=%d",
+		helper == DI_ENC ? "ENC" : "DEC", nBytesIn, nBytes, retv);
 	return retv;
+}
+
+// Dev-only override: if NOENC.TXT exists next to the running host exe (not
+// m_root - that's the registry ROOTDIR value, which is not necessarily the
+// exe folder), every outgoing-encryption gate below skips Xecure() entirely
+// (and leaves stat's statENC bit off) so the plaintext TR payload shows up
+// as-is in the axlog pipeline instead of ciphertext. Checked fresh each call
+// (not cached) so it can be toggled mid-session just by dropping/removing
+// the file - no rebuild or app restart needed. Only affects what THIS client
+// sends; whether the server also stops encrypting its response is a separate,
+// unverified question (see docs/MigrationSpec_SocketToDrawing.md section 8.9).
+BOOL CGuard::IsNoEncMode()
+{
+	char exePath[MAX_PATH];
+	::GetModuleFileName(NULL, exePath, MAX_PATH);
+	CString exeDir = exePath;
+	int pos = exeDir.ReverseFind('\\');
+	if (pos != -1)
+		exeDir = exeDir.Left(pos);
+
+	CString checkPath = exeDir + "\\NOENC.TXT";
+	BOOL noEnc = (::GetFileAttributes(checkPath) != INVALID_FILE_ATTRIBUTES);
+	axlog(LOG_DATA, "[Xecure] IsNoEncMode check path=%s result=%d", checkPath.GetString(), noEnc);
+	return noEnc;
 }
 
 CString	CGuard::Secure(CString src, CString keys, int mode, bool enc)
@@ -2853,8 +2882,7 @@ bool CGuard::RouteTR(CClient* client)
 
 BOOL CGuard::Write(char* pBytes, int nBytes, int key)
 {
-	m_slog.Format("\r\n[wizard][guard]<%d>[%s] len =[%d] pBytes=[%.50s]",__LINE__, __FUNCTION__, nBytes, pBytes);
-	OutputDebugString(m_slog);
+	axlog(LOG_DATA, "CGuard::Write(1) len=%d key=%d", nBytes, key);
 // updateXXX_2022XX
 	if (nBytes > maxIOs)
 	{
@@ -2897,7 +2925,7 @@ BOOL CGuard::Write(char* pBytes, int nBytes, int key)
 		axisH->auxs |= auxsCA;
 	}
 
-	if (!(m_term & flagENX) && userth->stat & US_ENC)
+	if (!IsNoEncMode() && !(m_term & flagENX) && userth->stat & US_ENC)
 	{
 		if (GetFdsValue(CString(axisH->trxC, L_TRXC), &sendB[L_axisH], nBytes))
 			axisH->auxs |= auxsFDS;
@@ -2965,51 +2993,12 @@ BOOL CGuard::Write(int msgK, CString trxC, char* datB, int datL, int key, bool t
 	return FALSE;
 }
 
-/* 20171101 for signUSERc
-BOOL CGuard::Login(char* datB, int datL, bool xecure)
-{
-	CString	text;
-	char*	sendB;
-	struct	_axisH*	axisH;
-
-	sendB = new char[L_axisH+datL+2048];	// 256 -> 2048 : for FDS
-	axisH = (struct _axisH *) sendB;
-	ZeroMemory(axisH, L_axisH);
-
-	text = _T("AXLOGON");
-	axisH->msgK = msgK_SIGN;
-	CopyMemory(axisH->trxC, text, text.GetLength());
-	CopyMemory(&sendB[L_axisH], datB, datL);
-	if (GetFdsValue(_T("AXLOGON"), &sendB[L_axisH], datL))
-		axisH->auxs |= auxsFDS;
-	if (xecure)
-	{
-		if (!Xecure(DI_ENC, (char *)&sendB[L_axisH], datL))
-		{
-			delete [] sendB;
-			return FALSE;
-		}
-		axisH->stat |= statENC;
-	}
-
-	text.Format("%05d", datL);
-	CopyMemory(axisH->datL, (char *)text.operator LPCTSTR(), sizeof(axisH->datL));
-	if (Write(sendB, L_axisH+datL, false))
-	{
-		delete [] sendB;
-		return TRUE;
-	}
-
-	delete [] sendB;
-	return FALSE;
-}
-*/
-
 BOOL CGuard::Login(int mode, char* datB, int datL, bool xecure)
 {
 	CString	trN, text;
 	char*	sendB;
 	struct	_axisH*	axisH;
+	axlog(LOG_INIT, "CGuard::Login mode=%d datL=%d xecure=%d", mode, datL, xecure ? 1 : 0);
 
 	sendB = new char[L_axisH+datL+2048];	// 256 -> 2048 : for FDS
 	axisH = (struct _axisH *) sendB;
@@ -3030,7 +3019,7 @@ BOOL CGuard::Login(int mode, char* datB, int datL, bool xecure)
 	if (GetFdsValue(trN, &sendB[L_axisH], datL))
 		axisH->auxs |= auxsFDS;
 
-	if (xecure)
+	if (xecure && !IsNoEncMode())
 	{
 		if (!Xecure(DI_ENC, (char *)&sendB[L_axisH], datL))
 		{
@@ -3082,7 +3071,7 @@ BOOL CGuard::Service(CScreen* screen, CString trxC, char* datB, int datL, int mo
 		axisH->auxs |= auxsCA;
 	}
 
-	if (!(m_term & flagENX) && mode & US_ENC)
+	if (!IsNoEncMode() && !(m_term & flagENX) && mode & US_ENC)
 	{
 		if (GetFdsValue(CString(axisH->trxC, L_TRXC), &sendB[L_axisH], datL))
 			axisH->auxs |= auxsFDS;
@@ -3163,6 +3152,10 @@ long CGuard::UploadFile(CScreen* screen, CString trxC, char* datB, int datL, int
 	CFile	file;
 	struct	_axisH*	axisH;
 
+	axlog(LOG_DATA, "[0-UploadFile-send] trxC=%s fileN=%s mode=%d offset=%d leadData=[%.60s]",
+		trxC.GetString(), fileN.GetString(), mode, offset,
+		CString(datB, min(datL, 60)).GetString());
+
 	sendB = new char[maxIOs];
 	axisH = (struct _axisH *) sendB;
 	ZeroMemory(axisH, L_axisH);
@@ -3222,6 +3215,11 @@ long CGuard::UploadFile(CScreen* screen, CString trxC, char* datB, int datL, int
 	CopyMemory(fileH->datL, (char *)text.operator LPCTSTR(), sizeof(fileH->datL));
 
 	datL += rc;
+
+	axlog(LOG_DATA, "[0-UploadFile-chunk] trxC=%s fileN=%s chunkBytes=%d offset=%d totalSize=%d fileF=%d willEncrypt=%d",
+		trxC.GetString(), fileN.GetString(), rc, offset, size, fileH->fileF,
+		(!(m_term & flagENX) && mode & US_ENC) ? 1 : 0);
+
 	if (!(m_term & flagCAX) && mode & US_CA)
 	{
 		if (!Certify(&sendB[L_axisH], datL))
@@ -3232,7 +3230,7 @@ long CGuard::UploadFile(CScreen* screen, CString trxC, char* datB, int datL, int
 		axisH->auxs |= auxsCA;
 	}
 
-	if (!(m_term & flagENX) && mode & US_ENC)
+	if (!IsNoEncMode() && !(m_term & flagENX) && mode & US_ENC)
 	{
 		if (GetFdsValue(CString(axisH->trxC, L_TRXC), &sendB[L_axisH], datL))
 			axisH->auxs |= auxsFDS;
@@ -3304,7 +3302,7 @@ BOOL CGuard::DownloadFile(CScreen* screen, CString trxC, char* datB, int datL, i
 		axisH->auxs |= auxsCA;
 	}
 
-	if (!(m_term & flagENX) && mode & US_ENC)
+	if (!IsNoEncMode() && !(m_term & flagENX) && mode & US_ENC)
 	{
 		if (GetFdsValue(CString(axisH->trxC, L_TRXC), &sendB[L_axisH], datL))
 			axisH->auxs |= auxsFDS;
@@ -3421,7 +3419,7 @@ BOOL CGuard::Invoke(char* pBytes, int nBytes, int key)
 		axisH->auxs |= auxsCA;
 	}
 
-	if (!(m_term & flagENX) && userth->stat & US_ENC)
+	if (!IsNoEncMode() && !(m_term & flagENX) && userth->stat & US_ENC)
 	{
 		if (GetFdsValue(CString(axisH->trxC, L_TRXC), &sendB[L_axisH], nBytes))
 			axisH->auxs |= auxsFDS;
@@ -3455,11 +3453,50 @@ BOOL CGuard::Invoke(char* pBytes, int nBytes, int key)
 
 BOOL CGuard::Write(char* pBytes, int nBytes, bool trace)
 {
-// updateXXX_2022XX	
-OutputDebugString("\r\n--------------");
-m_slog.Format("\r\n[wizard][guard]<%d>[%s] len =[%d] pBytes=[%x][%x]", __LINE__, __FUNCTION__, nBytes, *pBytes, *(pBytes  + 3));
-OutputDebugString(m_slog);
-OutputDebugString("\r\n============");
+// updateXXX_2022XX
+	// A single Write() call can carry several _axisH-framed sub-messages back to
+	// back (e.g. Screen.Send(targetALL) batches every pending screen into one
+	// TCP write via MakeStream(bool)) - walk each one separately so a multi-unit
+	// send doesn't look like one screen's data spilling into another's header.
+	{
+		int offset = 0;
+		int msgIdx = 0;
+		while (offset + L_axisH <= nBytes)
+		{
+			struct _axisH* dbgH = (struct _axisH *)(pBytes + offset);
+			int subDatL = atoi(CString(dbgH->datL, sizeof(dbgH->datL)));
+			if (subDatL < 0) break;
+			int availL = max(0, min(subDatL, nBytes - offset - L_axisH));
+			int nChunks = max(1, (availL + 99) / 100);
+			for (int chunk = 0; chunk < nChunks; chunk++)
+			{
+				int chunkOff = chunk * 100;
+				int chunkL = max(0, min(100, availL - chunkOff));
+				char* chunkB = pBytes + offset + L_axisH + chunkOff;
+
+				// Build a copy safe for a single-line debug log: "%.*s" stops
+				// early at an embedded NUL regardless of precision, and CR/LF
+				// bytes (real row separators in tab-delimited grid data, see
+				// GetDataNRM's "iosB[iosL++] = '\n'/'\r'") make DebugView split
+				// one log line into two, hiding whatever follows. Replace NUL/
+				// CR/LF with '.' - other bytes, including CP949 Korean text,
+				// are passed through unchanged.
+				CString dispBuf;
+				for (int i = 0; i < chunkL; i++)
+				{
+					char c = chunkB[i];
+					dispBuf += (c == '\0' || c == '\r' || c == '\n') ? '.' : c;
+				}
+
+				axlog(LOG_DATA, "[0-Write-send] #%d winK=%d unit=%d msgK=%d trxC=%.8s datL=%d chunk=%d/%d preview=[%s]",
+					msgIdx, dbgH->winK, dbgH->unit, dbgH->msgK, dbgH->trxC, subDatL, chunk+1, nChunks,
+					dispBuf.GetString());
+			}
+			offset += L_axisH + subDatL;
+			msgIdx++;
+		}
+	}
+	axlog(LOG_DATA, "CGuard::Write(2) len=%d hdr0=0x%02x hdr3=0x%02x trace=%d", nBytes, (unsigned char)*pBytes, (unsigned char)*(pBytes + 3), trace);
 	if (nBytes > L_axisH + maxIOs)
 	{
 		SetGuide(AE_MAXIO, ((struct _axisH *)pBytes)->winK);
@@ -4321,6 +4358,8 @@ BOOL CGuard::SetFont(int point, bool resize, int key)
 
 BOOL CGuard::Certify(BOOL force, BOOL certify, BOOL xcertify, BOOL xserver)
 {
+	axlog(LOG_INIT, "CGuard::Certify force=%d certify=%d xcertify=%d xserver=%d hasCertifyCtrl=%d",
+		force, certify, xcertify, xserver, m_certify ? 1 : 0);
 	if (certify)
 	{
 		BOOL	retv;
@@ -4333,6 +4372,7 @@ BOOL CGuard::Certify(BOOL force, BOOL certify, BOOL xcertify, BOOL xserver)
 			{
 				delete m_certify;
 				m_certify = NULL;
+				axlog(LOG_INIT, "CGuard::Certify CreateControl(AxisCertify.CertifyCtrl.IBK2019) FAILED");
 				if (!force)
 				{
 					AfxMessageBox("Xecure create fail");
@@ -4370,6 +4410,7 @@ BOOL CGuard::Certify(BOOL force, BOOL certify, BOOL xcertify, BOOL xserver)
 
 int CGuard::OnCertify(char* pBytes, int nBytes)
 {
+	axlog(LOG_INIT, "CGuard::OnCertify nBytes=%d hasCertifyCtrl=%d", nBytes, m_certify ? 1 : 0);
 	if (!m_certify)
 		return -1;
 
@@ -4411,6 +4452,7 @@ BOOL CGuard::Certify(char* pBytes, int& nBytes, CString maps)
 
 void CGuard::CertifyId(char* pBytes, bool retry)
 {
+	axlog(LOG_INIT, "CGuard::CertifyId retry=%d", retry ? 1 : 0);
 	Certify(TRUE, TRUE);
 	if (m_certify)
 		m_certify->InvokeHelper(DI_CAID, DISPATCH_METHOD, VT_EMPTY, NULL, (BYTE *)(VTS_I4), pBytes);
@@ -5626,6 +5668,11 @@ void CGuard::SetClipboard(CString text)
 			SetClipboardData(CF_TEXT, hg);
 		}
 		CloseClipboard();
+		axlog(LOG_EVENT, "CGuard::SetClipboard OpenClipboard=OK textLen=%d", size);
+	}
+	else
+	{
+		axlog(LOG_EVENT, "CGuard::SetClipboard OpenClipboard FAILED, GetLastError=%lu", GetLastError());
 	}
 }
 
@@ -5642,8 +5689,10 @@ bool CGuard::GetClipboard(CString& text)
 			GlobalUnlock(hg);
 		}
 		CloseClipboard();
+		axlog(LOG_EVENT, "CGuard::GetClipboard OpenClipboard=OK hasData=%d textLen=%d", hg ? 1 : 0, text.GetLength());
 		return hg ? true : false;
 	}
+	axlog(LOG_EVENT, "CGuard::GetClipboard OpenClipboard FAILED, GetLastError=%lu", GetLastError());
 	return false;
 }
 

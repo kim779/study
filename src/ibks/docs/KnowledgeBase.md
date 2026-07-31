@@ -693,6 +693,8 @@ case FM_OUT:
 
 **주의(미검증 리스크):** 기존 맵소스 중 특정 화면이 이 동작(Input 필드가 실시간으로 자동 프리필되는 것)에 의도적으로 의존하고 있었을 가능성은 전수조사되지 않음. 이상 동작 리포트 발생 시 이 변경을 1차 의심 지점으로 확인할 것.
 
+**2026-07-27 갱신 — 수정 잠정 보류(주석 처리로 원복):** 위 미검증 리스크가 실제로 마음에 걸려서, 이 `iok == EIO_INPUT` continue 처리를 코드에서 다시 주석 처리해 원래 동작(입력전용 필드도 실시간 갱신 대상)으로 되돌려놓은 상태다. 이게 "버그"인지 "특정 화면이 의도적으로 기대는 동작"인지 아직 확신이 없어서 — 확실한 근거 없이 성급하게 되돌리지 않겠다는 판단. 대신 `Wizard/Screen.cpp`의 `UpdateRTM`(FM_EDIT/FM_OUT 분기)에 진단 로그(`axlog(LOG_RTM, "[UpdateRTM-write] name=... iok=... isInput=...")`, `docs/DebugLogGuide.md` 참고)를 추가해서, 장중에 실제로 `isInput=1`인 필드가 얼마나/어떤 화면에서 실시간 갱신되는지 먼저 관찰하기로 함. **현재 코드 상태는 수정 적용 전(버그 재현 가능)이다** — 이 절 앞부분의 "수정 내용"/"검증" 문구는 2026-07-16 당시 상황 기록이며, 현재 코드와 다르다는 점에 주의. 로그로 실사용 화면 중 영향받는 사례가 있는지 확인한 뒤 최종 방향(재적용 여부, 혹은 화면별 예외 처리)을 정할 예정.
+
 ### 관련 파일
 
 | 파일 | 역할 |
@@ -747,7 +749,139 @@ bool usePython = (scpKind == -1) ? isPythonScript(scripts) : (scpKind != 0);
 
 ---
 
-## 13. 추가 자료
+## 13. Ctrl+C/V 클립보드 단축키가 외부에서 차단됨 — Ctrl+1/2/3 폴백으로 우회 (2026-07-29)
+
+### 증상
+
+HTS 화면의 입력필드(`CfmEdit`)에서 **Ctrl+C(복사)/Ctrl+V(붙여넣기)가 전혀 동작하지 않음**. 사용자가 직접 발견해서 보고.
+
+### 조사 경과 (axlog로 진단, `docs/DebugLogGuide.md` 4절 클립보드 로그 활용)
+
+1. **일반 문자 키(예: 그냥 C, 또는 Shift+C)는 완벽히 정상 동작** — `CKey::OnKey` → `CKey::OnChar` 파이프라인 자체는 문제 없음이 로그로 확인됨.
+2. **Ctrl 키를 누르고 있는 동안은 `CKey::OnKey`에 wParam=17(VK_CONTROL) 로그가 계속 정상적으로 찍힘.**
+3. **그 상태에서 C(또는 V)를 누르는 순간, 그 키의 WM_KEYDOWN 자체가 `CKey::OnKey`에 전혀 도달하지 않음.** (로그가 안 찍히는 게 아니라, 함수 진입 자체가 없음 — Wizard 코드가 받아서 무시하는 게 아니라 메시지 자체가 안 옴)
+4. `AXIS/axis.rc`의 `IDR_MAINFRAME ACCELERATORS` 테이블 확인 → Ctrl+C/V 항목 없음.
+5. `AXIS/MainFrm.cpp`의 `SetWindowsHookEx(WH_GETMESSAGE, KeyboardProc, ...)` 훅과 `RegisterHotKey` 사용처 확인 → C/V 관련 처리 없음.
+6. AXIS에 내장된 안랩 보안SDK(ASTx/STSDKEX, `MainFrm.cpp`의 `initASTx()`)를 사용자가 직접 `return false`로 강제 비활성화 후 재현 → **증상 동일** (이미 코드상 `pcAOS = false; //test astx`로 호출 자체가 스킵되고 있었음에도 동일).
+7. 작업관리자에서 `GnAhnLab.exe` 프로세스 종료 후 재현 → **증상 동일** (단, AXIS가 이미 떠있는 상태에서 죽인 거라 완전히 확정적인 테스트는 아님 — 후킹이 프로세스 시작 시점에 한 번 주입되는 방식이면 이미 늦음).
+8. `tasklist /m`으로 AXIS.exe(32비트)의 로드된 DLL 목록 조회 시도 → `ntdll.dll`/`wow64*.dll` 외에는 아무것도 안 보임(정상 프로세스라면 다 보여야 함) — anti-tampering으로 프로세스가 보호되고 있는 것으로 추정.
+9. `AppInit_DLLs` 레지스트리(`HKLM\SOFTWARE\...\Windows`, 32/64비트 뷰 둘 다) 확인 → 비어있고 `LoadAppInit_DLLs=0` — 이 경로의 전역 DLL 주입은 아님.
+
+### 결론
+
+**Wizard/AXIS 소스 문제가 아님.** OS 메시지 큐 단계에서 Ctrl+C/V 조합만 선택적으로 삼켜지는 것으로 보이며, 가장 유력한 원인은 시스템 전역 저수준 키보드 후크(WH_KEYBOARD_LL 방식) 기반의 보안/DLP 에이전트 — 안랩(`GnAhnLab.exe`/`GnAgent.exe`/`GnPlugin.exe`/`GnStart.exe`) 또는 SYSTEM 권한으로 떠있는 `I3GMainSvc.exe` 계열로 추정되나, 정확한 원인 프로세스는 확정하지 못함 (완전 확정하려면 AXIS를 완전히 종료 → 후보 프로세스/서비스 전부 정지 → AXIS 재시작 → 재현 여부 확인하는 절차가 필요하나, 이번엔 여기까지 진행하지 않고 실용적 우회로 마무리함).
+
+### 적용한 우회책 — `Wizard/Key.cpp::CKey::OnKey`
+
+기존 `Copy$Paste(WPARAM, CScreen*, CfmBase*)` 함수(코드 3=복사/24=잘라내기/22=붙여넣기)는 전혀 문제가 없으므로, 이걸 그대로 호출하는 대체 단축키를 추가:
+
+| 단축키 | 동작 |
+|---|---|
+| `Ctrl+1` | 복사 |
+| `Ctrl+2` | 붙여넣기 |
+| `Ctrl+3` | 잘라내기 |
+
+처음엔 `Ctrl+Insert`/`Shift+Insert`/`Shift+Delete`(Windows 레거시 클립보드 단축키, Ctrl+C/V/X와 겹치지 않는 VK 코드라 후킹을 피할 가능성이 높다고 판단해서 선택)로 구현했으나, 사용자의 키보드가 미니 키보드라 Insert 키가 없어서 **Ctrl+1/2/3으로 재변경**. `AXIS/MainFrm.cpp::PreTranslateMessage`의 기존 Ctrl+조합(`Ctrl+Shift+F`, `Ctrl+Shift+X` 등) 확인 결과 숫자키 1/2/3과 충돌 없음.
+
+**교훈:** "우리 코드가 특정 키 이벤트를 처리 안 한다"와 "그 키 이벤트 자체가 우리 코드까지 도달하지 않는다"는 증상은 똑같아 보이지만 원인이 완전히 다르다. 후자는 axlog처럼 진입점(`OnKey`/`OnChar`) 맨 앞에 로그를 심어서 "함수가 호출되는지 자체"를 확인해야 구분 가능하다 — 이번 건은 `CKey::OnKey` 진입 로그가 Ctrl+C/V 조합에서만 아예 안 찍히는 것으로 외부 차단임을 확정했다.
+
+---
+
+## 14. COnTimer는 죽은 코드 — 실제 타이머는 전부 평범한 WM_TIMER (2026-07-29)
+
+### 배경
+
+`OnTimer.cpp`에 축된 axlog 커버리지를 넓히던 중(`docs/DebugLogGuide.md` 10절), 사용자가 `CClient::SetTimer(UINT id, UINT elapse)`(Client.cpp:4192)를 직접 보고 `COnTimer` 클래스 관련 코드가 통째로 주석 처리돼 있다는 걸 발견함.
+
+### 확인된 사실
+
+`COnTimer` 관련 코드가 **세 군데 모두** 주석 처리돼 있음:
+- `Client.h:99` — `m_OnTimer` 멤버 선언 자체가 주석
+- `Client.cpp` 생성자 — `m_OnTimer = NULL;` 주석
+- `Client.cpp` 소멸자 — 정리 로직(`m_OnTimer->PostThreadMessage(WM_QUIT, ...)` 등) 통째로 주석
+- `Client.cpp::SetTimer` — `AfxBeginThread(RUNTIME_CLASS(COnTimer), ...)` 생성부 주석, 대신 `m_view->KillTimer(id); m_view->SetTimer(id, elapse, NULL);`만 실행
+
+`Wizard.vcxproj`엔 `OnTimer.cpp`/`.h`가 빌드 대상으로 포함돼 있어 **컴파일은 되지만, 실제로 인스턴스화하는 곳이 코드 전체에 단 한 군데도 없다.** 실제 타이머 흐름은 전부 평범한 MFC `SetTimer` → `WM_TIMER` → `Event.cpp`의 `CallProc`에서 `wParam`(`TM_RTM`/`TM_WAIT`/`TM_REPBN`/`TM_REPTR`/`TM_VB`/`TM_VBx`)으로 분기하는 방식.
+
+git 로그로는 언제/왜 되돌렸는지 확인 불가 — 이 저장소는 `ffd9e2e4 wizard 260217`(2026-02-17) 커밋 하나로 전체가 한 번에 임포트되어, 그 이전 히스토리 자체가 없음.
+
+### 설계 의도로 추정되는 것
+
+`COnTimer`는 생산자-소비자 큐(`m_que`+`m_keys`(중복제거)+`m_section`(임계구역)+`m_event`) 위에서 별도 워커스레드(`Run()`, 표준 메시지펌프 안 씀 — 완전 커스텀 루프)가 `DoParse()`로 메인스레드 창에 **동기 `SendMessage(WM_USER+11, key)`**를 보내는 구조. `WM_TIMER`는 Windows 메시지 중 최하위 우선순위라 메시지큐가 비어있을 때만 합성되는데, 이 프로그램처럼 RTM으로 메시지큐가 계속 바쁜 트레이딩 화면에서는 `WM_TIMER`가 계속 밀릴 수 있음 — `COnTimer`는 이걸 우회해서 `SendMessage`로 즉시 전달하려 한 시도로 추정됨.
+
+### 되돌려진 이유로 추정되는 것 (증거 기반 추정, 미확정)
+
+소멸자의 주석 처리된 코드:
+```cpp
+m_OnTimer->PostThreadMessage(WM_QUIT, NULL, NULL);
+// HANDLE hThread = m_OnTimer->m_hThread;
+// if (WaitForSingleObject(hThread, 500) == WAIT_TIMEOUT)
+//     TerminateThread(hThread, 0);
+```
+`Run()`은 메시지펌프를 전혀 안 도는 커스텀 루프인데 `PostThreadMessage(WM_QUIT)`로 종료시키려 했다 — **이 스레드는 애초에 WM_QUIT를 못 받는 구조**라 500ms 타임아웃 후 최후수단으로 위험한 `TerminateThread`까지 준비돼 있었음. 게다가 `DoParse`의 `SendMessage`가 동기 블로킹인데, 만약 UI 스레드가 종료 중 이 워커스레드의 `WaitForSingleObject`를 기다리는 동안(=메시지펌프 정지 상태) 워커스레드가 그 `SendMessage`의 응답을 기다리고 있었다면 교착상태(deadlock) 조건이 성립함. 종료 시점에 멈추거나 크래시나는 문제를 겪고 근본 수정 대신 통째로 되돌린 것으로 보임(생성자/소멸자/생성지점 세 군데를 일관되게 지운 정황).
+
+### 교훈
+
+**"클래스가 빌드에 포함되고 내부 로직이 그럴듯해 보인다"가 "실제로 쓰이고 있다"를 보장하지 않는다.** `axlog`를 추가하기 전에 실제 호출 경로(인스턴스화 지점)를 먼저 확인했어야 함 — 이번엔 로그를 다 넣고 나서야 죽은 코드라는 걸 알게 됨(`DebugLogGuide.md` 10절에 이 사실을 명시해둠). 그리고 나중에 플랫폼 마이그레이션 시 "스레드 간 동기 SendMessage + 부정확한 종료 핸드셰이크" 패턴은 조용히 죽지 않고 데드락/크래시로 이어지기 쉬우니 재도입 시 주의할 지점으로 기록.
+
+### 관련 파일
+
+| 파일 | 역할 |
+|---|---|
+| `Wizard/OnTimer.h/cpp` | `COnTimer` 정의 — 빌드는 되나 미사용 |
+| `Wizard/Client.h:99`, `Client.cpp`(생성자/소멸자/`SetTimer`) | `m_OnTimer` 관련 코드가 전부 주석 처리된 실제 위치 |
+| `Wizard/Event.cpp` | 실제 타이머 처리 경로 — `CallProc`의 `WM_TIMER` 분기 |
+| `@docs/DebugLogGuide.md` 10절 | `COnTimer`에 추가한 axlog 태그 카탈로그(현재 미발화 상태 명시) |
+
+---
+
+## 15. Screen.Send() 중복/연쇄 억제 메커니즘 (2026-07-29, 실측 트레이스 기반)
+
+### 배경
+
+`IB1208` 화면을 열었을 때의 axlog 실측 트레이스(`docs/DebugLogGuide.md` 4/6절 태그 활용)에서, 서브맵(`IB120810`)의 `1301` 필드 `OnChange`(`AX_1301_OnChange_AX_`)가 연속 2번 호출됐는데도 실제 소켓 송신(`[0-MakeStream-send]`/`CGuard::Write`)은 **1번만** 일어난 것을 발견함. "OnChange가 여러 번 타도 그 안의 `Screen.Send(0)`이 매번 다 나가지는 않는 것 같다"는 관찰에서 출발한 조사.
+
+### 확인된 사실 — Send/OnChange 무한연쇄를 막는 5중 안전장치
+
+1. **`CfmBase::IsChanged()` — read-and-clear dirty bit** (`CScreen::OnChange`, `Screen.cpp:1807`): `if (form->IsChanged()) { ...스크립트 호출... }` 구조. `IsChanged()`를 호출하는 순간 내부 변경플래그가 리셋됨 — 즉 **필드값이 실제로 다시 바뀌지 않는 한, 같은 필드에 대해 `OnChange()`가 또 호출돼도 스크립트가 다시 실행되지 않는다.**
+2. **`CScreen::OnTRAN()` — Send 직전 전체 필드 재검증 패스** (`Screen.cpp:1748`): `Screen.Send()`가 실제로 `CStream::InStream()`을 타면, `MakeStream()` 호출 전에 **화면의 모든 입력필드를 순회하며 `OnChange(idx, byKey)`를 한 번씩 다시 호출**한다(1791줄, `if (!OnChange(ii, byKey)) return false;`). "Send 누르기 직전에 아직 반영 안 된 변경사항을 마저 커밋"하는 의도로 보이며, 위 1번의 dirty-bit 덕분에 이미 처리된 필드는 여기서 다시 스크립트를 타지 않는다.
+3. **`CStream::m_lock` — 비재진입 락** (`Stream.cpp:58`, `InStream(CScreen*, bool, CString)`): `if (m_lock || !screen->OnTRAN(byKey)) return false;` — `MakeStream()`~소켓 `Write()` 구간 동안 `m_lock=true`로 걸어두므로, 그 안에서 스크립트가 재귀적으로 또 `Screen.Send()`를 불러도 즉시 `false`로 튕겨나간다. `CStream`은 `CClient`당 1개(`m_stream`)라 같은 클라이언트의 어느 화면에서 걸어도 전부 공유되는 락이다.
+4. **`CxScreen::_Send()` 자체 가드** (`xscreen.cpp:371`): `if (m_screen->m_client->m_vm->m_script) return; // ignore dup` — `CScript::m_script`(현재 실행 중인 스크립트 콜백이 `byKey`로 트리거된 것인지 나타내는 플래그, `OnChange`/`OnClick`에서 `m_script = byKey`로 세팅됨)가 설정된 상태에서 또 `_Send`가 불리면 무시.
+5. **`screen->m_state & waitSN` — 응답 대기 중 재송신 차단** (`Stream.cpp:1361`, `CStream::MakeStream` 맨 첫 줄): `if (screen->m_state & waitSN) return;`. `InStream()`이 송신에 성공하면 그 직후 `CClient::WaitState(screen, true)`가 `screen->m_state |= waitSN`을 세팅하고(`Client.cpp:1931`), 그 TR의 응답(`OutStream`)이 도착해야 `Stream.cpp:185` 등에서 `waitSN`이 다시 꺼진다. 이 사이에 `Screen.Send()`가 또 호출되면 `OnTRAN()` 검증까지는 정상 통과해도(3번 락과 달리 이건 `OnTRAN` **밖에서** 체크됨) `MakeStream()` 맨 앞에서 아무 로그도 없이(패킷 조립·`OnSend` 관련 코드에 도달하기 전) 조용히 리턴된다.
+
+### 실측으로 확정됨 (2026-07-29, `[OnTRAN-gate]`/`[MakeStream-waitSN-drop]` 로그 추가 후 재현)
+
+위 5개 중 실제 트레이스(서브맵 `IB120810`의 `1301` 필드가 초기화 중 연속 2번 `OnChange`된 케이스)에서 두 번째 시도를 막은 것은 **5번(`waitSN`)이었다** — `Screen.cpp:1802`에 추가한 `[OnTRAN-gate]` 로그가 두 번째 호출에서도 `onSendResult=1 m_return=1`(즉 `OnTRAN()` 자체는 정상적으로 `true`를 반환)로 찍혔는데도 그 뒤 `[0-MakeStream-send]` 배너가 안 나온 것으로 확정. 1~4번(dirty-bit/필드재검증/`m_lock`/`m_script` 가드)은 전부 `OnTRAN()` **내부**에서 걸리는 것들이라 `OnTRAN()`이 `true`를 반환한 이 케이스에서는 관여하지 않았다는 뜻. 실제 흐름:
+
+```
+OnChange(1301) #1 → Screen.Send(0) → InStream() → OnTRAN()=true → MakeStream() 실제 전송 → WaitState(screen,true) → screen->m_state |= waitSN
+(그 사이 원인 미상의 두 번째 WriteData로 1301이 다시 dirty)
+OnChange(1301) #2 → Screen.Send(0) → InStream() → OnTRAN()=true (1~4번 가드 전부 통과, IsChanged가 이 시점엔 다시 true였던 것으로 보임)
+                  → MakeStream() 진입하자마자 `screen->m_state & waitSN`이 아직 true(첫 TR 응답이 아직 안 옴) → 조용히 return
+```
+
+**교훈:** `m_lock`(3번)은 "지금 이 순간 소켓에 쓰는 중"만 막는 아주 짧은 재진입 락이라 두 호출처럼 간격이 있는 케이스는 못 막는다. 실질적으로 "같은 화면이 이전 TR 응답을 아직 못 받았으면 새 Send를 버린다"는 더 넓은 범위의 안전장치는 `waitSN`이 담당한다. 원인이 된 "왜 1301이 두 번 dirty가 됐는지"(어느 코드가 두 번째 `WriteData`를 했는지)는 아직 미조사 — 서브맵 attach 초기화 경로(`CScreen::Parse`의 `FA_FLASH` 등록 블록 등) 쪽을 다음에 확인해볼 만하다.
+
+### 부수 발견 — OnStart 실행 전에 이미 Send가 나갈 수 있음
+
+`CClient::Attach`의 타이밍 로그 순서(`screen->Parse` 완료 → 이번 자동 OnChange/Send 연쇄 → `SetFont` → `OnStart(script)`)를 보면, **`Parse()` 단계에서 필드에 기본값이 채워지며 발생하는 `OnChange`는 화면의 `AX_SUB_OnStart_AX_`가 실행되기도 전에 이미 스크립트를 트리거하고 서버로 조회를 보낼 수 있다.** 스크립트 작성자가 "OnStart에서 초기화 로직을 다 마친 뒤 조회한다"고 가정하고 코드를 짜면 실제 실행 순서와 어긋날 수 있으므로, VBS/Python 변환 작업이나 신규 스크립트 작성 가이드에 반영할 가치가 있음.
+
+### 관련 파일
+
+| 파일 | 역할 |
+|---|---|
+| `Wizard/Screen.cpp:1748` | `CScreen::OnTRAN` — Send 직전 전체 필드 재검증 루프 |
+| `Wizard/Screen.cpp:1807` | `CScreen::OnChange` — `IsChanged()` dirty-bit 체크 지점 |
+| `Wizard/Stream.cpp:58` | `CStream::InStream(CScreen*, ...)` — `m_lock` 재진입 방지 |
+| `Wizard/xscreen.cpp:366` | `CxScreen::_Send` — `m_script` 플래그 기반 dup 가드 |
+| `Wizard/Screen.cpp:1802` | `CScreen::OnTRAN` 끝부분 — `[OnTRAN-gate]` 로그(2026-07-29 추가), `onSendResult`/`m_return` 값 노출 |
+| `Wizard/Stream.cpp:1359` | `CStream::MakeStream` — 실제 송신 시점, `[0-MakeStream-send] ------ map=... tr=... ------` 배너 로그(2026-07-29 추가, `docs/DebugLogGuide.md` 6절) |
+| `Wizard/Stream.cpp:1361` | `CStream::MakeStream` 맨 첫 줄 — `waitSN` 체크, `[MakeStream-waitSN-drop]` 로그(2026-07-29 추가) — 실제 두 번째 Send를 막은 지점 |
+| `Wizard/Client.cpp:1927` | `CClient::WaitState` — 송신 성공 직후 `screen->m_state |= waitSN` 세팅 |
+
+---
+
+## 16. 추가 자료
 
 ### 참고 문서
 - `@docs/Architecture.md` - 모듈 구조
@@ -755,6 +889,7 @@ bool usePython = (scpKind == -1) ? isPythonScript(scripts) : (scpKind != 0);
 - `@docs/python_engine_260608.md` - 프로젝트 상세 기록
 - `@docs/CallGraph.md` - 함수 호출 흐름
 - `@docs/WizardArchitecture.md` - axwizard 클래스 계층/이벤트 흐름 상세 분석 (2026-07-13)
+- `@docs/DebugLogGuide.md` - axlog 태그 카탈로그 (이번 조사에 사용한 클립보드 로그 포함)
 
 ### 외부 참고
 - [Python C API 문서](https://docs.python.org/3.11/c-api/)
@@ -763,5 +898,5 @@ bool usePython = (scpKind == -1) ? isPythonScript(scripts) : (scpKind != 0);
 
 ---
 
-**최종 수정:** 2026-07-13
+**최종 수정:** 2026-07-29
 **기여자:** Documentation Agent

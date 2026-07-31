@@ -92,6 +92,33 @@ void CKey::OnKey(WPARAM wParam, LPARAM lParam)
 	if (!SetOnKeys(screen, form, true) && !screen)
 		return;
 
+	// Fallback clipboard shortcuts: some external keyboard-security hook swallows
+	// Ctrl+C/X/V before they ever reach WM_KEYDOWN, so route Ctrl+1/2/3 to the
+	// same handler (compact keyboards often lack dedicated Insert/Delete keys).
+	if (form)
+	{
+		if ((GetKeyState(VK_CONTROL) & 0x8000))
+		{
+			switch (wParam)
+			{
+			case '1':
+				axlog(LOG_EVENT, "CKey::OnKey Ctrl+1 -> Copy fallback (Ctrl+C blocked externally)");
+				Copy$Paste(3, screen, form);
+				return;
+			case '2':
+				axlog(LOG_EVENT, "CKey::OnKey Ctrl+2 -> Paste fallback (Ctrl+V blocked externally)");
+				Copy$Paste(22, screen, form);
+				return;
+			case '3':
+				axlog(LOG_EVENT, "CKey::OnKey Ctrl+3 -> Cut fallback (Ctrl+X blocked externally)");
+				Copy$Paste(24, screen, form);
+				return;
+			default:
+				break;
+			}
+		}
+	}
+
 	int	result;
 
 	int	trxK = 0;
@@ -452,8 +479,14 @@ void CKey::OnIME(WPARAM wParam, LPARAM lParam)
 
 void CKey::OnChar(WPARAM wParam, LPARAM lParam)
 {
+	axlog(LOG_EVENT, "CKey::OnChar wParam=%d(0x%x) lParam=0x%08lx client_key=%d isWait=%d",
+		(int)wParam, (int)wParam, (long)lParam, m_client->m_key, m_guard->IsWait(m_client) ? 1 : 0);
+
 	if (!(lParam & 0xff0000))
+	{
+		axlog(LOG_EVENT, "CKey::OnChar returned early: no scan code (IME), lParam=0x%08lx", (long)lParam);
 		return;				// Specifies the scan code, ignore IME code
+	}
 
 	switch (wParam)
 	{
@@ -1055,6 +1088,7 @@ void CKey::Copy$Paste(WPARAM wParam, CScreen* screen, CfmBase* form)
 {
 	CString	text;
 	int	row, col;
+	axlog(LOG_EVENT, "CKey::Copy$Paste wParam=%d kind=%d attr=0x%x", (int)wParam, form->m_form->kind, form->m_form->attr);
 
 	switch (form->m_form->kind)
 	{
@@ -1091,6 +1125,7 @@ void CKey::Copy$Paste(WPARAM wParam, CScreen* screen, CfmBase* form)
 	case 24:		// Ctrl+X
 		form->ReadData(text, false, -1, col, row);
 		text.TrimRight();
+		axlog(LOG_EVENT, "CKey::Copy$Paste Copy/Cut textLen=%d", text.GetLength());
 		if (!text.IsEmpty())
 		{
 			if (wParam == 24)
@@ -1099,13 +1134,17 @@ void CKey::Copy$Paste(WPARAM wParam, CScreen* screen, CfmBase* form)
 		}
 		break;
 	case 22:		// Ctrl+V
-		if (m_guard->GetClipboard(text))
+	{
+		BOOL got = m_guard->GetClipboard(text);
+		axlog(LOG_EVENT, "CKey::Copy$Paste Paste got=%d textLen=%d", got, text.GetLength());
+		if (got)
 		{
 			form->WriteData(text, true, col, row);
 			form->SetFocus(true);
 			m_client->m_vm->OnProcedure(screen, "OnPaste");
 		}
 		break;
+	}
 	default:
 		return;
 	}

@@ -150,6 +150,27 @@ winK_END  = 0xff
 
 **실측 예시(2026-07-25 로그):** `type=97`(0x61) = `vtypeREX`(0x60,상위) + `vtypeNRM`(0x01,하위) → 일반 맵 화면, 리사이즈-고정형.
 
+### `unit` — 작업영역 안의 화면(스크린) 식별자 (2026-07-30 확인)
+
+`winK`이 작업영역(창) 하나를 식별한다면, 그 작업영역 안에 대표화면 + 임베디드 서브맵(`FM_OBJECT`, 4.1절 참고)이 여러 개 동시에 존재할 수 있고, 이들도 각자 독립적으로 TR을 송수신한다. 이걸 구분하는 필드가 `_axisH.unit`이다.
+
+`h/axis.h`:
+```cpp
+#define unitMAIN 0x00   // 대표(메인) 화면 -- trxC에 MAP명이 실림, MAP 전환 가능
+#define unitSUB  0xff   // 아직 정수 키가 없어 trxC 문자열로 화면을 찾아야 하는 경우
+                        // 그 외 값 = 그 화면의 실제 unit window key
+```
+
+`Stream.cpp::GetScreen`의 실제 매칭 로직: `if (axisH->unit == screen->m_key) return true;` — 즉 **`unit`은 `CScreen::m_key`를 그대로 실어 보낸 값**이다. `CClient::SetAtScreen`(대표화면/서브맵 임베딩 공용, `Client.cpp:735`)이 `key == -1`로 호출되면 `for (key=0; key<m_magic; key++)`로 빈 슬롯을 찾아 순번을 배정한다 — 대표화면은 항상 0(`unitMAIN`), 서브맵들은 배정 순서대로 1, 2, 3...을 받는다.
+
+**실측 예시(2026-07-29~30 로그, `IB120800`이 대표화면, `IB120810`이 그 안의 서브맵):**
+```
+[0-MakeStream-send] ------ map=IB120810 tr=pooppoop ------ winK=35 unit=1   <- 서브맵(m_key=1)
+[0-MakeStream-send] ------ map=IB120800 tr=piboPBxQ ------ winK=35 unit=0   <- 대표화면(m_key=0=unitMAIN)
+```
+
+**주의 — `unit`은 `msgK`에 따라 인코딩이 다르다.** 위 규칙(`unit == screen->m_key`)은 `msgK_AXIS`/`msgK_TAB`(일반 TR 송수신)에만 적용된다. `msgK_CTRL`(0x26, `FM_CONTROL` 필드 직접 갱신)은 전혀 다른 조회 경로(`CStream::GetScreen(screen, axisH, index, ukey)` 오버로드)를 타며, 내부적으로 `CClient::GetScreenKey(axisH->unit, index, ukey)`가 `CClient::m_keys`라는 별도 룩업테이블에서 `unit` 한 바이트에 패킹된 (화면키+컨트롤인덱스+ukey) 조합을 풀어낸다(`Client.cpp:3769`). 실측 로그에서 본 `unit=253`(`PIDOSETa`)/`unit=254`(`pidomemo`, 둘 다 `msgK=38=0x26=msgK_CTRL`)이 이 경로다 — **`screen->m_key` 값이 아니라 별도 룩업키이므로, 새 플랫폼에서 두 msgK 그룹을 동일한 방식으로 디코딩하면 안 된다.**
+
 ---
 
 ## 4. 화면(맵) 로드/조립 규칙 — `CScreen::Parse()`
@@ -447,6 +468,59 @@ bool CStream::SetDataH(CScreen* screen, char* datB, int& datH)
 
 ---
 
+## 8.8. 송신측 TCP write 프레이밍 — 한 번의 write에 여러 `_axisH` 메시지가 묶일 수 있음 (2026-07-30 실측 확인)
+
+`CGuard::Write(char* pBytes, int nBytes, bool trace)`가 실제 소켓 송신 직전의 **유일한 합류 지점**임을 확인함(`RouteTR`(일반 TR)과 `CGuard::UploadFile`(파일 업로드) 둘 다 최종적으로 이 함수 하나를 거침). 여기에 로그를 달아보니, **한 번의 `Write()` 호출(=한 번의 TCP 송신)이 서로 다른 화면(unit) 앞으로 가는 `_axisH` 프레임을 여러 개 이어붙여서 보낼 수 있다**는 게 실측으로 확인됨.
+
+**원인:** `CStream::MakeStream(bool byKey)`(단일 화면용 `MakeStream(CScreen*, CString)`과는 다른 오버로드)는 `m_client`에 속한 **모든 화면을 순회**하며(`skip`/`MM_MENU`/`isUob()` 제외) 화면마다 `MakeStream(screen)`을 호출해 **같은 송신버퍼(`m_sndB`)에 계속 이어붙인다.** `m_sndL`(누적 오프셋)은 이 배치 시작 시점에 딱 한 번만 0으로 리셋되고, 그 뒤 화면 개수만큼 `_axisH`+데이터 프레임이 순서대로 쌓인 뒤, **딱 한 번의 `RouteTR`/`Write()`로 전부 한꺼번에 전송**된다. 이 배치 경로는 스크립트의 `Screen.Send(targetALL)`(`CxScreen::_Send`의 `targetALL` case → 인자 없는 `InStream()` 호출)로 진입한다.
+
+**실측 예시(2026-07-30):** 화면 안에 `IB282300`(unit=0)/`IB282310`(unit=1) 두 화면이 동시에 조회를 시도한 경우:
+```
+[0-MakeStream-send] ------ map=IB282300 tr=poopoop ------ winK=47 unit=0
+[0-MakeStream-send] ------ map=IB282310 tr=poopoop ------ winK=47 unit=1
+[0-Write-send] #0 winK=47 unit=0 msgK=32 trxC=poopoop datL=... preview=[...]
+[0-Write-send] #1 winK=47 unit=1 msgK=32 trxC=poopoop datL=... preview=[...]
+CGuard::Write(2) len=315 ...      <- 두 프레임 합쳐서 한 번에 315바이트 전송
+```
+AxisChaser는 이 315바이트짜리 TCP 페이로드를 각 프레임의 `datL`(헤더의 5자리 ASCII 길이 필드) 경계로 스스로 파싱해서 `[Send Data 87 Bytes][Unit 0]`/`[Send Data 228 Bytes][Unit 1]` 두 개의 별도 항목으로 나눠 보여준다 — **Wizard 쪽에서 보면 한 번의 소켓 write이지만, 논리적으로는 독립된 여러 메시지가 프레임 단위로 이어붙여진 것**이다.
+
+**새 플랫폼 설계 시사점:** 소켓 수신 파서를 만들 때 "한 번의 recv/read가 정확히 하나의 논리 메시지"라고 가정하면 안 된다. TCP 스트림 특성상 여러 프레임이 한 번의 시스템 콜로 도착하거나(반대로 하나의 프레임이 여러 번에 걸쳐 도착하거나, 4절의 `statCON` 재조립 규칙 참고) 할 수 있으므로, 항상 `_axisH` 헤더의 `datL` 필드로 프레임 경계를 직접 계산하며 루프를 도는 파서가 필요하다 — 이번 확인으로 송신측도 동일한 원칙이 적용됨을 알았으니, 신규 구현체는 송수신 양쪽 모두 "고정 24바이트 헤더 + `datL`만큼의 페이로드"를 한 단위로 보고 반복 파싱하는 구조로 설계해야 한다.
+
+---
+
+## 8.9. 페이로드 암호화/복호화 — `CGuard::Xecure` (2026-07-31 실측 확인)
+
+**실측 캡처 (IB140300, `SRGSQ145` 조회 — 결산분배금 내역):**
+```
+[0-MakeStream-send] map=IB140300 tr=piboPBxQ winK=39 unit=0
+[0-GetDataNRM-field] name=zPwd kind=7 value=[***]                (평문 조립, L_axisH 이후 페이로드)
+[Xecure] helper=ENC nBytesIn=434 nBytesOut=496 retv=1              <- 암호화: 434B -> 496B
+[0-Write-send] ... datL=496 (암호문 그대로 전송)
+CGuard::Write(2) len=520 hdr0=0x20 hdr3=0x27                       <- 520 = L_axisH(24) + 496, 정확히 일치
+...
+[Xecure] helper=DEC nBytesIn=912 nBytesOut=860 retv=1              <- 응답 복호화: 912B -> 860B
+[1-OnAxis-raw] nBytes=860                                          <- 이후 파이프라인은 평문 기준으로 정상 진행
+```
+
+### 확정된 규칙
+
+1. **암호화 대상은 `_axisH` 헤더(24바이트) 이후 페이로드뿐 — 헤더 자체는 항상 평문이다.** `CStream::MakeStream`/`Guard.cpp`의 모든 `Xecure(DI_ENC, ...)` 호출은 `&sendB[L_axisH]`/`&m_sndB[m_sndL]`(헤더 다음 위치)부터 시작하는 버퍼를 넘긴다. `winK`/`unit`/`trxC`/`datL` 같은 라우팅 정보를 서버가 복호화 없이도 읽을 수 있어야 하므로 당연한 설계지만, 이번에 바이트 길이 계산으로 실측 확정됨: `CGuard::Write(2) len=520` = 헤더 24B + 암호문 496B, 오차 없음.
+2. **암호화 여부는 헤더의 `stat` 필드 `statENC` 비트로 표시된다.** 송신측이 `Xecure(DI_ENC, ...)` 성공 시 `axisH->stat |= statENC`를 세팅하고, 수신측(`CWizardCtrl::OnRead`, `WizardCtrl.cpp:712`)은 `[1-OnAxis-raw]`로 넘기기 **전에** `axisH->stat & statENC`를 검사해 켜져 있으면 `Xecure(DI_DEC, ...)`부터 통과시킨다. 복호화 실패 시 그 프레임은 조용히 버려진다(`continue`, `[Xecure] decrypt FAILED` 로그 참고, `docs/DebugLogGuide.md` 12절).
+3. **암호화는 전체 TR이 아니라 맵(화면) 단위로 켜고 끈다.** `CStream::MakeStream`의 게이트 조건은 `!(m_guard->m_term & flagENX) && screen->m_mapH->options & OP_ENC` — 즉 (a) 이 맵의 빌드 옵션에 `OP_ENC`가 설정돼 있어야 하고, (b) 로그인 시 받은 단말 권한 플래그(`m_term`)에 암호화 예외(`flagENX`) 비트가 없어야 한다. 두 조건 다 충족해야만 암호화 경로를 탄다 — 모든 TR이 무조건 암호화되는 게 아니다.
+4. **`datL`(헤더의 5자리 ASCII 길이 필드)는 암호화가 걸리면 원문이 아니라 암호문 길이를 담는다.** 위 캡처에서 원문 434B가 아니라 암호문 496B가 `datL`/`Write` 길이에 그대로 반영됨 — 새 플랫폼 파서는 "헤더 다음에 `datL`만큼 읽고, `statENC`가 켜져 있으면 그 블록 전체를 복호화한 뒤에야 실제 필드 파싱(`SetDataNRM` 등)을 시작"하는 순서를 지켜야 한다.
+5. **암호화/복호화 알고리즘 자체는 이번 조사로 확인 불가 — `AxisXecure.XecureCtrl.IBK2019`라는 서드파티 ActiveX 컨트롤(COM `InvokeHelper` 호출) 뒤에 완전히 캡슐화돼 있다.** `nBytesIn`→`nBytesOut` 증가폭(이번 예: 요청 434→496, +62B / 응답 912→860, -52B)은 매번 다를 수 있어 보이며(요청과 응답은 별개의 메시지라 증감폭이 대칭일 필요는 없음), 패딩+IV+MAC 등 정확한 구성은 블랙박스 안에 있어 바이트 길이 관찰만으로는 알고리즘을 특정할 수 없다. **새 플랫폼에서 동일 프로토콜을 구현하려면 이 컨트롤을 그대로 재사용하거나(COM 상호운용), 벤더/보안팀으로부터 실제 알고리즘·키 교환 방식을 별도로 전달받아야 한다** — 리버스엔지니어링 대상이 아니라 공식 스펙을 받아야 하는 영역.
+6. **서버는 클라이언트가 보낸 요청의 `statENC` 비트를 보고 응답의 암호화 여부를 그대로 맞춘다.** 같은 화면/TR(IB140300, SRGSQ145)을 암호화 켠 상태와 끈 상태로 번갈아 조회해서 확인(2026-07-31, `docs/DebugLogGuide.md` 12절의 `NOENC.TXT` 개발용 스위치로 재현) — 요청에 `statENC`를 안 실으면(암호화 생략) 응답도 `stat=0`(평문)으로 오고, 요청에 `statENC`를 실으면 응답도 `stat=2`로 암호화돼서 온다. 즉 암호화 여부는 **세션/계정 단위 서버 정책이 아니라 매 요청마다 클라이언트가 선언한 값에 서버가 그대로 반응하는 요청-단위(per-request) 협상**이다 — 새 플랫폼도 "요청 시점에 암호화 여부를 결정해 `stat` 비트로 선언하면, 그 요청에 대한 응답은 동일한 방식으로 온다"고 가정하고 구현하면 된다.
+
+### 개발용 진단 스위치 — `NOENC.TXT`
+
+호스트 exe(AXIS.exe) 폴더에 `NOENC.TXT` 빈 파일을 두면(`CGuard::IsNoEncMode()`, 앱 재시작 불필요, 파일 유무를 매번 재확인) 위 규칙 6에 따라 요청·응답이 전부 평문으로 오가게 되어 로그에서 실제 필드 데이터를 바로 읽을 수 있다 — 이번 절의 확인들도 이 스위치로 재현한 것. 상세는 `docs/DebugLogGuide.md` 12절.
+
+### 로그 대응표
+
+`docs/DebugLogGuide.md` 12절에 상세 — `[Xecure]` 키워드로 DebugView 필터링하면 이 절의 모든 호출이 잡힌다.
+
+---
+
 ## 9. 다음 조사 대상 (미완료)
 
 - **`ParseSCC`/`SetCC`의 `CC_*` 플래그 전체 목록** — `CC_PRO`/`CC_MAND`/`CC_SEND`/`CC_VIS`/`CC_ENB`/`CC_SET` 등 확인됨(Stream.cpp:2900-2928), 전체 목록과 각각의 정확한 UI 효과는 추가 확인 여지
@@ -454,7 +528,7 @@ bool CStream::SetDataH(CScreen* screen, char* datB, int& datH)
 - **`SetDataH`** — 레코드 헤더 파싱 상세 미조사
 - **`SetTable`엔 있고 `SetCells`엔 없는 FCC/RCC/SCC 처리** — 왜 GO_TABLE 방식만 셀별 동적 속성제어를 지원하는지 설계의도 미확인
 - `WM_USER` 커스텀 메시지의 정확한 용도
-- TR 요청(사용자가 조회 버튼 누르는 것) → 소켓 송신 경로 (`MakeStream`은 확인됨, `RouteTR` 이후 실제 소켓 write는 미확인)
+- ~~TR 요청(사용자가 조회 버튼 누르는 것) → 소켓 송신 경로~~ — **확인 완료(2026-07-30), 8.8절 참고.** `RouteTR`이 `CGuard::Write(char*, int, bool)`로 최종 소켓 전송하며, 한 번의 write에 여러 화면(unit)의 `_axisH` 프레임이 배치로 묶일 수 있음
 - `CDll::OnAxis`(DLL 기반 작업영역)의 실제 파싱 로직 — CClient와 다른지 동일한지
 
 ---

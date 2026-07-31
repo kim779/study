@@ -57,6 +57,8 @@ TK_TR1001 = 1   # 주식 시세조회
 TK_TR1002 = 2   # 주식 조회(OOP)
 TK_TR1003 = 3   # 주식 조회(OOP)
 TK_TR1004 = 6   # 주식 실시간 다중종목 등록
+TK_TR1005 = 16  # 주식 일/주/월별 시세조회
+TK_TR1006 = 18  # 주요 시장지표(지수/금리) 조회
 TK_TR1201 = 4   # 주식 주문
 TK_TR1203 = 5   # 주식 주문 시장구분
 TK_TR1211 = 7   # 주식 체결/미체결조회
@@ -83,8 +85,46 @@ TK_GREEKS2 = 151 # 옵션 그릭스(민감도) 조회용 키2
 
 # TR1002(NXT/통합 시세조회) 요청 시 1777(장운영구분) 뒤에 붙이는 요청 필드번호 목록
 # 순서 = 응답에서 값이 오는 순서와 동일하다고 가정 (실측 후 확정 필요)
-TR1002_SISE_FIELDS = ["1021","2023", "2033", "2029", "2030", "2031", "2024", "2027", "2041", "2061"]
+TR1002_SISE_FIELDS = ["2023", "2033", "2029", "2030", "2031", "2024", "2027", "2041", "2061"]
 TR1002_SISE_LABELS = ["현재가", "등락율", "시가", "고가", "저가", "전일대비", "거래량", "매도잔량", "매수잔량"]
+
+# TR1005(종목 일/주/월별 시세) 요청 필드 목록 - AxisChaser 실측(Send_Rev.ini) 그대로
+TR1005_DAILY_FIELDS = ["12021", "12302", "12029", "12030", "12031", "12023", "12024", "12033",
+                        "12027", "12028", "12036", "12363", "12367", "12390", "12399", "12338",
+                        "12119", "12118", "12037"]
+
+# TR1006(주요 시장지표) 지수 코드 라벨. 지수 레코드는 87바이트 고정폭:
+# 코드(5)+지수명+지수(023)+대비(024)+등락률(033)+거래량,천(027)+대금,백만(028)+거래종목수(256)+상승(252)+하락(255)
+# 필드번호는 [2901] 화면 Grid Column Edit Dialog 실측으로 확인.
+TR1006_INDEX_LABELS = {
+    "K0001": "코스피(종합)",
+    "K5001": "KRX100",
+    "K2001": "코스피200",
+    "ET181": "KTOP30",
+    "KQ001": "코스닥(종합)",
+    "KQ047": "코스닥150",
+    "ST050": "코리아밸류업지수",
+}
+TR1006_INDEX_RE = re.compile(
+    r'([A-Z][A-Z0-9]{4})([가-힣A-Za-z0-9]+)\s+([\d.]+)\s+(\d+\.\d+)([+-][\d.]+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)'
+)
+# 금리 구간: "CP(91일)"부터 TJ코드 시작 전까지, "구분명 금리[+-]?대비" 반복
+TR1006_RATE_RE = re.compile(r'([가-힣A-Za-z0-9()]+?)\s+(\d+\.\d{2})([+-]?)\s*(\d+\.\d{2})')
+# 기관/외국인 동향: TJ+8자리코드+순매수+매수+매도. 코드 앞4자리=시장(01코스피/02선물), 뒤4자리=투자자(0000기관/0900외국인)
+TR1006_FLOW_RE = re.compile(r'TJ(\d{8})\s+([+-]{1,2}\d+)\s+(\d+)\s+(\d+)')
+TR1006_FLOW_LABELS = {
+    "01000001": "코스피 기관",
+    "01090001": "코스피 외국인",
+    "02000000": "선물 기관",
+    "02090000": "선물 외국인",
+}
+
+# TR1005 필드 라벨 - [2011]일자별시세 실측값과 1:1 대조로 확인(2026-07-29, 005930 07-28행 기준).
+# 12023(전일대비), 12036(외인보유)는 값 앞에 등락구분으로 보이는 숫자 한자리가 더 붙어 나옴(미해결).
+# 12037은 대응하는 값을 못 찾음(레코드에 값 자체가 안 옴).
+TR1005_DAILY_LABELS = ["일자", "시가", "고가", "저가", "종가", "전일대비", "등락률", "거래량",
+                        "거래대금", "체결강도", "외인보유", "외인비중", "기관", "외국인", "신용비율",
+                        "매수체결", "매도체결", "차이", "12037"]
 
 MKGB_NAMES = {"1": "KRX", "2": "NXT", "3": "통합"}
 
@@ -228,7 +268,7 @@ class TestWindow(QMainWindow):
         super().__init__()
         self.setWindowTitle("Auto Trader")
         self.setMinimumWidth(500)
-        self.resize(1500, 750)
+        self.resize(1850, 700)
 
         ocx_ok, ocx_info = _check_ocx_registry()
         if not ocx_ok:
@@ -290,7 +330,11 @@ class TestWindow(QMainWindow):
         mid.addWidget(self._build_order_group(), 1, 0, 1, 2)
         layout.addLayout(mid)
         layout.addWidget(self._build_jango_group())
-        layout.addWidget(self._build_collect_group())
+        misc = QHBoxLayout()
+        misc.addWidget(self._build_collect_group())
+        misc.addWidget(self._build_daily_group())
+        misc.addWidget(self._build_market_group())
+        layout.addLayout(misc)
         layout.addWidget(self._build_log_group())
 
     # ── UI builders ──────────────────────────────────────────────
@@ -407,6 +451,9 @@ class TestWindow(QMainWindow):
         t, self.lbl_dvol  = make_pair("매도잔량"); grid.addWidget(t, 4, 0); grid.addWidget(self.lbl_dvol,  4, 1)
         t, self.lbl_svol  = make_pair("매수잔량"); grid.addWidget(t, 4, 2); grid.addWidget(self.lbl_svol,  4, 3)
         v.addLayout(grid)
+        self.lbl_market_summary = QLabel("시장지표: -")
+        v.addWidget(self.lbl_market_summary)
+        v.addStretch()
 
         return group
 
@@ -427,6 +474,11 @@ class TestWindow(QMainWindow):
         self.edit_chart_long = QLineEdit("20")
         self.edit_chart_long.setMaximumWidth(40)
         h1.addWidget(self.edit_chart_long)
+        h1.addWidget(QLabel("낙폭제한(%)"))
+        self.edit_chart_dip = QLineEdit()
+        self.edit_chart_dip.setMaximumWidth(40)
+        self.edit_chart_dip.setPlaceholderText("없음")
+        h1.addWidget(self.edit_chart_dip)
         h1.addStretch()
         v.addLayout(h1)
 
@@ -458,10 +510,12 @@ class TestWindow(QMainWindow):
         self.table_chart_trades.setHorizontalHeaderLabels(["매수시간", "매수가", "매도시간", "매도가", "손익"])
         self.table_chart_trades.verticalHeader().setVisible(False)
         self.table_chart_trades.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        for col, w in enumerate([75, 65, 75, 65, 65]):
+            self.table_chart_trades.setColumnWidth(col, w)
         trade_box.addWidget(self.table_chart_trades)
         trade_widget = QWidget()
         trade_widget.setLayout(trade_box)
-        h3.addWidget(trade_widget, 2)
+        h3.addWidget(trade_widget, 3)
 
         v.addLayout(h3)
 
@@ -477,6 +531,13 @@ class TestWindow(QMainWindow):
             long_win = int(self.edit_chart_long.text().strip() or 20)
         except ValueError:
             self._log("차트: 단기/장기 윈도우는 숫자로 입력하세요")
+            return
+        dip_text = self.edit_chart_dip.text().strip()
+        try:
+            # 낙폭제한(%): 시가 대비 이 비율 이하로 하락하면 신규 매수를 막는다. 빈 값이면 필터 없음.
+            dip_threshold = -float(dip_text) / 100 if dip_text else None
+        except ValueError:
+            self._log("차트: 낙폭제한은 숫자로 입력하세요")
             return
 
         cur = self.db_conn.execute(
@@ -534,7 +595,7 @@ class TestWindow(QMainWindow):
 
         # 실제 매수->매도로 짝지어지는 거래만 별도로 뽑아서 목록/승률 표시
         raw_times = [r[0] for r in rows]
-        trades, entry = find_trades(raw_times, prices, short, long_)
+        trades, entry = find_trades(raw_times, prices, short, long_, dip_threshold=dip_threshold)
         self.table_chart_trades.setRowCount(0)
         total_pnl = 0
         wins = 0
@@ -669,7 +730,7 @@ class TestWindow(QMainWindow):
         v.setContentsMargins(4, 4, 4, 4)
         v.setSpacing(2)
 
-        cols = ["종목코드", "잔고수량", "가능수량", "현재가", "평가금액", "수익률(%)"]
+        cols = ["종목코드", "잔고수량", "가능수량", "현재가", "평가금액", "평가손익", "수익률(%)"]
         self.table_jango = QTableWidget(0, len(cols))
         self.table_jango.setHorizontalHeaderLabels(cols)
         self.table_jango.verticalHeader().setVisible(False)
@@ -685,9 +746,13 @@ class TestWindow(QMainWindow):
         return group
 
     def _add_jango_row(self, code, remain, avail, maip, curr, eval_amt, rate):
+        try:
+            pnl = f"{float(eval_amt) - float(maip):.0f}"
+        except ValueError:
+            pnl = "-"
         row = self.table_jango.rowCount()
         self.table_jango.insertRow(row)
-        for col, val in enumerate([code, remain, avail, curr, eval_amt, rate]):
+        for col, val in enumerate([code, remain, avail, curr, eval_amt, pnl, rate]):
             self.table_jango.setItem(row, col, QTableWidgetItem(val))
         code_key = code.lstrip('A')
         self._jango_row_by_code[code_key] = row
@@ -702,16 +767,16 @@ class TestWindow(QMainWindow):
         except ValueError:
             pass
 
-    def _update_jango_row(self, code, curr=None, eval_amt=None, rate=None):
+    def _update_jango_row(self, code, curr=None, eval_amt=None, pnl=None, rate=None):
         row = self._jango_row_by_code.get(code.lstrip('A'))
         if row is None:
             return
-        for col, val in [(3, curr), (4, eval_amt), (5, rate)]:
+        for col, val in [(3, curr), (4, eval_amt), (5, pnl), (6, rate)]:
             if val is not None:
                 self.table_jango.setItem(row, col, QTableWidgetItem(val))
 
     def _recalc_jango_on_price(self, code, new_curr_s):
-        # OnRealData로 들어온 현재가로 잔고 종목의 평가금액/수익률을 실시간 재계산
+        # OnRealData로 들어온 현재가로 잔고 종목의 평가금액/평가손익/수익률을 실시간 재계산
         code_key = code.lstrip('A')
         calc = self._jango_calc.get(code_key)
         if calc is None:
@@ -724,8 +789,10 @@ class TestWindow(QMainWindow):
         remain = calc['remain']
         maip = calc['maip']
         new_eval = calc['base_eval'] + (new_curr - calc['base_curr']) * remain
-        rate = (new_eval - maip) * 100 / maip if maip else 0.0
-        self._update_jango_row(code_key, curr=f"{new_curr:.0f}", eval_amt=f"{new_eval:.0f}", rate=f"{rate:.2f}")
+        pnl = new_eval - maip
+        rate = pnl * 100 / maip if maip else 0.0
+        self._update_jango_row(code_key, curr=f"{new_curr:.0f}", eval_amt=f"{new_eval:.0f}",
+                                pnl=f"{pnl:.0f}", rate=f"{rate:.2f}")
 
     def _on_jango_double_clicked(self, row, col):
         item = self.table_jango.item(row, col)
@@ -862,7 +929,7 @@ class TestWindow(QMainWindow):
         mkgubn = self.combo_watch_mkgubn.currentData()  # 1=KRX 2=NXT 3=통합
         # TR1001은 시장구분 파라미터가 없어 KRX 실시간만 등록된다.
         # TR1002를 종목별로 반복 호출하면 서버가 매 호출마다 이전 등록을 새 등록으로
-        # 덮어써서 마지막 종목만 실시간이 살아있는 문제가 있었다 -> 다중종목 등록
+        # 덮어써서 마지막 종목만 실시간이 살아있는 문제가 있었다 -> 다중종목 등록5
         # TR1004(콤마구분 종목코드 전체를 한 번에 전송)로 전환.
         fields = "\t".join(TR1002_SISE_FIELDS)
         codes = [c.strip() for c in self.edit_watch_codes.text().split(',') if c.strip()]
@@ -904,6 +971,63 @@ class TestWindow(QMainWindow):
         else:
             self._log("구독 중지: 대상 없음 (구독중인 종목이 아님)")
         self.lbl_watch_status.setText(f"구독중: {len(self.watch_codes)}개")
+
+    def _build_daily_group(self):
+        group = QGroupBox("일/주/월별 시세조회")
+        h = QHBoxLayout(group)
+        h.addWidget(QLabel("종목코드"))
+        self.edit_daily_code = QLineEdit()
+        self.edit_daily_code.setMaximumWidth(90)
+        h.addWidget(self.edit_daily_code)
+        h.addWidget(QLabel("구분"))
+        self.combo_daily_period = QComboBox()
+        for text, val in [("일", "0"), ("주", "1"), ("월", "2")]:
+            self.combo_daily_period.addItem(text, val)
+        h.addWidget(self.combo_daily_period)
+        h.addWidget(QLabel("시장"))
+        self.combo_daily_mkgubn = QComboBox()
+        for text, val in [("KRX", 1), ("NXT", 2), ("통합", 3)]:
+            self.combo_daily_mkgubn.addItem(text, val)
+        self.combo_daily_mkgubn.setCurrentIndex(2)
+        h.addWidget(self.combo_daily_mkgubn)
+        btn = QPushButton("조회")
+        btn.clicked.connect(self._on_daily_send)
+        h.addWidget(btn)
+        h.addStretch()
+        return group
+
+    def _on_daily_send(self):
+        code = self.edit_daily_code.text().strip()
+        if not code:
+            self._log("일자별시세: 종목코드를 입력하세요")
+            return
+        period = self.combo_daily_period.currentData()  # 0=일 1=주 2=월 ($1250{period} 마커에 대응)
+        mkgubn = self.combo_daily_mkgubn.currentData()
+        base_date = datetime.now().strftime("%Y%m%d")
+        fields = "\t".join(TR1005_DAILY_FIELDS)
+        symb = f"{period}\x7f{base_date}\t1777\x7f{mkgubn}\t{fields}\t"
+        result = self.ocx.dynamicCall(
+            "TR1005(int, QString, QString)", [TK_TR1005, code, symb])
+        self._log(f"일자별시세 요청({code}, 구분={period}, 시장={mkgubn}) => {result}")
+        if not result:
+            err = self.ocx.dynamicCall("GetLastErrMsg()")
+            self._log_err(err)
+
+    def _build_market_group(self):
+        group = QGroupBox("주요 시장지표(TR1006) 조회")
+        h = QHBoxLayout(group)
+        btn = QPushButton("조회")
+        btn.clicked.connect(self._on_market_send)
+        h.addWidget(btn)
+        h.addStretch()
+        return group
+
+    def _on_market_send(self):
+        result = self.ocx.dynamicCall("TR1006(int, QString)", [TK_TR1006, "1"])
+        self._log(f"시장지표 요청 => {result}")
+        if not result:
+            err = self.ocx.dynamicCall("GetLastErrMsg()")
+            self._log_err(err)
 
     # ── OCX event handlers ───────────────────────────────────────
 
@@ -1240,9 +1364,9 @@ class TestWindow(QMainWindow):
             self.lbl_diff.setText(m.get("024", "-"))
             self.lbl_rate.setText(m.get("033", "-"))
             self.lbl_gvol.setText(m.get("027", "-"))
-            self.lbl_siga.setText(m.get("029", "-"))
-            self.lbl_koga.setText(m.get("030", "-"))
-            self.lbl_jega.setText(m.get("031", "-"))
+            self.lbl_siga.setText(m.get("029", "-").lstrip('+-') or "-")
+            self.lbl_koga.setText(m.get("030", "-").lstrip('+-') or "-")
+            self.lbl_jega.setText(m.get("031", "-").lstrip('+-') or "-")
             self.lbl_mgjv.setText(m.get("201", "-"))
         elif "111" in m:  # 동시호가 구간엔 034(체결) 대신 111(예상체결가)만 옴
             self.lbl_curr.setText(m.get("111", "-").lstrip('+-') or "-")
@@ -1371,18 +1495,20 @@ class TestWindow(QMainWindow):
             elif key == TK_TR1002:  # 주식 시세(NXT/통합) - 응답이 고정바이너리 아닌 평문 텍스트
                 text = raw.decode('cp949', errors='ignore')
                 self._log(f"  [TR1002 시세] raw={text!r}")
-                # 맨 앞 토큰 = 1021(종목코드) 필드값. 실시간 코드와 동일 형식(M.A005930 등)이라
-                # OnRealData 매칭용 키로 저장해두고, 나머지 토큰만 요청 필드 순서대로 매핑
-                tokens = [v for v in text.replace('\n', '\t').split('\t') if v != '']
+                # 맨 앞 토큰 = 종목코드(실시간 코드와 동일 형식, M.A005930 등). 빈 필드가 있을 수
+                # 있어서(예: 매도/매수잔량 미제공) 빈 문자열을 걸러내면 안 됨 - 위치가 밀려버림.
+                tokens = text.replace('\n', '\t').split('\t')
                 realtime_key, vals = (tokens[0], tokens[1:]) if tokens else ("", [])
                 self._sise_realtime_key = realtime_key
                 pairs = ", ".join(f"{lbl}={v}" for lbl, v in zip(TR1002_SISE_LABELS, vals))
                 self._log(f"  [TR1002 파싱시도] code={realtime_key} {pairs}")
                 # 현재가,등락율,시가,고가,저가,전일대비,거래량,매도잔량,매수잔량 순
+                # 등락률/전일대비는 방향(+-)이 의미가 있어 부호를 유지하고, 나머지는 부호를 뗀다.
                 widgets = [self.lbl_curr, self.lbl_rate, self.lbl_siga, self.lbl_koga,
                            self.lbl_jega, self.lbl_diff, self.lbl_gvol, self.lbl_dvol, self.lbl_svol]
+                keep_sign = {self.lbl_rate, self.lbl_diff}
                 for w, v in zip(widgets, vals):
-                    w.setText(v)
+                    w.setText(v if w in keep_sign else (v.lstrip('+-') or "-"))
             elif key == TK_TR1004:  # 다중종목 실시간 등록 응답 - 코드별로 레코드가 이어붙어 옴
                 text = raw.decode('cp949', errors='ignore')
                 self._log(f"  [TR1004 응답] size={size}")
@@ -1393,9 +1519,51 @@ class TestWindow(QMainWindow):
                     code = m.group(1).split('.')[-1].lstrip('A')
                     start = m.end()
                     end = matches[i + 1].start() if i + 1 < len(matches) else len(text)
-                    vals = [v for v in text[start:end].split('\t') if v != '']
+                    vals = text[start:end].rstrip('\t').split('\t')
                     pairs = ", ".join(f"{lbl}={v}" for lbl, v in zip(TR1002_SISE_LABELS, vals))
                     self._log(f"  [TR1004 파싱] code={code} {pairs}")
+            elif key == TK_TR1005:  # 일/주/월별 시세조회 응답
+                # 레코드 시작점 = 일자(12021, 8자리 20xxxxxx) 필드 + 탭. 그 앞에는 화면 헤더용
+                # 고정 필드가 섞여 있어서(TR1004와 동일 문제) 코드 패턴 대신 일자 패턴으로 잘라낸다.
+                text = raw.decode('cp949', errors='ignore')
+                matches = list(re.finditer(r'(?:^|\t)(20\d{6})\t', text))
+                self._log(f"  [TR1005 응답] size={size} 레코드수={len(matches)}")
+                for i, m in enumerate(matches[:5]):
+                    start = m.start(1)
+                    end = matches[i + 1].start(1) if i + 1 < len(matches) else len(text)
+                    vals = [v for v in text[start:end].split('\t') if v != '']
+                    pairs = ", ".join(f"{lbl}={v}" for lbl, v in zip(TR1005_DAILY_LABELS, vals))
+                    self._log(f"  [TR1005 레코드] {pairs}")
+                if len(matches) > 5:
+                    self._log(f"  [TR1005] ... 외 {len(matches) - 5}건 더 있음")
+            elif key == TK_TR1006:  # 주요 시장지표(지수/금리) 응답
+                text = raw.decode('cp949', errors='ignore')
+                self._log(f"  [TR1006 응답] size={size}")
+                idx_by_code = {}
+                for m in TR1006_INDEX_RE.finditer(text):
+                    code, _name, price, diff, rate, vol, amt, ntot, nup, ndn = m.groups()
+                    label = TR1006_INDEX_LABELS.get(code, code)
+                    idx_by_code[code] = (label, price, rate)
+                    self._log(f"  [TR1006 지수] {label} 현재가={price} 전일대비={diff} 등락률={rate}% "
+                              f"거래량(천)={vol} 거래대금(백만)={amt} 거래종목수={ntot} 상승={nup} 하락={ndn}")
+                kospi = idx_by_code.get("K0001")
+                kosdaq = idx_by_code.get("KQ001")
+                if kospi and kosdaq:
+                    self.lbl_market_summary.setText(
+                        f"코스피 {kospi[1]}({kospi[2]}%)   코스닥 {kosdaq[1]}({kosdaq[2]}%)")
+                rate_start = text.find("CP(91")
+                rate_end = text.find("TJ", rate_start) if rate_start >= 0 else -1
+                if rate_start >= 0 and rate_end >= 0:
+                    for m in TR1006_RATE_RE.finditer(text[rate_start:rate_end]):
+                        gubn, rate, sign, diff = m.groups()
+                        self._log(f"  [TR1006 금리] {gubn} 금리={rate} 전일대비={sign}{diff}")
+                for m in TR1006_FLOW_RE.finditer(text):
+                    code, netbuy, buy, sell = m.groups()
+                    label = TR1006_FLOW_LABELS.get(code, code)
+                    self._log(f"  [TR1006 매매동향] {label} 순매수={netbuy} 매수={buy} 매도={sell}")
+                dump_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "tr1006_raw.bin")
+                with open(dump_path, "wb") as f:
+                    f.write(raw)
             else:
                 self._log(f"  [RecvData] key={key} (미처리)")
         except Exception as e:

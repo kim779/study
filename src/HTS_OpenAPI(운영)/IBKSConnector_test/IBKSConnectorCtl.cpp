@@ -141,6 +141,8 @@ BEGIN_DISPATCH_MAP(CIBKSConnectorCtrl, COleControl)
 	DISP_FUNCTION(CIBKSConnectorCtrl, "TR1223", TR1223, VT_BOOL, VTS_I4 VTS_BSTR VTS_BSTR VTS_I4 VTS_I4 VTS_BSTR) //test1223  주식주문시장구분
 	DISP_FUNCTION(CIBKSConnectorCtrl, "TR1203", TR1203, VT_BOOL, VTS_I4 VTS_I4 VTS_BSTR VTS_BSTR VTS_I4 VTS_BSTR VTS_I4 VTS_I4 VTS_I4 VTS_I4 VTS_I4) //test1203 잔고시장구분
 	DISP_FUNCTION(CIBKSConnectorCtrl, "TR1004", TR1004, VT_BOOL, VTS_I4 VTS_BSTR VTS_BSTR)
+	DISP_FUNCTION(CIBKSConnectorCtrl, "TR1005", TR1005, VT_BOOL, VTS_I4 VTS_BSTR VTS_BSTR)
+	DISP_FUNCTION(CIBKSConnectorCtrl, "TR1006", TR1006, VT_BOOL, VTS_I4 VTS_BSTR)
 	//}}AFX_DISPATCH_MAP
 END_DISPATCH_MAP()
 
@@ -2513,6 +2515,94 @@ BOOL CIBKSConnectorCtrl::S_TR1002(int key, LPCSTR code, LPCSTR data)
 	return SendTR("pooppoop", key, US_OOP, (LPCSTR)sdat, sdat.GetLength(), &CIBKSConnectorCtrl::C_TR1002);
 }
 
+//시장조회
+BOOL CIBKSConnectorCtrl::S_TR1006(int key, LPCSTR val)
+{
+	CString sdat;
+	sdat.Format("%s", val);
+	return SendTR("pino2901", key, US_OOP, (LPCSTR)sdat, sdat.GetLength(), &CIBKSConnectorCtrl::C_TR1006);
+}
+
+//주식 일별 데이터 
+BOOL CIBKSConnectorCtrl::S_TR1005(int key, LPCSTR code, LPCSTR data)
+{
+	if (strlen(code) != 6)
+	{
+		m_sLastMsg = "종목코드를 확인하십시오";
+		return FALSE;
+	}
+
+	// data 형식: "{period}\x7f{base_date}\t1777\x7f{mkgubn}\t{field1}\t{field2}\t...\t"
+	// period: 0=일 1=주 2=월 ($1250{period} 마커에 대응)
+	CString period, baseDate, mkgubnS, fieldsPart;
+	{
+		CString d(data);
+		int p7f = d.Find((TCHAR)0x7f);
+		if (p7f < 0) { m_sLastMsg = "TR1005 data 형식 오류"; return FALSE; }
+		period = d.Left(p7f);
+
+		int ptab1 = d.Find(_T('\t'), p7f + 1);
+		if (ptab1 < 0) { m_sLastMsg = "TR1005 data 형식 오류"; return FALSE; }
+		baseDate = d.Mid(p7f + 1, ptab1 - p7f - 1);
+
+		int p7f2 = d.Find((TCHAR)0x7f, ptab1 + 1);
+		if (p7f2 < 0) { m_sLastMsg = "TR1005 data 형식 오류"; return FALSE; }
+		int ptab2 = d.Find(_T('\t'), p7f2 + 1);
+		if (ptab2 < 0) { m_sLastMsg = "TR1005 data 형식 오류"; return FALSE; }
+		mkgubnS = d.Mid(p7f2 + 1, ptab2 - p7f2 - 1);
+
+		fieldsPart = d.Mid(ptab2 + 1);
+	}
+
+	// 탭 구분 필드 목록을 줄바꿈(0x0A) 구분으로 변환
+	CStringA fieldListLF;
+	{
+		int fp = 0;
+		CString ftok;
+		do {
+			ftok = fieldsPart.Tokenize(_T("\t"), fp);
+			if (!ftok.IsEmpty())
+			{
+				fieldListLF += CStringA(ftok);
+				fieldListLF += "\n";
+			}
+		} while (fp != -1);
+	}
+
+	std::string sendS;
+	sendS += "1301";
+	sendS += (char)0x7f;
+	sendS += code;
+	sendS += "\t";
+
+	sendS += "12901";
+	sendS += (char)0x7f;
+	sendS += (LPCSTR)CStringA(baseDate);
+	sendS += "\t";
+
+	sendS += "1777";
+	sendS += (char)0x7f;
+	sendS += (LPCSTR)CStringA(mkgubnS);
+	sendS += "\t";
+
+	sendS += "1022";
+	sendS += "\t";
+
+	sendS += "$1250";
+	sendS += (LPCSTR)CStringA(period);
+	sendS += (char)0x7f;
+
+	// _gridHi: visible[2]+rows[4]+type+dir+sort(9) + symbol[16]+key+page[4]+save[80](101) = 110바이트
+	// AxisChaser 실측값 그대로(일/주/월 공통): visible=23, rows=2000, type=1(flexible GRID), dir=1, sort=0
+	sendS += "232000110";
+	sendS += std::string(16 + 1 + 4 + 80, ' ');
+
+	sendS += (LPCSTR)fieldListLF;
+	sendS += "\t";
+
+	return SendTR("pooppoop", key, US_OOP, sendS.data(), (int)sendS.size(), &CIBKSConnectorCtrl::C_TR1005);  
+}
+
 BOOL CIBKSConnectorCtrl::S_TR1004_multi(int key, LPCSTR code, LPCSTR data)
 {
 	CStringArray codeArr;
@@ -2610,6 +2700,28 @@ void CIBKSConnectorCtrl::C_TR1002(WPARAM wParam, LPARAM lParam)
 }
 
 void CIBKSConnectorCtrl::C_TR1004(WPARAM wParam, LPARAM lParam)
+{
+	int key = LOWORD(wParam);
+	int size = HIWORD(wParam);
+	LPCSTR data = (LPCSTR)lParam;
+	CString odat = CString(data, size);
+	odat.TrimRight();
+
+	FireOnRecvData(key, (long)(LPCSTR)odat, odat.GetLength(), false, "");
+}
+
+void CIBKSConnectorCtrl::C_TR1005(WPARAM wParam, LPARAM lParam)
+{
+	int key = LOWORD(wParam);
+	int size = HIWORD(wParam);
+	LPCSTR data = (LPCSTR)lParam;
+	CString odat = CString(data, size);
+	odat.TrimRight();
+
+	FireOnRecvData(key, (long)(LPCSTR)odat, odat.GetLength(), false, "");
+}
+
+void CIBKSConnectorCtrl::C_TR1006(WPARAM wParam, LPARAM lParam)
 {
 	int key = LOWORD(wParam);
 	int size = HIWORD(wParam);
@@ -2823,6 +2935,18 @@ BOOL CIBKSConnectorCtrl::TR1004(long key, LPCTSTR code, LPCTSTR symb)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 	return AccessTr(eTR1004) ? S_TR1004_multi(key, code, symb) : FALSE;
+}
+
+BOOL CIBKSConnectorCtrl::TR1005(long key, LPCTSTR code, LPCTSTR symb)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+	return AccessTr(eTR1005) ? S_TR1005(key, code, symb) : FALSE;
+}
+
+BOOL CIBKSConnectorCtrl::TR1006(long key, LPCTSTR val)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+	return AccessTr(eTR1006) ? S_TR1006(key, val) : FALSE;
 }
 
 BOOL CIBKSConnectorCtrl::TR3002(long key, LPCTSTR code, LPCTSTR symb) 

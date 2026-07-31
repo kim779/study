@@ -7,6 +7,7 @@
 #include "../h/axisvar.h"
 #include "../h/axis.h"
 #include "../h/axisfire.h"
+#include "../h/axlog.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -366,6 +367,7 @@ void CDde::OnAdvise(HSZ hItem, bool advise)
 		CString	topic, item, tmps;
 
 		item = tmpb;
+		axlog(LOG_INIT, "CDde::OnAdvise item=%s advise=%d", CString(tmpb).GetString(), advise ? 1 : 0);
 		idx = item.Find(prefixDDE);
 		if (idx < 0)	return;
 
@@ -454,6 +456,7 @@ HDDEDATA CDde::OnAdvise(HSZ hItem)
 
 void CDde::OnExit()
 {
+	axlog(LOG_INIT, "CDde::OnExit postCount=%d", (int)m_post.GetCount());
 	m_conv    = -1;
 	m_posting = false;
 	m_dde     = flagDDE::stopDDE;
@@ -591,9 +594,11 @@ void CDde::OnDDE()
 {
 	if (m_inst)
 		return;
-	
-	if (!DdeInitialize(&m_inst, (PFNCALLBACK) DdeCallback,
-		CBF_FAIL_EXECUTES|CBF_FAIL_POKES|CBF_SKIP_REGISTRATIONS|CBF_SKIP_UNREGISTRATIONS, 0L))
+
+	UINT ddeErr = DdeInitialize(&m_inst, (PFNCALLBACK) DdeCallback,
+		CBF_FAIL_EXECUTES|CBF_FAIL_POKES|CBF_SKIP_REGISTRATIONS|CBF_SKIP_UNREGISTRATIONS, 0L);
+	axlog(LOG_INIT, "CDde::OnDDE DdeInitialize err=%u (0=success)", ddeErr);
+	if (!ddeErr)
 	{
 		char	tmpb[64];
 

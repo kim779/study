@@ -281,7 +281,10 @@ LONG CDbar1::OnXMSG(WPARAM wParam, LPARAM lParam)
 			skey.Format("%d", ret - 1);
 			if (mapMenu.Lookup(skey, stmp))
 			{
-				m_slog = ExtractBracketContent(stmp);
+				if (stmp.Left(2) == "IB")
+					m_slog = stmp;
+				else
+					m_slog = ExtractBracketContent(stmp);
 				CWnd* pMain = AfxGetMainWnd();
 				if (pMain)
 					pMain->SendMessage(WM_USER, MAKEWPARAM(MMSG_POP_MAP, 3), (LPARAM)(LPSTR)(LPCTSTR)m_slog);

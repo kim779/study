@@ -11,6 +11,16 @@ static char THIS_FILE[] = __FILE__;
 #endif
 
 /////////////////////////////////////////////////////////////////////////////
+// Stack of map names for the screen(s) currently running script, innermost
+// last. A stack (not a single variable) because DoProcedure can re-enter
+// itself on the same thread (e.g. Screen.Send(0) inside OnClick synchronously
+// reaching OnSend, or Screen.Proc() jumping into another screen's script).
+static std::vector<CString> s_mapStack;
+
+CString CEngineWrapper::GetCurrentMap()
+{
+    return s_mapStack.empty() ? CString() : s_mapStack.back();
+}
 
 CEngineWrapper::CEngineWrapper(CWnd* parent)
     : m_parent(parent)
@@ -57,11 +67,9 @@ bool CEngineWrapper::LoadScript(CString scripts, int scpKind)
 {
     bool usePython = (scpKind == -1) ? isPythonScript(scripts) : (scpKind != 0);
 
-    CString dbg;
-    dbg.Format("[WIZARD][ENGINE][DEBUG] scpKind=%d -> engine=%s (source=%s)\n",
+    axlog(LOG_SCRIPT, "CEngineWrapper::LoadScript scpKind=%d -> engine=%s (source=%s)",
         scpKind, usePython ? "Python" : "VBScript",
         (scpKind == -1) ? "auto-detect(legacy text scan)" : "explicit pythonMode");
-    OutputDebugString(dbg);
 
     ensureEngine(usePython);
 
@@ -96,6 +104,7 @@ bool CEngineWrapper::DoProcedure(CString procs, WPARAM wParam, LPARAM lParam, in
     axlog(LOG_EVENT, "DoProcedure(1) procs=%s engine=%s",
         procs.GetString(), (m_usePython && m_py) ? "Python" : (m_vbs ? "VBS" : "none"));
 
+    s_mapStack.push_back(m_pendingMaps);
     bool result;
     if (m_usePython && m_py) {
         result   = m_py->DoProcedure(procs, wParam, lParam, key);
@@ -104,8 +113,9 @@ bool CEngineWrapper::DoProcedure(CString procs, WPARAM wParam, LPARAM lParam, in
         result   = m_vbs->DoProcedure(procs, wParam, lParam, key);
         m_invoke = m_vbs->m_invoke;
     } else {
-        return false;
+        result = false;
     }
+    s_mapStack.pop_back();
     return result;
 }
 
@@ -114,6 +124,7 @@ bool CEngineWrapper::DoProcedure(CString procs, CString data, int count)
     axlog(LOG_EVENT, "DoProcedure(2) procs=%s engine=%s",
         procs.GetString(), (m_usePython && m_py) ? "Python" : (m_vbs ? "VBS" : "none"));
 
+    s_mapStack.push_back(m_pendingMaps);
     bool result;
     if (m_usePython && m_py) {
         result   = m_py->DoProcedure(procs, data, count);
@@ -122,8 +133,9 @@ bool CEngineWrapper::DoProcedure(CString procs, CString data, int count)
         result   = m_vbs->DoProcedure(procs, data, count);
         m_invoke = m_vbs->m_invoke;
     } else {
-        return true;
+        result = true;
     }
+    s_mapStack.pop_back();
     return result;
 }
 

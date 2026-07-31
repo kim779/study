@@ -178,7 +178,7 @@ bool CClient::Attach(CString maps, bool only, bool fix)
 		return false;
 
 	ULONGLONG t0 = GetTickCount64();
-	axlog(LOG_INIT, "[CClient::Attach-enter] maps=%.7s", maps.GetString());
+	axlog(LOG_INIT, "[CClient::Attach-enter] maps=%.8s", maps.GetString());
 
 	m_guard->SetCursor(0, m_view);
 	m_sync.Lock();
@@ -4200,7 +4200,12 @@ void CClient::SetTimer(UINT id, UINT elapse)
 	}*/
 
 	m_view->KillTimer(id);
-	m_view->SetTimer(id, elapse, NULL);
+	// ::SetTimer() returns 0 on failure (invalid HWND, per-process timer limit,
+	// etc.) but that return value was previously discarded here - a failed
+	// registration produced no error anywhere, just a WM_TIMER that never comes.
+	UINT_PTR result = m_view->SetTimer(id, elapse, NULL);
+	axlog(LOG_EVENT, "CClient::SetTimer id=%d elapse=%d result=%llu isWindow=%d client_key=%d",
+		id, elapse, (unsigned long long)result, ::IsWindow(m_view->GetSafeHwnd()), m_key);
 }
 
 //******************************************************[23/01/17][kjs] 함수추가

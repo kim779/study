@@ -11,6 +11,7 @@
 
 #include "../h/axisvar.h"
 #include "../h/axlog.h"
+#include "../dll/vbs/engineWrapper.h"
 #include <winsock2.h>
 #include <WS2tcpip.h>
 #include <mmsystem.h>
@@ -321,6 +322,7 @@ void CxSystem::_Help(LPCTSTR file)
 
 void CxSystem::_Navigate(LPCTSTR url)
 {
+	axlog(LOG_SCRIPT, "CxSystem::_Navigate url=%s", CString(url).GetString());
 	m_guard->SendAxis(MAKEWPARAM(htmlVIEW, 0), (LPARAM)url);
 }
 
@@ -375,12 +377,20 @@ void CxSystem::_SetHistory(LPCTSTR symbol, LPCTSTR code)
 
 void CxSystem::_Trace(LPCTSTR str)
 {
+	// xTRACE() only reaches DebugView/AxisChaser if an external trace window
+	// (m_hTrace) happens to be registered - without one, System.Trace() output
+	// was silently dropped. Mirror it into axlog so it's always visible.
+	// CxSystem is shared session-wide (not per-screen), so the caller's map
+	// name is looked up via CEngineWrapper::GetCurrentMap() - the innermost
+	// screen whose script is executing right now (see engineWrapper.cpp).
+	axlog(LOG_SCRIPT, "CxSystem::_Trace maps=%s str=%s", CEngineWrapper::GetCurrentMap().GetString(), CString(str).GetString());
 	m_guard->xTRACE(x_STRs, (char *)str);
 }
 
 void CxSystem::_Push(LPCTSTR name, LPCTSTR data)
 {
 	CString	text;
+	axlog(LOG_SCRIPT, "CxSystem::_Push name=%s", CString(name).GetString());
 
 	text.Format("%s\t%s", name, data);
 	m_guard->PushData(text);
@@ -396,6 +406,7 @@ BSTR CxSystem::_Pop(LPCTSTR name)
 
 BOOL CxSystem::_Open(LPCTSTR file)
 {
+	axlog(LOG_SCRIPT, "CxSystem::_Open file=%s", CString(file).GetString());
 	if (ShellExecute(NULL, "open", file, NULL, NULL, SW_SHOW) <= (HINSTANCE)32)
 		return FALSE;
 	return TRUE;
@@ -408,16 +419,19 @@ void CxSystem::_SetAutoCode(LPCTSTR data, long count)
 
 BOOL CxSystem::_ExcelToText(LPCTSTR files)
 {
+	axlog(LOG_SCRIPT, "CxSystem::_ExcelToText files=%s", CString(files).GetString());
 	return m_guard->MakeXlsToTxt(files);
 }
 
 BOOL CxSystem::_TextToExcel(LPCTSTR files)
 {
+	axlog(LOG_SCRIPT, "CxSystem::_TextToExcel files=%s", CString(files).GetString());
 	return m_guard->MakeTxtToXls(files);
 }
 
 void CxSystem::_Exit(BOOL reboot)
 {
+	axlog(LOG_EVENT, "CxSystem::_Exit reboot=%d", reboot);
 	m_guard->PostAxis(MAKEWPARAM(closeAXIS, reboot ? true : false));
 }
 
@@ -448,7 +462,9 @@ BOOL CxSystem::_CheckPasswd(LPCTSTR passwd)
 	CString	pass;
 
 	pass = m_guard->GetLoginPass();
-	return pass.Compare(passwd) ? FALSE : TRUE;
+	BOOL match = pass.Compare(passwd) ? FALSE : TRUE;
+	axlog(LOG_SCRIPT, "CxSystem::_CheckPasswd match=%d", match);	// never log the password itself
+	return match;
 }
 
 BSTR CxSystem::_Encrypt(LPCTSTR data, LPCTSTR keys)

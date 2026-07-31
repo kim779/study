@@ -10,6 +10,7 @@
 #include "Key.h"
 
 #include "../h/axiserr.h"
+#include "../h/axlog.h"
 #include "../dll/vbs/engineWrapper.h"
 
 #ifdef _DEBUG
@@ -39,6 +40,7 @@ CScript::~CScript()
 bool CScript::OnStart(CScreen* screen)
 {
 	CString	procs = getProcName(evStart);
+	axlog(LOG_EVENT, "CScript::OnStart maps=%s procs=%s", screen->m_mapH ? CString(screen->m_mapH->mapN, L_MAPN).GetString() : _T("(null)"), procs.GetString());
 	if (screen->m_vbe->IsAvailable(procs))
 	{
 		m_script = false;
@@ -51,6 +53,7 @@ bool CScript::OnStart(CScreen* screen)
 bool CScript::OnFocus(CScreen* screen)
 {
 	CString	procs = getProcName(evFocus);
+	axlog(LOG_EVENT, "CScript::OnFocus maps=%s procs=%s", screen->m_mapH ? CString(screen->m_mapH->mapN, L_MAPN).GetString() : _T("(null)"), procs.GetString());
 	if (screen->m_vbe->IsAvailable(procs))
 	{
 		m_script = false;
@@ -63,6 +66,7 @@ bool CScript::OnFocus(CScreen* screen)
 bool CScript::OnClose(CScreen* screen)
 {
 	CString	procs = getProcName(evClose);
+	axlog(LOG_EVENT, "CScript::OnClose maps=%s procs=%s", screen->m_mapH ? CString(screen->m_mapH->mapN, L_MAPN).GetString() : _T("(null)"), procs.GetString());
 	if (screen->m_vbe->IsAvailable(procs))
 	{
 		m_script = false;
@@ -75,6 +79,7 @@ bool CScript::OnClose(CScreen* screen)
 bool CScript::OnReceive(CScreen* screen, CString trs)
 {
 	CString	procs = getProcName(evReceive);
+	axlog(LOG_EVENT, "CScript::OnReceive maps=%s procs=%s", screen->m_mapH ? CString(screen->m_mapH->mapN, L_MAPN).GetString() : _T("(null)"), procs.GetString());
 	if (screen->m_vbe->IsAvailable(procs))
 	{
 		m_script = false;
@@ -87,6 +92,7 @@ bool CScript::OnReceive(CScreen* screen, CString trs)
 bool CScript::OnSend(CScreen* screen)
 {
 	CString	procs = getProcName(evSend);
+	axlog(LOG_EVENT, "CScript::OnSend maps=%s procs=%s", screen->m_mapH ? CString(screen->m_mapH->mapN, L_MAPN).GetString() : _T("(null)"), procs.GetString());
 	if (screen->m_vbe->IsAvailable(procs))
 	{
 		m_script = false;
@@ -99,6 +105,7 @@ bool CScript::OnSend(CScreen* screen)
 bool CScript::OnKey(CScreen* screen, CfmBase* form)
 {
 	CString	procs = getProcName(evKey, form ? form->GetSymbolName() : _T(""));
+	axlog(LOG_EVENT, "CScript::OnKey maps=%s procs=%s", screen->m_mapH ? CString(screen->m_mapH->mapN, L_MAPN).GetString() : _T("(null)"), procs.GetString());
 	if (screen->m_vbe->IsAvailable(procs))
 	{
 		m_script = false;
@@ -112,6 +119,7 @@ bool CScript::OnKey(CScreen* screen, CfmBase* form)
 bool CScript::OnService(class CScreen* screen, char* data, int datL)
 {
 	CString	procs = getProcName(evService);
+	axlog(LOG_EVENT, "CScript::OnService maps=%s procs=%s", screen->m_mapH ? CString(screen->m_mapH->mapN, L_MAPN).GetString() : _T("(null)"), procs.GetString());
 	if (screen->m_vbe->IsAvailable(procs))
 	{
 		m_script = false;
@@ -124,6 +132,7 @@ bool CScript::OnService(class CScreen* screen, char* data, int datL)
 bool CScript::OnApprove(class CScreen* screen, int key, char* data, int datL)
 {
 	CString	procs = getProcName(evApprove);
+	axlog(LOG_EVENT, "CScript::OnApprove maps=%s procs=%s", screen->m_mapH ? CString(screen->m_mapH->mapN, L_MAPN).GetString() : _T("(null)"), procs.GetString());
 	if (screen->m_vbe->IsAvailable(procs))
 	{
 		m_script = false;
@@ -136,6 +145,7 @@ bool CScript::OnApprove(class CScreen* screen, int key, char* data, int datL)
 bool CScript::OnDevice(CScreen* screen)
 {
 	CString	procs = getProcName(evDevice);
+	axlog(LOG_EVENT, "CScript::OnDevice maps=%s procs=%s", screen->m_mapH ? CString(screen->m_mapH->mapN, L_MAPN).GetString() : _T("(null)"), procs.GetString());
 	if (screen->m_vbe->IsAvailable(procs))
 	{
 		m_script = false;
@@ -148,6 +158,7 @@ bool CScript::OnDevice(CScreen* screen)
 bool CScript::OnTimer(class CScreen* screen)
 {
 	CString procs = getProcName(evTimer);
+	axlog(LOG_EVENT, "CScript::OnTimer maps=%s procs=%s", screen->m_mapH ? CString(screen->m_mapH->mapN, L_MAPN).GetString() : _T("(null)"), procs.GetString());
 	if (screen->m_vbe->IsAvailable(procs))
 	{
 		m_script = false;
@@ -160,6 +171,7 @@ bool CScript::OnTimer(class CScreen* screen)
 bool CScript::OnTimerX(class CScreen* screen, int id)
 {
 	CString	procs = getProcName(evTimerX);
+	axlog(LOG_EVENT, "CScript::OnTimerX id=%d maps=%s procs=%s", id, screen->m_mapH ? CString(screen->m_mapH->mapN, L_MAPN).GetString() : _T("(null)"), procs.GetString());
 	if (screen->m_vbe->IsAvailable(procs))
 	{
 		m_script = false;
@@ -172,6 +184,7 @@ bool CScript::OnTimerX(class CScreen* screen, int id)
 bool CScript::OnSelect(class CScreen* screen, CString maps)
 {
 	CString	procs = getProcName(evSelect);
+	axlog(LOG_EVENT, "CScript::OnSelect maps=%s procs=%s selMaps=%s", screen->m_mapH ? CString(screen->m_mapH->mapN, L_MAPN).GetString() : _T("(null)"), procs.GetString(), maps.GetString());
 	if (screen->m_vbe->IsAvailable(procs))
 	{
 		m_script = false;
@@ -184,6 +197,7 @@ bool CScript::OnSelect(class CScreen* screen, CString maps)
 bool CScript::OnFile(class CScreen* screen, BOOL upload, char* data, int datL)
 {
 	CString	procs = getProcName(evFile);
+	axlog(LOG_EVENT, "CScript::OnFile upload=%d maps=%s procs=%s", upload, screen->m_mapH ? CString(screen->m_mapH->mapN, L_MAPN).GetString() : _T("(null)"), procs.GetString());
 	if (screen->m_vbe->IsAvailable(procs))
 	{
 		m_script = false;
@@ -210,6 +224,7 @@ return true;
 bool CScript::OnSize(class CScreen* screen)
 {
 	CString procs = getProcName(evSize);
+	axlog(LOG_EVENT, "CScript::OnSize maps=%s procs=%s", screen->m_mapH ? CString(screen->m_mapH->mapN, L_MAPN).GetString() : _T("(null)"), procs.GetString());
 	if (screen->m_vbe->IsAvailable(procs))
 	{
 		m_script = false;
@@ -222,6 +237,7 @@ bool CScript::OnSize(class CScreen* screen)
 bool CScript::OnClick(CScreen* screen, CfmBase* form, bool byKey)
 {
 	CString	procs = getProcName(evClick, form->GetSymbolName());
+	axlog(LOG_EVENT, "CScript::OnClick maps=%s procs=%s byKey=%d", screen->m_mapH ? CString(screen->m_mapH->mapN, L_MAPN).GetString() : _T("(null)"), procs.GetString(), byKey);
 	if (screen->m_vbe->IsAvailable(procs))
 	{
 		m_script = byKey;
@@ -236,6 +252,7 @@ bool CScript::OnClick(CScreen* screen, CfmBase* form, bool byKey)
 bool CScript::OnDblClick(CScreen* screen, CfmBase* form)
 {
 	CString	procs = getProcName(evDblClk, form->GetSymbolName());
+	axlog(LOG_EVENT, "CScript::OnDblClick maps=%s procs=%s", screen->m_mapH ? CString(screen->m_mapH->mapN, L_MAPN).GetString() : _T("(null)"), procs.GetString());
 	if (screen->m_vbe->IsAvailable(procs))
 	{
 		m_script = false;
@@ -250,6 +267,7 @@ bool CScript::OnDblClick(CScreen* screen, CfmBase* form)
 bool CScript::OnChange(CScreen* screen, CfmBase* form, bool byKey)
 {
 	CString	procs = getProcName(evChange, form->GetSymbolName());
+	axlog(LOG_EVENT, "CScript::OnChange maps=%s procs=%s byKey=%d", screen->m_mapH ? CString(screen->m_mapH->mapN, L_MAPN).GetString() : _T("(null)"), procs.GetString(), byKey);
 	if (screen->m_vbe->IsAvailable(procs))
 	{
 		m_script = byKey;
@@ -262,6 +280,7 @@ bool CScript::OnChange(CScreen* screen, CfmBase* form, bool byKey)
 bool CScript::OnMouseDown(CScreen* screen, CfmBase* form)
 {
 	CString	procs = getProcName(evMouseDn, form->GetSymbolName());
+	axlog(LOG_EVENT, "CScript::OnMouseDown maps=%s procs=%s", screen->m_mapH ? CString(screen->m_mapH->mapN, L_MAPN).GetString() : _T("(null)"), procs.GetString());
 	if (screen->m_vbe->IsAvailable(procs))
 	{
 		m_script = false;
@@ -274,6 +293,7 @@ bool CScript::OnMouseDown(CScreen* screen, CfmBase* form)
 bool CScript::OnMouseUp(CScreen* screen, CfmBase* form)
 {
 	CString	procs = getProcName(evMouseUp, form->GetSymbolName());
+	axlog(LOG_EVENT, "CScript::OnMouseUp maps=%s procs=%s", screen->m_mapH ? CString(screen->m_mapH->mapN, L_MAPN).GetString() : _T("(null)"), procs.GetString());
 	if (screen->m_vbe->IsAvailable(procs))
 	{
 		m_script = false;
@@ -286,6 +306,7 @@ bool CScript::OnMouseUp(CScreen* screen, CfmBase* form)
 bool CScript::OnCharChange(CScreen* screen, CfmBase* form)
 {
 	CString	procs = getProcName(evChar, form->GetSymbolName());
+	axlog(LOG_EVENT, "CScript::OnCharChange maps=%s procs=%s", screen->m_mapH ? CString(screen->m_mapH->mapN, L_MAPN).GetString() : _T("(null)"), procs.GetString());
 	if (screen->m_vbe->IsAvailable(procs))
 	{
 		m_script = false;
@@ -298,6 +319,7 @@ bool CScript::OnCharChange(CScreen* screen, CfmBase* form)
 bool CScript::OnSetFocus(CScreen* screen, CfmBase* form)
 {
 	CString	procs = getProcName(evSetFocus, form->GetSymbolName());
+	axlog(LOG_EVENT, "CScript::OnSetFocus maps=%s procs=%s", screen->m_mapH ? CString(screen->m_mapH->mapN, L_MAPN).GetString() : _T("(null)"), procs.GetString());
 	if (screen->m_vbe->IsAvailable(procs))
 	{
 		m_script = false;
@@ -310,6 +332,7 @@ bool CScript::OnSetFocus(CScreen* screen, CfmBase* form)
 bool CScript::OnMouseEnter(CScreen* screen, CfmBase* form)
 {
 	CString procs = getProcName(evMouseEnter, form->GetSymbolName());
+	axlog(LOG_EVENT, "CScript::OnMouseEnter maps=%s procs=%s", screen->m_mapH ? CString(screen->m_mapH->mapN, L_MAPN).GetString() : _T("(null)"), procs.GetString());
 	if (screen->m_vbe->IsAvailable(procs))
 	{
 		m_script = false;
@@ -322,6 +345,7 @@ bool CScript::OnMouseEnter(CScreen* screen, CfmBase* form)
 bool CScript::OnMouseLeave(CScreen* screen, CfmBase* form)
 {
 	CString	procs = getProcName(evMouseLeave, form->GetSymbolName());
+	axlog(LOG_EVENT, "CScript::OnMouseLeave maps=%s procs=%s", screen->m_mapH ? CString(screen->m_mapH->mapN, L_MAPN).GetString() : _T("(null)"), procs.GetString());
 	if (screen->m_vbe->IsAvailable(procs))
 	{
 		m_script = false;
@@ -333,6 +357,7 @@ bool CScript::OnMouseLeave(CScreen* screen, CfmBase* form)
 
 bool CScript::OnProcedure(CScreen* screen, CString procs)
 {
+	axlog(LOG_EVENT, "CScript::OnProcedure maps=%s procs=%s", screen->m_mapH ? CString(screen->m_mapH->mapN, L_MAPN).GetString() : _T("(null)"), procs.GetString());
 	if (screen->m_vbe->IsAvailable(procs))
 	{
 		m_script = false;
@@ -343,6 +368,7 @@ bool CScript::OnProcedure(CScreen* screen, CString procs)
 
 bool CScript::Procedure(class CScreen* screen, CString procs, CString data, int count)
 {
+	axlog(LOG_EVENT, "CScript::Procedure maps=%s procs=%s count=%d", screen->m_mapH ? CString(screen->m_mapH->mapN, L_MAPN).GetString() : _T("(null)"), procs.GetString(), count);
 	if (screen->m_vbe->IsAvailable(procs))
 	{
 		m_script = false;

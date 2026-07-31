@@ -1620,7 +1620,7 @@ void CTestDlgDlg::OnBnClickedBtnHashkey()
 {
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
 	CString sname;
-	sname = "##opuser";
+	sname = "##ibksmts";
 	CString sdata;
 	sdata.Format("%08u", Hashdata((LPCSTR)sname));
 	

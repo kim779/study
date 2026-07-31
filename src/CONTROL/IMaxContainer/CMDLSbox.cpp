@@ -1,4 +1,4 @@
-ï»¿// CMDLSbox.cpp: êµ¬í˜„ íŒŒì¼
+// CMDLSbox.cpp: ±¸Çö ÆÄÀÏ
 //
 
 #include "stdafx.h"
@@ -7,7 +7,7 @@
 #include "afxdialogex.h"
 
 
-// CMDLSbox ëŒ€í™” ìƒìž
+// CMDLSbox ´ëÈ­ »óÀÚ
 
 IMPLEMENT_DYNAMIC(CMDLSbox, CDialog)
 
@@ -34,13 +34,13 @@ BEGIN_MESSAGE_MAP(CMDLSbox, CDialog)
 END_MESSAGE_MAP()
 
 
-// CMDLSbox ë©”ì‹œì§€ ì²˜ë¦¬ê¸°
+// CMDLSbox ¸Þ½ÃÁö Ã³¸®±â
 
 
 void CMDLSbox::OnDestroy()
 {
 	CDialog::OnDestroy();
-	// TODO: ì—¬ê¸°ì— ë©”ì‹œì§€ ì²˜ë¦¬ê¸° ì½”ë“œë¥¼ ì¶”ê°€í•©ë‹ˆë‹¤.
+	// TODO: ¿©±â¿¡ ¸Þ½ÃÁö Ã³¸®±â ÄÚµå¸¦ Ãß°¡ÇÕ´Ï´Ù.
 	
 }
 
@@ -49,17 +49,17 @@ BOOL CMDLSbox::OnInitDialog()
 {
 	CDialog::OnInitDialog();
 
-	// TODO:  ì—¬ê¸°ì— ì¶”ê°€ ì´ˆê¸°í™” ìž‘ì—…ì„ ì¶”ê°€í•©ë‹ˆë‹¤.
+	// TODO:  ¿©±â¿¡ Ãß°¡ ÃÊ±âÈ­ ÀÛ¾÷À» Ãß°¡ÇÕ´Ï´Ù.
 
 	SetDlgItemText(IDC_STATIC, m_text);
 	return TRUE;  // return TRUE unless you set the focus to a control
-				  // ì˜ˆì™¸: OCX ì†ì„± íŽ˜ì´ì§€ëŠ” FALSEë¥¼ ë°˜í™˜í•´ì•¼ í•©ë‹ˆë‹¤.
+				  // ¿¹¿Ü: OCX ¼Ó¼º ÆäÀÌÁö´Â FALSE¸¦ ¹ÝÈ¯ÇØ¾ß ÇÕ´Ï´Ù.
 }
 
 
 void CMDLSbox::OnBnClickedOk()
 {
-	// TODO: ì—¬ê¸°ì— ì»¨íŠ¸ë¡¤ ì•Œë¦¼ ì²˜ë¦¬ê¸° ì½”ë“œë¥¼ ì¶”ê°€í•©ë‹ˆë‹¤.
+	// TODO: ¿©±â¿¡ ÄÁÆ®·Ñ ¾Ë¸² Ã³¸®±â ÄÚµå¸¦ Ãß°¡ÇÕ´Ï´Ù.
 	if (m_pParent && ::IsWindow(m_pParent->GetSafeHwnd()))
 		m_pParent->PostMessage(WM_USER + 999, 1, 0);
 	CDialog::OnOK();
@@ -68,7 +68,7 @@ void CMDLSbox::OnBnClickedOk()
 
 void CMDLSbox::OnBnClickedCancel()
 {
-	// TODO: ì—¬ê¸°ì— ì»¨íŠ¸ë¡¤ ì•Œë¦¼ ì²˜ë¦¬ê¸° ì½”ë“œë¥¼ ì¶”ê°€í•©ë‹ˆë‹¤.
+	// TODO: ¿©±â¿¡ ÄÁÆ®·Ñ ¾Ë¸² Ã³¸®±â ÄÚµå¸¦ Ãß°¡ÇÕ´Ï´Ù.
 	if (m_pParent && ::IsWindow(m_pParent->GetSafeHwnd()))
 		m_pParent->PostMessage(WM_USER + 999, 0, 0);
 	CDialog::OnCancel();
@@ -77,7 +77,7 @@ void CMDLSbox::OnBnClickedCancel()
 
 BOOL CMDLSbox::PreTranslateMessage(MSG* pMsg)
 {
-	// TODO: ì—¬ê¸°ì— íŠ¹ìˆ˜í™”ëœ ì½”ë“œë¥¼ ì¶”ê°€ ë°/ë˜ëŠ” ê¸°ë³¸ í´ëž˜ìŠ¤ë¥¼ í˜¸ì¶œí•©ë‹ˆë‹¤.
+	// TODO: ¿©±â¿¡ Æ¯¼öÈ­µÈ ÄÚµå¸¦ Ãß°¡ ¹×/¶Ç´Â ±âº» Å¬·¡½º¸¦ È£ÃâÇÕ´Ï´Ù.
 	if (pMsg->message == WM_KEYDOWN)
 	{
 		if (pMsg->wParam == VK_RETURN || pMsg->wParam == VK_ESCAPE)

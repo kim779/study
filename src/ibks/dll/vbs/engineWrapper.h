@@ -40,6 +40,12 @@ public:
 
     void    Close();
 
+    // Map name of the screen whose script is currently executing (innermost,
+    // for nested/reentrant DoProcedure calls). Lets shared, screen-agnostic
+    // objects (e.g. CxSystem, which has no CScreen* of its own) report which
+    // screen's script called them - see CxSystem::_Trace.
+    static CString GetCurrentMap();
+
 // Implementation
 private:
     CWnd*           m_parent;

@@ -4492,7 +4492,8 @@ LONG CMainFrame::OnUSER(WPARAM wParam, LPARAM lParam)
 					CString sval;
 					sval.Format("%s", (char*)lParam);
 					sval.TrimRight();
-					InputScreenNo(sval);
+					if (sval.Left(2) == "IB")
+						m_mapHelper->ChangeChild(sval);
 				}
 				break;
 			}
@@ -27995,6 +27996,8 @@ OutputDebugString(m_slog);
 	//const BOOL pcAOS = AfxGetApp()->GetProfileInt(INFORMATION, "AOS", 1);
 	BOOL pcAOS = TRUE;
 
+	pcAOS = false;  //test astx
+
 	if(pcAOS && Axis::isCustomer)
 	{
 		if(m_bNoProtect)
@@ -29431,6 +29434,8 @@ void CMainFrame::ParsePihoitgyList(char* dat, int len)
 		FreeLibrary(hModule);
 	}
 
+	//test
+	cnt = 0;
 	if(cnt > 0)
 	{
 		if(m_bUseNewLogin)

@@ -278,8 +278,7 @@ LONG CWizardCtrl::OnFireAlert(WPARAM wParam, LPARAM lParam)
 BOOL CWizardCtrl::RunAxis(long mode, long pBytes, long nBytes)
 {
 	BOOL	retv;
-m_slog.Format("\r\n[WIZARD][CWizardCtrl][RunAxis]RunAxis mode=[%d] [%s]\r\n", mode, (char*)pBytes);
-OutputDebugString(m_slog);
+	axlog(LOG_INIT, "CWizardCtrl::RunAxis mode=%d m_mode=%d", mode, (int)m_mode);
 	switch (mode)
 	{
 	case loginSHOP:
@@ -427,8 +426,7 @@ long CWizardCtrl::axWizard(long kind, long variant)
 		}
 		return (long)tmps.operator LPCTSTR();
 	case setFDC:
-		m_slog.Format("\r\n[WIZARD][CWizardCtrl][axWizard][TRIGGER]  setFDS [%d] [%s]\r\n", HIWORD(kind), (char*)variant);
-		OutputDebugString(m_slog);
+		axlog(LOG_EVENT, "CWizardCtrl::axWizard setFDC kind=%d variant=%s", HIWORD(kind), (char*)variant);
 		if (HIWORD(kind) & 0xff00)
 		{
 			if (m_guard->GetClient(HIWORD(kind) & 0x00ff, works))
@@ -713,6 +711,7 @@ OutputDebugString(m_slog);
 
 		if (axisH->stat & statENC && !m_guard->Xecure(DI_DEC, chain, axisL))
 		{
+			axlog(LOG_DATA, "[Xecure] decrypt FAILED trxC=%.8s winK=%d - packet dropped", axisH->trxC, axisH->winK);
 			OnFire(FEV_GUIDE, axisH->winK, AE_SSECURE);
 			continue;
 		}
@@ -1052,12 +1051,6 @@ void CWizardCtrl::OnXecure(int encK, char* pBytes, int nBytes)
 	case encOK:
 		if (m_xtype == xtFlag::xtXEC)
 		{
-			//	if (m_guard->m_xecure)
-			//	{
-			//		delete m_guard->m_xecure;
-			//		m_guard->m_xecure = NULL;
-			//	}
-
 			m_mode  = mtFlag::mtCON;
 			m_xtype = xtFlag::xtWS;
 			OnFire(FEV_RUN, 0, 0);

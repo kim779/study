@@ -4,6 +4,7 @@
 #include <Python.h>
 #include "pythonEngine.h"
 #include "VbGuide.h"
+#include "../../h/axlog.h"
 
 #include <vector>
 #include <algorithm>
@@ -344,6 +345,7 @@ void CPythonEngine::Initialize(CString maps)
 {
     m_maps = maps;
     m_errors.RemoveAll();
+    axlog(LOG_INIT, "maps=%s alreadyInit=%d", maps.GetString(), Py_IsInitialized() ? 1 : 0);
 
     if (!Py_IsInitialized()) {
         PyConfig config;
@@ -382,6 +384,7 @@ void CPythonEngine::Initialize(CString maps)
 void CPythonEngine::AddObject(CString names, CCmdTarget* object, DWORD /*flag*/)
 {
     if (!m_globals || !object) return;
+    axlog(LOG_SCRIPT, "name=%s maps=%s", names.GetString(), m_maps.GetString());
 
     if (::isdigit(static_cast<unsigned char>(names.GetAt(0))))
         names.Insert(0, 'S');
@@ -453,6 +456,7 @@ bool CPythonEngine::UnloadScript()
 bool CPythonEngine::IsAvailable(CString procs)
 {
     PyObject* func = getFunction(procs);
+    axlog(LOG_SCRIPT, "procs=%s found=%d", procs.GetString(), func ? 1 : 0);
     if (func) { Py_DECREF(func); return true; }
     return false;
 }
@@ -461,6 +465,7 @@ bool CPythonEngine::DoProcedure(CString procs, WPARAM wParam, LPARAM lParam, int
 {
     PyObject* func = getFunction(procs);
     if (!func) return false;
+    axlog(LOG_EVENT, "procs=%s maps=%s", procs.GetString(), m_maps.GetString());
 
     m_invoke = true;
     PyObject* args = NULL;
@@ -512,6 +517,7 @@ bool CPythonEngine::DoProcedure(CString procs, WPARAM wParam, LPARAM lParam, int
     if (!result) {
         fetchError();
         m_invoke = false;
+        axlog(LOG_EVENT, "FAILED procs=%s maps=%s", procs.GetString(), m_maps.GetString());
         return false;
     }
     Py_DECREF(result);
@@ -523,6 +529,7 @@ bool CPythonEngine::DoProcedure(CString procs, CString data, int count)
 {
     PyObject* func = getFunction(procs);
     if (!func) return true;  // match VBS behavior: true even if not found
+    axlog(LOG_EVENT, "procs=%s maps=%s data=%s", procs.GetString(), m_maps.GetString(), data.GetString());
 
     m_invoke = true;
 
@@ -557,6 +564,7 @@ bool CPythonEngine::DoProcedure(CString procs, CString data, int count)
     if (!result) {
         fetchError();
         m_invoke = false;
+        axlog(LOG_EVENT, "FAILED procs=%s maps=%s", procs.GetString(), m_maps.GetString());
         return false;
     }
     Py_DECREF(result);
@@ -661,6 +669,7 @@ void CPythonEngine::fetchError()
     }
     if (msg.IsEmpty())
         msg.Format("Python Error [%s]: Unknown error", m_maps.GetString());
+    axlog(LOG_SCRIPT, "%s", msg.GetString());
 
     m_errors.Add(msg);
 

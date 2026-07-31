@@ -477,6 +477,8 @@ void CChildView::OnRCVData(WPARAM wParam, LPARAM lParam)
 		if (!m_bSNDRCV)	break;
 
 		CString trxCode;
+		unsigned char winK = 0;
+		unsigned char unitK = 0;
 		if (len > L_axisH)
 		{
 			struct _axisH* axisH = (struct _axisH*)dat;
@@ -495,13 +497,16 @@ void CChildView::OnRCVData(WPARAM wParam, LPARAM lParam)
 			int nul = trxCode.Find('\0');
 			if (nul >= 0)	trxCode = trxCode.Left(nul);
 			trxCode.TrimRight(' ');
+
+			winK = axisH->winK;
+			unitK = axisH->unit;
 		}
 
 		if (HIWORD(wParam) == x_SNDs && !m_options.send)	break;
 		if (HIWORD(wParam) == x_RCVs && !m_options.receive)	break;
 		if (HIWORD(wParam) == x_SNDs)
-			string.Format("\n>>>>>>>>>>>>>>>>>>>> [Send Data %d Bytes][%s] <<<<<<<<<<<<<<<<<<<< \n", len, timeS);
-		else	string.Format("\n<<<<<<<<<<<<<<<<<<<< [Receive Data %d Bytes][%s] >>>>>>>>>>>>>>>>>>>> \n", len, timeS);
+			string.Format("\n>>>>>>>>>>>>>>>>>>>> [Send Data %d Bytes][%s][Win %d][Unit %d] <<<<<<<<<<<<<<<<<<<< \n", len, timeS, winK, unitK);
+		else	string.Format("\n<<<<<<<<<<<<<<<<<<<< [Receive Data %d Bytes][%s][Win %d][Unit %d] >>>>>>>>>>>>>>>>>>>> \n", len, timeS, winK, unitK);
 
 		addTrace(string, K_SNDRCV);
 		if (!len)
@@ -780,8 +785,10 @@ void CChildView::addTrace(CString dat, int kind, CString boldSub)
 	stmp = dat;
 	stmp.TrimRight();
 	stmp.Replace("\n", "");
+#ifdef _DEBUG
 	slog.Format("[addTrace] [%d][%s]", stmp.GetLength(), stmp);
 	OutputDebugString(slog);
+#endif
 
 	if (dat.IsEmpty())	return;
 	if (!m_bBypassFilter && m_bFilterOn && !m_strKeyword.IsEmpty() && dat.Find(">>>>") < 0 && dat.Find("<<<<") < 0)
@@ -792,6 +799,13 @@ void CChildView::addTrace(CString dat, int kind, CString boldSub)
 
 	if (m_bLogEnable && (kind == K_SNDRCV || kind == K_REPORT))
 		WriteLogFile(dat);
+
+	if (m_trace.GetTextLength() > 50 * 1024 * 1024)
+	{
+		int docLen = m_trace.GetTextLength();
+		m_trace.SetSel(0, docLen / 2);
+		m_trace.ReplaceSel("");
+	}
 
 	if (m_findDlg)
 		m_findDlg->SetFocus();
@@ -858,8 +872,6 @@ void CChildView::addTrace(CString dat, int kind, CString boldSub)
 		c << dat >> m_trace;
 	}
 #endif
-	if (m_bNOSCROLL)	return;
-	m_trace.SendMessage(WM_VSCROLL, SB_BOTTOM);
 }
 
 CString CChildView::parse(CString &dat, CString separate)
@@ -1027,8 +1039,12 @@ void CChildView::CopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct)
 	DWORD	len  = cdss->len;
 	DWORD	flag = cdss->flag;
 #if 1
-	if (flag == x_RTMs && m_que.GetSize() > 200)
+	if ((flag == x_RTMs && m_que.GetSize() > 200) ||
+		(flag == x_SNDs && m_que.GetSize() > 500) ||
+		(flag == x_RCVs && m_que.GetSize() > 500))
+	{
 		return;
+	}
 
 	CQue*	que = new CQue;
 	que->m_flag = flag;
@@ -1065,6 +1081,9 @@ LRESULT CChildView::OnReceive(WPARAM wParam, LPARAM lParam)
 
 	if (m_que.GetSize())
 		PostMessage(WM_RECEIVE);
+
+	if (!m_bNOSCROLL)
+		m_trace.SendMessage(WM_VSCROLL, SB_BOTTOM);
 
 	return 0;
 }

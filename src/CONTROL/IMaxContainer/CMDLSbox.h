@@ -1,7 +1,7 @@
-ï»¿#pragma once
+#pragma once
 
 
-// CMDLSbox ëŒ€í™” ìƒì
+// CMDLSbox ´ëÈ­ »óÀÚ
 
 
 class CMDLSbox : public CDialog
@@ -9,18 +9,18 @@ class CMDLSbox : public CDialog
 	DECLARE_DYNAMIC(CMDLSbox)
 
 public:
-	CMDLSbox(CWnd* pParent = nullptr);   // í‘œì¤€ ìƒì„±ìì…ë‹ˆë‹¤.
+	CMDLSbox(CWnd* pParent = nullptr);   // Ç¥ÁØ »ı¼ºÀÚÀÔ´Ï´Ù.
 	virtual ~CMDLSbox();
 
 	CWnd* m_pParent{};
 	CString m_text{};
-// ëŒ€í™” ìƒì ë°ì´í„°ì…ë‹ˆë‹¤.
+// ´ëÈ­ »óÀÚ µ¥ÀÌÅÍÀÔ´Ï´Ù.
 #ifdef AFX_DESIGN_TIME
 	enum { IDD = IDD_DLG_MDLS };
 #endif
 
 protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV ì§€ì›ì…ë‹ˆë‹¤.
+	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV Áö¿øÀÔ´Ï´Ù.
 
 	DECLARE_MESSAGE_MAP()
 public:

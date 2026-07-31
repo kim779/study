@@ -8,6 +8,7 @@
 #include "image.h"
 
 #include "../../h/axiserr.h"
+#include "../../h/axlog.h"
 #include <math.h>
 
 #ifdef _DEBUG
@@ -243,8 +244,7 @@ void CfmEdit::_Refresh()
 
 void CfmEdit::_Trigger(LPCTSTR name, BOOL all) 
 {
-	m_slog.Format("\r\n[axisform][CfmEdit][_Trigger][Trigger] name=[%s]\r\n", name);
-	OutputDebugString(m_slog);
+	axlog(LOG_AXISFORM, "CfmEdit::_Trigger name=%s", name);
 	m_axform->DoSomething(doTRIGGER, this, (WPARAM)all,  (LPARAM)name);
 }
 
@@ -611,8 +611,7 @@ void CfmEdit::Draw(CDC* dc)
 	CBrush*	brush;
 	int	ndc = dc->SaveDC();
 
-	m_slog.Format("[WIZARD][axisform][%s]<%d>  m_caret=[%d] \r\n", __FUNCTION__, __LINE__, m_caret);
-	OutputDebugString(m_slog);
+	axlog(LOG_AXISFORM, "CfmEdit::Draw m_caret=%d", m_caret);
 
 	if (m_caret)
 	{
@@ -622,8 +621,7 @@ void CfmEdit::Draw(CDC* dc)
 			m_axform->m_view->HideCaret();
 		else
 		{
-m_slog.Format("[WIZARD][axisform][%s]<%d>  m_fHeight=[%d] \r\n", __FUNCTION__, __LINE__, m_fHeight);
-OutputDebugString(m_slog);
+axlog(LOG_AXISFORM, "CfmEdit::Draw m_fHeight=%d", (int)m_fHeight);
 			m_axform->m_view->CreateSolidCaret(2, (int)m_fHeight);
 		}
 	}
@@ -725,8 +723,7 @@ OutputDebugString(m_slog);
 		tSize.cy = (int)m_fHeight;
 	}
 	
-m_slog.Format("[WIZARD][axisform][%s]<%d>  tmpS=[%s] m_caretPos=[%d] \r\n", __FUNCTION__, __LINE__, tmpS, m_caretPos);
-OutputDebugString(m_slog);
+axlog(LOG_AXISFORM, "CfmEdit::Draw tmpS=%s m_caretPos=%d", tmpS.GetString(), m_caretPos);
 
 	if (m_form->attr & FA_RIGHT)
 		dc->DrawText(tmpS, m_tRc, DT_SINGLELINE|DT_VCENTER|DT_RIGHT|DT_NOPREFIX);
@@ -871,8 +868,7 @@ OutputDebugString(m_slog);
 
 		tPoint.y = m_tRc.top + (m_tRc.Height() - (int)m_fHeight) / 2;
 
-m_slog.Format("[WIZARD][axisform][%s]<%d>  setCaretPos =[x=%d y=%d] \r\n", __FUNCTION__, __LINE__,  tPoint.x, tPoint.y);
-OutputDebugString(m_slog);
+axlog(LOG_AXISFORM, "CfmEdit::Draw setCaretPos x=%d y=%d", tPoint.x, tPoint.y);
 
 		setCaretPos(tPoint);
 		m_axform->m_view->ShowCaret();
@@ -886,8 +882,7 @@ OutputDebugString(m_slog);
 void CfmEdit::OnLButton(bool down, CPoint pt, int& result)
 {
 	result = RC_NOP;
-	m_slog.Format("[WIZARD][spin][%s]<%d>", __FUNCTION__, __LINE__);
-	OutputDebugString(m_slog);
+	axlog(LOG_AXISFORM, "CfmEdit::OnLButton down=%d", down);
 	if (down)
 		m_axform->m_cursor = pt;
 	else if (!m_focus)
@@ -1217,13 +1212,11 @@ void CfmEdit::SetFocus(bool focus)
 {
 	if (m_strR == "a")
 	{
-		OutputDebugString("!!!!!");
+		axlog(LOG_AXISFORM, "CfmEdit::SetFocus early-return (m_strR==\"a\")");
 		return;
 	}
 
-	m_slog.Format("[WIZARD][axisform][key][%s]<%d>m_strR =[%s]  focus=[%d] left=[%d] ]",
-		__FUNCTION__, __LINE__, m_strR, focus, m_iRc.left);
-	OutputDebugString(m_slog);
+	axlog(LOG_AXISFORM, "CfmEdit::SetFocus m_strR=%s focus=%d left=%d", m_strR.GetString(), focus, m_iRc.left);
 
 	CRect	iRc = m_iRc;
 	bool	setfocus = false;
@@ -1403,9 +1396,7 @@ void CfmEdit::WriteData(CString data, bool redraw, int col, int row)
 
 void CfmEdit::UpdateData(int key, bool moving, int& result)
 {
-m_slog.Format("[WIZARD][axisform][key][%s ------ start]<%d>m_strR =[%s]  key=[%d] char=[%c] moving=[%d]", 
-	__FUNCTION__, __LINE__, m_strR, key, (char)key, moving);
-OutputDebugString(m_slog);
+axlog(LOG_AXISFORM, "CfmEdit::UpdateData start m_strR=%s key=%d char=%c moving=%d", m_strR.GetString(), key, (char)key, moving);
 
 	result = RC_NOP;
 	if (m_form->attr & FA_PROTECT)
@@ -1543,10 +1534,7 @@ OutputDebugString(m_slog);
 		tmpS += m_strR.Left(m_caretPos);
 		len = (key < 0x80) ? 1 : 2;
 
-		m_slog.Format("[WIZARD][axisform][key][%s  111]<%d>m_strR =[%s]  tmpS=[%s]  len=[%d] m_caretPos=[%d]",
-			__FUNCTION__, __LINE__, m_strR, tmpS, len, m_caretPos);
-		OutputDebugString(m_slog);
-
+		axlog(LOG_AXISFORM, "CfmEdit::UpdateData[111] m_strR=%s tmpS=%s len=%d m_caretPos=%d", m_strR.GetString(), tmpS.GetString(), len, m_caretPos);
 
 		if (len == 1)
 		{
@@ -1559,23 +1547,16 @@ OutputDebugString(m_slog);
 		{
 			tmpS += HIBYTE(LOWORD(key));
 
-			m_slog.Format("[WIZARD][axisform][key][%s  222]<%d>m_strR =[%s]  tmpS=[%s]  len=[%d] m_caretPos=[%d]",
-				__FUNCTION__, __LINE__, m_strR, tmpS, len, m_caretPos);
-			OutputDebugString(m_slog);
+			axlog(LOG_AXISFORM, "CfmEdit::UpdateData[222] m_strR=%s tmpS=%s len=%d m_caretPos=%d", m_strR.GetString(), tmpS.GetString(), len, m_caretPos);
 
 			tmpS += LOBYTE(LOWORD(key));
 
-			m_slog.Format("[WIZARD][axisform][key][%s  333]<%d>m_strR =[%s]  tmpS=[%s]  len=[%d] m_caretPos=[%d]",
-				__FUNCTION__, __LINE__, m_strR, tmpS,  len, m_caretPos);
-			OutputDebugString(m_slog);
-
+			axlog(LOG_AXISFORM, "CfmEdit::UpdateData[333] m_strR=%s tmpS=%s len=%d m_caretPos=%d", m_strR.GetString(), tmpS.GetString(), len, m_caretPos);
 		}
 
 		int index = (whichHangulEdit(m_caretPos, m_strR) == WC_H1) ? m_caretPos+2 : m_caretPos+len;
 
-		m_slog.Format("[WIZARD][axisform][key][%s whichHangulEdit]<%d>m_strR =[%s]  index=[%d] m_caretPos=[%d] len=[%d]",
-			__FUNCTION__, __LINE__, m_strR, index, m_caretPos, len);
-		OutputDebugString(m_slog);
+		axlog(LOG_AXISFORM, "CfmEdit::UpdateData whichHangulEdit m_strR=%s index=%d m_caretPos=%d len=%d", m_strR.GetString(), index, m_caretPos, len);
 
 		if (index < m_strR.GetLength())
 		{
@@ -1594,18 +1575,14 @@ OutputDebugString(m_slog);
 	if (moving)
 		m_caretPos += len;
 
-	m_slog.Format("[WIZARD][axisform][key][%s]]<%d>m_strR =[%s] m_caretPos=[%d] len=[%d] tmpS=[%s] ",
-		__FUNCTION__, __LINE__, m_strR,  m_caretPos, len, tmpS);
-	OutputDebugString(m_slog);
+	axlog(LOG_AXISFORM, "CfmEdit::UpdateData pre-assign m_strR=%s m_caretPos=%d len=%d tmpS=%s", m_strR.GetString(), m_caretPos, len, tmpS.GetString());
 
 	m_strR = tmpS;
 	checkMode();
 	editData();
 	getStartPos();
 
-	m_slog.Format("[WIZARD][axisform][key][%s]]<%d>m_strR =[%s] m_caretPos=[%d] len=[%d] tmpS=[%s] ",
-		__FUNCTION__, __LINE__, m_strR, m_caretPos, len, tmpS);
-	OutputDebugString(m_slog);
+	axlog(LOG_AXISFORM, "CfmEdit::UpdateData post-assign m_strR=%s m_caretPos=%d len=%d tmpS=%s", m_strR.GetString(), m_caretPos, len, tmpS.GetString());
 
 	if ((m_form->properties & PR_CODE) && !m_category.IsEmpty() && m_category.GetAt(0) != 'H')
 	{
@@ -1623,16 +1600,12 @@ OutputDebugString(m_slog);
 	m_focusing = false;
 	invalidateRect(&m_tRc, false);
 
-	m_slog.Format("[WIZARD][axisform][key][%s ~~~~~ end]<%d>m_strR =[%s]  key=[%d] char=[%c] moving=[%d]",
-		__FUNCTION__, __LINE__, m_strR, key, (char)key, moving);
-	OutputDebugString(m_slog);
+	axlog(LOG_AXISFORM, "CfmEdit::UpdateData end m_strR=%s key=%d char=%c moving=%d", m_strR.GetString(), key, (char)key, moving);
 }
 
 void CfmEdit::InsertData(int key, bool moving, int& result)
 {
-	m_slog.Format("[WIZARD][axisform][key][%s]<%d>m_strR =[%s]  key=[%d] char=[%c] moving=[%d]",
-		__FUNCTION__, __LINE__, m_strR, key, (char)key, moving);
-	OutputDebugString(m_slog);
+	axlog(LOG_AXISFORM, "CfmEdit::InsertData m_strR=%s key=%d char=%c moving=%d", m_strR.GetString(), key, (char)key, moving);
 
 	result = RC_NOP;
 	if (m_form->attr & FA_PROTECT)
@@ -2565,8 +2538,7 @@ int CfmEdit::calcCaretPos()
 
 void CfmEdit::getStartPos()
 {
-	m_slog.Format("[WIZARD][axisform][%s start]<%d>  m_stPos=[%d] m_caretPos=[%d] \r\n", __FUNCTION__, __LINE__, m_stPos, m_caretPos);
-	OutputDebugString(m_slog);
+	axlog(LOG_AXISFORM, "CfmEdit::getStartPos start m_stPos=%d m_caretPos=%d", m_stPos, m_caretPos);
 
 	int	stpos = m_stPos;
 
@@ -2640,8 +2612,7 @@ void CfmEdit::getStartPos()
 	if (whichHangulEdit(m_stPos, m_strR) == WC_H2)
 		m_stPos++;
 
-	m_slog.Format("[WIZARD][axisform][%s end]<%d>  m_stPos=[%d] \r\n", __FUNCTION__, __LINE__, m_stPos);
-	OutputDebugString(m_slog);
+	axlog(LOG_AXISFORM, "CfmEdit::getStartPos end m_stPos=%d", m_stPos);
 
 
 	releaseDC(dc);

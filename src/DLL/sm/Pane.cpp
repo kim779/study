@@ -930,11 +930,12 @@ void CPane::Draw_KIndex(CDC* pDC, int key)
 
 		pDC->DrawText(text, tRc, DT_RIGHT|DT_VCENTER|DT_SINGLELINE);
 
-		cx = pDC->GetTextExtent(" 999.99").cx;
+		text = commaE(value);
+		cx = pDC->GetTextExtent(text).cx;
 		tRc.left = tRc.right;
 		tRc.right = tRc.left + cx;
 
-		pDC->DrawText(commaE(value), tRc, DT_RIGHT|DT_VCENTER|DT_SINGLELINE);
+		pDC->DrawText(text, tRc, DT_RIGHT|DT_VCENTER|DT_SINGLELINE);
 	}
 
 	switch (key)

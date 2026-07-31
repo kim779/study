@@ -5,6 +5,8 @@
 #include "Wizard.h"
 #include "OnTimer.h"
 
+#include "../h/axlog.h"
+
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #undef THIS_FILE
@@ -46,10 +48,12 @@ END_MESSAGE_MAP()
 /////////////////////////////////////////////////////////////////////////////
 // COnTimer message handlers
 
-int COnTimer::Run() 
+int COnTimer::Run()
 {
 	int	key;
 	CSingleLock	syncLock(&m_event);
+
+	axlog(LOG_EVENT, "COnTimer::Run thread started tid=%d", (int)GetCurrentThreadId());
 
 	while (m_alive)
 	{
@@ -65,36 +69,48 @@ int COnTimer::Run()
 		m_keys.RemoveKey(key);
 		m_section.Unlock();
 
+		axlog(LOG_EVENT, "COnTimer::Run dequeued key=%d tid=%d", key, (int)GetCurrentThreadId());
 		DoParse(key);
 	}
+
+	axlog(LOG_EVENT, "COnTimer::Run thread exiting tid=%d", (int)GetCurrentThreadId());
 	return 0;
 }
 
 void COnTimer::Dispatch(int key)
 {
 	if (!m_alive)
+	{
+		axlog(LOG_EVENT, "COnTimer::Dispatch key=%d ignored (not alive) tid=%d", key, (int)GetCurrentThreadId());
 		return;
+	}
 
 	int	value;
+	bool	dup;
 
 	m_section.Lock();
-	if (!m_keys.Lookup(key, value))
+	dup = m_keys.Lookup(key, value) ? true : false;
+	if (!dup)
 	{
 		m_que.Add(key);
 		m_keys.SetAt(key, key);
 	}
 	m_section.Unlock();
+	axlog(LOG_EVENT, "COnTimer::Dispatch key=%d dup=%d queLen=%d tid=%d", key, dup, (int)m_que.GetSize(), (int)GetCurrentThreadId());
 	m_event.SetEvent();
 }
 
 void COnTimer::Startup(CWnd* view)
 {
+	axlog(LOG_INIT, "COnTimer::Startup view=%p tid=%d", view, (int)GetCurrentThreadId());
 	m_view  = view;
 	m_alive = true;
 }
 
 void COnTimer::Cleanup(bool exit)
 {
+	axlog(LOG_INIT, "COnTimer::Cleanup exit=%d queLen=%d tid=%d", exit, (int)m_que.GetSize(), (int)GetCurrentThreadId());
+
 	if (exit)
 		m_alive = false;
 
@@ -109,6 +125,10 @@ void COnTimer::Cleanup(bool exit)
 bool COnTimer::DoParse(int key)
 {
 	if (m_alive)
+	{
+		ULONGLONG t0 = GetTickCount64();
 		m_view->SendMessage(WM_USER+11, key);
+		axlog(LOG_EVENT, "COnTimer::DoParse key=%d SendMessage +%dms tid=%d", key, (int)(GetTickCount64()-t0), (int)GetCurrentThreadId());
+	}
 	return true;
 }

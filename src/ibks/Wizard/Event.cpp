@@ -10,6 +10,7 @@
 #include "Stream.h"
 //#include "OnTimer.h"
 #include "../h/axiserr.h"
+#include "../h/axlog.h"
 
 LRESULT CALLBACK CallProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
@@ -23,7 +24,7 @@ LRESULT CALLBACK CallProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	CRect	rect; 
 	bool	fBool;
 	int	value;
-	CScreen* screen;
+	CScreen* screen = NULL;
 	CString slog;
 
 	if (client->m_focus && (client->m_status & S_LOAD) && client->isTips())
@@ -241,6 +242,8 @@ LRESULT CALLBACK CallProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	case WM_CHAR:
 		if (client->m_status & S_LOAD)
 			client->m_keyx->OnChar(wParam, lParam);
+		else
+			axlog(LOG_EVENT, "CallProc WM_CHAR SKIPPED (not S_LOAD) wParam=%d(0x%x) client_key=%d", (int)wParam, (int)wParam, client->m_key);
 		break;
 
 	case WM_IME_CHAR:
@@ -312,13 +315,25 @@ LRESULT CALLBACK CallProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				id  = (wParam % TM_VBx);
 				client->m_view->KillTimer(wParam);
 				client->m_timers.RemoveKey(wParam);
-				if (!(client->m_status & S_ING) && client->GetAtScreen(screen, key))
+				// TM_VBx timers are one-shot: KillTimer above runs unconditionally,
+				// so if S_ING is set or the screen slot no longer resolves, this fire
+				// is silently lost (script must re-issue SetTimerX to get another one).
+				bool ing = (client->m_status & S_ING) ? true : false;
+				bool got = !ing && client->GetAtScreen(screen, key);
+				axlog(LOG_EVENT, "CallProc WM_TIMER TM_VBx wParam=%d key=%d id=%d S_ING=%d GetAtScreen=%d client_key=%d",
+					(int)wParam, key, id, ing, got, client->m_key);
+				if (got)
 					client->m_vm->OnTimerX(screen, id);
-			}			
+			}
 			else if (wParam >= TM_VB)
 			{
 				client->m_view->KillTimer(wParam);
-				if (!(client->m_status & S_ING) && client->GetAtScreen(screen, wParam - TM_VB))
+				// Same one-shot caveat as TM_VBx above (see comment there).
+				bool ing = (client->m_status & S_ING) ? true : false;
+				bool got = !ing && client->GetAtScreen(screen, wParam - TM_VB);
+				axlog(LOG_EVENT, "CallProc WM_TIMER TM_VB wParam=%d screenKey=%d S_ING=%d GetAtScreen=%d client_key=%d",
+					(int)wParam, (int)(wParam - TM_VB), ing, got, client->m_key);
+				if (got)
 					client->m_vm->OnTimer(screen);
 			}
 			else if (wParam >= TM_REPTR && !client->m_stream->m_lock)

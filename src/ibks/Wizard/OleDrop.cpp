@@ -6,6 +6,7 @@
 #include "Wizard.h"
 #include "OleDrop.h"
 #include "Works.h"
+#include "../h/axlog.h"
 
 #ifdef _DEBUG
 #undef THIS_FILE
@@ -45,13 +46,14 @@ DROPEFFECT COleDrop::OnDragOver(CWnd* pWnd,COleDataObject* pDataObject, DWORD dw
 	return DROPEFFECT_COPY;
 }
 
-BOOL COleDrop::OnDrop(CWnd* pWnd, COleDataObject* pDataObject, DROPEFFECT dropEffect, CPoint point) 
+BOOL COleDrop::OnDrop(CWnd* pWnd, COleDataObject* pDataObject, DROPEFFECT dropEffect, CPoint point)
 {
 	HGLOBAL	hg = pDataObject->GetGlobalData(CF_TEXT);
+	axlog(LOG_EVENT, "COleDrop::OnDrop hasCFText=%d acceptDrop=%d", hg ? 1 : 0, (m_works && m_works->m_status & S_DROP) ? 1 : 0);
 	if (hg != NULL)
 	{
 		CString	text;
-		
+
 		text = (char *)::GlobalLock(hg);
 
 		::GlobalUnlock(hg);
@@ -69,5 +71,6 @@ BOOL COleDrop::Register(CWorks* works)
 {
 	m_works = works;
 	COleDropTarget::Revoke();
+	axlog(LOG_INIT, "COleDrop::Register client_key=%d", works ? works->m_key : -1);
 	return COleDropTarget::Register(works->m_view);
 }

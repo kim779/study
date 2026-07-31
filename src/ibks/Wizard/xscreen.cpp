@@ -238,6 +238,7 @@ void CxScreen::_ClearAll(long dest, long type)
 void CxScreen::_ChangeTR(LPCTSTR trN)
 {
 	CString	str = trN;
+	axlog(LOG_SCRIPT, "CxScreen::_ChangeTR trN=%s", str.GetString());
 
 	if (!str.IsEmpty())
 		m_screen->ChangeTR((char *)str.operator LPCTSTR());
@@ -246,6 +247,7 @@ void CxScreen::_ChangeTR(LPCTSTR trN)
 void CxScreen::_ChangePath(LPCTSTR path)
 {
 	CString	str = path;
+	axlog(LOG_SCRIPT, "CxScreen::_ChangePath path=%s", str.GetString());
 	struct	_toPath {
 		char	strName[8];
 		BYTE	defValue;
@@ -283,6 +285,7 @@ BSTR CxScreen::_GetLedger(long pos, long length)
 void CxScreen::_ChangeMap(LPCTSTR mapN)
 {
 	CString	str = mapN;
+	axlog(LOG_SCRIPT, "CxScreen::_ChangeMap mapN=%s", str.GetString());
 	if (!str.IsEmpty())
 	{
 		m_guard->m_dragbys = str;
@@ -304,6 +307,7 @@ void CxScreen::_SetMessage2(long level, LPCTSTR msg)
 void CxScreen::_CreateWindow(long type, LPCTSTR param, LPCTSTR data)
 {
 	CString	text = param;
+	axlog(LOG_SCRIPT, "CxScreen::_CreateWindow type=%d param=%s", type, text.GetString());
 
 	if (!text.IsEmpty())
 	{
@@ -361,7 +365,7 @@ void CxScreen::_CreateWindow(long type, LPCTSTR param, LPCTSTR data)
 
 void CxScreen::_Send(long target)
 {
-	axlog(LOG_SCRIPT, "CxScreen::_Send target=%d mapN=%.7s",
+	axlog(LOG_SCRIPT, "CxScreen::_Send target=%d mapN=%.8s",
 		target, CString(m_screen->m_mapH->mapN, L_MAPN).GetString());
 
 	if (m_screen->m_client->m_vm->m_script)
@@ -391,6 +395,8 @@ void CxScreen::_Send(long target)
 
 void CxScreen::_RSend(long target)
 {
+	axlog(LOG_SCRIPT, "CxScreen::_RSend target=%d mapN=%.8s",
+		target, CString(m_screen->m_mapH->mapN, L_MAPN).GetString());
 	if (m_screen->m_client->m_vm->m_script)
 		return;		// ignore dup
 
@@ -415,6 +421,8 @@ void CxScreen::_RSend(long target)
 
 void CxScreen::_CloseWindow()
 {
+	axlog(LOG_SCRIPT, "CxScreen::_CloseWindow maps=%s screenKey=%d client_key=%d",
+		CString(m_screen->m_mapH->mapN, L_MAPN).GetString(), m_screen->m_key, m_screen->m_client->m_key);
 	m_guard->PostAxis(delVIEW, m_screen->m_client->m_key, (LPARAM)0);
 }
 
@@ -617,6 +625,7 @@ long CxScreen::_GetCodeType(LPCTSTR code)
 
 BOOL CxScreen::_Service(LPCTSTR trN, LPCTSTR data, long length, long mode)
 {
+	axlog(LOG_SCRIPT, "CxScreen::_Service trN=%s length=%d mode=%d", CString(trN).GetString(), length, mode);
 	if (m_screen->m_client->m_vm->m_script)
 		return FALSE;		// ignore dup
 
@@ -625,6 +634,8 @@ BOOL CxScreen::_Service(LPCTSTR trN, LPCTSTR data, long length, long mode)
 
 void CxScreen::_Proc(LPCTSTR procs, LPCTSTR data)
 {
+	axlog(LOG_SCRIPT, "CxScreen::_Proc maps=%s screenKey=%d procs=%s",
+		CString(m_screen->m_mapH->mapN, L_MAPN).GetString(), m_screen->m_key, CString(procs).GetString());
 	int	value;
 	CString	string, name;
 	CScreen* screen;
@@ -709,6 +720,7 @@ void CxScreen::_Proc(LPCTSTR procs, LPCTSTR data)
 
 void CxScreen::_ProcEx(LPCTSTR procs, LPCTSTR data, long count)
 {
+	axlog(LOG_SCRIPT, "CxScreen::_ProcEx procs=%s count=%d", CString(procs).GetString(), count);
 	int	value;
 	CString	string, name;
 	CScreen* screen;
@@ -797,6 +809,7 @@ void CxScreen::_SetCaption(LPCTSTR caption)
 
 BOOL CxScreen::_Approve(long key, LPCTSTR ip, LPCTSTR map, LPCTSTR data, long length)
 {
+	axlog(LOG_SCRIPT, "CxScreen::_Approve key=%d ip=%s map=%s length=%d", key, CString(ip).GetString(), CString(map).GetString(), length);
 	return m_guard->Approve(m_screen, key, ip, map, (char *)data, length);
 }
 
@@ -886,6 +899,8 @@ void CxScreen::_SetFont(long point, LPCTSTR name)
 BOOL CxScreen::_CreateObject(LPCTSTR name)
 {
 	CCmdTarget* target;
+	axlog(LOG_SCRIPT, "CxScreen::_CreateObject maps=%s screenKey=%d name=%s",
+		CString(m_screen->m_mapH->mapN, L_MAPN).GetString(), m_screen->m_key, CString(name).GetString());
 
 	if (m_guard->CreateObject(name, target))
 	{
@@ -909,6 +924,8 @@ void CxScreen::_Print(LPCTSTR text)
 
 void CxScreen::_SetTimer(long interval, BOOL main)
 {
+	axlog(LOG_SCRIPT, "CxScreen::_SetTimer maps=%s screenKey=%d interval=%d main=%d",
+		CString(m_screen->m_mapH->mapN, L_MAPN).GetString(), m_screen->m_key, interval, main);
 /*	if (main)
 	{
 		m_screen->m_view->KillTimer(TM_VB);
@@ -928,11 +945,15 @@ void CxScreen::_SetTimer(long interval, BOOL main)
 
 long CxScreen::_UploadFile(LPCTSTR trN, LPCTSTR data, long length, long mode, LPCTSTR fileN, long offset)
 {
+	axlog(LOG_SCRIPT, "CxScreen::_UploadFile trN=%s fileN=%s length=%d mode=%d",
+		CString(trN).GetString(), CString(fileN).GetString(), length, mode);
 	return m_guard->UploadFile(m_screen, trN, (char *)data, length, mode, (char *)fileN, offset);
 }
 
 BOOL CxScreen::_DownloadFile(LPCTSTR trN, LPCTSTR data, long length, long mode, LPCTSTR fileN)
 {
+	axlog(LOG_SCRIPT, "CxScreen::_DownloadFile trN=%s fileN=%s length=%d mode=%d",
+		CString(trN).GetString(), CString(fileN).GetString(), length, mode);
 	return m_guard->DownloadFile(m_screen, trN, (char *)data, length, mode, fileN);
 }
 
@@ -1137,6 +1158,7 @@ bool CxScreen::findForm(int parent, CString name, CfmBase*& form)
 
 void CxScreen::_SendTR(LPCTSTR trN)
 {
+	axlog(LOG_SCRIPT, "CxScreen::_SendTR trN=%s", CString(trN).GetString());
 	m_screen->m_client->m_stream->InStream(m_screen, false, trN);
 }
 
@@ -1208,6 +1230,7 @@ void CxScreen::_InternalTrigger(LPCTSTR procs, LPCTSTR param, LPCTSTR maps, BOOL
 BOOL CxScreen::_CreateObjectEx(LPCTSTR name)
 {
 	CCmdTarget* target;
+	axlog(LOG_SCRIPT, "CxScreen::_CreateObjectEx name=%s", CString(name).GetString());
 
 	switch (m_screen->CreateObject(name, target))
 	{
@@ -1224,6 +1247,8 @@ BOOL CxScreen::_CreateObjectEx(LPCTSTR name)
 void CxScreen::_SetTimerX(short id, long interval, BOOL main)
 {
 	int	tid;
+	axlog(LOG_SCRIPT, "CxScreen::_SetTimerX maps=%s screenKey=%d id=%d interval=%d main=%d",
+		CString(m_screen->m_mapH->mapN, L_MAPN).GetString(), m_screen->m_key, id, interval, main);
 
 	if (main)
 		id += TM_VBx;

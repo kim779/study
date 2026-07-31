@@ -5,10 +5,10 @@ class CMarketTimeManager
         enum US_MARKET_SESSION
         {
             US_SESSION_CLOSED = 0,
-            US_SESSION_DAY,       // ï¿½Ö°ï¿½ï¿½Å·ï¿½
-            US_SESSION_PRE,       // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
-            US_SESSION_REGULAR,   // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
-            US_SESSION_AFTER      // ï¿½ï¿½ï¿½ï¿½ï¿½Í¸ï¿½ï¿½ï¿½
+            US_SESSION_DAY,       // ÁÖ°£°Å·¡
+            US_SESSION_PRE,       // ÇÁ¸®¸¶ÄÏ
+            US_SESSION_REGULAR,   // Á¤±ÔÀå
+            US_SESSION_AFTER      // ¾ÖÇÁÅÍÀå
         };
 
     public:

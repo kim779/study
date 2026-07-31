@@ -6,6 +6,7 @@
 #include "Wizard.h"
 #include "OleDropEx.h"
 #include "Works.h"
+#include "../h/axlog.h"
 
 #ifdef _DEBUG
 #undef THIS_FILE
@@ -79,6 +80,7 @@ HRESULT COleDropEx::DragLeave()
 
 HRESULT _stdcall COleDropEx::Drop(IDataObject *pObject, unsigned long state, _POINTL mouse, unsigned long *pDrop)
 {
+	axlog(LOG_EVENT, "COleDropEx::Drop mouse=(%ld,%ld)", mouse.x, mouse.y);
 	if (pObject == NULL)
 		return E_FAIL;
 
@@ -118,6 +120,8 @@ HRESULT _stdcall COleDropEx::Drop(IDataObject *pObject, unsigned long state, _PO
 			CString text = (char *)::GlobalLock(medium.hGlobal);
 			if (pWnd) pWnd->ScreenToClient(&point);
 			::GlobalUnlock(medium.hGlobal);
+			axlog(LOG_EVENT, "COleDropEx::Drop client_key=%d acceptDrop=%d textLen=%d",
+				works->m_key, (works->m_status & S_DROP) ? 1 : 0, text.GetLength());
 			if (works->m_status & S_DROP)
 				works->OnDrop(point, text, pWnd ? pWnd : (CWnd*) 0);
 		}
@@ -136,6 +140,7 @@ BOOL COleDropEx::Register(CWorks* works, HWND hWnd)
 		return FALSE;
 
 	HRESULT hr = ::RegisterDragDrop(hWnd, this);
+	axlog(LOG_INIT, "COleDropEx::Register client_key=%d hr=0x%08lx", works ? works->m_key : -1, hr);
 	if (SUCCEEDED(hr))
 	{
 		AddRef();
@@ -147,6 +152,7 @@ BOOL COleDropEx::Register(CWorks* works, HWND hWnd)
 
 void COleDropEx::Revoke(HWND hWnd)
 {
+	axlog(LOG_INIT, "COleDropEx::Revoke hWnd=%p", hWnd);
 	if (hWnd != NULL)
 	{
 		m_works.RemoveKey(hWnd);

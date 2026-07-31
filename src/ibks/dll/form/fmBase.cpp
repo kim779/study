@@ -7,6 +7,7 @@
 #include <math.h>
 
 #include "../../h/axiserr.h"
+#include "../../h/axlog.h"
 #include "../lib/axislib.h"
 
 #ifdef _DEBUG
@@ -508,9 +509,7 @@ void CfmBase::ReadAll(CString& data, bool edit, bool head)
 void CfmBase::ReadData(CString& data, bool edit, int size, int col, int row)
 {
 
-	CString slog;
-	slog.Format("[WIZARD][AXFORM][%s]<%d> [combo] m_strR=[%s] ", __FUNCTION__, __LINE__, m_strR);
-	OutputDebugString(slog);
+	axlog(LOG_AXISFORM, "CfmBase::ReadData [combo] m_strR=%s", m_strR.GetString());
 	data = m_strR;
 }
 
@@ -524,9 +523,7 @@ void CfmBase::WriteData(CString data, bool redraw, int col, int row)
 	if (!m_strR.Compare(data))
 		return;
 
-	CString slog;
-	slog.Format("[WIZARD][AXFORM][%s]<%d> [combo] m_strR=[%s] data=[%s]", __FUNCTION__, __LINE__, m_strR, data);
-	OutputDebugString(slog);
+	axlog(LOG_AXISFORM, "CfmBase::WriteData [combo] m_strR=%s data=%s", m_strR.GetString(), data.GetString());
 
 	m_strR = data;
 	if (redraw && (m_form->properties & PR_VISIBLE))

@@ -425,7 +425,7 @@ bool CDll::Attach(CString maps, bool only, bool fix)
 	maps   = maps.Left(L_MAPN);
 	CopyMemory(tmapN, (char *)maps.GetString(), L_MAPN); tmapN[L_MAPN] = '\0';
 
-	axlog(LOG_INIT, "CDll::Attach maps=%.7s domino=%s", tmapN, domino.GetString());
+	axlog(LOG_INIT, "CDll::Attach maps=%.8s domino=%s", tmapN, domino.GetString());
 
 	bool	equal = false;
 	bool	isvirtual = m_guard->GetVirtualTR(tmapN);
@@ -465,7 +465,7 @@ bool CDll::Attach(CString maps, bool only, bool fix)
 				}
 				dll = new CWnd();
 				dll->Attach(hWnd);
-				axlog(LOG_INIT, "CDll::Attach loaded via axCreateEx maps=%.7s", tmapN);
+				axlog(LOG_INIT, "CDll::Attach loaded via axCreateEx maps=%.8s", tmapN);
 			}
 			else
 			{
@@ -482,7 +482,7 @@ bool CDll::Attach(CString maps, bool only, bool fix)
 					return false;
 				}
 				is_domino = true;
-				axlog(LOG_INIT, "CDll::Attach loaded via axCreateX maps=%.7s domino=%s", tmapN, domino.GetString());
+				axlog(LOG_INIT, "CDll::Attach loaded via axCreateX maps=%.8s domino=%s", tmapN, domino.GetString());
 			}
 		}
 		else
@@ -493,7 +493,7 @@ bool CDll::Attach(CString maps, bool only, bool fix)
 				AfxFreeLibrary(instance);
 				return false;
 			}
-			axlog(LOG_INIT, "CDll::Attach loaded via axCreate maps=%.7s", tmapN);
+			axlog(LOG_INIT, "CDll::Attach loaded via axCreate maps=%.8s", tmapN);
 		}
 
 		Free();

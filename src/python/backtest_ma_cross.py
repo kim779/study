@@ -39,12 +39,20 @@ def sma_series(prices, window):
     return result
 
 
-def find_trades(times, prices, short, long_):
+def find_trades(times, prices, short, long_, dip_threshold=None):
     # 골든크로스(단기가 장기를 상향 돌파) 매수, 데드크로스(하향 돌파) 매도로 짝지어
     # 완결된 거래 목록과, 아직 청산 안 된 포지션(있다면)을 반환한다.
+    # dip_threshold: 당일 시가 대비 하락률(예: -0.01 = -1%) 이하이면 신규 매수를 막는다.
+    #                None이면 필터 없음(기존 동작과 동일). 청산(매도)은 필터와 무관하게 그대로 동작.
     position = None  # None=미보유, else 매수가격
     trades = []  # (buy_time, buy_price, sell_time, sell_price)
     entry = None
+
+    day_open = {}
+    for i in range(len(prices)):
+        d = times[i][:8] if len(times[i]) >= 8 else None
+        if d and d not in day_open:
+            day_open[d] = prices[i]
 
     for i in range(1, len(prices)):
         if short[i] is None or long_[i] is None or short[i - 1] is None or long_[i - 1] is None:
@@ -53,7 +61,16 @@ def find_trades(times, prices, short, long_):
         golden_cross = short[i - 1] <= long_[i - 1] and short[i] > long_[i]
         dead_cross = short[i - 1] >= long_[i - 1] and short[i] < long_[i]
 
-        if position is None and golden_cross:
+        blocked = False
+        if dip_threshold is not None:
+            d = times[i][:8] if len(times[i]) >= 8 else None
+            open_price = day_open.get(d)
+            if open_price:
+                change = (prices[i] - open_price) / open_price
+                if change <= dip_threshold:
+                    blocked = True
+
+        if position is None and golden_cross and not blocked:
             position = prices[i]
             entry = (times[i], prices[i])
         elif position is not None and dead_cross:

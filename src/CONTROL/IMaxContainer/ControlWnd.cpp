@@ -30,29 +30,29 @@ static char THIS_FILE[] = __FILE__;
 //
 //	Get/Set IMAXApi
 //
-#define WUM_IMAXDATAGET			WM_USER + 201			// ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
-#define WUM_IMAXDATASET			WM_USER + 202			// ï¿½ï¿½ï¿½Î·ï¿½ ï¿½É¼ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½
-#define WUM_RECEIVECODECHANGE		WM_USER + 3003			// ï¿½ï¿½ï¿½ï¿½ï¿½Úµï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ IMAXAPIï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+#define WUM_IMAXDATAGET			WM_USER + 201			// °¡°İ ¼ö·® °¡Á®¿À±â
+#define WUM_IMAXDATASET			WM_USER + 202			// ³»ºÎ·Î ¿É¼Ç ¼³Á¤ ÇÒ °æ¿ì
+#define WUM_RECEIVECODECHANGE		WM_USER + 3003			// Á¾¸ñÄÚµå º¯°æ½Ã IMAXAPI·Î Àü´Ş
 
 #define IMXID_SETBALANCEVALUEFIRST	20015				// First Jango Grid
 #define IMXID_SETBALANCEVALUENEXT	20080				// Next Jango Grid
-#define IMXID_SETOPTION			20016				// [ï¿½Úµï¿½ï¿½Şºï¿½] ï¿½Şºï¿½ Open ï¿½Ê±ï¿½È­ ï¿½É¼ï¿½ ï¿½ï¿½ï¿½ï¿½ (ï¿½âº» : 0  , 0x0800 : ETF)
-#define IMXID_SETORDERMODE		20034				// ï¿½ï¿½ï¿½ï¿½ ï¿½Ã¼ï¿½ï¿½ï¿½ï¿½ï¿½
-#define IMXID_SETFOCUS			20031				// [ï¿½Úµï¿½ï¿½Şºï¿½] SetFocus
+#define IMXID_SETOPTION			20016				// [ÄÚµåÄŞº¸] ÄŞº¸ Open ÃÊ±âÈ­ ¿É¼Ç ¼³Á¤ (±âº» : 0  , 0x0800 : ETF)
+#define IMXID_SETORDERMODE		20034				// Á¾¸ñº° ½Ã¼¼Á¤º¸
+#define IMXID_SETFOCUS			20031				// [ÄÚµåÄŞº¸] SetFocus
 
 #define IMXID_SETPRICETEXT		20022
 
 #define IMAX_BALANCEVALUEFIRST		0				// First Jango Grid
 #define IMAX_BALANCEVALUENEXT		1				// Next Jango Grid
-#define IMAX_SETORDERMODE		2				// ï¿½Ö¹ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
-#define IMAX_SETOPTION			3				// [ï¿½Úµï¿½ï¿½Şºï¿½] ï¿½Şºï¿½ Open ï¿½Ê±ï¿½È­ ï¿½É¼ï¿½ ï¿½ï¿½ï¿½ï¿½ (ï¿½âº» : 0  , 0x0800 : ETF)
+#define IMAX_SETORDERMODE		2				// ÁÖ¹® ¸ğµå º¯°æ
+#define IMAX_SETOPTION			3				// [ÄÚµåÄŞº¸] ÄŞº¸ Open ÃÊ±âÈ­ ¿É¼Ç ¼³Á¤ (±âº» : 0  , 0x0800 : ETF)
 #define IMAX_FOCUS			9
-#define IMAX_HKCHANGECODE		12				// È«ï¿½ï¿½
-#define IMAX_SHCHANGECODE		16				// ï¿½ï¿½ï¿½ï¿½
-#define IMAX_SZCHANGECODE		17				// ï¿½ï¿½Ãµ
-#define	IMAX_NYCHANGECODE		21				// ï¿½ï¿½ï¿½ï¿½
-#define IMAX_NASCHANGECODE		22				// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
-#define	IMAX_AMSCHANGECODE		23				// ï¿½Æ¸ß½ï¿½
+#define IMAX_HKCHANGECODE		12				// È«Äá
+#define IMAX_SHCHANGECODE		16				// »óÇØ
+#define IMAX_SZCHANGECODE		17				// ½ÉÃµ
+#define	IMAX_NYCHANGECODE		21				// ´º¿å
+#define IMAX_NASCHANGECODE		22				// ³ª½º´Ú
+#define	IMAX_AMSCHANGECODE		23				// ¾Æ¸ß½º
 #define	IMAX_OTCCHANGECODE		24				// OTC
 
 #define IMAX_PRCSETTING			25
@@ -70,24 +70,24 @@ static char THIS_FILE[] = __FILE__;
 #define IMAX_ABLEMEDO			"IMAXABLEMEDO"
 #define IMAX_ALLGRIDCULVAL			"IMAXGRIDCULVAL"
 
-#define	IMXID_GETCODE			 11				// ï¿½ï¿½ï¿½ï¿½ï¿½Úµï¿½
-#define IMXID_GETCURPRICE		100				// ï¿½ï¿½ï¿½ç°¡
-#define IMXID_GETBASEPRICE		101				// ï¿½ï¿½ï¿½Ø°ï¿½
-#define IMXID_GETBUYPRICE1		201				// ï¿½Å¼ï¿½1È£ï¿½ï¿½
+#define	IMXID_GETCODE			 11				// Á¾¸ñÄÚµå
+#define IMXID_GETCURPRICE		100				// ÇöÀç°¡
+#define IMXID_GETBASEPRICE		101				// ±âÁØ°¡
+#define IMXID_GETBUYPRICE1		201				// ¸Å¼ö1È£°¡
 #define IMXID_GETBUYPRICE2		202
 #define IMXID_GETBUYPRICE3		203
 #define IMXID_GETBUYPRICE4		204
 #define IMXID_GETBUYPRICE5		205
-#define IMXID_GETSELPRICE1		301				// ï¿½Åµï¿½1È£ï¿½ï¿½
+#define IMXID_GETSELPRICE1		301				// ¸Åµµ1È£°¡
 #define IMXID_GETSELPRICE2		302
 #define IMXID_GETSELPRICE3		303
 #define IMXID_GETSELPRICE4		304
 #define IMXID_GETSELPRICE5		305
-#define IMXID_GETBUYVOLUME		401				// ï¿½Å¼ï¿½ï¿½ï¿½ï¿½ï¿½
-#define IMXID_GETSELLVOLUME		501				// ï¿½Åµï¿½ï¿½ï¿½ï¿½ï¿½
-#define	IMXID_GETCURRENCY		601				// ï¿½ï¿½È­
-#define IMXID_GETAUTHORITY		701				// ï¿½Ã¼ï¿½ï¿½ï¿½ï¿½ï¿½
-#define IMXID_GETCODEINFO		20060				// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+#define IMXID_GETBUYVOLUME		401				// ¸Å¼ö¼ö·®
+#define IMXID_GETSELLVOLUME		501				// ¸Åµµ¼ö·®
+#define	IMXID_GETCURRENCY		601				// ÅëÈ­
+#define IMXID_GETAUTHORITY		701				// ½Ã¼¼±¸ºĞ
+#define IMXID_GETCODEINFO		20060				// Á¾¸ñÁ¤º¸
 
 
 //skin color
@@ -215,15 +215,15 @@ END_INTERFACE_MAP()
 
 long CControlWnd::IMAXOnMessageFETCH(WPARAM wParam, LPARAM lParam)
 {
-	// wParam = 0 ï¿½Ì¸ï¿½ È­ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½, ï¿½×¿Ü¿ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
-	// lParam = IMAX È­ï¿½ï¿½ï¿½È£
+	// wParam = 0 ÀÌ¸é È­¸é ½ÇÆĞ, ±×¿Ü¿¡´Â ¼º°ø
+	// lParam = IMAX È­¸é¹øÈ£
 	int nView = (int)lParam;
 	int nOk = (int)wParam;
 
 	m_slog.Format("[IMAX][FETCH][%s] nView = [%d] nOk = [%d] m_bLoinSuccess=[%d]", __FUNCTION__, nView, nOk, m_bLoinSuccess);
 	OutputDebugString(m_slog);
 
-	// 20141105 WParam 0 ï¿½Ì¸ï¿½ È­ï¿½ï¿½ ï¿½ï¿½ï¿½Â½ï¿½ï¿½ï¿½, ï¿½×¿Ü¿ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+	// 20141105 WParam 0 ÀÌ¸é È­¸é ¿ÀÇÂ½ÇÆĞ, ±×¿Ü¿¡´Â ¼º°ø
 	//if (nOk != 0 && !m_bLoinSuccess)
 	if (nOk != 0)
 	{
@@ -235,45 +235,54 @@ long CControlWnd::IMAXOnMessageFETCH(WPARAM wParam, LPARAM lParam)
 
 long CControlWnd::IMAXOnMessageOPEN(WPARAM wParam, LPARAM lParam)
 {
-m_tmpX.Format("IMAXOnMessageOPEN()[OPEN] viewNo[%s]msg[%s]map[%s]", m_sViewNo, (LPCTSTR)lParam, (LPCTSTR)wParam);
+m_tmpX.Format("IMAXOnMessageOPEN()[OPEN] viewNo[%s]msg[%s]map[%s]", m_sViewNo, (LPCTSTR)lParam, (LPCTSTR)wParam); dprint();
 OutputDebugString(m_tmpX);
-dprint();
 
 	CString sIMAXMessageInfo = (LPCTSTR)lParam;
 	CString	sImaxMapNum = (LPCTSTR)wParam;
 	CString	stmp;
 	
-	if (sImaxMapNum == "3111")   //ï¿½Ã¼ï¿½ï¿½ï¿½Ã»
+	if (sImaxMapNum == "3111")   //½Ã¼¼½ÅÃ»
 	{
 		stmp.Format("%s /S /p5 /t0", "IB599000");
 		openView(typePOPUP, stmp); 
 		return 0;
 	}
-	else if (sImaxMapNum == "8520")   //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+	else if (sImaxMapNum == "8520")   //±â¾÷Á¤º¸
 	{
 		stmp.Format("%s /S /p5 /t0", "IB567100");
 		openView(typePOPUP, stmp); 
 		return 0;
 	}
-	else if (sImaxMapNum == "2112")   //ï¿½ï¿½ï¿½ç°¡
+	else if (sImaxMapNum == "2112")   //ÇöÀç°¡
 	{
 		stmp.Format("%s /t", "IB567000");
 		openView(typeVIEW, stmp); 
 		return 0;
 	}
-	else if (sImaxMapNum == "3333")  //ï¿½ï¿½Æ®
+	else if (sImaxMapNum == "2114")
+	{
+		if (m_sViewNo == "2110")
+			stmp.Format("%s /t", "IB567000");
+		else
+			stmp.Format("%s /t", "IB567900");
+
+		openView(typeVIEW, stmp);
+		return 0;
+	}
+	else if (sImaxMapNum == "3333")  //Â÷Æ®
 	{
 		stmp.Format("%s /S/t0", "IB586000");
 		openView(typeVIEW, stmp); 
 		return 0;
 	}
-	else if (sImaxMapNum == "1448") //ï¿½Ö¹ï¿½ï¿½ï¿½ï¿½ï¿½
+	else if (sImaxMapNum == "1448") //ÁÖ¹®Á¾ÇÕ
 	{
 		stmp.Format("%s /S/t0", "IB550000");
 		openView(typeVIEW, stmp); 
 		return 0;
 	}
-	else if (sImaxMapNum == "5964") //ï¿½Ì±ï¿½ï¿½Ã¼ï¿½ï¿½ï¿½Ã»
+	else if (sImaxMapNum == "5964") //¹Ì±¹½Ã¼¼½ÅÃ»
 	{
 		m_sCustomerAuth.Empty();
 		m_sCustomerNum.Empty();
@@ -299,7 +308,7 @@ dprint();
 long CControlWnd::IMAXOnMessageJano(WPARAM wParam, LPARAM lParam)
 {
 	
-	if (m_sViewNo == "1428") //ï¿½Ü°ï¿½ï¿½Î°ï¿½ï¿½4
+	if (m_sViewNo == "1428") //ÀÜ°íÀÎ°æ¿ì4
 	{
 		m_slog.Format("IMAXOnMessageJano()  viewNo[%s][%s] wParam = [%d] msg[%s]", m_sViewNo, m_param.options,(int)wParam, (LPCTSTR)lParam);
 		OutputDebugString(m_slog);
@@ -310,19 +319,19 @@ long CControlWnd::IMAXOnMessageJano(WPARAM wParam, LPARAM lParam)
 		OutputDebugString(m_slog);
 
 
-		double sumBuyAmt = 0.0;		// ï¿½ï¿½ï¿½Ô±İ¾ï¿½ ï¿½ï¿½
-		double sumMarketAmt = 0.0;	// ï¿½ò°¡±İ¾ï¿½	ï¿½ï¿½
-		double sumProfit = 0.0;   // ï¿½ò°¡¼ï¿½ï¿½ï¿½ ï¿½ï¿½
-		//double sumRate = 0.0;     // ï¿½ï¿½ï¿½Í·ï¿½ ï¿½ï¿½
-		int count = 0;            // ï¿½Ü°ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+		double sumBuyAmt = 0.0;		// ¸ÅÀÔ±İ¾× ÇÕ
+		double sumMarketAmt = 0.0;	// Æò°¡±İ¾×	ÇÕ
+		double sumProfit = 0.0;   // Æò°¡¼ÕÀÍ ÇÕ
+		//double sumRate = 0.0;     // ¼öÀÍ·ü ÇÕ
+		int count = 0;            // ÀÜ°í µ¥ÀÌÅÍ °³¼ö
 		CString stmp;
 		CString sArr[50]{ "", };
 		int idx = 0;
-		//arr 7 - ï¿½ï¿½ï¿½Ô±İ¾ï¿½(ï¿½ï¿½È­) , 15 - ï¿½ò°¡±İ¾ï¿½ , 11 - ï¿½ò°¡¼ï¿½ï¿½ï¿½, ï¿½ï¿½ï¿½Í·ï¿½ = ((ï¿½ò°¡±İ¾ï¿½ - ï¿½ï¿½ï¿½Ô±İ¾ï¿½)/ï¿½ï¿½ï¿½Ô±İ¾ï¿½)*100
+		//arr 7 - ¸ÅÀÔ±İ¾×(¿øÈ­) , 15 - Æò°¡±İ¾× , 11 - Æò°¡¼ÕÀÍ, ¼öÀÍ·ü = ((Æò°¡±İ¾× - ¸ÅÀÔ±İ¾×)/¸ÅÀÔ±İ¾×)*100
 		while (AfxExtractSubString(stmp, m_sJango, idx, '\n'))
 		{
 			sArr[idx] = stmp;
-			++idx; // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+			++idx; // ¼º°øÇßÀ» ¶§¸¸ Áõ°¡
 		}
 
 
@@ -342,20 +351,20 @@ long CControlWnd::IMAXOnMessageJano(WPARAM wParam, LPARAM lParam)
 					++idx;
 				}
 				
-				//replaceï¿½ï¿½ Ã³ï¿½ï¿½ï¿½ï¿½ï¿½Ï¸ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ì½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½î°¡ï¿½ï¿½ ï¿½ï¿½È­ï¿½é¿¡ï¿½ï¿½ ï¿½Û¾ï¿½ï¿½ï¿½ ï¿½Ñ¹ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½.
+				//replace¸¦ Ã³¸®¾ÈÇÏ¸é ½ºÆäÀÌ½º°ªÀÌ µé¾î°¡¼­ ¸ÊÈ­¸é¿¡¼­ ÀÛ¾÷À» ÇÑ¹ø ´õÇØÁà¾ßÇÔ.
 				CString sBuyAmt, sMarketAmt, sProfit, sQty, sExRate;
-				sBuyAmt = colArr[7];//ï¿½Å¼ï¿½ï¿½İ¾ï¿½(ï¿½ï¿½È­) ï¿½ï¿½Õ´Ü°ï¿½
+				sBuyAmt = colArr[7];//¸Å¼ö±İ¾×(¿ÜÈ­) Æò±Õ´Ü°¡
 				sBuyAmt.Replace(",", "");
-				sMarketAmt = colArr[15];//ï¿½ï¿½È­ ï¿½ò°¡±İ¾ï¿½
+				sMarketAmt = colArr[15];//¿øÈ­ Æò°¡±İ¾×
 				sMarketAmt.Replace(",", "");
-				sProfit = colArr[13];	//ï¿½ï¿½È­ ï¿½ò°¡¼ï¿½ï¿½ï¿½
+				sProfit = colArr[13];	//¿øÈ­ Æò°¡¼ÕÀÍ
 				sProfit.Replace(",", "");
 
 				sQty = colArr[6];
-				sQty.Replace(",", "");	//ï¿½Ü°ï¿½ï¿½ï¿½ï¿½ï¿½
+				sQty.Replace(",", "");	//ÀÜ°í¼ö·®
 
 				sExRate = colArr[14];
-				sExRate.Replace(",", "");	//ï¿½ï¿½ï¿½ï¿½È¯ï¿½ï¿½
+				sExRate.Replace(",", "");	//±âÁØÈ¯À²
 				double BuyAmt = _tstof(sBuyAmt); // 
 				double MarketAmt =	_tstof(sMarketAmt); // CString -> double
 				double profit =		_tstof(sProfit); // CString -> double
@@ -364,13 +373,13 @@ long CControlWnd::IMAXOnMessageJano(WPARAM wParam, LPARAM lParam)
 				//double rate = _tstof(colArr[12]);
 
 				
-				sumBuyAmt += BuyAmt* Qty * ExRate;	//ï¿½ï¿½È­ ï¿½Å¼ï¿½ï¿½İ¾ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Â°ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Õ´Ü°ï¿½*ï¿½Ü°ï¿½ï¿½ï¿½ï¿½ï¿½*È¯ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
+				sumBuyAmt += BuyAmt* Qty * ExRate;	//¿øÈ­ ¸Å¼ö±İ¾×ÀÌ ¾ø´Â°ü°è·Î Æò±Õ´Ü°¡*ÀÜ°í¼ö·®*È¯À²·Î °è»ê
 				sumMarketAmt += MarketAmt;
 				sumProfit += profit;
 				//sumRate += rate;
 				count++;
 
-				//m_slog.Format("IMAXOnMessageJano()  [%s] ï¿½ò°¡¼ï¿½ï¿½ï¿½ï¿½ï¿½=[%f] ï¿½ï¿½ï¿½Í·ï¿½ï¿½ï¿½=[%f]  ï¿½ò°¡¼ï¿½ï¿½ï¿½=[%f]   ï¿½ï¿½ï¿½Í·ï¿½=[%f]",
+				//m_slog.Format("IMAXOnMessageJano()  [%s] Æò°¡¼ÕÀÍÇÕ=[%f] ¼öÀÍ·üÇÕ=[%f]  Æò°¡¼ÕÀÍ=[%f]   ¼öÀÍ·ü=[%f]",
 				//	colArr[4], sumProfit, sumRate, profit, rate);
 				//OutputDebugString(m_slog);
 
@@ -389,14 +398,14 @@ long CControlWnd::IMAXOnMessageJano(WPARAM wParam, LPARAM lParam)
 			CString result;
 			CString send;
 			
-			result.Format("IMAXOnMessageJano  ï¿½ï¿½ï¿½ ï¿½ò°¡¼ï¿½ï¿½ï¿½: %.2f, ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Í·ï¿½: %.2f", sumProfit, avgRate);
+			result.Format("IMAXOnMessageJano  Æò±Õ Æò°¡¼ÕÀÍ: %.2f, Æò±Õ ¼öÀÍ·ü: %.2f", sumProfit, avgRate);
 			OutputDebugString(result);
-			send.Format("%s%c%d|%d|%d|%.2f", "SetAvgData", P_TAB, (int)sumBuyAmt, (int)sumMarketAmt, (int)sumProfit, avgRate);	//ï¿½ï¿½ï¿½Ô±İ¾ï¿½, ï¿½ò°¡±İ¾ï¿½, ï¿½ò°¡¼ï¿½ï¿½ï¿½, ï¿½ï¿½ï¿½Í·ï¿½ ï¿½ï¿½È­ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½Ò¼ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ê¿ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ intï¿½ï¿½ï¿½ï¿½È¯
+			send.Format("%s%c%d|%d|%d|%.2f", "SetAvgData", P_TAB, (int)sumBuyAmt, (int)sumMarketAmt, (int)sumProfit, avgRate);	//¸ÅÀÔ±İ¾×, Æò°¡±İ¾×, Æò°¡¼ÕÀÍ, ¼öÀÍ·ü ¿øÈ­µ¥ÀÌÅÍÀÇ °æ¿ì ¼Ò¼öÁ¡ÀÌ ÇÊ¿ä¾ø´Â °ü°è·Î intÇüº¯È¯
 			IMAXToMapTrigger(send);
 		}
 		else
 		{
-			OutputDebugString("IMAXOnMessageJano()  ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½");
+			OutputDebugString("IMAXOnMessageJano()  µ¥ÀÌÅÍ ¾øÀ½");
 		}
 
 		m_pParent->SendMessage(WM_USER, MAKEWPARAM(eventDLL, MAKEWORD(m_param.key, evOnClick)), (LPARAM)m_param.name.GetString());
@@ -463,7 +472,7 @@ void CControlWnd::parseIMAXMessageData(int nKind, CString sIMAXInfo)
 
 		sISINCode	= sArr[14];
 		sablemedo	= sArr[15];
-		m_sCodeAll = sISINCode;      //20230321 ï¿½ï¿½ï¿½ï¿½ï¿½Úµï¿½ ï¿½ï¿½È¯
+		m_sCodeAll = sISINCode;      //20230321 Á¾¸ñÄÚµå ¹İÈ¯
 		m_sCodeAll.TrimRight();
 
 		if (sISINCode.IsEmpty())
@@ -490,9 +499,9 @@ m_tmpX.Format("parseIMAXMessageData(IMAX_INFO_CODE) viewNo[%s]Kind[%d]sExid[%s]s
 		sOrderQty	= sArr[6];
 		sOrderQty.TrimRight();
 		//spBPrc ,   sgbVal,     sValCnt,     sRate,   sevPrf,      sPrfrate,     sevPrc,      sevWPrf,          sevWPrc,           scurr, sSExrate, sLoanDate, sLoanWprc;
-		//ï¿½ï¿½Õ´Ü°ï¿½, ï¿½Ü°ï¿½ï¿½ï¿½ï¿½ï¿½, ï¿½Ü°ï¿½ï¿½ï¿½ï¿½ï¿½  ï¿½ï¿½ï¿½ï¿½ï¿½  ï¿½ò°¡¼ï¿½ï¿½ï¿½  ï¿½ï¿½ï¿½Í·ï¿½       ï¿½ò°¡±İ¾ï¿½  ï¿½ï¿½È­ï¿½ò°¡¼ï¿½ï¿½ï¿½  ï¿½ï¿½È­ï¿½ò°¡±İ¾ï¿½    ï¿½ï¿½È­ ï¿½ï¿½ï¿½ï¿½È¯ï¿½ï¿½  ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½       ï¿½ï¿½ï¿½ï¿½ï¿½(ï¿½ï¿½È­)
+		//Æò±Õ´Ü°¡, ÀÜ°í±¸ºĞ, ÀÜ°í¼ö·®  µî¶ô·ü  Æò°¡¼ÕÀÍ  ¼öÀÍ·ü       Æò°¡±İ¾×  ¿øÈ­Æò°¡¼öÀÍ  ¿øÈ­Æò°¡±İ¾×    ÅëÈ­ ±âÁØÈ¯À²  ´ëÃâÀÏ       ´ëÃâ±İ(¿øÈ­)
 	
-		spBPrc = sArr[7];  //ï¿½ï¿½Õ´Ü°ï¿½
+		spBPrc = sArr[7];  //Æò±Õ´Ü°¡
 		sgbVal = sArr[8];
 		sValCnt = sArr[9];
 		sRate = sArr[10];
@@ -628,7 +637,7 @@ m_tmpX = _T("parseIMAXMessageData() PRICE_") + stmp; dprint();
 		IMAXToMapTrigger(stmp);
 
 
-		m_slog.Format("]IMAXTRIGGER]<%d>[%d] IMAXJQTY code = %s ï¿½ï¿½ï¿½É¼ï¿½ï¿½ï¿½ =%s ", __LINE__,nKind, sCode, sArr[6]);
+		m_slog.Format("]IMAXTRIGGER]<%d>[%d] IMAXJQTY code = %s °¡´É¼ö·® =%s ", __LINE__,nKind, sCode, sArr[6]);
 		OutputDebugString(m_slog);
 	}
 
@@ -679,7 +688,9 @@ void CControlWnd::SetParam(struct _param *pParam)
 			break;
 		}
 	}
-m_tmpX.Format("SetParam() viewNo[%s]cx[%d]cy[%d]", m_sViewNo, m_param.rect.Width(), m_param.rect.Height()); dprint();
+m_tmpX.Format("SetParam() viewNo[%s]cx[%d]cy[%d]", m_sViewNo, m_param.rect.Width(), m_param.rect.Height()); 
+OutputDebugString(m_tmpX);
+dprint();
 }
 
 void CControlWnd::Init()
@@ -817,7 +828,7 @@ long CControlWnd::OnMessage(WPARAM wParam, LPARAM lParam)
 					m_bSearhAuthFinish = TRUE;
 				}*/
 				if (strecode.Left(1) != "0")
-				{ //ï¿½ï¿½È¸ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½×³ï¿½ ï¿½ï¿½ï¿½ï¿½Ã¼ï¿½
+				{ //Á¶È¸ °á°ú°¡ ¿À·ù°¡ ÀÖÀ¸¸é ±×³É À¯·á½Ã¼¼
 					m_sCustomerAuth = "00000000000000000000000000000000011";
 					m_sCustomerNum.Empty();
 					AbroadAuth(true);
@@ -929,7 +940,7 @@ void CControlWnd::SearchCustomAuth()
 		return;
 	}
 
-	//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½È¸
+	//°í°´±ÇÇÑ Á¶È¸
 	CString stmp{};
 	stmp = m_sUsID;
 	stmp.Replace(".", "#");
@@ -991,7 +1002,7 @@ void CControlWnd::SearchCustomAuth()
 	m_slog.Format("[IMAX][%s] ret = [%d] ", __FUNCTION__, iret);
 	OutputDebugString(m_slog);
 
-	//ï¿½ï¿½ï¿½ï¿½ID ï¿½ï¿½È¸ end
+	//°í°´ID Á¶È¸ end
 }
 
 short CControlWnd::_InitIMAX() 
@@ -1026,7 +1037,7 @@ bool CControlWnd::LoadIMAXView(CString ViewName, CRect rcCli)
 			sSkinName.Format("%s", readB);
 			sSkinName.TrimRight();
 
-			if (sSkinName == "Gray")  //gray È¸ï¿½ï¿½ï¿½ï¿½
+			if (sSkinName == "Gray")  //gray È¸»öÀÓ
 				m_iSkin = 1;
 			else if (sSkinName == "Blue")
 				m_iSkin = 2;
@@ -1143,7 +1154,7 @@ m_tmpX.Format("SetIMAXData(IMAX_CHANGECODE) viewNo[%s]kind[%d]value[%s]code[%s]"
 			m_IMAXApi.ChangeCodeWindow(hWnd, (char *)sCodeFormat.GetString());
 			m_sCode = sValue;
 		}
-	case IMAX_PRCSETTING:  //È£ï¿½ï¿½ï¿½ï¿½ï¿½É¿ï¿½ï¿½ï¿½Æ® ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+	case IMAX_PRCSETTING:  //È£°¡½ºÇÉ¿¡µğÆ® °ªº¯°æ
 		{
 			::SendMessage(hWnd, IMXID_SETPRICETEXT, (WPARAM)0, (LPARAM)sValue.GetString());
 		}
@@ -1189,13 +1200,13 @@ BSTR CControlWnd::_GetIMAXValue(LPCTSTR sValueText)
 	else if (sText == "codeinfo") nKey = IMXID_GETCODEINFO;
 	else if (sText == "jangoinfo") nKey = 20905;
 
-	if (nKey == IMXID_GETCODE)  //20230321 ï¿½ï¿½ï¿½ï¿½ï¿½Úµï¿½ ï¿½ï¿½È¯
+	if (nKey == IMXID_GETCODE)  //20230321 Á¾¸ñÄÚµå ¹İÈ¯
 	{
 		strResult = m_sCodeAll;
 		return strResult.AllocSysString();
 	}
 
-	if (nKey == IMXID_GETCODEINFO)  //ï¿½Úµï¿½ï¿½ï¿½ï¿½ï¿½
+	if (nKey == IMXID_GETCODEINFO)  //ÄÚµåÁ¤º¸
 	{
 		::SendMessage(hWnd, WUM_IMAXDATAGET + 1, (WPARAM)nKey, (LPARAM)szBuf);
 		strResult = szBuf;
@@ -1204,7 +1215,7 @@ BSTR CControlWnd::_GetIMAXValue(LPCTSTR sValueText)
 		return strResult.AllocSysString();
 	}
 
-	if (nKey == 20905)  //20230321 ï¿½Ü°ï¿½ ï¿½ï¿½ï¿½ï¿½
+	if (nKey == 20905)  //20230321 ÀÜ°í °ü·Ã
 	{
 		::SendMessage(hWnd, WUM_IMAXDATAGET, (WPARAM)nKey, (LPARAM)szBuf);
 		strResult = szBuf;
@@ -1212,7 +1223,7 @@ BSTR CControlWnd::_GetIMAXValue(LPCTSTR sValueText)
 		return strResult.AllocSysString();
 	}
 
-	if (nKey == IMXID_GETCURPRICE)  //20230321 ï¿½Ü°ï¿½ ï¿½ï¿½ï¿½ï¿½
+	if (nKey == IMXID_GETCURPRICE)  //20230321 ÀÜ°í °ü·Ã
 	{
 		::SendMessage(hWnd, WUM_IMAXDATAGET, (WPARAM)nKey, (LPARAM)szBuf);
 		strResult = szBuf;
@@ -1284,7 +1295,7 @@ void CControlWnd::dprint()
 
 	m_tmpX.Insert(0, _T("[IMAX:CON] : "));
 
-// ï¿½Ê¿ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Ò°ï¿½. ï¿½ï¿½Ò¿ï¿½ ï¿½Ö¼ï¿½Ã³ï¿½ï¿½
+// ÇÊ¿ä½Ã »ç¿ëÇÒ°Í. Æò¼Ò¿£ ÁÖ¼®Ã³¸®
 //	OutputDebugString(m_tmpX);
 
 	m_tmpX.Empty();
@@ -1323,7 +1334,7 @@ void CControlWnd::SendTR_Control(CString name, char* datb, int datl, char stat)
 
 void CControlWnd::OnTimer(UINT_PTR nIDEvent)
 {
-	// TODO: ï¿½ï¿½ï¿½â¿¡ ï¿½Ş½ï¿½ï¿½ï¿½ Ã³ï¿½ï¿½ï¿½ï¿½ ï¿½Úµå¸¦ ï¿½ß°ï¿½ ï¿½ï¿½/ï¿½Ç´ï¿½ ï¿½âº»ï¿½ï¿½ï¿½ï¿½ È£ï¿½ï¿½ï¿½Õ´Ï´ï¿½.
+	// TODO: ¿©±â¿¡ ¸Ş½ÃÁö Ã³¸®±â ÄÚµå¸¦ Ãß°¡ ¹×/¶Ç´Â ±âº»°ªÀ» È£ÃâÇÕ´Ï´Ù.
 	switch (nIDEvent)
 	{
 		case DF_TIMER_OPEN5964:
@@ -1380,7 +1391,7 @@ void CControlWnd::OnTimer(UINT_PTR nIDEvent)
 				OutputDebugString(m_slog);
 
 
-				if (bret)  //5500 ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½È­ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+				if (bret)  //5500 °°ÀÌ ¼øÂ÷ÀûÀ¸·Î ¿­¸®´Â Á¾ÇÕÈ­¸éÀ» À§ÇÑ
 					m_pParent->SendMessage(WM_USER, MAKEWPARAM(eventDLL, MAKEWORD(m_param.key, evOnDblClk)), (LPARAM)m_param.name.GetString());			
 			}
 		}
@@ -1481,7 +1492,7 @@ void CControlWnd::AbroadAuth(bool bSet, bool bfile)
 			m_sCustomerAuth.TrimRight();
 			m_sCustomerNum = stmp;
 
-			if ((long)m_pParent->SendMessage(WM_USER, MAKEWPARAM(variantDLL, orderCC), 0L) == 0)  //0 ï¿½ï¿½ï¿½ï¿½
+			if ((long)m_pParent->SendMessage(WM_USER, MAKEWPARAM(variantDLL, orderCC), 0L) == 0)  //0 Á÷¿ø
 			{
 				m_sCustomerAuth = "00000000000000000000000000000000022";
 				m_sCustomerNum = "";
@@ -1505,7 +1516,7 @@ void CControlWnd::DoWork(int itype, int iSec)
 
 				while (true)
 				{
-					std::this_thread::yield();  //cpuï¿½çº¸
+					std::this_thread::yield();  //cpu¾çº¸
 					auto now = std::chrono::steady_clock::now();
 					if (std::chrono::duration_cast<std::chrono::seconds>(now - start).count() >= iSec)
 						break;
@@ -1526,7 +1537,7 @@ BSTR CControlWnd::GetsJango()
 
 	CString strResult;
 
-	// TODO: ï¿½ï¿½ï¿½â¿¡ ï¿½ï¿½ï¿½ï¿½Ä¡ Ã³ï¿½ï¿½ï¿½ï¿½ ï¿½Úµå¸¦ ï¿½ß°ï¿½ï¿½Õ´Ï´ï¿½.
+	// TODO: ¿©±â¿¡ µğ½ºÆĞÄ¡ Ã³¸®±â ÄÚµå¸¦ Ãß°¡ÇÕ´Ï´Ù.
 	strResult.Format("%s", m_sJango);
 	return strResult.AllocSysString();
 }
@@ -1536,7 +1547,7 @@ void CControlWnd::SetsJango(BSTR newVal)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
-	// TODO: ï¿½ï¿½ï¿½â¿¡ ï¿½Ó¼ï¿½ Ã³ï¿½ï¿½ï¿½ï¿½ ï¿½Úµå¸¦ ï¿½ß°ï¿½ï¿½Õ´Ï´ï¿½.
+	// TODO: ¿©±â¿¡ ¼Ó¼º Ã³¸®±â ÄÚµå¸¦ Ãß°¡ÇÕ´Ï´Ù.
 }
 
 #include "CMarketTimeManager.h"
@@ -1557,7 +1568,7 @@ void CControlWnd::SetMapNum(BSTR sMapNum)
 
 	m_sViewNo.Format("%s", sMapNum);
 	m_sViewNo.TrimRight();
-	// TODO: ì—¬ê¸°ì— ë””ìŠ¤íŒ¨ì¹˜ ì²˜ë¦¬ê¸° ì½”ë“œë¥¼ ì¶”ê°€í•©ë‹ˆë‹¤.
+	// TODO: ¿©±â¿¡ µğ½ºÆĞÄ¡ Ã³¸®±â ÄÚµå¸¦ Ãß°¡ÇÕ´Ï´Ù.
 }
 
 
@@ -1567,7 +1578,7 @@ BSTR CControlWnd::GetMarketType()
 
 	CString strResult;
 
-	// TODO: ì—¬ê¸°ì— ë””ìŠ¤íŒ¨ì¹˜ ì²˜ë¦¬ê¸° ì½”ë“œë¥¼ ì¶”ê°€í•©ë‹ˆë‹¤.
+	// TODO: ¿©±â¿¡ µğ½ºÆĞÄ¡ Ã³¸®±â ÄÚµå¸¦ Ãß°¡ÇÕ´Ï´Ù.
 
 	return strResult.AllocSysString();
 }

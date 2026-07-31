@@ -316,6 +316,20 @@ void CStream::GetDataH(CScreen* screen, char* sysB, int& sysL)
 	sysL += datH;
 }
 
+// Defense in depth for the [0-GetDataNRM-*] debug logs: mask on FA_PASSWD as
+// before, but also mask by field name even when a map author forgot to set
+// FA_PASSWD (seen in practice: an EDIT field literally named "pwd" with no
+// FA_PASSWD attribute logged its value in the clear). Wire encryption is
+// unaffected either way - this only protects the axlog/DebugView output.
+static bool isMaskedField(DWORD attr, const char* name)
+{
+	if (attr & FA_PASSWD)
+		return true;
+	CString n(name);
+	n.MakeLower();
+	return n.Find("pwd") >= 0 || n.Find("passwd") >= 0 || n.Find("password") >= 0;
+}
+
 int CStream::GetDataNRM(CScreen* screen, char* iosB, bool tab, bool skip)
 {
 	CfmBase*	form = NULL;
@@ -358,6 +372,9 @@ int CStream::GetDataNRM(CScreen* screen, char* iosB, bool tab, bool skip)
 					m_guard->SetGuide(AE_MAXIO, m_client->m_key);
 					return 0;
 				}
+				axlog(LOG_DATA, "[0-GetDataNRM-field] name=%s kind=%d value=[%.80s]",
+					(char *)form->m_form->name, form->m_form->kind,
+					isMaskedField(form->m_form->attr, (char *)form->m_form->name) ? "***" : text.GetString());
 				CopyMemory(&iosB[iosL], (char *)text.operator LPCTSTR(), formL);
 				iosL += formL;
 				if (tab) iosB[iosL++] = '\t';
@@ -392,6 +409,9 @@ int CStream::GetDataNRM(CScreen* screen, char* iosB, bool tab, bool skip)
 				text += '\t';
 			}
 			formL = text.GetLength();
+			axlog(LOG_DATA, "[0-GetDataNRM-field] name=%s kind=%d value=[%s]",
+				(char *)form->m_form->name, form->m_form->kind,
+				isMaskedField(form->m_form->attr, (char *)form->m_form->name) ? "***" : text.GetString());
 			CopyMemory(&iosB[iosL], text, formL);
 			iosL += formL;
 			continue;
@@ -431,6 +451,8 @@ int CStream::GetDataNRM(CScreen* screen, char* iosB, bool tab, bool skip)
 			if (rowN <= 0)
 				continue;
 
+			axlog(LOG_DATA, "[0-GetDataNRM-grid] name=%s rows=%d cols=%d", (char *)form->m_form->name, rowN, nCols);
+
 			bool	edit;
 
 			edit = false;
@@ -464,6 +486,10 @@ int CStream::GetDataNRM(CScreen* screen, char* iosB, bool tab, bool skip)
 						text += '\t';
 					}
 
+					axlog(LOG_DATA, "[0-GetDataNRM-cell] name=%s row=%d col=%d iok=%d value=[%s]",
+						(char *)form->m_form->name, idx, kk, cell->iok,
+						(cell->attr & FA_PASSWD) ? "***" : text.GetString());
+
 					formL = text.GetLength();
 					if (iosL + formL > maxIOs)
 					{
@@ -491,6 +517,9 @@ int CStream::GetDataNRM(CScreen* screen, char* iosB, bool tab, bool skip)
 			wsprintf(&iosB[iosL], "%02d", formL/form->m_form->size);
 			iosL += 2;
 
+			axlog(LOG_DATA, "[0-GetDataNRM-field] name=%s kind=%d value=[%.80s]",
+				(char *)form->m_form->name, form->m_form->kind,
+				isMaskedField(form->m_form->attr, (char *)form->m_form->name) ? "***" : text.GetString());
 			CopyMemory(&iosB[iosL], text, formL);
 			iosL += formL;
 			if (tab)
@@ -506,6 +535,9 @@ int CStream::GetDataNRM(CScreen* screen, char* iosB, bool tab, bool skip)
 			case EIO_INOUT:
 				form->ReadData(text);
 				formL = text.GetLength();
+				axlog(LOG_DATA, "[0-GetDataNRM-field] name=%s kind=%d value=[%s]",
+					(char *)form->m_form->name, form->m_form->kind,
+					isMaskedField(form->m_form->attr, (char *)form->m_form->name) ? "***" : text.GetString());
 				CopyMemory(&iosB[iosL], text, formL);
 				iosL += formL;
 				if (tab)
@@ -534,6 +566,9 @@ int CStream::GetDataNRM(CScreen* screen, char* iosB, bool tab, bool skip)
 			text += '\t';
 		}
 		formL = text.GetLength();
+		axlog(LOG_DATA, "[0-GetDataNRM-field] name=%s kind=%d value=[%s]",
+			(char *)form->m_form->name, form->m_form->kind,
+			isMaskedField(form->m_form->attr, (char *)form->m_form->name) ? "***" : text.GetString());
 		CopyMemory(&iosB[iosL], text, formL);
 		iosL += formL;
 	}
@@ -1359,7 +1394,11 @@ void CStream::MakeStream(bool byKey)
 void CStream::MakeStream(CScreen* screen, CString trx)
 {
 	if (screen->m_state & waitSN)
+	{
+		axlog(LOG_DATA, "[MakeStream-waitSN-drop] map=%.8s tr=%.8s -- screen still waiting for a prior TR response, send suppressed",
+			screen->m_mapH->mapN, trx.GetString());
 		return;			// maybe does not happen except for script bug
+	}
 
 	struct _axisH*	axisH;
 
@@ -1372,9 +1411,6 @@ void CStream::MakeStream(CScreen* screen, CString trx)
 	axisH->unit = screen->m_key;
 	axisH->trxK = screen->m_trxK;
 	screen->m_trxK = 0;
-
-	axlog(LOG_DATA, "[0-MakeStream-send] winK=%d unit=%d mapN=%.7s",
-		axisH->winK, axisH->unit, screen->m_mapH->mapN);
 
 	bool	tab = false;
 	if (screen->m_mapH->options & OP_TABS)
@@ -1392,6 +1428,9 @@ void CStream::MakeStream(CScreen* screen, CString trx)
 	CopyMemory(axisH->trxC, trx, L_TRXC);
 	CopyMemory(axisH->svcN, CString(screen->m_mapH->mapN, L_MAPN).Mid(L_SGID, L_SELC), sizeof(axisH->svcN));
 	m_sndL += L_axisH;
+
+	axlog(LOG_DATA, "[0-MakeStream-send] ------ map=%.8s tr=%.8s ------ winK=%d unit=%d",
+		screen->m_mapH->mapN, trx.GetString(), axisH->winK, axisH->unit);
 
 	bool info_trx = screen->GetTranInfo(trx);
 	if (screen->m_mapH->options & OP_OOP)
@@ -1422,7 +1461,7 @@ void CStream::MakeStream(CScreen* screen, CString trx)
 		axisH->auxs |= auxsCA;
 	}
 
-	if (!(m_guard->m_term & flagENX) && screen->m_mapH->options & OP_ENC)
+	if (!m_guard->IsNoEncMode() && !(m_guard->m_term & flagENX) && screen->m_mapH->options & OP_ENC)
 	{
 		if (m_guard->GetFdsValue(CString(axisH->trxC, L_TRXC), &m_sndB[m_sndL], axisL))
 			axisH->auxs |= auxsFDS;
