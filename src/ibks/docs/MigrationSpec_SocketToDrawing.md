@@ -6,9 +6,13 @@
 
 **범위:** 소켓으로 원시 바이트가 들어와서, 화면에 값이 그려지기까지의 전체 파이프라인과 그 안의 모든 규칙. `@docs/WizardArchitecture.md`(클래스 계층), `@docs/RealtimeCodeIndex_Investigation.md`(RTM 매칭 상세)와 상호보완 관계 — 이 문서는 "파이프라인 전체 흐름과 프로토콜"에 집중.
 
-**진행상태:** 🔍 작성 중 — 소켓 수신→재조립→파싱→필드쓰기(`SetDataNRM`)까지 실측 로그(`[WIZARD][DATA][0]~[5]`)로 검증 완료. 그리드(`FM_GRID`) 파싱, `FCC`/`RCC`/`SCC` 제어코드 정확한 의미, `SetDataOOP`/`TAB`류 나머지 포맷은 다음 조사 대상 (9절 참고).
+**진행상태:** 🔍 작성 중 — 소켓 수신→재조립→파싱→필드쓰기(`SetDataNRM`/그리드 `SetCells`/원장 `SetDataH`)까지, 그리고 송수신 암호화(`CGuard::Xecure`, 8.9절)까지 전부 실측 로그로 검증 완료. `SetDataOOP`/`TAB`류 나머지 포맷, `CC_*` 플래그 전체 목록, `ARM`/`AUX`/`DIAL`/`MAPX` msgK 처리 로직은 다음 조사 대상 (9절 참고).
 
 **2026-07-25 실측 검증:** AxisChaser(패킷캡처 도구)로 원시 바이트를 직접 대조해서 `_axisH` 구조체 필드 순서(msgK/stat/auxs/winK/unit)가 실제 와이어 바이트와 1:1로 정확히 일치함을 확인함. 코드분석+로그+원시패킷캡처 3중 검증됨.
+
+**2026-07-31 실측 검증:** 암호화/복호화(`CGuard::Xecure`, 8.9절) 전체 흐름과 `msgK` 전체 값 목록(1절)을 axlog+실제 통신 캡처로 확정. 개발용 `NOENC.TXT` 스위치로 "서버가 클라이언트의 암호화 선언을 그대로 따라간다"는 사실도 확인.
+
+**2026-08-14 확인:** `IBKSConnector`(OCX) 소스에서 OOP 포맷(`trxC=pooppoop/GOOPHOOP` 계열) TR의 **요청 페이로드 조립 문법**을 확정(8.10절 신설) — 단일값/그리드/캔들 세 가지 문법과 `$`/`?` 마커, `grid_i`/`grid_o` 페이징 구조체까지 소스 코드로 직접 확인. 단, 이건 클라이언트→서버 요청 쪽만 확인된 것이고, Wizard(서버 응답 수신) 쪽의 `SetDataOOP` 파싱은 여전히 미조사(9절 참고) — 서로 다른 절반.
 
 ---
 
@@ -64,19 +68,33 @@ struct _axisH {
 
 **모든 클라이언트-서버 패킷은 이 24바이트 헤더 + 가변 페이로드 구조**입니다. 새 플랫폼에서 소켓을 파싱하려면 이 구조를 그대로 재현해야 함.
 
-### `msgK` (메시지 종류) — `h/axis.h:44~`
+### `msgK` (메시지 종류) — `h/axis.h:44~70` (전수 확인, 2026-07-31 갱신)
 
-| 값 | 상수 | 의미 |
-|---|---|---|
-| 0x20 | `msgK_AXIS` | 일반 AXIS 메시지 |
-| 0x21 | `msgK_HTM` | HTML 메시지 |
-| 0x22 | `msgK_TAB` | 탭 구분 메시지 |
-| 0x24 | `msgK_SVC` | 서비스 콜 |
-| 0x25 | `msgK_APC` | 승인 콜 |
-| 0x26 | `msgK_CTRL` | 컨트롤 데이터 |
-| 0x27 | `msgK_UPF` | 파일 업로드 |
-| 0x28 | `msgK_DNF` | 파일 다운로드 |
-| 0x30 | `msgK_RSM` | 리소스 요청 (맵 파일 등, `CGuard::RequestMAPs`가 씀) |
+| 값 | 상수 | 의미 | 처리 경로 |
+|---|---|---|---|
+| 0x20 | `msgK_AXIS` | 일반 AXIS 메시지 (TR 조회 요청/응답) | `OutStream` (요청-응답, 8.5절) |
+| 0x21 | `msgK_HTM` | HTML 메시지 | `OutStream` |
+| 0x22 | `msgK_TAB` | 탭 구분 메시지 | `OutStream` |
+| 0x24 | `msgK_SVC` | 서비스 콜 | `OutStream` |
+| 0x25 | `msgK_APC` | 승인 콜 | `OutStream` |
+| 0x26 | `msgK_CTRL` | 컨트롤(`FM_CONTROL`) 데이터 직접 갱신 | `OutStream` |
+| 0x27 | `msgK_UPF` | 파일 업로드 | `OutStream` |
+| 0x28 | `msgK_DNF` | 파일 다운로드 | `OutStream` |
+| 0x30 | `msgK_RSM` | 리소스 요청 (맵 파일 등, `CGuard::RequestMAPs`가 씀) | `CGuard::OnRsm` (OutStream 안 탐) |
+| 0x40 | `msgK_RTM` | 실시간 시세 데이터 | `CGuard::OnAlert`→`DoRTM` (RTM 전용 경로, `@docs/RealtimeCodeIndex_Investigation.md`) |
+| 0x50 | `msgK_MAPX` | 맵(화면) 전환 지시 | 미조사 |
+| 0x80 | `msgK_ENC` | 암호화 키 데이터 | `CWizardCtrl::OnXecure` |
+| 0x81 | `msgK_XCA` | 인증서(Certify) 데이터 | `CWizardCtrl::OnXecure` |
+| 0x82 | `msgK_SIGN` | 로그인/로그아웃(sign on/off) | `OnStream`(`OutStream`이 아니라 별도 스트림 진입점) |
+| 0x83 | `msgK_SIGNx` | 로그인/로그아웃(인증서 로그인) | `OnStream` |
+| 0x90 | `msgK_TICK` | **"tick pane(notice...)"** — 서버가 임의 시점에 미는 브로드캐스트 알림(체결통보류). TR 요청-응답이 아니라 요청 없이 도착 | `CGuard::OnNotice` → `CScreen::OnNotice`(`$$` 마킹 그리드, 2026-07-31 확인) |
+| 0x91 | `msgK_POP` | 모달리스 다이얼로그(ASCII 컨트롤 데이터) | `OnFire(FEV_AXIS, MAKEWPARAM(alarmPAN,...))` |
+| 0x92 | `msgK_ARM` | 알람 메시지 | 미조사 |
+| 0x93 | `msgK_AUX` | AUX 실시간 메시지 | 미조사 |
+| 0x94 | `msgK_DIAL` | 확인 다이얼로그(`axisH.winK`가 세부 다이얼로그 타입) | 미조사 |
+| 0x99 | `msgK_ERR` | 에러 메시지 | `OutStream` |
+
+**중요 — 두 계층의 `msgK` 분기가 있다.** `CWizardCtrl::OnRead`(WizardCtrl.cpp:719-768)가 소켓에서 막 재조립한 모든 프레임에 대해 **1차로** `msgK`를 검사하고, `AXIS`/`TAB`/`HTM`/`SVC`/`APC`/`CTRL`/`UPF`/`DNF`/`ERR` 계열만 `CWizardCtrl::OnAxis`를 거쳐 `CStream::OutStream`(8.5절 표)까지 도달한다. `SIGN`/`SIGNx`/`RSM`/`ENC`/`XCA`/`TICK`/`POP` 등은 **`OutStream`을 아예 타지 않고** `OnRead`의 switch 안에서 곧바로 별도 함수로 갈라진다 — 즉 8.5절의 `OutStream` 표는 "TR 요청-응답 계열"만 다루는 하위 집합이고, 이 표가 실제 전체 `msgK` 공간이다. 새 플랫폼의 소켓 디스패처는 이 두 계층 구조(전체 `msgK` 1차 분기 → 그중 TR 계열만 2차로 요청/응답 매칭)를 그대로 반영해야 한다.
 
 ### `auxs` 부가상태 (확인된 것)
 
@@ -304,7 +322,11 @@ if (screen->m_vbe->IsAvailable(procs))   // 스크립트에 이 이름의 함수
 ```
 ①~③은 라우팅/재조립만 하고, **④에서 처음으로 데이터 내용에 따라 분기**한다. 반대 방향(클라이언트→서버 송신)은 `CGuard::Write`/`Login`/`Service`이 담당하고, `CClient::OnWrite`에서 보이는 `m_stream->InStream(screen)`이 그 카운터파트로 추정됨(필드 변경 시 자동 전송) — `Out`/`In` 네이밍은 서버 기준(서버에서 나가는/서버로 들어가는)으로 추정.
 
-### `msgK` 전체 종류 (9개 + RSM, `CStream::OutStream` 실측)
+**정정(2026-07-31):** 위 ①(`CWizardCtrl::OnAxis`)이 실제로는 "첫 분기점"이 아니다 — 더 앞단인 `CWizardCtrl::OnRead`(소켓에서 막 재조립한 프레임을 받는 지점, 복호화도 여기서 일어남·8.9절)에 `msgK` 전체를 보는 1차 switch가 있고, 이 표에서 다루는 ①~④ 체인은 그중 TR 요청-응답 계열(`AXIS`/`TAB`/`HTM`/`SVC`/`APC`/`CTRL`/`UPF`/`DNF`)만 `OnAxis`로 넘겨받은 것이다. 전체 `msgK` 공간과 1차/2차 분기 구조는 1절 표 참고.
+
+### `msgK` 종류 — `OutStream`까지 도달하는 것만 (TR 요청-응답 계열 하위 집합, `CStream::OutStream` 실측)
+
+> 전체 `msgK` 값 목록(`SIGN`/`TICK`/`ENC` 등 `OutStream`을 안 타는 것 포함)은 1절 `msgK` 표 참고 — 이 표는 그중 `OutStream`까지 도달하는 것들의 세부 처리만 다룬다.
 
 | msgK | 값 | 처리 | 공통꼬리(커서복원/재조회) 통과 여부 |
 |---|---|---|---|
@@ -521,15 +543,139 @@ CGuard::Write(2) len=520 hdr0=0x20 hdr3=0x27                       <- 520 = L_ax
 
 ---
 
+## 8.10. IBKSConnector OOP 요청 페이로드 문법 — `pooppoop`/`GOOPHOOP` 계열 (2026-08-14 확인)
+
+### 배경 — 이 절이 다루는 범위
+
+8.9절까지는 `trxC=piboPBxQ`(`US_ENC`, 일반 AXIS 포맷)류를 다뤘다. 이 절은 **`trxC`가 `pooppoop`/`GOOPHOOP` 등인 `US_OOP` 포맷 TR의 요청 페이로드를 클라이언트(IBKSConnector OCX)가 어떻게 조립하는지**를 다룬다. `MigrationSpec` 9절에 오래 남아있던 `SetDataOOP`(서버 응답을 Wizard가 파싱하는 쪽, `Stream.cpp`)와는 **반대 방향(클라이언트→서버 요청 조립)이며 소스 위치도 다르다** — `Wizard/` 안이 아니라 `HTS_OpenAPI(운영)/IBKSConnector/IBKSConnectorCtl.cpp`에 있다. 즉 OOP 프로토콜의 "요청 조립" 절반은 이번에 확정됐고, "응답 파싱"(`SetDataOOP`) 절반은 여전히 미확인이다(9절 참고).
+
+**중요 — 이 문법은 `trxC` 자체와 무관하게, `_axisH` 헤더(24바이트) 다음에 오는 페이로드 안에서 작동하는 문법이다.** 즉 1절의 `_axisH` 구조(헤더 24바이트+`datL`만큼의 페이로드), 8.9절의 암호화 규칙(헤더 이후 페이로드만 암호화)은 OOP 포맷에도 동일하게 적용되고, 이 절은 그 페이로드 **내부**의 문법만 다룬다.
+
+**근거:** `HTS_OpenAPI(운영)/IBKSConnector/IBKSConnectorCtl.cpp`의 `S_TR1002`/`S_TR1003`/`S_TR3002`/`S_TR3003`(2341~2505행)과 `IBKSConnector_test/IBKSConnectorCtl.cpp`의 `S_TR1007`(2527~2662행, 원본 CP949 주석 iconv로 확인) — 전부 실제 소스 코드 직접 확인(로그/추정 아님).
+
+### 1) 단일값(비그리드) 조회 — 특수문자 없음
+
+`S_TR1002`(주식 조회), `S_TR3002`(선물옵션 조회):
+```cpp
+sdat.Format("1301\x7f%s\t%s\t", code, data);
+return SendTR("pooppoop", key, US_OOP, (LPCSTR)sdat, sdat.GetLength(), &CIBKSConnectorCtrl::C_TR1002);
+```
+
+**문법:** `<필드코드>\x7f<값>\t<필드코드2>\t<필드코드3>...\t`
+
+- `1301` = "종목코드" 필드코드. 여기에 값을 채우고 싶으면 `\x7f`(0x7f, DEL 문자)로 필드코드와 값을 붙인다: `1301\x7f005930`.
+- 값 없이 "이 필드코드를 조회해달라"만 요청할 때는 필드코드만 탭(`\t`, 0x09)으로 나열한다.
+- `data`(함수 인자명은 파일마다 `data`/`symb`로 다르게 불리지만 실체는 같음, Python `dynamicCall`에서는 `TR1002(int, QString, QString)`의 세 번째 인자)는 **조회하고 싶은 필드코드들을 탭으로 이어붙인 문자열**이다. "심볼 하나"가 아니라 "필드코드 목록"이다.
+- 맨 끝에 항상 trailing 탭이 하나 더 붙는다(`Format(...%s\t)`의 마지막 `\t`).
+
+**실측 예시(사용자가 앞서 캡처한 로그)와 대조:**
+```
+preview=[1301024110	1034	1022	1023	1024	1033	1027	1025	1026	1029	1030	1031	1021	1310	1311	1312	1313	1316	131...
+```
+- `1301024110` = `1301` + `\x7f`(비인쇄 문자라 화면엔 안 보임) + `024110`(종목코드) — `\x7f`가 프린트 안 되는 문자라 로그 미리보기에서는 필드코드와 종목코드가 그냥 붙어 보인 것.
+- 그 뒤 `1034\t1022\t1023\t1024...`는 조회를 요청한 필드코드 목록 — 실제로 이 18개 목록(`1034,1022,1023,1024,1033,1027,1025,1026,1029,1030,1031,1021,1310,1311,1312,1313,1316,1318`)은 `S_TR1007`이 내부적으로 쓰는 `snapFields[]` 배열과 정확히 동일하다(아래 3절 참고) — "스냅샷 18필드"라는 이름으로 여러 TR 호출부에서 재사용되는 공통 필드 세트로 보인다.
+
+**사용자 질문에 대한 답:** "`1301 0x7f 실제종목코드 0x09 심볼 0x09` — 종목코드는 1301 값이고 심볼에 해당하는 데이터 조회시 사용" — **골격은 정확히 맞다.** 다만 "심볼"이라는 이름 때문에 오해할 수 있는데, 실제로는 단일 심볼이 아니라 **조회하고 싶은 필드코드들을 탭으로 이어붙인 문자열 전체**가 그 자리에 들어간다(위 로그 예시처럼 18개가 한 번에 들어갈 수 있음). 마지막 탭은 종결자다.
+
+### 2) 그리드(다중 레코드) 조회 — `$` 마커
+
+`S_TR1003`(주식 그리드 조회, 예: 체결/호가 등 여러 행이 필요한 조회), `S_TR3003`(선물옵션 버전):
+```cpp
+sin.Format("1301\x7f%s\t10302\x7f%d\t$10310\x7f", code, type);   // 3003은 "30301.../$33310" 또는 "40301.../$43310"
+sout = columns; sout.TrimRight(); sout.Replace('\t', '\n'); sout += "\n\t";
+
+vector<char> buff(ilen+glen+olen);
+memcpy(&buff[0],         sin,  ilen);
+memcpy(&buff[ilen],      &gin, glen);   // grid_i 이진 구조체
+memcpy(&buff[ilen+glen], sout, olen);
+
+return SendTR("pooppoop", key, US_OOP, buff.data(), buff.size(), &CIBKSConnectorCtrl::C_TR1003);
+```
+
+**문법:** `<일반필드=값...>\t $<그리드시작필드코드>\x7f [grid_i 이진구조체] [컬럼목록, \n구분]\n\t`
+
+- `$10310`(3003은 `$33310`/`$43310`) — **필드코드 앞에 `$`가 붙으면 "여기부터는 단일 값이 아니라 그리드(표) 형태로 응답을 만들어달라"는 마커**다. 1)의 문법과 필드코드/값 부분은 동일하되, 그리드 시작 지점에만 `$`가 붙는다.
+- `$필드코드\x7f` 바로 뒤에는 **텍스트가 아니라 이진 구조체 `grid_i`(`grid_i.h`)가 그대로 붙는다** — 정렬/페이징 요청 정보:
+  ```cpp
+  class grid_i {
+      char vrow[2];   // 보이는 행수
+      char nrow[4];   // 요청 행수
+      char vflg[1];   // 뷰 플래그
+      char gdir[1];   // 정렬방향(그리드)
+      char sdir[1];   // 정렬방향(부가)
+      char scol[16];  // 정렬 기준 컬럼명
+      char ikey[1];   // 입력 키(연속조회 시 setIKEY(2))
+      char page[4];   // 페이지 번호
+      char save[80];  // 연속조회 이어보기 토큰 — 응답 grid_o.save를 그대로 되돌려보냄
+  };
+  ```
+- `grid_i` 바이너리 다음에 **원하는 컬럼(필드) 목록**이 텍스트로 이어진다 — 호출자가 넘긴 `columns`(탭구분)를 개행(`\n`)구분으로 바꾸고 끝에 `\n\t`를 붙인 형태.
+- **연속조회(페이징) 메커니즘:** 응답에는 `grid_o`(같은 헤더, `IsNext()`/`GetNKey()` 제공)가 돌아온다. 다음 페이지가 필요하면 `S_TR1003`의 `nkey` 인자에 직전 응답의 `grid_o.save`(80바이트)를 그대로 넣어서 재호출 → `gin.setGRIDO(gout)`으로 `grid_i.save`에 그대로 반영됨. 즉 **`save` 80바이트가 서버-클라이언트 간 "이어보기 토큰"**이고, 새 플랫폼도 이 필드를 불투명한 opaque 토큰으로 왕복시켜주기만 하면 됨(내용 해석 불필요).
+
+### 3) 캔들/시계열 조회 — `?` 마커
+
+`S_TR1007`(차트/캔들 조회, `trxC=GOOPHOOP`, `IBKSConnector_test/IBKSConnectorCtl.cpp:2527`):
+```cpp
+sendS += "1301"; sendS += (char)0x7f; sendS += code; sendS += "\t";
+for (18개 snapFields) sendS += 필드코드 + "\t";     // 종목이면 그대로, 업종(GU_INDEX)이면 "2" 접두(21301, 21034...)
+
+sendS += "1777"; sendS += (char)0x7f; sendS += mkgubn; sendS += "\t";
+
+sendS += (dunit==2) ? "?25500" : "?5500";           // ★ 캔들 마커 — $가 아니라 ?
+sendS += (char)0x7f;
+// _dataH(136바이트 이진 헤더): count[6] + dummy[6] + dkind + dkey + pday[8] + dunit + dindex + lgap[4] + ltic[4]
+//                              + option1 + option2 + rcode[16] + ikey + xpos + page[4] + save[80]
+
+for (캔들필드 10개) sendS += 필드코드 + "\n";        // 시가/고가/저가/종가/거래량/거래대금/권리락/수정비율 등
+sendS += "\t";
+
+return SendTR("GOOPHOOP", key, US_OOP, sendS.data(), sendS.size(), &CIBKSConnectorCtrl::C_TR1007);
+```
+
+**문법:** 2)와 뼈대는 동일(`특수문자+필드코드\x7f` → 이진헤더 → 필드목록\n구분\n\t)이지만 **마커 문자가 `$`가 아니라 `?`**다(`5500`/`25500` — 종목은 접두어 없이, 업종은 `2` 접두). 이진 헤더도 `grid_i`가 아니라 TR1007 전용 136바이트 `_dataH`(요청 건수/기준일/일봉·주봉·월봉 구분 등)로 다르다.
+
+**주의 — 업종(GU_INDEX) vs 종목(GU_CODE) 전체 접두 규칙:** `dunit==2`(업종)이면 코드값 자체는 그대로(3자리, `00` 접두 없음)이지만 **필드코드/캔들마커 전부에 `2`가 접두**된다(`1301`→`21301`, `5500`→`25500`, 캔들필드 `5302`→`25302` 등). `docs/RealtimeCodeIndex_Investigation.md`류 조사에서 마주칠 수 있는 `2`로 시작하는 필드코드들이 이 규칙과 관련 있을 가능성이 있다 — 교차 확인 가치 있음.
+
+### 4) 공통 요약 — 세 문법을 관통하는 규칙
+
+```
+[일반 필드코드\x7f값 / 필드코드만 ...]\t  [마커?][그리드또는캔들시작 필드코드]\x7f  [이진 헤더구조체]  [원하는필드/컬럼목록, \n구분]\n\t
+```
+
+| 구분 | 마커 | 이진 헤더 | 헤더 크기 | 뒤따르는 목록 |
+|---|---|---|---|---|
+| 단일값 (TR1002/3002) | 없음 | 없음 | - | (없음, 앞부분 필드코드 나열이 곧 요청 전부) |
+| 그리드 (TR1003/3003) | `$` | `grid_i` | `sizeof(grid_i)` | 컬럼 목록 |
+| 캔들/시계열 (TR1007) | `?` | `_dataH` | 136바이트 | 캔들 필드 목록(10개) |
+
+공통 구분자:
+- `\x7f`(0x7f, DEL) — 필드코드와 그 값을 붙일 때
+- `\t`(0x09) — 필드/파라미터 구분
+- `\n`(0x0a) — 그리드/캔들 문법에서만, 목록 항목 구분
+- 페이로드 끝은 항상 `\t`로 종결
+
+### 5) 확인 범위와 다음 단계
+
+**확인 완료:** TR1002, TR1003, TR3002, TR3003, TR1007 — 5개 TR의 요청 조립 문법.
+
+**미확인 (다음 관찰 대상):**
+- `$`/`?` 외에 다른 마커 문자가 더 존재하는지 (예: 파일업로드/원장류 등 다른 US_OOP TR)
+- 이 문법을 쓰는 다른 그리드성 OOP TR이 더 있는지 — `IBKSConnectorCtl.cpp`에서 `US_OOP`로 검색하면 후보를 추가로 찾을 수 있음
+- Wizard(서버) 쪽에서 이 요청을 받아 실제로 어떻게 파싱/응답을 만드는지(`SetDataOOP`, 9절의 기존 미확인 항목과 동일 — 이 절이 다룬 건 클라이언트 쪽 절반뿐)
+
+**진행 방법(사용자 제안, 2026-08-14):** AxisChaser로 새로운 그리드성 TR을 캡처할 때마다, "같은 TR의 비그리드 버전(있다면)"이나 "필드코드만 나열한 단순 요청"과 바이트 단위로 대조해서 **어느 필드코드 앞에 특수문자가 붙었는지**만 찾으면 위 4)의 문법이 그대로 적용될 가능성이 높다. 새로 확인되는 대로 이 절에 TR을 추가할 것.
+
+---
+
 ## 9. 다음 조사 대상 (미완료)
 
 - **`ParseSCC`/`SetCC`의 `CC_*` 플래그 전체 목록** — `CC_PRO`/`CC_MAND`/`CC_SEND`/`CC_VIS`/`CC_ENB`/`CC_SET` 등 확인됨(Stream.cpp:2900-2928), 전체 목록과 각각의 정확한 UI 효과는 추가 확인 여지
-- **`SetDataOOP`/`SetDataNRM2`/`SetDataTAB`/`SetDataTAB2`** — `SetDataNRM` 외 4개 포맷 변형 상세 미조사
+- **`SetDataOOP`/`SetDataNRM2`/`SetDataTAB`/`SetDataTAB2`** — `SetDataNRM` 외 4개 포맷 변형 상세 미조사. **단, OOP 포맷의 요청(클라이언트→서버) 쪽 문법은 8.10절에서 확인 완료** — `SetDataOOP`가 다루는 건 그 반대 방향(서버 응답을 Wizard가 파싱하는 쪽)이라 여전히 미확인
 - **`SetDataH`** — 레코드 헤더 파싱 상세 미조사
 - **`SetTable`엔 있고 `SetCells`엔 없는 FCC/RCC/SCC 처리** — 왜 GO_TABLE 방식만 셀별 동적 속성제어를 지원하는지 설계의도 미확인
 - `WM_USER` 커스텀 메시지의 정확한 용도
 - ~~TR 요청(사용자가 조회 버튼 누르는 것) → 소켓 송신 경로~~ — **확인 완료(2026-07-30), 8.8절 참고.** `RouteTR`이 `CGuard::Write(char*, int, bool)`로 최종 소켓 전송하며, 한 번의 write에 여러 화면(unit)의 `_axisH` 프레임이 배치로 묶일 수 있음
-- `CDll::OnAxis`(DLL 기반 작업영역)의 실제 파싱 로직 — CClient와 다른지 동일한지
+- `CDll::OnAxis`(DLL 기반 작업영역)의 실제 파싱 로직 — **`CClient`와 다르다는 것 자체는 확인됨(2026-07-31)**: `CStream::OutStream`/`SetDataNRM`을 전혀 안 타고 받은 바이트를 그대로 `WM_USER`로 로드된 DLL에 던진다(`Dll.cpp:530`, `[CDll-OnAxis-raw]` 로그 추가, `@docs/DebugLogGuide.md` 7절). 다만 그 DLL 내부의 실제 파싱 로직 자체는 Wizard 소스 밖이라 여전히 미조사 — 실사용 사례: `9524`(이벤트 데이터 조회, 기획부) 화면이 이 경로를 탐
 
 ---
 

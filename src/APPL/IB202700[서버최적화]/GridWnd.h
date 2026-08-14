@@ -485,4 +485,11 @@ public:
 	int _typeAuto = 0;
 	void initgridalert();
 	void setMemo();
+
+#ifdef DF_SESSION_EXPECT
+	int _marketType = 0;   // MK_MARKET 캐시 (1=KRX,2=NXT,3=TOTAL,4=NXT/KRX)
+	int _krxSession = 0;   // 실시간 data[298] 최신값
+	int _nxtSession = 0;   // 실시간 data[299] 최신값
+	bool IsExpectSession() const;
+#endif
 };

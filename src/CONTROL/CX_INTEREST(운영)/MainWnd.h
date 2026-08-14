@@ -339,6 +339,10 @@ public:
 	CTime ParseRTSTime(const CString& sTime, const COleDateTime& today);
 	std::unordered_map<std::string, CTime> m_lastRTSTimeMap;
 	bool ShouldSkipRTSByServerTime(const std::string& code, const char* pServerTime, int  minIntervalSec);
+#ifdef DF_RTS_TIMER
+	void RTS_RecvRTSx(LPARAM lParam);	// DF_RTS_TIMER용 - raw data[] 슬롯 그대로 깊은복사해서 캐시에 저장
+	std::unordered_map<std::string, std::unique_ptr<_Ralert>> _mapRealData;
+#endif
 
 protected:
 	

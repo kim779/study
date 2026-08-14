@@ -110,6 +110,8 @@ protected:
 
 	CEdit		m_editLogFile;
 	CButton		m_btnLogOpen;
+	CButton		m_btnLogFolder;
+	CButton		m_btnLogClear;
 	CButton		m_chkLogEnable;
 	CString		m_logFilePath;
 	BOOL		m_bLogEnable;
@@ -184,6 +186,8 @@ protected:
 	afx_msg void OnClickedChkRange();
 	afx_msg void OnChangeEditLogFile();
 	afx_msg void OnClickedBtnLogOpen();
+	afx_msg void OnClickedBtnLogFolder();
+	afx_msg void OnClickedBtnLogClear();
 	afx_msg void OnClickedChkLogEnable();
 	//}}AFX_MSG
 	afx_msg LRESULT OnFindDialogMessage(WPARAM wParam, LPARAM lParam);

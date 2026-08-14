@@ -657,7 +657,6 @@ LRESULT CALLBACK KeyboardProc(int nCode, WPARAM wParam, LPARAM lParam)
 					//m_pMain->update_ticker(0,"S0000	047	1	014	506727	048	20100527	301	 	015	윤흡 한백 대표 `이달의 기능한국인` 선정                                                                                 	016	20100527110009    273724	041	13	042	9	044	173339	022	 	045	인물/동정	046	헤럴	");
 					//폰패드장비에 비밀번호 읽어옴
 					if(!Axis::isCustomer)
-
 					{	
 						//m_pMain->ReadPhonePad(0);
 						m_pMain->RunPhonePad();
@@ -1158,7 +1157,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	//	OutputDebugString("[SetPriorityClass] Fail");
 	//}
 
-//	::DeleteFile(Axis::home + "\\exe\\axis.log");  //test code
+	::DeleteFile(Axis::home + "\\exe\\axis.log");
 
 	const char obExe[] = "\x61\x78\x69\x73\x2E\x65\x78\x65";
 	char wb[32]{};
@@ -1620,6 +1619,10 @@ BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)
 				{
 					if (bCtrl && bShift)
 					{
+#ifdef DF_TEST
+						Sendpibojggb();
+						return 0;
+#endif
 						CString	Path;
 						Path.Format("%s\\%s\\ACCNTDEPT.INI", Axis::home, "tab");
 
@@ -1669,6 +1672,10 @@ BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)
 				{
 					if (bCtrl && bShift)
 					{
+#ifdef DF_TEST
+						Sendpibojggb("K");
+						return 0;
+#endif
 						char	buf[512];
 						CString	file, stmp;
 						file.Format("%s\\tab\\axis.ini", Axis::home);
@@ -2833,7 +2840,9 @@ void CMainFrame::OnUpdateRunCommand(CCmdUI* pCmdUI)
 
 void CMainFrame::OnClose() 
 {
+#ifdef  DF_AXISCLOSE
 	if (m_bClose) return;  //test close
+#endif
 
 	if (!m_bCLOSE_ASTx)
 	{
@@ -2865,7 +2874,9 @@ void CMainFrame::OnClose()
 
 	if (!m_mapHelper->closeX())
 	{
+#ifdef  DF_AXISCLOSE
 		m_bClose = false;  //test close
+#endif
 		return;
 	}
 
@@ -2902,7 +2913,9 @@ void CMainFrame::OnClose()
 			const UINT modalResult = exit.DoModal();
 			if (modalResult == IDCANCEL)
 			{
+#ifdef  DF_AXISCLOSE
 				m_bClose = false;  //test close
+#endif
 				return;
 			}
 
@@ -2929,7 +2942,9 @@ void CMainFrame::OnClose()
 			m_bExit = false;
 			
 			m_mapHelper->SendInterSignal();
+#ifdef  DF_AXISCLOSE
 			m_bClose = false;  //test close
+#endif
 			return;
 		}
 	}
@@ -4492,8 +4507,7 @@ LONG CMainFrame::OnUSER(WPARAM wParam, LPARAM lParam)
 					CString sval;
 					sval.Format("%s", (char*)lParam);
 					sval.TrimRight();
-					if (sval.Left(2) == "IB")
-						m_mapHelper->ChangeChild(sval);
+					InputScreenNo(sval);
 				}
 				break;
 			}
@@ -7522,15 +7536,15 @@ void CMainFrame::load_start_notice( BOOL bReload )
 
 		
 		const CWnd* wnd = FindWindow(NULL,"실시간해외지수");
-
+		
 		if (!wnd)
 		{
 			noticeMapName = "IB780100";
-
+		
 			CProfile pout(pkUserConfig);
-
+		
 			const int piout = pout.GetInt(noticeMapName, "OnLoad", 0);
-
+		
 			if (piout > 0)
 			{
 				m_mapHelper->ChangeChild(noticeMapName, 1, 0, CenterPOS);
@@ -12929,8 +12943,8 @@ void CMainFrame::load_eninfomation(bool first)
 
 	if (first && GetPrivateProfileInt("SCREEN", "POPUPACC", 1, file) && Axis::user.CollateNoCase("guest"))
 		AcctPasswordConfig();
-	if(first)
-		Popup7805();
+	//if(first)
+	//	Popup7805();
 
 	//새창열기 허용
 	m_screenNew = GetPrivateProfileInt("SCREEN", "SCREENNEW", 1, file);
@@ -13550,7 +13564,9 @@ void CMainFrame::OnTimer(UINT nIDEvent)
 		}
 		break;
 
-		if(m_bClose) return;  //test close
+#ifdef  DF_AXISCLOSE
+		if(m_bClose) return;
+#endif
 		/*
 	case TM_CB_SEARCH:
 		{
@@ -14124,14 +14140,14 @@ NXT
 */
 	switch (igubn)
 	{
-	case 799:  // KRX 7:00~ 7:50   KRX프리
+	case 854:  // KRX 7:00~ 7:50   KRX프리
 	{
 		m_iKRXype = 5;
 		m_iNXType = 5;
 		m_bar1->SetShowAIBtn(m_iKRXype, m_iNXType);
 	}
 	break;
-	case 798:  // KRX 7:50~ 8:00  KRX장전
+	case 855:  // KRX 7:50~ 8:00  KRX장전
 	{
 		m_iKRXype = 4;
 		m_iNXType = 5;
@@ -14212,6 +14228,15 @@ NXT
 		m_bar1->SetShowAIBtn(m_iKRXype, m_iNXType);
 	}
 	break;
+#ifdef DF_KRX_FREEAFTER
+	case 856: //KRX 16:00~ 20:00 KRX 애프터
+	{
+		m_iKRXype = 6;  //애프터
+		m_iNXType = 3; //애프터
+		m_bar1->SetShowAIBtn(m_iKRXype, m_iNXType);  //KRX 805가 들어오면 NXT 888 애프터
+	}
+	break;
+#else
 	case 805: //KRX 16:00~ KRX 단일가 시작
 	case 853:  //KRX 16:00~ 주식시간외종가매매종료
 	{
@@ -14220,18 +14245,29 @@ NXT
 		m_bar1->SetShowAIBtn(m_iKRXype, m_iNXType);  //KRX 805가 들어오면 NXT 888 애프터
 	}
 	break;
+#endif
 	case 897:  //NXT 16:00~
 	{
 		m_iNXType = 3; //애프터
 		m_bar1->SetShowAIBtn(m_iKRXype, m_iNXType);  //KRX 805가 들어오면 NXT 888 애프터
 	}
 	break;
+#ifdef DF_KRX_FREEAFTER
+	case 857:  //KRX 20:00~ KRX 애프터종료
+	{
+		m_iKRXype = 0;  //장마감
+		m_iNXType = 0;  //장마감
+		m_bar1->SetShowAIBtn(m_iKRXype, m_iNXType);
+	}
+	break;
+#else
 	case 806: //KRX 장마감 시작 18:00~
 	{
 		m_iKRXype = 6;  //장마감
 		m_bar1->SetShowAIBtn(m_iKRXype, m_iNXType);
 	}
 	break;
+#endif
 	case 889: //KRX 장마감 시작 20:00~
 	{
 		m_iKRXype = 0;  //장마감
@@ -15139,6 +15175,8 @@ void CMainFrame::ShowMngInfo(DWORD* dat)
 
 #ifdef DF_MK_CAPTION
 		CheckMarketByMNG(val);
+		//m_slog.Format("[장운영] val=[%s]", val);
+		//m_axGuide->SetGuide(m_slog);
 		if (val == "884")  //우선 NXT 장시작은 skip
 			return;
 #endif
@@ -17309,6 +17347,11 @@ void CMainFrame::processFMX(WPARAM wParam, LPARAM lParam)
 		m_slog.Format("[axis][CMainFrame] 장시장구분(PIBOjggb) 조회결과 !!  gubn= [%s]  \n", (char*)pdata->gubn);
 		OutputDebugString(m_slog);
 
+#ifdef DF_TEST
+		//m_axGuide->SetGuide("NXT " + m_slog, this);
+		AfxMessageBox("NXT " + m_slog);
+#endif
+
 		sRes.Format("%s", (char*)pdata->gubn);
 		sRes.TrimRight();
 
@@ -17431,6 +17474,12 @@ NXT
 		m_slog.Format("[axis][CMainFrame] 장시장구분(PIBOjggb) 조회결과 !!  gubn= [%s]  \n", (char*)pdata->gubn);
 		OutputDebugString(m_slog);
 
+#ifdef DF_TEST
+		//m_axGuide->SetGuide("KRX " + m_slog, this);
+		AfxMessageBox("KRX " + m_slog);
+#endif
+
+
 		sRes.Format("%s", (char*)pdata->gubn);
 		sRes.TrimRight();
 
@@ -17470,7 +17519,7 @@ NXT
 				break;
 				case 6:  //장마감, 시간외   15:30~16:00                 
 				{
-					if(m_iNXType == 4)
+					if(m_iNXType == 4)   //m_iNXType = 4;  //NXT 단일가매매   15:30~15:40       
 						m_iKRXype = 0;  //KRX 장마감
 					else
 						m_iKRXype = 1;   //KRX 시간외
@@ -17478,10 +17527,14 @@ NXT
 				break;
 				case 7:  //단일가매매   16:00~18:00                       
 				{
+#ifdef DF_KRX_FREEAFTER
+					m_iKRXype = 6; //KRX AFTER
+#else
 					m_iKRXype = 3;   //KRX 단일가
+#endif
 				}
 				break;
-				case 8:  //장마감       18:00~                    
+				case 8:  //장마감       18:00~
 				{
 					m_iKRXype = 0;  //KRX 장마감
 				}
@@ -18484,23 +18537,20 @@ void CMainFrame::GetDispN(char* mapN)
 
 int CMainFrame::InputScreenNo(CString dispN)
 {
-#ifdef DF_PHONETEST
 	if(dispN == "8788")
 	{
 		RunPhonePad();
 		return 0;
 	}
-#endif
 
 	if (m_tMenu)
 	{
 		CString mapN = m_tMenu->GetMap(dispN);
 		if (ScreenCheck(mapN) == DF_NUSE)
 			return 0;
-#ifndef DF_PHONETEST
+
 		if (!ExistMenu(mapN))	
 			return 0;
-#endif
 // 		if (IsForeignMap(mapN))
 // 			RunForeignMap();
 		else if (IsNewRealTick(mapN))
@@ -18532,6 +18582,16 @@ void CMainFrame::ConfigFrame()
 	file.Format("%s\\%s\\%s\\usertool.ini", Axis::home, USRDIR, Axis::user);
 	cpfile.Format("%s\\%s\\usertool.ini", Axis::home, MTBLDIR);
 	CopyFile(cpfile, file, TRUE);
+
+	if (!CopyFile(cpfile, file, TRUE))
+	{
+		::WritePrivateProfileString("00"	, "#002"	, NULL, file);
+		::WritePrivateProfileString("02"	, "IB280900", NULL, file);
+		::WritePrivateProfileString("02"	, "IB281000", NULL, file);
+		::WritePrivateProfileString("02"	, "IB281200", NULL, file);
+		::WritePrivateProfileString("02"	, "IB281300", NULL, file);
+		::WritePrivateProfileString("#006"	, "IB101400", NULL, file);
+	}
 
 	file.Format("%s\\%s\\%s\\axisticker.ini", Axis::home, USRDIR, Axis::user);
 	cpfile.Format("%s\\%s\\axisticker.ini", Axis::home, MTBLDIR);
@@ -23995,7 +24055,7 @@ BOOL CMainFrame::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct)
 BOOL CMainFrame::IsForeignMap(const char* map)
 {
 	const char* foreignMapName = "IB780100";
-
+	
 	return !strcmp(foreignMapName, map);
 }
 
@@ -24027,9 +24087,9 @@ void CMainFrame::RunNewRealTick()
 	//SetWorkingDirectory(Axis::home);
 	SetCurrentDirectory(Axis::home + "\\exe");
 	ShellExecute(NULL, _T("open"), "GWTicker.EXE", cmdLine,NULL, SW_SHOWNORMAL);
-// 	CString s;
-// 	s.Format("REALTV.EXE [%s]\n",cmdLine);
-// 	OutputDebugString(s);
+ 	CString s;
+ 	s.Format("REALTV.EXE [%s]\n",cmdLine);
+ 	OutputDebugString(s);
 
 // 	CProfile profile(pkAxis);
 // 	
@@ -24991,14 +25051,14 @@ void CMainFrame::DoFunc(int funcID)
 		AcctPasswordConfig();
 		break;
 	case 5: // 사용자 WORKSPACE
-		//ShowUScreenMenu();
+	//ShowUScreenMenu();
 		saveUserScreen();
 		break;
 	case 6: // 증권계산기
 		ExecuteCalculator();
 		break;
 	case 7: // 해외지수 실시간티커
-		/*RunForeignMap();*/
+	/*RunForeignMap();*/
 		RunNewRealTick();
 		break;
 	case 8: // 이미지저장(현재화면)
@@ -26534,7 +26594,6 @@ BOOL CMainFrame::IsPhonePad(const char *map)
 	if (map == nullptr)
 		return FALSE;
 
-#ifdef DF_PHONETEST
 	CString stmp;
 	stmp.Format("%s", map);
 
@@ -26542,10 +26601,6 @@ BOOL CMainFrame::IsPhonePad(const char *map)
 		return TRUE;
 	else
 		return FALSE;
-#else
-	return strcmp(map, "IB877700") == 0 ||
-		strcmp(map, "IB878800") == 0;
-#endif
 }
 
 void CMainFrame::dnloadAction()
@@ -27675,7 +27730,10 @@ void CMainFrame::loadingELWcode()
 
 void CMainFrame::RunFOConfig()
 {
-	m_mapHelper->CreateChild("IB0000B2", 0);
+	if (m_bSise == 0 )
+		m_mapHelper->CreateChild("IB0000B2", 0);
+	else
+		Axis::MessageBox(this, "시세/준회원 조회 로그인으로 사용이 불가한 서비스입니다.", MB_ICONSTOP);
 }
 
 void CMainFrame::load_secure_agree(BOOL bAOS, BOOL bFirewall, BOOL bKeysecure)
@@ -27995,8 +28053,6 @@ OutputDebugString(m_slog);
 	//modi ASTx 202409  무조건 실행
 	//const BOOL pcAOS = AfxGetApp()->GetProfileInt(INFORMATION, "AOS", 1);
 	BOOL pcAOS = TRUE;
-
-	pcAOS = false;  //test astx
 
 	if(pcAOS && Axis::isCustomer)
 	{
@@ -29434,8 +29490,6 @@ void CMainFrame::ParsePihoitgyList(char* dat, int len)
 		FreeLibrary(hModule);
 	}
 
-	//test
-	cnt = 0;
 	if(cnt > 0)
 	{
 		if(m_bUseNewLogin)
@@ -33759,12 +33813,6 @@ void CMainFrame::EncryptIniFile(const CString& iniPath, const std::vector<BYTE>&
 						{
 							CString encVal = AesEncrypt(CString(part.c_str()), key);
 							part = (LPCSTR)encVal;
-
-							if (encVal.GetLength() < 32)
-							{
-								m_slog.Format("[AXIS][ENC][%s]<%d>  lower than 32 = [%s] [%s]", __FUNCTION__, __LINE__, encVal, iniPath);
-								output_DebugString(m_slog);
-							}
 						}
 					}
 
@@ -33780,7 +33828,6 @@ void CMainFrame::EncryptIniFile(const CString& iniPath, const std::vector<BYTE>&
 				continue;
 			}
 		}
-
 
 		out << line << '\n';
 	}
@@ -33804,7 +33851,7 @@ void CMainFrame::EncryptIniFile(const CString& iniPath, const std::vector<BYTE>&
 	m_slog.Format("[AXIS][ENC][%s]<%d> [%s] deleted=[%d]", __FUNCTION__, __LINE__, backupPath, DeleteFileA(backupPath));
 	//OutputDebugString(m_slog);
 }
-
+#ifdef DF_NEW_ENCACC
 std::pair<int, int> CMainFrame::EncryptAllUserIni(const CString& rootPath)
 	{
 		int successCount = 0;
@@ -33896,6 +33943,81 @@ std::pair<int, int> CMainFrame::EncryptAllUserIni(const CString& rootPath)
 		SecureZeroMemory(key.data(), key.size());
 		return { successCount, failCount };
 	}
+#else
+std::pair<int, int> CMainFrame::EncryptAllUserIni(const CString& rootPath)
+{
+	int successCount = 0;
+	int failCount = 0;
+
+	CString searchPath = rootPath + "\\*";
+	WIN32_FIND_DATAA fd = {};
+	HANDLE hFind = FindFirstFileA(searchPath, &fd);
+	if (hFind == INVALID_HANDLE_VALUE)
+		throw std::runtime_error("Cannot open root folder");
+
+	std::vector<BYTE> key = DeriveKeyFromRegkey(m_regkey);
+
+	do {
+		if (!(fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) continue;
+		if (strcmp(fd.cFileName, ".") == 0)  continue;
+		if (strcmp(fd.cFileName, "..") == 0) continue;
+
+		CString userFolder;
+		userFolder.Format("%s\\%s", (LPCSTR)rootPath, fd.cFileName);
+
+		// ── 사용자 폴더 내 파일 전체 순회 ──────────────
+		CString innerSearch = userFolder + "\\*";
+		WIN32_FIND_DATAA fd2 = {};
+		HANDLE hFind2 = FindFirstFileA(innerSearch, &fd2);
+		if (hFind2 == INVALID_HANDLE_VALUE)
+			continue;
+
+		do {
+			if (fd2.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) continue;
+
+			CString fname(fd2.cFileName);
+
+			// .ini 포함된 파일만, .bak/.tmp 제외
+			if (fname.Find(".ini") == -1) continue;
+			if (fname.Right(4) == ".bak") continue;
+			if (fname.Right(4) == ".tmp") continue;
+
+			CString iniPath;
+			iniPath.Format("%s\\%s", (LPCSTR)userFolder, (LPCSTR)fname);
+
+			try {
+				if (fname == CString(fd.cFileName) + ".ini")
+				{
+					CString endataPath;
+					endataPath.Format("%s\\endata.dll", (LPCSTR)userFolder);
+					if (GetFileAttributesA(endataPath) == INVALID_FILE_ATTRIBUTES)
+					{
+						CopyFileA(iniPath, endataPath, FALSE);
+						m_slog.Format("[ENC][BACKUP] [%s] -> [%s]", iniPath, endataPath);
+						OutputDebugString(m_slog);
+					}
+				}
+				EncryptIniFile(iniPath, key);
+				successCount++;
+				m_slog.Format("[ENC] iniPath=[%s] successCount=[%d]", iniPath, successCount);
+				OutputDebugString(m_slog);
+			}
+			catch (const std::exception& e) {
+				OutputDebugStringA(e.what());
+				failCount++;
+			}
+
+		} while (FindNextFileA(hFind2, &fd2));
+
+		FindClose(hFind2);
+
+	} while (FindNextFileA(hFind, &fd));
+
+	FindClose(hFind);
+	SecureZeroMemory(key.data(), key.size());
+	return { successCount, failCount };
+}
+#endif
 
 void CMainFrame::DecryptIniFile(const CString& iniPath, const std::vector<BYTE>& enkey)
 {
@@ -34297,25 +34419,36 @@ bool CMainFrame::IsHeadquartersIP(CString ip)
 void CMainFrame::AccEncrypt()
 {
 	CString filename;
+	CString sdept;
+	sdept = Variant(getDEPT);
 	
 	filename.Format("%s\\%s\\AXISAI.ini", Axis::home, "tab");
 	int dw = GetPrivateProfileInt("NewPhonepad", "check", 0, filename);
 
-	if (dw == 0)
+	//	if (!Axis::isCustomer && IsHeadquartersIP(m_ipAddr))
+	//	{
+	//		m_bNewPhonepad = true;
+	//	}
+	//}
+	//else
 	{
-	//	if (!Axis::isCustomer && ConnectWithTimeOut("172.16.202.106", 15201, 3000))  //test code
-		if ( ConnectWithTimeOut("211.255.204.104", 15201, 3000))
+		if (!Axis::isCustomer && (sdept == "001" || sdept == "933"))
+	//	if (sdept == "000" || sdept == "933")                     
 		{
 			m_bNewPhonepad = true;
 		}
 	}
-	else
-	{
-		if (!Axis::isCustomer && IsHeadquartersIP(m_ipAddr))
-		{
-			m_bNewPhonepad = true;
-		}
-	}
+
+	dw = GetPrivateProfileInt("NewPhonepad", "forceNewPhonepad", 0, filename);
+	if (dw == 1)
+		m_bNewPhonepad = true;
+
+	dw = GetPrivateProfileInt("NewPhonepad", "forceOldPhonepad", 0, filename);
+	if (dw == 1)
+		m_bNewPhonepad = false;
+
+	m_slog.Format("[axis][%s] sdept = [%s]  m_bNewPhonepad=[%d]\n", __FUNCTION__, sdept, m_bNewPhonepad);
+	OutputDebugString(m_slog);
 
 	filename.Format("%s\\%s\\%s", Axis::home, "tab", "axis.ini");
 	WritePrivateProfileString("AXIS", "reg", m_regkey, filename);

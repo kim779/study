@@ -199,20 +199,28 @@ void CAccEdit::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 	if (!m_bEditMode)
 		return;
 
+	UINT nCheckChar = nChar;
+	//if (nCheckChar == VK_PROCESSKEY)
+	//{
+	//	UINT nRealVK = ImmGetVirtualKey(GetSafeHwnd());
+	//	if (nRealVK != 0)
+	//		nCheckChar = nRealVK;
+	//}
+
 	if (m_bEditNumType)		//숫자형식일때
 	{
-		if (!IsNumber(nChar) && !IsSpecialKey(nChar))
+		if (!IsNumber(nCheckChar) && !IsSpecialKey(nCheckChar))
 			bTrans = true;
 	}
 	else					//문자형식일때
 	{
-		if (IsNumber(nChar))
+		if (IsNumber(nCheckChar))
 			bTrans = true;
 	}
 
 	if (bTrans)
 	{
-		if (IsNumber(nChar))
+		if (IsNumber(nCheckChar))
 		{
 			SetAccMask();
 		}

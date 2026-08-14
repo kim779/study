@@ -188,7 +188,11 @@ public: // RTM
 	CTime ParseRTSTime(const CString& sTime, const COleDateTime& today);
 	std::unordered_map<std::string, CTime> m_lastRTSTimeMap;
 	bool ShouldSkipRTSByServerTime(const std::string& code, const char* pServerTime, int  minIntervalSec);
-private:			 
+#ifdef DF_RTS_TIMER
+	void RTS_RecvRTSx(LPARAM lParam);	// DF_RTS_TIMER용 - 관심 필드만 raw 그대로 깊은복사해서 캐시에 저장
+	std::unordered_map<std::string, std::unique_ptr<_Ralert>> _mapRealData;
+#endif
+private:
 
 private:
 	MINMAXINFO m_MMI{};

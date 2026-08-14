@@ -3797,7 +3797,10 @@ BOOL CintGrid::RedrawCell(int nRow, int nCol, CDC* pDC)
 		return FALSE;
 	}
 
+#ifndef DF_NEW_REALPROCESS
 	// 캐시된 가시 영역 정보 사용 (함수 호출 최소화)
+	// 주의: static 지역변수라 CintGrid 인스턴스(그리드/화면) 전체가 공유함 -
+	// 그리드가 여러 개 열려있으면 다른 그리드의 캐시값으로 오판할 수 있음(간헐적 미갱신 원인 후보)
 	static CIdCell s_lastTlCell(-1, -1);
 	static CRangeCell s_lastVisCellRange;
 	static ULONGLONG s_lastUpdateTick = 0;
@@ -3819,6 +3822,7 @@ BOOL CintGrid::RedrawCell(int nRow, int nCol, CDC* pDC)
 		nCol < minVisibleCol || nCol > maxVisibleCol) {
 		return FALSE;
 	}
+#endif
 
 	// IsCellVisible 호출 최소화 - 범위 내에 있으면 대부분 보임
 	CRect rect;
@@ -3862,11 +3866,16 @@ BOOL CintGrid::RedrawCell(int nRow, int nCol, CDC* pDC)
 		//AxStd::_Msg("RedrawCell Skip FilterDraw [%d,%d]", nRow, nCol);
 		//return FALSE;
 	}
+#ifdef DF_NEW_REALPROCESS
+	// 홀드/배치 누적 없이 즉시 그리기 - 데이터 누락 방지 우선
+	InvalidateRect(rect, FALSE);
+	return TRUE;
+#else
 	// drawHolding 처리 최적화
 	if (m_drawHolding)
 	{
 		//AxStd::_Msg("RedrawCell Holding [%d,%d]", nRow, nCol);
-				//const ULONGLONG tick = GetTickCount64();			
+				//const ULONGLONG tick = GetTickCount64();
 				// map 조회 최적화
 		const auto it = _timeFilterCode.find(nRow);
 		const bool inserted = (it == _timeFilterCode.end());
@@ -3904,6 +3913,7 @@ BOOL CintGrid::RedrawCell(int nRow, int nCol, CDC* pDC)
 		return FALSE;
 	}
 	return TRUE;
+#endif
 }
 
 CIdCell CintGrid::SetFocusCell(int nRow, int nCol)
@@ -9991,7 +10001,10 @@ int CintGrid::GetGridWidth()
 
 
 void CintGrid::endDrawHolding()
-{ 	
+{
+#ifdef DF_NEW_REALPROCESS
+	return;   // RedrawCell()이 즉시 그리므로 m_drawRect가 항상 비어있어 여기서 할 일 없음
+#endif
 	if (1)
 	{
 		const ULONGLONG tick = ::GetTickCount64();

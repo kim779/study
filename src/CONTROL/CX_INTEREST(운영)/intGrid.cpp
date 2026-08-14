@@ -4025,11 +4025,14 @@ BOOL CintGrid::RedrawCell(int nRow, int nCol, CDC* pDC)
 		return FALSE;
 	}
 	
+#ifndef DF_NEW_REALPROCESS
 	// 캐시된 가시 영역 정보 사용 (함수 호출 최소화)
+	// 주의: static 지역변수라 CintGrid 인스턴스(그리드/화면) 전체가 공유함 -
+	// 그리드가 여러 개 열려있으면 다른 그리드의 캐시값으로 오판할 수 있음(간헐적 미갱신 원인 후보)
 	static CIdCell s_lastTlCell(-1, -1);
 	static CRangeCell s_lastVisCellRange;
 	static ULONGLONG s_lastUpdateTick = 0;
-	
+
 	const ULONGLONG currentTick = GetTickCount64();
 	if (currentTick - s_lastUpdateTick > 500) { // 500ms마다 업데이트
 		s_lastTlCell = GetTopleftNonFixedCell();
@@ -4037,17 +4040,18 @@ BOOL CintGrid::RedrawCell(int nRow, int nCol, CDC* pDC)
 		s_lastVisCellRange = GetVisibleNonFixedCellRange(visRect);
 		s_lastUpdateTick = currentTick;
 	}
-	
+
 	const int minVisibleRow = s_lastTlCell.row;
 	const int minVisibleCol = s_lastTlCell.col;
 	const int maxVisibleRow = s_lastVisCellRange.GetMaxRow();
 	const int maxVisibleCol = s_lastVisCellRange.GetMaxCol();
 
-	if (nRow < minVisibleRow || nRow > maxVisibleRow || 
+	if (nRow < minVisibleRow || nRow > maxVisibleRow ||
 	    nCol < minVisibleCol || nCol > maxVisibleCol) {
 		return FALSE;
 	}
-	
+#endif
+
 	// IsCellVisible 호출 최소화 - 범위 내에 있으면 대부분 보임
 	CRect rect;
 	if (!GetCellRect(nRow, nCol, rect)) {
@@ -4065,6 +4069,11 @@ BOOL CintGrid::RedrawCell(int nRow, int nCol, CDC* pDC)
 		return TRUE;
 	}
 
+#ifdef DF_NEW_REALPROCESS
+	// 홀드/배치 누적 없이 즉시 그리기 - 데이터 누락 방지 우선
+	InvalidateRect(rect, FALSE);
+	return TRUE;
+#else
 	const int key = 1000* nRow + nCol;
 	const auto& it = _mapFilterDraw.emplace(key, 1);
 	if (it.second == false)
@@ -4074,11 +4083,11 @@ BOOL CintGrid::RedrawCell(int nRow, int nCol, CDC* pDC)
 
 	auto& filter = _timeFilterCode.find(nRow);
 	const bool inserted = (filter == _timeFilterCode.end());
-		
+
 	if (inserted) {
 		_timeFilterCode[nRow] = currentTick;
 	}
-		
+
 	// Blink 처리 최적화
 	if (!inserted && _blinkType != 0 && _bReal) {
 		CRect blinkRect;
@@ -4087,24 +4096,25 @@ BOOL CintGrid::RedrawCell(int nRow, int nCol, CDC* pDC)
 			rect.UnionRect(rect, blinkRect);
 		}
 	}
-		
+
 	// 시간 차이 계산 최적화
 	const ULONGLONG diff = inserted ? 99999 : (currentTick - filter->second);
 	if (diff >= static_cast<ULONGLONG>(500)) {
 		if (!inserted) filter->second = currentTick;
-			
+
 		// Union 연산 최적화
 		if (!_filterRect.IsRectEmpty()) {
 			rect.UnionRect(rect, _filterRect);
 			_filterRect.SetRectEmpty();
 		}
 		_DrawAllRect.UnionRect(_DrawAllRect, rect);
-	} 
-	else 
+	}
+	else
 	{
 		_filterRect.UnionRect(_filterRect, rect);
 	}
 	return TRUE;
+#endif
 }
 
 CIdCell CintGrid::SetFocusCell(int nRow, int nCol)
@@ -10286,6 +10296,9 @@ void CintGrid::ReDrawAll()
 
 void CintGrid::ReDrawTimer()
 {
+#ifdef DF_NEW_REALPROCESS
+	return;   // RedrawCell()이 즉시 그리므로 _DrawAllRect가 항상 비어있어 여기서 할 일 없음
+#endif
 	if (_DrawAllRect.IsRectEmpty())
 		return;
 

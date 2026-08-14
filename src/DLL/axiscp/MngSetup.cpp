@@ -14,9 +14,10 @@ static char THIS_FILE[] = __FILE__;
 #define COLOR_INLINE	RGB(103,170,197)
 #define COLOR_OUTLINE	RGB(255,255,255)
 
-#define SIG_KRX_FREE_OPEN    799
-#define SIG_KRX_AFTER_OPEN   798
-#define SIG_KRX_AFTER_CLOSE  797
+#define SIG_KRX_FREE_OPEN    854
+#define SIG_KRX_FREE_CLOSE    855
+#define SIG_KRX_AFTER_OPEN   856
+#define SIG_KRX_AFTER_CLOSE  857
 /////////////////////////////////////////////////////////////////////////////
 // CMngSetup dialog
 CMngSetup::CMngSetup(CWnd* pParent /*=NULL*/)
@@ -64,8 +65,9 @@ BOOL CMngSetup::OnInitDialog()
 	((CButton*)GetDlgItem(KOSPI_CLOSE_10S))->ShowWindow(SW_HIDE);
 	((CButton*)GetDlgItem(KOSPI_FREE))->ShowWindow(SW_HIDE);
 	((CButton*)GetDlgItem(FUTURE_OPEN_10S))->ShowWindow(SW_HIDE);
+	((CButton*)GetDlgItem(KOSPI_FREE_END))->ShowWindow(SW_HIDE);
 	
-	
+
 	return TRUE;  
 }
 
@@ -439,6 +441,7 @@ void CMngSetup::InitSignalControlMap()
 		{817, KOSPI_OPEN_CIRCUIT},
 		{818, KOSPI_CLOSE_CIRCUIT},
 		{SIG_KRX_FREE_OPEN, KOSPI_FREE},
+		{SIG_KRX_FREE_CLOSE, KOSPI_FREE_END},
 		{SIG_KRX_AFTER_OPEN, KOSPI_AFTER_START},
 		{SIG_KRX_AFTER_CLOSE, KOSPI_AFTER_END},
 

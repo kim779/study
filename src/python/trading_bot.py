@@ -13,9 +13,10 @@ from PyQt5.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
     QGroupBox, QPushButton, QLabel, QLineEdit, QTextEdit, QFormLayout,
     QComboBox, QGridLayout, QMessageBox, QTableWidget, QTableWidgetItem,
-    QHeaderView, QAbstractItemView, QDateTimeEdit
+    QHeaderView, QAbstractItemView, QDateTimeEdit, QCheckBox, QScrollArea,
+    QTabWidget, QDialog, QTreeWidget, QTreeWidgetItem, QDateEdit
 )
-from PyQt5.QtCore import QDateTime, QDate, QTime
+from PyQt5.QtCore import QDateTime, QDate, QTime, QTimer, Qt
 from datetime import datetime
 import matplotlib
 matplotlib.rcParams['font.family'] = 'Malgun Gothic'
@@ -24,6 +25,10 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg
 from matplotlib.figure import Figure
 import matplotlib.dates
 from backtest_ma_cross import sma_series, find_trades
+from backtest_daily import (
+    load_daily, sma as daily_sma, cross_signals,
+    simulate as daily_simulate, today_signal as daily_today_signal
+)
 
 OCX_GUID = "{CDADD338-C7AB-4977-B65D-8E988B5958E3}"
 
@@ -59,6 +64,7 @@ TK_TR1003 = 3   # 주식 조회(OOP)
 TK_TR1004 = 6   # 주식 실시간 다중종목 등록
 TK_TR1005 = 16  # 주식 일/주/월별 시세조회
 TK_TR1006 = 18  # 주요 시장지표(지수/금리) 조회
+TK_TR1007 = 21  # 차트(일/주/월봉 캔들) 조회
 TK_TR1201 = 4   # 주식 주문
 TK_TR1203 = 5   # 주식 주문 시장구분
 TK_TR1211 = 7   # 주식 체결/미체결조회
@@ -125,6 +131,13 @@ TR1006_FLOW_LABELS = {
 TR1005_DAILY_LABELS = ["일자", "시가", "고가", "저가", "종가", "전일대비", "등락률", "거래량",
                         "거래대금", "체결강도", "외인보유", "외인비중", "기관", "외국인", "신용비율",
                         "매수체결", "매도체결", "차이", "12037"]
+
+# TR1007(차트/캔들 조회) 응답 캔들 레코드 필드. AxisChaser 실측(GOOPHOOP) 확인 완료.
+# 레코드는 "일자\t시간(공백)\t시가\t고가\t저가\t종가\t거래량\t거래대금\t권리락\t수정비율\n" 형태로 LF 구분.
+TR1007_CANDLE_LABELS = ["일자", "시간", "시가", "고가", "저가", "종가", "거래량", "거래대금", "권리락", "수정비율"]
+# 업종(GU_INDEX) 조회는 마지막 2개 필드가 권리락/수정비율이 아니라 25256/25257(실측값 137/57,
+# KOSPI200 200종목 기준 상승/하락 종목수로 추정)로 완전히 다른 필드임(2026-08-08 실측).
+TR1007_INDEX_CANDLE_LABELS = ["일자", "시간", "시가", "고가", "저가", "종가", "거래량", "거래대금", "상승종목수(추정)", "하락종목수(추정)"]
 
 MKGB_NAMES = {"1": "KRX", "2": "NXT", "3": "통합"}
 
@@ -227,6 +240,24 @@ def _init_db():
         )
     """)
     conn.execute("CREATE INDEX IF NOT EXISTS idx_ticks_code_time ON ticks(code, trade_time)")
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS daily_candles (
+            code TEXT NOT NULL,
+            unit INTEGER NOT NULL,
+            dindex INTEGER NOT NULL,
+            date TEXT NOT NULL,
+            open INTEGER,
+            high INTEGER,
+            low INTEGER,
+            close INTEGER,
+            volume INTEGER,
+            amount INTEGER,
+            extra1 REAL,
+            extra2 REAL,
+            received_at TEXT NOT NULL,
+            PRIMARY KEY (code, unit, dindex, date)
+        )
+    """)
     conn.commit()
     return conn
 
@@ -243,6 +274,41 @@ def _is_my_dev_pc():
         return False
     finally:
         s.close()
+
+
+def _fmt_date(yyyymmdd):
+    # "20260811" -> "2026/08/11" (화면 표시용)
+    if not yyyymmdd or len(yyyymmdd) != 8:
+        return yyyymmdd
+    return f"{yyyymmdd[0:4]}/{yyyymmdd[4:6]}/{yyyymmdd[6:8]}"
+
+
+def _fmt_datetime(s):
+    # "20260813132302"(14자리) -> "08/13 13:23:02" (연도는 자리만 차지해서 생략, 구형 6자리 HHMMSS는 그대로 둔다)
+    if not s or len(s) != 14:
+        return s
+    return f"{s[4:6]}/{s[6:8]} {s[8:10]}:{s[10:12]}:{s[12:14]}"
+
+
+def _fmt_hhmmssxx(s):
+    # "10564000"(8자리 HHMMSSxx) -> "10:56:40:00"
+    if not s or len(s) != 8:
+        return s
+    return f"{s[0:2]}:{s[2:4]}:{s[4:6]}:{s[6:8]}"
+
+
+def _fmt_num(s):
+    # "1234567" -> "1,234,567" (부호가 명시돼 있으면 유지, 파싱 실패시 원본 그대로)
+    if not s:
+        return s
+    try:
+        v = float(s)
+    except (TypeError, ValueError):
+        return s
+    spec = "+,.0f" if s.strip().startswith('+') else ",.0f"
+    if v != int(v):
+        spec = spec.replace(".0f", ".2f")
+    return format(v, spec)
 
 
 def _check_ocx_registry():
@@ -263,12 +329,204 @@ def _check_ocx_registry():
     return True, path
 
 
+class StockPickerDialog(QDialog):
+    # 업종/테마 트리에서 종목을 골라 반환하는 모달. 왼쪽 트리에서 카테고리를 고르면
+    # 오른쪽 표에 그 카테고리 종목이 채워진다 - 표에서 더블클릭하면 그 종목 하나만,
+    # "전종목 받기"를 누르면 표에 보이는 전체 종목코드를 콤마로 이어서 반환한다.
+    def __init__(self, parent=None, seed_code=None):
+        super().__init__(parent)
+        self.seed_code = seed_code
+        self.setWindowTitle(f"종목검색 - {seed_code} 관련종목" if seed_code else "종목검색")
+        self.resize(520, 420)
+        self.result_code = None
+
+        layout = QHBoxLayout(self)
+
+        self.tree = QTreeWidget()
+        self.tree.setHeaderHidden(True)
+        self.tree.setMaximumWidth(180)
+        self.tree.itemClicked.connect(self._on_tree_select)
+        layout.addWidget(self.tree)
+
+        right = QVBoxLayout()
+        self.edit_search = QLineEdit()
+        self.edit_search.setPlaceholderText("종목코드/종목명 검색 (숫자=코드 앞자리, 한글=이름 포함)")
+        self.edit_search.textChanged.connect(self._on_search_text)
+        right.addWidget(self.edit_search)
+
+        self.table = QTableWidget(0, 2)
+        self.table.setHorizontalHeaderLabels(["코드", "종목명"])
+        self.table.verticalHeader().setVisible(False)
+        self.table.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        self.table.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.table.cellDoubleClicked.connect(self._on_pick_single)
+        right.addWidget(self.table)
+
+        btn_all = QPushButton("전종목 받기")
+        btn_all.clicked.connect(self._on_pick_all)
+        right.addWidget(btn_all)
+
+        right_widget = QWidget()
+        right_widget.setLayout(right)
+        layout.addWidget(right_widget, 1)
+
+        self._load_categories()
+
+    def _load_categories(self):
+        self._all_stocks = []
+        try:
+            from stock_master import build_categories, load_stocks, find_related
+            self._all_stocks = load_stocks()
+            all_categories = build_categories(stocks=self._all_stocks)
+            if self.seed_code:
+                categories = find_related(self.seed_code, categories=all_categories)
+                if not categories:
+                    err = QTreeWidgetItem([f"({self.seed_code}가 속한 업종/테마/그룹사를 못 찾았습니다)"])
+                    self.tree.addTopLevelItem(err)
+                    return
+            else:
+                categories = all_categories
+        except Exception as e:
+            err = QTreeWidgetItem([f"(마스터 파일 로드 실패: {e})"])
+            self.tree.addTopLevelItem(err)
+            return
+        for cat_name, sub in categories.items():
+            cat_item = QTreeWidgetItem([cat_name])
+            self.tree.addTopLevelItem(cat_item)
+            for sub_name, pairs in sub.items():
+                sub_item = QTreeWidgetItem([f"{sub_name} ({len(pairs)})"])
+                sub_item.setData(0, Qt.UserRole, pairs)
+                cat_item.addChild(sub_item)
+        if self.seed_code:
+            self.tree.expandAll()  # 관련종목 모드는 결과가 적으니 바로 펼쳐서 보여준다
+
+    def _fill_table(self, pairs):
+        self.table.setRowCount(len(pairs))
+        for row, (code, name) in enumerate(pairs):
+            self.table.setItem(row, 0, QTableWidgetItem(code))
+            self.table.setItem(row, 1, QTableWidgetItem(name))
+
+    def _on_tree_select(self, item, column):
+        self.edit_search.blockSignals(True)
+        self.edit_search.clear()
+        self.edit_search.blockSignals(False)
+        pairs = item.data(0, Qt.UserRole)
+        self.table.setRowCount(0)
+        if pairs:
+            self._fill_table(pairs)
+
+    def _on_search_text(self, text):
+        text = text.strip()
+        self.table.setRowCount(0)
+        if not text:
+            return
+        pool = [s for s in self._all_stocks if s["ssgb"] == 0]  # 일반주식만(ELW/ETN/신주인수권 등 제외)
+        if text.isdigit():
+            pairs = [(s["code"], s["name"]) for s in pool if s["code"].startswith(text)]
+        else:
+            pairs = [(s["code"], s["name"]) for s in pool if text in s["name"]]
+        self._fill_table(pairs)
+
+    def _on_pick_single(self, row, column):
+        code_item = self.table.item(row, 0)
+        if code_item:
+            self.result_code = code_item.text()
+            self.accept()
+
+    def _on_pick_all(self):
+        codes = [self.table.item(row, 0).text()
+                 for row in range(self.table.rowCount()) if self.table.item(row, 0)]
+        if codes:
+            self.result_code = ",".join(codes)
+            self.accept()
+
+
+class DataManageDialog(QDialog):
+    # daily_candles에 누적된 종목을 종목 단위로 삭제하거나, 선택한 종목을 기존
+    # 일괄수집 파이프라인에 다시 태워 최신 데이터로 갱신한다(재수집은 INSERT OR REPLACE라
+    # 별도 갱신 로직 없이 기존 일괄수집을 재사용하면 됨).
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.main_window = parent
+        self.setWindowTitle("종목 관리 (daily_candles)")
+        self.resize(480, 420)
+
+        v = QVBoxLayout(self)
+        self.table = QTableWidget(0, 5)
+        self.table.setHorizontalHeaderLabels(["종목코드", "종목명", "레코드수", "시작일", "종료일"])
+        self.table.verticalHeader().setVisible(False)
+        self.table.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        self.table.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.table.setSelectionMode(QAbstractItemView.ExtendedSelection)
+        v.addWidget(self.table)
+
+        btn_h = QHBoxLayout()
+        btn_refresh = QPushButton("새로고침")
+        btn_refresh.clicked.connect(self._load)
+        btn_h.addWidget(btn_refresh)
+        btn_update = QPushButton("선택 갱신(재수집)")
+        btn_update.clicked.connect(self._on_update_selected)
+        btn_h.addWidget(btn_update)
+        btn_delete = QPushButton("선택 삭제")
+        btn_delete.clicked.connect(self._on_delete_selected)
+        btn_h.addWidget(btn_delete)
+        btn_h.addStretch()
+        btn_close = QPushButton("닫기")
+        btn_close.clicked.connect(self.accept)
+        btn_h.addWidget(btn_close)
+        v.addLayout(btn_h)
+
+        self._load()
+
+    def _load(self):
+        cur = self.main_window.db_conn.execute(
+            "SELECT code, COUNT(*), MIN(date), MAX(date) FROM daily_candles "
+            "WHERE unit = 1 GROUP BY code ORDER BY code")
+        rows = cur.fetchall()
+        self.table.setRowCount(len(rows))
+        for row, (code, cnt, dmin, dmax) in enumerate(rows):
+            vals = [code, self.main_window._stock_name(code), str(cnt), _fmt_date(dmin), _fmt_date(dmax)]
+            for col, val in enumerate(vals):
+                self.table.setItem(row, col, QTableWidgetItem(val))
+
+    def _selected_codes(self):
+        rows = sorted({idx.row() for idx in self.table.selectedIndexes()})
+        return [self.table.item(row, 0).text() for row in rows]
+
+    def _on_update_selected(self):
+        codes = self._selected_codes()
+        if not codes:
+            self.main_window._log("종목 관리: 갱신할 종목을 선택하세요")
+            return
+        self.main_window.edit_history_code.setText(",".join(codes))
+        self.main_window._on_history_batch_start()
+        self.main_window._log(f"종목 관리: {len(codes)}종목 갱신(재수집) 시작 - 일괄수집 진행상황을 확인하세요")
+        self.accept()
+
+    def _on_delete_selected(self):
+        codes = self._selected_codes()
+        if not codes:
+            self.main_window._log("종목 관리: 삭제할 종목을 선택하세요")
+            return
+        reply = QMessageBox.question(
+            self, "삭제 확인",
+            f"{len(codes)}개 종목의 일/주/월봉 데이터를 전부 삭제합니다.\n{', '.join(codes)}\n\n계속할까요?",
+            QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+        if reply != QMessageBox.Yes:
+            return
+        self.main_window.db_conn.executemany(
+            "DELETE FROM daily_candles WHERE code = ? AND unit = 1", [(c,) for c in codes])
+        self.main_window.db_conn.commit()
+        self.main_window._log(f"종목 관리: {len(codes)}종목 삭제 완료 - {', '.join(codes)}")
+        self._load()
+
+
 class TestWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Auto Trader")
         self.setMinimumWidth(500)
-        self.resize(1850, 700)
+        self.resize(1850, 980)
 
         ocx_ok, ocx_info = _check_ocx_registry()
         if not ocx_ok:
@@ -297,7 +555,26 @@ class TestWindow(QMainWindow):
         self._jango_calc = {}
         self._sise_realtime_key = ""  # TR1002 응답의 1021 필드값 (OnRealData 코드와 동일 형식)
         self.watch_codes = set()
+        self.auto_watch_code = None
+        self.auto_watch_short = None
+        self.auto_watch_long = None
+        self.auto_watch_prices = []
+        self.auto_watch_position = None
+        self._auto_order_pending = False
+        self.chart_auto_timer = QTimer(self)
+        self.chart_auto_timer.timeout.connect(self._on_chart_send)
+        self._history_last_dunit = 1
+        self._history_last_dindex = 1
+        self._history_last_code = ""
+        self._history_batch_queue = []
+        self._history_batch_total = 0
+        self._history_batch_timer = QTimer(self)
+        self._history_batch_timer.timeout.connect(self._on_history_batch_tick)
         self.db_conn = _init_db()
+        self._stock_name_map = None
+        self.bt_ax = None
+        self.bt_artists = {}
+        self.chart_artists = {}
 
         # OCX event connections
         self.ocx.OnLogin.connect(self._evt_login)
@@ -316,28 +593,84 @@ class TestWindow(QMainWindow):
         self.ocx.OnUpdateEnd.connect(self._evt_update_end)
 
         central = QWidget()
-        self.setCentralWidget(central)
+        scroll = QScrollArea()
+        scroll.setWidgetResizable(True)
+        scroll.setWidget(central)
+        self.setCentralWidget(scroll)
         layout = QVBoxLayout(central)
         layout.setSpacing(8)
 
         layout.addWidget(self._build_init_group())
 
-        # Login | 시세조회 를 위에, 주문을 그 아래에 두고, 차트는 오른쪽에서 두 행을 모두 세로로 차지
+        # Login | 시세조회 를 위에, 주문을 그 아래에 두고, 전략(차트) 영역은 오른쪽에서
+        # 두 행을 모두 세로로 차지하는 탭으로 묶는다 - 전략이 늘어날 때마다 탭만 추가하면 됨.
+        self.strategy_tabs = QTabWidget()
+        self.strategy_tabs.addTab(self._build_chart_group(), "틱 크로스오버")
+        self.strategy_tabs.addTab(self._build_daily_backtest_group(), "일봉 크로스오버")
+        self.strategy_tabs.addTab(self._build_scan_group(), "전체 스캔")
+        self.strategy_tabs.addTab(self._build_param_scan_group(), "파라미터 스캔")
+
         mid = QGridLayout()
         mid.addWidget(self._build_login_group(), 0, 0)
         mid.addWidget(self._build_sise_group(), 0, 1)
-        mid.addWidget(self._build_chart_group(), 0, 2, 2, 1)
+        mid.addWidget(self.strategy_tabs, 0, 2, 2, 1)
         mid.addWidget(self._build_order_group(), 1, 0, 1, 2)
+        mid.setColumnStretch(0, 1)
+        mid.setColumnStretch(1, 1)
+        mid.setColumnStretch(2, 4)  # 차트가 있는 전략 탭 영역을 왼쪽(로그인/시세조회)보다 넓게
         layout.addLayout(mid)
         layout.addWidget(self._build_jango_group())
         misc = QHBoxLayout()
         misc.addWidget(self._build_collect_group())
         misc.addWidget(self._build_daily_group())
         misc.addWidget(self._build_market_group())
+        misc.addWidget(self._build_history_group())
         layout.addLayout(misc)
         layout.addWidget(self._build_log_group())
 
     # ── UI builders ──────────────────────────────────────────────
+
+    def _add_code_picker(self, layout, line_edit):
+        # 종목코드 입력란 옆에 붙이는 "종목검색" 버튼 - 누르면 StockPickerDialog를 모달로 띄운다.
+        btn = QPushButton("...")
+        btn.setMaximumWidth(28)
+        btn.setToolTip("종목검색")
+        btn.clicked.connect(lambda: self._open_stock_picker(line_edit))
+        layout.addWidget(btn)
+        return btn
+
+    def _open_stock_picker(self, line_edit):
+        dlg = StockPickerDialog(self)
+        if dlg.exec_() and dlg.result_code:
+            line_edit.setText(dlg.result_code)
+
+    def _on_find_related(self):
+        code = self.edit_bt_code.text().strip()
+        if not code:
+            self._log("관련종목: 종목코드를 먼저 입력하세요")
+            return
+        dlg = StockPickerDialog(self, seed_code=code)
+        if not (dlg.exec_() and dlg.result_code):
+            return
+        if ',' in dlg.result_code:  # "전종목 받기": 일괄수집 코드란 + 전체 스캔 종목제한란에 같이 채운다
+            self.edit_history_code.setText(dlg.result_code)
+            self.edit_scan_codes.setText(dlg.result_code)
+            self._log(f"관련종목: {dlg.result_code.count(',') + 1}종목을 일괄수집/전체스캔 코드란에 넣었습니다 - "
+                       f"'일괄수집' 먼저 누른 뒤 '전체 스캔' 탭에서 스캔하세요")
+        else:  # 더블클릭: 그 종목 하나로 바로 분석
+            self.edit_bt_code.setText(dlg.result_code)
+            self._on_daily_backtest_send()
+
+    def _stock_name(self, code):
+        # 종목코드마스터(hjcode3.dat)에서 종목명을 찾는다. 첫 호출 시에만 파일을 읽어 캐시한다.
+        if self._stock_name_map is None:
+            try:
+                from stock_master import load_stocks
+                self._stock_name_map = {s["code"]: s["name"] for s in load_stocks()}
+            except Exception as e:
+                self._log(f"[종목마스터 로드 실패] {e}")
+                self._stock_name_map = {}
+        return self._stock_name_map.get(code, "")
 
     def _build_init_group(self):
         group = QGroupBox("Initialize")
@@ -362,9 +695,9 @@ class TestWindow(QMainWindow):
 
         is_dev = _is_my_dev_pc()
         form = QFormLayout()
-        self.edit_user_id  = QLineEdit("khs779" if is_dev else "")
-        self.edit_user_pw  = QLineEdit("1q2w3e4r" if is_dev else ""); self.edit_user_pw.setEchoMode(QLineEdit.Password)
-        self.edit_cert_pw  = QLineEdit("ra33080404!" if is_dev else ""); self.edit_cert_pw.setEchoMode(QLineEdit.Password)
+        self.edit_user_id  = QLineEdit("ng12589" if is_dev else "")
+        self.edit_user_pw  = QLineEdit("wnsgur12@" if is_dev else ""); self.edit_user_pw.setEchoMode(QLineEdit.Password)
+        self.edit_cert_pw  = QLineEdit("ahffkdy123 " if is_dev else ""); self.edit_cert_pw.setEchoMode(QLineEdit.Password)
         self.combo_server  = QComboBox()
         self.combo_server.addItem("", "")
         for ip, name in SERVER_LIST:
@@ -418,6 +751,12 @@ class TestWindow(QMainWindow):
         self.edit_sise_code = QLineEdit()
         self.edit_sise_code.setMaximumWidth(100)
         h.addWidget(self.edit_sise_code)
+        self._add_code_picker(h, self.edit_sise_code)
+        self.lbl_sise_name = QLabel("")
+        self.lbl_sise_name.setMinimumWidth(80)
+        h.addWidget(self.lbl_sise_name)
+        self.edit_sise_code.textChanged.connect(
+            lambda text: self.lbl_sise_name.setText(self._stock_name(text.strip())))
         h.addWidget(QLabel("시장"))
         self.combo_mkgubn = QComboBox()
         for text, val in [("KRX", 1), ("NXT", 2), ("통합", 3)]:
@@ -466,6 +805,7 @@ class TestWindow(QMainWindow):
         self.edit_chart_code = QLineEdit()
         self.edit_chart_code.setMaximumWidth(90)
         h1.addWidget(self.edit_chart_code)
+        self._add_code_picker(h1, self.edit_chart_code)
         h1.addWidget(QLabel("단기"))
         self.edit_chart_short = QLineEdit("5")
         self.edit_chart_short.setMaximumWidth(40)
@@ -495,27 +835,73 @@ class TestWindow(QMainWindow):
         btn = QPushButton("조회")
         btn.clicked.connect(self._on_chart_send)
         h2.addWidget(btn)
+        self.chk_chart_auto = QCheckBox("자동조회")
+        self.chk_chart_auto.toggled.connect(self._on_chart_auto_toggle)
+        h2.addWidget(self.chk_chart_auto)
+        self.edit_chart_auto_sec = QLineEdit("5")
+        self.edit_chart_auto_sec.setMaximumWidth(40)
+        h2.addWidget(self.edit_chart_auto_sec)
+        h2.addWidget(QLabel("초마다"))
         h2.addStretch()
         v.addLayout(h2)
+
+        h2b = QHBoxLayout()
+        h2b.addWidget(QLabel("표시"))
+        self.chk_chart_show = {}
+        for key, label in [("price", "가격"), ("short", "단기이평"), ("long", "장기이평"),
+                            ("golden", "골든크로스"), ("dead", "데드크로스")]:
+            chk = QCheckBox(label)
+            chk.setChecked(True)
+            chk.toggled.connect(self._apply_chart_series_visibility)
+            self.chk_chart_show[key] = chk
+            h2b.addWidget(chk)
+        h2b.addStretch()
+        v.addLayout(h2b)
+
+        h2c = QHBoxLayout()
+        h2c.addWidget(QLabel("실시간 자동매매 -"))
+        h2c.addWidget(QLabel("수량"))
+        self.edit_auto_qty = QLineEdit("1")
+        self.edit_auto_qty.setMaximumWidth(40)
+        h2c.addWidget(self.edit_auto_qty)
+        self.chk_auto_trade = QCheckBox("자동주문 실행(해제시 신호만 로그에 표시 - 반자동)")
+        self.chk_auto_trade.toggled.connect(self._on_auto_trade_toggled)
+        h2c.addWidget(self.chk_auto_trade)
+        self.chk_auto_order_confirm = QCheckBox("주문확인창")
+        h2c.addWidget(self.chk_auto_order_confirm)
+        self.btn_auto_watch = QPushButton("감시 시작")
+        self.btn_auto_watch.clicked.connect(self._on_auto_watch_toggle)
+        h2c.addWidget(self.btn_auto_watch)
+        h2c.addStretch()
+        v.addLayout(h2c)
+        self.lbl_auto_watch_status = QLabel("감시 중지됨")
+        v.addWidget(self.lbl_auto_watch_status)
 
         h3 = QHBoxLayout()
         self.chart_fig = Figure(figsize=(5, 3))
         self.chart_canvas = FigureCanvasQTAgg(self.chart_fig)
-        h3.addWidget(self.chart_canvas, 3)
+        h3.addWidget(self.chart_canvas, 1)
 
         trade_box = QVBoxLayout()
         self.lbl_chart_summary = QLabel("거래 없음")
+        self.lbl_chart_summary.setWordWrap(True)
+        self.lbl_chart_summary.setFixedHeight(40)
         trade_box.addWidget(self.lbl_chart_summary)
         self.table_chart_trades = QTableWidget(0, 5)
         self.table_chart_trades.setHorizontalHeaderLabels(["매수시간", "매수가", "매도시간", "매도가", "손익"])
         self.table_chart_trades.verticalHeader().setVisible(False)
         self.table_chart_trades.setEditTriggers(QAbstractItemView.NoEditTriggers)
-        for col, w in enumerate([75, 65, 75, 65, 65]):
+        for col, w in enumerate([110, 65, 110, 65, 65]):  # 시간 컬럼은 "08/14 09:54:26" 다 보이게 넓힘
             self.table_chart_trades.setColumnWidth(col, w)
+        # 컬럼폭 합(415) + 세로 스크롤바/테두리 여유를 더해 5개 컬럼이 스크롤 없이 다 보이게.
+        # maximumWidth만으로는 창 폭이 좁을 때 레이아웃이 이 위젯까지 같이 눌러버려서
+        # setFixedWidth로 고정해 창 크기와 무관하게 항상 이 폭을 확보한다.
+        self.table_chart_trades.setFixedWidth(460)
         trade_box.addWidget(self.table_chart_trades)
         trade_widget = QWidget()
         trade_widget.setLayout(trade_box)
-        h3.addWidget(trade_widget, 3)
+        trade_widget.setFixedWidth(460)
+        h3.addWidget(trade_widget, 0)
 
         v.addLayout(h3)
 
@@ -539,6 +925,11 @@ class TestWindow(QMainWindow):
         except ValueError:
             self._log("차트: 낙폭제한은 숫자로 입력하세요")
             return
+
+        self.chart_fig.clear()
+        self.chart_canvas.draw()
+        self.table_chart_trades.setRowCount(0)
+        self.lbl_chart_summary.setText("계산 중...")
 
         cur = self.db_conn.execute(
             "SELECT trade_time, price FROM ticks WHERE code=? AND price IS NOT NULL ORDER BY id", (code,))
@@ -606,7 +997,8 @@ class TestWindow(QMainWindow):
                 wins += 1
             row = self.table_chart_trades.rowCount()
             self.table_chart_trades.insertRow(row)
-            for col, val in enumerate([buy_t, f"{buy_p:.0f}", sell_t, f"{sell_p:.0f}", f"{pnl:+.0f}"]):
+            vals = [_fmt_datetime(buy_t), f"{buy_p:.0f}", _fmt_datetime(sell_t), f"{sell_p:.0f}", f"{pnl:+.0f}"]
+            for col, val in enumerate(vals):
                 self.table_chart_trades.setItem(row, col, QTableWidgetItem(val))
         if trades:
             win_rate = wins * 100 / len(trades)
@@ -614,22 +1006,169 @@ class TestWindow(QMainWindow):
         else:
             summary = "거래 없음"
         if entry is not None:
-            summary += f"  (미청산: {entry[0]} @ {entry[1]:.0f})"
+            summary += f"  (미청산: {_fmt_datetime(entry[0])} @ {entry[1]:.0f})"
         self.lbl_chart_summary.setText(summary)
 
         self.chart_fig.clear()
         ax = self.chart_fig.add_subplot(111)
-        ax.plot(times, plot_prices, label="가격", color="black", linewidth=0.8)
-        ax.plot(times, plot_short, label=f"{short_win}틱 이평", color="green", linewidth=1)
-        ax.plot(times, plot_long, label=f"{long_win}틱 이평", color="red", linewidth=1)
-        ax.scatter(golden_x, golden_y, marker='^', color='blue', s=25, zorder=5, label="골든크로스")
-        ax.scatter(dead_x, dead_y, marker='v', color='magenta', s=25, zorder=5, label="데드크로스")
+        self.chart_artists = {
+            "price": ax.plot(times, plot_prices, label="가격", color="black", linewidth=0.8)[0],
+            "short": ax.plot(times, plot_short, label=f"{short_win}틱 이평", color="green", linewidth=1)[0],
+            "long": ax.plot(times, plot_long, label=f"{long_win}틱 이평", color="red", linewidth=1)[0],
+            "golden": ax.scatter(golden_x, golden_y, marker='^', color='blue', s=25, zorder=5, label="골든크로스"),
+            "dead": ax.scatter(dead_x, dead_y, marker='v', color='magenta', s=25, zorder=5, label="데드크로스"),
+        }
         ax.set_title(code)
         ax.legend(loc="upper left", fontsize=8)
         ax.xaxis.set_major_formatter(matplotlib.dates.DateFormatter('%H:%M:%S'))
         self.chart_fig.autofmt_xdate()
         self.chart_fig.tight_layout()
+        self._apply_chart_series_visibility()
+
+    def _apply_chart_series_visibility(self):
+        # 표시 체크박스 상태를 각 시리즈(가격/단기이평/장기이평/골든/데드크로스)에 반영한다.
+        if not self.chart_artists:
+            return
+        for key, artist in self.chart_artists.items():
+            artist.set_visible(self.chk_chart_show[key].isChecked())
         self.chart_canvas.draw()
+
+    def _on_chart_auto_toggle(self, checked):
+        if not checked:
+            self.chart_auto_timer.stop()
+            return
+        try:
+            sec = int(self.edit_chart_auto_sec.text().strip() or 5)
+        except ValueError:
+            self._log("차트: 자동조회 주기는 숫자(초)로 입력하세요")
+            self.chk_chart_auto.setChecked(False)
+            return
+        if sec <= 0:
+            self._log("차트: 자동조회 주기는 1초 이상으로 입력하세요")
+            self.chk_chart_auto.setChecked(False)
+            return
+        self.chart_auto_timer.start(sec * 1000)
+        self._on_chart_send()
+
+    def _on_auto_trade_toggled(self, checked):
+        # 완전자동 켜는 순간 주문확인창(모달)은 기본적으로 꺼서 흐름이 안 막히게 하되,
+        # 사용자가 필요하면 이후에 다시 체크해서 켤 수 있다.
+        if checked:
+            self.chk_auto_order_confirm.setChecked(False)
+
+    def _on_auto_watch_toggle(self):
+        if self.auto_watch_code is not None:
+            self._on_auto_watch_stop()
+        else:
+            self._on_auto_watch_start()
+
+    def _on_auto_watch_start(self):
+        code = self.edit_chart_code.text().strip()
+        if len(code) != 6:
+            self._log("자동매매: 종목코드 6자리를 입력하세요")
+            return
+        try:
+            short_win = int(self.edit_chart_short.text().strip() or 5)
+            long_win = int(self.edit_chart_long.text().strip() or 20)
+        except ValueError:
+            self._log("자동매매: 단기/장기 윈도우는 숫자로 입력하세요")
+            return
+        if short_win >= long_win:
+            self._log("자동매매: 단기는 장기보다 작아야 합니다")
+            return
+
+        if code not in self.watch_codes:
+            mkgubn = self.combo_watch_mkgubn.currentData()
+            fields = "\t".join(TR1002_SISE_FIELDS)
+            symb = f"1777\x7f{mkgubn}\t{fields}\t"
+            result = self.ocx.dynamicCall("TR1004(int, QString, QString)", [TK_TR1004, code, symb])
+            if not result:
+                err = self.ocx.dynamicCall("GetLastErrMsg()")
+                self._log(f"자동매매: 실시간 구독 실패({code}): {err}")
+                return
+            self.watch_codes.add(code)
+            self._log(f"자동매매: 실시간 구독 등록({code})")
+
+        # 오늘 이미 쌓인 틱이 있으면 이평선 계산에 바로 활용(처음부터 대기하지 않도록)
+        cur = self.db_conn.execute(
+            "SELECT price FROM ticks WHERE code=? AND price IS NOT NULL AND trade_time LIKE ? ORDER BY id",
+            (code, datetime.now().strftime("%Y%m%d") + "%"))
+        seed_prices = [r[0] for r in cur.fetchall()]
+
+        self.auto_watch_code = code
+        self.auto_watch_short = short_win
+        self.auto_watch_long = long_win
+        self.auto_watch_prices = seed_prices
+        self.auto_watch_position = None
+        self.btn_auto_watch.setText("감시 중지")
+        mode = "자동주문" if self.chk_auto_trade.isChecked() else "반자동(로그만)"
+        self._log(f"자동매매 감시 시작: {code} 단기={short_win} 장기={long_win} 모드={mode} (시드 틱 {len(seed_prices)}개)")
+        self._update_auto_watch_status()
+
+    def _on_auto_watch_stop(self):
+        code = self.auto_watch_code
+        self.auto_watch_code = None
+        self.auto_watch_prices = []
+        self.auto_watch_position = None
+        self.btn_auto_watch.setText("감시 시작")
+        self.lbl_auto_watch_status.setText("감시 중지됨")
+        self._log(f"자동매매 감시 중지: {code}")
+
+    def _update_auto_watch_status(self):
+        if self.auto_watch_code is None:
+            self.lbl_auto_watch_status.setText("감시 중지됨")
+            return
+        pos = f"보유중 @ {self.auto_watch_position['entry_price']}" if self.auto_watch_position else "미보유"
+        mode = "자동주문" if self.chk_auto_trade.isChecked() else "반자동(로그만)"
+        self.lbl_auto_watch_status.setText(
+            f"감시중: {self.auto_watch_code} (틱 {len(self.auto_watch_prices)}개, {pos}, {mode})")
+
+    def _on_auto_watch_tick(self, price):
+        prices = self.auto_watch_prices
+        prices.append(price)
+        short_win, long_win = self.auto_watch_short, self.auto_watch_long
+        if len(prices) < long_win + 1:
+            return
+        short_now = sum(prices[-short_win:]) / short_win
+        long_now = sum(prices[-long_win:]) / long_win
+        short_prev = sum(prices[-short_win - 1:-1]) / short_win
+        long_prev = sum(prices[-long_win - 1:-1]) / long_win
+
+        if short_prev <= long_prev and short_now > long_now and self.auto_watch_position is None:
+            self._fire_auto_signal("BUY", price)
+        elif short_prev >= long_prev and short_now < long_now and self.auto_watch_position is not None:
+            self._fire_auto_signal("SELL", price)
+
+    def _fire_auto_signal(self, side, price):
+        ts = datetime.now().strftime("%H:%M:%S")
+        code = self.auto_watch_code
+        self._log(f"[자동매매] {code} {side} 신호 @ {price} ({ts})")
+
+        if side == "BUY":
+            self.auto_watch_position = {"entry_price": price, "entry_time": ts}
+        else:
+            self.auto_watch_position = None
+
+        if not self.chk_auto_trade.isChecked():
+            self._log("[자동매매] 반자동 모드 - 실제 주문 미실행 (체크박스를 켜면 자동주문 실행)")
+            self._update_auto_watch_status()
+            return
+
+        # 주문 탭 폼을 그대로 재사용해서 전송 - 계좌/비밀번호/호가유형/종목코드('A' 접두문자 포함)는
+        # 사용자가 주문 탭에서 미리 설정해둔 값을 그대로 따른다(자동매매라고 별도로 채우지 않음).
+        # 다만 감시 종목과 주문탭 종목코드가 어긋나 있으면 엉뚱한 종목 주문이 나갈 수 있어 확인 후 막는다.
+        odr_code_key = self.edit_odr_code.text().strip().split('.')[-1].lstrip('A')
+        if odr_code_key != code:
+            self._log(f"[자동매매] 주문 미실행 - 주문탭 종목코드({self.edit_odr_code.text().strip()})가 "
+                       f"감시종목({code})과 다릅니다. 주문탭 종목코드를 확인하세요")
+            self._update_auto_watch_status()
+            return
+        self.combo_mmgb.setCurrentIndex(1 if side == "BUY" else 0)  # 1=매수, 0=매도
+        self.edit_odr_jprc.setText(str(price))
+        self.edit_odr_jqty.setText(self.edit_auto_qty.text().strip() or "1")
+        self._auto_order_pending = True  # 응답 도착시 모달 대신 로그만 남기도록 표시
+        self._on_odr_send()
+        self._update_auto_watch_status()
 
     @staticmethod
     def _parse_trade_time(s):
@@ -659,7 +1198,12 @@ class TestWindow(QMainWindow):
         left.addRow("비밀번호", self.edit_odr_pswd)
 
         self.edit_odr_code = QLineEdit()
-        left.addRow("종목코드", self.edit_odr_code)
+        odr_code_row = QHBoxLayout()
+        odr_code_row.addWidget(self.edit_odr_code)
+        self._add_code_picker(odr_code_row, self.edit_odr_code)
+        odr_code_widget = QWidget()
+        odr_code_widget.setLayout(odr_code_row)
+        left.addRow("종목코드", odr_code_widget)
 
         self.combo_mmgb = QComboBox()
         for text, val in [("1 매도", 1), ("2 매수", 2), ("3 정정", 3), ("4 취소", 4)]:
@@ -667,8 +1211,15 @@ class TestWindow(QMainWindow):
         left.addRow("매매구분", self.combo_mmgb)
 
         self.combo_hogb = QComboBox()
-        for text, val in [("00 지정가", 0), ("03 시장가", 3), ("05 조건부", 5),
-                          ("06 최유리", 6), ("10 지정가(IOC)", 10), ("20 지정가(FOK)", 20)]:
+        # IBKSConnectorCtl.h의 pibosodr_hogb[] 화이트리스트와 정확히 일치해야 서버가 받아준다.
+        # (hogb%10=기본 호가구분, hogb/10=0 일반/1 IOC/2 FOK. 61/81은 예외적으로 값 그대로 사용)
+        for text, val in [
+            ("00 지정가", 0), ("03 시장가", 3), ("05 조건부지정가", 5),
+            ("06 최유리지정가", 6), ("07 최우선지정가", 7),
+            ("10 지정가(IOC)", 10), ("13 시장가(IOC)", 13), ("16 최유리지정가(IOC)", 16),
+            ("20 지정가(FOK)", 20), ("23 시장가(FOK)", 23), ("26 최유리지정가(FOK)", 26),
+            ("61 장전시간외종가", 61), ("81 시간외종가", 81),
+        ]:
             self.combo_hogb.addItem(text, val)
         left.addRow("호가유형", self.combo_hogb)
 
@@ -730,7 +1281,22 @@ class TestWindow(QMainWindow):
         v.setContentsMargins(4, 4, 4, 4)
         v.setSpacing(2)
 
-        cols = ["종목코드", "잔고수량", "가능수량", "현재가", "평가금액", "평가손익", "수익률(%)"]
+        self.jango_tabs = QTabWidget()
+        v.addWidget(self.jango_tabs)
+
+        jango_widget = QWidget()
+        jv = QVBoxLayout(jango_widget)
+        jv.setContentsMargins(0, 0, 0, 0)
+        jv.setSpacing(2)
+
+        h = QHBoxLayout()
+        btn_jango_scan = QPushButton("보유종목 스캔(일봉 크로스오버)")
+        btn_jango_scan.clicked.connect(self._on_jango_scan)
+        h.addWidget(btn_jango_scan)
+        h.addStretch()
+        jv.addLayout(h)
+
+        cols = ["종목코드", "종목명", "잔고수량", "가능수량", "현재가", "평가금액", "평가손익", "수익률(%)"]
         self.table_jango = QTableWidget(0, len(cols))
         self.table_jango.setHorizontalHeaderLabels(cols)
         self.table_jango.verticalHeader().setVisible(False)
@@ -738,23 +1304,45 @@ class TestWindow(QMainWindow):
         self.table_jango.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.table_jango.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.table_jango.horizontalHeader().setStretchLastSection(True)
-        self.table_jango.horizontalHeader().setSectionResizeMode(0, QHeaderView.Stretch)
+        self.table_jango.horizontalHeader().setSectionResizeMode(1, QHeaderView.Stretch)
         self.table_jango.setFixedHeight(140)  # 헤더 + 6줄 고정
         self.table_jango.cellDoubleClicked.connect(self._on_jango_double_clicked)
-        v.addWidget(self.table_jango)
+        jv.addWidget(self.table_jango)
+        self.jango_tabs.addTab(jango_widget, "잔고")
+
+        self.table_chegyul = self._build_chegyul_table()
+        self.jango_tabs.addTab(self.table_chegyul, "체결")
+
+        self.table_michegyul = self._build_chegyul_table()
+        self.jango_tabs.addTab(self.table_michegyul, "미체결")
 
         return group
+
+    def _build_chegyul_table(self):
+        # TR1211(주식 체결/미체결조회) 응답 그리드를 그대로 표로 보여준다.
+        cols = ["주문번호", "원주문번호", "시장", "종목코드", "종목명", "구분",
+                "주문가", "주문량", "체결가", "체결량", "미체결", "상태", "시간"]
+        t = QTableWidget(0, len(cols))
+        t.setHorizontalHeaderLabels(cols)
+        t.verticalHeader().setVisible(False)
+        t.verticalHeader().setDefaultSectionSize(18)
+        t.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        t.setSelectionBehavior(QAbstractItemView.SelectRows)
+        t.setFixedHeight(140)
+        return t
 
     def _add_jango_row(self, code, remain, avail, maip, curr, eval_amt, rate):
         try:
             pnl = f"{float(eval_amt) - float(maip):.0f}"
         except ValueError:
             pnl = "-"
+        code_key = code.split('.')[-1].lstrip('A')  # "M.A010140"처럼 시장접두사가 붙는 경우 대응
         row = self.table_jango.rowCount()
         self.table_jango.insertRow(row)
-        for col, val in enumerate([code, remain, avail, curr, eval_amt, pnl, rate]):
+        vals = [code, self._stock_name(code_key), _fmt_num(remain), _fmt_num(avail),
+                _fmt_num(curr), _fmt_num(eval_amt), _fmt_num(pnl), rate]
+        for col, val in enumerate(vals):
             self.table_jango.setItem(row, col, QTableWidgetItem(val))
-        code_key = code.lstrip('A')
         self._jango_row_by_code[code_key] = row
         # 실시간 재계산용 기준값 저장 (서버가 계산한 초기 평가금액을 기준점으로 삼아
         # 현재가 변동분만큼만 보정 -> 수수료/세금을 몰라도 근사치가 아닌 정확한 값 유지)
@@ -768,16 +1356,20 @@ class TestWindow(QMainWindow):
             pass
 
     def _update_jango_row(self, code, curr=None, eval_amt=None, pnl=None, rate=None):
-        row = self._jango_row_by_code.get(code.lstrip('A'))
+        row = self._jango_row_by_code.get(code.split('.')[-1].lstrip('A'))
         if row is None:
             return
-        for col, val in [(3, curr), (4, eval_amt), (5, pnl), (6, rate)]:
+        fmt = [(4, _fmt_num(curr) if curr is not None else None),
+               (5, _fmt_num(eval_amt) if eval_amt is not None else None),
+               (6, _fmt_num(pnl) if pnl is not None else None),
+               (7, rate)]
+        for col, val in fmt:
             if val is not None:
                 self.table_jango.setItem(row, col, QTableWidgetItem(val))
 
     def _recalc_jango_on_price(self, code, new_curr_s):
         # OnRealData로 들어온 현재가로 잔고 종목의 평가금액/평가손익/수익률을 실시간 재계산
-        code_key = code.lstrip('A')
+        code_key = code.split('.')[-1].lstrip('A')
         calc = self._jango_calc.get(code_key)
         if calc is None:
             return
@@ -801,8 +1393,8 @@ class TestWindow(QMainWindow):
         text = item.text().strip()
         if col == 0:  # 종목코드 -> 주문 종목코드 ('A' 접두문자 포함 그대로)
             self.edit_odr_code.setText(text)
-        elif col == 3:  # 현재가 -> 주문가격 (부호는 등락 표시이므로 제거)
-            self.edit_odr_jprc.setText(text.lstrip('+-'))
+        elif col == 4:  # 현재가 -> 주문가격 (부호와 콤마 제거)
+            self.edit_odr_jprc.setText(text.lstrip('+-').replace(',', ''))
 
     def _build_collect_group(self):
         group = QGroupBox("데이터수집 (틱 저장)")
@@ -810,6 +1402,7 @@ class TestWindow(QMainWindow):
         h.addWidget(QLabel("구독종목(콤마구분)"))
         self.edit_watch_codes = QLineEdit()
         h.addWidget(self.edit_watch_codes)
+        self._add_code_picker(h, self.edit_watch_codes)
         h.addWidget(QLabel("시장"))
         self.combo_watch_mkgubn = QComboBox()
         for text, val in [("KRX", 1), ("NXT", 2), ("통합", 3)]:
@@ -852,6 +1445,8 @@ class TestWindow(QMainWindow):
     def _log_err(self, err):
         self._log(f"  오류: {err}")
         if err and "제한" in err:
+            if self.chk_auto_trade.isChecked() and not self.chk_auto_order_confirm.isChecked():
+                return  # 자동매매 중(주문확인창 꺼짐)엔 흐름을 막지 않도록 로그만 남긴다
             QMessageBox.warning(self, "요청 제한", err)
 
     def _on_initialize(self):
@@ -979,6 +1574,7 @@ class TestWindow(QMainWindow):
         self.edit_daily_code = QLineEdit()
         self.edit_daily_code.setMaximumWidth(90)
         h.addWidget(self.edit_daily_code)
+        self._add_code_picker(h, self.edit_daily_code)
         h.addWidget(QLabel("구분"))
         self.combo_daily_period = QComboBox()
         for text, val in [("일", "0"), ("주", "1"), ("월", "2")]:
@@ -1028,6 +1624,678 @@ class TestWindow(QMainWindow):
         if not result:
             err = self.ocx.dynamicCall("GetLastErrMsg()")
             self._log_err(err)
+
+    def _build_history_group(self):
+        group = QGroupBox("차트(일/주/월봉) 조회")
+        h = QHBoxLayout(group)
+        h.addWidget(QLabel("대상"))
+        self.combo_history_unit = QComboBox()
+        for text, val in [("종목", 1), ("업종", 2)]:
+            self.combo_history_unit.addItem(text, val)
+        h.addWidget(self.combo_history_unit)
+        h.addWidget(QLabel("코드"))
+        self.edit_history_code = QLineEdit()
+        self.edit_history_code.setMaximumWidth(90)
+        h.addWidget(self.edit_history_code)
+        self._add_code_picker(h, self.edit_history_code)
+        h.addWidget(QLabel("구분"))
+        self.combo_history_period = QComboBox()
+        for text, val in [("일", 1), ("주", 2), ("월", 3)]:
+            self.combo_history_period.addItem(text, val)
+        h.addWidget(self.combo_history_period)
+        h.addWidget(QLabel("건수"))
+        self.edit_history_count = QLineEdit("200")
+        self.edit_history_count.setMaximumWidth(50)
+        h.addWidget(self.edit_history_count)
+        h.addWidget(QLabel("시장"))
+        self.combo_history_mkgubn = QComboBox()
+        for text, val in [("KRX", 1), ("NXT", 2), ("통합", 3)]:
+            self.combo_history_mkgubn.addItem(text, val)
+        self.combo_history_mkgubn.setCurrentIndex(2)
+        h.addWidget(self.combo_history_mkgubn)
+        btn = QPushButton("조회")
+        btn.clicked.connect(self._on_history_send)
+        h.addWidget(btn)
+        btn_batch = QPushButton("일괄수집")
+        btn_batch.setToolTip("코드란에 콤마(,)로 여러 개를 넣으면 1.2초 간격으로 순서대로 조회해 DB에 저장합니다")
+        btn_batch.clicked.connect(self._on_history_batch_start)
+        h.addWidget(btn_batch)
+        btn_manage = QPushButton("종목 관리")
+        btn_manage.setToolTip("daily_candles에 쌓인 종목을 선택해서 갱신(재수집)하거나 삭제합니다")
+        btn_manage.clicked.connect(self._on_open_data_manage)
+        h.addWidget(btn_manage)
+        self.lbl_history_batch = QLabel("")
+        h.addWidget(self.lbl_history_batch)
+        h.addStretch()
+        return group
+
+    def _on_open_data_manage(self):
+        DataManageDialog(self).exec_()
+
+    def _on_history_send(self):
+        code = self.edit_history_code.text().strip()
+        if not code:
+            self._log("차트조회: 코드를 입력하세요")
+            return
+        self._request_history(code)
+
+    def _request_history(self, code):
+        dunit = self.combo_history_unit.currentData()  # 1=종목 2=업종
+        dindex = self.combo_history_period.currentData()  # 1=일 2=주 3=월
+        count = self.edit_history_count.text().strip() or "200"
+        mkgubn = self.combo_history_mkgubn.currentData()
+        pday = datetime.now().strftime("%Y%m%d")
+        symb = f"{dunit}\t{dindex}\x7f{pday}\t{count}\t1777\x7f{mkgubn}\t"
+        self._history_last_dunit = dunit
+        self._history_last_dindex = dindex
+        self._history_last_code = code
+        result = self.ocx.dynamicCall(
+            "TR1007(int, QString, QString)", [TK_TR1007, code, symb])
+        self._log(f"차트조회 요청({code}, 대상={dunit}, 구분={dindex}, 건수={count}, 시장={mkgubn}) => {result}")
+        if not result:
+            err = self.ocx.dynamicCall("GetLastErrMsg()")
+            self._log_err(err)
+
+    def _on_history_batch_start(self):
+        # eTR1007 요청 제한(1건/1000ms)을 넘지 않도록 1.2초 간격 QTimer로 순차 조회한다.
+        codes = [c.strip() for c in self.edit_history_code.text().split(',') if c.strip()]
+        if not codes:
+            self._log("차트 일괄수집: 코드를 콤마(,)로 구분해 입력하세요")
+            return
+        self._history_batch_queue = codes
+        self._history_batch_total = len(codes)
+        self._on_history_batch_tick()
+        self._history_batch_timer.start(1200)
+
+    def _on_history_batch_tick(self):
+        if not self._history_batch_queue:
+            self._history_batch_timer.stop()
+            self.lbl_history_batch.setText("수집 완료")
+            return
+        code = self._history_batch_queue.pop(0)
+        done = self._history_batch_total - len(self._history_batch_queue)
+        self.lbl_history_batch.setText(f"수집중: {done}/{self._history_batch_total} ({code})")
+        self._request_history(code)
+
+    def _save_history_records(self, code, dunit, dindex, records):
+        # extra1/extra2 의미: 종목=권리락/수정비율, 업종=상승종목수(추정)/하락종목수(추정)
+        now = datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")
+        rows = []
+        for vals in records:
+            try:
+                rows.append((
+                    code, dunit, dindex, vals[0],
+                    int(vals[2]), int(vals[3]), int(vals[4]), int(vals[5]),
+                    int(vals[6]), int(vals[7]), float(vals[8]), float(vals[9]),
+                    now,
+                ))
+            except (ValueError, IndexError):
+                continue
+        if not rows:
+            return 0
+        try:
+            self.db_conn.executemany(
+                "INSERT OR REPLACE INTO daily_candles "
+                "(code, unit, dindex, date, open, high, low, close, volume, amount, extra1, extra2, received_at) "
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                rows
+            )
+            self.db_conn.commit()
+        except sqlite3.Error as e:
+            self._log(f"캔들 저장 오류({code}): {e}")
+            return 0
+        return len(rows)
+
+    def _build_daily_backtest_group(self):
+        group = QGroupBox("일봉 백테스트 (daily_candles 기반)")
+        v = QVBoxLayout(group)
+
+        h1 = QHBoxLayout()
+        h1.addWidget(QLabel("종목코드"))
+        self.edit_bt_code = QLineEdit()
+        self.edit_bt_code.setMaximumWidth(90)
+        h1.addWidget(self.edit_bt_code)
+        self._add_code_picker(h1, self.edit_bt_code)
+        self.lbl_bt_name = QLabel("")
+        self.lbl_bt_name.setMinimumWidth(60)
+        h1.addWidget(self.lbl_bt_name)
+        self.edit_bt_code.textChanged.connect(
+            lambda text: self.lbl_bt_name.setText(self._stock_name(text.strip())))
+        btn_related = QPushButton("관련종목")
+        btn_related.setToolTip("이 종목이 속한 업종/테마/그룹사에서 다른 종목 찾기")
+        btn_related.clicked.connect(self._on_find_related)
+        h1.addWidget(btn_related)
+        h1.addWidget(QLabel("단기"))
+        self.edit_bt_short = QLineEdit("5")
+        self.edit_bt_short.setMaximumWidth(40)
+        h1.addWidget(self.edit_bt_short)
+        h1.addWidget(QLabel("장기"))
+        self.edit_bt_long = QLineEdit("20")
+        self.edit_bt_long.setMaximumWidth(40)
+        h1.addWidget(self.edit_bt_long)
+        self.chk_bt_regime = QCheckBox("코스피(001)")
+        h1.addWidget(self.chk_bt_regime)
+        self.edit_bt_regime_days = QLineEdit("20")
+        self.edit_bt_regime_days.setMaximumWidth(40)
+        h1.addWidget(self.edit_bt_regime_days)
+        h1.addWidget(QLabel("일선 필터"))
+        btn = QPushButton("분석")
+        btn.clicked.connect(self._on_daily_backtest_send)
+        h1.addWidget(btn)
+        h1.addStretch()
+        v.addLayout(h1)
+
+        h1b = QHBoxLayout()
+        h1b.addWidget(QLabel("차트 기간"))
+        self.edit_bt_date_from = QDateEdit(QDate.currentDate().addMonths(-3))
+        self.edit_bt_date_from.setCalendarPopup(True)
+        self.edit_bt_date_from.setDisplayFormat("yyyy-MM-dd")
+        h1b.addWidget(self.edit_bt_date_from)
+        h1b.addWidget(QLabel("~"))
+        self.edit_bt_date_to = QDateEdit(QDate.currentDate())
+        self.edit_bt_date_to.setCalendarPopup(True)
+        self.edit_bt_date_to.setDisplayFormat("yyyy-MM-dd")
+        h1b.addWidget(self.edit_bt_date_to)
+        self.chk_bt_zoom = QCheckBox("기간으로 확대")
+        self.chk_bt_zoom.toggled.connect(lambda checked: self._apply_bt_date_zoom())
+        self.edit_bt_date_from.dateChanged.connect(lambda d: self._apply_bt_date_zoom())
+        self.edit_bt_date_to.dateChanged.connect(lambda d: self._apply_bt_date_zoom())
+        h1b.addWidget(self.chk_bt_zoom)
+        h1b.addStretch()
+        v.addLayout(h1b)
+
+        h1c = QHBoxLayout()
+        h1c.addWidget(QLabel("표시"))
+        self.chk_bt_show = {}
+        for key, label in [("close", "종가"), ("short", "단기선"), ("long", "장기선"),
+                            ("buy", "매수"), ("sell", "매도")]:
+            chk = QCheckBox(label)
+            chk.setChecked(True)
+            chk.toggled.connect(self._apply_bt_series_visibility)
+            self.chk_bt_show[key] = chk
+            h1c.addWidget(chk)
+        h1c.addStretch()
+        v.addLayout(h1c)
+
+        h2 = QHBoxLayout()
+        self.bt_fig = Figure(figsize=(6, 2.2))
+        self.bt_canvas = FigureCanvasQTAgg(self.bt_fig)
+        h2.addWidget(self.bt_canvas, 3)
+
+        trade_box = QVBoxLayout()
+        self.lbl_bt_today = QLabel("오늘 신호: -")
+        trade_box.addWidget(self.lbl_bt_today)
+        self.lbl_bt_summary = QLabel("거래 없음")
+        trade_box.addWidget(self.lbl_bt_summary)
+        self.table_bt_trades = QTableWidget(0, 6)
+        self.table_bt_trades.setHorizontalHeaderLabels(["매수일", "매수가", "매도일", "매도가", "수익률", "상태"])
+        self.table_bt_trades.verticalHeader().setDefaultSectionSize(18)
+        self.table_bt_trades.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        self.table_bt_trades.setMaximumHeight(110)
+        for col, w in enumerate([70, 60, 70, 60, 60, 60]):
+            self.table_bt_trades.setColumnWidth(col, w)
+        trade_box.addWidget(self.table_bt_trades)
+        trade_widget = QWidget()
+        trade_widget.setLayout(trade_box)
+        h2.addWidget(trade_widget, 2)
+
+        v.addLayout(h2)
+        return group
+
+    def _on_daily_backtest_send(self):
+        code = self.edit_bt_code.text().strip()
+        if not code:
+            self._log("일봉 백테스트: 종목코드를 입력하세요")
+            return
+        try:
+            short_win = int(self.edit_bt_short.text().strip() or 5)
+            long_win = int(self.edit_bt_long.text().strip() or 20)
+            regime_days = int(self.edit_bt_regime_days.text().strip() or 20)
+        except ValueError:
+            self._log("일봉 백테스트: 단기/장기 이평, 코스피 필터 일수는 숫자로 입력하세요")
+            return
+
+        self.bt_fig.clear()
+        self.bt_canvas.draw()
+        self.table_bt_trades.setRowCount(0)
+        self.lbl_bt_today.setText("계산 중...")
+        self.lbl_bt_summary.setText("계산 중...")
+
+        stock = load_daily(self.db_conn, code, unit=1, dindex=1)
+        if len(stock) < long_win + 1:
+            self._log(f"일봉 백테스트: {code} 데이터 부족(레코드 {len(stock)}건, 최소 {long_win + 1}건 필요) "
+                       f"- 차트조회로 먼저 모아주세요")
+            return
+
+        closes = [r["close"] for r in stock]
+        short_ma = daily_sma(closes, short_win)
+        long_ma = daily_sma(closes, long_win)
+        signals = cross_signals(short_ma, long_ma)
+
+        regime_ok = None
+        if self.chk_bt_regime.isChecked():
+            kospi = load_daily(self.db_conn, "001", unit=2, dindex=1)
+            if len(kospi) < regime_days + 1:
+                self._log("일봉 백테스트: 코스피(001) 데이터가 부족해 필터 없이 진행합니다 "
+                           "- 차트조회(대상=업종, 코드=001)로 먼저 모아주세요")
+            else:
+                kospi_closes = [r["close"] for r in kospi]
+                kospi_ma = daily_sma(kospi_closes, regime_days)
+                kospi_regime_by_date = {
+                    r["date"]: (kospi_ma[i] is not None and kospi_closes[i] > kospi_ma[i])
+                    for i, r in enumerate(kospi)
+                }
+                regime_ok = [kospi_regime_by_date.get(r["date"], False) for r in stock]
+
+        trades, position = daily_simulate(stock, signals, regime_ok=regime_ok)
+        sig = daily_today_signal(stock, signals, position, regime_ok=regime_ok)
+        hold_state = f"보유중(진입 {_fmt_date(position['entry_date'])} @ {position['entry_price']:.0f})" if position else "미보유"
+        today_date = _fmt_date(stock[-1]['date'])
+        if sig == "BUY":
+            today_text = f"오늘({today_date}) 신호: 매수 (내일 시가 매수 검토) - 현재 {hold_state}"
+        elif sig == "SELL":
+            today_text = f"오늘({today_date}) 신호: 매도 (내일 시가 매도 검토) - 현재 {hold_state}"
+        else:
+            today_text = f"오늘({today_date}) 신호: 없음(관망) - 현재 {hold_state}"
+        self.lbl_bt_today.setText(today_text)
+
+        self.table_bt_trades.setRowCount(0)
+        for t in trades:
+            row = self.table_bt_trades.rowCount()
+            self.table_bt_trades.insertRow(row)
+            vals = [_fmt_date(t["entry_date"]), f"{t['entry_price']:.0f}", _fmt_date(t["exit_date"]),
+                    f"{t['exit_price']:.0f}", f"{t['return'] * 100:+.2f}%", "완료"]
+            for col, val in enumerate(vals):
+                self.table_bt_trades.setItem(row, col, QTableWidgetItem(val))
+        if position:  # 아직 청산 안 된 현재 보유 포지션도 마지막 줄에 표시
+            row = self.table_bt_trades.rowCount()
+            self.table_bt_trades.insertRow(row)
+            vals = [_fmt_date(position["entry_date"]), f"{position['entry_price']:.0f}", "-", "-", "-", "보유중"]
+            for col, val in enumerate(vals):
+                self.table_bt_trades.setItem(row, col, QTableWidgetItem(val))
+
+        buy_hold = (closes[-1] - closes[0]) / closes[0] * 100
+        if trades:
+            wins = [t for t in trades if t["return"] > 0]
+            cum = 1.0
+            for t in trades:
+                cum *= (1 + t["return"])
+            avg = sum(t["return"] for t in trades) / len(trades)
+            summary = (f"거래 {len(trades)}건  승률 {len(wins) / len(trades) * 100:.1f}%  "
+                       f"평균수익률 {avg * 100:+.2f}%  누적수익률 {(cum - 1) * 100:+.2f}%  "
+                       f"(단순보유 {buy_hold:+.2f}%)")
+        else:
+            summary = f"거래 없음  (단순보유 {buy_hold:+.2f}%)"
+        self.lbl_bt_summary.setText(summary)
+        self._log(f"일봉 백테스트({code}, 단기={short_win}, 장기={long_win}, "
+                   f"필터={'ON(' + str(regime_days) + '일)' if regime_ok else 'OFF'}) => {summary} / {today_text}")
+
+        dates = [datetime.strptime(r["date"], "%Y%m%d") for r in stock]
+        buy_x = [datetime.strptime(t["entry_date"], "%Y%m%d") for t in trades]
+        buy_y = [t["entry_price"] for t in trades]
+        sell_x = [datetime.strptime(t["exit_date"], "%Y%m%d") for t in trades]
+        sell_y = [t["exit_price"] for t in trades]
+        if position:  # 아직 청산 안 된 현재 보유 포지션도 매수 마커로 표시
+            buy_x.append(datetime.strptime(position["entry_date"], "%Y%m%d"))
+            buy_y.append(position["entry_price"])
+
+        self.bt_fig.clear()
+        ax = self.bt_fig.add_subplot(111)
+        self.bt_artists = {
+            "close": ax.plot(dates, closes, label="종가", color="black", linewidth=0.8)[0],
+            "short": ax.plot(dates, short_ma, label=f"{short_win}일선", color="green", linewidth=1)[0],
+            "long": ax.plot(dates, long_ma, label=f"{long_win}일선", color="red", linewidth=1)[0],
+            "buy": ax.scatter(buy_x, buy_y, marker='^', color='blue', s=30, zorder=5, label="매수"),
+            "sell": ax.scatter(sell_x, sell_y, marker='v', color='magenta', s=30, zorder=5, label="매도"),
+        }
+        ax.set_title(code)
+        ax.legend(loc="upper left", fontsize=7)
+        ax.xaxis.set_major_formatter(matplotlib.dates.DateFormatter('%y-%m-%d'))
+        self.bt_fig.autofmt_xdate()
+        self.bt_fig.tight_layout()
+        self.bt_ax = ax
+        self._apply_bt_series_visibility()
+        self._apply_bt_date_zoom()
+
+    def _apply_bt_date_zoom(self):
+        # 이동평균/신호는 항상 전체 데이터로 계산된 상태 그대로 두고, x축 보기 범위만 좁힌다
+        # (먼저 데이터를 잘라서 다시 계산하면 구간 시작부에 룩백이 부족해 결과가 달라진다).
+        if self.bt_ax is None:
+            return
+        if self.chk_bt_zoom.isChecked():
+            d_from = datetime.combine(self.edit_bt_date_from.date().toPyDate(), datetime.min.time())
+            d_to = datetime.combine(self.edit_bt_date_to.date().toPyDate(), datetime.min.time())
+            self.bt_ax.set_xlim(d_from, d_to)
+        else:
+            self.bt_ax.autoscale(enable=True, axis='x')
+        self.bt_canvas.draw()
+
+    def _apply_bt_series_visibility(self):
+        # 표시 체크박스 상태를 각 시리즈(종가/단기선/장기선/매수/매도)에 반영한다.
+        if not self.bt_artists:
+            return
+        for key, artist in self.bt_artists.items():
+            artist.set_visible(self.chk_bt_show[key].isChecked())
+        self.bt_canvas.draw()
+
+    def _build_scan_group(self):
+        group = QGroupBox("전체 종목 스캔 (오늘의 매수/매도 후보)")
+        v = QVBoxLayout(group)
+
+        h0 = QHBoxLayout()
+        h0.addWidget(QLabel("종목 제한(비우면 전체)"))
+        self.edit_scan_codes = QLineEdit()
+        self.edit_scan_codes.setPlaceholderText("콤마로 구분된 종목코드 - 비우면 daily_candles 전체")
+        h0.addWidget(self.edit_scan_codes)
+        self._add_code_picker(h0, self.edit_scan_codes)
+        v.addLayout(h0)
+
+        h = QHBoxLayout()
+        h.addWidget(QLabel("단기"))
+        self.edit_scan_short = QLineEdit("5")
+        self.edit_scan_short.setMaximumWidth(40)
+        h.addWidget(self.edit_scan_short)
+        h.addWidget(QLabel("장기"))
+        self.edit_scan_long = QLineEdit("20")
+        self.edit_scan_long.setMaximumWidth(40)
+        h.addWidget(self.edit_scan_long)
+        self.chk_scan_regime = QCheckBox("코스피(001)")
+        h.addWidget(self.chk_scan_regime)
+        self.edit_scan_regime_days = QLineEdit("20")
+        self.edit_scan_regime_days.setMaximumWidth(40)
+        h.addWidget(self.edit_scan_regime_days)
+        h.addWidget(QLabel("일선 필터"))
+        self.chk_scan_state = QCheckBox("상태기반 포함(오늘 신호 없어도 상승국면 표시)")
+        h.addWidget(self.chk_scan_state)
+        btn = QPushButton("스캔")
+        btn.clicked.connect(self._on_scan_send)
+        h.addWidget(btn)
+        h.addStretch()
+        v.addLayout(h)
+
+        self.lbl_scan_summary = QLabel("스캔 결과 없음")
+        v.addWidget(self.lbl_scan_summary)
+
+        self.table_scan = QTableWidget(0, 5)
+        self.table_scan.setHorizontalHeaderLabels(["종목코드", "종목명", "신호", "상태", "갭%"])
+        self.table_scan.verticalHeader().setVisible(False)
+        self.table_scan.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        self.table_scan.cellDoubleClicked.connect(self._on_scan_row_select)
+        v.addWidget(self.table_scan)
+        lbl_scan_hint = QLabel("행 더블클릭 -> 파라미터 스캔 탭에서 이 종목의 단기/장기 조합 비교")
+        v.addWidget(lbl_scan_hint)
+        return group
+
+    def _on_scan_send(self):
+        codes_text = self.edit_scan_codes.text().strip()
+        if codes_text:
+            codes = [c.strip() for c in codes_text.split(',') if c.strip()]
+            label = f"선택 {len(codes)}종목"
+        else:
+            cur = self.db_conn.execute(
+                "SELECT DISTINCT code FROM daily_candles WHERE unit = 1 AND dindex = 1 ORDER BY code")
+            codes = [r[0] for r in cur.fetchall()]
+            label = "전체"
+        if not codes:
+            self._log("전체 스캔: daily_candles에 종목 데이터가 없습니다 - 차트조회/일괄수집으로 먼저 모아주세요")
+            return
+        self._run_scan(codes, label)
+
+    def _on_jango_scan(self):
+        codes = list(self._jango_row_by_code.keys())
+        if not codes:
+            self._log("보유종목 스캔: 잔고에 종목이 없습니다 - 잔고조회를 먼저 해주세요")
+            return
+        self.strategy_tabs.setCurrentIndex(2)  # 전체 스캔 탭
+        self._run_scan(codes, "보유종목")
+
+    def _run_scan(self, codes, label):
+        try:
+            short_win = int(self.edit_scan_short.text().strip() or 5)
+            long_win = int(self.edit_scan_long.text().strip() or 20)
+            regime_days = int(self.edit_scan_regime_days.text().strip() or 20)
+        except ValueError:
+            self._log("전체 스캔: 단기/장기 이평, 코스피 필터 일수는 숫자로 입력하세요")
+            return
+
+        self.table_scan.setRowCount(0)
+        self.lbl_scan_summary.setText("스캔 중...")
+        QApplication.processEvents()
+
+        use_regime = self.chk_scan_regime.isChecked()
+        kospi_regime_by_date = {}
+        if use_regime:
+            kospi = load_daily(self.db_conn, "001", unit=2, dindex=1)
+            if len(kospi) < regime_days + 1:
+                self._log("전체 스캔: 코스피(001) 데이터가 부족해 필터 없이 진행합니다")
+                use_regime = False
+            else:
+                kospi_closes = [r["close"] for r in kospi]
+                kospi_ma = daily_sma(kospi_closes, regime_days)
+                kospi_regime_by_date = {
+                    r["date"]: (kospi_ma[i] is not None and kospi_closes[i] > kospi_ma[i])
+                    for i, r in enumerate(kospi)
+                }
+
+        use_state = self.chk_scan_state.isChecked()
+        self.table_scan.setRowCount(0)
+        buy_count = sell_count = state_count = 0
+        no_data_codes = []
+        for code in codes:
+            stock = load_daily(self.db_conn, code, unit=1, dindex=1)
+            if len(stock) < long_win + 1:
+                no_data_codes.append(code)
+                continue
+            closes = [r["close"] for r in stock]
+            short_ma = daily_sma(closes, short_win)
+            long_ma = daily_sma(closes, long_win)
+            signals = cross_signals(short_ma, long_ma)
+            regime_ok = [kospi_regime_by_date.get(r["date"], False) for r in stock] if use_regime else None
+            _, position = daily_simulate(stock, signals, regime_ok=regime_ok)
+            sig = daily_today_signal(stock, signals, position, regime_ok=regime_ok)
+            gap_pct = (short_ma[-1] - long_ma[-1]) / long_ma[-1] * 100
+
+            if sig is None and use_state and short_ma[-1] > long_ma[-1]:
+                sig = "상태:상승국면"
+                state_count += 1
+            elif sig is None:
+                continue
+            elif sig == "BUY":
+                buy_count += 1
+            else:
+                sell_count += 1
+
+            row = self.table_scan.rowCount()
+            self.table_scan.insertRow(row)
+            state = f"보유중 @ {position['entry_price']:.0f}" if position else "미보유"
+            for col, val in enumerate([code, self._stock_name(code), sig, state, f"{gap_pct:.2f}"]):
+                self.table_scan.setItem(row, col, QTableWidgetItem(val))
+
+        self.lbl_scan_summary.setText(
+            f"스캔({label}) {len(codes)}종목 중 매수후보 {buy_count}개, 매도후보 {sell_count}개"
+            + (f", 상승국면 {state_count}개" if use_state else ""))
+        if no_data_codes:
+            self._log(f"스캔({label}): 데이터 부족으로 제외된 종목 - {', '.join(no_data_codes)} "
+                       f"(일괄수집으로 먼저 일봉을 모아주세요)")
+        self._log(f"스캔({label}, 단기={short_win}, 장기={long_win}, "
+                   f"필터={'ON(' + str(regime_days) + '일)' if use_regime else 'OFF'}) "
+                   f"=> {len(codes)}종목 중 매수 {buy_count} / 매도 {sell_count}"
+                   + (f" / 상승국면 {state_count}" if use_state else ""))
+
+    def _on_scan_row_select(self, row, column):
+        # 전체 스캔 표에서 종목을 더블클릭하면 파라미터 스캔 탭으로 넘어가
+        # 그 종목의 단기/장기 조합별 백테스트를 바로 비교해볼 수 있게 한다.
+        code = self.table_scan.item(row, 0).text()
+        self.edit_pscan_code.setText(code)
+        self.chk_pscan_regime.setChecked(self.chk_scan_regime.isChecked())
+        self.edit_pscan_regime_days.setText(self.edit_scan_regime_days.text())
+        self.strategy_tabs.setCurrentIndex(3)  # 파라미터 스캔 탭
+        self._on_param_scan_send()
+
+    def _build_param_scan_group(self):
+        group = QGroupBox("파라미터 스캔 (단기/장기 이평 조합별 백테스트 비교)")
+        v = QVBoxLayout(group)
+
+        h1 = QHBoxLayout()
+        h1.addWidget(QLabel("종목코드"))
+        self.edit_pscan_code = QLineEdit()
+        self.edit_pscan_code.setMaximumWidth(90)
+        h1.addWidget(self.edit_pscan_code)
+        self._add_code_picker(h1, self.edit_pscan_code)
+        self.lbl_pscan_name = QLabel("")
+        self.lbl_pscan_name.setMinimumWidth(60)
+        h1.addWidget(self.lbl_pscan_name)
+        self.edit_pscan_code.textChanged.connect(
+            lambda text: self.lbl_pscan_name.setText(self._stock_name(text.strip())))
+        h1.addWidget(QLabel("단기"))
+        self.edit_pscan_short_from = QLineEdit("3")
+        self.edit_pscan_short_from.setMaximumWidth(35)
+        h1.addWidget(self.edit_pscan_short_from)
+        h1.addWidget(QLabel("~"))
+        self.edit_pscan_short_to = QLineEdit("15")
+        self.edit_pscan_short_to.setMaximumWidth(35)
+        h1.addWidget(self.edit_pscan_short_to)
+        h1.addWidget(QLabel("step"))
+        self.edit_pscan_short_step = QLineEdit("1")
+        self.edit_pscan_short_step.setMaximumWidth(30)
+        h1.addWidget(self.edit_pscan_short_step)
+        h1.addWidget(QLabel("장기"))
+        self.edit_pscan_long_from = QLineEdit("15")
+        self.edit_pscan_long_from.setMaximumWidth(35)
+        h1.addWidget(self.edit_pscan_long_from)
+        h1.addWidget(QLabel("~"))
+        self.edit_pscan_long_to = QLineEdit("60")
+        self.edit_pscan_long_to.setMaximumWidth(35)
+        h1.addWidget(self.edit_pscan_long_to)
+        h1.addWidget(QLabel("step"))
+        self.edit_pscan_long_step = QLineEdit("5")
+        self.edit_pscan_long_step.setMaximumWidth(30)
+        h1.addWidget(self.edit_pscan_long_step)
+        h1.addStretch()
+        v.addLayout(h1)
+
+        h2 = QHBoxLayout()
+        self.chk_pscan_regime = QCheckBox("코스피(001)")
+        h2.addWidget(self.chk_pscan_regime)
+        self.edit_pscan_regime_days = QLineEdit("20")
+        self.edit_pscan_regime_days.setMaximumWidth(40)
+        h2.addWidget(self.edit_pscan_regime_days)
+        h2.addWidget(QLabel("일선 필터"))
+        btn = QPushButton("스캔")
+        btn.clicked.connect(self._on_param_scan_send)
+        h2.addWidget(btn)
+        h2.addStretch()
+        v.addLayout(h2)
+
+        self.lbl_pscan_summary = QLabel("스캔 결과 없음")
+        v.addWidget(self.lbl_pscan_summary)
+
+        self.table_pscan = QTableWidget(0, 6)
+        self.table_pscan.setHorizontalHeaderLabels(
+            ["단기", "장기", "거래횟수", "승률(%)", "평균수익률(%)", "누적수익률(%)"])
+        self.table_pscan.verticalHeader().setVisible(False)
+        self.table_pscan.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        self.table_pscan.setSortingEnabled(True)
+        self.table_pscan.cellDoubleClicked.connect(self._on_pscan_row_select)
+        v.addWidget(self.table_pscan)
+        lbl_hint = QLabel("행 더블클릭 -> 일봉 크로스오버 탭에서 해당 조합의 매수/매도 날짜 상세 확인")
+        v.addWidget(lbl_hint)
+        return group
+
+    def _on_param_scan_send(self):
+        code = self.edit_pscan_code.text().strip()
+        if not code:
+            self._log("파라미터 스캔: 종목코드를 입력하세요")
+            return
+        try:
+            short_from = int(self.edit_pscan_short_from.text().strip())
+            short_to = int(self.edit_pscan_short_to.text().strip())
+            short_step = int(self.edit_pscan_short_step.text().strip())
+            long_from = int(self.edit_pscan_long_from.text().strip())
+            long_to = int(self.edit_pscan_long_to.text().strip())
+            long_step = int(self.edit_pscan_long_step.text().strip())
+            regime_days = int(self.edit_pscan_regime_days.text().strip() or 20)
+        except ValueError:
+            self._log("파라미터 스캔: 단기/장기 범위·step, 코스피 필터 일수는 숫자로 입력하세요")
+            return
+
+        stock = load_daily(self.db_conn, code, unit=1, dindex=1)
+        max_long = long_to
+        if len(stock) < max_long + 1:
+            msg = (f"{code} 데이터 부족(레코드 {len(stock)}건, 장기 최대값 {max_long} -> 최소 {max_long + 1}건 필요) "
+                   f"- 장기 범위를 줄이거나 차트조회로 데이터를 더 모아주세요")
+            self.table_pscan.setRowCount(0)
+            self.lbl_pscan_summary.setText(msg)
+            self._log(f"파라미터 스캔: {msg}")
+            return
+        closes = [r["close"] for r in stock]
+
+        regime_ok = None
+        if self.chk_pscan_regime.isChecked():
+            kospi = load_daily(self.db_conn, "001", unit=2, dindex=1)
+            if len(kospi) < regime_days + 1:
+                self._log("파라미터 스캔: 코스피(001) 데이터가 부족해 필터 없이 진행합니다")
+            else:
+                kospi_closes = [r["close"] for r in kospi]
+                kospi_ma = daily_sma(kospi_closes, regime_days)
+                kospi_regime_by_date = {
+                    r["date"]: (kospi_ma[i] is not None and kospi_closes[i] > kospi_ma[i])
+                    for i, r in enumerate(kospi)
+                }
+                regime_ok = [kospi_regime_by_date.get(r["date"], False) for r in stock]
+
+        self.table_pscan.setSortingEnabled(False)
+        self.table_pscan.setRowCount(0)
+        self.lbl_pscan_summary.setText("스캔 중...")
+        QApplication.processEvents()
+
+        combo_count = 0
+        for short_win in range(short_from, short_to + 1, short_step):
+            short_ma = daily_sma(closes, short_win)
+            for long_win in range(long_from, long_to + 1, long_step):
+                if short_win >= long_win:
+                    continue
+                combo_count += 1
+                long_ma = daily_sma(closes, long_win)
+                signals = cross_signals(short_ma, long_ma)
+                trades, _ = daily_simulate(stock, signals, regime_ok=regime_ok)
+                if not trades:
+                    continue
+                wins = [t for t in trades if t["return"] > 0]
+                cum = 1.0
+                for t in trades:
+                    cum *= (1 + t["return"])
+                avg = sum(t["return"] for t in trades) / len(trades)
+                row = self.table_pscan.rowCount()
+                self.table_pscan.insertRow(row)
+                vals = [short_win, long_win, len(trades), len(wins) / len(trades) * 100,
+                        avg * 100, (cum - 1) * 100]
+                for col, v_ in enumerate(vals):
+                    item = QTableWidgetItem()
+                    item.setData(Qt.DisplayRole, round(v_, 2) if isinstance(v_, float) else v_)
+                    self.table_pscan.setItem(row, col, item)
+
+        self.table_pscan.setSortingEnabled(True)
+        self.table_pscan.sortItems(5, Qt.DescendingOrder)  # 누적수익률 기준 내림차순
+        buy_hold = (closes[-1] - closes[0]) / closes[0] * 100
+        self.lbl_pscan_summary.setText(
+            f"{code} - {combo_count}개 조합 중 거래 발생 {self.table_pscan.rowCount()}개 "
+            f"(열 헤더 클릭으로 재정렬) / 단순보유(전체기간) {buy_hold:+.2f}%")
+        self._log(f"파라미터 스캔({code}, 단기={short_from}~{short_to}/{short_step}, "
+                   f"장기={long_from}~{long_to}/{long_step}) => {combo_count}개 조합 스캔 완료")
+
+    def _on_pscan_row_select(self, row, column):
+        # 파라미터 스캔 표에서 조합을 더블클릭하면 일봉 크로스오버 탭으로 넘어가
+        # 그 조합의 매수/매도 날짜 상세(차트+거래표)를 바로 보여준다.
+        short_win = self.table_pscan.item(row, 0).text()
+        long_win = self.table_pscan.item(row, 1).text()
+        self.edit_bt_code.setText(self.edit_pscan_code.text().strip())
+        self.edit_bt_short.setText(short_win)
+        self.edit_bt_long.setText(long_win)
+        self.chk_bt_regime.setChecked(self.chk_pscan_regime.isChecked())
+        self.edit_bt_regime_days.setText(self.edit_pscan_regime_days.text())
+        self.strategy_tabs.setCurrentIndex(1)  # 일봉 크로스오버 탭
+        self._on_daily_backtest_send()
 
     # ── OCX event handlers ───────────────────────────────────────
 
@@ -1240,6 +2508,7 @@ class TestWindow(QMainWindow):
             return
         self._jngo_acno = acno
         self._jngo_pswd = pswd
+        self.table_chegyul.setRowCount(0)
         if self.combo_jtype.currentIndex() == 0:  # 선물옵션
             result = self.ocx.dynamicCall(
                 "TR3211(int, QString, QString, int, int, QString, int, int, QString)",
@@ -1261,6 +2530,7 @@ class TestWindow(QMainWindow):
             return
         self._jngo_acno = acno
         self._jngo_pswd = pswd
+        self.table_michegyul.setRowCount(0)
         if self.combo_jtype.currentIndex() == 0:  # 선물옵션 dlgb=2
             result = self.ocx.dynamicCall(
                 "TR3211(int, QString, QString, int, int, QString, int, int, QString)",
@@ -1356,6 +2626,11 @@ class TestWindow(QMainWindow):
         if code in self.watch_codes and "034" in m:
             self._save_tick(code, m)
 
+        if code == self.auto_watch_code and "034" in m:
+            price = self._parse_price_int(m.get("023", ""))
+            if price is not None:
+                self._on_auto_watch_tick(price)
+
         if code != self.edit_sise_code.text().strip().lstrip('A'):
             return  # 현재 조회 중인 종목만 처리(시세조회 화면 갱신은 여기까지)
 
@@ -1419,6 +2694,16 @@ class TestWindow(QMainWindow):
                 label = "선물주문" if key == TK_TR3201 else "주식주문"
                 self.lbl_odr_result.setText(f"주문번호:{jmno}")
                 self._log(f"  [{label}] 주문번호={jmno} 원주문번호={ojno} 메시지={emsg}")
+                if self._auto_order_pending and not self.chk_auto_order_confirm.isChecked():
+                    # 자동매매가 낸 주문은 기본적으로 모달 팝업 없이 로그로만 결과를 남긴다
+                    # ("주문확인창" 체크박스를 켜두면 자동주문도 수동과 동일하게 팝업으로 확인 가능)
+                    self._auto_order_pending = False
+                    if jmno and jmno != "000000":
+                        self._log(f"[자동매매] {label} 접수 - 주문번호: {jmno}")
+                    else:
+                        self._log(f"[자동매매] {label} 실패 - {emsg or '주문이 거부되었습니다.'}")
+                    return
+                self._auto_order_pending = False
                 if jmno and jmno != "000000":
                     QMessageBox.information(self, f"{label} 접수", f"주문번호: {jmno}\n{emsg}")
                 else:
@@ -1475,13 +2760,24 @@ class TestWindow(QMainWindow):
             elif key == TK_TR1211:  # 주식 체결/미체결 (header: acno[11]+nrec[4]=15, grid=265)
                 GRID = 265
                 mode = getattr(self, '_chegyul_mode', '체결')
+                table = self.table_chegyul if mode == "체결" else self.table_michegyul
                 nrec = int(raw[11:15].decode('cp949', errors='ignore').strip() or "0")
                 self._log(f"  [주식{mode}] {nrec}건")
                 for i in range(nrec):
                     g = raw[15 + i*GRID: 15 + (i+1)*GRID]
                     if len(g) < GRID: break
                     mkgb = s(g[20:21])
-                    self._log(f"    주문={s(g[0:10])} 원주문={s(g[10:20])} 시장={MKGB_NAMES.get(mkgb, mkgb)} 종목={s(g[21:33])} {s(g[33:73])} {s(g[73:93])} 주문가={s(g[133:145])} 주문량={s(g[145:157])} 체결가={s(g[157:169])} 체결량={s(g[169:181])} 미체결={s(g[193:205])} [{s(g[237:257])}] 시간={s(g[257:265])}")
+                    juno, ojno, cod2 = s(g[0:10]), s(g[10:20]), s(g[21:33])
+                    hnam, gubn = s(g[33:73]), s(g[73:93])
+                    oprc, oqty, dprc, dqty = s(g[133:145]), s(g[145:157]), s(g[157:169]), s(g[169:181])
+                    wqty, stat, time_ = s(g[193:205]), s(g[237:257]), s(g[257:265])
+                    self._log(f"    주문={juno} 원주문={ojno} 시장={MKGB_NAMES.get(mkgb, mkgb)} 종목={cod2} {hnam} {gubn} 주문가={oprc} 주문량={oqty} 체결가={dprc} 체결량={dqty} 미체결={wqty} [{stat}] 시간={time_}")
+                    row = table.rowCount()
+                    table.insertRow(row)
+                    vals = [juno, ojno, MKGB_NAMES.get(mkgb, mkgb), cod2, hnam, gubn,
+                            oprc, oqty, dprc, dqty, wqty, stat, _fmt_hhmmssxx(time_)]
+                    for col, val in enumerate(vals):
+                        table.setItem(row, col, QTableWidgetItem(val))
                 if b_next:
                     acno = getattr(self, '_jngo_acno', '')
                     pswd = getattr(self, '_jngo_pswd', '')
@@ -1564,6 +2860,31 @@ class TestWindow(QMainWindow):
                 dump_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "tr1006_raw.bin")
                 with open(dump_path, "wb") as f:
                     f.write(raw)
+            elif key == TK_TR1007:  # 차트(일/주/월봉 캔들) 응답
+                # 캔들 레코드는 "일자\t\t시가\t...\t수정비율\n" 형태로, TR1005/TR1004와 동일하게
+                # 앞부분에 스냅샷 필드가 섞여 있어서 "일자+빈시간필드" 이중탭 패턴으로 레코드 시작점을 찾는다.
+                text = raw.decode('cp949', errors='ignore')
+                matches = list(re.finditer(r'(20\d{6})\t\t', text))
+                labels = TR1007_INDEX_CANDLE_LABELS if self._history_last_dunit == 2 else TR1007_CANDLE_LABELS
+                # 스냅샷/dataH 에코 안에도 우연히 "날짜+이중탭" 패턴이 하나 섞여 나올 수 있는데(값이
+                # "6296,38" 처럼 쉼표가 섞이는 등 깨져 있음), 시가~거래대금이 순수 숫자가 아니면 걸러낸다.
+                records = []
+                for i, m in enumerate(matches):
+                    start = m.start(1)
+                    end = matches[i + 1].start(1) if i + 1 < len(matches) else len(text)
+                    vals = text[start:end].rstrip('\n').split('\t')
+                    if len(vals) < 10 or not all(re.fullmatch(r'\d+', v) for v in vals[2:8]):
+                        continue
+                    records.append(vals)
+                self._log(f"  [TR1007 응답] size={size} 레코드수={len(records)}")
+                for vals in records[:5]:
+                    pairs = ", ".join(f"{lbl}={v}" for lbl, v in zip(labels, vals))
+                    self._log(f"  [TR1007 레코드] {pairs}")
+                if len(records) > 5:
+                    self._log(f"  [TR1007] ... 외 {len(records) - 5}건 더 있음")
+                saved = self._save_history_records(
+                    self._history_last_code, self._history_last_dunit, self._history_last_dindex, records)
+                self._log(f"  [TR1007] DB 저장: {saved}건 (code={self._history_last_code})")
             else:
                 self._log(f"  [RecvData] key={key} (미처리)")
         except Exception as e:

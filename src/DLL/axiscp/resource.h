@@ -541,6 +541,7 @@
 #define IDC_CHK_OCLOSE                  7282
 #define IDC_POPUP                       7282
 #define IDC_TREEMENU                    7283
+#define KOSPI_FREE_END                  7283
 #define IDC_STATIC_DLG                  7286
 #define IDC_SCREENBAR                   7287
 #define IDC_CHK_DISPLAY                 7288

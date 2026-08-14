@@ -143,6 +143,7 @@ BEGIN_DISPATCH_MAP(CIBKSConnectorCtrl, COleControl)
 	DISP_FUNCTION(CIBKSConnectorCtrl, "TR1004", TR1004, VT_BOOL, VTS_I4 VTS_BSTR VTS_BSTR)
 	DISP_FUNCTION(CIBKSConnectorCtrl, "TR1005", TR1005, VT_BOOL, VTS_I4 VTS_BSTR VTS_BSTR)
 	DISP_FUNCTION(CIBKSConnectorCtrl, "TR1006", TR1006, VT_BOOL, VTS_I4 VTS_BSTR)
+	DISP_FUNCTION(CIBKSConnectorCtrl, "TR1007", TR1007, VT_BOOL, VTS_I4 VTS_BSTR VTS_BSTR)
 	//}}AFX_DISPATCH_MAP
 END_DISPATCH_MAP()
 
@@ -2523,6 +2524,144 @@ BOOL CIBKSConnectorCtrl::S_TR1006(int key, LPCSTR val)
 	return SendTR("pino2901", key, US_OOP, (LPCSTR)sdat, sdat.GetLength(), &CIBKSConnectorCtrl::C_TR1006);
 }
 
+//차트(캔들) 조회 - chart_dll(C_Total.dll)의 GOOPHOOP 프로토콜을 AxisChaser 실측으로 역공학
+BOOL CIBKSConnectorCtrl::S_TR1007(int key, LPCSTR code, LPCSTR data)
+{
+	// data 형식: "{dunit}\t{dindex}\x7f{pday}\t{count}\t1777\x7f{mkgubn}\t"
+	// dunit: 1=종목(GU_CODE) 2=업종(GU_INDEX)
+	// dindex: 1=일봉 2=주봉 3=월봉 (GI_DAY/GI_WEEK/GI_MONTH)
+	CString dunitS, dindexS, pday, countS, mkgubnS;
+	{
+		CString d(data);
+		int ptab0 = d.Find(_T('\t'));
+		if (ptab0 < 0) { m_sLastMsg = "TR1007 data 형식 오류"; return FALSE; }
+		dunitS = d.Left(ptab0);
+
+		int p7f = d.Find((TCHAR)0x7f, ptab0 + 1);
+		if (p7f < 0) { m_sLastMsg = "TR1007 data 형식 오류"; return FALSE; }
+		dindexS = d.Mid(ptab0 + 1, p7f - ptab0 - 1);
+
+		int ptab1 = d.Find(_T('\t'), p7f + 1);
+		if (ptab1 < 0) { m_sLastMsg = "TR1007 data 형식 오류"; return FALSE; }
+		pday = d.Mid(p7f + 1, ptab1 - p7f - 1);
+
+		int ptab2 = d.Find(_T('\t'), ptab1 + 1);
+		if (ptab2 < 0) { m_sLastMsg = "TR1007 data 형식 오류"; return FALSE; }
+		countS = d.Mid(ptab1 + 1, ptab2 - ptab1 - 1);
+
+		int p7f2 = d.Find((TCHAR)0x7f, ptab2 + 1);
+		if (p7f2 < 0) { m_sLastMsg = "TR1007 data 형식 오류"; return FALSE; }
+		int ptab3 = d.Find(_T('\t'), p7f2 + 1);
+		if (ptab3 < 0) { m_sLastMsg = "TR1007 data 형식 오류"; return FALSE; }
+		mkgubnS = d.Mid(p7f2 + 1, ptab3 - p7f2 - 1);
+	}
+
+	int dunit = atoi((LPCSTR)CStringA(dunitS));
+	if (dunit != 1 && dunit != 2) dunit = 1;
+
+	// GU_CODE(종목)=6자리 종목코드, GU_INDEX(업종)=3자리 업종코드(001=코스피,101=코스피200,201=코스닥 등)
+	if (dunit == 1 && strlen(code) != 6)
+	{
+		m_sLastMsg = "종목코드를 확인하십시오";
+		return FALSE;
+	}
+	if (dunit == 2 && strlen(code) != 3)
+	{
+		m_sLastMsg = "업종코드를 확인하십시오";
+		return FALSE;
+	}
+
+	int dindex = atoi((LPCSTR)CStringA(dindexS));
+	if (dindex < 1 || dindex > 3) dindex = 1;
+	int count = atoi((LPCSTR)CStringA(countS));
+	if (count <= 0) count = 200;
+	if (pday.GetLength() != 8) { m_sLastMsg = "TR1007 pday 형식 오류(yyyymmdd)"; return FALSE; }
+
+	std::string sendS;
+	// 스냅샷 필드 18개(1034~1318) - GetTRInfo()/MakeInputSymbol() 실측 그대로, 순서 고정
+	// 업종(GU_INDEX)은 코드태그/필드번호 모두 "2"를 접두어로 붙인 21301/21034.. 형태를 씀(axisgwin.h IJ_CODE/II_CODE, OJ_*/OI_* 대응 확인)
+	static const char* snapFields[] = {
+		"1034","1022","1023","1024","1033","1027","1025","1026","1029","1030",
+		"1031","1021","1310","1311","1312","1313","1316","1318"
+	};
+	if (dunit == 2)
+	{
+		// AxisChaser 실측(Send_Rev.ini, 2026-08-08 KOSPI200/101 조회) 확인:
+		// - 코드는 "00" 접두 없이 3자리 그대로("101")
+		// - 코드태그/스냅샷 필드는 "2" 접두(21301, 21034..)
+		sendS += "21301";
+		sendS += (char)0x7f;
+		sendS += code;
+		sendS += "\t";
+		for (int i = 0; i < 18; i++)
+		{
+			sendS += "2";
+			sendS += snapFields[i];
+			sendS += "\t";
+		}
+	}
+	else
+	{
+		sendS += "1301";
+		sendS += (char)0x7f;
+		sendS += code;
+		sendS += "\t";
+		for (int i = 0; i < 18; i++)
+		{
+			sendS += snapFields[i];
+			sendS += "\t";
+		}
+	}
+
+	sendS += "1777";
+	sendS += (char)0x7f;
+	sendS += (LPCSTR)CStringA(mkgubnS);
+	sendS += "\t";
+
+	// 캔들 마커도 업종은 "?25500"("2"+"5500"), 종목은 "?5500" - 실측 확인
+	sendS += (dunit == 2) ? "?25500" : "?5500";
+	sendS += (char)0x7f;
+
+	// _dataH(136바이트, GetGrpHeader() 실측 그대로) - count/pday/dindex/dunit 외 나머지는 고정값
+	CString countFmt;
+	countFmt.Format("%06d", count);
+	sendS += (LPCSTR)CStringA(countFmt);   // count[6]
+	sendS += std::string(6, ' ');          // dummy[6]
+	sendS += (char)0x20;                   // dkind(미사용)
+	sendS += (char)0x01;                   // dkey
+	sendS += (LPCSTR)CStringA(pday);       // pday[8]
+	sendS += (char)dunit;                  // dunit(1=GU_CODE 종목, 2=GU_INDEX 업종), raw byte
+	sendS += (char)dindex;                 // dindex(1일/2주/3월), raw byte
+	sendS += "0000";                       // lgap[4](분봉/틱봉 전용, 미사용)
+	sendS += std::string(4, ' ');          // ltic[4]
+	sendS += (char)0x21;                   // option1 = 수정주가(GUI_MOD)
+	sendS += (char)0x21;                   // option2
+	sendS += std::string(16, ' ');         // rcode[16](미사용)
+	sendS += (char)0x20;                   // ikey[1]
+	sendS += (char)0x20;                   // xpos
+	sendS += std::string(4, ' ');          // page[4]
+	sendS += std::string(80, ' ');         // save[80]
+
+	// 캔들 필드 10개 - 줄바꿈 구분, 마지막 탭
+	// 업종(GU_INDEX)은 앞 8개(시가~거래대금)만 "2" 접두이고, 마지막 2개는 권리락/수정비율(5311/5310) 대신
+	// 25256/25257(실측 응답값 137/57 - KOSPI200 200종목 기준 상승/하락 종목수로 추정)로 완전히 다른 필드를 씀
+	static const char* candleFieldsCode[] = {
+		"5302","5034","5029","5030","5031","5023","5027","5028","5311","5310"
+	};
+	static const char* candleFieldsIndex[] = {
+		"25302","25034","25029","25030","25031","25023","25027","25028","25256","25257"
+	};
+	const char** candleFields = (dunit == 2) ? candleFieldsIndex : candleFieldsCode;
+	for (int i = 0; i < 10; i++)
+	{
+		sendS += candleFields[i];
+		sendS += "\n";
+	}
+	sendS += "\t";
+
+	return SendTR("GOOPHOOP", key, US_OOP, sendS.data(), (int)sendS.size(), &CIBKSConnectorCtrl::C_TR1007);
+}
+
 //주식 일별 데이터 
 BOOL CIBKSConnectorCtrl::S_TR1005(int key, LPCSTR code, LPCSTR data)
 {
@@ -2722,6 +2861,17 @@ void CIBKSConnectorCtrl::C_TR1005(WPARAM wParam, LPARAM lParam)
 }
 
 void CIBKSConnectorCtrl::C_TR1006(WPARAM wParam, LPARAM lParam)
+{
+	int key = LOWORD(wParam);
+	int size = HIWORD(wParam);
+	LPCSTR data = (LPCSTR)lParam;
+	CString odat = CString(data, size);
+	odat.TrimRight();
+
+	FireOnRecvData(key, (long)(LPCSTR)odat, odat.GetLength(), false, "");
+}
+
+void CIBKSConnectorCtrl::C_TR1007(WPARAM wParam, LPARAM lParam)
 {
 	int key = LOWORD(wParam);
 	int size = HIWORD(wParam);
@@ -2949,7 +3099,13 @@ BOOL CIBKSConnectorCtrl::TR1006(long key, LPCTSTR val)
 	return AccessTr(eTR1006) ? S_TR1006(key, val) : FALSE;
 }
 
-BOOL CIBKSConnectorCtrl::TR3002(long key, LPCTSTR code, LPCTSTR symb) 
+BOOL CIBKSConnectorCtrl::TR1007(long key, LPCTSTR code, LPCTSTR symb)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+	return AccessTr(eTR1007) ? S_TR1007(key, code, symb) : FALSE;
+}
+
+BOOL CIBKSConnectorCtrl::TR3002(long key, LPCTSTR code, LPCTSTR symb)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 	return AccessTr(eTR3002) ? S_TR3002(key, code, symb) : FALSE;

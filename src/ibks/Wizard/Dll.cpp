@@ -532,6 +532,13 @@ void CDll::OnAxis(struct _axisH* axisH, char* pBytes, int nBytes)
 	struct _auxH*	auxH = nullptr;
 	CString	guide = _T("");
 
+	// CDll never touches CStream::OutStream/SetDataNRM/SetCells - the raw
+	// payload is handed straight to the loaded DLL via WM_USER, so none of
+	// the [3-CClient-...]/[4-OutStream-parse]/[5-SetDataNRM-write] tags fire
+	// for a DLL-backed work area. This is the only trace point for that path.
+	axlog(LOG_DATA, "[CDll-OnAxis-raw] winK=%d unit=%d msgK=%d stat=%d nBytes=%d statAUX=%d",
+		axisH->winK, axisH->unit, axisH->msgK, axisH->stat, nBytes, (axisH->stat & statAUX) ? 1 : 0);
+
 	if (axisH->stat & statAUX)
 	{
 		auxH = (struct _auxH *)pBytes;

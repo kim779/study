@@ -136,6 +136,7 @@ protected:
 public:	//2012.02.13 KSJ 이벤트로 보내면 데이터가 깨져서 직접 메소드 호출함.
 	//void RecvRTS(LPARAM lParam);
 	void	RecvRTSx(LPARAM lParam, int igubn = 0);//2012.01.19 KSJ Alertx 추가
+	void	RecvRTSxDirect(LPARAM lParam);	// DF_NEW_REALPROCESS용 - 지역변수로 즉시 처리
 
 	void	loadcfg();
 	void	loadfield();

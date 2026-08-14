@@ -17,6 +17,7 @@
 #include "InterDomino.h"
 #include "mmsystem.h"
 #include <math.h>
+#include <unordered_set>
 #include "resource.h"
 #include "axMenu.h"
 
@@ -38,35 +39,61 @@ _DLL_SetSignal SignalLib_SetSignal;
 static const std::unordered_map<int, int>& FwdMap()
 {
 	static const std::unordered_map<int, int> m = {
-		{ 23, 323 },
-		{ 24, 324 },
-		{ 27, 327 },
-		{ 28, 328 },
-		{ 29, 329 },
-		{ 30, 330 },
-		{ 31, 331 },
-		{ 32, 332 },
-		{ 33, 333 },
-		{ 36, 336 },
-		{ 41, 341 },
-		{ 51, 351 },
-		{ 61, 361 },
-		{ 71, 371 },
-		{ 101, 301 },
-		{ 104, 304 },
-		{ 106, 306 },
-		{ 109, 309 },
-		{ 146, 346 },
-		{ 181, 381 },
-		{ 111, 311 },
-		{ 112, 312 },
-		{ 115, 315 },
-		{ 116, 316 },
+		{ 23, 223 },
+		{ 24, 224 },
+		{ 27, 227 },
+		{ 28, 228 },
+		{ 29, 229 },
+		{ 30, 230 },
+		{ 31, 231 },
+		{ 32, 232 },
+		{ 33, 233 },
+		{ 36, 236 },
+		{ 41, 240 },
+		{ 51, 250 },
+		{ 61, 261 },
+		{ 71, 271 },
+		{ 101, 201 },
+		{ 104, 204 },
+		{ 106, 206 },
+		{ 109, 209 },
+		{ 146, 246 },
+		{ 181, 281 },
+		{ 111, 211 },
+		{ 112, 212 },
+		{ 115, 215 },
+		{ 116, 216 },
 
 		// ...
 	};
 	return m;
 }
+
+#ifdef DF_SESSION_EXPECT
+// 예상가(동시호가/단일가) 세션ID 목록 - 서버 스펙(2026-08-10 시안) 노란색 셀 기준.
+// TOTAL(통합)은 별도 표가 없어 KRX/NXT 합집합으로 하드코딩 - 누락된 세션ID가 있을 수 있음.
+static const std::unordered_set<int>& KrxExpectSessionSet()
+{
+	static const std::unordered_set<int> s = { 10,11,20,21,30,50,51,52,53,54,80 };
+	return s;
+}
+
+static const std::unordered_set<int>& NxtExpectSessionSet()
+{
+	static const std::unordered_set<int> s = { 20,22,24,26,50,51,52,54 };
+	return s;
+}
+
+static const std::unordered_set<int>& TotalExpectSessionSet()
+{
+	static const std::unordered_set<int> s = [] {
+		std::unordered_set<int> r = KrxExpectSessionSet();
+		r.insert(NxtExpectSessionSet().begin(), NxtExpectSessionSet().end());
+		return r;
+	}();
+	return s;
+}
+#endif
 
 static const std::unordered_map<int, int>& RevMap()
 {
@@ -284,8 +311,29 @@ void CGridWnd::setMemo()
 
 void  CGridWnd::initgridalert()
 {
-	_typeAuto = (BOOL)m_pToolWnd->SendMessage(WM_MANAGE, MK_AUTOEXPECT);	
+	_typeAuto = (BOOL)m_pToolWnd->SendMessage(WM_MANAGE, MK_AUTOEXPECT);
+#ifdef DF_SESSION_EXPECT
+	_marketType = m_pToolWnd->SendMessage(WM_MANAGE, MK_MARKET);
+#endif
 }
+
+#ifdef DF_SESSION_EXPECT
+bool CGridWnd::IsExpectSession() const
+{
+	switch (_marketType)
+	{
+	case 1: // KRX
+		return KrxExpectSessionSet().count(_krxSession) != 0;
+	case 2: // NXT
+		return NxtExpectSessionSet().count(_nxtSession) != 0;
+	case 3: // TOTAL
+	case 4: // NXT/KRX
+	default:
+		return TotalExpectSessionSet().count(_krxSession) != 0
+			|| TotalExpectSessionSet().count(_nxtSession) != 0;
+	}
+}
+#endif
 
 void CGridWnd::HoldDraw() {
 	if (m_grid)
@@ -297,7 +345,7 @@ void CGridWnd::HoldDraw() {
 		m_grid->setVirtualDraw(bVisible);
 		m_grid->setDelay(_pApp->getDelay());
 		m_grid->setReal(true);
-		//m_grid->beginDrawHolding();
+		m_grid->beginDrawHolding();
 		m_grid->setBlinkType(_pApp->getBlinkType());
 		m_grid->setBlinkColor(_pApp->getBlinkColor());
 		m_grid->setMemoType(_pApp->getMemoType());
@@ -2017,7 +2065,10 @@ void CGridWnd::sendTransactionTR(int update, int nStart, int nEnd)
 
 	//중요..  여기서 NXT시장 구분값을 날려줌...
 	const int type = m_pToolWnd->SendMessage(WM_MANAGE, MK_MARKET);
-	sprintf(tempB, "%s%c%d%c", gNXT, P_DELI, type, P_TAB);	// 시장구분자   KRX :1  NXT :2  TOTAL : 3      NXT / KRX : 4 
+#ifdef DF_SESSION_EXPECT
+	_marketType = type;
+#endif
+	sprintf(tempB, "%s%c%d%c", gNXT, P_DELI, type, P_TAB);	// 시장구분자   KRX :1  NXT :2  TOTAL : 3      NXT / KRX : 4
         CopyMemory(&sendB[sendL], tempB, strlen(tempB));
 	sendL += strlen(tempB);
 
@@ -7090,7 +7141,7 @@ int CGridWnd::CheckRealTimeCode(CString code)
 			m_irowCode[ii] = idx->index[ii];
 
 		slog.Format("[IB202200][symbol] [%s] code=[%s] ii=[%d]", __FUNCTION__, code, idx->idxCnt);
-		Output_DebugString(slog);
+		//Output_DebugString(slog);
 
 		return idx->idxCnt;
 	}
@@ -9041,7 +9092,15 @@ void CGridWnd::parsingAlertx(LPARAM lParam)
 			return true;
 		return false;
 	};
-	
+
+#ifdef DF_SESSION_EXPECT
+	// 서버가 실시간 데이터에 매 틱 실어주는 장운영 세션ID(298=KRX,299=NXT). 종목코드와 무관하게 갱신.
+	if (const LPCSTR ptr298 = getDataPtr(298))
+		_krxSession = _ttoi(ptr298);
+	if (const LPCSTR ptr299 = getDataPtr(299))
+		_nxtSession = _ttoi(ptr299);
+#endif
+
 	if (const LPCSTR ptr = getDataPtr(0))
 		strGubn = ptr;
 	
@@ -9251,11 +9310,41 @@ void CGridWnd::parsingAlertx(LPARAM lParam)
 					
 			if (_typeAuto == 0) //자동
 			{
+#ifdef DF_SESSION_EXPECT
+				// 서버 세션ID(298=KRX,299=NXT) 기준으로 실제 동시호가/단일가 구간인지 판단.
+				// rawExpectValue가 남아있어도 세션상 아니면 서버가 안 지워준 것으로 보고 강제로 지운다.
+				if (IsExpectSession())
+				{
+					bTransSymbol = TRUE; // 2012.02.09 KSJ 현재가 심볼이 예상가 심볼로 바껴야함.
+				}
+				else																																				                             
+				{
+					if (oldEXP == "1")
+					{
+						slog.Format("[STUCK_EXPECT][%s] 자동모드, 세션상 예상가 구간 아님(krxSession=%d nxtSession=%d marketType=%d)인데 rawExpectValue=[%s] 남아있어서 강제로 지움",
+							strCode, _krxSession, _nxtSession, _marketType, rawExpectValue);
+						Output_DebugString(slog);
+					}
+					m_grid->SetItemText(xrow, colEXPECT, "0");
+				}
+#else
 				bTransSymbol = TRUE; // 2012.02.09 KSJ 현재가 심볼이 예상가 심볼로 바껴야함.
+#endif
 			}
 			else if(_typeAuto == 1)  //예상
 			{
+#ifdef DF_SESSION_EXPECT
+				if (IsExpectSession())
+				{
+					bTransSymbol = TRUE; // 2012.02.09 KSJ 현재가 심볼이 예상가 심볼로 바껴야함.
+				}
+				else
+				{
+					m_grid->SetItemText(xrow, colEXPECT, "0");
+				}
+#else
 				bTransSymbol = TRUE; // 2012.02.09 KSJ 현재가 심볼이 예상가 심볼로 바껴야함.
+#endif
 			}
 			else
 			{
@@ -9299,7 +9388,7 @@ void CGridWnd::parsingAlertx(LPARAM lParam)
 		_gridHdr xgridHdr{};
 
 		slog.Format("[IB202200][symbol] [%s] newEXP=[%s] bForceDraw=[%d]  bExpect=[%d]", strCode, newEXP, bForceDraw, bExpect);
-		//Output_DebugString(slog);
+		Output_DebugString(slog);
 
 		// 2012.11.08 KSJ 주식과 선물옵션의 심볼값이 똑같은 것이 있다. 외인소진률 같은것.
 		const bool bKospi = (codeLength == 6);

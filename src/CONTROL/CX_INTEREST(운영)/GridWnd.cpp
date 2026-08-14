@@ -18,6 +18,7 @@
 #include "ShowMsgWnd.h"			// ADD PSH 20070918
 #include "mmsystem.h"
 #include <math.h>
+#include <unordered_set>
 #include "resource.h"
 #include "axMenu.h"
 #include "CX_INTERGRID.h"
@@ -34,12 +35,30 @@ static char THIS_FILE[] = __FILE__;
 static const std::unordered_map<int, int>& FwdMap()
 {
 	static const std::unordered_map<int, int> m = {
-		{ 23, 623 }, { 24, 624 }, { 27, 627 }, { 28, 628 },
-		{ 29, 629 }, { 30, 630 }, { 31, 631 }, { 32, 632 },
-		{ 33, 633 }, { 36, 634 }, { 41, 641 }, { 51, 651 },
-		{ 61, 661 }, { 71, 671 }, { 101, 601 }, { 104, 604 },
-		{ 106, 606 }, { 109, 609 }, { 146, 646 }, { 181, 681 },
-		{ 111, 611 }, { 112, 612 }, { 115, 615 }, { 116, 616 },
+		{ 23, 223 },
+		{ 24, 224 },
+		{ 27, 227 },
+		{ 28, 228 },
+		{ 29, 229 },
+		{ 30, 230 },
+		{ 31, 231 },
+		{ 32, 232 },
+		{ 33, 233 },
+		{ 36, 236 },
+		{ 41, 240 },
+		{ 51, 250 },
+		{ 61, 261 },
+		{ 71, 271 },
+		{ 101, 201 },
+		{ 104, 204 },
+		{ 106, 206 },
+		{ 109, 209 },
+		{ 146, 246 },
+		{ 181, 281 },
+		{ 111, 211 },
+		{ 112, 212 },
+		{ 115, 215 },
+		{ 116, 216 },
 	};
 	return m;
 }
@@ -50,6 +69,48 @@ static int ToMapped(int idx)
 	auto it = m.find(idx);
 	return (it != m.end()) ? it->second : idx;
 }
+
+#ifdef DF_SESSION_EXPECT
+// 예상가(동시호가/단일가) 세션ID 목록 - 서버 스펙(2026-08-10 시안) 노란색 셀 기준.
+// TOTAL(통합)은 별도 표가 없어 KRX/NXT 합집합으로 하드코딩 - 누락된 세션ID가 있을 수 있음.
+static const std::unordered_set<int>& KrxExpectSessionSet()
+{
+	static const std::unordered_set<int> s = { 10,11,20,21,30,50,51,52,53,54,80 };
+	return s;
+}
+
+static const std::unordered_set<int>& NxtExpectSessionSet()
+{
+	static const std::unordered_set<int> s = { 20,22,24,26,50,51,52,54 };
+	return s;
+}
+
+static const std::unordered_set<int>& TotalExpectSessionSet()
+{
+	static const std::unordered_set<int> s = [] {
+		std::unordered_set<int> r = KrxExpectSessionSet();
+		r.insert(NxtExpectSessionSet().begin(), NxtExpectSessionSet().end());
+		return r;
+	}();
+	return s;
+}
+
+bool CGridWnd::IsExpectSession() const
+{
+	switch (_marketType)
+	{
+	case 1: // KRX
+		return KrxExpectSessionSet().count(_krxSession) != 0;
+	case 2: // NXT
+		return NxtExpectSessionSet().count(_nxtSession) != 0;
+	case 3: // TOTAL
+	case 4: // NXT/KRX
+	default:
+		return TotalExpectSessionSet().count(_krxSession) != 0
+			|| TotalExpectSessionSet().count(_nxtSession) != 0;
+	}
+}
+#endif
 
 CGridWnd::CGridWnd(CWnd* pMainWnd, int nIndex) : CBaseWnd(pMainWnd)
 {
@@ -2380,8 +2441,11 @@ void CGridWnd::SendWhenVisibleModeTR(CGridData* sdata, int nStart, int nEnd, int
 	//
 
 	int type = m_pMainWnd->SendMessage(WM_MANAGE, MK_MARKET);
+#ifdef DF_SESSION_EXPECT
+	_marketType = type;
+#endif
 	// 중요..  여기서 NXT시장 구분값을 날려줌...
-	sprintf(tempB, "%s%c%d%c", gNXT, P_DELI, type, P_TAB);				// 시장구분자   KRX :1 NXT :2  TOTAL : 3  NXT / KRX : 4 
+	sprintf(tempB, "%s%c%d%c", gNXT, P_DELI, type, P_TAB);				// 시장구분자   KRX :1 NXT :2  TOTAL : 3  NXT / KRX : 4
 	CopyMemory(&sendB[sendL], tempB, strlen(tempB));
 	sendL += strlen(tempB);
 
@@ -2596,8 +2660,11 @@ void CGridWnd::sendTransactionTR(int update,int nStart,int nEnd)
 	//
 
 	int type = m_pMainWnd->SendMessage(WM_MANAGE, MK_MARKET);
+#ifdef DF_SESSION_EXPECT
+	_marketType = type;
+#endif
 	// 중요..  여기서 NXT시장 구분값을 날려줌...
-	sprintf(tempB, "%s%c%d%c", gNXT, P_DELI, type, P_TAB);				// 시장구분자   KRX :1 NXT :2  TOTAL : 3  NXT / KRX : 4 
+	sprintf(tempB, "%s%c%d%c", gNXT, P_DELI, type, P_TAB);				// 시장구분자   KRX :1 NXT :2  TOTAL : 3  NXT / KRX : 4
 	CopyMemory(&sendB[sendL], tempB, strlen(tempB));
 	sendL += strlen(tempB);
 
@@ -8026,8 +8093,11 @@ void  CGridWnd::initgridalert(bool bSend)
 
 	if (bSend)
 	{
-		_bManual    = (BOOL)m_pToolWnd->SendMessage(WM_MANAGE, MK_EXPECT);	
-		_bAutoCheck = (BOOL)m_pToolWnd->SendMessage(WM_MANAGE, MK_AUTOEXPECT);	
+		_bManual    = (BOOL)m_pToolWnd->SendMessage(WM_MANAGE, MK_EXPECT);
+		_bAutoCheck = (BOOL)m_pToolWnd->SendMessage(WM_MANAGE, MK_AUTOEXPECT);
+#ifdef DF_SESSION_EXPECT
+		_marketType = m_pMainWnd->SendMessage(WM_MANAGE, MK_MARKET);
+#endif
 	}
 }
 
@@ -8086,6 +8156,14 @@ void CGridWnd::parsingAlertx(LPARAM lParam)
 		return false;
 	};
 	// ─────────────────────────────────────────────────────────
+
+#ifdef DF_SESSION_EXPECT
+	// 서버가 실시간 데이터에 매 틱 실어주는 장운영 세션ID(298=KRX,299=NXT). 종목코드와 무관하게 갱신.
+	if (hasData(298))
+		_krxSession = _ttoi(getData(298));
+	if (hasData(299))
+		_nxtSession = _ttoi(getData(299));
+#endif
 
 	if (hasData(0))
 		strGubn = getData(0);
@@ -8210,11 +8288,41 @@ void CGridWnd::parsingAlertx(LPARAM lParam)
 				// _typeAuto==2 (수동): !_bManual && !_bAutoCheck
 				if (_bManual)					// _typeAuto == 1 (예상)
 				{
+#ifdef DF_SESSION_EXPECT
+					// 서버 세션ID(298=KRX,299=NXT) 기준으로 실제 동시호가/단일가 구간인지 판단.
+					// rawExpectValue가 남아있어도 세션상 아니면 서버가 안 지워준 것으로 보고 강제로 지운다.
+					if (IsExpectSession())
+					{
+						bTransSymbol = TRUE;
+					}
+					else
+					{
+						m_grid->SetItemText(xrow, colEXPECT, "0");
+					}
+#else
 					bTransSymbol = TRUE;
+#endif
 				}
 				else if (_bAutoCheck)			// _typeAuto == 0 (자동)
 				{
+#ifdef DF_SESSION_EXPECT
+					if (IsExpectSession())
+					{
+						bTransSymbol = TRUE;
+					}
+					else
+					{
+						if (oldEXP == "1")
+						{
+							slog.Format("[STUCK_EXPECT][%s] 자동모드, 세션상 예상가 구간 아님(krxSession=%d nxtSession=%d marketType=%d)인데 rawExpectValue=[%s] 남아있어서 강제로 지움",
+								strCode, _krxSession, _nxtSession, _marketType, rawExpectValue);
+							Output_DebugString(slog);
+						}
+						m_grid->SetItemText(xrow, colEXPECT, "0");
+					}
+#else
 					bTransSymbol = TRUE;
+#endif
 				}
 				else							// _typeAuto == 2 (수동) - 예상가 표시 안함
 				{
@@ -8298,6 +8406,10 @@ void CGridWnd::parsingAlertx(LPARAM lParam)
 
 				if (symbol.GetLength() >= 3)
 					symbol = symbol.Right(3);
+
+				//외인소진율은 실시간이 아니다. (IB202700과 동일하게 실시간 처리에서 컬럼 자체를 건너뜀)
+				if (symbol == "204")
+					continue;
 
 				if (!bTransSymbol)
 				{

@@ -167,6 +167,9 @@ void CMainWnd::CheckRTSTimer(bool bFirst)
 		else  //최초 화면 오픈하였을 경우
 		{
 			m_iTime = iTime;
+#ifdef DF_RTS_TIMER
+			SetTimer(TM_RTSTIME, m_iTime, nullptr);
+#endif
 		}
 
 		ichk = GetPrivateProfileInt("CUSTOMER", "Real", 0, filePath);
@@ -207,6 +210,9 @@ void CMainWnd::CheckRTSTimer(bool bFirst)
 				else  //최초 화면 오픈하였을 경우
 				{
 					m_iTime = iTime;
+#ifdef DF_RTS_TIMER
+					SetTimer(TM_RTSTIME, m_iTime, nullptr);
+#endif
 				}
 
 				ichk = GetPrivateProfileInt("SCUSTOMER", "Real", 0, filePath);
@@ -229,7 +235,11 @@ void CMainWnd::CheckRTSTimer(bool bFirst)
 	else  //최초 화면 오픈하였을 경우
 	{
 		m_iTime = iTime;
+#ifdef DF_RTS_TIMER
+		SetTimer(TM_RTSTIME, m_iTime, nullptr);
+#else
 		//SetTimer(TM_RTSTIME, m_iTime, nullptr);
+#endif
 	}
 	ichk = GetPrivateProfileInt("CUSTOMER", "Real", 0, filePath);
 	if (ichk)
@@ -1055,11 +1065,20 @@ LONG CMainWnd::OnUser(WPARAM wParam, LPARAM lParam)
 		}
 		else
 		{
+#ifdef DF_RTS_TIMER
+			if (m_iTime > 0)
+				RTS_RecvRTSx(lParam);		// 캐시에 저장, TM_RTSTIME 타이머에서 flush
+			else
+				m_pGroupWnd->RecvRTSxDirect(lParam);	// 실시간 설정(0ms)이면 즉시처리
+#elif defined(DF_NEW_REALPROCESS)
+			m_pGroupWnd->RecvRTSxDirect(lParam);
+#else
 			m_pGroupWnd->initAlert();
 			AxStd::async([this, lParam]() {
 				m_pGroupWnd->RecvRTSx(lParam);
 				});
 			m_pGroupWnd->UpdateDraw();
+#endif
 		}
 	
 		
@@ -2045,8 +2064,79 @@ void CMainWnd::OnTimer(UINT nIDEvent)
 		if (m_bDominoToolWnd && m_pToolWnd != nullptr)
 			m_pToolWnd->SendMessage(WM_MANAGE, MAKEWPARAM(MK_SELECTGROUP, (LPARAM)m_nGroupIndex));
 	}
+#ifdef DF_RTS_TIMER
+	else if (nIDEvent == TM_RTSTIME)
+	{
+		if (m_pGroupWnd != nullptr && !_mapRealData.empty())
+		{
+			for (auto& kv : _mapRealData)
+			{
+				_Ralert* pval = kv.second.get();
+
+				DWORD data[999]{};
+				for (int ii = 0; ii < 999; ++ii)
+				{
+					if (pval->ptr[ii])
+						data[ii] = reinterpret_cast<DWORD>(pval->ptr[ii].get());
+				}
+
+				_alertR alertR{};
+				alertR.code = pval->code.c_str();
+				alertR.stat = pval->stat;
+				alertR.size = pval->size;
+				alertR.ptr[0] = reinterpret_cast<DWORD>(data);
+
+				m_pGroupWnd->RecvRTSxDirect(reinterpret_cast<LPARAM>(&alertR));
+			}
+			_mapRealData.clear();
+		}
+	}
+#endif
 	CWnd::OnTimer(nIDEvent);
 }
+
+#ifdef DF_RTS_TIMER
+// DF_RTS_TIMER용 - raw data[] 슬롯(0~998)을 있는 그대로 깊은복사해서 캐시에 저장.
+// 어떤 슬롯이 어떤 필드를 의미하는지(w/bNeedMap, FwdMap 매핑)는 전혀 판단하지 않는다 -
+// TM_RTSTIME 타이머(OnTimer)에서 flush되며, flush 시 기존 parsingAlertx()를 그대로
+// 재사용하므로 해석은 100% parsingAlertx()가 담당한다.
+void CMainWnd::RTS_RecvRTSx(LPARAM lParam)
+{
+	if (m_pGroupWnd == nullptr)
+		return;
+
+	const auto* alertR = reinterpret_cast<const _alertR*>(lParam);
+	if (alertR == nullptr)
+		return;
+
+	const DWORD* data = reinterpret_cast<const DWORD*>(alertR->ptr[0]);
+	if (data == nullptr)
+		return;
+
+	const std::string scode = CStringA(alertR->code);
+
+	auto it = _mapRealData.find(scode);
+	if (it == _mapRealData.end())
+	{
+		auto res = _mapRealData.emplace(scode, std::make_unique<_Ralert>());
+		it = res.first;
+		it->second->code = scode;
+	}
+	it->second->stat = alertR->stat;
+	it->second->size = alertR->size;
+
+	for (int ii = 0; ii < 999; ++ii)
+	{
+		const char* pdata = reinterpret_cast<const char*>(data[ii]);
+		if (pdata == nullptr)
+			continue;
+
+		const size_t len = strlen(pdata) + 1;
+		it->second->ptr[ii] = std::make_unique<char[]>(len);
+		memcpy(it->second->ptr[ii].get(), pdata, len);
+	}
+}
+#endif
 
 //////////////////////////////////////////////////////////////////////////
 //장운영시간 조회

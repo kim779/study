@@ -1773,6 +1773,10 @@ void CGroupWnd::ExpectOper(int param)
 	{
 		m_GridWnd[0]->SendMessage(WM_MANAGE, MK_SENDTR);
 	}
+
+	// DF_NEW_REALPROCESS로 실시간 틱마다의 initAlert() 호출을 제거했기 때문에,
+	// 토글 시점에 _bManual/_bAutoCheck를 갱신해주지 않으면 실시간 갱신 시 낡은 값으로 되돌아간다.
+	initAlert();
 }
 
 void CGroupWnd::ChangeFieldOper(int param)
@@ -1806,8 +1810,12 @@ void CGroupWnd::AutoExpectOper(int param)
 {
 	for ( int ii = 0 ; ii < m_nGroup ; ii++ )
 	{
-		m_GridWnd[ii]->toggleAction(false);	
+		m_GridWnd[ii]->toggleAction(false);
 	}
+
+	// DF_NEW_REALPROCESS로 실시간 틱마다의 initAlert() 호출을 제거했기 때문에,
+	// 토글 시점에 _bManual/_bAutoCheck를 갱신해주지 않으면 실시간 갱신 시 낡은 값으로 되돌아간다.
+	initAlert();
 }
 
 
@@ -2313,6 +2321,32 @@ void CGroupWnd::UpdateDraw()
 		pGridWnd->UpdateDraw();
 	});
 	_cacheGrid.clear();
+}
+
+// DF_NEW_REALPROCESS용 - _cacheGrid 멤버 대신 지역변수로 처리해서
+// RecvRTSx()+UpdateDraw() 두 단계로 나뉘어 있던 것을 한 번에 끝냄
+void CGroupWnd::RecvRTSxDirect(LPARAM lParam)
+{
+	if (m_nGroup == 0)
+		return;
+
+	std::vector<CGridWnd*> cacheGrid;
+
+	const auto* alertR = reinterpret_cast<const _alertR*>(lParam);
+	const CString code  = alertR->code;
+
+	for_each_n(m_GridWnd.begin(), m_nGroup, [this, code, &cacheGrid](const auto& gridWnd) {
+		if (gridWnd->IsCode(code))
+			cacheGrid.push_back(gridWnd.get());
+	});
+
+	for_each(cacheGrid.begin(), cacheGrid.end(), [lParam](CGridWnd* pGridWnd) {
+		pGridWnd->parsingAlertx(lParam);
+	});
+
+	for_each(cacheGrid.begin(), cacheGrid.end(), [](CGridWnd* pGridWnd) {
+		pGridWnd->UpdateDraw();
+	});
 }
 
 

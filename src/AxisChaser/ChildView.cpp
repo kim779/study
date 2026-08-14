@@ -139,6 +139,8 @@ BEGIN_MESSAGE_MAP(CChildView,CWnd )
 	ON_BN_CLICKED(IDC_CHK_RANGE, OnClickedChkRange)
 	ON_EN_CHANGE(IDC_EDIT_LOGFILE, OnChangeEditLogFile)
 	ON_BN_CLICKED(IDC_BTN_LOGOPEN, OnClickedBtnLogOpen)
+	ON_BN_CLICKED(IDC_BTN_LOGFOLDER, OnClickedBtnLogFolder)
+	ON_BN_CLICKED(IDC_BTN_LOGCLEAR, OnClickedBtnLogClear)
 	ON_BN_CLICKED(IDC_CHK_LOGENABLE, OnClickedChkLogEnable)
 	//}}AFX_MSG_MAP
 	ON_MESSAGE(WM_RECEIVE, OnReceive)
@@ -198,6 +200,37 @@ void CChildView::OnClickedBtnLogOpen()
 	HINSTANCE h = ShellExecute(m_hWnd, "open", m_logFilePath, NULL, NULL, SW_SHOWNORMAL);
 	if ((INT_PTR)h <= 32)
 		::MessageBox(m_hWnd, "Cannot open file: " + m_logFilePath, "Axis Chaser", MB_ICONWARNING);
+}
+
+void CChildView::OnClickedBtnLogFolder()
+{
+	if (m_logFilePath.IsEmpty())	return;
+
+	CString folder = m_logFilePath;
+	int pos = folder.ReverseFind('\\');
+	if (pos != -1)
+		folder = folder.Left(pos);
+
+	HINSTANCE h = ShellExecute(m_hWnd, "open", folder, NULL, NULL, SW_SHOWNORMAL);
+	if ((INT_PTR)h <= 32)
+		::MessageBox(m_hWnd, "Cannot open folder: " + folder, "Axis Chaser", MB_ICONWARNING);
+}
+
+void CChildView::OnClickedBtnLogClear()
+{
+	if (m_logFilePath.IsEmpty())	return;
+
+	if (::MessageBox(m_hWnd, "Delete and recreate as an empty file?\n" + m_logFilePath,
+		"Axis Chaser", MB_ICONQUESTION | MB_YESNO) != IDYES)
+		return;
+
+	DeleteFile(m_logFilePath);
+
+	CFile f;
+	if (f.Open(m_logFilePath, CFile::modeCreate | CFile::modeWrite))
+		f.Close();
+	else
+		::MessageBox(m_hWnd, "Cannot create file: " + m_logFilePath, "Axis Chaser", MB_ICONWARNING);
 }
 
 BOOL CChildView::PreCreateWindow(CREATESTRUCT& cs) 
@@ -347,13 +380,21 @@ int CChildView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	CRect rcLogOpen(384, 62, 444, 84);
 	m_btnLogOpen.Create(_T("OPEN"), WS_CHILD | WS_VISIBLE, rcLogOpen, this, IDC_BTN_LOGOPEN);
 
-	CRect rcLogEnable(448, 62, 580, 84);
+	CRect rcLogFolder(448, 62, 508, 84);
+	m_btnLogFolder.Create(_T("FOLDER"), WS_CHILD | WS_VISIBLE, rcLogFolder, this, IDC_BTN_LOGFOLDER);
+
+	CRect rcLogClear(512, 62, 572, 84);
+	m_btnLogClear.Create(_T("CLEAR"), WS_CHILD | WS_VISIBLE, rcLogClear, this, IDC_BTN_LOGCLEAR);
+
+	CRect rcLogEnable(576, 62, 708, 84);
 	m_chkLogEnable.Create(_T("Log SND/RCV"),
 		WS_CHILD | WS_VISIBLE | BS_AUTOCHECKBOX,
 		rcLogEnable, this, IDC_CHK_LOGENABLE);
 
 	m_editLogFile.SetFont(GetFont());
 	m_btnLogOpen.SetFont(GetFont());
+	m_btnLogFolder.SetFont(GetFont());
+	m_btnLogClear.SetFont(GetFont());
 	m_chkLogEnable.SetFont(GetFont());
 
 	char logBuf[512];
@@ -420,8 +461,12 @@ void CChildView::OnSize(UINT nType, int cx, int cy)
 		m_editLogFile.MoveWindow(margin, row3Y, logEditWidth, ctrlHeight);
 	if (m_btnLogOpen.GetSafeHwnd())
 		m_btnLogOpen.MoveWindow(margin + logEditWidth + margin, row3Y, logBtnWidth, ctrlHeight);
+	if (m_btnLogFolder.GetSafeHwnd())
+		m_btnLogFolder.MoveWindow(margin + logEditWidth + margin + logBtnWidth + margin, row3Y, logBtnWidth, ctrlHeight);
+	if (m_btnLogClear.GetSafeHwnd())
+		m_btnLogClear.MoveWindow(margin + logEditWidth + margin + logBtnWidth + margin + logBtnWidth + margin, row3Y, logBtnWidth, ctrlHeight);
 	if (m_chkLogEnable.GetSafeHwnd())
-		m_chkLogEnable.MoveWindow(margin + logEditWidth + margin + logBtnWidth + margin, row3Y, 130, ctrlHeight);
+		m_chkLogEnable.MoveWindow(margin + logEditWidth + margin + logBtnWidth + margin + logBtnWidth + margin + logBtnWidth + margin, row3Y, 130, ctrlHeight);
 
 	if (m_trace.GetSafeHwnd())
 	{

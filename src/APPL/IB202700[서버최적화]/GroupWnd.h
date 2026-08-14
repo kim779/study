@@ -136,6 +136,7 @@ protected:
 
 public:						     	// 2012.02.13 KSJ 이벤트로 보내면 데이터가 깨져서 직접 메소드 호출함.
 	void RecvRTSx(LPARAM lParam);
+	void RecvRTSxDirect(LPARAM lParam);	// DF_NEW_REALPROCESS용 - _cacheGrid 멤버 없이 지역변수로 즉시 처리
 	void SelectOper();
 	void UpdateDraw();
 

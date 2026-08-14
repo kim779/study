@@ -1,5 +1,202 @@
 # 디버그 로그 가이드 (axlog)
 
+## 전체 로그 키워드 목록 (DebugView 등록용)
+
+이 문서에서 다루는 모든 로그 태그를 그대로 나열합니다. DebugView의 Highlight/Bookmark에 하나씩 추가해두는 용도. 각 태그의 상세 의미·주의사항은 아래 색인 표에서 절 번호를 찾아 본문 참고. `CxScreen::_`/`CxSystem::_`/`CScript::On`처럼 접두사만 적은 항목은 그 뒤에 붙는 여러 구체 메서드명(`_Send`/`_ChangeTR`/`OnClick`/`OnChange` 등)을 한 번에 잡기 위한 substring 필터임. 10절(`COnTimer`)은 죽은 코드라 실제로 안 찍히므로 목록에서 제외.
+
+**카테고리 (필수, 1절)**
+```
+[WIZARD][INIT]
+[WIZARD][EVENT]
+[WIZARD][DATA]
+[WIZARD][RTM]
+[WIZARD][SCRIPT]
+[WIZARD][AXISFORM]
+```
+
+**화면 열기/구조 (2절)**
+```
+axAttach
+CClient::Attach-enter
+CClient::Attach-timing
+CClient::Attach-total
+CScreen::ctor
+CScreen::dtor
+CScreen::Parse
+[SCREEN-TREE]
+setFDC
+```
+
+**스크립트 엔진 내부 (3절, LOG_SCRIPT)**
+```
+LoadScript OK
+LoadScript FAILED
+DoSomething
+getIDOfProcedure
+DoProcedure(1)
+DoProcedure(2)
+CEngineWrapper::LoadScript
+[Initialize]
+[AddObject]
+[IsAvailable]
+[DoProcedure]
+[fetchError]
+CxScreen::_
+CxSystem::_
+```
+
+**이벤트→스크립트 프로시저 디스패치 (4절)**
+```
+CScript::On
+CScript::Procedure
+```
+
+**입력 이벤트 — 마우스/키보드/클립보드 (5절)**
+```
+CMouse::OnDown
+CKey::OnKey
+VK_RETURN->InStream
+Ctrl+1/2/3
+CKey::OnChar
+blocked by IsWait
+CKey::Copy$Paste
+CGuard::SetClipboard
+CGuard::GetClipboard
+```
+
+**소켓 데이터 파이프라인 (6절)**
+```
+[OnTRAN-gate]
+[MakeStream-waitSN-drop]
+[0-MakeStream-send]
+[0-GetDataNRM-field]
+[0-GetDataNRM-grid]
+[0-GetDataNRM-cell]
+[0-Write-send]
+[1-OnAxis-raw]
+[2-OnStream-reassemble]
+[3-CClient-OnAxis-reassembled]
+[4-OutStream-parse]
+[SetDataH]
+[SetDataH-ledger]
+[5-SetDataNRM-write]
+[6-SetCells
+[UpdateRTM-write]
+[ATTACH]
+[MISMATCH]
+CGuard::Write
+```
+
+**CDll 기반 화면 (7절)**
+```
+CDll::Attach
+loaded via axCreate
+DllProc WM_USER
+DllProc WM_SIZE
+[CDll-OnAxis-raw]
+```
+
+**로그인/인증 · OLE 드래그앤드롭 · DDE (8절)**
+```
+CWizardCtrl::RunAxis
+CGuard::Login
+CGuard::Certify
+CGuard::OnCertify
+CGuard::CertifyId
+COleDrop::OnDrop
+COleDrop::Register
+COleDropEx::Drop
+COleDropEx::Register
+COleDropEx::Revoke
+CDde::OnDDE
+CDde::OnAdvise
+CDde::OnExit
+```
+
+**스크립트 타이머 (10.5절, 실제 동작 경로)**
+```
+CallProc WM_TIMER TM_VB
+CClient::SetTimer
+```
+
+**axisform.dll 컨트롤 레이어 (11절, LOG_AXISFORM)**
+```
+CfmEdit::_Trigger
+CfmEdit::Draw
+CfmEdit::OnLButton
+CfmEdit::SetFocus
+CfmEdit::UpdateData
+CfmEdit::InsertData
+CfmEdit::getStartPos
+CfmBase::ReadData
+CfmBase::WriteData
+```
+
+**암호화/복호화 — Xecure, NOENC.TXT (12절)**
+```
+[Xecure]
+IsNoEncMode
+```
+
+---
+
+## 색인 — 태그/절 빠른 찾기
+
+전체를 읽지 않고 원하는 로그 태그나 상황부터 바로 찾기 위한 표. 상세 설명·조건·주의사항은 각 절 본문 참고.
+
+| 절 | 주제 | 핵심 태그/키워드 |
+|---|---|---|
+| 1 | axlog 인프라, 카테고리 on/off | `LOG_INIT` / `LOG_EVENT` / `LOG_DATA` / `LOG_RTM` / `LOG_SCRIPT`(OFF) / `LOG_AXISFORM`(OFF) |
+| 2 | 화면 열기(Attach→Parse) 타이밍 | `CClient::Attach-enter/timing/total`, `CScreen::ctor`/`dtor`, `CScreen::Parse`(`-timing`), `[SCREEN-TREE]`, `CWizardCtrl::axWizard setFDC` |
+| 3 | 스크립트 엔진 내부(VBS/Python), `LOG_SCRIPT` | `getIDOfProcedure`, `DoProcedure(1)/(2)`(`LOG_EVENT`), `CEngineWrapper::LoadScript scpKind=`, Python `[Initialize]`/`[AddObject]`/`[IsAvailable]`/`[DoProcedure]`/`[fetchError]`, `CxScreen::_Send`/`_ChangeTR`/`_CreateWindow`/`_Proc`/`_SetTimer` 등, `CxSystem::_Trigger`/`_Trace`/`_CheckPasswd` 등 |
+| 4 | 이벤트→스크립트 프로시저 디스패치(`CScript`) | `CScript::OnStart`/`OnFocus`/`OnClose`/`OnTimer`/`OnKey`/`OnClick`/`OnChange`/`OnProcedure`/`Procedure` 등 (`OnAlert`는 죽은코드, 로그 없음) |
+| 5 | 입력 이벤트(마우스/키보드/클립보드) | `CMouse::OnDown`, `CKey::OnKey`(+`VK_RETURN->InStream`, +`Ctrl+1/2/3 fallback`), `CKey::OnChar`(+`blocked by IsWait`), `CKey::Copy$Paste`, `CGuard::SetClipboard`/`GetClipboard` |
+| 6 | 소켓 데이터 파이프라인(송수신, 번호순 실행) | `[OnTRAN-gate]`, `[MakeStream-waitSN-drop]`, `[0-MakeStream-send]`, `[0-GetDataNRM-field/grid/cell]`, `[0-Write-send]`, `[1-OnAxis-raw]`, `[2-OnStream-reassemble]`, `[3-CClient-OnAxis-reassembled]`, `[4-OutStream-parse]`, `[SetDataH]`/`[SetDataH-ledger]`, `[5-SetDataNRM-write]`, `[6-SetCells-*]`, `[UpdateRTM-write]`, `CGuard::Write(1)/(2)` |
+| 7 | `CDll` 기반 화면(외부 DLL 로드형) | `CDll::Attach`, `loaded via axCreate/axCreateEx/axCreateX`, `DllProc WM_USER/WM_SIZE`, `[CDll-OnAxis-raw]`(`OutStream`을 안 타는 화면의 유일한 추적점) |
+| 8 | 로그인/인증, OLE 드래그앤드롭, DDE | `CWizardCtrl::RunAxis`, `CGuard::Login`/`Certify`/`OnCertify`/`CertifyId`, `COleDrop::OnDrop`/`Register`, `COleDropEx::Drop`/`Register`/`Revoke`, `CDde::OnDDE`/`OnAdvise`/`OnExit` |
+| 9 | 화면 열고닫으며 확인할 체크리스트 | (태그 없음, 진단 순서 안내) |
+| 10 | `COnTimer` 워커스레드 — **죽은 코드, 실제로 안 찍힘** | `COnTimer::Startup`/`Dispatch`/`Run`/`DoParse`/`Cleanup` (참고용으로만 남김) |
+| 10.5 | 스크립트 타이머(`Screen.SetTimer`/`SetTimerX`, 실제 동작 경로) | `CallProc WM_TIMER TM_VB`/`TM_VBx`, `CClient::SetTimer id=... result=...`(등록 성공여부) |
+| 11 | axisform.dll 컨트롤 렌더링/입력(`LOG_AXISFORM`, OFF) | `CfmEdit::Draw`/`SetFocus`/`UpdateData`/`InsertData`/`getStartPos`/`_Trigger`/`OnLButton`, `CfmBase::ReadData`/`WriteData [combo]` |
+| 12 | 암호화/복호화(Xecure), `NOENC.TXT` 개발스위치 | `CGuard::Initial m_xecure CreateControl`, `[Xecure] helper=ENC/DEC nBytesIn/nBytesOut/retv`, `[Xecure] helper=... SKIPPED`, `[Xecure] IsNoEncMode check path/result`, `[Xecure] decrypt FAILED` |
+| 13 | 관련 문서 링크 | (태그 없음) |
+
+### 증상별 시작점
+
+| 증상 | 먼저 볼 곳 |
+|---|---|
+| 특정 화면의 소켓 수신 로그(`[4-OutStream-parse]` 등)가 전혀 안 보임 | 7절 — `CDll` 기반 화면이면 `OutStream` 자체를 안 타고 `[CDll-OnAxis-raw]`만 찍힘 |
+| `Screen.Send()`를 불렀는데 실제 송신이 안 됨 | 6절 `[OnTRAN-gate]`/`[MakeStream-waitSN-drop]` — 응답 대기중(`waitSN`)이면 조용히 버려짐 |
+| 타이머가 한 번만 돌고 이후 멈춤/아예 안 됨 | 10.5절 "진단 순서" 4단계 체크리스트 |
+| 로그에 평문이 아니라 암호화된 바이트만 보임 | 12절 `NOENC.TXT` — 개발용으로 요청/응답 암호화를 통째로 끌 수 있음 |
+| Ctrl+C/V가 안 먹힘 | 5절 `Copy$Paste`(+`docs/KnowledgeBase.md` 13절, OS 레벨 차단 이슈) |
+| 화면 열기가 느림 | 2절 `[CClient::Attach-timing]`으로 단계별 소요시간 확인 (9절 체크리스트 1번) |
+| 스크립트 이벤트가 실행 안 됨 | 4절(디스패치 자체가 됐는지) → 3절 `IsAvailable`(프로시저가 정의됐는지) |
+
+### 추천 DebugView 필터/북마크 세트
+
+카테고리 필터(`[WIZARD][INIT/EVENT/DATA/SCRIPT]`, `[RTM]`)에 더해, 아래 태그들을 북마크/하이라이트로 추가해두면 상황별로 찾기 편하다.
+
+**소켓/송수신 (6절)**
+- `[0-Write-send]` 또는 `CGuard::Write` — 실제로 소켓에 나가는 바이트 원문(청크단위). `MakeStream`은 "보내려는 시도"까지고, 이건 "진짜 나갔다"의 최종 확인 지점.
+- `[MakeStream-waitSN-drop]` — `MakeStream` 키워드에 이미 포함돼서 잡히지만, 따로 하이라이트해두면 "Send 호출했는데 응답대기(`waitSN`) 때문에 조용히 버려진" 케이스를 한눈에 구분 가능.
+- `[CDll-OnAxis-raw]` — `CDll` 기반 화면(예: 9524)은 `OutStream`/`SetDataNRM` 계열 로그가 아예 안 찍히는데, 이게 그 화면들의 유일한 수신 흔적.
+
+**암호화 (12절)**
+- `[Xecure]` — 암/복호화 호출마다(`helper=ENC/DEC`, `nBytesIn/nBytesOut/retv`) 찍힘. `NOENC.TXT` 스위치 상태 확인(`IsNoEncMode check ... result=`)도 이걸로 잡힘.
+
+**스크립트 디스패치 (3~4절) — "이벤트는 도는데 스크립트가 안 도네" 진단용**
+- `CScript::On` — 어떤 이벤트가 어느 맵의 어느 프로시저(`AX_*_On*_AX_`)로 매핑됐는지(4절). `getIDOfProcedure`보다 한 단계 앞선 지점이라, 여기부터 보면 "디스패치 자체가 안 됐다"와 "디스패치는 됐는데 함수가 없다"(`getIDOfProcedure`/`IsAvailable`)를 구분하기 쉬움.
+- `IsAvailable` — Python 엔진 쪽도 `[IsAvailable]` 태그로 찍혀서 VBS/Python 양쪽 다 이걸로 걸림.
+
+**화면 열기/구조 (2절)**
+- `CClient::Attach` — 열기 시작~단계별 시간~총 소요시간이 전부 이 키워드로 잡힘(`enter`/`timing`/`total`).
+- `[SCREEN-TREE]` — 부모맵이 어느 서브맵을 어느 컨트롤에 임베딩했는지, 하이라이트해두면 화면 구조를 로그만으로 재구성 가능.
+
+우선순위 추천: `[Xecure]`(그동안 전혀 안 잡히고 있던 영역)와 `CGuard::Write`(실제 송신 바이트 확인) 두 개가 가장 가치가 큼.
+
+---
+
 ## 문서 목적
 
 2026-07-26 세션에서 도입한 중앙 로깅 인프라(`h/axlog.h`)와, 그날 하루 동안 추가한 모든 진단 로그의 위치·의미·태그를 정리합니다.
@@ -174,6 +371,7 @@ DebugView(또는 DebugView++)의 "Find" 창에 아래 태그를 넣어 검색하
 | `loaded via axCreate / axCreateEx / axCreateX` | `Dll.cpp` | 세 가지 DLL 진입점 중 실제로 성공한 것 |
 | `DllProc WM_USER cmd=...` | `Dll.cpp` | 로드된 DLL이 부모(Wizard)에게 서비스 요청(자식→부모 콜백) |
 | `DllProc WM_SIZE propagate` | `Dll.cpp` | 부모 리사이즈를 자식 DLL 윈도우에 수동 전파 |
+| `[CDll-OnAxis-raw] winK=... unit=... msgK=... stat=... nBytes=... statAUX=...` | `Dll.cpp` (`CDll::OnAxis`, 2026-07-31 추가) | **`CDll` 기반 작업영역의 유일한 수신 트레이스 지점.** `CClient::OnAxis`와 달리 `CStream::OutStream`/`SetDataNRM`/`SetCells`를 전혀 안 타고, 받은 바이트를 그대로 `WM_USER`로 로드된 DLL에 던진다 — 그래서 이 화면 유형은 `[4-OutStream-parse]`/`[5-SetDataNRM-write]` 같은 로그가 원천적으로 안 찍힌다. `[1-OnAxis-raw]`(`CWizardCtrl::OnAxis`)/`[2-OnStream-reassemble]`(`CWorks::OnStream`)까지는 `CClient`/`CDll` 공통 경로라 똑같이 찍히고, 그 다음 갈라지는 지점이 바로 여기다. AxisChaser에서는 정상적으로 보이는데 axlog에서 `[4-...]`/`[5-...]` 이후가 안 보이면 이 로그가 찍히는지부터 확인할 것 — 찍힌다면 그 화면은 `CDll` 기반이라 실제 필드 파싱은 이 DLL 내부에서 일어나며(현재 미조사, `@docs/MigrationSpec_SocketToDrawing.md` 9절), Wizard 쪽 axlog로는 더 깊이 들어갈 수 없다 |
 
 ---
 
