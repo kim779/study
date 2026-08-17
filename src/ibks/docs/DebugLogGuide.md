@@ -195,6 +195,38 @@ IsNoEncMode
 
 우선순위 추천: `[Xecure]`(그동안 전혀 안 잡히고 있던 영역)와 `CGuard::Write`(실제 송신 바이트 확인) 두 개가 가장 가치가 큼.
 
+### 컨트롤 `kind` 코드 표 (참고용, `builder/h/form.h` 확정)
+
+`[0-GetDataNRM-field]`/`[5-SetDataNRM-write]`/`[ATTACH]` 등 로그에 찍히는 `kind=` 숫자는 그 필드/컨트롤의 종류(`CfmBase` 파생 클래스, `@docs/AxisformArchitecture.md` 참고)를 나타낸다. 전체 21종:
+
+| kind | 상수 | 종류 |
+|---|---|---|
+| 1 | `FM_SYS` | 시스템 정보 |
+| 2 | `FM_LABEL` | 레이블 |
+| 3 | `FM_BOX` | 박스/테두리 |
+| 4 | `FM_GROUP` | 그룹박스 |
+| 5 | `FM_PANEL` | 패널(3D) |
+| 6 | `FM_BUTTON` | 버튼 |
+| 7 | `FM_EDIT` | 입력필드 |
+| 8 | `FM_COMBO` | 콤보박스 |
+| 9 | `FM_OUT` | 출력전용 필드 |
+| 10 | `FM_MEMO` | 멀티라인 텍스트 |
+| 11 | `FM_GRID` | 그리드 |
+| 12 | `FM_TABLE` | 테이블 |
+| 13 | `FM_TREE` | 트리뷰 |
+| 14 | `FM_AVI` | AVI 동영상 |
+| 15 | `FM_CONTROL` | 임베디드 컨트롤(외부 OCX) |
+| 16 | `FM_OBJECT` | 서브맵(unit MAP object) |
+| 17 | `FM_TAB` | 탭 |
+| 18 | `FM_UTAB` | 사용자 정의 탭 |
+| 19 | `FM_SHEET` | 스프레드시트 스타일 |
+| 20 | `FM_BROWSER` | 웹 브라우저 |
+| 21 | `FM_GRIDEX` | 그리드Ex |
+
+**주의:** `@docs/AxisformArchitecture.md` 5절의 24개 파생 클래스 목록(`CfmCheck`/`CfmRadio`/`CfmEditEx`/`CfmSysm` 포함)과 여기 21개 `kind` 숫자가 1:1로 안 맞는다 — 체크박스/라디오/EditEx 등 일부는 별도 `kind` 번호 없이 다른 `kind`(예: `FM_BUTTON`)에 속성 플래그로 얹혀 세분화되는 것으로 추정된다(미확인, 필요 시 `LoadForm`의 kind별 팩토리 분기 확인 요).
+
+**실측 예시(2026-08-14, IB622300/IB622302 원장TR 비교):** 같은 이름의 필드(`AN15`/`csubb`)가 부모맵과 서브맵에서 서로 다른 `kind`로 정의된 경우가 실제로 확인됨(`AN15`: 부모=15/`FM_CONTROL`, 서브맵=7/`FM_EDIT`) — 서브맵은 부모와 완전히 독립적인 컨트롤 정의를 가진다는 기존 관찰(`@docs/WizardArchitecture.md`)과 일치.
+
 ---
 
 ## 문서 목적

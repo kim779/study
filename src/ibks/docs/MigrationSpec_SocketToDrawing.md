@@ -218,6 +218,37 @@ screen->Parse(resize, ...);   // 재귀 호출, 새 CScreen이지만 같은 창(
 ```
 **중요:** `CScreen`은 자기 소유의 윈도우(`view`)가 없음 — 항상 `m_client->m_view`(소속 CClient의 창)를 공유. 창(윈도우) 1개 : 작업영역(CClient) 1개 : 화면(CScreen) N개(메인+서브) 관계.
 
+### 4.2 그리드 특수역할 마커 — `vals[2]`의 `$$`/`$?`/`$*` (Screen.cpp:372-385, 2026-08-14 확인)
+
+**⚠️ 주의 — 8.10절의 `$`/`?` 마커와 이름만 같을 뿐 완전히 다른 메커니즘이다.** 8.10절은 **와이어 프로토콜**(클라이언트→서버 OOP TR 요청 페이로드) 레벨의 마커였고, 이 절은 **맵소스 파싱 시점**(화면이 열릴 때 `CScreen::Parse()`가 `.map` 바이너리를 읽는 순간)에만 작동하는 **UI 역할 지정** 마커다. 소스 위치도 다르다(하나는 `IBKSConnector`, 하나는 `Wizard/Screen.cpp`) — 우연히 `$`라는 같은 특수문자를 재사용했을 뿐 서로 무관하다.
+
+`CScreen::Parse()`의 `FM_GRID` 케이스(352-386행)에서, 그리드 컨트롤의 `vals[2]`(맵소스 빌드 시 지정하는 부가 문자열 값)을 검사해서 그 그리드가 세 가지 특수 역할 중 하나를 맡는지 판별한다:
+
+```cpp
+if (form->m_form->vals[2] != NOVALUE)
+{
+    form->m_form->vals[2] = (DWORD)&m_strR[form->m_form->vals[2]];
+    text = (char *)form->m_form->vals[2];
+    if (text.Find("$$") == 0)
+    {
+        form->m_form->vals[2] += 2;
+        m_notice = form;
+    }
+    else if (text.Find("$?") == 0)
+        m_sales = form;
+    else if (text.Find("$*") == 0)
+        m_push = form;
+}
+```
+
+| 마커 | 대상 멤버 | 실제 소비하는 함수 | 역할 |
+|---|---|---|---|
+| `$$` | `m_notice` | `CScreen::OnNotice()` (Screen.cpp:1188) | `msgK_TICK`(0x90, 1절) 브로드캐스트 알림(체결통보 등, 요청 없이 서버가 미는 데이터)을 표시하는 그리드로 지정 |
+| `$?` | `m_sales` | `CScreen::UpdateRTM()`/`ScrollRTM()` (Screen.cpp:897, 1132) | RTM 틱 수신 시 새 행을 스크롤 삽입하는 관심종목형 확장 그리드로 지정 |
+| `$*` | `m_push` | `CScreen::OnPush()` (Screen.cpp:719) | 푸시 메시지 전용 그리드로 지정 |
+
+**정정(2026-08-14):** 이전 대화에서 이 마커를 `text.Find("$") == 0`(홑따옴표 `$` 하나)로 설명한 적이 있는데, 실제 소스는 **`"$$"`(더블 달러)**다. 단순 `$`로 시작하고 `$$`/`$?`/`$*` 중 아무것도 아닌 `vals[2]` 값은 이 세 역할 중 어디에도 매칭되지 않고 그냥 지나간다.
+
 ---
 
 ## 5. 컨트롤은 실제 윈도우가 아님 — 가상 컨트롤 구조
@@ -548,6 +579,8 @@ CGuard::Write(2) len=520 hdr0=0x20 hdr3=0x27                       <- 520 = L_ax
 ### 배경 — 이 절이 다루는 범위
 
 8.9절까지는 `trxC=piboPBxQ`(`US_ENC`, 일반 AXIS 포맷)류를 다뤘다. 이 절은 **`trxC`가 `pooppoop`/`GOOPHOOP` 등인 `US_OOP` 포맷 TR의 요청 페이로드를 클라이언트(IBKSConnector OCX)가 어떻게 조립하는지**를 다룬다. `MigrationSpec` 9절에 오래 남아있던 `SetDataOOP`(서버 응답을 Wizard가 파싱하는 쪽, `Stream.cpp`)와는 **반대 방향(클라이언트→서버 요청 조립)이며 소스 위치도 다르다** — `Wizard/` 안이 아니라 `HTS_OpenAPI(운영)/IBKSConnector/IBKSConnectorCtl.cpp`에 있다. 즉 OOP 프로토콜의 "요청 조립" 절반은 이번에 확정됐고, "응답 파싱"(`SetDataOOP`) 절반은 여전히 미확인이다(9절 참고).
+
+**⚠️ 주의 — 4.2절의 `$$`/`$?`/`$*`(그리드 특수역할 마커)와 이름만 같을 뿐 무관한 별개 메커니즘이다.** 저건 맵소스 파싱 시점(`CScreen::Parse()`)의 UI 역할 지정이고, 이 절은 와이어 프로토콜(요청 페이로드) 레벨의 마커다.
 
 **중요 — 이 문법은 `trxC` 자체와 무관하게, `_axisH` 헤더(24바이트) 다음에 오는 페이로드 안에서 작동하는 문법이다.** 즉 1절의 `_axisH` 구조(헤더 24바이트+`datL`만큼의 페이로드), 8.9절의 암호화 규칙(헤더 이후 페이로드만 암호화)은 OOP 포맷에도 동일하게 적용되고, 이 절은 그 페이로드 **내부**의 문법만 다룬다.
 
