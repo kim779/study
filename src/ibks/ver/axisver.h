@@ -32,7 +32,7 @@ public:
 	//}}AFX_VIRTUAL
 
 public:
-	enum class argACT {argNONE, argMANAGER, argUSER, argRETRY, argMOVE, argCLASS, argAPNAME, argDIR, argRSV} m_argument;
+	enum class argACT {argNONE, argMANAGER, argUSER, argRETRY, argMOVE, argCLASS, argAPNAME, argDIR, argPID, argRSV} m_argument;
 	CString	m_user;
 	CString	m_pass;
 	CString	m_root;
@@ -40,6 +40,7 @@ public:
 	CString	m_keys;
 	CString	m_params;
 	HWND	m_axis;
+	DWORD	m_axisPid;		// AXIS.exe 자신의 PID (/x, AxMisc::RunVers()가 GetCurrentProcessId()로 넘겨줌)
 
 	CStringArray m_files;
 

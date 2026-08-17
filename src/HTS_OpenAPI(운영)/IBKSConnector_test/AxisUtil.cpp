@@ -44,7 +44,9 @@ LPCSTR OCX[] = { "axWizard.ocx", "axSock.ocx", "axXecure.ocx", "axCertify.ocx", 
 
 bool RegisterOCX( CString path )
 {
- 	HINSTANCE hInst = LoadLibraryEx(path, NULL, LOAD_LIBRARY_AS_DATAFILE);	//2014.02.06 VISTA이상 버전에서는 Ex를 써야 라이브러리가 로딩된다.
+ 	HINSTANCE hInst = LoadLibraryEx(path, NULL, 0);	//2014.02.06 VISTA이상 버전에서는 Ex를 써야 라이브러리가 로딩된다.
+	//2026.08.17 LOAD_LIBRARY_AS_DATAFILE 플래그 제거 - 이 플래그는 코드 실행 없이 리소스만 매핑하는 용도라
+	//DllRegisterServer() 같은 실제 코드 호출이 보장 안 됨(성공처럼 반환되지만 실제 등록은 안 되는 현상 확인됨).
 //	HINSTANCE hInst = LoadLibrary(path);
 	if (!hInst)		
 		return false;

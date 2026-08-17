@@ -1,0 +1,59 @@
+﻿// Sock.idl: ActiveX 컨트롤 프로젝트의 형식 라이브러리 소스입니다.
+
+// 이 파일은 MIDL 컴파일러 도구에 의해 처리되어
+// Sock.ocx에서 리소스가 되는 형식 라이브러리(Sock.tlb)를
+// Sock.ocx.
+
+#include <olectl.h>
+#include <idispids.h>
+
+[ uuid(2a62b8e8-6e92-4a7c-8b3f-4f2f87344380), version(1.0),
+  control ]
+library SockLib
+{
+	importlib(STDOLE_TLB);
+
+	//  CSockCtrl의 기본 디스패치 인터페이스
+	[ 
+		uuid(891ac554-ebec-4e4c-84eb-e5bcddf5ab08)
+	]
+	dispinterface _DSock
+	{
+		properties:
+		methods:
+
+			[id(1)] boolean OpenSock(BSTR home, BSTR ip, long port);
+			[id(2)] void CloseSock();
+			[id(3)] boolean WriteStream(long pBytes, long nBytes);
+			[id(4)] boolean OpenDgram(long port);
+			[id(5)] void CloseDgram();
+			[id(6)] boolean WriteDgram(BSTR ip, long pBytes, long nBytes, bool route);
+			[id(7)] boolean StartAxis(long key, long mode);
+			[id(8)] long GetEnum(long pBytes, long nBytes, long mode);
+	};
+
+	//  CSockCtrl의 이벤트 디스패치 인터페이스
+
+	[ 
+		uuid(77abd00d-a694-48fb-a979-a69b72b81a83)
+	]
+	dispinterface _DSockEvents
+	{
+		properties:
+			//  이벤트 인터페이스에 속성이 없습니다.
+
+		methods:
+			[id(1)] void OnStream(long type, long pBytes, long nBytes);
+	};
+
+	//  CSockCtrl에 대한 클래스 정보
+	[
+		uuid(7136b426-24ff-4e0c-bf12-6bf8ff889d75)
+	]
+	coclass Sock
+	{
+		[default] dispinterface _DSock;
+		[default, source] dispinterface _DSockEvents;
+	};
+
+};

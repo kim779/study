@@ -820,6 +820,8 @@ BOOL CWizardCtrl::OnAxis(int type, char* pBytes, int variant)
 	if (nBytes == modeRM)
 	{
 		value = m_guard->m_app->GetProfileInt(WORKSTATION, AXISONLY, 0);
+		axlog(LOG_FILEPATCH, "[AxisOnly-check] m_keys=%s Workstation/AxisOnly=%d -> %s",
+			m_guard->m_keys.GetString(), value, (value > 0) ? "modeRMx(RSC skip)" : "modeRM(RSC included)");
 		if (value > 0)
 			nBytes = modeRMx;
 	}

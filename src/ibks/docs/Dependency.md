@@ -280,6 +280,66 @@ exe/
 | "The application failed to initialize properly" | vcruntime140.dll 없음 | exe 폴더 복사 |
 | "modulename.pyd not found" | sys.path 오류 | Python 경로 설정 |
 
+### OPEN API(`C:\HTS_OPENAPI\exe\`) 배포 — axWizard.ocx 실측 의존성 (2026-08-17)
+
+**배경:** OPEN API(IBKSConnector.ocx)는 본HTS(`F:\util\HTS\IBK_SMART\exe\`)와 별도의 최소 설치 폴더(`C:\HTS_OPENAPI\exe\`)를 씀. axlog 로깅 추가 후 axWizard.ocx를 재빌드해서 이 폴더에 새로 `regsvr32` 등록하려다 `LoadLibrary error 126`("지정된 모듈을 찾을 수 없습니다") 발생 — `dumpbin /dependents`로 실제 원인 확인.
+
+`dumpbin /dependents axWizard.ocx` 직접 의존성 (VS2019 v142 툴셋 빌드):
+```
+WS2_32.dll, IMM32.dll, VERSION.dll, WINMM.dll,
+axislib.dll, axisform.dll, axisvbs.dll,        ← 커스텀 모듈, 파일 자체는 있었음(아래 참고 - 얘네도 각자 추가 의존성 있음)
+mfc140.dll, MSVCP140.dll, VCRUNTIME140.dll,     ← VC++ 2015-2019 재배포런타임, C:\HTS_OPENAPI\exe\에 없어서 1차 원인
+KERNEL32.dll, USER32.dll, GDI32.dll, WINSPOOL.DRV, ADVAPI32.dll,
+SHELL32.dll, COMCTL32.dll, ole32.dll, OLEAUT32.dll, gdiplus.dll,
+api-ms-win-crt-runtime-l1-1-0.dll, api-ms-win-crt-string-l1-1-0.dll,
+api-ms-win-crt-convert-l1-1-0.dll, api-ms-win-crt-time-l1-1-0.dll,
+api-ms-win-crt-heap-l1-1-0.dll, api-ms-win-crt-stdio-l1-1-0.dll,
+api-ms-win-crt-multibyte-l1-1-0.dll, api-ms-win-crt-math-l1-1-0.dll
+```
+(`WS2_32`~`gdiplus`까지는 표준 시스템 DLL, Windows 자체 제공이라 배포 불필요. `api-ms-win-crt-*`는 Universal CRT API-Set — Windows 10+에 apisetschema로 가상 매핑되어 물리 파일로 안 보이는 게 정상, 배포 불필요.)
+
+**커스텀 모듈 3개의 2차 의존성도 각각 `dumpbin`으로 실측**(단순히 파일이 있다고 끝이 아니라, 그 파일들이 또 뭘 요구하는지까지 확인 필요했음):
+- `axislib.dll` → mfc140/VCRUNTIME140 + api-ms-win-crt-*(이미 해결됨)
+- `axisform.dll` → **axislib.dll**(위와 동일 체인) + MSIMG32/WINMM(표준) + mfc140/VCRUNTIME140
+- `axisvbs.dll` → **`python311.dll`**(!) + mfc140/MSVCP140/VCRUNTIME140 + api-ms-win-crt-*
+
+**조치 (2단계):**
+1. `mfc140.dll`/`msvcp140.dll`/`vcruntime140.dll` 3개를 `%WINDIR%\SysWOW64\`에서 `C:\HTS_OPENAPI\exe\`로 복사
+2. **`python311.dll`도 없었음** — `F:\util\HTS\IBK_SMART\exe\python311.dll`(본HTS 배포본, axisvbs.dll과 짝맞는 버전)에서 복사
+
+전부 앱 로컬 배포(시스템 전역 재배포런타임/Python 설치에 의존하지 않음) — OPEN API를 가져다 쓸 "부모 프로세스" 환경에 이런 게 깔려있다는 보장이 없으므로 이 방향이 맞음. **최소 모듈 화이트리스트에 위 4개(mfc140/msvcp140/vcruntime140/python311.dll)는 필수 포함 대상.**
+
+**교훈:** `dumpbin /dependents`는 **직접 의존성만** 보여줌 — 커스텀 DLL(axislib/axisform/axisvbs)이 파일로 존재한다고 안심하지 말고, 그 DLL들 각각에도 `dumpbin /dependents`를 돌려서 2차 의존성까지 확인해야 함(재귀적으로).
+
+### OPEN API 진입점 5개 전체 — 재귀 의존성 완전 폐쇄집합 (2026-08-17, `C:\HTS_OPENAPI\exe\` 기준 전수 확인)
+
+`IBKSConnector.ocx`/`axWizard.ocx`/`axSock.ocx`/`axCertify.ocx`/`axXecure.ocx` 5개 전부와, 그 아래 커스텀 DLL을 전부 재귀적으로 `dumpbin /dependents` 돌려서 확인. **표준 Windows 시스템 DLL(System32/SysWOW64에 이미 있는 것, `api-ms-win-*` API-Set 포함)은 배포 불필요라 제외**하고, 비표준(커스텀/재배포) 모듈만 남긴 최종 목록:
+
+```
+[진입점 OCX 5개]
+IBKSConnector.ocx, axWizard.ocx, axSock.ocx, axCertify.ocx, axXecure.ocx
+
+[axWizard.ocx 계열]
+axislib.dll, axisform.dll(→axislib.dll 재사용), axisvbs.dll
+
+[axCertify.ocx 계열 — SK 인증서 모듈]
+SKComdIF.dll → SKCommSC.dll, SKCommEM.dll, SKCommCM.dll
+
+[axXecure.ocx 계열 — Xecure 암호화 모듈, 서브모듈 13개+1]
+xcon30.dll →
+  XecureIO_v20.dll, XecureCrypto_v20.dll, XecureCSP_v20.dll,
+  XecurePKCS8_v20.dll, XecurePKC_v20.dll, XecureASN_v20.dll,
+  XecurePKCS7_v20.dll, XecureOCSP_v20.dll, XecureLDAP_v20.dll,
+  XecureCRL_v20.dll, XecureCodec_v20.dll, XecurePVD_v20.dll,
+  XecurePKCS5_v20.dll, xwcs_client.dll
+
+[공용 런타임 — 전부 다 이걸 씀]
+mfc140.dll, msvcp140.dll, vcruntime140.dll   ← 재배포런타임, 원래 없었음(조치완료)
+python311.dll                                ← axisvbs.dll 전용, 원래 없었음(조치완료)
+```
+
+**전수 확인 결과: 위 목록 전부 `C:\HTS_OPENAPI\exe\`에 현재 존재함(재배포런타임 2종 조치 후).** 이 목록이 **OPEN API 화이트리스트 프로젝트(사용자 메모리 `project_openapi_patch_whitelist` 참고)의 "필요 최소 모듈" 초안**이 됨. 다만 이건 정적 PE 임포트 테이블 기준이라, **런타임에 `LoadLibrary`/`CoCreateInstance`로 동적 로드하는 모듈**(예: ProgID 문자열로 그때그때 생성하는 것들)은 이 방법으론 안 잡힘 — DebugLogGuide.md의 axlog나 Process Monitor로 실제 실행 중 로드되는 것까지 교차검증 필요.
+
 ---
 
 ## 7. 빌드 순서 및 의존성

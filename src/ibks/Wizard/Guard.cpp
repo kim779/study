@@ -240,6 +240,31 @@ int CGuard::Initial(CWnd* control)
 		OutputDebugString(slogTrace);
 		return -1;
 	}
+	else
+	{
+		// 임시 진단 로그 - m_sock이 실제로 어느 axSock.ocx 파일(레지스트리 등록 경로)을 로드했는지 확인용.
+		CString sockPath = _T("(resolve failed)");
+		CLSID clsid;
+		if (SUCCEEDED(CLSIDFromProgID(L"AxisSock.SockCtrl.IBK2019", &clsid)))
+		{
+			LPOLESTR clsidStr = NULL;
+			StringFromCLSID(clsid, &clsidStr);
+			CString keyPath;
+			keyPath.Format(_T("CLSID\\%S\\InprocServer32"), clsidStr);	// %S: clsidStr은 항상 wide, 이 프로젝트는 ANSI 빌드
+			CoTaskMemFree(clsidStr);
+
+			HKEY hKey;
+			if (RegOpenKeyEx(HKEY_CLASSES_ROOT, keyPath, 0, KEY_READ, &hKey) == ERROR_SUCCESS)
+			{
+				TCHAR buf[MAX_PATH] = { 0 };
+				DWORD size = sizeof(buf);
+				if (RegQueryValueEx(hKey, NULL, NULL, NULL, (LPBYTE)buf, &size) == ERROR_SUCCESS)
+					sockPath = buf;
+				RegCloseKey(hKey);
+			}
+		}
+		axlog(LOG_FILEPATCH, "CGuard::Initial m_sock CreateControl(AxisSock.SockCtrl.IBK2019) OK, registeredPath=%s", sockPath.GetString());
+	}
 
 	m_certify = new CWnd();
 	if (!m_certify->CreateControl(_T("AxisCertify.CertifyCtrl.IBK2019"), NULL, 0, CRect(0, 0, 0, 0), control, 0))

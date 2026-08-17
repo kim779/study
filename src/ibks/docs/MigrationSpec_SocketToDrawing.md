@@ -14,6 +14,8 @@
 
 **2026-08-14 확인:** `IBKSConnector`(OCX) 소스에서 OOP 포맷(`trxC=pooppoop/GOOPHOOP` 계열) TR의 **요청 페이로드 조립 문법**을 확정(8.10절 신설) — 단일값/그리드/캔들 세 가지 문법과 `$`/`?` 마커, `grid_i`/`grid_o` 페이징 구조체까지 소스 코드로 직접 확인. 단, 이건 클라이언트→서버 요청 쪽만 확인된 것이고, Wizard(서버 응답 수신) 쪽의 `SetDataOOP` 파싱은 여전히 미조사(9절 참고) — 서로 다른 절반.
 
+**2026-08-17 확인:** 그리드 실시간 갱신 마커 `$?`/`$$`/`$*`(8.11절 신설) 전체 추적 완료. 그중 `$*`가 RTM(`_rtmH`)도 TR(`_axisH`)도 아닌 **완전히 별도의 소켓 이벤트/헤더(`FEV_PUSH`, `_anmH`)를 쓰는 제3의 채널**이라는 걸 신규 발견 — `msgK_ARM`/`msgK_AUX`(1절, 미조사 상태였던 것)와의 관계는 아직 미확인.
+
 ---
 
 ## 0. 전체 파이프라인 개요
@@ -700,6 +702,112 @@ return SendTR("GOOPHOOP", key, US_OOP, sendS.data(), sendS.size(), &CIBKSConnect
 
 ---
 
+## 8.11. 그리드 실시간 갱신 3종 마커 — `$?`/`$$`/`$*` (2026-08-17 확인)
+
+**배경:** `CScreen::Parse()`(4절)의 FM_GRID 처리 중 `form->m_form->vals[2]`(빌더 UI의 "Variant" 속성)에 특수 문자열이 들어있으면 그 그리드를 화면당 딱 1개씩 `m_notice`/`m_sales`/`m_push` 중 하나로 등록해두는 코드가 있었음(문서에 등장은 했으나 실제 사용처는 이번에 처음 추적). 이 3개는 **서로 완전히 다른 실시간 갱신 메커니즘**이며, 사용자가 실제 HTS 화면(체결 그리드, 시가총액순위 그리드)과 대조하며 검증함.
+
+| 마커 | 저장 필드 | 데이터 출처 | 갱신 방식 | 용도(추정) |
+|---|---|---|---|---|
+| `$?` | `m_sales` | RTM(`_rtmH`, 6절 요약) 스크롤버퍼 | 무조건 `CfmGrid::InsertRow` — 기존 행 매칭 없음 | 체결 틱커(스크린샷으로 실측 확인) |
+| `$$` | `m_notice` | RTM(`_rtmH`) | 키 매칭 → 있으면 셀 갱신 or 상태플래그 꺼지면 행삭제, 없으면 행삽입 (upsert) | 미체결/주문 리스트류 (추정, 실측화면 미확인) |
+| `$*` | `m_push` | **별도 채널(`_anmH`, 아래 8.11.3)** | 고정크기 원형버퍼, 커서(`m_row`) 위치에 덮어쓰기 | 대량 배치푸시/뉴스크롤류 (추정, 실측화면 미확인) |
+
+### 8.11.1. `$?` — `CScreen::ScrollRTM` (순수 삽입, 매칭 없음)
+
+RTM 파이프라인(1절/6절)에서 종목별로 스크롤형(`stat_SCR`, 아래 참고) 데이터를 버퍼링했다가 한꺼번에 플러시하는 구조:
+
+```
+CGuard::OnAlert(code, pBytes, nBytes, stat)   [Guard.cpp:1030]
+  rtmK_INFO 패킷: 종목의 필드번호 순서표(rtmk, CStringArray)를 캐시
+  rtmK_DATA 패킷: 값 파싱, 종목코드별 CObArray*(scroll맵, obs)에 CdataSet 버퍼링(InsertAt(0,...))
+    → 같은 종목 "일반" 시세갱신이 오거나, 이번 소켓패킷 처리가 끝나는 시점에
+      DoRTM(code, stat_SCR, rts, obs, updates) 로 일괄 플러시
+        ↓
+CScreen::UpdateRTM (Screen.cpp:897)
+  if (m_sales && (stat & alert_SCR))  ScrollRTM(obs);
+        ↓
+CScreen::ScrollRTM(CObArray* obs)   [Screen.cpp:1132]
+  obs 안 CdataSet들을 컬럼이름으로 조회해 탭구분 멀티라인 문자열로 조립
+  (form->m_form->attr2 & GO_TOP) ? InsertRows(0,...) : InsertRows(-1,...)
+        ↓
+CfmGrid::InsertRows()   [dll/form/fmGrid.cpp:5016, axisform.dll]
+  줄바꿈으로 쪼개 insertRow()로 실제 삽입, 기존 행은 밀려남
+```
+
+`stat_SCR = 0x10 // scroll data (grid, graph)` (`h/axisanm.h:59`) — 와이어 RTM 헤더(`rtmH->stat`)에 실제로 실리는 비트, 서버가 "이건 스크롤형 데이터"라고 명시적으로 표시함. **행 매칭 로직이 전혀 없음** — 종목코드나 특정 row를 찾는 코드가 `ScrollRTM` 안에 없음(실측 확인).
+
+### 8.11.2. `$$` — `CScreen::OnNotice` 후반부 (키매칭 upsert/삭제)
+
+`OnNotice(CdataSet& major, CdataSet& minor, CdataSet& fms, CString notices)`(Screen.cpp:1188)의 후반부(1288~1397):
+
+```cpp
+// 1. minor(키 데이터셋)로 기존 행 중 일치하는 행 탐색
+for (kk=0; kk<nRows; kk++)
+    for (idx=0; idx<nCols; idx++)
+        if (minor.Lookup(form->GetName(idx), string) && text.Compare(string)==0) match=true;
+
+// 2. vals[2]에 남은 숫자("$$201" -> Parse()가 "$$" 2글자 skip -> "201")가
+//    "삭제여부" 판단용 필드번호
+name = atoi((char*)form->m_form->vals[2]);
+
+if (match && fms.Lookup(name,text) && !atoi(text))
+    ((CfmGrid*)form)->RemoveRow(kk);          // 상태플래그 꺼짐 -> 행 삭제
+else if (!match && (!fms.Lookup(name,text) || atoi(text)))
+    ((CfmGrid*)form)->InsertRow(GO_TOP ? 0 : -1);  // 새 키 -> 행 삽입
+
+if (match)
+    for (idx=0; idx<nCols; idx++)
+        form->WriteData(text, true, idx, kk);  // 그 행 셀들 갱신
+```
+
+`major`는 화면 레벨 컨텍스트 매칭(같은 함수 앞부분, 1203~1286행), `minor`는 그리드 행 단위 키 매칭 — 2단계 스코프 구조. 실측 화면(어떤 맵이 `$$`를 쓰는지)은 아직 미확인 — 동작 특성(키 매칭+상태기반 삭제)상 미체결/주문상태 리스트류로 추정.
+
+### 8.11.3. `$*` — `_anmH`라는 완전히 별도의 소켓 채널 (신규 발견)
+
+**핵심 발견: `$*`는 RTM(`_rtmH`)도 TR(`_axisH`)도 아닌 제3의 독립 프로토콜을 씀.** 소켓 OCX가 쏘는 이벤트 자체가 분리되어 있음:
+
+```cpp
+// WizardCtrl.cpp:203, CWizardCtrl::OnFireEvent
+case FEV_ANM:   OnAlert(pBytes, nBytes);   break;   // RTM (_rtmH)
+case FEV_PUSH:  OnPush(pBytes, nBytes);    break;   // ← $* 전용 채널
+case FEV_AXIS:  OnRead(pBytes, nBytes);    break;   // TR (_axisH)
+```
+
+**수신 파싱** (`CWizardCtrl::OnPush`, WizardCtrl.cpp:663) — 자체 헤더 `_anmH` 사용:
+```cpp
+struct _anmH* anmH = (struct _anmH*)pBytes;
+switch (anmH->anmK) {
+case anmK_ALIVE: break;                              // 하트비트
+case anmK_PUSH:  m_guard->OnPush(CString(&pBytes[L_anmH], anmL)); break;
+}
+```
+
+**구독 요청(클라이언트→서버)** — `CGuard::SetPush(bool push)`(Guard.cpp:715). `$*` 그리드가 있는 화면이 열리면(`CScreen::Parse()`, Screen.cpp:511) `push=true`로 호출됨:
+```cpp
+// CScreen::isPush(pushN) — 화면의 첫 FM_EDIT 필드값을 "토픽 이름"으로 사용
+anmH->anmK = anmK_PUSH;
+anmH->anmF = push ? 1 : 0;                // 구독/해지 플래그
+if (!pushN.IsEmpty()) {
+    // USRDIR/{pushN} 로컬 파일을 읽어 페이로드에 실어 같이 전송 (동기화용으로 추정)
+    fileH.Open(path, ...); fileH.Read(&datB[L_anmH], datL);
+}
+m_sock->InvokeHelper(DI_DWRITE, ...);     // ★ 일반 DI_WRITE(axisH 경로)가 아닌 별도 디스패치
+```
+
+**수신 후 처리** — `CGuard::OnPush(CString pushs)`(Guard.cpp:763): 열려있는 모든 `CClient`(`S_LOAD` 상태)에 `client->OnPush(pushs)`로 브로드캐스트 → `CClient::OnPush`(Client.cpp:1502) → `screen->OnPush(pushs)`. 처리 후 **`SetPush(false)`로 즉시 자동 구독해지** — 지속 스트리밍이 아니라 1회성 배치 수신+해지 패턴.
+
+**그리드 반영** — `CScreen::OnPush(CString pushs)`(Screen.cpp:719): `$?`(InsertRow로 밀어내기)와 달리 **고정 크기 원형버퍼**:
+```cpp
+form->WriteData(cmps, true, idx, m_row);   // 커서(m_row) 위치에 씀
+if (++m_row >= rowN) m_row = 0;            // 끝까지 가면 처음으로 순환
+// 바로 다음 칸은 미리 공백으로 지워둠 (다음 삽입 예정 위치 표시)
+```
+`\x1b`(ESC) 이스케이프로 라인별 전경/배경 RGB 직접 지정 가능(`text.Mid(1,3)`/`Mid(4,3)` = 3자리 RGB 코드) — 뉴스크롤/공지사항처럼 서버가 색상 포함된 대량 텍스트를 한 번에 밀어주는 용도로 추정.
+
+**미해결:** `$$`/`$*`를 실제로 쓰는 맵 화면 예시 미확인(`$?`는 체결그리드로 실측 확인됨). `_anmH`/`anmK_*` 상수 전체 목록, `USRDIR/{pushN}` 파일의 실제 포맷과 용도, 이 채널이 1절의 `msgK_ARM`(0x92)/`msgK_AUX`(0x93, 둘 다 미조사 상태였음)와 같은 것인지 다른 것인지 미확인 — **내일 최우선 확인 대상.**
+
+---
+
 ## 9. 다음 조사 대상 (미완료)
 
 - **`ParseSCC`/`SetCC`의 `CC_*` 플래그 전체 목록** — `CC_PRO`/`CC_MAND`/`CC_SEND`/`CC_VIS`/`CC_ENB`/`CC_SET` 등 확인됨(Stream.cpp:2900-2928), 전체 목록과 각각의 정확한 UI 효과는 추가 확인 여지
@@ -709,6 +817,7 @@ return SendTR("GOOPHOOP", key, US_OOP, sendS.data(), sendS.size(), &CIBKSConnect
 - `WM_USER` 커스텀 메시지의 정확한 용도
 - ~~TR 요청(사용자가 조회 버튼 누르는 것) → 소켓 송신 경로~~ — **확인 완료(2026-07-30), 8.8절 참고.** `RouteTR`이 `CGuard::Write(char*, int, bool)`로 최종 소켓 전송하며, 한 번의 write에 여러 화면(unit)의 `_axisH` 프레임이 배치로 묶일 수 있음
 - `CDll::OnAxis`(DLL 기반 작업영역)의 실제 파싱 로직 — **`CClient`와 다르다는 것 자체는 확인됨(2026-07-31)**: `CStream::OutStream`/`SetDataNRM`을 전혀 안 타고 받은 바이트를 그대로 `WM_USER`로 로드된 DLL에 던진다(`Dll.cpp:530`, `[CDll-OnAxis-raw]` 로그 추가, `@docs/DebugLogGuide.md` 7절). 다만 그 DLL 내부의 실제 파싱 로직 자체는 Wizard 소스 밖이라 여전히 미조사 — 실사용 사례: `9524`(이벤트 데이터 조회, 기획부) 화면이 이 경로를 탐
+- **(신규, 2026-08-17, 8.11.3절) `$*`(`m_push`) 전용 채널 `_anmH`/`FEV_PUSH`** — 구조(요청 SetPush/수신 OnPush/원형버퍼 반영)는 코드로 확정됐으나: (1) `anmK_*` 상수 전체 목록 미확인(`anmK_ALIVE`/`anmK_PUSH`만 확인됨), (2) `USRDIR/{pushN}` 로컬 파일의 실제 포맷/용도 미확인, (3) 1절의 `msgK_ARM`(0x92)/`msgK_AUX`(0x93)와 이 `_anmH` 채널이 같은 것인지 완전히 별개인지 미확인, (4) `$$`/`$*`를 실제로 쓰는 맵 화면 예시 미확인(`$?`만 체결그리드로 실측됨) — **내일 최우선 조사 대상**
 
 ---
 
