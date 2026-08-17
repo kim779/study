@@ -83,25 +83,22 @@ void LogProcessesUsingFile(LPCSTR filePath)
 	RmEndSession(dwSession);
 }
 
-static BOOL WaitAxisExit(HWND hAxis, DWORD timeoutMs)
+static BOOL WaitAxisExit(HWND hAxis, DWORD pid, DWORD timeoutMs)
 {
 	CString slog;
-	if (!::IsWindow(hAxis))
-		return TRUE;   // 이미 창이 없으면 종료된 것으로 간주
 
-	DWORD pid = 0;
-	::GetWindowThreadProcessId(hAxis, &pid);
-	if (pid == 0)
-	{
-		slog.Format("[VER] axis pid is 0....\n");;
-		OutputDebugString(slog);
-		return TRUE;
-	}
+	// PID 우선: /x 로 AXIS가 자기 PID를 직접 넘겨준 경우, 창(hAxis) 상태와 무관하게
+	// 바로 프로세스 핸들을 열어 대기한다. SendMessage(WM_CLOSE)가 리턴하는 순간 이미
+	// 창은 파괴돼있는(IsWindow=FALSE) 경우가 흔한데, 창 소멸과 프로세스(DLL 언로드,
+	// 소켓/COM 정리) 완료는 별개 타이밍이라 hAxis만으로는 이 구간을 놓친다.
+	HANDLE hProc = (pid != 0) ? ::OpenProcess(SYNCHRONIZE | PROCESS_TERMINATE, FALSE, pid) : NULL;
 
-	HANDLE hProc = ::OpenProcess(SYNCHRONIZE | PROCESS_TERMINATE, FALSE, pid);
 	if (hProc == NULL)
 	{
-		// 핸들을 못 열면 이미 죽었을 가능성. 창 존재만 폴링으로 확인.
+		// 구버전 호출(=/x 없이 실행됨) 등 PID를 못 받은 경우의 폴백 - 기존 창 폴링 로직 유지
+		if (!::IsWindow(hAxis))
+			return TRUE;   // 이미 창이 없으면 종료된 것으로 간주
+
 		DWORD waited = 0;
 		while (::IsWindow(hAxis) && waited < timeoutMs)
 		{
@@ -110,22 +107,33 @@ static BOOL WaitAxisExit(HWND hAxis, DWORD timeoutMs)
 
 			slog.Format("[VER] axis waited =[%d] timeoutMs=[%d]", waited, timeoutMs);
 			OutputDebugString(slog);
-
 		}
 		return !::IsWindow(hAxis);
 	}
 
 	DWORD wr = ::WaitForSingleObject(hProc, timeoutMs);
+	BOOL exited = TRUE;
 	if (wr == WAIT_TIMEOUT)
 	{
 		// 정상 종료가 시간 내 안 끝남 → 마지막 수단으로 강제 종료
 		slog.Format("[VER] axis exit timeout. terminating pid=%d\n", pid);
 		OutputDebugString(slog);
 		::TerminateProcess(hProc, 0);
-		::WaitForSingleObject(hProc, 3000);   // 강제 종료 반영 대기
+		DWORD wr2 = ::WaitForSingleObject(hProc, 3000);   // 강제 종료 반영 대기
+		exited = (wr2 == WAIT_OBJECT_0);
+		if (!exited)
+		{
+			slog.Format("[VER] axis force-kill wait FAILED pid=%d\n", pid);
+			OutputDebugString(slog);
+		}
+	}
+	else
+	{
+		slog.Format("[VER] WaitForSingleObject no timeout  pid=%d\n", pid);
+		OutputDebugString(slog);
 	}
 	::CloseHandle(hProc);
-	return TRUE;
+	return exited;
 }
 
 BEGIN_MESSAGE_MAP(CAxisverApp, CWinApp)
@@ -193,23 +201,29 @@ void CAxisverApp::parsingCommandStatus()
 	m_params.Empty();
 	m_keys.Empty();
 	m_axis = (HWND) NULL;
+	m_axisPid = 0;
 
 	CCommLine cmdInfo;
 	ParseCommandLine(cmdInfo);
 
 	CString slog;
-	slog.Format("[VER] axis =  [%x]\n", m_axis);
+	slog.Format("[VER] axis =  [%x] pid=[%d]\n", m_axis, m_axisPid);
 	OutputDebugString(slog);
 }
 
 void CAxisverApp::updateObjectAXIS()
 {
-	if (m_axis != (HWND) NULL)
+	if (m_axis != (HWND) NULL || m_axisPid != 0)
 	{
 		Sleep(500);
-		::SendMessage(m_axis, WM_CLOSE, 0, 0);
-		WaitAxisExit(m_axis, 10000);
-		//Sleep(500);
+		if (m_axis != (HWND) NULL)
+			::SendMessage(m_axis, WM_CLOSE, 0, 0);
+		if (!WaitAxisExit(m_axis, m_axisPid, 3000))
+		{
+			CString slog;
+			slog.Format("[VER] WaitAxisExit FAILED pid=[%d] - proceeding to copy anyway\n", m_axisPid);
+			OutputDebugString(slog);
+		}
 	}
 
 	if (!getDownDirFileName())
@@ -322,12 +336,12 @@ void CAxisverApp::updateObjectAXIS()
 
 void CAxisverApp::retryAXIS()
 {
-	if (IsWindow(m_axis))
+	if (IsWindow(m_axis) || m_axisPid != 0)
 	{
 		Sleep(500);
-		::PostMessage(m_axis, WM_CLOSE, 0, 0);
-		//WaitForSingleObject(m_axis, 3000);
-		WaitAxisExit(m_axis, 10000);
+		if (IsWindow(m_axis))
+			::PostMessage(m_axis, WM_CLOSE, 0, 0);
+		WaitAxisExit(m_axis, m_axisPid, 10000);
 	}
 
 	CString	tmps, dests, text;
@@ -443,6 +457,8 @@ void CCommLine::ParseParam(LPCSTR lpszParam, BOOL bFlag, BOOL bLast)
 			app->m_argument = CAxisverApp::argACT::argRETRY;
 		else if (!tmps.CompareNoCase("k"))
 			app->m_argument = CAxisverApp::argACT::argMANAGER;
+		else if (!tmps.CompareNoCase("x"))
+			app->m_argument = CAxisverApp::argACT::argPID;
 		else
 		{
 			app->m_params += " /";
@@ -471,6 +487,9 @@ void CCommLine::ParseParam(LPCSTR lpszParam, BOOL bFlag, BOOL bLast)
 		return;
 	case CAxisverApp::argACT::argMANAGER:
 		app->m_keys = tmps;
+		return;
+	case CAxisverApp::argACT::argPID:
+		app->m_axisPid = (DWORD)atoi(tmps);
 		return;
 	case CAxisverApp::argACT::argRSV:
 		app->m_params += ' ';

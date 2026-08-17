@@ -1,17 +1,25 @@
 // axlog.h - unified debug log helper, category on/off via DF_LOG_* defines.
-// Shared across Wizard.dll and axisvbs.dll (inline, header-only - no link dependency).
+// Shared across Wizard.dll, axisvbs.dll and axSock.ocx (inline, header-only - no link dependency).
 #pragma once
 #include <stdarg.h>
+
+// Module tag shown as "[TAG][category]...". Define this before #include-ing
+// axlog.h in a given .cpp to override; existing Wizard/axisvbs files that
+// don't define it keep the original "WIZARD" tag unchanged.
+#ifndef AXLOG_MODULE_TAG
+#define AXLOG_MODULE_TAG "WIZARD"
+#endif
 
 #define DF_LOG_INIT
 #define DF_LOG_EVENT
 #define DF_LOG_DATA
 #define DF_LOG_RTM
 #define DF_LOG_SCRIPT
+#define DF_LOG_FILEPATCH
 // OFF by default: axisform.dll's CfmEdit::Draw/UpdateData fire on every repaint/keystroke, very high volume.
 // #define DF_LOG_AXISFORM
 
-enum axLogCat { LOG_INIT, LOG_EVENT, LOG_DATA, LOG_RTM, LOG_SCRIPT, LOG_AXISFORM };
+enum axLogCat { LOG_INIT, LOG_EVENT, LOG_DATA, LOG_RTM, LOG_SCRIPT, LOG_AXISFORM, LOG_FILEPATCH };
 
 inline bool axLogOn(axLogCat cat)
 {
@@ -35,6 +43,9 @@ inline bool axLogOn(axLogCat cat)
 #ifdef DF_LOG_AXISFORM
 	case LOG_AXISFORM: return true;
 #endif
+#ifdef DF_LOG_FILEPATCH
+	case LOG_FILEPATCH: return true;
+#endif
 	default: return false;
 	}
 }
@@ -43,10 +54,10 @@ inline void axlogImpl(axLogCat cat, const char* func, int line, LPCTSTR fmt, ...
 {
 	if (!axLogOn(cat)) return;
 
-	// Category names padded to the width of the longest one (AXISFORM=8) so
-	// "[WIZARD][xxx]" is always the same length regardless of category.
+	// Category names padded to the width of the longest one (FILEPATCH=9) so
+	// "[TAG][xxx]" is always the same length regardless of category.
 	static const char* catNames[] = {
-		"INIT", "EVENT", "DATA", "RTM", "SCRIPT", "AXISFORM"
+		"INIT", "EVENT", "DATA", "RTM", "SCRIPT", "AXISFORM", "FILEPATCH"
 	};
 
 	va_list args;
@@ -63,7 +74,7 @@ inline void axlogImpl(axLogCat cat, const char* func, int line, LPCTSTR fmt, ...
 	// Longer entries just overflow the field without truncation or misalignment
 	// of their own message - only later, shorter lines stay aligned.
 	CString line_out;
-	line_out.Format("[WIZARD][%-8s] %-42s %s\n", catNames[cat], (LPCTSTR)funcLine, (LPCTSTR)msg);
+	line_out.Format("[%s][%-9s] %-42s %s\n", "WIZARD", catNames[cat], (LPCTSTR)funcLine, (LPCTSTR)msg);
 
 	OutputDebugString(line_out);
 }

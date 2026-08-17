@@ -11,6 +11,8 @@
 #include "../h/axisfire.h"
 #include "../h/axisanm.h"
 #include "../h/axisvar.h"
+#define AXLOG_MODULE_TAG "SOCK"
+#include "../h/axlog.h"
 
 #include "Log.h"
 
@@ -629,6 +631,57 @@ public:
 	int	m_key;
 };
 
+// <home>/exe/openapi_whitelist.txt 존재 시, 그 안에 나열된 "폴더/파일명"(또는 "폴더/*" 와일드카드)만
+// 패치 다운로드 대상으로 허용한다. 파일이 없으면(본HTS 등 OPEN API가 아닌 배포) 기존 동작 그대로
+// 전부 허용 - 하위호환. 프로세스당 1회만 읽어서 캐시함(패치 목록 확정은 세션 시작 시 한 번뿐).
+static bool IsPatchWhitelisted(const CString& home, const CString& folder, const CString& fileName)
+{
+	static bool loaded = false;
+	static bool active = false;
+	static CStringArray entries;   // "FOLDER/FILENAME" 또는 "FOLDER/*", 전부 대문자로 저장
+
+	if (!loaded)
+	{
+		CString path;
+		path.Format(_T("%s/%s/openapi_whitelist.txt"), home.GetString(), RUNDIR);
+		CStdioFile file;
+		if (file.Open(path, CFile::modeRead))
+		{
+			active = true;
+			CString line;
+			while (file.ReadString(line))
+			{
+				line.Trim();
+				if (line.IsEmpty() || line[0] == _T('#'))
+					continue;
+				line.MakeUpper();
+				entries.Add(line);
+			}
+			file.Close();
+			axlog(LOG_FILEPATCH, "[Whitelist-load] path=%s entries=%d", path.GetString(), entries.GetSize());
+		}
+		else
+		{
+			axlog(LOG_FILEPATCH, "[Whitelist-load] not found(%s) - filtering OFF, full behavior", path.GetString());
+		}
+		loaded = true;
+	}
+
+	if (!active)
+		return true;
+
+	CString exact, wildcard;
+	exact.Format(_T("%s/%s"), folder.GetString(), fileName.GetString());
+	exact.MakeUpper();
+	wildcard.Format(_T("%s/*"), folder.GetString());
+	wildcard.MakeUpper();
+
+	for (int i = 0; i < entries.GetSize(); i++)
+		if (entries.GetAt(i) == exact || entries.GetAt(i) == wildcard)
+			return true;
+	return false;
+}
+
 bool CWsh::MakeUpdateList()
 {
 	CString	path, infos, str, text;
@@ -661,9 +714,11 @@ bool CWsh::MakeUpdateList()
 			item->m_vers = vers;
 			clist.SetAt(wb, item);
 		}
+		axlog(LOG_FILEPATCH, "[MakeUpdateList-local] localCount=%d (tab/infoAXIS)", clist.GetCount());
 
 		path.Format(_T("%s/%s/infoAXIS.new"), m_home.GetString(), TABDIR);
 		LoadFile(path, arr);
+		axlog(LOG_FILEPATCH, "[MakeUpdateList-server] serverCount=%d (tab/infoAXIS.new)", arr.GetSize());
 
 		value = 0;
 		path.Format(_T("%s/%s/updateX"), m_home.GetString(), TABDIR);
@@ -687,13 +742,23 @@ bool CWsh::MakeUpdateList()
 			if (clist.Lookup(wb, (CObject *&)item))
 			{
 				if (vers <= item->m_vers)
+				{
+					axlog(LOG_FILEPATCH, "[MakeUpdateList-skip] name=%s localVers=%d serverVers=%d (up to date)", wb, item->m_vers, vers);
 					continue;
+				}
 			}
 
 			if (size == 0)
 			{
 				str.Format(_T("%s/%s/%s"), m_home.GetString(), RUNDIR, wb);
+				axlog(LOG_FILEPATCH, "[MakeUpdateList-delete] name=%s (server size=0)", wb);
 				DeleteFile(str);
+				continue;
+			}
+
+			if (!IsPatchWhitelisted(m_home, RUNDIR, wb))
+			{
+				axlog(LOG_FILEPATCH, "[MakeUpdateList-skip-whitelist] name=%s (not in openapi_whitelist.txt)", wb);
 				continue;
 			}
 
@@ -703,6 +768,7 @@ bool CWsh::MakeUpdateList()
 			update->m_size = size;
 			m_list.Add(update);
 			value += size;
+			axlog(LOG_FILEPATCH, "[MakeUpdateList-queue] name=%s serverVers=%d size=%d", wb, vers, size);
 
 			str.Format(_T("%d"), m_list.GetSize());
 			text.Format(_T("%s:%d\n"), update->m_name.GetString(), update->m_size);
@@ -716,6 +782,8 @@ bool CWsh::MakeUpdateList()
 			delete item;
 		}
 		clist.RemoveAll();
+
+		axlog(LOG_FILEPATCH, "[MakeUpdateList-summary] queuedCount=%d totalBytes=%d", m_list.GetSize(), value);
 
 		if (m_list.GetSize() > 0 && value > 0)
 		{
@@ -851,6 +919,12 @@ bool CWsh::MakeUpdateList()
 			count++;
 		default:
 			break;
+		}
+
+		if (!IsPatchWhitelisted(m_home, twb, wb))
+		{
+			axlog(LOG_FILEPATCH, "[MakeUpdateList-skip-whitelist-rsc] name=%s path=%s (not in openapi_whitelist.txt)", wb, twb);
+			continue;
 		}
 
 		update = new Cupdate;

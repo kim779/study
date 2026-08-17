@@ -1,0 +1,37 @@
+# openapi_whitelist.txt
+#
+# 이 파일이 <설치루트>\exe\ 에 존재하면 패치 화이트리스트 모드가 켜짐
+# (axSock의 CWsh::MakeUpdateList가 이 파일의 존재 여부로 OPEN API 모드를 판별함).
+# 없으면 기존 동작(본HTS와 동일, 전체 패치 허용) 그대로 유지 - 하위호환.
+#
+# 형식: 폴더/파일명   (한 줄에 하나, #으로 시작하면 주석)
+#       폴더 전체 허용은 폴더/*
+#
+# 확정 경위: ibks/docs/Dependency.md, 사용자 메모리 project_openapi_patch_whitelist 참고.
+# - exe/ 아래 17개: 5개 진입점 OCX + dumpbin 재귀조사로 확인한 커스텀 DLL들
+#   (AXISCODE/AXISDIALOG/CX_FDS/NSLDAP32V11은 정적분석으론 못 잡고 Process Explorer 실측으로 확인됨)
+# - tab/*: 종목마스터(hjcode3.dat/upcode.dat)와 테마/그룹사 INI(THEMCD.INI/GROPCD.INI)가 필요해서
+#   폴더 전체 허용. 그 안에 펀드코드(ffcode.dat) 등 불필요한 것도 같이 딸려오지만 용량이 작아 감수.
+#   (2026-08-17: tab/* 대신 필요한 파일만 골라내는 선별작업은 추후 과제로 남김)
+# - dev/CX_FDS.DLL: dev 폴더는 화면DLL 수백개가 섞여있어 전체 허용은 안 하고, 실제 로드 확인된
+#   이 파일만 개별 허용.
+# - map/, image, icss/* 등 나머지 폴더(조건검색식/차트이미지/화면 등, 수천 개)는 전부 미포함 = 차단.
+
+exe/IBKSCONNECTOR.OCX
+exe/AXWIZARD.OCX
+exe/AXSOCK.OCX
+exe/AXCERTIFY.OCX
+exe/AXXECURE.OCX
+exe/AXISFORM.DLL
+exe/AXISLIB.DLL
+exe/AXISVBS.DLL
+exe/AXISLOGIN.DLL
+exe/AXISCODE.DLL
+exe/AXISDIALOG.DLL
+exe/SKCOMDIF.DLL
+exe/SKCOMMSC.DLL
+exe/SKCOMMEM.DLL
+exe/SKCOMMCM.DLL
+exe/NSLDAP32V11.DLL
+dev/CX_FDS.DLL
+tab/*

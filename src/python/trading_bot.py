@@ -32,6 +32,15 @@ from backtest_daily import (
 
 OCX_GUID = "{CDADD338-C7AB-4977-B65D-8E988B5958E3}"
 
+# IBKSConnector.ocx가 내부적으로 셀프등록하는 의존 컨트롤들 (AxisUtil.cpp의 OCX[] 배열과 동일)
+# 등록경로가 엉뚱한 폴더로 바뀌는 문제를 여러 번 겪어서, 초기화 시 실제 로드경로를 눈으로 바로 확인하기 위함.
+DEPENDENT_OCX_PROGIDS = {
+    "AxisWizard": "AxisWizard.WizardCtrl.IBK2019",
+    "AxisSock":   "AxisSock.SockCtrl.IBK2019",
+    "AxisCertify": "AxisCertify.CertifyCtrl.IBK2019",
+    "AxisXecure": "AxisXecure.XecureCtrl.IBK2019",
+}
+
 # 접속서버 목록 (IP, 이름) - 포트는 UI의 svr_port 값 공용 사용
 SERVER_LIST = [
     ("211.255.204.104", "UAT"),
@@ -693,11 +702,12 @@ class TestWindow(QMainWindow):
         group = QGroupBox("Login")
         layout = QVBoxLayout(group)
 
-        is_dev = _is_my_dev_pc()
+        #is_dev = _is_my_dev_pc()
+        is_dev = True
         form = QFormLayout()
-        self.edit_user_id  = QLineEdit("ng12589" if is_dev else "")
-        self.edit_user_pw  = QLineEdit("wnsgur12@" if is_dev else ""); self.edit_user_pw.setEchoMode(QLineEdit.Password)
-        self.edit_cert_pw  = QLineEdit("ahffkdy123 " if is_dev else ""); self.edit_cert_pw.setEchoMode(QLineEdit.Password)
+        self.edit_user_id  = QLineEdit("khs779" if is_dev else "")  #ng12589
+        self.edit_user_pw  = QLineEdit("1q2w3e4r" if is_dev else ""); self.edit_user_pw.setEchoMode(QLineEdit.Password) #wnsgur12@
+        self.edit_cert_pw  = QLineEdit("ahffkdy123 " if is_dev else ""); self.edit_cert_pw.setEchoMode(QLineEdit.Password) #ahffkdy123 
         self.combo_server  = QComboBox()
         self.combo_server.addItem("", "")
         for ip, name in SERVER_LIST:
@@ -1454,6 +1464,21 @@ class TestWindow(QMainWindow):
         self.lbl_init.setText(str(result))
         self._log(f"Initialize() => {result}")
         self._log(f"OCX path: {self._get_ocx_path()}")
+        for name, progid in DEPENDENT_OCX_PROGIDS.items():
+            self._log(f"  {name} path: {self._get_ocx_path_by_progid(progid)}")
+        if not result:
+            err = self.ocx.dynamicCall("GetLastErrMsg()")
+            self._log(f"  Initialize 실패: {err}")
+            QMessageBox.critical(
+                None, "초기화 실패",
+                "Initialize()가 실패했습니다 — IBKSConnector.ocx가 필요한 컴포넌트(axWizard/axSock/axCertify/axXecure)를\n"
+                "자체 등록하는 과정에서 문제가 발생했을 가능성이 높습니다.\n\n"
+                f"상세: {err}\n\n"
+                "해결 방법:\n"
+                "1. 이 프로그램을 관리자 권한으로 다시 실행해주세요.\n"
+                "2. 관리자 권한으로도 계속 실패하면 exe 폴더의 해당 OCX 파일이 손상/누락되지 않았는지 확인하세요."
+            )
+            sys.exit(1)
 
     def _get_ocx_path(self):
         reg_key = f"CLSID\\{OCX_GUID}\\InprocServer32"
@@ -1461,6 +1486,19 @@ class TestWindow(QMainWindow):
             key = winreg.OpenKey(winreg.HKEY_CLASSES_ROOT, reg_key)
             path, _ = winreg.QueryValueEx(key, "")
             winreg.CloseKey(key)
+            return path
+        except Exception as e:
+            return f"(registry read failed: {e})"
+
+    def _get_ocx_path_by_progid(self, progid):
+        # ProgID -> CLSID -> InprocServer32 순으로 조회 (C++ CLSIDFromProgID와 동일한 경로)
+        try:
+            clsid_key = winreg.OpenKey(winreg.HKEY_CLASSES_ROOT, f"{progid}\\CLSID")
+            clsid, _ = winreg.QueryValueEx(clsid_key, "")
+            winreg.CloseKey(clsid_key)
+            path_key = winreg.OpenKey(winreg.HKEY_CLASSES_ROOT, f"CLSID\\{clsid}\\InprocServer32")
+            path, _ = winreg.QueryValueEx(path_key, "")
+            winreg.CloseKey(path_key)
             return path
         except Exception as e:
             return f"(registry read failed: {e})"
