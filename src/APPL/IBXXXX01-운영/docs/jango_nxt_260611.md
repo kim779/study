@@ -1,5 +1,18 @@
 # 실시간잔고 NXT 종목코드 처리 수정 (2026-06-11)
 
+
+## 목차
+
+- [모듈 개요](#모듈-개요)
+- [배경](#배경)
+- [keyS 구조](#keys-구조)
+- [수정 내용 (Remain.cpp `CalRemainData`)](#수정-내용-remaincpp-calremaindata)
+- [검토 결과](#검토-결과)
+- [기존 버그 (이번 수정과 무관)](#기존-버그-이번-수정과-무관)
+- [체결 흐름 (MapWnd.cpp parsingNotice)](#체결-흐름-mapwndcpp-parsingnotice)
+
+---
+
 ## 모듈 개요
 
 `Remain.cpp` / `Remain.h` — 실시간 잔고 계산 모듈 (`CRemain` 클래스)

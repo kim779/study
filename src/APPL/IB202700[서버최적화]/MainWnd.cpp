@@ -26,6 +26,7 @@ static char THIS_FILE[] = __FILE__;
 /////////////////////////////////////////////////////////////////////////////
 // CMainWnd
 #define TM_RTSTIME 9898
+#define TM_FOCUSFIX 8786
 
 
 
@@ -1094,7 +1095,11 @@ LONG CMainWnd::OnUser(WPARAM wParam, LPARAM lParam)
 		if (m_bDestroy)
 			break;
 
-
+		{
+			CString slogTrig;
+			slogTrig.Format("[GROUPTR_DIAG][DLL_TRIGGER] datB=[%.64s]", (char*)lParam);
+			Output_DebugString(slogTrig);
+		}
 		parsingTrigger((char *)lParam);
 		break;
 	case DLL_DOMINO:
@@ -1201,6 +1206,11 @@ void CMainWnd::parsingTrigger(CString datB)
 		BOOL bMemo = BlinkIni["INTERFIELD"]["MEMO"] << "0";
 		_pApp->setMemoType(bMemo);
 
+		{
+			CString slogTrig;
+			slogTrig.Format("[GROUPTR_DIAG][OnPortfolio] m_bProc=[%d]", m_bProc);
+			Output_DebugString(slogTrig);
+		}
 		if (!m_bProc)
 		{
 			// 2016.12.14 KSJ 관심종목을 여러개 띄웠을때 수정된 내용이 있다면 refresh 하지 않는다.
@@ -2049,6 +2059,22 @@ void CMainWnd::OnTimer(UINT nIDEvent)
 			{
 				const int nKey = m_pWnd->SendMessage(WM_USER, MAKEWPARAM(variantDLL, majorCC), NULL);
 				m_strTag.Format("%d", nKey);
+
+				// 2026-08-21: WM_USER+9333/9444 경로와 동일하게 기본 설정파일(FILE_CONFIG)을
+				// 새 태그의 intercfg 파일로 복사해온다. 이게 없으면 loadinfo()가 이 태그의
+				// ini를 못 찾아 그룹개수/마지막조회그룹이 기본값(1개, 빈 그룹)으로만 세팅된다.
+				CString strCfg, filepath;
+				strCfg.Format("intercfg%s.ini", m_strTag);
+				filepath.Format("%s\\%s\\%s\\%s", m_home, USRDIR, m_user, strCfg);
+
+				CString basefile;
+				basefile.Format("%s\\%s\\%s\\%s", m_home, USRDIR, m_user, FILE_CONFIG);
+
+				CFileFind finder;
+				if (finder.FindFile(basefile))
+				{
+					::CopyFile(basefile, filepath, FALSE);
+				}
 			}
 
 			Variant(titleCC, "관심종목");
@@ -2056,6 +2082,11 @@ void CMainWnd::OnTimer(UINT nIDEvent)
 			loadinfo();
 			CreateChild(); // ontimer
 			SetPallette();
+			ResizeOper(m_size.cx, m_size.cy);  //test 1 독립실행시 그룹종목 조회가 안되서 추가 이게 있어야 트리윈도우와 연계가 된다
+
+			// 2026-08-21: 독립실행시 이 시점 이후 메인(호스트)이 포커스를 한번 가져가면서
+			// 이 화면이 뒤로 넘어가는 증상이 있어, 잠시 뒤 다시 앞으로 가져온다.
+			//SetTimer(TM_FOCUSFIX, 300, nullptr);
 		}
 		Invalidate(false);
 
@@ -2063,6 +2094,16 @@ void CMainWnd::OnTimer(UINT nIDEvent)
 		//생성되면 메세지 보내줔.
 		if (m_bDominoToolWnd && m_pToolWnd != nullptr)
 			m_pToolWnd->SendMessage(WM_MANAGE, MAKEWPARAM(MK_SELECTGROUP, (LPARAM)m_nGroupIndex));
+	}
+	else if (nIDEvent == TM_FOCUSFIX)
+	{
+		KillTimer(TM_FOCUSFIX);
+		CWnd* pTop = GetTopLevelParent();
+		if (pTop)
+		{
+			pTop->BringWindowToTop();
+			pTop->SetFocus();
+		}
 	}
 #ifdef DF_RTS_TIMER
 	else if (nIDEvent == TM_RTSTIME)
@@ -2419,6 +2460,13 @@ void CMainWnd::receiveOub(int key, CString data)
 		data = data.Mid(4);
 		data.Trim();
 
+		{
+			CString slogGroup;
+			slogGroup.Format("[GROUPTR_DIAG] cnt=[%d] dataEmpty=[%d] m_pTreeWnd=[%p] m_pToolWnd=[%p] m_pGroupWnd=[%p] _bInit=[%d]",
+				cnt, data.IsEmpty(), m_pTreeWnd.get(), m_pToolWnd.get(), m_pGroupWnd.get(), _bInit);
+			Output_DebugString(slogGroup);
+		}
+
 		if (!data.IsEmpty() && cnt > 0)
 		{
 			std::vector<std::pair<CString, CString>> vGroupName;
@@ -2448,6 +2496,12 @@ void CMainWnd::receiveOub(int key, CString data)
 					map.emplace(std::make_pair(atoi(item.second), item.first));
 				});
 
+				{
+					CString slogGroup;
+					slogGroup.Format("[GROUPTR_DIAG] before SelectOper m_nGroup=[%d]",
+						m_pGroupWnd->GetmnGroupCount());
+					Output_DebugString(slogGroup);
+				}
 				m_pGroupWnd->SelectOper();
 				if (!_bInit)
 				{

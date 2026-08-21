@@ -1,5 +1,86 @@
 # ibks 프로젝트 지식 베이스
 
+
+## 목차
+
+- [문서 목적](#문서-목적)
+- [1. 설계 의도](#1-설계-의도)
+  - [VBScript → Python 엔진 전환의 이유](#vbscript-python-엔진-전환의-이유)
+  - [CEngineWrapper의 역할](#cenginewrapper의-역할)
+- [2. 아키텍처 설계 상세](#2-아키텍처-설계-상세)
+  - [왜 AddObject 버퍼링을 했는가?](#왜-addobject-버퍼링을-했는가)
+  - [왜 바이너리 마커를 제거해야 하는가?](#왜-바이너리-마커를-제거해야-하는가)
+  - [왜 재진입(Re-entrance) 방어가 필요한가?](#왜-재진입re-entrance-방어가-필요한가)
+- [3. 트러블슈팅 이력](#3-트러블슈팅-이력)
+  - [버그 1: LoadLibrary error 126](#버그-1-loadlibrary-error-126)
+  - [버그 2: C4996 Py_SetPythonHome deprecated](#버그-2-c4996-py_setpythonhome-deprecated)
+  - [버그 3: 모든 화면에서 Python 동작](#버그-3-모든-화면에서-python-동작)
+  - [버그 4: INFO 객체 오류 (800a01a8)](#버그-4-info-객체-오류-800a01a8)
+  - [버그 5: 프로그램 크래시 (PyDict_GetItem)](#버그-5-프로그램-크래시-pydict_getitem)
+  - [버그 6: SYSTEM is not defined](#버그-6-system-is-not-defined)
+- [4. 중요한 설계 결정](#4-중요한-설계-결정)
+  - [1. COM 객체 래핑 방식](#1-com-객체-래핑-방식)
+  - [2. 엔진 생성 시점](#2-엔진-생성-시점)
+  - [3. 바이너리 마커 처리 위치](#3-바이너리-마커-처리-위치)
+- [5. Python 환경 설정](#5-python-환경-설정)
+  - [sys.path 구성](#syspath-구성)
+  - [표준 라이브러리 사용](#표준-라이브러리-사용)
+- [6. COM 객체 명칭 규약](#6-com-객체-명칭-규약)
+  - [대소문자 규칙](#대소문자-규칙)
+  - [VBS → Python 변환 매핑](#vbs-python-변환-매핑)
+- [7. 성능 최적화 팁](#7-성능-최적화-팁)
+  - [1. LoadScript 캐싱](#1-loadscript-캐싱)
+  - [2. GC 최적화](#2-gc-최적화)
+  - [3. 대량 AddObject 최적화](#3-대량-addobject-최적화)
+- [8. 알려진 제한사항](#8-알려진-제한사항)
+  - [1. 스레드 안전성](#1-스레드-안전성)
+  - [2. 상속/클래스 정의 불가](#2-상속클래스-정의-불가)
+  - [3. 모듈 import 제한](#3-모듈-import-제한)
+- [9. 배포 체크리스트](#9-배포-체크리스트)
+  - [DLL 배포](#dll-배포)
+  - [설정 확인](#설정-확인)
+- [10. 다음 단계 (미완료)](#10-다음-단계-미완료)
+- [11. 실시간 데이터(RTM) 갱신 흐름과 Input 필드 버그 (2026-07-16)](#11-실시간-데이터rtm-갱신-흐름과-input-필드-버그-2026-07-16)
+  - [배경](#배경)
+  - [전체 흐름](#전체-흐름)
+  - [발견한 문제](#발견한-문제)
+  - [수정 내용](#수정-내용)
+  - [관련 파일](#관련-파일)
+- [12. axwizard 소스 분석 중 발견한 문서-코드 드리프트 (2026-07-13)](#12-axwizard-소스-분석-중-발견한-문서-코드-드리프트-2026-07-13)
+  - [12.1 엔진 선택 방식이 "순수 자동감지"에서 "빌드 시 확정 + 자동감지 폴백"으로 진화](#121-엔진-선택-방식이-순수-자동감지에서-빌드-시-확정-자동감지-폴백으로-진화)
+  - [12.2 텍스트 스캔 폴백(`isPythonScript()`) 자체도 더 엄격해짐](#122-텍스트-스캔-폴백ispythonscript-자체도-더-엄격해짐)
+  - [12.3 재진입(reentrancy) 방어 코드(`m_inException`)가 현재 코드에 없음](#123-재진입reentrancy-방어-코드m_inexception가-현재-코드에-없음)
+  - [12.4 PendingObject 버퍼링 메커니즘은 그대로 유지됨 (기존 설계 확인됨)](#124-pendingobject-버퍼링-메커니즘은-그대로-유지됨-기존-설계-확인됨)
+- [13. Ctrl+C/V 클립보드 단축키가 외부에서 차단됨 — Ctrl+1/2/3 폴백으로 우회 (2026-07-29)](#13-ctrlcv-클립보드-단축키가-외부에서-차단됨-ctrl123-폴백으로-우회-2026-07-29)
+  - [증상](#증상)
+  - [조사 경과 (axlog로 진단, `docs/DebugLogGuide.md` 4절 클립보드 로그 활용)](#조사-경과-axlog로-진단-docsdebuglogguidemd-4절-클립보드-로그-활용)
+  - [결론](#결론)
+  - [적용한 우회책 — `Wizard/Key.cpp::CKey::OnKey`](#적용한-우회책-wizardkeycppckeyonkey)
+- [14. COnTimer는 죽은 코드 — 실제 타이머는 전부 평범한 WM_TIMER (2026-07-29)](#14-contimer는-죽은-코드-실제-타이머는-전부-평범한-wm_timer-2026-07-29)
+  - [배경](#배경-1)
+  - [확인된 사실](#확인된-사실)
+  - [설계 의도로 추정되는 것](#설계-의도로-추정되는-것)
+  - [되돌려진 이유로 추정되는 것 (증거 기반 추정, 미확정)](#되돌려진-이유로-추정되는-것-증거-기반-추정-미확정)
+  - [교훈](#교훈)
+  - [관련 파일](#관련-파일-1)
+- [15. Screen.Send() 중복/연쇄 억제 메커니즘 (2026-07-29, 실측 트레이스 기반)](#15-screensend-중복연쇄-억제-메커니즘-2026-07-29-실측-트레이스-기반)
+  - [배경](#배경-2)
+  - [확인된 사실 — Send/OnChange 무한연쇄를 막는 5중 안전장치](#확인된-사실-sendonchange-무한연쇄를-막는-5중-안전장치)
+  - [실측으로 확정됨 (2026-07-29, `[OnTRAN-gate]`/`[MakeStream-waitSN-drop]` 로그 추가 후 재현)](#실측으로-확정됨-2026-07-29-ontran-gatemakestream-waitsn-drop-로그-추가-후-재현)
+  - [부수 발견 — OnStart 실행 전에 이미 Send가 나갈 수 있음](#부수-발견-onstart-실행-전에-이미-send가-나갈-수-있음)
+  - [관련 파일](#관련-파일-2)
+- [16. FlashGrid RTM 로그의 포맷스트링 타입 불일치로 인한 크래시 (2026-08-20)](#16-flashgrid-rtm-로그의-포맷스트링-타입-불일치로-인한-크래시-2026-08-20)
+  - [증상](#증상-1)
+  - [원인](#원인-1)
+  - [수정](#수정)
+  - [교훈](#교훈-1)
+  - [관련 파일](#관련-파일-3)
+- [17. 추가 자료](#17-추가-자료)
+  - [참고 문서](#참고-문서)
+  - [외부 참고](#외부-참고)
+
+---
+
 ## 문서 목적
 
 ibks 프로젝트의 분석, 디버깅, 개발 과정에서 얻은 지식을 누적하고 재사용 가능한 형태로 정리합니다.
@@ -881,7 +962,63 @@ OnChange(1301) #2 → Screen.Send(0) → InStream() → OnTRAN()=true (1~4번 �
 
 ---
 
-## 16. 추가 자료
+## 16. FlashGrid RTM 로그의 포맷스트링 타입 불일치로 인한 크래시 (2026-08-20)
+
+### 증상
+
+`CScreen::FlashGrid`(그리드 RTM 실시간 갱신, `@docs/MigrationSpec_SocketToDrawing.md` 8.11.4절)의 axlog 진단 로그(`[FlashGrid-write]`, 2026-08-19 추가, `@docs/DebugLogGuide.md` 6절)가 찍히는 순간 프로그램이 죽는 현상을 사용자가 실측 로그로 발견. Visual Studio에서 `h/axlog.h`의 `axlog()` 구현부, `CString funcLine;` 줄(포맷 문자열 조립이 끝난 뒤 다음 `CString`을 새로 만드는 지점)에서 예외로 멈추는 것까지 확인됨 — 즉 크래시 지점 자체는 `axlog` 내부처럼 보이지만 실제 원인은 그 직전 호출부에 있었음.
+
+### 원인
+
+`Wizard/Screen.cpp`(`CScreen::FlashGrid`)의 로그 호출:
+
+```cpp
+axlog(LOG_RTM, "[FlashGrid-write] name=%.16s code=%s row=%d col=%.16s old=[%.32s] new=[%.32s]",
+    (char*)form->m_form->name, code.GetString(), ii, form->GetName(idx), text.GetString(), string.GetString());
+```
+
+`col=%.16s`(문자열 포인터를 기대하는 포맷 지정자)에 넘긴 `form->GetName(idx)`가 실제로는 `int`를 반환한다:
+
+```cpp
+// dll/form/fmBase.h:171
+virtual int GetName(int col = -1) { return m_rts; }
+// dll/form/fmGrid.h:205 (CfmGrid override, 실제 런타임 타입)
+int GetName(int col = -1);
+```
+
+`CString::FormatV`가 가변인자를 포맷 문자열대로 순서대로 소비하는데, `%s` 자리에서 정수값을 포인터로 오인해 그 값을 주소로 역참조 — 대부분 유효하지 않은 메모리 영역이라 힙/스택이 오염되거나 접근위반이 발생한다. 크래시가 `FormatV` 호출 그 순간이 아니라 **다음 힙 할당 지점(`axlog.h`의 후속 `CString funcLine;` 생성자)에서 지연 발현**된 것도 이 유형의 버그(포맷스트링 타입 불일치로 인한 메모리 오염)의 전형적인 특징 — 죽는 줄과 원인 줄이 다르게 보여 진단이 헷갈리기 쉽다.
+
+**참고 — 같은 함수(1036행) `fms->Lookup(form->GetName(idx), string)`은 정상이다.** `fms`(`CdataSet*`)는 필드코드를 정수 키로 쓰는 구조라 `GetName()`이 `int`를 반환하는 게 거기서는 맞는 용법. 문제는 오직 axlog 호출에서 그 정수를 `%s` 포맷에 그대로 넣은 것뿐 — 같은 반환값이라도 소비하는 쪽(정수 키 조회 vs 문자열 포맷)에 따라 옳고 그름이 갈리는 사례.
+
+### 수정
+
+`col=%.16s` → `col=%d`로 포맷 지정자를 실제 타입(`int`)에 맞게 교정(사용자 직접 적용, 2026-08-20). 로그 문구 외 다른 로직은 변경 없음:
+
+```cpp
+axlog(LOG_RTM, "[FlashGrid-write] name=%.16s code=%s row=%d col=%d old=[%.32s] new=[%.32s]",
+    (char*)form->m_form->name, code.GetString(), ii, form->GetName(idx), text.GetString(), string.GetString());
+```
+
+같은 시점에 추가된 `[FlashSemi-write]`(Screen.cpp:1118)/`[ScrollRTM-insert]`(Screen.cpp:1186)는 `GetName()`을 쓰지 않아 이 버그와 무관함을 확인함.
+
+### 교훈
+
+`axlog`/`printf` 계열 가변인자 함수에서 크래시가 나면, **크래시가 찍힌 줄이 아니라 그 직전에 호출된 가변인자 함수(및 그 인자 타입)부터 의심**해야 한다 — 포맷 지정자와 실제 인자 타입이 어긋나면 컴파일러가 잡아주지 못하고(가변인자는 타입체크 대상 밖), 오염된 메모리가 다음 할당 시점에야 크래시로 드러나는 경우가 흔하다. 특히 이름이 `GetName()`인 함수라도 실제로 문자열을 반환한다고 가정하지 말 것 — 이 코드베이스에서는 `int`(내부 식별자 `m_rts`)를 반환하는 동명 함수가 실재한다.
+
+### 관련 파일
+
+| 파일 | 역할 |
+|---|---|
+| `Wizard/Screen.cpp:1048-1049` | `CScreen::FlashGrid` — 버그가 있던 axlog 호출, 수정 완료 |
+| `dll/form/fmBase.h:171` | `CfmBase::GetName(int col=-1)` — `int m_rts` 반환 (기반 클래스 기본 구현) |
+| `dll/form/fmGrid.h:205` | `CfmGrid::GetName(int col=-1)` — `int` 반환 오버라이드 (`FlashGrid`에서 실제 호출되는 런타임 타입) |
+| `h/axlog.h` | `axlog()` 구현 — `msg.FormatV(fmt, args)` 직후 `CString funcLine` 생성 시점에 오염된 메모리로 인한 크래시가 지연 발현된 지점 |
+| `@docs/DebugLogGuide.md` 6절 | `[FlashGrid-write]` 태그 설명 (2026-08-19 추가 당시 기록, 이번 버그 발생 시점) |
+| `@docs/MigrationSpec_SocketToDrawing.md` 8.11.4절 | `FlashGrid`/`FlashSemi` 메커니즘 상세 |
+
+---
+
+## 17. 추가 자료
 
 ### 참고 문서
 - `@docs/Architecture.md` - 모듈 구조
@@ -898,5 +1035,5 @@ OnChange(1301) #2 → Screen.Send(0) → InStream() → OnTRAN()=true (1~4번 �
 
 ---
 
-**최종 수정:** 2026-07-29
+**최종 수정:** 2026-08-20
 **기여자:** Documentation Agent

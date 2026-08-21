@@ -1052,6 +1052,12 @@ void CGroupWnd::OperInit()
 
 void CGroupWnd::InitSetGroup()
 {
+	{
+		CString slogInit;
+		slogInit.Format("[GROUPTR_DIAG][InitSetGroup] m_nGroup=[%d] m_nCurSel=[%d] m_GridWnd[m_nCurSel]=[%p]",
+			m_nGroup, m_nCurSel, m_GridWnd[m_nCurSel].get());
+		Output_DebugString(slogInit);
+	}
 	const UINT kind = m_GridWnd[m_nCurSel]->GetKind();
 	const int gIndex = GetPrivateProfileInt(SEC_MAIN, KEY_SELECTGROUP, 1, m_fileCFG);  //test mod
 	const UINT val = MAKE_TREEID(xINTEREST, 0, 2, gIndex, TD_ITEM);
@@ -2073,6 +2079,12 @@ void CGroupWnd::DrawMove(CRect rect)
 
 void CGroupWnd::SelectOper()
 {
+	{
+		CString slogSel;
+		slogSel.Format("[GROUPTR_DIAG][SelectOper] m_nGroup=[%d] m_nCurSel=[%d] m_GridWnd[m_nCurSel]=[%p]",
+			m_nGroup, m_nCurSel, m_GridWnd[m_nCurSel].get());
+		Output_DebugString(slogSel);
+	}
 	for (int ii = 0; ii < m_nGroup; ii++)
 	{
 		m_GridWnd[ii]->SendMessage(WM_MANAGE, MK_SELGROUP);
@@ -2153,7 +2165,11 @@ int CGroupWnd::_httoi(const TCHAR *value)
 
 void CGroupWnd::SendGrid(int nIndex, UINT kind)
 {
-
+	{
+		CString slogSendGrid;
+		slogSendGrid.Format("[GROUPTR_DIAG][SendGrid#1] nIndex=[%d] kind=[%u]", nIndex, kind);
+		Output_DebugString(slogSendGrid);
+	}
 	const int max = MAX_LINE;
 	CGridData sdata;
 	if (CAST_TREEID(kind)->kind == xINTEREST)
@@ -2193,6 +2209,12 @@ void CGroupWnd::saveRecommandGroup()
 
 void CGroupWnd::SendGrid(int nIndex, CGridData *sdata)
 {
+	{
+		CString slogSendGrid;
+		slogSendGrid.Format("[GROUPTR_DIAG][SendGrid#2] nIndex=[%d] m_nGroup=[%d] getArraySize=[%d]",
+			nIndex, m_nGroup, (nIndex < m_nGroup && nIndex < 30) ? (int)m_GridWnd[nIndex]->getArray().size() : -1);
+		Output_DebugString(slogSendGrid);
+	}
 	if (nIndex >= 30) // XMSG(È®ÀÎ¿ä¸Á...)
 		return;
 

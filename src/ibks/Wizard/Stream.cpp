@@ -1967,6 +1967,9 @@ int CStream::SetDataOOP(CScreen* screen, char* axisB, int axisL, bool skip)
 			else
 				pos = text.GetLength();
 
+			axlog(LOG_DATA, "[5-SetDataOOP-write] key=%d name=%.16s kind=%d iok=%d value=[%.64s]",
+				key, (char*)form->m_form->name, form->m_form->kind, form->m_form->iok, text.GetString());
+
 			if (form->m_form->kind == FM_MEMO || form->m_form->kind == FM_BROWSER)
 				form->WriteAll(text);
 			else
@@ -2002,6 +2005,9 @@ int CStream::SetDataOOP(CScreen* screen, char* axisB, int axisL, bool skip)
 				pos += index + ((screen->m_mapH->options & OP_OOP2) ? 1 : 2);
 			}
 
+			axlog(LOG_DATA, "[5-SetDataOOP-write] key=%d name=%.16s kind=%d GRID textLen=%d preview=[%.64s]",
+				key, (char*)form->m_form->name, form->m_form->kind, text.GetLength(), text.GetString());
+
 			form->WriteAll(text);
 			screen->OnProfit(form);
 			form->IsChanged();
@@ -2034,6 +2040,10 @@ int CStream::SetDataOOP(CScreen* screen, char* axisB, int axisL, bool skip)
 				text = text.Mid(index);
 				pos += index;
 			}
+
+			axlog(LOG_DATA, "[5-SetDataOOP-write] key=%d name=%.16s kind=%d TABLE value=[%.64s]",
+				key, (char*)form->m_form->name, form->m_form->kind, dats.GetString());
+
 			form->WriteAll(dats);
 			break;
 
@@ -2071,6 +2081,10 @@ int CStream::SetDataOOP(CScreen* screen, char* axisB, int axisL, bool skip)
 					else
 						pos = text.GetLength();
 				}
+
+				axlog(LOG_DATA, "[5-SetDataOOP-write] key=%d name=%.16s kind=%d CONTROL value=[%.64s]",
+					key, (char*)form->m_form->name, form->m_form->kind, text.GetString());
+
 				form->WriteData(text);
 				form->IsChanged();
 				break;
@@ -3037,6 +3051,7 @@ int CStream::ParseRCC(CScreen* screen, char* datB)
 	CfmBase*	form;
 	if (!screen->FindForm(CString(rcc->name, indx), form))
 	{
+		axlog(LOG_DATA, "[ParseRCC] name=%.16s NOT FOUND on screen, dropping ccl=%d entries", rcc->name, rcc->ccl);
 		for (indx = 0; indx < rcc->ccl; indx++)
 		{
 			skipL += strlen(datB);
@@ -3069,6 +3084,9 @@ int CStream::ParseRCC(CScreen* screen, char* datB)
 			datB = &datB[strlen(datB)];
 			datB++; skipL++;
 		}
+
+		axlog(LOG_DATA, "[ParseRCC-combo] name=%.16s ccl=%d textLen=%d preview=[%.100s]",
+			rcc->name, rcc->ccl, text.GetLength(), text.GetString());
 
 		form->WriteAll(text);
 		break;

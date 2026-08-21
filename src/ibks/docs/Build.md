@@ -1,5 +1,51 @@
 # ibks 프로젝트 빌드 가이드
 
+
+## 목차
+
+- [문서 목적](#문서-목적)
+- [1. 빌드 환경 요구사항](#1-빌드-환경-요구사항)
+  - [필수 소프트웨어](#필수-소프트웨어)
+  - [선택 소프트웨어](#선택-소프트웨어)
+  - [환경 변수](#환경-변수)
+- [2. 프로젝트 구조](#2-프로젝트-구조)
+  - [주요 vcxproj 파일](#주요-vcxproj-파일)
+- [3. 빌드 순서](#3-빌드-순서)
+  - [1단계: axisvbs.dll (스크립트 엔진)](#1단계-axisvbsdll-스크립트-엔진)
+  - [2단계: axwizard.dll (화면 런타임)](#2단계-axwizarddll-화면-런타임)
+  - [3단계: axisbuilder.exe (화면 편집기)](#3단계-axisbuilderexe-화면-편집기)
+- [4. vcxproj 설정 상세](#4-vcxproj-설정-상세)
+  - [axisvbs.vcxproj 설정](#axisvbsvcxproj-설정)
+    - [Include Directories](#include-directories)
+    - [Library Directories](#library-directories)
+    - [Additional Dependencies](#additional-dependencies)
+    - [Runtime Library](#runtime-library)
+  - [Wizard.vcxproj 설정](#wizardvcxproj-설정)
+    - [Include Directories](#include-directories-1)
+    - [Library Directories](#library-directories-1)
+    - [Additional Dependencies](#additional-dependencies-1)
+- [5. 빌드 트러블슈팅](#5-빌드-트러블슈팅)
+  - [오류 1: LNK1104 - 파일을 열 수 없음](#오류-1-lnk1104---파일을-열-수-없음)
+  - [오류 2: C1083 - Include 파일을 열 수 없음](#오류-2-c1083---include-파일을-열-수-없음)
+  - [오류 3: LNK2019 - 외부 기호 확인 불가](#오류-3-lnk2019---외부-기호-확인-불가)
+  - [오류 4: MSB3191 - OutDir 드라이브 문제 (Release)](#오류-4-msb3191---outdir-드라이브-문제-release)
+  - [오류 5: LNK2019 - 노트북/PC 간 드라이브 문자(D:\ vs F:\) 불일치 (2026-07-20)](#오류-5-lnk2019---노트북pc-간-드라이브-문자d-vs-f-불일치-2026-07-20)
+- [6. 배포 단계](#6-배포-단계)
+  - [배포 폴더 구성](#배포-폴더-구성)
+  - [배포 체크리스트](#배포-체크리스트)
+  - [배포 후 검증](#배포-후-검증)
+- [7. 개발 빌드 vs 배포 빌드](#7-개발-빌드-vs-배포-빌드)
+  - [Debug 빌드 (개발)](#debug-빌드-개발)
+  - [Release 빌드 (배포)](#release-빌드-배포)
+- [8. 빌드 자동화 (옵션)](#8-빌드-자동화-옵션)
+  - [MSBuild 명령어](#msbuild-명령어)
+  - [배치 파일 예시](#배치-파일-예시)
+- [9. 빌드 검사 (Pre-Build)](#9-빌드-검사-pre-build)
+  - [필수 사항 확인](#필수-사항-확인)
+- [10. 관련 문서](#10-관련-문서)
+
+---
+
 ## 문서 목적
 
 ibks 프로젝트의 빌드 환경, 프로세스, 문제 해결 방법을 정의합니다.

@@ -64,8 +64,8 @@ struct _Ralert {
 
 // 서버가 실시간 데이터에 field 298(KRX 장운영세션)/299(NXT 장운영세션)을 추가로 실어줌(2026-08-10 시안).
 // 기존 beginTime/endTime 클라이언트 시각 비교 방식 대신 이 세션ID로 동시호가/단일가 여부를 판단한다.
-// 원복: 이 줄만 주석 처리.
-#define DF_SESSION_EXPECT1
+// 2026-08-19: 기능 잠정 중단(의도적 비활성화, IB202700과 동일). 재개: 주석 해제.
+//#define DF_SESSION_EXPECT
 
 inline void Output_DebugString(CString slog)
 {

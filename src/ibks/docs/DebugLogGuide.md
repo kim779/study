@@ -1,5 +1,32 @@
 # 디버그 로그 가이드 (axlog)
 
+
+## 목차
+
+- [전체 로그 키워드 목록 (DebugView 등록용)](#전체-로그-키워드-목록-debugview-등록용)
+- [색인 — 태그/절 빠른 찾기](#색인-태그절-빠른-찾기)
+  - [증상별 시작점](#증상별-시작점)
+  - [추천 DebugView 필터/북마크 세트](#추천-debugview-필터북마크-세트)
+  - [컨트롤 `kind` 코드 표 (참고용, `builder/h/form.h` 확정)](#컨트롤-kind-코드-표-참고용-builderhformh-확정)
+- [문서 목적](#문서-목적)
+- [1. axlog 인프라 개요](#1-axlog-인프라-개요)
+- [2. 화면 열기 흐름 (CClient::Attach → CScreen::Parse)](#2-화면-열기-흐름-cclientattach-cscreenparse)
+- [3. 스크립트 엔진 내부 (LOG_SCRIPT — 평소 꺼둠)](#3-스크립트-엔진-내부-log_script-평소-꺼둠)
+- [4. 이벤트 → 스크립트 프로시저 디스패치 (CScript, 2026-07-29 추가)](#4-이벤트-스크립트-프로시저-디스패치-cscript-2026-07-29-추가)
+- [5. 입력 이벤트 (마우스/키보드)](#5-입력-이벤트-마우스키보드)
+- [6. 소켓 데이터 파이프라인 (번호 순서대로 실행됨)](#6-소켓-데이터-파이프라인-번호-순서대로-실행됨)
+- [7. DLL 기반 화면 (CDll)](#7-dll-기반-화면-cdll)
+- [8. 로그인/인증 · OLE 드래그앤드롭 · DDE (2026-07-28 추가)](#8-로그인인증-ole-드래그앤드롭-dde-2026-07-28-추가)
+- [9. 내일(화면 열고 닫으며 확인할 때) 체크리스트](#9-내일화면-열고-닫으며-확인할-때-체크리스트)
+- [10. 타이머 워커 스레드 (COnTimer, 2026-07-29 추가)](#10-타이머-워커-스레드-contimer-2026-07-29-추가)
+- [10.5. 스크립트 타이머 (Screen.SetTimer/SetTimerX) — 실제 살아있는 경로 (2026-07-30 추가)](#105-스크립트-타이머-screensettimersettimerx-실제-살아있는-경로-2026-07-30-추가)
+- [11. axisform.dll 컨트롤 레이어 로그 (LOG_AXISFORM, 2026-07-29 추가)](#11-axisformdll-컨트롤-레이어-로그-log_axisform-2026-07-29-추가)
+- [12. 암호화/복호화 (Xecure, 2026-07-31 추가)](#12-암호화복호화-xecure-2026-07-31-추가)
+  - [NOENC.TXT — 개발용 암호화 강제 비활성화 (2026-07-31 추가)](#noenctxt-개발용-암호화-강제-비활성화-2026-07-31-추가)
+- [13. 관련 문서](#13-관련-문서)
+
+---
+
 ## 전체 로그 키워드 목록 (DebugView 등록용)
 
 이 문서에서 다루는 모든 로그 태그를 그대로 나열합니다. DebugView의 Highlight/Bookmark에 하나씩 추가해두는 용도. 각 태그의 상세 의미·주의사항은 아래 색인 표에서 절 번호를 찾아 본문 참고. `CxScreen::_`/`CxSystem::_`/`CScript::On`처럼 접두사만 적은 항목은 그 뒤에 붙는 여러 구체 메서드명(`_Send`/`_ChangeTR`/`OnClick`/`OnChange` 등)을 한 번에 잡기 위한 substring 필터임. 10절(`COnTimer`)은 죽은 코드라 실제로 안 찍히므로 목록에서 제외.
@@ -81,7 +108,12 @@ CGuard::GetClipboard
 [SetDataH-ledger]
 [5-SetDataNRM-write]
 [6-SetCells
+[ParseRCC]
+[ParseRCC-combo]
 [UpdateRTM-write]
+[FlashGrid-write]
+[FlashSemi-write]
+[ScrollRTM-insert]
 [ATTACH]
 [MISMATCH]
 CGuard::Write
@@ -151,7 +183,7 @@ IsNoEncMode
 | 3 | 스크립트 엔진 내부(VBS/Python), `LOG_SCRIPT` | `getIDOfProcedure`, `DoProcedure(1)/(2)`(`LOG_EVENT`), `CEngineWrapper::LoadScript scpKind=`, Python `[Initialize]`/`[AddObject]`/`[IsAvailable]`/`[DoProcedure]`/`[fetchError]`, `CxScreen::_Send`/`_ChangeTR`/`_CreateWindow`/`_Proc`/`_SetTimer` 등, `CxSystem::_Trigger`/`_Trace`/`_CheckPasswd` 등 |
 | 4 | 이벤트→스크립트 프로시저 디스패치(`CScript`) | `CScript::OnStart`/`OnFocus`/`OnClose`/`OnTimer`/`OnKey`/`OnClick`/`OnChange`/`OnProcedure`/`Procedure` 등 (`OnAlert`는 죽은코드, 로그 없음) |
 | 5 | 입력 이벤트(마우스/키보드/클립보드) | `CMouse::OnDown`, `CKey::OnKey`(+`VK_RETURN->InStream`, +`Ctrl+1/2/3 fallback`), `CKey::OnChar`(+`blocked by IsWait`), `CKey::Copy$Paste`, `CGuard::SetClipboard`/`GetClipboard` |
-| 6 | 소켓 데이터 파이프라인(송수신, 번호순 실행) | `[OnTRAN-gate]`, `[MakeStream-waitSN-drop]`, `[0-MakeStream-send]`, `[0-GetDataNRM-field/grid/cell]`, `[0-Write-send]`, `[1-OnAxis-raw]`, `[2-OnStream-reassemble]`, `[3-CClient-OnAxis-reassembled]`, `[4-OutStream-parse]`, `[SetDataH]`/`[SetDataH-ledger]`, `[5-SetDataNRM-write]`, `[6-SetCells-*]`, `[UpdateRTM-write]`, `CGuard::Write(1)/(2)` |
+| 6 | 소켓 데이터 파이프라인(송수신, 번호순 실행) | `[OnTRAN-gate]`, `[MakeStream-waitSN-drop]`, `[0-MakeStream-send]`, `[0-GetDataNRM-field/grid/cell]`, `[0-Write-send]`, `[1-OnAxis-raw]`, `[2-OnStream-reassemble]`, `[3-CClient-OnAxis-reassembled]`, `[4-OutStream-parse]`, `[SetDataH]`/`[SetDataH-ledger]`, `[5-SetDataNRM-write]`, `[6-SetCells-*]`, `[ParseRCC]`/`[ParseRCC-combo]`, `[UpdateRTM-write]`, `[FlashGrid-write]`, `[FlashSemi-write]`, `[ScrollRTM-insert]`, `CGuard::Write(1)/(2)` |
 | 7 | `CDll` 기반 화면(외부 DLL 로드형) | `CDll::Attach`, `loaded via axCreate/axCreateEx/axCreateX`, `DllProc WM_USER/WM_SIZE`, `[CDll-OnAxis-raw]`(`OutStream`을 안 타는 화면의 유일한 추적점) |
 | 8 | 로그인/인증, OLE 드래그앤드롭, DDE | `CWizardCtrl::RunAxis`, `CGuard::Login`/`Certify`/`OnCertify`/`CertifyId`, `COleDrop::OnDrop`/`Register`, `COleDropEx::Drop`/`Register`/`Revoke`, `CDde::OnDDE`/`OnAdvise`/`OnExit` |
 | 9 | 화면 열고닫으며 확인할 체크리스트 | (태그 없음, 진단 순서 안내) |
@@ -389,7 +421,12 @@ DebugView(또는 DebugView++)의 "Find" 창에 아래 태그를 넣어 검색하
 | `[SetDataH]` / `[SetDataH-ledger]` | `Stream.cpp` | 레코드헤더 파싱, `TH_LEDGER`인 경우 원장 블록(384바이트) 파싱 |
 | `[5-SetDataNRM-write]` | `Stream.cpp` (`SetDataNRM`) | TR 응답 필드 단위 쓰기(`FM_EDIT`/`FM_OUT` 등) |
 | `[6-SetCells-...]` | `Stream.cpp` (`SetCells`) | 그리드 셀 단위 파싱(진입/셀값/스킵/완료) |
+| `[ParseRCC]` / `[ParseRCC-combo]` | `Stream.cpp` (`CStream::ParseRCC`, 2026-08-21 추가) | 콤보/트리 항목 목록을 채우는 RCC(인밴드 제어코드, `MigrationSpec_SocketToDrawing.md` 8.5절) 처리 지점. `[5-SetDataNRM-write]`는 콤보의 "현재 선택된 값" 하나(고정폭)만 잡고, 드롭다운 항목 목록 자체가 채워지는 이 경로는 별도라 지금까지 로그가 전혀 없었음. `[ParseRCC]`는 `rcc->name`(컨트롤명)으로 화면에서 폼을 못 찾아 데이터 전체가 조용히 버려지는 경우, `[ParseRCC-combo]`는 `csCOMBO` 케이스에서 실제로 `form->WriteAll(text)`로 항목 목록을 쓰기 직전 — `ccl`(항목 개수)/`textLen`/앞부분 미리보기(`%.100s`)를 출력. `csTREE`(트리 컨트롤, `USRDIR` INI 파일에 씀)는 아직 로그 미추가 |
+| `[WIZARD][RTM][DEBUG] compare` | `Screen.cpp` (`CScreen::OnAlert`의 `default:` 분기) | 단일 필드(`FA_FLASH`, 그리드/테이블 아님)의 RTM 코드 매칭 비교 — `field=` vs `code=`, `match=`. **주의: `axlog`가 아니라 `OutputDebugString`을 직접 호출하는 leftover 코드라 `LOG_RTM` 카테고리 게이트를 안 탄다** — `LOG_RTM`을 꺼도 이 줄만은 계속 찍힘. 이름은 `[WIZARD][RTM]`이라 다른 axlog 줄들과 같아 보이지만 실제로는 이 화면(단일필드 매칭용)에만 존재하고, `FM_GRID`/`FM_TABLE`은 이 줄 대신 `[FlashGrid-write]`/`[FlashSemi-write]`/`[ScrollRTM-insert]`(아래, 2026-08-19 추가)를 본다 — 그리드가 있는 화면에서 이 `compare` 줄이 안 보인다고 "실시간이 안 온다"는 뜻이 아님, 애초에 그리드는 이 경로를 안 탐 |
 | `[UpdateRTM-write]` | `Screen.cpp` (`UpdateRTM`) | 실시간 시세로 필드 갱신 시 `EIO_INPUT` 여부 |
+| `[FlashGrid-write]` | `Screen.cpp` (`CScreen::FlashGrid`, 2026-08-19 추가) | `FM_GRID`가 `vals[2]` 마커(`$?`/`$$`/`$*`) 없이 `FA_FLASH`로만 등록된 경우의 실시간 셀 갱신(`MigrationSpec_SocketToDrawing.md` 8.11.4절) — 코드가 일치하는 행을 찾아 값이 바뀐 셀만 덮어씀. `row`/`col`/`old`/`new` 값을 함께 출력하므로 어느 종목의 어느 컬럼이 언제 바뀌었는지 이 한 줄로 추적 가능. 행 삽입/삭제는 없음(그런 경우는 `[ScrollRTM-insert]` 참고). **버그 이력(2026-08-20, 수정완료):** 추가 당시 `col=%.16s` 포맷 지정자에 `form->GetName(idx)`(실제로는 `int` 반환)를 그대로 넘겨 크래시가 났음 — `col=%d`로 수정됨, 상세는 `KnowledgeBase.md` 16절 참고 |
+| `[FlashSemi-write]` | `Screen.cpp` (`CScreen::FlashSemi`, 2026-08-19 추가) | `FlashGrid`의 `FM_TABLE`(고정 테이블) 버전 — 컬럼이 아니라 `_cellR` 배열 기반의 고정 행 구조, 항상 0번 열에 씀 |
+| `[ScrollRTM-insert]` | `Screen.cpp` (`CScreen::ScrollRTM`, 2026-08-19 추가) | `vals[2]="$?"`(`m_sales`) 그리드의 실시간 행 삽입(8.11.1절) — 코드 매칭 없이 무조건 `InsertRows`. `top=1`이면 위쪽 삽입(`GO_TOP`), `ticks`는 이번 소켓 패킷에 버퍼링되어 한 번에 플러시된 틱 개수 |
 | `[WIZARD][RTM][DEBUG][ATTACH]` / `[MISMATCH]` | `Screen.cpp` (`DF_RTM_INDEX` 빌드시만) | RTM 종목코드 역인덱스 attach/검증 로그 — 별도 조사(`RealtimeCodeIndex_Investigation.md`) 참고 |
 | `CGuard::Write(1)` / `CGuard::Write(2)` | `Guard.cpp` | 실제 소켓 송신 직전(`CGuard::Write` 두 오버로드). **2026-07-29 이전엔 `[wizard][guard]` 소문자 태그로 게이트 없이 무조건 출력됐고, `Write(1)`은 송신 바이트 원문을 최대 50자까지 그대로 찍고 있었음** — 로그인/주문 등 민감정보가 섞일 수 있어 axlog 전환하며 `len`/`key`만 남기고 원문 미리보기는 제거함(`RunAxis` 평문 로그 제거와 같은 이유). `Write(2)`는 원래도 헤더 바이트 2개(hex)만 찍던 거라 내용은 그대로 유지 |
 

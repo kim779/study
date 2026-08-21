@@ -1,0 +1,173 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB555001)
+MAPSIZE(82, 300)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("Untitled")
+MAPPUBLIC(";")
+FONT("굴림", 9, NORMAL)
+OPTIONS(CR2TAB)
+TITLE("미국주간거래")
+TOPATH(AXIS)
+METHOD(FORM)
+MAPTYPE(FIXED)
+HEADER(NOP)
+}
+
+
+
+FORM DIVISION
+{
+
+BUTTON  BUTTON0(15, 15, 80, 55)  TP_PUSH      AL_CENTER    FOCUS  COLOR(208, 232)  CUR(0)      TABORDER(1)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+EDIT  edRes(185, 20, 275, 40)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(2)  IOORDER(1)  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL0(106, 19, 166, 41)  '주간거래'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  LABEL1(105, 45, 177, 67)  '서버조회시간'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+LABEL  lbServerTime(185, 45, 285, 67)  '주간거래'  AL_LEFT  CUR(0)      COLOR(208, 232)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONDECLARE_AW_
+Function IsUSDayMarket()
+	Dim sDate
+    Dim sTime
+    Dim nHour
+    Dim nMin
+    Dim nSec
+    Dim nTime
+    Dim dtDate
+    Dim ServerTime
+	Dim slog
+	    
+	IsUSDayMarket = False
+	edRes.Data = "0"
+	ServerTime =  SCREEN.ServiceEx("pihobizd","0", 1,&H02, 5000000)
+lbServerTime.Text = ServerTime
+slog = 	ServerTime
+SYSTEM.Trace "[IB555001][IsUSDayMarket] servertime = " & slog
+	
+	' 앞 8자리 : YYYYMMDD
+    sDate = Left(ServerTime, 8)
+	
+	 ' 다음 6자리 : HHMMSS
+    sTime = Mid(ServerTime, 9, 6)
+
+    ' 날짜 생성
+    dtDate = DateSerial( _
+                CInt(Left(sDate, 4)), _
+                CInt(Mid(sDate, 5, 2)), _
+                CInt(Right(sDate, 2)) _
+             )
+     
+    '시간 추출
+    nHour = CInt(Left(sTime, 2))
+    nMin = CInt(Mid(sTime, 3, 2))
+    nSec = CInt(Right(sTime, 2))
+  
+    'HHMMSS 숫자로 변환
+    nTime = nHour * 10000 + nMin * 100 + nSec
+    
+slog = 	nTime
+SYSTEM.Trace "[IB555001][IsUSDayMarket] nTime = " & slog  
+
+    '토요일 / 일요일은 주간거래 불가
+    If Weekday(dtDate, vbMonday) > 5 Then
+ SYSTEM.Trace "[IB555001][IsUSDayMarket] 토요일 일요일은 주간거래 불가!!!"
+        Exit Function
+    End If  
+    
+    ' 미국 서머타임 여부 확인
+    If IsUSDST(dtDate) Then
+        ' 서머타임 : 09:00:00 ~ 17:00:00
+        If nTime >= 90000 And nTime < 170000 Then
+            IsUSDayMarket = True
+       		edRes.Data = "1"
+        Else
+        	edRes.Data = "0"
+        End If
+SYSTEM.Trace "[IB555001][IsUSDayMarket] dtDate = " & dtDate  & " 서머타임!!!"
+    Else  
+    	  ' 겨울 : 10:00:00 ~ 18:00:00
+        If nTime >= 100000 And nTime < 180000 Then
+            IsUSDayMarket = True
+            edRes.Data = "1"
+         Else
+        	edRes.Data = "0"
+        End If
+SYSTEM.Trace "[IB555001][IsUSDayMarket] dtDate = " & dtDate  & " 서머타임 아님!!!" 
+    End If
+SYSTEM.Trace "[IB555001][IsUSDayMarket] 주간거래 여부 = >>>>>" & 	edRes.Data  & "<<<<<"       
+End Function
+
+' ============================================================
+' 미국 서머타임 여부
+' 3월 둘째 일요일 ~ 11월 첫째 일요일
+' ============================================================
+Function IsUSDST(dtDate)
+
+    Dim y
+    Dim dstStart
+    Dim dstEnd
+
+    y = Year(dtDate)
+
+    ' 3월 둘째 일요일
+    dstStart = GetNthSunday(y, 3, 2) 
+    ' 11월 첫째 일요일
+    dstEnd = GetNthSunday(y, 11, 1)
+
+    If dtDate >= dstStart And dtDate < dstEnd Then
+        IsUSDST = True
+    Else
+        IsUSDST = False
+    End If
+    
+SYSTEM.Trace "[IB555001][IsUSDST]서머타임 3월둘째 일요일(" & dstStart & ")  -→ " &  "11월첫째 일요일(" & dstEnd &")"    
+
+End Function
+
+' ============================================================
+' 해당 월의 N번째 일요일
+' ============================================================
+Function GetNthSunday(y, m, n)
+
+    Dim firstDay
+    Dim firstSunday
+    Dim resultDate
+
+    firstDay = DateSerial(y, m, 1)
+
+    ' 첫 번째 일요일 계산
+    firstSunday = firstDay + (7 - Weekday(firstDay, vbSunday)) Mod 7
+
+    ' N번째 일요일
+    resultDate = firstSunday + (n - 1) * 7
+
+    GetNthSunday = resultDate
+
+End Function
+
+_AW_SCRIPT_AW_(BUTTON0)
+_AW_ONCLICK_AW_
+IsUSDayMarket()
+_AW_ONENDSUB_AW_
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

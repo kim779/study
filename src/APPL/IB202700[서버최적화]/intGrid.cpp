@@ -682,9 +682,114 @@ void CintGrid::Blink(const int nRow, const int nCol, const ULONGLONG tick, CRect
 				}
 			);
 		}
-		else 
+		else
 			ft->second = tick;
 	}
+}
+
+long CintGrid::MakeBlinkKey(int row, int col) const
+{
+	return (row << 16) | (col & 0xFFFF);
+}
+
+void CintGrid::BlinkCell(int row, int col)
+{
+	if (_blinkType == 0)
+		return;
+
+	if (row < 0 || row >= GetRowCount())
+		return;
+
+	if (col < 0 || col >= GetColumnCount())
+		return;
+
+	if (IsCellAttribute(CIdCell(row, col), GVAT_HIDDEN))
+		return;
+
+	const long key = MakeBlinkKey(row, col);
+
+	auto it = _mapBlinkColor.find(key);
+	if (it != _mapBlinkColor.end())
+		return;  // 이미 깜박이는 중이면 무시 (tick 갱신 안 함)
+
+	GVITEM item{};
+	item.row = row;
+	item.col = col;
+	item.mask = GVMK_FLASH;
+	item.flash = GVFL_FLASHED;
+	SetItem(&item);
+
+	BlinkItem blink{};
+	blink.tick = GetTickCount64();
+	_mapBlinkColor.emplace(key, blink);
+
+	InvalidateCellRect(CIdCell(row, col));
+}
+
+void CintGrid::BlinkRow(int row)
+{
+	if (_blinkType == 0)
+		return;
+
+	if (row < 0 || row >= GetRowCount())
+		return;
+
+	for (int col = colNAME; col < GetColumnCount(); col++)
+	{
+		if (IsCellAttribute(CIdCell(row, col), GVAT_HIDDEN))
+			continue;
+
+		BlinkCell(row, col);
+	}
+}
+
+void CintGrid::Blink(int row, int col)
+{
+	if (_blinkType == 0)
+		return;
+
+	if (_blinkType == 1)
+	{
+		BlinkCell(row, col);
+		return;
+	}
+
+	if (_blinkType == 2)
+	{
+		BlinkRow(row);
+		return;
+	}
+}
+
+void CintGrid::ProcessBlink()
+{
+	const ULONGLONG now = GetTickCount64();
+	std::vector<long> vErase;
+
+	for (auto& it : _mapBlinkColor)
+	{
+		const long key = it.first;
+		const BlinkItem& blink = it.second;
+
+		if ((now - blink.tick) <= 500)
+			continue;
+
+		const int row = key >> 16;
+		const int col = key & 0xFFFF;
+
+		GVITEM item{};
+		item.row = row;
+		item.col = col;
+		item.mask = GVMK_FLASH;
+		item.flash = 0;
+		SetItem(&item);
+
+		InvalidateCellRect(CIdCell(row, col));
+		vErase.push_back(key);
+	}
+
+	for (long key : vErase)
+		_mapBlinkColor.erase(key);
 }
 
 // ADD PSH 20070912
@@ -1302,6 +1407,13 @@ void CintGrid::OnTimer(UINT nIDEvent)
 
 	if (nIDEvent == TIMEFLASH)
 	{
+		if (1)
+		{
+			ProcessBlink();
+			return;
+		}
+		else
+		{
 		if (_blinkType == 0)
 		 	return;
 
@@ -1359,10 +1471,11 @@ void CintGrid::OnTimer(UINT nIDEvent)
 				if(!rowRect.IsRectEmpty())
 					InvalidateRect(rowRect);	
 			}
-			else 
+			else
 				InvalidateCellRect(CIdCell{ key / 100, key % 100 });
 		}
 		return;
+		}
 	}
 
 	if (nIDEvent != WM_LBUTTONDOWN )
@@ -5707,6 +5820,8 @@ BOOL CintGrid::SetItemText(int nRow, int nCol, LPCTSTR str)
 			{
 				pCell->dtext = dstr;
 				RedrawCell(nRow,colCURR);
+				RedrawCell(nRow,colEXPECT);
+				Blink(nRow, colCURR);   // colEXPECT는 hidden, colCURR에 표시
 				return TRUE;
 			}
 		}
@@ -5719,6 +5834,10 @@ BOOL CintGrid::SetItemText(int nRow, int nCol, LPCTSTR str)
 	//2016.03.30 KSJ 이전데이터와 같으면 다시 그리지 않는다.
 	//2016.04.20 KSJ 봉데이터가 이전데이터와 계속 같이 들어와서 우선 주석처리함 고가 저가를 저장하기때문에 같을수 밖에 없음....
 	//if(nCol == colNAME || nCol == colCURR || bBong)	RedrawCell(nRow,nCol);
+
+	if (_bReal && nRow >= m_nFixedRows)
+		Blink(nRow, nCol);   // 변한 컬럼으로 blink (hidden이면 BlinkCell에서 알아서 skip)
+
 	RedrawCell(nRow,nCol);
 
 	return TRUE;

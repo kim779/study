@@ -1,5 +1,26 @@
 # IBK 증권 OpenAPI Python 테스트 프로젝트 진행 사항
 
+
+## 목차
+
+- [프로젝트 개요](#프로젝트-개요)
+- [완료된 작업](#완료된-작업)
+  - [[2026-06-28] 기본 UI 및 OCX 연동 완성](#2026-06-28-기본-ui-및-ocx-연동-완성)
+    - [구현 완료 기능](#구현-완료-기능)
+    - [OCX 이벤트 처리](#ocx-이벤트-처리)
+    - [UI 구성](#ui-구성)
+    - [바이너리 패킷 레이아웃](#바이너리-패킷-레이아웃)
+- [[2026-06-28] 개발환경 정비 (노트북 ↔ 다른 PC git 동기화)](#2026-06-28-개발환경-정비-노트북-다른-pc-git-동기화)
+  - [symstore PDB 관리](#symstore-pdb-관리)
+  - [NuGet 패키지 경로 문제 (TestDlg)](#nuget-패키지-경로-문제-testdlg)
+- [관련 C++ 프로젝트 현황](#관련-c-프로젝트-현황)
+  - [IBKSConnector_test (MFC OCX 본체)](#ibksconnector_test-mfc-ocx-본체)
+  - [AxisChaser (MFC 뷰어)](#axischaser-mfc-뷰어)
+- [미완료 / 향후 작업](#미완료-향후-작업)
+- [메모](#메모)
+
+---
+
 ## 프로젝트 개요
 
 IBK증권 OCX 커넥터(`ibkconnector.ocx`, GUID `{CDADD338-C7AB-4977-B65D-8E988B5958E3}`)를

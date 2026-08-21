@@ -1,5 +1,29 @@
 # VBScript -> Python Engine 전환 프로젝트 (2026-06-08 ~)
 
+
+## 목차
+
+- [목표](#목표)
+- [관련 경로](#관련-경로)
+- [전체 아키텍처](#전체-아키텍처)
+- [엔진 선택 방식](#엔진-선택-방식)
+- [Python 환경](#python-환경)
+  - [배포 시 필수 파일 (HTS exe 폴더에 복사)](#배포-시-필수-파일-hts-exe-폴더에-복사)
+- [수정된 파일 목록](#수정된-파일-목록)
+  - [axisvbs.dll (ibks/dll/vbs/)](#axisvbsdll-ibksdllvbs)
+  - [axwizard (ibks/Wizard/)](#axwizard-ibkswizard)
+  - [axisbuilder (builder/)](#axisbuilder-builder)
+- [버그 수정 이력](#버그-수정-이력)
+- [CPythonEngine 핵심 구조](#cpythonengine-핵심-구조)
+  - [바이너리 마커 제거 (중요)](#바이너리-마커-제거-중요)
+- [COM 객체 명칭 (Python 대소문자 주의)](#com-객체-명칭-python-대소문자-주의)
+- [axisbuilder Python 모드 사용법](#axisbuilder-python-모드-사용법)
+- [진행 현황](#진행-현황)
+  - [9단계 상세 (2026-06-11)](#9단계-상세-2026-06-11)
+- [다음 작업](#다음-작업)
+
+---
+
 ## 목표
 
 axisvbs.dll 내부의 VBScript 엔진(CScriptEngine)을 Python 엔진(CPythonEngine)으로 교체.

@@ -81,7 +81,7 @@ typedef BOOL(WINAPI* RtlGetVersion_FUNC) (OSVERSIONINFOEXW*);
 #define DF_PHONETEST
 #define DF_AXISFATCH
 #define DF_AXISCLOSE
-#define DF_TEST
+#define DF_TEST1
 
 
 enum AXIS_STATE

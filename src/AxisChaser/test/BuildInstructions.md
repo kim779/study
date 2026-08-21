@@ -1,5 +1,37 @@
 # AxisChaser 테스트 빌드 지침
 
+
+## 목차
+
+- [빌드 전 확인사항](#빌드-전-확인사항)
+  - [1. 의존성 확인](#1-의존성-확인)
+  - [2. 빌드 순서](#2-빌드-순서)
+  - [3. Visual Studio 설정](#3-visual-studio-설정)
+  - [4. 코드 인코딩 주의](#4-코드-인코딩-주의)
+- [빌드 명령어](#빌드-명령어)
+  - [Command Line 빌드 (MSBuild)](#command-line-빌드-msbuild)
+  - [Visual Studio IDE 빌드](#visual-studio-ide-빌드)
+- [빌드 오류 해결](#빌드-오류-해결)
+  - [오류 1: "RichLib.lib not found"](#오류-1-richliblib-not-found)
+  - [오류 2: "axisfire.h not found" 또는 "axis.h not found"](#오류-2-axisfireh-not-found-또는-axish-not-found)
+  - [오류 3: "Cannot open include file: 'afxwin.h'"](#오류-3-cannot-open-include-file-afxwinh)
+  - [오류 4: "LNK1104: cannot open file 'RichLib.lib'"](#오류-4-lnk1104-cannot-open-file-richliblib)
+- [테스트 실행 전 체크리스트](#테스트-실행-전-체크리스트)
+  - [빌드 완료 후](#빌드-완료-후)
+  - [실행 전 준비](#실행-전-준비)
+  - [실행 명령어](#실행-명령어)
+- [성능 프로파일링 설정](#성능-프로파일링-설정)
+  - [1. Debug 출력 캡처](#1-debug-출력-캡처)
+  - [2. Performance Monitoring (Windows Task Manager)](#2-performance-monitoring-windows-task-manager)
+  - [3. Event Viewer (크래시 로그)](#3-event-viewer-크래시-로그)
+- [테스트 데이터 생성기](#테스트-데이터-생성기)
+  - [C++ 테스트 프로그램 (TestSender.exe)](#c-테스트-프로그램-testsenderexe)
+- [빌드 성공 확인](#빌드-성공-확인)
+- [주의사항](#주의사항)
+- [관련 문서](#관련-문서)
+
+---
+
 **작성일**: 2026-07-30  
 **목적**: 성능 개선 테스트를 위한 빌드 및 준비 사항
 

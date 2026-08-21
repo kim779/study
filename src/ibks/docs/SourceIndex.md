@@ -1,5 +1,51 @@
 # ibks 소스 파일 색인
 
+
+## 목차
+
+- [문서 목적](#문서-목적)
+- [1. 모듈 별 파일 구성](#1-모듈-별-파일-구성)
+  - [1.1 axisvbs.dll - 스크립트 엔진 DLL](#11-axisvbsdll---스크립트-엔진-dll)
+    - [Python 엔진 (신규)](#python-엔진-신규)
+    - [VBS 엔진 (기존)](#vbs-엔진-기존)
+    - [빌드 설정](#빌드-설정)
+  - [1.2 axwizard (ibks/Wizard/) - 화면 런타임](#12-axwizard-ibkswizard---화면-런타임)
+    - [핵심 파일](#핵심-파일)
+    - [UI 지원 파일](#ui-지원-파일)
+    - [리소스 파일](#리소스-파일)
+  - [1.3 axisbuilder (builder/) - 화면 편집기](#13-axisbuilder-builder---화면-편집기)
+    - [Python 모드 지원 (신규/수정)](#python-모드-지원-신규수정)
+    - [빌드/컴파일](#빌드컴파일)
+    - [레이아웃/UI](#레이아웃ui)
+- [2. 계층 별 파일 분류](#2-계층-별-파일-분류)
+  - [계층 1: 엔진 (axisvbs.dll)](#계층-1-엔진-axisvbsdll)
+  - [계층 2: 런타임 (axwizard)](#계층-2-런타임-axwizard)
+  - [계층 3: 편집기 (axisbuilder)](#계층-3-편집기-axisbuilder)
+- [3. 주요 클래스 색인](#3-주요-클래스-색인)
+  - [Python 엔진 클래스](#python-엔진-클래스)
+  - [VBS 엔진 클래스](#vbs-엔진-클래스)
+  - [화면 클래스](#화면-클래스)
+- [4. 중요 함수 색인](#4-중요-함수-색인)
+  - [CPythonEngine 핵심 함수](#cpythonengine-핵심-함수)
+  - [CEngineWrapper 핵심 함수](#cenginewrapper-핵심-함수)
+  - [CScreen 핵심 함수](#cscreen-핵심-함수)
+- [5. 파일 간 호출 관계](#5-파일-간-호출-관계)
+- [6. 외부 의존 API](#6-외부-의존-api)
+  - [Python C API](#python-c-api)
+  - [COM/Windows API](#comwindows-api)
+  - [MFC API](#mfc-api)
+- [7. 빌드 의존성](#7-빌드-의존성)
+  - [axisvbs.dll 빌드](#axisvbsdll-빌드)
+  - [axwizard.dll 빌드 (axisvbs.dll 이후)](#axwizarddll-빌드-axisvbsdll-이후)
+  - [axisbuilder.exe 빌드](#axisbuilderexe-빌드)
+- [8. 파일 크기 및 복잡도 (추정)](#8-파일-크기-및-복잡도-추정)
+- [9. TEST/DEBUG 코드](#9-testdebug-코드)
+  - [TEST 블록 (제거 예정)](#test-블록-제거-예정)
+- [10. 알려진 제한사항](#10-알려진-제한사항)
+- [11. 관련 문서](#11-관련-문서)
+
+---
+
 ## 문서 목적
 
 ibks 프로젝트의 주요 소스 파일을 역할, 클래스/함수, 관련 파일, 사용 API별로 색인화합니다.

@@ -940,12 +940,17 @@ LONG CTreeWnd::OnManage(WPARAM wParam, LPARAM lParam)
 		{
 			HTREEITEM	hItem = GetSelectedItem();
 			DWORD		val{};
+			{
+				CString slogSetup;
+				slogSetup.Format("[GROUPTR_DIAG][TreeWnd MK_SETUPOK] hItem=[%p]", hItem);
+				Output_DebugString(slogSetup);
+			}
 			if (hItem)
 			{
 				val = GetItemData(hItem);
-				
+
 				if (CAST_TREEID(val)->kind == xINTEREST && CAST_TREEID(val)->depth == TD_ITEM)
-				{					
+				{
 					HTREEITEM	hParent = GetParentItem(hItem);
 					loadingInterest(hParent);
 					selectinterest(hParent, val);
@@ -954,6 +959,11 @@ LONG CTreeWnd::OnManage(WPARAM wParam, LPARAM lParam)
 			}
 			
 			m_mapParam.Lookup(MAKE_TREEID(xINTEREST), hItem);
+			{
+				CString slogSetup;
+				slogSetup.Format("[GROUPTR_DIAG][TreeWnd MK_SETUPOK] fallback loadingInterest hItem=[%p]", hItem);
+				Output_DebugString(slogSetup);
+			}
 			loadingInterest(hItem);
 		}
 		break;
@@ -2741,7 +2751,13 @@ void CTreeWnd::receiveOub(CString& data, int keys)
 
 void CTreeWnd::GetInterest(class CGridData& sdata, int max)
 {
-	struct _treeID	treeID = CONVERT_TREEID(sdata.GetKind());	
+	struct _treeID	treeID = CONVERT_TREEID(sdata.GetKind());
+	{
+		CString slogGet;
+		slogGet.Format("[GROUPTR_DIAG][GetInterest] treeID.value=[%d] arrInterSize=[%d]",
+			treeID.value, (int)_arrInter.size());
+		Output_DebugString(slogGet);
+	}
 	if (IS_WITHOUTx(0, _arrInter.size(), treeID.value))
 		return;
 
@@ -3071,6 +3087,12 @@ void CTreeWnd::DataReloadFore(class CGridData& sdata, CString data)
 bool CTreeWnd::GetData(class CGridData& sdata, int max, int opt)
 {
 	struct _treeID treeID = CONVERT_TREEID(sdata.GetKind());
+	{
+		CString slogGetData;
+		slogGetData.Format("[GROUPTR_DIAG][TreeWnd::GetData] kind=[%d] treeID.value=[%d] max=[%d] opt=[%d]",
+			treeID.kind, treeID.value, max, opt);
+		Output_DebugString(slogGetData);
+	}
 	switch (treeID.kind)
 	{
 	case xETFCOMPANY:

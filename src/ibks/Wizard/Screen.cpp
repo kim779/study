@@ -1044,6 +1044,10 @@ bool CScreen::FlashGrid(int key, CString code, CdataSet *fms)
 					m_color = true;
 
 				gridK = baseK + ii*nCols+idx;
+
+				axlog(LOG_RTM, "[FlashGrid-write] name=%.16s code=%s row=%d col=%d old=[%.32s] new=[%.32s]",
+					(char*)form->m_form->name, code.GetString(), ii, form->GetName(idx), text.GetString(), string.GetString());
+
 				if (m_guard->m_status & WS_FCB)
 				{
 					if (!m_revObs.Lookup(gridK, flashK))
@@ -1110,6 +1114,10 @@ bool CScreen::FlashSemi(int key, CdataSet *fms, CString code)
 			m_color = true;
 
 		semiK = baseK + ii;
+
+		axlog(LOG_RTM, "[FlashSemi-write] name=%.16s code=%s row=%d old=[%.32s] new=[%.32s]",
+			(char*)form->m_form->name, code.GetString(), ii, text.GetString(), string.GetString());
+
 		if (m_guard->m_status & WS_FCB)
 		{
 			if (!m_revObs.Lookup(semiK, flashK))
@@ -1175,6 +1183,9 @@ void CScreen::ScrollRTM(CObArray* obs)
 	}
 	if (insertF)
 	{
+		axlog(LOG_RTM, "[ScrollRTM-insert] name=%.16s ticks=%d top=%d",
+			(char*)form->m_form->name, obs->GetSize(), (form->m_form->attr2 & GO_TOP) ? 1 : 0);
+
 		if (form->m_form->attr2 & GO_TOP)
 			((CfmGrid *)form)->InsertRows(0, string);
 		else

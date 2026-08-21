@@ -1,5 +1,42 @@
 # AxisChaser 성능 개선 테스트 결과
 
+
+## 목차
+
+- [테스트 환경](#테스트-환경)
+- [Phase 1: 회귀 테스트 (기존 기능)](#phase-1-회귀-테스트-기존-기능)
+  - [TC-1.1: 기본 데이터 수신 및 표시](#tc-11-기본-데이터-수신-및-표시)
+  - [TC-1.2: 옵션 다이얼로그](#tc-12-옵션-다이얼로그)
+  - [TC-1.3: 로그 파일 저장](#tc-13-로그-파일-저장)
+- [Phase 2: WM_VSCROLL 배치 처리 검증](#phase-2-wm_vscroll-배치-처리-검증)
+  - [TC-2.1: 중간 크기 배치 (RTM 50건/초, 5초)](#tc-21-중간-크기-배치-rtm-50건초-5초)
+  - [TC-2.2: 대량 배치 (RTM 200건/초, 10초)](#tc-22-대량-배치-rtm-200건초-10초)
+- [Phase 3: RichEdit Truncate 검증 (50MB 상한)](#phase-3-richedit-truncate-검증-50mb-상한)
+  - [TC-3.1: Truncate 동작 확인](#tc-31-truncate-동작-확인)
+  - [TC-3.2: 스크롤 위치 손실 검증](#tc-32-스크롤-위치-손실-검증)
+- [Phase 4: 큐 상한 검증 (RTM 200건, SND/RCV 500건)](#phase-4-큐-상한-검증-rtm-200건-sndrcv-500건)
+  - [TC-4.1: RTM 큐 상한 (500건/초, 5초)](#tc-41-rtm-큐-상한-500건초-5초)
+  - [TC-4.2: SND/RCV 큐 상한 (300건/초, 5초)](#tc-42-sndrcv-큐-상한-300건초-5초)
+- [Phase 5: Stress Test (극한 시나리오)](#phase-5-stress-test-극한-시나리오)
+  - [TC-5.1: 통합 Stress Test (10분 이상)](#tc-51-통합-stress-test-10분-이상)
+- [종합 평가](#종합-평가)
+  - [Pass/Fail 판정](#passfail-판정)
+  - [개선 효과 정량화](#개선-효과-정량화)
+  - [주요 발견사항](#주요-발견사항)
+  - [리스크 재평가](#리스크-재평가)
+- [권장사항](#권장사항)
+  - [Immediate Actions (즉시 조치)](#immediate-actions-즉시-조치)
+  - [Follow-up Testing (후속 테스트)](#follow-up-testing-후속-테스트)
+  - [Code Review Items (코드 리뷰)](#code-review-items-코드-리뷰)
+  - [Documentation Updates (문서 갱신)](#documentation-updates-문서-갱신)
+- [첨부](#첨부)
+  - [A. 성능 그래프](#a-성능-그래프)
+  - [B. Debug 로그](#b-debug-로그)
+  - [C. 스크린샷](#c-스크린샷)
+- [서명](#서명)
+
+---
+
 **테스트 날짜**: [YYYY-MM-DD]  
 **테스터**: [Name]  
 **빌드 버전**: [Release / Debug]  

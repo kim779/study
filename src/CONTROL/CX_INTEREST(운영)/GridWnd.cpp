@@ -8321,6 +8321,26 @@ void CGridWnd::parsingAlertx(LPARAM lParam)
 						m_grid->SetItemText(xrow, colEXPECT, "0");
 					}
 #else
+					// DF_SESSION_EXPECT 비활성 상태라 세션ID 기반 판단 없이 무조건 예상가로 전환됨.
+					// 서버가 동시호가/단일가 구간이 아닌데도 rawExpectValue(111)를 안 지워주면 여기서
+					// 걸러내지 못하고 그대로 표시되므로, 체결시각(field 34) 기준으로 참고 로그만 남긴다(동작 변경 없음).
+					// m_strBeginTime/m_strEndTime은 장전 동시호가(08:50~09:00)만 커버하므로,
+					// 장마감 동시호가(15:20~15:30)는 CMainWnd가 따로 갖고 있는 값을 추가로 확인한다.
+					{
+						LPCSTR p34 = getData(34);
+						strTime = p34 ? p34 : "";
+						const CString closeBegin = ((CMainWnd*)m_pMainWnd)->GetCloseAuctionBeginTime();
+						const CString closeEnd = ((CMainWnd*)m_pMainWnd)->GetCloseAuctionEndTime();
+						const bool bInOpenAuction = (m_strBeginTime <= strTime && m_strEndTime >= strTime);
+						const bool bInCloseAuction = !closeBegin.IsEmpty() && !closeEnd.IsEmpty()
+							&& (closeBegin <= strTime && closeEnd >= strTime);
+						if (bKrx && !bInOpenAuction && !bInCloseAuction)
+						{
+							slog.Format("[STUCK_EXPECT][%s] 자동모드, DF_SESSION_EXPECT 비활성 - 체결시각(%s)이 장전동시호가(%s~%s)/장마감동시호가(%s~%s) 밖인데 rawExpectValue=[%s] 로 예상가 표시됨",
+								strCode, strTime, m_strBeginTime, m_strEndTime, closeBegin, closeEnd, rawExpectValue);
+							Output_DebugString(slog);
+						}
+					}
 					bTransSymbol = TRUE;
 #endif
 				}

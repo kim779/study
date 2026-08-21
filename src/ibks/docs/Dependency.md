@@ -1,5 +1,41 @@
 # ibks 프로젝트 의존성 분석
 
+
+## 목차
+
+- [문서 목적](#문서-목적)
+- [1. 전체 의존성 구조](#1-전체-의존성-구조)
+- [2. 모듈 별 의존성](#2-모듈-별-의존성)
+  - [2.1 axisvbs.dll (핵심 엔진 DLL)](#21-axisvbsdll-핵심-엔진-dll)
+  - [2.2 axisbuilder (화면 편집기)](#22-axisbuilder-화면-편집기)
+    - [2.2.1 axisBuilder 전체 링크 구조 검증 (2026-08-18, `builder/builder` 신버전 트리)](#221-axisbuilder-전체-링크-구조-검증-2026-08-18-builderbuilder-신버전-트리)
+    - [2.2.2 axwizard (화면 런타임)](#222-axwizard-화면-런타임)
+- [3. Python 3.11.6 의존성 (신규)](#3-python-3116-의존성-신규)
+  - [설치 경로](#설치-경로)
+  - [빌드 설정 (axisvbs.vcxproj)](#빌드-설정-axisvbsvcxproj)
+  - [Python C API 주요 함수](#python-c-api-주요-함수)
+  - [주의사항](#주의사항)
+- [4. 내부 Header Include Graph](#4-내부-header-include-graph)
+- [5. 외부 의존성 요약](#5-외부-의존성-요약)
+  - [필수 (반드시 설치/배포)](#필수-반드시-설치배포)
+  - [선택 (기존 프로젝트)](#선택-기존-프로젝트)
+- [6. 배포 의존성](#6-배포-의존성)
+  - [HTS exe 폴더 필수 DLL](#hts-exe-폴더-필수-dll)
+  - [누락 시 발생 오류](#누락-시-발생-오류)
+  - [OPEN API(`C:\HTS_OPENAPI\exe\`) 배포 — axWizard.ocx 실측 의존성 (2026-08-17)](#open-apichts_openapiexe-배포-axwizardocx-실측-의존성-2026-08-17)
+  - [OPEN API 진입점 5개 전체 — 재귀 의존성 완전 폐쇄집합 (2026-08-17, `C:\HTS_OPENAPI\exe\` 기준 전수 확인)](#open-api-진입점-5개-전체-재귀-의존성-완전-폐쇄집합-2026-08-17-chts_openapiexe-기준-전수-확인)
+- [7. 빌드 순서 및 의존성](#7-빌드-순서-및-의존성)
+- [8. 순환 의존성 (Circular Dependencies)](#8-순환-의존성-circular-dependencies)
+- [9. 버전 호환성](#9-버전-호환성)
+  - [Python 버전 선택 이유](#python-버전-선택-이유)
+  - [C++ 표준](#c-표준)
+- [10. 성능 임팩트](#10-성능-임팩트)
+  - [메모리 오버헤드](#메모리-오버헤드)
+  - [CPU 오버헤드](#cpu-오버헤드)
+- [11. 관련 문서](#11-관련-문서)
+
+---
+
 ## 문서 목적
 
 ibks 프로젝트의 Header Include, DLL/LIB 링크, COM, 외부 SDK 의존성을 명시하고 의존성 그래프로 시각화합니다.
@@ -97,7 +133,57 @@ ibks/dll/vbs/
       └── 신규 cpp 파일 등록
 ```
 
-### 2.2 axwizard (화면 런타임)
+### 2.2 axisbuilder (화면 편집기)
+
+axisbuilder는 `.map` 화면 파일을 만들어내는 상위 편집 도구이고, axwizard(2.2.2절)는 그 `.map`을 로드해 실행하는 런타임이다 — 산출물 흐름상 axwizard가 axisbuilder 하위에 위치하는 게 자연스러워 이 구조로 정리함(2026-08-18).
+
+**정적 링크:**
+
+| 라이브러리 | 용도 |
+|-----------|------|
+| `awWcc.lib` | 빌드/컴파일 DLL |
+| `awBuild.lib` | 맵 로드/파싱 DLL |
+| `mfc*.lib` | MFC |
+
+**세부 의존성:**
+
+```
+builder/
+  ├── VBScriptEdit.cpp        (Python 키워드 추가)
+  ├── scriptWnd.cpp           ([PY] 버튼 UI)
+  ├── awWcc/
+  │   ├── BinaryMngr.h        (#define PYTHON 2 추가)
+  │   └── Compile.cpp         (pythonMode 기반 ScpKind)
+  └── awBuild/
+      └── mapload.cpp         (pythonMode 자동감지)
+```
+
+#### 2.2.1 axisBuilder 전체 링크 구조 검증 (2026-08-18, `builder/builder` 신버전 트리)
+
+위 표는 Python 엔진 관련 의존성만 다룬 것이고, axisBuilder 자체의 전체 링크 구조는 별도로 실측 검증함. 사용자가 처음 이해했던 모델(`axisbuilder - awWcc, awBuild, awDlg, awTool, awUser, awCommon, awSock, awObject` / `공유 - axislib, axisform`)과 실제 `.sln`/`.vcxproj`를 대조한 결과, 두 가지가 착각으로 확인됨.
+
+**① `axisBuilder.sln`의 실제 서브프로젝트는 6개뿐:**
+
+```
+axisBuilder, awWcc, awBuild, awTool, awSock, awDlg
+```
+
+`awUser`/`awCommon`은 신버전 트리(`builder/builder`)에는 프로젝트 자체가 없음. 대신 **`src_7_11/platform/builder/`(구버전 트리)에는 `awCommon/awCommon.vcxproj`, `awObject/awObject.vcxproj`, `awUser/awUser.vcxproj`가 실제로 존재** — 즉 이 모델은 구버전 아키텍처이고, 신버전으로 넘어오며 세 프로젝트가 제거/통합된 것으로 추정됨(정확한 시점/사유는 git 히스토리가 `ffd9e2e4`(2026-02-17) 임포트 이전을 담고 있지 않아 확인 불가).
+
+`axisBuilder.vcxproj`의 실제 `AdditionalDependencies`: `axislib.lib`, `awBuild.lib`, `awCom.lib`, `awWcc.lib`, `awSock.lib`, `awTool.lib`, `awDlg.lib`, `awObject.lib` (+ 일부 설정에서 `axiform.lib`, `axObject.lib`). 이 중 `awObject.lib`/`awCom.lib`는 문자열로는 참조되지만 `libR`/`libD`/`lib_real`에 실제 파일이 없음(대신 `axObject.lib`만 존재) — 신버전 이관 과정에서 이름이 바뀌었는데 vcxproj 참조가 안 고쳐진 흔적으로 보이나, 링크가 실제로 어떻게 성립하는지는 미확인(추가 조사 필요).
+
+**② "공유 - axisform"은 착시 — 이름이 비슷한 별개의 두 DLL이 있음:**
+
+| DLL | 위치 | 실제 사용처 |
+|---|---|---|
+| `axisform.dll` (25개 클래스, ~4000줄 CfmGrid 포함 — `@docs/AxisformArchitecture.md` 참고) | `builder/dll/form/` | **axwizard만.** `Wizard.vcxproj`가 `../dll/form/release/axisform.lib` 직접 링크 |
+| `axiform.dll` ("s" 없음, dllmain/draw/iForm/palette뿐인 소형 DLL) | `builder/dll/iform/` | **axisBuilder만.** `awWcc`/`awTool`/`awDlg`가 `axiform.lib`(+`axObject.lib`) 링크 |
+
+즉 axisBuilder는 자신만의 별도 프리뷰 렌더링 DLL(`axiform`)을 쓰고, axwizard가 런타임에 쓰는 진짜 `axisform`은 axisBuilder 어느 서브프로젝트에서도 링크하지 않음. 두 모듈 간 실제로 공유되는 것은 **`axislib.lib` 하나뿐.**
+
+#### 2.2.2 axwizard (화면 런타임)
+
+axisbuilder가 만든 `.map`을 실제로 로드/실행하는 런타임. 위 2.2.1절에서 확인했듯 axisBuilder의 awXXX 서브프로젝트들과는 `axisform.lib`을 공유하지 않고, 오직 `axislib.lib`만 공유한다.
 
 **정적 링크:**
 
@@ -131,29 +217,6 @@ CScriptEngine* m_vbe;
 
 // After
 CEngineWrapper* m_vbe;                 // 엔진 자동 선택
-```
-
-### 2.3 axisbuilder (화면 편집기)
-
-**정적 링크:**
-
-| 라이브러리 | 용도 |
-|-----------|------|
-| `awWcc.lib` | 빌드/컴파일 DLL |
-| `awBuild.lib` | 맵 로드/파싱 DLL |
-| `mfc*.lib` | MFC |
-
-**세부 의존성:**
-
-```
-builder/
-  ├── VBScriptEdit.cpp        (Python 키워드 추가)
-  ├── scriptWnd.cpp           ([PY] 버튼 UI)
-  ├── awWcc/
-  │   ├── BinaryMngr.h        (#define PYTHON 2 추가)
-  │   └── Compile.cpp         (pythonMode 기반 ScpKind)
-  └── awBuild/
-      └── mapload.cpp         (pythonMode 자동감지)
 ```
 
 ---

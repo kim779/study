@@ -1,5 +1,19 @@
 # CLAUDE.md
 
+
+## 목차
+
+- [Overview](#overview)
+- [Commands](#commands)
+- [Architecture](#architecture)
+  - [핵심 구조 (`test_ocx.py`)](#핵심-구조-test_ocxpy)
+  - [TR 키 상수 매핑](#tr-키-상수-매핑)
+  - [바이너리 레이아웃 규칙](#바이너리-레이아웃-규칙)
+  - [실시간 데이터 (`OnRealData`)](#실시간-데이터-onrealdata)
+- [주의사항](#주의사항)
+
+---
+
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 ## Overview

@@ -1,5 +1,54 @@
 # AXIS 프로젝트 소스 색인 (Source Index)
 
+
+## 목차
+
+- [파일 분류 및 색인](#파일-분류-및-색인)
+  - [1. MFC 프레임워크 핵심 (Framework Core)](#1-mfc-프레임워크-핵심-framework-core)
+  - [2. 동기화 및 예외 처리 (Synchronization & Exception Handling)](#2-동기화-및-예외-처리-synchronization-exception-handling)
+  - [3. 워커 스레드 (Worker Threads)](#3-워커-스레드-worker-threads)
+  - [4. 싱글톤 및 전역 관리 (Singletons & Global Management)](#4-싱글톤-및-전역-관리-singletons-global-management)
+  - [5. 데이터 모델 (Data Models)](#5-데이터-모델-data-models)
+  - [6. 커스텀 컨트롤 (Custom Controls)](#6-커스텀-컨트롤-custom-controls)
+    - [그리드 컨트롤](#그리드-컨트롤)
+    - [버튼 및 기본 컨트롤](#버튼-및-기본-컨트롤)
+  - [7. 다이얼로그 (Dialogs - 60+ 개)](#7-다이얼로그-dialogs---60-개)
+    - [핵심 다이얼로그](#핵심-다이얼로그)
+  - [8. 거래/주문 처리 (Trading/Order)](#8-거래주문-처리-tradingorder)
+  - [9. 시스템 정보 및 모니터링 (System Info & Monitoring)](#9-시스템-정보-및-모니터링-system-info-monitoring)
+  - [10. 알림 및 이벤트 (Notifications & Events)](#10-알림-및-이벤트-notifications-events)
+  - [11. 그래픽 및 렌더링 (Graphics & Rendering)](#11-그래픽-및-렌더링-graphics-rendering)
+  - [12. 파일 처리 (File Operations)](#12-파일-처리-file-operations)
+  - [13. 보안 및 인증 (Security & Authentication)](#13-보안-및-인증-security-authentication)
+  - [14. 네트워크 (Network)](#14-네트워크-network)
+  - [15. 특수 기능 (Special Features)](#15-특수-기능-special-features)
+  - [16. 레이아웃 및 UI 유틸 (Layout & UI Utils)](#16-레이아웃-및-ui-유틸-layout-ui-utils)
+  - [17. 리소스 및 초기화 (Resource & Initialization)](#17-리소스-및-초기화-resource-initialization)
+  - [18. 기타 다이얼로그 및 도구 (Misc)](#18-기타-다이얼로그-및-도구-misc)
+- [파일 통계](#파일-통계)
+  - [전체 요약](#전체-요약)
+  - [주요 파일 (Top 10 복잡도)](#주요-파일-top-10-복잡도)
+- [의존성 관계 요약](#의존성-관계-요약)
+  - [상향식 의존성 (Bottom-up)](#상향식-의존성-bottom-up)
+  - [순환 의존성 위험](#순환-의존성-위험)
+- [빌드 순서 제안](#빌드-순서-제안)
+  - [단계 1: 기반 (Foundations)](#단계-1-기반-foundations)
+  - [단계 2: 핵심 앱 (Core App)](#단계-2-핵심-앱-core-app)
+  - [단계 3: 서비스 (Services)](#단계-3-서비스-services)
+  - [단계 4: 모델 (Models)](#단계-4-모델-models)
+  - [단계 5: 컨트롤 (Controls)](#단계-5-컨트롤-controls)
+  - [단계 6: 다이얼로그 & 뷰 (Dialogs & Views)](#단계-6-다이얼로그-뷰-dialogs-views)
+  - [단계 7: 특수 기능 (Special Features)](#단계-7-특수-기능-special-features)
+- [분석 가능성 (Analyzability)](#분석-가능성-analyzability)
+  - [높음 (Easy to analyze)](#높음-easy-to-analyze)
+  - [중간 (Medium)](#중간-medium)
+  - [낮음 (Hard to analyze)](#낮음-hard-to-analyze)
+- [테스트 전략](#테스트-전략)
+  - [단위 테스트 (Unit Test) 가능성](#단위-테스트-unit-test-가능성)
+- [참고](#참고)
+
+---
+
 **분석 일시**: 2026-07-14  
 **대상 범위**: d:\src\IBKS\src\AXIS 디렉토리의 주요 .cpp/.h 파일
 

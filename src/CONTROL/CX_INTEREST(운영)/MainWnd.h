@@ -92,7 +92,9 @@ public:
 	CRect	GetParamRect() { return m_param.rect; }
 	BOOL	GetViewType() { return m_bAllType; }
 	void    doRTMx(LPARAM lParam);
-	CString GetMarketTime() { return m_strMarketTime; };	//KSJ 2012.11.26 장운영시간 
+	CString GetMarketTime() { return m_strMarketTime; };	//KSJ 2012.11.26 장운영시간
+	CString GetCloseAuctionBeginTime() { return m_strEndTime; };		// 장마감 동시호가 시작(15:20대) - GridWnd의 m_strBeginTime/m_strEndTime(장전 동시호가용)와는 별개
+	CString GetCloseAuctionEndTime() { return m_strEndTimeEnd; };		// 장마감 동시호가 종료(15:30대)
 	void	uploadBackup();			//2016.07.12 KSJ 관심종목 설정과 같이 'b' 보내줌
 // Overrides
 	// ClassWizard generated virtual function overrides

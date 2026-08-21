@@ -1,5 +1,24 @@
 # Dependency
 
+
+## 목차
+
+- [런타임 DLL 로드 개요](#런타임-dll-로드-개요)
+- [모듈별 Include/링크 의존성](#모듈별-include링크-의존성)
+  - [appl + h + rm](#appl-h-rm)
+  - [axis (메인 EXE)](#axis-메인-exe)
+  - [control (8개 DLL 공통)](#control-8개-dll-공통)
+  - [dll/axissm](#dllaxissm)
+  - [dll (axissm 제외)](#dll-axissm-제외)
+  - [platform/builder (awDlg/Components 포함 전체)](#platformbuilder-awdlgcomponents-포함-전체)
+  - [platform/dll (axisform/axislib/axisvbs)](#platformdll-axisformaxislibaxisvbs)
+  - [platform/wizard + sock + h](#platformwizard-sock-h)
+- [구조적 의존성 이슈](#구조적-의존성-이슈)
+- [외부 SDK/라이브러리 총괄](#외부-sdk라이브러리-총괄)
+- [다음 단계](#다음-단계)
+
+---
+
 - 생성일: 2026-07-07 / 최초 분석 갱신: 2026-07-07
 - 목적: Header Include, DLL/LIB, COM, 외부 SDK, MFC/ATL, Windows API 의존성을 기록한다.
 

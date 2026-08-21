@@ -1,5 +1,20 @@
 # CLAUDE.md — TestDlg-b_TestDlg
 
+
+## 목차
+
+- [빌드 & 실행](#빌드-실행)
+- [아키텍처](#아키텍처)
+  - [핵심 모듈](#핵심-모듈)
+  - [스레드 흐름 (Production_td 경로)](#스레드-흐름-production_td-경로)
+  - [Race Condition 데모](#race-condition-데모)
+  - [CPU 친화도](#cpu-친화도)
+  - [MiniDump (whdump)](#minidump-whdump)
+- [주요 매크로 / 분기](#주요-매크로-분기)
+- [주의사항](#주의사항)
+
+---
+
 MFC C++ 멀티스레드 실험/학습용 테스트 프로그램.
 Race Condition 재현, CPU 친화도 제어, MiniDump 생성 등을 실습하는 Sandbox.
 
