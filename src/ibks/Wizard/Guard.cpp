@@ -348,6 +348,7 @@ int CGuard::Initial(CWnd* control)
 
 void CGuard::Startup()
 {
+	axlog(LOG_INIT, "CGuard::Startup ENTER m_alive=%d", (int)m_alive);
 	if (m_alive)	return;
 
 	void	(APIENTRY* axCreateEx)(void* root);
@@ -499,6 +500,7 @@ void CGuard::Startup()
 
 void CGuard::LoadHistory()
 {
+	axlog(LOG_INIT, "CGuard::LoadHistory ENTER");
 	int	idx;
 	CString	name, text, arrays, tmps;
 	CCode*	code;

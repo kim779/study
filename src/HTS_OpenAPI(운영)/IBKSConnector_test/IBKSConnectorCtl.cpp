@@ -144,6 +144,7 @@ BEGIN_DISPATCH_MAP(CIBKSConnectorCtrl, COleControl)
 	DISP_FUNCTION(CIBKSConnectorCtrl, "TR1005", TR1005, VT_BOOL, VTS_I4 VTS_BSTR VTS_BSTR)
 	DISP_FUNCTION(CIBKSConnectorCtrl, "TR1006", TR1006, VT_BOOL, VTS_I4 VTS_BSTR)
 	DISP_FUNCTION(CIBKSConnectorCtrl, "TR1007", TR1007, VT_BOOL, VTS_I4 VTS_BSTR VTS_BSTR)
+	DISP_FUNCTION(CIBKSConnectorCtrl, "LoginQuote", LoginQuote, VT_BOOL, VTS_BSTR VTS_BSTR VTS_BSTR VTS_I4)
 	//}}AFX_DISPATCH_MAP
 END_DISPATCH_MAP()
 
@@ -221,6 +222,7 @@ CIBKSConnectorCtrl::CIBKSConnectorCtrl()
 
 	// COM Object 생성을 위한 초기화 작업
 	m_bInit = m_bLogin = FALSE;
+	m_bQuoteOnly = false;	// 시세조회 전용(무인증서) 로그인 여부
 	m_bPTS = false;		//2012.08.08 KSJ PTS기본은 false
 	m_bUpdate	=	false;	//2012.08.27 KSJ UpdateStart가 호출되었는지 체크해서 UpdateEnd를 호출한다.
 	m_nPggb = 0;		// 2014.04.21 KSJ 차익/비차익 구분
@@ -482,12 +484,13 @@ int CIBKSConnectorCtrl::OnFevOpen(WPARAM wParam, LPARAM lParam)
 		memset(&mid, ' ', L_axlogon_mid);
 		strcpy(mid.user, (LPCSTR)m_usid);
 		strcpy(mid.pass, (LPCSTR)szEnc);
-		strcpy(mid.cpas, (LPCSTR)m_certpw);
+		if (!m_bQuoteOnly)
+			strcpy(mid.cpas, (LPCSTR)m_certpw);	// 시세조회 전용 로그인은 인증서비밀번호 없이 공백으로 둠
 		strcpy(mid.uips, (LPCSTR)m_cltip);
 		strcpy(mid.madr, (LPCSTR)m_maddr);
 		mid.forc[0] = '0';	// 최초[0] 강제[2]
 		mid.atcp[0] = '1';	// 수동[0] 자동[1]
-		mid.norm[0] = '0';	// 주문[0] 시세[1]
+		mid.norm[0] = m_bQuoteOnly ? '1' : '0';	// 주문[0] 시세[1]
 		mid.cust[0] = '1';	// 직원[0] 고객[1]
 
 // 		if(IsPTS())
@@ -753,6 +756,7 @@ BOOL CIBKSConnectorCtrl::Login(LPCTSTR user_id, LPCTSTR user_pw, LPCTSTR cert_pw
 		return FALSE;
 	}
 
+	m_bQuoteOnly = false;
 	m_usid = user_id;
 	m_uspw = user_pw;
 	m_certpw = cert_pw;
@@ -800,6 +804,66 @@ BOOL CIBKSConnectorCtrl::Login(LPCTSTR user_id, LPCTSTR user_pw, LPCTSTR cert_pw
 // 	CString strTemp;
 // 	strTemp.Format("[KSJ]Login ip[%s] port[%d]", m_svrip, m_svrport);
 // 	OutputDebugString(strTemp);
+	return TRUE;
+}
+
+// 인증서 없이 아이디/비밀번호만으로 접속하는 시세조회 전용 로그인.
+// Login()과 동일한 흐름이되 cert_pw가 없고, 서버에는 axlogon_mid.norm='1'(시세)로 전달된다.
+BOOL CIBKSConnectorCtrl::LoginQuote(LPCTSTR user_id, LPCTSTR user_pw, LPCTSTR svr_ip, long svr_port)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	if (!IsInit())
+	{
+		m_sLastMsg = "초기화되지 않았습니다.";
+		MessageBox(m_sLastMsg, MB_CAPTION, MB_ERROPTION);
+		return FALSE;
+	}
+	if (IsLogin())
+	{
+		m_sLastMsg = "이미 로그인되어 있습니다. 재접속 후 이용하세요";
+		MessageBox(m_sLastMsg, MB_CAPTION, MB_ERROPTION);
+		return FALSE;
+	}
+
+	m_bQuoteOnly = true;
+	m_usid = user_id;
+	m_uspw = user_pw;
+	m_certpw = "";
+	m_svrip = svr_ip;
+	m_svrport = svr_port;
+
+	m_usid.TrimRight(); m_usid.TrimLeft();
+	m_uspw.TrimRight(); m_uspw.TrimLeft();
+	m_svrip.TrimRight(); m_svrip.TrimLeft();
+
+	if (m_usid.GetLength()==0)
+	{
+		MessageBox("접속ID를 입력하세요.", MB_CAPTION, MB_ERROPTION);
+		return FALSE;
+	}
+
+	if (m_uspw.GetLength()==0)
+	{
+		MessageBox("접속비밀번호를 입력하세요.", MB_CAPTION, MB_ERROPTION);
+		return FALSE;
+	}
+
+	if (m_svrip.IsEmpty())
+		m_svrip = GetGlbIP(m_usid, "", "");
+	m_cltip = GetLocalIP(m_svrip, m_svrport);
+	m_fcltip = ToKoscomIP(m_cltip);
+
+	m_maddr = GetMacAddress(m_cltip);
+	CString slog;
+	slog.Format("glb=[%s]      [%s]     [%s] ", m_svrip, m_cltip, m_fcltip);
+	WriteLog(slog);
+#ifdef FOR_WARSHIP
+	m_Wizard.RunAxis(loginSHOP, (LONG)(LPCSTR)m_svrip, m_svrport);
+#else
+	m_Wizard.RunAxis(loginAXIS, (LONG)(LPCSTR)m_svrip, m_svrport);
+#endif
+
 	return TRUE;
 }
 

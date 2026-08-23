@@ -22537,6 +22537,8 @@ void CMainFrame::MngInfoPos()
 
 void CMainFrame::sendRTime()
 {
+WriteLog("[AXIS] CMainFrame::sendRTime");
+
 	CString	str, gdatS, inputStr = _T(""), gData;
 
 	str.Format("1301%c005930\t", 0x7f);

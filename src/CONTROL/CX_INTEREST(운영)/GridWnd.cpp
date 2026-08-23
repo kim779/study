@@ -1606,6 +1606,15 @@ void CGridWnd::loadcfg()
 	if (CAST_TREEID(m_kind)->kind == xREMAIN)
 		m_kind = 0;
 
+	// 2026-08-25: 설정파일(FILE_SMALLCONFIG/FILE_LARGECONFIG)이 아예 없는 최초접속자(m_bfirstStart)인
+	// 경우, 첫 번째 그룹(m_nIndex==0)까지 kind=0(빈 화면)으로 남는 걸 막고 기본 관심종목 그룹 하나는
+	// 보이도록 기본값을 넣어준다. InitSetGroup()의 기본 gIndex(=1)와 동일한 값으로 일관성을 맞춤.
+	// (F:\src\IBK\src\APPL\IB202700[서버최적화]\GridWnd.cpp 동일 수정, 2026-08-25)
+	if (m_bfirstStart == TRUE && m_nIndex == 0 && m_kind == 0)
+	{
+		m_kind = MAKE_TREEID(xINTEREST, 0, 2, 1, TD_ITEM);
+	}
+
 	char	buf[1024];
 
 	memset(buf, 0x00, sizeof(buf));

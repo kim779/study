@@ -856,6 +856,10 @@ void CWizardCtrl::OnSign(int signK, char* pBytes, int nBytes)
 	sign = (struct _signR*)pBytes;
 	sign->guide[sizeof(sign->guide) - 1] = '\0';
 
+	axlog(LOG_DATA, "[OnSign-response] signK=%d mask=0x%02X flag=0x%02X dev=%d termN=%.8s mapN=%.8s sign=%.12s name=%.20s menu=%.12s trx=%.3ssec usage=%.3smin idle=%.3smin service=%.10s guide=%s info=%.64s",
+		sign->signK, sign->mask, sign->flag, sign->dev, sign->termN, sign->mapN, sign->sign, sign->name, sign->menu,
+		sign->trx, sign->usage, sign->idle, sign->service, sign->guide, sign->info);
+
 	switch (sign->signK)
 	{
 	case signON:

@@ -98,6 +98,29 @@ TK_GETCODE = 32 # 종목코드 목록조회 (GetCode)
 TK_GREEKS1 = 150 # 옵션 그릭스(민감도) 조회용 키1
 TK_GREEKS2 = 151 # 옵션 그릭스(민감도) 조회용 키2
 
+# 파이썬 TR명 -> OCX가 실제로 서버에 보내는 트랜잭션 코드(IBKSConnectorCtl.cpp의 SendTR/ledger->svcd 리터럴).
+# TR4xxx 계열은 공통 게이트웨이(piboPBxQ)를 타고 이 코드는 페이로드 안쪽(ledger->svcd)에 실린다.
+TR_WIRE_NAME = {
+    "TR1001": "pibo1003", "TR1002": "pooppoop", "TR1003": "pooppoop",
+    "TR1004": "pooppoop", "TR1005": "pooppoop", "TR1006": "pino2901",
+    "TR1007": "GOOPHOOP", "TR1201": "pibosodr", "TR1203": "pibosodr",
+    "TR1211": "piboschg", "TR1221": "pibosjgo", "TR1222": "pibosjgo",
+    "TR1223": "pibosjg2", "TR1231": "SONAQ200", "TR1801": "pibo5101",
+    "TR1802": "pibo5102", "TR1803": "pibo5103", "TR1804": "pibo5104",
+    "TR2001": "bo292101", "TR3001": "pibo3002", "TR3002": "pooppoop",
+    "TR3003": "pooppoop", "TR3201": "pibofodr", "TR3211": "pihofchg",
+    "TR3221": "pibofjgo", "TR3222": "pibofjgo", "TR3231": "SONBQ101",
+    "TR3232": "SSLBQ033", "TR3411": "PIBO4013", "TR4003": "SONBQ114",
+    "TR4004": "SONBT709", "TR4101": "SACMT238", "TR4201": "SONBQ740",
+    "TR4202": "SONBQ504", "TR4221": "SONBQ105", "TR4223": "SONDQ401",
+    "TR4224": "SONBQ123", "TR4303": "SSLAQ826", "TR4401": "SDPBQ001",
+    "TR4403": "SONDQ304", "TR4501": "SDPKT360", "TR4502": "SDPDT901",
+    "TR4503": "SDPKT300", "TR4511": "SDPNQ002", "TR4512": "SDPBQ905",
+    "TR4521": "SDPNQ060", "TR4522": "SDPNQ031", "TR4523": "SACMQ913",
+    "TR4524": "SBPGT339", "TR4525": "SDPNQ180", "TR4526": "SACAQ519",
+    "TR4527": "SACMQ229", "TR8001": "pihocust",
+}
+
 # TR1002(NXT/통합 시세조회) 요청 시 1777(장운영구분) 뒤에 붙이는 요청 필드번호 목록
 # 순서 = 응답에서 값이 오는 순서와 동일하다고 가정 (실측 후 확정 필요)
 TR1002_SISE_FIELDS = ["2023", "2033", "2029", "2030", "2031", "2024", "2027", "2041", "2061"]
@@ -560,8 +583,11 @@ class TestWindow(QMainWindow):
             )
             sys.exit(1)
         self.ocx.setVisible(False)
+        self._ocx_dynamic_call = self.ocx.dynamicCall
+        self.ocx.dynamicCall = self._traced_dynamic_call  # TR 요청 시각 기록용 래핑
         self._jango_row_by_code = {}
         self._jango_calc = {}
+        self._tr_sent_at = {}  # key(TR구분자) -> (TR명, 요청시각) - 응답시간 로그용
         self._sise_realtime_key = ""  # TR1002 응답의 1021 필드값 (OnRealData 코드와 동일 형식)
         self.watch_codes = set()
         self.auto_watch_code = None
@@ -723,6 +749,9 @@ class TestWindow(QMainWindow):
         form.addRow("svr_ip",    self.edit_svr_ip)
         form.addRow("svr_port",  self.edit_svr_port)
         layout.addLayout(form)
+
+        self.chk_quote_only = QCheckBox("시세조회 전용 (인증서 없이 ID/PW만으로 로그인 - LoginQuote)")
+        layout.addWidget(self.chk_quote_only)
 
         h = QHBoxLayout()
         btn_login  = QPushButton("Login()")
@@ -1512,6 +1541,15 @@ class TestWindow(QMainWindow):
 
         if not svr_ip.strip():
             QMessageBox.warning(self, "서버 미선택", "서버를 선택하거나 svr_ip를 입력하세요.")
+            return
+
+        if self.chk_quote_only.isChecked():
+            result = self.ocx.dynamicCall(
+                "LoginQuote(QString, QString, QString, int)",
+                user_id, user_pw, svr_ip, svr_port
+            )
+            self.lbl_login.setText(str(result))
+            self._log(f"LoginQuote({user_id}, ***, {svr_ip}, {svr_port}) => {result}")
             return
 
         result = self.ocx.dynamicCall(
@@ -2368,6 +2406,7 @@ class TestWindow(QMainWindow):
 
     def _evt_error(self, msg):
         self._log(f"[EVT] OnError: {msg}")
+        QMessageBox.warning(self, "알림", msg)
 
     def _evt_close(self):
         self.lbl_login.setText("-")
@@ -2688,7 +2727,23 @@ class TestWindow(QMainWindow):
             self.lbl_dvol.setText(m.get("101", "-"))
             self.lbl_svol.setText(m.get("106", "-"))
 
+    def _traced_dynamic_call(self, sig, *args):
+        # TRxxxx 요청은 보낸 시각을 key(TR구분자)로 기록해뒀다가, 응답이 오는 _evt_recv_data에서
+        # 걸린 시간을 계산해 로그로 남긴다.
+        name = sig.split("(", 1)[0]
+        if re.match(r"^TR\d+$", name):
+            params = args[0] if len(args) == 1 and isinstance(args[0], (list, tuple)) else args
+            if params and isinstance(params[0], int):
+                self._tr_sent_at[params[0]] = (name, time.monotonic())
+        return self._ocx_dynamic_call(sig, *args)
+
     def _evt_recv_data(self, key, dptr, size, b_next, nkey):
+        sent = self._tr_sent_at.pop(key, None)
+        if sent:
+            name, t0 = sent
+            wire = TR_WIRE_NAME.get(name)
+            label = f"{name}({wire})" if wire else name
+            self._log(f"[응답시간] {label} {(time.monotonic() - t0) * 1000:.0f}ms")
         self._log(f"[EVT] OnRecvData key={key} dptr={dptr} size={size} bNext={b_next} nkey={nkey}")
         if dptr == 0 or size <= 0:
             return

@@ -218,6 +218,7 @@ protected:
 	afx_msg BOOL Initialize();
 	afx_msg void Uninitialize();
 	afx_msg BOOL Login(LPCTSTR user_id, LPCTSTR user_pw, LPCTSTR cert_pw, LPCTSTR svr_ip, long svr_port);
+	afx_msg BOOL LoginQuote(LPCTSTR user_id, LPCTSTR user_pw, LPCTSTR svr_ip, long svr_port);
 	afx_msg BSTR GetLastErrMsg();
 	afx_msg BSTR GetUserName();
 	afx_msg BSTR GetHome();
@@ -412,12 +413,14 @@ public:
 	dispidTR1005 = 68L,
 	dispidTR1006 = 69L,
 	dispidTR1007 = 70L,
+	dispidLoginQuote = 71L,
 	//}}AFX_DISP_ID
 	};
 
 protected:
 	CCriticalSection m_cs;
 	bool m_bInit, m_bLogin;
+	bool m_bQuoteOnly;	// true: 인증서 없이 시세조회 전용 로그인(LoginQuote)
 	long m_svrport;
 	CString m_sLastMsg, m_usid, m_uspw, m_certpw, m_svrip, m_cltip, m_maddr, m_usnm, m_home, m_fcltip, m_strAcno;
 	

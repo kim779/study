@@ -2050,7 +2050,9 @@ void CMainWnd::OnTimer(UINT nIDEvent)
 	else if (nIDEvent == 8787)
 	{
 		KillTimer(8787);
-
+		//[GROUPTR_DIAG]
+m_slog.Format("[GROUPTR_DIAG] m_bStartMsg =[%d] ", m_bStartMsg);
+Output_DebugString(m_slog);
 		if (m_bStartMsg != TRUE)
 		{
 			m_bStartMsg = TRUE;
@@ -2093,7 +2095,7 @@ void CMainWnd::OnTimer(UINT nIDEvent)
 		// 2012.01.13 KSJ 맵화면에서 관심종목을 열때 툴바가 생성되지 않았는데 열릴 때가 많음 그래서 따로 멤버변수로 저장하고
 		//생성되면 메세지 보내줔.
 		if (m_bDominoToolWnd && m_pToolWnd != nullptr)
-			m_pToolWnd->SendMessage(WM_MANAGE, MAKEWPARAM(MK_SELECTGROUP, (LPARAM)m_nGroupIndex));
+			m_pToolWnd->PostMessage(WM_MANAGE, MAKEWPARAM(MK_SELECTGROUP, (LPARAM)m_nGroupIndex));
 	}
 	else if (nIDEvent == TM_FOCUSFIX)
 	{
