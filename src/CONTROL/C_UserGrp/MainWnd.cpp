@@ -96,6 +96,7 @@ BEGIN_DISPATCH_MAP(CMainWnd, CWnd)
 	DISP_FUNCTION(CMainWnd, "Clear", Clear, VT_EMPTY, VTS_NONE)
 	DISP_FUNCTION(CMainWnd, "SetData", SetData, VT_EMPTY, VTS_BSTR)
 	DISP_FUNCTION(CMainWnd, "SetShowLine", SetShowLine, VT_EMPTY, VTS_I2 VTS_BOOL)
+	DISP_FUNCTION(CMainWnd, "SetRTS", SetRTS, VT_EMPTY, VTS_BOOL)
 	//}}AFX_DISPATCH_MAP
 	
 	DISP_PROPERTY_EX_ID(CMainWnd, "RTSCode", dispidRTSCode, GetRTSCode, SetRTSCode, VT_BSTR)
@@ -276,6 +277,12 @@ void CMainWnd::SetShowLine(short nLIne, BOOL bShow)
 {
 	// TODO: Add your dispatch handler code here
 	m_pGrpWnd->SetShowLine(nLIne,bShow);
+}
+
+void CMainWnd::SetRTS( BOOL bShow)
+{
+	// TODO: Add your dispatch handler code here
+	m_pGrpWnd->SetRTS(bShow);
 }
 
 

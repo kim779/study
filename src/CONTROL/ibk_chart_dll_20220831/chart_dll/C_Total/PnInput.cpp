@@ -900,10 +900,10 @@ void CPnInput::MakeInputSymbol()
 	switch (m_pMainWnd->m_iDtUnit)
 	{
 	case GU_CODE:
-		m_outSymbol.Format("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t",
+		m_outSymbol.Format("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t",
 			OJ_TIME, OJ_NAME, OJ_JGGA, OJ_DIFF, OJ_RATE, OJ_GVOL, OJ_MDHG, OJ_MSHG, 
 			OJ_SIGA, OJ_KOGA, OJ_JEGA,
-			OJ_CODE, OJ_CDAY, OJ_SAHG, OJ_HAHG, OJ_JJGA, OJ_STCK, OJ_START);
+			OJ_CODE, OJ_CDAY, OJ_SAHG, OJ_HAHG, OJ_JJGA, OJ_STCK, OJ_START, OJ_KRXSTART, OJ_KRXEND, OJ_AFTERSTART);
 		break;
 	case GU_INDEX:
 		m_outSymbol.Format("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t",

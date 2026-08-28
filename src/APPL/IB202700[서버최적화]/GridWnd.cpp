@@ -1524,6 +1524,9 @@ void CGridWnd::loadcfg()
 	// 지금까지는 첫 번째 그룹(m_nIndex==0)까지 kind=0(빈 화면)으로 남아서 "빈 공간입니다"
 	// 처리되던 것을, 최소한 그룹 하나는 기본 관심종목으로 보이도록 기본값을 넣어준다.
 	// InitSetGroup()의 기본 gIndex(=1)와 동일한 값을 사용해 일관성을 맞춤.
+
+	m_slog.Format("[GROUPTR_DIAG] m_bfirstStart=[%d] m_nIndex=[%d] m_kind=[%d]", m_bfirstStart, m_nIndex, m_kind);
+	OutputDebugString(m_slog);
 	if (m_bfirstStart == TRUE && m_nIndex == 0 && m_kind == 0)
 	{
 		m_kind = MAKE_TREEID(xINTEREST, 0, 2, 1, TD_ITEM);

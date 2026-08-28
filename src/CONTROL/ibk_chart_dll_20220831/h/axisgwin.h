@@ -645,7 +645,10 @@ typedef struct {
 #define	OJ_JJGA		"1313"	// 전일종가
 #define	OJ_STCK		"1316"	// 상장주식수
 #define	OJ_START	"1318"	// 장시작시간
-#define	OJ_GUBN		"1901"	// 소속구분(kospi,kosdaq,제3시장)
+#define	OJ_KRXSTART	"1900"	// KRXAFTER 장시작
+#define	OJ_KRXEND	"1901"	// KRXAFTER 장마감
+#define	OJ_AFTERSTART	"1902"	// KRXAFTER 애프터 시작
+//#define	OJ_GUBN		"1901"	// 소속구분(kospi,kosdaq,제3시장)
 
 #define	OI_CODE		"21021"	// original code, RTS code
 #define	OI_NAME		"21022"	// 한글명

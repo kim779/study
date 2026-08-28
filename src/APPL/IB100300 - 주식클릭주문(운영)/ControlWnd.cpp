@@ -1731,9 +1731,14 @@ void CControlWnd::ChangeFont(double* lRate, CFont* pfont, CFont* boldFont)
 {
 	m_pfont = pfont;
 
-	
+
 	CRect wrc, rc;
 	GetClientRect(&rc);
+
+CString slogCF;
+slogCF.Format("[CTRLWND_DIAG] ChangeFont enter rate0=[%f] rate1=[%f] rcW=[%d] rcH=[%d]", lRate[0], lRate[1], rc.Width(), rc.Height());
+OutputDebugString(slogCF);
+
 	int iw{}, ih{}, iright{}, ibottom{};
 	int ileft = rc.left + GAP;
 	int itop = rc.top + GAP;
@@ -1830,11 +1835,7 @@ void CControlWnd::ChangeFont(double* lRate, CFont* pfont, CFont* boldFont)
 	wrc.top = m_tRc3.bottom + GAP;
 	wrc.bottom = wrc.top+ih;
 
-	ibottom = wrc.bottom + GAP;
 	//2015.03.16 KSJ 약정가격
-	wrc.top = ibottom;
-	wrc.bottom = ibottom+ih;
-
 	m_tRc4 = wrc; //약정가격
 
 // 	m_pBtnConAmt->SetFont(m_pfont);
@@ -1851,53 +1852,69 @@ void CControlWnd::ChangeFont(double* lRate, CFont* pfont, CFont* boldFont)
 	m_sRc2.bottom = m_sRc2.top + ih;
 	m_rectJango = m_rectPgdg = m_rectPgsi = wrc;
 
-	ih = m_rectConAmt.Height(); 
+	ih = m_rectConAmt.Height();
 
 	int itmp = m_sRc2.Height() - (ih*3);
-	igap2 = min(itmp / 4, 6); 
+	igap2 = min(itmp / 4, 6);
 	igap2 = max(igap2, GAP);
 
-	//잔고 텍스트
-	m_rectJango.top = m_sRc2.top + igap2;
-	m_rectJango.bottom = m_rectJango.top + ih;
+	int iLabelW = 70 + (int)(lRate[0] * 70.0f);
 
-	//평균단가 텍스트
-	m_rectJangoS = m_rectJango;
+	//잔고 (왼쪽 라벨칸 + 오른쪽 값칸, 같은 행)
+	m_rectJangoS.top = m_sRc2.top + igap2;
+	m_rectJangoS.bottom = m_rectJangoS.top + ih;
 	m_rectJangoS.left = m_tRc4.left;
-	m_rectJangoS.right = m_tRc4.right;
-	
-	//평가손익텍스트
-	m_rectPgdg.top = m_rectJango.bottom + igap2;
-	m_rectPgdg.bottom = m_rectPgdg.top + ih;
-	m_tRc5 = m_rectPgdg;
+	m_rectJangoS.right = m_rectJangoS.left + iLabelW;
+
+	m_rectJango.top = m_rectJangoS.top;
+	m_rectJango.bottom = m_rectJangoS.bottom;
+	m_rectJango.left = m_rectJangoS.right + GAP;
+	//m_rectJango.right = rc.right - GAP;
+	m_rectJango.right = rc.right - GAP*6;
+
+	//평균단가 (왼쪽 라벨칸 + 오른쪽 값칸)
+	m_tRc5.top = m_rectJangoS.bottom + igap2;
+	m_tRc5.bottom = m_tRc5.top + ih;
 	m_tRc5.left = m_tRc4.left;
-	m_tRc5.right = m_tRc4.right;
-	
-	m_rectPgsi.top = m_rectPgdg.bottom + igap2;
-	m_rectPgsi.bottom = m_rectPgsi.top + ih;
-	m_tRc6 = m_rectPgsi;
+	m_tRc5.right = m_tRc5.left + iLabelW;
+
+	m_rectPgdg.top = m_tRc5.top;
+	m_rectPgdg.bottom = m_tRc5.bottom;
+	m_rectPgdg.left = m_tRc5.right + GAP;
+	//m_rectPgdg.right = rc.right - GAP;
+	m_rectPgdg.right = rc.right - GAP*6;
+
+	//평가손익 (왼쪽 라벨칸 + 오른쪽 값칸)
+	m_tRc6.top = m_tRc5.bottom + igap2;
+	m_tRc6.bottom = m_tRc6.top + ih;
 	m_tRc6.left = m_tRc4.left;
-	m_tRc6.right = m_tRc4.right;
-	m_sRc2.bottom = m_rectPgsi.bottom + igap2; 
+	m_tRc6.right = m_tRc6.left + iLabelW;
+
+	m_rectPgsi.top = m_tRc6.top;
+	m_rectPgsi.bottom = m_tRc6.bottom;
+	m_rectPgsi.left = m_tRc6.right + GAP;
+	//m_rectPgsi.right = rc.right - GAP;
+	m_rectPgsi.right = rc.right - GAP*6;
+
+	m_sRc2.bottom = m_rectPgsi.bottom + igap2;
 	
 ////세번째
 	m_sRc3 = m_sRc2;
 	ih = m_sRc3.Height() ;
 	ih = ih + (int)(lRate[1] * (float)ih);
-	m_sRc3.top = m_sRc2.bottom + igap2;
-	m_sRc3.bottom = m_sRc3.top + ih;
+	const int iRow3Top = m_sRc2.bottom + GAP;
 
-	
-	ih = m_rectConAmt.Height(); 
-	itmp = m_sRc3.Height() - (ih*4);
-	igap2 = min(itmp / 5, 6); 
+
+	ih = m_rectConAmt.Height();
+	itmp = ih - (ih*4);
+	igap2 = min(itmp / 5, 6);
 	igap2 = max(igap2, GAP);
 
 	iw = m_tRc7.Width()  ;
 	iw = iw + (int)(lRate[0] * (float)iw);
 	m_tRc7 = m_tRc4; //수량
 	m_tRc7.right = m_tRc7.left + iw;
-	m_tRc7.top =  m_sRc3.top + igap2;
+	m_tRc7.top =  iRow3Top + igap2;
 	m_tRc7.bottom = m_tRc7.top + m_tRc3.Height();
 
 	//수량 선택버튼
@@ -1995,6 +2012,9 @@ void CControlWnd::ChangeFont(double* lRate, CFont* pfont, CFont* boldFont)
 	m_money.rcChk = m_money.rcText = wrc; //금액주문
 	m_money.rcChk.right = m_money.rcChk.left + ichkw;
 
+	//그룹박스: 수량은 박스 밖(위), 금액주문부터 박스 안에 들어가도록 시작선을 여기로 내림
+	m_sRc3.top = wrc.top - GAP;
+
 	
 	
 	iw = ichktxtw + (int)(lRate[0] * (float)ichktxtw);
@@ -2025,13 +2045,11 @@ void CControlWnd::ChangeFont(double* lRate, CFont* pfont, CFont* boldFont)
 	iw = m_condition[0].rcText.Width(); 
 	ichktxtw = iw + (int)(lRate[0] * (float)iw);
 
-	//없음, IOC, FOK 체크 영역
+	//현금/대출 (1번째 줄)
 	wrc.top = wrc.bottom + igap2;
 	wrc.bottom = wrc.top + m_multi.rcText.Height();
 	m_condition[0].rcChk = m_condition[0].rcText = wrc;
-	m_condition[1].rcChk = m_condition[1].rcText = wrc;
 	m_condition[2].rcChk = m_condition[2].rcText = wrc;
-
 
 	m_condition[0].rcChk.left = m_money.rcChk.left;
 	ileft = m_condition[0].rcChk.left;
@@ -2043,20 +2061,35 @@ void CControlWnd::ChangeFont(double* lRate, CFont* pfont, CFont* boldFont)
 	m_condition[0].rcText.right = m_condition[0].rcText.left + ichktxtw;
 
 	ileft = m_condition[0].rcText.right + GAP;
-	m_condition[1].rcChk.left = ileft;
-	m_condition[1].rcChk.right = ileft + ichkw;
-	m_condition[1].rcText.left = ileft + ichkw+1;
-	ichktxtw = GetTextWidth(m_condition[1].data);
-	m_condition[1].rcText.right = m_condition[1].rcText.left + ichktxtw;
-
-	ileft = m_condition[1].rcText.right + 1;
 	m_condition[2].rcChk.left = ileft;
 	m_condition[2].rcChk.right = ileft + ichkw+1;
 	m_condition[2].rcText.left = ileft + ichkw;
 
 	ichktxtw = GetTextWidth(m_condition[2].data);
 	m_condition[2].rcText.right = m_condition[2].rcText.left + ichktxtw;
-	m_sRc3.bottom = m_condition[2].rcText.bottom + igap2; 
+
+	//신용 + 유통융자 콤보 (2번째 줄)
+	wrc.top = wrc.bottom + igap2;
+	wrc.bottom = wrc.top + m_multi.rcText.Height();
+	m_condition[1].rcChk = m_condition[1].rcText = wrc;
+	m_condition[1].rcChk.left = m_condition[0].rcChk.left;
+	ileft = m_condition[1].rcChk.left;
+	m_condition[1].rcText.left = ileft;
+	m_condition[1].rcChk.right = ileft + ichkw+1;
+	m_condition[1].rcText.left = ileft + ichkw;
+
+	ichktxtw = GetTextWidth(m_condition[1].data);
+	m_condition[1].rcText.right = m_condition[1].rcText.left + ichktxtw;
+
+	CRect wrcCr;
+	wrcCr.left = m_condition[1].rcText.right + GAP;
+	wrcCr.right = m_rectPgsi.right;
+	wrcCr.top = m_condition[1].rcChk.top - 2;
+	wrcCr.bottom = wrcCr.top + 200;
+	m_cbCrType.SetFont(m_pfont);
+	m_cbCrType.MoveWindow(wrcCr);
+
+	m_sRc3.bottom = m_condition[1].rcText.bottom + igap2;
 
 //예약틱
 	ih = m_sRc4.Height() ;
@@ -2071,45 +2104,50 @@ void CControlWnd::ChangeFont(double* lRate, CFont* pfont, CFont* boldFont)
 	m_tRc8.right = m_tRc8.left + GetTextWidth(m_text8) + 4;
 	
 	
+	//틱입력에디트 (예약틱 라벨 바로 옆)
 	m_pEditTick->GetWindowRect( &wrc);
 	ScreenToClient(&wrc);
 	iw = wrc.Width();
 	iw = iw + (int)(lRate[0] * (float)iw);
-	wrc.left = (m_tRc8.right + 2)/2;//m_rectPgsi.left;
-
-//	if( (m_rectPgsi.Width() - wrc.left) < iw) iw = m_rectPgsi.right - 24;
-	itmp = m_rectPgsi.Width() - 18;
-//	CString ss;
-//	ss.Format("%d-%d-%d-%d", iw, m_rectPgsi.Width(), wrc.left, itmp);
-//	AfxMessageBox(ss);
-
-	if(itmp < iw) iw = itmp;
-	wrc.right = (wrc.left + iw)/2;
+	wrc.left = m_tRc8.right + GAP;
+	wrc.right = wrc.left + iw;
 	wrc.top = m_tRc8.top;
 	wrc.bottom = m_tRc8.bottom;
-
-	//틱입력에디트
 	m_pEditTick->SetFont(m_pfont);
-	m_pEditTick->MoveWindow(wrc); 
-	
-	wrc.left = wrc.right/2;
-	wrc.right = m_rectPgsi.right/2;
+	m_pEditTick->MoveWindow(wrc);
+
+	//틱입력에디트 스핀 (에디트 바로 옆)
+	CRect wrcSpin;
+	m_pSpinTick->GetWindowRect(&wrcSpin);
+	ScreenToClient(&wrcSpin);
+	int iwSpin = wrcSpin.Width();
+	iwSpin = iwSpin + (int)(lRate[0] * (float)iwSpin);
+	wrc.left = wrc.right;
+	wrc.right = wrc.left + iwSpin;
 	m_pSpinTick->SetFont(m_pfont);//틱입력에디트 스핀
-	m_pSpinTick->MoveWindow(wrc); 
-	m_sRc4.bottom = wrc.bottom + GAP; 
+	m_pSpinTick->MoveWindow(wrc);
+	m_sRc4.bottom = wrc.bottom + GAP;
 
-	m_click.rcChk = m_multi.rcChk;
-	m_click.rcText = m_money.rcText;
-	m_click.rcChk.top =  m_click.rcText.top = wrc.bottom + igap2;
-	m_click.rcChk.bottom =  m_click.rcText.bottom = m_click.rcChk.top + m_click.rcText.Height();
-
+	//시장가 (예약틱과 같은 줄, 스핀 옆)
 	m_sijang.rcChk = m_multi.rcChk;
 	m_sijang.rcText = m_money.rcText;
-	m_sijang.rcChk.top =  m_click.rcText.top = wrc.bottom + igap2;
-	m_sijang.rcChk.bottom =  m_click.rcText.bottom = m_click.rcChk.top + m_click.rcText.Height();
+	m_sijang.rcChk.top =  m_sijang.rcText.top = m_tRc8.top;
+	m_sijang.rcChk.bottom =  m_sijang.rcText.bottom = m_tRc8.bottom;
+	m_sijang.rcChk.left = wrc.right + GAP;
+	m_sijang.rcChk.right = m_sijang.rcChk.left + ichkw;
+	m_sijang.rcText.left = m_sijang.rcChk.right;
+	m_sijang.rcText.right = m_sijang.rcText.left + GetTextWidth(m_sijang.data) + 4;
+
+	//원클릭주문 (다음 줄, 단독)
+	m_click.rcChk = m_multi.rcChk;
+	m_click.rcText = m_money.rcText;
+	m_click.rcChk.top =  m_click.rcText.top = m_tRc8.bottom + igap2;
+	m_click.rcChk.bottom =  m_click.rcText.bottom = m_click.rcChk.top + m_money.rcText.Height();
+	m_click.rcText.left = m_click.rcChk.right;
+	m_click.rcText.right = m_click.rcText.left + GetTextWidth(m_click.data) + 4;
 
 
-	itop = wrc.bottom + GAP + GAP;
+	itop = m_click.rcChk.bottom + GAP + GAP;
 	//종목추가 포함하단윈도우
 	m_pCodeReg->GetWindowRect( &wrc);
 	ScreenToClient(&wrc);
@@ -2120,7 +2158,24 @@ void CControlWnd::ChangeFont(double* lRate, CFont* pfont, CFont* boldFont)
 	wrc.top = itop;
 	wrc.bottom = itop + ih;
 	m_pCodeReg->ChangeFont(lRate, m_pfont);
-	m_pCodeReg->MoveWindow(wrc); 
+	m_pCodeReg->MoveWindow(wrc);
+
+CString slogCF2;
+slogCF2.Format("[CTRLWND_DIAG] ChangeFont exit money=[%d,%d,%d,%d] multi=[%d,%d,%d,%d] click=[%d,%d,%d,%d] sijang=[%d,%d,%d,%d] jangoS=[%d,%d,%d,%d] jango=[%d,%d,%d,%d] pgdg=[%d,%d,%d,%d] pgsi=[%d,%d,%d,%d] tRc5=[%d,%d,%d,%d] tRc6=[%d,%d,%d,%d] tRc7=[%d,%d,%d,%d] tRc8=[%d,%d,%d,%d] codeReg=[%d,%d,%d,%d]",
+	m_money.rcChk.left, m_money.rcChk.top, m_money.rcText.right, m_money.rcText.bottom,
+	m_multi.rcChk.left, m_multi.rcChk.top, m_multi.rcText.right, m_multi.rcText.bottom,
+	m_click.rcChk.left, m_click.rcChk.top, m_click.rcText.right, m_click.rcText.bottom,
+	m_sijang.rcChk.left, m_sijang.rcChk.top, m_sijang.rcText.right, m_sijang.rcText.bottom,
+	m_rectJangoS.left, m_rectJangoS.top, m_rectJangoS.right, m_rectJangoS.bottom,
+	m_rectJango.left, m_rectJango.top, m_rectJango.right, m_rectJango.bottom,
+	m_rectPgdg.left, m_rectPgdg.top, m_rectPgdg.right, m_rectPgdg.bottom,
+	m_rectPgsi.left, m_rectPgsi.top, m_rectPgsi.right, m_rectPgsi.bottom,
+	m_tRc5.left, m_tRc5.top, m_tRc5.right, m_tRc5.bottom,
+	m_tRc6.left, m_tRc6.top, m_tRc6.right, m_tRc6.bottom,
+	m_tRc7.left, m_tRc7.top, m_tRc7.right, m_tRc7.bottom,
+	m_tRc8.left, m_tRc8.top, m_tRc8.right, m_tRc8.bottom,
+	wrc.left, wrc.top, wrc.right, wrc.bottom);
+OutputDebugString(slogCF2);
 }
 
 void CControlWnd::LoadBuffer()

@@ -157,6 +157,8 @@ void CStream::OutStream(struct _axisH* axisH, char* datB, int datL)
 		}
 
 		screen->m_trxS = axisH->trxS;
+		CopyMemory(screen->m_trxC, axisH->trxC, L_TRXC);
+		screen->m_trxC[L_TRXC] = 0;
 
 		switch (axisH->msgK)
 		{
@@ -183,6 +185,13 @@ void CStream::OutStream(struct _axisH* axisH, char* datB, int datL)
 
 		wait = false;
 		screen->m_state &= ~waitSN;
+		if (screen->m_sendTick != 0)
+		{
+			axlog(LOG_DATA, "[TR-RTT] map=%.8s tr=%.8s winK=%d unit=%d elapsed=%dms",
+				screen->m_mapH->mapN, axisH->trxC, axisH->winK, axisH->unit,
+				(int)(GetTickCount64() - screen->m_sendTick));
+			screen->m_sendTick = 0;
+		}
 		if (axisH->stat & statAUX)
 		{
 			if (auxH->type != typeFM || !SetGuide(screen, guide))
@@ -198,6 +207,13 @@ void CStream::OutStream(struct _axisH* axisH, char* datB, int datL)
 	case msgK_SVC:
 		if (GetScreen(screen, axisH))
 		{
+			if (screen->m_svcSendTick != 0)
+			{
+				axlog(LOG_DATA, "[SVC-RTT] map=%.8s tr=%.8s winK=%d unit=%d elapsed=%dms",
+					screen->m_mapH->mapN, axisH->trxC, axisH->winK, axisH->unit,
+					(int)(GetTickCount64() - screen->m_svcSendTick));
+				screen->m_svcSendTick = 0;
+			}
 			if (!screen->m_xscreen->OnService(datB, datL))
 				m_client->m_vm->OnService(screen, datB, datL);
 			screen->m_state &= ~waitSN;
@@ -216,6 +232,17 @@ void CStream::OutStream(struct _axisH* axisH, char* datB, int datL)
 		if (GetScreen(screen, axisH, index, key))
 		{
 		//	screen->m_state &= ~waitSN;
+			{
+				ULONGLONG	sendTick;
+				DWORD	ctrlKey = MAKELONG(axisH->winK, axisH->unit);
+				if (m_guard->m_ctrlSendTick.Lookup(ctrlKey, sendTick))
+				{
+					axlog(LOG_DATA, "[CTRL-RTT] map=%.8s tr=%.8s winK=%d unit=%d elapsed=%dms",
+						screen->m_mapH->mapN, axisH->trxC, axisH->winK, axisH->unit,
+						(int)(GetTickCount64() - sendTick));
+					m_guard->m_ctrlSendTick.RemoveKey(ctrlKey);
+				}
+			}
 			form = screen->GetAtForm(index);
 			if (form && form->m_form->kind == FM_CONTROL)
 				form->WriteData(CString(datB, datL), true, datL, key);
@@ -1431,6 +1458,7 @@ void CStream::MakeStream(CScreen* screen, CString trx)
 
 	axlog(LOG_DATA, "[0-MakeStream-send] ------ map=%.8s tr=%.8s ------ winK=%d unit=%d",
 		screen->m_mapH->mapN, trx.GetString(), axisH->winK, axisH->unit);
+	screen->m_sendTick = GetTickCount64();
 
 	bool info_trx = screen->GetTranInfo(trx);
 	if (screen->m_mapH->options & OP_OOP)
@@ -1700,6 +1728,9 @@ int CStream::SetDataNRM(CScreen* screen, char* axisB, int axisL, bool skip)
 
 			if (formL > 0)
 			{
+				axlog(LOG_DATA, "[5-SetDataNRM-CONTROL] name=%.16s kind=%d size=%d tr=%.8s",
+					(char*)form->m_form->name, form->m_form->kind, formL, screen->m_trxC);
+
 				form->WriteData(CString(&axisB[idx], formL));
 				form->IsChanged();
 				idx += formL;
@@ -1885,6 +1916,9 @@ int CStream::SetDataNRM2(CScreen* screen, char* axisB, int axisL, bool skip)
 			}
 			if (formL > 0)
 			{
+				axlog(LOG_DATA, "[5-SetDataNRM2-CONTROL] name=%.16s kind=%d size=%d tr=%.8s",
+					(char*)form->m_form->name, form->m_form->kind, formL, screen->m_trxC);
+
 				form->WriteData(CString(&axisB[idx], formL));
 				form->IsChanged();
 				idx += formL;

@@ -52,6 +52,7 @@ protected:
 	afx_msg void Clear();
 	afx_msg void SetData(LPCTSTR str);
 	afx_msg void SetShowLine(short nLIne, BOOL bShow);
+	afx_msg void SetRTS(BOOL bShow);
 	//}}AFX_DISPATCH
 	DECLARE_DISPATCH_MAP()
 	DECLARE_INTERFACE_MAP()

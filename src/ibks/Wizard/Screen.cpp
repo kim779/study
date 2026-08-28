@@ -52,12 +52,15 @@ CScreen::CScreen(CClient* client, CRect rect)
 	m_tabL   = 0;
 	m_ioL    = 0;
 	m_state  = 0;
+	m_sendTick = 0;
+	m_svcSendTick = 0;
 	m_push   = NULL;
 	m_tabR   = NULL;
 	m_ioR    = NULL;
 	m_parent = 0;
 	m_trxK   = 0;
 	m_trxS   = 0;
+	m_trxC[0] = 0;
 	m_object = 0;
 	m_notice = NULL;
 	m_profit = NULL;

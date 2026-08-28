@@ -341,18 +341,19 @@ ed_gmm.Data = SCREEN.Object(objnm & ".ed_gmm").data		'기타입력2
 
 ' 스톱지정가 입력 CHK
 If UCase(TypeName( SCREEN.Object(objnm & ".edStopPrc"))) <> "NOTHING" Then
-	If SCREEN.Object(objnm & ".shogb").data = 1 Then	' 주문유형이 스톱지정가일때
-
-		' mmgb 매매구분 	1:매도 2:매수 3:정정 4:취소
-		Select Case ed_mmgb.Data
-		Case 1	' 매도
-		Case 2	' 매수
-			If Len(Trim(SCREEN.Object(objnm & ".edStopPrc").data)) = 0  Or SCREEN.Object(objnm & ".edStopPrc").data = 0 Then
-				MsgBox "스톱지정가 가격을 설정하세요",,"IBK투자증권"
-				SCREEN.OnSend = False
-				Exit Sub
-			End If
-		End Select
+	If Left(SCREEN.Object(objnm & ".shogb").data , 1) <> "P" Then
+		If SCREEN.Object(objnm & ".shogb").data = 1 Then	' 주문유형이 스톱지정가일때
+			' mmgb 매매구분 	1:매도 2:매수 3:정정 4:취소
+			Select Case ed_mmgb.Data
+			Case 1	' 매도
+			Case 2	' 매수
+				If Len(Trim(SCREEN.Object(objnm & ".edStopPrc").data)) = 0  Or SCREEN.Object(objnm & ".edStopPrc").data = 0 Then
+					MsgBox "스톱지정가 가격을 설정하세요",,"IBK투자증권"
+					SCREEN.OnSend = False
+					Exit Sub
+				End If
+			End Select
+		End If
 	End If
 	ed_gmm.Data = SCREEN.Object(objnm & ".edStopPrc").data		'기타입력2
 End If

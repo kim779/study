@@ -3118,6 +3118,9 @@ BOOL CGuard::Service(CScreen* screen, CString trxC, char* datB, int datL, int mo
 
 	if (Write(sendB, L_axisH+datL, true))
 	{
+		screen->m_svcSendTick = GetTickCount64();
+		axlog(LOG_DATA, "[SVC-send] map=%.8s tr=%.8s winK=%d unit=%d mode=%d",
+			CString(screen->m_mapH->mapN, L_MAPN).GetString(), axisH->trxC, axisH->winK, axisH->unit, mode);
 		screen->m_client->m_units.SetAt(screen->m_key, screen->m_key);
 		if (!(mode & US_PASS))
 		{
@@ -3467,6 +3470,10 @@ BOOL CGuard::Invoke(char* pBytes, int nBytes, int key)
 
 	if (Write(sendB, L_axisH+nBytes, true))
 	{
+		ULONGLONG nSendTick = GetTickCount64();
+		axlog(LOG_DATA, "[CTRL-send] map=%.8s tr=%.8s winK=%d unit=%d",
+			CString(screen->m_mapH->mapN, L_MAPN).GetString(), axisH->trxC, key, keyx);
+		m_ctrlSendTick.SetAt(MAKELONG(key, keyx), nSendTick);
 		screen->m_client->m_units.SetAt(keyx, keyx);
 		if (key && !(userth->stat & US_PASS))
 			PostAxis(MAKEWPARAM(waitPAN, key), true);

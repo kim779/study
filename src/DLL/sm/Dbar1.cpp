@@ -281,10 +281,20 @@ LONG CDbar1::OnXMSG(WPARAM wParam, LPARAM lParam)
 			skey.Format("%d", ret - 1);
 			if (mapMenu.Lookup(skey, stmp))
 			{
-				if (stmp.Left(2) == "IB")
-					m_slog = stmp;
-				else
-					m_slog = ExtractBracketContent(stmp);
+				if (stmp == "[8788] 신규폰패드" || stmp == "[1001] 주식주문" || stmp == "[1020] 주식자동주문" ||
+					stmp == "[5000] 시간외단일가종합" || stmp == "[2000] 주식종합화면")
+				{
+					int LoginType = 0;
+					LoginType = (*m_axiscall)(AXI_FUNCKEY, MAKEWPARAM(LOGIN_MPO, 0), (LPARAM)LoginType);
+					if (LoginType == 1)
+					{
+						Axis::MessageBox(this, "시세/준회원 조회 로그인으로 사용이 불가한 서비스입니다.", MB_ICONSTOP);
+						return 0;
+					}
+
+				}
+
+				m_slog = ExtractBracketContent(stmp);
 				CWnd* pMain = AfxGetMainWnd();
 				if (pMain)
 					pMain->SendMessage(WM_USER, MAKEWPARAM(MMSG_POP_MAP, 3), (LPARAM)(LPSTR)(LPCTSTR)m_slog);
@@ -337,6 +347,17 @@ LONG CDbar1::OnXMSG(WPARAM wParam, LPARAM lParam)
 			skey.Format("%d", ret - 1);
 			if (mapMenu.Lookup(skey, stmp))
 			{
+				if (stmp == "[2000] 주식종합화면" || stmp == "[1001] 주식주문")
+				{
+					int LoginType = 0;
+					LoginType = (*m_axiscall)(AXI_FUNCKEY, MAKEWPARAM(LOGIN_MPO, 0), (LPARAM)LoginType);
+					if (LoginType == 1)
+					{
+						Axis::MessageBox(this, "시세/준회원 조회 로그인으로 사용이 불가한 서비스입니다.", MB_ICONSTOP);
+						return 0;
+					}
+
+				}
 				m_slog = ExtractBracketContent(stmp);
 				CWnd* pMain = AfxGetMainWnd();
 				if (pMain)
@@ -1216,6 +1237,9 @@ void CDbar1::load_BandItem()
 	{
 		m_band->ItemADD("IB871000=관리체결;관리체결", false);
 		m_band->m_arItem[m_band->m_arItem.GetSize()-1]->draw = 1;
+
+		m_band->ItemADD("IB877700=폰패드;폰패드", false);
+		m_band->m_arItem[m_band->m_arItem.GetSize() - 1]->draw = 1;
 	}
 
 #if 0
@@ -2113,7 +2137,7 @@ void CDbar1::SetShowAIBtn(int Kgubn, int Ngubn)
 				m_btKRX->set_Image(CAxButtonName(Format("TOOL_%s", "KRX_FREE")));
 			}
 			break;
-			case 6: //KRX 애프터
+			case 6: //KRX after
 			{
 				m_btKRX->set_Image(CAxButtonName(Format("TOOL_%s", "KRX_AFTER")));
 			}

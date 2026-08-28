@@ -3998,6 +3998,9 @@ BOOL CClient::SetFocus(int key, bool action, CWnd* pWnd)
 
 			if (((CfmCtrl *)form)->m_ctrl == pWnd)
 			{
+				axlog(LOG_EVENT, "[CClient::SetFocus] map=%.8s name=%.16s action=%d CONTROL already has OS focus (reactive)",
+					screen->m_mapH->mapN, (char*)form->m_form->name, action);
+
 				CCaret	caret = m_current;
 
 				m_current.m_key = key;

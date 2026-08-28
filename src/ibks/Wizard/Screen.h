@@ -81,8 +81,11 @@ public:
 	int		m_object;
 	int		m_trxK;
 	unsigned char	m_trxS;
+	char		m_trxC[9];		// last received TR code (L_TRXC=8 + null), for [5-SetDataNRM-CONTROL] logging
 
 	UINT		m_state;
+	ULONGLONG	m_sendTick;		// GetTickCount64() at last MakeStream send, for [TR-RTT] logging
+	ULONGLONG	m_svcSendTick;		// GetTickCount64() at last CGuard::Service send, for [SVC-RTT] logging (separate from m_sendTick: Service() bypasses waitSN via US_PASS, so it can overlap a regular TR)
 	int		m_tabL;
 	int*		m_tabR;
 

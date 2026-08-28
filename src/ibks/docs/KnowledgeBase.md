@@ -75,7 +75,16 @@
   - [수정](#수정)
   - [교훈](#교훈-1)
   - [관련 파일](#관련-파일-3)
-- [17. 추가 자료](#17-추가-자료)
+- [17. 화면 대기(모래시계) 커서 메커니즘 — Wizard는 커서를 직접 그리지 않는다 (2026-08-26)](#17-화면-대기모래시계-커서-메커니즘-wizard는-커서를-직접-그리지-않는다-2026-08-26)
+  - [배경](#배경-3)
+  - [전체 체인 — Wizard(스크립트/네트워크) → 호스트 EXE(실제 SetCursor)](#전체-체인-wizard스크립트네트워크-호스트-exe실제-setcursor)
+  - [Wizard가 "대기 상태"로 들어가는 트리거 5가지](#wizard가-대기-상태로-들어가는-트리거-5가지)
+  - [종합화면에서 부분(창)마다 커서가 다르게 바뀌는 이유](#종합화면에서-부분창마다-커서가-다르게-바뀌는-이유)
+  - [발견 1 — TranTimeout 워치독은 Send()에만 있고 Service()/Wait 속성에는 없음](#발견-1-trantimeout-워치독은-send에만-있고-servicewait-속성에는-없음)
+  - [발견 2 — 실사용 사례: IB000157/IB000130의 Screen.Service (워치독 없는 패턴)](#발견-2-실사용-사례-ib000157ib000130의-screenservice-워치독-없는-패턴)
+  - [발견 3 — 죽은 코드: ChildFrm/SChild의 axWAIT 처리 (로직 반전 + break 누락, 호출자 없음)](#발견-3-죽은-코드-childfrmschild의-axwait-처리-로직-반전-break-누락-호출자-없음)
+  - [관련 파일](#관련-파일-4)
+- [18. 추가 자료](#18-추가-자료)
   - [참고 문서](#참고-문서)
   - [외부 참고](#외부-참고)
 
@@ -1018,7 +1027,109 @@ axlog(LOG_RTM, "[FlashGrid-write] name=%.16s code=%s row=%d col=%d old=[%.32s] n
 
 ---
 
-## 17. 추가 자료
+## 17. 화면 대기(모래시계) 커서 메커니즘 — Wizard는 커서를 직접 그리지 않는다 (2026-08-26)
+
+### 배경
+
+종합화면 "조회시 약 1분 헹" 증상 조사(`[TR-RTT]`/`[CTRL-RTT]`/`[SVC-RTT]`/`[ServiceEx-wait]` 로그 추가 작업, `@docs/DebugLogGuide.md` 6절)와 같은 맥락에서, 사용자가 "종합화면의 특정 부분에 커서가 옮겨가면 그 화면의 상황에 맞게 커서가 바뀐다"는 걸 관찰하고 axwizard 소스 중 정확히 어떤 상황에서 대기(모래시계) 커서가 뜨는지 전수조사를 요청함. 모래시계가 실제로 어떤 내부 상태를 반영하는지 알면, 헹이 발생하는 순간을 커서 상태만 보고도 "지금 어느 채널이 걸려있는지" 추정할 수 있어 진단에 도움이 됨.
+
+### 전체 체인 — Wizard(스크립트/네트워크) → 호스트 EXE(실제 SetCursor)
+
+**핵심 발견: `axwizard.ocx`(Wizard.dll) 자체에는 `::SetCursor()`/`LoadCursor()` 호출이 전혀 없다**(`Wizard/` 전체 grep으로 확인). Wizard는 오직 "지금 대기 상태다/아니다"만 판단해서 COM Fire 이벤트(`waitPAN`, `h/axisfire.h:89`)로 호스트 EXE에 알릴 뿐이고, 실제로 마우스 커서를 `IDC_WAIT`로 바꾸는 코드는 전부 호스트 EXE(`AXIS.exe`, `AXIS/` 트리)에 있다.
+
+```
+[Wizard.dll — "대기 상태" 판정]
+CClient::WaitState(screen, timeout)          Client.cpp:1927
+    screen->m_state |= waitSN
+    m_units.SetAt(screen->m_key, ...)        (그 작업영역 안에서 "아직 응답 안 온 unit" 집합)
+    m_status |= S_WAIT
+    if (timeout && m_guard->m_wait > 0)
+        m_view->SetTimer(TM_WAIT, m_guard->m_wait, NULL)   ← 유일한 자동 복구 안전장치(발견1 참고)
+    m_guard->PostAxis(MAKEWPARAM(waitPAN, m_key), true)    ← COM Fire 이벤트로 호스트에 통지
+            │
+            ▼  (COM OnFire, 프로세스 경계를 넘어 호스트 EXE로)
+[AXIS.exe — 실제 커서 교체]
+CMainFrame::OnFireXXX 의 case waitPAN:
+    if (lParam) beginWait(HIWORD(wParam));   else endWait(HIWORD(wParam));
+            │
+            ▼
+CMainFrame::beginWait(key)                   MainFrm.cpp:12162
+    key에 대응하는 CChildFrame/CSChild/CMPop/CGPop을 찾아 그 창의 m_cursor = 1
+    (key == m_activeKey면 그 자리에서 즉시 ::SetCursor(IDC_WAIT)도 호출)
+            │
+            ▼  (이후 사용자가 마우스를 그 창 위로 움직일 때마다 Windows가 재문의)
+WM_SETCURSOR
+CChildFrame::OnSetCursor / CSChild::OnSetCursor / CGPop::OnSetCursor
+    if (m_cursor == 1) { ::SetCursor(IDC_WAIT); return TRUE; }
+```
+
+반대 방향(`WaitDone`)도 대칭 — `m_units`가 완전히 빌 때(그 작업영역의 모든 unit이 응답을 받았을 때)만 `S_WAIT`를 끄고 `PostAxis(waitPAN, key, false)` → `endWait(key)` → `m_cursor = 0`.
+
+### Wizard가 "대기 상태"로 들어가는 트리거 5가지
+
+1. **`Screen.Send(target)`/엔터키 조회 등** — `CStream::InStream()` 두 오버로드가 성공적으로 송신하면 항상 `WaitState(screen 또는 NULL, timeout=true)` 호출. **유일하게 `TranTimeout` 워치독이 걸리는 경로**(발견1).
+2. **`Screen.Service(trN, data, len, mode)`** — `mode`에 `US_PASS`(0x04) 비트가 없으면 `CGuard::Service()`가 `CClient::WaitState()`를 거치지 않고 **직접** `screen->m_state |= waitSN` + `PostAxis(waitPAN,...)`를 실행 → 모래시계는 뜨지만 **워치독은 안 걸림**(발견1). `mode`에 `US_PASS`가 있으면 대기상태 진입 자체를 안 함(fire-and-forget, 커서 변화 없음).
+3. **`Screen.ServiceEx(trN, data, len, mode, timeout)`** — 내부적으로 항상 `_Service(...,mode|US_PASS)`를 호출하므로 위 2번의 "대기상태 진입" 자체가 일어나지 않음(**모래시계가 안 뜬다**). 대신 `xscreen.cpp`의 자체 `PeekMessage` 루프로 UI 스레드를 직접 블로킹 — "커서는 안 바뀌는데 화면(다른 조작)은 멈추는" 유형의 헹이 이 경로에서 나올 수 있음(`@docs/DebugLogGuide.md`의 `[ServiceEx-wait]` 참고).
+4. **`Screen.Wait` 스크립트 속성**(`CxScreen::_getWait`/`_setWait`, `xscreen.cpp:155`) — 스크립트가 `Screen.Wait = True`로 직접 강제 진입 가능. `WaitState(screen, timeout=false)`로 호출되므로 **역시 워치독 없음** — 스크립트가 실수로 `False`로 되돌리지 않으면(조건 분기 누락, 예외로 인한 조기 리턴 등) 이론상 무한정 모래시계가 뜬 채로 남을 수 있음.
+5. `CGuard::Approve`/`UploadFile`/`DownloadFile` 등 다른 `CGuard::Write` 계열도 각자 `waitSN`/`PostAxis`를 직접 세팅하는 유사한 코드가 있음(`Guard.cpp` 3286/3358/3479행대 — `[CTRL-send]`/`[SVC-send]` 로그를 추가했던 바로 그 자리들과 같은 함수군) — 개별 화면 정책까지 전부 확인하지는 않았으나 패턴은 2번과 동일한 것으로 보임.
+
+### 종합화면에서 부분(창)마다 커서가 다르게 바뀌는 이유
+
+`waitPAN`의 key는 `CClient::m_key`(작업영역/창 단위)이고, `beginWait`/`endWait`가 `m_cursor` 플래그를 세팅하는 대상은 **그 key에 대응하는 개별 창(`CChildFrame`/`CSChild`/`CMPop`/`CGPop`) 하나씩**이다. 종합화면이 여러 개의 별도 작업영역(창)으로 구성돼 있다면, 그중 응답을 기다리는 중인 작업영역의 창만 `m_cursor=1`이 되고, 마우스가 창 경계를 넘어갈 때마다 Windows가 그 창에 `WM_SETCURSOR`를 새로 물어보므로 — 다른 부분(다른 작업영역의 창)으로 마우스를 옮기면 그 창 자신의 `m_cursor`(대개 0, 대기 없음)를 따라 즉시 화살표로 돌아온다. 사용자가 관찰한 "특정 부분에 커서가 옮겨가면 그 화면의 상황에 맞게 바뀐다"는 정확히 이 개별 창별 `m_cursor` 플래그 때문이다.
+
+### 발견 1 — TranTimeout 워치독은 Send()에만 있고 Service()/Wait 속성에는 없음
+
+`m_guard->m_wait`는 레지스트리 `HKCU\...\Workstation\TranTimeout`(초 단위, `h/axisvar.h:145`)에서 읽어 ms로 변환한다(`Guard.cpp:394`, 값이 없으면 기본 0=워치독 없음). `WaitState()`의 `if (timeout && m_guard->m_wait > 0) m_view->SetTimer(TM_WAIT, m_guard->m_wait, NULL)`가 유일한 자동 복구 지점 — `TM_WAIT` 타이머가 만료되면 `Event.cpp`의 `case TM_WAIT: client->WaitDone(NULL, true); client->m_guard->SetGuide(AE_TIMEOUT, client->m_key);`가 그 작업영역의 **모든** unit의 `waitSN`을 강제로 꺼버리고 `WM_GUIDE`로 안내(`AE_TIMEOUT`=22)를 띄운다.
+
+**`TranTimeout`이 예컨대 60(초)로 설정돼 있다면, 이게 "약 1분 후에 풀어주는" 증상과 정확히 일치할 수 있다** — 서버가 어떤 이유로든 응답을 안/못 주는 상황에서 이 클라이언트 측 워치독이 60초 뒤 강제로 화면을 풀어주는 정상 동작일 가능성이 있음. **다만 이건 어디까지나 `Screen.Send()` 계열에만 적용된다** — 아래처럼 `Screen.Service()`/`Screen.Wait` 경로는 이 워치독 자체가 안 걸리므로, 만약 실제 헹의 원인이 이쪽이라면 60초에도 안 풀리고 그보다 훨씬 오래갈 수 있다.
+
+**확인 방법:** 레지스트리 `HKEY_CURRENT_USER\Software\IBK투자증권MAC\AXIS Workstation V04.00\Workstation\TranTimeout` 값을 확인하면 현재 설정된 워치독 시간(초)을 알 수 있다. 값이 없거나 0이면 `Send()` 경로조차 워치독 없이 무한 대기한다.
+
+### 발견 2 — 실사용 사례: IB000157/IB000130의 Screen.Service (워치독 없는 패턴)
+
+이번 종합화면 CTRL-RTT 조사에서 이미 등장했던 두 서브맵(`IB000157`, `IB000130`)의 `.map` 바이너리를 직접 추출해 확인한 결과, 둘 다 동일하게:
+```vbscript
+SCREEN.Service "pidomyst", data, DataLen.Data, &H02
+```
+를 호출한다. `&H02` = `US_OOP`(0x02)이고 `US_PASS`(0x04)가 아니므로 — 위 "트리거 2"에 해당, **모래시계는 뜨지만 워치독(TranTimeout)이 전혀 안 걸리는** 패턴이다. 다만 호출 위치가 `_AW_ONCLOSE_AW_`(화면을 닫을 때, 설정 저장 여부를 묻는 `MsgBox` 확인 이후) — 즉 **화면을 여는/조회하는 시점이 아니라 닫는 시점**에 실행되므로, 이번에 캡처된 "화면 열자마자 발생하는 조회 헹"의 직접 원인일 가능성은 낮다. 그러나 "서버가 `pidomyst` 서비스에 응답을 안 주면 닫기 확인 후 화면이 워치독 없이 무한정 멈출 수 있다"는 별개의 잠재 위험으로 기록해둘 가치가 있음 — 종합화면을 **닫을 때**도 비슷한 헹이 보고되면 1차 의심 지점.
+
+`Screen.Wait` 속성(트리거 4)을 이 종합화면 계열 스크립트가 실제로 쓰는지는 이번 조사에서는 확인하지 않았음(미조사).
+
+### 발견 3 — 죽은 코드: ChildFrm/SChild의 axWAIT 처리 (로직 반전 + break 누락, 호출자 없음)
+
+`CChildFrame::OnAXIS`/`CSChild::OnAXIS`/`CGPop::OnAXIS`에 `WM_AXIS`(`axWAIT` 서브명령, `axMsg.hxx:64`)로 커서를 직접 바꾸는 **또 다른 경로**가 남아있다:
+```cpp
+// ChildFrm.cpp:336, SChild.cpp:84 — 실제 살아있는 beginWait/endWait와 로직이 반대!
+case axWAIT:
+    m_cursor = (int) lParam;
+    if (m_cursor)  ::SetCursor(IDC_ARROW);   // m_cursor=1(대기)인데 화살표?!
+    else           ::SetCursor(IDC_WAIT);    // m_cursor=0(정상)인데 모래시계?!
+                                              // ChildFrm은 break 없이 axLINKEDIT로 그대로 흘러들어감
+```
+`GPop.cpp:98`은 로직 자체는 정상(`m_cursor`가 참이면 `IDC_WAIT`)이지만, 이 세 곳 다 **`axWAIT`를 `PostMessage`/`SendMessage`로 실제 보내는 호출자가 코드베이스 전체에 단 한 곳도 없다**(전수 grep 확인) — 즉 현재는 완전히 도달 불가능한 죽은 코드다. 실제 라이브 경로는 `beginWait`/`endWait`가 `m_cursor`를 직접 멤버 대입하고 `OnSetCursor`(`WM_SETCURSOR`)가 그 값을 읽는 방식뿐이다. `COnTimer`(`@docs/KnowledgeBase.md` 14절)와 같은 유형의 leftover — 나중에 이 메시지 경로를 되살리는 리팩터링을 한다면 `ChildFrm.cpp`/`SChild.cpp`의 반전된 로직과 누락된 `break`부터 고쳐야 함.
+
+### 관련 파일
+
+| 파일 | 역할 |
+|---|---|
+| `Wizard/Client.cpp:1927` | `CClient::WaitState` — waitSN 세팅 + TranTimeout 워치독 타이머 무장 + waitPAN 발사 |
+| `Wizard/Client.cpp:1956` | `CClient::WaitDone` — waitSN 해제, `m_units` 전부 비면 waitPAN(false) 발사 |
+| `Wizard/Stream.cpp:44,58` | `CStream::InStream` 두 오버로드 — Send() 성공 시 `WaitState` 호출 지점 |
+| `Wizard/Guard.cpp:3071` | `CGuard::Service` — `US_PASS` 없으면 `WaitState`를 거치지 않고 직접 waitSN/waitPAN 세팅(워치독 미적용) |
+| `Wizard/xscreen.cpp:68,155-166` | `CxScreen::_getWait`/`_setWait` — 스크립트 노출 `Screen.Wait` 속성 |
+| `Wizard/xscreen.cpp:992` | `CxScreen::_ServiceEx` — 항상 `US_PASS`로 우회, 대신 자체 `PeekMessage` 대기루프(`@docs/DebugLogGuide.md`의 `[ServiceEx-wait]` 참고) |
+| `Wizard/Event.cpp:284-292` | `WM_TIMER`의 `TM_WAIT` 핸들러 — 워치독 만료 시 강제 `WaitDone` + `AE_TIMEOUT` 안내 |
+| `Wizard/Guard.cpp:394` | `m_wait = GetProfileInt(WORKSTATION, TRANTMO, 0) * 1000` — 레지스트리 `TranTimeout`(초) 로드 |
+| `h/axisfire.h:89` | `waitPAN` COM Fire 이벤트 정의 |
+| `AXIS/MainFrm.cpp:12162,12199` | `CMainFrame::beginWait`/`endWait` — waitPAN 수신, 창별 `m_cursor` 세팅 |
+| `AXIS/ChildFrm.cpp:384`, `SChild.cpp:532`, `GPop.cpp:202` | `OnSetCursor`(`WM_SETCURSOR`) — 실제 `::SetCursor(IDC_WAIT)` 호출 지점(라이브 경로) |
+| `AXIS/ChildFrm.cpp:331`, `SChild.cpp:79`, `GPop.cpp:90` | `OnAXIS`의 `axWAIT` 분기 — 죽은 코드, ChildFrm/SChild는 로직도 반전 |
+| `map_src/IB/IB0/IB000157`, `IB000130` | `_AW_ONCLOSE_AW_`에서 `SCREEN.Service "pidomyst",...,&H02` 사용(워치독 없는 실사용 사례) |
+| `@docs/DebugLogGuide.md` 6절 | `[SVC-send]`/`[SVC-RTT]`/`[ServiceEx-wait]` — 이번 조사와 같은 맥락에서 추가된 msgK_SVC 진단 로그 |
+
+---
+
+## 18. 추가 자료
 
 ### 참고 문서
 - `@docs/Architecture.md` - 모듈 구조
@@ -1035,5 +1146,5 @@ axlog(LOG_RTM, "[FlashGrid-write] name=%.16s code=%s row=%d col=%d old=[%.32s] n
 
 ---
 
-**최종 수정:** 2026-08-20
+**최종 수정:** 2026-08-26
 **기여자:** Documentation Agent

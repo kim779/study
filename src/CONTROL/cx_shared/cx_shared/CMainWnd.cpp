@@ -346,8 +346,8 @@ int CMainWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	m_SmMemory->remainSHMEMNAME = sSHMENAME;
 	m_SmMemory->InitSharedMemory(this->m_hWnd);
 	//m_SmMemory->AddHandle(this->m_hWnd);
-	if(Axis_IsMainRTS())
-		StartWorkerThread();
+	//if(Axis_IsMainRTS())
+	//	StartWorkerThread();
 	FileMove();
 	return 0;
 }
@@ -355,6 +355,10 @@ int CMainWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 void CMainWnd::OnDestroy()
 {
+	// StartWorkerThread()를 안 쓰기로 해서(OnCreate 참고) m_workerThread가 애초에
+	// 시작되지 않으므로 여기서도 짝을 맞춰 주석 처리함. (2026-08-27)
+	//StopWorkerThread();
+
 	CWnd::OnDestroy();
 
 	// TODO: 여기에 메시지 처리기 코드를 추가합니다.

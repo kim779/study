@@ -45,6 +45,15 @@ char* LCcontrast[] = { "  ", "↓", "▼", "▲", "↑" };
 
 IMPLEMENT_DYNCREATE(CAxisForm, CCmdTarget)
 
+// AxisCodx.dll 핸들/함수포인터는 화면(CAxisForm) 인스턴스 전체가 공유하는 static.
+// 참조카운트(m_hCodeRefCount)가 0에서 1이 될 때만 로드하고, 마지막 화면이 파괴되어
+// 0으로 돌아갈 때만 해제한다 (2026-08-27, AxisCodx.dll 언로드-후-참조 크래시 수정).
+HINSTANCE	CAxisForm::m_hCode = NULL;
+bool		(APIENTRY* CAxisForm::axGetCategory)(char*, int, int, char*, bool) = NULL;
+int		(APIENTRY* CAxisForm::axGetSpinData)(DWORD, int, int, char*, double, bool) = NULL;
+double		(APIENTRY* CAxisForm::axGetDelta)(DWORD, double, bool) = NULL;
+int		CAxisForm::m_hCodeRefCount = 0;
+
 CAxisForm::CAxisForm()
 {
 	EnableAutomation();
@@ -70,19 +79,23 @@ CAxisForm::CAxisForm()
 	m_drawOnly = false;
 	m_tabs.RemoveAll();
 
-	m_hCode = AfxLoadLibrary("AxisCodx.dll");
-	if (m_hCode == NULL)
+	if (m_hCodeRefCount == 0)
 	{
-		axGetCategory = NULL;
-		axGetSpinData = NULL;
-		axGetDelta    = NULL;
+		m_hCode = AfxLoadLibrary("AxisCodx.dll");
+		if (m_hCode == NULL)
+		{
+			axGetCategory = NULL;
+			axGetSpinData = NULL;
+			axGetDelta    = NULL;
+		}
+		else
+		{
+			axGetCategory = (bool   (APIENTRY*)(char*, int, int, char*, bool))GetProcAddress(m_hCode, _T("axGetCategory"));
+			axGetSpinData = (int    (APIENTRY*)(DWORD, int, int, char*, double, bool))GetProcAddress(m_hCode, _T("axGetSpinData"));
+			axGetDelta    = (double	(APIENTRY*)(DWORD, double, bool))GetProcAddress(m_hCode, _T("axGetDelta"));
+		}
 	}
-	else
-	{
-		axGetCategory = (bool   (APIENTRY*)(char*, int, int, char*, bool))GetProcAddress(m_hCode, _T("axGetCategory")); 
-		axGetSpinData = (int    (APIENTRY*)(DWORD, int, int, char*, double, bool))GetProcAddress(m_hCode, _T("axGetSpinData"));
-		axGetDelta    = (double	(APIENTRY*)(DWORD, double, bool))GetProcAddress(m_hCode, _T("axGetDelta"));
-	}
+	m_hCodeRefCount++;
 
 	m_LCtype = PRIMARYLANGID(GetSystemDefaultLangID());
 	switch (m_LCtype)
@@ -127,8 +140,14 @@ CAxisForm::~CAxisForm()
 		delete[] m_mapB;
 
 	m_tabs.RemoveAll();
-	if (m_hCode)
+	if (--m_hCodeRefCount == 0 && m_hCode)
+	{
 		AfxFreeLibrary(m_hCode);
+		m_hCode = NULL;
+		axGetCategory = NULL;
+		axGetSpinData = NULL;
+		axGetDelta    = NULL;
+	}
 }
 
 

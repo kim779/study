@@ -993,6 +993,9 @@ BSTR CxScreen::_ServiceEx(LPCTSTR trN, LPCTSTR data, long length, long mode, lon
 {
 	CString strResult = _T("");
 
+	axlog(LOG_DATA, "CxScreen::_ServiceEx enter maps=%s screenKey=%d trN=%s timeout=%d m_service=%d",
+		CString(m_screen->m_mapH->mapN, L_MAPN).GetString(), m_screen->m_key, CString(trN).GetString(), timeout, (int)m_service);
+
 	switch (m_service)
 	{
 	case svFlag::svREADY:
@@ -1013,12 +1016,18 @@ BSTR CxScreen::_ServiceEx(LPCTSTR trN, LPCTSTR data, long length, long mode, lon
 	HWND	hWnd = m_screen->m_view->GetSafeHwnd();
 	ULONGLONG elapse = GetTickCount64();
 
+	axlog(LOG_DATA, "[ServiceEx-wait] maps=%s screenKey=%d trN=%s timeout=%d - entering blocking wait loop",
+		CString(m_screen->m_mapH->mapN, L_MAPN).GetString(), m_screen->m_key, CString(trN).GetString(), timeout);
+
 	while (m_service != svFlag::svDONE)
 	{
 		if (!::IsWindow(hWnd) || (timeout > 0 && GetTickCount64() - elapse > (ULONGLONG)timeout))
 		{
 			m_service = svFlag::svTIMEOUT;
-// updateXXX_202202	
+			axlog(LOG_DATA, "[ServiceEx-wait] maps=%s screenKey=%d trN=%s exit=TIMEOUT/WINDOW-GONE elapsed=%dms isWindow=%d",
+				CString(m_screen->m_mapH->mapN, L_MAPN).GetString(), m_screen->m_key, CString(trN).GetString(),
+				(int)(GetTickCount64() - elapse), (int)::IsWindow(hWnd));
+// updateXXX_202202
 			m_screen->m_client->WaitDone(m_screen, false, true);
 			return strResult.AllocSysString();
 		}
@@ -1046,6 +1055,10 @@ BSTR CxScreen::_ServiceEx(LPCTSTR trN, LPCTSTR data, long length, long mode, lon
 			}
 		}
 	}
+
+	axlog(LOG_DATA, "[ServiceEx-wait] maps=%s screenKey=%d trN=%s exit=DONE elapsed=%dms",
+		CString(m_screen->m_mapH->mapN, L_MAPN).GetString(), m_screen->m_key, CString(trN).GetString(),
+		(int)(GetTickCount64() - elapse));
 
 	if (m_pBytes)
 	{

@@ -8,6 +8,7 @@
 #include "TextColorDlg.h"
 #include "FontSetDlg.h"
 #include "Options.h"
+#include "HistDetailWnd.h"
 
 #include <shellapi.h>
 
@@ -89,12 +90,22 @@ CChildView::CChildView()
 
 	m_root.Format("%s\\exe\\AXXECURE.OCX", spath);
 
-	
+	m_histWnd = NULL;
 }
 
 CChildView::~CChildView()
 {
 	m_font.DeleteObject();
+
+	for (int ii = 0; ii < m_history.GetSize(); ii++)
+		delete (CHistItem*) m_history.GetAt(ii);
+	m_history.RemoveAll();
+
+	if (m_histWnd)
+	{
+		m_histWnd->DestroyWindow();
+		delete m_histWnd;
+	}
 }
 
 
@@ -134,6 +145,7 @@ BEGIN_MESSAGE_MAP(CChildView,CWnd )
 	ON_COMMAND(ID_SAVEAS, OnSaveas)
 	ON_EN_CHANGE(IDC_EDIT_KEYWORD, OnChangeEditKeyword)
 	ON_BN_CLICKED(IDC_CHK_FILTER, OnClickedChkFilter)
+	ON_BN_CLICKED(IDC_BTN_FINDTIME, OnClickedBtnFindTime)
 	ON_EN_CHANGE(IDC_EDIT_RANGE_FROM, OnChangeEditRangeFrom)
 	ON_EN_CHANGE(IDC_EDIT_RANGE_TO, OnChangeEditRangeTo)
 	ON_BN_CLICKED(IDC_CHK_RANGE, OnClickedChkRange)
@@ -158,6 +170,62 @@ void CChildView::OnChangeEditKeyword()
 void CChildView::OnClickedChkFilter()
 {
 	m_bFilterOn = (m_chkFilter.GetCheck() == BST_CHECKED);
+}
+
+void CChildView::OnClickedBtnFindTime()
+{
+	CString key;
+	m_editKeyword.GetWindowText(key);
+	key.TrimLeft(); key.TrimRight();
+	if (key.IsEmpty())
+	{
+		::MessageBox(m_hWnd, "필터 입력란에 찾을 시각(예: 16:09:47:591)을 입력하세요.", "Axis Chaser", MB_ICONINFORMATION);
+		return;
+	}
+
+	int found = -1;
+	for (int ii = 0; ii < m_history.GetSize(); ii++)
+	{
+		if (((CHistItem*) m_history.GetAt(ii))->m_time.Find(key) >= 0)
+		{
+			found = ii;
+			break;
+		}
+	}
+
+	if (found < 0)
+	{
+		::MessageBox(m_hWnd, "해당 시각의 기록을 찾지 못했습니다. (히스토리 보관 한도를 벗어났을 수 있습니다)", "Axis Chaser", MB_ICONWARNING);
+		return;
+	}
+
+	CHistItem* matched = (CHistItem*) m_history.GetAt(found);
+	CHistItem* pair = NULL;
+
+	if (matched->m_flag == x_SNDs)
+	{
+		for (int ii = found + 1; ii < m_history.GetSize(); ii++)
+		{
+			CHistItem* item = (CHistItem*) m_history.GetAt(ii);
+			if (item->m_flag == x_RCVs) { pair = item; break; }
+		}
+	}
+	else if (matched->m_flag == x_RCVs)
+	{
+		for (int ii = found - 1; ii >= 0; ii--)
+		{
+			CHistItem* item = (CHistItem*) m_history.GetAt(ii);
+			if (item->m_flag == x_SNDs) { pair = item; break; }
+		}
+	}
+
+	CString text = matched->m_text;
+	if (pair)
+		text += "\r\n" + pair->m_text;
+
+	if (!m_histWnd)
+		m_histWnd = new CHistDetailWnd();
+	m_histWnd->ShowText(this, "Time Detail: " + key, text);
 }
 
 void CChildView::OnChangeEditRangeFrom()
@@ -332,6 +400,10 @@ int CChildView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		WS_CHILD | WS_VISIBLE | BS_AUTOCHECKBOX,
 		rcChk, this, IDC_CHK_FILTER);
 
+	CRect rcFindTime(390, 10, 460, 32);
+	m_btnFindTime.Create(_T("FIND"), WS_CHILD | WS_VISIBLE,
+		rcFindTime, this, IDC_BTN_FINDTIME);
+
 	//m_editKeyword.SetWindowPos(&CWnd::wndTop, 0, 0, 0, 0,
 	//	SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
 	//m_chkFilter.SetWindowPos(&CWnd::wndTop, 0, 0, 0, 0,
@@ -339,6 +411,7 @@ int CChildView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 	m_editKeyword.SetFont(GetFont());
 	m_chkFilter.SetFont(GetFont());
+	m_btnFindTime.SetFont(GetFont());
 
 	CRect rcFrom(10, 36, 80, 58);
 	m_editRangeFrom.Create(WS_CHILD | WS_VISIBLE | WS_BORDER | ES_AUTOHSCROLL | ES_NUMBER,
@@ -547,6 +620,9 @@ void CChildView::OnRCVData(WPARAM wParam, LPARAM lParam)
 			unitK = axisH->unit;
 		}
 
+		char*	origDat = dat;		// snapshot before header/data/range display filters trim dat/len below
+		int	origLen = len;
+
 		if (HIWORD(wParam) == x_SNDs && !m_options.send)	break;
 		if (HIWORD(wParam) == x_RCVs && !m_options.receive)	break;
 		if (HIWORD(wParam) == x_SNDs)
@@ -706,6 +782,23 @@ void CChildView::OnRCVData(WPARAM wParam, LPARAM lParam)
 		}
 
 		addTrace(string, K_SNDRCV, trxCode);
+
+		CHistItem* hist = new CHistItem;
+		hist->m_time = timeS;
+		hist->m_flag = HIWORD(wParam);
+		if (HIWORD(wParam) == x_SNDs)
+			hist->m_text.Format(">>>>>>>>>>>>>>>>>>>> [Send Data %d Bytes][%s][Win %d][Unit %d] <<<<<<<<<<<<<<<<<<<<\r\n",
+				origLen, timeS, winK, unitK);
+		else
+			hist->m_text.Format("<<<<<<<<<<<<<<<<<<<< [Receive Data %d Bytes][%s][Win %d][Unit %d] >>>>>>>>>>>>>>>>>>>>\r\n",
+				origLen, timeS, winK, unitK);
+		hist->m_text += BuildHexDump(origDat, origLen);
+		m_history.Add(hist);
+		if (m_history.GetSize() > 2000)
+		{
+			delete (CHistItem*) m_history.GetAt(0);
+			m_history.RemoveAt(0);
+		}
 	}
 		break;
 	case x_RTMs:
@@ -821,6 +914,26 @@ void CChildView::OnRCVData(WPARAM wParam, LPARAM lParam)
 		}
 		break;
 	}
+}
+
+CString CChildView::BuildHexDump(char* dat, int len)
+{
+	CString result, sDat;
+	int maxCnt = 80;
+	int rowCnt = (len + maxCnt - 1) / maxCnt;
+
+	for (int row = 0; row < rowCnt; row++)
+	{
+		sDat.Empty();
+		for (int ii = row * maxCnt; ii < (row + 1) * maxCnt && ii < len; ii++)
+		{
+			unsigned char c = (unsigned char) dat[ii];
+			sDat += (c >= 0x20 && c < 0x80) ? (char) c : '.';
+		}
+		sDat += "\r\n";
+		result += sDat;
+	}
+	return result;
 }
 
 void CChildView::addTrace(CString dat, int kind, CString boldSub)

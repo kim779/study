@@ -97,6 +97,7 @@
 #define HORZFIT_BOTTOM		1	
 
 #define BUTTONWIDTH		45
+#define LOGIN_MPO		48
 #define	DEAL_BTNWIDTH		56
 #define	STOP_BTNWIDTH		52
 #define	REMOTE_BTNWIDTH		53

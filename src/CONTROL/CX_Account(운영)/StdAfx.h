@@ -39,7 +39,7 @@
 
 //#define DF_ACC_EMPHASIS  //사용안하기로 함
 
-#define  DF_TEST_MODE1
+#define  DF_TEST_MODE
 #define DF_ACC_HASH
 #define DF_SINGLETONE_FILE		// AccountHistory ini 파일 접근을 CAccHistoryStore 싱글톤으로 처리 (실험용 토글)
 

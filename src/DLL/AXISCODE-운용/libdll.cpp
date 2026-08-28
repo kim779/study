@@ -846,188 +846,170 @@ __declspec(dllexport) bool WINAPI axGetName(int kind, char* code, char* name, in
 
 	case whichTYPE: // 선택..
 		{
-		CString slog;
-		slog.Format("[AXISCODE] whichTYPE szCode=[%s]", szCode);
-		Output_DebugString(slog);
+			CString slog;
+			slog.Format("[AXISCODE] whichTYPE szCode=[%s]", szCode);
+			Output_DebugString(slog);
+
 			auto& map = pApp->_mapCODEx;
-			if (const auto ft = map.find(szCode); ft != map.end())
+
+			// 1. 종목코드 검색
+			auto ft = map.find(szCode);
+
+			if (ft == map.end())
 			{
-				const struct hjcodex* hjc = ft->second;
+				// 앞자리 제거 후 재검색
+				if (szCode.GetLength() > 1)
+				{
+					CString tmpCode = szCode.Mid(1);
+					ft = map.find(tmpCode);
+				}
+			}
+
+			// 2. 종목코드가 존재하는 경우
+			if (ft != map.end())
+			{
+				const hjcodex* hjc = ft->second;
+
 				szName = CString(hjc->hnam, HNameLen).Trim();
-				
+
+				// 기본 시장구분
 				switch (hjc->kosd)
 				{
-				case jmKOSPI:
-					*type = kospiType;		break;
-				case jmKOSDAQ:
-					*type = kosdaqType;		break;
-				case jm3RD:
-					*type = thirdType;		break;
-				case jmMUFND:
-					//	case jmMUFND2:
-					*type = mufundType;		break;
-				case jmREITS:
-					*type = reitsType;		break;
+				case jmKOSPI:   *type = kospiType;   break;
+				case jmKOSDAQ:  *type = kosdaqType;  break;
+				case jm3RD:     *type = thirdType;   break;
+				case jmMUFND:   *type = mufundType;  break;
+				case jmREITS:   *type = reitsType;   break;
 				}
 
-				if (hjc->ssgb == jmETF)
+				// 상세 종목구분
+				switch (hjc->ssgb)
+				{
+				case jmETF:
 					*type = etfType;
-				if (hjc->ssgb == jmSINJU || hjc->ssgb == jmSINJS)
-					*type = sinjuType;
-				if (hjc->ssgb == jmHYFND)
-					*type = hyfundType;
-				if (hjc->ssgb == jmELW)
-					*type = elwType;
-				if (hjc->ssgb == jmFOREIGN)
-					*type = foreignType;
-				if (hjc->ssgb == jmETN)//KSJ 2014.10.28 ETN 추가
-					*type = etnType;
-				if (hjc->ssgb == jmTJCONJS)//2024/04/22 신종코드타입
-					*type = singjongType;
-				if (hjc->ssgb == jmSINSUJS)//2024/04/22 신종코드타입
-					*type = singjongType;
-				if (hjc->ssgb == jmGOODSTOCK)
-					*type = singjongGoodType;
-			/*	if (hjc->ssgb == jmBDCPST)
-					*type = BDCpstType;
-				if (hjc->ssgb == jmBDCICY)
-					*type = BDCicyType;*/
+					break;
 
-				//20191114 맵화면에서 getcodetype를 사용하는 곳이 너무 많아서 kind를 typeforTAX로 주는 경우에만 타입을 세분화 해줌
-				//SCREEN.GetName(199, 종목코드, 0)
-				if (hjc->ssgb == jmKONEX && kind == typeforTAX)
-					*type = KONEXType;
+				case jmSINJU:
+				case jmSINJS:
+					*type = sinjuType;
+					break;
+
+				case jmHYFND:
+					*type = hyfundType;
+					break;
+
+				case jmELW:
+					*type = elwType;
+					break;
+
+				case jmFOREIGN:
+					*type = foreignType;
+					break;
+
+				case jmETN:
+					*type = etnType;
+					break;
+
+				case jmTJCONJS:
+				case jmSINSUJS:
+					*type = singjongType;
+					break;
+
+				case jmGOODSTOCK:
+					*type = singjongGoodType;
+					break;
+
+				case jmKONEX:
+					if (kind == typeforTAX)
+						*type = KONEXType;
+					break;
+
+					/*
+					case jmBDCPST:
+						*type = BDCpstType;
+						break;
+
+					case jmBDCICY:
+						*type = BDCicyType;
+						break;
+					*/
+				}
+
 				strcpy(name, szName);
 
-				slog.Format("[AXISCODE] whichTYPE szName=[%s] type=[%d]", szName, *type);
+				slog.Format("[AXISCODE] whichTYPE szName=[%s] type=[%d]",
+					szName, *type);
 				Output_DebugString(slog);
 
-				return TRUE;			
+				return TRUE;
 			}
-			else
-			{
-				CString tmpCode;
-				tmpCode = szCode.Mid(1);
-				if (const auto ft = map.find(tmpCode); ft != map.end())
-				{
-					const struct hjcodex* hjc = ft->second;
-					szName = CString(hjc->hnam, HNameLen).Trim();
 
-					switch (hjc->kosd)
+			// 3. 파생상품 코드
+			if (szCode.GetLength() > 5)
+			{
+				const TCHAR ch1 = szCode.GetAt(0);
+				const TCHAR ch2 = szCode.GetAt(1);
+
+				if ((ch1 == '1' || ch1 == '4' || ch1 == 'A' || ch1 == 'D') &&
+					ch2 != '0')
+				{
+					CCustomFuturesDlg cfdlg(0);
+					cfdlg.loadSfCode();
+
+					if (cfdlg.FindCode(kind, code))
 					{
-					case jmKOSPI:
-						*type = kospiType;		break;
-					case jmKOSDAQ:
-						*type = kosdaqType;		break;
-					case jm3RD:
-						*type = thirdType;		break;
-					case jmMUFND:
-						//	case jmMUFND2:
-						*type = mufundType;		break;
-					case jmREITS:
-						*type = reitsType;		break;
+						szName = cfdlg.GetName();
+						strcpy(name, szName);
+						*type = cfdlg.GetJongmuk();
+
+						return TRUE;
+					}
+				}
+				else
+				{
+					CFuturesDlg fdlg(kind);
+
+					if (fdlg.FindCode(kind, code))
+					{
+						szName = fdlg.GetName();
+						strcpy(name, szName);
+						*type = fdlg.GetJongmuk();
+
+						slog.Format("[AXISCODE][whichTYPE][%s]<%d> type=[%d] code=[%s]",
+							__FUNCTION__, __LINE__,
+							fdlg.m_jongmuk, szCode);
+						Output_DebugString(slog);
+
+						return TRUE;
 					}
 
-					if (hjc->ssgb == jmETF)
-						*type = etfType;
-					if (hjc->ssgb == jmSINJU || hjc->ssgb == jmSINJS)
-						*type = sinjuType;
-					if (hjc->ssgb == jmHYFND)
-						*type = hyfundType;
-					if (hjc->ssgb == jmELW)
-						*type = elwType;
-					if (hjc->ssgb == jmFOREIGN)
-						*type = foreignType;
-					if (hjc->ssgb == jmETN)//KSJ 2014.10.28 ETN 추가
-						*type = etnType;
-					if (hjc->ssgb == jmTJCONJS)//2024/04/22 신종코드타입
-						*type = singjongType;
-					if (hjc->ssgb == jmSINSUJS)//2024/04/22 신종코드타입
-						*type = singjongType;
-					if (hjc->ssgb == jmGOODSTOCK)
-						*type = singjongGoodType;
-			/*		if (hjc->ssgb == jmBDCPST)
-						*type = BDCpstType;
-					if (hjc->ssgb == jmBDCICY)
-						*type = BDCicyType;*/
+					slog.Format("[AXISCODE][whichTYPE][%s]<%d> code=[%s] 타입을 모른다",
+						__FUNCTION__, __LINE__, szCode);
+					Output_DebugString(slog);
+				}
+			}
+			// 4. 업종코드
+			else if (szCode.GetLength() <= 3)
+			{
+				CJongmukDlg dlg(kind, 0);
 
-					//20191114 맵화면에서 getcodetype를 사용하는 곳이 너무 많아서 kind를 typeforTAX로 주는 경우에만 타입을 세분화 해줌
-					//SCREEN.GetName(199, 종목코드, 0)
-					if (hjc->ssgb == jmKONEX && kind == typeforTAX)
-						*type = KONEXType;
+				dlg.LoadUPCode();
+
+				if (dlg.FindCode(indexNAME, code, *type))
+				{
+					szName = dlg.GetName();
 					strcpy(name, szName);
 
-					slog.Format("[AXISCODE] whichTYPE szName=[%s] type=[%d]", szName, *type);
-					Output_DebugString(slog);
+					*type = indexType;
 
+					dlg.DeleteAllData();
 					return TRUE;
 				}
-
-
-				if (szCode.GetLength() > 5)
-				{
-					const TCHAR	ch1 = szCode.GetAt(0);
-					const TCHAR	ch2 = szCode.GetAt(1);
-				
-					if ((ch1 == '1' || ch1 == '4' || ch1 == 'A' || ch1 == 'D') && ch2 != '0')  //파생상품 코드개편
-					{
-						CCustomFuturesDlg cfdlg(0);
-						cfdlg.loadSfCode();
-						
-						if (cfdlg.FindCode(kind, code))
-						{
-							szName = cfdlg.GetName();
-							strcpy(name, szName);
-
-							*type = cfdlg.GetJongmuk();
-							return TRUE;
-						}
-					}
-					else
-					{
-						CFuturesDlg fdlg(kind);
-						if (fdlg.FindCode(kind, code))
-						{
-							// 선물
-							szName = fdlg.GetName();
-							strcpy(name, szName);
-
-							*type = fdlg.GetJongmuk();
-
-							CString slog;
-							slog.Format("[AXISCODE][whichTYPE][%s]<%d> type=[%d] code=[%s] ", __FUNCTION__, __LINE__, fdlg.m_jongmuk, szCode );
-							Output_DebugString(slog);
-
-							return TRUE;
-						}
-						else
-						{
-							CString slog;
-							slog.Format("[AXISCODE][whichTYPE][%s]<%d>  code=[%s] 타입을 모른다 ", __FUNCTION__, __LINE__,szCode);
-							Output_DebugString(slog);
-						}
-					}
-				} 
-				else if (szCode.GetLength() <= 3)
-				{
-					CJongmukDlg dlg(kind, 0);
-
-					// 업종
-					dlg.LoadUPCode();
-					if (dlg.FindCode(indexNAME, code, *type))
-					{
-						szName = dlg.GetName();
-						strcpy(name, szName);
-
-						*type = indexType;
-						dlg.DeleteAllData();
-						return TRUE;
-					} 
-				} 
-
-				*type = -1;
-//AxStd::_Msg("GetCodeTypexxxxx  [%s][%s][%d]", code, name, type);
 			}
+
+			*type = -1;
+
+			return FALSE;
 		}
 		break; 
 

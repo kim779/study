@@ -112,11 +112,15 @@
       <LinkDLL>true</LinkDLL>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
-      <OutputFile>D:\util\HTS\IBK투자증권 HTS\dev\cx_Symbol.dll</OutputFile>
+      <OutputFile>D:\util\HTS\IBK_SMART\dev\cx_Symbol.dll</OutputFile>
       <ImportLibrary>.\Release\cx_Symbol.lib</ImportLibrary>
       <ModuleDefinitionFile>.\CX_Symbol.def</ModuleDefinitionFile>
       <GenerateMapFile>true</GenerateMapFile>
+      <ProgramDatabaseFile>D:\symbol\$(ProjectName).pdb</ProgramDatabaseFile>
     </Link>
+    <PostBuildEvent>
+      <Command>"C:\Program Files (x86)\Windows Kits\8.1\Debuggers\x86\symstore.exe" add /f "D:\symbol\$(ProjectName).pdb" /s "D:\symstore" /t "IBKS"</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

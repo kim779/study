@@ -714,11 +714,11 @@ bool CWsh::MakeUpdateList()
 			item->m_vers = vers;
 			clist.SetAt(wb, item);
 		}
-		axlog(LOG_FILEPATCH, "[MakeUpdateList-local] localCount=%d (tab/infoAXIS)", clist.GetCount());
+		axlog(LOG_FILEPATCH, "[MakeUpdateList-local-axis] localCount=%d (tab/infoAXIS)", clist.GetCount());
 
 		path.Format(_T("%s/%s/infoAXIS.new"), m_home.GetString(), TABDIR);
 		LoadFile(path, arr);
-		axlog(LOG_FILEPATCH, "[MakeUpdateList-server] serverCount=%d (tab/infoAXIS.new)", arr.GetSize());
+		axlog(LOG_FILEPATCH, "[MakeUpdateList-server-axis] serverCount=%d (tab/infoAXIS.new)", arr.GetSize());
 
 		value = 0;
 		path.Format(_T("%s/%s/updateX"), m_home.GetString(), TABDIR);
@@ -743,7 +743,7 @@ bool CWsh::MakeUpdateList()
 			{
 				if (vers <= item->m_vers)
 				{
-					axlog(LOG_FILEPATCH, "[MakeUpdateList-skip] name=%s localVers=%d serverVers=%d (up to date)", wb, item->m_vers, vers);
+					axlog(LOG_FILEPATCH, "[MakeUpdateList-skip-axis] name=%s localVers=%d serverVers=%d (up to date)", wb, item->m_vers, vers);
 					continue;
 				}
 			}
@@ -751,14 +751,14 @@ bool CWsh::MakeUpdateList()
 			if (size == 0)
 			{
 				str.Format(_T("%s/%s/%s"), m_home.GetString(), RUNDIR, wb);
-				axlog(LOG_FILEPATCH, "[MakeUpdateList-delete] name=%s (server size=0)", wb);
+				axlog(LOG_FILEPATCH, "[MakeUpdateList-delete-axis] name=%s (server size=0)", wb);
 				DeleteFile(str);
 				continue;
 			}
 
 			if (!IsPatchWhitelisted(m_home, RUNDIR, wb))
 			{
-				axlog(LOG_FILEPATCH, "[MakeUpdateList-skip-whitelist] name=%s (not in openapi_whitelist.txt)", wb);
+				axlog(LOG_FILEPATCH, "[MakeUpdateList-skip-whitelist-axis] name=%s (not in openapi_whitelist.txt)", wb);
 				continue;
 			}
 
@@ -768,7 +768,7 @@ bool CWsh::MakeUpdateList()
 			update->m_size = size;
 			m_list.Add(update);
 			value += size;
-			axlog(LOG_FILEPATCH, "[MakeUpdateList-queue] name=%s serverVers=%d size=%d", wb, vers, size);
+			axlog(LOG_FILEPATCH, "[MakeUpdateList-queue-axis] name=%s serverVers=%d size=%d", wb, vers, size);
 
 			str.Format(_T("%d"), m_list.GetSize());
 			text.Format(_T("%s:%d\n"), update->m_name.GetString(), update->m_size);
@@ -783,7 +783,7 @@ bool CWsh::MakeUpdateList()
 		}
 		clist.RemoveAll();
 
-		axlog(LOG_FILEPATCH, "[MakeUpdateList-summary] queuedCount=%d totalBytes=%d", m_list.GetSize(), value);
+		axlog(LOG_FILEPATCH, "[MakeUpdateList-summary-axis] queuedCount=%d totalBytes=%d", m_list.GetSize(), value);
 
 		if (m_list.GetSize() > 0 && value > 0)
 		{
@@ -809,6 +809,10 @@ bool CWsh::MakeUpdateList()
 
 	char	twb[64], keys[16];
 	int	count;
+	// count는 verM[] 배열의 실제 인덱스라 건드리면 안 됨 - 아래 3개는 그중 몇 개가
+	// 이미 최신(up-to-date)/화면열때로 지연(deferred)/즉시받을 dev파일(devPending)인지
+	// 로그로만 구분하기 위한 통계 전용 카운터 (2026-08-27 추가)
+	int	upToDateCount = 0, deferredOnlyCount = 0, devPendingCount = 0;
 	struct	_verM*	verM = nullptr;
 	bool	force = false;
 	enum	{ verNONE = 0, verMAP, verDEV } version;
@@ -847,9 +851,11 @@ bool CWsh::MakeUpdateList()
 		item->m_key  = atoi(keys);
 		clist.SetAt(str, item);
 	}
+	axlog(LOG_FILEPATCH, "[MakeUpdateList-local-rsc] localCount=%d (tab/infoRSC)", clist.GetCount());
 
 	path.Format(_T("%s/%s/infoRSC.new"), m_home.GetString(), TABDIR);
 	LoadFile(path, arr);
+	axlog(LOG_FILEPATCH, "[MakeUpdateList-server-rsc] serverCount=%d (tab/infoRSC.new)", arr.GetSize());
 	if (arr.GetSize() > 0)
 		verM = (struct _verM *)new char[sizeof(struct _verM) * arr.GetSize()];
 
@@ -879,6 +885,7 @@ bool CWsh::MakeUpdateList()
 		if (size == 0)
 		{
 			text.Format(_T("%s/%s/%s"), m_home.GetString(), twb, wb);
+			axlog(LOG_FILEPATCH, "[MakeUpdateList-delete-rsc] name=%s path=%s (server size=0)", wb, twb);
 			DeleteFile(text);
 			continue;
 		}
@@ -898,10 +905,14 @@ bool CWsh::MakeUpdateList()
 		{
 			if (atoi(keys) <= item->m_key)
 			{
+				axlog(LOG_FILEPATCH, "[MakeUpdateList-skip-rsc] name=%s path=%s localKey=%d serverKey=%s (up to date)", wb, twb, item->m_key, keys);
 				str += '\n';
 				m_file.WriteString(str);
 				if (version != verNONE)
+				{
 					count++;
+					upToDateCount++;
+				}
 				continue;
 			}
 		}
@@ -911,12 +922,15 @@ bool CWsh::MakeUpdateList()
 		case verMAP:
 			if (m_runDown)
 			{
+				axlog(LOG_FILEPATCH, "[MakeUpdateList-defer-rsc] name=%s path=%s serverKey=%s (runDown=on, flagged for lazy per-screen download)", wb, twb, keys);
 				verM[count].request = true;
 				count++;
+				deferredOnlyCount++;
 				continue;
 			}
 		case verDEV:
 			count++;
+			devPendingCount++;
 		default:
 			break;
 		}
@@ -927,6 +941,7 @@ bool CWsh::MakeUpdateList()
 			continue;
 		}
 
+		axlog(LOG_FILEPATCH, "[MakeUpdateList-queue-rsc] name=%s path=%s serverKey=%s size=%d", wb, twb, keys, size);
 		update = new Cupdate;
 		update->m_name = text;
 		update->m_size = size;
@@ -949,6 +964,9 @@ bool CWsh::MakeUpdateList()
 		delete item;
 	}
 	clist.RemoveAll();
+
+	axlog(LOG_FILEPATCH, "[MakeUpdateList-summary-rsc] queuedCount=%d totalBytes=%d verMTotal=%d upToDateCount=%d deferredCount=%d devPendingCount=%d",
+		m_list.GetSize(), value, count, upToDateCount, deferredOnlyCount, devPendingCount);
 
 	if (m_list.GetSize() > 0 && value > 0)
 	{

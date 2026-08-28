@@ -75,6 +75,7 @@
 #define IDC_CHK_LOGENABLE	10008
 #define IDC_BTN_LOGFOLDER	10009
 #define IDC_BTN_LOGCLEAR	10010
+#define IDC_BTN_FINDTIME	10011
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED

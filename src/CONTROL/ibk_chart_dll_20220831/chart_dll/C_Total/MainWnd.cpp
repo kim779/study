@@ -130,12 +130,14 @@ BEGIN_MESSAGE_MAP(CMainWnd, CWnd)
 	ON_MESSAGE(GEV_CTRL, OnCtrlEvent)
 	ON_MESSAGE(GEV_TOOL, OnToolEvent)
 	ON_MESSAGE(GEV_TABLE, OnTableEvent)
+	ON_WM_PAINT()
 END_MESSAGE_MAP()
 
 
 BEGIN_DISPATCH_MAP(CMainWnd, CWnd)
 	//{{AFX_DISPATCH_MAP(CMainWnd)
 	DISP_PROPERTY_NOTIFY(CMainWnd, "visible", m_visible, OnVisibleChanged, VT_BOOL)
+	DISP_PROPERTY_EX_ID(CMainWnd, "sMarket", dispidsMarket, GetsMarket, SetsMarket, VT_BSTR)
 	DISP_FUNCTION(CMainWnd, "GetProperties", GetProperties, VT_BSTR, VTS_NONE)
 	DISP_FUNCTION(CMainWnd, "SetProperties", SetProperties, VT_EMPTY, VTS_BSTR)
 	DISP_FUNCTION(CMainWnd, "RequestTR", RequestTR, VT_BOOL, VTS_BSTR)
@@ -542,6 +544,10 @@ LRESULT CMainWnd::Oub(WPARAM wwParam, LPARAM lParam)
 	struct _extTHx* info = (struct _extTHx*)lParam;
 	const int length = info->size;
 	lParam = (LPARAM)(char*)info->data;
+
+	//m_pwndInput->ShowWindow(SW_HIDE);
+	//m_pwndChart->ShowWindow(SW_HIDE);
+	//return 0;
  
 	struct  _zcom_head* pZComHead = (struct  _zcom_head*)lParam;
 	// 데이터가 여러번에 거쳐 올경우 저장
@@ -1330,6 +1336,19 @@ void CMainWnd::SendRequest()
 		inputLen = m_pwndInput->SendMessage(GEV_INPUT, MAKEWPARAM(INPUT_DATA, GET_TR_INFO), (long)inputStr);
 	else
 		inputLen = m_pExtraMsg->InputEvent(MAKEWPARAM(INPUT_DATA, GET_TR_INFO), (long)inputStr);
+
+	//NXT
+	CString stmp{};
+	if (m_strMarket == "통합")
+		stmp.Format("%s%c%d%c", "1777", 0x7f, 3, 0x09);
+	else if (m_strMarket == "KRX")
+		stmp.Format("%s%c%d%c",  "1777", 0x7f, 1, 0x09);
+	else if (m_strMarket == "NXT")
+		stmp.Format("%s%c%d%c","1777", 0x7f, 2, 0x09);
+
+	strcat(inputStr, (LPSTR)(LPCTSTR)stmp);
+	inputLen += stmp.GetLength();
+	//NXT
 
 	if (inputLen == 0)
 	{
@@ -2408,4 +2427,51 @@ void CMainWnd::DoEvent(int nEvent)
 		CString	ctrlName = m_strIName.Left(m_strIName.GetLength() -1);
 		m_pwndView->SendMessage(WM_USER, MAKEWPARAM(eventDLL, MAKEWORD(m_iKey, nEvent)), (long)ctrlName.operator LPCTSTR());
 	}
+}
+
+BSTR CMainWnd::GetsMarket()
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	CString strResult;
+
+	// TODO: 여기에 디스패치 처리기 코드를 추가합니다.
+	strResult.Format("%s", m_strMarket);
+
+	return strResult.AllocSysString();
+}
+
+
+void CMainWnd::SetsMarket(BSTR newVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+	CString sMarket;
+	sMarket.Format("%s", newVal);
+	sMarket.Trim();
+
+	if (sMarket == "KRX")
+	{
+		//m_markettype = TYPE_KRX;
+		m_strMarket = "KRX";
+	}
+	else if (sMarket == "NXT")
+	{
+		//m_markettype = TYPE_NXT;
+		m_strMarket = "NXT";
+	}
+	else if (sMarket == "통합")
+	{
+		//m_markettype = TYPE_TOTAL;
+		m_strMarket = "통합";
+	}
+}
+
+void CMainWnd::OnPaint()
+{
+	CPaintDC dc(this); // device context for painting
+					   // TODO: 여기에 메시지 처리기 코드를 추가합니다.
+					   // 그리기 메시지에 대해서는 CWnd::OnPaint()을(를) 호출하지 마십시오.
+	//CRect rec;
+	//GetClientRect(&rec);
+	//dc.FillSolidRect(rec, RGB(256, 0, 0));
 }

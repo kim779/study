@@ -112,10 +112,11 @@ BOOL CAxMisc::RunVers(int type, CString user, CString pass, CString cpass)
 		exes.Format("%s.exe", app->m_pszExeName);
 	else	exes.Format("%s.exe", app->m_exeName);		
 #pragma warning(disable : 6273)
+#ifdef DF_AXISVER
 	if (app->m_exeName.IsEmpty() && app->m_progK == 'B')
 	{
 		if (app->m_mode == MD_DEV)
-			cmds.Format(" /c %d /x %d /d \"%s\" /a \"%s\" /p B /s %c", AfxGetMainWnd()->m_hWnd, GetCurrentProcessId(), m_root, exes, 0x7f);
+			cmds.Format(" /c %d /x %d /d \"%s\" /a \"%s\" /p B /s %c", AfxGetMainWnd()->m_hWnd, GetCurrentProcessId() , m_root, exes, 0x7f);
 		else
 		{
 			cmds.Format(" /c %d /x %d /d \"%s\" /a \"%s\" /p B", AfxGetMainWnd()->m_hWnd, GetCurrentProcessId(), m_root, exes);
@@ -125,11 +126,31 @@ BOOL CAxMisc::RunVers(int type, CString user, CString pass, CString cpass)
 	{
 		if (app->m_mode == MD_DEV)
 			cmds.Format(" /c %d /x %d /d \"%s\" /a %s /s %c", AfxGetMainWnd()->m_hWnd, GetCurrentProcessId(), m_root, exes, 0x7f);
-		else
+		else	
 		{
 			cmds.Format(" /c %d /x %d /d \"%s\" /a %s", AfxGetMainWnd()->m_hWnd, GetCurrentProcessId(), m_root, exes);
 		}
 	}
+#else
+	if (app->m_exeName.IsEmpty() && app->m_progK == 'B')
+	{
+		if (app->m_mode == MD_DEV)
+			cmds.Format(" /c %d /d \"%s\" /a \"%s\" /p B /s %c", AfxGetMainWnd()->m_hWnd, m_root, exes, 0x7f);
+		else
+		{
+			cmds.Format(" /c %d /d \"%s\" /a \"%s\" /p B", AfxGetMainWnd()->m_hWnd, m_root, exes);
+		}
+	}
+	else
+	{
+		if (app->m_mode == MD_DEV)
+			cmds.Format(" /c %d /d \"%s\" /a %s /s %c", AfxGetMainWnd()->m_hWnd, m_root, exes, 0x7f);
+		else	
+		{
+			cmds.Format(" /c %d /d \"%s\" /a %s", AfxGetMainWnd()->m_hWnd, m_root, exes);
+		}
+	}
+#endif
 	CString reg; reg.Format(" /k %s", m_regkey);
 	cmds += reg;
 	
@@ -251,7 +272,7 @@ BOOL CAxMisc::RunVers(int type, CString user, CString pass, CString cpass)
 #endif
 
 	slog.Format("[CX_SecureDataEngine][ENC]  cmds=[%s] ", cmds);
-	OutputDebugString(slog);
+	//OutputDebugString(slog);
 
 	/*FILE* fp;
 	fopen_s(&fp, Axis::home + "\\exe\\axMisc.log", "wb");

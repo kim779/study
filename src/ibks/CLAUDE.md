@@ -22,3 +22,4 @@
 | 2026-07-24 | @docs/AxisformArchitecture.md | axisform.dll(dll/form) 클래스 계층, 컨트롤 생명주기, DLL 경계 vtable 위험성 | ✓ 1차 완료 |
 | 2026-07-31 | @docs/MigrationSpec_SocketToDrawing.md | **연말 플랫폼 마이그레이션용 명세서** — 소켓 프로토콜(_axisH), 패킷재조립, winK/unit 화면식별, 필드파싱(SetDataNRM/그리드/원장), 암호화(Xecure, 8.9절), msgK 전체 목록(1절), 실측+패킷캡처 3중검증 | 🔍 작성 중 (SetDataOOP/TAB류, ARM/AUX/DIAL/MAPX msgK 남음) |
 | 2026-07-31 | @docs/DebugLogGuide.md | axlog 중앙로깅 인프라 및 전체 로그 태그 카탈로그(화면열기/스크립트엔진/입력이벤트/소켓파이프라인/CDll/암호화Xecure/NOENC.TXT 개발스위치) — DebugView 검색용 | ✓ 완료 |
+| 2026-08-28 | @docs/FilePatchProtocol.md | 로그인시 파일 패치 프로토콜 — MakeUpdateList() AXIS/RSC 브랜치 판정로직, infoAXIS/infoRSC/updateAXIS/updateRSC/updateX 파일 카탈로그, m_runDown/defer-rsc 지연패치 메커니즘, LOG_FILEPATCH 태그+실측 로그 해설 | 🔍 1차 완료 (vers 필드/m_runDown 트리거 시나리오 미확인) |

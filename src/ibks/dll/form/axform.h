@@ -73,10 +73,18 @@ class AFX_EXT_CLASS CAxisForm : public CCmdTarget
 
 // Attributes
 private:
-	HINSTANCE	m_hCode;
-	bool		(APIENTRY* axGetCategory)(char* root, int kind, int index, char* code, bool prev);
-	int		(APIENTRY* axGetSpinData)(DWORD type, int nfloat, int xfloat, char* data, double value, bool prev);
-	double		(APIENTRY* axGetDelta)(DWORD type, double value, bool prev);
+	// AxisCodx.dll은 CAxisForm(=화면) 인스턴스마다 개별 로드/해제하지 않고
+	// 프로세스 전체에서 static으로 공유한다. 화면별로 각자 AfxLoadLibrary/AfxFreeLibrary를
+	// 호출하던 예전 방식은, 여러 화면이 한꺼번에 파괴되는 종료 시점에 한 화면이 마지막
+	// 참조를 해제해 DLL이 실제로 언로드된 직후 아직 파괴 중인 다른 화면이 자신의(이미
+	// 무효해진) 함수포인터로 호출을 시도해 크래시하는 경합을 유발했다
+	// (<Unloaded_AxisCodx.dll> 크래시, 2026-08-27 확인). static 참조카운트로 공유하면
+	// 화면이 하나라도 살아있는 한 DLL이 계속 로드된 상태로 유지되어 이 경합이 사라진다.
+	static HINSTANCE	m_hCode;
+	static bool		(APIENTRY* axGetCategory)(char* root, int kind, int index, char* code, bool prev);
+	static int		(APIENTRY* axGetSpinData)(DWORD type, int nfloat, int xfloat, char* data, double value, bool prev);
+	static double		(APIENTRY* axGetDelta)(DWORD type, double value, bool prev);
+	static int		m_hCodeRefCount;
 
 protected:
 	CMap	<int, int, int, int&> m_radio;

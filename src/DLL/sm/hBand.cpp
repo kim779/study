@@ -182,6 +182,32 @@ BOOL CHBand::OnCommand(WPARAM wParam, LPARAM lParam)
 	if (comm >= 0 && comm < m_commandList.GetSize())
 	{
 		CString mapN = m_commandList.GetAt(comm);
+
+		int LoginType = 0;
+		LoginType = (*m_axiscall)(AXI_FUNCKEY, MAKEWPARAM(LOGIN_MPO, 0), (LPARAM)LoginType);
+		if (LoginType == 1)
+		{
+			if (mapN == "IB000100" || mapN == "IB200000" || mapN == "IB500000" || mapN == "IB100100" || mapN == "IB680100"
+			 || mapN == "IB610100" || mapN == "IB100000" || mapN == "IB300000" || mapN == "IB360000" || mapN == "IB860500"
+			 || mapN == "IB100200" || mapN == "IB104000" || mapN == "IB100300" || mapN == "IB102100" || mapN == "IB103200"
+			 || mapN == "IB101900" || mapN == "IB101100" || mapN == "IB101200" || mapN == "IB101300" || mapN == "IB670100"
+			 || mapN == "IB220000" || mapN == "IB330000" || mapN == "IB300100" || mapN == "IB883000" || mapN == "IB302000"
+			 || mapN == "IB300600" || mapN == "IB300200" || mapN == "IB300300" || mapN == "IB301100" || mapN == "IB300700"
+			 || mapN == "IB300800" || mapN == "IB300500" || mapN == "IB301200" || mapN == "IB301300" || mapN == "IB303000"
+			 || mapN == "IB303100" || mapN == "IB230000" || mapN == "IB314100" || mapN == "IB314200" || mapN == "IB314900"
+			 || mapN == "IB300900" || mapN == "IB851400" || mapN == "IB851700" || mapN == "IB850300" || mapN == "IB850400"
+			 || mapN == "IB850500" || mapN == "IB105000" || mapN == "IB282100" || mapN == "IB596000" || mapN == "IB596100"
+			 || mapN == "IB596200" || mapN == "IB550000" || mapN == "IB556000" || mapN == "IB590000" || mapN == "IB593000"
+			 || mapN == "IB594000" || mapN == "IB596400" || mapN == "IB596300" || mapN == "IB498700" || mapN == "IB498900"
+			 || mapN == "IB611600" || mapN == "IB283200" || mapN == "IB623700" || mapN == "IB623200" || mapN == "IB623400"
+			 || mapN == "IB620200" || mapN == "IB620300" || mapN == "IB620400" || mapN == "IB650100" || mapN == "IB630100"
+			 || mapN == "IB661000" || mapN == "IB662000" || mapN == "IB320700")
+			{
+				Axis::MessageBox(this, "시세/준회원 조회 로그인으로 사용이 불가한 서비스입니다.", MB_ICONSTOP);
+				return 0;
+			}
+		}
+
 		(*m_axiscall)(AXI_CHANGEVIEW, 0, (LPARAM)(const char *)mapN);
 	}
 	return CWnd::OnCommand(wParam, lParam);
@@ -385,10 +411,41 @@ void CHBand::OnLButtonUp(UINT nFlags, CPoint point)
 			const CBandItem* item = m_arItem.GetAt(nItem).get();
 #else
 			const CBandItem* item = m_arItem.GetAt(nItem);
-#endif
-			
+#endif		
+
+
 			if (item->kind == BAND_ITEM)
-				(*m_axiscall)(AXI_CHANGEVIEW, 0, (LPARAM)(const char *)item->mapN);
+			{
+				int LoginType = 0;
+				LoginType = (*m_axiscall)(AXI_FUNCKEY, MAKEWPARAM(LOGIN_MPO, 0), (LPARAM)LoginType);
+				if (LoginType == 1)
+				{
+					if (item->mapN == "IB000100" || item->mapN == "IB200000" || item->mapN == "IB500000" || item->mapN == "IB100100" || item->mapN == "IB680100"
+					 || item->mapN == "IB610100" || item->mapN == "IB100000" || item->mapN == "IB300000" || item->mapN == "IB360000" || item->mapN == "IB860500"
+					 || item->mapN == "IB100200" || item->mapN == "IB104000" || item->mapN == "IB100300" || item->mapN == "IB102100" || item->mapN == "IB103200"
+					 || item->mapN == "IB101900" || item->mapN == "IB101100" || item->mapN == "IB101200" || item->mapN == "IB101300" || item->mapN == "IB670100"
+					 || item->mapN == "IB220000" || item->mapN == "IB330000" || item->mapN == "IB300100" || item->mapN == "IB883000" || item->mapN == "IB302000"
+					 || item->mapN == "IB300600" || item->mapN == "IB300200" || item->mapN == "IB300300" || item->mapN == "IB301100" || item->mapN == "IB300700"
+					 || item->mapN == "IB300800" || item->mapN == "IB300500" || item->mapN == "IB301200" || item->mapN == "IB301300" || item->mapN == "IB303000"
+					 || item->mapN == "IB303100" || item->mapN == "IB230000" || item->mapN == "IB314100" || item->mapN == "IB314200" || item->mapN == "IB314900"
+					 || item->mapN == "IB300900" || item->mapN == "IB851400" || item->mapN == "IB851700" || item->mapN == "IB850300" || item->mapN == "IB850400"
+					 || item->mapN == "IB850500" || item->mapN == "IB105000" || item->mapN == "IB282100" || item->mapN == "IB596000" || item->mapN == "IB596100"
+					 || item->mapN == "IB596200" || item->mapN == "IB550000" || item->mapN == "IB556000" || item->mapN == "IB590000" || item->mapN == "IB593000"
+					 || item->mapN == "IB594000" || item->mapN == "IB596400" || item->mapN == "IB596300" || item->mapN == "IB498700" || item->mapN == "IB498900"
+					 || item->mapN == "IB611600" || item->mapN == "IB283200" || item->mapN == "IB623700" || item->mapN == "IB623200" || item->mapN == "IB623400"
+					 || item->mapN == "IB620200" || item->mapN == "IB620300" || item->mapN == "IB620400" || item->mapN == "IB650100" || item->mapN == "IB630100"
+					 || item->mapN == "IB661000" || item->mapN == "IB662000" || item->mapN == "IB320700")
+					{
+						Axis::MessageBox(this, "시세/준회원 조회 로그인으로 사용이 불가한 서비스입니다.", MB_ICONSTOP);
+						m_nDragItem = -99;
+						m_push = -1;
+						m_pushON = false;
+						return;
+					}
+				}
+
+				(*m_axiscall)(AXI_CHANGEVIEW, 0, (LPARAM)(const char*)item->mapN);
+			}
 			else
 			{
 				const CRect	iRc = GetToolRect(nItem);

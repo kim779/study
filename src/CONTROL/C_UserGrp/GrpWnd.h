@@ -55,6 +55,7 @@ public:
 	void	TipMouseMove(CPoint point);
 	void	MouseMove(bool bIsTipEvent, CPoint point, bool bCrossOnly = false);
 	void	SetShowLine(int nLine,bool bflag);
+	void	SetRTS(bool bflag);
 	class CCrossLine* GetCrossLine() { return m_pCrossLine.get(); }
 	void	MessageToParent(int message, int wParam, int lParam)	{ m_pParent->SendMessage(message, wParam, lParam); }
 public:
@@ -104,7 +105,7 @@ public:
 	bool			m_bTickVertic;	// 하단틱 수직으로
 	bool			m_bItemRts;	// 각 항목별 개별 실시간
 	bool			m_b3NChart;	// IGK_2D3NBAR
-
+	bool			m_bRTS{};
 	CString m_sRTSCode{};
 private:
 	int	DispatchData(WPARAM wParam, LPARAM lParam);
@@ -135,10 +136,12 @@ private:
 	void	ReviseTick();
 	int	CetBottomVerticHeight(CDC *pDC);
 	void	SetError(CString sErr) { m_sError = sErr; }
-
+public:
+	CWnd* m_pView{};
+	CWnd* m_pParent{};
 private:
-	CWnd			*m_pView;
-	CWnd			*m_pParent;
+	//CWnd			*m_pView;
+	//CWnd			*m_pParent;
 	std::unique_ptr<class CToolTip>		m_pToolTip;
 	std::unique_ptr<class CCrossLine>	m_pCrossLine;
 	char			m_pHeader[sz_UPHEADER+1];

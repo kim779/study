@@ -41,7 +41,7 @@ public:
 	bool		m_bHideMenuBtn;
 
 	CString		m_sParam;
-
+	CString    m_strMarket = "KRX";
 private:
 	bool		m_bForeign;
 	bool		m_bTransaction;
@@ -159,7 +159,9 @@ public:
 // Implementation
 public:
 	virtual ~CMainWnd();
-
+	enum {
+		dispidsMarket = 2
+	};
 	// Generated message map functions
 protected:
 	//{{AFX_MSG(CMainWnd)
@@ -197,6 +199,11 @@ protected:
 	afx_msg LRESULT OnToolEvent(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT OnTableEvent(WPARAM wParam, LPARAM lParam);
 	DECLARE_INTERFACE_MAP()
+
+	BSTR GetsMarket();
+	void SetsMarket(BSTR newVal);
+public:
+	afx_msg void OnPaint();
 };
 
 /////////////////////////////////////////////////////////////////////////////

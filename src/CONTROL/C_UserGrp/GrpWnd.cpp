@@ -77,7 +77,7 @@ CGrpWnd::CGrpWnd(CWnd *pView, CWnd *pParent, struct _param *pInfo)
 	m_TkLineColor = GetTickColor(m_TkTextColor);
 
 	m_pApp = (CC_UserGrpApp*)AfxGetApp();
-
+	m_bRTS = TRUE;
 	SetError("");
 }
 
@@ -119,7 +119,8 @@ LONG CGrpWnd::OnUser(WPARAM wParam, LPARAM lParam)
 		return RequestHead();
 		break;
 	case DLL_ALERTx:
-		RealTimeData((struct _alertR*)lParam);
+		if(m_bRTS) 
+			RealTimeData((struct _alertR*)lParam);
 		break;
 	case DLL_SETPAL:	// Palette Change
 		ChangePalette();
@@ -138,6 +139,8 @@ LONG CGrpWnd::OnUser(WPARAM wParam, LPARAM lParam)
 			Resize();
 			Invalidate();
 		}				
+		break;
+	default:
 		break;
 	}
 
@@ -190,8 +193,12 @@ LONG CGrpWnd::OnGrp(WPARAM wParam, LPARAM lParam)
 		case ExcelData:
 			ExcelProc();
 			break;
+		default:
+			break;
 		}
 		break;
+	default:
+			break;
 	}
 
 	return 0;
@@ -201,6 +208,8 @@ int CGrpWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 {
 	if (CWnd::OnCreate(lpCreateStruct) == -1)
 		return -1;
+
+	srand((unsigned int)time(NULL));
 	
 	m_pToolTip->Create();
 	m_pToolTip->ShowWindow(SW_HIDE);
@@ -297,6 +306,8 @@ void CGrpWnd::OnTimer(UINT nIDEvent)
 				SendMessage(WM_USER, MAKEWPARAM(DLL_ALERT, strlen(pRts)), (LPARAM)pRts);
 			}
 		}
+	default:
+		break;
 	}
 	
 	CWnd::OnTimer(nIDEvent);
@@ -880,6 +891,11 @@ void CGrpWnd::SetShowLine(int nLine,bool bflag)
 				m_pGrpInfo[nLine]->m_bHide = FALSE;
 		}
 	}
+}
+
+void	CGrpWnd::SetRTS(bool bflag)
+{
+	m_bRTS = bflag;
 }
 
 void CGrpWnd::DrawEmpty(CDC *pDC, bool bInit)

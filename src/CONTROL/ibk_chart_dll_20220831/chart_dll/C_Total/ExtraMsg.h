@@ -35,6 +35,9 @@ private:
 	CString	m_jjga;		// 전일종가
 	CString	m_stock;	// 주식수
 	CString	m_start;	// 장시작시간
+	CString	m_start2;	// 장시작시간
+	CString	m_end;	// 장마감시간
+	CString	m_afterstart;	// 애프터시작시간
 
 	CString	m_curr;		// 현재가
 	CString	m_udyl;		// 등락

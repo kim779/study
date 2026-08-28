@@ -418,7 +418,6 @@ protected:
 	void CreateOubWnd(CString sMsg = "" , BOOL bIsAgent = false);
 	std::vector<COubWnd*> m_arrOubWnd;
 	void FileLog(CString strhome, LPCSTR log, ...);
-	void Check2AgentAcc();
 	CString m_sbAgn{}, m_sInvst{}, m_sInfogubn{}, m_sInvsCnvs{}, m_sWeakInv{}, m_sCusGrdNm{}, m_sDueDt{};
 	CString m_slog{};
 	void ShowAcntCheckResult();

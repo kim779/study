@@ -652,139 +652,6 @@ void CAccountCtrl::_SetFocus()
 /////////////////////////////////////////////////////////////////////////////
 // CAccountCtrl message handlers
 //사용안함
-void CAccountCtrl::Check2AgentAcc()
-{
-	CString slog;
-	
-#ifndef DF_TEST_MODE
-	if (!m_staff)
-	{
-		m_bCheckAgetn = false;
-		return;
-	}
-#endif
-	//m_iAxisState = m_pAxisMainFrame->SendMessage(WM_USER, MMSG_GETMAIN_STATE, 0);
-	//if (!m_bPOPTrdTed || m_iAxisState <= 5)
-	//	return;
-
-////주문대리인 조회 관련 화면 분류
-//대표화면 내부의 오브젝트에 계좌 컨트롤이 있는경우 
-	CString mapname0;
-	mapname0 = (LPCSTR)m_pParent->SendMessage(WM_USER, MAKEWPARAM(mapDLL, 0), 0);
-	slog.Format("\r\n[cx_account] -------------------------------------------[%s]----------------------------------------------------------", mapname0);
-	WriteLog(Variant(homeCC), slog);
-
-	CString	Path, strTemp;
-	char	readb[10 * 1024]{};
-	int	readl;                    
-	Path.Format("%s\\tab\\AGENTCHECK.INI", Variant(homeCC, ""));
-	readl = GetPrivateProfileString("SACAQ029", mapname0, "", readb, sizeof(readb), Path);
-	strTemp.Format("%s", readb);
-	strTemp.Trim();
-
-	if (readl <= 0)  //AGENTCHECK 에 없는 화면은 안함
-	{
-		m_bCheckAgetn = false;
-		return;
-	}
-
-	if (strTemp == "-1")  //IB101100= -1    이런화면도 안함
-	{
-		m_bCheckAgetn = true;
-		slog.Format("\r\n [cx_account] !!!!! -1로 파일에  cx_account [%s]  map0=[%s]    m_bCheckAgetn=[%d] m_bDLL=[%d]  !!!!", m_Param.options, mapname0, m_bCheckAgetn, m_bDLL);
-		WriteLog(Variant(homeCC), slog);
-		return;
-	}
-
-	CStringArray arr;
-	while (1)
-	{
-		arr.Add(Parser(strTemp, ";"));
-		if (strTemp.IsEmpty())
-			break;
-	}
-
-	//대표화면에 계좌컨트롤이 있는 경우
-	BOOL bAccInMain = FALSE;
-	if (arr.GetSize() == 1)
-	{
-		strTemp = arr.GetAt(0);
-		if (mapname0 == Parser(strTemp, ","))
-		{
-			bAccInMain = TRUE;
-		}
-	}
-
-	int idex = 1;
-	CString strobjname, stmp, sresult;
-	BOOL bFind = FALSE;
-	m_slog.Format("[cx_account]---------------------------------------------------------------------------------------------------");
-	Output_DebugString(m_slog);
-
-	while (1)
-	{
-		stmp = (LPCSTR)m_pParent->SendMessage(WM_USER, MAKEWPARAM(mapDLL, idex), 0);
-		sresult += stmp;
-		sresult += " | ";
-
-m_slog.Format("[cx_account][%s]<%d><%x>			mapDLL로 검색(stmp)  =[%s] idex =[%d]", __FUNCTION__, __LINE__, this, stmp, idex);
-Output_DebugString(m_slog);
-
-		for (int ii = 0; ii < arr.GetSize(); ii++ )
-		{
-			strTemp = (LPCSTR)m_pParent->SendMessage(WM_USER, MAKEWPARAM(mapDLL, idex + 1));
-
-m_slog.Format("	[cx_account][%s]<%d>		strTemp  =[%s] mapname0(대표화면) =[%s] bAccInMain=[%d] m_bCheckAgetn=[%d] ",
-	__FUNCTION__, __LINE__, strTemp, mapname0, bAccInMain, m_bCheckAgetn);
-Output_DebugString(m_slog);
-
-			if (arr.GetAt(ii).Find(stmp) >= 0 && (strTemp == mapname0))
-			{
-
-m_slog.Format("		[cx_account][%s]<%d>		arr에 있음 ->  stmp  =[%s] strTemp =[%s]", __FUNCTION__, __LINE__, stmp, strTemp);
-Output_DebugString(m_slog);
-
-				if (bAccInMain && idex > 1)
-					continue;
-
-				strobjname = stmp;
-				bFind = TRUE;
-				m_bCheckAgetn = true;
-
-				Path.Format("%s\\tab\\AGENTCHECK.INI", Variant(homeCC, ""));
-				readl = GetPrivateProfileString("SACAQ029", "hide", "", readb, sizeof(readb), Path);
-
-				strTemp.Format("%s", readb);
-				strTemp.Trim();
-
-
-
-				if (strTemp.Find(m_mapName) >= 0)
-					m_bCheckAgetn = false;
-
-				slog.Format("\r\n			[cx_account]---  map0=[%s]  strobjname=<%s>[%s]  idex=[%d] ---  m_bCheckAgetn=[%d] m_bDLL=[%d]  sresult=[%s] ii=[%d] size=[%d] bAccInMain=[%d]",
-					mapname0, strobjname, (LPCSTR)m_pParent->SendMessage(WM_USER, MAKEWPARAM(mapDLL, idex + 1), 0), idex, m_bCheckAgetn, m_bDLL, sresult, ii, arr.GetSize(), bAccInMain);
-				Output_DebugString(slog);
-				WriteLog(Variant(homeCC), slog);
-				return;
-			}
-		}
-
-		idex++;
-		if (idex == 30)
-		{
-			strobjname = "못찾음";
-			slog.Format("\r\n [cx_account] [%s] ---  map0=[%s]  strobjname=<%s>  idex=[%d] ---   sresult=[%s] ",
-				m_Param.options, mapname0, strobjname, idex - 1, sresult);
-			Output_DebugString(slog);
-			WriteLog(Variant(homeCC), slog);
-			bFind = FALSE;
-			m_bCheckAgetn = false;
-			return;;
-		}
-	}
-}
-
 BOOL CAccountCtrl::Initialize(BOOL bDLL)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
@@ -794,7 +661,7 @@ BOOL CAccountCtrl::Initialize(BOOL bDLL)
 	
 	m_staff = false;
 	m_bBankLinked = FALSE;
-	
+
 	m_strRoot = Variant(homeCC);
 	m_strUser = Variant(userCC);
 	m_strName = Variant(nameCC);
@@ -805,8 +672,11 @@ BOOL CAccountCtrl::Initialize(BOOL bDLL)
 
 	m_strDept.Trim();
 	m_staff = IsNumber(m_strUser);
-	//Check2AgentAcc();
 	InitAllowDept();  //전 계좌 가능 지점부서 초기화 
+
+#ifdef DF_TEST_MODE
+	m_staff = true;
+#endif
 
 	m_pCombo = std::make_unique<CAccCombo>(this);
 	m_pEdit  = std::make_shared<CAccEdit>();
@@ -894,6 +764,7 @@ BOOL CAccountCtrl::Initialize(BOOL bDLL)
 	}
 #ifdef  DF_TEST_MODE
 	m_bEditMode = TRUE;  //testcode
+	m_bOrderEnable = TRUE;
 #endif
 
 	m_pEdit->SetEditMode(m_bEditMode);
@@ -2779,7 +2650,9 @@ LRESULT CAccountCtrl::OnMessage(WPARAM wParam, LPARAM lParam)
 
 			//WriteLog(Variant(homeCC), m_slog);
 			//AfxMessageBox(sRet);
+#ifndef DF_TEST_MODE
 			SACAQ0239Ret_Check();
+#endif
 			m_bSearching = FALSE;
 		}
 		break;
@@ -4842,9 +4715,6 @@ LRESULT CAccountCtrl::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 
 BOOL CAccountCtrl::IsValidAccComplete(CString strAccount, CString dept, BOOL bOrderCheck)
 {
-#ifdef DF_TEST_MODE
-	return TRUE;
-#endif
 	if (!m_bOrderEnable && bOrderCheck)
 		return FALSE;
 
@@ -6173,10 +6043,6 @@ bool CAccountCtrl::SACAQ0239Ret_Check()
 			CreateOubWnd(smsg);
 	}
 
-	//test
-#ifdef DF_TEST_MODE
-	m_sbAgn = "Y";
-#endif
 	if (m_sbAgn == "Y")
 	{
 		CString strData;

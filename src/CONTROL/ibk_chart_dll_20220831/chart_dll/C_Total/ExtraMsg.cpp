@@ -145,10 +145,10 @@ int CExtraMsg::GetInputTRInfo(char *pHeader)
 	switch (m_pMainWnd->m_iDtUnit)
 	{
 	case GU_CODE:
-		outSymbol.Format("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t",
+		outSymbol.Format("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t",
 			OJ_TIME, OJ_NAME, OJ_JGGA, OJ_DIFF, OJ_RATE, OJ_GVOL, OJ_MDHG, OJ_MSHG, 
 			OJ_SIGA, OJ_KOGA, OJ_JEGA,
-			OJ_CODE, OJ_CDAY, OJ_SAHG, OJ_HAHG, OJ_JJGA, OJ_STCK, OJ_START);
+			OJ_CODE, OJ_CDAY, OJ_SAHG, OJ_HAHG, OJ_JJGA, OJ_STCK, OJ_START, OJ_KRXSTART, OJ_KRXEND, OJ_AFTERSTART);
 		break;
 	case GU_INDEX:
 		outSymbol.Format("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t",
@@ -315,8 +315,9 @@ int CExtraMsg::ReceiveData(char* pcData, int iLen)
 		default:break;
 		}		
 	}
-
-	for (int ii = 0; ii < 7; ii++)
+	CString stemp;
+	//for (int ii = 0; ii < 7; ii++)
+	for (int ii = 0; ii < 10; ii++)
 	{
 		int tLen = m_pMainWnd->GetToken(&pcData[index], token);
 		index += tLen;
@@ -330,6 +331,9 @@ int CExtraMsg::ReceiveData(char* pcData, int iLen)
 		case 4:	m_jjga.Format("%s", token);	break;
 		case 5:	m_stock.Format("%s", token);	break;
 		case 6:	m_start.Format("%s", token);	break;
+		case 7:	m_start2.Format("%s", token);	break;
+		case 8:	m_end.Format("%s", token);	break;
+		case 9:	m_afterstart.Format("%s", token);	break;
 		}
 	}
 
@@ -337,6 +341,9 @@ int CExtraMsg::ReceiveData(char* pcData, int iLen)
 	if (hName.IsEmpty())
 		return 0;
 
+	CString slog;
+	slog.Format("[chart] m_start=[%s] m_start2=[%s] m_end=[%s] m_afterstart=[%s]", m_start, m_start2, m_end, m_afterstart);
+	OutputDebugString(slog);
 	return index;
 }
 

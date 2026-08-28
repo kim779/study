@@ -6,6 +6,7 @@
 #include "axform.h"
 
 #include "../../h/axisfire.h"
+#include "../../h/axlog.h"
 
 #define	TM_FOCUS		1226
 
@@ -375,11 +376,17 @@ void CfmCtrl::SetFocus(bool focus)
 		if (m_ctrl->IsChild(pWnd))
 			pWnd = pWnd;
 		if (!m_ctrl->IsChild(pWnd))
+		{
+			axlog(LOG_EVENT, "[CfmCtrl::SetFocus] map=%.8s name=%.16s CONTROL focus IN",
+				m_axform->m_mapH->mapN, (char*)m_form->name);
 			m_ctrl->SetFocus();
+		}
 	//	m_ctrl->SetTimer(TM_FOCUS, 1, NULL);
 	}
 	else if (GetFocus() == m_ctrl->GetSafeHwnd())
 	{
+		axlog(LOG_EVENT, "[CfmCtrl::SetFocus] map=%.8s name=%.16s CONTROL focus OUT",
+			m_axform->m_mapH->mapN, (char*)m_form->name);
 		m_axform->m_view->SetFocus();
 	}
 	else if (GetParent(GetFocus()) == m_ctrl->GetSafeHwnd())
@@ -420,6 +427,10 @@ LRESULT CALLBACK ControlProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 	switch (msg)
 	{
+	case WM_SETFOCUS:
+		axlog(LOG_EVENT, "[ControlProc] map=%.8s name=%.16s WM_SETFOCUS received (native OS focus, any source)",
+			ctrl->m_axform->m_mapH->mapN, (char*)ctrl->m_form->name);
+		break;
 	case WM_TIMER:
 		if (wParam == TM_FOCUS)
 		{

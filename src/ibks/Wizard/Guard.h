@@ -96,6 +96,8 @@ public:
 	int		m_flash;		// flash color index
 	int		m_wait;
 
+	CMap<DWORD, DWORD, ULONGLONG, ULONGLONG&>	m_ctrlSendTick;	// key=MAKELONG(winK,unit), for [CTRL-RTT] logging
+
 	CString		m_dragbys;		// text
 
 	class CxSystem*	m_xsystem;

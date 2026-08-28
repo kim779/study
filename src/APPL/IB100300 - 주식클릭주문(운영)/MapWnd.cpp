@@ -3002,9 +3002,13 @@ void CMapWnd::Resize(int cx, int cy)
 	if(m_iOldSize[0] == cx && m_iOldSize[1] == cy) 
 		return;
 
-	double lcalcrate[2] = {( (float)cx - (float)m_iOldSize[0] ) / (float)m_iOldSize[0], 
+	double lcalcrate[2] = {( (float)cx - (float)m_iOldSize[0] ) / (float)m_iOldSize[0],
 							( (float)cy - (float)m_iOldSize[1] ) /(float)m_iOldSize[1]};
-	
+
+CString slogResize;
+slogResize.Format("[CTRLWND_DIAG] Resize cx=[%d] cy=[%d] oldCx=[%d] oldCy=[%d] rate0=[%f] rate1=[%f]", cx, cy, m_iOldSize[0], m_iOldSize[1], lcalcrate[0], lcalcrate[1]);
+OutputDebugString(slogResize);
+
 	m_iOldSize[0] = cx ;
 	m_iOldSize[1] = cy ;
 

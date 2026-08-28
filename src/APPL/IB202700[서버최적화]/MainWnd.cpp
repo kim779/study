@@ -2088,7 +2088,8 @@ Output_DebugString(m_slog);
 
 			// 2026-08-21: 독립실행시 이 시점 이후 메인(호스트)이 포커스를 한번 가져가면서
 			// 이 화면이 뒤로 넘어가는 증상이 있어, 잠시 뒤 다시 앞으로 가져온다.
-			//SetTimer(TM_FOCUSFIX, 300, nullptr);
+			SetTimer(TM_FOCUSFIX, 1000, nullptr);
+			return;
 		}
 		Invalidate(false);
 
@@ -2100,12 +2101,12 @@ Output_DebugString(m_slog);
 	else if (nIDEvent == TM_FOCUSFIX)
 	{
 		KillTimer(TM_FOCUSFIX);
-		CWnd* pTop = GetTopLevelParent();
-		if (pTop)
-		{
-			pTop->BringWindowToTop();
-			pTop->SetFocus();
-		}
+		Invalidate(false);
+
+		// 2012.01.13 KSJ 맵화면에서 관심종목을 열때 툴바가 생성되지 않았는데 열릴 때가 많음 그래서 따로 멤버변수로 저장하고
+		//생성되면 메세지 보내줔.
+		if (m_bDominoToolWnd && m_pToolWnd != nullptr)
+			m_pToolWnd->PostMessage(WM_MANAGE, MAKEWPARAM(MK_SELECTGROUP, (LPARAM)1));
 	}
 #ifdef DF_RTS_TIMER
 	else if (nIDEvent == TM_RTSTIME)

@@ -755,22 +755,42 @@ void CControlWnd::parseAlert(struct _alertR* alert)
 	bool	bChanged = false;
 	CString rned,dist,vist,vitime, vitype;
 
-	m_slog.Format("[dll][symbol] alert->code = [%s]   m_sRtsCode=[%s]", alert->code, m_sRtsCode);
-	OutputDebugString(m_slog);
-
 	if (alert->code == m_sRtsCode)
 	{
 		DWORD*	data = nullptr;
 
+		m_slog.Format("[SYM_IMG_DIAG] 시작");
+		OutputDebugString(m_slog);
+
+
 		for (int ii = alert->size - 1; ii >= 0; ii--)
 		{
+			if(ii==1)
+			{
+				m_slog.Format("[SYM_IMG_DIAG] !!!!!!!!!!   alert->size=[%d]", alert->size);
+				OutputDebugString(m_slog);
+			}
+
 			data = (DWORD *)alert->ptr[ii];
-			
+
+			//2026-08-26: 패킷마다 독립적으로 판단하도록 이전 반복의 잔여값을 걷어내고
+			//현재 유지중인 m_jinfo 값으로 초기화한다(이전엔 for문 밖에서 한번만 선언되어
+			//한번 바뀌면 이후 패킷들까지 계속 loadBitmap이 재호출되고, 그때 안 바뀐
+			//필드는 빈 문자열이 넘어가던 문제가 있었음).
+			bChanged = false;
+			rned = m_jinfo.rned;
+			dist = m_jinfo.dist;
+			vist = m_jinfo.vist;
+			vitime = m_jinfo.vitime;
+			vitype = m_jinfo.vitype;
+
 			if (data[950])		//배분정보
 			{
 				dist = (char*)data[950];
 
 				bChanged = true;
+				m_slog.Format("[SYM_IMG_DIAG][%s] bChanged=true (data[950] 배분정보) dist=[%s]", m_sCode, dist);
+				OutputDebugString(m_slog);
 			}
 
 			if (data[951])       //임의종료
@@ -778,6 +798,8 @@ void CControlWnd::parseAlert(struct _alertR* alert)
 				rned = (char*)data[951];
 
 				bChanged = true;
+				m_slog.Format("[SYM_IMG_DIAG][%s] bChanged=true (data[951] 임의종료) rned=[%s]", m_sCode, rned);
+				OutputDebugString(m_slog);
 			}
 
 			if (data[701])      //변동성
@@ -786,13 +808,24 @@ void CControlWnd::parseAlert(struct _alertR* alert)
 				vitime = (char*)data[702];
 				vitype = (char*)data[703];
 				bChanged = true;
+				m_slog.Format("[SYM_IMG_DIAG](data[701] 변동성) [%s] bChanged=true  vist=[%s] vitime=[%s] vitype=[%s]", m_sCode, vist, vitime, vitype);
+				OutputDebugString(m_slog);
 			}
+
+			m_jinfo.rned = rned;
+			m_jinfo.dist = dist;
+			m_jinfo.vist = vist;
+			m_jinfo.vitime = vitime;
+			m_jinfo.vitype = vitype;
 
 			if (data[704])      //정지
 			{
 				CString sval;
 				sval.Format("%s", (char*)data[704]);
 				sval.TrimRight();
+
+				m_slog.Format("[SYM_IMG_DIAG] (data[704] 정지) [%s]  sval=[%s] krgb=[%s] m_sSearchkrgb=[%s]", m_sCode, sval, m_jinfo.krgb, m_sSearchkrgb);
+				OutputDebugString(m_slog);
 
 				if (sval == "0")  //정상
 				{
@@ -814,6 +847,8 @@ void CControlWnd::parseAlert(struct _alertR* alert)
 					loadBitmap(m_jinfo.jrat, m_jinfo.nrat, m_jinfo.jgub, m_jinfo.krgb, m_jinfo.rned, m_jinfo.dist, m_jinfo.vist, m_jinfo.vitime, m_jinfo.vitype);
 				Invalidate();
 				bChanged = true;
+				m_slog.Format("[SYM_IMG_DIAG] (data[704] 정지) [%s] bChanged=true sval=[%s] krgb=[%s] ", m_sCode, sval, m_jinfo.krgb);
+				OutputDebugString(m_slog);
 			}
 
 			if (data[191])   //투자유의
@@ -826,26 +861,36 @@ void CControlWnd::parseAlert(struct _alertR* alert)
 					if (m_jinfo.krgb.Find("유의") < 0)
 					{
 						m_jinfo.krgb = "유의";
+						m_sSearchkrgb = m_jinfo.krgb;
 						m_sInfo = m_jinfo.krgb;
 						loadBitmap(m_jinfo.jrat, m_jinfo.nrat, m_jinfo.jgub, m_jinfo.krgb, m_jinfo.rned, m_jinfo.dist, m_jinfo.vist, m_jinfo.vitime, m_jinfo.vitype);
-						Invalidate();	
+						Invalidate();
 					}
-					
+
 				}
 				else if (val == "0")
 				{
 					if (m_jinfo.krgb.Find("정상") < 0)
 					{
 						m_jinfo.krgb = "정상";
+						m_sSearchkrgb = m_jinfo.krgb;
 						m_sInfo = m_jinfo.krgb;
 						loadBitmap(m_jinfo.jrat, m_jinfo.nrat, m_jinfo.jgub, m_jinfo.krgb, m_jinfo.rned, m_jinfo.dist, m_jinfo.vist, m_jinfo.vitime, m_jinfo.vitype);
-						Invalidate();	
+						Invalidate();
 					}
 				}
 			}
 
 			if (bChanged)
 			{
+				m_slog.Format("[SYM_IMG_DIAG][마지막][%s] bChanged loadBitmap  krgb=[%s] 지역변수 rned=[%s] dist=[%s] vist=[%s] vitime=[%s] vitype=[%s] ",
+					m_sCode, m_jinfo.krgb, rned, dist, vist, vitime, vitype);
+				OutputDebugString(m_slog);
+
+				m_slog.Format("[SYM_IMG_DIAG][마지막][%s] bChanged loadBitmap  krgb=[%s] m_jinfo rned=[%s] dist=[%s] vist=[%s] vitime=[%s] vitype=[%s]",
+					m_sCode, m_jinfo.krgb, m_jinfo.rned, m_jinfo.dist, m_jinfo.vist, m_jinfo.vitime, m_jinfo.vitype);
+				OutputDebugString(m_slog);
+
 				loadBitmap(m_jinfo.jrat, m_jinfo.nrat, m_jinfo.jgub, m_jinfo.krgb,rned,dist,vist,vitime,vitype);
 
 				Invalidate();

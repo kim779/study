@@ -1619,10 +1619,6 @@ BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)
 				{
 					if (bCtrl && bShift)
 					{
-#ifdef DF_TEST
-						Sendpibojggb();
-						return 0;
-#endif
 						CString	Path;
 						Path.Format("%s\\%s\\ACCNTDEPT.INI", Axis::home, "tab");
 
@@ -1672,10 +1668,6 @@ BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)
 				{
 					if (bCtrl && bShift)
 					{
-#ifdef DF_TEST
-						Sendpibojggb("K");
-						return 0;
-#endif
 						char	buf[512];
 						CString	file, stmp;
 						file.Format("%s\\tab\\axis.ini", Axis::home);
@@ -3182,12 +3174,23 @@ void CMainFrame::OnClose()
 		}
 	}
 	
+	if (m_pSharedMemory)
+	{
+		// cx_shared.dll의 창(WNDPROC이 그 DLL 코드 안에 있음)을 FreeLibrary 전에 먼저 파괴해야 함.
+		// 순서가 바뀌면 DestroyWindow 연쇄(부모 프레임 파괴 시 자식창에 전달되는 메시지)가
+		// 이미 언로드된 DLL 메모리로 점프해 크래시함 (axis!CAxisApp::ExitInstance 경유,
+		// <Unloaded_cx_shared.dll> 크래시덤프로 확인됨, 2026-08-27)
+		m_pSharedMemory->DestroyWindow();
+		delete m_pSharedMemory;
+		m_pSharedMemory = nullptr;
+	}
+
 	if (m_hSharedLib)
 	{
 		FreeLibrary(m_hSharedLib);
 		m_hSharedLib = nullptr;
 	}
-	
+
 	m_slog.Format("--------------------[Axis_State][onClose end]  m_iAxisState =[%d]-------------", m_iAxisState);
 	OutputDebugString(m_slog);
 	CMDIFrameWnd::OnClose();
@@ -14119,7 +14122,7 @@ void CMainFrame::OnTimer(UINT nIDEvent)
 	CMDIFrameWnd::OnTimer(nIDEvent);
 }
 
-#ifdef DF_KRX_FREEAFTER
+#ifdef DF_KRX_FREEAFTER  //CheckMarketByMNG 전체
 void CMainFrame::CheckMarketByMNG(CString sval)
 {
 	int igubn = atoi(sval);
@@ -14182,7 +14185,7 @@ NXT
 	case 883:  //KRX 단일가 시작     8:50~
 	{
 		m_iKRXype = 3;   //단일가
-		m_iNXType = 0;  //장마감
+		m_iNXType = 5;  //장전
 		m_bar1->SetShowAIBtn(m_iKRXype, m_iNXType);   //   KRX 802가 들어오면 NXT 881 프리
 	}
 	break;
@@ -14200,7 +14203,7 @@ NXT
 	break;
 	case 886: //NXT 15:20~ NXT 오후휴장 
 	{
-		m_iNXType = 0;  //장마감
+		m_iNXType = 5;  //장마감
 		m_bar1->SetShowAIBtn(m_iKRXype, m_iNXType);
 	}
 	break;
@@ -14210,7 +14213,7 @@ NXT
 		m_bar1->SetShowAIBtn(m_iKRXype, m_iNXType);
 	}
 	break;
-	case 809: //KRX 15:30~ KRX장마감
+	case 809: //KRX 15:30~ KRX 장전
 	{
 		m_iKRXype = 4;
 		m_bar1->SetShowAIBtn(m_iKRXype, m_iNXType);
@@ -14228,7 +14231,7 @@ NXT
 		m_bar1->SetShowAIBtn(m_iKRXype, m_iNXType);
 	}
 	break;
-#ifdef DF_KRX_FREEAFTER
+#ifdef DF_KRX_FREEAFTER   //CheckMarketByMNG
 	case 856: //KRX 16:00~ 20:00 KRX 애프터
 	{
 		m_iKRXype = 6;  //애프터
@@ -14252,7 +14255,7 @@ NXT
 		m_bar1->SetShowAIBtn(m_iKRXype, m_iNXType);  //KRX 805가 들어오면 NXT 888 애프터
 	}
 	break;
-#ifdef DF_KRX_FREEAFTER
+#ifdef DF_KRX_FREEAFTER  //CheckMarketByMNG
 	case 857:  //KRX 20:00~ KRX 애프터종료
 	{
 		m_iKRXype = 0;  //장마감
@@ -14263,7 +14266,7 @@ NXT
 #else
 	case 806: //KRX 장마감 시작 18:00~
 	{
-		m_iKRXype = 6;  //장마감
+		m_iKRXype = 0;  //장마감
 		m_bar1->SetShowAIBtn(m_iKRXype, m_iNXType);
 	}
 	break;
@@ -14580,7 +14583,7 @@ NXT
 	m_bar1->SetShowAIBtn(m_iKRXype, m_iNXType);   
 #endif
 }
-#endif  //DF_KRX_FREEAFTER
+#endif  //DF_KRX_FREEAFTER   CheckMarketByMNG #endif
 bool CMainFrame::IsCurrentTimeBetween(int startHour, int startMin, int endHour, int endMin)
 {
 	CTime now = CTime::GetCurrentTime();
@@ -15181,7 +15184,7 @@ void CMainFrame::ShowMngInfo(DWORD* dat)
 			return;
 #endif
 
-#ifdef DF_KRX_FREEAFTER
+#ifdef DF_KRX_FREEAFTER  //ShowMnginfo
 		if (val == "65")  //선물옵션 장개시10초전 skip
 			return;
 		if (val == "35")  //주식 장개시10초전 skip
@@ -17347,11 +17350,6 @@ void CMainFrame::processFMX(WPARAM wParam, LPARAM lParam)
 		m_slog.Format("[axis][CMainFrame] 장시장구분(PIBOjggb) 조회결과 !!  gubn= [%s]  \n", (char*)pdata->gubn);
 		OutputDebugString(m_slog);
 
-#ifdef DF_TEST
-		//m_axGuide->SetGuide("NXT " + m_slog, this);
-		AfxMessageBox("NXT " + m_slog);
-#endif
-
 		sRes.Format("%s", (char*)pdata->gubn);
 		sRes.TrimRight();
 
@@ -17399,7 +17397,11 @@ NXT
 			break;
 			case 3:  //3. 오전휴장     08:50~09:00                
 			{
+#ifdef DF_KRX_FREEAFTER  //processFMX
+				 m_iNXType = 5;    //KRX AFTER 부터 장마감이 아니라 장전 (휴장이 없다)
+#else
 				m_iNXType = 0;   //NXT 장마감
+#endif
 			}
 			break;
 			case 4:  //메인마켓     09:00~15:20                    
@@ -17409,7 +17411,11 @@ NXT
 			break;
 			case 5:  //오후휴장     15:20~15:30                    
 			{
+#ifdef DF_KRX_FREEAFTER //processFMX
+				m_iNXType = 5;    //KRX AFTER 부터 장마감이 아니라 장전 (휴장이 없다)
+#else
 				m_iNXType = 0;  //NXT 장마감
+#endif
 			}
 			break;
 			case 6:  //단일가매매   15:30~15:40                 
@@ -17474,12 +17480,6 @@ NXT
 		m_slog.Format("[axis][CMainFrame] 장시장구분(PIBOjggb) 조회결과 !!  gubn= [%s]  \n", (char*)pdata->gubn);
 		OutputDebugString(m_slog);
 
-#ifdef DF_TEST
-		//m_axGuide->SetGuide("KRX " + m_slog, this);
-		AfxMessageBox("KRX " + m_slog);
-#endif
-
-
 		sRes.Format("%s", (char*)pdata->gubn);
 		sRes.TrimRight();
 
@@ -17520,21 +17520,25 @@ NXT
 				case 6:  //장마감, 시간외   15:30~16:00                 
 				{
 					if(m_iNXType == 4)   //m_iNXType = 4;  //NXT 단일가매매   15:30~15:40       
+#ifdef DF_KRX_FREEAFTER //processFMX
+						m_iKRXype = 4;  //KRX 장전
+#else
 						m_iKRXype = 0;  //KRX 장마감
+#endif
 					else
 						m_iKRXype = 1;   //KRX 시간외
 				}
 				break;
 				case 7:  //단일가매매   16:00~18:00                       
 				{
-#ifdef DF_KRX_FREEAFTER
+#ifdef DF_KRX_FREEAFTER //processFMX
 					m_iKRXype = 6; //KRX AFTER
 #else
 					m_iKRXype = 3;   //KRX 단일가
 #endif
 				}
 				break;
-				case 8:  //장마감       18:00~
+				case 8:  //장마감       18:00~                    
 				{
 					m_iKRXype = 0;  //KRX 장마감
 				}
@@ -17729,7 +17733,16 @@ void CMainFrame::SendPIBOpopu(CString sGubn, int ikey)
 	FillMemory(data, sizeof(data), ' ');
 	
 	PIBOpopu_mid* mid = (PIBOpopu_mid*)&data[0];
-	memcpy(mid->gubn, "NXTS", 4);   //NXTF->NXTS
+	if(Axis::devMode)
+		memcpy(mid->gubn, "NXT3", 4);   //NXTF->NXTS
+	else
+	{
+		if(CTime::GetCurrentTime() >= CTime(2026,8,28,0,0,0))
+			memcpy(mid->gubn, "NXT3", 4);   //NXTF->NXTS
+		else
+			memcpy(mid->gubn, "NXTS", 4);   //NXTF->NXTS
+	}
+	
 	memcpy(mid->type, sGubn, 1);
 	memcpy(mid->data, "0100", 4);
 	memcpy(mid->usid, Axis::userID, Axis::userID.GetLength());
@@ -22537,8 +22550,6 @@ void CMainFrame::MngInfoPos()
 
 void CMainFrame::sendRTime()
 {
-WriteLog("[AXIS] CMainFrame::sendRTime");
-
 	CString	str, gdatS, inputStr = _T(""), gData;
 
 	str.Format("1301%c005930\t", 0x7f);

@@ -31,6 +31,15 @@ public:
 	char	*m_pBytes;
 };
 
+// one captured Send/Receive record, kept for time-key lookup (see m_history)
+class CHistItem : public CObject
+{
+public:
+	CString	m_time;		// "[ HH:MM:SS:mmm ]", unique capture time, used as lookup key
+	DWORD	m_flag;		// x_SNDs or x_RCVs
+	CString	m_text;		// full un-trimmed header+dump text, ignoring current display filters
+};
+
 struct _options {
 	BOOL	send;		// displays send data	(default : TRUE)
 	BOOL	receive;	// displays receive data (default : TRUE)
@@ -87,6 +96,9 @@ protected:
 	CObArray		m_que;
 	CCriticalSection	m_sync;
 
+	CObArray		m_history;	// capped history of CHistItem*, for time-key lookup (OnClickedBtnFindTime)
+	class CHistDetailWnd*	m_histWnd;
+
 	CMapStringToString	m_mapCode;
 	struct _options		m_options;
 
@@ -96,6 +108,7 @@ protected:
 	CString m_slog;
 	CEdit		m_editKeyword;
 	CButton		m_chkFilter;
+	CButton		m_btnFindTime;
 	CString		m_strKeyword;
 	BOOL		m_bFilterOn;
 	BOOL		m_bBypassFilter;
@@ -134,6 +147,7 @@ public:
 	void	CopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct) ;
 
 	void	addTrace(CString dat, int kind = K_NORMAL, CString boldSub = _T(""));
+	CString	BuildHexDump(char* dat, int len);
 	CString	parse(CString &dat, CString separate);
 	void	parseData(CString dat, CMapStringToString& ary, CStringArray& aryS);
 	void	ReportParse(CString dat, CMapStringToString& ary, CStringArray& aryS);
@@ -181,6 +195,7 @@ protected:
 	afx_msg void OnSaveas();
 	afx_msg void OnChangeEditKeyword();
 	afx_msg void OnClickedChkFilter();
+	afx_msg void OnClickedBtnFindTime();
 	afx_msg void OnChangeEditRangeFrom();
 	afx_msg void OnChangeEditRangeTo();
 	afx_msg void OnClickedChkRange();

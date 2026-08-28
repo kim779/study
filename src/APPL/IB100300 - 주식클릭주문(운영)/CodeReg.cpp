@@ -523,6 +523,17 @@ void CCodeReg::ChangeFont(double* lRate, CFont* pfont, CFont* boldFont)
 	const int itop = rc.top + GAP;
 	
 
+	//조회종목/시간대별 탭 - 맨 위 줄
+	m_pTab->GetWindowRect(&wrc);
+	ScreenToClient(&wrc);
+	iw = wrc.Width() , ih = wrc.Height() ;
+	iw = iw + (int)(lRate[0] * (float)iw);
+	ih = ih + (int)(lRate[1] * (float)ih);
+	wrc.SetRect(rc.left, itop, rc.left+iw, itop+ih);
+	m_pTab->MoveWindow(wrc);
+	const int iBtnTop = wrc.bottom + GAP;
+
+	//종목 추가 버튼 - 탭 바로 아래 줄
 	m_pBtnHead->GetWindowRect( &wrc);
 	ScreenToClient(&wrc);
 	iw = wrc.Width() , ih = wrc.Height() ;
@@ -530,12 +541,12 @@ void CCodeReg::ChangeFont(double* lRate, CFont* pfont, CFont* boldFont)
 	ih = ih + (int)(lRate[1] * (float)ih);
 
 	iright = rc.left+iw-GAP;
-	wrc.SetRect(rc.left, itop, iright, itop+ih);
+	wrc.SetRect(rc.left, iBtnTop, iright, iBtnTop+ih);
 	m_pBtnHead->SetFont(m_pfont);
-	m_pBtnHead->MoveWindow(wrc); 
+	m_pBtnHead->MoveWindow(wrc);
 
-
-	m_iCellTop = wrc.bottom + GAP;
+	//m_iCellTop = wrc.bottom + GAP;
+	m_iCellTop = iBtnTop + GAP;	//OnPaint에서 여기에 CTRL_HEIGHT(버튼 한 줄)를 더해 리스트 시작위치를 잡음
 	m_iCellHeight = m_iCellHeight + (int)(lRate[1] * (float)m_iCellHeight);
 	m_iRow = (rc.Height() - m_iCellHeight) / m_iCellHeight + 1;
 	
