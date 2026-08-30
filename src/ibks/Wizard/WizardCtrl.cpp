@@ -643,6 +643,8 @@ void CWizardCtrl::OnAlert(int type, char* pBytes, int nBytes)
 	int	key;
 	CString	code, text;
 
+	axlog(LOG_DATA, "[OnAlert] type=%d nBytes=%d preview=%.32s", type, nBytes, pBytes);
+
 	text = CString(pBytes, nBytes);
 	//	m_guard->xTRACE(x_RTMs, (char*)text.operator LPCTSTR());
 
@@ -673,6 +675,8 @@ void CWizardCtrl::OnPush(char* pBytes, int nBytes)
 	if (anmL > int(nBytes - L_anmH))
 		return;
 
+	axlog(LOG_DATA, "[OnPush] anmK=%d anmL=%d preview=%.32s", anmH->anmK, anmL, &pBytes[L_anmH]);
+
 	switch (anmH->anmK)
 	{
 	case anmK_ALIVE:
@@ -696,10 +700,10 @@ void CWizardCtrl::OnRead(char* pBytes, int nBytes)
 		pBytes += L_axisH;
 		nBytes -= L_axisH;
 
-m_slog.Format("\r\n [axwizrd][Receive]<%d>[%s] trc=[%.8s]",__LINE__, __FUNCTION__, (char*)&axisH->trxC[0]);
-OutputDebugString(m_slog);
-m_slog.Format("\r\n [axwizrd][Receive]");
-OutputDebugString(m_slog);
+// 2026-08-29: 예전 무조건 OutputDebugString([axwizrd][Receive], 카테고리 게이팅 없음)을
+// axlog 체계로 이전 - 소켓에서 메시지 하나를 막 꺼낸 시점(로그인 포함 모든 msgK). 로그인
+// 패킷만 보려면 trxC=AXLOGONE/AXLOGONC로 찾을 것.
+axlog(LOG_SOCK_RECEIVE, "trxC=%.8s winK=%d msgK=%d stat=%d nBytes=%d", axisH->trxC, axisH->winK, axisH->msgK, axisH->stat, nBytes);
 		
 		axisL = atoi(CString(axisH->datL, sizeof(axisH->datL)));
 		if (axisL > nBytes)
@@ -856,9 +860,12 @@ void CWizardCtrl::OnSign(int signK, char* pBytes, int nBytes)
 	sign = (struct _signR*)pBytes;
 	sign->guide[sizeof(sign->guide) - 1] = '\0';
 
-	axlog(LOG_DATA, "[OnSign-response] signK=%d mask=0x%02X flag=0x%02X dev=%d termN=%.8s mapN=%.8s sign=%.12s name=%.20s menu=%.12s trx=%.3ssec usage=%.3smin idle=%.3smin service=%.10s guide=%s info=%.64s",
+	// 2026-08-29: infox[192]의 실제 내용을 로그로 찍어보니 주민등록번호로 보이는 필드(성명/IP/전화번호로
+	// 보이는 필드와 함께 탭 구분)가 포함되어 있는 것을 확인함 - 개인정보라 절대 평문으로 로그에 남기면
+	// 안 됨. 내용은 찍지 않고 길이만 남긴다. (문서: docs/LoginSequence.md 4절 참고, 실제 값은 기록 안 함)
+	axlog(LOG_LOGIN, "[OnSign-response] signK=%d mask=0x%02X flag=0x%02X dev=%d termN=%.8s mapN=%.8s sign=%.12s name=%.20s menu=%.12s trx=%.3ssec usage=%.3smin idle=%.3smin service=%.10s guide=%s info=%.64s infoxLen=%d(PII-필드포함, 내용미기록)",
 		sign->signK, sign->mask, sign->flag, sign->dev, sign->termN, sign->mapN, sign->sign, sign->name, sign->menu,
-		sign->trx, sign->usage, sign->idle, sign->service, sign->guide, sign->info);
+		sign->trx, sign->usage, sign->idle, sign->service, sign->guide, sign->info, (int)sizeof(sign->infox));
 
 	switch (sign->signK)
 	{
@@ -959,6 +966,8 @@ void CWizardCtrl::OnSign(int signK, char* pBytes, int nBytes)
 void CWizardCtrl::OnCertify(char* pBytes, int nBytes)
 {
 	CString	text;
+
+	axlog(LOG_LOGIN, "[OnCertify] LOWORD(nBytes)=%d HIWORD(nBytes)=%d", LOWORD(nBytes), HIWORD(nBytes));
 
 	switch (LOWORD(nBytes))
 	{

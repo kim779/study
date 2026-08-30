@@ -41,6 +41,14 @@
 [WIZARD][AXISFORM]
 ```
 
+**추가 카테고리 (2026-08-28~29, 이 문서 작성 이후 신설 — 상세는 각 문서 참고)**
+```
+[WIZARD][FILEPATCH]      ← 로그인시 파일패치, 상세: FilePatchProtocol.md
+[WIZARD][LOGIN]          ← 로그인 응답 파싱(OnSign/AddRegistry/OnCertify), 상세: LoginSequence.md
+[WIZARD][SOCK_SEND]      ← 소켓 저수준 송신(CGuard::Write), 상세: LoginSequence.md
+[WIZARD][SOCK_RECEIVE]   ← 소켓 저수준 수신(OnRead, 로그인 포함 전체 메시지), 상세: LoginSequence.md
+```
+
 **화면 열기/구조 (2절)**
 ```
 axAttach

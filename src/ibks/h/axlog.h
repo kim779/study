@@ -16,10 +16,13 @@
 #define DF_LOG_RTM
 #define DF_LOG_SCRIPT
 #define DF_LOG_FILEPATCH
+#define DF_LOG_LOGIN
+#define DF_LOG_SOCK_SEND
+#define DF_LOG_SOCK_RECEIVE
 // OFF by default: axisform.dll's CfmEdit::Draw/UpdateData fire on every repaint/keystroke, very high volume.
 // #define DF_LOG_AXISFORM
 
-enum axLogCat { LOG_INIT, LOG_EVENT, LOG_DATA, LOG_RTM, LOG_SCRIPT, LOG_AXISFORM, LOG_FILEPATCH };
+enum axLogCat { LOG_INIT, LOG_EVENT, LOG_DATA, LOG_RTM, LOG_SCRIPT, LOG_AXISFORM, LOG_FILEPATCH, LOG_LOGIN, LOG_SOCK_SEND, LOG_SOCK_RECEIVE };
 
 inline bool axLogOn(axLogCat cat)
 {
@@ -46,6 +49,15 @@ inline bool axLogOn(axLogCat cat)
 #ifdef DF_LOG_FILEPATCH
 	case LOG_FILEPATCH: return true;
 #endif
+#ifdef DF_LOG_LOGIN
+	case LOG_LOGIN:  return true;
+#endif
+#ifdef DF_LOG_SOCK_SEND
+	case LOG_SOCK_SEND:     return true;
+#endif
+#ifdef DF_LOG_SOCK_RECEIVE
+	case LOG_SOCK_RECEIVE: return true;
+#endif
 	default: return false;
 	}
 }
@@ -54,10 +66,10 @@ inline void axlogImpl(axLogCat cat, const char* func, int line, LPCTSTR fmt, ...
 {
 	if (!axLogOn(cat)) return;
 
-	// Category names padded to the width of the longest one (FILEPATCH=9) so
+	// Category names padded to the width of the longest one (SOCK_RECEIVE=12) so
 	// "[TAG][xxx]" is always the same length regardless of category.
 	static const char* catNames[] = {
-		"INIT", "EVENT", "DATA", "RTM", "SCRIPT", "AXISFORM", "FILEPATCH"
+		"INIT", "EVENT", "DATA", "RTM", "SCRIPT", "AXISFORM", "FILEPATCH", "LOGIN", "SOCK_SEND", "SOCK_RECEIVE"
 	};
 
 	va_list args;
@@ -74,7 +86,7 @@ inline void axlogImpl(axLogCat cat, const char* func, int line, LPCTSTR fmt, ...
 	// Longer entries just overflow the field without truncation or misalignment
 	// of their own message - only later, shorter lines stay aligned.
 	CString line_out;
-	line_out.Format("[%s][%-9s] %-42s %s\n", "WIZARD", catNames[cat], (LPCTSTR)funcLine, (LPCTSTR)msg);
+	line_out.Format("[%s][%-12s] %-42s %s\n", "WIZARD", catNames[cat], (LPCTSTR)funcLine, (LPCTSTR)msg);
 
 	OutputDebugString(line_out);
 }

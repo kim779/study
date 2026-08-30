@@ -1265,6 +1265,8 @@ void CGuard::UpdateVersion(CString name)
 
 void CGuard::UpdateVers(char *verB, int verL, bool runtime)
 {
+	axlog(LOG_DATA, "[UpdateVers] verL=%d runtime=%d", verL, (int)runtime);
+
 	CString	name, text;
 	Cvers*	vers;
 	struct _verM *verM = (struct _verM *) verB;
@@ -1756,17 +1758,22 @@ void CGuard::AddRegistry(char* datB, int datL, CString& dns)
 	CString	entry, name;
 	struct	_regH*	regH;
 
+	axlog(LOG_LOGIN, "[AddRegistry] ENTER datL=%d", datL);
+
 	while (datL > sizeof(struct _regH))
 	{
 		regH = (struct _regH *) datB;
 		datB += sizeof(struct _regH);
 		datL -= sizeof(struct _regH);
 
+		axlog(LOG_LOGIN, "[AddRegistry] record regK=0x%02X regL=%.4s remainDatL=%d", regH->regK, regH->regL, datL);
+
 		switch (regH->regK)
 		{
 		case regK_COMBO:
 			m_combo.RemoveAll();
 			size = atoi(CString(regH->regL, sizeof(regH->regL)));
+			axlog(LOG_LOGIN, "[AddRegistry] COMBO count=%d", size);
 			for (ii = 0; ii < size; ii++)
 			{
 				entry = datB;
@@ -1785,10 +1792,13 @@ void CGuard::AddRegistry(char* datB, int datL, CString& dns)
 				if (entry.IsEmpty())
 					continue;
 				m_combo.SetAt(name, entry);
+
+				axlog(LOG_LOGIN, "[AddRegistry] COMBO[%d/%d] name=%s len=%d value=%.512s", ii + 1, size, name, entry.GetLength(), entry);
 			}
 			break;
 		case regK_ACCNO:
 			size = atoi(CString(regH->regL, sizeof(regH->regL)));
+			axlog(LOG_LOGIN, "[AddRegistry] ACCNO count=%d", size);
 			for (ii = 0; ii < size; ii++)
 			{
 				entry = datB;
@@ -1811,6 +1821,9 @@ void CGuard::AddRegistry(char* datB, int datL, CString& dns)
 LOG_OUTP(3, "[axwizard][loadacc]", entry, __FUNCTION__);
 
 				m_accno.Add(name);
+
+				// 비밀번호(entry, 이 시점엔 이미 lz4enc로 인코딩된 값)는 절대 로그에 남기지 않음 - 계좌번호만 기록
+				axlog(LOG_LOGIN, "[AddRegistry] ACCNO[%d/%d] account=%s (password omitted)", ii + 1, size, name);
 			}
 			break;
 		case regK_CA:
@@ -1820,6 +1833,13 @@ LOG_OUTP(3, "[axwizard][loadacc]", entry, __FUNCTION__);
 				// ignore regH->regL due to extend sizeof _caH
 				idx = sizeof(struct _caH);
 				dns = CString(datB, idx);
+
+				{
+					const struct _caH* caH = (const struct _caH*)datB;
+					axlog(LOG_LOGIN, "[AddRegistry] CA ecode=%.5s pwdn=%d dns=%.64s map=%.64s",
+						caH->ecode, caH->pwdn, caH->dns, caH->map);
+				}
+
 				datB += idx;
 				datL -= idx;
 			}
@@ -1830,9 +1850,12 @@ LOG_OUTP(3, "[axwizard][loadacc]", entry, __FUNCTION__);
 			*/
 			break;
 		default:
+			axlog(LOG_LOGIN, "[AddRegistry] UNKNOWN regK=0x%02X - parsing stopped here", regH->regK);
 			return;
 		}
 	}
+
+	axlog(LOG_LOGIN, "[AddRegistry] EXIT combo=%d account=%d accno=%d", (int)m_combo.GetCount(), (int)m_account.GetCount(), (int)m_accno.GetSize());
 }
 
 void CGuard::RemoveRegistry()
@@ -2909,7 +2932,7 @@ bool CGuard::RouteTR(CClient* client)
 
 BOOL CGuard::Write(char* pBytes, int nBytes, int key)
 {
-	axlog(LOG_DATA, "CGuard::Write(1) len=%d key=%d", nBytes, key);
+	axlog(LOG_SOCK_SEND, "CGuard::Write(1) len=%d key=%d", nBytes, key);
 // updateXXX_2022XX
 	if (nBytes > maxIOs)
 	{
@@ -3522,7 +3545,7 @@ BOOL CGuard::Write(char* pBytes, int nBytes, bool trace)
 					dispBuf += (c == '\0' || c == '\r' || c == '\n') ? '.' : c;
 				}
 
-				axlog(LOG_DATA, "[0-Write-send] #%d winK=%d unit=%d msgK=%d trxC=%.8s datL=%d chunk=%d/%d preview=[%s]",
+				axlog(LOG_SOCK_SEND, "[0-Write-send] #%d winK=%d unit=%d msgK=%d trxC=%.8s datL=%d chunk=%d/%d preview=[%s]",
 					msgIdx, dbgH->winK, dbgH->unit, dbgH->msgK, dbgH->trxC, subDatL, chunk+1, nChunks,
 					dispBuf.GetString());
 			}
@@ -3530,7 +3553,7 @@ BOOL CGuard::Write(char* pBytes, int nBytes, bool trace)
 			msgIdx++;
 		}
 	}
-	axlog(LOG_DATA, "CGuard::Write(2) len=%d hdr0=0x%02x hdr3=0x%02x trace=%d", nBytes, (unsigned char)*pBytes, (unsigned char)*(pBytes + 3), trace);
+	axlog(LOG_SOCK_SEND, "CGuard::Write(2) len=%d hdr0=0x%02x hdr3=0x%02x trace=%d", nBytes, (unsigned char)*pBytes, (unsigned char)*(pBytes + 3), trace);
 	if (nBytes > L_axisH + maxIOs)
 	{
 		SetGuide(AE_MAXIO, ((struct _axisH *)pBytes)->winK);
