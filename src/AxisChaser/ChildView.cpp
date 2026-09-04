@@ -154,6 +154,7 @@ BEGIN_MESSAGE_MAP(CChildView,CWnd )
 	ON_BN_CLICKED(IDC_BTN_LOGFOLDER, OnClickedBtnLogFolder)
 	ON_BN_CLICKED(IDC_BTN_LOGCLEAR, OnClickedBtnLogClear)
 	ON_BN_CLICKED(IDC_CHK_LOGENABLE, OnClickedChkLogEnable)
+	ON_BN_CLICKED(IDC_BTN_DUMP, OnClickedBtnDump)
 	//}}AFX_MSG_MAP
 	ON_MESSAGE(WM_RECEIVE, OnReceive)
 	ON_WM_TIMER()
@@ -301,7 +302,76 @@ void CChildView::OnClickedBtnLogClear()
 		::MessageBox(m_hWnd, "Cannot create file: " + m_logFilePath, "Axis Chaser", MB_ICONWARNING);
 }
 
-BOOL CChildView::PreCreateWindow(CREATESTRUCT& cs) 
+namespace
+{
+	struct FindWinByPid { DWORD pid; HWND hwnd; };
+
+	BOOL CALLBACK EnumFindNotepadProc(HWND hwnd, LPARAM lParam)
+	{
+		FindWinByPid* ctx = (FindWinByPid*) lParam;
+
+		DWORD pid = 0;
+		GetWindowThreadProcessId(hwnd, &pid);
+		if (pid != ctx->pid)
+			return TRUE;
+
+		TCHAR cls[64];
+		GetClassName(hwnd, cls, 64);
+		if (_tcscmp(cls, _T("Notepad")) == 0)
+		{
+			ctx->hwnd = hwnd;
+			return FALSE;
+		}
+		return TRUE;
+	}
+}
+
+void CChildView::OnClickedBtnDump()
+{
+	CString strText;
+	m_trace.GetWindowText(strText);
+
+	STARTUPINFO si = { sizeof(si) };
+	PROCESS_INFORMATION pi = {};
+	TCHAR cmdLine[] = _T("notepad.exe");
+
+	if (!CreateProcess(NULL, cmdLine, NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi))
+	{
+		::MessageBox(m_hWnd, "Cannot launch Notepad.", "Axis Chaser", MB_ICONWARNING);
+		return;
+	}
+
+	WaitForInputIdle(pi.hProcess, 5000);
+
+	FindWinByPid ctx = { pi.dwProcessId, NULL };
+	for (int ii = 0; ii < 100 && !ctx.hwnd; ii++)
+	{
+		EnumWindows(EnumFindNotepadProc, (LPARAM) &ctx);
+		if (!ctx.hwnd)
+			Sleep(50);
+	}
+
+	HWND hEdit = NULL;
+	for (int ii = 0; ii < 20 && ctx.hwnd && !hEdit; ii++)
+	{
+		hEdit = ::FindWindowEx(ctx.hwnd, NULL, _T("Edit"), NULL);
+		if (!hEdit)
+			Sleep(50);
+	}
+
+	CloseHandle(pi.hThread);
+	CloseHandle(pi.hProcess);
+
+	if (!hEdit)
+	{
+		::MessageBox(m_hWnd, "Cannot locate the Notepad window.", "Axis Chaser", MB_ICONWARNING);
+		return;
+	}
+
+	::SendMessage(hEdit, WM_SETTEXT, 0, (LPARAM)(LPCTSTR) strText);
+}
+
+BOOL CChildView::PreCreateWindow(CREATESTRUCT& cs)
 {
 	if (!CWnd::PreCreateWindow(cs))
 		return FALSE;
@@ -464,11 +534,15 @@ int CChildView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		WS_CHILD | WS_VISIBLE | BS_AUTOCHECKBOX,
 		rcLogEnable, this, IDC_CHK_LOGENABLE);
 
+	CRect rcDump(712, 62, 772, 84);
+	m_btnDump.Create(_T("DUMP"), WS_CHILD | WS_VISIBLE, rcDump, this, IDC_BTN_DUMP);
+
 	m_editLogFile.SetFont(GetFont());
 	m_btnLogOpen.SetFont(GetFont());
 	m_btnLogFolder.SetFont(GetFont());
 	m_btnLogClear.SetFont(GetFont());
 	m_chkLogEnable.SetFont(GetFont());
+	m_btnDump.SetFont(GetFont());
 
 	char logBuf[512];
 	GetCurrentDirectory(sizeof(logBuf), logBuf);
@@ -540,6 +614,8 @@ void CChildView::OnSize(UINT nType, int cx, int cy)
 		m_btnLogClear.MoveWindow(margin + logEditWidth + margin + logBtnWidth + margin + logBtnWidth + margin, row3Y, logBtnWidth, ctrlHeight);
 	if (m_chkLogEnable.GetSafeHwnd())
 		m_chkLogEnable.MoveWindow(margin + logEditWidth + margin + logBtnWidth + margin + logBtnWidth + margin + logBtnWidth + margin, row3Y, 130, ctrlHeight);
+	if (m_btnDump.GetSafeHwnd())
+		m_btnDump.MoveWindow(margin + logEditWidth + margin + logBtnWidth + margin + logBtnWidth + margin + logBtnWidth + margin + 130 + margin, row3Y, logBtnWidth, ctrlHeight);
 
 	if (m_trace.GetSafeHwnd())
 	{

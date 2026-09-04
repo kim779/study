@@ -1,3 +1,10 @@
+---
+project: ibks
+category: dependency
+status: 작성됨
+updated: 2026-08-28
+---
+
 # C_UserGrp 의존성 분석
 
 ## 목차

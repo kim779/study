@@ -1,3 +1,10 @@
+---
+project: AXIS
+category: architecture
+status: 작성됨
+updated: 2026-08-21
+---
+
 # AXIS 프로젝트 아키텍처
 
 

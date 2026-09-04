@@ -1,3 +1,10 @@
+---
+project: src_7_11
+category: call-graph
+status: 미작성
+updated: 2026-07-09
+---
+
 # CallGraph
 
 - 생성일: 2026-07-07

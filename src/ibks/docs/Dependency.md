@@ -1,3 +1,10 @@
+---
+project: ibks
+category: dependency
+status: 완료
+updated: 2026-08-21
+---
+
 # ibks 프로젝트 의존성 분석
 
 

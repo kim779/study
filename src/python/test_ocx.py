@@ -300,6 +300,17 @@ class TestWindow(QMainWindow):
         h.addStretch()
         layout.addLayout(h)
 
+        h_chaser = QHBoxLayout()
+        btn_chaser_show = QPushButton("체이서 보기")
+        btn_chaser_show.setToolTip("AxisChaser.exe를 실행해 이 프로그램의 송수신 프로토콜을 실시간으로 확인합니다")
+        btn_chaser_hide = QPushButton("체이서 닫기")
+        btn_chaser_show.clicked.connect(self._on_show_chaser)
+        btn_chaser_hide.clicked.connect(self._on_hide_chaser)
+        h_chaser.addWidget(btn_chaser_show)
+        h_chaser.addWidget(btn_chaser_hide)
+        h_chaser.addStretch()
+        layout.addLayout(h_chaser)
+
         # account combo - populated after login
         h2 = QHBoxLayout()
         h2.addWidget(QLabel("계좌"))
@@ -753,6 +764,16 @@ class TestWindow(QMainWindow):
         self._log(f"고객정보조회 => {result}")
         if not result:
             self._log_err(self.ocx.dynamicCall('GetLastErrMsg()'))
+
+    def _on_show_chaser(self):
+        result = self.ocx.dynamicCall("ShowChaser()")
+        self._log(f"체이서 실행 => {result}")
+        if not result:
+            self._log_err(self.ocx.dynamicCall('GetLastErrMsg()'))
+
+    def _on_hide_chaser(self):
+        self.ocx.dynamicCall("HideChaser()")
+        self._log("체이서 종료 요청")
 
     def _on_odr_send(self):
         acno  = self.combo_odr_accn.currentData() or ""

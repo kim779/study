@@ -375,6 +375,7 @@ int CObjMgr::DispatchGraphDataS(struct _trData* pTD)
 
 bool CObjMgr::RealtimeGraphData(char* pcRTData)
 {
+	CString slog;
 	if (m_arGraphQue.GetSize() <= 0)
 		return false;
 

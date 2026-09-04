@@ -1,3 +1,10 @@
+---
+project: ibks
+category: note
+status: 작성됨
+updated: 2026-08-28
+---
+
 # axisGData 캔들(OHLC) 구성 방식
 
 ## 목차

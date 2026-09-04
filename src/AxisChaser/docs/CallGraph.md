@@ -1,3 +1,10 @@
+---
+project: AxisChaser
+category: call-graph
+status: 미작성
+updated: 2026-07-10
+---
+
 # CallGraph
 
 - 생성일: 2026-07-10

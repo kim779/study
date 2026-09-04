@@ -1,5 +1,6 @@
 # CLAUDE.md
 
+> 프로젝트 전체(AXIS/ibks/AxisChaser/python/src_7_11) 문서 61개를 한 번에 훑어보려면 @DOCS_INDEX.md 참고.
 
 ## 목차
 

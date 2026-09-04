@@ -1,3 +1,10 @@
+---
+project: src_7_11
+category: todo
+status: 작성됨
+updated: 2026-08-21
+---
+
 # Todo
 
 

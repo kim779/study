@@ -1,3 +1,10 @@
+---
+project: ibks
+category: source-index
+status: 작성됨
+updated: 2026-08-28
+---
+
 # C_UserGrp 소스 인덱스
 
 ## 목차

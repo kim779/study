@@ -1,3 +1,10 @@
+---
+project: ibks
+category: guide
+status: 완료
+updated: 2026-08-30
+---
+
 # 디버그 로그 가이드 (axlog)
 
 

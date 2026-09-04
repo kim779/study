@@ -1,3 +1,10 @@
+---
+project: AXIS
+category: knowledge-base
+status: 작성됨
+updated: 2026-08-28
+---
+
 # KnowledgeBase
 
 - 생성일: 2026-07-14

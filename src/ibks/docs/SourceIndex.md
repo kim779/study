@@ -1,3 +1,10 @@
+---
+project: ibks
+category: source-index
+status: 완료
+updated: 2026-08-21
+---
+
 # ibks 소스 파일 색인
 
 

@@ -1,3 +1,10 @@
+---
+project: src
+category: knowledge-base
+status: 작성됨
+updated: 2026-07-16
+---
+
 # KnowledgeBase (Workspace Index)
 
 - 생성일: 2026-07-07 (갱신: 2026-07-14)

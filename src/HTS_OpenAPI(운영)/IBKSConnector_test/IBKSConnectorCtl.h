@@ -106,7 +106,19 @@ typedef enum {
 	eTR4526,	// 계좌 서비스현황
 	eTR4527,	// 계좌명조회
 	eTR8001 = 100,	// 고객등급 조회
-	eTR2001	// 투자주체일별
+	eTR2001,		// 투자주체일별
+
+	eTR2002,	        //  주식 거래내역
+	eTR5000,		// 외화 예수금조회
+	eTR5001,		// 해외주식 계좌잔고조회
+	eTR5002,		// 해외주식 체결내역
+	eTR5003,		// 해외주식 거래내역
+	eTR5004,		// 거래환율조회 (국민)
+	eTR5005,
+	eTR5007,		// 거래환율조회(기업)
+	eTR5006,
+	eTR5010,		// 중계은행조회
+	eFNORDER		// 해외주문	
 } TR_KEY;
 
 //2013.04.01 KSJ 남윤호차장의 요청에 의해서 조회 4 -> 6으로 수정
@@ -172,13 +184,24 @@ struct LIMIT_ITEM
 	{ eTR4525, 1000, 0,  1, 0}, 
 	{ eTR4526, 1000, 0,  1, 0}, 
 	{ eTR4527, 1000, 0,  1, 0}, 
-	{ eTR8001, 1000, 0,  1, 0}, 
+	{ eTR8001, 1000, 0,  1, 0},
+	
+	{ eTR2002, 1000, 0,  1, 0},
+	{ eTR5000, 1000, 0,  1, 0},
+	{ eTR5001, 1000, 0,  1, 0},
+	{ eTR5002, 1000, 0,  1, 0},
+	
+	
+	{ eFNORDER, 1000, 0,  1, 0},
+
 	{ eNone,      0, 0,  0, 0}
 };
 
 // 허용가능한 호가구분 설정
 int pibosodr_hogb[] = { 0, 3, 5, 6, 7, 10, 13, 16, 20, 23, 26, 81, 61 };
 int pibofodr_hogb[] = { 0, 3, 5, 6, 10, 20 };
+
+class CChaser;	// AxisChaser 프로토콜 트레이스 릴레이용 숨김 자식윈도우, 정의는 .cpp에 있음
 
 class CIBKSConnectorCtrl : public COleControl
 {
@@ -211,6 +234,7 @@ protected:
 	//{{AFX_MSG(CIBKSConnectorCtrl)
 	//}}AFX_MSG
 	afx_msg LRESULT OnUser(WPARAM wParam, LPARAM lParam);
+	afx_msg LRESULT OnCHASER(WPARAM wParam, LPARAM lParam);
 	DECLARE_MESSAGE_MAP()
 
 // Dispatch maps
@@ -286,6 +310,23 @@ protected:
 	afx_msg void SetPrograms(long pggb);
 	afx_msg BOOL TR1223(long key, LPCTSTR acno, LPCTSTR pswd, long allf, long mkgubn, LPCTSTR nkey);  //test1223
 	afx_msg BOOL TR1203(long key, long mmgb, LPCTSTR acno, LPCTSTR pswd, long ojno, LPCTSTR code, long jqty, long jprc, long hogb, long mdgb, long mkgb);
+	afx_msg BOOL ShowChaser();
+	afx_msg void HideChaser();
+	afx_msg BOOL TR2002(long key, LPCTSTR acc, LPCTSTR pswd, LPCTSTR stDate, LPCTSTR endDate, LPCTSTR type, LPCTSTR code);	
+	afx_msg BOOL TR5000(long key, LPCTSTR acc, LPCTSTR pswd);
+	afx_msg BOOL TR5001(long key, LPCTSTR acc, LPCTSTR pswd, LPCTSTR sDate, LPCTSTR  today, LPCTSTR qryTp);
+	afx_msg BOOL TR5002(long key, LPCTSTR acc, LPCTSTR pswd, LPCTSTR sDate, LPCTSTR mm, LPCSTR gubn, LPCTSTR type, LPCTSTR code, LPCSTR market, LPCSTR ordertype, long sort);
+	afx_msg BOOL TR5003(long key, LPCTSTR acc, LPCTSTR pswd, LPCTSTR stDate, LPCTSTR seDate, LPCTSTR code, LPCSTR CancTp, LPCSTR gubn, LPCSTR stktp);
+	afx_msg BOOL TR5004(long key, LPCTSTR acc, LPCTSTR crcycode);
+	afx_msg BOOL TR5007(long key, LPCTSTR acc, LPCTSTR crcycode);
+	afx_msg BOOL TR5010(long key);
+	afx_msg BOOL FNORDER(long key, LPCTSTR odgb, LPCTSTR mmgb, LPCTSTR ogno, LPCTSTR accn, LPCTSTR pswd, LPCTSTR mkgb, LPCTSTR code, LPCTSTR jqty, 
+		                       LPCTSTR jprc, LPCTSTR hogb, LPCTSTR rsvgubn, LPCTSTR curCode, LPCTSTR rsvlpdt, LPCTSTR rsvStDt, LPCTSTR rsvEndDt, LPCTSTR rsvOrdNo, 
+		                       LPCTSTR rsv_lndt, LPCTSTR creditCode);
+
+	afx_msg BOOL TR5006(long key, LPCTSTR acc, LPCTSTR pswd, LPCTSTR mxchgtpcode, LPCTSTR trxtp, LPCTSTR regtpcode, LPCTSTR xchrattpcode, LPCTSTR mxchgptncode, LPCTSTR tgrtmnyoutamt, LPCTSTR mxchgmnyinamt, LPCTSTR tgrtcrcycode, LPCTSTR mxchgcrcycode, LPCTSTR appxcharat, LPCTSTR prvlgrat);
+	afx_msg BOOL TR5005(long key, LPCTSTR acc, LPCTSTR pswd, LPCTSTR gdxchrat, LPCTSTR mxchgptncode);
+
 	//}}AFX_DISPATCH
 	DECLARE_DISPATCH_MAP()
 
@@ -414,6 +455,8 @@ public:
 	dispidTR1006 = 69L,
 	dispidTR1007 = 70L,
 	dispidLoginQuote = 71L,
+	dispidShowChaser = 81L,
+	dispidHideChaser = 82L,
 	//}}AFX_DISP_ID
 	};
 
@@ -436,6 +479,10 @@ protected:
 	CWnd m_jngoWnd;
 	CAxisWizard m_Wizard;	
 	CWnd m_Notify;
+	CChaser* m_chaser;	// AxisChaser 트레이스 대상 창(ShowChaser/CreateChaser에서 생성)
+	CCriticalSection m_chaserSync;
+	void CreateChaser();
+	void DeleteChaser();
 
 	int m_nPggb;	//차익/비차익 구분
 	HINSTANCE m_hiSha256;	//2014.04.21 KSJ 일방향암호화 추가
@@ -524,6 +571,7 @@ public:
 	BOOL S_PIBOSJG2(int key, LPCSTR acno, LPCSTR pswd, int allf, LPCSTR nkey, int mkgubn);
 	BOOL S_SONAQ200(int key, LPCSTR acno, LPCSTR pswd, LPCSTR code, int zBnsTp, double dOrdPrc); // 주문가능수량조회
 
+
 	// 선물옵션
 	BOOL S_PIBO3002(int key, LPCSTR fcod);	// 시세조회
 	BOOL S_PIBOFODR(int key, int mmgb, LPCSTR acno, LPCSTR pswd, int ojno, LPCSTR fcod, int jqty, int jprc, int hogb, int mdgb ); // 주문
@@ -607,6 +655,22 @@ public:
 
 	// 버젼체크
 	BOOL S_PIDOVERS();
+
+	BOOL S_TR2002(long key, LPCTSTR acc, LPCTSTR pswd, LPCTSTR stDate, LPCTSTR endDate, LPCTSTR type, LPCTSTR code);	
+	BOOL S_TR5000(long key, LPCTSTR acc, LPCTSTR pswd);
+	BOOL S_TR5001(long key, LPCTSTR acc, LPCTSTR pswd, LPCTSTR sDate, LPCTSTR  today, LPCTSTR qryTp);
+	BOOL S_TR5002(long key, LPCTSTR acc, LPCTSTR pswd, LPCTSTR sDate, LPCTSTR mm, LPCSTR gubn, LPCTSTR type, LPCTSTR code, LPCSTR market, LPCSTR ordertype, long sort);
+	BOOL S_TR5003(long key, LPCTSTR acc, LPCTSTR pswd, LPCTSTR stDate, LPCTSTR seDate, LPCTSTR code, LPCSTR CancTp, LPCSTR gubn, LPCSTR stktp);
+	BOOL S_TR5004(long key, LPCTSTR acc, LPCTSTR crcycode);
+	BOOL S_TR5007(long key, LPCTSTR acc, LPCTSTR crcycode);
+	BOOL S_TR5010(long key);
+	BOOL S_FNORDER(long key, LPCTSTR odgb, LPCTSTR mmgb, LPCTSTR ogno, LPCTSTR accn, LPCTSTR pswd, LPCTSTR mkgb, LPCTSTR code, LPCTSTR jqty, LPCTSTR jprc, 
+		                 LPCTSTR hogb, LPCTSTR rsvgubn, LPCTSTR curCode, LPCTSTR rsvlpdt, LPCTSTR rsvStDt, LPCTSTR rsvEndDt, LPCTSTR rsvOrdNo, LPCTSTR rsv_lndt, LPCTSTR creditCode);
+
+	BOOL S_TR5006(long key, LPCTSTR acc, LPCTSTR pswd, LPCTSTR mxchgtpcode, LPCTSTR trxtp, LPCTSTR regtpcode, LPCTSTR xchrattpcode, LPCTSTR mxchgptncode, LPCTSTR tgrtmnyoutamt, LPCTSTR mxchgmnyinamt, LPCTSTR tgrtcrcycode, LPCTSTR mxchgcrcycode, LPCTSTR appxcharat, LPCTSTR prvlgrat);
+	BOOL S_TR5005(long key, LPCTSTR acc, LPCTSTR pswd, LPCTSTR gdxchrat, LPCTSTR mxchgptncode);
+
+
 
 	CString m_slog;
 };

@@ -5,6 +5,7 @@
 #include "CX_Account.h"
 #include "AccountCtrl.h"
 #include "../../axis/axMsg.hxx"
+#include "../../ibks/h/axlog.h"
 
 #include "AccCrypto.h"
 #ifdef DF_SINGLETONE_FILE
@@ -646,6 +647,8 @@ void CAccountCtrl::_Empty()
 
 void CAccountCtrl::_SetFocus()
 {
+	axlog(LOG_EVENT, "[CAccountCtrl::_SetFocus] key=%d name=%.16s external SetFocus() automation call (script or sibling control)",
+		m_Param.key, m_Param.name.GetString());
 	SetFocus();
 }
 

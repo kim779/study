@@ -19,10 +19,11 @@
 #define DF_LOG_LOGIN
 #define DF_LOG_SOCK_SEND
 #define DF_LOG_SOCK_RECEIVE
+#define DF_LOG_CERTIFY
 // OFF by default: axisform.dll's CfmEdit::Draw/UpdateData fire on every repaint/keystroke, very high volume.
 // #define DF_LOG_AXISFORM
 
-enum axLogCat { LOG_INIT, LOG_EVENT, LOG_DATA, LOG_RTM, LOG_SCRIPT, LOG_AXISFORM, LOG_FILEPATCH, LOG_LOGIN, LOG_SOCK_SEND, LOG_SOCK_RECEIVE };
+enum axLogCat { LOG_INIT, LOG_EVENT, LOG_DATA, LOG_RTM, LOG_SCRIPT, LOG_AXISFORM, LOG_FILEPATCH, LOG_LOGIN, LOG_SOCK_SEND, LOG_SOCK_RECEIVE, LOG_CERTIFY };
 
 inline bool axLogOn(axLogCat cat)
 {
@@ -58,6 +59,9 @@ inline bool axLogOn(axLogCat cat)
 #ifdef DF_LOG_SOCK_RECEIVE
 	case LOG_SOCK_RECEIVE: return true;
 #endif
+#ifdef DF_LOG_CERTIFY
+	case LOG_CERTIFY: return true;
+#endif
 	default: return false;
 	}
 }
@@ -69,7 +73,7 @@ inline void axlogImpl(axLogCat cat, const char* func, int line, LPCTSTR fmt, ...
 	// Category names padded to the width of the longest one (SOCK_RECEIVE=12) so
 	// "[TAG][xxx]" is always the same length regardless of category.
 	static const char* catNames[] = {
-		"INIT", "EVENT", "DATA", "RTM", "SCRIPT", "AXISFORM", "FILEPATCH", "LOGIN", "SOCK_SEND", "SOCK_RECEIVE"
+		"INIT", "EVENT", "DATA", "RTM", "SCRIPT", "AXISFORM", "FILEPATCH", "LOGIN", "SOCK_SEND", "SOCK_RECEIVE", "CERTIFY"
 	};
 
 	va_list args;
@@ -86,7 +90,7 @@ inline void axlogImpl(axLogCat cat, const char* func, int line, LPCTSTR fmt, ...
 	// Longer entries just overflow the field without truncation or misalignment
 	// of their own message - only later, shorter lines stay aligned.
 	CString line_out;
-	line_out.Format("[%s][%-12s] %-42s %s\n", "WIZARD", catNames[cat], (LPCTSTR)funcLine, (LPCTSTR)msg);
+	line_out.Format("[%s][%-12s] %-42s %s\n", AXLOG_MODULE_TAG, catNames[cat], (LPCTSTR)funcLine, (LPCTSTR)msg);
 
 	OutputDebugString(line_out);
 }

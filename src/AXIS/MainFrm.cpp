@@ -117,6 +117,23 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
+// m_iKRXype / m_iNXType 상태값 정의 - 실제 아이콘 매핑은 DLL/sm/Dbar1.cpp::CDbar1::SetShowAIBtn() 기준
+// -1은 상태 미확정(default: 분기)을 나타내는 별도 값이라 여기 포함하지 않음
+#define KRX_MARKET_END			0	//장마감  (KRX_OFF)
+#define KRX_MARKET_TIMEOUT		1	//시간외  (KRX_TIMEOUT)
+#define KRX_MARKET_NORMAL		2	//정규장  (KRX_ON)
+#define KRX_MARKET_ONEPRC		3	//단일가  (KRX_SINGLE)
+#define KRX_MARKET_BEFORE		4	//장전    (KRX_MBEFORE)
+#define KRX_MARKET_FREE			5	//프리    (KRX_FREE)
+#define KRX_MARKET_AFTER		6	//애프터  (KRX_AFTER)
+
+#define NXT_MARKET_END			0	//장마감  (NXT_OFF)
+#define NXT_MARKET_FREE			1	//프리    (NXT_FREE)
+#define NXT_MARKET_NORMAL		2	//메인    (NXT_ON)
+#define NXT_MARKET_AFTER		3	//애프터  (NXT_AFTER)
+#define NXT_MARKET_ONEPRC		4	//단일가  (NXT_ONEPRC)
+#define NXT_MARKET_BEFORE		5	//장전    (NXT_MBEFORE)
+
 static CRect	g_monRc(0, 0, 0, 0);
 static CMainFrame* m_pMain = NULL;
 
@@ -14145,97 +14162,97 @@ NXT
 	{
 	case 854:  // KRX 7:00~ 7:50   KRX프리
 	{
-		m_iKRXype = 5;
-		m_iNXType = 5;
+		m_iKRXype = KRX_MARKET_FREE;     //KRX프리
+		m_iNXType = NXT_MARKET_BEFORE;    //NXT장전
 		m_bar1->SetShowAIBtn(m_iKRXype, m_iNXType);
 	}
 	break;
 	case 855:  // KRX 7:50~ 8:00  KRX장전
 	{
-		m_iKRXype = 4;
-		m_iNXType = 5;
+		m_iKRXype = KRX_MARKET_BEFORE;  //KRX장전
+		m_iNXType = NXT_MARKET_BEFORE;  //NXT장전
 		m_bar1->SetShowAIBtn(m_iKRXype, m_iNXType);
 	}
 	break;
 	case 881:  //NXT  8:00~ NXT 프리 시작
 	{
-		m_iNXType = 1;  //프리
+		m_iNXType = NXT_MARKET_FREE;  //프리
 		m_bar1->SetShowAIBtn(m_iKRXype, m_iNXType);
 	}
 	break;
 	case 851:  //KRX 8:30~ 주식 장개시전 동시호가 개시
 	case 802:  //KRX 8:30~KRX 장전시간외 시작    
 	{
-		m_iKRXype = 1;   //시간외
+		m_iKRXype = KRX_MARKET_TIMEOUT;   //시간외
 		m_bar1->SetShowAIBtn(m_iKRXype, m_iNXType);
 	}
 	break;
 	case 832:  //NXT 8:30~
 	{
-		m_iNXType = 1;   // 프리
+		m_iNXType = NXT_MARKET_FREE;   // 프리
 		m_bar1->SetShowAIBtn(m_iKRXype, m_iNXType);   //   KRX 802가 들어오면 NXT 881 프리
 	}
 	break;
 	case 803:  //KRX 장전     8:40~8:50
 	{
-		m_iKRXype = 4;   //장전
+		m_iKRXype = KRX_MARKET_BEFORE;   //장전
 		m_bar1->SetShowAIBtn(m_iKRXype, m_iNXType);   //   KRX 802가 들어오면 NXT 881 프리
 	}
 	break;
 	case 883:  //KRX 단일가 시작     8:50~
 	{
-		m_iKRXype = 3;   //단일가
-		m_iNXType = 5;  //장전
+		m_iKRXype = KRX_MARKET_ONEPRC;   //단일가
+		m_iNXType = NXT_MARKET_BEFORE;  //장전
 		m_bar1->SetShowAIBtn(m_iKRXype, m_iNXType);   //   KRX 802가 들어오면 NXT 881 프리
 	}
 	break;
 	case 801:   //KRX 9:00~  KRX 정규장 시작
 	{
-		m_iKRXype = 2;  //정규장
+		m_iKRXype = KRX_MARKET_NORMAL;  //정규장
 		m_bar1->SetShowAIBtn(m_iKRXype, m_iNXType);
 	}
 	break;
 	case 884:   //NXT 9:00:30~  NXT 메인 시작
 	{
-		m_iNXType = 2;  //정규장
+		m_iNXType = NXT_MARKET_NORMAL;  //정규장
 		m_bar1->SetShowAIBtn(m_iKRXype, m_iNXType);
 	}
 	break;
 	case 886: //NXT 15:20~ NXT 오후휴장 
 	{
-		m_iNXType = 5;  //장마감
+		m_iNXType = NXT_MARKET_BEFORE;  //장전
 		m_bar1->SetShowAIBtn(m_iKRXype, m_iNXType);
 	}
 	break;
 	case 887: //NXT 15:30~ NXT 단일가
 	{
-		m_iNXType = 4;  //NXT 15:30~15:40  단일가 개시
+		m_iNXType = NXT_MARKET_ONEPRC;  //NXT 15:30~15:40  단일가 개시
 		m_bar1->SetShowAIBtn(m_iKRXype, m_iNXType);
 	}
 	break;
 	case 809: //KRX 15:30~ KRX 장전
 	{
-		m_iKRXype = 4;
+		m_iKRXype = KRX_MARKET_BEFORE;
 		m_bar1->SetShowAIBtn(m_iKRXype, m_iNXType);
 	}
 	break;
 	case 888:  //NXT 15:40~ NXT 애프터 시작
 	{
-		m_iNXType = 3;  //애프터
+		m_iNXType = NXT_MARKET_AFTER;  //애프터
 		m_bar1->SetShowAIBtn(m_iKRXype, m_iNXType);
 	}
 	break;
 	case 804:  //KRX 15:40~ KRX 시간외
 	{
-		m_iKRXype = 1;   //시간외
+		m_iKRXype = KRX_MARKET_TIMEOUT;   //시간외
 		m_bar1->SetShowAIBtn(m_iKRXype, m_iNXType);
 	}
 	break;
 #ifdef DF_KRX_FREEAFTER   //CheckMarketByMNG
 	case 856: //KRX 16:00~ 20:00 KRX 애프터
 	{
-		m_iKRXype = 6;  //애프터
-		m_iNXType = 3; //애프터
+		m_iKRXype = KRX_MARKET_AFTER;  //애프터
+		m_iNXType = NXT_MARKET_AFTER; //애프터
 		m_bar1->SetShowAIBtn(m_iKRXype, m_iNXType);  //KRX 805가 들어오면 NXT 888 애프터
 	}
 	break;
@@ -14243,38 +14260,38 @@ NXT
 	case 805: //KRX 16:00~ KRX 단일가 시작
 	case 853:  //KRX 16:00~ 주식시간외종가매매종료
 	{
-		m_iKRXype = 6;  //애프터
-		m_iNXType = 3; //애프터
+		m_iKRXype = KRX_MARKET_AFTER;  //애프터
+		m_iNXType = NXT_MARKET_AFTER; //애프터
 		m_bar1->SetShowAIBtn(m_iKRXype, m_iNXType);  //KRX 805가 들어오면 NXT 888 애프터
 	}
 	break;
 #endif
 	case 897:  //NXT 16:00~
 	{
-		m_iNXType = 3; //애프터
+		m_iNXType = NXT_MARKET_AFTER; //애프터
 		m_bar1->SetShowAIBtn(m_iKRXype, m_iNXType);  //KRX 805가 들어오면 NXT 888 애프터
 	}
 	break;
 #ifdef DF_KRX_FREEAFTER  //CheckMarketByMNG
 	case 857:  //KRX 20:00~ KRX 애프터종료
 	{
-		m_iKRXype = 0;  //장마감
-		m_iNXType = 0;  //장마감
+		m_iKRXype = KRX_MARKET_END;  //장마감
+		m_iNXType = NXT_MARKET_END;  //장마감
 		m_bar1->SetShowAIBtn(m_iKRXype, m_iNXType);
 	}
 	break;
 #else
 	case 806: //KRX 장마감 시작 18:00~
 	{
-		m_iKRXype = 0;  //장마감
+		m_iKRXype = KRX_MARKET_END;  //장마감
 		m_bar1->SetShowAIBtn(m_iKRXype, m_iNXType);
 	}
 	break;
 #endif
 	case 889: //KRX 장마감 시작 20:00~
 	{
-		m_iKRXype = 0;  //장마감
-		m_iNXType = 0; //장마감
+		m_iKRXype = KRX_MARKET_END;  //장마감
+		m_iNXType = NXT_MARKET_END; //장마감
 		m_bar1->SetShowAIBtn(m_iKRXype, m_iNXType);
 	}
 	break;
@@ -14298,78 +14315,73 @@ NXT
 */
 	if (IsCurrentTimeBetween(7 + (m_bCSAT * 1), 0, 7 + (m_bCSAT * 1), 50))  //7 00 ~ 7 50
 	{
-		m_iKRXype = 5;   //KRX프리
-		m_iNXType = 5;  //NXT장전
+		m_iKRXype = KRX_MARKET_FREE;   //KRX프리
+		m_iNXType = NXT_MARKET_BEFORE;  //NXT장전
 	}
 	else if (IsCurrentTimeBetween(7 + (m_bCSAT * 1), 50, 8 + (m_bCSAT * 1), 00))  //7 50 ~ 8 00
 	{
-		m_iKRXype = 4;   //KRX장전
-		m_iNXType = 5;  //NXT장전
+		m_iKRXype = KRX_MARKET_BEFORE;   //KRX장전
+		m_iNXType = NXT_MARKET_BEFORE;  //NXT장전
 	}
 	else if (IsCurrentTimeBetween(8 + (m_bCSAT * 1), 0, 8 + (m_bCSAT * 1), 30))  //8 00 ~ 8 30
 	{
-		m_iKRXype = 4;   //KRX장전
-		m_iNXType = 1;  //NXT프리
+		m_iKRXype = KRX_MARKET_BEFORE;   //KRX장전
+		m_iNXType = NXT_MARKET_FREE;  //NXT프리
 	}
 	else if (IsCurrentTimeBetween(8 + (m_bCSAT * 1), 30, 8 + (m_bCSAT * 1), 40))  //8 30 ~ 8 40
 	{
-		m_iKRXype = 1;   //KRX시간외
-		m_iNXType = 1;  //NXT프리
+		m_iKRXype = KRX_MARKET_TIMEOUT;   //KRX시간외
+		m_iNXType = NXT_MARKET_FREE;  //NXT프리
 	}
 	else if (IsCurrentTimeBetween(8 + (m_bCSAT * 1), 40, 8 + (m_bCSAT * 1), 50))  //8 40 ~ 8 50
 	{
-		m_iKRXype = 4;  //KRX장전
-		m_iNXType = 1;  //NXT프리
+		m_iKRXype = KRX_MARKET_BEFORE;  //KRX장전
+		m_iNXType = NXT_MARKET_FREE;  //NXT프리
 	}
 	else if (IsCurrentTimeBetween(8 + (m_bCSAT * 1), 50, 9 + (m_bCSAT * 1), 00))  //8 50 ~ 9 00
 	{
-		m_iKRXype = 3;  //KRX단일가
-		m_iNXType = 5;  //장전
+		m_iKRXype = KRX_MARKET_ONEPRC;  //KRX단일가
+		m_iNXType = NXT_MARKET_BEFORE;  //장전
 	}
 	else if (IsCurrentTimeBetween(9 + (m_bCSAT * 1), 0, 15 + (m_bCSAT * 1), 0))  //9 00 ~ 15 00
 	{
-		m_iKRXype = 2;  //정규장
-		m_iNXType = 2;  //정규장
+		m_iKRXype = KRX_MARKET_NORMAL;  //정규장
+		m_iNXType = NXT_MARKET_NORMAL;  //정규장
 	}
 	else if (IsCurrentTimeBetween(15 + (m_bCSAT * 1), 0, 15 + (m_bCSAT * 1), 20))  //15 00 ~ 15 20
 	{
-		m_iKRXype = 2;  //정규장
-		m_iNXType = 2;  //정규장
+		m_iKRXype = KRX_MARKET_NORMAL;  //정규장
+		m_iNXType = NXT_MARKET_NORMAL;  //정규장
 	}
 	else if (IsCurrentTimeBetween(15 + (m_bCSAT * 1), 20, 15 + (m_bCSAT * 1), 30))  //15 20 ~ 15 30
 	{
-		m_iKRXype = 2;  //정규장
-		m_iNXType = 0;  //장전
+		m_iKRXype = KRX_MARKET_NORMAL;  //정규장
+		m_iNXType = NXT_MARKET_BEFORE;  //장전
 	}
 	else if (IsCurrentTimeBetween(15 + (m_bCSAT * 1), 30, 15 + (m_bCSAT * 1), 40))  //15 30 ~ 15 40
 	{
-		m_iKRXype = 4;  //KRX장전
-		m_iNXType = 4;  //단일가
+		m_iKRXype = KRX_MARKET_BEFORE;  //KRX장전
+		m_iNXType = NXT_MARKET_ONEPRC;  //단일가
 	}
 	else if (IsCurrentTimeBetween(15 + (m_bCSAT * 1), 40, 16 + (m_bCSAT * 1), 0))  //15 40 ~ 16 00
 	{
-		m_iKRXype = 1;  //시간외
-		m_iNXType = 3;  //애프터
+		m_iKRXype = KRX_MARKET_TIMEOUT;  //시간외
+		m_iNXType = NXT_MARKET_AFTER;  //애프터
 	}
-	else if (IsCurrentTimeBetween(16 + (m_bCSAT * 1), 0, 18 + (m_bCSAT * 1), 0))  //16 00 ~ 18 00
+	else if (IsCurrentTimeBetween(16 + (m_bCSAT * 1), 0, 20 + (m_bCSAT * 1), 0))  //16 00 ~ 20 00
 	{
-		m_iKRXype = 6;  //애프터
-		m_iNXType = 3;  //애프터
-	}
-	else if (IsCurrentTimeBetween(18 + (m_bCSAT * 1), 0, 20 + (m_bCSAT * 1), 0))  //18 00 ~ 20 00
-	{
-		m_iKRXype = 6;    //애프터
-		m_iNXType = 3;    //애프터
+		m_iKRXype = KRX_MARKET_AFTER;  //애프터
+		m_iNXType = NXT_MARKET_AFTER;  //애프터
 	}
 	else if (IsCurrentTimeBetween(20 + (m_bCSAT * 1), 0, 24 + (m_bCSAT * 1), 0))  //20 00 ~ 24 00
 	{
-		m_iKRXype = 0;  //장마감
-		m_iNXType = 0;  //장마감
+		m_iKRXype = KRX_MARKET_END;  //장마감
+		m_iNXType = NXT_MARKET_END;  //장마감
 	}
 	else
 	{
-		m_iKRXype = 0;  //장마감
-		m_iNXType = 0;  //장마감
+		m_iKRXype = KRX_MARKET_END;  //장마감
+		m_iNXType = NXT_MARKET_END;  //장마감
 	}
 
 	m_bar1->SetShowAIBtn(m_iKRXype, m_iNXType);
@@ -14397,101 +14409,101 @@ NXT
 	{
 		case 881:  //NXT  8:00~ NXT 프리 시작
 		{
-			m_iNXType = 1;  //프리
+			m_iNXType = NXT_MARKET_FREE;  //프리
 			m_bar1->SetShowAIBtn(m_iKRXype, m_iNXType);
 		}
 		break;
 		case 851:  //KRX 8:30~ 주식 장개시전 동시호가 개시
 		case 802:  //KRX 8:30~KRX 장전시간외 시작    
 		{
-			m_iKRXype = 1;   //시간외
+			m_iKRXype = KRX_MARKET_TIMEOUT;   //시간외
 			m_bar1->SetShowAIBtn(m_iKRXype, m_iNXType);
 		}
 		break;
 		case 832:  //NXT 8:30~
 		{
-			m_iNXType = 1;   // 프리
+			m_iNXType = NXT_MARKET_FREE;   // 프리
 			m_bar1->SetShowAIBtn(m_iKRXype, m_iNXType);   //   KRX 802가 들어오면 NXT 881 프리
 		}
 		break;
 		case 803:  //KRX 장전     8:40~8:50
 		{
-			m_iKRXype = 4;   //장전
+			m_iKRXype = KRX_MARKET_BEFORE;   //장전
 			m_bar1->SetShowAIBtn(m_iKRXype, m_iNXType);   //   KRX 802가 들어오면 NXT 881 프리
 		}
 		break;
 		case 883:  //KRX 단일가 시작     8:50~
 		{
-			m_iKRXype = 3;   //단일가
-			m_iNXType = 0;  //장마감
+			m_iKRXype = KRX_MARKET_ONEPRC;   //단일가
+			m_iNXType = NXT_MARKET_END;  //장마감
 			m_bar1->SetShowAIBtn(m_iKRXype, m_iNXType);   //   KRX 802가 들어오면 NXT 881 프리
 		}
 		break;
 		case 801:   //KRX 9:00~  KRX 정규장 시작
 		{
-			m_iKRXype = 2;  //정규장
+			m_iKRXype = KRX_MARKET_NORMAL;  //정규장
 			m_bar1->SetShowAIBtn(m_iKRXype, m_iNXType);
 		}
 		break;
 		case 884:   //NXT 9:00:30~  NXT 메인 시작
 		{
-			m_iNXType = 2;  //정규장
+			m_iNXType = NXT_MARKET_NORMAL;  //정규장
 			m_bar1->SetShowAIBtn(m_iKRXype, m_iNXType);
 		}
 		break;
 		case 886: //NXT 15:20~ NXT 오후휴장 
 		{
-			m_iNXType = 0;  //장마감
+			m_iNXType = NXT_MARKET_END;  //장마감
 			m_bar1->SetShowAIBtn(m_iKRXype, m_iNXType);
 		}
 		break;
 		case 887: //NXT 15:30~ NXT 단일가
 		{
-			m_iNXType = 4;  //NXT 15:30~15:40  단일가 개시
+			m_iNXType = NXT_MARKET_ONEPRC;  //NXT 15:30~15:40  단일가 개시
 			m_bar1->SetShowAIBtn(m_iKRXype, m_iNXType);
 		}
 		break;
 		case 809: //KRX 15:30~ KRX장마감
 		{
-			m_iKRXype = 0;
+			m_iKRXype = KRX_MARKET_END;
 			m_bar1->SetShowAIBtn(m_iKRXype, m_iNXType);
 		}
 		break;
 		case 888:  //NXT 15:40~ NXT 애프터 시작
 		{
-			m_iNXType = 3;  //애프터
+			m_iNXType = NXT_MARKET_AFTER;  //애프터
 			m_bar1->SetShowAIBtn(m_iKRXype, m_iNXType);
 		}
 		break;
 		case 804:  //KRX 15:40~ KRX 시간외
 		{
-			m_iKRXype = 1;   //시간외
+			m_iKRXype = KRX_MARKET_TIMEOUT;   //시간외
 			m_bar1->SetShowAIBtn(m_iKRXype, m_iNXType);
 		}
 		break;
 		case 805: //KRX 16:00~ KRX 단일가 시작
 		case 853:  //KRX 16:00~ 주식시간외종가매매종료
 		{
-			m_iKRXype = 3;  //단일가
-			m_iNXType = 3; //애프터
+			m_iKRXype = KRX_MARKET_ONEPRC;  //단일가
+			m_iNXType = NXT_MARKET_AFTER; //애프터
 			m_bar1->SetShowAIBtn(m_iKRXype, m_iNXType);  //KRX 805가 들어오면 NXT 888 애프터
 		}
 		break;
 		case 897:  //NXT 16:00~
 		{
-			m_iNXType = 3; //애프터
+			m_iNXType = NXT_MARKET_AFTER; //애프터
 			m_bar1->SetShowAIBtn(m_iKRXype, m_iNXType);  //K RX 805가 들어오면 NXT 888 애프터
 		}
 		case 806: //KRX 장마감 시작 18:00~
 		{
-			m_iKRXype = 0;  //장마감
+			m_iKRXype = KRX_MARKET_END;  //장마감
 			m_bar1->SetShowAIBtn(m_iKRXype, m_iNXType);
 		}
 		break;
 		case 889: //KRX 장마감 시작 20:00~
 		{
-			m_iKRXype = 0;  //장마감
-			m_iNXType = 0; //장마감
+			m_iKRXype = KRX_MARKET_END;  //장마감
+			m_iNXType = NXT_MARKET_END; //장마감
 			m_bar1->SetShowAIBtn(m_iKRXype, m_iNXType);
 		}
 		break;
@@ -14515,68 +14527,68 @@ NXT
 */
 	if (IsCurrentTimeBetween(8 + (m_bCSAT * 1), 0, 8 + (m_bCSAT * 1), 30))  //8 00 ~ 8 30
 	{
-		m_iKRXype = 0;   //장마감
-		m_iNXType = 1;  //프리
+		m_iKRXype = KRX_MARKET_END;   //장마감
+		m_iNXType = NXT_MARKET_FREE;  //프리
 	}
 	else if (IsCurrentTimeBetween(8 + (m_bCSAT * 1), 30, 8 + (m_bCSAT * 1), 40))  //8 30 ~ 8 40
 	{
-		m_iKRXype = 1;   //장전시간외
-		m_iNXType = 1;  //프리
+		m_iKRXype = KRX_MARKET_TIMEOUT;   //장전시간외
+		m_iNXType = NXT_MARKET_FREE;  //프리
 	}
 	else if (IsCurrentTimeBetween(8 + (m_bCSAT * 1), 40, 8 + (m_bCSAT * 1), 50))  //8 40 ~ 8 50
 	{
-		m_iKRXype = 0;  //장마감
-		m_iNXType = 1;  //프리
+		m_iKRXype = KRX_MARKET_END;  //장마감
+		m_iNXType = NXT_MARKET_FREE;  //프리
 	}
 	else if (IsCurrentTimeBetween(8 + (m_bCSAT * 1), 50, 9 + (m_bCSAT * 1), 00))  //8 50 ~ 9 00
 	{
-		m_iKRXype = 0;  //장마감
-		m_iNXType = 0;  //장마감
+		m_iKRXype = KRX_MARKET_END;  //장마감
+		m_iNXType = NXT_MARKET_END;  //장마감
 	}
 	else if (IsCurrentTimeBetween(9 + (m_bCSAT * 1), 0, 15 + (m_bCSAT * 1), 0))  //9 00 ~ 15 00
 	{
-		m_iKRXype = 2;  //정규장
-		m_iNXType = 2;  //정규장
+		m_iKRXype = KRX_MARKET_NORMAL;  //정규장
+		m_iNXType = NXT_MARKET_NORMAL;  //정규장
 	}
 	else if (IsCurrentTimeBetween(15 + (m_bCSAT * 1), 0, 15 + (m_bCSAT * 1), 20))  //15 00 ~ 15 20
 	{
-		m_iKRXype = 2;  //정규장
-		m_iNXType = 2;  //정규장
+		m_iKRXype = KRX_MARKET_NORMAL;  //정규장
+		m_iNXType = NXT_MARKET_NORMAL;  //정규장
 	}
 	else if (IsCurrentTimeBetween(15 + (m_bCSAT * 1), 20, 15 + (m_bCSAT * 1), 30))  //15 20 ~ 15 30
 	{
-		m_iKRXype = 2;  //정규장
-		m_iNXType = 0;  //장마감
+		m_iKRXype = KRX_MARKET_NORMAL;  //정규장
+		m_iNXType = NXT_MARKET_END;  //장마감
 	}
 	else if (IsCurrentTimeBetween(15 + (m_bCSAT * 1), 30, 15 + (m_bCSAT * 1), 40))  //15 30 ~ 15 40
 	{
-		m_iKRXype = 0;  //장마감
-		m_iNXType = 3;  //애프터
+		m_iKRXype = KRX_MARKET_END;  //장마감
+		m_iNXType = NXT_MARKET_AFTER;  //애프터
 	}
 	else if (IsCurrentTimeBetween(15 + (m_bCSAT * 1), 40, 16 + (m_bCSAT * 1), 0))  //15 40 ~ 16 00
 	{
-		m_iKRXype = 1;  //장후시간외
-		m_iNXType = 3;  //애프터
+		m_iKRXype = KRX_MARKET_TIMEOUT;  //장후시간외
+		m_iNXType = NXT_MARKET_AFTER;  //애프터
 	}
 	else if (IsCurrentTimeBetween(16 + (m_bCSAT * 1), 0, 18 + (m_bCSAT * 1), 0))  //16 00 ~ 18 00
 	{
-		m_iKRXype = 3;  //단일가
-		m_iNXType = 3;  //애프터
+		m_iKRXype = KRX_MARKET_ONEPRC;  //단일가
+		m_iNXType = NXT_MARKET_AFTER;  //애프터
 	}
 	else if (IsCurrentTimeBetween(18 + (m_bCSAT * 1), 0, 20 + (m_bCSAT * 1), 0))  //18 00 ~ 20 00
 	{
-		m_iKRXype = 0;    //장마감
-		m_iNXType = 3;    //애프터
+		m_iKRXype = KRX_MARKET_END;    //장마감
+		m_iNXType = NXT_MARKET_AFTER;    //애프터
 	}
 	else if (IsCurrentTimeBetween(20 + (m_bCSAT * 1), 0, 24 + (m_bCSAT * 1), 0))  //20 00 ~ 24 00
 	{
-		m_iKRXype = 0;  //장마감
-		m_iNXType = 0;  //장마감
+		m_iKRXype = KRX_MARKET_END;  //장마감
+		m_iNXType = NXT_MARKET_END;  //장마감
 	}
 	else
 	{
-		m_iKRXype = 0;  //장마감
-		m_iNXType = 0;  //장마감
+		m_iKRXype = KRX_MARKET_END;  //장마감
+		m_iNXType = NXT_MARKET_END;  //장마감
 	}
 
 #ifdef   DF_MK_CAPTION
@@ -17377,13 +17389,13 @@ NXT
 		{
 			case 0:  //휴장일                       
 			{
-				m_iKRXype = 0;   //KRX 장마감
-				m_iNXType = 0;   //NXT 장마감  
+				m_iKRXype = KRX_MARKET_END;   //KRX 장마감
+				m_iNXType = NXT_MARKET_END;   //NXT 장마감  
 			}
 			break;
 			case 1:  //1. 장전              ~08:00               
 			{
-				m_iNXType = 5;   //NXT 장전 
+				m_iNXType = NXT_MARKET_BEFORE;   //NXT 장전 
 			}
 			break;
 			/*
@@ -17392,40 +17404,40 @@ NXT
 			*/
 			case 2:  // 2. 프리마켓     08:00~08:50       
 			{
-				m_iNXType = 1;   //NXT 프리마켓
+				m_iNXType = NXT_MARKET_FREE;   //NXT 프리마켓
 			}
 			break;
 			case 3:  //3. 오전휴장     08:50~09:00                
 			{
 #ifdef DF_KRX_FREEAFTER  //processFMX
-				 m_iNXType = 5;    //KRX AFTER 부터 장마감이 아니라 장전 (휴장이 없다)
+				 m_iNXType = NXT_MARKET_BEFORE;    //KRX AFTER 부터 장마감이 아니라 장전 (휴장이 없다)
 #else
-				m_iNXType = 0;   //NXT 장마감
+				m_iNXType = NXT_MARKET_END;   //NXT 장마감
 #endif
 			}
 			break;
 			case 4:  //메인마켓     09:00~15:20                    
 			{
-				m_iNXType = 2;    //NXT 메인
+				m_iNXType = NXT_MARKET_NORMAL;    //NXT 메인
 			}
 			break;
 			case 5:  //오후휴장     15:20~15:30                    
 			{
 #ifdef DF_KRX_FREEAFTER //processFMX
-				m_iNXType = 5;    //KRX AFTER 부터 장마감이 아니라 장전 (휴장이 없다)
+				m_iNXType = NXT_MARKET_BEFORE;    //KRX AFTER 부터 장마감이 아니라 장전 (휴장이 없다)
 #else
-				m_iNXType = 0;  //NXT 장마감
+				m_iNXType = NXT_MARKET_END;  //NXT 장마감
 #endif
 			}
 			break;
 			case 6:  //단일가매매   15:30~15:40                 
 			{
-				m_iNXType = 4;  //NXT 단일가
+				m_iNXType = NXT_MARKET_ONEPRC;  //NXT 단일가
 			}
 			break;
 			case 7:  //에프터마켓   15:40~18:00                       
 			{
-				m_iNXType = 3;   //NXT 애프터
+				m_iNXType = NXT_MARKET_AFTER;   //NXT 애프터
 			}
 			break;
 			/*
@@ -17434,7 +17446,7 @@ NXT
 		*/
 			case 8:  //장마감       20:00~                    
 			{
-				m_iNXType = 0; //NXT 장마감
+				m_iNXType = NXT_MARKET_END; //NXT 장마감
 			}
 			break;
 			default:
@@ -17465,8 +17477,8 @@ NXT
 /*          4. 정규장장중   09:00~15:20           */
 /*          5. 정후동시호가 15:20~15:30           */
 /*          6. 장후시간외   15:30~16:00           */
-/*          7. 시간외단일가 16:00~18:00           */
-/*          8. 장마감       18:00~                
+/*          7. 애프터마켓(KRX AFTER) 16:00~20:00   */
+/*          8. 장마감       20:00~
 		*/
 		struct PIBOjggb_mod //장운영
 		{
@@ -17489,58 +17501,58 @@ NXT
 			{
 				case 0:  //휴장일                       
 				{
-					m_iKRXype = 0;   //KRX 장마감
+					m_iKRXype = KRX_MARKET_END;   //KRX 장마감
 				}
 				break;
 				case 1:  //1. 장전              ~08:10               
 				{
-					m_iKRXype = 4;   //KRX 장전 ~08:10       
+					m_iKRXype = KRX_MARKET_BEFORE;   //KRX 장전 ~08:10       
 				}
 				break;
 				case 2:  // 2. 장전시간외    08:30~08:40       
 				{
-					m_iKRXype = 1;   //KRX 시간외
+					m_iKRXype = KRX_MARKET_TIMEOUT;   //KRX 시간외  
 				}
 				break;
 				case 3:  //3. 장전동시호가     08:40~08:50    주문접수           
 				{
-					m_iKRXype = 4;   //KRX 장전 08:40~08:50    주문접수     
+					m_iKRXype = KRX_MARKET_BEFORE;   //KRX 장전 08:40~08:50    주문접수     
 				}
 				break;
 				case 4:  //메인마켓     09:00~15:20                    
 				{
-					m_iKRXype = 2;     //KRX 정규장
+					m_iKRXype = KRX_MARKET_NORMAL;     //KRX 정규장
 				}
 				break;
 				case 5:  // 장후동시호가    15:20~15:30                    
 				{
-					m_iKRXype = 2;   //KRX 정규장
+					m_iKRXype = KRX_MARKET_NORMAL;   //KRX 정규장
 				}
 				break;
 				case 6:  //장마감, 시간외   15:30~16:00                 
 				{
-					if(m_iNXType == 4)   //m_iNXType = 4;  //NXT 단일가매매   15:30~15:40       
+					if(m_iNXType == NXT_MARKET_ONEPRC)   //m_iNXType = NXT_MARKET_ONEPRC;  //NXT 단일가매매   15:30~15:40       
 #ifdef DF_KRX_FREEAFTER //processFMX
-						m_iKRXype = 4;  //KRX 장전
+						m_iKRXype = KRX_MARKET_BEFORE;  //KRX 장전
 #else
-						m_iKRXype = 0;  //KRX 장마감
+						m_iKRXype = KRX_MARKET_END;  //KRX 장마감
 #endif
 					else
-						m_iKRXype = 1;   //KRX 시간외
+						m_iKRXype = KRX_MARKET_TIMEOUT;   //KRX 시간외
 				}
 				break;
-				case 7:  //단일가매매   16:00~18:00                       
+				case 7:  //애프터마켓(KRX AFTER)  16:00~20:00
 				{
 #ifdef DF_KRX_FREEAFTER //processFMX
-					m_iKRXype = 6; //KRX AFTER
+					m_iKRXype = KRX_MARKET_AFTER; //KRX AFTER
 #else
-					m_iKRXype = 3;   //KRX 단일가
+					m_iKRXype = KRX_MARKET_ONEPRC;   //KRX 단일가
 #endif
 				}
 				break;
-				case 8:  //장마감       18:00~                    
+				case 8:  //장마감       20:00~
 				{
-					m_iKRXype = 0;  //KRX 장마감
+					m_iKRXype = KRX_MARKET_END;  //KRX 장마감
 				}
 				break;
 				default:
@@ -17554,11 +17566,11 @@ NXT
 		{
 			if (sRes == "A")   //장준비    08:10~08 : 30
 			{
-				m_iKRXype = 4;   //KRX 장전  08:10~08 : 30
+				m_iKRXype = KRX_MARKET_BEFORE;   //KRX 장전  08:10~08 : 30
 			}
 			else if (sRes == "B")  //B. 장전동시호가     08:50~09:00       예상체결
 			{
-				m_iKRXype = 3;   //KRX 단일가
+				m_iKRXype = KRX_MARKET_ONEPRC;   //KRX 단일가
 			}
 		}
 		m_bar1->SetShowAIBtn(m_iKRXype, -1);  //HTS 시작후 장상태조회  pibojggb
@@ -24885,23 +24897,25 @@ void CMainFrame::DrawFrame(CDC* dc)
 
 	if (!m_bSDI)
 	{
-		CBitmap* bmpBgPattern  = Axis::GetSkinBitmap("BG_PATERN");
-
-		CDC mdc;
-		mdc.CreateCompatibleDC(dc);
-		const CBitmap* oldBmp = mdc.SelectObject(bmpBgPattern);
-
-		BITMAP bm;
-		bmpBgPattern->GetBitmap(&bm);
-
-		rc.top += CAPTION_HEIGHT;
-		rc.bottom += 2;
-		rc.left++;
-		rc.right--;
 		
-		dc->StretchBlt( rc.left, rc.top, 2, rc.Height(), &mdc, 0,0, bm.bmWidth, bm.bmHeight, SRCCOPY );
-		dc->StretchBlt( rc.right-2, rc.top, 2, rc.Height(), &mdc, 0,0, bm.bmWidth, bm.bmHeight, SRCCOPY );
-		
+		CBitmap* bmpBgPattern = Axis::GetSkinBitmap("BG_PATERN");
+		if (bmpBgPattern)
+		{
+			CDC mdc;
+			mdc.CreateCompatibleDC(dc);
+			const CBitmap* oldBmp = mdc.SelectObject(bmpBgPattern);
+
+			BITMAP bm;
+			bmpBgPattern->GetBitmap(&bm);
+
+			rc.top += CAPTION_HEIGHT;
+			rc.bottom += 2;
+			rc.left++;
+			rc.right--;
+
+			dc->StretchBlt(rc.left, rc.top, 2, rc.Height(), &mdc, 0, 0, bm.bmWidth, bm.bmHeight, SRCCOPY);
+			dc->StretchBlt(rc.right - 2, rc.top, 2, rc.Height(), &mdc, 0, 0, bm.bmWidth, bm.bmHeight, SRCCOPY);
+		}
 
 		/*rc.top += CAPTION_HEIGHT;
 		rc.bottom += 2;

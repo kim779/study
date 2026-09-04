@@ -1,3 +1,10 @@
+---
+project: src
+category: todo
+status: 미작성
+updated: 2026-07-16
+---
+
 # Todo
 
 - 생성일: 2026-07-07

@@ -24,3 +24,6 @@
 | 2026-07-31 | @docs/DebugLogGuide.md | axlog 중앙로깅 인프라 및 전체 로그 태그 카탈로그(화면열기/스크립트엔진/입력이벤트/소켓파이프라인/CDll/암호화Xecure/NOENC.TXT 개발스위치) — DebugView 검색용 | ✓ 완료 |
 | 2026-08-28 | @docs/FilePatchProtocol.md | 로그인시 파일 패치 프로토콜 — MakeUpdateList() AXIS/RSC 브랜치 판정로직, infoAXIS/infoRSC/updateAXIS/updateRSC/updateX 파일 카탈로그, m_runDown/defer-rsc 지연패치 메커니즘, LOG_FILEPATCH 태그+실측 로그 해설 | 🔍 1차 완료 (vers 필드/m_runDown 트리거 시나리오 미확인) |
 | 2026-08-28 | @docs/LoginSequence.md | 로그인 시퀀스 송신/수신 전체 카탈로그 — OnFireEvent 전체 분기(FEV_ANM/PUSH/VERS/CA 등), _signR 응답 필드 카탈로그, 송신측 7단계(AXLOGONE~LoadHistory), axlog 태그 카탈로그, IBKSConnector 로그인흐름 참고 | 🔍 1차 완료 (OnAlert/OnPush/OnCertify/UpdateVers 로그 방금 추가, 실측 전) |
+| 2026-09-04 | @docs/WizardDependency.md | axWizard.ocx 의존성 4계층(①빌드타임 MFC확장DLL/②COM컨트롤/③고정이름 LoadLibrary/④.map·스크립트가 이름지정하는 가변 플러그인 DLL) — CONTROL/CX_*·C_* 전체가 Wizard에 꽂히는 공통 진입점(GetControl/CreateObject 3중구현) 정리 | ✓ 1차 완료 |
+| 2026-09-04 | @docs/CX_WebViewBidirectional.md | CX_WebView(EdgeView/WebView2) 양방향 통신 현황 — add_WebMessageReceived 훅은 있으나 TODO뿐, PostWebMessageAsString은 주석처리, 스크립트 노출 API는 Navigate류뿐; Gap분석+구현방향 제안 | ✓ 1차 현황조사 완료 (구현 미착수) |
+| 2026-09-04 | @docs/CertifyArchitecture.md | 공동인증서(CertifyCtrl, ibks/certify_cloude) 전체 흐름 — Wizard↔CertifyCtrl 양방향 디스패치 카탈로그, 로그인시 CA활성화/DN수신/CertifyFull, 일반vs클라우드서명, OP_CERTIFY 자동서명, Python OpenAPI 활용범위 비교(모달UI 전제라 헤드리스봇 이식 불가 결론) | ✓ 1차 완료 |

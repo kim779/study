@@ -1,3 +1,10 @@
+---
+project: AXIS
+category: dependency
+status: 작성됨
+updated: 2026-08-21
+---
+
 # AXIS 프로젝트 의존성 분석
 
 

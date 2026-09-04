@@ -146,12 +146,18 @@ void CBmpButton::SetImgBitmap(CBitmap* bmp, int statusCount)
 
 	ReleaseBitmap();
 
-	m_bmp = (HBITMAP)bmp->m_hObject;
+	if (!bmp)
+		return;
 
+	m_bmp = (HBITMAP)bmp->m_hObject;
+	if (!m_bmp)
+		return;
+	
 	m_statusCount = statusCount;
 	m_bmpSize = BitmapSize(m_bmp);
 	if (::IsWindow(m_hWnd))
 		FitImageSize();
+	
 }
 
 void CBmpButton::SetFont(CFont* pFont, BOOL redraw)

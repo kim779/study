@@ -609,15 +609,25 @@ void CGrpWnd::RealTimeData(struct _alertR* alert)
 	
 	for (int ii = alert->size - 1; ii >= 0; ii--)
 	{
+		DWORD*	data = (DWORD*)alert->ptr[ii];
+
+		// 000(구분)이 "B"인데 568(상태코드)이 K1/N1/K4/K0가 아니면 우선 실시간 데이터 반영 안 함
+		if (data[0] && CString((char*)data[0]) == "B")
+		{
+			CString sSts = data[568] ? (char*)data[568] : "";
+			if (sSts != "K1" && sSts != "N1" && sSts != "K4" && sSts != "K0")
+				continue;
+		}
+
 		if (m_bItemRts)
 		{
-			if (RealTimeItems(sCode, (DWORD*)alert->ptr[ii]))
+			if (RealTimeItems(sCode, data))
 				bChange = true;
 
 		}
 		else
 		{
-			if (RealTimeBasic(sCode, (DWORD*)alert->ptr[ii]))
+			if (RealTimeBasic(sCode, data))
 				bChange = true;
 		}
 	}

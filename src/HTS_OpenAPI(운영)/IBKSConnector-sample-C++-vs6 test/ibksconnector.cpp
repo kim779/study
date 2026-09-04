@@ -599,3 +599,103 @@ BOOL CIBKSConnector::TR3232(long key, LPCTSTR acno, LPCTSTR pswd, long fstp, lon
 		key, acno, pswd, fstp, ertp);
 	return result;
 }
+
+BOOL CIBKSConnector::TR2001(long key, LPCTSTR upcd, long dtgb)
+{
+	BOOL result;
+	static BYTE parms[] =
+		VTS_I4 VTS_BSTR VTS_I4;
+	InvokeHelper(0x3f, DISPATCH_METHOD, VT_BOOL, (void*)&result, parms,
+		key, upcd, dtgb);
+	return result;
+}
+
+void CIBKSConnector::SetPrograms(long pggb)
+{
+	static BYTE parms[] =
+		VTS_I4;
+	InvokeHelper(0x40, DISPATCH_METHOD, VT_EMPTY, NULL, parms,
+		pggb);
+}
+
+BOOL CIBKSConnector::TR1223(long key, LPCTSTR acno, LPCTSTR pswd, long allf, long mkgubn, LPCTSTR nkey)
+{
+	BOOL result;
+	static BYTE parms[] =
+		VTS_I4 VTS_BSTR VTS_BSTR VTS_I4 VTS_I4 VTS_BSTR;
+	InvokeHelper(0x41, DISPATCH_METHOD, VT_BOOL, (void*)&result, parms,
+		key, acno, pswd, allf, mkgubn, nkey);
+	return result;
+}
+
+BOOL CIBKSConnector::TR1203(long key, long mmgb, LPCTSTR acno, LPCTSTR pswd, long ojno, LPCTSTR code, long jqty, long jprc, long hogb, long mdgb, long mkgb)
+{
+	BOOL result;
+	static BYTE parms[] =
+		VTS_I4 VTS_I4 VTS_BSTR VTS_BSTR VTS_I4 VTS_BSTR VTS_I4 VTS_I4 VTS_I4 VTS_I4 VTS_I4;
+	InvokeHelper(0x42, DISPATCH_METHOD, VT_BOOL, (void*)&result, parms,
+		key, mmgb, acno, pswd, ojno, code, jqty, jprc, hogb, mdgb, mkgb);
+	return result;
+}
+
+BOOL CIBKSConnector::TR1004(long key, LPCTSTR code, LPCTSTR symb)
+{
+	BOOL result;
+	static BYTE parms[] =
+		VTS_I4 VTS_BSTR VTS_BSTR;
+	InvokeHelper(0x43, DISPATCH_METHOD, VT_BOOL, (void*)&result, parms,
+		key, code, symb);
+	return result;
+}
+
+BOOL CIBKSConnector::TR1005(long key, LPCTSTR code, LPCTSTR symb)
+{
+	BOOL result;
+	static BYTE parms[] =
+		VTS_I4 VTS_BSTR VTS_BSTR;
+	InvokeHelper(0x44, DISPATCH_METHOD, VT_BOOL, (void*)&result, parms,
+		key, code, symb);
+	return result;
+}
+
+BOOL CIBKSConnector::TR1006(long key, LPCTSTR val)
+{
+	BOOL result;
+	static BYTE parms[] =
+		VTS_I4 VTS_BSTR;
+	InvokeHelper(0x45, DISPATCH_METHOD, VT_BOOL, (void*)&result, parms,
+		key, val);
+	return result;
+}
+
+BOOL CIBKSConnector::TR1007(long key, LPCTSTR code, LPCTSTR symb)
+{
+	BOOL result;
+	static BYTE parms[] =
+		VTS_I4 VTS_BSTR VTS_BSTR;
+	InvokeHelper(0x46, DISPATCH_METHOD, VT_BOOL, (void*)&result, parms,
+		key, code, symb);
+	return result;
+}
+
+BOOL CIBKSConnector::LoginQuote(LPCTSTR user_id, LPCTSTR user_pw, LPCTSTR svr_ip, long svr_port)
+{
+	BOOL result;
+	static BYTE parms[] =
+		VTS_BSTR VTS_BSTR VTS_BSTR VTS_I4;
+	InvokeHelper(0x47, DISPATCH_METHOD, VT_BOOL, (void*)&result, parms,
+		user_id, user_pw, svr_ip, svr_port);
+	return result;
+}
+
+BOOL CIBKSConnector::ShowChaser()
+{
+	BOOL result;
+	InvokeHelper(0x48, DISPATCH_METHOD, VT_BOOL, (void*)&result, NULL);
+	return result;
+}
+
+void CIBKSConnector::HideChaser()
+{
+	InvokeHelper(0x49, DISPATCH_METHOD, VT_EMPTY, NULL, NULL);
+}

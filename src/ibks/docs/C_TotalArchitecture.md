@@ -1,3 +1,10 @@
+---
+project: ibks
+category: architecture
+status: 작성됨
+updated: 2026-08-28
+---
+
 # C_Total 아키텍처
 
 ## 목차

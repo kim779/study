@@ -1,3 +1,10 @@
+---
+project: ibks
+category: knowledge-base
+status: 완료
+updated: 2026-08-28
+---
+
 # ibks 프로젝트 지식 베이스
 
 

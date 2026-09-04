@@ -1,3 +1,10 @@
+---
+project: ibks
+category: investigation
+status: 조사중
+updated: 2026-08-21
+---
+
 # 실시간 시세(RTM) 종목코드 역인덱스 도입 조사
 
 

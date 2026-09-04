@@ -3545,8 +3545,8 @@ BOOL CGuard::Write(char* pBytes, int nBytes, bool trace)
 					dispBuf += (c == '\0' || c == '\r' || c == '\n') ? '.' : c;
 				}
 
-				axlog(LOG_SOCK_SEND, "[0-Write-send] #%d winK=%d unit=%d msgK=%d trxC=%.8s datL=%d chunk=%d/%d preview=[%s]",
-					msgIdx, dbgH->winK, dbgH->unit, dbgH->msgK, dbgH->trxC, subDatL, chunk+1, nChunks,
+				axlog(LOG_SOCK_SEND, "[0-Write-send] #%d winK=%d unit=%d msgK=%d stat=%d auxs=%d trxC=%.8s datL=%d chunk=%d/%d preview=[%s]",
+					msgIdx, dbgH->winK, dbgH->unit, dbgH->msgK, dbgH->stat, dbgH->auxs, dbgH->trxC, subDatL, chunk+1, nChunks,
 					dispBuf.GetString());
 			}
 			offset += L_axisH + subDatL;
@@ -4415,7 +4415,7 @@ BOOL CGuard::SetFont(int point, bool resize, int key)
 
 BOOL CGuard::Certify(BOOL force, BOOL certify, BOOL xcertify, BOOL xserver)
 {
-	axlog(LOG_INIT, "CGuard::Certify force=%d certify=%d xcertify=%d xserver=%d hasCertifyCtrl=%d",
+	axlog(LOG_CERTIFY, "CGuard::Certify force=%d certify=%d xcertify=%d xserver=%d hasCertifyCtrl=%d",
 		force, certify, xcertify, xserver, m_certify ? 1 : 0);
 	if (certify)
 	{
@@ -4429,7 +4429,7 @@ BOOL CGuard::Certify(BOOL force, BOOL certify, BOOL xcertify, BOOL xserver)
 			{
 				delete m_certify;
 				m_certify = NULL;
-				axlog(LOG_INIT, "CGuard::Certify CreateControl(AxisCertify.CertifyCtrl.IBK2019) FAILED");
+				axlog(LOG_CERTIFY, "CGuard::Certify CreateControl(AxisCertify.CertifyCtrl.IBK2019) FAILED");
 				if (!force)
 				{
 					AfxMessageBox("Xecure create fail");
@@ -4437,11 +4437,13 @@ BOOL CGuard::Certify(BOOL force, BOOL certify, BOOL xcertify, BOOL xserver)
 				}
 				return TRUE;
 			}
+			axlog(LOG_CERTIFY, "CGuard::Certify CreateControl OK");
 		}
 
 		if (certify && xcertify && !xserver)
 		{
 			m_certify->InvokeHelper(DI_CAEX, DISPATCH_METHOD, VT_BOOL, (void*)&retv, (BYTE *)(VTS_I4 VTS_I4), NULL, NULL);
+			axlog(LOG_CERTIFY, "CGuard::Certify DI_CAEX(NULL) retv=%d", retv);
 			if (!retv)
 				return FALSE;
 		}
@@ -4455,10 +4457,12 @@ BOOL CGuard::Certify(BOOL force, BOOL certify, BOOL xcertify, BOOL xserver)
 				text += '\t';
 			}
 			m_certify->InvokeHelper(DI_CAEX, DISPATCH_METHOD, VT_BOOL, (void*)&retv, (BYTE *)(VTS_I4 VTS_I4), (long)text.operator LPCTSTR(), 0);
+			axlog(LOG_CERTIFY, "CGuard::Certify DI_CAEX(accno) accnoCount=%d retv=%d", m_accno.GetSize(), retv);
 		}
 	}
 	else if (m_certify)
 	{
+		axlog(LOG_CERTIFY, "CGuard::Certify delete m_certify");
 		delete m_certify;
 		m_certify = NULL;
 	}
@@ -4467,12 +4471,13 @@ BOOL CGuard::Certify(BOOL force, BOOL certify, BOOL xcertify, BOOL xserver)
 
 int CGuard::OnCertify(char* pBytes, int nBytes)
 {
-	axlog(LOG_INIT, "CGuard::OnCertify nBytes=%d hasCertifyCtrl=%d", nBytes, m_certify ? 1 : 0);
+	axlog(LOG_CERTIFY, "CGuard::OnCertify nBytes=%d hasCertifyCtrl=%d", nBytes, m_certify ? 1 : 0);
 	if (!m_certify)
 		return -1;
 
 	long	retv;
 	m_certify->InvokeHelper(DI_ONCA, DISPATCH_METHOD, VT_I4, (void*)&retv, (BYTE *)(VTS_I4 VTS_I4), pBytes, &nBytes);
+	axlog(LOG_CERTIFY, "CGuard::OnCertify DI_ONCA result nBytes=%d", nBytes);
 	if (nBytes > 0)
 	{
 		if (m_term & flagXCS || Write(msgK_XCA, "AXISENCA", (char *)retv, nBytes))
@@ -4484,17 +4489,21 @@ int CGuard::OnCertify(char* pBytes, int nBytes)
 
 BOOL CGuard::CertifyErr(char* pBytes, int nBytes)
 {
+	axlog(LOG_CERTIFY, "CGuard::CertifyErr nBytes=%d hasCertifyCtrl=%d", nBytes, m_certify ? 1 : 0);
 	if (!m_certify)
 		return FALSE;
 
 	BOOL	retv;
 	m_certify->InvokeHelper(DI_CAERR, DISPATCH_METHOD, VT_BOOL, (void*)&retv,
 						(BYTE *)(VTS_I4 VTS_I4), pBytes, nBytes);
+	axlog(LOG_CERTIFY, "CGuard::CertifyErr DI_CAERR retv=%d", retv);
 	return retv;
 }
 
 BOOL CGuard::Certify(char* pBytes, int& nBytes, CString maps)
 {
+	axlog(LOG_CERTIFY, "CGuard::Certify(TR-sign) maps=%.8s nBytes=%d hasCertifyCtrl=%d selfWS=%d",
+		maps.GetString(), nBytes, m_certify ? 1 : 0, (m_status & WS_SELF) ? 1 : 0);
 	if (!m_certify || !(m_status & WS_SELF))
 	{
 		SetGuide(AE_ECERTIFY);
@@ -4504,12 +4513,13 @@ BOOL CGuard::Certify(char* pBytes, int& nBytes, CString maps)
 	BOOL	retv;
 	m_certify->InvokeHelper(DI_CA, DISPATCH_METHOD, VT_BOOL, (void*)&retv,
 					(BYTE *)(VTS_I4 VTS_I4 VTS_I4), pBytes, &nBytes, (char *)maps.operator LPCTSTR());
+	axlog(LOG_CERTIFY, "CGuard::Certify(TR-sign) DI_CA retv=%d signedLen=%d", retv, nBytes);
 	return retv;
 }
 
 void CGuard::CertifyId(char* pBytes, bool retry)
 {
-	axlog(LOG_INIT, "CGuard::CertifyId retry=%d", retry ? 1 : 0);
+	axlog(LOG_CERTIFY, "CGuard::CertifyId retry=%d", retry ? 1 : 0);
 	Certify(TRUE, TRUE);
 	if (m_certify)
 		m_certify->InvokeHelper(DI_CAID, DISPATCH_METHOD, VT_EMPTY, NULL, (BYTE *)(VTS_I4), pBytes);

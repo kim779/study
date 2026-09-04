@@ -1,3 +1,10 @@
+---
+project: ibks
+category: todo
+status: 완료
+updated: 2026-08-21
+---
+
 # ibks 프로젝트 진행 과제 (Todo)
 
 

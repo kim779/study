@@ -428,7 +428,18 @@ int CDataMgr::ParseRealtime(CString sCode, CString strRTData, bool& rbIncrease)
 
 		strRTData = strRTData.Mid(iPos);
 	}
-	
+
+	// 000(구분)이 "B"인데 568(상태코드)이 K1/N1/K4/K0가 아니면 우선 실시간 데이터 반영 안 함
+	{
+		CString	strGubn, strSts;
+		mapRtmStore.Lookup("000", strGubn);
+		if (strGubn == "B")
+		{
+			mapRtmStore.Lookup("568", strSts);	// 필드 자체가 없으면 strSts는 빈 문자열로 남음
+			if (strSts != "K1" && strSts != "N1" && strSts != "K4" && strSts != "K0")
+				return iResponse;
+		}
+	}
 
 	CString	astrSymbol[10] = { R_CTIM, R_CURR, R_DIFF, R_UDYL, R_GVOL, R_MDGA, R_MSGA, R_SIGA, R_KOGA, R_JEGA};
 	CString	astrBasicVal[10] = { "", "", "", "", "", "", "", "", "", ""};

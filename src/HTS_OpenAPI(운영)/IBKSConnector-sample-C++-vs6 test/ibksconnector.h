@@ -104,6 +104,17 @@ public:
 	BOOL TR3411(long key, LPCTSTR mymd);
 	CString GetGreeksData(LPCTSTR sData);
 	BOOL TR3232(long key, LPCTSTR acno, LPCTSTR pswd, long fstp, long ertp);
+	BOOL TR2001(long key, LPCTSTR upcd, long dtgb);
+	void SetPrograms(long pggb);
+	BOOL TR1223(long key, LPCTSTR acno, LPCTSTR pswd, long allf, long mkgubn, LPCTSTR nkey);
+	BOOL TR1203(long key, long mmgb, LPCTSTR acno, LPCTSTR pswd, long ojno, LPCTSTR code, long jqty, long jprc, long hogb, long mdgb, long mkgb);
+	BOOL TR1004(long key, LPCTSTR code, LPCTSTR symb);
+	BOOL TR1005(long key, LPCTSTR code, LPCTSTR symb);
+	BOOL TR1006(long key, LPCTSTR val);
+	BOOL TR1007(long key, LPCTSTR code, LPCTSTR symb);
+	BOOL LoginQuote(LPCTSTR user_id, LPCTSTR user_pw, LPCTSTR svr_ip, long svr_port);
+	BOOL ShowChaser();
+	void HideChaser();
 
 };
 

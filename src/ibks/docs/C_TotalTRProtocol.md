@@ -1,3 +1,10 @@
+---
+project: ibks
+category: protocol
+status: 작성됨
+updated: 2026-08-28
+---
+
 # C_Total TR 요청/응답 구조체 (송수신 프로토콜)
 
 ## 목차

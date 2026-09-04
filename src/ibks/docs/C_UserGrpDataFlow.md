@@ -1,3 +1,10 @@
+---
+project: ibks
+category: data-flow
+status: 작성됨
+updated: 2026-08-28
+---
+
 # C_UserGrp: Data Flow Architecture
 
 ## Overview

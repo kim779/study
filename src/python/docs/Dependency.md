@@ -1,3 +1,10 @@
+---
+project: python
+category: dependency
+status: 미작성
+updated: 2026-07-09
+---
+
 # Dependency
 
 - 생성일: 2026-07-08

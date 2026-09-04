@@ -1,3 +1,10 @@
+---
+project: python
+category: build
+status: 미작성
+updated: 2026-07-09
+---
+
 # Build
 
 - 생성일: 2026-07-08

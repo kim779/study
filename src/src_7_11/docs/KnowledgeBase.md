@@ -1,3 +1,10 @@
+---
+project: src_7_11
+category: knowledge-base
+status: 작성됨
+updated: 2026-07-10
+---
+
 # KnowledgeBase
 
 - 생성일: 2026-07-07

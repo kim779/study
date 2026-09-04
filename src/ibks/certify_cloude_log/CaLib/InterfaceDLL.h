@@ -6,11 +6,6 @@
 #ifdef _SKEURE 
 #include "session_api.h"
 #endif
-#ifdef _AFXDLL 
-
-#include "./sk_pc_identity.h"
-#endif
-//_AFXDLL
 
 #define IN
 #define OUT
@@ -153,6 +148,18 @@ extern "C" {
 						const char *pszPassword,
 						int	bMakeContentInfoOrNot,
 						UString *pIn, UString *pOut, UString *pR) ;
+	////
+	__declspec(dllimport) int
+		sk_if_cert_checkexpire(SD_API_CONTEXT *pContext);
+
+	__declspec(dllimport) BOOL sk_if_CertNew_DirectCM_NoSave(SD_API_CONTEXT_NEW *pContext, int nOption) ;
+
+	__declspec(dllimport) int
+		sk_if_cert_CMSSignDataInfo_directCM(APP_CONTEXT *pApp_Context,
+		const char *pszPassword,
+		int	bMakeContentInfoOrNot,
+		UString *pIn, UString *pOut, UString *pR);
+	///
 
 	__declspec(dllimport) int
 				sk_if_cert_CMSVerifySignedDataInfo(APP_CONTEXT *pApp_Context,
@@ -338,7 +345,7 @@ extern "C" {
 	__declspec(dllimport) int  sk_if_SetCertNewUrlInfo(LPCTSTR url) ;
 	__declspec(dllimport) int  sk_if_SetExipreCheckSkip(int boolFlag) ;
 
-	__declspec(dllimport) BOOL sk_if_CMP_SetCmpConfig(const char *ip, int port) ;
+	__declspec(dllimport) BOOL sk_if_CMP_SetCmpConfig(const char *ip, int port) ;	
 	
 	//-----------------------------------------------------------------------------------------
 	//	- 인증서 선택시 저장매체별 수동선택 
@@ -375,7 +382,7 @@ extern "C" {
 	//      pOid => 정책 OID 직접 입력   (oid end 표시 ';')
 	
 	// 호출 예 ) 범용인증서만 선택창에서 보여주고 싶은 경우 
-		//           sk_if_SetPolicyFilter(1+16, "");
+	//           sk_if_SetPolicyFilter(1+16, "");
 	//
 	//           증권전용 인증서와 OID가 1.2.410.200004.5.1.1.4 또는  1.2.410.200004.5.1.1.5 인 인증서 선택 
 	//			 sk_if_SetPolicyFilter(256, "1.2.410.200004.5.1.1.4;1.2.410.200004.5.1.1.5;");
@@ -452,8 +459,6 @@ extern "C" {
 	     return : encrypted size  플래그 + 16 = 17
 		                          플래그 + 32 = 33
 	--------------------------------------------------------------------------------------------*/
-	__declspec(dllimport) int sk_if_GetPCIdentity(PC_INFO_CONTEXT* pContext, int nMode);
-	/*--------------------------------------------------------------------------------------------*/
 	__declspec(dllimport) int sk_if_GetEncryptedPassword(const char *password, char *enc_password33Bytes );	
 	/*-------------------------------------------------------------------------------------------
 	   int sk_if_GetEncryptedPasswordB64(const char *pPassword, char *pOutBuf, int *nOutlen );
@@ -538,10 +543,7 @@ extern "C" {
   
 	__declspec(dllexport) void sk_if_show_tray(void);
     __declspec(dllexport) void sk_if_hide_tray(void);
-	
-	//[9.9.7.4] [2017/12/15] #222 통합인증앱 연동 임시키 생성 서명 기능 추가
-	__declspec(dllimport) int sk_if_Appcert_GenKeyAndSign
-		(HWND hwnd, SD_API_CONTEXT_NEW * Context, char * pUserDn, bool bUseVerifyCode, UString *pInputData, UString *pOutSignData,UString *pR);
+
 	//[9.9.9.0] [2021/03/03] 폴더 경로를 지정 해줄 수 있는 api 추가
 	__declspec(dllimport) int sk_if_SetEnvPath(char *pfolderPath, int nOption);
 
@@ -578,6 +580,7 @@ extern "C" {
 	/*-------------------------------------------------------------------------------------------
 	[10.0.0.1] [2021/11/29] #260 클라우드 인증 기능 추가
 	--------------------------------------------------------------------------------------------*/
+	__declspec(dllimport) int sk_if_Set_CloudLicenseCheckFileName(char * cFileName);
 	__declspec(dllimport) int sk_if_Set_CloudConfig(CloudConfig cloud_config);		
 	__declspec(dllimport) int sk_if_Set_Show_OnlyValidateCloudCert_flag(int flag);
 	__declspec(dllimport) int sk_if_Cloud_KeyPadUse(int flag);
@@ -594,6 +597,7 @@ extern "C" {
 	__declspec(dllimport) int sk_if_NotCloudConnect_PinCheckPossibleOnOff(int flag);
 	__declspec(dllimport) int sk_if_Cloud_AutoConnectCheckBoxHide(int flag);
 	__declspec(dllimport) int sk_if_Cloud_GetCurrentUserID(char * char65Byte_UserID, int nOptionValue);
+	__declspec(dllimport) int sk_if_Cloud_AbroadPhoneAuthenticationOnOff(int flag);
 
 #ifdef __cplusplus
 }

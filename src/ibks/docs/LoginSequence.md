@@ -1,3 +1,10 @@
+---
+project: ibks
+category: other
+status: 완료
+updated: 2026-08-30
+---
+
 # 로그인 시퀀스 — 송신/수신 전체 카탈로그
 
 ## 목차

@@ -1,3 +1,10 @@
+---
+project: AxisChaser
+category: source-index
+status: 작성됨
+updated: 2026-07-10
+---
+
 # SourceIndex
 
 - 생성일: 2026-07-10

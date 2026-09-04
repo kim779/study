@@ -464,6 +464,18 @@ bool CGrpWnd::Alert(CString sRTM)
 		rtm = rtm.Mid(index);
 	}
 
+	// 000(구분)이 "B"인데 568(상태코드)이 K1/N1/K4/K0가 아니면 우선 실시간 데이터 반영 안 함
+	{
+		CString	strGubn, strSts;
+		rtmStore.Lookup("000", strGubn);
+		if (strGubn == "B")
+		{
+			rtmStore.Lookup("568", strSts);	// 필드 자체가 없으면 strSts는 빈 문자열로 남음
+			if (strSts != "K1" && strSts != "N1" && strSts != "K4" && strSts != "K0")
+				return false;
+		}
+	}
+
 	m_siga = m_koga = m_jega = m_jgga = _T("");
 	m_gvol = m_ctim = _T("");
 

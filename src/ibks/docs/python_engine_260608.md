@@ -1,3 +1,10 @@
+---
+project: ibks
+category: other
+status: 완료
+updated: 2026-08-21
+---
+
 # VBScript -> Python Engine 전환 프로젝트 (2026-06-08 ~)
 
 

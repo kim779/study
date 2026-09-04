@@ -1,3 +1,10 @@
+---
+project: ibks
+category: dependency
+status: 작성됨
+updated: 2026-08-28
+---
+
 # C_Total 의존성 분석
 
 ## 목차
@@ -308,6 +315,79 @@ pWnd = axCreateCtrl(GEV_CHART, m_pwndView, this, (char*)m_pEnvInfo, m_pFont);
 
 자세한 내용은 [AxisGMain_GDlgDependency.md](AxisGMain_GDlgDependency.md) 참고.
 
+### 빌드타임 링크 vs 런타임 로딩 — 전체 계층 구조 (2026-09-02 추가)
+
+"lib를 IDE 차원에서 링크하는 것"과 "코드로 LoadLibrary 하는 것"이 이 모듈 체인에서는 **완전히
+분리된 두 계층**으로 겹쳐 있습니다. `C_Total.dll` → `axisGMain.dll`은 순수 런타임 계층(빌드
+의존성 0)인데, `axisGMain.dll` → `axisGData.dll` 등은 반대로 순수 빌드타임 계층(암시적 링크)이라
+같은 "DLL을 쓴다"는 말이 두 단계에서 서로 다른 메커니즘을 가리킵니다. 게다가 그 빌드타임 계층의
+실제 파일 탐색조차, 전혀 관련 없어 보이는 `axWizard.ocx`(Wizard 모듈)가 세팅해둔 프로세스 전역
+PATH 값에 의해 좌우됩니다(exe→dev 실측 확인, 2026-09-02).
+
+```mermaid
+graph TD
+    subgraph L1["① 빌드타임 — IDE/링커가 처리 (컴파일 시점 확정)"]
+        CTotal["C_Total.dll<br/>(C_Total.vcxproj)"]
+        GMain["axisGMain.dll<br/>(axisGMain.vcxproj)"]
+        GData["axisGData.dll<br/>ConfigurationType=DynamicLibrary"]
+        GIndc["axisGIndc.dll<br/>ConfigurationType=DynamicLibrary"]
+        GTool["axisGTool.dll<br/>ConfigurationType=DynamicLibrary"]
+        MPat["AxMPattern.dll<br/>ConfigurationType=DynamicLibrary"]
+
+        CTotal -. "링크 의존성 없음<br/>(AdditionalDependencies에 axisGMain 항목 자체가 없음)" .-> GMain
+        GMain -- "AdditionalDependencies:<br/>axisGData.lib" --> GData
+        GMain -- "AdditionalDependencies:<br/>axisGIndc.lib" --> GIndc
+        GMain -- "AdditionalDependencies:<br/>axisGTool.lib" --> GTool
+        GMain -- "AdditionalDependencies:<br/>axMPattern.lib" --> MPat
+    end
+
+    subgraph L2["② 런타임 — Windows 로더가 처리 (프로세스 실행 시점 확정)"]
+        direction TB
+        Step1["CMainWnd::OnCreate()<br/>LoadLibrary 3단계 폴백<br/>①#DF_ABSOLUTE_PATH: {root}\\dev\\axisGMain.dll<br/>②bare name: axisGMain.dll<br/>③LoadLibraryEx + LOAD_WITH_ALTERED_SEARCH_PATH"]
+        Step2["axisGMain.dll 로드 성공<br/>→ PE 임포트 테이블의<br/>axisGData/GIndc/GTool/AxMPattern.dll을<br/>Windows 표준 DLL 검색순서로 자동 탐색"]
+        Step3["GetProcAddress(m_hGMainLib,'axCreateCtrl')<br/>함수 포인터로 실제 호출"]
+        Step1 --> Step2 --> Step3
+    end
+
+    subgraph L3["③ PATH 주입 — 완전히 별개 모듈의 부작용 (프로세스 전역)"]
+        Wizard["axWizard.ocx<br/>CGuard::Initial() (Guard.cpp)"]
+        PathEnv["프로세스 PATH 환경변수<br/>SetEnvironmentVariable('path',<br/>기존PATH;{root}\\exe;{root}\\dev)"]
+        Wizard -- "append, 이 순서 그대로" --> PathEnv
+    end
+
+    L1 -. "빌드 산출물(.dll 파일)만 연결,<br/>어디서 찾을지는 무관" .-> L2
+    PathEnv -. "표준 검색순서 마지막 단계(PATH)로<br/>axisGData.dll 등을 찾을 때 참조됨" .-> Step2
+
+    style L1 fill:#eef,stroke:#88a
+    style L2 fill:#efe,stroke:#8a8
+    style L3 fill:#fee,stroke:#a88
+```
+
+**계층별 정리:**
+
+| 계층 | 확정 시점 | 메커니즘 | 이 체인에서의 실제 모습 |
+|---|---|---|---|
+| ① 빌드타임 | 컴파일/링크 시 | `AdditionalDependencies`(import lib 암시적 링크) | `C_Total`→`axisGMain`은 **없음**(0건). `axisGMain`→`axisGData/GIndc/GTool/AxMPattern`은 **있음**(4건 전부 DynamicLibrary의 import lib) |
+| ② 런타임 | 프로세스 실행 시 | `LoadLibrary`/`LoadLibraryEx` + `GetProcAddress` | `C_Total`이 `axisGMain.dll`을 3단계 폴백으로 직접 찾음(맨 처음엔 `dev\` 절대경로, 실패시 bare name) |
+| (② 부속) | `axisGMain.dll` 로드 성공 직후, 자동 | Windows 로더의 표준 DLL 검색순서(앱 폴더→시스템→...→PATH) | `axisGData.dll` 등 ①에서 링크된 4개 DLL이 이 시점에 **로더에 의해 자동으로** 탐색됨 — `C_Total`/`axisGMain` 코드는 이 탐색 자체를 제어하지 않음 |
+| ③ PATH 주입 | 세션 시작 시 (Wizard 쪽) | `SetEnvironmentVariable` | `axWizard.ocx`가 `{root}\exe`를 `{root}\dev`보다 먼저 PATH에 추가 → ②-부속 단계의 최후 검색 지점(PATH)에서 **exe가 항상 dev보다 우선** |
+
+**실측으로 확인된 결과:** `axisGMain.dll`은 `dev\`에 두든 `exe\`(폴백)에서 찾든 상관없이 로드되지만, 그 안의 임포트 의존성인 `axisGData.dll`은 exe/dev 둘 다에 있으면 **무조건 exe가 이깁니다** — PATH에서 exe가 dev보다 앞서 등록되기 때문입니다. 개발 중 `axisGData.dll`만 교체해서 테스트하려면 exe에 구버전이 남아있지 않은지 항상 먼저 확인해야 합니다(자세한 경위는 `docs/KnowledgeBase.md`에 추가 예정).
+
+### ①의 두 패턴 — "확장(Extension) DLL"과 "순수 런타임 플러그인"은 이름만 같지 완전히 다른 메커니즘
+
+같은 "①빌드타임 링크"라는 말 안에도 `C_Total→axisGMain`과 `axisGMain→axisGData`는 성격이 정반대입니다.
+
+| | `C_Total → axisGMain` | `axisGMain → axisGData`(+GIndc/GTool/AxMPattern) |
+|---|---|---|
+| 빌드 시 헤더 include | 없음 | **있음** — `axisGMain`이 `axisGData`의 클래스 헤더를 그대로 include (`ObjMgr.cpp`/`PnChart.h`: `#include "../gData/DataMgr.h"`) |
+| 빌드 시 lib 링크 | 없음 (`AdditionalDependencies` 자체가 없음) | **있음** — `axisGData.lib` 등 import lib을 `AdditionalDependencies`로 링크 |
+| 호출 방식 | `GetProcAddress`로 C 함수 포인터 1개(`axCreateCtrl`)만 획득 | 마치 static lib처럼 `CDataMgr` 등 **C++ 클래스를 직접 new/호출** |
+| DLL 종류 | 일반(Regular) DLL | **MFC 확장(Extension) DLL** — 소스에서 확인됨: `axisGData.cpp`에 `static AFX_EXTENSION_MODULE AxisGDataDLL`, `AfxInitExtensionModule(AxisGDataDLL, hInstance)`, `.dsp`에 `_AFXDLL`+`_AFXEXT` 정의 |
+| 용도 | 코드에서 존재 자체를 몰라도 되는 느슨한 플러그인 연결 | 같은 MFC 버전을 쓰는 여러 DLL 사이에서 C++ 클래스/객체를 그대로 공유하기 위한 정식 MFC 메커니즘 |
+
+**공통점(중요):** 이렇게 헤더+lib까지 다 갖춘 "확장 DLL" 관계라도, **실제 `.dll` 파일 자체를 어디서 찾을지는 여전히 런타임(②) 소관**입니다 — 빌드는 "이런 이름의 DLL을 쓴다"는 참조만 PE 임포트 테이블에 새겨넣을 뿐이고, 그 이름을 실제 파일로 매핑하는 건 프로세스 실행 시점에 Windows 로더가 표준 검색순서(→PATH, ③의 exe/dev 우선순위)로 수행합니다. 즉 "빌드타임에 링크됐다"가 "런타임 검색경로와 무관하다"를 의미하지 않는다는 게 이번 조사의 핵심입니다.
+
 ---
 
 ## 포함 경로
@@ -459,3 +539,9 @@ graph LR
 
 - **초기 작성**: 2026-08-27
 - **마지막 갱신**: 2026-08-27 (런타임 LoadLibrary 의존성: axisGMain.dll/axisGDlg.dll 추가)
+- **2026-09-02**: "빌드타임 링크 vs 런타임 로딩 — 전체 계층 구조" 절 추가. axisGMain.dll의 실제 임포트
+  의존성(axisGData/GIndc/GTool/AxMPattern, 전부 vcxproj `AdditionalDependencies`로 확인)과, 그
+  의존성 탐색이 axWizard.ocx(`Guard.cpp`)가 세팅하는 프로세스 PATH(exe 우선, dev 폴백)에 좌우된다는
+  실측 사실을 도식화함. 이어서 axisGData 등이 `AFX_EXTENSION_MODULE`/`AfxInitExtensionModule`/
+  `_AFXEXT` 근거로 실제 **MFC 확장(Extension) DLL**임을 소스로 확인하고, `C_Total→axisGMain`(순수
+  런타임 플러그인, 헤더/lib 없음)과의 차이를 비교표로 정리함.

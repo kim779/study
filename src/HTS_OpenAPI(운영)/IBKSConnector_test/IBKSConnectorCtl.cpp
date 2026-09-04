@@ -8,9 +8,49 @@
 #include "grid_i.h"
 #include <math.h>
 #include "../../h/grid.h"
+#include <fstream>
+#include <string>
+//#include <gsl/span>  
+
 
 #define MB_CAPTION		("IBK투자증권")
 #define MB_ERROPTION	(MB_OK|MB_ICONERROR)
+
+// AxisChaser 프로토콜 트레이스 연동 (AXIS/MainFrm.cpp의 CreateChaser/showChaser/OnCHASER를 그대로 이식,
+// 2026-09-03). AxisChaser.exe/CWnd::FindWindow는 top-level 창만 찾을 수 있는데 IBKSConnector.ocx는
+// Python(Qt) 안에 임베드된 자식 컨트롤이라, AxisChaser 자체 체크박스가 클래스명으로 찾아 되돌려 보내는
+// 역방향 ON/OFF 채널은 못 쓴다 - 그래서 ShowChaser() 한 번 호출로 프로세스 실행+트레이스 시작을 같이 한다.
+#define OPENAPI_CHASER_KEY	"IBK_OPENAPI"
+#define WM_CHASER	(WM_USER + 22222)
+
+struct _exeCDSS
+{
+	DWORD	flag;
+	DWORD	len;
+};
+#define L_cds	sizeof(struct _exeCDSS)
+
+class CChaser : public CWnd
+{
+public:
+	CChaser(CWnd* parent) { m_parent = parent; }
+	virtual ~CChaser() {}
+
+protected:
+	CWnd*	m_parent;
+
+	afx_msg LRESULT OnChaser(WPARAM wParam, LPARAM lParam)
+	{
+		if (m_parent->GetSafeHwnd())
+			m_parent->SendMessage(WM_CHASER, wParam, lParam);
+		return 0;
+	}
+	DECLARE_MESSAGE_MAP()
+};
+
+BEGIN_MESSAGE_MAP(CChaser, CWnd)
+	ON_MESSAGE(WM_USER, OnChaser)
+END_MESSAGE_MAP()
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -18,6 +58,10 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
+void Msg(CString msg)
+{
+	::OutputDebugString("[OPENAPI] " + msg);
+}
 
 // #define FOR_WARSHIP
 
@@ -65,6 +109,7 @@ BEGIN_MESSAGE_MAP(CIBKSConnectorCtrl, COleControl)
 	//}}AFX_MSG_MAP
 	ON_OLEVERB(AFX_IDS_VERB_PROPERTIES, OnProperties)
 	ON_MESSAGE(WM_USER, OnUser)
+	ON_MESSAGE(WM_CHASER, OnCHASER)
 END_MESSAGE_MAP()
 //DISP_FUNCTION(CIBKSConnectorCtrl, "TR3202", TR3202, VT_BOOL, VTS_I4 VTS_I4 VTS_BSTR VTS_BSTR VTS_I4 VTS_BSTR VTS_I4 VTS_I4 VTS_I4 VTS_I4 VTS_I4)
 //DISP_FUNCTION(CIBKSConnectorCtrl, "TR3201", TR3201, VT_BOOL, VTS_I4 VTS_I4 VTS_BSTR VTS_BSTR VTS_I4 VTS_BSTR VTS_I4 VTS_I4 VTS_I4 VTS_I4)
@@ -145,8 +190,22 @@ BEGIN_DISPATCH_MAP(CIBKSConnectorCtrl, COleControl)
 	DISP_FUNCTION(CIBKSConnectorCtrl, "TR1006", TR1006, VT_BOOL, VTS_I4 VTS_BSTR)
 	DISP_FUNCTION(CIBKSConnectorCtrl, "TR1007", TR1007, VT_BOOL, VTS_I4 VTS_BSTR VTS_BSTR)
 	DISP_FUNCTION(CIBKSConnectorCtrl, "LoginQuote", LoginQuote, VT_BOOL, VTS_BSTR VTS_BSTR VTS_BSTR VTS_I4)
+	DISP_FUNCTION(CIBKSConnectorCtrl, "TR2002", TR2002, VT_BOOL, VTS_I4 VTS_BSTR VTS_BSTR VTS_BSTR VTS_BSTR VTS_BSTR VTS_BSTR)
+	DISP_FUNCTION(CIBKSConnectorCtrl, "TR5002", TR5002, VT_BOOL, VTS_I4 VTS_BSTR VTS_BSTR VTS_BSTR VTS_BSTR VTS_BSTR VTS_BSTR VTS_BSTR VTS_BSTR VTS_BSTR VTS_I4)
+	DISP_FUNCTION(CIBKSConnectorCtrl, "TR5000", TR5000, VT_BOOL, VTS_I4 VTS_BSTR VTS_BSTR)
+	DISP_FUNCTION(CIBKSConnectorCtrl, "TR5001", TR5001, VT_BOOL, VTS_I4 VTS_BSTR VTS_BSTR VTS_BSTR VTS_BSTR VTS_BSTR)
+	DISP_FUNCTION(CIBKSConnectorCtrl, "TR5003", TR5003, VT_BOOL, VTS_I4 VTS_BSTR VTS_BSTR VTS_BSTR VTS_BSTR VTS_BSTR VTS_BSTR VTS_BSTR VTS_BSTR)
+	DISP_FUNCTION(CIBKSConnectorCtrl, "TR5004", TR5004, VT_BOOL, VTS_I4 VTS_BSTR VTS_BSTR)
+	DISP_FUNCTION(CIBKSConnectorCtrl, "TR5007", TR5007, VT_BOOL, VTS_I4 VTS_BSTR VTS_BSTR)
+	DISP_FUNCTION(CIBKSConnectorCtrl, "TR5010", TR5010, VT_BOOL, VTS_I4)
+	DISP_FUNCTION(CIBKSConnectorCtrl, "FNORDER", FNORDER, VT_BOOL, VTS_I4 VTS_BSTR VTS_BSTR VTS_BSTR VTS_BSTR VTS_BSTR VTS_BSTR VTS_BSTR VTS_BSTR VTS_BSTR
+				                                              VTS_BSTR VTS_BSTR VTS_BSTR VTS_BSTR VTS_BSTR VTS_BSTR VTS_BSTR VTS_BSTR VTS_BSTR)
+	DISP_FUNCTION(CIBKSConnectorCtrl, "ShowChaser", ShowChaser, VT_BOOL, VTS_NONE)
+	DISP_FUNCTION(CIBKSConnectorCtrl, "HideChaser", HideChaser, VT_EMPTY, VTS_NONE)
+
 	//}}AFX_DISPATCH_MAP
 END_DISPATCH_MAP()
+ 
 
 BEGIN_EVENT_MAP(CIBKSConnectorCtrl, COleControl)
 	//{{AFX_EVENT_MAP(CIBKSConnectorCtrl)
@@ -227,6 +286,7 @@ CIBKSConnectorCtrl::CIBKSConnectorCtrl()
 	m_bUpdate	=	false;	//2012.08.27 KSJ UpdateStart가 호출되었는지 체크해서 UpdateEnd를 호출한다.
 	m_nPggb = 0;		// 2014.04.21 KSJ 차익/비차익 구분
 	m_hiSha256 = NULL;
+	m_chaser = NULL;
 
 	CoInitialize(NULL);
 	AfxEnableControlContainer();
@@ -234,6 +294,12 @@ CIBKSConnectorCtrl::CIBKSConnectorCtrl()
 
 CIBKSConnectorCtrl::~CIBKSConnectorCtrl()
 {
+	if (m_chaser)
+	{
+		m_chaser->DestroyWindow();
+		delete m_chaser;
+		m_chaser = NULL;
+	}
 	CoUninitialize();
 }
 
@@ -265,7 +331,7 @@ void CIBKSConnectorCtrl::OnResetState()
 BOOL CIBKSConnectorCtrl::Initialize() 
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
-	OutputDebugString("CIBKSConnectorCtrl - Initialize");
+OutputDebugString("<OPENAPI> CIBKSConnectorCtrl - Initialize");
 	if (IsInit()) return TRUE;
 
 	int n;
@@ -867,6 +933,122 @@ BOOL CIBKSConnectorCtrl::LoginQuote(LPCTSTR user_id, LPCTSTR user_pw, LPCTSTR sv
 	return TRUE;
 }
 
+// AxisChaser 프로토콜 트레이스 연동 - AXIS/MainFrm.cpp의 CreateChaser()를 그대로 이식.
+// Wizard OCX(DI_WIZARD/setTRACE)에게 "이후 송수신 트레이스를 이 창(hwnd)으로 WM_USER 메시지로 보내라"고 지시한다.
+void CIBKSConnectorCtrl::CreateChaser()
+{
+	if (m_chaser)
+	{
+		m_Wizard.axWizard(MAKEWPARAM(setTRACE, WM_USER), (long)m_chaser->GetSafeHwnd());
+		return;
+	}
+
+	m_chaser = new CChaser(this);
+	if (!m_chaser->Create(NULL, "openapi chaser", WS_CHILD, CRect(0, 0, 0, 0), this, (UINT)(UINT_PTR)m_chaser))
+	{
+		delete m_chaser;
+		m_chaser = NULL;
+		return;
+	}
+
+	m_Wizard.axWizard(MAKEWPARAM(setTRACE, WM_USER), (long)m_chaser->GetSafeHwnd());
+}
+
+// AXIS/MainFrm.cpp의 DeleteChaser()를 그대로 이식 - 트레이스 대상 창을 NULL로 지정해서 끈다.
+void CIBKSConnectorCtrl::DeleteChaser()
+{
+	m_Wizard.axWizard(MAKEWPARAM(setTRACE, WM_USER), NULL);
+}
+
+// AXIS/MainFrm.cpp의 showChaser()+CreateChaser()를 한 번에 합친 것.
+// IBKSConnector.ocx는 Python(Qt) 안에 임베드된 자식 컨트롤이라 AxisChaser 자체 체크박스가 클래스명으로
+// 찾아 되돌려 보내는 역방향 ON/OFF 채널을 쓸 수 없어서, 호출 즉시 프로세스 실행+트레이스 시작을 같이 한다.
+BOOL CIBKSConnectorCtrl::ShowChaser()
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	CString aps, cmds;
+	STARTUPINFO si;
+	PROCESS_INFORMATION pi;
+
+	ZeroMemory(&si, sizeof(STARTUPINFO));
+	ZeroMemory(&pi, sizeof(PROCESS_INFORMATION));
+	si.cb          = sizeof(STARTUPINFO);
+	si.dwFlags     = STARTF_USESHOWWINDOW;
+	si.wShowWindow = SW_SHOW;
+
+	// AxisChaser.exe는 Release 빌드(NDEBUG)에서 /c(클래스명)가 비어 있으면 InitInstance()가
+	// 곧바로 FALSE를 반환하고 조용히 종료해버린다(AxisChaser.cpp:67) - 우리는 역방향 채널을 안 써서
+	// 실제 클래스명일 필요는 없고, 그냥 비어있지만 않으면 된다.
+	cmds.Format(" /c %s /r \"%s\"", OPENAPI_CHASER_KEY, OPENAPI_CHASER_KEY);
+	aps = GetRootPath() + "\\AxisChaser.exe";
+
+	const BOOL bRc = CreateProcess(
+			aps,
+			(char *)(const char*)cmds,
+			NULL,
+			NULL,
+			FALSE,
+			0,
+			NULL,
+			NULL,
+			&si,
+			&pi);
+
+	if (!bRc)
+	{
+		m_sLastMsg.Format("AxisChaser 실행 실패 - %s", aps);
+		return FALSE;
+	}
+	CloseHandle(pi.hProcess);
+	CloseHandle(pi.hThread);
+
+	CreateChaser();
+	return TRUE;
+}
+
+// AxisChaser 트레이스를 끄고, 떠 있는 AxisChaser 창도 닫는다(AXIS의 DeleteChaser+CloseChaserAPP에 대응).
+void CIBKSConnectorCtrl::HideChaser()
+{
+	DeleteChaser();
+
+	CString winCaption;
+	winCaption.Format("AxisChaser for %s", OPENAPI_CHASER_KEY);
+	CWnd* wnd = CWnd::FindWindow(NULL, winCaption);
+	if (wnd && wnd->GetSafeHwnd())
+		::PostMessage(wnd->m_hWnd, WM_CLOSE, 0, 0);
+}
+
+// AXIS/MainFrm.cpp의 OnCHASER()를 그대로 이식 - Wizard가 보낸 트레이스 데이터를
+// _exeCDSS 헤더를 붙여서 AxisChaser 창(캡션으로 찾음)에 WM_COPYDATA로 전달한다.
+LRESULT CIBKSConnectorCtrl::OnCHASER(WPARAM wParam, LPARAM lParam)
+{
+	m_chaserSync.Lock();
+	const int	len = L_cds + LOWORD(wParam);
+	char	bufx[1024*128];
+
+	ZeroMemory(bufx, sizeof(bufx));
+	struct _exeCDSS* cds = (struct _exeCDSS *) bufx;
+
+	cds->flag = HIWORD(wParam);
+	cds->len  = LOWORD(wParam);
+	CopyMemory(&bufx[L_cds], (char *) lParam, len);
+
+	COPYDATASTRUCT cs;
+	cs.cbData = len + L_cds;
+	cs.dwData = 0;
+	cs.lpData = bufx;
+
+	CString winCaption;
+	winCaption.Format("AxisChaser for %s", OPENAPI_CHASER_KEY);
+	CWnd* wnd = CWnd::FindWindow(NULL, winCaption);
+	if (wnd && wnd->GetSafeHwnd())
+		::SendMessage(wnd->m_hWnd, WM_COPYDATA, 0, (LPARAM)&cs);
+
+	m_chaserSync.Unlock();
+	return 0;
+}
+
 CString CIBKSConnectorCtrl::ToKoscomIP(CString addr)
 {
 	if (addr.IsEmpty()) return "";
@@ -1209,54 +1391,54 @@ void CIBKSConnectorCtrl::DEF_CALLBACK(WPARAM wParam, LPARAM lParam)
 	FireOnRecvData(key, (long)lParam, size, false, "");
 }
 
-void CIBKSConnectorCtrl::DEF_KOSCOM_CALLBACK(WPARAM wParam, LPARAM lParam)
-{
-// 	OutputDebugString("[KSJ] DEF_KOSCOM_CALLBACK");
-
-	CString slog;
-	slog.Format("[OPENAPI][%s]<%d> \n", __FUNCTION__, __LINE__);
-	OutputDebugString(slog);
-
-	char nID[8]={0,};
-	char nkey[19]={0,};
-	char zErrMsg[99]={0,};
-
-	struct ledger *ledg = (struct ledger *)lParam;
-
-	BOOL bNext = (ledg->next[0]=='Y');
-	if (bNext)
-		memcpy(nkey, ledg->nkey, sizeof(ledg->nkey));
-
-	ledg->emsg[98] = '\0';
-	memcpy(zErrMsg, ledg->emsg, sizeof(ledg->emsg));
-
-	int key = LOWORD(wParam);
-	int size = HIWORD(wParam)-L_ledger;
-	LPCSTR data = (LPCSTR)(lParam+L_ledger);
-
-	//입력데이터 포맷에러
-	if(strlen(ledg->ecod))
-		FireOnGuideMsg(key, zErrMsg);
-	
-	if(m_bSaveLog)
-		testSaveFile(key, data, size);
-
-	FireOnRecvData(key, (long)data, size, bNext, nkey);
-
-	//2012.06.13 KSJ ID를 포함해서 이벤트를 새로 만듬
-	memcpy(nID, ledg->csym, sizeof(ledg->csym));
-	int id = atoi(nID);
-
-	slog.Format("[OPENAPI][%s]<%d> key=[%d] size=[%d]\n", __FUNCTION__, __LINE__, key, size);
-	OutputDebugString(slog);
-
-// 	CString strTemp;
-// 	strTemp.Format("[KSJ]nID[%s]id[%d]ledg->csym[%s]", nID, id, ledg->csym);
-// 	OutputDebugString(strTemp);
-	
-	FireOnRecvDataID(key, (long)data, size, bNext, nkey, id);
-	//KSJ
-}
+//void CIBKSConnectorCtrl::DEF_KOSCOM_CALLBACK(WPARAM wParam, LPARAM lParam)
+//{
+//// 	OutputDebugString("[KSJ] DEF_KOSCOM_CALLBACK");
+//
+//	CString slog;
+//	slog.Format("[OPENAPI][%s]<%d> \n", __FUNCTION__, __LINE__);
+//	OutputDebugString(slog);
+//
+//	char nID[8]={0,};
+//	char nkey[19]={0,};
+//	char zErrMsg[99]={0,};
+//
+//	struct ledger *ledg = (struct ledger *)lParam;
+//
+//	BOOL bNext = (ledg->next[0]=='Y');
+//	if (bNext)
+//		memcpy(nkey, ledg->nkey, sizeof(ledg->nkey));
+//
+//	ledg->emsg[98] = '\0';
+//	memcpy(zErrMsg, ledg->emsg, sizeof(ledg->emsg));
+//
+//	int key = LOWORD(wParam);
+//	int size = HIWORD(wParam)-L_ledger;
+//	LPCSTR data = (LPCSTR)(lParam+L_ledger);
+//
+//	//입력데이터 포맷에러
+//	if(strlen(ledg->ecod))
+//		FireOnGuideMsg(key, zErrMsg);
+//	
+//	if(m_bSaveLog)
+//		testSaveFile(key, data, size);
+//
+//	FireOnRecvData(key, (long)data, size, bNext, nkey);
+//
+//	//2012.06.13 KSJ ID를 포함해서 이벤트를 새로 만듬
+//	memcpy(nID, ledg->csym, sizeof(ledg->csym));
+//	int id = atoi(nID);
+//
+//	slog.Format("[OPENAPI][%s]<%d> key=[%d] size=[%d]\n", __FUNCTION__, __LINE__, key, size);
+//	OutputDebugString(slog);
+//
+//// 	CString strTemp;
+//// 	strTemp.Format("[KSJ]nID[%s]id[%d]ledg->csym[%s]", nID, id, ledg->csym);
+//// 	OutputDebugString(strTemp);
+//	
+//	FireOnRecvDataID(key, (long)data, size, bNext, nkey, id);
+//	//KSJ
+//}
 
 bool CIBKSConnectorCtrl::IsValidAccount(LPCSTR acno)
 {
@@ -2349,6 +2531,7 @@ BOOL CIBKSConnectorCtrl::S_SSLBQ033(int key, LPCTSTR acno, LPCTSTR pswd, int fst
 void CIBKSConnectorCtrl::Logout() 
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+Msg("Logout\n");
 
 	if (IsInit()/* && IsLogin()*/)
 	{
@@ -2591,10 +2774,11 @@ BOOL CIBKSConnectorCtrl::S_TR1006(int key, LPCSTR val)
 //차트(캔들) 조회 - chart_dll(C_Total.dll)의 GOOPHOOP 프로토콜을 AxisChaser 실측으로 역공학
 BOOL CIBKSConnectorCtrl::S_TR1007(int key, LPCSTR code, LPCSTR data)
 {
-	// data 형식: "{dunit}\t{dindex}\x7f{pday}\t{count}\t1777\x7f{mkgubn}\t"
+	// data 형식: "{dunit}\t{dindex}\x7f{pday}\t{count}\t1777\x7f{mkgubn}\t{gap}\t"
 	// dunit: 1=종목(GU_CODE) 2=업종(GU_INDEX)
-	// dindex: 1=일봉 2=주봉 3=월봉 (GI_DAY/GI_WEEK/GI_MONTH)
-	CString dunitS, dindexS, pday, countS, mkgubnS;
+	// dindex: 1=일봉 2=주봉 3=월봉 4=분봉 5=틱봉 (GI_DAY/GI_WEEK/GI_MONTH/GI_MINUTE/GI_TICK)
+	// gap: 분봉/틱봉 간격(예: 분봉 5 -> 5분봉). 일/주/월이면 무시. 생략 가능(기본 1) - 신규 필드, 기존 호출과 호환
+	CString dunitS, dindexS, pday, countS, mkgubnS, gapS;
 	{
 		CString d(data);
 		int ptab0 = d.Find(_T('\t'));
@@ -2618,6 +2802,11 @@ BOOL CIBKSConnectorCtrl::S_TR1007(int key, LPCSTR code, LPCSTR data)
 		int ptab3 = d.Find(_T('\t'), p7f2 + 1);
 		if (ptab3 < 0) { m_sLastMsg = "TR1007 data 형식 오류"; return FALSE; }
 		mkgubnS = d.Mid(p7f2 + 1, ptab3 - p7f2 - 1);
+
+		// gap: 새로 추가된 선택 필드. 없으면(구버전 호출부) 빈 값 허용 - 하위호환
+		int ptab4 = d.Find(_T('\t'), ptab3 + 1);
+		if (ptab4 > ptab3)
+			gapS = d.Mid(ptab3 + 1, ptab4 - ptab3 - 1);
 	}
 
 	int dunit = atoi((LPCSTR)CStringA(dunitS));
@@ -2636,10 +2825,22 @@ BOOL CIBKSConnectorCtrl::S_TR1007(int key, LPCSTR code, LPCSTR data)
 	}
 
 	int dindex = atoi((LPCSTR)CStringA(dindexS));
-	if (dindex < 1 || dindex > 3) dindex = 1;
+	if (dindex < 1 || dindex > 5) dindex = 1;
+	if (dunit == 2 && dindex > 3)
+	{
+		// 업종(GU_INDEX)의 분봉/틱봉은 실측 확인이 안 돼 있어 일단 막아둔다 - 필요해지면 캡처부터.
+		m_sLastMsg = "업종은 분봉/틱봉을 지원하지 않습니다";
+		return FALSE;
+	}
 	int count = atoi((LPCSTR)CStringA(countS));
 	if (count <= 0) count = 200;
 	if (pday.GetLength() != 8) { m_sLastMsg = "TR1007 pday 형식 오류(yyyymmdd)"; return FALSE; }
+
+	int gap = atoi((LPCSTR)CStringA(gapS));
+	if (dindex >= 4 && gap <= 0) gap = 1;   // 분/틱봉인데 간격 미지정 시 기본 1
+
+	// dindex 계열별 필드 접두어 - 2026-08-24 AxisChaser 실측 확인(일/주/월=5, 분=4, 틱=2)
+	const char* famPfx = (dindex == 4) ? "4" : (dindex == 5) ? "2" : "5";
 
 	std::string sendS;
 	// 스냅샷 필드 18개(1034~1318) - GetTRInfo()/MakeInputSymbol() 실측 그대로, 순서 고정
@@ -2682,11 +2883,14 @@ BOOL CIBKSConnectorCtrl::S_TR1007(int key, LPCSTR code, LPCSTR data)
 	sendS += (LPCSTR)CStringA(mkgubnS);
 	sendS += "\t";
 
-	// 캔들 마커도 업종은 "?25500"("2"+"5500"), 종목은 "?5500" - 실측 확인
-	sendS += (dunit == 2) ? "?25500" : "?5500";
+	// 캔들 마커 - 종목 "?"+접두어+"500", 업종 "?2"+접두어+"500" (기존 "?5500"/"?25500" 하드코딩을 일반화, 값 동일함 검증됨)
+	sendS += "?";
+	if (dunit == 2) sendS += "2";
+	sendS += famPfx;
+	sendS += "500";
 	sendS += (char)0x7f;
 
-	// _dataH(136바이트, GetGrpHeader() 실측 그대로) - count/pday/dindex/dunit 외 나머지는 고정값
+	// _dataH(136바이트, GetGrpHeader() 실측 그대로) - count/pday/dindex/dunit/gap 외 나머지는 고정값
 	CString countFmt;
 	countFmt.Format("%06d", count);
 	sendS += (LPCSTR)CStringA(countFmt);   // count[6]
@@ -2695,9 +2899,14 @@ BOOL CIBKSConnectorCtrl::S_TR1007(int key, LPCSTR code, LPCSTR data)
 	sendS += (char)0x01;                   // dkey
 	sendS += (LPCSTR)CStringA(pday);       // pday[8]
 	sendS += (char)dunit;                  // dunit(1=GU_CODE 종목, 2=GU_INDEX 업종), raw byte
-	sendS += (char)dindex;                 // dindex(1일/2주/3월), raw byte
-	sendS += "0000";                       // lgap[4](분봉/틱봉 전용, 미사용)
-	sendS += std::string(4, ' ');          // ltic[4]
+	sendS += (char)dindex;                 // dindex(1일/2주/3월/4분/5틱), raw byte
+	{
+		// lgap[4] - 분/틱봉 간격("0005"=5분봉 등). 일/주/월은 "0000". 2026-08-24 실측 확인.
+		CString gapFmt;
+		gapFmt.Format("%04d", (dindex >= 4) ? gap : 0);
+		sendS += (LPCSTR)CStringA(gapFmt);
+	}
+	sendS += std::string(4, ' ');          // ltic[4] - 실측 두 사례 모두 공백, 용도 미상
 	sendS += (char)0x21;                   // option1 = 수정주가(GUI_MOD)
 	sendS += (char)0x21;                   // option2
 	sendS += std::string(16, ' ');         // rcode[16](미사용)
@@ -2706,20 +2915,31 @@ BOOL CIBKSConnectorCtrl::S_TR1007(int key, LPCSTR code, LPCSTR data)
 	sendS += std::string(4, ' ');          // page[4]
 	sendS += std::string(80, ' ');         // save[80]
 
-	// 캔들 필드 10개 - 줄바꿈 구분, 마지막 탭
+	// 캔들 필드 - 일/주/월 10개(기존), 분/틱 8개(2026-08-24 실측: 7번째가 027 아닌 032, 311/310 없음)
 	// 업종(GU_INDEX)은 앞 8개(시가~거래대금)만 "2" 접두이고, 마지막 2개는 권리락/수정비율(5311/5310) 대신
 	// 25256/25257(실측 응답값 137/57 - KOSPI200 200종목 기준 상승/하락 종목수로 추정)로 완전히 다른 필드를 씀
-	static const char* candleFieldsCode[] = {
-		"5302","5034","5029","5030","5031","5023","5027","5028","5311","5310"
+	// (업종은 위에서 이미 dindex>3을 막아뒀으므로 여기선 일/주/월 필드만 쓴다)
+	static const char* candleSuffixDayFamily[] = {
+		"302","034","029","030","031","023","027","028","311","310"
+	};
+	static const char* candleSuffixMinTick[] = {
+		"302","034","029","030","031","023","032","028"
 	};
 	static const char* candleFieldsIndex[] = {
 		"25302","25034","25029","25030","25031","25023","25027","25028","25256","25257"
 	};
-	const char** candleFields = (dunit == 2) ? candleFieldsIndex : candleFieldsCode;
-	for (int i = 0; i < 10; i++)
+
+	if (dunit == 2)
 	{
-		sendS += candleFields[i];
-		sendS += "\n";
+		for (int i = 0; i < 10; i++) { sendS += candleFieldsIndex[i]; sendS += "\n"; }
+	}
+	else if (dindex >= 4)
+	{
+		for (int i = 0; i < 8; i++) { sendS += famPfx; sendS += candleSuffixMinTick[i]; sendS += "\n"; }
+	}
+	else
+	{
+		for (int i = 0; i < 10; i++) { sendS += famPfx; sendS += candleSuffixDayFamily[i]; sendS += "\n"; }
 	}
 	sendS += "\t";
 
@@ -4756,6 +4976,158 @@ BOOL CIBKSConnectorCtrl::TR2001(long key, LPCTSTR upcd, long dtgb)
 }
 
 
+
+//BOOL CIBKSConnectorCtrl::TR5005(long key, LPCTSTR jidx) 
+//{
+//	// 해외주문...
+//	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+//	return AccessTr(eTR5005) ? S_PIBOGODR(key, "", "", jidx) : FALSE;
+//}
+//
+//BOOL CIBKSConnectorCtrl::S_PIBOGODR(int key, LPCSTR acno, LPCSTR pswd, int userid)
+//	//int mmgb, LPCSTR acno, LPCSTR pswd, int ojno, LPCSTR fcod, int jqty, int jprc, int hogb, int mdgb, int id )
+//{
+//	if (!IsValidState())		return FALSE;
+//	if (!IsValidAccount(acno))	return FALSE;
+//	if (!IsValidAcnoPswd(pswd))	return FALSE;
+//	
+//	return FALSE;
+//
+//	// map IB99993B
+//	struct order_fi // 해외주식 주문 
+//	{
+//		char gubn[2];		//1 구분
+//		char icont[4];		//2 주문개수
+//		char odgb[1];           //3 주문유형 
+//		char mmgb[2];		//4 매매구분
+//		char opcd[2];		//5 주문유형코드
+//		char ogno[10];		//6 원주문번호
+//		char accn[20];		//7 계좌번호
+//		char pswd[8];		//8 계좌비번
+//		char mkgb[2];		//9 주문시장코드
+//		char code[12];		//10 종목코드
+//		char jqty[16];		//11 주문수량
+//		char jprc[15];		//12 주문가격
+//		char hogb[2];		//13 호가구분
+//		char jmgb[2];		//14 통신매체
+//		char mdgb[2];           //15 중개인구분코드
+//		char rsvgubn[1];	//16 예약구분
+//		char curCode[3];	//17 국가코드
+//		char rsvlpdt[8];	//18 예약일자
+//		char rsvStDt[8];	//19 예약시작일자
+//		char rsvEndDt[8];	//20 예약종료일자
+//		char rsvOrdNo[2];	//21 예약주문조건코드
+//		char rsv_lndt[8];	//22 대출일
+//		char creditCode[3];	//23 신용거래코드
+//		char filler[8];		//24 filler
+//
+//	};
+//
+//	struct order_fo
+//	{
+//		char cnt[4];		//1 주문개수
+//		char jmno[10];		//2 주문번호
+//		char accn[40];		//3 계좌번호
+//		char codename[40];	//4 종목명
+//		char result[80];	//5 결과코드
+//	};
+//
+//
+//
+//	if (mmgb<1 || mmgb>4)
+//	{
+//		m_sLastMsg = "매매구분 입력값이 올바르지 않습니다.";
+//		return FALSE;
+//	}
+//	
+//	if (m_shoga.find(hogb)==m_shoga.end()) 
+//	{
+//		m_sLastMsg = "호가구분 입력값이 올바르지 않습니다.";
+//		return FALSE;	
+//	}
+//	if (mdgb<0 || mdgb>2) return FALSE;
+//	if (strlen(fcod)<7)
+//	{
+//		m_sLastMsg = "종목코드가 올바르지 않습니다.";
+//		return FALSE;
+//	}
+//	if (jqty<0) 
+//	{
+//		m_sLastMsg = "주문수량이 올바르지 않습니다.";
+//		return FALSE;
+//	}
+//	if (jqty==0 && (mmgb==1 || mmgb==2))
+//	{
+//		m_sLastMsg = "주문수량이 올바르지 않습니다.";
+//		return FALSE;
+//	}
+//	if ((mmgb==3 || mmgb==4) && ojno==0)
+//	{
+//		m_sLastMsg = "원주문번호가 올바르지 않습니다.";
+//		return FALSE;
+//	}
+//	
+//	vector<char> buff( L_ledger + L_tr1201_mid );
+//	memset(&buff[0], ' ', buff.size());
+//	
+//	struct ledger *ledger = (struct ledger*)&buff[0];
+//	struct tr3201_mid *mid = (struct tr3201_mid*)&buff[L_ledger];
+//	
+//	//  Ledger 편집
+//	GetLedger(ledger);
+//	FillMemory(ledger->usid, sizeof(ledger->usid), ' ');
+//	memcpy(ledger->usid, (LPCSTR)m_usid, m_usid.GetLength());
+//	memcpy(ledger->brno, "000", 3);
+//	memcpy(ledger->rcnt, "0000", 4);
+//	memcpy(ledger->fkey, "5   ", 4);
+//
+//	CString strTemp;
+//	strTemp.Format("%08d", id);
+//	CopyMemory(ledger->csym, strTemp, strTemp.GetLength());		// 2012.06.04 KSJ 사용자 정의 ID 추가
+//
+//	//2014.04.21 KSJ 일방향암호화 추가
+//	CString sPswd;
+//	sPswd = GetEncPassword(pswd);
+//	CopyMemory(ledger->hsiz, "44", sizeof(ledger->hsiz));
+//	CopyMemory(ledger->epwd, sPswd, sPswd.GetLength());
+//
+//// 	CString strTemp;
+//// 	strTemp.Format("[KSJ][%s]", ledger->csym);
+//// 	OutputDebugString(strTemp);
+//
+//	// 주문 편집
+//	memcpy(mid->gubn, "^C", 2);				//^C 2014.04.21 KSJ 차익/비차익 때문에 추가
+//	sprintf(mid->nrec, "%04d", 1);			// 반복횟수
+//	mid->odgb[0] = '1';						// 선물
+//	mid->mmgb[0] = '0' + mmgb;				// 매매구분
+//	memcpy(mid->accn, acno, 11);				// 계좌번호
+//	//memcpy(mid->pswd, pswd, strlen(pswd));	// 계좌비번
+//	memcpy(mid->pswd, "HEAD", 4);			// 계좌비번	2015.05.23 KSJ
+//	sprintf(mid->ojno, "%012d", ojno);		// 원주문번호
+//	sprintf(mid->fcod, "%.8s", fcod);		// 종목코드
+//	sprintf(mid->jqty, "%08d", jqty);		// 주문수량
+//	sprintf(mid->jprc, "%010d", jprc);		// 주문가격
+//	if (hogb==61 || hogb==81)
+//	{
+//		sprintf(mid->hogb, "%02d", hogb);		// 호가구분
+//		sprintf(mid->cdgb, "%d", 0);		// IOC/FOK
+//	}
+//	else
+//	{
+//		sprintf(mid->hogb, "%02d", hogb%10);		// 호가구분
+//		sprintf(mid->cdgb, "%d", hogb/10);		// IOC/FOK
+//	}
+//	sprintf(mid->mdgb, "%d", mdgb);			// 정정취소
+//	mid->prgb[0] = 'X';
+//	sprintf(mid->pggb, "%02d", m_nPggb);	// 프로그램(00:일반 01:차익 03:비차익) 2014.04.21 추가
+//
+//	//return SendTR("pibosodr", key, US_CA|US_KEY, (LPCSTR)&buff[0], buff.size(), DEF_KOSCOM_CALLBACK);  //vc2019
+//	return SendTR("pibosodr", key, US_CA | US_KEY, (LPCSTR)&buff[0], buff.size(), &CIBKSConnectorCtrl::DEF_KOSCOM_CALLBACK);
+//}
+
+
+
+
 void CIBKSConnectorCtrl::SaveConfig(LPCTSTR sSendName, LPCTSTR sKey, LPCTSTR sValue) 
 {
 	// TODO: Add your dispatch handler code here
@@ -5295,3 +5667,1176 @@ bool CIBKSConnectorCtrl::IsMyDevPC()
 //	return (m_svrip == "172.16.202.106" || m_svrip == "211.255.204.104");
 //}
 #pragma warning (default : 4996)
+
+
+BOOL CIBKSConnectorCtrl::TR2002(long key, LPCTSTR acno, LPCTSTR pswd, LPCTSTR stDate, LPCTSTR endDate, LPCTSTR type, LPCTSTR code)
+{
+	//Msg("TR2002 - 주식거래내역");
+
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	if (!IsValidState())		return FALSE;
+	if (!IsValidAccount(acno))	return FALSE;
+	if (!IsValidAcnoPswd(pswd))	return FALSE;
+
+	return AccessTr(eTR2002) ? S_TR2002(key, acno, pswd, stDate, endDate, type, code) : FALSE;
+}
+
+
+//주식 거래내역...
+BOOL CIBKSConnectorCtrl::S_TR2002(long key, LPCTSTR acc, LPCTSTR pswd, LPCTSTR stDate, LPCTSTR endDate, LPCTSTR type, LPCTSTR code)
+{
+	//Msg("TR2002 - 주식거래내역");
+	CTime time = CTime::GetCurrentTime();	
+	CTimeSpan mm(7,0,0,0);
+	CTime st = time - mm;
+
+	CString sDate(stDate), eDate(endDate);
+
+	if (sDate.IsEmpty())
+		sDate = st.Format("%Y%m%d");
+	if (eDate.IsEmpty())
+		eDate = time.Format("%Y%m%d");
+
+	vector<char> buff;
+	buff.resize(L_ledger + L_tr2002_mid + L_tr2002_out, ' ');
+
+	struct ledger* pledger = (struct ledger*)&buff[0];
+	struct tr2002_mid* pmid = (struct tr2002_mid*)&buff[L_ledger];
+	struct tr2002_out* pout = (struct tr2002_out*)&buff[L_ledger + L_tr2002_mid];
+	
+	//  Ledger 편집
+	GetLedger(pledger);
+	FillMemory(pledger->usid, sizeof(pledger->usid), ' ');
+	memcpy(pledger->usid, (LPCSTR)m_usid, m_usid.GetLength());
+	memcpy(pledger->brno, "000", 3);
+	memcpy(pledger->rcnt, "0000", 4);
+	memcpy(pledger->svcd, "SDPBQ005", 8);
+	memcpy(pledger->fkey, "C   ", 4);
+
+	// CString strTemp;
+	// strTemp.Format("%08d", id);
+	// CopyMemory(ledger->csym, strTemp, strTemp.GetLength()); // 2012.06.04 KSJ 사용자 정의 ID 추가
+	
+	CopyMemory(pmid->In, "00001", 5);
+	CopyMemory(pmid->AcntNo, acc, strlen(acc));
+	CopyMemory(pmid->Pwd,"HEAD", 4);
+	CopyMemory(pmid->QrySrtDt, sDate, 8);
+	CopyMemory(pmid->QryEndDt, eDate, 8);
+	pmid->QryTp[0] = type[0];
++	CopyMemory(pmid->IsuNo, code, strlen(code));
+	pmid->xx[0] = '9';
+
+	FillMemory(pout, L_tr2002_out, '0');
+	CopyMemory(pout->Out1, "00001", 5);
+
+	CString sPswd; 
+	sPswd = GetEncPassword(pswd);
+
+	//  일방향암호화 추가
+	CopyMemory(pledger->hsiz, "44", sizeof(pledger->hsiz));
+	CopyMemory(pledger->epwd, sPswd, sPswd.GetLength());
+
+	return  SendTR("piboPBxQ", key, US_ENC, buff.data(), buff.size(), &CIBKSConnectorCtrl::DEF_KOSCOM_CALLBACK);
+}
+
+
+BOOL CIBKSConnectorCtrl::TR5002(long key, LPCTSTR acc, LPCTSTR pswd, LPCTSTR sDate, LPCTSTR mm, LPCSTR gubn, LPCTSTR type, LPCTSTR code, LPCSTR market, LPCSTR ordertype, long sort)
+{
+	// TODO: Add your dispatch handler code here
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+	if (IsValidState() == FALSE) return FALSE;
+	if (IsValidAccount(acc) == FALSE) return FALSE;
+	if (IsValidAcnoPswd(pswd) == FALSE) return FALSE;
+	return AccessTr(eTR5002) ? S_TR5002(key, acc, pswd, sDate, mm, gubn, type, code, market, ordertype, sort) : FALSE;
+}
+
+
+BOOL CIBKSConnectorCtrl::S_TR5002(long key, LPCTSTR acc, LPCTSTR pswd, LPCTSTR stDate, LPCTSTR mm, LPCSTR gubn, LPCTSTR type, LPCTSTR code, LPCSTR market, LPCSTR ordertype, long sort)
+{
+	CTime now = CTime::GetCurrentTime();
+	CString sDate(stDate);
+	if (sDate.IsEmpty()) sDate = now.Format("%Y%m%d");
+
+	vector<char> buff;
+	buff.resize(L_ledger + L_cosaq005_mid, ' ');
+
+	struct ledger* pledger = (struct ledger*)&buff[0];
+	struct cosaq005_mid* pmid = (struct cosaq005_mid*)&buff[L_ledger];
+
+
+	//  Ledger 편집
+	GetLedger(pledger);
+	FillMemory(pledger->usid, sizeof(pledger->usid), ' ');
+	memcpy(pledger->usid, (LPCSTR)m_usid, m_usid.GetLength());
+	memcpy(pledger->brno, "000", 3);
+	memcpy(pledger->rcnt, "0010", 4);
+	memcpy(pledger->svcd, "COSAQ005", 8);
+	memcpy(pledger->fkey, "C   ", 4);
+
+	// CString strTemp;
+	// strTemp.Format("%08d", id);
+	// CopyMemory(ledger->csym, strTemp, strTemp.GetLength()); // 2012.06.04 KSJ 사용자 정의 ID 추가
+
+
+	CopyMemory(pmid->In, "00001", 5);
+	CopyMemory(pmid->AcntNo, acc, strlen(acc));
+	CopyMemory(pmid->Pwd, "HEAD", 4);
+	pmid->BnsTp[0] = mm[0]; //  매매구분 (전체: %  매도 : 1  매수: 2 단주매도: 8 단주취소: 9)
+	pmid->ExecYn[0] = gubn[0]; //  체결여부 (전체: 0  미체결: 1  체결: 2)
+	pmid->BkseqTp[0] = (sort == 0) ? '0' : '1'; // 역순구분 (0:정순 1:역순)
+	if (sort == 0) CopyMemory(pmid->SrtOrdNo2, "+000000001", 10);
+	else           CopyMemory(pmid->SrtOrdNo2, "+999999999", 10);
+
+	CopyMemory(pmid->SrtDt, "20260903", 8);
+	CopyMemory(pmid->EndDt, sDate, 8);
+
+
+	pmid->QryTp[0] = '1';
+	pmid->RcptStatTp[0] = type[0]; // 접수상태    전체 : A  접수전: 2 접수완료: 0  거부: 4
+
+	CopyMemory(pmid->IsuNo, code, strlen(code));
+	pmid->OrdMktCode[0] = '%';
+	CopyMemory(pmid->ReqMktCode, market, strlen(market)); // 등록시장 코드    전체 - 99  NYSE - 81  NASDAQ - 82  AMEX - 87  홍콩 - 71 상해 - 72  심천 73
+	CopyMemory(pmid->CommdaCode, "99", 2);
+	CopyMemory(pmid->ChgFnoOrdprcPtnCode, "  ", 2);
+	CopyMemory(pmid->OrdprcPtnCode, ordertype, 2); //  주문타입  전체-99, 지정가 - 00, 시장가 - 03, MOC - B1, LOC - B2, TWAP -A2, VWAP - A3, ,Limit TWAP - A4, Limit VWAP - A5, 
+	CopyMemory(pmid->ClntClssCode, "  ", 2);
+	CopyMemory(pmid->MngtBrnNo, "000", 3);
+
+	pmid->StkTp[0] = '1';
+	pmid->LoanTp[0] = '0';
+
+
+	CString sPswd;
+	sPswd = GetEncPassword(pswd);
+
+	//2014.04.21 KSJ 일방향암호화 추가
+	CopyMemory(pledger->hsiz, "44", sizeof(pledger->hsiz));
+	CopyMemory(pledger->epwd, sPswd, sPswd.GetLength());
+
+	//std::ofstream file("tr.txt", std::ios::out | std::ios::trunc);
+	//file << buff.data() << std::endl;
+	//file.close();
+	return SendTR("piboPBxQ", key, US_ENC, buff.data(), buff.size(), &CIBKSConnectorCtrl::DEF_KOSCOM_CALLBACK);
+}
+
+BOOL  CIBKSConnectorCtrl::TR5001(long key, LPCTSTR acc, LPCTSTR pswd, LPCTSTR sDate, LPCTSTR  today, LPCTSTR qryTp)
+{
+	// TODO: Add your dispatch handler code here
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+	if (IsValidState() == FALSE) return FALSE;
+	if (IsValidAccount(acc) == FALSE) return FALSE;
+	if (IsValidAcnoPswd(pswd) == FALSE) return FALSE;
+	return AccessTr(eTR5001) ? S_TR5001(key, acc, pswd, sDate, today, qryTp) : FALSE;
+}
+
+BOOL  CIBKSConnectorCtrl::S_TR5001(long key, LPCTSTR acc, LPCTSTR pswd, LPCTSTR stDate, LPCTSTR today, LPCTSTR qryTp)
+{
+	// 해외주식 잔고...
+	CTime now = CTime::GetCurrentTime();
+	CString sDate(stDate);
+	if (sDate.IsEmpty()) sDate = now.Format("%Y%m%d");
+
+	vector<char> buff;
+	buff.resize(L_ledger + L_cosaq003_mid, ' ');
+
+	struct ledger* pledger = (struct ledger*)&buff[0];
+	struct cosaq003_mid* pmid = (struct cosaq003_mid*)&buff[L_ledger];
+
+
+	//  Ledger 편집
+	GetLedger(pledger);
+	FillMemory(pledger->usid, sizeof(pledger->usid), ' ');
+	memcpy(pledger->usid, (LPCSTR)m_usid, m_usid.GetLength());
+	memcpy(pledger->brno, "000", 3);
+	memcpy(pledger->rcnt, "0019", 4);
+	memcpy(pledger->svcd, "COSAQ003", 8);
+	memcpy(pledger->fkey, "C   ", 4);
+
+	// CString strTemp;
+	// strTemp.Format("%08d", id);
+	// CopyMemory(ledger->csym, strTemp, strTemp.GetLength()); // 2012.06.04 KSJ 사용자 정의 ID 추가
+
+
+	CopyMemory(pmid->In, "00001", 5);
+	CopyMemory(pmid->AcntNo, acc, strlen(acc));
+	CopyMemory(pmid->Pwd, "HEAD", 4);
+	CopyMemory(pmid->QryDt, sDate, 8);
+	//CopyMemory(pmid->IsuNo, code, 12);
+	CopyMemory(pmid->OrdMktCode, "10", 2);			//10-LEK, 20-초상증권
+	pmid->MktTp[0] = today[0];				// 1-당일, 2일별
+	pmid->QryTp[0] = qryTp[0];				// 0-전체, 1-홍콩, 2-중국, 3-미국
+
+
+	CString sPswd;
+	sPswd = GetEncPassword(pswd);
+
+	//2014.04.21 KSJ 일방향암호화 추가
+	CopyMemory(pledger->hsiz, "44", sizeof(pledger->hsiz));
+	CopyMemory(pledger->epwd, sPswd, sPswd.GetLength());
+
+	//std::ofstream file("tr.txt", std::ios::out | std::ios::trunc);
+	//file << buff.data() << std::endl;
+	//file.close();
+	return SendTR("piboPBxQ", key, US_ENC, buff.data(), buff.size(), &CIBKSConnectorCtrl::DEF_KOSCOM_CALLBACK);
+
+}
+
+
+BOOL CIBKSConnectorCtrl::TR5000(long key, LPCTSTR acc, LPCTSTR pswd)
+{
+	// TODO: Add your dispatch handler code here
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+	if (IsValidState() == FALSE) return FALSE;
+	if (IsValidAccount(acc) == FALSE) return FALSE;
+	if (IsValidAcnoPswd(pswd) == FALSE) return FALSE;
+	return AccessTr(eTR5000) ? S_TR5000(key, acc, pswd) : FALSE;
+}
+
+BOOL CIBKSConnectorCtrl::S_TR5000(long key, LPCTSTR acc, LPCTSTR pswd)
+{ 
+	vector<char> buff;
+	buff.resize(L_ledger + L_cosaq027_mid, ' ');
+
+	struct ledger* pledger = (struct ledger*)&buff[0];
+	struct cosaq027_mid* pmid = (struct cosaq027_mid*)&buff[L_ledger];
+
+
+	//  Ledger 편집
+	GetLedger(pledger);
+	FillMemory(pledger->usid, sizeof(pledger->usid), ' ');
+	memcpy(pledger->usid, (LPCSTR)m_usid, m_usid.GetLength());
+	memcpy(pledger->brno, "000", 3);
+	memcpy(pledger->rcnt, "0012", 4);
+	memcpy(pledger->svcd, "COSAQ027", 8);
+	memcpy(pledger->fkey, "C   ", 4);
+
+	// CString strTemp;
+	// strTemp.Format("%08d", id);
+	// CopyMemory(ledger->csym, strTemp, strTemp.GetLength()); // 2012.06.04 KSJ 사용자 정의 ID 추가
+	CopyMemory(pmid->In, "00001", 5);
+	CopyMemory(pmid->AcntNo, acc, strlen(acc));
+	CopyMemory(pmid->Pwd, "HEAD", 4);
+	CopyMemory(pmid->CrcyCode, "   ", 3);
+	pmid->prcptntp[0] = ' ';
+
+
+	CString sPswd;
+	sPswd = GetEncPassword(pswd);
+	//2014.04.21 KSJ 일방향암호화 추가
+	CopyMemory(pledger->hsiz, "44", sizeof(pledger->hsiz));
+	CopyMemory(pledger->epwd, sPswd, sPswd.GetLength());
+
+std::ofstream file("tr.txt", std::ios::out | std::ios::trunc);
+file << buff.data() << std::endl;
+file.close();
+
+	return SendTR("piboPBxQ", key, US_ENC, buff.data(), buff.size(), &CIBKSConnectorCtrl::DEF_KOSCOM_CALLBACK);
+}
+
+BOOL CIBKSConnectorCtrl::TR5003(long key, LPCTSTR acc, LPCTSTR pswd, LPCTSTR stDate, LPCTSTR seDate, LPCTSTR code, LPCSTR CancTp, LPCSTR gubn, LPCSTR stktp)
+{
+	// TODO: Add your dispatch handler code here
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+	if (IsValidState() == FALSE) return FALSE;
+	if (IsValidAccount(acc) == FALSE) return FALSE;
+	if (IsValidAcnoPswd(pswd) == FALSE) return FALSE;
+	return AccessTr(eTR5003) ? S_TR5003(key, acc, pswd, stDate, seDate, code, CancTp, gubn, stktp) : FALSE;
+}
+
+
+BOOL CIBKSConnectorCtrl::S_TR5003(long key, LPCTSTR acc, LPCTSTR pswd, LPCTSTR stDate, LPCTSTR seDate,  LPCTSTR code, LPCSTR CancTp, LPCSTR gubn, LPCSTR stktp)
+{
+	// 해외주식 거래내역...
+	CTime now = CTime::GetCurrentTime();
+	CTimeSpan mm(7, 0, 0, 0);
+	CTime st = now - mm;
+	
+	CString stFirst(stDate), stSecond(seDate);
+	
+	if (stFirst.IsEmpty()) stFirst = st.Format("%Y%m%d");
+	if (stSecond.IsEmpty()) stSecond = now.Format("%Y%m%d");
+	
+
+	vector<char> buff;
+	buff.resize(L_ledger + L_cosaq208_mid, ' ');
+
+	struct ledger* pledger = (struct ledger*)&buff[0];
+	struct cosaq208_mid* pmid = (struct cosaq208_mid*)&buff[L_ledger];
+
+	//  Ledger 편집
+	GetLedger(pledger);
+	FillMemory(pledger->usid, sizeof(pledger->usid), ' ');
+	memcpy(pledger->usid, (LPCSTR)m_usid, m_usid.GetLength());
+	memcpy(pledger->brno, "000", 3);
+	memcpy(pledger->rcnt, "0010", 4);
+	memcpy(pledger->svcd, "COSAQ208", 8);
+	memcpy(pledger->fkey, "C   ", 4);
+
+	// CString strTemp;
+	// strTemp.Format("%08d", id);
+	// CopyMemory(ledger->csym, strTemp, strTemp.GetLength()); // 2012.06.04 KSJ 사용자 정의 ID 추가
+
+	CopyMemory(pmid->In, "00001", 5);
+	CopyMemory(pmid->AcntNo, acc, strlen(acc));
+	CopyMemory(pmid->Pwd, "HEAD", 4);
+	CopyMemory(pmid->SrtDt, stFirst.GetString(), 8);
+	CopyMemory(pmid->EndDate, stSecond.GetString(), 8);
+	CopyMemory(pmid->IsuNo, code, strlen(code));
+	CopyMemory(pmid->TrdNo, "+999999999", 10);
+	pmid->CancTp[0] = CancTp[0];		// 1- 취소
+	CopyMemory(pmid->TrdTpCode, gubn, 2);	// 00- 전체, 10-출납, 11-입출금, 12-입출고, 13-외화입출금, 14-환전, 20-매매내역, 21-대금결제, 22-유가결제, 30-과세내역
+	pmid->StkTp[0] = stktp[0];		// 0-전체, 1-온주, 2-소수점, 3-적립식
+
+	CString sPswd;
+	sPswd = GetEncPassword(pswd);
+
+	//2014.04.21 KSJ 일방향암호화 추가
+	CopyMemory(pledger->hsiz, "44", sizeof(pledger->hsiz));
+	CopyMemory(pledger->epwd, sPswd, sPswd.GetLength());
+
+std::ofstream file("tr.txt", std::ios::out | std::ios::trunc);
+file << buff.data() << std::endl;
+file.close();
+	return SendTR("piboPBxQ", key, US_ENC, buff.data(), buff.size(), &CIBKSConnectorCtrl::DEF_KOSCOM_CALLBACK);
+}
+
+BOOL CIBKSConnectorCtrl::TR5004(long key, LPCTSTR acc, LPCTSTR crcycode)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+	if (IsValidState() == FALSE) return FALSE;
+	if (IsValidAccount(acc) == FALSE) return FALSE;
+	return AccessTr(eTR5004) ? S_TR5004(key, acc, crcycode) : FALSE;
+}
+
+
+
+BOOL CIBKSConnectorCtrl::S_TR5004(long key, LPCTSTR acc, LPCTSTR crcycode)
+{
+	// 환율 국민은행...
+	if (strlen(crcycode) != 3)
+	{
+		//"USD" - 미국달러, "AUD" - 호주달러,  "HKD" - 홍콩달러, "CNY" - 중국위안화
+		m_sLastMsg = "통화코드를 확인하세요.[crcycode]";
+		return FALSE;
+	}
+
+	vector<char> buff;
+	buff.resize(L_ledger + L_sdpkt169_mid, ' ');
+	struct ledger* pledger = (struct ledger*)&buff[0];
+	struct sdpkt169_mid* pmid = (struct sdpkt169_mid*)&buff[L_ledger];
+	GetLedger(pledger);
+	FillMemory(pledger->usid, sizeof(pledger->usid), ' ');
+	memcpy(pledger->usid, (LPCSTR)m_usid, m_usid.GetLength());
+	memcpy(pledger->brno, "000", 3);
+	memcpy(pledger->rcnt, "0008", 4);
+	memcpy(pledger->svcd, "SDPKT169", 8);
+	memcpy(pledger->fkey, "C   ", 4);
+	
+	memcpy(pmid->In, "00001", 5);
+	pmid->TrxTp[0] = '1';
+	memcpy(pmid->CrcyCode, crcycode, 3);
+	//memcpy(pmid->AcntNo, acc, min((int)strlen(acc), (int)sizeof(pmid->AcntNo)));
+
+	std::ofstream file("tr.txt", std::ios::out | std::ios::trunc);
+	file << buff.data() << std::endl;
+	file.close();
+
+	return SendTR("piboPBxQ", key, US_ENC, buff.data(), buff.size(), &CIBKSConnectorCtrl::DEF_KOSCOM_CALLBACK);
+}
+
+BOOL CIBKSConnectorCtrl::TR5007(long key, LPCTSTR acc, LPCTSTR crcycode)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+	if (IsValidState() == FALSE) return FALSE;
+	if (IsValidAccount(acc) == FALSE) return FALSE;
+	return AccessTr(eTR5007) ? S_TR5007(key, acc, crcycode) : FALSE;
+}
+
+
+BOOL CIBKSConnectorCtrl::S_TR5007(long key, LPCTSTR acc, LPCTSTR crcycode)
+{	
+	// 환율 기업은행...
+	if (strlen(crcycode) != 3)
+	{
+		//"USD" - 미국달러, "AUD" - 호주달러,  "HKD" - 홍콩달러, "CNY" - 중국위안화
+		m_sLastMsg = "통화코드를 확인하세요.[crcycode]";
+		return FALSE;
+	}
+
+	vector<char> buff;
+	buff.resize(L_ledger + sizeof(struct sdpkt183_mid), ' ');
+	struct ledger* pledger = (struct ledger*)&buff[0];
+	struct sdpkt183_mid* pmid = (struct sdpkt183_mid*)&buff[L_ledger];
+
+	GetLedger(pledger);
+	FillMemory(pledger->usid, sizeof(pledger->usid), ' ');
+	memcpy(pledger->usid, (LPCSTR)m_usid, m_usid.GetLength());
+	memcpy(pledger->brno, "000", 3);
+	memcpy(pledger->rcnt, "0008", 4);
+	memcpy(pledger->svcd, "SDPKT183", 8);
+	memcpy(pledger->fkey, "C   ", 4);
+
+
+	memcpy(pmid->In, "00001", 5);
+	pmid->TrxTp[0] = '1';
+	memcpy(pmid->CrcyCode, crcycode, 3);
+	//memcpy(pmid->AcntNo, acc, min((int)strlen(acc), (int)sizeof(pmid->AcntNo)));
+
+	std::ofstream file("tr.txt", std::ios::out | std::ios::trunc);
+	file << buff.data() << std::endl;
+	file.close();
+
+	return SendTR("piboPBxQ", key, US_ENC, buff.data(), buff.size(), &CIBKSConnectorCtrl::DEF_KOSCOM_CALLBACK);
+}
+
+BOOL CIBKSConnectorCtrl::TR5010(long key)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+	if (IsValidState() == FALSE) return FALSE;
+	return AccessTr(eTR5010) ? S_TR5010(key) : FALSE;
+}
+
+
+BOOL CIBKSConnectorCtrl::S_TR5010(long key)
+{
+	vector<char> buff;
+	buff.resize(L_ledger + sizeof(struct sdpwq002_mid), ' ');
+
+	struct ledger* pledger = (struct ledger*)&buff[0];
+	struct sdpwq002_mid* pmid = (struct sdpwq002_mid*)&buff[L_ledger];
+
+	GetLedger(pledger);
+	FillMemory(pledger->usid, sizeof(pledger->usid), ' ');
+	memcpy(pledger->usid, (LPCSTR)m_usid, m_usid.GetLength());
+	memcpy(pledger->brno, "000", 3);
+	memcpy(pledger->rcnt, "0008", 4);
+	memcpy(pledger->svcd, "SDPWQ002", 8);
+	memcpy(pledger->fkey, "C   ", 4);
+
+
+	memcpy(pmid->In, "00001", 5);
+	return SendTR("piboPBxQ", key, US_ENC, buff.data(), buff.size(), &CIBKSConnectorCtrl::DEF_KOSCOM_CALLBACK);
+
+}
+
+BOOL CIBKSConnectorCtrl::TR5005(long key, LPCTSTR acc, LPCTSTR pswd, LPCTSTR gdxchrat, LPCTSTR mxchgptncode)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+	if (IsValidState() == FALSE) return FALSE;
+	if (IsValidAccount(acc) == FALSE) return FALSE;
+	if (IsValidAcnoPswd(pswd) == FALSE) return FALSE;
+	return AccessTr(eTR5005) ? S_TR5005(key, acc, pswd, gdxchrat, mxchgptncode) : FALSE;
+}
+
+
+BOOL CIBKSConnectorCtrl::S_TR5005(long key, LPCTSTR acc, LPCTSTR pswd, LPCTSTR gdxchrat, LPCTSTR mxchgptncode)
+{
+	// 일단 대기... 환율을 알아야함....
+	vector<char> buff;
+	buff.resize(L_ledger + L_sdpdq099_mid, ' ');
+
+	struct ledger* pledger = (struct ledger*)&buff[0];
+	struct sdpdq099_mid* pmid = (struct sdpdq099_mid*)&buff[L_ledger];
+
+
+	// Ledger 편집
+	GetLedger(pledger);
+	FillMemory(pledger->usid, sizeof(pledger->usid), ' ');
+	memcpy(pledger->usid, (LPCSTR)m_usid, m_usid.GetLength());
+	memcpy(pledger->brno, "000", 3);
+	memcpy(pledger->rcnt, "0008", 4);
+	memcpy(pledger->svcd, "SDPDQ099", 8);
+	memcpy(pledger->fkey, "C   ", 4);
+
+
+	CopyMemory(pmid->In, "00001", 5);
+	CopyMemory(pmid->AcntNo, acc, min((int)strlen(acc), (int)sizeof(pmid->AcntNo)));
+	CopyMemory(pmid->Pwd, "HEAD", 4);
+
+
+	double dRate;// = atof(sRate);
+	CString sFmtRate;
+	sFmtRate.Format("%+010.5f", dRate);
+	CopyMemory(pmid->GdXchrat, (LPCSTR)sFmtRate, min((int)sFmtRate.GetLength(), (int)sizeof(pmid->GdXchrat)));
+	CopyMemory(pmid->MxchgPtnCode, mxchgptncode, 2); // "01" 외화매수   "02" 외화매도
+
+
+	CString sPswd;
+	sPswd = GetEncPassword(pswd);
+
+
+	// 일방향암호화 추가
+	CopyMemory(pledger->hsiz, "44", sizeof(pledger->hsiz));
+	CopyMemory(pledger->epwd, sPswd, sPswd.GetLength());
+
+
+
+std::ofstream file("tr.txt", std::ios::out | std::ios::trunc);
+file << buff.data() << std::endl;
+file.close();
+
+	return SendTR("piboPBxQ", key, US_ENC, buff.data(), buff.size(), &CIBKSConnectorCtrl::DEF_KOSCOM_CALLBACK);
+
+}
+
+
+BOOL CIBKSConnectorCtrl::TR5006(long key, LPCTSTR acc, LPCTSTR pswd, LPCTSTR mxchgtpcode, LPCTSTR trxtp, LPCTSTR regtpcode, LPCTSTR xchrattpcode, LPCTSTR mxchgptncode, LPCTSTR tgrtmnyoutamt, LPCTSTR mxchgmnyinamt, LPCTSTR tgrtcrcycode, LPCTSTR mxchgcrcycode, LPCTSTR appxcharat, LPCTSTR prvlgrat)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	if (IsValidState() == FALSE) return FALSE;
+	if (IsValidAccount(acc) == FALSE) return FALSE;
+	if (IsValidAcnoPswd(pswd) == FALSE) return FALSE;
+	return AccessTr(eTR5006) ? S_TR5006(key, acc, pswd, mxchgtpcode, trxtp, regtpcode, xchrattpcode, mxchgptncode, tgrtmnyoutamt, mxchgmnyinamt, tgrtcrcycode, mxchgcrcycode, appxcharat, prvlgrat) : FALSE;
+}
+
+
+BOOL CIBKSConnectorCtrl::S_TR5006(long key, LPCTSTR acc, LPCTSTR pswd, LPCTSTR mxchgtpcode, LPCTSTR trxtp, LPCTSTR regtpcode, LPCTSTR xchrattpcode, LPCTSTR mxchgptncode, LPCTSTR tgrtmnyoutamt, LPCTSTR mxchgmnyinamt, LPCTSTR tgrtcrcycode, LPCTSTR mxchgcrcycode, LPCTSTR appxcharat, LPCTSTR prvlgrat)
+{
+
+	vector<char> buff;
+	buff.resize(L_ledger + L_sdpdt080_mid, ' ');
+
+	struct ledger* pledger = (struct ledger*)&buff[0];
+	struct sdpdt080_mid* pmid = (struct sdpdt080_mid*)&buff[L_ledger];
+
+
+	// Ledger 편집
+	GetLedger(pledger);
+	FillMemory(pledger->usid, sizeof(pledger->usid), ' ');
+	memcpy(pledger->usid, (LPCSTR)m_usid, m_usid.GetLength());
+	memcpy(pledger->brno, "000", 3);
+	memcpy(pledger->rcnt, "0000", 4);
+	memcpy(pledger->svcd, "SDPDT080", 8);
+	memcpy(pledger->fkey, "5   ", 4);
+
+	CopyMemory(pmid->In, "00001", 5);
+	pmid->MxchgTpCode[0] = '1'; // 1: 단건환전   2: 일괄환전 
+	pmid->TrxTp[0] = ' ';
+
+	CopyMemory(pmid->AcntNo, acc, min((int)strlen(acc), (int)sizeof(pmid->AcntNo)));
+	CopyMemory(pmid->Pwd, "HEAD", 4);
+
+	if (regtpcode && strlen(regtpcode) > 0)
+		CopyMemory(pmid->RegTpCode, regtpcode, min((int)strlen(regtpcode), (int)sizeof(pmid->RegTpCode)));
+	if (xchrattpcode && strlen(xchrattpcode) > 0)
+		CopyMemory(pmid->XchratTpCode, xchrattpcode, min((int)strlen(xchrattpcode), (int)sizeof(pmid->XchratTpCode)));
+	if (mxchgptncode && strlen(mxchgptncode) > 0)
+		CopyMemory(pmid->MxchgPtnCode, mxchgptncode, min((int)strlen(mxchgptncode), (int)sizeof(pmid->MxchgPtnCode)));
+
+
+	if (tgrtmnyoutamt && strlen(tgrtmnyoutamt) > 0)
+	{
+		CString sAmt(tgrtmnyoutamt);
+		sAmt.Trim();
+
+		if (sAmt.GetLength() == sizeof(pmid->TgrtMnyoutAmt))
+			CopyMemory(pmid->TgrtMnyoutAmt, (LPCSTR)sAmt, sizeof(pmid->TgrtMnyoutAmt));
+		else
+		{
+			double dAmt = atof(sAmt);
+			CString sFmt;
+			sFmt.Format("%+026.6f", dAmt);
+			CopyMemory(pmid->TgrtMnyoutAmt, (LPCSTR)sFmt, min((int)sFmt.GetLength(), (int)sizeof(pmid->TgrtMnyoutAmt)));
+		}
+	}
+
+
+	if (mxchgmnyinamt && strlen(mxchgmnyinamt) > 0)
+	{
+		CString sAmt(mxchgmnyinamt);
+		sAmt.Trim();
+		if (sAmt.GetLength() == sizeof(pmid->MxchgMnyinAmt))
+			CopyMemory(pmid->MxchgMnyinAmt, (LPCSTR)sAmt, sizeof(pmid->MxchgMnyinAmt));
+		else
+		{
+			double dAmt = atof(sAmt);
+			CString sFmt;
+			sFmt.Format("%+026.6f", dAmt);
+			CopyMemory(pmid->MxchgMnyinAmt, (LPCSTR)sFmt, min((int)sFmt.GetLength(), (int)sizeof(pmid->MxchgMnyinAmt)));
+		}
+	}
+
+
+	if (tgrtcrcycode && strlen(tgrtcrcycode) > 0)
+		CopyMemory(pmid->TgrtCrcyCode, tgrtcrcycode, min((int)strlen(tgrtcrcycode), (int)sizeof(pmid->TgrtCrcyCode)));
+	if (mxchgcrcycode && strlen(mxchgcrcycode) > 0)
+		CopyMemory(pmid->MxchgCrcyCode, mxchgcrcycode, min((int)strlen(mxchgcrcycode), (int)sizeof(pmid->MxchgCrcyCode)));
+
+	if (appxcharat && strlen(appxcharat) > 0)
+	{
+		CString sRate(appxcharat);
+
+		sRate.Trim();
+		if (sRate.GetLength() == sizeof(pmid->AppXcharat))
+			CopyMemory(pmid->AppXcharat, (LPCSTR)sRate, sizeof(pmid->AppXcharat));
+		else
+		{
+			double dRate = atof(sRate);
+			CString sFmt;
+			sFmt.Format("%+015.4f", dRate);
+			CopyMemory(pmid->AppXcharat, (LPCSTR)sFmt, min((int)sFmt.GetLength(), (int)sizeof(pmid->AppXcharat)));
+		}
+	}
+
+	if (prvlgrat && strlen(prvlgrat) > 0)
+	{
+		CString sRate(prvlgrat);
+		sRate.Trim();
+		if (sRate.GetLength() == sizeof(pmid->PrvlgRat))
+			CopyMemory(pmid->PrvlgRat, (LPCSTR)sRate, sizeof(pmid->PrvlgRat));
+		else
+		{
+			double dRate = atof(sRate);
+			CString sFmt;
+			sFmt.Format("%+015.4f", dRate);
+			CopyMemory(pmid->PrvlgRat, (LPCSTR)sFmt, min((int)sFmt.GetLength(), (int)sizeof(pmid->PrvlgRat)));
+		}
+	}
+
+
+	CString sPswd;
+	sPswd = GetEncPassword(pswd);
+
+
+
+	// 일방향암호화 추가
+	CopyMemory(pledger->hsiz, "44", sizeof(pledger->hsiz));
+	CopyMemory(pledger->epwd, sPswd, sPswd.GetLength());
+
+
+std::ofstream file("tr.txt", std::ios::out | std::ios::trunc);
+file << buff.data() << std::endl;
+file.close();
+
+	return SendTR("piboPBxQ", key, US_ENC, buff.data(), buff.size(), &CIBKSConnectorCtrl::DEF_KOSCOM_CALLBACK);
+}
+
+
+BOOL CIBKSConnectorCtrl::FNORDER(long key, LPCTSTR odgb, LPCTSTR mmgb,LPCTSTR ogno, LPCTSTR accn, LPCTSTR pswd, LPCTSTR mkgb, LPCTSTR code, LPCTSTR jqty, LPCTSTR jprc, LPCTSTR hogb, LPCTSTR rsvgubn, LPCTSTR curCode, LPCTSTR rsvlpdt, LPCTSTR rsvStDt, LPCTSTR rsvEndDt, LPCTSTR rsvOrdNo, LPCTSTR rsv_lndt, LPCTSTR creditCode)
+
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+	
+	if (IsValidState() == FALSE) return FALSE;
+	if (IsValidAccount(accn) == FALSE) return FALSE;
+	if (IsValidAcnoPswd(pswd) == FALSE) return FALSE;
+
+	return AccessTr(eFNORDER) ? S_FNORDER(key, odgb, mmgb, ogno, accn, pswd, mkgb, code, jqty, jprc, hogb, rsvgubn, curCode, rsvlpdt, rsvStDt, rsvEndDt, rsvOrdNo, rsv_lndt, creditCode) : FALSE;
+}
+
+BOOL CIBKSConnectorCtrl::S_FNORDER(long key, LPCTSTR odgb, LPCTSTR mmgb, LPCTSTR ogno, LPCTSTR accn, LPCTSTR pswd, LPCTSTR mkgb, LPCTSTR code, LPCTSTR jqty, LPCTSTR jprc, LPCTSTR hogb,LPCTSTR rsvgubn, LPCTSTR curCode, LPCTSTR rsvlpdt, LPCTSTR rsvStDt, LPCTSTR rsvEndDt, LPCTSTR rsvOrdNo, LPCTSTR rsv_lndt, LPCTSTR creditCode)
+{
+
+	vector<char> buff;
+	buff.resize(L_ledger + L_pibogorder_mid, ' ');
+
+	struct ledger* pledger = (struct ledger*)&buff[0];
+	struct pibogorder_mid* pmid = (struct pibogorder_mid*)&buff[L_ledger];
+
+	GetLedger(pledger);
+	FillMemory(pledger->usid, sizeof(pledger->usid), ' ');
+	memcpy(pledger->usid, (LPCSTR)m_usid, m_usid.GetLength());
+	memcpy(pledger->brno, "000", 3);
+	memcpy(pledger->rcnt, "0000", 4);
+	memcpy(pledger->fkey, "C   ", 4);
+	memcpy(pledger->svcd, "piboGorder", 8);
+
+
+	CString sPswd = GetEncPassword(pswd);
+	CopyMemory(pledger->hsiz, "44", sizeof(pledger->hsiz));
+	CopyMemory(pledger->epwd, sPswd, sPswd.GetLength());
+
+	CopyMemory(pmid->gubn, "^E", 2);		//Default
+	CopyMemory(pmid->icont, "0001", 4);		//Default
+	CopyMemory(pmid->jmgb, "XX", 2);		// 통신매체 default
+
+	//If stmp = "71" Or stmp = "72" Or stmp = "73" Then
+	//	ed_ordTp.Data = "1"
+	//	ed_mdgb.Data = "20"
+	//	ElseIf stmp = "81" Or stmp = "82" Or stmp = "87" Then
+	//	ed_ordTp.Data = "2"
+	//	ed_mdgb.Data = "10"
+	//	Else
+
+	CString sNasdaq("818287");
+
+	CString sQty, sPrc;
+	sQty.Format("%08d", atoi(jqty));
+	Msg(sQty);
+
+	const INT64 value = (INT64)floor(atof(jprc) * 10000.0 + 0.5);
+	sPrc.Format("%015I64d", value);
+	Msg(sPrc);
+
+	CopyMemory(pmid->odgb, sNasdaq.FindOneOf(mkgb) != -1 ? "1" : "2", 1);   // 주문유형 1-중국 2-미국 3-예약
+	CopyMemory(pmid->mmgb, mmgb, min((int)strlen(mmgb), (int)sizeof(pmid->mmgb)));					  // 매매구분 01-매도 02-매수 08-취소 21-단주매도 28-단주매수  11- 매도담보상환
+	CopyMemory(pmid->opcd, "  ", 2);										  // 매도상환일때만.... 11번 셋팅
+	CopyMemory(pmid->ogno, ogno, min((int)strlen(ogno), (int)sizeof(pmid->ogno)));					  // 원주문번호 
+	CopyMemory(pmid->accn, accn, min((int)strlen(accn), (int)sizeof(pmid->accn)));
+	CopyMemory(pmid->pswd, "HEAD", 4);
+	CopyMemory(pmid->mkgb, mkgb, min((int)strlen(mkgb), (int)sizeof(pmid->mkgb)));					  // 뉴욕 81, 나스닥 82, 아멕스 87, 홍콩 71, 상해 72, 심천 73
+	CopyMemory(pmid->code, code, min((int)strlen(code), (int)sizeof(pmid->code)));					  // 종목코드 
+	CopyMemory(pmid->jqty, sQty.GetString(), sQty.GetLength());									 // 종목수량   취소주문인 경우 주문수량을 0으로 넣어야 전량 취소...
+
+	CopyMemory(pmid->jprc, sPrc.GetString(), 15);									  // 가격..  10 -> 100000  52.12 -> 521200        10000을 곱할것...
+	
+	CopyMemory(pmid->hogb, hogb, min((int)strlen(hogb), (int)sizeof(pmid->hogb)));					  // 00: 지정가   03: 시장가  A2:TWAP  A3:VWAP A4:LIMIT_TWAP A5:LIMIT_VWAP B1:MOC B2:LOC
+	CopyMemory(pmid->mdgb, sNasdaq.FindOneOf(mkgb) != -1 ? "20" : "10", sizeof(pmid->mdgb));			  // 중개인 구분코드
+
+
+	CopyMemory(pmid->rsvgubn, rsvgubn, min((int)strlen(rsvgubn), (int)sizeof(pmid->rsvgubn)));			  // 예약처리 구분 0: 등록 2:취소
+	CopyMemory(pmid->curCode, curCode, min((int)strlen(curCode), (int)sizeof(pmid->curCode)));			  // 국가코드 001 미국 003 일본 006 중국
+	
+	
+	CopyMemory(pmid->rsvlpdt, rsvlpdt, min((int)strlen(rsvlpdt), (int)sizeof(pmid->rsvlpdt)));			  // 예약주문 입력일
+	CopyMemory(pmid->rsvStDt, rsvStDt, min((int)strlen(rsvStDt), (int)sizeof(pmid->rsvStDt)));			  // 예약주문 시작일
+	CopyMemory(pmid->rsvEndDt, rsvEndDt, min((int)strlen(rsvEndDt), (int)sizeof(pmid->rsvEndDt)));			  // 예약주문 종료일
+	CopyMemory(pmid->rsvOrdNo, rsvOrdNo, min((int)strlen(rsvOrdNo), (int)sizeof(pmid->rsvOrdNo)));			  // 예약주무조건코드 
+	
+	
+	//// 매도담보상환 주문...
+	//CopyMemory(pmid->rsv_lndt, rsv_lndt, min((int)strlen(rsv_lndt), (int)sizeof(pmid->rsv_lndt)));		  //대충일
+	//CopyMemory(pmid->creditCode, creditCode, min((int)strlen(creditCode), (int)sizeof(pmid->creditCode)));	  // 신용거래코드 180
+
+
+	//// 예약매도담보상환 주문  opcd  11이면 나머지 공백처리...
+
+std::ofstream file("tr.txt", std::ios::out | std::ios::trunc);
+file << buff.data() << std::endl;
+file.close();
+
+	return SendTR("pibogodr", key, US_CA | US_KEY, buff.data(), buff.size(), &CIBKSConnectorCtrl::DEF_KOSCOM_CALLBACK);
+
+}
+
+
+void CIBKSConnectorCtrl::DEF_KOSCOM_CALLBACK(WPARAM wParam, LPARAM lParam)
+{
+	CString slog;
+	slog.Format("[OPENAPI][%s]<%d> \n", __FUNCTION__, __LINE__);
+	OutputDebugString(slog);
+
+	char nID[8] = { 0, };
+	char nkey[19] = { 0, };
+	char zErrMsg[99] = { 0, };
+
+	struct ledger* ledg = (struct ledger*)lParam;
+
+	BOOL bNext = (ledg->next[0] == 'Y');
+	if (bNext)
+		memcpy(nkey, ledg->nkey, sizeof(ledg->nkey));
+
+	ledg->emsg[98] = '\0';
+	memcpy(zErrMsg, ledg->emsg, sizeof(ledg->emsg));
+
+	int key = LOWORD(wParam);
+	int size = HIWORD(wParam) - L_ledger;
+	LPCSTR data = (LPCSTR)(lParam + L_ledger);
+
+	//입력데이터 포맷에러
+	if (strlen(ledg->ecod))
+		FireOnGuideMsg(key, zErrMsg);
+
+	if (m_bSaveLog)
+		testSaveFile(key, data, size);
+
+	FireOnRecvData(key, (long)data, size, bNext, nkey);
+
+	//2012.06.13 KSJ ID를 포함해서 이벤트를 새로 만듬
+	memcpy(nID, ledg->csym, sizeof(ledg->csym));
+	int id = atoi(nID);
+
+	slog.Format("[OPENAPI][%s]<%d> key=[%d] size=[%d]\n", __FUNCTION__, __LINE__, key, size);
+	OutputDebugString(slog);
+
+
+string sdata(data, size);
+std::ofstream file("rdata.txt", std::ios::out | std::ios::trunc);
+file << sdata << std::endl;
+
+//if (key == 152)
+//{ // TR2002 주식 거래내역...
+//
+//	std::ofstream file("data.txt", std::ios::out | std::ios::trunc);
+//	gsl::span<const char> response(data, size);
+//	const size_t recordsOffset = L_tr2002_mid + L_tr2002_mod - L_tr2002_rec;
+//
+//	if (response.size_bytes() >= recordsOffset)
+//	{
+//		const auto* pmid = reinterpret_cast<const tr2002_mid*>(response.data());
+//		const auto* pmod = reinterpret_cast<const tr2002_mod*>(response.data() + L_tr2002_mid);
+//		const int count = atoi(string(pmod->Out2, sizeof(pmod->Out2)).data());
+//		const auto recordData = response.subspan(recordsOffset);
+//		const gsl::span<const tr2002_rec> records(reinterpret_cast<const tr2002_rec*>(recordData.data()),recordData.size_bytes() / sizeof(tr2002_rec));
+//		const size_t recordCount = count > 0 ? min<size_t>(count, records.size()) : 0;
+//		auto field = [](const char* value, int length)
+//		{
+//			CString result(value, length);
+//			result.Trim();
+//			return result;
+//		};
+//
+//		file << "주식 거래내역 (" << count << "건)" << std::endl;
+//		file << "조회기간: " << (LPCSTR)field(pmid->QrySrtDt, sizeof(pmid->QrySrtDt))
+//			<< " ~ " << (LPCSTR)field(pmid->QryEndDt, sizeof(pmid->QryEndDt)) << std::endl;
+//		file << "================================================================" << std::endl;
+//		file << "매도: 수량 " << (LPCSTR)field(pmod->out1.SellQty, sizeof(pmod->out1.SellQty))
+//			<< "  금액 " << (LPCSTR)field(pmod->out1.SellAmt, sizeof(pmod->out1.SellAmt))
+//			<< "  수수료 " << (LPCSTR)field(pmod->out1.SellCmsnAmt, sizeof(pmod->out1.SellCmsnAmt)) << std::endl;
+//		file << "매수: 수량 " << (LPCSTR)field(pmod->out1.BuyQty, sizeof(pmod->out1.BuyQty))
+//			<< "  금액 " << (LPCSTR)field(pmod->out1.BuyAmt, sizeof(pmod->out1.BuyAmt))
+//			<< "  수수료 " << (LPCSTR)field(pmod->out1.BuyCmsnAmt, sizeof(pmod->out1.BuyCmsnAmt)) << std::endl;
+//		file << "합계: 수량 " << (LPCSTR)field(pmod->out1.SumQty, sizeof(pmod->out1.SumQty))
+//			<< "  금액 " << (LPCSTR)field(pmod->out1.SumAmt, sizeof(pmod->out1.SumAmt))
+//			<< "  수수료 " << (LPCSTR)field(pmod->out1.CmsnAmtSum, sizeof(pmod->out1.CmsnAmtSum))
+//			<< "  세금 " << (LPCSTR)field(pmod->out1.EvrTax, sizeof(pmod->out1.EvrTax)) << std::endl;
+//		file << "================================================================" << std::endl;
+//
+//
+//		for (size_t ii = 0; ii < recordCount; ++ii)
+//		{
+//			const auto& item = records[ii];
+//			file << "[" << (ii + 1) << "] " << (LPCSTR)field(item.TrdDate, sizeof(item.TrdDate))
+//				<< "  " << (LPCSTR)field(item.IsuNm, sizeof(item.IsuNm))
+//				<< "  거래번호 " << (LPCSTR)field(item.TrdNo, sizeof(item.TrdNo)) << std::endl;
+//			file << "    적요: " << (LPCSTR)field(item.SmryNm, sizeof(item.SmryNm))
+//				<< "  수량 " << (LPCSTR)field(item.TrdQty, sizeof(item.TrdQty))
+//				<< "  단가 " << (LPCSTR)field(item.TrdUprc, sizeof(item.TrdUprc))
+//				<< "  거래금액 " << (LPCSTR)field(item.TrdAmt, sizeof(item.TrdAmt)) << std::endl;
+//			file << "    수수료 " << (LPCSTR)field(item.CmsnAmt, sizeof(item.CmsnAmt))
+//				<< "  세금 " << (LPCSTR)field(item.TaxSumAmt, sizeof(item.TaxSumAmt))
+//				<< "  정산금액 " << (LPCSTR)field(item.AdjstAmt, sizeof(item.AdjstAmt))
+//				<< "  예수금잔액 " << (LPCSTR)field(item.DpsCrbalAmt, sizeof(item.DpsCrbalAmt)) << std::endl;
+//			file << "    유가증권잔량 " << (LPCSTR)field(item.SecCrbalQty, sizeof(item.SecCrbalQty))
+//				<< "  처리시각 " << (LPCSTR)field(item.TrxTime, sizeof(item.TrxTime)) << std::endl;
+//			file << "----------------------------------------------------------------" << std::endl;
+//		}
+//
+//		if (recordCount < static_cast<size_t>(count))
+//			file << "응답에 포함된 레코드: " << recordCount << "건 (선언된 건수: " << count << "건)" << std::endl;
+//	}
+//	else
+//	{
+//		file << "TR2002 응답 길이가 헤더 크기보다 작습니다." << std::endl;
+//	}
+//	file.close();
+//}
+//else if (key == 154)
+//{
+//	// TR5000  외화예수금..
+//	std::ofstream file("data.txt", std::ios::out | std::ios::trunc);
+//	gsl::span<const char> response(data, size);
+//	size_t offset = L_cosaq027_mid;
+//
+//	auto field = [](const char* value, int length)
+//	{
+//		CString result(value, length);
+//		result.Trim();
+//		return result;
+//	};
+//
+//	auto readCount = [&response, &offset](int& count)
+//	{
+//		if (response.size_bytes() - offset < 5)
+//			return false;
+//		count = atoi(string(response.data() + offset, 5).data());
+//		offset += 5;
+//		return count >= 0;
+//	};
+//
+//
+//	if (response.size_bytes() < offset)
+//	{
+//		file << "COSAQ027 응답 길이가 헤더 크기보다 작습니다." << std::endl;
+//	}
+//	else
+//	{
+//		int declaredCount = 0;
+//		if (!readCount(declaredCount))
+//		{
+//			file << "COSAQ027 통화별 정산금액 건수를 읽을 수 없습니다." << std::endl;
+//		}
+//		else
+//		{
+//			const size_t recordCount = min<size_t>(declaredCount, (response.size_bytes() - offset) / sizeof(cosaq027_out1));
+//			const auto* records = reinterpret_cast<const cosaq027_out1*>(response.data() + offset);
+//			file << "해외증권 외화예수금" << std::endl;
+//			file << "================================================================" << std::endl;
+//			for (size_t ii = 0; ii < recordCount; ++ii)
+//			{
+//				const auto& item = records[ii];
+//				file << "[" << (ii + 1) << "] 통화: " << (LPCSTR)field(item.CrcyCode, sizeof(item.CrcyCode)) << std::endl;
+//				file << "    매수정산금: " << (LPCSTR)field(item.FcurrBuyAdjustAmt1, sizeof(item.FcurrBuyAdjustAmt1))
+//					<< " / " << (LPCSTR)field(item.FcurrBuyAdjustAmt2, sizeof(item.FcurrBuyAdjustAmt2))
+//					<< " / " << (LPCSTR)field(item.FcurrBuyAdjustAmt3, sizeof(item.FcurrBuyAdjustAmt3))
+//					<< " / " << (LPCSTR)field(item.FcurrBuyAdjustAmt4, sizeof(item.FcurrBuyAdjustAmt4)) << std::endl;
+//				file << "    매도정산금: " << (LPCSTR)field(item.FcurrSellAdjustAmt1, sizeof(item.FcurrSellAdjustAmt1))
+//					<< " / " << (LPCSTR)field(item.FcurrSellAdjustAmt2, sizeof(item.FcurrSellAdjustAmt2))
+//					<< " / " << (LPCSTR)field(item.FcurrSellAdjustAmt3, sizeof(item.FcurrSellAdjustAmt3))
+//					<< " / " << (LPCSTR)field(item.FcurrSellAdjustAmt4, sizeof(item.FcurrSellAdjustAmt4)) << std::endl;
+//				file << "    추정예수금: " << (LPCSTR)field(item.PrsmptFcurrDps1, sizeof(item.PrsmptFcurrDps1))
+//					<< " / " << (LPCSTR)field(item.PrsmptFcurrDps2, sizeof(item.PrsmptFcurrDps2))
+//					<< " / " << (LPCSTR)field(item.PrsmptFcurrDps3, sizeof(item.PrsmptFcurrDps3))
+//					<< " / " << (LPCSTR)field(item.PrsmptFcurrDps4, sizeof(item.PrsmptFcurrDps4)) << std::endl;
+//				file << "    추정환전가능금: " << (LPCSTR)field(item.PrsmptMxchgAbleAmt1, sizeof(item.PrsmptMxchgAbleAmt1))
+//					<< " / " << (LPCSTR)field(item.PrsmptMxchgAbleAmt2, sizeof(item.PrsmptMxchgAbleAmt2))
+//					<< " / " << (LPCSTR)field(item.PrsmptMxchgAbleAmt3, sizeof(item.PrsmptMxchgAbleAmt3))
+//					<< " / " << (LPCSTR)field(item.PrsmptMxchgAbleAmt4, sizeof(item.PrsmptMxchgAbleAmt4)) << std::endl;
+//				file << "----------------------------------------------------------------" << std::endl;
+//			}
+//			offset += recordCount * sizeof(cosaq027_out1);
+//			if (recordCount < static_cast<size_t>(declaredCount))
+//				file << "정산금액 레코드: " << recordCount << "건 (선언된 건수: " << declaredCount << "건)" << std::endl;
+//		}
+//
+//		int balanceCount = 0;
+//		if (readCount(balanceCount))
+//		{
+//			const size_t recordCount = min<size_t>(balanceCount, (response.size_bytes() - offset) / sizeof(cosaq027_out2));
+//			const auto* records = reinterpret_cast<const cosaq027_out2*>(response.data() + offset);
+//			file << "통화별 잔고 (" << balanceCount << "건)" << std::endl;
+//			file << "================================================================" << std::endl;
+//			for (size_t ii = 0; ii < recordCount; ++ii)
+//			{
+//				const auto& item = records[ii];
+//				file << "[" << (ii + 1) << "] " << (LPCSTR)field(item.CntryNm, sizeof(item.CntryNm))
+//					<< " (" << (LPCSTR)field(item.CrcyCode, sizeof(item.CrcyCode)) << ")" << std::endl;
+//				file << "    외화예수금 " << (LPCSTR)field(item.FcurrDps, sizeof(item.FcurrDps))
+//					<< "  주문가능 " << (LPCSTR)field(item.FcurrOrdAbleAmt, sizeof(item.FcurrOrdAbleAmt))
+//					<< "  주문금액 " << (LPCSTR)field(item.FcurrOrdAmt, sizeof(item.FcurrOrdAmt)) << std::endl;
+//				file << "    환전가능 " << (LPCSTR)field(item.FcurrMxchgAbleAmt, sizeof(item.FcurrMxchgAbleAmt))
+//					<< "  담보금 " << (LPCSTR)field(item.FcurrPldgAmt, sizeof(item.FcurrPldgAmt))
+//					<< "  미수금 " << (LPCSTR)field(item.FcurrRcvblAmt, sizeof(item.FcurrRcvblAmt)) << std::endl;
+//				file << "----------------------------------------------------------------" << std::endl;
+//			}
+//			offset += recordCount * sizeof(cosaq027_out2);
+//		}
+//
+//		int wonBalanceCount = 0;
+//		if (readCount(wonBalanceCount))
+//		{
+//			const size_t recordCount = min<size_t>(wonBalanceCount, (response.size_bytes() - offset) / sizeof(cosaq027_out3));
+//			const auto* records = reinterpret_cast<const cosaq027_out3*>(response.data() + offset);
+//			for (size_t ii = 0; ii < recordCount; ++ii)
+//			{
+//				const auto& item = records[ii];
+//				file << "원화예수금 " << (LPCSTR)field(item.WwonDpsBalAmt, sizeof(item.WwonDpsBalAmt))
+//					<< "  출금가능금액 " << (LPCSTR)field(item.MnyoutAbleAmt, sizeof(item.MnyoutAbleAmt))
+//					<< "  원화환산거래금액 " << (LPCSTR)field(item.WwonConvTrdAmt, sizeof(item.WwonConvTrdAmt))
+//					<< "  매매증거금 " << (LPCSTR)field(item.BnsMgn, sizeof(item.BnsMgn)) << std::endl;
+//			}
+//		}
+//	}
+//	file.close();
+//}
+//else if (key == 155)
+//{
+//	// TR5001 해외잔고...
+//	std::ofstream file("data.txt", std::ios::out | std::ios::trunc);
+//	gsl::span<const char> response(data, size);
+//	const size_t recordsOffset = L_cosaq003_mid + L_cosaq003_mod - L_cosaq003_out;
+//
+//	if (response.size_bytes() >= recordsOffset)
+//	{
+//		const auto module = response.subspan(L_cosaq003_mid);
+//		const auto* pmod = reinterpret_cast<const cosaq003_mod*>(module.data());
+//		const int count = atoi(string(pmod->Out, sizeof(pmod->Out)).data());
+//		const auto recordData = response.subspan(recordsOffset);
+//		const gsl::span<const cosaq003_out> records(
+//			reinterpret_cast<const cosaq003_out*>(recordData.data()),
+//			recordData.size_bytes() / sizeof(cosaq003_out));
+//		const size_t recordCount = count > 0 ? min<size_t>(count, records.size()) : 0;
+//
+//		file << "해외주식 잔고내역 (" << count << "건)" << std::endl;
+//		file << "================================================================" << std::endl;
+//
+//		for (size_t ii = 0; ii < recordCount; ++ii)
+//		{
+//			const auto& item = records[ii];
+//			auto field = [](const char* value, int length)
+//			{
+//				CString result(value, length);
+//				result.Trim();
+//				return result;
+//			};
+//
+//			file << "[" << (ii + 1) << "] "
+//				<< (LPCSTR)field(item.HangulsuNm80, sizeof(item.HangulsuNm80))
+//				<< " (" << (LPCSTR)field(item.ShtnIsuNo, sizeof(item.ShtnIsuNo)) << ")"
+//				<< "  통화: " << (LPCSTR)field(item.HanglCrcyNm, sizeof(item.HanglCrcyNm)) << std::endl;
+//			file << "    보유수량 " << (LPCSTR)field(item.HldQty, sizeof(item.HldQty))
+//				<< "  매도가능 " << (LPCSTR)field(item.SellAbleQty, sizeof(item.SellAbleQty))
+//				<< "  매입단가 " << (LPCSTR)field(item.FcurrBookPrc, sizeof(item.FcurrBookPrc))
+//				<< "  현재가 " << (LPCSTR)field(item.NowMprc, sizeof(item.NowMprc)) << std::endl;
+//			file << "    외화: 장부금액 " << (LPCSTR)field(item.FcurrBookAmt, sizeof(item.FcurrBookAmt))
+//				<< "  평가금액 " << (LPCSTR)field(item.FcurrEvalAmt, sizeof(item.FcurrEvalAmt))
+//				<< "  평가손익 " << (LPCSTR)field(item.FcurrEvalPflt, sizeof(item.FcurrEvalPflt)) << std::endl;
+//			file << "    원화: 평가금액 " << (LPCSTR)field(item.WonEvalAmt, sizeof(item.WonEvalAmt))
+//				<< "  평가손익 " << (LPCSTR)field(item.WonEvalLoss, sizeof(item.WonEvalLoss))
+//				<< "  수익률 " << (LPCSTR)field(item.ErnRat, sizeof(item.ErnRat)) << std::endl;
+//			file << "    주문: 매도 " << (LPCSTR)field(item.SellOrdQty, sizeof(item.SellOrdQty))
+//				<< "  매수체결 " << (LPCSTR)field(item.BuyExecQty, sizeof(item.BuyExecQty))
+//				<< "  매도체결 " << (LPCSTR)field(item.SellExecQty, sizeof(item.SellExecQty))
+//				<< "  기준환율 " << (LPCSTR)field(item.BaseXchrat, sizeof(item.BaseXchrat)) << std::endl;
+//			file << "----------------------------------------------------------------" << std::endl;
+//
+//		}
+//
+//		if (recordCount < static_cast<size_t>(count))
+//			file << "응답에 포함된 레코드: " << recordCount << "건 (선언된 건수: " << count << "건)" << std::endl;
+//
+//	}
+//	else
+//	{
+//		file << "COSAQ003 응답 길이가 헤더 크기보다 작습니다." << std::endl;
+//	}
+//
+//	file.close();
+//}
+//else if (key == 156)
+//{
+//	// 해외 거래내역...
+//	std::ofstream file("data.txt", std::ios::out | std::ios::trunc);
+//	gsl::span<const char> response(data, size);
+//	const size_t recordsOffset = L_cosaq208_mid + L_cosaq208_mod - L_cosaq208_rec;
+//	if (response.size_bytes() >= recordsOffset)
+//	{
+//		const auto module = response.subspan(L_cosaq208_mid);
+//		const auto* pmod = reinterpret_cast<const cosaq208_mod*>(module.data());
+//		const int count = atoi(string(pmod->out, 5).data());
+//
+//		file << "해외 거래내역 (" << count << "건)" << std::endl;
+//		file << "================================================================" << std::endl;
+//
+//		const auto recordData = response.subspan(recordsOffset);
+//		const gsl::span<const cosaq208_rec> records(
+//			reinterpret_cast<const cosaq208_rec*>(recordData.data()),
+//			recordData.size_bytes() / sizeof(cosaq208_rec));
+//		const size_t recordCount = count > 0 ? min<size_t>(count, records.size()) : 0;
+//
+//		for (size_t ii = 0; ii < recordCount; ii++)
+//		{
+//			const auto& item = records[ii];
+//			auto field = [](const char* value, int length)
+//			{
+//				CString result(value, length);
+//				result.Trim();
+//				return result;
+//			};
+//
+//			file << "[" << (ii + 1) << "] "
+//				<< "거래일 " << (LPCSTR)field(item.TrdDt, sizeof(item.TrdDt))
+//				<< "  거래번호 " << (LPCSTR)field(item.TrdNo, sizeof(item.TrdNo))
+//				<< "  주문번호 " << (LPCSTR)field(item.OrdNo, sizeof(item.OrdNo)) << std::endl;
+//			file << "    종목: " << (LPCSTR)field(item.IsuNm, sizeof(item.IsuNm))
+//				<< " (" << (LPCSTR)field(item.ShtnIsuNo, sizeof(item.ShtnIsuNo)) << ")"
+//				<< "  시장: " << (LPCSTR)field(item.MktNm, sizeof(item.MktNm))
+//				<< "  통화: " << (LPCSTR)field(item.CrcyCode, sizeof(item.CrcyCode)) << std::endl;
+//			file << "    거래: 외화 " << (LPCSTR)field(item.FcurrAmt, sizeof(item.FcurrAmt))
+//				<< "  원화 " << (LPCSTR)field(item.WonAmt, sizeof(item.WonAmt))
+//				<< "  수량 " << (LPCSTR)field(item.Position, sizeof(item.Position))
+//				<< "  단가 " << (LPCSTR)field(item.Uprc, sizeof(item.Uprc))
+//				<< "  환율 " << (LPCSTR)field(item.TrdXchrat, sizeof(item.TrdXchrat)) << std::endl;
+//			file << "    잔고: 외화 " << (LPCSTR)field(item.FcurrDpsBalAmt, sizeof(item.FcurrDpsBalAmt))
+//				<< "  원화 " << (LPCSTR)field(item.WwonDpsBalAmt, sizeof(item.WwonDpsBalAmt))
+//				<< "  유가증권 " << (LPCSTR)field(item.SecRbalQty, sizeof(item.SecRbalQty)) << std::endl;
+//			file << "    수수료/세금: 국내 " << (LPCSTR)field(item.DomCmsnAmt, sizeof(item.DomCmsnAmt))
+//				<< "  국외 " << (LPCSTR)field(item.AbrdFcurrCmsnAmt, sizeof(item.AbrdFcurrCmsnAmt))
+//				<< "  소득세 " << (LPCSTR)field(item.Ictax, sizeof(item.Ictax))
+//				<< "  거래세 " << (LPCSTR)field(item.Trtax, sizeof(item.Trtax)) << std::endl;
+//			file << "    적요: " << (LPCSTR)field(item.SmryNm, sizeof(item.SmryNm))
+//				<< "  매체: " << (LPCSTR)field(item.MdaCodeNm, sizeof(item.MdaCodeNm))
+//				<< "  처리시각: " << (LPCSTR)field(item.TrxTime, sizeof(item.TrxTime)) << std::endl;
+//			file << "----------------------------------------------------------------" << std::endl;
+//
+//		}
+//
+//		if (recordCount < static_cast<size_t>(count))
+//			file << "응답에 포함된 레코드: " << recordCount << "건 (선언된 건수: " << count << "건)" << std::endl;
+//
+//	}
+//	file.close();
+//
+//
+//}
+//else if (key == 153)
+//{
+//	// TR5002 해외시장 주문체결내역...
+//	std::ofstream file("data.txt", std::ios::out | std::ios::trunc);
+//	gsl::span<const char> response(data, size);
+//
+//	const size_t recordsOffset = L_cosaq005_mid + L_cosaq005_mod - L_cosaq005_rec;
+//
+//	if (response.size_bytes() >= recordsOffset)
+//	{
+//		const auto module = response.subspan(L_cosaq005_mid);
+//		const auto* pmod = reinterpret_cast<const cosaq005_mod*>(module.data());
+//		const int count = atoi(string(pmod->count, sizeof(pmod->count)).data());
+//		const auto recordData = response.subspan(recordsOffset);
+//		const gsl::span<const cosaq005_rec> records(reinterpret_cast<const cosaq005_rec*>(recordData.data()),recordData.size_bytes() / sizeof(cosaq005_rec));
+//		const size_t recordCount = count > 0 ? min<size_t>(count, records.size()) : 0;
+//
+//		file << "해외시장 주문체결내역 (" << count << "건)" << std::endl;
+//		file << "================================================================" << std::endl;
+//
+//		for (size_t ii = 0; ii < recordCount; ++ii)
+//		{
+//			const auto& item = records[ii];
+//			auto field = [](const char* value, int length)
+//			{
+//				CString result(value, length);
+//				result.Trim();
+//				return result;
+//			};
+//			file << "[" << (ii + 1) << "] "
+//				<< "주문일 " << (LPCSTR)field(item.OrdDt, sizeof(item.OrdDt))
+//				<< "  주문번호 " << (LPCSTR)field(item.OrdNo, sizeof(item.OrdNo))
+//				<< "  원주문번호 " << (LPCSTR)field(item.OrgOrdNo, sizeof(item.OrgOrdNo)) << std::endl;
+//			file << "    종목: " << (LPCSTR)field(item.HangulsuNm80, sizeof(item.HangulsuNm80))
+//				<< " (" << (LPCSTR)field(item.ShtnIsuNo, sizeof(item.ShtnIsuNo)) << ")"
+//				<< "  시장: " << (LPCSTR)field(item.MktNm, sizeof(item.MktNm))
+//				<< "  통화: " << (LPCSTR)field(item.CrcyCode, sizeof(item.CrcyCode)) << std::endl;
+//			file << "    주문: " << (LPCSTR)field(item.OrdPtnNm, sizeof(item.OrdPtnNm))
+//				<< "  " << (LPCSTR)field(item.OrdprcPtnNm, sizeof(item.OrdprcPtnNm))
+//				<< "  수량 " << (LPCSTR)field(item.OrdQty, sizeof(item.OrdQty))
+//				<< "  가격 " << (LPCSTR)field(item.OvrsOrdPrc, sizeof(item.OvrsOrdPrc)) << std::endl;
+//			file << "    체결: 일자 " << (LPCSTR)field(item.ExecDt, sizeof(item.ExecDt))
+//				<< "  시각 " << (LPCSTR)field(item.ExecTime, sizeof(item.ExecTime))
+//				<< "  수량 " << (LPCSTR)field(item.ExecQty, sizeof(item.ExecQty))
+//				<< "  누계 " << (LPCSTR)field(item.TotExecQty, sizeof(item.TotExecQty))
+//				<< "  가격 " << (LPCSTR)field(item.OvrsExecPrc, sizeof(item.OvrsExecPrc)) << std::endl;
+//			file << "    미체결 " << (LPCSTR)field(item.UnercQty, sizeof(item.UnercQty))
+//				<< "  정정/취소가능 " << (LPCSTR)field(item.MrcAbleQty, sizeof(item.MrcAbleQty))
+//				<< "  주문시각 " << (LPCSTR)field(item.OrdTime, sizeof(item.OrdTime))
+//				<< "  매체 " << (LPCSTR)field(item.CommdaNm, sizeof(item.CommdaNm)) << std::endl;
+//
+//			const CString rejectReason = field(item.RjtRsn, sizeof(item.RjtRsn));
+//			if (!rejectReason.IsEmpty())
+//				file << "    거부사유: " << (LPCSTR)rejectReason << std::endl;
+//			file << "----------------------------------------------------------------" << std::endl;
+//		}
+//		if (recordCount < static_cast<size_t>(count))
+//			file << "응답에 포함된 레코드: " << recordCount << "건 (선언된 건수: " << count << "건)" << std::endl;
+//
+//	}
+//	else
+//	{
+//		file << "COSAQ005 응답 길이가 헤더 크기보다 작습니다." << std::endl;
+//	}
+//	file.close();
+//
+//}
+
+
+
+
+// 	CString strTemp;
+// 	strTemp.Format("[KSJ]nID[%s]id[%d]ledg->csym[%s]", nID, id, ledg->csym);
+// 	OutputDebugString(strTemp);
+
+	FireOnRecvDataID(key, (long)data, size, bNext, nkey, id);
+	//KSJ
+}

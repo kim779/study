@@ -235,7 +235,9 @@ long CControlWnd::IMAXOnMessageFETCH(WPARAM wParam, LPARAM lParam)
 
 long CControlWnd::IMAXOnMessageOPEN(WPARAM wParam, LPARAM lParam)
 {
-m_tmpX.Format("IMAXOnMessageOPEN()[OPEN] viewNo[%s]msg[%s]map[%s]", m_sViewNo, (LPCTSTR)lParam, (LPCTSTR)wParam); dprint();
+m_tmpX.Format("IMAXOnMessageOPEN()[OPEN] viewNo[%s]msg[%s]map[%s]", m_sViewNo, (LPCTSTR)lParam, (LPCTSTR)wParam);
+OutputDebugString(m_tmpX);
+dprint();
 OutputDebugString(m_tmpX);
 
 	CString sIMAXMessageInfo = (LPCTSTR)lParam;
@@ -1287,8 +1289,8 @@ void CControlWnd::_SetEnable(BOOL bEnable)
 
 void CControlWnd::dprint()
 {
-	if (m_tmpX.IsEmpty())
-		return;
+//	if (m_tmpX.IsEmpty())
+	//	return;
 
 	//if (m_iType == 1)
 	//	m_tmpX.Empty();
@@ -1298,7 +1300,7 @@ void CControlWnd::dprint()
 // 필요시 사용할것. 평소엔 주석처리
 //	OutputDebugString(m_tmpX);
 
-	m_tmpX.Empty();
+//	m_tmpX.Empty();
 }
 
 int CControlWnd::openView(int type, CString data)

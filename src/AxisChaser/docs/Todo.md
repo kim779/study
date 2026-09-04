@@ -1,3 +1,10 @@
+---
+project: AxisChaser
+category: todo
+status: 작성됨
+updated: 2026-07-31
+---
+
 # Todo
 
 - 생성일: 2026-07-10

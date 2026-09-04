@@ -128,6 +128,8 @@ protected:
 	CButton		m_chkLogEnable;
 	CString		m_logFilePath;
 	BOOL		m_bLogEnable;
+
+	CButton		m_btnDump;
 // Operations
 public:
 
@@ -204,6 +206,7 @@ protected:
 	afx_msg void OnClickedBtnLogFolder();
 	afx_msg void OnClickedBtnLogClear();
 	afx_msg void OnClickedChkLogEnable();
+	afx_msg void OnClickedBtnDump();
 	//}}AFX_MSG
 	afx_msg LRESULT OnFindDialogMessage(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT	OnReceive(WPARAM wParam, LPARAM lParam);

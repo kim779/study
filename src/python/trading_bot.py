@@ -170,6 +170,9 @@ TR1007_CANDLE_LABELS = ["일자", "시간", "시가", "고가", "저가", "종�
 # 업종(GU_INDEX) 조회는 마지막 2개 필드가 권리락/수정비율이 아니라 25256/25257(실측값 137/57,
 # KOSPI200 200종목 기준 상승/하락 종목수로 추정)로 완전히 다른 필드임(2026-08-08 실측).
 TR1007_INDEX_CANDLE_LABELS = ["일자", "시간", "시가", "고가", "저가", "종가", "거래량", "거래대금", "상승종목수(추정)", "하락종목수(추정)"]
+# 분봉/틱봉(dindex 4,5)은 일/주/월과 달리 시간 필드가 실제 값("191100")으로 채워져 오고
+# 권리락/수정비율 2개 필드가 없음(2026-09-03 실측: "일자\t시간\t시가\t고가\t저가\t종가\t거래량\t거래대금\n").
+TR1007_MINUTE_CANDLE_LABELS = ["일자", "시간", "시가", "고가", "저가", "종가", "거래량", "거래대금"]
 
 MKGB_NAMES = {"1": "KRX", "2": "NXT", "3": "통합"}
 
@@ -605,6 +608,12 @@ class TestWindow(QMainWindow):
         self._history_batch_total = 0
         self._history_batch_timer = QTimer(self)
         self._history_batch_timer.timeout.connect(self._on_history_batch_tick)
+        self._hts_check_queue = []
+        self._hts_check_results = []
+        self._hts_check_current = None  # {'label':..., 'key':...} - 응답 대기 중인 점검 항목
+        self._hts_check_timeout_timer = QTimer(self)
+        self._hts_check_timeout_timer.setSingleShot(True)
+        self._hts_check_timeout_timer.timeout.connect(self._on_hts_check_timeout)
         self.db_conn = _init_db()
         self._stock_name_map = None
         self.bt_ax = None
@@ -767,6 +776,29 @@ class TestWindow(QMainWindow):
         h.addWidget(self.lbl_login)
         h.addStretch()
         layout.addLayout(h)
+
+        h_chaser = QHBoxLayout()
+        btn_chaser_show = QPushButton("체이서 보기")
+        btn_chaser_show.setToolTip("AxisChaser.exe를 실행해 이 프로그램의 송수신 프로토콜을 실시간으로 확인합니다")
+        btn_chaser_hide = QPushButton("체이서 닫기")
+        btn_chaser_show.clicked.connect(self._on_show_chaser)
+        btn_chaser_hide.clicked.connect(self._on_hide_chaser)
+        h_chaser.addWidget(btn_chaser_show)
+        h_chaser.addWidget(btn_chaser_hide)
+        h_chaser.addStretch()
+        layout.addLayout(h_chaser)
+
+        h_check = QHBoxLayout()
+        btn_hts_check = QPushButton("HTS 일괄점검")
+        btn_hts_check.setToolTip("로그인 후 시세/잔고/체결/미체결/시장지표/차트조회를 순서대로 실행해 응답을 확인하고 "
+                                  "결과를 보고서로 보여줍니다 (각 탭에 입력된 종목코드/계좌를 그대로 사용, 값이 없으면 "
+                                  "'건너뜀'으로 표시. 주문성 TR은 포함하지 않음)")
+        btn_hts_check.clicked.connect(self._on_hts_check_start)
+        self.lbl_hts_check = QLabel("")
+        h_check.addWidget(btn_hts_check)
+        h_check.addWidget(self.lbl_hts_check)
+        h_check.addStretch()
+        layout.addLayout(h_check)
 
         # account combo - populated after login
         h2 = QHBoxLayout()
@@ -1702,7 +1734,7 @@ class TestWindow(QMainWindow):
             self._log_err(err)
 
     def _build_history_group(self):
-        group = QGroupBox("차트(일/주/월봉) 조회")
+        group = QGroupBox("차트(일/주/월/분/틱봉) 조회")
         h = QHBoxLayout(group)
         h.addWidget(QLabel("대상"))
         self.combo_history_unit = QComboBox()
@@ -1716,9 +1748,16 @@ class TestWindow(QMainWindow):
         self._add_code_picker(h, self.edit_history_code)
         h.addWidget(QLabel("구분"))
         self.combo_history_period = QComboBox()
-        for text, val in [("일", 1), ("주", 2), ("월", 3)]:
+        for text, val in [("일", 1), ("주", 2), ("월", 3), ("분", 4), ("틱", 5)]:
             self.combo_history_period.addItem(text, val)
+        self.combo_history_period.currentIndexChanged.connect(self._on_history_period_changed)
         h.addWidget(self.combo_history_period)
+        h.addWidget(QLabel("간격"))
+        self.edit_history_gap = QLineEdit("1")
+        self.edit_history_gap.setMaximumWidth(40)
+        self.edit_history_gap.setEnabled(False)
+        self.edit_history_gap.setToolTip("분봉/틱봉일 때만 사용 (예: 분봉 5 -> 5분봉)")
+        h.addWidget(self.edit_history_gap)
         h.addWidget(QLabel("건수"))
         self.edit_history_count = QLineEdit("200")
         self.edit_history_count.setMaximumWidth(50)
@@ -1748,6 +1787,9 @@ class TestWindow(QMainWindow):
     def _on_open_data_manage(self):
         DataManageDialog(self).exec_()
 
+    def _on_history_period_changed(self):
+        self.edit_history_gap.setEnabled(self.combo_history_period.currentData() in (4, 5))
+
     def _on_history_send(self):
         code = self.edit_history_code.text().strip()
         if not code:
@@ -1757,17 +1799,18 @@ class TestWindow(QMainWindow):
 
     def _request_history(self, code):
         dunit = self.combo_history_unit.currentData()  # 1=종목 2=업종
-        dindex = self.combo_history_period.currentData()  # 1=일 2=주 3=월
+        dindex = self.combo_history_period.currentData()  # 1=일 2=주 3=월 4=분 5=틱
         count = self.edit_history_count.text().strip() or "200"
         mkgubn = self.combo_history_mkgubn.currentData()
+        gap = self.edit_history_gap.text().strip() or "1" if dindex in (4, 5) else "1"
         pday = datetime.now().strftime("%Y%m%d")
-        symb = f"{dunit}\t{dindex}\x7f{pday}\t{count}\t1777\x7f{mkgubn}\t"
+        symb = f"{dunit}\t{dindex}\x7f{pday}\t{count}\t1777\x7f{mkgubn}\t{gap}\t"
         self._history_last_dunit = dunit
         self._history_last_dindex = dindex
         self._history_last_code = code
         result = self.ocx.dynamicCall(
             "TR1007(int, QString, QString)", [TK_TR1007, code, symb])
-        self._log(f"차트조회 요청({code}, 대상={dunit}, 구분={dindex}, 건수={count}, 시장={mkgubn}) => {result}")
+        self._log(f"차트조회 요청({code}, 대상={dunit}, 구분={dindex}, 간격={gap}, 건수={count}, 시장={mkgubn}) => {result}")
         if not result:
             err = self.ocx.dynamicCall("GetLastErrMsg()")
             self._log_err(err)
@@ -1795,16 +1838,26 @@ class TestWindow(QMainWindow):
 
     def _save_history_records(self, code, dunit, dindex, records):
         # extra1/extra2 의미: 종목=권리락/수정비율, 업종=상승종목수(추정)/하락종목수(추정)
+        # 분봉/틱봉(dindex 4,5)은 extra1/extra2가 없고, 같은 날짜에 레코드가 여러 개 오므로
+        # date 필드에 시간(vals[1])까지 합쳐서 (code,unit,dindex,date) PK 유일성을 확보한다.
         now = datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")
         rows = []
         for vals in records:
             try:
-                rows.append((
-                    code, dunit, dindex, vals[0],
-                    int(vals[2]), int(vals[3]), int(vals[4]), int(vals[5]),
-                    int(vals[6]), int(vals[7]), float(vals[8]), float(vals[9]),
-                    now,
-                ))
+                if dindex in (4, 5):
+                    rows.append((
+                        code, dunit, dindex, vals[0] + vals[1],
+                        int(vals[2]), int(vals[3]), int(vals[4]), int(vals[5]),
+                        int(vals[6]), int(vals[7]) if vals[7] else 0, 0.0, 0.0,
+                        now,
+                    ))
+                else:
+                    rows.append((
+                        code, dunit, dindex, vals[0],
+                        int(vals[2]), int(vals[3]), int(vals[4]), int(vals[5]),
+                        int(vals[6]), int(vals[7]), float(vals[8]), float(vals[9]),
+                        now,
+                    ))
             except (ValueError, IndexError):
                 continue
         if not rows:
@@ -2519,6 +2572,113 @@ class TestWindow(QMainWindow):
         if not result:
             self._log_err(self.ocx.dynamicCall('GetLastErrMsg()'))
 
+    def _on_show_chaser(self):
+        result = self.ocx.dynamicCall("ShowChaser()")
+        self._log(f"체이서 실행 => {result}")
+        if not result:
+            self._log_err(self.ocx.dynamicCall('GetLastErrMsg()'))
+
+    def _on_hide_chaser(self):
+        self.ocx.dynamicCall("HideChaser()")
+        self._log("체이서 종료 요청")
+
+    def _hts_check_precheck_sise(self):
+        code = self.edit_sise_code.text().strip()
+        need = 8 if self.combo_jtype.currentIndex() == 0 else 6
+        if len(code) != need:
+            return False, f"시세조회 탭의 종목코드를 {need}자리로 입력하세요(현재: '{code}')"
+        return True, ""
+
+    def _hts_check_precheck_acno_pswd(self):
+        acno = self.combo_odr_accn.currentData() or ""
+        pswd = self.edit_odr_pswd.text()
+        if not acno.strip():
+            return False, "주문 탭에서 계좌를 선택하세요"
+        if not pswd.strip():
+            return False, "주문 탭에 비밀번호를 입력하세요"
+        return True, ""
+
+    def _hts_check_precheck_history(self):
+        code = self.edit_history_code.text().strip()
+        if not code:
+            return False, "차트조회 탭에 코드를 입력하세요"
+        return True, ""
+
+    def _on_hts_check_start(self):
+        if self._hts_check_current is not None:
+            self._log("[HTS점검] 이미 점검이 진행 중입니다")
+            return
+        # 주문성 TR(TR1201/1203/3201 등)은 실제 체결이 나갈 수 있어 점검 목록에서 제외 - 조회성 TR만 순서대로 실행한다.
+        self._hts_check_queue = [
+            {"label": "시세조회", "precheck": self._hts_check_precheck_sise,
+             "fire": self._on_sise_send, "key": TK_TR3001 if self.combo_jtype.currentIndex() == 0 else TK_TR1002},
+            {"label": "잔고조회", "precheck": self._hts_check_precheck_acno_pswd,
+             "fire": self._on_michegyul_send, "key": TK_TR3221 if self.combo_jtype.currentIndex() == 0 else TK_TR1223},
+            {"label": "체결조회", "precheck": self._hts_check_precheck_acno_pswd,
+             "fire": self._on_chegyul_send, "key": TK_TR3211 if self.combo_jtype.currentIndex() == 0 else TK_TR1211},
+            {"label": "미체결조회", "precheck": self._hts_check_precheck_acno_pswd,
+             "fire": self._on_michegyul_odr_send, "key": TK_TR3211 if self.combo_jtype.currentIndex() == 0 else TK_TR1211},
+            {"label": "시장지표조회", "precheck": lambda: (True, ""),
+             "fire": self._on_market_send, "key": TK_TR1006},
+            {"label": "차트조회", "precheck": self._hts_check_precheck_history,
+             "fire": self._on_history_send, "key": TK_TR1007},
+        ]
+        self._hts_check_results = []
+        self._log(f"[HTS점검] 시작 - 총 {len(self._hts_check_queue)}건")
+        self._hts_check_next()
+
+    def _hts_check_next(self):
+        if not self._hts_check_queue:
+            self.lbl_hts_check.setText("점검 완료")
+            self._log("[HTS점검] 완료")
+            self._show_hts_check_report()
+            return
+        item = self._hts_check_queue.pop(0)
+        label = item["label"]
+        ok, reason = item["precheck"]()
+        if not ok:
+            self._hts_check_results.append((label, "건너뜀", "-", reason))
+            self._log(f"[HTS점검] {label}: 건너뜀 - {reason}")
+            QTimer.singleShot(0, self._hts_check_next)
+            return
+        self.lbl_hts_check.setText(f"점검중: {label} (응답 대기)")
+        self._log(f"[HTS점검] {label} 요청")
+        self._hts_check_current = {"label": label, "key": item["key"]}
+        item["fire"]()
+        self._hts_check_timeout_timer.start(5000)
+
+    def _on_hts_check_timeout(self):
+        if not self._hts_check_current:
+            return
+        label = self._hts_check_current["label"]
+        self._hts_check_results.append(
+            (label, "무응답", "5000ms+", "5초 내 응답 없음 (로그인 상태/TR 제한/요청 실패 여부 확인 필요)"))
+        self._log(f"[HTS점검] {label}: 무응답(타임아웃)")
+        self._hts_check_current = None
+        self._hts_check_next()
+
+    def _show_hts_check_report(self):
+        dlg = QDialog(self)
+        dlg.setWindowTitle("HTS 일괄점검 결과")
+        dlg.resize(600, 260)
+        v = QVBoxLayout(dlg)
+        table = QTableWidget(len(self._hts_check_results), 4)
+        table.setHorizontalHeaderLabels(["항목", "상태", "소요시간", "비고"])
+        table.verticalHeader().setVisible(False)
+        table.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        for row, (label, status, elapsed, detail) in enumerate(self._hts_check_results):
+            table.setItem(row, 0, QTableWidgetItem(label))
+            table.setItem(row, 1, QTableWidgetItem(status))
+            table.setItem(row, 2, QTableWidgetItem(elapsed))
+            table.setItem(row, 3, QTableWidgetItem(detail))
+        table.resizeColumnsToContents()
+        table.horizontalHeader().setStretchLastSection(True)
+        v.addWidget(table)
+        btn_close = QPushButton("닫기")
+        btn_close.clicked.connect(dlg.accept)
+        v.addWidget(btn_close)
+        dlg.exec_()
+
     def _on_odr_send(self):
         acno  = self.combo_odr_accn.currentData() or ""
         pswd  = self.edit_odr_pswd.text()
@@ -2745,6 +2905,18 @@ class TestWindow(QMainWindow):
             label = f"{name}({wire})" if wire else name
             self._log(f"[응답시간] {label} {(time.monotonic() - t0) * 1000:.0f}ms")
         self._log(f"[EVT] OnRecvData key={key} dptr={dptr} size={size} bNext={b_next} nkey={nkey}")
+        if self._hts_check_current and key == self._hts_check_current["key"]:
+            self._hts_check_timeout_timer.stop()
+            label = self._hts_check_current["label"]
+            elapsed = f"{(time.monotonic() - sent[1]) * 1000:.0f}ms" if sent else "-"
+            if dptr != 0 and size > 0:
+                status, detail = "정상", f"size={size}"
+            else:
+                status, detail = "응답없음", f"size={size}"
+            self._hts_check_results.append((label, status, elapsed, detail))
+            self._log(f"[HTS점검] {label}: {status} ({elapsed}, {detail})")
+            self._hts_check_current = None
+            QTimer.singleShot(1000, self._hts_check_next)
         if dptr == 0 or size <= 0:
             return
         try:
@@ -2953,22 +3125,42 @@ class TestWindow(QMainWindow):
                 dump_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "tr1006_raw.bin")
                 with open(dump_path, "wb") as f:
                     f.write(raw)
-            elif key == TK_TR1007:  # 차트(일/주/월봉 캔들) 응답
-                # 캔들 레코드는 "일자\t\t시가\t...\t수정비율\n" 형태로, TR1005/TR1004와 동일하게
-                # 앞부분에 스냅샷 필드가 섞여 있어서 "일자+빈시간필드" 이중탭 패턴으로 레코드 시작점을 찾는다.
+            elif key == TK_TR1007:  # 차트(일/주/월/분/틱봉 캔들) 응답
                 text = raw.decode('cp949', errors='ignore')
-                matches = list(re.finditer(r'(20\d{6})\t\t', text))
-                labels = TR1007_INDEX_CANDLE_LABELS if self._history_last_dunit == 2 else TR1007_CANDLE_LABELS
-                # 스냅샷/dataH 에코 안에도 우연히 "날짜+이중탭" 패턴이 하나 섞여 나올 수 있는데(값이
-                # "6296,38" 처럼 쉼표가 섞이는 등 깨져 있음), 시가~거래대금이 순수 숫자가 아니면 걸러낸다.
                 records = []
-                for i, m in enumerate(matches):
-                    start = m.start(1)
-                    end = matches[i + 1].start(1) if i + 1 < len(matches) else len(text)
-                    vals = text[start:end].rstrip('\n').split('\t')
-                    if len(vals) < 10 or not all(re.fullmatch(r'\d+', v) for v in vals[2:8]):
-                        continue
-                    records.append(vals)
+                if self._history_last_dindex in (4, 5):
+                    # 분봉/틱봉은 "일자\t시간\t시가\t고가\t저가\t종가\t거래량\t거래대금\n" 형태로
+                    # 시간 필드가 실제 값으로 채워져 있음(일/주/월과 달리 이중탭이 아님, 2026-09-03 실측).
+                    # 틱봉은 거래대금(마지막 필드)이 빈 문자열로 옴(값 자체가 없음, 2026-09-03 실측) -
+                    # 시가~거래량(vals[2:7])만 숫자 검증하고 거래대금은 숫자 또는 빈 값을 허용한다.
+                    matches = list(re.finditer(r'(20\d{6})\t(\d{6})\t', text))
+                    labels = TR1007_MINUTE_CANDLE_LABELS
+                    for i, m in enumerate(matches):
+                        start = m.start(1)
+                        end = matches[i + 1].start(1) if i + 1 < len(matches) else len(text)
+                        vals = (text[start:end].rstrip('\n').split('\t') + [''])[:8]
+                        if not all(re.fullmatch(r'\d+', v) for v in vals[2:7]) or not re.fullmatch(r'\d*', vals[7]):
+                            continue
+                        records.append(vals)
+                else:
+                    # 캔들 레코드는 "일자\t\t시가\t...\t수정비율\n" 형태로, TR1005/TR1004와 동일하게
+                    # 앞부분에 스냅샷 필드가 섞여 있어서 "일자+빈시간필드" 이중탭 패턴으로 레코드 시작점을 찾는다.
+                    matches = list(re.finditer(r'(20\d{6})\t\t', text))
+                    labels = TR1007_INDEX_CANDLE_LABELS if self._history_last_dunit == 2 else TR1007_CANDLE_LABELS
+                    # 스냅샷/dataH 에코 안에도 우연히 "날짜+이중탭" 패턴이 하나 섞여 나올 수 있는데(값이
+                    # "6296,38" 처럼 쉼표가 섞이는 등 깨져 있음), 시가~거래대금이 순수 숫자가 아니면 걸러낸다.
+                    for i, m in enumerate(matches):
+                        start = m.start(1)
+                        end = matches[i + 1].start(1) if i + 1 < len(matches) else len(text)
+                        vals = text[start:end].rstrip('\n').split('\t')
+                        if len(vals) < 10 or not all(re.fullmatch(r'\d+', v) for v in vals[2:8]):
+                            continue
+                        records.append(vals)
+                if not records:
+                    dump_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "tr1007_raw.bin")
+                    with open(dump_path, "wb") as f:
+                        f.write(raw)
+                    self._log(f"  [TR1007] 레코드 0건 - 원문을 {dump_path} 에 저장했습니다(구조 분석용)")
                 self._log(f"  [TR1007 응답] size={size} 레코드수={len(records)}")
                 for vals in records[:5]:
                     pairs = ", ".join(f"{lbl}={v}" for lbl, v in zip(labels, vals))

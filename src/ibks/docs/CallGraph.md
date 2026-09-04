@@ -1,3 +1,10 @@
+---
+project: ibks
+category: call-graph
+status: 완료
+updated: 2026-08-21
+---
+
 # ibks 함수 호출 흐름 분석
 
 

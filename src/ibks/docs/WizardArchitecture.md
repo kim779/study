@@ -1,3 +1,10 @@
+---
+project: ibks
+category: architecture
+status: 완료
+updated: 2026-08-21
+---
+
 # axwizard(Wizard) 소스 분석
 
 

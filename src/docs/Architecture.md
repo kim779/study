@@ -1,3 +1,10 @@
+---
+project: src
+category: architecture
+status: 작성됨
+updated: 2026-07-16
+---
+
 # Architecture (Workspace Index)
 
 - 생성일: 2026-07-07 (갱신: 2026-07-14)

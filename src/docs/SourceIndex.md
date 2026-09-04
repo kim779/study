@@ -1,3 +1,10 @@
+---
+project: src
+category: source-index
+status: 미작성
+updated: 2026-07-09
+---
+
 # SourceIndex
 
 - 생성일: 2026-07-07

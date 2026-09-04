@@ -1,3 +1,10 @@
+---
+project: AxisChaser
+category: dependency
+status: 작성됨
+updated: 2026-08-21
+---
+
 # Dependency
 
 

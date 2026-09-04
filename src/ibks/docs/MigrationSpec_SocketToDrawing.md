@@ -1,3 +1,10 @@
+---
+project: ibks
+category: spec
+status: 진행중
+updated: 2026-08-21
+---
+
 # 마이그레이션 명세서 — 소켓 데이터 → 화면 드로잉 파이프라인
 
 

@@ -1,3 +1,10 @@
+---
+project: ibks
+category: protocol
+status: 완료
+updated: 2026-08-28
+---
+
 # 로그인 시점 파일 패치(File Patch) 프로토콜
 
 

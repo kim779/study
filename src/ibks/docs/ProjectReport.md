@@ -1,3 +1,10 @@
+---
+project: ibks
+category: project-report
+status: 완료
+updated: 2026-08-21
+---
+
 # ibks 프로젝트 최종 보고서
 
 
