@@ -189,6 +189,7 @@ CfmBase::WriteData
 ```
 [Xecure]
 IsNoEncMode
+[Xecure-Nego]
 ```
 
 ---
@@ -211,7 +212,7 @@ IsNoEncMode
 | 10 | `COnTimer` 워커스레드 — **죽은 코드, 실제로 안 찍힘** | `COnTimer::Startup`/`Dispatch`/`Run`/`DoParse`/`Cleanup` (참고용으로만 남김) |
 | 10.5 | 스크립트 타이머(`Screen.SetTimer`/`SetTimerX`, 실제 동작 경로) | `CallProc WM_TIMER TM_VB`/`TM_VBx`, `CClient::SetTimer id=... result=...`(등록 성공여부) |
 | 11 | axisform.dll 컨트롤 렌더링/입력(`LOG_AXISFORM`, OFF) | `CfmEdit::Draw`/`SetFocus`/`UpdateData`/`InsertData`/`getStartPos`/`_Trigger`/`OnLButton`, `CfmBase::ReadData`/`WriteData [combo]` |
-| 12 | 암호화/복호화(Xecure), `NOENC.TXT` 개발스위치 | `CGuard::Initial m_xecure CreateControl`, `[Xecure] helper=ENC/DEC nBytesIn/nBytesOut/retv`, `[Xecure] helper=... SKIPPED`, `[Xecure] IsNoEncMode check path/result`, `[Xecure] decrypt FAILED` |
+| 12 | 암호화/복호화(Xecure), `NOENC.TXT` 개발스위치 | `CGuard::Initial m_xecure CreateControl`, `[Xecure] helper=ENC/DEC nBytesIn/nBytesOut/retv`, `[Xecure] helper=... SKIPPED`, `[Xecure] IsNoEncMode check path/result`, `[Xecure] decrypt FAILED`, `[Xecure-Nego]`(로그인 초반 AXISENCX 키교환, `CWizardCtrl::Xecure`류 — `[Xecure]`와 이름만 같고 별개 함수) |
 | 13 | 관련 문서 링크 | (태그 없음) |
 
 ### 증상별 시작점
@@ -238,6 +239,7 @@ IsNoEncMode
 
 **암호화 (12절)**
 - `[Xecure]` — 암/복호화 호출마다(`helper=ENC/DEC`, `nBytesIn/nBytesOut/retv`) 찍힘. `NOENC.TXT` 스위치 상태 확인(`IsNoEncMode check ... result=`)도 이걸로 잡힘.
+- `[Xecure-Nego]` — 로그인 맨 처음 `AXISENCX` 키교환 협상 전용(`CWizardCtrl::Xecure`류). `[Xecure]`와 헷갈리기 쉬우니 필터를 분리해서 볼 것 — 협상 시작 판단→`DI_XEC` 결과→실제 송신→응답수신 순서로 찍힘.
 
 **스크립트 디스패치 (3~4절) — "이벤트는 도는데 스크립트가 안 도네" 진단용**
 - `CScript::On` — 어떤 이벤트가 어느 맵의 어느 프로시저(`AX_*_On*_AX_`)로 매핑됐는지(4절). `getIDOfProcedure`보다 한 단계 앞선 지점이라, 여기부터 보면 "디스패치 자체가 안 됐다"와 "디스패치는 됐는데 함수가 없다"(`getIDOfProcedure`/`IsAvailable`)를 구분하기 쉬움.
@@ -605,6 +607,19 @@ DebugView(또는 DebugView++)의 "Find" 창에 아래 태그를 넣어 검색하
 - NOENC ON(`result=1`): `[Xecure] helper=ENC`/`helper=DEC` 둘 다 아예 안 찍힘. 응답 쪽 `[1-OnAxis-raw] ... stat=0` — 서버도 평문으로 응답.
 - NOENC OFF(`result=0`): 요청은 `helper=ENC`로 암호화되고, 응답은 `[1-OnAxis-raw] ... stat=2`(`h/axis.h`의 `statENC=0x02` 비트)로 암호화된 채 와서 `helper=DEC`로 정상 복호화.
 - 결론: 서버는 클라이언트가 보낸 요청의 `stat`(`statENC` 비트) 여부를 보고 응답의 암호화 여부를 그대로 맞춰준다 — NOENC 모드에서는 요청/응답 전체가 평문으로 보이므로 로그 판독이 훨씬 쉬워졌다. (앱 재시작 없이 `NOENC.TXT` 파일만 지웠다 놨다 해도 즉시 반영되는 것도 같이 확인됨.)
+
+### `[Xecure-Nego]` — 로그인 초반 암호화 채널 협상(AXISENCX), `[Xecure]`와는 별개 함수 (2026-08-31 추가)
+
+**주의 — 이름이 겹쳐서 헷갈리기 쉽다.** 위의 `[Xecure]`는 `CGuard::Xecure()`(TR 페이로드 자체를 암/복호화하는 함수)의 로그이고, **여기 `[Xecure-Nego]`는 `CWizardCtrl::Xecure()`/`Xecure(char*,int)`/`OnXecure()`(로그인 맨 처음 암호화 키를 교환하는 함수, `LoginSequence.md`의 `AXISENCX` 단계)의 로그다 — 클래스도 역할도 다른 완전히 별개의 함수인데 이름만 같다.** 기존엔 이 협상 함수 쪽엔 로그가 전혀 없었음.
+
+| 태그 | 위치 | 의미 |
+|---|---|---|
+| `[Xecure-Nego] enter flagENC=... m_xtype=...` | `WizardCtrl.cpp` (`CWizardCtrl::Xecure()`, 인자없는 오버로드) | 협상을 시작할지 판단하는 진입점 — `flagENC`(로그인 응답의 암호화단말 플래그)가 꺼져있으면 바로 `Run()`으로 건너뜀(`skipped -> Run()` 로그) |
+| `[Xecure-Nego] DI_XEC nBytesIn=... nBytesOut=... retv=...` | `WizardCtrl.cpp` (`CWizardCtrl::Xecure(char*,int)`) | `AxisXecure.XecureCtrl`의 `DI_XEC`(키교환 전용, `CGuard::Xecure`가 쓰는 `DI_ENC`/`DI_DEC`와 다른 디스패치) 호출 결과. 입력이 `NULL,0`이라 컨트롤이 그 자리에서 새로 키교환값을 생성해서 돌려줌 |
+| `[Xecure-Nego] AXISENCX send nBytes=...` | 〃 | **실제로 `AXISENCX` 메시지가 소켓에 나가는 순간** — `m_guard->Write(msgK_ENC, "AXISENCX", ...)` 직전 |
+| `[Xecure-Nego] OnXecure encK=... nBytes=... m_mode=...` | `WizardCtrl.cpp` (`CWizardCtrl::OnXecure`) | 서버로부터 협상 응답(또는 이어지는 인증서 관련 이벤트)이 돌아왔을 때 진입점 — `encK`가 `encERR`/`encENC`/`encOK` 중 무엇인지로 이후 분기가 갈림 |
+
+`m_guard->m_xecure`(COM 컨트롤 인스턴스)는 `CGuard::Xecure()`와 완전히 공유됨 — 즉 로그인 때 이 흐름으로 한 번 생성된 같은 컨트롤을, 이후 TR마다 `[Xecure]` 쪽이 계속 재사용해서 암/복호화한다.
 
 ---
 

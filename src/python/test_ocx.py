@@ -10,17 +10,15 @@ from PyQt5.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
     QGroupBox, QPushButton, QLabel, QLineEdit, QTextEdit, QFormLayout,
     QComboBox, QGridLayout, QMessageBox, QTableWidget, QTableWidgetItem,
-    QHeaderView, QAbstractItemView
+    QHeaderView, QAbstractItemView, QTabWidget, QScrollArea
 )
 from datetime import datetime
 
 OCX_GUID = "{CDADD338-C7AB-4977-B65D-8E988B5958E3}"
 
-# 접속서버 목록 (IP, 이름) - 포트는 UI의 svr_port 값 공용 사용
 SERVER_LIST = [
-    ("211.255.204.104", "UAT")
-    #("211.255.204.104", "UAT"),
-    #("211.255.204.70", "BP10"),
+    ("211.255.204.104", "UAT"),
+    ("211.255.204.70", "BP10")
     #("211.255.204.71", "BP11"),
     #("211.255.204.72", "BP12"),
     #("211.255.204.73", "BP13"),
@@ -69,6 +67,13 @@ TK_TR1223  = 51 # 주식 잔고조회(시장구분)
 TK_GETCODE = 32 # 종목코드 목록조회 (GetCode)
 TK_GREEKS1 = 150 # 옵션 그릭스(민감도) 조회용 키1
 TK_GREEKS2 = 151 # 옵션 그릭스(민감도) 조회용 키2
+TK_TR5002 = 160  # 해외주식 체결/미체결조회
+TK_TR5000 = 161  # 해외증권 예수금조회
+TK_TR5001 = 162  # 해외주식 잔고조회
+TK_TR2002 = 163  # 주식 거래내역
+TK_TR5003 = 164  # 해외주식 거래내역
+TK_TR5005 = 165  # 환전 적용환율조회
+TK_TR5006 = 166  # 외화환전(단건)
 
 # TR1002(NXT/통합 시세조회) 요청 시 1777(장운영구분) 뒤에 붙이는 요청 필드번호 목록
 # 순서 = 응답에서 값이 오는 순서와 동일하다고 가정 (실측 후 확정 필요)
@@ -76,6 +81,7 @@ TR1002_SISE_FIELDS = ["2023", "2033", "2029", "2030", "2031", "2024", "2027", "2
 TR1002_SISE_LABELS = ["현재가", "등락율", "시가", "고가", "저가", "전일대비", "거래량", "매도잔량", "매수잔량"]
 
 MKGB_NAMES = {"1": "KRX", "2": "NXT", "3": "통합"}
+OVS_BNSTP_NAMES = {"%": "전체", "1": "매도", "2": "매수", "8": "단주매도", "9": "단주취소"}
 
 # C structs mirroring Open_API_OUT.h (#pragma pack(1))
 class _Hoga3001(ctypes.Structure):
@@ -177,8 +183,8 @@ class TestWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("IBKConnector OCX Test")
-        self.setMinimumWidth(500)
-        self.resize(650, 750)
+        self.setMinimumWidth(1000)
+        self.resize(1300, 700)
 
         ocx_ok, ocx_info = _check_ocx_registry()
         if not ocx_ok:
@@ -224,9 +230,12 @@ class TestWindow(QMainWindow):
         self.ocx.OnUpdateEnd.connect(self._evt_update_end)
 
         central = QWidget()
-        self.setCentralWidget(central)
+        scroll = QScrollArea()
+        scroll.setWidgetResizable(True)
+        scroll.setWidget(central)
+        self.setCentralWidget(scroll)
         layout = QVBoxLayout(central)
-        layout.setSpacing(8)
+        layout.setSpacing(6)
 
         layout.addWidget(self._build_init_group())
 
@@ -238,8 +247,14 @@ class TestWindow(QMainWindow):
         mid_h.addWidget(self._build_sise_group())
         layout.addWidget(mid)
 
-        layout.addWidget(self._build_order_group())
-        layout.addWidget(self._build_jango_group())
+        # 주문(국내) | 해외거래 좌우 분할
+        odr = QWidget()
+        odr_h = QHBoxLayout(odr)
+        odr_h.setContentsMargins(0, 0, 0, 0)
+        odr_h.addWidget(self._build_order_group())
+        odr_h.addWidget(self._build_overseas_group())
+        layout.addWidget(odr)
+
         layout.addWidget(self._build_log_group())
 
     # ── UI builders ──────────────────────────────────────────────
@@ -257,7 +272,8 @@ class TestWindow(QMainWindow):
         self.combo_jtype = QComboBox()
         self.combo_jtype.addItem("선물옵션")
         self.combo_jtype.addItem("주식")
-        self.combo_jtype.setCurrentIndex(1)
+        self.combo_jtype.addItem("해외")
+        self.combo_jtype.setCurrentIndex(2)
         h.addWidget(self.combo_jtype)
         return group
 
@@ -369,20 +385,37 @@ class TestWindow(QMainWindow):
         return group
 
     def _build_order_group(self):
-        group = QGroupBox("주문")
-        h_main = QHBoxLayout(group)
+        group = QGroupBox("국내")
+        v = QVBoxLayout(group)
 
-        # 왼쪽 컬럼: 계좌 / 비밀번호 / 종목코드 / 매매구분 / 호가유형
-        left = QFormLayout()
+        # 계좌/비밀번호는 탭 공통 - 해외거래 쪽과 같은 구성
+        acc_h = QHBoxLayout()
+        acc_h.addWidget(QLabel("계좌"))
         self.combo_odr_accn = QComboBox()
         self.combo_odr_accn.setMinimumWidth(260)
         self.combo_odr_accn.setSizeAdjustPolicy(QComboBox.AdjustToContents)
-        left.addRow("계좌", self.combo_odr_accn)
-
+        acc_h.addWidget(self.combo_odr_accn)
+        acc_h.addWidget(QLabel("비밀번호"))
         self.edit_odr_pswd = QLineEdit()
         self.edit_odr_pswd.setEchoMode(QLineEdit.Password)
-        left.addRow("비밀번호", self.edit_odr_pswd)
+        acc_h.addWidget(self.edit_odr_pswd)
+        acc_h.addStretch()
+        v.addLayout(acc_h)
 
+        tabs = QTabWidget()
+        v.addWidget(tabs)
+        tabs.addTab(self._build_odr_order_tab(), "주문")
+        tabs.addTab(self._build_odr_chegyul_tab(), "체결")
+        tabs.addTab(self._build_odr_michegyul_tab(), "미체결")
+        tabs.addTab(self._build_odr_jango_tab(), "잔고")
+        tabs.addTab(self._build_odr_gorae_tab(), "거래내역(TR2002)")
+        return group
+
+    def _build_odr_order_tab(self):
+        w = QWidget()
+        h_main = QHBoxLayout(w)
+
+        left = QFormLayout()
         self.edit_odr_code = QLineEdit()
         left.addRow("종목코드", self.edit_odr_code)
 
@@ -397,7 +430,6 @@ class TestWindow(QMainWindow):
             self.combo_hogb.addItem(text, val)
         left.addRow("호가유형", self.combo_hogb)
 
-        # 오른쪽 컬럼: 주문가격 / 주문수량 / 원주문번호 / 주문버튼
         right = QFormLayout()
         self.edit_odr_jprc = QLineEdit("0")
         right.addRow("주문가격", self.edit_odr_jprc)
@@ -417,42 +449,89 @@ class TestWindow(QMainWindow):
         right.addRow("프로그램구분", self.combo_pggb)
 
         mk_h = QHBoxLayout()
-        self.combo_jango_mkgubn = QComboBox()
+        self.combo_odr_mkgubn = QComboBox()
         for text, val in [("KRX", 1), ("NXT", 2), ("통합", 3)]:
-            self.combo_jango_mkgubn.addItem(text, val)
+            self.combo_odr_mkgubn.addItem(text, val)
         self.lbl_odr_result = QLabel("-")
-        mk_h.addWidget(self.combo_jango_mkgubn)
+        mk_h.addWidget(self.combo_odr_mkgubn)
         mk_h.addWidget(self.lbl_odr_result)
         mk_h.addStretch()
         right.addRow(mk_h)
 
-        btn_h = QHBoxLayout()
         btn = QPushButton("주문실행")
         btn.clicked.connect(self._on_odr_send)
-        btn_mc = QPushButton("잔고조회")
-        btn_mc.clicked.connect(self._on_michegyul_send)
-        btn_cg = QPushButton("체결조회")
-        btn_cg.clicked.connect(self._on_chegyul_send)
-        btn_uc = QPushButton("미체결조회")
-        btn_uc.clicked.connect(self._on_michegyul_odr_send)
-        btn_h.addWidget(btn)
-        btn_h.addWidget(btn_mc)
-        btn_h.addWidget(btn_cg)
-        btn_h.addWidget(btn_uc)
-        btn_h.addStretch()
-        right.addRow(btn_h)
+        right.addRow(btn)
 
         h_main.addLayout(left)
         h_main.addSpacing(20)
         h_main.addLayout(right)
         h_main.addStretch()
-        return group
+        return w
 
-    def _build_jango_group(self):
-        group = QGroupBox("잔고")
-        v = QVBoxLayout(group)
+    def _build_chegyul_columns(self):
+        return ["주문번호", "원주문번호", "종목", "주문가", "주문량", "체결가", "체결량", "미체결량", "메시지/시간"]
+
+    def _build_odr_chegyul_tab(self):
+        w = QWidget()
+        v = QVBoxLayout(w)
+        h = QHBoxLayout()
+        btn = QPushButton("조회")
+        btn.clicked.connect(self._on_chegyul_send)
+        h.addWidget(btn)
+        h.addStretch()
+        v.addLayout(h)
+
+        cols = self._build_chegyul_columns()
+        self.table_chegyul = QTableWidget(0, len(cols))
+        self.table_chegyul.setHorizontalHeaderLabels(cols)
+        self.table_chegyul.verticalHeader().setVisible(False)
+        self.table_chegyul.verticalHeader().setDefaultSectionSize(18)
+        self.table_chegyul.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        self.table_chegyul.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.table_chegyul.horizontalHeader().setStretchLastSection(True)
+        self.table_chegyul.setFixedHeight(140)
+        v.addWidget(self.table_chegyul)
+        return w
+
+    def _build_odr_michegyul_tab(self):
+        w = QWidget()
+        v = QVBoxLayout(w)
+        h = QHBoxLayout()
+        btn = QPushButton("조회")
+        btn.clicked.connect(self._on_michegyul_odr_send)
+        h.addWidget(btn)
+        h.addStretch()
+        v.addLayout(h)
+
+        cols = self._build_chegyul_columns()
+        self.table_michegyul = QTableWidget(0, len(cols))
+        self.table_michegyul.setHorizontalHeaderLabels(cols)
+        self.table_michegyul.verticalHeader().setVisible(False)
+        self.table_michegyul.verticalHeader().setDefaultSectionSize(18)
+        self.table_michegyul.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        self.table_michegyul.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.table_michegyul.horizontalHeader().setStretchLastSection(True)
+        self.table_michegyul.setFixedHeight(140)
+        v.addWidget(self.table_michegyul)
+        return w
+
+    def _build_odr_jango_tab(self):
+        w = QWidget()
+        v = QVBoxLayout(w)
         v.setContentsMargins(4, 4, 4, 4)
         v.setSpacing(2)
+
+        h = QHBoxLayout()
+        h.addWidget(QLabel("시장"))
+        self.combo_jango_mkgubn = QComboBox()
+        for text, val in [("KRX", 1), ("NXT", 2), ("통합", 3)]:
+            self.combo_jango_mkgubn.addItem(text, val)
+        h.addWidget(self.combo_jango_mkgubn)
+        btn = QPushButton("조회")
+        btn.clicked.connect(self._on_michegyul_send)
+        h.addWidget(btn)
+        h.addStretch()
+        v.addLayout(h)
 
         cols = ["종목코드", "잔고수량", "가능수량", "현재가", "평가금액", "수익률(%)"]
         self.table_jango = QTableWidget(0, len(cols))
@@ -467,7 +546,383 @@ class TestWindow(QMainWindow):
         self.table_jango.cellDoubleClicked.connect(self._on_jango_double_clicked)
         v.addWidget(self.table_jango)
 
+        return w
+
+    def _build_odr_gorae_tab(self):
+        w = QWidget()
+        v = QVBoxLayout(w)
+
+        h = QHBoxLayout()
+        h.addWidget(QLabel("시작일"))
+        self.edit_odr_gorae_sdate = QLineEdit()
+        self.edit_odr_gorae_sdate.setPlaceholderText("YYYYMMDD")
+        h.addWidget(self.edit_odr_gorae_sdate)
+        h.addWidget(QLabel("종료일"))
+        self.edit_odr_gorae_edate = QLineEdit()
+        self.edit_odr_gorae_edate.setPlaceholderText("YYYYMMDD (비우면 오늘)")
+        h.addWidget(self.edit_odr_gorae_edate)
+        h.addWidget(QLabel("조회구분"))
+        self.combo_odr_gorae_type = QComboBox()
+        for text, val in [("전체", "0"), ("입출금", "1"), ("입출고", "2"), ("매매", "3"),
+                           ("매수", "E"), ("매도", "F"), ("기타", "4"), ("담보대출", "5")]:
+            self.combo_odr_gorae_type.addItem(text, val)
+        h.addWidget(self.combo_odr_gorae_type)
+        h.addWidget(QLabel("종목코드"))
+        self.edit_odr_gorae_code = QLineEdit()
+        h.addWidget(self.edit_odr_gorae_code)
+        btn = QPushButton("조회")
+        btn.clicked.connect(self._on_odr_gorae_send)
+        h.addWidget(btn)
+        h.addStretch()
+        v.addLayout(h)
+
+        cols = ["거래일자", "적요명", "종목명", "거래수량", "거래단가", "거래금액", "수수료", "세금합계", "처리시각"]
+        self.table_odr_gorae = QTableWidget(0, len(cols))
+        self.table_odr_gorae.setHorizontalHeaderLabels(cols)
+        self.table_odr_gorae.verticalHeader().setVisible(False)
+        self.table_odr_gorae.verticalHeader().setDefaultSectionSize(18)
+        self.table_odr_gorae.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        self.table_odr_gorae.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.table_odr_gorae.horizontalHeader().setStretchLastSection(True)
+        self.table_odr_gorae.setFixedHeight(140)
+        v.addWidget(self.table_odr_gorae)
+
+        return w
+
+    def _build_overseas_group(self):
+        group = QGroupBox("해외거래")
+        v = QVBoxLayout(group)
+
+        # 계좌/비밀번호는 탭 공통 - 탭마다 다시 고를 필요 없게 그룹 상단에 하나만 둔다.
+        acc_h = QHBoxLayout()
+        acc_h.addWidget(QLabel("계좌"))
+        self.combo_ovs_accn = QComboBox()
+        self.combo_ovs_accn.setEditable(True)  # 직접 타이핑해서 다른 계좌번호로 테스트 가능하게
+        self.combo_ovs_accn.setMinimumWidth(260)
+        self.combo_ovs_accn.setSizeAdjustPolicy(QComboBox.AdjustToContents)
+        acc_h.addWidget(self.combo_ovs_accn)
+        acc_h.addWidget(QLabel("비밀번호"))
+        self.edit_ovs_pswd = QLineEdit()
+        self.edit_ovs_pswd.setEchoMode(QLineEdit.Password)
+        acc_h.addWidget(self.edit_ovs_pswd)
+        acc_h.addStretch()
+        v.addLayout(acc_h)
+
+        tabs = QTabWidget()
+        v.addWidget(tabs)
+
+        tabs.addTab(self._build_ovs_jango_tab(), "잔고(TR5001)")
+        tabs.addTab(self._build_ovs_chegyul_tab(), "체결내역(TR5002)")
+        tabs.addTab(self._build_ovs_gorae_tab(), "거래내역(TR5003)")
+        tabs.addTab(self._build_ovs_yesugeum_tab(), "예수금(TR5000)")
+        tabs.addTab(self._build_ovs_hwanjeon_tab(), "환전(TR5005/5006)")
         return group
+
+    def _build_ovs_jango_tab(self):
+        w = QWidget()
+        v = QVBoxLayout(w)
+
+        h = QHBoxLayout()
+        h.addWidget(QLabel("기준"))
+        self.combo_ovs5001_today = QComboBox()
+        self.combo_ovs5001_today.addItem("당일", "1")
+        self.combo_ovs5001_today.addItem("일별", "2")
+        h.addWidget(self.combo_ovs5001_today)
+        h.addWidget(QLabel("조회일자"))
+        self.edit_ovs5001_date = QLineEdit()
+        self.edit_ovs5001_date.setPlaceholderText("YYYYMMDD (비우면 오늘)")
+        h.addWidget(self.edit_ovs5001_date)
+        h.addWidget(QLabel("조회구분"))
+        self.combo_ovs5001_qrytp = QComboBox()
+        for text, val in [("전체", "0"), ("홍콩", "1"), ("중국", "2"), ("미국", "3")]:
+            self.combo_ovs5001_qrytp.addItem(text, val)
+        h.addWidget(self.combo_ovs5001_qrytp)
+        btn = QPushButton("조회")
+        btn.clicked.connect(self._on_ovs_jango_send)
+        h.addWidget(btn)
+        h.addStretch()
+        v.addLayout(h)
+
+        cols = ["종목코드", "종목명", "통화", "보유수량", "매도가능수량", "현재가", "외화평가금액", "외화평가손익", "수익률"]
+        self.table_ovs_jango = QTableWidget(0, len(cols))
+        self.table_ovs_jango.setHorizontalHeaderLabels(cols)
+        self.table_ovs_jango.verticalHeader().setVisible(False)
+        self.table_ovs_jango.verticalHeader().setDefaultSectionSize(18)
+        self.table_ovs_jango.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        self.table_ovs_jango.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.table_ovs_jango.horizontalHeader().setStretchLastSection(True)
+        self.table_ovs_jango.setFixedHeight(140)
+        v.addWidget(self.table_ovs_jango)
+
+        return w
+
+    def _build_ovs_chegyul_tab(self):
+        w = QWidget()
+        v = QVBoxLayout(w)
+        grid = QGridLayout()
+
+        self.edit_ovs5002_code = QLineEdit()
+        self.edit_ovs5002_edate = QLineEdit()
+        self.edit_ovs5002_edate.setPlaceholderText("YYYYMMDD (비우면 오늘)")
+        # 참고: OCX S_TR5002가 시작일(SrtDt)을 "20260903"으로 고정해서 보내고 있어서
+        # (실제 값은 이 필드 하나(종료일)만 반영됨) - OCX 쪽 수정 후 시작일 필드도 추가 예정.
+
+        self.combo_ovs5002_mm = QComboBox()
+        for text, val in [("전체", "%"), ("매도", "1"), ("매수", "2"), ("단주매도", "8"), ("단주취소", "9")]:
+            self.combo_ovs5002_mm.addItem(text, val)
+
+        self.combo_ovs5002_gubn = QComboBox()
+        for text, val in [("전체", "0"), ("미체결", "1"), ("체결", "2")]:
+            self.combo_ovs5002_gubn.addItem(text, val)
+
+        self.combo_ovs5002_type = QComboBox()
+        for text, val in [("전체", "A"), ("접수전", "2"), ("접수완료", "0"), ("거부", "4")]:
+            self.combo_ovs5002_type.addItem(text, val)
+
+        self.combo_ovs5002_market = QComboBox()
+        for text, val in [("전체", "99"), ("NYSE", "81"), ("NASDAQ", "82"), ("AMEX", "87"),
+                           ("홍콩", "71"), ("상해", "72"), ("심천", "73")]:
+            self.combo_ovs5002_market.addItem(text, val)
+
+        self.combo_ovs5002_ordtype = QComboBox()
+        for text, val in [("지정가", "00"), ("시장가", "03"), ("MOC", "B1"), ("LOC", "B2"),
+                           ("TWAP", "A2"), ("VWAP", "A3"), ("Limit TWAP", "A4"), ("Limit VWAP", "A5")]:
+            self.combo_ovs5002_ordtype.addItem(text, val)
+
+        self.combo_ovs5002_sort = QComboBox()
+        self.combo_ovs5002_sort.addItem("정순", 0)
+        self.combo_ovs5002_sort.addItem("역순", 1)
+
+        fields_row1 = [("종목코드", self.edit_ovs5002_code), ("조회종료일", self.edit_ovs5002_edate),
+                       ("매매구분", self.combo_ovs5002_mm), ("체결여부", self.combo_ovs5002_gubn)]
+        fields_row2 = [("접수상태", self.combo_ovs5002_type), ("등록시장", self.combo_ovs5002_market),
+                       ("주문타입", self.combo_ovs5002_ordtype), ("정렬", self.combo_ovs5002_sort)]
+        for row, fields in enumerate([fields_row1, fields_row2]):
+            for col, (label, widget) in enumerate(fields):
+                grid.addWidget(QLabel(label), row, col*2)
+                grid.addWidget(widget, row, col*2+1)
+
+        btn = QPushButton("조회")
+        btn.clicked.connect(self._on_ovs_chegyul_send)
+        grid.addWidget(btn, 2, 0, 1, 2)
+        v.addLayout(grid)
+
+        cols = ["주문번호", "원주문번호", "종목", "구분", "주문량", "체결량", "미체결량",
+                "주문가", "체결가", "주문시각", "체결시각", "거부사유"]
+        self.table_ovs_chegyul = QTableWidget(0, len(cols))
+        self.table_ovs_chegyul.setHorizontalHeaderLabels(cols)
+        self.table_ovs_chegyul.verticalHeader().setVisible(False)
+        self.table_ovs_chegyul.verticalHeader().setDefaultSectionSize(18)
+        self.table_ovs_chegyul.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        self.table_ovs_chegyul.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.table_ovs_chegyul.horizontalHeader().setStretchLastSection(True)
+        self.table_ovs_chegyul.setFixedHeight(140)
+        v.addWidget(self.table_ovs_chegyul)
+
+        return w
+
+    def _build_ovs_gorae_tab(self):
+        w = QWidget()
+        v = QVBoxLayout(w)
+
+        h = QHBoxLayout()
+        h.addWidget(QLabel("시작일"))
+        self.edit_ovs5003_sdate = QLineEdit()
+        self.edit_ovs5003_sdate.setPlaceholderText("YYYYMMDD (비우면 1주일 전)")
+        h.addWidget(self.edit_ovs5003_sdate)
+        h.addWidget(QLabel("종료일"))
+        self.edit_ovs5003_edate = QLineEdit()
+        self.edit_ovs5003_edate.setPlaceholderText("YYYYMMDD (비우면 오늘)")
+        h.addWidget(self.edit_ovs5003_edate)
+        h.addWidget(QLabel("종목코드"))
+        self.edit_ovs5003_code = QLineEdit()
+        h.addWidget(self.edit_ovs5003_code)
+        v.addLayout(h)
+
+        h2 = QHBoxLayout()
+        h2.addWidget(QLabel("거래구분"))
+        self.combo_ovs5003_gubn = QComboBox()
+        for text, val in [("전체", "00"), ("출납", "10"), ("입출금", "11"), ("입출고", "12"),
+                           ("외화입출금", "13"), ("환전", "14"), ("매매내역", "20"),
+                           ("대금결제", "21"), ("유가결제", "22"), ("과세내역", "30")]:
+            self.combo_ovs5003_gubn.addItem(text, val)
+        h2.addWidget(self.combo_ovs5003_gubn)
+        h2.addWidget(QLabel("주식구분"))
+        self.combo_ovs5003_stktp = QComboBox()
+        for text, val in [("전체", "0"), ("온주", "1"), ("소수점", "2"), ("적립식", "3")]:
+            self.combo_ovs5003_stktp.addItem(text, val)
+        h2.addWidget(self.combo_ovs5003_stktp)
+        btn = QPushButton("조회")
+        btn.clicked.connect(self._on_ovs_gorae_send)
+        h2.addWidget(btn)
+        h2.addStretch()
+        v.addLayout(h2)
+
+        cols = ["거래일자", "적요명", "종목명", "통화", "수량", "단가", "외화금액", "원화금액", "시장명", "처리시각"]
+        self.table_ovs_gorae = QTableWidget(0, len(cols))
+        self.table_ovs_gorae.setHorizontalHeaderLabels(cols)
+        self.table_ovs_gorae.verticalHeader().setVisible(False)
+        self.table_ovs_gorae.verticalHeader().setDefaultSectionSize(18)
+        self.table_ovs_gorae.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        self.table_ovs_gorae.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.table_ovs_gorae.horizontalHeader().setStretchLastSection(True)
+        self.table_ovs_gorae.setFixedHeight(140)
+        v.addWidget(self.table_ovs_gorae)
+
+        return w
+
+    def _build_ovs_yesugeum_tab(self):
+        w = QWidget()
+        v = QVBoxLayout(w)
+
+        h = QHBoxLayout()
+        btn = QPushButton("조회")
+        btn.clicked.connect(self._on_ovs_yesugeum_send)
+        h.addWidget(btn)
+        h.addStretch()
+        v.addLayout(h)
+
+        # 원화 기준 요약 (COSAQ027 out3)
+        sum_h = QHBoxLayout()
+        def make_sum(label):
+            sum_h.addWidget(QLabel(label))
+            lbl = QLabel("-")
+            lbl.setMinimumWidth(90)
+            sum_h.addWidget(lbl)
+            return lbl
+        self.lbl_ovs_wondps = make_sum("원화예수금")
+        self.lbl_ovs_wonout = make_sum("원화출금가능금액")
+        self.lbl_ovs_wonconv = make_sum("원화환산거래금액")
+        self.lbl_ovs_bnsmgn = make_sum("매매증거금")
+        sum_h.addStretch()
+        v.addLayout(sum_h)
+
+        # 통화별 상세 (COSAQ027 out2 반복)
+        cols = ["통화", "외화예수금", "외화주문가능금액", "외화주문금액", "외화담보금액",
+                "외화환전가능금", "미수금", "외화상환금액"]
+        self.table_ovs_yesugeum = QTableWidget(0, len(cols))
+        self.table_ovs_yesugeum.setHorizontalHeaderLabels(cols)
+        self.table_ovs_yesugeum.verticalHeader().setVisible(False)
+        self.table_ovs_yesugeum.verticalHeader().setDefaultSectionSize(18)
+        self.table_ovs_yesugeum.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        self.table_ovs_yesugeum.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.table_ovs_yesugeum.horizontalHeader().setStretchLastSection(True)
+        self.table_ovs_yesugeum.setFixedHeight(120)
+        v.addWidget(self.table_ovs_yesugeum)
+
+        return w
+
+    def _build_ovs_hwanjeon_tab(self):
+        w = QWidget()
+        v = QVBoxLayout(w)
+        form = QFormLayout()
+
+        self.combo_hwj_bnstp = QComboBox()
+        self.combo_hwj_bnstp.addItem("외화매수", "01")
+        self.combo_hwj_bnstp.addItem("외화매도", "02")
+        self.combo_hwj_bnstp.setMaximumWidth(100)
+        form.addRow("매매구분", self.combo_hwj_bnstp)
+
+        crcy_h = QHBoxLayout()
+        self.combo_hwj_crcy_from = QComboBox()
+        self.combo_hwj_crcy_to = QComboBox()
+        for c in ["USD", "HKD", "CNY", "AUD"]:
+            self.combo_hwj_crcy_from.addItem(c, c)
+            self.combo_hwj_crcy_to.addItem(c, c)
+        crcy_h.addWidget(self.combo_hwj_crcy_from)
+        crcy_h.addWidget(QLabel("→"))
+        crcy_h.addWidget(self.combo_hwj_crcy_to)
+        btn_rate = QPushButton("적용환율조회")
+        btn_rate.clicked.connect(self._on_hwj_rate_send)
+        crcy_h.addWidget(btn_rate)
+        crcy_h.addWidget(QLabel("적용환율은 10초간 유지됩니다."))
+        crcy_h.addStretch()
+        form.addRow("통화코드", crcy_h)
+
+        rate_h = QHBoxLayout()
+        self.edit_hwj_rate = QLineEdit("0.00")
+        self.edit_hwj_rate.setReadOnly(True)
+        rate_h.addWidget(self.edit_hwj_rate)
+        self.lbl_hwj_ratetime = QLabel("(최종조회시간: 00:00:00)")
+        rate_h.addWidget(self.lbl_hwj_ratetime)
+        rate_h.addStretch()
+        form.addRow("적용환율", rate_h)
+
+        EDIT_W = 100
+        self.edit_hwj_rate.setMaximumWidth(EDIT_W)
+
+        amt_h = QHBoxLayout()
+        self.edit_hwj_fcurramt = QLineEdit("0.00")
+        self.edit_hwj_fcurramt.setMaximumWidth(EDIT_W)
+        amt_h.addWidget(self.edit_hwj_fcurramt)
+        btn_calc = QPushButton("환전예상액계산")
+        btn_calc.clicked.connect(self._on_hwj_calc)
+        amt_h.addWidget(btn_calc)
+        amt_h.addStretch()
+        form.addRow("신청외화", amt_h)
+
+        won_h = QHBoxLayout()
+        self.edit_hwj_wonamt = QLineEdit("0.00")
+        self.edit_hwj_wonamt.setReadOnly(True)
+        self.edit_hwj_wonamt.setMaximumWidth(EDIT_W)
+        won_h.addWidget(self.edit_hwj_wonamt)
+        btn_exec = QPushButton("외화 환전")
+        btn_exec.clicked.connect(self._on_hwj_exec_send)
+        won_h.addWidget(btn_exec)
+        won_h.addStretch()
+        form.addRow("예상원화", won_h)
+
+        v.addLayout(form)
+
+        result_h = QHBoxLayout()
+        result_h.addWidget(QLabel("처리결과"))
+        self.lbl_hwj_result = QLabel("-")
+        result_h.addWidget(self.lbl_hwj_result)
+        result_h.addWidget(QLabel("거래번호"))
+        self.lbl_hwj_trno = QLabel("-")
+        result_h.addWidget(self.lbl_hwj_trno)
+        result_h.addStretch()
+        v.addLayout(result_h)
+        v.addStretch()
+
+        return w
+
+    def _add_ovs_yesugeum_row(self, crcy, dps, ordable, ordamt, pldg, mxchg, rcvbl, fund):
+        row = self.table_ovs_yesugeum.rowCount()
+        self.table_ovs_yesugeum.insertRow(row)
+        for col, val in enumerate([crcy, dps, ordable, ordamt, pldg, mxchg, rcvbl, fund]):
+            self.table_ovs_yesugeum.setItem(row, col, QTableWidgetItem(val))
+
+    def _add_ovs_jango_row(self, code, name, crcy, hld, sellable, curr, eval_amt, eval_pflt, rate):
+        row = self.table_ovs_jango.rowCount()
+        self.table_ovs_jango.insertRow(row)
+        for col, val in enumerate([code, name, crcy, hld, sellable, curr, eval_amt, eval_pflt, rate]):
+            self.table_ovs_jango.setItem(row, col, QTableWidgetItem(val))
+
+    def _add_chegyul_row(self, mode, jmno, ojno, jong, jprc, jqty, cprc, cqty, michegyul, msg):
+        table = self.table_michegyul if mode == "미체결" else self.table_chegyul
+        row = table.rowCount()
+        table.insertRow(row)
+        for col, val in enumerate([jmno, ojno, jong, jprc, jqty, cprc, cqty, michegyul, msg]):
+            table.setItem(row, col, QTableWidgetItem(val))
+
+    def _add_odr_gorae_row(self, tdate, smry, isunm, qty, uprc, amt, cmsn, tax, ttime):
+        row = self.table_odr_gorae.rowCount()
+        self.table_odr_gorae.insertRow(row)
+        for col, val in enumerate([tdate, smry, isunm, qty, uprc, amt, cmsn, tax, ttime]):
+            self.table_odr_gorae.setItem(row, col, QTableWidgetItem(val))
+
+    def _add_ovs_gorae_row(self, tdate, smry, isunm, crcy, qty, uprc, fcurr, won, mkt, ttime):
+        row = self.table_ovs_gorae.rowCount()
+        self.table_ovs_gorae.insertRow(row)
+        for col, val in enumerate([tdate, smry, isunm, crcy, qty, uprc, fcurr, won, mkt, ttime]):
+            self.table_ovs_gorae.setItem(row, col, QTableWidgetItem(val))
+
+    def _add_ovs_chegyul_row(self, jmno, ojno, jong, gubn, jqty, cqty, michegyul, jprc, cprc, otime, ctime, rjt):
+        row = self.table_ovs_chegyul.rowCount()
+        self.table_ovs_chegyul.insertRow(row)
+        for col, val in enumerate([jmno, ojno, jong, gubn, jqty, cqty, michegyul, jprc, cprc, otime, ctime, rjt]):
+            self.table_ovs_chegyul.setItem(row, col, QTableWidgetItem(val))
 
     def _add_jango_row(self, code, remain, avail, maip, curr, eval_amt, rate):
         row = self.table_jango.rowCount()
@@ -637,6 +1092,7 @@ class TestWindow(QMainWindow):
         raw = self.ocx.dynamicCall("GetAccounts()")
         self.combo_accn.clear()
         self.combo_odr_accn.clear()
+        self.combo_ovs_accn.clear()
         if not raw:
             self._log("GetAccounts() => (empty)")
             return
@@ -650,6 +1106,7 @@ class TestWindow(QMainWindow):
             self._log(f"  계좌={acno}({len(acno)}자리) 명={acnm}")
             self.combo_accn.addItem(display, acno)
             self.combo_odr_accn.addItem(display, acno)
+            self.combo_ovs_accn.addItem(display, acno)
 
     def _evt_error(self, msg):
         self._log(f"[EVT] OnError: {msg}")
@@ -790,7 +1247,7 @@ class TestWindow(QMainWindow):
                 "TR3201(int, int, QString, QString, int, QString, int, int, int, int)",
                 [TK_TR3201, mmgb, acno, pswd, ojno, code, jqty, jprc, hogb, 0])
         else:  # 주식
-            mkgb = self.combo_jango_mkgubn.currentData()  # 1=KRX 2=NXT 3=통합
+            mkgb = self.combo_odr_mkgubn.currentData()  # 1=KRX 2=NXT 3=통합
             result = self.ocx.dynamicCall(
                 "TR1203(int, int, QString, QString, int, QString, int, int, int, int, int)",
                 [TK_TR1203, mmgb, acno, pswd, ojno, code, jqty, jprc, hogb, 0, mkgb])
@@ -841,6 +1298,7 @@ class TestWindow(QMainWindow):
             return
         self._jngo_acno = acno
         self._jngo_pswd = pswd
+        self.table_chegyul.setRowCount(0)
         if self.combo_jtype.currentIndex() == 0:  # 선물옵션
             result = self.ocx.dynamicCall(
                 "TR3211(int, QString, QString, int, int, QString, int, int, QString)",
@@ -862,6 +1320,7 @@ class TestWindow(QMainWindow):
             return
         self._jngo_acno = acno
         self._jngo_pswd = pswd
+        self.table_michegyul.setRowCount(0)
         if self.combo_jtype.currentIndex() == 0:  # 선물옵션 dlgb=2
             result = self.ocx.dynamicCall(
                 "TR3211(int, QString, QString, int, int, QString, int, int, QString)",
@@ -872,6 +1331,147 @@ class TestWindow(QMainWindow):
                 [TK_TR1211, acno, pswd, "", 0, 0, 2, 1, ""])
         self._chegyul_mode = "미체결"
         self._log(f"미체결조회 => {result}")
+        if not result:
+            self._log_err(self.ocx.dynamicCall('GetLastErrMsg()'))
+
+    def _on_ovs_chegyul_send(self):
+        acno = self.combo_ovs_accn.currentData() or self.combo_ovs_accn.currentText().strip()
+        pswd = self.edit_ovs_pswd.text()
+        if not acno.strip():
+            self._log("계좌를 선택하세요")
+            return
+        code = self.edit_ovs5002_code.text()
+        edate = self.edit_ovs5002_edate.text()
+        mm = self.combo_ovs5002_mm.currentData()
+        gubn = self.combo_ovs5002_gubn.currentData()
+        rtype = self.combo_ovs5002_type.currentData()
+        market = self.combo_ovs5002_market.currentData()
+        ordtype = self.combo_ovs5002_ordtype.currentData()
+        sort = self.combo_ovs5002_sort.currentData()
+        self.table_ovs_chegyul.setRowCount(0)
+        result = self.ocx.dynamicCall(
+            "TR5002(int, QString, QString, QString, QString, QString, QString, QString, QString, QString, int)",
+            [TK_TR5002, acno, pswd, edate, mm, gubn, rtype, code, market, ordtype, sort])
+        self._log(f"해외체결내역조회(TR5002) => {result}")
+        if not result:
+            self._log_err(self.ocx.dynamicCall('GetLastErrMsg()'))
+
+    def _on_ovs_yesugeum_send(self):
+        acno = self.combo_ovs_accn.currentData() or self.combo_ovs_accn.currentText().strip()
+        pswd = self.edit_ovs_pswd.text()
+        if not acno.strip():
+            self._log("계좌를 선택하세요")
+            return
+        self.table_ovs_yesugeum.setRowCount(0)
+        result = self.ocx.dynamicCall(
+            "TR5000(int, QString, QString)",
+            [TK_TR5000, acno, pswd])
+        self._log(f"해외예수금조회(TR5000) => {result}")
+        if not result:
+            self._log_err(self.ocx.dynamicCall('GetLastErrMsg()'))
+
+    def _on_ovs_jango_send(self):
+        acno = self.combo_ovs_accn.currentData() or self.combo_ovs_accn.currentText().strip()
+        pswd = self.edit_ovs_pswd.text()
+        if not acno.strip():
+            self._log("계좌를 선택하세요")
+            return
+        edate = self.edit_ovs5001_date.text()
+        today = self.combo_ovs5001_today.currentData()
+        qrytp = self.combo_ovs5001_qrytp.currentData()
+        self.table_ovs_jango.setRowCount(0)
+        # 참고: TR5001의 ODL 선언(4개)이 실제 함수(6개: key,acc,pswd,sDate,today,qryTp)와 안 맞는다고
+        # 말씀드렸던 그 함수입니다 - OCX가 아직 안 고쳐졌으면 이 호출이 None을 반환할 수 있습니다.
+        result = self.ocx.dynamicCall(
+            "TR5001(int, QString, QString, QString, QString, QString)",
+            [TK_TR5001, acno, pswd, edate, today, qrytp])
+        self._log(f"해외잔고조회(TR5001) => {result}")
+        if not result:
+            self._log_err(self.ocx.dynamicCall('GetLastErrMsg()'))
+
+    def _on_odr_gorae_send(self):
+        acno = self.combo_odr_accn.currentData() or ""
+        pswd = self.edit_odr_pswd.text()
+        if not acno.strip():
+            self._log("계좌를 선택하세요")
+            return
+        sdate = self.edit_odr_gorae_sdate.text()
+        edate = self.edit_odr_gorae_edate.text()
+        qtype = self.combo_odr_gorae_type.currentData()
+        code = self.edit_odr_gorae_code.text()
+        self.table_odr_gorae.setRowCount(0)
+        result = self.ocx.dynamicCall(
+            "TR2002(int, QString, QString, QString, QString, QString, QString)",
+            [TK_TR2002, acno, pswd, sdate, edate, qtype, code])
+        self._log(f"주식거래내역조회(TR2002) => {result}")
+        if not result:
+            self._log_err(self.ocx.dynamicCall('GetLastErrMsg()'))
+
+    def _on_ovs_gorae_send(self):
+        acno = self.combo_ovs_accn.currentData() or self.combo_ovs_accn.currentText().strip()
+        pswd = self.edit_ovs_pswd.text()
+        if not acno.strip():
+            self._log("계좌를 선택하세요")
+            return
+        sdate = self.edit_ovs5003_sdate.text()
+        edate = self.edit_ovs5003_edate.text()
+        code = self.edit_ovs5003_code.text()
+        gubn = self.combo_ovs5003_gubn.currentData()
+        stktp = self.combo_ovs5003_stktp.currentData()
+        self.table_ovs_gorae.setRowCount(0)
+        result = self.ocx.dynamicCall(
+            "TR5003(int, QString, QString, QString, QString, QString, QString, QString, QString)",
+            [TK_TR5003, acno, pswd, sdate, edate, code, "0", gubn, stktp])
+        self._log(f"해외거래내역조회(TR5003) => {result}")
+        if not result:
+            self._log_err(self.ocx.dynamicCall('GetLastErrMsg()'))
+
+    def _on_hwj_rate_send(self):
+        # 참고: TR5005/5006은 아직 OCX ODL/디스패치맵에 등록 안 되어 있어서 이 호출은 지금은
+        # None을 반환합니다. 또한 S_TR5005는 환율(dRate)이 초기화 안 된 채 전송되는 버그가 있어서
+        # OCX 쪽에서 그것도 같이 고쳐져야 정상 동작합니다.
+        acno = self.combo_ovs_accn.currentData() or self.combo_ovs_accn.currentText().strip()
+        pswd = self.edit_ovs_pswd.text()
+        if not acno.strip():
+            self._log("계좌를 선택하세요")
+            return
+        bnstp = self.combo_hwj_bnstp.currentData()
+        result = self.ocx.dynamicCall(
+            "TR5005(int, QString, QString, QString, QString)",
+            [TK_TR5005, acno, pswd, "", bnstp])
+        self._log(f"적용환율조회(TR5005) => {result}")
+        if not result:
+            self._log_err(self.ocx.dynamicCall('GetLastErrMsg()'))
+
+    def _on_hwj_calc(self):
+        # 서버 호출 없이 화면에서 바로 계산 (신청외화 x 적용환율)
+        try:
+            rate = float(self.edit_hwj_rate.text() or "0")
+            fcurramt = float(self.edit_hwj_fcurramt.text() or "0")
+            self.edit_hwj_wonamt.setText(f"{fcurramt * rate:,.2f}")
+        except ValueError:
+            self._log("환전예상액계산: 적용환율/신청외화 값을 확인하세요")
+
+    def _on_hwj_exec_send(self):
+        # 참고: TR5006도 TR5005와 마찬가지로 아직 OCX에 안 올라와 있어서 None이 나올 수 있습니다.
+        # tgrtcrcycode/mxchgcrcycode, tgrtmnyoutamt/mxchgmnyinamt의 매수/매도 방향별 대응은
+        # C++ 주석만으로는 확실치 않아 추정으로 채웠습니다 - 실제 동작 확인 후 조정이 필요합니다.
+        acno = self.combo_ovs_accn.currentData() or self.combo_ovs_accn.currentText().strip()
+        pswd = self.edit_ovs_pswd.text()
+        if not acno.strip():
+            self._log("계좌를 선택하세요")
+            return
+        bnstp = self.combo_hwj_bnstp.currentData()  # 01:외화매수 02:외화매도
+        crcy_from = self.combo_hwj_crcy_from.currentData()
+        crcy_to = self.combo_hwj_crcy_to.currentData()
+        fcurramt = self.edit_hwj_fcurramt.text()
+        wonamt = self.edit_hwj_wonamt.text()
+        rate = self.edit_hwj_rate.text()
+        result = self.ocx.dynamicCall(
+            "TR5006(int, QString, QString, QString, QString, QString, QString, QString, QString, QString, QString, QString, QString, QString)",
+            [TK_TR5006, acno, pswd, "1", "", "", "", bnstp, wonamt, fcurramt, crcy_to, crcy_from, rate, ""])
+        self.lbl_hwj_result.setText(str(result))
+        self._log(f"외화환전(TR5006) => {result}")
         if not result:
             self._log_err(self.ocx.dynamicCall('GetLastErrMsg()'))
 
@@ -1003,7 +1603,10 @@ class TestWindow(QMainWindow):
                 for i in range(nrec):
                     g = raw[15 + i*GRID: 15 + (i+1)*GRID]
                     if len(g) < GRID: break
-                    self._log(f"    주문={s(g[6:12])} {s(g[18:26])} {s(g[56:64])} 주문가={s(g[84:95])} 주문량={s(g[95:102])} 체결가={s(g[106:117])} 체결량={s(g[117:124])} 미체결={s(g[130:137])} [{s(g[144:152])}]")
+                    self._add_chegyul_row(
+                        mode, s(g[6:12]), "", f"{s(g[18:26])} {s(g[56:64])}".strip(),
+                        s(g[84:95]), s(g[95:102]), s(g[106:117]), s(g[117:124]),
+                        s(g[130:137]), s(g[144:152]))
                 if b_next:
                     acno = getattr(self, '_jngo_acno', '')
                     pswd = getattr(self, '_jngo_pswd', '')
@@ -1020,7 +1623,12 @@ class TestWindow(QMainWindow):
                     g = raw[15 + i*GRID: 15 + (i+1)*GRID]
                     if len(g) < GRID: break
                     mkgb = s(g[20:21])
-                    self._log(f"    주문={s(g[0:10])} 원주문={s(g[10:20])} 시장={MKGB_NAMES.get(mkgb, mkgb)} 종목={s(g[21:33])} {s(g[33:73])} {s(g[73:93])} 주문가={s(g[133:145])} 주문량={s(g[145:157])} 체결가={s(g[157:169])} 체결량={s(g[169:181])} 미체결={s(g[193:205])} [{s(g[237:257])}] 시간={s(g[257:265])}")
+                    jong = f"[{MKGB_NAMES.get(mkgb, mkgb)}] {s(g[21:33])} {s(g[33:73])}".strip()
+                    msg = s(g[237:257]) or s(g[257:265])
+                    self._add_chegyul_row(
+                        mode, s(g[0:10]), s(g[10:20]), jong,
+                        s(g[133:145]), s(g[145:157]), s(g[157:169]), s(g[169:181]),
+                        s(g[193:205]), msg)
                 if b_next:
                     acno = getattr(self, '_jngo_acno', '')
                     pswd = getattr(self, '_jngo_pswd', '')
@@ -1028,6 +1636,85 @@ class TestWindow(QMainWindow):
                     self.ocx.dynamicCall(
                         "TR1211(int, QString, QString, QString, int, int, int, int, QString)",
                         [TK_TR1211, acno, pswd, "", 0, 0, dlgb, 1, nkey])
+            elif key == TK_TR5002:  # 해외 체결/미체결 (COSAQ005, mid[93]+count[5]+rec[1030]*n)
+                MID_LEN = 93
+                REC = 1030
+                nrec = int(raw[MID_LEN:MID_LEN+5].decode('cp949', errors='ignore').strip() or "0")
+                self._log(f"  [해외체결내역] {nrec}건")
+                for i in range(nrec):
+                    g = raw[MID_LEN+5 + i*REC: MID_LEN+5 + (i+1)*REC]
+                    if len(g) < REC: break
+                    bnstp = s(g[400:401])
+                    jong = f"{s(g[109:121])} {s(g[10:50])}".strip()
+                    self._add_ovs_chegyul_row(
+                        s(g[0:10]), s(g[50:60]), jong, OVS_BNSTP_NAMES.get(bnstp, bnstp),
+                        s(g[283:299]), s(g[322:338]), s(g[461:477]),
+                        s(g[440:461]), s(g[500:521]), s(g[562:571]), s(g[571:580]),
+                        s(g[920:1020]))
+                if b_next:
+                    self._log(f"    (다음 페이지 있음: nkey={nkey} - 현재 OCX가 이어보기 커서를 안 받아서 자동 연속조회는 아직 안 됨)")
+            elif key == TK_TR5000:  # 해외증권 예수금 (COSAQ027, mid[37] + count1+out1[275]*count1 + count2+out2[216]*count2 + count3+out3[64] + ...)
+                MID_LEN = 37
+                pos = MID_LEN
+                # count1(요청 통화 상세 건수) - 0이면 out1[275] 블록 자체가 통째로 생략되고 온다
+                count1 = int(raw[pos:pos+5].decode('cp949', errors='ignore').strip() or "0")
+                pos += 5 + count1 * 275  # out1은 아직 화면에 안 씀 - count1건만큼 건너뛰기만 함
+                count2 = int(raw[pos:pos+5].decode('cp949', errors='ignore').strip() or "0")
+                pos += 5
+                self.table_ovs_yesugeum.setRowCount(0)
+                for i in range(count2):
+                    o = raw[pos + i*216: pos + (i+1)*216]
+                    if len(o) < 216: break
+                    self._add_ovs_yesugeum_row(
+                        s(o[40:43]), s(o[60:77]), s(o[77:94]), s(o[111:128]),
+                        s(o[128:145]), s(o[162:179]), s(o[179:199]), s(o[199:216]))
+                pos += count2 * 216
+                pos += 5  # count3
+                o3 = raw[pos:pos+64]
+                self.lbl_ovs_wondps.setText(s(o3[0:16]))
+                self.lbl_ovs_wonout.setText(s(o3[16:32]))
+                self.lbl_ovs_wonconv.setText(s(o3[32:48]))
+                self.lbl_ovs_bnsmgn.setText(s(o3[48:64]))
+                self._log(f"  [해외예수금] 통화 {count2}건")
+            elif key == TK_TR5001:  # 해외주식 잔고 (COSAQ003, mid[57]+count[5]+rec[469]*n)
+                MID_LEN = 57
+                REC = 469
+                nrec = int(raw[MID_LEN:MID_LEN+5].decode('cp949', errors='ignore').strip() or "0")
+                self.table_ovs_jango.setRowCount(0)
+                for i in range(nrec):
+                    g = raw[MID_LEN+5 + i*REC: MID_LEN+5 + (i+1)*REC]
+                    if len(g) < REC: break
+                    self._add_ovs_jango_row(
+                        s(g[100:112]), s(g[0:100]), s(g[137:177]), s(g[121:137]),
+                        s(g[209:225]), s(g[289:304]), s(g[319:336]), s(g[336:353]), s(g[304:316]))
+                self._log(f"  [해외잔고] {nrec}건")
+            elif key == TK_TR2002:  # 주식 거래내역 (mid[63]+out1[614]+count[5]+rec[440]*n)
+                MID_LEN = 63
+                OUT1_LEN = 614
+                pos = MID_LEN + OUT1_LEN
+                nrec = int(raw[pos:pos+5].decode('cp949', errors='ignore').strip() or "0")
+                pos += 5
+                REC = 440
+                for i in range(nrec):
+                    g = raw[pos + i*REC: pos + (i+1)*REC]
+                    if len(g) < REC: break
+                    self._add_odr_gorae_row(
+                        s(g[0:8]), s(g[8:48]), s(g[158:198]), s(g[52:68]),
+                        s(g[198:211]), s(g[68:84]), s(g[84:100]), s(g[227:243]), s(g[431:440]))
+                self._log(f"  [주식거래내역] {nrec}건")
+            elif key == TK_TR5003:  # 해외주식 거래내역 (COSAQ208, mid[75]+count[5]+AcntNm[40]+out[5]+rec[981]*n)
+                MID_LEN = 75
+                pos = MID_LEN + 5 + 40 + 5  # count(5) + AcntNm(40) + out(5)
+                nrec = int(raw[MID_LEN:MID_LEN+5].decode('cp949', errors='ignore').strip() or "0")
+                REC = 981
+                for i in range(nrec):
+                    g = raw[pos + i*REC: pos + (i+1)*REC]
+                    if len(g) < REC: break
+                    self._add_ovs_gorae_row(
+                        s(g[0:8]), s(g[337:377]), s(g[59:99]), s(g[99:102]),
+                        s(g[216:238]), s(g[681:696]), s(g[102:119]), s(g[119:135]),
+                        s(g[803:843]), s(g[876:885]))
+                self._log(f"  [해외거래내역] {nrec}건")
             elif key == TK_TR8001:  # 고객정보 (pihocust, mod: gubn[1])
                 gubn = raw[0:1].decode('cp949', errors='ignore').strip()
                 self._log(f"  [고객정보] gubn={gubn!r} raw={raw[:32].hex(' ')}")

@@ -1003,12 +1003,16 @@ void CWizardCtrl::OnCertify(char* pBytes, int nBytes)
 
 void CWizardCtrl::Xecure()
 {
+	axlog(LOG_DATA, "[Xecure-Nego] enter flagENC=%d m_xtype=%d",
+		(m_guard->m_term & flagENC) ? 1 : 0, (int)m_xtype);
+
 	if (m_guard->m_term & flagENC && m_xtype != xtFlag::xtXEC)
 	{
 		m_mode = mtFlag::mtXEC;
 		OnFire(FEV_GUIDE, 0, AE_SECURE);
 		if (Xecure(NULL, 0) == -1)
 		{
+			axlog(LOG_DATA, "[Xecure-Nego] Xecure(NULL,0) FAILED");
 			m_mode = mtFlag::mtCON;
 			AfxMessageBox(_T("암호화 과정 오류"));
 			OnFire(FEV_GUIDE, 0, AE_ESECURE);
@@ -1016,11 +1020,14 @@ void CWizardCtrl::Xecure()
 		}
 		return;
 	}
+	axlog(LOG_DATA, "[Xecure-Nego] skipped -> Run()");
 	Run();
 }
 
 void CWizardCtrl::OnXecure(int encK, char* pBytes, int nBytes)
 {
+	axlog(LOG_DATA, "[Xecure-Nego] OnXecure encK=%d nBytes=%d m_mode=%d", encK, nBytes, (int)m_mode);
+
 	switch (encK)
 	{
 	case encERR:
@@ -1137,9 +1144,12 @@ int CWizardCtrl::Xecure(char* pBytes, int nBytes)
 	}
 
 	long	retv;
+	int	nBytesIn = nBytes;
 
 	m_guard->m_xecure->InvokeHelper(DI_XEC, DISPATCH_METHOD, VT_I4, (void*)&retv,
 		(BYTE*)VTS_I4 VTS_I4, pBytes, &nBytes);
+
+	axlog(LOG_DATA, "[Xecure-Nego] DI_XEC nBytesIn=%d nBytesOut=%d retv=%d", nBytesIn, nBytes, (int)retv);
 
 	switch (nBytes)
 	{
@@ -1148,11 +1158,13 @@ int CWizardCtrl::Xecure(char* pBytes, int nBytes)
 	case -1:
 		if (retv != NULL)
 		{
+			axlog(LOG_DATA, "[Xecure-Nego] DI_XEC error retv=%d", (int)retv);
 			OnFire(FEV_ERROR, true, retv);
 			return -2;
 		}
 		break;
 	default:
+		axlog(LOG_DATA, "[Xecure-Nego] AXISENCX send nBytes=%d", nBytes);
 		if (m_guard->Write(msgK_ENC, "AXISENCX", (char*)retv, nBytes))
 			return nBytes;
 		break;
