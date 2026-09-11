@@ -234,6 +234,12 @@ void CMBongWnd::Dispatch(char *pData, CString sUpper, CString sLower, int Digit)
 		pBong = std::make_shared<CBongData>();
 		pBong->SetData(&ew->candle[ii]);
 		m_arData.Add(pBong);
+
+		// 2026.09.08 KSJ 조회 시점에 서버가 내려준 일자별 원본 OHLC 로그 - 고가/종가 역전 원인 추적용
+		CString sLog;
+		sLog.Format("[MBong-Dispatch] idx=%d date=%s siga=%.0f koga=%.0f jega=%.0f jgga=%.0f gvol=%.0f\n",
+			ii, pBong->m_date, pBong->m_siga, pBong->m_koga, pBong->m_jega, pBong->m_jgga, pBong->m_gvol);
+		OutputDebugString(sLog);
 	}
 
 	calculate();
@@ -286,8 +292,8 @@ void CMBongWnd::Alert(CString sRts)
 	if (siga == 0.0 || jgga == 0.0)	return;
 
 	pData->m_siga = siga;
-	pData->m_koga = koga;
-	pData->m_jega = jega;
+	if (koga > 0.0) pData->m_koga = koga;	// 2026.09.08 KSJ 이번 틱에 고가(30)가 없으면 기존값 유지 - 0으로 덮어써서 min/max가 튀는 버그 수정
+	if (jega > 0.0) pData->m_jega = jega;	// 2026.09.08 KSJ 이번 틱에 저가(31)가 없으면 기존값 유지
 	pData->m_jgga = jgga;
 	pData->m_gvol = volume;
 
@@ -343,13 +349,13 @@ void CMBongWnd::Alert(struct _alertR* alertR)
 		
 	if (siga == 0.0 || jgga == 0.0)
 		return;
-		
+
 	pData->m_siga = siga;
-	pData->m_koga = koga;
-	pData->m_jega = jega;
+	if (koga > 0.0) pData->m_koga = koga;	// 2026.09.08 KSJ 이번 틱에 고가(30)가 없으면 기존값 유지
+	if (jega > 0.0) pData->m_jega = jega;	// 2026.09.08 KSJ 이번 틱에 저가(31)가 없으면 기존값 유지
 	pData->m_jgga = jgga;
 	pData->m_gvol = volume;
-		
+
 	nCount = m_arMADay.GetSize();
 	for (int ii = 0 ; ii < nCount ; ii++ )
 		m_MAData[ii][0] = calcuMA(m_arMADay.GetAt(ii), 0);
@@ -538,6 +544,20 @@ void CMBongWnd::calcuMinMax()
 		if (pData->m_jega < tmpMin)
 			tmpMin = pData->m_jega;
 
+		// 2026.09.08 KSJ 정상 데이터면 고가/저가가 항상 최대/최소지만,
+		// 종가(또는 시가)가 서버 데이터 이상으로 고가를 넘어서는 경우에도
+		// getYPos()가 범위 밖으로 튀지 않도록 시가/종가도 같이 스캔해 축 범위에 반영
+		if (pData->m_siga != UNUSED_VALUE)
+		{
+			if (pData->m_siga > tmpMax) tmpMax = pData->m_siga;
+			if (pData->m_siga < tmpMin) tmpMin = pData->m_siga;
+		}
+		if (pData->m_jgga != UNUSED_VALUE)
+		{
+			if (pData->m_jgga > tmpMax) tmpMax = pData->m_jgga;
+			if (pData->m_jgga < tmpMin) tmpMin = pData->m_jgga;
+		}
+
 		if (pData->m_gvol > tmpVMax)
 			tmpVMax = pData->m_gvol;	
 	}
@@ -702,8 +722,8 @@ void CMBongWnd::drawBong(CDC* pDC)
 		if (pData == NULL)
 			continue;
 
-		if (pData->m_jgga == UNUSED_VALUE)
-			continue;
+		if (pData->m_koga == UNUSED_VALUE || pData->m_jega == UNUSED_VALUE || pData->m_jgga == UNUSED_VALUE)
+			continue;	// 2026.09.08 KSJ calcuMinMax()의 제외기준(m_koga)과 일치시킴 - 안 그러면 범위 밖 UNUSED_VALUE가 getYPos에 그대로 들어감
 
 		nPos[0] = getXPosR(ii+1) + 1;
 		nPos[1] = getXPosR(ii) - 1;		
@@ -887,6 +907,15 @@ int CMBongWnd::getYPos(double val, double maxValue, double minValue, CRect rect)
 		return rect.bottom;
 
 	yPos = fHeight * fGab / fMinMax;
+
+	// 2026.09.08 KSJ 범위 밖 값(예: UNUSED_VALUE)이 들어와도 컨트롤 높이를 벗어나지 않도록 clamp
+	// calcuMinMax()가 시가/고가/저가/종가/MA를 전부 스캔해서 평소엔 발동 안 하지만,
+	// drawBong()의 스킵조건이 m_siga는 안 봐서 그쪽이 UNUSED_VALUE가 되는 경우 등 최후 방어선으로 유지
+	if (yPos < 0)
+		yPos = 0;
+	else if (yPos > fHeight)
+		yPos = fHeight;
+
 	return (int)((double)rect.top + yPos);
 }
 

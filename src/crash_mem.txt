@@ -1,0 +1,55 @@
+
+Microsoft (R) Windows Debugger Version 6.3.9600.17298 X86
+Copyright (c) Microsoft Corporation. All rights reserved.
+
+
+Loading Dump File [C:\IBKS\IBK투자증권 HTS\user\1172747575\Crashlog\khs779_91114h31m22s.dmp]
+WARNING: Minidump contains unknown stream type 0x15
+WARNING: Minidump contains unknown stream type 0x16
+WARNING: Minidump contains unknown stream type 0x18
+User Mini Dump File: Only registers, stack and portions of memory are available
+
+
+************* Symbol Path validation summary **************
+Response                         Time (ms)     Location
+OK                                             D:\symbol
+OK                                             D:\symstore
+Symbol search path is: D:\symbol;D:\symstore
+Executable search path is: 
+Windows 8 Version 17763 MP (16 procs) Free x86 compatible
+Product: WinNt, suite: SingleUserTS
+Built by: 17763.1.x86fre.rs5_release.180914-1434
+Machine Name:
+Debug session time: Fri Sep 11 14:31:23.000 2026 (UTC + 9:00)
+System Uptime: not available
+Process Uptime: 0 days 6:25:41.000
+................................................................
+................................................................
+................................................................
+.................................................
+Loading unloaded module list
+................................................................
+This dump file has an exception of interest stored in it.
+The stored exception information can be accessed via .ecxr.
+(3654.8e8): Access violation - code c0000005 (first/second chance not available)
+eax=00000000 ebx=16c41008 ecx=00000000 edx=00000000 esi=000002cc edi=16c40ff8
+eip=76fa2b8c esp=092fca8c ebp=092fca98 iopl=0         nv up ei pl nz na po nc
+cs=0023  ss=002b  ds=002b  es=002b  fs=0053  gs=002b             efl=00200202
+ntdll!NtGetContextThread+0xc:
+76fa2b8c c20800          ret     8
+0:000> cdb: Reading initial command '.ecxr; dp 153cbff0 L10; dp 153cc000-20 L10; ub 76fa2b8c-8; q'
+eax=0000000c ebx=153cc000 ecx=00000003 edx=0000000c esi=153cc000 edi=15e4a610
+eip=6f50ee87 esp=092fe96c ebp=092fe990 iopl=0         nv up ei pl nz na pe nc
+cs=0023  ss=002b  ds=002b  es=002b  fs=0053  gs=002b             efl=00210206
+VCRUNTIME140!memcpy+0x507:
+6f50ee87 8b16            mov     edx,dword ptr [esi]  ds:002b:153cc000=????????
+153cbff0  ???????? ???????? ???????? ????????
+153cc000  ???????? ???????? ???????? ????????
+153cc010  ???????? ???????? ???????? ????????
+153cc020  ???????? ???????? ???????? ????????
+153cbfe0  ???????? ???????? ???????? ????????
+153cbff0  ???????? ???????? ???????? ????????
+153cc000  ???????? ???????? ???????? ????????
+153cc010  ???????? ???????? ???????? ????????
+                                                               ^ Unable to find valid previous instruction for '.ecxr; dp 153cbff0 l10; dp 153cc000-20 l10; ub 76fa2b8c-8; q'
+0:000> 

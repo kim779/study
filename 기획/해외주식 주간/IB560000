@@ -153,14 +153,7 @@ Today = getCurrDay()
 Dim m_binit
 m_binit = False
 
-Sub InitIMAX
-	If m_binit = False Then
-		ed_initimax.Data = l_initimax("ctrl_jango")
-		ed_initimax.Data = l_initimax("ctrl_day_jango")
-		m_binit = True
-		GetParentGroupAdnSkin()
-	End If
-	
+Sub CheckUSDayMarke()
 	If IsUSDayMarket() = True Then
 		ctrl_jango.SetVisible(False)
 		ctrl_day_jango.SetVisible(True)
@@ -168,6 +161,17 @@ Sub InitIMAX
 		ctrl_jango.SetVisible(True)
 		ctrl_day_jango.SetVisible(False)
 	End If
+End Sub
+
+Sub InitIMAX
+	If m_binit = False Then
+		ed_initimax.Data = l_initimax("ctrl_jango")
+		ed_initimax.Data = l_initimax("ctrl_day_jango")
+		m_binit = True
+		GetParentGroupAdnSkin()
+	End If
+
+	CheckUSDayMarke()
 End Sub
 
 Sub Set_account()

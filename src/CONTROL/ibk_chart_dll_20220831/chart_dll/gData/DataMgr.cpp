@@ -4,6 +4,10 @@
 
 #include "stdafx.h"
 #include "DataMgr.h"
+
+#define AXLOG_MODULE_TAG "C_TOTAL"
+#include "../../../../ibks/h/axlog.h"
+
 #include <math.h>
 
 #include "AppMA.h"
@@ -477,6 +481,8 @@ int CDataMgr::ParseRealtime(CString sCode, CString strRTData, bool& rbIncrease)
 	m_strSiga.Format(_T("%s"), LPCTSTR(astrBasicVal[7]));
 	m_strKoga.Format(_T("%s"), LPCTSTR(astrBasicVal[8]));
 	m_strJega.Format(_T("%s"), LPCTSTR(astrBasicVal[9]));
+
+	axlog(LOG_RTM, "[ParseRealtime] code=%s time=%s price=%s", sCode.GetString(), m_strCtim.GetString(), m_strCurr.GetString());
 
 	astrSymbol[0].Format("%s", R_CVOL);
 	astrSymbol[1].Format("%s", R_GAMT);

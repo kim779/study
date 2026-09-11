@@ -13,6 +13,7 @@
 - [8. 스크립트에서 직접 서명 — CxSystem::CertifyFull](#8-스크립트에서-직접-서명--cxsystemcertifyfull)
 - [9. 오류코드 카탈로그](#9-오류코드-카탈로그)
 - [10. 전체 흐름도](#10-전체-흐름도)
+- [10.5. 실측 로그인 시퀀스 (2026-09-04 axlog 검증)](#105-실측-로그인-시퀀스-2026-09-04-axlog-검증)
 - [11. Python OpenAPI 프로젝트와의 활용 범위 비교](#11-python-openapi-프로젝트와의-활용-범위-비교)
 - [12. 관련 파일](#12-관련-파일)
 - [13. 미확인 / 다음 조사](#13-미확인--다음-조사)
@@ -218,6 +219,85 @@ flowchart TD
 
 ---
 
+## 10.5. 실측 로그인 시퀀스 (2026-09-04 axlog 검증)
+
+`certify_cloude_log/CertifyCtrl.cpp`에 `axlog(LOG_CERTIFY, ...)`를 전체 함수에 계측(73개 지점)한 뒤, 실제 개발서버(twas.signkorea.com, `m_bDev=1`) 로그인 1회를 캡처해서 얻은 **실측 시퀀스**. 10절의 흐름도가 코드 리딩으로 재구성한 전체 경로도라면, 이 절은 그중 정확히 어떤 가지가 실제로 도는지 로그로 확정한 것이다.
+
+### `m_ca` 상태값 — dispid enum과 같은 블록에서 이어지는 것으로 실측 확정
+
+`CertifyCtrl.h`에서 `m_ca` enum이 dispid enum(`dispidCertifyCloud=8L`)과 한 `enum` 선언 안에 이어져 있어, 실제 정수값이 8 다음부터 순서대로 매겨진다:
+
+| 상수 | 실측값 |
+|---|---|
+| `caNO` | 9 |
+| `caNOx` | 10 |
+| `caOK` | 11 |
+| `caRUN` | 12 |
+| `caPWD` | 13 |
+| `caPWDa` | 14 |
+| `caOKx` | 15 |
+
+### 시퀀스 다이어그램
+
+```mermaid
+sequenceDiagram
+    participant AXIS as AXIS/Wizard(CGuard)
+    participant Cert as CCertifyCtrl
+    participant SDK as SignKorea SDK(sk_if_*)
+
+    Note over Cert: 로그인 초기화 단계 — 클라우드 사용여부 확정
+    AXIS->>Cert: CertifyCloud(func=12)
+    Cert->>Cert: CheckCloude() → m_bDev=1(개발서버)<br/>리턴값은 무시(항상 TRUE)
+    Cert->>Cert: InitCloude() → SDK 설정<br/>(twas.signkorea.com, 포트8500)
+    Cert-->>Cert: m_bCloudeUse = FALSE<br/>(func=12 → 로컬/일반 공동인증서 확정)
+
+    Note over AXIS,Cert: 리셋 → 전체서명(CertifyFull)
+    AXIS->>Cert: OnCertify(pBytes=NULL)
+    Cert-->>AXIS: m_ca = caNO(9), m_name="cn=" 리셋
+
+    AXIS->>Cert: CertifyFull(pInB, pInL=1)
+    Cert->>SDK: sk_if_CertSetSelectExt()<br/>(로컬 저장매체에서 인증서 검색)
+    SDK-->>Cert: success=1 (비번팝업 없이 성공)
+    Cert->>SDK: sk_if_cert_SignData()
+    SDK-->>Cert: signedLen=1929
+    Cert-->>AXIS: m_ca: caNO(9) → caOKx(15)
+
+    Note over AXIS,Cert: 부가정보 조회
+    AXIS->>Cert: CertifyName()
+    Cert-->>AXIS: dnLen=68
+    AXIS->>Cert: CertifyId(pBytes)
+    Cert-->>AXIS: m_auto=1 (자동서명 체크됨)
+
+    Note over AXIS,Cert: 서버 등록정보(regK_CA) 반영 → 서명 준비완료
+    AXIS->>Cert: CertifyEx(pBytes≠NULL)
+    Cert-->>AXIS: TRUE (형식적 확인, no-op)
+
+    AXIS->>Cert: OnCertify(caH, caL=462)<br/>※ LoginSequence.md §8의<br/>regK_CA 레코드(462B)와 정확히 일치
+    Cert->>Cert: caH->dns → m_name 파싱<br/>caH->map → m_emaps(자동서명 예외맵) 등록
+    Cert-->>AXIS: m_ca: caOKx(15) → caRUN(12)
+
+    Note over AXIS,Cert: 이 시점부터 Certify(TR-sign)이<br/>OP_CERTIFY 화면의 Send()에서 실제 서명 수행 가능
+```
+
+### 관찰 포인트
+
+- **`CertifyCloud`가 로그인 초기화 시점에 명시적으로 `func=12`(클라우드 미사용)를 호출** — 즉 이 세션은 코드상 존재하는 클라우드/간편인증 경로(5·6절)를 타지 않고 처음부터 로컬 공동인증서 경로로 확정된다. `CheckCloude()`는 호출은 되지만(부수효과로 `m_bDev`만 세팅) 반환값 자체는 관찰상 쓰이지 않음 — 5절의 "항상 TRUE 반환" 미스터리와 별개로, **최종 `m_bCloudeUse` 값은 오직 `CertifyCloud(11/12)` 호출로만 결정된다**는 게 이번 실측으로 확인됨.
+- **`sk_if_CertSetSelectExt()`가 비밀번호 팝업 없이 `success=1`로 즉시 성공** — 벤더 SDK 내부(블랙박스)에서 캐시/자동선택으로 처리된 것으로 보이며, 저희 axlog로는 이 내부 UI까지는 안 잡힘(실패 시에만 에러코드가 로그에 남음, 9절 참고).
+- **`caL=462`가 `LoginSequence.md` §8에서 별도로 확인했던 `regK_CA` 레지스트리 레코드 크기(462바이트)와 정확히 일치** — 로그인 응답에 실린 서버측 CA 등록정보가 `_caH` 구조체 그대로 `OnCertify`에 전달된다는 것이 두 문서(로그인 시퀀스 관점 vs CertifyCtrl 내부 관점)에서 교차검증됨.
+- **최종 상태 `m_ca=caRUN(12)`에 도달해야 `Certify(TR-sign)`(7절, `OP_CERTIFY` 자동서명)이 정상 동작** — 그 전 단계(`caNO`/`caOKx`)에서 TR 서명을 시도하면 `Certify()`의 `default:` 분기(`FEV_CA guideCA/AE_ECERTIFY`)로 빠져 실패한다(3절 표).
+- **⚠️ 로그에 실사용자(또는 테스트용) 실명이 DN 문자열(`cn=...`)로 그대로 노출됨** — `m_name`을 로그에 찍을 때 전체 문자열 대신 앞부분만 자르거나 마스킹하는 것을 향후 검토할 것(운영 환경 캡처 시 특히 주의).
+
+### 재현성 확인 + 로그인 방식별 컬럼1/컬럼3 실행순서 차이 (2026-09-04, 동일 계정 2회 캡처)
+
+같은 테스트 계정으로 공동인증서 로그인을 다시 한번 캡처한 결과, `signedLen=1929`/`dnLen=68`/`caL=462`/DN 이름까지 첫 번째 캡처와 **완전히 동일** — 이 환경에서 결정론적으로 재현됨을 확인. 이 재확인으로 10절 흐름도의 **컬럼1("로그인 성공 `_signR`")과 컬럼3("`AXIS::signOnCert()`")의 실행 순서가 로그인 방식에 따라 뒤바뀐다**는 게 우연이 아니라 구조적인 차이임이 확정됨:
+
+- **ID/PW 로그인일 때** — 컬럼1이 먼저 돈다. 로그인 응답의 `regK_CA` DN을 받은 `OnCertify`가 `m_ca=caNO` 상태에서 `caH`를 처리 → `sk_if_CertSetSelectExt`로 서버가 알려준 DN에 해당하는 인증서를 **그때 처음** 로컬에서 자동매칭한다. 이후 컬럼3(`CertifyFull`)이 실행되면 이미 선택돼있는 컨텍스트로 서명만 수행.
+- **공동인증서 로그인일 때(이번 2회 캡처 전부 이 경우)** — 컬럼3이 먼저 돈다. 로그인 자격증명 자체를 서버에 보내려면 그 전에 인증서를 선택하고 서명해야 하므로(`AXLOGONC` 페이로드 자체가 서명값을 담음, `LoginSequence.md` §10), `signOnCert()`가 `CertifyFull`을 먼저 실행해 `m_ca: caNO→caOKx`로 전이시킨다. 로그인이 성공해 `_signR`이 돌아온 뒤 실행되는 컬럼1의 `OnCertify`는 이미 `m_ca=caOKx`이므로 `caNO` 케이스가 아니라 `caOKx` 케이스로 들어가서 — 인증서를 다시 매칭하지 않고 서버가 보낸 등록정보(DN/필수서명맵 목록)만 반영한 뒤 `caRUN`으로 넘어간다.
+
+즉 두 컬럼은 "서로 다른 두 로그인 방식"이 아니라 **"같은 두 단계(인증서 선택·서명 / 서버등록정보 반영)가 로그인 방식에 따라 실행 순서만 뒤바뀌는 것"**이다.
+
+---
+
 ## 11. Python OpenAPI 프로젝트와의 활용 범위 비교
 
 **핵심 결론: 이 모듈은 전면적으로 모달 UI(`CDialog::DoModal()`) 기반으로 설계되어 있어, 헤드리스 Python 자동매매 봇에 그대로 이식할 수 없다.**
@@ -252,12 +332,12 @@ flowchart TD
 ## 13. 미확인 / 다음 조사
 
 - `CxSystem::CertifyFull`(`xsystem.cpp:505`)이 스크립트에 어떤 이름(`System.XXX(...)`)으로 노출되는지 정확한 함수 시그니처 미확인.
-- `CheckCloude()`가 항상 `TRUE`를 반환하도록 되어 있는 것(5절)이 의도적 하드코딩인지, 원래 ini 분기 로직을 임시로 우회해둔 것인지 — 실제로 이 값이 `CertifyCloud(11/12)` 호출과 언제/어떻게 상호작용하는지(호출 순서) 미조사.
+- `CheckCloude()`가 항상 `TRUE`를 반환하도록 되어 있는 것(5절)이 의도적 하드코딩인지, 원래 ini 분기 로직을 임시로 우회해둔 것인지는 여전히 미확인. **다만 `CertifyCloud(11/12)`와의 상호작용 순서는 2026-09-04 axlog 실측으로 확인됨(10.5절)** — 로그인 초기화 시 `CertifyCloud(func)`가 호출되면 그 안에서 항상 `CheckCloude()`(반환값 무시, `m_bDev`만 세팅)+`InitCloude()`가 먼저 실행된 뒤, `switch(func)`의 11/12 케이스가 `m_bCloudeUse`를 최종 확정한다 — 즉 최종 값은 오직 `CertifyCloud(11/12)` 호출 인자로만 결정되고 `CheckCloude()`의 반환값은 실질적으로 죽은 코드임이 실측으로도 재확인됨.
 - `_caH.map`(필수 재확인 맵 목록)에 실제로 어떤 맵코드들이 서버로부터 내려오는지(이체류로 추정만 했을 뿐 실측 로그 없음).
 - OPEN API(`IBKSConnector`) 배포본에 포함된 `axCertify.ocx`가 실제로 어떤 시나리오에서 호출되는지(사용자용 수동 로그인 시에만 쓰이는지, 프로그램적으로 접근 가능한 경로가 있는지) — 이번 조사는 Wizard 쪽 코드만 확인했고 `IBKSConnector` 자체 소스의 Certify 관련 호출은 확인하지 않음.
 
 ---
 
 **최종 수정:** 2026-09-04
-**작성 방식:** `certify_cloude/CertifyCtrl.cpp/.h`, `Wizard/Guard.cpp`, `Wizard/WizardCtrl.cpp`, `Wizard/Stream.cpp`, `Wizard/xsystem.cpp`, `h/axisfire.h` 소스 직접 확인
+**작성 방식:** `certify_cloude/CertifyCtrl.cpp/.h`, `Wizard/Guard.cpp`, `Wizard/WizardCtrl.cpp`, `Wizard/Stream.cpp`, `Wizard/xsystem.cpp`, `h/axisfire.h` 소스 직접 확인 + `certify_cloude_log/CertifyCtrl.cpp`(axlog 계측 사본, `LOG_CERTIFY` 카테고리) 실측 로그인 캡처 1회 대조(10.5절)
 **상태:** 1차 완료 — 13절 미확인 사항 존재

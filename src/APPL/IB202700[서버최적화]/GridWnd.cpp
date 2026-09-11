@@ -9962,8 +9962,8 @@ void CGridWnd::parsingAlertx(LPARAM lParam)
 				if (!strName.IsEmpty())
 				{
 					bool bHalted = (strName.GetAt(0) == 'X');
-					bool bHaltedNow = (str704 != "0");
-					if (bHaltedNow != bHalted)
+					bool bHaltedNow = (str704 != "0");  //0정상 1정지 
+					if (bHaltedNow != bHalted)  //정지종목이고 704심볼이 1이면 
 					{
 						if (bHaltedNow)
 							strName.Insert(0, 'X');

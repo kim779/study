@@ -8803,6 +8803,32 @@ void CGridWnd::parsingAlertx(LPARAM lParam)
 					}
 				}
 			}
+
+			// 2026.09.08 KSJ 실시간 거래정지(704) - IB202700[서버최적화] 참고, "0"이면 정상, 그 외는 정지
+			if (hasData(704))
+			{
+				CString str704 = getData(704);
+				if (!str704.IsEmpty())
+				{
+					CString strName = m_grid->GetItemText(xrow, colNAME);
+					if (!strName.IsEmpty())
+					{
+						bool bHalted = (strName.GetAt(0) == 'X');
+						bool bHaltedNow = (str704 != "0");  //0정상 1정지
+						if (bHaltedNow != bHalted)  //정지상태가 바뀌면
+						{
+							if (bHaltedNow)
+								strName.Insert(0, 'X');
+							else
+								strName.Delete(0);
+							m_grid->SetItemText(xrow, colNAME, strName);
+							entry = m_grid->GetItemText(xrow, colINFO); // 종목특이사항
+							SetColInfo(strName, xrow, entry);
+						}
+					}
+				}
+			}
+			// KSJ
 		} // for rowPosition 끝
 
 #ifdef DF_RTS_CHECK

@@ -13,6 +13,9 @@
 #include "CrossLine.h"
 #include "../../H/memDc.h"
 
+#define AXLOG_MODULE_TAG "C_USERGRP"
+#include "../../ibks/h/axlog.h"
+
 #include <math.h>
 #include <float.h>
 
@@ -690,6 +693,7 @@ bool CGrpWnd::RealTimeBasic(CString sCode, DWORD* data)
 
 				dVal = atof(sVal) * m_pDataInfo->m_pInfo[ii]->power;
 				sVal.Format("%.f", dVal);
+				axlog(LOG_RTM, "[RealTimeBasic] code=%s time=%s price=%s", sCode.GetString(), sTime.GetString(), sVal.GetString());
 				iResult = m_pDataInfo->RealTimeData(ii, sTime, sVal, bInsert);
 				if (iResult == RTS_INSERT)
 					bInsert = false;
@@ -734,6 +738,7 @@ bool CGrpWnd::RealTimeItems(CString sCode, DWORD* data)
 			}
 
 			sVal.Format("%.f", atof(sVal) * m_pDataInfo->m_pInfo[0]->power);
+			axlog(LOG_RTM, "[RealTimeItems] code=%s key=%s price=%s", sCode.GetString(), skey.GetString(), sVal.GetString());
 			m_pDataInfo->RealTimeItemData(ii, sVal);
 		}
 	}

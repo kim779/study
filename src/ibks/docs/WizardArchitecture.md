@@ -2,7 +2,7 @@
 project: ibks
 category: architecture
 status: 완료
-updated: 2026-08-21
+updated: 2026-09-11
 ---
 
 # axwizard(Wizard) 소스 분석
@@ -27,6 +27,7 @@ updated: 2026-08-21
   - [7.7 작은 헬퍼/데이터 구조체 (Misc.h)](#77-작은-헬퍼데이터-구조체-misch)
 - [8. 다음 분석 대상 (미착수)](#8-다음-분석-대상-미착수)
 - [9. 관련 문서](#9-관련-문서)
+- [10. AXIS ↔ Wizard ↔ axSock 통신 프로토콜 (axisfire.h)](#10-axis--wizard--axsock-통신-프로토콜-axisfireh)
 
 ---
 

@@ -1,0 +1,182 @@
+
+Microsoft (R) Windows Debugger Version 6.3.9600.17298 X86
+Copyright (c) Microsoft Corporation. All rights reserved.
+
+
+Loading Dump File [D:\util\HTS\IBK_SMART\user\1353626433\Crashlog\h12589_91114h58m20s.dmp]
+WARNING: Minidump contains unknown stream type 0x15
+WARNING: Minidump contains unknown stream type 0x16
+User Mini Dump File: Only registers, stack and portions of memory are available
+
+
+************* Symbol Path validation summary **************
+Response                         Time (ms)     Location
+OK                                             D:\symbol
+OK                                             D:\symstore
+Symbol search path is: D:\symbol;D:\symstore
+Executable search path is: 
+Windows 8 Version 17763 MP (16 procs) Free x86 compatible
+Product: WinNt, suite: SingleUserTS
+Built by: 17763.1.x86fre.rs5_release.180914-1434
+Machine Name:
+Debug session time: Fri Sep 11 14:58:21.000 2026 (UTC + 9:00)
+System Uptime: not available
+Process Uptime: 0 days 0:01:34.000
+................................................................
+................................................................
+................................................................
+................................................................
+....
+Loading unloaded module list
+.......................................................
+This dump file has an exception of interest stored in it.
+The stored exception information can be accessed via .ecxr.
+(5748.4454): Access violation - code c0000005 (first/second chance not available)
+eax=00000000 ebx=22cc1630 ecx=00000000 edx=00000000 esi=000002cc edi=22cc1620
+eip=76fa2b8c esp=091cd2b4 ebp=091cd2c0 iopl=0         nv up ei pl nz na pe nc
+cs=0023  ss=002b  ds=002b  es=002b  fs=0053  gs=002b             efl=00000206
+ntdll!NtGetContextThread+0xc:
+76fa2b8c c20800          ret     8
+0:000> cdb: Reading initial command '!analyze -v; q'
+*******************************************************************************
+*                                                                             *
+*                        Exception Analysis                                   *
+*                                                                             *
+*******************************************************************************
+
+*** ERROR: Symbol file could not be found.  Defaulted to export symbols for axisvbs.dll - 
+*** ERROR: Symbol file could not be found.  Defaulted to export symbols for axWizard.ocx - 
+*** ERROR: Symbol file could not be found.  Defaulted to export symbols for axSock.ocx - 
+*** ERROR: Symbol file could not be found.  Defaulted to export symbols for axis.exe - 
+*** ERROR: Symbol file could not be found.  Defaulted to export symbols for ChartCommonAddIn.dll - 
+*** WARNING: Unable to verify checksum for IMaxComm.dll
+*** ERROR: Symbol file could not be found.  Defaulted to export symbols for IMaxComm.dll - 
+*** The OS name list needs to be updated! Unknown Windows version: 10.0 ***
+GetUrlPageData2 (WinHttp) failed: 12002.
+
+FAULTING_IP: 
+vbscript!NameTbl::InvokeEx+df5
+149b7b55 8b7074          mov     esi,dword ptr [eax+74h]
+
+EXCEPTION_RECORD:  ffffffff -- (.exr 0xffffffffffffffff)
+ExceptionAddress: 149b7b55 (vbscript!NameTbl::InvokeEx+0x00000df5)
+   ExceptionCode: c0000005 (Access violation)
+  ExceptionFlags: 00000000
+NumberParameters: 2
+   Parameter[0]: 00000000
+   Parameter[1]: 00000074
+Attempt to read from address 00000074
+
+CONTEXT:  00000000 -- (.cxr 0x0;r)
+eax=00000000 ebx=22cc1630 ecx=00000000 edx=00000000 esi=000002cc edi=22cc1620
+eip=76fa2b8c esp=091cd2b4 ebp=091cd2c0 iopl=0         nv up ei pl nz na pe nc
+cs=0023  ss=002b  ds=002b  es=002b  fs=0053  gs=002b             efl=00000206
+ntdll!NtGetContextThread+0xc:
+76fa2b8c c20800          ret     8
+
+DEFAULT_BUCKET_ID:  NULL_CLASS_PTR_READ
+
+PROCESS_NAME:  axis.exe
+
+ERROR_CODE: (NTSTATUS) 0xc0000005 - 0x%p
+
+EXCEPTION_CODE: (NTSTATUS) 0xc0000005 - 0x%p
+
+EXCEPTION_PARAMETER1:  00000000
+
+EXCEPTION_PARAMETER2:  00000074
+
+READ_ADDRESS:  00000074 
+
+FOLLOWUP_IP: 
+vbscript!NameTbl::InvokeEx+df5
+149b7b55 8b7074          mov     esi,dword ptr [eax+74h]
+
+APPLICATION_VERIFIER_FLAGS:  0
+
+APP:  axis.exe
+
+ANALYSIS_VERSION: 6.3.9600.17336 (debuggers(dbg).150226-1500) x86fre
+
+FAULTING_THREAD:  00004454
+
+PRIMARY_PROBLEM_CLASS:  NULL_CLASS_PTR_READ
+
+BUGCHECK_STR:  APPLICATION_FAULT_NULL_CLASS_PTR_READ
+
+LAST_CONTROL_TRANSFER:  from 149ed4f1 to 149b7b55
+
+STACK_TEXT:  
+091cf208 149ed4f1 0f707550 00000038 00000000 vbscript!NameTbl::InvokeEx+0xdf5
+091cf238 0fb6b7e0 0f707550 00000038 0f922ba4 vbscript!LocalsNameTbl::Invoke+0x61
+091cf2fc 0fb6bc0e 00000038 00000001 00000000 mfc140!COleDispatchDriver::InvokeHelperV+0x210
+091cf31c 50011d3b 15b14094 00000038 00000001 mfc140!COleDispatchDriver::InvokeHelper+0x1e
+WARNING: Stack unwind information not available. Following frames may be wrong.
+091cf380 0e900e24 1662eae0 00000000 1e9a2a38 axisvbs!CScriptEngine::DoProcedure+0x1ab
+091cf3c4 0e90489f 19f42890 1e9a2a38 faad5c35 axWizard+0x50e24
+091cf428 0e90cb48 13bc4a20 13bc4a38 00001b64 axWizard+0x5489f
+091cf46c 0e90b228 1e664818 1e664830 00001b64 axWizard!DllUnregisterServer+0x3748
+091cf4b8 0e90b897 1e664818 1e664830 00001b64 axWizard!DllUnregisterServer+0x1e28
+091cf518 0e9095e4 1e664818 00001bb8 00000010 axWizard!DllUnregisterServer+0x2497
+091cf52c 0fb5fb3e 00000006 1e664818 00001bb8 axWizard!DllUnregisterServer+0x1e4
+091cf53c 0fb6a186 fffffffe 84d4bbf1 0fb6a10e mfc140!_AfxDispatchCall+0x10
+091cf5f8 0fb54871 0e9296e0 00000001 091cf624 mfc140!CCmdTarget::CallMemberFunc+0x1a6
+091cf66c 0fb54ae4 ffffffff 091cf6e8 00000000 mfc140!CCmdTarget::OnEvent+0x201
+091cf680 0fb00bb5 09683ee8 ffffffff 091cf6e8 mfc140!COccManager::OnEvent+0x14
+091cf6b0 0fb58709 ffffffff fffffffe 091cf6e8 mfc140!CCmdTarget::OnCmdMsg+0x45
+091cf6d8 0fb5a10d 091cf6e8 0fb5a0c0 00000000 mfc140!COleControlSite::OnEvent+0x69
+091cf714 0fb6b7e0 0d0df170 00000001 0f922ba4 mfc140!COleControlSite::XEventSink::Invoke+0x4d
+091cf7d8 0fb0516c 00000001 00000001 00000000 mfc140!COleDispatchDriver::InvokeHelperV+0x210
+091cf834 0fb051d6 00000001 0e9b0048 091cf860 mfc140!COleControl::FireEventV+0x8c
+091cf84c 0e9a3e48 0d12ac08 00000001 0e9b0048 mfc140!COleControl::FireEvent+0x16
+091cf86c 0fb9cc9e 00001bb8 1e664818 84d4b7f1 axSock!DllUnregisterServer+0x978
+091cf950 0fb9c410 00000402 00001bb8 1e664818 mfc140!CWnd::OnWndMsg+0x85e
+091cf974 0fb03f25 00000402 00001bb8 1e664818 mfc140!CWnd::WindowProc+0x30
+091cf99c 0fb9a6af 00000402 00001bb8 1e664818 mfc140!COleControl::WindowProc+0x155
+091cfa14 0fb9a914 0d12ac08 000a1580 00000402 mfc140!AfxCallWndProc+0xaf
+091cfa34 0e9aab32 000a1580 00000402 00001bb8 mfc140!AfxWndProc+0x34
+091cfa70 74596f7b 000a1580 00000402 00001bb8 axSock!DllUnregisterServer+0x7662
+091cfa9c 74587a4c 0e9aaaff 000a1580 00000402 user32!_InternalCallWinProc+0x2b
+091cfb80 745875ea 0e9aaaff 00000000 00000402 user32!UserCallWinProcCheckWow+0x3ac
+091cfbe4 745943ef 09b856b0 00000000 00000402 user32!DispatchClientMessage+0xea
+091cfc20 76fa411d 091cfc3c 00000020 091cfd28 user32!__fnDWORD+0x3f
+091cfc58 759d2b8c 745792e5 096191c0 00000000 ntdll!KiUserCallbackDispatcher+0x4d
+091cfc5c 745792e5 096191c0 00000000 00000000 win32u!NtUserGetMessage+0xc
+091cfc9c 0fb87468 096191c0 00000000 00000000 user32!GetMessageA+0x55
+091cfcb8 0fb87c44 00ff0328 00f83136 ffffffff mfc140!AfxInternalPumpMessage+0x18
+091cfcd4 0fbb0974 00000000 00000001 09358000 mfc140!CWinThread::Run+0x64
+091cfcec 00f85798 00e00000 00000000 095f3f4d mfc140!AfxWinMain+0x94
+091cfd38 756105c9 09358000 756105b0 091cfda4 axis!Axis_State+0xfcae8
+091cfd48 76f97eed 09358000 a3c2f695 00000000 kernel32!BaseThreadInitThunk+0x19
+091cfda4 76f97ebd ffffffff 76fb6ffe 00000000 ntdll!__RtlUserThreadStart+0x2f
+091cfdb4 00000000 00f85861 09358000 00000000 ntdll!_RtlUserThreadStart+0x1b
+
+
+STACK_COMMAND:  ~0s; .ecxr ; kb
+
+SYMBOL_STACK_INDEX:  0
+
+SYMBOL_NAME:  vbscript!NameTbl::InvokeEx+df5
+
+FOLLOWUP_NAME:  MachineOwner
+
+MODULE_NAME: vbscript
+
+IMAGE_NAME:  vbscript.dll
+
+DEBUG_FLR_IMAGE_TIMESTAMP:  1bafa6d2
+
+FAILURE_BUCKET_ID:  NULL_CLASS_PTR_READ_c0000005_vbscript.dll!NameTbl::InvokeEx
+
+BUCKET_ID:  APPLICATION_FAULT_NULL_CLASS_PTR_READ_vbscript!NameTbl::InvokeEx+df5
+
+ANALYSIS_SOURCE:  UM
+
+FAILURE_ID_HASH_STRING:  um:null_class_ptr_read_c0000005_vbscript.dll!nametbl::invokeex
+
+FAILURE_ID_HASH:  {f7e2da2d-db01-a860-b294-d8924c505869}
+
+Followup: MachineOwner
+---------
+
+quit:

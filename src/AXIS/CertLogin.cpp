@@ -1956,6 +1956,30 @@ BOOL CCertLogin::PreTranslateMessage(MSG* pMsg)
 		}
 #endif
 	}
+	else if (pMsg->message == WM_SYSKEYDOWN)
+	{
+		if (pMsg->wParam == VK_F1) // alt + F1, 로그인 화면에서도 체이서 실행 (m_runAxis 체크 없이 직접 실행)
+		{
+			CMainFrame* pFrame = (CMainFrame*)m_frame;
+			char buffer[1024];
+			GetClassName(pFrame->GetSafeHwnd(), buffer, sizeof(buffer));
+
+			CString cmds, aps;
+			cmds.Format(" /c %s /r \"%s\"", buffer, pFrame->m_regkey);
+			aps.Format("%s\\%s\\AxisChaser.exe", Axis::home, RUNDIR);
+
+			STARTUPINFO si;
+			PROCESS_INFORMATION pi;
+			ZeroMemory(&si, sizeof(STARTUPINFO));
+			ZeroMemory(&pi, sizeof(PROCESS_INFORMATION));
+			si.cb          = sizeof(STARTUPINFO);
+			si.dwFlags     = STARTF_USESHOWWINDOW;
+			si.wShowWindow = SW_SHOW;
+
+			CreateProcess(aps, (char *)(const char*)cmds, NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi);
+			return TRUE;
+		}
+	}
 	else if (pMsg->message == WM_LBUTTONUP)
 	{
 		if (GetDlgItem(IDC_DUSER)->m_hWnd == pMsg->hwnd)

@@ -22,7 +22,6 @@
 
 //#include "../../IBK/H/axislog.h"
 
-#define AXLOG_MODULE_TAG "CERTIFY"
 #include "../h/axlog.h"
 
 #pragma	comment(lib, "CaLib/SKComdIF")
@@ -1351,7 +1350,7 @@ long CCertifyCtrl::CertifyName(long pBytes)
 
 	rc = strlen(m_contextNew.sd.szDN);
 	CopyMemory((char*)pBytes, m_contextNew.sd.szDN, rc);
-	axlog(LOG_CERTIFY, "CertifyName dnLen=%d", rc);
+	axlog(LOG_CERTIFY, "CertifyName dnLen=%d  pBytes=[%.*s]", rc, rc, (char*)pBytes);
 	return rc;
 }
 

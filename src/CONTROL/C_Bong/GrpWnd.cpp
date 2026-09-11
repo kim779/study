@@ -16,6 +16,10 @@
 #include "MainWnd.h"
 
 #include "../../h/axiscgrp.h"
+
+#define AXLOG_MODULE_TAG "C_BONG"
+#include "../../ibks/h/axlog.h"
+
 #include <math.h>
 #include <float.h>
 
@@ -491,6 +495,8 @@ bool CGrpWnd::Alert(CString sRTM)
 	{
 		m_ctim = sVal;
 	}
+
+	axlog(LOG_RTM, "[Alert] time=%s price=%s", m_ctim.GetString(), m_jgga.GetString());
 
 	if (m_dIndex == CDI_DAY)
 	{

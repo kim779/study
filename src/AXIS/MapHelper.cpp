@@ -3942,7 +3942,8 @@ BOOL CMapHelper::closeChild()
 			const CWnd* base = child->GetActiveView()->GetWindow(GW_CHILD);
 			base->SendMessage(WM_CLOSE2022,0,0);
 		}
-		child->SendMessage(WM_CLOSE, 0, 0);
+		//child->SendMessage(WM_CLOSE, 0, 0);  //test
+		child->PostMessage(WM_CLOSE, 0, 0);
 	}
 	return TRUE;
 }

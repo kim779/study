@@ -540,6 +540,7 @@ bool CBongBase::IsChangeMinMaxRTM(bool bShift, bool bIncrease)
 
 void CBongBase::DrawTickRight(CDC* pDC, double dMax, double dMin, bool bDrawMin)
 {
+	CString slog;
 	if (!(m_pgraph->dwDraOption & GO_TKRIGHT))
 	{
 		TRACE("DrawTickRight Function Error\n");
@@ -781,6 +782,22 @@ void CBongBase::DrawTickRight(CDC* pDC, double dMax, double dMin, bool bDrawMin)
 						rectText.OffsetRect(0, rectTickSave.top - rectText.bottom);
 				}
 				rectText.IntersectRect(&rectText, &rectOrgTick);
+				if (strDisp.GetLength() >= 9)
+					strDisp.Replace(",", "");
+				{
+					CSize sizeFinal = pDC->GetOutputTextExtent(strDisp);
+					int iAvailW = rectText.Width();
+					if (iAvailW < sizeFinal.cx)
+					{
+						int iNewLeft = rectText.right - sizeFinal.cx;
+						if (iNewLeft < rectOrgTick.left)
+							iNewLeft = rectOrgTick.left;
+						rectText.left = iNewLeft;
+					}
+					slog.Format("[DrawTickRight-ii0] ii=%d dVal=%.2f dMax=%.2f dMin=%.2f strDisp=[%s] needW=%d availW=%d\n",
+						ii, adDispValue[ii], dMax, dMin, strDisp, sizeFinal.cx, iAvailW);
+					OutputDebugString(slog);
+				}
 				pDC->DrawText(strDisp, &rectText, DT_RIGHT|DT_SINGLELINE|DT_VCENTER);
 			}
 			else
@@ -823,6 +840,22 @@ void CBongBase::DrawTickRight(CDC* pDC, double dMax, double dMin, bool bDrawMin)
 					rectText.OffsetRect(0, rectTickSave.top - rectText.bottom);
 			}
 			rectText.IntersectRect(&rectText, &rectOrgTick);
+			if (strDisp.GetLength() >= 9)
+				strDisp.Replace(",", "");
+			{
+				CSize sizeFinal = pDC->GetOutputTextExtent(strDisp);
+				int iAvailW = rectText.Width();
+				if (iAvailW < sizeFinal.cx)
+				{
+					int iNewLeft = rectText.right - sizeFinal.cx;
+					if (iNewLeft < rectOrgTick.left)
+						iNewLeft = rectOrgTick.left;
+					rectText.left = iNewLeft;
+				}
+				slog.Format("[DrawTickRight-iiN] ii=%d dVal=%.2f dMax=%.2f dMin=%.2f strDisp=[%s] needW=%d availW=%d\n",
+					ii, adDispValue[ii], dMax, dMin, strDisp, sizeFinal.cx, iAvailW);
+				OutputDebugString(slog);
+			}
 			pDC->DrawText(strDisp, &rectText, DT_RIGHT|DT_SINGLELINE|DT_VCENTER);
 		}
 		rectTickSave = rectText;
@@ -886,6 +919,7 @@ void CBongBase::DrawTickRight(CDC* pDC, double dMax, double dMin, bool bDrawMin)
 
 void CBongBase::DrawTickLeft(CDC* pDC, double dMax, double dMin, bool bDrawMin)
 {
+	CString slog;
 	if (!(m_pgraph->dwDraOption & GO_TKLEFT))
 	{
 		TRACE("DrawTickLeft Function Error\n");
@@ -1116,6 +1150,22 @@ void CBongBase::DrawTickLeft(CDC* pDC, double dMax, double dMin, bool bDrawMin)
 						rectText.OffsetRect(0, rectTickSave.top - rectText.bottom);
 				}
 				rectText.IntersectRect(&rectText, &rectOrgTick);
+				if (strDisp.GetLength() >= 9)
+					strDisp.Replace(",", "");
+				{
+					CSize sizeFinal = pDC->GetOutputTextExtent(strDisp);
+					int iAvailW = rectText.Width();
+					if (iAvailW < sizeFinal.cx)
+					{
+						int iNewRight = rectText.left + sizeFinal.cx;
+						if (iNewRight > rectOrgTick.right)
+							iNewRight = rectOrgTick.right;
+						rectText.right = iNewRight;
+					}
+					slog.Format("[DrawTickLeft-ii0] ii=%d dVal=%.2f dMax=%.2f dMin=%.2f strDisp=[%s] needW=%d availW=%d\n",
+						ii, adDispValue[ii], dMax, dMin, strDisp, sizeFinal.cx, iAvailW);
+					OutputDebugString(slog);
+				}
 				pDC->DrawText(strDisp, rectText, DT_RIGHT|DT_SINGLELINE|DT_VCENTER);
 			}
 			else
@@ -1129,6 +1179,8 @@ void CBongBase::DrawTickLeft(CDC* pDC, double dMax, double dMin, bool bDrawMin)
 					rectText.SetRect(rectTick.left, rectTick.bottom - size.cy,
 						m_rectOrgGrp.left - lenTICK, rectTick.bottom);
 				rectText.IntersectRect(&rectText, &rectOrgTick);
+				if (strDisp.GetLength() >= 9)
+					strDisp.Replace(",", "");
 				pDC->DrawText(strDisp, rectText, DT_RIGHT|DT_SINGLELINE|DT_VCENTER);
 			}
 		}
@@ -1156,6 +1208,22 @@ void CBongBase::DrawTickLeft(CDC* pDC, double dMax, double dMin, bool bDrawMin)
 					rectText.OffsetRect(0, rectTickSave.top - rectText.bottom);
 			}
 			rectText.IntersectRect(&rectText, &rectOrgTick);
+			if (strDisp.GetLength() >= 9)
+				strDisp.Replace(",", "");
+			{
+				CSize sizeFinal = pDC->GetOutputTextExtent(strDisp);
+				int iAvailW = rectText.Width();
+				if (iAvailW < sizeFinal.cx)
+				{
+					int iNewRight = rectText.left + sizeFinal.cx;
+					if (iNewRight > rectOrgTick.right)
+						iNewRight = rectOrgTick.right;
+					rectText.right = iNewRight;
+				}
+				slog.Format("[DrawTickLeft-iiN] ii=%d dVal=%.2f dMax=%.2f dMin=%.2f strDisp=[%s] needW=%d availW=%d\n",
+					ii, adDispValue[ii], dMax, dMin, strDisp, sizeFinal.cx, iAvailW);
+				OutputDebugString(slog);
+			}
 			pDC->DrawText(strDisp, rectText, DT_RIGHT|DT_SINGLELINE|DT_VCENTER);
 		}
 		rectTickSave = rectText;
@@ -1784,6 +1852,7 @@ bool CBongBase::CalculateDisplay(double &rdDiv, double dMax, double dMin, double
 
 void CBongBase::DrawTick(CDC* pDC)
 {
+	CString slog;
 	bool	bDrawMin = true;
 
 	switch (m_iGrpKind)
@@ -1816,6 +1885,9 @@ void CBongBase::DrawTick(CDC* pDC)
 	if (m_dYMax == DBL_MIN || m_dYMin == DBL_MAX)
 		return;
 
+	slog.Format ("[DrawTick] kind=%d validDigit=%d YMax=%.2f YMin=%.2f\n",
+		m_iGrpKind, m_iValidDigit, m_dYMax, m_dYMin);
+	OutputDebugString(slog);
 
 //	if (m_pgraph->dwDraOption & GO_TKBOTTOM)
 //		DrawTickVertical(pDC);
