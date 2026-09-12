@@ -1015,18 +1015,28 @@ BSTR CxScreen::_ServiceEx(LPCTSTR trN, LPCTSTR data, long length, long mode, lon
 	MSG	msg;
 	HWND	hWnd = m_screen->m_view->GetSafeHwnd();
 	ULONGLONG elapse = GetTickCount64();
+	CString mapN(m_screen->m_mapH->mapN, L_MAPN);	// m_screen이 나중에 파괴될 수 있으므로 로그용 정보는 미리 복사해둔다
+	int screenKey = m_screen->m_key;
 
 	axlog(LOG_DATA, "[ServiceEx-wait] maps=%s screenKey=%d trN=%s timeout=%d - entering blocking wait loop",
-		CString(m_screen->m_mapH->mapN, L_MAPN).GetString(), m_screen->m_key, CString(trN).GetString(), timeout);
+		mapN.GetString(), screenKey, CString(trN).GetString(), timeout);
 
 	while (m_service != svFlag::svDONE)
 	{
-		if (!::IsWindow(hWnd) || (timeout > 0 && GetTickCount64() - elapse > (ULONGLONG)timeout))
+		if (!::IsWindow(hWnd))
+		{
+			// 창(화면)이 이미 파괴된 상태 - m_screen은 더 이상 안전하게 참조할 수 없으므로
+			// WaitDone 등 m_screen을 건드리는 어떤 호출도 하지 않고 즉시 반환한다.
+			axlog(LOG_DATA, "[ServiceEx-wait] maps=%s screenKey=%d trN=%s exit=WINDOW-GONE elapsed=%dms - screen destroyed while waiting, skip touching it",
+				mapN.GetString(), screenKey, CString(trN).GetString(), (int)(GetTickCount64() - elapse));
+			return strResult.AllocSysString();
+		}
+		if (timeout > 0 && GetTickCount64() - elapse > (ULONGLONG)timeout)
 		{
 			m_service = svFlag::svTIMEOUT;
-			axlog(LOG_DATA, "[ServiceEx-wait] maps=%s screenKey=%d trN=%s exit=TIMEOUT/WINDOW-GONE elapsed=%dms isWindow=%d",
-				CString(m_screen->m_mapH->mapN, L_MAPN).GetString(), m_screen->m_key, CString(trN).GetString(),
-				(int)(GetTickCount64() - elapse), (int)::IsWindow(hWnd));
+			m_timeoutTick = GetTickCount64();
+			axlog(LOG_DATA, "[ServiceEx-wait] maps=%s screenKey=%d trN=%s exit=TIMEOUT elapsed=%dms",
+				mapN.GetString(), screenKey, CString(trN).GetString(), (int)(m_timeoutTick - elapse));
 // updateXXX_202202
 			m_screen->m_client->WaitDone(m_screen, false, true);
 			return strResult.AllocSysString();
@@ -1078,8 +1088,11 @@ bool CxScreen::OnService(char* pBytes, int nBytes)
 	switch (m_service)
 	{
 	case svFlag::svTIMEOUT:
+		axlog(LOG_DATA, "[ServiceEx-late] maps=%s screenKey=%d nBytes=%d lateBy=%dms - response arrived AFTER timeout already gave up",
+			CString(m_screen->m_mapH->mapN, L_MAPN).GetString(), m_screen->m_key, nBytes,
+			(int)(GetTickCount64() - m_timeoutTick));
 		m_service = svFlag::svREADY;
-// updateXXX_202202	
+// updateXXX_202202
 		m_screen->m_client->WaitDone(m_screen, false, true);
 		return true;
 	case svFlag::svWAIT:

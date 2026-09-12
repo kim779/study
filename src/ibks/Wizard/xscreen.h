@@ -30,6 +30,7 @@ protected:
 	char*		m_pBytes = nullptr;
 	int		m_nBytes = 0;
 	enum class svFlag {svREADY, svWAIT, svTIMEOUT, svDONE}	m_service;
+	ULONGLONG	m_timeoutTick = 0;	// ServiceEx가 svTIMEOUT으로 빠진 시각 (지연응답 로깅용)
 
 // Operations
 public:

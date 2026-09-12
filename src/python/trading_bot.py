@@ -740,9 +740,9 @@ class TestWindow(QMainWindow):
         is_dev = _is_my_dev_pc()
         #is_dev = True
         form = QFormLayout()
-        self.edit_user_id  = QLineEdit("ng12589" if is_dev else "")  #ng12589
-        self.edit_user_pw  = QLineEdit("wnsgur12@" if is_dev else ""); self.edit_user_pw.setEchoMode(QLineEdit.Password) #wnsgur12@
-        self.edit_cert_pw  = QLineEdit("ahffkdy123 " if is_dev else ""); self.edit_cert_pw.setEchoMode(QLineEdit.Password) #ahffkdy123 
+        self.edit_user_id  = QLineEdit("khs779" if is_dev else "")  #ng12589
+        self.edit_user_pw  = QLineEdit("1q2w3e4r" if is_dev else ""); self.edit_user_pw.setEchoMode(QLineEdit.Password) #wnsgur12@
+        self.edit_cert_pw  = QLineEdit("ra33080404!" if is_dev else ""); self.edit_cert_pw.setEchoMode(QLineEdit.Password) #ahffkdy123 
         self.combo_server  = QComboBox()
         self.combo_server.addItem("", "")
         for ip, name in SERVER_LIST:

@@ -883,12 +883,12 @@ void CControlWnd::parseAlert(struct _alertR* alert)
 
 			if (bChanged)
 			{
-				m_slog.Format("[SYM_IMG_DIAG][마지막][%s] bChanged loadBitmap  krgb=[%s] 지역변수 rned=[%s] dist=[%s] vist=[%s] vitime=[%s] vitype=[%s] ",
-					m_sCode, m_jinfo.krgb, rned, dist, vist, vitime, vitype);
+				m_slog.Format("[SYM_IMG_DIAG][마지막][%x][%s] bChanged loadBitmap  krgb=[%s] 지역변수 rned=[%s] dist=[%s] vist=[%s] vitime=[%s] vitype=[%s] ",
+					this, m_sCode, m_jinfo.krgb, rned, dist, vist, vitime, vitype);
 				OutputDebugString(m_slog);
 
-				m_slog.Format("[SYM_IMG_DIAG][마지막][%s] bChanged loadBitmap  krgb=[%s] m_jinfo rned=[%s] dist=[%s] vist=[%s] vitime=[%s] vitype=[%s]",
-					m_sCode, m_jinfo.krgb, m_jinfo.rned, m_jinfo.dist, m_jinfo.vist, m_jinfo.vitime, m_jinfo.vitype);
+				m_slog.Format("[SYM_IMG_DIAG][마지막][%x][%s] bChanged loadBitmap  krgb=[%s] m_jinfo rned=[%s] dist=[%s] vist=[%s] vitime=[%s] vitype=[%s]",
+					this,m_sCode, m_jinfo.krgb, m_jinfo.rned, m_jinfo.dist, m_jinfo.vist, m_jinfo.vitime, m_jinfo.vitype);
 				OutputDebugString(m_slog);
 
 				loadBitmap(m_jinfo.jrat, m_jinfo.nrat, m_jinfo.jgub, m_jinfo.krgb,rned,dist,vist,vitime,vitype);
