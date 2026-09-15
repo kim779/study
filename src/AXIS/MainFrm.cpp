@@ -103,6 +103,7 @@
 #include "enc.h"
 #include "FirstJob.h"
 #include "../H/interMSG.h"
+#include "../ibks/h/axlog.h"
 
 
 #include <lm.h>
@@ -328,6 +329,10 @@ void WriteUpLog(LPCSTR sfile, LPCSTR log, ...)
 	}
 	END_CATCH
 }
+
+// WriteLog/WriteUpLog/WriteLog_File는 전부 맨 앞에 return;이 있어 현재 아무것도 기록하지 않는다.
+// 드물게 발생하는 크래시/레이스 조건을 진단할 때는 h/axlog.h의 axDiagLog()를 사용한다 -
+// AXIS/docs/KnowledgeBase.md의 "진단로그 관리 규칙" 참고 (2026-09-15, ShowHistoryMap/IB0000X8 조사 계기로 axlog.h에 공용화됨)
 
 void WriteLog( LPCSTR log, ... )
 {
@@ -1304,6 +1309,17 @@ void CMainFrame::MakeExpectSymbolTable()
 	}
 }
 
+// axDiagLog 호출 인자(Axis::home + ... 의 CString 연결)가 임시 CString 객체를 만드는데,
+// __try가 있는 함수 안에 이런 소멸자 있는 C++ 객체가 있으면 C2712(개체 해제 기능이 사용되는
+// 함수에서는 __try를 사용할 수 없습니다)가 난다 - ShowHistoryMap의 __except 블록에서 직접
+// 호출하지 않고 이 별도 함수로 분리해서 우회한다 (2026-09-15).
+static void LogViewRaceCrash(CWnd* miniWid, CWnd* viewHist, WPARAM wParam, LPARAM lParam)
+{
+	axDiagLog(Axis::home + "\\user\\" + Axis::user + "\\Crashlog", "IB0000X8_ViewRace.log",
+		"[ShowHistoryMap-SEH] dangling pointer caught - m_miniWid=0x%p m_viewHist=0x%p wParam=0x%p lParam=0x%p tick=%lu",
+		miniWid, viewHist, (void*)wParam, (void*)lParam, GetTickCount());
+}
+
 void CMainFrame::ShowHistoryMap(WPARAM wParam, LPARAM lParam)
 {
 	//if (1)
@@ -1383,27 +1399,39 @@ void CMainFrame::ShowHistoryMap(WPARAM wParam, LPARAM lParam)
 
 			// ---------------------------------
 			// view / window 체크
+			// m_miniWid/m_viewHist는 미니창 close 경로에서 갱신을 놓치면
+			// 댕글링 포인터가 될 수 있어(OnMiniClose 참고) SEH로 한 번 더 감싼다.
 			// ---------------------------------
-			if (!m_miniWid || !m_miniWid->GetSafeHwnd())
+			__try
 			{
-				m_codeHist.Empty();
-				return;
+				if (!m_miniWid || !m_miniWid->GetSafeHwnd())
+				{
+					m_codeHist.Empty();
+					return;
+				}
+
+				if (!m_viewHist || !m_viewHist->GetSafeHwnd())
+					m_viewHist = m_miniWid->GetActiveView();
+
+				if (!m_viewHist || !m_viewHist->GetSafeHwnd())
+				{
+					m_codeHist.Empty();
+					return;
+				}
+
+				CWnd* base = m_viewHist->GetWindow(GW_CHILD);
+				if (base && base->GetSafeHwnd())
+				{
+					// 여기서 죽는 경우는 base 내부 로직 문제
+					base->SendMessage(WD_HISTORYVIEW, wParam, (LPARAM)&openRC);
+				}
 			}
-
-			if (!m_viewHist || !m_viewHist->GetSafeHwnd())
-				m_viewHist = m_miniWid->GetActiveView();
-
-			if (!m_viewHist || !m_viewHist->GetSafeHwnd())
+			__except (EXCEPTION_EXECUTE_HANDLER)
 			{
-				m_codeHist.Empty();
-				return;
-			}
-
-			CWnd* base = m_viewHist->GetWindow(GW_CHILD);
-			if (base && base->GetSafeHwnd())
-			{
-				// 여기서 죽는 경우는 base 내부 로직 문제
-				base->SendMessage(WD_HISTORYVIEW, wParam, (LPARAM)&openRC);
+				// 희귀 레이스 진단용 - 자세한 배경은 AXIS/docs/KnowledgeBase.md 사례 #4 참고 (2026-09-15)
+				LogViewRaceCrash(m_miniWid, m_viewHist, wParam, lParam);
+				m_miniWid = NULL;
+				m_viewHist = NULL;
 			}
 
 			m_codeHist.Empty();
@@ -28891,9 +28919,10 @@ void CMainFrame::CheckEncryptDirectory()
 LRESULT CMainFrame::OnMiniClose( WPARAM wParam, LPARAM lParam )
 {
 	m_miniWid = NULL;
+	m_viewHist = NULL;	// 미니창과 함께 파괴되는 자식 뷰 - 남겨두면 댕글링 포인터가 됨(ShowHistoryMap 크래시 원인)
 
 	//OutputDebugString("DESTORY MINI WND FROM MAIN\n");
-	
+
 	return 0;
 }
 

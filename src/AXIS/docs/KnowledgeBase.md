@@ -386,6 +386,55 @@ if (--m_hCodeRefCount == 0 && m_hCode)
 
 **재현 조건 참고**: 종합화면처럼 화면(서브맵 포함)을 여러 개 동시에 띄운 세션에서 HTS를 종료할 때 재현 가능성이 높은 것으로 추정됨(경쟁 조건이므로 사례 #2처럼 결정적이지는 않을 수 있음). 수정 후 재발 여부는 다음 종료 테스트로 확인 필요.
 
+### 사례 #4 — 2026-09-14, ShowHistoryMap의 m_viewHist 댕글링 포인터 (조치 완료, 재현/실측 대기)
+
+- **덤프 위치**: `D:\test\dump\h12589_91415h25m28s\h12589_91415h25m28s.dmp`
+- **예외**: Access violation (0xC0000005), `axis!CWnd::GetSafeHwnd+0x1b`에서 발생 — `eax`가 유효하지 않은 쓰레기 포인터.
+- **증상**: `Process Uptime` 41초 — HTS **시작 직후**(재접속/종료 시점이 아님)에 발생. 사용자가 "로그인 통과 후 MainFrame이 막 실행되면서 난다"고 관찰한 것과 정확히 일치.
+
+**콜스택 요약**:
+
+
+**원인 (디스어셈블리로 확정)**:
+덤프와 타임스탬프/체크섬이 정확히 일치하는 로컬 `axis.exe`(`D:\util\HTS\IBK_SMART\exe\axis.exe`)를 `cdb -i`로 붙여 `ShowHistoryMap` 전체를 역어셈블한 결과:
+1. `m_miniWid`(IB0000X8의 `CChildFrame`) 자체는 **유효**하다 — 그 자신의 `GetSafeHwnd()`는 성공.
+2. `m_miniWid->GetActiveView()`(MFC의 단순 필드 접근자, `m_pViewActive`를 검증 없이 그대로 리턴)가 **stale/미확정 값**을 반환. `GetActiveView()` 자체는 죽지 않고, 그 값을 재검증하는 바로 다음 줄에서 크래시로 드러난다.
+3. `MapHelper.cpp`가 IB0000X8을 생성한 직후(`ShowWindow(SW_HIDE)` 바로 다음) 이미 무검증으로 `child->GetActiveView()`를 읽는 기존 코드가 있다는 점, 그리고 41초라는 짧은 Uptime을 근거로 — "파괴된 뒤 참조"가 아니라 **MDI 활성화(`SetActiveView`, 보통 `WM_MDIACTIVATE`)가 아직 실행되기 전에 `m_pViewActive`를 읽는 초기화 순서 경쟁**으로 결론.
+
+**수정 (2026-09-15, `AXIS/MainFrm.cpp`, `AXIS/MapHelper.cpp`)**:
+1. `CMainFrame::OnMiniClose`에서 `m_miniWid`뿐 아니라 `m_viewHist`도 함께 `NULL` 처리.
+2. `ShowHistoryMap` 전체를 `__try`/`__except(EXCEPTION_EXECUTE_HANDLER)`로 감싸 방어. `except` 블록에서 `axDiagLog(...)`로 진단 기록 후 두 포인터를 `NULL`로 정리.
+3. `MapHelper.cpp`의 IB0000X8 생성 블록에서 `m_viewHist = child->GetActiveView()` 직후 `GetSafeHwnd()` 검증이 실패하면 같은 로그파일에 진단 기록 추가(가설 검증용).
+
+**잔여 리스크(미수정)**: `MapHelper.cpp`의 바로 다음 줄 `child->GetActiveView()->GetWindow(GW_CHILD)`는 여전히 `GetActiveView()` 반환값에 대한 NULL 체크가 없다 — 가설이 확정되면 이 지점도 별도로 가드할지 결정 필요.
+
+**교훈**: MFC의 `GetActiveView()`류 "캐시된 값을 검증 없이 반환하는" 접근자는, 그 값이 세팅되는 시점보다 먼저 읽히면 조용히 stale 값을 내어줄 뿐 스스로는 죽지 않는다 — 실제 크래시는 그 값을 나중에 재사용하는 지점에서 터지므로, 콜스택만 보면 원인이 아니라 결과 지점을 가리키기 쉽다. 미니덤프는 힙 전체를 못 읽어 `dt`로 멤버 값 확인이 안 되지만, 덤프와 타임스탬프/체크섬이 일치하는 실제 바이너리를 로컬에서 찾아 `cdb -i`로 붙이면 디스어셈블리로 상당 부분 우회 가능.
+
+**재현 조건 참고**: HTS 시작 후 이른 시점(관심종목 자동로드, `endWorkstation()` 경로)에 `ShowHistoryMap`이 호출될 때만 재현 가능성 있는 것으로 추정. 결정적 재현 조건은 아직 못 잡음 — 아래 "진단로그 관리 규칙"의 로그가 실제로 찍히면 가설이 확정됨.
+
+---
+
+## 진단로그 관리 규칙
+
+**배경**: `WriteLog`/`WriteUpLog`/`WriteLog_File`(`AXIS/MainFrm.cpp`)는 전부 함수 맨 앞에 `return;`이 있어 실제로는 전혀 기록되지 않는 죽은 코드였다(사례 #4 조사 중 발견). 반면 `axlog()`(`h/axlog.h`, `LOG_INIT`/`EVENT`/... 카테고리)는 `OutputDebugString` 기반이라 DebugView를 실시간으로 띄워두고 있어야만 볼 수 있는데, 이번처럼 발생빈도가 낮은 크래시는 "테스트해놓고 DebugView를 안 보고 있다가 놓치는" 일이 반복되기 쉽다.
+
+**해결책**: `h/axlog.h`에 `axDiagLog(dir, sfile, fmt, ...)` 매크로를 추가함(2026-09-15, 사례 #4 조사 계기). `axlog()`와 달리:
+- 어떤 `DF_LOG_*` 카테고리 토글과도 무관하게 **항상** 파일에 남는다.
+- `dir`을 빈 문자열(`""`)로 넘기면 **실행 파일과 같은 폴더**(`GetModuleFileName`)에, 프로젝트별 관례가 있으면(AXIS: `Axis::home+"\\user\\"+Axis::user+"\\Crashlog"`) 그 경로에 남긴다.
+- Wizard/axisvbs/axSock뿐 아니라 AXIS.exe에서도 쓸 수 있도록 공용화됨(`AXIS/MainFrm.h`에서 `AXLOG_MODULE_TAG "AXIS"` 정의 후 `../ibks/h/axlog.h` include).
+
+**앞으로 유사한 희귀/재현 어려운 조사를 할 때의 사용 규칙**:
+1. 그 조사 전용 로그 파일명을 하나 정한다(예: 이번 사례의 `IB0000X8_ViewRace.log`) — 여러 조사가 뒤섞이지 않도록.
+2. 로그 라인마다 `[어느 함수-태그] 무엇을 확인하려는지, 관련 포인터/값`을 `axDiagLog` 한 줄에 담는다.
+3. 이 `KnowledgeBase.md`에 그 로그파일의 목적/태그/관련 사례 번호를 반드시 기록해서, 나중에(재현빈도가 낮아 몇 주/몇 달 뒤가 될 수 있음) "이 로그파일이 왜 있었는지" 잊지 않도록 한다.
+4. 가설이 확정되거나 더 이상 필요 없어지면, 로그 호출 자체를 남겨둘지(빈도가 낮아 성능부담 없음) 제거할지 결정하고 이 문서에 상태를 갱신한다.
+
+**`IB0000X8_ViewRace.log` (사례 #4 전용)**:
+- 위치: `{Axis::home}\user\{Axis::user}\Crashlog\IB0000X8_ViewRace.log` (크래시 덤프가 쌓이는 것과 같은 폴더)
+- `[ShowHistoryMap-SEH]` 태그: `MainFrm.cpp`의 `ShowHistoryMap` `__except` 블록 — SEH가 실제로 AV를 잡아낸 순간마다 1줄. 이게 찍히면 방어코드가 실전에서 작동했다는 뜻이자, 근본 원인(초기화 순서 경쟁)이 여전히 발생 중이라는 뜻.
+- `[MapHelper-IB0000X8]` 태그: `MapHelper.cpp`의 IB0000X8 생성 블록 — `GetActiveView()` 직후 검증이 실패하는 순간마다 1줄. 이게 찍히면 "생성 시점에 이미 `m_viewHist`가 무효"라는 가설이 실측으로 확정됨.
+
+
 ## 기록 목록
 
 | 날짜 | 항목 | 상태 |
@@ -397,6 +446,7 @@ if (--m_hCodeRefCount == 0 && m_hCode)
 | 2026-07-14 | 사례 #1 사용자 WinDbg GUI 교차검증 — 동일 결과(khs779_71410h32m27s.windbg_log.txt) | 완료 |
 | 2026-08-27 | 크래시 사례 #2 분석+수정 (HTS 종료 시 cx_shared.dll 언로드 후 참조, BAD_INSTRUCTION_PTR) — MainFrm.cpp::OnClose에 DestroyWindow 순서 수정 + CMainWnd 미사용 워커스레드 비활성화 | 완료 (재현 테스트 대기) |
 | 2026-08-27 | 크래시 사례 #3 분석+수정 (HTS 종료 시 AxisCodx.dll 언로드 후 참조, BAD_INSTRUCTION_PTR) — CAxisForm의 인스턴스별 로드/해제를 static 참조카운트 공유로 변경 (ibks/dll/form/axform.h·cpp) | 완료 (axisform.dll+axWizard.ocx 재빌드/재배포 및 재현 테스트 대기) |
+| 2026-09-15 | 크래시 사례 #4 분석+수정 (ShowHistoryMap의 m_viewHist 댕글링 포인터, 초기화 순서 경쟁) — OnMiniClose 널처리 + SEH 방어 + axDiagLog(h/axlog.h 신설) 진단로그 2곳 추가 | 완료 (재현/실측 대기) |
 | - | MainFrame 멤버(m_mapHelper/m_axMisc/m_axGuide) 실제 생성/소멸 위치 검증 | 추후 검증 |
 | - | Grid Excel Export Thread 안전성 테스트 | 추후 검증 |
 | - | axis.exe/axis.pdb symstore GUID 버전관리 체계 구축 | 미착수 |

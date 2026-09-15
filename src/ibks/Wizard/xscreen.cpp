@@ -489,6 +489,11 @@ LPDISPATCH CxScreen::_Object(LPCTSTR forms)
 
 	if (m_screen->m_client->FindScreen(value, str, screen))
 	{
+		axlog(LOG_SCRIPT, "CxScreen::_Object forms=%s from=%s resolved=%s winK=%d resolvedWinK=%d",
+			CString(forms).GetString(), CString(m_screen->m_mapH->mapN, L_MAPN).GetString(),
+			CString(screen->m_mapH->mapN, L_MAPN).GetString(),
+			m_screen->m_client->m_key, screen->m_client->m_key);
+
 		value = str.ReverseFind('.');
 		if (value != -1)
 			str = str.Mid(value+1);
@@ -518,7 +523,19 @@ LPDISPATCH CxScreen::_Object(LPCTSTR forms)
 					return form->GetIDispatch(TRUE);
 				}
 			}
+			else
+			{
+				axlog(LOG_SCRIPT, "CxScreen::_Object NOT-FOUND forms=%s from=%s resolved=%s symbol=%s winK=%d resolvedWinK=%d",
+					CString(forms).GetString(), CString(m_screen->m_mapH->mapN, L_MAPN).GetString(),
+					CString(screen->m_mapH->mapN, L_MAPN).GetString(), str.GetString(),
+					m_screen->m_client->m_key, screen->m_client->m_key);
+			}
 		}
+	}
+	else
+	{
+		axlog(LOG_SCRIPT, "CxScreen::_Object FindScreen-FAIL forms=%s from=%s",
+			CString(forms).GetString(), CString(m_screen->m_mapH->mapN, L_MAPN).GetString());
 	}
 
 	return NULL;

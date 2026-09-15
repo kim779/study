@@ -1576,6 +1576,14 @@ OutputDebugString(s);
 		//child->SendMessage(WD_ADD_CODE,(WPARAM)0,(LPARAM)(LPCSTR)"TR");
 		m_main->m_miniWid = child;
 		m_main->m_viewHist = child->GetActiveView();
+		if (!m_main->m_viewHist || !m_main->m_viewHist->GetSafeHwnd())
+		{
+			// IB0000X8 생성 직후 GetActiveView()가 아직 안정화되지 않았는지 확인하는 진단 로그
+			// (2026-09-15 ShowHistoryMap/m_viewHist 댕글링 크래시 조사, AXIS/docs/KnowledgeBase.md 사례 #4 참고)
+			axDiagLog(Axis::home + "\\user\\" + Axis::user + "\\Crashlog", "IB0000X8_ViewRace.log",
+				"[MapHelper-IB0000X8] GetActiveView invalid at creation - child=0x%p viewHist=0x%p tick=%lu",
+				(void*)child, (void*)m_main->m_viewHist, GetTickCount());
+		}
 		const CWnd* base = child->GetActiveView()->GetWindow(GW_CHILD);
 		base->SendMessage(WD_SETWND,(WPARAM)m_main->m_bMiniMode,(LPARAM)(LONG)m_main);
 		//m_main->m_miniWid = (CWnd*)child;

@@ -3078,18 +3078,26 @@ bool CClient::FindScreen(int parent, CString& name, CScreen*& screen, bool only)
 	case dpMAIN:
 		if (!GetAtScreen(screen))
 			return false;
+		axlog(LOG_SCRIPT, "CClient::FindScreen dpMAIN step0(key0) mapN=%.8s key=%d parent=%d",
+			screen->m_mapH->mapN, screen->m_key, screen->m_parent);
 		[[fallthrough]];
 	case dpGREAT:
 		if (!GetAtScreen(screen, screen->m_parent))
 			return false;
+		axlog(LOG_SCRIPT, "CClient::FindScreen dpGREAT step mapN=%.8s key=%d parent=%d",
+			screen->m_mapH->mapN, screen->m_key, screen->m_parent);
 		[[fallthrough]];
 	case dpGRAND:
 		if (!GetAtScreen(screen, screen->m_parent))
 			return false;
+		axlog(LOG_SCRIPT, "CClient::FindScreen dpGRAND step mapN=%.8s key=%d parent=%d",
+			screen->m_mapH->mapN, screen->m_key, screen->m_parent);
 		[[fallthrough]];
 	case dpPARENT:
 		if (!GetAtScreen(screen, screen->m_parent))
 			return false;
+		axlog(LOG_SCRIPT, "CClient::FindScreen dpPARENT step mapN=%.8s key=%d parent=%d",
+			screen->m_mapH->mapN, screen->m_key, screen->m_parent);
 		break;
 	case dpCURRENT:
 	default:

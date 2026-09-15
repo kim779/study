@@ -544,18 +544,22 @@ void CMBongWnd::calcuMinMax()
 		if (pData->m_jega < tmpMin)
 			tmpMin = pData->m_jega;
 
-		// 2026.09.08 KSJ 정상 데이터면 고가/저가가 항상 최대/최소지만,
-		// 종가(또는 시가)가 서버 데이터 이상으로 고가를 넘어서는 경우에도
-		// getYPos()가 범위 밖으로 튀지 않도록 시가/종가도 같이 스캔해 축 범위에 반영
+		//// 2026.09.08 KSJ 정상 데이터면 고가/저가가 항상 최대/최소지만,
+		//// 종가(또는 시가)가 서버 데이터 이상으로 고가를 넘어서는 경우에도
+		//// getYPos()가 범위 밖으로 튀지 않도록 시가/종가도 같이 스캔해 축 범위에 반영
 		if (pData->m_siga != UNUSED_VALUE)
 		{
-			if (pData->m_siga > tmpMax) tmpMax = pData->m_siga;
-			if (pData->m_siga < tmpMin) tmpMin = pData->m_siga;
+			if (pData->m_siga > tmpMax) 
+				tmpMax = pData->m_siga;
+			if (pData->m_siga < tmpMin) 
+				tmpMin = pData->m_siga;
 		}
 		if (pData->m_jgga != UNUSED_VALUE)
 		{
-			if (pData->m_jgga > tmpMax) tmpMax = pData->m_jgga;
-			if (pData->m_jgga < tmpMin) tmpMin = pData->m_jgga;
+			if (pData->m_jgga > tmpMax) 
+				tmpMax = pData->m_jgga;
+			if (pData->m_jgga < tmpMin) 
+				tmpMin = pData->m_jgga;
 		}
 
 		if (pData->m_gvol > tmpVMax)
@@ -702,6 +706,7 @@ void CMBongWnd::drawGraph(CDC* pDC)
 
 void CMBongWnd::drawBong(CDC* pDC)
 {
+	CString slog;
 //	COLORREF	sColor, eColor;
 	CPen	*upPen = m_pApp->GetPen(m_pWizard, m_clrUp);
 	CPen	*dnPen = m_pApp->GetPen(m_pWizard, m_clrDown);
@@ -722,8 +727,10 @@ void CMBongWnd::drawBong(CDC* pDC)
 		if (pData == NULL)
 			continue;
 
-		if (pData->m_koga == UNUSED_VALUE || pData->m_jega == UNUSED_VALUE || pData->m_jgga == UNUSED_VALUE)
-			continue;	// 2026.09.08 KSJ calcuMinMax()의 제외기준(m_koga)과 일치시킴 - 안 그러면 범위 밖 UNUSED_VALUE가 getYPos에 그대로 들어감
+		//if (pData->m_koga == UNUSED_VALUE || pData->m_jega == UNUSED_VALUE || pData->m_jgga == UNUSED_VALUE)
+		//	continue;	// 2026.09.08 KSJ calcuMinMax()의 제외기준(m_koga)과 일치시킴 - 안 그러면 범위 밖 UNUSED_VALUE가 getYPos에 그대로 들어감
+		if (pData->m_jgga == UNUSED_VALUE)
+			continue;
 
 		nPos[0] = getXPosR(ii+1) + 1;
 		nPos[1] = getXPosR(ii) - 1;		
@@ -743,6 +750,10 @@ void CMBongWnd::drawBong(CDC* pDC)
 		{
 			pDC->SelectObject(dnPen);
 			pDC->SelectObject(dnBrush);
+		/*	if(ii != 0)
+				pt[4] = CPoint(pt[0].x, getYPos(pData->m_jgga, m_fBMax, m_fBMin, m_rcBong));
+			else
+				pt[4] = CPoint(pt[0].x, getYPos(pData->m_siga + 1, m_fBMax, m_fBMin, m_rcBong));*/
 			pt[4] = CPoint(pt[0].x, getYPos(pData->m_jgga, m_fBMax, m_fBMin, m_rcBong));
 			pt[1] = CPoint(pt[0].x, getYPos(pData->m_siga, m_fBMax, m_fBMin, m_rcBong));
 			//sColor = m_clrDown2;	eColor = m_clrDown;
@@ -791,6 +802,10 @@ void CMBongWnd::drawBong(CDC* pDC)
 		pDC->Polyline(pt, 11);
 */
 		pDC->Polygon(pt, 11);
+
+		slog.Format("[%s] m_rcBong=[%d] ii=[%d]  pt[0]=[%d,%d] pt[1]=[%d,%d] pt[2]=[%d,%d] pt[3]=[%d,%d] pt[4]=[%d,%d] pt[5]=[%d,%d] pt[6]=[%d,%d] pt[7]=[%d,%d] pt[8]=[%d,%d] pt[9]=[%d,%d]  pt[10]=[%d,%d]",
+			__FUNCTION__, m_rcBong.bottom,ii, pt[0].x, pt[0].y, pt[1].x, pt[1].y, pt[2].x, pt[2].y, pt[3].x, pt[3].y, pt[4].x, pt[4].y, pt[5].x, pt[5].y, pt[6].x, pt[6].y, pt[7].x, pt[7].y, pt[8].x, pt[8].y, pt[9].x, pt[9].y, pt[10].x, pt[10].y);
+		OutputDebugString(slog);
 	}
 
 	pDC->SelectObject(sPen);
@@ -911,11 +926,11 @@ int CMBongWnd::getYPos(double val, double maxValue, double minValue, CRect rect)
 	// 2026.09.08 KSJ 범위 밖 값(예: UNUSED_VALUE)이 들어와도 컨트롤 높이를 벗어나지 않도록 clamp
 	// calcuMinMax()가 시가/고가/저가/종가/MA를 전부 스캔해서 평소엔 발동 안 하지만,
 	// drawBong()의 스킵조건이 m_siga는 안 봐서 그쪽이 UNUSED_VALUE가 되는 경우 등 최후 방어선으로 유지
-	if (yPos < 0)
-		yPos = 0;
-	else if (yPos > fHeight)
-		yPos = fHeight;
-
+	//if (yPos < 0)
+	//	yPos = 0;
+	//else if (yPos > fHeight)
+	//	yPos = fHeight;
+	
 	return (int)((double)rect.top + yPos);
 }
 

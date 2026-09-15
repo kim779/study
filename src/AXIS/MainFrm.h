@@ -15,6 +15,8 @@
 //#include "inca/NpnxMgr.h" //** pc firewall wrapper class definition header (INCA software)
 #include "../h/jmcode.h"
 #include "../h/axisfire.h"
+#define AXLOG_MODULE_TAG "AXIS"
+#include "../ibks/h/axlog.h"	// axDiagLog() - 희귀 크래시/레이스 진단용 파일로그, KnowledgeBase.md "진단로그 관리 규칙" 참고
 #include "childFrm.h"
 #include "SChild.h"
 #include "inca/npenkAppInstall5WIN.h"

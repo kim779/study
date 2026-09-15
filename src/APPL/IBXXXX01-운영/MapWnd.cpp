@@ -383,6 +383,10 @@ LRESULT CMapWnd::OnReceiveRemainData(WPARAM wParam, LPARAM lParam)
 		pAccn->m_bCredit = bCredit;
 
 		m_AccnMap.SetAt(sAccn, pAccn);
+
+		CString slog;
+		slog.Format("[IBXXXX01][%s]<%d> [key][m_AccnMap]  sAccn=[%s] pAccn =[%x] ", __FUNCTION__, __LINE__, sAccn, pAccn);
+		Output_DebugString(slog);
 	}
 
 	if (!pAccn->m_pswd.IsEmpty())
@@ -591,7 +595,7 @@ void CMapWnd::sendRemainTR(CString sAccn, CString sPswd, bool bFuture, bool bCre
 			const int kNum = GetNewAccHandleKey();
 			AccHandleKey.Format("%d",kNum);
 
-			m_slog.Format("[NXT][BALANCE][%s]<%d> m_AccnKey EXIST  m_AccnMap NO  sHandle[%s] AccHandleKey[%s] acc=[%s] market=[%d]",
+			m_slog.Format("[IBXXXX01][%s]<%d> [key][m_AccnMap]   sHandle[%s] AccHandleKey[%s] acc=[%s] market=[%d]",
 				__FUNCTION__, __LINE__, sHandle, AccHandleKey, sAccn, pAccn->m_iMarket);
 			Output_DebugString(m_slog);
 
@@ -644,6 +648,14 @@ void CMapWnd::sendRemainTR(CString sAccn, CString sPswd, bool bFuture, bool bCre
 		AccHandleKey.Format("%d",kNum);
 		m_AccnMap.SetAt(AccHandleKey, pAccn);
 		m_AccnKey.SetAt(sHandle, AccHandleKey);
+
+		CString slog;
+		slog.Format("[IBXXXX01][%s]<%d> cx_notify로부터잔고조회 요청  [key][m_AccnMap]  AccHandleKey=[%s] pAccn =[%x] ", __FUNCTION__, __LINE__, AccHandleKey, pAccn);
+		Output_DebugString(slog);
+
+		slog.Format("[IBXXXX01][%s]<%d> cx_notify로부터잔고조회 요청 [key][m_AccnKey]  sHandle=[%s] AccHandleKey =[%s] ", __FUNCTION__, __LINE__, sHandle, AccHandleKey);
+		Output_DebugString(slog);
+
 		skey = kNum;
 
 		if (sdata == "1")  //NXT bal
@@ -952,6 +964,10 @@ void CMapWnd::attachCB(HWND hWnd, CString accn)
 	text = tmps;//DOUBLED HWND BLOCK
 
 	m_multicb.SetAt(accn, text);
+
+	CString slog;
+	slog.Format("[IBXXXX01][%s]<%d> [key][m_multicb] accn=[%s]  text(handle) =[%x] ", __FUNCTION__, __LINE__, accn, hWnd);
+	Output_DebugString(slog);
 
 	m_sync.Unlock();
 }
@@ -1336,7 +1352,9 @@ HWND CMapWnd::GetRightHwnd(CString key)
 		}
 	}
 	m_sync.Unlock();
-
+	CString slog;
+	slog.Format("[IBXXXX01][%s]<%d> [key][m_multicb] key=[%s]  text(handle) =[%x] ", __FUNCTION__, __LINE__, key, hWnd);
+	Output_DebugString(slog);
 	return hWnd;
 }
 
@@ -1689,11 +1707,32 @@ CString CMapWnd::parsingNotice(CString str)
 					}
 					
 					pRemain->m_curr = currS;
-					
+
 					mapNotice.Lookup(RT_CRATE, rateS);
 					pRemain->m_srate = rateS;
 					pRemain->CalPgsonik("", "", TRUE);
 					m_ShMemory->SendTrigger(sAcc + "\tI\t" + pRemain->TotalData(), GetRightHwnd(keyS));
+
+					// 이 화면(pAccn)이 조회한 시장과 신규잔고의 시장이 다르면, 서버에 그 시장코드로
+					// 실시간 등록이 안 되어 있어 등락률이 계속 비어있게 된다. 같은 시장/계좌로
+					// 재조회하여 실시간 등록을 다시 받는다. (결과 통보는 기존 attachCB/detachCB
+					// -> WM_REMAIN -> CX_Notify::OnRemainMessage 경로를 그대로 탄다)
+					int iNoticeMkt = MK_KRX;
+					if (smkgb == "2")		iNoticeMkt = MK_NXT;
+					else if (smkgb == "3")	iNoticeMkt = MK_TOT;
+
+					if (pAccn->m_iMarket != 0 && pAccn->m_iMarket != iNoticeMkt)
+					{
+						HWND hwndReQuery = GetRightHwnd(keyS);
+						if (hwndReQuery)
+						{
+							CString sMarketReQuery;
+							sMarketReQuery.Format("%d", pAccn->m_iMarket);
+							sendRemainTR(pAccn->m_accn, pAccn->m_pswd, pAccn->m_bFuture, pAccn->m_bCredit,
+								pAccn->m_dFee, pAccn->m_dMass, pAccn->m_dSave, pAccn->m_dCalcType, pAccn->m_iMcgb,
+								hwndReQuery, sMarketReQuery);
+						}
+					}
 				}
 				
 				if (bNewCode && type == 0 && pRemain)
