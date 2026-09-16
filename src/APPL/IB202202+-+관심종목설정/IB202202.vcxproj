@@ -169,13 +169,17 @@
     <Link>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <LinkDLL>true</LinkDLL>
-      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
-      <OutputFile>D:\util\HTS\IBK투자증권 HTS\dev\IB202202.dll</OutputFile>
+      <OutputFile>D:\util\HTS\IBK_SMART\dev\IB202202.dll</OutputFile>
       <ImportLibrary>.\Release\IB202202.lib</ImportLibrary>
       <AdditionalDependencies>../../control/fx_grid/release/fx_grid.lib;../../control/fx_misc/release/fx_misc.lib;winmm.lib;Imm32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>.\IB202201.def</ModuleDefinitionFile>
+      <ProgramDatabaseFile>D:\symbol\$(ProjectName).pdb</ProgramDatabaseFile>
     </Link>
+    <PostBuildEvent>
+      <Command>"C:\Program Files (x86)\Windows Kits\8.1\Debuggers\x86\symstore.exe" add /f "D:\symbol\$(ProjectName).pdb" /s "D:\symstore" /t "IBKS"</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="BmpButton.cpp" />

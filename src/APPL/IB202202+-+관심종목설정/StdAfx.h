@@ -38,3 +38,8 @@
 #define ROW_BOOKMARK '9'
 #define DF_NEWTREE
 //#define DF_USEBOOKFILE   //기존 북마크 사용하는 모드
+
+static void output_debugstring(CString str)
+{
+	OutputDebugString(str);
+}

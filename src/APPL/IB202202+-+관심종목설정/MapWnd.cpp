@@ -1774,6 +1774,33 @@ CString CMapWnd::Variant(int comm, CString data)
 	return retvalue;
 }
 
+//char	cont[1];	// 연속구분 'F':First, 'M':Middle, 'L':First&Last, 'C':Cancel, 
+					// 'S':그룹편집, 'E':그룹조합처리, 'b':DB백업, 'R':DB원복, 'V':최종상태저장, 'r':최종상태복원
+					// 'D':그룹삭제, 'j':해당그룹종목전송, 'g':그룹리스트조회, 'G':그룹종목전송, 'C':전송취소
+					//'n' 그룹리스트조회  'N' 그룹리스트 업로드
+
+CString getTRCsrt(char ch)
+{
+	CString sval{};
+	switch (ch)
+	{
+	case 'S' : 	sval = "S:그룹편집"; 			break;
+	case 'E': 	sval = "E:그룹조합처리"; 		break;
+	case 'b':	sval = "b:DB백업";		break;
+	case 'R':	sval = "R:DB원복";		break;
+	case 'V':	sval = "V:최종상태저장";		break;
+	case 'D':	sval = "D:그룹삭제";		break;
+	case 'j':		sval = "j:해당그룹종목전송";		break;
+	case 'g':	sval = "g:그룹리스트조회";		break;
+	case 'G':	sval = "G:그룹종목전송";		break;																											
+	case 'C':	sval = "C:전송취소";		break;
+	case 'n':	sval = "n:그룹리스트조회";		break;
+	case 'J':		sval = "J:해당그룹코드조회";		break;
+	case 'N':	sval = "N:그룹내종목 업로드";		break;
+	}
+	return sval;
+}
+
 void CMapWnd::sendTR(CString trCode, char* datB, int datL, int key)
 {
 	auto sendB = std::make_unique<char[]>(L_userTH + datL + 1);
@@ -1791,7 +1818,11 @@ void CMapWnd::sendTR(CString trCode, char* datB, int datL, int key)
 #ifdef SAVELOGFILE
 	CString strTemp;
 	
-	strTemp.Format("%s", datB);
+	CString strCont;
+	strCont.Format("<%s>", (LPCTSTR)getTRCsrt(datB[3]));
+	strTemp.Format("[IB202202][%s][len:%-5d] %-24s %.100s",__FUNCTION__, datL, (LPCTSTR)strCont, datB);
+	output_debugstring(strTemp);
+	
 	//testSaveFile3("[202202]sendTR", strTemp);
 #endif
 }
