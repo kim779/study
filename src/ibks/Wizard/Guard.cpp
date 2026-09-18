@@ -2974,7 +2974,9 @@ BOOL CGuard::Write(char* pBytes, int nBytes, int key)
 		}
 		axisH->auxs |= auxsCA;
 	}
-
+	CString slog;
+	slog.Format("[FDS] %d %d", !(m_term & flagENX), userth->stat & US_ENC);
+	OutputDebugString(slog);
 	if (!IsNoEncMode() && !(m_term & flagENX) && userth->stat & US_ENC)
 	{
 		if (GetFdsValue(CString(axisH->trxC, L_TRXC), &sendB[L_axisH], nBytes))

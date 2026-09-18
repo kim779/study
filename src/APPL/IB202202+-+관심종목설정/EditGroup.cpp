@@ -104,39 +104,49 @@ void CEditGroup::OnOK()
 
 
 
-void CEditGroup::OnUpBtn() 
+void CEditGroup::OnUpBtn()
 {
 	int	nItem{}, data{};
 	CString	text;
-	CString	gname, gno;
 	POSITION pos = m_list.GetFirstSelectedItemPosition();
 	if (pos != nullptr)
 	{
 		nItem = m_list.GetNextSelectedItem(pos);
 
-		//매니징 배열 수정
-		CString temp1, temp2, temp3;
-
 		if (nItem != 0)
 		{
-			temp1 = ((CPage1*)m_pParent)->m_manageGroup[nItem-1][0];
-			temp2 = ((CPage1*)m_pParent)->m_manageGroup[nItem-1][1];
-			temp3 = ((CPage1*)m_pParent)->m_manageGroup[nItem-1][3];
-			
-			((CPage1*)m_pParent)->m_manageGroup[nItem-1][0] = ((CPage1*)m_pParent)->m_manageGroup[nItem][0];
-			((CPage1*)m_pParent)->m_manageGroup[nItem-1][1] = ((CPage1*)m_pParent)->m_manageGroup[nItem][1];
-			((CPage1*)m_pParent)->m_manageGroup[nItem-1][3] = ((CPage1*)m_pParent)->m_manageGroup[nItem][3];
+			CPage1* page = (CPage1*)m_pParent;
+			const int groupNoCur = (int)m_list.GetItemData(nItem);
+			const int groupNoAbove = (int)m_list.GetItemData(nItem - 1);
 
-			((CPage1*)m_pParent)->m_manageGroup[nItem][0] = temp1;
-			((CPage1*)m_pParent)->m_manageGroup[nItem][1] = temp2;
-			((CPage1*)m_pParent)->m_manageGroup[nItem][3] = temp3;
+			int rowCur = -1, rowAbove = -1;
+			for (int row = 0; row < page->getManageCount(); row++)
+			{
+				if (atoi(page->m_manageGroup[row][0]) == groupNoCur)   rowCur = row;
+				if (atoi(page->m_manageGroup[row][0]) == groupNoAbove) rowAbove = row;
+			}
 
-	
+			if (rowCur >= 0 && rowAbove >= 0)
+			{
+				//매니지 배열 교환
+				CString temp1 = page->m_manageGroup[rowAbove][0];
+				CString temp2 = page->m_manageGroup[rowAbove][1];
+				CString temp3 = page->m_manageGroup[rowAbove][3];
+
+				page->m_manageGroup[rowAbove][0] = page->m_manageGroup[rowCur][0];
+				page->m_manageGroup[rowAbove][1] = page->m_manageGroup[rowCur][1];
+				page->m_manageGroup[rowAbove][3] = page->m_manageGroup[rowCur][3];
+
+				page->m_manageGroup[rowCur][0] = temp1;
+				page->m_manageGroup[rowCur][1] = temp2;
+				page->m_manageGroup[rowCur][3] = temp3;
+			}
+
 			text = m_list.GetItemText(nItem, 0);
 			data = m_list.GetItemData(nItem);
 			m_list.DeleteItem(nItem);
 
-			nItem = addItem(text, nItem -1);
+			nItem = addItem(text, nItem - 1);
 			m_list.SetItemData(nItem, data);
 
 			KillSelected(&m_list);
@@ -147,11 +157,11 @@ void CEditGroup::OnUpBtn()
 	}
 }
 
-void CEditGroup::OnDownBtn() 
+
+void CEditGroup::OnDownBtn()
 {
 	int	nItem{}, data{};
 	CString	text;
-	CString	gname, gno;
 	POSITION pos = m_list.GetFirstSelectedItemPosition();
 	if (pos != nullptr)
 	{
@@ -159,19 +169,32 @@ void CEditGroup::OnDownBtn()
 
 		if (nItem != m_list.GetItemCount() - 1)
 		{
-			//매니징 배열 수정
-			CString temp1, temp2, temp3;
-			temp1 = ((CPage1*)m_pParent)->m_manageGroup[nItem][0];
-			temp2 = ((CPage1*)m_pParent)->m_manageGroup[nItem][1];
-			temp3 = ((CPage1*)m_pParent)->m_manageGroup[nItem][3];
+			CPage1* page = (CPage1*)m_pParent;
+			const int groupNoCur = (int)m_list.GetItemData(nItem);
+			const int groupNoBelow = (int)m_list.GetItemData(nItem + 1);
 
-			((CPage1*)m_pParent)->m_manageGroup[nItem][0] = ((CPage1*)m_pParent)->m_manageGroup[nItem+1][0];
-			((CPage1*)m_pParent)->m_manageGroup[nItem][1] = ((CPage1*)m_pParent)->m_manageGroup[nItem+1][1];
-			((CPage1*)m_pParent)->m_manageGroup[nItem][3] = ((CPage1*)m_pParent)->m_manageGroup[nItem+1][3];
-			
-			((CPage1*)m_pParent)->m_manageGroup[nItem+1][0] = temp1;
-			((CPage1*)m_pParent)->m_manageGroup[nItem+1][1] = temp2;
-			((CPage1*)m_pParent)->m_manageGroup[nItem+1][3] = temp3;
+			int rowCur = -1, rowBelow = -1;
+			for (int row = 0; row < page->getManageCount(); row++)
+			{
+				if (atoi(page->m_manageGroup[row][0]) == groupNoCur)   rowCur = row;
+				if (atoi(page->m_manageGroup[row][0]) == groupNoBelow) rowBelow = row;
+			}
+
+			if (rowCur >= 0 && rowBelow >= 0)
+			{
+				//매니지 배열 교환
+				CString temp1 = page->m_manageGroup[rowBelow][0];
+				CString temp2 = page->m_manageGroup[rowBelow][1];
+				CString temp3 = page->m_manageGroup[rowBelow][3];
+
+				page->m_manageGroup[rowBelow][0] = page->m_manageGroup[rowCur][0];
+				page->m_manageGroup[rowBelow][1] = page->m_manageGroup[rowCur][1];
+				page->m_manageGroup[rowBelow][3] = page->m_manageGroup[rowCur][3];
+
+				page->m_manageGroup[rowCur][0] = temp1;
+				page->m_manageGroup[rowCur][1] = temp2;
+				page->m_manageGroup[rowCur][3] = temp3;
+			}
 
 			text = m_list.GetItemText(nItem, 0);
 			data = m_list.GetItemData(nItem);
@@ -179,15 +202,15 @@ void CEditGroup::OnDownBtn()
 
 			nItem = addItem(text, nItem + 1);
 			m_list.SetItemData(nItem, data);
-			
+
 			KillSelected(&m_list);
 			SetSelected(&m_list, nItem, FALSE);
 
 			m_selindex = nItem;
-
 		}
-	}		
+	}
 }
+
 
 void CEditGroup::OnDelBtn() 
 {
@@ -211,10 +234,16 @@ void CEditGroup::OnDelBtn()
 			{
 				if (select_count <= m_list.GetItemCount())
 				{
-					int idata = nItemIndex[i];
-					idata = m_list.GetItemData(nItemIndex[i]);
-					int aryIndex = m_list.GetItemData(nItemIndex[i]) - 1;
-					((CPage1*)m_pParent)->m_manageGroup[aryIndex][1] = "D";
+					CPage1* page = (CPage1*)m_pParent;
+					const int groupNo = (int)m_list.GetItemData(nItemIndex[i]);
+					for (int row = 0; row < page->getManageCount(); row++)
+					{
+						if (atoi(page->m_manageGroup[row][0]) == groupNo)
+						{
+							page->m_manageGroup[row][1] = "D";
+							break;
+						}
+					}
 					m_list.DeleteItem(nItemIndex[i]);
 					select_count--;	//2015.03.23 KSJ 전체지우면 안지워지는 현상 수정
 				}
@@ -294,26 +323,60 @@ void CEditGroup::OnDelBtn()
 
 void CEditGroup::OnRenameBtn() 
 {
-	CString	gname, gno;
-	
-	m_selindex = m_list.GetSelectionMark();
-	if (m_selindex < 0) return;
-
-	CString	string = m_list.GetItemText(m_selindex, 0); // 0번째 인덱스 
-	
-	if (!string.IsEmpty()) m_clickItem = string;
-
-	CNewGroup newGroup(this, 1, m_clickItem);
-	if (newGroup.DoModal() == IDOK)
+	if (1)
 	{
-		gname = newGroup.m_defName; gname.TrimLeft();
-		if (gname.IsEmpty()) gname = m_clickItem;
+		CString	gname;
 
-		m_list.SetItemText(m_selindex, 0, gname);
-		
-		//매니징 배열 수정
-		((CPage1*)m_pParent)->m_manageGroup[m_selindex][1] = "M";
-		((CPage1*)m_pParent)->m_manageGroup[m_selindex][3] = gname;
+		m_selindex = m_list.GetSelectionMark();
+		if (m_selindex < 0) return;
+
+		CString	string = m_list.GetItemText(m_selindex, 0);
+		if (!string.IsEmpty()) m_clickItem = string;
+
+		CNewGroup newGroup(this, 1, m_clickItem);
+		if (newGroup.DoModal() == IDOK)
+		{
+			gname = newGroup.m_defName; gname.TrimLeft();
+			if (gname.IsEmpty()) gname = m_clickItem;
+
+			m_list.SetItemText(m_selindex, 0, gname);
+
+			CPage1* page = (CPage1*)m_pParent;
+			const int groupNo = (int)m_list.GetItemData(m_selindex);
+			for (int row = 0; row < page->getManageCount(); row++)
+			{
+				if (atoi(page->m_manageGroup[row][0]) == groupNo)
+				{
+					page->m_manageGroup[row][1] = "M";
+					page->m_manageGroup[row][3] = gname;
+					break;
+				}
+			}
+		}
+	}
+	else
+	{
+		CString	gname, gno;
+
+		m_selindex = m_list.GetSelectionMark();
+		if (m_selindex < 0) return;
+
+		CString	 string = m_list.GetItemText(m_selindex, 0); // 0번째 인덱스 
+
+		if (!string.IsEmpty()) m_clickItem = string;
+
+		CNewGroup newGroup(this, 1, m_clickItem);
+		if (newGroup.DoModal() == IDOK)
+		{
+			gname = newGroup.m_defName; gname.TrimLeft();
+			if (gname.IsEmpty()) gname = m_clickItem;
+
+			m_list.SetItemText(m_selindex, 0, gname);
+
+			//매니징 배열 수정
+			((CPage1*)m_pParent)->m_manageGroup[m_selindex][1] = "M";
+			((CPage1*)m_pParent)->m_manageGroup[m_selindex][3] = gname;
+		}
 	}
 }
 
@@ -391,7 +454,7 @@ void CEditGroup::OnDblclkList(NMHDR* pNMHDR, LRESULT* pResult)
 	*pResult = 0;
 }
 
-void CEditGroup::OnEndlabeleditList(NMHDR* pNMHDR, LRESULT* pResult) 
+void CEditGroup::OnEndlabeleditList(NMHDR* pNMHDR, LRESULT* pResult)
 {
 	LV_DISPINFO* pDispInfo = (LV_DISPINFO*)pNMHDR;
 
@@ -404,12 +467,22 @@ void CEditGroup::OnEndlabeleditList(NMHDR* pNMHDR, LRESULT* pResult)
 	m_pEdit->UnsubclassWindow();
 	m_list.SetItemText(m_selindex, 0, gname);
 
-	//매니징 배열 수정
-	((CPage1*)m_pParent)->m_manageGroup[m_selindex][1] = "M";
-	((CPage1*)m_pParent)->m_manageGroup[m_selindex][3] = gname;
+	//매니지 배열 정리
+	CPage1* page = (CPage1*)m_pParent;
+	const int groupNo = (int)m_list.GetItemData(m_selindex);
+	for (int row = 0; row < page->getManageCount(); row++)
+	{
+		if (atoi(page->m_manageGroup[row][0]) == groupNo)
+		{
+			page->m_manageGroup[row][1] = "M";
+			page->m_manageGroup[row][3] = gname;
+			break;
+		}
+	}
 
 	*pResult = 0;
 }
+
 
 void CEditGroup::OnClickList(NMHDR* pNMHDR, LRESULT* pResult) 
 {
@@ -437,7 +510,7 @@ void CEditGroup::InitList()
 	sGroupArr.Empty();
 	CWnd* wnd = ((CPage1*)m_pParent)->GetParent()->GetParent();
 
-	memset(m_pdata, 0x00, 1024 * 2);
+	memset(m_pdata, 0x00, 1024 * 4);
 	const bool ret = wnd->SendMessage(WM_MSG, MAKEWPARAM(MSG_GET_GROUPARR, 0), (LPARAM)m_pdata);
 	
 	if (ret == 0)
@@ -577,9 +650,9 @@ void CEditGroup::endDrag(CPoint point)
 
 	m_list.GetClientRect(&ListRc);
 	m_list.ClientToScreen(&ListRc);
-	
+
 	ClientToScreen(&point);
-	
+
 	if (ListRc.PtInRect(point))
 	{
 		LVHITTESTINFO lvhti;
@@ -587,25 +660,37 @@ void CEditGroup::endDrag(CPoint point)
 		lvhti.pt = point;
 
 		int nItem = m_list.HitTest(&lvhti);
-		
-		if (nItem < 0)
-			nItem = m_list.GetItemCount() -1;
 
-		
-		//매니징 배열 수정
-		((CPage1*)m_pParent)->sortManageGroup(m_nItem, nItem);
+		if (nItem < 0)
+			nItem = m_list.GetItemCount() - 1;
+
+		//매니지 배열 정리 - 화면위치가 아닌 실제 그룹번호로 배열 행을 찾아서 처리
+		CPage1* page = (CPage1*)m_pParent;
+		const int groupNoDrag = (int)m_list.GetItemData(m_nItem);
+		const int groupNoDrop = (int)m_list.GetItemData(nItem);
+
+		int rowDrag = -1, rowDrop = -1;
+		for (int row = 0; row < page->getManageCount(); row++)
+		{
+			if (atoi(page->m_manageGroup[row][0]) == groupNoDrag) rowDrag = row;
+			if (atoi(page->m_manageGroup[row][0]) == groupNoDrop) rowDrop = row;
+		}
+
+		if (rowDrag >= 0 && rowDrop >= 0)
+			page->sortManageGroup(rowDrag, rowDrop);
 
 		sItem = m_list.GetItemText(m_nItem, 0);
 		const DWORD dData = m_list.GetItemData(m_nItem);
 		m_list.DeleteItem(m_nItem);
-		
+
 		nItem = addItem(sItem, nItem);
 		m_list.SetItemData(nItem, dData);
-		
+
 		KillSelected(&m_list);
 		SetSelected(&m_list, nItem, FALSE);
 	}
 }
+
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

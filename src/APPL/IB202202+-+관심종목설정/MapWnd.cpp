@@ -427,7 +427,12 @@ long CMapWnd::OnMsg(WPARAM wParam, LPARAM lParam)
 			}
 		
 			char* pResult = new char[stmp.GetLength()];
-			memcpy((char*)lParam, (LPSTR)(LPCTSTR)stmp, stmp.GetLength());
+
+			//가장 작은 호출측 버퍼(CEditGroup::m_pdata, 4096바이트)를 넘지 않도록 제한
+			const int MAX_COPY = 1024 * 4 - 1;   //널 종료 자리 확보
+			const int copyLen = min(stmp.GetLength(), MAX_COPY);
+			memcpy((char*)lParam, (LPSTR)(LPCTSTR)stmp, copyLen);
+			((char*)lParam)[copyLen] = '\0';
 			return 1;
 		}
 		break;

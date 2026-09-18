@@ -8034,6 +8034,9 @@ void CPage1::setManageGroup(char* datB)
 	CString tempAry[MAXGROUP][4];
 	CString newNos, oldNoS;
 
+m_slog.Format("\r\n[setManageGroup] ------------------------  nCount=%d", nCount);
+OutputDebugString(m_slog);
+
 	if(nCount > 0)
 	{
 		//임시배열에 복사
@@ -8051,16 +8054,53 @@ void CPage1::setManageGroup(char* datB)
 			
 			newNos.Format("%.2s", list.ngrs);
 			oldNoS.Format("%.2s", list.ogrs);
-			
-			if(atoi(oldNoS) != atoi(newNos))
+
+			m_slog.Format("\r\n[setManageGroup]                   i=%d", i);
+			OutputDebugString(m_slog);
+
+
+			if (atoi(oldNoS) != atoi(newNos))
 			{
-				for(int j=0 ; j<4 ; j++)
+m_slog.Format("\r\n[setManageGroup] 서버 내려온 값이 변경 되었다고 내려온 그룹 newNos=%s oldNoS=%s", newNos, oldNoS);
+OutputDebugString(m_slog);
+				//m_slog.Format("\r\n[setManageGroup] old=%s new=%s tempAry[old-1][0]=%s(기대값과 다르면 버그)", oldNoS, newNos, tempAry[atoi(oldNoS) - 1][0]);
+				//OutputDebugString(m_slog);
+				//oldNoS 값을 가진 실제 행을 찾는다 (위치가 아니라 그룹번호로 매칭)
+				int oldRow = -1;
+				for (int row = 0; row < MAXGROUP; row++)
 				{
-					if(j != 2)
+m_slog.Format("\r\n		[setManageGroup] row =%d (클라)tempAry[row][0]=%s (서버)oldNoS=%s", row, tempAry[row][0], oldNoS);
+OutputDebugString(m_slog);
+
+					if (atoi(tempAry[row][0]) == atoi(oldNoS))
 					{
-						m_manageGroup[atoi(newNos)-1][j] = tempAry[atoi(oldNoS)-1][j];
-					}	
-				}				
+						oldRow = row;
+						m_slog.Format("\r\n		[setManageGroup] !!!! 클라서버 같음 BREAK !!!!row =%d tempAry[row][0]=%s oldNoS=%s", row, tempAry[row][0], oldNoS);
+						OutputDebugString(m_slog);
+						break;
+					}
+					else
+					{
+						m_slog.Format("\r\n		[setManageGroup] @@@@ 다름 클라서버 row =%d tempAry[row][0]=%s oldNoS=%s", row, tempAry[row][0], oldNoS);
+						OutputDebugString(m_slog);
+					}
+				}
+				if (oldRow < 0) continue;
+				/*
+				[0]	수정 전 그룹번호
+				[1]	변경 상태: M 이름 수정, D 삭제, N 추가
+				[2]	수정 후 그룹번호
+				[3]	그룹명
+				*/
+				for (int j = 0; j < 4; j++)  //
+				{
+					if (j != 2)
+					{
+						m_manageGroup[atoi(newNos) - 1][j] = tempAry[oldRow][j];
+m_slog.Format("\r\n			[setManageGroup] newNos-1=[%d] oldNoS=%s  [%s]", atoi(newNos) - 1, oldNoS, tempAry[oldRow][j]);
+OutputDebugString(m_slog);
+					}
+				}
 			}
 		}
 	}

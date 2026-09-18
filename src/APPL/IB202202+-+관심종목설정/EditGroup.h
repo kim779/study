@@ -21,7 +21,7 @@ public:
 	//}}AFX_DATA
 
 public:
-	char m_pdata[1024 * 2];
+	char m_pdata[1024 * 4];
 	CString		m_userD;
 	CString		m_tempN;
 

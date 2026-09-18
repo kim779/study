@@ -111,8 +111,19 @@ void CEditGroup::OnUpBtn()
 
 		if (nItem != 0)
 		{
-			auto& vGroup = ((CPage1*)m_pParent)->m_manageGroup;
-			vGroup[nItem - 1].swap(vGroup[nItem]);
+			CPage1* page = (CPage1*)m_pParent;
+			const int groupNoCur   = (int)m_list.GetItemData(nItem);
+			const int groupNoAbove = (int)m_list.GetItemData(nItem - 1);
+
+			int rowCur = -1, rowAbove = -1;
+			for (int row = 0; row < page->getManageCount(); row++)
+			{
+				if (atoi(page->m_manageGroup[row][0]) == groupNoCur)   rowCur = row;
+				if (atoi(page->m_manageGroup[row][0]) == groupNoAbove) rowAbove = row;
+			}
+
+			if (rowCur >= 0 && rowAbove >= 0)
+				page->m_manageGroup[rowAbove].swap(page->m_manageGroup[rowCur]);
 
 			text = m_list.GetItemText(nItem, 0);
 			data = m_list.GetItemData(nItem);
@@ -142,8 +153,19 @@ void CEditGroup::OnDownBtn()
 		if (nItem != m_list.GetItemCount() - 1)
 		{
 			//매니징 배열 수정
-			auto& vGroup = ((CPage1*)m_pParent)->m_manageGroup;
-			vGroup[nItem].swap(vGroup[nItem+1]);
+			CPage1* page = (CPage1*)m_pParent;
+			const int groupNoCur   = (int)m_list.GetItemData(nItem);
+			const int groupNoBelow = (int)m_list.GetItemData(nItem + 1);
+
+			int rowCur = -1, rowBelow = -1;
+			for (int row = 0; row < page->getManageCount(); row++)
+			{
+				if (atoi(page->m_manageGroup[row][0]) == groupNoCur)   rowCur = row;
+				if (atoi(page->m_manageGroup[row][0]) == groupNoBelow) rowBelow = row;
+			}
+
+			if (rowCur >= 0 && rowBelow >= 0)
+				page->m_manageGroup[rowCur].swap(page->m_manageGroup[rowBelow]);
 
 			text = m_list.GetItemText(nItem, 0);
 			data = m_list.GetItemData(nItem);
@@ -179,8 +201,16 @@ void CEditGroup::OnDelBtn()
 			CString bookdir, booktmpdir;
 
 			//매니징 배열 수정
-			const int aryIndex = m_list.GetItemData(item) - 1;
-			((CPage1*)m_pParent)->m_manageGroup[aryIndex][1] = "D";
+			CPage1* page = (CPage1*)m_pParent;
+			const int groupNo = (int)m_list.GetItemData(item);
+			for (int row = 0; row < page->getManageCount(); row++)
+			{
+				if (atoi(page->m_manageGroup[row][0]) == groupNo)
+				{
+					page->m_manageGroup[row][1] = "D";
+					break;
+				}
+			}
 
 			bookdir.Format("%s/bookmark.i%02d", m_userD, m_list.GetItemData(item));
 			booktmpdir.Format("%s", bookdir);
@@ -214,10 +244,19 @@ void CEditGroup::OnRenameBtn()
 		if (gname.IsEmpty()) gname = m_clickItem;
 
 		m_list.SetItemText(m_selindex, 0, gname);
-		
+
 		//매니징 배열 수정
-		((CPage1*)m_pParent)->m_manageGroup[m_selindex][1] = "M";
-		((CPage1*)m_pParent)->m_manageGroup[m_selindex][3] = gname;
+		CPage1* page = (CPage1*)m_pParent;
+		const int groupNo = (int)m_list.GetItemData(m_selindex);
+		for (int row = 0; row < page->getManageCount(); row++)
+		{
+			if (atoi(page->m_manageGroup[row][0]) == groupNo)
+			{
+				page->m_manageGroup[row][1] = "M";
+				page->m_manageGroup[row][3] = gname;
+				break;
+			}
+		}
 
 		CWnd* wnd = ((CPage1*)m_pParent)->GetParent()->GetParent();
 
@@ -325,8 +364,17 @@ void CEditGroup::OnEndlabeleditList(NMHDR* pNMHDR, LRESULT* pResult)
 	m_list.SetItemText(m_selindex, 0, gname);
 
 	//매니징 배열 수정
-	((CPage1*)m_pParent)->m_manageGroup[m_selindex][1] = "M";
-	((CPage1*)m_pParent)->m_manageGroup[m_selindex][3] = gname;
+	CPage1* page = (CPage1*)m_pParent;
+	const int groupNo = (int)m_list.GetItemData(m_selindex);
+	for (int row = 0; row < page->getManageCount(); row++)
+	{
+		if (atoi(page->m_manageGroup[row][0]) == groupNo)
+		{
+			page->m_manageGroup[row][1] = "M";
+			page->m_manageGroup[row][3] = gname;
+			break;
+		}
+	}
 	*pResult = 0;
 }
 
@@ -476,9 +524,21 @@ void CEditGroup::endDrag(CPoint point)
 			nItem = m_list.GetItemCount() -1;
 
 		
-		//매니징 배열 수정
-		((CPage1*)m_pParent)->sortManageGroup(m_nItem, nItem);
-		((CPage1*)m_pParent)->traceManageGroup();
+		//매니징 배열 수정 - 화면위치가 아닌 실제 그룹번호로 배열 행을 찾아서 처리
+		CPage1* page = (CPage1*)m_pParent;
+		const int groupNoDrag = (int)m_list.GetItemData(m_nItem);
+		const int groupNoDrop = (int)m_list.GetItemData(nItem);
+
+		int rowDrag = -1, rowDrop = -1;
+		for (int row = 0; row < page->getManageCount(); row++)
+		{
+			if (atoi(page->m_manageGroup[row][0]) == groupNoDrag) rowDrag = row;
+			if (atoi(page->m_manageGroup[row][0]) == groupNoDrop) rowDrop = row;
+		}
+
+		if (rowDrag >= 0 && rowDrop >= 0)
+			page->sortManageGroup(rowDrag, rowDrop);
+		page->traceManageGroup();
 
 		sItem = m_list.GetItemText(m_nItem, 0);
 		const DWORD dData = m_list.GetItemData(m_nItem);

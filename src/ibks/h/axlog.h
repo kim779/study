@@ -11,7 +11,7 @@
 #define AXLOG_MODULE_TAG "WIZARD"
 #endif
 
-//#define DF_LOG_INIT
+#define DF_LOG_INIT
 #define DF_LOG_EVENT
 #define DF_LOG_DATA
 //#define DF_LOG_RTM
