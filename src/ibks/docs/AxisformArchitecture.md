@@ -55,7 +55,7 @@ AXIS HTS의 **폼/컨트롤 렌더링 레이어**(axisform.dll, `dll/form/`)의 
 이 서브시스템은 화면(맵) 위의 모든 시각적 컨트롤(입력박스, 버튼, 그리드 등)의 생명주기를 관리하는 핵심 인프라이며,
 **그동안 전혀 문서화된 적 없는 사각지대**였습니다.
 
-관련 고수준 문서: `@docs/WizardArchitecture.md`(Wizard 계층), `@docs/Architecture.md`(전체 3계층)
+관련 고수준 문서: [[WizardArchitecture.md]](Wizard 계층), [[Architecture.md]](전체 3계층)
 
 ---
 
@@ -517,12 +517,12 @@ dll/form/
 
 ## 14. 관련 문서
 
-- `@docs/Architecture.md` — 3계층 개요 (Wizard ↔ axisform 통합 관점)
-- `@docs/WizardArchitecture.md` — Wizard(CScreen 등) 클래스 계층/이벤트 흐름 상세
-- `@docs/KnowledgeBase.md` — RTM 흐름, DLL 경계 이슈, 트러블슈팅 이력
-- `@docs/RealtimeCodeIndex_Investigation.md` — FA_FLASH 필드, vtable 크래시 실사례 상세 기록
-- `@docs/CallGraph.md` — 함수 호출 흐름도
-- `@docs/SourceIndex.md` — 소스 파일 색인
+- [[Architecture.md]] — 3계층 개요 (Wizard ↔ axisform 통합 관점)
+- [[WizardArchitecture.md]] — Wizard(CScreen 등) 클래스 계층/이벤트 흐름 상세
+- [[KnowledgeBase.md]] — RTM 흐름, DLL 경계 이슈, 트러블슈팅 이력
+- [[RealtimeCodeIndex_Investigation.md]] — FA_FLASH 필드, vtable 크래시 실사례 상세 기록
+- [[CallGraph.md]] — 함수 호출 흐름도
+- [[SourceIndex.md]] — 소스 파일 색인
 
 ---
 

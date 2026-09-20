@@ -150,8 +150,8 @@ Microsoft WebView2 SDK가 공식 제공하는 호스트↔웹페이지 메시징
 | `CONTROL/CX_WebView/IEWnd.h/cpp` | 레거시 IE 기반 대안 — 메시징 배선 없음, `Navigate`만 |
 | `CONTROL/CX_WebView/MainWnd.h/cpp` | dispatch map 선언은 있으나 비어있음 |
 | `CONTROL/CX_WebView/CX_WebView.h/cpp/odl` | OCX 최상위 진입점, 신규 dispatch/event 추가 시 `.odl` 반영 필요 |
-| `@docs/WizardDependency.md` §④ | CX_* 계열 컨트롤이 Wizard에 꽂히는 공통 진입점(`axCreate`) 및 기존 WM_USER 통신 관례 |
-| `@docs/DebugLogGuide.md` §7 | `DllProc WM_USER cmd=...` — 6절에서 언급한 기존 컨트롤↔Wizard 통신축의 로그 태그 |
+| [[WizardDependency.md]] §④ | CX_* 계열 컨트롤이 Wizard에 꽂히는 공통 진입점(`axCreate`) 및 기존 WM_USER 통신 관례 |
+| [[DebugLogGuide.md]] §7 | `DllProc WM_USER cmd=...` — 6절에서 언급한 기존 컨트롤↔Wizard 통신축의 로그 태그 |
 
 ---
 

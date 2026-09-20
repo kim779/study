@@ -34,7 +34,7 @@ updated: 2026-09-11
 ## 문서 목적
 
 HTS 핵심 구성요소인 `ibks/Wizard/` (axwizard, ActiveX 컨트롤 DLL) 자체의 구조를 분석/이해합니다.
-`@docs/Architecture.md`가 Python 엔진 전환 프로젝트 관점의 3계층 개요라면, 이 문서는 axwizard 내부 클래스 계층과 이벤트 흐름을 더 상세히 다룹니다.
+[[Architecture.md]]가 Python 엔진 전환 프로젝트 관점의 3계층 개요라면, 이 문서는 axwizard 내부 클래스 계층과 이벤트 흐름을 더 상세히 다룹니다.
 
 ---
 
@@ -117,7 +117,7 @@ if (m_ledger)           m_vbe->AddObject("Ledger", m_ledger);
 m_vbe->LoadScript(text, m_mapH->pythonMode);               // 여기서 비로소 VBS/Python 엔진 확정+생성
 ```
 
-**핵심:** `AddObject()`는 `LoadScript()`보다 먼저 여러 번 호출되지만, 이 시점엔 아직 VBS 엔진인지 Python 엔진인지 결정되지 않은 상태다. `CEngineWrapper`는 이를 `PendingObject` 벡터에 버퍼링해뒀다가, `LoadScript()`에서 엔진 종류가 확정되는 순간(`ensureEngine()`) 일괄 등록한다. (`@docs/python_engine_260608.md`에 기록된 "INFO 객체 오류" 버그의 근본 해결책과 동일 메커니즘 — 현재도 유지되고 있음을 코드로 확인.)
+**핵심:** `AddObject()`는 `LoadScript()`보다 먼저 여러 번 호출되지만, 이 시점엔 아직 VBS 엔진인지 Python 엔진인지 결정되지 않은 상태다. `CEngineWrapper`는 이를 `PendingObject` 벡터에 버퍼링해뒀다가, `LoadScript()`에서 엔진 종류가 확정되는 순간(`ensureEngine()`) 일괄 등록한다. ([[python_engine_260608.md]]에 기록된 "INFO 객체 오류" 버그의 근본 해결책과 동일 메커니즘 — 현재도 유지되고 있음을 코드로 확인.)
 
 ---
 
@@ -166,7 +166,7 @@ m_vbe->LoadScript(text, m_mapH->pythonMode);               // 여기서 비로�
 
 ## 5. dll/vbs/engineWrapper.cpp 현재 구현 (2026-07-13 코드 확인, 문서 드리프트 주의)
 
-`@docs/python_engine_260608.md` 작성 당시(2026-06-08~11) 설계와 **현재 코드가 달라진 부분**이 있어 별도 기록한다 (docs는 병합 원칙이라 KnowledgeBase.md 12절에도 동일 내용 기록).
+[[python_engine_260608.md]] 작성 당시(2026-06-08~11) 설계와 **현재 코드가 달라진 부분**이 있어 별도 기록한다 (docs는 병합 원칙이라 KnowledgeBase.md 12절에도 동일 내용 기록).
 
 - **엔진 선택이 이제 2단계다.** `CScreen::Parse()`가 `m_vbe->LoadScript(text, m_mapH->pythonMode)`로 **빌드 시점에 확정된 `pythonMode` 플래그**(axisbuilder의 mapload.cpp가 빌드 시 자동감지, 9단계 작업)를 명시적으로 전달한다. `engineWrapper.cpp::LoadScript(scripts, scpKind)`는 `scpKind != -1`이면 이 명시적 값을 그대로 쓰고, `scpKind == -1`일 때만 텍스트 스캔 폴백(`isPythonScript()`)을 쓴다.
 - **텍스트 스캔 폴백도 더 엄격해졌다.** 기존 문서는 `scripts.Find("def ") >= 0`(텍스트 어디든 포함)였지만, 현재 `isPythonScript()`는 **줄 단위로 순회하며 각 줄의 선행 공백을 제거한 뒤 줄의 맨 앞이 `def ` 또는 `import `로 시작하는지**를 검사한다. 문자열/주석 안에 우연히 "import"가 들어간 경우의 오탐을 줄이는 방향으로 개선된 것으로 보임.
@@ -209,7 +209,7 @@ m_vbe->LoadScript(text, m_mapH->pythonMode);               // 여기서 비로�
 | `CGuard` | Guard.h/cpp | 세션 허브 (1절 참고) |
 | `CWorks` | Works.h/cpp | 작업영역의 **추상 기반 클래스**. `CClient`/`CDll`이 상속. `S_*` 상태 플래그(S_LOAD, S_FLASH, S_LOCK 등) 정의, `Attach`/`OnAxis`/`OnAlert`/`OnDomino` 등 가상함수로 공통 인터페이스 제공. `m_drop`(COleDrop)로 OLE 드래그앤드롭도 여기서 관리 |
 | `CClient : CWorks` | Client.h/cpp | 실제 화면 작업영역 (1절 참고) |
-| `CDll : CWorks` | Dll.h/cpp | **DLL 기반 작업영역** — CClient(화면 기반)의 대안 경로로 보임. `m_dll`(별도 로드된 DLL 핸들), `m_screens`(CMapWordToPtr)로 자체 화면 목록 관리. `LoadLibrary`로 외부 DLL을 동적 로드해서 작업영역처럼 다룸(`Attach`가 `HINSTANCE m_instance` 사용) — 용도는 미조사 (예: 특정 화면군을 별도 DLL로 배포하는 확장 메커니즘 추정) |
+| `CDll : CWorks` | Dll.h/cpp | **DLL 기반 작업영역** — CClient(화면 기반)의 대안 경로. `m_dll`(별도 로드된 DLL 핸들), `m_screens`(CMapWordToPtr)로 자체 화면 목록 관리. `LoadLibrary`로 외부 DLL을 동적 로드해서 작업영역처럼 다룸(`Attach`가 `HINSTANCE m_instance` 사용) — **실사용처 확정(2026-09-13):** `AXIS.exe`의 `CMainFrame::load_hidescreen()`이 `IBXXXX01`(실시간잔고, `MAPN_REALTIMEJANGO`) 같은 화면-안-보이는 창을 로드할 때 이 경로를 탄다. `mapname`이 `.map` 바이너리가 아니라 실제 DLL(`IBXXXX01.dll`)을 가리키는 경우. 상세는 [[WizardFireProtocol.md]] §4 참고 |
 
 ### 7.3 화면 / 스크립트 노출 객체 계층
 
@@ -264,15 +264,15 @@ m_vbe->LoadScript(text, m_mapH->pythonMode);               // 여기서 비로�
 
 - CGuard 초기화/로그인 시퀀스 상세 (RunAxis mode별 분기, Xecure/Certify 흐름)
 - CClient 이벤트 라우팅 상세 (OnMouse/OnKey/OnTRAN → CScript 호출 지점) — `CKey`/`CMouse`가 1차 수신하는 것으로 보이나 `CClient`로 넘어가는 정확한 지점 미확인
-- `CDll`(작업영역의 DLL 기반 대안 경로)의 실제 사용처 — 어떤 화면/기능이 CClient 대신 CDll을 쓰는지
+- ~~`CDll`(작업영역의 DLL 기반 대안 경로)의 실제 사용처~~ — **확인 완료(2026-09-13)**, [[WizardFireProtocol.md]] §4 참고(`IBXXXX01` 등 히든화면이 이 경로). 다만 `CGuard::Attach`/`CWorks::Attach`가 `vtype`을 보고 `CClient` vs `CDll` 중 어느 쪽을 만들지 분기하는 정확한 코드 지점은 아직 미확인 — `vtypeDLL`(0x03) 판정 분기 자체를 짚어보는 게 다음 확인 대상
 - `COleDrop`과 `COleDropEx` 두 드래그앤드롭 구현이 공존하는 이유
-- RTM(실시간) 갱신 흐름은 이미 `@docs/KnowledgeBase.md` 11절, `@docs/RealtimeCodeIndex_Investigation.md`에 기록됨 (참고)
+- RTM(실시간) 갱신 흐름은 이미 [[KnowledgeBase.md]] 11절, [[RealtimeCodeIndex_Investigation.md]]에 기록됨 (참고)
 
 ---
 
 ## 9. 관련 문서
 
-- `@docs/Architecture.md` - Python 엔진 전환 프로젝트 관점 3계층 개요
-- `@docs/python_engine_260608.md` - VBS→Python 전환 상세 기록 (초기 설계, 일부 드리프트 있음 → 5절 참고)
-- `@docs/KnowledgeBase.md` - 버그/설계 지식 베이스 (12절에 이 문서의 드리프트 발견 내용 반영)
-- `@docs/RealtimeCodeIndex_Investigation.md` - RTM 종목코드 역인덱스 조사, `CKey`/`fmEdit` 입력 경로 상세
+- [[Architecture.md]] - Python 엔진 전환 프로젝트 관점 3계층 개요
+- [[python_engine_260608.md]] - VBS→Python 전환 상세 기록 (초기 설계, 일부 드리프트 있음 → 5절 참고)
+- [[KnowledgeBase.md]] - 버그/설계 지식 베이스 (12절에 이 문서의 드리프트 발견 내용 반영)
+- [[RealtimeCodeIndex_Investigation.md]] - RTM 종목코드 역인덱스 조사, `CKey`/`fmEdit` 입력 경로 상세

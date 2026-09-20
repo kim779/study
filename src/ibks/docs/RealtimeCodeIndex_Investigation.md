@@ -30,7 +30,7 @@ updated: 2026-08-21
 
 ## 배경 / 목표
 
-`CGuard::DoRTM`(Guard.cpp:5898~5982)이 실시간 틱 1건마다 열려있는 **모든 화면**(`m_clients` 전체)을 순회하며 "이 화면이 이 종목에 관심있나"를 검사한다 (`@docs/KnowledgeBase.md` 참고 — 2026-07-19 발견). 화면을 많이 띄운 상태에서 틱이 몰릴 때 UI가 버벅이는 원인으로 추정됨.
+`CGuard::DoRTM`(Guard.cpp:5898~5982)이 실시간 틱 1건마다 열려있는 **모든 화면**(`m_clients` 전체)을 순회하며 "이 화면이 이 종목에 관심있나"를 검사한다 ([[KnowledgeBase.md]] 참고 — 2026-07-19 발견). 화면을 많이 띄운 상태에서 틱이 몰릴 때 UI가 버벅이는 원인으로 추정됨.
 
 **개선 방향:** 종목코드 → 관심 화면 역인덱스를 `CGuard`에 두고, 틱마다 전체순회 대신 인덱스 조회로 대체.
 
@@ -267,5 +267,5 @@ bool	m_rtmIndexCutover = false;	// runtime kill switch (registry: Workstation\RT
 
 ## 관련 문서
 
-- `@docs/WizardArchitecture.md` — 전체 아키텍처
-- `@docs/KnowledgeBase.md` 11절 — RTM 흐름 최초 기록, 12절 — 이 조사의 발단이 된 문서-코드 드리프트
+- [[WizardArchitecture.md]] — 전체 아키텍처
+- [[KnowledgeBase.md]] 11절 — RTM 흐름 최초 기록, 12절 — 이 조사의 발단이 된 문서-코드 드리프트

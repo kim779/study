@@ -347,7 +347,7 @@ exe/
 
 ## 11. 관련 문서
 
-- `@docs/python_engine_260608.md` - VBScript->Python 전환 상세 기록
-- `@docs/Dependency.md` - 라이브러리 의존성 분석
-- `@docs/SourceIndex.md` - 소스 파일 색인
-- `@docs/CallGraph.md` - 함수 호출 흐름도
+- [[python_engine_260608.md]] - VBScript->Python 전환 상세 기록
+- [[Dependency.md]] - 라이브러리 의존성 분석
+- [[SourceIndex.md]] - 소스 파일 색인
+- [[CallGraph.md]] - 함수 호출 흐름도

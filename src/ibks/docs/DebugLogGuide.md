@@ -253,7 +253,7 @@ IsNoEncMode
 
 ### 컨트롤 `kind` 코드 표 (참고용, `builder/h/form.h` 확정)
 
-`[0-GetDataNRM-field]`/`[5-SetDataNRM-write]`/`[ATTACH]` 등 로그에 찍히는 `kind=` 숫자는 그 필드/컨트롤의 종류(`CfmBase` 파생 클래스, `@docs/AxisformArchitecture.md` 참고)를 나타낸다. 전체 21종:
+`[0-GetDataNRM-field]`/`[5-SetDataNRM-write]`/`[ATTACH]` 등 로그에 찍히는 `kind=` 숫자는 그 필드/컨트롤의 종류(`CfmBase` 파생 클래스, [[AxisformArchitecture.md]] 참고)를 나타낸다. 전체 21종:
 
 | kind | 상수 | 종류 |
 |---|---|---|
@@ -279,9 +279,9 @@ IsNoEncMode
 | 20 | `FM_BROWSER` | 웹 브라우저 |
 | 21 | `FM_GRIDEX` | 그리드Ex |
 
-**주의:** `@docs/AxisformArchitecture.md` 5절의 24개 파생 클래스 목록(`CfmCheck`/`CfmRadio`/`CfmEditEx`/`CfmSysm` 포함)과 여기 21개 `kind` 숫자가 1:1로 안 맞는다 — 체크박스/라디오/EditEx 등 일부는 별도 `kind` 번호 없이 다른 `kind`(예: `FM_BUTTON`)에 속성 플래그로 얹혀 세분화되는 것으로 추정된다(미확인, 필요 시 `LoadForm`의 kind별 팩토리 분기 확인 요).
+**주의:** [[AxisformArchitecture.md]] 5절의 24개 파생 클래스 목록(`CfmCheck`/`CfmRadio`/`CfmEditEx`/`CfmSysm` 포함)과 여기 21개 `kind` 숫자가 1:1로 안 맞는다 — 체크박스/라디오/EditEx 등 일부는 별도 `kind` 번호 없이 다른 `kind`(예: `FM_BUTTON`)에 속성 플래그로 얹혀 세분화되는 것으로 추정된다(미확인, 필요 시 `LoadForm`의 kind별 팩토리 분기 확인 요).
 
-**실측 예시(2026-08-14, IB622300/IB622302 원장TR 비교):** 같은 이름의 필드(`AN15`/`csubb`)가 부모맵과 서브맵에서 서로 다른 `kind`로 정의된 경우가 실제로 확인됨(`AN15`: 부모=15/`FM_CONTROL`, 서브맵=7/`FM_EDIT`) — 서브맵은 부모와 완전히 독립적인 컨트롤 정의를 가진다는 기존 관찰(`@docs/WizardArchitecture.md`)과 일치.
+**실측 예시(2026-08-14, IB622300/IB622302 원장TR 비교):** 같은 이름의 필드(`AN15`/`csubb`)가 부모맵과 서브맵에서 서로 다른 `kind`로 정의된 경우가 실제로 확인됨(`AN15`: 부모=15/`FM_CONTROL`, 서브맵=7/`FM_EDIT`) — 서브맵은 부모와 완전히 독립적인 컨트롤 정의를 가진다는 기존 관찰([[WizardArchitecture.md]])과 일치.
 
 ---
 
@@ -471,7 +471,7 @@ DebugView(또는 DebugView++)의 "Find" 창에 아래 태그를 넣어 검색하
 | `loaded via axCreate / axCreateEx / axCreateX` | `Dll.cpp` | 세 가지 DLL 진입점 중 실제로 성공한 것 |
 | `DllProc WM_USER cmd=...` | `Dll.cpp` | 로드된 DLL이 부모(Wizard)에게 서비스 요청(자식→부모 콜백) |
 | `DllProc WM_SIZE propagate` | `Dll.cpp` | 부모 리사이즈를 자식 DLL 윈도우에 수동 전파 |
-| `[CDll-OnAxis-raw] winK=... unit=... msgK=... stat=... nBytes=... statAUX=...` | `Dll.cpp` (`CDll::OnAxis`, 2026-07-31 추가) | **`CDll` 기반 작업영역의 유일한 수신 트레이스 지점.** `CClient::OnAxis`와 달리 `CStream::OutStream`/`SetDataNRM`/`SetCells`를 전혀 안 타고, 받은 바이트를 그대로 `WM_USER`로 로드된 DLL에 던진다 — 그래서 이 화면 유형은 `[4-OutStream-parse]`/`[5-SetDataNRM-write]` 같은 로그가 원천적으로 안 찍힌다. `[1-OnAxis-raw]`(`CWizardCtrl::OnAxis`)/`[2-OnStream-reassemble]`(`CWorks::OnStream`)까지는 `CClient`/`CDll` 공통 경로라 똑같이 찍히고, 그 다음 갈라지는 지점이 바로 여기다. AxisChaser에서는 정상적으로 보이는데 axlog에서 `[4-...]`/`[5-...]` 이후가 안 보이면 이 로그가 찍히는지부터 확인할 것 — 찍힌다면 그 화면은 `CDll` 기반이라 실제 필드 파싱은 이 DLL 내부에서 일어나며(현재 미조사, `@docs/MigrationSpec_SocketToDrawing.md` 9절), Wizard 쪽 axlog로는 더 깊이 들어갈 수 없다 |
+| `[CDll-OnAxis-raw] winK=... unit=... msgK=... stat=... nBytes=... statAUX=...` | `Dll.cpp` (`CDll::OnAxis`, 2026-07-31 추가) | **`CDll` 기반 작업영역의 유일한 수신 트레이스 지점.** `CClient::OnAxis`와 달리 `CStream::OutStream`/`SetDataNRM`/`SetCells`를 전혀 안 타고, 받은 바이트를 그대로 `WM_USER`로 로드된 DLL에 던진다 — 그래서 이 화면 유형은 `[4-OutStream-parse]`/`[5-SetDataNRM-write]` 같은 로그가 원천적으로 안 찍힌다. `[1-OnAxis-raw]`(`CWizardCtrl::OnAxis`)/`[2-OnStream-reassemble]`(`CWorks::OnStream`)까지는 `CClient`/`CDll` 공통 경로라 똑같이 찍히고, 그 다음 갈라지는 지점이 바로 여기다. AxisChaser에서는 정상적으로 보이는데 axlog에서 `[4-...]`/`[5-...]` 이후가 안 보이면 이 로그가 찍히는지부터 확인할 것 — 찍힌다면 그 화면은 `CDll` 기반이라 실제 필드 파싱은 이 DLL 내부에서 일어나며(현재 미조사, [[MigrationSpec_SocketToDrawing.md]] 9절), Wizard 쪽 axlog로는 더 깊이 들어갈 수 없다 |
 
 ---
 
@@ -625,7 +625,7 @@ DebugView(또는 DebugView++)의 "Find" 창에 아래 태그를 넣어 검색하
 
 ## 13. 관련 문서
 
-- `@docs/MigrationSpec_SocketToDrawing.md` — 소켓→파싱→렌더링 파이프라인 명세서 (이 로그들이 검증한 내용의 원본)
-- `@docs/WizardArchitecture.md` — 클래스 계층 전체
-- `@docs/KnowledgeBase.md` 11~12절 — RTM 흐름, 문서-코드 드리프트 이력
-- `@docs/RealtimeCodeIndex_Investigation.md` — RTM 역인덱스, `EIO_INPUT` 미해결 이슈
+- [[MigrationSpec_SocketToDrawing.md]] — 소켓→파싱→렌더링 파이프라인 명세서 (이 로그들이 검증한 내용의 원본)
+- [[WizardArchitecture.md]] — 클래스 계층 전체
+- [[KnowledgeBase.md]] 11~12절 — RTM 흐름, 문서-코드 드리프트 이력
+- [[RealtimeCodeIndex_Investigation.md]] — RTM 역인덱스, `EIO_INPUT` 미해결 이슈

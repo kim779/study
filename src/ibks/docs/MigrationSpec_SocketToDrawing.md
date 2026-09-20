@@ -103,7 +103,7 @@ updated: 2026-08-21
 
 **배경:** 연말 HTS 플랫폼 전면 교체 예정 (axis/axwizard 폐기, 새 프로세스/플랫폼으로 이전). 이 문서는 "코드베이스 이해"가 아니라 **새 플랫폼 개발팀이 참고할 수 있는 정확한 사양서**를 목표로 함. 애매한 추정은 배제하고, 실측(로그) 또는 소스 직접 확인으로 검증된 내용만 기록.
 
-**범위:** 소켓으로 원시 바이트가 들어와서, 화면에 값이 그려지기까지의 전체 파이프라인과 그 안의 모든 규칙. `@docs/WizardArchitecture.md`(클래스 계층), `@docs/RealtimeCodeIndex_Investigation.md`(RTM 매칭 상세)와 상호보완 관계 — 이 문서는 "파이프라인 전체 흐름과 프로토콜"에 집중.
+**범위:** 소켓으로 원시 바이트가 들어와서, 화면에 값이 그려지기까지의 전체 파이프라인과 그 안의 모든 규칙. [[WizardArchitecture.md]](클래스 계층), [[RealtimeCodeIndex_Investigation.md]](RTM 매칭 상세)와 상호보완 관계 — 이 문서는 "파이프라인 전체 흐름과 프로토콜"에 집중.
 
 **진행상태:** 🔍 작성 중 — **①단순 TR 송수신 카테고리는 완결(2026-08-18~19)**: 소켓 수신→재조립→파싱→필드쓰기(`SetDataNRM`/`NRM2`/`SetDataOOP`/`TAB`/`TAB2`, 그리드 `SetCells`/`SetTable`, 원장 `SetDataH`), 송신 조립(`GetDataNRM`/`NRM2`/`OOP`/`OOP2`), 인밴드 제어코드(FCC/RCC/SCC, `CC_*` 전체), 송수신 암호화(`CGuard::Xecure`, 8.9절)까지 전부 소스+실측 로그로 검증 완료(§0.1에 호출 스택 정리). 나머지 카테고리(②실시간/③체결통보/④로그인/⑤파일패치)와 `MAPX`/`DIAL` msgK, `_anmH` 채널 상세는 다음 조사 대상 (9절 참고).
 
@@ -183,7 +183,7 @@ CWizardCtrl::OnFireEvent(int type, char* pBytes, int nBytes)   ← 소켓 OCX �
 - **`msgK_AUX`(0x93)** — `OnAlert(0, chain, axisL)`(3-인자 오버로드, WizardCtrl.cpp:641)로 라우팅됨. 이 함수는 페이로드를 `<코드>\t<나머지>`로 텍스트 파싱한 뒤 `m_guard->OnAlert(code, pBytes, nBytes, type=0)`을 호출한다 — **`FEV_ANM`(RTM, `OnAlert(pBytes,nBytes)` 2-인자 오버로드)과는 다른 시그니처**이므로, 8.11.3절에서 미해결로 남겨뒀던 "`msgK_AUX`가 `_anmH`/RTM과 같은 채널인지"는 **"아니다, 최소 클라이언트 진입점(`CWizardCtrl`)에서는 별도 오버로드로 갈라진다"**까지는 확인됨. 다만 `CGuard::OnAlert`의 2-인자/4-인자 두 오버로드가 내부적으로 같은 `DoRTM` 파이프라인으로 합류하는지는 이번 조사 범위 밖(추가 확인 필요, 9절 반영).
 - **`msgK_AXIS`/`msgK_TAB`에 숨어있던 특수 `winK` 라우팅** — `winK_FMX`(0x1e, "AXIS/Frame TRx service")/`winK_DDE`(0x1f, "DDE service")면 일반 화면 라우팅(②) 대신 `OnAux()`를 거쳐 각각 `OnFire(FEV_FMX,...)`/`m_guard->OnDDE(...)`로 빠진다 — 즉 같은 msgK라도 `winK`값에 따라 "화면에 그리는 일반 TR"과 "DDE/외부프레임 연동용 TR"로 완전히 다른 목적지로 갈릴 수 있다. `CDde`(`WizardArchitecture.md` §7.5)로 이어지는 연결고리가 이번에 확정됨.
 
-실시간 시세(RTM) 갱신은 별도 경로(`CGuard::OnAlert`→`DoRTM`)를 타며 `@docs/RealtimeCodeIndex_Investigation.md`에 상세 기록됨 — 이 문서에는 개요만 요약(6절).
+실시간 시세(RTM) 갱신은 별도 경로(`CGuard::OnAlert`→`DoRTM`)를 타며 [[RealtimeCodeIndex_Investigation.md]]에 상세 기록됨 — 이 문서에는 개요만 요약(6절).
 
 ### 0.1. 단순 TR 송수신 — 함수 호출 스택 정리 (2026-08-18)
 
@@ -276,7 +276,7 @@ struct _axisH {
 | 0x27 | `msgK_UPF` | 파일 업로드 | `OutStream` |
 | 0x28 | `msgK_DNF` | 파일 다운로드 | `OutStream` |
 | 0x30 | `msgK_RSM` | 리소스 요청 (맵 파일 등, `CGuard::RequestMAPs`가 씀) | `CGuard::OnRsm` (OutStream 안 탐) |
-| 0x40 | `msgK_RTM` | 실시간 시세 데이터 | `CGuard::OnAlert`→`DoRTM` (RTM 전용 경로, `@docs/RealtimeCodeIndex_Investigation.md`) |
+| 0x40 | `msgK_RTM` | 실시간 시세 데이터 | `CGuard::OnAlert`→`DoRTM` (RTM 전용 경로, [[RealtimeCodeIndex_Investigation.md]]) |
 | 0x50 | `msgK_MAPX` | 맵(화면) 전환 지시 | 미조사 |
 | 0x80 | `msgK_ENC` | 암호화 키 데이터 | `CWizardCtrl::OnXecure` |
 | 0x81 | `msgK_XCA` | 인증서(Certify) 데이터 | `CWizardCtrl::OnXecure` |
@@ -527,7 +527,7 @@ if (screen->m_vbe->IsAvailable(procs))   // 스크립트에 이 이름의 함수
 
 ## 8. 실시간 시세(RTM) 매칭 규칙 — 요약
 
-상세는 `@docs/RealtimeCodeIndex_Investigation.md` 참고. 핵심만 요약:
+상세는 [[RealtimeCodeIndex_Investigation.md]] 참고. 핵심만 요약:
 
 - 화면의 "종목코드 필드"는 이름 규칙이 아니라 **`FA_FLASH` 속성 플래그**로 식별 (`FM_EDIT`일 수도 `FM_OUT`일 수도 있음 — 조회용 필드와 실시간 키 필드가 별개인 경우 있음)
 - 매칭은 **캐시 없이 매 틱마다 라이브로 필드값을 읽어서(`ReadData`) 비교**하는 방식 (`CScreen::OnAlert`)
@@ -1445,7 +1445,7 @@ case FM_GRID:
 
 ### 배경
 
-8.5절 "인밴드 제어코드" 절에서 다룬 `RCC`(0x1B, 드롭다운/트리 데이터 채우기)와 관련해, 실사용 화면에서 "콤보 드롭다운에 항목이 몇 개 안 들어간다"는 증상이 보고됨. `CStream::ParseRCC`(Stream.cpp:3025)의 `csCOMBO` 케이스에는 그동안 axlog가 전혀 없어서(`@docs/DebugLogGuide.md` 6절), `[ParseRCC]`/`[ParseRCC-combo]` 태그를 신규 추가(2026-08-21)한 뒤 실측 캡처로 원인을 완전히 규명함.
+8.5절 "인밴드 제어코드" 절에서 다룬 `RCC`(0x1B, 드롭다운/트리 데이터 채우기)와 관련해, 실사용 화면에서 "콤보 드롭다운에 항목이 몇 개 안 들어간다"는 증상이 보고됨. `CStream::ParseRCC`(Stream.cpp:3025)의 `csCOMBO` 케이스에는 그동안 axlog가 전혀 없어서([[DebugLogGuide.md]] 6절), `[ParseRCC]`/`[ParseRCC-combo]` 태그를 신규 추가(2026-08-21)한 뒤 실측 캡처로 원인을 완전히 규명함.
 
 ### 확인된 사실
 
@@ -1477,7 +1477,7 @@ case FM_GRID:
 | `Wizard/Stream.cpp:3025-3088` | `CStream::ParseRCC` — `csCOMBO` 처리, `[ParseRCC]`/`[ParseRCC-combo]` axlog 추가 지점(2026-08-21) |
 | `h/axis.h:296-301` | `_RCC` 구조체 정의(`rcc`/`ccs`/`name[16]`/`ccl`) — `ccl`이 `unsigned char`라 최대 255가 물리적 한계 |
 | `dll/form/fmCombo.cpp:774-846` | `CfmCombo::WriteAll` — RCC로 조립된 탭구분 문자열을 실제 콤보 항목(`m_datas`/`m_displays`)으로 분해 |
-| `@docs/DebugLogGuide.md` 6절 | `[ParseRCC]`/`[ParseRCC-combo]` 태그 설명 |
+| [[DebugLogGuide.md]] 6절 | `[ParseRCC]`/`[ParseRCC-combo]` 태그 설명 |
 
 ---
 
@@ -1493,7 +1493,7 @@ case FM_GRID:
 - **(신규, 2026-08-18, 8.5절) RCC의 `csTREE`가 `USRDIR` 하위에 파일을 쓰는 부수효과의 정확한 포맷/용도** — 존재는 확인(`CStream::ParseRCC`), 상세 미조사
 - `WM_USER` 커스텀 메시지의 정확한 용도
 - ~~TR 요청(사용자가 조회 버튼 누르는 것) → 소켓 송신 경로~~ — **확인 완료(2026-07-30), 8.8절 참고.** `RouteTR`이 `CGuard::Write(char*, int, bool)`로 최종 소켓 전송하며, 한 번의 write에 여러 화면(unit)의 `_axisH` 프레임이 배치로 묶일 수 있음
-- `CDll::OnAxis`(DLL 기반 작업영역)의 실제 파싱 로직 — **`CClient`와 다르다는 것 자체는 확인됨(2026-07-31)**: `CStream::OutStream`/`SetDataNRM`을 전혀 안 타고 받은 바이트를 그대로 `WM_USER`로 로드된 DLL에 던진다(`Dll.cpp:530`, `[CDll-OnAxis-raw]` 로그 추가, `@docs/DebugLogGuide.md` 7절). 다만 그 DLL 내부의 실제 파싱 로직 자체는 Wizard 소스 밖이라 여전히 미조사 — 실사용 사례: `9524`(이벤트 데이터 조회, 기획부) 화면이 이 경로를 탐
+- `CDll::OnAxis`(DLL 기반 작업영역)의 실제 파싱 로직 — **`CClient`와 다르다는 것 자체는 확인됨(2026-07-31)**: `CStream::OutStream`/`SetDataNRM`을 전혀 안 타고 받은 바이트를 그대로 `WM_USER`로 로드된 DLL에 던진다(`Dll.cpp:530`, `[CDll-OnAxis-raw]` 로그 추가, [[DebugLogGuide.md]] 7절). 다만 그 DLL 내부의 실제 파싱 로직 자체는 Wizard 소스 밖이라 여전히 미조사 — 실사용 사례: `9524`(이벤트 데이터 조회, 기획부) 화면이 이 경로를 탐
 - **(신규, 2026-08-19) `CDll`의 두번째 유력 사용처 후보 — `CONTROL/ibk_chart_dll_20220831/chart_dll/gView/axisGView.dll`.** KRX 애프터장 대응(1900/1901/1902 필드, 위 6항) 작업 중 `gCom`(`AxisGCom.dll`)이 `chart_dll/C_Total`이 아니라 `chart_dll/gView/grpView.cpp`가 `LoadLibrary("axisGCom.dll")`/`LoadLibrary("axisGMain.dll")`로 동적 로드하는, `C_Total`과는 독립적인 **세번째 GOOPHOOP 클라이언트 구현**임을 발견. `axisGView.def`가 export하는 유일한 함수명이 `axCreate` 하나뿐인데, 이건 `CDll::Attach`(`Wizard/Dll.cpp:454`)가 찾는 첫번째 진입점 이름과 정확히 일치 — `CDll::Attach`의 `name.Format("%s\\%s\\%s.dll", root, DEVDIR, tmapN)`(`tmapN`=화면의 8자리 맵코드) 규칙상 실제 배포 파일명은 맵코드 이름으로 리네임될 것으로 추정되어, 소스 검색만으로는 `axisGView.dll`이 정확히 어느 맵코드에 대응하는지 확인 불가(이 환경엔 배포된 HTS 폴더 자체가 없어 실물 대조도 불가능했음). `vtypeGRX`(0x04, "그래픽")가 `CDll`로 라우팅되는 두 `type` 중 하나라는 기존 기록과 정황상 맞아떨어짐 — **차트/그래프 화면이 `CDll` 경로의 원래 설계 의도였을 가능성.** 정확한 맵코드는 실제 배포 환경(`axscreenmanage.ini` 등) 확인 필요, 사용자 확인 대기 중.
 - **(신규, 2026-08-19) `gCom`(`AxisGCom.dll`)의 `MakeInputSymbol()`이 이미 오래전부터 `OJ_GUBN`(1901)을 GOOPHOOP 요청에 포함하고 있었음** — `C_Total`/IBKSConnector의 18개 필드와 달리 `gView` 경로는 19개(`...OJ_START, OJ_GUBN`, `gCom/PnInput.cpp:1361`). `axisgwin.h` 주석("소속구분")과 이번에 확인된 새 의미("장마감시간", 위 6항)가 상충하는데, 만약 `gView`가 실제로 라이브 화면에서 이 필드를 이미 쓰고 있다면 **KRX 서버측 개편으로 1901의 반환값이 바뀌는 순간 `gView` 쪽 화면에서 조용한 회귀(잘못된 데이터 표시)가 생길 위험**이 있음 — `gView`의 실사용처가 확인되는 대로 재검토 필요.
 - **(신규, 2026-08-17, 8.11.3절) `$*`(`m_push`) 전용 채널 `_anmH`/`FEV_PUSH`** — 구조(요청 SetPush/수신 OnPush/원형버퍼 반영)는 코드로 확정됐으나: (1) `anmK_*` 상수 전체 목록 미확인(`anmK_ALIVE`/`anmK_PUSH`만 확인됨), (2) `USRDIR/{pushN}` 로컬 파일의 실제 포맷/용도 미확인, (3) 1절의 `msgK_ARM`(0x92)/`msgK_AUX`(0x93)와 이 `_anmH` 채널의 관계는 **`CWizardCtrl` 레벨에서는 별개 함수로 갈라짐이 2026-08-18 확인됨(0절 참고)** — 더 아래 `CGuard` 레벨 합류 여부만 남음, (4) `$$`/`$*`를 실제로 쓰는 맵 화면 예시 미확인(`$?`만 체결그리드로 실측됨)
@@ -1505,7 +1505,7 @@ case FM_GRID:
 
 ## 10. 관련 문서
 
-- `@docs/WizardArchitecture.md` — 클래스 계층, 7절에 전체 클래스 레퍼런스
-- `@docs/RealtimeCodeIndex_Investigation.md` — RTM 종목코드 매칭 상세
-- `@docs/AxisformArchitecture.md` — 컨트롤(`CfmBase` 24종) 렌더링 레이어 상세
-- `@docs/KnowledgeBase.md` — 트러블슈팅/설계의도 누적 기록
+- [[WizardArchitecture.md]] — 클래스 계층, 7절에 전체 클래스 레퍼런스
+- [[RealtimeCodeIndex_Investigation.md]] — RTM 종목코드 매칭 상세
+- [[AxisformArchitecture.md]] — 컨트롤(`CfmBase` 24종) 렌더링 레이어 상세
+- [[KnowledgeBase.md]] — 트러블슈팅/설계의도 누적 기록

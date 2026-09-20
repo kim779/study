@@ -806,7 +806,7 @@ case FM_OUT:
 
 ## 12. axwizard 소스 분석 중 발견한 문서-코드 드리프트 (2026-07-13)
 
-`ibks/Wizard/` 전체 아키텍처 분석 프로젝트(`@docs/WizardArchitecture.md`) 진행 중, 초기 설계 문서(`@docs/python_engine_260608.md`, 2026-06-08~11 작성)와 **현재 `dll/vbs/engineWrapper.cpp` / `pythonEngine.h` 실제 코드가 달라진 부분**을 발견함. 아래는 그 상세 내용 (기존 기록은 삭제하지 않고 이 절로 보강).
+`ibks/Wizard/` 전체 아키텍처 분석 프로젝트([[WizardArchitecture.md]]) 진행 중, 초기 설계 문서([[python_engine_260608.md]], 2026-06-08~11 작성)와 **현재 `dll/vbs/engineWrapper.cpp` / `pythonEngine.h` 실제 코드가 달라진 부분**을 발견함. 아래는 그 상세 내용 (기존 기록은 삭제하지 않고 이 절로 보강).
 
 ### 12.1 엔진 선택 방식이 "순수 자동감지"에서 "빌드 시 확정 + 자동감지 폴백"으로 진화
 
@@ -928,7 +928,7 @@ m_OnTimer->PostThreadMessage(WM_QUIT, NULL, NULL);
 | `Wizard/OnTimer.h/cpp` | `COnTimer` 정의 — 빌드는 되나 미사용 |
 | `Wizard/Client.h:99`, `Client.cpp`(생성자/소멸자/`SetTimer`) | `m_OnTimer` 관련 코드가 전부 주석 처리된 실제 위치 |
 | `Wizard/Event.cpp` | 실제 타이머 처리 경로 — `CallProc`의 `WM_TIMER` 분기 |
-| `@docs/DebugLogGuide.md` 10절 | `COnTimer`에 추가한 axlog 태그 카탈로그(현재 미발화 상태 명시) |
+| [[DebugLogGuide.md]] 10절 | `COnTimer`에 추가한 axlog 태그 카탈로그(현재 미발화 상태 명시) |
 
 ---
 
@@ -982,7 +982,7 @@ OnChange(1301) #2 → Screen.Send(0) → InStream() → OnTRAN()=true (1~4번 �
 
 ### 증상
 
-`CScreen::FlashGrid`(그리드 RTM 실시간 갱신, `@docs/MigrationSpec_SocketToDrawing.md` 8.11.4절)의 axlog 진단 로그(`[FlashGrid-write]`, 2026-08-19 추가, `@docs/DebugLogGuide.md` 6절)가 찍히는 순간 프로그램이 죽는 현상을 사용자가 실측 로그로 발견. Visual Studio에서 `h/axlog.h`의 `axlog()` 구현부, `CString funcLine;` 줄(포맷 문자열 조립이 끝난 뒤 다음 `CString`을 새로 만드는 지점)에서 예외로 멈추는 것까지 확인됨 — 즉 크래시 지점 자체는 `axlog` 내부처럼 보이지만 실제 원인은 그 직전 호출부에 있었음.
+`CScreen::FlashGrid`(그리드 RTM 실시간 갱신, [[MigrationSpec_SocketToDrawing.md]] 8.11.4절)의 axlog 진단 로그(`[FlashGrid-write]`, 2026-08-19 추가, [[DebugLogGuide.md]] 6절)가 찍히는 순간 프로그램이 죽는 현상을 사용자가 실측 로그로 발견. Visual Studio에서 `h/axlog.h`의 `axlog()` 구현부, `CString funcLine;` 줄(포맷 문자열 조립이 끝난 뒤 다음 `CString`을 새로 만드는 지점)에서 예외로 멈추는 것까지 확인됨 — 즉 크래시 지점 자체는 `axlog` 내부처럼 보이지만 실제 원인은 그 직전 호출부에 있었음.
 
 ### 원인
 
@@ -1029,8 +1029,8 @@ axlog(LOG_RTM, "[FlashGrid-write] name=%.16s code=%s row=%d col=%d old=[%.32s] n
 | `dll/form/fmBase.h:171` | `CfmBase::GetName(int col=-1)` — `int m_rts` 반환 (기반 클래스 기본 구현) |
 | `dll/form/fmGrid.h:205` | `CfmGrid::GetName(int col=-1)` — `int` 반환 오버라이드 (`FlashGrid`에서 실제 호출되는 런타임 타입) |
 | `h/axlog.h` | `axlog()` 구현 — `msg.FormatV(fmt, args)` 직후 `CString funcLine` 생성 시점에 오염된 메모리로 인한 크래시가 지연 발현된 지점 |
-| `@docs/DebugLogGuide.md` 6절 | `[FlashGrid-write]` 태그 설명 (2026-08-19 추가 당시 기록, 이번 버그 발생 시점) |
-| `@docs/MigrationSpec_SocketToDrawing.md` 8.11.4절 | `FlashGrid`/`FlashSemi` 메커니즘 상세 |
+| [[DebugLogGuide.md]] 6절 | `[FlashGrid-write]` 태그 설명 (2026-08-19 추가 당시 기록, 이번 버그 발생 시점) |
+| [[MigrationSpec_SocketToDrawing.md]] 8.11.4절 | `FlashGrid`/`FlashSemi` 메커니즘 상세 |
 
 ---
 
@@ -1038,7 +1038,7 @@ axlog(LOG_RTM, "[FlashGrid-write] name=%.16s code=%s row=%d col=%d old=[%.32s] n
 
 ### 배경
 
-종합화면 "조회시 약 1분 헹" 증상 조사(`[TR-RTT]`/`[CTRL-RTT]`/`[SVC-RTT]`/`[ServiceEx-wait]` 로그 추가 작업, `@docs/DebugLogGuide.md` 6절)와 같은 맥락에서, 사용자가 "종합화면의 특정 부분에 커서가 옮겨가면 그 화면의 상황에 맞게 커서가 바뀐다"는 걸 관찰하고 axwizard 소스 중 정확히 어떤 상황에서 대기(모래시계) 커서가 뜨는지 전수조사를 요청함. 모래시계가 실제로 어떤 내부 상태를 반영하는지 알면, 헹이 발생하는 순간을 커서 상태만 보고도 "지금 어느 채널이 걸려있는지" 추정할 수 있어 진단에 도움이 됨.
+종합화면 "조회시 약 1분 헹" 증상 조사(`[TR-RTT]`/`[CTRL-RTT]`/`[SVC-RTT]`/`[ServiceEx-wait]` 로그 추가 작업, [[DebugLogGuide.md]] 6절)와 같은 맥락에서, 사용자가 "종합화면의 특정 부분에 커서가 옮겨가면 그 화면의 상황에 맞게 커서가 바뀐다"는 걸 관찰하고 axwizard 소스 중 정확히 어떤 상황에서 대기(모래시계) 커서가 뜨는지 전수조사를 요청함. 모래시계가 실제로 어떤 내부 상태를 반영하는지 알면, 헹이 발생하는 순간을 커서 상태만 보고도 "지금 어느 채널이 걸려있는지" 추정할 수 있어 진단에 도움이 됨.
 
 ### 전체 체인 — Wizard(스크립트/네트워크) → 호스트 EXE(실제 SetCursor)
 
@@ -1076,7 +1076,7 @@ CChildFrame::OnSetCursor / CSChild::OnSetCursor / CGPop::OnSetCursor
 
 1. **`Screen.Send(target)`/엔터키 조회 등** — `CStream::InStream()` 두 오버로드가 성공적으로 송신하면 항상 `WaitState(screen 또는 NULL, timeout=true)` 호출. **유일하게 `TranTimeout` 워치독이 걸리는 경로**(발견1).
 2. **`Screen.Service(trN, data, len, mode)`** — `mode`에 `US_PASS`(0x04) 비트가 없으면 `CGuard::Service()`가 `CClient::WaitState()`를 거치지 않고 **직접** `screen->m_state |= waitSN` + `PostAxis(waitPAN,...)`를 실행 → 모래시계는 뜨지만 **워치독은 안 걸림**(발견1). `mode`에 `US_PASS`가 있으면 대기상태 진입 자체를 안 함(fire-and-forget, 커서 변화 없음).
-3. **`Screen.ServiceEx(trN, data, len, mode, timeout)`** — 내부적으로 항상 `_Service(...,mode|US_PASS)`를 호출하므로 위 2번의 "대기상태 진입" 자체가 일어나지 않음(**모래시계가 안 뜬다**). 대신 `xscreen.cpp`의 자체 `PeekMessage` 루프로 UI 스레드를 직접 블로킹 — "커서는 안 바뀌는데 화면(다른 조작)은 멈추는" 유형의 헹이 이 경로에서 나올 수 있음(`@docs/DebugLogGuide.md`의 `[ServiceEx-wait]` 참고).
+3. **`Screen.ServiceEx(trN, data, len, mode, timeout)`** — 내부적으로 항상 `_Service(...,mode|US_PASS)`를 호출하므로 위 2번의 "대기상태 진입" 자체가 일어나지 않음(**모래시계가 안 뜬다**). 대신 `xscreen.cpp`의 자체 `PeekMessage` 루프로 UI 스레드를 직접 블로킹 — "커서는 안 바뀌는데 화면(다른 조작)은 멈추는" 유형의 헹이 이 경로에서 나올 수 있음([[DebugLogGuide.md]]의 `[ServiceEx-wait]` 참고).
 4. **`Screen.Wait` 스크립트 속성**(`CxScreen::_getWait`/`_setWait`, `xscreen.cpp:155`) — 스크립트가 `Screen.Wait = True`로 직접 강제 진입 가능. `WaitState(screen, timeout=false)`로 호출되므로 **역시 워치독 없음** — 스크립트가 실수로 `False`로 되돌리지 않으면(조건 분기 누락, 예외로 인한 조기 리턴 등) 이론상 무한정 모래시계가 뜬 채로 남을 수 있음.
 5. `CGuard::Approve`/`UploadFile`/`DownloadFile` 등 다른 `CGuard::Write` 계열도 각자 `waitSN`/`PostAxis`를 직접 세팅하는 유사한 코드가 있음(`Guard.cpp` 3286/3358/3479행대 — `[CTRL-send]`/`[SVC-send]` 로그를 추가했던 바로 그 자리들과 같은 함수군) — 개별 화면 정책까지 전부 확인하지는 않았으나 패턴은 2번과 동일한 것으로 보임.
 
@@ -1113,7 +1113,7 @@ case axWAIT:
     else           ::SetCursor(IDC_WAIT);    // m_cursor=0(정상)인데 모래시계?!
                                               // ChildFrm은 break 없이 axLINKEDIT로 그대로 흘러들어감
 ```
-`GPop.cpp:98`은 로직 자체는 정상(`m_cursor`가 참이면 `IDC_WAIT`)이지만, 이 세 곳 다 **`axWAIT`를 `PostMessage`/`SendMessage`로 실제 보내는 호출자가 코드베이스 전체에 단 한 곳도 없다**(전수 grep 확인) — 즉 현재는 완전히 도달 불가능한 죽은 코드다. 실제 라이브 경로는 `beginWait`/`endWait`가 `m_cursor`를 직접 멤버 대입하고 `OnSetCursor`(`WM_SETCURSOR`)가 그 값을 읽는 방식뿐이다. `COnTimer`(`@docs/KnowledgeBase.md` 14절)와 같은 유형의 leftover — 나중에 이 메시지 경로를 되살리는 리팩터링을 한다면 `ChildFrm.cpp`/`SChild.cpp`의 반전된 로직과 누락된 `break`부터 고쳐야 함.
+`GPop.cpp:98`은 로직 자체는 정상(`m_cursor`가 참이면 `IDC_WAIT`)이지만, 이 세 곳 다 **`axWAIT`를 `PostMessage`/`SendMessage`로 실제 보내는 호출자가 코드베이스 전체에 단 한 곳도 없다**(전수 grep 확인) — 즉 현재는 완전히 도달 불가능한 죽은 코드다. 실제 라이브 경로는 `beginWait`/`endWait`가 `m_cursor`를 직접 멤버 대입하고 `OnSetCursor`(`WM_SETCURSOR`)가 그 값을 읽는 방식뿐이다. `COnTimer`([[KnowledgeBase.md]] 14절)와 같은 유형의 leftover — 나중에 이 메시지 경로를 되살리는 리팩터링을 한다면 `ChildFrm.cpp`/`SChild.cpp`의 반전된 로직과 누락된 `break`부터 고쳐야 함.
 
 ### 관련 파일
 
@@ -1124,7 +1124,7 @@ case axWAIT:
 | `Wizard/Stream.cpp:44,58` | `CStream::InStream` 두 오버로드 — Send() 성공 시 `WaitState` 호출 지점 |
 | `Wizard/Guard.cpp:3071` | `CGuard::Service` — `US_PASS` 없으면 `WaitState`를 거치지 않고 직접 waitSN/waitPAN 세팅(워치독 미적용) |
 | `Wizard/xscreen.cpp:68,155-166` | `CxScreen::_getWait`/`_setWait` — 스크립트 노출 `Screen.Wait` 속성 |
-| `Wizard/xscreen.cpp:992` | `CxScreen::_ServiceEx` — 항상 `US_PASS`로 우회, 대신 자체 `PeekMessage` 대기루프(`@docs/DebugLogGuide.md`의 `[ServiceEx-wait]` 참고) |
+| `Wizard/xscreen.cpp:992` | `CxScreen::_ServiceEx` — 항상 `US_PASS`로 우회, 대신 자체 `PeekMessage` 대기루프([[DebugLogGuide.md]]의 `[ServiceEx-wait]` 참고) |
 | `Wizard/Event.cpp:284-292` | `WM_TIMER`의 `TM_WAIT` 핸들러 — 워치독 만료 시 강제 `WaitDone` + `AE_TIMEOUT` 안내 |
 | `Wizard/Guard.cpp:394` | `m_wait = GetProfileInt(WORKSTATION, TRANTMO, 0) * 1000` — 레지스트리 `TranTimeout`(초) 로드 |
 | `h/axisfire.h:89` | `waitPAN` COM Fire 이벤트 정의 |
@@ -1132,19 +1132,19 @@ case axWAIT:
 | `AXIS/ChildFrm.cpp:384`, `SChild.cpp:532`, `GPop.cpp:202` | `OnSetCursor`(`WM_SETCURSOR`) — 실제 `::SetCursor(IDC_WAIT)` 호출 지점(라이브 경로) |
 | `AXIS/ChildFrm.cpp:331`, `SChild.cpp:79`, `GPop.cpp:90` | `OnAXIS`의 `axWAIT` 분기 — 죽은 코드, ChildFrm/SChild는 로직도 반전 |
 | `map_src/IB/IB0/IB000157`, `IB000130` | `_AW_ONCLOSE_AW_`에서 `SCREEN.Service "pidomyst",...,&H02` 사용(워치독 없는 실사용 사례) |
-| `@docs/DebugLogGuide.md` 6절 | `[SVC-send]`/`[SVC-RTT]`/`[ServiceEx-wait]` — 이번 조사와 같은 맥락에서 추가된 msgK_SVC 진단 로그 |
+| [[DebugLogGuide.md]] 6절 | `[SVC-send]`/`[SVC-RTT]`/`[ServiceEx-wait]` — 이번 조사와 같은 맥락에서 추가된 msgK_SVC 진단 로그 |
 
 ---
 
 ## 18. 추가 자료
 
 ### 참고 문서
-- `@docs/Architecture.md` - 모듈 구조
-- `@docs/Dependency.md` - 라이브러리 의존성
-- `@docs/python_engine_260608.md` - 프로젝트 상세 기록
-- `@docs/CallGraph.md` - 함수 호출 흐름
-- `@docs/WizardArchitecture.md` - axwizard 클래스 계층/이벤트 흐름 상세 분석 (2026-07-13)
-- `@docs/DebugLogGuide.md` - axlog 태그 카탈로그 (이번 조사에 사용한 클립보드 로그 포함)
+- [[Architecture.md]] - 모듈 구조
+- [[Dependency.md]] - 라이브러리 의존성
+- [[python_engine_260608.md]] - 프로젝트 상세 기록
+- [[CallGraph.md]] - 함수 호출 흐름
+- [[WizardArchitecture.md]] - axwizard 클래스 계층/이벤트 흐름 상세 분석 (2026-07-13)
+- [[DebugLogGuide.md]] - axlog 태그 카탈로그 (이번 조사에 사용한 클립보드 로그 포함)
 
 ### 외부 참고
 - [Python C API 문서](https://docs.python.org/3.11/c-api/)

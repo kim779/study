@@ -411,6 +411,6 @@ Worker Thread (선택사항)
 
 ## 9. 관련 문서
 
-- `@docs/Architecture.md` - 모듈 계층 구조
-- `@docs/SourceIndex.md` - 소스 파일별 함수 색인
-- `@docs/python_engine_260608.md` - Python 엔진 전환 상세 기록
+- [[Architecture.md]] - 모듈 계층 구조
+- [[SourceIndex.md]] - 소스 파일별 함수 색인
+- [[python_engine_260608.md]] - Python 엔진 전환 상세 기록

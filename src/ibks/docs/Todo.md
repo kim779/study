@@ -327,6 +327,6 @@ if x > 10:
 
 ## 관련 문서
 
-- `@docs/Architecture.md` - 모듈 구조
-- `@docs/python_engine_260608.md` - 상세 기록
-- `@docs/KnowledgeBase.md` - 지식 베이스
+- [[Architecture.md]] - 모듈 구조
+- [[python_engine_260608.md]] - 상세 기록
+- [[KnowledgeBase.md]] - 지식 베이스

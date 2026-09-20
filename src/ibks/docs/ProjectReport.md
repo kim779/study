@@ -434,14 +434,14 @@ M5 📅 (2026-08-31) - 정식 배포 (5,391화면)
 
 ### 참고 문서
 
-- `@docs/Architecture.md`
-- `@docs/Dependency.md`
-- `@docs/SourceIndex.md`
-- `@docs/CallGraph.md`
-- `@docs/KnowledgeBase.md`
-- `@docs/Build.md`
-- `@docs/Todo.md`
-- `@docs/python_engine_260608.md`
+- [[Architecture.md]]
+- [[Dependency.md]]
+- [[SourceIndex.md]]
+- [[CallGraph.md]]
+- [[KnowledgeBase.md]]
+- [[Build.md]]
+- [[Todo.md]]
+- [[python_engine_260608.md]]
 
 ### 외부 자료
 

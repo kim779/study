@@ -442,7 +442,7 @@ axisbuilder.exe
 
 ## 11. 관련 문서
 
-- `@docs/Architecture.md` - 모듈 구조 및 인터페이스
-- `@docs/Dependency.md` - 라이브러리 의존성
-- `@docs/python_engine_260608.md` - 전환 프로젝트 상세 기록
-- `@docs/CallGraph.md` - 함수 호출 흐름도 (작성 예정)
+- [[Architecture.md]] - 모듈 구조 및 인터페이스
+- [[Dependency.md]] - 라이브러리 의존성
+- [[python_engine_260608.md]] - 전환 프로젝트 상세 기록
+- [[CallGraph.md]] - 함수 호출 흐름도 (작성 예정)

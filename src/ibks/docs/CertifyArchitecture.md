@@ -323,9 +323,9 @@ sequenceDiagram
 | `ibks/Wizard/WizardCtrl.cpp` | 로그인 응답 처리 중 CA 활성화/DN전달/CertifyFull 트리거 지점 |
 | `ibks/Wizard/xsystem.cpp:505` | `CxSystem`을 통한 스크립트 직접 서명 경로 |
 | `ibks/Wizard/Stream.cpp:1482` | `OP_CERTIFY` 맵의 TR 송신 시 자동서명 삽입 지점 |
-| `@docs/LoginSequence.md` §10 | 로그인 시퀀스 관점의 공동인증서 흐름(`AXLOGONC`/`pibfenca`), `AXISENCA`와의 관계 |
-| `@docs/WizardDependency.md` §2 | `AxisCertify.CertifyCtrl.IBK2019` 로딩 지점 |
-| `@docs/Dependency.md` | OPEN API 화이트리스트의 `axCertify.ocx` 배포 확인 |
+| [[LoginSequence.md]] §10 | 로그인 시퀀스 관점의 공동인증서 흐름(`AXLOGONC`/`pibfenca`), `AXISENCA`와의 관계 |
+| [[WizardDependency.md]] §2 | `AxisCertify.CertifyCtrl.IBK2019` 로딩 지점 |
+| [[Dependency.md]] | OPEN API 화이트리스트의 `axCertify.ocx` 배포 확인 |
 
 ---
 

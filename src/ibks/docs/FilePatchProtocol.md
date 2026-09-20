@@ -302,15 +302,15 @@ case modeRM:
 - **`GetUpdateList()`가 재개 시 파싱하는 `key`(정수) 필드**(`Wsh.cpp` 재개 파싱부, `"%s %d %d %d %s"`)도 파싱만 되고 이후 코드에서 실제 사용되는지 미확인.
 - **`m_runDown=true`가 실제로 언제 트리거되는지** — `StartAxis()`가 양수 `mode`로 호출되는 실제 시나리오(어떤 이벤트가 "세션 중 재확인"을 유발하는지)를 아직 추적하지 못함. 이걸 알아야 `defer-rsc`가 실사용 중 실제로 얼마나 자주 발생하는지 가늠 가능.
 - **AXIS 브랜치의 `RUNDIR/name@vers` 목적지 포맷** — 다운로드 대상 경로에 `@버전번호`가 붙는 이유(파일명에 버전을 실어 스테이징 후 나중에 rename하는 방식으로 추정)는 `MakeDir()`/파일쓰기 쪽 코드까지 더 봐야 확정 가능, 이번엔 미조사.
-- **`infoAXIS.new`/`infoRSC.new` 자체가 서버에서 내려오는 시점의 상세 RSM 프로토콜**(`MakeDir()`, `resK_REQ`/`resK_REQ2` 분기)은 이번 문서에서 개요만 다뤘고 세부 조각전송 규칙은 `@docs/MigrationSpec_SocketToDrawing.md` 2절(패킷 조각 재조립)과 사실상 동일한 매커니즘으로 보이나 1:1 대조 검증은 안 함.
+- **`infoAXIS.new`/`infoRSC.new` 자체가 서버에서 내려오는 시점의 상세 RSM 프로토콜**(`MakeDir()`, `resK_REQ`/`resK_REQ2` 분기)은 이번 문서에서 개요만 다뤘고 세부 조각전송 규칙은 [[MigrationSpec_SocketToDrawing.md]] 2절(패킷 조각 재조립)과 사실상 동일한 매커니즘으로 보이나 1:1 대조 검증은 안 함.
 
 ---
 
 ## 9. 관련 문서
 
-- `@docs/DebugLogGuide.md` — axlog 전체 태그 카탈로그(`LOG_FILEPATCH` 추가 예정)
-- `@docs/MigrationSpec_SocketToDrawing.md` 2절 — 패킷 조각 재조립 규칙(RSM 파일전송과 유사한 메커니즘)
-- `@docs/KnowledgeBase.md` — 관련 설계의도/트러블슈팅 누적 기록
+- [[DebugLogGuide.md]] — axlog 전체 태그 카탈로그(`LOG_FILEPATCH` 추가 예정)
+- [[MigrationSpec_SocketToDrawing.md]] 2절 — 패킷 조각 재조립 규칙(RSM 파일전송과 유사한 메커니즘)
+- [[KnowledgeBase.md]] — 관련 설계의도/트러블슈팅 누적 기록
 - `project_openapi_patch_whitelist`(사용자 메모리) — `openapi_whitelist.txt` 도입 배경(2026-08-17)
 
 ---

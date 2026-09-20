@@ -183,7 +183,7 @@ axisBuilder, awWcc, awBuild, awTool, awSock, awDlg
 
 | DLL | 위치 | 실제 사용처 |
 |---|---|---|
-| `axisform.dll` (25개 클래스, ~4000줄 CfmGrid 포함 — `@docs/AxisformArchitecture.md` 참고) | `builder/dll/form/` | **axwizard만.** `Wizard.vcxproj`가 `../dll/form/release/axisform.lib` 직접 링크 |
+| `axisform.dll` (25개 클래스, ~4000줄 CfmGrid 포함 — [[AxisformArchitecture.md]] 참고) | `builder/dll/form/` | **axwizard만.** `Wizard.vcxproj`가 `../dll/form/release/axisform.lib` 직접 링크 |
 | `axiform.dll` ("s" 없음, dllmain/draw/iForm/palette뿐인 소형 DLL) | `builder/dll/iform/` | **axisBuilder만.** `awWcc`/`awTool`/`awDlg`가 `axiform.lib`(+`axObject.lib`) 링크 |
 
 즉 axisBuilder는 자신만의 별도 프리뷰 렌더링 DLL(`axiform`)을 쓰고, axwizard가 런타임에 쓰는 진짜 `axisform`은 axisBuilder 어느 서브프로젝트에서도 링크하지 않음. 두 모듈 간 실제로 공유되는 것은 **`axislib.lib` 하나뿐.**
@@ -481,7 +481,7 @@ python311.dll                                ← axisvbs.dll 전용, 원래 없�
 
 ## 11. 관련 문서
 
-- `@docs/Architecture.md` - 모듈 구조 및 계층
-- `@docs/python_engine_260608.md` - Python 엔진 전환 상세 기록
-- `@docs/Build.md` - 빌드 프로세스 및 환경 설정 (작성 예정)
-- `@docs/SourceIndex.md` - 소스 파일 색인 (작성 예정)
+- [[Architecture.md]] - 모듈 구조 및 계층
+- [[python_engine_260608.md]] - Python 엔진 전환 상세 기록
+- [[Build.md]] - 빌드 프로세스 및 환경 설정 (작성 예정)
+- [[SourceIndex.md]] - 소스 파일 색인 (작성 예정)
