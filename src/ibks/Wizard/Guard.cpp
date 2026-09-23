@@ -6003,7 +6003,10 @@ void CGuard::InternalTrigger(CClient* client, CString procs, CString param, CStr
 BOOL CGuard::IsWait(CClient* client)
 {
 	if (client->m_status & S_WAIT)
+	{
+		axlog(LOG_EVENT, "CGuard::IsWait   m_mapN =[%s] m_status = S_WAIT[%d]", client->m_mapN, client->m_status);
 		return TRUE;
+	}
 
 	if (client->m_status & S_WORKS)
 	{
@@ -6013,7 +6016,10 @@ BOOL CGuard::IsWait(CClient* client)
 		if (m_clients.Lookup(owner, works))
 		{
 			if (((CDll*)works)->IsWait(0))
+			{
+				axlog(LOG_EVENT, "CGuard::IsWait  client->m_mapN = m_mapN[%s]", client->m_mapN);
 				return TRUE;
+			}
 			return ((CDll*)works)->IsWait();
 		}
 	}

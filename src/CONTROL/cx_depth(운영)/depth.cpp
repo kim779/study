@@ -507,6 +507,7 @@ BOOL Cdepth::Create(CWnd* parent, void* ptr)
 	m_configFile = _T("");
 	m_mapName = (LPCTSTR)m_parent->SendMessage(WM_USER, MAKEWPARAM(mapDLL, 0));
 
+	//test comment
 	if (m_rect.Width() >= 320)
 		m_bAble = true;
 	else
@@ -2901,7 +2902,9 @@ void Cdepth::drawItems(CDC* dc)
 			{
 				
 				string = item->m_data;
-
+				m_slog.Format("[cxdepth]  string=[%s]", string);
+				OutputDebugString(m_slog);
+				//string.TrimRight();
 				//호가 캡쳐
 				if (m_config.shl == 1)
 				switch (hogaTypeToInt(string))
@@ -2934,7 +2937,7 @@ void Cdepth::drawItems(CDC* dc)
 					if (string.GetLength() > 7)
 						string.Remove(',');
 				}
-
+		
 				if((ii >= askPrice1 && ii <= askPrice10))
 					m_slog.Format("------------------[%s]<%d> [depth] code=[%s] data=[%s] [%s%d%s]", __FUNCTION__, __LINE__, m_code, string, "매도", ii, "호가");   //매도1~10  실제 드로잉
 				else

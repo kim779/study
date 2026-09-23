@@ -9025,43 +9025,64 @@ void CTestDlgDlg::OnBnClickedSfcode()
 }
 
 
-void CTestDlgDlg::OnBnClickedSfcode2()
+#include <windows.h>
+#include <cstdio>
+#include <cstring>
+
+typedef void* (*PFN_Open)(int);
+typedef int   (*PFN_Compress)(void*, const unsigned char*, int, unsigned char*);
+typedef int   (*PFN_Decompress)(void*, const unsigned char*, int, unsigned char*);
+typedef void  (*PFN_Close)(void*);
+
+typedef int (*PFN_CompressFile)(const char*, const char*, bool);
+typedef int (*PFN_DecompressFile)(const char*, const char*, bool);
+void CTestDlgDlg::OnBnClickedSfcode2()  //123123
 {
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
-	CString stmp, stemp;
-	int ival = 0, cnt = 0;
-	stmp = "8;10;20;20;4;40;20;16;23;16;16;16;16;16;16;40;10;40;13;16;16;16;16;16;16;9;10;12;16;16;16;16;16;3;40;16;16;13;16;16;16;16;16;20;20;16;16;16;16;16;16;16;16;16;16;16;16;16;8;100;40;";
-
-	while (stmp.GetLength() > 0)
-	{
-		stemp = parser(stmp, ";");
-		ival += atoi(stemp);
-		cnt++;
+	HMODULE  hDll = LoadLibraryA("D:\\util\\HTS\\IBK_SMART\\exe\\lzwcodec.dll");
+	if (!hDll) { printf("LoadLibrary 실패\n"); 
+	return ; 
 	}
 
-	TRACE("!23'");
-
-	int irowcnt = 3;
-	int idata;
-	int ilinecnt = 10;
-
-	CString sData , sLine;
-	for (int ii = 0; ii < 45; ii++)
-		sData += "1";
-
-	sData = "1234567890abcdfghijk1264567890";
-
-	CString ssval;
-	ssval = "20250228+00000000150120125524         대체입금            1005대체입금                                정상                +000000000000000+000000000000000.000000+000000000000000+000000000000000+000000000000000+000000000000000+000000000000000+000000000000000HTS                                     +000000000                                        +000000000.00+000000000000000+000000000000000+000000000000000+000000000000000+000000000000000+000000000000000173734023+000000046            +000000000010000+000000000000000+000000000000000+000000000000000+000000000000000034IBKWM센터강남                           +000000000000000+000000000000000+000000000.00+000000000010000+000000000000000+000000000000000+000000000000000+000000000000000+00000000.0000000000+00000000.0000000000+000000000000000+000000000000000+000000000000000+000000000000000+000000000000000+000000000000000+000000000000000+000000000000000+000000000000000+000000000000000+000000000010000+000000000000000+000000000000000                                                                                                                                                    ";
-	int iilen = ssval.GetLength();
-
-	for (int ir = 0; ir <= irowcnt; ir++)
-	{
-		idata = 0;
-		sLine = sData.Left(ilinecnt);
-		sData = sData.Right(sData.GetLength() - ilinecnt);
-
+	auto Open = (PFN_Open)GetProcAddress(hDll, "LZW_Open");
+	auto Compress = (PFN_Compress)GetProcAddress(hDll, "LZW_Compress");
+	auto Decompress = (PFN_Decompress)GetProcAddress(hDll, "LZW_Decompress");
+	auto Close = (PFN_Close)GetProcAddress(hDll, "LZW_Close");
+	if (!Open || !Compress || !Decompress || !Close) { printf("GetProcAddress 실패\n");
+	return ;
 	}
+
+	const char* sample = "AAAAAAAAAA0000000000BBBBBBBBBB0000000000";
+	int len = (int)strlen(sample);
+
+	unsigned char cbuf[1024] = { 0 };
+	unsigned char dbuf[1024] = { 0 };
+
+	void* h = Open(13);
+	int clen = Compress(h, (const unsigned char*)sample, len, cbuf);
+	int dlen = Decompress(h, cbuf, clen, dbuf);
+	Close(h);
+	CString slog;
+	slog.Format("\r\n원본길이=%d 압축길이=%d 복원길이=%d\n", len, clen, dlen);
+	OutputDebugString(slog);
+	slog.Format("\r\n복원결과 일치=%s\n", (dlen == len && memcmp(sample, dbuf, len) == 0) ? "OK" : "FAIL");
+	OutputDebugString(slog);
+
+
+
+
+	auto CompressFile = (PFN_CompressFile)GetProcAddress(hDll, "LZW_CompressFile");
+	auto DecompressFile = (PFN_DecompressFile)GetProcAddress(hDll, "LZW_DecompressFile");
+	if (!CompressFile || !DecompressFile) { printf("GetProcAddress 실패(File)\n"); return; }
+
+	// 테스트용 원본 파일 하나 미리 만들어두세요 (예: test_original.txt, 적당히 반복되는 텍스트로)
+	int rc1 = CompressFile("D:\\util\\HTS\\IBK_SMART\\exe\\CUSTOMERCALC.exe", "D:\\util\\HTS\\IBK_SMART\\exe\\CUSTOMERCALC.bin", true);
+	int rc2 = DecompressFile("D:\\util\\HTS\\IBK_SMART\\exe\\CUSTOMERCALC.bin", "D:\\util\\HTS\\IBK_SMART\\exe\\CUSTOMERCALC.exe", true);
+
+	printf("압축 결과=%d 해제 결과=%d\n", rc1, rc2);
+
+
+	FreeLibrary(hDll);
 }
 
 //DPI

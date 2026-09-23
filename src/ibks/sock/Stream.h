@@ -9,6 +9,12 @@
 #include <afxmt.h>
 #include "../h/axisfm.h"
 
+typedef void* HLZW;
+typedef HLZW(*PFN_LZW_Open)(int);
+typedef int(*PFN_LZW_Compress)(HLZW, const unsigned char*, int, unsigned char*);
+typedef int(*PFN_LZW_Decompress)(HLZW, const unsigned char*, int, unsigned char*);
+typedef void(*PFN_LZW_Close)(HLZW);
+
 /////////////////////////////////////////////////////////////////////////////
 // CStream command target
 
@@ -59,6 +65,13 @@ protected:
 	class CWsh*	m_rsm;
 	class CWsh*	m_wsh;
 	class CCompress* m_zip;
+
+	HMODULE            m_hLzwDll;
+	PFN_LZW_Open       m_pLzwOpen;
+	PFN_LZW_Compress   m_pLzwCompress;
+	PFN_LZW_Decompress m_pLzwDecompress;
+	PFN_LZW_Close      m_pLzwClose;
+	HLZW               m_hLzw;
 
 #ifdef	_DEBUG
 	class CLog*	m_log;

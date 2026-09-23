@@ -34,6 +34,20 @@ CStream::CStream(CWsh* rsm, CWsh* wsh)
 	m_rsm    = rsm;
 	m_wsh    = wsh;
 	m_zip    = new CCompress();
+
+	m_hLzwDll = LoadLibraryA("lzwcodec.dll");
+	m_pLzwOpen = NULL; m_pLzwCompress = NULL; m_pLzwDecompress = NULL; m_pLzwClose = NULL;
+	m_hLzw = NULL;
+	if (m_hLzwDll)
+	{
+		m_pLzwOpen = (PFN_LZW_Open)GetProcAddress(m_hLzwDll, "LZW_Open");
+		m_pLzwCompress = (PFN_LZW_Compress)GetProcAddress(m_hLzwDll, "LZW_Compress");
+		m_pLzwDecompress = (PFN_LZW_Decompress)GetProcAddress(m_hLzwDll, "LZW_Decompress");
+		m_pLzwClose = (PFN_LZW_Close)GetProcAddress(m_hLzwDll, "LZW_Close");
+		if (m_pLzwOpen)
+			m_hLzw = m_pLzwOpen(13);
+	}
+
 	m_lock   = new CSingleLock(&m_event);
 
 	m_ssm    = ssM_RM;
@@ -49,6 +63,10 @@ CStream::~CStream()
 	delete m_lock;
 	delete m_zip;
 
+	if (m_hLzw && m_pLzwClose)
+		m_pLzwClose(m_hLzw);
+	if (m_hLzwDll)
+		FreeLibrary(m_hLzwDll);
 #ifdef	_DEBUG
 	delete m_log;
 #endif
@@ -208,11 +226,23 @@ bool CStream::ParseFrame()
 	switch (fmH->fmC)
 	{
 	case fmC_NRM:
-		if (fmH->stat & stat_PACK)
+		if (1 && ((m_hLzw && m_pLzwDecompress)))
 		{
-			BYTE	dbuf[maxIOs];
-			m_rcvL = m_zip->decompress((BYTE *) m_ptr, m_rcvL, dbuf);
-			CopyMemory(m_ptr, dbuf, m_rcvL);
+			if (fmH->stat & stat_PACK)
+			{
+				BYTE 	dbuf[maxIOs];
+				m_rcvL = m_pLzwDecompress(m_hLzw, (const unsigned char*)m_ptr, m_rcvL, dbuf);
+				CopyMemory(m_ptr, dbuf, m_rcvL);
+			}
+		}
+		else
+		{
+			if (fmH->stat & stat_PACK)
+			{
+				BYTE 	dbuf[maxIOs];
+				m_rcvL = m_zip->decompress((BYTE*)m_ptr, m_rcvL, dbuf);
+				CopyMemory(m_ptr, dbuf, m_rcvL);
+			}
 		}
 
 		if (m_chain)
@@ -358,7 +388,11 @@ bool CStream::WriteData(char *data, int ndat, bool wait)
 	FillMemory(fmh->rsvB, sizeof(fmh->rsvB), ' ');
 
 	int	nBytes;
-	nBytes = m_zip->compress((BYTE *) data, ndat, (BYTE *) &m_pBytesToData[L_fmH]);
+	if(1 && (m_hLzw && m_pLzwCompress))
+		nBytes = m_pLzwCompress(m_hLzw, (const unsigned char*)data, ndat, (unsigned char*)&m_pBytesToData[L_fmH]);
+	else
+		nBytes = m_zip->compress((BYTE *) data, ndat, (BYTE *) &m_pBytesToData[L_fmH]);
+
 	if (nBytes >= ndat || nBytes <= 0)
 	{
 		nBytes = ndat;

@@ -851,6 +851,7 @@ mouse_t CMouse::L_Up(CPoint& point)
 	int idx = WhichForm(point);
 	if (idx < 0 || m_mouse.m_idx != idx)
 	{
+		axlog(LOG_EVENT, "L_Up mouseOUT: downIdx=%d upIdx=%d", m_mouse.m_idx, idx);
 		form = m_screen->GetAtForm(m_mouse.m_idx);
 		if (form) form->OnLButton(false, point, result);
 		return mouse_t::mouseOUT;
@@ -970,7 +971,10 @@ bool CMouse::OnClick()
 	}
 
 	if (!m_client->m_vm->IsAvailable(m_screen, evClick, m_screen->GetAtForm(m_mouse.m_idx)))
+	{
+		axlog(LOG_EVENT, "CGuard::IsWait  IsAvailable false");
 		return false;
+	}
 
 	m_client->m_vm->OnClick(m_screen, m_screen->GetAtForm(m_mouse.m_idx));
 	return true;
