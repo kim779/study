@@ -151,3 +151,119 @@ inline void axDiagLogImpl(LPCTSTR dir, LPCTSTR sfile, const char* func, int line
 }
 
 #define axDiagLog(dir, sfile, ...) axDiagLogImpl(dir, sfile, __FUNCTION__, __LINE__, __VA_ARGS__)
+
+// axlogShow(cat, fmt, ...) - same content/formatting as axlog() above, but also appended to a
+// small floating, non-blocking window instead of only OutputDebugString/DebugView. Use this at
+// call sites where you need to *see* a value live while the screen keeps running - unlike
+// AfxMessageBox()/MessageBox(), this never blocks the message loop (no modal dialog), so it
+// can't stall a live trading screen the way a stray debug messagebox could.
+// One shared window per DLL/module (this header is header-only, so each module that includes
+// it gets its own independent window/static state - same "no link dependency" design as the
+// rest of this file); closing it via the titlebar X just hides it, it reappears on the next
+// axlogShow() call so history isn't lost. UI-thread only, same as every other axlog() call site.
+namespace axlogShowDetail
+{
+	inline LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+	{
+		switch (msg)
+		{
+		case WM_SIZE:
+		{
+			HWND hEdit = ::GetWindow(hWnd, GW_CHILD);
+			if (hEdit)
+			{
+				RECT rc;
+				::GetClientRect(hWnd, &rc);
+				::MoveWindow(hEdit, 0, 0, rc.right, rc.bottom, TRUE);
+			}
+			return 0;
+		}
+		case WM_CLOSE:
+		{}
+			// hide, don't destroy - keeps the accumulated log text around for next time
+			//::ShowWindow(hWnd, SW_HIDE);
+			//return 0;
+		}
+		return ::DefWindowProc(hWnd, msg, wParam, lParam);
+	}
+
+	inline HWND EnsureWindow()
+	{
+		static HWND s_hWnd = NULL;
+		if (::IsWindow(s_hWnd))
+			return s_hWnd;
+
+		static bool s_bRegistered = false;
+		if (!s_bRegistered)
+		{
+			WNDCLASS wc = { 0 };
+			wc.lpfnWndProc = WndProc;
+			wc.hInstance = AfxGetInstanceHandle();
+			wc.hCursor = ::LoadCursor(NULL, IDC_ARROW);
+			wc.hbrBackground = (HBRUSH)(COLOR_BTNFACE + 1);
+			wc.lpszClassName = _T("AxLogShowWnd");
+			::RegisterClass(&wc);
+			s_bRegistered = true;
+		}
+
+		s_hWnd = ::CreateWindowEx(WS_EX_TOPMOST, _T("AxLogShowWnd"), _T("axlogShow"),
+			WS_POPUPWINDOW | WS_CAPTION | WS_THICKFRAME,
+			CW_USEDEFAULT, CW_USEDEFAULT, 700, 350, NULL, NULL, AfxGetInstanceHandle(), NULL);
+		if (!s_hWnd)
+			return NULL;
+
+		::CreateWindowEx(WS_EX_CLIENTEDGE, _T("EDIT"), NULL,
+			WS_CHILD | WS_VISIBLE | WS_VSCROLL | ES_MULTILINE | ES_READONLY | ES_AUTOVSCROLL,
+			0, 0, 700, 350, s_hWnd, NULL, AfxGetInstanceHandle(), NULL);
+
+		return s_hWnd;
+	}
+
+	inline void Append(LPCTSTR text)
+	{
+		HWND hWnd = EnsureWindow();
+		if (!hWnd) return;
+
+		if (!::IsWindowVisible(hWnd))
+			::ShowWindow(hWnd, SW_SHOWNOACTIVATE);	// never steals focus from whatever's in front
+
+		HWND hEdit = ::GetWindow(hWnd, GW_CHILD);
+		if (!hEdit) return;
+
+		// cap growth so a long-running screen doesn't slowly balloon this window's memory
+		if (::GetWindowTextLength(hEdit) > 200000)
+			::SetWindowText(hEdit, _T(""));
+
+		const int len = ::GetWindowTextLength(hEdit);
+		::SendMessage(hEdit, EM_SETSEL, (WPARAM)len, (LPARAM)len);
+		::SendMessage(hEdit, EM_REPLACESEL, FALSE, (LPARAM)(LPCTSTR)text);
+		::SendMessage(hEdit, EM_REPLACESEL, FALSE, (LPARAM)_T("\r\n"));
+		::SendMessage(hEdit, EM_SCROLLCARET, 0, 0);
+	}
+}
+
+inline void axlogShowImpl(axLogCat cat, const char* func, int line, LPCTSTR fmt, ...)
+{
+	if (!axLogOn(cat)) return;
+
+	static const char* catNames[] = {
+		"INIT", "EVENT", "DATA", "RTM", "SCRIPT", "AXISFORM", "FILEPATCH", "LOGIN", "SOCK_SEND", "SOCK_RECEIVE", "CERTIFY"
+	};
+
+	va_list args;
+	va_start(args, fmt);
+	CString msg;
+	msg.FormatV(fmt, args);
+	va_end(args);
+
+	CString funcLine;
+	funcLine.Format("[%s:%d]", func, line);
+
+	CString line_out;
+	line_out.Format("[%s][%-12s] %-42s %s", AXLOG_MODULE_TAG, catNames[cat], (LPCTSTR)funcLine, (LPCTSTR)msg);
+
+	OutputDebugString(line_out + "\n");
+	axlogShowDetail::Append(line_out);
+}
+
+#define axlogShow(cat, ...) axlogShowImpl(cat, __FUNCTION__, __LINE__, __VA_ARGS__)

@@ -154,6 +154,8 @@ public:
 	CPoint		m_ptUp;
 	CArray< sGrade, sGrade > m_arrGrade;
 
+	DllInvoker shareddll{};
+	CWnd* m_pMainFrame{};
 	// Generated message map functions
 protected:
 	//{{AFX_MSG(CControlWnd)

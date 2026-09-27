@@ -9,6 +9,9 @@
 #include "../../H/interMSG.h"
 //#include "../../../axis/axMsg.hxx"
 #include "../../AXIS/axMsg.hxx"
+
+#define AXLOG_MODULE_TAG "SYMBOL"
+#include "../../ibks/h/axlog.h"
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #undef THIS_FILE
@@ -48,6 +51,8 @@ CControlWnd::CControlWnd()
 	m_bSideTime = FALSE;
 
 	m_sMkMsg.Empty();
+
+	shareddll.Load("cx_shared.dll");
 }
 
 CControlWnd::~CControlWnd()
@@ -212,9 +217,6 @@ void CControlWnd::load_jinfo3(char* pData)
 	m_jinfo.jrat = CString(jinfo.jrat, sizeof(jinfo.jrat));
 	m_jinfo.nrat = CString(jinfo.nrat, sizeof(jinfo.nrat));	// 20070718
 
-m_slog.Format("[cx_symbol][%s]<%d>  m_jinfo.codx = [%s]  m_jinfo.hnam =[%s]", __FUNCTION__, __LINE__, m_jinfo.codx, m_jinfo.hnam);
-OutputDebugString(m_slog);
-
 	// extended infomation
 	m_jinfo.krgb = CString(jinfo.krgb, sizeof(jinfo.krgb));	
 	m_sSearchkrgb = m_jinfo.krgb;
@@ -229,9 +231,19 @@ OutputDebugString(m_slog);
 	m_sCode = m_jinfo.codx; m_sCode.Trim();
 	m_sRtsCode = m_sCode;
 
-	m_slog.Format("\r\n[cx_symbol][%-40s][%d][%-35s]-->1", __FUNCTION__, __LINE__, m_sRtsCode);
-	m_slog.Trim();
+	CString snam;
+	snam.Format("%s", m_jinfo.hnam);
+	snam.TrimRight();
+	m_slog.Format("[cx_symbol][%s]<%d>  m_jinfo.codx = [%s]  m_jinfo.hnam =[%s]", __FUNCTION__, __LINE__, m_jinfo.codx, snam);
 	OutputDebugString(m_slog);
+
+	m_slog.Format("\r\n[cx_symbol][%-40s][%d][%-35s][%s]", __FUNCTION__, __LINE__, m_sRtsCode, snam);
+	m_slog.Trim();
+	if(m_pMainFrame)
+		m_pMainFrame->SendMessage(WM_USER, MMSG_SHARED_GUIDEMESSAGE, (LPARAM)(LPSTR)(LPCTSTR)m_slog);
+	OutputDebugString(m_slog);
+	// 모달 메시지박스 대신 모달리스 로그창으로 확인 (axlog.h::axlogShow)
+	axlogShow(LOG_DATA, "%s", (LPCTSTR)m_slog);
 
 	m_sInfo = m_jinfo.krgb;
 	m_sInfo.TrimRight();
@@ -282,7 +294,7 @@ long CControlWnd::OnMessage(WPARAM wParam, LPARAM lParam)
 		struct	_extTHx* exth;
 		exth = (struct _extTHx*)lParam;
 
-		m_slog.Format("\r\n[memo][%-40s][%d][%-35s]--> key=[%s] len=[%d] ",
+		m_slog.Format("\r\n[cx_symbol][dll_oubx][%-40s][%d][%-35s]--> key=[%s] len=[%d] ",
 			__FUNCTION__, __LINE__, "DLL_OUBx_size", GetMemoTrKeyType(exth->key), exth->size);
 		m_slog.Trim();
 		OutputDebugString(m_slog);
@@ -497,9 +509,9 @@ long CControlWnd::OnMessage(WPARAM wParam, LPARAM lParam)
 
 	case DLL_OUB:	// NOT USED. Use DLL_OUBx Only !!!
 		key = LOWORD(HIBYTE(wParam));
-		m_slog.Format("\r\n[memo][%-40s][%d][%-35s]-->key=[%s] len=[%d] [%.50s] ", __FUNCTION__, __LINE__, "DLL_OUB",
+		m_slog.Format("\r\n[cx_symbol][dll_oub][%-40s][%d][%-35s]-->key=[%s] len=[%d] [%.50s] ", __FUNCTION__, __LINE__, "DLL_OUB",
 			GetMemoTrKeyType(key), HIWORD(wParam), (char*)lParam);
-		m_slog.Trim();
+		m_slog.Trim(); 
 		OutputDebugString(m_slog);
 
 
@@ -2297,6 +2309,23 @@ int CControlWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 	codedll.Load("axiscode.dll");
 	LoadLoanGrade();
+
+	shareddll.Load("cx_shared.dll");
+
+	if (shareddll.IsLoaded())
+	{
+		if (!shareddll.Function<const bool WINAPI(int, CWnd**)>("axGetData")(1, &m_pMainFrame))
+		{
+			m_pMainFrame = GetTopLevelParent();
+			m_slog.Format("				[cx_symbol][mainWnd]  GetTopLevelParent m_pMainFrame=[%x]", m_pMainFrame);
+			OutputDebugString(m_slog);
+		}
+		else
+		{
+			m_slog.Format("				[cx_symbol][mainWnd]  !!!!not GetTopLevelParent[%x] shared!!! m_pMainFrame=[%x] ", GetTopLevelParent(), m_pMainFrame);
+			OutputDebugString(m_slog);
+		}
+	}
 	
 	return 0;
 }
