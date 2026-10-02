@@ -97,7 +97,7 @@ class Cdepth : public CWnd
 public:
 	Cdepth();
 	virtual ~Cdepth();
-
+	DWORD	m_dwTestOpenTick;	//TEST_TEMP: 화면 연 시각(테스트용, 완료 후 삭제)
 protected:
 	CString	m_class;
 	CWnd*	m_parent;

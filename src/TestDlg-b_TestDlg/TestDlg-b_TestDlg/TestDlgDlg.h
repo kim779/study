@@ -392,5 +392,6 @@ public:
 	public:
 
 		afx_msg void OnBnClickedDump();
+		afx_msg void OnBnClickedSecuresession();
 };
 static cs_TLS* m_csTls;

@@ -85,6 +85,27 @@ public:
 	CWnd*		m_certify;
 	COleDropEx	m_drop;
 
+#ifdef DF_MD_XECURE
+	typedef void* HSS;
+	typedef HSS(*PFN_SS_Open)(const char*, const char*, unsigned char*, int*);
+	typedef int  (*PFN_SS_Handshake)(HSS, const unsigned char*, int, unsigned char*, int*);
+	typedef int  (*PFN_SS_Encrypt)(HSS, const unsigned char*, int, unsigned char*, int*);
+	typedef int  (*PFN_SS_Decrypt)(HSS, const unsigned char*, int, unsigned char*, int*);
+	typedef void (*PFN_SS_Close)(HSS);
+	typedef const char* (*PFN_SS_GetLastError)(void);
+
+	HMODULE             m_hSecureSession;
+	PFN_SS_Open         m_pSSOpen;
+	PFN_SS_Handshake    m_pSSHandshake;
+	PFN_SS_Encrypt      m_pSSEncrypt;
+	PFN_SS_Decrypt      m_pSSDecrypt;
+	PFN_SS_Close        m_pSSClose;
+	PFN_SS_GetLastError m_pSSGetLastError;
+	HSS                 m_ss;   // 실제(우선) 암호화 세션 핸들
+
+#endif 
+
+
 	CAxisPalette*	m_palette;		// Axis palette
 	CAxisDraw*	m_draw;
 	class CTips*	m_tips;

@@ -14,5 +14,5 @@
 // 켜려면 아래 줄 주석 해제 후 재빌드 - DoRTM의 실제 동작(전체순회)은 그대로이고
 // 인덱스 조회 결과를 로그로만 비교합니다. (docs/RealtimeCodeIndex_Investigation.md)
  #define DF_RTM_INDEX
-
+#define  DF_MD_XECURE
 #endif //PCH_H

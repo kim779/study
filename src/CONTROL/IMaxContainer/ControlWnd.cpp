@@ -220,7 +220,7 @@ long CControlWnd::IMAXOnMessageFETCH(WPARAM wParam, LPARAM lParam)
 	int nView = (int)lParam;
 	int nOk = (int)wParam;
 
-	m_slog.Format("[IMAX][FETCH][%s] nView = [%d] nOk = [%d] m_bLoinSuccess=[%d]", __FUNCTION__, nView, nOk, m_bLoinSuccess);
+	m_slog.Format("[주간][IMAX][FETCH][%s] nView = [%d] nOk = [%d] m_bLoinSuccess=[%d]", __FUNCTION__, nView, nOk, m_bLoinSuccess);
 	OutputDebugString(m_slog);
 
 	// 20141105 WParam 0 이면 화면 오픈실패, 그외에는 성공
@@ -235,7 +235,7 @@ long CControlWnd::IMAXOnMessageFETCH(WPARAM wParam, LPARAM lParam)
 
 long CControlWnd::IMAXOnMessageOPEN(WPARAM wParam, LPARAM lParam)
 {
-m_tmpX.Format("IMAXOnMessageOPEN()[OPEN] viewNo[%s]msg[%s]map[%s]", m_sViewNo, (LPCTSTR)lParam, (LPCTSTR)wParam);
+m_tmpX.Format("[주간]IMAXOnMessageOPEN()[OPEN] viewNo[%s]msg[%s]map[%s]", m_sViewNo, (LPCTSTR)lParam, (LPCTSTR)wParam);
 OutputDebugString(m_tmpX);
 dprint();
 OutputDebugString(m_tmpX);
@@ -309,7 +309,8 @@ OutputDebugString(m_tmpX);
 //
 long CControlWnd::IMAXOnMessageJano(WPARAM wParam, LPARAM lParam)
 {
-	
+	m_slog.Format("[주간][%s] [%d] ", __FUNCTION__, wParam);
+	OutputDebugString(m_slog);
 	if (m_sViewNo == "1428") //잔고인경우4
 	{
 		m_slog.Format("IMAXOnMessageJano()  viewNo[%s][%s] wParam = [%d] msg[%s]", m_sViewNo, m_param.options,(int)wParam, (LPCTSTR)lParam);
@@ -417,7 +418,7 @@ long CControlWnd::IMAXOnMessageJano(WPARAM wParam, LPARAM lParam)
 
 long CControlWnd::IMAXOnMessageCODEChange(WPARAM wParam, LPARAM lParam)
 {
-m_tmpX.Format("IMAXOnMessageCODEChange()[CODEChange] viewNo[%s]msg[%s]", m_sViewNo, (LPCTSTR)lParam); dprint();
+m_tmpX.Format("[주간]IMAXOnMessageCODEChange()[CODEChange] viewNo[%s]msg[%s]", m_sViewNo, (LPCTSTR)lParam); dprint();
 OutputDebugString(m_tmpX);
 
 	CString sIMAXMessageInfo = (LPCTSTR)lParam;
@@ -427,10 +428,11 @@ OutputDebugString(m_tmpX);
 
 long CControlWnd::IMAXOnMessageORDERINFO(WPARAM wParam, LPARAM lParam)
 {
-m_tmpX.Format("IMAXOnMessageORDERINFO()[ORDERINFO] viewNo[%s]msg[%s]", m_sViewNo, (LPCTSTR)lParam); dprint();	
-OutputDebugString(m_tmpX);
-
 	CString sIMAXMessageInfo = (LPCTSTR)lParam;
+	m_tmpX.Format("[주간]IMAXOnMessageORDERINFO()[ORDERINFO] sIMAXMessageInfo=[%s] viewNo[%s] msg[%s]", sIMAXMessageInfo,m_sViewNo, (LPCTSTR)lParam); dprint();
+	OutputDebugString(m_tmpX);
+
+
 
 	if (sIMAXMessageInfo.Find('\t') < 0)
 		parseIMAXMessageData(IMAX_INFO_ORDERPRICE, sIMAXMessageInfo);
@@ -567,7 +569,7 @@ m_tmpX.Format("parseIMAXMessageData(IMAX_INFO_BUTTONEVENT) viewNo[%s]Kind[%d]sEx
 	{
 		m_sExid = sExid;
 		stmp.Format("%s\t%s", IMAX_EXID, sExid);
-		if (m_sViewNo != "1427")
+		if (m_sViewNo != "1427" && m_sViewNo != "1527")
 			IMAXToMapTrigger(stmp);
 m_tmpX = _T("parseIMAXMessageData() EXID_") + stmp; dprint();		
 	
@@ -771,7 +773,8 @@ void CControlWnd::LoginIMAX()
 long CControlWnd::OnMsgFormDlg(WPARAM wParam, LPARAM lParam)
 {
 	int ival = (int)wParam;
-	m_slog.Format("%d", ival);
+	m_slog.Format("[주간][%s] %d", __FUNCTION__,  ival);
+	OutputDebugString(m_slog);
 	switch (ival)
 	{
 		case 0:

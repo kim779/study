@@ -45,7 +45,7 @@ CSampleWnd::~CSampleWnd()
 		m_pMarketpicker->DestroyWindow();
 		delete m_pMarketpicker;
 	}
-	// cleanup mirrors IB100300(운영)\MapWnd.cpp's own m_pwndSymbol teardown
+	// cleanup mirrors IB100300(운영)\MapWnd.cpp's own m_pwn                                              dSymbol teardown
 	if (m_pwndSymbol)
 	{
 		if (IsWindow(m_pwndSymbol->GetSafeHwnd()))

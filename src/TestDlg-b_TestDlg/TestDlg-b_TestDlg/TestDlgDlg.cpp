@@ -338,6 +338,7 @@ BEGIN_MESSAGE_MAP(CTestDlgDlg, CDialogEx)
 		ON_BN_CLICKED(IDC_MFC_REGE2, &CTestDlgDlg::OnBnClickedMfcRege2)
 		ON_BN_CLICKED(IDC_MFC_SEARCH, &CTestDlgDlg::OnBnClickedMfcSearch)
 		ON_BN_CLICKED(IDC_DUMP, &CTestDlgDlg::OnBnClickedDump)
+		ON_BN_CLICKED(IDC_SECURESESSION, &CTestDlgDlg::OnBnClickedSecuresession)
 		END_MESSAGE_MAP()
 
 
@@ -5944,13 +5945,9 @@ void CTestDlgDlg::OnBnClickedBtnCmd2()
 void CTestDlgDlg::OnBnClickedBtnSock()
 {
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
-	CSockDlg dlg;
-	dlg.DoModal();
-
-	
-
-
-
+	CSockDlg* dlg = new CSockDlg(this);
+	dlg->Create(IDD_DLG_SOCK, this);
+	dlg->ShowWindow(SW_SHOW);
 }
 
 
@@ -8068,12 +8065,7 @@ void CTestDlgDlg::OnBnClickedBtnMonitor2()
 }
 
 
-void CTestDlgDlg::OnBnClickedBtnWrite32()
-{
-	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
-	/*CString stmp{}, sCode, sName, sFilepath;
-	sFilepath = "F:\\util\\HTS\\IBK투자증권 HTS\\tab\\axPOPMenu.INI";*/
-}
+
 
 #include <imm.h>
 void CTestDlgDlg::CheckIME()
@@ -9022,67 +9014,6 @@ void CTestDlgDlg::OnBnClickedSfcode()
 	CString stmp;
 	stmp.Format("%d", ival);
 	AfxMessageBox(stmp);
-}
-
-
-#include <windows.h>
-#include <cstdio>
-#include <cstring>
-
-typedef void* (*PFN_Open)(int);
-typedef int   (*PFN_Compress)(void*, const unsigned char*, int, unsigned char*);
-typedef int   (*PFN_Decompress)(void*, const unsigned char*, int, unsigned char*);
-typedef void  (*PFN_Close)(void*);
-
-typedef int (*PFN_CompressFile)(const char*, const char*, bool);
-typedef int (*PFN_DecompressFile)(const char*, const char*, bool);
-void CTestDlgDlg::OnBnClickedSfcode2()  //123123
-{
-	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
-	HMODULE  hDll = LoadLibraryA("D:\\util\\HTS\\IBK_SMART\\exe\\lzwcodec.dll");
-	if (!hDll) { printf("LoadLibrary 실패\n"); 
-	return ; 
-	}
-
-	auto Open = (PFN_Open)GetProcAddress(hDll, "LZW_Open");
-	auto Compress = (PFN_Compress)GetProcAddress(hDll, "LZW_Compress");
-	auto Decompress = (PFN_Decompress)GetProcAddress(hDll, "LZW_Decompress");
-	auto Close = (PFN_Close)GetProcAddress(hDll, "LZW_Close");
-	if (!Open || !Compress || !Decompress || !Close) { printf("GetProcAddress 실패\n");
-	return ;
-	}
-
-	const char* sample = "AAAAAAAAAA0000000000BBBBBBBBBB0000000000";
-	int len = (int)strlen(sample);
-
-	unsigned char cbuf[1024] = { 0 };
-	unsigned char dbuf[1024] = { 0 };
-
-	void* h = Open(13);
-	int clen = Compress(h, (const unsigned char*)sample, len, cbuf);
-	int dlen = Decompress(h, cbuf, clen, dbuf);
-	Close(h);
-	CString slog;
-	slog.Format("\r\n원본길이=%d 압축길이=%d 복원길이=%d\n", len, clen, dlen);
-	OutputDebugString(slog);
-	slog.Format("\r\n복원결과 일치=%s\n", (dlen == len && memcmp(sample, dbuf, len) == 0) ? "OK" : "FAIL");
-	OutputDebugString(slog);
-
-
-
-
-	auto CompressFile = (PFN_CompressFile)GetProcAddress(hDll, "LZW_CompressFile");
-	auto DecompressFile = (PFN_DecompressFile)GetProcAddress(hDll, "LZW_DecompressFile");
-	if (!CompressFile || !DecompressFile) { printf("GetProcAddress 실패(File)\n"); return; }
-
-	// 테스트용 원본 파일 하나 미리 만들어두세요 (예: test_original.txt, 적당히 반복되는 텍스트로)
-	int rc1 = CompressFile("D:\\util\\HTS\\IBK_SMART\\exe\\CUSTOMERCALC.exe", "D:\\util\\HTS\\IBK_SMART\\exe\\CUSTOMERCALC.bin", true);
-	int rc2 = DecompressFile("D:\\util\\HTS\\IBK_SMART\\exe\\CUSTOMERCALC.bin", "D:\\util\\HTS\\IBK_SMART\\exe\\CUSTOMERCALC.exe", true);
-
-	printf("압축 결과=%d 해제 결과=%d\n", rc1, rc2);
-
-
-	FreeLibrary(hDll);
 }
 
 //DPI
@@ -10619,4 +10550,148 @@ void CTestDlgDlg::OnBnClickedFdsfile2()
 	void CTestDlgDlg::OnBnClickedDump()
 	{
 		// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	}
+
+#include <windows.h>
+#include <cstdio>
+#include <cstring>
+
+	typedef void* (*PFN_Open)(int);
+	typedef int   (*PFN_Compress)(void*, const unsigned char*, int, unsigned char*);
+	typedef int   (*PFN_Decompress)(void*, const unsigned char*, int, unsigned char*);
+	typedef void  (*PFN_Close)(void*);
+
+	typedef int (*PFN_CompressFile)(const char*, const char*, bool);
+	typedef int (*PFN_DecompressFile)(const char*, const char*, bool);
+	void CTestDlgDlg::OnBnClickedSfcode2()  //123123
+	{
+		// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+		HMODULE  hDll = LoadLibraryA("D:\\util\\HTS\\IBK_SMART\\exe\\lzwcodec.dll");
+		if (!hDll) {
+			printf("LoadLibrary 실패\n");
+			return;
+		}
+
+		auto Open = (PFN_Open)GetProcAddress(hDll, "LZW_Open");
+		auto Compress = (PFN_Compress)GetProcAddress(hDll, "LZW_Compress");
+		auto Decompress = (PFN_Decompress)GetProcAddress(hDll, "LZW_Decompress");
+		auto Close = (PFN_Close)GetProcAddress(hDll, "LZW_Close");
+		if (!Open || !Compress || !Decompress || !Close) {
+			printf("GetProcAddress 실패\n");
+			return;
+		}
+
+		const char* sample = "AAAAAAAAAA0000000000BBBBBBBBBB0000000000";
+		int len = (int)strlen(sample);
+
+		unsigned char cbuf[1024] = { 0 };
+		unsigned char dbuf[1024] = { 0 };
+
+		void* h = Open(13);
+		int clen = Compress(h, (const unsigned char*)sample, len, cbuf);
+		int dlen = Decompress(h, cbuf, clen, dbuf);
+		Close(h);
+		CString slog;
+		slog.Format("\r\n원본길이=%d 압축길이=%d 복원길이=%d\n", len, clen, dlen);
+		OutputDebugString(slog);
+		slog.Format("\r\n복원결과 일치=%s\n", (dlen == len && memcmp(sample, dbuf, len) == 0) ? "OK" : "FAIL");
+		OutputDebugString(slog);
+
+
+
+
+		auto CompressFile = (PFN_CompressFile)GetProcAddress(hDll, "LZW_CompressFile");
+		auto DecompressFile = (PFN_DecompressFile)GetProcAddress(hDll, "LZW_DecompressFile");
+		if (!CompressFile || !DecompressFile) { printf("GetProcAddress 실패(File)\n"); return; }
+
+		// 테스트용 원본 파일 하나 미리 만들어두세요 (예: test_original.txt, 적당히 반복되는 텍스트로)
+		int rc1 = CompressFile("D:\\util\\HTS\\IBK_SMART\\exe\\CUSTOMERCALC.exe", "D:\\util\\HTS\\IBK_SMART\\exe\\CUSTOMERCALC.bin", true);
+		int rc2 = DecompressFile("D:\\util\\HTS\\IBK_SMART\\exe\\CUSTOMERCALC.bin", "D:\\util\\HTS\\IBK_SMART\\exe\\CUSTOMERCALC.exe", true);
+
+		printf("압축 결과=%d 해제 결과=%d\n", rc1, rc2);
+
+
+		FreeLibrary(hDll);
+	}
+
+#include "D:\src\IBKS\src\ibks\securesession\securesession\securesession.h"
+#pragma comment (lib, "D:\\src\\IBKS\\src\\ibks\\securesession\\Release\\securesession.lib")
+	void CTestDlgDlg::OnBnClickedSecuresession()  
+	{
+		// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+		HMODULE  hDll = LoadLibraryA("D:\\src\\IBKS\\src\\ibks\\securesession\\Release\\securesession.dll");
+		if (!hDll) {
+			printf("LoadLibrary 실패\n");
+			return;
+		}
+
+		unsigned char outBuf[65536];
+		int outLen = sizeof(outBuf);
+
+		HSS h = SS_Open("qwer1234", "C:\\IBKS\\IBK투자증권 HTS\\exe\\xc_conf.ini", outBuf, &outLen);
+
+		if (h == NULL)
+		{
+			CString msg;
+			//msg.Format(_T("SS_Open 실패: %s"), SS_GetLastError());
+			const char* err = SS_GetLastError();
+			int wlen = MultiByteToWideChar(CP_UTF8, 0, err, -1, NULL, 0);
+			wchar_t* wbuf = new wchar_t[wlen];
+			MultiByteToWideChar(CP_UTF8, 0, err, -1, wbuf, wlen);
+
+			int alen = WideCharToMultiByte(CP_ACP, 0, wbuf, -1, NULL, 0, NULL, NULL);
+			char* abuf = new char[alen];
+			WideCharToMultiByte(CP_ACP, 0, wbuf, -1, abuf, alen, NULL, NULL);
+
+
+			msg.Format("SS_Open 실패: %s", abuf);
+			AfxMessageBox(msg);
+
+			delete[] wbuf;
+			delete[] abuf;
+		}
+		else
+			printf("SS_Open 성공, outLen=%d\n", outLen);
+	}
+
+	//certsign test
+#include "D:\\src\\IBKS\\src\\ibks\\certsign\\certsign\\certsign.h"
+#pragma comment (lib, "D:\\src\\IBKS\\src\\ibks\\certsign\\release\\certsign.lib")
+	void CTestDlgDlg::OnBnClickedBtnWrite32()
+	{
+		HCS h = CS_Open();
+		if (!h)
+		{
+			AfxMessageBox(_T("CS_Open 실패"));
+			return;
+		}
+
+		// 실제 등록된 테스트용 인증서 DN + 비밀번호로 교체해서 테스트
+		int rc = CS_Select(h,
+			"cn=황펭귄,ou=테스트지점,ou=테스트회사,ou=테스트업종,o=SignKorea,c=KR",
+			"ahffkdy123 ",3,
+			"cn=황펭귄 ou=테스트지점 ou=테스트회사 ou=테스트업종 o=SignKorea c=KR");
+
+		CString msg;
+		msg.Format(_T("CS_Select rc=%d  err=%hs"), rc, CS_GetLastError());
+		AfxMessageBox(msg);
+
+		CS_Close(h);
+
+
+
+		//HCS h = CS_Open();
+		//if (!h) { AfxMessageBox(_T("CS_Open 실패")); return; }
+
+		//char dn[301] = { 0 };
+		//unsigned char storage = 0;
+		//char certSetName[513] = { 0 };
+
+		//int rc = CS_SelectInteractive(h, GetSafeHwnd(), dn, sizeof(dn), &storage, certSetName, sizeof(certSetName));
+
+		//CString msg;
+		//msg.Format(_T("rc=%d\ndn=%hs\nstorage=%d\ncertSetName=%hs"), rc, dn, (int)storage, certSetName);
+		//AfxMessageBox(msg);
+
+		//CS_Close(h);
 	}

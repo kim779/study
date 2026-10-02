@@ -101,6 +101,17 @@ CGuard::CGuard()
 	axFDSValue = NULL;
 
 	ZeroMemory(m_encID, sizeof(m_encID));
+
+#ifdef DF_MD_XECURE
+	m_hSecureSession = NULL;
+	m_pSSOpen = NULL;
+	m_pSSHandshake = NULL;
+	m_pSSEncrypt = NULL;
+	m_pSSDecrypt = NULL;
+	m_pSSClose = NULL;
+	m_pSSGetLastError = NULL;
+	m_ss = NULL;
+#endif
 }
 
 CGuard::~CGuard()
@@ -231,6 +242,34 @@ int CGuard::Initial(CWnd* control)
 #ifndef _DEBUG
 	});
 #endif // !1
+
+#ifdef DF_MD_XECURE
+	m_hSecureSession = LoadLibrary(_T("securesession.dll"));
+	if (m_hSecureSession)
+	{
+		m_pSSOpen = (PFN_SS_Open)GetProcAddress(m_hSecureSession, "SS_Open");
+		m_pSSHandshake = (PFN_SS_Handshake)GetProcAddress(m_hSecureSession, "SS_Handshake");
+		m_pSSEncrypt = (PFN_SS_Encrypt)GetProcAddress(m_hSecureSession, "SS_Encrypt");
+		m_pSSDecrypt = (PFN_SS_Decrypt)GetProcAddress(m_hSecureSession, "SS_Decrypt");
+		m_pSSClose = (PFN_SS_Close)GetProcAddress(m_hSecureSession, "SS_Close");
+		m_pSSGetLastError = (PFN_SS_GetLastError)GetProcAddress(m_hSecureSession, "SS_GetLastError");
+
+		if (!m_pSSOpen || !m_pSSHandshake || !m_pSSEncrypt || !m_pSSDecrypt || !m_pSSClose)
+		{
+			axlog(LOG_INIT, "CGuard::Initial securesession.dll loaded but export missing - fallback to vendor control");
+			FreeLibrary(m_hSecureSession);
+			m_hSecureSession = NULL;
+		}
+		else
+		{
+			axlog(LOG_INIT, "CGuard::Initial securesession.dll loaded OK");
+		}
+	}
+	else
+	{
+		axlog(LOG_INIT, "CGuard::Initial securesession.dll not found - fallback to vendor control");
+	}
+#endif
 //	//xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
 	if (!m_sock->CreateControl(_T("AxisSock.SockCtrl.IBK2019"), NULL, WS_VISIBLE, CRect(0, 0, 0, 0), control, -1))
@@ -2127,6 +2166,35 @@ LOG_OUTP(3, "axwizard", __FUNCTION__, m_slog);
 
 BOOL CGuard::Xecure(int helper, char* pBytes, int& nBytes)
 {
+#ifdef DF_MD_XECURE
+	int nBytesIn = nBytes;
+
+	if (m_hSecureSession && m_ss &&
+		((helper == DI_ENC && m_pSSEncrypt) || (helper == DI_DEC && m_pSSDecrypt)))
+	{
+		unsigned char outBuf[65536];
+		int outLen = sizeof(outBuf);
+		int rc;
+
+		if (helper == DI_ENC)
+			rc = m_pSSEncrypt(m_ss, (unsigned char*)pBytes, nBytesIn, outBuf, &outLen);
+		else
+			rc = m_pSSDecrypt(m_ss, (unsigned char*)pBytes, nBytesIn, outBuf, &outLen);
+
+		axlog(LOG_DATA, "[Xecure] helper=%s(ours) nBytesIn=%d nBytesOut=%d rc=%d",
+			helper == DI_ENC ? "ENC" : "DEC", nBytesIn, outLen, rc);
+
+		if (rc == 0)
+		{
+			CopyMemory(pBytes, outBuf, outLen);
+			nBytes = outLen;
+			return TRUE;
+		}
+		axlog(LOG_DATA, "[Xecure] helper=%s(ours) FAILED, fallback to vendor control",
+			helper == DI_ENC ? "ENC" : "DEC");
+		nBytes = nBytesIn;   // 폴백 전에 원래 길이로 복원
+	}
+#else
 	if (m_xecure == NULL)
 	{
 		axlog(LOG_DATA, "[Xecure] helper=%s SKIPPED (m_xecure is NULL)", helper == DI_ENC ? "ENC" : "DEC");
@@ -2139,6 +2207,7 @@ BOOL CGuard::Xecure(int helper, char* pBytes, int& nBytes)
 	axlog(LOG_DATA, "[Xecure] helper=%s nBytesIn=%d nBytesOut=%d retv=%d",
 		helper == DI_ENC ? "ENC" : "DEC", nBytesIn, nBytes, retv);
 	return retv;
+#endif
 }
 
 // Dev-only override: if NOENC.TXT exists next to the running host exe (not
@@ -2161,7 +2230,7 @@ BOOL CGuard::IsNoEncMode()
 
 	CString checkPath = exeDir + "\\NOENC.TXT";
 	BOOL noEnc = (::GetFileAttributes(checkPath) != INVALID_FILE_ATTRIBUTES);
-	axlog(LOG_DATA, "[Xecure] IsNoEncMode check path=%s result=%d", checkPath.GetString(), noEnc);
+	//axlog(LOG_DATA, "[Xecure] IsNoEncMode check path=%s result=%d", checkPath.GetString(), noEnc);
 	return noEnc;
 }
 

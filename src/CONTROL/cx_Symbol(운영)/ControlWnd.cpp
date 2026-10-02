@@ -237,13 +237,13 @@ void CControlWnd::load_jinfo3(char* pData)
 	m_slog.Format("[cx_symbol][%s]<%d>  m_jinfo.codx = [%s]  m_jinfo.hnam =[%s]", __FUNCTION__, __LINE__, m_jinfo.codx, snam);
 	OutputDebugString(m_slog);
 
-	m_slog.Format("\r\n[cx_symbol][%-40s][%d][%-35s][%s]", __FUNCTION__, __LINE__, m_sRtsCode, snam);
+	m_slog.Format("\r\n[cx_symbol][%-40s][%d][%s][%s]", __FUNCTION__, __LINE__, m_sRtsCode, snam);
 	m_slog.Trim();
 	if(m_pMainFrame)
 		m_pMainFrame->SendMessage(WM_USER, MMSG_SHARED_GUIDEMESSAGE, (LPARAM)(LPSTR)(LPCTSTR)m_slog);
 	OutputDebugString(m_slog);
 	// 모달 메시지박스 대신 모달리스 로그창으로 확인 (axlog.h::axlogShow)
-	axlogShow(LOG_DATA, "%s", (LPCTSTR)m_slog);
+	//axlogShow(LOG_DATA, "%s", (LPCTSTR)m_slog);
 
 	m_sInfo = m_jinfo.krgb;
 	m_sInfo.TrimRight();

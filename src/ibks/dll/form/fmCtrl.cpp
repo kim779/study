@@ -425,6 +425,9 @@ LRESULT CALLBACK ControlProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	CRect	rect(0,0,0,0);
 	CPoint	pt(0,0);
 
+	/*axlog(LOG_EVENT, "[ControlProc] map=%.8s name=%.16s msg= [%d]  ",
+		ctrl->m_axform->m_mapH->mapN, (char*)ctrl->m_form->name, msg );*/
+
 	switch (msg)
 	{
 	case WM_SETFOCUS:

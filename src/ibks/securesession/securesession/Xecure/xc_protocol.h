@@ -1,0 +1,250 @@
+#ifndef __XC_PROTOCOL_H__
+#define __XC_PROTOCOL_H__
+
+struct _RPC_ASYNC_STATE;
+
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+#define XC_STATE
+
+/* Type definition */
+#define uint8   unsigned char
+#define uint16  unsigned short
+#define uint32  unsigned int
+
+/*	Size	*/
+#define	SIZE_128				128
+#define	SIZE_256				256
+#define	SIZE_512				512
+#define	SIZE_1K					1024
+#define	SIZE_2K					1024*2
+#define	SIZE_2KM				1024*2-1
+#define	SIZE_4K					1024*4
+#define	SIZE_8K					1024*8
+#define	SIZE_16K				1024*16
+#define	SIZE_32K				1024*32
+#define	SIZE_64K				1024*64
+
+#define	SEED_IV_SIZE				16
+#define	SEED_BLOCK_SIZE				16
+#define	SEED_KEY_SIZE				16
+
+#define	AES128_IV_SIZE				16
+#define	AES128_BLOCK_SIZE			16
+#define	AES128_KEY_SIZE				16
+
+#define	TDES_IV_SIZE				8
+#define	TDES_BLOCK_SIZE				8
+#define	TDES_KEY_SIZE				24
+
+#define	RC4128_KEY_SIZE				16
+#define	MAC_SECRET_SIZE_SHA256			32
+
+#define	MAC_SECRET_SIZE				20
+
+#define	HMAC_DATA_LENGTH			20
+#define	SHA_DIGEST_LENGTH			20
+#define	SHA256_DIGEST_LENGTH			32
+#define	RANDOM_SIZE				20
+#define	SECRET_SIZE				48
+#define	MASTER_SECRET_SIZE			48
+
+#define	MAC_SECRET_MAX_SIZE			20
+#define	WRITE_KEY_MAX_SIZE			24
+#define	IV_MAX_SIZE				24
+#define	BLOCK_MAX_SIZE				16
+#define	KEYBLOCK_MAX_SIZE_SHA256		128
+#define	KEYBLOCK_MAX_SIZE			104
+#define	KEYBLOCK_MAX_SIZE_KS			80
+#define	MESSAGE_MAX_SIZE			SIZE_64K - SIZE_256	/*avoid	buffer	overflow*/
+#define	PROCESS_ID_MAX_SIZE			32
+#define	SESSION_ID_MAX_SIZE			32
+#define	DEFAULT_SESSION_ID_SIZE			20
+#define	MASTER_EXPANSION_SIZE			SECRET_SIZE+MAC_SECRET_MAX_SIZE
+
+/* Version */ 
+#define SCP1_CLIENT_VERSION_MAJOR               0x01
+
+#define SCP2_PROTOCOL_VERSION_MAJOR             0x02
+#define SCP2_PROTOCOL_VERSION_MINOR             0x00
+#define SCP2_CLIENT_VERSION_MAJOR               0x02
+#define SCP2_CLIENT_VERSION_MINOR               0x00
+#define SCP2_CLIENT_VERSION_MINOR_FIVE          0x05
+
+#define SCP2_CLIENT_VERSION_MINOR_NINE           0x09
+#define SCP2_SERVER_VERSION_MAJOR               0x02
+#define SCP2_SERVER_VERSION_MINOR               0x00
+#define SCP2_SERVER_VERSION_MINOR_NINE           0x09
+
+#define SCP3_PROTOCOL_VERSION_MAJOR             0x03
+#define SCP3_PROTOCOL_VERSION_MINOR             0x00
+#define SCP3_PROTOCOL_VERSION_MINOR_ONE         0x01
+#define SCP3_PROTOCOL_VERSION_MINOR_V3          0x03
+#define SCP3_CLIENT_VERSION_MAJOR               0x03
+#define SCP3_CLIENT_VERSION_MINOR               0x00
+#define SCP3_CLIENT_VERSION_MINOR_ONE           0x01
+#define SCP3_CLIENT_VERSION_MINOR_V3            0x03
+#define SCP3_SERVER_VERSION_MAJOR               0x03
+#define SCP3_SERVER_VERSION_MINOR               0x00
+#define SCP3_SERVER_VERSION_MINOR_ONE           0x01
+#define SCP3_SERVER_VERSION_MINOR_V3            0x03
+
+
+/* Mode */
+#define SCP3_MODE_RSA_NULL_SEEDP5_HMAC			0x01
+#define SCP3_MODE_RSA_RSA_SEEDP5_HMAC			0x02
+#define SCP3_MODE_SHAREDMAC_SEEDP5_HMAC			0x03
+#define SCP3_MODE_RSA_NULL_RC4_128			0x04
+#define SCP3_MODE_RSA_KCDSA_NEAT_HMAC			0x05	/* Not support */
+#define SCP3_MODE_RSA_NULL_SEEDP5_CBCMAC		0x11
+#define SCP3_MODE_RSA_NULL_NEAT_HMAC			0x12
+#define SCP3_MODE_RSA_RSA_SEEDP5_CBCMAC			0x21
+#define SCP3_MODE_RSA_RSA_NEAT_HMAC			0x22
+#define SCP3_MODE_SHAREDMAC_SEEDP5_CBCMAC		0x31
+#define SCP3_MODE_RSA_NULL_ARIA_HMAC			0x41
+#define SCP3_MODE_RSA_RSA_ARIA_HMAC			0x42
+#define SCP3_MODE_RSA_NULL_AES_HMAC			0x51
+#define SCP3_MODE_RSA_RSA_AES_HMAC			0x52
+#define SCP3_MODE_OLD_SEEDP5_HMAC			0xf0
+
+/* Mac Mode */
+#define SCP3_MMODE_HMACSHA1				0xf0
+#define SCP3_MMODE_SEEDCBCMAC				0xf1
+#define SCP3_MMODE_NULL					0xff
+
+#define SCP3_MMODE_HMACSHA256				0xf2
+
+
+/* Cert Mode */
+#define SCP3_CMODE_RSA_NULL				0xe0
+#define SCP3_CMODE_RSA_RSA				0xe1
+#define SCP3_CMODE_SHAREDMAC				0xef
+
+/* Algorithm Mode */
+#define SCP3_AMODE_SEEDP5				0xd0
+#define SCP3_AMODE_NEAT					0xd1
+#define SCP3_AMODE_AES					0xd2
+#define SCP3_AMODE_ARIA128				0xd3
+#define SCP3_AMODE_ARIA192				0xd4
+#define SCP3_AMODE_ARIA256				0xd5
+#define SCP3_AMODE_TDES					0xd6
+#define SCP3_AMODE_RC4_128				0xdf
+
+/* Client Cert Type */
+#define SCP3_CERTTYPE_NULL				0x00
+#define SCP3_CERTTYPE_ASN1CERT				0x01
+#define SCP3_CERTTYPE_WTLSCERT				0x02
+#define SCP3_CERTTYPE_CERTURL				0x03
+
+/* Server Cert Update Type */
+#define SCP3_UPDATE_CERT				0x01
+#define SCP3_UPDATE_MODE				0x04
+#define SCP3_UPDATE_POLICY				0x10
+
+/* Content Type */
+#define SCP3_CT_KEY_INIT				0x31
+#define SCP3_CT_KEY_FINAL				0x32
+#define SCP3_CT_RESUME_INIT				0x33
+#define SCP3_CT_RESUME_FINAL				0x34
+#define SCP3_CT_NEW_PROFILE				0x35
+#define SCP3_CT_NEW_PROFILE_VERSION1			0x37
+#define SCP3_CT_NOKEY					0x36
+#define SCP3_CT_MESSAGE					0x41
+#define SCP3_CT_COMPRESSED_MESSAGE			0x42
+#define SCP3_CT_LONG_MESSAGE				0x44
+#define SCP3_CT_ALERT					0x51
+
+#define SCP3_CT_KEY_INIT_V1				0x60
+#define SCP3_CT_KEY_FINAL_V1				0x61
+#define SCP3_CT_NEW_PROFILE_V1				0x62
+#define SCP3_CT_MESSAGE_V1				0x63
+#define SCP3_CT_KEY_INIT_V3				0x70
+#define SCP3_CT_KEY_FINAL_V3				0x71
+#define SCP3_CT_NEW_PROFILE_V3				0x72
+#define SCP3_CT_MESSAGE_V3				0x73
+
+/* USAGE */
+#define KEYUSAGEDESC					"keyEncipherment"
+#define KEYUSAGEDESCSIGN				"digitalSignature"
+#define VIDALGDESC					"SHA1"
+
+/* For Old Version : SCP 2.0 */
+#define	SECRET_SIZE					48
+#define	MASTER_KEY_SIZE					20
+#define KEY_BLOCK_SIZE					104
+
+/* Content type */
+typedef enum {
+    XM2_CT_KEYINIT = 1, XM2_CT_KEYFINAL, XM2_CT_MESSAGE, XM2_CT_ALERT,
+    XM2_CT_NEW_PROFILE = 10,
+    XM2_CT_RESUME_INIT = 20, XM2_CT_RESUME_FINAL, XM2_CT_NO_KEY,
+    XM2_CT_SESSION_CLOSE = 100, XM2_CT_MASTER_SESSION_CLOSE = 100
+} ContentType_V2;
+
+/* version */
+#define XM2_PROTOCOL_VERSION_MAJOR		0x02
+#define XM2_PROTOCOL_VERSION_MINOR		0x00
+#define XM2_PROTOCOL_VERSION_MINOR_		0x04
+#define XM2_PROTOCOL_VERSION_MINOR_NINE		0x09
+#define XM2_PROTOCOL_VERSION_MINOR_FIVE		0x05
+#define XM2_SERVER_VERSION_MAJOR		0x02
+#define XM2_SERVER_VERSION_MINOR		0x00
+#define XM2_SERVER_VERSION_MINOR_ONE		0x01
+#define XM2_SERVER_VERSION_MINOR_FIVE		0x05
+#define XM2_SERVER_VERSION_MINOR_NINE		0x09
+#define XM2_CLIENT_VERSION_MAJOR		0x02
+#define XM2_CLIENT_VERSION_MINOR		0x00
+#define XM2_CLIENT_VERSION_MINOR_ONE		0x01
+#define XM2_CLIENT_VERSION_MINOR_		0x04
+#define XM2_CLIENT_VERSION_MINOR_FIVE		0x05
+
+/* Profile */
+#define XXX2_RSAE_NULL_WITH_AES_SHA1_NULL       0x011100
+#define XXX2_RSAE_NULL_WITH_AES_MD5_NULL        0x011200
+#define XXX2_RSAE_NULL_WITH_SEED_SHA1_NULL      0x012100
+#define XXX2_RSAE_NULL_WITH_SEED_MD5_NULL       0x012200
+#define XXX2_RSAE_NULL_WITH_SEED_CBCMAC_NULL    0x012300
+#define XXX2_RSAE_NULL_WITH_3DES_SHA1_NULL      0x013100
+#define XXX2_RSAE_NULL_WITH_3DES_MD5_NULL       0x013200
+#define XXX2_RSAE_RSAS_WITH_AES_SHA1_NULL       0x021100
+#define XXX2_RSAE_RSAS_WITH_AES_MD5_NULL        0x021200
+#define XXX2_RSAE_RSAS_WITH_SEED_SHA1_NULL      0x022100
+#define XXX2_RSAE_RSAS_WITH_SEED_MD5_NULL       0x022200
+#define XXX2_RSAE_RSAS_WITH_3DES_SHA1_NULL      0x023100
+#define XXX2_RSAE_RSAS_WITH_3DES_MD5_NULL       0x023200
+
+/* added by hnkwon envelope algorithm */
+#define	XC_PKCS7_ENCID_DES_CBC				1
+#define	XC_PKCS7_ENCID_DES_EDE3_CBC			2
+#define	XC_PKCS7_ENCID_RC2_CBC				3
+#define	XC_PKCS7_ENCID_NEAT_CBC				4
+#define	XC_PKCS7_ENCID_SEED_CBC				8
+#define XC_PKCS7_ENCID_ARIA_CBC				9		
+#define XC_PKCS7_ENCID_ARIA_CBC128			16
+#define XC_PKCS7_ENCID_ARIA_CBC192			17	
+#define XC_PKCS7_ENCID_ARIA_CBC256			18
+
+/* Seperated profile : appended */
+#define XXX2_RSAE_NULL      0x01
+#define XXX2_RSAE_RSAS      0x02
+
+#define XXX2_AES_SHA1       0x11
+#define XXX2_AES_MD5        0x12
+#define XXX2_SEED_SHA1      0x21
+#define XXX2_SEED_MD5       0x22
+#define XXX2_SEED_CBCMAC    0x23
+#define XXX2_SEED_SHA256    0x24 
+#define XXX2_3DES_SHA1      0x31
+#define XXX2_3DES_MD5       0x32
+
+#define XXX2_COMPRESS_NULL  0x00
+#define XXX2_COMPRESS_ZLIP  0x01
+#define XXX2_LGT_NULL       0x02
+
+typedef enum {
+    XM_UT_CERT = 1, XM_UT_AUTH_TYPE, XM_UT_BOTH
+} UpdateType_V2;
+
+#endif

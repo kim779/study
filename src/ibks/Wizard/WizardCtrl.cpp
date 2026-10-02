@@ -1003,7 +1003,7 @@ void CWizardCtrl::OnCertify(char* pBytes, int nBytes)
 
 void CWizardCtrl::Xecure()
 {
-	axlog(LOG_DATA, "[Xecure-Nego] enter flagENC=%d m_xtype=%d",
+	axlog(LOG_DATA, "[Xecure-Nego] 최초한번 한다 암호화를 할건인지 판단하고  flagENC=%d m_xtype=%d",
 		(m_guard->m_term & flagENC) ? 1 : 0, (int)m_xtype);
 
 	if (m_guard->m_term & flagENC && m_xtype != xtFlag::xtXEC)
@@ -1130,6 +1130,63 @@ void CWizardCtrl::OnAxis(struct _axisH* axisH, char* pBytes, int nBytes)
 
 int CWizardCtrl::Xecure(char* pBytes, int nBytes)
 {
+#ifdef DF_MD_XECURE
+	int nBytesIn = nBytes;
+	bool useOurs = (m_guard->m_hSecureSession && m_guard->m_pSSOpen && m_guard->m_pSSHandshake);
+
+	if (useOurs)
+	{
+		unsigned char outBuf[65536];
+		int outLen = sizeof(outBuf);
+
+		if (pBytes == NULL && nBytesIn == 0)
+		{
+			// 최초 호출 - xc_conf.ini 경로 계산 (원본 XecureCtrl.cpp::Xecure()와 동일 로직)
+			char chfile[500]{};
+			GetModuleFileName(nullptr, chfile, 260);
+			CString spath(chfile);
+			spath.TrimRight();
+			int pos = spath.ReverseFind('\\');
+			if (pos != -1)
+			{
+				CString filename = spath.Mid(pos + 1);
+				spath.Replace(filename, "xc_conf.ini");
+			}
+
+			m_guard->m_ss = m_guard->m_pSSOpen("qwer1234", (LPCSTR)spath, outBuf, &outLen);
+			if (m_guard->m_ss)
+			{
+				axlog(LOG_DATA, "[Xecure-Nego] SS_Open nBytesOut=%d", outLen);
+				if (m_guard->Write(msgK_ENC, "AXISENCX", (char*)outBuf, outLen))
+					return outLen;
+				return -1;
+			}
+			axlog(LOG_DATA, "[Xecure-Nego] SS_Open FAILED, fallback to vendor control");
+			useOurs = false;
+		}
+		else if (m_guard->m_ss)
+		{
+			int rc = m_guard->m_pSSHandshake(m_guard->m_ss, (unsigned char*)pBytes, nBytesIn, outBuf, &outLen);
+			axlog(LOG_DATA, "[Xecure-Nego] SS_Handshake rc=%d outLen=%d", rc, outLen);
+
+			if (rc == 0)
+				return 0;
+			if (rc == 1)
+			{
+				if (m_guard->Write(msgK_ENC, "AXISENCX", (char*)outBuf, outLen))
+					return outLen;
+				return -1;
+			}
+			return -1;
+		}
+		else
+		{
+			useOurs = false;
+		}
+	}
+
+	return -1;
+#else
 	if (m_guard->m_xecure == NULL)
 	{
 		m_guard->m_xecure = new CWnd();
@@ -1149,7 +1206,7 @@ int CWizardCtrl::Xecure(char* pBytes, int nBytes)
 	m_guard->m_xecure->InvokeHelper(DI_XEC, DISPATCH_METHOD, VT_I4, (void*)&retv,
 		(BYTE*)VTS_I4 VTS_I4, pBytes, &nBytes);
 
-	axlog(LOG_DATA, "[Xecure-Nego] DI_XEC nBytesIn=%d nBytesOut=%d retv=%d", nBytesIn, nBytes, (int)retv);
+	axlog(LOG_DATA, "[Xecure-Nego] DI _XEC nBytesIn=%d nBytesOut=%d retv=%d", nBytesIn, nBytes, (int)retv);
 
 	switch (nBytes)
 	{
@@ -1158,19 +1215,20 @@ int CWizardCtrl::Xecure(char* pBytes, int nBytes)
 	case -1:
 		if (retv != NULL)
 		{
-			axlog(LOG_DATA, "[Xecure-Nego] DI_XEC error retv=%d", (int)retv);
+			axlog(LOG_DATA, "[Xecure-Nego] DI _XEC error retv=%d", (int)retv);
 			OnFire(FEV_ERROR, true, retv);
 			return -2;
 		}
 		break;
 	default:
-		axlog(LOG_DATA, "[Xecure-Nego] AXISENCX send nBytes=%d", nBytes);
+		axlog(LOG_DATA, "[Xecure-Nego] AXISENCX send nBytes=%d retv=[%s]", nBytes, (char*)retv);
 		if (m_guard->Write(msgK_ENC, "AXISENCX", (char*)retv, nBytes))
 			return nBytes;
 		break;
 	}
 	//	OnFire(FEV_GUIDE, 0, AE_ESECURE);
 	return -1;
+#endif
 }
 
 void CWizardCtrl::Run()

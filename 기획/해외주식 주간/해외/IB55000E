@@ -1,0 +1,137 @@
+GLOBAL DIVISION
+{
+
+MAPNAME(IB55000E)
+MAPSIZE(267, 813)
+VERSION(000)
+MAPKIND(NORMAL)
+MAPGROUP(1)
+MAPDESC("환율조회")
+MAPPUBLIC(";")
+FONT("굴림", 9, NORMAL)
+OPTIONS(ENCODE)
+TITLE("환율조회")
+TOPATH(AXIS)
+METHOD(FORM)
+TRXCODE("piboPBxQ")
+MAPTYPE(FIXED)
+HEADER(LEDGER)
+TRXH("15CCOSAQ058")
+}
+
+
+
+FORM DIVISION
+{
+
+LABEL  LABEL6(28, 70, 101, 89)  '통화코드'  AL_CENTER  CUR(0)      COLOR(195, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL10(28, 48, 101, 67)  '계좌번호'  AL_CENTER  CUR(0)      COLOR(195, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  ed_acno(105, 45, 212, 64)  LEN(20)  IO_NUM|EDIT_INOUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(1)  IOORDER(2)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  ed_mkcode(107, 70, 214, 89)  LEN(3)  IO_MIXED|EDIT_INOUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE          TABORDER(2)  IOORDER(3)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL13(284, 71, 357, 90)  '개인법인구분'  AL_CENTER  CUR(0)      COLOR(195, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  o_pstp(362, 71, 422, 86)  LEN(1)  IO_MIXED|AL_CENTER||FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_SPACE|SA_COSIGN    COLOR(192, 209)  CUR(0)            IFRGB(69, 69)  TABORDER(0)  IOORDER(5)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  o_ocnt(362, 46, 422, 66)  LEN(5)  IO_NUM|AL_CENTER|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(4)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL22(284, 95, 357, 114)  '개인법인구분명'  AL_CENTER  CUR(0)      COLOR(195, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL16(284, 46, 357, 65)  'O CNT'  AL_CENTER  CUR(0)      COLOR(195, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL21(28, 27, 101, 46)  'I CNT'  AL_CENTER  CUR(0)      COLOR(195, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  ed_icnt(107, 27, 148, 46)  LEN(5)  IO_NUM|EDIT_INOUT|FA_WRAP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("00001")          TABORDER(3)  IOORDER(1)  ENABLE  &
+  HINTTYPE(IH_NONE)
+GROUP  GROUP0(10, 15, 255, 395)  'Input'        COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+GROUP  GROUP1(260, 30, 772, 230)  'Output'        COLOR(-1, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL11(284, 120, 357, 139)  '환율'  AL_CENTER  CUR(0)      COLOR(195, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  o_pstpnm(362, 94, 595, 114)  LEN(40)  IO_MIXED|AL_CENTER|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(6)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  o_exrate(362, 119, 590, 139)  LEN(17)  IO_NUM|AL_CENTER||FA_COMMA|FA_RIGHT|FA_ZEROSUP|FA_CORGB|SA_ZERO|SA_CORAW    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(7)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  LABEL14(285, 145, 358, 164)  '거래일'  AL_CENTER  CUR(0)      COLOR(195, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+OUT  o_trddt(365, 145, 593, 165)  LEN(8)  IO_MIXED|AL_CENTER|    COLOR(192, 232)  CUR(0)            TABORDER(0)  IOORDER(8)  ENABLE  &
+  HINTTYPE(IH_NONE)
+LABEL  lb_reuslt(285, 180, 755, 199)  'result'  AL_CENTER  CUR(0)      COLOR(195, 232)  ENABLE  &
+  HINTTYPE(IH_NONE)
+EDIT  bsending(350, 10, 420, 25)  LEN(1)  IO_NUM|EDIT_INPUT|FA_WRAP|FA_SKIP    COLOR(192, 232)  CUR(0)  TP_NONE  INIT("0")          TABORDER(4)  IOORDER(9)  ENABLE  &
+  VISIBLE  HINTTYPE(IH_NONE)
+}
+
+
+
+RESOURCE DIVISION
+{
+
+
+_AW_ONSEND_AW_
+SCREEN.OnSend False
+If Trim(ed_acno.Data) = "" Then
+	Exit Sub
+End If
+
+
+If bsending.Data = 1 Then
+SYSTEM.Trace "------------!!!!!!!---------- bsending = " & bsending.Data
+	Exit Sub
+End If
+SYSTEM.Trace "------------@@@@@@---------- bsending = " & bsending.Data
+SCREEN.OnSend True
+bsending.Data = 1
+
+LEDGER.Hsiz = 44
+LEDGER.Epwd = ""
+
+_AW_ONENDSUB_AW_
+_AW_ONRECEIVE_AW_
+Dim ecod
+ecod = LEDGER.Ecod
+
+
+
+If Left(ecod, 1) = "0" Then
+'	o_exrate.Data = Replace(o_exrate.Data, "+", "")
+'	o_exrate.Data = Replace(o_exrate.Data, "-", "")
+'	SCREEN.Object("parent.out_ERate").Data = o_exrate.Text
+'	SCREEN.Proc "parent.CalWon", ""
+
+
+
+	o_exrate.Data = Replace(o_exrate.Data, "+", "")
+	o_exrate.Data = Replace(o_exrate.Data, "-", "")
+
+	If UCase(TypeName( SCREEN.Object("parent.OBJ_odr.out_ERate") )) <> "NOTHING" Then
+		SCREEN.Object("parent.OBJ_odr.out_ERate").Data =  o_exrate.Text
+	End If
+
+	If UCase(TypeName( SCREEN.Object("parent.out_ERate") )) <> "NOTHING" Then
+		SCREEN.Object("parent.out_ERate").Data =  o_exrate.Text
+	End If
+
+	SCREEN.Proc "parent.OBJ_odr.CalWon", ""
+'	SCREEN.Object("parent.out_ERate").Data = o_exrate.Text
+'	SCREEN.Proc "parent.CalWon", ""
+
+End If
+
+	bsending.Data = 0
+
+	SYSTEM.Trace "---------rrrrrrr---------------- bsending = " & bsending.Data
+
+_AW_ONENDSUB_AW_
+_AW_SCRIPT_AW_(o_pstp)
+_AW_ENDSCRIPT_AW_
+
+
+}
+
+
+

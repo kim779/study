@@ -486,7 +486,7 @@ BOOL Cdepth::Create(CWnd* parent, void* ptr)
 {
 	char	wb[256]{};
 	struct	_param*	param = nullptr;
-	
+	m_dwTestOpenTick = GetTickCount();	//TEST_TEMP
 	m_parent  = parent;
 	param     = (struct _param *)ptr;
 	strcpy(wb, param->fonts);
@@ -912,6 +912,9 @@ long Cdepth::OnMessage(WPARAM wParam, LPARAM lParam)
 		{
 			if (HIWORD(wParam) == alert_DEIN)
 				break;
+
+		//	if (GetTickCount() - m_dwTestOpenTick < 3000)	//TEST_TEMP: 10초간 실시간 무시
+		//		break;
 
 			struct _alertR* alertR = (struct _alertR*)lParam;
 
@@ -1478,6 +1481,8 @@ int Cdepth::CheckCodeMkType(CString sCode)
 
 void Cdepth::dispatchTEN(char* datB, int datL)
 {
+	const bool bTestNoHoga = (GetTickCount() - m_dwTestOpenTick < 3000);
+
 	CString	tmps;
 	int	askI = 0, bidI = 0, askA = 0, bidA = 0;
 	const	struct	_hoga* hoga = (struct _hoga *) datB;
@@ -1539,6 +1544,7 @@ void Cdepth::dispatchTEN(char* datB, int datL)
 	{
 		tmps = CString(hoga->price[ii].ask, sizeof(hoga->price[ii].ask));
 		m_items.GetAt(askPrice1+ii)->m_data = format(tmps, askPrice1+ii);
+		//m_items.GetAt(askPrice1 + ii)->m_data = bTestNoHoga ? _T("") : format(tmps, askPrice1 + ii);   //TEST_TEMP
 
 		if (m_items.GetAt(askPrice1+ii)->m_data.GetLength() > 7)
 		{
@@ -1560,6 +1566,7 @@ void Cdepth::dispatchTEN(char* datB, int datL)
 		m_items.GetAt(askI+ii)->m_data = format(tmps, askI+ii);
 
 		tmps = CString(hoga->price[ii].bid, sizeof(hoga->price[ii].bid));
+		//m_items.GetAt(bidPrice1 + ii)->m_data = bTestNoHoga ? _T("") : format(tmps, bidPrice1 + ii);   //TEST_TEMP
 		m_items.GetAt(bidPrice1+ii)->m_data = format(tmps, bidPrice1+ii);
 
 		if (m_items.GetAt(bidPrice1+ii)->m_data.GetLength() > 7)
@@ -2383,7 +2390,16 @@ void Cdepth::alert(struct _alertR* alertR)  //실제 실시간처리
 			if ((index >= askPrice1 && index <= askPrice10) || (index >= bidPrice1 && index <= bidPrice10))
 			{
 				changePrice = true;
-				if (text.GetLength() > 7) m_bBigDigit = TRUE;
+				//if (text.GetLength() > 7) m_bBigDigit = TRUE;
+				if (text.GetLength() > 7 && !m_bBigDigit)
+				{
+					m_bBigDigit = TRUE;
+					m_slog.Format("[cx_depth]----------------------------------------alert -------------------------");
+					OutputDebugString(m_slog);
+					calculateColumnWidth();
+					EW_Move();
+					setItemRect();
+				}
 			}
 			else if ((index >= askSize1 && index <= askSize10) || (index >= bidSize1 && index <= bidSize10))
 				changeSize = true;
@@ -2944,8 +2960,15 @@ void Cdepth::drawItems(CDC* dc)
 					m_slog.Format("------------------[%s]<%d> [depth] code=[%s]  data=[%s] [%s%d%s]", __FUNCTION__, __LINE__, m_code, string, "매수", ii - 40, "호가"); //매수1~10  실제 드로잉
 				Output_DebugString(m_slog);
 
+				
+
 				dc->DrawText(string, item->m_fRc, style);
 			}
+			//if (ii == askPrice1)
+			//{
+			//	m_slog.Format("------------------[cx_depth][%s]<%d>   l=[%d] t=[%d] r=[%d] b=[%d]", __FUNCTION__, __LINE__, item->m_fRc.left, item->m_fRc.top, item->m_fRc.right, item->m_fRc.bottom); //매수1~10  실제 드로잉
+			//	Output_DebugString(m_slog);
+			//}
 		}
 		else if ((ii >= askPercent1 && ii <= askPercent10) || (ii >= bidPercent1 && ii <= bidPercent10))
 		{

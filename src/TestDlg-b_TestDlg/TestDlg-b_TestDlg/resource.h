@@ -186,9 +186,11 @@
 #define IDC_CHECK11                     1094
 #define IDC_BTN_DOWM                    1094
 #define IDC_BTN_CAL1                    1094
+#define IDC_BTN_piboac10                1094
 #define IDC_CHECK12                     1095
 #define IDC_BTN_QSORT                   1095
 #define IDC_BTN_CAL2                    1095
+#define IDC_BTN_AXISENCX                1095
 #define IDC_CHECK13                     1096
 #define IDC_BTN_EDGESELF                1096
 #define IDC_STATIC_CAL                  1096
@@ -287,6 +289,7 @@
 #define IDC_FUNC_TEMP                   1177
 #define IDC_BTN_FILEMOVE                1177
 #define IDC_STATIC_PAINT                1178
+#define IDC_SECURESESSION               1178
 #define IDC_DRAW_THREAD                 1179
 #define IDC_DRAW_THREAD2                1180
 #define IDC_FUNC_CB                     1181

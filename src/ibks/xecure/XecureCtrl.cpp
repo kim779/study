@@ -195,8 +195,8 @@ BOOL CXecureCtrl::Encrypt(long pBytes, long nBytes)
 	CString slog;
 	int inputLen = *(int*)nBytes;
 
-	slog.Format("[xecure][%s]<%d> before nBytes=[%d]\r\n", __FUNCTION__, __LINE__,
-		inputLen);
+	slog.Format("[xecure][%s]<%d> before nBytes=[%d] pBytes=[%.100s]\r\n", __FUNCTION__, __LINE__,
+		inputLen, pBytes);
 	OutputDebugString(slog);
 
 	if (m_enc != stepENC::encRUN)
@@ -216,7 +216,7 @@ BOOL CXecureCtrl::Encrypt(long pBytes, long nBytes)
 		m_pChaser = CWnd::FindWindow(NULL, stitle);
 
 		slog.Format("[xecure][%s]<%d> pChaser find=[%x]\r\n", __FUNCTION__, __LINE__, m_pChaser);
-		OutputDebugString(slog);
+		//OutputDebugString(slog);
 	}
 
 	if (m_pChaser)
@@ -243,7 +243,7 @@ BOOL CXecureCtrl::Encrypt(long pBytes, long nBytes)
 	else
 	{
 		slog.Format("[xecure][%s]<%d> pChaser not find\r\n", __FUNCTION__, __LINE__);
-		OutputDebugString(slog);
+		//OutputDebugString(slog);
 	}
 
 	m_sync.Lock();
@@ -267,7 +267,7 @@ BOOL CXecureCtrl::Encrypt(long pBytes, long nBytes)
 	*(int*)nBytes = m_nBytes;
 	CopyMemory((void*)pBytes, m_pBytes, m_nBytes);
 
-	slog.Format("[xecure][%s]<%d> after nBytes=[%d]\r\n", __FUNCTION__, __LINE__, m_nBytes);
+	slog.Format("[xecure][%s]<%d> after nBytes=[%d] pBytes=[%.100s]\r\n", __FUNCTION__, __LINE__, m_nBytes, pBytes);
 	OutputDebugString(slog);
 
 	m_sync.Unlock();
@@ -277,8 +277,8 @@ BOOL CXecureCtrl::Encrypt(long pBytes, long nBytes)
 BOOL CXecureCtrl::Decrypt(long pBytes, long nBytes)
 {
 	CString slog;
-	//slog.Format("[xecure][%s]<%d> Xecure nBytes=[%d]  pBytes=[%.50s] \r\n  ", __FUNCTION__, __LINE__, nBytes, pBytes);
-	//OutputDebugString(slog);
+	slog.Format("[xecure][%s]<%d> Xecure nBytes=[%d]  pBytes=[%.100s] \r\n  ", __FUNCTION__, __LINE__, nBytes, pBytes);
+	OutputDebugString(slog);
 
 	if (m_enc != stepENC::encRUN)
 	{
@@ -308,6 +308,9 @@ BOOL CXecureCtrl::Decrypt(long pBytes, long nBytes)
 	*(int*)nBytes = m_nBytes;
 	CopyMemory((void*)pBytes, m_pBytes, m_nBytes);
 
+	slog.Format("[xecure][%s]<%d> Xecure nBytes=[%d]  pBytes=[%.100s] \r\n  ", __FUNCTION__, __LINE__, nBytes, pBytes);
+	OutputDebugString(slog);
+
 	m_sync.Unlock();
 	return TRUE;
 }
@@ -328,7 +331,7 @@ long CXecureCtrl::Xecure(long pBytes, long nBytes)
 	char chfile[500]{};
 	GetModuleFileName(nullptr, chfile, 260);
 	CString slog;
-	slog.Format("[xecure] Xecure dirSTR=[%s]  path=[%s] \r\n  ", dirSTR, chfile);
+	slog.Format("[xecure][%s]<%d> Xecure dirSTR=[%s]  path=[%s] \r\n  ", __FUNCTION__, __LINE__,dirSTR, chfile);
 	OutputDebugString(slog);
 	//FileLog(slog);
 
@@ -377,7 +380,7 @@ long CXecureCtrl::Xecure(long pBytes, long nBytes)
 	//spath.Replace("AXIS.EXE", "xc_conf.ini");
 	//spath.Replace("axis.exe", "xc_conf.ini");
 	//spath.Replace("ibks_setup.exe", "xc_conf.ini");
-	OutputDebugString("[XECURE]" + spath);
+	OutputDebugString("[XECURE] 설정파일의 위치 = " + spath);
 	//FileLog(spath);
 
 
@@ -400,7 +403,7 @@ long CXecureCtrl::Xecure(long pBytes, long nBytes)
 		}
 		m_log->Trace("xecure_3", 0, dirSTR);
 
-		slog.Format("[xecure] Xecure encHELLO dirSTR=[%s] \r\n  ", dirSTR);
+		slog.Format("[xecure] Xecure encHELLO m_pBytes=[%.100s] \r\n  ", m_pBytes);
 		OutputDebugString(slog);
 
 		ZeroMemory(&m_ctx, sizeof(XC_CTX));
@@ -412,11 +415,14 @@ long CXecureCtrl::Xecure(long pBytes, long nBytes)
 		m_log->Trace("xecure_4", 0, dirSTR);
 		m_enc = stepENC::encOK;
 
-		slog.Format("[xecure] Xecure encOK dirSTR=[%s] \r\n  ", dirSTR);
+		slog.Format("[xecure] Xecure encOK m_pBytes=[%.100s] \r\n  ", m_pBytes);
 		OutputDebugString(slog);
 
 		break;
 	case stepENC::encOK:
+		slog.Format("[xecure] Xecure encOK m_pBytes=[%.100s] \r\n  ", m_pBytes);
+		OutputDebugString(slog);
+
 		rc = XC_DECODE(&m_ctx, (unsigned char*)m_pBytes, &m_nBytes, (unsigned char*)pBytes, encL, NULL, 0);
 		if (rc < 0)
 		{

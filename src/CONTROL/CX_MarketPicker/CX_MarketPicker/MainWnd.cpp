@@ -312,7 +312,7 @@ long CMainWnd::OnMsgFromDll(WPARAM wParam, LPARAM lParam)
 			m_slog.Format("				[cxMarketPicker][MARKETPICKER][OnMsgFromDll]       DLL 화면 -->  컨트롤MSG            [%d][%x]", LOWORD(wParam), (CWnd*)lParam);
 			//OutputDebugString(m_slog);
 		
-			m_pContainerWnd = (CWnd*)lParam;
+			m_pContainerWnd = (CWnd*)lParam;  //test
 			m_bInDLL = TRUE;
 
 			return 1;

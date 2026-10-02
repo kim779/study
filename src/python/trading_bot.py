@@ -653,6 +653,8 @@ class TestWindow(QMainWindow):
         self.strategy_tabs.addTab(self._build_daily_backtest_group(), "일봉 크로스오버")
         self.strategy_tabs.addTab(self._build_scan_group(), "전체 스캔")
         self.strategy_tabs.addTab(self._build_param_scan_group(), "파라미터 스캔")
+        self.strategy_tabs.addTab(self._build_jango_group(), "잔고/체결/미체결")
+        self.strategy_tabs.addTab(self._build_data_group(), "데이터수집/시세조회")
 
         mid = QGridLayout()
         mid.addWidget(self._build_login_group(), 0, 0)
@@ -663,14 +665,7 @@ class TestWindow(QMainWindow):
         mid.setColumnStretch(1, 1)
         mid.setColumnStretch(2, 4)  # 차트가 있는 전략 탭 영역을 왼쪽(로그인/시세조회)보다 넓게
         layout.addLayout(mid)
-        layout.addWidget(self._build_jango_group())
-        misc = QHBoxLayout()
-        misc.addWidget(self._build_collect_group())
-        misc.addWidget(self._build_daily_group())
-        misc.addWidget(self._build_market_group())
-        misc.addWidget(self._build_history_group())
-        layout.addLayout(misc)
-        layout.addWidget(self._build_log_group())
+        layout.addWidget(self._build_log_group(), 1)
 
     # ── UI builders ──────────────────────────────────────────────
 
@@ -1327,16 +1322,7 @@ class TestWindow(QMainWindow):
         btn_h = QHBoxLayout()
         btn = QPushButton("주문실행")
         btn.clicked.connect(self._on_odr_send)
-        btn_mc = QPushButton("잔고조회")
-        btn_mc.clicked.connect(self._on_michegyul_send)
-        btn_cg = QPushButton("체결조회")
-        btn_cg.clicked.connect(self._on_chegyul_send)
-        btn_uc = QPushButton("미체결조회")
-        btn_uc.clicked.connect(self._on_michegyul_odr_send)
         btn_h.addWidget(btn)
-        btn_h.addWidget(btn_mc)
-        btn_h.addWidget(btn_cg)
-        btn_h.addWidget(btn_uc)
         btn_h.addStretch()
         right.addRow(btn_h)
 
@@ -1467,6 +1453,16 @@ class TestWindow(QMainWindow):
         elif col == 4:  # 현재가 -> 주문가격 (부호와 콤마 제거)
             self.edit_odr_jprc.setText(text.lstrip('+-').replace(',', ''))
 
+    def _build_data_group(self):
+        widget = QWidget()
+        h = QHBoxLayout(widget)
+        h.setContentsMargins(0, 0, 0, 0)
+        h.addWidget(self._build_collect_group())
+        h.addWidget(self._build_daily_group())
+        h.addWidget(self._build_market_group())
+        h.addWidget(self._build_history_group())
+        return widget
+
     def _build_collect_group(self):
         group = QGroupBox("데이터수집 (틱 저장)")
         h = QHBoxLayout(group)
@@ -1502,7 +1498,7 @@ class TestWindow(QMainWindow):
         v.addLayout(h)
         self.log_edit = QTextEdit()
         self.log_edit.setReadOnly(True)
-        self.log_edit.setMinimumHeight(150)
+        self.log_edit.setMinimumHeight(300)
         v.addWidget(self.log_edit)
         return group
 

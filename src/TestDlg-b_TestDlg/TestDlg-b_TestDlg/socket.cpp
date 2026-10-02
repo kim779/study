@@ -75,6 +75,7 @@ void Csocket::OnSend(int nErrorCode)
 
 void Csocket::OnReceive(int nErrorCode) 
 {
+	CString dbg;
 	if (nErrorCode)
 	{
 		OnClose(nErrorCode);
@@ -86,6 +87,16 @@ void Csocket::OnReceive(int nErrorCode)
 	struct	_fmH*	fmH = nullptr;
 
 	frameL = Receive(frameB, sizeof(frameB));
+
+	// 진단용: _fmH 파싱 전에 실제로 뭐가 왔는지 무조건 확인
+	{
+		CString hex;
+		for (int i = 0; i < frameL && i < 60; i++)
+			hex.AppendFormat("%02X ", (unsigned char)frameB[i]);
+		CString msg;
+		msg.Format("[Csocket][%s]<%d> frameL=%d  %s", __FUNCTION__, __LINE__, frameL, hex);
+		if (frameL != 12) OutputDebugString(msg);
+	}
 
 	switch (frameL)
 	{
@@ -106,6 +117,10 @@ void Csocket::OnReceive(int nErrorCode)
 			switch ((BYTE)frameB[ii])
 			{
 			case fmF_FS:
+				
+				dbg.Format("[Csocket][%s]<%d> flowS: fmF_FS found, m_idx(before)=%d" ,__FUNCTION__, __LINE__, m_idx);
+				if (frameL != 12) OutputDebugString(dbg);
+
 				m_flow = (_flow)m_idx;
 				m_rcvB[m_idx++] = frameB[ii];
 				break;
@@ -122,6 +137,10 @@ void Csocket::OnReceive(int nErrorCode)
 
 			fmH = (struct _fmH *)m_rcvB;
 			m_rcvL = atoi(CString(fmH->datL, sizeof(fmH->datL)));
+			{
+				dbg.Format("[Csocket][%s]<%d> flowH done: m_idx=%d m_rcvL(from fmH.datL)=%d" , __FUNCTION__, __LINE__, m_idx, m_rcvL);
+				if (frameL != 12) OutputDebugString(dbg);
+			}
 			if (m_rcvL == 0)
 			{
 				m_flow = flowE;
@@ -141,6 +160,14 @@ void Csocket::OnReceive(int nErrorCode)
 		{
 			m_flow = flowS;
 			m_idx  = 0;
+
+			CString hexB;
+			int dumpLen = min(L_fmH + m_rcvL, 60);
+			for (int i = 0; i < dumpLen; i++)
+				hexB.AppendFormat("%02X ", (unsigned char)m_rcvB[i]);
+			dbg.Format("[Csocket][%s]<%d> flowE: m_idx=%d m_rcvL=[[[%d]]] m_rcvB[%d]=%s", __FUNCTION__, __LINE__, m_idx, m_rcvL, dumpLen, hexB);
+			if (frameL != 12) OutputDebugString(dbg);
+
 			if (m_rcvL > 0)
 				m_parent->SendMessage(WM_USER + 12, MAKEWPARAM(sm_RECEIVE, L_fmH+m_rcvL), (LPARAM)m_rcvB);
 			break;
@@ -203,6 +230,12 @@ BOOL Csocket::Write(char* sndB, int sndL)
 {
 	if (!m_alive)
 		return FALSE;
+
+	CString msg;
+	msg.Format("[Csocket] @@@@@@@@@@@@@@@@@@@@");
+	OutputDebugString(msg);
+	msg.Format("[Csocket][%s]<%d>  sndL =[%d]  sndB=[%.100s]", __FUNCTION__ , __LINE__, sndL, sndB);
+	OutputDebugString(msg);
 
 	BOOL	success = FALSE;
 
