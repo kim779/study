@@ -154,6 +154,9 @@ CCertifyCtrl::CCertifyCtrl()
 	m_bDev = FALSE;
 	m_bCloudeUse = FALSE;
 	m_bCloudeInit = FALSE;
+
+	m_slog.Format("[WIZARD][CERTIFY] 생성자!!!!");
+	OutputDebugString(m_slog);
 }
 
 // CCertifyCtrl::~CCertifyCtrl - 소멸자
@@ -1772,7 +1775,7 @@ void CCertifyCtrl::InitCloude()
 	FileLog(slog);
 
 	//해외전화 ARS 인증버튼 0:비활성화 1:활성화
-	sk_if_Cloud_AbroadPhoneAuthenticationOnOff(1);
+	//sk_if_Cloud_AbroadPhoneAuthenticationOnOff(1);
 
 	m_bCloudeInit = TRUE;
 	axlog(LOG_CERTIFY, "InitCloude EXIT m_bCloudeInit=TRUE serverHost=%s", m_bDev ? DEV_CLOUDE_SERVER : REAL_CLOUDE_SERVER);

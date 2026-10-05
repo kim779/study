@@ -105,6 +105,31 @@ public:
 
 #endif 
 
+#ifdef DF_MD_CERTSIGN
+	typedef void* HCS;
+	typedef HCS(*PFN_CS_Open)(void);
+	typedef int (*PFN_CS_SelectInteractive)(HCS, HWND, char*, int, unsigned char*, char*, int);
+	typedef int (*PFN_CS_Sign)(HCS, const unsigned char*, int, unsigned char*, int*);
+	typedef void (*PFN_CS_Close)(HCS);
+	typedef const char* (*PFN_CS_GetLastError)(void);
+
+	HMODULE			m_hCertSign;
+	PFN_CS_Open		m_pCSOpen;
+	PFN_CS_SelectInteractive m_pCSSelectInteractive;
+	PFN_CS_Sign              m_pCSSign;
+	PFN_CS_Close             m_pCSClose;
+	PFN_CS_GetLastError      m_pCSGetLastError;
+
+	HCS              m_cs;        // non-NULL = 이 로그인 세션은 certsign이 담당
+	CString          m_csDN;      // 선택된 인증서 DN (CertifyName용)
+	bool             m_csAuto;    // 로그인창 "주문시 비밀번호 입력 안함" (CertifyCtrl::m_auto)
+	bool             m_csCloud;   // CertifyCloude(11) 이후 true → 클라우드는 벤더 컨트롤
+	CMapStringToPtr  m_csEmaps;   // _caH.map: 자동서명이어도 매번 비밀번호 확인할 맵
+
+	void	CloseCertSign();
+	int	SelectCertSign();         // 선택창 + DN 저장, 0=성공/벤더오류코드
+#endif
+
 
 	CAxisPalette*	m_palette;		// Axis palette
 	CAxisDraw*	m_draw;

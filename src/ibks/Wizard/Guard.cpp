@@ -112,6 +112,18 @@ CGuard::CGuard()
 	m_pSSGetLastError = NULL;
 	m_ss = NULL;
 #endif
+
+#ifdef DF_MD_CERTSIGN
+	m_hCertSign = NULL;
+	m_pCSOpen = NULL;
+	m_pCSSelectInteractive = NULL;
+	m_pCSSign = NULL;
+	m_pCSClose = NULL;
+	m_pCSGetLastError = NULL;
+	m_cs = NULL;
+	m_csAuto = false;
+	m_csCloud = false;
+#endif
 }
 
 CGuard::~CGuard()
@@ -144,8 +156,24 @@ CGuard::~CGuard()
 
 	if (m_xecure)
 		delete m_xecure;
+#ifdef DF_MD_XECURE
+	if (m_ss && m_pSSClose)
+		m_pSSClose(m_ss);
+	m_ss = NULL;
+	if (m_hSecureSession)
+		FreeLibrary(m_hSecureSession);
+	m_hSecureSession = NULL;
+#endif
+
+#ifdef DF_MD_CERTSIGN
+	CloseCertSign();
+	if (m_hCertSign)
+		FreeLibrary(m_hCertSign);
+	m_hCertSign = NULL;
+#endif
+
 	if (m_certify)
-		delete m_certify; 
+		delete m_certify;
 	delete m_sock;
 
 	delete m_dde;
@@ -270,7 +298,30 @@ int CGuard::Initial(CWnd* control)
 		axlog(LOG_INIT, "CGuard::Initial securesession.dll not found - fallback to vendor control");
 	}
 #endif
-//	//xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+#ifdef DF_MD_CERTSIGN
+	m_hCertSign = LoadLibrary(_T("certsign.dll"));
+	if (m_hCertSign)
+	{
+		m_pCSOpen = (PFN_CS_Open)GetProcAddress(m_hCertSign, "CS_Open");
+		m_pCSSelectInteractive = (PFN_CS_SelectInteractive)GetProcAddress(m_hCertSign, "CS_SelectInteractive");
+		m_pCSSign = (PFN_CS_Sign)GetProcAddress(m_hCertSign, "CS_Sign");
+		m_pCSClose = (PFN_CS_Close)GetProcAddress(m_hCertSign, "CS_Close");
+		m_pCSGetLastError = (PFN_CS_GetLastError)GetProcAddress(m_hCertSign, "CS_GetLastError");
+
+		if (!m_pCSOpen || !m_pCSSelectInteractive || !m_pCSSign || !m_pCSClose)
+		{
+			axlog(LOG_INIT, "CGuard::Initial certsign.dll loaded but export missing - fallback to vendor control");
+			FreeLibrary(m_hCertSign);
+			m_hCertSign = NULL;
+		}
+		else
+			axlog(LOG_INIT, "CGuard::Initial certsign.dll loaded OK");
+	}
+	else
+		axlog(LOG_INIT, "CGuard::Initial certsign.dll not found - fallback to vendor control");
+#endif
+
 
 	if (!m_sock->CreateControl(_T("AxisSock.SockCtrl.IBK2019"), NULL, WS_VISIBLE, CRect(0, 0, 0, 0), control, -1))
 	{
@@ -2166,11 +2217,14 @@ LOG_OUTP(3, "axwizard", __FUNCTION__, m_slog);
 
 BOOL CGuard::Xecure(int helper, char* pBytes, int& nBytes)
 {
-#ifdef DF_MD_XECURE
 	int nBytesIn = nBytes;
 
-	if (m_hSecureSession && m_ss &&
-		((helper == DI_ENC && m_pSSEncrypt) || (helper == DI_DEC && m_pSSDecrypt)))
+#ifdef DF_MD_XECURE
+	// The engine for this session is decided once, when AXISENCX negotiation starts
+	// (CWizardCtrl::Xecure(NULL,0)). If m_ss exists, the session key lives only inside
+	// securesession.dll, so a failure here must NOT fall back to the vendor control
+	// (it does not know the key and would produce ciphertext the server cannot read).
+	if (m_ss)
 	{
 		unsigned char outBuf[65536];
 		int outLen = sizeof(outBuf);
@@ -2190,24 +2244,25 @@ BOOL CGuard::Xecure(int helper, char* pBytes, int& nBytes)
 			nBytes = outLen;
 			return TRUE;
 		}
-		axlog(LOG_DATA, "[Xecure] helper=%s(ours) FAILED, fallback to vendor control",
-			helper == DI_ENC ? "ENC" : "DEC");
-		nBytes = nBytesIn;   // 폴백 전에 원래 길이로 복원
+		axlog(LOG_DATA, "[Xecure] helper=%s(ours) FAILED err=%s (no vendor fallback mid-session)",
+			helper == DI_ENC ? "ENC" : "DEC", m_pSSGetLastError ? m_pSSGetLastError() : "");
+		nBytes = nBytesIn;   // 실패 시 원래 길이로 복원
+		return FALSE;
 	}
-#else
+#endif
+	// vendor control path: used when DF_MD_XECURE is off, or when this session
+	// was negotiated with the vendor control (securesession.dll missing / SS_Open failed)
 	if (m_xecure == NULL)
 	{
 		axlog(LOG_DATA, "[Xecure] helper=%s SKIPPED (m_xecure is NULL)", helper == DI_ENC ? "ENC" : "DEC");
 		return FALSE;
 	}
 	BOOL	retv;
-	int		nBytesIn = nBytes;
 	m_xecure->InvokeHelper(helper, DISPATCH_METHOD, VT_BOOL, (void*)&retv,
 						(BYTE *) VTS_I4 VTS_I4, pBytes, &nBytes);
 	axlog(LOG_DATA, "[Xecure] helper=%s nBytesIn=%d nBytesOut=%d retv=%d",
 		helper == DI_ENC ? "ENC" : "DEC", nBytesIn, nBytes, retv);
 	return retv;
-#endif
 }
 
 // Dev-only override: if NOENC.TXT exists next to the running host exe (not
@@ -4486,6 +4541,10 @@ BOOL CGuard::SetFont(int point, bool resize, int key)
 
 BOOL CGuard::Certify(BOOL force, BOOL certify, BOOL xcertify, BOOL xserver)
 {
+#ifdef DF_MD_CERTSIGN
+	if (m_cs)
+		return TRUE;      // certsign 세션: 벤더 컨트롤 생성/DI_CAEX 안 함
+#endif
 	axlog(LOG_CERTIFY, "CGuard::Certify force=%d certify=%d xcertify=%d xserver=%d hasCertifyCtrl=%d",
 		force, certify, xcertify, xserver, m_certify ? 1 : 0);
 	if (certify)
@@ -4542,6 +4601,28 @@ BOOL CGuard::Certify(BOOL force, BOOL certify, BOOL xcertify, BOOL xserver)
 
 int CGuard::OnCertify(char* pBytes, int nBytes)
 {
+#ifdef DF_MD_CERTSIGN
+	if (m_cs)
+	{
+		if (pBytes == NULL || nBytes <= 0)
+			return 0;
+		// CertifyCtrl caOKx 분기와 동일: _caH.map의 8자리 맵코드들을 등록, AXISENCA 송신 없음
+		struct _caH* caH = (struct _caH*)pBytes;
+		CString text(caH->map, sizeof(caH->map));
+		int idx = text.Find('\0');
+		if (idx != -1)
+			text = text.Left(idx);
+		m_csEmaps.RemoveAll();
+		for (; !text.IsEmpty(); )
+		{
+			m_csEmaps.SetAt(text.Left(L_MAPN), NULL);
+			text = (text.GetLength() > L_MAPN) ? text.Mid(L_MAPN) : CString();
+		}
+		axlog(LOG_CERTIFY, "[CertSign] OnCertify caL=%d emaps=%d", nBytes, (int)m_csEmaps.GetCount());
+		return 0;
+	}
+#endif
+
 	axlog(LOG_CERTIFY, "CGuard::OnCertify nBytes=%d hasCertifyCtrl=%d", nBytes, m_certify ? 1 : 0);
 	if (!m_certify)
 		return -1;
@@ -4573,6 +4654,40 @@ BOOL CGuard::CertifyErr(char* pBytes, int nBytes)
 
 BOOL CGuard::Certify(char* pBytes, int& nBytes, CString maps)
 {
+#ifdef DF_MD_CERTSIGN
+	if (m_cs)
+	{
+		if (!(m_status & WS_SELF))
+		{
+			SetGuide(AE_ECERTIFY);
+			return FALSE;
+		}
+		void* p;
+		if (!m_csAuto || m_csEmaps.Lookup(maps.Left(L_MAPN), p))
+		{
+			// [v1] 기존 작은 비밀번호창(checkPasswd) 대신 선택창을 다시 띄워 비밀번호 확인
+			if (SelectCertSign() != 0)
+			{
+				SetGuide(AE_ECERTIFY);
+				return FALSE;
+			}
+		}
+		static unsigned char sig[8 * 1024];
+		int sigL = sizeof(sig);
+		int rc = m_pCSSign(m_cs, (const unsigned char*)pBytes, nBytes, sig, &sigL);
+		axlog(LOG_CERTIFY, "[CertSign] TR-sign maps=%.8s rc=%d dataLen=%d sigLen=%d",
+			maps.GetString(), rc, nBytes, rc == 0 ? sigL : 0);
+		if (rc != 0)
+		{
+			SetGuide(AE_ECERTIFY);
+			return FALSE;
+		}
+		CopyMemory(pBytes + nBytes, sig, sigL);     // CertifyCtrl::Certify와 동일: 원문 뒤에 서명
+		nBytes += sigL;
+		return TRUE;
+	}
+#endif
+
 	axlog(LOG_CERTIFY, "CGuard::Certify(TR-sign) maps=%.8s nBytes=%d hasCertifyCtrl=%d selfWS=%d",
 		maps.GetString(), nBytes, m_certify ? 1 : 0, (m_status & WS_SELF) ? 1 : 0);
 	if (!m_certify || !(m_status & WS_SELF))
@@ -4590,6 +4705,17 @@ BOOL CGuard::Certify(char* pBytes, int& nBytes, CString maps)
 
 void CGuard::CertifyId(char* pBytes, bool retry)
 {
+#ifdef DF_MD_CERTSIGN
+	if (m_cs)
+	{
+		// CertifyCtrl::CertifyId와 같은 위치: dats(22)[1] = 자동서명, cpas(32~61) = 인증서 비번 → 지움
+		m_csAuto = (pBytes[22 + 1] == '1');
+		FillMemory(pBytes + 32, 30, ' ');
+		axlog(LOG_CERTIFY, "[CertSign] CertifyId auto=%d", m_csAuto ? 1 : 0);
+		return;
+
+	}
+#endif
 	axlog(LOG_CERTIFY, "CGuard::CertifyId retry=%d", retry ? 1 : 0);
 	Certify(TRUE, TRUE);
 	if (m_certify)
@@ -6420,10 +6546,61 @@ char* CGuard::strtokx(char* str, const char delim, char** start)
 	*start = save;
 	return sbegin;
 }
+#ifdef DF_MD_CERTSIGN
+void CGuard::CloseCertSign()
+{
+	if (m_cs && m_pCSClose)
+		m_pCSClose(m_cs);
+	m_cs = NULL;
+	m_csDN.Empty();
+	m_csAuto = false;
+	m_csEmaps.RemoveAll();
+}
+
+int CGuard::SelectCertSign()
+{
+	char dn[301] = { 0 };
+	char setName[513] = { 0 };
+	unsigned char storage = 0;
+
+	int rc = m_pCSSelectInteractive(m_cs, m_parent ? m_parent->GetSafeHwnd() : NULL,
+		dn, sizeof(dn), &storage, setName, sizeof(setName));
+	if (rc == 0)
+		m_csDN = dn;
+	axlog(LOG_CERTIFY, "[CertSign] SelectInteractive rc=%d storage=%d", rc, (int)storage);
+	return rc;
+ }
+#endif
 
 long CGuard::CertifyFull(CString srcB, int srcL, char* desB, int& desL)
 {
 	desL = 0;
+
+#ifdef DF_MD_CERTSIGN
+	if (m_hCertSign && !m_csCloud)
+	{
+		CloseCertSign();                       // 재로그인/재선택: 이전 세션 정리
+		m_cs = m_pCSOpen();
+		if (m_cs)                              // CS_Open 실패면 아래 벤더 경로로 (아직 아무것도 안 보낸 시점)
+		{
+			int rc = SelectCertSign();
+			if (rc == 0)
+			{
+				int outL = 8 * 1024;           // 호출부 버퍼(caFULL의 wb) 크기
+				rc = m_pCSSign(m_cs, (const unsigned char*)srcB.operator LPCTSTR(), srcL,
+					(unsigned char*)desB, &outL);
+				if (rc == 0)
+					desL = outL;
+			}
+			axlog(LOG_CERTIFY, "[CertSign] CertifyFull engine=ours rc=%d sigLen=%d", rc, desL);
+			if (rc != 0)
+				CloseCertSign();               // 2417/2501 등 → MainFrm이 기존처럼 처리
+			return rc;
+		}
+		axlog(LOG_CERTIFY, "[CertSign] CS_Open FAILED - this session uses vendor control");
+	}
+#endif
+
 	Certify(TRUE, TRUE);
 	if (!m_certify)
 		return -1;
@@ -6437,6 +6614,14 @@ long CGuard::CertifyFull(CString srcB, int srcL, char* desB, int& desL)
 
 long CGuard::CertifyName(char* datB)
 {
+#ifdef DF_MD_CERTSIGN
+	if (m_cs)
+	{
+		CopyMemory(datB, m_csDN.GetString(), m_csDN.GetLength());
+		return m_csDN.GetLength();
+	}
+#endif
+
 	Certify(TRUE, TRUE);
 	if (!m_certify)
 		return 0;
@@ -6496,6 +6681,11 @@ int CGuard::lz4dec(char* inB, int inL, char* outB, int outL)
 
 int CGuard::CertifyCloude(LONG gubn)
 {
+#ifdef DF_MD_CERTSIGN
+	if (gubn == 11)      m_csCloud = true;     // 클라우드 사용 → certsign 안 탐
+	else if (gubn == 12) m_csCloud = false;
+#endif
+
 	if (!m_certify)
 		return 0;
 

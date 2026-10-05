@@ -10,6 +10,8 @@
 #include "h/axisfm.h"
 #include "socket.h"
 
+//#define DF_PLACE_COMPANY 1
+
 // CSockDlg 대화 상자
 #define DF_TRKEY_POOP 1
 
@@ -246,8 +248,12 @@ void CSockDlg::OnBnClickedBtnTestsend()
 }
 
 
+#ifdef DF_PLACE_COMPANY
+	#pragma comment (lib, "D:\\src\\IBKS\\src\\ibks\\securesession\\Release\\securesession.lib")
+#else
+	#pragma comment (lib, "F:\\src\\IBK\\src\\ibks\\securesession\\Release\\securesession.lib")
+#endif
 
-#pragma comment (lib, "D:\\src\\IBKS\\src\\ibks\\securesession\\Release\\securesession.lib")
 void CSockDlg::SockWrite_AXISENCX()
 {
 	CString msg;

@@ -17,7 +17,11 @@
 #endif //PCH_H
 #include "axislog.h"
 #include "ThreadingDefs.h"
-#include "D:\src\IBKS\src\ibks\securesession\securesession\securesession.h"
+#ifdef DF_PLACE_COMPANY
+	#include "D:\src\IBKs\src\ibks\securesession\securesession\securesession.h"
+#else
+	#include "F:\\src\\IBK\\src\\ibks\\securesession\\securesession\securesession.h"
+#endif
 #define DF_NOHTS
 #define DF_MAXCNT 100
 //#define DF_USEAPP

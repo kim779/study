@@ -1,4 +1,21 @@
 #pragma once
+#include <stdio.h>
+#include <stdarg.h>
+
+#define cslog(fmt, ...) cslogImpl(__FUNCTION__, __LINE__, fmt, __VA_ARGS__)
+
+static void cslogImpl(const char* func, int line, const char* fmt, ...)
+{
+    char msg [1024];
+    va_list args;
+    va_start(args, fmt);
+    _vsnprintf_s(msg, sizeof(msg), _TRUNCATE, fmt, args);
+    va_end(args);
+
+    char out[1200];
+    _snprintf_s(out, sizeof(out), _TRUNCATE, "[CERTSIGN][%s:%d] %s\n", func, line, msg);
+    OutputDebugStringA(out);
+}
 
 #ifdef CERTSIGN_EXPORTS
 #define CS_API __declspec(dllexport)

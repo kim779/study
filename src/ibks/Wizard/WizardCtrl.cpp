@@ -304,6 +304,10 @@ BOOL CWizardCtrl::RunAxis(long mode, long pBytes, long nBytes)
 			return TRUE;
 		}
 		m_guard->CertifyId((char*)pBytes);
+#ifdef DF_MD_CERTSIGN
+		if (mode == signUSER)
+			m_guard->CloseCertSign();   // ID 로그인은 벤더 CertifyCtrl 경로 (이전 인증서 세션 정리)
+#endif
 		if (m_guard->Login(mode, (char*)pBytes, nBytes, m_xtype == xtFlag::xtXEC))
 		{
 			m_mode = mtFlag::mtSIGN;
@@ -1130,18 +1134,29 @@ void CWizardCtrl::OnAxis(struct _axisH* axisH, char* pBytes, int nBytes)
 
 int CWizardCtrl::Xecure(char* pBytes, int nBytes)
 {
-#ifdef DF_MD_XECURE
 	int nBytesIn = nBytes;
-	bool useOurs = (m_guard->m_hSecureSession && m_guard->m_pSSOpen && m_guard->m_pSSHandshake);
 
-	if (useOurs)
+#ifdef DF_MD_XECURE
+	// The encryption engine for this session is decided once, here, when AXISENCX
+	// negotiation starts (pBytes == NULL). Nothing has been sent to the server yet,
+	// so if securesession.dll is missing or SS_Open fails, the whole session safely
+	// uses the vendor control instead. Once SS_Open succeeds (m_ss != NULL) the
+	// session key lives only inside securesession.dll, so later failures must NOT
+	// fall back to the vendor control.
+	if (pBytes == NULL && nBytesIn == 0)
 	{
-		unsigned char outBuf[65536];
-		int outLen = sizeof(outBuf);
-
-		if (pBytes == NULL && nBytesIn == 0)
+		if (m_guard->m_ss)		// renegotiation: drop the previous session first
 		{
-			// 최초 호출 - xc_conf.ini 경로 계산 (원본 XecureCtrl.cpp::Xecure()와 동일 로직)
+			m_guard->m_pSSClose(m_guard->m_ss);
+			m_guard->m_ss = NULL;
+		}
+
+		if (m_guard->m_hSecureSession)
+		{
+			unsigned char outBuf[65536];
+			int outLen = sizeof(outBuf);
+
+			// xc_conf.ini 경로 계산 (원본 XecureCtrl.cpp::Xecure()와 동일 로직)
 			char chfile[500]{};
 			GetModuleFileName(nullptr, chfile, 260);
 			CString spath(chfile);
@@ -1156,37 +1171,36 @@ int CWizardCtrl::Xecure(char* pBytes, int nBytes)
 			m_guard->m_ss = m_guard->m_pSSOpen("qwer1234", (LPCSTR)spath, outBuf, &outLen);
 			if (m_guard->m_ss)
 			{
-				axlog(LOG_DATA, "[Xecure-Nego] SS_Open nBytesOut=%d", outLen);
+				axlog(LOG_DATA, "[Xecure-Nego] engine=ours SS_Open nBytesOut=%d", outLen);
 				if (m_guard->Write(msgK_ENC, "AXISENCX", (char*)outBuf, outLen))
 					return outLen;
 				return -1;
 			}
-			axlog(LOG_DATA, "[Xecure-Nego] SS_Open FAILED, fallback to vendor control");
-			useOurs = false;
-		}
-		else if (m_guard->m_ss)
-		{
-			int rc = m_guard->m_pSSHandshake(m_guard->m_ss, (unsigned char*)pBytes, nBytesIn, outBuf, &outLen);
-			axlog(LOG_DATA, "[Xecure-Nego] SS_Handshake rc=%d outLen=%d", rc, outLen);
-
-			if (rc == 0)
-				return 0;
-			if (rc == 1)
-			{
-				if (m_guard->Write(msgK_ENC, "AXISENCX", (char*)outBuf, outLen))
-					return outLen;
-				return -1;
-			}
-			return -1;
+			axlog(LOG_DATA, "[Xecure-Nego] SS_Open FAILED err=%s - this session uses vendor control",
+				m_guard->m_pSSGetLastError ? m_guard->m_pSSGetLastError() : "");
 		}
 		else
-		{
-			useOurs = false;
-		}
+			axlog(LOG_DATA, "[Xecure-Nego] securesession.dll not loaded - this session uses vendor control");
 	}
+	else if (m_guard->m_ss)
+	{
+		unsigned char outBuf[65536];
+		int outLen = sizeof(outBuf);
 
-	return -1;
-#else
+		int rc = m_guard->m_pSSHandshake(m_guard->m_ss, (unsigned char*)pBytes, nBytesIn, outBuf, &outLen);
+		axlog(LOG_DATA, "[Xecure-Nego] engine=ours SS_Handshake rc=%d outLen=%d", rc, outLen);
+
+		if (rc == 0)
+			return 0;
+		if (rc == 1)
+		{
+			if (m_guard->Write(msgK_ENC, "AXISENCX", (char*)outBuf, outLen))
+				return outLen;
+		}
+		return -1;		// no vendor fallback mid-negotiation (AXISENCX already sent by ours)
+	}
+#endif
+	// vendor control path
 	if (m_guard->m_xecure == NULL)
 	{
 		m_guard->m_xecure = new CWnd();
@@ -1201,7 +1215,6 @@ int CWizardCtrl::Xecure(char* pBytes, int nBytes)
 	}
 
 	long	retv;
-	int	nBytesIn = nBytes;
 
 	m_guard->m_xecure->InvokeHelper(DI_XEC, DISPATCH_METHOD, VT_I4, (void*)&retv,
 		(BYTE*)VTS_I4 VTS_I4, pBytes, &nBytes);
@@ -1228,7 +1241,6 @@ int CWizardCtrl::Xecure(char* pBytes, int nBytes)
 	}
 	//	OnFire(FEV_GUIDE, 0, AE_ESECURE);
 	return -1;
-#endif
 }
 
 void CWizardCtrl::Run()

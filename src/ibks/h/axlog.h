@@ -20,7 +20,7 @@
 //#define DF_LOG_LOGIN
 //#define DF_LOG_SOCK_SEND
 //#define DF_LOG_SOCK_RECEIVE
-//#define DF_LOG_CERTIFY
+#define DF_LOG_CERTIFY
 // OFF by default: axisform.dll's CfmEdit::Draw/UpdateData fire on every repaint/keystroke, very high volume.
 // #define DF_LOG_AXISFORM
 

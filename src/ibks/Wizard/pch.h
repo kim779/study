@@ -15,4 +15,5 @@
 // 인덱스 조회 결과를 로그로만 비교합니다. (docs/RealtimeCodeIndex_Investigation.md)
  #define DF_RTM_INDEX
 #define  DF_MD_XECURE
+#define  DF_MD_CERTSIGN
 #endif //PCH_H

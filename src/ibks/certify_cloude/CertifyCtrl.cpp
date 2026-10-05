@@ -20,8 +20,8 @@
 #include "../h/axisfire.h"
 #include "../h/axisvar.h"
 
-#include "../../IBK/H/axislog.h"
-
+//#include "../../IBK/H/axislog.h"
+void FileLog(CString str) {};
 #pragma	comment(lib, "CaLib/SKComdIF")
 #pragma	message("Automatically linking with SKComdIF library")
 

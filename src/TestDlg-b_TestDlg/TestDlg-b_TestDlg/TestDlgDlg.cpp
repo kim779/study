@@ -10614,12 +10614,23 @@ void CTestDlgDlg::OnBnClickedFdsfile2()
 		FreeLibrary(hDll);
 	}
 
-#include "D:\src\IBKS\src\ibks\securesession\securesession\securesession.h"
-#pragma comment (lib, "D:\\src\\IBKS\\src\\ibks\\securesession\\Release\\securesession.lib")
+#ifdef DF_PLACE_COMPANY
+	#include "D:\\src\\IBKS\\src\\ibks\\securesession\\securesession\\securesession.h"
+	#pragma comment (lib, "D:\\src\\IBKS\\src\\ibks\\securesession\\Release\\securesession.lib")
+#else
+	#include "F:\\src\\IBK\\src\\ibks\\securesession\\securesession\\securesession.h"
+	#pragma comment (lib, "F:\\src\\IBK\\src\\ibks\\securesession\\Release\\securesession.lib")
+#endif
+
+
 	void CTestDlgDlg::OnBnClickedSecuresession()  
 	{
 		// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+#ifdef DF_PLACE_COMPANY
 		HMODULE  hDll = LoadLibraryA("D:\\src\\IBKS\\src\\ibks\\securesession\\Release\\securesession.dll");
+#else
+		HMODULE  hDll = LoadLibraryA("F:\\src\\IBK\\src\\ibks\\securesession\\Release\\securesession.dll");
+#endif
 		if (!hDll) {
 			printf("LoadLibrary 실패\n");
 			return;
@@ -10655,28 +10666,142 @@ void CTestDlgDlg::OnBnClickedFdsfile2()
 	}
 
 	//certsign test
-#include "D:\\src\\IBKS\\src\\ibks\\certsign\\certsign\\certsign.h"
-#pragma comment (lib, "D:\\src\\IBKS\\src\\ibks\\certsign\\release\\certsign.lib")
+#ifdef DF_PLACE_COMPANY
+	#include "D:\\src\\IBKS\\src\\ibks\\certsign\\certsign\\certsign.h"
+	#pragma comment (lib, "D:\\src\\IBKS\\src\\ibks\\certsign\\release\\certsign.lib")
+#else
+	#include "F:\\src\\IBK\\src\\ibks\\certsign\\certsign\\certsign.h"
+	#pragma comment (lib, "F:\\src\\IBK\\src\\ibks\\certsign\\release\\certsign.lib")
+#endif
+	// 세션을 버튼 밖에 유지: 로그인 때 한 번 선택하고 이후엔 서명만 하는 OPEN API 시나리오 흉내
+	static HCS  s_hcs = NULL;
+	static char s_dn[301] = { 0 };
+	static unsigned char s_storage = 0;
+
 	void CTestDlgDlg::OnBnClickedBtnWrite32()
 	{
-		HCS h = CS_Open();
-		if (!h)
+		// [2026-10-04] 선택창 방식 + 서명 테스트 (docs/ModuleSplit.md §6, §9-1)
+		// HTS 로그인(MainFrm::signOnCert -> caFULL)과 같은 원문: 공백 1바이트
+		// 첫 클릭: 선택창+서명 / 이후 클릭: 서명만 / Shift+클릭: 세션 닫고 다시 선택
+		if (s_hcs && (GetKeyState(VK_SHIFT) & 0x8000))
 		{
-			AfxMessageBox(_T("CS_Open 실패"));
-			return;
+			CS_Close(s_hcs);
+			s_hcs = NULL;
 		}
 
-		// 실제 등록된 테스트용 인증서 DN + 비밀번호로 교체해서 테스트
-		int rc = CS_Select(h,
-			"cn=황펭귄,ou=테스트지점,ou=테스트회사,ou=테스트업종,o=SignKorea,c=KR",
-			"ahffkdy123 ",3,
-			"cn=황펭귄 ou=테스트지점 ou=테스트회사 ou=테스트업종 o=SignKorea c=KR");
+		bool selectedNow = false;
+		if (!s_hcs)
+		{
+			s_hcs = CS_Open();
+			if (!s_hcs)
+			{
+				AfxMessageBox(_T("CS_Open 실패"));
+				return;
+			}
+
+			char certSetName[513] = { 0 };
+			ZeroMemory(s_dn, sizeof(s_dn));
+			int rc = CS_SelectInteractive(s_hcs, GetSafeHwnd(), s_dn, sizeof(s_dn), &s_storage, certSetName, sizeof(certSetName));
+			if (rc != 0)
+			{
+				CString msg;
+				msg.Format(_T("CS_SelectInteractive rc=%d err=%hs"), rc, CS_GetLastError());
+				AfxMessageBox(msg);
+				CS_Close(s_hcs);
+				s_hcs = NULL;
+				return;
+			}
+			selectedNow = true;
+		}
+		HCS h = s_hcs;
+
+		const unsigned char plain[1] = { ' ' };
+		static unsigned char sig1[16 * 1024], sig2[16 * 1024];
+		int sig1Len = sizeof(sig1), sig2Len = sizeof(sig2);
+
+		DWORD t0 = GetTickCount();
+		int rc1 = CS_Sign(h, plain, sizeof(plain), sig1, &sig1Len);
+		DWORD t1 = GetTickCount();
+		int rc2 = CS_Sign(h, plain, sizeof(plain), sig2, &sig2Len);	// 두 번째: 팝업 없이 되는지 확인
+		DWORD t2 = GetTickCount();
+
+		m_slog.Format("[TestDlg][%s]<%d>sig1Len=[%d]  sig2Len=[%d] plain=[%s]", __FUNCTION__, __LINE__, sig1Len, sig2Len, plain);
+		OutputDebugString(m_slog);
+
+		// 서명값 전체를 hex로 저장 (구조 분석용)
+		char tempDir[MAX_PATH] = { 0 };
+		GetTempPathA(MAX_PATH, tempDir);
+		CString path = CString(tempDir) + _T("certsign_sig.hex");
+
+		m_slog.Format("[TestDlg][%s]<%d> path=[%s]", __FUNCTION__, __LINE__, path);
+		OutputDebugString(m_slog);
+
+
+		FILE* fp = NULL;
+
+		// [2026-10-05] 덮어쓰기 전에 이전 저장값(첫 줄)과 비교: SignData(평문) → SignData_notEncode(암호화 비번)
+		// 전환 후에도 출력 형식이 같은지 확인. 같은 인증서/원문이면 1이어야 함 (-1 = 이전 파일 없음)
+		int samePrev = -1;
+		if (rc1 == 0 && fopen_s(&fp, path, "rt") == 0 && fp)
+		{
+			static char prevHex[32 * 1024 + 2];
+			prevHex[0] = 0;
+			fgets(prevHex, sizeof(prevHex), fp);
+			fclose(fp);
+			fp = NULL;
+			CStringA cur;
+			for (int i = 0; i < sig1Len; i++)
+				cur.AppendFormat("%02X", sig1[i]);
+			CStringA prev(prevHex);
+			prev.TrimRight("\r\n");
+			samePrev = (cur == prev) ? 1 : 0;
+		}
+
+		if (rc1 == 0 && fopen_s(&fp, path, "wt") == 0 && fp)
+		{
+			for (int i = 0; i < sig1Len; i++)
+				fprintf(fp, "%02X", sig1[i]);
+			fprintf(fp, "\n");
+			if (rc2 == 0)
+			{
+				for (int i = 0; i < sig2Len; i++)
+					fprintf(fp, "%02X", sig2[i]);
+				fprintf(fp, "\n");
+			}
+			fclose(fp);
+		}
+
+		CString head;
+		for (int i = 0; i < 16 && i < sig1Len; i++)
+		{
+			CString b;
+			b.Format(_T("%02X "), sig1[i]);
+			head += b;
+		}
 
 		CString msg;
-		msg.Format(_T("CS_Select rc=%d  err=%hs"), rc, CS_GetLastError());
+		msg.Format(_T("%s\ndn=%hs\nstorage=%d\n\n")
+			_T("sign#1 rc=%d len=%d (%lums)\nsign#2 rc=%d len=%d (%lums)\nsame=%d\nsamePrev=%d (vs last saved)\n\nhead: %s\nerr=%hs\nsaved: %s"),
+			selectedNow ? _T("select OK (new session)") : _T("reuse session (no select dialog)"),
+			s_dn, (int)s_storage,
+			rc1, rc1 == 0 ? sig1Len : 0, t1 - t0,
+			rc2, rc2 == 0 ? sig2Len : 0, t2 - t1,
+			(rc1 == 0 && rc2 == 0 && sig1Len == sig2Len && memcmp(sig1, sig2, sig1Len) == 0) ? 1 : 0,
+			samePrev,
+			(LPCTSTR)head, CS_GetLastError(), (LPCTSTR)path);
 		AfxMessageBox(msg);
+		// 세션은 닫지 않음 (Shift+클릭으로 재선택)
 
-		CS_Close(h);
+		//// [이전] DN 직접 지정 테스트 — DN이 실제 테스트 인증서(황너굴)와 다르고 비밀번호 끝 공백 있음
+		//HCS h = CS_Open();
+		//int rc = CS_Select(h,
+		//	"cn=황펭귄,ou=테스트지점,ou=테스트회사,ou=테스트업종,o=SignKorea,c=KR",
+		//	"<password>",3,
+		//	"cn=황펭귄 ou=테스트지점 ou=테스트회사 ou=테스트업종 o=SignKorea c=KR");
+		//CString msg;
+		//msg.Format(_T("CS_Select rc=%d  err=%hs"), rc, CS_GetLastError());
+		//AfxMessageBox(msg);
+		//CS_Close(h);
 
 
 
