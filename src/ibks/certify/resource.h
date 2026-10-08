@@ -1,6 +1,6 @@
 //{{NO_DEPENDENCIES}}
-// Microsoft Visual C++에서 생성한 포함 파일입니다.
-// Certify.rc에서 사용되고 있습니다.
+// Microsoft Developer Studio generated include file.
+// Used by Certify.rc
 //
 #define IDS_CERTIFY                     1
 #define IDB_CERTIFY                     1

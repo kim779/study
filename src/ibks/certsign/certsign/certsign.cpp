@@ -163,3 +163,33 @@ CS_API int CS_SelectInteractive(HCS h, HWND parentWnd,
 
 	return 0;
 }
+
+CS_API int CS_SignFull(HCS h, const unsigned char* data, int dataLen, unsigned char* sigOut, int* sigOutLen)
+{
+	if (!h || !sigOut || !sigOutLen)
+		return -1;
+
+	cslog("CS_SignFull len=[%d]", dataLen);
+
+	CS_SESSION* s = (CS_SESSION*)h;
+	if (!s->selected)
+		return -1;
+
+	UString in = { dataLen, (unsigned char*)data };
+	UString out = { 0 , nullptr };
+	//로그인용 - notEncode 아님. 벤터 CertifyFull/sign() 과 동일한 함수
+	if (sk_if_cert_SignData(&s->appCtx, s->encpass, &in, &out))
+		return sk_if_GetLastErrorCode();
+
+	if (out.length > *sigOutLen)
+	{
+		sk_if_cert_MemFree(out.value);
+		return  -2;
+	}
+
+	CopyMemory(sigOut, out.value, out.length);
+	*sigOutLen = out.length;
+	sk_if_cert_MemFree(out.value);
+
+	return 0;
+}

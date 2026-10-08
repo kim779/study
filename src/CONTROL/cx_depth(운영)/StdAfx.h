@@ -39,6 +39,8 @@
 
 #define DF_SHOW_LOG
 
+#define DF_TEST_HOGA
+
 inline void Output_DebugString(CString slog)
 {
 	OutputDebugString(slog);

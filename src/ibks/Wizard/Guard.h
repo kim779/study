@@ -103,6 +103,7 @@ public:
 	PFN_SS_GetLastError m_pSSGetLastError;
 	HSS                 m_ss;   // 실제(우선) 암호화 세션 핸들
 
+
 #endif 
 
 #ifdef DF_MD_CERTSIGN
@@ -112,6 +113,8 @@ public:
 	typedef int (*PFN_CS_Sign)(HCS, const unsigned char*, int, unsigned char*, int*);
 	typedef void (*PFN_CS_Close)(HCS);
 	typedef const char* (*PFN_CS_GetLastError)(void);
+	typedef int (*PFN_CS_Select)(HCS, const char*, const char*, unsigned char, const char*);
+	typedef int (*PFN_CS_SignFull)(HCS, const unsigned char*, int, unsigned char*, int*);
 
 	HMODULE			m_hCertSign;
 	PFN_CS_Open		m_pCSOpen;
@@ -119,15 +122,23 @@ public:
 	PFN_CS_Sign              m_pCSSign;
 	PFN_CS_Close             m_pCSClose;
 	PFN_CS_GetLastError      m_pCSGetLastError;
+	PFN_CS_Select            m_pCSSelect;
+	PFN_CS_SignFull          m_pCSSignFull;
+
+	CString          m_csLoginId;   //Certifyid 가 캐시한 로그인 ID, onCertify 가 DN받으면 이걸로 서명
 
 	HCS              m_cs;        // non-NULL = 이 로그인 세션은 certsign이 담당
-	CString          m_csDN;      // 선택된 인증서 DN (CertifyName용)
+	CString          m_csDN;      // 선택된 인증서 DN (CertifyName용) 
 	bool             m_csAuto;    // 로그인창 "주문시 비밀번호 입력 안함" (CertifyCtrl::m_auto)
 	bool             m_csCloud;   // CertifyCloude(11) 이후 true → 클라우드는 벤더 컨트롤
 	CMapStringToPtr  m_csEmaps;   // _caH.map: 자동서명이어도 매번 비밀번호 확인할 맵
+	char m_csPendingPass[32]{};
 
 	void	CloseCertSign();
 	int	SelectCertSign();         // 선택창 + DN 저장, 0=성공/벤더오류코드
+
+	enum CSStage { csIdle, csAwaitDn, csAwaitAck };
+	CSStage m_csStage;   // 생성자/CloseCertSign()에서 csIdle로 초기화
 #endif
 
 

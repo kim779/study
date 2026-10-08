@@ -72,7 +72,7 @@ void CPassInput::OnOK()
 	GetDlgItem(IDOK)->EnableWindow(FALSE);
 }
 
-void CPassInput::OnTimer(UINT nIDEvent) 
+void CPassInput::OnTimer(UINT nIDEvent)
 {
 	CDialog::OnTimer(nIDEvent);
 	KillTimer(nIDEvent);

@@ -1688,7 +1688,7 @@ void CCertifyCtrl::InitCloude()
 	FileLog(slog);
 
 	//해외전화 ARS 인증버튼 0:비활성화 1:활성화
-	sk_if_Cloud_AbroadPhoneAuthenticationOnOff(1);
+	//sk_if_Cloud_AbroadPhoneAuthenticationOnOff(1);
 	
 	m_bCloudeInit = TRUE;
 }

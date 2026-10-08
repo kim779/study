@@ -20,10 +20,12 @@
 #include "../h/axisfire.h"
 #include "../h/axisvar.h"
 
+//#include "../../IBK/H/axislog.h"
 
 #pragma	comment(lib, "CaLib/SKComdIF")
 #pragma	message("Automatically linking with SKComdIF library")
 
+#define DF_DEV
 #define DEV_CLOUDE_SERVER  "twas.signkorea.com"
 #define REAL_CLOUDE_SERVER "cert.signkorea.com"
 #define DEV_AGREEMENT_URL "https://tweb.signkorea.com:8700/notice/html/conditionsOfUse.txt"
@@ -34,6 +36,8 @@
 #endif
 
 #define	TM_MSG	10000
+
+void FileLog(CString slog) {};
 
 IMPLEMENT_DYNCREATE(CCertifyCtrl, COleControl)
 
@@ -55,6 +59,7 @@ BEGIN_DISPATCH_MAP(CCertifyCtrl, COleControl)
 	DISP_FUNCTION(CCertifyCtrl, "CertifyEx", CertifyEx, VT_BOOL, VTS_I4 VTS_I4)
 	DISP_FUNCTION(CCertifyCtrl, "CertifyFull", CertifyFull, VT_I4, VTS_I4 VTS_I4 VTS_I4 VTS_I4)
 	DISP_FUNCTION(CCertifyCtrl, "CertifyName", CertifyName, VT_I4, VTS_I4)
+	DISP_FUNCTION_ID(CCertifyCtrl, "CertifyCloud", dispidCertifyCloud, CertifyCloud, VT_I4, VTS_I4)
 END_DISPATCH_MAP()
 
 // 이벤트 맵입니다.
@@ -125,30 +130,6 @@ BOOL CCertifyCtrl::CCertifyCtrlFactory::UpdateRegistry(BOOL bRegister)
 
 // CCertifyCtrl::CCertifyCtrl - 생성자
 
-CString CCertifyCtrl::getStatus()
-{//enum { caNO, caNOx, caOK, caRUN, caPWD, caPWDa, caOKx } m_ca;
-	switch (m_ca)
-	{
-	case caNO:
-		return "caNO";
-	case caNOx:
-		return "caNOx";
-	case caOK:
-		return "caOK";
-	case caRUN:
-		return "caRUN";
-	case caPWD:
-		return "caPWD";
-	case caPWDa:
-		return "caPWDa";
-	case caOKx:
-		return "caOKx";
-	default:
-		return "";
-	}
-	return "";
-}
-
 CCertifyCtrl::CCertifyCtrl()
 {
 	InitializeIIDs(&IID_DCertify, &IID_DCertifyEvents);
@@ -165,6 +146,9 @@ CCertifyCtrl::CCertifyCtrl()
 
 	m_emaps.RemoveAll();
 
+	m_bDev = FALSE;
+	m_bCloudeUse = FALSE;
+	m_bCloudeInit = FALSE;
 }
 
 // CCertifyCtrl::~CCertifyCtrl - 소멸자
@@ -210,71 +194,28 @@ void CCertifyCtrl::OnResetState()
 	// TODO: 여기에서 다른 모든 컨트롤의 상태를 다시 설정합니다.
 }
 
-
-/*
-*자기 자신이 ontimer에서 sendmessage 하거나 내부의 공동인증비번 화면에서  사용됨
-
-checkPass - 1로 값을 보내줬을때 removeCertificate 호출하지만 하는것은 없음
-                    0 으로 CPassInput 다이알로그(공동인증비번 입력화면)에서 보내주며 비번인증할때..
-rebootAxis - 5회이상 오류나서 모듈 닫으려고 할때 쓴다
-encryptPass - 실제로 사용되지는 않음
-*/
 // CCertifyCtrl 메시지 처리기
 LRESULT CCertifyCtrl::OnMessage(WPARAM wParam, LPARAM lParam)
 {
 	switch (LOWORD(wParam))
 	{
-		case checkPass:   
-		{
-			if (HIWORD(wParam))	// remove certificate
-			{
-				m_slog.Format("[certify][CCertifyCtrl::OnMessage] [checkPass] removeCertificate\r\n");
-				OutputDebugString(m_slog);
-				removeCertificate();
-			}
-			else
-			{
-				m_slog.Format("[certify][CCertifyCtrl::OnMessage] [checkPass] checkPasswd\r\n");
-				OutputDebugString(m_slog);
-				return checkPasswd(CString((char*)lParam));
-			}
-		}
-		case rebootAxis:
-		{
-			m_slog.Format("[certify][CCertifyCtrl::OnMessage] [rebootAxis]\r\n");
-			OutputDebugString(m_slog);
-			OnFire(FEV_CA, MAKELONG(closeCA, HIWORD(wParam)), 0);
-		}
-			break;
-		case encryptPass:
-		{
-			m_slog.Format("[certify][CCertifyCtrl::OnMessage] [encryptPass]\r\n");
-			OutputDebugString(m_slog);
-			OnFire(FEV_CA, MAKELONG(encryptCA, HIWORD(wParam)), lParam);
-			return (long)lParam;
-		}
+	case checkPass:
+		if (HIWORD(wParam))	// remove certificate
+			removeCertificate();
+		else
+			return checkPasswd(CString((char*)lParam));
+	case rebootAxis:
+		OnFire(FEV_CA, MAKELONG(closeCA, HIWORD(wParam)), 0);
+		break;
+	case encryptPass:
+		OnFire(FEV_CA, MAKELONG(encryptCA, HIWORD(wParam)), lParam);
+		return (long)lParam;
 	}
 	return 0;
 }
 
-/*
-1. CWizardCtrl::OnSign(int signK, char* pBytes, int nBytes)
-1. CWizardCtrl::OnXecure(int encK, char* pBytes, int nBytes)
-2.m_certify->InvokeHelper(DI_ONCA,..)  
-위 방식으로 타고 온다. 
-
-pBytes = nullptr로 해서 맨처음 시작할때 초기화 목적으로 보내거나 
-로그인 하면서 인증해달라고 넘어온다.
-
-암호화(xecure) m_mode == mtFlag::mtCA || m_mode == mtFlag::mtRUN 
-과정에서도 넘어온다
-
-*/
 long CCertifyCtrl::OnCertify(long pBytes, long nBytes)
 {
-	m_slog.Format("[certify][CCertifyCtrl::OnCertify]  m_ca=[%s] nBytes=[%d]  pBytes=[%s]\r\n", getStatus(), *(int*)nBytes, (char*)pBytes);
-	OutputDebugString(m_slog);
-
 	if (pBytes == NULL)
 	{
 		m_ca = caNO;
@@ -414,9 +355,9 @@ long CCertifyCtrl::OnCertify(long pBytes, long nBytes)
 			query = false;
 		}
 
-	case caPWD:
+	case caPWD:                 
 		if (m_ca == caPWD)
-		{
+		{   //ID로그인  - 공동비번 틀리면 여기로 온다
 			retry = true;
 			struct	_pwdR* pwdR = (struct _pwdR*)pBytes;
 			switch (pwdR->ret[0])
@@ -430,18 +371,18 @@ long CCertifyCtrl::OnCertify(long pBytes, long nBytes)
 				guideMsg((msgNO)-1, msg);
 				return NULL;
 			}
-
+			//죽는 경우가 생기면
+			
 			char* pdata = new char[2];
 			memset(pdata, 0x00, 2);
 			memcpy(pdata, (char*)&pwdR->pwdn[0], 1);
 			CString sdata;
 			sdata.Format("%s", pdata); sdata.TrimRight();
 			idx = atoi(sdata);
-
-		//	idx = atoi((const char*)pwdR->pwdn[0]); // CString(pwdR->pwdn, sizeof(pwdR->pwdn)) );
 			
+			//idx = atoi((const char*)pwdR->pwdn[0]); // CString(pwdR->pwdn, sizeof(pwdR->pwdn)) );
 
-			CCountPass countDlg(idx, retry);
+			CCountPass countDlg(idx, retry);     // 공동오류 횟수 다이알로그
 			switch (countDlg.DoModal())
 			{
 			case IDOK:
@@ -547,15 +488,8 @@ long CCertifyCtrl::OnCertify(long pBytes, long nBytes)
 	return (long)m_pBytes;
 }
 
-/*
-BOOL CGuard::Certify(char* pBytes, int& nBytes, CString maps)
-실제로 맵등 화면에서 공동인증을 하려거나 할때 사용된다.
-*/
 BOOL CCertifyCtrl::Certify(long pBytes, long nBytes, long infos)
 {
-	m_slog.Format("[certify][CCertifyCtrl::Certify]  m_ca=[%s]  pBytes=[%s] infos=[%s] \r\n", getStatus(), (unsigned char*)pBytes, CString((char*)infos, L_MAPN));
-	OutputDebugString(m_slog);
-
 	switch (m_ca)
 	{
 	case caNO:
@@ -572,27 +506,30 @@ BOOL CCertifyCtrl::Certify(long pBytes, long nBytes, long infos)
 
 	ZeroMemory(encpass, sizeof(encpass));
 	CString maps = CString((char*)infos, L_MAPN);
-	if (m_auto && !isMustCertify(maps))  //로그인시 공동인증자동 체크 
+	if (m_auto && !isMustCertify(maps))  //로그인시 공동인증자동 체크했을 경우 
 		CopyMemory(encpass, m_encpass, sizeof(encpass));
-	else
+	else	//로그인시 공동인증자동 체크 안했을 경우 공동인증입력창을 작은걸로 받는다
 	{
-		CString	pass;
-		pass = checkPasswd();   //주문낼때 여기 타고 온다
-		if (pass.IsEmpty())
+		if (!m_bCloudeUse)
 		{
-			if (m_ca != caPWDa)
-				m_ca = caRUN;
-			return FALSE;
+			CString	 pass;
+			pass = checkPasswd();   //주문낼때 여기 타고 온다 작은 공인인증창 팝업
+			if (pass.IsEmpty())
+			{
+				if (m_ca != caPWDa)
+					m_ca = caRUN;
+				return FALSE;
+			}
+			sk_if_GetEncryptedPassword((char*)pass.operator LPCTSTR(), m_encpass);
+			CopyMemory(encpass, m_encpass, sizeof(encpass));
+			pass = _T("");
 		}
-		sk_if_GetEncryptedPassword((char*)pass.operator LPCTSTR(), m_encpass);
-		CopyMemory(encpass, m_encpass, sizeof(encpass));
-		pass = _T("");
 	}
-	BOOL bCloude = CheckCloude();
-	if (bCloude)
+	
+	if (m_bCloudeUse)
 	{
 		int iret = Cloude_ConTraction_sign(pBytes, nBytes);
-		return  iret == 1 ? TRUE : FALSE;
+		return  iret == 1 ? TRUE :  FALSE;
 	}
 	else
 	{
@@ -619,17 +556,9 @@ BOOL CCertifyCtrl::Certify(long pBytes, long nBytes, long infos)
 		return TRUE;
 	}
 }
-/*
-void CWizardCtrl::OnXecure(int encK, char* pBytes, int nBytes)
-m_guard->CertifyErr(pBytes, nBytes)
-m_certify->InvokeHelper(DI_CAERR, DISPATCH_METHOD, VT_BOOL, (void*)&retv,
-						(BYTE *)(VTS_I4 VTS_I4), pBytes, nBytes);
-*/
+
 BOOL CCertifyCtrl::CertifyErr(long pBytes, long nBytes)
 {
-	m_slog.Format("[certify][CCertifyCtrl::CertifyErr]  m_ca=[%s]  nBytes=[%d] pBytes=[%s] \r\n", getStatus(), (char*)pBytes);
-	OutputDebugString(m_slog);
-
 	enum { eNONE = 0, eHTS = 1, eSIGN = 2 } eKind;
 
 	eKind = eNONE;
@@ -753,61 +682,44 @@ BOOL CCertifyCtrl::CertifyErr(long pBytes, long nBytes)
 
 // id(12) + pass(10) + info(10) + cpass(30) + ip(15) + mac(16)
 // info[1] : 주문자동서명, info[2] : 공인인증사용
-/*
-CWizardCtrl::RunAxis(long mode, long pBytes, long nBytes)
-switch (mode)
-	{
-	....
-	case signUSER:
-	case signUSERc:
-		switch (m_mode)
-		{
-		case mtFlag::mtCON:
-			break;
-		case mtFlag::mtRUN:
-			m_guard->CertifyId((char*)pBytes, true);
-			return TRUE;
-		case mtFlag::mtNO:
-		default:
-			return TRUE;
-	}
-	m_guard->CertifyId((char*)pBytes);
-	if (m_guard->Login(mode, (char*)pBytes, nBytes, m_xtype == xtFlag::xtXEC))
-.....
-	m_certify->InvokeHelper(DI_CAID, DISPATCH_METHOD, VT_EMPTY, NULL, (BYTE *)(VTS_I4), pBytes);
-*/
+//ID 로그인시 최초 
 void CCertifyCtrl::CertifyId(long pBytes)
 {
-	OutputDebugString("[certify][CCertifyCtrl::CertifyId] -------------------------------------------------------------\r\n");
-	m_slog.Format("[certify][CCertifyCtrl::CertifyId]  m_ca=[%s]  pBytes=[%62s] \r\n", getStatus(), (char*)pBytes);
-	OutputDebugString(m_slog);
-
+	CString slog;
 	int	idx;
-	CString	info, pass;
+	CString	info, pass, stmp;
 	//	char* nAuto = _T("주문시매번비밀번호입력한다");
 	//	char* yAuto = _T("주문시매번비밀번호입력하지않는다");
 
 	m_user = CString((char*)pBytes, 12);
-	info = CString((char*)(pBytes + 22), 10);  
-	pass = CString((char*)(pBytes + 32), 30);
+	stmp = m_user;
+	stmp.Trim();
+
+	if (stmp.IsEmpty())  //공동인증서
+	{
+		info = CString((char*)(pBytes + 22), 10);
+		pass = CString((char*)(pBytes + 32), 30);
+	}
+	else   //ID로그인
+	{
+		info = CString((char*)(pBytes + 24), 10);
+		pass = CString((char*)(pBytes + 34), 30);
+	}
+
 	m_user.TrimRight();
 	idx = pass.Find(_T('\0'));
 	if (idx != -1)
 		pass = pass.Left(idx);
 	//	pass.TrimRight();	// 공인인증 비밀번호 마지막에 ' '(space)가 있는 경우가 있어 TrimRight 제외
-	FillMemory((char*)(pBytes + 32), 30, ' ');
-
-	m_slog.Format("[certify][CCertifyCtrl::CertifyId] m_calogon =[%d]  m_user=[%s]  info=[%s]  pass=[%s]\r\n", m_calogon, m_user, info, pass);
-	OutputDebugString(m_slog);
+	if (stmp.IsEmpty())  //공동인증서
+		FillMemory((char*)(pBytes + 32), 30, ' ');
+	else
+		FillMemory((char*)(pBytes + 34), 30, ' ');
 
 	if (!m_calogon)
 	{
 		sk_if_SetPasswordEncMode(1);
 		sk_if_GetEncryptedPassword((char*)pass.operator LPCTSTR(), m_encpass);
-
-		m_slog.Format("[certify][CCertifyCtrl::CertifyId] m_encpass=[%s]\r\n", m_encpass);
-		OutputDebugString(m_slog);
-
 		pass = _T("");
 	}
 	m_calogon = false;
@@ -817,24 +729,8 @@ void CCertifyCtrl::CertifyId(long pBytes)
 	//	m_certifys.Format("%s(%s)=%s", m_user, "사용자", m_auto ? yAuto : nAuto);
 }
 
-/*
-void CWizardCtrl::OnSign(int signK, char* pBytes, int nBytes)
-...
-if (!m_guard->Certify(FALSE, sign->flag & flagCA, sign->flag & flagCAX, sign->flag & flagXCS))
-...
-BOOL CGuard::Certify(BOOL force, BOOL certify, BOOL xcertify, BOOL xserver)
-..
-if (certify && xcertify && !xserver)
-		{
-			m_certify->InvokeHelper(DI_CAEX, DISPATCH_METHOD, VT_BOOL, (void*)&retv, (BYTE *)(VTS_I4 VTS_I4), NULL, NULL);
-
-이거 개발기는 공동인증 안할때 여기로 온다.
-*/
 BOOL CCertifyCtrl::CertifyEx(long pBytes, long nBytes)
 {
-	m_slog.Format("[certify][CCertifyCtrl::CertifyEx]  m_ca=[%s] pBytes=[%s] \r\n", getStatus(), (char*)pBytes);
-	OutputDebugString(m_slog);
-
 	if (pBytes == NULL)
 	{
 		if (MessageBox(_T("공인인증 절차를 수행할 수 없습니다.\r\n공인인증을 사용하지 않고 진행을 계속하시겠습니까?"),
@@ -848,16 +744,12 @@ BOOL CCertifyCtrl::CertifyEx(long pBytes, long nBytes)
 	return TRUE;
 }
 
-//클라우드 할때도 여기 타는지 확인한다.
 bool CCertifyCtrl::sign()
 {
-	m_slog.Format("[certify][CCertifyCtrl::sign]  m_ca=[%s]  [%d] m_certifys=[%s]\r\n", getStatus(), m_certifys.GetLength(), m_certifys);
-	OutputDebugString(m_slog);
-
 	UString src, des;
 
 	src.length = m_certifys.GetLength();
-	src.value = (unsigned char*)m_certifys.operator LPCTSTR();
+	src.value = (unsigned char*)m_certifys.operator LPCTSTR();  //m_certifys  는  로그인 시도 하는 ID이다.
 	if (sk_if_cert_SignData(&m_context, NULL, &src, &des))
 		return false;
 
@@ -871,17 +763,9 @@ bool CCertifyCtrl::sign()
 	sk_if_cert_MemFree(des.value);
 	return true;
 }
-/*
-ID로그인 할때
-OnCertify 에서  m_ca 가 case caNO:  일때 여기를 온다.  dn값을 알고 있다.
-certifyID 하고 온다. 인증처리에 대한 결과를 dn값을 통해서 가져오는거 같다. 성공 실패등 알고 있다.
 
-*/
 int CCertifyCtrl::queryDn(CString dn_name, int* nBytes, bool retry)
 {
-	m_slog.Format("[certify][CCertifyCtrl::queryDn]  m_ca=[%s] dn_name=[%s] \r\n", getStatus(), dn_name);
-	OutputDebugString(m_slog);
-
 	CWnd* pWnd;
 	BOOL	success = FALSE;
 
@@ -891,7 +775,7 @@ int CCertifyCtrl::queryDn(CString dn_name, int* nBytes, bool retry)
 	m_contextNew.sd.bForceAllCaSearchMode = 1;
 	strcpy_s(m_contextNew.sd.szUserId, E_BUFLEN, (char*)dn_name.GetString());
 	ZeroMemory(m_contextNew.sd.szOldPasswd, sizeof(m_contextNew.sd.szOldPasswd));
-	sk_if_SetKeySaferMode(1);
+	sk_if_SetKeySaferMode(1);  //9 안내받음  1기존 (IBKs 내부방화벽에서 9번관련 막힌다함..)
 	if (retry || m_encpass[0] == NULL)
 	{
 		if (pWnd && IsWindow(pWnd->GetSafeHwnd()))
@@ -904,8 +788,8 @@ int CCertifyCtrl::queryDn(CString dn_name, int* nBytes, bool retry)
 		success = sk_if_CertSetSelect(&m_contextNew.sd);
 	}
 
-	if (!success)  
-	{//ID 로그인 방식에서 공동인증서 검증 할때..  인증서 비번오류상황
+	if (!success)
+	{
 		switch (sk_if_GetLastErrorCode())
 		{
 		case 2001:		// 만료
@@ -970,9 +854,6 @@ int CCertifyCtrl::queryDn(CString dn_name, int* nBytes, bool retry)
 
 void CCertifyCtrl::savePasswd()
 {
-	m_slog.Format("[certify][CCertifyCtrl::savePasswd]  m_ca=[%s] m_encpass=[%s] \r\n", getStatus(), m_encpass);
-	OutputDebugString(m_slog);
-
 	if (m_context.pInterfaceContext == NULL)
 		return;
 
@@ -980,20 +861,11 @@ void CCertifyCtrl::savePasswd()
 
 	pass = CString(m_context.pInterfaceContext->szOldPasswd, sizeof(m_context.pInterfaceContext->szOldPasswd));
 	sk_if_GetEncryptedPassword((char*)pass.operator LPCTSTR(), m_encpass);
-
-m_slog.Format("[certify][CCertifyCtrl::savePasswd]  pass[%d]=[%s] \r\n", pass.GetLength() , pass);
-OutputDebugString(m_slog);
-m_slog.Format("[certify][CCertifyCtrl::savePasswd]  m_encpass[%d]=[%s] \r\n", strlen(m_encpass), m_encpass);
-OutputDebugString(m_slog);
-
 	pass = _T("");
 }
 
 BOOL CCertifyCtrl::checkPasswd(CString pass)
 {
-	m_slog.Format("[certify][CCertifyCtrl::checkPasswd]  m_ca=[%s] pass =[%s]  \r\n", getStatus(), pass);
-	OutputDebugString(m_slog);
-
 	CString	text;
 	UString	src, des;
 	char	encpass[32 + 1];
@@ -1038,7 +910,9 @@ CString CCertifyCtrl::checkPasswd()
 
 	src.length = 0;
 	src.value = NULL;
-	sk_if_SetKeySaferMode(1);
+
+	sk_if_SetKeySaferMode(1); //9 안내받음  1기존 (IBKs 내부방화벽에서 9번관련 막힌다함..)
+
 	if (sk_if_cert_SignData_notEncode(&m_context, encpass, &src, &des, NULL))
 	{
 		if (sk_if_GetLastErrorCode() == 2417)
@@ -1056,18 +930,11 @@ CString CCertifyCtrl::checkPasswd()
 	ZeroMemory(encpass, sizeof(encpass));
 	pass = CString(m_context.pInterfaceContext->szOldPasswd, pswdL);
 	m_sync.Unlock();
-
-	m_slog.Format("[certify][CCertifyCtrl::checkPasswd]  pass=[%s] \r\n", pass);
-	OutputDebugString(m_slog);
-
 	return pass;
 }
 
 bool CCertifyCtrl::certify(bool reissue)
 {
-	m_slog.Format("[certify][CCertifyCtrl::certify]  m_ca=[%s] reissue=[%d]\r\n", getStatus(), reissue);
-	OutputDebugString(m_slog);
-
 	m_string = _T("http://www.ibks.com/LoadService.jsp?url=/customer/certificate/newissue.jsp");
 	OnFire(FEV_CA, MAKELONG(htmlCA, 0), (long)(char*)m_string.operator LPCTSTR());
 	return true;
@@ -1075,9 +942,6 @@ bool CCertifyCtrl::certify(bool reissue)
 
 void CCertifyCtrl::otherCertificate()
 {
-	m_slog.Format("[certify][CCertifyCtrl::otherCertificate]  m_ca=[%s] \r\n", getStatus());
-	OutputDebugString(m_slog);
-
 	m_string = _T("http://www.ibks.com/LoadService.jsp?url=/customer/certificate/etc_entry.jsp");
 	OnFire(FEV_CA, MAKELONG(htmlCA, 0), (long)(char*)m_string.operator LPCTSTR());
 }
@@ -1090,9 +954,6 @@ void CCertifyCtrl::removeCertificate()
 
 bool CCertifyCtrl::guideMsg(msgNO msgno, CString guide, CString title)
 {
-	m_slog.Format("[certify][CCertifyCtrl::guideMsg]  m_ca=[%s] msgno=[%s] guide=[%s] title=[%s]\r\n", getStatus(), msgno, guide, title);
-	OutputDebugString(m_slog);
-
 	struct	_msg {
 		char	no;
 		bool	confirm;
@@ -1145,9 +1006,6 @@ bool CCertifyCtrl::guideMsg(msgNO msgno, CString guide, CString title)
 
 BOOL CCertifyCtrl::isMustCertify(CString maps)
 {
-	m_slog.Format("[certify][CCertifyCtrl::isMustCertify]  m_ca=[%s] maps=[%s] \r\n", getStatus(), maps);
-	OutputDebugString(m_slog);
-
 	void* ptr;
 
 	return m_emaps.Lookup(maps, ptr);
@@ -1156,8 +1014,8 @@ BOOL CCertifyCtrl::isMustCertify(CString maps)
 void CCertifyCtrl::OnTimer(UINT nIDEvent)
 {
 	COleControl::OnTimer(nIDEvent);
+	
 	KillTimer(nIDEvent);
-
 	if (nIDEvent != TM_MSG)
 		return;
 
@@ -1190,133 +1048,138 @@ void CCertifyCtrl::OnTimer(UINT nIDEvent)
 // updateXX_20160503
 long CCertifyCtrl::CertifyFull(long pInB, long pInL, long pOutB, long pOutL)
 {
-	BOOL bCloude = CheckCloude();
-	m_slog.Format("[certify][CCertifyCtrl::CertifyFull]  m_ca=[%s] pInL=[%d] bCloude=[%d]\r\n", getStatus(), pInL, bCloude);
-	OutputDebugString(m_slog);
-	//bCloude = false; 
-	if (bCloude)   //클라우드 로그인
+//	m_bCloudeUse = CheckCloude();
+	if (m_bCloudeUse)   //클라우드 로그인
 	{
-//--------------------------------------------------------------------------------------------------------------------------------
-//클라우드 초기화
+		m_slog.Format("[CERTIFY] DEV = [%d] [%s]", m_bDev, "!!!!!!!  클라우드 로그인 !!!!!!");
+		FileLog(m_slog);
+		//--------------------------------------------------------------------------------------------------------------------------------
+		//클라우드 초기화
 		int	pswdL, rc = 0;
 		switch (m_ca)
 		{
-			case caNO:
-			{
-				CloudConfig config;
-				memset(&config, 0x00, sizeof(CloudConfig));
+		case caNO:
+		{
+			InitCloude();
+			//CloudConfig config;
+			//memset(&config, 0x00, sizeof(CloudConfig));
 
-				config.CUSTOMER_ID = "SS0068";
-				if (m_bDev)
-				{
-					config.SITE_CODE[0] = "U1MwMDY4XzA2";
-					config.SERVER_HOST = DEV_CLOUDE_SERVER;
-					config.AGREEMENT_URL = DEV_AGREEMENT_URL;
-				}
-				else
-				{
-					config.SITE_CODE[0] = "U1MwMDY4X0FYSVNfRA==";
-					config.SERVER_HOST = REAL_CLOUDE_SERVER;
-					config.AGREEMENT_URL = REAL_AGREEMENT_URL;
-				}
+			//config.CUSTOMER_ID = "SS0068";
+			//if (m_bDev)
+			//{
+			//	config.SITE_CODE[0] = "U1MwMDY4XzA2";
+			//	config.SERVER_HOST = DEV_CLOUDE_SERVER;
+			//	config.AGREEMENT_URL = DEV_AGREEMENT_URL;
+			//}
+			//else
+			//{
+			//	config.SITE_CODE[0] = "U1MwMDY4X0FYSVNfRA==";
+			//	config.SERVER_HOST = REAL_CLOUDE_SERVER;
+			//	config.AGREEMENT_URL = REAL_AGREEMENT_URL;
+			//}
+			//
+			//config.VERSION = "1.0.0";
+			//config.SERVER_PORT = 8500;
 
-				config.VERSION = "1.0.0";
-				config.SERVER_PORT = 8500;
+			////타임아웃 기간을 설정합니다 1~10초 (msec 단위)
+			//config.TIMEOUT_MSEC = 3000;
 
-				//타임아웃 기간을 설정합니다 1~10초 (msec 단위)
-				config.TIMEOUT_MSEC = 3000;
+			//sk_if_Set_CloudConfig(config);
+			//sk_if_DialogModalMode(m_hWnd); //모달 모드
 
-				sk_if_Set_CloudConfig(config);
-				sk_if_DialogModalMode(m_hWnd); //모달 모드
+//--------------------------------------------------------------------------------------------------------------------------------
+			//APP_CONTEXT	m_context;
+			//SD_API_CONTEXT_NEW m_contextNew;
 
-	//--------------------------------------------------------------------------------------------------------------------------------
-				//APP_CONTEXT	m_context;
-				//SD_API_CONTEXT_NEW m_contextNew;
-
-				int rc = 0;
-				SD_API_CONTEXT_NEW Context;
-				memset(&Context, 0x00, sizeof(Context)); //구조체 선언
-				memset(&m_context, 0, sizeof(APP_CONTEXT));
-				sk_if_cert_InitContextApp(&m_context, NULL, (int)false); //초기화
-
-				////sk_if_SetPolicyFilter(0, NULL); //인증서 OID 필터 기능 적용
-				////sk_if_SetExipreCheckSkip(TRUE); //인증서 갱신안내 스킵옵션
-				////sk_if_Set_Show_OnlyValidateCloudCert_flag(1); //클라우드 인증서 유효한것만 보이기(컴퓨터시간 기준)
-				////sk_if_SetKeySaferMode(nflag); //키보드보안 모듈 연동	
-
-				////클라우드 인증서 선택 기능
-				////클라우드 인증서 선택을 성공하면 해당 구조체에
-				////인증서 정보와 개인키, 임시 비밀번호가 담깁니다
-				////사용 완료시까지 임시 비밀번호와 개인키 정보를 초기화 해서는 안됩니다
-				////성공시 0, 실패시 0이와에 값이 반환됩니다
-
-				////선택 옵션
-				//// SELECT_CLOUDCERT_OPTION_NOSEARCHLOCAL	1 - Dn 입력한 인증서 로컬저장소에서 검색하지 않겠다   
-				//// SELECT_CLOUDCERT_OPTION_NOCERT_OUT		4 - 클라우드에 인증서가 없으면 바로 에러 반환 (에러코드 2500)
-				rc = sk_if_CloudCertSetSelectExt(&Context, 0);
-				if (rc == 0)
-				{
-					//MessageBox("성공", "클라우드 인증서 선택", MB_OK);
-				}
-				else
-				{
+			int rc = 0;
+			SD_API_CONTEXT_NEW Context;
+			memset(&Context, 0x00, sizeof(Context)); //구조체 선언
+			memset(&m_context, 0, sizeof(APP_CONTEXT));
+			sk_if_cert_InitContextApp(&m_context, NULL, (int)false); //초기화
 			
-					memset(m_contextNew.sd.szDN, 0x00, sizeof(m_contextNew.sd.szDN));
-					if (rc == -2) //-2면 연결끊기를 한것이다.
-					{
-						*(int*)pOutL = -3;
-						return 2501;
-					}
-				
-					int errorCode = sk_if_GetLastErrorCode();
+			////sk_if_SetPolicyFilter(0, NULL); //인증서 OID 필터 기능 적용
+			////sk_if_SetExipreCheckSkip(TRUE); //인증서 갱신안내 스킵옵션
+			////sk_if_Set_Show_OnlyValidateCloudCert_flag(1); //클라우드 인증서 유효한것만 보이기(컴퓨터시간 기준)
+			////sk_if_SetKeySaferMode(nflag); //키보드보안 모듈 연동	
+
+			////클라우드 인증서 선택 기능
+			////클라우드 인증서 선택을 성공하면 해당 구조체에
+			////인증서 정보와 개인키, 임시 비밀번호가 담깁니다
+			////사용 완료시까지 임시 비밀번호와 개인키 정보를 초기화 해서는 안됩니다
+			////성공시 0, 실패시 0이와에 값이 반환됩니다
+
+			////선택 옵션
+			//// SELECT_CLOUDCERT_OPTION_NOSEARCHLOCAL	1 - Dn 입력한 인증서 로컬저장소에서 검색하지 않겠다   
+			//// SELECT_CLOUDCERT_OPTION_NOCERT_OUT		4 - 클라우드에 인증서가 없으면 바로 에러 반환 (에러코드 2500)
+			rc = sk_if_CloudCertSetSelectExt(&Context, 0);
+			if (rc == 0)
+			{
+				 
+			}
+			else
+			{
+				memset(m_contextNew.sd.szDN, 0x00, sizeof(m_contextNew.sd.szDN));
+				int errorCode = sk_if_GetLastErrorCode();
+				if (rc == -2) //-2면 연결끊기를 한것이다.
+				{
 					*(int*)pOutL = -3;
-					
+					m_slog.Format("[CERTIFY]  sk_if_CloudCertSetSelectExt rc. = [%d]  errorCode=[%d]", rc, errorCode);
+					FileLog(m_slog);
 					return errorCode;
 				}
+				
+				*(int*)pOutL = -3;
+				m_slog.Format("[CERTIFY]  sk_if_CloudCertSetSelectExt rc.. = [%d]  errorCode=[%d]", rc, errorCode);
+				FileLog(m_slog);
 
-				//Context.sd.bOldStorage == 7 은 클라우드 저장소에 있는 인증서임을 표시합니다
-				////이뒤로 서명
-				sk_if_cert_preset_context(&m_context, &Context.sd);
-				CString plain, strResult;
-				UString p1, p2, p3;
-
-				plain = "abcdefghijklmnopqrstuvwxyz1234567890!@#$%^&*()-=";
-
-				p1.value = (unsigned char*)LPCTSTR(plain);
-				p1.length = plain.GetLength();
-
-
-				//p1 = 원문 , p2 결과값 , p3 = R값 결과
-				memset(&p3, 0x00, sizeof(UString));
-				rc = sk_if_cert_SignDataWithR(&m_context, "", &p1, &p2, &p3);
-
-				if (rc) {
-					//MessageBox(sk_if_GetLastErrorMsg(), "전자서명 오류", MB_OK);
-					return sk_if_GetLastErrorCode();
-				}
-				else
-				{
-					//	MessageBox("로그인 성공", "전자 서명", MB_OK);
-					CopyMemory((void*)pOutB, p2.value, p2.length);
-					*(int*)pOutL = p2.length;
-
-					if (m_ca == caNO)
-						m_ca = caOKx;
-					m_calogon = true;
-					savePasswd();
-
-					memcpy(&m_appContext, (APP_CONTEXT*)&m_context, sizeof(APP_CONTEXT));
-					memcpy(&m_SDAPIContext, (SD_API_CONTEXT_NEW*)&Context.sd, sizeof(SD_API_CONTEXT_NEW));
-					sk_if_cert_preset_context(&m_appContext, &m_SDAPIContext.sd);
-				}
-
-				memcpy(&m_contextNew, &Context, sizeof(SD_API_CONTEXT_NEW));
+				return errorCode;
 			}
-			break;
+
+			//Context.sd.bOldStorage == 7 은 클라우드 저장소에 있는 인증서임을 표시합니다
+			////이뒤로 서명
+			sk_if_cert_preset_context(&m_context, &Context.sd);
+
+			CString plain, strResult;
+			UString p1, p2, p3;
+
+			plain = "abcdefghijklmnopqrstuvwxyz1234567890!@#$%^&*()-=";
+
+			p1.value = (unsigned char*)LPCTSTR(plain);
+			p1.length = plain.GetLength();
+
+			//p1 = 원문 , p2 결과값 , p3 = R값 결과
+			memset(&p3, 0x00, sizeof(UString));
+			rc = sk_if_cert_SignDataWithR(&m_context, "", &p1, &p2, &p3);
+
+			if (rc) {
+				m_slog.Format("[CERTIFY]  sk_if_cert_SignDataWithR 오류 rc = [%d]  errorCode=[%d]", rc, sk_if_GetLastErrorCode());
+				FileLog(m_slog);
+				return sk_if_GetLastErrorCode();
+			}
+			else
+			{
+				CopyMemory((void*)pOutB, p2.value, p2.length);
+				*(int*)pOutL = p2.length;
+				//sk_if_cert_MemFree(p2.value);//추후에 해줘야 할수도
+
+				if (m_ca == caNO)
+					m_ca = caOKx;
+				m_calogon = true;
+				savePasswd();
+
+				memcpy(&m_cpContext, (APP_CONTEXT * )&m_context, sizeof(APP_CONTEXT));
+				memcpy(&m_cpContextNew, (SD_API_CONTEXT_NEW*)&Context.sd, sizeof(SD_API_CONTEXT_NEW));
+				sk_if_cert_preset_context(&m_cpContext, &m_cpContextNew.sd);
+			}
+
+			memcpy(&m_contextNew, &Context, sizeof(SD_API_CONTEXT_NEW));
+			return 0;
+		}
+		break;
 		case caRUN:
 			pswdL = sizeof(m_context.pInterfaceContext->szOldPasswd);
 			ZeroMemory(m_context.pInterfaceContext->szOldPasswd, pswdL);
-			return Cloude_Full_sign( pOutB,  pOutL);
+			return Cloude_Full_sign(pOutB, pOutL);
 			break;
 		default:
 			OnFire(FEV_CA, MAKELONG(guideCA, AE_ECERTIFY), 0);
@@ -1353,7 +1216,7 @@ long CCertifyCtrl::CertifyFull(long pInB, long pInL, long pOutB, long pOutL)
 			m_contextNew.sd.bForceAllCaSearchMode = 1;
 			strcpy_s(m_contextNew.sd.szUserId, E_BUFLEN, (char*)m_name.GetString());
 			ZeroMemory(m_contextNew.sd.szOldPasswd, sizeof(m_contextNew.sd.szOldPasswd));
-			sk_if_SetKeySaferMode(1);
+			sk_if_SetKeySaferMode(1);  //9 안내받음  1기존 (IBKs 내부방화벽에서 9번관련 막힌다함..)
 			if (pWnd && IsWindow(pWnd->GetSafeHwnd()))
 				sk_if_DialogModalMode(pWnd->GetSafeHwnd());
 			success = sk_if_CertSetSelectExt(&m_contextNew, CONTEXT_SELECT2, SEARCH_ALLMEDIA);
@@ -1432,12 +1295,9 @@ long CCertifyCtrl::CertifyFull(long pInB, long pInL, long pOutB, long pOutL)
 		return 0;
 	}
 }
-//저장되있는 DN값을 내리는 것이다 
+
 long CCertifyCtrl::CertifyName(long pBytes)
 {
-	m_slog.Format("[certify][CCertifyCtrl::CertifyName]  m_ca=[%s] pBytes=[%s] \r\n", getStatus(), pBytes);
-	OutputDebugString(m_slog);
-
 	int	rc = 0;
 
 	rc = strlen(m_contextNew.sd.szDN);
@@ -1453,24 +1313,22 @@ BOOL CCertifyCtrl::CheckCloude()
 	CString spath, stmp;
 	spath.Format("%s", chfile);
 	spath.TrimRight();
-	
+
 	int iFind = spath.Find("exe");
 	spath = spath.Left(iFind);
 	m_root = spath;
-	spath += "tab\\axis.ini";
+	spath += "tab\\DEV_CLOUDE.ini";
 
-	int readL;
-	memset(chfile, 0x00, 500);
-
-	GetPrivateProfileString("MODE", "DEV", "0", chfile, sizeof(chfile), spath);
-	stmp.Format("%s", chfile);
-	stmp.TrimRight();
-	if (stmp == "1")
+	CFileFind   finder;
+	if (finder.FindFile(spath))
 		m_bDev = TRUE;
 	else
 		m_bDev = FALSE;
 
-	memset(chfile, 0x00, 500);
+	m_slog.Format("[CERTIFY] CheckCloude  m_bDev = [%d]  ", m_bDev);
+	FileLog(m_slog);
+
+	/*memset(chfile, 0x00, 500);
 	GetPrivateProfileString("CLOUDELOGIN", "USE", "0", chfile, sizeof(chfile), spath);
 
 	stmp.Format("%s", chfile);
@@ -1479,7 +1337,9 @@ BOOL CCertifyCtrl::CheckCloude()
 	if (stmp == "1")
 		return TRUE;
 	else
-		return FALSE;
+		return FALSE;*/
+
+	return TRUE;
 }
 
 int CCertifyCtrl::Cloude_Full_sign(long pOutB, long pOutL)
@@ -1509,7 +1369,7 @@ int CCertifyCtrl::Cloude_Full_sign(long pOutB, long pOutL)
 		else
 		{
 			int errorCode = sk_if_GetLastErrorCode();
-			MessageBox(sk_if_GetLastErrorMsg(), "전자 서명 오류", MB_OK);
+			
 			if (errorCode == 2501)   //일부러 취소했을때
 				*(int*)pOutL = -3;
 			else
@@ -1528,7 +1388,8 @@ int CCertifyCtrl::Cloude_Full_sign(long pOutB, long pOutL)
 	rc = sk_if_cert_SignDataWithR(&m_context, "", &p1, &p2, &p3);
 
 	if (rc) {
-		MessageBox(sk_if_GetLastErrorMsg(), "전자서명 오류", MB_OK);
+		m_slog.Format("[CERTIFY]  전자서명 오류 sk_if_cert_SignDataWithR rc = [%d]  errorCode=[%d]", rc, sk_if_GetLastErrorCode());
+		FileLog(m_slog);
 		CString emsg;
 		emsg = sk_if_GetLastErrorMsg();
 		int iret = sk_if_GetLastErrorCode();
@@ -1537,10 +1398,9 @@ int CCertifyCtrl::Cloude_Full_sign(long pOutB, long pOutL)
 	}
 	else
 	{
-		//MessageBox("계좌이체 성공", "전자 서명", MB_OK);
-		CopyMemory((void*)pOutB, p2.value, p2.length);
+ 		CopyMemory((void*)pOutB, p2.value, p2.length);
 		*(int*)pOutL = p2.length;
-		
+		//sk_if_cert_MemFree(p2.value); //추후에 해줘야 할수도
 		if (m_ca == caNO)
 			m_ca = caOKx;
 		m_calogon = true;
@@ -1587,23 +1447,24 @@ int CCertifyCtrl::Cloude_ConTraction_sign(long pOutB, long pOutL)
 		else
 		{
 			int errorCode = sk_if_GetLastErrorCode();
-			MessageBox(sk_if_GetLastErrorMsg(), "축약서명 오류", MB_OK);
+			m_slog.Format("[CERTIFY]  축약서명 오류 sk_if_CloudCertSetSelectExt rc = [%d]  errorCode=[%d]", rc, sk_if_GetLastErrorCode());
+			FileLog(m_slog);
 			m_sync.Unlock();
 			return  -2;
 		}
 
 		memset(&tContext, 0x00, sizeof(SD_API_CONTEXT_NEW));
 	}
-
+	
 	m_sync.Lock();
 	m_nBytes = *(int*)pOutL;
 	p1.length = m_nBytes;
 	p1.value = (unsigned char*)pOutB;
-
-	if (sk_if_cert_SignData_notEncode(&m_appContext, "", &p1, &p2, NULL))
+	
+	if (sk_if_cert_SignData_notEncode(&m_cpContext, "", &p1, &p2, NULL))
 	{
-		m_slog.Format("축약서명 오류 Ecod =[%s]", sk_if_GetLastErrorMsg());
-		MessageBox(m_slog, "IBK 투자증권", MB_OK);
+		m_slog.Format("[CERTIFY] 축약서명 오류 Ecod =[%s]", sk_if_GetLastErrorMsg());
+		FileLog(m_slog);
 		m_sync.Unlock();
 		return  -2;
 	}
@@ -1621,126 +1482,228 @@ int CCertifyCtrl::Cloude_ConTraction_sign(long pOutB, long pOutL)
 	return 0;
 }
 
-//CString CCertifyCtrl::checkPasswd()
-//{
-//	BOOL bCloude = CheckCloude();
-//
-//	m_slog.Format("[certify][CCertifyCtrl::checkPasswd]  m_ca=[%s] bCloude=[%d]\r\n", getStatus(), bCloude);
-//	OutputDebugString(m_slog);
-//
-//	if (bCloude)
-//	{
-//		CString	text, pass = _T("");
-//
-//		SD_API_CONTEXT_NEW tContext; //구조체 선언(클라우드 인증서 정보를 담을)
-//		memset(&tContext, 0x00, sizeof(SD_API_CONTEXT_NEW));
-//		int rc = 0;
-//
-//		CString plain, strResult;
-//		UString p1, p2, p3;
-//
-//		//간편비밀번호를 다시 입력 받고 싶다면
-//		if (m_contextNew.sd.bOldStorage == 7)
-//		{
-//			memcpy(&tContext, &m_contextNew, sizeof(SD_API_CONTEXT_NEW));
-//			memset(&tContext.sd.szOldPasswd, 0x00, sizeof(tContext.sd.szOldPasswd)); //비밀번호 부분만 초기화
-//
-//			rc = sk_if_CloudCertSetSelectExt(&tContext, 1);
-//
-//			if (rc == 0)
-//			{
-//				memset(&m_contextNew, 0x00, sizeof(SD_API_CONTEXT_NEW));
-//				memcpy(&m_contextNew, &tContext, sizeof(SD_API_CONTEXT_NEW));
-//				sk_if_cert_preset_context(&m_context, &m_contextNew.sd);
-//
-//			}
-//			else
-//			{
-//				int errorCode = sk_if_GetLastErrorCode();
-//				MessageBox(sk_if_GetLastErrorMsg(), "전자 서명 오류", MB_OK);
-//				return "";
-//				//if (errorCode == 2501)   //일부러 취소했을때
-//				//	*(int*)pOutL = -3;
-//				//else
-//				//	*(int*)pOutL = -2;
-//				//return -1;
-//			}
-//			memset(&tContext, 0x00, sizeof(SD_API_CONTEXT_NEW));
-//		}
-//
-//		plain = "abcdefghijklmnopqrstuvwxyz1234567890!@#$%^&*()-=";
-//		p1.value = (unsigned char*)LPCTSTR(plain);
-//		p1.length = plain.GetLength();
-//
-//		//p1 = 원문 , p2 결과값 , p3 = R값 결과
-//		memset(&p3, 0x00, sizeof(UString));
-//		rc = sk_if_cert_SignDataWithR(&m_context, "", &p1, &p2, &p3);
-//
-//		if (rc) {
-//			MessageBox(sk_if_GetLastErrorMsg(), "전자서명 오류", MB_OK);
-//			return "";
-//			/*CString emsg;
-//			emsg = sk_if_GetLastErrorMsg();
-//			int iret = sk_if_GetLastErrorCode();
-//			*(int*)pOutL = -2;
-//			return iret;*/
-//		}
-//		else
-//		{
-//			//MessageBox("계좌이체 성공", "전자 서명", MB_OK);
-//		//	CopyMemory((void*)pOutB, p2.value, p2.length);
-//		/*	*(int*)pOutL = p2.length;
-//
-//			if (m_ca == caNO)
-//				m_ca = caOKx;
-//			m_calogon = true;
-//			savePasswd();
-//
-//			return 1;*/
-//
-//			pass = CString(tContext.sd.szOldPasswd, 33);
-//			return pass;
-//		}
-//		/*		*/
-//
-//		return pass;
-//	}
-//	else
-//	{
-//		CString	text, pass = _T("");
-//		UString	src, des;
-//		char	encpass[32 + 1];
-//		int	pswdL;
-//
-//		m_sync.Lock();
-//		ZeroMemory(encpass, sizeof(encpass));
-//		pswdL = sizeof(m_context.pInterfaceContext->szOldPasswd);
-//		ZeroMemory(m_context.pInterfaceContext->szOldPasswd, pswdL);
-//
-//		src.length = 0;
-//		src.value = NULL;
-//		sk_if_SetKeySaferMode(1);
-//		if (sk_if_cert_SignData_notEncode(&m_context, encpass, &src, &des, NULL))
-//		{
-//			if (sk_if_GetLastErrorCode() == 2417)
-//			{
-//				m_ca = caPWDa;
-//				m_string = _T("pswd\t");
-//				OnFire(FEV_CA, MAKELONG(invokeCA, m_string.GetLength()), (long)(char*)m_string.operator LPCTSTR());
-//			}
-//			ZeroMemory(encpass, sizeof(encpass));
-//			m_sync.Unlock();
-//			return pass;
-//		}
-//		sk_if_cert_MemFree(des.value);
-//
-//		ZeroMemory(encpass, sizeof(encpass));
-//		pass = CString(m_context.pInterfaceContext->szOldPasswd, pswdL);
-//		m_sync.Unlock();
-//
-//		m_slog.Format("[certify][CCertifyCtrl::checkPasswd]  pass=[%s] \r\n", pass);
-//		OutputDebugString(m_slog);
-//
-//		return pass;
-//	}
-//}
+LONG CCertifyCtrl::CertifyCloud(LONG func)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	// TODO: 여기에 디스패치 처리기 코드를 추가합니다.
+	//m_bCloudeUse = CheckCloude();
+	CheckCloude();
+	InitCloude();
+	
+	int rc = 0;
+	switch (func)
+	{
+		case 1:  //인증서 올리기
+		{
+			SD_API_CONTEXT_NEW Context;
+			memset(&Context, 0x00, sizeof(Context));
+
+			rc = sk_if_UploadPCtoCloud(&Context, 0);
+			if (rc == 0)
+				return rc;
+			else
+			{
+				m_slog.Format("[CERTIFY] 클라우드로 인증서 올리기 오류 sk_if_UploadPCtoCloud rc = [%d]  errorCode=[%d] error  msg = [%s]",
+					rc, sk_if_GetLastErrorCode(), sk_if_GetLastErrorMsg());
+				FileLog(m_slog);
+				return sk_if_GetLastErrorCode();
+			}
+		}
+			break;
+		case 2:  //인증서 내려받기
+		{
+			rc = sk_if_DownloadCloudtoPC(0);
+			if (rc == 0)
+				return rc;
+			else
+			{
+				m_slog.Format("[CERTIFY] 클라우드에서 인증서리 내려받기 오류 sk_if_DownloadCloudtoPC rc = [%d]  errorCode=[%d] error  msg = [%s]",
+					rc, sk_if_GetLastErrorCode(), sk_if_GetLastErrorMsg());
+				FileLog(m_slog);
+				return sk_if_GetLastErrorCode();
+			}
+		}
+			break;
+		case 3:  //간편비밀번호 변경
+		{
+			SD_API_CONTEXT_NEW Context;
+			memset(&Context, 0x00, sizeof(Context));
+
+			rc = sk_if_CertChangePin_inCloud(&Context, 0);
+			if (rc == 0)
+				return rc;
+			else
+			{
+				m_slog.Format("[CERTIFY] 간편비밀번호 변경 오류 sk_if_CertChangePin_inCloud rc = [%d]  errorCode=[%d] error  msg = [%s]",
+					rc, sk_if_GetLastErrorCode(), sk_if_GetLastErrorMsg());
+				FileLog(m_slog);
+				return sk_if_GetLastErrorCode();
+			}
+		}
+		break;
+		case 4:  //인증서 발급
+		{
+			SD_API_CONTEXT_NEW Context;
+			memset(&Context, 0x00, sizeof(Context));
+
+			int rc = 0;
+			rc = sk_if_IssueCert_toCloud(&Context, 0);
+			if (rc == 0)
+				FileLog("[CERTIFY] 클라우드 인증서 발급");
+			else
+			{
+				m_slog.Format("[CERTIFY] 클라우드 인증서 발급 오류 sk_if_IssueCert_toCloud rc = [%d]  errorCode=[%d] error  msg = [%s]",
+					rc, sk_if_GetLastErrorCode(), sk_if_GetLastErrorMsg());
+				FileLog(m_slog);
+				return sk_if_GetLastErrorCode();
+			}
+			return 0;
+		}
+		break;
+		case 5:  //인증서 갱신
+		{
+			SD_API_CONTEXT_NEW Context;
+			memset(&Context, 0x00, sizeof(Context));
+
+			int rc = 0;
+			rc = sk_if_CertNew_toCloud(&Context, 0);
+			if (rc == 0)
+				FileLog("[CERTIFY] 클라우드 인증서 갱신");
+			else
+			{
+				m_slog.Format("[CERTIFY] 클라우드 인증서 갱신 오류 sk_if_CertNew_toCloud rc = [%d]  errorCode=[%d] error  msg = [%s]",
+					rc, sk_if_GetLastErrorCode(), sk_if_GetLastErrorMsg());
+				FileLog(m_slog);
+				return sk_if_GetLastErrorCode();
+			}
+
+			return 0;
+		}
+		break;
+		case 6:  //인증서 삭제
+		{
+			int rc = 0;
+			rc = sk_if_DeleteCert_inCloud(0);
+			if (rc == 0)
+				FileLog("[CERTIFY] 클라우드 인증서 삭제");
+			else
+			{
+				m_slog.Format("[CERTIFY] 클라우드 인증서 삭제 오류 sk_if_DeleteCert_inCloud rc = [%d]  errorCode=[%d] error  msg = [%s]",
+					rc, sk_if_GetLastErrorCode(), sk_if_GetLastErrorMsg());
+				FileLog(m_slog);
+				return sk_if_GetLastErrorCode();
+			}
+				
+			return 0;
+		}
+		break;
+		case 7: //연결확인
+		{
+			int rc = 0;
+			rc = sk_if_Connected_CloudUser_Confirm(0); //1 : 화면을 보지않고 연결확인 된 것만 알겠다
+			if (rc == 1)
+				FileLog("[CERTIFY] 클라우드 연결 끊기 성공");
+
+			if (rc < 0)
+			{
+				{
+					m_slog.Format("[CERTIFY] 클라우드에 연결된 정보 확인 rc = [%d]  errorCode=[%d] error  msg = [%s]",
+						rc, sk_if_GetLastErrorCode(), sk_if_GetLastErrorMsg());
+					FileLog(m_slog);
+					return sk_if_GetLastErrorCode();
+				}
+			}
+			FileLog("[CERTIFY] 클라우드에 연결된 정보 확인");
+	
+			return 0;
+		}
+		break;
+		case 8: //자동연결된 기기 조회
+		{
+			int rc = 0;
+			rc = sk_if_Cloud_AutoConnected_Device(0);
+			return 0;
+		}
+		break;
+		case 9:  //회원탈퇴
+		{
+			int rc = 0;
+			rc = sk_if_CloudUser_DeleteAccount(0);
+			return 0;
+		}
+		break;
+		case 10: //설정
+		{
+			return 0;
+		}
+		break;
+		case 11: //클라우드 사용
+		{
+			m_bCloudeUse = TRUE;
+			FileLog("[CERTIFY] 클라우드 사용");
+			return 0;
+		}
+		break;
+		case 12: //클라우드 미사용
+		{
+			m_bCloudeUse = FALSE;
+			FileLog("[CERTIFY] 클라우드 미사용");
+			return 0;
+		}
+		break;
+		default:
+		{
+			return 0;
+		}
+		break;
+	}
+	return 0;
+}
+
+void CCertifyCtrl::InitCloude()
+{
+	m_slog.Format("[CERTIFY]  InitCloude  m_bCloudeInit = [%d]  ", m_bCloudeInit);
+	FileLog(m_slog);
+
+	if (m_bCloudeInit)
+		return;
+
+	CString slog;
+	CloudConfig config;
+	memset(&config, 0x00, sizeof(CloudConfig));
+
+	config.CUSTOMER_ID = "SS0068";
+	if (m_bDev)
+	{
+		config.SITE_CODE[0] = "U1MwMDY4XzA2";   
+		config.SERVER_HOST = DEV_CLOUDE_SERVER;
+		config.AGREEMENT_URL = DEV_AGREEMENT_URL;
+	}
+	else
+	{
+		config.SITE_CODE[0] = "U1MwMDY4X0FYSVNfRDM=";    // U1MwMDY4X0FYSVNfRDM=   기존 U1MwMDY4X0FYSVNfRDI
+											//U1MwMDY4X0FYSVNfRDI=   <-- 코드사인토큰 변경
+											//"U1MwMDY4X0FYSVNfRA==";  //기존
+		config.SERVER_HOST = REAL_CLOUDE_SERVER;
+		config.AGREEMENT_URL = REAL_AGREEMENT_URL;
+	}
+
+	slog.Format("[CERTIFY] --InitCloude-- m_bDev=[%d]  ", m_bDev);
+	FileLog(slog);
+
+	config.VERSION = "1.0.0";
+	config.SERVER_PORT = 8500;
+
+	//타임아웃 기간을 설정합니다 1~10초 (msec 단위)
+	config.TIMEOUT_MSEC = 3000;
+	sk_if_Cloud_KeyPadUse(1);
+	sk_if_Set_CloudConfig(config);
+	sk_if_DialogModalMode(m_hWnd); //모달 모드
+	int ret = sk_if_SetKeySaferMode(1);  //9 안내받음  1기존 (IBKs 내부방화벽에서 9번관련 막힌다함..)
+	
+	slog.Format("[CERTIFY] --InitCloude-- sk_if_SetKeySaferMode ret=[%d] ", ret);
+	FileLog(slog);
+	
+	m_bCloudeInit = TRUE;
+}

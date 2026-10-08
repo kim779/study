@@ -304,10 +304,7 @@ BOOL CWizardCtrl::RunAxis(long mode, long pBytes, long nBytes)
 			return TRUE;
 		}
 		m_guard->CertifyId((char*)pBytes);
-#ifdef DF_MD_CERTSIGN
-		if (mode == signUSER)
-			m_guard->CloseCertSign();   // ID 로그인은 벤더 CertifyCtrl 경로 (이전 인증서 세션 정리)
-#endif
+
 		if (m_guard->Login(mode, (char*)pBytes, nBytes, m_xtype == xtFlag::xtXEC))
 		{
 			m_mode = mtFlag::mtSIGN;

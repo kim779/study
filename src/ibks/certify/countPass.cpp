@@ -40,7 +40,6 @@ BEGIN_MESSAGE_MAP(CCountPass, CDialog)
 	ON_BN_CLICKED(IDC_ISSUE, OnIssue)
 	ON_BN_CLICKED(IDC_OTHER, OnOther)
 	//}}AFX_MSG_MAP
-	ON_BN_CLICKED(IDOK, &CCountPass::OnBnClickedOk)
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
@@ -68,11 +67,4 @@ void CCountPass::OnIssue()
 void CCountPass::OnOther() 
 {
 	EndDialog(IDC_OTHER);
-}
-
-
-void CCountPass::OnBnClickedOk()
-{
-	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
-	CDialog::OnOK();
 }

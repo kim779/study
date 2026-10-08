@@ -339,6 +339,7 @@ BEGIN_MESSAGE_MAP(CTestDlgDlg, CDialogEx)
 		ON_BN_CLICKED(IDC_MFC_SEARCH, &CTestDlgDlg::OnBnClickedMfcSearch)
 		ON_BN_CLICKED(IDC_DUMP, &CTestDlgDlg::OnBnClickedDump)
 		ON_BN_CLICKED(IDC_SECURESESSION, &CTestDlgDlg::OnBnClickedSecuresession)
+		ON_BN_CLICKED(IDC_BTN_WRITE33, &CTestDlgDlg::OnBnClickedBtnWrite33)
 		END_MESSAGE_MAP()
 
 
@@ -10819,4 +10820,22 @@ void CTestDlgDlg::OnBnClickedFdsfile2()
 		//AfxMessageBox(msg);
 
 		//CS_Close(h);
+	}
+
+	void CTestDlgDlg::OnBnClickedBtnWrite33()
+	{
+		HCS h = CS_Open();
+		if (!h) { AfxMessageBox(_T("CS_Open 실패")); return; }
+
+		int rc = CS_Select(h,
+			"cn=황펭귄,ou=테스트지점,ou=테스트회사,ou=테스트업종,o=SignKorea,c=KR",
+			"ahffkdy123 ",
+			0,                                                                           // storage = 0 (바뀐 부분)
+			"cn=황펭귄 ou=테스트지점 ou=테스트회사 ou=테스트업종 o=SignKorea c=KR");     // DN의 콤마를 공백으로 바꾼 값
+
+		CString msg;
+		msg.Format(_T("CS_Select rc=%d  err=%hs"), rc, CS_GetLastError());
+		AfxMessageBox(msg);
+
+		CS_Close(h);
 	}

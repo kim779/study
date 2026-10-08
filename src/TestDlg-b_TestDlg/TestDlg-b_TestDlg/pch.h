@@ -17,6 +17,9 @@
 #endif //PCH_H
 #include "axislog.h"
 #include "ThreadingDefs.h"
+
+#define DF_PLACE_COMPANY 1
+
 #ifdef DF_PLACE_COMPANY
 	#include "D:\src\IBKs\src\ibks\securesession\securesession\securesession.h"
 #else

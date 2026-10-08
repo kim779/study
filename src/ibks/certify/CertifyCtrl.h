@@ -2,13 +2,8 @@
 
 // CertifyCtrl.h : CCertifyCtrl ActiveX 컨트롤 클래스의 선언입니다.
 
-#define LIB_CLOUDE 1
-
-
 #include <afxmt.h>
 #include "CaLib/interfaceDLL.h"
-
-
 
 // CCertifyCtrl : 구현에 대해서는 CertifyCtrl.cpp을(를) 참조하세요.
 
@@ -19,11 +14,7 @@ class CCertifyCtrl : public COleControl
 // 생성자입니다.
 public:
 	CCertifyCtrl();
-	CString m_slog;
-	CString m_root;
-	BOOL CheckCloude();
-	int Cloude_ConTraction_sign(long pOutB, long pOutL);
-	int Cloude_Full_sign(long pOutB, long pOutL);
+
 // 재정의입니다.
 public:
 	virtual void OnDraw(CDC* pdc, const CRect& rcBounds, const CRect& rcInvalid);
@@ -35,8 +26,9 @@ private:
 	CString		m_name;
 	APP_CONTEXT	m_context;
 	SD_API_CONTEXT_NEW m_contextNew;
-	enum { caNO, caNOx, caOK, caRUN, caPWD, caPWDa, caOKx } m_ca;
-	CString getStatus();
+	enum {
+		dispidCertifyCloud = 8L,
+		caNO, caNOx, caOK, caRUN, caPWD, caPWDa, caOKx } m_ca;
 
 	int		m_nBytes;
 	char		m_pBytes[16 * 1024];
@@ -56,6 +48,21 @@ private:
 	//	class	CPassInput*	m_passDlg;
 
 	CMapStringToPtr	m_emaps;
+
+public:     //cloude
+	BOOL	m_bCloudeUse{};
+	APP_CONTEXT m_cpContext;
+	SD_API_CONTEXT_NEW m_cpContextNew;
+	BOOL	m_bDev;
+	CString m_slog{};
+	CString m_root;
+	BOOL	m_bCloudeInit{};
+
+	void InitCloude();
+	BOOL CheckCloude();
+	int Cloude_ConTraction_sign(long pOutB, long pOutL);
+	int Cloude_Full_sign(long pOutB, long pOutL);
+	int TEST_Cloude_ConTraction_sign();
 private:
 	bool	sign();
 	int	queryDn(CString dn_name, int* nBytes, bool retry = false);
@@ -67,13 +74,7 @@ private:
 	void	removeCertificate();
 	bool	guideMsg(msgNO msgno, CString guide = _T(""), CString title = _T(""));
 	BOOL	isMustCertify(CString maps);
-	
 
-	void GetLocalIP();
-	CString m_ipAddr;
-	APP_CONTEXT m_appContext;
-	SD_API_CONTEXT_NEW m_SDAPIContext;
-	BOOL	m_bDev;
 protected:
 	~CCertifyCtrl();
 
@@ -117,5 +118,7 @@ public:
 
 		eventidOnFire = 1L,
 	};
+protected:
+	LONG CertifyCloud(LONG func);
 };
 

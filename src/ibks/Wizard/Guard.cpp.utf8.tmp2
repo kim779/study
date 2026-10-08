@@ -102,7 +102,7 @@ CGuard::CGuard()
 
 	ZeroMemory(m_encID, sizeof(m_encID));
 
-#ifdef DF_MD_XECURE   //CGuard::CGuard() 생성자
+#ifdef DF_MD_XECURE
 	m_hSecureSession = NULL;
 	m_pSSOpen = NULL;
 	m_pSSHandshake = NULL;
@@ -113,7 +113,7 @@ CGuard::CGuard()
 	m_ss = NULL;
 #endif
 
-#ifdef DF_MD_CERTSIGN   //CGuard::CGuard() 생성자
+#ifdef DF_MD_CERTSIGN
 	m_hCertSign = NULL;
 	m_pCSOpen = NULL;
 	m_pCSSelectInteractive = NULL;
@@ -155,8 +155,8 @@ CGuard::~CGuard()
 	RemoveRegistry();
 
 	if (m_xecure)
-		delete m_xecure; 
-#ifdef DF_MD_XECURE    //CGuard::~CGuard() 소멸자
+		delete m_xecure;
+#ifdef DF_MD_XECURE
 	if (m_ss && m_pSSClose)
 		m_pSSClose(m_ss);
 	m_ss = NULL;
@@ -165,7 +165,7 @@ CGuard::~CGuard()
 	m_hSecureSession = NULL;
 #endif
 
-#ifdef DF_MD_CERTSIGN //CGuard::~CGuard() 소멸자
+#ifdef DF_MD_CERTSIGN
 	CloseCertSign();
 	if (m_hCertSign)
 		FreeLibrary(m_hCertSign);
@@ -250,7 +250,7 @@ int CGuard::Initial(CWnd* control)
 		return -1;
 
 	//xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-	// [KJS] ������ ó��...  ����׽� ������ ó���ϸ� ó�� �ȵ�...
+	// [KJS] 占쏙옙占쏙옙占쏙옙 처占쏙옙...  占쏙옙占쏙옙謬占 占쏙옙占쏙옙占쏙옙 처占쏙옙占싹몌옙 처占쏙옙 占싫듸옙...
 	//xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 #ifndef _DEBUG
 	auto future = std::async([&]() {	
@@ -271,7 +271,7 @@ int CGuard::Initial(CWnd* control)
 	});
 #endif // !1
 
-#ifdef DF_MD_XECURE   //CGuard::Initial
+#ifdef DF_MD_XECURE
 	m_hSecureSession = LoadLibrary(_T("securesession.dll"));
 	if (m_hSecureSession)
 	{
@@ -299,7 +299,7 @@ int CGuard::Initial(CWnd* control)
 	}
 #endif
 
-#ifdef DF_MD_CERTSIGN  //CGuard::Initial
+#ifdef DF_MD_CERTSIGN
 	m_hCertSign = LoadLibrary(_T("certsign.dll"));
 	if (m_hCertSign)
 	{
@@ -308,10 +308,8 @@ int CGuard::Initial(CWnd* control)
 		m_pCSSign = (PFN_CS_Sign)GetProcAddress(m_hCertSign, "CS_Sign");
 		m_pCSClose = (PFN_CS_Close)GetProcAddress(m_hCertSign, "CS_Close");
 		m_pCSGetLastError = (PFN_CS_GetLastError)GetProcAddress(m_hCertSign, "CS_GetLastError");
-		m_pCSSelect = (PFN_CS_Select)GetProcAddress(m_hCertSign, "CS_Select");
-		m_pCSSignFull = (PFN_CS_SignFull)GetProcAddress(m_hCertSign, "CS_SignFull");
 
-		if (!m_pCSOpen || !m_pCSSelectInteractive || !m_pCSSelect || !m_pCSSign || !m_pCSSignFull || !m_pCSClose)
+		if (!m_pCSOpen || !m_pCSSelectInteractive || !m_pCSSign || !m_pCSClose)
 		{
 			axlog(LOG_INIT, "CGuard::Initial certsign.dll loaded but export missing - fallback to vendor control");
 			FreeLibrary(m_hCertSign);
@@ -334,7 +332,7 @@ int CGuard::Initial(CWnd* control)
 	}
 	else
 	{
-		// 임시 진단 로그 - m_sock이 실제로 어느 axSock.ocx 파일(레지스트리 등록 경로)을 로드했는지 확인용.
+		// 엫떆 吏꾨떒 濡쒓렇 - m_sock씠 떎젣濡 뼱뒓 axSock.ocx 뙆씪(젅吏뒪듃由 벑濡 寃쎈줈)쓣 濡쒕뱶뻽뒗吏 솗씤슜.
 		CString sockPath = _T("(resolve failed)");
 		CLSID clsid;
 		if (SUCCEEDED(CLSIDFromProgID(L"AxisSock.SockCtrl.IBK2019", &clsid)))
@@ -342,7 +340,7 @@ int CGuard::Initial(CWnd* control)
 			LPOLESTR clsidStr = NULL;
 			StringFromCLSID(clsid, &clsidStr);
 			CString keyPath;
-			keyPath.Format(_T("CLSID\\%S\\InprocServer32"), clsidStr);	// %S: clsidStr은 항상 wide, 이 프로젝트는 ANSI 빌드
+			keyPath.Format(_T("CLSID\\%S\\InprocServer32"), clsidStr);	// %S: clsidStr 빆긽 wide, 씠 봽濡쒖젥듃뒗 ANSI 鍮뚮뱶
 			CoTaskMemFree(clsidStr);
 
 			HKEY hKey;
@@ -428,7 +426,7 @@ int CGuard::Initial(CWnd* control)
 	isMenu(true);
 #ifndef _DEBUG
 //	//xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-//	// [KJS] ������ ���������� ��ٸ�
+//	// [KJS] 占쏙옙占쏙옙占쏙옙 占쏙옙占쏙옙占쏙옙占쏙옙占쏙옙 占쏙옙摸占
 //	//xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 	const std::chrono::milliseconds wtime(50);
 	while (future.wait_for(wtime) != std::future_status::ready)
@@ -1215,7 +1213,7 @@ void CGuard::OnNotice(char* pBytes, int nBytes)
 
 	text = CString(pBytes, nBytes);
  	tmps = text;
-	if (text.Find("w  ") != -1 && text.Find("quote") != -1)	// �ü������ǿ� ������
+	if (text.Find("w  ") != -1 && text.Find("quote") != -1)	// 占시쇽옙占쏙옙占쏙옙占실울옙 占쏙옙占쏙옙占쏙옙
 	{
 		CWorks* works;
 
@@ -1670,10 +1668,10 @@ void CGuard::Sign(int signK, char* signB, int signL, CString& dns, bool shop)
 
 	int	idx;
 	switch (signR->mask & maskSEC)  
-	{//�հ� ������ ��Ģ�� ���ߴ°� ����.
-	 //or  ,  and,  xor ���߿� �ϳ� �ϱ�� ������ �����ذ� �����ڷ� �ް�
-	//���� incS ���� ������ �����ڷ� ��Ʈ �����Ѵ�.
-	//�迭�� ���� 1, 0 ���� ��Ʈ�����ؼ� �־�д�.
+	{//占쌌곤옙 占쏙옙占쏙옙占쏙옙 占쏙옙칙占쏙옙 占쏙옙占쌩는곤옙 占쏙옙占쏙옙.
+	 //or  ,  and,  xor 占쏙옙占쌩울옙 占싹놂옙 占싹깍옙占 占쏙옙占쏙옙占쏙옙 占쏙옙占쏙옙占쌔곤옙 占쏙옙占쏙옙占쌘뤄옙 占쌨곤옙
+	//占쏙옙占쏙옙 incS 占쏙옙占쏙옙 占쏙옙占쏙옙占쏙옙 占쏙옙占쏙옙占쌘뤄옙 占쏙옙트 占쏙옙占쏙옙占싼댐옙.
+	//占썼열占쏙옙 占쏙옙占쏙옙 1, 0 占쏙옙占쏙옙 占쏙옙트占쏙옙占쏙옙占쌔쇽옙 占쌍억옙畇占.
 	case maskOR:
 		for (idx = 0; idx < sizeof(signR->incS); idx++)
 		{
@@ -1762,7 +1760,7 @@ void CGuard::Sign(int signK, char* signB, int signL, CString& dns, bool shop)
 				SYSTEMTIME st;
 				time_t	tmx = (time_t)atoi(string.Mid(idx + 1));
 				errno_t	eno = localtime_s(&ltime, &tmx);
-// KJS  2022/11/04  ���� ����....
+// KJS  2022/11/04  占쏙옙占쏙옙 占쏙옙占쏙옙....
 				if (eno == 0)
 				{
 					GetLocalTime(&st);
@@ -1914,7 +1912,7 @@ LOG_OUTP(3, "[axwizard][loadacc]", entry, __FUNCTION__);
 
 				m_accno.Add(name);
 
-				// 비밀번호(entry, 이 시점엔 이미 lz4enc로 인코딩된 값)는 절대 로그에 남기지 않음 - 계좌번호만 기록
+				// 鍮꾨踰덊샇(entry, 씠 떆젏뿏 씠誘 lz4enc濡 씤肄붾뵫맂 媛)뒗 젅 濡쒓렇뿉 궓湲곗 븡쓬 - 怨꾩쥖踰덊샇留 湲곕줉
 				axlog(LOG_LOGIN, "[AddRegistry] ACCNO[%d/%d] account=%s (password omitted)", ii + 1, size, name);
 			}
 			break;
@@ -2248,7 +2246,7 @@ BOOL CGuard::Xecure(int helper, char* pBytes, int& nBytes)
 		}
 		axlog(LOG_DATA, "[Xecure] helper=%s(ours) FAILED err=%s (no vendor fallback mid-session)",
 			helper == DI_ENC ? "ENC" : "DEC", m_pSSGetLastError ? m_pSSGetLastError() : "");
-		nBytes = nBytesIn;   // 실패 시 원래 길이로 복원
+		nBytes = nBytesIn;   // 떎뙣 떆 썝옒 湲몄씠濡 蹂듭썝
 		return FALSE;
 	}
 #endif
@@ -4543,9 +4541,9 @@ BOOL CGuard::SetFont(int point, bool resize, int key)
 
 BOOL CGuard::Certify(BOOL force, BOOL certify, BOOL xcertify, BOOL xserver)
 {
-#ifdef DF_MD_CERTSIGN    //CGuard::Certify
+#ifdef DF_MD_CERTSIGN
 	if (m_cs)
-		return TRUE;      // certsign 세션: 벤더 컨트롤 생성/DI_CAEX 안 함
+		return TRUE;      // certsign 꽭뀡: 踰ㅻ뜑 而⑦듃濡 깮꽦/DI_CAEX 븞 븿
 #endif
 	axlog(LOG_CERTIFY, "CGuard::Certify force=%d certify=%d xcertify=%d xserver=%d hasCertifyCtrl=%d",
 		force, certify, xcertify, xserver, m_certify ? 1 : 0);
@@ -4603,21 +4601,13 @@ BOOL CGuard::Certify(BOOL force, BOOL certify, BOOL xcertify, BOOL xserver)
 
 int CGuard::OnCertify(char* pBytes, int nBytes)
 {
-#ifdef DF_MD_CERTSIGN //CGuard::OnCertify
+#ifdef DF_MD_CERTSIGN
 	if (m_cs)
 	{
 		if (pBytes == NULL || nBytes <= 0)
 			return 0;
-		// CertifyCtrl caOKx 분기와 동일: _caH.map의 8자리 맵코드들을 등록, AXISENCA 송신 없음
+		// CertifyCtrl caOKx 遺꾧린 룞씪: _caH.map쓽 8옄由 留듭퐫뱶뱾쓣 벑濡, AXISENCA 넚떊 뾾쓬
 		struct _caH* caH = (struct _caH*)pBytes;
-
-		if (m_csStage == csAwaitAck)
-		{
-			m_csStage = csIdle;
-			SecureZeroMemory(m_csPendingPass, sizeof(m_csPendingPass));
-			return 0;
-		}
-
 		CString text(caH->map, sizeof(caH->map));
 		int idx = text.Find('\0');
 		if (idx != -1)
@@ -4629,50 +4619,6 @@ int CGuard::OnCertify(char* pBytes, int nBytes)
 			text = (text.GetLength() > L_MAPN) ? text.Mid(L_MAPN) : CString();
 		}
 		axlog(LOG_CERTIFY, "[CertSign] OnCertify caL=%d emaps=%d", nBytes, (int)m_csEmaps.GetCount());
-
-		if (m_csStage == csAwaitDn)
-		{
-			//caNO 대응 : dn 받아서 팝업없이 선택 + 서명 + 전송
-			CString dn(caH->dns, sizeof(caH->dns));
-			int idx = dn.Find('\0');
-			if (idx != -1)
-				dn = dn.Left(idx);
-			m_csDN = dn;
-
-			//int rc = m_pCSSelect(m_cs, m_csDN.GetString(), nullptr, 0, m_csPendingPass);
-			CString stmp;
-			stmp = m_csDN;
-			stmp.Replace(",", " ");
-			int rc = m_pCSSelect(m_cs, m_csDN.GetString(), m_csPendingPass, 0, stmp.GetString());
-
-			if (rc != 0)
-			{
-				m_csStage = csIdle;
-				SecureZeroMemory(m_csPendingPass, sizeof(m_csPendingPass));
-				return -1;
-			}
-
-			CString keys = _T("key\t");
-			static unsigned char sig[8 * 1024]{};
-			int sigL = sizeof(sig) - keys.GetLength();
-			 rc = m_pCSSign(m_cs, (const unsigned char*)m_csLoginId.GetString(), m_csLoginId.GetLength(), sig, &sigL);
-			axlog(LOG_CERTIFY, "[CertSign] OnCertify Sign rc=%d sigLen=%d", rc, rc == 0 ? sigL : 0);
-			if (rc != 0)
-			{
-				m_csStage = csIdle;
-				SecureZeroMemory(m_csPendingPass, sizeof(m_csPendingPass));
-				return -1;
-			}
-			
-			static unsigned char outBuf[8 * 1024];
-			CopyMemory(outBuf, keys.GetString(), keys.GetLength());
-			CopyMemory(outBuf + keys.GetLength(), sig, sigL);
-			int outL = keys.GetLength() + sigL;
-
-			SecureZeroMemory(m_csPendingPass, sizeof(m_csPendingPass));
-			m_csStage = csAwaitAck;
-			return Write(msgK_XCA, "AXISENCA", (char*)outBuf, outL) ? outL : -1;
-		}
 		return 0;
 	}
 #endif
@@ -4708,7 +4654,7 @@ BOOL CGuard::CertifyErr(char* pBytes, int nBytes)
 
 BOOL CGuard::Certify(char* pBytes, int& nBytes, CString maps)
 {
-#ifdef DF_MD_CERTSIGN  //CGuard::Certify
+#ifdef DF_MD_CERTSIGN
 	if (m_cs)
 	{
 		if (!(m_status & WS_SELF))
@@ -4719,7 +4665,7 @@ BOOL CGuard::Certify(char* pBytes, int& nBytes, CString maps)
 		void* p;
 		if (!m_csAuto || m_csEmaps.Lookup(maps.Left(L_MAPN), p))
 		{
-			// [v1] 기존 작은 비밀번호창(checkPasswd) 대신 선택창을 다시 띄워 비밀번호 확인
+			// [v1] 湲곗〈 옉 鍮꾨踰덊샇李(checkPasswd) 떊 꽑깮李쎌쓣 떎떆 쓣썙 鍮꾨踰덊샇 솗씤
 			if (SelectCertSign() != 0)
 			{
 				SetGuide(AE_ECERTIFY);
@@ -4736,7 +4682,7 @@ BOOL CGuard::Certify(char* pBytes, int& nBytes, CString maps)
 			SetGuide(AE_ECERTIFY);
 			return FALSE;
 		}
-		CopyMemory(pBytes + nBytes, sig, sigL);     // CertifyCtrl::Certify와 동일: 원문 뒤에 서명
+		CopyMemory(pBytes + nBytes, sig, sigL);     // CertifyCtrl::Certify 룞씪: 썝臾 뮘뿉 꽌紐
 		nBytes += sigL;
 		return TRUE;
 	}
@@ -4759,22 +4705,14 @@ BOOL CGuard::Certify(char* pBytes, int& nBytes, CString maps)
 
 void CGuard::CertifyId(char* pBytes, bool retry)
 {
-#ifdef DF_MD_CERTSIGN  //CGuard::CertifyId
-	if (!m_cs && m_hCertSign)
-		m_cs = m_pCSOpen();
-
+#ifdef DF_MD_CERTSIGN
 	if (m_cs)
 	{
 		CString stmp(pBytes, 12);
 		stmp.Trim();
 
-		m_csStage = csAwaitDn;
-
-		if (!stmp.IsEmpty())
-			m_csLoginId = stmp;
-
-		int infoOff = stmp.IsEmpty() ? 22 : 24;   // 공동인증서: 22 / ID로그인: 24
-		int passOff = stmp.IsEmpty() ? 32 : 34;   // 공동인증서: 32 / ID로그인: 34
+		int infoOff = stmp.IsEmpty() ? 22 : 24;   // 怨듬룞씤利앹꽌: 22 / ID濡쒓렇씤: 24
+		int passOff = stmp.IsEmpty() ? 32 : 34;   // 怨듬룞씤利앹꽌: 32 / ID濡쒓렇씤: 34
 
 		m_csAuto = (pBytes[infoOff + 1] == '1');
 
@@ -6085,7 +6023,7 @@ CString CGuard::GetFileName(CString fileN, CString filter, CString& ext, bool fo
 			if (GetString(AS_FILE, tmps))
 				string.Format(tmps, fileN);
 			else
-				string.Format(_T("�� ��ġ��  \'%s\' ������ �ֽ��ϴ�. ������ ������(��) �ٲٽðڽ��ϱ�?"), fileN.GetString());
+				string.Format(_T("占쏙옙 占쏙옙치占쏙옙  \'%s\' 占쏙옙占쏙옙占쏙옙 占쌍쏙옙占싹댐옙. 占쏙옙占쏙옙占쏙옙 占쏙옙占쏙옙占쏙옙(占쏙옙) 占쌕꾸시겠쏙옙占싹깍옙?"), fileN.GetString());
 
 			int	rc = ::MessageBox(NULL, string, "Excel", MB_YESNOCANCEL | MB_ICONINFORMATION);
 			switch (rc)
@@ -6096,7 +6034,7 @@ CString CGuard::GetFileName(CString fileN, CString filter, CString& ext, bool fo
 					if (GetString(AS_USING, tmps))
 						string.Format(tmps, fileN);
 					else
-						string.Format(_T("\'%s\' ������ ������Դϴ�. ������� ������ �ݰ� �ٽ� �õ��� �ֽʽÿ�."), fileN.GetString());
+						string.Format(_T("\'%s\' 占쏙옙占쏙옙占쏙옙 占쏙옙占쏙옙占쏙옙都求占. 占쏙옙占쏙옙占쏙옙占 占쏙옙占쏙옙占쏙옙 占쌥곤옙 占쌕쏙옙 占시듸옙占쏙옙 占쌍십시울옙."), fileN.GetString());
 					::MessageBox(NULL, string, "Excel", MB_OK | MB_ICONINFORMATION);
 					return _T("");
 				}
@@ -6391,7 +6329,7 @@ void CGuard::DoRTM(CString code, int stat, CdataSet* fms, CObArray* obs, CString
 		m_alertR.ptr[0] = (DWORD)fms->GetData();
 	}
 
-	m_parent->SendMessage(WM_ANM, 0, (LPARAM)&m_alertR);		// Array �������� ����
+	m_parent->SendMessage(WM_ANM, 0, (LPARAM)&m_alertR);		// Array 占쏙옙占쏙옙占쏙옙占쏙옙 占쏙옙占쏙옙
 	for (pos = m_clients.GetStartPosition(); pos; )
 	{
 		m_clients.GetNextAssoc(pos, key, works);
@@ -6621,7 +6559,7 @@ char* CGuard::strtokx(char* str, const char delim, char** start)
 	*start = save;
 	return sbegin;
 }
-#ifdef DF_MD_CERTSIGN  //CGuard::CloseCertSign
+#ifdef DF_MD_CERTSIGN
 void CGuard::CloseCertSign()
 {
 	if (m_cs && m_pCSClose)
@@ -6652,25 +6590,25 @@ long CGuard::CertifyFull(CString srcB, int srcL, char* desB, int& desL)
 {
 	desL = 0;
 
-#ifdef DF_MD_CERTSIGN  //CGuard::CertifyFull
+#ifdef DF_MD_CERTSIGN
 	if (m_hCertSign && !m_csCloud)
 	{
-		CloseCertSign();                       // 재로그인/재선택: 이전 세션 정리
+		CloseCertSign();                       // 옱濡쒓렇씤/옱꽑깮: 씠쟾 꽭뀡 젙由
 		m_cs = m_pCSOpen();
-		if (m_cs)                              // CS_Open 실패면 아래 벤더 경로로 (아직 아무것도 안 보낸 시점)
+		if (m_cs)                              // CS_Open 떎뙣硫 븘옒 踰ㅻ뜑 寃쎈줈濡 (븘吏 븘臾닿쾬룄 븞 蹂대궦 떆젏)
 		{
 			int rc = SelectCertSign();
 			if (rc == 0)
 			{
-				int outL = 8 * 1024;           // 호출부 버퍼(caFULL의 wb) 크기
-				rc = m_pCSSignFull(m_cs, (const unsigned char*)srcB.operator LPCTSTR(), srcL,
+				int outL = 8 * 1024;           // 샇異쒕 踰꾪띁(caFULL쓽 wb) 겕湲
+				rc = m_pCSSign(m_cs, (const unsigned char*)srcB.operator LPCTSTR(), srcL,
 					(unsigned char*)desB, &outL);
 				if (rc == 0)
 					desL = outL;
 			}
 			axlog(LOG_CERTIFY, "[CertSign] CertifyFull engine=ours rc=%d sigLen=%d", rc, desL);
 			if (rc != 0)
-				CloseCertSign();               // 2417/2501 등 → MainFrm이 기존처럼 처리
+				CloseCertSign();               // 2417/2501 벑 넂 MainFrm씠 湲곗〈泥섎읆 泥섎━
 			return rc;
 		}
 		axlog(LOG_CERTIFY, "[CertSign] CS_Open FAILED - this session uses vendor control");
@@ -6690,7 +6628,7 @@ long CGuard::CertifyFull(CString srcB, int srcL, char* desB, int& desL)
 
 long CGuard::CertifyName(char* datB)
 {
-#ifdef DF_MD_CERTSIGN  //CGuard::CertifyName
+#ifdef DF_MD_CERTSIGN
 	if (m_cs)
 	{
 		CopyMemory(datB, m_csDN.GetString(), m_csDN.GetLength());
@@ -6757,8 +6695,8 @@ int CGuard::lz4dec(char* inB, int inL, char* outB, int outL)
 
 int CGuard::CertifyCloude(LONG gubn)
 {
-#ifdef DF_MD_CERTSIGN  //CGuard::CertifyCloude
-	if (gubn == 11)      m_csCloud = true;     // 클라우드 사용 → certsign 안 탐
+#ifdef DF_MD_CERTSIGN
+	if (gubn == 11)      m_csCloud = true;     // 겢씪슦뱶 궗슜 넂 certsign 븞 깘
 	else if (gubn == 12) m_csCloud = false;
 #endif
 

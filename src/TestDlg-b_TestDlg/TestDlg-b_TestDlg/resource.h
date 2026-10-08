@@ -291,6 +291,7 @@
 #define IDC_STATIC_PAINT                1178
 #define IDC_SECURESESSION               1178
 #define IDC_DRAW_THREAD                 1179
+#define IDC_BTN_WRITE33                 1179
 #define IDC_DRAW_THREAD2                1180
 #define IDC_FUNC_CB                     1181
 #define IDC_CAL                         1182

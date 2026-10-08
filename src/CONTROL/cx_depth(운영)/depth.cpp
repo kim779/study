@@ -913,8 +913,10 @@ long Cdepth::OnMessage(WPARAM wParam, LPARAM lParam)
 			if (HIWORD(wParam) == alert_DEIN)
 				break;
 
-		//	if (GetTickCount() - m_dwTestOpenTick < 3000)	//TEST_TEMP: 10초간 실시간 무시
-		//		break;
+#ifdef DF_TEST_HOGA
+		if (GetTickCount() - m_dwTestOpenTick < 3000)	//TEST_TEMP: 10초간 실시간 무시
+				break;
+#endif
 
 			struct _alertR* alertR = (struct _alertR*)lParam;
 
@@ -1543,8 +1545,12 @@ void Cdepth::dispatchTEN(char* datB, int datL)
 	for (int ii = 0; ii < 10; ii++)
 	{
 		tmps = CString(hoga->price[ii].ask, sizeof(hoga->price[ii].ask));
-		m_items.GetAt(askPrice1+ii)->m_data = format(tmps, askPrice1+ii);
-		//m_items.GetAt(askPrice1 + ii)->m_data = bTestNoHoga ? _T("") : format(tmps, askPrice1 + ii);   //TEST_TEMP
+		
+#ifdef DF_TEST_HOGA
+		m_items.GetAt(askPrice1 + ii)->m_data = bTestNoHoga ? _T("") : format(tmps, askPrice1 + ii);   //TEST_TEMP
+#else
+		m_items.GetAt(askPrice1 + ii)->m_data = format(tmps, askPrice1 + ii);
+#endif
 
 		if (m_items.GetAt(askPrice1+ii)->m_data.GetLength() > 7)
 		{
@@ -1566,8 +1572,11 @@ void Cdepth::dispatchTEN(char* datB, int datL)
 		m_items.GetAt(askI+ii)->m_data = format(tmps, askI+ii);
 
 		tmps = CString(hoga->price[ii].bid, sizeof(hoga->price[ii].bid));
-		//m_items.GetAt(bidPrice1 + ii)->m_data = bTestNoHoga ? _T("") : format(tmps, bidPrice1 + ii);   //TEST_TEMP
+#ifdef DF_TEST_HOGA
+		m_items.GetAt(bidPrice1 + ii)->m_data = bTestNoHoga ? _T("") : format(tmps, bidPrice1 + ii);   //TEST_TEMP
+#else
 		m_items.GetAt(bidPrice1+ii)->m_data = format(tmps, bidPrice1+ii);
+#endif
 
 		if (m_items.GetAt(bidPrice1+ii)->m_data.GetLength() > 7)
 		{

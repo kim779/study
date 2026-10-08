@@ -54,6 +54,12 @@ CS_API int CS_SelectInteractive(HCS h, HWND parentWnd,
     unsigned char* storageOut,
     char* certSetNameOut, int certSetNameOutCap);
 
+//Sign data for th LOGIN step - produces a full PKCS#7 SignedData bundle
+//with the signer's certificate embedded (server identifyes the account from 
+//the embedded cert). Nedds CS_Select/CS_SelectInteractive to have succeeded
+//Unlike CS_Sign (lean, no-cert, for repeat TR-signing), this is required
+//for login because the server has no prior session to identify you by.
+CS_API int CS_SignFull(HCS h, const unsigned char* data, int dataLen, unsigned char* sigOut, int* sigOutLen);
 
 #ifdef __cplusplus
 }

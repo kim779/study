@@ -591,6 +591,9 @@ extern "C" {
 	__declspec(dllimport) int sk_if_Connected_CloudUser_Confirm(int nOptionValue);
 	__declspec(dllimport) int sk_if_Cloud_AutoConnected_Device(int nOptionValue);
 	__declspec(dllimport) int sk_if_CloudUser_DeleteAccount(int nOptionValue);
+	__declspec(dllimport) int sk_if_NotCloudConnect_PinCheckPossibleOnOff(int flag);
+	__declspec(dllimport) int sk_if_Cloud_AutoConnectCheckBoxHide(int flag);
+	__declspec(dllimport) int sk_if_Cloud_GetCurrentUserID(char * char65Byte_UserID, int nOptionValue);
 
 #ifdef __cplusplus
 }

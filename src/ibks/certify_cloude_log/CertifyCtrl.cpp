@@ -724,19 +724,34 @@ BOOL CCertifyCtrl::CertifyErr(long pBytes, long nBytes)
 void CCertifyCtrl::CertifyId(long pBytes)
 {
 	int	idx;
-	CString	info, pass;
+	CString	info, pass, stmp;
 	//	char* nAuto = _T("주문시매번비밀번호입력한다");
 	//	char* yAuto = _T("주문시매번비밀번호입력하지않는다");
 
 	m_user = CString((char*)pBytes, 12);
-	info = CString((char*)(pBytes + 22), 10);
-	pass = CString((char*)(pBytes + 32), 30);
+	stmp = m_user;
+	stmp.Trim();
+
+	if (stmp.IsEmpty())  //공동인증서
+	{
+		info = CString((char*)(pBytes + 22), 10);
+		pass = CString((char*)(pBytes + 32), 30);
+	}
+	else   //ID로그인
+	{
+		info = CString((char*)(pBytes + 24), 10);
+		pass = CString((char*)(pBytes + 34), 30);
+	}
+
 	m_user.TrimRight();
 	idx = pass.Find(_T('\0'));
 	if (idx != -1)
 		pass = pass.Left(idx);
 	//	pass.TrimRight();	// 공인인증 비밀번호 마지막에 ' '(space)가 있는 경우가 있어 TrimRight 제외
-	FillMemory((char*)(pBytes + 32), 30, ' ');
+	if (stmp.IsEmpty())  //공동인증서
+		FillMemory((char*)(pBytes + 32), 30, ' ');
+	else
+		FillMemory((char*)(pBytes + 34), 30, ' ');
 
 	if (!m_calogon)
 	{
@@ -749,7 +764,7 @@ void CCertifyCtrl::CertifyId(long pBytes)
 	m_auto = (info.GetAt(1) == '1') ? true : false;
 	m_certifys.Format(_T("%s"), m_user.GetString());
 	//	m_certifys.Format("%s(%s)=%s", m_user, "사용자", m_auto ? yAuto : nAuto);
-	axlog(LOG_CERTIFY, "CertifyId EXIT userLen=%d m_auto=%d", m_user.GetLength(), m_auto);
+	axlog(LOG_CERTIFY, "CertifyId EXIT userLen=%d m_auto=%d certOnly=%d", m_user.GetLength(), m_auto, stmp.IsEmpty());
 }
 
 BOOL CCertifyCtrl::CertifyEx(long pBytes, long nBytes)
@@ -1751,7 +1766,7 @@ void CCertifyCtrl::InitCloude()
 	}
 	else
 	{
-		config.SITE_CODE[0] = "U1MwMDY4X0FYSVNfRDI=";  
+		config.SITE_CODE[0] = "U1MwMDY4X0FYSVNfRDM=";    // U1MwMDY4X0FYSVNfRDM=   기존 U1MwMDY4X0FYSVNfRDI
 											//U1MwMDY4X0FYSVNfRDI=   <-- 코드사인토큰 변경
 											//"U1MwMDY4X0FYSVNfRA==";  //기존
 		config.SERVER_HOST = REAL_CLOUDE_SERVER;
