@@ -1306,3 +1306,44 @@ void CWizardCtrl::OnStream(struct _axisH* axisH, char* pBytes, int nBytes)
 		delete[] m_axisB;
 	}
 }
+
+#ifdef DF_MD_CERTSIGN
+// CertifyCtrl의 CCountPass(IDD_COUNT) 대응. v1: [재입력]/[취소]만 (재발급·타기관 등록은 v2)
+int CertPwdErrorPrompt(int count, bool retry)
+{
+	CString text;
+	text.Format(_T("입력하신 전자서명비밀번호가 맞지 않습니다. (%d회)\n")
+		_T("계속해서 5회 이상 전자서명비밀번호가 맞지 않는 경우\n")
+		_T("더 이상 전자서명을 수행할 수 없습니다.\n")
+		_T("기타 궁금하신 사항은 고객센터로 문의하시기 바랍니다."), count);
+
+	if (!retry)
+	{
+		AfxMessageBox(text, MB_ICONSTOP | MB_SYSTEMMODAL);
+		return FALSE;
+	}
+	text += _T("\n\n다시 입력하시겠습니까?");
+	return AfxMessageBox(text, MB_OKCANCEL | MB_ICONWARNING | MB_SYSTEMMODAL) == IDOK;
+}
+
+// CertifyCtrl::OnTimer(TM_MSG) 대응 (TR 서명 중 비밀번호 오류 후 서버 응답)
+void CertTrPwdErrorMsg(char ret, int count, CString msg)
+{
+	CString text;
+	switch (ret)
+	{
+	case 'X':
+		CertPwdErrorPrompt(count, false);   // 5회: 안내 후 호출부가 -3 → AXIS 종료
+		return;
+	case '0':
+		text.Format(_T("전자서명 비밀번호 %d회 오류입니다"), count);
+		break;
+	default:
+		text = msg;
+		text.Trim();
+		break;
+	}
+	AfxMessageBox(text, MB_ICONINFORMATION | MB_OK);
+}
+
+#endif

@@ -115,6 +115,8 @@ public:
 	typedef const char* (*PFN_CS_GetLastError)(void);
 	typedef int (*PFN_CS_Select)(HCS, const char*, const char*, unsigned char, const char*);
 	typedef int (*PFN_CS_SignFull)(HCS, const unsigned char*, int, unsigned char*, int*);
+	typedef int (*PFN_CS_VerifyPassword)(HCS, HWND);
+	typedef int (*PFN_CS_SignFullPrompt)(HCS, HWND, const unsigned char*, int, unsigned char*, int*);
 
 	HMODULE			m_hCertSign;
 	PFN_CS_Open		m_pCSOpen;
@@ -124,6 +126,9 @@ public:
 	PFN_CS_GetLastError      m_pCSGetLastError;
 	PFN_CS_Select            m_pCSSelect;
 	PFN_CS_SignFull          m_pCSSignFull;
+	PFN_CS_VerifyPassword    m_pCSVerifyPassword;                      // 추가 (없으면 선택창 폴백)
+	PFN_CS_SignFullPrompt    m_pCSSignFullPrompt;
+
 
 	CString          m_csLoginId;   //Certifyid 가 캐시한 로그인 ID, onCertify 가 DN받으면 이걸로 서명
 
@@ -131,14 +136,20 @@ public:
 	CString          m_csDN;      // 선택된 인증서 DN (CertifyName용) 
 	bool             m_csAuto;    // 로그인창 "주문시 비밀번호 입력 안함" (CertifyCtrl::m_auto)
 	bool             m_csCloud;   // CertifyCloude(11) 이후 true → 클라우드는 벤더 컨트롤
+	bool             m_csRun;     // CertifyCtrl caRUN: 로그인 완료. OnCertify(NULL)/CloseCertSign에서 false
 	CMapStringToPtr  m_csEmaps;   // _caH.map: 자동서명이어도 매번 비밀번호 확인할 맵
 	char m_csPendingPass[32]{};
 
 	void	CloseCertSign();
 	int	SelectCertSign();         // 선택창 + DN 저장, 0=성공/벤더오류코드
 
-	enum CSStage { csIdle, csAwaitDn, csAwaitAck };
+	enum CSStage { csIdle, csAwaitDn, csAwaitAck, csAwaitPwdR, csAwaitPwdTr };
 	CSStage m_csStage;   // 생성자/CloseCertSign()에서 csIdle로 초기화
+
+	int SendCertLoginSign();
+	int SendCertPwdError();
+	int OnCertifyPwdR(char* pBytes, int nBytes);
+	int OnCertifyPwdTr(char* pBytes, int nBytes);
 #endif
 
 

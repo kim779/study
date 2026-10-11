@@ -41,6 +41,12 @@ static char THIS_FILE[]=__FILE__;
 
 #define DF_NOENC1
 
+#ifdef DF_MD_CERTSIGN
+// CertifyCtrl의 CCountPass(IDD_COUNT) 대응. v1: [재입력]/[취소]만 (재발급·타기관 등록은 v2)
+extern int CertPwdErrorPrompt(int count, bool retry);
+extern void CertTrPwdErrorMsg(char ret, int count, CString msg);
+#endif
+
 CGuard::CGuard()
 {
 	m_app     = AfxGetApp();
@@ -123,6 +129,9 @@ CGuard::CGuard()
 	m_cs = NULL;
 	m_csAuto = false;
 	m_csCloud = false;
+	m_pCSVerifyPassword = NULL;
+	m_csRun = false;
+	m_pCSSignFullPrompt = NULL;
 #endif
 }
 
@@ -310,6 +319,8 @@ int CGuard::Initial(CWnd* control)
 		m_pCSGetLastError = (PFN_CS_GetLastError)GetProcAddress(m_hCertSign, "CS_GetLastError");
 		m_pCSSelect = (PFN_CS_Select)GetProcAddress(m_hCertSign, "CS_Select");
 		m_pCSSignFull = (PFN_CS_SignFull)GetProcAddress(m_hCertSign, "CS_SignFull");
+		m_pCSVerifyPassword = (PFN_CS_VerifyPassword)GetProcAddress(m_hCertSign, "CS_VerifyPassword");
+		m_pCSSignFullPrompt = (PFN_CS_SignFullPrompt)GetProcAddress(m_hCertSign, "CS_SignFullPrompt");
 
 		if (!m_pCSOpen || !m_pCSSelectInteractive || !m_pCSSelect || !m_pCSSign || !m_pCSSignFull || !m_pCSClose)
 		{
@@ -4601,13 +4612,23 @@ BOOL CGuard::Certify(BOOL force, BOOL certify, BOOL xcertify, BOOL xserver)
 	return TRUE;
 }
 
+static DWORD fnv1a(const unsigned char* p, int n)
+{
+	DWORD h = 2166136261u;
+	for (int i = 0; i < n; i++) { h ^= p[i]; h *= 16777619u; }
+	return h;
+}
+
 int CGuard::OnCertify(char* pBytes, int nBytes)
 {
 #ifdef DF_MD_CERTSIGN //CGuard::OnCertify
 	if (m_cs)
 	{
 		if (pBytes == NULL || nBytes <= 0)
+		{
+			m_csRun = false;
 			return 0;
+		}
 		// CertifyCtrl caOKx 분기와 동일: _caH.map의 8자리 맵코드들을 등록, AXISENCA 송신 없음
 		struct _caH* caH = (struct _caH*)pBytes;
 
@@ -4615,8 +4636,15 @@ int CGuard::OnCertify(char* pBytes, int nBytes)
 		{
 			m_csStage = csIdle;
 			SecureZeroMemory(m_csPendingPass, sizeof(m_csPendingPass));
+			m_csRun = true;
 			return 0;
 		}
+
+		if (m_csStage == csAwaitPwdR)
+			return OnCertifyPwdR(pBytes, nBytes);
+
+		if (m_csStage == csAwaitPwdTr)
+			return OnCertifyPwdTr(pBytes, nBytes);
 
 		CString text(caH->map, sizeof(caH->map));
 		int idx = text.Find('\0');
@@ -4644,35 +4672,45 @@ int CGuard::OnCertify(char* pBytes, int nBytes)
 			stmp = m_csDN;
 			stmp.Replace(",", " ");
 			int rc = m_pCSSelect(m_cs, m_csDN.GetString(), m_csPendingPass, 0, stmp.GetString());
-
-			if (rc != 0)
-			{
-				m_csStage = csIdle;
-				SecureZeroMemory(m_csPendingPass, sizeof(m_csPendingPass));
-				return -1;
-			}
-
-			CString keys = _T("key\t");
-			static unsigned char sig[8 * 1024]{};
-			int sigL = sizeof(sig) - keys.GetLength();
-			 rc = m_pCSSign(m_cs, (const unsigned char*)m_csLoginId.GetString(), m_csLoginId.GetLength(), sig, &sigL);
-			axlog(LOG_CERTIFY, "[CertSign] OnCertify Sign rc=%d sigLen=%d", rc, rc == 0 ? sigL : 0);
-			if (rc != 0)
-			{
-				m_csStage = csIdle;
-				SecureZeroMemory(m_csPendingPass, sizeof(m_csPendingPass));
-				return -1;
-			}
-			
-			static unsigned char outBuf[8 * 1024];
-			CopyMemory(outBuf, keys.GetString(), keys.GetLength());
-			CopyMemory(outBuf + keys.GetLength(), sig, sigL);
-			int outL = keys.GetLength() + sigL;
-
+			axlog(LOG_CERTIFY, "[CertSign] OnCertify Select rc=%d ecode=%.5s", rc, caH->ecode);
 			SecureZeroMemory(m_csPendingPass, sizeof(m_csPendingPass));
-			m_csStage = csAwaitAck;
-			return Write(msgK_XCA, "AXISENCA", (char*)outBuf, outL) ? outL : -1;
+
+			if(rc == 2417 || rc == 1001)
+				return SendCertPwdError();
+
+			if (rc != 0)
+			{
+				m_csStage = csIdle;
+				SecureZeroMemory(m_csPendingPass, sizeof(m_csPendingPass));
+				return -1;
+			}
+
+			return SendCertLoginSign();
+
+			//CString keys = _T("key\t");
+			//static unsigned char sig[8 * 1024]{};
+			//int sigL = sizeof(sig) - keys.GetLength();
+			//// rc = m_pCSSign(m_cs, (const unsigned char*)m_csLoginId.GetString(), m_csLoginId.GetLength(), sig, &sigL);
+			//  rc = m_pCSSignFull(m_cs, (const unsigned char*)m_csLoginId.GetString(), m_csLoginId.GetLength(), sig, &sigL);
+			//axlog(LOG_CERTIFY, "[CertSign] OnCertify Sign rc=%d sigLen=%d", rc, rc == 0 ? sigL : 0);
+			//if (rc != 0)
+			//{
+			//	m_csStage = csIdle;
+			//	SecureZeroMemory(m_csPendingPass, sizeof(m_csPendingPass));
+			//	return -1;
+			//}
+			//
+			//static unsigned char outBuf[8 * 1024];
+			//CopyMemory(outBuf, keys.GetString(), keys.GetLength());
+			//CopyMemory(outBuf + keys.GetLength(), sig, sigL);
+			//int outL = keys.GetLength() + sigL;
+
+			//SecureZeroMemory(m_csPendingPass, sizeof(m_csPendingPass));
+			//m_csStage = csAwaitAck;
+			//axlog(LOG_CERTIFY, "[AXISENCA] engine=ours len=%d fnv=%08X", outL, fnv1a(outBuf, outL));
+			//return Write(msgK_XCA, "AXISENCA", (char*)outBuf, outL) ? outL : -1;
 		}
+		m_csRun = true;
 		return 0;
 	}
 #endif
@@ -4686,12 +4724,70 @@ int CGuard::OnCertify(char* pBytes, int nBytes)
 	axlog(LOG_CERTIFY, "CGuard::OnCertify DI_ONCA result nBytes=%d", nBytes);
 	if (nBytes > 0)
 	{
+		// 기존 CertifyCtrl 경로: "key\t" + PKCS#7(로그인 ID 서명). 우리 경로 로그와 같은 범위로 해시
+		axlog(LOG_CERTIFY, "[AXISENCA] engine=vendor len=%d sigLen=%d head=%.4s fnv=%08X",
+			nBytes, nBytes - 4, (char*)retv, fnv1a((const unsigned char*)retv, nBytes));
 		if (m_term & flagXCS || Write(msgK_XCA, "AXISENCA", (char *)retv, nBytes))
 			return nBytes;
 		return -1;
 	}
 	return nBytes;
 }
+
+#ifdef DF_MD_CERTSIGN
+int CGuard::SendCertLoginSign()
+{
+	CString keys = _T("key\t");
+	static unsigned char sig[8 * 1024];
+	int sigL = sizeof(sig) - keys.GetLength();
+	int rc = m_pCSSignFull(m_cs, (const unsigned char*)m_csLoginId.GetString(), m_csLoginId.GetLength(), sig, &sigL);
+	axlog(LOG_CERTIFY, "[CertSign] OnCertify Sign rc=%d sigLen=%d", rc, rc == 0 ? sigL : 0);
+	if (rc != 0)
+	{
+		m_csStage = csIdle;
+		return -1;
+	}
+
+	static unsigned char outBuf[8  *  1024];
+	CopyMemory(outBuf, keys.GetString(), keys.GetLength());
+	CopyMemory(outBuf + keys.GetLength(), sig, sigL);
+	int outL = keys.GetLength() + sigL;
+
+	m_csStage = csAwaitAck;
+	axlog(LOG_CERTIFY, "[AXISENCA] engine=ours len=%d fnv=%08X", outL, fnv1a(outBuf, outL));
+	return Write(msgK_XCA, "AXISENCA", (char*)outBuf, outL) ? outL : -1;
+}
+	
+// CertifyCtrl OnCertify의 rspPASSWD 분기와 동일: 서버에 비번 오류를 알리면 서버가 횟수(_pwdR)를 돌려줌
+int CGuard::SendCertPwdError()
+{
+	char pswd[] = "pswd\t";
+	int len = (int)strlen(pswd);
+	m_csStage = csAwaitPwdR;
+	axlog(LOG_CERTIFY, "[AXISENCA] engine=ours head=pswd (wrong cert password)");
+	return Write(msgK_XCA, "AXISENCA", pswd, len) ? len : -1;
+}
+
+// CertifyCtrl caPWDa 분기 + OnTimer(TM_MSG) 대응. 로그인 후라 반환값이 중요:
+// 0 = WS_SELF+Xecure() 재협상(안 됨), -1 = 로그인 오류 안내(안 됨) → -2(무시) / 'X'만 -3(AXIS 종료)
+int CGuard::OnCertifyPwdTr(char* pBytes, int nBytes)
+{
+	struct _pwdR { char ret[1]; char msg[80]; char pwdn[1]; };
+	m_csStage = csIdle;
+	if (nBytes < (int)sizeof(_pwdR))
+	{
+		axlog(LOG_CERTIFY, "[CertSign] PwdTr too short nBytes=%d", nBytes);
+		return -2;
+	}
+	_pwdR* pwdR = (_pwdR*)pBytes;
+	int count = (pwdR->pwdn[0] >= '0' && pwdR->pwdn[0] <= '9') ? pwdR->pwdn[0] - '0' : 0;
+	axlog(LOG_CERTIFY, "[CertSign] PwdTr ret=%c count=%d", pwdR->ret[0], count);
+
+	CertTrPwdErrorMsg(pwdR->ret[0], count, CString(pwdR->msg, sizeof(pwdR->msg)));
+	return (pwdR->ret[0] == 'X') ? -3 : -2;
+}
+
+#endif
 
 BOOL CGuard::CertifyErr(char* pBytes, int nBytes)
 {
@@ -4705,7 +4801,58 @@ BOOL CGuard::CertifyErr(char* pBytes, int nBytes)
 	axlog(LOG_CERTIFY, "CGuard::CertifyErr DI_CAERR retv=%d", retv);
 	return retv;
 }
+#ifdef DF_MD_CERTSIGN
+//CertufyCtrl OnCertify caPWD 분기 + CCountPass 대응
+int CGuard::OnCertifyPwdR(char* pBytes, int nBytes)
+{
+	struct _pwdR { char ret[1]; char msg[80]; char pwdn[1]; };   // certify_cloude/Certify.h와 동일
+	m_csStage = csIdle;
+	if (nBytes < (int)sizeof(_pwdR))
+	{
+		axlog(LOG_CERTIFY, "[CertSign] PwdR too short nBytes=%d", nBytes);
+		return -1;
+	}
 
+	_pwdR* pwdR = (_pwdR*)pBytes;
+	bool retry = true;
+	switch (pwdR->ret[0])
+	{
+		case 'X':
+			retry = false;
+		case '0':
+			break;
+		default:
+		{
+			CString msg(pwdR->msg, sizeof(pwdR->msg));
+			msg.Trim();
+			axlog(LOG_CERTIFY, "[CertSign] PwdR ret=%c", pwdR->ret[0]);
+			AfxMessageBox(msg, MB_ICONSTOP);
+		}
+		return -1;
+	}
+	
+	int count = (pwdR->pwdn[0] >= '0' && pwdR->pwdn[0] <= '9') ? pwdR->pwdn[0] - '0' : 0;
+	axlog(LOG_CERTIFY, "[CertSign] PwdR ret=%c count=%d", pwdR->ret[0], count);
+
+	if (!CertPwdErrorPrompt(count, retry))   // 취소 또는 재입력 불가
+		return -1;
+
+	// 재입력: queryDn(retry=true)처럼 선택창. 로그인 계정의 인증서(DN)인지 확인
+	CString expectDN = m_csDN;
+	int rc = SelectCertSign();
+	if (rc == 2417 || rc == 1001)
+		return SendCertPwdError();               // 또 틀림 → 서버에 다시 보고(횟수 +1)
+	if (rc != 0)
+		return -1;                               // 취소(2501) 등
+	if (m_csDN.CompareNoCase(expectDN) != 0)
+	{
+		axlog(LOG_CERTIFY, "[CertSign] PwdR reselect: different certificate");
+		m_csDN = expectDN;
+		return -1;
+	}
+	return SendCertLoginSign();
+}
+#endif
 BOOL CGuard::Certify(char* pBytes, int& nBytes, CString maps)
 {
 #ifdef DF_MD_CERTSIGN  //CGuard::Certify
@@ -4719,18 +4866,29 @@ BOOL CGuard::Certify(char* pBytes, int& nBytes, CString maps)
 		void* p;
 		if (!m_csAuto || m_csEmaps.Lookup(maps.Left(L_MAPN), p))
 		{
-			// [v1] 기존 작은 비밀번호창(checkPasswd) 대신 선택창을 다시 띄워 비밀번호 확인
-			if (SelectCertSign() != 0)
+			// CertifyCtrl::checkPasswd()와 동일: 벤더의 작은 비밀번호 창. DLL이 구버전이면 선택창
+			int vrc = m_pCSVerifyPassword
+				? m_pCSVerifyPassword(m_cs, m_parent ? m_parent->GetSafeHwnd() : NULL)
+				: SelectCertSign();
+			axlog(LOG_CERTIFY, "[CertSign] TR re-confirm maps=%.8s rc=%d small=%d",
+				maps.GetString(), vrc, m_pCSVerifyPassword ? 1 : 0);
+			if (vrc == 2417)
 			{
-				SetGuide(AE_ECERTIFY);
+				// caPWDa와 동일: 서버에 오류 보고 → 응답(_pwdR)은 OnCertify → OnCertifyPwdTr
+				char pswd[] = "pswd\t";
+				m_csStage = csAwaitPwdTr;
+				Write(msgK_XCA, "AXISENCA", pswd, (int)strlen(pswd));
 				return FALSE;
 			}
+			if (vrc != 0)                            // 취소(2501) 등
+				return FALSE;
 		}
 		static unsigned char sig[8 * 1024];
 		int sigL = sizeof(sig);
 		int rc = m_pCSSign(m_cs, (const unsigned char*)pBytes, nBytes, sig, &sigL);
-		axlog(LOG_CERTIFY, "[CertSign] TR-sign maps=%.8s rc=%d dataLen=%d sigLen=%d",
-			maps.GetString(), rc, nBytes, rc == 0 ? sigL : 0);
+		axlog(LOG_CERTIFY, "[CertSign][TR-SIGN] engine=ours maps=%.8s rc=%d inLen=%d inFnv=%08X sigLen=%d sigFnv=%08X",
+			maps.GetString(), rc, nBytes, fnv1a((const unsigned char*)pBytes, nBytes),
+			rc == 0 ? sigL : 0, rc == 0 ? fnv1a(sig, sigL) : 0);
 		if (rc != 0)
 		{
 			SetGuide(AE_ECERTIFY);
@@ -4750,44 +4908,58 @@ BOOL CGuard::Certify(char* pBytes, int& nBytes, CString maps)
 		return FALSE;
 	}
 
+	int	inLen = nBytes;
+	DWORD	inFnv = fnv1a((const unsigned char*)pBytes, nBytes);
 	BOOL	retv;
 	m_certify->InvokeHelper(DI_CA, DISPATCH_METHOD, VT_BOOL, (void*)&retv,
-					(BYTE *)(VTS_I4 VTS_I4 VTS_I4), pBytes, &nBytes, (char *)maps.operator LPCTSTR());
-	axlog(LOG_CERTIFY, "CGuard::Certify(TR-sign) DI_CA retv=%d signedLen=%d", retv, nBytes);
+		(BYTE*)(VTS_I4 VTS_I4 VTS_I4), pBytes, &nBytes, (char*)maps.operator LPCTSTR());
+	axlog(LOG_CERTIFY, "[CertSign][TR-SIGN] engine=vendor maps=%.8s retv=%d inLen=%d inFnv=%08X sigLen=%d sigFnv=%08X",
+		maps.GetString(), retv, inLen, inFnv, retv ? nBytes - inLen : 0,
+		(retv && nBytes > inLen) ? fnv1a((const unsigned char*)pBytes + inLen, nBytes - inLen) : 0);
 	return retv;
 }
 
 void CGuard::CertifyId(char* pBytes, bool retry)
 {
 #ifdef DF_MD_CERTSIGN  //CGuard::CertifyId
-	if (!m_cs && m_hCertSign)
+	CString stmp(pBytes, 12);
+	stmp.Trim();
+	bool certLogin = stmp.IsEmpty();                 // user 공백 = 공동인증서 로그인
+
+	// 인증서 로그인은 CertifyFull이 이미 엔진을 정함(m_cs 있음=certsign / 없음=벤더: 클라우드·CS_Open 실패).
+	// 여기서 새로 열면 인증서 선택 없는 빈 세션이 벤더 세션을 가로채므로 ID 로그인만 연다
+	if (!m_cs && m_hCertSign && !certLogin)
 		m_cs = m_pCSOpen();
 
 	if (m_cs)
 	{
-		CString stmp(pBytes, 12);
-		stmp.Trim();
 
-		m_csStage = csAwaitDn;
+		// ID 로그인만 DN 수신 후 선택·서명(AXISENCA) 단계로 감.
+		// 인증서 로그인은 CertifyFull에서 이미 선택·서명했으므로 OnCertify(caH)는
+		// 필수 재확인 맵만 등록하고 끝 (CertifyCtrl caOKx와 동일). AXISENCA/pswd 송신 없음
+		m_csStage = certLogin ? csIdle : csAwaitDn;
 
-		if (!stmp.IsEmpty())
+		if (!certLogin)
 			m_csLoginId = stmp;
 
-		int infoOff = stmp.IsEmpty() ? 22 : 24;   // 공동인증서: 22 / ID로그인: 24
-		int passOff = stmp.IsEmpty() ? 32 : 34;   // 공동인증서: 32 / ID로그인: 34
+		int infoOff = certLogin ? 22 : 24;   // 공동인증서: 22 / ID로그인: 24 (_signM.pass[12])
+		int passOff = certLogin ? 32 : 34;   // 공동인증서: 32 / ID로그인: 34
 
 		m_csAuto = (pBytes[infoOff + 1] == '1');
 
-		CString pass(pBytes + passOff, 30);
-		int idx = pass.Find('\0');
-		if (idx != -1)
-			pass = pass.Left(idx);
-		strncpy_s(m_csPendingPass, sizeof(m_csPendingPass), (LPCTSTR)pass, _TRUNCATE);
-		pass.Empty();
+		if (!certLogin)                       // 인증서 비번은 ID 로그인에서만 필요 (인증서 로그인은 cpas 공백)
+		{
+			CString pass(pBytes + passOff, 30);
+			int idx = pass.Find('\0');
+			if (idx != -1)
+				pass = pass.Left(idx);
+			strncpy_s(m_csPendingPass, sizeof(m_csPendingPass), (LPCTSTR)pass, _TRUNCATE);
+			pass.Empty();
+		}
+		FillMemory(pBytes + passOff, 30, ' ');   // 지우는 것은 양쪽 모두
 
-		FillMemory(pBytes + passOff, 30, ' ');
-
-		axlog(LOG_CERTIFY, "[CertSign] CertifyId auto=%d certOnly=%d", m_csAuto ? 1 : 0, stmp.IsEmpty());
+		axlog(LOG_CERTIFY, "[CertSign] CertifyId auto=%d certOnly=%d stage=%d",
+			m_csAuto ? 1 : 0, certLogin ? 1 : 0, (int)m_csStage);
 		return;
 	}
 #endif
@@ -6631,6 +6803,9 @@ void CGuard::CloseCertSign()
 	m_csAuto = false;
 	m_csEmaps.RemoveAll();
 	SecureZeroMemory(m_csPendingPass, sizeof(m_csPendingPass));
+	m_csEmaps.RemoveAll();
+	m_csRun = false;
+
 }
 
 int CGuard::SelectCertSign()
@@ -6653,6 +6828,25 @@ long CGuard::CertifyFull(CString srcB, int srcL, char* desB, int& desL)
 	desL = 0;
 
 #ifdef DF_MD_CERTSIGN  //CGuard::CertifyFull
+	// 로그인 후 스크립트 서명(이체 등) = CertifyCtrl caRUN 분기: 세션 유지, 작은 비밀번호 창 + PKCS#7
+	if (m_cs && m_csRun && m_pCSSignFullPrompt)
+	{
+		int outL = 8 * 1024;                   // 호출부 버퍼(CxSystem maxCERT, caFULLx wb) 크기
+		int rc = m_pCSSignFullPrompt(m_cs, m_parent ? m_parent->GetSafeHwnd() : NULL,
+			(const unsigned char*)srcB.operator LPCTSTR(), srcL, (unsigned char*)desB, &outL);
+		if (rc == 0)
+			desL = outL;
+		else if (rc == 1000 || rc == 2501)
+			desL = -3;                          // 취소 (벤더와 같은 음수 코드)
+		else if (rc == 2417 || rc == 1001)
+			desL = -4;                          // 비밀번호 오류
+		else
+			desL = -2;
+		axlog(LOG_CERTIFY, "[CertSign] [RUN-SIGN] CertifyFull engine=ours rc=%d desL=%d fnv=%08X",
+			rc, desL, desL > 0 ? fnv1a((const unsigned char*)desB, desL) : 0);
+		return rc;
+	}
+
 	if (m_hCertSign && !m_csCloud)
 	{
 		CloseCertSign();                       // 재로그인/재선택: 이전 세션 정리
@@ -6668,7 +6862,9 @@ long CGuard::CertifyFull(CString srcB, int srcL, char* desB, int& desL)
 				if (rc == 0)
 					desL = outL;
 			}
-			axlog(LOG_CERTIFY, "[CertSign] CertifyFull engine=ours rc=%d sigLen=%d", rc, desL);
+			axlog(LOG_CERTIFY, "[CertSign] [CA-LOGIN] CertifyFull engine=ours rc=%d sigLen=%d fnv=%08X",
+				rc, desL, desL > 0 ? fnv1a((const unsigned char*)desB, desL) : 0);
+
 			if (rc != 0)
 				CloseCertSign();               // 2417/2501 등 → MainFrm이 기존처럼 처리
 			return rc;

@@ -1,21 +1,5 @@
 #pragma once
-#include <stdio.h>
-#include <stdarg.h>
 
-#define cslog(fmt, ...) cslogImpl(__FUNCTION__, __LINE__, fmt, __VA_ARGS__)
-
-static void cslogImpl(const char* func, int line, const char* fmt, ...)
-{
-    char msg [1024];
-    va_list args;
-    va_start(args, fmt);
-    _vsnprintf_s(msg, sizeof(msg), _TRUNCATE, fmt, args);
-    va_end(args);
-
-    char out[1200];
-    _snprintf_s(out, sizeof(out), _TRUNCATE, "[CERTSIGN][%s:%d] %s\n", func, line, msg);
-    OutputDebugStringA(out);
-}
 
 #ifdef CERTSIGN_EXPORTS
 #define CS_API __declspec(dllexport)
@@ -60,6 +44,17 @@ CS_API int CS_SelectInteractive(HCS h, HWND parentWnd,
 //Unlike CS_Sign (lean, no-cert, for repeat TR-signing), this is required
 //for login because the server has no prior session to identify you by.
 CS_API int CS_SignFull(HCS h, const unsigned char* data, int dataLen, unsigned char* sigOut, int* sigOutLen);
+
+// TR signing re-confirm: shows the vendor's small password dialog (no certificate picker)
+// and, on success, replaces the session's encrypted password. Same as CertifyCtrl::checkPasswd().
+// Returns 0 on success, vendor error code on failure (2417=wrong password, 2501=cancel).
+CS_API int CS_VerifyPassword(HCS h, HWND parentWnd);
+
+// After login (CertifyCtrl::CertifyFull caRUN): clears the stored password so the vendor shows its
+// small password dialog, signs data as PKCS#7, and on success replaces the encrypted password.
+// Returns 0 on success, vendor error code on failure (1000=cancel, 2417=wrong password).
+CS_API int CS_SignFullPrompt(HCS h, HWND parentWnd, const unsigned char* data, int dataLen,
+    unsigned char* sigOut, int* sigOutLen);
 
 #ifdef __cplusplus
 }

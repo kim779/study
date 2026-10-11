@@ -1,11 +1,35 @@
 #include "pch.h"
 #include "certsign.h"
+#include <stdio.h>
+#include <stdarg.h>
 
 #include "include/InterfaceTypes.h"
 #include "include/InterfaceDLL.h"
 
 #pragma comment (lib, "lib/SKComdIF.lib")
 #pragma comment (lib, "lib/SKCommIF.lib")
+
+#define cslog(fmt, ...) cslogImpl(__FUNCTION__, __LINE__, fmt, __VA_ARGS__)
+
+static void cslogImpl(const char* func, int line, const char* fmt, ...)
+{
+	char msg[1024];
+	va_list args;
+	va_start(args, fmt);
+	_vsnprintf_s(msg, sizeof(msg), _TRUNCATE, fmt, args);
+	va_end(args);
+
+	char out[1200];
+	_snprintf_s(out, sizeof(out), _TRUNCATE, "[CERTSIGN][%s:%d] %s\n", func, line, msg);
+	OutputDebugStringA(out);
+}
+
+static unsigned long csFnv(const unsigned char* p, int n)
+{
+	unsigned long h = 2166136261u;
+	for (int i = 0; i < n; i++) { h ^= p[i]; h *= 16777619u; }
+	return h;
+}
 
 struct CS_SESSION
 {
@@ -49,27 +73,37 @@ CS_API int CS_Select(HCS h, const char* dn, const char* password,
 
 	CS_SESSION* s = (CS_SESSION*)h;
 
-	cslog("[cersign]CS_Select dn=[%s] certSetName=[%s] ", dn, certSetName);
-
 	ZeroMemory(&s->sd, sizeof(SD_API_CONTEXT));
-	s->sd.bOldStorage = storage;                                   // 0x00 -> 실제 값(3)
+	s->sd.bOldStorage = storage;                 // queryDn: 0x00 (전체 매체)
+	s->sd.bForceAllCaSearchMode = 1;             // queryDn과 동일: 모든 CA 검색
 	strncpy_s(s->sd.szUserId, sizeof(s->sd.szUserId), dn, _TRUNCATE);
-	strncpy_s(s->sd.szOldPasswd, sizeof(s->sd.szOldPasswd), password, _TRUNCATE);
-	if (certSetName)
-		strncpy_s(s->sd.szCertSetName, sizeof(s->sd.szCertSetName), certSetName, _TRUNCATE);  // 추가
+	if (certSetName && *certSetName)
+		strncpy_s(s->sd.szCertSetName, sizeof(s->sd.szCertSetName), certSetName, _TRUNCATE);
+
+	// CertifyId: SetPasswordEncMode(1) + GetEncryptedPassword → queryDn: 암호화 값을 szOldPasswd에
+	ZeroMemory(s->encpass, sizeof(s->encpass));
+	sk_if_SetPasswordEncMode(1);
+	sk_if_GetEncryptedPassword(password, s->encpass);
+	CopyMemory(s->sd.szOldPasswd, s->encpass, min(sizeof(s->encpass), sizeof(s->sd.szOldPasswd)));
 
 	sk_if_SetWrongPasswordLimit(1);
 	sk_if_SetKeySaferMode(1);
 
+	int rc = 0;
 	if (!sk_if_CertSetSelect(&s->sd))
-		return sk_if_GetLastErrorCode();
+		rc = sk_if_GetLastErrorCode();               // 2417=비번오류, 2500=인증서 없음, 2001=만료
+	else if (sk_if_cert_preset_context(&s->appCtx, &s->sd) < 0)
+		rc = sk_if_GetLastErrorCode();
 
-	if (sk_if_cert_preset_context(&s->appCtx, &s->sd) < 0)
-		return sk_if_GetLastErrorCode();
-
-	savePasswd(s, s->sd.szOldPasswd, sizeof(s->sd.szOldPasswd));
-	s->selected = true;
+	cslog("CS_Select rc=%d storage=%d", rc, (int)storage);   // DN·비번은 찍지 않음
+	if (rc != 0)
+	{
+		SecureZeroMemory(s->encpass, sizeof(s->encpass));
+		return rc;
+	}
+	s->selected = true;                              // 서명은 CS_Sign → SignData_notEncode(encpass)
 	return 0;
+
 }
 
 CS_API  int CS_Sign(HCS h, const unsigned char* data, int dataLen, unsigned char* sigOut, int* sigOutLen)
@@ -77,7 +111,8 @@ CS_API  int CS_Sign(HCS h, const unsigned char* data, int dataLen, unsigned char
 	if (!h || !sigOut || !sigOutLen)
 		return -1;
 
-	cslog("CS_Sign len=[%d] data=[%s] ", dataLen, data);
+	//cslog("CS_Sign len=[%d] data=[%s] ", dataLen, data);
+	cslog("CS_Sign len=%d fnv=%08X", dataLen, csFnv(data, dataLen));
 
 	CS_SESSION* s = (CS_SESSION*)h;
 	if (!s->selected)
@@ -127,7 +162,9 @@ CS_API int CS_SelectInteractive(HCS h, HWND parentWnd,
 
 	CS_SESSION* s = (CS_SESSION*)h;
 
-	cslog("[cersign]CS_SelectInteractive  data=[%s] ", dnOut);
+	//cslog("[cersign]CS_SelectInteractive  data=[%s] ", dnOut);
+	cslog("[cersign]CS_SelectInteractive  storage=%d",  (int)s->sd.bOldStorage);
+
 
 	SD_API_CONTEXT_NEW ctxNew;
 	ZeroMemory(&ctxNew, sizeof(SD_API_CONTEXT_NEW));
@@ -192,4 +229,74 @@ CS_API int CS_SignFull(HCS h, const unsigned char* data, int dataLen, unsigned c
 	sk_if_cert_MemFree(out.value);
 
 	return 0;
+}
+
+//certfyctrl::checkPasswd() 동일 : 컨텍스트 비번을 비우고 빈 원문으로 서명 
+//벤더가 작은 비밀번호 창을 띄워 입력값을 sd.szOldPasswd에 넣음 -> 암호화해서 encpass 교체
+CS_API int CS_VerifyPassword(HCS h, HWND parentWnd)
+{
+	if (!h)
+		return -1;
+
+	CS_SESSION* s = (CS_SESSION*)h;
+	if (!s->selected)
+		return -1;
+	SecureZeroMemory(s->sd.szOldPasswd, sizeof(s->sd.szOldPasswd));   // s->sd == appCtx.pInterfaceContext
+	sk_if_SetKeySaferMode(1);
+	if (parentWnd)
+		sk_if_DialogModalMode(parentWnd);
+
+	char empty[32 + 1] = { 0 };
+	UString in = { 0, nullptr };
+	UString out = { 0, nullptr };
+	int rc = 0;
+	if (sk_if_cert_SignData_notEncode(&s->appCtx, empty, &in, &out, NULL))
+		rc = sk_if_GetLastErrorCode();
+	else
+	{
+		sk_if_cert_MemFree(out.value);
+		savePasswd(s, s->sd.szOldPasswd, sizeof(s->sd.szOldPasswd));   // encpass 교체 + 평문 삭제
+	}
+	SecureZeroMemory(s->sd.szOldPasswd, sizeof(s->sd.szOldPasswd));
+	cslog("CS_VerifyPassword rc=%d", rc);
+	return rc;
+}
+
+//벤더 CertifyFull caRUN 분기와 동일 : szOldPasswd 를 비우고 빈 비번으로 SignData->
+//벤터가 작은 비밀번호 창을 띄우고 입력값을 sd.szOldPasswd 에 넣음 -> 성공시 savePasswd
+CS_API int CS_SignFullPrompt(HCS h, HWND parentWnd, const unsigned char* data, int dataLen,
+	unsigned char* sigOut, int* sigOutLen)
+{
+	if (!h || !sigOut || !sigOutLen)
+		return -1;
+	CS_SESSION* s = (CS_SESSION*)h;
+	if (!s->selected)
+		return -1;
+
+	SecureZeroMemory(s->sd.szOldPasswd, sizeof(s->sd.szOldPasswd));   // s->sd == appCtx.pInterfaceContext
+	sk_if_SetKeySaferMode(1);
+	if (parentWnd)
+		sk_if_DialogModalMode(parentWnd);
+
+	char empty[32 + 1] = { 0 };
+	UString in = { dataLen, (unsigned char*)data };
+	UString out = { 0, nullptr };
+	int rc = 0;
+	if (sk_if_cert_SignData(&s->appCtx, empty, &in, &out))
+		rc = sk_if_GetLastErrorCode();
+	else if (out.length > *sigOutLen)
+	{
+		sk_if_cert_MemFree(out.value);
+		rc = -2;
+	}
+	else
+	{
+		CopyMemory(sigOut, out.value, out.length);
+		*sigOutLen = out.length;
+		sk_if_cert_MemFree(out.value);
+		savePasswd(s, s->sd.szOldPasswd, sizeof(s->sd.szOldPasswd));   // encpass 교체 + 평문 삭제
+	}
+	SecureZeroMemory(s->sd.szOldPasswd, sizeof(s->sd.szOldPasswd));
+	cslog("CS_SignFullPrompt rc=%d len=%d sigLen=%d", rc, dataLen, rc == 0 ? *sigOutLen : 0);
+	return rc;
 }
