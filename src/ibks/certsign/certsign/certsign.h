@@ -56,6 +56,11 @@ CS_API int CS_VerifyPassword(HCS h, HWND parentWnd);
 CS_API int CS_SignFullPrompt(HCS h, HWND parentWnd, const unsigned char* data, int dataLen,
     unsigned char* sigOut, int* sigOutLen);
 
+//clude 인증서 선택  - 로컬과 달리 항상 벤터 팝업(폰 pin/푸시확인) 필요
+CS_API int CS_CloudSelectInteractive(HCS h, HWND parentWnd, char* dnOut, int dnOutCap, char* certSetNameOut, int certSetNameOutCap);
+
+//cloude 서명 
+CS_API int CS_CloudSignFull(HCS h, const unsigned char* data, int dataLen, unsigned char* sigOut, int* sigOutLen);
 #ifdef __cplusplus
 }
 #endif

@@ -265,7 +265,10 @@ public:
 	void SendWhenVisibleModeTR(CString data[100][2], int nStart, int nEnd);
 
 	void settingFieldBeforeSend(int &sendL, char *sendB); //그리드 필드 세팅
-	void setBoolSecond(bool data) { m_bSecond = data; }
+
+	int  m_nPending{};   // TR sent but response not yet received
+	int  m_nSkip{};      // stale responses to discard
+	void setBoolSecond(bool data) { m_bSecond = data; }   // revert the minimal fix
 
 	void alertBMsuik();
 	void SetGridinfo(bool bWidthSave = false); // 2013.04.16 KSJ width만 저장할때는 true해준다

@@ -832,6 +832,10 @@ BOOL CPage1::OnKillActive()
 
 BOOL CPage1::endSendAction() 
 {
+	m_slog.Format("\r\n[interest][IB202202][%s] activegno=[%d] groupcount=[%d]",
+		__FUNCTION__, m_activegno, GetGroupCount());
+	OutputDebugString(m_slog);
+
 	CString	gname;
 	if (m_activegno != -1)
 	{
@@ -2832,7 +2836,17 @@ void CPage1::initCombo(bool isEditOk)
 	memset(m_pdata, 0x00, 1024 * 4);
 	const bool ret = wnd->SendMessage(WM_MSG, MAKEWPARAM(MSG_GET_GROUPARR, 0), (LPARAM)m_pdata);
 	if (ret == 0)
-		return;
+	{
+			m_slog.Format("\r\n[interest][IB202202][%s] ret=0 activegno=[%d] mg0=[%s][%s]",
+				__FUNCTION__, m_activegno, (LPCTSTR)m_manageGroup[0][0], (LPCTSTR)m_manageGroup[0][3]);
+			OutputDebugString(m_slog);
+
+			for (int kk = 0; kk < MAXGROUP; kk++)
+				for (int jj = 0; jj < 4; jj++)
+					m_manageGroup[kk][jj] = "";
+			m_list2.DeleteAllItems();
+			return;
+	}
 
 	string.Format("%s", m_pdata);
 

@@ -253,6 +253,11 @@ long CMapWnd::OnMessage(WPARAM wParam, LPARAM lParam)
 					CString stmp, seq, sgname;
 					char* pdata = (char*)lParam;
 					int cnt = atoi(CString(pdata, 4));
+
+					m_slog.Format("\r\n[interest][IB202202][%s] TRKEY_GROUPARR cnt=[%d]", __FUNCTION__, cnt);
+					OutputDebugString(m_slog);
+					m_slog.Format("\r\n[interest][IB202202][%s] GROUPARR raw=[%.40s]", __FUNCTION__, pdata);
+					OutputDebugString(m_slog);
 					if (cnt > 0)
 					{
 						int parseL = 4;
@@ -286,6 +291,7 @@ long CMapWnd::OnMessage(WPARAM wParam, LPARAM lParam)
 						m_sheet->initCombo();
 						return 1;
 					}
+					m_sheet->initCombo();
 				}
 				break;
 				case TRKEY_GROUPCODE:

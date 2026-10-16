@@ -20,7 +20,8 @@
 #include "resource.h"
 #include "axMenu.h"
 
-#define GRIDMAXNUM 31
+#define GRIDMAXNUM 31  //31  이면 에러 40은 정상
+//#define GRIDMAXNUM 40
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #undef THIS_FILE
@@ -2056,6 +2057,9 @@ void CGridWnd::sendTransactionTR(int update, int nStart, int nEnd)
 		sendL += strlen(tempB);
 	}
 
+	m_slog.Format("[IB202200][%x][%s]<%d>[%s] nStart=[%d] nEnd=[%d] m_nIndex=[%d]", this, __FUNCTION__, __LINE__, m_szTitle, nStart, nEnd, m_nIndex);
+	OutputDebugString(m_slog);
+
 	sprintf(tempB, "2321%c", P_NEW); //전일거래량
 	CopyMemory(&sendB[sendL], tempB, strlen(tempB));
 	sendL += strlen(tempB);
@@ -2113,6 +2117,7 @@ void CGridWnd::sendTransactionTR(int update, int nStart, int nEnd)
 
 	sdata.SetData("pooppoop", key, sendB.data(), sendL, "");
 
+	m_nPending++;
 	m_bSending = true;
 	m_pMainWnd->SendMessage(WM_MANAGE, MK_SENDTR, (LPARAM)&sdata);
 	m_endsort = false;
@@ -2120,10 +2125,34 @@ void CGridWnd::sendTransactionTR(int update, int nStart, int nEnd)
 	sendB.clear();
 	m_grid->initFilter();
 
+	m_slog.Format("[IB202200]");
+	OutputDebugString(m_slog);
 }
 
 void CGridWnd::sendTransaction(int update)
 {
+	int tmp_skip = m_nSkip;
+	if (m_bContinue || m_nPending > 0)
+		tmp_skip += m_nPending;
+
+	m_slog.Format("[IB202200][%x][%s]<%d>[%s] SEND_IN idx=[%d] kind=[%d] skind=[%d] group=[%d] title=[%s] cont=[%d] second=[%d] pending=[%d] m_nSkip=[%d]",
+		this, __FUNCTION__, __LINE__, m_szTitle, m_nIndex,
+		CAST_TREEID(m_kind)->kind, CAST_TREEID(m_kind)->skind, CAST_TREEID(m_kind)->value,
+		(LPCTSTR)m_szTitle, m_bContinue, m_bSecond, m_nPending, tmp_skip);
+	OutputDebugString(m_slog);
+	if (m_bContinue || m_nPending > 0)
+	{
+		m_nSkip += m_nPending;   // responses still in flight belong to the old request
+		m_nPending = 0;
+		m_bContinue = FALSE;
+		m_bSecond = FALSE;
+
+		m_slog.Format("[IB202200][%x][%s]<%d>[%s] m_nSkip 증가!!!!!!!!  idx=[%d] kind=[%d] skind=[%d] group=[%d] title=[%s] cont=[%d] second=[%d] pending=[%d] m_nSkip=[%d]",
+			this, __FUNCTION__, __LINE__, m_szTitle, m_nIndex,
+			CAST_TREEID(m_kind)->kind, CAST_TREEID(m_kind)->skind, CAST_TREEID(m_kind)->value,
+			(LPCTSTR)m_szTitle, m_bContinue, m_bSecond, m_nPending, tmp_skip);
+		OutputDebugString(m_slog);
+	}
 	m_pGridArray.RemoveAll();
 	m_staticUpdate = update;
 
@@ -2152,6 +2181,12 @@ void CGridWnd::sendTransaction(int update)
 			m_bContinue = TRUE;
 
 			sendTransactionTR(m_staticUpdate, 0, GRIDMAXNUM);
+		}
+		else
+		{
+			m_slog.Format("[IB202200][%x][%s]<%d>[%s] SEND_DROP cont=[%d] second=[%d] size=[%d] idx=[%d]",
+				this, __FUNCTION__, __LINE__, m_szTitle, m_bContinue, m_bSecond, m_pGridArray.GetSize(), m_nIndex);
+			OutputDebugString(m_slog);
 		}
 	}
 	else
@@ -5452,6 +5487,17 @@ void CGridWnd::parsingOubsUpjong(char *datB, int datL)
 
 void CGridWnd::parsingOubs(char *datB, int datL)
 {
+	if (m_nSkip > 0)
+	{
+		m_nSkip--;
+		m_slog.Format("[IB202200][%x][%s]<%d>[%s] --------------STALE_SKIP-------------- datL=[%d] idx=[%d] remain=[%d]",
+			this, __FUNCTION__, __LINE__, m_szTitle, datL, m_nIndex, m_nSkip);
+		OutputDebugString(m_slog);
+		return;
+	}
+
+	if (m_nPending > 0) m_nPending--;
+
 	// KSJ 장운영시간 저장
 	CString strTime = ((CMainWnd *)m_pMainWnd)->GetMarketTime();
 	CString strEndTime = ((CMainWnd *)m_pMainWnd)->GetMarketEndTime();
@@ -5487,6 +5533,14 @@ void CGridWnd::parsingOubs(char *datB, int datL)
 	}
 
 	const int gridHoL = sizeof(struct _gridHo);
+
+	m_slog.Format("[IB202200][%x][%s]<%d>[%s] datL =[%d]  data=[%s]  ", this, __FUNCTION__, __LINE__, m_szTitle, datL, CString(&datB[sizeof(struct _gridHo)], datL - gridHoL));
+	OutputDebugString(m_slog);
+
+	m_slog.Format("[IB202200][%x][%s]<%d>[%s] 	OUBS_IN cont=[%d] second=[%d] size=[%d] idx=[%d]",
+		this, __FUNCTION__, __LINE__, m_szTitle, m_bContinue, m_bSecond, m_pGridArray.GetSize(), m_nIndex);
+	OutputDebugString(m_slog);
+
 	if (datL < gridHoL)
 		return;
 
@@ -5531,6 +5585,10 @@ void CGridWnd::parsingOubs(char *datB, int datL)
 			nEnd = GRIDMAXNUM;
 		}
 	}
+
+	m_slog.Format("[IB202200][%x][%s]<%d>[%s] OUBS_RANGE  cont=[%d] second=[%d] size=[%d] idx=[%d] nStart = [%d] nEnd  =[%d]",
+		this, __FUNCTION__, __LINE__, m_szTitle, m_bContinue, m_bSecond, m_pGridArray.GetSize(), m_nIndex, nStart, nEnd);
+	OutputDebugString(m_slog);
 
 	if (kind == xISSUE)
 	{
@@ -6077,11 +6135,19 @@ void CGridWnd::parsingOubs(char *datB, int datL)
 	{
 		if (!m_bSecond)
 		{
+			m_slog.Format("[IB202200][%x][%s]<%d>[%s]   연속조회시도 cont=[%d] second=[%d] size=[%d] idx=[%d]",
+				this, __FUNCTION__, __LINE__, m_szTitle, m_bContinue, m_bSecond, m_pGridArray.GetSize(), m_nIndex);
+			OutputDebugString(m_slog);
+
 			m_bSecond = TRUE;
 			sendTransactionTR(-1, GRIDMAXNUM, m_pGridArray.GetSize());
 		}
 		else
 		{
+			m_slog.Format("[IB202200][%x][%s]<%d>[%s]       조회끝 cont=[%d] second=[%d] size=[%d] idx=[%d]",
+				this, __FUNCTION__, __LINE__, m_szTitle, m_bContinue, m_bSecond, m_pGridArray.GetSize(), m_nIndex);
+			OutputDebugString(m_slog);
+
 			m_bContinue = FALSE;
 			m_bSecond = FALSE;
 			m_bSending = false;
@@ -6089,6 +6155,9 @@ void CGridWnd::parsingOubs(char *datB, int datL)
 	}
 	else
 		m_bSending = false;
+
+	m_slog.Format("[IB202200]");
+	OutputDebugString(m_slog);
 }
 
 void CGridWnd::getBase(CString m_code)
@@ -6269,6 +6338,21 @@ CString CGridWnd::setsuikRate(struct _intersx *pinters)
 
 void CGridWnd::parsingOubsOne(char *datB, int datL, int update)
 {
+	if (m_nSkip > 0)
+	{
+		m_nSkip--;
+		m_slog.Format("[IB202200][%x][%s]<%d>[%s]   STALE_SKIP datL=[%d] idx=[%d] remain=[%d]",
+			this, __FUNCTION__, __LINE__, m_szTitle, datL, m_nIndex, m_nSkip);
+		OutputDebugString(m_slog);
+		return;
+	}
+
+	if (m_nPending > 0) m_nPending--;
+
+	m_slog.Format("[IB202200][%x][%s]<%d>[%s] ONE_IN cont=[%d] second=[%d] size=[%d] idx=[%d]",
+		this, __FUNCTION__, __LINE__, m_szTitle, m_bContinue, m_bSecond, m_pGridArray.GetSize(), m_nIndex);
+	OutputDebugString(m_slog);
+
 	if (m_staticUpdate < 0)
 		return;
 	const int gridHoL = sizeof(struct _gridHo);
@@ -6706,6 +6790,10 @@ void CGridWnd::parsingOubsOne(char *datB, int datL, int update)
 
 	if (m_bContinue)
 	{
+		m_slog.Format("[IB202200][%x][%s]<%d>[%s] ONE_SEND2 cont=[%d] second=[%d] size=[%d] idx=[%d]",
+			this, __FUNCTION__, __LINE__, m_szTitle, m_bContinue, m_bSecond, m_pGridArray.GetSize(), m_nIndex);
+		OutputDebugString(m_slog);
+
 		m_bSecond = TRUE;
 		sendTransactionTR(-1, GRIDMAXNUM, m_pGridArray.GetSize());
 	}
@@ -7284,6 +7372,12 @@ void CGridWnd::SetKind(UINT kind)
 
 	InvalidateRect(m_rcTitle, FALSE);
 	m_grid->SetSortColumn(-1);
+
+	m_slog.Format("[IB202200][%x][%s]<%d>[%s] SETKIND idx=[%d] kind=[%d] skind=[%d] group=[%d] title=[%s]",
+		this,__FUNCTION__, __LINE__, m_szTitle, m_nIndex,
+		CAST_TREEID(m_kind)->kind, CAST_TREEID(m_kind)->skind,
+		CAST_TREEID(m_kind)->value, (LPCTSTR)m_szTitle);
+	OutputDebugString(m_slog);
 }
 
 CString CGridWnd::FindTitle(UINT kind)
@@ -8759,7 +8853,7 @@ void CGridWnd::SendWhenVisibleModeTR(CString data[100][2], int nStart, int nEnd)
 	}
 
 	int nInterCnt = 0;
-
+	m_nPending++;
 	CWnd *pWnd = (CWnd *)m_pMainWnd->SendMessage(WM_MANAGE, MAKEWPARAM(MK_GETWND, MO_TOOL));
 	const int nOver = (int)pWnd->SendMessage(WM_MANAGE, MK_INPUTOVER);
 

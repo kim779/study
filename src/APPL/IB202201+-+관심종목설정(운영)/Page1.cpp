@@ -1556,6 +1556,10 @@ void CPage1::OnEditgroup()
 		//서버에 전송
 		CWnd* wnd = GetParent()->GetParent();
 		wnd->SendMessage(TOmapWnd, MAKEWPARAM(upEachGroupACTION, m_activegno-1), 0);
+
+		m_slog.Format("\r\n[interest][IB202201][%s] m_activegno=[%d] combo=[%d]",
+			__FUNCTION__, m_activegno, m_gname.GetCount());
+		OutputDebugString(m_slog);
 	}
 
 	m_bIsEdit = TRUE;
@@ -6159,7 +6163,9 @@ void CPage1::OnShareimport()
 		{
 			ClearInterest();
 
-			gsl::span<_inters> spanInter((_inters*)sBuffer.GetBuffer(), maxJONGMOK);	
+			//gsl::span<_inters> spanInter((_inters*)sBuffer.GetBuffer(), maxJONGMOK);	
+			const int itemCount = min((int)(len / sizeof(_inters)), maxJONGMOK);   // 실제 들어있는 레코드 수만큼만
+			gsl::span<_inters> spanInter((_inters*)sBuffer.GetBuffer(), itemCount);
 			for (auto& item :spanInter)
 			{
 				auto &inter = m_inters.emplace_back(std::make_shared<_intersx>());	
@@ -7340,7 +7346,13 @@ void CPage1::receiveOub(int key, CString data)
 	case dnGROUPLIST:
 		{
 			int cnt = atoi(data.Left(4));
+
+			m_slog.Format("\r\n[interest][IB202201][%s] GROUPLIST cnt=[%d] mg0=[%s][%s]",
+				__FUNCTION__, cnt, (LPCTSTR)m_manageGroup[0][0], (LPCTSTR)m_manageGroup[0][3]);
+			OutputDebugString(m_slog);
+
 			data = data.Mid(4);
+			m_manageGroup.fill({ "", "", "", "" });
 			const gsl::span<_gnewlistex> groupList((_gnewlistex*)data.GetString(), cnt);
 			for_each(groupList.begin(), groupList.end(), [&](auto item) {
 				const CString groupkey = CString(item.ngrs, 2).Trim();
@@ -7358,6 +7370,14 @@ void CPage1::receiveOub(int key, CString data)
 
 			});		
 			initCombo();
+
+			if (cnt <= 0)                             // no group left
+			{
+				m_activegno = -1;
+				m_list2.DeleteAllItems();
+				break;
+			}
+
 			m_activegno = 1; //test mod
 			CWnd* wnd = GetParent()->GetParent();
 			wnd->SendMessage(TOmapWnd, MAKEWPARAM(dnGROUPCODE, 0), m_activegno);

@@ -9609,13 +9609,13 @@ void CTestDlgDlg::OnBnClickedFdsfile2()
 			}
 		}
 		CString filename;
-		HMODULE hModule = LoadLibrary("F:\\util\\HTS\\IBK투자증권 HTS\\dev\\CX_SHA256.DLL");
+		HMODULE hModule = LoadLibrary("C:\\IBKS\\IBK투자증권 HTS\\dev\\CX_SHA256.DLL");
 
 
 		typedef long (WINAPI* GETSHAFUNC)(char*);
 
 		//D:\\IBKS_TEST\\src\\APPL\\TestDlg\\TestDlg\\Release\\TestDlg.exe
-		char* pName = "D:\\IBKS_TEST\\src\\APPL\\TestDlg\\TestDlg\\Release\\TestDlg.exe";
+		char* pName = "C:\\IBKS\\IBK투자증권 HTS\\exe\\IBKSCONNECTOR.OCX";
 		GETSHAFUNC func = (GETSHAFUNC)GetProcAddress(hModule, "axFileEncrypt");
 		if (func)
 		{

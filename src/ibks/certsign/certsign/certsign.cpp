@@ -42,6 +42,8 @@ struct CS_SESSION
 // 평문 비밀번호를 33바이트 암호화 값으로 보관하고 평문은 지운다 (CertifyCtrl::savePasswd 패턴)
 static void savePasswd(CS_SESSION* s, char* plain, int plainCap)
 {
+	//cslog("[certsign.dll] savePasswd");
+	cslog("[certsign.dll] savePasswd [%s]", plain);
 	ZeroMemory(s->encpass, sizeof(s->encpass));
 	sk_if_GetEncryptedPassword(plain, s->encpass);
 	SecureZeroMemory(plain, plainCap);
@@ -50,7 +52,7 @@ static void savePasswd(CS_SESSION* s, char* plain, int plainCap)
 CS_API HCS CS_Open(void)
 {
 	//cslog("CS_SelectInteractive rc=%d storage=%d", rc, (int)s->sd.bOldStorage)
-	cslog("[cersign]CS_Open");
+	cslog("[certsign.dll] CS_Open");
 	CS_SESSION* s = new CS_SESSION();
 	ZeroMemory(&s->appCtx, sizeof(APP_CONTEXT));
 	ZeroMemory(&s->sd, sizeof(SD_API_CONTEXT));
@@ -71,6 +73,7 @@ CS_API int CS_Select(HCS h, const char* dn, const char* password,
 	if (!h || !dn || !password)
 		return -1;
 
+	cslog("[certsign.dll] CS_Select");
 	CS_SESSION* s = (CS_SESSION*)h;
 
 	ZeroMemory(&s->sd, sizeof(SD_API_CONTEXT));
@@ -111,6 +114,7 @@ CS_API  int CS_Sign(HCS h, const unsigned char* data, int dataLen, unsigned char
 	if (!h || !sigOut || !sigOutLen)
 		return -1;
 
+	cslog("[certsign.dll] CS_Sign");
 	//cslog("CS_Sign len=[%d] data=[%s] ", dataLen, data);
 	cslog("CS_Sign len=%d fnv=%08X", dataLen, csFnv(data, dataLen));
 
@@ -141,6 +145,7 @@ CS_API void CS_Close(HCS h)
 	if (!h)
 		return;
 
+	cslog("[certsign.dll] CS_Close");
 	CS_SESSION* s = (CS_SESSION*)h;
 	sk_if_cert_static_context_release();
 	SecureZeroMemory(s, sizeof(CS_SESSION));
@@ -160,6 +165,7 @@ CS_API int CS_SelectInteractive(HCS h, HWND parentWnd,
 	if (!h)
 		return -1;
 
+	cslog("[certsign.dll] CS_SelectInteractive");
 	CS_SESSION* s = (CS_SESSION*)h;
 
 	//cslog("[cersign]CS_SelectInteractive  data=[%s] ", dnOut);
@@ -206,7 +212,7 @@ CS_API int CS_SignFull(HCS h, const unsigned char* data, int dataLen, unsigned c
 	if (!h || !sigOut || !sigOutLen)
 		return -1;
 
-	cslog("CS_SignFull len=[%d]", dataLen);
+	cslog("[certsign.dll] CS_SignFull len=[%d]  data=[%s]", dataLen, data);
 
 	CS_SESSION* s = (CS_SESSION*)h;
 	if (!s->selected)
@@ -238,6 +244,7 @@ CS_API int CS_VerifyPassword(HCS h, HWND parentWnd)
 	if (!h)
 		return -1;
 
+	cslog("[certsign.dll] CS_VerifyPassword");
 	CS_SESSION* s = (CS_SESSION*)h;
 	if (!s->selected)
 		return -1;
@@ -273,6 +280,7 @@ CS_API int CS_SignFullPrompt(HCS h, HWND parentWnd, const unsigned char* data, i
 	if (!s->selected)
 		return -1;
 
+	cslog("[certsign.dll] CS_SignFullPrompt");
 	SecureZeroMemory(s->sd.szOldPasswd, sizeof(s->sd.szOldPasswd));   // s->sd == appCtx.pInterfaceContext
 	sk_if_SetKeySaferMode(1);
 	if (parentWnd)
@@ -297,6 +305,78 @@ CS_API int CS_SignFullPrompt(HCS h, HWND parentWnd, const unsigned char* data, i
 		savePasswd(s, s->sd.szOldPasswd, sizeof(s->sd.szOldPasswd));   // encpass 교체 + 평문 삭제
 	}
 	SecureZeroMemory(s->sd.szOldPasswd, sizeof(s->sd.szOldPasswd));
-	cslog("CS_SignFullPrompt rc=%d len=%d sigLen=%d", rc, dataLen, rc == 0 ? *sigOutLen : 0);
+	cslog("[certsign.dll] CS_SignFullPrompt rc=%d len=%d sigLen=%d", rc, dataLen, rc == 0 ? *sigOutLen : 0);
 	return rc;
+}
+
+CS_API int CS_CloudSelectInteractive(HCS h, HWND parentWnd,
+	char* dnOut, int dnOutCap,
+	char* certSetNameOut, int certSetNameOutCap)
+{
+	if (!h)
+		return -1;
+
+	CS_SESSION* s = (CS_SESSION*)h;
+
+	cslog("[certsign.dll] CS_CloudSelectInteractive");
+
+	SD_API_CONTEXT_NEW ctxNew;
+	ZeroMemory(&ctxNew, sizeof(SD_API_CONTEXT_NEW));
+
+	if (parentWnd && IsWindow(parentWnd))
+		sk_if_DialogModalMode(parentWnd);
+
+	int rc = sk_if_CloudCertSetSelectExt(&ctxNew, 0);   // 0 = 벤더 선택창(폰 PIN/푸시확인)
+	if (rc != 0)
+		return sk_if_GetLastErrorCode();
+
+	// CS_SelectInteractive와 같은 이유로, 지역변수(ctxNew.sd)가 아니라 세션 구조체에 먼저 복사
+	// (안 그러면 댕글링 포인터로 다음 CS_CloudSignFull이 실패함)
+	CopyMemory(&s->sd, &ctxNew.sd, sizeof(SD_API_CONTEXT));
+
+	if (sk_if_cert_preset_context(&s->appCtx, &s->sd) < 0)
+		return sk_if_GetLastErrorCode();
+
+	// 클라우드는 로컬비번(encpass) 불필요 - 인증은 선택 단계(벤더 팝업)에서 이미 끝남
+	SecureZeroMemory(s->encpass, sizeof(s->encpass));
+
+	if (dnOut)
+		strncpy_s(dnOut, dnOutCap, s->sd.szDN, _TRUNCATE);
+	if (certSetNameOut)
+		strncpy_s(certSetNameOut, certSetNameOutCap, s->sd.szCertSetName, _TRUNCATE);
+
+	s->selected = true;
+	return 0;
+}
+
+CS_API int CS_CloudSignFull(HCS h, const unsigned char* data, int dataLen, unsigned char* sigOut, int* sigOutLen)
+{
+	if (!h || !sigOut || !sigOutLen)
+		return -1;
+
+	cslog("[certsign.dll] CS_CloudSignFull len=%d fnv=%08X", dataLen, csFnv(data, dataLen));
+
+	CS_SESSION* s = (CS_SESSION*)h;
+	if (!s->selected)
+		return -1;
+
+	UString in = { dataLen, (unsigned char*)data };
+	UString out = { 0, nullptr };
+	UString r = { 0, nullptr };                 // 벤더도 안 씀 (CertifyCtrl.cpp:1132-1134)
+	if (sk_if_cert_SignDataWithR(&s->appCtx, "", &in, &out, &r))
+		return sk_if_GetLastErrorCode();
+
+	if (r.value)
+		sk_if_cert_MemFree(r.value);            // 벤더는 이거 누락(누수) - 여긴 정리
+
+	if (out.length > *sigOutLen)
+	{
+		sk_if_cert_MemFree(out.value);
+		return -2;
+	}
+
+	CopyMemory(sigOut, out.value, out.length);
+	*sigOutLen = out.length;
+	sk_if_cert_MemFree(out.value);
+	return 0;
 }

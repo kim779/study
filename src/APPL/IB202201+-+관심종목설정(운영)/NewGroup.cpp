@@ -70,6 +70,15 @@ void CNewGroup::OnOK()
 	string.TrimLeft(); 
 	string.TrimRight();
 
+	if (string.FindOneOf("\\/:*?\"<>|") >= 0)
+	{
+		MessageBox("그룹명에 다음 문자는 사용할 수 없습니다.\n\n  \\ / : * ? \" < > |",
+			m_title, MB_OK | MB_ICONEXCLAMATION);
+		m_grpname.SetFocus();
+		m_grpname.SetSel(0, -1);
+		return;
+	}
+
 	if (string.GetLength() <= 0)
 	{
 		string.LoadString(IDS_ENOGROUP);

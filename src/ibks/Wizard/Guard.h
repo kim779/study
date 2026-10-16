@@ -117,6 +117,9 @@ public:
 	typedef int (*PFN_CS_SignFull)(HCS, const unsigned char*, int, unsigned char*, int*);
 	typedef int (*PFN_CS_VerifyPassword)(HCS, HWND);
 	typedef int (*PFN_CS_SignFullPrompt)(HCS, HWND, const unsigned char*, int, unsigned char*, int*);
+	typedef int (*PFN_CS_CloudSelectInteractive)(HCS, HWND, char*, int, char*, int);
+	typedef int (*PFN_CS_CloudSignFull)(HCS, const unsigned char*, int, unsigned char*, int*);
+
 
 	HMODULE			m_hCertSign;
 	PFN_CS_Open		m_pCSOpen;
@@ -128,6 +131,8 @@ public:
 	PFN_CS_SignFull          m_pCSSignFull;
 	PFN_CS_VerifyPassword    m_pCSVerifyPassword;                      // 추가 (없으면 선택창 폴백)
 	PFN_CS_SignFullPrompt    m_pCSSignFullPrompt;
+	PFN_CS_CloudSelectInteractive m_pCSCloudSelectInteractive;;
+	PFN_CS_CloudSignFull           m_pCSCloudSignFull;
 
 
 	CString          m_csLoginId;   //Certifyid 가 캐시한 로그인 ID, onCertify 가 DN받으면 이걸로 서명

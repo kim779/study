@@ -9,9 +9,6 @@
 #include "../../H/interMSG.h"
 //#include "../../../axis/axMsg.hxx"
 #include "../../AXIS/axMsg.hxx"
-
-#define AXLOG_MODULE_TAG "SYMBOL"
-#include "../../ibks/h/axlog.h"
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #undef THIS_FILE
@@ -51,8 +48,6 @@ CControlWnd::CControlWnd()
 	m_bSideTime = FALSE;
 
 	m_sMkMsg.Empty();
-
-	shareddll.Load("cx_shared.dll");
 }
 
 CControlWnd::~CControlWnd()
@@ -217,6 +212,9 @@ void CControlWnd::load_jinfo3(char* pData)
 	m_jinfo.jrat = CString(jinfo.jrat, sizeof(jinfo.jrat));
 	m_jinfo.nrat = CString(jinfo.nrat, sizeof(jinfo.nrat));	// 20070718
 
+m_slog.Format("[cx_symbol][%s]<%d>  m_jinfo.codx = [%s]  m_jinfo.hnam =[%s]", __FUNCTION__, __LINE__, m_jinfo.codx, m_jinfo.hnam);
+OutputDebugString(m_slog);
+
 	// extended infomation
 	m_jinfo.krgb = CString(jinfo.krgb, sizeof(jinfo.krgb));	
 	m_sSearchkrgb = m_jinfo.krgb;
@@ -231,19 +229,9 @@ void CControlWnd::load_jinfo3(char* pData)
 	m_sCode = m_jinfo.codx; m_sCode.Trim();
 	m_sRtsCode = m_sCode;
 
-	CString snam;
-	snam.Format("%s", m_jinfo.hnam);
-	snam.TrimRight();
-	m_slog.Format("[cx_symbol][%s]<%d>  m_jinfo.codx = [%s]  m_jinfo.hnam =[%s]", __FUNCTION__, __LINE__, m_jinfo.codx, snam);
-	OutputDebugString(m_slog);
-
-	m_slog.Format("\r\n[cx_symbol][%-40s][%d][%s][%s]", __FUNCTION__, __LINE__, m_sRtsCode, snam);
+	m_slog.Format("\r\n[cx_symbol][%-40s][%d][%-35s]-->1", __FUNCTION__, __LINE__, m_sRtsCode);
 	m_slog.Trim();
-	if(m_pMainFrame)
-		m_pMainFrame->SendMessage(WM_USER, MMSG_SHARED_GUIDEMESSAGE, (LPARAM)(LPSTR)(LPCTSTR)m_slog);
 	OutputDebugString(m_slog);
-	// 모달 메시지박스 대신 모달리스 로그창으로 확인 (axlog.h::axlogShow)
-	//axlogShow(LOG_DATA, "%s", (LPCTSTR)m_slog);
 
 	m_sInfo = m_jinfo.krgb;
 	m_sInfo.TrimRight();
@@ -294,7 +282,7 @@ long CControlWnd::OnMessage(WPARAM wParam, LPARAM lParam)
 		struct	_extTHx* exth;
 		exth = (struct _extTHx*)lParam;
 
-		m_slog.Format("\r\n[cx_symbol][dll_oubx][%-40s][%d][%-35s]--> key=[%s] len=[%d] ",
+		m_slog.Format("\r\n[memo][%-40s][%d][%-35s]--> key=[%s] len=[%d] ",
 			__FUNCTION__, __LINE__, "DLL_OUBx_size", GetMemoTrKeyType(exth->key), exth->size);
 		m_slog.Trim();
 		OutputDebugString(m_slog);
@@ -509,9 +497,9 @@ long CControlWnd::OnMessage(WPARAM wParam, LPARAM lParam)
 
 	case DLL_OUB:	// NOT USED. Use DLL_OUBx Only !!!
 		key = LOWORD(HIBYTE(wParam));
-		m_slog.Format("\r\n[cx_symbol][dll_oub][%-40s][%d][%-35s]-->key=[%s] len=[%d] [%.50s] ", __FUNCTION__, __LINE__, "DLL_OUB",
+		m_slog.Format("\r\n[memo][%-40s][%d][%-35s]-->key=[%s] len=[%d] [%.50s] ", __FUNCTION__, __LINE__, "DLL_OUB",
 			GetMemoTrKeyType(key), HIWORD(wParam), (char*)lParam);
-		m_slog.Trim(); 
+		m_slog.Trim();
 		OutputDebugString(m_slog);
 
 
@@ -767,42 +755,22 @@ void CControlWnd::parseAlert(struct _alertR* alert)
 	bool	bChanged = false;
 	CString rned,dist,vist,vitime, vitype;
 
+	m_slog.Format("[dll][symbol] alert->code = [%s]   m_sRtsCode=[%s]", alert->code, m_sRtsCode);
+	OutputDebugString(m_slog);
+
 	if (alert->code == m_sRtsCode)
 	{
 		DWORD*	data = nullptr;
 
-		m_slog.Format("[SYM_IMG_DIAG] 시작");
-		OutputDebugString(m_slog);
-
-
 		for (int ii = alert->size - 1; ii >= 0; ii--)
 		{
-			if(ii==1)
-			{
-				m_slog.Format("[SYM_IMG_DIAG] !!!!!!!!!!   alert->size=[%d]", alert->size);
-				OutputDebugString(m_slog);
-			}
-
 			data = (DWORD *)alert->ptr[ii];
-
-			//2026-08-26: 패킷마다 독립적으로 판단하도록 이전 반복의 잔여값을 걷어내고
-			//현재 유지중인 m_jinfo 값으로 초기화한다(이전엔 for문 밖에서 한번만 선언되어
-			//한번 바뀌면 이후 패킷들까지 계속 loadBitmap이 재호출되고, 그때 안 바뀐
-			//필드는 빈 문자열이 넘어가던 문제가 있었음).
-			bChanged = false;
-			rned = m_jinfo.rned;
-			dist = m_jinfo.dist;
-			vist = m_jinfo.vist;
-			vitime = m_jinfo.vitime;
-			vitype = m_jinfo.vitype;
-
+			
 			if (data[950])		//배분정보
 			{
 				dist = (char*)data[950];
 
 				bChanged = true;
-				m_slog.Format("[SYM_IMG_DIAG][%s] bChanged=true (data[950] 배분정보) dist=[%s]", m_sCode, dist);
-				OutputDebugString(m_slog);
 			}
 
 			if (data[951])       //임의종료
@@ -810,8 +778,6 @@ void CControlWnd::parseAlert(struct _alertR* alert)
 				rned = (char*)data[951];
 
 				bChanged = true;
-				m_slog.Format("[SYM_IMG_DIAG][%s] bChanged=true (data[951] 임의종료) rned=[%s]", m_sCode, rned);
-				OutputDebugString(m_slog);
 			}
 
 			if (data[701])      //변동성
@@ -820,10 +786,8 @@ void CControlWnd::parseAlert(struct _alertR* alert)
 				vitime = (char*)data[702];
 				vitype = (char*)data[703];
 				bChanged = true;
-				m_slog.Format("[SYM_IMG_DIAG](data[701] 변동성) [%s] bChanged=true  vist=[%s] vitime=[%s] vitype=[%s]", m_sCode, vist, vitime, vitype);
-				OutputDebugString(m_slog);
 			}
-
+			//krx_after
 			m_jinfo.rned = rned;
 			m_jinfo.dist = dist;
 			m_jinfo.vist = vist;
@@ -835,9 +799,6 @@ void CControlWnd::parseAlert(struct _alertR* alert)
 				CString sval;
 				sval.Format("%s", (char*)data[704]);
 				sval.TrimRight();
-
-				m_slog.Format("[SYM_IMG_DIAG] (data[704] 정지) [%s]  sval=[%s] krgb=[%s] m_sSearchkrgb=[%s]", m_sCode, sval, m_jinfo.krgb, m_sSearchkrgb);
-				OutputDebugString(m_slog);
 
 				if (sval == "0")  //정상
 				{
@@ -859,8 +820,6 @@ void CControlWnd::parseAlert(struct _alertR* alert)
 					loadBitmap(m_jinfo.jrat, m_jinfo.nrat, m_jinfo.jgub, m_jinfo.krgb, m_jinfo.rned, m_jinfo.dist, m_jinfo.vist, m_jinfo.vitime, m_jinfo.vitype);
 				Invalidate();
 				bChanged = true;
-				m_slog.Format("[SYM_IMG_DIAG] (data[704] 정지) [%s] bChanged=true sval=[%s] krgb=[%s] ", m_sCode, sval, m_jinfo.krgb);
-				OutputDebugString(m_slog);
 			}
 
 			if (data[191])   //투자유의
@@ -873,36 +832,26 @@ void CControlWnd::parseAlert(struct _alertR* alert)
 					if (m_jinfo.krgb.Find("유의") < 0)
 					{
 						m_jinfo.krgb = "유의";
-						m_sSearchkrgb = m_jinfo.krgb;
 						m_sInfo = m_jinfo.krgb;
 						loadBitmap(m_jinfo.jrat, m_jinfo.nrat, m_jinfo.jgub, m_jinfo.krgb, m_jinfo.rned, m_jinfo.dist, m_jinfo.vist, m_jinfo.vitime, m_jinfo.vitype);
-						Invalidate();
+						Invalidate();	
 					}
-
+					
 				}
 				else if (val == "0")
 				{
 					if (m_jinfo.krgb.Find("정상") < 0)
 					{
 						m_jinfo.krgb = "정상";
-						m_sSearchkrgb = m_jinfo.krgb;
 						m_sInfo = m_jinfo.krgb;
 						loadBitmap(m_jinfo.jrat, m_jinfo.nrat, m_jinfo.jgub, m_jinfo.krgb, m_jinfo.rned, m_jinfo.dist, m_jinfo.vist, m_jinfo.vitime, m_jinfo.vitype);
-						Invalidate();
+						Invalidate();	
 					}
 				}
 			}
 
 			if (bChanged)
 			{
-				m_slog.Format("[SYM_IMG_DIAG][마지막][%x][%s] bChanged loadBitmap  krgb=[%s] 지역변수 rned=[%s] dist=[%s] vist=[%s] vitime=[%s] vitype=[%s] ",
-					this, m_sCode, m_jinfo.krgb, rned, dist, vist, vitime, vitype);
-				OutputDebugString(m_slog);
-
-				m_slog.Format("[SYM_IMG_DIAG][마지막][%x][%s] bChanged loadBitmap  krgb=[%s] m_jinfo rned=[%s] dist=[%s] vist=[%s] vitime=[%s] vitype=[%s]",
-					this,m_sCode, m_jinfo.krgb, m_jinfo.rned, m_jinfo.dist, m_jinfo.vist, m_jinfo.vitime, m_jinfo.vitype);
-				OutputDebugString(m_slog);
-
 				loadBitmap(m_jinfo.jrat, m_jinfo.nrat, m_jinfo.jgub, m_jinfo.krgb,rned,dist,vist,vitime,vitype);
 
 				Invalidate();
@@ -1919,8 +1868,8 @@ void CControlWnd::loadBitmap(CString jrab, CString nrat, CString jgub, CString k
 				break;
 			case 'F':  //스팩
 			case '2':	// 코스닥
-			case 'C':	// BDC 수익증권
-			case 'D':	// BDC 투자회사
+			//case 'C':	// BDC 수익증권
+			//case 'D':	// BDC 투자회사
 				strImgPath.Format("%s/image/코스닥.bmp", m_sRoot);
 				m_pRBmp = getBitmap(strImgPath);
 				break;
@@ -1955,6 +1904,8 @@ void CControlWnd::loadBitmap(CString jrab, CString nrat, CString jgub, CString k
 				m_pRBmp = getBitmap(strImgPath);
 				break;
 			case 'A' :	//2013.06.11 KSJ 코넥스 추가
+			case 'C':	//2013.06.11 KSJ 코넥스 추가
+			case 'D':	//2013.06.11 KSJ 코넥스 추가
 				strImgPath.Format("%s/image/코넥스.bmp", m_sRoot);
 				m_pRBmp = getBitmap(strImgPath);
 				break;
@@ -2309,23 +2260,6 @@ int CControlWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 	codedll.Load("axiscode.dll");
 	LoadLoanGrade();
-
-	shareddll.Load("cx_shared.dll");
-
-	if (shareddll.IsLoaded())
-	{
-		if (!shareddll.Function<const bool WINAPI(int, CWnd**)>("axGetData")(1, &m_pMainFrame))
-		{
-			m_pMainFrame = GetTopLevelParent();
-			m_slog.Format("				[cx_symbol][mainWnd]  GetTopLevelParent m_pMainFrame=[%x]", m_pMainFrame);
-			OutputDebugString(m_slog);
-		}
-		else
-		{
-			m_slog.Format("				[cx_symbol][mainWnd]  !!!!not GetTopLevelParent[%x] shared!!! m_pMainFrame=[%x] ", GetTopLevelParent(), m_pMainFrame);
-			OutputDebugString(m_slog);
-		}
-	}
 	
 	return 0;
 }

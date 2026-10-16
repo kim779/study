@@ -633,10 +633,10 @@ LONG CGroupWnd::OnManage(WPARAM wParam, LPARAM lParam)
 	{
 		if ((int)lParam == 1)
 			m_RecomGroup[0] = 1;
-		for (int i = 0; i < m_nGroup; i++)
+	/*	for (int i = 0; i < m_nGroup; i++)
 		{
 			m_GridWnd[i]->setBoolSecond(false);
-		}
+		}*/
 	}
 	break;
 	case MK_SAVECFG:
@@ -712,7 +712,13 @@ void CGroupWnd::testSaveFile(CString dt)
 // KR7005930003
 void CGroupWnd::RecvOper(int kind, CRecvData *rdata)
 {
+	int igroup{};
 	_trkey *trkey = (struct _trkey *)&kind;
+	igroup = min(trkey->kind == TRKEY_OVER ? trkey->group + 8 : trkey->group, m_nGroup - 1);
+	CString slog;
+	slog.Format("[IB202200][%s]<%d> igroup =[%d]  group=[%d] m_nGroup=[%d]  trkey->kind =[%d] ",
+		__FUNCTION__, __LINE__,  igroup, trkey->group, m_nGroup, trkey->kind);
+	OutputDebugString(slog);
 	switch (trkey->kind)
 	{
 	case TRKEY_GRIDNEWS:

@@ -155,7 +155,7 @@ CCertifyCtrl::CCertifyCtrl()
 	m_bCloudeUse = FALSE;
 	m_bCloudeInit = FALSE;
 
-	m_slog.Format("[WIZARD][CERTIFY] 생성자!!!!");
+	m_slog.Format("[WIZARD][AXCERTIFY] 생성자!!!!");
 	OutputDebugString(m_slog);
 }
 
@@ -1110,7 +1110,7 @@ long CCertifyCtrl::CertifyFull(long pInB, long pInL, long pOutB, long pOutL)
 	axlog(LOG_CERTIFY, "CertifyFull ENTER m_bCloudeUse=%d m_ca=%d pInL=%ld", m_bCloudeUse, (int)m_ca, pInL);
 	if (m_bCloudeUse)   //클라우드 로그인
 	{
-		m_slog.Format("[CERTIFY] DEV = [%d] [%s]", m_bDev, "!!!!!!!  클라우드 로그인 !!!!!!");
+		m_slog.Format("[AXCERTIFY] DEV = [%d] [%s]", m_bDev, "!!!!!!!  클라우드 로그인 !!!!!!");
 		//--------------------------------------------------------------------------------------------------------------------------------
 		//클라우드 초기화
 		int	pswdL, rc = 0;
@@ -1182,12 +1182,12 @@ long CCertifyCtrl::CertifyFull(long pInB, long pInL, long pOutB, long pOutL)
 				if (rc == -2) //-2면 연결끊기를 한것이다.
 				{
 					*(int*)pOutL = -3;
-					m_slog.Format("[CERTIFY]  sk_if_CloudCertSetSelectExt rc. = [%d]  errorCode=[%d]", rc, errorCode);
+					m_slog.Format("[AXCERTIFY]  sk_if_CloudCertSetSelectExt rc. = [%d]  errorCode=[%d]", rc, errorCode);
 					return errorCode;
 				}
 				
 				*(int*)pOutL = -3;
-				m_slog.Format("[CERTIFY]  sk_if_CloudCertSetSelectExt rc.. = [%d]  errorCode=[%d]", rc, errorCode);
+				m_slog.Format("[AXCERTIFY]  sk_if_CloudCertSetSelectExt rc.. = [%d]  errorCode=[%d]", rc, errorCode);
 
 				return errorCode;
 			}
@@ -1210,7 +1210,7 @@ long CCertifyCtrl::CertifyFull(long pInB, long pInL, long pOutB, long pOutL)
 			axlog(LOG_CERTIFY, "CertifyFull caNO/cloud sk_if_cert_SignDataWithR rc=%d", rc);
 
 			if (rc) {
-				m_slog.Format("[CERTIFY]  sk_if_cert_SignDataWithR 오류 rc = [%d]  errorCode=[%d]", rc, sk_if_GetLastErrorCode());
+				m_slog.Format("[AXCERTIFY]  sk_if_cert_SignDataWithR 오류 rc = [%d]  errorCode=[%d]", rc, sk_if_GetLastErrorCode());
 			
 				return sk_if_GetLastErrorCode();
 			}
@@ -1392,7 +1392,7 @@ BOOL CCertifyCtrl::CheckCloude()
 	else
 		m_bDev = FALSE;
 
-	m_slog.Format("[CERTIFY] CheckCloude  m_bDev = [%d]  ", m_bDev);
+	m_slog.Format("[AXCERTIFY] CheckCloude  m_bDev = [%d]  ", m_bDev);
 	FileLog(m_slog);
 
 	/*memset(chfile, 0x00, 500);
@@ -1459,7 +1459,7 @@ int CCertifyCtrl::Cloude_Full_sign(long pOutB, long pOutL)
 	axlog(LOG_CERTIFY, "Cloude_Full_sign sk_if_cert_SignDataWithR rc=%d", rc);
 
 	if (rc) {
-		m_slog.Format("[CERTIFY]  전자서명 오류 sk_if_cert_SignDataWithR rc = [%d]  errorCode=[%d]", rc, sk_if_GetLastErrorCode());
+		m_slog.Format("[AXCERTIFY]  전자서명 오류 sk_if_cert_SignDataWithR rc = [%d]  errorCode=[%d]", rc, sk_if_GetLastErrorCode());
 		FileLog(m_slog);
 		CString emsg;
 		emsg = sk_if_GetLastErrorMsg();
@@ -1521,7 +1521,7 @@ int CCertifyCtrl::Cloude_ConTraction_sign(long pOutB, long pOutL)
 		else
 		{
 			int errorCode = sk_if_GetLastErrorCode();
-			m_slog.Format("[CERTIFY]  축약서명 오류 sk_if_CloudCertSetSelectExt rc = [%d]  errorCode=[%d]", rc, sk_if_GetLastErrorCode());
+			m_slog.Format("[AXCERTIFY]  축약서명 오류 sk_if_CloudCertSetSelectExt rc = [%d]  errorCode=[%d]", rc, sk_if_GetLastErrorCode());
 			FileLog(m_slog);
 			m_sync.Unlock();
 			return  -2;
@@ -1537,7 +1537,7 @@ int CCertifyCtrl::Cloude_ConTraction_sign(long pOutB, long pOutL)
 
 	if (sk_if_cert_SignData_notEncode(&m_cpContext, "", &p1, &p2, NULL))
 	{
-		m_slog.Format("[CERTIFY] 축약서명 오류 Ecod =[%s]", sk_if_GetLastErrorMsg());
+		m_slog.Format("[AXCERTIFY] 축약서명 오류 Ecod =[%s]", sk_if_GetLastErrorMsg());
 		FileLog(m_slog);
 		axlog(LOG_CERTIFY, "Cloude_ConTraction_sign sk_if_cert_SignData_notEncode FAILED");
 		m_sync.Unlock();
@@ -1581,7 +1581,7 @@ LONG CCertifyCtrl::CertifyCloud(LONG func)
 				return rc;
 			else
 			{
-				m_slog.Format("[CERTIFY] 클라우드로 인증서 올리기 오류 sk_if_UploadPCtoCloud rc = [%d]  errorCode=[%d] error  msg = [%s]",
+				m_slog.Format("[AXCERTIFY] 클라우드로 인증서 올리기 오류 sk_if_UploadPCtoCloud rc = [%d]  errorCode=[%d] error  msg = [%s]",
 					rc, sk_if_GetLastErrorCode(), sk_if_GetLastErrorMsg());
 				FileLog(m_slog);
 				return sk_if_GetLastErrorCode();
@@ -1595,7 +1595,7 @@ LONG CCertifyCtrl::CertifyCloud(LONG func)
 				return rc;
 			else
 			{
-				m_slog.Format("[CERTIFY] 클라우드에서 인증서리 내려받기 오류 sk_if_DownloadCloudtoPC rc = [%d]  errorCode=[%d] error  msg = [%s]",
+				m_slog.Format("[AXCERTIFY] 클라우드에서 인증서리 내려받기 오류 sk_if_DownloadCloudtoPC rc = [%d]  errorCode=[%d] error  msg = [%s]",
 					rc, sk_if_GetLastErrorCode(), sk_if_GetLastErrorMsg());
 				FileLog(m_slog);
 				return sk_if_GetLastErrorCode();
@@ -1612,7 +1612,7 @@ LONG CCertifyCtrl::CertifyCloud(LONG func)
 				return rc;
 			else
 			{
-				m_slog.Format("[CERTIFY] 간편비밀번호 변경 오류 sk_if_CertChangePin_inCloud rc = [%d]  errorCode=[%d] error  msg = [%s]",
+				m_slog.Format("[AXCERTIFY] 간편비밀번호 변경 오류 sk_if_CertChangePin_inCloud rc = [%d]  errorCode=[%d] error  msg = [%s]",
 					rc, sk_if_GetLastErrorCode(), sk_if_GetLastErrorMsg());
 				FileLog(m_slog);
 				return sk_if_GetLastErrorCode();
@@ -1627,10 +1627,10 @@ LONG CCertifyCtrl::CertifyCloud(LONG func)
 			int rc = 0;
 			rc = sk_if_IssueCert_toCloud(&Context, 0);
 			if (rc == 0)
-				FileLog("[CERTIFY] 클라우드 인증서 발급");
+				FileLog("[AXCERTIFY] 클라우드 인증서 발급");
 			else
 			{
-				m_slog.Format("[CERTIFY] 클라우드 인증서 발급 오류 sk_if_IssueCert_toCloud rc = [%d]  errorCode=[%d] error  msg = [%s]",
+				m_slog.Format("[AXCERTIFY] 클라우드 인증서 발급 오류 sk_if_IssueCert_toCloud rc = [%d]  errorCode=[%d] error  msg = [%s]",
 					rc, sk_if_GetLastErrorCode(), sk_if_GetLastErrorMsg());
 				FileLog(m_slog);
 				return sk_if_GetLastErrorCode();
@@ -1646,10 +1646,10 @@ LONG CCertifyCtrl::CertifyCloud(LONG func)
 			int rc = 0;
 			rc = sk_if_CertNew_toCloud(&Context, 0);
 			if (rc == 0)
-				FileLog("[CERTIFY] 클라우드 인증서 갱신");
+				FileLog("[AXCERTIFY] 클라우드 인증서 갱신");
 			else
 			{
-				m_slog.Format("[CERTIFY] 클라우드 인증서 갱신 오류 sk_if_CertNew_toCloud rc = [%d]  errorCode=[%d] error  msg = [%s]",
+				m_slog.Format("[AXCERTIFY] 클라우드 인증서 갱신 오류 sk_if_CertNew_toCloud rc = [%d]  errorCode=[%d] error  msg = [%s]",
 					rc, sk_if_GetLastErrorCode(), sk_if_GetLastErrorMsg());
 				FileLog(m_slog);
 				return sk_if_GetLastErrorCode();
@@ -1663,10 +1663,10 @@ LONG CCertifyCtrl::CertifyCloud(LONG func)
 			int rc = 0;
 			rc = sk_if_DeleteCert_inCloud(0);
 			if (rc == 0)
-				FileLog("[CERTIFY] 클라우드 인증서 삭제");
+				FileLog("[AXCERTIFY] 클라우드 인증서 삭제");
 			else
 			{
-				m_slog.Format("[CERTIFY] 클라우드 인증서 삭제 오류 sk_if_DeleteCert_inCloud rc = [%d]  errorCode=[%d] error  msg = [%s]",
+				m_slog.Format("[AXCERTIFY] 클라우드 인증서 삭제 오류 sk_if_DeleteCert_inCloud rc = [%d]  errorCode=[%d] error  msg = [%s]",
 					rc, sk_if_GetLastErrorCode(), sk_if_GetLastErrorMsg());
 				FileLog(m_slog);
 				return sk_if_GetLastErrorCode();
@@ -1680,18 +1680,18 @@ LONG CCertifyCtrl::CertifyCloud(LONG func)
 			int rc = 0;
 			rc = sk_if_Connected_CloudUser_Confirm(0); //1 : 화면을 보지않고 연결확인 된 것만 알겠다
 			if (rc == 1)
-				FileLog("[CERTIFY] 클라우드 연결 끊기 성공");
+				FileLog("[AXCERTIFY] 클라우드 연결 끊기 성공");
 
 			if (rc < 0)
 			{
 				{
-					m_slog.Format("[CERTIFY] 클라우드에 연결된 정보 확인 rc = [%d]  errorCode=[%d] error  msg = [%s]",
+					m_slog.Format("[AXCERTIFY] 클라우드에 연결된 정보 확인 rc = [%d]  errorCode=[%d] error  msg = [%s]",
 						rc, sk_if_GetLastErrorCode(), sk_if_GetLastErrorMsg());
 					FileLog(m_slog);
 					return sk_if_GetLastErrorCode();
 				}
 			}
-			FileLog("[CERTIFY] 클라우드에 연결된 정보 확인");
+			FileLog("[AXCERTIFY] 클라우드에 연결된 정보 확인");
 	
 			return 0;
 		}
@@ -1719,7 +1719,7 @@ LONG CCertifyCtrl::CertifyCloud(LONG func)
 		{
 			m_bCloudeUse = TRUE;
 			axlog(LOG_CERTIFY, "CertifyCloud func=11 -> m_bCloudeUse=TRUE");
-			FileLog("[CERTIFY] 클라우드 사용");
+			FileLog("[AXCERTIFY] 클라우드 사용");
 			return 0;
 		}
 		break;
@@ -1727,7 +1727,7 @@ LONG CCertifyCtrl::CertifyCloud(LONG func)
 		{
 			m_bCloudeUse = FALSE;
 			axlog(LOG_CERTIFY, "CertifyCloud func=12 -> m_bCloudeUse=FALSE");
-			FileLog("[CERTIFY] 클라우드 미사용");
+			FileLog("[AXCERTIFY] 클라우드 미사용");
 			return 0;
 		}
 		break;
@@ -1743,7 +1743,7 @@ LONG CCertifyCtrl::CertifyCloud(LONG func)
 
 void CCertifyCtrl::InitCloude()
 {
-	m_slog.Format("[CERTIFY]  InitCloude  m_bCloudeInit = [%d]  ", m_bCloudeInit);
+	m_slog.Format("[AXCERTIFY]  InitCloude  m_bCloudeInit = [%d]  ", m_bCloudeInit);
 	FileLog(m_slog);
 	axlog(LOG_CERTIFY, "InitCloude ENTER m_bCloudeInit=%d m_bDev=%d", m_bCloudeInit, m_bDev);
 
@@ -1773,7 +1773,7 @@ void CCertifyCtrl::InitCloude()
 		config.AGREEMENT_URL = REAL_AGREEMENT_URL;
 	}
 
-	slog.Format("[CERTIFY] --InitCloude-- m_bDev=[%d]  ", m_bDev);
+	slog.Format("[AXCERTIFY] --InitCloude-- m_bDev=[%d]  ", m_bDev);
 	FileLog(slog);
 
 	config.VERSION = "1.0.0";
@@ -1786,7 +1786,7 @@ void CCertifyCtrl::InitCloude()
 	sk_if_DialogModalMode(m_hWnd); //모달 모드
 	int ret = sk_if_SetKeySaferMode(1);  //9 안내받음  1기존 (IBKs 내부방화벽에서 9번관련 막힌다함..)
 	
-	slog.Format("[CERTIFY] --InitCloude-- sk_if_SetKeySaferMode ret=[%d] ", ret);
+	slog.Format("[AXCERTIFY] --InitCloude-- sk_if_SetKeySaferMode ret=[%d] ", ret);
 	FileLog(slog);
 
 	//해외전화 ARS 인증버튼 0:비활성화 1:활성화

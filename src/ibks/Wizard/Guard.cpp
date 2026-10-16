@@ -321,6 +321,8 @@ int CGuard::Initial(CWnd* control)
 		m_pCSSignFull = (PFN_CS_SignFull)GetProcAddress(m_hCertSign, "CS_SignFull");
 		m_pCSVerifyPassword = (PFN_CS_VerifyPassword)GetProcAddress(m_hCertSign, "CS_VerifyPassword");
 		m_pCSSignFullPrompt = (PFN_CS_SignFullPrompt)GetProcAddress(m_hCertSign, "CS_SignFullPrompt");
+		m_pCSCloudSelectInteractive = (PFN_CS_CloudSelectInteractive)GetProcAddress(m_hCertSign, "CS_CloudSelectInteractive");
+		m_pCSCloudSignFull = (PFN_CS_CloudSignFull)GetProcAddress(m_hCertSign, "CS_CloudSignFull");
 
 		if (!m_pCSOpen || !m_pCSSelectInteractive || !m_pCSSelect || !m_pCSSign || !m_pCSSignFull || !m_pCSClose)
 		{
@@ -6870,6 +6872,32 @@ long CGuard::CertifyFull(CString srcB, int srcL, char* desB, int& desL)
 			return rc;
 		}
 		axlog(LOG_CERTIFY, "[CertSign] CS_Open FAILED - this session uses vendor control");
+	}
+	else if (m_hCertSign && m_csCloud && m_pCSCloudSelectInteractive && m_pCSCloudSignFull)
+	{
+		CloseCertSign();
+		m_cs = m_pCSOpen();
+		if (m_cs)
+		{
+			char dn[301] = { 0 }, setName[513] = { 0 };
+			int rc = m_pCSCloudSelectInteractive(m_cs, m_parent ? m_parent->GetSafeHwnd() : NULL,
+				dn, sizeof(dn), setName, sizeof(setName));
+			if (rc == 0)
+			{
+				m_csDN = dn;
+				static const char plain[] = "abcdefghijklmnopqrstuvwxyz1234567890!@#$%^&*()-=";
+				int outL = 8 * 1024;
+				rc = m_pCSCloudSignFull(m_cs, (const unsigned char*)plain, (int)strlen(plain),
+					(unsigned char*)desB, &outL);
+				if (rc == 0)
+					desL = outL;
+			}
+			axlog(LOG_CERTIFY, "[CertSign] [CLOUD-LOGIN] CertifyFull engine=ours rc=%d sigLen=%d", rc, desL);
+			if (rc != 0)
+				CloseCertSign();
+			return rc;
+		}
+		axlog(LOG_CERTIFY, "[CertSign] CS_Open FAILED(cloud) - this session uses vendor control");
 	}
 #endif
 

@@ -213,10 +213,10 @@ void CAxisverApp::parsingCommandStatus()
 
 void CAxisverApp::updateObjectAXIS()
 {
-	if (m_axis != (HWND) NULL || m_axisPid != 0)
+	if (m_axis != (HWND)NULL || m_axisPid != 0)
 	{
 		Sleep(500);
-		if (m_axis != (HWND) NULL)
+		if (m_axis != (HWND)NULL)
 			::SendMessage(m_axis, WM_CLOSE, 0, 0);
 		if (!WaitAxisExit(m_axis, m_axisPid, 3000))
 		{
@@ -269,12 +269,12 @@ void CAxisverApp::updateObjectAXIS()
 		tmps = "Component/" + tmps;
 
 		text = news + ".DZ";
-		if (zip.Decompress((char *)news.operator LPCTSTR(), (char *)text.operator LPCTSTR()))
+		if (zip.Decompress((char*)news.operator LPCTSTR(), (char*)text.operator LPCTSTR()))
 			DeleteFile(news);
 		else
 			text = news;
 
-		for ( ;; )
+		for (;; )
 		{
 			if (CopyFile(text, dests, FALSE))
 				break;
@@ -286,7 +286,7 @@ void CAxisverApp::updateObjectAXIS()
 			if (err == ERROR_SHARING_VIOLATION)   // 32
 				LogProcessesUsingFile(dests);     // 누가 잡고 있는지 로그
 
-			AfxMessageBox(tmps + "을 사용중입니다. 프로그램을 종료하십시오.", MB_OK|MB_ICONINFORMATION|MB_SYSTEMMODAL);
+			AfxMessageBox(tmps + "을 사용중입니다. 프로그램을 종료하십시오.", MB_OK | MB_ICONINFORMATION | MB_SYSTEMMODAL);
 		}
 		DeleteFile(text);
 		update->m_progress.OffsetPos(step);
@@ -314,24 +314,31 @@ void CAxisverApp::updateObjectAXIS()
 	ZeroMemory(&si, sizeof(STARTUPINFO));
 	ZeroMemory(&pi, sizeof(PROCESS_INFORMATION));
 
-	si.cb          = sizeof(STARTUPINFO);
-	si.dwFlags     = STARTF_USESHOWWINDOW;
+	si.cb = sizeof(STARTUPINFO);
+	si.dwFlags = STARTF_USESHOWWINDOW;
 	si.wShowWindow = SW_SHOWNORMAL;
 
 	Sleep(1000);
+	//C:\IBKS\IBK투자증권 HTS\exe
+	//dests.Format("C:\\IBKS\\IBK투자증권 HTS\\exe\\AXIS.EXE");
 	fBool = CreateProcess(dests,				// application name
-				(char *)tmps.operator LPCTSTR(),// command line
-				NULL,				// process attribute
-				NULL,				// thread attribute
-				FALSE,				// is inherit handle
-				0,				// creation flags
-				NULL,				// environment
-				NULL,				// current directory
-				&si,				// STARTUPINFO
-				&pi);				// PROCESS_INFORMATION
+		(char*)tmps.operator LPCTSTR(),// command line
+		NULL,				// process attribute
+		NULL,				// thread attribute
+		FALSE,				// is inherit handle
+		0,				// creation flags
+		NULL,				// environment
+		NULL,				// current directory
+		&si,				// STARTUPINFO
+		&pi);				// PROCESS_INFORMATION
 
 	if (!fBool || !pi.hProcess)
-		AfxMessageBox("Can't Update Runtime Program.\n\nReinstall Program.");
+	{
+		CString slog;
+		slog.Format("Can't Update Runtime Program  err =[%d]", GetLastError());
+		AfxMessageBox(slog);
+		//AfxMessageBox("Can't Update Runtime Program.\n\nReinstall Program.");
+	}
 }
 
 void CAxisverApp::retryAXIS()
