@@ -115,10 +115,12 @@ typedef enum {
 	eTR5003,		// 해외주식 거래내역
 	eTR5004,		// 거래환율조회 (국민)
 	eTR5005,
+	eTR5006,		// 환전.
 	eTR5007,		// 거래환율조회(기업)
-	eTR5006,
 	eTR5010,		// 중계은행조회
-	eFNORDER		// 해외주문	
+	eFNORDER,		// 해외주문	
+	eFNCANCELORDER,		// 해외취소주문
+	eFNRESERVEORDER		// 해외예약주문
 } TR_KEY;
 
 //2013.04.01 KSJ 남윤호차장의 요청에 의해서 조회 4 -> 6으로 수정
@@ -184,16 +186,20 @@ struct LIMIT_ITEM
 	{ eTR4525, 1000, 0,  1, 0}, 
 	{ eTR4526, 1000, 0,  1, 0}, 
 	{ eTR4527, 1000, 0,  1, 0}, 
-	{ eTR8001, 1000, 0,  1, 0},
-	
+	{ eTR8001, 1000, 0,  1, 0},	
 	{ eTR2002, 1000, 0,  1, 0},
 	{ eTR5000, 1000, 0,  1, 0},
 	{ eTR5001, 1000, 0,  1, 0},
-	{ eTR5002, 1000, 0,  1, 0},
-	
-	
+	{ eTR5002, 1000, 0,  1, 0},	
+	{ eTR5003, 1000, 0,  1, 0},
+	{ eTR5004, 1000, 0,  1, 0},
+	{ eTR5005, 1000, 0,  1, 0},
+	{ eTR5006, 1000, 0,  10, 0},
+	{ eTR5007, 1000, 0,  1, 0},
+	{ eTR5010, 1000, 0, 10, 0},
 	{ eFNORDER, 1000, 0,  1, 0},
-
+	{ eFNCANCELORDER,  1000, 0,  10, 0},
+	{ eFNRESERVEORDER, 1000, 0,  10, 0},
 	{ eNone,      0, 0,  0, 0}
 };
 
@@ -312,21 +318,24 @@ protected:
 	afx_msg BOOL TR1203(long key, long mmgb, LPCTSTR acno, LPCTSTR pswd, long ojno, LPCTSTR code, long jqty, long jprc, long hogb, long mdgb, long mkgb);
 	afx_msg BOOL ShowChaser();
 	afx_msg void HideChaser();
-	afx_msg BOOL TR2002(long key, LPCTSTR acc, LPCTSTR pswd, LPCTSTR stDate, LPCTSTR endDate, LPCTSTR type, LPCTSTR code);	
+	afx_msg BOOL TR2002(long key, LPCTSTR acc, LPCTSTR pswd, LPCTSTR stDate, LPCTSTR endDate, LPCTSTR type, LPCTSTR code, LPCTSTR nkey);
 	afx_msg BOOL TR5000(long key, LPCTSTR acc, LPCTSTR pswd);
-	afx_msg BOOL TR5001(long key, LPCTSTR acc, LPCTSTR pswd, LPCTSTR sDate, LPCTSTR  today, LPCTSTR qryTp);
-	afx_msg BOOL TR5002(long key, LPCTSTR acc, LPCTSTR pswd, LPCTSTR sDate, LPCTSTR mm, LPCSTR gubn, LPCTSTR type, LPCTSTR code, LPCSTR market, LPCSTR ordertype, long sort);
-	afx_msg BOOL TR5003(long key, LPCTSTR acc, LPCTSTR pswd, LPCTSTR stDate, LPCTSTR seDate, LPCTSTR code, LPCSTR CancTp, LPCSTR gubn, LPCSTR stktp);
-	afx_msg BOOL TR5004(long key, LPCTSTR acc, LPCTSTR crcycode);
-	afx_msg BOOL TR5007(long key, LPCTSTR acc, LPCTSTR crcycode);
-	afx_msg BOOL TR5010(long key);
-	afx_msg BOOL FNORDER(long key, LPCTSTR odgb, LPCTSTR mmgb, LPCTSTR ogno, LPCTSTR accn, LPCTSTR pswd, LPCTSTR mkgb, LPCTSTR code, LPCTSTR jqty, 
-		                       LPCTSTR jprc, LPCTSTR hogb, LPCTSTR rsvgubn, LPCTSTR curCode, LPCTSTR rsvlpdt, LPCTSTR rsvStDt, LPCTSTR rsvEndDt, LPCTSTR rsvOrdNo, 
-		                       LPCTSTR rsv_lndt, LPCTSTR creditCode);
-
-	afx_msg BOOL TR5006(long key, LPCTSTR acc, LPCTSTR pswd, LPCTSTR mxchgtpcode, LPCTSTR trxtp, LPCTSTR regtpcode, LPCTSTR xchrattpcode, LPCTSTR mxchgptncode, LPCTSTR tgrtmnyoutamt, LPCTSTR mxchgmnyinamt, LPCTSTR tgrtcrcycode, LPCTSTR mxchgcrcycode, LPCTSTR appxcharat, LPCTSTR prvlgrat);
+	afx_msg BOOL TR5001(long key, LPCTSTR acc, LPCTSTR pswd, LPCTSTR sDate, LPCTSTR  today, LPCTSTR qryTp, LPCTSTR nkey);
+	afx_msg BOOL TR5002(long key, LPCTSTR acc, LPCTSTR pswd, LPCTSTR sDate, LPCTSTR mm, LPCSTR gubn, LPCTSTR type, LPCTSTR code, LPCSTR market, LPCSTR ordertype, long sort, LPCSTR nkey);
+	afx_msg BOOL TR5003(long key, LPCTSTR acc, LPCTSTR pswd, LPCTSTR stDate, LPCTSTR seDate, LPCTSTR code, LPCSTR CancTp, LPCSTR gubn, LPCSTR stktp, LPCSTR nkey);
+	//afx_msg BOOL TR5004(long key, LPCTSTR crcycode);
+	//afx_msg BOOL TR5007(long key, LPCTSTR crcycode);
+	afx_msg BOOL TR5010(long key, LPCTSTR crcycode);
+	afx_msg BOOL FNORDER(long key, LPCTSTR odgb, LPCTSTR mmgb, LPCTSTR accn, LPCTSTR pswd, LPCTSTR mkgb, LPCTSTR code, LPCTSTR jqty, LPCTSTR jprc, LPCTSTR hogb);
 	afx_msg BOOL TR5005(long key, LPCTSTR acc, LPCTSTR pswd, LPCTSTR gdxchrat, LPCTSTR mxchgptncode);
+	afx_msg BOOL TR5006(long key, LPCTSTR acc, LPCTSTR pswd, LPCTSTR tgrtcrcycode, LPCTSTR mxchgcrcycode, LPCTSTR appxcharat, LPCTSTR prvlgrat, LPCTSTR sInput, LPCTSTR mmgb, LPCTSTR trxtp, LPCTSTR rtWon, LPCTSTR rtTarget);
+	afx_msg BOOL FNCancelORDER(long key, LPCTSTR odgb, LPCTSTR mmgb, LPCTSTR accn, LPCTSTR pswd, LPCTSTR org, LPCTSTR mkgb, LPCTSTR code);
 
+	// not use...
+	afx_msg BOOL FNRESERVEORDER(long key, LPCTSTR odgb, LPCTSTR mmgb, LPCTSTR ogno, LPCTSTR accn, LPCTSTR pswd, LPCTSTR mkgb, LPCTSTR code, LPCTSTR jqty,
+		                              LPCTSTR jprc, LPCTSTR hogb, LPCTSTR rsvgubn, LPCTSTR curCode, LPCTSTR rsvlpdt, LPCTSTR rsvStDt, LPCTSTR rsvEndDt, LPCTSTR rsvOrdNo);
+
+	afx_msg BSTR getBankCode();
 	//}}AFX_DISPATCH
 	DECLARE_DISPATCH_MAP()
 
@@ -471,7 +480,7 @@ protected:
 	vector<CString> m_acno, m_acnm;
 	map<int, CString> m_chk_acno;
 	map<TR_KEY, struct LIMIT_ITEM> m_limit;
-	map<int, TR_CALLBACK> m_callback;
+	unordered_map<int, TR_CALLBACK> m_callback;
 	map<int, int> m_cbcount;
 	map< int, vector<char> > m_codes;
 	map< int, CString> m_cname;
@@ -523,9 +532,9 @@ protected:
 	CString GetAuthParam();										//2012.09.17 KSJ 이체URL뒤에 붙는 PARAM
 	CString Parser(CString &srcstr, CString substr = "\t");
 
-	void InitJanGo();											// 2012.09.13 KSJ 잔고 컨트롤 세팅
+	void InitJanGo();								// 2012.09.13 KSJ 잔고 컨트롤 세팅
 	CString URLEncode(const char* lpszURL);						// 2012.09.13 KSJ
-	CString HTSEncode(const char* lpszSource, const char* key);	// 2012.09.13 KSJ
+	CString HTSEncode(const char* lpszSource, const char* key);			// 2012.09.13 KSJ
 	CString GetEncPassword(CString sPswd);						// 2014.04.21 KSJ 일방향암호화 비번
 
 	// AxisWizard Event Handler
@@ -543,6 +552,19 @@ protected:
 	int SendTR(LPCSTR trnm, int tkey, int stat, LPCSTR data, int size, TR_CALLBACK cb);
 	char* GetFileSHA256( CString sPath, HMODULE hModule);
 	char* GetSHA256(char* data, int dataL,HMODULE hModule,bool isfile);
+
+	
+	unordered_map<int, int>   _manageKey;
+	std::pair<string, string> m_typemoney;
+	std::pair<string, string> m_chrat;
+	CString		m_ctbank;
+	
+	
+	
+//	vector<string> _vParameter;
+	
+
+
 
 protected:
 	void OnSetClientSite();
@@ -656,21 +678,21 @@ public:
 	// 버젼체크
 	BOOL S_PIDOVERS();
 
-	BOOL S_TR2002(long key, LPCTSTR acc, LPCTSTR pswd, LPCTSTR stDate, LPCTSTR endDate, LPCTSTR type, LPCTSTR code);	
+	BOOL S_TR2002(long key, LPCTSTR acc, LPCTSTR pswd, LPCTSTR stDate, LPCTSTR endDate, LPCTSTR type, LPCTSTR code, LPCTSTR nkey);	
 	BOOL S_TR5000(long key, LPCTSTR acc, LPCTSTR pswd);
-	BOOL S_TR5001(long key, LPCTSTR acc, LPCTSTR pswd, LPCTSTR sDate, LPCTSTR  today, LPCTSTR qryTp);
-	BOOL S_TR5002(long key, LPCTSTR acc, LPCTSTR pswd, LPCTSTR sDate, LPCTSTR mm, LPCSTR gubn, LPCTSTR type, LPCTSTR code, LPCSTR market, LPCSTR ordertype, long sort);
-	BOOL S_TR5003(long key, LPCTSTR acc, LPCTSTR pswd, LPCTSTR stDate, LPCTSTR seDate, LPCTSTR code, LPCSTR CancTp, LPCSTR gubn, LPCSTR stktp);
-	BOOL S_TR5004(long key, LPCTSTR acc, LPCTSTR crcycode);
-	BOOL S_TR5007(long key, LPCTSTR acc, LPCTSTR crcycode);
-	BOOL S_TR5010(long key);
+	BOOL S_TR5001(long key, LPCTSTR acc, LPCTSTR pswd, LPCTSTR sDate, LPCTSTR  today, LPCTSTR qryTp, LPCTSTR nkey);
+	BOOL S_TR5002(long key, LPCTSTR acc, LPCTSTR pswd, LPCTSTR sDate, LPCTSTR mm, LPCSTR gubn, LPCTSTR type, LPCTSTR code, LPCSTR market, LPCSTR ordertype, long sort, LPCSTR nkey);
+	BOOL S_TR5003(long key, LPCTSTR acc, LPCTSTR pswd, LPCTSTR stDate, LPCTSTR seDate, LPCTSTR code, LPCSTR CancTp, LPCSTR gubn, LPCSTR stktp, LPCSTR nkey);
+	BOOL S_TR5004(long key, LPCTSTR crcycode);
+	BOOL S_TR5007(long key, LPCTSTR crcycode);
+	BOOL S_TR5010(long key, LPCTSTR crcycode);
 	BOOL S_FNORDER(long key, LPCTSTR odgb, LPCTSTR mmgb, LPCTSTR ogno, LPCTSTR accn, LPCTSTR pswd, LPCTSTR mkgb, LPCTSTR code, LPCTSTR jqty, LPCTSTR jprc, 
 		                 LPCTSTR hogb, LPCTSTR rsvgubn, LPCTSTR curCode, LPCTSTR rsvlpdt, LPCTSTR rsvStDt, LPCTSTR rsvEndDt, LPCTSTR rsvOrdNo, LPCTSTR rsv_lndt, LPCTSTR creditCode);
 
-	BOOL S_TR5006(long key, LPCTSTR acc, LPCTSTR pswd, LPCTSTR mxchgtpcode, LPCTSTR trxtp, LPCTSTR regtpcode, LPCTSTR xchrattpcode, LPCTSTR mxchgptncode, LPCTSTR tgrtmnyoutamt, LPCTSTR mxchgmnyinamt, LPCTSTR tgrtcrcycode, LPCTSTR mxchgcrcycode, LPCTSTR appxcharat, LPCTSTR prvlgrat);
+	BOOL S_TR5006(long key, LPCTSTR acc, LPCTSTR pswd, LPCTSTR tgrtcrcycode, LPCTSTR mxchgcrcycode, LPCTSTR appxcharat, LPCTSTR prvlgrat, LPCTSTR sInput, LPCTSTR mmgb, LPCTSTR type, LPCTSTR trxtp, LPCTSTR rtWon, LPCTSTR rtTarget);
 	BOOL S_TR5005(long key, LPCTSTR acc, LPCTSTR pswd, LPCTSTR gdxchrat, LPCTSTR mxchgptncode);
 
-
+	bool OnDev(long key, string svcd, LPCTSTR data, long size, BOOL bNext, LPCTSTR nkey);
 
 	CString m_slog;
 };

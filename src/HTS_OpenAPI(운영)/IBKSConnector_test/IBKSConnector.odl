@@ -97,19 +97,21 @@ library IBKSCONNECTORLib
 			[id(69)] boolean TR1006(long key, BSTR val);
 			[id(70)] boolean TR1007(long key, BSTR code, BSTR symb);
 			[id(71)] boolean LoginQuote(BSTR user_id, BSTR user_pw, BSTR svr_ip, long svr_port);
-			[id(72)] boolean TR2002(long key, BSTR acc, BSTR pswd, BSTR stDate, BSTR endDate, BSTR type, BSTR code);
-			[id(73)] boolean TR5002(long key, BSTR acc, BSTR pswd, BSTR sDate, BSTR mm, BSTR gubn, BSTR type, BSTR code, BSTR market, BSTR ordertype, long sort);
+			[id(72)] boolean TR2002(long key, BSTR acc, BSTR pswd, BSTR stDate, BSTR endDate, BSTR type, BSTR code, BSTR nkey);
+			[id(73)] boolean TR5002(long key, BSTR acc, BSTR pswd, BSTR sDate, BSTR mm, BSTR gubn, BSTR type, BSTR code, BSTR market, BSTR ordertype, long sort, BSTR nkey);
 			[id(74)] boolean TR5000(long key, BSTR acc, BSTR pswd);
-			[id(75)] boolean TR5001(long key, BSTR acc, BSTR pswd, BSTR date);
-			[id(76)] boolean TR5003(long key, BSTR acc, BSTR pswd, BSTR sdate, BSTR eDate, BSTR code, BSTR CancTp, BSTR gubn, BSTR stktp);
-			[id(77)] boolean TR5004(long key, BSTR acc, BSTR moneycode);	
-			[id(78)] boolean TR5007(long key, BSTR acc, BSTR moneycode);
-			[id(79)] boolean TR5010(long key);
-			[id(80)] boolean FNORDER(long key, BSTR odgb, BSTR mmgb, BSTR opcd, BSTR ogno, BSTR accn, BSTR pswd, BSTR mkgb, BSTR code, BSTR jqty, BSTR jprc,
-							   BSTR hogb, BSTR rsvgubn, BSTR curCode, BSTR rsvlpdt, BSTR rsvStDt, BSTR rsvEndDt, BSTR rsvOrdNo, BSTR rsv_lndt, 
-				                           BSTR creditCode);
-			[id(81)] boolean ShowChaser();
-			[id(82)] void HideChaser();
+			[id(75)] boolean TR5001(long key, BSTR acc, BSTR pswd, BSTR date, BSTR nkey);
+			[id(76)] boolean TR5003(long key, BSTR acc, BSTR pswd, BSTR sdate, BSTR eDate, BSTR code, BSTR CancTp, BSTR gubn, BSTR stktp, BSTR nkey);
+			[id(77)] boolean TR5010(long key, BSTR moneycode);
+			[id(78)] boolean FNORDER(long key, BSTR odgb, BSTR mmgb, BSTR accn, BSTR pswd, BSTR mkgb, BSTR code, BSTR jqty, BSTR jprc, BSTR hogb);
+			[id(79)] boolean ShowChaser();
+			[id(80)] void HideChaser();
+			[id(81)] boolean TR5005(long key, BSTR acc, BSTR pswd, BSTR gdxchrat, BSTR xcode);
+			[id(82)] boolean TR5006(long key, BSTR acc, BSTR pswd, BSTR tcode, BSTR chcode, BSTR chrat, BSTR vip, BSTR input, BSTR mmgb, BSTR trxtp, BSTR rtWon, BSTR rtTarget);
+			[id(83)] boolean FNCANCELORDER(long key, BSTR odgb, BSTR mmgb, BSTR accn, BSTR pswd, BSTR orgno, BSTR mkgb, BSTR code);
+			[id(84)] BSTR  getBankCode();
+			//[id(85)] boolean FNRESERVEORDER(long key, BSTR odgb, BSTR mmgb, BSTR ogno, BSTR accn, BSTR pswd, BSTR mkgb, BSTR code, BSTR jqty, BSTR jprc, BSTR hogb, 
+			//	                                  BSTR rsvgubn, BSTR curCode, BSTR rsvlpdt, BSTR rsvStDt, BSTR rsvEndDt, BSTR rsvOrdNo);
 			//}}AFX_ODL_METHOD
 	};
 
@@ -129,9 +131,9 @@ library IBKSCONNECTORLib
 			[id(4)] void OnRecvData(long key, long dptr, long size, VARIANT_BOOL bNext, BSTR nkey);
 			[id(5)] void OnError(BSTR msg);
 			[id(6)] void OnClose();
-			[id(7)] void OnAlert(long code, BSTR msg);
-			[id(8)] void OnRecvDataID(long key, long dptr, long size, VARIANT_BOOL bNext, BSTR nkey, long id);
-			[id(9)] void OnVerUpdate();
+			[id(7)]  void OnAlert(long code, BSTR msg);
+			[id(8)]  void OnRecvDataID(long key, long dptr, long size, VARIANT_BOOL bNext, BSTR nkey, long id);
+			[id(9)]  void OnVerUpdate();
 			[id(10)] void OnUpdateStart();
 			[id(11)] void OnUpdating(BSTR sData, long nProgress);
 			[id(12)] void OnUpdateEnd();

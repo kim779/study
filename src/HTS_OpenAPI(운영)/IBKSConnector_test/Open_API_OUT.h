@@ -93,40 +93,40 @@ struct tr1201_mod
 struct tr1211_mid
 {
 	char	gubn[1];	/* '>' */						//2015.05.28  구분추가
-    char    acno[11];
-    char    pswd[8];
-    char    date[8];
-    char    cod2[12];
-    char    fill[5];    /* 시작주문번호             */	//2015.05.28  filler추가
-    char    dsgb[1];    /* 0.All 1.매도 2.매수      */
-    char    otim[1];    /* 0.All 1.장중 2.시간외    */
-    char    sygb[1];    /* 0.All 1.신용 2.담보      */
-    char    dllf[1];    /* 0.MAP 1.DLL              */
-    char    dlgb[1];    /* 0.All 1.체결 2.미체결    */
-    char    sort[1];    /* 1.역순 2.정순            */
+	char    acno[11];
+	char    pswd[8];
+	char    date[8];
+	char    cod2[12];
+	char    fill[5];    /* 시작주문번호             */	//2015.05.28  filler추가
+	char    dsgb[1];    /* 0.All 1.매도 2.매수      */
+	char    otim[1];    /* 0.All 1.장중 2.시간외    */
+	char    sygb[1];    /* 0.All 1.신용 2.담보      */
+	char    dllf[1];    /* 0.MAP 1.DLL              */
+	char    dlgb[1];    /* 0.All 1.체결 2.미체결    */
+	char    sort[1];    /* 1.역순 2.정순            */
 	char    juno[10];    /* 시작주문번호             */	//2015.05.28 5 -> 10로 변경
 };
 #define L_tr1211_mid		sizeof(struct tr1211_mid)
 struct tr1211_grid
 {
-    char    juno[10];    /* 주문   번호      */	//2015.05.28 5 -> 10로 변경
-    char    ojno[10];    /* 원주문 번호      */	//2015.05.28 5 -> 10로 변경
+	char    juno[10];    /* 주문   번호      */	//2015.05.28 5 -> 10로 변경
+	char    ojno[10];    /* 원주문 번호      */	//2015.05.28 5 -> 10로 변경
 	char    mkgb[1];   /* 시장구분         */
-    char    cod2[12];   /* 종목코드         */
-    char    hnam[40];   /* 종목명           */
-    char    odgb[20];   /* 주문구분         */
-    char    mcgb[20];   /* 정취구분         */
-    char    hogb[20];   /* 호가구분         */
-    char    oprc[12];   /* 주문가격         */
-    char    oqty[12];   /* 주문수량         */
-    char    dprc[12];   /* 체결가격         */
-    char    dqty[12];   /* 체결수량         */
-    char    tqty[12];   /* 체결수량합       */
-    char    wqty[12];   /* 미체결수량       */
+	char    cod2[12];   /* 종목코드         */
+	char    hnam[40];   /* 종목명           */
+	char    odgb[20];   /* 주문구분         */
+	char    mcgb[20];   /* 정취구분         */
+	char    hogb[20];   /* 호가구분         */
+	char    oprc[12];   /* 주문가격         */
+	char    oqty[12];   /* 주문수량         */
+	char    dprc[12];   /* 체결가격         */
+	char    dqty[12];   /* 체결수량         */
+	char    tqty[12];   /* 체결수량합       */
+	char    wqty[12];   /* 미체결수량       */
 	char    stopPrc[12];   /* 스톱가격       */
 	char    stopStat[20];   /* 스톱유형       */
-    char    stat[20];   /* 접수상태         */
-    char    time[8];    /* 주문시간         */
+	char    stat[20];   /* 접수상태         */
+	char    time[8];    /* 주문시간         */
 };
 #define L_tr1211_grid		sizeof(struct tr1211_grid)
 struct tr1211_mod
@@ -772,9 +772,9 @@ struct Jango{
 	char code[12];	// 종목코드
 	char name[40];	// 종목명
 	char gubn[10];	// 구분
-	int  jqty;		// 보유수량
-	int  xqty;		// 청산가능수량
-	int  pprc;		// 평균가
+	int  jqty;	// 보유수량
+	int  xqty;	// 청산가능수량
+	int  pprc;	// 평균가
 	double camt;	// 평가금액
 	double tamt;	// 평가손익
 	double srat;	// 수익률
@@ -783,8 +783,9 @@ struct Jango{
 
 	
 /* COSAQ005 해외시장주문체결조회 */  
-struct cosaq005_mid	//TR5002
+struct tr5002_mid	//TR5002
 {
+	//	cosaq005_mid
 	char In[5];			// 1. 입력건수 (X(5))
 	char BnsTp[1];			// 2. 매매구분 (X(1))
 	char ExecYn[1];			// 3. 체결여부 (X(1))
@@ -807,10 +808,10 @@ struct cosaq005_mid	//TR5002
 	char StkTp[1];			// 20. 주식구분 (X(1))
 	char LoanTp[1];			// 21. 대출구분 (X(1))
 };
-#define L_cosaq005_mid sizeof(struct cosaq005_mid)
+#define L_tr5002_mid sizeof(struct tr5002_mid)
 
 
-struct cosaq005_rec
+struct tr5002_rec
 {
 	char OrdNo[10];					// 1. 주문번호 (S9(9))
 	char ShtnHangulssuNm[40];			// 2. 단축한글종목명 (X(40))
@@ -859,19 +860,19 @@ struct cosaq005_rec
 	char RjtRsn[100];				// 45. 거부사유 (X(100))
 	char CvrgTpNm[10];				// 46. 반대매매구분명 (X(10))
 };
-#define L_cosaq005_rec sizeof(struct cosaq005_rec)
+#define L_tr5002_rec sizeof(struct tr5002_rec)
 
 
-struct cosaq005_mod
+struct tr5002_mod
 {
 	char count[5]; // 출력건수 (X(5))
-	struct cosaq005_rec rec[1];
+	struct tr5002_rec rec[1];
 };
-#define L_cosaq005_mod sizeof(struct cosaq005_mod)
+#define L_tr5002_mod sizeof(struct tr5002_mod)
 
 
 /* COSAQ027 해외증권 예수금 조회 */
-struct cosaq027_mid	//TR5000
+struct tr5000_mid	//TR5000
 {
 	char In[5];			// 1. 입력건수 (X(5))
 	char AcntNo[20];		// 2. 계좌번호 (X(20))
@@ -879,9 +880,9 @@ struct cosaq027_mid	//TR5000
 	char CrcyCode[3];		// 4. 통화코드 (X(3))
 	char prcptntp[1];		// 5. 가격유형구분
 };
-#define L_cosaq027_mid sizeof(struct cosaq027_mid)
+#define L_tr5000_mid sizeof(struct tr5000_mid)
 
-struct cosaq027_out1
+struct tr5000_out1
 {
 	char CrcyCode[3];			// 6.   통화코드 (X(3))
 	char FcurrBuyAdjustAmt1[17];		// 7.   외화매수정산금1 (S9(11),9(4))
@@ -901,9 +902,9 @@ struct cosaq027_out1
 	char PrsmptMxchgAbleAmt3[17];		// 21.  추정환전가능금3 (S9(11),9(4))
 	char PrsmptMxchgAbleAmt4[17];		// 22.  추정환전가능금4 (S9(11),9(4))
 };
-#define L_cosaq027_out1 sizeof(struct cosaq027_out1)
+#define L_tr5000_out1 sizeof(struct tr5000_out1)
 
-struct cosaq027_out2
+struct tr5000_out2
 {
 	char CntryNm[40];		// 24. 국가명 (X(40))
 	char CrcyCode[3];		// 25. 통화코드 (X(3))
@@ -918,25 +919,25 @@ struct cosaq027_out2
 	char FcurrRcvblAmt[20];		// 34. 미수금 (S9(14),9(4))
 	char FcurrFundAmt[17];		// 35. 외화상환금액 (S9(11),9(4))
 };
-#define L_cosaq027_out2 sizeof(struct cosaq027_out2)
+#define L_tr5000_out2 sizeof(struct tr5000_out2)
 
-struct cosaq027_out3
+struct tr5000_out3
 {
 	char WwonDpsBalAmt[16];		// 37. 원화예수금잔고금액 (S9(15))
 	char MnyoutAbleAmt[16];		// 38. 출금가능금액 (S9(15))
 	char WwonConvTrdAmt[16];	// 39. 원화환산거래금액 (S9(15))
 	char BnsMgn[16];		// 40. 매매증거금 (S9(15))
 };
-#define L_cosaq027_out3 sizeof(struct cosaq027_out3)
+#define L_tr5000_out3 sizeof(struct tr5000_out3)
 
 
-struct cosaq027_out4
+struct tr5000_out4
 {
 	char NfCode[2];			// 42. 아이템명: NfCode, 내외국인코드 (X(2))
 };
-#define L_cosaq027_out4 sizeof(struct cosaq027_out4)
+#define L_tr5000_out4 sizeof(struct tr5000_out4)
 
-struct cosaq027_out5
+struct tr5000_out5
 {
 	char DpstgTotamt[16];		// 예탁총액
 	char BscDpsamt[16];		// 기본예탁금
@@ -945,23 +946,23 @@ struct cosaq027_out5
 	char WonAmt[16];		// 원화금액
 };
 
-
-struct cosaq027_mod
+struct tr5000_mod
 {
 	char count1[5];
-	struct cosaq027_out1 out1;
+	struct tr5000_out1 out1;
 	char count2[5];
-	struct cosaq027_out2 out2;
+	struct tr5000_out2 out2;
 	char count3[5];
-	struct cosaq027_out3 out3;
+	struct tr5000_out3 out3;
 	char count4[5];
-	struct cosaq027_out4 out4;
+	struct tr5000_out4 out4;
 };
-#define L_cosaq027_mod sizeof(struct cosaq027_mod)
+#define L_tr5000_mod sizeof(struct tr5000_mod)
 
 //TR5001
-struct cosaq003_mid
-{
+struct tr5001_mid
+{		
+	//cosaq003  :  해외주식잔고...
 	char In[5];		// 1. 입력건수 (X(5))
 	char AcntNo[20];	// 2. 계좌번호 (X(20))
 	char Pwd[8];		// 3. 비밀번호 (X(8))
@@ -971,9 +972,9 @@ struct cosaq003_mid
 	char QryDt[8];		// 7. 조회일자 (X(8))
 	char MktTp[1];		// 8. 시장구분 (X(1))
 };
-#define L_cosaq003_mid sizeof(struct cosaq003_mid)
+#define L_tr5001_mid sizeof(struct tr5001_mid)
 
-struct cosaq003_out
+struct tr5001_out
 {
 	char HangulsuNm80[100];			// 10. HangulsuNm80, 한글종목명80 (X(100))
 	char IsuNo[12];				// 11. IsuNo, 종목번호 (X(12))
@@ -1002,19 +1003,20 @@ struct cosaq003_out
 	char LoanDt[8];				// 34. LoanDt, 대출일 (X(8))
 	char DueDt[8];				// 35. DueDt, 만기일 (X(8))
 };
-#define L_cosaq003_out sizeof(struct cosaq003_out)
+#define L_tr5001_out sizeof(struct tr5001_out)
 
 
-struct cosaq003_mod
+struct tr5001_mod
 {
 	char Out[5];				// 9. Out, 출력건수 (X(5))=
-	struct cosaq003_out rec[1];
+	struct tr5001_out rec[1];
 };
-#define L_cosaq003_mod sizeof(struct cosaq003_mod)
+#define L_tr5001_mod sizeof(struct tr5001_mod)
 
 
-struct cosaq208_mid	//TR5003
-{
+struct tr5003_mid	//TR5003
+{	
+	//cosaq208
 	char In[5];				// 1. In, 입력건수 (X(5))
 	char AcntNo[20];			// 2. AcntNo, 계좌번호 (X(20))
 	char Pwd[8];				// 3. Pwd, 비밀번호 (X(8))
@@ -1026,20 +1028,20 @@ struct cosaq208_mid	//TR5003
 	char TrdTpCode[2];			// 9. TrdTpCode, 거래구분코드 (X(2))
 	char StkTp[1];				// 10. StkTp, 주식구분 (X(1))
 };
-#define L_cosaq208_mid sizeof(struct cosaq208_mid)
+#define L_tr5003_mid sizeof(struct tr5003_mid)
 
-struct cosaq208_rec
+struct tr5003_rec
 {
 	char TrdDt[8];				// 14. TrdDt, 거래일 (X(8))
 	char TrdNo[10];				// 15. TrdNo, 거래번호 (S9(9))
 	char CancTpNm[20];			// 16. CancTpNm, 취소구분 (X(20))
 	char IsuNo[12];				// 17. IsuNo, 종목번호 (X(12))
-	char ShtnIsuNo[9];			// 18. ShtnIsuNo, 단축종목번호 (X(9))
+	char ShtnIsuNo[9];			// 18. ShtnIsuNo, 단축종목번호 (X(9))	
 	char IsuNm[40];				// 19. IsuNm, 종목명 (X(40))
 	char CrcyCode[3];			// 20. CrcyCode, 통화코드 (X(3))
 	char FcurrAmt[17];			// 21. FcurrAmt, 외화금액 (S9(11),9(4))
 	char WonAmt[16];			// 22. WonAmt, 원화금액 (S9(15))
-	char FcurrDpsBalAmt[16];		// 23. FcurrDpsBalAmt, 외화예수금잔고금액 (S9(11),9(4))
+	char FcurrDpsBaAmt[17];			// 23. FcurrDpsBalAmt, 외화예수금잔고금액 (S9(11),9(4))
 	char WwonDpsBalAmt[16];			// 24. WwonDpsBalAmt, 원화예수금잔고금액 (S9(15))
 	char SecRbalQty[16];			// 25. SecRbalQty, 유가증권잔수량 (S9(15))
 	char WonBoaAmt[16];			// 26. WonBoaAmt, 원화표준금액 (S9(15))
@@ -1064,14 +1066,14 @@ struct cosaq208_rec
 	char UserId[16];			// 45. UserId, 사용자ID (X(16))
 	char RcvblClrAmt[16];			// 46. RcvblClrAmt, 미수발생금액 (S9(15))
 	char FwexchCvntDt[8];			// 47. FwexchCvntDt, 선물환계약일 (X(8))
-	char FwexchCvntNo[9];			// 48. FwexchCvntNo, 선물환계약번호 (S9(9))
+	char FwexchCvntNo[10];			// 48. FwexchCvntNo, 선물환계약번호 (S9(9))
 	char RvsnAmt[16];			// 49. RvsnAmt, 보정금액 (S9(15))
 	char Ictax[16];				// 50. Ictax, 소득세 (S9(15))
 	char FcurrIctax[17];			// 51. FcurrIctax, 외화소득세 (S9(11),9(4))
 	char Ihtax[16];				// 52. Ihtax, 주민세 (S9(15))
 	char FcurrIhtax[17];			// 53. FcurrIhtax, 외화주민세 (S9(11),9(4))
 	char Fstax[16];				// 54. Fstax, 농특세 (S9(15))
-	char Trtax[16];				// 55. Trtax, 거래세 (S9(15))
+	char Trtax[16];				// 55. Trtax, 거래세 (S9(15))	
 	char Uprc[15];				// 56. Uprc, 단가 (S9(9),9(4))
 	char ClntNo[20];			// 57. ClntNo, 고객번호 (X(20))
 	char BrkCmsnAmt[17];			// 58. BrkCmsnAmt, BROKER수수료 (S9(11),9(4))
@@ -1079,7 +1081,7 @@ struct cosaq208_rec
 	char SecCmsnAmt[17];			// 60. SecCmsnAmt, SEC수수료 (S9(11),9(4))
 	char FcurrEtcCmsnAmt[17];		// 61. FcurrEtcCmsnAmt, 외화기타수수료 (S9(11),9(4))
 	char FcurrEtcTax[17];			// 62. FcurrEtcTax, 외화기타세금 (S9(11),9(4))
-	char BloterCode[2];			// 63. BloterCode, BLOTER 코드 (X(2))
+	char BloterCode[2];			// 63. BloterCode, BLOTER 코드 (X(2))	
 	char MktNm[40];				// 64. MktNm, 시장명 (X(40))
 	char FcurrAdjustAmt[17];		// 65. FcurrAdjustAmt, 외화정산금액 (S9(11),9(4))
 	char SmryCode[4];			// 66. SmryCode, 적요코드 (X(4))
@@ -1088,57 +1090,61 @@ struct cosaq208_rec
 	char TrxTime[9];			// 69. TrxTime, 처리시각 (X(9))
 	char FcurrStrmpTax[17];			// 70. FcurrStrmpTax, 외화인지세 (S9(11),9(4))
 	char FcurrAmt1[17];			// 71. FcurrAmt1, 외화금액1 (S9(11),9(4))
-	char FcurrFwdthdAbleAmt[22];		// 72. FcurrFwdthdAbleAmt, 인출가능금액 (S9(14),9(6))
+	char FcurrFwdthdAbleAmt[20];		// 72. FcurrFwdthdAbleAmt, 인출가능금액 (S9(14),9(4))
 	char TpNm1[40];				// 73. TpNm1, 구분명1 (X(40))
 };
-#define L_cosaq208_rec sizeof(struct cosaq208_rec)
+#define L_tr5003_rec sizeof(struct tr5003_rec)
 
 
-struct cosaq208_mod
+struct tr5003_mod
 {
 	char count[5];				// 11. Out1, 출력건수 (X(5))
 	char AcntNm[40];			// 12. AcntNm, 계좌명 (X(40))		
 	char out[5];
-	struct cosaq208_rec rec[1];
+	struct tr5003_rec rec[1];
 };
-#define L_cosaq208_mod sizeof(struct cosaq208_mod)
+#define L_tr5003_mod sizeof(struct tr5003_mod)
 
 
 
 /* SDPDT080 환전 */    //점검
-struct sdpdt080_mid
+struct tr5006_mid
 {
 	char In[5];			// 1. In, 입력건수 (X(5))
-	char MxchgTpCode[1];		// 2. MxchgTpCode, 환전구분코드 (X(1))
-	char TrxTp[1];			// 3. TrxTp, 처리구분 (X(1))
-	char AcntNo[20];		// 4. AcntNo, 계좌번호 (X(20))
-	char Pwd[8];			// 5. Pwd, 비밀번호 (X(8))
-	char RegTpCode[2];		// 6. RegTpCode, 등록구분코드 (X(2))
-	char XchratTpCode[2];		// 7. XchratTpCode, 환율구분코드 (X(2))
-	char MxchgPtnCode[2];		// 8. MxchgPtnCode, 환전유형코드 (X(2))
-	char TgrtMnyoutAmt[26];		// 9. TgrtMnyoutAmt, 대상출금금액 (S9(18),9(6))
-	char MxchgMnyinAmt[26];		// 10. MxchgMnyinAmt, 환전입금금액 (S9(18),9(6))
-	char TgrtCrcyCode[3];		// 11. TgrtCrcyCode, 대상통화코드 (X(3))
-	char MxchgCrcyCode[3];		// 12. MxchgCrcyCode, 환전통화코드 (X(3))
-	char AppXcharat[15];		// 13. AppXcharat, 적용환율 (S9(9),9(4))
-	char PrvlgRat[15];		// 14. PrvlgRat, 우대율 (S9(9),9(4))
-	char Tp2[2];			// 15. Tp2, 구분2 (X(2))
-	char RsvMxchgSeqno[10];		// 16. RsvMxchgSeqno, 예약환전일련번호 (X(10))
-	char BaseXchrat[11];		// 17. BaseXchrat, 기준환율 (S9(5),9(4))
-	char PrvlgRatAppTp[1];		// 18. PrvlgRatAppTp, 우대율적용구분 (X(1))
-	char MxchgAmt[18];		// 19. MxchgAmt, 환전금액 (S9(14),99)
-	char WonAmt[16];		// 20. WonAmt, 원화금액 (S9(15))
-	char FcurrAmt[17];		// 21. FcurrAmt, 외화금액 (S9(11),9(4))
-	char RespnseCode1[3];		// 22. RespnseCode1, 응답코드 (X(3))
-	char FrcustXchrat[15];		// 23. FrcustXchrat, 대고객환율 (S9(9),9(4))
-	char TqSeqno[10];		// 24. TqSeqno, 전문일련번호 (S9(9))
-	char TrxSeqno[10];		// 25. TrxSeqno, 처리일련번호 (S9(9))
-	char TrxBrnNo[3];		// 26. TrxBrnNo, 처리지점번호 (X(3))
-	char TrdDt[8];			// 27. TrdDt, 거래일 (X(8))
+	char mgNo[10];			// 2. 관리번호  
+	char MxchgTpCode[1];		// 3. MxchgTpCode, 환전구분코드 (X(1))			
+	char TrxTp[1];			// 4. TrxTp, 처리구분 (X(1))				//0:환전예상금액 1:전문송신 2: 은행응답불능 3: 은행응답정상
+	char AcntNo[20];		// 5. AcntNo, 계좌번호 (X(20))
+	char Pwd[8];			// 6. Pwd, 비밀번호 (X(8))
+	char RegTpCode[2];		// 7. RegTpCode, 등록구분코드 (X(2))
+	char XchratTpCode[2];		// 8. XchratTpCode, 환율구분코드 (X(2))			//01-고시환율  02-우대환율
+	char MxchgPtnCode[2];		// 9. MxchgPtnCode, 환전유형코드 (X(2))			//01-외화매수  02 외화매도
+	
+	char TgrtMnyoutAmt[26];		// 10. TgrtMnyoutAmt, 대상출금금액 (S9(18),9(6))
+	char MxchgMnyinAmt[26];		// 11. MxchgMnyinAmt, 환전입금금액 (S9(18),9(6))
+	char TgrtCrcyCode[3];		// 12. TgrtCrcyCode, 대상통화코드 (X(3))		// USD /HKD /CNY /AUD /KRW
+	char MxchgCrcyCode[3];		// 13. MxchgCrcyCode, 환전통화코드 (X(3))		// USD /HKD /CNY /AUD /KRW
+	char AppXcharat[15];		// 14. AppXcharat, 적용환율 (S9(9),9(4))		 조회한값.... 입력...
+	char PrvlgRat[15];		// 15. PrvlgRat, 우대율 (S9(9),9(4))			 조회한값.... 입력...
+	char Tp2[2];			// 16. Tp2, 구분2 (X(2))				// 01- 원화 02-외화
+	
+	char RsvMxchgSeqno[10];		// 17. RsvMxchgSeqno, 예약환전일련번호 (X(10))
+	char BaseXchrat[11];		// 18. BaseXchrat, 기준환율 (S9(5),9(4))		
+	char PrvlgRatAppTp[1];		// 19. PrvlgRatAppTp, 우대율적용구분 (X(1))		// 1.실질우대율, 2.협의우대율
+	char MxchgAmt[18];		// 20. MxchgAmt, 환전금액 (S9(14),99)
+	
+	char WonAmt[16];		// 21. WonAmt, 원화금액 (S9(15))	
+	char FcurrAmt[17];		// 22. FcurrAmt, 외화금액 (S9(11),9(4))
+	char RespnseCode1[3];		// 23. RespnseCode1, 응답코드 (X(3))
+	char FrcustXchrat[15];		// 24. FrcustXchrat, 대고객환율 (S9(9),9(4))
+	char TqSeqno[10];		// 25. TqSeqno, 전문일련번호 (S9(9))
+	char TrxSeqno[10];		// 26. TrxSeqno, 처리일련번호 (S9(9))			//일괄환전시 사용	
+	char TrxBrnNo[3];		// 27. TrxBrnNo, 처리지점번호 (X(3))			//일괄환전시 사용
+	char TrdDt[8];			// 28. TrdDt, 거래일 (X(8))
 };
-#define L_sdpdt080_mid sizeof(struct sdpdt080_mid)
+#define L_tr5006_mid sizeof(struct tr5006_mid)
 
-struct sdpdt080_rec
+struct tr5006_rec
 {
 	char TrdNo[10];			// 29. TrdNo, 거래번호 (S9(9))
 	char WwonCbalAmt[16];		// 30. WwonCbalAmt, 원화잔고 (S9(15))
@@ -1149,41 +1155,43 @@ struct sdpdt080_rec
 	char FcurrAmt[17];		// 35. FcurrAmt, 외화금액 (S9(11),9(4))
 	char AppXcharat[15];		// 36. AppXcharat, 적용환율 (S9(9),9(4))
 };
-#define L_sdpdt080_rec sizeof(struct sdpdt080_rec)
+#define L_tr5006_rec sizeof(struct tr5006_rec)
 
-struct sdpdt080_mod
+struct tr5006_mod
 {
 	char Out[5];			// 28. Out, 출력건수 (X(5))
-	struct sdpdt080_rec rec[1];
+	struct tr5006_rec rec[1];
 };
-#define L_sdpdt080_mod sizeof(struct sdpdt080_mod)
+#define L_tr5006_mod sizeof(struct tr5006_mod)
 
 
 
 /* SDPDQ099 해외주식 환전 적용환율 조회 */
-struct sdpdq099_mid
+struct tr5005_mid
 {
 	char In[5];			// 1. In, 입력건수 (X(5))
 	char AcntNo[20];		// 2. AcntNo, 계좌번호 (X(20))
 	char Pwd[8];			// 3. Pwd, 비밀번호 (X(8))
 	char GdXchrat[17];		// 4. GdXchrat, 환율 (S9(10),9(5))
 	char MxchgPtnCode[2];		// 5. MxchgPtnCode, 환전유형코드 (X(2))
+	char Margin[15];		// 6. 마진값
+	char Margin1[15];		// 7. 마진값1
+
 };
-#define L_sdpdq099_mid sizeof(struct sdpdq099_mid)
+#define L_tr5005_mid sizeof(struct tr5005_mid)
 
-
-struct sdpdq099_rec
+struct tr5005_rec
 {
 	char AppXchrat[15];		// 7. AppXchrat, 적용환율 (S9(9),9(4))
 	char PrvlgRat[15];		// 8. PrvlgRat, 우대율 (S9(9),9(4))
 };
 
-struct sdpdq099_mod
+struct tr5005_mod
 {
 	char count[5];			// 9. count, 출력건수 (X(5))
-	struct sdpdq099_rec rec[1];
+	struct tr5005_rec rec[1];
 };
-#define L_sdpdq099_mod sizeof(struct sdpdq099_mod)
+#define L_tr5005_mod sizeof(struct tr5005_mod)
 
 
 /* TR2002 주식 거래내역 조회 */
@@ -1279,6 +1287,7 @@ struct pibogorder_mid // 해외주식 주문
 	char jqty[16];			//11 주문수량
 	char jprc[15];			//12 주문가격
 	char hogb[2];			//13 호가구분
+	
 	char jmgb[2];			//14 통신매체
 	char mdgb[2];			//15 중개인구분코드
 	char rsvgubn[1];		//16 예약구분
@@ -1296,29 +1305,31 @@ struct pibogorder_mid // 해외주식 주문
 struct pibogorder_rec
 {
 	char jmno[10];			//2 주문번호
-	char accn[40];			//3 계좌번호
+	char accn[40];			//3 계좌명
 	char codename[40];		//4 종목명
 	char result[80];		//5 결과코드
 };
 #define L_pibogorder_rec sizeof(struct pibogorder_rec)
 
-struct pibogorderr_mod
+struct pibogorder_mod
 {
 	char cnt[4];			//1 주문개수
 	pibogorder_rec rec[1];
 };
-#define L_pibogorder_mod sizeof(struct pibogorderr_mod)
+#define L_pibogorder_mod sizeof(struct pibogorder_mod)
 
 
-struct sdpkt183_mid		//TR5007
+// 중소기업 환율  sdpkt183_mid
+struct tr5007_mid		//TR5007
 {
 	char In[5];			// 1. In, 입력건수 (X(5))
 	char TrxTp[1];			// 2. TrxTp, 처리구분 (X(1))
 	char CrcyCode[3];		// 3. CrcyCode, 통화코드 (X(3))
 	char AcntNo[20];		// 4. AcntNo, 계좌번호 (X(20))
 };
+#define L_tr5007_mid sizeof(struct tr5007_mid)
 
-struct skpkt183_rec
+struct tr5007_rec
 {
 	char SysTime[17];		// 6. SysTime, 시스템시각 (X(17))
 	char BfXchrat[11];		// 7. BfXchrat, 환율 (S9(5),9(4))
@@ -1329,59 +1340,71 @@ struct skpkt183_rec
 	char BnkMsgCnts[100];		// 15. BnkMsgCnts, 은행메시지내용 (X(100))
 	char IfMgmtNo[10];		// 16. ifMgmtNo, IF관리번호 (X(10))
 };
+#define L_tr5007_rec sizeof(struct tr5007_rec)
 
-struct skpkt183_mod
+struct tr5007_mod
 {
 	char Out[5];			// 17. Out, 출력건수 (X(5))
-	skpkt183_rec rec[1];
+	tr5007_rec rec[1];
 };
+#define L_tr5007_mod sizeof(struct tr5007_mod)
 
-/* SDPKT169 거래환율조회(자동환전) */
-struct sdpkt169_mid	//TR5004
+
+
+/* SDPKT169 거래환율조회(자동환전) 국민은행*/
+struct tr5004_mid	//TR5004
 {
 	char In[5];			// 1. In, 입력건수 (X(5))
 	char TrxTp[1];			// 2. TrxTp, 처리구분 (X(1))
 	char CrcyCode[3];		// 3. CrcyCode, 통화코드 (X(3))
 	char AcntNo[20];		// 4. AcntNo, 계좌번호 (X(20))
 };
-#define L_sdpkt169_mid sizeof(struct sdpkt169_mid)
+#define L_tr5004_mid sizeof(struct tr5004_mid)
 
 
-struct sdpkt169_rec
+struct tr5004_rec
 {
 	char SysTime[17];		// 6. SysTime, 시스템시각 (X(17))
-	char BfXchrat[11];		// 7. BfXchrat, 환율 (S9(5),9(4))
-	char Xchrat[11];		// 8. Xchrat, 환율 (S9(5),9(4))
+	char BfXchrat[11];		// 7. BfXchrat,증권사매도율 (S9(5),9(4))
+	char Xchrat[11];		// 8. Xchrat,  증권사매입율 (S9(5),9(4))
+	char BaseXchart[11];		// 9. 기준환율
+	char Pchsxchrat[11];		// 10. 매입환율
+	char SellXchrat[11];		// 11. 매도환율
+	char RlyBnkCode[3];		// 12. 중계은행코드
+	char RlyBnkNm[40];		// 13  중계은행명
 	char BnkRpsnCode[4];		// 9. BnkRpsnCode, 은행응답코드 (X(4))
 	char BnkMsgCnts[100];		// 10. BnkMsgCnts, 은행메시지내용 (X(100))
 };
-#define L_sdpkt169_mod sizeof(struct sdpkt169_mod)
+#define L_tr5004_mod sizeof(struct tr5004_mod)
 
-struct sdpkt169_mod
+struct tr5004_mod
 {
 	char Out[5];			// 5. Out, 출력건수 (X(5))
-	sdpkt169_rec rec[1];
+	tr5004_rec rec[1];
 };
 
 
-struct sdpwq002_mid	//TR5010
+//	sdpwq002 : 중계은행조회
+struct tr5010_mid
 {
 	char In[5]; // 1. In, 입력건수 (X(5))
 	char filler[1];
 };
+#define L_tr5010_mid sizeof(struct tr5010_mid);
 
 
-struct sdpwq002_rec
+struct tr5010_rec
 {
-	char xxx[6]; // 1. xxx, 설명 (X(6))
-	char bnkcode[3]; // 2. bnkcode, 은행코드 (X(3))
+	char bnkcode[3];  // 2. bnkcode, 은행코드 (X(3))
 	char bnkname[40]; // 3. bnkname, 은행명 (X(40))
 };
+#define L_tr5010_rec sizeof(struct tr5010_rec);
 
-struct sdpwq002_mod
+struct tr5010_mod
 {
 	char out5[5];
-	sdpwq002_rec rec[1];
+	tr5010_rec rec[1];
 };
+#define L_tr5010_mod sizeof(struct tr5010_mod);
 
 #pragma	pack()

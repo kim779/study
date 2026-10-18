@@ -10,7 +10,7 @@ from PyQt5.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
     QGroupBox, QPushButton, QLabel, QLineEdit, QTextEdit, QFormLayout,
     QComboBox, QGridLayout, QMessageBox, QTableWidget, QTableWidgetItem,
-    QHeaderView, QAbstractItemView, QTabWidget, QScrollArea
+    QHeaderView, QAbstractItemView, QTabWidget, QScrollArea, QCheckBox
 )
 from datetime import datetime
 
@@ -300,6 +300,9 @@ class TestWindow(QMainWindow):
         form.addRow("svr_ip",    self.edit_svr_ip)
         form.addRow("svr_port",  self.edit_svr_port)
         layout.addLayout(form)
+
+        self.chk_quote_only = QCheckBox("시세조회 전용 (인증서 없이 ID/PW만으로 로그인 - LoginQuote)")
+        layout.addWidget(self.chk_quote_only)
 
         h = QHBoxLayout()
         btn_login  = QPushButton("Login()")
@@ -1029,6 +1032,15 @@ class TestWindow(QMainWindow):
 
         if not svr_ip.strip():
             QMessageBox.warning(self, "서버 미선택", "서버를 선택하거나 svr_ip를 입력하세요.")
+            return
+
+        if self.chk_quote_only.isChecked():
+            result = self.ocx.dynamicCall(
+                "LoginQuote(QString, QString, QString, int)",
+                user_id, user_pw, svr_ip, svr_port
+            )
+            self.lbl_login.setText(str(result))
+            self._log(f"LoginQuote({user_id}, ***, {svr_ip}, {svr_port}) => {result}")
             return
 
         result = self.ocx.dynamicCall(
