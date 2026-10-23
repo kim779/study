@@ -330,6 +330,11 @@ protected:
 	bool	_bReal = false;
 	// blink (for rtm)
 	std::unordered_map<long, ULONGLONG> _mapBlink;
+	struct BlinkItem
+	{
+		ULONGLONG tick{};
+	};
+	std::map<long, BlinkItem> _mapBlinkColor;
 	std::unordered_map<int, ULONGLONG>  _timeFilterCode;
 	std::unordered_map<int, int>	    _mapFilterDraw;
 
@@ -473,6 +478,12 @@ protected:
 
 	CBitmap*	m_pBmpExpect{};
 	BOOL		m_bPaintLock{};
+
+	long MakeBlinkKey(int row, int col) const;
+	void BlinkCell(int row, int col);
+	void BlinkRow(int row);
+	void Blink(int row, int col);
+	void ProcessBlink();
 	// END ADD
 
 	std::vector<CBitmap*>	_vBmpInfo;
@@ -526,7 +537,7 @@ public:
 	int	GetScrollPos32(int nBar, BOOL bGetTrackPos = FALSE);
 	BOOL	SetScrollPos32(int nBar, int nPos, BOOL bRedraw = TRUE);
 	void    ReDrawAll();
-	void	   ReDrawTimer();
+	void ReDrawTimer();
 
 protected:
 	HBITMAP getBitmap(CString path);

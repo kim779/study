@@ -35,30 +35,30 @@ static char THIS_FILE[] = __FILE__;
 static const std::unordered_map<int, int>& FwdMap()
 {
 	static const std::unordered_map<int, int> m = {
-		{ 23, 223 },
-		{ 24, 224 },
-		{ 27, 227 },
-		{ 28, 228 },
-		{ 29, 229 },
-		{ 30, 230 },
-		{ 31, 231 },
-		{ 32, 232 },
-		{ 33, 233 },
-		{ 36, 236 },
-		{ 41, 240 },
-		{ 51, 250 },
-		{ 61, 261 },
-		{ 71, 271 },
-		{ 101, 201 },
-		{ 104, 204 },
-		{ 106, 206 },
-		{ 109, 209 },
-		{ 146, 246 },
-		{ 181, 281 },
-		{ 111, 211 },
-		{ 112, 212 },
-		{ 115, 215 },
-		{ 116, 216 },
+		{ 23, 223 },  //현재가
+		{ 24, 224 },  //대비
+		{ 27, 227 },  //거래량
+		{ 28, 228 },  //거래대금
+		{ 29, 229 },  //시가
+		{ 30, 230 },  //고가
+		{ 31, 231 },  //저가  
+		{ 32, 232 },  //체결량
+		{ 33, 233 },  //등락률
+		{ 36, 236 },  //체결강도
+		{ 41, 240 },  //매도1호가잔량
+		{ 51, 250 },  //매도1호가
+		{ 61, 261 },  //매수1호가잔량
+		{ 71, 271 }, //매수1호가
+		{ 101, 201 },  //매도총잔량
+		{ 104, 204 },  //매도총잔량직전대비
+		{ 106, 206 },  //매수총잔량
+		{ 109, 209 }, //매수총잔량직전대비
+		{ 146, 246 }, //중간가
+		{ 181, 281 }, //중간가등락률
+		{ 111, 211 }, //예상체결가
+		{ 112, 212 }, //예상수량
+		{ 115, 215 }, //예체기준대비
+		{ 116, 216 }, //예체가기준대비등락
 	};
 	return m;
 }
@@ -70,12 +70,10 @@ static int ToMapped(int idx)
 	return (it != m.end()) ? it->second : idx;
 }
 
-#ifdef DF_SESSION_EXPECT
-// 예상가(동시호가/단일가) 세션ID 목록 - 서버 스펙(2026-08-10 시안) 노란색 셀 기준.
-// TOTAL(통합)은 별도 표가 없어 KRX/NXT 합집합으로 하드코딩 - 누락된 세션ID가 있을 수 있음.
-static const std::unordered_set<int>& KrxExpectSessionSet()
+#ifdef DF_SESSION_EXPECT	
+static const std::unordered_set <int>& KrxExpectSessionSet()
 {
-	static const std::unordered_set<int> s = { 10,11,20,21,30,50,51,52,53,54,80 };
+	static const std::unordered_set<int> s = { 10,11,20,21,30,50,51,52,52,54,80 };
 	return s;
 }
 
@@ -99,12 +97,12 @@ bool CGridWnd::IsExpectSession() const
 {
 	switch (_marketType)
 	{
-	case 1: // KRX
+	case 1:
 		return KrxExpectSessionSet().count(_krxSession) != 0;
-	case 2: // NXT
+	case 2:
 		return NxtExpectSessionSet().count(_nxtSession) != 0;
-	case 3: // TOTAL
-	case 4: // NXT/KRX
+	case 3:
+	case 4:
 	default:
 		return TotalExpectSessionSet().count(_krxSession) != 0
 			|| TotalExpectSessionSet().count(_nxtSession) != 0;
@@ -337,6 +335,7 @@ void CGridWnd::OperInit()
 	m_grid->SetBmpIcon(fileIMG + "감1.BMP",21);	//2013.03.18 KSJ 감자
 	m_grid->SetBmpIcon(fileIMG + "감.BMP",22);	//2013.03.18 KSJ 감리
 	m_grid->SetBmpIcon(fileIMG + "유.BMP",23);	//2016.06.14 KSJ 초저유동성
+	m_grid->SetBmpIcon(fileIMG + "저2.BMP", 24);	
 
 	m_bMoveCfg  = m_pToolWnd->SendMessage(WM_MANAGE, MK_GETMOVECFG);
 	m_nMoveSave = m_pToolWnd->SendMessage(WM_MANAGE, MK_GETMOVESAVE);
@@ -1606,11 +1605,7 @@ void CGridWnd::loadcfg()
 	if (CAST_TREEID(m_kind)->kind == xREMAIN)
 		m_kind = 0;
 
-	// 2026-08-25: 설정파일(FILE_SMALLCONFIG/FILE_LARGECONFIG)이 아예 없는 최초접속자(m_bfirstStart)인
-	// 경우, 첫 번째 그룹(m_nIndex==0)까지 kind=0(빈 화면)으로 남는 걸 막고 기본 관심종목 그룹 하나는
-	// 보이도록 기본값을 넣어준다. InitSetGroup()의 기본 gIndex(=1)와 동일한 값으로 일관성을 맞춤.
-	// (F:\src\IBK\src\APPL\IB202700[서버최적화]\GridWnd.cpp 동일 수정, 2026-08-25)
-	if (m_bfirstStart == TRUE && m_nIndex == 0 && m_kind == 0)
+	if (m_bfirstStart == TRUE && m_nIndex == xREMAIN)
 	{
 		m_kind = MAKE_TREEID(xINTEREST, 0, 2, 1, TD_ITEM);
 	}
@@ -2454,7 +2449,7 @@ void CGridWnd::SendWhenVisibleModeTR(CGridData* sdata, int nStart, int nEnd, int
 	_marketType = type;
 #endif
 	// 중요..  여기서 NXT시장 구분값을 날려줌...
-	sprintf(tempB, "%s%c%d%c", gNXT, P_DELI, type, P_TAB);				// 시장구분자   KRX :1 NXT :2  TOTAL : 3  NXT / KRX : 4
+	sprintf(tempB, "%s%c%d%c", gNXT, P_DELI, type, P_TAB);				// 시장구분자   KRX :1 NXT :2  TOTAL : 3  NXT / KRX : 4 
 	CopyMemory(&sendB[sendL], tempB, strlen(tempB));
 	sendL += strlen(tempB);
 
@@ -2673,7 +2668,7 @@ void CGridWnd::sendTransactionTR(int update,int nStart,int nEnd)
 	_marketType = type;
 #endif
 	// 중요..  여기서 NXT시장 구분값을 날려줌...
-	sprintf(tempB, "%s%c%d%c", gNXT, P_DELI, type, P_TAB);				// 시장구분자   KRX :1 NXT :2  TOTAL : 3  NXT / KRX : 4
+	sprintf(tempB, "%s%c%d%c", gNXT, P_DELI, type, P_TAB);				// 시장구분자   KRX :1 NXT :2  TOTAL : 3  NXT / KRX : 4 
 	CopyMemory(&sendB[sendL], tempB, strlen(tempB));
 	sendL += strlen(tempB);
 
@@ -3078,7 +3073,8 @@ BOOL CGridWnd::OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult)
 								//m_arrBaseInters 사이즈가 0임..
 								//rebuildInterest()함수의 주석 처리된 부분 해제함.
 								//CopyInter(m_arrBaseInters.GetAt(xrow), pinters);
-								m_arrBaseInters.at(xrow) = pinterrow;
+								if(xrow < nRowCnt)
+									m_arrBaseInters.at(xrow) = pinterrow;
 							}
 							else
 							{
@@ -3204,7 +3200,8 @@ BOOL CGridWnd::OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult)
 					{
 						if (!pinters.get()->code.IsEmpty())
 						{
-							m_arrBaseInters.at(xrow) = pinters;
+							if(xrow < nRowCnt)
+								m_arrBaseInters.at(xrow) = pinters;
 						}
 						else
 						{
@@ -8102,8 +8099,8 @@ void  CGridWnd::initgridalert(bool bSend)
 
 	if (bSend)
 	{
-		_bManual    = (BOOL)m_pToolWnd->SendMessage(WM_MANAGE, MK_EXPECT);
-		_bAutoCheck = (BOOL)m_pToolWnd->SendMessage(WM_MANAGE, MK_AUTOEXPECT);
+		_bManual    = (BOOL)m_pToolWnd->SendMessage(WM_MANAGE, MK_EXPECT);	
+		_bAutoCheck = (BOOL)m_pToolWnd->SendMessage(WM_MANAGE, MK_AUTOEXPECT);	
 #ifdef DF_SESSION_EXPECT
 		_marketType = m_pMainWnd->SendMessage(WM_MANAGE, MK_MARKET);
 #endif
@@ -8167,7 +8164,7 @@ void CGridWnd::parsingAlertx(LPARAM lParam)
 	// ─────────────────────────────────────────────────────────
 
 #ifdef DF_SESSION_EXPECT
-	// 서버가 실시간 데이터에 매 틱 실어주는 장운영 세션ID(298=KRX,299=NXT). 종목코드와 무관하게 갱신.
+//서버가 실시간 데이터에 매 틱 실어주는 장운영 정보 298=KRX , 299=NXT
 	if (hasData(298))
 		_krxSession = _ttoi(getData(298));
 	if (hasData(299))
@@ -8298,8 +8295,6 @@ void CGridWnd::parsingAlertx(LPARAM lParam)
 				if (_bManual)					// _typeAuto == 1 (예상)
 				{
 #ifdef DF_SESSION_EXPECT
-					// 서버 세션ID(298=KRX,299=NXT) 기준으로 실제 동시호가/단일가 구간인지 판단.
-					// rawExpectValue가 남아있어도 세션상 아니면 서버가 안 지워준 것으로 보고 강제로 지운다.
 					if (IsExpectSession())
 					{
 						bTransSymbol = TRUE;
@@ -8321,9 +8316,9 @@ void CGridWnd::parsingAlertx(LPARAM lParam)
 					}
 					else
 					{
-						if (oldEXP == "1")
+						if(oldEXP == "1")
 						{
-							slog.Format("[STUCK_EXPECT][%s] 자동모드, 세션상 예상가 구간 아님(krxSession=%d nxtSession=%d marketType=%d)인데 rawExpectValue=[%s] 남아있어서 강제로 지움",
+							slog.Format("[STRUCT_EXPECT][%s] 자동모드, 세션상 예상가 구간 아님(krxSession=%d nxtSession=%d marketType=%d)인데 rawExpectValue=[%s] 남아있어서 강제로 지움",
 								strCode, _krxSession, _nxtSession, _marketType, rawExpectValue);
 							Output_DebugString(slog);
 						}
@@ -8331,22 +8326,19 @@ void CGridWnd::parsingAlertx(LPARAM lParam)
 					}
 #else
 					// DF_SESSION_EXPECT 비활성 상태라 세션ID 기반 판단 없이 무조건 예상가로 전환됨.
-					// 서버가 동시호가/단일가 구간이 아닌데도 rawExpectValue(111)를 안 지워주면 여기서
-					// 걸러내지 못하고 그대로 표시되므로, 체결시각(field 34) 기준으로 참고 로그만 남긴다(동작 변경 없음).
-					// m_strBeginTime/m_strEndTime은 장전 동시호가(08:50~09:00)만 커버하므로,
-					// 장마감 동시호가(15:20~15:30)는 CMainWnd가 따로 갖고 있는 값을 추가로 확인한다.
+				// 서버가 동시호가/단일가 구간이 아닌데도 rawExpectValue(111)를 안 지워주면 여기서
+				// 걸러내지 못하고 그대로 표시되므로, 체결시각(field 34) 기준으로 참고 로그만 남긴다(동작 변경 없음).
 					{
 						LPCSTR p34 = getData(34);
 						strTime = p34 ? p34 : "";
 						const CString closeBegin = ((CMainWnd*)m_pMainWnd)->GetCloseAuctionBeginTime();
 						const CString closeEnd = ((CMainWnd*)m_pMainWnd)->GetCloseAuctionEndTime();
-						const bool bInOpenAuction = (m_strBeginTime <= strTime && m_strEndTime >= strTime);
-						const bool bInCloseAuction = !closeBegin.IsEmpty() && !closeEnd.IsEmpty()
-							&& (closeBegin <= strTime && closeEnd >= strTime);
-						if (bKrx && !bInOpenAuction && !bInCloseAuction)
+						const bool bInOpenAcution = (m_strBeginTime <= strTime && m_strEndTime >= strTime);
+						const bool bInCloseAcution = !closeBegin.IsEmpty() && !closeEnd.IsEmpty() && (closeBegin <= strTime && closeEnd >= strTime);
+						if (bKrx && !bInOpenAcution && !bInCloseAcution)
 						{
-							slog.Format("[STUCK_EXPECT][%s] 자동모드, DF_SESSION_EXPECT 비활성 - 체결시각(%s)이 장전동시호가(%s~%s)/장마감동시호가(%s~%s) 밖인데 rawExpectValue=[%s] 로 예상가 표시됨",
-								strCode, strTime, m_strBeginTime, m_strEndTime, closeBegin, closeEnd, rawExpectValue);
+							slog.Format("[STUCK_EXPECT][%s] 자동모드, DF_SESSION_EXPECT 비활성 - 체결시각(%s)이 설정된 동시호가 구간(%s~%s) 밖인데 rawExpectValue=[%s] 로 예상가 표시됨",
+								strCode, strTime, m_strBeginTime, m_strEndTime, rawExpectValue);
 							Output_DebugString(slog);
 						}
 					}
@@ -8436,9 +8428,10 @@ void CGridWnd::parsingAlertx(LPARAM lParam)
 				if (symbol.GetLength() >= 3)
 					symbol = symbol.Right(3);
 
-				//외인소진율은 실시간이 아니다. (IB202700과 동일하게 실시간 처리에서 컬럼 자체를 건너뜀)
+#ifdef DF_NEW_REALPROCESS
 				if (symbol == "204")
 					continue;
+#endif
 
 				if (!bTransSymbol)
 				{
@@ -8804,7 +8797,7 @@ void CGridWnd::parsingAlertx(LPARAM lParam)
 				}
 			}
 
-			// 2026.09.08 KSJ 실시간 거래정지(704) - IB202700[서버최적화] 참고, "0"이면 정상, 그 외는 정지
+			//704 0정상  1정지
 			if (hasData(704))
 			{
 				CString str704 = getData(704);
@@ -8814,21 +8807,21 @@ void CGridWnd::parsingAlertx(LPARAM lParam)
 					if (!strName.IsEmpty())
 					{
 						bool bHalted = (strName.GetAt(0) == 'X');
-						bool bHaltedNow = (str704 != "0");  //0정상 1정지
-						if (bHaltedNow != bHalted)  //정지상태가 바뀌면
+						bool bHaltedNow = (str704 != "0"); //0정상 1정지
+						if (bHaltedNow != bHalted)
 						{
 							if (bHaltedNow)
 								strName.Insert(0, 'X');
 							else
 								strName.Delete(0);
 							m_grid->SetItemText(xrow, colNAME, strName);
-							entry = m_grid->GetItemText(xrow, colINFO); // 종목특이사항
+							entry = m_grid->GetItemText(xrow, colINFO);
 							SetColInfo(strName, xrow, entry);
 						}
 					}
 				}
 			}
-			// KSJ
+
 		} // for rowPosition 끝
 
 #ifdef DF_RTS_CHECK
@@ -8921,6 +8914,10 @@ void CGridWnd::SetColInfo(CString strName, int nRow, CString strEntry)	//2012.11
 	{
 		m_grid->SetItemData(nRow, colINFO, 23);
 	}
+	else if (strName.GetAt(0) == 'V')
+	{
+		m_grid->SetItemData(nRow, colINFO, 24);
+	}
 	else	//2011.12.06 KSJ 일치하는게 없으면 0으로 세팅해준다.
 	{
 		m_grid->SetItemData(nRow, colINFO, 0);
@@ -9009,7 +9006,6 @@ void CGridWnd::calcInClient(int row)
 
 int CGridWnd::CheckRealTimeCode(CString code)
 {
-	CString slog;
 	class CIndexMap* idx = nullptr;
 
 	const int realtimeCol = 0;
@@ -9033,9 +9029,6 @@ int CGridWnd::CheckRealTimeCode(CString code)
 
 		for (ii = 0; ii < idx->idxCnt; ii++)
 			m_irowCode[ii] = idx->index[ii];
-
-		slog.Format("[cx_interest][symbol] [%s] code=[%s] ii=[%d]", __FUNCTION__, code, ii);
-		Output_DebugString(slog);
 
 		return idx->idxCnt;
 	}
@@ -9285,7 +9278,7 @@ void CGridWnd::OnTimer(UINT nIDEvent)
 	if (nIDEvent == 1000)
 	{
 		const int	ncnt = m_arExist.GetCount();
-		if (ncnt < 0)
+		if (ncnt <= 0)
 		{
 			KillTimer(1000);
 			return;

@@ -45,8 +45,6 @@ constexpr	int xKBp = 201, xSECp = 202, xSKp = 203, xPOSCOp = 204, xKTp = 205, xK
 constexpr	int xKOSPIUP = 50, xKOSDAQUP = 51, xKOSPIex = 52, xKOSDAQex = 53;
 constexpr	int xGOODSTOCK = 122;
 constexpr       int xNXT = 123;
-constexpr       int xBDC = 124;
-
 constexpr struct _exKospi {
 	char* code{};
 	char* name{};
@@ -832,10 +830,6 @@ BOOL CPage1::OnKillActive()
 
 BOOL CPage1::endSendAction() 
 {
-	m_slog.Format("\r\n[interest][IB202202][%s] activegno=[%d] groupcount=[%d]",
-		__FUNCTION__, m_activegno, GetGroupCount());
-	OutputDebugString(m_slog);
-
 	CString	gname;
 	if (m_activegno != -1)
 	{
@@ -1395,15 +1389,6 @@ void CPage1::SelectTree(int selItem)
 		m_Radio_ELWPut.ShowWindow(SW_HIDE);
 		xNxtList();
 		break;
-	case xBDC:
-	{
-		m_search.SetWindowText("");
-		m_Radio_ELWAll.ShowWindow(SW_HIDE);
-		m_Radio_ELWCall.ShowWindow(SW_HIDE);
-		m_Radio_ELWPut.ShowWindow(SW_HIDE);
-		xBDCkToList();
-	}
-	break;
 	default:
 		m_Radio_ELWAll.ShowWindow(SW_HIDE);
 		m_Radio_ELWCall.ShowWindow(SW_HIDE);
@@ -2530,8 +2515,6 @@ void CPage1::initTree()
 	m_tree.SetItemData(m_tree.InsertItem(_T("ETN"), hRoot, TVI_LAST), xETNCODE);	//2013.06.25 KSJ 코넥스 추가
 
 	m_tree.SetItemData(m_tree.InsertItem(_T("상장형수익증권"), hRoot, TVI_LAST), xGOODSTOCK);	//25.06.12 상장형수익증권 추가
-
-	m_tree.SetItemData(m_tree.InsertItem(_T("BDC"), hRoot, TVI_LAST), xBDC);	//25.06.12 상장형수익증권 추가
 
 	m_tree.SetItemData(m_tree.InsertItem(_T("리츠"), hRoot, TVI_LAST), xRITS);	//20240422 리츠
 
@@ -5036,40 +5019,6 @@ int CPage1::xSinjuCodeToList()
 				continue;
 			}
 			break;
-		default:
-			continue;
-		}
-
-		code = CString(hjcode.code, HCodeLen);
-		name = CString(hjcode.name, HNameLen);
-
-		AppendItemToList1(position, code, name.Trim());
-		position += 1;
-	}
-	m_list1.SetItemCountEx(m_arList.GetSize());
-	m_list1.Invalidate();
-	return position;
-}
-
-int CPage1::xBDCkToList()
-{
-	ClearListitem();
-	m_list1.DeleteAllItems();
-
-	_shjcode   hjcode;
-	CString code, name;
-	int position = 0;
-
-	for (int ii = 0; ii < m_hjcode.GetSize(); ii++)
-	{
-		hjcode = m_hjcode.GetAt(ii);
-
-		switch (hjcode.ssgb)
-		{
-		case jmBDCPST:
-		case jmBDCICY:
-			break;
-
 		default:
 			continue;
 		}
@@ -7744,7 +7693,7 @@ void CPage1::OnShareimport()  //관심그룹 불러오기
 		
 		temp.Format("%02d", m_activegno);
 		
-		if (m_activegno > 1)
+		if (m_activegno >= 1)
 		{
 			m_manageGroup[m_activegno - 1][0] = temp;
 			m_manageGroup[m_activegno - 1][1] = "N";
@@ -8048,9 +7997,6 @@ void CPage1::setManageGroup(char* datB)
 	CString tempAry[MAXGROUP][4];
 	CString newNos, oldNoS;
 
-m_slog.Format("\r\n[setManageGroup] ------------------------  nCount=%d", nCount);
-OutputDebugString(m_slog);
-
 	if(nCount > 0)
 	{
 		//임시배열에 복사
@@ -8068,51 +8014,28 @@ OutputDebugString(m_slog);
 			
 			newNos.Format("%.2s", list.ngrs);
 			oldNoS.Format("%.2s", list.ogrs);
-
-			m_slog.Format("\r\n[setManageGroup]                   i=%d", i);
-			OutputDebugString(m_slog);
-
-
+			
 			if (atoi(oldNoS) != atoi(newNos))
 			{
-m_slog.Format("\r\n[setManageGroup] 서버 내려온 값이 변경 되었다고 내려온 그룹 newNos=%s oldNoS=%s", newNos, oldNoS);
-OutputDebugString(m_slog);
 				//m_slog.Format("\r\n[setManageGroup] old=%s new=%s tempAry[old-1][0]=%s(기대값과 다르면 버그)", oldNoS, newNos, tempAry[atoi(oldNoS) - 1][0]);
 				//OutputDebugString(m_slog);
 				//oldNoS 값을 가진 실제 행을 찾는다 (위치가 아니라 그룹번호로 매칭)
 				int oldRow = -1;
 				for (int row = 0; row < MAXGROUP; row++)
 				{
-m_slog.Format("\r\n		[setManageGroup] row =%d (클라)tempAry[row][0]=%s (서버)oldNoS=%s", row, tempAry[row][0], oldNoS);
-OutputDebugString(m_slog);
-
 					if (atoi(tempAry[row][0]) == atoi(oldNoS))
 					{
 						oldRow = row;
-						m_slog.Format("\r\n		[setManageGroup] !!!! 클라서버 같음 BREAK !!!!row =%d tempAry[row][0]=%s oldNoS=%s", row, tempAry[row][0], oldNoS);
-						OutputDebugString(m_slog);
 						break;
-					}
-					else
-					{
-						m_slog.Format("\r\n		[setManageGroup] @@@@ 다름 클라서버 row =%d tempAry[row][0]=%s oldNoS=%s", row, tempAry[row][0], oldNoS);
-						OutputDebugString(m_slog);
 					}
 				}
 				if (oldRow < 0) continue;
-				/*
-				[0]	수정 전 그룹번호
-				[1]	변경 상태: M 이름 수정, D 삭제, N 추가
-				[2]	수정 후 그룹번호
-				[3]	그룹명
-				*/
-				for (int j = 0; j < 4; j++)  //
+
+				for (int j = 0; j < 4; j++)
 				{
 					if (j != 2)
 					{
 						m_manageGroup[atoi(newNos) - 1][j] = tempAry[oldRow][j];
-m_slog.Format("\r\n			[setManageGroup] newNos-1=[%d] oldNoS=%s  [%s]", atoi(newNos) - 1, oldNoS, tempAry[oldRow][j]);
-OutputDebugString(m_slog);
 					}
 				}
 			}

@@ -1173,46 +1173,32 @@ class TestWindow(QMainWindow):
 
     def _evt_ver_update(self):
         self._log("[업데이트] OnVerUpdate: exe\\axis\\ -> exe\\ 복사 및 OCX 재등록 시작")
-        home = self.ocx.dynamicCall("GetHome()")
-        exe_dir  = os.path.join(home, "exe")
-        axis_dir = os.path.join(exe_dir, "axis")
+        home    = self.ocx.dynamicCall("GetHome()")
+        exe_dir = os.path.join(home, "exe")
+        axisver = os.path.join(exe_dir, "axisver.exe")
 
-        if os.path.isdir(axis_dir):
-            # IBKSCONNECTOR.OCX 는 직접 빌드한 버전 사용 - 서버 버전으로 덮어쓰지 않음
-            SKIP = {"IBKSCONNECTOR.OCX"}
-            OCX_FILES = {"AXWIZARD.OCX", "AXXECURE.OCX", "AXSOCK.OCX", "AXCERTIFY.OCX"}
-            for fname in os.listdir(axis_dir):
-                if fname.upper() in SKIP:
-                    self._log(f"  skip: {fname}")
-                    continue
-                src = os.path.join(axis_dir, fname)
-                dst = os.path.join(exe_dir, fname)
-                try:
-                    shutil.copy2(src, dst)
-                    self._log(f"  copy: {fname}")
-                except Exception as e:
-                    self._log(f"  copy FAIL: {fname} - {e}")
+        if not getattr(sys, "frozen", False) or not os.path.exists(axisver):
+            self._log(f"[업데이트] axisver 위임 불가 (frozen={getattr(sys, 'frozen', False)}, axisver={os.path.exists(axisver)})")
+            QMessageBox.information(self, "업데이트", "업데이트 파일을 받았습니다.\n프로그램 종료 후 다시 실행해주세요.")
+            return
 
-            for ocx in OCX_FILES:
-                ocx_path = os.path.join(exe_dir, ocx)
-                if os.path.exists(ocx_path):
-                    r = subprocess.call(["regsvr32", "/s", ocx_path])
-                    self._log(f"  regsvr32 {ocx} => {'OK' if r == 0 else f'FAIL({r})'}")
+        try:
+            # axisver runs "<root>\exe\<apname>", so pass self path relative to exe dir
+            rel = os.path.relpath(sys.executable, exe_dir)
+        except ValueError:   # different drive
+            QMessageBox.information(self, "업데이트", "업데이트 파일을 받았습니다.\n프로그램 종료 후 다시 실행해주세요.")
+            return
 
-            try:
-                shutil.rmtree(axis_dir)
-                self._log(f"  axis\\ 폴더 삭제 완료")
-            except Exception as e:
-                self._log(f"  axis\\ 삭제 실패: {e}")
-        else:
-            self._log(f"  axis\\ 폴더 없음 ({axis_dir})")
+        args = [axisver,
+                "/c", str(int(self.winId())),   # WM_CLOSE target
+                "/x", str(os.getpid()),         # wait/kill target (new axisver)
+                "/d", home,                     # root (parent of exe)
+                "/a", rel,                      # relaunch target
+                "/u"]                           # MUST be last flag
+        self._log(f"[업데이트] axisver 실행: {subprocess.list2cmdline(args)}")
+        subprocess.Popen(args)
 
-        self._log("[업데이트] 완료 - 프로그램을 재시작합니다")
-        QMessageBox.information(self, "업데이트 완료", "파일 업데이트가 완료되었습니다.\n확인을 누르면 프로그램이 재시작됩니다.")
-        # ActiveX 컨트롤을 먼저 명시적으로 해제해야 재시작 시 임시폴더(_MEI) 삭제가 안정적으로 됨
-        self.ocx.clear()
-        time.sleep(0.5)
-        subprocess.Popen([sys.executable] + sys.argv)
+        self.ocx.clear()                        # release OCX/DLL file locks
         QApplication.quit()
 
     def _evt_update_start(self):

@@ -712,13 +712,7 @@ void CGroupWnd::testSaveFile(CString dt)
 // KR7005930003
 void CGroupWnd::RecvOper(int kind, CRecvData *rdata)
 {
-	int igroup{};
 	_trkey *trkey = (struct _trkey *)&kind;
-	igroup = min(trkey->kind == TRKEY_OVER ? trkey->group + 8 : trkey->group, m_nGroup - 1);
-	CString slog;
-	slog.Format("[IB202200][%s]<%d> igroup =[%d]  group=[%d] m_nGroup=[%d]  trkey->kind =[%d] ",
-		__FUNCTION__, __LINE__,  igroup, trkey->group, m_nGroup, trkey->kind);
-	OutputDebugString(slog);
 	switch (trkey->kind)
 	{
 	case TRKEY_GRIDNEWS:
@@ -1103,8 +1097,8 @@ void CGroupWnd::savecfg()
 void CGroupWnd::OperInit()
 {
 	CString filePath;
-	filePath.Format("%s/%s/InterOption.ini", m_root, "tab");
-	m_iTime = GetPrivateProfileInt("DRAWTIME", "TIME", 0, filePath); // win10
+	//filePath.Format("%s/%s/InterOption.ini", m_root, "tab");
+	//m_iTime = GetPrivateProfileInt("DRAWTIME", "TIME", 0, filePath); // win10
 
 	loadcfg();
 	CreateGrid();
@@ -1910,6 +1904,10 @@ void CGroupWnd::ExpectOper(int param)
 	{
 		m_GridWnd[ii]->toggleAction(bExpect);
 	}
+
+#ifdef DF_NEW_REALPROCESS
+	initAlert();
+#endif
 }
 
 void CGroupWnd::AutoExpectOper(int param)
@@ -1918,6 +1916,9 @@ void CGroupWnd::AutoExpectOper(int param)
 	{
 		m_GridWnd[ii]->toggleAction(false);
 	}
+#ifdef DF_NEW_REALPROCESS
+	initAlert();
+#endif
 }
 
 void CGroupWnd::SetEqualizerField(int param)
@@ -2385,7 +2386,7 @@ int CGroupWnd::OverOper(int nIndex, CGridData *sdata)
 				max = max - 1;
 			}
 		}
-		if (max == 0)
+		if (max <= 0)
 			max = MAX_LINE;
 
 		int ncnt = sdata->GetCount();
@@ -2489,6 +2490,35 @@ void CGroupWnd::UpdateDraw()
 		grid->UpdateAll();
 
 	_cacheGrid.clear();
+}
+
+// DF_NEW_REALPROCESS용 - _cacheGrid 멤버 대신 지역변수로 처리해서
+// RecvRTSx()+UpdateDraw() 두 단계로 나뉘어 있던 것을 한 번에 끝냄
+void CGroupWnd::RecvRTSxDirect(LPARAM lParam)
+{
+	if (m_nGroup == 0)
+		return;
+
+	std::vector<CGridWnd*> cacheGrid;
+
+	const auto* alertR = reinterpret_cast<const _alertR*>(lParam);
+	const CString code = alertR->code;
+
+	for_each_n(m_GridWnd.begin(), m_nGroup, [this, code, &cacheGrid](const auto& gridWnd) {
+		if (gridWnd->IsCode(code))
+			cacheGrid.push_back(gridWnd.get());
+		});
+
+	for_each(cacheGrid.begin(), cacheGrid.end(), [lParam](CGridWnd* pGridWnd) {
+		pGridWnd->HoldDraw();
+		pGridWnd->parsingAlertx(lParam);
+		});
+
+	for (auto& grid : cacheGrid)
+		grid->ReleaseDraw();
+
+	for (auto& grid : cacheGrid)
+		grid->UpdateAll();
 }
 
 void CGroupWnd::initAlert()

@@ -21,7 +21,7 @@ public:
 	void UpdateTimeText(int timeMs);
 	void UpdateSliderByCheckState();
 	int m_iTime{};
-	BOOL m_bOldReal = FALSE;
+	bool m_bOldReal{};
 // 대화 상자 데이터입니다.
 #ifdef AFX_DESIGN_TIME
 	enum { IDD = IDD_DLG_SLIDER };

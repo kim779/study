@@ -95,7 +95,6 @@ void CMainWnd::WorkerThreadFunc()
 		if (idx >= 0)
 		{
 			UpdateSnapshotFromAlert(g_dlltickSlots[idx], item);
-			DLL_PushDirtySlot(idx);  // ← API로
 		}
 		delete item;
 	}
@@ -233,11 +232,6 @@ long CMainWnd::OnMessage(WPARAM wParam, LPARAM lParam)
 	CString slog;
 	switch (LOBYTE(LOWORD(wParam)))
 	{
-		case MMSG_SHARED_DUMP:
-		{
-			DumpAllSlots();
-		}
-		break;
 	    case DLL_ALERT:
 		{
 			struct _alertR* alertR = (struct _alertR*)lParam;
@@ -349,6 +343,7 @@ int CMainWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	//if(Axis_IsMainRTS())
 	//	StartWorkerThread();
 	FileMove();
+	FileDelete();
 	return 0;
 }
 
@@ -447,6 +442,97 @@ void   CMainWnd::FileMove()
 	sfile.Format("%s\\tab\\AXISENC.ini", m_sRoot);
 	m_slog.Format("%s\t%s", "", "");
 	WritePrivateProfileString("ABROAD", "auth", m_slog, sfile);
+}
+
+// mode: 0 = top files only, 1 = all files keep folders, 2 = delete folder itself
+static void DeleteFolderContents(const CString& strDir, int mode)
+{
+	CFileFind ff;
+	BOOL bWork = ff.FindFile(strDir + "\\*.*");
+	while (bWork)
+	{
+		bWork = ff.FindNextFile();
+		if (ff.IsDots())
+			continue;
+
+		if (ff.IsDirectory())
+		{
+			if (mode != 0)
+				DeleteFolderContents(ff.GetFilePath(), mode);
+			continue;
+		}
+
+		::SetFileAttributes(ff.GetFilePath(), FILE_ATTRIBUTE_NORMAL);
+		DeleteFile(ff.GetFilePath());
+	}
+	ff.Close();
+
+	if (mode == 2)
+		::RemoveDirectory(strDir);
+}
+
+
+void   CMainWnd::FileDelete()
+{
+	CString strVal, strDir, strfile, strPath, stmp;
+
+	char sbuf[1024]{};
+	GetModuleFileName(nullptr, sbuf, 260);
+	CString sRoot(sbuf);
+	sRoot.TrimRight();
+	sRoot = sRoot.Left(sRoot.Find("exe"));
+
+	// default delete list (always applied)
+	const char* defFiles[] = { "gex\\rhkd62.txt", "gex\\mong97.txt" };
+	for (const char* defFile : defFiles)
+	{
+		strPath.Format("%s%s", sRoot, defFile);
+
+		CFileFind cfFind;
+		if (cfFind.FindFile(strPath))
+			DeleteFile(strPath);
+	}
+
+	char buff[128];
+	CString iniConf = sRoot + "tab\\AXISFILE.ini";
+	GetPrivateProfileString("delete", "cnt", "", buff, sizeof(buff), iniConf);
+	stmp.Format("%s", buff);
+	int cnt = atoi(stmp);
+
+	for (int ii = 0; ii < cnt; ii++)
+	{
+		stmp.Format("%d", ii);
+
+		GetPrivateProfileString("delete", stmp, "", buff, sizeof(buff), iniConf);
+		strVal.Format("%s", buff);
+		strVal.TrimRight();
+		if (strVal.IsEmpty())
+			continue;
+
+		//ex) gex:mapc2_30-39.xml     folder:filename
+	    //    gex:folder               delete folder itself (with subfolders)
+		//    gex:files                delete all files, keep folder tree
+		strDir = Parser(strVal, ":");
+		strfile = strVal;
+		strfile.TrimRight();
+		if (strDir.IsEmpty() || strfile.IsEmpty())
+			continue;
+
+		if (strfile.CompareNoCase("folder") == 0 || strfile.CompareNoCase("files") == 0)
+		{
+			strPath.Format("%s%s", sRoot, strDir);
+			DWORD dwAttr = ::GetFileAttributes(strPath);
+			if (dwAttr != INVALID_FILE_ATTRIBUTES && (dwAttr & FILE_ATTRIBUTE_DIRECTORY))
+				DeleteFolderContents(strPath, strfile.CompareNoCase("folder") == 0?2:1);
+			continue;
+		}
+
+		strPath.Format("%s%s\\%s", sRoot, strDir, strfile);
+
+		CFileFind cfFind;
+		if (cfFind.FindFile(strPath))
+			DeleteFile(strPath);
+	}
 }
 
 CString CMainWnd::Variant(int comm, CString data)

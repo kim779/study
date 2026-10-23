@@ -214,7 +214,6 @@ void CEditGroup::OnDownBtn()
 
 void CEditGroup::OnDelBtn() 
 {
-	CString slog;
 #ifdef DF_SEARCH
 	int	select_count;
 	int* nItemIndex = NULL;
@@ -237,10 +236,6 @@ void CEditGroup::OnDelBtn()
 				{
 					CPage1* page = (CPage1*)m_pParent;
 					const int groupNo = (int)m_list.GetItemData(nItemIndex[i]);
-					slog.Format("\r\n[interest][IB202202][%s] DEL groupNo=[%d] manageCount=[%d] mg0=[%s][%s]",
-						__FUNCTION__, groupNo, page->getManageCount(),
-						(LPCTSTR)page->m_manageGroup[0][0], (LPCTSTR)page->m_manageGroup[0][1]);
-					OutputDebugString(slog);
 					for (int row = 0; row < page->getManageCount(); row++)
 					{
 						if (atoi(page->m_manageGroup[row][0]) == groupNo)

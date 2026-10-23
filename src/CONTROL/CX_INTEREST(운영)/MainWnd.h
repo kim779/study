@@ -92,9 +92,9 @@ public:
 	CRect	GetParamRect() { return m_param.rect; }
 	BOOL	GetViewType() { return m_bAllType; }
 	void    doRTMx(LPARAM lParam);
-	CString GetMarketTime() { return m_strMarketTime; };	//KSJ 2012.11.26 장운영시간
-	CString GetCloseAuctionBeginTime() { return m_strEndTime; };		// 장마감 동시호가 시작(15:20대) - GridWnd의 m_strBeginTime/m_strEndTime(장전 동시호가용)와는 별개
-	CString GetCloseAuctionEndTime() { return m_strEndTimeEnd; };		// 장마감 동시호가 종료(15:30대)
+	CString GetMarketTime() { return m_strMarketTime; };	//KSJ 2012.11.26 장운영시간 
+	CString GetCloseAuctionBeginTime() { return m_strEndTime; };
+	CString GetCloseAuctionEndTime() { return m_strEndTimeEnd; };
 	void	uploadBackup();			//2016.07.12 KSJ 관심종목 설정과 같이 'b' 보내줌
 // Overrides
 	// ClassWizard generated virtual function overrides
@@ -341,11 +341,8 @@ public:
 	CTime ParseRTSTime(const CString& sTime, const COleDateTime& today);
 	std::unordered_map<std::string, CTime> m_lastRTSTimeMap;
 	bool ShouldSkipRTSByServerTime(const std::string& code, const char* pServerTime, int  minIntervalSec);
-#ifdef DF_RTS_TIMER
-	void RTS_RecvRTSx(LPARAM lParam);	// DF_RTS_TIMER용 - raw data[] 슬롯 그대로 깊은복사해서 캐시에 저장
+	void RTS_RecvRTSx(LPARAM lParam);
 	std::unordered_map<std::string, std::unique_ptr<_Ralert>> _mapRealData;
-#endif
-
 protected:
 	
 

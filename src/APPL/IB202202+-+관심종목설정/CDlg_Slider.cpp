@@ -38,6 +38,7 @@ BEGIN_MESSAGE_MAP(CDlg_Slider, CDialog)
 	ON_NOTIFY(NM_CUSTOMDRAW, IDC_SLIDER1, &CDlg_Slider::OnCustomdrawSlider1)
 	ON_WM_PAINT()
 	ON_WM_HSCROLL()
+	ON_BN_CLICKED(IDC_CK_REAL, &CDlg_Slider::OnBnClickedCkReal)
 END_MESSAGE_MAP()
 
 
@@ -114,8 +115,10 @@ void CDlg_Slider::LoadRate()
 		ipos = ((iTime - DF_IMIN_RATE) / ((DF_IMAX_RATE - DF_IMIN_RATE) / (DF_IMAX_POS - DF_IMIN_POS))) + DF_IMIN_POS;
 		m_slider.SetPos(ipos);
 		ichk = GetPrivateProfileInt("STAFF", "cReal", 0, filePath);
+		m_bOldReal = (ichk != 0);
 		if (ichk)
 			((CButton*)GetDlgItem(IDC_CK_REAL))->SetCheck(BST_CHECKED);
+		UpdateSliderByCheckState();
 		return;
 	}
 
@@ -153,8 +156,10 @@ void CDlg_Slider::LoadRate()
 				ipos = ((iTime - DF_IMIN_RATE) / ((DF_IMAX_RATE - DF_IMIN_RATE) / (DF_IMAX_POS - DF_IMIN_POS))) + DF_IMIN_POS;
 				m_slider.SetPos(ipos);
 				ichk = GetPrivateProfileInt("SCUSTOMER", "cReal", 0, filePath);
+				m_bOldReal = (ichk != 0);
 				if (ichk)
 					((CButton*)GetDlgItem(IDC_CK_REAL))->SetCheck(BST_CHECKED);
+				UpdateSliderByCheckState();
 				return;
 			}
 		}
@@ -167,6 +172,8 @@ void CDlg_Slider::LoadRate()
 	ichk = GetPrivateProfileInt("CUSTOMER", "cReal", 0, filePath);
 	if (ichk)
 		((CButton*)GetDlgItem(IDC_CK_REAL))->SetCheck(BST_CHECKED);
+	m_bOldReal = (ichk != 0);
+	UpdateSliderByCheckState();
 }
 
 void CDlg_Slider::SaveRate()
@@ -186,7 +193,9 @@ void CDlg_Slider::SaveRate()
 		else
 			WritePrivateProfileString("STAFF", "cReal", "0", filePath);
 
-		if (isliderPos < m_iTime || ((CButton*)GetDlgItem(IDC_CK_REAL))->GetCheck())
+		
+	//if (isliderPos < m_iTime || (!m_bOldReal && ((CButton*)GetDlgItem(IDC_CK_REAL))->GetCheck()))
+		if (!m_bOldReal && ((CButton*)GetDlgItem(IDC_CK_REAL))->GetCheck())
 			AfxMessageBox("실시간 갱신주기 변경 시 시세처리량이 증가하여 HTS 반응속도가 느려질 수 있습니다.");
 		return;
 	}
@@ -221,7 +230,8 @@ void CDlg_Slider::SaveRate()
 			else
 				WritePrivateProfileString("SCUSTOMER", "cReal", "0", filePath);
 
-			if (isliderPos < m_iTime || ((CButton*)GetDlgItem(IDC_CK_REAL))->GetCheck())
+			//if (isliderPos < m_iTime || (!m_bOldReal && ((CButton*)GetDlgItem(IDC_CK_REAL))->GetCheck()))
+			if (!m_bOldReal && ((CButton*)GetDlgItem(IDC_CK_REAL))->GetCheck())
 				AfxMessageBox("실시간 갱신주기 변경 시 시세처리량이 증가하여 HTS 반응속도가 느려질 수 있습니다.");
 			return;
 		}
@@ -233,7 +243,8 @@ void CDlg_Slider::SaveRate()
 	else
 		WritePrivateProfileString("CUSTOMER", "cReal", "0", filePath);
 
-	if (isliderPos < m_iTime || ((CButton*)GetDlgItem(IDC_CK_REAL))->GetCheck())
+	//if (isliderPos < m_iTime || (!m_bOldReal && ((CButton*)GetDlgItem(IDC_CK_REAL))->GetCheck()))
+	if (!m_bOldReal && ((CButton*)GetDlgItem(IDC_CK_REAL))->GetCheck())
 		AfxMessageBox("실시간 갱신주기 변경 시 시세처리량이 증가하여 HTS 반응속도가 느려질 수 있습니다.");
 }
 
@@ -394,4 +405,15 @@ void CDlg_Slider::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 		UpdateTimeText(timeMs);
 	}
 	CDialog::OnHScroll(nSBCode, nPos, pScrollBar);
+}
+
+void CDlg_Slider::OnBnClickedCkReal()
+{
+	UpdateSliderByCheckState();
+}
+
+void CDlg_Slider::UpdateSliderByCheckState()
+{
+	BOOL bChecked = ((CButton*)GetDlgItem(IDC_CK_REAL))->GetCheck() == BST_CHECKED;
+	m_slider.EnableWindow(!bChecked);
 }

@@ -25,6 +25,7 @@ static char THIS_FILE[] = __FILE__;
 /////////////////////////////////////////////////////////////////////////////
 // CMainWnd
 #define TM_RTSTIME 9898
+#define TM_FOCUSFIX 8786
 
 CMainWnd::CMainWnd(CWnd *pWnd) : _pApp(static_cast<CIB202200App*>(AfxGetApp()))
 {
@@ -113,10 +114,13 @@ void CMainWnd::CheckRTSTimer(bool bFirst)
 	CString userip;
 	m_bcustomer = m_pWnd->SendMessage(WM_USER, MAKEWPARAM(variantDLL, orderCC), 0L);
 	userip = CheckIP();
+
 	CString filePath;
-	filePath.Format("%s/%s/InterOption.ini", Variant(homeCC), "tab");
+	filePath.Format("%s/%s/AXISAI.ini", Variant(homeCC), "tab");
 	m_icheckTime = GetPrivateProfileInt("OVERTIME", "TIME", 300, filePath);
 	m_DiffSec = GetPrivateProfileInt("OVERTIME", "DIFFSEC", 0, filePath);
+
+	filePath.Format("%s/%s/InterOption.ini", Variant(homeCC), "tab");
 	int iTime = 800;  
 	int ichk{};
 	if (!m_bcustomer) //직원용
@@ -128,12 +132,18 @@ void CMainWnd::CheckRTSTimer(bool bFirst)
 			if (iTime != m_iTime)  //실시간 데이터 수신 설정률이 변한 경우만 타이머 다시 세팅
 			{
 				m_iTime = iTime;
+#ifdef DF_RTS_TIMER
+				KillTimer(TM_RTSTIME);
+				SetTimer(TM_RTSTIME, m_iTime, nullptr);
+#endif
 			}
 		}
 		else  //최초 화면 오픈하였을 경우
 		{
 			m_iTime = iTime;
+#ifdef DF_RTS_TIMER
 			SetTimer(TM_RTSTIME, m_iTime, nullptr);
+#endif
 		}
 
 		ichk = GetPrivateProfileInt("STAFF", "Real", 0, filePath);
@@ -157,11 +167,18 @@ void CMainWnd::CheckRTSTimer(bool bFirst)
 				m_slog.Format("[IB202200][CheckRTSTimer2] KillTimer 고객용 iTime=[%d] m_iTime=[%d]", iTime, m_iTime);
 				Output_DebugString(m_slog);
 				m_iTime = iTime;
+#ifdef DF_RTS_TIMER
+				KillTimer(TM_RTSTIME);
+				SetTimer(TM_RTSTIME, m_iTime, nullptr);
+#endif
 			}
 		}
 		else  //최초 화면 오픈하였을 경우
 		{
 			m_iTime = iTime;
+#ifdef DF_RTS_TIMER
+			SetTimer(TM_RTSTIME, m_iTime, nullptr);
+#endif
 		}
 
 		ichk = GetPrivateProfileInt("CUSTOMER", "Real", 0, filePath);
@@ -197,11 +214,18 @@ void CMainWnd::CheckRTSTimer(bool bFirst)
 					if (iTime != m_iTime)  //실시간 데이터 수신 설정률이 변한 경우만 타이머 다시 세팅
 					{
 						m_iTime = iTime;
+#ifdef DF_RTS_TIMER
+						KillTimer(TM_RTSTIME);
+						SetTimer(TM_RTSTIME, m_iTime, nullptr);
+#endif
 					}
 				}
 				else  //최초 화면 오픈하였을 경우
 				{
 					m_iTime = iTime;
+#ifdef DF_RTS_TIMER
+					SetTimer(TM_RTSTIME, m_iTime, nullptr);
+#endif
 				}
 
 				ichk = GetPrivateProfileInt("SCUSTOMER", "Real", 0, filePath);
@@ -219,12 +243,18 @@ void CMainWnd::CheckRTSTimer(bool bFirst)
 		if (iTime != m_iTime)  //실시간 데이터 수신 설정률이 변한 경우만 타이머 다시 세팅
 		{
 			m_iTime = iTime;
+#ifdef DF_RTS_TIMER
+			KillTimer(TM_RTSTIME);
+			SetTimer(TM_RTSTIME, m_iTime, nullptr);
+#endif
 		}
 	}
 	else  //최초 화면 오픈하였을 경우
 	{
 		m_iTime = iTime;
-		//SetTimer(TM_RTSTIME, m_iTime, nullptr);
+#ifdef DF_RTS_TIMER
+		SetTimer(TM_RTSTIME, m_iTime, nullptr);
+#endif
 	}
 	ichk = GetPrivateProfileInt("CUSTOMER", "Real", 0, filePath);
 	if (ichk)
@@ -1009,14 +1039,16 @@ LONG CMainWnd::OnUser(WPARAM wParam, LPARAM lParam)
 		CString stmp;
 		stmp.Format("%s", (char*)data[0]);
 		stmp.TrimRight();
-		if (stmp != "w")  
+
+		//m_slog.Format("[RTS] = [%s] 0 =[%s] 23=[%s] 623=[%s] 611=[%s] 624=[%s] 627=[%s] 628=[%s] 629=[%s] 630=[%s] 631=[%s] 632=[%s] 633=[%s] 636=[%s] 641=[%s] 661=[%s]601=[%s] 604=[%s] 606=[%s] 609=[%s] 646=[%s] 681=[%s]", code, stmp,
+		//	(char*)data[23], (char*)data[623], (char*)data[611], (char*)data[624], (char*)data[627], (char*)data[628], (char*)data[629], (char*)data[630], (char*)data[631], (char*)data[632], (char*)data[633], (char*)data[636], (char*)data[641], (char*)data[661],
+		//	(char*)data[601], (char*)data[604], (char*)data[606], (char*)data[609], (char*)data[646], (char*)data[681]);
+
+		//if(stmp == "X" || stmp == "J" || stmp == "Y")
+		Output_DebugString(m_slog);
+		//선물체결 K, 선물예상체결 4, 옵션 예상체결 O, 옵션예상호가 P, 옵션시세  O, 옵션호가 P, 상품선물체결 f, 상품선물호가 g, 업종지수 J, 업종예상지수 Y, 상품선물체결 f, 상품선물호가 g
+		if (stmp != "w" && stmp != "T" && stmp != "K" && stmp != "4" && stmp != "O" && stmp != "P" && stmp != "f" && stmp != "g" && stmp != "J" && stmp != "Y" &&  stmp != "X")
 			return 0;
-
-		stmp.Format("[RTS] 23=[%s] 24=[%s] 27=[%s] 28=[%s] 29=[%s] 30=[%s] 31=[%s] 32=[%s] 33=[%s] 36=[%s] 41=[%s] 61=[%s] 101=[%s] 104=[%s] 106=[%s] 109=[%s] 146=[%s] 181=[%s]",
-		(char*)data[623], (char*)data[624], (char*)data[627], (char*)data[628], (char*)data[629], (char*)data[630], (char*)data[631], (char*)data[632], (char*)data[633], (char*)data[636], (char*)data[641], (char*)data[661],
-			(char*)data[601], (char*)data[604], (char*)data[606], (char*)data[609], (char*)data[646], (char*)data[681]);
-		Output_DebugString(stmp);
-
 
 		//test
 		COleDateTime oTime;
@@ -1042,31 +1074,27 @@ LONG CMainWnd::OnUser(WPARAM wParam, LPARAM lParam)
 
 		std::string scode = CStringA(code);
 
-		if (bOverChecking && ShouldSkipRTSByServerTime(scode, (char*)data[34], m_DiffSec) == true  )
+		if (bOverChecking && ShouldSkipRTSByServerTime(scode, (char*)data[34], m_DiffSec) == true)
 		{
-			m_slog.Format("[IB202200][skipped]!!!!!!!ShouldSkipRTSByServerTime true");
-			Output_DebugString(m_slog);
 			return 0;
 		}
 		else
 		{
-/*			static constexpr int arr[] = { 41, 61, 101, 104, 106, 107, 109, 146, 181 };
-			auto& rmap = m_pGroupWnd->getRSymbol();
-			const bool bHoga = std::any_of(std::begin(arr), std::end(arr), [&rmap](const int symbol) {
-				return rmap.find(symbol) != rmap.end();
-				});
-
-			if (bHoga == false && !(alertR->stat & alert_SCR))
-				return 0;*/
-
+#ifdef DF_RTS_TIMER
+			if (m_iTime > 0)
+				RTS_RecvRTSx(lParam);
+			else
+				m_pGroupWnd->RecvRTSxDirect(lParam);
+#elif defined(DF_NEW_REALPROCESS)
+			m_pGroupWnd->RecvRTSxDirect(lParam);
+#else
 			m_pGroupWnd->initAlert();
 			AxStd::async([this, lParam]() {
 				m_pGroupWnd->RecvRTSx(lParam);
 				});
 			m_pGroupWnd->UpdateDraw();
+#endif
 		}
-	
-		
 	}
 	break;
 	// KSJ 
@@ -1103,15 +1131,11 @@ bool CMainWnd::ShouldSkipRTSByServerTime(
 {
 	if (!pServerTime)
 	{
-		m_slog.Format("[IB202200][skipped]!!!!!!!pServerTime null");
-		Output_DebugString(m_slog);
 		return false;
 	}
 
 	if (minIntervalSec <= 0)
 	{
-		m_slog.Format("[IB202200][skipped]!!!!!!! minIntervalSec null");
-		Output_DebugString(m_slog);
 		return false;
 	}
 	
@@ -1126,8 +1150,6 @@ bool CMainWnd::ShouldSkipRTSByServerTime(
 	if (it == m_lastRTSTimeMap.end())
 	{
 		m_lastRTSTimeMap.emplace(code, curServerTime);
-		m_slog.Format("[IB202200][NOskipped] 첫수신 통과  code=[%s]  m_lastRTSTimeMap size = [%d] ", (LPCTSTR)&code, m_lastRTSTimeMap.size());
-		Output_DebugString(m_slog);
 		return false;
 	}
 
@@ -1138,14 +1160,9 @@ bool CMainWnd::ShouldSkipRTSByServerTime(
 
 	if (diffSec < minIntervalSec)
 	{
-		m_slog.Format("[IB202200][skipped]!!!!!!! code=[%s] diffSec=[%d] minIntervalSec=[%d]", (LPCTSTR)&code, diffSec, minIntervalSec);
-	   Output_DebugString(m_slog);
 		return true;
 	}
 
-	// 통과 → 마지막 시간 갱신
-	//m_slog.Format("[IB202200][NOskipped]@@@@@ code=[%s] diffSec=[%d] minIntervalSec=[%d]", (LPCTSTR)&code, diffSec, minIntervalSec);
-	//Output_DebugString(m_slog);
 	it->second = curServerTime;  //이코드가 시간이 걸린다
 	return false;
 }
@@ -1183,11 +1200,6 @@ void CMainWnd::parsingTrigger(CString datB)
 	strDataB = datB;
 	symbol = IH::Parser(datB, "\t");
 
-	//m_slog.Format("\r\n[interest][IB202200] -------------------------------------");
-	//OutputDebugString(m_slog);
-	//m_slog.Format("\r\n[interest][IB202200][%s]  symbol=[%s] strDataB=[%s] m_bProc =[%d]", __FUNCTION__, symbol, strDataB, m_bProc);
-	//OutputDebugString(m_slog);
-
 	if (symbol == _T("OnPortfolio") && datB == _T("ok"))
 	{
 		CheckRTSTimer(false);
@@ -1208,8 +1220,6 @@ void CMainWnd::parsingTrigger(CString datB)
 			if (m_pGroupWnd->IsNewDrop())
 			{
 				m_bProc = false;
-//m_slog.Format("\r\n[interest][IB202200][%s]  parsingTrigger 인데 먼가 수정된 내용이 있어서 refresh를 하지 않음", __FUNCTION__);
-//OutputDebugString(m_slog);
 				return;
 			}
 			const int ret = (int)m_pToolWnd->SendMessage(WM_MANAGE, MK_SETUPOK);
@@ -1293,11 +1303,6 @@ void CMainWnd::init()
 	m_user = Variant(nameCC);
 	m_id = Variant(userCC);
 	m_pBrush = getAxBrush(RGB(100, 100, 100));
-
-
-	// EZIni optionIni(AxStd::FORMAT("%s/%s/InterOption.ini", m_home, "tab"));	
-	// m_iTime = optionIni["SCUSTOMER"]["TIME"] << "300";
-	// _pApp->setDelaytime(m_iTime);
 
 	EZIni BlinkIni(AxStd::FORMAT("%s/%s/%s/interField.ini", m_home, "user", m_user));
 	int index = BlinkIni["INTERFIELD"]["FLASHTYPE"];
@@ -1593,7 +1598,8 @@ LRESULT CMainWnd::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 		}
 		else if (!m_bUser9111)
 		{
-			m_pGroupWnd->SendMessage(WM_MANAGE, MAKEWPARAM(MK_INTSAVE, 1));
+			if(m_pGroupWnd)
+				m_pGroupWnd->SendMessage(WM_MANAGE, MAKEWPARAM(MK_INTSAVE, 1));
 		}
 
 		Sleep(150); // 2016.08.18 KSJ G보낸거 리턴받을 시간을 벌기 위해... 그래야 V를 보낼수 있다.
@@ -1613,7 +1619,8 @@ LRESULT CMainWnd::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 		wb = (char *)lParam;
 		sprintf(wb, m_strTag);
 
-		m_pGroupWnd->SendMessage(WM_MANAGE, MAKEWPARAM(MK_INTSAVE, 0));
+		if (m_pGroupWnd)
+			m_pGroupWnd->SendMessage(WM_MANAGE, MAKEWPARAM(MK_INTSAVE, 0));
 
 		Sleep(100); // 2016.08.18 KSJ G보낸거 리턴받을 시간을 벌기 위해... 그래야 V를 보낼수 있다.
 
@@ -1638,8 +1645,6 @@ LRESULT CMainWnd::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 
 			if (finder.FindFile(filepath))
 			{
-				// CString slog;
-				// slog.Format("[IB202200][CMainWnd::WindowProc] LASTSTAT 파일을 지우기 위함이다..? WM_USER+9333 = [%s] \n", filepath);
 				::DeleteFile(filepath);
 			}
 
@@ -1818,7 +1823,7 @@ void CMainWnd::SendOper(class CSendData *sdata)
 		stdata = CString(sdata->GetData(), sdata->GetDataLen());
 		sgubn = stdata.Left(1);
 		scode = stdata.Mid(17, 16).Trim();
-		sendTR(sdata->GetTRCODE(), sdata->GetData(), sdata->GetDataLen(), sdata->GetDataKey());
+		//sendTR(sdata->GetTRCODE(), sdata->GetData(), sdata->GetDataLen(), sdata->GetDataKey());
 		
 		if (sgubn == "S")  //메모 조회면 
 			m_mapMemoCode.SetAt(scode, "0");
@@ -2054,6 +2059,19 @@ void CMainWnd::OnTimer(UINT nIDEvent)
 			{
 				const int nKey = m_pWnd->SendMessage(WM_USER, MAKEWPARAM(variantDLL, majorCC), NULL);
 				m_strTag.Format("%d", nKey);
+
+				CString strCfg, filepath;
+				strCfg.Format("intercfg%s.ini", m_strTag);
+				filepath.Format("%s\\%s\\%s\\%s", m_home, USRDIR, m_user, strCfg);
+
+				CString basefile;
+				basefile.Format("%s\\%s\\%s\\%s", m_home, USRDIR, m_user, FILE_CONFIG);
+
+				CFileFind finder;
+				if (finder.FindFile(basefile))
+				{
+					::CopyFile(basefile, filepath, FALSE);
+				}
 			}
 
 			Variant(titleCC, "관심종목");
@@ -2061,6 +2079,9 @@ void CMainWnd::OnTimer(UINT nIDEvent)
 			loadinfo();
 			CreateChild(); // ontimer
 			SetPallette();
+			ResizeOper(m_size.cx, m_size.cy);
+			SetTimer(TM_FOCUSFIX, 1000, nullptr);
+			return;
 		}
 		Invalidate(false);
 
@@ -2069,8 +2090,82 @@ void CMainWnd::OnTimer(UINT nIDEvent)
 		if (m_bDominoToolWnd && m_pToolWnd != nullptr)
 			m_pToolWnd->SendMessage(WM_MANAGE, MAKEWPARAM(MK_SELECTGROUP, (LPARAM)m_nGroupIndex));
 	}
+	else if (nIDEvent == TM_FOCUSFIX)
+	{
+		KillTimer(TM_FOCUSFIX);
+		Invalidate(false);
+
+		if (m_pToolWnd != nullptr)
+			m_pToolWnd->PostMessage(WM_MANAGE, MAKEWPARAM(MK_SELECTGROUP, (LPARAM)1));  //독립해서 화면 복사하면 화면키가 기존 incfg%d.ini 에 없어서.. 그냥 1번 그룹디폴트
+
+	}
+	else if (nIDEvent == TM_RTSTIME)
+	{
+		if (m_pGroupWnd != nullptr && !_mapRealData.empty())
+		{
+			for (auto& kv : _mapRealData)
+			{
+				_Ralert* pval = kv.second.get();
+
+				DWORD data[999]{};
+				for (int ii = 0; ii < 999; ++ii)
+				{
+					if (pval->ptr[ii])
+						data[ii] = reinterpret_cast<DWORD>(pval->ptr[ii].get());
+				}
+
+				_alertR alertR{};
+				alertR.code = pval->code.c_str();
+				alertR.stat = pval->stat;
+				alertR.size = pval->size;
+				alertR.ptr[0] = reinterpret_cast<DWORD>(data);
+
+				m_pGroupWnd->RecvRTSxDirect(reinterpret_cast<LPARAM>(&alertR));
+			}
+			_mapRealData.clear();
+		}
+	}
 	CWnd::OnTimer(nIDEvent);
 }
+
+#ifdef DF_RTS_TIMER
+void CMainWnd::RTS_RecvRTSx(LPARAM lParam)
+{
+	if (m_pGroupWnd == nullptr)
+		return;
+
+	const auto* alertR = reinterpret_cast<const _alertR*>(lParam);
+	if (alertR == nullptr)
+		return;
+
+	const DWORD* data = reinterpret_cast<const DWORD*>(alertR->ptr[0]);
+	if (data == nullptr)
+		return;
+
+	const std::string scode = CStringA(alertR->code);
+
+	auto it = _mapRealData.find(scode);
+	if (it == _mapRealData.end())
+	{
+		auto res = _mapRealData.emplace(scode, std::make_unique<_Ralert>());
+		it = res.first;
+		it->second->code = scode;
+	}
+	it->second->stat = alertR->stat;
+	it->second->size = alertR->size;
+
+	for (int ii = 0; ii < 999; ++ii)
+	{
+		const char* pdata = reinterpret_cast<const char*>(data[ii]);
+		if (pdata == nullptr)
+			continue;
+
+		const size_t len = strlen(pdata) + 1;
+		it->second->ptr[ii] = std::make_unique<char[]>(len);
+		memcpy(it->second->ptr[ii].get(), pdata, len);
+	}
+}
+#endif
 
 //////////////////////////////////////////////////////////////////////////
 //장운영시간 조회
@@ -2297,11 +2392,6 @@ bool CMainWnd::isIPInRange(CString ip, CString network_s, CString network_e)
 
 void CMainWnd::Request_GroupList()
 {
-//	m_slog.Format("\r\n[interest][IB202200] -------------------------------------");
-//	OutputDebugString(m_slog);
-//	m_slog.Format("\r\n[interest][IB202200][%s]", __FUNCTION__);
-//	OutputDebugString(m_slog);
-
 	int	sendL = 0;
 	std::string sendB;
 	sendB.resize(16 * 1024);
@@ -2321,11 +2411,6 @@ void CMainWnd::Request_GroupList()
 
 void CMainWnd::Request_GroupCode(int iseq)
 {
-//	m_slog.Format("\r\n[interest][IB202200] -------------------------------------");
-//	OutputDebugString(m_slog);
-//	m_slog.Format("\r\n[interest][IB202200][%s]  iseq =%d", __FUNCTION__, iseq);
-//	OutputDebugString(m_slog);
-
 	const int index = iseq;
 	int sendL = 0;
 	CString stmp;
@@ -2359,18 +2444,9 @@ void CMainWnd::receiveOub(int key, CString data)
 
 	if (key == TRKEY_GROUP)
 	{
-//		m_slog.Format("\r\n[interest][IB202200] -------------------------------------");
-//		OutputDebugString(m_slog);
-//		m_slog.Format("\r\n[interest][IB202200] 그룹리스트  조회결과");
-//		OutputDebugString(m_slog);
-
 		const int cnt = atoi(data.Left(4));
 		data = data.Mid(4);
 		data.Trim();
-
-//		m_slog.Format("\r\n[interest][IB202200] data =[%s]", data);
-//		OutputDebugString(m_slog);
-
 
 		if (!data.IsEmpty() && cnt > 0)
 		{
@@ -2384,8 +2460,6 @@ void CMainWnd::receiveOub(int key, CString data)
 			for_each(groupList.begin(), groupList.end(), [&](auto item) {
 				const CString groupKey = CString(item.ngrs, 2).Trim();
 				const CString groupName = CString(item.gnam, 30).Trim();
-//m_slog.Format("\r\n[interest][IB202200] groupKey =[%s]  groupName=[%s]", groupKey, groupName);
-//OutputDebugString(m_slog);
 				vGroupName.emplace_back(std::make_pair(groupName, groupKey));
 			});
 
@@ -2402,13 +2476,6 @@ void CMainWnd::receiveOub(int key, CString data)
 				for_each(vGroupName.begin(), vGroupName.end(), [&](const auto item) {
 					map.emplace(std::make_pair(atoi(item.second), item.first));
 				});
-
-		
-				// CString stmp;
-				// for_each(m_pGroupWnd->_GroupName.begin(), m_pGroupWnd->_GroupName.end(), [&](const auto item) {
-				// 	stmp.Format("\r\n[interest][IB202200] _GroupName [%d] [%s]", item.first, item.second);
-				// 	OutputDebugString(stmp);
-				// });
 
 				m_pGroupWnd->SelectOper();
 				if (!_bInit)
@@ -2483,11 +2550,6 @@ bool CMainWnd::IsEnableRTSTimeCheck(
 		return false;
 
 	const CTimeSpan diff = currentTime - baseTime;
-
-	//CString slog;
-	//slog.Format("[IB202200][IsEnableRTSTimeCheck] checkTimeSec=[%d] deff=[%llu] m_strBeginTimeEnd=[%s]",
-	//	checkTimeSec, diff.GetTotalMinutes(), m_strBeginTimeEnd);
-	//OutputDebugString(slog);
 
 	if (diff.GetTotalSeconds() < 0) 
 		return false;

@@ -188,6 +188,8 @@ public: // RTM
 	CTime ParseRTSTime(const CString& sTime, const COleDateTime& today);
 	std::unordered_map<std::string, CTime> m_lastRTSTimeMap;
 	bool ShouldSkipRTSByServerTime(const std::string& code, const char* pServerTime, int  minIntervalSec);
+	void RTS_RecvRTSx(LPARAM lParam);
+	std::unordered_map<std::string, std::unique_ptr<_Ralert>> _mapRealData;
 private:			 
 
 private:

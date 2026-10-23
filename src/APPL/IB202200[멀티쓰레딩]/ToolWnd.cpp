@@ -119,8 +119,8 @@ void CToolWnd::OperInit()
 
 	_cbAuto = std::make_unique<CComboBox>();
 	_cbAuto->Create(WS_VSCROLL |CBS_DROPDOWN, CRect(0, 0, 0, 0), this, IDC_CB_AUTO);
-	_cbAuto->AddString("자 동");
-	_cbAuto->AddString("예 상");
+	_cbAuto->AddString("자동");
+	_cbAuto->AddString("예상");
 	_cbAuto->AddString("정규장");
 	_cbAuto->SetCurSel(0);
 	_cbAuto->SetFont(m_pFont);

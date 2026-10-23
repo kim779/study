@@ -468,8 +468,8 @@ protected:
 
 	BOOL				m_bMargin;
 	CMapStringToString		m_mapMargin;
-	CNewMenu			m_menuHeader;   
-	CNewMenu			m_menuSubHeader; 
+	CNewMenu			m_menuHeader;
+	CNewMenu			m_menuSubHeader;
 	BOOL				m_bSorting;
 	COLORREF			m_clrMarkerBKG;
 	COLORREF			m_clrMarkerTXT;
@@ -520,9 +520,9 @@ public:
 	void initgridalert(bool bsend = true);
 
 #ifdef DF_SESSION_EXPECT
-	int _marketType = 0;   // MK_MARKET 캐시 (1=KRX,2=NXT,3=TOTAL,4=NXT/KRX)
-	int _krxSession = 0;   // 실시간 data[298] 최신값
-	int _nxtSession = 0;   // 실시간 data[299] 최신값
+	int _marketType = 0;
+	int _krxSession = 0;
+	int _nxtSession = 0;
 	bool IsExpectSession() const;
 #endif
 };

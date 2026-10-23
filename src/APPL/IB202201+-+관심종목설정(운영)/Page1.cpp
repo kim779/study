@@ -51,7 +51,6 @@ constexpr	int xKOSPIUP = 50, xKOSDAQUP = 51, xKOSPIex = 52, xKOSDAQex = 53;
 
 constexpr       int xGOODSTOCK = 122;
 constexpr       int xNXT = 123;
-constexpr       int xBDC = 124;
 
 constexpr struct _exKospi {
 	char* code{};
@@ -388,7 +387,7 @@ BOOL CPage1::OnInitDialog()
 	rec.OffsetRect(-15, 0);
 	m_btnClear->MoveWindow(rec);
 	return TRUE;  // return TRUE unless you set the focus to a control
-	              // EXCEPTION: OCX Property Pages should return FALSE
+	              // EXCEPTION OCX Property Pages should return FALSE
 }
 
 
@@ -1073,15 +1072,6 @@ void CPage1::SelectTree(int selItem)
 		m_Radio_ELWPut.ShowWindow(SW_HIDE);
 		xNxtList();
 		break;
-	case xBDC:
-	{
-		m_search.SetWindowText("");
-		m_Radio_ELWAll.ShowWindow(SW_HIDE);
-		m_Radio_ELWCall.ShowWindow(SW_HIDE);
-		m_Radio_ELWPut.ShowWindow(SW_HIDE);
-		xBDCkToList();
-	}
-	break;
 	default:
 		m_Radio_ELWAll.ShowWindow(SW_HIDE);
 		m_Radio_ELWCall.ShowWindow(SW_HIDE);
@@ -1556,10 +1546,6 @@ void CPage1::OnEditgroup()
 		//서버에 전송
 		CWnd* wnd = GetParent()->GetParent();
 		wnd->SendMessage(TOmapWnd, MAKEWPARAM(upEachGroupACTION, m_activegno-1), 0);
-
-		m_slog.Format("\r\n[interest][IB202201][%s] m_activegno=[%d] combo=[%d]",
-			__FUNCTION__, m_activegno, m_gname.GetCount());
-		OutputDebugString(m_slog);
 	}
 
 	m_bIsEdit = TRUE;
@@ -1907,8 +1893,6 @@ void CPage1::initTree()
 	m_tree.SetItemData(m_tree.InsertItem(_T("ETN"), hRoot, TVI_LAST), xETNCODE);	//2013.06.25 KSJ 코넥스 추가
 
 	m_tree.SetItemData(m_tree.InsertItem(_T("상장형수익증권"), hRoot, TVI_LAST), xGOODSTOCK);	//25.06.12 상장형수익증권 추가
-
-	m_tree.SetItemData(m_tree.InsertItem(_T("BDC"), hRoot, TVI_LAST), xBDC);	//25.06.12 상장형수익증권 추가
 
 	m_tree.SetItemData(m_tree.InsertItem(_T("리츠"), hRoot, TVI_LAST), xRITS);	//20240422 리츠
 	
@@ -2716,8 +2700,9 @@ void CPage1::searchAction(int column)
 		m_bAddAll = SearchData(m_cbSearch.GetCurSel(), string, m_bAddAll);
 		const int icnt = m_list1.GetItemCount();
 
-//		m_slog.Format("[interest][IB202201][search2][%s]   sTitle =[%s] icnt=[%d] m_bAddAll=[%d]", __FUNCTION__, string, icnt, m_bAddAll);
-//		OutputDebugString(m_slog);
+		//m_slog.Format("[interest][IB202201][search2][%s] 이름검색  sTitle =[%s] icnt=[%d] m_bAddAll=[%d] 리스트  사이즈=[%d]",
+		//	__FUNCTION__, string, icnt, m_bAddAll, icnt);
+		//OutputDebugString(m_slog);
 
 		if (m_list1.GetItemCount() > 0)
 		{
@@ -3978,40 +3963,6 @@ int CPage1::xSinjuCodeToList()
 		auto& item = _vList.emplace_back(std::move(CITEMS()));
 		item.code = CString(hjcode.code, HCodeLen);
 		item.name = CString(hjcode.name, HNameLen);
-	}
-	//speed
-	m_list1.SetItemCountEx(_vList.size());
-	m_list1.Invalidate();
-	//@speed
-	return 0;
-}
-
-int CPage1::xBDCkToList()
-{
-	CString slog;
-	ClearListitem();
-	m_list1.DeleteAllItems();
-
-	_shjcode   hjcode;
-	for (int ii = 0; ii < m_hjcode.GetSize(); ii++)
-	{
-		hjcode = m_hjcode.GetAt(ii);
-
-		switch (hjcode.ssgb)
-		{
-		case jmBDCPST:
-		case jmBDCICY:
-			slog.Format("%s", CString(hjcode.name, HNameLen));
-			break;
-
-		default:
-			continue;
-		}
-
-		auto& item = _vList.emplace_back(std::move(CITEMS()));
-		item.code = CString(hjcode.code, HCodeLen);
-		item.name = CString(hjcode.name, HNameLen);
-
 	}
 	//speed
 	m_list1.SetItemCountEx(_vList.size());
@@ -6139,7 +6090,7 @@ void CPage1::OnShareimport()
 		CString temp;	
 		temp.Format("%02d", m_activegno);
 		
-		if (m_activegno > 1)
+		if (m_activegno >= 1)
 		{
 			m_manageGroup[m_activegno - 1][0] = temp;
 			m_manageGroup[m_activegno - 1][1] = "N";
@@ -6164,7 +6115,7 @@ void CPage1::OnShareimport()
 			ClearInterest();
 
 			//gsl::span<_inters> spanInter((_inters*)sBuffer.GetBuffer(), maxJONGMOK);	
-			const int itemCount = min((int)(len / sizeof(_inters)), maxJONGMOK);   // 실제 들어있는 레코드 수만큼만
+			const int itemCount = min((int)(len / sizeof(_inters)), maxJONGMOK);
 			gsl::span<_inters> spanInter((_inters*)sBuffer.GetBuffer(), itemCount);
 			for (auto& item :spanInter)
 			{
@@ -7370,14 +7321,6 @@ void CPage1::receiveOub(int key, CString data)
 
 			});		
 			initCombo();
-
-			if (cnt <= 0)                             // no group left
-			{
-				m_activegno = -1;
-				m_list2.DeleteAllItems();
-				break;
-			}
-
 			m_activegno = 1; //test mod
 			CWnd* wnd = GetParent()->GetParent();
 			wnd->SendMessage(TOmapWnd, MAKEWPARAM(dnGROUPCODE, 0), m_activegno);
@@ -7653,6 +7596,9 @@ bool CPage1::SearchData(int kind, CString sName, bool bAddAll)
 	CString name;
 	if (sName.GetAt(0) & 0x80000000)	// 한글로 시작하는...
 	{	
+	/*	m_slog.Format("[interest][IB202201][search2][%s] 한글로 시작한다  sName=[%s]", __FUNCTION__, sName);
+		OutputDebugString(m_slog);*/
+
 		for_each(_vListCopy.begin(), _vListCopy.end(), [&](const auto& hjc){
 			name = hjc.name;
 			name.TrimRight();
@@ -7720,6 +7666,8 @@ bool CPage1::SearchData(int kind, CString sName, bool bAddAll)
 	}
 	else	// 종목코드순 후에 영문명순
 	{
+	/*	m_slog.Format("[interest][IB202201][search2][%s] 한글은 아니다  sName=[%s]", __FUNCTION__, sName);
+		OutputDebugString(m_slog);*/
 	 	sName.MakeUpper();
 	 	for_each(_vListCopy.begin(), _vListCopy.end(), [&](const auto& hjc){
 			name = hjc.name;

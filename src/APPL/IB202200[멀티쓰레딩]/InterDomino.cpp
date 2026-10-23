@@ -197,6 +197,9 @@ BOOL CInterDomino::OnInitDialog()
 		m_strCode[ii][1] = name;
 		m_strCode[ii][2] = type;
 
+		if (m_maxCount == ii)
+			break;
+
 		m_ListBox.AddString(name);
 	}
 	
@@ -207,7 +210,8 @@ BOOL CInterDomino::OnInitDialog()
 		m_strCode[ii][3] = "1";
 	}
 
-	m_staticCount.Format("%d", m_maxCount);
+	//m_staticCount.Format("%d", m_maxCount);
+	m_staticCount.Format("%d", m_ListBox.GetCount());
 	UpdateData(FALSE);
 
 	return TRUE;  // return TRUE  unless you set the focus to a control

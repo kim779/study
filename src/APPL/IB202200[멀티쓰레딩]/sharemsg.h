@@ -734,8 +734,7 @@ enum _xKIND {
 		xSINTAKST,  //20240422 신탁수익증권
 		xTUSACONST,  //20240422 투자계약증권
 		xGOODSTOCK,   //25.06.12 상장형수익증권
-		xNXT,
-		xBDC
+		xNXT
 };
 
 enum _colINDEX

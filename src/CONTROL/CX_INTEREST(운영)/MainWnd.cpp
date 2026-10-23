@@ -953,13 +953,12 @@ LONG CMainWnd::OnUser(WPARAM wParam, LPARAM lParam)
 
 		//if (bHoga == false && !(alertR->stat & alert_SCR))
 		//	return 0;
-
 #ifdef DF_RTS_TIMER
 		if (m_iTime > 0)
-			RTS_RecvRTSx(lParam);		// 캐시에 저장, TM_RTSTIME 타이머에서 flush
+			RTS_RecvRTSx(lParam);
 		else
-			m_pGroupWnd->RecvRTSxDirect(lParam);	// 실시간 설정(0ms)이면 즉시처리
-#elif defined(DF_NEW_REALPROCESS)
+			m_pGroupWnd->RecvRTSxDirect(lParam);
+#elif DF_NEW_REALPROCESS
 		m_pGroupWnd->RecvRTSxDirect(lParam);
 #else
 		m_pGroupWnd->initAlert();
@@ -1669,16 +1668,10 @@ void CMainWnd::OnTimer(UINT nIDEvent)
 		}
 	}
 #endif
-
-
 	CWnd::OnTimer(nIDEvent);
 }
 
 #ifdef DF_RTS_TIMER
-// DF_RTS_TIMER용 - raw data[] 슬롯(0~998)을 있는 그대로 깊은복사해서 캐시에 저장.
-// 어떤 슬롯이 어떤 필드를 의미하는지(w/bNeedMap, FwdMap 매핑)는 전혀 판단하지 않는다 -
-// TM_RTSTIME 타이머(OnTimer)에서 flush되며, flush 시 기존 parsingAlertx()를 그대로
-// 재사용하므로 해석은 100% parsingAlertx()가 담당한다.
 void CMainWnd::RTS_RecvRTSx(LPARAM lParam)
 {
 	if (m_pGroupWnd == nullptr)
@@ -1718,7 +1711,7 @@ void CMainWnd::RTS_RecvRTSx(LPARAM lParam)
 #endif
 
 //////////////////////////////////////////////////////////////////////////
-//장운영시간 조회
+//장운영시간 조회 
 void CMainWnd::RequestMarketTime()
 {
 	CSendData	sdata;
@@ -2515,12 +2508,18 @@ void CMainWnd::CheckRTSTimer(bool bFirst)
 			if (iTime != m_iTime)  //실시간 데이터 수신 설정률이 변한 경우만 타이머 다시 세팅
 			{
 				m_iTime = iTime;
+#ifdef DF_RTS_TIMER
+				KillTimer(TM_RTSTIME);
+				SetTimer(TM_RTSTIME, m_iTime, nullptr);
+#endif
 			}
 		}
 		else  //최초 화면 오픈하였을 경우
 		{
 			m_iTime = iTime;
+#ifdef DF_RTS_TIMER
 			SetTimer(TM_RTSTIME, m_iTime, nullptr);
+#endif
 		}
 		//_pApp->setDelaytime(m_iTime);
 		ichk = GetPrivateProfileInt("STAFF", "cReal", 0, filePath);
@@ -2543,6 +2542,10 @@ void CMainWnd::CheckRTSTimer(bool bFirst)
 				m_slog.Format("[IB202200][CheckRTSTimer2] KillTimer 고객용 iTime=[%d] m_iTime=[%d]", iTime, m_iTime);
 				Output_DebugString(m_slog);
 				m_iTime = iTime;
+#ifdef DF_RTS_TIMER
+				KillTimer(TM_RTSTIME);
+				SetTimer(TM_RTSTIME, m_iTime, nullptr);
+#endif
 			}
 		}
 		else  //최초 화면 오픈하였을 경우
@@ -2552,7 +2555,7 @@ void CMainWnd::CheckRTSTimer(bool bFirst)
 			SetTimer(TM_RTSTIME, m_iTime, nullptr);
 #endif
 		}
-
+		
 		ichk = GetPrivateProfileInt("CUSTOMER", "cReal", 0, filePath);
 		if (ichk)
 			m_iTime = 0;
@@ -2586,6 +2589,10 @@ void CMainWnd::CheckRTSTimer(bool bFirst)
 					if (iTime != m_iTime)  //실시간 데이터 수신 설정률이 변한 경우만 타이머 다시 세팅
 					{
 						m_iTime = iTime;
+#ifdef DF_RTS_TIMER
+						KillTimer(TM_RTSTIME);
+						SetTimer(TM_RTSTIME, m_iTime, nullptr);
+#endif
 					}
 				}
 				else  //최초 화면 오픈하였을 경우
@@ -2595,7 +2602,7 @@ void CMainWnd::CheckRTSTimer(bool bFirst)
 					SetTimer(TM_RTSTIME, m_iTime, nullptr);
 #endif
 				}
-
+				
 				ichk = GetPrivateProfileInt("SCUSTOMER", "cReal", 0, filePath);
 				if (ichk)
 					m_iTime = 0;
@@ -2611,6 +2618,10 @@ void CMainWnd::CheckRTSTimer(bool bFirst)
 		if (iTime != m_iTime)  //실시간 데이터 수신 설정률이 변한 경우만 타이머 다시 세팅
 		{
 			m_iTime = iTime;
+#ifdef DF_RTS_TIMER
+			KillTimer(TM_RTSTIME);
+			SetTimer(TM_RTSTIME, m_iTime, nullptr);
+#endif
 		}
 	}
 	else  //최초 화면 오픈하였을 경우
@@ -2618,11 +2629,9 @@ void CMainWnd::CheckRTSTimer(bool bFirst)
 		m_iTime = iTime;
 #ifdef DF_RTS_TIMER
 		SetTimer(TM_RTSTIME, m_iTime, nullptr);
-#else
-		//SetTimer(TM_RTSTIME, m_iTime, nullptr);
 #endif
 	}
-
+	
 	ichk = GetPrivateProfileInt("CUSTOMER", "cReal", 0, filePath);
 	if (ichk)
 		m_iTime = 0;

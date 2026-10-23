@@ -453,7 +453,7 @@ protected:
 
 	int m_nCount;			  // 2013.04.22 KSJ 그리드 카운트
 
-	HINSTANCE m_hSignalMng;
+	HINSTANCE m_hSignalMng{};
 
 	// win10
 	bool m_bSkipRTS;
@@ -472,6 +472,10 @@ public:
 
 	std::unordered_map<int, int>	_mRsymbol;
 	std::map<CString, int>		_mapSymbol;
+	std::map<CString, CString> m_mapCodeName{};
+
+	std::map<CString, int> m_mapRtCallCount;  // code별 1분 누적 호출 횟수
+	int m_nRtLogMinute = -1;                  // 마지막 로그 기록한 분 (hour*60+min)
 
 	void parsingAlertx(LPARAM lParam);
 	void initRSymbol();
@@ -484,4 +488,11 @@ public:
 	int _typeAuto = 0;
 	void initgridalert();
 	void setMemo();
+
+#ifdef DF_SESSION_EXPECT
+	int _marketType = 0;
+	int _krxSession = 0;
+	int _nxtSession = 0;
+	bool IsExpectSession() const;
+#endif
 };

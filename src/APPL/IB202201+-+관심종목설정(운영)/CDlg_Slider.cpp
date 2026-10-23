@@ -163,7 +163,6 @@ void CDlg_Slider::LoadRate()
 				m_bOldReal = (ichk != 0);
 				if (ichk)
 					((CButton*)GetDlgItem(IDC_CK_REAL))->SetCheck(BST_CHECKED);
-
 				UpdateSliderByCheckState();
 				return;
 			}
@@ -178,7 +177,6 @@ void CDlg_Slider::LoadRate()
 	m_bOldReal = (ichk != 0);
 	if (ichk)
 		((CButton*)GetDlgItem(IDC_CK_REAL))->SetCheck(BST_CHECKED);
-
 	UpdateSliderByCheckState();
 }
 
@@ -417,16 +415,13 @@ void CDlg_Slider::OnBnClickedOk()
 	CDialog::OnOK();
 }
 
-
 void CDlg_Slider::OnBnClickedCkReal()
 {
-	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
 	UpdateSliderByCheckState();
 }
-
 
 void CDlg_Slider::UpdateSliderByCheckState()
 {
 	BOOL bChecked = ((CButton*)GetDlgItem(IDC_CK_REAL))->GetCheck() == BST_CHECKED;
-	m_slider.EnableWindow(!bChecked);  // üũ ON -> �����̴� ��Ȱ��, üũ OFF -> Ȱ��
+	m_slider.EnableWindow(!bChecked);
 }

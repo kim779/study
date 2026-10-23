@@ -104,6 +104,7 @@ Dim r_stat, r_jmno, r_ojno, row_F, row_O, r_stopPrc, r_stopStat
 	End If
 
 	row_F = Find_Row(r_jmno)
+	SYSTEM.Trace "sCont_Notice row_F = " & row_F 
 ' ********* 동일한 주문번호가 존재하는 경우 *********
 	If row_F > 0 Then
 		If r_stat = "체결" Then
@@ -112,7 +113,9 @@ Dim r_stat, r_jmno, r_ojno, row_F, row_O, r_stopPrc, r_stopStat
 			RTSGRID.RemoveRow 0
 			Exit Sub
 		ElseIf r_stat = "정정확인" Or r_stat = "취소확인" Then
+		
 			row_O = Find_Row(r_ojno)
+	SYSTEM.Trace "sCont_Notice row_O = " & row_O 			
 '			If row_O > 0 And r_stat = "정정확인"	Then
 			If row_O > 0 Then
 					Modify_wqty(row_O)
@@ -160,12 +163,23 @@ SYSTEM.Trace ""
 SYSTEM.Trace ""
 SYSTEM.Trace "================ sNCont_Notice ==========================================="
 Dim r_stat, r_jmno, r_ojno, row_F, row_O, r_stopPrc, r_stopStat
+Dim SkipOrgOrde
 	r_stat = Trim(RTSGRID.GetGridCell(1, 11))					' 접수구분
 	r_jmno = Trim(RTSGRID.GetGridCell(1, 2))						' 주문번호
 	r_ojno = Trim(RTSGRID.GetGridCell(1, 3))						' 원주문번호
 	r_wqty = Trim(RTSGRID.GetGridCell(1, 8))						' 미체결수량
 	r_stopPrc = Trim(RTSGRID.GetGridCell(1, r_culSPrc))					' 스탑가격
 	r_stopStat = Trim(RTSGRID.GetGridCell(1, r_culSStat))					' 스탑유효
+	
+   SkipOrgOrder = False
+    If Not IsEmpty(20) Then                       ' only maps that define r_cul996
+        If Trim(RTSGRID.GetGridCell(1, 20)) = "13" _
+           And InStr(Trim(RTSGRID.GetGridCell(1, 7)), "GTP") > 0 _
+           And r_stat = "취소확인" Then
+            SkipOrgOrder = True
+            SYSTEM.Trace "GTP auto-cancel: skip original ojno=[" & r_ojno & "] jmno=[" & r_jmno & "]"
+        End If
+    End If	
 
 SYSTEM.Trace "r_stopPrc = [" & r_stopPrc & "] r_stopStat = [" & r_stopStat & "] r_stat = [" & r_stat & "]"
 
@@ -225,7 +239,13 @@ SYSTEM.Trace "row_F = [" & row_F & "]"
 '			If row_O > 0 And r_stat = "정정확인"	Then
 			If row_O > 0 Then
 					Modify_wqty(row_O)
-					If l_cdbl(Trim(VIEWGRID.GetGridCell (row_O, c_wqty))) < 1 Then
+					If row_O > 0 And SkipOrgOrder = False Then
+					    Modify_wqty(row_O)
+					    If l_cdbl(Trim(VIEWGRID.GetGridCell (row_O, c_wqty))) < 1 Then
+					        VIEWGRID.RemoveRow row_O-1
+					    End If
+					End If
+					If l_cdbl(Trim(VIEWGRID.GetGridCell (row_O, c_wqty))) < 1 && SkipOrgOrder = False Then
 							VIEWGRID.RemoveRow row_O-1
 					End If
 			End If
@@ -367,7 +387,7 @@ SYSTEM.Trace "row = [" & row & "]"
 		Else
 			VIEWGRID.SetGridCell row, c_code, Trim(RTSGRID.GetGridCell(1, 4))  			' 종목코드
 		End If
-		
+
 		VIEWGRID.SetGridCell row, c_hnam, Trim(RTSGRID.GetGridCell(1, 5))			' 종목명
 		VIEWGRID.SetGridCell row, c_wqty, Trim(RTSGRID.GetGridCell(1, 8))			' 미체결수량
 		VIEWGRID.SetGridCell row, c_dqty, Trim(RTSGRID.GetGridCell(1, 13))			' 체결수량

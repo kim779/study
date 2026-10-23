@@ -24,6 +24,7 @@ public:
 	CString m_sRoot{};
 	CString m_sName{};
 	void   FileMove();
+	void   FileDelete();
 	CString Variant(int comm, CString data);
 	CString Parser(CString& srcstr, CString substr);
 protected:

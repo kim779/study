@@ -687,6 +687,110 @@ void CintGrid::Blink(const int nRow, const int nCol, const ULONGLONG tick, CRect
 	}
 }
 
+long CintGrid::MakeBlinkKey(int row, int col) const
+{
+	return (row << 16) | (col & 0xFFFF);
+}
+
+void CintGrid::BlinkCell(int row, int col)
+{
+	if (_blinkType == 0)
+		return;
+
+	if (row < 0 || row >= GetRowCount())
+		return;
+
+	if (col < 0 || col >= GetColumnCount())
+		return;
+
+	if (IsCellAttribute(CIdCell(row, col), GVAT_HIDDEN))
+		return;
+
+	const long key = MakeBlinkKey(row, col);
+
+	auto it = _mapBlinkColor.find(key);
+	if (it != _mapBlinkColor.end())
+		return;
+
+	GVITEM item{};
+	item.row = row;
+	item.col = col;
+	item.mask = GVMK_FLASH;
+	item.flash = GVFL_FLASHED;
+	SetItem(&item);
+
+	BlinkItem blink{};
+	blink.tick = GetTickCount64();
+	_mapBlinkColor.emplace(key, blink);
+
+	InvalidateCellRect(CIdCell(row, col));
+}
+
+void CintGrid::BlinkRow(int row)
+{
+	if (_blinkType == 0)
+		return;
+
+	if (row < 0 || row >= GetRowCount())
+		return;
+
+	for (int col = colNAME; col < GetColumnCount(); col++)
+	{
+		if (IsCellAttribute(CIdCell(row, col), GVAT_HIDDEN))
+			continue;
+		BlinkCell(row, col);
+	}
+}
+
+void CintGrid::Blink(int row, int col)
+{
+	if (_blinkType == 0)
+		return;
+
+	if (_blinkType == 1)
+	{
+		BlinkCell(row, col);
+		return;
+	}
+
+	if (_blinkType == 2)
+	{
+		BlinkRow(row);
+		return;
+	}
+}
+
+void CintGrid::ProcessBlink()
+{
+	const ULONGLONG now = GetTickCount64();
+	std::vector<long> vErase;
+
+	for (auto& it : _mapBlinkColor)
+	{
+		const long key = it.first;
+		const BlinkItem& blink = it.second;
+		
+		if ((now - blink.tick) <= 500)
+			continue;
+
+		const int row = key >> 16;
+		const int col = key & 0xFFFF;
+
+		GVITEM item{};
+		item.row = row;
+		item.col = col;
+		item.mask = GVMK_FLASH;
+		item.flash = 0;
+		SetItem(&item);
+
+		InvalidateCellRect(CIdCell(row, col));
+		vErase.push_back(key);
+	}
+
+	for (long key : vErase)
+		_mapBlinkColor.erase(key);
+}
+
 // ADD PSH 20070912
 void CintGrid::SetMarginRatio(BOOL bMargin /* = TRUE */, BOOL bErase /* = TRUE */)
 { 
@@ -1302,67 +1406,75 @@ void CintGrid::OnTimer(UINT nIDEvent)
 
 	if (nIDEvent == TIMEFLASH)
 	{
-		if (_blinkType == 0)
-		 	return;
-
-		CRect rowRect = CRect(0,0,0,0);
-		concurrent_vector<long> vdel;
-		AxStd::async([&](){
-			for_each(_mapBlink.begin(), _mapBlink.end(), [this, &vdel, &rowRect](auto& pair)
-			{
-				// Do something with pair.first (key) and pair.second (value)
-				const ULONGLONG time = pair.second;
-				const long key       = pair.first;
-				
-				if ((GetTickCount64() - time) > 500)
-				{
-					GVITEM gvitem{};
-					gvitem.row = key / 100;
-					gvitem.col = key % 100;
-				
-					if (gvitem.col == 0)
-					{
-						for (int ii = colNAME; ii < GetColumnCount(); ii++)
-						{
-							CRect rc;
-
-							gvitem.col = ii;
-							gvitem.mask = GVMK_ATTR;
-							GetItem(&gvitem);
-							if (gvitem.attr & GVAT_HIDDEN)
-								continue;
-
-							GetItemRect(gvitem.row, ii, &rc);
-							rowRect.UnionRect(rowRect, rc);
-
-							gvitem.mask = GVMK_FLASH;
-							gvitem.flash = 0;
-							SetItem(&gvitem);	
-						}
-					}
-					else
-					{
-						gvitem.mask = GVMK_FLASH;
-						gvitem.flash = 0;
-						SetItem(&gvitem);			
-					}
-					vdel.push_back(key);
-				}
-			});
-		});
-
-		for (const auto& key : vdel)
-		{	
-			_mapBlink.erase(key);
-			if (key % 100 == 0)
-			{	
-				if(!rowRect.IsRectEmpty())
-					InvalidateRect(rowRect);	
-			}
-			else 
-				InvalidateCellRect(CIdCell{ key / 100, key % 100 });
+		if (1)
+		{
+			ProcessBlink();
+			return;
 		}
-		return;
+		else
+		{
+			if (_blinkType == 0)
+				return;
+
+			CRect rowRect = CRect(0, 0, 0, 0);
+			concurrent_vector<long> vdel;
+			AxStd::async([&]() {
+				for_each(_mapBlink.begin(), _mapBlink.end(), [this, &vdel, &rowRect](auto& pair)
+					{
+						// Do something with pair.first (key) and pair.second (value)
+						const ULONGLONG time = pair.second;
+						const long key = pair.first;
+
+						if ((GetTickCount64() - time) > 500)
+						{
+							GVITEM gvitem{};
+							gvitem.row = key / 100;
+							gvitem.col = key % 100;
+
+							if (gvitem.col == 0)
+							{
+								for (int ii = colNAME; ii < GetColumnCount(); ii++)
+								{
+									CRect rc;
+
+									gvitem.col = ii;
+									gvitem.mask = GVMK_ATTR;
+									GetItem(&gvitem);
+									if (gvitem.attr & GVAT_HIDDEN)
+										continue;
+
+									GetItemRect(gvitem.row, ii, &rc);
+									rowRect.UnionRect(rowRect, rc);
+
+									gvitem.mask = GVMK_FLASH;
+									gvitem.flash = 0;
+									SetItem(&gvitem);
+								}
+							}
+							else
+							{
+								gvitem.mask = GVMK_FLASH;
+								gvitem.flash = 0;
+								SetItem(&gvitem);
+							}
+							vdel.push_back(key);
+						}
+					});
+				});
+
+			for (const auto& key : vdel)
+			{
+				_mapBlink.erase(key);
+				if (key % 100 == 0)
+				{
+					if (!rowRect.IsRectEmpty())
+						InvalidateRect(rowRect);
+				}
+				else
+					InvalidateCellRect(CIdCell{ key / 100, key % 100 });
+			}
+			return;
+		}
 	}
 
 	if (nIDEvent != WM_LBUTTONDOWN )
@@ -3785,224 +3897,132 @@ BOOL CintGrid::RedrawCell(const CIdCell& cell, CDC* pDC)
 
 BOOL CintGrid::RedrawCell(int nRow, int nCol, CDC* pDC)
 {
-	if (0)
-	{
-		if (!_bVirtualDraw)
-			return FALSE;
-		// 빠른 유효성 검사	
-		if (nRow < 0 || nRow >= m_nRows || nCol < 0 || nCol >= m_nCols) {
-			return FALSE;
-		}
+	if (!_bVirtualDraw)
+		return FALSE;
+	// 빠른 유효성 검사	
+	if (nRow < 0 || nRow >= m_nRows || nCol < 0 || nCol >= m_nCols) {
+		return FALSE;
+	}
 
-		// 윈도우 핸들 체크 (가장 빠른 체크)
-		if (!GetSafeHwnd()) {
-			return FALSE;
-		}
+	// 윈도우 핸들 체크 (가장 빠른 체크)
+	if (!GetSafeHwnd()) {
+		return FALSE;
+	}
+#ifndef DF_NEW_REALPROCESS
+	// 캐시된 가시 영역 정보 사용 (함수 호출 최소화)
+	static CIdCell s_lastTlCell(-1, -1);
+	static CRangeCell s_lastVisCellRange;
+	static ULONGLONG s_lastUpdateTick = 0;
 
-		// 캐시된 가시 영역 정보 사용 (함수 호출 최소화)
-		static CIdCell s_lastTlCell(-1, -1);
-		static CRangeCell s_lastVisCellRange;
-		static ULONGLONG s_lastUpdateTick = 0;
+	const ULONGLONG currentTick = GetTickCount64();
+	if (currentTick - s_lastUpdateTick > 500) { // 500ms마다 업데이트
+		s_lastTlCell = GetTopleftNonFixedCell();
+		CRect visRect;
+		s_lastVisCellRange = GetVisibleNonFixedCellRange(visRect);
+		s_lastUpdateTick = currentTick;
+	}
 
-		const ULONGLONG currentTick = GetTickCount64();
-		if (currentTick - s_lastUpdateTick > 500) { // 500ms마다 업데이트
-			s_lastTlCell = GetTopleftNonFixedCell();
-			CRect visRect;
-			s_lastVisCellRange = GetVisibleNonFixedCellRange(visRect);
-			s_lastUpdateTick = currentTick;
-		}
+	const int minVisibleRow = s_lastTlCell.row;
+	const int minVisibleCol = s_lastTlCell.col;
+	const int maxVisibleRow = s_lastVisCellRange.GetMaxRow();
+	const int maxVisibleCol = s_lastVisCellRange.GetMaxCol();
 
-		const int minVisibleRow = s_lastTlCell.row;
-		const int minVisibleCol = s_lastTlCell.col;
-		const int maxVisibleRow = s_lastVisCellRange.GetMaxRow();
-		const int maxVisibleCol = s_lastVisCellRange.GetMaxCol();
+	if (nRow < minVisibleRow || nRow > maxVisibleRow ||
+		nCol < minVisibleCol || nCol > maxVisibleCol) {
+		return FALSE;
+	}
+#endif
+	// IsCellVisible 호출 최소화 - 범위 내에 있으면 대부분 보임
+	CRect rect;
+	if (!GetCellRect(nRow, nCol, rect)) {
+		return FALSE;
+	}
 
-		if (nRow < minVisibleRow || nRow > maxVisibleRow ||
-			nCol < minVisibleCol || nCol > maxVisibleCol) {
-			return FALSE;
-		}
+	// 빈 rect 체크 (빠른 반환)
+	if (rect.IsRectEmpty()) {
+		return FALSE;
+	}
 
-		// IsCellVisible 호출 최소화 - 범위 내에 있으면 대부분 보임
-		CRect rect;
-		if (!GetCellRect(nRow, nCol, rect)) {
-			return FALSE;
-		}
-
-		// 빈 rect 체크 (빠른 반환)
-		if (rect.IsRectEmpty()) {
-			return FALSE;
-		}
-
-		// colSIG 뉴스 컬럼만 InvalidateRect 호출 (필요시에만)
-		if (nCol == colSIG) {
-			InvalidateRect(rect, FALSE);
-			return TRUE;
-		}
-
-		const int key = nRow * 1000 + nCol;
-
-	
-		const auto& it = _mapFilterDraw.emplace(key, 1);
-
-		//m_slog.Format("[2022error]nRow=[%d] nCol=[%d]  key=[%d] size=[%d]  [%s]",
-		//	nRow, nCol, key, _mapFilterDraw.size(), it.second==true?"true":"false");
-		//OutputDebugString(m_slog);
-
-		if (it.second == false)
-		{
-			return FALSE;
-		}
-
-		//drawHolding 처리 최적화
-		if (m_drawHolding)
-		{
-			const auto it = _timeFilterCode.find(nRow);
-			const bool inserted = (it == _timeFilterCode.end());
-
-			if (inserted) {
-				_timeFilterCode[nRow] = currentTick;
-			}
-
-			//시간 차이 계산 최적화
-			const ULONGLONG diff = inserted ? m_iTime : (currentTick - it->second);
-			if (diff >= static_cast<ULONGLONG>(m_iTime)) {
-				if (!inserted) it->second = currentTick;
-
-				// Blink 처리 최적화
-				if (!inserted && _blinkType != 0 && _bReal) {
-					CRect blinkRect;
-					Blink(nRow, nCol, currentTick, blinkRect);
-					if (!blinkRect.IsRectEmpty()) {
-						rect.UnionRect(rect, blinkRect);
-					}
-				}
-
-				// Union 연산 최적화
-				if (!_filterRect.IsRectEmpty()) {
-					rect.UnionRect(rect, _filterRect);
-					_filterRect.SetRectEmpty();
-				}
-
-				m_drawRect.UnionRect(m_drawRect, rect);
-			}
-			else
-			{
-				_filterRect.UnionRect(_filterRect, rect);
-			}
-
-			return FALSE;
-		}
+	// colSIG 뉴스 컬럼만 InvalidateRect 호출 (필요시에만)
+	if (nCol == colSIG) {
+		InvalidateRect(rect, FALSE);
 		return TRUE;
 	}
-	else
+
+	if (!IsWindowVisible())
 	{
-		if (!_bVirtualDraw)
-			return FALSE;
-		// 빠른 유효성 검사	
-		if (nRow < 0 || nRow >= m_nRows || nCol < 0 || nCol >= m_nCols) {
-			return FALSE;
-		}
-
-		// 윈도우 핸들 체크 (가장 빠른 체크)
-		if (!GetSafeHwnd()) {
-			return FALSE;
-		}
-
-		// 캐시된 가시 영역 정보 사용 (함수 호출 최소화)
-		static CIdCell s_lastTlCell(-1, -1);
-		static CRangeCell s_lastVisCellRange;
-		static ULONGLONG s_lastUpdateTick = 0;
-
-		const ULONGLONG currentTick = GetTickCount64();
-		if (currentTick - s_lastUpdateTick > 500) { // 500ms마다 업데이트
-			s_lastTlCell = GetTopleftNonFixedCell();
-			CRect visRect;
-			s_lastVisCellRange = GetVisibleNonFixedCellRange(visRect);
-			s_lastUpdateTick = currentTick;
-		}
-
-		const int minVisibleRow = s_lastTlCell.row;
-		const int minVisibleCol = s_lastTlCell.col;
-		const int maxVisibleRow = s_lastVisCellRange.GetMaxRow();
-		const int maxVisibleCol = s_lastVisCellRange.GetMaxCol();
-
-		if (nRow < minVisibleRow || nRow > maxVisibleRow ||
-			nCol < minVisibleCol || nCol > maxVisibleCol) {
-			return FALSE;
-		}
-
-		// IsCellVisible 호출 최소화 - 범위 내에 있으면 대부분 보임
-		CRect rect;
-		if (!GetCellRect(nRow, nCol, rect)) {
-			return FALSE;
-		}
-
-		// 빈 rect 체크 (빠른 반환)
-		if (rect.IsRectEmpty()) {
-			return FALSE;
-		}
-
-		// colSIG 뉴스 컬럼만 InvalidateRect 호출 (필요시에만)
-		if (nCol == colSIG) {
-			InvalidateRect(rect, FALSE);
-			return TRUE;
-		}
-
-		const auto& it = _mapFilterDraw.emplace(nRow, nCol);
-		//m_slog.Format("[2022error]nRow=[%d] nCol=[%d]    [%s]",
-		//	nRow, nCol,   it.second == true ? "true" : "false");
+		//m_slog.Format("[IB202700][visible] false IsWindowVisible");
 		//OutputDebugString(m_slog);
-
-		if (it.second == false)
-		{
-			//AxStd::_Msg("RedrawCell Skip FilterDraw [%d,%d]", nRow, nCol);
-			//return FALSE;
-		}
-		// drawHolding 처리 최적화
-		if (m_drawHolding)
-		{
-			//AxStd::_Msg("RedrawCell Holding [%d,%d]", nRow, nCol);
-					//const ULONGLONG tick = GetTickCount64();			
-					// map 조회 최적화
-			const auto it = _timeFilterCode.find(nRow);
-			const bool inserted = (it == _timeFilterCode.end());
-
-			if (inserted) {
-				_timeFilterCode[nRow] = currentTick;
-			}
-
-			// Blink 처리 최적화
-			if (!inserted && _blinkType != 0 && _bReal) {
-				CRect blinkRect;
-				Blink(nRow, nCol, currentTick, blinkRect);
-				if (!blinkRect.IsRectEmpty()) {
-					rect.UnionRect(rect, blinkRect);
-				}
-			}
-
-			// 시간 차이 계산 최적화
-			const ULONGLONG diff = inserted ? m_iTime : (currentTick - it->second);
-			if (diff >= static_cast<ULONGLONG>(m_iTime)) {
-				if (!inserted) it->second = currentTick;
-
-				// Union 연산 최적화
-				if (!_filterRect.IsRectEmpty()) {
-					rect.UnionRect(rect, _filterRect);
-					_filterRect.SetRectEmpty();
-				}
-				m_drawRect.UnionRect(m_drawRect, rect);
-			}
-			else
-			{
-				_filterRect.UnionRect(_filterRect, rect);
-			}
-
-			return FALSE;
-		}
 		return TRUE;
-
 	}
-	
+
+	HWND hRoot = ::GetAncestor(m_hWnd, GA_ROOT);
+	if (hRoot && ::IsIconic(hRoot))
+	{
+		//m_slog.Format("[IB202700][visible] false iconic");
+		//OutputDebugString(m_slog);
+		return TRUE;
+	}
+
+	const auto& it = _mapFilterDraw.emplace(nRow, nCol);
+	//m_slog.Format("[2022error]nRow=[%d] nCol=[%d]    [%s]",
+	//	nRow, nCol,   it.second == true ? "true" : "false");
+	//OutputDebugString(m_slog);
+
+	if (it.second == false)
+	{
+		//AxStd::_Msg("RedrawCell Skip FilterDraw [%d,%d]", nRow, nCol);
+		//return FALSE;
+	}
+
+#ifdef DF_NEW_REALPROCESS
+	// 홀드/배치 누적 없이 즉시 그리기 - 데이터 누락 방지 우선
+	InvalidateRect(rect, FALSE);
+	return TRUE;
+#else
+	// drawHolding 처리 최적화
+	if (m_drawHolding)
+	{
+		//AxStd::_Msg("RedrawCell Holding [%d,%d]", nRow, nCol);
+				//const ULONGLONG tick = GetTickCount64();			
+				// map 조회 최적화
+		const auto it = _timeFilterCode.find(nRow);
+		const bool inserted = (it == _timeFilterCode.end());
+
+		if (inserted) {
+			_timeFilterCode[nRow] = currentTick;
+		}
+
+		// Blink 처리 최적화
+		if (!inserted && _blinkType != 0 && _bReal) {
+			CRect blinkRect;
+			Blink(nRow, nCol, currentTick, blinkRect);
+			if (!blinkRect.IsRectEmpty()) {
+				rect.UnionRect(rect, blinkRect);
+			}
+		}
+
+		// 시간 차이 계산 최적화
+		const ULONGLONG diff = inserted ? m_iTime : (currentTick - it->second);
+		if (diff >= static_cast<ULONGLONG>(m_iTime)) {
+			if (!inserted) it->second = currentTick;
+
+			// Union 연산 최적화
+			if (!_filterRect.IsRectEmpty()) {
+				rect.UnionRect(rect, _filterRect);
+				_filterRect.SetRectEmpty();
+			}
+			m_drawRect.UnionRect(m_drawRect, rect);
+		}
+		else
+		{
+			_filterRect.UnionRect(_filterRect, rect);
+		}
+
+		return FALSE;
+	}
+	return TRUE;
+#endif
 }
 
 CIdCell CintGrid::SetFocusCell(int nRow, int nCol)
@@ -5796,6 +5816,8 @@ BOOL CintGrid::SetItemText(int nRow, int nCol, LPCTSTR str)
 			{
 				pCell->dtext = dstr;
 				RedrawCell(nRow,colCURR);
+				RedrawCell(nRow, colEXPECT);
+				Blink(nRow, colCURR);
 				return TRUE;
 			}
 		}
@@ -5808,6 +5830,10 @@ BOOL CintGrid::SetItemText(int nRow, int nCol, LPCTSTR str)
 	//2016.03.30 KSJ 이전데이터와 같으면 다시 그리지 않는다.
 	//2016.04.20 KSJ 봉데이터가 이전데이터와 계속 같이 들어와서 우선 주석처리함 고가 저가를 저장하기때문에 같을수 밖에 없음....
 	//if(nCol == colNAME || nCol == colCURR || bBong)	RedrawCell(nRow,nCol);
+
+	if (_bReal && nRow >= m_nFixedRows)
+		Blink(nRow, nCol);
+
 	RedrawCell(nRow,nCol);
 
 	return TRUE;
@@ -10091,6 +10117,9 @@ int CintGrid::GetGridWidth()
 
 void CintGrid::endDrawHolding()
 { 	
+#ifdef DF_NEW_REALPROCESS
+	return;   // RedrawCell()이 즉시 그리므로 m_drawRect가 항상 비어있어 여기서 할 일 없음
+#endif
 	if (1)
 	{
 		const ULONGLONG tick = ::GetTickCount64();
