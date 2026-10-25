@@ -18,7 +18,7 @@ OCX_GUID = "{CDADD338-C7AB-4977-B65D-8E988B5958E3}"
 
 SERVER_LIST = [
     ("211.255.204.104", "UAT"),
-    ("211.255.204.70", "BP10")
+    #("211.255.204.70", "BP10"),
     #("211.255.204.71", "BP11"),
     #("211.255.204.72", "BP12"),
     #("211.255.204.73", "BP13"),
@@ -184,7 +184,10 @@ class TestWindow(QMainWindow):
         super().__init__()
         self.setWindowTitle("IBKConnector OCX Test")
         self.setMinimumWidth(1000)
-        self.resize(1300, 700)
+        # 로그창까지 보이도록 화면 작업영역 높이에 맞춘다
+        avail = QApplication.primaryScreen().availableGeometry()
+        self.setGeometry(avail.x() + (avail.width() - min(1300, avail.width())) // 2,
+                         avail.y() + 30, min(1300, avail.width()), avail.height() - 40)
 
         ocx_ok, ocx_info = _check_ocx_registry()
         if not ocx_ok:
@@ -329,16 +332,6 @@ class TestWindow(QMainWindow):
         h_chaser.addWidget(btn_chaser_hide)
         h_chaser.addStretch()
         layout.addLayout(h_chaser)
-
-        # account combo - populated after login
-        h2 = QHBoxLayout()
-        h2.addWidget(QLabel("계좌"))
-        self.combo_accn = QComboBox()
-        self.combo_accn.setMinimumWidth(260)
-        self.combo_accn.setSizeAdjustPolicy(QComboBox.AdjustToContents)
-        h2.addWidget(self.combo_accn)
-        h2.addStretch()
-        layout.addLayout(h2)
 
         return group
 
@@ -1007,11 +1000,20 @@ class TestWindow(QMainWindow):
         if err and "제한" in err:
             QMessageBox.warning(self, "요청 제한", err)
 
+    def _check_result(self, result):
+        # None = COM 호출 자체가 실패(OCX 메서드 시그니처 불일치 등) → OCX 내부 메시지는 이전 것이라 조회하지 않는다
+        if result is None:
+            self._log("  오류: OCX 호출 실패 (인터페이스 불일치 - 인자 개수/타입 확인 필요)")
+        elif not result:
+            self._log_err(self.ocx.dynamicCall('GetLastErrMsg()'))
+
     def _on_initialize(self):
         result = self.ocx.dynamicCall("Initialize()")
         self.lbl_init.setText(str(result))
         self._log(f"Initialize() => {result}")
         self._log(f"OCX path: {self._get_ocx_path()}")
+        if not result:
+            self._log_err(self.ocx.dynamicCall("GetLastErrMsg()"))
 
     def _get_ocx_path(self):
         reg_key = f"CLSID\\{OCX_GUID}\\InprocServer32"
@@ -1030,10 +1032,7 @@ class TestWindow(QMainWindow):
         svr_ip   = self.edit_svr_ip.text()
         svr_port = int(self.edit_svr_port.text() or "0")
 
-        if not svr_ip.strip():
-            QMessageBox.warning(self, "서버 미선택", "서버를 선택하거나 svr_ip를 입력하세요.")
-            return
-
+        # svr_ip가 비어 있으면 OCX가 glb로 서버 IP를 조회한다.
         if self.chk_quote_only.isChecked():
             result = self.ocx.dynamicCall(
                 "LoginQuote(QString, QString, QString, int)",
@@ -1102,7 +1101,6 @@ class TestWindow(QMainWindow):
     def _load_accounts(self):
         # GetAccounts() returns "계좌번호\t계좌명\n계좌번호\t계좌명" format
         raw = self.ocx.dynamicCall("GetAccounts()")
-        self.combo_accn.clear()
         self.combo_odr_accn.clear()
         self.combo_ovs_accn.clear()
         if not raw:
@@ -1116,7 +1114,6 @@ class TestWindow(QMainWindow):
             acnm = parts[1] if len(parts) > 1 else ""
             display = f"{acno[:3]} {acno[3:5]} {acno[5:]}  {acnm}".strip() if len(acno) >= 5 else line
             self._log(f"  계좌={acno}({len(acno)}자리) 명={acnm}")
-            self.combo_accn.addItem(display, acno)
             self.combo_odr_accn.addItem(display, acno)
             self.combo_ovs_accn.addItem(display, acno)
 
@@ -1211,9 +1208,9 @@ class TestWindow(QMainWindow):
         self._log("[업데이트] 파일 업데이트 완료")
 
     def _on_tr8001(self):
-        acno = self.combo_accn.currentData() or ""
+        acno = self.combo_odr_accn.currentData() or ""
         if not acno.strip():
-            self._log("계좌를 선택하세요")
+            self._log("국내 계좌를 선택하세요")
             return
         result = self.ocx.dynamicCall("TR8001(int, QString)", TK_TR8001, acno)
         self._log(f"고객정보조회 => {result}")
@@ -1348,11 +1345,10 @@ class TestWindow(QMainWindow):
         sort = self.combo_ovs5002_sort.currentData()
         self.table_ovs_chegyul.setRowCount(0)
         result = self.ocx.dynamicCall(
-            "TR5002(int, QString, QString, QString, QString, QString, QString, QString, QString, QString, int)",
-            [TK_TR5002, acno, pswd, edate, mm, gubn, rtype, code, market, ordtype, sort])
+            "TR5002(int, QString, QString, QString, QString, QString, QString, QString, QString, QString, int, QString)",
+            [TK_TR5002, acno, pswd, edate, mm, gubn, rtype, code, market, ordtype, sort, ""])
         self._log(f"해외체결내역조회(TR5002) => {result}")
-        if not result:
-            self._log_err(self.ocx.dynamicCall('GetLastErrMsg()'))
+        self._check_result(result)
 
     def _on_ovs_yesugeum_send(self):
         acno = self.combo_ovs_accn.currentData() or self.combo_ovs_accn.currentText().strip()
@@ -1378,14 +1374,13 @@ class TestWindow(QMainWindow):
         today = self.combo_ovs5001_today.currentData()
         qrytp = self.combo_ovs5001_qrytp.currentData()
         self.table_ovs_jango.setRowCount(0)
-        # 참고: TR5001의 ODL 선언(4개)이 실제 함수(6개: key,acc,pswd,sDate,today,qryTp)와 안 맞는다고
-        # 말씀드렸던 그 함수입니다 - OCX가 아직 안 고쳐졌으면 이 호출이 None을 반환할 수 있습니다.
+        # 참고: TR5001은 OCX의 ODL 선언(5개: key,acc,pswd,date,nkey)이 실제 구현
+        # (7개: key,acc,pswd,sDate,today,qryTp,nkey)과 안 맞는다 - OCX ODL 수정 전까지는 None 반환.
         result = self.ocx.dynamicCall(
-            "TR5001(int, QString, QString, QString, QString, QString)",
-            [TK_TR5001, acno, pswd, edate, today, qrytp])
+            "TR5001(int, QString, QString, QString, QString, QString, QString)",
+            [TK_TR5001, acno, pswd, edate, today, qrytp, ""])
         self._log(f"해외잔고조회(TR5001) => {result}")
-        if not result:
-            self._log_err(self.ocx.dynamicCall('GetLastErrMsg()'))
+        self._check_result(result)
 
     def _on_odr_gorae_send(self):
         acno = self.combo_odr_accn.currentData() or ""
@@ -1399,11 +1394,10 @@ class TestWindow(QMainWindow):
         code = self.edit_odr_gorae_code.text()
         self.table_odr_gorae.setRowCount(0)
         result = self.ocx.dynamicCall(
-            "TR2002(int, QString, QString, QString, QString, QString, QString)",
-            [TK_TR2002, acno, pswd, sdate, edate, qtype, code])
+            "TR2002(int, QString, QString, QString, QString, QString, QString, QString)",
+            [TK_TR2002, acno, pswd, sdate, edate, qtype, code, ""])
         self._log(f"주식거래내역조회(TR2002) => {result}")
-        if not result:
-            self._log_err(self.ocx.dynamicCall('GetLastErrMsg()'))
+        self._check_result(result)
 
     def _on_ovs_gorae_send(self):
         acno = self.combo_ovs_accn.currentData() or self.combo_ovs_accn.currentText().strip()
@@ -1418,11 +1412,10 @@ class TestWindow(QMainWindow):
         stktp = self.combo_ovs5003_stktp.currentData()
         self.table_ovs_gorae.setRowCount(0)
         result = self.ocx.dynamicCall(
-            "TR5003(int, QString, QString, QString, QString, QString, QString, QString, QString)",
-            [TK_TR5003, acno, pswd, sdate, edate, code, "0", gubn, stktp])
+            "TR5003(int, QString, QString, QString, QString, QString, QString, QString, QString, QString)",
+            [TK_TR5003, acno, pswd, sdate, edate, code, "0", gubn, stktp, ""])
         self._log(f"해외거래내역조회(TR5003) => {result}")
-        if not result:
-            self._log_err(self.ocx.dynamicCall('GetLastErrMsg()'))
+        self._check_result(result)
 
     def _on_hwj_rate_send(self):
         # 참고: TR5005/5006은 아직 OCX ODL/디스패치맵에 등록 안 되어 있어서 이 호출은 지금은
