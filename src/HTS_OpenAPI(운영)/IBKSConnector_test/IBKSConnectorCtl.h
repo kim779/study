@@ -33,6 +33,8 @@ using namespace std;
 #define PUT		3
 #define THETA_VAL	0.002739726
 
+#define OCX_INTEGRITY_ENFORCE	0
+
 #define GAMMA		0.2316419
 #define CNORMAL_1	0.31938153
 #define CNORMAL_2	-0.356563782
@@ -120,7 +122,8 @@ typedef enum {
 	eTR5010,		// 중계은행조회
 	eFNORDER,		// 해외주문	
 	eFNCANCELORDER,		// 해외취소주문
-	eFNRESERVEORDER		// 해외예약주문
+	eFNRESERVEORDER,		// 해외예약주문
+	eTR5011			// 해외주식 가정산조회
 } TR_KEY;
 
 //2013.04.01 KSJ 남윤호차장의 요청에 의해서 조회 4 -> 6으로 수정
@@ -200,6 +203,7 @@ struct LIMIT_ITEM
 	{ eFNORDER, 1000, 0,  1, 0},
 	{ eFNCANCELORDER,  1000, 0,  10, 0},
 	{ eFNRESERVEORDER, 1000, 0,  10, 0},
+	{ eTR5011, 1000, 0,  1, 0},
 	{ eNone,      0, 0,  0, 0}
 };
 
@@ -214,6 +218,10 @@ class CIBKSConnectorCtrl : public COleControl
 	typedef void (CIBKSConnectorCtrl::*TR_CALLBACK)(WPARAM wParam, LPARAM lParam);
 
 	DECLARE_DYNCREATE(CIBKSConnectorCtrl)
+
+	enum userType { normal = 0, foreign, admin};	// 일반고객, 해외, 관리자
+
+	userType _type = admin;
 
 public:
 	CIBKSConnectorCtrl();
@@ -326,6 +334,10 @@ protected:
 	//afx_msg BOOL TR5004(long key, LPCTSTR crcycode);
 	//afx_msg BOOL TR5007(long key, LPCTSTR crcycode);
 	afx_msg BOOL TR5010(long key, LPCTSTR crcycode);
+	afx_msg BOOL TR5011(long key, LPCTSTR acc, LPCTSTR pswd, LPCTSTR Date, LPCTSTR code, LPCTSTR nkey);
+	afx_msg BOOL TR5010A(long key, LPCTSTR crcycode);	// relay bank code only, no auto-chain (dispid 86)
+	afx_msg BOOL TR5007(long key, LPCTSTR crcycode);	// IBK rate SDPKT183 (dispid 87)
+	afx_msg BOOL TR5004(long key, LPCTSTR crcycode);	// KB rate SDPKT169 (dispid 88)
 	afx_msg BOOL FNORDER(long key, LPCTSTR odgb, LPCTSTR mmgb, LPCTSTR accn, LPCTSTR pswd, LPCTSTR mkgb, LPCTSTR code, LPCTSTR jqty, LPCTSTR jprc, LPCTSTR hogb);
 	afx_msg BOOL TR5005(long key, LPCTSTR acc, LPCTSTR pswd, LPCTSTR gdxchrat, LPCTSTR mxchgptncode);
 	afx_msg BOOL TR5006(long key, LPCTSTR acc, LPCTSTR pswd, LPCTSTR tgrtcrcycode, LPCTSTR mxchgcrcycode, LPCTSTR appxcharat, LPCTSTR prvlgrat, LPCTSTR sInput, LPCTSTR mmgb, LPCTSTR trxtp, LPCTSTR rtWon, LPCTSTR rtTarget);
@@ -479,6 +491,13 @@ protected:
 	set<int> m_shoga, m_fhoga;
 	vector<CString> m_acno, m_acnm;
 	map<int, CString> m_chk_acno;
+	
+	//거래약정계좌 여부를 확인하기위해서 보유계좌 순차검증 로직이 필요함
+	std::vector<CString> m_chkQueue;
+	size_t m_chkIdx;
+	std::set<CString> m_delAcno;
+	void RequestNextContract();
+
 	map<TR_KEY, struct LIMIT_ITEM> m_limit;
 	unordered_map<int, TR_CALLBACK> m_callback;
 	map<int, int> m_cbcount;
@@ -510,7 +529,8 @@ protected:
 	double	GetND(double value);
 	int	CallPut(LPSTR code);
 	bool IsDevOrUAT();
-	bool IsMyDevPC();
+	bool LoadSha256Module();
+	void StartContractCheck();
 protected:
 	void DebugFile(LPCSTR path, LPCSTR mode, LPCSTR data, int dlen);
 	inline bool IsInit();										// 초기화 여부 확인
@@ -558,6 +578,7 @@ protected:
 	std::pair<string, string> m_typemoney;
 	std::pair<string, string> m_chrat;
 	CString		m_ctbank;
+	std::set<int>	m_relayKeys;	// keys requested via TR5010A - relay SDPWQ002 response as-is
 	
 	
 	
@@ -686,6 +707,7 @@ public:
 	BOOL S_TR5004(long key, LPCTSTR crcycode);
 	BOOL S_TR5007(long key, LPCTSTR crcycode);
 	BOOL S_TR5010(long key, LPCTSTR crcycode);
+	BOOL S_TR5011(long key, LPCTSTR acc, LPCTSTR pswd, LPCTSTR Date, LPCTSTR code, LPCTSTR nkey);
 	BOOL S_FNORDER(long key, LPCTSTR odgb, LPCTSTR mmgb, LPCTSTR ogno, LPCTSTR accn, LPCTSTR pswd, LPCTSTR mkgb, LPCTSTR code, LPCTSTR jqty, LPCTSTR jprc, 
 		                 LPCTSTR hogb, LPCTSTR rsvgubn, LPCTSTR curCode, LPCTSTR rsvlpdt, LPCTSTR rsvStDt, LPCTSTR rsvEndDt, LPCTSTR rsvOrdNo, LPCTSTR rsv_lndt, LPCTSTR creditCode);
 

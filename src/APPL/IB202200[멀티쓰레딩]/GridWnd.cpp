@@ -9797,18 +9797,18 @@ void CGridWnd::parsingAlertx(LPARAM lParam)
 					if (getDataPtr(146))
 						m_grid->SetItemText(xrow, ii, entry);
 				}
- 				else if (symbol.CompareNoCase("051") == 0)
- 				{
-					entry = getDataString(25);
- 					if (!entry.IsEmpty())
- 						m_grid->SetItemText(xrow, ii, entry);
- 				}
- 				else if (symbol.CompareNoCase("071") == 0)
- 				{
-					entry = getDataString(26);
- 					if (!entry.IsEmpty())
- 						m_grid->SetItemText(xrow, ii, entry);
- 				}
+				else if (symbol.CompareNoCase("051") == 0)
+				{
+					entry = getDataString(bNeedMap ? 51 : 25);   // 'w': 51->250, legacy 'D': 25
+					if (!entry.IsEmpty())
+						m_grid->SetItemText(xrow, ii, entry);
+				}
+				else if (symbol.CompareNoCase("071") == 0)
+				{
+					entry = getDataString(bNeedMap ? 71 : 26);   // 'w': 71->271, legacy 'D': 26
+					if (!entry.IsEmpty())
+						m_grid->SetItemText(xrow, ii, entry);
+				}
 				else if (!entry.IsEmpty()) // 2012.03.20 KSJ 현재가 보합될때 대비, 등락률 지워지지 않는 현상 수정
 				{
 					if (bDaebi)

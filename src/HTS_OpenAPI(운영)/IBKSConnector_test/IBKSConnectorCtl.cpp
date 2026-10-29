@@ -217,8 +217,15 @@ BEGIN_DISPATCH_MAP(CIBKSConnectorCtrl, COleControl)
 	DISP_FUNCTION(CIBKSConnectorCtrl, "TR5006", TR5006, VT_BOOL, VTS_I4 VTS_BSTR VTS_BSTR VTS_BSTR VTS_BSTR VTS_BSTR VTS_BSTR VTS_BSTR VTS_BSTR VTS_BSTR VTS_BSTR VTS_BSTR)
 	DISP_FUNCTION(CIBKSConnectorCtrl, "FNCANCELORDER", FNCancelORDER, VT_BOOL, VTS_I4 VTS_BSTR VTS_BSTR VTS_BSTR VTS_BSTR VTS_BSTR VTS_BSTR VTS_BSTR)
 	DISP_FUNCTION(CIBKSConnectorCtrl, "getBankCode", getBankCode, VT_BSTR, VTS_NONE)
+	DISP_FUNCTION(CIBKSConnectorCtrl, "TR5011", TR5011, VT_BOOL, VTS_I4 VTS_BSTR VTS_BSTR VTS_BSTR VTS_BSTR VTS_BSTR)
 	//DISP_FUNCTION(CIBKSConnectorCtrl, "FNRESERVEORDER", FNRESERVEORDER, VT_BOOL, VTS_I4 VTS_BSTR VTS_BSTR VTS_BSTR VTS_BSTR VTS_BSTR VTS_BSTR VTS_BSTR VTS_BSTR VTS_BSTR VTS_BSTR 
 	//	                                                                            VTS_BSTR VTS_BSTR VTS_BSTR VTS_BSTR VTS_BSTR VTS_BSTR)
+
+	// dispid 85 is reserved for the vendor developer: add it with DISP_FUNCTION ABOVE this line.
+	// Entries below use DISP_FUNCTION_ID so their dispid is fixed regardless of position.
+	DISP_FUNCTION_ID(CIBKSConnectorCtrl, "TR5010A", 86, TR5010A, VT_BOOL, VTS_I4 VTS_BSTR)
+	DISP_FUNCTION_ID(CIBKSConnectorCtrl, "TR5007", 87, TR5007, VT_BOOL, VTS_I4 VTS_BSTR)
+	DISP_FUNCTION_ID(CIBKSConnectorCtrl, "TR5004", 88, TR5004, VT_BOOL, VTS_I4 VTS_BSTR)
 
 
 
@@ -306,6 +313,7 @@ CIBKSConnectorCtrl::CIBKSConnectorCtrl()
 	m_nPggb = 0;		// 2014.04.21 KSJ 차익/비차익 구분
 	m_hiSha256 = NULL;
 	m_chaser = NULL;
+	m_chkIdx = 0;
 
 	CoInitialize(NULL);
 	AfxEnableControlContainer();
@@ -897,7 +905,7 @@ BOOL CIBKSConnectorCtrl::Login(LPCTSTR user_id, LPCTSTR user_pw, LPCTSTR cert_pw
 	
 	m_maddr = GetMacAddress(m_cltip);
 	CString slog;
-	slog.Format("glb=[%s]      [%s]     [%s] ", m_svrip, m_cltip, m_fcltip);
+	slog.Format("glb=[*]      [%s]     [%s] ", m_cltip, m_fcltip);	// server IP not logged (security)
 	WriteLog(slog);
 #ifdef FOR_WARSHIP
 	m_Wizard.RunAxis(loginSHOP, (LONG)(LPCSTR)m_svrip, m_svrport);	//그냥 로그인
@@ -960,7 +968,7 @@ BOOL CIBKSConnectorCtrl::LoginQuote(LPCTSTR user_id, LPCTSTR user_pw, LPCTSTR sv
 
 	m_maddr = GetMacAddress(m_cltip);
 	CString slog;
-	slog.Format("glb=[%s]      [%s]     [%s] ", m_svrip, m_cltip, m_fcltip);
+	slog.Format("glb=[*]      [%s]     [%s] ", m_cltip, m_fcltip);	// server IP not logged (security)
 	WriteLog(slog);
 #ifdef FOR_WARSHIP
 	m_Wizard.RunAxis(loginSHOP, (LONG)(LPCSTR)m_svrip, m_svrport);
@@ -1005,6 +1013,9 @@ BOOL CIBKSConnectorCtrl::ShowChaser()
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
+	if (_type < CIBKSConnectorCtrl::admin)
+		return FALSE;
+
 	CString aps, cmds;
 	STARTUPINFO si;
 	PROCESS_INFORMATION pi;
@@ -1048,6 +1059,9 @@ BOOL CIBKSConnectorCtrl::ShowChaser()
 // AxisChaser 트레이스를 끄고, 떠 있는 AxisChaser 창도 닫는다(AXIS의 DeleteChaser+CloseChaserAPP에 대응).
 void CIBKSConnectorCtrl::HideChaser()
 {
+	if (_type < CIBKSConnectorCtrl::admin)
+		return;
+
 	DeleteChaser();
 
 	CString winCaption;
@@ -1189,77 +1203,66 @@ char* CIBKSConnectorCtrl::GetFileSHA256( CString sPath, HMODULE hModule)
 BOOL CIBKSConnectorCtrl::S_PIDOVERS()
 {
 	struct	pihoitgy_mid	mid;
-	
-	FillMemory((char*) &mid, sizeof(pihoitgy_mid), ' ');
-
-	HMODULE hModule = LoadLibrary("CX_SHA256.DLL");
+	FillMemory((char*)&mid, sizeof(pihoitgy_mid), ' ');
 
 	CString filename;
-
-	if(hModule)
+	filename.Format("%s\\exe\\IBKSCONNECTOR.OCX", m_home);
+	char* str = LoadSha256Module() ? GetFileSHA256(filename, m_hiSha256) : NULL;
+	if (str == NULL)
 	{
-		filename.Format("%s\\exe\\IBKSCONNECTOR.OCX", m_home);
-
-		char* str = GetFileSHA256(filename,hModule);
-
-		CString sdat;
-		
-		CString strCnt,strMsg;
-
-		CopyMemory(mid.gubn,"2",sizeof(mid.gubn));
-		sprintf(mid.nrec, "%04d", 1);			// 반복횟수
-
-		CopyMemory(mid.grid2[0].gubn,"EXE",3);
-		CopyMemory(mid.grid2[0].mnam,"IBKSCONNECTOR.OCX",17);
-		CopyMemory(mid.grid2[0].skey,str,strlen(str));
-
-		m_slog.Format("[openapi] IBKSCONNECTOR sha256 =[%s]", str);
+		m_slog.Format("[openapi][%s]<%d> OCX sha256 failed file=[%s]", __FUNCTION__, __LINE__, (LPCSTR)filename);
 		WriteLog(m_slog);
-		
-		//CopyMemory(mid.grid2,(char*)&grid,sizeof(mid.grid2));
+		return FALSE;
 	}
-	
-//	return SendTR("pihoitgy", 1, 0, (LPCSTR)&mid, L_pihoitgy_mid, C_PIDOVERS);  //vc2019
+
+	CopyMemory(mid.gubn, "2", sizeof(mid.gubn));
+	sprintf(mid.nrec, "%04d", 1);			// 반복횟수
+	CopyMemory(mid.grid2[0].gubn, "EXE", 3);
+	CopyMemory(mid.grid2[0].mnam, "IBKSCONNECTOR.OCX", 17);
+	CopyMemory(mid.grid2[0].skey, str, min(strlen(str), sizeof(mid.grid2[0].skey)));
+
+	m_slog.Format("[openapi] IBKSCONNECTOR sha256 =[%s]", str);
+	WriteLog(m_slog);
+
 	return SendTR("pihoitgy", 1, 0, (LPCSTR)&mid, L_pihoitgy_mid, &CIBKSConnectorCtrl::C_PIDOVERS);
 }
 
+
 void CIBKSConnectorCtrl::C_PIDOVERS(WPARAM wParam, LPARAM lParam)
 {
-	int key = LOWORD(wParam);
-	int len = HIWORD(wParam);
-
-	pihoitgy_mod* mod = (struct pihoitgy_mod*) lParam;
+	pihoitgy_mod* mod = (struct pihoitgy_mod*)lParam;
 	int	cnt = atoi(CString(mod->nrec, sizeof(mod->nrec)));
-	//AfxMessageBox(CString(mod->nrec, sizeof(mod->nrec)));
 
-	if(cnt > 0)
+	m_slog.Format("[openapi][%s]<%d> integrity result nrec=[%d] module=[%s]", __FUNCTION__, __LINE__,
+		cnt, cnt > 0 ? (LPCSTR)CString(mod->grid[0].mnam, sizeof(mod->grid[0].mnam)).Trim() : "");
+	WriteLog(m_slog);
+
+#if OCX_INTEGRITY_ENFORCE
+	if (cnt > 0)
 	{
 		m_bLogin = false;
-		FireOnLogin(false,"정상적인 OCX 버젼이 아닙니다.배포된 OCX를 사용해 주세요..");
-
+		FireOnLogin(false, "정상적인 OCX 버젼이 아닙니다.배포된 OCX를 사용해 주세요..");
 		m_Wizard.RunAxis(loginAXIS, 0, -1);
+		return;
 	}
-	else
-	{
-		m_bLogin = true;
-		//FireOnLogin(true,"버젼확인완료");
-	}
+#endif
+	StartContractCheck();		// m_bLogin/OnLogin(TRUE) are set later in InitJanGo()
 }
 
 void CIBKSConnectorCtrl::C_PIDOUINI(WPARAM wParam, LPARAM lParam)
 {
-	struct pidouini_mod *mod = (struct pidouini_mod*)lParam;
+	struct pidouini_mod* mod = (struct pidouini_mod*)lParam;
 	CString val = CString(mod->item.valu, 4);
 	val.MakeUpper();
 
-	if(IsPTS())		//2012.08.08 PTS면 사용자등록 검사결과를 무시한다.
+	if (IsPTS())		//2012.08.08 PTS면 사용자등록 검사결과를 무시한다.
 		val = "TRUE";
 
-	if (val=="TRUE")
+	if (val == "TRUE")
 	{
 		// 사용자명 저장
 		m_usnm = (LPCSTR)Variant(nameCC, 0);
-		
+
 		// 홈디렉토리 저장
 		m_home = (LPCSTR)Variant(homeCC, 0);
 
@@ -1268,123 +1271,151 @@ void CIBKSConnectorCtrl::C_PIDOUINI(WPARAM wParam, LPARAM lParam)
 
 		// 계좌번호 저장
 		m_acno.clear();
-		int pos=0, ed;
+		int pos = 0, ed;
 		CString acno = (LPCSTR)Variant(accountCC, 0);
 
-		if(m_bSaveLog)
+		if (m_bSaveLog)
 			testSaveFile("accountCC", acno, acno.GetLength());
 
-		if (acno.GetLength()>=11)
+		if (acno.GetLength() >= 11)
 		{
 			do {
 				ed = acno.Find("\n", pos);
-				CString acc = acno.Mid(pos, ed-pos);
+				CString acc = acno.Mid(pos, ed - pos);
 
-m_slog.Format("[openapi][%s]<%d> 전체계좌 acc =[%s %s %s]", __FUNCTION__, __LINE__, acc.Left(3), acc.Mid(3,2), acc.Mid(5,6));
-WriteLog(m_slog);
+				m_slog.Format("[openapi][%s]<%d> 전체계좌 acc =[%s %s %s]", __FUNCTION__, __LINE__, acc.Left(3), acc.Mid(3, 2), acc.Mid(5, 6));
+				WriteLog(m_slog);
 
-				m_acno.push_back( acc.Mid(0, 11) );
-				m_acnm.push_back( acc.Mid(12, acc.Find("|", 12)-12) );
-				pos = ed+1;
+				m_acno.push_back(acc.Mid(0, 11));
+				m_acnm.push_back(acc.Mid(12, acc.Find("|", 12) - 12));
+				pos = ed + 1;
 
-			} while(pos<acno.GetLength());
+			} while (pos < acno.GetLength());
 		}
 
 		// 사용자 ID - 1개의 프로세스에서 여러 인스턴스를 생성할 경우 userCC가 마지막껄로만 나온다. (static인듯)
 		//m_usid = (LPCSTR)Variant(userCC, 0);
-		
+
 #ifdef FOR_WARSHIP
 		// for warship
 		InitJanGo();
 		return;
 #endif
-
-		// 계좌약정조회
-		m_chk_acno.clear();
-		if(!IsPTS())
+		// [자체추가] required module: without CX_SHA256.DLL every account password is sent blank
+	// (server counts it as a wrong password and locks the account after 5 times)
+		if (!LoadSha256Module())
 		{
-//	약정계좌만 조회하는 서비스 : SACEQ320
-// 			vector<char> data(L_ledger+L_saceq320_mid);
-// 
-// 			CTime time = CTime::GetCurrentTime();
-// 			CString today = time.Format("%Y%m%d");
-// 			struct ledger  *ledger = (struct ledger*)&data[0];
-// 			GetLedger(ledger);
-// 			memcpy(ledger->svcd, "SACEQ320", 8);
-// 			memcpy(ledger->fkey, "C   ", 4);
-// 			FillMemory(ledger->usid, sizeof(ledger->usid), ' ');
-// 			memcpy(ledger->usid, (LPCSTR)m_usid, m_usid.GetLength());
-// 			memcpy(ledger->brno, "000", 3);
-// 			memcpy(ledger->rcnt, "0015", 4);
-// 
-// 			struct saceq320_mid *mid = (struct saceq320_mid*)&data[L_ledger];
-// 
-// 			FillMemory(mid, L_saceq320_mid, ' ');
-// 			CopyMemory(mid->In, "00001", 5);
-// 			CopyMemory(mid->fnUserId, m_usid, 16);
-// 			CopyMemory(mid->servCode, "3056", 4);
-// 
-// 			SendTR("piboPBxQ", 100, US_ENC, (LPCSTR)&data[0], data.size(), C_SACEQ320);
-//	기존 약정계좌인지 체크하는 서비스
-			vector<char> data(L_ledger+L_sacaq504_mid);
-			
-			CTime time = CTime::GetCurrentTime();
-			CString today = time.Format("%Y%m%d");
-			struct ledger  *ledger = (struct ledger*)&data[0];
-			GetLedger(ledger);
-			memcpy(ledger->svcd, "SACAQ504", 8);
-			memcpy(ledger->fkey, "C   ", 4);
-			FillMemory(ledger->usid, sizeof(ledger->usid), ' ');
-			memcpy(ledger->usid, (LPCSTR)m_usid, m_usid.GetLength());
-			memcpy(ledger->brno, "000", 3);
-			memcpy(ledger->rcnt, "0015", 4);
-
-			struct sacaq504_mid *mid = (struct sacaq504_mid*)&data[L_ledger];
-			for(int n=0; n<m_acno.size(); ++n)
-			{
-				FillMemory(mid, L_sacaq504_mid, ' ');
-				CopyMemory(mid->In, "00001", 5);
-				CopyMemory(mid->QryTp, "2", 1);
-				CopyMemory(mid->SvcKindCode, SYSTRADING_SVCCODE, 4);
-				
-				switch( atoi(m_acno[n].Mid(3, 2)) )
-				{
-				case 10: case 11:
-					CopyMemory(mid->PdptnCode, "01", 2); break;
-				case 20: case 21:
-					CopyMemory(mid->PdptnCode, "03", 2); break;
-				default:
-					continue;
-				}
-
-				if(m_bSaveLog)
-					testSaveFile("sacaq504_mid", m_acno[n], 11);
-
-				m_chk_acno[n] = m_acno[n];
-				
-				CopyMemory(mid->QrySrtDt, "20110401", 8);
-				CopyMemory(mid->QryEndDt, today, today.GetLength());
-				CopyMemory(mid->RegTp, "0", 1);
-				CopyMemory(mid->AcntNo, (LPCSTR)m_acno[n], m_acno[n].GetLength());
-				
-				//SendTR("piboPBxQ", n, US_ENC, (LPCSTR)&data[0], data.size(), C_SACAQ504);
-				SendTR("piboPBxQ", n, US_ENC, (LPCSTR)&data[0], data.size(), &CIBKSConnectorCtrl::C_SACAQ504);  //vc2019
-
-				// 너무 많은TR을 한번에 올리면 끊긴다.
-				Sleep(200);
-			}
-		}
-		else	//2012.09.13 KSJ 시스템매매 교육이수 및 위험고지확인 PTS일때는 체크하면 안됨
-		{
-			InitJanGo();    
+			m_bLogin = false;
+			FireOnLogin(false, "필수 모듈(dev\\CX_SHA256.DLL)이 없습니다. 프로그램을 다시 설치해 주세요.");
+			return;
 		}
 
-		//S_PIDOVERS();
+		// OCX integrity check first; contract check starts in C_PIDOVERS after it passes
+		if (!S_PIDOVERS())
+		{
+			m_bLogin = false;
+			FireOnLogin(false, "OCX 무결성 검사 요청에 실패했습니다.");
+		}
 	}
 	else
 	{
 		m_bLogin = false;
 		FireOnLogin(false, "허용된 사용자가 아닙니다.");
+	}
+}
+
+// [자체추가] 계좌 약정확인(SACAQ504) 시작 - 무결성 검사 통과 후 C_PIDOVERS에서 호출
+void CIBKSConnectorCtrl::StartContractCheck()
+{
+	m_chk_acno.clear();
+	m_chkQueue.clear();
+	m_delAcno.clear();
+	m_chkIdx = 0;
+	// 계좌약정조회
+	if (!IsPTS())
+	{
+		for (size_t n = 0; n < m_acno.size(); ++n)
+		{
+			switch (atoi(m_acno[n].Mid(3, 2)))
+			{
+			case 10:
+			case 11:
+			case 20:
+			case 21:
+				m_chkQueue.push_back(m_acno[n]);
+				break;
+			default:
+				break;
+			}
+		}
+		RequestNextContract();
+	}
+	else
+	{
+		InitJanGo();
+	}
+}
+
+
+void CIBKSConnectorCtrl::RequestNextContract()
+{
+	if (m_chkIdx >= m_chkQueue.size())
+	{
+		//every account decided : remove the non-contracted ones at once, then complete login
+		for (std::set<CString>::const_iterator it = m_delAcno.begin(); it != m_delAcno.end(); ++it)
+		{
+			for (size_t n = 0; n < m_acno.size(); ++n)
+			{
+				if (m_acno[n] == *it)
+				{
+					m_slog.Format("[openapi][%s]<%d> sacaq504 remove acc =[%s]", __FUNCTION__, __LINE__, (LPCSTR)*it);
+					WriteLog(m_slog);
+					m_acno.erase(m_acno.begin() + n);
+					m_acnm.erase(m_acnm.begin() + n);
+					break;
+				}
+			}
+		}
+		m_delAcno.clear();
+		m_chkQueue.clear();
+		InitJanGo();
+		return;
+	}
+
+	const CString acc = m_chkQueue[m_chkIdx];
+
+	vector<char> data(L_ledger + L_sacaq504_mid);
+	const CString today = CTime::GetCurrentTime().Format("%Y%m%d");
+
+	struct ledger* ledger = (struct ledger*)&data[0];
+	GetLedger(ledger);
+	memcpy(ledger->svcd, "SACAQ504", 8);
+	memcpy(ledger->fkey, "C   ", 4);
+	FillMemory(ledger->usid, sizeof(ledger->usid), ' ');
+	memcpy(ledger->usid, (LPCSTR)m_usid, m_usid.GetLength());
+	memcpy(ledger->brno, "000", 3);
+	memcpy(ledger->rcnt, "0015", 4);
+
+	struct sacaq504_mid* mid = (struct sacaq504_mid*)&data[L_ledger];
+	FillMemory(mid, L_sacaq504_mid, ' ');
+	CopyMemory(mid->In, "00001", 5);
+	CopyMemory(mid->QryTp, "2", 1);
+	CopyMemory(mid->SvcKindCode, SYSTRADING_SVCCODE, 4);
+	const int pcode = atoi(acc.Mid(3, 2));
+	CopyMemory(mid->PdptnCode, (pcode == 10 || pcode == 11) ? "01" : "03", 2);	// 01 stock, 03 futures
+	CopyMemory(mid->QrySrtDt, "20110401", 8);
+	CopyMemory(mid->QryEndDt, (LPCSTR)today, today.GetLength());
+	CopyMemory(mid->RegTp, "0", 1);
+	CopyMemory(mid->AcntNo, (LPCSTR)acc, acc.GetLength());
+
+	// key = queue index (SendTR accepts 0..255), same key range as the old code
+	if (!SendTR("piboPBxQ", (int)m_chkIdx, US_ENC, (LPCSTR)&data[0], (int)data.size(),
+		&CIBKSConnectorCtrl::C_SACAQ504))
+	{
+		//SendTr를 송신하는거 부터 실패해서 우선 지우는 계좌로 한다.
+		m_delAcno.insert(acc); 
+		++m_chkIdx;
+		RequestNextContract();
 	}
 }
 
@@ -2668,6 +2699,7 @@ BOOL CIBKSConnectorCtrl::TR1231(long key, LPCTSTR acno, LPCTSTR pswd, LPCTSTR co
 
 BOOL CIBKSConnectorCtrl::TR3001(long key, LPCTSTR code) 
 {
+	return FALSE;   //선옵삭제
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 	return AccessTr(eTR3001) ? S_PIBO3002(key, code) : FALSE;
 }
@@ -2732,12 +2764,14 @@ BOOL CIBKSConnectorCtrl::TR3231(long key, LPCTSTR acno, LPCTSTR pswd, LPCTSTR co
 
 BOOL CIBKSConnectorCtrl::TR3232(long key, LPCTSTR acno, LPCTSTR pswd, long fstp, long ertp) //옵션 당일손익 조회 KSJ 2013.04.08
 {
+	return FALSE;   //선옵삭제
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 	return AccessTr(eTR3232) ? S_SSLBQ033(key, acno, pswd, fstp, ertp) : FALSE;
 }
 
 BOOL CIBKSConnectorCtrl::TR3411(long key, LPCTSTR mymd) 	//옵션 월물별 전종목 시세 조회 KSJ 2013.04.08
 {
+	return FALSE;   //선옵삭제
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 	return AccessTr(eTR3411) ? S_PIBO4013(key, mymd) : FALSE;
 }
@@ -2750,6 +2784,7 @@ BOOL CIBKSConnectorCtrl::TR1801(long key, LPCTSTR code)
 
 BOOL CIBKSConnectorCtrl::TR1802(long key, LPCTSTR code) 
 {
+	return FALSE;   //선옵삭제
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 	return AccessTr(eTR1802) ? S_PIBO5102(key, code) : FALSE;
 }
@@ -3459,12 +3494,14 @@ BOOL CIBKSConnectorCtrl::TR1007(long key, LPCTSTR code, LPCTSTR symb)
 
 BOOL CIBKSConnectorCtrl::TR3002(long key, LPCTSTR code, LPCTSTR symb)
 {
+	return FALSE;   //선옵삭제
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 	return AccessTr(eTR3002) ? S_TR3002(key, code, symb) : FALSE;
 }
 
 BOOL CIBKSConnectorCtrl::TR3003(long key, LPCTSTR code, long type, LPCTSTR symb, LPCTSTR nkey) 
 {
+	return FALSE;   //선옵삭제
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 	return AccessTr(eTR3003) ? S_TR3003(key, code, type, symb, nkey) : FALSE;
 }
@@ -3544,72 +3581,112 @@ BOOL CIBKSConnectorCtrl::GetCode(long key, LPCTSTR reqtype)
 
 void CIBKSConnectorCtrl::C_SACAQ504( WPARAM wParam, LPARAM lParam )
 {
-	int key = LOWORD(wParam);
-	int size = HIWORD(wParam);
+	struct ledger* ledger = (struct ledger*)lParam;
+	struct sacaq504_mod* mod = (struct sacaq504_mod*)((LPCSTR)lParam + L_ledger);
 
-	//int key = _manageKey.at(rkey);
-	//_manageKey.erase(rkey);
+	//ignore reponses that do not belong to the account currently begin checked
+	if (m_chkIdx >= m_chkQueue.size() || (size_t)LOWORD(wParam) != m_chkIdx)
+		return;
 
-	struct ledger *ledger = (struct ledger *)lParam;
-	struct sacaq504_mod *mod = (struct sacaq504_mod *)( (LPCSTR)lParam + L_ledger);
-	
-	if(m_bSaveLog)
-		testSaveFile("sacaq504_mod", (LPCSTR)lParam + L_ledger + L_sacaq504_mid, size - L_ledger - L_sacaq504_mid);
+	const CString acc = m_chkQueue[m_chkIdx];
 
-	if (ledger->ecod[0]!='0')
+	CString rAcc(mod->mid.AcntNo, sizeof(mod->mid.AcntNo));
+	rAcc.Trim();
+	if (rAcc != acc)
 	{
-		// 등록내용이 없다면 계좌목록에서 삭제
-		for(size_t n=0; n<m_acno.size(); ++n)
-		{
-			if (m_chk_acno[key]==m_acno[n])
-			{
-				if(m_bSaveLog)
-					testSaveFile("Not Found", m_acno[n], 11);
-
-				m_slog.Format("[openapi][%s]<%d> sacaq504 (약정)결과에 따라 삭제 계좌 =[%s]", __FUNCTION__, __LINE__, (LPCSTR)m_acno[n]);
-				WriteLog(m_slog);
-				
-				if (!IsMyDevPC()) {
-				//	m_acno.erase(m_acno.begin() + n);
-				//	m_acnm.erase(m_acnm.begin() + n);
-				}
-				break;
-			}
-		}
+		m_slog.Format("[openapi][%s]<%d> sacaq504 acc mismatch req=[%s] res=[%s]", __FUNCTION__, __LINE__, (LPCSTR)acc, (LPCSTR)rAcc);
+		WriteLog(m_slog);
+		return;
 	}
-	else if (ledger->next[0] == 'Y')	//2014.11.25 KSJ 이경민대리님은 약정이 많아서 FEP가 끊긴다. 연속처리함.
+
+	if (ledger->ecod[0] == '0' && ledger->next[0] == 'Y')
 	{
+m_slog.Format("[openapi][%s]<%d>연속조회  sacaq504 next page acc =[%s]", __FUNCTION__, __LINE__, (LPCSTR)acc);
+WriteLog(m_slog);
 		memcpy(ledger->fkey, "7   ", 4);
-		//SendTR("piboPBxQ", key, US_ENC, (LPCSTR)lParam, L_ledger + L_sacaq504_mid, C_SACAQ504);  //vc2019
-		SendTR("piboPBxQ", key, US_ENC, (LPCSTR)lParam, L_ledger + L_sacaq504_mid, &CIBKSConnectorCtrl::C_SACAQ504);
+		if (SendTR("piboPBxQ", (int)m_chkIdx, US_ENC, (LPCSTR)lParam, L_ledger + L_sacaq504_mid, &CIBKSConnectorCtrl::C_SACAQ504))
+			return;
+		m_delAcno.insert(acc);  //연속조회 하려 SendTr 실패해쓸때
 	}
 	else
 	{
-		int idx = atoi(CString(mod->Out2, sizeof(mod->Out2))) - 1;
-
-		if(m_bSaveLog)
-			testSaveFile("RegTp", mod->grid[idx].RegTp, 1);
-
-		if (mod->grid[idx].RegTp[0]!='1')
+		//contracted only if. no error, at least one history row, and the lastest row is "registered"
+		const int cnt = atoi(CString(mod->Out2, sizeof(mod->Out2)));
+		const bool registered = (ledger->ecod[0] == '0' && cnt > 0 && mod->grid[cnt - 1].RegTp[0] == '1');
+		if (!registered)
 		{
-			// 마지막 내용이 등록이 아니라면 해지로 보고 계좌 삭제
-			for(size_t n=0; n<m_acno.size(); ++n)
-			{
-				if (m_chk_acno[key]==m_acno[n])
-				{
-					if(m_bSaveLog)
-						testSaveFile("UnReg", m_acno[n], 11);
-
-					m_acno.erase(m_acno.begin()+n);
-					m_acnm.erase(m_acnm.begin()+n);
-					break;
-				}
-			}
+			m_slog.Format("[openapi][%s]<%d> sacaq504 not contracted acc = [%s] ecod=[%c] cnt=[%d]", __FUNCTION__, __LINE__,
+				(LPCSTR)acc, ledger->ecod[0], cnt);
+			WriteLog(m_slog);
+			m_delAcno.insert(acc);
 		}
+		
 	}
-     
-	m_chk_acno.erase(key);
-	InitJanGo();
+	++m_chkIdx;  //sacaq504 응답받고 처리 완료
+	RequestNextContract();
+
+
+	//int key = LOWORD(wParam);
+	//int size = HIWORD(wParam);
+
+	//struct ledger *ledger = (struct ledger *)lParam;
+	//struct sacaq504_mod *mod = (struct sacaq504_mod *)( (LPCSTR)lParam + L_ledger);
+	//
+	//if(m_bSaveLog)
+	//	testSaveFile("sacaq504_mod", (LPCSTR)lParam + L_ledger + L_sacaq504_mid, size - L_ledger - L_sacaq504_mid);
+
+	//if (ledger->ecod[0]!='0')
+	//{
+	//	// 등록내용이 없다면 계좌목록에서 삭제
+	//	for(size_t n=0; n<m_acno.size(); ++n)
+	//	{
+	//		if (m_chk_acno[key]==m_acno[n])
+	//		{
+	//			if(m_bSaveLog)
+	//				testSaveFile("Not Found", m_acno[n], 11);
+
+	//			m_slog.Format("[openapi][%s]<%d> sacaq504 (약정)결과에 따라 삭제 계좌 =[%s]", __FUNCTION__, __LINE__, (LPCSTR)m_acno[n]);
+	//			WriteLog(m_slog);
+	//			
+	//			m_acno.erase(m_acno.begin() + n);
+	//			m_acnm.erase(m_acnm.begin() + n);
+	//			
+	//			break;
+	//		}
+	//	}
+	//}
+	//else if (ledger->next[0] == 'Y')	//2014.11.25 KSJ 이경민대리님은 약정이 많아서 FEP가 끊긴다. 연속처리함.
+	//{
+	//	memcpy(ledger->fkey, "7   ", 4);
+	//	SendTR("piboPBxQ", key, US_ENC, (LPCSTR)lParam, L_ledger + L_sacaq504_mid, &CIBKSConnectorCtrl::C_SACAQ504);
+	//}
+	//else
+	//{
+	//	int idx = atoi(CString(mod->Out2, sizeof(mod->Out2))) - 1;
+
+	//	if(m_bSaveLog)
+	//		testSaveFile("RegTp", mod->grid[idx].RegTp, 1);
+
+	//	if (mod->grid[idx].RegTp[0]!='1')
+	//	{
+	//		// 마지막 내용이 등록이 아니라면 해지로 보고 계좌 삭제
+	//		for(size_t n=0; n<m_acno.size(); ++n)
+	//		{
+	//			if (m_chk_acno[key]==m_acno[n])
+	//			{
+	//				if(m_bSaveLog)
+	//					testSaveFile("UnReg", m_acno[n], 11);
+
+	//				m_acno.erase(m_acno.begin()+n);
+	//				m_acnm.erase(m_acnm.begin()+n);
+	//				break;
+	//			}
+	//		}
+	//	}
+	//}
+ //    
+	//m_chk_acno.erase(key);
+	//InitJanGo();
 }
 
 void CIBKSConnectorCtrl::InitJanGo()
@@ -4871,6 +4948,8 @@ BOOL CIBKSConnectorCtrl::TR4224(long key, LPCSTR acno, LPCSTR pswd, double zKpi2
 {
 	// TODO: Add your dispatch handler code here
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+	if (_type < CIBKSConnectorCtrl::admin)
+		return FALSE;
 	return AccessTr(eTR4224) ? S_SONBQ123(key, acno, pswd, zKpi200Idx) : FALSE;
 }
 
@@ -4878,6 +4957,8 @@ BOOL CIBKSConnectorCtrl::TR4223(long key, LPCSTR acno, LPCSTR pswd, LPCSTR zSrtD
 {
 	// TODO: Add your dispatch handler code here
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+	if (_type < CIBKSConnectorCtrl::admin)
+		return FALSE;
 	return AccessTr(eTR4223) ? S_SONDQ401(key, acno, pswd, zSrtDt, zEndDt, nkey) : FALSE;
 }
 
@@ -4885,6 +4966,8 @@ BOOL CIBKSConnectorCtrl::TR4303(long key, LPCSTR acno, LPCSTR pswd, LPCSTR zQryS
 {
 	// TODO: Add your dispatch handler code here
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+	if (_type < CIBKSConnectorCtrl::admin)
+		return FALSE;
 	return AccessTr(eTR4303) ? S_SSLAQ826(key, acno, pswd, zQrySrtDt, zQryEndDt, zQryTp, zStnlnSeqTp, zBalEvalTp, nkey) : FALSE;
 }
 
@@ -4892,12 +4975,17 @@ BOOL CIBKSConnectorCtrl::TR4201(long key, LPCSTR acno, LPCSTR pswd, long zFnoCls
 {
 	// TODO: Add your dispatch handler code here
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+	if (_type < CIBKSConnectorCtrl::admin)
+		return FALSE;
 	return AccessTr(eTR4201) ? S_SONBQ740(key, acno, pswd, zFnoClssCode, nkey) : FALSE;
 }
 
 BOOL CIBKSConnectorCtrl::TR4101(long key, LPCSTR acno, LPCSTR pswd) 
 {
 	// TODO: Add your dispatch handler code here
+	if (_type < CIBKSConnectorCtrl::admin)
+		return FALSE;
+
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 	return AccessTr(eTR4101) ? S_SACMT238(key, acno, pswd) : FALSE;
 }
@@ -4906,6 +4994,8 @@ BOOL CIBKSConnectorCtrl::TR4221(long key, LPCSTR acno, LPCSTR pswd)
 {
 	// TODO: Add your dispatch handler code here
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+	if (_type < CIBKSConnectorCtrl::admin)
+		return FALSE;
 	return AccessTr(eTR4221) ? S_SONBQ105(key, acno, pswd) : FALSE;
 }
 
@@ -4913,6 +5003,8 @@ BOOL CIBKSConnectorCtrl::TR4401(long key, LPCSTR acno, LPCSTR pswd, long zQryTp,
 {
 	// TODO: Add your dispatch handler code here
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+	if (_type < CIBKSConnectorCtrl::admin)
+		return FALSE;
 	return AccessTr(eTR4401) ? S_SDPBQ001(key, acno, pswd, zQryTp, zQrySrtDt, zQryEndDt, zIsuNo, nkey) : FALSE;
 }
 
@@ -4920,6 +5012,9 @@ BOOL CIBKSConnectorCtrl::TR4202(long key, LPCSTR acno, LPCSTR pswd, long zBalEva
 {
 	// TODO: Add your dispatch handler code here
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	if (_type < CIBKSConnectorCtrl::admin)
+		return FALSE;
 	return AccessTr(eTR4202) ? S_SONBQ504(key, acno, pswd, zBalEvalTp, zPrcEvalTp, nkey) : FALSE;
 }
 
@@ -4927,6 +5022,8 @@ BOOL CIBKSConnectorCtrl::TR4003(long key, LPCSTR acno, LPCSTR pswd, long zMprcOr
 {
 	// TODO: Add your dispatch handler code here
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+	if (_type < CIBKSConnectorCtrl::admin)
+		return FALSE;
 	return AccessTr(eTR4003) ? S_SONBQ114(key, acno, pswd, zMprcOrdTp, zRoopData) : FALSE;
 }
 
@@ -4934,6 +5031,7 @@ BOOL CIBKSConnectorCtrl::TR4004(long key, LPCSTR acno, LPCSTR pswd, LPCSTR zRoop
 {
 	// TODO: Add your dispatch handler code here
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
 	return AccessTr(eTR4004) ? S_SONBT709(key, acno, pswd, zRoopData) : FALSE;
 }
 
@@ -5032,13 +5130,15 @@ BOOL CIBKSConnectorCtrl::TR8001(long key, LPCSTR acno)
 {
 	// TODO: Add your dispatch handler code here
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+	if (!IsValidAccount(acno))	return FALSE;
 	return AccessTr(eTR8001) ? S_PIHOCUST(key, acno) : FALSE;
 }
 
 BOOL CIBKSConnectorCtrl::TR4403(long key, LPCTSTR acno, LPCTSTR pswd, long zFnoClssCode, LPCTSTR zCmsnAmtAddupCode, LPCTSTR zStrDt, LPCTSTR zEndDt, LPCTSTR nkey) 
 {
-	// TODO: Add your dispatch handler code here
+	return FALSE;   //선옵삭제
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+	return FALSE;
 	return AccessTr(eTR4403) ? S_SONDQ304(key, acno, pswd, zFnoClssCode, zCmsnAmtAddupCode, zStrDt, zEndDt, nkey) : FALSE;
 }
 
@@ -5451,33 +5551,34 @@ double CIBKSConnectorCtrl::GetOptionTheoryAmt(POPTION ins)
 	return ret;
 }
 
-CString CIBKSConnectorCtrl::GetEncPassword(CString sPswd)
+// [자체추가] dev\CX_SHA256.DLL 로드 - 계좌비밀번호 암호화와 OCX 무결성검사가 같이 사용
+bool CIBKSConnectorCtrl::LoadSha256Module()
 {
-	CString dllPath;
-	dllPath.Format(_T("%s%s"), m_home, _T("\\dev\\CX_SHA256.DLL"));
-	CString strRetrun;
-	
-	if(m_hiSha256 == NULL)
+	if (m_hiSha256 == NULL)
 	{
+		CString dllPath;
+		dllPath.Format(_T("%s\\dev\\CX_SHA256.DLL"), m_home);
 		m_hiSha256 = LoadLibrary(dllPath);
-		
-		if (!m_hiSha256)
+		if (m_hiSha256 == NULL)
 		{
-			TRACE("CX_SHA256 컨트롤 생성 실패1");
-			return "";
+			m_slog.Format("[openapi][%s]<%d> CX_SHA256 load failed path=[%s] err=%d", __FUNCTION__, __LINE__, (LPCSTR)dllPath, GetLastError());
+			WriteLog(m_slog);
 		}
 	}
-	
-	if(m_hiSha256)
-	{
-		typedef long (WINAPI *GETSHAFUNC)(char*, int);	
-		GETSHAFUNC func = (GETSHAFUNC)GetProcAddress(m_hiSha256, "axEncrypt");
-		
-		if (func)
-		{
-			strRetrun =  (char*)func(sPswd.GetBuffer(sPswd.GetLength()),sPswd.GetLength());
-		}
-	}	
+	return m_hiSha256 != NULL;
+}
+
+CString CIBKSConnectorCtrl::GetEncPassword(CString sPswd)
+{
+	CString strRetrun;
+
+	if (!LoadSha256Module())
+		return strRetrun;
+
+	typedef long (WINAPI* GETSHAFUNC)(char*, int);
+	GETSHAFUNC func = (GETSHAFUNC)GetProcAddress(m_hiSha256, "axEncrypt");
+	if (func)
+		strRetrun = (char*)func(sPswd.GetBuffer(sPswd.GetLength()), sPswd.GetLength());
 	return strRetrun;
 }
 
@@ -5582,10 +5683,6 @@ bool CIBKSConnectorCtrl::IsDevOrUAT()
 // 개발자 PC 테스트 전용 - 접속에 사용된 로컬 IP(m_cltip)가 개발자 사설 IP와
 // 일치할 때만 true. 고객 PC의 사설 IP는 이 값과 다르므로 실수로 배포되어도
 // 항상 false로 평가되어 기존 정식 동작(계좌 제거)이 그대로 유지된다.
-bool CIBKSConnectorCtrl::IsMyDevPC()
-{
-	return (m_cltip == "172.19.1.106");
-}
 
 //bool CIBKSConnectorCtrl::IsDevOrUAT()
 //{
@@ -5680,9 +5777,11 @@ BOOL CIBKSConnectorCtrl::S_TR2002(long key, LPCTSTR acc, LPCTSTR pswd, LPCTSTR s
 	return  SendTR("piboPBxQ", key, US_ENC, buff.data(), buff.size(), &CIBKSConnectorCtrl::DEF_KOSCOM_CALLBACK);
 }
 
-
 BOOL CIBKSConnectorCtrl::TR5002(long key, LPCTSTR acc, LPCTSTR pswd, LPCTSTR sDate, LPCTSTR mm, LPCSTR gubn, LPCTSTR type, LPCTSTR code, LPCSTR market, LPCSTR ordertype, long sort, LPCSTR nkey)
 {
+	if (_type < CIBKSConnectorCtrl::foreign)
+		return FALSE;
+
 	// 해외주식 체결조회
 	// TODO: Add your dispatch handler code here
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
@@ -5740,8 +5839,9 @@ BOOL CIBKSConnectorCtrl::TR5002(long key, LPCTSTR acc, LPCTSTR pswd, LPCTSTR sDa
 BOOL CIBKSConnectorCtrl::S_TR5002(long key, LPCTSTR acc, LPCTSTR pswd, LPCTSTR stDate, LPCTSTR mm, LPCSTR gubn, LPCTSTR type, LPCTSTR code, LPCSTR market, LPCSTR ordertype, long sort, LPCSTR nkey)
 {
 	CTime now = CTime::GetCurrentTime();
-	CString sDate(stDate);
+	CString sDate(stDate), eDate;
 	if (sDate.IsEmpty()) sDate = now.Format("%Y%m%d");
+	eDate = now.Format("%Y%m%d");
 
 	vector<char> buff(L_ledger + L_tr5002_mid, ' ');
 
@@ -5780,8 +5880,8 @@ BOOL CIBKSConnectorCtrl::S_TR5002(long key, LPCTSTR acc, LPCTSTR pswd, LPCTSTR s
 	if (sort == 0) CopyMemory(pmid->SrtOrdNo2, "+000000001", 10);
 	else           CopyMemory(pmid->SrtOrdNo2, "+999999999", 10);
 
-	CopyMemory(pmid->SrtDt, "20260903", 8);
-	CopyMemory(pmid->EndDt, sDate, 8);
+	CopyMemory(pmid->SrtDt, sDate, 8);
+	CopyMemory(pmid->EndDt, eDate, 8);
 
 
 	pmid->QryTp[0] = '1';
@@ -5820,6 +5920,9 @@ BOOL  CIBKSConnectorCtrl::TR5001(long key, LPCTSTR acc, LPCTSTR pswd, LPCTSTR sD
 	//_vParameter.emplace_back(sDate);
 	//_vParameter.emplace_back(today);
 	//_vParameter.emplace_back(qryTp);
+
+	if (_type < CIBKSConnectorCtrl::foreign)
+		return FALSE;
 
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 	if (IsValidState() == FALSE) return FALSE;
@@ -5906,6 +6009,9 @@ BOOL  CIBKSConnectorCtrl::S_TR5001(long key, LPCTSTR acc, LPCTSTR pswd, LPCTSTR 
 
 BOOL CIBKSConnectorCtrl::TR5000(long key, LPCTSTR acc, LPCTSTR pswd)
 {
+	if (_type < CIBKSConnectorCtrl::foreign)
+		return FALSE;
+
 	// TODO: Add your dispatch handler code here
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 	if (IsValidState() == FALSE) return FALSE;
@@ -5953,6 +6059,9 @@ BOOL CIBKSConnectorCtrl::S_TR5000(long key, LPCTSTR acc, LPCTSTR pswd)
 
 BOOL CIBKSConnectorCtrl::TR5003(long key, LPCTSTR acc, LPCTSTR pswd, LPCTSTR stDate, LPCTSTR seDate, LPCTSTR code, LPCSTR CancTp, LPCSTR gubn, LPCSTR stktp, LPCTSTR nkey)
 {
+	if (_type < CIBKSConnectorCtrl::foreign)
+		return FALSE;
+
 	// 해외주식 거래내역
 	// TODO: Add your dispatch handler code here
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
@@ -6029,7 +6138,7 @@ BOOL CIBKSConnectorCtrl::S_TR5003(long key, LPCTSTR acc, LPCTSTR pswd, LPCTSTR s
 	CopyMemory(pmid->SrtDt, stFirst.GetString(), 8);
 	CopyMemory(pmid->EndDate, stSecond.GetString(), 8);
 	CopyMemory(pmid->IsuNo, code, strlen(code));
-	CopyMemory(pmid->TrdNo, "+999999999", 10);
+	CopyMemory(pmid->TrdNo, "+000000000", 10);
 	pmid->CancTp[0] = CancTp[0];		// 1- 취소
 	CopyMemory(pmid->TrdTpCode, gubn, 2);	// 00- 전체, 10-출납, 11-입출금, 12-입출고, 13-외화입출금, 14-환전, 20-매매내역, 21-대금결제, 22-유가결제, 30-과세내역
 	pmid->StkTp[0] = stktp[0];		// 0-전체, 1-온주, 2-소수점, 3-적립식
@@ -6044,24 +6153,72 @@ BOOL CIBKSConnectorCtrl::S_TR5003(long key, LPCTSTR acc, LPCTSTR pswd, LPCTSTR s
 	return SendTR("piboPBxQ", key, US_ENC, buff.data(), buff.size(), &CIBKSConnectorCtrl::DEF_KOSCOM_CALLBACK);
 }
 
-//BOOL CIBKSConnectorCtrl::TR5004(long key, LPCTSTR crcycode)
-//{
-//	AFX_MANAGE_STATE(AfxGetStaticModuleState());
-//	if (IsValidState() == FALSE) return FALSE;
-//
-//
-//	std::vector<CString> vMcode = { "USD", "AUD", "HKD", "CNY" };
-//	CString par(crcycode);
-//
-//	auto ft = std::find(vMcode.begin(), vMcode.end(), par);
-//	if (ft == vMcode.end())
-//	{
-//		
-//		m_sLastMsg = "통화코드를 확인하세요. crcycode : [USD - 미국달러, AUD - 호주달러, HKD - 홍콩달러, CNY - 중국위안화]";
-//		return FALSE;
-//	}
-//	return AccessTr(eTR5004) ? S_TR5004(key, crcycode) : FALSE;
-//}
+BOOL CIBKSConnectorCtrl::TR5011(long key, LPCTSTR acc, LPCTSTR pswd, LPCTSTR Date, LPCTSTR code, LPCTSTR nkey)
+{
+	if (_type < CIBKSConnectorCtrl::foreign)
+		return FALSE;
+	// 해외주식 가정산 조회
+	// TODO: Add your dispatch handler code here
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	if (IsValidState() == FALSE) return FALSE;
+	if (IsValidAccount(acc) == FALSE) return FALSE;
+	if (IsValidAcnoPswd(pswd) == FALSE) return FALSE;
+
+	return AccessTr(eTR5011) ? S_TR5011(key, acc, pswd, Date, code, nkey) : FALSE;
+}
+
+BOOL CIBKSConnectorCtrl::S_TR5011(long key, LPCTSTR acc, LPCTSTR pswd, LPCTSTR Date, LPCTSTR code, LPCTSTR nkey)
+{
+	// 해외주식 가정산 조회
+	vector<char> buff(L_ledger + sizeof(struct tr5011_mid), ' ');
+	struct ledger* pledger = (struct ledger*)&buff[0];
+	struct tr5011_mid* pmid = (struct tr5011_mid*)&buff[L_ledger];
+
+	//  Ledger 편집
+	GetLedger(pledger);
+
+	FillMemory(pledger->usid, sizeof(pledger->usid), ' ');
+	memcpy(pledger->usid, (LPCSTR)m_usid, m_usid.GetLength());
+	memcpy(pledger->brno, "000", 3);
+	memcpy(pledger->rcnt, "0010", 4);
+	memcpy(pledger->svcd, "COSCQ002", 8);
+
+	if (strlen(nkey) == 0)
+		memcpy(pledger->fkey, "C   ", 4);
+	else
+	{
+		pledger->next[0] = 'Y';
+		memcpy(pledger->fkey, "7   ", 4);
+		memcpy(pledger->nkey, nkey, 18);
+	}
+
+	CopyMemory(pmid->In, "00001", 5);
+	CopyMemory(pmid->AcntNo, acc, strlen(acc));
+	CopyMemory(pmid->Pwd, "HEAD", 4);
+	CopyMemory(pmid->IsuNo, code, strlen(code));
+	pmid->Qrytp[0] = '1';				// 조회구분  1- 계좌별
+	pmid->Lngtp[0] = '1';				// 언어구분  1- 한글
+
+	CopyMemory(pmid->BrnNo, "000", 3);
+	CopyMemory(pmid->Orddt, Date, 8);
+	pmid->datatp[0] = '9';				// 자료구분 "9" - 전체	
+	CopyMemory(pmid->crcy, "000", 3);		// 통화코드 전체일경우 000
+	pmid->bnstp[0] = '%';				// 매매구분  %-전체
+	CopyMemory(pmid->fcurrmkt, "% ", 2);		// 외화 시장코드 %전체 71홍콩  72상해 73심천  81뉴욕거래소 82나스닥 82AMEX
+	pmid->mkttp[0] = '1';				// 1 장내
+	CopyMemory(pmid->people, "99", 2);		// 고객구분코드   99 - 전체
+
+
+	CString sPswd;
+	sPswd = GetEncPassword(pswd);
+
+	//2014.04.21 KSJ 일방향암호화 추가
+	CopyMemory(pledger->hsiz, "44", sizeof(pledger->hsiz));
+	CopyMemory(pledger->epwd, sPswd, sPswd.GetLength());
+
+	return SendTR("piboPBxQ", key, US_ENC, buff.data(), buff.size(), &CIBKSConnectorCtrl::DEF_KOSCOM_CALLBACK);
+}
 
 BOOL CIBKSConnectorCtrl::S_TR5004(long key, LPCTSTR crcycode)
 {
@@ -6146,6 +6303,9 @@ BOOL CIBKSConnectorCtrl::S_TR5007(long key, LPCTSTR crcycode)
 
 BOOL CIBKSConnectorCtrl::TR5010(long key, LPCTSTR curcode)
 {
+	if (_type < CIBKSConnectorCtrl::foreign)
+		return FALSE;
+
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 	if (IsValidState() == FALSE) return FALSE;
 
@@ -6159,6 +6319,62 @@ BOOL CIBKSConnectorCtrl::TR5010(long key, LPCTSTR curcode)
 		return FALSE;
 	}
 	return AccessTr(eTR5010) ? S_TR5010(key, curcode) : FALSE;
+}
+
+// [자체추가] 환전 중계은행 조회(SDPWQ002) - TR5010과 같은 요청이지만 응답을 그대로 돌려주고 다음 조회는 자동으로 하지 않음
+// Same request as TR5010 (SDPWQ002), but the response is relayed to the client as-is.
+// No automatic TR5004/TR5007 follow-up - the client calls the next step explicitly.
+BOOL CIBKSConnectorCtrl::TR5010A(long key, LPCTSTR curcode)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	m_relayKeys.insert(key);
+	const BOOL bRet = TR5010(key, curcode);	// reuse validation / AccessTr / S_TR5010
+	if (!bRet)
+		m_relayKeys.erase(key);
+	return bRet;
+}
+
+// Public wrappers for the bank rate inquiries that TR5010 used to call internally.
+// The SDPKT183 response still updates m_chrat / m_ctbank (used by TR5006) in the callback.
+static bool IsValidMxchgCrcy(LPCTSTR crcycode)
+{
+	const std::vector<CString> vMcode = { "USD", "AUD", "HKD", "CNY" };
+	return std::find(vMcode.begin(), vMcode.end(), CString(crcycode)) != vMcode.end();
+}
+
+// [자체추가] 환전 기업은행 적용환율 조회(SDPKT183)
+BOOL CIBKSConnectorCtrl::TR5007(long key, LPCTSTR crcycode)
+{
+	if (_type < CIBKSConnectorCtrl::foreign)
+		return FALSE;
+
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+	if (IsValidState() == FALSE) return FALSE;
+
+	if (!IsValidMxchgCrcy(crcycode))
+	{
+		m_sLastMsg = "통화코드를 확인하세요. crcycode : [USD - 미국달러, AUD - 호주달러, HKD - 홍콩달러, CNY - 중국위안화]";
+		return FALSE;
+	}
+	return AccessTr(eTR5007) ? S_TR5007(key, crcycode) : FALSE;
+}
+
+// [자체추가] 환전 국민은행 적용환율 조회(SDPKT169)
+BOOL CIBKSConnectorCtrl::TR5004(long key, LPCTSTR crcycode)
+{
+	if (_type < CIBKSConnectorCtrl::foreign)
+		return FALSE;
+
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+	if (IsValidState() == FALSE) return FALSE;
+
+	if (!IsValidMxchgCrcy(crcycode))
+	{
+		m_sLastMsg = "통화코드를 확인하세요. crcycode : [USD - 미국달러, AUD - 호주달러, HKD - 홍콩달러, CNY - 중국위안화]";
+		return FALSE;
+	}
+	return AccessTr(eTR5004) ? S_TR5004(key, crcycode) : FALSE;
 }
 
 
@@ -6188,6 +6404,9 @@ BOOL CIBKSConnectorCtrl::S_TR5010(long key, LPCTSTR curcode)
 
 BOOL CIBKSConnectorCtrl::TR5005(long key, LPCTSTR acc, LPCTSTR pswd, LPCTSTR gdxchrat, LPCTSTR mxchgptncode)
 {
+	if (_type < CIBKSConnectorCtrl::foreign)
+		return FALSE;
+
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
 	if (IsValidState() == FALSE) return FALSE;
@@ -6252,10 +6471,13 @@ BOOL CIBKSConnectorCtrl::S_TR5005(long key, LPCTSTR acc, LPCTSTR pswd, LPCTSTR g
 
 BOOL CIBKSConnectorCtrl::TR5006(long key, LPCTSTR acc, LPCTSTR pswd, LPCTSTR tgrtcrcycode, LPCTSTR mxchgcrcycode, LPCTSTR appxcharat, LPCTSTR prvlgrat, LPCTSTR sInput, LPCTSTR mmgb, LPCTSTR trxtp, LPCTSTR rtWon, LPCTSTR rtTarget)
 {
+	if (_type < CIBKSConnectorCtrl::foreign)
+		return FALSE;
+
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
 	if (IsValidState() == FALSE) return FALSE;
-	//if (IsValidAccount(acc) == FALSE) return FALSE;
+	if (IsValidAccount(acc) == FALSE) return FALSE;
 	//if (IsValidAcnoPswd(pswd) == FALSE) return FALSE;
 	if (m_typemoney.second.empty())
 	{
@@ -6370,6 +6592,9 @@ BOOL CIBKSConnectorCtrl::S_TR5006(long key, LPCTSTR acc, LPCTSTR pswd, LPCTSTR t
 
 BOOL CIBKSConnectorCtrl::FNCancelORDER(long key, LPCTSTR odgb, LPCTSTR mmgb, LPCTSTR accn, LPCTSTR pswd, LPCTSTR org, LPCTSTR mkgb, LPCTSTR code)
 {
+	if (_type < CIBKSConnectorCtrl::foreign)
+		return FALSE;
+
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
 	if (IsValidState() == FALSE) return FALSE;
@@ -6382,6 +6607,9 @@ BOOL CIBKSConnectorCtrl::FNCancelORDER(long key, LPCTSTR odgb, LPCTSTR mmgb, LPC
 
 BOOL CIBKSConnectorCtrl::FNORDER(long key, LPCTSTR odgb, LPCTSTR mmgb, LPCTSTR accn, LPCTSTR pswd, LPCTSTR mkgb, LPCTSTR code, LPCTSTR jqty, LPCTSTR jprc, LPCTSTR hogb)
 {
+	if (_type < CIBKSConnectorCtrl::foreign)
+		return FALSE;
+
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 	
 	if (IsValidState() == FALSE) return FALSE;
@@ -6580,8 +6808,17 @@ void CIBKSConnectorCtrl::DEF_KOSCOM_CALLBACK(WPARAM wParam, LPARAM lParam)
 
 	string svcd(ledg->svcd, 8);
 
+	// [자체추가] TR5010A 응답: 은행코드만 저장하고 다음 조회 없이 그대로 클라이언트에 전달
+	// TR5010A: store bank code only and fall through to FireOnRecvData (no auto TR5004/TR5007)
+	if (svcd.compare("SDPWQ002") == 0 && size > 0 && m_relayKeys.erase(key) > 0)
+	{
+		const size_t Offset = L_tr5010_mid;
+		const gsl::span out(data, size);
+		const gsl::span<tr5010_mod> mod((tr5010_mod*)out.subspan(Offset).data(), 1);
+		m_typemoney.second = string(mod[0].rec->bnkcode, 3);	// TR5006 needs it
+	}
 	// 환전처리... TR 2번처리 
-	if (svcd.compare("SDPWQ002") == 0 && size > 0)
+	else if (svcd.compare("SDPWQ002") == 0 && size > 0)
 	{
 		// 환전 중계은행조회
 		const size_t Offset = L_tr5010_mid;

@@ -1407,4 +1407,62 @@ struct tr5010_mod
 };
 #define L_tr5010_mod sizeof(struct tr5010_mod);
 
+// coscq002
+struct tr5011_mid
+{
+	char In[5];		// in
+	char Qrytp[1];		// 조회구분
+	char Lngtp[1];		// 언어구분
+	char AcntNo[20];	// 계좌번호
+	char BrnNo[3];		// 지점번호
+	char Pwd[8];		// 패스워드
+	char Orddt[8];		// 주문일
+	char IsuNo[12];		// 종목번호
+	char datatp[1];		// 자료구분
+	char crcy[3];		// 통화코드
+	char bnstp[1];		// 매매구분
+	char fcurrmkt[2];	// 외화시장코드
+	char mkttp[1];		// 시장구분
+	char people[2];		// 고객구분코드
+};
+#define L_tr5011_mid sizeof(struct tr5011_mid);
+
+
+struct tr5011_mod
+{
+	char AcnoNo[20];	// 계좌번호
+	char bnstpnm[10];	// 매매구분명
+	char IsuNo[12];		// 종목번호
+	char IsuNo1[12];	// 종목번호1
+	char Hname[100];	// 한글종목명	
+	char ExecQty[16];	// 체결수량
+	char AcntNm[40];	// 계좌명 
+	char avrPrice[18];	// 평균가격
+	char exepr[17];		// 외화체결금액
+	char cms[17];		// 외화수수료
+	char adjs[17];		// 외화정산금액
+	char stmp[17];		// 외화인지세
+	char elec[17];		// 외화전자금융거래세
+	char trade[17];		// 외화증권거래세
+	char trtax[21];		// 해외증권매매수수료
+	char FcurrMkt[2];	// 외화시장코드
+	char Mktnm[40];		// 시장명
+	char crcy[3];		// 통화코드
+	char brktpcode[2];	// 중개구분코드
+	char oppbrknmn[40];	// 상대중계인명
+	char bnstp[1];		// 매매구분
+	char cmsrat[10];	// 수수료율
+	char comm[40];		// 통신매체명
+};
+#define L_tr5011_mod sizeof(struct tr5011_mod);
+
+
+struct tr5011_rec
+{
+	char out[5];
+	tr5011_mod rec[1];
+};
+#define L_tr5011_rec sizeof(struct tr5011_rec);
+
+
 #pragma	pack()
