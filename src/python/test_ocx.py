@@ -22,7 +22,13 @@ OCX_GUID = "{CDADD338-C7AB-4977-B65D-8E988B5958E3}"
 
 SVR_PORT = 15201  # 서버 포트 (화면 비노출)
 
-INTERNAL_MODE = True   # False for customer build: internal-only UI is not created at all
+# Build target - keep in sync with OCX IBKSConnectorCtl.h `_type`
+#   "normal"  : domestic customer   (domestic only)
+#   "foreign" : overseas developer  (+ overseas group incl. exchange/pre-settlement tabs)
+#   "admin"   : internal test       (+ server select, chaser, TR8001, login save)
+USER_TYPE = "foreign"
+IS_FOREIGN = USER_TYPE in ("foreign", "admin")
+IS_ADMIN   = USER_TYPE == "admin"
 
 LOGIN_SAVE_FILE = "login.dat"   # saved next to the exe, DPAPI encrypted (internal only)
 
@@ -47,26 +53,6 @@ def _dpapi(data: bytes, protect: bool) -> bytes:
 
 SERVER_LIST = [
     ("211.255.204.104", "UAT"),
-    ("211.255.204.70", "BP10"),
-    ("211.255.204.71", "BP11"),
-    ("211.255.204.72", "BP12"),
-    ("211.255.204.73", "BP13"),
-    ("211.255.204.74", "BP14"),
-    ("211.255.204.75", "BP15"),
-    ("211.255.204.76", "BP16"),
-    ("211.255.204.77", "BP17"),
-    ("211.255.204.78", "BP18"),
-    ("211.255.204.79", "BP19"),
-    ("211.255.204.33", "BP20"),
-    ("211.255.204.34", "BP21"),
-    ("211.255.204.35", "BP22"),
-    ("211.255.204.36", "BP23"),
-    ("211.255.204.37", "BP24"),
-    ("211.255.204.38", "BP25"),
-    ("211.255.204.39", "BP26"),
-    ("211.255.204.57", "BP27"),
-    ("211.255.204.58", "BP28"),
-    ("211.255.204.59", "BP29"),
 ]
 
 # TR key constants - must match Common.h exactly
@@ -172,12 +158,13 @@ def _check_ocx_registry():
 class TestWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("IBKConnector OCX Test" + (" [내부테스트용]" if INTERNAL_MODE else ""))
+        title_tag = {"admin": " [내부테스트용]", "foreign": " [해외개발자용]"}.get(USER_TYPE, "")
+        self.setWindowTitle("IBKConnector OCX Test" + title_tag)
         self.setMinimumWidth(1000)
         # 로그창까지 보이도록 화면 작업영역 높이에 맞춘다
         avail = QApplication.primaryScreen().availableGeometry()
-        self.setGeometry(avail.x() + (avail.width() - min(1300, avail.width())) // 2,
-                         avail.y() + 30, min(1300, avail.width()), avail.height() - 40)
+        self.setGeometry(avail.x() + (avail.width() - min(1400, avail.width())) // 2,
+                         avail.y() + 30, min(1400, avail.width()), avail.height() - 40)
 
         ocx_ok, ocx_info = _check_ocx_registry()
         if not ocx_ok:
@@ -236,7 +223,8 @@ class TestWindow(QMainWindow):
         mid_h = QHBoxLayout(mid)
         mid_h.setContentsMargins(0, 0, 0, 0)
         mid_h.addWidget(self._build_login_group())
-        mid_h.addWidget(self._build_sise_group())
+        if IS_ADMIN:                     # domestic quote panel: internal only
+            mid_h.addWidget(self._build_sise_group())
         layout.addWidget(mid)
 
         # 주문(국내) | 해외거래 좌우 분할
@@ -244,13 +232,13 @@ class TestWindow(QMainWindow):
         odr_h = QHBoxLayout(odr)
         odr_h.setContentsMargins(0, 0, 0, 0)
         odr_h.addWidget(self._build_order_group())
-        if INTERNAL_MODE:                # overseas features are internal only
+        if IS_FOREIGN:                   # overseas group: foreign developer + internal
             odr_h.addWidget(self._build_overseas_group())
         layout.addWidget(odr)
 
         layout.addWidget(self._build_log_group())
 
-        if INTERNAL_MODE:
+        if IS_ADMIN:
             self._load_login_info()      # after log group exists (uses _log)
 
     # ── UI builders ──────────────────────────────────────────────
@@ -277,23 +265,28 @@ class TestWindow(QMainWindow):
         form.addRow("user_id",   self.edit_user_id)
         form.addRow("user_pw",   self.edit_user_pw)
         form.addRow("cert_pw",   self.edit_cert_pw)
-        if INTERNAL_MODE:
+        if IS_FOREIGN:                   # server combo: foreign (UAT by name) + internal (all, with IP)
             self.combo_server  = QComboBox()
             self.combo_server.addItem("", "")
             for ip, name in SERVER_LIST:
-                self.combo_server.addItem(f"{name} ({ip})", ip)   # internal only, so IP is shown
-            self.combo_server.setCurrentIndex(0)
-            self.combo_server.currentIndexChanged.connect(self._on_server_selected)
-            self.edit_svr_ip   = QLineEdit("")
+                # IP is shown only in the internal build
+                self.combo_server.addItem(f"{name} ({ip})" if IS_ADMIN else name, ip)
+            # default: foreign -> UAT, internal -> blank (GLB)
+            uat_idx = self.combo_server.findText("UAT")
+            self.combo_server.setCurrentIndex(uat_idx if not IS_ADMIN and uat_idx >= 0 else 0)
             svr_h = QHBoxLayout()
             svr_h.addWidget(self.combo_server, 1)              # half width
             svr_h.addWidget(QLabel("미선택시 GLB"), 1)
             form.addRow("서버선택",  svr_h)
+        if IS_FOREIGN:                   # direct IP input: foreign + internal
+            self.combo_server.currentIndexChanged.connect(self._on_server_selected)
+            self.edit_svr_ip   = QLineEdit("")
             form.addRow("svr_ip",    self.edit_svr_ip)
         layout.addLayout(form)
 
-        self.chk_quote_only = QCheckBox("시세조회 전용 (인증서 없이 ID/PW만으로 로그인 - LoginQuote)")
-        layout.addWidget(self.chk_quote_only)
+        if IS_ADMIN:                     # quote-only login (LoginQuote): internal only
+            self.chk_quote_only = QCheckBox("시세조회 전용 (인증서 없이 ID/PW만으로 로그인 - LoginQuote)")
+            layout.addWidget(self.chk_quote_only)
 
         h = QHBoxLayout()
         btn_login  = QPushButton("Login()")
@@ -306,7 +299,7 @@ class TestWindow(QMainWindow):
         self.lbl_login = QLabel("-")
         h.addWidget(btn_login)
         h.addWidget(btn_logout)
-        if INTERNAL_MODE:
+        if IS_ADMIN:
             btn_cust = QPushButton("고객정보(TR8001)")
             btn_cust.clicked.connect(self._on_tr8001)
             h.addWidget(btn_cust)
@@ -319,7 +312,7 @@ class TestWindow(QMainWindow):
         h.addWidget(btn_full)        # far right, away from Login() to avoid misclicks
         layout.addLayout(h)
 
-        if INTERNAL_MODE:
+        if IS_ADMIN:
             h_chaser = QHBoxLayout()
             btn_chaser_show = QPushButton("체이서 보기")
             btn_chaser_show.setToolTip("AxisChaser.exe를 실행해 이 프로그램의 송수신 프로토콜을 실시간으로 확인합니다")
@@ -412,6 +405,9 @@ class TestWindow(QMainWindow):
         left = QFormLayout()
         self.edit_odr_code = QLineEdit()
         left.addRow("종목코드", self.edit_odr_code)
+        lbl_code_hint = QLabel("ex) A005930")     # stock code needs the leading 'A'
+        lbl_code_hint.setStyleSheet("color: gray;")
+        left.addRow("", lbl_code_hint)
 
         self.combo_mmgb = QComboBox()
         for text, val in [("1 매도", 1), ("2 매수", 2), ("3 정정", 3), ("4 취소", 4)]:
@@ -610,7 +606,7 @@ class TestWindow(QMainWindow):
         tabs.addTab(self._build_ovs_chegyul_tab(), "체결내역(TR5002)")
         tabs.addTab(self._build_ovs_gorae_tab(), "거래내역(TR5003)")
         tabs.addTab(self._build_ovs_yesugeum_tab(), "예수금(TR5000)")
-        if INTERNAL_MODE:
+        if IS_FOREIGN:
             tabs.addTab(self._build_ovs_hwanjeon_tab(), "환전(TR5005/5006)")
             tabs.addTab(self._build_ovs_gajungsan_tab(), "가정산(TR5011)")
         return group
@@ -1156,17 +1152,18 @@ class TestWindow(QMainWindow):
         user_id  = self.edit_user_id.text()
         user_pw  = self.edit_user_pw.text()
         cert_pw  = self.edit_cert_pw.text()
-        if INTERNAL_MODE:
-            # 서버콤보를 고르면 그 IP(화면 비노출), 아니면 직접 입력한 svr_ip를 쓴다.
-            svr_ip   = self.combo_server.currentData() or self.edit_svr_ip.text()
-            svr_name = self.combo_server.currentText().split(" (")[0] or ("직접입력" if svr_ip else "glb")   # log name only, no IP
+        if IS_FOREIGN:
+            # 직접 입력한 svr_ip가 있으면 그것을, 없으면 서버콤보의 IP(화면 비노출)를 쓴다.
+            typed_ip = self.edit_svr_ip.text().strip()
+            svr_ip   = typed_ip or self.combo_server.currentData()
+            svr_name = "직접입력" if typed_ip else (self.combo_server.currentText().split(" (")[0] or "glb")   # log name only, no IP
         else:
             svr_ip, svr_name = "", "glb"    # customer: OCX resolves the production server via glb
         svr_port = SVR_PORT
         self._login_svr_ip = svr_ip         # saved with login info when OnLogin succeeds
 
         # svr_ip가 비어 있으면 OCX가 glb로 서버 IP를 조회한다.
-        if self.chk_quote_only.isChecked():
+        if IS_ADMIN and self.chk_quote_only.isChecked():
             result = self.ocx.dynamicCall(
                 "LoginQuote(QString, QString, QString, int)",
                 user_id, user_pw, svr_ip, svr_port
@@ -1224,14 +1221,14 @@ class TestWindow(QMainWindow):
             home = self.ocx.dynamicCall("GetHome()")
             self._log(f"  OCX 홈 경로: {home}")
             self._load_accounts()
-            if INTERNAL_MODE and self.chk_save_login.isChecked():
+            if IS_ADMIN and self.chk_save_login.isChecked():
                 self._save_login_info()
 
     def _load_accounts(self):
         # GetAccounts() returns "계좌번호\t계좌명\n계좌번호\t계좌명" format
         raw = self.ocx.dynamicCall("GetAccounts()")
         self.combo_odr_accn.clear()
-        if INTERNAL_MODE:
+        if IS_FOREIGN:
             self.combo_ovs_accn.clear()
         if not raw:
             self._log("GetAccounts() => (empty)")
@@ -1245,7 +1242,7 @@ class TestWindow(QMainWindow):
             display = f"{acno[:3]} {acno[3:5]} {acno[5:]}  {acnm}".strip() if len(acno) >= 5 else line
             self._log(f"  계좌={acno}({len(acno)}자리) 명={acnm}")
             self.combo_odr_accn.addItem(display, acno)
-            if INTERNAL_MODE:
+            if IS_FOREIGN:
                 self.combo_ovs_accn.addItem(display, acno)
 
     def _evt_error(self, msg):
@@ -1757,8 +1754,8 @@ class TestWindow(QMainWindow):
         if code in self._jango_calc and "023" in m:
             self._recalc_jango_on_price(code, m["023"])
 
-        if code != self.edit_sise_code.text().strip().lstrip('A'):
-            return  # 현재 조회 중인 종목만 처리(시세조회 화면 갱신은 여기까지)
+        if not IS_ADMIN or code != self.edit_sise_code.text().strip().lstrip('A'):
+            return  # 현재 조회 중인 종목만 처리(시세조회 화면 갱신은 여기까지, 시세 패널은 내부용에만 있음)
 
         if "034" in m:  # 체결시간 있으면 체결 데이터
             self.lbl_curr.setText(m.get("023", "-").lstrip('+-') or "-")

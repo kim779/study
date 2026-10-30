@@ -472,6 +472,7 @@ afx_msg int CIBKSConnectorCtrl::OnAxisFire(int type, WPARAM wParam, LPARAM lPara
 		{
 			if(lParam == 1) // 플랫폼 파일 업그레이드 재접속
 			{
+				MessageBox("플랫폼 업데이트 완료\n파일복사 후 재기동 하시기 바랍니다.", "플랫폼 업데이트", MB_OK);
 				FireOnVerUpdate();	//2012.08.27 플랫폼업데이트 이벤트 발생시킴
 			}
 			else
@@ -1233,7 +1234,7 @@ void CIBKSConnectorCtrl::C_PIDOVERS(WPARAM wParam, LPARAM lParam)
 	pihoitgy_mod* mod = (struct pihoitgy_mod*)lParam;
 	int	cnt = atoi(CString(mod->nrec, sizeof(mod->nrec)));
 
-	m_slog.Format("[openapi][%s]<%d> integrity result nrec=[%d] module=[%s]", __FUNCTION__, __LINE__,
+	m_slog.Format("[openapi][%s]<%d>무결성검증 결과 수신 integrity result nrec=[%d] module=[%s]", __FUNCTION__, __LINE__,
 		cnt, cnt > 0 ? (LPCSTR)CString(mod->grid[0].mnam, sizeof(mod->grid[0].mnam)).Trim() : "");
 	WriteLog(m_slog);
 
@@ -1246,7 +1247,7 @@ void CIBKSConnectorCtrl::C_PIDOVERS(WPARAM wParam, LPARAM lParam)
 		return;
 	}
 #endif
-	StartContractCheck();		// m_bLogin/OnLogin(TRUE) are set later in InitJanGo()
+	StartContractCheck();		// m_bLogin/OnLogin(TRUE) are set later in InitJanGo()  무결성 검증후 약정계좌 체크
 }
 
 void CIBKSConnectorCtrl::C_PIDOUINI(WPARAM wParam, LPARAM lParam)
@@ -3624,69 +3625,6 @@ WriteLog(m_slog);
 	}
 	++m_chkIdx;  //sacaq504 응답받고 처리 완료
 	RequestNextContract();
-
-
-	//int key = LOWORD(wParam);
-	//int size = HIWORD(wParam);
-
-	//struct ledger *ledger = (struct ledger *)lParam;
-	//struct sacaq504_mod *mod = (struct sacaq504_mod *)( (LPCSTR)lParam + L_ledger);
-	//
-	//if(m_bSaveLog)
-	//	testSaveFile("sacaq504_mod", (LPCSTR)lParam + L_ledger + L_sacaq504_mid, size - L_ledger - L_sacaq504_mid);
-
-	//if (ledger->ecod[0]!='0')
-	//{
-	//	// 등록내용이 없다면 계좌목록에서 삭제
-	//	for(size_t n=0; n<m_acno.size(); ++n)
-	//	{
-	//		if (m_chk_acno[key]==m_acno[n])
-	//		{
-	//			if(m_bSaveLog)
-	//				testSaveFile("Not Found", m_acno[n], 11);
-
-	//			m_slog.Format("[openapi][%s]<%d> sacaq504 (약정)결과에 따라 삭제 계좌 =[%s]", __FUNCTION__, __LINE__, (LPCSTR)m_acno[n]);
-	//			WriteLog(m_slog);
-	//			
-	//			m_acno.erase(m_acno.begin() + n);
-	//			m_acnm.erase(m_acnm.begin() + n);
-	//			
-	//			break;
-	//		}
-	//	}
-	//}
-	//else if (ledger->next[0] == 'Y')	//2014.11.25 KSJ 이경민대리님은 약정이 많아서 FEP가 끊긴다. 연속처리함.
-	//{
-	//	memcpy(ledger->fkey, "7   ", 4);
-	//	SendTR("piboPBxQ", key, US_ENC, (LPCSTR)lParam, L_ledger + L_sacaq504_mid, &CIBKSConnectorCtrl::C_SACAQ504);
-	//}
-	//else
-	//{
-	//	int idx = atoi(CString(mod->Out2, sizeof(mod->Out2))) - 1;
-
-	//	if(m_bSaveLog)
-	//		testSaveFile("RegTp", mod->grid[idx].RegTp, 1);
-
-	//	if (mod->grid[idx].RegTp[0]!='1')
-	//	{
-	//		// 마지막 내용이 등록이 아니라면 해지로 보고 계좌 삭제
-	//		for(size_t n=0; n<m_acno.size(); ++n)
-	//		{
-	//			if (m_chk_acno[key]==m_acno[n])
-	//			{
-	//				if(m_bSaveLog)
-	//					testSaveFile("UnReg", m_acno[n], 11);
-
-	//				m_acno.erase(m_acno.begin()+n);
-	//				m_acnm.erase(m_acnm.begin()+n);
-	//				break;
-	//			}
-	//		}
-	//	}
-	//}
- //    
-	//m_chk_acno.erase(key);
-	//InitJanGo();
 }
 
 void CIBKSConnectorCtrl::InitJanGo()
@@ -3739,8 +3677,6 @@ void CIBKSConnectorCtrl::InitJanGo()
 		{
 			m_sLastMsg = "IBXXXX11 생성 실패";
 		}
-
-		//S_PIDOVERS();   //test comment
 	}
 }
 
@@ -7384,6 +7320,34 @@ bool CIBKSConnectorCtrl::OnDev(long key, string svcd, LPCTSTR data, long size, B
 	
 		std::ofstream file("change.json", std::ios::out | std::ios::trunc);
 		file << chxx.dump(8) << std::endl;
+		file.close();
+	}
+	else if (svcd.compare("COSCQ002") == 0 && size > 0)
+	{
+		std::ofstream file("rdata.txt", std::ios::out | std::ios::trunc);
+		gsl::span<const char> response(data, size);	
+		gsl::span<const struct tr5011_mid> mid(reinterpret_cast<const struct tr5011_mid*>(response.subspan(0).data()), 1);	
+		size_t offset = L_tr5011_mid;
+		gsl::span<const struct tr5011_rec> rec(reinterpret_cast<const struct tr5011_rec*>(response.subspan(offset).data()), 1);		
+		CString sCount(rec.data()->out, 5);		
+		int size = atoi(sCount);
+		if (size > 0)
+		{	
+			gsl::span<struct tr5011_mod> mod((struct tr5011_mod*)(response.subspan(offset + 5).data()), size);	
+			for (const auto& item : mod)
+			{
+				file << std::string(item.AcnoNo, 20).data() << std::endl;
+				file << std::string(mod.data()->AcntNm, 40).data() << std::endl;
+				file << std::string(mod.data()->bnstpnm, 10).data() << std::endl;
+				file << std::string(mod.data()->IsuNo, 20).data() << std::endl;
+				file << std::string(mod.data()->Hname, 100).data() << std::endl;
+				file << std::string(mod.data()->ExecQty, 16).data() << std::endl;
+				file << std::string(mod.data()->avrPrice, 18).data() << std::endl;
+				file << std::string(mod.data()->cms,17).data() << std::endl;
+				file << std::string(mod.data()->trade, 17).data() << std::endl;
+				file << std::string(mod.data()->trtax, 17).data() << std::endl;
+			}
+		}
 		file.close();
 	}
 	return true;

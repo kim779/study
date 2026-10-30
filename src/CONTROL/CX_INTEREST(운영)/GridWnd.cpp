@@ -8591,14 +8591,14 @@ void CGridWnd::parsingAlertx(LPARAM lParam)
 					}
 					else if (symbol.CompareNoCase("051") == 0)
 					{
-						LPCSTR p25 = getData(25);
+						LPCSTR p25 = getData(bNeedMap ? 51 : 25);
 						entry = p25 ? p25 : "";
 						if (!entry.IsEmpty())
 							m_grid->SetItemText(xrow, ii, entry);
 					}
 					else if (symbol.CompareNoCase("071") == 0)
 					{
-						LPCSTR p26 = getData(26);
+						LPCSTR p26 = getData(bNeedMap ? 71 : 26);
 						entry = p26 ? p26 : "";
 						if (!entry.IsEmpty())
 							m_grid->SetItemText(xrow, ii, entry);
