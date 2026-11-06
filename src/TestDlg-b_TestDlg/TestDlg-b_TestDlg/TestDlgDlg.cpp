@@ -398,6 +398,13 @@ BOOL CTestDlgDlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// 작은 아이콘을 설정합니다.
 
 	// TODO: 여기에 추가 초기화 작업을 추가합니다.
+	// Create scrollable button panel at IDC_STATIC_PANEL placeholder
+	CRect rcPanel;
+	GetDlgItem(IDC_STATIC_PANEL)->GetWindowRect(rcPanel);
+	ScreenToClient(rcPanel);
+	m_btnPanel.Create(IDD_BTN_PANEL, this);
+	m_btnPanel.SetWindowPos(nullptr, rcPanel.left, rcPanel.top, rcPanel.Width(), rcPanel.Height(), SWP_NOZORDER | SWP_SHOWWINDOW);
+
 	SetToolTiplist();
 
 	/*
@@ -2663,10 +2670,31 @@ void CTestDlgDlg::SetToolTiplist()
 
 	// 툴팁이 사용할 컨트롤의 ID가 IDC_STATIC 이라고 하면 아래와 같이 사용할
 	// 내용을 명시해야 한다.
-	m_tooltip.AddTool(GetDlgItem(IDC_BTN_SERIAL2), _T("★STATIC 툴팁★"));  //
-	m_tooltip.AddTool(GetDlgItem(IDC_BRN_BIT), _T("16진수 비트 연산"));  //
-	m_tooltip.AddTool(GetDlgItem(IDC_BRN_BIT2), _T("Round 계산(수수료에 이용됨)"));  
-	m_tooltip.AddTool(GetDlgItem(IDC_BTN_PAIR), _T("pare 를 이용한 c++17 stl"));  
+	// Extra descriptions shown above the handler name
+	struct { UINT id; LPCTSTR desc; } descs[] = {
+		{ IDC_BTN_SERIAL2, _T("★STATIC 툴팁★") },
+		{ IDC_BRN_BIT,     _T("16진수 비트 연산") },
+		{ IDC_BRN_BIT2,    _T("Round 계산(수수료에 이용됨)") },
+		{ IDC_BTN_PAIR,    _T("pare 를 이용한 c++17 stl") },
+	};
+
+	// Button caption is "label\nHandlerSuffix" -> tooltip shows full handler name
+	for (CWnd* pChild = m_btnPanel.GetWindow(GW_CHILD); pChild; pChild = pChild->GetNextWindow())
+	{
+		CString caption;
+		pChild->GetWindowText(caption);
+		const int pos = caption.Find(_T('\n'));
+		if (pos < 0)
+			continue;
+
+		CString tip = _T("OnBnClicked") + caption.Mid(pos + 1);	// handler may live in CTestDlgDlg or CBtnPanel
+		for (const auto& d : descs)
+		{
+			if (d.id == (UINT)pChild->GetDlgCtrlID())
+				tip = CString(d.desc) + _T("\r\n") + tip;
+		}
+		m_tooltip.AddTool(pChild, tip);
+	}
 
 	// 툴팁에 사용할 내용이 너무 긴 경우에 한줄로 표시되면 사용자가 불편할 수 있다.
 	// 이런 경우에는 툴팁의 폭을 제한하여 여러줄로 출력하게 만들면 된다.
@@ -3695,13 +3723,28 @@ void CTestDlgDlg::OnBnClickedBtnCalcwindowrect()
 void CTestDlgDlg::OnSize(UINT nType, int cx, int cy)
 {
 	CDialogEx::OnSize(nType, cx, cy);
-	CRect rect;
 
-	GetClientRect(rect);
+	// Button panel follows dialog height (width fixed)
+	if (m_btnPanel.GetSafeHwnd())
+	{
+		CRect rcPanel;
+		m_btnPanel.GetWindowRect(rcPanel);
+		ScreenToClient(rcPanel);
+		m_btnPanel.SetWindowPos(nullptr, 0, 0, rcPanel.Width(), max(0, cy - rcPanel.top), SWP_NOMOVE | SWP_NOZORDER);
+	}
 
-	if(m_pWnd)
-		m_pWnd->MoveWindow(rect);
-	// TODO: 여기에 메시지 처리기 코드를 추가합니다.
+	CWnd* pAnchor = GetDlgItem(IDC_STATIC_WND);
+	if (!m_pWnd || !pAnchor)
+		return;
+
+	// Keep top-left at IDC_STATIC_WND, stretch to right edge only (controls sit below it)
+	CRect rcAnchor;
+	pAnchor->GetWindowRect(rcAnchor);
+	ScreenToClient(rcAnchor);
+
+	CRect rc = rcAnchor;
+	rc.right = max(rcAnchor.right, (LONG)cx - 7);
+	m_pWnd->MoveWindow(rc);
 }
                                                                                    
 #include "CScrollDlg.h"

@@ -18,14 +18,18 @@
 #define IDC_BUTTON1                     1005
 #define IDC_LIST_CLEAR                  1005
 #define IDC_LIST_CLEAR2                 1006
-#define IDC_BTN_DUMPANS                 1006
 #define IDC_BUTTON2                     1007
 #define IDC_BTN_HIDE                    1007
 #define IDC_BUTTON3                     1008
-#define IDC_BTN_DECACC                  1008
 #define IDC_BTN_DUMPOPEN                1009
 #define IDC_EDIT_SYMPATH                1010
 #define IDC_BTN_SYMPATH                 1011
+#define IDC_CHK_HTS                     1012
+#define IDC_CHK_FILTER                  1013
+#define IDC_EDIT_FILTER                 1014
+#define IDC_CHK_DEBUG                   1015
+#define IDC_STATIC_SYMPATH              1016
+#define IDC_EDIT_DETAIL                 1017
 
 // Next default values for new objects
 // 
@@ -33,7 +37,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        132
 #define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         1012
+#define _APS_NEXT_CONTROL_VALUE         1018
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

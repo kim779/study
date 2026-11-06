@@ -10,7 +10,9 @@
 #include <TlHelp32.h>
 #pragma comment(lib, "DbgHelp.lib")
 
-#define WM_PING_LOG (WM_USER + 100)
+#include <mutex>
+#include <deque>
+#define WM_AGENT_LOG (WM_APP + 0x120)
 
 // 트레이 관련
 #define WM_TRAYICON  (WM_USER + 100)
@@ -72,7 +74,6 @@ public:
 	char   m_regkey[256];
 	DWORD  m_parentPid;
 	HANDLE m_hPingThread;
-	char m_sUserpath[256]{};
 
 	//ping 관련
 	HANDLE m_hPingProcess{};
@@ -90,23 +91,56 @@ public:
 	CButton m_chkStop;
 	CButton m_chkPing;
 	CButton m_chkMonitor;
+	CButton m_chkHts;
+	CButton m_chkDebug;
+	CButton m_chkFilter;
+	CEdit   m_editFilter;
+	CString m_sFilter;		// cached keyword (read from worker threads, no GetWindowText there)
+	bool    m_bFilter = false;
 	CListCtrl m_listLog;
+	CRichEditCtrl m_editDetail;	// shows the double-clicked log row
+
+	// resize layout
+	enum { LAY_MOVE_X = 1, LAY_MOVE_Y = 2, LAY_SIZE_X = 4, LAY_SIZE_Y = 8 };
+	struct LayoutItem { UINT id; CRect rc; int flags; };
+	std::vector<LayoutItem> m_layout;
+	CSize m_szInitClient;
+	CSize m_szMinWindow;
+	void InitLayout();
+	void CopyLogsToClipboard(bool bAll);
 	CEdit   m_editSymPath;
 	CString m_sSymPath;
 
 	void RegisterToMain();
 	bool ShouldShowLogType(const char* type);
+	bool PassFilter(const CString& msg);
 
 	int        m_dumpSeq = 0;
 	int        m_dumpCount = 0;
+	int        m_dumpTotal = 0;		// lifetime dump count (not reset)
+	bool       m_bDumpLimitLogged = false;
+	int        m_dumpFailCount = 0;
 	ULONGLONG  m_lastDumpTick = 0;
 
 	// 멤버변수
 	DWORD   m_dwMainThreadId = 0;       // 메인 스레드 ID
 	HANDLE  m_hMonitorThread = NULL;
-	bool    m_bDumpCreated = false;   // 중복 덤프 방지
 	static DWORD WINAPI MonitorThreadProc(LPVOID pParam);
 	void MonitorLoop();
+
+	//락
+	std::mutex	m_logQueueLock;
+	std::deque<AGENT_LOG_ROW>   m_logQueue;
+	bool m_bLogPosted = false;
+
+	// latest open-screen list from HTS "[MAP] ... | now=[...]" log
+	std::mutex m_mapsLock;
+	CStringA   m_lastMaps;
+	DWORD      m_firstMapTick = 0;	// guarded by m_mapsLock; tick of first [MAP] (screen restore start)
+
+	// CpuSpike dump policy
+	bool IsCpuDumpEnabled() const;	// tab\AXISAI.ini [Axisagent] cpudump (default 1)
+
 
 	DWORD m_lastMonitorSummaryTick;
 	bool  m_bLastHung;
@@ -124,16 +158,12 @@ public:
 		ULONGLONG& prevTickMs,
 		ULONGLONG  curTickMs);
 
-	void CreateDump(const char* reason);
+	void CreateDump(const char* reason, const char* trigger = nullptr);
 	void AnalyzeDump(const char* dumpPath);
-	void WriteMonitorLog(const char* msg);
+	void WriteMonitorLog(const char* msg, const char* type = "MONITOR");
+	void CleanupPingFolder(int keepDays);
 	CString GetFileNameOnly(const char* fullPath) const;
 	CString GetDumpAnalysisIniPath() const;
-	CString GetMainCrashDumpDir() const;
-	//BOOL IsDumpAlreadyAnalyzed(const char* dumpPath) const;
-	BOOL IsDumpAlreadyAnalyzed(const CString& dumpPath) const;
-
-	void ScanAndAnalyzeMainCrashDumps();
 
 	void AppendBlankLineToIni();
 	void WriteDumpAnalysisIniByDumpName(
@@ -166,6 +196,7 @@ public:
 	void AddLog(const char* type, const char* msg);
 	void AppendLogToList(const CString& sTime, const CString& sType, const CString& sMsg);
 	void RefreshLogList();
+	void SaveSymPath();
 
 	// 네트워크
 	enum NetType { NET_NONE, NET_WIFI, NET_WIRED };
@@ -180,7 +211,7 @@ public:
 	void OnTrayHide();
 	void OnTrayExit();
 
-	CAxisAgentDlgAutoProxy* m_pAutoProxy;
+	CAxisAgentDlgAutoProxy* m_pAutoProxy{};
 	HICON m_hIcon;
 
 	BOOL CanExit();
@@ -195,21 +226,26 @@ public:
 	virtual void OnCancel();
 	afx_msg LRESULT OnTrayIcon(WPARAM wParam, LPARAM lParam);
 	DECLARE_MESSAGE_MAP()
-
+	afx_msg LRESULT OnAgentLog(WPARAM, LPARAM);
 	afx_msg BOOL OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCds); // HTS → Agent
 	afx_msg void OnDestroy();
 public:
 	afx_msg void OnBnClickedBtnTest();
 	afx_msg void OnBnClickedChkPing();
-	afx_msg void OnBnClickedChkStop();
 	afx_msg void OnBnClickedChkMonitor();
+	afx_msg void OnBnClickedChkHts();
+	afx_msg void OnBnClickedChkDebug();
+	afx_msg void OnSize(UINT nType, int cx, int cy);
+	afx_msg void OnGetMinMaxInfo(MINMAXINFO* lpMMI);
+	afx_msg void OnNMRClickListLog(NMHDR* pNMHDR, LRESULT* pResult);
+	afx_msg void OnNMDblclkListLog(NMHDR* pNMHDR, LRESULT* pResult);
+	afx_msg void OnBnClickedChkFilter();
+	afx_msg void OnEnChangeEditFilter();
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	afx_msg void OnBnClickedListClear();
-	afx_msg void OnBnClickedBtnDumpans();
-	virtual BOOL OnCommand(WPARAM wParam, LPARAM lParam);
 	afx_msg void OnBnClickedBtnHide();
-	afx_msg void OnBnClickedBtnDecacc();
 	afx_msg void OnBnClickedBtnDumpOpen();
-	afx_msg void OnBnClickedBtnDumpopen();
 	afx_msg void OnBnClickedBtnSympath();
+
+	afx_msg void OnBnClickedChkStop();
 };

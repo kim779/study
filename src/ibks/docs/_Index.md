@@ -73,3 +73,4 @@ VBScript→Python 스크립트엔진 전환 프로젝트 당시 작성된 초기
 ## 5. 작업일지 / 기타
 
 - [[2026-08-17.md]] — 작업일지(platform 분석 내용 정리 등)
+- [[AxisAgent.md]] — AxisAgent(크래시/행 감시 exe) 개선 과제 목록과 항목별 수정 제안

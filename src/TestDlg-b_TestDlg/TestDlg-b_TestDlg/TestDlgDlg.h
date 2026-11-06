@@ -12,6 +12,7 @@
 #include "EditX.h"
 #include "CEditSearch.h"
 #include "CMarketPopWnd.h"
+#include "CBtnPanel.h"
 #ifndef _gMuVal
 //extern HANDLE g_hMutex;
 #define _gMuVal
@@ -72,6 +73,7 @@ public:
 
 	char* m_ledger;
 	CToolTipCtrl		m_tooltip;
+	CBtnPanel			m_btnPanel;		// scrollable button area (IDD_BTN_PANEL)
 	void SetToolTiplist();
 	CString m_slog;
 	class CTestScroll* m_pWnd{};

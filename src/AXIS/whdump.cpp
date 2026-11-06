@@ -157,6 +157,21 @@ MiniDumper::MiniDumper(LPCTSTR szAppName)
 //    return retval;
 //}
 
+static BOOL CALLBACK DumpCallback(PVOID,
+    const PMINIDUMP_CALLBACK_INPUT pInput,
+    PMINIDUMP_CALLBACK_OUTPUT pOutput)
+{
+    if (pInput == NULL || pOutput == NULL)
+        return TRUE;
+
+    if (pInput->CallbackType == ModuleCallback &&
+        _wcsnicmp(pInput->Module.FullPath, L"C:\\Windows\\", 11) == 0)
+    {
+        pOutput->ModuleWriteFlags &= ~(ModuleWriteDataSeg | ModuleWriteCodeSegs);
+    }
+    return TRUE;
+}
+
 LONG MiniDumper::TopLevelFilter(struct _EXCEPTION_POINTERS* pExceptionInfo)
 {
     LONG retval = EXCEPTION_CONTINUE_SEARCH;
@@ -247,11 +262,13 @@ LONG MiniDumper::TopLevelFilter(struct _EXCEPTION_POINTERS* pExceptionInfo)
                     MiniDumpWithIndirectlyReferencedMemory | 
                     MiniDumpWithCodeSegs);    // x64 CALL
 
+                MINIDUMP_CALLBACK_INFORMATION mci = { DumpCallback, NULL };
+
                 const BOOL bOK = pDump(
                     GetCurrentProcess(), GetCurrentProcessId(),
                     hFile,
                     dumpType,
-                    &ExInfo, NULL, NULL);
+                    &ExInfo, NULL, &mci);
 
                 if (bOK)
                 {

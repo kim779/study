@@ -46,7 +46,8 @@ constexpr int MAX_SLOT = 4096;
 
 #ifdef AXIS_MAIN
 extern std::unordered_map<std::string, int> g_codeToIndex;
-extern TickSnapshot g_tickSlots[MAX_SLOT];
+//extern TickSnapshot g_tickSlots[MAX_SLOT];
+extern TickSnapshot* g_tickSlots;
 extern int g_nextIndex;
 extern std::shared_mutex  g_codeMapLock;
 //extern std::unordered_set<int> g_dirtySlots;
@@ -66,7 +67,8 @@ AXIS_API BOOL Axis_State();
 
 #ifdef DLL_MAIN
 extern std::unordered_map<std::string, int> g_dllcodeToIndex;
-extern TickSnapshot g_dlltickSlots[MAX_SLOT];
+//extern TickSnapshot g_dlltickSlots[MAX_SLOT];
+extern TickSnapshot* g_dlltickSlots;
 extern int g_dllnextIndex;
 extern std::shared_mutex  g_dllcodeMapLock;
 //extern std::vector<int> g_dlldirtySlots;

@@ -56,6 +56,7 @@ BOOL CAxisAgentApp::InitInstance()
 	InitCommonControlsEx(&InitCtrls);
 
 	CWinApp::InitInstance();
+	AfxInitRichEdit2();	// required for the RichEdit20A detail box in the dialog
 
 	if (!AfxSocketInit())
 	{

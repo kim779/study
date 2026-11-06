@@ -138,6 +138,9 @@ CString CPrinterSettings::PrinterSetup( CWnd* pWnd)
 {
 	// Ask the user which printer to use.
 	ASSERT(pWnd);
+
+	if (!m_hDevMode)
+		CopyDefaultMfcPrinter();
 	
 	CPrintDialog pd(
 	  FALSE,PD_ALLPAGES | PD_USEDEVMODECOPIES | PD_NOPAGENUMS | PD_HIDEPRINTTOFILE | PD_NOSELECTION,pWnd);
@@ -239,6 +242,10 @@ void CPrinterSettings::CopyDefaultMfcPrinter()
 void CPrinterSettings::SetThisPrinter()
 {
 	PRINTDLG pd;
+
+	if (!m_hDevMode)
+		CopyDefaultMfcPrinter();
+
 	// Save MFC's printer and select ours instead.
 	AfxGetApp()->GetPrinterDeviceDefaults(&pd);
 	m_hSaveDevNames = pd.hDevNames;

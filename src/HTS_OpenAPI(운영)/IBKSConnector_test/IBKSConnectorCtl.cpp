@@ -1284,7 +1284,7 @@ void CIBKSConnectorCtrl::C_PIDOUINI(WPARAM wParam, LPARAM lParam)
 				ed = acno.Find("\n", pos);
 				CString acc = acno.Mid(pos, ed - pos);
 
-				m_slog.Format("[openapi][%s]<%d> 전체계좌 acc =[%s %s %s]", __FUNCTION__, __LINE__, acc.Left(3), acc.Mid(3, 2), acc.Mid(5, 6));
+				m_slog.Format("[openapi][%s]<%d> 전체계좌 acc =[%s %s %s]  accInfo=[%s]", __FUNCTION__, __LINE__, acc.Left(3), acc.Mid(3, 2), acc.Mid(5, 6), acc);
 				WriteLog(m_slog);
 
 				m_acno.push_back(acc.Mid(0, 11));

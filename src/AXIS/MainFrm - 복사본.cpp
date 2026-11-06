@@ -103,6 +103,7 @@
 #include "enc.h"
 #include "FirstJob.h"
 #include "../H/interMSG.h"
+#include "../ibks/h/axlog.h"
 
 
 #include <lm.h>
@@ -117,12 +118,31 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
+// m_iKRXype / m_iNXType 상태값 정의 - 실제 아이콘 매핑은 DLL/sm/Dbar1.cpp::CDbar1::SetShowAIBtn() 기준
+// -1은 상태 미확정(default: 분기)을 나타내는 별도 값이라 여기 포함하지 않음
+#define KRX_MARKET_END			0	//장마감  (KRX_OFF)
+#define KRX_MARKET_TIMEOUT		1	//시간외  (KRX_TIMEOUT)
+#define KRX_MARKET_NORMAL		2	//정규장  (KRX_ON)
+#define KRX_MARKET_ONEPRC		3	//단일가  (KRX_SINGLE)
+#define KRX_MARKET_BEFORE		4	//장전    (KRX_MBEFORE)
+#define KRX_MARKET_FREE			5	//프리    (KRX_FREE)
+#define KRX_MARKET_AFTER		6	//애프터  (KRX_AFTER)
+
+#define NXT_MARKET_END			0	//장마감  (NXT_OFF)
+#define NXT_MARKET_FREE			1	//프리    (NXT_FREE)
+#define NXT_MARKET_NORMAL		2	//메인    (NXT_ON)
+#define NXT_MARKET_AFTER		3	//애프터  (NXT_AFTER)
+#define NXT_MARKET_ONEPRC		4	//단일가  (NXT_ONEPRC)
+#define NXT_MARKET_BEFORE		5	//장전    (NXT_MBEFORE)
+
 static CRect	g_monRc(0, 0, 0, 0);
 static CMainFrame* m_pMain = NULL;
 
 #ifdef DF_MAIN_RTS
 std::unordered_map<std::string, int> g_codeToIndex;
-TickSnapshot g_tickSlots[MAX_SLOT];
+//TickSnapshot g_tickSlots[MAX_SLOT];
+TickSnapshot* g_tickSlots = (TickSnapshot*)::VirtualAlloc(NULL,
+	sizeof(TickSnapshot) * MAX_SLOT, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
 int g_nextIndex = 0;
 std::shared_mutex  g_codeMapLock;
 int g_nextSlot{};
@@ -312,16 +332,12 @@ void WriteUpLog(LPCSTR sfile, LPCSTR log, ...)
 	END_CATCH
 }
 
+// WriteLog/WriteUpLog/WriteLog_File는 전부 맨 앞에 return;이 있어 현재 아무것도 기록하지 않는다.
+// 드물게 발생하는 크래시/레이스 조건을 진단할 때는 h/axlog.h의 axDiagLog()를 사용한다 -
+// AXIS/docs/KnowledgeBase.md의 "진단로그 관리 규칙" 참고 (2026-09-15, ShowHistoryMap/IB0000X8 조사 계기로 axlog.h에 공용화됨)
+
 void WriteLog( LPCSTR log, ... )
 {
-	CString slog;
-
-	va_list args;
-	va_start(args, log);
-	slog.FormatV(log, args);   // log를 포맷 문자열로, 뒤 인자들을 채운다
-	va_end(args);
-
-	output_DebugString(slog);
 #if 0
 	TRY
 	{
@@ -783,6 +799,11 @@ bool axiscall(int msg, WPARAM wParam, LPARAM lParam)
 				m_pMain->m_TOP10Rect.bottom = rc.bottom;
 			}
 
+			if (LOWORD(wParam) == 48)
+			{
+				return m_pMain->m_bSise;  //0 일반 1 시세전용
+			}
+
 			m_pMain->funcKey(LOWORD(wParam), (int) lParam);		
 		}
 		break;
@@ -1002,7 +1023,7 @@ CMainFrame::CMainFrame()
 	m_EmpPassChangeDlg = NULL;
 
 	m_printsetup = new CPrinterSettings();
-	m_printsetup->CopyDefaultMfcPrinter();
+	//m_printsetup->CopyDefaultMfcPrinter();
 	m_tabviewlist.RemoveAll();
 	m_waitlist.RemoveAll();
 
@@ -1290,6 +1311,17 @@ void CMainFrame::MakeExpectSymbolTable()
 	}
 }
 
+// axDiagLog 호출 인자(Axis::home + ... 의 CString 연결)가 임시 CString 객체를 만드는데,
+// __try가 있는 함수 안에 이런 소멸자 있는 C++ 객체가 있으면 C2712(개체 해제 기능이 사용되는
+// 함수에서는 __try를 사용할 수 없습니다)가 난다 - ShowHistoryMap의 __except 블록에서 직접
+// 호출하지 않고 이 별도 함수로 분리해서 우회한다 (2026-09-15).
+static void LogViewRaceCrash(CWnd* miniWid, CWnd* viewHist, WPARAM wParam, LPARAM lParam)
+{
+	axDiagLog(Axis::home + "\\user\\" + Axis::user + "\\Crashlog", "IB0000X8_ViewRace.log",
+		"[ShowHistoryMap-SEH] dangling pointer caught - m_miniWid=0x%p m_viewHist=0x%p wParam=0x%p lParam=0x%p tick=%lu",
+		miniWid, viewHist, (void*)wParam, (void*)lParam, GetTickCount());
+}
+
 void CMainFrame::ShowHistoryMap(WPARAM wParam, LPARAM lParam)
 {
 	//if (1)
@@ -1369,27 +1401,39 @@ void CMainFrame::ShowHistoryMap(WPARAM wParam, LPARAM lParam)
 
 			// ---------------------------------
 			// view / window 체크
+			// m_miniWid/m_viewHist는 미니창 close 경로에서 갱신을 놓치면
+			// 댕글링 포인터가 될 수 있어(OnMiniClose 참고) SEH로 한 번 더 감싼다.
 			// ---------------------------------
-			if (!m_miniWid || !m_miniWid->GetSafeHwnd())
+			__try
 			{
-				m_codeHist.Empty();
-				return;
+				if (!m_miniWid || !m_miniWid->GetSafeHwnd())
+				{
+					m_codeHist.Empty();
+					return;
+				}
+
+				if (!m_viewHist || !m_viewHist->GetSafeHwnd())
+					m_viewHist = m_miniWid->GetActiveView();
+
+				if (!m_viewHist || !m_viewHist->GetSafeHwnd())
+				{
+					m_codeHist.Empty();
+					return;
+				}
+
+				CWnd* base = m_viewHist->GetWindow(GW_CHILD);
+				if (base && base->GetSafeHwnd())
+				{
+					// 여기서 죽는 경우는 base 내부 로직 문제
+					base->SendMessage(WD_HISTORYVIEW, wParam, (LPARAM)&openRC);
+				}
 			}
-
-			if (!m_viewHist || !m_viewHist->GetSafeHwnd())
-				m_viewHist = m_miniWid->GetActiveView();
-
-			if (!m_viewHist || !m_viewHist->GetSafeHwnd())
+			__except (EXCEPTION_EXECUTE_HANDLER)
 			{
-				m_codeHist.Empty();
-				return;
-			}
-
-			CWnd* base = m_viewHist->GetWindow(GW_CHILD);
-			if (base && base->GetSafeHwnd())
-			{
-				// 여기서 죽는 경우는 base 내부 로직 문제
-				base->SendMessage(WD_HISTORYVIEW, wParam, (LPARAM)&openRC);
+				// 희귀 레이스 진단용 - 자세한 배경은 AXIS/docs/KnowledgeBase.md 사례 #4 참고 (2026-09-15)
+				LogViewRaceCrash(m_miniWid, m_viewHist, wParam, lParam);
+				m_miniWid = NULL;
+				m_viewHist = NULL;
 			}
 
 			m_codeHist.Empty();
@@ -2835,6 +2879,10 @@ void CMainFrame::OnUpdateRunCommand(CCmdUI* pCmdUI)
 
 void CMainFrame::OnClose() 
 {
+#ifdef  DF_AXISCLOSE
+	if (m_bClose) return;  //test close
+#endif
+
 	if (!m_bCLOSE_ASTx)
 	{
 		MemoUpload();  //memo
@@ -2865,6 +2913,9 @@ void CMainFrame::OnClose()
 
 	if (!m_mapHelper->closeX())
 	{
+#ifdef  DF_AXISCLOSE
+		m_bClose = false;  //test close
+#endif
 		return;
 	}
 
@@ -2900,7 +2951,13 @@ void CMainFrame::OnClose()
 			exit.SetTime(m_connectT);
 			const UINT modalResult = exit.DoModal();
 			if (modalResult == IDCANCEL)
+			{
+#ifdef  DF_AXISCLOSE
+				m_bClose = false;  //test close
+#endif
 				return;
+			}
+
 			
 			//UploadFile();
 			//SendConfig();
@@ -2924,11 +2981,15 @@ void CMainFrame::OnClose()
 			m_bExit = false;
 			
 			m_mapHelper->SendInterSignal();
-			
+#ifdef  DF_AXISCLOSE
+			m_bClose = false;  //test close
+#endif
 			return;
 		}
 	}
-
+#ifdef DF_AXISCLOSE
+	SetTimer(TM_CLOSE_WATCHDOG, 5000, nullptr);
+#endif
 	TRY
 	{
 		file.Format("%s\\%s\\%s\\%s", Axis::home, USRDIR, Axis::user, "AccList.dat");
@@ -3160,12 +3221,23 @@ void CMainFrame::OnClose()
 		}
 	}
 	
+	if (m_pSharedMemory)
+	{
+		// cx_shared.dll의 창(WNDPROC이 그 DLL 코드 안에 있음)을 FreeLibrary 전에 먼저 파괴해야 함.
+		// 순서가 바뀌면 DestroyWindow 연쇄(부모 프레임 파괴 시 자식창에 전달되는 메시지)가
+		// 이미 언로드된 DLL 메모리로 점프해 크래시함 (axis!CAxisApp::ExitInstance 경유,
+		// <Unloaded_cx_shared.dll> 크래시덤프로 확인됨, 2026-08-27)
+		m_pSharedMemory->DestroyWindow();
+		delete m_pSharedMemory;
+		m_pSharedMemory = nullptr;
+	}
+
 	if (m_hSharedLib)
 	{
 		FreeLibrary(m_hSharedLib);
 		m_hSharedLib = nullptr;
 	}
-	
+
 	m_slog.Format("--------------------[Axis_State][onClose end]  m_iAxisState =[%d]-------------", m_iAxisState);
 	OutputDebugString(m_slog);
 	CMDIFrameWnd::OnClose();
@@ -3278,6 +3350,7 @@ WriteLog(slog);
 		break;
 	case axSTART:	// start step
 		{
+			CreateAgentProcess();
 			if(m_bUseNewLogin)
 			{
 				m_bCertLogin = m_axConnect->GetCertLogin();
@@ -3806,7 +3879,7 @@ WriteLog("[AXIS] OnAxis-axAXIS - Step 13");
 // 			}
 
 			m_bInit = FALSE;
-			CreateAgentProcess(); 
+			//CreateAgentProcess(); 
 		}
 		break;
 	case axSIGNON:	
@@ -6833,7 +6906,7 @@ bool CMainFrame::Start(CString user)
 	OutputDebugString("[axis]CMainFrame::Start");
 #ifdef USE_AHNLAB_SECUREBROWSER
 	//Delete_AsisICon();
-
+	
 	CString filename;
 	filename.Format("%s\\%s\\%s", Axis::home, "exe", "NOAOS.TXT");
 	FILE* fp;
@@ -7513,15 +7586,15 @@ void CMainFrame::load_start_notice( BOOL bReload )
 
 		
 		const CWnd* wnd = FindWindow(NULL,"실시간해외지수");
-
+		
 		if (!wnd)
 		{
 			noticeMapName = "IB780100";
-
+		
 			CProfile pout(pkUserConfig);
-
+		
 			const int piout = pout.GetInt(noticeMapName, "OnLoad", 0);
-
+		
 			if (piout > 0)
 			{
 				m_mapHelper->ChangeChild(noticeMapName, 1, 0, CenterPOS);
@@ -7838,7 +7911,6 @@ WriteLog(s);
 		m_mapHelper->ChangeChild(trust, 1, 0, CenterPOS);
 	}	
 
-
 	WriteLog("[AXIS] endWorkstation - Step 19");
 
 	CFirstJob fj;
@@ -7907,7 +7979,6 @@ WriteLog(s);
 
 	//서킷브레이크 조회
 	//SetTimer(TM_CB_SEARCH, 5000, NULL);
-
 }
 
 void CMainFrame::Send2018()
@@ -8268,6 +8339,15 @@ void CMainFrame::signOn()
 			}
 		}
 		str = m_axConnect->GetSignInfo();
+
+		if (str.Mid(2, 1) == "0") //정상
+		{
+			m_bSise = 0;
+		}
+		else if (str.Mid(2, 1) == "1") //시세전용
+		{
+			m_bSise = 1;
+		}
 
 		m_axConnect->SetProgress(false);
 		m_axConnect->SetStatus(SM_WSH);
@@ -12913,8 +12993,8 @@ void CMainFrame::load_eninfomation(bool first)
 
 	if (first && GetPrivateProfileInt("SCREEN", "POPUPACC", 1, file) && Axis::user.CollateNoCase("guest"))
 		AcctPasswordConfig();
-	if(first)
-		Popup7805();
+	//if(first)
+	//	Popup7805();
 
 	//새창열기 허용
 	m_screenNew = GetPrivateProfileInt("SCREEN", "SCREENNEW", 1, file);
@@ -13519,6 +13599,24 @@ void CMainFrame::OnTimer(UINT nIDEvent)
 	//WriteLog("OnTimer Start");
 	switch (nIDEvent)
 	{
+		case TM_FORCE_TERMINATE:
+		{
+			KillTimer(TM_FORCE_TERMINATE);
+			WriteLog("[RunVers][verUPDATE] onTimer TM_FORCE_TERMINATE ");
+			TerminateProcess(GetCurrentProcess(), 0);
+		}
+		break;
+		case TM_CLOSE_WATCHDOG:
+		{
+			KillTimer(TM_CLOSE_WATCHDOG);
+			WriteLog("[OnClose] onTimer TM_CLOSE_WATCHDOG ");
+			TerminateProcess(GetCurrentProcess(), 0);
+		}
+		break;
+
+#ifdef  DF_AXISCLOSE
+		if(m_bClose) return;
+#endif
 		/*
 	case TM_CB_SEARCH:
 		{
@@ -14071,7 +14169,254 @@ void CMainFrame::OnTimer(UINT nIDEvent)
 	CMDIFrameWnd::OnTimer(nIDEvent);
 }
 
-#ifdef DF_MK_CAPTION
+#ifdef DF_KRX_FREEAFTER  //CheckMarketByMNG 전체
+void CMainFrame::CheckMarketByMNG(CString sval)
+{
+	int igubn = atoi(sval);
+
+	CString slog;
+	slog.Format("[mnginfo][%s][%d] sval = [%s]", __FUNCTION__, __LINE__, sval);
+	//m_dtick = GetTickCount();a
+	OutputDebugString(slog);
+
+
+	/*
+KRX
+0 장마감, 1 시간외,  2 정규장, 3 단일가
+	809       802,804        801          805
+NXT
+0 장마감, 1 프리, 2 메인, 3 애프터
+	890        881        884      888
+*/
+	switch (igubn)
+	{
+	case 854:  // KRX 7:00~ 7:50   KRX프리
+	{
+		m_iKRXype = KRX_MARKET_FREE;     //KRX프리
+		m_iNXType = NXT_MARKET_BEFORE;    //NXT장전
+		m_bar1->SetShowAIBtn(m_iKRXype, m_iNXType);
+	}
+	break;
+	case 855:  // KRX 7:50~ 8:00  KRX장전
+	{
+		m_iKRXype = KRX_MARKET_BEFORE;  //KRX장전
+		m_iNXType = NXT_MARKET_BEFORE;  //NXT장전
+		m_bar1->SetShowAIBtn(m_iKRXype, m_iNXType);
+	}
+	break;
+	case 881:  //NXT  8:00~ NXT 프리 시작
+	{
+		m_iNXType = NXT_MARKET_FREE;  //프리
+		m_bar1->SetShowAIBtn(m_iKRXype, m_iNXType);
+	}
+	break;
+	case 851:  //KRX 8:30~ 주식 장개시전 동시호가 개시
+	case 802:  //KRX 8:30~KRX 장전시간외 시작    
+	{
+		m_iKRXype = KRX_MARKET_TIMEOUT;   //시간외
+		m_bar1->SetShowAIBtn(m_iKRXype, m_iNXType);
+	}
+	break;
+	case 832:  //NXT 8:30~
+	{
+		m_iNXType = NXT_MARKET_FREE;   // 프리
+		m_bar1->SetShowAIBtn(m_iKRXype, m_iNXType);   //   KRX 802가 들어오면 NXT 881 프리
+	}
+	break;
+	case 803:  //KRX 장전     8:40~8:50
+	{
+		m_iKRXype = KRX_MARKET_BEFORE;   //장전
+		m_bar1->SetShowAIBtn(m_iKRXype, m_iNXType);   //   KRX 802가 들어오면 NXT 881 프리
+	}
+	break;
+	case 883:  //KRX 단일가 시작     8:50~
+	{
+		m_iKRXype = KRX_MARKET_ONEPRC;   //단일가
+		m_iNXType = NXT_MARKET_BEFORE;  //장전
+		m_bar1->SetShowAIBtn(m_iKRXype, m_iNXType);   //   KRX 802가 들어오면 NXT 881 프리
+	}
+	break;
+	case 801:   //KRX 9:00~  KRX 정규장 시작
+	{
+		m_iKRXype = KRX_MARKET_NORMAL;  //정규장
+		m_bar1->SetShowAIBtn(m_iKRXype, m_iNXType);
+	}
+	break;
+	case 884:   //NXT 9:00:30~  NXT 메인 시작
+	{
+		m_iNXType = NXT_MARKET_NORMAL;  //정규장
+		m_bar1->SetShowAIBtn(m_iKRXype, m_iNXType);
+	}
+	break;
+	case 886: //NXT 15:20~ NXT 오후휴장 
+	{
+		m_iNXType = NXT_MARKET_BEFORE;  //장전
+		m_bar1->SetShowAIBtn(m_iKRXype, m_iNXType);
+	}
+	break;
+	case 887: //NXT 15:30~ NXT 단일가
+	{
+		m_iNXType = NXT_MARKET_ONEPRC;  //NXT 15:30~15:40  단일가 개시
+		m_bar1->SetShowAIBtn(m_iKRXype, m_iNXType);
+	}
+	break;
+	case 809: //KRX 15:30~ KRX 장전
+	{
+		m_iKRXype = KRX_MARKET_BEFORE;
+		m_bar1->SetShowAIBtn(m_iKRXype, m_iNXType);
+	}
+	break;
+	case 888:  //NXT 15:40~ NXT 애프터 시작
+	{
+		m_iNXType = NXT_MARKET_AFTER;  //애프터
+		m_bar1->SetShowAIBtn(m_iKRXype, m_iNXType);
+	}
+	break;
+	case 804:  //KRX 15:40~ KRX 시간외
+	{
+		m_iKRXype = KRX_MARKET_TIMEOUT;   //시간외
+		m_bar1->SetShowAIBtn(m_iKRXype, m_iNXType);
+	}
+	break;
+#ifdef DF_KRX_FREEAFTER   //CheckMarketByMNG
+	case 856: //KRX 16:00~ 20:00 KRX 애프터
+	{
+		m_iKRXype = KRX_MARKET_AFTER;  //애프터
+		m_iNXType = NXT_MARKET_AFTER; //애프터
+		m_bar1->SetShowAIBtn(m_iKRXype, m_iNXType);  //KRX 805가 들어오면 NXT 888 애프터
+	}
+	break;
+#else
+	case 805: //KRX 16:00~ KRX 단일가 시작
+	case 853:  //KRX 16:00~ 주식시간외종가매매종료
+	{
+		m_iKRXype = KRX_MARKET_AFTER;  //애프터
+		m_iNXType = NXT_MARKET_AFTER; //애프터
+		m_bar1->SetShowAIBtn(m_iKRXype, m_iNXType);  //KRX 805가 들어오면 NXT 888 애프터
+	}
+	break;
+#endif
+	case 897:  //NXT 16:00~
+	{
+		m_iNXType = NXT_MARKET_AFTER; //애프터
+		m_bar1->SetShowAIBtn(m_iKRXype, m_iNXType);  //KRX 805가 들어오면 NXT 888 애프터
+	}
+	break;
+#ifdef DF_KRX_FREEAFTER  //CheckMarketByMNG
+	case 857:  //KRX 20:00~ KRX 애프터종료
+	{
+		m_iKRXype = KRX_MARKET_END;  //장마감
+		m_iNXType = NXT_MARKET_END;  //장마감
+		m_bar1->SetShowAIBtn(m_iKRXype, m_iNXType);
+	}
+	break;
+#else
+	case 806: //KRX 장마감 시작 18:00~
+	{
+		m_iKRXype = KRX_MARKET_END;  //장마감
+		m_bar1->SetShowAIBtn(m_iKRXype, m_iNXType);
+	}
+	break;
+#endif
+	case 889: //KRX 장마감 시작 20:00~
+	{
+		m_iKRXype = KRX_MARKET_END;  //장마감
+		m_iNXType = NXT_MARKET_END; //장마감
+		m_bar1->SetShowAIBtn(m_iKRXype, m_iNXType);
+	}
+	break;
+	default:
+	{
+
+	}
+	break;
+	}
+}
+
+void CMainFrame::CheckMarketStat()
+{
+	/*
+KRX
+0 장마감, 1 시간외,  2 정규장, 3 단일가
+	809       802,804        801          805
+NXT
+0 장마감, 1 프리, 2 메인, 3 애프터
+	890        881        884      888
+*/
+	if (IsCurrentTimeBetween(7 + (m_bCSAT * 1), 0, 7 + (m_bCSAT * 1), 50))  //7 00 ~ 7 50
+	{
+		m_iKRXype = KRX_MARKET_FREE;   //KRX프리
+		m_iNXType = NXT_MARKET_BEFORE;  //NXT장전
+	}
+	else if (IsCurrentTimeBetween(7 + (m_bCSAT * 1), 50, 8 + (m_bCSAT * 1), 00))  //7 50 ~ 8 00
+	{
+		m_iKRXype = KRX_MARKET_BEFORE;   //KRX장전
+		m_iNXType = NXT_MARKET_BEFORE;  //NXT장전
+	}
+	else if (IsCurrentTimeBetween(8 + (m_bCSAT * 1), 0, 8 + (m_bCSAT * 1), 30))  //8 00 ~ 8 30
+	{
+		m_iKRXype = KRX_MARKET_BEFORE;   //KRX장전
+		m_iNXType = NXT_MARKET_FREE;  //NXT프리
+	}
+	else if (IsCurrentTimeBetween(8 + (m_bCSAT * 1), 30, 8 + (m_bCSAT * 1), 40))  //8 30 ~ 8 40
+	{
+		m_iKRXype = KRX_MARKET_TIMEOUT;   //KRX시간외
+		m_iNXType = NXT_MARKET_FREE;  //NXT프리
+	}
+	else if (IsCurrentTimeBetween(8 + (m_bCSAT * 1), 40, 8 + (m_bCSAT * 1), 50))  //8 40 ~ 8 50
+	{
+		m_iKRXype = KRX_MARKET_BEFORE;  //KRX장전
+		m_iNXType = NXT_MARKET_FREE;  //NXT프리
+	}
+	else if (IsCurrentTimeBetween(8 + (m_bCSAT * 1), 50, 9 + (m_bCSAT * 1), 00))  //8 50 ~ 9 00
+	{
+		m_iKRXype = KRX_MARKET_ONEPRC;  //KRX단일가
+		m_iNXType = NXT_MARKET_BEFORE;  //장전
+	}
+	else if (IsCurrentTimeBetween(9 + (m_bCSAT * 1), 0, 15 + (m_bCSAT * 1), 0))  //9 00 ~ 15 00
+	{
+		m_iKRXype = KRX_MARKET_NORMAL;  //정규장
+		m_iNXType = NXT_MARKET_NORMAL;  //정규장
+	}
+	else if (IsCurrentTimeBetween(15 + (m_bCSAT * 1), 0, 15 + (m_bCSAT * 1), 20))  //15 00 ~ 15 20
+	{
+		m_iKRXype = KRX_MARKET_NORMAL;  //정규장
+		m_iNXType = NXT_MARKET_NORMAL;  //정규장
+	}
+	else if (IsCurrentTimeBetween(15 + (m_bCSAT * 1), 20, 15 + (m_bCSAT * 1), 30))  //15 20 ~ 15 30
+	{
+		m_iKRXype = KRX_MARKET_NORMAL;  //정규장
+		m_iNXType = NXT_MARKET_BEFORE;  //장전
+	}
+	else if (IsCurrentTimeBetween(15 + (m_bCSAT * 1), 30, 15 + (m_bCSAT * 1), 40))  //15 30 ~ 15 40
+	{
+		m_iKRXype = KRX_MARKET_BEFORE;  //KRX장전
+		m_iNXType = NXT_MARKET_ONEPRC;  //단일가
+	}
+	else if (IsCurrentTimeBetween(15 + (m_bCSAT * 1), 40, 16 + (m_bCSAT * 1), 0))  //15 40 ~ 16 00
+	{
+		m_iKRXype = KRX_MARKET_TIMEOUT;  //시간외
+		m_iNXType = NXT_MARKET_AFTER;  //애프터
+	}
+	else if (IsCurrentTimeBetween(16 + (m_bCSAT * 1), 0, 20 + (m_bCSAT * 1), 0))  //16 00 ~ 20 00
+	{
+		m_iKRXype = KRX_MARKET_AFTER;  //애프터
+		m_iNXType = NXT_MARKET_AFTER;  //애프터
+	}
+	else if (IsCurrentTimeBetween(20 + (m_bCSAT * 1), 0, 24 + (m_bCSAT * 1), 0))  //20 00 ~ 24 00
+	{
+		m_iKRXype = KRX_MARKET_END;  //장마감
+		m_iNXType = NXT_MARKET_END;  //장마감
+	}
+	else
+	{
+		m_iKRXype = KRX_MARKET_END;  //장마감
+		m_iNXType = NXT_MARKET_END;  //장마감
+	}
+
+	m_bar1->SetShowAIBtn(m_iKRXype, m_iNXType);
+}
+#else
 void CMainFrame::CheckMarketByMNG(CString sval)
 {
 	int igubn = atoi(sval);
@@ -14092,118 +14437,103 @@ NXT
 */
 	switch (igubn)
 	{
-		case 799:  // KRX 7:00~ 7:50   KRX프리
-		{
-			m_iKRXype = 5;
-			m_iNXType = 5;
-			m_bar1->SetShowAIBtn(m_iKRXype, m_iNXType);
-		}
-		break;
-		case 798:  // KRX 7:50~ 8:00  KRX장전
-		{
-			m_iKRXype = 4;
-			m_iNXType = 5;
-			m_bar1->SetShowAIBtn(m_iKRXype, m_iNXType);
-		}
-		break;
 		case 881:  //NXT  8:00~ NXT 프리 시작
 		{
-			m_iNXType = 1;  //프리
+			m_iNXType = NXT_MARKET_FREE;  //프리
 			m_bar1->SetShowAIBtn(m_iKRXype, m_iNXType);
 		}
 		break;
 		case 851:  //KRX 8:30~ 주식 장개시전 동시호가 개시
 		case 802:  //KRX 8:30~KRX 장전시간외 시작    
 		{
-			m_iKRXype = 1;   //시간외
+			m_iKRXype = KRX_MARKET_TIMEOUT;   //시간외
 			m_bar1->SetShowAIBtn(m_iKRXype, m_iNXType);
 		}
 		break;
 		case 832:  //NXT 8:30~
 		{
-			m_iNXType = 1;   // 프리
+			m_iNXType = NXT_MARKET_FREE;   // 프리
 			m_bar1->SetShowAIBtn(m_iKRXype, m_iNXType);   //   KRX 802가 들어오면 NXT 881 프리
 		}
 		break;
 		case 803:  //KRX 장전     8:40~8:50
 		{
-			m_iKRXype = 4;   //장전
+			m_iKRXype = KRX_MARKET_BEFORE;   //장전
 			m_bar1->SetShowAIBtn(m_iKRXype, m_iNXType);   //   KRX 802가 들어오면 NXT 881 프리
 		}
 		break;
 		case 883:  //KRX 단일가 시작     8:50~
 		{
-			m_iKRXype = 3;   //단일가
-			m_iNXType = 0;  //장마감
+			m_iKRXype = KRX_MARKET_ONEPRC;   //단일가
+			m_iNXType = NXT_MARKET_END;  //장마감
 			m_bar1->SetShowAIBtn(m_iKRXype, m_iNXType);   //   KRX 802가 들어오면 NXT 881 프리
 		}
 		break;
 		case 801:   //KRX 9:00~  KRX 정규장 시작
 		{
-			m_iKRXype = 2;  //정규장
+			m_iKRXype = KRX_MARKET_NORMAL;  //정규장
 			m_bar1->SetShowAIBtn(m_iKRXype, m_iNXType);
 		}
 		break;
 		case 884:   //NXT 9:00:30~  NXT 메인 시작
 		{
-			m_iNXType = 2;  //정규장
+			m_iNXType = NXT_MARKET_NORMAL;  //정규장
 			m_bar1->SetShowAIBtn(m_iKRXype, m_iNXType);
 		}
 		break;
 		case 886: //NXT 15:20~ NXT 오후휴장 
 		{
-			m_iNXType = 0;  //장마감
+			m_iNXType = NXT_MARKET_END;  //장마감
 			m_bar1->SetShowAIBtn(m_iKRXype, m_iNXType);
 		}
 		break;
 		case 887: //NXT 15:30~ NXT 단일가
 		{
-			m_iNXType = 4;  //NXT 15:30~15:40  단일가 개시
+			m_iNXType = NXT_MARKET_ONEPRC;  //NXT 15:30~15:40  단일가 개시
 			m_bar1->SetShowAIBtn(m_iKRXype, m_iNXType);
 		}
 		break;
 		case 809: //KRX 15:30~ KRX장마감
 		{
-			m_iKRXype = 4;
+			m_iKRXype = KRX_MARKET_END;
 			m_bar1->SetShowAIBtn(m_iKRXype, m_iNXType);
 		}
 		break;
 		case 888:  //NXT 15:40~ NXT 애프터 시작
 		{
-			m_iNXType = 3;  //애프터
+			m_iNXType = NXT_MARKET_AFTER;  //애프터
 			m_bar1->SetShowAIBtn(m_iKRXype, m_iNXType);
 		}
 		break;
 		case 804:  //KRX 15:40~ KRX 시간외
 		{
-			m_iKRXype = 1;   //시간외
+			m_iKRXype = KRX_MARKET_TIMEOUT;   //시간외
 			m_bar1->SetShowAIBtn(m_iKRXype, m_iNXType);
 		}
 		break;
 		case 805: //KRX 16:00~ KRX 단일가 시작
 		case 853:  //KRX 16:00~ 주식시간외종가매매종료
 		{
-			m_iKRXype = 6;  //애프터
-			m_iNXType = 3; //애프터
+			m_iKRXype = KRX_MARKET_ONEPRC;  //단일가
+			m_iNXType = NXT_MARKET_AFTER; //애프터
 			m_bar1->SetShowAIBtn(m_iKRXype, m_iNXType);  //KRX 805가 들어오면 NXT 888 애프터
 		}
 		break;
 		case 897:  //NXT 16:00~
 		{
-			m_iNXType = 3; //애프터
-			m_bar1->SetShowAIBtn(m_iKRXype, m_iNXType);  //KRX 805가 들어오면 NXT 888 애프터
+			m_iNXType = NXT_MARKET_AFTER; //애프터
+			m_bar1->SetShowAIBtn(m_iKRXype, m_iNXType);  //K RX 805가 들어오면 NXT 888 애프터
 		}
-		break;
 		case 806: //KRX 장마감 시작 18:00~
 		{
-			m_iKRXype = 6;  //장마감
+			m_iKRXype = KRX_MARKET_END;  //장마감
 			m_bar1->SetShowAIBtn(m_iKRXype, m_iNXType);
 		}
 		break;
 		case 889: //KRX 장마감 시작 20:00~
 		{
-			m_iKRXype = 0;  //장마감
-			m_iNXType = 0; //장마감
+			m_iKRXype = KRX_MARKET_END;  //장마감
+			m_iNXType = NXT_MARKET_END; //장마감
 			m_bar1->SetShowAIBtn(m_iKRXype, m_iNXType);
 		}
 		break;
@@ -14225,87 +14555,77 @@ NXT
 0 장마감, 1 프리, 2 메인, 3 애프터
     890        881        884      888
 */
-	if (IsCurrentTimeBetween(7 + (m_bCSAT * 1), 0, 7 + (m_bCSAT * 1), 50))  //7 00 ~ 7 50
+	if (IsCurrentTimeBetween(8 + (m_bCSAT * 1), 0, 8 + (m_bCSAT * 1), 30))  //8 00 ~ 8 30
 	{
-		m_iKRXype = 5;   //KRX프리
-		m_iNXType = 5;  //NXT장전
-	}
-	else if (IsCurrentTimeBetween(7 + (m_bCSAT * 1), 50, 8 + (m_bCSAT * 1), 00))  //7 50 ~ 8 00
-	{
-		m_iKRXype = 4;   //KRX장전
-		m_iNXType = 5;  //NXT장전
-	}
-	else if (IsCurrentTimeBetween(8 + (m_bCSAT * 1), 0, 8 + (m_bCSAT * 1), 30))  //8 00 ~ 8 30
-	{
-		m_iKRXype = 4;   //KRX장전
-		m_iNXType = 1;  //NXT프리
+		m_iKRXype = KRX_MARKET_END;   //장마감
+		m_iNXType = NXT_MARKET_FREE;  //프리
 	}
 	else if (IsCurrentTimeBetween(8 + (m_bCSAT * 1), 30, 8 + (m_bCSAT * 1), 40))  //8 30 ~ 8 40
 	{
-		m_iKRXype = 1;   //KRX시간외
-		m_iNXType = 1;  //NXT프리
+		m_iKRXype = KRX_MARKET_TIMEOUT;   //장전시간외
+		m_iNXType = NXT_MARKET_FREE;  //프리
 	}
 	else if (IsCurrentTimeBetween(8 + (m_bCSAT * 1), 40, 8 + (m_bCSAT * 1), 50))  //8 40 ~ 8 50
 	{
-		m_iKRXype = 4;  //KRX장전
-		m_iNXType = 1;  //NXT프리
+		m_iKRXype = KRX_MARKET_END;  //장마감
+		m_iNXType = NXT_MARKET_FREE;  //프리
 	}
 	else if (IsCurrentTimeBetween(8 + (m_bCSAT * 1), 50, 9 + (m_bCSAT * 1), 00))  //8 50 ~ 9 00
 	{
-		m_iKRXype = 3;  //KRX단일가
-		m_iNXType = 5;  //장전
+		m_iKRXype = KRX_MARKET_END;  //장마감
+		m_iNXType = NXT_MARKET_END;  //장마감
 	}
 	else if (IsCurrentTimeBetween(9 + (m_bCSAT * 1), 0, 15 + (m_bCSAT * 1), 0))  //9 00 ~ 15 00
 	{
-		m_iKRXype = 2;  //정규장
-		m_iNXType = 2;  //정규장
+		m_iKRXype = KRX_MARKET_NORMAL;  //정규장
+		m_iNXType = NXT_MARKET_NORMAL;  //정규장
 	}
 	else if (IsCurrentTimeBetween(15 + (m_bCSAT * 1), 0, 15 + (m_bCSAT * 1), 20))  //15 00 ~ 15 20
 	{
-		m_iKRXype = 2;  //정규장
-		m_iNXType = 2;  //정규장
+		m_iKRXype = KRX_MARKET_NORMAL;  //정규장
+		m_iNXType = NXT_MARKET_NORMAL;  //정규장
 	}
 	else if (IsCurrentTimeBetween(15 + (m_bCSAT * 1), 20, 15 + (m_bCSAT * 1), 30))  //15 20 ~ 15 30
 	{
-		m_iKRXype = 2;  //정규장
-		m_iNXType = 0;  //장전
+		m_iKRXype = KRX_MARKET_NORMAL;  //정규장
+		m_iNXType = NXT_MARKET_END;  //장마감
 	}
 	else if (IsCurrentTimeBetween(15 + (m_bCSAT * 1), 30, 15 + (m_bCSAT * 1), 40))  //15 30 ~ 15 40
 	{
-		m_iKRXype = 4;  //KRX장전
-		m_iNXType = 4;  //단일가
+		m_iKRXype = KRX_MARKET_END;  //장마감
+		m_iNXType = NXT_MARKET_AFTER;  //애프터
 	}
 	else if (IsCurrentTimeBetween(15 + (m_bCSAT * 1), 40, 16 + (m_bCSAT * 1), 0))  //15 40 ~ 16 00
 	{
-		m_iKRXype = 1;  //시간외
-		m_iNXType = 3;  //애프터
+		m_iKRXype = KRX_MARKET_TIMEOUT;  //장후시간외
+		m_iNXType = NXT_MARKET_AFTER;  //애프터
 	}
 	else if (IsCurrentTimeBetween(16 + (m_bCSAT * 1), 0, 18 + (m_bCSAT * 1), 0))  //16 00 ~ 18 00
 	{
-		m_iKRXype = 6;  //애프터
-		m_iNXType = 3;  //애프터
+		m_iKRXype = KRX_MARKET_ONEPRC;  //단일가
+		m_iNXType = NXT_MARKET_AFTER;  //애프터
 	}
 	else if (IsCurrentTimeBetween(18 + (m_bCSAT * 1), 0, 20 + (m_bCSAT * 1), 0))  //18 00 ~ 20 00
 	{
-		m_iKRXype = 6;    //애프터
-		m_iNXType = 3;    //애프터
+		m_iKRXype = KRX_MARKET_END;    //장마감
+		m_iNXType = NXT_MARKET_AFTER;    //애프터
 	}
 	else if (IsCurrentTimeBetween(20 + (m_bCSAT * 1), 0, 24 + (m_bCSAT * 1), 0))  //20 00 ~ 24 00
 	{
-		m_iKRXype = 0;  //장마감
-		m_iNXType = 0;  //장마감
+		m_iKRXype = KRX_MARKET_END;  //장마감
+		m_iNXType = NXT_MARKET_END;  //장마감
 	}
 	else
 	{
-		m_iKRXype = 0;  //장마감
-		m_iNXType = 0;  //장마감
+		m_iKRXype = KRX_MARKET_END;  //장마감
+		m_iNXType = NXT_MARKET_END;  //장마감
 	}
 
 #ifdef   DF_MK_CAPTION
 	m_bar1->SetShowAIBtn(m_iKRXype, m_iNXType);   
 #endif
 }
-
+#endif  //DF_KRX_FREEAFTER   CheckMarketByMNG #endif
 bool CMainFrame::IsCurrentTimeBetween(int startHour, int startMin, int endHour, int endMin)
 {
 	CTime now = CTime::GetCurrentTime();
@@ -14327,7 +14647,7 @@ bool CMainFrame::IsCurrentTimeBetween(int startHour, int startMin, int endHour, 
 		return false;
 	}
 }
-#endif
+
 
 CWnd* CMainFrame::getActiveView(int key)
 {
@@ -14900,9 +15220,27 @@ void CMainFrame::ShowMngInfo(DWORD* dat)
 
 #ifdef DF_MK_CAPTION
 		CheckMarketByMNG(val);
+		//m_slog.Format("[장운영] val=[%s]", val);
+		//m_axGuide->SetGuide(m_slog);
 		if (val == "884")  //우선 NXT 장시작은 skip
 			return;
 #endif
+
+#ifdef DF_KRX_FREEAFTER  //ShowMnginfo
+		if (val == "65")  //선물옵션 장개시10초전 skip
+			return;
+		if (val == "35")  //주식 장개시10초전 skip
+			return;
+		if (val == "135")  //주식 장마감10초전 skip
+			return;
+		if (val == "853")  //시간외종가 매매종료, 시간외단일가 매매개시
+			return;
+		if (val == "806")  //시간외단일가 매매종료
+			return;
+		if (val == "846")  //KOBA ELW 조기종료
+			return;
+#endif
+
 
 		if (!m_mapAlarmList.Lookup(val, str))
 		{
@@ -17081,13 +17419,13 @@ NXT
 		{
 			case 0:  //휴장일                       
 			{
-				m_iKRXype = 0;   //KRX 장마감
-				m_iNXType = 0;   //NXT 장마감  
+				m_iKRXype = KRX_MARKET_END;   //KRX 장마감
+				m_iNXType = NXT_MARKET_END;   //NXT 장마감  
 			}
 			break;
 			case 1:  //1. 장전              ~08:00               
 			{
-				m_iNXType = 5;   //NXT 장전 
+				m_iNXType = NXT_MARKET_BEFORE;   //NXT 장전 
 			}
 			break;
 			/*
@@ -17096,32 +17434,40 @@ NXT
 			*/
 			case 2:  // 2. 프리마켓     08:00~08:50       
 			{
-				m_iNXType = 1;   //NXT 프리마켓
+				m_iNXType = NXT_MARKET_FREE;   //NXT 프리마켓
 			}
 			break;
 			case 3:  //3. 오전휴장     08:50~09:00                
 			{
-				m_iNXType = 0;   //NXT 장마감
+#ifdef DF_KRX_FREEAFTER  //processFMX
+				 m_iNXType = NXT_MARKET_BEFORE;    //KRX AFTER 부터 장마감이 아니라 장전 (휴장이 없다)
+#else
+				m_iNXType = NXT_MARKET_END;   //NXT 장마감
+#endif
 			}
 			break;
 			case 4:  //메인마켓     09:00~15:20                    
 			{
-				m_iNXType = 2;    //NXT 메인
+				m_iNXType = NXT_MARKET_NORMAL;    //NXT 메인
 			}
 			break;
 			case 5:  //오후휴장     15:20~15:30                    
 			{
-				m_iNXType = 0;  //NXT 장마감
+#ifdef DF_KRX_FREEAFTER //processFMX
+				m_iNXType = NXT_MARKET_BEFORE;    //KRX AFTER 부터 장마감이 아니라 장전 (휴장이 없다)
+#else
+				m_iNXType = NXT_MARKET_END;  //NXT 장마감
+#endif
 			}
 			break;
 			case 6:  //단일가매매   15:30~15:40                 
 			{
-				m_iNXType = 4;  //NXT 단일가
+				m_iNXType = NXT_MARKET_ONEPRC;  //NXT 단일가
 			}
 			break;
 			case 7:  //에프터마켓   15:40~18:00                       
 			{
-				m_iNXType = 3;   //NXT 애프터
+				m_iNXType = NXT_MARKET_AFTER;   //NXT 애프터
 			}
 			break;
 			/*
@@ -17130,7 +17476,7 @@ NXT
 		*/
 			case 8:  //장마감       20:00~                    
 			{
-				m_iNXType = 0; //NXT 장마감
+				m_iNXType = NXT_MARKET_END; //NXT 장마감
 			}
 			break;
 			default:
@@ -17161,8 +17507,8 @@ NXT
 /*          4. 정규장장중   09:00~15:20           */
 /*          5. 정후동시호가 15:20~15:30           */
 /*          6. 장후시간외   15:30~16:00           */
-/*          7. 시간외단일가 16:00~18:00           */
-/*          8. 장마감       18:00~                
+/*          7. 애프터마켓(KRX AFTER) 16:00~20:00   */
+/*          8. 장마감       20:00~
 		*/
 		struct PIBOjggb_mod //장운영
 		{
@@ -17185,50 +17531,58 @@ NXT
 			{
 				case 0:  //휴장일                       
 				{
-					m_iKRXype = 0;   //KRX 장마감
+					m_iKRXype = KRX_MARKET_END;   //KRX 장마감
 				}
 				break;
 				case 1:  //1. 장전              ~08:10               
 				{
-					m_iKRXype = 4;   //KRX 장전 ~08:10       
+					m_iKRXype = KRX_MARKET_BEFORE;   //KRX 장전 ~08:10       
 				}
 				break;
 				case 2:  // 2. 장전시간외    08:30~08:40       
 				{
-					m_iKRXype = 1;   //KRX 시간외
+					m_iKRXype = KRX_MARKET_TIMEOUT;   //KRX 시간외  
 				}
 				break;
 				case 3:  //3. 장전동시호가     08:40~08:50    주문접수           
 				{
-					m_iKRXype = 4;   //KRX 장전 08:40~08:50    주문접수     
+					m_iKRXype = KRX_MARKET_BEFORE;   //KRX 장전 08:40~08:50    주문접수     
 				}
 				break;
 				case 4:  //메인마켓     09:00~15:20                    
 				{
-					m_iKRXype = 2;     //KRX 정규장
+					m_iKRXype = KRX_MARKET_NORMAL;     //KRX 정규장
 				}
 				break;
 				case 5:  // 장후동시호가    15:20~15:30                    
 				{
-					m_iKRXype = 2;   //KRX 정규장
+					m_iKRXype = KRX_MARKET_NORMAL;   //KRX 정규장
 				}
 				break;
 				case 6:  //장마감, 시간외   15:30~16:00                 
 				{
-					if(m_iNXType == 4)
-						m_iKRXype = 0;  //KRX 장마감
+					if(m_iNXType == NXT_MARKET_ONEPRC)   //m_iNXType = NXT_MARKET_ONEPRC;  //NXT 단일가매매   15:30~15:40       
+#ifdef DF_KRX_FREEAFTER //processFMX
+						m_iKRXype = KRX_MARKET_BEFORE;  //KRX 장전
+#else
+						m_iKRXype = KRX_MARKET_END;  //KRX 장마감
+#endif
 					else
-						m_iKRXype = 1;   //KRX 시간외
+						m_iKRXype = KRX_MARKET_TIMEOUT;   //KRX 시간외
 				}
 				break;
-				case 7:  //단일가매매   16:00~18:00                       
+				case 7:  //애프터마켓(KRX AFTER)  16:00~20:00
 				{
-					m_iKRXype = 3;   //KRX 단일가
+#ifdef DF_KRX_FREEAFTER //processFMX
+					m_iKRXype = KRX_MARKET_AFTER; //KRX AFTER
+#else
+					m_iKRXype = KRX_MARKET_ONEPRC;   //KRX 단일가
+#endif
 				}
 				break;
-				case 8:  //장마감       18:00~                    
+				case 8:  //장마감       20:00~
 				{
-					m_iKRXype = 0;  //KRX 장마감
+					m_iKRXype = KRX_MARKET_END;  //KRX 장마감
 				}
 				break;
 				default:
@@ -17242,11 +17596,11 @@ NXT
 		{
 			if (sRes == "A")   //장준비    08:10~08 : 30
 			{
-				m_iKRXype = 4;   //KRX 장전  08:10~08 : 30
+				m_iKRXype = KRX_MARKET_BEFORE;   //KRX 장전  08:10~08 : 30
 			}
 			else if (sRes == "B")  //B. 장전동시호가     08:50~09:00       예상체결
 			{
-				m_iKRXype = 3;   //KRX 단일가
+				m_iKRXype = KRX_MARKET_ONEPRC;   //KRX 단일가
 			}
 		}
 		m_bar1->SetShowAIBtn(m_iKRXype, -1);  //HTS 시작후 장상태조회  pibojggb
@@ -17421,7 +17775,16 @@ void CMainFrame::SendPIBOpopu(CString sGubn, int ikey)
 	FillMemory(data, sizeof(data), ' ');
 	
 	PIBOpopu_mid* mid = (PIBOpopu_mid*)&data[0];
-	memcpy(mid->gubn, "NXTS", 4);   //NXTF->NXTS
+	if(Axis::devMode)
+		memcpy(mid->gubn, "NXT3", 4);   //NXTF->NXTS
+	else
+	{
+		if(CTime::GetCurrentTime() >= CTime(2026,8,28,0,0,0))
+			memcpy(mid->gubn, "NXT3", 4);   //NXTF->NXTS
+		else
+			memcpy(mid->gubn, "NXTS", 4);   //NXTF->NXTS
+	}
+	
 	memcpy(mid->type, sGubn, 1);
 	memcpy(mid->data, "0100", 4);
 	memcpy(mid->usid, Axis::userID, Axis::userID.GetLength());
@@ -18229,7 +18592,7 @@ void CMainFrame::GetDispN(char* mapN)
 
 int CMainFrame::InputScreenNo(CString dispN)
 {
-	if (dispN == "8788")
+	if(dispN == "8788")
 	{
 		RunPhonePad();
 		return 0;
@@ -18274,6 +18637,16 @@ void CMainFrame::ConfigFrame()
 	file.Format("%s\\%s\\%s\\usertool.ini", Axis::home, USRDIR, Axis::user);
 	cpfile.Format("%s\\%s\\usertool.ini", Axis::home, MTBLDIR);
 	CopyFile(cpfile, file, TRUE);
+
+	if (!CopyFile(cpfile, file, TRUE))
+	{
+		::WritePrivateProfileString("00"	, "#002"	, NULL, file);
+		::WritePrivateProfileString("02"	, "IB280900", NULL, file);
+		::WritePrivateProfileString("02"	, "IB281000", NULL, file);
+		::WritePrivateProfileString("02"	, "IB281200", NULL, file);
+		::WritePrivateProfileString("02"	, "IB281300", NULL, file);
+		::WritePrivateProfileString("#006"	, "IB101400", NULL, file);
+	}
 
 	file.Format("%s\\%s\\%s\\axisticker.ini", Axis::home, USRDIR, Axis::user);
 	cpfile.Format("%s\\%s\\axisticker.ini", Axis::home, MTBLDIR);
@@ -23737,7 +24110,7 @@ BOOL CMainFrame::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct)
 BOOL CMainFrame::IsForeignMap(const char* map)
 {
 	const char* foreignMapName = "IB780100";
-
+	
 	return !strcmp(foreignMapName, map);
 }
 
@@ -23769,9 +24142,9 @@ void CMainFrame::RunNewRealTick()
 	//SetWorkingDirectory(Axis::home);
 	SetCurrentDirectory(Axis::home + "\\exe");
 	ShellExecute(NULL, _T("open"), "GWTicker.EXE", cmdLine,NULL, SW_SHOWNORMAL);
-// 	CString s;
-// 	s.Format("REALTV.EXE [%s]\n",cmdLine);
-// 	OutputDebugString(s);
+ 	CString s;
+ 	s.Format("REALTV.EXE [%s]\n",cmdLine);
+ 	OutputDebugString(s);
 
 // 	CProfile profile(pkAxis);
 // 	
@@ -24554,23 +24927,25 @@ void CMainFrame::DrawFrame(CDC* dc)
 
 	if (!m_bSDI)
 	{
-		CBitmap* bmpBgPattern  = Axis::GetSkinBitmap("BG_PATERN");
-
-		CDC mdc;
-		mdc.CreateCompatibleDC(dc);
-		const CBitmap* oldBmp = mdc.SelectObject(bmpBgPattern);
-
-		BITMAP bm;
-		bmpBgPattern->GetBitmap(&bm);
-
-		rc.top += CAPTION_HEIGHT;
-		rc.bottom += 2;
-		rc.left++;
-		rc.right--;
 		
-		dc->StretchBlt( rc.left, rc.top, 2, rc.Height(), &mdc, 0,0, bm.bmWidth, bm.bmHeight, SRCCOPY );
-		dc->StretchBlt( rc.right-2, rc.top, 2, rc.Height(), &mdc, 0,0, bm.bmWidth, bm.bmHeight, SRCCOPY );
-		
+		CBitmap* bmpBgPattern = Axis::GetSkinBitmap("BG_PATERN");
+		if (bmpBgPattern)
+		{
+			CDC mdc;
+			mdc.CreateCompatibleDC(dc);
+			const CBitmap* oldBmp = mdc.SelectObject(bmpBgPattern);
+
+			BITMAP bm;
+			bmpBgPattern->GetBitmap(&bm);
+
+			rc.top += CAPTION_HEIGHT;
+			rc.bottom += 2;
+			rc.left++;
+			rc.right--;
+
+			dc->StretchBlt(rc.left, rc.top, 2, rc.Height(), &mdc, 0, 0, bm.bmWidth, bm.bmHeight, SRCCOPY);
+			dc->StretchBlt(rc.right - 2, rc.top, 2, rc.Height(), &mdc, 0, 0, bm.bmWidth, bm.bmHeight, SRCCOPY);
+		}
 
 		/*rc.top += CAPTION_HEIGHT;
 		rc.bottom += 2;
@@ -24733,14 +25108,14 @@ void CMainFrame::DoFunc(int funcID)
 		AcctPasswordConfig();
 		break;
 	case 5: // 사용자 WORKSPACE
-		//ShowUScreenMenu();
+	//ShowUScreenMenu();
 		saveUserScreen();
 		break;
 	case 6: // 증권계산기
 		ExecuteCalculator();
 		break;
 	case 7: // 해외지수 실시간티커
-		/*RunForeignMap();*/
+	/*RunForeignMap();*/
 		RunNewRealTick();
 		break;
 	case 8: // 이미지저장(현재화면)
@@ -26228,15 +26603,20 @@ void CMainFrame::RunPhonePad()
 	CString strPhonepad;
 	strPhonepad = "C:\\PhonePAD\\PhonePad.EXE";
 
-	if(!IsFileExist(strPhonepad))
-	{
-		Axis::MessageBox(this,"폰패드 프로그램이 설치되지 않았습니다.\n폰패드 프로그램을 설치하셔요.",MB_ICONINFORMATION);
-		return;
-	}
+	//if(!IsFileExist(strPhonepad))
+	//{
+	//	Axis::MessageBox(this,"폰패드 프로그램이 설치되지 않았습니다.\n폰패드 프로그램을 설치하셔요.",MB_ICONINFORMATION);
+	//	return;
+	//}
 	
 	CString mapN;
 
-	CPhonePad* m_phone_dlgs = new CPhonePad(this);
+	if(m_bNewPhonepad)
+		mapN = _T("IB878800");
+	else
+		mapN = _T("IB877700");
+
+	/*CPhonePad* m_phone_dlgs = new CPhonePad(this);
 	m_phone_dlgs->main_hwnd = m_hWnd;
 	int ret = m_phone_dlgs->DoModal();
 	delete m_phone_dlgs;
@@ -26251,8 +26631,17 @@ void CMainFrame::RunPhonePad()
 	else
 	{
 		return;
-	}
+	}*/
 	//mapN = _T("IB877700");
+	CGPop* pExist = m_pMain->getGPOP(mapN);
+	if (pExist && pExist->GetSafeHwnd())
+	{
+		if (pExist->IsIconic())
+			pExist->ShowWindow(SW_RESTORE);
+		pExist->SetForegroundWindow();
+		return;
+	}
+
 	m_pMain->m_mapHelper->CreatePopup(mapN, TRIGGERN, winK_POPUP,
 		1, 1, CPoint(-1, -1), false);
 }
@@ -26262,8 +26651,13 @@ BOOL CMainFrame::IsPhonePad(const char *map)
 	if (map == nullptr)
 		return FALSE;
 
-	return strcmp(map, "IB877700") == 0 ||
-		strcmp(map, "IB878800") == 0;
+	CString stmp;
+	stmp.Format("%s", map);
+
+	if (stmp.Find("8777") >= 0 || stmp.Find("8788") >= 0)
+		return TRUE;
+	else
+		return FALSE;
 }
 
 void CMainFrame::dnloadAction()
@@ -27393,7 +27787,10 @@ void CMainFrame::loadingELWcode()
 
 void CMainFrame::RunFOConfig()
 {
-	m_mapHelper->CreateChild("IB0000B2", 0);
+	if (m_bSise == 0 )
+		m_mapHelper->CreateChild("IB0000B2", 0);
+	else
+		Axis::MessageBox(this, "시세/준회원 조회 로그인으로 사용이 불가한 서비스입니다.", MB_ICONSTOP);
 }
 
 void CMainFrame::load_secure_agree(BOOL bAOS, BOOL bFirewall, BOOL bKeysecure)
@@ -28524,9 +28921,10 @@ void CMainFrame::CheckEncryptDirectory()
 LRESULT CMainFrame::OnMiniClose( WPARAM wParam, LPARAM lParam )
 {
 	m_miniWid = NULL;
+	m_viewHist = NULL;	// 미니창과 함께 파괴되는 자식 뷰 - 남겨두면 댕글링 포인터가 됨(ShowHistoryMap 크래시 원인)
 
 	//OutputDebugString("DESTORY MINI WND FROM MAIN\n");
-	
+
 	return 0;
 }
 
@@ -29073,10 +29471,6 @@ void CMainFrame::ParsePihoitgyList(char* dat, int len)
 	const pihoitgy_mod* mod = (struct pihoitgy_mod*) dat;
 	int	cnt = atoi(CString(mod->nrec, sizeof(mod->nrec)));
 
-	s.Format("[PIHOITGY] cnt = [%d]\n", cnt);
-	OutputDebugString(s);
-
-
 	m_arrayItgy.RemoveAll();
 	m_arrayPlfItgy.RemoveAll();
 
@@ -29087,8 +29481,8 @@ void CMainFrame::ParsePihoitgyList(char* dat, int len)
 
 		CString filename,gridItem;
 
- 		s.Format("[PIHOITGY] [%s] [%s] [%d]\n",gubn,mnam,mnam.Find("@"));
- 		OutputDebugString(s);
+// 		s.Format("PIHOITGY [%s] [%s] [%d]\n",gubn,mnam,mnam.Find("@"));
+// 		OutputDebugString(s);
 
 // 		if(!gubn.CompareNoCase("PLF"))
 // 		{
@@ -29115,7 +29509,7 @@ void CMainFrame::ParsePihoitgyList(char* dat, int len)
 				tmpG = "EXE";
 
 #ifdef DF_SHOWITGYLOG
-				m_slog.Format("[PIHOITGY] 조회해온 itgylist mnam=[%s] ", mnam);
+				m_slog.Format("[core] 조회해온 itgylist mnam=[%s] ", mnam);
 				OutputDebugString(m_slog);
 #endif
 
@@ -29132,7 +29526,7 @@ void CMainFrame::ParsePihoitgyList(char* dat, int len)
 			filename.Format("%s\\%s\\IB\\%s\\%s", Axis::home, gubn, mnam.Mid(0,3), mnam);
 		}
 
-		s.Format("[PIHOITGY] [%s] [%s] [%d]\n",gubn,mnam,mnam.Find("@"));
+		s.Format("PIHOITGY [%s] [%s] [%d]\n",gubn,mnam,mnam.Find("@"));
 		OutputDebugString(s);
 
 		if(hModule)
@@ -29142,7 +29536,7 @@ void CMainFrame::ParsePihoitgyList(char* dat, int len)
 			gridItem.Format("%-3s%-47s%-44s",gubn,mnam,str);
 
 #ifdef DF_SHOWITGYLOG	
-			m_slog.Format("[PIHOITGY] 조회해온 모듈의 sha256  mnam=[%s] sha=[%s]  ", mnam, str);
+			m_slog.Format("[core] 조회해온 모듈의 sha256  mnam=[%s] sha=[%s]  ", mnam, str);
 			OutputDebugString(m_slog);
 #endif
 			m_arrayItgy.Add(gridItem);
@@ -29161,7 +29555,7 @@ void CMainFrame::ParsePihoitgyList(char* dat, int len)
 		else
 			m_axConnectOld->SetGuide("검증 데이타를 전송합니다.");
 
-		//QueryPihoitgy();  //test comment
+		QueryPihoitgy();
 	}
 	else
 	{
@@ -31216,7 +31610,7 @@ OutputDebugString(m_slog);
 	struct	i_pc {
 		char    header[20]{};
 		char	user[12]{};
-		char	pass[10]{};
+		char	pass[10]{};    //signonsimpleauth
 		char	dats[10]{};
 		char	cpas[30]{};
 		char	uips[15]{};
@@ -32832,6 +33226,17 @@ bool CMainFrame::LoadScreenInfo(const CString& filePath)
 	return true;
 }
 
+AXIS_API int Axis_State()
+{
+	if (!g_pMainFrame) return FALSE;
+	return g_pMainFrame->m_iAxisState;
+}
+
+AXIS_API  CWnd* Axis_GetMainWnd()
+{
+	if (!g_pMainFrame) return FALSE;
+	return g_pMainFrame;
+}
 
 #ifdef DF_MAIN_RTS
 //MMSG_GETRTS_FROM_MAIN   화면에서 실시간 데이터 요청해서 읽을때!!
@@ -32871,6 +33276,9 @@ int CMainFrame::EnsureSlotIndexForCode(const char* code)
 	if (it != g_codeToIndex.end())
 		return it->second;
 
+	if (g_nextSlot >= MAX_SLOT)
+		return -1;
+
 	int idx = g_nextSlot++;
 	g_codeToIndex[code] = idx;
 
@@ -32909,12 +33317,6 @@ int CMainFrame::EnsureSlotIndexForCode(const char* code)
 	//OutputDebugString(slog);
 
 	//return idx;
-}
-
-AXIS_API int Axis_State()
-{
-	if (!g_pMainFrame) return FALSE;
-	return g_pMainFrame->m_iAxisState;
 }
 
 AXIS_API int Axis_EnsureSlotIndex(const char* code)
@@ -32957,16 +33359,12 @@ AXIS_API  BOOL Axis_IsMainRTS()
 	return g_pMainFrame->m_bMainRTS;
 }
 
-AXIS_API  CWnd* Axis_GetMainWnd()
-{
-	if (!g_pMainFrame) return FALSE;
-	return g_pMainFrame;
-}
+
 #endif
 
 
 #endif
-
+#ifdef DF_MAIN_RTS
 void CMainFrame::TestRTSData()
 {
 	static int s_seq = 0;
@@ -33133,7 +33531,7 @@ void CMainFrame::WorkerThreadFunc()
 	//	delete item;
 	//}
 }
-
+#endif
 NetType CMainFrame::GetCurrentNetType(BOOL bUpload)
 {
 	ULONG size = 0;
@@ -33477,12 +33875,6 @@ void CMainFrame::EncryptIniFile(const CString& iniPath, const std::vector<BYTE>&
 						{
 							CString encVal = AesEncrypt(CString(part.c_str()), key);
 							part = (LPCSTR)encVal;
-
-							if (encVal.GetLength() < 32)
-							{
-								m_slog.Format("[AXIS][ENC][%s]<%d>  lower than 32 = [%s] [%s]", __FUNCTION__, __LINE__, encVal, iniPath);
-								OutputDebugString(m_slog);
-							}
 						}
 					}
 
@@ -33521,7 +33913,7 @@ void CMainFrame::EncryptIniFile(const CString& iniPath, const std::vector<BYTE>&
 	m_slog.Format("[AXIS][ENC][%s]<%d> [%s] deleted=[%d]", __FUNCTION__, __LINE__, backupPath, DeleteFileA(backupPath));
 	//OutputDebugString(m_slog);
 }
-
+#ifdef DF_NEW_ENCACC
 std::pair<int, int> CMainFrame::EncryptAllUserIni(const CString& rootPath)
 	{
 		int successCount = 0;
@@ -33568,21 +33960,37 @@ std::pair<int, int> CMainFrame::EncryptAllUserIni(const CString& rootPath)
 					{
 						CString endataPath;
 						endataPath.Format("%s\\endata.dll", (LPCSTR)userFolder);
-						if (GetFileAttributesA(endataPath) == INVALID_FILE_ATTRIBUTES)
+						if (Axis::isCustomer)
 						{
-							CopyFileA(iniPath, endataPath, FALSE);
-							m_slog.Format("[ENC][BACKUP] [%s] -> [%s]", iniPath, endataPath);
-							OutputDebugString(m_slog);
+							//고객 PC : 평문 백업을 만들지 않고 과거 버전이 남긴 백업파일 삭제
+							if (GetFileAttributesA(endataPath) != INVALID_FILE_ATTRIBUTES)
+							{
+								DeleteFileA(endataPath);
+							}
+						}
+						else if (HasPlainAccountHistory(iniPath))
+						{
+							//직원/지원용 : 아직 평문일 때만 1회 복구본 생성
+							if (CopyFileA(iniPath, endataPath, FALSE))
+							{
+								m_slog.Format("[ENC][BACKUP] [%s] -> [%s]", iniPath, endataPath);
+								output_DebugString(m_slog);
+							}
+							else
+							{
+								m_slog.Format("[ENC][BACKUP] failed [%s]-> [%s] err=[%d]", iniPath, endataPath,  GetLastError());
+								output_DebugString(m_slog);
+							}
 						}
 					}
 					EncryptIniFile(iniPath, key);
 					successCount++;
 					m_slog.Format("[ENC] iniPath=[%s] successCount=[%d]", iniPath, successCount);
-					OutputDebugString(m_slog);
+					output_DebugString(m_slog);
 				}
 				catch (const std::exception& e) {
 					m_slog.Format("[ENC] 파일암호화 실패 = [%s]", iniPath);
-					OutputDebugString(m_slog);
+					output_DebugString(m_slog);
 					OutputDebugStringA(e.what());
 					failCount++;
 				}
@@ -33597,6 +34005,81 @@ std::pair<int, int> CMainFrame::EncryptAllUserIni(const CString& rootPath)
 		SecureZeroMemory(key.data(), key.size());
 		return { successCount, failCount };
 	}
+#else
+std::pair<int, int> CMainFrame::EncryptAllUserIni(const CString& rootPath)
+{
+	int successCount = 0;
+	int failCount = 0;
+
+	CString searchPath = rootPath + "\\*";
+	WIN32_FIND_DATAA fd = {};
+	HANDLE hFind = FindFirstFileA(searchPath, &fd);
+	if (hFind == INVALID_HANDLE_VALUE)
+		throw std::runtime_error("Cannot open root folder");
+
+	std::vector<BYTE> key = DeriveKeyFromRegkey(m_regkey);
+
+	do {
+		if (!(fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) continue;
+		if (strcmp(fd.cFileName, ".") == 0)  continue;
+		if (strcmp(fd.cFileName, "..") == 0) continue;
+
+		CString userFolder;
+		userFolder.Format("%s\\%s", (LPCSTR)rootPath, fd.cFileName);
+
+		// ── 사용자 폴더 내 파일 전체 순회 ──────────────
+		CString innerSearch = userFolder + "\\*";
+		WIN32_FIND_DATAA fd2 = {};
+		HANDLE hFind2 = FindFirstFileA(innerSearch, &fd2);
+		if (hFind2 == INVALID_HANDLE_VALUE)
+			continue;
+
+		do {
+			if (fd2.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) continue;
+
+			CString fname(fd2.cFileName);
+
+			// .ini 포함된 파일만, .bak/.tmp 제외
+			if (fname.Find(".ini") == -1) continue;
+			if (fname.Right(4) == ".bak") continue;
+			if (fname.Right(4) == ".tmp") continue;
+
+			CString iniPath;
+			iniPath.Format("%s\\%s", (LPCSTR)userFolder, (LPCSTR)fname);
+
+			try {
+				if (fname == CString(fd.cFileName) + ".ini")
+				{
+					CString endataPath;
+					endataPath.Format("%s\\endata.dll", (LPCSTR)userFolder);
+					if (GetFileAttributesA(endataPath) == INVALID_FILE_ATTRIBUTES)
+					{
+						CopyFileA(iniPath, endataPath, FALSE);
+						m_slog.Format("[ENC][BACKUP] [%s] -> [%s]", iniPath, endataPath);
+						OutputDebugString(m_slog);
+					}
+				}
+				EncryptIniFile(iniPath, key);
+				successCount++;
+				m_slog.Format("[ENC] iniPath=[%s] successCount=[%d]", iniPath, successCount);
+				OutputDebugString(m_slog);
+			}
+			catch (const std::exception& e) {
+				OutputDebugStringA(e.what());
+				failCount++;
+			}
+
+		} while (FindNextFileA(hFind2, &fd2));
+
+		FindClose(hFind2);
+
+	} while (FindNextFileA(hFind, &fd));
+
+	FindClose(hFind);
+	SecureZeroMemory(key.data(), key.size());
+	return { successCount, failCount };
+}
+#endif
 
 void CMainFrame::DecryptIniFile(const CString& iniPath, const std::vector<BYTE>& enkey)
 {
@@ -33901,6 +34384,76 @@ bool CMainFrame::isIPInRange24(CString ip, CString network)
 	return false;
 }
 
+BOOL CMainFrame::ConnectWithTimeOut(const char* ip, int port, int timeoutMS)
+{
+	WSADATA wsa;
+	if (WSAStartup(MAKEWORD(2, 2), &wsa) != 0)
+		return FALSE;
+
+	SOCKET sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+	if (sock == INVALID_SOCKET)
+	{
+		WSACleanup();
+		return FALSE;
+	}
+
+	//Non_blocking 모드
+	u_long mode = 1;
+	ioctlsocket(sock, FIONBIO, &mode);
+
+	sockaddr_in addr;
+	ZeroMemory(&addr, sizeof(addr));
+
+	addr.sin_family = AF_INET;
+	addr.sin_port = htons(port);
+	addr.sin_addr.s_addr = inet_addr(ip);
+
+	int ret = connect(sock, (sockaddr*)&addr, sizeof(addr));
+
+	if (ret == SOCKET_ERROR)
+	{
+		int err = WSAGetLastError();
+
+		//아래3 가지 상황이 아니면 확실히 접속 안되는거니까 바로 false 리턴
+		if (err != WSAEWOULDBLOCK &&  
+			err != WSAEINPROGRESS &&
+			err != WSAEINVAL)
+		{
+			closesocket(sock);
+			WSACleanup();
+			return FALSE;
+		}
+	}
+
+	fd_set writeSet;
+	FD_ZERO(&writeSet);
+	FD_SET(sock, &writeSet);
+
+	timeval tv;
+	tv.tv_sec = timeoutMS / 1000;
+	tv.tv_usec = (timeoutMS % 1000) * 1000;
+
+	ret = select(0, nullptr, &writeSet, nullptr, &tv);
+
+	BOOL bConnected = false;
+
+	if (ret > 0)
+	{
+		int so_error = 0;
+		int len = sizeof(so_error);
+
+		getsockopt(sock, SOL_SOCKET, SO_ERROR, (char*)&so_error, &len);
+
+		if (so_error == 0)
+			bConnected = true;
+	}
+
+	closesocket(sock);
+	WSACleanup();
+
+	return bConnected;
+}
+
 bool CMainFrame::IsHeadquartersIP(CString ip)
 {
 	static const char* HQ_RANGES[] = {
@@ -33928,21 +34481,45 @@ bool CMainFrame::IsHeadquartersIP(CString ip)
 void CMainFrame::AccEncrypt()
 {
 	CString filename;
+	CString sdept;
+	sdept = Variant(getDEPT);
+	
+	filename.Format("%s\\%s\\AXISAI.ini", Axis::home, "tab");
+	int dw = GetPrivateProfileInt("NewPhonepad", "check", 0, filename);
+
+	//	if (!Axis::isCustomer && IsHeadquartersIP(m_ipAddr))
+	//	{
+	//		m_bNewPhonepad = true;
+	//	}
+	//}
+	//else
+	{
+		if (!Axis::isCustomer && (sdept == "001" || sdept == "933"))
+	//	if (sdept == "000" || sdept == "933")                     
+		{
+			m_bNewPhonepad = true;
+		}
+	}
+
+	dw = GetPrivateProfileInt("NewPhonepad", "forceNewPhonepad", 0, filename);
+	if (dw == 1)
+		m_bNewPhonepad = true;
+
+	dw = GetPrivateProfileInt("NewPhonepad", "forceOldPhonepad", 0, filename);
+	if (dw == 1)
+		m_bNewPhonepad = false;
+
+	m_slog.Format("[axis][%s] sdept = [%s]  m_bNewPhonepad=[%d]\n", __FUNCTION__, sdept, m_bNewPhonepad);
+	OutputDebugString(m_slog);
+
 	filename.Format("%s\\%s\\%s", Axis::home, "tab", "axis.ini");
 	WritePrivateProfileString("AXIS", "reg", m_regkey, filename);
 
 	filename.Format("%s\\%s\\AXISAI.ini", Axis::home, "tab");
-	int dw = GetPrivateProfileInt("ENC", "acchistory", 0, filename);
+	dw = GetPrivateProfileInt("ENC", "acchistory", 0, filename);
 
 	if (dw == 0)
 		return;
-
-	//if (!IsHeadquartersIP(m_ipAddr))
-	//{
-	//	m_slog.Format("[AXIS][AccEncrypt] Skipped - not HQ IP=[%s]", m_ipAddr);
-	//	output_DebugString(m_slog);
-	//	return;
-	//}
 
 	CString sPath;
 	CString strFilePath;
@@ -34213,6 +34790,32 @@ void CMainFrame::ProcessFileManager(const CString& setupFile)
 	}
 
 	WriteLog("[FM] done.\n");
+}
+
+bool CMainFrame::HasPlainAccountHistory(const CString& iniPath)
+{
+	std::vector<char> buf(1024 * 20);
+	DWORD len = GetPrivateProfileSection("AccountHistory", buf.data(), (DWORD)buf.size(), iniPath);
+
+	//섹션이 버퍼보다 크면(반환값==버퍼크기 - 2) 버퍼를 키워서 재시도
+	while (len == buf.size() - 2)
+	{
+		buf.reserve(buf.size() * 4);
+		len = GetPrivateProfileSection("AccountHistory", buf.data(), (DWORD)buf.size(), iniPath);
+	}
+
+	for (const char* p = buf.data(); *p; p += strlen(p) + 1)
+	{
+		const char* eq = strchr(p, '=');
+		if (!eq) continue;
+
+		std::string key(p, eq - p);
+		std::string val(eq + 1);
+
+		if (key != "VERSION" && val.empty() && val.find('|') != std::string::npos)
+			return true;
+	}
+	return false;
 }
 #endif
 

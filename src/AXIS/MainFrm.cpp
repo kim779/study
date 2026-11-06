@@ -103,7 +103,7 @@
 #include "enc.h"
 #include "FirstJob.h"
 #include "../H/interMSG.h"
-#include "../ibks/h/axlog.h"
+
 
 
 #include <lm.h>
@@ -134,6 +134,8 @@ static char THIS_FILE[] = __FILE__;
 #define NXT_MARKET_AFTER		3	//애프터  (NXT_AFTER)
 #define NXT_MARKET_ONEPRC		4	//단일가  (NXT_ONEPRC)
 #define NXT_MARKET_BEFORE		5	//장전    (NXT_MBEFORE)
+
+#define AGENT_MSG_LOG 9997
 
 static CRect	g_monRc(0, 0, 0, 0);
 static CMainFrame* m_pMain = NULL;
@@ -329,10 +331,6 @@ void WriteUpLog(LPCSTR sfile, LPCSTR log, ...)
 	}
 	END_CATCH
 }
-
-// WriteLog/WriteUpLog/WriteLog_File는 전부 맨 앞에 return;이 있어 현재 아무것도 기록하지 않는다.
-// 드물게 발생하는 크래시/레이스 조건을 진단할 때는 h/axlog.h의 axDiagLog()를 사용한다 -
-// AXIS/docs/KnowledgeBase.md의 "진단로그 관리 규칙" 참고 (2026-09-15, ShowHistoryMap/IB0000X8 조사 계기로 axlog.h에 공용화됨)
 
 void WriteLog( LPCSTR log, ... )
 {
@@ -1021,7 +1019,7 @@ CMainFrame::CMainFrame()
 	m_EmpPassChangeDlg = NULL;
 
 	m_printsetup = new CPrinterSettings();
-	m_printsetup->CopyDefaultMfcPrinter();
+	//m_printsetup->CopyDefaultMfcPrinter();
 	m_tabviewlist.RemoveAll();
 	m_waitlist.RemoveAll();
 
@@ -1309,17 +1307,6 @@ void CMainFrame::MakeExpectSymbolTable()
 	}
 }
 
-// axDiagLog 호출 인자(Axis::home + ... 의 CString 연결)가 임시 CString 객체를 만드는데,
-// __try가 있는 함수 안에 이런 소멸자 있는 C++ 객체가 있으면 C2712(개체 해제 기능이 사용되는
-// 함수에서는 __try를 사용할 수 없습니다)가 난다 - ShowHistoryMap의 __except 블록에서 직접
-// 호출하지 않고 이 별도 함수로 분리해서 우회한다 (2026-09-15).
-static void LogViewRaceCrash(CWnd* miniWid, CWnd* viewHist, WPARAM wParam, LPARAM lParam)
-{
-	axDiagLog(Axis::home + "\\user\\" + Axis::user + "\\Crashlog", "IB0000X8_ViewRace.log",
-		"[ShowHistoryMap-SEH] dangling pointer caught - m_miniWid=0x%p m_viewHist=0x%p wParam=0x%p lParam=0x%p tick=%lu",
-		miniWid, viewHist, (void*)wParam, (void*)lParam, GetTickCount());
-}
-
 void CMainFrame::ShowHistoryMap(WPARAM wParam, LPARAM lParam)
 {
 	//if (1)
@@ -1399,11 +1386,10 @@ void CMainFrame::ShowHistoryMap(WPARAM wParam, LPARAM lParam)
 
 			// ---------------------------------
 			// view / window 체크
-			// m_miniWid/m_viewHist는 미니창 close 경로에서 갱신을 놓치면
-			// 댕글링 포인터가 될 수 있어(OnMiniClose 참고) SEH로 한 번 더 감싼다.
 			// ---------------------------------
 			__try
 			{
+
 				if (!m_miniWid || !m_miniWid->GetSafeHwnd())
 				{
 					m_codeHist.Empty();
@@ -1428,12 +1414,11 @@ void CMainFrame::ShowHistoryMap(WPARAM wParam, LPARAM lParam)
 			}
 			__except (EXCEPTION_EXECUTE_HANDLER)
 			{
-				// 희귀 레이스 진단용 - 자세한 배경은 AXIS/docs/KnowledgeBase.md 사례 #4 참고 (2026-09-15)
-				LogViewRaceCrash(m_miniWid, m_viewHist, wParam, lParam);
-				m_miniWid = NULL;
-				m_viewHist = NULL;
-			}
+				m_miniWid = nullptr;
+				m_viewHist = nullptr;
 
+			}
+	
 			m_codeHist.Empty();
 	}
 	/*else
@@ -1754,6 +1739,7 @@ BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)
 				break;
 				case 'D':
 				{
+					SendLogToAgent("testlog");
 					/*	int nCount = m_mapAlarmList.GetCount();
 						m_slog.Format("[mng][main]] Map Count = %d\n", nCount);
 						OutputDebugString(m_slog);
@@ -3218,24 +3204,22 @@ void CMainFrame::OnClose()
 			}
 		}
 	}
-	
+
+#ifdef DF_KRX_FREEAFTER
 	if (m_pSharedMemory)
 	{
-		// cx_shared.dll의 창(WNDPROC이 그 DLL 코드 안에 있음)을 FreeLibrary 전에 먼저 파괴해야 함.
-		// 순서가 바뀌면 DestroyWindow 연쇄(부모 프레임 파괴 시 자식창에 전달되는 메시지)가
-		// 이미 언로드된 DLL 메모리로 점프해 크래시함 (axis!CAxisApp::ExitInstance 경유,
-		// <Unloaded_cx_shared.dll> 크래시덤프로 확인됨, 2026-08-27)
 		m_pSharedMemory->DestroyWindow();
 		delete m_pSharedMemory;
 		m_pSharedMemory = nullptr;
 	}
+#endif	
 
 	if (m_hSharedLib)
 	{
 		FreeLibrary(m_hSharedLib);
 		m_hSharedLib = nullptr;
 	}
-
+	
 	m_slog.Format("--------------------[Axis_State][onClose end]  m_iAxisState =[%d]-------------", m_iAxisState);
 	OutputDebugString(m_slog);
 	CMDIFrameWnd::OnClose();
@@ -3348,7 +3332,6 @@ WriteLog(slog);
 		break;
 	case axSTART:	// start step
 		{
-			CreateAgentProcess();
 			if(m_bUseNewLogin)
 			{
 				m_bCertLogin = m_axConnect->GetCertLogin();
@@ -5525,7 +5508,6 @@ WriteLog("[AXIS] CMainFrame::OnFireRec (lparam null )     FEV_RUN\n");
 	case FEV_ANM:	
 		{
 			update_ticker((int)wParam, (struct _alertR*)lParam);
-			//ForwardTickerToAgent(wParam, lParam);
 		}
 		break;
 	case FEV_AXIS:
@@ -6390,6 +6372,7 @@ bool CMainFrame::CreateWizard()
 		WriteLog("[AXIS] ---------------[axis]createwizard fail---------------");
 		return false;
 	}
+	SendLogToAgent("CreateWizard success");
 	return true;
 }
 
@@ -6402,6 +6385,7 @@ int CMainFrame::Initialize()
 	}
 	CloseChaserAPP();
 	CloseAgent();
+	CreateAgentProcess();
 
 	CString filename;
 	filename.Format("%s\\%s\\%s", Axis::home, "tab", "axis.ini");
@@ -7100,23 +7084,11 @@ bool CMainFrame::Start(CString user)
 		dw = GetPrivateProfileString("MAINRTS", "use", "0", buf, sizeof(buf), spath);
 		s.Format("%s", buf);
 		s.TrimRight();
+
+#ifdef DF_MAIN_RTS
 		m_bMainRTS = (_ttoi(s) == 1) ? TRUE : FALSE;
+#endif
 
-		memset(buf, 512, 0x00);
-		spath.Format("%s\\%s\\AXISAI.ini", Axis::home, "tab");
-		dw = GetPrivateProfileString("AxisAgent", "use", "0", buf, sizeof(buf), spath);
-		s.Format("%s", buf);
-		s.TrimRight();
-		m_bAxisAgent = (_ttoi(s) == 1) ? TRUE : FALSE;
-
-		memset(buf, 512, 0x00);
-		spath.Format("%s\\%s\\AXISAI.ini", Axis::home, "tab");
-		dw = GetPrivateProfileString("AxisAgent", "show", "0", buf, sizeof(buf), spath);
-		s.Format("%s", buf);
-		s.TrimRight();
-		m_bShowAxisAgent = (_ttoi(s) == 1) ? TRUE : FALSE;
-		
-	
 		if(m_bUseNewLogin)
 		{
 #ifdef DF_ENCUSER
@@ -7392,7 +7364,7 @@ void CMainFrame::registerControl()
 		{
 			TRACE("LoadLibrary error....[%s] error=[%d]\n", path, GetLastError());
 			m_slog.Format("[AXIS] [registerControl] LoadLibrary error....[%s] error=[%d]\n", path, GetLastError());
-			OutputDebugString(m_slog);
+			SendLogToAgent(m_slog);
 			WriteLog(m_slog);
 			continue;
 		}
@@ -7410,7 +7382,7 @@ void CMainFrame::registerControl()
 		FreeLibrary(hLib);
 
 		m_slog.Format("[AXIS] [registerControl] LoadLibrary%s] \n", path);
-		OutputDebugString(m_slog);
+		SendLogToAgent(m_slog);
 		WriteLog(m_slog);
 	}
 }
@@ -22493,8 +22465,8 @@ void CMainFrame::OnDestroy()
 
  	if (m_hMNews) FreeLibrary(m_hMNews);
 
-	m_slog.Format("--------------------[Axis_State][OnDestroy end]  m_iAxisState =[%d]-------------", m_iAxisState);
-	OutputDebugString(m_slog);
+	//m_slog.Format("--------------------[Axis_State][OnDestroy end]  m_iAxisState =[%d]-------------", m_iAxisState);
+	//OutputDebugString(m_slog);
 	//FreeFirewall();
 }
 
@@ -24035,6 +24007,19 @@ void CMainFrame::SetLastMaps(CString sRemoveMap, CString sInsertMap)
 	{
 		m_sLastMapInfo += sInsertMap + " ";
 	}
+
+	// Agent: screen open/close trail with the full open list
+	if (sRemoveMap != sInsertMap)
+	{
+		CString sAct;
+		if (sRemoveMap.IsEmpty())       sAct.Format("open %s", (LPCSTR)sInsertMap);
+		else if (sInsertMap.IsEmpty())  sAct.Format("close %s", (LPCSTR)sRemoveMap);
+		else                            sAct.Format("change %s -> %s", (LPCSTR)sRemoveMap, (LPCSTR)sInsertMap);
+
+		CString sLog;
+		sLog.Format("[MAP] %s | now=[%s]", (LPCSTR)sAct, (LPCSTR)m_sLastMapInfo);
+		SendLogToAgent(sLog);
+	}
 }
 
 #define AGENT_MSG_PING      9998    // 핑 로그
@@ -24925,8 +24910,7 @@ void CMainFrame::DrawFrame(CDC* dc)
 
 	if (!m_bSDI)
 	{
-		
-		CBitmap* bmpBgPattern = Axis::GetSkinBitmap("BG_PATERN");
+		CBitmap* bmpBgPattern  = Axis::GetSkinBitmap("BG_PATERN");
 		if (bmpBgPattern)
 		{
 			CDC mdc;
@@ -28919,10 +28903,9 @@ void CMainFrame::CheckEncryptDirectory()
 LRESULT CMainFrame::OnMiniClose( WPARAM wParam, LPARAM lParam )
 {
 	m_miniWid = NULL;
-	m_viewHist = NULL;	// 미니창과 함께 파괴되는 자식 뷰 - 남겨두면 댕글링 포인터가 됨(ShowHistoryMap 크래시 원인)
-
+	m_viewHist = NULL;
 	//OutputDebugString("DESTORY MINI WND FROM MAIN\n");
-
+	
 	return 0;
 }
 
@@ -33224,6 +33207,17 @@ bool CMainFrame::LoadScreenInfo(const CString& filePath)
 	return true;
 }
 
+AXIS_API int Axis_State()
+{
+	if (!g_pMainFrame) return FALSE;
+	return g_pMainFrame->m_iAxisState;
+}
+
+AXIS_API  CWnd* Axis_GetMainWnd()
+{
+	if (!g_pMainFrame) return FALSE;
+	return g_pMainFrame;
+}
 
 #ifdef DF_MAIN_RTS
 //MMSG_GETRTS_FROM_MAIN   화면에서 실시간 데이터 요청해서 읽을때!!
@@ -33303,12 +33297,6 @@ int CMainFrame::EnsureSlotIndexForCode(const char* code)
 	//return idx;
 }
 
-AXIS_API int Axis_State()
-{
-	if (!g_pMainFrame) return FALSE;
-	return g_pMainFrame->m_iAxisState;
-}
-
 AXIS_API int Axis_EnsureSlotIndex(const char* code)
 {
 	CMainFrame* pFrame = (CMainFrame*)AfxGetMainWnd();
@@ -33343,22 +33331,12 @@ AXIS_API const TickSnapshot* Axis_GetTickSlots()
 //	return count;
 //}
 
-AXIS_API  BOOL Axis_IsMainRTS()
-{
-	if (!g_pMainFrame) return FALSE;
-	return g_pMainFrame->m_bMainRTS;
-}
-
-AXIS_API  CWnd* Axis_GetMainWnd()
-{
-	if (!g_pMainFrame) return FALSE;
-	return g_pMainFrame;
-}
 #endif
 
 
 #endif
 
+#ifdef DF_MAIN_RTS
 void CMainFrame::TestRTSData()
 {
 	static int s_seq = 0;
@@ -33526,6 +33504,8 @@ void CMainFrame::WorkerThreadFunc()
 	//}
 }
 
+#endif
+
 NetType CMainFrame::GetCurrentNetType(BOOL bUpload)
 {
 	ULONG size = 0;
@@ -33571,51 +33551,62 @@ NetType CMainFrame::GetCurrentNetType(BOOL bUpload)
 	free(addresses);
 	return result;
 }
-   
-void CMainFrame::ForwardTickerToAgent(WPARAM wParam, LPARAM lParam)
+
+static BOOL CALLBACK FindAgentWndProc(HWND hWnd, LPARAM lParam)
 {
-	if (lParam == 0) return;
-
-	m_sync.Lock();  // 기존 코드와 동일 패턴
-
-	const WORD wFlag = HIWORD(wParam);
-	const WORD wBodyLen = LOWORD(wParam);
-	const int  nTotal = L_cds + wBodyLen;
-
-	// 안전 체크
-	static char bufx[1024 * 128];  // 128KB - 기존과 동일
-	if (nTotal > (int)sizeof(bufx)) {
-		m_sync.Unlock();
-		return;
-	}
-
-	ZeroMemory(bufx, nTotal);  // 필요한 만큼만 (성능)
-
-	struct _exeCDSS* cds = (struct _exeCDSS*)bufx;
-	cds->flag = wFlag;
-	cds->len = wBodyLen;
-	CopyMemory(&bufx[L_cds], (char*)lParam, wBodyLen);  // 본문 길이만 복사
-
-	COPYDATASTRUCT cs;
-	cs.cbData = nTotal;
-	cs.dwData = 0;            // 기존 컨벤션 유지 (또는 IPC_REALTIME_TICK)
-	cs.lpData = bufx;
-
-	// 에이전트로 송신
-	if (m_hAgentWnd && ::IsWindow(m_hAgentWnd))
+	DWORD* pPid = (DWORD*)lParam;
+	DWORD pid = 0;
+	GetWindowThreadProcessId(hWnd, &pid);
+	if (pid == pPid[0] && GetWindow(hWnd, GW_OWNER) == NULL)
 	{
-		::SendMessageTimeout(
-			m_hAgentWnd, WM_COPYDATA,
-			(WPARAM)GetSafeHwnd(),
-			(LPARAM)&cs,
-			SMTO_ABORTIFHUNG, 200, NULL);
+		pPid[1] = (DWORD)(UINT_PTR)hWnd;	// found (32-bit build)
+		return FALSE;
 	}
-
-	m_sync.Unlock();
+	return TRUE;
 }
 
+void CMainFrame::SendLogToAgent(LPCSTR msg)
+{
+	OutputDebugString(msg);  //SendLogToAgent
+
+	if (!m_hAgentProcess || !msg)
+		return;		// agent not started -> do nothing
+
+	if (!m_hAgentWnd || !::IsWindow(m_hAgentWnd))
+	{
+		DWORD param[2] = { GetProcessId(m_hAgentProcess), 0 };
+		EnumWindows(FindAgentWndProc, (LPARAM)param);
+		m_hAgentWnd = (HWND)(UINT_PTR)param[1];
+		if (!m_hAgentWnd)
+			return;	// agent window not created yet
+	}
+
+	COPYDATASTRUCT cds = {};
+	cds.dwData = AGENT_MSG_LOG;		// 9997
+	cds.cbData = (DWORD)strlen(msg) + 1;
+	cds.lpData = (PVOID)msg;
+
+	::SendMessageTimeout(m_hAgentWnd, WM_COPYDATA, (WPARAM)GetSafeHwnd(), (LPARAM)&cds,
+		SMTO_ABORTIFHUNG | SMTO_NORMAL, 200, NULL);
+}
 void CMainFrame::CreateAgentProcess(bool bforce)
 {
+	CString spath, s;
+	char buf[256]{};
+	memset(buf, 512, 0x00);
+	spath.Format("%s\\%s\\AXISAI.ini", Axis::home, "tab");
+	int dw = GetPrivateProfileString("AxisAgent", "use", "0", buf, sizeof(buf), spath);
+	s.Format("%s", buf);
+	s.TrimRight();
+	m_bAxisAgent = (_ttoi(s) == 1) ? TRUE : FALSE;
+
+	memset(buf, 512, 0x00);
+	spath.Format("%s\\%s\\AXISAI.ini", Axis::home, "tab");
+	dw = GetPrivateProfileString("AxisAgent", "show", "0", buf, sizeof(buf), spath);
+	s.Format("%s", buf);
+	s.TrimRight();
+	m_bShowAxisAgent = (_ttoi(s) == 1) ? TRUE : FALSE;
+
 	if (!m_bAxisAgent && !bforce)
 		return;
 	if (bforce)

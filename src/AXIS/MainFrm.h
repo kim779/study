@@ -15,8 +15,6 @@
 //#include "inca/NpnxMgr.h" //** pc firewall wrapper class definition header (INCA software)
 #include "../h/jmcode.h"
 #include "../h/axisfire.h"
-#define AXLOG_MODULE_TAG "AXIS"
-#include "../ibks/h/axlog.h"	// axDiagLog() - 희귀 크래시/레이스 진단용 파일로그, KnowledgeBase.md "진단로그 관리 규칙" 참고
 #include "childFrm.h"
 #include "SChild.h"
 #include "inca/npenkAppInstall5WIN.h"
@@ -495,7 +493,7 @@ struct _stMap
 	std::vector<CString> extra;
 };
 
-#define DF_MAIN_RTS
+#define DF_MAIN_RTS1
 #ifdef DF_MAIN_RTS
 //////////////////////////////////////////////////////////////////////메인실시간처리//////////////////////////////////////////////
 
@@ -1852,6 +1850,19 @@ public:
 
 	BOOL m_bSise{};   //1시세전용  0일반
 
+	BOOL m_bAxisAgent{};
+	BOOL m_bShowAxisAgent{};
+	HWND m_hAgentWnd{};
+	DWORD  m_dwAgentPid{};
+	HANDLE m_hAgentProcess{};
+	HANDLE m_hStopEvent = NULL;
+	NetType GetCurrentNetType(BOOL bUpload = false);
+	CString m_netTypeStr{};
+	int     m_pingMs{};
+	CString     m_sMonitor;
+	void CreateAgentProcess(bool bforce = false);
+	void SendLogToAgent(LPCSTR msg);
+	void CloseAgent();
 	//실시간메인처리
 #ifdef DF_MAIN_RTS
 	struct SafeAlertItem {

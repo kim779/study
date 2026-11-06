@@ -14,8 +14,13 @@
 #define new DEBUG_NEW
 #endif
 
-static const int MAX_DUMP_COUNT = 3;
-static const DWORD DUMP_INTERVAL_MS = 1000;
+static const int MAX_DUMP_COUNT = 3;	// per episode (reset by [D8])
+static const int MAX_DUMP_TOTAL = 10;	// per agent lifetime, never reset
+static const int CPU_SUSTAINED_SAMPLES = 30;	// 1s samples; CpuSpike dump only after high CPU this long
+static const DWORD STARTUP_GRACE_MS = 60000;	// no CpuSpike dump within 60s after first [MAP] (screen restore)
+static const int PING_KEEP_DAYS = 7;	// files in ping folder older than this are deleted at start
+static const int MAX_DUMP_FAIL = 3;     // stop retrying after N failed attempts
+static const DWORD DUMP_INTERVAL_MS = 3000;
 
 // 응용 프로그램 정보에 사용되는 CAboutDlg 대화 상자입니다.
 #include <string>
@@ -24,6 +29,27 @@ static const DWORD DUMP_INTERVAL_MS = 1000;
 
 namespace
 {
+	// Exclude code/data segments of Windows system modules to reduce dump size.
+	// ntdll data is kept: !locks / !cs -l need its critical section list.
+	static BOOL CALLBACK AgentDumpCallback(PVOID,
+		const PMINIDUMP_CALLBACK_INPUT pInput,
+		PMINIDUMP_CALLBACK_OUTPUT pOutput)
+	{
+		if (pInput == NULL || pOutput == NULL)
+			return TRUE;
+
+		if (pInput->CallbackType == ModuleCallback &&
+			_wcsnicmp(pInput->Module.FullPath, L"C:\\Windows\\", 11) == 0)
+		{
+			const wchar_t* name = wcsrchr(pInput->Module.FullPath, L'\\');
+			if (name && _wcsicmp(name + 1, L"ntdll.dll") == 0)
+				pOutput->ModuleWriteFlags &= ~ModuleWriteCodeSegs;	// keep ntdll data
+			else
+				pOutput->ModuleWriteFlags &= ~(ModuleWriteDataSeg | ModuleWriteCodeSegs);
+		}
+		return TRUE;
+	}
+
 	static bool IsWaitLikeFunction(const char* name)
 	{
 		if (!name || !name[0]) return false;
@@ -84,78 +110,6 @@ namespace
 				"[MAIN_UI] TID=%lu ui-pattern detected: %s / %s / %s",
 				threadId, s0, s1, s2);
 			pThis->WriteMonitorLog(buf);
-		}
-	}
-
-	struct StackHotState
-	{
-		std::string lastTopFunc;
-		DWORD64 lastTopAddr;
-		int repeatCount;
-
-		StackHotState()
-			: lastTopAddr(0), repeatCount(0)
-		{
-		}
-	};
-
-	static StackHotState g_hotState;
-
-	static void WriteTaggedLog(CAxisAgentDlg* pThis, const char* tag, const char* msg)
-	{
-		if (!pThis || !tag || !msg)
-			return;
-
-		char buf[1024] = { 0 };
-		sprintf_s(buf, "[%s] %s", tag, msg);
-		pThis->WriteMonitorLog(buf);
-	}
-
-	static void UpdateHotStateAndLog(
-		CAxisAgentDlg* pThis,
-		BOOL bMain,
-		int frameNo,
-		DWORD64 addr,
-		const char* funcName,
-		DWORD64 disp64)
-	{
-		if (!pThis || !funcName || !funcName[0])
-			return;
-
-		char msg[1024] = { 0 };
-
-		// 1. TOP 프레임은 무조건 강조
-		if (frameNo == 0)
-		{
-			sprintf_s(msg,
-				"%s %s + 0x%I64X",
-				bMain ? "[MAIN][TOP]" : "[TOP]",
-				funcName,
-				disp64);
-			WriteTaggedLog(pThis, "HOT", msg);
-
-			// 2. 같은 TOP 함수/주소 반복되면 STUCK 강조
-			if (g_hotState.lastTopFunc == funcName && g_hotState.lastTopAddr == addr)
-			{
-				g_hotState.repeatCount++;
-			}
-			else
-			{
-				g_hotState.lastTopFunc = funcName;
-				g_hotState.lastTopAddr = addr;
-				g_hotState.repeatCount = 0;
-			}
-
-			if (g_hotState.repeatCount >= 2)
-			{
-				sprintf_s(msg,
-					"%s 같은 TOP 반복 func=%s addr=0x%I64X repeat=%d",
-					bMain ? "[MAIN][STUCK]" : "[STUCK]",
-					funcName,
-					addr,
-					g_hotState.repeatCount);
-				WriteTaggedLog(pThis, "HOT", msg);
-			}
 		}
 	}
 
@@ -289,119 +243,6 @@ namespace
 	}
 }
 
-void dumptest()
-{
-	SYSTEMTIME st;
-	GetLocalTime(&st);
-
-	char selfPath[MAX_PATH] = { 0 };
-	GetModuleFileNameA(NULL, selfPath, MAX_PATH);
-	char* p = strrchr(selfPath, '\\');
-	if (p) *p = '\0';
-
-	// DbgHelp.dll - exe 옆에 있는거 우선 로드 (없으면 시스템꺼)
-	char dbgHelpPath[MAX_PATH] = { 0 };
-	sprintf_s(dbgHelpPath, "%s\\DbgHelp.dll", selfPath);
-
-	HMODULE hDbgHelp = LoadLibraryA(dbgHelpPath);
-	if (!hDbgHelp)
-	{
-		//DebugLog("TestDump: exe 옆 DbgHelp.dll 없음 - 시스템꺼 로드\n");
-		hDbgHelp = LoadLibraryA("DbgHelp.dll");
-	}
-
-	if (!hDbgHelp)
-	{
-		//AddLog("DUMP", "DbgHelp.dll 로드 실패");
-		return;
-	}
-
-	// 버전 로그
-	char loadedPath[MAX_PATH] = { 0 };
-	GetModuleFileNameA(hDbgHelp, loadedPath, MAX_PATH);
-	//DebugLog("TestDump: DbgHelp.dll 로드 [%s]\n", loadedPath);
-
-	typedef BOOL(WINAPI* PFN_MiniDumpWriteDump)(
-		HANDLE, DWORD, HANDLE, MINIDUMP_TYPE,
-		PMINIDUMP_EXCEPTION_INFORMATION,
-		PMINIDUMP_USER_STREAM_INFORMATION,
-		PMINIDUMP_CALLBACK_INFORMATION);
-
-	PFN_MiniDumpWriteDump pfnDump =
-		(PFN_MiniDumpWriteDump)GetProcAddress(hDbgHelp, "MiniDumpWriteDump");
-
-	if (!pfnDump)
-	{
-	//	AddLog("DUMP", "MiniDumpWriteDump GetProcAddress 실패");
-		FreeLibrary(hDbgHelp);
-		return;
-	}
-
-	// 덤프 파일 생성
-	char dumpPath[MAX_PATH] = { 0 };
-	sprintf_s(dumpPath, "%s\\ping\\test_dump_%04d%02d%02d_%02d%02d%02d.dmp",
-		selfPath,
-		st.wYear, st.wMonth, st.wDay,
-		st.wHour, st.wMinute, st.wSecond);
-
-	HANDLE hFile = CreateFileA(
-		dumpPath,
-		GENERIC_WRITE, 0, NULL,
-		CREATE_ALWAYS,
-		FILE_ATTRIBUTE_NORMAL, NULL);
-
-	if (hFile == INVALID_HANDLE_VALUE)
-	{
-		char buf[256] = { 0 };
-		sprintf_s(buf, "TestDump: CreateFile 실패 err=%lu", GetLastError());
-	//	AddLog("DUMP", buf);
-		FreeLibrary(hDbgHelp);
-		return;
-	}
-
-	MINIDUMP_TYPE dumpType = (MINIDUMP_TYPE)(
-		MiniDumpWithDataSegs |
-		MiniDumpWithHandleData |
-		MiniDumpWithThreadInfo |
-		MiniDumpWithUnloadedModules);
-
-	BOOL bOk = pfnDump(
-		GetCurrentProcess(),
-		GetCurrentProcessId(),
-		hFile,
-		dumpType,
-		NULL, NULL, NULL);
-
-	DWORD err = GetLastError();
-	CloseHandle(hFile);
-	FreeLibrary(hDbgHelp);
-
-	if (bOk)
-	{
-		HANDLE hCheck = CreateFileA(dumpPath, GENERIC_READ, FILE_SHARE_READ,
-			NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-		DWORD size = 0;
-		if (hCheck != INVALID_HANDLE_VALUE)
-		{
-			size = GetFileSize(hCheck, NULL);
-			CloseHandle(hCheck);
-		}
-
-		char buf[256] = { 0 };
-		sprintf_s(buf, "TestDump: 성공 size=%lu bytes", size);
-	
-	//	DebugLog("TestDump: [%s] %s\n", dumpPath, buf);
-	}
-	else
-	{
-		char buf[256] = { 0 };
-		sprintf_s(buf, "TestDump: 실패 err=%lu (0x%08X)", err, err);
-	
-	//	DebugLog("%s\n", buf);
-	}
-
-}
-
 void CAxisAgentDlg::DebugLog(const char* fmt, ...)
 {
 
@@ -489,8 +330,13 @@ void CAxisAgentDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_LIST_LOG,      m_listLog);
 	DDX_Control(pDX, IDC_CHK_PING,     m_chkPing);
 	DDX_Control(pDX, IDC_CHK_MONITOR,  m_chkMonitor);
+	DDX_Control(pDX, IDC_CHK_HTS,      m_chkHts);
+	DDX_Control(pDX, IDC_CHK_DEBUG,    m_chkDebug);
+	DDX_Control(pDX, IDC_CHK_FILTER,   m_chkFilter);
+	DDX_Control(pDX, IDC_EDIT_FILTER,  m_editFilter);
 	DDX_Control(pDX, IDC_CHK_STOP,     m_chkStop);
 	DDX_Control(pDX, IDC_EDIT_SYMPATH, m_editSymPath);
+	DDX_Control(pDX, IDC_EDIT_DETAIL,  m_editDetail);
 }
 
 BEGIN_MESSAGE_MAP(CAxisAgentDlg, CDialogEx)
@@ -503,18 +349,25 @@ BEGIN_MESSAGE_MAP(CAxisAgentDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BTN_TEST, &CAxisAgentDlg::OnBnClickedBtnTest)
 	ON_BN_CLICKED(IDC_CHK_PING, &CAxisAgentDlg::OnBnClickedChkPing)
 	ON_BN_CLICKED(IDC_CHK_MONITOR, &CAxisAgentDlg::OnBnClickedChkMonitor)
+	ON_BN_CLICKED(IDC_CHK_HTS, &CAxisAgentDlg::OnBnClickedChkHts)
+	ON_BN_CLICKED(IDC_CHK_DEBUG, &CAxisAgentDlg::OnBnClickedChkDebug)
+	ON_WM_SIZE()
+	ON_WM_GETMINMAXINFO()
+	ON_NOTIFY(NM_RCLICK, IDC_LIST_LOG, &CAxisAgentDlg::OnNMRClickListLog)
+	ON_NOTIFY(NM_DBLCLK, IDC_LIST_LOG, &CAxisAgentDlg::OnNMDblclkListLog)
+	ON_BN_CLICKED(IDC_CHK_FILTER, &CAxisAgentDlg::OnBnClickedChkFilter)
+	ON_EN_CHANGE(IDC_EDIT_FILTER, &CAxisAgentDlg::OnEnChangeEditFilter)
 	ON_WM_TIMER()
-	ON_BN_CLICKED(IDC_CHK_STOP, &CAxisAgentDlg::OnBnClickedChkStop)
 	ON_BN_CLICKED(IDC_LIST_CLEAR, &CAxisAgentDlg::OnBnClickedListClear)
-	ON_BN_CLICKED(IDC_BTN_DUMPANS, &CAxisAgentDlg::OnBnClickedBtnDumpans)
 	ON_COMMAND(ID_TRAY_SHOW, OnTrayShow)
 	ON_COMMAND(ID_TRAY_HIDE, OnTrayHide)
 	ON_COMMAND(ID_TRAY_EXIT, OnTrayExit)
 	ON_MESSAGE(WM_TRAYICON, OnTrayIcon)
+	ON_MESSAGE(WM_AGENT_LOG, OnAgentLog)
 	ON_BN_CLICKED(IDC_BTN_HIDE, &CAxisAgentDlg::OnBnClickedBtnHide)
-	ON_BN_CLICKED(IDC_BTN_DECACC, &CAxisAgentDlg::OnBnClickedBtnDecacc)
 	ON_BN_CLICKED(IDC_BTN_DUMPOPEN, &CAxisAgentDlg::OnBnClickedBtnDumpOpen)
 	ON_BN_CLICKED(IDC_BTN_SYMPATH,  &CAxisAgentDlg::OnBnClickedBtnSympath)
+	ON_BN_CLICKED(IDC_CHK_STOP, &CAxisAgentDlg::OnBnClickedChkStop)
 END_MESSAGE_MAP()
 
 
@@ -556,9 +409,26 @@ bool CAxisAgentDlg::ShouldShowLogType(const char* type)
 	if (sType.CompareNoCase("MONITOR") == 0)
 		return m_chkMonitor.GetCheck() == BST_CHECKED;
 
+	if (sType.CompareNoCase("HTS") == 0)
+		return m_chkHts.GetCheck() == BST_CHECKED;
+
+	if (sType.CompareNoCase("DEBUG") == 0)
+		return m_chkDebug.GetCheck() == BST_CHECKED;
+
 	// INIT, DEBUG 같은 건 일단 항상 보이게 할지,
 	// 아니면 MONITOR 쪽으로 묶을지 선택
 	return true;
+}
+
+// Keyword filter: case-insensitive substring match on message
+bool CAxisAgentDlg::PassFilter(const CString& msg)
+{
+	if (!m_bFilter || m_sFilter.IsEmpty())
+		return true;
+
+	CString sMsg = msg;
+	sMsg.MakeLower();
+	return sMsg.Find(m_sFilter) >= 0;	// m_sFilter is stored lower-case
 }
 
 BOOL CAxisAgentDlg::OnInitDialog()
@@ -574,6 +444,8 @@ BOOL CAxisAgentDlg::OnInitDialog()
 
 	m_chkPing.SetCheck(BST_CHECKED);
 	m_chkMonitor.SetCheck(BST_CHECKED);
+	m_chkHts.SetCheck(BST_CHECKED);
+	m_chkDebug.SetCheck(BST_CHECKED);
 
 	m_listLog.SetExtendedStyle(
 		LVS_EX_FULLROWSELECT |
@@ -583,7 +455,8 @@ BOOL CAxisAgentDlg::OnInitDialog()
 	m_listLog.InsertColumn(0, "Time", LVCFMT_LEFT, 90);
 	m_listLog.InsertColumn(1, "Type", LVCFMT_LEFT, 80);
 	m_listLog.InsertColumn(2, "Message", LVCFMT_LEFT, 500);
-	AddLog("INIT", "리스트 테스트");
+
+	InitLayout();
 
 	// 커맨드라인 파싱
 #ifdef _DEBUG   //디버그는 다보이기
@@ -607,8 +480,8 @@ BOOL CAxisAgentDlg::OnInitDialog()
 		char* sl = strrchr(exeDir, '\\'); if (sl) *sl = '\0';
 		char iniPath[MAX_PATH] = {};
 		sprintf_s(iniPath, "%s\\AxisAgent.ini", exeDir);
-		char buf[MAX_PATH] = {};
-		GetPrivateProfileStringA("Symbol", "Path", "", buf, MAX_PATH, iniPath);
+		char buf[1024] = {};
+		GetPrivateProfileStringA("Symbol", "Path", "", buf, sizeof(buf), iniPath);
 		m_sSymPath = buf;
 		m_editSymPath.SetWindowText(m_sSymPath);
 	}
@@ -643,7 +516,7 @@ BOOL CAxisAgentDlg::OnInitDialog()
 
 	// Named Event 열기
 	char eventName[64] = { 0 };
-	sprintf_s(eventName, "PingStop_%lu", m_parentPid);
+	sprintf_s(eventName, "AgentEnd_%lu", m_parentPid);
 	m_hStopEvent = OpenEvent(EVENT_MODIFY_STATE | SYNCHRONIZE, FALSE, eventName);
 	if (m_hStopEvent)
 		DebugLog("OnInitDialog: StopEvent 열기 성공 [%s]\n", eventName);
@@ -697,6 +570,7 @@ BOOL CAxisAgentDlg::OnInitDialog()
 	case NET_NONE:  sprintf_s(netLog, "[시작] 네트워크: 없음\n");  break;
 	}
 	WriteLog(netLog);
+	
 	//SendToParent(netLog, AGENT_MSG_NETTYPE);
 
 	m_bLastPingSuccess = true;
@@ -721,7 +595,6 @@ BOOL CAxisAgentDlg::OnInitDialog()
 		DebugLog("OnInitDialog: MonitorThread CreateThread 실패 err=%lu\n", GetLastError());
 
 	RegisterTrayIcon();
-	RegisterToMain();
 	return TRUE;
 }
 
@@ -876,17 +749,6 @@ void CAxisAgentDlg::ParseCommandLine()
 				m_dwMainThreadId);
 			AddLog("MONITOR", output);
 		}
-
-		else if (wcscmp(argvW[i], L"/d") == 0 && i + 1 < argc)
-		{
-			WideCharToMultiByte(CP_ACP, 0, argvW[++i], -1,
-				m_sUserpath, sizeof(m_sUserpath), NULL, NULL);
-			memset(output, sizeof(output), 0x00);
-			sprintf_s(output, sizeof(output),
-				"[m_sUserpath = %s]\n",
-				m_sUserpath);
-			AddLog("MONITOR", output);
-		}
 	}
 
 	LocalFree(argvW);
@@ -966,6 +828,35 @@ BOOL CAxisAgentDlg::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCds)
 			char* pMsg = (char*)pCds->lpData;
 			DebugLog("OnCopyData: 수신 [%s]\n", pMsg);
 			// 추후 명령 처리
+		}
+		break;
+
+		case AGENT_MSG_LOG:	// log text from HTS
+		{
+			if (pCds->cbData == 0 || !pCds->lpData)
+				break;
+			// do not trust NUL terminator; cap length (WriteMonitorLog buffer is 2048)
+			const char* p = (const char*)pCds->lpData;
+			int len = (int)strnlen(p, min(pCds->cbData, (DWORD)1800));
+			CStringA msg(p, len);
+			if (msg.Left(5) == "[MAP]")
+			{
+				int s = msg.Find("now=[");
+				if (s >= 0)
+				{
+					int e = msg.Find(']', s);
+					CStringA maps = (e > s) ? msg.Mid(s + 5, e - s - 5)
+					                        : msg.Mid(s + 5);   // truncated at 1800: keep what we have
+					maps.Trim();
+					std::lock_guard<std::mutex> lk(m_mapsLock);
+					m_lastMaps = maps;
+					if (m_firstMapTick == 0)
+						m_firstMapTick = ::GetTickCount();
+				}
+			}
+			CStringA line;
+			line.Format("[HTS] %s", (LPCSTR)msg);
+			WriteMonitorLog(line, "HTS");
 		}
 		break;
 	}
@@ -1087,8 +978,6 @@ CAxisAgentDlg::NetType CAxisAgentDlg::GetCurrentNetType()
 
 bool CAxisAgentDlg::ShouldStop()
 {
-	if (m_bShow)
-		return false;
 	// 부모 프로세스 죽었는지
 	if (m_hParent)
 	{
@@ -1468,7 +1357,7 @@ float CAxisAgentDlg::CalcThreadCpuUsage(
 }
 
 // 모니터링 로그 저장
-void CAxisAgentDlg::WriteMonitorLog(const char* msg)
+void CAxisAgentDlg::WriteMonitorLog(const char* msg, const char* type)
 {
 #ifdef AGENT_LOG_MONITOR
 		SYSTEMTIME st;
@@ -1498,16 +1387,98 @@ void CAxisAgentDlg::WriteMonitorLog(const char* msg)
 		}
 #endif
 
-	AddLog("MONITOR", msg);   //testcmt
+	AddLog(type, msg);   //testcmt
 }
 
-void CAxisAgentDlg::CreateDump(const char* reason)
+// Delete files in <exe>\ping older than keepDays (last write time)
+void CAxisAgentDlg::CleanupPingFolder(int keepDays)
 {
-	if (m_dumpCount >= MAX_DUMP_COUNT)
-	{
-		WriteMonitorLog("[D0] dump skipped: max dump count reached");
+	char selfPath[MAX_PATH] = { 0 };
+	GetModuleFileNameA(NULL, selfPath, MAX_PATH);
+	char* lastSlash = strrchr(selfPath, '\\');
+	if (lastSlash) *lastSlash = '\0';
+
+	char pingDir[MAX_PATH] = { 0 };
+	sprintf_s(pingDir, "%s\\ping", selfPath);
+
+	char findPath[MAX_PATH] = { 0 };
+	sprintf_s(findPath, "%s\\*", pingDir);
+
+	FILETIME ftNow = {};
+	GetSystemTimeAsFileTime(&ftNow);
+	ULARGE_INTEGER now = {};
+	now.LowPart = ftNow.dwLowDateTime;
+	now.HighPart = ftNow.dwHighDateTime;
+	const ULONGLONG day100ns = 24ULL * 60 * 60 * 10000000ULL;
+	const ULONGLONG keep100ns = (ULONGLONG)keepDays * day100ns;
+
+	WIN32_FIND_DATAA fd = {};
+	HANDLE hFind = FindFirstFileA(findPath, &fd);
+	if (hFind == INVALID_HANDLE_VALUE)
 		return;
+
+	int nDeleted = 0;
+	ULONGLONG freedBytes = 0;
+	do
+	{
+		if (fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+			continue;
+
+		ULARGE_INTEGER wt = {};
+		wt.LowPart = fd.ftLastWriteTime.dwLowDateTime;
+		wt.HighPart = fd.ftLastWriteTime.dwHighDateTime;
+		if (now.QuadPart <= wt.QuadPart || now.QuadPart - wt.QuadPart < keep100ns)
+			continue;
+
+		char fullPath[MAX_PATH] = { 0 };
+		sprintf_s(fullPath, "%s\\%s", pingDir, fd.cFileName);
+
+		const ULONGLONG size = ((ULONGLONG)fd.nFileSizeHigh << 32) | fd.nFileSizeLow;
+		const int ageDays = (int)((now.QuadPart - wt.QuadPart) / day100ns);
+
+		char logMsg[512] = { 0 };
+		if (DeleteFileA(fullPath))
+		{
+			++nDeleted;
+			freedBytes += size;
+			sprintf_s(logMsg, "[C1] deleted %s (age=%dd size=%llu)", fd.cFileName, ageDays, size);
+		}
+		else
+		{
+			sprintf_s(logMsg, "[C1] delete fail %s err=%lu", fd.cFileName, GetLastError());
+		}
+		WriteMonitorLog(logMsg);
+	} while (FindNextFileA(hFind, &fd));
+	FindClose(hFind);
+
+	char sumMsg[256] = { 0 };
+	sprintf_s(sumMsg, "[C0] ping cleanup keep=%dd deleted=%d freed=%lluMB",
+		keepDays, nDeleted, freedBytes / (1024 * 1024));
+	WriteMonitorLog(sumMsg);
+}
+
+void CAxisAgentDlg::CreateDump(const char* reason, const char* trigger)
+{
+	CStringA mapsAtDump;
+	{
+		std::lock_guard<std::mutex> lk(m_mapsLock);
+		mapsAtDump = m_lastMaps;
 	}
+
+	if (m_dumpTotal >= MAX_DUMP_TOTAL ||
+		m_dumpCount >= MAX_DUMP_COUNT ||
+		m_dumpFailCount >= MAX_DUMP_FAIL)
+	{
+		if (!m_bDumpLimitLogged)   // log once per episode
+		{
+			WriteMonitorLog(m_dumpTotal >= MAX_DUMP_TOTAL ? "[D0] dump skipped: max total dump count reached"
+				: m_dumpCount >= MAX_DUMP_COUNT ? "[D0] dump skipped: max dump count reached"
+				: "[D0] dump skipped: max fail count reached");
+			m_bDumpLimitLogged = true;
+		}
+		return;   // returns from CreateDump only; MonitorLoop keeps running
+	}
+
 	const ULONGLONG nowTick = GetTickCount64();
 	if (m_lastDumpTick != 0 && (nowTick - m_lastDumpTick) < DUMP_INTERVAL_MS)
 	{
@@ -1518,6 +1489,7 @@ void CAxisAgentDlg::CreateDump(const char* reason)
 		WriteMonitorLog(skipMsg);
 		return;
 	}
+	m_lastDumpTick = nowTick;
 	const int seq = ++m_dumpSeq;
 	SYSTEMTIME st;
 	GetLocalTime(&st);
@@ -1599,6 +1571,7 @@ void CAxisAgentDlg::CreateDump(const char* reason)
 		{
 			sprintf_s(logMsg, "[D2] seq=%d OpenProcess(ALL_ACCESS) fail err=%lu", seq, GetLastError());
 			WriteMonitorLog(logMsg);
+			++m_dumpFailCount;
 			return;
 		}
 		sprintf_s(logMsg, "[D2] seq=%d OpenProcess(ALL_ACCESS) success", seq);
@@ -1626,6 +1599,7 @@ void CAxisAgentDlg::CreateDump(const char* reason)
 		sprintf_s(logMsg, "[D4] seq=%d CreateFile fail err=%lu", seq, GetLastError());
 		WriteMonitorLog(logMsg);
 		CloseHandle(hProcess);
+		++m_dumpFailCount;
 		return;
 	}
 
@@ -1640,8 +1614,11 @@ void CAxisAgentDlg::CreateDump(const char* reason)
 		MiniDumpWithIndirectlyReferencedMemory |
 		MiniDumpWithDataSegs |
 		MiniDumpWithProcessThreadData |
-		MiniDumpWithCodeSegs          // x64 스택 언와인드 테이블 포함 (CALLER 복원에 필수)
+		MiniDumpWithCodeSegs |         // x64 스택 언와인드 테이블 포함 (CALLER 복원에 필수)
+		MiniDumpWithUnloadedModules
 		);
+
+	MINIDUMP_CALLBACK_INFORMATION mci = { AgentDumpCallback, NULL };
 
 	SetLastError(0);
 	BOOL bOk = MiniDumpWriteDump(
@@ -1651,7 +1628,7 @@ void CAxisAgentDlg::CreateDump(const char* reason)
 		dumpType,		// ← 기존: MiniDumpNormal
 		NULL,
 		NULL,
-		NULL);
+		&mci);		// was NULL
 
 	DWORD dwErr = GetLastError();
 
@@ -1682,17 +1659,26 @@ void CAxisAgentDlg::CreateDump(const char* reason)
 	if (bOk && fileSize.QuadPart > 0)
 	{
 		m_dumpCount++;
-		m_lastDumpTick = nowTick;
+		m_dumpTotal++;
+		m_dumpFailCount = 0;
 		sprintf_s(logMsg,
-			"[D6] dump success seq=%d count=%d",
-			seq, m_dumpCount);
+			"[D6] dump success seq=%d count=%d total=%d",
+			seq, m_dumpCount, m_dumpTotal);
 		WriteMonitorLog(logMsg);
 		AnalyzeDump(dumpPath);
+		::WritePrivateProfileStringA(GetFileNameOnly(dumpPath), "MAPS",
+			mapsAtDump.IsEmpty() ? "(unknown)" : (LPCSTR)mapsAtDump,
+			GetDumpAnalysisIniPath());
+		::WritePrivateProfileStringA(GetFileNameOnly(dumpPath), "TRIGGER",
+			(trigger && trigger[0]) ? trigger : (reason ? reason : ""),
+			GetDumpAnalysisIniPath());
 	}
 	else
 	{
 		sprintf_s(logMsg, "[D7] dump failed seq=%d", seq);
 		WriteMonitorLog(logMsg);
+		++m_dumpFailCount;             
+		DeleteFileA(dumpPath);
 	}
 }
 
@@ -1708,6 +1694,7 @@ void CAxisAgentDlg::MonitorLoop()
 {
 	WriteMonitorLog("MonitorLoop 시작");
 
+	//HTS 보내준 프로세스ID로  프로세스 핸들을 얻는다
 	HANDLE hProcess = OpenProcess(
 		PROCESS_QUERY_INFORMATION | SYNCHRONIZE,
 		FALSE, m_parentPid);
@@ -1720,6 +1707,7 @@ void CAxisAgentDlg::MonitorLoop()
 		return;
 	}
 
+	//HTS 보내준 스레드ID로  메인스레드 핸들을 얻는다
 	HANDLE hMainThread = OpenThread(
 		THREAD_QUERY_INFORMATION,
 		FALSE, m_dwMainThreadId);
@@ -1738,6 +1726,7 @@ void CAxisAgentDlg::MonitorLoop()
 	ULONGLONG prevProcTickMs = GetTickCount64();
 	ULONGLONG prevMainTickMs = prevProcTickMs;
 
+	//HTS  프로세스 시간을 가져온다?
 	if (!GetProcessTimes(hProcess, &ftDummy, &ftDummy, &ftPrevProcKernel, &ftPrevProcUser))
 	{
 		char buf[256] = { 0 };
@@ -1750,6 +1739,7 @@ void CAxisAgentDlg::MonitorLoop()
 		return;
 	}
 
+	//HTS  스레드 시간을 가져온다?
 	if (hMainThread)
 	{
 		if (!GetThreadTimes(hMainThread, &ftDummy, &ftDummy, &ftPrevMainKernel, &ftPrevMainUser))
@@ -1762,9 +1752,13 @@ void CAxisAgentDlg::MonitorLoop()
 
 	int noResponseCount = 0;
 	int cpuSpikeCount = 0;
+	int hungCount = 0;				// consecutive IsHungAppWindow == TRUE
+	bool bSkipCpuSample = false;	// next CPU sample overlaps a dump (target was suspended)
 
 	//bool bNoResponseDumpTried = false;
 	//bool bCpuDumpTried = false;
+
+	CleanupPingFolder(PING_KEEP_DAYS);
 
 	while (!ShouldStop())
 	{
@@ -1783,7 +1777,9 @@ void CAxisAgentDlg::MonitorLoop()
 			break;
 		}
 
+		//HTS 메인프레임이 헹인지 본다
 		bool bHung = IsHungAppWindow(m_hParentWnd) ? true : false;
+		hungCount = bHung ? hungCount + 1 : 0;
 
 		DWORD_PTR result = 0;
 		LRESULT lr = SendMessageTimeout(
@@ -1795,7 +1791,7 @@ void CAxisAgentDlg::MonitorLoop()
 			THRESHOLD_HANG_MS,
 			&result);
 
-		if (lr == 0)
+		if (lr == 0)   //행이니까 응답이 안올때..
 			++noResponseCount;
 		else
 			noResponseCount = 0;
@@ -1870,7 +1866,7 @@ void CAxisAgentDlg::MonitorLoop()
 		{
 			char logMsg[512] = { 0 };
 			sprintf_s(logMsg,
-				"[monitor][상태변화] CPU=%.1f MAIN=%.1f THR=%d HUNG=%d NORESP=%d",
+				"[monitor][상태변화] CPU[all]=%.1f MAIN[core]=%.1f THR=%d HUNG=%d NORESP=%d",
 				fProcCpu, fMainCpu, nThreadCount,
 				bHung ? 1 : 0,
 				noResponseCount);
@@ -1886,7 +1882,7 @@ void CAxisAgentDlg::MonitorLoop()
 		{
 			char logMsg[512] = { 0 };
 			sprintf_s(logMsg,
-				"[monitor][1분요약] CPU=%.1f MAIN=%.1f THR=%d HUNG=%d NORESP=%d",
+				"[monitor][1분요약] CPU[all]=%.1f MAIN[core]=%.1f THR=%d HUNG=%d NORESP=%d",
 				fProcCpu, fMainCpu, nThreadCount,
 				bHung ? 1 : 0,
 				noResponseCount);
@@ -1898,7 +1894,7 @@ void CAxisAgentDlg::MonitorLoop()
 
 		char sendMsg[256] = { 0 };
 		sprintf_s(sendMsg,
-			"CPU=%.1f MAIN=%.1f THR=%d HUNG=%d NORESP=%d",
+			"CPU[all]=%.1f MAIN[core]=%.1f THR=%d HUNG=%d NORESP=%d",
 			fProcCpu, fMainCpu, nThreadCount, bHung ? 1 : 0, noResponseCount);
 		//SendToParent(sendMsg, AGENT_MSG_MONITOR);
 
@@ -1907,36 +1903,100 @@ void CAxisAgentDlg::MonitorLoop()
 			WriteMonitorLog("[M4] 응답없음 판정 진입");
 		}
 
-		if (fMainCpu > THRESHOLD_CPU)
+		// [M5] CPU judgement; skip the sample that overlapped a dump
+		if (bSkipCpuSample)
 		{
-			WriteMonitorLog("[M5] CPU 임계치 초과");
+			bSkipCpuSample = false;		// keep cpuSpikeCount as is
+		}
+		else if (fMainCpu > THRESHOLD_CPU)
+		{
 			++cpuSpikeCount;
+			char buf[256] = { 0 };
+			sprintf_s(buf, "[M5] CPU 임계치 초과 MAIN[core]=%.1f CPU[all]=%.1f cnt=%d/%d",
+				fMainCpu, fProcCpu, cpuSpikeCount, CPU_SUSTAINED_SAMPLES);
+			WriteMonitorLog(buf);
 		}
 		else
 		{
+			if (cpuSpikeCount > 0)	// show where a high-CPU run was broken
+			{
+				char buf[256] = { 0 };
+				sprintf_s(buf, "[M5] CPU 정상 복귀 MAIN[core]=%.1f CPU[all]=%.1f (cnt %d -> 0)",
+					fMainCpu, fProcCpu, cpuSpikeCount);
+				WriteMonitorLog(buf);
+			}
 			cpuSpikeCount = 0;
 		}
 
-		if (noResponseCount >= 2)
+		// Episode over (responding, not hung, CPU normal): allow dumps for the next episode
+		if (noResponseCount == 0 && hungCount == 0 && cpuSpikeCount == 0 && m_dumpCount > 0)
 		{
-			char buf[256] = { 0 };
-			sprintf_s(buf,
-				"[M8] noresponse trigger noResp=%d hung=%d mainCpu=%.1f procCpu=%.1f",
-				noResponseCount, bHung ? 1 : 0, fMainCpu, fProcCpu);
+			char buf[128] = { 0 };
+			sprintf_s(buf, "[D8] episode ended, dump budget reset (used=%d)", m_dumpCount);
 			WriteMonitorLog(buf);
-
-			CreateDump("NoResponse");
+			m_dumpCount = 0;
+			m_bDumpLimitLogged = false;
 		}
 
-		if (cpuSpikeCount >= 3)
+		// 60s after the first [MAP]: screen restore keeps the frame busy (Hung/CpuSpike are expected)
+		bool bStartupGrace = false;
+		{
+			std::lock_guard<std::mutex> lk(m_mapsLock);
+			bStartupGrace = (m_firstMapTick != 0 &&
+				::GetTickCount() - m_firstMapTick < STARTUP_GRACE_MS);
+		}
+
+		if (bStartupGrace && hungCount == 2 && noResponseCount < 2)	// log once per episode
+		{
+			char buf[256] = { 0 };
+			sprintf_s(buf, "[M8] Hung ignored: startup grace (screen restore) mainCpu[core]=%.1f procCpu[all]=%.1f",
+				fMainCpu, fProcCpu);
+			WriteMonitorLog(buf);
+		}
+
+		// One dump per loop at most. Priority: NoResponse > Hung > CpuSpike
+		// NoResponse is never delayed by the grace: no WM_NULL reply means a real stall.
+		const char* dumpReason = nullptr;
+		if (noResponseCount >= 2)
+			dumpReason = "NoResponse";
+		else if (hungCount >= 2 && !bStartupGrace)
+			dumpReason = "Hung";
+		else if (cpuSpikeCount >= CPU_SUSTAINED_SAMPLES)
+		{
+			const char* skip = nullptr;
+			if (!IsCpuDumpEnabled())
+				skip = "disabled (cpudump=0)";
+			else if (bStartupGrace)
+				skip = "startup grace (screen restore)";
+
+			if (!skip)
+				dumpReason = "CpuSpike";
+			else if (cpuSpikeCount == CPU_SUSTAINED_SAMPLES)	// log once per episode
+			{
+				char buf[256] = { 0 };
+				sprintf_s(buf, "[M8] CpuSpike ignored: %s mainCpu[core]=%.1f procCpu[all]=%.1f",
+					skip, fMainCpu, fProcCpu);
+				WriteMonitorLog(buf);
+			}
+		}
+
+		if (dumpReason)
 		{
 			char buf[256] = { 0 };
 			sprintf_s(buf,
-				"[M9] cpuspike trigger cpuSpikeCount=%d hung=%d mainCpu=%.1f procCpu=%.1f",
-				cpuSpikeCount, bHung ? 1 : 0, fMainCpu, fProcCpu);
+				"[M8] %s trigger noResp=%d hungCnt=%d cpuSpike=%d mainCpu[core]=%.1f procCpu[all]=%.1f",
+				dumpReason, noResponseCount, hungCount, cpuSpikeCount, fMainCpu, fProcCpu);
 			WriteMonitorLog(buf);
 
-			CreateDump("CpuSpike");
+			// Skip next CPU sample only if a dump was actually written (target was suspended).
+			// If CreateDump returned early (limit/interval), keep judging so the episode can end.
+			const int seqBefore = m_dumpSeq;
+			char trig[160] = { 0 };
+			sprintf_s(trig,
+				"%s mainCpu[core]=%.1f procCpu[all]=%.1f cpuSpike=%d noResp=%d hung=%d",
+				dumpReason, fMainCpu, fProcCpu, cpuSpikeCount, noResponseCount, hungCount);
+			CreateDump(dumpReason, trig);
+			bSkipCpuSample = (m_dumpSeq != seqBefore);
 		}
 
 	}
@@ -2119,6 +2179,7 @@ void CAxisAgentDlg::AnalyzeDump(const char* dumpPath)
 	ULONG excSize = 0;
 
 	DWORD exceptionThreadId = 0;
+	RVA   exceptionCtxRva   = 0;     // context at the moment of the exception
 
 	if (MiniDumpReadDumpStream(
 		pView, ExceptionStream, &pDir, &pExcStream, &excSize) && pExcStream)
@@ -2127,6 +2188,8 @@ void CAxisAgentDlg::AnalyzeDump(const char* dumpPath)
 			(MINIDUMP_EXCEPTION_STREAM*)pExcStream;
 
 		exceptionThreadId = pExc->ThreadId;
+		if (pExc->ThreadContext.DataSize >= sizeof(CONTEXT))
+			exceptionCtxRva = pExc->ThreadContext.Rva;
 
 		DWORD excCode = pExc->ExceptionRecord.ExceptionCode;
 		const char* excName = "UNKNOWN";
@@ -2291,7 +2354,13 @@ void CAxisAgentDlg::AnalyzeDump(const char* dumpPath)
 			bException ? "(예외스레드)" : "");
 		WriteMonitorLog(logMsg);
 
-		CONTEXT* pCtx = (CONTEXT*)(pView + th.ThreadContext.Rva);
+		RVA ctxRva = (bException && exceptionCtxRva != 0)
+			? exceptionCtxRva            // crash dump: use .ecxr context
+			: th.ThreadContext.Rva;      // hang dump: thread snapshot
+		CONTEXT* pCtx = (CONTEXT*)(pView + ctxRva);
+
+		if (ctxRva == exceptionCtxRva && exceptionCtxRva != 0)
+			WriteMonitorLog("  [AN6] context=exception record");
 		if (!pCtx)
 		{
 			WriteMonitorLog("  컨텍스트 없음");
@@ -2457,30 +2526,59 @@ void CAxisAgentDlg::AppendLogToList(const CString& sTime, const CString& sType, 
 	m_listLog.EnsureVisible(nIndex, FALSE);
 }
 
+LRESULT CAxisAgentDlg::OnAgentLog(WPARAM, LPARAM)
+{
+	std::deque<AGENT_LOG_ROW> batch;
+
+	{
+		std::lock_guard<std::mutex> lk(m_logQueueLock);
+		batch.swap(m_logQueue);
+		m_bLogPosted = false;
+	}
+
+	BOOL bStop = m_chkStop.GetCheck();
+
+	for (size_t i = 0; i < batch.size(); i++)
+	{
+		const AGENT_LOG_ROW& row = batch[i];
+		m_allLogs.push_back(row);
+
+		if (!bStop && ShouldShowLogType(CT2A(row.type)) && PassFilter(row.msg))
+			AppendLogToList(row.time, row.type, row.msg);
+	}
+	return 0;
+}
+
 void CAxisAgentDlg::AddLog(const char* type, const char* msg)
 {
 	SYSTEMTIME st;
 	GetLocalTime(&st);
 
-	CString sTime;
-	sTime.Format("%02d:%02d:%02d", st.wHour, st.wMinute, st.wSecond);
-
-	CString sType = type ? type : "";
-	CString sMsg = msg ? msg : "";
-
 	AGENT_LOG_ROW row;
-	row.time = sTime;
-	row.type = sType;
-	row.msg = sMsg;
+	row.time.Format("%02d:%02d:%02d", st.wHour, st.wMinute, st.wSecond);
+	row.type = type ? type : "";
+	row.msg  = msg  ? msg  : "";
 
-	m_allLogs.push_back(row);
+	bool bPost = false;
+	{
+		std::lock_guard<std::mutex> lk(m_logQueueLock);
+		m_logQueue.push_back(row);
+		if (!m_bLogPosted)
+		{
+			m_bLogPosted = true;
+			bPost = true;
+		}
+	}
 
-
-	if (m_chkStop.GetCheck())
-		return;
-
-	if (ShouldShowLogType(type))
-		AppendLogToList(sTime, sType, sMsg);
+	if (bPost)
+	{
+		if (!::IsWindow(GetSafeHwnd()) ||
+			!::PostMessage(GetSafeHwnd(), WM_AGENT_LOG, 0, 0))
+		{
+			std::lock_guard<std::mutex> lk(m_logQueueLock);
+			m_bLogPosted = false;   // allow next AddLog to retry
+		}
+	}
 }
 
 void CAxisAgentDlg::RefreshLogList()
@@ -2494,7 +2592,7 @@ void CAxisAgentDlg::RefreshLogList()
 	{
 		const AGENT_LOG_ROW& row = m_allLogs[i];
 
-		if (ShouldShowLogType(CT2A(row.type)))
+		if (ShouldShowLogType(CT2A(row.type)) && PassFilter(row.msg))
 			AppendLogToList(row.time, row.type, row.msg);
 	}
 }
@@ -2509,11 +2607,184 @@ void CAxisAgentDlg::OnBnClickedChkMonitor()
 	RefreshLogList();
 }
 
-void CAxisAgentDlg::OnBnClickedChkStop()
+void CAxisAgentDlg::OnBnClickedChkHts()
 {
-	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	RefreshLogList();
 }
 
+void CAxisAgentDlg::OnBnClickedChkDebug()
+{
+	RefreshLogList();
+}
+
+// Remember initial control rects so OnSize can stretch/move them
+void CAxisAgentDlg::InitLayout()
+{
+	CRect rcClient, rcWnd;
+	GetClientRect(&rcClient);
+	GetWindowRect(&rcWnd);
+	m_szInitClient = rcClient.Size();
+	m_szMinWindow = rcWnd.Size();
+
+	const struct { UINT id; int flags; } items[] = {
+		{ IDC_LIST_LOG,       LAY_SIZE_X | LAY_SIZE_Y },
+		{ IDC_EDIT_SYMPATH,   LAY_SIZE_X },
+		{ IDC_BTN_SYMPATH,    LAY_MOVE_X },
+		{ IDC_EDIT_DETAIL,    LAY_MOVE_Y | LAY_SIZE_X },
+		{ IDC_BTN_TEST,       LAY_MOVE_Y },
+		{ IDC_BTN_DUMPOPEN,   LAY_MOVE_Y },
+		{ IDC_CHK_STOP,       LAY_MOVE_X },
+		{ IDC_LIST_CLEAR,     LAY_MOVE_X },
+		{ IDC_BTN_HIDE,       LAY_MOVE_X | LAY_MOVE_Y },
+	};
+
+	m_layout.clear();
+	for (const auto& it : items)
+	{
+		CWnd* pWnd = GetDlgItem(it.id);
+		if (!pWnd)
+			continue;
+		LayoutItem li;
+		li.id = it.id;
+		li.flags = it.flags;
+		pWnd->GetWindowRect(&li.rc);
+		ScreenToClient(&li.rc);
+		m_layout.push_back(li);
+	}
+}
+
+void CAxisAgentDlg::OnSize(UINT nType, int cx, int cy)
+{
+	CDialogEx::OnSize(nType, cx, cy);
+
+	if (m_layout.empty() || nType == SIZE_MINIMIZED)
+		return;
+
+	const int dx = cx - m_szInitClient.cx;
+	const int dy = cy - m_szInitClient.cy;
+
+	HDWP hdwp = ::BeginDeferWindowPos((int)m_layout.size());
+	for (const auto& li : m_layout)
+	{
+		CWnd* pWnd = GetDlgItem(li.id);
+		if (!pWnd || !hdwp)
+			continue;
+		CRect rc = li.rc;
+		if (li.flags & LAY_MOVE_X) rc.OffsetRect(dx, 0);
+		if (li.flags & LAY_MOVE_Y) rc.OffsetRect(0, dy);
+		if (li.flags & LAY_SIZE_X) rc.right += dx;
+		if (li.flags & LAY_SIZE_Y) rc.bottom += dy;
+		hdwp = ::DeferWindowPos(hdwp, pWnd->GetSafeHwnd(), NULL,
+			rc.left, rc.top, rc.Width(), rc.Height(), SWP_NOZORDER | SWP_NOACTIVATE);
+	}
+	if (hdwp)
+		::EndDeferWindowPos(hdwp);
+
+	// Message column fills the remaining width (never narrower than 500)
+	if (::IsWindow(m_listLog.GetSafeHwnd()))
+	{
+		CRect rcList;
+		m_listLog.GetClientRect(&rcList);
+		int w = rcList.Width() - m_listLog.GetColumnWidth(0) - m_listLog.GetColumnWidth(1);
+		m_listLog.SetColumnWidth(2, max(w, 500));
+	}
+	Invalidate();
+}
+
+void CAxisAgentDlg::OnGetMinMaxInfo(MINMAXINFO* lpMMI)
+{
+	CDialogEx::OnGetMinMaxInfo(lpMMI);
+	if (m_szMinWindow.cx > 0)
+	{
+		lpMMI->ptMinTrackSize.x = m_szMinWindow.cx;
+		lpMMI->ptMinTrackSize.y = m_szMinWindow.cy;
+	}
+}
+
+void CAxisAgentDlg::OnNMRClickListLog(NMHDR* pNMHDR, LRESULT* pResult)
+{
+	*pResult = 0;
+	if (m_listLog.GetItemCount() == 0)
+		return;
+
+	enum { ID_LOG_COPY_SEL = 1, ID_LOG_COPY_ALL = 2 };
+	CMenu menu;
+	menu.CreatePopupMenu();
+	menu.AppendMenu(MF_STRING | (m_listLog.GetSelectedCount() ? 0 : MF_GRAYED),
+		ID_LOG_COPY_SEL, "선택영역 복사");
+	menu.AppendMenu(MF_STRING, ID_LOG_COPY_ALL, "전체영역 복사");
+
+	CPoint pt;
+	GetCursorPos(&pt);
+	UINT cmd = menu.TrackPopupMenu(TPM_LEFTALIGN | TPM_RIGHTBUTTON | TPM_RETURNCMD, pt.x, pt.y, this);
+	if (cmd == ID_LOG_COPY_SEL)
+		CopyLogsToClipboard(false);
+	else if (cmd == ID_LOG_COPY_ALL)
+		CopyLogsToClipboard(true);
+}
+
+// Show the double-clicked row in the detail box (long text scrolls there)
+void CAxisAgentDlg::OnNMDblclkListLog(NMHDR* pNMHDR, LRESULT* pResult)
+{
+	*pResult = 0;
+	LPNMITEMACTIVATE pItem = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
+	if (pItem->iItem < 0 || !::IsWindow(m_editDetail.GetSafeHwnd()))
+		return;
+
+	CString sText;
+	sText.Format("%s  %s\r\n%s",
+		(LPCTSTR)m_listLog.GetItemText(pItem->iItem, 0),
+		(LPCTSTR)m_listLog.GetItemText(pItem->iItem, 1),
+		(LPCTSTR)m_listLog.GetItemText(pItem->iItem, 2));
+	m_editDetail.SetWindowText(sText);
+}
+
+// Copy rows as "time<TAB>type<TAB>message" lines to clipboard
+// bAll: every row shown in the list, otherwise selected rows only
+void CAxisAgentDlg::CopyLogsToClipboard(bool bAll)
+{
+	CString text;
+	const int count = m_listLog.GetItemCount();
+	for (int i = 0; i < count; ++i)
+	{
+		if (!bAll && !(m_listLog.GetItemState(i, LVIS_SELECTED) & LVIS_SELECTED))
+			continue;
+		text += m_listLog.GetItemText(i, 0) + "\t"
+			+ m_listLog.GetItemText(i, 1) + "\t"
+			+ m_listLog.GetItemText(i, 2) + "\r\n";
+	}
+	if (text.IsEmpty() || !OpenClipboard())
+		return;
+
+	EmptyClipboard();
+	const size_t bytes = (text.GetLength() + 1) * sizeof(TCHAR);
+	HGLOBAL hMem = ::GlobalAlloc(GMEM_MOVEABLE, bytes);
+	if (hMem)
+	{
+		memcpy(::GlobalLock(hMem), (LPCTSTR)text, bytes);
+		::GlobalUnlock(hMem);
+		if (!::SetClipboardData(CF_TEXT, hMem))	// MBCS build
+			::GlobalFree(hMem);
+	}
+	CloseClipboard();
+}
+
+void CAxisAgentDlg::OnBnClickedChkFilter()
+{
+	m_bFilter = (m_chkFilter.GetCheck() == BST_CHECKED);
+	RefreshLogList();
+}
+
+void CAxisAgentDlg::OnEnChangeEditFilter()
+{
+	CString s;
+	m_editFilter.GetWindowText(s);
+	s.Trim();
+	s.MakeLower();
+	m_sFilter = s;
+	if (m_bFilter)
+		RefreshLogList();
+}
 
 void CAxisAgentDlg::OnBnClickedListClear()
 {
@@ -2571,8 +2842,13 @@ CString CAxisAgentDlg::GetDumpAnalysisIniPath() const
 	if (lastSlash)
 		*lastSlash = '\0';
 
+	// one file per day, removed by CleanupPingFolder like the other logs
+	SYSTEMTIME st;
+	::GetLocalTime(&st);
+
 	CString iniPath;
-	iniPath.Format("%s\\ping\\dump_analysis.ini", selfPath);
+	iniPath.Format("%s\\ping\\dump_analysis_%04d%02d%02d.ini",
+		selfPath, st.wYear, st.wMonth, st.wDay);
 
 	return iniPath;
 }
@@ -2587,136 +2863,6 @@ CString CAxisAgentDlg::GetFileNameOnly(const char* fullPath) const
 
 	return sPath;
 }
-
-CString CAxisAgentDlg::GetMainCrashDumpDir() const
-{
-	// 메인 whdump.cpp 에서 dump 남기는 위치와 동일하게 맞춰야 함
-	CString dumpDir;
-	dumpDir.Format("%s",m_sUserpath);
-	return dumpDir;
-}
-
-BOOL CAxisAgentDlg::IsDumpAlreadyAnalyzed(const CString& dumpPath) const
-{
-	CString iniPath = GetDumpAnalysisIniPath();
-	CString section = GetFileNameOnly(dumpPath);
-
-	char buf[64] = { 0 };
-	::GetPrivateProfileStringA(
-		(LPCSTR)section,
-		"TIME",
-		"",
-		buf,
-		sizeof(buf),
-		(LPCSTR)iniPath);
-
-	return (buf[0] != 0);
-}
-
-void CAxisAgentDlg::ScanAndAnalyzeMainCrashDumps()
-{
-	CString slog;
-	CString dumpDir = GetMainCrashDumpDir();
-
-	if (dumpDir.IsEmpty())
-	{
-		AddLog("MONITOR", "ScanAndAnalyzeMainCrashDumps: dumpDir is empty");
-		return;
-	}
-
-	dumpDir.TrimRight("\\/");
-
-	CString spec;
-	spec.Format("%s\\*.dmp", (LPCSTR)dumpDir);
-
-	slog.Format("dumpDir=[%s]", (LPCSTR)dumpDir);
-	AddLog("MONITOR", slog);
-
-	slog.Format("spec=[%s]", (LPCSTR)spec);
-	AddLog("MONITOR", slog);
-
-	DWORD attr = GetFileAttributes((LPCSTR)dumpDir);
-	slog.Format("dir attr=0x%08X", attr);
-	AddLog("MONITOR", slog);
-
-	if (attr == INVALID_FILE_ATTRIBUTES || !(attr & FILE_ATTRIBUTE_DIRECTORY))
-	{
-		AddLog("MONITOR", "ScanAndAnalyzeMainCrashDumps: dumpDir not found");
-		return;
-	}
-
-	WIN32_FIND_DATA fd = { 0 };
-	HANDLE hFind = FindFirstFile((LPCSTR)spec, &fd);
-	if (hFind == INVALID_HANDLE_VALUE)
-	{
-		slog.Format("FindFirstFile fail err=%lu", GetLastError());
-		AddLog("MONITOR", slog);
-		return;
-	}
-
-	int foundCount = 0;
-	int analyzedCount = 0;
-	std::vector<CString> dumpFiles;
-
-	do
-	{
-		if (fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
-			continue;
-
-		CString fileName = fd.cFileName;
-		CString fullPath;
-		fullPath.Format("%s\\%s", (LPCSTR)dumpDir, (LPCSTR)fileName);
-
-		dumpFiles.push_back(fullPath);
-		foundCount++;
-
-		slog.Format("found dump: [%s]", (LPCSTR)fullPath);
-		AddLog("MONITOR", slog);
-
-	} while (FindNextFile(hFind, &fd));
-
-	FindClose(hFind);
-
-	std::sort(dumpFiles.begin(), dumpFiles.end(),
-		[](const CString& a, const CString& b)
-		{
-			return a.CompareNoCase(b) < 0;
-		});
-
-	for (size_t i = 0; i < dumpFiles.size(); ++i)
-	{
-		const CString& dumpPath = dumpFiles[i];
-
-		if (IsDumpAlreadyAnalyzed((LPCSTR)dumpPath))
-			continue;
-
-		CString msg;
-		msg.Format("미분석 dump 발견: %s",
-			(LPCSTR)GetFileNameOnly((LPCSTR)dumpPath));
-		AddLog("DUMP", msg);
-
-		AnalyzeDump((LPCSTR)dumpPath);
-
-		CString okMsg;
-		okMsg.Format("dump 분석 완료: %s",
-			(LPCSTR)GetFileNameOnly((LPCSTR)dumpPath));
-		AddLog("DUMP", okMsg);
-
-		analyzedCount++;
-	}
-
-	CString sumMsg;
-	sumMsg.Format("Crashlog scan 완료: found=%d analyzed=%d",
-		foundCount, analyzedCount);
-	AddLog("DUMP", sumMsg);
-}
-
-
-void CAxisAgentDlg::OnBnClickedBtnDumpans()
-{
-	ScanAndAnalyzeMainCrashDumps();
-}
-
 
 void CAxisAgentDlg::AppendBlankLineToIni()
 {
@@ -2849,23 +2995,9 @@ LRESULT CAxisAgentDlg::OnTrayIcon(WPARAM wParam, LPARAM lParam)
 	return 0;
 }
 
-BOOL CAxisAgentDlg::OnCommand(WPARAM wParam, LPARAM lParam)
-{
-	// TODO: 여기에 특수화된 코드를 추가 및/또는 기본 클래스를 호출합니다.
-
-	return CDialogEx::OnCommand(wParam, lParam);
-}
-
-
 void CAxisAgentDlg::OnBnClickedBtnHide()
 {
 	OnTrayHide();
-}
-
-
-void CAxisAgentDlg::OnBnClickedBtnDecacc()
-{
-	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
 }
 
 void CAxisAgentDlg::OnBnClickedBtnDumpOpen()
@@ -2879,6 +3011,7 @@ void CAxisAgentDlg::OnBnClickedBtnDumpOpen()
 		return;
 
 	m_editSymPath.GetWindowText(m_sSymPath);
+	SaveSymPath();     // keep hand-typed paths (e.g. "D:\symbol;D:\symstore")
 
 	CStringA szPath(dlg.GetPathName());
 	AddLog("DUMP", "--------------------------------");
@@ -2899,22 +3032,51 @@ void CAxisAgentDlg::OnBnClickedBtnSympath()
 	char folderPath[MAX_PATH] = {};
 	if (SHGetPathFromIDListA(pidl, folderPath))
 	{
-		m_sSymPath = folderPath;
-		m_editSymPath.SetWindowText(m_sSymPath);
+		m_editSymPath.GetWindowText(m_sSymPath);
 
-		// INI 저장
-		char exeDir[MAX_PATH] = {};
-		GetModuleFileNameA(NULL, exeDir, MAX_PATH);
-		char* sl = strrchr(exeDir, '\\'); if (sl) *sl = '\0';
-		char iniPath[MAX_PATH] = {};
-		sprintf_s(iniPath, "%s\\AxisAgent.ini", exeDir);
-		WritePrivateProfileStringA("Symbol", "Path", folderPath, iniPath);
+		// append unless already listed
+		CString sCheck = _T(";") + m_sSymPath + _T(";");
+		CString sNew   = _T(";") + CString(folderPath) + _T(";");
+		if (sCheck.MakeLower().Find(sNew.MakeLower()) < 0)
+		{
+			if (!m_sSymPath.IsEmpty() && m_sSymPath.Right(1) != _T(";"))
+				m_sSymPath += _T(";");
+			m_sSymPath += folderPath;
+		}
+
+		m_editSymPath.SetWindowText(m_sSymPath);
+		SaveSymPath();
 	}
 	CoTaskMemFree(pidl);
 }
 
-
-void CAxisAgentDlg::OnBnClickedBtnDumpopen()
+// <home>\tab\AXISAI.ini [Axisagent] cpudump: 0 = no CpuSpike dump, default 1 (on).
+// Agent runs from <home>\exe, so the ini is ..\tab\AXISAI.ini. Read each time so it can be toggled live.
+bool CAxisAgentDlg::IsCpuDumpEnabled() const
 {
-	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	char exeDir[MAX_PATH] = {};
+	GetModuleFileNameA(NULL, exeDir, MAX_PATH);
+	char* sl = strrchr(exeDir, '\\'); if (sl) *sl = '\0';	// <home>\exe
+	sl = strrchr(exeDir, '\\'); if (sl) *sl = '\0';		// <home>
+	char iniPath[MAX_PATH] = {};
+	sprintf_s(iniPath, "%s\\tab\\AXISAI.ini", exeDir);
+	return GetPrivateProfileIntA("Axisagent", "cpudump", 1, iniPath) != 0;
+}
+
+// Save m_sSymPath to AxisAgent.ini [Symbol] Path
+void CAxisAgentDlg::SaveSymPath()
+{
+	char exeDir[MAX_PATH] = {};
+	GetModuleFileNameA(NULL, exeDir, MAX_PATH);
+	char* sl = strrchr(exeDir, '\\'); if (sl) *sl = '\0';
+	char iniPath[MAX_PATH] = {};
+	sprintf_s(iniPath, "%s\\AxisAgent.ini", exeDir);
+	WritePrivateProfileStringA("Symbol", "Path", CStringA(m_sSymPath), iniPath);
+}
+
+
+void CAxisAgentDlg::OnBnClickedChkStop()
+{
+	if (!m_chkStop.GetCheck())
+		RefreshLogList();
 }
