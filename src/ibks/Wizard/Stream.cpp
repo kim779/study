@@ -1489,6 +1489,44 @@ void CStream::MakeStream(CScreen* screen, CString trx)
 		axisH->auxs |= auxsCA;
 	}
 
+	if (screen->m_mapH->typeH == TH_LEDGER && axisL >= (int)L_ledgerH)
+	{
+		const struct _ledgerH* lg = (const struct _ledgerH*)&m_sndB[m_sndL];
+		CString acc(lg->fil2 + 37, 12); 		acc.Trim();
+		axlog(LOG_DATA, "[LEDGERCHK] map=%.8s tr=%.8s acc=[%s] svcd=%.8s usid=%.16s pbid=%.16s term=%.8s brno=%.3s odrf=%.1s fil1=[%.6s] fil2=[%.49s]",
+			screen->m_mapH->mapN, CString(axisH->trxC, L_TRXC).GetString(), acc,
+			lg->svcd, lg->usid, lg->pbid, lg->term, lg->brno, lg->odrf, lg->fil1, lg->fil2);
+
+			// [ACCCHK] protected services must declare the account in fil2 (228..239)
+			static const char* const protSvcd[] = { "SAMFQ014", "SAMDT002" };
+			bool prot = false;
+			for (int ii = 0; ii < _countof(protSvcd); ii++)
+			{
+				if (!memcmp(lg->svcd, protSvcd[ii], 8))
+				{
+					prot = true;
+					break;
+				}
+			}
+
+			int own = -1;			// -1: no account in fil2
+			if (!acc.IsEmpty())
+				own = m_guard->AccHashCheck(acc) ? 1 : 0;
+
+			bool bad = (own == 0) || (prot && own == -1);
+			axlog(LOG_DATA, "[ACCCHK] -----  map=%.8s svcd=%.8s acc=%s own=%d prot=%d%s",
+				screen->m_mapH->mapN, lg->svcd, acc.GetString(), own, prot ? 1 : 0, bad ? " BLOCK" : "");
+
+	//#ifdef DF_ACCCHK_BLOCK
+			if (bad)
+			{
+				m_sndL -= L_axisH;
+				SetGuide(screen, "Account verification failed.");
+				return;
+			}
+  //#endif
+	}
+
 	if (!m_guard->IsNoEncMode() && !(m_guard->m_term & flagENX) && screen->m_mapH->options & OP_ENC)
 	{
 		if (m_guard->GetFdsValue(CString(axisH->trxC, L_TRXC), &m_sndB[m_sndL], axisL))
@@ -1504,7 +1542,14 @@ void CStream::MakeStream(CScreen* screen, CString trx)
 		axisH->stat |= statENC;
 	}
 
-	m_guard->xTRACE(x_SNDs, &m_sndB[m_sndL-L_axisH], L_axisH+axisL);
+	axlog(LOG_DATA, "[SENDENC][0-MakeStream-enc] map=%.8s tr=%.8s req(OP_ENC)=%d enc(statENC)=%d enx=%d noenc=%d",
+		screen->m_mapH->mapN, CString(axisH->trxC, L_TRXC).GetString(),
+		(screen->m_mapH->options & OP_ENC) ? 1 : 0,
+		(axisH->stat & statENC) ? 1 : 0,
+		(m_guard->m_term & flagENX) ? 1 : 0,
+		m_guard->IsNoEncMode() ? 1 : 0);
+
+	m_guard->xTRACE(x_SNDs, &m_sndB[m_sndL - L_axisH], L_axisH + axisL);   // 1507
 //	m_guard->xTRACE(x_SNDs, &m_sndB[m_sndL], axisL);
 
 	CString	text;

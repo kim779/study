@@ -17,7 +17,7 @@
 //#define DF_LOG_RTM
 #define DF_LOG_SCRIPT
 //#define DF_LOG_FILEPATCH
-//#define DF_LOG_LOGIN
+#define DF_LOG_LOGIN
 //#define DF_LOG_SOCK_SEND
 //#define DF_LOG_SOCK_RECEIVE
 #define DF_LOG_CERTIFY

@@ -26,6 +26,9 @@
 #include <future>
 #include <thread>
 
+#include <bcrypt.h>
+#pragma comment(lib, "bcrypt.lib")
+
 #ifdef _DEBUG
 #undef THIS_FILE
 static char THIS_FILE[]=__FILE__;
@@ -1926,6 +1929,7 @@ void CGuard::AddRegistry(char* datB, int datL, CString& dns)
 LOG_OUTP(3, "[axwizard][loadacc]", entry, __FUNCTION__);
 
 				m_accno.Add(name);
+				AccHashAdd(name);
 
 				// 비밀번호(entry, 이 시점엔 이미 lz4enc로 인코딩된 값)는 절대 로그에 남기지 않음 - 계좌번호만 기록
 				axlog(LOG_LOGIN, "[AddRegistry] ACCNO[%d/%d] account=%s (password omitted)", ii + 1, size, name);
@@ -1967,6 +1971,7 @@ void CGuard::RemoveRegistry()
 {
 	m_combo.RemoveAll();
 	m_account.RemoveAll();
+	m_accHash.RemoveAll();
 	m_accno.RemoveAll();
 
 	m_stock_accs.Empty();
@@ -2081,6 +2086,7 @@ void CGuard::SetAccounts(CString entry)
 			}
 		}
 		m_account.RemoveKey(entry);
+		AccHashRemove(entry);
 	}
 	else
 	{
@@ -2095,8 +2101,94 @@ LOG_OUTP(3, "[axwizard][loadacc]", tmps, __FUNCTION__);
 
 		lz4enc(tmps);
 		m_account.SetAt(keys, tmps);
+		AccHashAdd(keys);
 	}
 }
+
+CString CGuard::AccHash(CString acc)
+{
+	CString norm;
+	for (int ii = 0; ii < acc.GetLength(); ii++)
+	{
+		if (isalnum((unsigned char)acc[ii]))
+			norm += acc[ii];
+	}
+	if (norm.IsEmpty())
+		return _T("");
+
+	if (!m_accSaltOK)
+	{
+		if (!BCRYPT_SUCCESS(BCryptGenRandom(NULL, m_accSalt, sizeof(m_accSalt), BCRYPT_USE_SYSTEM_PREFERRED_RNG)))
+			return _T("");
+		m_accSaltOK = true;
+	}
+
+	BYTE digest[32]{};
+	BCRYPT_ALG_HANDLE  hAlg = NULL;
+	BCRYPT_HASH_HANDLE hHash = NULL;
+	bool ok = BCRYPT_SUCCESS(BCryptOpenAlgorithmProvider(&hAlg, BCRYPT_SHA256_ALGORITHM, NULL, 0))
+		&& BCRYPT_SUCCESS(BCryptCreateHash(hAlg, &hHash, NULL, 0, NULL, 0, 0))
+		&& BCRYPT_SUCCESS(BCryptHashData(hHash, m_accSalt, sizeof(m_accSalt), 0))
+		&& BCRYPT_SUCCESS(BCryptHashData(hHash, (PUCHAR)norm.GetString(), norm.GetLength(), 0))
+		&& BCRYPT_SUCCESS(BCryptFinishHash(hHash, digest, sizeof(digest), 0));
+	if (hHash)	BCryptDestroyHash(hHash);
+	if (hAlg)	BCryptCloseAlgorithmProvider(hAlg, 0);
+	if (!ok)
+		return _T("");
+
+	CString hex, b;
+	for (int ii = 0; ii < (int)sizeof(digest); ii++)
+	{
+		b.Format(_T("%02x"), digest[ii]);
+		hex += b;
+	}
+	return hex;
+}
+
+void CGuard::AccHashAdd(CString acc)
+{
+	CString h = AccHash(acc);
+	if (h.IsEmpty())
+	{
+		axlog(LOG_LOGIN, "[ACCHASH] add FAILED acc=%s", acc.GetString());
+		return;
+	}
+	for (int ii = 0; ii < m_accHash.GetSize(); ii++)
+	{
+		if (m_accHash[ii] == h)
+			return;		// already registered
+	}
+	m_accHash.Add(h);
+	axlog(LOG_LOGIN, "[ACCHASH] add acc=%s hash=%.8s count=%d", acc.GetString(), h.GetString(), (int)m_accHash.GetSize());
+}
+
+void CGuard::AccHashRemove(CString acc)
+{
+	CString h = AccHash(acc);
+	for (int ii = 0; ii < m_accHash.GetSize(); ii++)
+	{
+		if (m_accHash[ii] == h)
+		{
+			m_accHash.RemoveAt(ii);
+			break;
+		}
+	}
+	axlog(LOG_LOGIN, "[ACCHASH] remove acc=%s count=%d", acc.GetString(), (int)m_accHash.GetSize());
+}
+
+bool CGuard::AccHashCheck(CString acc)
+{
+	CString h = AccHash(acc);
+	if (h.IsEmpty())
+		return false;
+	for (int ii = 0; ii < m_accHash.GetSize(); ii++)
+	{
+		if (m_accHash[ii] == h)
+			return true;
+	}
+	return false;
+}
+
 
 void CGuard::GetAccounts(CString& account)
 {
@@ -3136,6 +3228,11 @@ BOOL CGuard::Write(char* pBytes, int nBytes, int key)
 	text.Format(_T("%05d"), nBytes);
 	CopyMemory(axisH->datL, text.GetString(), sizeof(axisH->datL));
 
+	axlog(LOG_DATA, "[SENDENC][DLL-send] map=%s tr=%.8s winK=%d unit=%d req(US_ENC)=%d enc(statENC)=%d enx=%d",
+		works ? works->m_mapN.GetString() : "", CString(axisH->trxC, L_TRXC).GetString(), key, userth->key,
+		(userth->stat & US_ENC) ? 1 : 0, (axisH->stat & statENC) ? 1 : 0,
+		(m_term & flagENX) ? 1 : 0);
+
 	if (Write(sendB, L_axisH+nBytes, true))
 	{
 		if (key && !(userth->stat & US_PASS))
@@ -3283,9 +3380,10 @@ BOOL CGuard::Service(CScreen* screen, CString trxC, char* datB, int datL, int mo
 	if (Write(sendB, L_axisH+datL, true))
 	{
 		screen->m_svcSendTick = GetTickCount64();
-		axlog(LOG_DATA, "[SVC-send] map=%.8s tr=%.8s winK=%d unit=%d mode=%d",
-			CString(screen->m_mapH->mapN, L_MAPN).GetString(), axisH->trxC, axisH->winK, axisH->unit, mode);
-		screen->m_client->m_units.SetAt(screen->m_key, screen->m_key);
+		axlog(LOG_DATA, "[SENDENC][SVC-send] map=%.8s tr=%.8s winK=%d unit=%d mode=%d req(US_ENC)=%d enc(statENC)=%d",
+			CString(screen->m_mapH->mapN, L_MAPN).GetString(), axisH->trxC, axisH->winK, axisH->unit, mode,
+			(mode & US_ENC) ? 1 : 0, (axisH->stat & statENC) ? 1 : 0);
+
 		if (!(mode & US_PASS))
 		{
 			screen->m_state |= waitSN;
@@ -3635,8 +3733,9 @@ BOOL CGuard::Invoke(char* pBytes, int nBytes, int key)
 	if (Write(sendB, L_axisH+nBytes, true))
 	{
 		ULONGLONG nSendTick = GetTickCount64();
-		axlog(LOG_DATA, "[CTRL-send] map=%.8s tr=%.8s winK=%d unit=%d",
-			CString(screen->m_mapH->mapN, L_MAPN).GetString(), axisH->trxC, key, keyx);
+		axlog(LOG_DATA, "[SENDENC][CTRL-send] map=%.8s tr=%.8s winK=%d unit=%d req(US_ENC)=%d enc(statENC)=%d",
+			CString(screen->m_mapH->mapN, L_MAPN).GetString(), axisH->trxC, key, keyx,
+			(userth->stat& US_ENC) ? 1 : 0, (axisH->stat& statENC) ? 1 : 0);
 		m_ctrlSendTick.SetAt(MAKELONG(key, keyx), nSendTick);
 		screen->m_client->m_units.SetAt(keyx, keyx);
 		if (key && !(userth->stat & US_PASS))
@@ -5967,6 +6066,7 @@ void CGuard::AddRegistry(char* datB, int datL, bool cbonly)
 	}
 	m_accno.RemoveAll();
 	m_account.RemoveAll();
+	m_accHash.RemoveAll();
 	AddRegistry(datB, datL, string);
 	PostAxis(MAKEWPARAM(accnINFO, 0));
 }

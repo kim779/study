@@ -13,6 +13,9 @@ class BrowserWindowEdge :
 
 	std::wstring m_initialUri;
 	std::function<void()> m_onWebViewFirstInitialized = nullptr;
+	bool m_bCreating = false;
+	int  m_nRenderRetry = 0;
+	int  m_nEnvRetry = 0;
 	bool InitWebView();
 	
 	DECLARE_MESSAGE_MAP()
@@ -42,8 +45,10 @@ public:
 	BOOL ShowWindow(int nCmdShow);
 	afx_msg void OnShowWindow(BOOL bShow, UINT nStatus);
 	afx_msg LRESULT OnRunAsync(WPARAM wParam, LPARAM lParam);
+	afx_msg void OnTimer(UINT_PTR nIDEvent);
 
 	static wil::com_ptr<ICoreWebView2Environment> m_webViewEnvironment;
+	static bool m_bEnvCreating;
 	static BOOL InitInstance(HINSTANCE hInstance);
 	// https://stackoverflow.com/questions/4804298/how-to-convert-wstring-into-string
 	static std::wstring s2ws(const std::string& str);
@@ -65,7 +70,7 @@ public:
 	HRESULT AddInitializeScript(std::wstring script, Microsoft::WRL::ComPtr<ICoreWebView2AddScriptToExecuteOnDocumentCreatedCompletedHandler> handler = nullptr);
 	// Execute JavaScript code from the javascript parameter in the current top level document rendered in the WebView.	
 	HRESULT InjectScript(std::wstring script, Microsoft::WRL::ComPtr<ICoreWebView2ExecuteScriptCompletedHandler> handler = nullptr);
-
+	HRESULT ShowPrintUI(bool bSystemDialog);
 	static void CheckFailure(HRESULT hr, LPCWSTR errorMessage);
 	static std::wstring GetAppDataDirectory();
 	static std::wstring GetFullPathFor(LPCWSTR relativePath);

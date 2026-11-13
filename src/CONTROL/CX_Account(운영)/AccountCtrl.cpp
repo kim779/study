@@ -3520,7 +3520,7 @@ BOOL CAccountCtrl::SendTR(CString strName, BYTE type, char* pBytes, int nBytes, 
 	std::unique_ptr<TCHAR[]> buff = std::make_unique<TCHAR[]>(L_userTH + nBytes + 128);
 
 	CopyMemory(udat.trc, strName, strName.GetLength());
-	udat.stat = type | US_KEY;
+	udat.stat = type | US_KEY | US_ENC;
 	if (m_bDLL)
 	{
 		udat.key = key;			//TRKEY_GROUP;

@@ -3466,6 +3466,7 @@ void CPane::MatchNewsIndex(int &index)
 		case 13:    index = 15; break;  // IR GO
 		case 14:    index = 16; break;  // 컨슈머타임즈
 		case 15:    index = 17; break;  //modi  20240704 뉴스웨이 추가
+		case 16:    index = 18; break;
 	}
 }
 

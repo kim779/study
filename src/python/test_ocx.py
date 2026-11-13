@@ -26,9 +26,11 @@ SVR_PORT = 15201  # 서버 포트 (화면 비노출)
 #   "normal"  : domestic customer   (domestic only)
 #   "foreign" : overseas developer  (+ overseas group incl. exchange/pre-settlement tabs)
 #   "admin"   : internal test       (+ server select, chaser, TR8001, login save)
-USER_TYPE = "foreign"
+USER_TYPE = "normal"
 IS_FOREIGN = USER_TYPE in ("foreign", "admin")
 IS_ADMIN   = USER_TYPE == "admin"
+IS_NORMAL  = USER_TYPE == "normal"
+HAS_SISE   = IS_NORMAL or IS_ADMIN   # domestic quote panel
 
 LOGIN_SAVE_FILE = "login.dat"   # saved next to the exe, DPAPI encrypted (internal only)
 
@@ -223,7 +225,7 @@ class TestWindow(QMainWindow):
         mid_h = QHBoxLayout(mid)
         mid_h.setContentsMargins(0, 0, 0, 0)
         mid_h.addWidget(self._build_login_group())
-        if IS_ADMIN:                     # domestic quote panel: internal only
+        if HAS_SISE:                     # domestic quote panel: normal + internal
             mid_h.addWidget(self._build_sise_group())
         layout.addWidget(mid)
 
@@ -282,6 +284,16 @@ class TestWindow(QMainWindow):
             self.combo_server.currentIndexChanged.connect(self._on_server_selected)
             self.edit_svr_ip   = QLineEdit("")
             form.addRow("svr_ip",    self.edit_svr_ip)
+        if IS_NORMAL:                    # server combo: UAT (test id) / production (real id, glb)
+            self.combo_server  = QComboBox()
+            uat_ip = next((ip for ip, name in SERVER_LIST if name == "UAT"), "")
+            self.combo_server.addItem("테스트 - 테스트아이디접속", uat_ip)
+            self.combo_server.addItem("일반 - 실제아이디로접속", "")
+            self.combo_server.setCurrentIndex(1)               # default: production
+            svr_h = QHBoxLayout()
+            svr_h.addWidget(self.combo_server, 1)              # half width
+            svr_h.addStretch(1)
+            form.addRow("서버선택",  svr_h)
         layout.addLayout(form)
 
         if IS_ADMIN:                     # quote-only login (LoginQuote): internal only
@@ -308,6 +320,12 @@ class TestWindow(QMainWindow):
             self.chk_save_login.toggled.connect(self._on_save_login_toggled)
             h.addWidget(self.chk_save_login)
         h.addWidget(self.lbl_login)
+        if IS_NORMAL:                    # shown only while the production server is selected
+            lbl_warn = QLabel("실제 운영서버이니 주문 등 사용에 유의해주십시오")
+            lbl_warn.setStyleSheet("color: red; font-weight: bold;")
+            h.addWidget(lbl_warn)
+            self.combo_server.currentIndexChanged.connect(
+                lambda _: lbl_warn.setVisible(not self.combo_server.currentData()))
         h.addStretch()
         h.addWidget(btn_full)        # far right, away from Login() to avoid misclicks
         layout.addLayout(h)
@@ -1157,6 +1175,9 @@ class TestWindow(QMainWindow):
             typed_ip = self.edit_svr_ip.text().strip()
             svr_ip   = typed_ip or self.combo_server.currentData()
             svr_name = "직접입력" if typed_ip else (self.combo_server.currentText().split(" (")[0] or "glb")   # log name only, no IP
+        elif IS_NORMAL:
+            svr_ip   = self.combo_server.currentData()   # UAT IP, or "" = production via glb
+            svr_name = "UAT" if svr_ip else "glb"
         else:
             svr_ip, svr_name = "", "glb"    # customer: OCX resolves the production server via glb
         svr_port = SVR_PORT
@@ -1754,8 +1775,8 @@ class TestWindow(QMainWindow):
         if code in self._jango_calc and "023" in m:
             self._recalc_jango_on_price(code, m["023"])
 
-        if not IS_ADMIN or code != self.edit_sise_code.text().strip().lstrip('A'):
-            return  # 현재 조회 중인 종목만 처리(시세조회 화면 갱신은 여기까지, 시세 패널은 내부용에만 있음)
+        if not HAS_SISE or code != self.edit_sise_code.text().strip().lstrip('A'):
+            return  # 현재 조회 중인 종목만 처리(시세조회 화면 갱신은 여기까지, 시세 패널은 normal/내부용에만 있음)
 
         if "034" in m:  # 체결시간 있으면 체결 데이터
             self.lbl_curr.setText(m.get("023", "-").lstrip('+-') or "-")

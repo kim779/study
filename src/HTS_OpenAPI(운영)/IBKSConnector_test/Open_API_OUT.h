@@ -1465,4 +1465,26 @@ struct tr5011_rec
 #define L_tr5011_rec sizeof(struct tr5011_rec);
 
 
+//COSAQ058
+struct gdxhart_mid
+{
+	char in[5];		// in
+	char acc[20];		// acc
+	char crcy[3];		// 통화코드
+};
+#define L_gdxhart_mid sizeof(struct gdxhart_mid);
+
+
+
+struct gdxhart_mod
+{
+	char out[5];		// out
+	char pstp[1];		// 개인법인구분
+	char pstpNm[40];	// 개인법인구분명
+	char gdxchrat[17];	// 환율
+	char trddt[8];		// 거래일
+};
+#define L_gdxhart_mod sizeof(struct gdxhart_mod);
+
+
 #pragma	pack()

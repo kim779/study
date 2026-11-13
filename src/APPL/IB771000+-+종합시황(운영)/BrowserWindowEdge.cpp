@@ -9,11 +9,13 @@ using namespace Microsoft::WRL;
 
 
 wil::com_ptr<ICoreWebView2Environment> BrowserWindowEdge::m_webViewEnvironment = nullptr;
+bool BrowserWindowEdge::m_bEnvCreating = false;
 
 
 BEGIN_MESSAGE_MAP(BrowserWindowEdge, CWnd)
 	ON_WM_SIZE()
 	ON_WM_SHOWWINDOW()
+	ON_WM_TIMER()
 	ON_MESSAGE(WM_APP, &BrowserWindowEdge::OnRunAsync)
 END_MESSAGE_MAP()
 
@@ -21,7 +23,14 @@ END_MESSAGE_MAP()
 bool BrowserWindowEdge::InitWebView()
 {
 	if (m_webViewEnvironment == nullptr)
+	{
+		CString s; s.Format("-[edge][InitWebView]<%d> %p InitWebView: env NOT ready -> retry=%d", __LINE__, this, m_nEnvRetry);  // suspect #1
+		OutputDebugString(s);
+		if (m_nEnvRetry++ < 50)          // retry every 100ms, up to ~5 sec
+			SetTimer(1, 100, nullptr);
 		return false;
+	}
+	m_nEnvRetry = 0;
 
 	if (m_webViewController && m_webView)
 	{
@@ -35,9 +44,27 @@ bool BrowserWindowEdge::InitWebView()
 		}
 		return true;
 	}
-	
+
+
+	if (m_bCreating)
+	{
+CString s; s.Format("-[edge][InitWebView]<%d> %p InitWebView: creating in progress -> navigate on completion uri=[%S]", __LINE__, this, m_initialUri.c_str());
+OutputDebugString(s);
+		return true;
+	}
+	m_bCreating = true;
+
+CString s; s.Format("-[edge][InitWebView]<%d> %p InitWebView: create controller request", __LINE__, this);  // twice before completion = suspect #2
+OutputDebugString(s);
+
 	HRESULT hr = m_webViewEnvironment->CreateCoreWebView2Controller(m_hWnd, Callback<ICoreWebView2CreateCoreWebView2ControllerCompletedHandler>(
 		[&](HRESULT result, ICoreWebView2Controller* controller) -> HRESULT {
+
+		m_bCreating = false;
+
+CString s; s.Format("-[edge][InitWebView]<%d> %p controller completed hr=0x%08X new=%p old=%p", __LINE__,
+this, result, controller, m_webViewController.get());  // old != NULL = duplicate overwrite 
+OutputDebugString(s);
 
 		if (!SUCCEEDED(result))
 		{
@@ -45,18 +72,27 @@ bool BrowserWindowEdge::InitWebView()
 			return result;
 		}
 
-		if (controller != nullptr) {
-			m_webViewController = controller;
-			CheckFailure(m_webViewController->get_CoreWebView2(&m_webView), L"");
+		if (controller == nullptr)
+			return E_FAIL;
+
+		m_webViewController = controller;
+		HRESULT hrWv = m_webViewController->get_CoreWebView2(&m_webView);
+		if (FAILED(hrWv) || !m_webView)
+		{
+			CString e; e.Format("-[edge][InitWebView]<%d> %p get_CoreWebView2 failed hr=0x%08X", __LINE__, this, hrWv);
+			OutputDebugString(e);
+			m_webViewController = nullptr;
+			return hrWv;
 		}
 
 		// Add a few settings for the webview
-		// this is a redundant demo step as they are the default settings values
-		ICoreWebView2Settings* Settings;
-		m_webView->get_Settings(&Settings);
-		Settings->put_IsScriptEnabled(TRUE);
-		Settings->put_AreDefaultScriptDialogsEnabled(TRUE);
-		Settings->put_IsWebMessageEnabled(TRUE);
+		wil::com_ptr<ICoreWebView2Settings> Settings;      // released automatically
+		if (SUCCEEDED(m_webView->get_Settings(&Settings)) && Settings)
+		{
+			Settings->put_IsScriptEnabled(TRUE);
+			Settings->put_AreDefaultScriptDialogsEnabled(TRUE);
+			Settings->put_IsWebMessageEnabled(TRUE);
+		}
 
 		// Resize WebView to fit the bounds of the parent window
 		m_webViewController->put_IsVisible(TRUE);
@@ -75,7 +111,8 @@ bool BrowserWindowEdge::InitWebView()
 
 	if (!SUCCEEDED(hr))
 	{
-		OutputDebugStringW(L"CreateCoreWebView2Controller  failed\n");
+		m_bCreating = false;
+OutputDebugStringW(L"CreateCoreWebView2Controller  failed\n");
 		return false;
 	}
 
@@ -192,6 +229,17 @@ HRESULT BrowserWindowEdge::SetEventsAndBrokers()
 		RETURN_IF_FAILED(args->get_IsSuccess(&isSuccess));
 		TRACE("\r\n[%ld] %p NavigationCompleted %d\r\n", GetCurrentThreadId(), this, isSuccess);
 
+		COREWEBVIEW2_WEB_ERROR_STATUS st{};
+		args->get_WebErrorStatus(&st);
+		wil::unique_cotaskmem_string src;
+		webview->get_Source(&src);
+		CString s; s.Format("-[edge][SetEventsAndBrokers]<%d> %p NavCompleted success=%d status=%d src=[%S]",__LINE__,
+			this, isSuccess, st, src ? src.get() : L"");  // success=0 = suspect #3
+		OutputDebugString(s);
+
+		if (isSuccess)
+			m_nRenderRetry = 0;
+
 		SetEvent(NavigationCompletedEvent.Get());
 
 		if (m_onWebViewFirstInitialized)
@@ -210,27 +258,47 @@ HRESULT BrowserWindowEdge::SetEventsAndBrokers()
 	{
 		COREWEBVIEW2_PROCESS_FAILED_KIND failureType;
 		RETURN_IF_FAILED(args->get_ProcessFailedKind(&failureType));
+
+		CString s; s.Format("-[edge][SetEventsAndBrokers]<%d> %p ProcessFailed kind=%d",__LINE__, this, failureType);  // suspect #4
+		OutputDebugString(s);
+
+		if (failureType == COREWEBVIEW2_PROCESS_FAILED_KIND_RENDER_PROCESS_EXITED)
+		{
+			// renderer killed/crashed: reload current page (limit to avoid reload loop)
+			if (m_nRenderRetry < 3)
+			{
+				m_nRenderRetry++;
+				CString r; r.Format("-[edge][SetEventsAndBrokers]<%d> %p render exited -> Reload (retry=%d)", __LINE__, this, m_nRenderRetry);
+				OutputDebugString(r);
+				RunAsync([this] { if (m_webView) m_webView->Reload(); });
+			}
+			return S_OK;
+		}
+
 		if (failureType == COREWEBVIEW2_PROCESS_FAILED_KIND_BROWSER_PROCESS_EXITED)
 		{
-			int button = ::MessageBoxW(
-				m_hWnd,
-				L"Browser process exited unexpectedly.  Recreate webview?",
-				L"Browser process exited",
-				MB_YESNO);
-			if (button == IDYES)
-			{
-				//m_appWindow->ReinitializeWebView();
-			}
+			CString r; r.Format("-[edge][SetEventsAndBrokers]<%d> %p browser exited -> recreate", __LINE__, this);
+			OutputDebugString(r);
+			RunAsync([this] {
+				if (m_webViewController)
+					m_webViewController->Close();
+				m_webViewController = nullptr;
+				m_webView = nullptr;
+				m_bCreating = false;
+				m_webViewEnvironment = nullptr;   // shared: dead browser process
+				InitInstance(nullptr);            // guarded: created only once
+				InitWebView();                    // env not ready -> timer retry -> navigate m_initialUri
+				});
 		}
 		else if (failureType == COREWEBVIEW2_PROCESS_FAILED_KIND_RENDER_PROCESS_UNRESPONSIVE)
 		{
-			int button = ::MessageBoxW(
-				m_hWnd,
-				L"Browser render process has stopped responding.  Recreate webview?",
-				L"Web page unresponsive", MB_YESNO);
-			if (button == IDYES)
+			// renderer hung: reload current page (shares retry limit with render exited)
+			if (m_nRenderRetry < 3)
 			{
-				//m_appWindow->ReinitializeWebView();
+				m_nRenderRetry++;
+				CString r; r.Format("-[edge][SetEventsAndBrokers]<%d> %p render unresponsive -> Reload (retry=%d)", __LINE__, this, m_nRenderRetry);
+				OutputDebugString(r);
+				RunAsync([this] { if (m_webView) m_webView->Reload(); });
 			}
 		}
 		return S_OK;
@@ -251,7 +319,8 @@ HRESULT BrowserWindowEdge::SetEventsAndBrokers()
 	}).Get();
 	RETURN_IF_FAILED(m_webView->CallDevToolsProtocolMethod(L"Security.enable", L"{}", nullptr));
 	BrowserWindowEdge::CheckFailure(m_webView->GetDevToolsProtocolEventReceiver(L"Security.securityStateChanged", &devToolsProtocolEventReceiver), L"");
-	devToolsProtocolEventReceiver->add_DevToolsProtocolEventReceived(m_devToolsSecurityBroker.Get(), &m_DevToolsSecurityToken);
+	if (devToolsProtocolEventReceiver)
+		devToolsProtocolEventReceiver->add_DevToolsProtocolEventReceived(m_devToolsSecurityBroker.Get(), &m_DevToolsSecurityToken);
 
 	//https://chromedevtools.github.io/devtools-protocol/tot/Log#type-LogEntry
 	m_devToolsLogBroker = Callback<ICoreWebView2DevToolsProtocolEventReceivedEventHandler>(
@@ -265,8 +334,8 @@ HRESULT BrowserWindowEdge::SetEventsAndBrokers()
 	}).Get();
 	RETURN_IF_FAILED(m_webView->CallDevToolsProtocolMethod(L"Log.enable", L"{}", nullptr));
 	BrowserWindowEdge::CheckFailure(m_webView->GetDevToolsProtocolEventReceiver(L"Log.entryAdded", &devToolsProtocolEventReceiver), L"");
-	devToolsProtocolEventReceiver->add_DevToolsProtocolEventReceived(m_devToolsLogBroker.Get(), &m_DevToolsLogToken);
-
+	if (devToolsProtocolEventReceiver)
+		devToolsProtocolEventReceiver->add_DevToolsProtocolEventReceived(m_devToolsLogBroker.Get(), &m_DevToolsLogToken);
 
 	return S_OK;
 }
@@ -325,8 +394,21 @@ afx_msg LRESULT BrowserWindowEdge::OnRunAsync(WPARAM wParam, LPARAM lParam)
 	return S_OK;
 }
 
+void BrowserWindowEdge::OnTimer(UINT_PTR nIDEvent)
+{
+	if (nIDEvent == 1)
+	{
+		KillTimer(1);
+		InitWebView();
+	}
+	CWnd::OnTimer(nIDEvent);
+}
+
 BOOL BrowserWindowEdge::InitInstance(HINSTANCE hInstance)
 {	
+	if (m_webViewEnvironment || m_bEnvCreating)
+		return TRUE;
+	m_bEnvCreating = true;
 	LPCWSTR subFolder = nullptr;
 
 	// Get directory for user data. This will be kept separated from the
@@ -353,16 +435,17 @@ BOOL BrowserWindowEdge::InitInstance(HINSTANCE hInstance)
 	{
 		if (!SUCCEEDED(result))
 		{
+			m_bEnvCreating = false;
 			if (result == HRESULT_FROM_WIN32(ERROR_FILE_NOT_FOUND))
 			{
-				::MessageBoxW(
-					nullptr,
-					L"Couldn't find Edge installation. "
-					"Do you have a version installed that's compatible with this "
-					"WebView2 SDK version?",
-					nullptr, MB_OK);
+				OutputDebugString("-[edge][InitInstance] WebView2 runtime not found (ERROR_FILE_NOT_FOUND)");
 			}
 		}
+
+		m_bEnvCreating = false;
+		CString s; s.Format("-[edge][InitInstance]<%d> env created hr=0x%08X env=%p",  __LINE__, result, env);
+		OutputDebugString(s);
+
 		RETURN_IF_FAILED(result);
 
 		m_webViewEnvironment = env;
@@ -372,6 +455,7 @@ BOOL BrowserWindowEdge::InitInstance(HINSTANCE hInstance)
 
 	if (!SUCCEEDED(hr))
 	{
+		m_bEnvCreating = false;
 		OutputDebugStringW(L"WebView2Environment creation failed\n");
 		return FALSE;
 	}
@@ -403,6 +487,9 @@ BrowserWindowEdge::BrowserWindowEdge() :
 
 BrowserWindowEdge::~BrowserWindowEdge()
 {
+	CString s; s.Format("-[edge][~BrowserWindowEdge]<%d> %p dtor begin creating=%d", __LINE__, this, m_bCreating);
+	OutputDebugString(s);
+
 	TRACE("\r\n\t--- [%ld] %s - %p \r\n", GetCurrentThreadId(), __FUNCTION__, this);
 	if (m_webViewController)
 	{
@@ -412,6 +499,9 @@ BrowserWindowEdge::~BrowserWindowEdge()
 	}
 
 	DestroyWindow();
+
+	s.Format("-[edge][~BrowserWindowEdge]<%d> %p dtor end", __LINE__, this);
+	OutputDebugString(s);
 }
 
 void BrowserWindowEdge::RunAsync(std::function<void()> callback)
@@ -422,6 +512,8 @@ void BrowserWindowEdge::RunAsync(std::function<void()> callback)
 
 void BrowserWindowEdge::Init(std::wstring initialUri, std::function<void()> webviewCreatedCallback)
 {	
+CString s; s.Format("-[edge][Init]<%d> %p Init uri=[%S]",    __LINE__,this, initialUri.c_str());
+OutputDebugString(s);
 	m_initialUri = initialUri;
 	m_onWebViewFirstInitialized = webviewCreatedCallback;
 
@@ -451,6 +543,9 @@ HRESULT BrowserWindowEdge::Navigate(std::wstring url)
 	SetEvent(NavigationCompletedEvent.Get());
 
 	auto result = m_webView->Navigate(url.c_str());
+
+	CString s; s.Format("-[edge][Navigate]<%d> %p Navigate hr=0x%08X url=[%S]",  __LINE__, this, result, url.c_str());
+	OutputDebugString(s);
 
 	WaitForSingleObjectEx(NavigationCompletedEvent.Get(), INFINITE, FALSE);
 	
@@ -523,6 +618,24 @@ HRESULT BrowserWindowEdge::InjectScript(std::wstring script, Microsoft::WRL::Com
 
 }
 
+HRESULT BrowserWindowEdge::ShowPrintUI(bool bSystemDialog)
+{
+	if (m_webView == nullptr)
+		return ERROR_INVALID_HANDLE;
+
+	auto webView16 = m_webView.try_query<ICoreWebView2_16>();
+	HRESULT hr;
+	if (webView16)
+		hr = webView16->ShowPrintUI(bSystemDialog ? COREWEBVIEW2_PRINT_DIALOG_KIND_SYSTEM : COREWEBVIEW2_PRINT_DIALOG_KIND_BROWSER);
+	else
+		hr = InjectScript(L"window.print();");   // old runtime fallback
+
+	CString s; s.Format("-[edge][ShowPrintUI]<%d> %p system=%d api16=%d hr=0x%08X", __LINE__, this, bSystemDialog, webView16 ? 1 : 0, hr);
+	OutputDebugString(s);
+	return hr;
+}
+
+
 void BrowserWindowEdge::CheckFailure(HRESULT hr, LPCWSTR errorMessage)
 {
 	if (FAILED(hr))
@@ -537,7 +650,8 @@ void BrowserWindowEdge::CheckFailure(HRESULT hr, LPCWSTR errorMessage)
 			message = std::wstring(errorMessage);
 		}
 
-		::MessageBoxW(nullptr, message.c_str(), nullptr, MB_OK);
+		CString s; s.Format("-[edge][CheckFailure] hr=0x%08X msg=[%S]", hr, message.c_str());
+		OutputDebugString(s);
 	}
 }
 

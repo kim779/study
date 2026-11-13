@@ -13,7 +13,6 @@
 #include <gsl/span>  
 #include <json.hpp>
 
-
 using namespace nlohmann;
 
 #define MB_CAPTION		("IBK투자증권")
@@ -112,7 +111,6 @@ void WriteLog(LPCSTR log, ...)
 	END_CATCH
 #endif
 }
-
 
 IMPLEMENT_DYNCREATE(CIBKSConnectorCtrl, COleControl)
 
@@ -753,18 +751,6 @@ int CIBKSConnectorCtrl::SendTR( LPCSTR trnm, int tkey, int stat, LPCSTR data, in
 		return 0;
 	}
 
-//	CString sMsg;
-//	int rkey = 0;
-//	bool bflag = false;
-//	while (!bflag)
-//	{
-//		rkey = rand() % 255;
-//		auto it = _manageKey.emplace(rkey, tkey);
-//
-//		bflag = it.second;
-//	}
-//	sMsg.Format("[%d][%d]", tkey, rkey);
-//Msg(sMsg);
 
 	if (!RegCallBack(tkey, cb)) return FALSE;
 
@@ -1118,6 +1104,12 @@ CString CIBKSConnectorCtrl::ToKoscomIP(CString addr)
 
 void CIBKSConnectorCtrl::CheckValidUser()
 {
+	const CString acno = (LPCSTR)Variant(accountCC, 0);	
+	CString acc;
+	AfxExtractSubString(acc, acno, 0, '\n');
+	acc = acc.Left(11);	
+	getgdxrat(199, acc, "USD");
+
 	S_PIDOUINI();
 }
 
@@ -1284,15 +1276,34 @@ void CIBKSConnectorCtrl::C_PIDOUINI(WPARAM wParam, LPARAM lParam)
 				ed = acno.Find("\n", pos);
 				CString acc = acno.Mid(pos, ed - pos);
 
-				m_slog.Format("[openapi][%s]<%d> 전체계좌 acc =[%s %s %s]  accInfo=[%s]", __FUNCTION__, __LINE__, acc.Left(3), acc.Mid(3, 2), acc.Mid(5, 6), acc);
+				m_slog.Format("[openapi][%s]<%d> 전체계좌 acc =[%s %s %s]", __FUNCTION__, __LINE__, acc.Left(3), acc.Mid(3, 2), acc.Mid(5, 6));
 				WriteLog(m_slog);
 
-				m_acno.push_back(acc.Mid(0, 11));
+				const CString sAcc = acc.Mid(0, 11);
+				m_acno.push_back(sAcc);
 				m_acnm.push_back(acc.Mid(12, acc.Find("|", 12) - 12));
+
+				const size_t len = acc.GetLength();
+				if (acc[len - 2] == '|')
+				{
+					char cc = acc[len - 1];
+					_accInfo.emplace(sAcc.GetString(), (cc & 0x04) ? "1" : "0");
+				}
 				pos = ed + 1;
 
 			} while (pos < acno.GetLength());
 		}
+
+		//ntmp 2진 개인0 / 법인1(0x04) 일반0 / WRAP1(0x02) 대리인0 / 본인1(0x01)
+		//	0 000 X X X 개인 · 일반 · 대리인
+		//	1 001 X X O 개인 · 일반 · 본인
+		//	2 010 X O X 개인 · WRAP · 대리인
+		//	3 011 X O O 개인 · WRAP · 본인
+		//	4 100 O X X 법인 · 일반 · 대리인
+		//	5 101 O X O 법인 · 일반 · 본인
+		//	6 110 O O X 법인 · WRAP · 대리인
+		//	7 111 O O O 법인 · WRAP · 본인
+
 
 		// 사용자 ID - 1개의 프로세스에서 여러 인스턴스를 생성할 경우 userCC가 마지막껄로만 나온다. (static인듯)
 		//m_usid = (LPCSTR)Variant(userCC, 0);
@@ -1448,10 +1459,6 @@ void CIBKSConnectorCtrl::DEF_CALLBACK(WPARAM wParam, LPARAM lParam)
 {
 	int key  = LOWORD(wParam);
 	int size = HIWORD(wParam);
-
-	//int key = _manageKey.at(rkey);
-	//_manageKey.erase(rkey);
-
 
 	CString slog;
 	slog.Format("[OPENAPI][%s]<%d> key=[%d] size=[%d]\n", __FUNCTION__, __LINE__, key, size);
@@ -3193,8 +3200,6 @@ void CIBKSConnectorCtrl::C_TR1002(WPARAM wParam, LPARAM lParam)
 	int key = LOWORD(wParam);
 	int size = HIWORD(wParam);
 
-	//int key = _manageKey.at(rkey);
-	//_manageKey.erase(rkey);
 	LPCSTR data = (LPCSTR)lParam;
 	CString odat = CString(data, size);
 	odat.TrimRight();
@@ -3206,8 +3211,7 @@ void CIBKSConnectorCtrl::C_TR1004(WPARAM wParam, LPARAM lParam)
 {
 	int key = LOWORD(wParam);
 	int size = HIWORD(wParam);
-	//int key = _manageKey.at(rkey);
-	//_manageKey.erase(rkey);
+
 	LPCSTR data = (LPCSTR)lParam;
 	CString odat = CString(data, size);
 	odat.TrimRight();
@@ -3220,8 +3224,6 @@ void CIBKSConnectorCtrl::C_TR1005(WPARAM wParam, LPARAM lParam)
 	int key = LOWORD(wParam);
 	int size = HIWORD(wParam);
 
-	//int key = _manageKey.at(rkey);
-	//_manageKey.erase(rkey);
 	LPCSTR data = (LPCSTR)lParam;
 	CString odat = CString(data, size);
 	odat.TrimRight();
@@ -3234,8 +3236,6 @@ void CIBKSConnectorCtrl::C_TR1006(WPARAM wParam, LPARAM lParam)
 	int key = LOWORD(wParam);
 	int size = HIWORD(wParam);
 
-	//int key = _manageKey.at(rkey);
-	//_manageKey.erase(rkey);
 	LPCSTR data = (LPCSTR)lParam;
 	CString odat = CString(data, size);
 	odat.TrimRight();
@@ -3248,8 +3248,6 @@ void CIBKSConnectorCtrl::C_TR1007(WPARAM wParam, LPARAM lParam)
 	int key = LOWORD(wParam);
 	int size = HIWORD(wParam);
 
-	//int key = _manageKey.at(rkey);
-	//_manageKey.erase(rkey);
 	LPCSTR data = (LPCSTR)lParam;
 	CString odat = CString(data, size);
 	odat.TrimRight();
@@ -3295,9 +3293,6 @@ void CIBKSConnectorCtrl::C_TR1003(WPARAM wParam, LPARAM lParam)
 	int key = LOWORD(wParam);
 	int size = HIWORD(wParam);
 
-	//int key = _manageKey.at(rkey);
-	//_manageKey.erase(rkey);
-
 	LPCSTR gdata = (LPCSTR)lParam;
 	LPCSTR data = gdata + sizeof(grid_o);
 	if (size>=sizeof(grid_o))
@@ -3337,8 +3332,6 @@ void CIBKSConnectorCtrl::C_TR3002(WPARAM wParam, LPARAM lParam)
 	int key = LOWORD(wParam);
 	int size = HIWORD(wParam);
 
-	//int key = _manageKey.at(rkey);
-	//_manageKey.erase(rkey);
 	LPCSTR data = (LPCSTR)lParam;
 	CString odat = CString(data, size);
 	odat.TrimRight();
@@ -3391,8 +3384,6 @@ void CIBKSConnectorCtrl::C_TR3003(WPARAM wParam, LPARAM lParam)
 	int key = LOWORD(wParam);
 	int size = HIWORD(wParam);
 
-	//int key = _manageKey.at(rkey);
-	//_manageKey.erase(rkey);
 	LPCSTR gdata = (LPCSTR)lParam;
 	LPCSTR data = gdata + sizeof(grid_o);
 	
@@ -3432,8 +3423,6 @@ void CIBKSConnectorCtrl::C_TR2001(WPARAM wParam, LPARAM lParam)
 	int key = LOWORD(wParam);
 	int size = HIWORD(wParam);
 
-	//int key = _manageKey.at(rkey);
-	//_manageKey.erase(rkey);
 	LPCSTR gdata = (LPCSTR)lParam;
 	LPCSTR data = gdata + sizeof(grid_o);
 	
@@ -3537,9 +3526,6 @@ void CIBKSConnectorCtrl::C_PIBOTRAN(WPARAM wParam, LPARAM lParam)
 {
 	int key = LOWORD(wParam);
 	int size = HIWORD(wParam);
-
-	//int key = _manageKey.at(rkey);
-	//_manageKey.erase(rkey);
 
 	struct pibotran_mod *mod = (struct pibotran_mod*)lParam;
 
@@ -5551,9 +5537,6 @@ void CIBKSConnectorCtrl::C_SACEQ320( WPARAM wParam, LPARAM lParam )
 	int key = LOWORD(wParam);
 	int size = HIWORD(wParam);
 	
-	//int key = _manageKey.at(rkey);
-	//_manageKey.erase(rkey);
-
 	struct ledger *ledger = (struct ledger *)lParam;
 	struct saceq320_mod *mod = (struct saceq320_mod *)( (LPCSTR)lParam + L_ledger);
 	
@@ -6547,7 +6530,25 @@ BOOL CIBKSConnectorCtrl::FNORDER(long key, LPCTSTR odgb, LPCTSTR mmgb, LPCTSTR a
 		return FALSE;
 
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
-	
+	_orderacc = accn;
+
+	// 미국만 주문착오 작동...  
+	if (odgb[0] == '2')	
+	{
+		std::string type     = _accInfo.at(accn);
+		const double dgchrat = _todaychrat.first;
+		const double dMax = type == "0" ? 500000000.0 : 1000000000.0;	// 0 : 개인 1: 법인
+		const double dVal = dMax / dgchrat;
+		const double dOrd = atof(jprc) * atof(jqty);
+
+		if (dVal <= dOrd)
+		{	
+			std::string sout = format_with_comma(dVal);
+			m_sLastMsg.Format("주문 금액이 $%s 를 넘었어요.\n분할 또는 호가를 조정한 후 다시 주문하세요.", sout.data());
+			return FALSE;
+		}
+	}
+
 	if (IsValidState() == FALSE) return FALSE;
 	if (IsValidAccount(accn) == FALSE) return FALSE;
 	if (IsValidAcnoPswd(pswd) == FALSE) return FALSE;
@@ -6585,10 +6586,8 @@ BOOL CIBKSConnectorCtrl::S_FNORDER(long key, LPCTSTR odgb, LPCTSTR mmgb, LPCTSTR
 		else if (odgb[0] == '2' && mm.compare("01") == 0 && (sho.compare("00") == 0 || sho.compare("B2") == 0 || sho.compare("03") == 0 || sho.compare("B1") == 0))
 			return true;
 
-
 		if (odgb[0] == '3')
 			return true;
-
 
 		if (odgb[0] == '1')
 			lastmsg = "중국주식은 [지정가] 주문만 허용됩니다.";
@@ -6664,13 +6663,9 @@ BOOL CIBKSConnectorCtrl::S_FNORDER(long key, LPCTSTR odgb, LPCTSTR mmgb, LPCTSTR
 	CString sQty, sPrc, sOrg;
 	sQty.Format("%08d", atoi(jqty));
 	
-//msg.Format("주문수량[%s]\n", sQty);
-//Msg(msg);
 	const INT64 value = (INT64)floor(atof(jprc) * 10000.0 + 0.5);
 	sPrc.Format("%015I64d", value);
 
-//msg.Format("주문가격[%s]\n", sPrc);
-//Msg(msg);
 	pmid->odgb[0] = odgb[0];											  // 주문유형 1-중국 2-미국 3-예약      
 
 
@@ -6705,6 +6700,28 @@ BOOL CIBKSConnectorCtrl::S_FNORDER(long key, LPCTSTR odgb, LPCTSTR mmgb, LPCTSTR
 }
 
 
+BOOL CIBKSConnectorCtrl::getgdxrat(long key, CString acc, CString curcode)
+{
+	// 주문을 위한 환율조회
+	vector<char> buff(L_ledger + sizeof(gdxhart_mid), ' ');
+
+	struct ledger* pledger = (struct ledger*)&buff[0];
+	struct gdxhart_mid* pmid = (struct gdxhart_mid*)&buff[L_ledger];
+
+	GetLedger(pledger);
+	FillMemory(pledger->usid, sizeof(pledger->usid), ' ');
+	memcpy(pledger->usid, (LPCSTR)m_usid, m_usid.GetLength());
+	memcpy(pledger->brno, "000", 3);
+	memcpy(pledger->rcnt, "0008", 4);
+	memcpy(pledger->svcd, "COSAQ058", 8);
+	memcpy(pledger->fkey, "C   ", 4);
+	memcpy(pmid->in, "00001", 5);
+	memcpy(pmid->acc, acc, acc.GetLength());
+	memcpy(pmid->crcy, curcode, sizeof(pmid->crcy));
+	return SendTR("piboPBxQ", key, US_ENC, buff.data(), buff.size(), &CIBKSConnectorCtrl::DEF_KOSCOM_CALLBACK);
+}
+
+
 void CIBKSConnectorCtrl::DEF_KOSCOM_CALLBACK(WPARAM wParam, LPARAM lParam)
 {
 	CString slog;
@@ -6727,10 +6744,6 @@ void CIBKSConnectorCtrl::DEF_KOSCOM_CALLBACK(WPARAM wParam, LPARAM lParam)
 	int size = HIWORD(wParam) - L_ledger;
 	LPCSTR data = (LPCSTR)(lParam + L_ledger);
 
-
-	//int key = _manageKey.at(rkey);
-	//_manageKey.erase(rkey);
-
 	//입력데이터 포맷에러
 	if (strlen(ledg->ecod))
 	{
@@ -6742,7 +6755,7 @@ void CIBKSConnectorCtrl::DEF_KOSCOM_CALLBACK(WPARAM wParam, LPARAM lParam)
 	if (m_bSaveLog)
 		testSaveFile(key, data, size);
 
-	string svcd(ledg->svcd, 8);
+	const string svcd(ledg->svcd, 8);
 
 	// [자체추가] TR5010A 응답: 은행코드만 저장하고 다음 조회 없이 그대로 클라이언트에 전달
 	// TR5010A: store bank code only and fall through to FireOnRecvData (no auto TR5004/TR5007)
@@ -6763,31 +6776,17 @@ void CIBKSConnectorCtrl::DEF_KOSCOM_CALLBACK(WPARAM wParam, LPARAM lParam)
 		const tr5010_rec* item = mod[0].rec;
 		int count = atoi(string(mod[0].out5, 5).data());
 
-		if (count > 0)
-		{
-			json Jbank;
-
-			Jbank["bnkCode"] = makeUTF(item->bnkcode, 3);
-			Jbank["bnkName"] = makeUTF(item->bnkname, 40);
-
-			std::ofstream file("bank.json", std::ios::out | std::ios::trunc);
-			file << Jbank.dump(8) << std::endl;
-			file.close();
-		}
-
 		string bankcode(item->bnkcode, 3);
 		m_typemoney.second = bankcode;
-
 
 		// 같은키로 처리해야 응답을 받을수 있음.
 		if (bankcode.compare("004") == 0)	S_TR5004(key, m_typemoney.first.data());
 		else                                    S_TR5007(key, m_typemoney.first.data());
-
+		// user에게 전달 금지
 		return;
 	}
 	else if (svcd.compare("SDPKT183") == 0 && size > 0)
 	{
-
 		//// 중소기업 은행조회
 		const size_t offset = L_tr5007_mid;
 		const gsl::span out(data, size);	
@@ -6797,25 +6796,33 @@ void CIBKSConnectorCtrl::DEF_KOSCOM_CALLBACK(WPARAM wParam, LPARAM lParam)
 		m_chrat.first  = CString(item->BfXchrat, 11);
 		m_chrat.second = CString(item->Xchrat, 11);
 		m_ctbank       = CString(item->IfMgmtNo, 10);
-	
+	}
+	else if(svcd.compare("COSAQ058") == 0 && size > 0)
+	{
+		// 환율조회....
+		const size_t offset = L_gdxhart_mid;
+		const gsl::span out(data, size);
+		const gsl::span<const struct gdxhart_mod> mod(reinterpret_cast<const struct gdxhart_mod*>(out.subspan(offset).data()), 1);
+		const string chrat = string(mod[0].gdxchrat, 17);
+		const CTime time = CTime::GetCurrentTime();
+		const long tt = atol(time.Format("%Y%m%d"));
 
-		//std::ofstream file("bank1.json", std::ios::out | std::ios::trunc);
-		//json bank500
-		//bank["SysTime"] = makeUTF(item->SysTime, 17);
-		//bank[makeUTF("증권사매도율", 12)] = makeUTF(item->BfXchrat, 11);
-		//bank[makeUTF("증권사매입율", 12)] = makeUTF(item->Xchrat, 11);
-		//bank[makeUTF("기준환율", 8)] = makeUTF(item->BaseXchart, 11);
-		
-		
-		//bank[makeUTF("매입환율", 8)] = makeUTF(item->Pchsxchrat, 11);		// 매수
-		//bank[makeUTF("매도환율", 8)] = makeUTF(item->SellXchrat, 11);		// 매도
-		//bank[makeUTF("중계은행코드", 12)] = makeUTF(item->RlyBnkCode, 3);
-		//bank[makeUTF("중계은행명", 10)] = makeUTF(item->RlyBnkNm, 40);
-		//bank[makeUTF("은행응답코드", 12)] = makeUTF(item->BnkRpsnCode, 4);
-		//bank[makeUTF("은행메시지내용", 14)] = makeUTF(item->BnkMsgCnts, 100);
-
-		//file << bank.dump(8) << std::endl;
-		//file.close();
+		_todaychrat.first = atof(chrat.data());
+		_todaychrat.second = tt;
+		// user에게 전달 금지
+		return;
+	}
+	else if (svcd.compare("COSAT003") == 0 && size > 0)
+	{
+		// 해외주문...
+		// date 날짜로 업데이트
+		const CTime time = CTime::GetCurrentTime();
+		const long tdate = atol(time.Format("%Y%m%d"));
+		if (tdate > _todaychrat.second && !_orderacc.IsEmpty())
+		{
+			getgdxrat(199, _orderacc, "USD");
+			_orderacc.Empty();
+		}
 	}
 
 	FireOnRecvData(key, (long)data, size, bNext, nkey);
@@ -6834,521 +6841,3 @@ void CIBKSConnectorCtrl::DEF_KOSCOM_CALLBACK(WPARAM wParam, LPARAM lParam)
 				
 }
 
-
-bool CIBKSConnectorCtrl::OnDev(long key, string svcd, LPCTSTR data, long size, BOOL bNext, LPCTSTR nkey)
-{
-	if (size <= 0)
-		return false;
-
-	if (key == 154)
-	{
-		// TR5000  외화예수금..
-		std::ofstream file("data.txt", std::ios::out | std::ios::trunc);
-		gsl::span<const char> response(data, size);
-		size_t offset = L_tr5000_mid;
-
-		auto field = [](const char* value, int length)
-		{
-			CString result(value, length);
-			result.Trim();
-			return result;
-		};
-
-		auto readCount = [&response, &offset](int& count)
-		{
-			if (response.size_bytes() - offset < 5)
-				return false;
-			count = atoi(string(response.data() + offset, 5).data());
-			offset += 5;
-			return count >= 0;
-		};
-
-		if (response.size_bytes() < offset)
-		{
-			file << "COSAQ027 응답 길이가 헤더 크기보다 작습니다." << std::endl;
-		}
-		else
-		{
-			int declaredCount = 0;
-			if (!readCount(declaredCount))
-			{
-				file << "COSAQ027 통화별 정산금액 건수를 읽을 수 없습니다." << std::endl;
-			}
-			else
-			{
-				const size_t recordCount = min<size_t>(declaredCount, (response.size_bytes() - offset) / sizeof(tr5000_out1));
-				const auto* records = reinterpret_cast<const tr5000_out1*>(response.data() + offset);
-				file << "해외증권 외화예수금" << std::endl;
-				file << "================================================================" << std::endl;
-				for (size_t ii = 0; ii < recordCount; ++ii)
-				{
-					const auto& item = records[ii];
-					file << "[" << (ii + 1) << "] 통화: " << (LPCSTR)field(item.CrcyCode, sizeof(item.CrcyCode)) << std::endl;
-					file << "    매수정산금: " << (LPCSTR)field(item.FcurrBuyAdjustAmt1, sizeof(item.FcurrBuyAdjustAmt1))
-						<< " / " << (LPCSTR)field(item.FcurrBuyAdjustAmt2, sizeof(item.FcurrBuyAdjustAmt2))
-						<< " / " << (LPCSTR)field(item.FcurrBuyAdjustAmt3, sizeof(item.FcurrBuyAdjustAmt3))
-						<< " / " << (LPCSTR)field(item.FcurrBuyAdjustAmt4, sizeof(item.FcurrBuyAdjustAmt4)) << std::endl;
-					file << "    매도정산금: " << (LPCSTR)field(item.FcurrSellAdjustAmt1, sizeof(item.FcurrSellAdjustAmt1))
-						<< " / " << (LPCSTR)field(item.FcurrSellAdjustAmt2, sizeof(item.FcurrSellAdjustAmt2))
-						<< " / " << (LPCSTR)field(item.FcurrSellAdjustAmt3, sizeof(item.FcurrSellAdjustAmt3))
-						<< " / " << (LPCSTR)field(item.FcurrSellAdjustAmt4, sizeof(item.FcurrSellAdjustAmt4)) << std::endl;
-					file << "    추정예수금: " << (LPCSTR)field(item.PrsmptFcurrDps1, sizeof(item.PrsmptFcurrDps1))
-						<< " / " << (LPCSTR)field(item.PrsmptFcurrDps2, sizeof(item.PrsmptFcurrDps2))
-						<< " / " << (LPCSTR)field(item.PrsmptFcurrDps3, sizeof(item.PrsmptFcurrDps3))
-						<< " / " << (LPCSTR)field(item.PrsmptFcurrDps4, sizeof(item.PrsmptFcurrDps4)) << std::endl;
-					file << "    추정환전가능금: " << (LPCSTR)field(item.PrsmptMxchgAbleAmt1, sizeof(item.PrsmptMxchgAbleAmt1))
-						<< " / " << (LPCSTR)field(item.PrsmptMxchgAbleAmt2, sizeof(item.PrsmptMxchgAbleAmt2))
-						<< " / " << (LPCSTR)field(item.PrsmptMxchgAbleAmt3, sizeof(item.PrsmptMxchgAbleAmt3))
-						<< " / " << (LPCSTR)field(item.PrsmptMxchgAbleAmt4, sizeof(item.PrsmptMxchgAbleAmt4)) << std::endl;
-					file << "----------------------------------------------------------------" << std::endl;
-				}
-				offset += recordCount * sizeof(tr5000_out1);
-				if (recordCount < static_cast<size_t>(declaredCount))
-					file << "정산금액 레코드: " << recordCount << "건 (선언된 건수: " << declaredCount << "건)" << std::endl;
-			}
-
-			int balanceCount = 0;
-			if (readCount(balanceCount))
-			{
-				const size_t recordCount = min<size_t>(balanceCount, (response.size_bytes() - offset) / sizeof(tr5000_out2));
-				const auto* records = reinterpret_cast<const tr5000_out2*>(response.data() + offset);
-				file << "통화별 잔고 (" << balanceCount << "건)" << std::endl;
-				file << "================================================================" << std::endl;
-				for (size_t ii = 0; ii < recordCount; ++ii)
-				{
-					const auto& item = records[ii];
-					file << "[" << (ii + 1) << "] " << (LPCSTR)field(item.CntryNm, sizeof(item.CntryNm))
-						<< " (" << (LPCSTR)field(item.CrcyCode, sizeof(item.CrcyCode)) << ")" << std::endl;
-					file << "    외화예수금 " << (LPCSTR)field(item.FcurrDps, sizeof(item.FcurrDps))
-						<< "  주문가능 " << (LPCSTR)field(item.FcurrOrdAbleAmt, sizeof(item.FcurrOrdAbleAmt))
-						<< "  주문금액 " << (LPCSTR)field(item.FcurrOrdAmt, sizeof(item.FcurrOrdAmt)) << std::endl;
-					file << "    환전가능 " << (LPCSTR)field(item.FcurrMxchgAbleAmt, sizeof(item.FcurrMxchgAbleAmt))
-						<< "  담보금 " << (LPCSTR)field(item.FcurrPldgAmt, sizeof(item.FcurrPldgAmt))
-						<< "  미수금 " << (LPCSTR)field(item.FcurrRcvblAmt, sizeof(item.FcurrRcvblAmt)) << std::endl;
-					file << "----------------------------------------------------------------" << std::endl;
-				}
-				offset += recordCount * sizeof(tr5000_out2);
-			}
-
-			int wonBalanceCount = 0;
-			if (readCount(wonBalanceCount))
-			{
-				const size_t recordCount = min<size_t>(wonBalanceCount, (response.size_bytes() - offset) / sizeof(tr5000_out3));
-				const auto* records = reinterpret_cast<const tr5000_out3*>(response.data() + offset);
-				for (size_t ii = 0; ii < recordCount; ++ii)
-				{
-					const auto& item = records[ii];
-					file << "원화예수금 " << (LPCSTR)field(item.WwonDpsBalAmt, sizeof(item.WwonDpsBalAmt))
-						<< "  출금가능금액 " << (LPCSTR)field(item.MnyoutAbleAmt, sizeof(item.MnyoutAbleAmt))
-						<< "  원화환산거래금액 " << (LPCSTR)field(item.WwonConvTrdAmt, sizeof(item.WwonConvTrdAmt))
-						<< "  매매증거금 " << (LPCSTR)field(item.BnsMgn, sizeof(item.BnsMgn)) << std::endl;
-				}
-			}
-		}
-		file.close();
-	}
-	else if (key == 159)
-	{
-		const size_t recOffset = L_pibogorder_mid;// +L_pibogorder_mod - L_pibogorder_rec;	
-		const pibogorder_mod* pout = reinterpret_cast<const pibogorder_mod*>(data);
-
-		json order;
-		if (size > 1)
-		{
-			std::ofstream file("order.json", std::ios::out | std::ios::trunc);
-
-			order["accn"] = makeUTF(pout->rec->accn, 40);
-			order["codename"] = makeUTF(pout->rec->codename, 40);
-			order["jmno"] = makeUTF(pout->rec->jmno, 10);
-			order["result"] = makeUTF(pout->rec->result, 80);
-			file << order.dump(8) << std::endl;
-
-			file.close();
-		}
-	}
-	else if (svcd.compare("COSAQ208") == 0 && size > 0)
-	{
-		//if (bNext)
-		//	S_TR5003(key, _vParameter[0].data(), _vParameter[1].data(), _vParameter[2].data(), _vParameter[3].data(), _vParameter[4].data(), _vParameter[5].data(),
-		//		_vParameter[6].data(), _vParameter[7].data(), nkey);
-
-		// 해외 거래내역...
-		std::ofstream file("data.txt", std::ios::out | std::ios::trunc);
-		gsl::span<const char> response(data, size);
-		const size_t recordsOffset = L_tr5003_mid + L_tr5003_mod - L_tr5003_rec;
-		if (response.size_bytes() >= recordsOffset)
-		{
-			const auto module = response.subspan(L_tr5003_mid);
-			const auto* pmod = reinterpret_cast<const tr5003_mod*>(module.data());
-			const int count = atoi(string(pmod->out, 5).data());
-
-			file << "해외 거래내역 (" << count << "건)" << std::endl;
-			file << "================================================================" << std::endl;
-
-			const auto recordData = response.subspan(recordsOffset);
-			const gsl::span<const tr5003_rec> records(
-				reinterpret_cast<const tr5003_rec*>(recordData.data()),
-				recordData.size_bytes() / sizeof(tr5003_rec));
-			const size_t recordCount = count > 0 ? min<size_t>(count, records.size()) : 0;
-
-			for (size_t ii = 0; ii < recordCount; ii++)
-			{
-				const auto& item = records[ii];
-				auto field = [](const char* value, int length)
-				{
-					CString result(value, length);
-					result.Trim();
-					return result;
-				};
-
-				file << "[" << (ii + 1) << "] "
-					<< "거래일 " << (LPCSTR)field(item.TrdDt, sizeof(item.TrdDt))
-					<< "  거래번호 " << (LPCSTR)field(item.TrdNo, sizeof(item.TrdNo))
-					<< " 주문일" << (LPCSTR)field(item.OrdDt, sizeof(item.OrdDt))
-					<< "  주문번호 " << (LPCSTR)field(item.OrdNo, sizeof(item.OrdNo)) << std::endl;
-				file << "    종목: " << (LPCSTR)field(item.IsuNm, sizeof(item.IsuNm))
-					<< " (" << (LPCSTR)field(item.ShtnIsuNo, sizeof(item.ShtnIsuNo)) << ")"
-					<< "  시장: " << (LPCSTR)field(item.MktNm, sizeof(item.MktNm))
-					<< "  통화: " << (LPCSTR)field(item.CrcyCode, sizeof(item.CrcyCode)) << std::endl;
-				file << "    거래: 외화 " << (LPCSTR)field(item.FcurrAmt, sizeof(item.FcurrAmt))
-					<< "  원화 " << (LPCSTR)field(item.WonAmt, sizeof(item.WonAmt))
-					<< "  수량 " << (LPCSTR)field(item.Position, sizeof(item.Position))
-					<< "  단가 " << (LPCSTR)field(item.Uprc, sizeof(item.Uprc))
-					<< "  환율 " << (LPCSTR)field(item.TrdXchrat, sizeof(item.TrdXchrat)) << std::endl;
-				file << "    잔고: 외화 " << (LPCSTR)field(item.FcurrDpsBaAmt, sizeof(item.FcurrDpsBaAmt))
-					<< "  원화 " << (LPCSTR)field(item.WwonDpsBalAmt, sizeof(item.WwonDpsBalAmt))
-					<< "  유가증권 " << (LPCSTR)field(item.SecRbalQty, sizeof(item.SecRbalQty)) << std::endl;
-				file << "    수수료/세금: 국내 " << (LPCSTR)field(item.DomCmsnAmt, sizeof(item.DomCmsnAmt))
-					<< "  국외 " << (LPCSTR)field(item.AbrdFcurrCmsnAmt, sizeof(item.AbrdFcurrCmsnAmt))
-					<< "  소득세 " << (LPCSTR)field(item.Ictax, sizeof(item.Ictax))
-					<< "  거래세 " << (LPCSTR)field(item.Trtax, sizeof(item.Trtax)) << std::endl;
-				file << "    적요: " << (LPCSTR)field(item.SmryNm, sizeof(item.SmryNm))
-					<< "  매체: " << (LPCSTR)field(item.MdaCodeNm, sizeof(item.MdaCodeNm))
-					<< " 국가코드 " << (LPCSTR)field(item.CntryCode, sizeof(item.CntryCode))
-					<< "  처리시각: " << (LPCSTR)field(item.TrxTime, sizeof(item.TrxTime)) << std::endl;
-				file << "----------------------------------------------------------------" << std::endl;
-
-			}
-
-			if (recordCount < static_cast<size_t>(count))
-				file << "응답에 포함된 레코드: " << recordCount << "건 (선언된 건수: " << count << "건)" << std::endl;
-
-		}
-		file.close();
-	}
-	else if (svcd.compare("COSAQ005") == 0 && size > 0)
-	{
-		// TR5002 해외시장 주문체결내역...
-		//if (bNext)
-		//	S_TR5002(key, _vParameter[0].data(), _vParameter[1].data(), _vParameter[2].data(), _vParameter[3].data(), _vParameter[4].data(), _vParameter[5].data(),
-		//		_vParameter[6].data(), _vParameter[7].data(), _vParameter[7].data(), 1, nkey);
-		json result;
-
-		if (PathFileExists("data.json"))
-		{
-			CFile jFile("data.json", CFile::modeRead | CFile::typeBinary);
-			CString sBuffer;
-			UINT len = jFile.GetLength();
-			sBuffer.Format("파일길이 [%d]", len);
-
-			jFile.Read(sBuffer.GetBuffer(len), len);
-			sBuffer.ReleaseBuffer();
-			jFile.Close();
-			result = json::parse(sBuffer.GetString());
-		}
-
-		std::ofstream file("data.json", std::ios::out | std::ios::trunc);
-		gsl::span<const char> response(data, size);
-		result["transaction"] = "TR5002";
-
-		const size_t recordsOffset = L_tr5002_mid + L_tr5002_mod - L_tr5002_rec;
-
-		if (response.size_bytes() >= recordsOffset)
-		{
-			const auto module = response.subspan(L_tr5002_mid);
-			const auto* pmod = reinterpret_cast<const tr5002_mod*>(module.data());
-			const int count = atoi(string(pmod->count, sizeof(pmod->count)).data());
-			const auto recordData = response.subspan(recordsOffset);
-			const gsl::span<const tr5002_rec> records(reinterpret_cast<const tr5002_rec*>(recordData.data()), recordData.size_bytes() / sizeof(tr5002_rec));
-			const size_t recordCount = count > 0 ? min<size_t>(count, records.size()) : 0;
-
-			CString ss;
-			int ct = 0;
-			if (result.contains("recordCount"))
-				ct = result["recordCount"].get<int>();
-			result["recordCount"] = count + ct;
-
-			if (!result.contains("records"))
-				result["records"] = json::array();
-
-			for (size_t ii = 0; ii < recordCount; ++ii)
-			{
-				const auto& item = records[ii];
-
-				json record;
-
-				record["orderDate"] = makeUTF(item.OrdDt, sizeof(item.OrdDt));
-				record["orderNumber"] = makeUTF(item.OrdNo, sizeof(item.OrdNo));
-				record["originalOrderNumber"] = makeUTF(item.OrgOrdNo, sizeof(item.OrgOrdNo));
-				record["securityName"] = makeUTF(item.HangulsuNm80, sizeof(item.HangulsuNm80));
-				record["securityCode"] = makeUTF(item.ShtnIsuNo, sizeof(item.ShtnIsuNo));
-				record["market"] = makeUTF(item.MktNm, sizeof(item.MktNm));
-				record["currency"] = makeUTF(item.CrcyCode, sizeof(item.CrcyCode));
-				record["orderType"] = makeUTF(item.OrdPtnNm, sizeof(item.OrdPtnNm));
-				record["orderPriceType"] = makeUTF(item.OrdprcPtnNm, sizeof(item.OrdprcPtnNm));
-				record["orderQuantity"] = makeUTF(item.OrdQty, sizeof(item.OrdQty));
-				record["orderPrice"] = makeUTF(item.OvrsOrdPrc, sizeof(item.OvrsOrdPrc));
-				record["executionDate"] = makeUTF(item.ExecDt, sizeof(item.ExecDt));
-				record["executionTime"] = makeUTF(item.ExecTime, sizeof(item.ExecTime));
-				record[makeUTF("체결수량", 8)] = makeUTF(item.ExecQty, sizeof(item.ExecQty));
-				record["totalExecutionQuantity"] = makeUTF(item.TotExecQty, sizeof(item.TotExecQty));
-				record["executionPrice"] = makeUTF(item.OvrsExecPrc, sizeof(item.OvrsExecPrc));
-				record["unfilledQuantity"] = makeUTF(item.UnercQty, sizeof(item.UnercQty));
-				record["modifiableCancelableQuantity"] = makeUTF(item.MrcAbleQty, sizeof(item.MrcAbleQty));
-				record["orderTime"] = makeUTF(item.OrdTime, sizeof(item.OrdTime));
-				record["orderChannel"] = makeUTF(item.CommdaNm, sizeof(item.CommdaNm));
-				record["rejectReason"] = makeUTF(item.RjtRsn, sizeof(item.RjtRsn));
-				record[makeUTF("미체결수량", 10)] = makeUTF(item.UnercQty, 16);
-				record[makeUTF("주문처리유형명", 50)] = makeUTF(item.OrdTxPtnNm, 50);
-				result["records"].push_back(record);
-			}
-		}
-		else
-		{
-			result["error"] = "COSAQ005 response is shorter than its header.";
-		}
-
-		file << result.dump(2) << std::endl;
-		file.close();
-	}
-	else if (svcd.compare("COSAQ003") == 0 && size > 0)
-	{
-		//if (bNext)
-		//	S_TR5001(key, _vParameter[0].data(), _vParameter[1].data(), _vParameter[2].data(), _vParameter[3].data(), _vParameter[4].data(), nkey);
-
-		// TR5001 해외잔고...
-		std::ofstream file("data.txt", std::ios::out | (bNext ? std::ios::app : std::ios::trunc));
-		gsl::span<const char> response(data, size);
-		const size_t recordsOffset = L_tr5001_mid + L_tr5001_mod - L_tr5001_out;
-
-		if (response.size_bytes() >= recordsOffset)
-		{
-			const auto module = response.subspan(L_tr5001_mid);
-			const auto* pmod = reinterpret_cast<const tr5001_mod*>(module.data());
-			const int count = atoi(string(pmod->Out, sizeof(pmod->Out)).data());
-			const auto recordData = response.subspan(recordsOffset);
-			const gsl::span<const tr5001_out> records(
-				reinterpret_cast<const tr5001_out*>(recordData.data()),
-				recordData.size_bytes() / sizeof(tr5001_out));
-			const size_t recordCount = count > 0 ? min<size_t>(count, records.size()) : 0;
-
-			file << "해외주식 잔고내역 (" << count << "건)" << std::endl;
-			file << "================================================================" << std::endl;
-			for (size_t ii = 0; ii < recordCount; ++ii)
-			{
-				const auto& item = records[ii];
-				auto field = [](const char* value, int length)
-				{
-					CString result(value, length);
-					result.Trim();
-					return result;
-				};
-
-				file << "[" << (ii + 1) << "] "
-					<< (LPCSTR)field(item.HangulsuNm80, sizeof(item.HangulsuNm80))
-					<< " (" << (LPCSTR)field(item.ShtnIsuNo, sizeof(item.ShtnIsuNo)) << ")"
-					<< "  통화: " << (LPCSTR)field(item.HanglCrcyNm, sizeof(item.HanglCrcyNm)) << std::endl;
-				file << "    보유수량 " << (LPCSTR)field(item.HldQty, sizeof(item.HldQty))
-					<< "  매도가능 " << (LPCSTR)field(item.SellAbleQty, sizeof(item.SellAbleQty))
-					<< "  매입단가 " << (LPCSTR)field(item.FcurrBookPrc, sizeof(item.FcurrBookPrc))
-					<< "  현재가 " << (LPCSTR)field(item.NowMprc, sizeof(item.NowMprc)) << std::endl;
-				file << "    외화: 장부금액 " << (LPCSTR)field(item.FcurrBookAmt, sizeof(item.FcurrBookAmt))
-					<< "  평가금액 " << (LPCSTR)field(item.FcurrEvalAmt, sizeof(item.FcurrEvalAmt))
-					<< "  평가손익 " << (LPCSTR)field(item.FcurrEvalPflt, sizeof(item.FcurrEvalPflt)) << std::endl;
-				file << "    원화: 평가금액 " << (LPCSTR)field(item.WonEvalAmt, sizeof(item.WonEvalAmt))
-					<< "  평가손익 " << (LPCSTR)field(item.WonEvalLoss, sizeof(item.WonEvalLoss))
-					<< "  수익률 " << (LPCSTR)field(item.ErnRat, sizeof(item.ErnRat)) << std::endl;
-				file << "    주문: 매도 " << (LPCSTR)field(item.SellOrdQty, sizeof(item.SellOrdQty))
-					<< "  매수체결 " << (LPCSTR)field(item.BuyExecQty, sizeof(item.BuyExecQty))
-					<< "  매도체결 " << (LPCSTR)field(item.SellExecQty, sizeof(item.SellExecQty))
-					<< "  기준환율 " << (LPCSTR)field(item.BaseXchrat, sizeof(item.BaseXchrat)) << std::endl;
-				file << "----------------------------------------------------------------" << std::endl;
-
-			}
-
-			if (recordCount < static_cast<size_t>(count))
-				file << "응답에 포함된 레코드: " << recordCount << "건 (선언된 건수: " << count << "건)" << std::endl;
-
-		}
-		else
-		{
-			file << "COSAQ003 응답 길이가 헤더 크기보다 작습니다." << std::endl;
-		}
-		file.close();
-	}
-	else if (svcd.compare("SDPBQ005") == 0 && size > 0)
-	{ // TR2002 주식 거래내역...
-		//if (bNext)
-		//	S_TR2002(key, _vParameter[0].data(), _vParameter[1].data(), _vParameter[2].data(), _vParameter[3].data(), _vParameter[4].data(), _vParameter[5].data(), nkey);
-
-		std::ofstream file("data.txt", std::ios::out | std::ios::app);
-		gsl::span<const char> response(data, size);
-		const size_t recordsOffset = L_tr2002_mid + L_tr2002_mod - L_tr2002_rec;
-
-		if (response.size_bytes() >= recordsOffset)
-		{
-			const auto* pmid = reinterpret_cast<const tr2002_mid*>(response.data());
-			const auto* pmod = reinterpret_cast<const tr2002_mod*>(response.data() + L_tr2002_mid);
-			const int count = atoi(string(pmod->Out2, sizeof(pmod->Out2)).data());
-			const auto recordData = response.subspan(recordsOffset);
-			const gsl::span<const tr2002_rec> records(reinterpret_cast<const tr2002_rec*>(recordData.data()), recordData.size_bytes() / sizeof(tr2002_rec));
-			const size_t recordCount = count > 0 ? min<size_t>(count, records.size()) : 0;
-			auto field = [](const char* value, int length)
-			{
-				CString result(value, length);
-				result.Trim();
-				return result;
-			};
-
-			file << "주식 거래내역 (" << count << "건)" << std::endl;
-			file << "조회기간: " << (LPCSTR)field(pmid->QrySrtDt, sizeof(pmid->QrySrtDt))
-				<< " ~ " << (LPCSTR)field(pmid->QryEndDt, sizeof(pmid->QryEndDt)) << std::endl;
-			file << "================================================================" << std::endl;
-			file << "매도: 수량 " << (LPCSTR)field(pmod->out1.SellQty, sizeof(pmod->out1.SellQty))
-				<< "  금액 " << (LPCSTR)field(pmod->out1.SellAmt, sizeof(pmod->out1.SellAmt))
-				<< "  수수료 " << (LPCSTR)field(pmod->out1.SellCmsnAmt, sizeof(pmod->out1.SellCmsnAmt)) << std::endl;
-			file << "매수: 수량 " << (LPCSTR)field(pmod->out1.BuyQty, sizeof(pmod->out1.BuyQty))
-				<< "  금액 " << (LPCSTR)field(pmod->out1.BuyAmt, sizeof(pmod->out1.BuyAmt))
-				<< "  수수료 " << (LPCSTR)field(pmod->out1.BuyCmsnAmt, sizeof(pmod->out1.BuyCmsnAmt)) << std::endl;
-			file << "합계: 수량 " << (LPCSTR)field(pmod->out1.SumQty, sizeof(pmod->out1.SumQty))
-				<< "  금액 " << (LPCSTR)field(pmod->out1.SumAmt, sizeof(pmod->out1.SumAmt))
-				<< "  수수료 " << (LPCSTR)field(pmod->out1.CmsnAmtSum, sizeof(pmod->out1.CmsnAmtSum))
-				<< "  세금 " << (LPCSTR)field(pmod->out1.EvrTax, sizeof(pmod->out1.EvrTax)) << std::endl;
-			file << "================================================================" << std::endl;
-
-
-			for (size_t ii = 0; ii < recordCount; ++ii)
-			{
-				const auto& item = records[ii];
-				file << "[" << (ii + 1) << "] " << (LPCSTR)field(item.TrdDate, sizeof(item.TrdDate))
-					<< "  " << (LPCSTR)field(item.IsuNm, sizeof(item.IsuNm))
-					<< "  거래번호 " << (LPCSTR)field(item.TrdNo, sizeof(item.TrdNo)) << std::endl;
-				file << "    적요: " << (LPCSTR)field(item.SmryNm, sizeof(item.SmryNm))
-					<< "  수량 " << (LPCSTR)field(item.TrdQty, sizeof(item.TrdQty))
-					<< "  단가 " << (LPCSTR)field(item.TrdUprc, sizeof(item.TrdUprc))
-					<< "  거래금액 " << (LPCSTR)field(item.TrdAmt, sizeof(item.TrdAmt)) << std::endl;
-				file << "    수수료 " << (LPCSTR)field(item.CmsnAmt, sizeof(item.CmsnAmt))
-					<< "  세금 " << (LPCSTR)field(item.TaxSumAmt, sizeof(item.TaxSumAmt))
-					<< "  정산금액 " << (LPCSTR)field(item.AdjstAmt, sizeof(item.AdjstAmt))
-					<< "  예수금잔액 " << (LPCSTR)field(item.DpsCrbalAmt, sizeof(item.DpsCrbalAmt)) << std::endl;
-				file << "    유가증권잔량 " << (LPCSTR)field(item.SecCrbalQty, sizeof(item.SecCrbalQty))
-					<< "  처리시각 " << (LPCSTR)field(item.TrxTime, sizeof(item.TrxTime)) << std::endl;
-				file << "----------------------------------------------------------------" << std::endl;
-			}
-
-			if (recordCount < static_cast<size_t>(count))
-				file << "응답에 포함된 레코드: " << recordCount << "건 (선언된 건수: " << count << "건)" << std::endl;
-		}
-		else
-		{
-			file << "TR2002 응답 길이가 헤더 크기보다 작습니다." << std::endl;
-		}
-		file.close();
-
-	}
-	else if (svcd.compare("SDPDQ099") == 0 && size > 0)
-	{
-		std::ofstream file("bankq.json", std::ios::out | std::ios::trunc);
-
-		const size_t offset = L_tr5005_mid;
-		const tr5005_mod* pmod = reinterpret_cast<const tr5005_mod*>(data + offset);
-		const size_t count = atoi(string(pmod->count, 5).data());
-
-		if (count > 0)
-		{
-			json data;
-
-			data[makeUTF("적용환율", 8)] = makeUTF(pmod->rec->AppXchrat, 15);
-			data[makeUTF("우대율", 6)] = makeUTF(pmod->rec->PrvlgRat, 15);
-
-			file << data.dump(8) << std::endl;
-		}
-		file.close();
-
-	}
-	else if (svcd.compare("COSAT002") == 0)
-	{
-		const pibogorder_mod* pmod = reinterpret_cast<const pibogorder_mod*>(data);
-		const size_t count = atoi(string(pmod->cnt, 4).data());
-
-		if (count > 0)
-		{
-			const auto item = pmod->rec;
-			std::ofstream file("order.json", std::ios::out | std::ios::trunc);
-			json jorder;
-
-			jorder[makeUTF("계좌명", 6)] = makeUTF(item->accn, 40);
-			jorder[makeUTF("종목명", 6)] = makeUTF(item->codename, 40);
-			jorder[makeUTF("주문번호", 8)] = makeUTF(item->jmno, 10);
-			jorder[makeUTF("메세지", 6)] = makeUTF(item->result, 80);
-
-			file << jorder.dump(8) << std::endl;
-			file.close();
-		}
-	}
-	else if (svcd.compare("SDPDT080") == 0 && size > 0)
-	{
-		const size_t Offset = L_tr5006_mid;
-		const tr5006_mid* pmid = reinterpret_cast<const tr5006_mid*>(data);
-		const tr5006_mod* pmod = reinterpret_cast<const tr5006_mod*>(data + Offset);
-		const tr5006_rec* item = pmod->rec;
-
-		json chxx;
-
-		chxx[makeUTF("환전금액in", 10)] = makeUTF(pmid->MxchgAmt, 18);
-		chxx[makeUTF("외화금액in", 10)] = makeUTF(pmid->FcurrAmt, 17);
-		chxx[makeUTF("원화금액in", 10)] = makeUTF(pmid->WonAmt, 16);
-		chxx[makeUTF("우대율in", 8)]    = makeUTF(pmid->PrvlgRatAppTp, 1);
-		chxx[makeUTF("적용환율", 8)] = makeUTF(item->AppXcharat, 15);
-		chxx[makeUTF("외화금액", 8)] = makeUTF(item->FcurrAmt, 17);
-		chxx[makeUTF("외화잔고", 8)] = makeUTF(item->FcurrCbalAmt,17);
-		chxx[makeUTF("외화환전", 8)] = makeUTF(item->FcurrFbalAmt, 17);
-		chxx[makeUTF("거래번호", 8)] = makeUTF(item->TrdNo, 10);
-		chxx[makeUTF("원화금액", 8)] = makeUTF(item->WonAmt, 16);
-		chxx[makeUTF("원화환전", 8)] = makeUTF(item->WonFbalAmt, 16);
-		chxx[makeUTF("원화잔고", 8)] = makeUTF(item->WwonCbalAmt, 16);
-	
-		std::ofstream file("change.json", std::ios::out | std::ios::trunc);
-		file << chxx.dump(8) << std::endl;
-		file.close();
-	}
-	else if (svcd.compare("COSCQ002") == 0 && size > 0)
-	{
-		std::ofstream file("rdata.txt", std::ios::out | std::ios::trunc);
-		gsl::span<const char> response(data, size);	
-		gsl::span<const struct tr5011_mid> mid(reinterpret_cast<const struct tr5011_mid*>(response.subspan(0).data()), 1);	
-		size_t offset = L_tr5011_mid;
-		gsl::span<const struct tr5011_rec> rec(reinterpret_cast<const struct tr5011_rec*>(response.subspan(offset).data()), 1);		
-		CString sCount(rec.data()->out, 5);		
-		int size = atoi(sCount);
-		if (size > 0)
-		{	
-			gsl::span<struct tr5011_mod> mod((struct tr5011_mod*)(response.subspan(offset + 5).data()), size);	
-			for (const auto& item : mod)
-			{
-				file << std::string(item.AcnoNo, 20).data() << std::endl;
-				file << std::string(mod.data()->AcntNm, 40).data() << std::endl;
-				file << std::string(mod.data()->bnstpnm, 10).data() << std::endl;
-				file << std::string(mod.data()->IsuNo, 20).data() << std::endl;
-				file << std::string(mod.data()->Hname, 100).data() << std::endl;
-				file << std::string(mod.data()->ExecQty, 16).data() << std::endl;
-				file << std::string(mod.data()->avrPrice, 18).data() << std::endl;
-				file << std::string(mod.data()->cms,17).data() << std::endl;
-				file << std::string(mod.data()->trade, 17).data() << std::endl;
-				file << std::string(mod.data()->trtax, 17).data() << std::endl;
-			}
-		}
-		file.close();
-	}
-	return true;
-}

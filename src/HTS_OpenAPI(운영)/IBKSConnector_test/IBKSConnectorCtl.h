@@ -11,11 +11,15 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <mutex>
+#include <thread>
 
 using namespace std;
 
 #include <set>
 #include <functional>
+#include <locale>
+#include <sstream>
 
 #define	DELWND(w)	{ if(w) {w->DestroyWindow(); delete w; w=NULL;} }
 
@@ -211,6 +215,25 @@ struct LIMIT_ITEM
 int pibosodr_hogb[] = { 0, 3, 5, 6, 7, 10, 13, 16, 20, 23, 26, 81, 61 };
 int pibofodr_hogb[] = { 0, 3, 5, 6, 10, 20 };
 
+
+struct comma_separator : std::numpunct<char>
+{
+	char do_decimal_point() const override { return '.'; }
+	char do_thousands_sep() const override { return ','; }
+	string_type do_grouping() const override{ return "\3"; }
+};
+
+
+template<typename T>
+std::string format_with_comma(T value)
+{
+	std::stringstream ss;
+	ss.imbue(std::locale(ss.getloc(), new comma_separator()));
+	ss << value;
+	return ss.str();
+}
+
+
 class CChaser;	// AxisChaser 프로토콜 트레이스 릴레이용 숨김 자식윈도우, 정의는 .cpp에 있음
 
 class CIBKSConnectorCtrl : public COleControl
@@ -221,7 +244,7 @@ class CIBKSConnectorCtrl : public COleControl
 
 	enum userType { normal = 0, foreign, admin};	// 일반고객, 해외, 관리자
 
-	userType _type = foreign;
+	userType _type = normal;
 
 public:
 	CIBKSConnectorCtrl();
@@ -347,7 +370,7 @@ protected:
 	afx_msg BOOL FNRESERVEORDER(long key, LPCTSTR odgb, LPCTSTR mmgb, LPCTSTR ogno, LPCTSTR accn, LPCTSTR pswd, LPCTSTR mkgb, LPCTSTR code, LPCTSTR jqty,
 		                              LPCTSTR jprc, LPCTSTR hogb, LPCTSTR rsvgubn, LPCTSTR curCode, LPCTSTR rsvlpdt, LPCTSTR rsvStDt, LPCTSTR rsvEndDt, LPCTSTR rsvOrdNo);
 
-	afx_msg BSTR getBankCode();
+	afx_msg BSTR getBankCode();	
 	//}}AFX_DISPATCH
 	DECLARE_DISPATCH_MAP()
 
@@ -574,23 +597,23 @@ protected:
 	char* GetSHA256(char* data, int dataL,HMODULE hModule,bool isfile);
 
 	
-	unordered_map<int, int>   _manageKey;
+	std::unordered_map<string, string> _accInfo;	// 계좌 법인 - 1   개인 - 0
 	std::pair<string, string> m_typemoney;
-	std::pair<string, string> m_chrat;
+	std::pair<string, string>  m_chrat;	// 환전환율
+	std::pair<double, long>   _todaychrat;	// 주문당일환율
+	CString	_orderacc;			// 주문계좌...
 	CString		m_ctbank;
 	std::set<int>	m_relayKeys;	// keys requested via TR5010A - relay SDPWQ002 response as-is
 	
-	
-	
-//	vector<string> _vParameter;
-	
-
-
 
 protected:
 	void OnSetClientSite();
 
 public:
+
+
+	BOOL getgdxrat(long key, CString acc, CString curcode);
+
 	// default callback function
 	void DEF_CALLBACK(WPARAM wParam, LPARAM lParam);
 	void DEF_KOSCOM_CALLBACK(WPARAM wParam, LPARAM lParam);
@@ -714,10 +737,13 @@ public:
 	BOOL S_TR5006(long key, LPCTSTR acc, LPCTSTR pswd, LPCTSTR tgrtcrcycode, LPCTSTR mxchgcrcycode, LPCTSTR appxcharat, LPCTSTR prvlgrat, LPCTSTR sInput, LPCTSTR mmgb, LPCTSTR type, LPCTSTR trxtp, LPCTSTR rtWon, LPCTSTR rtTarget);
 	BOOL S_TR5005(long key, LPCTSTR acc, LPCTSTR pswd, LPCTSTR gdxchrat, LPCTSTR mxchgptncode);
 
-	bool OnDev(long key, string svcd, LPCTSTR data, long size, BOOL bNext, LPCTSTR nkey);
 
 	CString m_slog;
+
 };
+
+
+
 
 //{{AFX_INSERT_LOCATION}}
 // Microsoft Visual C++ will insert additional declarations immediately before the previous line.

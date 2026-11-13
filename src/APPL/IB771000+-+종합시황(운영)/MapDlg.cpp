@@ -672,7 +672,7 @@ void CMapDlg::SaveNodeSelect()
 	selectData.TrimRight(":");
 
 	WritePrivateProfileString( _T("SELITEM"), _T("ITEMS"), selectData,m_sFile);
-	WritePrivateProfileString( _T("SELITEM"), _T("VERSION"), "4",m_sFile);    //modi 뉴스웨이 추가 버전업 3->4
+	WritePrivateProfileString( _T("SELITEM"), _T("VERSION"), "5",m_sFile);    //modi 브릿지뉴스 추가 버전업 4->5
 }
 
 void CMapDlg::parsingNewsCount( char* inBuf, int len )
@@ -1639,6 +1639,11 @@ void CMapDlg::OnTimer(UINT nIDEvent)
 			std::wstring wnewsurl;
 			wnewsurl.assign(message.begin(), message.end());
 			browserEdge->Init(wnewsurl);
+		}
+		else
+		{
+			m_slog.Format("-[edge][%s]<%d> TM_HTMLFILE retry: file still not found [%s]", __FUNCTION__, __LINE__, m_szFileName);
+			OutputDebugString(m_slog);
 		}
 	}
 	else if (nIDEvent == TM_EDGECONTROLRESIZE)
@@ -2926,6 +2931,12 @@ void CMapDlg::SetCountNewsCtrl( BOOL bShow )
 
 void CMapDlg::OnButtonPrint() 
 {
+	if (m_bUsingEdgeBrowser)
+	{
+		if (browserEdge)
+			browserEdge->ShowPrintUI(true);    // system print dialog
+		return;
+	}
 	//프린터 셋업 다이얼로그 띄워서 프린팅    
 // 	CPrintDialog pd(TRUE);
 // 	LPDEVMODE k;
@@ -3068,6 +3079,12 @@ cleanup:
 
 void CMapDlg::OnButtonPreview() 
 {
+	if (m_bUsingEdgeBrowser)
+	{
+		if (browserEdge)
+			browserEdge->ShowPrintUI(false);   // Edge print preview dialog
+		return;
+	}
 	// TODO: Add your control notification handler code here
 	CString	date;
 //	GetAxVariant(guideCC ,"인쇄중입니다." );
@@ -3555,11 +3572,12 @@ void CMapDlg::InitTree()
 
 	CString version = GetConfigFileString(m_sFile,_T("SELITEM"),_T("VERSION"),_T(""));
 
-	if(version == "2" || version == "3")  //test
+
+	if (atoi(version) >= 2)  //modi load history for all versions (4 was missing)
 	{
 		GetSelectHistory();
 	}
-	
+
 	m_TreeWnd.SetParent(this);
 	m_TreeWnd.SetBkColor(GetAxColor(181));
 
@@ -3670,6 +3688,14 @@ OutputDebugString(slog);
 						m_TreeWnd.m_selItem.Add(hItem);
 						SaveNodeSelect();
 					}
+
+					if (sTitle == "브릿지경제" && atoi(version) <= 4)  //modi bridge news
+					{
+						m_TreeWnd.SetCheck(hItem, TRUE);
+						m_TreeWnd.m_selItem.Add(hItem);
+						SaveNodeSelect();
+					}
+
 				}
 			}
 		}
@@ -3866,7 +3892,7 @@ void CMapDlg::RequestCountList(BOOL bNext)
 	CString strCODE = "999";
 	CString strPAGE = "0000";
   //CString strGUBN = "111111011111";
-	CString strGUBN = "11111101111111110000"; //c
+	CString strGUBN = "11111101111111111100"; //c 뒤에 8바이트 안씀   //20261109 브릿지경제추가  11111101111111110000->11111101111111111100
 	CString strSORT = "2";
 
 	switch( m_nTrkey )
@@ -3911,7 +3937,7 @@ void CMapDlg::GetGugnAndSubgMask( char* szGubn, char* szSubg )
 	if( m_TreeWnd.GetParentItem( select_hItem ) == NULL )
 	{
 //		memcpy( szGubn, "1111110111111", 13 ); 
-		memcpy( szGubn, "11111101111111110000", 20 );  //c
+		memcpy( szGubn, "11111101111111111100", 20 );  //20261109 브릿지경제추가  11111101111111110000->11111101111111111100 
 		memcpy( szSubg, "999", 3 );
 
 		// 전체 뉴스 config 체크 
@@ -3951,7 +3977,7 @@ void CMapDlg::GetGugnAndSubgMask( char* szGubn, char* szSubg )
 	}
 	else if(m_TreeWnd.GetItemText(select_hItem) != "공시" && m_TreeWnd.GetParentItem(m_TreeWnd.GetParentItem( select_hItem )) == NULL)
 	{
-		memcpy( szGubn, "10111101111111110000", 20 );  //c
+		memcpy( szGubn, "10111101111111111100", 20 );  //20261109 브릿지경제추가  11111101111111110000->11111101111111111100
 		memcpy( szSubg, "999", 3 );
 
 		// 전체 뉴스 config 체크 
@@ -4021,7 +4047,7 @@ void CMapDlg::GetCateGugnAndSubgMask( char* szGubn, char* szSubg )
 	if( m_TreeWnd.GetParentItem( select_hItem ) == NULL )
 	{
 //		memcpy( szGubn, "1111110111111", 13 );
-		memcpy( szGubn, "11111101111111110000", 20 );  
+		memcpy( szGubn, "11111101111111111100", 20 );   //20261109 브릿지경제추가  11111101111111110000->11111101111111111100
 		memcpy( szSubg, "999", 3 );
 
 		// 전체 뉴스 config 체크 
@@ -4031,7 +4057,7 @@ void CMapDlg::GetCateGugnAndSubgMask( char* szGubn, char* szSubg )
 	else if(m_TreeWnd.GetParentItem(m_TreeWnd.GetParentItem( select_hItem )) == NULL)
 	{
 //		memcpy( szGubn, "1011110111111", 13 );
-		memcpy( szGubn, "11111101111111110000", 20 );   //c
+		memcpy( szGubn, "11111101111111111100", 20 );  //20261109 브릿지경제추가  11111101111111110000->11111101111111111100
 		memcpy( szSubg, "999", 3 );
 
 		// 전체 뉴스 config 체크 
@@ -4182,8 +4208,8 @@ void CMapDlg::RequestTitleList( BOOL bKeyword, BOOL bNext )
 	}
 
 	//req.sNewGubn[0] = '1'; 
-//	if(CString(req.gubn, 13) == "0000000000000" || CString(req.gubn, 13) == "1111110111111")
-	if(CString(req.gubn, 20) == "00000000000000000000" || CString(req.gubn, 20) == "11111101111111110000")  //c
+	//20261109 브릿지경제추가  11111101111111110000->11111101111111111100
+	if(CString(req.gubn, 20) == "00000000000000000000" || CString(req.gubn, 20) == "11111101111111111100") 
 		memcpy(req.sNewGubn, "10000000000000000000", 20);
 
 // 	OutputDebugString("[KSJ]szcode[" + m_szCode +"] req.cod2[" + req.cod2 + "]");
@@ -6309,9 +6335,15 @@ void CMapDlg::selectTab(int nIndex)
 						}
 						else
 						{
-							OutputDebugString("[edge] no file timer");
+							OutputDebugString("[edge] no file timer"); 
 							SetTimer(TM_HTMLFILE, 2000, nullptr);
 						}
+					}
+					else
+					{
+						m_slog.Format("-[edge][%s]<%d> skip: browserEdge=%p visible=%d", __FUNCTION__, __LINE__, browserEdge.get(),
+							browserEdge ? browserEdge->IsWindowVisible() : -1);
+						OutputDebugString(m_slog);
 					}
 				}
 				else
