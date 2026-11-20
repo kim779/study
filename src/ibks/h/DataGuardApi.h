@@ -3,11 +3,12 @@
 // DG_API is append-only: never insert or reorder members.
 #pragma once
 
-#define DG_VERSION	1
+#define DG_VERSION	2
 
 // session data kinds (append-only)
 #define DG_ACCOUNT	1
 #define DG_USERID	2
+#define DG_JUNO		3
 
 // Check() result
 #define DG_PASS		0		// ok, or service not protected
@@ -28,6 +29,7 @@ struct DG_API {
 	// data: body including ledger, len: body length
 	int	(*Check)(const char* svc, const char* data, int len, int dir);
 	// append new functions here only
+	void	(*SessionClearKind)(int kind);
 };
 
 typedef const DG_API* (*DG_GETAPI)(int version);

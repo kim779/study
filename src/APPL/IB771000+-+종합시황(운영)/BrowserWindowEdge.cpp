@@ -26,8 +26,15 @@ bool BrowserWindowEdge::InitWebView()
 	{
 		CString s; s.Format("-[edge][InitWebView]<%d> %p InitWebView: env NOT ready -> retry=%d", __LINE__, this, m_nEnvRetry);  // suspect #1
 		OutputDebugString(s);
-		if (m_nEnvRetry++ < 50)          // retry every 100ms, up to ~5 sec
+		if (!m_bEnvCreating)             // env creation already finished with failure
+		{
+			NotifyFail(1);
+			return false;
+		}
+		if (m_nEnvRetry++ < 50)          // still creating: retry every 100ms, up to ~5 sec
 			SetTimer(1, 100, nullptr);
+		else
+			NotifyFail(2);               // creation did not complete in time
 		return false;
 	}
 	m_nEnvRetry = 0;
@@ -68,12 +75,17 @@ OutputDebugString(s);
 
 		if (!SUCCEEDED(result))
 		{
-			OutputDebugStringW(L"WebView creation failed\n");
-			return result;
+			OutputDebugStringW(L"WebView creation failed\n");   // existing - do not add again
+			if (result != E_ABORT)		// E_ABORT = window closing, not a failure
+				NotifyFail(3);
+			return result;                                      // existing - do not add again
 		}
 
 		if (controller == nullptr)
+		{
+			NotifyFail(3);
 			return E_FAIL;
+		}
 
 		m_webViewController = controller;
 		HRESULT hrWv = m_webViewController->get_CoreWebView2(&m_webView);
@@ -82,6 +94,7 @@ OutputDebugString(s);
 			CString e; e.Format("-[edge][InitWebView]<%d> %p get_CoreWebView2 failed hr=0x%08X", __LINE__, this, hrWv);
 			OutputDebugString(e);
 			m_webViewController = nullptr;
+			NotifyFail(4);
 			return hrWv;
 		}
 
@@ -113,6 +126,7 @@ OutputDebugString(s);
 	{
 		m_bCreating = false;
 OutputDebugStringW(L"CreateCoreWebView2Controller  failed\n");
+		NotifyFail(5);
 		return false;
 	}
 
@@ -392,6 +406,25 @@ afx_msg LRESULT BrowserWindowEdge::OnRunAsync(WPARAM wParam, LPARAM lParam)
 	delete task;
 
 	return S_OK;
+}
+
+/*
+ 1 = env 생성 실패, 
+ 2 = env 5초 안에 미완료, 
+ 3 = 컨트롤러 생성 실패, 
+ 4 = WebView 획득 실패, 
+ 5 = 컨트롤러 요청 실패.
+*/
+void BrowserWindowEdge::NotifyFail(int why)
+{
+	if (!::IsWindow(m_hWnd))			// window already destroyed (closing)
+		return;
+	CString s; s.Format("-[edge][NotifyFail]<%d> %p why=%d -> IE fallback", __LINE__, this, why);
+	OutputDebugString(s);
+	KillTimer(1);
+	CWnd* parent = GetParent();
+	if (parent && ::IsWindow(parent->m_hWnd))
+		parent->PostMessage(WM_EDGE_FAILED, (WPARAM)why, 0);
 }
 
 void BrowserWindowEdge::OnTimer(UINT_PTR nIDEvent)

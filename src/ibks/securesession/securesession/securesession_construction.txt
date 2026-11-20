@@ -1,0 +1,105 @@
+==============================================================================
+ securesession.dll 명세서
+==============================================================================
+ 최초 작성 : 2026-11-18   (계속 수정)
+ 소스      : ibks/securesession/securesession/   (ssapi.cpp = 구현, securesession.h = API)
+ 벤더 SDK  : securesession/securesession/Xecure/  (xcon30.lib, xc_main.h, xc_protocol.h)
+ 출력      : securesession.dll (Release|Win32)
+ 배포 위치 : HTS exe 폴더 (LoadLibrary("securesession.dll") 로 이름만으로 로드)
+
+------------------------------------------------------------------------------
+ 1. 목적
+------------------------------------------------------------------------------
+ 송수신 암호화(Xecure, AXISENCX 핸드셰이크)를 벤더 ActiveX 컨트롤 대신 직접 수행하는
+ 모듈. 벤더 SDK(XC_INIT / XC_ENCODE / XC_DECODE)를 세션 핸들 하나로 감싼다.
+
+ - DLL 이 없거나 SS_Open 이 실패하면 호출측(axWizard)은 그 세션 전체를 기존 벤더
+   컨트롤로 처리한다(fallback).
+ - SS_Open 이 성공한 뒤에는 세션 키가 이 DLL 안에만 있으므로, 이후 암·복호화 실패를
+   벤더 컨트롤로 넘기면 안 된다(키가 달라 서버와 맞지 않음).
+
+------------------------------------------------------------------------------
+ 2. 사용 방법 (호출 순서)
+------------------------------------------------------------------------------
+ (1) 로드 : 동적 로드, 함수 6개를 GetProcAddress 로 받는다. 하나라도 없으면 벤더 사용.
+
+ (2) 핸드셰이크
+     unsigned char out[64*1024]; int outLen = sizeof(out);
+     HSS ss = SS_Open(profilePassword, "...\\xc_conf.ini", out, &outLen);
+     if (!ss) → 이 세션은 벤더 컨트롤 사용 (SS_GetLastError() 로그)
+     out[0..outLen) 을 서버로 송신 (AXISENCX 첫 메시지)
+
+     서버 응답 수신 시:
+     outLen = sizeof(out);
+     int rc = SS_Handshake(ss, resp, respLen, out, &outLen);
+       rc == 1 : 미완료 → out 을 서버로 다시 보내고, 응답이 오면 SS_Handshake 재호출
+       rc == 0 : 완료  → 이제 SS_Encrypt / SS_Decrypt 사용 가능
+       rc <  0 : 실패
+
+ (3) 송수신
+     SS_Encrypt(ss, plain, plainLen, enc, &encLen);   // 송신 직전
+     SS_Decrypt(ss, enc, encLen, plain, &plainLen);   // 수신 직후
+
+ (4) 종료 : SS_Close(ss)
+
+------------------------------------------------------------------------------
+ 3. 함수 설명
+------------------------------------------------------------------------------
+ 공통 : outLen 류 인자는 [in] 버퍼 크기 / [out] 실제 채운 길이.
+        내부 버퍼 한도 SS_MAXLEN = 64KB (입력·출력 모두 이 이하).
+
+ HSS SS_Open(const char* password, const char* confPath, unsigned char* outBuf, int* outLen)
+   - password : 벤더 SDK 로컬 프로필 잠금 암호
+   - confPath : xc_conf.ini 전체 경로
+   - outBuf   : [out] 서버로 보낼 첫 핸드셰이크 메시지 (XC_TMODE_KEY)
+   - 반환     : 세션 핸들, 실패 시 nullptr (XC_INIT 실패 / 메시지 생성 실패 / outBuf 부족)
+   - 상태     : HELLO → OK
+
+ int SS_Handshake(HSS h, const unsigned char* inBuf, int inLen, unsigned char* outBuf, int* outLen)
+   - inBuf    : 서버 핸드셰이크 응답
+   - 반환     : 0 완료(상태 RUN, *outLen=0) / 1 계속(outBuf 를 서버로 재송신) / -1 실패
+   - 1 이 나오는 경우 : 서버가 XC_MTYPE_NEWPROFILE 을 요구할 때 (새 키 메시지 재생성)
+   - 상태가 OK 가 아니면 -1
+
+ int SS_Encrypt(HSS h, const unsigned char* in, int inLen, unsigned char* out, int* outLen)
+   - 평문 → 암호문 (XC_TMODE_MSG). 반환 0 성공 / -1 실패
+   - 핸드셰이크 완료(RUN) 전이면 -1
+
+ int SS_Decrypt(HSS h, const unsigned char* in, int inLen, unsigned char* out, int* outLen)
+   - 암호문 → 평문. 반환 0 성공 / -1 실패. RUN 전이면 -1
+
+ void SS_Close(HSS h)
+   - 세션 메모리 해제 (NULL 허용)
+
+ const char* SS_GetLastError(void)
+   - 벤더 SDK 마지막 오류 메시지 (XC_GETERR)
+
+------------------------------------------------------------------------------
+ 4. 호출측 (axWizard) 연결 위치
+------------------------------------------------------------------------------
+ Guard.h          PFN_SS_* 함수 포인터, m_hSecureSession, m_ss
+ Guard.cpp:293    Initial - LoadLibrary("securesession.dll") + GetProcAddress
+                  (export 누락 시 "fallback to vendor control" 로그)
+ WizardCtrl.cpp:1156~1190  키 교환(Xecure-Nego)
+                  - xc_conf.ini 경로 계산 (원본 XecureCtrl::Xecure() 와 동일 로직)
+                  - SS_Open → [Xecure-Nego] engine=ours SS_Open nBytesOut=..
+                  - 서버 응답마다 SS_Handshake
+ Guard.cpp:2304~2325  송수신 암·복호화 (m_ss 있으면 SS_Encrypt / SS_Decrypt, 실패 시 벤더로 안 넘김)
+ Guard.cpp:173    소멸자 SS_Close
+
+ ※ 조회전용 로그인(서버 flag 0x30 = flagENX)은 키 교환 자체를 하지 않아 이 모듈도
+   쓰이지 않는다(전 구간 평문, 서버팀 정책 확인 중).
+
+------------------------------------------------------------------------------
+ 5. 주의 사항
+------------------------------------------------------------------------------
+ - 프로필 잠금 암호가 호출측(WizardCtrl.cpp:1168)에 고정 문자열로 들어 있다
+   (벤더 컨트롤과 같은 값으로 맞춘 것). 변경 시 양쪽을 함께 확인.
+ - 세션 1개당 64KB 버퍼를 갖고 있고 스레드 보호가 없다 → 한 세션을 여러 스레드에서
+   동시에 Encrypt/Decrypt 하지 말 것.
+ - 64KB 를 넘는 데이터는 -1 (분할 송신은 호출측 책임).
+
+------------------------------------------------------------------------------
+ 6. 변경 이력
+------------------------------------------------------------------------------
+ 2026-11-18  명세서 최초 작성 (구현은 이전에 완료·적용됨)

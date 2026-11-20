@@ -22,12 +22,13 @@
 #include "../h/axiserr.h"
 #include "../h/axstring.h"
 #include "../h/axlog.h"
+#include "../h/DataGuardApi.h"
 #include "../dll/form/fmgrid.h"
 #include <future>
 #include <thread>
 
-#include <bcrypt.h>
-#pragma comment(lib, "bcrypt.lib")
+//#include <bcrypt.h>
+//#pragma comment(lib, "bcrypt.lib")
 
 #ifdef _DEBUG
 #undef THIS_FILE
@@ -184,6 +185,11 @@ CGuard::~CGuard()
 	m_hCertSign = NULL;
 #endif
 
+	m_dg = NULL;
+	if (m_hDG)
+		FreeLibrary(m_hDG);
+	m_hDG = NULL;
+
 	if (m_certify)
 		delete m_certify;
 	delete m_sock;
@@ -339,7 +345,32 @@ int CGuard::Initial(CWnd* control)
 	else
 		axlog(LOG_INIT, "CGuard::Initial certsign.dll not found - fallback to vendor control");
 #endif
+	{
+		//DAtaGuard.dll 
+		char exePath[MAX_PATH]{};
+		::GetModuleFileName(NULL, exePath, MAX_PATH);
+		CString dgPath = exePath;
+		int pos = dgPath.ReverseFind('\\');
+		if (pos != -1)
+			dgPath = dgPath.Left(pos);
 
+		dgPath += "\\DataGuard.dll";
+
+		m_hDG = ::LoadLibrary(dgPath);
+		DG_GETAPI getApi = m_hDG ? (DG_GETAPI)::GetProcAddress(m_hDG, DG_GETAPI_NAME) : NULL;
+		m_dg = getApi ? getApi(DG_VERSION) : NULL;
+
+		if (m_dg)
+			axlog(LOG_INIT, "[DG] load OK path=%s ver=%d size=%d", dgPath.GetString(), m_dg->version, m_dg->size);
+		else
+		{
+			axlog(LOG_INIT, "[DG] load FAILED path=%s h=%p getApi=%p err=%d -> fail-open",
+				dgPath.GetString(), m_hDG, getApi, GetLastError());
+			if (m_hDG)
+				FreeLibrary(m_hDG);
+			m_hDG = NULL;
+		}
+	}
 
 	if (!m_sock->CreateControl(_T("AxisSock.SockCtrl.IBK2019"), NULL, WS_VISIBLE, CRect(0, 0, 0, 0), control, -1))
 	{
@@ -1725,6 +1756,26 @@ void CGuard::Sign(int signK, char* signB, int signL, CString& dns, bool shop)
 		m_status |= WS_SIGN;
 		RemoveRegistry();
 		AddRegistry(&signB[idx], signL-idx, dns);
+		if (m_dg)	// [DG] session: resident no. (same source as LOGIN.Juno)
+		{
+			CString info(signR->infox, sizeof(signR->infox));                  
+			int z = info.Find('\0');                                          
+			if (z != -1)                                                         
+				info = info.Left(z);                                          
+			CString juno;                                                      
+			AfxExtractSubString(juno, info, 7, '\t');                          
+			juno.Trim();                                                        
+			if (!juno.IsEmpty())                                                 
+				m_dg->SessionAdd(DG_JUNO, juno.GetString());                  
+
+			CString usid(signR->sign, sizeof(signR->sign));	// login id = ledger usid
+			z = usid.Find('\0');
+			if (z != -1)
+				usid = usid.Left(z);
+			usid.Trim();
+			if (!usid.IsEmpty())
+				m_dg->SessionAdd(DG_USERID, usid.GetString());
+		}
 		break;
 	case signOX:
 		m_status &= ~WS_SIGN;
@@ -1929,7 +1980,8 @@ void CGuard::AddRegistry(char* datB, int datL, CString& dns)
 LOG_OUTP(3, "[axwizard][loadacc]", entry, __FUNCTION__);
 
 				m_accno.Add(name);
-				AccHashAdd(name);
+				if (m_dg)
+					m_dg->SessionAdd(DG_ACCOUNT, name.GetString());
 
 				// 비밀번호(entry, 이 시점엔 이미 lz4enc로 인코딩된 값)는 절대 로그에 남기지 않음 - 계좌번호만 기록
 				axlog(LOG_LOGIN, "[AddRegistry] ACCNO[%d/%d] account=%s (password omitted)", ii + 1, size, name);
@@ -1971,7 +2023,8 @@ void CGuard::RemoveRegistry()
 {
 	m_combo.RemoveAll();
 	m_account.RemoveAll();
-	m_accHash.RemoveAll();
+	if(m_dg)
+		m_dg->SessionClear();
 	m_accno.RemoveAll();
 
 	m_stock_accs.Empty();
@@ -2086,7 +2139,8 @@ void CGuard::SetAccounts(CString entry)
 			}
 		}
 		m_account.RemoveKey(entry);
-		AccHashRemove(entry);
+		if (m_dg)
+			m_dg->SessionRemove(DG_ACCOUNT, entry.GetString());
 	}
 	else
 	{
@@ -2101,94 +2155,10 @@ LOG_OUTP(3, "[axwizard][loadacc]", tmps, __FUNCTION__);
 
 		lz4enc(tmps);
 		m_account.SetAt(keys, tmps);
-		AccHashAdd(keys);
+		if (m_dg)
+			m_dg->SessionAdd(DG_ACCOUNT, keys.GetString());
 	}
 }
-
-CString CGuard::AccHash(CString acc)
-{
-	CString norm;
-	for (int ii = 0; ii < acc.GetLength(); ii++)
-	{
-		if (isalnum((unsigned char)acc[ii]))
-			norm += acc[ii];
-	}
-	if (norm.IsEmpty())
-		return _T("");
-
-	if (!m_accSaltOK)
-	{
-		if (!BCRYPT_SUCCESS(BCryptGenRandom(NULL, m_accSalt, sizeof(m_accSalt), BCRYPT_USE_SYSTEM_PREFERRED_RNG)))
-			return _T("");
-		m_accSaltOK = true;
-	}
-
-	BYTE digest[32]{};
-	BCRYPT_ALG_HANDLE  hAlg = NULL;
-	BCRYPT_HASH_HANDLE hHash = NULL;
-	bool ok = BCRYPT_SUCCESS(BCryptOpenAlgorithmProvider(&hAlg, BCRYPT_SHA256_ALGORITHM, NULL, 0))
-		&& BCRYPT_SUCCESS(BCryptCreateHash(hAlg, &hHash, NULL, 0, NULL, 0, 0))
-		&& BCRYPT_SUCCESS(BCryptHashData(hHash, m_accSalt, sizeof(m_accSalt), 0))
-		&& BCRYPT_SUCCESS(BCryptHashData(hHash, (PUCHAR)norm.GetString(), norm.GetLength(), 0))
-		&& BCRYPT_SUCCESS(BCryptFinishHash(hHash, digest, sizeof(digest), 0));
-	if (hHash)	BCryptDestroyHash(hHash);
-	if (hAlg)	BCryptCloseAlgorithmProvider(hAlg, 0);
-	if (!ok)
-		return _T("");
-
-	CString hex, b;
-	for (int ii = 0; ii < (int)sizeof(digest); ii++)
-	{
-		b.Format(_T("%02x"), digest[ii]);
-		hex += b;
-	}
-	return hex;
-}
-
-void CGuard::AccHashAdd(CString acc)
-{
-	CString h = AccHash(acc);
-	if (h.IsEmpty())
-	{
-		axlog(LOG_LOGIN, "[ACCHASH] add FAILED acc=%s", acc.GetString());
-		return;
-	}
-	for (int ii = 0; ii < m_accHash.GetSize(); ii++)
-	{
-		if (m_accHash[ii] == h)
-			return;		// already registered
-	}
-	m_accHash.Add(h);
-	axlog(LOG_LOGIN, "[ACCHASH] add acc=%s hash=%.8s count=%d", acc.GetString(), h.GetString(), (int)m_accHash.GetSize());
-}
-
-void CGuard::AccHashRemove(CString acc)
-{
-	CString h = AccHash(acc);
-	for (int ii = 0; ii < m_accHash.GetSize(); ii++)
-	{
-		if (m_accHash[ii] == h)
-		{
-			m_accHash.RemoveAt(ii);
-			break;
-		}
-	}
-	axlog(LOG_LOGIN, "[ACCHASH] remove acc=%s count=%d", acc.GetString(), (int)m_accHash.GetSize());
-}
-
-bool CGuard::AccHashCheck(CString acc)
-{
-	CString h = AccHash(acc);
-	if (h.IsEmpty())
-		return false;
-	for (int ii = 0; ii < m_accHash.GetSize(); ii++)
-	{
-		if (m_accHash[ii] == h)
-			return true;
-	}
-	return false;
-}
-
 
 void CGuard::GetAccounts(CString& account)
 {
@@ -6066,7 +6036,8 @@ void CGuard::AddRegistry(char* datB, int datL, bool cbonly)
 	}
 	m_accno.RemoveAll();
 	m_account.RemoveAll();
-	m_accHash.RemoveAll();
+	if(m_dg)
+		m_dg->SessionClearKind(DG_ACCOUNT);
 	AddRegistry(datB, datL, string);
 	PostAxis(MAKEWPARAM(accnINFO, 0));
 }

@@ -128,6 +128,7 @@ protected:
 	afx_msg void OnSelchangeOrdTab(NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg LONG OnManage(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT OnSend(WPARAM wParam, LPARAM lParam);
+	afx_msg LRESULT OnEdgeFailed(WPARAM wParam, LPARAM lParam);
 	afx_msg LONG OnMessage(WPARAM wParam, LPARAM lParam);
 	afx_msg LONG OnWxEditMessage(WPARAM wParam, LPARAM lParam);
 	afx_msg LONG OnDoInnerJob(WPARAM wParam, LPARAM lParam);

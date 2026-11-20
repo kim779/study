@@ -1,0 +1,210 @@
+==============================================================================
+ astxManager.dll 명세서
+==============================================================================
+ 최초 작성 : 2026-11-19   (계속 수정)
+ 소스      : ibks/astxManager/astxManager/   (astxManager.cpp = 구현, astxManager.h = API)
+             astxManager.cpp 는 CP949 (AM_ErrStr 한글 메시지), astxManager.h 는 ASCII
+ 벤더 SDK  : AhnLab ASTx  ASTx/(StSdkEx*.h, stsdk*.h 16개, StSdkEx.lib)
+             AXIS/ASTx 와 동일 파일 (2026-11-19 바이트 비교 확인)
+             StSdkEx.lib 는 STSDKEX.DLL 의 import lib (정적 lib 아님)
+ 출력      : src/release/astxManager.dll (Release|Win32, MultiByte, MFC 미사용 일반 DLL)
+ 의존 DLL  : STSDKEX.DLL (HTS exe 폴더에 이미 배포됨), VC 런타임(MSVCP140/VCRUNTIME140)
+ 배포 위치 : HTS exe 폴더 (LoadLibrary("astxManager.dll") 로 이름만으로 로드 예정)
+
+------------------------------------------------------------------------------
+ 1. 목적
+------------------------------------------------------------------------------
+ axis.exe MainFrm.cpp 에 흩어져 있던 ASTx(해킹방지/방화벽/PC스캔/키보드보안) SDK 호출을
+ 하나의 DLL 로 모은다.
+
+ - DLL 은 SDK 호출만 한다. 설치 안내, 실패 메시지, HTS 차단 여부 같은 UI·정책 판단은
+   호출측(MainFrm)에 남긴다.
+ - 기존 MainFrm 코드의 버그를 DLL 안에서 바로잡는다 (5장).
+ - DLL 이 없거나 로드에 실패하면 호출측은 기존 MainFrm 코드로 처리(fallback).
+
+------------------------------------------------------------------------------
+ 2. 사용 방법 (호출 순서)
+------------------------------------------------------------------------------
+ (1) 로드 : 동적 로드, 함수 14개 GetProcAddress. 하나라도 없으면 기존 코드 사용.
+
+ (2) 설치 확인 / 설치
+     if (!AM_IsInstalled())
+         AM_Install(hwnd);                       // 벤더 설치 UI 표시
+
+ (3) 초기화
+     DWORD r = AM_Init(customerId, eventCb);     // eventCb 는 NULL 가능
+     if (r != AM_OK) -> AM_ErrStr(r) 로 메시지
+
+ (4) 기능 시작 (마스크 OR 가능)
+     AM_Start(AM_FUNC_PB);                       // 해킹방지 (메모리 보호 + 원격 차단)
+     AM_Start(AM_FUNC_FW);                       // 방화벽
+     AM_AkStart(akCb);                           // 키보드보안
+     AM_AkProtectEdit(hEdit);                    // 보호할 입력창 등록
+
+ (5) 상태 확인
+     AM_IsRunning(AM_FUNC_PB) == AM_OK  ->  동작 중
+
+ (6) 종료
+     AM_Uninit();                                // AK 종료 -> 전체 Stop -> SDK Uninit 순서로 내부 처리
+
+------------------------------------------------------------------------------
+ 3. 함수 설명
+------------------------------------------------------------------------------
+ 공통 : 반환 0(AM_OK) = 성공, 그 외 = STSDKEX_ERROR_* (0x32A41xxx). AM_ErrStr() 로 한글 메시지.
+        AM_ERR_NOT_INITIALIZED (0x32A41007) : AM_Init 전 호출
+        AM_ERR_NOT_INSTALLED   (0x32A4100F) : ASTx 미설치
+
+ 기능 마스크 (STSDKEX_FUNC_CODE_* 와 같은 값)
+   AM_FUNC_PB      0x00000004   해킹방지
+   AM_FUNC_FW      0x00000080   방화벽
+   AM_FUNC_PCSCAN  0x00008000   PC 스캔 (기존 MainFrm 에는 시작 경로가 없었음)
+   AM_FUNC_ALL     위 셋 OR
+
+ BOOL  AM_IsInstalled(void)
+   - STSDKEX_IsInstalled 가 PRODUCT_NOT_INSTALLED 가 아니면 TRUE.
+
+ DWORD AM_Install(HWND parent)
+   - 이미 설치되어 있으면 바로 AM_OK.
+   - STSDKEX_InstallA(UI_MODE_SHOW, parent, "") : 빈 URL = SDK 기본 마스터 URL.
+
+ DWORD AM_Init(const char* customerId, AM_EVENT_CB cb)
+   - 이미 초기화되어 있으면 AM_OK.
+   - 환경옵션 : ASYNC=on, FUNCTIMEOUT=180000(3분), STANDALONE=on  (MainFrm initASTx 와 동일)
+   - cb 가 있으면 STSDKEX_SetEventCallback 등록 후 STSDKEX_Initialize.
+   - customerId 는 DLL 안에 보관해 Start/Stop/IsRunning/AK 에 사용.
+
+ void  AM_Uninit(void)
+   - AM_AkStop -> AM_Stop(AM_FUNC_ALL) -> STSDKEX_Unintialize (SDK 철자 그대로).
+
+ BOOL  AM_IsInitialized(void)
+
+ DWORD AM_Start(DWORD funcMask)
+   - 마스크의 기능을 차례로 STSDKEX_StartFuncA. PB 는 시작 전에
+     PBSetActivateSubFunc(PROTECT_MEMORY | BLOCK_REMOTE).
+   - FUNCTION_ALREADY_STARTED, NOT_ABLE_BECAUSE_PRIORITY_RULE 은 성공으로 처리.
+   - 반환 : 처음 실패한 기능의 코드 (모두 성공이면 AM_OK).
+   - 정책 URL : http://webclinic.ahnlab.com/astx/policy/customer_stsdk_default.html
+                (MainFrm.h STSDKEX_CUSTOM_POLICY_URL 과 동일, DLL 에 하드코딩)
+
+ DWORD AM_Stop(DWORD funcMask)
+   - FUNCTION_ALREADY_STOPPED 는 성공으로 처리. 반환 규칙은 AM_Start 와 같음.
+
+ DWORD AM_IsRunning(DWORD funcCode)
+   - STSDKEX_IsRunningFuncA. 0 = 동작 중. 기능 코드는 하나씩.
+
+ DWORD AM_AkStart(AM_AK_CB cb)
+   - STSDKEX_GetMkd8ObjectA -> Initialize(AstxmodeProtectInAstx, 내부콜백).
+   - 내부콜백은 로그만 남기고 cb 로 넘긴다 (cb NULL 가능).
+
+ void  AM_AkStop(void)
+   - Uninitialize. 실패해도 내부 포인터를 비워 재시작 가능하게 함.
+
+ DWORD AM_AkProtectEdit(HWND edit)
+   - 입력창을 키보드보안 대상으로 등록.
+
+ DWORD AM_AkGetText(HWND edit, char* out, DWORD* size)
+ DWORD AM_AkGetEncText(DWORD customCode, HWND edit, char* out, DWORD* size, BYTE random[])
+   - 보호된 입력창의 평문 / 암호문. size : [in] 버퍼 크기 / [out] 길이.
+
+ const char* AM_ErrStr(DWORD code)
+   - 오류코드 -> 한글 메시지(CP949). 정적 문자열이므로 해제하지 않는다.
+
+------------------------------------------------------------------------------
+ 4. 호출측 (axis.exe MainFrm) 연결 위치  ※ 연결 작업 진행 예정
+------------------------------------------------------------------------------
+ 기존 ASTx 코드 (AXIS/MainFrm.cpp, CP949, 2026-11-19 기준 줄번호)
+   installASTx      30205      Err2Str      30270
+   initASTx         30561      uninitASTx   30637
+   startPB/stopPB   30662/30693
+   startFW/stopFW   30730/30757
+   AKSDK_Callback   30800      startAK/stopAK 30888/30943
+   IsASTxRunning    32830
+ 호출 지점
+   소멸자            1118~1122   uninitASTx -> stopPB/FW/AK  (순서 버그, 5장)
+   27826~27830       initASTx -> startPB/FW/AK
+   LoadSecureTools   28109~28154 installASTx / initASTx / startPB / FW / AK 정책별 on/off
+   3470, 13918       IsASTxRunning 으로 동작 여부 확인
+ 연결 방침
+   - axis.exe 쪽 클라이언트 클래스 AstxClient (AXIS/AstxClient.h/.cpp, ASCII, Win32 only, SDK 헤더 불필요)
+     가 astxManager.dll 을 LoadLibrary + GetProcAddress(12개). MainFrm 멤버 m_astx (스택 멤버).
+   - 성공 시 AM_* 사용, 실패 시 기존 MainFrm 코드 사용(fallback). 분기는 m_astx.IsLoaded().
+   - 한 프로세스 안에서 어느 쪽을 쓸지는 GetASTxInstall()(OnCreate 끝)에서 한 번만 정하고 바꾸지 않는다.
+   - 되돌리기 : GetASTxInstall 의 m_astx.Load() 주석 처리, 또는 exe 폴더에서 astxManager.dll 제거.
+   - MainFrm 분기 표시 주석 : "///astxManager.dll start" ~ "///astxManager.dll end"
+   - DLL 은 소멸 시 FreeLibrary 하지 않는다 (프로세스 종료 시 SDK 정리 중일 수 있음).
+
+ 연결 진행 (2026-11-19)
+   1단계 로드 (GetASTxInstall)                         완료·확인
+   2단계 initASTx / uninitASTx                         완료·확인
+   3단계 startPB / stopPB / startFW / stopFW           완료·확인 (start 확인, stop 은 종료 시 AM_Uninit 로 확인)
+   4단계 startAK / stopAK                              완료·확인 (종료 시 AK -> Stop -> Uninit 순서 확인)
+   5단계 설치확인 3곳(InstalledCode) / installASTx / IsASTxRunning   완료·확인 (로그인 직후·30초 타이머 on[0])
+         IsASTxRunning 은 HTS 강제종료 조건이므로 DLL 초기화 후에만 DLL 사용, 그 전에는 기존 직접 호출 유지.
+   6단계 fallback 코드를 AstxClient 로 이동 (2026-11-20)  완료·확인 (DLL 있음 dll=[1] / DLL 없음 dll=[0] 둘 다)
+         AstxClient 가 두 경로를 모두 가짐 (SDK 헤더 include, m_customer / m_init / m_ak).
+         MainFrm 의 STSDKEX_ 함수 호출은 콜백 정의만 남음. g_pIAstxAkSDK 삭제.
+         기존 경로도 종료 순서가 AK -> 기능별 Stop -> Uninit 으로 바뀜.
+   7단계 콜백 이관 (2026-11-20)  완료·확인 (DLL 있음/없음 모두 [ASTx][CB] event code=0x00030008 = FW_CALLBACK_START)
+         콜백 스레드 = Init 호출 스레드(UI) 확인 (tid 동일).
+         STSDKEX_EventCallback / AKSDK_Callback 삭제 -> AstxClient.cpp 파일 static OnSdkEvent / OnAkEvent.
+         Init(customerId), AkStart() 는 자체 콜백을 등록 (인자에서 콜백 제거).
+         탐지 안내(메모리 비정상 접근 / 원격 감지 / 원격 차단)는 작업 스레드에서 MessageBox(NULL, MB_TOPMOST)
+         -> 콜백은 즉시 반환, HTS 는 막히지 않음. 종류별 1개만 표시(표시 중 반복 이벤트는 로그만).
+         AstxClient.cpp 는 한글 안내 문구 때문에 CP949.
+         남은 확인 : 원격 접속으로 안내창 표시·HTS 조작 가능·중복 억제 실측
+   8단계 SDK 참조 정리 (2026-11-20)  적용, 빌드·실행 확인 대기
+         MainFrm.h : ASTx 관련은 #include "AstxClient.h" 한 줄 (USE_AHNLAB_SECUREBROWSER 블록 밖).
+                     SDK include 4개, #pragma comment(lib), STSDKEX_MASTER_*/CUSTOM_POLICY_URL 정의,
+                     콜백·Err2Str 선언 삭제.
+         AstxClient : 상수 FUNC_PB/FW/PCSCAN, RESULT_OK/RESULT_NOT_INSTALLED (SDK 값과 static_assert 로 일치 강제),
+                      static ErrStr() = 옛 CMainFrame::Err2Str 문구 52개 그대로 (두 경로 공통).
+                      #pragma comment(lib, "ASTx/StSdkEx.lib") 는 AstxClient.cpp 로 이동.
+         MainFrm.cpp : STSDKEX_ / Err2Str / IAstxMkd8 0건. installASTx 의 strMasterURL 블록,
+                       미사용 typedef _StSdk_GetMkd8ObjectA/W 삭제.
+         참고 : Dtconnect.h / CertLogin.h 는 SetAK(IAstxMkd8*) 때문에 StSdkExDef.h 를 자체 include (범위 밖).
+
+ 남은 확인
+   - WriteLog() 에 추가한 OutputDebugString 3줄(테스트용, MainFrm.cpp 336) 배포 전 제거 여부 결정
+   - installASTx 경로는 ASTx 미설치 PC/VM 에서 실측 필요
+
+------------------------------------------------------------------------------
+ 5. 기존 MainFrm 코드에서 고친 점
+------------------------------------------------------------------------------
+ | 기존 MainFrm                                         | astxManager                     |
+ |------------------------------------------------------|---------------------------------|
+ | 소멸자에서 uninitASTx 후 stopPB/FW/AK 호출            | AM_Uninit 이 AK -> Stop -> Uninit |
+ |  (uninitASTx 가 StopFunc(PB|FW|PCSCAN) 는 먼저 하므로  |  순서로 직접 처리               |
+ |   PB/FW 는 멈춤. 단 이후 stopPB/FW 는 무의미하고,      |                                 |
+ |   AK 는 SDK 종료 뒤에 Uninitialize 됨)                 |                                 |
+ | AKSDK_Callback 에 break 누락 (다음 case 로 흐름)      | 내부콜백은 로그 후 cb 로 위임    |
+ | startPB / startFW 가 실패해도 TRUE 반환              | 실제 오류코드 반환              |
+ | PCSCAN 시작 경로 없음                                | AM_FUNC_PCSCAN 마스크 지원       |
+ | AK 가 보호하는 입력창 등록 없음                       | AM_AkProtectEdit 제공           |
+ | AK Uninitialize 실패 시 포인터가 남아 재시작 불가     | 실패해도 포인터 정리            |
+
+------------------------------------------------------------------------------
+ 6. 빌드 확인 (2026-11-19)
+------------------------------------------------------------------------------
+ - 32비트 PE (machine 0x14c), 15KB
+ - export 14개, 데코레이션 없음 (extern "C" + __declspec(dllexport))
+   AM_AkGetEncText AM_AkGetText AM_AkProtectEdit AM_AkStart AM_AkStop AM_ErrStr
+   AM_Init AM_Install AM_IsInitialized AM_IsInstalled AM_IsRunning AM_Start AM_Stop AM_Uninit
+ - import : KERNEL32, StSdkEx.dll(ordinal 11개), VC 런타임
+   StSdkEx.dll ordinal #1,2,3,4,6,8,10,12,13,23,25 는 현재 axis.exe 가 쓰는 11개와 동일
+   -> 배포된 exe\STSDKEX.DLL 로 그대로 로드됨
+
+------------------------------------------------------------------------------
+ 7. 주의 사항
+------------------------------------------------------------------------------
+ - axis.exe(MainFrm) 와 astxManager.dll 이 같은 STSDKEX.DLL 을 공유한다.
+   전환 기간에 MainFrm 과 DLL 이 둘 다 Init / Start 를 호출하지 않도록 할 것.
+ - AM_AkGetText / AM_AkGetEncText 결과(비밀번호 등 입력값)를 절대 로그에 남기지 말 것.
+   DLL 내부 로그(OutputDebugString "[AM] ...")에도 넣지 않았다.
+ - 스레드 보호 없음. MainFrm UI 스레드에서만 호출하는 것을 전제로 한다.
+ - Debug|Win32 구성도 문자 집합을 MultiByte 로 맞출 것 (Unicode 면 IAstxMkd8W 로 매핑되어 컴파일 오류).
+ - 정책 URL 이 DLL 에 하드코딩되어 있으므로 MainFrm.h 값이 바뀌면 함께 바꿀 것.
+
+------------------------------------------------------------------------------
+ 8. 변경 이력
+------------------------------------------------------------------------------
+ 2026-11-19  프로젝트 생성, 구현·Release 빌드 완료, 명세서 최초 작성

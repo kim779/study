@@ -1344,8 +1344,8 @@ void CMapForm::ChangePasswordNotifyToMain(const char* data)
 	CString slog;
 	if (m_main)
 	{
-		slog.Format("[0000A1]ChangePasswordNotifyToMain  [%s]", data);
-		OutputDebugString(slog);
+	//	slog.Format("[0000A1]ChangePasswordNotifyToMain  [%s]", data);
+	//	OutputDebugString(slog);
 		m_main->SendMessage(WM_USER + 5555, 0, (LPARAM)data);
 	}
 }

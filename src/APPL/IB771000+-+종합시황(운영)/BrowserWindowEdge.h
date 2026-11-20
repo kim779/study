@@ -1,7 +1,7 @@
 #pragma once
 #ifndef BROWSER_WINDOW_EDGE_H
 #define BROWSER_WINDOW_EDGE_H
-
+#define WM_EDGE_FAILED	(WM_USER + 0x771)
 #include <afxwin.h>
 #include "StdAfx.h"
 
@@ -17,7 +17,7 @@ class BrowserWindowEdge :
 	int  m_nRenderRetry = 0;
 	int  m_nEnvRetry = 0;
 	bool InitWebView();
-	
+	void NotifyFail(int why);
 	DECLARE_MESSAGE_MAP()
 
 protected:

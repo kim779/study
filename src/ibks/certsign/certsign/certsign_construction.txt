@@ -1,0 +1,127 @@
+==============================================================================
+ certsign.dll 명세서
+==============================================================================
+ 최초 작성 : 2026-11-18   (계속 수정)
+ 소스      : ibks/certsign/certsign/   (certsign.cpp = 구현, certsign.h = API)
+ 벤더 SDK  : SignKorea  include/(InterfaceDLL.h, InterfaceTypes.h, sk_pc_identity.h)
+             lib/(SKComdIF.lib, SKCommIF.lib)
+ 출력      : certsign.dll (Release|Win32)
+ 배포 위치 : HTS exe 폴더 (LoadLibrary("certsign.dll") 로 이름만으로 로드)
+
+------------------------------------------------------------------------------
+ 1. 목적
+------------------------------------------------------------------------------
+ 공동인증서 선택·서명을 벤더 ActiveX(CertifyCtrl) 대신 직접 수행하는 모듈.
+ SignKorea SDK(sk_if_*)를 세션 핸들 하나로 감싼다.
+
+ - 로그인 서명 : 서명자 인증서를 포함한 PKCS#7 (서버가 인증서로 계정을 식별)
+ - TR 서명     : 인증서 미포함 서명 (로그인 후 반복 서명용)
+ - 클라우드 인증서 : 벤더 팝업(폰 PIN/푸시 확인) 경유
+ - DLL 이 없거나 CS_Open 이 실패하면 호출측은 그 세션을 기존 벤더 컨트롤로 처리(fallback).
+   CS_Open 성공 후에는 같은 세션 안에서 엔진을 바꾸지 않는다.
+
+------------------------------------------------------------------------------
+ 2. 사용 방법 (호출 순서)
+------------------------------------------------------------------------------
+ (1) 로드 : 동적 로드, 함수 11개 GetProcAddress. 하나라도 없으면 벤더 사용.
+
+ (2) 로그인 (로컬 인증서)
+     HCS cs = CS_Open();                          // 실패 → 벤더 경로
+     // 방법 A: 벤더 인증서 선택창
+     CS_SelectInteractive(cs, hwnd, dn, dnCap, &storage, setName, setCap);
+     // 방법 B: DN + 비밀번호로 직접 선택 (선택창 없음)
+     CS_Select(cs, dn, password, storage, setName);
+     // 로그인 서명 (인증서 포함 PKCS#7)
+     int sigLen = sizeof(sig);
+     CS_SignFull(cs, loginData, loginLen, sig, &sigLen);
+
+ (3) 로그인 (클라우드 인증서)
+     cs = CS_Open();
+     CS_CloudSelectInteractive(cs, hwnd, dn, dnCap, setName, setCap);
+     CS_CloudSignFull(cs, data, len, sig, &sigLen);
+
+ (4) 로그인 후 TR 서명
+     CS_Sign(cs, trData, trLen, sig, &sigLen);              // 인증서 미포함
+     // 비밀번호 재확인이 필요한 TR
+     CS_VerifyPassword(cs, hwnd);                            // 작은 비밀번호 창만 표시
+     // 로그인 후 재서명(caRUN) - 비밀번호 창 + PKCS#7
+     CS_SignFullPrompt(cs, hwnd, data, len, sig, &sigLen);
+
+ (5) 종료 : CS_Close(cs)
+
+------------------------------------------------------------------------------
+ 3. 함수 설명
+------------------------------------------------------------------------------
+ 공통 : 반환 0 = 성공, 그 외 = 벤더 오류코드(sk_if_GetLastErrorCode)
+        자주 보는 코드 : 2417 비밀번호 오류 / 2500 인증서 없음 / 2001 만료 /
+                         2501 취소(비밀번호 창) / 1000 취소(SignFullPrompt)
+        sigOutLen 류 : [in] 버퍼 크기 / [out] 실제 서명 길이
+        hwnd 인자    : 벤더 창을 모달로 띄울 부모 (NULL 허용)
+
+ HCS CS_Open(void)
+   - 벤더 APP_CONTEXT 초기화(sk_if_cert_InitContextApp). 실패 시 NULL.
+
+ int CS_Select(HCS h, const char* dn, const char* password, unsigned char storage, const char* certSetName)
+   - 선택창 없이 DN + 비밀번호로 인증서 선택.
+   - 비밀번호는 즉시 벤더 방식으로 암호화해 세션에 보관(평문 미보관).
+   - 오입력 허용 1회, KeySafer 모드.
+
+ int CS_SelectInteractive(HCS h, HWND parent, char* dnOut, int dnOutCap,
+                          unsigned char* storageOut, char* certSetNameOut, int certSetNameOutCap)
+   - 벤더 인증서 선택창(전체 매체 검색). 선택된 DN·저장매체·인증서셋 이름을 돌려준다.
+
+ int CS_SignFull(HCS h, const unsigned char* data, int dataLen, unsigned char* sigOut, int* sigOutLen)
+   - 로그인용. 서명자 인증서가 포함된 PKCS#7 SignedData (sk_if_cert_SignData).
+   - CS_Select / CS_SelectInteractive 성공 후 호출.
+
+ int CS_Sign(HCS h, const unsigned char* data, int dataLen, unsigned char* sigOut, int* sigOutLen)
+   - TR 반복 서명용. 인증서 미포함(sk_if_cert_SignData_notEncode).
+
+ int CS_VerifyPassword(HCS h, HWND parent)
+   - 인증서 선택창 없이 벤더 비밀번호 창만 띄워 확인. 성공 시 세션 비밀번호 교체.
+   - CertifyCtrl::checkPasswd() 와 같은 동작.
+
+ int CS_SignFullPrompt(HCS h, HWND parent, const unsigned char* data, int dataLen,
+                       unsigned char* sigOut, int* sigOutLen)
+   - 로그인 후(CertifyFull caRUN) 저장 비밀번호를 지우고 벤더 비밀번호 창으로 받아
+     PKCS#7 서명. 성공 시 세션 비밀번호 교체.
+
+ int CS_CloudSelectInteractive(HCS h, HWND parent, char* dnOut, int dnOutCap,
+                               char* certSetNameOut, int certSetNameOutCap)
+   - 클라우드 인증서 선택. 항상 벤더 팝업(폰 PIN / 푸시 확인) 필요.
+
+ int CS_CloudSignFull(HCS h, const unsigned char* data, int dataLen, unsigned char* sigOut, int* sigOutLen)
+   - 클라우드 인증서 서명(sk_if_cert_SignDataWithR). 벤더 샘플에 있던 r 값 메모리 누수를 정리함.
+
+ void CS_Close(HCS h)
+   - 세션 해제 + 벤더 정적 컨텍스트 해제(sk_if_cert_static_context_release).
+
+ const char* CS_GetLastError(void)
+   - 벤더 마지막 오류 메시지(ANSI).
+
+------------------------------------------------------------------------------
+ 4. 호출측 (axWizard) 연결 위치
+------------------------------------------------------------------------------
+ Guard.h           PFN_CS_* 함수 포인터, m_hCertSign, m_cs
+ Guard.cpp:321     Initial - LoadLibrary("certsign.dll") + GetProcAddress
+ Guard.cpp:4629~4814  로그인 서명 (CS_Select → CS_SignFull)
+ Guard.cpp:4930~4959  TR 서명 (CS_VerifyPassword / CS_Sign)
+ Guard.cpp:5000~5005  인증서 로그인이 아닌 경우 CS_Open 시점 결정
+ Guard.cpp:6872~6990  CertifyFull: 선택창(CS_SelectInteractive), caRUN(CS_SignFullPrompt),
+                      로컬(CS_Open→CS_SignFull) / 클라우드(CS_CloudSelectInteractive→CS_CloudSignFull),
+                      CS_Open 실패 시 "[CertSign] CS_Open FAILED - this session uses vendor control"
+ 로그 카테고리     LOG_CERTIFY "[CertSign] ..."
+
+------------------------------------------------------------------------------
+ 5. 주의 사항
+------------------------------------------------------------------------------
+ - CS_Close 가 벤더 "정적" 컨텍스트까지 해제하므로, 같은 프로세스에서 벤더 컨트롤과
+   certsign 을 동시에 쓰는 구성은 피할 것.
+ - sigOut 버퍼가 작으면 실패 처리(벤더 메모리는 해제됨). 충분한 크기로 호출.
+ - 비밀번호·서명 원문을 로그에 남기지 말 것.
+ - 사인코리아 고도화(신규 클라이언트 모듈) 도착 시 lib/include 교체 후 재검증 필요.
+
+------------------------------------------------------------------------------
+ 6. 변경 이력
+------------------------------------------------------------------------------
+ 2026-11-18  명세서 최초 작성 (구현은 이전에 완료·적용됨)

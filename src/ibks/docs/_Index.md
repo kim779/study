@@ -75,3 +75,4 @@ VBScript→Python 스크립트엔진 전환 프로젝트 당시 작성된 초기
 - [[WorkLog.md]] — 작업 일지: 날짜별 한 일 / 다음 할 일, 누적 할 일 목록 (2026-11-06~)
 - [[2026-08-17.md]] — 작업일지(platform 분석 내용 정리 등)
 - [[AxisAgent.md]] — AxisAgent(크래시/행 감시 exe) 개선 과제 목록과 항목별 수정 제안
+- [[VBScriptDeprecation.md]] — MS VBScript 지원 중단 대응: 일정, HTS 의존 지점, 실패 시 크래시 실측과 NULL 방어, AxisAgent 검사·활성화

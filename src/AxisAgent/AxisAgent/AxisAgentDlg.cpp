@@ -24,7 +24,9 @@ static const DWORD DUMP_INTERVAL_MS = 3000;
 
 // 응용 프로그램 정보에 사용되는 CAboutDlg 대화 상자입니다.
 #include <string>
-
+#include<set>
+#include <Shlwapi.h>
+#pragma comment(lib, "shlwapi.lib")
 
 
 namespace
@@ -368,6 +370,8 @@ BEGIN_MESSAGE_MAP(CAxisAgentDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BTN_DUMPOPEN, &CAxisAgentDlg::OnBnClickedBtnDumpOpen)
 	ON_BN_CLICKED(IDC_BTN_SYMPATH,  &CAxisAgentDlg::OnBnClickedBtnSympath)
 	ON_BN_CLICKED(IDC_CHK_STOP, &CAxisAgentDlg::OnBnClickedChkStop)
+	ON_BN_CLICKED(IDC_BTN_DEPEND, &CAxisAgentDlg::OnBnClickedBtnDepend)
+	ON_BN_CLICKED(IDC_BTN_VBCHECK, &CAxisAgentDlg::OnBnClickedBtnVbcheck)
 END_MESSAGE_MAP()
 
 
@@ -430,6 +434,148 @@ bool CAxisAgentDlg::PassFilter(const CString& msg)
 	sMsg.MakeLower();
 	return sMsg.Find(m_sFilter) >= 0;	// m_sFilter is stored lower-case
 }
+
+// True if VBScript engine can be created (same 32-bit COM view as HTS).
+// path (optional): receives loaded vbscript.dll full path
+static bool IsVBScriptAvailable(char* path = NULL, int pathCap = 0)
+{
+	HRESULT hrInit = ::CoInitializeEx(NULL, COINIT_APARTMENTTHREADED);
+	bool ok = false;
+	CLSID clsid;
+	if (SUCCEEDED(::CLSIDFromProgID(L"VBScript", &clsid)))
+	{
+		IUnknown* unk = NULL;
+		if (SUCCEEDED(::CoCreateInstance(clsid, NULL, CLSCTX_INPROC_SERVER, IID_IUnknown, (void**)&unk)))
+		{
+			// get path while DLL is still loaded (CoUninitialize unloads it)
+			if (path && pathCap > 0)
+			{
+				HMODULE hv = ::GetModuleHandleA("vbscript.dll");
+				if (hv) ::GetModuleFileNameA(hv, path, pathCap);
+			}
+			unk->Release();
+			ok = true;
+		}
+	}
+	if (SUCCEEDED(hrInit))
+		::CoUninitialize();
+	return ok;
+}
+
+
+//Run DISM elevated (UAC) to add VBScript capability.
+// Returns DISM exit code (0 ok, 3010 reboot required), -1 if not launched/f inished
+static long EnableVBScript(DWORD* launchErr)
+{
+	char winDir[MAX_PATH] = { 0 };
+	::GetWindowsDirectoryA(winDir, MAX_PATH);
+
+	//32-bit processon 64-bit windows must run 64-bit DISM via Sysnative
+	BOOL wow64 = FALSE;
+	::IsWow64Process(::GetCurrentProcess(), &wow64);
+	CString dism;
+	dism.Format("%s\\%s\\dism.exe", winDir, wow64 ? "Sysnative" : "System32");
+
+	SHELLEXECUTEINFOA sei = { sizeof(sei) };
+	sei.fMask = SEE_MASK_NOCLOSEPROCESS;
+	sei.lpVerb = "runas";
+	sei.lpFile = dism;
+	sei.lpParameters = "/Online /Add-Capability /CapabilityName:VBSCRIPT~~~~ /NoRestart";
+	sei.nShow = SW_HIDE;
+
+	*launchErr = 0;
+	if (!::ShellExecuteExA(&sei) || sei.hProcess == NULL)
+	{
+		*launchErr = ::GetLastError(); 
+		return -1;
+	}
+
+	DWORD code = (DWORD)-1;
+	if (::WaitForSingleObject(sei.hProcess, 15 * 60 * 1000) == WAIT_OBJECT_0)
+		::GetExitCodeProcess(sei.hProcess, &code);
+	else
+		*launchErr = WAIT_TIMEOUT;
+	::CloseHandle(sei.hProcess);
+	return (long)code;
+}
+
+static void RunVBScriptCheck(CAxisAgentDlg* dlg, bool manual)
+{
+	char msg[256] = { 0 };
+
+	char vpath[MAX_PATH] = { 0 };
+	if (IsVBScriptAvailable(vpath, MAX_PATH))
+	{
+		sprintf_s(msg, "-------------------------[VBS] VBScript 사용 가능 path=%s\n", vpath);
+		dlg->AddLog("MONITOR", msg);
+		if (manual)
+		{
+			sprintf_s(msg, "VBScript 기능이 정상적으로 켜져 있습니다.\n\n%s", vpath);
+			::MessageBoxA(NULL, msg, "HTS", MB_OK | MB_ICONINFORMATION | MB_TOPMOST);
+		}
+		return;
+	}
+	dlg->WriteLog("[VBS] VBScript 꺼짐 - 사용자 확인 요청\n");
+
+	int ans = ::MessageBoxA(NULL,
+		"HTS 화면 동작에 필요한 Windows 기능(VBScript)이 꺼져 있습니다.\n"
+		"지금 켜시겠습니까? (관리자 권한 확인 창이 표시됩니다)",
+		"HTS", MB_YESNO | MB_ICONWARNING | MB_TOPMOST);
+	if (ans != IDYES)
+	{
+		dlg->WriteLog("[VBS] 사용자가 활성화 거부\n");
+		return;
+	}
+
+	DWORD err = 0;
+	long code = EnableVBScript(&err);
+	bool now = IsVBScriptAvailable();
+	sprintf_s(msg, "[VBS] DISM exit=%ld(0x%08lx) err=%lu available=%d\n", code, (DWORD)code, err, now ? 1 : 0);
+	dlg->WriteLog(msg);
+
+	if (code == 0 || code == 3010)
+	{
+		::MessageBoxA(NULL,
+			(code == 3010) ? "VBScript 기능을 켰습니다. PC를 다시 시작한 뒤 HTS를 사용해 주십시오."
+			: "VBScript 기능을 켰습니다. HTS를 다시 실행해 주십시오.",
+			"HTS", MB_OK | MB_ICONINFORMATION | MB_TOPMOST);
+	}
+	else if (err != ERROR_CANCELLED)
+	{
+		sprintf_s(msg,
+			"VBScript 기능을 켜지 못했습니다. (code=0x%08lx)\n\n"
+			"설정 > 시스템 > 선택적 기능 > 기능 보기 에서\n"
+			"VBSCRIPT 를 추가해 주십시오.", (DWORD)code);
+		::MessageBoxA(NULL, msg, "HTS", MB_OK | MB_ICONERROR | MB_TOPMOST);
+	}
+}
+
+// Only one check at a time (startup check and button click may overlap)
+static volatile LONG s_vbsCheckRunning = 0;
+
+static DWORD WINAPI VBScriptCheckThreadProc(LPVOID param)		// startup: silent when OK
+{
+	RunVBScriptCheck((CAxisAgentDlg*)param, false);
+	::InterlockedExchange(&s_vbsCheckRunning, 0);
+	return 0;
+}
+
+static DWORD WINAPI VBScriptManualThreadProc(LPVOID param)		// button: always report
+{
+	RunVBScriptCheck((CAxisAgentDlg*)param, true);
+	::InterlockedExchange(&s_vbsCheckRunning, 0);
+	return 0;
+}
+
+
+
+
+
+
+
+
+
+
 
 BOOL CAxisAgentDlg::OnInitDialog()
 {
@@ -593,6 +739,13 @@ BOOL CAxisAgentDlg::OnInitDialog()
 		DebugLog("OnInitDialog: MonitorThread 시작\n");
 	else
 		DebugLog("OnInitDialog: MonitorThread CreateThread 실패 err=%lu\n", GetLastError());
+
+	::InterlockedExchange(&s_vbsCheckRunning, 1);
+	HANDLE hVbs = CreateThread(NULL, 0, VBScriptCheckThreadProc, (LPVOID)this, 0, NULL);
+	if (hVbs)
+		CloseHandle(hVbs);
+	else
+		::InterlockedExchange(&s_vbsCheckRunning, 0);
 
 	RegisterTrayIcon();
 	return TRUE;
@@ -2633,6 +2786,8 @@ void CAxisAgentDlg::InitLayout()
 		{ IDC_EDIT_DETAIL,    LAY_MOVE_Y | LAY_SIZE_X },
 		{ IDC_BTN_TEST,       LAY_MOVE_Y },
 		{ IDC_BTN_DUMPOPEN,   LAY_MOVE_Y },
+		{ IDC_BTN_DEPEND,     LAY_MOVE_Y },
+		{ IDC_BTN_VBCHECK,    LAY_MOVE_Y },
 		{ IDC_CHK_STOP,       LAY_MOVE_X },
 		{ IDC_LIST_CLEAR,     LAY_MOVE_X },
 		{ IDC_BTN_HIDE,       LAY_MOVE_X | LAY_MOVE_Y },
@@ -3079,4 +3234,145 @@ void CAxisAgentDlg::OnBnClickedChkStop()
 {
 	if (!m_chkStop.GetCheck())
 		RefreshLogList();
+}
+
+
+static BYTE* MapPeIamge(const char* path, HMODULE* hOut)
+{
+	*hOut = ::LoadLibraryExA(path, NULL, LOAD_LIBRARY_AS_IMAGE_RESOURCE | LOAD_LIBRARY_AS_DATAFILE);
+	if (*hOut == NULL)
+		return NULL;
+	return (BYTE*)((ULONG_PTR)*hOut & ~(ULONG_PTR)3);  
+}
+
+static IMAGE_DATA_DIRECTORY* PeDataDir(BYTE* base, int idx)
+{
+	IMAGE_DOS_HEADER* dos = (IMAGE_DOS_HEADER*)base;
+	if (dos->e_magic != IMAGE_DOS_SIGNATURE)
+		return NULL;
+	IMAGE_NT_HEADERS32* nt = (IMAGE_NT_HEADERS32*)(base + dos->e_lfanew);
+	if (nt->Signature != IMAGE_NT_SIGNATURE || nt->OptionalHeader.Magic != IMAGE_NT_OPTIONAL_HDR32_MAGIC)
+		return NULL;
+	IMAGE_DATA_DIRECTORY* dir = &nt->OptionalHeader.DataDirectory[idx];
+	return dir->VirtualAddress ? dir : NULL;
+}
+
+static bool LoadExportNames(const char* path, std::set<std::string>& out)
+{
+	HMODULE h;
+	BYTE* b = MapPeIamge(path, &h);
+	if (b == NULL)
+		return false;
+	IMAGE_DATA_DIRECTORY* dir = PeDataDir(b, IMAGE_DIRECTORY_ENTRY_EXPORT);
+	if (dir)
+	{
+		IMAGE_EXPORT_DIRECTORY* ex = (IMAGE_EXPORT_DIRECTORY*)(b + dir->VirtualAddress);
+		DWORD* names = (DWORD*)(b + ex->AddressOfNames);
+		for (DWORD i = 0; i < ex->NumberOfNames; i++)
+			out.insert((const char*)(b + names[i]));
+	}
+	::FreeLibrary(h);
+	return true;
+}
+
+static int CheckModuleImports(CAxisAgentDlg* dlg, const char* target)
+{
+	char folder[MAX_PATH], msg[512];
+	lstrcpynA(folder, target, MAX_PATH);
+	::PathRemoveFileSpecA(folder);
+
+	HMODULE h;
+	BYTE* b = MapPeIamge(target, &h);
+	if (b == NULL)
+	{
+		sprintf_s(msg, "[DEPEND] 파일 열기 실패 err=%lu", ::GetLastError());
+		dlg->AddLog("DEPEND", msg);
+		return -1;
+	}
+	if (PeDataDir(b, IMAGE_DIRECTORY_ENTRY_IMPORT) == NULL && PeDataDir(b, IMAGE_DIRECTORY_ENTRY_EXPORT) == NULL)
+	{
+		dlg->AddLog("DEPEND", "[DEPEND] 32비트 PE 파일이 아니거나 import가 없음");
+		::FreeLibrary(h);
+		return -1;
+	}
+	int total = 0, checked = 0;
+	IMAGE_DATA_DIRECTORY* dir = PeDataDir(b, IMAGE_DIRECTORY_ENTRY_IMPORT);
+	for (IMAGE_IMPORT_DESCRIPTOR* imp = dir ? (IMAGE_IMPORT_DESCRIPTOR*)(b + dir->VirtualAddress) : NULL;
+		imp && imp->Name; imp++)
+	{
+		const char* dll = (const char*)(b + imp->Name);
+		char path[MAX_PATH];
+		::PathCombineA(path, folder, dll);
+		if (::GetFileAttributesA(path) == INVALID_FILE_ATTRIBUTES)
+			continue;	// system/CRT DLL, not in the same folder
+
+		std::set<std::string> ex;
+		if (!LoadExportNames(path, ex))
+			continue;
+
+		int count = 0, missing = 0;
+		DWORD thunk = imp->OriginalFirstThunk ? imp->OriginalFirstThunk : imp->FirstThunk;
+		for (IMAGE_THUNK_DATA32* t = (IMAGE_THUNK_DATA32*)(b + thunk); t->u1.AddressOfData; t++, count++)
+		{
+			if (IMAGE_SNAP_BY_ORDINAL32(t->u1.Ordinal))
+				continue;
+			const char* fn = (const char*)((IMAGE_IMPORT_BY_NAME*)(b + t->u1.AddressOfData))->Name;
+			if (ex.find(fn) == ex.end())
+			{
+				missing++;
+				sprintf_s(msg, "[DEPEND]     MISSING %s!%.400s", dll, fn);
+				dlg->AddLog("DEPEND", msg);
+			}
+		}
+		sprintf_s(msg, "[DEPEND] %-20s imports=%d missing=%d", dll, count, missing);
+		dlg->AddLog("DEPEND", msg);
+		total += missing;
+		checked++;
+	}
+	::FreeLibrary(h);
+
+	if (checked == 0)
+		dlg->AddLog("DEPEND", "[DEPEND] 같은 폴더에 있는 의존 DLL 없음 (시스템 DLL만 사용)");
+	return total;
+}
+
+void CAxisAgentDlg::OnBnClickedBtnDepend()
+{
+	CFileDialog dlg(TRUE, NULL, NULL,
+		OFN_FILEMUSTEXIST | OFN_HIDEREADONLY,
+		_T("Modules (*.exe;*.dll;*.ocx)|*.exe;*.dll;*.ocx|All Files (*.*)|*.*||"),
+		this);
+
+	if (dlg.DoModal() != IDOK)
+		return;
+
+	CStringA szPath(dlg.GetPathName());
+	AddLog("DEPEND", "--------------------------------");
+	AddLog("DEPEND", (LPCSTR)(CStringA("[DEPEND] 검사 시작: ") + szPath));
+
+	int missing = CheckModuleImports(this, szPath);
+	if (missing == 0)
+		AddLog("DEPEND", "[DEPEND] 결과: 정상 (누락 함수 없음)");
+	else if (missing > 0)
+	{
+		CStringA s;
+		s.Format("[DEPEND] 결과: 누락 함수 %d개 -> 로드시 127 에러 발생", missing);
+		AddLog("DEPEND", s);
+	}
+}
+
+
+void CAxisAgentDlg::OnBnClickedBtnVbcheck()
+{
+	if (::InterlockedCompareExchange(&s_vbsCheckRunning, 1, 0) != 0)
+	{
+		AddLog("MONITOR", "[VBS] 검사가 이미 진행 중입니다");
+		return;
+	}
+	AddLog("MONITOR", "[VBS] 수동 검사 시작");
+	HANDLE h = CreateThread(NULL, 0, VBScriptManualThreadProc, (LPVOID)this, 0, NULL);
+	if (h)
+		CloseHandle(h);
+	else
+		::InterlockedExchange(&s_vbsCheckRunning, 0);
 }

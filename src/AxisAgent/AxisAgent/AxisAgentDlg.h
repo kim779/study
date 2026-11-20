@@ -248,4 +248,6 @@ public:
 	afx_msg void OnBnClickedBtnSympath();
 
 	afx_msg void OnBnClickedChkStop();
+	afx_msg void OnBnClickedBtnDepend();
+	afx_msg void OnBnClickedBtnVbcheck();
 };

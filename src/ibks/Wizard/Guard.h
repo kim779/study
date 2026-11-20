@@ -15,6 +15,7 @@
 #include "Misc.h"
 #include "OleDropEx.h"
 #include "encrypt/lz4.h"
+struct DG_API;				// [DG] DataGuard.dll API table (h/DataGuardApi.h)
 
 #define	WM_GUIDE	WM_USER+1
 #define	WM_VERS		WM_USER+2
@@ -214,14 +215,6 @@ private:
 	CStringArray	m_accno;		// account #
 	CMapStringToString m_account;		// account entry
 
-	CStringArray	m_accHash;		// salted SHA-256 hex of own accounts, set only at registration
-	BYTE		m_accSalt[16]{};	// per-process random salt
-	bool		m_accSaltOK = false;
-	CString	AccHash(CString acc);
-	void	AccHashAdd(CString acc);
-	void	AccHashRemove(CString acc);
-
-
 	CMapStringToString m_push;		// user push forms
 
 	unsigned char	m_absS;			// abs security
@@ -331,7 +324,8 @@ public:
 	void	GetCode(CString& domino);
 
 	void	SetAccounts(CString entry);
-	bool	AccHashCheck(CString acc);
+	HMODULE		m_hDG = NULL;			// [DG] DataGuard.dll handle
+	const DG_API*	m_dg = NULL;			// [DG] NULL = not loaded -> fail-open (no check)
 	void	GetAccounts(CString& account);
 	void	GetAcName(CString& account, BOOL full);
 	bool	GetAcPass(CString key, CString& pass);

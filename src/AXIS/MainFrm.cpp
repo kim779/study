@@ -334,6 +334,9 @@ void WriteUpLog(LPCSTR sfile, LPCSTR log, ...)
 
 void WriteLog( LPCSTR log, ... )
 {
+	CString slog;
+	slog.Format("%s", log);
+	OutputDebugString(slog);
 #if 0
 	TRY
 	{
@@ -478,137 +481,6 @@ static UINT indicators[] =
 	ID_INDICATOR_NUM,
 	ID_INDICATOR_SCRL,
 };
-
-//ASTx Callback Function
-int __stdcall STSDKEX_EventCallback(long lCode, void* pParam, long lParamSize)
-{
-	UNREFERENCED_PARAMETER(pParam);
-	UNREFERENCED_PARAMETER(lParamSize);
-
-	switch(lCode)
-	{
-					
-		case STSDKEX_PB_CALLBACK_ABNORMAL_MEMORY_ACCESS:
-			{
-				if(pParam)
-				{
-					PST_STSDKEX_PB_PROCESS_PATH phpf = (PST_STSDKEX_PB_PROCESS_PATH)pParam;
-#pragma warning (disable : 26496)					
-					USES_CONVERSION;
-#pragma warning (default : 26496)		
-					TRACE(_T("[STSDKEX_PB_Callback] STSDKEX_PB_CALLBACK_ABNORMAL_MEMORY_ACCESS(#%ld,'%s')\n"),  
-						phpf->ulPID, A2T(phpf->szProcessName));
-				}
-				AfxMessageBox(_T("메모리에 허가되지 않은 접근을 시도했습니다."));
-				
-				// 프로그램 종료 코드
-				//theApp.quitApplication();
-			}
-			break;
-		case STSDKEX_PB_CALLBACK_REMOTE_DETECT:
-			{
-				AfxMessageBox(_T("원격 접근을 감지하였습니다."));
-			}
-			break;
-		case STSDKEX_PB_CALLBACK_REMOTE_BLOCKD:
-			{
-				AfxMessageBox(_T("원격 접근을 차단하였습니다."));
-			}
-			break;
-
-		case STSDKEX_PB_CALLBACK_START:
-			{
-			    const DWORD dwErrCode = (DWORD)pParam;
-				CString strMsg;
-				strMsg.Format(_T("STSDKEX_PB_CALLBACK_START dwErrCode:(%x)"), dwErrCode);
-				OutputDebugString(strMsg);
-			}
-			break;
-			
-		case STSDKEX_PB_CALLBACK_STOP:
-			{
-			    const DWORD dwErrCode = (DWORD)pParam;
-				CString strMsg;
-				strMsg.Format(_T("STSDKEX_PB_CALLBACK_STOP dwErrCode:(%x)"), dwErrCode);
-				OutputDebugString(strMsg);
-			}
-			break;
-			
-		case STSDKEX_PB_CALLBACK_EXCEPTION_PROCESS:
-			{
-			    const DWORD dwErrCode = (DWORD)pParam;
-				CString strMsg;
-				strMsg.Format(_T("STSDKEX_PB_CALLBACK_EXCEPTION_PROCESS dwErrCode:(%x)"), dwErrCode);
-				OutputDebugString(strMsg);
-			}
-			break;
-			
-		case STSDKEX_PB_CALLBACK_PROTECT_PROCESS_INS:
-			{
-			    const DWORD dwErrCode = (DWORD)pParam;
-				CString strMsg;
-				strMsg.Format(_T("STSDKEX_PB_CALLBACK_PROTECT_PROCESS_INS dwErrCode:(%x)"), dwErrCode);
-				OutputDebugString(strMsg);
-			}
-			break;
-			
-		case STSDKEX_PB_CALLBACK_PROTECT_PROCESS_DEL:
-			{
-			    const DWORD dwErrCode = (DWORD)pParam;
-				CString strMsg;
-				strMsg.Format(_T("STSDKEX_PB_CALLBACK_PROTECT_PROCESS_DEL dwErrCode:(%x)"), dwErrCode);
-				OutputDebugString(strMsg);
-
-			}
-			break;
-			
-		case STSDKEX_PB_CALLBACK_EXCEPTION_PROCESS_INS:
-			{
-			    const DWORD dwErrCode = (DWORD)pParam;
-				CString strMsg;
-				strMsg.Format(_T("STSDKEX_PB_CALLBACK_EXCEPTION_PROCESS_INS dwErrCode:(%x)"), dwErrCode);
-				OutputDebugString(strMsg);
-			}
-			break;
-			
-		case STSDKEX_PB_CALLBACK_EXCEPTION_PROCESS_DEL:
-			{
-			    const DWORD dwErrCode = (DWORD)pParam;
-				CString strMsg;
-				strMsg.Format(_T("STSDKEX_PB_CALLBACK_EXCEPTION_PROCESS_DEL dwErrCode:(%x)"), dwErrCode);
-				OutputDebugString(strMsg);
-			}
-			break;
-			
-		case STSDKEX_FW_CALLBACK_START:
-			{
-			    const DWORD dwErrCode = (DWORD)pParam;
-				CString strMsg;
-				strMsg.Format(_T("STSDKEX_FW_CALLBACK_START dwErrCode:(%x)"), dwErrCode);
-				OutputDebugString(strMsg);
-			}
-			break;
-			
-		case STSDKEX_FW_CALLBACK_STOP:
-			{
-			    const DWORD dwErrCode = (DWORD)pParam;
-				CString strMsg;
-				strMsg.Format(_T("STSDKEX_FW_CALLBACK_STOP dwErrCode:(%x)"), dwErrCode);
-				OutputDebugString(strMsg);
-			}
-			break;
-
-		default :
-			{
-				CString strMsg;
-				strMsg.Format(_T("해킹방지 기능에 문제가 발생했습니다(lCode=0x%08x)"), lCode);
-				OutputDebugString(strMsg);
-			}
-			break;
-	} // end of switch
-
-	return 0;
-}
 
 BOOL CALLBACK MyInfoEnumProc(HMONITOR hMonitor,  HDC hdcMonitor, LPRECT lprcMonitor, LPARAM dwData)
 {
@@ -1101,7 +973,7 @@ CMainFrame::CMainFrame()
 
 	m_arrGlb.RemoveAll();
 
-	m_DInstallASTx = STSDKEX_ERROR_SUCCESS;
+	m_DInstallASTx = AstxClient::RESULT_OK;
 
 	m_bitmapBtn = nullptr;
 
@@ -28087,7 +27959,7 @@ OutputDebugString(m_slog);
 
 #endif
 
-	DWORD dwError = STSDKEX_ERROR_SUCCESS;
+	DWORD dwError = AstxClient::RESULT_OK;
 	
 	//modi ASTx 202409  무조건 실행
 	//const BOOL pcAOS = AfxGetApp()->GetProfileInt(INFORMATION, "AOS", 1);
@@ -28103,8 +27975,8 @@ OutputDebugString(m_slog);
 			m_axConnect->SetGuide("메모리 보호 프로그램을 설정합니다...");
 		}
 		
-		dwError = STSDKEX_IsInstalled();
-		if(STSDKEX_ERROR_PRODUCT_NOT_INSTALLED == dwError)
+		dwError = m_astx.InstalledCode();
+		if(AstxClient::RESULT_NOT_INSTALLED == dwError)
 		{
 			installASTx();
 		}
@@ -30204,35 +30076,16 @@ LRESULT CMainFrame::OnTop10( WPARAM wParam, LPARAM lParam )
 //ASTx 관련 함수
 BOOL CMainFrame::installASTx()
 {
-	CString strMasterURL;
+	DWORD dwError = m_astx.InstalledCode();
+	switch (dwError)
+	{
+	case AstxClient::RESULT_NOT_INSTALLED:
+	{
+		dwError = m_astx.Install(this->GetSafeHwnd());     // InstallA(UI_MODE_SHOW, hwnd, "") on both paths
 
-//	if(IsWow64() == TRUE) //20191212 ASTX 설치 
-	if(IsWow64() == "64 Bit") 
-	{
-		// x64
-		strMasterURL.Format(_T("%s/%s/%s"), STSDKEX_MASTER_URL, STSDKEX_MASTER_PLATFORM_X64, STSDKEX_MASTER_NAME);
-	}
-	else
-	{
-		// x86
-		strMasterURL.Format(_T("%s/%s/%s"), STSDKEX_MASTER_URL, STSDKEX_MASTER_PLATFORM_NT32, STSDKEX_MASTER_NAME);
-	}
-
-	const DWORD dwUIMode = STSDKEX_UI_MODE_SHOW;
-// 	BOOL bHideUpdateUI = IsDlgButtonChecked(IDC_CHK_HIDE_UPDATEUI);
-// 	if( bHideUpdateUI )
-// 		dwUIMode = STSDKEX_UI_MODE_HIDE;
-	strMasterURL.Empty();  //url 주소를 빈값으로 올리면 알아서 바꿔준다고 함
-	DWORD dwError = STSDKEX_IsInstalled();
-	switch( dwError )
-	{
-	case STSDKEX_ERROR_PRODUCT_NOT_INSTALLED:
-		{
-			dwError = STSDKEX_InstallA(STSDKEX_UI_MODE_SHOW, this->GetSafeHwnd(), strMasterURL);
-			
-			if( STSDKEX_ERROR_SUCCESS	!= dwError )
+			if(AstxClient::RESULT_OK != dwError )
 			{
-				if(STSDKEX_ERROR_PRODUCT_NOT_INSTALLED == dwError)
+				if(AstxClient::RESULT_NOT_INSTALLED == dwError)
 				{
 					CString path;
 					path.Format("%s\\exe\\%s",Axis::home,"astx_setup_offline.exe");
@@ -30241,7 +30094,7 @@ BOOL CMainFrame::installASTx()
 				else
 				{
 					CString szMsg;
-					szMsg.Format(_T("업데이트중 오류가 발생했습니다.\r\n(result=0x%08x, %s)"), dwError, Err2Str(dwError));
+					szMsg.Format(_T("업데이트중 오류가 발생했습니다.\r\n(result=0x%08x, %s)"), dwError, AstxClient::ErrStr(dwError));
 					AfxMessageBox(szMsg);
 					return FALSE;
 				}
@@ -30252,7 +30105,7 @@ BOOL CMainFrame::installASTx()
 
 	//astx 설치후 재시작
 	const int AOSRESTART = AfxGetApp()->GetProfileInt(INFORMATION, "AOSRESTART", 0);
-	if(AOSRESTART == 0 && dwError == STSDKEX_ERROR_SUCCESS)
+	if(AOSRESTART == 0 && dwError == AstxClient::RESULT_OK)
 	{
 		AfxGetApp()->WriteProfileInt(INFORMATION, "AOSRESTART", 1);
 		m_bExit = false;
@@ -30267,697 +30120,171 @@ BOOL CMainFrame::installASTx()
 	return TRUE;
 }
 
-CString CMainFrame::Err2Str(DWORD dwErrCode)
-{
-	CString strErr;
-
-	switch( dwErrCode )
-	{
-	case STSDKEX_ERROR_SUCCESS:
-		{
-			strErr = _T("성공");
-		}
-		break;
-	case STSDKEX_ERROR_UNINITIALIZE_FAILED:
-		{
-			strErr = _T("UNINITIALIZE에 실패하였습니다.");
-		}
-		break;
-	case STSDKEX_ERROR_LOADLIBRARY_FAILED:
-		{
-			strErr = _T("SDK 모듈을 로드하는데 실패하였습니다.");
-		}
-		break;
-	case STSDKEX_ERROR_GETPROCADDRESS_FAILED:
-		{
-			strErr = _T("SDK 모듈에서 인터페이스를 찾을 수 없습니다.");
-		}
-		break;
-	case STSDKEX_ERROR_FUNCTION_START_FAILED:
-		{
-			strErr = _T("기능을 시작시키는데 실패하였습니다.");
-		}
-		break;
-	case STSDKEX_ERROR_FUNCTION_STOP_FAILED:
-		{
-			strErr = _T("기능을 종료시키는데 실패하였습니다.");
-		}
-		break;
-	case STSDKEX_ERROR_ALREADY_INSTALLED:
-		{
-			strErr = _T("제품이 이미 설치되어 있습니다.");
-		}
-		break;
-	case STSDKEX_ERROR_NOT_INITIALIZED:
-		{
-			strErr = _T("초기화 되지 않았습니다.");
-		}
-		break;
-	case STSDKEX_ERROR_BAD_PARAMETER:
-		{
-			strErr = _T("파라미터가 이상합니다.");
-		}
-		break;
-	case STSDKEX_ERROR_INITIALIZE_FAILED:
-		{
-			strErr = _T("초기화에 실패하였습니다.");
-		}
-		break;
-	case STSDKEX_ERROR_NOT_LOADLIBRARY:
-		{
-			strErr = _T("SDK 모듈이 로드되어 있지 않습니다.");
-		}
-		break;
-	case STSDKEX_ERROR_REMAIN_SHAREDCOUNT:
-		{
-			strErr = _T("기능을 다른 곳에서 사용중이므로 종료할 수가 없습니다.");
-		}
-		break;
-	case STSDKEX_ERROR_FUNCTION_ALREADY_STOPPED:
-		{
-			strErr = _T("기능이 이미 종료된 상태입니다.");
-		}
-		break;
-	case STSDKEX_ERROR_INVALID_CUSTOMER_ID:
-		{
-			strErr = _T("고객사 ID가 잘못 되었습니다.");
-		}
-		break;
-	case STSDKEX_ERROR_INVALID_FUNCTION_CODE:
-		{
-			strErr = _T("기능 코드가 잘못 되었습니다.");
-		}
-		break;
-	case STSDKEX_ERROR_PRODUCT_NOT_INSTALLED:
-		{
-			strErr = _T("제품이 설치되지 않았습니다.");
-		}
-		break;
-	case STSDKEX_ERROR_DRIVER_RULE_NOT_VERIFYED:
-		{
-			strErr = _T("드라이버 룰이 유효하지 않습니다.");
-		}
-		break;
-	case STSDKEX_ERROR_NOT_PROTECTED_HWND:
-		{
-			strErr = _T("보호하지 않는 Edit Control입니다.");
-		}
-		break;
-	case STSDKEX_ERROR_NOT_PROPERTY_HWND:
-		{
-			strErr = _T("속성이 유효하지 않습니다.");
-		}
-		break;
-	case STSDKEX_ERROR_INVALID_PROCESS_ID:
-		{
-			strErr = _T("프로세스 ID가 잘못 지정되었습니다.");
-		}
-		break;
-	case STSDKEX_ERROR_DOWNLOAD_SETTING_FAILED:
-		{
-			strErr = _T("다운로드할 파일셋을 구성하는데 실패하였습니다.");
-		}
-		break;
-	case STSDKEX_ERROR_DOWNLOAD_UPDATESETUP:
-		{
-			strErr = _T("업데이트 프로그램 셋업을 받아올수 없습니다.");
-		}
-		break;
-	case STSDKEX_ERROR_CHECK_UPDATEMODULE:
-		{
-			strErr = _T("업데이트 프로그램 모듈 검증이 실패하였습니다.");
-		}
-		break;
-	case STSDKEX_ERROR_SIGN_NOT_VERIFYED:
-		{
-			strErr = _T("서명이 올바르게 되어 있지 않습니다.");
-		}
-		break;
-	case STSDKEX_ERROR_FUNCTION_FAILED:
-		{
-			strErr = _T("함수를 수행하는데 실패하였습니다.");
-		}
-		break;
-	case STSDKEX_ERROR_INVALID_SUB_FUNCTION_CODE:
-		{
-			strErr = _T("해킹보호 기능의 세부기능 코드가 잘못 되었습니다.");
-		}
-		break;
-	case STSDKEX_ERROR_FUNCTION_NOT_RUNNING:
-		{
-			strErr = _T("기능이 동작중이지 않습니다.");
-		}
-		break;
-	case STSDKEX_ERROR_FUNCTION_ALREADY_STARTED:
-		{
-			strErr = _T("기능이 이미 동작중인 상태입니다.");
-		}
-		break;
-	case STSDKEX_ERROR_CUSTOMER_POLICY_DOWNLOAD_FAILED:
-		{
-			strErr = _T("고객사 정책파일(기능)을 다운로드 하는데 실패하였습니다.");
-		}
-		break;
-	case STSDKEX_ERROR_OPTION_POLICY_DOWNLOAD_FAILED:
-		{
-			strErr = _T("고객사 정책파일(옵션)을 다운로드 하는데 실패하였습니다.");
-		}
-		break;
-	case STSDKEX_ERROR_INVALID_EXCEPTION_PROCESS_LIST:
-		{
-			strErr = _T("예외프로세스 리스트가 잘못 지정되었습니다.");
-		}
-		break;
-	case STSDKEX_ERROR_NOT_ABLE_BECAUSE_PRIORITY_RULE:
-		{
-			strErr = _T("우선순위(충돌 프로그램 존재, Super룰)에 따라 상위 룰이 존재하여 요청을 수행할 수 없습니다.");
-		}
-		break;
-
-	case STSDKEX_ERROR_CONNECT_FAILED:
-		{
-			strErr = _T("기능 연결에 실패하였습니다.");
-		}
-		break;
-	case STSDKEX_ERROR_FUNCTION_CALL_FAILED:
-		{
-			strErr = _T("시스템 함수 호출에 실패하였습니다.");
-		}
-		break;
-
-	case STSDKEX_ERROR_STSESS_EXEC_FAILED:
-		{
-			strErr = _T("STSESS 실행에 실패하였습니다.");
-		}
-		break;
-
-	case STSDKEX_ERROR_STSESS_TIMEOUT_FAILED:
-		{
-			strErr = _T("STSESS 실행이 Timeout 되었습니다.");
-		}
-		break;
-
-	case STSDKEX_ERROR_ASDSVC_NOT_RUNNING:
-		{
-			strErr = _T("AsdSvc 가 실행중이지 않습니다.");
-		}
-		break;
-
-	case STSDKEX_ERROR_ASTX_UPDATING:
-		{
-			strErr = _T("ASTx 업데이트 중입니다.");
-		}
-		break;
-
-	case STSDKEX_ERROR_NULL_CUSTOMER_ID:
-		{
-			strErr = _T("CUSTOMER ID가 NULL입니다.");
-		}
-		break;
-		
-	case STSDKEX_ERROR_GET_ACTIVE_CONSOLE_SESSION_ID:
-		{
-			strErr = _T("ActiveConsoleSessionId를 얻지 못했습니다.");
-		}
-		break;
-
-	case STSDKEX_ERROR_CALL_AFTER_INIT:
-		{
-			strErr = _T("STSDKEX_Initialize()보다 먼저 호출되어야 합니다.");
-		}
-		break;
-
-	case STSDKEX_ERROR_CALL_NOT_IMPLEMENTED:
-		{
-			strErr = _T("지원하지 않는 함수입니다.");
-		}
-		break;
-
-	case STSDKEX_ERROR_PB_NULL_CALLBACK:
-		{
-			strErr = _T("콜백함수가 NULL입니다.");
-		}
-		break;
-		
-	case STSDKEX_ERROR_PB_NULL_HSBCTL:
-		{
-			strErr = _T("HSBCTL이 NULL입니다.");
-		}
-		break;
-		
-	case STSDKEX_ERROR_PB_COMPATIBLITY_MODE:
-		{
-			strErr = _T("호환성 모드가 설정되어 있습니다.");
-		}
-		break;
-
-	case STSDKEX_ERROR_PB_CREATEOPTIONS_FAILED:
-		{
-			strErr = _T("CreateOptions이 실패하였습니다.");
-		}
-		break;
-
-	case STSDKEX_ERROR_PB_COPYDRIVER_FAILED:
-		{
-			strErr = _T("드라이버 복사에 실패하였습니다.");
-		}
-		break;
-
-	case STSDKEX_ERROR_PB_HSBDRV_INITIALIZE_FAILED:
-		{
-			strErr = _T("드라이버 초기화에 실패하였습니다.");
-		}
-		break;
-
-	case STSDKEX_ERROR_PB_HSBDRV_START_FAILED:
-		{
-			strErr = _T("드라이버 구동에 실패하였습니다.");
-		}
-		break;
-
-	case STSDKEX_ERROR_PB_HSBDRV_INSERTEXCEPTIONPROCESS_FAILED:
-		{
-			strErr = _T("드라이버 예외프로세스 설정에 실패하였습니다.");
-		}
-		break;
-
-	case STSDKEX_ERROR_PB_HSBDRV_GETDRIVERVERSION_FAILED:
-		{
-			strErr = _T("드라이버 버전확인에 실패하였습니다.");
-		}
-		break;
-
-	case STSDKEX_ERROR_PB_HSBDRV_LOADDRIVER_FAILED:
-		{
-			strErr = _T("드라이버 로드에 실패하였습니다.");
-		}
-		break;
-
-	}
-
-	return strErr;
-}
-
 BOOL CMainFrame::initASTx()
 {
 #ifdef _DEBUG
 	return FALSE;
 #endif
-	m_slog.Format("[AStx][initASTx] start m_bSdkInitialized=[%d]\n ", m_bSdkInitialized);
+	m_slog.Format("[AStx][initASTx] start m_bSdkInitialized=[%d] \n ", m_bSdkInitialized);
 	WriteLog(m_slog);
 
-	DWORD dwError = STSDKEX_ERROR_SUCCESS;
-
 	m_strCustomerID = "ibkstock";
-	
-	if(TRUE == m_bSdkInitialized)
+
+	if (TRUE == m_bSdkInitialized)
 	{
 		OutputDebugString(_T("[AStx][initASTx] already initialized"));
 		return FALSE;
 	}
-	
-	dwError = STSDKEX_IsInstalled();
-	if(STSDKEX_ERROR_PRODUCT_NOT_INSTALLED == dwError)
+
+	if (!m_astx.IsInstalled())
 	{
 		installASTx();
 		return FALSE;
-	}	
-	
-	// 비동기 모드 설정
-	dwError = STSDKEX_SetEnvOptionA(STSDKEX_ENV_OPTION_ASYNC,  "on");
-	
-	if( dwError != STSDKEX_ERROR_SUCCESS )
-	{
-		//( _T("[OnButtonSdkInitialize] Error SetEnvOption, STSDKEX_ENV_OPTION_ASYNC"), dwError ); 
-		return FALSE;
 	}
-	
-	// 기능 호출 Timeout 시간을 Milisecond 단위로 설정합니다.
-	dwError = STSDKEX_SetEnvOptionA(STSDKEX_ENV_OPTION_FUNCTIMEOUT,  "180000"); // 3분	
-	
-	if( dwError != STSDKEX_ERROR_SUCCESS )
+
+	const DWORD r = m_astx.Init(m_strCustomerID);
+	if (r != AstxClient::RESULT_OK)
 	{
-		//ShowErrorMessage( _T("[OnButtonSdkInitialize] Error SetEnvOption, STSDKEX_ENV_OPTION_FUNCTIMEOUT"), dwError ); 
-		return FALSE;
-	}
-	
-	// 독립실행모드 설정
-	dwError = STSDKEX_SetEnvOptionA(STSDKEX_ENV_OPTION_STANDALONE,  "on");
-	
-	if( dwError != STSDKEX_ERROR_SUCCESS )
-	{
-		//ShowErrorMessage( _T("[OnButtonSdkInitialize] Error SetEnvOption, STSDKEX_ENV_OPTION_STANDALONE"), dwError ); 
-		return FALSE;
-	}
-	
-	
-	// 콜백함수를 설정합니다.
-	STSDKEX_SetEventCallback(STSDKEX_EventCallback);
-	
-	// Initialize
-	dwError = STSDKEX_Initialize();
-	
-	if( dwError != STSDKEX_ERROR_SUCCESS )
-	{
-		//ShowErrorMessage( _T("[OnButtonSdkInitialize] call STSDKEX_Initialize"), dwError ); 
+		m_slog.Format("[AStx][initASTx] init FAIL dll=[%d] result=0x%08x %s\n", m_astx.IsLoaded(), r, AstxClient::ErrStr(r));
+		WriteLog(m_slog);
 		return FALSE;
 	}
 
 	m_bSdkInitialized = TRUE;
-
-	m_slog.Format("[AStx][initASTx]  정상  m_bSdkInitialized=[%d]\n ", m_bSdkInitialized);
+	m_slog.Format("[AStx][initASTx]  정상  m_bSdkInitialized=[%d] dll=[%d]\n ", m_bSdkInitialized, m_astx.IsLoaded());
 	WriteLog(m_slog);
-
 	return TRUE;
 }
+
 
 #pragma warning (disable : 26494)
 #pragma warning (disable : 26496)
 
 BOOL CMainFrame::uninitASTx()
 {
-	if(FALSE == m_bSdkInitialized)
-	{
-		//AfxMessageBox(_T("[OnButtonSDKUninitialize]  not SDKInitialized"));
+	if (FALSE == m_bSdkInitialized)
 		return FALSE;
-	}
-	
-	USES_CONVERSION;
-	
-	// 기능 종료
-	DWORD dwResult = STSDKEX_ERROR_FUNCTION_FAILED;
 
-	dwResult = STSDKEX_StopFuncA(T2A(LPSTR(LPCTSTR(m_strCustomerID))), STSDKEX_FUNC_CODE_PB|STSDKEX_FUNC_CODE_FW|STSDKEX_FUNC_CODE_PCSCAN);
-	
-	STSDKEX_Unintialize();
-	
+	m_astx.Uninit();                 // AK stop -> stop PB|FW|PCSCAN -> SDK uninit
 	m_bSdkInitialized = FALSE;
 
 	m_slog.Format("[AStx][uninitASTx]   m_bSdkInitialized=[%d]\n ", m_bSdkInitialized);
 	WriteLog(m_slog);
-
 	return TRUE;
 }
 
+
 BOOL CMainFrame::startPB()
 {
-	USES_CONVERSION;
-	
-	if(FALSE == m_bSdkInitialized)
+	if (FALSE == m_bSdkInitialized)
 	{
 		OutputDebugString("ASTx가 초기화 되지 않았습니다.");
 		return FALSE;
 	}
-	
-	const DWORD dwOption = STSDKEX_PB_ACTIVATE_PROTECT_MEMORY | STSDKEX_PB_ACTIVATE_BLOCK_REMOTE;
-	
-	STSDKEX_PBSetActivateSubFunc(dwOption);
-	
-	const DWORD dwResult = STSDKEX_StartFuncA(T2A(LPSTR(LPCTSTR(m_strCustomerID))), STSDKEX_FUNC_CODE_PB, STSDKEX_CUSTOM_POLICY_URL);
-	
-	if( STSDKEX_ERROR_SUCCESS == dwResult || STSDKEX_ERROR_NOT_ABLE_BECAUSE_PRIORITY_RULE == dwResult || STSDKEX_ERROR_FUNCTION_ALREADY_STARTED == dwResult )
-	{
-		OutputDebugString("[ASTx]해킹방지 기능이 정상적으로 시작되었습니다.");
-		WriteLog("[ASTx][startPB] 해킹방지 기능이 정상적으로 시작되었습니다. [메모리]"); 
-	}
+
+	const DWORD r = m_astx.Start(AstxClient::FUNC_PB);
+	if (r == AstxClient::RESULT_OK)
+		WriteLog("[ASTx][startPB] 해킹방지 기능이 정상적으로 시작되었습니다. [메모리]");
 	else
 	{
 		CString szMsg;
-		szMsg.Format(_T("[startPB]해킹방지 기능 시작중 문제가 발생하였습니다.\r\n(result=0x%08x, %s)"), dwResult, Err2Str(dwResult));
+		szMsg.Format(_T("[startPB]해킹방지 기능 시작중 문제가 발생하였습니다.\r\n(result=0x%08x, %s)"), r, AstxClient::ErrStr(r));
 		AfxMessageBox(szMsg);
 	}
-
 	return TRUE;
 }
+
 
 BOOL CMainFrame::stopPB()
 {
-	USES_CONVERSION;
-	
-	if(FALSE == m_bSdkInitialized)
+	if (FALSE == m_bSdkInitialized)
 	{
-		//AfxMessageBox(_T("[OnButtonStopPB] not SDKInitialized"));
 		OutputDebugString("[ASTx] SDK가 초기화 되지 않았습니다.");
 		return FALSE;
 	}
-	
-	const DWORD dwOption = STSDKEX_PB_ACTIVATE_PROTECT_MEMORY | STSDKEX_PB_ACTIVATE_BLOCK_REMOTE;
-	
-	STSDKEX_PBSetActivateSubFunc(dwOption);
-		
-	const DWORD dwResult = STSDKEX_StopFuncA(T2A(LPSTR(LPCTSTR(m_strCustomerID))), STSDKEX_FUNC_CODE_PB);
-	
-	if( STSDKEX_ERROR_SUCCESS == dwResult )
-	{
-		OutputDebugString("[ASTx] 해킹방지 기능이 종료 되었습니다.");
+
+	const DWORD r = m_astx.Stop(AstxClient::FUNC_PB);
+	if (r == AstxClient::RESULT_OK)
 		WriteLog("[ASTx][stopPB]해킹방지 기능이 종료 되었습니다. [메모리]");
-	}
-	else if( STSDKEX_ERROR_FUNCTION_ALREADY_STOPPED == dwResult )
-	{
-		OutputDebugString("[ASTx] 해킹방지 기능이 동작중이지 않습니다.");
-		WriteLog("[ASTx][stopPB]해킹방지 기능이 동작중이지 않습니다. [메모리]");
-	}
 	else
 	{
 		CString szMsg;
-		szMsg.Format(_T("[stopPB]해킹방지 기능 종료중 문제가 발생하였습니다.\r\n(result=0x%08x, %s)"), dwResult, Err2Str(dwResult));
+		szMsg.Format(_T("[stopPB]해킹방지 기능 종료중 문제가 발생하였습니다.\r\n(result=0x%08x, %s)"), r, AstxClient::ErrStr(r));
 		AfxMessageBox(szMsg);
 	}
-
 	return TRUE;
 }
+
 
 BOOL CMainFrame::startFW()
 {
-	USES_CONVERSION;
-	
-	if(FALSE == m_bSdkInitialized)
-	{
-		//AfxMessageBox(_T("[OnButtonStartFW] not SDKInitialized"));
+	if (FALSE == m_bSdkInitialized)
 		return FALSE;
-	}
-	
-	const DWORD dwResult = STSDKEX_StartFuncA(T2A(LPSTR(LPCTSTR(m_strCustomerID))), STSDKEX_FUNC_CODE_FW, STSDKEX_CUSTOM_POLICY_URL);
-	
-	if( STSDKEX_ERROR_SUCCESS == dwResult || STSDKEX_ERROR_NOT_ABLE_BECAUSE_PRIORITY_RULE == dwResult || STSDKEX_ERROR_FUNCTION_ALREADY_STARTED == dwResult )
-	{
-		OutputDebugString("[ASTx] 방화벽 기능이 정상적으로 기동되었습니다.");
+
+	const DWORD r = m_astx.Start(AstxClient::FUNC_FW);
+	if (r == AstxClient::RESULT_OK)
 		WriteLog("[ASTx][startFW]방화벽 기능이 정상적으로 기동되었습니다. [방화벽]");
-	}
 	else
 	{
 		CString szMsg;
-		szMsg.Format(_T("방화벽 기능 시작중 문제가 발생하였습니다.\r\n(result=0x%08x, %s)"), dwResult, Err2Str(dwResult));
+		szMsg.Format(_T("방화벽 기능 시작중 문제가 발생하였습니다.\r\n(result=0x%08x, %s)"), r, AstxClient::ErrStr(r));
 		AfxMessageBox(szMsg);
 	}
-
 	return TRUE;
 }
 
+
 BOOL CMainFrame::stopFW()
 {
-	USES_CONVERSION;
-	
-	if(FALSE == m_bSdkInitialized)
-	{
-		//AfxMessageBox(_T("[OnButtonStopFW] not SDKInitialized"));
+	if (FALSE == m_bSdkInitialized)
 		return FALSE;
-	}
-	
-	const DWORD dwResult = STSDKEX_StopFuncA(T2A(LPSTR(LPCTSTR(m_strCustomerID))), STSDKEX_FUNC_CODE_FW);
-	
-	if( STSDKEX_ERROR_SUCCESS == dwResult )
+
+	const DWORD r = m_astx.Stop(AstxClient::FUNC_FW);
+	if (r == AstxClient::RESULT_OK)
 	{
-		OutputDebugString(_T("[ASTx] 방화벽 기능이 종료 되었습니다."));
 		WriteLog("[ASTx]방화벽 기능이 종료 되었습니다. [방화벽] stopFW()");
 		return TRUE;
 	}
-	else if( STSDKEX_ERROR_FUNCTION_ALREADY_STOPPED == dwResult )
-	{
-		OutputDebugString(_T("[ASTx] 방화벽 기능이 이미 동작중이지 않습니다."));
-		WriteLog("[ASTx]방화벽 기능이 이미 동작중이지 않습니다. [방화벽] stopFW()");
-		return TRUE;
-	}
-	else
-	{
-		CString szMsg;
-		szMsg.Format(_T("방화벽 기능 종료중 문제가 발생하였습니다.\r\n(result=0x%08x, %s)"), dwResult, Err2Str(dwResult));
-		AfxMessageBox(szMsg);
-	}
 
+	CString szMsg;
+	szMsg.Format(_T("방화벽 기능 종료중 문제가 발생하였습니다.\r\n(result=0x%08x, %s)"), r, AstxClient::ErrStr(r));
+	AfxMessageBox(szMsg);
 	return FALSE;
 }
 
+
 #pragma warning (default : 26494)
 #pragma warning (default : 26496)
-
-// AK SDK Test
-typedef IAstxMkd8A* (*_StSdk_GetMkd8ObjectA)(DWORD* pdwErrorCode);
-typedef IAstxMkd8W* (*_StSdk_GetMkd8ObjectW)(DWORD* pdwErrorCode);
-
-static IAstxMkd8* g_pIAstxAkSDK = NULL;
-
-int __stdcall AKSDK_Callback(long lCode, LPARAM lParam)
-{
-	DWORD dwError = ERROR_SUCCESS;
-	if(lParam != ERROR_SUCCESS)
-	{
-		dwError = (DWORD)lParam;
-	}
-	CString s;
-
-	switch(lCode)
-	{
-	case STSDKEX_ERROR_BAD_PARAMETER:					// 0x32A41008L
-		{
-			s.Format(_T("STSDKEX_ERROR_BAD_PARAMETER"));
-			OutputDebugString(s);
-		}
-	case STSDKEX_ERROR_UNINITIALIZE_FAILED:			// 0x32A41001L
-		{
-			// Uninitialization failed.
-			s.Format(_T("STSDKEX_ERROR_UNINITIALIZE_FAILED"));
-			OutputDebugString(s);
-		}
-		break;
-	case STSDKEX_ERROR_LOADLIBRARY_FAILED:			// 0x32A41002L
-		{
-			// ASTX AK module loading failed.
-			s.Format(_T("STSDKEX_ERROR_LOADLIBRARY_FAILED"));
-			OutputDebugString(s);
-		}
-		break;
-	case STSDKEX_ERROR_NOT_INITIALIZED:				// 0x32A41007L
-		{
-			//Initialization not carried out.
-			s.Format(_T("STSDKEX_ERROR_NOT_INITIALIZED"));
-			OutputDebugString(s);
-		}
-		break;
-	case STSDKEX_ERROR_INITIALIZE_FAILED:				// 0x32A41009L
-		{
-			// Failed while initializing.
-			s.Format(_T("STSDKEX_ERROR_INITIALIZE_FAILED"));
-			OutputDebugString(s);
-		}
-		break;
-	case STSDKEX_ERROR_NOT_LOADLIBRARY:				// 0x32A4100AL
-		{
-			// ASTX AK module is not loaded.
-			s.Format(_T("STSDKEX_ERROR_NOT_LOADLIBRARY"));
-			OutputDebugString(s);
-		}
-		break;
-	case STSDKEX_ERROR_PRODUCT_NOT_INSTALLED:					// 0x32A4100FL
-		{
-			// ASTX AK is not installed.
-			s.Format(_T("STSDKEX_ERROR_PRODUCT_NOT_INSTALLED"));
-			OutputDebugString(s);
-		}
-		break;
-	case STSDKEX_ERROR_DRIVER_RULE_NOT_VERIFYED:		// 0x32A41010L
-		{
-			// ASTX AK is not compatible with application.
-			// Terminate all applications that use ASTX AK and restart.
-			s.Format(_T("STSDKEX_ERROR_DRIVER_RULE_NOT_VERIFYED"));
-			OutputDebugString(s);
-		}
-		break;
-	case STSDKEX_ERROR_NOT_PROTECTED_HWND:			// 0x32A41011L
-		{
-			// Unprotected Edit Control.
-			s.Format(_T("STSDKEX_ERROR_NOT_PROTECTED_HWND"));
-			OutputDebugString(s);
-		}
-		break;
-	case STSDKEX_ERROR_NOT_PROPERTY_HWND:				// 0x32A41012L
-		{
-			// Properties do not match.
-			s.Format(_T("STSDKEX_ERROR_NOT_PROPERTY_HWND"));
-			OutputDebugString(s);
-		}
-		break;
-	default:
-		break;
-	}
-	return 0;
-}
-
 #pragma warning (disable : 26494)
 #pragma warning (disable : 26496)
 BOOL CMainFrame::startAK()
 {
-	if(FALSE == m_bSdkInitialized)
+	if (FALSE == m_bSdkInitialized)
 	{
 		OutputDebugString("[ASTx] 초기화 되지않았습니다.");
 		WriteLog("[ASTx][startAK] m_bSdkInitialized=[FALSE] 초기화 되지않았습니다. [키보드보안])");
 		return FALSE;
 	}
-	
-	// StSdk_GetMkd8Object function call, get interface.
-	// StSdk_GetMkd8Object 함수를 호출하여 Interface를 얻어 옵니다.
-	DWORD dwErrorCode = STSDKEX_ERROR_SUCCESS;
-	
-	g_pIAstxAkSDK = STSDKEX_GetMkd8ObjectA( m_strCustomerID, &dwErrorCode );
-	
-	if( g_pIAstxAkSDK == NULL )
+
+	const DWORD r = m_astx.AkStart();
+	if (r != AstxClient::RESULT_OK)
 	{
-		OutputDebugString("[ASTx] AK SDK 초기화에 실패했습니다.");
-		WriteLog("[ASTx][startAK] AK SDK 초기화에 실패했습니다. [키보드보안]");
+		m_slog.Format("[ASTx][startAK] AK 초기화에 실패했습니다 result=0x%08x [키보드보안]", r);
+		WriteLog(m_slog);
 		return FALSE;
 	}
 
-	USES_CONVERSION;
-	
-	const DWORD dwInitMode = AstxmodeProtectInAstx;
-	const DWORD dwErr = g_pIAstxAkSDK->Initialize(dwInitMode, AKSDK_Callback);
-	if( dwErr != STSDKEX_ERROR_SUCCESS )
-	{
-		OutputDebugString("[ASTx] AK 초기화에 실패했습니다.");
-		WriteLog("[ASTx][startAK] AK 초기화에 실패했습니다 [키보드보안]");
-		return FALSE;
-	}
-	
-	// Protect Edit Ctrl1
-// 	HWND hwnd1 = m_axConnect->GetPassHwnd();
-// 	DWORD dwErr1 = g_pIAstxAkSDK->ProtectEditControl(hwnd1);
-// 	if( dwErr1 != 0 ) 
-// 	{
-// 		OutputDebugString("[ASTx] AK 비밀번호 에디트 초기화에 실패했습니다.");
-// 		return FALSE;
-// 	}
-// 
-// 	HWND hwnd2 = m_axConnect->GetCPassHwnd();
-// 	DWORD dwErr2 = g_pIAstxAkSDK->ProtectEditControl(hwnd2);
-// 	if( dwErr2 != 0 ) 
-// 	{
-// 		OutputDebugString("[ASTx] AK 인증번호 에디트 초기화에 실패했습니다.");
-// 		return FALSE;
-// 	}
-// 
-// 	m_axConnect->SetAK(g_pIAstxAkSDK);
 	WriteLog("[ASTx][startAK] 키보드보안 기능이 정상적으로 기동되었습니다");
 	return TRUE;
 }
 
+
 BOOL CMainFrame::stopAK()
 {
-	USES_CONVERSION;
-	
-	if(g_pIAstxAkSDK != NULL)
-	{	
-		const DWORD dwErr = g_pIAstxAkSDK->Uninitialize();
-		if( dwErr != 0 )
-		{
-			return FALSE;
-		}
-		
-		g_pIAstxAkSDK = NULL;
-		WriteLog("[ASTx][stopAK]키보드 보안기능이  정상적으로 종료되었습니다. [키보드보안]");
-	}
-
+	m_astx.AkStop();      // no-op if not started
 	return TRUE;
 }
+
 
 int CMainFrame::GetTheme()
 {
@@ -31450,7 +30777,11 @@ OutputDebugString(slog);
 
 void CMainFrame::GetASTxInstall()  //20191212 ASTx 설치체크
 {
-	m_DInstallASTx = STSDKEX_IsInstalled();
+	char amLog[256] = { 0 };
+	m_astx.Load(amLog, sizeof(amLog));
+	WriteLog(amLog);
+
+	m_DInstallASTx = m_astx.InstalledCode();
 }
 
 void CMainFrame::LoadNoTwoPOP_NoSaveLast()
@@ -32842,8 +32173,9 @@ BOOL CMainFrame::IsASTxRunning(BOOL bLog)
 		return TRUE;
 	}
 
-	DWORD ret = STSDKEX_IsRunningFuncA("ibkstock", STSDKEX_FUNC_CODE_PB);
-	if (ret == STSDKEX_ERROR_SUCCESS)
+	DWORD ret = m_astx.IsRunning(AstxClient::FUNC_PB, "ibkstock");   // before Init: direct SDK query inside AstxClient
+
+	if (ret == AstxClient::RESULT_OK)
 	{
 		m_slog.Format("[AXIS] !!!!!!!!!!! [ASTx] IsASTxRunning ASTx on[%d] m_bNoProtect=[%d] bExistFile=[%d] ", ret, m_bNoProtect,bExistFile);
 		OutputDebugString(m_slog);

@@ -30,7 +30,8 @@
   - [6.7 소스 수정](#67-소스-수정)
   - [6.8 덤프로 알 수 없었던 것](#68-덤프로-알-수-없었던-것)
 - [7. 덤프 크기 축소 (whdump)](#7-덤프-크기-축소-whdump)
-- [8. 남은 과제](#8-남은-과제)
+- [8. 모듈 로드 실패 진단 (peimp.py)](#8-모듈-로드-실패-진단-peimppy)
+- [9. 남은 과제](#9-남은-과제)
 
 ---
 
@@ -415,7 +416,36 @@ pause
 
 **심볼 확인 요령:** `x 모듈!변수`가 아무것도 출력하지 않으면 "변수 없음"과 "PDB 못 찾음"을 구분해야 한다. `lm m 모듈`로 `(pdb symbols)` 여부를 보고, 확실히 있는 함수(`x axis!CMainFrame::DrawFrame`)를 대조 검색한다.
 
-## 8. 남은 과제
+## 8. 모듈 로드 실패 진단 (peimp.py)
+
+`LoadLibrary` 오류 127(`ERROR_PROC_NOT_FOUND`)은 import한 함수 중 하나를 찾지 못했다는 뜻이다. 그런데 어느 DLL의 어느 함수인지는 알려 주지 않는다. `D:\src\IBKS\src\tools\peimp.py`를 쓰면 대상 파일의 import 목록과 같은 폴더 DLL들의 export 목록을 대조해, 없는 함수를 출력한다. dumpbin 없이 Python만으로 동작한다.
+
+```
+python -I D:\src\IBKS\src\tools\peimp.py "D:\util\HTS\IBK_SMART\exe\axWizard.ocx"
+
+axislib.dll   imports=12 missing=0
+axisform.dll  imports=41 missing=0
+axisvbs.dll   imports=12 missing=12
+    MISSING ??0CEngineWrapper@@QAE@PAVCWnd@@@Z
+```
+
+**사례 (2026-11-19):**
+- 증상: `[registerControl] LoadLibrary error....[...axWizard.ocx] error=[127]`가 출력되었는데 로그인 창은 떴다.
+- 원인: 운영 axisvbs.dll(`CEngineWrapper` 없음)을 개발 폴더에 잘못 복사했다.
+- 등록에 실패하자 `CreateWizard`가 레지스트리의 CLSID `{FE2FC2D9-...}`로 컨트롤을 만들었다. 이 CLSID는 `C:\IBKS\IBK투자증권 HTS\exe\axWizard.ocx`를 가리키므로, **운영 위자드가 대신 로드되었다.**
+- 이때는 개발 폴더에서 실행해도 Wizard 변경 사항이 반영되지 않으니 주의해야 한다.
+
+**한계:**
+- 같은 폴더의 DLL만 검사한다. 시스템 DLL은 검사하지 않는다.
+- 함수가 있는지만 본다. 구조체나 vtable 배치가 다른 문제는 잡지 못한다.
+- `LoadLibrary`/`GetProcAddress`로 동적 로드하는 DLL(DataGuard, certsign 등)은 대상이 아니다.
+
+**레지스트리 확인:** 어떤 ocx가 등록되어 있는지는 아래 명령으로 본다(32비트 등록).
+```
+reg query "HKCR\WOW6432Node\CLSID" /s /f "axWizard.ocx" /d
+```
+
+## 9. 남은 과제
 
 - **AxisAgent 시작 단계 행 감지:** 현재 `CMainFrame::CreateAgentProcess`에서 실행되어 사례 #1처럼 그 전에 멈추면 감시자가 없다. 또한 창 응답(`SendMessageTimeout`, `IsHungAppWindow`) 기반이라 창이 없으면 감지하지 못한다. → 실행 시점을 앞당기고, "시작 후 N초 안에 로그인 창이 없으면 덤프" 감시를 검토.
 - **배포 빌드 PDB 관리:** 배포하는 모든 axis.exe의 PDB를 symstore에 등록.

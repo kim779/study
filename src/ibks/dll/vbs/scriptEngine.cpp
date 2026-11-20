@@ -43,6 +43,12 @@ void CScriptEngine::Initialize(CString maps)
 	if (!verify(hr, "Scripting Engine (VBScript.dll) not registered"))
 		return;
 
+	//hr = CLSIDFromProgID(L"VBScript1", &clsid);  
+	//if (!verify(hr, "Scripting Engine (VBScript.dll) not registered"))
+	//{
+	//	return;
+	//}
+
 	// Start VBScript.dll (inproc server)
 	hr = CoCreateInstance(clsid, NULL, CLSCTX_INPROC_SERVER, IID_IActiveScript, (void**)&m_as);
 	if (!verify(hr, "Scripting Engine (VBScript.dll) not started"))
@@ -101,6 +107,10 @@ void CScriptEngine::AddObject(CString names, CCmdTarget* object, DWORD flag)
 // updateXXX__20220X
 	if (::isdigit(static_cast<unsigned char>(names.GetAt(0))))
 		names.Insert(0, 'S');
+
+	if (m_as == NULL)		// engine not created (VBScript unavailable)
+		return;
+
 	if (!m_ssite.m_objects.Lookup(names, (CObject*&)target))
 	{
 		hr = m_as->AddNamedItem(T2OLE(names), SCRIPTITEM_ISVISIBLE|SCRIPTITEM_ISSOURCE|flag);
@@ -116,6 +126,9 @@ bool CScriptEngine::LoadScript(CString scripts)
 	HRESULT	hr;
 	BSTR	strParse;
 	EXCEPINFO ei;
+
+	if (m_as == NULL || m_asp == NULL)	// engine not created (VBScript unavailable)
+		return false;
 
 	strParse = scripts.AllocSysString();
 	// This loads the script and keeps it around for the user
@@ -354,7 +367,9 @@ bool CScriptEngine::getIDOfProcedure(CString procs, DISPID* pID)
 {
 	if (!m_dispatch)
 	{
-		axlog(LOG_SCRIPT, "getIDOfProcedure(%s): m_dispatch is NULL", procs.GetString());
+		//axlog(LOG_SCRIPT, "getIDOfProcedure(%s): m_dispatch is NULL", procs.GetString());
+		if (m_as)
+			axlog(LOG_SCRIPT, "getIDOfProcedure(%s): m_dispatch is NULL", procs.GetString());
 		return false;
 	}
 
@@ -395,5 +410,6 @@ DWORD CScriptEngine::getParameter(CString data)
 
 void CScriptEngine::Close()
 {
-	m_as->Close();
+	if (m_as)
+		m_as->Close();
 }

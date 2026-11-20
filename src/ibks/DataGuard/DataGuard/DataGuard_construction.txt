@@ -1,0 +1,155 @@
+==============================================================================
+ DataGuard.dll 명세서
+==============================================================================
+ 최초 작성 : 2026-11-18   (계속 수정)
+ 소스      : ibks/DataGuard/DataGuard/   (Guard.cpp = 실제 구현, CP949)
+ 공용 헤더 : ibks/h/DataGuardApi.h      (DLL·호출측 공용, ASCII)
+ 출력      : src/release/DataGuard.dll  (Release|Win32, MultiByte, MFC 일반 DLL)
+ 배포 위치 : HTS exe 폴더 (axis.exe 와 같은 폴더)
+ 현재 버전 : DG_VERSION 2
+
+------------------------------------------------------------------------------
+ 1. 목적
+------------------------------------------------------------------------------
+ HTS 송신 데이터를 메모리에서 변조해 "남의 계좌 / 주민번호 / 사용자ID"로 조회하는
+ 공격을 클라이언트에서 탐지·차단한다. (서버 수정 없이 클라이언트 한정)
+
+ - 로그인 때 받은 본인 정보(계좌·주민번호·ID)를 salt SHA-256 해시로만 보관한다.
+ - 송신 직전(암호화 전 평문) 데이터의 지정 위치 값을 해시해 본인 정보와 대조한다.
+ - 불일치 시 규칙에 따라 로그만 남기거나(DG_LOG) 송신을 막는다(DG_BLOCK).
+ - 원문 값은 DLL 안에 남기지 않는다(해시만 보관). salt는 프로세스마다 새로 생성.
+
+------------------------------------------------------------------------------
+ 2. 사용 방법 (호출 순서)
+------------------------------------------------------------------------------
+ (1) 로드 : DLL 의 export 는 DG_GetApi 하나뿐이다. 나머지 함수는 API 테이블로 받는다.
+
+     #include "../h/DataGuardApi.h"
+
+     HMODULE hDG = ::LoadLibrary(exe폴더 + "\\DataGuard.dll");     // 전체 경로로 로드
+     DG_GETAPI getApi = hDG ? (DG_GETAPI)::GetProcAddress(hDG, DG_GETAPI_NAME) : NULL;
+     const DG_API* dg = getApi ? getApi(DG_VERSION) : NULL;
+     if (!dg) { FreeLibrary(hDG); hDG = NULL; }   // 실패 = fail-open (검사 없이 HTS 정상 동작)
+
+ (2) 로그인 성공 시 세션 등록
+     dg->SessionClear();                         // 전체 초기화
+     dg->SessionAdd(DG_ACCOUNT, "00110017502");   // 계좌 N건
+     dg->SessionAdd(DG_JUNO,    주민번호);
+     dg->SessionAdd(DG_USERID,  로그인ID);
+
+ (3) 계좌 변동
+     dg->SessionAdd(DG_ACCOUNT, acc);            // 계좌 1건 추가
+     dg->SessionRemove(DG_ACCOUNT, acc);         // 계좌 1건 삭제
+     dg->SessionClearKind(DG_ACCOUNT);           // 계좌 목록 재수신 시 계좌만 비움 (v2)
+
+ (4) 송신 직전 검사 (암호화 전, ledger 포함 전체 데이터)
+     int r = dg->Check(ledger->svcd, data, len, DG_SEND);
+     if (r == DG_BLOCK) { 송신 취소 }             // DG_PASS / DG_LOG 는 그대로 송신
+
+ (5) 종료 : FreeLibrary(hDG)   (별도 종료 함수 없음)
+
+ ※ 모든 호출 앞에 "dg != NULL" 확인. NULL 이면 아무것도 하지 않는다(fail-open).
+
+------------------------------------------------------------------------------
+ 3. 상수 (DataGuardApi.h)
+------------------------------------------------------------------------------
+ 세션 종류(kind)   : DG_ACCOUNT 1 / DG_USERID 2 / DG_JUNO 3        (끝에만 추가)
+ Check 결과        : DG_PASS 0 (정상 또는 보호대상 아님)
+                     DG_LOG  1 (불일치 - 로그만, 송신 계속)
+                     DG_BLOCK 2 (불일치 - 호출측이 송신을 멈춰야 함)
+ Check 방향(dir)   : DG_SEND 0 (송신, 암호화 전) / DG_RECV 1 (수신, 복호화 후 - 미사용)
+
+------------------------------------------------------------------------------
+ 4. 함수 설명
+------------------------------------------------------------------------------
+ const DG_API* DG_GetApi(int version)            [유일한 export, extern "C"]
+   - version : 호출측이 컴파일된 DG_VERSION
+   - 반환    : API 테이블 포인터. version > DLL 버전이면 NULL (호출측이 더 새것)
+   - 주의    : 새 호출측(v2) + 옛 DLL(v1) = NULL → fail-open 으로 검사가 전부 꺼진다.
+               반드시 호출측(axWizard.ocx)과 DLL 을 함께 배포할 것.
+
+ struct DG_API (append-only: 멤버 중간 삽입·순서 변경 금지)
+   int  size;      sizeof(DG_API)   (v2, Win32 = 28)
+   int  version;   DLL 의 DG_VERSION
+
+ void SessionClear(void)
+   - 세션 저장소 전체 삭제. 로그인 시작(RemoveRegistry)에서 호출.
+   - 로그 : [DG] session clear
+
+ void SessionAdd(int kind, const char* value)
+   - value 를 영숫자만 남겨 정규화(Normalize) → salt SHA-256 → 저장.
+     ("001-10-017502" 와 "00110017502" 는 같은 값으로 취급)
+   - value 가 NULL / 정규화 후 빈 값 / 이미 있는 값이면 무시.
+   - 로그 : 없음 (계좌 수만큼 찍혀서 주석 처리)
+
+ void SessionRemove(int kind, const char* value)
+   - 같은 kind + 같은 해시 1건 삭제.
+   - 로그 : [DG] session remove kind=%d count=%d
+
+ void SessionClearKind(int kind)                       (v2 추가)
+   - 지정 kind 만 전부 삭제, 다른 kind 는 유지.
+   - 용도 : 계좌 목록 재수신 시 주민번호·ID 를 지우지 않기 위해.
+   - 로그 : [DG] session clear kind=%d count=%d   (count = 삭제 후 남은 개수)
+
+ int Check(const char* svc, const char* data, int len, int dir)
+   - svc  : 서비스코드 8바이트 (ledger svcd, 공백 패딩, NULL 종료 아님)
+   - data : ledger(384B) 포함 송신 데이터 시작 주소
+   - len  : data 길이
+   - 반환 : DG_PASS / DG_LOG / DG_BLOCK (가장 강한 결과)
+   - 처리 순서
+     ① 공통 검사(g_common) : svcd 가 공백이 아닌 모든 원장 송신에 적용
+        - 지금 : {23, 16, DG_USERID}  (ledger usid = 로그인 ID), mode = DG_LOG
+        - 세션에 그 kind 가 없으면(로그인 전) 건너뜀
+        - 불일치일 때만 로그 : [DG][Common] TR=.. off=.. kind=.. vlen=.. own=0 mode=..
+     ② 서비스별 규칙(g_rules) : svc 가 일치하는 규칙이 있을 때만
+        - 필드마다 로그 : [DG][Check] TR=.. off=.. Kind=.. vlen=.. val=.. chk res=.. res mode=..
+          (val 은 계좌 종류만 출력, 나머지는 "-")
+   - 스레드 : 내부 mutex 로 보호 (세션 함수와 동시 호출 가능)
+
+------------------------------------------------------------------------------
+ 5. 규칙 테이블 (Guard.cpp 안에 내장 - 바꾸려면 DLL 재빌드·재배포)
+------------------------------------------------------------------------------
+ struct Field { int off; int len; int kind; };        // off = ledger 포함 data 기준
+ struct Rule  { char svc[9]; int mode; int n; Field f[4]; };
+   - mode : 불일치 시 반환값 (DG_LOG / DG_BLOCK)
+   - n    : f[] 중 실제 사용하는 필드 수
+   - 빈 필드(정규화 후 길이 0)는 "본인 아님"으로 판정
+
+ offset 계산 : 384(ledger) + 맵 IOORDER 상 앞쪽 입력필드 LEN 합
+ 검증 방법   : 384 + 본문 길이 = 로그 [Xecure] nBytesIn, [DG][Check] vlen 값
+
+ 현재 규칙
+   { "SACMT289", DG_LOG, 1, {{390, 24, DG_JUNO}} }   // IB820850, IB170900 (주민번호)
+   공통: {23, 16, DG_USERID}, DG_LOG
+
+------------------------------------------------------------------------------
+ 6. 호출측 (axWizard) 연결 위치
+------------------------------------------------------------------------------
+ Guard.h                 m_hDG, m_dg (NULL = fail-open)
+ Guard.cpp  Initial      LoadLibrary + DG_GetApi
+ Guard.cpp  ~CGuard      FreeLibrary
+ Guard.cpp  Sign signON  SessionAdd(DG_JUNO, infox 7번 필드), SessionAdd(DG_USERID, signR->sign)
+ Guard.cpp  AddRegistry  SessionAdd(DG_ACCOUNT)        (로그인 계좌 목록)
+ Guard.cpp  RemoveRegistry  SessionClear
+ Guard.cpp  SetAccounts  SessionAdd / SessionRemove(DG_ACCOUNT)
+ Guard.cpp  AddRegistry(cbonly=false)  SessionClearKind(DG_ACCOUNT)
+ Stream.cpp MakeStream   TH_LEDGER 송신에서 Check(), DG_BLOCK 이면 m_sndL -= L_axisH 후 return
+
+ 검사 범위 : 맵의 ledger 송신만. CTRL/DLL/ServiceEx 송신은 아직 대상 아님(2차 과제).
+
+------------------------------------------------------------------------------
+ 7. 주의 사항
+------------------------------------------------------------------------------
+ - DG_SHAPE_LOG : 송신 평문 전체를 로그로 남기는 개발자 확인용. 배포 빌드에서는 반드시
+                  미정의 상태(#define DG_SHAPE_LOG1)로 둘 것.
+ - 로그에 epwd·본문 평문·주민번호를 남기지 말 것.
+ - 한계 : 송신 함수 후킹(검사 후 변조)·DLL 교체는 막지 못함 → 2차에 DLL 무결성 확인 예정.
+
+------------------------------------------------------------------------------
+ 8. 변경 이력
+------------------------------------------------------------------------------
+ 2026-11-12  모듈화 착수 (Wizard inline 프로토타입 → DLL)
+ 2026-11-16  v1: SessionClear/Add/Remove/Check, fail-open 로드
+ 2026-11-17  SACMT289 주민번호 규칙, 공통 USERID 검사, BLOCK 검증
+             v2: SessionClearKind 추가
+ 2026-11-18  SessionClearKind 검증 (count=2: 계좌만 삭제, ID·주민번호 유지)

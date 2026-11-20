@@ -31,22 +31,9 @@
 // #include "aossdk/aossdkdef.h"
 // #pragma comment(lib, "aossdk/aossdk.lib")
 // int __stdcall SBSDK_Callback(long lCode, void* pParam, long lParamSize);
-#include "ASTx/StSdkExCfg.h"
-#include "ASTx/StSdkExCom.h"
-#include "ASTx/StSdkExDef.h"
-#include "ASTx/StSdkExErr.h"
-#pragma comment(lib, "ASTx/StSdkEx.lib")
-int __stdcall STSDKEX_EventCallback(long lCode, void* pParam, long lParamSize);
 #endif
 
-#define	STSDKEX_MASTER_NAME				_T("astx_setup.exe")
-#define	STSDKEX_MASTER_PLATFORM_NT32	_T("nt32")
-#define	STSDKEX_MASTER_PLATFORM_X64		_T("x64")
-
-// For Release
-#define STSDKEX_MASTER_URL				_T("https://safetx.ahnlab.com/master/win/default")
-#define STSDKEX_CUSTOM_POLICY_URL		_T("http://webclinic.ahnlab.com/astx/policy/customer_stsdk_default.html")
-
+#include "AstxClient.h"
 
 #define NCAP_CLOSE		0
 #define NCAP_MAX		1
@@ -899,6 +886,7 @@ public:
 	BOOL	m_bSdkInitialized;
 	CString m_strCustomerID;
 	
+	AstxClient m_astx;
 
 	//촉앤토크
 	int m_ShowSlide;
@@ -1134,7 +1122,6 @@ protected:
 	bool	isIPInRange(CString ip,CString network);
 	unsigned int IPToUInt(CString ip);
 	CString SplitString(CString &strData, CString strToken);
-	CString Err2Str(DWORD dwErrCode);
 	BOOL	installASTx();
 	BOOL	initASTx();
 	BOOL	uninitASTx();

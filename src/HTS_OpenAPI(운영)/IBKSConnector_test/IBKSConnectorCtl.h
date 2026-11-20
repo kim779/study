@@ -244,7 +244,7 @@ class CIBKSConnectorCtrl : public COleControl
 
 	enum userType { normal = 0, foreign, admin};	// 일반고객, 해외, 관리자
 
-	userType _type = normal;
+	userType _type = foreign;
 
 public:
 	CIBKSConnectorCtrl();

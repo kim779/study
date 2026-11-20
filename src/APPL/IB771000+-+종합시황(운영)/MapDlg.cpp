@@ -371,6 +371,7 @@ BEGIN_MESSAGE_MAP(CMapDlg, CDialog)
 	ON_NOTIFY(NM_CLICK, IDC_LIST_NEWS, OnClickListNews)
 	ON_MESSAGE(WM_SIZE_WEBBROW, OnWebBrowSize)
 	ON_MESSAGE(WM_SIZING_WEBBROW, OnWebBrowSizing)
+	ON_MESSAGE(WM_EDGE_FAILED, OnEdgeFailed)
 	ON_NOTIFY(DTN_CLOSEUP, IDC_DATETIMEPICKER, OnCloseupDatetimepicker)
 	ON_BN_CLICKED(IDC_RADIO_TOT, OnRadioTot)
 	ON_BN_CLICKED(IDC_RADIO_SEL, OnRadioSel)
@@ -832,6 +833,34 @@ CString GetMessage(int i)
 	}
 
 	return str;
+}
+
+LRESULT CMapDlg::OnEdgeFailed(WPARAM wParam, LPARAM lParam)
+{
+	if (!m_bUsingEdgeBrowser || !m_pBrowser)
+		return 0;					// already on IE (several fail points may post)
+
+	m_slog.Format("[edge][%s] why=%d -> switch to IE file=[%s]", __FUNCTION__, (int)wParam, m_szFileName);
+	OutputDebugString(m_slog);
+
+	CRect rc;
+	if (browserEdge && ::IsWindow(browserEdge->m_hWnd))
+	{
+		browserEdge->GetWindowRect(rc);
+		ScreenToClient(rc);
+		browserEdge->ShowWindow(SW_HIDE);
+	}
+	else
+		m_pBrowser->GetWindowRect(rc), ScreenToClient(rc);
+
+	KillTimer(TM_EDGECONTROLRESIZE);
+	m_bUsingEdgeBrowser = FALSE;	// all later paths (navigate/print/resize) go to IE
+
+	m_pBrowser->MoveWindow(rc);
+	m_pBrowser->ShowWindow(SW_SHOW);
+	if (!m_szFileName.IsEmpty())
+		m_pBrowser->Navigate2(m_szFileName);		// re-show current article
+	return 0;
 }
 
 void CMapDlg::GetNavigate( CString str )
@@ -4623,19 +4652,23 @@ bool CMapDlg::initControl()
 		GetClientRect(rect);
 
 		if (!browserEdge->Create(nullptr, "BrowserWindowEdge", WS_CHILD | WS_VISIBLE, rect, this, 0)) {
-			m_slog.Format("[edge] [%s] create failure", __FUNCTION__);
+			m_slog.Format("[edge] [%s] create failure -> IE", __FUNCTION__);
 			OutputDebugString(m_slog);
-			AfxMessageBox("edge create fail");
+			browserEdge.reset();
+			m_bUsingEdgeBrowser = FALSE;
+			m_pBrowser->ShowWindow(SW_SHOW);
 		}
+		else
+		{
+			CString strEmptyPage = _T("about:blank");
+			std::string message_a = strEmptyPage;
+			std::wstring wurl;
+			wurl.assign(message_a.begin(), message_a.end());
 
-		CString strEmptyPage = _T("about:blank");
-		std::string message_a = strEmptyPage;
-		std::wstring wurl;
-		wurl.assign(message_a.begin(), message_a.end());
-
-		browserEdge->Init(wurl);
-		m_slog.Format("[edge] [%s] create success", __FUNCTION__);
-		OutputDebugString(m_slog);
+			browserEdge->Init(wurl);
+			m_slog.Format("[edge] [%s] create success", __FUNCTION__);
+			OutputDebugString(m_slog);
+		}
 	}
 #endif
 #else

@@ -26,7 +26,7 @@ SVR_PORT = 15201  # 서버 포트 (화면 비노출)
 #   "normal"  : domestic customer   (domestic only)
 #   "foreign" : overseas developer  (+ overseas group incl. exchange/pre-settlement tabs)
 #   "admin"   : internal test       (+ server select, chaser, TR8001, login save)
-USER_TYPE = "normal"
+USER_TYPE = "admin"
 IS_FOREIGN = USER_TYPE in ("foreign", "admin")
 IS_ADMIN   = USER_TYPE == "admin"
 IS_NORMAL  = USER_TYPE == "normal"
@@ -55,6 +55,30 @@ def _dpapi(data: bytes, protect: bool) -> bytes:
 
 SERVER_LIST = [
     ("211.255.204.104", "UAT"),
+]
+
+# production BP servers - shown only in the admin (internal) build
+ADMIN_SERVER_LIST = [
+    ("211.255.204.70", "BP10"),
+    ("211.255.204.71", "BP11"),
+    ("211.255.204.72", "BP12"),
+    ("211.255.204.73", "BP13"),
+    ("211.255.204.74", "BP14"),
+    ("211.255.204.75", "BP15"),
+    ("211.255.204.76", "BP16"),
+    ("211.255.204.77", "BP17"),
+    ("211.255.204.78", "BP18"),
+    ("211.255.204.79", "BP19"),
+    ("211.255.204.33", "BP20"),
+    ("211.255.204.34", "BP21"),
+    ("211.255.204.35", "BP22"),
+    ("211.255.204.36", "BP23"),
+    ("211.255.204.37", "BP24"),
+    ("211.255.204.38", "BP25"),
+    ("211.255.204.39", "BP26"),
+    ("211.255.204.57", "BP27"),
+    ("211.255.204.58", "BP28"),
+    ("211.255.204.59", "BP29"),
 ]
 
 # TR key constants - must match Common.h exactly
@@ -270,7 +294,7 @@ class TestWindow(QMainWindow):
         if IS_FOREIGN:                   # server combo: foreign (UAT by name) + internal (all, with IP)
             self.combo_server  = QComboBox()
             self.combo_server.addItem("", "")
-            for ip, name in SERVER_LIST:
+            for ip, name in SERVER_LIST + (ADMIN_SERVER_LIST if IS_ADMIN else []):
                 # IP is shown only in the internal build
                 self.combo_server.addItem(f"{name} ({ip})" if IS_ADMIN else name, ip)
             # default: foreign -> UAT, internal -> blank (GLB)
