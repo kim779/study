@@ -35,9 +35,14 @@ if not errorlevel 1 goto :ok
 rem ---- step 1: per-user (HKCU) override -------------------------------------
 echo.
 echo [1] 사용자별(HKCU) 등록 키 확인/삭제
-reg query "HKCU\Software\Classes\CLSID\%CLSID%" >nul 2>&1 && (
-    echo     HKCU CLSID 키 발견 - 삭제합니다.
-    reg delete "HKCU\Software\Classes\CLSID\%CLSID%" /f >>"%LOG%" 2>&1
+rem HTS is 32-bit: HKCU\Software\Classes\CLSID is redirected, so check the 32-bit view too
+reg query "HKCU\Software\Classes\CLSID\%CLSID%" /reg:32 >nul 2>&1 && (
+    echo     HKCU CLSID 키^(32비트^) 발견 - 삭제합니다.
+    reg delete "HKCU\Software\Classes\CLSID\%CLSID%" /reg:32 /f >>"%LOG%" 2>&1
+)
+reg query "HKCU\Software\Classes\CLSID\%CLSID%" /reg:64 >nul 2>&1 && (
+    echo     HKCU CLSID 키^(64비트^) 발견 - 삭제합니다.
+    reg delete "HKCU\Software\Classes\CLSID\%CLSID%" /reg:64 /f >>"%LOG%" 2>&1
 )
 reg query "HKCU\Software\Classes\VBScript.RegExp" >nul 2>&1 && (
     echo     HKCU ProgID 키 발견 - 삭제합니다.

@@ -27,6 +27,7 @@ static const DWORD DUMP_INTERVAL_MS = 3000;
 #include<set>
 #include <Shlwapi.h>
 #pragma comment(lib, "shlwapi.lib")
+#include <ActivScp.h>
 
 
 namespace
@@ -435,31 +436,121 @@ bool CAxisAgentDlg::PassFilter(const CString& msg)
 	return sMsg.Find(m_sFilter) >= 0;	// m_sFilter is stored lower-case
 }
 
-// True if VBScript engine can be created (same 32-bit COM view as HTS).
-// path (optional): receives loaded vbscript.dll full path
-static bool IsVBScriptAvailable(char* path = NULL, int pathCap = 0)
+// VBScript health check (same 32-bit COM view as HTS).
+//  VBS_OFF    : engine cannot be created (feature off / removed)
+//  VBS_BROKEN : engine OK but test script fails (e.g. New RegExp, 2026-11-20 field case)
+enum { VBS_OK = 0, VBS_OFF = 1, VBS_BROKEN = 2 };
+
+struct VbsDiag
 {
-	HRESULT hrInit = ::CoInitializeEx(NULL, COINIT_APARTMENTTHREADED);
-	bool ok = false;
-	CLSID clsid;
-	if (SUCCEEDED(::CLSIDFromProgID(L"VBScript", &clsid)))
+	HRESULT engineHr;		// CLSIDFromProgID / CoCreateInstance of engine
+	HRESULT scriptErr;		// first runtime error of test script (S_OK = passed)
+	ULONG   scriptLine;		// 1-based line of that error
+	char    desc[128];		// error description (system language)
+	char    path[MAX_PATH];	// loaded vbscript.dll
+};
+
+// Line 1: New RegExp, line 2: CreateObject (COM registration), line 3-5: Replace result
+static const wchar_t kVbsTest[] =
+L"Set r = New RegExp\n"
+L"Set r2 = CreateObject(\"VBScript.RegExp\")\n"
+L"r.Pattern = \"[^0-9]\"\n"
+L"r.Global = True\n"
+L"If r.Replace(\"1,234won\", \"\") <> \"1234\" Then Err.Raise 5\n";
+
+// Minimal script site: records the first runtime error only
+class CVbsTestSite : public IActiveScriptSite
+{
+public:
+	HRESULT err = S_OK;
+	ULONG   line = 0;
+	char    desc[128] = { 0 };
+
+	STDMETHODIMP QueryInterface(REFIID riid, void** ppv) override
 	{
-		IUnknown* unk = NULL;
-		if (SUCCEEDED(::CoCreateInstance(clsid, NULL, CLSCTX_INPROC_SERVER, IID_IUnknown, (void**)&unk)))
-		{
-			// get path while DLL is still loaded (CoUninitialize unloads it)
-			if (path && pathCap > 0)
-			{
-				HMODULE hv = ::GetModuleHandleA("vbscript.dll");
-				if (hv) ::GetModuleFileNameA(hv, path, pathCap);
-			}
-			unk->Release();
-			ok = true;
-		}
+		if (riid == IID_IUnknown || riid == IID_IActiveScriptSite) { *ppv = this; return S_OK; }
+		*ppv = NULL;
+		return E_NOINTERFACE;
 	}
+	STDMETHODIMP_(ULONG) AddRef() override { return 1; }	// stack object, no ref counting
+	STDMETHODIMP_(ULONG) Release() override { return 1; }
+	STDMETHODIMP GetLCID(LCID*) override { return E_NOTIMPL; }
+	STDMETHODIMP GetItemInfo(LPCOLESTR, DWORD, IUnknown**, ITypeInfo**) override { return TYPE_E_ELEMENTNOTFOUND; }
+	STDMETHODIMP GetDocVersionString(BSTR*) override { return E_NOTIMPL; }
+	STDMETHODIMP OnScriptTerminate(const VARIANT*, const EXCEPINFO*) override { return S_OK; }
+	STDMETHODIMP OnStateChange(SCRIPTSTATE) override { return S_OK; }
+	STDMETHODIMP OnEnterScript() override { return S_OK; }
+	STDMETHODIMP OnLeaveScript() override { return S_OK; }
+	STDMETHODIMP OnScriptError(IActiveScriptError* pe) override
+	{
+		if (err != S_OK)
+			return S_OK;
+		EXCEPINFO ei = { 0 };
+		DWORD ctx = 0;
+		LONG  ch = 0;
+		pe->GetExceptionInfo(&ei);
+		if (ei.pfnDeferredFillIn)
+			ei.pfnDeferredFillIn(&ei);
+		pe->GetSourcePosition(&ctx, &line, &ch);
+		if (ei.scode != 0)
+			err = ei.scode;
+		else if (ei.wCode != 0)
+			err = MAKE_HRESULT(SEVERITY_ERROR, FACILITY_CONTROL, ei.wCode);	// 0x800Axxxx
+		else
+			err = E_FAIL;
+		if (ei.bstrDescription)
+			::WideCharToMultiByte(CP_ACP, 0, ei.bstrDescription, -1, desc, sizeof(desc) - 1, NULL, NULL);
+		::SysFreeString(ei.bstrSource);
+		::SysFreeString(ei.bstrDescription);
+		::SysFreeString(ei.bstrHelpFile);
+		return S_OK;
+	}
+};
+
+static int CheckVBScript(VbsDiag* d)
+{
+	memset(d, 0, sizeof(*d));
+	HRESULT hrInit = ::CoInitializeEx(NULL, COINIT_APARTMENTTHREADED);
+	int state = VBS_OFF;
+
+	CLSID clsid;
+	IActiveScript* as = NULL;
+	d->engineHr = ::CLSIDFromProgID(L"VBScript", &clsid);
+	if (SUCCEEDED(d->engineHr))
+		d->engineHr = ::CoCreateInstance(clsid, NULL, CLSCTX_INPROC_SERVER, IID_IActiveScript, (void**)&as);
+
+	if (SUCCEEDED(d->engineHr) && as)
+	{
+		// get path while DLL is still loaded (CoUninitialize unloads it)
+		HMODULE hv = ::GetModuleHandleA("vbscript.dll");
+		if (hv) ::GetModuleFileNameA(hv, d->path, MAX_PATH);
+
+		CVbsTestSite site;
+		IActiveScriptParse* asp = NULL;
+		HRESULT hr = as->QueryInterface(IID_IActiveScriptParse, (void**)&asp);
+		if (SUCCEEDED(hr)) hr = as->SetScriptSite(&site);
+		if (SUCCEEDED(hr)) hr = asp->InitNew();
+		if (SUCCEEDED(hr)) hr = asp->ParseScriptText(kVbsTest, NULL, NULL, NULL, 0, 0, 0, NULL, NULL);
+		if (SUCCEEDED(hr)) hr = as->SetScriptState(SCRIPTSTATE_STARTED);	// runs global code
+
+		d->scriptErr = (site.err != S_OK) ? site.err : (FAILED(hr) ? hr : S_OK);
+		d->scriptLine = (site.err != S_OK) ? site.line + 1 : 0;
+		strcpy_s(d->desc, site.desc);
+
+		as->Close();			// engine drops site reference before site leaves scope
+		if (asp) asp->Release();
+		as->Release();
+		state = (d->scriptErr == S_OK) ? VBS_OK : VBS_BROKEN;
+	}
+
 	if (SUCCEEDED(hrInit))
 		::CoUninitialize();
-	return ok;
+	return state;
+}
+
+static const char* VbsStateName(int s)
+{
+	return (s == VBS_OK) ? "OK" : ((s == VBS_OFF) ? "OFF" : "BROKEN");
 }
 
 
@@ -499,25 +590,213 @@ static long EnableVBScript(DWORD* launchErr)
 	return (long)code;
 }
 
+// Run elevated (UAC), hidden, and wait up to timeoutMs.
+// Returns exit code, -1 if not launched / not finished (launchErr has the reason)
+static long RunElevatedWait(const char* exe, const char* params, DWORD timeoutMs, DWORD* launchErr)
+{
+	SHELLEXECUTEINFOA sei = { sizeof(sei) };
+	sei.fMask = SEE_MASK_NOCLOSEPROCESS;
+	sei.lpVerb = "runas";
+	sei.lpFile = exe;
+	sei.lpParameters = params;
+	sei.nShow = SW_HIDE;
+
+	*launchErr = 0;
+	if (!::ShellExecuteExA(&sei) || sei.hProcess == NULL)
+	{
+		*launchErr = ::GetLastError();
+		return -1;
+	}
+
+	DWORD code = (DWORD)-1;
+	if (::WaitForSingleObject(sei.hProcess, timeoutMs) == WAIT_OBJECT_0)
+		::GetExitCodeProcess(sei.hProcess, &code);
+	else
+		*launchErr = WAIT_TIMEOUT;
+	::CloseHandle(sei.hProcess);
+	return (long)code;
+}
+
+// Remove then add VBScript capability with one UAC prompt (2026-11-20 field fix: remove -> add -> reboot).
+// Elevated process is created by the 64-bit AppInfo service, so System32\cmd.exe is the 64-bit cmd
+// and plain "dism" resolves to the 64-bit DISM.
+// '&' not '&&': add must run even if remove returns 3010. Exit code is that of add.
+static long ReinstallVBScript(DWORD* launchErr)
+{
+	char cmd[MAX_PATH] = { 0 };
+	::GetWindowsDirectoryA(cmd, MAX_PATH);
+	strcat_s(cmd, "\\System32\\cmd.exe");
+	return RunElevatedWait(cmd,
+		"/c dism /Online /Remove-Capability /CapabilityName:VBSCRIPT~~~~ /NoRestart"
+		" & dism /Online /Add-Capability /CapabilityName:VBSCRIPT~~~~ /NoRestart",
+		30 * 60 * 1000, launchErr);
+}
+
+// Delete per-user COM overrides of the VBScript engine / RegExp (HKCU wins over HKLM).
+// HKCU\Software\Classes\CLSID is WOW64-redirected; this 32-bit process sees the same view as HTS.
+// Returns number of keys deleted. No UAC needed.
+static int ClearVBScriptUserOverride(CAxisAgentDlg* dlg)
+{
+	static const char* kKeys[] = {
+		"Software\\Classes\\CLSID\\{3F4DACA4-160D-11D2-A8E9-00104B365C9F}",	// RegExp
+		"Software\\Classes\\CLSID\\{B54F3741-5B07-11CF-A4B0-00AA004A55E8}",	// VBScript engine
+		"Software\\Classes\\VBScript.RegExp",
+		"Software\\Classes\\VBScript",
+	};
+	char msg[256];
+	int n = 0;
+	for (const char* key : kKeys)
+	{
+		if (::RegDeleteTreeA(HKEY_CURRENT_USER, key) == ERROR_SUCCESS)
+		{
+			sprintf_s(msg, "[VBS] HKCU override deleted: %s\n", key);
+			dlg->WriteLog(msg);
+			n++;
+		}
+	}
+	return n;
+}
+
+// True if VBScript is installed as an optional feature (FOD, Win11 24H2+).
+// Only then DISM can remove/add it; on older Windows vbscript.dll is part of the OS image.
+static bool IsVBScriptFod()
+{
+	char pattern[MAX_PATH] = { 0 };
+	::GetWindowsDirectoryA(pattern, MAX_PATH);
+	strcat_s(pattern, "\\servicing\\Packages\\*VBSCRIPT*.mum");
+	WIN32_FIND_DATAA fd;
+	HANDLE h = ::FindFirstFileA(pattern, &fd);
+	if (h == INVALID_HANDLE_VALUE)
+		return false;
+	::FindClose(h);
+	return true;
+}
+
+// MessageBox has no position option and defaults to screen center, which overlaps
+// the HTS login window. Move it to the top-left of the work area via a thread-local CBT hook.
+static thread_local HHOOK t_msgBoxHook = NULL;
+
+static LRESULT CALLBACK TopLeftMsgBoxProc(int code, WPARAM wParam, LPARAM lParam)
+{
+	if (code == HCBT_ACTIVATE)
+	{
+		RECT wa = { 0 };
+		::SystemParametersInfoA(SPI_GETWORKAREA, 0, &wa, 0);
+		::SetWindowPos((HWND)wParam, NULL, wa.left + 20, wa.top + 20, 0, 0,
+			SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE);
+		::UnhookWindowsHookEx(t_msgBoxHook);	// one-shot
+		t_msgBoxHook = NULL;
+		return 0;
+	}
+	return ::CallNextHookEx(t_msgBoxHook, code, wParam, lParam);
+}
+
+static int TopLeftMessageBox(HWND owner, LPCSTR text, LPCSTR caption, UINT type)
+{
+	t_msgBoxHook = ::SetWindowsHookExA(WH_CBT, TopLeftMsgBoxProc, NULL, ::GetCurrentThreadId());
+	int r = ::MessageBoxA(owner, text, caption, type);
+	if (t_msgBoxHook)	// box never activated
+	{
+		::UnhookWindowsHookEx(t_msgBoxHook);
+		t_msgBoxHook = NULL;
+	}
+	return r;
+}
+
 static void RunVBScriptCheck(CAxisAgentDlg* dlg, bool manual)
 {
-	char msg[256] = { 0 };
+	char msg[512] = { 0 };
 
-	char vpath[MAX_PATH] = { 0 };
-	if (IsVBScriptAvailable(vpath, MAX_PATH))
+	VbsDiag d;
+	int state = CheckVBScript(&d);
+	sprintf_s(msg, "[VBS] state=%s engine=0x%08lx script=0x%08lx line=%lu desc=[%s] path=%s\n",
+		VbsStateName(state), (DWORD)d.engineHr, (DWORD)d.scriptErr, d.scriptLine, d.desc, d.path);
+	dlg->WriteLog(msg);
+
+	if (state == VBS_OK)
 	{
-		sprintf_s(msg, "-------------------------[VBS] VBScript 사용 가능 path=%s\n", vpath);
+		sprintf_s(msg, "-------------------------[VBS] VBScript 사용 가능 path=%s\n", d.path);
 		dlg->AddLog("MONITOR", msg);
 		if (manual)
 		{
-			sprintf_s(msg, "VBScript 기능이 정상적으로 켜져 있습니다.\n\n%s", vpath);
-			::MessageBoxA(NULL, msg, "HTS", MB_OK | MB_ICONINFORMATION | MB_TOPMOST);
+			sprintf_s(msg, "VBScript 기능이 정상적으로 켜져 있습니다.\n\n%s", d.path);
+			TopLeftMessageBox(NULL, msg, "HTS", MB_OK | MB_ICONINFORMATION | MB_TOPMOST);
 		}
 		return;
 	}
+
+	if (state == VBS_BROKEN)
+	{
+		dlg->AddLog("MONITOR", msg);
+
+		// step 1: per-user override (no UAC)
+		if (ClearVBScriptUserOverride(dlg) > 0 && CheckVBScript(&d) == VBS_OK)
+		{
+			dlg->WriteLog("[VBS] HKCU override removed - state=OK\n");
+			TopLeftMessageBox(NULL, "VBScript 설정을 복구했습니다. HTS를 다시 실행해 주십시오.",
+				"HTS", MB_OK | MB_ICONINFORMATION | MB_TOPMOST);
+			return;
+		}
+
+		// not an optional feature (Win10 etc.): DISM cannot reinstall it, guide only
+		if (!IsVBScriptFod())
+		{
+			dlg->WriteLog("[VBS] VBSCRIPT FOD package not found - reinstall not supported, guide only\n");
+			sprintf_s(msg,
+				"HTS 화면 동작에 필요한 Windows 구성요소(VBScript)가\n"
+				"손상되어 일부 화면이 정상 동작하지 않을 수 있습니다.\n"
+				"(code=0x%08lx, line=%lu)\n\n"
+				"이 Windows 버전에서는 자동 복구를 지원하지 않습니다.\n"
+				"Windows 업데이트를 진행하신 뒤에도 같은 증상이 계속되면\n"
+				"고객센터로 문의해 주십시오.",
+				(DWORD)d.scriptErr, d.scriptLine);
+			TopLeftMessageBox(NULL, msg, "HTS", MB_OK | MB_ICONWARNING | MB_TOPMOST);
+			return;
+		}
+
+		// step 2: reinstall feature (UAC)
+		sprintf_s(msg,
+			"HTS 화면 동작에 필요한 Windows 기능(VBScript)이 손상되어\n"
+			"일부 화면이 정상 동작하지 않을 수 있습니다. (code=0x%08lx, line=%lu)\n\n"
+			"지금 복구하시겠습니까?\n"
+			"(관리자 권한 확인 창이 표시되며, 수 분이 걸릴 수 있습니다)",
+			(DWORD)d.scriptErr, d.scriptLine);
+		if (TopLeftMessageBox(NULL, msg, "HTS", MB_YESNO | MB_ICONWARNING | MB_TOPMOST) != IDYES)
+		{
+			dlg->WriteLog("[VBS] 사용자가 복구 거부\n");
+			return;
+		}
+
+		dlg->AddLog("MONITOR", "[VBS] VBScript 기능 재설치 중...");
+		DWORD err = 0;
+		long code = ReinstallVBScript(&err);
+		int after = CheckVBScript(&d);		// may stay BROKEN until reboot
+		sprintf_s(msg, "[VBS] reinstall exit=%ld(0x%08lx) err=%lu state=%s script=0x%08lx\n",
+			code, (DWORD)code, err, VbsStateName(after), (DWORD)d.scriptErr);
+		dlg->WriteLog(msg);
+		dlg->AddLog("MONITOR", msg);
+
+		if (code == 0 || code == 3010)
+		{
+			TopLeftMessageBox(NULL,
+				"VBScript 기능을 다시 설치했습니다.\nPC를 다시 시작한 뒤 HTS를 사용해 주십시오.",
+				"HTS", MB_OK | MB_ICONINFORMATION | MB_TOPMOST);
+		}
+		else if (err != ERROR_CANCELLED)
+		{
+			sprintf_s(msg,
+				"VBScript 기능을 다시 설치하지 못했습니다. (code=0x%08lx)\n\n"
+				"설정 > 시스템 > 선택적 기능 에서 VBSCRIPT 를 제거한 뒤\n"
+				"다시 추가하고 PC를 다시 시작해 주십시오.", (DWORD)code);
+			TopLeftMessageBox(NULL, msg, "HTS", MB_OK | MB_ICONERROR | MB_TOPMOST);
+		}
+		return;
+	}
+
+
 	dlg->WriteLog("[VBS] VBScript 꺼짐 - 사용자 확인 요청\n");
 
-	int ans = ::MessageBoxA(NULL,
+	int ans = TopLeftMessageBox(NULL,
 		"HTS 화면 동작에 필요한 Windows 기능(VBScript)이 꺼져 있습니다.\n"
 		"지금 켜시겠습니까? (관리자 권한 확인 창이 표시됩니다)",
 		"HTS", MB_YESNO | MB_ICONWARNING | MB_TOPMOST);
@@ -529,13 +808,13 @@ static void RunVBScriptCheck(CAxisAgentDlg* dlg, bool manual)
 
 	DWORD err = 0;
 	long code = EnableVBScript(&err);
-	bool now = IsVBScriptAvailable();
+	bool now = (CheckVBScript(&d) == VBS_OK);
 	sprintf_s(msg, "[VBS] DISM exit=%ld(0x%08lx) err=%lu available=%d\n", code, (DWORD)code, err, now ? 1 : 0);
 	dlg->WriteLog(msg);
 
 	if (code == 0 || code == 3010)
 	{
-		::MessageBoxA(NULL,
+		TopLeftMessageBox(NULL,
 			(code == 3010) ? "VBScript 기능을 켰습니다. PC를 다시 시작한 뒤 HTS를 사용해 주십시오."
 			: "VBScript 기능을 켰습니다. HTS를 다시 실행해 주십시오.",
 			"HTS", MB_OK | MB_ICONINFORMATION | MB_TOPMOST);
@@ -546,9 +825,10 @@ static void RunVBScriptCheck(CAxisAgentDlg* dlg, bool manual)
 			"VBScript 기능을 켜지 못했습니다. (code=0x%08lx)\n\n"
 			"설정 > 시스템 > 선택적 기능 > 기능 보기 에서\n"
 			"VBSCRIPT 를 추가해 주십시오.", (DWORD)code);
-		::MessageBoxA(NULL, msg, "HTS", MB_OK | MB_ICONERROR | MB_TOPMOST);
+		TopLeftMessageBox(NULL, msg, "HTS", MB_OK | MB_ICONERROR | MB_TOPMOST);
 	}
 }
+
 
 // Only one check at a time (startup check and button click may overlap)
 static volatile LONG s_vbsCheckRunning = 0;
@@ -618,6 +898,17 @@ BOOL CAxisAgentDlg::OnInitDialog()
 	}
 #endif
 	ParseCommandLine();
+
+	// Always place at top-left of work area, ignoring /x /y (HTS main frame position,
+	// which overlaps the login window). Done here so that the hidden window, tray "show"
+	// and OnTrayShow all appear top-left instead of the dialog's default center.
+	{
+		RECT wa = { 0 };
+		::SystemParametersInfoA(SPI_GETWORKAREA, 0, &wa, 0);
+		m_startX = wa.left;
+		m_startY = wa.top;
+		SetWindowPos(NULL, m_startX, m_startY, 0, 0, SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE);
+	}
 
 	// 저장된 심볼경로 로드
 	{

@@ -143,7 +143,7 @@ DISM /Online /Add-Capability /CapabilityName:VBSCRIPT~~~~
 
 | 에러 | 의미 |
 |---|---|
-| 클래스가 정의되지 않았습니다: 'RegExp' (800A01FA) | RegExp 생성 실패 (이번 사례의 첫 에러로 추정) |
+| 정의되지 않은 클래스입니다.: 'RegExp' (800A01FA) | RegExp 생성 실패 (이번 사례의 첫 에러로 추정) |
 | ActiveX 구성 요소는 개체를 만들 수 없습니다 (800A01AD) | `CreateObject("VBScript.RegExp")` 생성 실패 |
 | 개체가 필요합니다: 're1' (800A01A8) | 앞선 전역 코드 실패의 **결과**. 원인 아님 |
 | Null을 잘못 사용했습니다 (800A005E) / 형식이 일치하지 않습니다 (800A000D) | RegExp는 정상. `Replace`에 넘긴 데이터 문제 |
@@ -197,7 +197,11 @@ DISM /Online /Add-Capability /CapabilityName:VBSCRIPT~~~~
 - [ ] 회사 보고: 2단계 일정, 증상, 단기·장기 대응 (계기: MS 발표 일정 대응)
 - [ ] 아이티젠 제안서에서 맵 스크립트(VBScript) 처리 방안 확인
 - [ ] 직접 로드 대안의 법무·보안 확인 여부 결정
-- [ ] AxisAgent 검사에 RegExp 생성 확인 추가 (엔진만 보면 6.1 사례를 놓침)
+- [x] AxisAgent 검사에 RegExp 생성 확인 추가 (2026-11-20, `CheckVBScript` OK/OFF/BROKEN; 테스트 스크립트를 AxisAgent 안에서 실행. 정상 PC `state=OK`, `New RegExp1` 강제 실패로 `state=BROKEN script=0x800a01fa line=1` 및 안내창 확인. 로그는 `<exe>\ping\pinglog_YYYYMMDD.txt`, 32비트라 path는 System32로 표시되지만 실제는 SysWOW64)
+- [x] AxisAgent ② BROKEN 복구 (2026-11-20): HKCU 가로채기 키 삭제(UAC 없음) → 재검사 → FOD 패키지(`%WINDIR%\servicing\Packages\*VBSCRIPT*.mum`)가 있으면 확인 후 UAC 1회로 `cmd /c dism Remove & dism Add`, 재부팅 안내. FOD가 아니면(Win10 등) 안내만. Win10에서 실행 경로 확인(`err=0`, DISM `exit=87` = 64비트 DISM까지 실행됨)
+- [ ] ② Win11 24H2 PC에서 실측: FOD 패키지 파일명 패턴 일치 여부, 제거·추가 성공, WU 접근 불가 PC에서 추가 실패 시 OFF로 남는 위험
+- [ ] 기존 OFF 경로 `EnableVBScript`의 `runas` + `Sysnative\dism.exe` 실행 가능 여부 확인 (관리자 권한 프로세스는 64비트 AppInfo가 생성하므로 Sysnative가 없을 수 있음. 실패 시 `ReinstallVBScript`처럼 `System32\cmd.exe /c dism`으로 변경)
+- [ ] AxisAgent ③ 진단 정보 수집, ④ HTS 연동 감지
 - [ ] `RegExpRepair.bat` 4단계를 Win11 24H2 PC에서 실측 (기능 이름 파싱, 제거와 추가 사이 재부팅 필요 여부)
 
 ## 9. 변경 이력
